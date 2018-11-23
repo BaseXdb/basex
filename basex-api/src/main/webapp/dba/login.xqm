@@ -7,6 +7,7 @@ module namespace dba = 'dba/login';
 
 import module namespace session = 'dba/session' at 'modules/session.xqm';
 import module namespace html = 'dba/html' at 'modules/html.xqm';
+import module namespace Request = 'http://exquery.org/ns/request';
 
 (:~
  : Permissions: checks the user credentials.
@@ -25,7 +26,7 @@ function dba:check(
   let $target := if(ends-with($path, '/dba')) then 'dba/login' else 'login'
   (: last visited page to redirect to (if there was one) :)
   let $page := replace($path, '^.*dba/?', '')[.]
-  return web:redirect($target, map { 'page': $page })
+  return web:redirect($target, dba:params(map { '_page': $page }))
 };
 
 (:~
@@ -37,9 +38,9 @@ function dba:check(
  :)
 declare
   %rest:path("/dba/login")
-  %rest:query-param("name",  "{$name}")
-  %rest:query-param("error", "{$error}")
-  %rest:query-param("page",  "{$page}")
+  %rest:query-param("_name",  "{$name}")
+  %rest:query-param("_error", "{$error}")
+  %rest:query-param("_page",  "{$page}")
   %output:method("html")
   %perm:allow("all")
 function dba:welcome(
@@ -51,22 +52,26 @@ function dba:welcome(
     <tr>
       <td>
         <form action="login-check" method="post">
-          <input type="hidden" name="page" value="{ $page }"/>
+          <input name="_page" value="{ $page }" type="hidden"/>
+          {
+            for $param in Request:parameter-names()[not(starts-with(., '_'))]
+            return <input name="{ $param }" value="{ Request:parameter($param) }" type="hidden"/>
+          }
           <div class='small'/>
           <table>
             <tr>
               <td><b>Name:</b></td>
               <td>
-                <input size="30" name="name" value="{ $name }" id="user"/>
+                <input name="_name" value="{ $name }" id="user" size="30"/>
                 { html:focus('user') }
               </td>
             </tr>
             <tr>
               <td><b>Password:</b></td>
               <td>{
-                <input size="30" type="password" name="pass"/>,
+                <input name="_pass" type="password" size="30"/>,
                 ' ',
-                html:button('login', 'Login')
+                <input type="submit" value="Login"/>
               }</td>
             </tr>
           </table>
@@ -84,10 +89,11 @@ function dba:welcome(
  : @return redirection
  :)
 declare
+  %rest:POST
   %rest:path("/dba/login-check")
-  %rest:query-param("name", "{$name}")
-  %rest:query-param("pass", "{$pass}")
-  %rest:query-param("page", "{$page}")
+  %rest:query-param("_name", "{$name}")
+  %rest:query-param("_pass", "{$pass}")
+  %rest:query-param("_page", "{$page}")
   %perm:allow("all")
 function dba:login(
   $name  as xs:string,
@@ -116,7 +122,7 @@ function dba:logout(
 ) as element(rest:response) {
   (: write log entry, redirect to login page :)
   admin:write-log('DBA user was logged out: ' || $session:VALUE),
-  web:redirect("/dba/login", map { 'name': $session:VALUE }),
+  web:redirect("/dba/login", map { '_name': $session:VALUE }),
   (: closes the DBA session :)
   session:close()
 };
@@ -136,14 +142,14 @@ declare %private function dba:accept(
   admin:write-log('DBA user was logged in: ' || $name),
 
   (: redirect to supplied page or main page :)
-  web:redirect(if($page) then $page else 'logs')
+  web:redirect(if($page) then $page else 'logs', dba:params(map { }))
 };
 
 (:~
  : Rejects a user and redirects to the login page.
  : @param  $name     entered user name
  : @param  $message  error message
- : @param  $page     path to redirect to (optional)
+ : @param  $page     page to redirect to (optional)
  : @return redirection
  :)
 declare %private function dba:reject(
@@ -153,5 +159,23 @@ declare %private function dba:reject(
 ) as element(rest:response) {
   (: write log entry, redirect to login page :)
   admin:write-log('DBA login was denied: ' || $name),
-  web:redirect("login", map { 'name': $name, 'error': $message, 'page': $page })
+  web:redirect(
+    "login",
+    dba:params(map { '_name': $name, '_error': $message, '_page': $page })
+  )
+};
+
+(:~
+ : Crerates a map with all current query parameters.
+ : @param  $map  additional parameters
+ : @return map
+ :)
+declare %private function dba:params(
+  $map  as map(*)
+) as map(*) {
+  map:merge((
+    $map,
+    for $param in Request:parameter-names()[not(starts-with(., '_'))]
+    return map { $param: Request:parameter($param) }
+  ))
 };
