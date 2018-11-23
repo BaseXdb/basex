@@ -277,11 +277,14 @@ public final class FilterTest extends AdvancedQueryTest {
         "<a b=\"1\"/>\n<a b=\"a\"/>");
   }
 
-  /** Start position. */
-  @Test public void startPos() {
+  /** Positional access, rewritings. */
+  @Test public void posAccess() {
     query("(<a/>,<b/>)[position() > 1]", "<b/>");
     query("(<a/>,<b/>,<c/>)[position() > 2]", "<c/>");
     query("(<a/>,<b/>,<c/>)[position() = 2 to 3]", "<b/>\n<c/>");
+
+    query("count((1 to 100000000)[position() != 1])", 99999999);
+    query("count((1 to 100000000)[position() != 0])", 100000000);
   }
 
   /** Start position. */

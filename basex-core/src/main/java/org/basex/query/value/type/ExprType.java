@@ -99,10 +99,11 @@ public final class ExprType {
   }
 
   /**
-   * Assigns the specified type, and result size or occurrence indicator.
+   * Assigns the specified type and result size. The occurrence indicator is ignored if the exact
+   * result size is available.
    * @param type type
-   * @param sz result size. If {@code -1}, the occurrence indicator will be assigned.
    * @param occ occurrence indicator
+   * @param sz exact result size ({@code -1} if unknown)
    */
   public void assign(final Type type, final Occ occ, final long sz) {
     if(sz >= 0) {

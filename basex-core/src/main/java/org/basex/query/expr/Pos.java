@@ -33,26 +33,25 @@ public final class Pos extends Arr {
   /**
    * Tries to rewrite {@code fn:position() CMP number(s)} to this expression.
    * Returns an instance of this class, the original expression, or an optimized expression.
-   * @param cmp comparison expression
+   * @param cmp2 position to be compared
    * @param op comparator
    * @param info input info
    * @param cc compilation context
-   * @return resulting or original expression
+   * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
-  public static Expr get(final Cmp cmp, final OpV op, final InputInfo info,
+  public static Expr get(final Expr cmp2, final OpV op, final InputInfo info,
       final CompileContext cc) throws QueryException {
 
-    final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
-    if(!Function.POSITION.is(cmp1)) return cmp;
-
     Expr min = null, max = null;
-    final SeqType st1 = cmp1.seqType(), st2 = cmp2.seqType();
+    final SeqType st2 = cmp2.seqType();
+
+    // rewrite only simple expressions that may be simplified even further later on
     if(cmp2.isSimple()) {
       if(cmp2 instanceof Range && op == OpV.EQ) {
         final Range range = (Range) cmp2;
         final Expr start = range.exprs[0], end = range.exprs[1];
-        if(st1.type.instanceOf(AtomType.ITR) && st2.type.instanceOf(AtomType.ITR)) {
+        if(st2.type.instanceOf(AtomType.ITR)) {
           min = start;
           max = start.equals(end) ? start : end;
         }
@@ -84,21 +83,20 @@ public final class Pos extends Arr {
         }
       }
     }
-    return min == null ? cmp : new Pos(info, min, max);
+    return min != null ? new Pos(info, min, max) : null;
   }
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     ctxValue(qc);
 
-    final Expr[] ex = exprs;
-    final Item item1 = ex[0].atomItem(qc, info);
+    final Item item1 = exprs[0].atomItem(qc, info);
     if(item1 == null) return Bln.FALSE;
     final long pos = qc.focus.pos;
     final double start = toDouble(item1);
-    if(ex[0] == ex[1]) return Bln.get(pos == start);
+    if(eq()) return Bln.get(pos == start);
 
-    final Item item2 = ex[1].atomItem(qc, info);
+    final Item item2 = exprs[1].atomItem(qc, info);
     if(item2 == null) return Bln.FALSE;
     final double end = toDouble(item2);
     return Bln.get(pos >= start && pos <= end);
@@ -117,12 +115,21 @@ public final class Pos extends Arr {
    */
   Expr intersect(final Pos pos, final InputInfo ii) {
     final Expr[] r1 = exprs, r2 = pos.exprs;
-    if(r1[0] != r1[1] && r2[0] != r2[1]) {
+    if(!eq() && !pos.eq()) {
       final Expr min = r1[0] == Int.ONE ? r2[0] : r2[0] == Int.ONE ? r1[0] : null;
       final Expr max = r1[1] == Int.MAX ? r2[1] : r2[1] == Int.MAX ? r1[1] : null;
       if(min != null && max != null) return new Pos(ii, min, max);
     }
     return null;
+  }
+
+  /**
+   * Checks if minimum and maximum expressions are identical.
+   * @return result of check
+   */
+  public boolean eq() {
+    final Expr[] ex = exprs;
+    return ex[0] == ex[1];
   }
 
   @Override
@@ -136,21 +143,20 @@ public final class Pos extends Arr {
   }
 
   @Override
-  public String description() {
-    return "positional access";
-  }
-
-  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(), exprs);
   }
 
   @Override
+  public String description() {
+    return "positional access";
+  }
+
+  @Override
   public String toString() {
-    final Expr[] ex = exprs;
     final StringBuilder sb = new StringBuilder();
-    sb.append(PAREN1).append(Function.POSITION).append(" = ").append(ex[0]);
-    if(ex[0] != ex[1]) sb.append(' ' + TO + ' ').append(ex[1]);
-    return sb.append(PAREN2).toString();
+    sb.append(Function.POSITION).append(" = ").append(exprs[0]);
+    if(!eq()) sb.append(' ' + TO + ' ').append(exprs[1]);
+    return sb.toString();
   }
 }

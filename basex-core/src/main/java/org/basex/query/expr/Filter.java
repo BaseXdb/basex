@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.expr.path.Axis.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -100,12 +101,12 @@ public abstract class Filter extends Preds {
     // no numeric predicates..
     if(!positional()) {
       // rewrite filter with document nodes to path; enables index rewritings
-      // example: db:open('db')[.//text() = 'x']  ->  db:open('db')/.[.//text() = 'x']
+      // example: db:open('db')[.//text() = 'x'] -> db:open('db')/.[.//text() = 'x']
       if(root instanceof Value && root.data() != null && root.seqType().type == NodeType.DOC)
         return Path.get(info, root, Step.get(info, SELF, KindTest.NOD, exprs)).optimize(cc);
 
       // rewrite independent deterministic single filter to if expression:
-      // example: (1 to 10)[$boolean]  ->  if($boolean) then (1 to 10) else ()
+      // example: (1 to 10)[$boolean] -> if($boolean) then (1 to 10) else ()
       final Expr expr = exprs[0];
       if(exprs.length == 1 && expr.isSimple() && !expr.seqType().mayBeNumber())
         return new If(info, expr, root, Empty.SEQ).optimize(cc);
@@ -124,8 +125,8 @@ public abstract class Filter extends Preds {
           // value: replace with last item
           exp = ((Value) rt).itemAt(rt.size() - 1);
         } else {
-          // rewrite positional predicate to util:last-from
-          exp = cc.function(Function._UTIL_LAST_FROM, info, rt);
+          // rewrite positional predicate to util:last
+          exp = cc.function(Function._UTIL_LAST, info, rt);
         }
       } else if(pred instanceof ItrPos) {
         final ItrPos pos = (ItrPos) pred;
@@ -134,29 +135,42 @@ public abstract class Filter extends Preds {
           final long size = pos.min - 1, len = Math.min(pos.max, rt.size()) - size;
           exp = len <= 0 ? Empty.SEQ : ((Value) rt).subSequence(size, len, cc.qc);
         } else if(pos.min == pos.max) {
-          // example: expr[pos] -> head(); expr[pos] -> util:item-at(expr, pos.min)
-          exp = pos.min == 1 ? cc.function(Function.HEAD, info, rt) :
-            cc.function(Function._UTIL_ITEM_AT, info, rt, Int.get(pos.min));
+          // expr[pos] -> util:item(expr, pos)
+          exp = cc.function(Function._UTIL_ITEM, info, rt, Int.get(pos.min));
         } else {
-          // example: expr[pos] -> util:item-range(expr, pos.min, pos.max)
-          exp = cc.function(Function._UTIL_ITEM_RANGE, info, rt, Int.get(pos.min),
-              Int.get(pos.max));
+          // expr[min..max] -> util:range(expr, min, max)
+          exp = cc.function(Function._UTIL_RANGE, info, rt, Int.get(pos.min), Int.get(pos.max));
         }
       } else if(pred instanceof Pos) {
         final Pos pos = (Pos) pred;
-        if(pos.exprs[0] == pos.exprs[1]) {
-          // example: expr[pos] -> util:item-at(expr, pos.min)
-          exp = cc.function(Function._UTIL_ITEM_AT, info, rt, pos.exprs[0]);
+        if(pos.eq()) {
+          // expr[pos] -> util:item(expr, pos.min)
+          exp = cc.function(Function._UTIL_ITEM, info, rt, pos.exprs[0]);
         } else {
-          // example: expr[pos] -> util:item-range(expr, pos.min, pos.max)
-          exp = cc.function(Function._UTIL_ITEM_RANGE, info, rt, pos.exprs[0], pos.exprs[1]);
+          // expr[min..max] -> util:range(expr, pos.min, pos.max)
+          exp = cc.function(Function._UTIL_RANGE, info, rt, pos.exprs[0], pos.exprs[1]);
         }
       } else if(numeric(pred)) {
-        /* - rewrite positional predicate to util:item-at
-         *   example: expr[pos] -> util:item-at(expr, pos)
+        /* - rewrite positional predicate to util:item
+         *   expr[pos] -> util:item(expr, pos)
          * - only choose deterministic and context-independent offsets
          *   illegal examples: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
-        exp = cc.function(Function._UTIL_ITEM_AT, info, rt, pred);
+        exp = cc.function(Function._UTIL_ITEM, info, rt, pred);
+      } else if(pred instanceof Cmp) {
+        // rewrite positional predicate to fn:remove
+        final Cmp cmp = (Cmp) pred;
+        final OpV opV = cmp.opV();
+        if(cmp.positional() && opV != null) {
+          final Expr ex = cmp.exprs[1];
+          if(opV == OpV.LT || opV == OpV.NE && Function.LAST.is(ex)) {
+            // expr[position() < last()] -> util:init(expr)
+            exp = cc.function(Function._UTIL_INIT, info, rt);
+          } else if(opV == OpV.NE && ex instanceof Item) {
+            // expr[position() != INT] -> remove(expr, INT)
+            final long p = ((Item) ex).itr(info);
+            if(p == ((Item) ex).dbl(info)) exp = cc.function(Function.REMOVE, info, rt, ex);
+          }
+        }
       }
 
       if(exp != null) {

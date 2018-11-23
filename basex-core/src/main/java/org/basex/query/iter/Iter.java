@@ -22,7 +22,7 @@ public abstract class Iter {
   /**
    * Returns the specified item, or an arbitrary item if the index is invalid.
    * If this method returns items, {@link #size()} needs to be implemented as well.
-   * @param i value offset
+   * @param i value offset (starting with 0)
    * @return specified item or {@code null}
    * @throws QueryException query exception
    */

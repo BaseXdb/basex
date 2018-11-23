@@ -21,11 +21,12 @@ public final class FnBoolean extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
+    // e.g.: boolean(exists(<a/>)) -> boolean(<a/>)
     final Expr expr = exprs[0].optimizeEbv(cc);
 
     // boolean($node/text()) -> exists($node/text())
     final SeqType st = expr.seqType();
-    if(st.type instanceof NodeType) return cc.function(Function.EXISTS, info, exprs);
+    if(st.type instanceof NodeType) return cc.function(Function.EXISTS, info, expr);
 
     // simplify, e.g.: boolean(true())) -> true()
     if(st.eq(SeqType.BLN_O)) return expr;

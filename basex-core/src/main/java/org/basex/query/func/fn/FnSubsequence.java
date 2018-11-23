@@ -17,50 +17,45 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 public class FnSubsequence extends StandardFunc {
-  /** Return all values. */
-  private static final long[] ALL = {};
+  /** All values. */
+  private static final SeqRange ALL = new SeqRange(0, Long.MAX_VALUE);
+  /** No values. */
+  private static final SeqRange EMPTY = new SeqRange(0, 0);
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     // no range: return empty sequence
-    final long[] range = range(qc);
-    if(range == null) return Empty.ITER;
+    final SeqRange sr = range(qc);
+    if(sr == EMPTY) return Empty.ITER;
 
-    // create iterator
+    // return iterator if all results are returned, of it iterator yields no items
     final Iter iter = exprs[0].iter(qc);
-    if(range == ALL) return iter;
-
-    // return empty iterator if iterator yields 0 items
-    final long sz = iter.size();
-    if(sz == 0) return Empty.ITER;
-
-    // compute start, length
-    final long s = range[0], l = range[1], max = l == Long.MAX_VALUE ? l : s + l;
-    final long start = Math.max(1, s), end = Math.min(max, sz + 1);
+    if(sr == ALL) return iter;
 
     // return subsequence iterator if iterator is value-based
-    final Value value = iter.value();
-    final long size = Math.max(0, end - start);
-    if(value != null) return value.subSequence(start - 1, size, qc).iter();
+    final long size = sr.adjust(iter.size());
+    if(sr.length == 0) return Empty.ITER;
 
-    // return optimized iterator if result size is known
-    if(sz > 0) {
-      if(size == 0) return Empty.ITER;
+    if(size != -1) {
+      final Value value = iter.value();
+      if(value != null) return value.subSequence(sr.start, sr.length, qc).iter();
+
+      if(sr.length == size) return iter;
       return new Iter() {
-        long c = start;
+        long c = sr.start;
 
         @Override
         public Item next() throws QueryException {
           qc.checkStop();
-          return c < end ? iter.get(c++ - 1) : null;
+          return c < sr.end ? iter.get(c++) : null;
         }
         @Override
         public Item get(final long i) throws QueryException {
-          return iter.get(start + i - 1);
+          return iter.get(sr.start + i);
         }
         @Override
         public long size() {
-          return size;
+          return sr.length;
         }
       };
     }
@@ -71,8 +66,8 @@ public class FnSubsequence extends StandardFunc {
 
       @Override
       public Item next() throws QueryException {
-        for(Item item; (item = qc.next(iter)) != null && ++c < max;) {
-          if(c >= start) return item;
+        for(Item item; c < sr.end && (item = qc.next(iter)) != null;) {
+          if(++c > sr.start) return item;
         }
         return null;
       }
@@ -81,69 +76,72 @@ public class FnSubsequence extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final long[] range = range(qc);
-    if(range == null) return Empty.SEQ;
+    final SeqRange sr = range(qc);
+    if(sr == EMPTY) return Empty.SEQ;
+
     final Expr expr = exprs[0];
-    if(range == ALL) return expr.value(qc);
-
-    final long st = range[0], ln = range[1];
+    if(sr == ALL) return expr.value(qc);
     final Iter iter = expr.iter(qc);
-    final long size = iter.size();
-
-    // return subsequence if iterator is value-based
-    final Value value = iter.value();
-    if(value != null) {
-      final long start = Math.max(0, st - 1);
-      final long length = Math.min(size - start, ln + Math.min(0, st - 1));
-      return length <= 0 ? Empty.SEQ : value.subSequence(start, length, qc);
-    }
 
     // take fast route if result size is known
-    if(size >= 0) {
-      final long start = Math.max(0, st - 1);
-      final long length = Math.min(size - start, ln + Math.min(0, st - 1));
-      if(start >= size || length <= 0) return Empty.SEQ;
-      if(start == 0 && length == size) return iter.value(qc);
+    final long size = sr.adjust(iter.size());
+    if(sr.length == 0) return Empty.SEQ;
+
+    if(size != -1) {
+      // return subsequence if iterator is value-based
+      final Value value = iter.value();
+      if(value != null) return value.subSequence(sr.start, sr.length, qc);
+
+      if(sr.length == size) return iter.value(qc);
+
       final ValueBuilder vb = new ValueBuilder(qc);
-      for(long i = 0; i < length; i++) vb.add(iter.get(start + i));
+      for(long i = sr.start; i < sr.end; i++) vb.add(iter.get(i));
       return vb.value();
     }
 
     // otherwise, retrieve all items
-    final long max = ln == Long.MAX_VALUE ? ln : st + ln;
     final ValueBuilder vb = new ValueBuilder(qc);
-    Item item;
-    for(int i = 1; i < max && (item = qc.next(iter)) != null; i++) {
-      if(i >= st) vb.add(item);
+    long c = 0;
+    for(Item item; c < sr.end && (item = qc.next(iter)) != null; c++) {
+      if(c >= sr.start) vb.add(item);
     }
     return vb.value();
   }
 
   /**
    * Returns the start position and length of the requested sub sequence.
-   * @param qc query context
-   * @return range (start and length) or {@code null}
+   * @param cc compilation context
+   * @return range or {@code null}
    * @throws QueryException query exception
    */
-  private long[] range(final QueryContext qc) throws QueryException {
-    final double st = toDouble(exprs[1], qc);
-    if(Double.isNaN(st)) return null;
+  public SeqRange range(final CompileContext cc) throws QueryException {
+    return exprs[1] instanceof Value && (exprs.length < 3 || exprs[2] instanceof Value) ?
+      range(cc.qc) : null;
+  }
 
-    final long start = start(st);
-    final boolean min = start == Long.MIN_VALUE;
-    long length = Long.MAX_VALUE;
+  /**
+   * Returns the start position and length of the requested sub sequence.
+   * @param qc query context
+   * @return range (start, end, length)
+   * @throws QueryException query exception
+   */
+  private SeqRange range(final QueryContext qc) throws QueryException {
+    double d = toDouble(exprs[1], qc);
+    if(Double.isNaN(d)) return EMPTY;
+    long start = start(d);
 
-    final int el = exprs.length;
-    if(el > 2) {
-      final double ln = toDouble(exprs[2], qc);
-      if(Double.isNaN(ln)) return null;
-      if(min && ln == Double.POSITIVE_INFINITY) return null;
-      length = length(ln);
+    long end = Long.MAX_VALUE;
+    if(exprs.length > 2) {
+      d = toDouble(exprs[2], qc);
+      if(Double.isNaN(d) || start == Long.MIN_VALUE && d == Double.POSITIVE_INFINITY) return EMPTY;
+      end = end(start, d);
     }
+    if(end == Long.MAX_VALUE && start <= 1) return ALL;
+    if(start == Long.MIN_VALUE) return EMPTY;
 
     // return all values, no values, or the specified range
-    return min ? length == Long.MAX_VALUE ? ALL : null :
-      new long[] { start, length(start, length) };
+    final SeqRange sr = new SeqRange(Math.max(0, start - 1), end);
+    return sr.length == 0 ? EMPTY : sr;
   }
 
   /**
@@ -156,40 +154,63 @@ public class FnSubsequence extends StandardFunc {
   }
 
   /**
-   * Returns the length.
-   * @param value double value
-   * @return long value
-   */
-  public long length(final double value) {
-    return StrictMath.round(value);
-  }
-
-  /**
    * Computes the count of items to be returned.
-   * @param start start
-   * @param length length
+   * @param first first argument
+   * @param second second argument
    * @return length
    */
-  public long length(@SuppressWarnings("unused") final long start, final long length) {
-    return length;
+  public long end(final long first, final double second) {
+    final long l = StrictMath.round(second);
+    return l == Long.MAX_VALUE ? l : l + first - 1;
   }
 
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
+    // ignore standard limitation for large values
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
     if(st.zero()) return expr;
-    exprType.assign(st.type, st.occ.union(Occ.ZERO));
 
-    if(exprs[1] instanceof Value && (exprs.length < 3 || exprs[2] instanceof Value)) {
-      final long[] range = range(cc.qc);
-      if(range != null) {
-        // all values?
-        if(range == ALL) return expr;
-        // faster retrieval of specified lines
-        return FileReadTextLines.rewrite(this, range[0], range[1], cc, info);
+    long sz = -1;
+    final SeqRange sr = range(cc);
+    if(sr != null) {
+      // no results
+      if(sr == EMPTY) return Empty.SEQ;
+      // all values?
+      if(sr == ALL) return expr;
+      // pre-evaluate value
+      if(expr instanceof Value) return value(cc.qc);
+
+      // check if result size is statically known
+      final long size = sr.adjust(expr.size());
+      if(size != -1) {
+        if(sr.length == size)
+          return expr;
+        // rewrite nested function calls
+        if(sr.start == size - 1)
+          return cc.function(Function._UTIL_LAST, info, expr);
+        if(sr.start == 1 && sr.end == size)
+          return cc.function(Function.TAIL, info, expr);
+        if(sr.start == 0 && sr.end == size - 1)
+          return cc.function(Function._UTIL_INIT, info, expr);
+        sz = sr.length;
+      } else if(st.zeroOrOne()) {
+        // sr.length is always larger than 0 at this point
+        return sr.start == 0 ? expr : Empty.SEQ;
       }
+
+      // rewrite nested function calls
+      if(sr.length == 1) {
+        return sr.start == 0 ? cc.function(Function.HEAD, info, expr) :
+          cc.function(Function._UTIL_ITEM, info, expr, Int.get(sr.start + 1));
+      }
+      if(sr.length == Long.MAX_VALUE && sr.start == 1)
+        return cc.function(Function.TAIL, info, expr);
+      if(Function._FILE_READ_TEXT_LINES.is(expr))
+        return ((FileReadTextLines) expr).opt(sr.start, sr.length, cc);
     }
+
+    exprType.assign(st.type, st.occ.union(Occ.ZERO), sz);
     return this;
   }
 }

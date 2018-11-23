@@ -1,13 +1,12 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
 import org.basex.query.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.fn.*;
-import org.basex.query.func.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -25,29 +24,27 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void abs() {
-    final Function func = Function.ABS;
-    final String name = Util.className(func.clazz);
+    final Function func = ABS;
 
     check(func.args(" ()"), "", empty());
-    check("for $i in 1 to 2 return " + func.args(" $i"), "1\n2", type(name, "xs:integer"));
-    check("for $i in (1,2.0) return " + func.args(" $i"), "1\n2", type(name, "xs:decimal"));
-    check(func.args(" <a>1</a>"), "1", type(name, "xs:double"));
+    check("for $i in 1 to 2 return " + func.args(" $i"), "1\n2", type(func, "xs:integer"));
+    check("for $i in (1,2.0) return " + func.args(" $i"), "1\n2", type(func, "xs:decimal"));
+    check(func.args(" <a>1</a>"), 1, type(func, "xs:double"));
 
-    check("for $i in ([],[]) return " + func.args(" $i"), "", type(name, "xs:numeric?"));
-    check("for $i in (1,<a>2</a>) return " + func.args(" $i"), "1\n2", type(name, "xs:numeric?"));
+    check("for $i in ([],[]) return " + func.args(" $i"), "", type(func, "xs:numeric?"));
+    check("for $i in (1,<a>2</a>) return " + func.args(" $i"), "1\n2", type(func, "xs:numeric?"));
   }
 
   /** Test method. */
   @Test public void analyzeString() {
-    final Function func = Function.ANALYZE_STRING;
+    final Function func = ANALYZE_STRING;
     query(func.args("a", "", "j") + "//fn:non-match/text()", "a");
     error(func.args("a", ""), REGROUP);
   }
 
   /** Test method. */
   @Test public void apply() {
-    final Function func = Function.APPLY;
-    final String name = Util.className(func.clazz);
+    final Function func = APPLY;
 
     query(func.args(" true#0", " []"), true);
     query(func.args(" count#1", " [(1,2,3)]"));
@@ -62,12 +59,12 @@ public final class FnModuleTest extends QueryPlanTest {
     error(func.args(" string-length#1", " [ ('a','b') ]"), INVTYPE_X_X_X);
 
     // no pre-evaluation (higher-order arguments), but type adjustment
-    check(func.args(" true#0", " []"), true, type(name, "xs:boolean"));
-    check(func.args(" count#1", " [1]"), 1, type(name, "xs:integer"));
-    check(func.args(" abs#1", " [1]"), 1, type(name, "xs:numeric?"));
-    check(func.args(" reverse#1", " [()]"), "", type(name, ""));
+    check(func.args(" true#0", " []"), true, type(func, "xs:boolean"));
+    check(func.args(" count#1", " [1]"), 1, type(func, "xs:integer"));
+    check(func.args(" abs#1", " [1]"), 1, type(func, "xs:numeric?"));
+    check(func.args(" reverse#1", " [()]"), "", type(func, ""));
     check("(true#0, 1)[. instance of function(*)] ! " + func.args(" .", " []"), true,
-        type(name, ""));
+        type(func, ""));
 
     // code coverage tests
     query("string-length(" + func.args(" reverse#1", " ['a']") + ")", 1);
@@ -77,38 +74,37 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void avg() {
-    final Function func = Function.AVG;
-    final String name = Util.className(func.clazz);
+    final Function func = AVG;
 
     check(func.args(" ()"), "", empty());
-    check(func.args(" prof:void('x')"), "", empty(func.clazz));
+    check(func.args(" prof:void('x')"), "", empty(func));
 
-    check(func.args(" 1"), 1, empty(func.clazz));
-    check(func.args(" 1.0"), 1, empty(func.clazz));
-    check(func.args(" 1e0"), 1, empty(func.clazz));
-    check(func.args(" xs:float('1')"), 1, empty(func.clazz));
+    check(func.args(" 1"), 1, empty(func));
+    check(func.args(" 1.0"), 1, empty(func));
+    check(func.args(" 1e0"), 1, empty(func));
+    check(func.args(" xs:float('1')"), 1, empty(func));
 
-    check(func.args(" 1[. = 1]"), 1, type(name, "xs:decimal?"));
-    check(func.args(" 1.0[. = 1]"), 1, type(name, "xs:decimal?"));
-    check(func.args(" 1e0[. = 1]"), 1, type(name, "xs:double?"));
-    check(func.args(" xs:float('1')[. = 1]"), 1, type(name, "xs:float?"));
+    check(func.args(" 1[. = 1]"), 1, type(func, "xs:decimal?"));
+    check(func.args(" 1.0[. = 1]"), 1, type(func, "xs:decimal?"));
+    check(func.args(" 1e0[. = 1]"), 1, type(func, "xs:double?"));
+    check(func.args(" xs:float('1')[. = 1]"), 1, type(func, "xs:float?"));
 
-    check(func.args(" (1,3[. = 5])"), 1, type(name, "xs:decimal"));
-    check(func.args(" (1,3.0[. = 5])"), 1, type(name, "xs:decimal"));
-    check(func.args(" (<a>1</a>, <a>3</a>)"), 2, type(name, "xs:double"));
+    check(func.args(" (1,3[. = 5])"), 1, type(func, "xs:decimal"));
+    check(func.args(" (1,3.0[. = 5])"), 1, type(func, "xs:decimal"));
+    check(func.args(" (<a>1</a>, <a>3</a>)"), 2, type(func, "xs:double"));
 
-    check(func.args(" (1 to 3)"), 2, empty(func.clazz));
-    check(func.args(" reverse(1 to 3)"), 2, empty(func.clazz));
-    check(func.args(" (1 to <_>3</_>)"), 2, type(name, "xs:decimal?"));
-    check(func.args(" (1 to <_>0</_>)"), "", type(name, "xs:decimal?"));
-    check(func.args(" (1 to 999999)"), 500000, empty(func.clazz));
-    check(func.args(" (1 to 999999) ! 1"), 1, empty(func.clazz));
+    check(func.args(" (1 to 3)"), 2, empty(func));
+    check(func.args(" reverse(1 to 3)"), 2, empty(func));
+    check(func.args(" (1 to <_>3</_>)"), 2, type(func, "xs:decimal?"));
+    check(func.args(" (1 to <_>0</_>)"), "", type(func, "xs:decimal?"));
+    check(func.args(" (1 to 999999)"), 500000, empty(func));
+    check(func.args(" (1 to 999999) ! 1"), 1, empty(func));
 
-    check(func.args(" (1 to 3) ! 1"), 1, empty(func.clazz));
-    check(func.args(" (1 to 3) ! xs:untypedAtomic(1)"), 1, empty(func.clazz));
+    check(func.args(" (1 to 3) ! 1"), 1, empty(func));
+    check(func.args(" (1 to 3) ! xs:untypedAtomic(1)"), 1, empty(func));
 
-    check(func.args(" util:replicate(1.0, 3)"), 1, empty(func.clazz));
-    check(func.args(" util:replicate(<_>1</_>, 3)"), 1, type(name, "xs:double"));
+    check(func.args(" util:replicate(1.0, 3)"), 1, empty(func));
+    check(func.args(" util:replicate(<_>1</_>, 3)"), 1, type(func, "xs:double"));
 
     error(func.args(" true#0"), FIATOM_X);
     error(func.args(" util:replicate(true#0, 2)"), FIATOM_X);
@@ -117,27 +113,26 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void bool() {
-    final Function func = Function.BOOLEAN;
-    final String name = Util.className(func.clazz);
+    final Function func = BOOLEAN;
 
     // pre-evaluated expressions
-    check(func.args(1), true, empty(name));
-    check(func.args(" ()"), false, empty(name));
+    check(func.args(1), true, empty(func));
+    check(func.args(" ()"), false, empty(func));
 
     // function is replaced with fn:exists
-    check(func.args(" <a/>/self::*"), true, exists(FnExists.class));
+    check(func.args(" <a/>/self::*"), true, exists(EXISTS));
     // function is replaced by its argument (argument yields no result)
-    check("(false(), true())[" + func.args(" .") + "]", true, empty(name));
+    check("(false(), true())[" + func.args(" .") + "]", true, empty(func));
     // no replacement
-    check("(false(), 1)[" + func.args(" .") + "]", 1, exists(name));
+    check("(false(), 1)[" + func.args(" .") + "]", 1, exists(func));
 
     // optimize ebv
-    check("[][. instance of xs:int][" + func.args(" .") + "]", "", empty(FnExists.class));
+    check("[][. instance of xs:int][" + func.args(" .") + "]", "", empty(EXISTS));
   }
 
   /** Test method. */
   @Test public void count() {
-    final Function func = Function.COUNT;
+    final Function func = COUNT;
 
     query(func.args(" (1 to 100000000) ! string()"), 100000000);
     query(func.args(" for $i in 1 to 100000000 return string('x')"), 100000000);
@@ -145,7 +140,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void distinctValues() {
-    final Function func = Function.DISTINCT_VALUES;
+    final Function func = DISTINCT_VALUES;
 
     query(func.args(" (1 to 100000000) ! 'a'"), "a");
     query("count(" + func.args(" 1 to 100000000") + ')', 100000000);
@@ -153,7 +148,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void error() {
-    final Function func = Function.ERROR;
+    final Function func = ERROR;
 
     // pre-evaluate empty sequence
     error(func.args(), FUNERR1);
@@ -170,7 +165,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void filter() {
-    final Function func = Function.FILTER;
+    final Function func = FILTER;
     query(func.args(" (0, 1)", " boolean#1"), 1);
 
     check(func.args(" ()", " boolean#1"), "", empty());
@@ -189,7 +184,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void foldLeft() {
-    final Function func = Function.FOLD_LEFT;
+    final Function func = FOLD_LEFT;
 
     query("(1,'a')[. instance of xs:integer] ! " +
         func.args(" .", 0, " function($a, $b) { $b }"), 1);
@@ -205,76 +200,71 @@ public final class FnModuleTest extends QueryPlanTest {
     // should be unrolled and evaluated at compile time
     check(func.args(" 2 to 10", 1, " function($a, $b) { $a + $b }"),
         55,
-        empty(Util.className(FnFoldLeft.class) + "[contains(@name, 'fold-left')]"),
+        empty(func),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
     check(func.args(" 2 to 10", 1, " function($a, $b) { 0 * random:double() + $b }"),
         10,
         exists(Int.class),
-        empty(Util.className(FnFoldLeft.class) + "[contains(@name, 'fold-left')]"),
+        empty(func),
         count(Util.className(Arith.class) + "[@op = '+']", 9));
     // should not be unrolled
-    check(func.args(" 1 to 11", 0, " function($a, $b) { $a + $b }"),
-        66,
-        exists(Util.className(FnFoldLeft.class) + "[contains(@name, 'fold-left')]"));
+    check(func.args(" 1 to 11", 0, " function($a, $b) { $a + $b }"), 66, exists(func));
   }
 
   /** Test method. */
   @Test public void foldRight() {
-    final Function func = Function.FOLD_RIGHT;
+    final Function func = FOLD_RIGHT;
 
     check(func.args(" ()", " ()", " function($a, $b) { $a }"), "", empty());
 
     // should be unrolled and evaluated at compile time
     check(func.args(" 1 to 9", 10, " function($a, $b) { $a + $b }"),
         55,
-        empty(FnFoldRight.class),
+        empty(FOLD_RIGHT),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
     check(func.args(" 1 to 9", 10, " function($a, $b) { 0 * random:double() + $b }"),
         10,
-        empty(FnFoldRight.class),
+        empty(FOLD_RIGHT),
         exists(Int.class),
         count(Util.className(Arith.class) + "[@op = '+']", 9));
     // should not be unrolled
-    check(func.args(" 0 to 10", 10, " function($a, $b) { $a + $b }"),
-        65,
-        exists(Util.className(FnFoldRight.class) + "[contains(@name, 'fold-right')]"));
+    check(func.args(" 0 to 10", 10, " function($a, $b) { $a + $b }"), 65, exists(func));
   }
 
   /** Test method. */
   @Test public void forEach() {
-    final Function func = Function.FOR_EACH;
+    final Function func = FOR_EACH;
 
-    query("(1,not#1)[. instance of function(*)] ! " + func.args(" 1", " ."), "false");
+    query("(1,not#1)[. instance of function(*)] ! " + func.args(" 1", " ."), false);
     query("sort(" + func.args(" (1 to 2)[. > 0]", " string#1") + ')', "1\n2");
     check(func.args(" ()", " boolean#1"), "", empty());
 
     // pre-compute result size
     query("count(" + func.args(" 1 to 10000000000", " string#1") + ')', 10000000000L);
-    check("count(" + func.args(" 1 to 20", " function($a) { $a, $a }") + ')', 40,
-        exists(FnForEach.class));
+    check("count(" + func.args(" 1 to 20", " function($a) { $a, $a }") + ')', 40, exists(FOR_EACH));
 
     // should be unrolled and evaluated at compile time
     check(func.args(" 0 to 8", " function($x) { $x + 1 }"),
         "1\n2\n3\n4\n5\n6\n7\n8\n9",
-        empty(FnForEach.class),
+        empty(func),
         exists(IntSeq.class));
     // should be unrolled but not evaluated at compile time
     check(func.args(" 1 to 9", " function($x) { 0 * random:double() + $x }"),
         "1\n2\n3\n4\n5\n6\n7\n8\n9",
-        empty(FnForEach.class),
+        empty(func),
         empty(IntSeq.class),
         count(Util.className(Arith.class) + "[@op = '+']", 9));
     // should not be unrolled
     check(func.args(" 0 to 10", " function($x) { $x + 1 }"),
         "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11",
-        exists(Util.className(FnForEach.class) + "[contains(@name, 'for-each')]"));
+        exists(func));
   }
 
   /** Test method. */
   @Test public void forEachPair() {
-    final Function func = Function.FOR_EACH_PAIR;
+    final Function func = FOR_EACH_PAIR;
 
     query("(0,concat#2)[. instance of function(*)] ! " +
         func.args("A", "B", " ."), "AB");
@@ -283,88 +273,97 @@ public final class FnModuleTest extends QueryPlanTest {
 
     // pre-compute result size
     check("count(" + func.args(" 1 to 10000000000", " 1 to 10000000000",
-        " function($a,$b) { 'a' }") + ')', 10000000000L, empty(FnForEachPair.class));
+        " function($a,$b) { 'a' }") + ')', 10000000000L, empty(func));
     check("count(" + func.args(" 1 to 20000000000", " 1 to 10000000000",
-        " function($a,$b) { 'a' }") + ')', 10000000000L, empty(FnForEachPair.class));
+        " function($a,$b) { 'a' }") + ')', 10000000000L, empty(func));
     check("count(" + func.args(" 1 to 10000000000", " 1 to 20000000000",
-        " function($a,$b) { 'a' }") + ')', 10000000000L, empty(FnForEachPair.class));
+        " function($a,$b) { 'a' }") + ')', 10000000000L, empty(func));
     check("count(" + func.args(" 1 to 20", " 1 to 20", " function($a,$b) { $a,$b }") + ')', 40,
-        exists(FnForEachPair.class));
+        exists(func));
 
     check(func.args(" ()", "a", " matches#2"), "", empty());
     check(func.args("aa", " ()", " matches#2"), "", empty());
 
-    query(func.args("aa", "a", " matches#2"), "true");
-    query(func.args(" ('aa','bb')", "a", " matches#2"), "true");
-    query(func.args("aa", " ('a','b')", " matches#2"), "true");
+    query(func.args("aa", "a", " matches#2"), true);
+    query(func.args(" ('aa','bb')", "a", " matches#2"), true);
+    query(func.args("aa", " ('a','b')", " matches#2"), true);
   }
 
   /** Test method. */
   @Test public void functionLookup() {
-    final Function func = Function.FUNCTION_LOOKUP;
-    final String name = Util.className(func.clazz);
+    final Function func = FUNCTION_LOOKUP;
 
     check("for $f in ('fn:true', 'fn:position') ! function-lookup(xs:QName(.), 0) " +
-        "return (8,9)[$f()]", "8\n9\n9", exists(name));
+        "return (8,9)[$f()]", "8\n9\n9", exists(func));
     check("for $f in xs:QName('fn:position') return (8,9)[function-lookup($f, 0)()]", "8\n9",
-        exists(name));
+        exists(func));
   }
 
   /** Test method. */
   @Test public void generateId() {
-    final Function func = Function.GENERATE_ID;
+    final Function func = GENERATE_ID;
 
     // GH-1633: ensure that database nodes return identical id
     query("count(distinct-values((document { <x/> } update {}) ! (*, *) ! " +
-        func.args(" .") + "))", "1");
+        func.args(" .") + "))", 1);
   }
 
   /** Test method. */
   @Test public void head() {
-    final Function func = Function.HEAD;
-    final String name = Util.className(func.clazz);
+    final Function func = HEAD;
 
     // pre-evaluate empty sequence
-    check(func.args(" ()"), "", empty(name));
-    check(func.args(1), 1, empty(name));
-    check(func.args(" (1,2)"), 1, empty(name));
-    check(func.args(" <a/>"), "<a/>", empty(name));
-    check(func.args(" <a/>[name()]"), "<a/>", empty(name));
-    check(func.args(" (<a/>, <b/>)[name()]"), "<a/>", exists(name));
+    check(func.args(" ()"), "", empty(func));
+    check(func.args(1), 1, empty(func));
+    check(func.args(" (1,2)"), 1, empty(func));
+    check(func.args(" <a/>"), "<a/>", empty(func));
+    check(func.args(" <a/>[name()]"), "<a/>", empty(func));
+    check(func.args(" (<a/>, <b/>)[name()]"), "<a/>", exists(func));
     check(func.args(" (1,error())"), 1, exists(Int.class));
-    check(func.args(" reverse((1, 2, 3)[. > 1])"), 3, exists(UtilLastFrom.class));
+    check(func.args(" reverse((1, 2, 3)[. > 1])"), 3, exists(_UTIL_LAST));
+
+    check(func.args(" util:init((<a/>,<b/>,<c/>))"), "<a/>", empty(_UTIL_INIT));
+    check(func.args(" util:init((<a/>,<b/>))"), "<a/>", empty(_UTIL_INIT));
+    check(func.args(" util:init((<a/>))"), "", empty());
+    check(func.args(" util:init((1, 2)[. = 0])"), "", exists(_UTIL_INIT));
+
+    check(func.args(" tail((<a/>,<b/>,<c/>))"), "<b/>", exists(_UTIL_ITEM));
+
+    check(func.args(" subsequence((<a/>,<b/>), <_>1</_>)"), "<a/>", exists(SUBSEQUENCE));
+    check(func.args(" subsequence((<a/>,<b/>,<c/>,<d/>), 2, 2)"), "<b/>", exists(_UTIL_ITEM));
+
+    check(func.args(" util:range((<a/>,<b/>,<c/>,<d/>), 2, 3)"), "<b/>", exists(_UTIL_ITEM));
   }
 
   /** Test method. */
   @Test public void innermost() {
-    final Function func = Function.INNERMOST;
+    final Function func = INNERMOST;
     query("let $n := <li/> return " + func.args(" ($n, $n)"), "<li/>");
   }
 
   /** Test for namespace functions and in-scope namespaces. */
-  @Test
-  public void inScopePrefixes() {
-    final Function func = Function.IN_SCOPE_PREFIXES;
+  @Test public void inScopePrefixes() {
+    final Function func = IN_SCOPE_PREFIXES;
     query("sort(<e xmlns:p='u'>{" + func.args(" <e/>") + "}</e>/text()/tokenize(.))", "p\nxml");
   }
 
   /** Test method. */
   @Test public void jsonDoc() {
-    final Function func = Function.JSON_DOC;
+    final Function func = JSON_DOC;
     query(func.args("src/test/resources/example.json") + "('address')('state')", "NY");
     query(func.args("src/test/resources/example.json") + "?address?state", "NY");
   }
 
   /** Test method. */
   @Test public void jsonToXml() {
-    final Function func = Function.JSON_TO_XML;
+    final Function func = JSON_TO_XML;
     contains(func.args("null"), "xmlns");
     contains(func.args("null") + " update ()", "xmlns");
   }
 
   /** Test method. */
   @Test public void matches() {
-    final Function func = Function.MATCHES;
+    final Function func = MATCHES;
     query(func.args("a", ""), true);
     query(func.args("a", "", "j"), true);
     error(func.args("a", "+"), REGPAT_X);
@@ -373,7 +372,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void min() {
-    final Function func = Function.MIN;
+    final Function func = MIN;
     query(func.args(1), 1);
     query(func.args(1.1), 1.1);
     query(func.args(" 1e1"), 10);
@@ -404,9 +403,9 @@ public final class FnModuleTest extends QueryPlanTest {
 
     // query plan checks
     check(func.args(" ()"), "", empty());
-    check(func.args(" prof:void(123)"), "", empty(func.clazz));
-    check(func.args(" 123"), 123, empty(func.clazz));
-    check(func.args(" <x>1</x>"), 1, exists(func.clazz));
+    check(func.args(" prof:void(123)"), "", empty(func));
+    check(func.args(" 123"), 123, empty(func));
+    check(func.args(" <x>1</x>"), 1, exists(func));
 
     // errors
     error(func.args(" xs:QName('a')"), CMP_X);
@@ -418,40 +417,40 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void namespaceUriForPrefix() {
-    final Function func = Function.NAMESPACE_URI_FOR_PREFIX;
+    final Function func = NAMESPACE_URI_FOR_PREFIX;
     query("sort(<e xmlns:p='u'>{" + func.args("p", " <e/>") + "}</e>/text()/tokenize(.))", "u");
   }
 
   /** Test method. */
   @Test public void not() {
-    final Function func = Function.NOT;
-    final String name = Util.className(func.clazz);
+    final Function func = NOT;
 
     // pre-evaluated expressions
-    check(func.args(1), false, empty(name));
-    check(func.args(" ()"), true,  empty(name));
+    check(func.args(1), false, empty(func));
+    check(func.args(" ()"), true,  empty(func));
 
     // function is replaced with fn:exists
-    check(func.args(" empty(1[.=1])"), true, exists(FnExists.class));
+    check(func.args(" empty(1[.=1])"), true, exists(EXISTS));
     // function is replaced with fn:empty
-    check(func.args(" exists(1[.=1])"), false, exists(FnEmpty.class));
-    check(func.args(" <a/>/self::*"), false, exists(FnEmpty.class));
+    check(func.args(" exists(1[.=1])"), false, exists(EMPTY));
+    check(func.args(" <a/>/self::*"), false, exists(EMPTY));
     // function is replaced with fn:boolean
-    check(func.args(" not(1[.=1])"), true, exists(FnBoolean.class));
+    check(func.args(func.args(" (1[.=1])")), true, exists(BOOLEAN));
 
     // function is replaced with fn:boolean
     check("for $i in (1,2) return " + func.args(" $i = $i + 1"),
         "true\ntrue", exists("*[@op != '=']"));
     check("for $i in (1,2) return " + func.args(" $i eq $i + 1"),
         "true\ntrue", exists("*[@op != 'eq']"));
+    check("for $i in (1,2) return " + func.args(" [$i] eq $i + 1"),
+        "true\ntrue", exists("*[@op != 'eq']"));
     check("for $i in (1,2) return " + func.args(" $i = ($i, $i)"),
-        "false\nfalse", exists(name));
+        "false\nfalse", exists(func));
   }
 
   /** Test method. */
   @Test public void number() {
-    final Function func = Function.NUMBER;
-    final String name = Util.className(func.clazz);
+    final Function func = NUMBER;
 
     query(func.args(1), 1);
     query(func.args(" ()"), "NaN");
@@ -459,11 +458,11 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args("X"), "NaN");
     query(func.args(" <a>1</a>"), 1);
 
-    check("for $d in (1e0, 2e-1) return " + func.args(" $d"), "1\n0.2", empty(name));
-    check("for $d in (1, 2.34) return " + func.args(" $d"), "1\n2.34", exists(name));
-    check("for $d in (1e0, 2e-1) return $d[" + func.args() + ']', 1, empty(name));
-    check("for $d in (1e0, 2e-1) return $d[" + func.args() + " = 1]", 1, empty(name));
-    check("for $d in (1, 2.34) return $d[" + func.args() + ']', 1, exists(name));
+    check("for $d in (1e0, 2e-1) return " + func.args(" $d"), "1\n0.2", empty(func));
+    check("for $d in (1, 2.34) return " + func.args(" $d"), "1\n2.34", exists(func));
+    check("for $d in (1e0, 2e-1) return $d[" + func.args() + ']', 1, empty(func));
+    check("for $d in (1e0, 2e-1) return $d[" + func.args() + " = 1]", 1, empty(func));
+    check("for $d in (1, 2.34) return $d[" + func.args() + ']', 1, exists(func));
 
     error(func.args(), QueryError.NOCTX_X);
     error(func.args(" true#0"), QueryError.FIATOM_X);
@@ -471,13 +470,13 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void outermost() {
-    final Function func = Function.INNERMOST;
+    final Function func = INNERMOST;
     query("let $n := <li/> return " + func.args(" ($n, $n)"), "<li/>");
   }
 
   /** Test method. */
   @Test public void parseIetfDate() {
-    final Function func = Function.PARSE_IETF_DATE;
+    final Function func = PARSE_IETF_DATE;
 
     query(func.args("Wed, 06 Jun 1994 07:29:35 GMT"), "1994-06-06T07:29:35Z");
     query(func.args("Wed, 6 Jun 94 07:29:35 GMT"), "1994-06-06T07:29:35Z");
@@ -515,13 +514,13 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void parseJson() {
-    final Function func = Function.PARSE_JSON;
+    final Function func = PARSE_JSON;
     query(func.args("\"x\\u0000\""), "x\uFFFD");
   }
 
   /** Test method. */
   @Test public void parseXML() {
-    final Function func = Function.PARSE_XML;
+    final Function func = PARSE_XML;
     contains(func.args("<x>a</x>") + "//text()", "a");
     query(func.args("<a/>") + "/a[node()]", "");
     query(func.args("<a/>") + "/*[1]", "<a/>");
@@ -533,7 +532,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void randomNumberGenerator() {
-    final Function func = Function.RANDOM_NUMBER_GENERATOR;
+    final Function func = RANDOM_NUMBER_GENERATOR;
 
     // ensure that the same seed will generate the same result
     final String query = func.args(123) + "?number";
@@ -555,9 +554,66 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void remove() {
+    final Function func = REMOVE;
+
+    // static rewrites
+    query(func.args(" ()", 1), "");
+    query(func.args("A", 1), "");
+    query(func.args(" (1,2)", 1), 2);
+    query(func.args(" (1 to 3)", 1), "2\n3");
+
+    // known result size
+    query(func.args(" <_>1</_> + 1", 1), "");
+    query(func.args(" (<_>1</_> + 1, 3), 1"), 3);
+    query(func.args(" prof:void(())", 1), "");
+
+    // unknown result size
+    query(func.args(" 1[. = 0]", 1), "");
+    query(func.args(" 1[. = 1]", 1), "");
+    query(func.args(" (1 to 2)[. = 0]", 1), "");
+    query(func.args(" (1 to 4)[. < 3]", 1), 2);
+
+    // value-based iterator
+    query(func.args(" tokenize(<_></_>)", 1), "");
+    query(func.args(" tokenize(<_>X</_>)", 1), "");
+    query(func.args(" tokenize(<_>X Y</_>)", 1), "Y");
+    query(func.args(" tokenize(<_>X Y Z</_>)", 1), "Y\nZ");
+
+    // static rewrites, dynamic position
+    query(func.args(" ()", " <_>1</_>"), "");
+    query(func.args("A", " <_>1</_>"), "");
+    query(func.args(" (1,2)", " <_>1</_>"), 2);
+    query(func.args(" (1 to 3)", " <_>1</_>"), "2\n3");
+
+    // known result size, dynamic position
+    query(func.args(" <_>1</_> + 1", " <_>1</_>"), "");
+    query(func.args(" (<_>1</_> + 1, 3), 1"), 3);
+    query(func.args(" prof:void(())", " <_>1</_>"), "");
+
+    // unknown result size, dynamic position
+    query(func.args(" 1[. = 0]", " <_>1</_>"), "");
+    query(func.args(" 1[. = 1]", " <_>1</_>"), "");
+    query(func.args(" (1 to 2)[. = 0]", " <_>1</_>"), "");
+    query(func.args(" (1 to 4)[. < 3]", " <_>1</_>"), 2);
+
+    // value-based iterator, dynamic position
+    query(func.args(" tokenize(<_></_>)", " <_>1</_>"), "");
+    query(func.args(" tokenize(<_>X</_>)", " <_>1</_>"), "");
+    query(func.args(" tokenize(<_>X Y</_>)", " <_>1</_>"), "Y");
+    query(func.args(" tokenize(<_>X Y Z</_>)", " <_>1</_>"), "Y\nZ");
+
+    // known result size
+    query(func.args(" (1, <_>2</_>, 3, 4)", 2), "1\n3\n4");
+    query(func.args(" (1, <_>2</_>, 3, 4)", 2) + "[1]", 1);
+    query(func.args(" (1, <_>2</_>, 3, 4)", 2) + "[2]", 3);
+    query(func.args(" (1, <_>2</_>, 3, 4)", 2) + "[3]", 4);
+  }
+
+  /** Test method. */
   @Test public void replace() {
     // tests for issue GH-573:
-    final Function func = Function.REPLACE;
+    final Function func = REPLACE;
     query(func.args("aaaaa bbbbbbbb ddd ", "(.{6,15}) ", "$1@"), "aaaaa bbbbbbbb@ddd ");
     query(func.args("aaaa AAA 123", "(\\s+\\P{Ll}{3,280}?)", "$1@"), "aaaa AAA@ 123@");
     error(func.args("asdf", "a{12,3}", ""), REGPAT_X);
@@ -568,13 +624,37 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void resolveQName() {
-    final Function func = Function.RESOLVE_QNAME;
+    final Function func = RESOLVE_QNAME;
     query("sort(<e xmlns:p='u'>{" + func.args("p:p", " <e/>") + "}</e>/text()/tokenize(.))", "p:p");
   }
 
   /** Test method. */
+  @Test public void reverse() {
+    final Function func = REVERSE;
+    query(func.args(" ()"), "");
+    query(func.args(" 1"), 1);
+    query(func.args(" 1 to 3"), "3\n2\n1");
+    query(func.args(" (<a/>,<b/>)"), "<b/>\n<a/>");
+    query(func.args(" 1[. = 1]"), 1);
+    query(func.args(" (1, 2)[. != 2]"), 1);
+    query(func.args(" tokenize(<a/>)"), "");
+    query(func.args(" tokenize(<a>1</a>)"), 1);
+    query(func.args(" tokenize(<a>1 2</a>)"), "2\n1");
+    query(func.args(" (1 to 2) ! 1"), "1\n1");
+    query(func.args(" (1 to 2) ! (1,2)"), "2\n1\n2\n1");
+
+    check(func.args(" tail((<a/>,<b/>,<c/>))"), "<c/>\n<b/>", empty(_UTIL_INIT));
+    check(func.args(" (<a/>,<b/>,<c/>)[position() < last()]"), "<b/>\n<a/>", empty(TAIL));
+
+    check(func.args(" tail(" + func.args(" (<a/>,<b/>,<c/>)") + ")"), "<a/>\n<b/>",
+        exists(_UTIL_INIT));
+    check(func.args(" (" + func.args(" (<a/>,<b/>,<c/>)") + ")[position() < last()]"),
+        "<b/>\n<c/>", exists(TAIL));
+  }
+
+  /** Test method. */
   @Test public void serialize() {
-    final Function func = Function.SERIALIZE;
+    final Function func = SERIALIZE;
     contains(func.args(" <x/>"), "<x/>");
     contains(func.args(" <x/>", " " + serialParams("")), "<x/>");
     contains(func.args(" <x>a</x>", " " + serialParams("<method value='text'/>")), "a");
@@ -582,7 +662,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void sort() {
-    final Function func = Function.SORT;
+    final Function func = SORT;
     query(func.args(" ('b','a')", "http://www.w3.org/2005/xpath-functions/collation/codepoint"),
         "a\nb");
 
@@ -601,12 +681,12 @@ public final class FnModuleTest extends QueryPlanTest {
     query("for $i in (1,2) return " + func.args(func.args(" (1,$i)")) + "[1]", "1\n1");
 
     check(func.args(" ()"), "", empty());
-    check(func.args("1"), 1, empty(func.clazz));
+    check(func.args(1), 1, empty(func));
 
-    check(func.args(" 1 to 100000000") + "[1]", 1, empty(func.clazz));
-    check(func.args(" reverse(1 to 100000000)") + "[1]", 1, empty(func.clazz));
-    check(func.args(" (1 to 100000000) ! 1") + "[1]", 1, empty(func.clazz));
-    check(func.args(" reverse((1 to 100000000) ! 1)") + "[1]", 1, empty(func.clazz));
+    check(func.args(" 1 to 100000000") + "[1]", 1, empty(func));
+    check(func.args(" reverse(1 to 100000000)") + "[1]", 1, empty(func));
+    check(func.args(" (1 to 100000000) ! 1") + "[1]", 1, empty(func));
+    check(func.args(" reverse((1 to 100000000) ! 1)") + "[1]", 1, empty(func));
 
     error(func.args(" true#0"), FIATOM_X);
     error(func.args(" (1 to 2) ! true#0"), FIATOM_X);
@@ -614,7 +694,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void staticBaseUri() {
-    final Function func = Function.STATIC_BASE_URI;
+    final Function func = STATIC_BASE_URI;
     query("declare base-uri 'a/'; ends-with(" + func.args() + ", '/')", true);
     query("declare base-uri '.' ; ends-with(" + func.args() + ", '/')", true);
     query("declare base-uri '..'; ends-with(" + func.args() + ", '/')", true);
@@ -622,18 +702,17 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void string() {
-    final Function func = Function.STRING;
-    final String name = Util.className(func.clazz);
+    final Function func = STRING;
 
     query(func.args(" ()"), "");
     query(func.args("A"), "A");
     query(func.args(" <a>A</a>"), "A");
 
-    check("for $s in ('a', 'b') return " + func.args(" $s"), "a\nb", empty(name));
-    check("for $s in (<a/>, <b/>) return " + func.args(" $s"), "\n", exists(name));
-    check("for $s in ('a', 'b') return $s[" + func.args() + ']', "a\nb", empty(name));
-    check("for $s in ('a' ,'b') return $s[" + func.args() + " = 'a']", "a", empty(name));
-    check("for $s in (<a/> ,<b/>) return $s[" + func.args() + ']', "", exists(name));
+    check("for $s in ('a', 'b') return " + func.args(" $s"), "a\nb", empty(func));
+    check("for $s in (<a/>, <b/>) return " + func.args(" $s"), "\n", exists(func));
+    check("for $s in ('a', 'b') return $s[" + func.args() + ']', "a\nb", empty(func));
+    check("for $s in ('a' ,'b') return $s[" + func.args() + " = 'a']", "a", empty(func));
+    check("for $s in (<a/> ,<b/>) return $s[" + func.args() + ']', "", exists(func));
 
     error(func.args(), QueryError.NOCTX_X);
     error(func.args(" true#0"), QueryError.FISTRING_X);
@@ -641,7 +720,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void stringLength() {
-    final Function func = Function.STRING_LENGTH;
+    final Function func = STRING_LENGTH;
     query(func.args(" ()"), 0);
     query(func.args("A"), 1);
     query("'A'[" + func.args() + ']', "A");
@@ -651,7 +730,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void subsequence() {
-    final Function func = Function.SUBSEQUENCE;
+    final Function func = SUBSEQUENCE;
 
     // static rewrites
     query(func.args(" ()", 0), "");
@@ -702,6 +781,8 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" (1 to 2)[. = 0]", 1), "");
     query(func.args(" (1 to 4)[. < 3]", 1), "1\n2");
     query(func.args(" (1 to 2)[. = 0]", 2), "");
+    query(func.args(" (1 to 2)[. = 0]", 2, 1), "");
+    query(func.args(" (1 to 2)[. = 0]", 2, 2), "");
     query(func.args(" (1 to 4)[. < 3]", 2), 2);
 
     // value-based iterator
@@ -710,17 +791,62 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" tokenize(<_>W X</_>)", 3), "");
     query(func.args(" tokenize(<_>W X Y</_>)", 3), "Y");
     query(func.args(" tokenize(<_>W X Y Z</_>)", 3), "Y\nZ");
+
+    query(func.args(1, " <_>NaN</_>"), "");
+    query(func.args(" (1 to 3)[. != 1]", " <_>2</_>"), 3);
+    query(func.args(" (1 to 4)[. != 1]", " <_>2</_>"), "3\n4");
+    query(func.args(" (1 to 5)[. != 1]", " <_>2</_>", 2), "3\n4");
+    query(func.args(" (1 to 4) ! (.*.)", 3), "9\n16");
+    query(func.args(" reverse((<a/>,<b/>,<c/>,<d/>))", 3), "<b/>\n<a/>");
+    query(func.args(" reverse((<a/>,<b/>,<c/>,<d/>))", " <_>1</_>"), "<d/>\n<c/>\n<b/>\n<a/>");
+    query(func.args(" reverse((<a/>,<b/>,<c/>,<d/>))", " <_>1</_>", 4), "<d/>\n<c/>\n<b/>\n<a/>");
+    query(func.args(" reverse((<a/>,<b/>,<c/>,<d/>))", " <_>2</_>") + "[2]", "<b/>");
+
+    query("xs:integer(" + func.args(" (1,2,3)[. != 0]", 3) + ')', 3);
+    query(func.args(" (1 to 6)[.!=0]", 3) + " instance of xs:integer+", true);
+    query(func.args(" (1 to 6)[.!=0]", 3, 2) + " instance of xs:integer+", true);
+
+    check(func.args(" 1[.!=0]", 1, 2), 1, empty(func));
+    check(func.args(" 1[.!=0]", 2), "", empty());
+
+    query(func.args(" reverse((<a/>,<b/>,<c/>))", " <_>2</_>") + " instance of node()+", true);
+    query(func.args(" reverse((<a/>,<b/>,<c/>))", " <_>1</_>, 3") + " instance of node()+", true);
+
+    query(func.args(" <_/>", " xs:double('-INF')", " xs:double('-INF')"), "");
+    query(func.args(" <_/>", " xs:double('-INF')", " xs:double('INF')"), "");
+    query(func.args(" <_/>", " xs:double('INF')", " xs:double('INF')"), "");
+    query(func.args(" <_/>", " xs:double('NaN')"), "");
+    query(func.args(" <_/>", 1, " xs:double('NaN')"), "");
+
+    query(func.args(1, " <_>NaN</_>") + " instance of xs:integer", false);
+    query(func.args(1, " <_>1</_>") + " instance of xs:integer", true);
+
+    query(func.args(" <_/>", 1, 1), "<_/>");
+    query(func.args(" (<_/>,<_/>,<_/>,<_/>)", 1, 2), "<_/>\n<_/>");
+
+    query(func.args(" (<_/>,<_/>,<_/>)", 1, 0), "");
+    query(func.args(" (<_/>,<_/>,<_/>)", 1, 1), "<_/>");
+    query(func.args(" (<_/>,<_/>,<_/>)", 1, 2), "<_/>\n<_/>");
+    query(func.args(" (<_/>,<_/>,<_/>)", 1, 3), "<_/>\n<_/>\n<_/>");
+    query(func.args(" (<_/>,<_/>,<_/>)", 2, 1), "<_/>");
+    query(func.args(" (<_/>,<_/>,<_/>)", 2, 2), "<_/>\n<_/>");
+    query(func.args(" (<_/>,<_/>,<_/>)", 3, 1), "<_/>");
+    query(func.args(" (<_/>,<_/>,<_/>)", 3, 2), "<_/>");
+    query(func.args(" (<_/>,<_/>,<_/>)", 4, 0), "");
+    query(func.args(" (<_/>,<_/>,<_/>)", 4, 1), "");
+
+    query("sort(" + func.args(" tokenize(<_/>)", 3) + ')', "");
   }
 
   /** Test method. */
   @Test public void substring() {
-    final Function func = Function.SUBSTRING;
+    final Function func = SUBSTRING;
     contains(func.args("'ab'", " [2]"), "b");
   }
 
   /** Test method. */
   @Test public void sum() {
-    final Function func = Function.SUM;
+    final Function func = SUM;
     query(func.args(1), 1);
     query(func.args(" 1 to 10"), 55);
     query(func.args(" 1 to 3037000499"), 4611686016981624750L);
@@ -776,7 +902,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void tail() {
-    final Function func = Function.TAIL;
+    final Function func = TAIL;
 
     // static rewrites
     query(func.args(" ()"), "");
@@ -800,18 +926,25 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" tokenize(<_>X</_>)"), "");
     query(func.args(" tokenize(<_>X Y</_>)"), "Y");
     query(func.args(" tokenize(<_>X Y Z</_>)"), "Y\nZ");
+
+    // nested function calls
+    query(func.args(func.args(" tokenize(<_>X Y Z</_>)")), "Z");
+    query(func.args(" subsequence(tokenize(<_>W X Y Z</_>), 3)"), "Z");
+    query(func.args(" subsequence(tokenize(<_/>), <_>1</_>)"), "");
+    query(func.args(" util:range(tokenize(<_>W X Y Z</_>), 3, 4)"), "Z");
+    query(func.args(" util:range(tokenize(<_/>), <_>1</_>, 1)"), "");
   }
 
   /** Test method. */
   @Test public void tokenize() {
-    final Function func = Function.TOKENIZE;
+    final Function func = TOKENIZE;
     query(func.args("a", "", "j"), "\na\n");
     error(func.args("a", ""), REGROUP);
   }
 
   /** Test method. */
   @Test public void unparsedText() {
-    final Function func = Function.UNPARSED_TEXT;
+    final Function func = UNPARSED_TEXT;
     contains(func.args(TEXT), "<html");
     contains(func.args(TEXT, "US-ASCII"), "<html");
     error(func.args(TEXT, "xyz"), ENCODING_X);
@@ -819,13 +952,13 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void unparsedTextLines() {
-    final Function func = Function.UNPARSED_TEXT_LINES;
+    final Function func = UNPARSED_TEXT_LINES;
     query(func.args(" ()"), "");
   }
 
   /** Test method. */
   @Test public void xmlToJson() {
-    final Function func = Function.XML_TO_JSON;
+    final Function func = XML_TO_JSON;
     query(func.args(" <map xmlns='http://www.w3.org/2005/xpath-functions'>"
         + "<string key=''>í</string></map>", " map { 'indent' : 'no' }"), "{\"\":\"\u00ed\"}");
     query(func.args(" <fn:string key='root'>X</fn:string>"), "\"X\"");

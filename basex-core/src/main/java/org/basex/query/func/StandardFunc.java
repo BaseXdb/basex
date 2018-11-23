@@ -481,6 +481,15 @@ public abstract class StandardFunc extends Arr {
     return visitor.lock(db, false);
   }
 
+  /**
+   * Returns the arguments of a standard function.
+   * @param func functions argument
+   * @return arguments
+   */
+  protected static final Expr[] args(final Expr func) {
+    return ((StandardFunc) func).exprs;
+  }
+
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof StandardFunc && sig == ((StandardFunc) obj).sig &&

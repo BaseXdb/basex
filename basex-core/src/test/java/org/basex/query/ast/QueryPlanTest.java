@@ -4,6 +4,7 @@ import static org.basex.util.Prop.*;
 import static org.junit.Assert.*;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -65,6 +66,15 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
   }
 
   /**
+   * Returns a test to check if the specified function does not occur in the query plan.
+   * @param func function
+   * @return test string
+   */
+  protected static String empty(final Function func) {
+    return empty(func.clazz);
+  }
+
+  /**
    * Returns a test to check if the specified expression or path occurs in the query plan.
    * @param expr expression
    * @return test string
@@ -80,6 +90,15 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
    */
   protected static String exists(final Class<?> clazz) {
     return exists(Util.className(clazz));
+  }
+
+  /**
+   * Returns a test to check if the specified function occurs in the query plan.
+   * @param func function
+   * @return test string
+   */
+  protected static String exists(final Function func) {
+    return exists(func.clazz);
   }
 
   /**
@@ -102,6 +121,16 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
 
   /**
    * Counts the number of results.
+   * @param func function
+   * @param count number of results
+   * @return test string
+   */
+  protected static String count(final Function func, final int count) {
+    return count(func.clazz, count);
+  }
+
+  /**
+   * Counts the number of results.
    * @param expr expression
    * @param count number of results
    * @return test string
@@ -118,5 +147,25 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
    */
   protected static String type(final String name, final String type) {
     return "string(//" + name + "/@type) = '" + type + "'";
+  }
+
+  /**
+   * Returns a test to check the type of an expression.
+   * @param clazz expression class
+   * @param type type
+   * @return test string
+   */
+  protected static String type(final Class<?> clazz, final String type) {
+    return type(Util.className(clazz), type);
+  }
+
+  /**
+   * Returns a test to check the type of a function.
+   * @param func function
+   * @param type type
+   * @return test string
+   */
+  protected static String type(final Function func, final String type) {
+    return type(func.clazz, type);
   }
 }

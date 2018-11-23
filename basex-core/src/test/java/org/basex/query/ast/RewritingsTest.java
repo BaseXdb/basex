@@ -233,9 +233,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("'a'[position() <= 1]", "a", "exists(QueryPlan/Str)");
 
     // check if positional predicates are rewritten to utility functions
-    final String uia = Util.className(_UTIL_ITEM_AT.clazz);
-    final String uir = Util.className(_UTIL_ITEM_RANGE.clazz);
-    final String ulf = Util.className(_UTIL_LAST_FROM.clazz);
+    final String uia = Util.className(_UTIL_ITEM.clazz);
+    final String uir = Util.className(_UTIL_RANGE.clazz);
+    final String ul = Util.className(_UTIL_LAST.clazz);
 
     check("for $i in (1,2) return 'a'[$i]", "a", exists(uia));
     check("for $i in (1,2) return 'a'[position() = $i]", "a", exists(uia));
@@ -257,15 +257,15 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $i in" + seq + "return ('a','b')[position() < $i]", "a\na\na", exists(uir));
 
     // check if multiple positional predicates are rewritten to utility functions
-    check("for $i in" + seq + "return ('a','b')[$i][$i]", "a", count(UtilItemAt.class, 2));
+    check("for $i in" + seq + "return ('a','b')[$i][$i]", "a", count(UtilItem.class, 2));
     check("for $i in" + seq + "return ('a','b')[position() = $i][position() = $i]", "a",
-        count(UtilItemAt.class, 2));
+        count(UtilItem.class, 2));
     check("for $i in" + seq + "return ('a','b')[position() < $i][position() < $i]", "a\na\na",
-        count(uir , 2));
+        count(uir, 2));
 
     // check if positional predicates are merged and rewritten to utility functions
     check("for $i in" + seq + "return ('a','b')[position() = $i and position() = $i]", "a\nb",
-        exists(UtilItemAt.class));
+        exists(UtilItem.class));
     check("for $i in" + seq + "return ('a','b')[position() >= $i and position() <= $i]", "a\nb",
         exists(uir));
     check("for $i in" + seq + "return ('a','b')[position() <= $i and position() >= $i]", "a\nb",
@@ -285,10 +285,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $i in" + seq + "return ('a','b')[position() < $i and position() < $i+1]", "a\na\na",
         exists(CachedFilter.class));
 
-    check("(<a/>,<b/>)[last()]", "<b/>", count(ulf , 1));
-    check("(<a/>,<b/>)[position() > 1 and position() < 3]", "<b/>", count(uia , 1));
-    check("(<a/>,<b/>)[position() > 1 and position() < 4]", "<b/>", count(uir , 1));
-    check("(<a/>,<b/>)[position() > 1 and position() < 3 and <b/>]", "<b/>", count(uia , 1));
+    check("(<a/>,<b/>)[last()]", "<b/>", count(ul, 1));
+    check("(<a/>,<b/>)[position() > 1 and position() < 3]", "<b/>", count(ul, 1));
+    check("(<a/>,<b/>)[position() > 1 and position() < 3 and <b/>]", "<b/>", count(ul, 1));
+    check("(<a/>,<b/>)[position() > 1 and position() < 4]", "<b/>", count(ul, 1));
   }
 
   /** Predicates. */

@@ -146,22 +146,22 @@ public final class CmpV extends Cmp {
     public String toString() { return name; }
   }
 
-  /** Comparator. */
-  OpV op;
+  /** Operator. */
+  OpV opV;
 
   /**
    * Constructor.
    * @param expr1 first expression
    * @param expr2 second expression
-   * @param op operator
+   * @param opV operator
    * @param coll collation (can be {@code null})
    * @param sc static context
    * @param info input info
    */
-  public CmpV(final Expr expr1, final Expr expr2, final OpV op, final Collation coll,
+  public CmpV(final Expr expr1, final Expr expr2, final OpV opV, final Collation coll,
       final StaticContext sc, final InputInfo info) {
     super(info, expr1, expr2, coll, SeqType.BLN_ZO, sc);
-    this.op = op;
+    this.opV = opV;
   }
 
   @Override
@@ -176,7 +176,7 @@ public final class CmpV extends Cmp {
     // swap operands
     if(swap()) {
       cc.info(OPTSWAP_X, this);
-      op = op.swap();
+      opV = opV.swap();
     }
 
     // try to skip type checking at runtime
@@ -184,16 +184,16 @@ public final class CmpV extends Cmp {
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     final Type type1 = st1.type, type2 = st2.type;
     check = !(type1 == type2 && !AtomType.AAT.instanceOf(type1) &&
-        (type1.isSortable() || op != OpV.EQ && op != OpV.NE) ||
+        (type1.isSortable() || opV != OpV.EQ && opV != OpV.NE) ||
         type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
         type1.instanceOf(AtomType.NUM) && type2.instanceOf(AtomType.NUM) ||
         type1.instanceOf(AtomType.DUR) && type2.instanceOf(AtomType.DUR));
 
     // try to rewrite to general expression (faster evaluation)
     Expr expr = check || !st1.oneNoArray() || !st2.oneNoArray() ? this :
-      new CmpG(expr1, expr2, OpG.get(op), coll, sc, info).optimize(cc);
+      new CmpG(expr1, expr2, OpG.get(opV), coll, sc, info).optimize(cc);
 
-    if(expr == this) expr = opt(op, cc);
+    if(expr == this) expr = opt(cc);
     // pre-evaluate values or return expression
     return allAreValues(false) ? cc.preEval(expr) : cc.replaceWith(this, expr);
   }
@@ -202,7 +202,7 @@ public final class CmpV extends Cmp {
   public Expr optimizeEbv(final CompileContext cc) {
     // e.g.: if($x eq true()) -> if($x)
     // checking one direction is sufficient, as operators may have been swapped
-    return (op == OpV.EQ && exprs[1] == Bln.TRUE || op == OpV.NE && exprs[1] == Bln.FALSE) &&
+    return (opV == OpV.EQ && exprs[1] == Bln.TRUE || opV == OpV.NE && exprs[1] == Bln.FALSE) &&
       exprs[0].seqType().eq(SeqType.BLN_O) ? cc.replaceEbv(this, exprs[0]) : this;
   }
 
@@ -212,7 +212,7 @@ public final class CmpV extends Cmp {
     if(item1 == null) return null;
     final Item item2 = exprs[1].atomItem(qc, info);
     if(item2 == null) return null;
-    if(item1.comparable(item2)) return Bln.get(op.eval(item1, item2, coll, sc, info));
+    if(item1.comparable(item2)) return Bln.get(opV.eval(item1, item2, coll, sc, info));
     throw diffError(item1, item2, info);
   }
 
@@ -221,33 +221,38 @@ public final class CmpV extends Cmp {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     return st1.oneNoArray() && st2.oneNoArray() ?
-      new CmpV(expr1, expr2, op.invert(), coll, sc, info).optimize(cc) : this;
+      new CmpV(expr1, expr2, opV.invert(), coll, sc, info).optimize(cc) : this;
+  }
+
+  @Override
+  public OpV opV() {
+    return opV;
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final Cmp cmp = new CmpV(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc, info);
+    final Cmp cmp = new CmpV(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), opV, coll, sc, info);
     cmp.check = check;
     return copyType(cmp);
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof CmpV && op == ((CmpV) obj).op && super.equals(obj);
+    return this == obj || obj instanceof CmpV && opV == ((CmpV) obj).opV && super.equals(obj);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(OP, op.name), exprs);
+    addPlan(plan, planElem(OP, opV.name), exprs);
   }
 
   @Override
   public String description() {
-    return "'" + op + "' operator";
+    return "'" + opV + "' operator";
   }
 
   @Override
   public String toString() {
-    return toString(" " + op + ' ');
+    return toString(" " + opV + ' ');
   }
 }

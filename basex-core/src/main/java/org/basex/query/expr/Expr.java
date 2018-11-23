@@ -42,7 +42,7 @@ public abstract class Expr extends ExprInfo {
    *     in order to pre-evaluate equality tests.
    *   </li>
    *   <li>{@link CmpG#optimize(CompileContext)} or
-   *     {@link Pos#get(Cmp, CmpV.OpV, InputInfo, CompileContext)},
+   *     {@link Pos#get(Expr, CmpV.OpV, InputInfo, CompileContext)},
    *     in order to compare the start and end value.
    *   </li>
    *   <li>{@link PathCache}, in order to find identical root values at runtime.

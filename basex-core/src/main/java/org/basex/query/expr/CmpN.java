@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -103,6 +104,11 @@ public final class CmpN extends Cmp {
   @Override
   public CmpN invert(final CompileContext cc) {
     throw Util.notExpected();
+  }
+
+  @Override
+  public OpV opV() {
+    return null;
   }
 
   @Override

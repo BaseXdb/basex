@@ -63,29 +63,23 @@ public final class FileReadTextLines extends FileRead {
 
   /**
    * Creates an updated version of {@link FileReadTextLines}.
-   * @param func calling function
-   * @param start first item to return
+   * @param start first item to return (starting from 0)
    * @param length number of items to return
    * @param cc compilation context
-   * @param info input info
    * @return optimized expression, or calling function
    * @throws QueryException query exception
    */
-  public static Expr rewrite(final StandardFunc func, final long start, final long length,
-      final CompileContext cc, final InputInfo info) throws QueryException {
+  public Expr opt(final long start, final long length, final CompileContext cc)
+      throws QueryException {
 
-    final Expr arg = func.exprs[0];
-    if(arg instanceof FileReadTextLines) {
-      final Expr[] args = ((Arr) arg).exprs;
-      final int al = args.length;
-      if(al < 4) {
-        final ExprList list = new ExprList().add(args);
-        if(al < 2) list.add(Str.get(Strings.UTF8));
-        if(al < 3) list.add(Bln.FALSE);
-        list.add(Int.get(start)).add(Int.get(length));
-        return cc.function(Function._FILE_READ_TEXT_LINES, info, list.finish());
-      }
-    }
-    return func;
+    // [CG] merge start/length values
+    final int al = exprs.length;
+    if(al > 3) return this;
+
+    final ExprList list = new ExprList().add(exprs);
+    if(al < 2) list.add(Str.get(Strings.UTF8));
+    if(al < 3) list.add(Bln.FALSE);
+    list.add(Int.get(start + 1)).add(Int.get(length));
+    return cc.function(Function._FILE_READ_TEXT_LINES, info, list.finish());
   }
 }

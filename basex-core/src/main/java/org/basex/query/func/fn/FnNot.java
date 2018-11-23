@@ -26,15 +26,15 @@ public final class FnNot extends StandardFunc {
 
     // not(empty(A)) -> exists(A)
     if(Function.EMPTY.is(expr)) {
-      return cc.function(Function.EXISTS, info, ((FnEmpty) expr).exprs);
+      return cc.function(Function.EXISTS, info, args(expr));
     }
     // not(exists(A)) -> empty(A)
     if(Function.EXISTS.is(expr)) {
-      return cc.function(Function.EMPTY, info, exprs = ((FnExists) expr).exprs);
+      return cc.function(Function.EMPTY, info, args(expr));
     }
     // not(not(A)) -> boolean(A)
     if(Function.NOT.is(expr)) {
-      return FnBoolean.get(((FnNot) expr).exprs[0], info, cc.sc());
+      return FnBoolean.get(args(expr)[0], info, cc.sc());
     }
     // not('a' = 'b') -> 'a' != 'b'
     if(expr instanceof CmpV || expr instanceof CmpG) {

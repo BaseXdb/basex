@@ -61,10 +61,19 @@ public final class FnReverse extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr = exprs[0];
-    return expr instanceof RangeSeq ? ((RangeSeq) expr).reverse(cc.qc) :
-      expr instanceof SingletonSeq && ((SingletonSeq) expr).value.size() == 1 ||
-      expr.seqType().zeroOrOne() ? expr : adoptType(expr);
+    // singleton sequence, single item: return argument
+    if(expr instanceof SingletonSeq && ((SingletonSeq) expr).value.size() == 1 ||
+      expr.seqType().zeroOrOne()) return expr;
+    // reverse sequence
+    if(expr instanceof RangeSeq) return ((RangeSeq) expr).reverse(cc.qc);
+
+    if(Function.TAIL.is(expr) && Function.REVERSE.is(args(expr)[0]))
+      return cc.function(Function._UTIL_INIT, info, args(args(expr)[0]));
+    if(Function._UTIL_INIT.is(expr) && Function.REVERSE.is(args(expr)[0]))
+      return cc.function(Function.TAIL, info, args(args(expr)[0]));
+
+    return adoptType(expr);
   }
 }

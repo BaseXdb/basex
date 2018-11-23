@@ -74,32 +74,31 @@ public final class ItrPos extends Simple {
   /**
    * Tries to rewrite {@code fn:position() CMP number(s)} to this expression.
    * Returns an instance of this class, the original expression, or an optimized expression.
-   * @param cmp comparison expression
+   * @param pos position to be compared
    * @param op comparator
    * @param info input info
-   * @return resulting or original expression
+   * @return optimized expression or {@code null}
+   * @throws QueryException query exception
    */
-  public static Expr get(final Cmp cmp, final OpV op, final InputInfo info) {
-    final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
-    if(!Function.POSITION.is(cmp1)) return cmp;
-
-    if(cmp2 instanceof RangeSeq && op == OpV.EQ) {
-      final long[] range = ((RangeSeq) cmp2).range(false);
+  public static Expr get(final Expr pos, final OpV op, final InputInfo info) throws QueryException {
+    if(pos instanceof RangeSeq && op == OpV.EQ) {
+      final long[] range = ((RangeSeq) pos).range(false);
       return get(range[0], range[1], info);
-    } else if(cmp2 instanceof ANum) {
-      final ANum item2 = (ANum) cmp2;
-      final long pos = item2.itr();
-      final boolean exact = pos == item2.dbl();
+    } else if(pos instanceof Item) {
+      final Item item2 = (Item) pos;
+      final long p = item2.itr(info);
+      final boolean exact = p == item2.dbl(info);
       switch(op) {
-        case EQ: return exact ? get(pos, info) : Bln.FALSE;
-        case GE: return get(exact ? pos : pos + 1, Long.MAX_VALUE, info);
-        case GT: return get(pos + 1, Long.MAX_VALUE, info);
-        case LE: return get(1, pos, info);
-        case LT: return get(1, exact ? pos - 1 : pos, info);
+        case EQ: return exact ? get(p, info) : Bln.FALSE;
+        case GE: return get(exact ? p : p + 1, Long.MAX_VALUE, info);
+        case GT: return get(p + 1, Long.MAX_VALUE, info);
+        case LE: return get(1, p, info);
+        case LT: return get(1, exact ? p - 1 : p, info);
+        case NE: return exact ? p < 2 ? get(p + 1, Long.MAX_VALUE, info) : null : Bln.TRUE;
         default:
       }
     }
-    return cmp;
+    return null;
   }
 
   @Override
@@ -166,13 +165,12 @@ public final class ItrPos extends Simple {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("position() ");
-    if(min == max) {
-      sb.append("= ").append(min);
+    final StringBuilder sb = new StringBuilder().append(Function.POSITION).append(' ');
+    if(max == Long.MAX_VALUE) {
+      sb.append(">= ").append(min);
     } else {
-      if(max == Long.MAX_VALUE) sb.append('>');
       sb.append("= ").append(min);
-      if(max != Long.MAX_VALUE) sb.append(" to ").append(max);
+      if(min != max) sb.append(' ').append(TO).append(' ').append(max);
     }
     return sb.toString();
   }

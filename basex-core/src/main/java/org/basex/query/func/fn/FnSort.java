@@ -24,8 +24,8 @@ import org.basex.query.value.type.*;
 public final class FnSort extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = exprs[0].value(qc), val = value(value);
-    return val != null ? val : iter(value, qc).value(qc);
+    final Value value = exprs[0].value(qc), v = value(value);
+    return v != null ? v : iter(value, qc).value(qc);
   }
 
   @Override

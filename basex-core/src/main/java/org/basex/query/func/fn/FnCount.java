@@ -3,7 +3,6 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.func.map.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -41,8 +40,8 @@ public final class FnCount extends StandardFunc {
     }
 
     // rewrite count(map:keys(...)) to map:size(...)
-    if(expr instanceof MapKeys)
-      return cc.function(Function._MAP_SIZE, info, ((MapKeys) expr).exprs);
+    if(Function._MAP_KEYS.is(expr))
+      return cc.function(Function._MAP_SIZE, info, args(expr));
 
     return this;
   }

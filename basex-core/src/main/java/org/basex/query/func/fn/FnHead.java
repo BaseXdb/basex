@@ -18,7 +18,8 @@ import org.basex.util.*;
 public final class FnHead extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return exprs[0].iter(qc).next();
+    final Expr expr = exprs[0];
+    return expr.iter(qc).next();
   }
 
   @Override
@@ -27,14 +28,27 @@ public final class FnHead extends StandardFunc {
     final SeqType st = expr.seqType();
     if(st.zeroOrOne()) return expr;
 
-    // ignore standard limitation for large values
+    // check for large values and fn:reverse function
     if(expr instanceof Value) return ((Value) expr).itemAt(0);
 
-    exprType.assign(st.type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
+    // rewrite nested function calls
+    final long size = expr.size();
+    if(Function._UTIL_INIT.is(expr) && size > 1)
+      return cc.function(Function.HEAD, info, args(expr));
+    if(Function.TAIL.is(expr))
+      return cc.function(Function._UTIL_ITEM, info, args(expr)[0], Int.get(2));
+    if(Function.SUBSEQUENCE.is(expr) || Function._UTIL_RANGE.is(expr)) {
+      final SeqRange r = SeqRange.get(expr, cc);
+      // safety check (due to previous optimizations, r.length will never be 0)
+      if(r != null && r.length != 0)
+        return cc.function(Function._UTIL_ITEM, info, args(expr)[0], Int.get(r.start + 1));
+    }
     if(Function.REVERSE.is(expr))
-      return cc.function(Function._UTIL_LAST_FROM, info, ((Arr) expr).exprs);
+      return cc.function(Function._UTIL_LAST, info, args(expr));
+    if(Function._FILE_READ_TEXT_LINES.is(expr))
+      return ((FileReadTextLines) expr).opt(0, 1, cc);
 
-    // faster retrieval of single line
-    return FileReadTextLines.rewrite(this, 1, 1, cc, info);
+    exprType.assign(st.type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
+    return this;
   }
 }

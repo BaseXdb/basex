@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import java.util.function.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.path.*;
@@ -62,14 +61,24 @@ public abstract class Preds extends Arr {
       Expr expr = ex.optimizeEbv(cc);
       if(expr instanceof CmpG || expr instanceof CmpV) {
         final Cmp cmp = (Cmp) expr;
-        final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
-        if(Function.POSITION.is(cmp1)) {
-          // position() = last()  ->  last()
-          // position() = $n (xs:numeric)  ->  $n
-          if(numeric(cmp2) || Function.LAST.is(cmp2)) {
-            if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
-               cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
-              expr = cc.replaceWith(expr, cmp2);
+        final OpV opV = cmp.opV();
+        if(opV != null) {
+          final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
+          if(Function.POSITION.is(cmp1)) {
+            if(numeric(cmp2) && opV == OpV.EQ) {
+              // position() = NUMBER -> NUMBER
+              expr = cmp2;
+            } else if(Function.LAST.is(cmp2)) {
+              switch(opV) {
+                // position() =/>= last() -> last()
+                case EQ: case GE: expr = cmp2; break;
+                // position() <= last() -> true()
+                case LE: expr = Bln.TRUE; break;
+                // position() > last() -> false()
+                case GT: expr = Bln.FALSE; break;
+                // position() </!= last() -> handled in {@link Filter} expression
+                default:
+              }
             }
           }
         }
@@ -199,12 +208,12 @@ public abstract class Preds extends Arr {
     for(final Expr expr : exprs) {
       Expr ex = expr;
       if(ex instanceof ContextValue && st.instanceOf(SeqType.NOD_ZM)) {
-        // E [ . ]  ->  E
+        // E [ . ] -> E
         cc.info(OPTREMOVE_X_X, ex, (Supplier<?>) this::description);
         continue;
       } else if(ex instanceof SimpleMap) {
-        // E [ . ! ... ]  ->  E [ ... ]
-        // E [ E ! ... ]  ->  E [ ... ]
+        // E [ . ! ... ] -> E [ ... ]
+        // E [ E ! ... ] -> E [ ... ]
         final SimpleMap map = (SimpleMap) ex;
         final Expr first = map.exprs[0], second = map.exprs[1];
         if(!second.has(Flag.POS) && (first instanceof ContextValue ||
@@ -215,8 +224,8 @@ public abstract class Preds extends Arr {
           ex = SimpleMap.get(map.info, el.finish());
         }
       } else if(ex instanceof Path) {
-        // E [ . / ... ]  ->  E [ ... ]
-        // E [ E / ... ]  ->  E [ ... ]
+        // E [ . / ... ] -> E [ ... ]
+        // E [ E / ... ] -> E [ ... ]
         final Path path = (Path) ex;
         final Expr first = path.root;
         if(st.type instanceof NodeType && (first instanceof ContextValue ||
@@ -245,7 +254,7 @@ public abstract class Preds extends Arr {
     final Expr pred = exprs[0];
     if(pred.seqType().mayBeNumber()) return this;
 
-    // a[b]  ->  a/b
+    // a[b] -> a/b
     if(pred instanceof Path) return Path.get(info, root, pred).optimize(cc);
 
     if(pred instanceof CmpG) {
@@ -255,9 +264,9 @@ public abstract class Preds extends Arr {
       // right operand must not depend on context
       if(!expr2.has(Flag.CTX)) {
         Expr expr1 = null;
-        // a[. = 'x']  ->  a = 'x'
+        // a[. = 'x'] -> a = 'x'
         if(expr instanceof ContextValue) expr1 = root;
-        // a[text() = 'x']  ->  a/text() = 'x'
+        // a[text() = 'x'] -> a/text() = 'x'
         if(expr instanceof Path) expr1 = Path.get(info, root, expr).optimize(cc);
         if(expr1 != null) return new CmpG(expr1, expr2, cmp.op, cmp.coll, cmp.sc, cmp.info);
       }
@@ -270,9 +279,9 @@ public abstract class Preds extends Arr {
       if(!ftexpr.has(Flag.CTX)) {
         final Expr expr = cmp.expr;
         Expr expr1 = null;
-        // a[. contains text 'x']  ->  a contains text 'x'
+        // a[. contains text 'x'] -> a contains text 'x'
         if(expr instanceof ContextValue) expr1 = root;
-        // a[text() contains text 'x']  ->  a/text() contains text 'x'
+        // a[text() contains text 'x'] -> a/text() contains text 'x'
         if(expr instanceof Path) expr1 = Path.get(info, root, expr).optimize(cc);
 
         if(expr1 != null) return new FTContains(expr1, ftexpr, cmp.info);

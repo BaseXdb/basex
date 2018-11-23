@@ -18,27 +18,63 @@ import org.basex.query.value.type.*;
 public final class FnRemove extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final long pos = toLong(exprs[1], qc) - 1;
     final Iter iter = exprs[0].iter(qc);
-    final long size = iter.size();
-    return pos < 0 || size != -1 && pos > size ? iter : new Iter() {
+    final long pos = toLong(exprs[1], qc), size = iter.size();
+
+    // position out of bounds: return original value
+    if(pos <= 0 || size != -1 && pos > size) return iter;
+
+    // check if iterator is value-based
+    final Value value = iter.value();
+    if(value != null) return value(value, pos, qc).iter();
+
+    // return optimized iterator if result size is known
+    if(size > 1) return new Iter() {
       long c;
       @Override
       public Item next() throws QueryException {
-        return c++ != pos || iter.next() != null ? qc.next(iter) : null;
+        return ++c != pos || iter.next() != null ? qc.next(iter) : null;
+      }
+      @Override
+      public Item get(final long i) throws QueryException {
+        return iter.get(i + 1 < pos ? i : i + 1);
+      }
+      @Override
+      public long size() {
+        return size - 1;
+      }
+    };
+
+    // return standard iterator
+    return new Iter() {
+      long c;
+      @Override
+      public Item next() throws QueryException {
+        return ++c != pos || iter.next() != null ? qc.next(iter) : null;
       }
     };
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = exprs[0].value(qc);
-    final long pos = toLong(exprs[1], qc) - 1, size = value.size();
+    return value(exprs[0].value(qc), toLong(exprs[1], qc), qc);
+  }
+
+  /**
+   * Returns the result value.
+   * @param value original value
+   * @param pos position of the item to remove
+   * @param qc query context
+   * @return resulting value
+   */
+  private static Value value(final Value value, final long pos, final QueryContext qc) {
+    final long size = value.size();
     // position out of bounds: return original value
-    if(pos < 0 || pos >= size) return value;
-    // remove first or last item: create sub sequence
-    if(pos == 0 || pos + 1 == size) return value.subSequence(pos == 0 ? 1 : 0, size - 1, qc);
-    return ((Seq) value).remove(pos, qc);
+    if(pos <= 0 || pos > size) return value;
+    // remove first or last item (size > 0)
+    if(pos == 1 || pos == size) return value.subSequence(pos == 1 ? 1 : 0, size - 1, qc);
+    // remove item at supplied position
+    return ((Seq) value).remove(pos - 1, qc);
   }
 
   @Override
@@ -46,10 +82,26 @@ public final class FnRemove extends StandardFunc {
     // ignore standard limitation for large values
     if(allAreValues(false)) return value(cc.qc);
 
-    final Expr expr = exprs[0];
+    final Expr expr = exprs[0], pos = exprs[1];
     final SeqType st = expr.seqType();
     if(st.zero()) return expr;
-    exprType.assign(st.type, st.occ.union(Occ.ZERO));
+
+    long sz = -1;
+    if(pos instanceof Value) {
+      // position is static...
+      final long p = toLong(pos, cc.qc);
+      // return all items
+      final long size = expr.size();
+      if(p < 1 || size > 0 && p > size) return expr;
+      // skip first item
+      if(p == 1) return cc.function(Function.TAIL, info, expr);
+      // skip last item
+      if(p == size) return cc.function(Function._UTIL_INIT, info, expr);
+      // decrement result size
+      sz--;
+    }
+
+    exprType.assign(st.type, st.occ.union(Occ.ZERO), sz);
     return this;
   }
 }

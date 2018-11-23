@@ -184,8 +184,8 @@ public abstract class Path extends ParseExpr {
     if(expr == this) expr = index(cc, rt);
     /* rewrite descendant to child steps. this optimization is called after the index rewritings,
      * as it is cheaper to invert a descendant step. examples:
-     * - //B [. = '...']  ->  IA('...', B)
-     * - /A/B[. = '...']  ->  IA('...', B)/parent::A *[parent::document-node()] */
+     * - //B [. = '...'] -> IA('...', B)
+     * - /A/B[. = '...'] -> IA('...', B)/parent::A *[parent::document-node()] */
     if(expr == this) expr = children(cc, rt);
     if(expr != this) return expr.optimize(cc);
 

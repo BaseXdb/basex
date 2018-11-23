@@ -49,7 +49,7 @@ public final class Arith extends Arr {
     } else if(allAreValues(false)) {
       expr = value(cc.qc);
     } else if(nums && oneNoArray) {
-      // example: number($a) + 0  ->  number($a)
+      // example: number($a) + 0 -> number($a)
       final Expr ex = calc.optimize(expr1, expr2);
       if(ex != null && ex.seqType().type.eq(type)) expr = ex;
     }

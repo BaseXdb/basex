@@ -81,16 +81,16 @@ public class CmpG extends Cmp {
     /** String representation. */
     public final String name;
     /** Value comparison operator. */
-    public final OpV op;
+    public final OpV opV;
 
     /**
      * Constructor.
      * @param name string representation
-     * @param op comparator
+     * @param opV operator for value comparisons
      */
-    OpG(final String name, final OpV op) {
+    OpG(final String name, final OpV opV) {
       this.name = name;
-      this.op = op;
+      this.opV = opV;
     }
 
     /**
@@ -110,18 +110,18 @@ public class CmpG extends Cmp {
 
     /**
      * Returns the comparator for the specified value comparison operator.
-     * @param cmp operator to be found
+     * @param opV operator to be found
      * @return comparator or {@code null}
      */
-    static OpG get(final OpV cmp) {
+    static OpG get(final OpV opV) {
       for(final OpG value : VALUES) {
-        if(value.op == cmp) return value;
+        if(value.opV == opV) return value;
       }
       return null;
     }
   }
 
-  /** Comparator. */
+  /** Operator. */
   OpG op;
 
   /**
@@ -151,7 +151,7 @@ public class CmpG extends Cmp {
     }
 
     // optimize expression
-    Expr expr = opt(op.op, cc);
+    Expr expr = opt(cc);
 
     // simplify singleton sequences
     for(int e = 0; e < 2; e++) {
@@ -275,7 +275,7 @@ public class CmpG extends Cmp {
           item1 instanceof AStr && item2 instanceof AStr ||
           item1 instanceof Dur && item2 instanceof Dur)) throw diffError(item1, item2, info);
     }
-    return op.op.eval(item1, item2, coll, sc, info);
+    return op.opV.eval(item1, item2, coll, sc, info);
   }
 
   @Override
@@ -284,6 +284,11 @@ public class CmpG extends Cmp {
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     return st1.oneNoArray() && st2.oneNoArray() ?
       new CmpG(expr1, expr2, op.invert(), coll, sc, info).optimize(cc) : this;
+  }
+
+  @Override
+  public final OpV opV() {
+    return op.opV;
   }
 
   /**

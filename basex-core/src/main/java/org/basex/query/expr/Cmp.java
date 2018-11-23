@@ -70,19 +70,24 @@ public abstract class Cmp extends Arr {
   public abstract Expr invert(CompileContext cc) throws QueryException;
 
   /**
+   * Returns the value operator of the expression.
+   * @return operator, or {@code null} if not defined
+   */
+  public abstract OpV opV();
+
+  /**
    * Performs various optimizations.
-   * @param op operator
    * @param cc compilation context
    * @return resulting expression
    * @throws QueryException query exception
    */
-  final Expr opt(final OpV op, final CompileContext cc) throws QueryException {
+  final Expr opt(final CompileContext cc) throws QueryException {
+    final OpV op = opV();
     Expr expr = optEqual(op, this instanceof CmpV, cc);
     if(expr == this) expr = optFalse(op, cc);
     if(expr == this) expr = optCount(op, cc);
     if(expr == this) expr = optStringLength(op, cc);
-    if(expr == this) expr = ItrPos.get(this, op, info);
-    if(expr == this) expr = Pos.get(this, op, info, cc);
+    if(expr == this) expr = optPos(op, cc);
     return expr;
   }
 
@@ -120,7 +125,7 @@ public abstract class Cmp extends Arr {
    * Tries to rewrite {@code A = false()} to {@code not(A)}.
    * @param op operator
    * @param cc compilation context
-   * @return resulting expression
+   * @return optimized or original expression
    * @throws QueryException query exception
    */
   final Expr optFalse(final OpV op, final CompileContext cc) throws QueryException {
@@ -133,7 +138,7 @@ public abstract class Cmp extends Arr {
    * Tries to rewrite {@code fn:count}.
    * @param op operator
    * @param cc compilation context
-   * @return resulting expression
+   * @return optimized or original expression
    * @throws QueryException query exception
    */
   final Expr optCount(final OpV op, final CompileContext cc) throws QueryException {
@@ -160,7 +165,7 @@ public abstract class Cmp extends Arr {
    * Tries to rewrite {@code fn:string-length}.
    * @param op operator
    * @param cc compilation context
-   * @return resulting expression
+   * @return optimized or original expression
    * @throws QueryException query exception
    */
   final Expr optStringLength(final OpV op, final CompileContext cc) throws QueryException {
@@ -186,6 +191,29 @@ public abstract class Cmp extends Arr {
       }
     }
     return this;
+  }
+
+  /**
+   * Positional optimizations.
+   * @param op operator
+   * @param cc compilation context
+   * @return optimized or original expression
+   * @throws QueryException query exception
+   */
+  final Expr optPos(final OpV op, final CompileContext cc) throws QueryException {
+    if(!positional()) return this;
+
+    Expr expr = ItrPos.get(exprs[1], op, info);
+    if(expr == null) expr = Pos.get(exprs[1], op, info, cc);
+    return expr != null ? expr : this;
+  }
+
+  /**
+   * Indicates if this is a positional comparison.
+   * @return result of check
+   */
+  public boolean positional() {
+    return Function.POSITION.is(exprs[0]);
   }
 
   /**

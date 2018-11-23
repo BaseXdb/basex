@@ -1312,19 +1312,26 @@ public enum Function {
   _UTIL_DEEP_EQUAL(UtilDeepEqual.class, "deep-equal(items1,items2[,options])",
       arg(ITEM_ZM, ITEM_ZM, ITEM_O), BLN_O, UTIL_URI),
   /** XQuery function. */
-  _UTIL_EXCEPT_LAST(UtilExceptLast.class, "except-last(items)", arg(ITEM_ZM), ITEM_ZM, UTIL_URI),
-  /** XQuery function. */
   _UTIL_IF(UtilIf.class, "if(condition,then[,else])",
       arg(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
-  _UTIL_ITEM_AT(UtilItemAt.class, "item-at(items,pos)", arg(ITEM_ZM, DBL_O), ITEM_ZO, UTIL_URI),
+  _UTIL_INIT(UtilInit.class, "init(items)", arg(ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
+  _UTIL_ITEM(UtilItem.class, "item(items,pos)", arg(ITEM_ZM, DBL_O), ITEM_ZO, UTIL_URI),
+  /** XQuery function (legacy, now: util:item). */
+  _UTIL_ITEM_AT(UtilItemAt.class, "item-at(items,pos)", arg(ITEM_ZM, DBL_O), ITEM_ZO, UTIL_URI),
+  /** XQuery function (legacy, now: util:sub). */
   _UTIL_ITEM_RANGE(UtilItemRange.class, "item-range(items,first,last)",
       arg(ITEM_ZM, DBL_O, DBL_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
+  _UTIL_LAST(UtilLast.class, "last(items)", arg(ITEM_ZM), ITEM_ZO, UTIL_URI),
+  /** XQuery function (legacy, now: util:last). */
   _UTIL_LAST_FROM(UtilLastFrom.class, "last-from(items)", arg(ITEM_ZM), ITEM_ZO, UTIL_URI),
   /** XQuery function. */
   _UTIL_OR(UtilOr.class, "or(items,default)", arg(ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
+  /** XQuery function. */
+  _UTIL_RANGE(UtilRange.class, "range(items,first,last)",
+      arg(ITEM_ZM, DBL_O, DBL_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_REPLICATE(UtilReplicate.class, "replicate(items,count)",
       arg(ITEM_ZM, ITR_O), ITEM_ZM, UTIL_URI),

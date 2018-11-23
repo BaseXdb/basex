@@ -45,7 +45,7 @@ public final class InlineTest extends QueryPlanTest {
         "  default return ()" +
         "return $type",
         "<type>a</type>",
-        count("Let", 2));
+        count(Let.class, 2));
   }
 
   /** Regression test for Issue GH-849, "Typing and Function items: XPTY0004". */
@@ -88,12 +88,12 @@ public final class InlineTest extends QueryPlanTest {
   /** Checks that the simple map operator prohibits inlining a context item into its RHS. */
   @Test public void gh1055() {
     check("let $d := for-each(1 to 100, function($a) { $a }) "
-        + "return count((1 to 2) ! $d)",
-        200,
-        exists(_UTIL_REPLICATE.clazz));
-    check("let $d := for-each(1 to 11, function($a) { $a }) return count((1 to 2) ! $d[1])",
-        2,
-        exists(_UTIL_REPLICATE.clazz));
+        + "return ((1 to 2) ! $d) = 1",
+        true,
+        exists(_UTIL_REPLICATE));
+    check("let $d := for-each(1 to 11, function($a) { $a }) return ((1 to 2) ! $d[1]) = 12",
+        false,
+        exists(_UTIL_REPLICATE));
     check("for $x in (<x/>, <x/>) where (1, 2) ! $x return $x",
         "<x/>\n<x/>",
         empty(ContextValue.class));
@@ -140,8 +140,8 @@ public final class InlineTest extends QueryPlanTest {
     check("let $s := 1 ! <a>{ . }</a> "
         + "for tumbling window $w in 1 to 2 start when true() end when true() return $s",
         "<a>1</a>\n<a>1</a>",
-        count("Let", 1),
-        count("Window", 1),
+        count(Let.class, 1),
+        count(Window.class, 1),
         "//Let << //Window");
   }
 
