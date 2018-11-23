@@ -19,7 +19,7 @@ declare variable $dba:CAT := 'logs';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/logs/jump")
+  %rest:path("/dba/logs-jump")
   %rest:query-param("name", "{$name}")
   %rest:query-param("time", "{$time}")
 function dba:jump-page(
@@ -190,7 +190,7 @@ function dba:log(
       'time': function() {
         let $value := string($log/@time)
         return if($input or $sort) then (
-          html:link($value, $dba:CAT || '/jump', map { 'name': $name, 'time': $value })
+          html:link($value, $dba:CAT || '-jump', map { 'name': $name, 'time': $value })
         ) else if($value = $time) then (
           <b>{ $value }</b>
         ) else (
