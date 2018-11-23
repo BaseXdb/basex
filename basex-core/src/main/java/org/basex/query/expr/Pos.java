@@ -44,7 +44,7 @@ public final class Pos extends Arr {
       final CompileContext cc) throws QueryException {
 
     final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
-    if(!cmp1.isFunction(Function.POSITION)) return cmp;
+    if(!Function.POSITION.is(cmp1)) return cmp;
 
     Expr min = null, max = null;
     final SeqType st1 = cmp1.seqType(), st2 = cmp2.seqType();

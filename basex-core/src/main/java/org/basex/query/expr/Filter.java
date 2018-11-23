@@ -119,7 +119,7 @@ public abstract class Filter extends Preds {
     boolean opt = false;
     for(final Expr pred : exprs) {
       exp = null;
-      if(pred.isFunction(Function.LAST)) {
+      if(Function.LAST.is(pred)) {
         if(rt instanceof Value) {
           // value: replace with last item
           exp = ((Value) rt).itemAt(rt.size() - 1);

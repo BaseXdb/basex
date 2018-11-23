@@ -39,7 +39,7 @@ public final class UtilLastFrom extends StandardFunc {
     if(expr instanceof Value) return ((Value) expr).itemAt(expr.size() - 1);
 
     exprType.assign(st.type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
-    if(expr.isFunction(Function.REVERSE))
+    if(Function.REVERSE.is(expr))
       return cc.function(Function.HEAD, info, ((Arr) expr).exprs);
 
     // check for large values and fn:reverse function

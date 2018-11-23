@@ -48,15 +48,15 @@ public abstract class Cmp extends Arr {
    */
   final boolean swap() {
     // move value, or path without root, to second position
-    final boolean swap = exprs[0] instanceof Value && !(exprs[1] instanceof Value) ||
-        exprs[1] instanceof Path && ((Path) exprs[1]).root == null &&
-        (!(exprs[0] instanceof Path) || ((Path) exprs[0]).root != null) ||
-        exprs[1].isFunction(Function.POSITION);
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final boolean swap = expr1 instanceof Value && !(expr2 instanceof Value) ||
+      expr2 instanceof Path && ((Path) expr2).root == null &&
+      (!(expr1 instanceof Path) || ((Path) expr1).root != null) ||
+      Function.POSITION.is(expr2);
 
     if(swap) {
-      final Expr tmp = exprs[0];
-      exprs[0] = exprs[1];
-      exprs[1] = tmp;
+      exprs[0] = expr2;
+      exprs[1] = expr1;
     }
     return swap;
   }
@@ -138,7 +138,7 @@ public abstract class Cmp extends Arr {
    */
   final Expr optCount(final OpV op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(!(expr1.isFunction(Function.COUNT) && expr2 instanceof Item)) return this;
+    if(!(Function.COUNT.is(expr1) && expr2 instanceof Item)) return this;
 
     // evaluate argument
     final Item item2 = (Item) expr2;
@@ -165,7 +165,7 @@ public abstract class Cmp extends Arr {
    */
   final Expr optStringLength(final OpV op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(!(expr1.isFunction(Function.STRING_LENGTH) && expr2 instanceof Item)) return this;
+    if(!(Function.STRING_LENGTH.is(expr1) && expr2 instanceof Item)) return this;
 
     // evaluate argument
     final Item item2 = (Item) expr2;

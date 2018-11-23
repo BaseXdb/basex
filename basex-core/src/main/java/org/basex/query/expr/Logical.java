@@ -84,7 +84,7 @@ abstract class Logical extends Arr {
 
     // negate expressions
     for(final Expr expr : exprs) {
-      if(!expr.isFunction(Function.NOT)) return this;
+      if(!Function.NOT.is(expr)) return this;
     }
     list = new ExprList(exprs.length);
     for(final Expr expr : exprs) list.add(((FnNot) expr).exprs[0]);

@@ -64,7 +64,7 @@ public final class Try extends Single {
 
     SeqType st = expr.seqType();
     for(final Catch ctch : catches) {
-      if(!ctch.expr.isFunction(Function.ERROR)) st = st.union(ctch.seqType());
+      if(!Function.ERROR.is(ctch.expr)) st = st.union(ctch.seqType());
     }
     exprType.assign(st);
     return this;

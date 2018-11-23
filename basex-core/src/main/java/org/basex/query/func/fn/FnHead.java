@@ -31,7 +31,7 @@ public final class FnHead extends StandardFunc {
     if(expr instanceof Value) return ((Value) expr).itemAt(0);
 
     exprType.assign(st.type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
-    if(expr.isFunction(Function.REVERSE))
+    if(Function.REVERSE.is(expr))
       return cc.function(Function._UTIL_LAST_FROM, info, ((Arr) expr).exprs);
 
     // faster retrieval of single line
