@@ -28,13 +28,13 @@ declare
   %rest:path("/dba/static/{$file=.+}")
   %perm:allow("all")
 function dba:file(
-  $file as xs:string
+  $file  as xs:string
 ) as item()+ {
   let $path := file:base-dir() || 'static/' || $file
   return (
     web:response-header(
       map { 'media-type': web:content-type($path) },
-      map { 'Cache-Control': 'max-age=3600,public' }
+      map { 'Cache-Control': 'max-age=3600,public', 'Content-Length': file:size($path) }
     ),
     file:read-binary($path)
   )

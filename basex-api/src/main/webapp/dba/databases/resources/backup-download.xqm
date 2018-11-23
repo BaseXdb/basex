@@ -11,10 +11,17 @@ module namespace dba = 'dba/databases';
  : @return binary data
  :)
 declare
+  %rest:GET
   %rest:path("/dba/backup/{$backup}")
-  %output:media-type("application/octet-stream")
 function dba:backup-download(
   $backup  as xs:string
-) as xs:base64Binary {
-  file:read-binary(db:option('dbpath') || '/' || $backup)
+) as item()+ {
+  let $path := db:option('dbpath') || '/' || $backup
+  return (
+    web:response-header(
+      map { 'media-type': 'application/octet-stream' },
+      map { 'Content-Length': file:size($path) }
+    ),
+    file:read-binary($path)
+  )
 };

@@ -18,6 +18,12 @@ declare
 function dba:files(
   $name  as xs:string
 ) as item()+ {
-  web:response-header(map { 'media-type': 'application/octet-stream' }),
-  file:read-binary(session:directory() || $name)
+  let $path := session:directory() || $name
+  return (
+    web:response-header(
+      map { 'media-type': 'application/octet-stream' },
+      map { 'Content-Length': file:size($path) }
+    ),
+    file:read-binary($path)
+  )
 };
