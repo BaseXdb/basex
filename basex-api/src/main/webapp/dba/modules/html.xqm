@@ -365,9 +365,9 @@ declare function html:table(
       if($single-page) then () else (
         '(Page: ',
         let $last := ($count - 1) idiv $max + 1
-        let $pages := distinct-values((
+        let $pages := sort(distinct-values((
           1, $page - ($last idiv 10), $page - 1, $page, $page + 1, $page + ($last idiv 10), $last
-        ))[. >= 1 and . <= $last]
+        ))[. >= 1 and . <= $last])
         for $p at $pos in $pages
         let $suffix := (if($p = $last) then ')' else ' ') ||
           (if($pages[$pos + 1] > $p + 1) then ' … ' else ())
