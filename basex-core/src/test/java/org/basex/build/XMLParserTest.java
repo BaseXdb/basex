@@ -27,7 +27,7 @@ public final class XMLParserTest extends SandboxTest {
   /**
    * Finishes the tests.
    */
-  @Before
+  @After
   public void after() {
     set(MainOptions.MAINMEM, false);
     set(MainOptions.CHOP, true);
@@ -76,8 +76,25 @@ public final class XMLParserTest extends SandboxTest {
 
     // list all errors
     if(sb.length() != 0) fail(sb.toString());
+  }
 
-    set(MainOptions.MAINMEM, false);
+  /**
+   * Empty elements with 31 attributes.
+   * @throws Exception exception
+   */
+  @Test
+  public void gh1648() throws Exception {
+    set(MainOptions.INTPARSE, true);
+
+    // build document with various number of arguments (30..33)
+    for(int a = 30; a <= 33; a++) {
+      final StringBuilder doc = new StringBuilder("<_");
+      for(int i = 0; i < a; i++) doc.append(" a").append(a).append("=''");
+      doc.append("/>");
+
+      new CreateDB(NAME, doc.toString()).execute(context);
+      new XQuery("_[_]").execute(context);
+    }
   }
 
   /**

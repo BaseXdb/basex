@@ -130,7 +130,7 @@ public abstract class Builder extends Job {
     addElem(name, att, nsp);
     final int pre = parStack.get(level);
     nspaces.close(pre);
-    if(att.size() > IO.MAXATTS) setSize(pre, meta.size - pre);
+    if(att.size() >= IO.MAXATTS) setSize(pre, meta.size - pre);
   }
 
   /**
