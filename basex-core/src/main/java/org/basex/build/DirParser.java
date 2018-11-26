@@ -110,7 +110,7 @@ public final class DirParser extends Parser {
     if(input instanceof IOFile && input.isDir()) {
       for(final IO f : ((IOFile) input).children()) parse(builder, f);
     } else if(archives && input.isArchive()) {
-      final String name = input.name().toLowerCase(Locale.ENGLISH);
+      String name = input.name().toLowerCase(Locale.ENGLISH);
       InputStream in = input.inputStream();
       if(name.endsWith(IO.TARSUFFIX) || name.endsWith(IO.TGZSUFFIX) ||
           name.endsWith(IO.TARGZSUFFIX)) {
@@ -127,7 +127,11 @@ public final class DirParser extends Parser {
       } else if(name.endsWith(IO.GZSUFFIX)) {
         // process GZIP archive
         try(GZIPInputStream is = new GZIPInputStream(in)) {
-          source = newStream(is, input.name().replaceAll("\\..*", IO.XMLSUFFIX), input);
+          // generate filename (the optional filename cannot be retrieve from the input stream):
+          // drop archive suffix, add .xml if no suffix remains
+          name = input.name().replaceAll("\\.[^.]+$", "");
+          if(!Strings.contains(name, '.')) name += IO.XMLSUFFIX;
+          source = newStream(is, name, input);
           parseResource(builder);
         }
       } else {
