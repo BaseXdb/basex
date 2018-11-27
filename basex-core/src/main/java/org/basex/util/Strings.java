@@ -59,6 +59,15 @@ public final class Strings {
   }
 
   /**
+   * Checks if the specified string is "yes", "true", "on" or "1".
+   * @param string string to be checked
+   * @return result of check
+   */
+  public static boolean toBoolean(final String string) {
+    return eqic(string, "1", Text.TRUE, Text.YES, Text.ON);
+  }
+
+  /**
    * Compares two strings for equality. The arguments may be {@code null}.
    * @param str1 first string
    * @param str2 strings to be compared
@@ -224,15 +233,6 @@ public final class Strings {
     } catch(final IllegalArgumentException ex) {
       return false;
     }
-  }
-
-  /**
-   * Checks if the specified string is "yes", "true", "on" or "1".
-   * @param string string to be checked
-   * @return result of check
-   */
-  public static boolean yes(final String string) {
-    return eqic(string, Text.TRUE, Text.YES, Text.ON, "1");
   }
 
   /**

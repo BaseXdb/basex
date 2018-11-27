@@ -132,7 +132,7 @@ public final class OptimizeAll extends ACreate {
     nmeta.createtoken = ometa.createtoken;
     nmeta.createft = ometa.createft;
     nmeta.original = ometa.original;
-    nmeta.filesize = ometa.filesize;
+    nmeta.inputsize = ometa.inputsize;
     nmeta.time = ometa.time;
     nmeta.dirty = true;
     try {

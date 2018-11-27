@@ -30,13 +30,13 @@ public final class MetaData {
   /** Database name. */
   public String name;
 
-  /** Path to original document. */
+  /** Path to initially imported resources. */
   public String original = "";
-  /** Size of original document. */
-  public long filesize;
-  /** Timestamp of original document. */
+  /** Size of initially imported resources. */
+  public long inputsize;
+  /** Database timestamp. */
   public long time;
-  /** Number of stored documents. */
+  /** Number of stored XML documents. */
   public int ndocs;
 
   /** Indicates if a text index exists. */
@@ -389,26 +389,26 @@ public final class MetaData {
         case DBMAXCATS:  maxcats = toInt(v); break;
         case DBLASTID:   lastid = toInt(v); break;
         case DBTIME:     time = toLong(v); break;
-        case DBFSIZE:    filesize = toLong(v); break;
-        case DBFTDC:     diacritics = toBool(v); break;
-        case DBUPDIDX:   updindex = toBool(v); break;
-        case DBAUTOOPT:  autooptimize = toBool(v); break;
-        case DBTXTIDX:   textindex = toBool(v); break;
-        case DBATVIDX:   attrindex = toBool(v); break;
-        case DBTOKIDX:   tokenindex = toBool(v); break;
-        case DBFTXIDX:   ftindex = toBool(v); break;
+        case DBFSIZE:    inputsize = toLong(v); break;
+        case DBFTDC:     diacritics = toBoolean(v); break;
+        case DBUPDIDX:   updindex = toBoolean(v); break;
+        case DBAUTOOPT:  autooptimize = toBoolean(v); break;
+        case DBTXTIDX:   textindex = toBoolean(v); break;
+        case DBATVIDX:   attrindex = toBoolean(v); break;
+        case DBTOKIDX:   tokenindex = toBoolean(v); break;
+        case DBFTXIDX:   ftindex = toBoolean(v); break;
         case DBTXTINC:   textinclude = v; break;
         case DBATVINC:   attrinclude = v; break;
         case DBTOKINC:   tokeninclude = v; break;
         case DBFTXINC:   ftinclude = v; break;
         case DBSPLITS:   splitsize = toInt(v); break;
-        case DBCRTTXT:   createtext = toBool(v); break;
-        case DBCRTATV:   createattr = toBool(v); break;
-        case DBCRTTOK:   createtoken = toBool(v); break;
-        case DBCRTFTX:   createft = toBool(v); break;
-        case DBFTST:     stemming = toBool(v); break;
-        case DBFTCS:     casesens = toBool(v); break;
-        case DBUPTODATE: uptodate = toBool(v); break;
+        case DBCRTTXT:   createtext = toBoolean(v); break;
+        case DBCRTATV:   createattr = toBoolean(v); break;
+        case DBCRTTOK:   createtoken = toBoolean(v); break;
+        case DBCRTFTX:   createft = toBoolean(v); break;
+        case DBFTST:     stemming = toBoolean(v); break;
+        case DBFTCS:     casesens = toBoolean(v); break;
+        case DBUPTODATE: uptodate = toBoolean(v); break;
       }
     }
 
@@ -431,7 +431,7 @@ public final class MetaData {
     writeInfo(out, DBFNAME,    original);
     writeInfo(out, DBTIME,     time);
     writeInfo(out, IDBSTR,     ISTORAGE);
-    writeInfo(out, DBFSIZE,    filesize);
+    writeInfo(out, DBFSIZE,    inputsize);
     writeInfo(out, DBNDOCS,    ndocs);
     writeInfo(out, DBSIZE,     size);
     writeInfo(out, DBUPDIDX,   updindex);
@@ -482,22 +482,13 @@ public final class MetaData {
    * @param parser parser
    */
   public void assign(final Parser parser) {
-    final IO file = parser.source;
-    original = file != null ? file.path() : "";
-    filesize = file != null ? file.length() : 0;
-    time = file != null ? file.timeStamp() : System.currentTimeMillis();
+    final IO source = parser.source;
+    original = source != null ? source.path() : "";
+    inputsize = source != null ? source.length() : 0;
+    time = source != null ? source.timeStamp() : System.currentTimeMillis();
   }
 
   // PRIVATE METHODS ==============================================================================
-
-  /**
-   * Converts the specified string to a boolean value.
-   * @param value value
-   * @return result
-   */
-  private static boolean toBool(final String value) {
-    return "1".equals(value);
-  }
 
   /**
    * Writes a boolean option to the specified output.

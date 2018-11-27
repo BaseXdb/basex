@@ -10,6 +10,7 @@ import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.io.parse.xml.*;
 import org.basex.util.*;
 import org.xml.sax.*;
@@ -24,31 +25,29 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class SAXWrapper extends SingleParser {
-  /** File counter. */
-  private long counter;
-  /** Current line. */
-  private int line = 1;
+  /** Processed bytes. */
+  private long bytes;
+  /** Processed lines. */
+  private int lines;
 
   /** SAX handler reference. */
   private SAXHandler saxh;
-  /** Optional XML reader. */
-  private final SAXSource saxs;
-  /** File length. */
+  /** File length (real or estimated). */
   private long length;
 
   /**
    * Constructor.
-   * @param source sax source
+   * @param source input source
    * @param opts database options
    */
   public SAXWrapper(final IO source, final MainOptions opts) {
     super(source, opts);
-    saxs = new SAXSource(source.inputSource());
   }
 
   @Override
   public void parse() throws IOException {
-    final InputSource is = wrap(saxs.getInputSource());
+    final InputSource is = inputSource();
+    final SAXSource saxs = new SAXSource(is);
     try {
       XMLReader reader = saxs.getXMLReader();
       if(reader == null) {
@@ -87,49 +86,34 @@ public final class SAXWrapper extends SingleParser {
   }
 
   /**
-   * Wraps the input source with a stream which counts the number of read bytes
-   * and parsed lines.
-   * @param is input source
-   * @return resulting stream, or {@code null} if specified source is {@code null} as well
+   * Returns an input source. Wraps the input source with a stream which counts the number of
+   * read bytes and parsed lines.
+   * @return resulting SAX source
    * @throws IOException I/O exception
    */
   @SuppressWarnings("resource")
-  private InputSource wrap(final InputSource is) throws IOException {
-    if(is == null) return null;
-
-    // choose input stream
-    final InputStream in;
-    if(is.getByteStream() != null) {
-      in = is.getByteStream();
-    } else if(is.getSystemId() == null || is.getSystemId().isEmpty()) {
-      return is;
-    } else if(source instanceof IOFile) {
-      in = new FileInputStream(source.path());
-    } else if(source instanceof IOContent || source instanceof IOUrl) {
-      in = new ByteArrayInputStream(source.read());
-    } else {
-      return is;
-    }
+  private InputSource inputSource() throws IOException {
+    final InputStream input = source.inputStream();
 
     // retrieve/estimate number of bytes to be read
     length = source.length();
     try {
-      if(length <= 0) length = in.available();
+      if(length <= 0) length = input.available();
     } catch(final IOException ex) {
-      in.close();
+      input.close();
       throw ex;
     }
 
-    // create wrapper
-    final InputSource tmp = new InputSource(new InputStream() {
-      final InputStream buffer = in instanceof ByteArrayInputStream ? in :
-        new BufferedInputStream(in);
+    // create input source with wrapped input stream
+    final InputStream wrapped = new InputStream() {
+      final InputStream buffer = input instanceof ByteArrayInputStream ||
+          input instanceof ArrayInput ? input : BufferInput.get(input);
 
       @Override
       public int read() throws IOException {
         final int i = buffer.read();
-        if(i == '\n') ++line;
-        ++counter;
+        if(i == '\n') ++lines;
+        ++bytes;
         return i;
       }
 
@@ -137,21 +121,20 @@ public final class SAXWrapper extends SingleParser {
       public void close() throws IOException {
         buffer.close();
       }
-    });
+    };
 
-    saxs.setInputSource(tmp);
-    saxs.setSystemId(is.getSystemId());
-    return tmp;
+    final InputSource is = new InputSource(wrapped);
+    is.setSystemId(source.url());
+    return is;
   }
 
   @Override
   public String detailedInfo() {
-    return length == 0 ? super.detailedInfo() : Util.info(SCANPOS_X_X, source.name(), line);
+    return length == 0 ? super.detailedInfo() : Util.info(SCANPOS_X_X, source.name(), lines + 1);
   }
 
   @Override
   public double progressInfo() {
-    return length == 0 ? saxh == null ? 0 : saxh.nodes / 3000000.0d % 1 :
-      (double) counter / length;
+    return length == 0 ? saxh == null ? 0 : saxh.nodes / 3000000.0d % 1 : (double) bytes / length;
   }
 }

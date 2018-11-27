@@ -53,7 +53,7 @@ public final class SqlConnect extends SqlFn {
           // open connection and set auto-commit mode
           conn = DriverManager.getConnection(url, props);
           if(options.containsKey(AUTOCOMMIT)) {
-            conn.setAutoCommit(Strings.yes(options.get(AUTOCOMMIT)));
+            conn.setAutoCommit(Strings.toBoolean(options.get(AUTOCOMMIT)));
           }
         } else {
           conn = DriverManager.getConnection(url, user, pass);

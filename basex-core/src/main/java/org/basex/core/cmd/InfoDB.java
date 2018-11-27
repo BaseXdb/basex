@@ -60,7 +60,7 @@ public final class InfoDB extends AInfo {
 
     tb.add(NL).addExt(header, RES_PROPS);
     info(tb, MetaProp.INPUTPATH, meta);
-    info(tb, MetaProp.INPUTSIZE.name(), Performance.format(meta.filesize));
+    info(tb, MetaProp.INPUTSIZE.name(), Performance.format(meta.inputsize));
     info(tb, MetaProp.INPUTDATE, meta);
 
     if(index) {

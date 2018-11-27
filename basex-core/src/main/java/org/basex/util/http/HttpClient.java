@@ -72,8 +72,8 @@ public final class HttpClient {
       final String status = req.attribute(STATUS_ONLY);
       final String sendAuth = req.attribute(SEND_AUTHORIZATION);
 
-      final boolean body = status == null || !Strings.yes(status);
-      final boolean challenge = sendAuth == null || !Strings.yes(sendAuth);
+      final boolean body = status == null || !Strings.toBoolean(status);
+      final boolean challenge = sendAuth == null || !Strings.toBoolean(sendAuth);
       final String url = href == null || href.length == 0 ? req.attribute(HREF) : string(href);
 
       if(url == null || url.isEmpty()) throw HC_URL.get(info);
@@ -233,7 +233,7 @@ public final class HttpClient {
         conn.setReadTimeout(Strings.toInt(timeout) * 1000);
       }
       final String redirect = request.attribute(FOLLOW_REDIRECT);
-      if(redirect != null) setFollowRedirects(Strings.yes(redirect));
+      if(redirect != null) setFollowRedirects(Strings.toBoolean(redirect));
 
       request.headers.forEach(conn::addRequestProperty);
     }

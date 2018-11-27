@@ -59,7 +59,7 @@ public final class DiskBuilder extends Builder {
     // calculate optimized output buffer sizes to reduce disk fragmentation
     final Runtime rt = Runtime.getRuntime();
     final long max = Math.min(1 << 22, rt.maxMemory() - rt.freeMemory() >> 2);
-    int bs = (int) Math.min(meta.filesize, max);
+    int bs = (int) Math.min(meta.inputsize, max);
     bs = Math.max(IO.BLOCKSIZE, bs - bs % IO.BLOCKSIZE);
 
     // drop old database (if available) and create new one

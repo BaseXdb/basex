@@ -162,7 +162,7 @@ public abstract class IO {
   }
 
   /**
-   * Tests if this is a directory instance.
+   * Tests if this is a local directory instance, or if the path ends with a slash.
    * @return result of check
    */
   public boolean isDir() {

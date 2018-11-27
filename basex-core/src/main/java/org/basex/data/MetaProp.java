@@ -56,7 +56,7 @@ public enum MetaProp {
   /** Property. */
   INPUTSIZE(false) {
     @Override
-    public Long value(final MetaData meta) { return meta.filesize; }
+    public Long value(final MetaData meta) { return meta.inputsize; }
   },
   /** Property. */
   INPUTDATE(false) {

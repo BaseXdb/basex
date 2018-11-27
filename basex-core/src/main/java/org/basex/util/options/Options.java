@@ -724,7 +724,7 @@ public class Options implements Iterable<Option<?>> {
       final boolean v;
       if(item.type.isStringOrUntyped()) {
         final String string = string(item.string(null));
-        v = Strings.yes(string);
+        v = Strings.toBoolean(string);
         if(!v && !Strings.no(string))
           throw new BaseXException(Text.OPT_BOOLEAN_X_X, option.name(), string);
       } else if(item instanceof Bln) {
@@ -797,7 +797,7 @@ public class Options implements Iterable<Option<?>> {
         if(b == null) throw new BaseXException(Text.OPT_BOOLEAN_X_X, option.name(), "");
         v = !b;
       } else {
-        v = Strings.yes(value);
+        v = Strings.toBoolean(value);
         if(!v && !Strings.no(value))
           throw new BaseXException(Text.OPT_BOOLEAN_X_X, option.name(), value);
       }

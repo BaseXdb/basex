@@ -71,7 +71,7 @@ public final class DBOptions {
         if(v < 0) throw BASEX_OPTIONS_X_X.get(info, key, value);
         map.put(option, v);
       } else if(option instanceof BooleanOption) {
-        final boolean yes = Strings.yes(value);
+        final boolean yes = Strings.toBoolean(value);
         if(!yes && !Strings.no(value)) throw BASEX_OPTIONS_X_X.get(info, key, value);
         map.put(option, yes);
       } else if(option instanceof StringOption) {

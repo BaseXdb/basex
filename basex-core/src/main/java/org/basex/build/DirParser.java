@@ -53,8 +53,8 @@ public final class DirParser extends Parser {
   private IO lastSrc;
   /** Parser reference. */
   private Parser parser;
-  /** Element counter. */
-  private int c;
+  /** Resource counter. */
+  private int resources;
 
   /**
    * Constructor.
@@ -95,7 +95,7 @@ public final class DirParser extends Parser {
 
   @Override
   public void parse(final Builder build) throws IOException {
-    build.meta.filesize = 0;
+    build.meta.inputsize = 0;
     build.meta.original = original;
     parse(build, source);
   }
@@ -117,10 +117,10 @@ public final class DirParser extends Parser {
         // process TAR files
         if(!name.endsWith(IO.TARSUFFIX)) in = new GZIPInputStream(in);
         try(TarInputStream is = new TarInputStream(in)) {
-          for(TarEntry ze; (ze = is.getNextEntry()) != null;) {
-            if(ze.isDirectory()) continue;
-            source = newStream(is, ze.getName(), input);
-            source.length(ze.getSize());
+          for(TarEntry te; (te = is.getNextEntry()) != null;) {
+            if(te.isDirectory()) continue;
+            source = newStream(is, te.getName(), input);
+            source.length(te.getSize());
             parseResource(builder);
           }
         }
@@ -174,10 +174,6 @@ public final class DirParser extends Parser {
   private void parseResource(final Builder builder) throws IOException {
     builder.checkStop();
 
-    // add file size for database meta information
-    final long l = source.length();
-    if(l != -1) builder.meta.filesize += l;
-
     // use global target as path prefix
     final String name = source.name();
     String targ = target;
@@ -191,54 +187,49 @@ public final class DirParser extends Parser {
     }
 
     // check if file passes the name filter pattern
-    boolean exclude = false;
-    if(filter != null) {
-      final String nm = Prop.CASE ? name : name.toLowerCase(Locale.ENGLISH);
-      exclude = !filter.matcher(nm).matches();
-    }
+    final boolean include = filter == null ||
+        filter.matcher(Prop.CASE ? name : name.toLowerCase(Locale.ENGLISH)).matches();
 
-    if(exclude) {
-      // exclude file: check if will be added as raw file
-      if(addRaw && rawPath != null) {
+    if(include ? rawParser : addRaw) {
+      // store input in raw format if raw parser was chosen, or if file was included otherwise
+      if(rawPath != null) {
         Store.store(source.inputSource(), new IOFile(rawPath, targ + name));
       }
-    } else {
-      if(rawParser) {
-        // store input in raw format if database path is known
-        if(rawPath != null) {
-          Store.store(source.inputSource(), new IOFile(rawPath, targ + name));
-        }
-      } else {
-        // store input as XML
-        boolean ok = true;
-        IO in = source;
-        if(skipCorrupt) {
-          // parse file twice to ensure that it is well-formed
-          try {
-            // cache file contents to allow or speed up a second run
-            if(!(source instanceof IOContent || dtd)) {
-              in = new IOContent(source.read());
-              in.name(name);
-            }
-            parser = Parser.singleParser(in, options, targ);
-            MemBuilder.build("", parser);
-          } catch(final IOException ex) {
-            Util.debug(ex);
-            skipped.add(source.path());
-            ok = false;
+    } else if(include) {
+      // store input as XML
+      boolean ok = true;
+      IO in = source;
+      if(skipCorrupt) {
+        // parse file twice to ensure that it is well-formed
+        try {
+          // cache file contents to allow or speed up a second run
+          if(!(source instanceof IOContent || dtd)) {
+            in = new IOContent(source.read());
+            in.name(name);
           }
-        }
-
-        // parse file
-        if(ok) {
           parser = Parser.singleParser(in, options, targ);
-          parser.parse(builder);
+          MemBuilder.build("", parser);
+        } catch(final IOException ex) {
+          Util.debug(ex);
+          skipped.add(source.path());
+          ok = false;
         }
-        parser = null;
-        // dump debug data
-        if(Prop.debug && (++c & 0x3FF) == 0) Util.err(";");
       }
+
+      // parse file
+      if(ok) {
+        parser = Parser.singleParser(in, options, targ);
+        parser.parse(builder);
+      }
+      parser = null;
     }
+
+    // sum meta data file size
+    final long l = source.length();
+    if(l != -1) builder.meta.inputsize += l;
+
+    // debugging: increment number of processed resources
+    if(Prop.debug && (++resources & 0x3FF) == 0) Util.err(";");
   }
 
   @Override
