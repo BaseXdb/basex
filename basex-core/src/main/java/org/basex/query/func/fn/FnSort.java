@@ -119,7 +119,7 @@ public final class FnSort extends StandardFunc {
       final Value value = value((Value) expr1);
       if(value != null) return value;
     }
-    if(exprs.length == 3) coerceFunc(2, cc, SeqType.AAT_ZM, st1.type.seqType());
+    if(exprs.length == 3) coerceFunc(2, cc, SeqType.AAT_ZM, st1.with(Occ.ONE));
 
     return adoptType(expr1);
   }

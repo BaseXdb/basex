@@ -33,6 +33,18 @@ public final class FnModuleTest extends QueryPlanTest {
 
     check("for $i in ([],[]) return " + func.args(" $i"), "", type(func, "xs:numeric?"));
     check("for $i in (1,<a>2</a>) return " + func.args(" $i"), "1\n2", type(func, "xs:numeric?"));
+
+    // pre-evaluate empty sequence
+    check(func.args(" ()"), "", empty(func));
+    // pre-evaluate argument
+    check(func.args(1), 1, empty(func));
+
+    // function is replaced by its argument (argument yields no result)
+    check(func.args(" prof:void(())"), "", empty(func));
+    // but type is adjusted
+    check(func.args(" <_>1</_>"), 1, type(func, "xs:double"));
+    // no adjustment of type
+    check(func.args(" 1 ! array { . }"), 1, type(func, "xs:numeric?"));
   }
 
   /** Test method. */
@@ -170,16 +182,14 @@ public final class FnModuleTest extends QueryPlanTest {
 
     check(func.args(" ()", " boolean#1"), "", empty());
     check(func.args(" 1 to 9", " function($_) { $_ = 0 }"), "",
-        exists("FuncItem[@type = 'function(xs:integer) as xs:boolean']"));
+        type(FuncItem.class, "function(xs:integer) as xs:boolean"));
     check(func.args(" ('a',<a/>)", " function($_ as xs:string) { $_ = 'a' }"), "a",
-        exists("FuncItem[@type = 'function(xs:string) as xs:boolean']"));
+        type(FuncItem.class, "function(xs:string) as xs:boolean"));
     check(func.args(" ('a',<a/>)", " function($_ as xs:string) as xs:boolean? { $_ = 'a' }"), "a",
-        exists("FuncItem[@type = 'function(xs:string) as xs:boolean']"));
+        type(FuncItem.class, "function(xs:string) as xs:boolean"));
 
-    check(func.args(" (<a/>, <b/>)", " boolean#1"), "<a/>\n<b/>",
-        exists("FnFilter[@type = 'element()*']"));
-    check(func.args(" <a/>", " boolean#1"), "<a/>",
-        exists("FnFilter[@type = 'element()?']"));
+    check(func.args(" (<a/>, <b/>)", " boolean#1"), "<a/>\n<b/>", type(FILTER, "element()*"));
+    check(func.args(" <a/>", " boolean#1"), "<a/>", type(FILTER, "element()?"));
   }
 
   /** Test method. */
@@ -260,6 +270,8 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" 0 to 10", " function($x) { $x + 1 }"),
         "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11",
         exists(func));
+
+    check(func.args(" (1 to 2)[. = 2]", " function($a) { $a * $a }"), 4, type(func, "xs:integer*"));
   }
 
   /** Test method. */
@@ -890,14 +902,12 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" (-3,-1,1,3)"), 0);
     query(func.args(" (1,1.1,1e0)"), 3.1);
 
-    check("for $i in 1 to 2 return " + func.args(" $i"), "1\n2",
-        exists("FnSum[@type = 'xs:integer']"));
-    check("for $i in 1 to 2 return " + func.args(" $i", "a"), "1\n2",
-        exists("FnSum[@type = 'xs:integer']"));
-    check(func.args(" 1[. = 1]", " 0.0"), 1, exists("FnSum[@type = 'xs:decimal']"));
-    check(func.args(" 1[. = 1]", "a"), 1, exists("FnSum[@type = 'xs:anyAtomicType']"));
-    check(func.args(" 1[. = 1]", " 1[. = 1]"), 1, exists("FnSum[@type = 'xs:integer?']"));
-    check(func.args(" 1[. = 1]", " 'a'[. = 'a']"), 1, exists("FnSum[@type = 'xs:anyAtomicType?']"));
+    check("for $i in 1 to 2 return " + func.args(" $i"), "1\n2", type(SUM, "xs:integer"));
+    check("for $i in 1 to 2 return " + func.args(" $i", "a"), "1\n2", type(SUM, "xs:integer"));
+    check(func.args(" 1[. = 1]", " 0.0"), 1, type(SUM, "xs:decimal"));
+    check(func.args(" 1[. = 1]", "a"), 1, type(SUM, "xs:anyAtomicType"));
+    check(func.args(" 1[. = 1]", " 1[. = 1]"), 1, type(SUM, "xs:integer?"));
+    check(func.args(" 1[. = 1]", " 'a'[. = 'a']"), 1, type(SUM, "xs:anyAtomicType?"));
   }
 
   /** Test method. */

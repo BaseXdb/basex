@@ -8,13 +8,10 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.fn.*;
-import org.basex.query.func.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
-import org.basex.util.*;
 import org.junit.Test;
 
 /**
@@ -169,31 +166,26 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Checks string-length optimizations. */
   @Test public void stringLength() {
-    final String filter = Util.className(IterFilter.class);
-    final String string = Util.className(FnString.class);
-    final String stringLength = Util.className(FnStringLength.class);
+    check("<a/>[string-length() >  -1]", "<a/>", empty(IterFilter.class));
+    check("<a/>[string-length() != -1]", "<a/>", empty(IterFilter.class));
+    check("<a/>[string-length() ge  0]", "<a/>", empty(IterFilter.class));
+    check("<a/>[string-length() ne 1.1]", "<a/>", empty(IterFilter.class));
 
-    check("<a/>[string-length() >  -1]", "<a/>", empty(filter));
-    check("<a/>[string-length() != -1]", "<a/>", empty(filter));
-    check("<a/>[string-length() ge  0]", "<a/>", empty(filter));
-    check("<a/>[string-length() ne 1.1]", "<a/>", empty(filter));
+    check("<a/>[string-length() <   0]", "", empty(IterFilter.class));
+    check("<a/>[string-length() <= -1]", "", empty(IterFilter.class));
+    check("<a/>[string-length() eq -1]", "", empty(IterFilter.class));
+    check("<a/>[string-length() eq 1.1]", "", empty(IterFilter.class));
 
-    check("<a/>[string-length() <   0]", "", empty(filter));
-    check("<a/>[string-length() <= -1]", "", empty(filter));
-    check("<a/>[string-length() eq -1]", "", empty(filter));
-    check("<a/>[string-length() eq 1.1]", "", empty(filter));
+    check("<a/>[string-length() >  0]", "", exists(STRING));
+    check("<a/>[string-length() >= 0.5]", "", exists(STRING));
+    check("<a/>[string-length() ne 0]", "", exists(STRING));
 
-    check("<a/>[string-length() >  0]", "", exists(string));
-    check("<a/>[string-length() >= 0.5]", "", exists(string));
-    check("<a/>[string-length() ne 0]", "", exists(string));
+    check("<a/>[string-length() <  0.5]", "<a/>", exists(STRING));
+    check("<a/>[string-length() <= 0.5]", "<a/>", exists(STRING));
+    check("<a/>[string-length() eq 0]", "<a/>", exists(STRING));
 
-    check("<a/>[string-length() <  0.5]", "<a/>", exists(string));
-    check("<a/>[string-length() <= 0.5]", "<a/>", exists(string));
-    check("<a/>[string-length() eq 0]", "<a/>", exists(string));
-
-    check("<a/>[string-length() gt 1]", "", exists(stringLength));
-
-    check("<a/>[string-length() = <a>1</a>]", "", exists(stringLength));
+    check("<a/>[string-length() gt 1]", "", exists(STRING_LENGTH));
+    check("<a/>[string-length() = <a>1</a>]", "", exists(STRING_LENGTH));
   }
 
   /** Checks that empty sequences are eliminated and that singleton lists are flattened. */
@@ -205,20 +197,16 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Checks that expressions marked as non-deterministic will not be rewritten. */
   @Test
   public void nonDeterministic() {
-    check("count((# basex:non-deterministic #) { <x/> })", 1, exists(FnCount.class));
+    check("count((# basex:non-deterministic #) { <x/> })", 1, exists(COUNT));
   }
 
   /** Ensures that fn:doc with URLs will not be rewritten. */
   @Test
   public void doc() {
-    check("<a>{ doc('" + FILE + "') }</a>//x", "",
-        exists(DBNode.class));
-    check("if(<x>1</x> = 1) then 2 else doc('" + FILE + "')", 2,
-        exists(DBNode.class));
-    check("if(<x>1</x> = 1) then 2 else doc('http://abc.de/')", 2,
-        exists(FnDoc.class));
-    check("if(<x>1</x> = 1) then 2 else collection('http://abc.de/')", 2,
-        exists(FnCollection.class));
+    check("<a>{ doc('" + FILE + "') }</a>//x", "", exists(DBNode.class));
+    check("if(<x>1</x> = 1) then 2 else doc('" + FILE + "')", 2, exists(DBNode.class));
+    check("if(<x>1</x> = 1) then 2 else doc('http://abc.de/')", 2, exists(DOC));
+    check("if(<x>1</x> = 1) then 2 else collection('http://abc.de/')", 2, exists(COLLECTION));
   }
 
   /** Positional predicates. */
@@ -233,47 +221,50 @@ public final class RewritingsTest extends QueryPlanTest {
     check("'a'[position() <= 1]", "a", "exists(QueryPlan/Str)");
 
     // check if positional predicates are rewritten to utility functions
-    final String uia = Util.className(_UTIL_ITEM.clazz);
-    final String uir = Util.className(_UTIL_RANGE.clazz);
-    final String ul = Util.className(_UTIL_LAST.clazz);
-
-    check("for $i in (1,2) return 'a'[$i]", "a", exists(uia));
-    check("for $i in (1,2) return 'a'[position() = $i]", "a", exists(uia));
-    check("for $i in (1,2) return 'a'[position() = $i to $i]", "a", exists(uia));
-    check("for $i in (1,2) return 'a'[position() = $i to $i+1]", "a", exists(uir));
-    check("for $i in (1,2) return 'a'[position() = $i to 1]", "a", exists(uir));
-    check("for $i in (1,2) return 'a'[position() >= $i]", "a", exists(uir));
-    check("for $i in (1,2) return 'a'[position() > $i]", "", exists(uir));
-    check("for $i in (1,2) return 'a'[position() <= $i]", "a\na", exists(uir));
-    check("for $i in (1,2) return 'a'[position() < $i]", "a", exists(uir));
+    check("for $i in (1,2) return 'a'[$i]", "a", exists(_UTIL_ITEM));
+    check("for $i in (1,2) return 'a'[position() = $i]", "a", exists(_UTIL_ITEM));
+    check("for $i in (1,2) return 'a'[position() = $i to $i]", "a", exists(_UTIL_ITEM));
+    check("for $i in (1,2) return 'a'[position() = $i to $i+1]", "a", exists(_UTIL_RANGE));
+    check("for $i in (1,2) return 'a'[position() = $i to 1]", "a", exists(_UTIL_RANGE));
+    check("for $i in (1,2) return 'a'[position() >= $i]", "a", exists(_UTIL_RANGE));
+    check("for $i in (1,2) return 'a'[position() > $i]", "", exists(_UTIL_RANGE));
+    check("for $i in (1,2) return 'a'[position() <= $i]", "a\na", exists(_UTIL_RANGE));
+    check("for $i in (1,2) return 'a'[position() < $i]", "a", exists(_UTIL_RANGE));
 
     // check if positional predicates are rewritten to utility functions
     final String seq = " (1, 1.1, 1.9, 2) ";
-    check("for $i in" + seq + "return ('a','b')[$i]", "a\nb", exists(uia));
-    check("for $i in" + seq + "return ('a','b')[position() = $i]", "a\nb", exists(uia));
-    check("for $i in" + seq + "return ('a','b')[position() >= $i]", "a\nb\nb\nb\nb", exists(uir));
-    check("for $i in" + seq + "return ('a','b')[position() > $i]", "b\nb\nb", exists(uir));
-    check("for $i in" + seq + "return ('a','b')[position() <= $i]", "a\na\na\na\nb", exists(uir));
-    check("for $i in" + seq + "return ('a','b')[position() < $i]", "a\na\na", exists(uir));
+    check("for $i in" + seq + "return ('a','b')[$i]", "a\nb",
+        exists(_UTIL_ITEM));
+    check("for $i in" + seq + "return ('a','b')[position() = $i]", "a\nb",
+        exists(_UTIL_ITEM));
+    check("for $i in" + seq + "return ('a','b')[position() >= $i]", "a\nb\nb\nb\nb",
+        exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a','b')[position() > $i]", "b\nb\nb",
+        exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a','b')[position() <= $i]", "a\na\na\na\nb",
+        exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a','b')[position() < $i]", "a\na\na",
+        exists(_UTIL_RANGE));
 
     // check if multiple positional predicates are rewritten to utility functions
-    check("for $i in" + seq + "return ('a','b')[$i][$i]", "a", count(UtilItem.class, 2));
+    check("for $i in" + seq + "return ('a','b')[$i][$i]", "a",
+        count(_UTIL_ITEM, 2));
     check("for $i in" + seq + "return ('a','b')[position() = $i][position() = $i]", "a",
-        count(UtilItem.class, 2));
+        count(_UTIL_ITEM, 2));
     check("for $i in" + seq + "return ('a','b')[position() < $i][position() < $i]", "a\na\na",
-        count(uir, 2));
+        count(_UTIL_RANGE, 2));
 
     // check if positional predicates are merged and rewritten to utility functions
     check("for $i in" + seq + "return ('a','b')[position() = $i and position() = $i]", "a\nb",
-        exists(UtilItem.class));
+        exists(_UTIL_ITEM));
     check("for $i in" + seq + "return ('a','b')[position() >= $i and position() <= $i]", "a\nb",
-        exists(uir));
+        exists(_UTIL_RANGE));
     check("for $i in" + seq + "return ('a','b')[position() <= $i and position() >= $i]", "a\nb",
-        exists(uir));
+        exists(_UTIL_RANGE));
     check("for $i in" + seq + "return ('a','b')[position() > $i and position() < $i]", "",
-        exists(uir));
+        exists(_UTIL_RANGE));
     check("for $i in" + seq + "return ('a','b')[position() < $i and position() > $i]", "",
-        exists(uir));
+        exists(_UTIL_RANGE));
 
     // no rewriting possible (conflicting positional predicates)
     check("for $i in" + seq + "return ('a','b')[position() = $i and position() = $i+1]", "",
@@ -285,10 +276,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $i in" + seq + "return ('a','b')[position() < $i and position() < $i+1]", "a\na\na",
         exists(CachedFilter.class));
 
-    check("(<a/>,<b/>)[last()]", "<b/>", count(ul, 1));
-    check("(<a/>,<b/>)[position() > 1 and position() < 3]", "<b/>", count(ul, 1));
-    check("(<a/>,<b/>)[position() > 1 and position() < 3 and <b/>]", "<b/>", count(ul, 1));
-    check("(<a/>,<b/>)[position() > 1 and position() < 4]", "<b/>", count(ul, 1));
+    check("(<a/>,<b/>)[last()]", "<b/>", count(_UTIL_LAST, 1));
+    check("(<a/>,<b/>)[position() > 1 and position() < 3]", "<b/>", count(_UTIL_LAST, 1));
+    check("(<a/>,<b/>)[position() > 1 and position() < 3 and <b/>]", "<b/>", count(_UTIL_LAST, 1));
+    check("(<a/>,<b/>)[position() > 1 and position() < 4]", "<b/>", count(_UTIL_LAST, 1));
   }
 
   /** Predicates. */
@@ -299,7 +290,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[.][.]", "<a/>", exists(CElem.class), empty(ContextValue.class));
     check("<a/>/self::*[.][.]", "<a/>", empty(ContextValue.class));
     check("<a/>/self::*[.][.]", "<a/>", empty(ContextValue.class));
-    check("('a','b')[position()[position() ! .]]", "a\nb", count(FnPosition.class, 2));
+    check("('a','b')[position()[position() ! .]]", "a\nb", count(POSITION, 2));
     check("('a','b')[. ! position()]", "a", exists("*[contains(name(), 'Map')]"));
     check("1[.]", 1, exists(ContextValue.class));
     check("let $x := (<a/>,<a/>) where $x[. eq ''] return $x", "<a/>\n<a/>", exists(CmpG.class));

@@ -765,7 +765,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test public void createBackup() {
-    final Function func = Function._DB_CREATE_BACKUP;
+    final Function func = _DB_CREATE_BACKUP;
     query("count(" + _DB_BACKUPS.args(NAME) + ")", 0);
     query(func.args(NAME));
     query("count(" + _DB_BACKUPS.args(NAME) + ")", 1);
@@ -779,7 +779,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test public void dropBackup() {
     // create and drop backup
-    final Function func = Function._DB_DROP_BACKUP;
+    final Function func = _DB_DROP_BACKUP;
     query(_DB_CREATE_BACKUP.args(NAME));
     query(func.args(NAME));
     query("count(" + _DB_BACKUPS.args(NAME) + ")", 0);
@@ -799,7 +799,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test public void copy() {
     // close database in global context
-    final Function func = Function._DB_COPY;
+    final Function func = _DB_COPY;
     execute(new Close());
 
     // copy database to new name and vice versa
@@ -823,7 +823,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test public void alter() {
     // close database in global context
-    final Function func = Function._DB_ALTER;
+    final Function func = _DB_ALTER;
     execute(new Close());
 
     // rename database to new name and vice versa
@@ -842,7 +842,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test public void restore() {
-    final Function func = Function._DB_RESTORE;
+    final Function func = _DB_RESTORE;
     execute(new Close());
 
     // backup and restore file

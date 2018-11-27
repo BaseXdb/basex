@@ -55,7 +55,7 @@ public class FnForEach extends StandardFunc {
     final SeqType st1 = expr1.seqType();
     if(st1.zero()) return expr1;
 
-    coerceFunc(1, cc, SeqType.ITEM_ZM, st1.type.seqType());
+    coerceFunc(1, cc, SeqType.ITEM_ZM, st1.with(Occ.ONE));
 
     // assign type after coercion (expression might have changed)
     final boolean updating = this instanceof UpdateForEach;

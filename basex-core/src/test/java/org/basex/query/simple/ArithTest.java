@@ -85,8 +85,7 @@ public final class ArithTest extends QueryPlanTest {
     check("for $i in (2,4) return 1 idiv $i", "0\n0", exists(Arith.class));
 
     // neutral number
-    check("for $i in (2,4) return $i idiv xs:double(1)", "2\n4",
-        empty(Arith.class), empty(GFLWOR.class));
+    check("for $i in (2,4) return $i idiv 1e0", "2\n4", empty(Arith.class), empty(GFLWOR.class));
     check("for $i in (2,4) return $i idiv 1", "2\n4", empty(Arith.class), empty(GFLWOR.class));
     check("for $i in (2,4) return $i idiv 1", "2\n4", empty(Arith.class), empty(GFLWOR.class));
 

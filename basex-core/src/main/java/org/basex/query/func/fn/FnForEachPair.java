@@ -56,7 +56,7 @@ public class FnForEachPair extends StandardFunc {
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     if(st1.zero()) return expr1;
     if(st2.zero()) return expr2;
-    coerceFunc(2, cc, SeqType.ITEM_ZM, st1.type.seqType(), st2.type.seqType());
+    coerceFunc(2, cc, SeqType.ITEM_ZM, st1.with(Occ.ONE), st2.with(Occ.ONE));
 
     // assign type after coercion (expression might have changed)
     final boolean updating = this instanceof UpdateForEachPair;

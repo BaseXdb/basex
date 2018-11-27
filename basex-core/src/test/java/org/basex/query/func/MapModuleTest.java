@@ -35,7 +35,7 @@ public final class MapModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test
   public void forEach() {
-    final Function func = Function._MAP_FOR_EACH;
+    final Function func = _MAP_FOR_EACH;
 
     query("(1,map { 1: 2 })[. instance of map(*)] ! " +
         func.args(" .", " function($k, $v) { $v }"), 2);
@@ -46,8 +46,7 @@ public final class MapModuleTest extends QueryPlanTest {
     query(func.args(" map { 1: 2 }", " function($k, $v) { $k+$v }"), 3);
     query(func.args(" map { 'a': 1, 'b': 2 }", " function($k, $v) { $v }"), "1\n2");
 
-    check(func.args(" map { 'aa': 'a' }", " matches#2"), true,
-        exists("MapForEach[@type = 'xs:boolean*']"));
+    check(func.args(" map { 'aa': 'a' }", " matches#2"), true, type(func, "xs:boolean*"));
   }
 
   /** Test method. */

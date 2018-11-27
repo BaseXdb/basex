@@ -5,7 +5,6 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.ast.*;
 import org.basex.query.expr.constr.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.junit.*;
@@ -59,14 +58,14 @@ public final class SimpleMapTest extends QueryPlanTest {
     check("<a/> ! . ! .", "<a/>", nomap);
 
     check("trace(1) ! (. + 1)", 2, exists(ItemMap.class));
-    check("1[.= 1] ! trace(.)", 1, exists(FnTrace.class));
+    check("1[.= 1] ! trace(.)", 1, exists(TRACE));
   }
 
   /** Typing. */
   @Test public void types() {
     check("(1, 2) ! .[. = 1]", 1, exists(IterMap.class));
-    check("1[. = 1] ! 2", "2", exists("ItemMap[@type = 'xs:integer?']"));
-    check("4[. = 4] ! (4, 5)[. = 4]", 4, exists("IterMap[@type = 'xs:integer*']"));
+    check("1[. = 1] ! 2", "2", type(ItemMap.class, "xs:integer?"));
+    check("4[. = 4] ! (4, 5)[. = 4]", 4, type(IterMap.class, "xs:integer*"));
   }
 
   /** Errors. */
@@ -77,9 +76,9 @@ public final class SimpleMapTest extends QueryPlanTest {
   /** Replicate results. */
   @Test public void replicate() {
     check("<x/> ! 2[. = 2]", "2", empty(CElem.class));
-    check("(1 to 2) ! 'a'[.]", "a\na", exists(_UTIL_REPLICATE.clazz));
-    check("(1 to 2) ! (4, 5)[. = 4]", "4\n4", exists(_UTIL_REPLICATE.clazz));
-    check("(1 to 2) ! prof:void(.)", "", empty(_UTIL_REPLICATE.clazz));
+    check("(1 to 2) ! 'a'[.]", "a\na", exists(_UTIL_REPLICATE));
+    check("(1 to 2) ! (4, 5)[. = 4]", "4\n4", exists(_UTIL_REPLICATE));
+    check("(1 to 2) ! prof:void(.)", "", empty(_UTIL_REPLICATE));
     // combine identical values in singleton sequence
     check("(1 to 2) ! ('a', 'a')", "a\na\na\na", exists(SingletonSeq.class) + " and .//@size = 4");
     check("(1 to 2) ! util:replicate('a', 2) ! util:replicate('a', 2)", "a\na\na\na\na\na\na\na",

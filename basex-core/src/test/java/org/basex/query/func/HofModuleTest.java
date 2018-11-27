@@ -5,7 +5,6 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.ast.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.hof.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -55,18 +54,18 @@ public final class HofModuleTest extends QueryPlanTest {
     final int limit = StandardFunc.UNROLL_LIMIT;
     check(func.args(" 1 to " + limit, " function($a, $b) {$a + $b}"),
         55,
-        empty(Util.className(HofFoldLeft1.class) + "[contains(@name, 'fold-left1')]"),
+        empty(func),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
     check(func.args(" 1 to " + limit, " function($a, $b) {0 * random:double() + $b}"),
         10,
         exists(Int.class),
-        empty(Util.className(HofFoldLeft1.class) + "[contains(@name, 'fold-left1')]"),
+        empty(func),
         count(Util.className(Arith.class) + "[@op = '+']", 9));
     // should not be unrolled
     check(func.args(" 1 to " + (limit + 1), " function($a, $b) {$a + $b}"),
         66,
-        exists(Util.className(HofFoldLeft1.class) + "[contains(@name, 'fold-left1')]"));
+        exists(func));
   }
 
   /** Test method. */
@@ -80,7 +79,7 @@ public final class HofModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test
   public void topKByTest() {
-    final Function func = Function._HOF_TOP_K_BY;
+    final Function func = _HOF_TOP_K_BY;
     query(func.args(" 1 to 1000", " function($x) { -$x }, 0"), "");
     query(func.args(" ()", " function($x) { -$x }", 5), "");
     query(func.args(" 1 to 1000", " function($x) { -$x }", 5), "1\n2\n3\n4\n5");

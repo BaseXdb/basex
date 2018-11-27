@@ -34,7 +34,7 @@ public class MapForEach extends StandardFunc {
     final Type type1 = exprs[0].seqType().type;
     if(type1 instanceof MapType) {
       final MapType mtype1 = (MapType) type1;
-      coerceFunc(1, cc, SeqType.ITEM_ZM, mtype1.argTypes[0].type.seqType(), mtype1.declType);
+      coerceFunc(1, cc, SeqType.ITEM_ZM, mtype1.argTypes[0].with(Occ.ONE), mtype1.declType);
     }
 
     final boolean updating = this instanceof UpdateMapForEach;

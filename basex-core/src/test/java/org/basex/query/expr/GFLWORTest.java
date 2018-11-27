@@ -342,8 +342,7 @@ public final class GFLWORTest extends QueryPlanTest {
   /** Tests inlining. */
   @Test public void inlineLetTest() {
     check("let $x := 1 let $b := $x + 2 return $b + 3", 6, empty(Let.class));
-    check("let $x := <x>0</x> let $b := $x/text() return $b + 1",
-        1, count(Let.class, 1));
+    check("let $x := <x>0</x> let $b := $x/text() return $b + 1", 1, count(Let.class, 1));
     error("let $x := <x>false</x> let $b as xs:boolean := $x/text() return $b", INVTYPE_X_X_X);
   }
 }
