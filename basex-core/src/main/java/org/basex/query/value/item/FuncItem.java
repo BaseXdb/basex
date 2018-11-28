@@ -136,39 +136,44 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public FuncItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo info,
-      final boolean opt) throws QueryException {
+      final boolean optimize) throws QueryException {
 
     final int pl = params.length;
     if(pl != ft.argTypes.length) throw QueryError.typeError(this, ft.seqType(), null, info);
 
-    // optimization: only ignore equal types
+    // optimize: continue with coercion if current type is only an instance of new type
     final FuncType tp = funcType();
-    if(opt ? tp.eq(ft) : tp.instanceOf(ft)) return this;
+    if(optimize ? tp.eq(ft) : tp.instanceOf(ft)) return this;
 
+    // create new compilation context and variable scope
+    final CompileContext cc = new CompileContext(qc);
     final VarScope vs = new VarScope(sc);
     final Var[] vars = new Var[pl];
     final Expr[] args = new Expr[pl];
     for(int p = pl; p-- > 0;) {
       vars[p] = vs.addNew(params[p].name, ft.argTypes[p], true, qc, info);
-      args[p] = new VarRef(info, vars[p]).optimize(null);
+      args[p] = new VarRef(info, vars[p]).optimize(cc);
     }
-
-    final boolean updating = anns.contains(Annotation.UPDATING) || expr.has(Flag.UPD);
-    final Expr ex = new DynFuncCall(info, sc, updating, false, this, args);
-
-    final CompileContext cc = new CompileContext(qc);
     cc.pushScope(vs);
 
-    final Expr optimized = opt ? ex.optimize(cc) : ex, checked;
-    if(tp.declType.instanceOf(ft.declType)) {
-      checked = optimized;
-    } else {
-      final TypeCheck tc = new TypeCheck(sc, info, optimized, ft.declType, true);
-      checked = opt ? tc.optimize(cc) : tc;
-    }
-    checked.markTailCalls(null);
+    // create new function call (will immediately be inlined/simplified when being optimized)
+    final boolean updating = anns.contains(Annotation.UPDATING) || expr.has(Flag.UPD);
+    Expr body = new DynFuncCall(info, sc, updating, false, this, args);
+    if(optimize) body = body.optimize(cc);
 
-    return new FuncItem(sc, anns, name, vars, ft, checked, vs.stackSize());
+    // add type check if return types differ
+    if(!tp.declType.instanceOf(ft.declType)) {
+      body = new TypeCheck(sc, info, body, ft.declType, true);
+      if(optimize) body = body.optimize(cc);
+    }
+
+    // adopt type of optimized body if it is more specific than passed on type
+    final SeqType st = body.seqType();
+    final FuncType newType = optimize && !st.eq(ft.declType) && st.instanceOf(ft.declType)
+        ? FuncType.get(st, ft.argTypes) : ft;
+
+    body.markTailCalls(null);
+    return new FuncItem(sc, anns, name, vars, newType, body, vs.stackSize());
   }
 
   @Override

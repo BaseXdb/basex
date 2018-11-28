@@ -178,42 +178,34 @@ public abstract class StandardFunc extends Arr {
    * @param cc compilation context
    * @param declType declared return type
    * @param argTypes argument types
+   * @return success flag
    * @throws QueryException query context
    */
-  public void coerceFunc(final int i, final CompileContext cc, final SeqType declType,
+  public boolean coerceFunc(final int i, final CompileContext cc, final SeqType declType,
       final SeqType... argTypes) throws QueryException {
 
     // check if argument is function item
     final Expr func = exprs[i];
-    if(func instanceof FuncItem) {
-      // stop typing refinement if number of arguments does not match function arguments
-      FuncItem fitem = (FuncItem) func;
-      FuncType ft = fitem.funcType();
-      final int al = argTypes.length;
-      if(al != ft.argTypes.length) return;
+    if(!(func instanceof FuncItem)) return false;
 
-      // select most specific argument and return types
-      final SeqType[] fat = ft.argTypes, at = new SeqType[al];
-      for(int a = 0; a < al; a++) {
-        at[a] = argTypes[a].instanceOf(fat[a]) ? argTypes[a] : fat[a];
-      }
-      SeqType dt = declType.instanceOf(ft.declType) ? declType : ft.declType;
+    // check number of arguments
+    final FuncItem fitem = (FuncItem) func;
+    final FuncType oldType = fitem.funcType();
+    final int al = argTypes.length;
+    final SeqType[] oldArgs = oldType.argTypes;
+    if(al != oldArgs.length) return false;
 
-      // coerce to new function type
-      FuncType ftp = FuncType.get(dt, at);
-      if(!ftp.eq(ft)) {
-        fitem = fitem.coerceTo(ftp, cc.qc, info, true);
-        ft = fitem.funcType();
-
-        // set new type of function item expression as return type
-        dt = fitem.expr.seqType();
-        if(dt.instanceOf(ft.declType)) {
-          ftp = FuncType.get(dt, at);
-          if(!ftp.eq(ft)) fitem = fitem.coerceTo(ftp, cc.qc, info, true);
-        }
-      }
-      exprs[i] = fitem;
+    // select most specific argument and return types
+    final SeqType[] newArgs = new SeqType[al];
+    for(int a = 0; a < al; a++) {
+      newArgs[a] = argTypes[a].instanceOf(oldArgs[a]) ? argTypes[a] : oldArgs[a];
     }
+    final SeqType newDecl = declType.instanceOf(oldType.declType) ? declType : oldType.declType;
+    final FuncType newType = FuncType.get(newDecl, newArgs);
+
+    // new type is more specific: coerce to new function type
+    if(!newType.eq(oldType)) exprs[i] = fitem.coerceTo(newType, cc.qc, info, true);
+    return true;
   }
 
   /**

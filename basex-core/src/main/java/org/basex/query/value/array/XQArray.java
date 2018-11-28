@@ -396,7 +396,7 @@ public abstract class XQArray extends FItem {
 
   @Override
   public final FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo info,
-      final boolean opt) throws QueryException {
+      final boolean optimize) throws QueryException {
 
     if(instanceOf(ft, true)) return this;
     throw typeError(this, ft, info);

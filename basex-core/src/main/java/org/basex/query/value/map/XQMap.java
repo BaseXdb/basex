@@ -144,7 +144,7 @@ public final class XQMap extends FItem {
 
   @Override
   public XQMap coerceTo(final FuncType ft, final QueryContext qc, final InputInfo info,
-      final boolean opt) throws QueryException {
+      final boolean optimize) throws QueryException {
 
     if(instanceOf(ft, true)) return this;
     throw typeError(this, ft, info);
