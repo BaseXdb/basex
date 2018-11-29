@@ -128,7 +128,7 @@ public class FnSubsequence extends StandardFunc {
   private SeqRange range(final QueryContext qc) throws QueryException {
     double d = toDouble(exprs[1], qc);
     if(Double.isNaN(d)) return EMPTY;
-    long start = start(d);
+    final long start = start(d);
 
     long end = Long.MAX_VALUE;
     if(exprs.length > 2) {

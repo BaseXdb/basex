@@ -58,11 +58,10 @@ public class FnApply extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    final Type type1 = expr1.seqType().type, type2 = expr2.seqType().type;
-    final FuncType ft1 = type1 instanceof FuncType ? (FuncType) type1 : null;
+    final FuncType ft1 = expr1.funcType(), ft2 = expr2.funcType();
 
     // try to pass on types of array argument to function item
-    if(type2 instanceof ArrayType) {
+    if(ft2 instanceof ArrayType) {
       if(expr2 instanceof XQArray) {
         // argument is a value: final types are known
         final XQArray arr = (XQArray) expr2;
@@ -76,7 +75,7 @@ public class FnApply extends StandardFunc {
         if(args1 != null) {
           final int as = args1.length;
           final SeqType[] args2 = new SeqType[as];
-          final ArrayType at2 = (ArrayType) type2;
+          final ArrayType at2 = (ArrayType) ft2;
           for(int a = 0; a < as; a++) args2[a] = at2.declType;
           coerceFunc(0, cc, SeqType.ITEM_ZM, args2);
         }

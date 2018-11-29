@@ -35,9 +35,9 @@ public final class HofUntil extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Type type2 = exprs[1].seqType().type;
-    if(type2 instanceof FuncType) {
-      final SeqType dt = ((FuncType) type2).declType, it = dt.intersect(exprs[2].seqType());
+    final FuncType ft = exprs[1].funcType();
+    if(ft != null) {
+      final SeqType it = ft.declType.intersect(exprs[2].seqType());
       if(it != null) exprType.assign(it);
     }
     return this;

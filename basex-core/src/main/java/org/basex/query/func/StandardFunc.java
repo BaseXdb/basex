@@ -444,8 +444,8 @@ public abstract class StandardFunc extends Arr {
       final QueryContext qc) throws QueryException {
 
     final FItem func = checkUp(toFunc(expr, qc), updating, sc);
-    if(func.arity() == nargs) return func;
     final int fargs = func.arity();
+    if(fargs == nargs) return func;
     throw FUNARITY_X_X.get(info, arguments(fargs), nargs);
   }
 

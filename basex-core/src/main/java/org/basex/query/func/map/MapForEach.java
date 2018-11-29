@@ -38,8 +38,8 @@ public class MapForEach extends StandardFunc {
     }
 
     final boolean updating = this instanceof UpdateMapForEach;
-    final Type type2 = exprs[1].seqType().type;
-    if(type2 instanceof FuncType && !updating) exprType.assign(((FuncType) type2).declType.type);
+    final FuncType ft = exprs[1].funcType();
+    if(ft != null && !updating) exprType.assign(ft.declType.type);
 
     return this;
   }

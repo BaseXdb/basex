@@ -60,12 +60,12 @@ public class FnForEach extends StandardFunc {
     // assign type after coercion (expression might have changed)
     final boolean updating = this instanceof UpdateForEach;
     final Expr expr2 = exprs[1];
-    final Type type2 = expr2.seqType().type;
-    if(type2 instanceof FuncType && !updating) {
-      final SeqType ft2 = ((FuncType) type2).declType;
-      final boolean mayBeEmpty = st1.mayBeEmpty() || ft2.mayBeEmpty();
-      final long size = ft2.zero() ? 0 : ft2.one() ? expr1.size() : -1;
-      exprType.assign(ft2.type, mayBeEmpty ? Occ.ZERO_MORE : Occ.ONE_MORE, size);
+    final FuncType ft = expr2.funcType();
+    if(ft != null && !updating) {
+      final SeqType declType = ft.declType;
+      final boolean mayBeEmpty = st1.mayBeEmpty() || declType.mayBeEmpty();
+      final long size = declType.zero() ? 0 : declType.one() ? expr1.size() : -1;
+      exprType.assign(declType.type, mayBeEmpty ? Occ.ZERO_MORE : Occ.ONE_MORE, size);
     }
 
     final long size1 = expr1.size();

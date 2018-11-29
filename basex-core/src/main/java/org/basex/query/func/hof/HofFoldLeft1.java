@@ -35,6 +35,7 @@ public final class HofFoldLeft1 extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if(expr1.seqType().zero()) throw EMPTYFOUND.get(info);
+
     if(allAreValues(false) && expr1.size() <= UNROLL_LIMIT) {
       final Value seq = (Value) expr1;
       final FItem func = checkArity(expr2, 2, cc.qc);
@@ -47,8 +48,8 @@ public final class HofFoldLeft1 extends StandardFunc {
       return expr;
     }
 
-    final Type type = expr2.seqType().type;
-    if(type instanceof FuncType) exprType.assign(((FuncType) type).declType);
+    final FuncType ft = expr2.funcType();
+    if(ft != null) exprType.assign(ft.declType);
     return this;
   }
 }

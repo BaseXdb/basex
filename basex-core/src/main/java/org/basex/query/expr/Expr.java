@@ -315,6 +315,15 @@ public abstract class Expr extends ExprInfo {
   public abstract SeqType seqType();
 
   /**
+   * Returns the function type of this expression.
+   * @return function type, or {@code null} if expression yields no functions
+   */
+  public FuncType funcType() {
+    final Type type = seqType().type;
+    return type instanceof FuncType ? (FuncType) type : null;
+  }
+
+  /**
    * Indicates if the items returned by this expression are iterable, i.e., if returned nodes are
    * in document order and contain no duplicates. This will also be guaranteed if zero or one
    * item is returned.

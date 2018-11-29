@@ -36,8 +36,8 @@ public final class ArrayForEachPair extends ArrayFn {
         SeqType.ITEM_ZM, ((ArrayType) type1).declType, ((ArrayType) type2).declType);
 
     // assign type after coercion (expression might have changed)
-    final Type type3 = exprs[2].seqType().type;
-    if(type3 instanceof FuncType) exprType.assign(ArrayType.get(((FuncType) type3).declType));
+    final FuncType ft = exprs[2].funcType();
+    if(ft != null) exprType.assign(ArrayType.get(ft.declType));
 
     return this;
   }

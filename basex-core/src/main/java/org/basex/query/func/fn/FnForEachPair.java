@@ -60,12 +60,13 @@ public class FnForEachPair extends StandardFunc {
 
     // assign type after coercion (expression might have changed)
     final boolean updating = this instanceof UpdateForEachPair;
-    final Type type3 = exprs[2].seqType().type;
-    if(type3 instanceof FuncType && !updating) {
-      final SeqType ft3 = ((FuncType) type3).declType;
-      final boolean mayBeEmpty = st1.mayBeEmpty() || st2.mayBeEmpty() || ft3.mayBeEmpty();
-      final long size = ft3.zero() ? 0 : ft3.one() ? Math.min(expr1.size(), expr2.size()) : -1;
-      exprType.assign(ft3.type, mayBeEmpty ? Occ.ZERO_MORE : Occ.ONE_MORE, size);
+    final FuncType ft = exprs[2].funcType();
+    if(ft != null && !updating) {
+      final SeqType declType = ft.declType;
+      final boolean mayBeEmpty = st1.mayBeEmpty() || st2.mayBeEmpty() || declType.mayBeEmpty();
+      final long size = declType.zero() ? 0 : declType.one() ?
+        Math.min(expr1.size(), expr2.size()) : -1;
+      exprType.assign(declType.type, mayBeEmpty ? Occ.ZERO_MORE : Occ.ONE_MORE, size);
     }
 
     return this;

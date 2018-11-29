@@ -92,12 +92,12 @@ public final class Lookup extends Arr {
   private boolean exprType(final Expr ctx, final Expr keys) {
     if(ctx == null) return false;
 
-    final Type type = ctx.seqType().type;
-    final boolean map = type instanceof MapType, array = type instanceof ArrayType;
+    final FuncType ft = ctx.funcType();
+    final boolean map = ft instanceof MapType, array = ft instanceof ArrayType;
     if(!map && !array) return false;
 
     // derive type from input expression
-    final SeqType st = ((FuncType) type).declType;
+    final SeqType st = ft.declType;
     Occ occ = st.occ;
     if(keys == Str.WC || ctx.size() != 1 || !keys.seqType().oneNoArray()) {
       // key is wildcard, or expression yields no single item

@@ -76,15 +76,14 @@ public final class DynFuncCall extends FuncCall {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final Expr func = body();
-    final Type type = func.seqType().type;
 
     final int nargs = exprs.length - 1;
-    if(type instanceof FuncType) {
-      final FuncType ft = (FuncType) type;
+    final FuncType ft = func.funcType();
+    if(ft != null) {
       if(ft.argTypes != null && ft.argTypes.length != nargs) throw INVARITY_X_X_X.get(info,
           arguments(nargs), ft.argTypes.length, func.toErrorString());
       SeqType dt = ft.declType;
-      if(type instanceof MapType) dt = dt.with(dt.occ.union(Occ.ZERO));
+      if(ft instanceof MapType) dt = dt.with(dt.occ.union(Occ.ZERO));
       exprType.assign(dt);
     }
 

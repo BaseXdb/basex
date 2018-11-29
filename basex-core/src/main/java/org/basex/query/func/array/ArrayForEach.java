@@ -31,8 +31,8 @@ public final class ArrayForEach extends ArrayFn {
     if(type1 instanceof ArrayType) coerceFunc(1, cc, SeqType.ITEM_ZM, ((ArrayType) type1).declType);
 
     // assign type after coercion (expression might have changed)
-    final Type type2 = exprs[1].seqType().type;
-    if(type2 instanceof FuncType) exprType.assign(ArrayType.get(((FuncType) type2).declType));
+    final FuncType ft = exprs[1].funcType();
+    if(ft != null) exprType.assign(ArrayType.get(ft.declType));
 
     return this;
   }
