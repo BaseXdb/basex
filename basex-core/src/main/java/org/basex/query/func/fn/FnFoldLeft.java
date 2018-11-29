@@ -45,7 +45,7 @@ public final class FnFoldLeft extends StandardFunc {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if(expr1 == Empty.SEQ) return expr2;
 
-    seqType(this, cc, false, true);
+    opt(this, cc, false, true);
 
     if(allAreValues(false) && expr1.size() <= UNROLL_LIMIT) {
       // unroll the loop
@@ -60,26 +60,48 @@ public final class FnFoldLeft extends StandardFunc {
   }
 
   /**
-   * Assigns more specific sequence types.
-   * @param func function
+   * Refines the types of the function argument.
+   * @param sf function
    * @param cc compilation context
    * @param array indicates is this is array function
    * @param left indicates is this is left/right fold
    * @throws QueryException query exception
    */
-  public static void seqType(final StandardFunc func, final CompileContext cc, final boolean array,
+  public static void opt(final StandardFunc sf, final CompileContext cc, final boolean array,
       final boolean left) throws QueryException {
 
-    final Expr[] exprs = func.exprs;
-    final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
-    if(exprs[2].seqType().type instanceof FuncType) {
-      final SeqType fst1 = array && st1.type instanceof ArrayType ?
-        ((ArrayType) st1.type).declType : st1;
-      func.coerceFunc(2, cc, SeqType.ITEM_ZM,
-          left ? SeqType.ITEM_ZM : fst1, left ? fst1 : SeqType.ITEM_ZM);
+    final Expr[] exprs = sf.exprs;
+    final Expr func = exprs[2];
+    if(func instanceof FuncItem) {
+      // function argument is a single function item
+      final SeqType seq = exprs[0].seqType(), zero = exprs[1].seqType();
+      final SeqType curr = array && seq.type instanceof ArrayType ?
+        ((ArrayType) seq.type).declType : seq.with(Occ.ONE);
 
-      final SeqType dt = ((FuncType) exprs[2].seqType().type).declType;
-      func.exprType.assign(array || st1.mayBeEmpty() ? dt.union(st2) : dt);
+        // assign item type of iterated value, optimize function
+      final SeqType[] args = { left ? SeqType.ITEM_ZM : curr, left ? curr : SeqType.ITEM_ZM };
+      Expr optFunc = sf.coerceFunc(func, cc, SeqType.ITEM_ZM, args);
+
+      final FuncType ft = optFunc.funcType();
+      final int i = left ? 0 : 1;
+      SeqType input = zero, output = ft.declType;
+
+      // if initial item has more specific type, assign it and check optimized result type
+      if(input.refinable(ft.argTypes[i])) {
+        do {
+          args[i] = input;
+          optFunc = sf.coerceFunc(func, cc, ft.declType, args);
+          output = optFunc.funcType().declType;
+
+          // optimized type is instance of input type: abort
+          if(output.instanceOf(input)) break;
+          // combine input and output type, optimize again
+          input = input.union(output);
+        } while(true);
+      }
+
+      sf.exprType.assign(array || seq.mayBeEmpty() ? output.union(zero) : output);
+      exprs[2] = optFunc;
     }
   }
 }

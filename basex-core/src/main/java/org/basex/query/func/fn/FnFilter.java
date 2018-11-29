@@ -35,8 +35,7 @@ public final class FnFilter extends StandardFunc {
     final SeqType st = expr.seqType();
     if(st.zero()) return expr;
 
-    coerceFunc(1, cc, SeqType.BLN_O, st.with(Occ.ONE));
-
+    exprs[1] = coerceFunc(exprs[1], cc, SeqType.BLN_O, st.with(Occ.ONE));
     exprType.assign(st.type, st.occ.union(Occ.ZERO));
     return this;
   }

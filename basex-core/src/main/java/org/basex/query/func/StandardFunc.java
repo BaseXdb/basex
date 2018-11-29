@@ -174,29 +174,27 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Refines the type of a function item argument.
-   * @param i index of argument
+   * @param expr expression
    * @param cc compilation context
    * @param declType declared return type
    * @param argTypes argument types
-   * @return success flag
+   * @return old or new expression
    * @throws QueryException query context
    */
-  public boolean coerceFunc(final int i, final CompileContext cc, final SeqType declType,
+  public Expr coerceFunc(final Expr expr, final CompileContext cc, final SeqType declType,
       final SeqType... argTypes) throws QueryException {
 
     // check if argument is function item
-    final Expr func = exprs[i];
-    if(!(func instanceof FuncItem)) return false;
+    if(!(expr instanceof FuncItem)) return expr;
 
     // check number of arguments
-    final FuncItem fitem = (FuncItem) func;
-    final FuncType oldType = fitem.funcType();
-    final int al = argTypes.length;
-    final SeqType[] oldArgs = oldType.argTypes;
-    if(al != oldArgs.length) return false;
+    final FuncItem func = (FuncItem) expr;
+    final int al = argTypes.length, fargs = func.arity();
+    if(fargs != al) return expr;
 
     // select most specific argument and return types
-    final SeqType[] newArgs = new SeqType[al];
+    final FuncType oldType = func.funcType();
+    final SeqType[] oldArgs = oldType.argTypes, newArgs = new SeqType[al];
     for(int a = 0; a < al; a++) {
       newArgs[a] = argTypes[a].instanceOf(oldArgs[a]) ? argTypes[a] : oldArgs[a];
     }
@@ -204,8 +202,7 @@ public abstract class StandardFunc extends Arr {
     final FuncType newType = FuncType.get(newDecl, newArgs);
 
     // new type is more specific: coerce to new function type
-    if(!newType.eq(oldType)) exprs[i] = fitem.coerceTo(newType, cc.qc, info, true);
-    return true;
+    return !newType.eq(oldType) ? func.coerceTo(newType, cc.qc, info, true) : expr;
   }
 
   /**

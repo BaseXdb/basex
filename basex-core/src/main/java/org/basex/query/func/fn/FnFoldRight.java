@@ -67,7 +67,7 @@ public final class FnFoldRight extends StandardFunc {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if(expr1 == Empty.SEQ) return expr2;
 
-    FnFoldLeft.seqType(this, cc, false, false);
+    FnFoldLeft.opt(this, cc, false, false);
 
     if(allAreValues(false) && expr1.size() <= UNROLL_LIMIT) {
       // unroll the loop

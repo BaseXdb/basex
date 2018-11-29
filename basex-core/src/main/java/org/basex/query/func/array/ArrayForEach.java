@@ -28,7 +28,9 @@ public final class ArrayForEach extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Type type1 = exprs[0].seqType().type;
-    if(type1 instanceof ArrayType) coerceFunc(1, cc, SeqType.ITEM_ZM, ((ArrayType) type1).declType);
+    if(type1 instanceof ArrayType) {
+      exprs[1] = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, ((ArrayType) type1).declType);
+    }
 
     // assign type after coercion (expression might have changed)
     final FuncType ft = exprs[1].funcType();

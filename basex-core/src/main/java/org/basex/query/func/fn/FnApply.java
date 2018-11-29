@@ -68,7 +68,7 @@ public class FnApply extends StandardFunc {
         final int as = Math.max(0, (int) arr.arraySize());
         final SeqType[] args = new SeqType[as];
         for(int a = 0; a < as; a++) args[a] = arr.get(a).seqType();
-        coerceFunc(0, cc, SeqType.ITEM_ZM, args);
+        exprs[0] = coerceFunc(exprs[0], cc, SeqType.ITEM_ZM, args);
       } else if(ft1 != null) {
         // argument will be of type array: assign generic array return type to all arguments
         final SeqType[] args1 = ft1.argTypes;
@@ -77,7 +77,7 @@ public class FnApply extends StandardFunc {
           final SeqType[] args2 = new SeqType[as];
           final ArrayType at2 = (ArrayType) ft2;
           for(int a = 0; a < as; a++) args2[a] = at2.declType;
-          coerceFunc(0, cc, SeqType.ITEM_ZM, args2);
+          exprs[0] = coerceFunc(exprs[0], cc, SeqType.ITEM_ZM, args2);
         }
       }
     }

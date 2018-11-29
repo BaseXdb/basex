@@ -33,7 +33,7 @@ public final class ArrayFilter extends ArrayFn {
     final Type type1 = expr1.seqType().type;
 
     if(type1 instanceof ArrayType) {
-      coerceFunc(1, cc, SeqType.BLN_O, ((ArrayType) type1).declType);
+      exprs[1] = coerceFunc(exprs[1], cc, SeqType.BLN_O, ((ArrayType) type1).declType);
       exprType.assign(type1);
     }
     return this;

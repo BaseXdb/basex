@@ -6,10 +6,8 @@ import static org.junit.Assert.*;
 
 import org.basex.query.*;
 import org.basex.query.ast.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -203,7 +201,8 @@ public final class FnModuleTest extends QueryPlanTest {
 
     query(func.args(" ()", 1, " function($a, $b) { $b }"), 1);
     query(func.args(" prof:void(1)", 1, " function($a, $b) { $b }"), 1);
-    query(func.args(" 2", 1, " function($a, $b) { $b }"), 2);
+    query(func.args(2, 1, " function($a, $b) { $b }"), 2);
+    query("sort(" + func.args(" <a/>", "a", " compare#2") + ")", 1);
 
     check(func.args(" ()", " ()", " function($a, $b) { $b }"), "", empty());
 
@@ -213,13 +212,32 @@ public final class FnModuleTest extends QueryPlanTest {
         empty(func),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 2 to 10", 1, " function($a, $b) { 0 * random:double() + $b }"),
-        10,
-        exists(Int.class),
+    check(func.args(" 2 to 10", 1, " function($a, $b) { $b[random:double()] }"),
+        "",
         empty(func),
-        count(Util.className(Arith.class) + "[@op = '+']", 9));
+        exists(_RANDOM_DOUBLE));
     // should not be unrolled
     check(func.args(" 1 to 11", 0, " function($a, $b) { $a + $b }"), 66, exists(func));
+
+    // type inference
+    check(func.args(" 1[. = 1]", " ()", " function($r, $a) { $r, $a }"), 1,
+        type(func, "xs:integer*"));
+    check(func.args(" 1[. = 0]", 1, " function($r, $a) { $r, $a }"), 1,
+        type(func, "xs:integer+"));
+    check(func.args(" 1[. = 1]", "a", " function($r, $a) { $r, $a }"), "a\n1",
+        type(func, "xs:anyAtomicType+"));
+
+    check(func.args(" <a>1</a>", " xs:byte(1)", " function($n, $_) {" +
+        " if($n instance of xs:byte ) then xs:short  (1) else" +
+        " if($n instance of xs:short) then xs:int    (1) else" +
+        " if($n instance of xs:int  ) then xs:long   (1) else" +
+        " if($n instance of xs:long ) then xs:integer(1) else" +
+        " xs:decimal(1)" +
+        "}"), 1,
+        type(func, "xs:decimal"));
+
+    check(func.args(" 1[. = 0]", 1, " function($r as xs:integer, $a) { $r + $r }"), 1,
+        type(func, "xs:integer"));
   }
 
   /** Test method. */
@@ -234,11 +252,10 @@ public final class FnModuleTest extends QueryPlanTest {
         empty(FOLD_RIGHT),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 1 to 9", 10, " function($a, $b) { 0 * random:double() + $b }"),
-        10,
+    check(func.args(" 1 to 9", 10, " function($a, $b) { $b[random:double()] }"),
+        "",
         empty(FOLD_RIGHT),
-        exists(Int.class),
-        count(Util.className(Arith.class) + "[@op = '+']", 9));
+        exists(_RANDOM_DOUBLE));
     // should not be unrolled
     check(func.args(" 0 to 10", 10, " function($a, $b) { $a + $b }"), 65, exists(func));
   }
@@ -261,11 +278,9 @@ public final class FnModuleTest extends QueryPlanTest {
         empty(func),
         exists(IntSeq.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 1 to 9", " function($x) { 0 * random:double() + $x }"),
-        "1\n2\n3\n4\n5\n6\n7\n8\n9",
+    check(func.args(" 1 to 9", " function($x) { $x[random:double()] }"), "",
         empty(func),
-        empty(IntSeq.class),
-        count(Util.className(Arith.class) + "[@op = '+']", 9));
+        exists(_RANDOM_DOUBLE));
     // should not be unrolled
     check(func.args(" 0 to 10", " function($x) { $x + 1 }"),
         "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11",
