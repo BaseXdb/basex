@@ -13,16 +13,34 @@ import org.basex.util.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-public final class FnEmpty extends StandardFunc {
+public class FnEmpty extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Expr expr = exprs[0];
-    final Item item = expr.seqType().zeroOrOne() ? expr.item(qc, info) : expr.iter(qc).next();
-    return Bln.get(item == null);
+    return Bln.get(empty(qc));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
+    final Bln empty = opt();
+    return empty == null ? this : empty;
+  }
+
+  /**
+   * Evaluates the function.
+   * @param qc query context
+   * @return boolean result
+   * @throws QueryException query exception
+   */
+  final boolean empty(final QueryContext qc) throws QueryException {
+    final Expr expr = exprs[0];
+    return (expr.seqType().zeroOrOne() ? expr.item(qc, info) : expr.iter(qc).next()) == null;
+  }
+
+  /**
+   * Optimizes an existence check.
+   * @return boolean result or {@code null}
+   */
+  final Bln opt() {
     // ignore non-deterministic expressions (e.g.: empty(error()))
     final Expr expr = exprs[0];
     if(!expr.has(Flag.NDT)) {
@@ -30,6 +48,6 @@ public final class FnEmpty extends StandardFunc {
       if(size != -1) return Bln.get(size == 0);
       if(expr.seqType().oneOrMore()) return Bln.FALSE;
     }
-    return this;
+    return null;
   }
 }
