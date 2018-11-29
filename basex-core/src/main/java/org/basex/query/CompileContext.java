@@ -222,7 +222,7 @@ public final class CompileContext {
         if(refine) {
           final ParseExpr re = (ParseExpr) res;
           final SeqType et = expr.seqType(), rt = re.seqType();
-          if(!et.eq(rt) && et.instanceOf(rt)) {
+          if(et.refinable(rt)) {
             final SeqType st = et.intersect(rt);
             if(st != null) re.exprType.assign(st);
           }
@@ -244,7 +244,7 @@ public final class CompileContext {
           // refine type of function items (includes maps and arrays)
           final FItem fitem = (FItem) res;
           final SeqType et = expr.seqType(), rt = res.seqType();
-          if(!et.eq(rt) && et.instanceOf(rt)) {
+          if(et.refinable(rt)) {
             final Type type = et.type.intersect(rt.type);
             if(type != null) fitem.type = type;
           }

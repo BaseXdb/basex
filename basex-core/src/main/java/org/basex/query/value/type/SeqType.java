@@ -503,7 +503,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type yields at most one item.
+   * Tests if expressions of this type yield at most one item.
    * @return result of check
    */
   public boolean zeroOrOne() {
@@ -511,7 +511,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type yields zero items.
+   * Tests if expressions of this type yield zero items.
    * @return result of check
    */
   public boolean zero() {
@@ -519,7 +519,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type yields exactly one item.
+   * Tests if expressions of this type yield exactly one item.
    * @return result of check
    */
   public boolean one() {
@@ -527,7 +527,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type yields exactly one item and is no array.
+   * Tests if expressions of this type yield exactly one item and is no array.
    * @return result of check
    */
   public boolean oneNoArray() {
@@ -535,7 +535,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type yields exactly one or more items.
+   * Tests if expressions of this type yield exactly one or more items.
    * @return result of check
    */
   public boolean oneOrMore() {
@@ -543,7 +543,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type may yield zero items.
+   * Tests if expressions of this type may yield zero items.
    * @return result of check
    */
   public boolean mayBeEmpty() {
@@ -551,7 +551,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type may be numeric. User for predicate rewritings.
+   * Tests if expressions of this type may be numeric. User for predicate rewritings.
    * @return result of check
    */
   public boolean mayBeNumber() {
@@ -560,7 +560,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type may be an array.
+   * Tests if expressions of this type may be an array.
    * @return result of check
    */
   public boolean mayBeArray() {
@@ -569,17 +569,29 @@ public final class SeqType {
   }
 
   /**
+   * Checks if this sequence type an instance of (but different to) the specified sequence type.
+   * @param st sequence type to check
+   * @return result of check
+   */
+  public boolean refinable(final SeqType st) {
+    return !eq(st) && instanceOf(st);
+  }
+
+  /**
    * Checks if this sequence type is an instance of the specified sequence type.
    * @param st sequence type to check
    * @return result of check
    */
   public boolean instanceOf(final SeqType st) {
+    // empty sequence: only check cardinality
+    if(zero()) return st.mayBeEmpty();
+
     final Type type1 = type, type2 = st.type;
     final Test kind1 = kind, kind2 = st.kind;
     return (type2 == AtomType.ITEM || type1.instanceOf(type2)) && occ.instanceOf(st.occ) &&
-      // [LW] complete kind check
       (kind2 == null || kind1 != null && kind1.intersect(kind2) != null);
   }
+
 
   /**
    * Checks the types for equality.

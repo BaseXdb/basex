@@ -150,7 +150,7 @@ public final class Var extends ExprInfo {
     }
 
     final SeqType dt = exprType.seqType();
-    if(!dt.eq(st) && !dt.instanceOf(st)) {
+    if(!dt.instanceOf(st)) {
       // the new type provides new information
       final SeqType it = dt.intersect(st);
       if(it != null) exprType.assign(it, size);
