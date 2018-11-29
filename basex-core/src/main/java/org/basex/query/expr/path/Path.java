@@ -489,7 +489,7 @@ public abstract class Path extends ParseExpr {
       if(step1 == null) continue;
 
       final Axis axis1 = step1.axis;
-      NodeType type1 = step1.test.type;
+      final NodeType type1 = step1.test.type;
 
       // check combination of axis and node test and axis
       if(!type1.oneOf(NodeType.NOD, NodeType.SCA, NodeType.SCE) && ((BooleanSupplier) () -> {

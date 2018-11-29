@@ -44,7 +44,7 @@ public class ArchiveCreateFrom extends ArchiveCreate {
       out.level(level);
       try {
         while(true) {
-          Item en = qc.next(entries);
+          final Item en = qc.next(entries);
           if(en == null) break;
           checkElemToken(en);
           final IOFile file = new IOFile(root, string(en.string(info)));

@@ -89,7 +89,7 @@ public class UtilItem extends StandardFunc {
    */
   private long pos(final QueryContext qc) throws QueryException {
     final double dp = toDouble(exprs[1], qc);
-    long pos = (long) dp;
+    final long pos = (long) dp;
     return dp != pos ? -1 : pos - 1;
   }
 }

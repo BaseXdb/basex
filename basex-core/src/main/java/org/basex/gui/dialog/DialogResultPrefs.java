@@ -60,7 +60,8 @@ final class DialogResultPrefs extends BaseXBack {
 
     serial = new BaseXSerial(dialog, gui.context.options.get(MainOptions.SERIALIZER));
 
-    BaseXBack p = new BaseXBack().layout(new RowLayout()), pp, ppp;
+    final BaseXBack p = new BaseXBack().layout(new RowLayout());
+    BaseXBack pp, ppp;
     p.add(new BaseXLabel(LIMITS + COL, true, true));
 
     pp = new BaseXBack(new RowLayout());
