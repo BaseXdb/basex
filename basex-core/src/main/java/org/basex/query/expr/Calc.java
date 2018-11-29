@@ -29,7 +29,7 @@ public enum Calc {
 
       if(num1) {
         // numbers or untyped values
-        final Type type = type(type1, type2);
+        final Type type = numType(type1, type2);
         if(type == ITR) {
           final long itr1 = item1.itr(info), itr2 = item2.itr(info);
           if(itr2 > 0 ? itr1 > Long.MAX_VALUE - itr2 : itr1 < Long.MIN_VALUE - itr2)
@@ -64,6 +64,17 @@ public enum Calc {
       final Expr expr = func.apply(ex1, ex2);
       return expr != null ? expr : func.apply(ex2, ex1);
     }
+
+    @Override
+    public Type type(final Type type1, final Type type2) {
+      if(type1 == YMD && type2 == YMD) return YMD;
+      if(type1 == DTD && type2 == DTD) return DTD;
+      if(type1 == DTM || type2 == DTM) return DTM;
+      if(type1 == DAT || type2 == DAT) return DAT;
+      if(type1 == TIM && type2 == DTD) return TIM;
+      if(type1 == DTD && type2 == TIM) return TIM;
+      return numType(type1, type2);
+    }
   },
 
   /** Subtraction. */
@@ -77,7 +88,7 @@ public enum Calc {
 
       if(num1) {
         // numbers or untyped values
-        final Type type = type(type1, type2);
+        final Type type = numType(type1, type2);
         if(type == ITR) {
           final long itr1 = item1.itr(info), itr2 = item2.itr(info);
           if(itr2 < 0 ? itr1 > Long.MAX_VALUE + itr2 : itr1 < Long.MIN_VALUE + itr2)
@@ -109,6 +120,17 @@ public enum Calc {
       return ex2 instanceof ANum && ((ANum) ex2).dbl() == 0 ? ex1 :
         ex1.equals(ex2) ? zero(ex1) : null;
     }
+
+    @Override
+    public Type type(final Type type1, final Type type2) {
+      if(type1 == DTM && type2 == DTM) return DTD;
+      if(type1 == DAT && type2 == DAT) return DTD;
+      if(type1 == TIM && type2 == TIM) return DTD;
+      if(type1 == DTM) return DTM;
+      if(type1 == DAT) return DAT;
+      if(type1 == TIM && type2 == DTD) return TIM;
+      return numType(type1, type2);
+    }
   },
 
   /** Multiplication. */
@@ -117,6 +139,7 @@ public enum Calc {
     public Item eval(final Item item1, final Item item2, final InputInfo info)
         throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
+
       if(type1 == YMD) {
         if(item2 instanceof ANum) return new YMDur((Dur) item1, item2.dbl(info), true, info);
         throw numberError(item2, info);
@@ -137,7 +160,7 @@ public enum Calc {
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
       if(num1 ^ num2) throw typeError(info, type1, type2);
       if(num1) {
-        final Type type = type(type1, type2);
+        final Type type = numType(type1, type2);
         if(type == ITR) {
           final long l1 = item1.itr(info);
           final long l2 = item2.itr(info);
@@ -163,6 +186,13 @@ public enum Calc {
       };
       final Expr expr = func.apply(ex1, ex2);
       return expr != null ? expr : func.apply(ex2, ex1);
+    }
+
+    @Override
+    public Type type(final Type type1, final Type type2) {
+      if(type1 == YMD || type2 == YMD) return YMD;
+      if(type1 == DTD || type2 == DTD) return DTD;
+      return numType(type1, type2);
     }
   },
 
@@ -195,7 +225,7 @@ public enum Calc {
       }
 
       checkNum(info, item1, item2);
-      final Type type = type(type1, type2);
+      final Type type = numType(type1, type2);
       if(type == DBL) return Dbl.get(item1.dbl(info) / item2.dbl(info));
       if(type == FLT) return Flt.get(item1.flt(info) / item2.flt(info));
 
@@ -211,6 +241,15 @@ public enum Calc {
       return ex2 instanceof ANum && ((ANum) ex2).dbl() == 1 ? ex1 :
         ex1.equals(ex2) ? one(ex1) : null;
     }
+
+    @Override
+    public Type type(final Type type1, final Type type2) {
+      if(type1 == YMD && type2 == YMD || type1 == DTD && type2 == DTD) return DEC;
+      if(type1 == YMD) return YMD;
+      if(type1 == DTD) return DTD;
+      final Type t = numType(type1, type2);
+      return t == ITR ? DEC : t;
+    }
   },
 
   /** Integer division. */
@@ -219,7 +258,7 @@ public enum Calc {
     public Int eval(final Item item1, final Item item2, final InputInfo info)
         throws QueryException {
       checkNum(info, item1, item2);
-      final Type type = type(item1.type, item2.type);
+      final Type type = numType(item1.type, item2.type);
       if(type == DBL || type == FLT) {
         final double dbl1 = item1.dbl(info), dbl2 = item2.dbl(info);
         if(dbl2 == 0) throw zeroError(info, item1);
@@ -252,6 +291,11 @@ public enum Calc {
       return ex2 instanceof ANum && ((ANum) ex2).dbl() == 1 ? ex1 :
         ex1.equals(ex2) ? one(ex1) : null;
     }
+
+    @Override
+    public Type type(final Type type1, final Type type2) {
+      return ITR;
+    }
   },
 
   /** Modulo. */
@@ -260,7 +304,7 @@ public enum Calc {
     public Item eval(final Item item1, final Item item2, final InputInfo info)
         throws QueryException {
       checkNum(info, item1, item2);
-      final Type type = type(item1.type, item2.type);
+      final Type type = numType(item1.type, item2.type);
       if(type == DBL) return Dbl.get(item1.dbl(info) % item2.dbl(info));
       if(type == FLT) return Flt.get(item1.flt(info) % item2.flt(info));
       if(type == ITR) {
@@ -278,6 +322,12 @@ public enum Calc {
     @Override
     public Expr optimize(final Expr ex1, final Expr ex2) {
       return null;
+    }
+
+    @Override
+    public Type type(final Type type1, final Type type2) {
+      final Type t = numType(type1, type2);
+      return t == AAT ? NUM : t;
     }
   };
 
@@ -316,12 +366,21 @@ public enum Calc {
   public abstract Expr optimize(Expr ex1, Expr ex2);
 
   /**
+   * Returns the result type of this calculation.
+   * @param type1 first item type
+   * @param type2 second item type
+   * @return result expression, or {@code null} if expression cannot be optimized
+   */
+  public abstract Type type(Type type1, Type type2);
+
+  /**
    * Returns the numeric type with the highest precedence.
    * @param type1 first item type
    * @param type2 second item type
    * @return type
    */
-  public static Type type(final Type type1, final Type type2) {
+  public static Type numType(final Type type1, final Type type2) {
+    if(!type1.isNumberOrUntyped() || !type2.isNumberOrUntyped()) return AAT;
     if(type1 == DBL || type2 == DBL || type1.isUntyped() || type2.isUntyped()) return DBL;
     if(type1 == FLT || type2 == FLT) return FLT;
     if(type1 == DEC || type2 == DEC) return DEC;
@@ -336,7 +395,7 @@ public enum Calc {
   private static Expr zero(final Expr expr) {
     // floating points
     final Type type = expr.seqType().type;
-    return type == DEC ? Dec.ZERO : type.instanceOf(AtomType.ITR) ? Int.ZERO : null;
+    return type == DEC ? Dec.ZERO : type.instanceOf(ITR) ? Int.ZERO : null;
   }
 
   /**
@@ -347,7 +406,7 @@ public enum Calc {
   private static Expr one(final Expr expr) {
     // floating points
     final Type type = expr.seqType().type;
-    return type == DEC ? Dec.ONE : type.instanceOf(AtomType.ITR) ? Int.ONE : null;
+    return type == DEC ? Dec.ONE : type.instanceOf(ITR) ? Int.ONE : null;
   }
 
   /**

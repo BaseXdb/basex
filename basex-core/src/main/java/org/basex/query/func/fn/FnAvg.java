@@ -47,10 +47,7 @@ public class FnAvg extends FnSum {
 
     if(!st.mayBeArray()) {
       // sequence is not empty: assign result type
-      Type type = st.type;
-      if(type.isUntyped()) type = AtomType.DBL;
-      else if(type.instanceOf(AtomType.ITR)) type = AtomType.DEC;
-      else if(!type.isNumber()) type = AtomType.AAT;
+      final Type type = Calc.DIV.type(st.type, st.type);
       exprType.assign(type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
     }
     return optFirst();

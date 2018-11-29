@@ -38,20 +38,20 @@ public final class Arith extends Arr {
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     final Type type1 = st1.type, type2 = st2.type;
     final boolean nums = type1.isNumberOrUntyped() && type2.isNumberOrUntyped();
-    final Type type = calc == Calc.IDIV ? AtomType.ITR : nums ? Calc.type(type1, type2) :
-      AtomType.AAT;
-    final boolean oneNoArray = st1.oneNoArray() && st2.oneNoArray();
-    exprType.assign(type, oneNoArray ? Occ.ONE : Occ.ZERO_ONE);
 
-    Expr expr = this;
-    if(oneIsEmpty()) {
-      expr = cc.emptySeq(this);
-    } else if(allAreValues(false)) {
-      expr = value(cc.qc);
-    } else if(nums && oneNoArray) {
-      // example: number($a) + 0 -> number($a)
-      final Expr ex = calc.optimize(expr1, expr2);
-      if(ex != null && ex.seqType().type.eq(type)) expr = ex;
+    final Type type = calc.type(type1, type2);
+    final boolean one = st1.oneNoArray() && st2.oneNoArray();
+    exprType.assign(type, one ? Occ.ONE : Occ.ZERO_ONE);
+
+    Expr expr = emptyExpr();
+    if(expr == this) {
+      if(allAreValues(false)) {
+        expr = value(cc.qc);
+      } else if(nums && one) {
+        // example: number($a) + 0 -> number($a)
+        final Expr ex = calc.optimize(expr1, expr2);
+        if(ex != null && ex.seqType().type.eq(type)) expr = ex;
+      }
     }
     return cc.replaceWith(this, expr);
   }

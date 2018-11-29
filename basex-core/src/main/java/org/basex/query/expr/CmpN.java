@@ -88,8 +88,15 @@ public final class CmpN extends Cmp {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    if(exprs[0].seqType().one() && exprs[1].seqType().one()) exprType.assign(Occ.ONE);
-    return oneIsEmpty() ? cc.emptySeq(this) : allAreValues(false) ? cc.preEval(this) : this;
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
+    if(st1.one() && st2.one()) exprType.assign(Occ.ONE);
+
+    Expr expr = emptyExpr();
+    if(expr == this) {
+      if(allAreValues(false)) expr = value(cc.qc);
+    }
+    return cc.replaceWith(this, expr);
   }
 
   @Override

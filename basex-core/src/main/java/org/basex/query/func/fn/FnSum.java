@@ -68,10 +68,7 @@ public class FnSum extends StandardFunc {
       if(type1.isUntyped()) exprType.assign(SeqType.DBL_O);
     } else if(st2 != null && !st2.zero() && !st2.mayBeArray()) {
       // sequence may be empty: include non-empty default argument in tests
-      final Type type1 = st1.type, type2 = st2.type;
-      final Type type = type1.isNumberOrUntyped() && type2.isNumberOrUntyped() ?
-        Calc.type(type1, type2) : AtomType.AAT;
-      exprType.assign(type, st2.one() ? Occ.ONE : Occ.ZERO_ONE);
+      exprType.assign(Calc.PLUS.type(st1.type, st2.type), st2.one() ? Occ.ONE : Occ.ZERO_ONE);
     }
     return this;
   }

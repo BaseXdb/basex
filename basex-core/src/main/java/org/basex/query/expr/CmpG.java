@@ -123,6 +123,8 @@ public class CmpG extends Cmp {
 
   /** Operator. */
   OpG op;
+  /** Type check at runtime. */
+  boolean check = true;
 
   /**
    * Constructor.
@@ -141,46 +143,52 @@ public class CmpG extends Cmp {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // pre-evaluate if one value is empty (e.g.: () eq local:expensive() )
-    if(oneIsEmpty()) return cc.replaceWith(this, Bln.FALSE);
-
     // swap operands
     if(swap()) {
       cc.info(OPTSWAP_X, this);
       op = op.swap();
     }
 
-    // optimize expression
-    Expr expr = opt(cc);
-
     // simplify singleton sequences
     for(int e = 0; e < 2; e++) {
       if(exprs[e] instanceof SingletonSeq) exprs[e] = ((SingletonSeq) exprs[e]).value;
     }
-    // range comparisons
-    if(expr == this) expr = CmpR.get(this, cc);
-    if(expr == this) expr = CmpSR.get(this, cc);
 
-    // try to skip type checking at runtime
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
-    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    final Type type1 = st1.type, type2 = st2.type;
-    // skip type check if types are identical (and a child instance of of any atomic type)
-    check = !(type1 == type2 && !AtomType.AAT.instanceOf(type1) &&
-        (type1.isSortable() || op != OpG.EQ && op != OpG.NE) ||
-        type1.isUntyped() || type2.isUntyped() ||
-        type1.instanceOf(AtomType.STR) && type2.instanceOf(AtomType.STR) ||
-        type1.instanceOf(AtomType.NUM) && type2.instanceOf(AtomType.NUM) ||
-        type1.instanceOf(AtomType.DUR) && type2.instanceOf(AtomType.DUR));
+    // pre-evaluate if one value is empty (e.g.: () eq local:expensive() )
+    Expr expr = emptyExpr();
+    if(expr != this) {
+      // prof:void() + 1 -> boolean(prof:void('123'))
+      expr = cc.function(Function.BOOLEAN, info, expr);
+    } else {
+      // optimize expression
+      expr = opt(cc);
 
-    // simple comparisons
-    if(expr == this && st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray())
-      expr = new CmpSimpleG(expr1, expr2, op, coll, sc, info);
+      // range comparisons
+      if(expr == this) expr = CmpR.get(this, cc);
+      if(expr == this) expr = CmpSR.get(this, cc);
 
-    // hash-based comparisons
-    if(expr == this && op == OpG.EQ && coll == null && (type1.isNumber() && type2.isNumber() ||
-        (type1.isStringOrUntyped() && type2.isStringOrUntyped())) && !st2.zeroOrOne())
-      expr = new CmpHashG(expr1, expr2, op, coll, sc, info);
+      if(expr == this) {
+        final Expr expr1 = exprs[0], expr2 = exprs[1];
+        final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
+        final Type type1 = st1.type, type2 = st2.type;
+        // skip type check if types are identical (and a child instance of of any atomic type)
+        check = !(type1 == type2 && !AtomType.AAT.instanceOf(type1) &&
+            (type1.isSortable() || op != OpG.EQ && op != OpG.NE) ||
+            type1.isUntyped() || type2.isUntyped() ||
+            type1.instanceOf(AtomType.STR) && type2.instanceOf(AtomType.STR) ||
+            type1.instanceOf(AtomType.NUM) && type2.instanceOf(AtomType.NUM) ||
+            type1.instanceOf(AtomType.DUR) && type2.instanceOf(AtomType.DUR));
+
+        if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
+          // simple comparisons
+          expr = new CmpSimpleG(expr1, expr2, op, coll, sc, info);
+        } else if(op == OpG.EQ && coll == null && (type1.isNumber() && type2.isNumber() ||
+            (type1.isStringOrUntyped() && type2.isStringOrUntyped())) && !st2.zeroOrOne()) {
+          // hash-based comparisons
+          expr = new CmpHashG(expr1, expr2, op, coll, sc, info);
+        }
+      }
+    }
 
     // pre-evaluate values or return expression
     return allAreValues(false) ? cc.preEval(expr) : cc.replaceWith(this, expr);

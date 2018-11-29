@@ -166,36 +166,37 @@ public final class CmpV extends Cmp {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // pre-evaluate if one value is empty (e.g.: () = local:expensive() )
-    if(oneIsEmpty()) return cc.emptySeq(this);
-
-    // operands will always yield a single item
-    if(exprs[1].seqType().oneNoArray() && exprs[0].seqType().oneNoArray())
-      exprType.assign(Occ.ONE);
-
     // swap operands
     if(swap()) {
       cc.info(OPTSWAP_X, this);
       opV = opV.swap();
     }
 
-    // try to skip type checking at runtime
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
-    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    final Type type1 = st1.type, type2 = st2.type;
-    check = !(type1 == type2 && !AtomType.AAT.instanceOf(type1) &&
-        (type1.isSortable() || opV != OpV.EQ && opV != OpV.NE) ||
-        type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
-        type1.instanceOf(AtomType.NUM) && type2.instanceOf(AtomType.NUM) ||
-        type1.instanceOf(AtomType.DUR) && type2.instanceOf(AtomType.DUR));
+    Expr expr = emptyExpr();
+    if(expr == this) {
+      if(allAreValues(false)) {
+        expr = value(cc.qc);
+      } else {
+        // check if operands will always yield a single item
+        final Expr expr1 = exprs[0], expr2 = exprs[1];
+        final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
+        if(st1.oneNoArray() && st2.oneNoArray()) {
+          exprType.assign(Occ.ONE);
 
-    // try to rewrite to general expression (faster evaluation)
-    Expr expr = check || !st1.oneNoArray() || !st2.oneNoArray() ? this :
-      new CmpG(expr1, expr2, OpG.get(opV), coll, sc, info).optimize(cc);
-
+          // no type check: rewrite to general expression (faster evaluation)
+          final Type type1 = st1.type, type2 = st2.type;
+          if(type1 == type2 && !AtomType.AAT.instanceOf(type1) &&
+              (type1.isSortable() || opV != OpV.EQ && opV != OpV.NE) ||
+              type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
+              type1.instanceOf(AtomType.NUM) && type2.instanceOf(AtomType.NUM) ||
+              type1.instanceOf(AtomType.DUR) && type2.instanceOf(AtomType.DUR)) {
+            expr = new CmpG(expr1, expr2, OpG.get(opV), coll, sc, info).optimize(cc);
+          }
+        }
+      }
+    }
     if(expr == this) expr = opt(cc);
-    // pre-evaluate values or return expression
-    return allAreValues(false) ? cc.preEval(expr) : cc.replaceWith(this, expr);
+    return cc.replaceWith(this, expr);
   }
 
   @Override
@@ -231,9 +232,7 @@ public final class CmpV extends Cmp {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final Cmp cmp = new CmpV(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), opV, coll, sc, info);
-    cmp.check = check;
-    return copyType(cmp);
+    return copyType(new CmpV(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), opV, coll, sc, info));
   }
 
   @Override

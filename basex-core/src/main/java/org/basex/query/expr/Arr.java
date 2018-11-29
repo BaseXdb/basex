@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -103,14 +102,16 @@ public abstract class Arr extends ParseExpr {
   }
 
   /**
-   * Returns true if at least one argument returns the empty sequence.
-   * @return result of check
+   * Returns the first expression that yields an empty sequence. If all expressions return non-empty
+   * results, the original expression is returned.
+   * @return empty or original expression
    */
-  protected final boolean oneIsEmpty() {
+  protected final Expr emptyExpr() {
+    // pre-evaluate if one value is empty (e.g.: () = local:expensive() )
     for(final Expr expr : exprs) {
-      if(expr == Empty.SEQ) return true;
+      if(expr.seqType().zero()) return expr;
     }
-    return false;
+    return this;
   }
 
   @Override

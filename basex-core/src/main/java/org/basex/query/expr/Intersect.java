@@ -28,7 +28,7 @@ public final class Intersect extends Set {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     super.optimize(cc);
-    return oneIsEmpty() ? cc.emptySeq(this) : this;
+    return cc.replaceWith(this, emptyExpr());
   }
 
   @Override
