@@ -320,7 +320,7 @@ public abstract class XQArray extends FItem {
   }
 
   @Override
-  public final Expr inlineExpr(final Expr[] exprs, final CompileContext cc, final InputInfo info) {
+  public final Expr inline(final Expr[] exprs, final CompileContext cc, final InputInfo info) {
     return null;
   }
 

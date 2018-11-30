@@ -88,6 +88,11 @@ public final class Unary extends Single {
   }
 
   @Override
+  public String description() {
+    return "unary expression";
+  }
+
+  @Override
   public String toString() {
     return (minus ? "-" : "") + expr;
   }

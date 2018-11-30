@@ -982,7 +982,7 @@ public enum AtomType implements Type {
    * @return query exception
    */
   public final QueryException castError(final byte[] value, final InputInfo info)  {
-    return FUNCCAST_X_X.get(info, this, chop(value, info));
+    return FUNCCAST_X_X.get(info, this, normalize(value, info));
   }
 
   @Override

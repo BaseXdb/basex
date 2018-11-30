@@ -286,7 +286,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc, final InputInfo ii)
+  public Expr inline(final Expr[] exprs, final CompileContext cc, final InputInfo ii)
       throws QueryException {
 
     if(!inline(cc, anns, expr) || has(Flag.CTX) || compiling || selfRecursive()) return null;

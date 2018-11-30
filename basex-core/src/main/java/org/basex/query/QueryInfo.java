@@ -68,7 +68,7 @@ public final class QueryInfo {
       for(int e = 0; e < el; e++) {
         final Object o = ext[e];
         ext[e] = o instanceof Supplier<?> ? ((Supplier<?>) o).get() :
-          QueryError.chop(token(o), null);
+          QueryError.normalize(token(o), null);
       }
       String info = Util.info(string, ext);
       if(!info.isEmpty()) {

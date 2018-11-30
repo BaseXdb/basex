@@ -1,7 +1,6 @@
 package org.basex.query;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryError.chop;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryText.DOLLAR;
 import static org.basex.util.Token.*;
@@ -801,8 +800,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void contextItemDecl() throws QueryException {
-    wsCheck(ITEMM);
-    if(!decl.add(ITEMM)) throw error(DUPLITEM);
+    wsCheck(ITEM);
+    if(!decl.add(ITEM)) throw error(DUPLITEM);
 
     if(wsConsumeWs(AS)) {
       final SeqType st = itemType();
@@ -2356,7 +2355,7 @@ public class QueryParser extends InputParser {
     if(tok.isEmpty()) throw error(NUMBER_X, tok);
     final long l = toLong(tok.toArray());
     return l != Long.MIN_VALUE ? Int.get(l) :
-      FnError.get(RANGE_X.get(info(), chop(tok, null)), SeqType.ITR_O, sc);
+      FnError.get(RANGE_X.get(info(), normalize(tok, null)), SeqType.ITR_O, sc);
   }
 
   /**

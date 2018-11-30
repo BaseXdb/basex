@@ -113,7 +113,7 @@ final class ASession {
     final Object object = session.getAttribute(key.toJava());
     if(object == null) return def;
     if(object instanceof Value) return (Value) object;
-    throw (id == null ? SESSION_GET_X : SESSIONS_GET_X).get(null, QueryError.chop(object, null));
+    throw (id == null ? SESSION_GET_X : SESSIONS_GET_X).get(null, normalize(object, null));
   }
 
   /**

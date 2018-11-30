@@ -205,7 +205,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc, final InputInfo info)
+  public Expr inline(final Expr[] exprs, final CompileContext cc, final InputInfo info)
       throws QueryException {
 
     if(!StaticFunc.inline(cc, anns, expr) || expr.has(Flag.CTX)) return null;
@@ -264,6 +264,11 @@ public final class FuncItem extends FItem implements Scope {
     return toString(false);
   }
 
+  @Override
+  public String description() {
+    return FUNCTION + ' ' + ITEM;
+  }
+
   /**
    * Returns a string representation.
    * @param error error flag
@@ -278,6 +283,7 @@ public final class FuncItem extends FItem implements Scope {
       if(p != 0) tb.add(',');
       tb.add(error ? params[p].toErrorString() : params[p]);
     }
-    return tb.add(')').add(" as ").add(funcType().declType).add(" {...}").toString();
+    tb.add(')').add(" as ").add(funcType().declType).add(" { ").add(expr).add(" }");
+    return tb.toString();
   }
 }

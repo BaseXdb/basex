@@ -269,7 +269,7 @@ final class Unit {
         try {
           exp.add(item.string(null));
         } catch(final QueryException ignored) {
-          exp.add(chop(item.toString(), null));
+          exp.add(normalize(item.toString(), null));
         }
       }
       if(count != -1) exp.add(ITEM, token(count)).add(TYPE, item.type.toString());

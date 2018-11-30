@@ -85,7 +85,7 @@ public interface QueryText {
   /** Parser token. */ String INTERSECT = "intersect";
   /** Parser token. */ String INTO = "into";
   /** Parser token. */ String INVOKE = "invoke";
-  /** Parser token. */ String ITEMM = "item";
+  /** Parser token. */ String ITEM = "item";
   /** Parser token. */ String LANGUAGE = "language";
   /** Parser token. */ String LAST = "last";
   /** Parser token. */ String LAX = "lax";

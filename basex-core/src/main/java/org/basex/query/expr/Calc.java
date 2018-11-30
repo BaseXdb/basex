@@ -416,7 +416,7 @@ public enum Calc {
    * @return query exception (indicates that an error is raised)
    */
   private static QueryException zeroError(final InputInfo info, final Item item) {
-    return DIVZERO_X.get(info, chop(item, info));
+    return DIVZERO_X.get(info, normalize(item, info));
   }
 
   /**

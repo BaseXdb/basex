@@ -263,7 +263,7 @@ public abstract class StandardFunc extends Arr {
       return p.startsWith(IO.FILEPREF) ? Paths.get(new URI(p)) : Paths.get(p);
     } catch(final InvalidPathException | URISyntaxException ex) {
       Util.debug(ex);
-      throw FILE_INVALID_PATH_X.get(info, QueryError.chop(path, info));
+      throw FILE_INVALID_PATH_X.get(info, normalize(path, info));
     }
   }
 
@@ -289,7 +289,7 @@ public abstract class StandardFunc extends Arr {
   protected final IO checkPath(final byte[] uri) throws QueryException {
     final QueryInput qi = new QueryInput(string(uri), sc);
     if(qi.io.exists()) return qi.io;
-    throw WHICHRES_X.get(info, QueryError.chop(uri, info));
+    throw WHICHRES_X.get(info, normalize(uri, info));
   }
 
   /**

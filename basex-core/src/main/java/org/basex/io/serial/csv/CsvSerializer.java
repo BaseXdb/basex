@@ -62,7 +62,7 @@ abstract class CsvSerializer extends StandardSerializer {
       if(delim || special || backslashes && contains(txt, '\\')) {
         final TokenBuilder tb = new TokenBuilder();
         if(delim && !backslashes && !quotes) throw CSV_SERIALIZE_X.getIO(
-            Util.info("Output must be put into quotes: %", chop(txt, null)));
+            Util.info("Output must be put into quotes: %", normalize(txt, null)));
 
         if(quotes && (delim || special)) tb.add('"');
         final int len = txt.length;

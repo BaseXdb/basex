@@ -1,7 +1,6 @@
 package org.basex.query.func.convert;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryError.chop;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -35,7 +34,7 @@ public abstract class ConvertFn extends StandardFunc {
       return toBinary(token, encoding);
     } catch(final CharacterCodingException ex) {
       Util.debug(ex);
-      throw CONVERT_BINARY_X_X.get(info, chop(token, info), encoding);
+      throw CONVERT_BINARY_X_X.get(info, normalize(token, info), encoding);
     }
   }
 

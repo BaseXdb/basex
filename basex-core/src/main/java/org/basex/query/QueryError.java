@@ -1591,7 +1591,7 @@ public enum QueryError {
 
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) tb.add('$').add(name.string()).add(" := ");
-    final byte[] value = tb.add(chop(expr, info)).finish();
+    final byte[] value = tb.add(normalize(expr, info)).finish();
     return INVTYPE_X_X_X.get(info, expr.seqType(), type, value);
   }
 
@@ -1663,37 +1663,37 @@ public enum QueryError {
   }
 
   /**
-   * Chops the specified value to a maximum size.
+   * Removes whitespaces and chops the specified value to a maximum size.
    * @param value value
    * @param info input info (can be {@code null}; an empty string will be returned if
    * {@link InputInfo#internal()} returns {@code true})
    * @return chopped or empty string
    */
-  public static byte[] chop(final Object value, final InputInfo info) {
+  public static byte[] normalize(final Object value, final InputInfo info) {
     return info != null && info.internal() ? Token.EMPTY :
-           value instanceof byte[] ? chop((byte[]) value, info) :
-           chop(value.toString(), info);
+           value instanceof byte[] ? normalize((byte[]) value, info) :
+             normalize(value.toString(), info);
   }
 
   /**
-   * Chops the specified string to a maximum size.
+   * Removes whitespaces and chops the specified string to a maximum size.
    * @param string string
    * @param info input info (can be {@code null}; an empty string will be returned if
    * {@link InputInfo#internal()} returns {@code true})
    * @return chopped or empty string
    */
-  public static byte[] chop(final String string, final InputInfo info) {
-    return info != null && info.internal() ? Token.EMPTY : chop(Token.token(string), info);
+  public static byte[] normalize(final String string, final InputInfo info) {
+    return info != null && info.internal() ? Token.EMPTY : normalize(Token.token(string), info);
   }
 
   /**
-   * Chops the specified token to a maximum size.
+   * Removes whitespaces and chops the specified token to a maximum size.
    * @param token token
    * @param info input info (can be {@code null}; an empty string will be returned if
    * {@link InputInfo#internal()} returns {@code true})
    * @return chopped or empty string
    */
-  public static byte[] chop(final byte[] token, final InputInfo info) {
+  public static byte[] normalize(final byte[] token, final InputInfo info) {
     if(info != null && info.internal()) return Token.EMPTY;
 
     final TokenBuilder tb = new TokenBuilder();

@@ -331,7 +331,7 @@ public final class XQMap extends FItem {
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc, final InputInfo info) {
+  public Expr inline(final Expr[] exprs, final CompileContext cc, final InputInfo info) {
     return null;
   }
 

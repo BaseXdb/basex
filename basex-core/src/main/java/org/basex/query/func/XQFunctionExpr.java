@@ -53,7 +53,7 @@ public interface XQFunctionExpr {
    * @return the expression to inline if successful, {@code null} otherwise
    * @throws QueryException query exception
    */
-  Expr inlineExpr(Expr[] exprs, CompileContext cc, InputInfo ii) throws QueryException;
+  Expr inline(Expr[] exprs, CompileContext cc, InputInfo ii) throws QueryException;
 
   /**
    * Checks if this function returns vacuous results (see {@link Expr#isVacuous()}).

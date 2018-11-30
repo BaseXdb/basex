@@ -65,8 +65,8 @@ public final class StaticFuncCall extends FuncCall {
     func.comp(cc);
 
     // try to inline the function
-    final Expr inl = func.inlineExpr(exprs, cc, info);
-    if(inl != null) return inl;
+    final Expr in = func.inline(exprs, cc, info);
+    if(in != null) return in;
 
     exprType.assign(func.seqType());
     return this;

@@ -256,17 +256,18 @@ public abstract class Seq extends Value {
    * @return string
    */
   private String toString(final boolean error) {
-    final StringBuilder sb = new StringBuilder(PAREN1);
+    final TokenBuilder tb = new TokenBuilder().add(PAREN1);
     for(int i = 0; i < size; ++i) {
-      sb.append(i == 0 ? "" : SEP);
+      if(i > 0) tb.add(SEP);
       final Item item = itemAt(i);
-      sb.append(error ? item.toErrorString() : item.toString());
-      if(sb.length() <= 16 || i + 1 == size) continue;
-      // output is chopped to prevent too long error strings
-      sb.append(SEP).append(DOTS);
-      break;
+      tb.add(error ? item.toErrorString() : item.toString());
+      if(i + 1 < size && tb.size() > 40) {
+        // chop too long strings
+        tb.add(SEP).add(DOTS);
+        break;
+      }
     }
-    return sb.append(PAREN2).toString();
+    return tb.add(PAREN2).toString();
   }
 
   /**

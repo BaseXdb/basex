@@ -249,7 +249,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final CompileContext cc, final InputInfo ii)
+  public Expr inline(final Expr[] exprs, final CompileContext cc, final InputInfo ii)
       throws QueryException {
 
     if(expr.has(Flag.CTX)) return null;

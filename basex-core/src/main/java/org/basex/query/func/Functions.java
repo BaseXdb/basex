@@ -214,7 +214,7 @@ public final class Functions extends TokenSet {
     if(eq(name.uri(), XS_URI)) {
       final Type type = getCast(name, arity, info);
       final VarScope vs = new VarScope(sc);
-      final Var[] params = { vs.addNew(new QNm(ITEMM, ""), SeqType.AAT_ZO, true, qc, info) };
+      final Var[] params = { vs.addNew(new QNm(ITEM, ""), SeqType.AAT_ZO, true, qc, info) };
       final Expr expr = new Cast(sc, info, new VarRef(info, params[0]), type.seqType());
       final AnnList anns = new AnnList();
       final FuncType ft = FuncType.get(anns, expr.seqType(), params);

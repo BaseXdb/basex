@@ -204,15 +204,15 @@ public final class CompileContext {
     final Expr res = result == null ? Empty.SEQ : result;
     if(res != expr) {
       final Supplier<String> f  = () -> {
-        final byte[] exprString = QueryError.chop(Token.token(expr.toString()), null);
-        final byte[] resString = QueryError.chop(Token.token(res.toString()), null);
-        if(Token.eq(exprString, resString)) return "";
-
         final TokenBuilder tb = new TokenBuilder();
         final String exprDesc = expr.description(), resDesc = res.description();
         tb.add(res instanceof ParseExpr ? OPTREWRITE : OPTPRE).add(' ').add(exprDesc);
         if(!exprDesc.equals(resDesc)) tb.add(" to ").add(resDesc);
-        tb.add(": ").add(exprString).add(" -> ").add(resString);
+
+        final byte[] exprString = QueryError.normalize(Token.token(expr.toString()), null);
+        final byte[] resString = QueryError.normalize(Token.token(res.toString()), null);
+        tb.add(": ").add(exprString);
+        if(!Token.eq(exprString, resString)) tb.add(" -> ").add(resString);
         return tb.toString();
       };
       info("%", f);

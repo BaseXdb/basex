@@ -96,8 +96,7 @@ public final class DynFuncCall extends FuncCall {
       final XQFunctionExpr fe = (XQFunctionExpr) func;
       if(!(func instanceof FuncItem && comesFrom((FuncItem) func))) {
         checkUp(fe, updating, sc);
-        final Expr[] args = Arrays.copyOf(exprs, nargs);
-        final Expr in = fe.inlineExpr(args, cc, info);
+        final Expr in = fe.inline(Arrays.copyOf(exprs, nargs), cc, info);
         if(in != null) return in;
       }
     } else if(func instanceof Item) {
