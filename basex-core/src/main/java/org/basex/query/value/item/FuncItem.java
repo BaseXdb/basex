@@ -280,7 +280,7 @@ public final class FuncItem extends FItem implements Scope {
     tb.add(anns).add(FUNCTION).add('(');
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
-      if(p != 0) tb.add(',');
+      if(p != 0) tb.add(", ");
       tb.add(error ? params[p].toErrorString() : params[p]);
     }
     tb.add(')').add(" as ").add(funcType().declType).add(" { ").add(expr).add(" }");

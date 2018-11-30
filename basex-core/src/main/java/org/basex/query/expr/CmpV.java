@@ -247,7 +247,7 @@ public final class CmpV extends Cmp {
 
   @Override
   public String description() {
-    return "'" + opV + "' operator";
+    return "'" + opV + "' comparison";
   }
 
   @Override

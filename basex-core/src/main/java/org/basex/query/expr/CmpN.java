@@ -135,7 +135,7 @@ public final class CmpN extends Cmp {
 
   @Override
   public String description() {
-    return "'" + op + "' operator";
+    return "'" + op + "' comparison";
   }
 
   @Override

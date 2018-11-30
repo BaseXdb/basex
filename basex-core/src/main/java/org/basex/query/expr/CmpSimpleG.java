@@ -43,6 +43,6 @@ public final class CmpSimpleG extends CmpG {
 
   @Override
   public String description() {
-    return "simple " + super.description();
+    return "simplified " + super.description();
   }
 }
