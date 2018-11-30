@@ -218,7 +218,7 @@ final class TrieBranch extends TrieNode {
   @Override
   boolean materialized() {
     for(final TrieNode nd : kids) {
-      if(!nd.materialized()) return false;
+      if(nd != null && !nd.materialized()) return false;
     }
     return true;
   }
