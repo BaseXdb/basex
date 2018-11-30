@@ -233,8 +233,8 @@ final class TrieBranch extends TrieNode {
 
   @Override
   boolean instanceOf(final AtomType kt, final SeqType dt) {
-    for(final TrieNode k : kids) {
-      if(!(k == null || k.instanceOf(kt, dt))) return false;
+    for(final TrieNode nd : kids) {
+      if(nd != null && !nd.instanceOf(kt, dt)) return false;
     }
     return true;
   }
@@ -242,8 +242,8 @@ final class TrieBranch extends TrieNode {
   @Override
   int hash(final InputInfo info) throws QueryException {
     int hash = 0;
-    for(final TrieNode ch : kids) {
-      if(ch != null) hash = (hash << 5) - hash + ch.hash(info);
+    for(final TrieNode nd : kids) {
+      if(nd != null) hash = (hash << 5) - hash + nd.hash(info);
     }
     return hash;
   }
