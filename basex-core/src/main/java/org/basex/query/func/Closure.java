@@ -266,7 +266,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     }
 
     // create the return clause
-    final Expr body = expr.copy(cc, vm);
+    final Expr body = expr.copy(cc, vm).optimize(cc);
     final Expr ret = declType == null ? body :
       new TypeCheck(vs.sc, info, body, declType, true).optimize(cc);
 

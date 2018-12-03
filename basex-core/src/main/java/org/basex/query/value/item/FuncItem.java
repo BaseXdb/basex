@@ -236,7 +236,7 @@ public final class FuncItem extends FItem implements Scope {
     }
 
     // create the return clause
-    final Expr ret = expr.copy(cc, vm);
+    final Expr ret = expr.copy(cc, vm).optimize(cc);
 
     ret.accept(new ASTVisitor() {
       @Override

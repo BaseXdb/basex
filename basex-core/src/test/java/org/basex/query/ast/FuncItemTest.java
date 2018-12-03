@@ -2,6 +2,7 @@ package org.basex.query.ast;
 
 import static org.basex.query.QueryError.*;
 
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
@@ -289,12 +290,11 @@ public final class FuncItemTest extends QueryPlanTest {
         empty());
   }
 
-  /** Tests inlining of a function literal. */
+  /** Static typing. */
   @Test
-  public void gh1113() {
-    check("let $join := array:join#1 return $join(([], []))",
-        "[]",
-        empty(DynFuncCall.class),
-        empty(StaticFuncCall.class));
+  public void gh1649() {
+    check("function($v) { if($v = 0) then () else $v }(<x>0</x>)",
+        "",
+        type(If.class, "element()?"));
   }
 }
