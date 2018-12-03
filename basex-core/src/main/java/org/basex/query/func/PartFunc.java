@@ -98,7 +98,7 @@ public final class PartFunc extends Arr {
     final DynFuncCall ex = new DynFuncCall(info, sc, updating, false, func, args);
 
     final FuncType type = FuncType.get(anns, ft.declType, vars);
-    return new FuncItem(sc, anns, null, vars, type, ex, qc.focus, vs.stackSize());
+    return new FuncItem(sc, anns, null, vars, type, ex, qc.focus, vs.stackSize(), info);
   }
 
   @Override

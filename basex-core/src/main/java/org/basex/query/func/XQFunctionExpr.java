@@ -5,7 +5,6 @@ import org.basex.query.expr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Interface for possibly non-compiled XQuery functions.
@@ -49,11 +48,10 @@ public interface XQFunctionExpr {
    * Tries to inline this function with the given arguments.
    * @param exprs arguments
    * @param cc compilation context
-   * @param ii input info
    * @return the expression to inline if successful, {@code null} otherwise
    * @throws QueryException query exception
    */
-  Expr inline(Expr[] exprs, CompileContext cc, InputInfo ii) throws QueryException;
+  Expr inline(Expr[] exprs, CompileContext cc) throws QueryException;
 
   /**
    * Checks if this function returns vacuous results (see {@link Expr#isVacuous()}).

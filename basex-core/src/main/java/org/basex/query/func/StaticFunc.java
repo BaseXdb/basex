@@ -187,7 +187,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   @Override
   public Value invokeValue(final QueryContext qc, final InputInfo ii, final Value... arg)
       throws QueryException {
-    return FuncCall.value(this, arg, qc, ii);
+    return FuncCall.value(this, arg, qc, info);
   }
 
   @Override
@@ -286,9 +286,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public Expr inline(final Expr[] exprs, final CompileContext cc, final InputInfo ii)
-      throws QueryException {
-
+  public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
     if(!inline(cc, anns, expr) || has(Flag.CTX) || compiling || selfRecursive()) return null;
     cc.info(OPTINLINE_X, (Supplier<?>) this::id);
 

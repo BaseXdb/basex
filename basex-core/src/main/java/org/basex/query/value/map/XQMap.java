@@ -1,16 +1,15 @@
 package org.basex.query.value.map;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.XQArray;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -23,7 +22,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
  */
-public final class XQMap extends FItem {
+public final class XQMap extends XQData {
   /** The empty map. */
   public static final XQMap EMPTY = new XQMap(TrieNode.EMPTY);
   /** Number of bits per level, maximum is 5 because {@code 1 << 5 == 32}. */
@@ -37,18 +36,8 @@ public final class XQMap extends FItem {
    * @param root map
    */
   private XQMap(final TrieNode root) {
-    super(SeqType.ANY_MAP, new AnnList());
+    super(SeqType.ANY_MAP);
     this.root = root;
-  }
-
-  @Override
-  public int arity() {
-    return 1;
-  }
-
-  @Override
-  public QNm funcName() {
-    return null;
   }
 
   @Override
@@ -66,25 +55,6 @@ public final class XQMap extends FItem {
     root.cache(info, lazy);
   }
 
-  @Override
-  public int stackFrameSize() {
-    return 0;
-  }
-
-  @Override
-  public Item invItem(final QueryContext qc, final InputInfo info, final Value... args)
-      throws QueryException {
-    return invValue(qc, info, args).item(qc, info);
-  }
-
-  @Override
-  public Value invValue(final QueryContext qc, final InputInfo info, final Value... args)
-      throws QueryException {
-    final Item key = args[0].atomItem(qc, info);
-    if(key == null) throw EMPTYFOUND.get(info);
-    return get(key, info);
-  }
-
   /**
    * Deletes a key from this map.
    * @param key key to delete (must not be {@code null})
@@ -97,13 +67,7 @@ public final class XQMap extends FItem {
     return del == root ? this : del == null ? EMPTY : new XQMap(del);
   }
 
-  /**
-   * Gets the value from this map.
-   * @param key key to look for (must not be {@code null})
-   * @param info input info
-   * @return bound value if found, the empty sequence {@code ()} otherwise
-   * @throws QueryException query exception
-   */
+  @Override
   public Value get(final Item key, final InputInfo info) throws QueryException {
     final Value value = root.get(key.hash(info), key, 0, info);
     return value == null ? Empty.SEQ : value;
@@ -138,30 +102,12 @@ public final class XQMap extends FItem {
   }
 
   @Override
-  public boolean instanceOf(final Type tp) {
-    return tp == AtomType.ITEM || tp instanceof FuncType && instanceOf((FuncType) tp, false);
-  }
-
-  @Override
-  public XQMap coerceTo(final FuncType ft, final QueryContext qc, final InputInfo info,
-      final boolean optimize) throws QueryException {
-
-    if(instanceOf(ft, true)) return this;
-    throw typeError(this, ft, info);
-  }
-
-  @Override
   public Item materialize(final QueryContext qc, final boolean copy) {
     return root.materialized() ? this : null;
   }
 
-  /**
-   * Checks if this is an instance of the specified type.
-   * @param ft type
-   * @param coerce coerce value
-   * @return result of check
-   */
-  private boolean instanceOf(final FuncType ft, final boolean coerce) {
+  @Override
+  protected boolean instanceOf(final FuncType ft, final boolean coerce) {
     if(ft instanceof ArrayType) return false;
     if(type.instanceOf(ft)) return true;
 
@@ -278,24 +224,20 @@ public final class XQMap extends FItem {
     addPlan(plan, elem);
   }
 
-  /**
-   * Returns a string representation of the map.
-   * @param indent indent output
-   * @param tb token builder
-   * @param level current level
-   * @param info input info
-   * @throws QueryException query exception
-   */
+  @Override
   public void string(final boolean indent, final TokenBuilder tb, final int level,
       final InputInfo info) throws QueryException {
 
     tb.add("map{");
     int c = 0;
+    final IntConsumer addWS = lvl -> {
+      for(int l = 0; l < lvl; l++) tb.add("  ");
+    };
     for(final Item key : keys()) {
       if(c++ > 0) tb.add(',');
       if(indent) {
         tb.add('\n');
-        indent(tb, level + 1);
+        addWS.accept(level + 1);
       }
       tb.add(key.toString()).add(':');
       if(indent) tb.add(' ');
@@ -316,34 +258,9 @@ public final class XQMap extends FItem {
     }
     if(indent) {
       tb.add('\n');
-      indent(tb, level);
+      addWS.accept(level);
     }
     tb.add('}');
-  }
-
-  /**
-   * Adds some indentation.
-   * @param tb token builder
-   * @param level level
-   */
-  private static void indent(final TokenBuilder tb, final int level) {
-    for(int l = 0; l < level; l++) tb.add("  ");
-  }
-
-  @Override
-  public Expr inline(final Expr[] exprs, final CompileContext cc, final InputInfo info) {
-    return null;
-  }
-
-  @Override
-  public boolean isVacuousBody() {
-    return false;
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    // [CG] could be enhanced
-    return this == obj;
   }
 
   @Override

@@ -39,6 +39,8 @@ public final class FuncItem extends FItem implements Scope {
   private final QueryFocus focus;
   /** Size of the stack frame needed for this function. */
   private final int stackSize;
+  /** Input information. */
+  public final InputInfo info;
 
   /**
    * Constructor.
@@ -49,10 +51,11 @@ public final class FuncItem extends FItem implements Scope {
    * @param type function type
    * @param expr function body
    * @param stackSize stack-frame size
+   * @param info input info
    */
   public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
-      final FuncType type, final Expr expr, final int stackSize) {
-    this(sc, anns, name, params, type, expr, new QueryFocus(), stackSize);
+      final FuncType type, final Expr expr, final int stackSize, final InputInfo info) {
+    this(sc, anns, name, params, type, expr, new QueryFocus(), stackSize, info);
   }
 
   /**
@@ -65,9 +68,11 @@ public final class FuncItem extends FItem implements Scope {
    * @param expr function body
    * @param focus query focus
    * @param stackSize stack-frame size
+   * @param info input info
    */
   public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
-      final FuncType type, final Expr expr, final QueryFocus focus, final int stackSize) {
+      final FuncType type, final Expr expr, final QueryFocus focus, final int stackSize,
+      final InputInfo info) {
 
     super(type, anns);
     this.name = name;
@@ -76,6 +81,7 @@ public final class FuncItem extends FItem implements Scope {
     this.stackSize = stackSize;
     this.sc = sc;
     this.focus = focus;
+    this.info = info;
   }
 
   @Override
@@ -104,7 +110,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Value invValue(final QueryContext qc, final InputInfo info, final Value... args)
+  public Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
 
     // bind variables and cache context
@@ -120,7 +126,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Item invItem(final QueryContext qc, final InputInfo info, final Value... args)
+  public Item invItem(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
     // bind variables and cache context
     final QueryFocus qf = qc.focus;
@@ -128,18 +134,30 @@ public final class FuncItem extends FItem implements Scope {
     try {
       final int pl = params.length;
       for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
-      return expr.item(qc, info);
+      return expr.item(qc, ii);
     } finally {
       qc.focus = qf;
     }
   }
 
   @Override
-  public FuncItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo info,
+  public Value invokeValue(final QueryContext qc, final InputInfo ii, final Value... args)
+      throws QueryException {
+    return FuncCall.value(this, args, qc, info);
+  }
+
+  @Override
+  public Item invokeItem(final QueryContext qc, final InputInfo ii, final Value... args)
+      throws QueryException {
+    return FuncCall.item(this, args, qc, info);
+  }
+
+  @Override
+  public FuncItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean optimize) throws QueryException {
 
     final int pl = params.length;
-    if(pl != ft.argTypes.length) throw QueryError.typeError(this, ft.seqType(), null, info);
+    if(pl != ft.argTypes.length) throw QueryError.typeError(this, ft.seqType(), null, ii);
 
     // optimize: continue with coercion if current type is only an instance of new type
     final FuncType tp = funcType();
@@ -151,19 +169,19 @@ public final class FuncItem extends FItem implements Scope {
     final Var[] vars = new Var[pl];
     final Expr[] args = new Expr[pl];
     for(int p = pl; p-- > 0;) {
-      vars[p] = vs.addNew(params[p].name, ft.argTypes[p], true, qc, info);
-      args[p] = new VarRef(info, vars[p]).optimize(cc);
+      vars[p] = vs.addNew(params[p].name, ft.argTypes[p], true, qc, ii);
+      args[p] = new VarRef(ii, vars[p]).optimize(cc);
     }
     cc.pushScope(vs);
 
     // create new function call (will immediately be inlined/simplified when being optimized)
     final boolean updating = anns.contains(Annotation.UPDATING) || expr.has(Flag.UPD);
-    Expr body = new DynFuncCall(info, sc, updating, false, this, args);
+    Expr body = new DynFuncCall(ii, sc, updating, false, this, args);
     if(optimize) body = body.optimize(cc);
 
     // add type check if return types differ
     if(!tp.declType.instanceOf(ft.declType)) {
-      body = new TypeCheck(sc, info, body, ft.declType, true);
+      body = new TypeCheck(sc, ii, body, ft.declType, true);
       if(optimize) body = body.optimize(cc);
     }
 
@@ -173,7 +191,7 @@ public final class FuncItem extends FItem implements Scope {
       FuncType.get(st, ft.argTypes) : ft;
 
     body.markTailCalls(null);
-    return new FuncItem(sc, anns, name, vars, newType, body, vs.stackSize());
+    return new FuncItem(sc, anns, name, vars, newType, body, vs.stackSize(), ii);
   }
 
   @Override
@@ -205,9 +223,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Expr inline(final Expr[] exprs, final CompileContext cc, final InputInfo info)
-      throws QueryException {
-
+  public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
     if(!StaticFunc.inline(cc, anns, expr) || expr.has(Flag.CTX)) return null;
     cc.info(OPTINLINE_X, this);
 
@@ -219,10 +235,10 @@ public final class FuncItem extends FItem implements Scope {
       clauses.add(new Let(cc.copy(params[p], vm), exprs[p], false).optimize(cc));
     }
 
-    // copy the function body
-    final Expr rt = expr.copy(cc, vm);
+    // create the return clause
+    final Expr ret = expr.copy(cc, vm);
 
-    rt.accept(new ASTVisitor() {
+    ret.accept(new ASTVisitor() {
       @Override
       public boolean inlineFunc(final Scope scope) {
         return scope.visit(this);
@@ -234,7 +250,7 @@ public final class FuncItem extends FItem implements Scope {
         return true;
       }
     });
-    return clauses == null ? rt : new GFLWOR(info, clauses, rt).optimize(cc);
+    return clauses == null ? ret : new GFLWOR(info, clauses, ret).optimize(cc);
   }
 
   @Override

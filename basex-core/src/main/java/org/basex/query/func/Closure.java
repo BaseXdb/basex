@@ -249,9 +249,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public Expr inline(final Expr[] exprs, final CompileContext cc, final InputInfo ii)
-      throws QueryException {
-
+  public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
     if(expr.has(Flag.CTX)) return null;
 
     cc.info(OPTINLINE_X, this);
@@ -267,11 +265,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       clauses.add(new Let(cc.copy(e.getKey(), vm), e.getValue(), false).optimize(cc));
     }
 
-    // copy the function body
-    final Expr cpy = expr.copy(cc, vm), dt = declType == null ? cpy :
-      new TypeCheck(vs.sc, ii, cpy, declType, true).optimize(cc);
+    // create the return clause
+    final Expr body = expr.copy(cc, vm);
+    final Expr ret = declType == null ? body :
+      new TypeCheck(vs.sc, info, body, declType, true).optimize(cc);
 
-    return clauses == null ? dt : new GFLWOR(ii, clauses, dt).optimize(cc);
+    return clauses == null ? ret : new GFLWOR(info, clauses, ret).optimize(cc);
   }
 
   @Override
@@ -314,7 +313,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     }
 
     final FuncType type = (FuncType) seqType().type;
-    return new FuncItem(vs.sc, anns, name, params, type, checked, vs.stackSize());
+    return new FuncItem(vs.sc, anns, name, params, type, checked, vs.stackSize(), info);
   }
 
   @Override

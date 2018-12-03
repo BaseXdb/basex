@@ -114,6 +114,7 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    // rewrite and operators in where clauses to single clauses
     final ListIterator<Clause> iter = clauses.listIterator();
     while(iter.hasNext()) {
       final Clause clause = iter.next();

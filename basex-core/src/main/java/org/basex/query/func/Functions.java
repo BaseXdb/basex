@@ -192,7 +192,7 @@ public final class Functions extends TokenSet {
   private static Expr closureOrFItem(final AnnList anns, final QNm name, final Var[] params,
       final FuncType ft, final Expr expr, final VarScope vs, final InputInfo info,
       final boolean runtime, final boolean updating) {
-    return runtime ? new FuncItem(vs.sc, anns, name, params, ft, expr, vs.stackSize()) :
+    return runtime ? new FuncItem(vs.sc, anns, name, params, ft, expr, vs.stackSize(), info) :
       new Closure(info, name, updating ? SeqType.EMP : ft.declType, params, expr, anns, null, vs);
   }
 
@@ -307,7 +307,7 @@ public final class Functions extends TokenSet {
       calls[a] = new VarRef(info, args[a]);
     }
     final TypedFunc tf = qc.funcs.undeclaredFuncCall(sf.name, calls, sc, info);
-    return new FuncItem(sc, tf.anns, sf.name, args, ft, tf.func, vs.stackSize());
+    return new FuncItem(sc, tf.anns, sf.name, args, ft, tf.func, vs.stackSize(), info);
   }
 
   /**

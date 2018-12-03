@@ -6,13 +6,11 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.collation.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.XQMap;
+import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -23,7 +21,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Leo Woerteler
  */
-public abstract class XQArray extends FItem {
+public abstract class XQArray extends XQData {
   /** Minimum size of a leaf. */
   static final int MIN_LEAF = 8;
   /** Maximum size of a leaf. */
@@ -39,7 +37,7 @@ public abstract class XQArray extends FItem {
    * Default constructor.
    */
   XQArray() {
-    super(SeqType.ANY_ARRAY, new AnnList());
+    super(SeqType.ANY_ARRAY);
   }
 
   /**
@@ -265,26 +263,6 @@ public abstract class XQArray extends FItem {
   abstract void checkInvariants();
 
   @Override
-  public final Value invValue(final QueryContext qc, final InputInfo info, final Value... args)
-      throws QueryException {
-    final Item key = args[0].atomItem(qc, info);
-    if(key == null) throw EMPTYFOUND_X.get(info, AtomType.ITR);
-    return get(key, info);
-  }
-
-  @Override
-  public final Item invItem(final QueryContext qc, final InputInfo info, final Value... args)
-      throws QueryException {
-    return invValue(qc, info, args).item(qc, info);
-  }
-
-  /**
-   * Gets the value from this array.
-   * @param key key to look for (must be an integer)
-   * @param info input info
-   * @return bound value if found, the empty sequence {@code ()} otherwise
-   * @throws QueryException query exception
-   */
   public final Value get(final Item key, final InputInfo info) throws QueryException {
     if(!key.type.instanceOf(AtomType.ITR) && !key.type.isUntyped())
       throw typeError(key, AtomType.ITR, info);
@@ -295,21 +273,6 @@ public abstract class XQArray extends FItem {
   }
 
   @Override
-  public final int stackFrameSize() {
-    return 0;
-  }
-
-  @Override
-  public final int arity() {
-    return 1;
-  }
-
-  @Override
-  public final QNm funcName() {
-    return null;
-  }
-
-  @Override
   public final QNm paramName(final int pos) {
     return new QNm("pos", "");
   }
@@ -317,16 +280,6 @@ public abstract class XQArray extends FItem {
   @Override
   public final FuncType funcType() {
     return ArrayType.get(SeqType.ITEM_ZM);
-  }
-
-  @Override
-  public final Expr inline(final Expr[] exprs, final CompileContext cc, final InputInfo info) {
-    return null;
-  }
-
-  @Override
-  public final boolean isVacuousBody() {
-    return false;
   }
 
   @Override
@@ -353,14 +306,7 @@ public abstract class XQArray extends FItem {
     return size;
   }
 
-  /**
-   * Returns a string representation of the array.
-   * @param indent indent output
-   * @param tb token builder
-   * @param level current level
-   * @param info input info
-   * @throws QueryException query exception
-   */
+  @Override
   public final void string(final boolean indent, final TokenBuilder tb, final int level,
       final InputInfo info) throws QueryException {
 
@@ -390,19 +336,6 @@ public abstract class XQArray extends FItem {
   }
 
   @Override
-  public final boolean instanceOf(final Type tp) {
-    return tp == AtomType.ITEM || tp instanceof FuncType && instanceOf((FuncType) tp, false);
-  }
-
-  @Override
-  public final FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo info,
-      final boolean optimize) throws QueryException {
-
-    if(instanceOf(ft, true)) return this;
-    throw typeError(this, ft, info);
-  }
-
-  @Override
   public Item materialize(final QueryContext qc, final boolean copy) {
     for(final Value value : members()) {
       for(final Item item : value) {
@@ -412,13 +345,8 @@ public abstract class XQArray extends FItem {
     return this;
   }
 
-  /**
-   * Checks if this is an instance of the specified type.
-   * @param ft type
-   * @param coerce coerce value
-   * @return result of check
-   */
-  private boolean instanceOf(final FuncType ft, final boolean coerce) {
+  @Override
+  protected boolean instanceOf(final FuncType ft, final boolean coerce) {
     if(ft instanceof MapType) return false;
     if(type.instanceOf(ft)) return true;
 
@@ -463,12 +391,6 @@ public abstract class XQArray extends FItem {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    // [CG] could be enhanced
-    return this == obj;
-  }
-
-  @Override
   public final void plan(final FElem plan) {
     final long size = arraySize();
     final FElem elem = planElem(ENTRIES, size, TYPE, seqType());
@@ -480,10 +402,10 @@ public abstract class XQArray extends FItem {
   @Override
   public final Object[] toJava() throws QueryException {
     final long size = arraySize();
-    final Object[] tmp = new Object[(int) size];
+    final ArrayList<Object> list = new ArrayList<>((int) size);
     final Iterator<Value> iter = iterator(0);
-    for(int i = 0; iter.hasNext(); i++) tmp[i] = iter.next().toJava();
-    return tmp;
+    while(iter.hasNext()) list.add(iter.next().toJava());
+    return list.toArray();
   }
 
   @Override
