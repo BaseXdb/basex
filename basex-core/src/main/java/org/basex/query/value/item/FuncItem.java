@@ -1,5 +1,6 @@
 package org.basex.query.value.item;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
@@ -11,6 +12,7 @@ import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -251,6 +253,27 @@ public final class FuncItem extends FItem implements Scope {
       }
     });
     return clauses == null ? ret : new GFLWOR(info, clauses, ret).optimize(cc);
+  }
+
+  @Override
+  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+    throw FIATOM_X.get(info, type);
+  }
+
+  @Override
+  public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    throw FIATOM_X.get(info, type);
+  }
+
+  @Override
+  public Item materialize(final QueryContext qc, final boolean copy) {
+    return null;
+  }
+
+  @Override
+  public boolean deep(final Item item, final InputInfo ii, final Collation coll)
+      throws QueryException {
+    throw FICMP_X.get(info, type);
   }
 
   @Override

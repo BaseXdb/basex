@@ -371,6 +371,7 @@ public abstract class XQArray extends XQData {
   public final boolean deep(final Item item, final InputInfo info, final Collation coll)
       throws QueryException {
 
+    if(item instanceof FuncItem) throw FICMP_X.get(info, type);
     if(item instanceof XQArray) {
       final XQArray o = (XQArray) item;
       if(arraySize() != o.arraySize()) return false;
@@ -382,7 +383,7 @@ public abstract class XQArray extends XQData {
       }
       return true;
     }
-    return item instanceof FItem && !(item instanceof XQMap) && super.deep(item, info, coll);
+    return false;
   }
 
   @Override

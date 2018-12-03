@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -39,30 +38,6 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public Value invokeValue(final QueryContext qc, final InputInfo info, final Value... args)
-      throws QueryException {
-    return FuncCall.value(this, args, qc, info);
-  }
-
-  @Override
-  public Item invokeItem(final QueryContext qc, final InputInfo info, final Value... args)
-      throws QueryException {
-    return FuncCall.item(this, args, qc, info);
-  }
-
-  /**
-   * Coerces this function item to the given function type.
-   * @param ft function type
-   * @param qc query context
-   * @param info input info
-   * @param optimize optimize resulting item
-   * @return coerced item
-   * @throws QueryException query exception
-   */
-  public abstract FItem coerceTo(FuncType ft, QueryContext qc, InputInfo info, boolean optimize)
-      throws QueryException;
-
-  @Override
   public final byte[] string(final InputInfo info) throws QueryException {
     throw FIATOM_X.get(info, type);
   }
@@ -78,20 +53,17 @@ public abstract class FItem extends Item implements XQFunction {
     return false;
   }
 
-  @Override
-  public Value atomValue(final QueryContext qc, final InputInfo info) throws QueryException {
-    throw FIATOM_X.get(info, type);
-  }
-
-  @Override
-  public Item atomItem(final QueryContext qc, final InputInfo info) throws QueryException {
-    throw FIATOM_X.get(info, type);
-  }
-
-  @Override
-  public Item materialize(final QueryContext qc, final boolean copy) {
-    return null;
-  }
+  /**
+   * Coerces this function item to the given function type.
+   * @param ft function type
+   * @param qc query context
+   * @param info input info
+   * @param optimize optimize resulting item
+   * @return coerced item
+   * @throws QueryException query exception
+   */
+  public abstract FItem coerceTo(FuncType ft, QueryContext qc, InputInfo info, boolean optimize)
+      throws QueryException;
 
   /**
    * Performs a deep comparison of two items.
@@ -101,11 +73,7 @@ public abstract class FItem extends Item implements XQFunction {
    * @return result of check
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
-  public boolean deep(final Item item, final InputInfo info, final Collation coll)
-      throws QueryException {
-    throw FICMP_X.get(info, type);
-  }
+  public abstract boolean deep(Item item, InputInfo info, Collation coll) throws QueryException;
 
   @Override
   public abstract void plan(FElem root);

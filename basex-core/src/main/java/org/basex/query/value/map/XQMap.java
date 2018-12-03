@@ -1,5 +1,6 @@
 package org.basex.query.value.map;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
@@ -102,6 +103,16 @@ public final class XQMap extends XQData {
   }
 
   @Override
+  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+    throw FIATOM_X.get(ii, type);
+  }
+
+  @Override
+  public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    throw FIATOM_X.get(ii, type);
+  }
+
+  @Override
   public Item materialize(final QueryContext qc, final boolean copy) {
     return root.materialized() ? this : null;
   }
@@ -184,8 +195,9 @@ public final class XQMap extends XQData {
   public boolean deep(final Item item, final InputInfo info, final Collation coll)
       throws QueryException {
 
+    if(item instanceof FuncItem) throw FICMP_X.get(info, type);
     if(item instanceof XQMap) return root.deep(info, ((XQMap) item).root, coll);
-    return item instanceof FItem && !(item instanceof XQArray) && super.deep(item, info, coll);
+    return false;
   }
 
   @Override
