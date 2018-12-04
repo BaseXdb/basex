@@ -14,43 +14,43 @@ import org.junit.*;
  */
 public final class XsltModuleTest extends AdvancedQueryTest {
   /** Test method. */
-  @Test
-  public void processor() {
-    assertFalse(query(_XSLT_PROCESSOR.args()).isEmpty());
+  @Test public void processor() {
+    final Function func = _XSLT_PROCESSOR;
+    assertFalse(query(func.args()).isEmpty());
   }
 
   /** Test method. */
-  @Test
-  public void version() {
-    assertFalse(query(_XSLT_VERSION.args()).isEmpty());
+  @Test public void version() {
+    final Function func = _XSLT_VERSION;
+    assertFalse(query(func.args()).isEmpty());
   }
 
   /** Test method. */
-  @Test
-  public void transform() {
+  @Test public void transform() {
+    final Function func = _XSLT_TRANSFORM;
     final String doc = " <a/>";
     String style = wrap("<xsl:template match='/'><X/></xsl:template>");
-    query(_XSLT_TRANSFORM.args(doc, ' ' + style), "<X/>");
-    query(_XSLT_TRANSFORM.args(doc, style), "<X/>");
+    query(func.args(doc, ' ' + style), "<X/>");
+    query(func.args(doc, style), "<X/>");
 
     style = wrap("<xsl:param name='t'/><xsl:template match='/'>" +
         "<X><xsl:value-of select='$t'/></X></xsl:template>");
-    query(_XSLT_TRANSFORM.args(doc, ' ' + style, " map { 't': '1' }"), "<X>1</X>");
-    query(_XSLT_TRANSFORM.args(doc, ' ' + style, " map { 't' : text { '1' } }"), "<X>1</X>");
+    query(func.args(doc, ' ' + style, " map { 't': '1' }"), "<X>1</X>");
+    query(func.args(doc, ' ' + style, " map { 't' : text { '1' } }"), "<X>1</X>");
   }
 
   /** Test method. */
-  @Test
-  public void transformText() {
+  @Test public void transformText() {
+    final Function func = _XSLT_TRANSFORM_TEXT;
     final String doc = " <a/>";
     String style = wrap("<xsl:template match='/'>" +
         "<xsl:output omit-xml-declaration='yes'/>1</xsl:template>");
-    query(_XSLT_TRANSFORM_TEXT.args(doc, ' ' + style), 1);
-    query(_XSLT_TRANSFORM_TEXT.args(doc, style), 1);
+    query(func.args(doc, ' ' + style), 1);
+    query(func.args(doc, style), 1);
 
     style = wrap("<xsl:param name='t'/><xsl:output omit-xml-declaration='yes'/>" +
       "<xsl:template match='/'><xsl:value-of select='$t'/></xsl:template>");
-    query(_XSLT_TRANSFORM_TEXT.args(doc, ' ' + style, " map { 't': '1' }"), 1);
+    query(func.args(doc, ' ' + style, " map { 't': '1' }"), 1);
   }
 
   /**

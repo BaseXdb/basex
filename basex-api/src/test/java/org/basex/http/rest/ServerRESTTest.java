@@ -13,8 +13,7 @@ public final class ServerRESTTest extends RESTTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass
-  public static void start() throws Exception {
+  @BeforeClass public static void start() throws Exception {
     init(REST_ROOT, false);
   }
 }

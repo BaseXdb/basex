@@ -24,8 +24,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:anyURI.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testAnyURI() throws XQException {
+  @Test public void testAnyURI() throws XQException {
     atomicTest("xs:anyURI('http://a/b/c')", "http://a/b/c", XQBASETYPE_ANYURI);
   }
 
@@ -33,8 +32,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:base64Binary.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testBase64Binary() throws XQException {
+  @Test public void testBase64Binary() throws XQException {
     atomicTest("xs:base64Binary('AAAA')", "AAAA", XQBASETYPE_BASE64BINARY);
   }
 
@@ -42,8 +40,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:boolean.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testBoolean() throws XQException {
+  @Test public void testBoolean() throws XQException {
     atomicTest("xs:boolean('true')", "true", XQBASETYPE_BOOLEAN);
   }
 
@@ -51,8 +48,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:byte.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testByte() throws XQException {
+  @Test public void testByte() throws XQException {
     atomicTest("xs:byte('1')", "1", XQBASETYPE_BYTE);
   }
 
@@ -60,8 +56,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:date.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testDate() throws XQException {
+  @Test public void testDate() throws XQException {
     atomicTest("xs:date('2000-12-31')", "2000-12-31", XQBASETYPE_DATE);
   }
 
@@ -69,8 +64,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:dateTime.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testDateTime() throws XQException {
+  @Test public void testDateTime() throws XQException {
     atomicTest(
       "xs:dateTime('2000-12-31T12:00:00')", "2000-12-31T12:00:00",
       XQBASETYPE_DATETIME
@@ -81,8 +75,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:decimal.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testDecimal() throws XQException {
+  @Test public void testDecimal() throws XQException {
     atomicTest("xs:decimal('1')", "1", XQBASETYPE_DECIMAL);
   }
 
@@ -90,8 +83,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:double.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testDouble() throws XQException {
+  @Test public void testDouble() throws XQException {
     atomicTest("xs:double('1')", "1", XQBASETYPE_DOUBLE);
   }
 
@@ -99,8 +91,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:ENTITY.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testENTITY() throws XQException {
+  @Test public void testENTITY() throws XQException {
     atomicTest("xs:ENTITY('AAA')", "AAA", XQBASETYPE_ENTITY);
   }
 
@@ -108,8 +99,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:float.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testFloat() throws XQException {
+  @Test public void testFloat() throws XQException {
     atomicTest("xs:float('1')", "1", XQBASETYPE_FLOAT);
   }
 
@@ -117,8 +107,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:gDay.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testGDay() throws XQException {
+  @Test public void testGDay() throws XQException {
     atomicTest("xs:gDay('---11')", "---11", XQBASETYPE_GDAY);
   }
 
@@ -126,8 +115,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:gMonth.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testGMonth() throws XQException {
+  @Test public void testGMonth() throws XQException {
     atomicTest("xs:gMonth('--11')", "--11", XQBASETYPE_GMONTH);
   }
 
@@ -135,8 +123,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:gMonthDay.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testGMonthDay() throws XQException {
+  @Test public void testGMonthDay() throws XQException {
     atomicTest("xs:gMonthDay('--01-01')", "--01-01", XQBASETYPE_GMONTHDAY);
   }
 
@@ -144,8 +131,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:gYear.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testGYear() throws XQException {
+  @Test public void testGYear() throws XQException {
     atomicTest("xs:gYear('2000')", "2000", XQBASETYPE_GYEAR);
   }
 
@@ -153,8 +139,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:gYearMonth.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testGYearMonth() throws XQException {
+  @Test public void testGYearMonth() throws XQException {
     atomicTest("xs:gYearMonth('2000-01')", "2000-01", XQBASETYPE_GYEARMONTH);
   }
 
@@ -162,8 +147,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:hexBinary.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testHexBinary() throws XQException {
+  @Test public void testHexBinary() throws XQException {
     atomicTest("xs:hexBinary('AA')", "AA", XQBASETYPE_HEXBINARY);
   }
 
@@ -171,8 +155,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:ID.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testID() throws XQException {
+  @Test public void testID() throws XQException {
     atomicTest("xs:ID('AA')", "AA", XQBASETYPE_ID);
   }
 
@@ -180,8 +163,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:IDREF.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testIDREF() throws XQException {
+  @Test public void testIDREF() throws XQException {
     atomicTest("xs:IDREF('AA')", "AA", XQBASETYPE_IDREF);
   }
 
@@ -189,8 +171,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:int.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testInt() throws XQException {
+  @Test public void testInt() throws XQException {
     atomicTest("xs:int('1')", "1", XQBASETYPE_INT);
   }
 
@@ -198,8 +179,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:integer.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testInteger() throws XQException {
+  @Test public void testInteger() throws XQException {
     atomicTest("xs:integer('1')", "1", XQBASETYPE_INTEGER);
   }
 
@@ -207,8 +187,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:language.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testLanguage() throws XQException {
+  @Test public void testLanguage() throws XQException {
     atomicTest("xs:language('en-GB')", "en-GB", XQBASETYPE_LANGUAGE);
   }
 
@@ -216,8 +195,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:long.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testLong() throws XQException {
+  @Test public void testLong() throws XQException {
     atomicTest("xs:long('1')", "1", XQBASETYPE_LONG);
   }
 
@@ -225,8 +203,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:Name.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testName() throws XQException {
+  @Test public void testName() throws XQException {
     atomicTest("xs:Name('AAA')", "AAA", XQBASETYPE_NAME);
   }
 
@@ -234,8 +211,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:NCName.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testNCName() throws XQException {
+  @Test public void testNCName() throws XQException {
     atomicTest("xs:NCName('AAA')", "AAA", XQBASETYPE_NCNAME);
   }
 
@@ -243,8 +219,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:negativeInteger.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testNegativeInteger() throws XQException {
+  @Test public void testNegativeInteger() throws XQException {
     atomicTest("xs:negativeInteger('-1')", "-1", XQBASETYPE_NEGATIVE_INTEGER);
   }
 
@@ -252,8 +227,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:NMTOKEN.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testNMTOKEN() throws XQException {
+  @Test public void testNMTOKEN() throws XQException {
     atomicTest("xs:NMTOKEN('AAA')", "AAA", XQBASETYPE_NMTOKEN);
   }
 
@@ -261,8 +235,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:nonNegativeInteger.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testNonNegativeInteger() throws XQException {
+  @Test public void testNonNegativeInteger() throws XQException {
     atomicTest("xs:nonNegativeInteger('1')", "1",
       XQBASETYPE_NONNEGATIVE_INTEGER);
   }
@@ -271,8 +244,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:nonPositiveInteger.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testNonPositiveInteger() throws XQException {
+  @Test public void testNonPositiveInteger() throws XQException {
     atomicTest("xs:nonPositiveInteger('-1')", "-1",
       XQBASETYPE_NONPOSITIVE_INTEGER);
   }
@@ -281,8 +253,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:normalizedString.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testNormalizedString() throws XQException {
+  @Test public void testNormalizedString() throws XQException {
     atomicTest("xs:normalizedString('AAA')", "AAA", XQBASETYPE_NORMALIZED_STRING);
   }
 
@@ -290,8 +261,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:positiveInteger.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testPositiveInteger() throws XQException {
+  @Test public void testPositiveInteger() throws XQException {
     atomicTest("xs:positiveInteger('1')", "1", XQBASETYPE_POSITIVE_INTEGER);
   }
 
@@ -299,8 +269,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:QName.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testQName() throws XQException {
+  @Test public void testQName() throws XQException {
     atomicTest("xs:QName('AAA')", "AAA", XQBASETYPE_QNAME);
   }
 
@@ -308,8 +277,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:short.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testShort() throws XQException {
+  @Test public void testShort() throws XQException {
     atomicTest("xs:short('1')", "1", XQBASETYPE_SHORT);
   }
 
@@ -317,8 +285,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:string.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testString() throws XQException {
+  @Test public void testString() throws XQException {
     atomicTest("'Hello World'", "Hello World", XQBASETYPE_STRING);
   }
 
@@ -326,8 +293,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:time.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testTime() throws XQException {
+  @Test public void testTime() throws XQException {
     atomicTest("xs:time('12:12:12')", "12:12:12", XQBASETYPE_TIME);
   }
 
@@ -335,8 +301,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:token.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testToken() throws XQException {
+  @Test public void testToken() throws XQException {
     atomicTest("xs:token('AAA')", "AAA", XQBASETYPE_TOKEN);
   }
 
@@ -344,8 +309,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:unsignedByte.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testUnsignedByte() throws XQException {
+  @Test public void testUnsignedByte() throws XQException {
     atomicTest("xs:unsignedByte('1')", "1", XQBASETYPE_UNSIGNED_BYTE);
   }
 
@@ -353,8 +317,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:unsignedInt.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testUnsignedInt() throws XQException {
+  @Test public void testUnsignedInt() throws XQException {
     atomicTest("xs:unsignedInt('1')", "1", XQBASETYPE_UNSIGNED_INT);
   }
 
@@ -362,8 +325,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:unsignedLong.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testUnsignedLong() throws XQException {
+  @Test public void testUnsignedLong() throws XQException {
     atomicTest("xs:unsignedLong('1')", "1", XQBASETYPE_UNSIGNED_LONG);
   }
 
@@ -371,8 +333,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:unsignedShort.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testUnsignedShort() throws XQException {
+  @Test public void testUnsignedShort() throws XQException {
     atomicTest("xs:unsignedShort('1')", "1", XQBASETYPE_UNSIGNED_SHORT);
   }
 
@@ -380,8 +341,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:dayTimeDuration.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testDayTimeDuration() throws XQException {
+  @Test public void testDayTimeDuration() throws XQException {
     atomicTest("xs:dayTimeDuration('PT5H')", "PT5H", XQBASETYPE_DAYTIMEDURATION);
   }
 
@@ -389,8 +349,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:untypedAtomic.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testUntypedAtomic() throws XQException {
+  @Test public void testUntypedAtomic() throws XQException {
     atomicTest("xs:untypedAtomic('AAA')", "AAA", XQBASETYPE_UNTYPEDATOMIC);
   }
 
@@ -398,8 +357,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests xs:yearMonthDuration.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testYearMonthDuration() throws XQException {
+  @Test public void testYearMonthDuration() throws XQException {
     atomicTest("xs:yearMonthDuration('P1M')", "P1M", XQBASETYPE_YEARMONTHDURATION);
   }
 
@@ -411,8 +369,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests comment().
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testComment() throws XQException {
+  @Test public void testComment() throws XQException {
     nodeTest("<!-- comment -->", "<!-- comment -->", XQITEMKIND_COMMENT);
   }
 
@@ -420,8 +377,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests element().
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testElement() throws XQException {
+  @Test public void testElement() throws XQException {
     nodeTest("<e>AAA</e>", "<e>AAA</e>", XQITEMKIND_ELEMENT);
   }
 
@@ -429,8 +385,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests document(element()).
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testDocumentElement() throws XQException {
+  @Test public void testDocumentElement() throws XQException {
     nodeTest("document{<e>AAA</e>}", "<e>AAA</e>", XQITEMKIND_DOCUMENT_ELEMENT);
   }
 
@@ -438,8 +393,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests processing-instruction().
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testProcessingInstruction() throws XQException {
+  @Test public void testProcessingInstruction() throws XQException {
     nodeTest("processing-instruction {'a'} {'b'}", "<?a b?>",
       XQITEMKIND_PI);
   }
@@ -448,8 +402,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests text().
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testText() throws XQException {
+  @Test public void testText() throws XQException {
     nodeTest("text { 'AAA' }", "AAA", XQITEMKIND_TEXT);
   }
 
@@ -457,8 +410,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests document().
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testDocumentNode() throws XQException {
+  @Test public void testDocumentNode() throws XQException {
     nodeTest("document { text { 'AAA' } }", "AAA", XQITEMKIND_DOCUMENT);
   }
 
@@ -466,8 +418,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests attribute().
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testAttribute() throws XQException {
+  @Test public void testAttribute() throws XQException {
     final XQResultSequence rs = xqc.createExpression().executeQuery(
       "attribute a { 'AAA' }"
     );
@@ -486,8 +437,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests the URI of a QName.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testQNameURI() throws XQException {
+  @Test public void testQNameURI() throws XQException {
     uriTest("fn:QName('http://a/b/c','a:b')", "http://a/b/c");
   }
 
@@ -495,8 +445,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * Tests the URI of an attribute.
    * @throws XQException XQuery exception
    */
-  @Test
-  public void testAttributeURI() throws XQException {
+  @Test public void testAttributeURI() throws XQException {
     final XQResultSequence rs = xqc.createExpression().executeQuery(
       "attribute { fn:QName('http://a/b/c', 'a:b') } { 'AAA' }"
     );

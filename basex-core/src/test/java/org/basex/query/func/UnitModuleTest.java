@@ -14,24 +14,24 @@ import org.junit.*;
  */
 public final class UnitModuleTest extends AdvancedQueryTest {
   /** Test method. */
-  @Test
-  public void faill() {
-    error(_UNIT_FAIL.args(1), UNIT_FAIL_X);
+  @Test public void faill() {
+    final Function func = _UNIT_FAIL;
+    error(func.args(1), UNIT_FAIL_X);
   }
 
   /** Test method. */
-  @Test
-  public void assrt() {
-    query(_UNIT_ASSERT.args(1), "");
-    query(_UNIT_ASSERT.args(" (<a/>,<b/>)"), "");
-    error(_UNIT_ASSERT.args(" ()"), UNIT_FAIL);
-    error(_UNIT_ASSERT.args(" ()", "X"), UNIT_FAIL_X);
+  @Test public void assrt() {
+    final Function func = _UNIT_ASSERT;
+    query(func.args(1), "");
+    query(func.args(" (<a/>,<b/>)"), "");
+    error(func.args(" ()"), UNIT_FAIL);
+    error(func.args(" ()", "X"), UNIT_FAIL_X);
   }
 
   /** Test method. */
-  @Test
-  public void assertEquals() {
-    query(_UNIT_ASSERT_EQUALS.args(1, 1), "");
-    error(_UNIT_ASSERT_EQUALS.args(1, 2), UNIT_FAIL_X_X_X);
+  @Test public void assertEquals() {
+    final Function func = _UNIT_ASSERT_EQUALS;
+    query(func.args(1, 1), "");
+    error(func.args(1, 2), UNIT_FAIL_X_X_X);
   }
 }

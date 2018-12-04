@@ -15,19 +15,14 @@ import org.junit.Test;
 public final class FnIdTest extends AdvancedQueryTest {
   /** Test document. */
   private static final String DOC = "src/test/resources/xmark.xml";
-  /**
-   * Closes the currently opened database.
-   */
-  @After
-  public void finish() {
+
+  /** Finalize test. */
+  @After public void finish() {
     execute(new Close());
   }
 
-  /**
-   * Basic delete.
-   */
-  @Test
-  public void delete() {
+  /** Basic delete. */
+  @Test public void delete() {
     execute(new CreateDB(NAME, DOC));
     execute(new DropIndex(IndexType.ATTRIBUTE));
 

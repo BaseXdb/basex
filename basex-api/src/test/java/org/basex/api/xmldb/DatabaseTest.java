@@ -20,8 +20,7 @@ public final class DatabaseTest extends XMLDBBaseTest {
    * Initializes a test.
    * @throws Exception any exception
    */
-  @Before
-  public void setUp() throws Exception {
+  @Before public void setUp() throws Exception {
     createDB();
     database = (BXDatabase) Class.forName(DRIVER).getDeclaredConstructor().newInstance();
   }
@@ -29,8 +28,7 @@ public final class DatabaseTest extends XMLDBBaseTest {
   /**
    * Finalizes a test.
    */
-  @After
-  public void tearDown() {
+  @After public void tearDown() {
     dropDB();
   }
 
@@ -38,8 +36,7 @@ public final class DatabaseTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testAcceptsURI() throws Exception {
+  @Test public void testAcceptsURI() throws Exception {
     database.acceptsURI(PATH);
 
     try {
@@ -54,8 +51,7 @@ public final class DatabaseTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetCollection() throws Exception {
+  @Test public void testGetCollection() throws Exception {
     // directly call and close database instance
     database.getCollection(PATH, LOGIN, PW).close();
 
@@ -74,24 +70,21 @@ public final class DatabaseTest extends XMLDBBaseTest {
   /**
    * Test.
    */
-  @Test
-  public void testGetConformanceLevel() {
+  @Test public void testGetConformanceLevel() {
     assertEquals(database.getConformanceLevel(), "0");
   }
 
   /**
    * Test.
    */
-  @Test
-  public void testGetName() {
+  @Test public void testGetName() {
     assertNotNull(database.getName());
   }
 
   /**
    * Test.
    */
-  @Test
-  public void testGetProperty() {
+  @Test public void testGetProperty() {
     assertNull(database.getProperty("ProbablyUnknown"));
 
     // the following tests are database specific...
@@ -103,8 +96,7 @@ public final class DatabaseTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testSetProperty() throws Exception {
+  @Test public void testSetProperty() throws Exception {
     try {
       database.setProperty("ProbablyUnknown", "on");
       fail("Invalid key was assigned.");

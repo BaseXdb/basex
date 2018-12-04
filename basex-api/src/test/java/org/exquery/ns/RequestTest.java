@@ -19,8 +19,7 @@ public final class RequestTest extends HTTPTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass
-  public static void start() throws Exception {
+  @BeforeClass public static void start() throws Exception {
     init(REST_ROOT, true);
   }
 
@@ -28,8 +27,7 @@ public final class RequestTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void method() throws Exception {
+  @Test public void method() throws Exception {
     assertEquals("GET", get("?query=" + request("R:method()")));
   }
 
@@ -37,8 +35,7 @@ public final class RequestTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void scheme() throws Exception {
+  @Test public void scheme() throws Exception {
     assertEquals("http", get("?query=" + request("R:scheme()")));
   }
 
@@ -46,8 +43,7 @@ public final class RequestTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void port() throws Exception {
+  @Test public void port() throws Exception {
     assertEquals(String.valueOf(HTTP_PORT), get("?query=" + request("R:port()")));
   }
 
@@ -55,8 +51,7 @@ public final class RequestTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void path() throws Exception {
+  @Test public void path() throws Exception {
     put(NAME, null);
     assertEquals("/rest/",        get("?query=" + request("R:path()")));
     assertEquals("/rest/" + NAME, get(NAME + "?query=" + request("R:path()")));
@@ -67,8 +62,7 @@ public final class RequestTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void query() throws Exception {
+  @Test public void query() throws Exception {
     assertEquals("true", get("?query=" + request("starts-with(R:query(), 'query')")));
   }
 
@@ -76,8 +70,7 @@ public final class RequestTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void uri() throws Exception {
+  @Test public void uri() throws Exception {
     assertEquals("true", get("?query=" + request("starts-with(R:uri(), 'http')")));
   }
 
@@ -85,8 +78,7 @@ public final class RequestTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void contextPath() throws Exception {
+  @Test public void contextPath() throws Exception {
     assertEquals("", get("?query=" + request("R:context-path()")));
   }
 
@@ -94,8 +86,7 @@ public final class RequestTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void parameterNames() throws Exception {
+  @Test public void parameterNames() throws Exception {
     final String query = "count(R:parameter-names())";
     assertEquals("1", get("?query=" + request(query)));
     assertEquals("2", get("?query=" + request(query) + "&a=b"));
@@ -106,8 +97,7 @@ public final class RequestTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void parameter() throws Exception {
+  @Test public void parameter() throws Exception {
     assertEquals("b",   get("?query=" + request("R:parameter('a')") + "&a=b"));
     assertEquals("b,c", get("?query=" + request("string-join(R:parameter('a'),',')") + "&a=b&a=c"));
     assertEquals("b",   get("?query=" + request("R:parameter('a','c')") + "&a=b"));
@@ -118,8 +108,7 @@ public final class RequestTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void headerNames() throws Exception {
+  @Test public void headerNames() throws Exception {
     final String result = get("?query=" + request("string-join(R:header-names(), ',')"));
     assertEquals("Accept,Connection,Host,User-Agent",
         query("``[" + result + "]`` => tokenize(',') => sort() => string-join(',')"));
@@ -129,8 +118,7 @@ public final class RequestTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void header() throws Exception {
+  @Test public void header() throws Exception {
     assertEquals("localhost:" + HTTP_PORT, get("?query=" + request("R:header('Host')")));
     assertEquals("def",                    get("?query=" + request("R:header('ABC', 'def')")));
   }
@@ -139,8 +127,7 @@ public final class RequestTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void cookieNames() throws Exception {
+  @Test public void cookieNames() throws Exception {
     assertEquals("0", get("?query=" + request("count(R:cookie-names())")));
   }
 
@@ -148,8 +135,7 @@ public final class RequestTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void cookie() throws Exception {
+  @Test public void cookie() throws Exception {
     assertEquals("0", get("?query=" + request("count(R:cookie('x'))")));
   }
 

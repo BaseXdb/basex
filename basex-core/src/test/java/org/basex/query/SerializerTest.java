@@ -13,14 +13,12 @@ import org.junit.*;
  */
 public final class SerializerTest extends AdvancedQueryTest {
   /** Test: method=xml. */
-  @Test
-  public void xml() {
+  @Test public void xml() {
     query(SerializerOptions.METHOD.arg("xml") + "<html/>", "<html/>");
   }
 
   /** Test: method=xhtml. */
-  @Test
-  public void xhtml() {
+  @Test public void xhtml() {
     final String option = SerializerOptions.METHOD.arg("xhtml");
     query(option + "<html/>", "<html></html>");
     final String[] empties = { "area", "base", "br", "col", "embed", "hr", "img", "input",
@@ -32,8 +30,7 @@ public final class SerializerTest extends AdvancedQueryTest {
   }
 
   /** Test: method=html. */
-  @Test
-  public void html() {
+  @Test public void html() {
     final String option = SerializerOptions.METHOD.arg("html");
     query(option + "<html/>", "<html></html>");
     final String[] empties = { "area", "base", "br", "col", "embed", "hr", "img", "input",
@@ -54,8 +51,7 @@ public final class SerializerTest extends AdvancedQueryTest {
   }
 
   /** Test: method=html, version=5.0. */
-  @Test
-  public void version50() {
+  @Test public void version50() {
     final String option = SerializerOptions.METHOD.arg("html") +
         SerializerOptions.VERSION.arg("5.0");
     query(option + "<html/>", "<!DOCTYPE html>\n<html></html>");
@@ -69,8 +65,7 @@ public final class SerializerTest extends AdvancedQueryTest {
   }
 
   /** Test: method=text. */
-  @Test
-  public void text() {
+  @Test public void text() {
     final String option = SerializerOptions.METHOD.arg("text");
     query(option + "1,2", "1 2");
     query(option + "<a>1</a>", 1);
@@ -78,8 +73,7 @@ public final class SerializerTest extends AdvancedQueryTest {
   }
 
   /** Test: item-separator. */
-  @Test
-  public void itemSeparator() {
+  @Test public void itemSeparator() {
     query(SerializerOptions.ITEM_SEPARATOR.arg("-") + "1,2", "1-2");
     query(SerializerOptions.ITEM_SEPARATOR.arg("") + "1,2", 12);
     query(SerializerOptions.ITEM_SEPARATOR.arg("ABC") + "1 to 3", "1ABC2ABC3");
@@ -90,8 +84,7 @@ public final class SerializerTest extends AdvancedQueryTest {
   }
 
   /** Test: xml:space='preserve'. */
-  @Test
-  public void preserve() {
+  @Test public void preserve() {
     query("<a xml:space='preserve'>T<b/></a>", "<a xml:space=\"preserve\">T<b/></a>");
     query("<a xml:space='default'>T<b/></a>", "<a xml:space=\"default\">T<b/>\n</a>");
     query("<a xml:space='x'>T<b/></a>", "<a xml:space=\"x\">T<b/>\n</a>");

@@ -189,20 +189,17 @@ public final class RewritingsTest extends QueryPlanTest {
   }
 
   /** Checks that empty sequences are eliminated and that singleton lists are flattened. */
-  @Test
-  public void list() {
+  @Test public void list() {
     check("((), <x/>, ())", "<x/>", empty(List.class), empty(Empty.class), exists(CElem.class));
   }
 
   /** Checks that expressions marked as non-deterministic will not be rewritten. */
-  @Test
-  public void nonDeterministic() {
+  @Test public void nonDeterministic() {
     check("count((# basex:non-deterministic #) { <x/> })", 1, exists(COUNT));
   }
 
   /** Ensures that fn:doc with URLs will not be rewritten. */
-  @Test
-  public void doc() {
+  @Test public void doc() {
     check("<a>{ doc('" + FILE + "') }</a>//x", "", exists(DBNode.class));
     check("if(<x>1</x> = 1) then 2 else doc('" + FILE + "')", 2, exists(DBNode.class));
     check("if(<x>1</x> = 1) then 2 else doc('http://abc.de/')", 2, exists(DOC));

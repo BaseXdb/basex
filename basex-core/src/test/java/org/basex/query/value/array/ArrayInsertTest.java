@@ -17,8 +17,7 @@ import org.junit.*;
  */
 public final class ArrayInsertTest extends ArrayTest {
   /** Randomly insert elements and compare the result to an array list. */
-  @Test
-  public void fuzzyTest() {
+  @Test public void fuzzyTest() {
     final int n = 50_000;
     final ArrayList<Integer> list = new ArrayList<>(n);
     XQArray arr = XQArray.empty();
@@ -44,8 +43,7 @@ public final class ArrayInsertTest extends ArrayTest {
   /**
    * Simple insert test.
    */
-  @Test
-  public void insertTest() {
+  @Test public void insertTest() {
     final int n = 1_000;
     XQArray seq = XQArray.empty();
 

@@ -25,16 +25,16 @@ public final class RepoModuleTest extends AdvancedQueryTest {
   private static final String PKG3ID = PKG3 + "-10.0";
 
   /** Prepares a test. */
-  @Before
-  public void setupTest() {
+  @Before public void setupTest() {
     context.soptions.set(StaticOptions.REPOPATH, REPO);
     new IOFile(REPO, normalize(PKG3ID)).delete();
   }
 
   /** Test method. */
-  @Test
-  public void install() {
-    query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
+  @Test public void install() {
+    final Function func = _REPO_INSTALL;
+    // queries
+    query(func.args(REPO + "pkg3.xar"));
     final String dir = normalize(PKG3ID);
     assertTrue(dir(dir));
     assertTrue(file(dir + "/expath-pkg.xml"));
@@ -45,32 +45,32 @@ public final class RepoModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void delete() {
+  @Test public void delete() {
+    final Function func = _REPO_DELETE;
     // install
     query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
     // delete by package name
     final String dir = normalize(PKG3ID);
     assertTrue("Directory not found: " + dir, dir(dir));
-    query(_REPO_DELETE.args(PKG3));
+    query(func.args(PKG3));
     assertFalse("Directory still exists: " + dir, dir(dir));
 
     // install again
     query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
     // delete by name and version
-    query(_REPO_DELETE.args(PKG3ID));
+    query(func.args(PKG3ID));
     assertFalse(dir(dir));
   }
 
   /** Test method. */
-  @Test
-  public void list() {
+  @Test public void list() {
+    final Function func = _REPO_LIST;
     // install pkg3
     query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
     // install pkg4
     query(_REPO_INSTALL.args(REPO + "pkg4.xar"));
-    contains(_REPO_LIST.toString(), PKG3);
-    contains(_REPO_LIST.toString(), PKG4);
+    contains(func.toString(), PKG3);
+    contains(func.toString(), PKG4);
     query(_REPO_DELETE.args(PKG4));
     query(_REPO_DELETE.args(PKG3));
   }

@@ -26,16 +26,14 @@ public final class AdminStressTest extends SandboxTest {
    * Starts the server.
    * @throws IOException I/O exception
    */
-  @BeforeClass
-  public static void start() throws IOException {
+  @BeforeClass public static void start() throws IOException {
     server = createServer();
   }
 
   /**
    * Stops the server.
    */
-  @AfterClass
-  public static void stop() {
+  @AfterClass public static void stop() {
     stopServer(server);
   }
 
@@ -43,8 +41,7 @@ public final class AdminStressTest extends SandboxTest {
    * Test simultaneous client sessions.
    * @throws Exception exception
    */
-  @Test
-  public void createAndListSessions() throws Exception {
+  @Test public void createAndListSessions() throws Exception {
     final CountDownLatch start = new CountDownLatch(1);
     final CountDownLatch stop = new CountDownLatch(NUM);
     final Client[] clients = new Client[NUM];

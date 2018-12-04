@@ -12,8 +12,7 @@ import org.junit.*;
 public final class ClientSessionOutTest extends ClientSessionTest {
   /** Initializes the test. */
   @Override
-  @Before
-  public void startSession() {
+  @Before public void startSession() {
     out = new ArrayOutput();
     super.startSession();
   }

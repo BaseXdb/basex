@@ -23,8 +23,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
    * Initializes a test.
    * @throws Exception any exception
    */
-  @Before
-  public void setUp() throws Exception {
+  @Before public void setUp() throws Exception {
     createDB();
     final Class<?> c = Class.forName(DRIVER);
     final Database database = (Database) c.getDeclaredConstructor().newInstance();
@@ -36,8 +35,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
    * Finalizes a test.
    * @throws Exception any exception
    */
-  @After
-  public void tearDown() throws Exception {
+  @After public void tearDown() throws Exception {
     coll.close();
     dropDB();
   }
@@ -46,8 +44,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testSetNamespace() throws Exception {
+  @Test public void testSetNamespace() throws Exception {
     // overwriting namespaces
     serv.setNamespace("hell", "a");
     serv.setNamespace("hell", "o");
@@ -69,8 +66,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetNamespace() throws Exception {
+  @Test public void testGetNamespace() throws Exception {
     // testing former namespace
     assertNull("Namespaces shouldn't be global.", serv.getNamespace("hell"));
 
@@ -84,8 +80,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testRemoveNamespace() throws Exception {
+  @Test public void testRemoveNamespace() throws Exception {
     // set and remove namespace
     serv.setNamespace("hell", "a");
     serv.removeNamespace("hell");
@@ -101,8 +96,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testClearNamespace() throws Exception {
+  @Test public void testClearNamespace() throws Exception {
     // set and clear namespace
     serv.setNamespace("hell", "a");
     serv.clearNamespaces();
@@ -113,8 +107,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testQuery() throws Exception {
+  @Test public void testQuery() throws Exception {
     // catch query errors
     try {
       serv.query("1+");
@@ -137,8 +130,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testQueryResource() throws Exception {
+  @Test public void testQueryResource() throws Exception {
      assertEquals("Wrong result size", 3, serv.queryResource(DOC1, "//node()").getSize());
 
     // catch query errors
@@ -152,8 +144,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetName() throws Exception {
+  @Test public void testGetName() throws Exception {
     assertEquals("XPathQueryService", serv.getName());
   }
 
@@ -161,8 +152,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetVersion() throws Exception {
+  @Test public void testGetVersion() throws Exception {
     assertEquals("1.0", serv.getVersion());
   }
 }

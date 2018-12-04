@@ -40,23 +40,20 @@ public final class PermissionTest extends SandboxTest {
    * Starts the server.
    * @throws IOException I/O exception
    */
-  @BeforeClass
-  public static void start() throws IOException {
+  @BeforeClass public static void start() throws IOException {
     server = createServer();
   }
 
   /**
    * Stops the server.
    */
-  @AfterClass
-  public static void stop() {
+  @AfterClass public static void stop() {
     stopServer(server);
     new IOFile(Prop.TEMPDIR, NAME + "-export").delete();
   }
 
   /** Set up method. */
-  @Before
-  public void setUp() {
+  @Before public void setUp() {
     try {
       adminSession = createClient();
       if(server.context.users.get(NAME) != null) {
@@ -76,8 +73,7 @@ public final class PermissionTest extends SandboxTest {
   }
 
   /** Clean up method. */
-  @After
-  public void cleanUp() {
+  @After public void cleanUp() {
     try {
       testSession.close();
       adminSession.execute(new DropDB(NAME2));
@@ -91,8 +87,7 @@ public final class PermissionTest extends SandboxTest {
   }
 
   /** Tests all commands where no permission is needed. */
-  @Test
-  public void noPermsNeeded() {
+  @Test public void noPermsNeeded() {
     ok(new Grant("none", NAME), adminSession);
 
     ok(new Password(NAME), testSession);
@@ -141,8 +136,7 @@ public final class PermissionTest extends SandboxTest {
   }
 
   /** Tests all commands where read permission is needed. */
-  @Test
-  public void readPermsNeeded() {
+  @Test public void readPermsNeeded() {
     ok(new Grant("read", NAME), adminSession);
 
     ok(new Open(NAME), testSession);
@@ -189,8 +183,7 @@ public final class PermissionTest extends SandboxTest {
   }
 
   /** Tests all commands where write permission is needed. */
-  @Test
-  public void writePermsNeeded() {
+  @Test public void writePermsNeeded() {
     ok(new Grant("write", NAME), adminSession);
     ok(new Open(NAME2), testSession);
     ok(new Rename(NAME2, NAME2 + '2'), testSession);
@@ -241,8 +234,7 @@ public final class PermissionTest extends SandboxTest {
   }
 
   /** Tests all commands where create permission is needed. */
-  @Test
-  public void createPermsNeeded() {
+  @Test public void createPermsNeeded() {
     ok(new Grant("create", NAME), adminSession);
     ok(new XQuery(_DB_CREATE.args(NAME)), testSession);
 
@@ -272,8 +264,7 @@ public final class PermissionTest extends SandboxTest {
   }
 
   /** Tests all commands where admin permission is needed. */
-  @Test
-  public void adminPermsNeeded() {
+  @Test public void adminPermsNeeded() {
     ok(new Grant(ADMIN, NAME), adminSession);
     if(server.context.users.get("test2") != null) {
       ok(new DropUser("test2"), testSession);
@@ -303,8 +294,7 @@ public final class PermissionTest extends SandboxTest {
   }
 
   /** Drops users. */
-  @Test
-  public void dropUsers() {
+  @Test public void dropUsers() {
     no(new DropUser(NAME), testSession);
     no(new DropUser(NAME), adminSession);
     ok(new Exit(), testSession);

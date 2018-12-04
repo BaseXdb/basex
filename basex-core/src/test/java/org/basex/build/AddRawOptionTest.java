@@ -26,24 +26,21 @@ public final class AddRawOptionTest extends SandboxTest {
   /**
    * Class set up method.
    */
-  @BeforeClass
-  public static void classSetUp() {
+  @BeforeClass public static void classSetUp() {
     set(MainOptions.ADDRAW, true);
   }
 
   /**
    * Set up method.
    */
-  @Before
-  public void setUp() {
+  @Before public void setUp() {
     execute(new CreateDB(NAME));
   }
 
   /**
    * Test if raw files are added on executing a {@code CREATE} command.
    */
-  @Test
-  public void testCreate() {
+  @Test public void testCreate() {
     execute(new CreateDB(NAME, DIR));
     assertAllFilesExist();
   }
@@ -51,8 +48,7 @@ public final class AddRawOptionTest extends SandboxTest {
   /**
    * Test if raw files are added on executing an {@code ADD} command.
    */
-  @Test
-  public void testAdd() {
+  @Test public void testAdd() {
     execute(new Add("", DIR));
     assertAllFilesExist();
   }

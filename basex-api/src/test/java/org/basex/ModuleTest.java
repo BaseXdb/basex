@@ -15,8 +15,7 @@ public final class ModuleTest {
   /**
    * Ensures the the constructors of XQuery modules are visible.
    */
-  @Test
-  public void visibility() {
+  @Test public void visibility() {
     new Restxq();
     new Request();
     new Response();

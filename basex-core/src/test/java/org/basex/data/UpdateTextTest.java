@@ -17,8 +17,7 @@ public final class UpdateTextTest extends DataUpdateTest {
    * Tests insert as last child.
    * @throws IOException I/O exception
    */
-  @Test
-  public void insertTextAsOnly1() throws IOException {
+  @Test public void insertTextAsOnly1() throws IOException {
     final Data data = context.data();
     final int nextid = data.meta.lastid;
     insertText(3, 0, T_JUNIT, Data.TEXT);
@@ -45,8 +44,7 @@ public final class UpdateTextTest extends DataUpdateTest {
    * Tests insert as last child.
    * @throws IOException I/O exception
    */
-  @Test
-  public void insertTextAsOnly2() throws IOException {
+  @Test public void insertTextAsOnly2() throws IOException {
     final Data data = context.data();
     final int nextid = data.meta.lastid;
     insertText(3, 1, T_JUNIT, Data.TEXT);
@@ -73,8 +71,7 @@ public final class UpdateTextTest extends DataUpdateTest {
    * Tests insert as last child.
    * @throws IOException I/O exception
    */
-  @Test
-  public void insertTextAsOnly3() throws IOException {
+  @Test public void insertTextAsOnly3() throws IOException {
     final Data data = context.data();
     final int nextid = data.meta.lastid;
     insertText(3, 2, T_JUNIT, Data.TEXT);
@@ -101,8 +98,7 @@ public final class UpdateTextTest extends DataUpdateTest {
    * Tests insert as last child.
    * @throws IOException I/O exception
    */
-  @Test
-  public void insertTextAfterAttsAsFirst() throws IOException {
+  @Test public void insertTextAfterAttsAsFirst() throws IOException {
     final Data data = context.data();
     final int nextid = data.meta.lastid;
     insertText(6, 1, T_JUNIT, Data.TEXT);
@@ -127,8 +123,7 @@ public final class UpdateTextTest extends DataUpdateTest {
    * Tests insert as last child.
    * @throws IOException I/O exception
    */
-  @Test
-  public void insertTextAfterAttsAsSecond() throws IOException {
+  @Test public void insertTextAfterAttsAsSecond() throws IOException {
     final Data data = context.data();
     final int nextid = data.meta.lastid;
     insertText(6, 2, T_JUNIT, Data.TEXT);
@@ -154,8 +149,7 @@ public final class UpdateTextTest extends DataUpdateTest {
    * Tests insert as last child.
    * @throws IOException I/O exception
    */
-  @Test
-  public void insertTextAfterAttsAsLast() throws IOException {
+  @Test public void insertTextAfterAttsAsLast() throws IOException {
     final Data data = context.data();
     final int nextid = data.meta.lastid;
     insertText(6, 0, T_JUNIT, Data.TEXT);
@@ -207,8 +201,7 @@ public final class UpdateTextTest extends DataUpdateTest {
    * Tests updateText.
    * @throws IOException I/O exception
    */
-  @Test
-  public void updateText() throws IOException {
+  @Test public void updateText() throws IOException {
     final Data data = context.data();
     data.startUpdate(context.options);
     data.update(10, Data.TEXT, T_JUNIT);

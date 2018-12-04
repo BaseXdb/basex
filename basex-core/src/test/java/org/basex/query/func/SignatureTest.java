@@ -22,8 +22,7 @@ public final class SignatureTest extends AdvancedQueryTest {
    * Tests the validity of all function signatures.
    * @throws Exception exception
    */
-  @Test
-  public void signatures() throws Exception {
+  @Test public void signatures() throws Exception {
     context.openDB(MemBuilder.build(new IOContent("<a/>")));
     for(final Function f : Function.values()) check(f);
   }

@@ -16,8 +16,7 @@ public final class ReplaceTest extends AdvancedQueryTest {
   /**
    * Replaces the first document in a database, using lazy replace.
    */
-  @Test
-  public void lazyReplace() {
+  @Test public void lazyReplace() {
     prepare("<a/>", "<c/>");
     query(_DB_REPLACE.args(NAME, "a.xml", " <a/>"));
     query("a, c", "<a/>\n<c/>");
@@ -28,8 +27,7 @@ public final class ReplaceTest extends AdvancedQueryTest {
   /**
    * Replaces the first document in a database, using rapid replace.
    */
-  @Test
-  public void rapidReplace() {
+  @Test public void rapidReplace() {
     prepare("<a/>", "<c/>");
     query(_DB_REPLACE.args(NAME, "a.xml", " <a><b/></a>"));
     query("a, c", "<a>\n<b/>\n</a>\n<c/>");
@@ -40,8 +38,7 @@ public final class ReplaceTest extends AdvancedQueryTest {
   /**
    * Replaces the first document in a database.
    */
-  @Test
-  public void replaceWithNs() {
+  @Test public void replaceWithNs() {
     // first document: introduce namespace
     prepare("<a/>", "<c/>");
     query(_DB_REPLACE.args(NAME, "a.xml", " <a xmlns='a'/>"));

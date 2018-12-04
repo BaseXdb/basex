@@ -20,8 +20,7 @@ public final class InsertTest extends XQJBaseTest {
   /** Name of test document. */
   private static final String URI = "doc.xml";
 
-  @Before
-  @Override
+  @Before @Override
   public void setUp() throws XQException {
     super.setUp();
 
@@ -32,8 +31,7 @@ public final class InsertTest extends XQJBaseTest {
     xqpe.close();
   }
 
-  @After
-  @Override
+  @After @Override
   public void tearDown() throws XQException {
     final XQExpression xqpe = xqc.createExpression();
     xqpe.executeCommand("DROP DB " + DB);
@@ -44,8 +42,7 @@ public final class InsertTest extends XQJBaseTest {
    * Testing regular insert.
    * @throws XQException query exception
    **/
-  @Test
-  public void testInsert() throws XQException {
+  @Test public void testInsert() throws XQException {
     final XQConnection2 xqc2 = (XQConnection2) xqc;
 
     xqc2.insertItem(URI, createDocument("<e>hello</e>"), null);
@@ -57,8 +54,7 @@ public final class InsertTest extends XQJBaseTest {
    * Testing insert via ADD strategy.
    * @throws XQException query exception
    **/
-  @Test
-  public void testAdd() throws XQException {
+  @Test public void testAdd() throws XQException {
     final XQConnection2 xqc2 = (XQConnection2) xqc;
     xqc2.insertItem(URI, createDocument("<e>a</e>"), options(ADD));
 
@@ -73,8 +69,7 @@ public final class InsertTest extends XQJBaseTest {
    * Testing insert via REPLACE strategy.
    * @throws XQException query exception
    **/
-  @Test
-  public void testReplace() throws XQException {
+  @Test public void testReplace() throws XQException {
     final XQConnection2 xqc2 = (XQConnection2) xqc;
     xqc2.insertItem(URI, createDocument("<e>a</e>"), options(REPLACE));
 
@@ -89,8 +84,7 @@ public final class InsertTest extends XQJBaseTest {
    * Testing insert via STORE strategy.
    * @throws XQException query exception
    **/
-  @Test
-  public void testStore() throws XQException {
+  @Test public void testStore() throws XQException {
     final XQConnection2 xqc2 = (XQConnection2) xqc;
     xqc2.insertItem(URI, createDocument("<e>a</e>"), options(STORE));
     assertTrue(dbExists(DB, URI));

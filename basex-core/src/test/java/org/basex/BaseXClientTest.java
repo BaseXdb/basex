@@ -25,8 +25,7 @@ public final class BaseXClientTest extends BaseXTest {
    * Test client with different port.
    * @throws IOException I/O exception
    */
-  @Test
-  public void port() throws IOException {
+  @Test public void port() throws IOException {
     equals("1", new String[] { "-p9898", "-q1" }, new String[] { "-p9898" });
   }
 
@@ -52,8 +51,7 @@ public final class BaseXClientTest extends BaseXTest {
    * Test client with different user.
    * @throws IOException I/O exception
    */
-  @Test
-  public void user() throws IOException {
+  @Test public void user() throws IOException {
     run("-cexit", "-cdrop user " + NAME);
     equals("5", new String[] { "-U" + NAME, "-P" + NAME, "-q5" },
         new String[] { "-ccreate user " + NAME + ' ' + NAME });

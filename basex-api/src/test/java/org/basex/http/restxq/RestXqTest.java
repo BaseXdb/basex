@@ -30,8 +30,7 @@ public abstract class RestXqTest extends HTTPTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass
-  public static void start() throws Exception {
+  @BeforeClass public static void start() throws Exception {
     init(HTTP_ROOT, true);
   }
 

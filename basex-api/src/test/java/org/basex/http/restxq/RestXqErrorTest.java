@@ -13,8 +13,7 @@ public final class RestXqErrorTest extends RestXqTest {
    * Error annotation.
    * @throws Exception exception
    */
-  @Test
-  public void error() throws Exception {
+  @Test public void error() throws Exception {
     // catch errors
     get("declare %R:path('') function m:a() { error() };" +
         "declare %R:error('*') function m:b() { 'F' };", "", "F");
@@ -66,8 +65,7 @@ public final class RestXqErrorTest extends RestXqTest {
    * Errors with error annotation.
    * @throws Exception exception
    */
-  @Test
-  public void errorErrors() throws Exception {
+  @Test public void errorErrors() throws Exception {
     // error (no appropriate error annotation)
     getE("declare %R:path('') function m:a() { error(xs:QName('x')) };" +
          "declare %R:error('y') function m:b() { 'F' };", "");
@@ -118,8 +116,7 @@ public final class RestXqErrorTest extends RestXqTest {
    * Error.
    * @throws Exception exception
    */
-  @Test
-  public void errorParam() throws Exception {
+  @Test public void errorParam() throws Exception {
     // catch errors
     get("declare %R:path('') function m:a() { error() };" +
         "declare %R:error('*') %R:error-param('code','{$x}') " +

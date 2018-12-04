@@ -48,16 +48,14 @@ public final class AddDeleteTest extends SandboxTest {
   /**
    * Creates a database.
    */
-  @Before
-  public void setUp() {
+  @Before public void setUp() {
     execute(new CreateDB(NAME));
   }
 
   /**
    * Drops the database.
    */
-  @After
-  public void tearDown() {
+  @After public void tearDown() {
     execute(new DropDB(NAME));
   }
 
@@ -67,8 +65,7 @@ public final class AddDeleteTest extends SandboxTest {
    * <li> with name and target set</li>
    * <li> w/o name and target set</li></ol>
    */
-  @Test
-  public void addXMLString() {
+  @Test public void addXMLString() {
     execute(new Add("index.xml", XMLFRAG));
     assertEquals(1, docs());
     execute(new Add("a/b/c/index2.xml", XMLFRAG));
@@ -80,8 +77,7 @@ public final class AddDeleteTest extends SandboxTest {
   /**
    * Adds a single file to the database.
    */
-  @Test
-  public void addFile() {
+  @Test public void addFile() {
     execute(new Add(null, FILE));
     assertEquals(1, docs());
   }
@@ -89,8 +85,7 @@ public final class AddDeleteTest extends SandboxTest {
   /**
    * Adds a zip file.
    */
-  @Test
-  public void addZip() {
+  @Test public void addZip() {
     execute(new Add("target", ZIPFILE));
     assertEquals(4, docs());
 
@@ -118,8 +113,7 @@ public final class AddDeleteTest extends SandboxTest {
   /**
    * Adds/deletes a GZIP file.
    */
-  @Test
-  public void addGzip() {
+  @Test public void addGzip() {
     execute(new Add("", GZIPFILE));
     execute(new Add("bar", GZIPFILE));
     execute(new Delete("bar"));
@@ -129,8 +123,7 @@ public final class AddDeleteTest extends SandboxTest {
   /**
    * Adds a folder. The contained a zip file is added as well.
    */
-  @Test
-  public void addFolder() {
+  @Test public void addFolder() {
     execute(new Add("", FLDR));
     assertEquals(NFLDR, docs());
   }
@@ -138,8 +131,7 @@ public final class AddDeleteTest extends SandboxTest {
   /**
    * Adds/deletes with target.
    */
-  @Test
-  public void deletePath() {
+  @Test public void deletePath() {
     execute(new Add("foo/pub", FLDR));
     assertEquals(NFLDR, docs());
     execute(new Delete("foo"));
@@ -153,8 +145,7 @@ public final class AddDeleteTest extends SandboxTest {
   /**
    * Adds/deletes a file/folder.
    */
-  @Test
-  public void addFoldersDeleteFiles() {
+  @Test public void addFoldersDeleteFiles() {
     execute(new Add("folder", FLDR));
     execute(new Add("", FILE));
     execute(new Delete("input.xml"));
@@ -165,8 +156,7 @@ public final class AddDeleteTest extends SandboxTest {
   /**
    * Adds/deletes with target.
    */
-  @Test
-  public void createDeleteAdd() {
+  @Test public void createDeleteAdd() {
     execute(new CreateDB(NAME, "<a/>"));
     execute(new Delete("/"));
     assertEquals(0, docs());
@@ -191,8 +181,7 @@ public final class AddDeleteTest extends SandboxTest {
    * Adds a broken input file to the database and checks if the file can be
    * deleted afterwards.
    */
-  @Test
-  public void addCorrupt() {
+  @Test public void addCorrupt() {
     final IOFile io = new IOFile(TEMP);
     write(io, "<x");
     try {
@@ -226,8 +215,7 @@ public final class AddDeleteTest extends SandboxTest {
   /**
    * Skips a corrupt file.
    */
-  @Test
-  public void skipCorrupt() {
+  @Test public void skipCorrupt() {
     final IOFile io = new IOFile(TEMP);
     write(io, "<x");
 

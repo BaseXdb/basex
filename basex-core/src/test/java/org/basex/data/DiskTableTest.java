@@ -41,8 +41,7 @@ public final class DiskTableTest extends SandboxTest {
   /**
    * Initializes the test class.
    */
-  @BeforeClass
-  public static void setUpBeforeClass() {
+  @BeforeClass public static void setUpBeforeClass() {
     set(MainOptions.TEXTINDEX, false);
     set(MainOptions.ATTRINDEX, false);
   }
@@ -51,8 +50,7 @@ public final class DiskTableTest extends SandboxTest {
    * Loads the JUnitTest database.
    * @throws Exception exception
    */
-  @Before
-  public void setUp() throws Exception {
+  @Before public void setUp() throws Exception {
     final Parser parser = Parser.xmlParser(IO.get(TESTFILE));
     data = new DiskBuilder(NAME, parser, context.soptions, context.options).build();
     size = data.meta.size;
@@ -72,8 +70,7 @@ public final class DiskTableTest extends SandboxTest {
    * Drops the JUnitTest database.
    * @throws Exception exception
    */
-  @After
-  public void tearDown() throws Exception {
+  @After public void tearDown() throws Exception {
     if(tda != null) tda.close();
     DropDB.drop(NAME, context.soptions);
   }
@@ -118,8 +115,7 @@ public final class DiskTableTest extends SandboxTest {
   /**
    * Tests size of file.
    */
-  @Test
-  public void size() {
+  @Test public void size() {
     assertEquals("Testfile size changed!", size, tdaSize());
     assertTrue("Need at least 3 blocks for testing!", blocks > 2);
     assertEquals("Unexpected number of blocks!", blocks, tdaBlocks());
@@ -162,8 +158,7 @@ public final class DiskTableTest extends SandboxTest {
   /**
    * Tests delete.
    */
-  @Test
-  public void deleteOneNode() {
+  @Test public void deleteOneNode() {
     tda.delete(3, 1);
     assertEquals("One node deleted => size-1", size - 1, tdaSize());
     assertEntrysEqual(0, 0, 3);
@@ -177,8 +172,7 @@ public final class DiskTableTest extends SandboxTest {
   /**
    * Tests delete at beginning.
    */
-  @Test
-  public void deleteAtBeginning() {
+  @Test public void deleteAtBeginning() {
     tda.delete(0, 3);
     assertEquals("Three nodes deleted => size-3", size - 3, tdaSize());
     assertEntrysEqual(3, 0, size - 3);
@@ -190,8 +184,7 @@ public final class DiskTableTest extends SandboxTest {
   /**
    * Tests delete at end.
    */
-  @Test
-  public void deleteAtEnd() {
+  @Test public void deleteAtEnd() {
     tda.delete(size - 3, 3);
     assertEquals("Three nodes deleted => size-3", size - 3, tdaSize());
     assertEntrysEqual(0, 0, size - 3);
@@ -203,8 +196,7 @@ public final class DiskTableTest extends SandboxTest {
   /**
    * Deletes first block.
    */
-  @Test
-  public void deleteFirstBlock() {
+  @Test public void deleteFirstBlock() {
     tda.delete(0, nodes);
     assertEquals(blocks - 1, tdaBlocks());
     assertEntrysEqual(nodes, 0, size - nodes);
@@ -216,8 +208,7 @@ public final class DiskTableTest extends SandboxTest {
   /**
    * Deletes the second block.
    */
-  @Test
-  public void deleteSecondBlock() {
+  @Test public void deleteSecondBlock() {
     tda.delete(nodes, nodes);
     assertEquals(blocks - 1, tdaBlocks());
     assertEntrysEqual(0, 0, nodes);
@@ -231,8 +222,7 @@ public final class DiskTableTest extends SandboxTest {
   /**
    * Deletes the last block.
    */
-  @Test
-  public void deleteLastBlock() {
+  @Test public void deleteLastBlock() {
     tda.delete(size / nodes * nodes, size % nodes);
     assertEquals(blocks - 1, tdaBlocks());
     assertEntrysEqual(0, 0, nodes - size % nodes);
@@ -244,8 +234,7 @@ public final class DiskTableTest extends SandboxTest {
   /**
    * Deletes the second block with some surrounding nodes.
    */
-  @Test
-  public void deleteSecondBlockAndSurroundingNodes() {
+  @Test public void deleteSecondBlockAndSurroundingNodes() {
     tda.delete(nodes - 1, nodes + 2);
     assertEquals(size - 2 - nodes, tdaSize());
     assertEquals(blocks - 1, tdaBlocks());
@@ -261,8 +250,7 @@ public final class DiskTableTest extends SandboxTest {
   /**
    * Tests basic insertion.
    */
-  @Test
-  public void simpleInsert() {
+  @Test public void simpleInsert() {
     tda.insert(4, getTestEntries(1));
     assertEquals(size + 1, tdaSize());
     assertEntrysEqual(0, 0, 4);
@@ -278,8 +266,7 @@ public final class DiskTableTest extends SandboxTest {
   /**
    * Tests inserting multiple entries.
    */
-  @Test
-  public void insertMultiple() {
+  @Test public void insertMultiple() {
     tda.insert(4, getTestEntries(3));
     assertEquals(size + 3, tdaSize());
     assertEntrysEqual(0, 0, 4);
@@ -295,8 +282,7 @@ public final class DiskTableTest extends SandboxTest {
   /**
    * Tests inserting multiple entries.
    */
-  @Test
-  public void insertMany() {
+  @Test public void insertMany() {
     tda.insert(4, getTestEntries(nodes - 1));
     assertEquals(size + nodes - 1, tdaSize());
     assertEntrysEqual(0, 0, 4);
@@ -312,8 +298,7 @@ public final class DiskTableTest extends SandboxTest {
   /**
    * Tests inserting multiple entries.
    */
-  @Test
-  public void insertAtBlockBoundary() {
+  @Test public void insertAtBlockBoundary() {
     tda.insert(nodes, getTestEntries(nodes));
     assertEquals(size + nodes, tdaSize());
     assertEquals(blocks + 1, tdaBlocks());

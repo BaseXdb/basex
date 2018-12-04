@@ -50,16 +50,14 @@ public final class CreateTest extends SandboxTest {
   /**
    * Drops the initial collection.
    */
-  @After
-  public void tearDown() {
+  @After public void tearDown() {
     execute(new DropDB(NAME));
   }
 
   /**
    * CREATE DB {DB}.
    */
-  @Test
-  public void createDB() {
+  @Test public void createDB() {
     execute(new CreateDB(NAME));
     // check if database name equals argument of create command
     assertEquals(db(), NAME);
@@ -68,8 +66,7 @@ public final class CreateTest extends SandboxTest {
   /**
    * CREATE DB {DB} {INPUT[]}.
    */
-  @Test
-  public void createDBWithInput() {
+  @Test public void createDBWithInput() {
     final int il = INPUTS.length;
     for(int i = 0; i < il; i++) {
       execute(new CreateDB(NAME, INPUTS[i]));
@@ -83,8 +80,7 @@ public final class CreateTest extends SandboxTest {
   /**
    * CREATE DB {DB}; ADD {INPUT[]}.
    */
-  @Test
-  public void createDBandAdd() {
+  @Test public void createDBandAdd() {
     // add file and folder, skip fragment
     final int il = INPUTS.length;
     for(int i = 0; i < il - 1; i++) {
@@ -97,8 +93,7 @@ public final class CreateTest extends SandboxTest {
   /**
    * CREATE DB {DB}; ADD TO {DOCNAME} {INPUT[]}.
    */
-  @Test
-  public void createDBandAddToName() {
+  @Test public void createDBandAddToName() {
     // add file and fragment, skip folder
     final int il = INPUTS.length;
     for(int i = 0; i < il; i += 2) {
@@ -111,8 +106,7 @@ public final class CreateTest extends SandboxTest {
   /**
    * CREATE DB {DB}; ADD TO {TARGET} {INPUT[]}.
    */
-  @Test
-  public void createDBandAddToTarget() {
+  @Test public void createDBandAddToTarget() {
     // add file and folder, skip fragment
     final int il = INPUTS.length;
     for(int i = 0; i < il - 1; i++) {
@@ -125,8 +119,7 @@ public final class CreateTest extends SandboxTest {
   /**
    * CREATE DB {DB}; ADD TO {TARGET/DOCNAME} {INPUT[]}.
    */
-  @Test
-  public void createDBandAddToTargetName() {
+  @Test public void createDBandAddToTargetName() {
     // add file and fragment, skip folder
     final int il = INPUTS.length;
     for(int i = 0; i < il; i += 2) {

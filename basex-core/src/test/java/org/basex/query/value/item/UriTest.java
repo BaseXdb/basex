@@ -83,16 +83,14 @@ public class UriTest {
   /**
    * Tests for {@link Uri#isAbsolute()}.
    */
-  @Test
-  public void isAbsolute() {
+  @Test public void isAbsolute() {
     assertEquals("Uri absolute check failed", absolute, Uri.uri(uri).isAbsolute());
   }
 
   /**
    * Tests for {@link Uri#isValid()}.
    */
-  @Test
-  public void isValid() {
+  @Test public void isValid() {
     assertEquals("Uri validation failed", valid, Uri.uri(uri).isValid());
   }
 }

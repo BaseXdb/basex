@@ -31,8 +31,7 @@ public final class TableTest extends SandboxTest {
   /**
    * Set up method.
    */
-  @Before
-  public void setUp() {
+  @Before public void setUp() {
     execute(new CreateDB(NAME, DBFILE));
     tbl = context.data().meta.dbfile(DataText.DATATBL);
   }
@@ -40,8 +39,7 @@ public final class TableTest extends SandboxTest {
   /**
    * Drops the JUnitTest database.
    */
-  @After
-  public void tearDown() {
+  @After public void tearDown() {
     execute(new DropDB(NAME));
   }
 
@@ -49,8 +47,7 @@ public final class TableTest extends SandboxTest {
    * Test if the size of the table remains constant after insertion, deletion,
    * and re-insertion of the same record.
    */
-  @Test
-  public void tableSize() {
+  @Test public void tableSize() {
     final long s = tbl.length();
 
     final String n = query(SELECT);

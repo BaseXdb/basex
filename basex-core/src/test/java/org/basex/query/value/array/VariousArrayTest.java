@@ -18,8 +18,7 @@ public final class VariousArrayTest extends ArrayTest {
   /**
    * Test for {@link XQArray#cons(Value)} and {@link XQArray#snoc(Value)}.
    */
-  @Test
-  public void consSnocTest() {
+  @Test public void consSnocTest() {
     final int n = 200_000;
     XQArray seq = XQArray.empty();
     for(int i = 0; i < n; i++) {
@@ -37,8 +36,7 @@ public final class VariousArrayTest extends ArrayTest {
   /**
    * Test an {@link XQArray} used as a FIFO queue.
    */
-  @Test
-  public void queueTest() {
+  @Test public void queueTest() {
     final int n = 2_000_000, k = n / 100;
     XQArray seq = XQArray.empty();
     for(int i = 0; i < k; i++) seq = seq.cons(Int.get(i));
@@ -63,8 +61,7 @@ public final class VariousArrayTest extends ArrayTest {
   /**
    * Test an {@link XQArray} used as a LIFO stack.
    */
-  @Test
-  public void stackTest() {
+  @Test public void stackTest() {
     final int n = 2_000_000;
     XQArray seq = XQArray.empty();
 
@@ -90,8 +87,7 @@ public final class VariousArrayTest extends ArrayTest {
   /**
    * Test for {@link XQArray#members()}.
    */
-  @Test
-  public void iteratorTest() {
+  @Test public void iteratorTest() {
     final int n = 1_000;
     XQArray seq = XQArray.empty();
     assertFalse(seq.iterator(0).hasNext());
@@ -112,8 +108,7 @@ public final class VariousArrayTest extends ArrayTest {
   }
 
   /** Tests {@link XQArray#tail()}. */
-  @Test
-  public void tailTest() {
+  @Test public void tailTest() {
     XQArray seq = XQArray.empty();
     for(int i = 0; i < 15; i++) {
       seq = seq.snoc(Int.get(i));

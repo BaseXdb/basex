@@ -29,110 +29,107 @@ public final class ClientModuleTest extends AdvancedQueryTest {
    * Starts the server.
    * @throws IOException I/O exception
    */
-  @BeforeClass
-  public static void start() throws IOException {
+  @BeforeClass public static void start() throws IOException {
     server = createServer();
   }
 
-  /**
-   * Stops the server.
-   */
-  @AfterClass
-  public static void stop() {
+  /** Stops the server. */
+  @AfterClass public static void stop() {
     stopServer(server);
   }
 
   /** Test method. */
-  @Test
-  public void connect() {
-    query(conn());
-    query("exists(" + conn() + ")", true);
+  @Test public void connect() {
+    final Function func = _CLIENT_CONNECT;
+    // successful queries
+    query(connection());
+    query("exists(" + connection() + ")", true);
     // BXCL0001: connection errors
-    error(_CLIENT_CONNECT.args(Text.S_LOCALHOST, DB_PORT, ADMIN, ""), CLIENT_CONNECT_X);
-    error(_CLIENT_CONNECT.args("xxx", DB_PORT, ADMIN, ADMIN), CLIENT_CONNECT_X);
+    error(func.args(Text.S_LOCALHOST, DB_PORT, ADMIN, ""), CLIENT_CONNECT_X);
+    error(func.args("xxx", DB_PORT, ADMIN, ADMIN), CLIENT_CONNECT_X);
   }
 
   /** Test method. */
-  @Test
-  public void execute() {
-    contains(_CLIENT_EXECUTE.args(conn(), new ShowUsers()), S_USERINFO[0]);
-    query("let $a :=" + conn() + ", $b :=" + conn() + " return (" +
-        _CLIENT_EXECUTE.args(" $a", new XQuery("1")) + ',' +
-        _CLIENT_EXECUTE.args(" $b", new XQuery("2")) + ')', "1\n2");
+  @Test public void execute() {
+    final Function func = _CLIENT_EXECUTE;
+    // successful queries
+    contains(func.args(connection(), new ShowUsers()), S_USERINFO[0]);
+    query("let $a :=" + connection() + ", $b :=" + connection() + " return (" +
+        func.args(" $a", new XQuery("1")) + ',' +
+        func.args(" $b", new XQuery("2")) + ')', "1\n2");
     // BXCL0004: connection errors
-    error(_CLIENT_EXECUTE.args(conn(), "x"), CLIENT_COMMAND_X);
+    error(func.args(connection(), "x"), CLIENT_COMMAND_X);
   }
 
   /** Test method. */
-  @Test
-  public void info() {
+  @Test public void info() {
+    final Function func = _CLIENT_INFO;
     // check if the info string is not empty
-    query("let $a := " + conn() + " return (" +
-        _CLIENT_EXECUTE.args(" $a", "xquery 123") + " and " +
-        _CLIENT_INFO.args(" $a") + ')', true);
+    query("let $a := " + connection() + " return (" + _CLIENT_EXECUTE.args(" $a", "xquery 123") +
+        " and " + func.args(" $a") + ')', true);
   }
 
   /** Test method. */
-  @Test
-  public void query() {
-    contains(_CLIENT_EXECUTE.args(conn(), new ShowUsers()), S_USERINFO[0]);
+  @Test public void query() {
+    final Function func = _CLIENT_QUERY;
+    // successful queries
+    contains(_CLIENT_EXECUTE.args(connection(), new ShowUsers()), S_USERINFO[0]);
     // multiple sessions
-    query("let $a := " + conn() + ", $b := " + conn() + " return " +
-        _CLIENT_QUERY.args(" $a", "1") + '+' + _CLIENT_QUERY.args(" $b", "2"), 3);
+    query("let $a := " + connection() + ", $b := " + connection() + " return " +
+        func.args(" $a", "1") + '+' + func.args(" $b", "2"), 3);
     // arguments
-    query(_CLIENT_QUERY.args(conn(), "declare variable $a external; $a*2",
+    query(func.args(connection(), "declare variable $a external; $a*2",
         " map { 'a': 1 }"), 2);
-    query(_CLIENT_QUERY.args(conn(), "declare variable $a external; count($a)",
+    query(func.args(connection(), "declare variable $a external; count($a)",
         " map { 'a': () }"), 0);
-    query(_CLIENT_QUERY.args(conn(), "declare variable $a external; count($a)",
+    query(func.args(connection(), "declare variable $a external; count($a)",
         " map { 'a': (1 to 5) }"), 5);
-    query(_CLIENT_QUERY.args(conn(), "declare context item external; .",
+    query(func.args(connection(), "declare context item external; .",
         " map { '': (1,<a/>,'a') }"), "1\n<a/>\na");
     // binary data
-    query(_CLIENT_QUERY.args(conn(), "xs:hexBinary('41')"), "A");
-    query(_CLIENT_QUERY.args(conn(), "xs:base64Binary('QQ==')"), "A");
+    query(func.args(connection(), "xs:hexBinary('41')"), "A");
+    query(func.args(connection(), "xs:base64Binary('QQ==')"), "A");
     // serialization parameters (should be ignored)
-    query(_CLIENT_QUERY.args(conn(),
+    query(func.args(connection(),
       SerializerOptions.METHOD.arg("text") + "<xml/>"), "<xml/>");
-    query(_CLIENT_QUERY.args(conn(),
+    query(func.args(connection(),
       SerializerOptions.ENCODING.arg("US-ASCII") + "'\u00e4'"), "\u00e4");
-    query(_CLIENT_QUERY.args(conn(), "xs:base64Binary('QQ==')"), "A");
+    query(func.args(connection(), "xs:base64Binary('QQ==')"), "A");
     // query errors: returning function items
-    error(_CLIENT_QUERY.args(conn(), "function(){}"), CLIENT_FITEM_X);
-    error(_CLIENT_QUERY.args(conn(), "true#0"), CLIENT_FITEM_X);
-    error(_CLIENT_QUERY.args(conn(), "array{}"), CLIENT_FITEM_X);
-    error(_CLIENT_QUERY.args(conn(), "map{}"), CLIENT_FITEM_X);
+    error(func.args(connection(), "function(){}"), CLIENT_FITEM_X);
+    error(func.args(connection(), "true#0"), CLIENT_FITEM_X);
+    error(func.args(connection(), "array{}"), CLIENT_FITEM_X);
+    error(func.args(connection(), "map{}"), CLIENT_FITEM_X);
     // query errors: server-side errors
-    error(_CLIENT_QUERY.args(conn(), "x"), NOCTX_X);
+    error(func.args(connection(), "x"), NOCTX_X);
   }
 
   /** Test method for the correct return of all XDM data types. */
-  @Test
-  public void queryTypes() {
+  @Test public void queryTypes() {
     final Object[][] types = XdmInfoTest.TYPES;
     for(final Object[] type : types) {
       if(type == null || type.length < 3) continue;
       query(SerializerOptions.BINARY.arg("no") +
-          _CLIENT_QUERY.args(conn(), " \"" + type[1] + '"'), type[2]);
+          _CLIENT_QUERY.args(connection(), " \"" + type[1] + '"'), type[2]);
     }
   }
 
   /** Test method. */
-  @Test
-  public void close() {
-    query(conn() + " ! " + _CLIENT_CLOSE.args(" ."));
+  @Test public void close() {
+    final Function func = _CLIENT_CLOSE;
+    // successful queries
+    query(connection() + " ! " + func.args(" ."));
     // BXCL0002: session not available
-    error(_CLIENT_CLOSE.args(" xs:anyURI('unknown')"), CLIENT_ID_X);
+    error(func.args(" xs:anyURI('unknown')"), CLIENT_ID_X);
     // BXCL0002: session has already been closed
-    error(conn() + " ! (" + _CLIENT_CLOSE.args(" .") + ", " + _CLIENT_CLOSE.args(" .") + ')',
-        CLIENT_ID_X);
+    error(connection() + " ! (" + func.args(" .") + ", " + func.args(" .") + ')', CLIENT_ID_X);
   }
 
   /**
    * Returns a successful connect string.
    * @return connect string
    */
-  private static String conn() {
+  private static String connection() {
     return _CLIENT_CONNECT.args(Text.S_LOCALHOST, DB_PORT, ADMIN, ADMIN);
   }
 }

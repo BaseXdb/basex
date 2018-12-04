@@ -25,8 +25,7 @@ public final class ParallelQueryTest extends SandboxTest {
    * Test.
    * @throws Throwable throwable
    */
-  @Test
-  public void test() throws Throwable {
+  @Test public void test() throws Throwable {
     // generate reference result
     result = query(QUERY);
     // generate results to be compared

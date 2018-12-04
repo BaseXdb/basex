@@ -13,16 +13,14 @@ public abstract class SandboxTest extends Sandbox {
   /**
    * Creates the sandbox.
    */
-  @BeforeClass
-  public static void initTests() {
+  @BeforeClass public static void initTests() {
     initSandbox();
   }
 
   /**
    * Removes test databases and closes the database context.
    */
-  @AfterClass
-  public static void finishTests() {
+  @AfterClass public static void finishTests() {
     finishSandbox();
   }
 }

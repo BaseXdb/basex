@@ -37,8 +37,7 @@ public final class ConcurrencyTest extends SandboxTest {
    * Starts the server.
    * @throws IOException exception
    */
-  @Before
-  public void start() throws IOException {
+  @Before public void start() throws IOException {
     server = createServer();
     sess = createClient();
     sess.execute(new CreateDB(NAME, FILE));
@@ -48,8 +47,7 @@ public final class ConcurrencyTest extends SandboxTest {
    * Stops the server.
    * @throws Exception exception
    */
-  @After
-  public void stop() throws Exception {
+  @After public void stop() throws Exception {
     sess.execute(new DropDB(NAME));
     sess.close();
     stopServer(server);
@@ -59,8 +57,7 @@ public final class ConcurrencyTest extends SandboxTest {
    * Efficiency test.
    * @throws Exception exception
    */
-  @Test
-  public void runQueries() throws Exception {
+  @Test public void runQueries() throws Exception {
     final int cl = 50;
     final QueryClient[] clients = new QueryClient[cl];
     for(int c = 0; c < cl; ++c) clients[c] = new QueryClient(c);
@@ -103,8 +100,7 @@ public final class ConcurrencyTest extends SandboxTest {
    * Efficiency test.
    * @throws Exception exception
    */
-  @Test
-  public void runCommands() throws Exception {
+  @Test public void runCommands() throws Exception {
     final int tl = 100;
     final Thread[] th = new Thread[tl];
     for(int t = 0; t < tl; t++) th[t] = new CommandClient();

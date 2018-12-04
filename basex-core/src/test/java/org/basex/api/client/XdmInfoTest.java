@@ -30,8 +30,7 @@ public final class XdmInfoTest extends SandboxTest {
    * Starts a session.
    * @throws Exception exception
    */
-  @BeforeClass
-  public static void start() throws Exception {
+  @BeforeClass public static void start() throws Exception {
     server = createServer();
     session = new TestSession(Text.S_LOCALHOST, DB_PORT, UserText.ADMIN, UserText.ADMIN);
   }
@@ -40,8 +39,7 @@ public final class XdmInfoTest extends SandboxTest {
    * Stops a session.
    * @throws Exception exception
    */
-  @AfterClass
-  public static void stop() throws Exception {
+  @AfterClass public static void stop() throws Exception {
     session.close();
     stopServer(server);
   }
@@ -50,8 +48,7 @@ public final class XdmInfoTest extends SandboxTest {
    * Tests the returned item types.
    * @throws IOException I/O exception
    */
-  @Test
-  public void testIter() throws IOException {
+  @Test public void testIter() throws IOException {
     for(final Object[] exp : TYPES) {
       if(exp.length < 2) continue;
       try(TestQuery tq = session.query(exp[1].toString())) {
@@ -67,8 +64,7 @@ public final class XdmInfoTest extends SandboxTest {
    * Tests the returned XDM information.
    * @throws IOException I/O exception
    */
-  @Test
-  public void testFull() throws IOException {
+  @Test public void testFull() throws IOException {
     for(final Object[] exp : TYPES) {
       if(exp.length < 2) continue;
       try(TestQuery tq = session.query(exp[1].toString())) {

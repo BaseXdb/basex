@@ -14,8 +14,7 @@ import org.junit.*;
  */
 public final class MinHeapTest {
   /** Checks if the heap can be used for sorting. */
-  @Test
-  public void heapSort() {
+  @Test public void heapSort() {
     final MinHeap<Integer, Integer> heap = new MinHeap<>(2, null);
     final int vl = 1000;
     final Integer[] vals = new Integer[vl];
@@ -36,8 +35,7 @@ public final class MinHeapTest {
   }
 
   /** Checks if the heap can be used for sorting a pre-sorted sequence. */
-  @Test
-  public void heapPreSort() {
+  @Test public void heapPreSort() {
     final MinHeap<Integer, Integer> heap = new MinHeap<>(2, null);
     for(int i = 0; i < 1000; i++) {
       heap.insert(i, i);

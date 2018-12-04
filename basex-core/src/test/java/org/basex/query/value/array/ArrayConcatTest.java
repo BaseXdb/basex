@@ -58,8 +58,7 @@ public final class ArrayConcatTest extends ArrayTest {
   /**
    * Simple concat test.
    */
-  @Test
-  public void concatTest() {
+  @Test public void concatTest() {
     XQArray seq1 = XQArray.empty();
     XQArray seq2 = XQArray.empty();
     final int n = 200_000;

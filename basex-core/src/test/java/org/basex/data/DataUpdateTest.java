@@ -59,8 +59,7 @@ public abstract class DataUpdateTest extends SandboxTest {
   /**
    * Initializes the test class.
    */
-  @BeforeClass
-  public static void setUpBeforeClass() {
+  @BeforeClass public static void setUpBeforeClass() {
     set(MainOptions.TEXTINDEX, false);
     set(MainOptions.ATTRINDEX, false);
   }
@@ -68,8 +67,7 @@ public abstract class DataUpdateTest extends SandboxTest {
   /**
    * Creates the database.
    */
-  @Before
-  public final void setUp() {
+  @Before public final void setUp() {
     set(MainOptions.MAINMEM, mainmem);
     execute(new CreateDB(NAME, TESTFILE));
     size = context.data().meta.size;
@@ -78,8 +76,7 @@ public abstract class DataUpdateTest extends SandboxTest {
   /**
    * Deletes the test database.
    */
-  @After
-  public final void tearDown() {
+  @After public final void tearDown() {
     if((Boolean) mainmem) return;
     execute(new Close());
     execute(new DropDB(NAME));
@@ -108,8 +105,7 @@ public abstract class DataUpdateTest extends SandboxTest {
   /**
    * Tests for correct data size.
    */
-  @Test
-  public final void size() {
+  @Test public final void size() {
     assertEquals("Unexpected size!", size, context.data().meta.size);
     reload();
     assertEquals("Unexpected size!", size, context.data().meta.size);

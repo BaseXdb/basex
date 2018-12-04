@@ -38,8 +38,7 @@ public abstract class AuthTest extends HTTPTest {
   /**
    * Stops the test.
    */
-  @AfterClass
-  public static void close() {
+  @AfterClass public static void close() {
     Prop.clear();
     ctx.close();
   }
@@ -48,8 +47,7 @@ public abstract class AuthTest extends HTTPTest {
    * Successful request.
    * @throws Exception Exception
    */
-  @Test
-  public void sendRequestOk() throws Exception {
+  @Test public void sendRequestOk() throws Exception {
     assertEquals("200", sendRequest("admin", "admin"));
   }
 
@@ -57,8 +55,7 @@ public abstract class AuthTest extends HTTPTest {
    * Failed request.
    * @throws Exception Exception
    */
-  @Test
-  public void sendRequestFail() throws Exception {
+  @Test public void sendRequestFail() throws Exception {
     assertEquals("401", sendRequest("unknown", "wrong"));
   }
 

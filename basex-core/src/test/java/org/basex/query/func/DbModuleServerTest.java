@@ -30,8 +30,7 @@ public final class DbModuleServerTest extends AdvancedQueryTest {
   /**
    * Initializes a test.
    */
-  @Before
-  public void finishTest() {
+  @Before public void finishTest() {
     execute(new DropDB(NAME));
   }
 
@@ -39,16 +38,14 @@ public final class DbModuleServerTest extends AdvancedQueryTest {
    * Starts the server.
    * @throws IOException I/O exception
    */
-  @BeforeClass
-  public static void start() throws IOException {
+  @BeforeClass public static void start() throws IOException {
     server = createServer();
   }
 
   /**
    * Finishes the test.
    */
-  @AfterClass
-  public static void finish() {
+  @AfterClass public static void finish() {
     stopServer(server);
   }
 
@@ -56,8 +53,7 @@ public final class DbModuleServerTest extends AdvancedQueryTest {
    * Tests client/server functionality of database functions.
    * @throws IOException I/O exception
    */
-  @Test
-  public void clientServer() throws IOException {
+  @Test public void clientServer() throws IOException {
     final ClientSession c1 = createClient();
     final ClientSession c2 = createClient();
 
@@ -71,8 +67,7 @@ public final class DbModuleServerTest extends AdvancedQueryTest {
    * @throws IOException I/O exception
    * @throws InterruptedException interrupted exception
    */
-  @Test
-  public void concurrentClients() throws IOException, InterruptedException {
+  @Test public void concurrentClients() throws IOException, InterruptedException {
     final ClientSession check = createClient();
 
     // same DB name, which is 2 x NUM times

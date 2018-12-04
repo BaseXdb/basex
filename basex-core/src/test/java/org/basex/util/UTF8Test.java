@@ -21,8 +21,7 @@ public final class UTF8Test extends SandboxTest {
   /**
    * Tests for all valid code points if characters are properly converted.
    */
-  @Test
-  public void string2token2string() {
+  @Test public void string2token2string() {
     for(int i = 0; i <= Character.MAX_CODE_POINT; i++) {
       final String s = new String(Character.toChars(i));
       assertEquals(s, string(token(s)));
@@ -32,8 +31,7 @@ public final class UTF8Test extends SandboxTest {
   /**
    * Tests for all valid code points if characters are properly converted.
    */
-  @Test
-  public void token2string() {
+  @Test public void token2string() {
     for(int i = 0; i <= Character.MAX_CODE_POINT; i++) {
       if(i >= Character.MIN_SURROGATE && i <= Character.MAX_SURROGATE) continue;
       final String s = new String(Character.toChars(i));
@@ -44,8 +42,7 @@ public final class UTF8Test extends SandboxTest {
   /**
    * Tests entity parsing with codepoints.
    */
-  @Test
-  public void entities() {
+  @Test public void entities() {
     for(int i = 0xA0; i <= Character.MAX_CODE_POINT; i++) {
       final String qu = query("'&#" + i + ";'");
       assertEquals(new String(Character.toChars(i)), qu);

@@ -20,26 +20,22 @@ import org.junit.*;
  */
 public final class CompressTest extends SandboxTest {
   /** Test. */
-  @Test
-  public void test1() {
+  @Test public void test1() {
     run(token(" abcdefghijklmnopqrstuvwxyz"));
   }
 
   /** Test. */
-  @Test
-  public void test2() {
+  @Test public void test2() {
     run(token("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
   }
 
   /** Test. */
-  @Test
-  public void test3() {
+  @Test public void test3() {
     run(token("abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890"));
   }
 
   /** Test. */
-  @Test
-  public void test4() {
+  @Test public void test4() {
     final int bl = 65;
     final byte[] bytes = new byte[bl];
     for(int b = 0; b < bl; b++) bytes[b] = (byte) b;
@@ -47,8 +43,7 @@ public final class CompressTest extends SandboxTest {
   }
 
   /** Test. */
-  @Test
-  public void test5() {
+  @Test public void test5() {
     final int bl = 256;
     final byte[] bytes = new byte[bl];
     for(int b = 0; b < bytes.length; b++) bytes[b] = (byte) b;
@@ -56,8 +51,7 @@ public final class CompressTest extends SandboxTest {
   }
 
   /** Test. */
-  @Test
-  public void test6() {
+  @Test public void test6() {
     final int bl = 4096;
     final byte[] bytes = new byte[bl];
     for(int b = 0; b < bytes.length; b++) bytes[b] = (byte) (b & 0xFF);
@@ -66,15 +60,13 @@ public final class CompressTest extends SandboxTest {
 
   /** Test.
    * @throws Exception exception */
-  @Test
-  public void test7() throws Exception {
+  @Test public void test7() throws Exception {
     texts("src/test/resources/xmark.xml");
   }
 
   /** Test.
    * @throws Exception exception */
-  @Test
-  public void test8() throws Exception {
+  @Test public void test8() throws Exception {
     texts("src/test/resources/factbook.zip");
   }
 

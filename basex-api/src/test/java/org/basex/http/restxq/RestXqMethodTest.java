@@ -19,8 +19,7 @@ public final class RestXqMethodTest extends RestXqTest {
    * Retrieve path with typed variable.
    * @throws Exception exception
    */
-  @Test
-  public void post() throws Exception {
+  @Test public void post() throws Exception {
     // text
     String f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x};";
     post(f, "12", "12", MediaType.TEXT_PLAIN);
@@ -40,8 +39,7 @@ public final class RestXqMethodTest extends RestXqTest {
   /**
    * Custom method.
    * @throws Exception exception */
-  @Test
-  public void method() throws Exception {
+  @Test public void method() throws Exception {
     // standard HTTP method without body
     get("declare %R:method('GET') %R:path('') function m:f() {'x'};", "", "x");
     // standard HTTP method specified twice
@@ -83,8 +81,7 @@ public final class RestXqMethodTest extends RestXqTest {
    * {@code %HEAD} method.
    * @throws Exception exception
    */
-  @Test
-  public void head() throws Exception {
+  @Test public void head() throws Exception {
     // correct return type
     headR("declare %R:HEAD %R:path('') function m:f() { <R:response/> };");
     headR("declare %R:HEAD %R:path('') function m:f() as element(R:response) { <R:response/> };");

@@ -26,8 +26,7 @@ public abstract class QueryTest extends SandboxTest {
   /**
    * Tests the specified instance.
    */
-  @Test
-  public void test() {
+  @Test public void test() {
     final StringBuilder sb = new StringBuilder();
     int fail = 0;
 

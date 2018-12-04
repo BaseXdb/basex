@@ -31,112 +31,96 @@ public final class WesternTokenizerTest {
   private static final byte[] TEXT = token("\\T\u00e9st.*\\t\u00c4Ste\\\\Toast\\.");
 
   /** Test case insensitive. */
-  @Test
-  public void cI() {
+  @Test public void cI() {
     run(TEXT, "test", "taste", "toast");
   }
 
   /** Test case sensitive. */
-  @Test
-  public void cS() {
+  @Test public void cS() {
     setFTFlags(FTCS);
     run(TEXT, "Test", "tASte", "Toast");
   }
 
   /** Test lower case. */
-  @Test
-  public void lC() {
+  @Test public void lC() {
     setFTFlags(FTCS | FTLC);
     run(TEXT, "test", "taste", "toast");
   }
 
   /** Test upper case. */
-  @Test
-  public void uC() {
+  @Test public void uC() {
     setFTFlags(FTCS | FTUC);
     run(TEXT, "TEST", "TASTE", "TOAST");
   }
 
   /** Test  + case insensitive. */
-  @Test
-  public void diaCI() {
+  @Test public void diaCI() {
     setFTFlags(FTDC);
     run(TEXT, "t\u00e9st", "täste", "toast");
   }
 
   /** Test diacritics + case sensitive. */
-  @Test
-  public void diaCS() {
+  @Test public void diaCS() {
     setFTFlags(FTDC | FTCS);
     run(TEXT, "T\u00e9st", "t\u00c4Ste", "Toast");
   }
 
   /** Test diacritics + lower case. */
-  @Test
-  public void diaLC() {
+  @Test public void diaLC() {
     setFTFlags(FTDC | FTCS | FTLC);
     run(TEXT, "t\u00e9st", "t\u00e4ste", "toast");
   }
 
   /** Test diacritics + upper case. */
-  @Test
-  public void diaUC() {
+  @Test public void diaUC() {
     setFTFlags(FTDC | FTCS | FTUC);
     run(TEXT, "T\u00c9ST", "T\u00c4STE", "TOAST");
   }
 
   /** Test wild cards + case insensitive. */
-  @Test
-  public void wildCardsCI() {
+  @Test public void wildCardsCI() {
     setFTFlags(FTWC);
     run(TEXT, "\\test.*\\taste", "toast");
   }
 
   /** Test wild cards + case sensitive. */
-  @Test
-  public void wildCardsCS() {
+  @Test public void wildCardsCS() {
     setFTFlags(FTWC | FTCS);
     run(TEXT, "\\Test.*\\tASte", "Toast");
   }
 
   /** Test wild cards + lower case. */
-  @Test
-  public void wildCardsLC() {
+  @Test public void wildCardsLC() {
     setFTFlags(FTWC | FTCS | FTLC);
     run(TEXT, "\\test.*\\taste", "toast");
   }
 
   /** Test wild cards + upper case. */
-  @Test
-  public void wildCardsUC() {
+  @Test public void wildCardsUC() {
     setFTFlags(FTWC | FTCS | FTUC);
     run(TEXT, "\\TEST.*\\TASTE", "TOAST");
   }
 
   /** Test wild cards + diacritics + case insensitive. */
-  @Test
-  public void wildCardsDiaCI() {
+  @Test public void wildCardsDiaCI() {
     setFTFlags(FTWC | FTDC);
     run(TEXT, "\\t\u00e9st.*\\t\u00e4ste", "toast");
   }
 
   /** Test wild cards + diacritics + case sensitive. */
-  @Test
-  public void wildCardsDiaCS() {
+  @Test public void wildCardsDiaCS() {
     setFTFlags(FTWC | FTDC | FTCS);
     run(TEXT, "\\T\u00e9st.*\\t\u00c4Ste", "Toast");
   }
 
   /** Test wild cards + diacritics + lower case. */
-  @Test
-  public void wildCardsDiaLC() {
+  @Test public void wildCardsDiaLC() {
     setFTFlags(FTWC | FTDC | FTCS | FTLC);
     run(TEXT, "\\t\u00e9st.*\\t\u00e4ste", "toast");
   }
 
   /** Test wild cards + diacritics + upper case. */
-  @Test
-  public void wildCardsDiaUC() {
+  @Test public void wildCardsDiaUC() {
     setFTFlags(FTWC | FTDC | FTCS | FTUC);
     run(TEXT, "\\T\u00c9ST.*\\T\u00c4STE", "TOAST");
   }

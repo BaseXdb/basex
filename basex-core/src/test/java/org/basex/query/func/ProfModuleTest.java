@@ -13,8 +13,7 @@ import org.junit.*;
  */
 public final class ProfModuleTest extends AdvancedQueryTest {
   /** Test method. */
-  @Test
-  public void memory() {
+  @Test public void memory() {
     final Function func = _PROF_MEMORY;
     query(func.args(" ()"));
     query("count(" + func.args(" 1 to 100 ") + ")", 100);
@@ -22,8 +21,7 @@ public final class ProfModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void time() {
+  @Test public void time() {
     final Function func = _PROF_TIME;
     query(func.args(" ()"));
     query("count(" + func.args(" 1 to 100 ") + ")", 100);
@@ -31,8 +29,7 @@ public final class ProfModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void track() {
+  @Test public void track() {
     final Function func = _PROF_TRACK;
     query(func.args(" ()"));
     query("exists(" + func.args("A") + "?memory)", "true");
@@ -44,8 +41,7 @@ public final class ProfModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void sleep() {
+  @Test public void sleep() {
     final Function func = _PROF_SLEEP;
     query(func.args(" 10"));
     query(func.args(" 1"));
@@ -54,8 +50,7 @@ public final class ProfModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void human() {
+  @Test public void human() {
     final Function func = _PROF_HUMAN;
     query(func.args(" 1"), "1 b");
     query(func.args(" 2"), "2 b");
@@ -65,23 +60,20 @@ public final class ProfModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void dump() {
+  @Test public void dump() {
     final Function func = _PROF_DUMP;
     query(func.args("a"), "");
   }
 
   /** Test method. */
-  @Test
-  public void variables() {
+  @Test public void variables() {
     final Function func = _PROF_VARIABLES;
     query("for $x in 1 to 2 return " + func.args(), "");
     query(func.args() + ", let $x := random:double() return floor($x * $x)", 0);
   }
 
   /** Test method. */
-  @Test
-  public void voidd() {
+  @Test public void voidd() {
     final Function func = _PROF_VOID;
     query(func.args(" ()"), "");
     query(func.args(1), "");
@@ -89,8 +81,7 @@ public final class ProfModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void type() {
+  @Test public void type() {
     final Function func = _PROF_TYPE;
     query(func.args(" ()"), "");
     query(func.args(1), 1);

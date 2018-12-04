@@ -16,8 +16,7 @@ import org.junit.*;
  */
 public final class XMLCommandTest extends SandboxTest {
   /** Check syntax of all commands. */
-  @Test
-  public void commands() {
+  @Test public void commands() {
     // surrounded by <commands/> element (required to process more than one command)
     ok("<commands><add>x</add></commands>");
 
@@ -139,8 +138,7 @@ public final class XMLCommandTest extends SandboxTest {
   }
 
   /** Evaluates some commands with invalid syntax. */
-  @Test
-  public void failing() {
+  @Test public void failing() {
     no("<add/>");
     no("<add x='X'>X</add>");
     no("<add path='X' x='X'>X</add>");

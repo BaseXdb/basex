@@ -24,39 +24,34 @@ public final class MixedTest extends AdvancedQueryTest {
   /**
    * Drops the collection.
    */
-  @AfterClass
-  public static void after() {
+  @AfterClass public static void after() {
     execute(new DropDB(NAME));
     execute(new DropDB(NAME + '2'));
   }
 
   /** Catches duplicate module import. */
-  @Test
-  public void duplImport() {
+  @Test public void duplImport() {
     error("import module namespace a='world' at '" + XQMFILE + "';" +
       "import module namespace a='world' at '" + XQMFILE + "'; 1",
       DUPLMODULE_X);
   }
 
   /** Catches duplicate module import with different module uri. */
-  @Test
-  public void duplImportDiffUri() {
+  @Test public void duplImportDiffUri() {
     error("import module namespace a='world' at '" + XQMFILE + "';" +
       "import module namespace a='galaxy' at '" + XQMFILE + "'; 1",
       DUPLNSDECL_X);
   }
 
   /** Catches duplicate module import. */
-  @Test
-  public void duplLocation() {
+  @Test public void duplLocation() {
     error("import module namespace a='world' at '" + XQMFILE + "';" +
       "import module namespace b='galaxy' at '" + XQMFILE + "'; 1",
       WRONGMODULE_X_X_X);
   }
 
   /** Checks static context scoping in variables. */
-  @Test
-  public void varsInModules() {
+  @Test public void varsInModules() {
     contains("import module namespace a='world' at '" + XQMFILE + "'; $a:eager", "hello:foo");
     contains("import module namespace a='world' at '" + XQMFILE + "'; $a:lazy", "hello:foo");
     contains("import module namespace a='world' at '" + XQMFILE + "'; $a:func()", "hello:foo");
@@ -66,8 +61,7 @@ public final class MixedTest extends AdvancedQueryTest {
   /**
    * Overwrites an empty attribute value.
    */
-  @Test
-  public void emptyAttValues() {
+  @Test public void emptyAttValues() {
     execute(new CreateDB(NAME, "<A a='' b=''/>"));
     query("replace value of node /A/@a with 'A'");
     query("/", "<A a=\"A\" b=\"\"/>");
@@ -76,8 +70,7 @@ public final class MixedTest extends AdvancedQueryTest {
   /**
    * Parse recursive queries.
    */
-  @Test
-  public void parseRec() {
+  @Test public void parseRec() {
     // simple call
     query("declare function local:x() { if(<a/>) then 1 else local:x() }; local:x()");
     // call from FLWOR expression
@@ -88,8 +81,7 @@ public final class MixedTest extends AdvancedQueryTest {
   /**
    * Performs count() on parts of a collection.
    */
-  @Test
-  public void countCollection() {
+  @Test public void countCollection() {
     execute(new CreateDB(NAME));
     execute(new Add("a", "<a/>"));
     execute(new Add("b", "<a/>"));
@@ -101,15 +93,13 @@ public final class MixedTest extends AdvancedQueryTest {
   /**
    * Tests constant-propagating variables that were introduced by inlining.
    */
-  @Test
-  public void gh907() {
+  @Test public void gh907() {
     execute(new CreateDB(NAME, "<x/>"));
     query("declare function local:a($a) { contains($a, 'a') }; //x[local:a(.)]", "");
   }
 
   /** Type intersections. */
-  @Test
-  public void gh1427() {
+  @Test public void gh1427() {
     query("let $a := function($f) as element(*) { $f() }"
         + "let $b := $a(function() as element(xml)* { <xml/> })"
         + "return $b", "<xml/>");
@@ -125,8 +115,7 @@ public final class MixedTest extends AdvancedQueryTest {
   }
 
   /** Optimizations of nested path expressions. */
-  @Test
-  public void gh1567() {
+  @Test public void gh1567() {
     query("let $_ := '_' return document { <_/> }/*[self::*[name() = $_]]", "<_/>");
     query("let $_ := '_' return document { <_/> }/*[self::*/name() = $_]", "<_/>");
     query("let $_ := '_' return document { <_/> }/*[name(self::*) = $_]", "<_/>");
@@ -138,8 +127,7 @@ public final class MixedTest extends AdvancedQueryTest {
   }
 
   /** Optimizations of nested path expressions. */
-  @Test
-  public void gh1587() {
+  @Test public void gh1587() {
     execute(new CreateDB(NAME, "<a id='0'><b id='1'/></a>"));
     final String query = "let $id := '0' return db:attribute('" + NAME + "', '1')/..";
     query(query, "<b id=\"1\"/>");
@@ -149,8 +137,7 @@ public final class MixedTest extends AdvancedQueryTest {
   }
 
   /** Node ids. */
-  @Test
-  public void gh1566() {
+  @Test public void gh1566() {
     query("((<_><a/><b/></_> update {})/* ! element _ { . })/*", "<a/>\n<b/>");
     query("((<_><a>A</a><b>B</b></_> update {})/* ! element _ { . })/*/node()", "A\nB");
   }
@@ -159,8 +146,7 @@ public final class MixedTest extends AdvancedQueryTest {
    * Tests document order across multiple documents or databases.
    * @throws IOException I/O exception
    */
-  @Test
-  public void diffDatabases() throws IOException {
+  @Test public void diffDatabases() throws IOException {
     final String xml1 = "<xml><n1a/><n1b/></xml>";
     final String xml2 = "<xml><n2a/><n2b/></xml>";
     final IOFile file1 = new IOFile(sandbox(), "doc1.xml");

@@ -22,8 +22,7 @@ public final class SelectiveIndexTest extends AdvancedQueryTest {
   /**
    * Tests the text index.
    */
-  @Test
-  public void textIndex() {
+  @Test public void textIndex() {
     map().forEach((key, value) -> {
       set(MainOptions.TEXTINCLUDE, key);
       execute(new CreateDB(NAME, FILE));
@@ -35,8 +34,7 @@ public final class SelectiveIndexTest extends AdvancedQueryTest {
   /**
    * Tests the attribute index.
    */
-  @Test
-  public void attrIndex() {
+  @Test public void attrIndex() {
     try {
       map().forEach((key, value) -> {
         set(MainOptions.ATTRINCLUDE, key);
@@ -52,8 +50,7 @@ public final class SelectiveIndexTest extends AdvancedQueryTest {
   /**
    * Tests the token index.
    */
-  @Test
-  public void tokenIndex() {
+  @Test public void tokenIndex() {
     set(MainOptions.TOKENINDEX, true);
     try {
       map().forEach((key, value) -> {
@@ -71,8 +68,7 @@ public final class SelectiveIndexTest extends AdvancedQueryTest {
   /**
    * Tests the full-text index.
    */
-  @Test
-  public void ftIndex() {
+  @Test public void ftIndex() {
     set(MainOptions.FTINDEX, true);
     try {
       map().forEach((key, value) -> {
@@ -89,8 +85,7 @@ public final class SelectiveIndexTest extends AdvancedQueryTest {
   /**
    * Tests the id functions.
    */
-  @Test
-  public void id() {
+  @Test public void id() {
     set(MainOptions.TOKENINDEX, true);
     try {
       final String idref = "idref=\"B C\"";

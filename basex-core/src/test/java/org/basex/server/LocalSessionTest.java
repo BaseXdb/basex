@@ -11,8 +11,7 @@ import org.junit.*;
  */
 public class LocalSessionTest extends SessionTest {
   /** Starts a session. */
-  @Before
-  public void startSession() {
+  @Before public void startSession() {
     session = new LocalSession(context, out);
   }
 }

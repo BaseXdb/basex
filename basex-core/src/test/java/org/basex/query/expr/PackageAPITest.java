@@ -52,8 +52,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * Prepares a test.
    * @throws IOException I/O exception
    */
-  @Before
-  public void init() throws IOException {
+  @Before public void init() throws IOException {
     new IOFile(REPO).delete();
     copy(Paths.get(SOURCE), Paths.get(REPO));
   }
@@ -61,8 +60,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   /**
    * Finalizes a test.
    */
-  @After
-  public void finish() {
+  @After public void finish() {
     new IOFile(REPO).delete();
   }
 
@@ -85,8 +83,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
 
   /** Tests repository initialization. */
-  @Test
-  public void repoInit() {
+  @Test public void repoInit() {
     // check namespace dictionary
     final HashMap<String, HashSet<String>> nsDict = context.repo.nsDict();
     final HashMap<String, Pkg> pkgDict = context.repo.pkgDict();
@@ -114,8 +111,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   }
 
   /** Test for missing mandatory attributes. */
-  @Test
-  public void mandatoryAttr() {
+  @Test public void mandatoryAttr() {
     error(new IOContent("<package xmlns:http='http://expath.org/ns/pkg' spec='1.0'/>"),
         REPO_DESCRIPTOR_X, "Missing mandatory attribute not detected.");
   }
@@ -124,8 +120,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * Tests package with not installed dependencies - dependency is defined with
    * no specific versions.
    */
-  @Test
-  public void notInstalledDeps() {
+  @Test public void notInstalledDeps() {
     error(
         desc(PKG5, "pkg5", "12.0",
             "<dependency package='" + PKG4 + "'/>"),
@@ -136,8 +131,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * Tests package with not installed dependencies - dependency is defined with
    * version set.
    */
-  @Test
-  public void notInstalledDepVersion() {
+  @Test public void notInstalledDepVersion() {
     error(
         desc(PKG5, "pkg5", "12.0",
             "<dependency package='" + PKG1 + "' versions='1.0 7.0'/>"),
@@ -148,8 +142,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * Tests package with not installed dependencies - dependency is defined with
    * version template.
    */
-  @Test
-  public void notInstalledDepTemp() {
+  @Test public void notInstalledDepTemp() {
     error(
         desc(PKG5, "pkg5", "12.0",
             "<dependency package='" + PKG1 + "' versions='12.7'/>"),
@@ -160,8 +153,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * Tests package with not installed dependencies - dependency is defined with
    * version template for minimal acceptable version.
    */
-  @Test
-  public void notInstalledMin() {
+  @Test public void notInstalledMin() {
     error(
         desc(PKG5, "pkg5", "12.0",
             "<dependency package='" + PKG1 + "' versions='12.7'/>"),
@@ -172,8 +164,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * Tests package with not installed dependencies - dependency is defined with
    * version template for maximal acceptable version.
    */
-  @Test
-  public void notInstalledMax() {
+  @Test public void notInstalledMax() {
     error(
         desc(PKG5, "pkg5", "12.0",
             "<dependency package='" + PKG1 + "' semver-max='11'/>"),
@@ -184,8 +175,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * Tests package with not installed dependencies - dependency is defined with
    * version templates for minimal and maximal acceptable version.
    */
-  @Test
-  public void notInstalledMinMax() {
+  @Test public void notInstalledMinMax() {
     error(desc(PKG5, "pkg5", "12.0",
         "<dependency package='" + PKG1 + "' semver-min='5.7' "
             + "semver-max='11'/>"), REPO_NOTFOUND_X,
@@ -196,8 +186,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * Tests package with component which is already installed as part of another
    * package.
    */
-  @Test
-  public void alreadyAnotherInstalled() {
+  @Test public void alreadyAnotherInstalled() {
     error(desc(PKG5, "pkg5", "12.0",
         "<xquery><namespace>ns1</namespace><file>pkg1mod1.xql</file></xquery>"),
         REPO_INSTALLED_X, "Already installed component not detected.");
@@ -206,8 +195,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   /**
    * Tests package with dependency on an older version of BaseX.
    */
-  @Test
-  public void notSupported() {
+  @Test public void notSupported() {
     error(desc(PKG5, "pkg5", "12.0",
         "<dependency processor='basex' semver='5.0'/>"), REPO_VERSION,
         "Unsupported package not detected.");
@@ -217,8 +205,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * Tests package with component which is already installed as part of another
    * version of the same package.
    */
-  @Test
-  public void alreadyAnotherSame() {
+  @Test public void alreadyAnotherSame() {
     ok(desc(PKG1, "pkg1", "10.0",
         "<xquery><namespace>ns1</namespace><file>pkg1mod1.xql</file></xquery>"));
   }
@@ -226,8 +213,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   /**
    * Tests valid package.
    */
-  @Test
-  public void valid() {
+  @Test public void valid() {
     ok(desc(PKG1, "pkg1", "10.0", "<dependency package='" + PKG1 + "' semver-min='11'/>"
         + "<xquery><namespace>ns3</namespace>"
         + "<file>pkg5mod1.xql</file></xquery>"));
@@ -237,8 +223,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * Tests ability to import two modules from the same package.
    * @throws Exception exception
    */
-  @Test
-  public void importTwoModulesFromPkg() throws Exception {
+  @Test public void importTwoModulesFromPkg() throws Exception {
     try(QueryProcessor qp = new QueryProcessor(
       "import module namespace ns1='ns1';" +
       "import module namespace ns3='ns3';" +
@@ -251,8 +236,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   /**
    * Tests package installation.
    */
-  @Test
-  public void repoInstall() {
+  @Test public void repoInstall() {
     // try to install non-existing package
     try {
       new RepoManager(context).install("src/test/resources/pkg");
@@ -280,8 +264,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * Tests installation of a XAR file.
    * @throws Exception exception
    */
-  @Test
-  public void installXar() throws Exception {
+  @Test public void installXar() throws Exception {
     // install package
     execute(new RepoInstall(REPO + "testJar.xar", null));
 
@@ -308,8 +291,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   /**
    * Tests installation of a JAR file.
    */
-  @Test
-  public void installJar() {
+  @Test public void installJar() {
     // ensure that all files are installed
     execute(new RepoInstall(REPO + "Hello.jar", null));
 
@@ -347,8 +329,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * Tests installation of a package containing a jar file with packaged dependencies.
    * @throws Exception exception
    */
-  @Test
-  public void installJarWithDependencies() throws Exception {
+  @Test public void installJarWithDependencies() throws Exception {
     // install package
     execute(new RepoInstall(REPO + "testJarInJar.jar", null));
 
@@ -377,8 +358,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * Tests usage of installed packages.
    * @throws Exception exception
    */
-  @Test
-  public void importPkg() throws Exception {
+  @Test public void importPkg() throws Exception {
     // try with a package without dependencies
     try(QueryProcessor qp = new QueryProcessor(
         "import module namespace ns3='ns3'; ns3:test()", context)) {
@@ -394,8 +374,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   /**
    * Tests package delete.
    */
-  @Test
-  public void delete() {
+  @Test public void delete() {
     // try to delete a package which is not installed
     try {
       new RepoManager(context).delete("xyz");

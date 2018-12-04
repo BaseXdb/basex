@@ -18,8 +18,7 @@ import org.junit.Test;
  */
 public final class LocalConcurrencyTest extends SandboxTest {
   /** Test for concurrently accessing and modifying users. */
-  @Test
-  public void userTest() {
+  @Test public void userTest() {
     final AtomicInteger counter = new AtomicInteger();
     final Exception[] error = new Exception[1];
     final int runs = 500;

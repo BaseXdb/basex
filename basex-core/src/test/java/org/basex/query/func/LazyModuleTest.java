@@ -16,8 +16,7 @@ public final class LazyModuleTest extends AdvancedQueryTest {
   private static final String FILE = "src/test/resources/corrupt.xml";
 
   /** Test method. */
-  @Test
-  public void cache() {
+  @Test public void cache() {
     final Function func = _LAZY_CACHE;
     query(_FILE_READ_TEXT.args(FILE), "<");
     query(func.args(_FILE_READ_BINARY.args(FILE)), "<");
@@ -27,8 +26,7 @@ public final class LazyModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void isLazy() {
+  @Test public void isLazy() {
     final Function func = _LAZY_IS_LAZY;
     query(func.args(_FILE_READ_BINARY.args(FILE)), true);
     query(func.args(_FILE_READ_TEXT.args(FILE)), true);
@@ -38,8 +36,7 @@ public final class LazyModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void isCached() {
+  @Test public void isCached() {
     final Function func = _LAZY_IS_CACHED;
     query(func.args(_FILE_READ_BINARY.args(FILE)), "false");
     query(func.args(_LAZY_CACHE.args(_FILE_READ_BINARY.args(FILE))), "true");

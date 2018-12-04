@@ -16,8 +16,7 @@ import org.junit.*;
  */
 public final class InlineTest extends SandboxTest {
   /** Test. */
-  @Test
-  public void inlineInteger() {
+  @Test public void inlineInteger() {
     // positive integers
     run("0");
     run("1");
@@ -30,8 +29,7 @@ public final class InlineTest extends SandboxTest {
   }
 
   /** Test. */
-  @Test
-  public void inlineToken() {
+  @Test public void inlineToken() {
     // tokens with a maximum of 4 characters
     run("");
     run(" ");
@@ -52,8 +50,7 @@ public final class InlineTest extends SandboxTest {
   }
 
   /** Test. */
-  @Test
-  public void inlineWhitespaces() {
+  @Test public void inlineWhitespaces() {
     // spaces
     run("     ");
     run("      ");
@@ -67,8 +64,7 @@ public final class InlineTest extends SandboxTest {
   }
 
   /** Test. */
-  @Test
-  public void reject() {
+  @Test public void reject() {
     // too long string
     reject("abcde");
     // too long string (and too large digit)

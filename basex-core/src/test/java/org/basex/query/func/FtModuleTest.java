@@ -24,15 +24,13 @@ public final class FtModuleTest extends AdvancedQueryTest {
   /**
    * Initializes a test.
    */
-  @Before
-  public void initTest() {
+  @Before public void initTest() {
     execute(new CreateDB(NAME, FILE));
     execute(new CreateIndex(CmdIndex.FULLTEXT));
   }
 
   /** Test method. */
-  @Test
-  public void contains() {
+  @Test public void contains() {
     final Function func = _FT_CONTAINS;
 
     // check index results
@@ -73,8 +71,7 @@ public final class FtModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void search() {
+  @Test public void search() {
     final Function func = _FT_SEARCH;
 
     // check index results
@@ -116,8 +113,7 @@ public final class FtModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void count() {
+  @Test public void count() {
     final Function func = _FT_COUNT;
     query(func.args(" ()"), 0);
     query(func.args(" //*[text() contains text '1']"), 1);
@@ -127,8 +123,7 @@ public final class FtModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void mark() {
+  @Test public void mark() {
     final Function func = _FT_MARK;
     query(func.args(" //*[text() contains text '1']"),
       "<li>Exercise <mark>1</mark>\n</li>");
@@ -154,8 +149,7 @@ public final class FtModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void extract() {
+  @Test public void extract() {
     final Function func = _FT_EXTRACT;
     query(func.args(" //*[text() contains text '1']"),
       "<li>Exercise <mark>1</mark>\n</li>");
@@ -168,16 +162,14 @@ public final class FtModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void score() {
+  @Test public void score() {
     final Function func = _FT_SCORE;
     query(func.args(_FT_SEARCH.args(NAME, "2")), 1);
     query(func.args(_FT_SEARCH.args(NAME, "XML")), "1\n0.5");
   }
 
   /** Test method. */
-  @Test
-  public void tokens() {
+  @Test public void tokens() {
     final Function func = _FT_TOKENS;
     execute(new CreateIndex(IndexType.FULLTEXT));
 
@@ -193,8 +185,7 @@ public final class FtModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void tokenize() {
+  @Test public void tokenize() {
     final Function func = _FT_TOKENIZE;
 
     query(func.args(" ()"), "");
@@ -211,8 +202,7 @@ public final class FtModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void normalize() {
+  @Test public void normalize() {
     final Function func = _FT_NORMALIZE;
 
     query(func.args(" ()"), "");

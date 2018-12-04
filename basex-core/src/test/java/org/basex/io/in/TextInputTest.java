@@ -18,8 +18,7 @@ public final class TextInputTest {
   /**
    * Test small array.
    */
-  @Test
-  public void read1() {
+  @Test public void read1() {
     final byte[] data = { ' ' };
     run(data);
   }
@@ -27,8 +26,7 @@ public final class TextInputTest {
   /**
    * Test intermediate array.
    */
-  @Test
-  public void read255() {
+  @Test public void read255() {
     final int dl = 255;
     final byte[] data = new byte[dl];
     for(int d = 0; d < dl; d++) data[d] = (byte) (' ' + (d & 0x3F));
@@ -38,8 +36,7 @@ public final class TextInputTest {
   /**
    * Test large array.
    */
-  @Test
-  public void read4095() {
+  @Test public void read4095() {
     final int dl = 4095;
     final byte[] data = new byte[dl];
     for(int d = 0; d < dl; d++) data[d] = (byte) (' ' + (d & 0x3F));
@@ -49,8 +46,7 @@ public final class TextInputTest {
   /**
    * Test large array.
    */
-  @Test
-  public void read65535() {
+  @Test public void read65535() {
     final int dl = 65536;
     final byte[] data = new byte[dl];
     for(int d = 0; d < dl; d++) data[d] = (byte) (' ' + (d & 0x3F));
@@ -70,8 +66,7 @@ public final class TextInputTest {
    * Test alternate encodings.
    * @throws IOException I/O exception
    */
-  @Test
-  public void ascii() throws IOException {
+  @Test public void ascii() throws IOException {
     final String in = "a";
     encoding("Shift_JIS", in);
     encoding("UTF8", in);
@@ -87,8 +82,7 @@ public final class TextInputTest {
    * Test alternate encodings.
    * @throws IOException I/O exception
    */
-  @Test
-  public void japanese() throws IOException {
+  @Test public void japanese() throws IOException {
     final String in = "\u3053\u308c\u306f\u6bb4\u843d\u3067\u3059\u3002";
     encoding("Shift_JIS", in);
     encoding("UTF8", in);

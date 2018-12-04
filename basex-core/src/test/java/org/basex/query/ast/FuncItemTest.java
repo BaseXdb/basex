@@ -17,8 +17,7 @@ import org.junit.*;
  */
 public final class FuncItemTest extends QueryPlanTest {
   /** Checks if the identity function is pre-compiled. */
-  @Test
-  public void idTest() {
+  @Test public void idTest() {
     check("function($x) { $x }(42)",
         42,
         empty(Closure.class)
@@ -26,8 +25,7 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Checks if a function literal is pre-compiled. */
-  @Test
-  public void literalTest() {
+  @Test public void literalTest() {
     check("lower-case#1('FooBar')",
         "foobar",
         empty(FuncLit.class)
@@ -35,8 +33,7 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Checks if a partial application is pre-compiled. */
-  @Test
-  public void partAppTest() {
+  @Test public void partAppTest() {
     check("starts-with('foobar', ?)('foo')",
         true,
         empty(PartFunc.class)
@@ -44,8 +41,7 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Checks if a partial application with non-empty closure is left alone. */
-  @Test
-  public void partApp2Test() {
+  @Test public void partApp2Test() {
     check("for $sub in ('foo', 'bar')" +
         "return starts-with(?, $sub)('foobar')",
         "true\nfalse",
@@ -54,8 +50,7 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Checks that the Y combinator is pre-compiled. */
-  @Test
-  public void yCombinatorTest() {
+  @Test public void yCombinatorTest() {
     check("function($f) {" +
         "  let $loop := function($x) { $f(function() { $x($x) }) }" +
         "  return $loop($loop)" +
@@ -68,16 +63,14 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Checks if {@code fold-left1(...)} can be used. */
-  @Test
-  public void foldLeft1Test() {
+  @Test public void foldLeft1Test() {
     check("hof:fold-left1(1 to 42, function($a, $b) { max(($a, $b)) })",
         42
     );
   }
 
   /** Checks if statically unused functions are compiled at runtime. */
-  @Test
-  public void compStatUnusedTest() {
+  @Test public void compStatUnusedTest() {
     check("declare function local:foo() { abs(?) };" +
         "function-lookup(xs:QName(('local:foo')[random:double() < 1]), 0)()(-42)",
         42,
@@ -89,8 +82,7 @@ public final class FuncItemTest extends QueryPlanTest {
    * Checks if statically used functions are compiled at compile time.
    * Added because of issue GH-382.
    */
-  @Test
-  public void compStatUsedTest() {
+  @Test public void compStatUsedTest() {
     check("declare function local:a() { local:b() };" +
         "declare function local:b() { 42 };" +
         "local:a#0()",
@@ -100,8 +92,7 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Checks for circular references leading to stack overflows. */
-  @Test
-  public void noLoopTest() {
+  @Test public void noLoopTest() {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
         "let $f := local:Y(function($x) { $x() }) return ($f ! .)[1]",
         "(anonymous-function)#1",
@@ -110,8 +101,7 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Checks for circular references leading to stack overflows. */
-  @Test
-  public void noLoopTest2() {
+  @Test public void noLoopTest2() {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
         "for-each(function($x) { $x() }, local:Y#1)[2]",
         "",
@@ -120,8 +110,7 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Checks for circular references leading to stack overflows. */
-  @Test
-  public void noLoopTest3() {
+  @Test public void noLoopTest3() {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
         "let $f := for-each(function($x) { $x() }, local:Y#1) return $f[2]",
         "",
@@ -130,8 +119,7 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Checks for circular references leading to stack overflows. */
-  @Test
-  public void noLoopTest4() {
+  @Test public void noLoopTest4() {
     check("declare function local:foo($x) { function($f) { $f($x) } };" +
         "declare function local:bar($f) { $f(function($_) { $f }) };" +
         "let $a := local:foo(local:foo(function($e) { $e() })) " +
@@ -143,8 +131,7 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Checks for circular references leading to stack overflows. */
-  @Test
-  public void noLoopTest5() {
+  @Test public void noLoopTest5() {
     check("declare function local:foo($f) { $f($f) };" +
         "let $id := local:foo(function($g) { $g })" +
         "return $id(42)",
@@ -154,8 +141,7 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Checks that recursive function items are not inlined. */
-  @Test
-  public void noLoopTest6() {
+  @Test public void noLoopTest6() {
     check("let $f := function($f) { $f($f) } return $f($f)",
         null,
         exists(FuncItem.class)
@@ -163,8 +149,7 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Checks in non-recursive function items are inlined. */
-  @Test
-  public void funcItemInlining() {
+  @Test public void funcItemInlining() {
     check("let $fold-left :=" +
         "  function($f, $start, $seq) {" +
         "    let $go :=" +
@@ -193,8 +178,7 @@ public final class FuncItemTest extends QueryPlanTest {
    * Checks if function items that have a non-empty closure but no arguments are correctly inlined.
    * @see <a href="https://github.com/BaseXdb/basex/issues/796">GH-796</a>
    */
-  @Test
-  public void closureOnlyInlining() {
+  @Test public void closureOnlyInlining() {
     check("declare function local:f($x as item()) { function() { $x } };" +
         "declare function local:g($f, $x) {if(fn:empty($f())) then local:f($x) else local:f(())};" +
         "declare variable $x := local:g(function() { () }, function() { () });" +
@@ -206,15 +190,13 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Tests for coercion of function items. */
-  @Test
-  public void funcItemCoercion() {
+  @Test public void funcItemCoercion() {
     error("let $f := function($g as function() as item()) { $g() }" +
         "return $f(function() { 1, 2 })", INVTYPE_X_X_X);
   }
 
   /** Checks if nested closures are inlined. */
-  @Test
-  public void nestedClosures() {
+  @Test public void nestedClosures() {
     check("for $i in 1 to 3 "
         + "let $f := function($x) { $i * $x },"
         + "    $g := function($y) { 2 * $f($y) }"
@@ -225,16 +207,14 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Tests if all functions are compiled when reflection takes places. */
-  @Test
-  public void gh839() {
+  @Test public void gh839() {
     check("declare function local:f() { function() { () } };"
         + "function-lookup(xs:QName('local:f'), 0)()(),"
         + "inspect:functions()()()", "");
   }
 
   /** Tests if recursive function items are inlined only once. */
-  @Test
-  public void gh879() {
+  @Test public void gh879() {
     check("declare function local:foo($root) {" +
         "  let $go :=" +
         "    function($go, $e) {" +
@@ -255,8 +235,7 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Tests if not-yet-known function references are parsed correctly. */
-  @Test
-  public void gh953() {
+  @Test public void gh953() {
     check("declare function local:go ($n) { $n, for-each($n/*, local:go(?)) };" +
         "let $source := <a><b/></a> return local:go($source)",
         "<a>\n<b/>\n</a>\n<b/>"
@@ -264,15 +243,13 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Tests if {@code fn:error()} is allowed with impossible types. */
-  @Test
-  public void gh958() {
+  @Test public void gh958() {
     error("declare function local:f() as item()+ { error() }; local:f()", FUNERR1);
     error("function() as item()+ { error() }()", FUNERR1);
   }
 
   /** Checks that run-time values are not inlined into the static AST. */
-  @Test
-  public void gh1023() {
+  @Test public void gh1023() {
     check("for $n in (<a/>, <b/>)"
         + "let $f := function() as element()* { trace($n) }"
         + "return $f()",
@@ -280,8 +257,7 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Checks that functions circularly referenced through function literals are compiled. */
-  @Test
-  public void gh1038() {
+  @Test public void gh1038() {
     check("declare function local:a() { let $a := local:c() return () };"
         + "declare function local:b() { let $a := function() { local:a() } return () };"
         + "declare function local:c() { local:b#0() };"
@@ -291,8 +267,7 @@ public final class FuncItemTest extends QueryPlanTest {
   }
 
   /** Static typing. */
-  @Test
-  public void gh1649() {
+  @Test public void gh1649() {
     check("function($v) { if($v = 0) then () else $v }(<x>0</x>)",
         "",
         type(If.class, "element()?"));

@@ -31,8 +31,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * Initializes a test.
    * @throws Exception any exception
    */
-  @Before
-  public void setUp() throws Exception {
+  @Before public void setUp() throws Exception {
     createDB();
     final Class<?> c = Class.forName(DRIVER);
     final Database database = (Database) c.getDeclaredConstructor().newInstance();
@@ -44,8 +43,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * Finalizes a test.
    * @throws Exception any exception
    */
-  @After
-  public void tearDown() throws Exception {
+  @After public void tearDown() throws Exception {
     coll.close();
     dropDB();
   }
@@ -54,8 +52,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testParentCollection() throws Exception {
+  @Test public void testParentCollection() throws Exception {
     assertEquals("Wrong collection name.", res.getParentCollection(), coll);
   }
 
@@ -63,8 +60,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetID() throws Exception {
+  @Test public void testGetID() throws Exception {
     assertEquals("Wrong ID.", res.getId(), DOC1);
   }
 
@@ -72,8 +68,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetResourceType() throws Exception {
+  @Test public void testGetResourceType() throws Exception {
     assertEquals("Wrong resource type.", res.getResourceType(),
         XMLResource.RESOURCE_TYPE);
   }
@@ -82,8 +77,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetContent() throws Exception {
+  @Test public void testGetContent() throws Exception {
     compare(DOCPATH + DOC1, res);
   }
 
@@ -91,8 +85,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetDocumentID() throws Exception {
+  @Test public void testGetDocumentID() throws Exception {
     // id and document id should be identical
     assertEquals("ID and DocumentID differ.", res.getId(), res.getDocumentId());
   }
@@ -101,8 +94,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetContentAsDOM() throws Exception {
+  @Test public void testGetContentAsDOM() throws Exception {
     final Node node = res.getContentAsDOM();
     final String root = node.getChildNodes().item(0).getNodeName();
     assertTrue("Document instance expected.", node instanceof Document);
@@ -113,8 +105,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testSetContentAsDOM() throws Exception {
+  @Test public void testSetContentAsDOM() throws Exception {
     // store small document
     final XMLResource xml = (XMLResource) coll.createResource(DOC2, XMLResource.RESOURCE_TYPE);
     xml.setContent("<xml/>");
@@ -137,8 +128,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetContentAsSAX() throws Exception {
+  @Test public void testGetContentAsSAX() throws Exception {
     final DefaultHandler ch = new DefaultHandler() {
       int count;
       @Override
@@ -158,8 +148,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testSetContentAsSAX() throws Exception {
+  @Test public void testSetContentAsSAX() throws Exception {
     // store small document
     final XMLResource doc2 = (XMLResource) coll.createResource(DOC2, XMLResource.RESOURCE_TYPE);
     final XMLResource doc3 = (XMLResource) coll.createResource(DOC3, XMLResource.RESOURCE_TYPE);

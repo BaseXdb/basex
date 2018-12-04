@@ -22,8 +22,7 @@ public abstract class XQJBaseTest {
    * @throws XQException query exception
    */
   @SuppressWarnings("unused")
-  @Before
-  public void setUp() throws XQException {
+  @Before public void setUp() throws XQException {
     xqds = new BaseXXQDataSource();
     xqc = xqds.getConnection();
   }
@@ -32,8 +31,7 @@ public abstract class XQJBaseTest {
    * Finalizes a test.
    * @throws XQException xquery exception
    */
-  @After
-  public void tearDown() throws XQException {
+  @After public void tearDown() throws XQException {
     xqc.close();
   }
 

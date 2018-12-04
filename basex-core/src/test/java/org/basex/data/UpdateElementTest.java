@@ -18,8 +18,7 @@ public final class UpdateElementTest extends DataUpdateTest {
    * Tests insert as last child.
    * @throws IOException I/O exception
    */
-  @Test
-  public void insertElementAsOnly1() throws IOException {
+  @Test public void insertElementAsOnly1() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertElement(3, 0, T_JUNIT, Data.ELEM);
@@ -45,8 +44,7 @@ public final class UpdateElementTest extends DataUpdateTest {
    * Tests insert as last child.
    * @throws IOException I/O exception
    */
-  @Test
-  public void insertElementAsOnly2() throws IOException {
+  @Test public void insertElementAsOnly2() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertElement(3, 1, T_JUNIT, Data.ELEM);
@@ -72,8 +70,7 @@ public final class UpdateElementTest extends DataUpdateTest {
    * Tests insert as last child.
    * @throws IOException I/O exception
    */
-  @Test
-  public void insertElementAsOnly3() throws IOException {
+  @Test public void insertElementAsOnly3() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertElement(3, 2, T_JUNIT, Data.ELEM);
@@ -99,8 +96,7 @@ public final class UpdateElementTest extends DataUpdateTest {
    * Tests insert as last child.
    * @throws IOException I/O exception
    */
-  @Test
-  public void insertElementAfterAttsAsFirst() throws IOException {
+  @Test public void insertElementAfterAttsAsFirst() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertElement(6, 1, T_JUNIT, Data.ELEM);
@@ -125,8 +121,7 @@ public final class UpdateElementTest extends DataUpdateTest {
    * Tests insert as last child.
    * @throws IOException I/O exception
    */
-  @Test
-  public void insertElementAfterAttsAsSecond() throws IOException {
+  @Test public void insertElementAfterAttsAsSecond() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertElement(6, 2, T_JUNIT, Data.ELEM);
@@ -151,8 +146,7 @@ public final class UpdateElementTest extends DataUpdateTest {
    * Tests insert as last child.
    * @throws IOException I/O exception
    */
-  @Test
-  public void insertElementAfterAttsAsLast() throws IOException {
+  @Test public void insertElementAfterAttsAsLast() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertElement(6, 0, T_JUNIT, Data.ELEM);
@@ -177,8 +171,7 @@ public final class UpdateElementTest extends DataUpdateTest {
    * Tests updateTagName.
    * @throws IOException I/O exception
    */
-  @Test
-  public void updateElementName() throws IOException {
+  @Test public void updateElementName() throws IOException {
     final Data data = context.data();
     data.startUpdate(context.options);
     data.update(6, Data.ELEM, T_JUNIT, Token.EMPTY);

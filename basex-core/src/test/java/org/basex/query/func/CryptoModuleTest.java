@@ -18,8 +18,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   }
 
   /** Checks default/empty arguments. */
-  @Test
-  public void check() {
+  @Test public void check() {
     query("crypto:hmac('msg','key','','')");
     query("crypto:encrypt('msg','','keykeyke','')");
     query("crypto:decrypt(crypto:encrypt('msg','','keykeyke',''),'','keykeyke','')");
@@ -30,8 +29,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   /**
    * Test method for encrypt and decrypt with symmetric keys.
    */
-  @Test
-  public void encryption1() {
+  @Test public void encryption1() {
     final String msg = "messagemessagemessagemessagemessagemessagemessage";
 
     query("let $e := crypto:encrypt('" + msg + "','symmetric','aaabbbaa'," +
@@ -42,8 +40,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   /**
    * Test method for encrypt and decrypt with symmetric keys.
    */
-  @Test
-  public void encryption2() {
+  @Test public void encryption2() {
     final String msg = "messagemessagemessagemessagemessagemessagemessage";
 
     query("let $e := crypto:encrypt('" + msg + "','symmetric','abababababababab'," +
@@ -53,16 +50,14 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   /**
    * Tests the creation of a message authentication code for the md5 algorithm.
    */
-  @Test
-  public void hmacMD5defencoding() {
+  @Test public void hmacMD5defencoding() {
     query("crypto:hmac('message','key','md5')", "TkdI5itGNSH2d1+/khI0tQ==");
   }
 
   /**
    * Tests the creation of a message authentication code for the md5 algorithm.
    */
-  @Test
-  public void hmacMD5hex() {
+  @Test public void hmacMD5hex() {
     query("crypto:hmac('message','key','md5', 'hex')",
         "4E4748E62B463521F6775FBF921234B5");
   }
@@ -70,16 +65,14 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   /**
    * Tests the creation of a message authentication code for the md5 algorithm.
    */
-  @Test
-  public void hmacMD5base64() {
+  @Test public void hmacMD5base64() {
     query("crypto:hmac('message','key','md5', 'base64')", "TkdI5itGNSH2d1+/khI0tQ==");
   }
 
   /**
    * Tests the creation of a message authentication code for the sha1 algorithm.
    */
-  @Test
-  public void hmacSHA1hex() {
+  @Test public void hmacSHA1hex() {
     query("crypto:hmac('message','key','sha1', 'hex')",
         "2088DF74D5F2146B48146CAF4965377E9D0BE3A4");
   }
@@ -87,8 +80,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
   /**
    * Tests the creation of a message authentication code for the sha1 algorithm.
    */
-  @Test
-  public void hmacSHA1base64() {
+  @Test public void hmacSHA1base64() {
     query("crypto:hmac('message','key','sha1', 'base64')",
         "IIjfdNXyFGtIFGyvSWU3fp0L46Q=");
   }
@@ -97,8 +89,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests the creation of a message authentication code for the sha256
    * algorithm.
    */
-  @Test
-  public void hmacSHA256hex() {
+  @Test public void hmacSHA256hex() {
     query("crypto:hmac('message','key','sha256', 'hex')",
         "6E9EF29B75FFFC5B7ABAE527D58FDADB2FE42E7219011976917343065F58ED4A");
   }
@@ -107,8 +98,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests the creation of a message authentication code for the sha256
    * algorithm.
    */
-  @Test
-  public void hmacSHA256base64() {
+  @Test public void hmacSHA256base64() {
     query("crypto:hmac('message','key','sha256', 'base64')",
         "bp7ym3X//Ft6uuUn1Y/a2y/kLnIZARl2kXNDBl9Y7Uo=");
   }
@@ -117,8 +107,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests the creation of a message authentication code for the sha384
    * algorithm.
    */
-  @Test
-  public void hmacSHA384hex() {
+  @Test public void hmacSHA384hex() {
     query("crypto:hmac('message','key','sha384', 'hex')",
         "2088DF74D5F2146B48146CAF4965377E9D0BE3A4");
   }
@@ -127,8 +116,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests the creation of a message authentication code for the sha384
    * algorithm.
    */
-  @Test
-  public void hmacSHA384base64() {
+  @Test public void hmacSHA384base64() {
     query("crypto:hmac('message','key','sha384', 'base64')",
         "IIjfdNXyFGtIFGyvSWU3fp0L46Q=");
   }
@@ -137,8 +125,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests the creation of a message authentication code for the sha512
    * algorithm.
    */
-  @Test
-  public void hmacSHA512hex() {
+  @Test public void hmacSHA512hex() {
     query("crypto:hmac('message','key','sha512', 'hex')",
         "E477384D7CA229DD1426E64B63EBF2D36EBD6D7E669A6735424E72EA6C01D3F8" +
         "B56EB39C36D8232F5427999B8D1A3F9CD1128FC69F4D75B434216810FA367E98");
@@ -148,8 +135,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests the creation of a message authentication code for the sha512
    * algorithm.
    */
-  @Test
-  public void hmacSHA512base64() {
+  @Test public void hmacSHA512base64() {
     query("crypto:hmac('message','key','sha512', 'base64')",
         "5Hc4TXyiKd0UJuZLY+vy0269bX5mmmc1Qk5y6mwB0/i1brOcNtgjL1QnmZuNGj+c0RK" +
         "Pxp9NdbQ0IWgQ+jZ+mA==");
@@ -159,8 +145,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignature1() {
+  @Test public void validateSignature1() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>,'','','','',''))",
         true);
   }
@@ -169,8 +154,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignature1b() {
+  @Test public void validateSignature1b() {
     query("crypto:validate-signature(" +
         "crypto:generate-signature(<a/>,'','SHA1','DSA_SHA1','','enveloped'))", true);
   }
@@ -179,8 +163,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignature1c() {
+  @Test public void validateSignature1c() {
     final String input =
         "<a><Signature xmlns='http://www.w3.org/2000/09/xmldsig#'>" +
         "<SignedInfo><CanonicalizationMethod " +
@@ -204,8 +187,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureWithCanonicalization() {
+  @Test public void validateSignatureWithCanonicalization() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>," +
         "'exclusive','','','',''))", true);
   }
@@ -214,8 +196,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureWithCanonicalization2() {
+  @Test public void validateSignatureWithCanonicalization2() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>," +
         "'exclusive-with-comments','','','',''))", true);
   }
@@ -224,8 +205,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureWithCanonicalization3() {
+  @Test public void validateSignatureWithCanonicalization3() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>," +
         "'inclusive','','','',''))", true);
   }
@@ -234,8 +214,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureWithCanonicalization4() {
+  @Test public void validateSignatureWithCanonicalization4() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>," +
         "'inclusive-with-comments','','','',''))", true);
   }
@@ -244,8 +223,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureWithDigestAlgorithm() {
+  @Test public void validateSignatureWithDigestAlgorithm() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>,'','SHA1','','',''))",
         true);
   }
@@ -254,8 +232,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureWithDigestAlgorithm2() {
+  @Test public void validateSignatureWithDigestAlgorithm2() {
     query("crypto:validate-signature(crypto:generate-signature(" +
         "<a/>,'','SHA256','','',''))", true);
   }
@@ -264,8 +241,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureWithDigestAlgorithm3() {
+  @Test public void validateSignatureWithDigestAlgorithm3() {
     query("crypto:validate-signature(crypto:generate-signature(" +
         "<a/>,'','SHA512','','',''))", true);
   }
@@ -274,8 +250,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureWithSignatureAlgorithm() {
+  @Test public void validateSignatureWithSignatureAlgorithm() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>,'',''," +
         "'DSA_SHA1','',''))", true);
   }
@@ -284,8 +259,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureWithSignatureAlgorithm2() {
+  @Test public void validateSignatureWithSignatureAlgorithm2() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>,'',''," +
         "'RSA_SHA1','',''))",
         true);
@@ -295,8 +269,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureWithSignatureNamespace3() {
+  @Test public void validateSignatureWithSignatureNamespace3() {
     query("crypto:validate-signature(crypto:generate-signature(" +
         "<a/>,'','','','prefix',''))", true);
   }
@@ -305,8 +278,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureWithSignatureType() {
+  @Test public void validateSignatureWithSignatureType() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>,'','','',''," +
         "'enveloped'))", true);
   }
@@ -315,8 +287,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureWithSignatureType2() {
+  @Test public void validateSignatureWithSignatureType2() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>,'','','',''," +
         "'enveloping'))", true);
   }
@@ -325,8 +296,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureWithXPath() {
+  @Test public void validateSignatureWithXPath() {
     query("crypto:validate-signature(crypto:generate-signature(<a><n/><n/></a>," +
         "'','','','','','/a/n'))", true);
   }
@@ -335,8 +305,7 @@ public final class CryptoModuleTest extends AdvancedQueryTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureFullySpecified() {
+  @Test public void validateSignatureFullySpecified() {
     query("crypto:validate-signature(crypto:generate-signature(<a><n/></a>," +
         "'exclusive','SHA512','RSA_SHA1','myPrefix','enveloped','/a/n'))", true);
   }

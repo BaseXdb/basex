@@ -18,8 +18,7 @@ import org.junit.*;
  */
 public final class GeoTest extends SandboxTest {
   /** Test method. */
-  @Test
-  public void dimension() {
+  @Test public void dimension() {
     run("geo:dimension(" +
             "<gml:Point><gml:coordinates>1,2</gml:coordinates></gml:Point>)", "0");
 
@@ -31,8 +30,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void geometryType() {
+  @Test public void geometryType() {
     run("geo:geometryType(<gml:MultiPoint><gml:Point>" +
             "<gml:coordinates>1,1</gml:coordinates></gml:Point>" +
             "<gml:Point><gml:coordinates>1,2</gml:coordinates></gml:Point>" +
@@ -45,8 +43,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void srid() {
+  @Test public void srid() {
     run("geo:srid(<gml:Polygon srsName=" +
             "\"http://www.opengis.net/gml/srs/epsg.xml#4326\">" +
             "<outerboundaryIs><gml:LinearRing><coordinates>" +
@@ -60,8 +57,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void envelope() {
+  @Test public void envelope() {
     run("geo:envelope(<gml:LinearRing><gml:coordinates>1,1 20,1 50,30 1,1" +
             "</gml:coordinates></gml:LinearRing>)",
             "<gml:Polygon xmlns:gml=\"http://www.opengis.net/gml\">" +
@@ -76,8 +72,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void asText() {
+  @Test public void asText() {
     run("geo:asText(<gml:LineString><gml:coordinates>1,1 55,99 2,1" +
             "</gml:coordinates></gml:LineString>)", "LINESTRING (1 1, 55 99, 2 1)");
 
@@ -88,8 +83,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void asBinary() {
+  @Test public void asBinary() {
     run("string(geo:asBinary(<gml:LineString><gml:coordinates>1,1 55,99 2,1" +
             "</gml:coordinates></gml:LineString>))",
           "AAAAAAIAAAADP/AAAAAAAAA/8AAAAAAAAEBLgAAAAAAAQFjAAAAAAABAAAAAAAAAAD/wAAAAAAAA");
@@ -101,8 +95,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void isSimple() {
+  @Test public void isSimple() {
     run("geo:isSimple(<gml:LineString><gml:coordinates>1,1 20,1 10,4 20,-10" +
             "</gml:coordinates></gml:LineString>)", "false");
 
@@ -113,8 +106,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void boundary() {
+  @Test public void boundary() {
     run("geo:boundary(<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
         "<gml:coordinates>11,11 18,11 18,18 11,18 11,11</gml:coordinates>" +
         "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>)",
@@ -133,8 +125,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void equals() {
+  @Test public void equals() {
     run("geo:equals(<gml:LinearRing><gml:coordinates>1,1 2,1 5,3 1,1" +
             "</gml:coordinates></gml:LinearRing>, " +
             "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
@@ -151,8 +142,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void disjoint() {
+  @Test public void disjoint() {
     run("geo:disjoint(<gml:MultiLineString><gml:LineString><gml:coordinates>" +
             "1,1 0,0 2,1</gml:coordinates></gml:LineString><gml:LineString>" +
             "<gml:coordinates>2,1 3,3 4,4</gml:coordinates></gml:LineString>" +
@@ -169,8 +159,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void intersects() {
+  @Test public void intersects() {
     run("geo:intersects(<gml:MultiLineString><gml:LineString><gml:coordinates>" +
             "1,1 0,0 2,1</gml:coordinates></gml:LineString><gml:LineString>" +
             "<gml:coordinates>2,1 3,3 4,4</gml:coordinates></gml:LineString>" +
@@ -187,8 +176,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void touches() {
+  @Test public void touches() {
     run("geo:touches(<gml:MultiLineString><gml:LineString><gml:coordinates>" +
         "1,1 0,0 2,1</gml:coordinates></gml:LineString><gml:LineString>" +
         "<gml:coordinates>2,1 3,3 4,4</gml:coordinates></gml:LineString>" +
@@ -205,8 +193,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void crosses() {
+  @Test public void crosses() {
     run("geo:crosses(" +
         "<gml:Point><gml:coordinates>10,11</gml:coordinates></gml:Point>, " +
         "<gml:LineString><gml:coordinates>0,0 2,2</gml:coordinates></gml:LineString>)",
@@ -222,8 +209,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void within() {
+  @Test public void within() {
     run("geo:within(<gml:LinearRing><gml:coordinates>1,1 2,1 5,3 1,1" +
             "</gml:coordinates></gml:LinearRing>, " +
             "<gml:LinearRing><gml:coordinates>1,1 20,1 50,30 1,1</gml:coordinates>" +
@@ -239,8 +225,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void contains() {
+  @Test public void contains() {
     run("geo:contains(" +
             "<gml:Point><gml:coordinates>1,1</gml:coordinates></gml:Point>, " +
             "<gml:Point><gml:coordinates>1.00,1.00</gml:coordinates></gml:Point>)",
@@ -257,8 +242,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void overlaps() {
+  @Test public void overlaps() {
     run("geo:overlaps(" +
         "<gml:LineString><gml:coordinates>1,1 55,99 2,1</gml:coordinates>" +
         "</gml:LineString>, <gml:LineString><gml:coordinates>1,1 55,0" +
@@ -274,8 +258,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void relate() {
+  @Test public void relate() {
     run("geo:relate(" +
         "<gml:Point><gml:coordinates>18,11</gml:coordinates></gml:Point>, " +
         "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
@@ -301,8 +284,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void distance() {
+  @Test public void distance() {
     run("geo:distance(<gml:LinearRing><gml:coordinates>10,400 20,200 30,100 " +
         "20,100 10,400</gml:coordinates></gml:LinearRing>, " +
         "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
@@ -319,8 +301,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void buffer() {
+  @Test public void buffer() {
     run("geo:buffer(<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
         "<gml:coordinates>10,10 20,10 30,40 20,40 10,10</gml:coordinates>" +
         "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>,xs:double(0))",
@@ -343,8 +324,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void convexHull() {
+  @Test public void convexHull() {
     run("geo:convexHull(<gml:LinearRing><gml:coordinates>1,1 55,99 2,2 1,1" +
             "</gml:coordinates></gml:LinearRing>)",
             "<gml:Polygon xmlns:gml=\"http://www.opengis.net/gml\">" +
@@ -359,8 +339,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void intersection() {
+  @Test public void intersection() {
     run("geo:intersection(<gml:LinearRing><gml:coordinates>1,1 55,99 2,3 1,1" +
             "</gml:coordinates></gml:LinearRing>," +
             "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
@@ -384,8 +363,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void union() {
+  @Test public void union() {
     run("geo:union(<gml:Point><gml:coordinates>2</gml:coordinates></gml:Point>," +
             "<gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>)",
             "<gml:MultiPoint xmlns:gml=\"http://www.opengis.net/gml\">" +
@@ -410,8 +388,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void difference() {
+  @Test public void difference() {
     run("geo:difference(" +
         "<gml:Point><gml:coordinates>20,1</gml:coordinates></gml:Point>," +
         "<gml:LinearRing><gml:coordinates>0,0 20,20 20,30 0,20 0,0" +
@@ -428,8 +405,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void symDifference() {
+  @Test public void symDifference() {
     run("geo:symDifference(" +
             "<gml:Point><gml:coordinates>20,1</gml:coordinates></gml:Point>," +
             "<gml:LinearRing><gml:coordinates>0,0 20,20 20,30 0,20 0,0" +
@@ -451,8 +427,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void geometryN() {
+  @Test public void geometryN() {
     run("geo:geometryN(" +
             "<gml:Point><gml:coordinates>2,1</gml:coordinates></gml:Point>, 1)",
             "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
@@ -473,8 +448,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void x() {
+  @Test public void x() {
     run("geo:x(<gml:Point><gml:coordinates>2,1</gml:coordinates></gml:Point>)", "2");
 
     error("geo:x(<gml:MultiPoint><gml:Point><gml:coordinates>1,1" +
@@ -493,8 +467,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void y() {
+  @Test public void y() {
     run("geo:y(<gml:Point><gml:coordinates>2,1</gml:coordinates></gml:Point>)",
             "1");
     run("geo:y(<gml:Point><gml:coordinates>2</gml:coordinates></gml:Point>)", "0");
@@ -514,8 +487,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void z() {
+  @Test public void z() {
     run("geo:z(<gml:Point><gml:coordinates>2,1,3</gml:coordinates></gml:Point>)",
         "3");
     run("geo:z(<gml:Point><gml:coordinates>2</gml:coordinates></gml:Point>)",
@@ -535,8 +507,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void length() {
+  @Test public void length() {
     run("geo:length(" +
             "<gml:Point><gml:coordinates>2,1,3</gml:coordinates></gml:Point>)", "0");
 
@@ -556,8 +527,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void startPoint() {
+  @Test public void startPoint() {
     run("geo:startPoint(<gml:LinearRing><gml:coordinates>1,1 20,1 20,20 1,1" +
             "</gml:coordinates></gml:LinearRing>)",
             "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
@@ -583,8 +553,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void endPoint() {
+  @Test public void endPoint() {
     run("geo:endPoint(<gml:LinearRing><gml:coordinates>2,3 20,1 20,20 2,3" +
             "</gml:coordinates></gml:LinearRing>)",
             "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
@@ -609,8 +578,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void isClosed() {
+  @Test public void isClosed() {
     run("geo:isClosed(<gml:LinearRing><gml:coordinates>2,3 20,1 20,20 2,3" +
             "</gml:coordinates></gml:LinearRing>)", "true");
     run("geo:isClosed(<gml:MultiLineString><gml:LineString><gml:coordinates>" +
@@ -635,8 +603,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void isRing() {
+  @Test public void isRing() {
     run("geo:isRing(<gml:LinearRing><gml:coordinates>2,3 20,1 20,20 2,3" +
             "</gml:coordinates></gml:LinearRing>)", "true");
 
@@ -660,8 +627,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void numPoints() {
+  @Test public void numPoints() {
     run("geo:numPoints(<gml:LinearRing><gml:coordinates>2,3 20,1 20,20 2,3" +
             "</gml:coordinates></gml:LinearRing>)", "4");
 
@@ -682,8 +648,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void pointN() {
+  @Test public void pointN() {
     run("geo:pointN(<gml:LinearRing><gml:coordinates>2,3 20,1 20,20 2,3" +
             "</gml:coordinates></gml:LinearRing>, 1)",
             "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
@@ -710,8 +675,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void area() {
+  @Test public void area() {
     run("geo:area(<gml:MultiPoint><gml:Point><gml:coordinates>1,1" +
             "</gml:coordinates></gml:Point><gml:Point><gml:coordinates>1,2" +
             "</gml:coordinates></gml:Point></gml:MultiPoint>)", "0");
@@ -731,8 +695,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void centroid() {
+  @Test public void centroid() {
     run("geo:centroid(<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
             "<gml:coordinates>11,11 18,11 18,18 11,18 11,11</gml:coordinates>" +
             "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>)",
@@ -760,8 +723,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void pointOnSurface() {
+  @Test public void pointOnSurface() {
     run("geo:pointOnSurface(<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
             "<gml:coordinates>11,11 18,11 18,18 11,18 11,11</gml:coordinates>" +
             "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>)",
@@ -789,8 +751,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void exteriorRing() {
+  @Test public void exteriorRing() {
     run("geo:exteriorRing(<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
             "<gml:coordinates>11,11 18,11 18,18 11,18 11,11</gml:coordinates>" +
             "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>)",
@@ -809,8 +770,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void numInteriorRing() {
+  @Test public void numInteriorRing() {
     run("geo:numInteriorRing(" +
             "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
             "<gml:coordinates>11,11 18,11 18,18 11,18 11,11</gml:coordinates>" +
@@ -829,8 +789,7 @@ public final class GeoTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test
-  public void interiorRingN() {
+  @Test public void interiorRingN() {
     run("geo:interiorRingN(<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
             "<gml:coordinates>11,11 18,11 18,18 11,18 11,11</gml:coordinates>" +
             "</gml:LinearRing></gml:outerBoundaryIs><gml:innerBoundaryIs>" +

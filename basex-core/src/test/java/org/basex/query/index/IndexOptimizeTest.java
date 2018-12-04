@@ -53,8 +53,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   }
 
   /** Checks the XQuery doc() function. */
-  @Test
-  public void docTest() {
+  @Test public void docTest() {
     createDoc();
     final String func = DOC.args(NAME);
     check(func + "//*[text() = '1']");
@@ -67,8 +66,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   }
 
   /** Checks the XQuery collection() function. */
-  @Test
-  public void collTest() {
+  @Test public void collTest() {
     createColl();
     final String func = COLLECTION.args(NAME);
     check(func + "//*[text() = '1']");
@@ -82,8 +80,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   }
 
   /** Checks the XQuery db:open() function. */
-  @Test
-  public void dbOpenTest() {
+  @Test public void dbOpenTest() {
     createColl();
     final String func = _DB_OPEN.args(NAME);
     check(func + "//*[text() = '1']");

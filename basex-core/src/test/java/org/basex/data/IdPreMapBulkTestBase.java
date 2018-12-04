@@ -26,8 +26,7 @@ public abstract class IdPreMapBulkTestBase {
   private ArrayList<int[]> ops;
 
   /** Set-up method. */
-  @Before
-  public void setUp() {
+  @Before public void setUp() {
     final int ml = baseid + 1;
     final int[] map = new int[ml];
     for(int m = 0; m < ml; m++) map[m] = m;

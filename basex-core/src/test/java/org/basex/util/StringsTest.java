@@ -11,8 +11,7 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public class StringsTest {
-  /** Test. */ @Test
-  public void capitalize() {
+  /** Test. */ @Test public void capitalize() {
     assertEquals("", Strings.capitalize(""));
     assertEquals("A", Strings.capitalize("a"));
     assertEquals("A", Strings.capitalize("A"));
@@ -20,8 +19,7 @@ public class StringsTest {
     assertEquals(".a", Strings.capitalize(".a"));
   }
 
-  /** Test. */ @Test
-  public void camelCase() {
+  /** Test. */ @Test public void camelCase() {
     assertEquals("", Strings.camelCase(""));
     assertEquals("a", Strings.camelCase("a"));
     assertEquals("aB", Strings.camelCase("a-b"));
@@ -30,8 +28,7 @@ public class StringsTest {
     assertEquals("a/b.cD", Strings.camelCase("a/b.c-D"));
   }
 
-  /** Test. */ @Test
-  public void className() {
+  /** Test. */ @Test public void className() {
     assertEquals("", Strings.className(""));
     assertEquals("A", Strings.className("a"));
     assertEquals(".", Strings.className("."));
@@ -45,8 +42,7 @@ public class StringsTest {
     assertEquals("a.BC", Strings.className("a/-b-c"));
   }
 
-  /** Test. */ @Test
-  public void uri2Path() {
+  /** Test. */ @Test public void uri2Path() {
     assertEquals("a", Strings.uri2path("a"));
     assertEquals("a", Strings.uri2path("/a"));
     assertEquals("a/b", Strings.uri2path("a/b"));

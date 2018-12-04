@@ -17,15 +17,13 @@ import org.junit.*;
  */
 public final class ArrayRemoveTest extends ArrayTest {
   /** Remove one element from singleton array. */
-  @Test
-  public void singletonTest() {
+  @Test public void singletonTest() {
     final XQArray singleton = XQArray.singleton(Int.get(42));
     assertSame(XQArray.empty(), singleton.remove(0, qc));
   }
 
   /** Delete each element once from arrays of varying length. */
-  @Test
-  public void deleteOneTest() {
+  @Test public void deleteOneTest() {
     final int n = 200;
     XQArray arr = XQArray.empty();
     for(int k = 0; k < n; k++) {
@@ -45,8 +43,7 @@ public final class ArrayRemoveTest extends ArrayTest {
   }
 
   /** Delete elements so that the middle tree collapses. */
-  @Test
-  public void collapseMiddleTest() {
+  @Test public void collapseMiddleTest() {
     final XQArray arr = from(0, 1, 2, 3, 4, 5, 6, 7, 8);
 
     XQArray arr2 = arr.tail();
@@ -66,8 +63,7 @@ public final class ArrayRemoveTest extends ArrayTest {
   }
 
   /** Delete elements so that the left digit is emptied. */
-  @Test
-  public void emptyLeftDigitTest() {
+  @Test public void emptyLeftDigitTest() {
     XQArray arr = from(0, 1, 2, 3, 4, 5, 6, 7, 8);
     arr = arr.remove(0, qc);
     arr = arr.remove(0, qc);
@@ -77,8 +73,7 @@ public final class ArrayRemoveTest extends ArrayTest {
   }
 
   /** Delete elements so that the right digit is emptied. */
-  @Test
-  public void emptyRightDigitTest() {
+  @Test public void emptyRightDigitTest() {
     XQArray arr = from(0, 1, 2, 3, 4, 5, 6, 7, 8);
     arr = arr.remove(8, qc);
     arr = arr.remove(7, qc);
@@ -94,8 +89,7 @@ public final class ArrayRemoveTest extends ArrayTest {
   }
 
   /** Delete in the left digit of a deep node. */
-  @Test
-  public void deepLeftTest() {
+  @Test public void deepLeftTest() {
     XQArray arr = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
     arr = arr.remove(3, qc);
     assertContains(arr, 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
@@ -155,8 +149,7 @@ public final class ArrayRemoveTest extends ArrayTest {
   }
 
   /** Delete in the middle tree of a deep node. */
-  @Test
-  public void deepMiddleTest() {
+  @Test public void deepMiddleTest() {
     XQArray arr = from(
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -183,8 +176,7 @@ public final class ArrayRemoveTest extends ArrayTest {
   }
 
   /** Delete in the right digit of a deep node. */
-  @Test
-  public void deepRightTest() {
+  @Test public void deepRightTest() {
     XQArray arr = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
     for(int i = 12; i >= 8; i--) arr = arr.remove(i, qc);
     arr = arr.remove(8, qc);
@@ -199,8 +191,7 @@ public final class ArrayRemoveTest extends ArrayTest {
   /**
    * Randomly delete elements until an array is empty.
    */
-  @Test
-  public void fuzzyTest() {
+  @Test public void fuzzyTest() {
     final int n = 20_000;
     final ArrayList<Value> list = new ArrayList<>(n);
     for(int i = 0; i < n; i++) list.add(Int.get(i));
@@ -228,8 +219,7 @@ public final class ArrayRemoveTest extends ArrayTest {
   /**
    * Simple remove test.
    */
-  @Test
-  public void removeTest() {
+  @Test public void removeTest() {
     final int n = 100;
     XQArray seq = XQArray.empty();
 

@@ -24,16 +24,14 @@ public final class XQJTest extends SandboxTest {
    * Starts the tests.
    * @throws IOException I/O exception
    */
-  @BeforeClass
-  public static void before() throws IOException {
+  @BeforeClass public static void before() throws IOException {
     server = createServer();
   }
 
   /**
    * Finishes the tests.
    */
-  @AfterClass
-  public static void after() {
+  @AfterClass public static void after() {
     stopServer(server);
   }
 
@@ -41,8 +39,7 @@ public final class XQJTest extends SandboxTest {
    * Simple query.
    * @throws Exception exception
    */
-  @Test
-  public void basicTest() throws Exception {
+  @Test public void basicTest() throws Exception {
     final XQDataSource xqds = new BaseXXQDataSource();
     xqds.setProperty("serverName", "localhost");
     xqds.setProperty("port", String.valueOf(DB_PORT));
@@ -65,8 +62,7 @@ public final class XQJTest extends SandboxTest {
    * Simple query.
    * @throws Exception exception
    */
-  @Test
-  public void entityTest() throws Exception {
+  @Test public void entityTest() throws Exception {
     final XQDataSource xqds = new BaseXXQDataSource();
     xqds.setProperty("serverName", "localhost");
     xqds.setProperty("port", String.valueOf(DB_PORT));

@@ -45,16 +45,14 @@ public final class ValueIndexTest extends QueryPlanTest {
   /**
    * Initializes a test.
    */
-  @Before
-  public void before() {
+  @Before public void before() {
     set(MainOptions.MAINMEM, mainmem);
   }
 
   /**
    * Finalizes a test.
    */
-  @After
-  public void after() {
+  @After public void after() {
     set(MainOptions.MAINMEM, false);
     set(MainOptions.UPDINDEX, false);
     set(MainOptions.FTINDEX, false);
@@ -67,16 +65,14 @@ public final class ValueIndexTest extends QueryPlanTest {
   /**
    * Initializes the tests.
    */
-  @BeforeClass
-  public static void start() {
+  @BeforeClass public static void start() {
     execute(new CreateDB(NAME, FILE));
   }
 
   /**
    * Tests the text index.
    */
-  @Test
-  public void textIndex() {
+  @Test public void textIndex() {
     map().forEach((key, value) -> {
       set(MainOptions.TEXTINCLUDE, key);
       execute(new CreateDB(NAME, FILE));
@@ -89,8 +85,7 @@ public final class ValueIndexTest extends QueryPlanTest {
   /**
    * Tests the attribute index.
    */
-  @Test
-  public void attrIndex() {
+  @Test public void attrIndex() {
     map().forEach((key, value) -> {
       set(MainOptions.ATTRINCLUDE, key);
       execute(new CreateDB(NAME, FILE));
@@ -103,8 +98,7 @@ public final class ValueIndexTest extends QueryPlanTest {
   /**
    * Tests the full-text index.
    */
-  @Test
-  public void fulltextIndex() {
+  @Test public void fulltextIndex() {
     // not applicable in main-memory mode
     if((Boolean) mainmem) return;
 
@@ -122,8 +116,7 @@ public final class ValueIndexTest extends QueryPlanTest {
   /**
    * Tests the text index and update operations.
    */
-  @Test
-  public void textUpdates() {
+  @Test public void textUpdates() {
     set(MainOptions.UPDINDEX, true);
 
     set(MainOptions.TEXTINCLUDE, "a");

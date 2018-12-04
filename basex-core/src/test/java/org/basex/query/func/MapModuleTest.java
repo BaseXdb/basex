@@ -14,16 +14,14 @@ import org.junit.*;
  */
 public final class MapModuleTest extends QueryPlanTest {
   /** Test method. */
-  @Test
-  public void contains() {
+  @Test public void contains() {
     final Function func = _MAP_CONTAINS;
     query(func.args(" map{}", 1), false);
     query(func.args(_MAP_ENTRY.args(1, 2), 1), true);
   }
 
   /** Test method. */
-  @Test
-  public void entry() {
+  @Test public void entry() {
     final Function func = _MAP_ENTRY;
     query("exists(" + func.args("A", "B") + ')', true);
     query("exists(" + func.args(1, 2) + ')', true);
@@ -33,8 +31,7 @@ public final class MapModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test
-  public void forEach() {
+  @Test public void forEach() {
     final Function func = _MAP_FOR_EACH;
 
     query("(1,map { 1: 2 })[. instance of map(*)] ! " +
@@ -50,16 +47,14 @@ public final class MapModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test
-  public void get() {
+  @Test public void get() {
     final Function func = _MAP_GET;
     query(func.args(" map{}", 1), "");
     query(func.args(_MAP_ENTRY.args(1, 2), 1), 2);
   }
 
   /** Test method. */
-  @Test
-  public void keys() {
+  @Test public void keys() {
     final Function func = _MAP_KEYS;
     query("for $i in " + func.args(
         _MAP_MERGE.args(" for $i in 1 to 3 return " +
@@ -71,19 +66,18 @@ public final class MapModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test
-  public void merge() {
+  @Test public void merge() {
     // no entry
     final Function func = _MAP_MERGE;
     query("exists(" + func.args(" ()") + ')', true);
-    mapSize(_MAP_ENTRY.args(1, 2), 1);
-    mapSize(func.args(" ()"), 0);
+    checkSize(_MAP_ENTRY.args(1, 2), 1);
+    checkSize(func.args(" ()"), 0);
     // single entry
     query("exists(" + func.args(" map{ 'a':'b' }") + ')', true);
-    mapSize(func.args(" map{ 'a':'b' }"), 1);
+    checkSize(func.args(" map{ 'a':'b' }"), 1);
     // single entry
     query("exists(" + func.args(" map{ 'a':'b','b':'c' }") + ')', true);
-    mapSize(func.args(" map{ 'a':'b','b':'c' }"), 2);
+    checkSize(func.args(" map{ 'a':'b','b':'c' }"), 2);
 
     query(func.args(" (map{ xs:time('01:01:01'):''}, map{ xs:time('01:01:01+01:00'):''})"));
 
@@ -122,14 +116,13 @@ public final class MapModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test
-  public void put() {
+  @Test public void put() {
     // no entry
     final Function func = _MAP_PUT;
-    mapSize(func.args(" map{}", 1, 2), 1);
-    mapSize(func.args(" map{}", "a", "b"), 1);
-    mapSize(func.args(" map{ 'a': 'b' }", "c", "d"), 2);
-    mapSize(func.args(" map{ 'a': 'b' }", "c", "d"), 2);
+    checkSize(func.args(" map{}", 1, 2), 1);
+    checkSize(func.args(" map{}", "a", "b"), 1);
+    checkSize(func.args(" map{ 'a': 'b' }", "c", "d"), 2);
+    checkSize(func.args(" map{ 'a': 'b' }", "c", "d"), 2);
 
     query(func.args(" map{ xs:time('01:01:01'):'b' }", "xs:time('01:01:02+01:00')", 1));
 
@@ -137,15 +130,13 @@ public final class MapModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test
-  public void remove() {
+  @Test public void remove() {
     final Function func = _MAP_REMOVE;
-    mapSize(func.args(_MAP_ENTRY.args(1, 2), 1), 0);
+    checkSize(func.args(_MAP_ENTRY.args(1, 2), 1), 0);
   }
 
   /** Test method. */
-  @Test
-  public void size() {
+  @Test public void size() {
     final Function func = _MAP_SIZE;
     query(func.args(" map{}"), 0);
   }
@@ -155,7 +146,7 @@ public final class MapModuleTest extends QueryPlanTest {
    * @param query query string
    * @param count expected number of entries
    */
-  private static void mapSize(final String query, final int count) {
+  private static void checkSize(final String query, final int count) {
     query(_MAP_SIZE.args(' ' + query), count);
   }
 }

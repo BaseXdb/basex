@@ -134,8 +134,7 @@ public final class FTBitapSearchTest {
   private FTBitapSearch[] searches;
 
   /** Set up method. */
-  @Before
-  public void setUp() {
+  @Before public void setUp() {
     final TokenComparator cmp = Token::eq;
     final int tl = TESTS.length;
     searches = new FTBitapSearch[tl];
@@ -145,8 +144,7 @@ public final class FTBitapSearchTest {
   }
 
   /** Test search. */
-  @Test
-  public void searchIter() {
+  @Test public void searchIter() {
     try {
       final int tl = TESTS.length;
       for(int t = 0; t < tl; t++) {

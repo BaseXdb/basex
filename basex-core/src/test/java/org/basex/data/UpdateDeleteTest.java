@@ -17,8 +17,7 @@ public final class UpdateDeleteTest extends DataUpdateTest {
    * Tests deletion of a simple node.
    * @throws IOException I/O exception
    */
-  @Test
-  public void simpleNodeDelete() throws IOException {
+  @Test public void simpleNodeDelete() throws IOException {
     final Data data = context.data();
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
@@ -45,8 +44,7 @@ public final class UpdateDeleteTest extends DataUpdateTest {
    * Tests deletion of a node with a child.
    * @throws IOException I/O exception
    */
-  @Test
-  public void cascadingDelete() throws IOException {
+  @Test public void cascadingDelete() throws IOException {
     final Data data = context.data();
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
@@ -70,8 +68,7 @@ public final class UpdateDeleteTest extends DataUpdateTest {
    * Tests deletion of a node with a child (with text) and attribute.
    * @throws IOException I/O exception
    */
-  @Test
-  public void cascadingDelete2() throws IOException {
+  @Test public void cascadingDelete2() throws IOException {
     final Data data = context.data();
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
@@ -98,8 +95,7 @@ public final class UpdateDeleteTest extends DataUpdateTest {
    * Tests deletion of an attribute.
    * @throws IOException I/O exception
    */
-  @Test
-  public void deleteAttribute() throws IOException {
+  @Test public void deleteAttribute() throws IOException {
     final Data data = context.data();
     final int oldRootSize = data.size(1, Data.ELEM);
     final int oldParentSize = data.size(6, Data.ELEM);
@@ -128,8 +124,7 @@ public final class UpdateDeleteTest extends DataUpdateTest {
    * Tests deletion of a text-node.
    * @throws IOException I/O exception
    */
-  @Test
-  public void deleteText() throws IOException {
+  @Test public void deleteText() throws IOException {
     final Data data = context.data();
     data.startUpdate(context.options);
     data.delete(10);

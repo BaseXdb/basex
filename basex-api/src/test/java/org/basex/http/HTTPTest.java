@@ -70,8 +70,7 @@ public abstract class HTTPTest extends SandboxTest {
    * Finish test.
    * @throws Exception exception
    */
-  @AfterClass
-  public static void stop() throws Exception {
+  @AfterClass public static void stop() throws Exception {
     http.stop();
 
     // cleanup: remove project specific system properties

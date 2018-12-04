@@ -22,8 +22,7 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
    * Initializes a test.
    * @throws Exception any exception
    */
-  @Before
-  public void setUp() throws Exception {
+  @Before public void setUp() throws Exception {
     createDB();
     final Class<?> c = Class.forName(DRIVER);
     final Database database = (Database) c.getDeclaredConstructor().newInstance();
@@ -35,8 +34,7 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
    * Finalizes a test.
    * @throws Exception any exception
    */
-  @After
-  public void tearDown() throws Exception {
+  @After public void tearDown() throws Exception {
     coll.close();
     dropDB();
   }
@@ -45,8 +43,7 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testHasMoreResources() throws Exception {
+  @Test public void testHasMoreResources() throws Exception {
     // test result
     ResourceIterator iter = serv.query("/").getIterator();
     assertTrue("Result expected.", iter.hasMoreResources());
@@ -60,8 +57,7 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testNextResource() throws Exception {
+  @Test public void testNextResource() throws Exception {
     // count down number of results
     final ResourceSet set = serv.query("//node()");
     final ResourceIterator iter = set.getIterator();

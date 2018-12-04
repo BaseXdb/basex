@@ -18,14 +18,12 @@ public final class IndexCacheTest {
   private IndexCache cache;
 
   /** Set up method. */
-  @Before
-  public void setUp() {
+  @Before public void setUp() {
     cache = new IndexCache();
   }
 
   /** Test for method {@link IndexCache#get(byte[])}. */
-  @Test
-  public void testGetNotExisting() {
+  @Test public void testGetNotExisting() {
     for(int i = 0; i < 4000; ++i) {
       final byte[] key = token("keyAdd" + i);
       final long pointer = i + 5000L;
@@ -37,8 +35,7 @@ public final class IndexCacheTest {
   }
 
   /** Test for method {@link IndexCache#add(byte[], int, long)}. */
-  @Test
-  public void testAdd() {
+  @Test public void testAdd() {
     for(int i = 0; i < 4000; ++i) {
       final byte[] key = token("keyAdd" + i);
       final long pointer = i + 5000L;
@@ -49,8 +46,7 @@ public final class IndexCacheTest {
   }
 
   /** Test for method {@link IndexCache#add(byte[], int, long)}: update. */
-  @Test
-  public void testUpdate() {
+  @Test public void testUpdate() {
     final byte[] key = token("keyUpdate");
     final int size = 10;
     final long pointer = 12L;
@@ -62,8 +58,7 @@ public final class IndexCacheTest {
   }
 
   /** Test for method {@link IndexCache#delete(byte[])}. */
-  @Test
-  public void testDelete() {
+  @Test public void testDelete() {
     final byte[] key = token("keyDelete");
     final int size = 10;
     final long pointer = 12L;
@@ -78,8 +73,7 @@ public final class IndexCacheTest {
    * Test that new records can be continuously added without hitting
    * {@link OutOfMemoryError}.
    */
-  @Test
-  @Ignore("Start this test with a small heap size (e.g. -Xmx64m)")
+  @Test @Ignore("Start this test with a small heap size (e.g. -Xmx64m)")
   public void testPerformance() {
     final Random random = new Random(System.nanoTime());
 

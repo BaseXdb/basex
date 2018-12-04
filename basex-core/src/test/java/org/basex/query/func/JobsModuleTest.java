@@ -24,8 +24,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   private static final String SLOW_QUERY = "(1 to 10000000)[.=1]";
 
   /** Wait until all queries have been processed. */
-  @After
-  public void clean() {
+  @After public void clean() {
     // wait for running jobs
     query(_JOBS_LIST.args() + "[. != " + _JOBS_CURRENT.args() + "] ! " + _JOBS_WAIT.args(" ."));
     // consume cached results
@@ -34,8 +33,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void eval1() {
+  @Test public void eval1() {
     final Function func = _JOBS_EVAL;
     query(func.args("1"));
     query(func.args(".", " map { '': '1' }"));
@@ -46,8 +44,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void eval2() {
+  @Test public void eval2() {
     // database creation
     final Function func = _JOBS_EVAL;
     error(_DB_OPEN.args("db"), DB_OPEN2_X);
@@ -57,8 +54,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void eval3() {
+  @Test public void eval3() {
     // errors (will not be raised before runtime)
     final Function func = _JOBS_EVAL;
     query(func.args("db:open('db')"));
@@ -72,8 +68,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void evalError() {
+  @Test public void evalError() {
     // errors
     final Function func = _JOBS_EVAL;
     error(func.args("1", " ()", " map{ 'start':'12345' }"), DATEFORMAT_X_X_X);
@@ -88,8 +83,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void evalStart() {
+  @Test public void evalStart() {
     // delayed execution
     final Function func = _JOBS_EVAL;
     final String id = query(func.args(" 'prof:sleep(200)'", " ()", " map{'start':'PT0.2S'}"));
@@ -103,8 +97,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void evalInterval() {
+  @Test public void evalInterval() {
     // scheduled execution
     final Function func = _JOBS_EVAL;
     final String id = query(func.args("prof:sleep(400)", " ()", " map{'interval':'PT1S'}"));
@@ -127,8 +120,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void evalEnd() {
+  @Test public void evalEnd() {
     // scheduled execution
     final Function func = _JOBS_EVAL;
     final String id = query(func.args("123", " ()",
@@ -145,8 +137,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void evalService() {
+  @Test public void evalService() {
     final Function func = _JOBS_EVAL;
     query(func.args("1", " ()", " map{ 'id':'ID','service':true() }"));
     query("file:exists(db:option('dbpath') || '/jobs.xml')", true);
@@ -158,15 +149,13 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void invoke() {
+  @Test public void invoke() {
     query("starts-with(" + _JOBS_INVOKE.args("src/test/resources/input.xq") + ", 'job')", true);
     error(_JOBS_INVOKE.args("src/test/resources/xxx.xq"), WHICHRES_X);
   }
 
   /** Test method. */
-  @Test
-  public void finished() {
+  @Test public void finished() {
     final String id = verySlowQuery();
     try {
       query(_JOBS_FINISHED.args(id), false);
@@ -178,8 +167,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void list() {
+  @Test public void list() {
     final String id = verySlowQuery();
     try {
       query(_JOBS_LIST.args() + " = '" + id + '\'', true);
@@ -189,8 +177,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void listDetails() {
+  @Test public void listDetails() {
     final String id = verySlowQuery();
     try {
       final String list = query(_JOBS_LIST_DETAILS.args() + "[@id = '" + id + "']");
@@ -205,8 +192,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   /**
    * Test method.
    * @throws IOException I/O exception */
-  @Test
-  public void stop() throws IOException {
+  @Test public void stop() throws IOException {
     final String id = verySlowQuery();
     final Function func = _JOBS_STOP;
     query(func.args(id));
@@ -229,8 +215,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   /**
    * Test method.
    * @throws IOException I/O exception */
-  @Test
-  public void result() throws IOException {
+  @Test public void result() throws IOException {
     // receive result of asynchronous execution
     final Function func = _JOBS_RESULT;
     query("let $q := " + _JOBS_EVAL.args(SLOW_QUERY, " ()", " map{'cache':true()}") +
@@ -274,8 +259,7 @@ public final class JobsModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void waitFor() {
+  @Test public void waitFor() {
     final Function func = _JOBS_WAIT;
     query(func.args(_JOBS_EVAL.args("1",  " ()", " map { 'start':'PT0.1S' }")));
     error(func.args(_JOBS_CURRENT.args()), JOBS_SELF_X);

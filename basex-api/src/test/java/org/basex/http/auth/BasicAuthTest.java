@@ -16,32 +16,28 @@ public final class BasicAuthTest extends AuthTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass
-  public static void start() throws Exception {
+  @BeforeClass public static void start() throws Exception {
     init("Basic");
   }
 
   /**
    * Successful response.
    */
-  @Test
-  public void simple() {
+  @Test public void simple() {
     test(REST_ROOT.replace("://", "://admin:admin@") + "?query=1", null);
   }
 
   /**
    * Missing authentication method.
    */
-  @Test
-  public void missingAuth() {
+  @Test public void missingAuth() {
     test(REST_ROOT, Util.info(HTTPText.WRONGAUTH_X, method));
   }
 
   /**
    * Access denied.
    */
-  @Test
-  public void accessDenied() {
+  @Test public void accessDenied() {
     test(REST_ROOT.replace("://", "://user:unknown@"), Text.ACCESS_DENIED);
   }
 }

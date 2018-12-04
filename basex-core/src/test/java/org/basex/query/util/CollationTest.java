@@ -21,8 +21,7 @@ public final class CollationTest extends AdvancedQueryTest {
   private static final String PROLOG = "declare default collation '" + COLLATION + "'; ";
 
   /** Checks the German collation and different strengths. */
-  @Test
-  public void german() {
+  @Test public void german() {
     for(final Strength strength : Strength.values()) {
       final int s = strength.ordinal();
       final String prolog = "declare default collation " +
@@ -57,8 +56,7 @@ public final class CollationTest extends AdvancedQueryTest {
   }
 
   /** Tests errors. */
-  @Test
-  public void errors() {
+  @Test public void errors() {
     error("compare('a', 'b', 'http://basex.org/collation?unknown=value')", WHICHCOLL_X);
     error("compare('a', 'b', 'http://basex.org/collation?strength=unknown')", WHICHCOLL_X);
     error("compare('a', 'b', 'http://basex.org/collation?decomposition=unknown')", WHICHCOLL_X);
@@ -66,8 +64,7 @@ public final class CollationTest extends AdvancedQueryTest {
   }
 
   /** Tests operators. */
-  @Test
-  public void operators() {
+  @Test public void operators() {
     query(PROLOG + "'\u00c4'  = 'a'", true);
     query(PROLOG + "'\u00c4' != 'a'", false);
     query(PROLOG + "'\u00c4'  > 'a'", false);
@@ -84,8 +81,7 @@ public final class CollationTest extends AdvancedQueryTest {
   }
 
   /** Tests the order by clause. */
-  @Test
-  public void orderBy() {
+  @Test public void orderBy() {
     // identical strings
     query(PROLOG + "for $a in ('b', 'b') order by $a return $a", "b\nb");
     query("for $a in ('b', 'b') order by $a collation '" + COLLATION + "'return $a", "b\nb");
@@ -99,8 +95,7 @@ public final class CollationTest extends AdvancedQueryTest {
   }
 
   /** Tests the group by clause. */
-  @Test
-  public void groupBy() {
+  @Test public void groupBy() {
     // identical strings
     query(PROLOG + "for $a in ('a','a') group by $b:=$a return count($a)", 2);
     query("for $a in ('a','a') group by $b:=$a return count($a)", 2);
@@ -112,8 +107,7 @@ public final class CollationTest extends AdvancedQueryTest {
   }
 
   /** Disallow index rewritings. */
-  @Test
-  public void index() {
+  @Test public void index() {
     query(PROLOG + "doc('<X>&#xe4;</X>')/X/text()[. = 'a']", "\u00e4");
     query(PROLOG + "doc('<X>&#xe4;</X>')/X[text() = 'a']", "<X>\u00e4</X>");
   }

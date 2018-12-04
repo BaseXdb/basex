@@ -21,8 +21,7 @@ public final class StringRangeTest extends QueryPlanTest {
   /**
    * Initializes the tests.
    */
-  @BeforeClass
-  public static void start() {
+  @BeforeClass public static void start() {
     final Random rnd = new Random();
 
     // create initial document
@@ -43,16 +42,14 @@ public final class StringRangeTest extends QueryPlanTest {
   /**
    * Finishes the tests.
    */
-  @AfterClass
-  public static void finish() {
+  @AfterClass public static void finish() {
     execute(new DropDB(NAME));
   }
 
   /**
    * Testing greater-equal and less-equal.
    */
-  @Test
-  public void geLe() {
+  @Test public void geLe() {
     test("exists(//*[text() >= '999' and text() <= '999'])", true, ValueAccess.class);
     final Class<? extends Expr> clz = StringRangeAccess.class;
     test("count(//*[text() >= '990' and text() <= '999'])", 10, clz);
@@ -66,8 +63,7 @@ public final class StringRangeTest extends QueryPlanTest {
   /**
    * Testing less-equal and greater-equal.
    */
-  @Test
-  public void leGe() {
+  @Test public void leGe() {
     test("exists(//*[text() <= '999' and text() >= '999'])", true, ValueAccess.class);
     final Class<? extends Expr> clz = StringRangeAccess.class;
     test("count(//*[text() <= '999' and text() >= '990'])", 10, clz);
@@ -80,8 +76,7 @@ public final class StringRangeTest extends QueryPlanTest {
   /**
    * Testing greater-than and less-than.
    */
-  @Test
-  public void gtLt() {
+  @Test public void gtLt() {
     test("exists(//*[text() > '999' and text() < '999'])", false);
     final Class<? extends Expr> clz = StringRangeAccess.class;
     test("count(//*[text() > '990' and text() < '999'])", 8, clz);

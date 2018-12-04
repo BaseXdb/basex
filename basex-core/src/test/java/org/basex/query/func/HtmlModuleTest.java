@@ -13,16 +13,14 @@ import org.junit.*;
  */
 public final class HtmlModuleTest extends AdvancedQueryTest {
   /** Test method. */
-  @Test
-  public void parser() {
+  @Test public void parser() {
     final Function func = _HTML_PARSER;
     // check if function returns a string
     query(func.args() + " instance of xs:string", true);
   }
 
   /** Test method. */
-  @Test
-  public void parse() {
+  @Test public void parse() {
     final Function func = _HTML_PARSE;
     query(func.args(" ()"), "");
     query(func.args(" []"), "");

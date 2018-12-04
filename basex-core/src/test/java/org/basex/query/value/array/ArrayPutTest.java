@@ -15,8 +15,7 @@ public final class ArrayPutTest extends ArrayTest {
   /**
    * Sets all values of a big array individually.
    */
-  @Test
-  public void setAllTest() {
+  @Test public void setAllTest() {
     final int n = 5000;
     final ArrayBuilder builder = new ArrayBuilder();
     for(int i = 0; i < n; i++) {

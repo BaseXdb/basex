@@ -22,8 +22,7 @@ public final class StoreTest extends SandboxTest {
   /**
    * Initializes the tests.
    */
-  @BeforeClass
-  public static void init() {
+  @BeforeClass public static void init() {
     // speed up updates and create initial database
     set(MainOptions.TEXTINDEX, false);
     set(MainOptions.ATTRINDEX, false);
@@ -33,8 +32,7 @@ public final class StoreTest extends SandboxTest {
   /**
    * Replaces text nodes with random double values.
    */
-  @Test
-  public void replace() {
+  @Test public void replace() {
     execute(new CreateDB(NAME, "<X><A>q</A><A>q</A></X>"));
     final long size = context.data().meta.dbfile(DataText.DATATXT).length();
     for(int n = 0; n < NQUERIES; n++) {
@@ -46,8 +44,7 @@ public final class StoreTest extends SandboxTest {
   /**
    * Replaces two text nodes with random integer values.
    */
-  @Test
-  public void deleteInsertTwo() {
+  @Test public void deleteInsertTwo() {
     execute(new CreateDB(NAME, "<X><A>q</A><A>q</A></X>"));
     final long size = context.data().meta.dbfile(DataText.DATATXT).length();
 
@@ -65,8 +62,7 @@ public final class StoreTest extends SandboxTest {
   /**
    * Deletes and inserts a text multiple times.
    */
-  @Test
-  public void deleteInsert() {
+  @Test public void deleteInsert() {
     execute(new CreateDB(NAME, "<X>abc</X>"));
     final long size = context.data().meta.dbfile(DataText.DATATXT).length();
 
@@ -81,8 +77,7 @@ public final class StoreTest extends SandboxTest {
    * Tests the {@link MainOptions#UPDINDEX} and {@link MainOptions#AUTOFLUSH} flags in combination.
    * Reaction on a bug (incremental value index was not correctly closed)
    */
-  @Test
-  public void updIndexFlush() {
+  @Test public void updIndexFlush() {
     try {
       for(int a = 0; a < 2; a++) {
         for(int b = 0; b < 2; b++) {

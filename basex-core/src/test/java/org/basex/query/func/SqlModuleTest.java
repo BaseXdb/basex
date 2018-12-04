@@ -12,42 +12,34 @@ import org.junit.*;
  */
 public final class SqlModuleTest extends AdvancedQueryTest {
   /** Test method. */
-  @Test
-  public void init() {
+  @Test public void init() {
   }
 
   /** Test method. */
-  @Test
-  public void connect() {
+  @Test public void connect() {
   }
 
   /** Test method. */
-  @Test
-  public void prepare() {
+  @Test public void prepare() {
   }
 
   /** Test method. */
-  @Test
-  public void execute() {
+  @Test public void execute() {
   }
 
   /** Test method. */
-  @Test
-  public void executePrepared() {
+  @Test public void executePrepared() {
   }
 
   /** Test method. */
-  @Test
-  public void close() {
+  @Test public void close() {
   }
 
   /** Test method. */
-  @Test
-  public void commit() {
+  @Test public void commit() {
   }
 
   /** Test method. */
-  @Test
-  public void rollback() {
+  @Test public void rollback() {
   }
 }

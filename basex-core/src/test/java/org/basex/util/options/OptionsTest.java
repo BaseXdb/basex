@@ -25,8 +25,7 @@ import org.junit.*;
  */
 public final class OptionsTest extends SandboxTest {
   /** Initializes various options. */
-  @AfterClass
-  public static void init() {
+  @AfterClass public static void init() {
     // instantiate options at least once
     new UCAOptions();
     new CsvOptions();
@@ -47,8 +46,7 @@ public final class OptionsTest extends SandboxTest {
   }
 
   /** Tests the effect of setting system properties. */
-  @Test
-  public void systemProperty() {
+  @Test public void systemProperty() {
     final BooleanOption name = MainOptions.CHOP;
     final Boolean value = Boolean.FALSE;
     System.setProperty(Prop.DBPREFIX + name.name(), value.toString());
@@ -63,8 +61,7 @@ public final class OptionsTest extends SandboxTest {
    * Tests the {@link MainOptions#WRITEBACK} option.
    * @throws Exception exception
    */
-  @Test
-  public void writeBack() throws Exception {
+  @Test public void writeBack() throws Exception {
     final BooleanOption name = MainOptions.WRITEBACK;
 
     final String input = "<a/>";

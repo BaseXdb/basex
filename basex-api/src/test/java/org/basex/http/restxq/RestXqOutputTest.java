@@ -13,8 +13,7 @@ public final class RestXqOutputTest extends RestXqTest {
    * Serialization parameters and elements.
    * @throws Exception exception
    */
-  @Test
-  public void output() throws Exception {
+  @Test public void output() throws Exception {
     // correct syntax
     get("declare %R:path('') %output:method('text') function m:f() {'9'};", "", "9");
     // unknown serialization parameter

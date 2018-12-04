@@ -70,8 +70,7 @@ public final class ServerLockingTest extends SandboxTest {
    * Starts the server.
    * @throws Exception None expected
    */
-  @BeforeClass
-  public static void start() throws Exception {
+  @BeforeClass public static void start() throws Exception {
     server = createServer();
     final CountDownLatch latch = new CountDownLatch(2);
     new Client(new CreateDB(NAME, DOC), null, latch);
@@ -83,8 +82,7 @@ public final class ServerLockingTest extends SandboxTest {
   /**
    * Stops the server.
    */
-  @AfterClass
-  public static void stop() {
+  @AfterClass public static void stop() {
     stopServer(server);
   }
 
@@ -138,8 +136,7 @@ public final class ServerLockingTest extends SandboxTest {
    * Test whether parallel execution of queries is successful.
    * @throws Exception None expected
    */
-  @Test
-  public void lockingTests() throws Exception {
+  @Test public void lockingTests() throws Exception {
     // Not querying any databases
     testQueries(
         new XQuery(Q),
@@ -197,8 +194,7 @@ public final class ServerLockingTest extends SandboxTest {
    * Load test.
    * @throws Exception None expected
    */
-  @Test
-  public void loadTests() throws Exception {
+  @Test public void loadTests() throws Exception {
     final int totalQueries = RUN_COUNT * QUERIES.length;
     final ArrayList<Client> clients = new ArrayList<>(totalQueries);
     final CountDownLatch allDone = new CountDownLatch(totalQueries);

@@ -35,81 +35,77 @@ public final class ZipModuleTest extends AdvancedQueryTest {
    * Initializes the test.
    * @throws IOException I/O exception.
    */
-  @BeforeClass
-  public static void init() throws IOException {
+  @BeforeClass public static void init() throws IOException {
     // create temporary file
     new IOFile(TMPFILE).write("!");
   }
 
   /** Finishes the test. */
-  @AfterClass
-  public static void finish() {
+  @AfterClass public static void finish() {
     new IOFile(TMPZIP).delete();
     new IOFile(TMPFILE).delete();
   }
 
   /** Test method. */
-  @Test
-  public void binaryEntry() {
-    query(_ZIP_BINARY_ENTRY.args(ZIP, ENTRY1));
-    contains("string(xs:hexBinary(" + _ZIP_BINARY_ENTRY.args(ZIP, ENTRY1) + "))", "610A61626F");
+  @Test public void binaryEntry() {
+    final Function func = _ZIP_BINARY_ENTRY;
+    query(func.args(ZIP, ENTRY1));
+    contains("string(xs:hexBinary(" + func.args(ZIP, ENTRY1) + "))", "610A61626F");
 
-    error(_ZIP_BINARY_ENTRY.args("abc", "xyz"), ZIP_NOTFOUND_X);
-    error(_ZIP_BINARY_ENTRY.args(ZIP, ""), ZIP_NOTFOUND_X);
+    error(func.args("abc", "xyz"), ZIP_NOTFOUND_X);
+    error(func.args(ZIP, ""), ZIP_NOTFOUND_X);
   }
 
   /** Test method. */
-  @Test
-  public void textEntry() {
-    query(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1));
-    query(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1, "US-ASCII"));
-    error(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1, "xyz"), ZIP_FAIL_X);
+  @Test public void textEntry() {
+    final Function func = _ZIP_TEXT_ENTRY;
+    query(func.args(ZIP, ENTRY1));
+    query(func.args(ZIP, ENTRY1, "US-ASCII"));
+    error(func.args(ZIP, ENTRY1, "xyz"), ZIP_FAIL_X);
     // newlines are removed from the result..
-    contains(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1), "a\nabout\nabove\n");
+    contains(func.args(ZIP, ENTRY1), "a\nabout\nabove\n");
   }
 
   /** Test method. */
-  @Test
-  public void xmlEntry() {
-    query(_ZIP_XML_ENTRY.args(ZIP, ENTRY2));
-    query(_ZIP_XML_ENTRY.args(ZIP, ENTRY2) + "//title/text()", "XML");
+  @Test public void xmlEntry() {
+    final Function func = _ZIP_XML_ENTRY;
+    query(func.args(ZIP, ENTRY2));
+    query(func.args(ZIP, ENTRY2) + "//title/text()", "XML");
   }
 
   /** Test method. */
-  @Test
-  public void entries() {
-    query(_ZIP_ENTRIES.args(ZIP));
+  @Test public void entries() {
+    final Function func = _ZIP_ENTRIES;
+    query(func.args(ZIP));
   }
 
   /**
    * Test method.
    * @throws IOException I/O exception
    */
-  @Test
-  public void zipFile() throws IOException {
+  @Test public void zipFile() throws IOException {
+    final Function func = _ZIP_ZIP_FILE;
     // check first file
-    query(_ZIP_ZIP_FILE.args(params("<entry name='one'/>")));
+    query(func.args(params("<entry name='one'/>")));
     checkEntry("one", new byte[0]);
     // check second file
-    query(_ZIP_ZIP_FILE.args(params("<entry name='two'>!</entry>")));
+    query(func.args(params("<entry name='two'>!</entry>")));
     checkEntry("two", new byte[] { '!' });
     // check third file
-    query(_ZIP_ZIP_FILE.args(
-        params("<entry name='three' encoding='UTF-16'>!</entry>")));
+    query(func.args(params("<entry name='three' encoding='UTF-16'>!</entry>")));
     checkEntry("three", new byte[] { '\0', '!' });
     // check fourth file
-    query(_ZIP_ZIP_FILE.args(params("<entry name='four' src='" + TMPFILE + "'/>")));
+    query(func.args(params("<entry name='four' src='" + TMPFILE + "'/>")));
     checkEntry("four", new byte[] { '!' });
     // check fifth file
-    query(_ZIP_ZIP_FILE.args(params("<entry src='" + TMPFILE + "'/>")));
+    query(func.args(params("<entry src='" + TMPFILE + "'/>")));
     checkEntry(NAME + ".tmp", new byte[] { '!' });
     // check sixth file
-    query(_ZIP_ZIP_FILE.args(params("<dir name='a'><entry name='b' src='" +
-        TMPFILE + "'/></dir>")));
+    query(func.args(params("<dir name='a'><entry name='b' src='" + TMPFILE + "'/></dir>")));
     checkEntry("a/b", new byte[] { '!' });
 
     // error: duplicate entry specified
-    error(_ZIP_ZIP_FILE.args(params("<entry src='" + TMPFILE + "'/>" +
+    error(func.args(params("<entry src='" + TMPFILE + "'/>" +
         "<entry src='" + TMPFILE + "'/>")), ZIP_FAIL_X);
   }
 
@@ -117,31 +113,31 @@ public final class ZipModuleTest extends AdvancedQueryTest {
    * Test method.
    * @throws IOException I/O exception
    */
-  @Test
-  public void zipFileNS() throws IOException {
+  @Test public void zipFileNS() throws IOException {
+    final Function func = _ZIP_ZIP_FILE;
     // ZIP namespace must be removed from zipped node
-    query(_ZIP_ZIP_FILE.args(params("<entry name='1'><a/></entry>")));
+    query(func.args(params("<entry name='1'><a/></entry>")));
     checkEntry("1", token("<a/>"));
     // ZIP namespace must be removed from zipped node
-    query(_ZIP_ZIP_FILE.args(params("<entry name='2'><a b='c'/></entry>")));
+    query(func.args(params("<entry name='2'><a b='c'/></entry>")));
     checkEntry("2", token("<a b=\"c\"/>"));
     // ZIP namespace must be removed from zipped node and its descendants
-    query(_ZIP_ZIP_FILE.args(params("<entry name='3'><a><b/></a></entry>")));
+    query(func.args(params("<entry name='3'><a><b/></a></entry>")));
     checkEntry("3", token("<a>" + Prop.NL + "  <b/>" + Prop.NL + "</a>"));
     // ZIP namespace must be removed from zipped entry
-    query(_ZIP_ZIP_FILE.args(params("<entry name='4'><a xmlns=''/></entry>")));
+    query(func.args(params("<entry name='4'><a xmlns=''/></entry>")));
     checkEntry("4", token("<a/>"));
 
     // ZIP namespace must be removed from zipped entry
-    query(_ZIP_ZIP_FILE.args(paramsPrefix("5", "<a/>")));
+    query(func.args(paramsPrefix("5", "<a/>")));
     checkEntry("5", token("<a/>"));
-    query(_ZIP_ZIP_FILE.args(paramsPrefix("6", "<a><b/></a>")));
+    query(func.args(paramsPrefix("6", "<a><b/></a>")));
     checkEntry("6", token("<a>" + Prop.NL + "  <b/>" + Prop.NL + "</a>"));
-    query(_ZIP_ZIP_FILE.args(paramsPrefix("7", "<z:a xmlns:z='z'/>")));
+    query(func.args(paramsPrefix("7", "<z:a xmlns:z='z'/>")));
     checkEntry("7", token("<z:a xmlns:z=\"z\"/>"));
-    query(_ZIP_ZIP_FILE.args(paramsPrefix("8", "<zip:a xmlns:zip='z'/>")));
+    query(func.args(paramsPrefix("8", "<zip:a xmlns:zip='z'/>")));
     checkEntry("8", token("<zip:a xmlns:zip=\"z\"/>"));
-    query(_ZIP_ZIP_FILE.args(paramsPrefix("9", "<a xmlns='z'/>")));
+    query(func.args(paramsPrefix("9", "<a xmlns='z'/>")));
     checkEntry("9", token("<a xmlns=\"z\"/>"));
   }
 
@@ -158,19 +154,19 @@ public final class ZipModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void updateEntries() {
+  @Test public void updateEntries() {
+    final Function func = _ZIP_UPDATE_ENTRIES;
     String list = query(_ZIP_ENTRIES.args(ZIP));
 
     // create and compare identical zip file
-    query(_ZIP_UPDATE_ENTRIES.args(' ' + list, TMPZIP));
+    query(func.args(' ' + list, TMPZIP));
     final String list2 = query(_ZIP_ENTRIES.args(TMPZIP));
     assertEquals(list.replaceAll(" href=\".*?\"", ""),
         list2.replaceAll(" href=\".*?\"", ""));
 
     // remove one directory
     list = list.replaceAll("<zip:dir name=.test.>.*</zip:dir>", "");
-    query(_ZIP_UPDATE_ENTRIES.args(' ' + list, TMPZIP));
+    query(func.args(' ' + list, TMPZIP));
   }
 
   /**

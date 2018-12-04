@@ -18,8 +18,7 @@ public final class FTTest extends FTData {
   static { create(DOC); }
   static { queries = QUERIES; }
 
-  @Test
-  @Override
+  @Test @Override
   public void test() {
     if(ALL) {
       // test with and without index

@@ -31,8 +31,7 @@ public final class IdPreMapTest {
   private IntList deletedpres;
 
   /** Set-up method. */
-  @Before
-  public void setUp() {
+  @Before public void setUp() {
     final int ml = BASEID + 1;
     final int[] map = new int[ml];
     for(int m = 0; m < ml; m++) map[m] = m;
@@ -43,8 +42,7 @@ public final class IdPreMapTest {
   }
 
   /** Insert correctness: insert values at at the end. */
-  @Test
-  public void appendCorrectness() {
+  @Test public void appendCorrectness() {
     final int n = BASEID + ITERATIONS;
     for(int id = BASEID + 1; id <= n; ++id) {
       insert(id, id);
@@ -53,8 +51,7 @@ public final class IdPreMapTest {
   }
 
   /** Insert correctness: insert values at at the end. */
-  @Test
-  public void deleteFromEndCorrectness() {
+  @Test public void deleteFromEndCorrectness() {
     for(int id = BASEID; id >= 0; --id) {
       delete(id);
       check();
@@ -62,8 +59,7 @@ public final class IdPreMapTest {
   }
 
   /** Insert correctness: insert values at random positions. */
-  @Test
-  public void insertCorrectness() {
+  @Test public void insertCorrectness() {
     final int n = BASEID + ITERATIONS;
     for(int id = BASEID + 1; id <= n; ++id) {
       insert(RANDOM.nextInt(id), id);
@@ -72,8 +68,7 @@ public final class IdPreMapTest {
   }
 
   /** Delete correctness: delete values at random positions. */
-  @Test
-  public void deleteCorrectness() {
+  @Test public void deleteCorrectness() {
     for(int id = BASEID + 1; id > 0; --id) {
       delete(RANDOM.nextInt(id));
       check();
@@ -81,8 +76,7 @@ public final class IdPreMapTest {
   }
 
   /** Delete correctness: delete values at random positions. */
-  @Test
-  public void deleteCorrectness2() {
+  @Test public void deleteCorrectness2() {
     final int n = BASEID + ITERATIONS;
     for(int id = BASEID + 1; id <= n; ++id) insert(RANDOM.nextInt(id), id);
 
@@ -93,8 +87,7 @@ public final class IdPreMapTest {
   }
 
   /** Correctness: randomly insert/delete value at random positions. */
-  @Test
-  public void insertDeleteCorrectness() {
+  @Test public void insertDeleteCorrectness() {
     for(int i = 0, cnt = BASEID + 1, id = BASEID + 1; i < ITERATIONS; ++i) {
       // can't delete if all records have been deleted:
       if(RANDOM.nextBoolean() || cnt == 0) insert(RANDOM.nextInt(++cnt), id++);
@@ -104,38 +97,32 @@ public final class IdPreMapTest {
   }
 
   /** Insert performance: insert at random positions. */
-  @Test
-  public void insertPerformance() {
+  @Test public void insertPerformance() {
     insertPerformance(testedmap);
   }
 
   /** Delete performance: delete at random positions. */
-  @Test
-  public void deletePerformance() {
+  @Test public void deletePerformance() {
     deletePerformance(testedmap, basemap);
   }
 
   /** Search performance: insert at random positions and the search. */
-  @Test
-  public void searchPerformance() {
+  @Test public void searchPerformance() {
     searchPerformance(testedmap);
   }
 
   /** Dummy insert performance: insert at random positions. */
-  @Test
-  public void insertPerformanceDummy() {
+  @Test public void insertPerformanceDummy() {
     insertPerformance(basemap);
   }
 
   /** Dummy delete performance: delete at random positions. */
-  @Test
-  public void deletePerformanceDummy() {
+  @Test public void deletePerformanceDummy() {
     deletePerformance(basemap, basemap.copy());
   }
 
   /** Dummy search performance: insert at random positions and the search. */
-  @Test
-  public void searchPerformanceDummy() {
+  @Test public void searchPerformanceDummy() {
     searchPerformance(basemap);
   }
 

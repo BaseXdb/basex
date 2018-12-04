@@ -19,8 +19,7 @@ public final class BaseXStandaloneTest extends BaseXTest {
    * Writes back updates.
    * @throws IOException I/O exception
    */
-  @Test
-  public void writeBack() throws IOException {
+  @Test public void writeBack() throws IOException {
     INPUT.write("<a>X</a>");
     run("-i", INPUT.toString(), "-u", "-q", "delete node //text()");
     assertEquals("<a/>", string(INPUT.read()));

@@ -26,8 +26,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Initializes a test.
    * @throws Exception any exception
    */
-  @Before
-  public void setUp() throws Exception {
+  @Before public void setUp() throws Exception {
     createDB();
     final Class<?> c = Class.forName(DRIVER);
     final Database database = (Database) c.getDeclaredConstructor().newInstance();
@@ -38,8 +37,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Finalizes a test.
    * @throws Exception any exception
    */
-  @After
-  public void tearDown() throws Exception {
+  @After public void tearDown() throws Exception {
     coll.close();
     dropDB();
   }
@@ -48,8 +46,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetName() throws Exception {
+  @Test public void testGetName() throws Exception {
     assertEquals(COLL, coll.getName());
   }
 
@@ -57,8 +54,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetServices() throws Exception {
+  @Test public void testGetServices() throws Exception {
     // get all services
     final Code code = new Code() {
       @Override
@@ -78,8 +74,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetService() throws Exception {
+  @Test public void testGetService() throws Exception {
     // assume existence of XPath service
     assertNotNull("XPath Implementation expected.",
         coll.getService("XPathQueryService", "1.0"));
@@ -102,8 +97,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetParentCollection() throws Exception {
+  @Test public void testGetParentCollection() throws Exception {
     // assume there's no parent collection
     final Code code = new Code() {
       @Override
@@ -117,8 +111,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetChildCollectionCount() throws Exception {
+  @Test public void testGetChildCollectionCount() throws Exception {
     // assume there's no child collection
     final Code code = new Code() {
       @Override
@@ -134,8 +127,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testListChildCollections() throws Exception {
+  @Test public void testListChildCollections() throws Exception {
     // assume there's no child collection
     final Code code = new Code() {
       @Override
@@ -149,8 +141,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetChildCollection() throws Exception {
+  @Test public void testGetChildCollection() throws Exception {
     // assume there's no child collection
     final Code code = new Code() {
       @Override
@@ -166,8 +157,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetResourceCount() throws Exception {
+  @Test public void testGetResourceCount() throws Exception {
     // tests could be added for here multiple documents
     final Code code = new Code() {
       @Override
@@ -181,8 +171,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testListResources() throws Exception {
+  @Test public void testListResources() throws Exception {
     final Code code = new Code() {
       @Override
       Object run() throws XMLDBException { return coll.listResources(); }
@@ -197,8 +186,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testCreateResource() throws Exception {
+  @Test public void testCreateResource() throws Exception {
     // test unknown resource type
     try {
       coll.createResource("hans", "UnknownResource");
@@ -236,8 +224,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testStoreResource() throws Exception {
+  @Test public void testStoreResource() throws Exception {
     Resource res = coll.createResource("NoContent", XMLResource.RESOURCE_TYPE);
 
     // try to store resource with missing content
@@ -301,8 +288,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testRemoveResource() throws Exception {
+  @Test public void testRemoveResource() throws Exception {
     final Resource res =
         coll.createResource("Correct", XMLResource.RESOURCE_TYPE);
     res.setContent("<xml/>");
@@ -338,8 +324,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testCreateId() throws Exception {
+  @Test public void testCreateId() throws Exception {
     final Code code = new Code() {
       @Override
       Object run() throws XMLDBException { return coll.createId(); }
@@ -358,8 +343,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testIsOpen() throws Exception {
+  @Test public void testIsOpen() throws Exception {
     assertTrue(coll.isOpen());
     coll.close();
     assertFalse(coll.isOpen());
@@ -369,8 +353,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testClose() throws Exception {
+  @Test public void testClose() throws Exception {
     coll.close();
     coll.close();
     assertFalse(coll.isOpen());
@@ -380,8 +363,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetProperty() throws Exception {
+  @Test public void testGetProperty() throws Exception {
     assertNull(coll.getProperty("ProbablyUnknown"));
 
     // the following tests are database specific...
@@ -393,8 +375,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testSetProperty() throws Exception {
+  @Test public void testSetProperty() throws Exception {
     try {
       coll.setProperty("ProbablyUnknown", "on");
       fail("Invalid key was assigned.");

@@ -19,8 +19,7 @@ public final class SessionModuleTest extends HTTPTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass
-  public static void start() throws Exception {
+  @BeforeClass public static void start() throws Exception {
     init(REST_ROOT, true);
   }
 
@@ -28,8 +27,7 @@ public final class SessionModuleTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void id() throws Exception {
+  @Test public void id() throws Exception {
     assertEquals("1", get("?query=" + request("count(S:id())")));
   }
 
@@ -37,8 +35,7 @@ public final class SessionModuleTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void names() throws Exception {
+  @Test public void names() throws Exception {
     assertEquals("a", get("?query=" + request("S:set('a','b'), S:names()")));
   }
 
@@ -46,8 +43,7 @@ public final class SessionModuleTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void get() throws Exception {
+  @Test public void get() throws Exception {
     assertEquals("", get("?query=" + request("S:get('a')")));
   }
 
@@ -55,8 +51,7 @@ public final class SessionModuleTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void set() throws Exception {
+  @Test public void set() throws Exception {
     final String query = "S:set('a','b'), S:get('a')";
     assertEquals("b", get("?query=" + request(query)));
   }
@@ -65,8 +60,7 @@ public final class SessionModuleTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test
-  public void close() throws Exception {
+  @Test public void close() throws Exception {
     assertEquals("", get("?query=" + request("S:close()")));
   }
 

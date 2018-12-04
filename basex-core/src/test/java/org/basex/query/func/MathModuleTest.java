@@ -13,8 +13,7 @@ import org.junit.*;
  */
 public final class MathModuleTest extends AdvancedQueryTest {
   /** Test method. */
-  @Test
-  public void crc32() {
+  @Test public void crc32() {
     final Function func = _MATH_CRC32;
     query(func.args(" ()"), "");
     query(func.args(" ()"), "");
@@ -23,36 +22,31 @@ public final class MathModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void pi() {
+  @Test public void pi() {
     final Function func = _MATH_PI;
     query(func.args(), StrictMath.PI);
   }
 
   /** Test method. */
-  @Test
-  public void e() {
+  @Test public void e() {
     final Function func = _MATH_E;
     query(func.args(), StrictMath.E);
   }
 
   /** Test method. */
-  @Test
-  public void sinh() {
+  @Test public void sinh() {
     final Function func = _MATH_SINH;
     query(func.args(" 0"), 0);
   }
 
   /** Test method. */
-  @Test
-  public void cosh() {
+  @Test public void cosh() {
     final Function func = _MATH_COSH;
     query(func.args(" 0"), 1);
   }
 
   /** Test method. */
-  @Test
-  public void tanh() {
+  @Test public void tanh() {
     final Function func = _MATH_TANH;
     query(func.args(" 0"), 0);
   }

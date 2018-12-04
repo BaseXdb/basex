@@ -29,8 +29,7 @@ public abstract class RESTTest extends HTTPTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass
-  public static void start() throws Exception {
+  @BeforeClass public static void start() throws Exception {
     init(REST_ROOT, true);
   }
 

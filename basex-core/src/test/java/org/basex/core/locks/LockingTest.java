@@ -55,8 +55,7 @@ public final class LockingTest extends SandboxTest {
    * Single thread acquires both global read lock and a single write lock.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void singleThreadGlobalReadLocalWriteTest() throws InterruptedException {
+  @Test public void singleThreadGlobalReadLocalWriteTest() throws InterruptedException {
     final CountDownLatch test = new CountDownLatch(1);
     final LockTester th1 = new LockTester(null, null, objects, test);
 
@@ -70,8 +69,7 @@ public final class LockingTest extends SandboxTest {
    * Test for concurrent writes.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void writeWriteTest() throws InterruptedException {
+  @Test public void writeWriteTest() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
     final LockTester th1 = new LockTester(null, NONE, objects, sync);
     final LockTester th2 = new LockTester(sync, NONE, objects, test);
@@ -90,8 +88,7 @@ public final class LockingTest extends SandboxTest {
    * Fetch write lock, then read lock.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void writeReadTest() throws InterruptedException {
+  @Test public void writeReadTest() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
     final LockTester th1 = new LockTester(null, NONE, objects, sync);
     final LockTester th2 = new LockTester(sync, objects, NONE, test);
@@ -110,8 +107,7 @@ public final class LockingTest extends SandboxTest {
    * Fetch read lock, then write lock.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void readWriteTest() throws InterruptedException {
+  @Test public void readWriteTest() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
     final LockTester th1 = new LockTester(null, objects, NONE, sync);
     final LockTester th2 = new LockTester(sync, NONE, objects, test);
@@ -130,8 +126,7 @@ public final class LockingTest extends SandboxTest {
    * Fetch two read locks.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void readReadTest() throws InterruptedException {
+  @Test public void readReadTest() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
     final LockTester th1 = new LockTester(null, objects, NONE, sync);
     final LockTester th2 = new LockTester(sync, objects, NONE, test);
@@ -148,8 +143,7 @@ public final class LockingTest extends SandboxTest {
    * Test parallel transaction limit.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void parallelTransactionLimitTest() throws InterruptedException {
+  @Test public void parallelTransactionLimitTest() throws InterruptedException {
     final CountDownLatch latch =
         new CountDownLatch(Math.max(context.soptions.get(StaticOptions.PARALLEL), 1));
     // Container for(maximum number allowed transactions) + 1 testers
@@ -184,8 +178,7 @@ public final class LockingTest extends SandboxTest {
    * Global locking test.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void globalWriteLocalWriteLockingTest() throws InterruptedException {
+  @Test public void globalWriteLocalWriteLockingTest() throws InterruptedException {
     final CountDownLatch sync1 = new CountDownLatch(1), sync2 = new CountDownLatch(1),
         test = new CountDownLatch(1);
     final LockTester th1 = new LockTester(null, NONE, objects, sync1);
@@ -212,8 +205,7 @@ public final class LockingTest extends SandboxTest {
    * Global locking test.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void globalWriteLocalReadLockingTest() throws InterruptedException {
+  @Test public void globalWriteLocalReadLockingTest() throws InterruptedException {
     final CountDownLatch sync1 = new CountDownLatch(1), sync2 = new CountDownLatch(1),
         test = new CountDownLatch(1);
     final LockTester th1 = new LockTester(null, objects, NONE, sync1);
@@ -240,8 +232,7 @@ public final class LockingTest extends SandboxTest {
    * Global locking test.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void globalReadLocalWriteLockingTest() throws InterruptedException {
+  @Test public void globalReadLocalWriteLockingTest() throws InterruptedException {
     final CountDownLatch sync1 = new CountDownLatch(1), sync2 = new CountDownLatch(1),
         test = new CountDownLatch(1);
     final LockTester th1 = new LockTester(null, NONE, objects, sync1);
@@ -268,8 +259,7 @@ public final class LockingTest extends SandboxTest {
    * Global locking test.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void globalReadLocalReadLockingTest() throws InterruptedException {
+  @Test public void globalReadLocalReadLockingTest() throws InterruptedException {
     final CountDownLatch sync1 = new CountDownLatch(1), sync2 = new CountDownLatch(1),
         test = new CountDownLatch(1);
     final LockTester th1 = new LockTester(null, objects, NONE, sync1);
@@ -292,8 +282,7 @@ public final class LockingTest extends SandboxTest {
    * Simultaneous read/write lock test.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void simultaneousReadWriteTest() throws InterruptedException {
+  @Test public void simultaneousReadWriteTest() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
     final LockTester th1 = new LockTester(null, objects, objects, sync);
     final LockTester th2 = new LockTester(sync, objects, NONE, test);
@@ -315,8 +304,7 @@ public final class LockingTest extends SandboxTest {
    * Another simultaneous read/write lock test.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void simultaneousReadWriteTestSingleReadFirst() throws InterruptedException {
+  @Test public void simultaneousReadWriteTestSingleReadFirst() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
     final LockTester th1 = new LockTester(null, objects, NONE, sync);
     final LockTester th2 = new LockTester(sync, objects, objects, test);
@@ -335,8 +323,7 @@ public final class LockingTest extends SandboxTest {
    * Another simultaneous read/write lock test.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void simultaneousReadWriteTestSingleWriteFirst() throws InterruptedException {
+  @Test public void simultaneousReadWriteTestSingleWriteFirst() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
     final LockTester th1 = new LockTester(null, NONE, objects, sync);
     final LockTester th2 = new LockTester(sync, objects, objects, test);
@@ -355,8 +342,7 @@ public final class LockingTest extends SandboxTest {
    * Locks downgrading, the other thread is reader.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void downgradeOtherReadTest() throws InterruptedException {
+  @Test public void downgradeOtherReadTest() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
 
     assertTrue("Increase {@code objects.length}!", objects.length > 1);
@@ -377,8 +363,7 @@ public final class LockingTest extends SandboxTest {
    * Locks downgrading, the other thread is writer.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void downgradeOtherWriteTest() throws InterruptedException {
+  @Test public void downgradeOtherWriteTest() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
 
     assertTrue("Increase {@code objects.length}!", objects.length > 1);
@@ -401,8 +386,7 @@ public final class LockingTest extends SandboxTest {
    * Downgrades from global write lock, other fetches local writes locks.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void downgradeGlobalWriteLockTest() throws InterruptedException {
+  @Test public void downgradeGlobalWriteLockTest() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
 
     final LockTester th1 = new LockTester(null, NONE, null, sync);
@@ -422,8 +406,7 @@ public final class LockingTest extends SandboxTest {
    * Downgrades from global write lock, other fetches local writes locks.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void downgradeToNoWriteLocksTest() throws InterruptedException {
+  @Test public void downgradeToNoWriteLocksTest() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
 
     final LockTester th1 = new LockTester(null, NONE, objects, sync);
@@ -441,8 +424,7 @@ public final class LockingTest extends SandboxTest {
    * Locks downgrading holding read locks.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void downgradeHoldingReadLocksTest() throws InterruptedException {
+  @Test public void downgradeHoldingReadLocksTest() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
 
     assertTrue("Increase {@code objects.length}!", objects.length > 1);
@@ -466,8 +448,7 @@ public final class LockingTest extends SandboxTest {
    * Forces a deadlock.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void deadlockTest() throws InterruptedException {
+  @Test public void deadlockTest() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test2 = new CountDownLatch(1),
         test3 = new CountDownLatch(1);
 
@@ -505,8 +486,7 @@ public final class LockingTest extends SandboxTest {
    * random locks, hold them for a while, release them and fetch the next one.
    * @throws InterruptedException Got interrupted.
    */
-  @Test
-  public void fuzzingTest() throws InterruptedException {
+  @Test public void fuzzingTest() throws InterruptedException {
     assertTrue("Increase {@code objects.length}!", objects.length > 1);
 
     final Thread[] threads = new Thread[FUZZING_THREADS];

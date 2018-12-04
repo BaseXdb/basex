@@ -15,16 +15,14 @@ public final class DiskDataTest extends MemDataTest {
   private final String dbName = Util.className(DiskDataTest.class);
 
   @Override
-  @Before
-  public void setUp() {
+  @Before public void setUp() {
     execute(new CreateDB(dbName, XMLSTR));
   }
 
   /**
    * Clean up method; executed after each test; drops the database.
    */
-  @After
-  public void cleanUp() {
+  @After public void cleanUp() {
     execute(new DropDB(dbName));
   }
 }

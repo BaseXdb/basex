@@ -22,16 +22,14 @@ public final class PathTest extends AdvancedQueryTest {
   /**
    * Creates a database.
    */
-  @Before
-  public void setUp() {
+  @Before public void setUp() {
     execute(new CreateDB(NAME, FILE));
   }
 
   /**
    * Drops the database.
    */
-  @After
-  public void tearDown() {
+  @After public void tearDown() {
     execute(new DropDB(NAME));
   }
 

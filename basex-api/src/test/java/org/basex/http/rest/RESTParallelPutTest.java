@@ -29,8 +29,7 @@ public final class RESTParallelPutTest extends HTTPTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass
-  public static void start() throws Exception {
+  @BeforeClass public static void start() throws Exception {
     init(REST_ROOT, true);
   }
 
@@ -40,8 +39,7 @@ public final class RESTParallelPutTest extends HTTPTest {
    * Concurrency test.
    * @throws Exception exception
    */
-  @Test
-  public void test() throws Exception {
+  @Test public void test() throws Exception {
     put(NAME, new ArrayInput(""));
 
     // start and join concurrent clients

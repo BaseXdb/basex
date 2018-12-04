@@ -32,8 +32,7 @@ public final class PoolTest extends SandboxTest {
    * Starts the server.
    * @throws Exception exception
    */
-  @BeforeClass
-  public static void start() throws Exception {
+  @BeforeClass public static void start() throws Exception {
     server = createServer();
     session1 = createClient();
     session2 = createClient();
@@ -43,16 +42,14 @@ public final class PoolTest extends SandboxTest {
    * Stops the server.
    * @throws IOException I/O exception
    */
-  @AfterClass
-  public static void stop() throws IOException {
+  @AfterClass public static void stop() throws IOException {
     session1.close();
     session2.close();
     stopServer(server);
   }
 
   /** Create and Drop Tests. */
-  @Test
-  public void createAndDrop() {
+  @Test public void createAndDrop() {
     ok(new CreateDB(NAME, FILE), session1);
     pins(1, NAME);
     ok(new CreateDB(NAME, FILE), session1);
@@ -68,8 +65,7 @@ public final class PoolTest extends SandboxTest {
   }
 
   /** Close and Open Tests. */
-  @Test
-  public void closeAndOpen() {
+  @Test public void closeAndOpen() {
     ok(new CreateDB(NAME, FILE), session2);
     pins(1, NAME);
     ok(new Close(), session1);

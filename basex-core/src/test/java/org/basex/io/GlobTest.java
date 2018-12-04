@@ -55,8 +55,7 @@ public final class GlobTest {
   /**
    * Glob test.
    */
-  @Test
-  public void test() {
+  @Test public void test() {
     for(final TEST g : TEST.values()) {
       final String regex = IOFile.regex(g.glob);
       final int sl = STRINGS.length;

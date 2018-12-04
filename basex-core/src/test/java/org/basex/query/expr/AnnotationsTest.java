@@ -13,8 +13,7 @@ import org.junit.*;
  */
 public final class AnnotationsTest extends AdvancedQueryTest {
   /** Parsing of function declarations. */
-  @Test
-  public void functionDecl() {
+  @Test public void functionDecl() {
     query("declare namespace a='a';declare %a:a function local:x() {1}; local:x()", 1);
     query("declare %public function local:x() { 1 }; local:x()", 1);
     query("declare %private function local:x() { 1 }; local:x()", 1);
@@ -22,8 +21,7 @@ public final class AnnotationsTest extends AdvancedQueryTest {
   }
 
   /** Parsing of variable declarations. */
-  @Test
-  public void varDecl() {
+  @Test public void varDecl() {
     query("declare %public variable $x := 1; $x", 1);
     query("declare %private variable $x := 1; $x", 1);
     query("declare namespace a='a';declare %a:a variable $x := 1; $x", 1);
@@ -31,8 +29,7 @@ public final class AnnotationsTest extends AdvancedQueryTest {
   }
 
   /** Parsing errors and conflicts. */
-  @Test
-  public void conflicts() {
+  @Test public void conflicts() {
     error("declare namespace a='a';declare %a:a() variable $x:=1; $x", ANNVALUE);
     error("declare namespace a='a';declare %a:a() variable $x:=1; $x", ANNVALUE);
     error("declare %pfff:public variable $x := 1; $x", NOURI_X);
@@ -47,8 +44,7 @@ public final class AnnotationsTest extends AdvancedQueryTest {
   }
 
   /** Parsing errors and conflicts. */
-  @Test
-  public void unknown() {
+  @Test public void unknown() {
     // ignore prefixes with no annotation definitions
     error("declare %db:xx function local:x() { 1 }; 1", BASEX_ANNOTATION1_X_X);
     // check unit annotations

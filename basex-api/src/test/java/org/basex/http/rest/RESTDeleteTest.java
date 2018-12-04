@@ -21,8 +21,7 @@ public final class RESTDeleteTest extends RESTTest {
    * DELETE Test.
    * @throws IOException I/O exception
    */
-  @Test
-  public void delete1() throws IOException {
+  @Test public void delete1() throws IOException {
     put(NAME, new FileInputStream(FILE));
     // delete database
     assertEquals(delete(NAME).trim(), Util.info(Text.DB_DROPPED_X, NAME));
@@ -38,8 +37,7 @@ public final class RESTDeleteTest extends RESTTest {
    * DELETE Test.
    * @throws IOException I/O exception
    */
-  @Test
-  public void delete2() throws IOException {
+  @Test public void delete2() throws IOException {
     put(NAME, null);
     put(NAME + "/a", new ArrayInput(token("<a/>")));
     put(NAME + "/b", new ArrayInput(token("<b/>")));
@@ -63,8 +61,7 @@ public final class RESTDeleteTest extends RESTTest {
    * DELETE Test: specify an option.
    * @throws IOException I/O exception
    */
-  @Test
-  public void deleteOption() throws IOException {
+  @Test public void deleteOption() throws IOException {
     put(NAME, null);
     delete(NAME + "/a?" + MainOptions.CHOP.name() + "=true");
     try {

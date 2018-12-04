@@ -38,8 +38,7 @@ public class CommandTest extends SandboxTest {
   /** Starts the server.
    * @throws IOException I/O exception
    */
-  @BeforeClass
-  public static void start() throws IOException {
+  @BeforeClass public static void start() throws IOException {
     session = new LocalSession(context);
     cleanUp();
   }
@@ -62,14 +61,12 @@ public class CommandTest extends SandboxTest {
    * Creates the database.
    * @throws IOException I/O exception
    */
-  @After
-  public final void after() throws IOException {
+  @After public final void after() throws IOException {
     cleanUp();
   }
 
   /** Command test. */
-  @Test
-  public final void add() {
+  @Test public final void add() {
     // database must be opened to add files
     no(new Add("", FILE));
     ok(new CreateDB(NAME));
@@ -80,8 +77,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void alterDB() {
+  @Test public final void alterDB() {
     no(new AlterDB("unknown", NAME));
 
     ok(new CreateDB(NAME));
@@ -95,8 +91,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void alterPassword() {
+  @Test public final void alterPassword() {
     ok(new CreateUser(NAME, NAME));
     ok(new AlterPassword(NAME, "test"));
     no(new AlterPassword(":", NAME));
@@ -104,8 +99,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void alterUser() {
+  @Test public final void alterUser() {
     // admin cannot be renamed
     no(new AlterUser(ADMIN, NAME));
     no(new AlterUser(NAME, ADMIN));
@@ -124,8 +118,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void close() {
+  @Test public final void close() {
     // close is successful, even if no database is opened
     ok(new Close());
     ok(new CreateDB(NAME, FILE));
@@ -134,8 +127,7 @@ public class CommandTest extends SandboxTest {
 
   /** Create Backup Test.
    * Using glob Syntax. */
-  @Test
-  public final void createBackup() {
+  @Test public final void createBackup() {
     no(new CreateBackup(NAME));
     ok(new CreateDB(NAME));
     ok(new CreateDB(NAME2));
@@ -158,8 +150,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void createDB() {
+  @Test public final void createDB() {
     ok(new CreateDB(NAME, FILE));
     ok(new InfoDB());
     ok(new CreateDB(NAME, FILE));
@@ -180,8 +171,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void createIndex() {
+  @Test public final void createIndex() {
     no(new CreateIndex(null));
     for(final CmdIndex cmd : CmdIndex.values()) no(new CreateIndex(cmd));
     ok(new CreateDB(NAME, FILE));
@@ -190,8 +180,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void createUser() {
+  @Test public final void createUser() {
     ok(new CreateUser(NAME2, "test"));
     ok(new CreateUser(NAME2, "test"));
     ok(new DropUser(NAME2));
@@ -203,8 +192,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void delete() {
+  @Test public final void delete() {
     // database must be opened to add and delete files
     no(new Delete(FILE));
     ok(new CreateDB(NAME));
@@ -220,8 +208,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void dropDB() {
+  @Test public final void dropDB() {
     ok(new DropDB(NAME));
     ok(new CreateDB(NAME, FILE));
     ok(new DropDB(NAME2));
@@ -241,8 +228,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void dropIndex() {
+  @Test public final void dropIndex() {
     for(final CmdIndex cmd : CmdIndex.values()) no(new DropIndex(cmd));
     ok(new CreateDB(NAME, FILE));
     for(final CmdIndex cmd : CmdIndex.values()) ok(new DropIndex(cmd));
@@ -250,8 +236,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void dropUser() {
+  @Test public final void dropUser() {
     ok(new CreateUser(NAME, NAME));
     ok(new CreateUser(NAME2, NAME));
 
@@ -268,8 +253,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void export() {
+  @Test public final void export() {
     final IOFile io = new IOFile(FN);
     no(new Export(io.path()));
     ok(new CreateDB(NAME, FILE));
@@ -280,16 +264,14 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void find() {
+  @Test public final void find() {
     no(new Find("1"));
     ok(new CreateDB(NAME, FILE));
     ok(new Find("1"));
   }
 
   /** Command test. */
-  @Test
-  public final void flush() {
+  @Test public final void flush() {
     no(new Flush());
     ok(new CreateDB(NAME));
     ok(new Flush());
@@ -298,8 +280,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void get() {
+  @Test public final void get() {
     ok(new Get());
     ok(new Get(MainOptions.CHOP));
     ok(new Get(MainOptions.TOKENINCLUDE));
@@ -307,8 +288,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void grant() {
+  @Test public final void grant() {
     ok(new CreateUser(NAME2, "test"));
     ok(new CreateUser(NAME, "test"));
     no(new Grant("something", NAME2));
@@ -322,29 +302,25 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void help() {
+  @Test public final void help() {
     no(new Help("bla"));
     ok(new Help(null));
   }
 
   /** Command test. */
-  @Test
-  public final void info() {
+  @Test public final void info() {
     ok(new Info());
   }
 
   /** Command test. */
-  @Test
-  public final void infoDB() {
+  @Test public final void infoDB() {
     no(new InfoDB());
     ok(new CreateDB(NAME, FILE));
     ok(new InfoDB());
   }
 
   /** Command test. */
-  @Test
-  public final void infoIndex() {
+  @Test public final void infoIndex() {
     no(new InfoIndex());
     ok(new CreateDB(NAME, FILE));
     ok(new InfoIndex());
@@ -352,8 +328,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void infoTable() {
+  @Test public final void infoTable() {
     no(new InfoStorage("1", "2"));
     ok(new CreateDB(NAME, FILE));
     ok(new InfoStorage());
@@ -362,24 +337,21 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void list() {
+  @Test public final void list() {
     ok(new List());
     ok(new CreateDB(NAME, FILE));
     ok(new List());
   }
 
   /** Command test. */
-  @Test
-  public final void listdb() {
+  @Test public final void listdb() {
     no(new List(NAME));
     ok(new CreateDB(NAME, FILE));
     ok(new List(NAME));
   }
 
   /** Command test. */
-  @Test
-  public final void open() {
+  @Test public final void open() {
     no(new Open(NAME));
     ok(new CreateDB(NAME, FILE));
     ok(new Open(NAME));
@@ -390,8 +362,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void optimize() {
+  @Test public final void optimize() {
     no(new Optimize());
     no(new OptimizeAll());
     ok(new CreateDB(NAME, FILE));
@@ -401,14 +372,12 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void password() {
+  @Test public final void password() {
     ok(new Password(UserText.ADMIN));
   }
 
   /** Command test. */
-  @Test
-  public final void rename() {
+  @Test public final void rename() {
     // database must be opened to rename paths
     no(new Rename(FILE, "xxx"));
     ok(new CreateDB(NAME, FILE));
@@ -438,8 +407,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void replace() {
+  @Test public final void replace() {
     // query to count number of documents
     final String count = COUNT.args(_DB_OPEN.args(NAME));
     // database must be opened to replace resources
@@ -470,8 +438,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void restore() {
+  @Test public final void restore() {
     no(new Restore(NAME));
     ok(new CreateDB(NAME));
     ok(new CreateBackup(NAME));
@@ -501,8 +468,7 @@ public class CommandTest extends SandboxTest {
   /**
    * Dropping backups.
    */
-  @Test
-  public final void dropBackup() {
+  @Test public final void dropBackup() {
     // dropping a backup with db name as argument
     ok(new CreateDB(NAME));
     ok(new CreateBackup(NAME));
@@ -519,8 +485,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Retrieves raw data. */
-  @Test
-  public final void retrieve() {
+  @Test public final void retrieve() {
     ok(new CreateDB(NAME));
     // retrieve non-existing file
     no(new Retrieve(NAME2));
@@ -530,8 +495,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Stores raw data. */
-  @Test
-  public final void store() {
+  @Test public final void store() {
     ok(new CreateDB(NAME));
     ok(new Store(NAME2, FILE));
     // file can be overwritten
@@ -547,8 +511,7 @@ public class CommandTest extends SandboxTest {
    * Command test.
    * @throws IOException I/O exception
    */
-  @Test
-  public final void run() throws IOException {
+  @Test public final void run() throws IOException {
     // test xquery
     IOFile io = new IOFile("test.xq");
     no(new Run(io.path()));
@@ -569,8 +532,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void execute() {
+  @Test public final void execute() {
     ok(new Execute(new CreateDB(NAME, FILE).toString()));
     ok(new XQuery("//li"));
     ok(new Execute("<info/>"));
@@ -583,8 +545,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void set() {
+  @Test public final void set() {
     ok(new Set(MainOptions.CHOP, false));
     ok(new Set(MainOptions.CHOP, true));
     ok(new Set("chop", true));
@@ -596,26 +557,22 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void jobsList() {
+  @Test public final void jobsList() {
     ok(new JobsList());
   }
 
   /** Command test. */
-  @Test
-  public final void jobsResult() {
+  @Test public final void jobsResult() {
     no(new JobsResult("job1"));
   }
 
   /** Command test. */
-  @Test
-  public final void jobsStop() {
+  @Test public final void jobsStop() {
     ok(new JobsStop("job1"));
   }
 
   /** Command test. */
-  @Test
-  public final void showUsers() {
+  @Test public final void showUsers() {
     ok(new ShowUsers());
     ok(new ShowUsers(NAME));
     ok(new CreateDB(NAME));
@@ -624,8 +581,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void xquery() {
+  @Test public final void xquery() {
     no(new XQuery("/"));
     ok(new CreateDB(NAME, FILE));
     ok(new XQuery("/"));
@@ -634,8 +590,7 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test
-  public final void test() {
+  @Test public final void test() {
     no(new org.basex.core.cmd.Test("sfsdssdf"));
     no(new org.basex.core.cmd.Test(FOLDER + "tests.xqm"));
     ok(new org.basex.core.cmd.Test(FOLDER + "tests-ok.xqm"));

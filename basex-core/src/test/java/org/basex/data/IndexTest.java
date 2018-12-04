@@ -41,16 +41,14 @@ public final class IndexTest extends AdvancedQueryTest {
   /**
    * Initializes a test.
    */
-  @Before
-  public void before() {
+  @Before public void before() {
     set(MainOptions.MAINMEM, mainmem);
   }
 
   /**
    * Finalize test.
    */
-  @After
-  public void after() {
+  @After public void after() {
     execute(new DropDB(NAME));
     set(MainOptions.TOKENINDEX, false);
     set(MainOptions.UPDINDEX, false);
@@ -61,8 +59,7 @@ public final class IndexTest extends AdvancedQueryTest {
   /**
    * Test.
    */
-  @Test
-  public void updindexText() {
+  @Test public void updindexText() {
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
@@ -76,8 +73,7 @@ public final class IndexTest extends AdvancedQueryTest {
   /**
    * Test.
    */
-  @Test
-  public void updindexText2() {
+  @Test public void updindexText2() {
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
@@ -92,8 +88,7 @@ public final class IndexTest extends AdvancedQueryTest {
   /**
    * Test.
    */
-  @Test
-  public void updindexText3() {
+  @Test public void updindexText3() {
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
@@ -107,8 +102,7 @@ public final class IndexTest extends AdvancedQueryTest {
   /**
    * Test.
    */
-  @Test
-  public void updindexAttribute() {
+  @Test public void updindexAttribute() {
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
@@ -124,8 +118,7 @@ public final class IndexTest extends AdvancedQueryTest {
   /**
    * Test.
    */
-  @Test
-  public void updindexToken() {
+  @Test public void updindexToken() {
     set(MainOptions.UPDINDEX, true);
     set(MainOptions.TOKENINDEX, true);
     execute(new CreateDB(NAME));
@@ -148,8 +141,7 @@ public final class IndexTest extends AdvancedQueryTest {
   /**
    * Test.
    */
-  @Test
-  public void updindexReplace1() {
+  @Test public void updindexReplace1() {
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME, "<X><A>q</A><B>q</B></X>"));
     query("replace node /X/A with 'x', replace node /X/B with 'y'", "");
@@ -158,8 +150,7 @@ public final class IndexTest extends AdvancedQueryTest {
   /**
    * Test.
    */
-  @Test
-  public void updindexReplace2() {
+  @Test public void updindexReplace2() {
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
     execute(new Replace("A", "<X a='?' b='a' c='1'/>"));
@@ -170,8 +161,7 @@ public final class IndexTest extends AdvancedQueryTest {
   /**
    * Test.
    */
-  @Test
-  public void updindexOpenClose1() {
+  @Test public void updindexOpenClose1() {
     final boolean openClose = !(Boolean) mainmem;
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
@@ -187,8 +177,7 @@ public final class IndexTest extends AdvancedQueryTest {
   /**
    * Test.
    */
-  @Test
-  public void updindexOpenClose2() {
+  @Test public void updindexOpenClose2() {
     final boolean openClose = !(Boolean) mainmem;
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
@@ -206,8 +195,7 @@ public final class IndexTest extends AdvancedQueryTest {
   /**
    * Test.
    */
-  @Test
-  public void autooptimize() {
+  @Test public void autooptimize() {
     set(MainOptions.AUTOOPTIMIZE, true);
     execute(new CreateDB(NAME));
     query(_DB_INFO.args(NAME) + "//textindex/text()", true);

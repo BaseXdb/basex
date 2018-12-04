@@ -53,8 +53,7 @@ public final class CommandLockingTest extends SandboxTest {
   /**
    * Test commands affecting databases.
    */
-  @Test
-  public void databaseCommands() {
+  @Test public void databaseCommands() {
     ckDBs(new Add(FILE, FILE), true, CTX_LIST);
     ckDBs(new AlterDB(NAME, NAME2), true, new LockList().add(NAME).add(NAME2));
     ckDBs(new AlterPassword(NAME, NAME), true, USER_LIST);
@@ -113,8 +112,7 @@ public final class CommandLockingTest extends SandboxTest {
   }
 
   /** Tests locked databases in XQuery queries. */
-  @Test
-  public void xquery() {
+  @Test public void xquery() {
     // Basic document access
     ckDBs(new XQuery(COLLECTION.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(COLLECTION.args()), false, CTX_LIST);
@@ -192,22 +190,19 @@ public final class CommandLockingTest extends SandboxTest {
   }
 
   /** Test admin module. */
-  @Test
-  public void admin() {
+  @Test public void admin() {
     ckDBs(new XQuery(_ADMIN_SESSIONS.args()), false, NONE);
     ckDBs(new XQuery(_ADMIN_LOGS.args()), false, NONE);
   }
 
   /** Test user module. */
-  @Test
-  public void user() {
+  @Test public void user() {
     ckDBs(new XQuery(_USER_LIST.args()), false, NONE);
     ckDBs(new XQuery(_USER_LIST_DETAILS.args()), false, NONE);
   }
 
   /** Test database module. */
-  @Test
-  public void db() {
+  @Test public void db() {
     // General Functions
     ckDBs(new XQuery(_DB_INFO.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(_DB_LIST.args(NAME)), false, NAME_LIST);
@@ -254,8 +249,7 @@ public final class CommandLockingTest extends SandboxTest {
   }
 
   /** Test ft module. */
-  @Test
-  public void ft() {
+  @Test public void ft() {
     ckDBs(new XQuery(_FT_SEARCH.args(NAME, "foo")), false, NAME_LIST);
     ckDBs(new XQuery(_FT_TOKENS.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(_FT_TOKENS.args(NAME, "foo")), false, NAME_LIST);
@@ -263,8 +257,7 @@ public final class CommandLockingTest extends SandboxTest {
   }
 
   /** Test index module. */
-  @Test
-  public void index() {
+  @Test public void index() {
     ckDBs(new XQuery(_INDEX_FACETS.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(_INDEX_TEXTS.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(_INDEX_TEXTS.args(NAME, "foo")), false, NAME_LIST);
@@ -277,20 +270,17 @@ public final class CommandLockingTest extends SandboxTest {
   }
 
   /** Update module. */
-  @Test
-  public void update() {
+  @Test public void update() {
     ckDBs(new XQuery(_UPDATE_OUTPUT.args("foo")), true, NONE);
   }
 
   /** Test repository module. */
-  @Test
-  public void repository() {
+  @Test public void repository() {
     ckDBs(new XQuery(_REPO_LIST.args()), false, REPO_LIST);
   }
 
   /** Test XQuery module. */
-  @Test
-  public void xqueryModule() {
+  @Test public void xqueryModule() {
     ckDBs(new XQuery(_XQUERY_EVAL.args("1")), false, null);
     ckDBs(new XQuery(_XQUERY_EVAL.args(FILE)), false, null);
   }

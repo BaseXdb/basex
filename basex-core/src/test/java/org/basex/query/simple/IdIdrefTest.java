@@ -72,8 +72,7 @@ public final class IdIdrefTest extends QueryTest {
   /**
    * Prepare test, setting up parametrized environment.
    */
-  @Before
-  public void setup() {
+  @Before public void setup() {
     // set up environment
     for(final Set option : paramSet) execute(option);
     execute(new CreateDB(NAME));

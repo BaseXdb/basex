@@ -12,16 +12,14 @@ import org.junit.*;
  */
 public final class BitArrayTest {
   /** Test method for {@link BitArray#toArray()}. */
-  @Test
-  public void getTrimmedWords() {
+  @Test public void getTrimmedWords() {
     final BitArray ba = new BitArray();
     ba.init(new long[] {-1L, 0L}, 64);
     assertEquals("Array not trimmed correctly", 1, ba.toArray().length);
   }
 
   /** Test method for {@link BitArray#get(int)}. */
-  @Test
-  public void get() {
+  @Test public void get() {
     final BitArray ba = new BitArray();
     ba.init(new long[] {-1L, 0L}, 65);
     assertTrue("Bit 63 is 0", ba.get(63));
@@ -29,8 +27,7 @@ public final class BitArrayTest {
   }
 
   /** Test method for {@link BitArray#set(int)}. */
-  @Test
-  public void set() {
+  @Test public void set() {
     final BitArray ba = new BitArray();
     ba.set(128);
     assertTrue("Bit 128 is 0", ba.get(128));
@@ -40,8 +37,7 @@ public final class BitArrayTest {
   }
 
   /** Test method for {@link BitArray#clear(int)}. */
-  @Test
-  public void clear() {
+  @Test public void clear() {
     final BitArray ba = new BitArray();
     ba.init(new long[] {-1L, 0L}, 64);
     ba.clear(63);
@@ -49,16 +45,14 @@ public final class BitArrayTest {
   }
 
   /** Test method for {@link BitArray#nextFree(int)}. */
-  @Test
-  public void nextFree() {
+  @Test public void nextFree() {
     final BitArray ba = new BitArray();
     ba.init(new long[] {-1L, 0L}, 64);
     assertEquals("Incorrect next clear bit", 64, ba.nextFree(0));
   }
 
   /** Test method for {@link BitArray#nextFree(int)}. */
-  @Test
-  public void nextSet() {
+  @Test public void nextSet() {
     final BitArray ba = new BitArray();
     ba.init(new long[] {0L, -1L}, 128);
     assertEquals("Incorrect next clear bit", 64, ba.nextSet(0));
@@ -68,8 +62,7 @@ public final class BitArrayTest {
   }
 
   /** Test method for {@link BitArray#cardinality()}. */
-  @Test
-  public void cardinality() {
+  @Test public void cardinality() {
     final BitArray ba = new BitArray();
     ba.init(new long[] { 0L }, 0);
     assertEquals(0, ba.cardinality());
@@ -88,8 +81,7 @@ public final class BitArrayTest {
   }
 
   /** Creates the constructor which fills the entries with a specified value. */
-  @Test
-  public void preFill() {
+  @Test public void preFill() {
     // map with zero entries
     BitArray ba = new BitArray(0, true);
     assertFalse("Incorrect value", ba.get(0));

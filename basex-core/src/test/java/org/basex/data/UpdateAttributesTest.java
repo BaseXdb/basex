@@ -18,8 +18,7 @@ public final class UpdateAttributesTest extends DataUpdateTest {
    * Tests the update of an existing attribute.
    * @throws IOException I/O exception
    */
-  @Test
-  public void updateAttribute() throws IOException {
+  @Test public void updateAttribute() throws IOException {
     final Data data = context.data();
     data.startUpdate(context.options);
     data.update(7, Data.ATTR, T_NAME, Token.EMPTY);
@@ -38,8 +37,7 @@ public final class UpdateAttributesTest extends DataUpdateTest {
    * Tests the update of an existing attribute.
    * @throws IOException I/O exception
    */
-  @Test
-  public void updateAttribute2() throws IOException {
+  @Test public void updateAttribute2() throws IOException {
     final Data data = context.data();
     data.startUpdate(context.options);
     data.update(8, Data.ATTR, T_NAME, Token.EMPTY);
@@ -56,8 +54,7 @@ public final class UpdateAttributesTest extends DataUpdateTest {
    * Tests the insertion of a new attribute.
    * @throws IOException I/O exception
    */
-  @Test
-  public void addAttribute() throws IOException {
+  @Test public void addAttribute() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
 

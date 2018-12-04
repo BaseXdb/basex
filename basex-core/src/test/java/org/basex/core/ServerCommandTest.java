@@ -26,8 +26,7 @@ public final class ServerCommandTest extends CommandTest {
    * Starts the server.
    * @throws IOException I/O exception
    */
-  @BeforeClass
-  public static void start() throws IOException {
+  @BeforeClass public static void start() throws IOException {
     server = createServer();
     session = createClient();
     cleanUp();
@@ -36,8 +35,7 @@ public final class ServerCommandTest extends CommandTest {
   /**
    * Stops the server.
    */
-  @AfterClass
-  public static void stop() {
+  @AfterClass public static void stop() {
     try {
       if(session != null) session.close();
     } catch(final Exception ex) {
@@ -50,8 +48,7 @@ public final class ServerCommandTest extends CommandTest {
    * Kill test.
    * @throws IOException on server error
    */
-  @Test
-  public void kill() throws IOException {
+  @Test public void kill() throws IOException {
     ok(new Kill(UserText.ADMIN));
     ok(new Kill(UserText.ADMIN + '2'));
     ok(new Kill(Prop.NAME + '*'));

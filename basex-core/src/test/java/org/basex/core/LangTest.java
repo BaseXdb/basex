@@ -18,8 +18,7 @@ public final class LangTest extends SandboxTest {
   /**
    * Tests files.
    */
-  @Test
-  public void test() {
+  @Test public void test() {
     try {
       final ArrayOutput ao = new ArrayOutput();
       System.setErr(new PrintStream(ao));

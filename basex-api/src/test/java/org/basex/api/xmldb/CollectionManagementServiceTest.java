@@ -30,8 +30,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
    * Initializes a test.
    * @throws Exception any exception
    */
-  @Before
-  public void setUp() throws Exception {
+  @Before public void setUp() throws Exception {
     createDB();
     final Class<?> c = Class.forName(DRIVER);
     db = (Database) c.getDeclaredConstructor().newInstance();
@@ -43,8 +42,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
    * Finalizes a test.
    * @throws Exception any exception
    */
-  @After
-  public void tearDown() throws Exception {
+  @After public void tearDown() throws Exception {
     coll.close();
     dropDB();
   }
@@ -53,8 +51,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testCreateCollection() throws Exception {
+  @Test public void testCreateCollection() throws Exception {
     // create a collection
     final Collection coll1 = serv.createCollection(TEMP);
     assertNotSame(coll, coll1);
@@ -70,8 +67,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testRemoveCollection() throws Exception {
+  @Test public void testRemoveCollection() throws Exception {
     serv.removeCollection(TEMP);
     assertNull("Collection was not removed.", db.getCollection(URL + TEMP, null, null));
   }
@@ -80,8 +76,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetName() throws Exception {
+  @Test public void testGetName() throws Exception {
     assertEquals(CMS, serv.getName());
   }
 
@@ -89,8 +84,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetVersion() throws Exception {
+  @Test public void testGetVersion() throws Exception {
     assertEquals("1.0", serv.getVersion());
   }
 }

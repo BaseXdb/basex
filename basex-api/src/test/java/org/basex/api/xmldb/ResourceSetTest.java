@@ -22,8 +22,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
    * Initializes a test.
    * @throws Exception any exception
    */
-  @Before
-  public void setUp() throws Exception {
+  @Before public void setUp() throws Exception {
     createDB();
     final Class<?> c = Class.forName(DRIVER);
     final Database database = (Database) c.getDeclaredConstructor().newInstance();
@@ -35,8 +34,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
    * Finalizes a test.
    * @throws Exception any exception
    */
-  @After
-  public void tearDown() throws Exception {
+  @After public void tearDown() throws Exception {
     coll.close();
     dropDB();
   }
@@ -45,8 +43,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetResource() throws Exception {
+  @Test public void testGetResource() throws Exception {
     // request resource
     final ResourceSet set = serv.query("//node()");
     assertNotNull(set.getResource(0));
@@ -65,8 +62,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testAddResource() throws Exception {
+  @Test public void testAddResource() throws Exception {
     // perform two queries
     final ResourceSet set1 = serv.query("1");
     final ResourceSet set2 = serv.query("2");
@@ -81,8 +77,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testRemoveResource() throws Exception {
+  @Test public void testRemoveResource() throws Exception {
     // perform query and remove result
     final ResourceSet set = serv.query("1");
     set.removeResource(0);
@@ -93,8 +88,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetIterator() throws Exception {
+  @Test public void testGetIterator() throws Exception {
     // test if iterator yields results
     final ResourceSet set = serv.query("1");
     set.removeResource(0);
@@ -106,8 +100,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetMembersAsResource() throws Exception {
+  @Test public void testGetMembersAsResource() throws Exception {
     // test created resource
     final ResourceSet set = serv.query("1");
     final Resource res = set.getMembersAsResource();
@@ -120,8 +113,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testGetSize() throws Exception {
+  @Test public void testGetSize() throws Exception {
     // test created resource
     final ResourceSet set = serv.query("1");
     assertEquals("Wrong result size.", 1, set.getSize());
@@ -133,8 +125,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
    * Test.
    * @throws Exception any exception
    */
-  @Test
-  public void testClear() throws Exception {
+  @Test public void testClear() throws Exception {
     // test created resource
     final ResourceSet set = serv.query("1");
     set.clear();

@@ -41,8 +41,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   /**
    * Single delete.
    */
-  @Test
-  public void scoring01() {
+  @Test public void scoring01() {
     final String doc = "<a><b/></a>";
     final Data d = data(doc);
     compare(
@@ -55,8 +54,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   /**
    * Two basic deletes called on siblings.
    */
-  @Test
-  public void scoring02() {
+  @Test public void scoring02() {
     final String doc = "<a><b/><c/><d/></a>";
     final Data d = data(doc);
     compare(
@@ -70,8 +68,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   /**
    * Three basic deletes called on siblings.
    */
-  @Test
-  public void scoring03() {
+  @Test public void scoring03() {
     final String doc = "<a><b/><c/><d/></a>";
     final Data d = data(doc);
     compare(
@@ -86,8 +83,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   /**
    * 'Insert after' and 'insert before' statement on the same target node.
    */
-  @Test
-  public void scoring04() {
+  @Test public void scoring04() {
     final String doc = "<a><b/></a>";
     final Data d = data(doc);
     compare(
@@ -106,8 +102,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
    * Tests if an insert into statement on target T is scored higher (hence executed first)
    * then all insert into statements on any of its descendant nodes.
    */
-  @Test
-  public void scoring05() {
+  @Test public void scoring05() {
     final String doc = "<a><b/></a>";
     final Data d = data(doc);
     compare(
@@ -125,8 +120,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
    *
    * Tests if the insert into on T is correctly score to be executed first.
    */
-  @Test
-  public void scoring06() {
+  @Test public void scoring06() {
     final String doc = "<a><b/></a>";
     final Data d = data(doc);
     compare(
@@ -146,8 +140,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
    * Tests if two corrected insert into/insert after statements are correctly scored
    * depending on their type (insert after must come first).
    */
-  @Test
-  public void scoring07() {
+  @Test public void scoring07() {
     final String doc = "<a><b><c/></b></a>";
     final Data d = data(doc);
     compare(
@@ -165,8 +158,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
    * Tests if an insert attribute statement on T and a delete statement on the single
    * attribute of T are scored correctly.
    */
-  @Test
-  public void scoring08() {
+  @Test public void scoring08() {
     final String doc = "<a id=\"0\"/>";
     final Data d = data(doc);
     compare(
@@ -183,8 +175,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   /**
    * Test if an exception is thrown for duplicate {@link NodeUpdate}.
    */
-  @Test
-  public void duplicateScore() {
+  @Test public void duplicateScore() {
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("Ambiguous order of UpdatePrimitives: ");
     final String doc = "<a><b/></a>";
@@ -208,8 +199,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
    *   <li> TYPE relates to the {@link UpdateType} hierarchy
    * </ul>
    */
-  @Test
-  public void comparatorTest() {
+  @Test public void comparatorTest() {
     // JUST ADD NEW SCENARIOS TO THE END OF THE DOCUMENT
     final Data d = data(TESTDOCUMENT);
 
@@ -283,8 +273,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   /**
    * Tests {@link InsertIntoAsFirst} on T and a {@link DeleteNode} on the attribute of T.
    */
-  @Test
-  public void shiftInsertIntoAsFirst() {
+  @Test public void shiftInsertIntoAsFirst() {
     final Data d = data(TESTDOCUMENT);
     compare(new NodeUpdate[] {
        new InsertIntoAsFirst(22, d, null, null),
@@ -295,8 +284,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   /**
    * Tests if {@link NodeUpdate} are ordered correctly for a target node T.
    */
-  @Test
-  public void compareOnSingleNode() {
+  @Test public void compareOnSingleNode() {
     final Data d = data(TESTDOCUMENT);
     compare(new NodeUpdate[] {
         new InsertAfter(10, d, null, null),
@@ -314,8 +302,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   /**
    * Tests if {@link NodeUpdate} are ordered correctly for two sibling nodes.
    */
-  @Test
-  public void compareOnSiblings() {
+  @Test public void compareOnSiblings() {
     final Data d = data(TESTDOCUMENT);
     compare(new NodeUpdate[] {
         new InsertAfter(8, d, null, null),
@@ -342,8 +329,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   /**
    * Tests if {@link NodeUpdate} are ordered correctly for a target node T.
    */
-  @Test
-  public void compareComplexRelationships() {
+  @Test public void compareComplexRelationships() {
     final Data d = data(TESTDOCUMENT);
     compare(new NodeUpdate[] {
         // 25
@@ -418,8 +404,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
    * Tests order of {@link NodeUpdate} for 2 siblings with the first sibling having
    * a single child node.
    */
-  @Test
-  public void compareSiblingsComplex() {
+  @Test public void compareSiblingsComplex() {
     final Data d = data(TESTDOCUMENT);
     compare(new NodeUpdate[] {
         // node 28
@@ -449,8 +434,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
    * Tests order of {@link NodeUpdate} for 2 siblings with the first sibling having
    * a single child node.
    */
-  @Test
-  public void compareSiblingsSimple() {
+  @Test public void compareSiblingsSimple() {
     final Data d = data(TESTDOCUMENT);
     compare(new NodeUpdate[] {
         new InsertInto(28, d, null, null),

@@ -36,8 +36,7 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
    * Runs read concurrency test.
    * @throws Throwable any exception or error
    */
-  @Test
-  public void testConcurrentXQuery1to1024() throws Throwable {
+  @Test public void testConcurrentXQuery1to1024() throws Throwable {
     final ArrayList<SimpleQueryThread> sqtList = new ArrayList<>();
 
     for(int i = 0; i < CONCURRENT_READ_THREADS; i++)
@@ -54,8 +53,7 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
    * Runs insert concurrency test.
    * @throws Exception exceptions
    */
-  @Test
-  public void testConcurrentInsert() throws Exception {
+  @Test public void testConcurrentInsert() throws Exception {
     final XQExpression xqpe = xqc.createExpression();
     try {
       xqpe.executeCommand("CREATE DB xqj-concurrent-insert-test");

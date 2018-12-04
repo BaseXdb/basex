@@ -28,8 +28,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Basic Lazy Replace tests.
    */
-  @Test
-  public void lazyReplace() {
+  @Test public void lazyReplace() {
     // IDENTICAL: 0 value updates
     query(transform("<doc><tree/></doc>",
         "replace node $input//tree with <tree/>"),
@@ -65,8 +64,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Basic test for tree-aware updates.
    */
-  @Test
-  public void treeAwareUpdates0() {
+  @Test public void treeAwareUpdates0() {
     final String doc = "<n1>" + "<n2 att3='0'><n4/><n5><n6/></n5></n2>" + "</n1>";
     final AtomicUpdateCache auc = atomics(doc);
     final MemData md = new MemData(context.options);
@@ -92,8 +90,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Tests tree-aware updates algorithm. - Delete and Insert on the single child of a node
    */
-  @Test
-  public void treeAwareUpdates1() {
+  @Test public void treeAwareUpdates1() {
     final String doc = "<a><b/></a>";
     final AtomicUpdateCache auc = atomics(doc);
     final MemData md = new MemData(context.options);
@@ -107,8 +104,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    * Tests tree-aware updates algorithm. - Insert on a target T - Delete and Insert on the
    * single child of T
    */
-  @Test
-  public void treeAwareUpdates2() {
+  @Test public void treeAwareUpdates2() {
     final String doc = "<a><b/></a>";
     final AtomicUpdateCache auc = atomics(doc);
     final MemData md = new MemData(context.options);
@@ -123,8 +119,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Tests tree-aware updates algorithm. - Insert on a target T - Replace on child of T
    */
-  @Test
-  public void treeAwareUpdates3() {
+  @Test public void treeAwareUpdates3() {
     final String doc = "<a><b/></a>";
     final AtomicUpdateCache auc = atomics(doc);
     final MemData md = new MemData(context.options);
@@ -139,8 +134,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    * Tests tree-aware updates algorithm. - Replace and InsertInto on the single child of a
    * node
    */
-  @Test
-  public void treeAwareUpdates4() {
+  @Test public void treeAwareUpdates4() {
     final String doc = "<a><b/></a>";
     final AtomicUpdateCache auc = atomics(doc);
     final MemData md = new MemData(context.options);
@@ -154,8 +148,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Tests tree-aware updates algorithm with value updates.
    */
-  @Test
-  public void treeAwareUpdates5() {
+  @Test public void treeAwareUpdates5() {
     final String doc = "<a><b/></a>";
     final AtomicUpdateCache auc = atomics(doc);
     auc.addDelete(2);
@@ -166,8 +159,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Tests tree-aware updates algorithm with attribute updates.
    */
-  @Test
-  public void treeAwareUpdates6() {
+  @Test public void treeAwareUpdates6() {
     final String doc = "<a><b id='1'/></a>";
     final AtomicUpdateCache auc = atomics(doc);
     auc.addDelete(3);
@@ -178,8 +170,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Merge atomic updates A,B with A being an insert atomic.
    */
-  @Test
-  public void mergeSequence01() {
+  @Test public void mergeSequence01() {
     // a=1, b=2
     final String doc = "<a><b/></a>";
 
@@ -220,8 +211,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Multiple destructive operations on same node.
    */
-  @Test
-  public void updateSequence01() {
+  @Test public void updateSequence01() {
     final AtomicUpdateCache auc = atomics("<a><b/></a>");
     auc.addDelete(2);
     thrown.expect(RuntimeException.class);
@@ -232,8 +222,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Multiple destructive operations on same node.
    */
-  @Test
-  public void updateSequence02() {
+  @Test public void updateSequence02() {
     final AtomicUpdateCache auc = atomics("<a><b/></a>");
     final MemData md = new MemData(context.options);
     auc.addDelete(2);
@@ -245,8 +234,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Multiple destructive operations on same node.
    */
-  @Test
-  public void updateSequence03() {
+  @Test public void updateSequence03() {
     final AtomicUpdateCache auc = atomics("<a><b/></a>");
     final MemData md = new MemData(context.options);
     auc.addReplace(2, elemClip(md, "<newb/>", false));
@@ -258,8 +246,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Multiple renames/updates on same node.
    */
-  @Test
-  public void updateSequence04() {
+  @Test public void updateSequence04() {
     final AtomicUpdateCache auc = atomics("<a><b/></a>");
     auc.addRename(2, token("foo"), EMPTY);
     thrown.expect(RuntimeException.class);
@@ -270,8 +257,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Multiple renames/updates on same node.
    */
-  @Test
-  public void updateSequence05() {
+  @Test public void updateSequence05() {
     final AtomicUpdateCache auc = atomics("<a><b/></a>");
     auc.addUpdateValue(2, token("foo"));
     thrown.expect(RuntimeException.class);
@@ -282,8 +268,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Order of updates.
    */
-  @Test
-  public void updateSequence06() {
+  @Test public void updateSequence06() {
     final AtomicUpdateCache auc = atomics("<a><b/></a>");
     auc.addDelete(3);
     thrown.expect(RuntimeException.class);
@@ -294,8 +279,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Order of updates.
    */
-  @Test
-  public void updateSequence07() {
+  @Test public void updateSequence07() {
     final AtomicUpdateCache auc = atomics("<a><b/></a>");
     auc.addRename(2, token("bb"), EMPTY);
     thrown.expect(RuntimeException.class);
@@ -307,8 +291,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Order of updates.
    */
-  @Test
-  public void updateSequence08() {
+  @Test public void updateSequence08() {
     final AtomicUpdateCache auc = atomics("<a><b/></a>");
     final MemData md = new MemData(context.options);
     auc.addDelete(2);
@@ -320,8 +303,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Order of updates.
    */
-  @Test
-  public void updateSequence09() {
+  @Test public void updateSequence09() {
     final AtomicUpdateCache auc = atomics("<a><b id='0'/></a>");
     final MemData md = new MemData(context.options);
     auc.addDelete(3);
@@ -333,8 +315,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Order of updates.
    */
-  @Test
-  public void updateSequence10() {
+  @Test public void updateSequence10() {
     final AtomicUpdateCache auc = atomics("<a><b/></a>");
     final MemData md = new MemData(context.options);
     auc.addReplace(2, elemClip(md, "<bb/>", false));
@@ -346,8 +327,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Order of updates.
    */
-  @Test
-  public void updateSequence11() {
+  @Test public void updateSequence11() {
     final AtomicUpdateCache auc = atomics("<a><b id='0'/></a>");
     final MemData md = new MemData(context.options);
     auc.addReplace(3, attrClip(md, "id", "11"));
@@ -359,8 +339,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Tests if PRE values are correctly calculated before/after updates.
    */
-  @Test
-  public void calculatePreValues() {
+  @Test public void calculatePreValues() {
     final String doc =
         "<n1>" +
             "<n2/><n3/><n4/><n5/><n6/><n7/><n8/><n9/><n10/><n11/>" +
@@ -422,8 +401,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Tests if distances are updated correctly.
    */
-  @Test
-  public void distanceCaching() {
+  @Test public void distanceCaching() {
     final String doc = "<n1>" + "<n2>T3</n2>T4<n5/>T6<n7/>"
         + "<n8><n9><n10><n11/><n12/></n10></n9></n8><n13/><n14/>" + "</n1>";
     final AtomicUpdateCache auc = atomics(doc);
@@ -455,8 +433,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /**
    * Tests if text node adjacency is correctly resolved.
    */
-  @Test
-  public void textMerging() {
+  @Test public void textMerging() {
     final String doc = "<n1>" + "<n2>T3</n2>T4<n5/>T6<n7/>" + "</n1>";
     final AtomicUpdateCache auc = atomics(doc);
     // MemData needed to build valid DataClip object

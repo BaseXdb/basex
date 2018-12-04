@@ -13,8 +13,7 @@ public final class RestXqFilterTest extends RestXqTest {
    * {@code %consumes} annotation.
    * @throws Exception exception
    */
-  @Test
-  public void consumes() throws Exception {
+  @Test public void consumes() throws Exception {
     // correct syntax
     get("declare %R:path('') %R:consumes('text/plain') function m:f() {1};", "", "1");
     get("declare %R:path('') %R:consumes('*/*') function m:f() {1};", "", "1");
@@ -31,8 +30,7 @@ public final class RestXqFilterTest extends RestXqTest {
    * {@code %produces} annotation.
    * @throws Exception exception
    */
-  @Test
-  public void produces() throws Exception {
+  @Test public void produces() throws Exception {
     // correct syntax
     get("declare %R:path('') %R:produces('text/plain') function m:f() {1};", "", "1");
     get("declare %R:path('') %R:produces('*/*') function m:f() {1};", "", "1");
@@ -47,8 +45,7 @@ public final class RestXqFilterTest extends RestXqTest {
    * {@code <restxq:response/>} elements.
    * @throws Exception exception
    */
-  @Test
-  public void response() throws Exception {
+  @Test public void response() throws Exception {
     get("declare %R:path('') function m:f() { <R:response/>, 1 };", "", "1");
     get("declare %R:path('') function m:f() { <R:R/> };", "",
         "<R:R xmlns:R=\"http://exquery.org/ns/restxq\"/>");

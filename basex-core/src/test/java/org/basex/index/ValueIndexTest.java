@@ -70,8 +70,7 @@ public final class ValueIndexTest extends SandboxTest {
   }
 
   /** Set down database. */
-  @After
-  public void setDown() {
+  @After public void setDown() {
     set(MainOptions.MAINMEM, false);
     set(MainOptions.UPDINDEX, false);
     execute(new DropDB(NAME));
@@ -80,8 +79,7 @@ public final class ValueIndexTest extends SandboxTest {
   /**
    * Tests the text index.
    */
-  @Test
-  public void textIndexTest() {
+  @Test public void textIndexTest() {
     final LinkedHashMap<String, Integer> tokens = new LinkedHashMap<>();
     tokens.put("3", 3);
     tokens.put("3.4", 1);
@@ -95,8 +93,7 @@ public final class ValueIndexTest extends SandboxTest {
   /**
    * Tests the attribute index.
    */
-  @Test
-  public void attributeIndexTest() {
+  @Test public void attributeIndexTest() {
     final LinkedHashMap<String, Integer> tokens = new LinkedHashMap<>();
     tokens.put("context", 1);
     tokens.put("baz bar blu", 1);
@@ -111,8 +108,7 @@ public final class ValueIndexTest extends SandboxTest {
   /**
    * Tests the token index.
    */
-  @Test
-  public void tokenIndexTest() {
+  @Test public void tokenIndexTest() {
     set(MainOptions.TOKENINDEX, true);
 
     final LinkedHashMap<String, Integer> tokens = new LinkedHashMap<>();

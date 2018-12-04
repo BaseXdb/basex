@@ -14,8 +14,7 @@ public final class ServerFnHttpTest extends FnHttpTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass
-  public static void start() throws Exception {
+  @BeforeClass public static void start() throws Exception {
     init(RESTURL, false);
     ctx = new Context();
   }

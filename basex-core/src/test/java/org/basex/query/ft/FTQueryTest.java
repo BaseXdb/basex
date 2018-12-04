@@ -11,8 +11,7 @@ import org.junit.*;
  */
 public final class FTQueryTest extends AdvancedQueryTest {
   /** Checks optimizations of full-text operations. */
-  @Test
-  public void ftOptimize() {
+  @Test public void ftOptimize() {
     query("let $a := <a>x</a> "
         + "let $b := $a[. contains text '.*' all using wildcards] "
         + "let $c := $b "

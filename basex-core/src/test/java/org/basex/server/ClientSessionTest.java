@@ -22,22 +22,19 @@ public class ClientSessionTest extends SessionTest {
    * Starts the server.
    * @throws IOException I/O exception
    */
-  @BeforeClass
-  public static void startServer() throws IOException {
+  @BeforeClass public static void startServer() throws IOException {
     server = createServer();
   }
 
   /**
    * Stops the server.
    */
-  @AfterClass
-  public static void stop() {
+  @AfterClass public static void stop() {
     stopServer(server);
   }
 
   /** Starts a session. */
-  @Before
-  public void startSession() {
+  @Before public void startSession() {
     try {
       session = createClient();
       session.setOutputStream(out);

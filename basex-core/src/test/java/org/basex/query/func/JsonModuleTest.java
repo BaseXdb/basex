@@ -75,19 +75,21 @@ public final class JsonModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test public void parseXQuery() {
+    final Function func = _JSON_PARSE;
+    // queries
     final String map = " map { 'format':'xquery' }";
-    query(_JSON_PARSE.args("{}", map), "map {\n}");
-    query(_JSON_PARSE.args("{\"A\":1}", map), "map {\n\"A\": 1.0e0\n}");
-    query(_JSON_PARSE.args("{\"\":null}", map), "map {\n\"\": ()\n}");
+    query(func.args("{}", map), "map {\n}");
+    query(func.args("{\"A\":1}", map), "map {\n\"A\": 1.0e0\n}");
+    query(func.args("{\"\":null}", map), "map {\n\"\": ()\n}");
 
-    query(_JSON_PARSE.args("[]", map), "[]");
-    query(_JSON_PARSE.args("[\"A\"]", map), "[\"A\"]");
-    query(_JSON_PARSE.args("[1,true]", map), "[1.0e0, true()]");
+    query(func.args("[]", map), "[]");
+    query(func.args("[\"A\"]", map), "[\"A\"]");
+    query(func.args("[1,true]", map), "[1.0e0, true()]");
 
-    query(_JSON_PARSE.args("1", map), 1);
-    query(_JSON_PARSE.args("\"f\"", map), "f");
-    query(_JSON_PARSE.args("false", map), false);
-    query(_JSON_PARSE.args("null", map), "");
+    query(func.args("1", map), 1);
+    query(func.args("\"f\"", map), "f");
+    query(func.args("false", map), false);
+    query(func.args("null", map), "");
   }
 
   /** Test method. */

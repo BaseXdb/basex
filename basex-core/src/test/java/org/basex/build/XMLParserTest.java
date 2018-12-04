@@ -19,16 +19,14 @@ public final class XMLParserTest extends SandboxTest {
   /**
    * Prepares the tests.
    */
-  @Before
-  public void before() {
+  @Before public void before() {
     set(MainOptions.MAINMEM, true);
   }
 
   /**
    * Finishes the tests.
    */
-  @After
-  public void after() {
+  @After public void after() {
     set(MainOptions.MAINMEM, false);
     set(MainOptions.CHOP, true);
     set(MainOptions.STRIPNS, false);
@@ -39,8 +37,7 @@ public final class XMLParserTest extends SandboxTest {
   /**
    * Tests the internal parser (Option {@link MainOptions#INTPARSE}).
    */
-  @Test
-  public void intParse() {
+  @Test public void intParse() {
     set(MainOptions.CHOP, false);
 
     final StringBuilder sb = new StringBuilder();
@@ -82,8 +79,7 @@ public final class XMLParserTest extends SandboxTest {
    * Empty elements with 31 attributes.
    * @throws Exception exception
    */
-  @Test
-  public void gh1648() throws Exception {
+  @Test public void gh1648() throws Exception {
     set(MainOptions.INTPARSE, true);
 
     // build document with various number of arguments (30..33)
@@ -100,8 +96,7 @@ public final class XMLParserTest extends SandboxTest {
   /**
    * Tests the namespace stripping option (Option {@link MainOptions#STRIPNS}).
    */
-  @Test
-  public void parse() {
+  @Test public void parse() {
     set(MainOptions.STRIPNS, true);
     set(MainOptions.SERIALIZER, SerializerMode.NOINDENT.get());
 
@@ -117,8 +112,7 @@ public final class XMLParserTest extends SandboxTest {
   /**
    * Tests the xml:space attribute.
    */
-  @Test
-  public void xmlSpace() {
+  @Test public void xmlSpace() {
     set(MainOptions.SERIALIZER, SerializerMode.NOINDENT.get());
 
     final String in = "<x><a xml:space='default'> </a><a> </a>" +

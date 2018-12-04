@@ -20,8 +20,7 @@ public final class RESTPutTest extends RESTTest {
    * PUT Test: create empty database.
    * @throws IOException I/O exception
    */
-  @Test
-  public void put1() throws IOException {
+  @Test public void put1() throws IOException {
     put(NAME, null);
     assertEquals("0", get(NAME + "?query=count(/)"));
     delete(NAME);
@@ -31,8 +30,7 @@ public final class RESTPutTest extends RESTTest {
    * PUT Test: create simple database.
    * @throws IOException I/O exception
    */
-  @Test
-  public void put2() throws IOException {
+  @Test public void put2() throws IOException {
     put(NAME, new ArrayInput(token("<a>A</a>")));
     assertEquals("A", get(NAME + "?query=/*/text()"));
     delete(NAME);
@@ -42,8 +40,7 @@ public final class RESTPutTest extends RESTTest {
    * PUT Test: create and overwrite database.
    * @throws IOException I/O exception
    */
-  @Test
-  public void put3() throws IOException {
+  @Test public void put3() throws IOException {
     put(NAME, new FileInputStream(FILE));
     put(NAME, new FileInputStream(FILE));
     assertEquals("XML", get(NAME + "?query=//title/text()"));
@@ -54,8 +51,7 @@ public final class RESTPutTest extends RESTTest {
    * PUT Test: create two documents in a database.
    * @throws IOException I/O exception
    */
-  @Test
-  public void put4() throws IOException {
+  @Test public void put4() throws IOException {
     put(NAME, null);
     put(NAME + "/a", new ArrayInput(token("<a>A</a>")));
     put(NAME + "/b", new ArrayInput(token("<b>B</b>")));
@@ -69,8 +65,7 @@ public final class RESTPutTest extends RESTTest {
    * PUT Test: specify an option.
    * @throws IOException I/O exception
    */
-  @Test
-  public void putOption() throws IOException {
+  @Test public void putOption() throws IOException {
     put(NAME + '?' + MainOptions.CHOP.name() + "=true", new FileInputStream(FILE));
     assertEquals("5", get(NAME + "?query=count(//text())"));
     put(NAME + '?' + MainOptions.CHOP.name() + "=false", new FileInputStream(FILE));
