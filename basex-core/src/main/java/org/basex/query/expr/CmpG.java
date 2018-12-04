@@ -157,7 +157,7 @@ public class CmpG extends Cmp {
     // pre-evaluate if one value is empty (e.g.: () eq local:expensive() )
     Expr expr = emptyExpr();
     if(expr != this) {
-      // prof:void() + 1 -> boolean(prof:void('123'))
+      // prof:void(123) = 1 -> boolean(prof:void('123'))
       expr = cc.function(Function.BOOLEAN, info, expr);
     } else {
       // optimize expression

@@ -155,6 +155,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("'x'[. != 'x'] = 1.3", false, empty(CmpR.class));
 
     check("1.1[. = 1.1] = 1.1", true, empty(CmpR.class));
+
+    // rewrite to positional test
+    check("(1 to 5)[let $p := position() return $p = 2]", 2, empty(CmpR.class));
   }
 
   /** Checks {@link CmpSR} optimizations. */

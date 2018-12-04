@@ -301,6 +301,13 @@ public final class GFLWOR extends ParseExpr {
         final Expr expr = lt.expr;
         if(expr.has(Flag.NDT)) continue;
 
+        final BooleanSupplier inlinable = () -> {
+          for(final ListIterator<Clause> i = clauses.listIterator(next); i.hasNext();) {
+            if(!i.next().removable(lt.var)) return false;
+          }
+          return rtrn.removable(lt.var);
+        };
+
         // inline simple values
         boolean inline = expr instanceof Value;
         if(!inline) {
@@ -308,22 +315,22 @@ public final class GFLWOR extends ParseExpr {
           inline = expr instanceof VarRef && !lt.var.checksType();
         }
         if(!inline) {
+          // inline cheap axis paths
+          inline = expr instanceof AxisPath && ((AxisPath) expr).cheap();
+        }
+        if(!inline) {
+          // inline context values
+          // allowed: 1[let $x := . return $x] -> 1[.]
+          // illegal: 1[let $x := . return <a/>[$x = 1]]
+          inline = expr instanceof ContextValue && inlinable.getAsBoolean();
+        }
+        if(!inline) {
           // inline expressions that occur once, but do not construct nodes
           // e.g. let $x := <X/> return <X xmlns='xx'>{ $x/self::X }</X>
           inline = count(lt.var, next) == VarUsage.ONCE && !expr.has(Flag.CNS);
-          if(inline && expr.has(Flag.CTX)) {
-            // only inline top-level context references
-            // allowed: 1[let $x := . return $x]
-            // illegal: 1[let $x := . return <a/>[$x = 1]]
-            inline = rtrn.removable(lt.var);
-            for(final ListIterator<Clause> i = clauses.listIterator(next); inline && i.hasNext();) {
-              inline = i.next().removable(lt.var);
-            }
-          }
-        }
-        if(!inline) {
-          // inline cheap axis paths
-          inline = expr instanceof AxisPath && ((AxisPath) expr).cheap();
+          // inline top-level context references
+          // e.g. (1 to 5)[let $p := position() return $p = 1] -> (1 to 5)[position() = 1]
+          if(inline && expr.has(Flag.CTX)) inline = inlinable.getAsBoolean();
         }
 
         if(inline) {

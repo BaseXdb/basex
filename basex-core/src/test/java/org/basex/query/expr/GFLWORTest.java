@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.up.expr.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -161,9 +162,10 @@ public final class GFLWORTest extends QueryPlanTest {
         "0\n1",
         "every $let in //Let satisfies $let << exactly-one(//" + uia + ')'
     );
-    check("<x/>/(for $i in 1 to 3 let $x := .  where $x return $x)",
+    check("<x/>/(for $i in 1 to 3 let $x := . where $x return $x)",
         "<x/>",
-        "//GFLWOR/*[1] is //Let"
+        empty(Let.class),
+        exists(SingletonSeq.class)
     );
     check("for $len in 1 to 3 " +
         "for sliding window $w in 1 to 3 start at $p when true() only " +

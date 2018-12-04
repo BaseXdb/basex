@@ -10,9 +10,11 @@ import org.basex.index.name.*;
 import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -126,7 +128,16 @@ public final class CmpR extends Single {
   public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st = expr.seqType();
     atomic = st.zeroOrOne() && !st.mayBeArray();
-    return expr instanceof Value ? cc.preEval(this) : this;
+
+    Expr ex = this;
+    if(expr instanceof Value) {
+      ex = item(cc.qc, info);
+    } else if(Function.POSITION.is(expr)) {
+      final int mn = Math.max((int) Math.ceil(min), 1);
+      final int mx = (int) Math.floor(max);
+      ex = ItrPos.get(RangeSeq.get(mn, mx - mn + 1, true), OpV.EQ, info);
+    }
+    return cc.replaceWith(this, ex);
   }
 
   @Override
