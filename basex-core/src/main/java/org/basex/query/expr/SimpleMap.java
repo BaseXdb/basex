@@ -170,23 +170,22 @@ public abstract class SimpleMap extends Arr {
 
   @Override
   public final VarUsage count(final Var var) {
-    VarUsage all = VarUsage.NEVER;
+    VarUsage uses = VarUsage.NEVER;
     final int el = exprs.length;
     for(int e = 1; e < el; e++) {
-      all = all.plus(exprs[e].count(var));
-      if(all == VarUsage.MORE_THAN_ONCE) break;
+      uses = uses.plus(exprs[e].count(var));
+      if(uses == VarUsage.MORE_THAN_ONCE) break;
     }
-    return all == VarUsage.NEVER ? exprs[0].count(var) : VarUsage.MORE_THAN_ONCE;
+    return uses == VarUsage.NEVER ? exprs[0].count(var) : VarUsage.MORE_THAN_ONCE;
   }
 
   @Override
   public final boolean removable(final Var var) {
-    if(!exprs[0].removable(var)) return false;
     final int el = exprs.length;
     for(int e = 1; e < el; e++) {
       if(exprs[e].uses(var)) return false;
     }
-    return true;
+    return exprs[0].removable(var);
   }
 
   @Override

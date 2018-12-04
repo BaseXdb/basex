@@ -294,29 +294,45 @@ public final class GFLWOR extends ParseExpr {
       final ListIterator<Clause> iter = clauses.listIterator();
       while(iter.hasNext()) {
         final Clause clause = iter.next();
-        final int next = iter.nextIndex();
-        if(clause instanceof Let) {
-          final Let lt = (Let) clause;
-          final Expr expr = lt.expr;
-          if(!expr.has(Flag.NDT) && (
-            // inline simple values
-            expr instanceof Value
-            // inline variable references without type checks
-            || expr instanceof VarRef && !lt.var.checksType()
-            // inline expressions that occur once, but do not...
-            // - access context  (e.g. let $x := . return <a/>[$x = 1]), or
-            // - construct nodes (e.g. let $x := <X/> return <X xmlns='xx'>{ $x/self::X }</X>)
-            || count(lt.var, next) == VarUsage.ONCE && !expr.has(Flag.CTX, Flag.CNS)
-            // inline only cheap axis paths
-            || expr instanceof AxisPath && ((AxisPath) expr).cheap())) {
+        if(!(clause instanceof Let)) continue;
 
-            cc.info(QueryText.OPTINLINE_X, lt.var);
-            inline(cc, lt.var, lt.inlineExpr(cc), iter);
-            clauses.remove(lt);
-            changing = changed = true;
-            // continue from the beginning as clauses below could have been deleted
-            break;
+        final int next = iter.nextIndex();
+        final Let lt = (Let) clause;
+        final Expr expr = lt.expr;
+        if(expr.has(Flag.NDT)) continue;
+
+        // inline simple values
+        boolean inline = expr instanceof Value;
+        if(!inline) {
+          // inline variable references without type checks
+          inline = expr instanceof VarRef && !lt.var.checksType();
+        }
+        if(!inline) {
+          // inline expressions that occur once, but do not construct nodes
+          // e.g. let $x := <X/> return <X xmlns='xx'>{ $x/self::X }</X>
+          inline = count(lt.var, next) == VarUsage.ONCE && !expr.has(Flag.CNS);
+          if(inline && expr.has(Flag.CTX)) {
+            // only inline top-level context references
+            // allowed: 1[let $x := . return $x]
+            // illegal: 1[let $x := . return <a/>[$x = 1]]
+            inline = rtrn.removable(lt.var);
+            for(final ListIterator<Clause> i = clauses.listIterator(next); inline && i.hasNext();) {
+              inline = i.next().removable(lt.var);
+            }
           }
+        }
+        if(!inline) {
+          // inline cheap axis paths
+          inline = expr instanceof AxisPath && ((AxisPath) expr).cheap();
+        }
+
+        if(inline) {
+          cc.info(QueryText.OPTINLINE_X, lt.var);
+          inline(cc, lt.var, lt.inlineExpr(cc), iter);
+          clauses.remove(lt);
+          changing = changed = true;
+          // continue from the beginning as clauses below could have been deleted
+          break;
         }
       }
     } while(changing);
@@ -461,17 +477,12 @@ public final class GFLWOR extends ParseExpr {
       final Where where = (Where) clause;
 
       if(where.expr instanceof Value) {
-        final boolean bool;
-        if(where.expr instanceof Bln) {
-          bool = ((Bln) where.expr).bool(info);
-        } else {
-          bool = where.expr.ebv(cc.qc, where.info).bool(where.info);
-          where.expr = Bln.get(bool);
+        // if test is always false, skip remaining tests (no results possible)
+        if(!where.expr.ebv(cc.qc, where.info).bool(where.info)) {
+          where.expr = Bln.FALSE;
+          break;
         }
-        // predicate is always false: no results possible
-        if(!bool) break;
-
-        // condition is always true
+        // test is always true: remove it
         clauses.remove(i--);
         changed = true;
       } else {
@@ -491,12 +502,14 @@ public final class GFLWOR extends ParseExpr {
           // it's safe to go on because clauses below the current one are never touched
         }
 
+        // try to rewrite where clause to predicate
         final int newPos = insert < 0 ? i : insert;
         for(int b4 = newPos; --b4 >= 0;) {
           final Clause before = clauses.get(b4);
           if(before instanceof For) {
             final For fr = (For) before;
             if(fr.toPredicate(cc, where.expr)) {
+              // for $i in ('a', 'b') where $i return $i -> for $i in ('a', 'b')[.] return $i
               fors.add((For) before);
               clauses.remove(newPos);
               i--;

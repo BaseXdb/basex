@@ -223,6 +223,7 @@ public abstract class Expr extends ExprInfo {
    * <ul>
    *   <li>{@link Preds#removable} if one of the variables is used within a predicate.</li>
    *   <li>{@link Path#removable} if the variable occurs within the path.</li>
+   *   <li>{@link SimpleMap#removable} if the variable occurs in a right-hand expression.</li>
    * </ul>
    * This method is called by {@link For#toPredicate(CompileContext, Expr)}.
    * @param var variable to be replaced
