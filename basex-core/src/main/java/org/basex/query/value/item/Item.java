@@ -347,7 +347,7 @@ public abstract class Item extends Value {
 
   @Override
   public String description() {
-    return type.toString();
+    return type + " " + ITEM;
   }
 
   /**

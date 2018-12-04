@@ -227,7 +227,7 @@ public final class For extends ForLet {
   @Override
   public void plan(final FElem plan) {
     final FElem elem = planElem();
-    if(empty) elem.add(planAttr(Token.token(EMPTYORD), Token.TRUE));
+    if(empty) elem.add(planAttr(Token.token(EMPTYY), Token.TRUE));
     var.plan(elem);
     if(pos != null) {
       final FElem el = new FElem(AT);
@@ -246,7 +246,7 @@ public final class For extends ForLet {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(FOR).append(' ').append(var);
-    if(empty) sb.append(' ').append(ALLOWING).append(' ').append(EMPTYORD);
+    if(empty) sb.append(' ').append(ALLOWING).append(' ').append(EMPTYY);
     if(pos != null) sb.append(' ').append(AT).append(' ').append(pos);
     if(score != null) sb.append(' ').append(SCORE).append(' ').append(score);
     return sb.append(' ').append(IN).append(' ').append(expr).toString();

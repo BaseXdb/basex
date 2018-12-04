@@ -146,7 +146,7 @@ public final class Empty extends Value {
 
   @Override
   public String description() {
-    return EMPTY_SEQUENCE + "()";
+    return EMPTYY + ' ' + SEQUENCE;
   }
 
   @Override

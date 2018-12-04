@@ -568,8 +568,8 @@ public class QueryParser extends InputParser {
    */
   private boolean emptyOrderDecl() throws QueryException {
     if(!wsConsumeWs(ORDER)) return false;
-    wsCheck(EMPTYORD);
-    if(!decl.add(EMPTYORD)) throw error(DUPLORDEMP);
+    wsCheck(EMPTYY);
+    if(!decl.add(EMPTYY)) throw error(DUPLORDEMP);
     sc.orderGreatest = wsConsumeWs(GREATEST);
     if(!sc.orderGreatest) wsCheck(LEAST);
     return true;
@@ -1105,7 +1105,7 @@ public class QueryParser extends InputParser {
     do {
       final Var var = newVar();
       final boolean emp = wsConsume(ALLOWING);
-      if(emp) wsCheck(EMPTYORD);
+      if(emp) wsCheck(EMPTYY);
       final Var at = wsConsumeWs(AT) ? newVar(SeqType.ITR_O) : null;
       final Var score = wsConsumeWs(SCORE) ? newVar(SeqType.DBL_O) : null;
       // check for duplicate variable names
@@ -1198,7 +1198,7 @@ public class QueryParser extends InputParser {
     boolean desc = false;
     if(!wsConsumeWs(ASCENDING)) desc = wsConsumeWs(DESCENDING);
     boolean least = !sc.orderGreatest;
-    if(wsConsumeWs(EMPTYORD)) {
+    if(wsConsumeWs(EMPTYY)) {
       least = !wsConsumeWs(GREATEST);
       if(least) wsCheck(LEAST);
     }

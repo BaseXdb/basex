@@ -71,7 +71,7 @@ public final class OrderKey extends Single {
   @Override
   public void plan(final FElem plan) {
     final FElem elem = planElem(DIR, Token.token(desc ? DESCENDING : ASCENDING),
-        Token.token(EMPTYORD), Token.token(least ? LEAST : GREATEST));
+        Token.token(EMPTYY), Token.token(least ? LEAST : GREATEST));
     expr.plan(elem);
     plan.add(elem);
   }
@@ -80,7 +80,7 @@ public final class OrderKey extends Single {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder().add(expr);
     if(desc) tb.add(' ').add(DESCENDING);
-    tb.add(' ').add(EMPTYORD).add(' ').add(least ? LEAST : GREATEST);
+    tb.add(' ').add(EMPTYY).add(' ').add(least ? LEAST : GREATEST);
     if(coll != null) tb.add(' ').add(COLLATION).add(" \"").add(coll.uri()).add('"');
     return tb.toString();
   }

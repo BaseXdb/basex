@@ -55,7 +55,7 @@ public interface QueryText {
   /** Parser token. */ String ELEMENT = "element";
   /** Parser token. */ String ELSE = "else";
   /** Parser token. */ String EMPTY_SEQUENCE = "empty-sequence";
-  /** Parser token. */ String EMPTYORD = "empty";
+  /** Parser token. */ String EMPTYY = "empty";
   /** Parser token. */ String ENCODING = "encoding";
   /** Parser token. */ String END = "end";
   /** Parser token. */ String ENTIRE = "entire";
@@ -413,7 +413,7 @@ public interface QueryText {
   /** Optimization info. */ String OPTLET_X = "hoist let clause: %";
   /** Optimization info. */ String OPTFORTOLET_X = "rewrite for to let: %";
   /** Optimization info. */ String OPTSWAP_X = "swap operands: %";
-  /** Optimization info. */ String OPTSIMPLE_X = "simplify %";
+  /** Optimization info. */ String OPTSIMPLE_X_X = "simplify %: %";
   /** Optimization info. */ String OPTINLINE_X = "inline %";
   /** Optimization info. */ String OPTREMOVE_X_X = "remove % from %";
   /** Optimization info. */ String OPTWHERE = "rewrite where clause(s)";
