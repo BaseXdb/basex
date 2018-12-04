@@ -249,12 +249,12 @@ public final class FnModuleTest extends QueryPlanTest {
     // should be unrolled and evaluated at compile time
     check(func.args(" 1 to 9", 10, " function($a, $b) { $a + $b }"),
         55,
-        empty(FOLD_RIGHT),
+        empty(func),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
     check(func.args(" 1 to 9", 10, " function($a, $b) { $b[random:double()] }"),
         "",
-        empty(FOLD_RIGHT),
+        empty(func),
         exists(_RANDOM_DOUBLE));
     // should not be unrolled
     check(func.args(" 0 to 10", 10, " function($a, $b) { $a + $b }"), 65, exists(func));
