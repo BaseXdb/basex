@@ -238,6 +238,10 @@ public final class FnModuleTest extends QueryPlanTest {
 
     check(func.args(" 1[. = 0]", 1, " function($r as xs:integer, $a) { $r + $r }"), 1,
         type(func, "xs:integer"));
+
+    check(func.args(" <_>1</_>", " ()", " function($s, $_) { "
+        + "let $h := head($s) return if($h < 0) then $h else ($s, 1) }"), 1,
+        type(func, "xs:integer*"));
   }
 
   /** Test method. */

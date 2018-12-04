@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -99,8 +100,8 @@ public abstract class SimpleMap extends Arr {
       }
     }
     if(exprs.length != list.size()) {
-      cc.info(OPTSIMPLE_X, this);
       exprs = list.finish();
+      cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
     }
     exprType.assign(exprs[exprs.length - 1].seqType().type, new long[] { min, max });
 

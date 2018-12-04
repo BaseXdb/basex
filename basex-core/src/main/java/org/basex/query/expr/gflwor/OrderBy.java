@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;

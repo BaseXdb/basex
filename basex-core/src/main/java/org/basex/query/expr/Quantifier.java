@@ -66,8 +66,8 @@ public final class Quantifier extends Single {
     // example: some $x in (1, 2) satisfies true() -> true()
     if(expr instanceof GFLWOR && !expr.has(Flag.NDT)) {
       final GFLWOR gflwor = (GFLWOR) expr;
-      if(gflwor.size() > 0 && gflwor.ret instanceof Value) {
-        final Value value = (Value) gflwor.ret;
+      if(gflwor.size() > 0 && gflwor.rtrn instanceof Value) {
+        final Value value = (Value) gflwor.rtrn;
         return cc.replaceWith(this, Bln.get(value.ebv(cc.qc, info).bool(info)));
       }
     }
@@ -115,7 +115,7 @@ public final class Quantifier extends Single {
         if(c++ != 0) sb.append(", ");
         sb.append(clause.toString().replaceAll('^' + FOR + ' ', ""));
       }
-      return sb.append(' ').append(SATISFIES).append(' ').append(gflwor.ret).toString();
+      return sb.append(' ').append(SATISFIES).append(' ').append(gflwor.rtrn).toString();
     }
     return expr.toString();
   }

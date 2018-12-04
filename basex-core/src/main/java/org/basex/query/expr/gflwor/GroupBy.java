@@ -6,7 +6,6 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;

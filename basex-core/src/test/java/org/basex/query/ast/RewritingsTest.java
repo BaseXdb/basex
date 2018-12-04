@@ -305,7 +305,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // path expression
     check("let $a := <a/> return $a[$a/self::a]", "<a/>", count(VarRef.class, 1));
-    check("let $a := <a/> return $a[$a]", "<a/>", count(VarRef.class, 1));
+    check("let $a := <a/> return $a[$a]", "<a/>", empty(VarRef.class));
 
     // if expression
     check("for $t in ('a','b') return $t[$t]", "a\nb", exists(If.class));

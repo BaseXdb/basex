@@ -32,20 +32,20 @@ public final class InlineTest extends QueryPlanTest {
     // all paths use $x only once
     check("let $x := 42 return switch(42) case 23 return $x case 84 return $x" +
         " case $x return 123 default return 1337", 123, empty(GFLWOR.class));
-    // $x is used twice
+    // $x is used twice, but first occurrence will be removed in typeswitch optimization
     check("let $x := <x/> return switch(23) case $x return 123 case 23 return $x" +
-        " default return 1337", "<x/>", exists(GFLWOR.class));
+        " default return 1337", "<x/>", empty(GFLWOR.class));
   }
 
   /** Regression test for Issue GH-738, "switch with contains". */
   @Test public void gh738() {
-    check("let $item:=<item>blah blah</item> " +
-        "let $type:= switch (fn:true())" +
+    check("let $item := <item>blah blah</item> " +
+        "let $type := switch (fn:true())" +
         "  case $item contains text \"blah\" return <type>a</type>" +
         "  default return ()" +
         "return $type",
         "<type>a</type>",
-        count(Let.class, 2));
+        count(Let.class, 1));
   }
 
   /** Regression test for Issue GH-849, "Typing and Function items: XPTY0004". */
@@ -103,7 +103,7 @@ public final class InlineTest extends QueryPlanTest {
   @Test public void gh1094() {
     check("for $d in (true(), false()) where boolean(<a/> ! (., .) ! (., .)) return $d",
         "true\nfalse", empty(GFLWOR.class));
-    check("let $a := <a/> return 'bar' ! . ! $a", "<a/>", exists(Let.class));
+    check("let $a := <a/> return 'bar' ! . ! $a", "<a/>", empty(Let.class));
   }
 
   /** Tests the annotation {@link Annotation#_BASEX_INLINE}. */

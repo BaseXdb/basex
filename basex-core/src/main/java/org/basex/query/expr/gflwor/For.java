@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;

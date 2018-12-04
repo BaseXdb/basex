@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -111,8 +112,8 @@ public final class Switch extends ParseExpr {
 
     if(tmpGroups.size() != groups.length) {
       // branches have changed
-      cc.info(OPTSIMPLE_X, this);
       groups = tmpGroups.toArray(new SwitchGroup[0]);
+      cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
     }
 
     // return first expression if all return expressions are equal, or if only one branch is left
