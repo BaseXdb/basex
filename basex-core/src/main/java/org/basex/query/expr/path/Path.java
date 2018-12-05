@@ -893,11 +893,11 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final boolean removable(final Var var) {
+  public final boolean inlineable(final Var var) {
     for(final Expr step : steps) {
       if(step.uses(var)) return false;
     }
-    return root == null || root.removable(var);
+    return root == null || root.inlineable(var);
   }
 
   @Override

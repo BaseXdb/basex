@@ -50,8 +50,8 @@ public final class IndexDynDb extends IndexDb {
   }
 
   @Override
-  public boolean removable(final Var var) {
-    return expr.removable(var);
+  public boolean inlineable(final Var var) {
+    return expr.inlineable(var);
   }
 
   @Override

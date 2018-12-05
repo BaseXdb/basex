@@ -180,12 +180,12 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
-  public final boolean removable(final Var var) {
+  public final boolean inlineable(final Var var) {
     final int el = exprs.length;
     for(int e = 1; e < el; e++) {
       if(exprs[e].uses(var)) return false;
     }
-    return exprs[0].removable(var);
+    return exprs[0].inlineable(var);
   }
 
   @Override

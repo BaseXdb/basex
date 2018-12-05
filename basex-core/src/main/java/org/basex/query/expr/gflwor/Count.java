@@ -69,7 +69,7 @@ public final class Count extends Clause {
   }
 
   @Override
-  public boolean removable(final Var v) {
+  public boolean inlineable(final Var v) {
     return true;
   }
 

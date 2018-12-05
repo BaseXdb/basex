@@ -225,8 +225,8 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public boolean removable(final Var var) {
-    return expr.removable(var) && super.removable(var);
+  public boolean inlineable(final Var var) {
+    return expr.inlineable(var) && super.inlineable(var);
   }
 
   @Override

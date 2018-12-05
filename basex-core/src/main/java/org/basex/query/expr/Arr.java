@@ -53,9 +53,9 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public boolean removable(final Var var) {
+  public boolean inlineable(final Var var) {
     for(final Expr expr : exprs) {
-      if(!expr.removable(var)) return false;
+      if(!expr.inlineable(var)) return false;
     }
     return true;
   }

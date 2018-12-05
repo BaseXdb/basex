@@ -50,8 +50,8 @@ abstract class ForLet extends Clause {
   }
 
   @Override
-  public final boolean removable(final Var v) {
-    return expr.removable(v);
+  public final boolean inlineable(final Var v) {
+    return expr.inlineable(v);
   }
 
   @Override

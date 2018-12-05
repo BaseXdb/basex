@@ -59,7 +59,7 @@ public final class ContextValue extends Simple {
   }
 
   @Override
-  public boolean removable(final Var var) {
+  public boolean inlineable(final Var var) {
     return false;
   }
 

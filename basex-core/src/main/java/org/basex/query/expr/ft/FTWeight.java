@@ -90,8 +90,8 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public boolean removable(final Var var) {
-    return weight.removable(var) && super.removable(var);
+  public boolean inlineable(final Var var) {
+    return weight.inlineable(var) && super.inlineable(var);
   }
 
   @Override

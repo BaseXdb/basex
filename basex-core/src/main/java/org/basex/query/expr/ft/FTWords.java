@@ -443,13 +443,13 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public boolean removable(final Var var) {
+  public boolean inlineable(final Var var) {
     if(occ != null) {
       for(final Expr o : occ) {
-        if(!o.removable(var)) return false;
+        if(!o.inlineable(var)) return false;
       }
     }
-    return query.removable(var);
+    return query.inlineable(var);
   }
 
   @Override

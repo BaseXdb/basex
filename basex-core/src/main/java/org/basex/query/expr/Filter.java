@@ -231,8 +231,8 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final boolean removable(final Var var) {
-    return root.removable(var) && super.removable(var);
+  public final boolean inlineable(final Var var) {
+    return root.inlineable(var) && super.inlineable(var);
   }
 
   @Override

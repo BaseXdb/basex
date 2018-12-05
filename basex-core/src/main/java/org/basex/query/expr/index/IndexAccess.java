@@ -40,8 +40,8 @@ public abstract class IndexAccess extends Simple {
   }
 
   @Override
-  public boolean removable(final Var var) {
-    return db.removable(var);
+  public boolean inlineable(final Var var) {
+    return db.inlineable(var);
   }
 
   @Override

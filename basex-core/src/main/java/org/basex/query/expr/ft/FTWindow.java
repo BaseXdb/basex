@@ -83,8 +83,8 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public boolean removable(final Var var) {
-    return win.removable(var) && super.removable(var);
+  public boolean inlineable(final Var var) {
+    return win.inlineable(var) && super.inlineable(var);
   }
 
   @Override

@@ -141,8 +141,8 @@ public final class If extends Arr {
   }
 
   @Override
-  public boolean removable(final Var var) {
-    return cond.removable(var) && super.removable(var);
+  public boolean inlineable(final Var var) {
+    return cond.inlineable(var) && super.inlineable(var);
   }
 
   @Override

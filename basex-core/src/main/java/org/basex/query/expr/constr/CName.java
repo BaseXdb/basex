@@ -96,8 +96,8 @@ abstract class CName extends CNode {
   }
 
   @Override
-  public boolean removable(final Var var) {
-    return name.removable(var) && super.removable(var);
+  public boolean inlineable(final Var var) {
+    return name.inlineable(var) && super.inlineable(var);
   }
 
   @Override

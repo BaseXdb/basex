@@ -269,8 +269,8 @@ public final class Window extends Clause {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    return expr.removable(v) && start.removable(v) && (end == null || end.removable(v));
+  public boolean inlineable(final Var v) {
+    return expr.inlineable(v) && start.inlineable(v) && (end == null || end.inlineable(v));
   }
 
   @Override

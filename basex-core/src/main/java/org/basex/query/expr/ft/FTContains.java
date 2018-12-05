@@ -89,8 +89,8 @@ public final class FTContains extends Single {
   }
 
   @Override
-  public boolean removable(final Var var) {
-    return super.removable(var) && ftexpr.removable(var);
+  public boolean inlineable(final Var var) {
+    return super.inlineable(var) && ftexpr.inlineable(var);
   }
 
   @Override

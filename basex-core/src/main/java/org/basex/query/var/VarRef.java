@@ -68,7 +68,7 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public boolean removable(final Var v) {
+  public boolean inlineable(final Var v) {
     return true;
   }
 

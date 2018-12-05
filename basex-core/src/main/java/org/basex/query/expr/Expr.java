@@ -218,7 +218,7 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Checks if the specified variable is replaceable by a context value.
+   * Checks if the specified variable is inlineable.
    * This function is called by:
    * <ul>
    *   <li> {@link For#toPredicate}</li>
@@ -226,14 +226,14 @@ public abstract class Expr extends ExprInfo {
    * </ul>
    * The following tests might return false:
    * <ul>
-   *   <li>{@link Preds#removable} if one of the variables is used within a predicate.</li>
-   *   <li>{@link Path#removable} if the variable occurs within the path.</li>
-   *   <li>{@link SimpleMap#removable} if the variable occurs in a right-hand expression.</li>
+   *   <li>{@link Preds#inlineable} if one of the variables is used within a predicate.</li>
+   *   <li>{@link Path#inlineable} if the variable occurs within the path.</li>
+   *   <li>{@link SimpleMap#inlineable} if the variable occurs in a right-hand expression.</li>
    * </ul>
-   * @param var variable to be replaced
+   * @param var variable to be inlined
    * @return result of check
    */
-  public abstract boolean removable(Var var);
+  public abstract boolean inlineable(Var var);
 
   /**
    * Checks how often a variable is used in this expression.

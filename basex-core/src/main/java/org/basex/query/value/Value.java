@@ -120,7 +120,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public final boolean removable(final Var var) {
+  public final boolean inlineable(final Var var) {
     return true;
   }
 

@@ -119,11 +119,11 @@ public final class Typeswitch extends ParseExpr {
   }
 
   @Override
-  public boolean removable(final Var var) {
+  public boolean inlineable(final Var var) {
     for(final TypeswitchGroup tg : groups) {
-      if(!tg.removable(var)) return false;
+      if(!tg.inlineable(var)) return false;
     }
-    return cond.removable(var);
+    return cond.inlineable(var);
   }
 
   @Override

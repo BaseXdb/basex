@@ -142,9 +142,9 @@ public final class OrderBy extends Clause {
   }
 
   @Override
-  public boolean removable(final Var var) {
+  public boolean inlineable(final Var var) {
     for(final OrderKey key : keys) {
-      if(!key.removable(var)) return false;
+      if(!key.inlineable(var)) return false;
     }
     return true;
   }

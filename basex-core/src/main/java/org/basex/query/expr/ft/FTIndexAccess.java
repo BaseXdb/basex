@@ -63,8 +63,8 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public boolean removable(final Var var) {
-    return ftexpr.removable(var) && db.removable(var);
+  public boolean inlineable(final Var var) {
+    return ftexpr.inlineable(var) && db.inlineable(var);
   }
 
   @Override

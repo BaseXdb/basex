@@ -55,7 +55,7 @@ public final class IndexStaticDb extends IndexDb {
   }
 
   @Override
-  public boolean removable(final Var var) {
+  public boolean inlineable(final Var var) {
     return true;
   }
 

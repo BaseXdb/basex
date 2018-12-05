@@ -157,11 +157,11 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public boolean removable(final Var var) {
+  public boolean inlineable(final Var var) {
     for(final SwitchGroup group : groups) {
-      if(!group.removable(var)) return false;
+      if(!group.inlineable(var)) return false;
     }
-    return cond.removable(var);
+    return cond.inlineable(var);
   }
 
   @Override

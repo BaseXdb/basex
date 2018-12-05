@@ -110,11 +110,11 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public boolean removable(final Var var) {
+  public boolean inlineable(final Var var) {
     for(final Let copy : copies) {
-      if(!copy.removable(var)) return false;
+      if(!copy.inlineable(var)) return false;
     }
-    return super.removable(var);
+    return super.inlineable(var);
   }
 
   @Override

@@ -89,8 +89,8 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public boolean removable(final Var var) {
-    return min.removable(var) || max.removable(var) && super.removable(var);
+  public boolean inlineable(final Var var) {
+    return min.inlineable(var) || max.inlineable(var) && super.inlineable(var);
   }
 
   @Override

@@ -181,13 +181,14 @@ public final class For extends ForLet {
 
   /**
    * Tries to add the given expression as a predicate.
+   * Replaces variable references with a context expression
    * @param cc compilation context
    * @param ex expression to add as predicate
    * @return success flag
    * @throws QueryException query exception
    */
   public boolean toPredicate(final CompileContext cc, final Expr ex) throws QueryException {
-    if(empty || !(vars().length == 1 && ex.uses(var) && ex.removable(var))) return false;
+    if(empty || !(vars().length == 1 && ex.uses(var) && ex.inlineable(var))) return false;
 
     // reset context value (will not be accessible in predicate)
     Expr pred = ex;

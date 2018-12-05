@@ -135,11 +135,11 @@ public final class Try extends Single {
   }
 
   @Override
-  public boolean removable(final Var var) {
+  public boolean inlineable(final Var var) {
     for(final Catch ctch : catches) {
-      if(!ctch.removable(var)) return false;
+      if(!ctch.inlineable(var)) return false;
     }
-    return super.removable(var);
+    return super.inlineable(var);
   }
 
   @Override

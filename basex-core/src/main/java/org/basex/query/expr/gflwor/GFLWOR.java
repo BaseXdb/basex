@@ -303,18 +303,19 @@ public final class GFLWOR extends ParseExpr {
         final Expr expr = lt.expr;
         if(expr.has(Flag.NDT)) continue;
 
+        final Var var = lt.var;
         final BooleanSupplier inlineable = () -> {
           for(final ListIterator<Clause> i = clauses.listIterator(next); i.hasNext();) {
-            if(!i.next().removable(lt.var)) return false;
+            if(!i.next().inlineable(var)) return false;
           }
-          return rtrn.removable(lt.var);
+          return rtrn.inlineable(var);
         };
 
         // inline simple values
         boolean inline = expr instanceof Value;
         if(!inline) {
           // inline variable references without type checks
-          inline = expr instanceof VarRef && !lt.var.checksType();
+          inline = expr instanceof VarRef && !var.checksType();
         }
         if(!inline) {
           // inline cheap axis paths
@@ -329,15 +330,15 @@ public final class GFLWOR extends ParseExpr {
         if(!inline) {
           // inline expressions that occur once, but do not construct nodes
           // e.g. let $x := <X/> return <X xmlns='xx'>{ $x/self::X }</X>
-          inline = count(lt.var, next) == VarUsage.ONCE && !expr.has(Flag.CNS);
+          inline = count(var, next) == VarUsage.ONCE && !expr.has(Flag.CNS);
           // inline top-level context references
           // e.g. (1 to 5)[let $p := position() return $p = 1] -> (1 to 5)[position() = 1]
           if(inline && expr.has(Flag.CTX)) inline = inlineable.getAsBoolean();
         }
 
         if(inline) {
-          cc.info(QueryText.OPTINLINE_X, lt.var);
-          inline(cc, lt.var, lt.inlineExpr(cc), iter);
+          cc.info(QueryText.OPTINLINE_X, var);
+          inline(cc, var, lt.inlineExpr(cc), iter);
           clauses.remove(lt);
           changing = changed = true;
           // continue from the beginning as clauses below could have been deleted
@@ -751,11 +752,11 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public boolean removable(final Var var) {
+  public boolean inlineable(final Var var) {
     for(final Clause clause : clauses) {
-      if(!clause.removable(var)) return false;
+      if(!clause.inlineable(var)) return false;
     }
-    return rtrn.removable(var);
+    return rtrn.inlineable(var);
   }
 
   @Override

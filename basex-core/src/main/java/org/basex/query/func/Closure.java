@@ -347,9 +347,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public boolean removable(final Var var) {
+  public boolean inlineable(final Var var) {
     for(final Entry<Var, Expr> e : global.entrySet()) {
-      if(!e.getValue().removable(var)) return false;
+      if(!e.getValue().inlineable(var)) return false;
     }
     return true;
   }

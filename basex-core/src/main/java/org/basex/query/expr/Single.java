@@ -51,8 +51,8 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
-  public boolean removable(final Var var) {
-    return expr.removable(var);
+  public boolean inlineable(final Var var) {
+    return expr.inlineable(var);
   }
 
   @Override

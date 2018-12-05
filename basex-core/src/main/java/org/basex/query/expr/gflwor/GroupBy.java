@@ -234,9 +234,9 @@ public final class GroupBy extends Clause {
   }
 
   @Override
-  public boolean removable(final Var var) {
+  public boolean inlineable(final Var var) {
     for(final GroupSpec spec : specs) {
-      if(!spec.removable(var)) return false;
+      if(!spec.inlineable(var)) return false;
     }
     return true;
   }
