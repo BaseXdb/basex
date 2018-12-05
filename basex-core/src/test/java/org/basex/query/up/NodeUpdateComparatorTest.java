@@ -27,16 +27,16 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   public final ExpectedException thrown = ExpectedException.none();
   /** Test document. */
   private static final String TESTDOCUMENT =
-      "<n1>" +
-          "<n2><n3/></n2>" +
-          "<n4><n5><n6/></n5></n4>" +
-          "<n7/><n8/><n9/>" +
-          "<n10 id11='0' id12='0'><n13/>TEXT14<n15><n16/></n15></n10><n17/>" +
-          "<n18 at19='0' at20='0'><n21><n22 at23='0'/></n21><n24><n25/></n24></n18>" +
-          "<n26><n27/></n26><n28/>" +
-          "<n29><n30/></n29><n31><n32/></n31>" +
-          "<n33 at34='0'/><n35/>" +
-      "</n1>";
+    "<n1>" +
+      "<n2><n3/></n2>" +
+      "<n4><n5><n6/></n5></n4>" +
+      "<n7/><n8/><n9/>" +
+      "<n10 id11='0' id12='0'><n13/>TEXT14<n15><n16/></n15></n10><n17/>" +
+      "<n18 at19='0' at20='0'><n21><n22 at23='0'/></n21><n24><n25/></n24></n18>" +
+      "<n26><n27/></n26><n28/>" +
+      "<n29><n30/></n29><n31><n32/></n31>" +
+      "<n33 at34='0'/><n35/>" +
+    "</n1>";
 
   /**
    * Single delete.
@@ -45,8 +45,8 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
     final String doc = "<a><b/></a>";
     final Data d = data(doc);
     compare(
-        new NodeUpdate[] {
-        new DeleteNode(2, d, null)
+      new NodeUpdate[] {
+      new DeleteNode(2, d, null)
     });
     query(transform(doc, "delete node $input//b"), "<a/>");
   }
@@ -58,9 +58,9 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
     final String doc = "<a><b/><c/><d/></a>";
     final Data d = data(doc);
     compare(
-        new NodeUpdate[] {
-        new DeleteNode(4, d, null),
-        new DeleteNode(2, d, null)
+      new NodeUpdate[] {
+      new DeleteNode(4, d, null),
+      new DeleteNode(2, d, null)
     });
     query(transform(doc, "delete node ($input//b, $input//d)"), "<a>\n<c/>\n</a>");
   }
@@ -72,10 +72,10 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
     final String doc = "<a><b/><c/><d/></a>";
     final Data d = data(doc);
     compare(
-        new NodeUpdate[] {
-        new DeleteNode(4, d, null),
-        new DeleteNode(3, d, null),
-        new DeleteNode(2, d, null)
+      new NodeUpdate[] {
+      new DeleteNode(4, d, null),
+      new DeleteNode(3, d, null),
+      new DeleteNode(2, d, null)
     });
     query(transform(doc, "delete node ($input//child::node())"), "<a/>");
   }
@@ -87,13 +87,13 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
     final String doc = "<a><b/></a>";
     final Data d = data(doc);
     compare(
-        new NodeUpdate[] {
-        new InsertAfter(2, d, null, null),
-        new InsertBefore(2, d, null, null)
+      new NodeUpdate[] {
+      new InsertAfter(2, d, null, null),
+      new InsertBefore(2, d, null, null)
     });
     query(transform(doc,
-        "insert node <before/> before $input/b, insert node <after/> after $input/b"),
-        "<a>\n<before/>\n<b/>\n<after/>\n</a>");
+      "insert node <before/> before $input/b, insert node <after/> after $input/b"),
+      "<a>\n<before/>\n<b/>\n<after/>\n</a>");
   }
 
   /**
@@ -106,13 +106,13 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
     final String doc = "<a><b/></a>";
     final Data d = data(doc);
     compare(
-        new NodeUpdate[] {
-        new InsertInto(1, d, null, null),
-        new InsertInto(2, d, null, null),
+      new NodeUpdate[] {
+      new InsertInto(1, d, null, null),
+      new InsertInto(2, d, null, null),
     });
     query(transform(doc,
-        "insert node <smallerpre/> into $input/b, insert node <largerpre/> into $input"),
-        "<a>\n<b>\n<smallerpre/>\n</b>\n<largerpre/>\n</a>");
+      "insert node <smallerpre/> into $input/b, insert node <largerpre/> into $input"),
+      "<a>\n<b>\n<smallerpre/>\n</b>\n<largerpre/>\n</a>");
   }
 
   /**
@@ -124,13 +124,13 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
     final String doc = "<a><b/></a>";
     final Data d = data(doc);
     compare(
-        new NodeUpdate[] {
-        new InsertInto(1, d, null, null),
-        new InsertAfter(2, d, null, null),
+      new NodeUpdate[] {
+      new InsertInto(1, d, null, null),
+      new InsertAfter(2, d, null, null),
     });
     query(transform(doc,
-        "insert node <smallerpre/> after $input/b, insert node <largerpre/> into $input"),
-        "<a>\n<b/>\n<smallerpre/>\n<largerpre/>\n</a>");
+      "insert node <smallerpre/> after $input/b, insert node <largerpre/> into $input"),
+      "<a>\n<b/>\n<smallerpre/>\n<largerpre/>\n</a>");
   }
 
   /**
@@ -144,14 +144,14 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
     final String doc = "<a><b><c/></b></a>";
     final Data d = data(doc);
     compare(
-        new NodeUpdate[] {
-        new InsertAfter(2, d, null, null),
-        new InsertInto(2, d, null, null),
+      new NodeUpdate[] {
+      new InsertAfter(2, d, null, null),
+      new InsertInto(2, d, null, null),
     });
     query(transform(doc,
-        "insert node <smallerpre/> into $input/b," +
-        "insert node <largerpre/> after $input/b"),
-        "<a>\n<b>\n<c/>\n<smallerpre/>\n</b>\n<largerpre/>\n</a>");
+      "insert node <smallerpre/> into $input/b," +
+      "insert node <largerpre/> after $input/b"),
+      "<a>\n<b>\n<c/>\n<smallerpre/>\n</b>\n<largerpre/>\n</a>");
   }
 
   /**
@@ -162,14 +162,14 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
     final String doc = "<a id=\"0\"/>";
     final Data d = data(doc);
     compare(
-        new NodeUpdate[] {
-        new DeleteNode(2, d, null),
-        new InsertAttribute(1, d, null, null),
+      new NodeUpdate[] {
+      new DeleteNode(2, d, null),
+      new InsertAttribute(1, d, null, null),
     });
     query(transform(doc,
-        "delete node $input/attribute::node()," +
-        "insert node attribute {'idnew'} {0} into $input"),
-        "<a idnew=\"0\"/>");
+      "delete node $input/attribute::node()," +
+      "insert node attribute {'idnew'} {0} into $input"),
+      "<a idnew=\"0\"/>");
   }
 
   /**
@@ -181,9 +181,9 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
     final String doc = "<a><b/></a>";
     final Data d = data(doc);
     compare(
-        new NodeUpdate[] {
-        new DeleteNode(2, d, null),
-        new DeleteNode(2, d, null),
+      new NodeUpdate[] {
+      new DeleteNode(2, d, null),
+      new DeleteNode(2, d, null),
     });
   }
 
@@ -206,67 +206,67 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
     // ****** Tests on single target node T and on the single descendant of T
     //(A=B, A=B, A=B, A>B)
     compare(new NodeUpdate[] {
-        new InsertIntoAsFirst(3, d, null, null),
-        new InsertBefore(3, d, null, null)
+      new InsertIntoAsFirst(3, d, null, null),
+      new InsertBefore(3, d, null, null)
     });
     //(A=B, A>B, A>B, A=B)
     compare(new NodeUpdate[] {
-        new InsertInto(2, d, null, null),
-        new InsertInto(3, d, null, null),
+      new InsertInto(2, d, null, null),
+      new InsertInto(3, d, null, null),
     });
     //(A=B, A>B, A=B, A>B, A<B)
     compare(new NodeUpdate[] {
-        new InsertInto(2, d, null, null),
-        new InsertAfter(3, d, null, null),
+      new InsertInto(2, d, null, null),
+      new InsertAfter(3, d, null, null),
     });
     //(A=B, A>B, A>B, A>B)
     compare(new NodeUpdate[] {
-        new InsertAfter(2, d, null, null),
-        new InsertInto(3, d, null, null),
+      new InsertAfter(2, d, null, null),
+      new InsertInto(3, d, null, null),
     });
     //(A>B, A>B, A>B, A<B)
     compare(new NodeUpdate[] {
-        new InsertInto(2, d, null, null),
-        new InsertAfter(3, d, null, null),
+      new InsertInto(2, d, null, null),
+      new InsertAfter(3, d, null, null),
     });
 
     // ****** Tests on target node T and on the subtree of T
     //(A=B, A=B, A=B, A>B)
     compare(new NodeUpdate[] {
-        new InsertIntoAsFirst(5, d, null, null),
-        new InsertBefore(5, d, null, null)
+      new InsertIntoAsFirst(5, d, null, null),
+      new InsertBefore(5, d, null, null)
     });
     //(A=B, A=B, A>B, A=B)
     compare(new NodeUpdate[] {
-        new InsertInto(4, d, null, null),
-        new InsertInto(5, d, null, null),
+      new InsertInto(4, d, null, null),
+      new InsertInto(5, d, null, null),
     });
     //(A=B, A=B, A>B, A<B)
     compare(new NodeUpdate[] {
-        new InsertInto(4, d, null, null),
-        new InsertAfter(5, d, null, null),
+      new InsertInto(4, d, null, null),
+      new InsertAfter(5, d, null, null),
     });
     //(A=B, A=B, A>B, A>B)
     compare(new NodeUpdate[] {
-        new InsertAfter(4, d, null, null),
-        new InsertInto(5, d, null, null),
+      new InsertAfter(4, d, null, null),
+      new InsertInto(5, d, null, null),
     });
 
     // ***** Tests on neighboring target nodes
     //(A=B, A=B, A=B, A>B)
     compare(new NodeUpdate[] {
-        new InsertAfter(7, d, null, null),
-        new InsertInto(7, d, null, null),
+      new InsertAfter(7, d, null, null),
+      new InsertInto(7, d, null, null),
     });
     //(A=B, A>B, A=B, A=B)
     compare(new NodeUpdate[] {
-        new InsertInto(7, d, null, null),
-        new InsertInto(4, d, null, null),
+      new InsertInto(7, d, null, null),
+      new InsertInto(4, d, null, null),
     });
     //(A>B, A=B, A=B, A=B)
     compare(new NodeUpdate[] {
-        new DeleteNode(9, d, null),
-        new DeleteNode(8, d, null),
+      new DeleteNode(9, d, null),
+      new DeleteNode(8, d, null),
     });
   }
 
@@ -276,8 +276,8 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   @Test public void shiftInsertIntoAsFirst() {
     final Data d = data(TESTDOCUMENT);
     compare(new NodeUpdate[] {
-       new InsertIntoAsFirst(22, d, null, null),
-       new DeleteNode(23, d, null),
+     new InsertIntoAsFirst(22, d, null, null),
+     new DeleteNode(23, d, null),
     });
   }
 
@@ -287,15 +287,15 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   @Test public void compareOnSingleNode() {
     final Data d = data(TESTDOCUMENT);
     compare(new NodeUpdate[] {
-        new InsertAfter(10, d, null, null),
-        new InsertInto(10, d, null, null),
-        new InsertIntoAsFirst(10, d, null, null),
-        new InsertAttribute(10, d, null, null),
-        new ReplaceValue(10, d, null, new byte[] {' '}),
-        new RenameNode(10, d, null, null),
-        new ReplaceNode(10, d, null, null),
-        new DeleteNode(10, d, null),
-        new InsertBefore(10, d, null, null),
+      new InsertAfter(10, d, null, null),
+      new InsertInto(10, d, null, null),
+      new InsertIntoAsFirst(10, d, null, null),
+      new InsertAttribute(10, d, null, null),
+      new ReplaceValue(10, d, null, new byte[] {' '}),
+      new RenameNode(10, d, null, null),
+      new ReplaceNode(10, d, null, null),
+      new DeleteNode(10, d, null),
+      new InsertBefore(10, d, null, null),
     });
   }
 
@@ -305,24 +305,24 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   @Test public void compareOnSiblings() {
     final Data d = data(TESTDOCUMENT);
     compare(new NodeUpdate[] {
-        new InsertAfter(8, d, null, null),
-        new InsertInto(8, d, null, null),
-        new InsertIntoAsFirst(8, d, null, null),
-        new InsertAttribute(8, d, null, null),
-        new ReplaceValue(8, d, null, new byte[] {' '}),
-        new RenameNode(8, d, null, null),
-        new ReplaceNode(8, d, null, null),
-        new DeleteNode(8, d, null),
-        new InsertBefore(8, d, null, null),
-        new InsertAfter(7, d, null, null),
-        new InsertInto(7, d, null, null),
-        new InsertIntoAsFirst(7, d, null, null),
-        new InsertAttribute(7, d, null, null),
-        new ReplaceValue(7, d, null, new byte[] {' '}),
-        new RenameNode(7, d, null, null),
-        new ReplaceNode(7, d, null, null),
-        new DeleteNode(7, d, null),
-        new InsertBefore(7, d, null, null),
+      new InsertAfter(8, d, null, null),
+      new InsertInto(8, d, null, null),
+      new InsertIntoAsFirst(8, d, null, null),
+      new InsertAttribute(8, d, null, null),
+      new ReplaceValue(8, d, null, new byte[] {' '}),
+      new RenameNode(8, d, null, null),
+      new ReplaceNode(8, d, null, null),
+      new DeleteNode(8, d, null),
+      new InsertBefore(8, d, null, null),
+      new InsertAfter(7, d, null, null),
+      new InsertInto(7, d, null, null),
+      new InsertIntoAsFirst(7, d, null, null),
+      new InsertAttribute(7, d, null, null),
+      new ReplaceValue(7, d, null, new byte[] {' '}),
+      new RenameNode(7, d, null, null),
+      new ReplaceNode(7, d, null, null),
+      new DeleteNode(7, d, null),
+      new InsertBefore(7, d, null, null),
     });
   }
 
@@ -332,71 +332,71 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   @Test public void compareComplexRelationships() {
     final Data d = data(TESTDOCUMENT);
     compare(new NodeUpdate[] {
-        // 25
-        new InsertAfter(18, d, null, null),
-        new InsertInto(18, d, null, null),
-        new InsertAfter(24, d, null, null),
-        new InsertInto(24, d, null, null),
-        new InsertAfter(25, d, null, null),
-        new InsertInto(25, d, null, null),
-        new InsertIntoAsFirst(25, d, null, null),
-        new InsertAttribute(25, d, null, null),
-        new ReplaceValue(25, d, null, new byte[] {' '}),
-        new RenameNode(25, d, null, null),
-        new ReplaceNode(25, d, null, null),
-        new DeleteNode(25, d, null),
-        new InsertBefore(25, d, null, null),
-     // 24
-        new InsertIntoAsFirst(24, d, null, null), //i==13
-        new InsertAttribute(24, d, null, null),
-        new ReplaceValue(24, d, null, new byte[] {' '}),
-        new RenameNode(24, d, null, null),
-        new ReplaceNode(24, d, null, null),
-        new DeleteNode(24, d, null),
-        new InsertBefore(24, d, null, null),
-     // 23
-        new InsertAfter(21, d, null, null),
-        new InsertInto(21, d, null, null),
-        new InsertAfter(22, d, null, null),
-        new InsertInto(22, d, null, null),
-        new InsertIntoAsFirst(22, d, null, null),
-        new ReplaceValue(23, d, null, new byte[] {' '}),
-        new RenameNode(23, d, null, null),
-        new ReplaceNode(23, d, null, null),
-        new DeleteNode(23, d, null),
-     // 22
-        new InsertAttribute(22, d, null, null),
-        new ReplaceValue(22, d, null, new byte[] {' '}),
-        new RenameNode(22, d, null, null),
-        new ReplaceNode(22, d, null, null),
-        new DeleteNode(22, d, null),
-        new InsertBefore(22, d, null, null),
-     // 21
-        new InsertIntoAsFirst(21, d, null, null),
-        new InsertAttribute(21, d, null, null),
-        new ReplaceValue(21, d, null, new byte[] {' '}),
-        new RenameNode(21, d, null, null),
-        new ReplaceNode(21, d, null, null),
-        new DeleteNode(21, d, null),
-        new InsertBefore(21, d, null, null),
-     // 20
-        new InsertIntoAsFirst(18, d, null, null),
-        new ReplaceValue(20, d, null, new byte[] {' '}),
-        new RenameNode(20, d, null, null),
-        new ReplaceNode(20, d, null, null),
-        new DeleteNode(20, d, null),
-     // 19
-        new ReplaceValue(19, d, null, new byte[] {' '}),
-        new RenameNode(19, d, null, null),
-        new ReplaceNode(19, d, null, null),
-        new DeleteNode(19, d, null),
-     // 18
-        new InsertAttribute(18, d, null, null),
-        new ReplaceValue(18, d, null, new byte[] {' '}),
-        new RenameNode(18, d, null, null),
-        new ReplaceNode(18, d, null, null),
-        new DeleteNode(18, d, null),
-        new InsertBefore(18, d, null, null),
+      // 25
+      new InsertAfter(18, d, null, null),
+      new InsertInto(18, d, null, null),
+      new InsertAfter(24, d, null, null),
+      new InsertInto(24, d, null, null),
+      new InsertAfter(25, d, null, null),
+      new InsertInto(25, d, null, null),
+      new InsertIntoAsFirst(25, d, null, null),
+      new InsertAttribute(25, d, null, null),
+      new ReplaceValue(25, d, null, new byte[] {' '}),
+      new RenameNode(25, d, null, null),
+      new ReplaceNode(25, d, null, null),
+      new DeleteNode(25, d, null),
+      new InsertBefore(25, d, null, null),
+      // 24
+      new InsertIntoAsFirst(24, d, null, null), //i==13
+      new InsertAttribute(24, d, null, null),
+      new ReplaceValue(24, d, null, new byte[] {' '}),
+      new RenameNode(24, d, null, null),
+      new ReplaceNode(24, d, null, null),
+      new DeleteNode(24, d, null),
+      new InsertBefore(24, d, null, null),
+      // 23
+      new InsertAfter(21, d, null, null),
+      new InsertInto(21, d, null, null),
+      new InsertAfter(22, d, null, null),
+      new InsertInto(22, d, null, null),
+      new InsertIntoAsFirst(22, d, null, null),
+      new ReplaceValue(23, d, null, new byte[] {' '}),
+      new RenameNode(23, d, null, null),
+      new ReplaceNode(23, d, null, null),
+      new DeleteNode(23, d, null),
+      // 22
+      new InsertAttribute(22, d, null, null),
+      new ReplaceValue(22, d, null, new byte[] {' '}),
+      new RenameNode(22, d, null, null),
+      new ReplaceNode(22, d, null, null),
+      new DeleteNode(22, d, null),
+      new InsertBefore(22, d, null, null),
+      // 21
+      new InsertIntoAsFirst(21, d, null, null),
+      new InsertAttribute(21, d, null, null),
+      new ReplaceValue(21, d, null, new byte[] {' '}),
+      new RenameNode(21, d, null, null),
+      new ReplaceNode(21, d, null, null),
+      new DeleteNode(21, d, null),
+      new InsertBefore(21, d, null, null),
+      // 20
+      new InsertIntoAsFirst(18, d, null, null),
+      new ReplaceValue(20, d, null, new byte[] {' '}),
+      new RenameNode(20, d, null, null),
+      new ReplaceNode(20, d, null, null),
+      new DeleteNode(20, d, null),
+      // 19
+      new ReplaceValue(19, d, null, new byte[] {' '}),
+      new RenameNode(19, d, null, null),
+      new ReplaceNode(19, d, null, null),
+      new DeleteNode(19, d, null),
+      // 18
+      new InsertAttribute(18, d, null, null),
+      new ReplaceValue(18, d, null, new byte[] {' '}),
+      new RenameNode(18, d, null, null),
+      new ReplaceNode(18, d, null, null),
+      new DeleteNode(18, d, null),
+      new InsertBefore(18, d, null, null),
     });
   }
 
@@ -407,26 +407,26 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   @Test public void compareSiblingsComplex() {
     final Data d = data(TESTDOCUMENT);
     compare(new NodeUpdate[] {
-        // node 28
-        new InsertAfter(28, d, null, null),
-        new InsertInto(28, d, null, null),
-        new InsertIntoAsFirst(28, d, null, null),
-        new InsertAttribute(28, d, null, null),
-        new ReplaceValue(28, d, null, new byte[] {' '}),
-        new RenameNode(28, d, null, null),
-        new ReplaceNode(28, d, null, null),
-        new DeleteNode(28, d, null),
-        new InsertBefore(28, d, null, null),
-        // node 26
-        new InsertAfter(26, d, null, null),
-        new InsertInto(26, d, null, null),
-        new InsertIntoAsFirst(26, d, null, null),
-        new InsertAttribute(26, d, null, null),
-        new ReplaceValue(26, d, null, new byte[] {' '}),
-        new RenameNode(26, d, null, null),
-        new ReplaceNode(26, d, null, null),
-        new DeleteNode(26, d, null),
-        new InsertBefore(26, d, null, null),
+      // node 28
+      new InsertAfter(28, d, null, null),
+      new InsertInto(28, d, null, null),
+      new InsertIntoAsFirst(28, d, null, null),
+      new InsertAttribute(28, d, null, null),
+      new ReplaceValue(28, d, null, new byte[] {' '}),
+      new RenameNode(28, d, null, null),
+      new ReplaceNode(28, d, null, null),
+      new DeleteNode(28, d, null),
+      new InsertBefore(28, d, null, null),
+      // node 26
+      new InsertAfter(26, d, null, null),
+      new InsertInto(26, d, null, null),
+      new InsertIntoAsFirst(26, d, null, null),
+      new InsertAttribute(26, d, null, null),
+      new ReplaceValue(26, d, null, new byte[] {' '}),
+      new RenameNode(26, d, null, null),
+      new ReplaceNode(26, d, null, null),
+      new DeleteNode(26, d, null),
+      new InsertBefore(26, d, null, null),
     });
   }
 
@@ -437,32 +437,32 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   @Test public void compareSiblingsSimple() {
     final Data d = data(TESTDOCUMENT);
     compare(new NodeUpdate[] {
-        new InsertInto(28, d, null, null),
-        new InsertInto(26, d, null, null),
+      new InsertInto(28, d, null, null),
+      new InsertInto(26, d, null, null),
     });
     compare(new NodeUpdate[] {
-        new InsertInto(31, d, null, null),
-        new InsertInto(29, d, null, null),
+      new InsertInto(31, d, null, null),
+      new InsertInto(29, d, null, null),
     });
     compare(new NodeUpdate[] {
-        new DeleteNode(28, d, null),
-        new InsertInto(26, d, null, null),
+      new DeleteNode(28, d, null),
+      new InsertInto(26, d, null, null),
     });
     // two empty siblings
     compare(new NodeUpdate[] {
-        new InsertInto(8, d, null, null),
-        new InsertInto(7, d, null, null),
+      new InsertInto(8, d, null, null),
+      new InsertInto(7, d, null, null),
     });
     // first sibling has attribute, second one is empty
     compare(new NodeUpdate[] {
-        new DeleteNode(35, d, null),
-        new InsertIntoAsFirst(33, d, null, null),
-        new DeleteNode(34, d, null),
+      new DeleteNode(35, d, null),
+      new InsertIntoAsFirst(33, d, null, null),
+      new DeleteNode(34, d, null),
     });
     // two empty siblings
     compare(new NodeUpdate[] {
-        new DeleteNode(8, d, null),
-        new InsertInto(7, d, null, null),
+      new DeleteNode(8, d, null),
+      new InsertInto(7, d, null, null),
     });
   }
 

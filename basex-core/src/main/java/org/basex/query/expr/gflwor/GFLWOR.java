@@ -133,7 +133,7 @@ public final class GFLWOR extends ParseExpr {
       final Expr branch = clauses.isEmpty() ? rtrn : this;
       expr = new If(info, where.expr, branch, Empty.SEQ).optimize(cc);
     } else {
-      calcSize();
+      calcType();
 
       final long size = size();
       if(size != -1 && !has(Flag.NDT, Flag.UPD)) {
@@ -176,9 +176,9 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Computes the number of results of this FLWOR expression.
+   * Computes the number of results of this FLWOR expression and assigns the sequence type.
    */
-  private void calcSize() {
+  private void calcType() {
     final long[] minMax = { 1, 1 };
     for(final Clause clause : clauses) {
       if(minMax[1] != 0) clause.calcSize(minMax);

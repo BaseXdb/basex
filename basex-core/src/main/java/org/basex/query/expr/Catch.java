@@ -103,20 +103,20 @@ public final class Catch extends Single {
   }
 
   /**
-   * Returns this clause as an inlineable expression.
+   * Returns the catch expression with inlined exception values.
    * @param qe caught exception
    * @param cc compilation context
-   * @return equivalent expression
-   * @throws QueryException query exception during inlining
+   * @return expression
+   * @throws QueryException query exception
    */
-  Expr asExpr(final QueryException qe, final CompileContext cc) throws QueryException {
-    if(expr instanceof Value) return expr;
-    int v = 0;
+  Expr toExpr(final QueryException qe, final CompileContext cc) throws QueryException {
     Expr ex = expr;
-    for(final Value value : values(qe)) {
-      final Expr ex2 = ex.inline(vars[v++], value, cc);
-      if(ex2 != null) ex = ex2;
-      if(ex instanceof Value) break;
+    if(!(ex instanceof Value)) {
+      int v = 0;
+      for(final Value value : values(qe)) {
+        final Expr ex2 = ex.inline(vars[v++], value, cc);
+        if(ex2 != null) ex = ex2;
+      }
     }
     return ex;
   }
@@ -129,10 +129,15 @@ public final class Catch extends Single {
   public static Value[] values(final QueryException qe) {
     final byte[] io = qe.file() == null ? EMPTY : token(qe.file());
     final Value value = qe.value();
-    return new Value[] { qe.qname(),
-        Str.get(qe.getLocalizedMessage()), value == null ? Empty.SEQ : value,
-        Str.get(io), Int.get(qe.line()), Int.get(qe.column()),
-        Str.get(qe.getMessage().replaceAll("\r\n?", "\n")) };
+    return new Value[] {
+      qe.qname(),
+      Str.get(qe.getLocalizedMessage()),
+      value == null ? Empty.SEQ : value,
+      Str.get(io),
+      Int.get(qe.line()),
+      Int.get(qe.column()),
+      Str.get(qe.getMessage().replaceAll("\r\n?", "\n"))
+    };
   }
 
   /**

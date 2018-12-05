@@ -157,28 +157,31 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   }
 
   // EntityResolver
+
   /* public InputSource resolveEntity(String pub, String sys) { } */
 
   // DTDHandler
+
   /* public void notationDecl(String name, String pub, String sys) { } */
-  /* public void unparsedEntityDecl(final String name, final String pub,
-      final String sys, final String not) { } */
+  /* public void unparsedEntityDecl(String name, String pub, String sys, String not) { } */
 
   // ContentHandler
-  /*public void setDocumentLocator(final Locator locator) { } */
+
+  /*public void setDocumentLocator(Locator locator) { } */
 
   @Override
   public void startPrefixMapping(final String prefix, final String uri) {
     if(!stripNS) nsp.add(token(prefix), token(uri));
   }
 
-  /*public void endPrefixMapping(final String prefix) { } */
+  /*public void endPrefixMapping(String prefix) { } */
   /*public void ignorableWhitespace(char[] ch, int s, int l) { } */
-  /*public void skippedEntity(final String name) { } */
+  /*public void skippedEntity(String name) { } */
 
   // ErrorHandler
-  /* public void warning(final SAXParseException ex) { } */
-  /* public void fatalError(final SAXParseException ex) { } */
+
+  /* public void warning(SAXParseException ex) { } */
+  /* public void fatalError(SAXParseException ex) { } */
 
   // LexicalHandler
   @Override
@@ -193,10 +196,13 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
 
   @Override
   public void endCDATA() { /* ignored. */ }
+
   @Override
   public void endEntity(final String entity) { /* ignored. */ }
+
   @Override
   public void startCDATA() { /* ignored. */ }
+
   @Override
   public void startEntity(final String entity) { /* ignored. */ }
 }

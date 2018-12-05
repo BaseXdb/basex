@@ -60,11 +60,11 @@ public final class FnFoldLeft extends StandardFunc {
   }
 
   /**
-   * Refines the types of the function argument.
+   * Refines the types of a fold function.
    * @param sf function
    * @param cc compilation context
-   * @param array indicates is this is array function
-   * @param left indicates is this is left/right fold
+   * @param array indicates if this is an array function
+   * @param left indicates if this is a left/right fold
    * @throws QueryException query exception
    */
   public static void opt(final StandardFunc sf, final CompileContext cc, final boolean array,
@@ -78,7 +78,7 @@ public final class FnFoldLeft extends StandardFunc {
       final SeqType curr = array && seq.type instanceof ArrayType ?
         ((ArrayType) seq.type).declType : seq.with(Occ.ONE);
 
-        // assign item type of iterated value, optimize function
+      // assign item type of iterated value, optimize function
       final SeqType[] args = { left ? SeqType.ITEM_ZM : curr, left ? curr : SeqType.ITEM_ZM };
       Expr optFunc = sf.coerceFunc(func, cc, SeqType.ITEM_ZM, args);
 

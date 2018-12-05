@@ -265,9 +265,9 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
     final boolean test = cmd instanceof Test, query = cmd instanceof AQuery;
     /* reset old text if:
-       a) deletion was requested by the last function call
-       b) the result contains execution times
-       c) result is not ok and no XQUnit tests are run */
+     * a) deletion was requested by the last function call
+     * b) the result contains execution times
+     * c) result is not ok and no XQUnit tests are run */
     if(clear || !times.isEmpty() || !(ok || test)) {
       tb.reset();
     } else if(test) {

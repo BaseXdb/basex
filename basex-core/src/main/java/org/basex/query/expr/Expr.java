@@ -204,7 +204,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Checks if the given variable is used by this expression.
    * @param var variable to be checked
-   * @return {@code true} if the variable is used, {@code false} otherwise
+   * @return {@code true} if the variable is used
    */
   public final boolean uses(final Var var) {
     // return true iff the the search was aborted, i.e. the variable is used
@@ -219,13 +219,17 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks if the specified variable is replaceable by a context value.
+   * This function is called by:
+   * <ul>
+   *   <li> {@link For#toPredicate}</li>
+   *   <li> {@link GFLWOR#inlineLets}</li>
+   * </ul>
    * The following tests might return false:
    * <ul>
    *   <li>{@link Preds#removable} if one of the variables is used within a predicate.</li>
    *   <li>{@link Path#removable} if the variable occurs within the path.</li>
    *   <li>{@link SimpleMap#removable} if the variable occurs in a right-hand expression.</li>
    * </ul>
-   * This method is called by {@link For#toPredicate(CompileContext, Expr)}.
    * @param var variable to be replaced
    * @return result of check
    */
@@ -233,8 +237,12 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks how often a variable is used in this expression.
-   * This function is e.g. called by {@link SwitchGroup#countCases} or (indirectly)
-   * {@link GFLWOR#inlineLets}.
+   * This function is called by:
+   * <ul>
+   *   <li> {@link GFLWOR#simplify}, {@link GFLWOR#inlineLets}, {@link GFLWOR#optimizePos}
+   *     and {@link GFLWOR#unusedVars}</li>
+   *   <li> {@link SwitchGroup#countCases}</li>
+   * </ul>
    * @param var variable to look for
    * @return how often the variable is used, see {@link VarUsage}
    */
@@ -242,8 +250,15 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Inlines an expression into this one, replacing all references to the given variable.
-   * This function is e.g. called by {@link GFLWOR#inlineLets} and {@link For#toPredicate},
-   * and the variable reference is replaced in {@link VarRef#inline}.
+   * This function is called by:
+   * <ul>
+   *   <li> {@link Catch#toExpr},</li>
+   *   <li> {@link Closure#optimize},</li>
+   *   <li> {@link For#toPredicate},</li>
+   *   <li> {@link GFLWOR#inlineLets}</li>
+   *   <li> {@link TypeswitchGroup#opt},</li>
+   * </ul>
+   * The variable reference is replaced in {@link VarRef#inline}.
    * @param var variable to replace
    * @param ex expression to inline
    * @param cc compilation context
