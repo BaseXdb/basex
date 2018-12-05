@@ -134,45 +134,47 @@ public final class GFLWOR extends ParseExpr {
       expr = new If(info, where.expr, branch, Empty.SEQ).optimize(cc);
     } else {
       calcType();
-
-      final long size = size();
-      if(size != -1 && !has(Flag.NDT, Flag.UPD)) {
-        if(size == 0) {
-          expr = Empty.SEQ;
-        } else if(rtrn instanceof Value) {
-          // rewrite expression with next value as singleton sequence
-          expr = SingletonSeq.get((Value) rtrn, size / rtrn.size());
-        } else if(!rtrn.has(Flag.CTX, Flag.POS) && !varsInReturn()) {
-          // skip expression that relies on the context
-          if(size == 1) {
-            expr = rtrn;
-          } else if(!rtrn.has(Flag.CNS)) {
-            // replace expression with replicated expression
-            expr = cc.function(Function._UTIL_REPLICATE, info, rtrn, Int.get(size / rtrn.size()));
-          }
-        }
-      }
+      expr = simplify(cc);
     }
 
     if(expr == rtrn) {
       cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, expr);
       return expr;
     }
-
     return cc.replaceWith(this, expr);
   }
 
   /**
-   * Checks if the return clause references variables from this FLWOR expression.
-   * @return result of check
+   * Simplifies a FLWOR expression.
+   * @param cc compilation context
+   * @return original or optimized expression
+   * @throws QueryException query exception
    */
-  private boolean varsInReturn() {
-    for(final Clause clause : clauses) {
-      for(final Var var : clause.vars()) {
-        if(rtrn.count(var) != VarUsage.NEVER) return true;
+  private Expr simplify(final CompileContext cc) throws QueryException {
+    final BooleanSupplier varsInReturn = () -> {
+      for(final Clause clause : clauses) {
+        for(final Var var : clause.vars()) {
+          if(rtrn.count(var) != VarUsage.NEVER) return true;
+        }
+      }
+      return false;
+    };
+
+    final long size = size();
+    if(size != -1 && !has(Flag.NDT, Flag.UPD)) {
+      // return empty sequence if expression will yield no results
+      if(size == 0) return Empty.SEQ;
+      // skip expression that relies on the context
+      if(!varsInReturn.getAsBoolean()) {
+        // single result: return expression of 'return' clause
+        if(size == 1) return rtrn;
+        // return result replicator (exclude node constructors)
+        if(!rtrn.has(Flag.CNS)) {
+          return cc.function(Function._UTIL_REPLICATE, info, rtrn, Int.get(size / rtrn.size()));
+        }
       }
     }
-    return false;
+    return this;
   }
 
   /**
@@ -301,7 +303,7 @@ public final class GFLWOR extends ParseExpr {
         final Expr expr = lt.expr;
         if(expr.has(Flag.NDT)) continue;
 
-        final BooleanSupplier inlinable = () -> {
+        final BooleanSupplier inlineable = () -> {
           for(final ListIterator<Clause> i = clauses.listIterator(next); i.hasNext();) {
             if(!i.next().removable(lt.var)) return false;
           }
@@ -322,7 +324,7 @@ public final class GFLWOR extends ParseExpr {
           // inline context values
           // allowed: 1[let $x := . return $x] -> 1[.]
           // illegal: 1[let $x := . return <a/>[$x = 1]]
-          inline = expr instanceof ContextValue && inlinable.getAsBoolean();
+          inline = expr instanceof ContextValue && inlineable.getAsBoolean();
         }
         if(!inline) {
           // inline expressions that occur once, but do not construct nodes
@@ -330,7 +332,7 @@ public final class GFLWOR extends ParseExpr {
           inline = count(lt.var, next) == VarUsage.ONCE && !expr.has(Flag.CNS);
           // inline top-level context references
           // e.g. (1 to 5)[let $p := position() return $p = 1] -> (1 to 5)[position() = 1]
-          if(inline && expr.has(Flag.CTX)) inline = inlinable.getAsBoolean();
+          if(inline && expr.has(Flag.CTX)) inline = inlineable.getAsBoolean();
         }
 
         if(inline) {
@@ -347,7 +349,7 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Unnests FLWR expressions in 'for' or 'let' clauses.
+   * Unnests basic FLWR expressions in 'for' or 'let' clauses.
    * @param cc compilation context
    * @return change flag
    * @throws QueryException query exception
