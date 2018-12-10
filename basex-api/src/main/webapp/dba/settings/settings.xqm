@@ -39,12 +39,11 @@ function dba:settings(
       <input name="{ $key }" type="number" value="{ options:get($key) }"/>
     ))
   }
-  let $boolean := function($key, $label) {
+  let $string := function($key, $label) {
     $table-row((
-      <input name='{ $key }' type='checkbox' value='true'/> update {
-        if(options:get($key)) then insert node attribute checked {} into . else ()
-      },
-      $label
+      $label,
+      <br/>,
+      <input name='{ $key }' type='text' value='{ options:get($key) }'/>
     ))
   }
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
@@ -78,7 +77,7 @@ function dba:settings(
           }</table>
           <h3>Logs</h3>
           <table>{
-            $boolean($options:IGNORE-DBA, 'Ignore DBA log entries')
+            $string($options:IGNORE-LOGS, <span>Ignore entries (e.g. <code>/dba</code>):</span>)
           }</table>
         </form>
       </td>

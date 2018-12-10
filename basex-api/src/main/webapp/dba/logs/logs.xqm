@@ -167,7 +167,7 @@ function dba:log(
     map { 'key': 'message', 'label': 'Message', 'type': 'xml' }
   )
   let $entries :=
-    let $ignore-dba := options:get($options:IGNORE-DBA)
+    let $ignore-logs := options:get($options:IGNORE-LOGS)
     let $input-exists := boolean($input)
     let $highlight := function($string, $found) {
       if($found) then (
@@ -184,7 +184,7 @@ function dba:log(
     let $user-found := $input-exists and contains($user, $input)
     let $message-found := $input-exists and not($user-found) and matches($message, $input, 'i')
     where (not($input-exists) or $user-found or $message-found) and (
-      not($ignore-dba and contains($message, '/dba'))
+      not($ignore-logs and matches($message, $ignore-logs, 'i'))
     )
     return map {
       'time': function() {

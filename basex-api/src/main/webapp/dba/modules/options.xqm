@@ -28,7 +28,7 @@ declare variable $options:MEMORY := 'memory';
 (:~ Permission when running queries. :)
 declare variable $options:PERMISSION := 'permission';
 (:~ Show DBA log entries. :)
-declare variable $options:IGNORE-DBA := 'ignore-dba';
+declare variable $options:IGNORE-LOGS := 'ignore-logs';
 
 (:~ Options file. :)
 declare %private variable $options:FILE := $options:DBA-DIRECTORY || '.dba.xml';
@@ -40,7 +40,7 @@ declare %basex:lazy %private variable $options:DEFAULTS := map {
   $options:TIMEOUT   : 30,
   $options:MEMORY    : 500,
   $options:PERMISSION: 'admin',
-  $options:IGNORE-DBA: false()
+  $options:IGNORE-LOGS: ''
 };
 
 (:~ Currently assigned options. :)
