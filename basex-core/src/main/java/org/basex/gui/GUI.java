@@ -439,7 +439,7 @@ public final class GUI extends JFrame implements BaseXWindow {
 
       // show query info, send feedback to query editor
       final String time = info.setInfo(inf, cmd, perf.getTime(), ok, true);
-      final boolean stopped = inf.endsWith(INTERRUPTED);
+      final boolean stopped = inf.substring(inf.lastIndexOf('\n') + 1).equals(INTERRUPTED);
       if(edit) editor.info(cause, stopped, true);
 
       // get query result and node references to currently opened database
