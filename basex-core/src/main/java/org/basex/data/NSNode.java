@@ -279,7 +279,7 @@ final class NSNode {
     if(pre >= start && pre <= end) {
       tb.add(NL);
       for(int i = 0; i < level; ++i) tb.add("  ");
-      tb.add(toString() + ' ');
+      tb.add(this).add(' ');
       final int[] vls = values;
       final int vl = vls.length;
       for(int i = 0; i < vl; i += 2) {

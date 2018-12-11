@@ -125,16 +125,16 @@ public final class XQMap extends XQData {
     final SeqType[] at = ft.argTypes;
     if(at != null && (at.length != 1 || !at[0].one())) return false;
 
-    SeqType ret = ft.declType;
+    SeqType dt = ft.declType;
     if(ft instanceof MapType) {
       AtomType arg = ((MapType) ft).keyType();
       if(arg == AtomType.AAT) arg = null;
-      if(ret.eq(SeqType.ITEM_ZM)) ret = null;
+      if(dt.eq(SeqType.ITEM_ZM)) dt = null;
       // map { ... } instance of function(...) as item() -> false (result may be empty sequence)
-      return (arg == null && ret == null) || root.instanceOf(arg, ret);
+      return (arg == null && dt == null) || root.instanceOf(arg, dt);
     }
     // allow coercion
-    return coerce || ret.eq(SeqType.ITEM_ZM);
+    return coerce || dt.eq(SeqType.ITEM_ZM);
   }
 
   /**
@@ -251,7 +251,7 @@ public final class XQMap extends XQData {
         tb.add('\n');
         addWS.accept(level + 1);
       }
-      tb.add(key.toString()).add(':');
+      tb.add(key).add(':');
       if(indent) tb.add(' ');
       final Value value = get(key, info);
       final boolean par = value.size() != 1;
@@ -264,7 +264,7 @@ public final class XQMap extends XQData {
         }
         if(item instanceof XQMap) ((XQMap) item).string(indent, tb, level + 1, info);
         else if(item instanceof XQArray) ((XQArray) item).string(indent, tb, level, info);
-        else tb.add(item.toString());
+        else tb.add(item);
       }
       if(par) tb.add(')');
     }

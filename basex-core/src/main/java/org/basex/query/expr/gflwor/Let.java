@@ -14,7 +14,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
-import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 
@@ -129,7 +128,7 @@ public final class Let extends ForLet {
   @Override
   public void plan(final FElem plan) {
     final FElem elem = planElem();
-    if(scoring) elem.add(planAttr(Token.token(SCORE), Token.TRUE));
+    if(scoring) elem.add(planAttr(SCORE, true));
     var.plan(elem);
     expr.plan(elem);
     plan.add(elem);

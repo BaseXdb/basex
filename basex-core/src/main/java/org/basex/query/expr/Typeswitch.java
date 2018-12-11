@@ -61,7 +61,7 @@ public final class Typeswitch extends ParseExpr {
       final Value value = (Value) cond;
       for(final TypeswitchGroup tg : groups) {
         if(tg.matches(value)) {
-          tg.opt(cc, value);
+          tg.inline(cc, value);
           return cc.replaceWith(this, tg.expr);
         }
       }
@@ -133,7 +133,7 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    boolean changed = inlineAll(groups, var, ex, cc);
+    boolean changed = inlineAll(var, ex, groups, cc);
     final Expr c = cond.inline(var, ex, cc);
     if(c != null) {
       changed = true;

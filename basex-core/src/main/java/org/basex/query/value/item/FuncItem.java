@@ -230,7 +230,7 @@ public final class FuncItem extends FItem implements Scope {
     cc.info(OPTINLINE_X, this);
 
     // create let bindings for all variables
-    final LinkedList<Clause> clauses = exprs.length == 0 ? null : new LinkedList<>();
+    final LinkedList<Clause> clauses = new LinkedList<>();
     final IntObjMap<Var> vm = new IntObjMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
@@ -238,21 +238,9 @@ public final class FuncItem extends FItem implements Scope {
     }
 
     // create the return clause
-    final Expr ret = expr.copy(cc, vm).optimize(cc);
-
-    ret.accept(new ASTVisitor() {
-      @Override
-      public boolean inlineFunc(final Scope scope) {
-        return scope.visit(this);
-      }
-
-      @Override
-      public boolean dynFuncCall(final DynFuncCall call) {
-        call.markInlined(FuncItem.this);
-        return true;
-      }
-    });
-    return clauses == null ? ret : new GFLWOR(info, clauses, ret).optimize(cc);
+    final Expr rtrn = expr.copy(cc, vm).optimize(cc);
+    rtrn.accept(new InlineVisitor());
+    return clauses.isEmpty() ? rtrn : new GFLWOR(info, clauses, rtrn).optimize(cc);
   }
 
   @Override
@@ -324,5 +312,24 @@ public final class FuncItem extends FItem implements Scope {
     }
     tb.add(')').add(" as ").add(funcType().declType).add(" { ").add(expr).add(" }");
     return tb.toString();
+  }
+
+  /**
+   * A visitor for checking inlined expressions.
+   *
+   * @author BaseX Team 2005-18, BSD License
+   * @author Leo Woerteler
+   */
+  private class InlineVisitor extends ASTVisitor {
+    @Override
+    public boolean inlineFunc(final Scope scope) {
+      return scope.visit(this);
+    }
+
+    @Override
+    public boolean dynFuncCall(final DynFuncCall call) {
+      call.markInlined(FuncItem.this);
+      return true;
+    }
   }
 }

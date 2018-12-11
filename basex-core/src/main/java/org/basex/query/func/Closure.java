@@ -149,10 +149,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final SeqType st = expr.seqType();
-    final SeqType dt = declType == null || st.instanceOf(declType) ? st : declType;
-    exprType.assign(FuncType.get(anns, dt, params));
-
     cc.pushScope(vs);
     try {
       // inline all values in the closure
@@ -194,6 +190,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     } finally {
       cc.removeScope(this);
     }
+
+    final SeqType st = expr.seqType();
+    final SeqType dt = declType == null || st.instanceOf(declType) ? st : declType;
+    exprType.assign(FuncType.get(anns, dt, params));
 
     // only evaluate if the closure is empty, so we don't lose variables
     return global.isEmpty() ? cc.preEval(this) : this;
@@ -253,9 +253,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     if(expr.has(Flag.CTX)) return null;
 
     cc.info(OPTINLINE_X, this);
+
     // create let bindings for all variables
-    final LinkedList<Clause> clauses =
-        exprs.length == 0 && global.isEmpty() ? null : new LinkedList<>();
+    final LinkedList<Clause> clauses = new LinkedList<>();
     final IntObjMap<Var> vm = new IntObjMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
@@ -267,10 +267,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     // create the return clause
     final Expr body = expr.copy(cc, vm).optimize(cc);
-    final Expr ret = declType == null ? body :
+    final Expr rtrn = declType == null ? body :
       new TypeCheck(vs.sc, info, body, declType, true).optimize(cc);
-
-    return clauses == null ? ret : new GFLWOR(info, clauses, ret).optimize(cc);
+    return clauses.isEmpty() ? rtrn : new GFLWOR(info, clauses, rtrn).optimize(cc);
   }
 
   @Override

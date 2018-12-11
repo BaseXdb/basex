@@ -160,7 +160,7 @@ public final class OrderBy extends Clause {
     for(int r = refs.length; --r >= 0;) {
       if(var.is(refs[r].var)) refs = Array.remove(refs, r);
     }
-    return inlineAll(keys, var, ex, cc) ? optimize(cc) : null;
+    return inlineAll(var, ex, keys, cc) ? optimize(cc) : null;
   }
 
   @Override

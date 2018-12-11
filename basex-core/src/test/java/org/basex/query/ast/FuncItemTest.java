@@ -150,16 +150,15 @@ public final class FuncItemTest extends QueryPlanTest {
 
   /** Checks in non-recursive function items are inlined. */
   @Test public void funcItemInlining() {
-    check("let $fold-left :=" +
-        "  function($f, $start, $seq) {" +
-        "    let $go :=" +
-        "      function($go, $acc, $xs) {" +
-        "        if(empty($xs)) then $acc" +
-        "        else $go($go, $f($acc, head($xs)), tail($xs))" +
-        "      }" +
-        "    return $go($go, $start, $seq)" +
-        "  }" +
-        "return $fold-left(function($a,$b) {$a + $b}, 0, 1 to 100000)",
+    check("let $fold-left := function($f, $start, $seq) {\n" +
+        "  let $go :=\n" +
+        "    function($go, $acc, $xs) {\n" +
+        "      if(empty($xs)) then $acc\n" +
+        "      else $go($go, $f($acc, head($xs)), tail($xs))\n" +
+        "    }\n" +
+        "  return $go($go, $start, $seq)\n" +
+        "}\n" +
+        "return $fold-left(function($a, $b) { $a + $b }, 0, 1 to 100000)",
 
         5000050000L,
 

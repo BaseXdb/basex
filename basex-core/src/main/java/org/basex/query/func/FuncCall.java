@@ -86,9 +86,9 @@ public abstract class FuncCall extends Arr {
     try {
       while(true) {
         qc.checkStop();
-        final Value ret = item ? fn.invItem(qc, info, args) : fn.invValue(qc, info, args);
+        final Value v = item ? fn.invItem(qc, info, args) : fn.invValue(qc, info, args);
         fn = qc.pollTailCall();
-        if(fn == null) return ret;
+        if(fn == null) return v;
         qc.stack.reuseFrame(fn.stackFrameSize());
         args = qc.pollTailArgs();
       }

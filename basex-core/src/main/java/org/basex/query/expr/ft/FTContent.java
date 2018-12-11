@@ -69,7 +69,7 @@ public final class FTContent extends FTFilter {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(CONTENT, content.toString()), exprs);
+    addPlan(plan, planElem(CONTENT, content), exprs);
   }
 
   @Override

@@ -78,7 +78,7 @@ public class ClientQuery extends Query {
           } else {
             tb.add(item.string(null));
           }
-          if(item.type != tp) tb.addByte((byte) 2).add(item.type.toString());
+          if(item.type != tp) tb.addByte((byte) 2).add(item.type);
         }
         v = tb.toString();
       } catch(final QueryException ex) {

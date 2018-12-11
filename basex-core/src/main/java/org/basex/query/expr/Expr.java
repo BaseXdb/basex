@@ -252,13 +252,17 @@ public abstract class Expr extends ExprInfo {
    * Inlines an expression into this one, replacing all references to the given variable.
    * This function is called by:
    * <ul>
-   *   <li> {@link Catch#toExpr},</li>
-   *   <li> {@link Closure#optimize},</li>
-   *   <li> {@link For#toPredicate},</li>
+   *   <li> {@link Catch#inline(QueryException, CompileContext)}</li>
+   *   <li> {@link Closure#optimize}</li>
+   *   <li> {@link For#toPredicate}</li>
    *   <li> {@link GFLWOR#inlineLets}</li>
-   *   <li> {@link TypeswitchGroup#opt},</li>
+   *   <li> {@link TypeswitchGroup#inline}</li>
    * </ul>
-   * The variable reference is replaced in {@link VarRef#inline}.
+   * The variable reference is replaced in:
+   * <ul>
+   *   <li> {@link VarRef#inline}</li>
+   *   <li> {@link OrderBy#inline}</li>
+   * </ul>
    * @param var variable to replace
    * @param ex expression to inline
    * @param cc compilation context
@@ -269,14 +273,14 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Inlines the given expression into all elements of the given array.
-   * @param array array
    * @param var variable to replace
    * @param expr expression to inline
+   * @param array array
    * @param cc compilation context
    * @return {@code true} if the array has changed, {@code false} otherwise
    * @throws QueryException query exception
    */
-  protected static boolean inlineAll(final Expr[] array, final Var var, final Expr expr,
+  protected static boolean inlineAll(final Var var, final Expr expr, final Expr[] array,
       final CompileContext cc) throws QueryException {
 
     boolean changed = false;

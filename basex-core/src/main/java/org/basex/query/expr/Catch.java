@@ -109,7 +109,7 @@ public final class Catch extends Single {
    * @return expression
    * @throws QueryException query exception
    */
-  Expr toExpr(final QueryException qe, final CompileContext cc) throws QueryException {
+  Expr inline(final QueryException qe, final CompileContext cc) throws QueryException {
     Expr ex = expr;
     if(!(ex instanceof Value)) {
       int v = 0;

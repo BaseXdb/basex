@@ -50,7 +50,7 @@ public final class Try extends Single {
       if(!ex.isCatchable()) throw ex;
       for(final Catch ctch : catches) {
         // found a matching clause: compile and inline error message
-        if(ctch.matches(ex)) return cc.replaceWith(this, ctch.compile(cc).toExpr(ex, cc));
+        if(ctch.matches(ex)) return cc.replaceWith(this, ctch.compile(cc).inline(ex, cc));
       }
       throw ex;
     }
@@ -111,7 +111,7 @@ public final class Try extends Single {
         if(ctch.matches(qe)) {
           // found a matching clause, inline variable and error message
           final Catch nw = ctch.inline(var, ex, cc);
-          return cc.replaceWith(this, (nw == null ? ctch : nw).toExpr(qe, cc));
+          return cc.replaceWith(this, (nw == null ? ctch : nw).inline(qe, cc));
         }
       }
       throw qe;

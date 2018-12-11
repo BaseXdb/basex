@@ -149,7 +149,7 @@ public final class QueryInfo {
       for(final byte[] line : compile) tb.add(LI).add(line).add(NL);
     }
     tb.add(NL).add(OPTIMIZED_QUERY).add(COL).add(NL);
-    tb.add(qc.root == null ? qc.funcs.toString() : usedDecls(qc.root)).add(NL);
+    tb.add(qc.root == null ? qc.funcs : usedDecls(qc.root)).add(NL);
     if(!evaluate.isEmpty()) {
       tb.add(NL).add(EVALUATING).add(COL).add(NL);
       for(final byte[] line : evaluate) tb.add(LI).add(line).add(NL);

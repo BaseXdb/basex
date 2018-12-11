@@ -86,14 +86,14 @@ public final class Switch extends ParseExpr {
     final ArrayList<SwitchGroup> tmpGroups = new ArrayList<>();
     for(final SwitchGroup group : groups) {
       final int el = group.exprs.length;
-      final Expr ret = group.exprs[0];
-      final ExprList list = new ExprList(el).add(ret);
+      final Expr rtrn = group.exprs[0];
+      final ExprList list = new ExprList(el).add(rtrn);
       for(int e = 1; e < el; e++) {
         final Expr expr = group.exprs[e];
         if(cond instanceof Value && expr instanceof Value) {
           // includes check for empty sequence (null reference)
           final Item cs = expr.atomItem(cc.qc, info);
-          if(item == cs || cs != null && item != null && item.equiv(cs, null, info)) return ret;
+          if(item == cs || cs != null && item != null && item.equiv(cs, null, info)) return rtrn;
           cc.info(OPTREMOVE_X_X, expr, description());
         } else if(cases.contains(expr)) {
           // case has already been checked before
@@ -176,7 +176,7 @@ public final class Switch extends ParseExpr {
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    boolean changed = inlineAll(groups, var, ex, cc);
+    boolean changed = inlineAll(var, ex, groups, cc);
     final Expr cn = cond.inline(var, ex, cc);
     if(cn != null) {
       changed = true;

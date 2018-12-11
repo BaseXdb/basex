@@ -14,7 +14,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Group of type switch cases.
@@ -33,11 +32,11 @@ public final class TypeswitchGroup extends Single {
    * @param info input info
    * @param var variable
    * @param types sequence types this case matches, the empty array means {@code default}
-   * @param expr return expression
+   * @param rtrn return expression
    */
   public TypeswitchGroup(final InputInfo info, final Var var, final SeqType[] types,
-      final Expr expr) {
-    super(info, expr, SeqType.ITEM_ZM);
+      final Expr rtrn) {
+    super(info, rtrn, SeqType.ITEM_ZM);
     this.var = var;
     this.types = types;
   }
@@ -59,12 +58,12 @@ public final class TypeswitchGroup extends Single {
   }
 
   /**
-   * Optimizes the expression.
+   * Inlines the expression.
    * @param cc compilation context
    * @param value value to be bound
    * @throws QueryException query exception
    */
-  void opt(final CompileContext cc, final Value value) throws QueryException {
+  void inline(final CompileContext cc, final Value value) throws QueryException {
     if(var == null) return;
     final Expr ex = expr.inline(var, var.checkType(value, cc.qc, true), cc);
     if(ex != null) expr = ex;
@@ -163,16 +162,16 @@ public final class TypeswitchGroup extends Single {
   public void plan(final FElem plan) {
     final FElem elem = planElem();
     if(types.length == 0) {
-      elem.add(planAttr(Token.token(DEFAULT), Token.TRUE));
+      elem.add(planAttr(DEFAULT, true));
     } else {
-      final ByteList bl = new ByteList();
+      final TokenBuilder tb = new TokenBuilder();
       for(final SeqType st : types) {
-        if(!bl.isEmpty()) bl.add('|');
-        bl.add(Token.token(st.toString()));
+        if(!tb.isEmpty()) tb.add('|');
+        tb.add(st);
       }
-      elem.add(planAttr(Token.token(CASE), bl.finish()));
+      elem.add(planAttr(CASE, tb.finish()));
     }
-    if(var != null) elem.add(planAttr(VAR, Token.token(var.toString())));
+    if(var != null) elem.add(planAttr(VAR, var));
     expr.plan(elem);
     plan.add(elem);
   }
@@ -182,13 +181,13 @@ public final class TypeswitchGroup extends Single {
     final int tl = types.length;
     final TokenBuilder tb = new TokenBuilder().add(tl == 0 ? DEFAULT : CASE);
     if(var != null) {
-      tb.add(' ').add(var.toString());
+      tb.add(' ').add(var);
       if(tl != 0) tb.add(' ').add(AS);
     }
     if(tl != 0) {
       for(int t = 0; t < tl; t++) {
         if(t > 0) tb.add(" |");
-        tb.add(' ').add(types[t].toString());
+        tb.add(' ').add(types[t]);
       }
     }
     return tb.add(' ' + RETURN + ' ' + expr).toString();

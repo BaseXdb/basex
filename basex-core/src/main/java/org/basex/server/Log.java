@@ -117,7 +117,7 @@ public final class Log {
     tb.add('\t').add(user != null ? user : UserText.ADMIN);
     tb.add('\t').add(type);
     tb.add('\t').add(info != null ? chop(normalize(token(info)), ml) : EMPTY);
-    if(perf != null) tb.add('\t').add(perf.toString());
+    if(perf != null) tb.add('\t').add(perf);
     tb.add(Prop.NL);
 
     try {

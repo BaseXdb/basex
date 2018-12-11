@@ -1065,9 +1065,9 @@ public class QueryParser extends InputParser {
 
     if(!wsConsumeWs(RETURN)) throw alterError(FLWORRETURN);
 
-    final Expr ret = check(single(), NORETURN);
+    final Expr rtrn = check(single(), NORETURN);
     localVars.closeScope(s);
-    return new GFLWOR(clauses.get(0).info, clauses, ret);
+    return new GFLWOR(clauses.get(0).info, clauses, rtrn);
   }
 
   /**
@@ -1354,9 +1354,9 @@ public class QueryParser extends InputParser {
         } while(wsConsume(PIPE));
       }
       wsCheck(RETURN);
-      final Expr ret = check(single(), NOTYPESWITCH);
+      final Expr rtrn = check(single(), NOTYPESWITCH);
       final SeqType[] st = types.toArray(new SeqType[0]);
-      cases = Array.add(cases, new TypeswitchGroup(info(), var, st, ret));
+      cases = Array.add(cases, new TypeswitchGroup(info(), var, st, rtrn));
       localVars.closeScope(s);
       types.clear();
     } while(cs);

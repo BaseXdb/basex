@@ -104,7 +104,7 @@ public final class FTDistance extends FTFilter {
     final Expr mn = min.inline(var, ex, cc), mx = max.inline(var, ex, cc);
     if(mn != null) min = mn;
     if(mx != null) max = mx;
-    return inlineAll(exprs, var, ex, cc) || mn != null || mx != null ? optimize(cc) : null;
+    return inlineAll(var, ex, exprs, cc) || mn != null || mx != null ? optimize(cc) : null;
   }
 
   @Override

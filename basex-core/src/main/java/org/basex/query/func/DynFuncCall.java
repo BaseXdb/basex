@@ -211,7 +211,7 @@ public final class DynFuncCall extends FuncCall {
     final TokenBuilder tb = new TokenBuilder().add(body()).add('(');
     final int last = exprs.length - 1;
     for(int e = 0; e < last; e++) {
-      tb.add(exprs[e].toString());
+      tb.add(exprs[e]);
       if(e < last - 1) tb.add(", ");
     }
     return tb.add(')').toString();

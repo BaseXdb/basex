@@ -1,8 +1,6 @@
 package org.basex.query.expr.gflwor;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
-
 import java.util.*;
 
 import org.basex.query.*;
@@ -176,10 +174,10 @@ public final class Condition extends Single {
     final FElem elem = new FElem(start ? START : END);
 
     // mapping variable names to roles
-    if(item != null) elem.add(planAttr(VAR, token(item.toString())));
-    if(pos  != null) elem.add(planAttr(token(AT), token(pos.toString())));
-    if(prev != null) elem.add(planAttr(token(PREVIOUS), token(prev.toString())));
-    if(next != null) elem.add(planAttr(token(NEXT), token(next.toString())));
+    if(item != null) elem.add(planAttr(VAR, item));
+    if(pos  != null) elem.add(planAttr(AT, pos));
+    if(prev != null) elem.add(planAttr(PREVIOUS, prev));
+    if(next != null) elem.add(planAttr(NEXT, next));
 
     // IDs and stack slots
     if(item != null) item.plan(elem);

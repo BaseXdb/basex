@@ -265,7 +265,7 @@ public final class Var extends ExprInfo {
   public void plan(final FElem plan) {
     final FElem elem = planElem(QueryText.NAME, toErrorString(),
         Token.ID, Token.token(id), QueryText.TYPE, seqType());
-    if(declType != null) elem.add(planAttr(QueryText.AS, declType.toString()));
+    if(declType != null) elem.add(planAttr(QueryText.AS, declType));
     if(promote) elem.add(planAttr(QueryText.PROMOTE, true));
     addPlan(plan, elem);
   }

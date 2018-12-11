@@ -162,7 +162,7 @@ final class JavaEval {
     for(final Class<?> param : exec.getParameterTypes()) {
       if(!expect.isEmpty()) expect.add(", ");
       final Type type = JavaMapping.type(param, false);
-      expect.add(type != null ? type.toString() : Util.className(param));
+      expect.add(type != null ? type : Util.className(param));
     }
     return JAVAARGS_X_X_X.get(call.info, call.name(), expect, types(exprs));
   }

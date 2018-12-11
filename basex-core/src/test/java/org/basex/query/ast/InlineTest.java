@@ -130,9 +130,13 @@ public final class InlineTest extends QueryPlanTest {
 
   /** Tests if all let clauses are removed. */
   @Test public void funcTest() {
-    check("let $a := function($a) { trace($a) }"
-        + "let $b := $a(1) let $c := $a(1) let $d := $a(1) return $b", 1, "count(//Let) != 2");
     check("let $a := 'foo' return 'bar' ! . ! $a", "foo", empty(Let.class));
+  }
+
+  /** Ensures that non-deterministic clauses are not reordered. */
+  @Test public void ndtFuncTest() {
+    check("let $a := function($d) { trace($d) }"
+        + "let $b := $a(1) let $c := $a(1) return $b", 1, exists(VarRef.class));
   }
 
   /** Checks that window clauses are recognized as loops. */

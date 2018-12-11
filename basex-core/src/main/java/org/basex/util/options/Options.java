@@ -598,7 +598,10 @@ public class Options implements Iterable<Option<?>> {
    */
   public static String allowed(final Option<?> option, final String value, final Object... all) {
     final TokenBuilder vals = new TokenBuilder();
-    for(final Object a : all) vals.add(vals.isEmpty() ? "" : ",").add(a.toString());
+    for(final Object a : all) {
+      if(!vals.isEmpty()) vals.add(',');
+      vals.add(a);
+    }
     return Util.info(Text.OPT_ONEOF_X_X_X, option.name(), value, vals);
   }
 

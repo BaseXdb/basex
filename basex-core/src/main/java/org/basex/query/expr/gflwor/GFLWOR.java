@@ -35,12 +35,12 @@ public final class GFLWOR extends ParseExpr {
    * Constructor.
    * @param info input info
    * @param clauses FLWOR clauses
-   * @param ret return expression
+   * @param rtrn return expression
    */
-  public GFLWOR(final InputInfo info, final LinkedList<Clause> clauses, final Expr ret) {
+  public GFLWOR(final InputInfo info, final LinkedList<Clause> clauses, final Expr rtrn) {
     super(info, SeqType.ITEM_ZM);
     this.clauses = clauses;
-    this.rtrn = ret;
+    this.rtrn = rtrn;
   }
 
   /**

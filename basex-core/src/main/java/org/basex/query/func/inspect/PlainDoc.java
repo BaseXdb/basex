@@ -133,10 +133,10 @@ final class PlainDoc extends Inspect {
     }
 
     final SeqType st = sf != null ? sf.seqType() : ft.declType;
-    final FElem ret = elem("return", function);
-    type(st, ret);
+    final FElem rtrn = elem("return", function);
+    type(st, rtrn);
     final TokenList returns = doc != null ? doc.get(DOC_RETURN) : null;
-    if(returns != null) for(final byte[] val : returns) add(val, ret);
+    if(returns != null) for(final byte[] val : returns) add(val, rtrn);
     return function;
   }
 

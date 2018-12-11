@@ -237,13 +237,13 @@ public class QueryException extends Exception {
   @Override
   public String getMessage() {
     final TokenBuilder tb = new TokenBuilder();
-    if(info != null) tb.add(STOPPED_AT).add(info.toString()).add(COL).add(NL);
+    if(info != null) tb.add(STOPPED_AT).add(info).add(COL).add(NL);
     final byte[] code = name.local();
     if(code.length != 0) tb.add('[').add(name.prefixId(QueryText.ERROR_URI)).add("] ");
     tb.add(getLocalizedMessage());
     if(!stack.isEmpty()) {
       tb.add(NL).add(NL).add(STACK_TRACE).add(COL);
-      for(final InputInfo ii : stack) tb.add(NL).add(LI).add(ii.toString());
+      for(final InputInfo ii : stack) tb.add(NL).add(LI).add(ii);
     }
     return tb.toString();
   }

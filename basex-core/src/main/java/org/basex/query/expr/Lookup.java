@@ -74,8 +74,8 @@ public final class Lookup extends Arr {
           final Var k = cc.vs().addNew(new QNm("k"), null, false, cc.qc, info);
           clauses.add(new For(k, null, null, keys, false));
           final VarRef rc = new VarRef(info, c), rk = new VarRef(info, k);
-          final DynFuncCall ret = new DynFuncCall(info, cc.sc(), rc, rk);
-          expr = new GFLWOR(info, clauses, ret).optimize(cc);
+          final DynFuncCall rtrn = new DynFuncCall(info, cc.sc(), rc, rk);
+          expr = new GFLWOR(info, clauses, rtrn).optimize(cc);
         }
         return cc.replaceWith(this, expr);
       }

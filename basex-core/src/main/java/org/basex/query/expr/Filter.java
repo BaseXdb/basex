@@ -246,7 +246,7 @@ public abstract class Filter extends Preds {
   public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
 
-    boolean changed = inlineAll(exprs, var, ex, cc);
+    boolean changed = inlineAll(var, ex, exprs, cc);
     if(root != null) {
       final Expr rt = root.inline(var, ex, cc);
       if(rt != null) {

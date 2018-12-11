@@ -95,7 +95,7 @@ public final class FTWindow extends FTFilter {
   @Override
   public FTExpr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    final boolean e = inlineAll(exprs, var, ex, cc);
+    final boolean e = inlineAll(var, ex, exprs, cc);
     final Expr w = win.inline(var, ex, cc);
     if(w != null) win = w;
     return e || w != null ? optimize(cc) : null;

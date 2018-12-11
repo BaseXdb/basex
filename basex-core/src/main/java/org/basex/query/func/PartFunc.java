@@ -144,11 +144,14 @@ public final class PartFunc extends Arr {
     int p = -1;
     final int es = exprs.length, hs = holes.length;
     for(int i = 0; i < hs; i++) {
-      while(++p < holes[i])
-        tb.add(p > 0 ? QueryText.SEP : "").add(exprs[p - i].toString());
-      tb.add(p > 0 ? QueryText.SEP : "").add('?');
+      while(++p < holes[i]) {
+        if(p > 0) tb.add(QueryText.SEP);
+        tb.add(exprs[p - i]);
+      }
+      if(p > 0) tb.add(QueryText.SEP);
+      tb.add('?');
     }
-    while(++p < es + hs - 1) tb.add(QueryText.SEP).add(exprs[p - hs].toString());
+    while(++p < es + hs - 1) tb.add(QueryText.SEP).add(exprs[p - hs]);
     return tb.add(')').toString();
   }
 }

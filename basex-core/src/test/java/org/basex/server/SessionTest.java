@@ -626,10 +626,10 @@ public abstract class SessionTest extends SandboxTest {
   /**
    * Checks if the most recent output equals the specified string.
    * @param exp expected string
-   * @param ret string returned from the client API
+   * @param rtrn string returned from the client API
    */
-  protected void assertEqual(final String exp, final String ret) {
-    final String result = (out != null ? out : ret).toString();
+  protected void assertEqual(final String exp, final String rtrn) {
+    final String result = (out != null ? out : rtrn).toString();
     if(out != null) out.reset();
     assertEquals(exp, normNL(result));
   }

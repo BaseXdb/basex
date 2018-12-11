@@ -33,10 +33,10 @@ public final class Transform extends Arr {
    * @param info input info
    * @param copies copy expressions
    * @param mod modify expression
-   * @param ret return expression
+   * @param rtrn return expression
    */
-  public Transform(final InputInfo info, final Let[] copies, final Expr mod, final Expr ret) {
-    super(info, SeqType.ITEM_ZM, mod, ret);
+  public Transform(final InputInfo info, final Let[] copies, final Expr mod, final Expr rtrn) {
+    super(info, SeqType.ITEM_ZM, mod, rtrn);
     this.copies = copies;
   }
 
@@ -124,8 +124,8 @@ public final class Transform extends Arr {
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    final boolean changed = inlineAll(copies, var, ex, cc);
-    return inlineAll(exprs, var, ex, cc) || changed ? optimize(cc) : null;
+    final boolean changed = inlineAll(var, ex, copies, cc);
+    return inlineAll(var, ex, exprs, cc) || changed ? optimize(cc) : null;
   }
 
   @Override

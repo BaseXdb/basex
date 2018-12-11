@@ -259,7 +259,7 @@ public class FuncType implements Type {
     if(this == SeqType.ANY_FUNC) {
       tb.add('*').add(')');
     } else {
-      tb.addSep(argTypes, ", ").add(") as ").add(declType.toString());
+      tb.addSep(argTypes, ", ").add(") as ").add(declType);
     }
     return tb.toString();
   }

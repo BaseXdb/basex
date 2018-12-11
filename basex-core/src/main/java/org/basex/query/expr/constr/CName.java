@@ -117,7 +117,7 @@ abstract class CName extends CNode {
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    boolean changed = inlineAll(exprs, var, ex, cc);
+    boolean changed = inlineAll(var, ex, exprs, cc);
     final Expr sub = name.inline(var, ex, cc);
     if(sub != null) {
       name = sub;

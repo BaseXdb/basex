@@ -291,16 +291,16 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     cc.info(OPTINLINE_X, (Supplier<?>) this::id);
 
     // create let bindings for all variables
-    final LinkedList<Clause> clauses = exprs.length == 0 ? null : new LinkedList<>();
-    final IntObjMap<Var> vars = new IntObjMap<>();
+    final LinkedList<Clause> clauses = new LinkedList<>();
+    final IntObjMap<Var> vm = new IntObjMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
-      clauses.add(new Let(cc.copy(params[p], vars), exprs[p], false).optimize(cc));
+      clauses.add(new Let(cc.copy(params[p], vm), exprs[p], false).optimize(cc));
     }
 
-    // copy the function body
-    final Expr ex = expr.copy(cc, vars);
-    return clauses == null ? ex : new GFLWOR(info, clauses, ex).optimize(cc);
+    // create the return clause
+    final Expr rtrn = expr.copy(cc, vm).optimize(cc);
+    return clauses.isEmpty() ? rtrn : new GFLWOR(info, clauses, rtrn).optimize(cc);
   }
 
   /**

@@ -16,7 +16,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
-import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -227,7 +226,7 @@ public final class For extends ForLet {
   @Override
   public void plan(final FElem plan) {
     final FElem elem = planElem();
-    if(empty) elem.add(planAttr(Token.token(EMPTYY), Token.TRUE));
+    if(empty) elem.add(planAttr(EMPTYY, true));
     var.plan(elem);
     if(pos != null) {
       final FElem el = new FElem(AT);

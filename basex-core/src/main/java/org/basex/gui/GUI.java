@@ -373,6 +373,7 @@ public final class GUI extends JFrame implements BaseXWindow {
       }
     }).start();
   }
+
   /**
    * Executes the specified command.
    * @param cmd command to be executed
