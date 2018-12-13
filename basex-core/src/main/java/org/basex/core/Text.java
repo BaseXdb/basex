@@ -55,60 +55,60 @@ public interface Text {
   String S_STANDALONE = "Standalone";
   /** Start information. */
   String  S_LOCALINFO =
-    " [-bcdiIoqrRstuvVwxXz] [input]" + NL +
-    "  [input]     XQuery or command file, or query string" + NL +
-    "  -b<pars>    Bind external query variables" + NL +
-    "  -c<input>   Execute commands from file or string" + NL +
-    "  -d          Activate debugging mode" + NL +
-    "  -i<input>   Assign file or database to context" + NL +
-    "  -I<input>   Assign input string to context" + NL +
-    "  -o<output>  Write output to file" + NL +
-    "  -q<expr>    Execute XQuery expression" + NL +
-    "  -r<num>     Set number of query executions" + NL +
-    "  -R          Turn query execution on/off" + NL +
-    "  -s<pars>    Set serialization parameter(s)" + NL +
-    "  -t[path]    Run tests in file or directory" + NL +
-    "  -u          Write updates back to original files" + NL +
-    "  -v/V        Show (all) process info" + NL +
-    "  -w          Preserve whitespaces from input files" + NL +
-    "  -x          Show query plan" + NL +
-    "  -X          Show query plan before/after compilation" + NL +
-    "  -z          Skip output of results";
+    " [-bcdiIoqrRstuvVwxz] [input]" + NL +
+    "  [input]    XQuery or command file, or query string" + NL +
+    "  -b<args>   Bind external query variables" + NL +
+    "  -c<input>  Execute commands from file or string" + NL +
+    "  -d         Toggle debugging output" + NL +
+    "  -i<input>  Bind file or database to context" + NL +
+    "  -I<input>  Bind input string to context" + NL +
+    "  -o<path>   Write output to local file" + NL +
+    "  -q<expr>   Execute XQuery expression" + NL +
+    "  -r<num>    Run query multiple times" + NL +
+    "  -R         Toggle query execution" + NL +
+    "  -s<args>   Set serialization parameters" + NL +
+    "  -t[path]   Run tests in file or directory" + NL +
+    "  -u         Toggle updates in original files" + NL +
+    "  -v         Toggle output of progress info" + NL +
+    "  -V         Toggle detailed query output" + NL +
+    "  -w         Toggle whitespace chopping" + NL +
+    "  -x         Toggle output of query plan" + NL +
+    "  -z         Toggle output of query result";
 
   /** Client mode. */
   String S_CLIENT = "Client";
   /** Client start information. */
   String S_CLIENTINFO =
-    " [-bcdiInopPqrRsUvVwxXz] [input]" + NL +
-    "  [input]     XQuery or command file, or query string" + NL +
-    "  -b<pars>    Bind external query variables" + NL +
-    "  -c<input>   Execute commands from file or string" + NL +
-    "  -d          Activate debugging mode" + NL +
-    "  -i<input>   Assign file or database to context" + NL +
-    "  -I<input>   Assign input string to context" + NL +
-    "  -n<name>    Set server (host) name" + NL +
-    "  -o<output>  Write output to file" + NL +
-    "  -p<port>    Set server port" + NL +
-    "  -P<pass>    Specify user password" + NL +
-    "  -q<expr>    Execute XQuery expression" + NL +
-    "  -r<num>     Set number of query executions" + NL +
-    "  -R          Turn query execution on/off" + NL +
-    "  -s<pars>    Set serialization parameter(s)" + NL +
-    "  -U<name>    Specify user name" + NL +
-    "  -v/V        Show (all) process info" + NL +
-    "  -w          Preserve whitespaces from input files" + NL +
-    "  -x          Show query execution plan" + NL +
-    "  -X          Show query plan before/after compilation" + NL +
-    "  -z          Skip output of results";
+    " [-bcdiInopPqrRsUvVwxz] [input]" + NL +
+    "  [input]    XQuery or command file, or query string" + NL +
+    "  -b<args>   Bind external query variables" + NL +
+    "  -c<input>  Execute commands from file or string" + NL +
+    "  -d         Toggle debugging output" + NL +
+    "  -i<input>  Bind file or database to context" + NL +
+    "  -I<input>  Bind input string to context" + NL +
+    "  -n<name>   Set server (host) name" + NL +
+    "  -o<path>   Write output to local file" + NL +
+    "  -p<port>   Set server port" + NL +
+    "  -P<pass>   Specify user password" + NL +
+    "  -q<expr>   Execute XQuery expression" + NL +
+    "  -r<num>    Run query multiple times" + NL +
+    "  -R         Toggle query execution" + NL +
+    "  -s<args>   Set serialization parameters" + NL +
+    "  -U<name>   Specify user name" + NL +
+    "  -v         Toggle output of progress info" + NL +
+    "  -V         Toggle detailed query output" + NL +
+    "  -w         Toggle whitespace chopping" + NL +
+    "  -x         Toggle output of query plan" + NL +
+    "  -z         Toggle output of query result";
 
   /** Server mode. */
   String S_SERVER = "Server";
   /** Server start information. */
   String S_SERVERINFO =
-    " [-cdinpSz] [stop]" + NL +
+    " [-cdnpSz] [stop]" + NL +
     "  stop       Stop running server" + NL +
     "  -c<input>  Execute commands from file or string" + NL +
-    "  -d         Activate debugging mode" + NL +
+    "  -d         Enable debugging output" + NL +
     "  -n<name>   Set host the server is bound to" + NL +
     "  -p<port>   Set server port" + NL +
     "  -S         Start as service" + NL +
@@ -120,16 +120,16 @@ public interface Text {
   String S_GUIINFO =
     " [-d] [file]" + NL +
     "  [file]  Open specified XML or XQuery file" + NL +
-    "  -d  Activate debugging mode";
+    "  -d  Enable debugging";
 
   /** HTTP server mode. */
   String S_HTTP_SERVER = "HTTP Server";
   /** HTTP information. */
   String S_HTTPINFO =
-    " [-dhlnpsSUz] [stop]" + NL +
+    " [-cdhlnpsSUz] [stop]" + NL +
     "  stop       Stop running server" + NL +
     "  -c<input>  Execute commands from file or string" + NL +
-    "  -d         Activate debugging mode" + NL +
+    "  -d         Enable debugging output" + NL +
     "  -h<port>   Set port of HTTP server" + NL +
     "  -l         Start in local mode" + NL +
     "  -n<name>   Set host name of database server" + NL +

@@ -70,99 +70,83 @@ public class BaseX extends CLI {
 
         switch(c) {
           case 'b':
-            // set/add variable binding
             if(bind.length() != 0) bind.append(',');
             // commas are escaped by a second comma
             value = bind.append(value.replaceAll(",", ",,")).toString();
             execute(new Set(MainOptions.BINDINGS, value), false);
             break;
           case 'c':
-            // evaluate commands
             console = false;
             if(!execute(input(value))) return;
             break;
           case 'D':
-            // hidden option: show/hide dot query graph
+            // hidden: toggle output of dot query graph
             execute(new Set(MainOptions.DOTPLAN, null), false);
             break;
           case 'i':
-            // open database or create main memory representation
             execute(new Set(MainOptions.MAINMEM, true), false);
             execute(new Check(value), verbose);
             execute(new Set(MainOptions.MAINMEM, false), false);
             break;
           case 'I':
-            // set context item binding
             if(bind.length() != 0) bind.append(',');
             // commas are escaped by a second comma
             value = bind.append('=').append(value.replaceAll(",", ",,")).toString();
             execute(new Set(MainOptions.BINDINGS, value), false);
             break;
           case 'o':
-            // change output stream
             if(out != System.out) out.close();
             out = new PrintOutput(new IOFile(value));
             session().setOutputStream(out);
             break;
           case 'q':
-            // evaluate query
             console = false;
             execute(new XQuery(value), verbose);
             break;
           case 'Q':
+            // hidden: run query with base uri
             console = false;
-            // evaluate file contents or string as query
             final Pair<String, String> input = input(value);
             execute(new XQuery(input.value()).baseURI(input.name()), verbose);
             break;
           case 'r':
-            // parse number of runs
             execute(new Set(MainOptions.RUNS, Strings.toInt(value)), false);
             break;
           case 'R':
-            // toggle query evaluation
             execute(new Set(MainOptions.RUNQUERY, null), false);
             break;
           case 's':
-            // set/add serialization parameter
             if(sopts == null) sopts = new SerializerOptions();
             final String[] kv = value.split("=", 2);
             sopts.assign(kv[0], kv.length > 1 ? kv[1] : "");
             execute(new Set(MainOptions.SERIALIZER, sopts), false);
             break;
           case 't':
-            // evaluate query
             console = false;
             execute(new Test(value), verbose);
             break;
           case 'u':
-            // (de)activate write-back for updates
             execute(new Set(MainOptions.WRITEBACK, null), false);
             break;
           case 'v':
-            // show/hide verbose mode
             v ^= true;
             break;
           case 'V':
-            // show/hide query info
             qi ^= true;
             execute(new Set(MainOptions.QUERYINFO, null), false);
             break;
           case 'w':
-            // toggle chopping of whitespaces
             execute(new Set(MainOptions.CHOP, null), false);
             break;
           case 'x':
-            // show/hide xml query plan
             execute(new Set(MainOptions.XMLPLAN, null), false);
             qp ^= true;
             break;
           case 'X':
-            // show query plan before/after query compilation
+            // hidden: toggle query plan creation before/after query compilation
             execute(new Set(MainOptions.COMPPLAN, null), false);
             break;
           case 'z':
-            // toggle result serialization
             execute(new Set(MainOptions.SERIALIZE, null), false);
             break;
         }
