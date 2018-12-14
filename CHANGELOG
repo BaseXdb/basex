@@ -1,3 +1,24 @@
+VERSION 9.1.1 (December 14, 2018) --------------------------------------
+
+ XQuery:
+ - Comprehensive rewritings of positional predicates and functions
+ - Higher-order functions: Improved type inference
+ - Improved rewriting of context-based and/or nested predicates
+
+ Java Bindings:
+ - Faster access to and evaluation of Java functions and variables
+ - Improved pre-selection of function candidates at compile time
+ - Better error messages (incl. function arity and similar names)
+
+ DBA:
+ - Settings: user-defined pattern for ignoring log entries
+ - Login: pass on URL query strings
+
+ Minor improvements:
+ - Import: detect epub files as ZIP archives
+ - Digest Authentication: No delay after first request
+ - GUI, Preferences: user-defined choice of XML suffixes
+
 VERSION 9.1 (October 31, 2018) -----------------------------------------
 
  WebSockets:
