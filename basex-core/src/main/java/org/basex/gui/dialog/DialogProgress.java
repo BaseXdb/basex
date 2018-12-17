@@ -50,7 +50,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * @param dialog dialog window
    * @param cmd progress reference
    */
-  private DialogProgress(final BaseXDialog dialog, final Command cmd) {
+  public DialogProgress(final BaseXDialog dialog, final Command cmd) {
     super(dialog, "");
     init(dialog, cmd);
   }
@@ -106,6 +106,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
   @Override
   public void dispose() {
     timer.stop();
+    command = null;
     super.dispose();
   }
 
@@ -155,7 +156,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * {@link BaseXDialog#action} if the dialog is closed.
    * @param gui reference to the main window
    * @param dialog reference to the dialog window (may be {@code null})
-   * @param post post-processing step
+   * @param post post-processing step (may be {@code null})
    * @param cmds commands to be run
    */
   private static void execute(final GUI gui, final BaseXDialog dialog, final Runnable post,
