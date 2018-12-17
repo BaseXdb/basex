@@ -354,6 +354,11 @@ public enum QueryError {
   /** Error code. */
   PROC_TIMEOUT(PROC, "timeout", "The timeout was exceeded."),
 
+  // Profiling Module
+
+  /** Error code. */
+  PROF_OPTION_X(PROF, "option", "Unknown option: %."),
+
   // Random Module
 
   /** Error code. */
@@ -1453,6 +1458,7 @@ public enum QueryError {
     /** Error type. */ JSON(JSON_PREFIX,         JSON_URI),
     /** Error type. */ OUTPUT(OUTPUT_PREFIX,     OUTPUT_URI),
     /** Error type. */ PROC(PROC_PREFIX,         PROC_URI),
+    /** Error type. */ PROF(PROF_PREFIX,         PROF_URI),
     /** Error type. */ RANDOM(RANDOM_PREFIX,     RANDOM_URI),
     /** Error type. */ REPO(REPO_PREFIX,         REPO_URI),
     /** Error type. */ SESSION(SESSION_PREFIX,   SESSION_URI),

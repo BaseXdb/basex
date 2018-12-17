@@ -1169,7 +1169,7 @@ public enum Function {
   /** XQuery function. */
   _PROF_SLEEP(ProfSleep.class, "sleep(ms)", arg(ITR_O), EMP, flag(NDT), PROF_URI),
   /** XQuery function. */
-  _PROF_RUNTIME(ProfRuntime.class, "runtime()", arg(), EMP, flag(NDT), PROF_URI),
+  _PROF_RUNTIME(ProfRuntime.class, "runtime(name)", arg(STR_O), ITEM_O, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_TIME(ProfTime.class, "time(value[,label])",
       arg(ITEM_ZM, STR_O), ITEM_ZM, flag(NDT), PROF_URI),
