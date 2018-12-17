@@ -1160,12 +1160,16 @@ public enum Function {
   /** XQuery function. */
   _PROF_DUMP(ProfDump.class, "dump(value[,label])", arg(ITEM_ZM, STR_O), EMP, flag(NDT), PROF_URI),
   /** XQuery function. */
+  _PROF_GC(ProfGc.class, "gc([count])", arg(ITR_O), EMP, flag(NDT), PROF_URI),
+  /** XQuery function. */
   _PROF_HUMAN(ProfHuman.class, "human(integer)", arg(ITR_O), STR_O, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_MEMORY(ProfMemory.class, "memory(value[,label])",
       arg(ITEM_ZM, STR_O), ITEM_ZM, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_SLEEP(ProfSleep.class, "sleep(ms)", arg(ITR_O), EMP, flag(NDT), PROF_URI),
+  /** XQuery function. */
+  _PROF_RUNTIME(ProfRuntime.class, "runtime()", arg(), EMP, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_TIME(ProfTime.class, "time(value[,label])",
       arg(ITEM_ZM, STR_O), ITEM_ZM, flag(NDT), PROF_URI),
