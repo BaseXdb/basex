@@ -71,11 +71,12 @@ public final class DialogSort extends BaseXDialog {
   @Override
   public void close() {
     if(!ok) return;
-    super.close();
+
     cs.assign();
     asc.assign();
     unicode.assign();
     merge.assign();
     column.assign();
+    super.close();
   }
 }

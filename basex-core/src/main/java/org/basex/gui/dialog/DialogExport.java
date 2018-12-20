@@ -100,8 +100,9 @@ public final class DialogExport extends BaseXDialog {
   @Override
   public void close() {
     if(!ok) return;
-    super.close();
+
     gui.set(MainOptions.EXPORTER, serial.options());
     path.updateHistory();
+    super.close();
   }
 }

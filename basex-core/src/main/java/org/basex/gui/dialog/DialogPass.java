@@ -55,8 +55,7 @@ public final class DialogPass extends BaseXDialog {
 
   @Override
   public void close() {
-    if(!ok) return;
-    super.close();
+    if(ok) super.close();
   }
 
   /**

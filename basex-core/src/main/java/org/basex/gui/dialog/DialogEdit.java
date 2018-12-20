@@ -122,7 +122,6 @@ public final class DialogEdit extends BaseXDialog {
 
   @Override
   public void close() {
-    super.close();
     ok = false;
     if(old1 != null) {
       result.add(input1.getText());
@@ -137,5 +136,6 @@ public final class DialogEdit extends BaseXDialog {
       result.add(text);
       ok |= !text.equals(old3);
     }
+    super.close();
   }
 }

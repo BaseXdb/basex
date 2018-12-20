@@ -206,7 +206,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
       else if(cmd.updating(gui.context)) gui.notify.update();
       gui.editor.refreshContextLabel();
     }
-    if(dialog != null) dialog.action(dialog);
+    if(dialog != null && dialog.isVisible()) dialog.action(dialog);
     if(post != null) SwingUtilities.invokeLater(post);
   }
 }

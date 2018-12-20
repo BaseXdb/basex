@@ -42,14 +42,15 @@ public final class DialogManage extends BaseXDialog {
   private final BaseXButton restore;
   /** Copy button. */
   private final BaseXButton copy;
-  /** Refresh list of databases. */
-  private boolean refresh;
   /** Combobox that lists available backups for a database. */
   private final BaseXList backups;
   /** Delete button for backups. */
   private final BaseXButton delete;
   /** Deletes all backups. */
   private final BaseXButton deleteAll;
+
+  /** Refresh list of databases. */
+  private boolean refresh;
 
   /**
    * Default constructor.

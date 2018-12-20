@@ -18,8 +18,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DialogNew extends BaseXDialog {
-  /** Dialog for importing new resources. */
-  private final DialogImport general;
   /** Options dialog. */
   private final DialogOptions options;
   /** Database name. */
@@ -35,8 +33,11 @@ public final class DialogNew extends BaseXDialog {
   private final BaseXCheckBox ftindex;
   /** Token index flag. */
   private final BaseXCheckBox tokenindex;
+
   /** Index creation options. */
-  private final DialogIndex[] index;
+  private DialogIndex[] indexes;
+  /** Dialog for importing new resources. */
+  private DialogImport general;
 
   /**
    * Default constructor.
@@ -62,7 +63,7 @@ public final class DialogNew extends BaseXDialog {
     final DialogParsing parsePanel = new DialogParsing(this, tabs);
     general = new DialogImport(this, pnl, parsePanel);
 
-    index = new DialogIndex[] {
+    indexes = new DialogIndex[] {
       new DialogValues(this, IndexType.TEXT), new DialogValues(this, IndexType.ATTRIBUTE),
       new DialogValues(this, IndexType.TOKEN), new DialogFT(this, true)
     };
@@ -75,18 +76,18 @@ public final class DialogNew extends BaseXDialog {
     // index panel
     final BaseXBack indexPanel = new BaseXBack(new RowLayout()).border(8);
     indexPanel.add(textindex);
-    indexPanel.add(index[0]);
+    indexPanel.add(indexes[0]);
     indexPanel.add(new BaseXBack());
     indexPanel.add(attrindex);
-    indexPanel.add(index[1]);
+    indexPanel.add(indexes[1]);
     indexPanel.add(new BaseXBack());
     indexPanel.add(tokenindex);
-    indexPanel.add(index[2]);
+    indexPanel.add(indexes[2]);
 
     // full-text index panel
     final BaseXBack ftPanel = new BaseXBack(new RowLayout()).border(8);
     ftPanel.add(ftindex);
-    ftPanel.add(index[3]);
+    ftPanel.add(indexes[3]);
 
     // options panel
     options = new DialogOptions(this, null);
@@ -109,11 +110,13 @@ public final class DialogNew extends BaseXDialog {
 
   @Override
   public void action(final Object comp) {
+    if(general == null) return;
+
     final boolean valid = general.action(comp, true) && options.action();
-    index[0].action(textindex.isSelected());
-    index[1].action(attrindex.isSelected());
-    index[2].action(tokenindex.isSelected());
-    index[3].action(ftindex.isSelected());
+    indexes[0].action(textindex.isSelected());
+    indexes[1].action(attrindex.isSelected());
+    indexes[2].action(tokenindex.isSelected());
+    indexes[3].action(ftindex.isSelected());
 
     // ...must be located before remaining checks
     if(comp == general.browse || comp == general.input) dbName.setText(general.dbName);
@@ -149,13 +152,20 @@ public final class DialogNew extends BaseXDialog {
   public void close() {
     if(!ok) return;
 
-    super.close();
     gui.set(MainOptions.TEXTINDEX, textindex.isSelected());
     gui.set(MainOptions.ATTRINDEX, attrindex.isSelected());
     gui.set(MainOptions.TOKENINDEX, tokenindex.isSelected());
     gui.set(MainOptions.FTINDEX, ftindex.isSelected());
     general.setOptions();
     options.setOptions(null);
-    for(final DialogIndex di : index) di.setOptions();
+    for(final DialogIndex index : indexes) index.setOptions();
+    super.close();
+  }
+
+  @Override
+  public void dispose() {
+    general = null;
+    indexes = null;
+    super.dispose();
   }
 }

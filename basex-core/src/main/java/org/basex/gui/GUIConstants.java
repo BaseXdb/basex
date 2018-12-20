@@ -118,10 +118,10 @@ public final class GUIConstants {
     C_SHOWMAP, C_SHOWTREE, C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE, C_SHOWEXPLORE,
   }, {
     C_RTEXEC, C_RTFILTER, SEPARATOR, C_COLOR, C_FONTS, SEPARATOR, C_PACKAGES,
-    Prop.MAC ? null : C_PREFS
+    Prop.MAC ? null : SEPARATOR, Prop.MAC ? null : C_PREFS
   }, {
     C_HELP, SEPARATOR, C_COMMUNITY, C_UPDATES,
-    Prop.MAC ? null : SEPARATOR, Prop.MAC ? null : C_ABOUT
+    SEPARATOR, C_SHOWMEM, Prop.MAC ? null : C_ABOUT
   }};
 
   /** Context menu entries. */

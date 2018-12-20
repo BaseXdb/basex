@@ -91,8 +91,6 @@ public final class DialogBindings extends BaseXDialog {
   public void close() {
     if(!ok) return;
 
-    super.close();
-
     final HashMap<String, String> map = new HashMap<>();
     for(int c = 0; c < MAX; c++) {
       final String name = names[c].getText().replaceAll("^\\s*\\$|\\s+$", "");
@@ -103,6 +101,7 @@ public final class DialogBindings extends BaseXDialog {
     assign(map, gui);
 
     gui.editor.refreshContextLabel();
+    super.close();
   }
 
   /**

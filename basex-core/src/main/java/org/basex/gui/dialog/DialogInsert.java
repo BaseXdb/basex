@@ -148,10 +148,7 @@ public final class DialogInsert extends BaseXDialog {
 
   @Override
   public void close() {
-    super.close();
-
-    final String in1 = input1.getText();
-    final String in2 = string(input2.getText());
+    final String in1 = input1.getText(), in2 = string(input2.getText());
     switch(kind) {
       case Data.ATTR: case Data.PI:
         result.add(in1).add(in2);
@@ -163,5 +160,6 @@ public final class DialogInsert extends BaseXDialog {
         result.add(in2);
         break;
     }
+    super.close();
   }
 }

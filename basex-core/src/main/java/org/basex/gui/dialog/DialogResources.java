@@ -35,6 +35,7 @@ final class DialogResources extends BaseXBack {
   private final BaseXButton filter;
   /** Clear button. */
   private final BaseXButton clear;
+
   /** Avoids superfluous filtering steps. */
   private boolean filtered;
 

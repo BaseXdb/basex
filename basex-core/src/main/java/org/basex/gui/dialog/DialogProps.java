@@ -50,10 +50,6 @@ public final class DialogProps extends BaseXDialog {
   private final IntList updated = new IntList();
   /** Tabbed pane. */
   private final BaseXTabs tabs;
-  /** Resource panel. */
-  final DialogResources resources;
-  /** Add panel. */
-  final DialogAdd addPanel;
   /** Options dialog. */
   private final DialogOptions optionsPanel;
   /** Index information panel. */
@@ -76,6 +72,11 @@ public final class DialogProps extends BaseXDialog {
   private final BaseXBack[] panels = new BaseXBack[LABELS.length];
   /** Index creation panels. */
   private final DialogIndex[] indexes = new DialogIndex[LABELS.length];
+
+  /** Add panel. */
+  DialogAdd addPanel;
+  /** Resource panel. */
+  DialogResources resources;
 
   /**
    * Default constructor.
@@ -235,6 +236,8 @@ public final class DialogProps extends BaseXDialog {
 
   @Override
   public void action(final Object cmp) {
+    if(resources == null) return;
+
     final Data data = gui.context.data();
     final boolean[] exists = { true, true, true, data.meta.textindex, data.meta.attrindex,
         data.meta.tokenindex, data.meta.ftindex };
@@ -282,8 +285,8 @@ public final class DialogProps extends BaseXDialog {
       updateInfo();
     }
 
-    for(final DialogIndex di : indexes) {
-      if(di != null) di.action(true);
+    for(final DialogIndex index : indexes) {
+      if(index != null) index.action(true);
     }
 
     dbInfo.setText(InfoDB.db(data.meta, true, false));
@@ -295,9 +298,16 @@ public final class DialogProps extends BaseXDialog {
 
   @Override
   public void close() {
-    super.close();
-    for(final DialogIndex di : indexes) {
-      if(di != null) di.setOptions();
+    for(final DialogIndex index : indexes) {
+      if(index != null) index.setOptions();
     }
+    super.close();
+  }
+
+  @Override
+  public void dispose() {
+    resources = null;
+    addPanel = null;
+    super.dispose();
   }
 }

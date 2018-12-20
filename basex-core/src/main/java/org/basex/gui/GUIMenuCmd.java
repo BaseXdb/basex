@@ -686,6 +686,14 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
+  /** Shows used memory. */
+  C_SHOWMEM(USED_MEM + DOTS, null, false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      DialogMem.show(gui);
+    }
+  },
+
   /** Fullscreen mode. */
   C_FULL(FULLSCREEN, Prop.MAC ? "% shift F" : "F11", false, true) {
     @Override

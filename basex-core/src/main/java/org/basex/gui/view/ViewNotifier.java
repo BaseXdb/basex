@@ -75,7 +75,9 @@ public final class ViewNotifier {
     } else {
       // database closed: close open dialogs
       for(final Window w : gui.getOwnedWindows()) {
-        if(w.isVisible() && w instanceof BaseXDialog) ((BaseXDialog) w).cancel();
+        if(w.isVisible() && w instanceof BaseXDialog && ((BaseXDialog) w).modal()) {
+          ((BaseXDialog) w).cancel();
+        }
       }
     }
 
