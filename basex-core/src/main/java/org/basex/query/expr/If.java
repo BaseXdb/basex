@@ -10,6 +10,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -26,11 +27,21 @@ public final class If extends Arr {
   private Expr cond;
 
   /**
+   * Constructor with empty 'else' branch.
+   * @param info input info
+   * @param cond condition
+   * @param branch1 'then' branch
+   */
+  public If(final InputInfo info, final Expr cond, final Expr branch1) {
+    this(info, cond, branch1, Empty.SEQ);
+  }
+
+  /**
    * Constructor.
    * @param info input info
    * @param cond condition
-   * @param branch1 then branch
-   * @param branch2 else branch
+   * @param branch1 'then' branch
+   * @param branch2 'else' branch
    */
   public If(final InputInfo info, final Expr cond, final Expr branch1, final Expr branch2) {
     super(info, SeqType.ITEM_ZM, branch1, branch2);

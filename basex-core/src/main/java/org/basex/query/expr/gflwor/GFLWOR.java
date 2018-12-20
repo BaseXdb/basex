@@ -131,7 +131,7 @@ public final class GFLWOR extends ParseExpr {
       // replace with 'if' expression if FLWOR starts with 'where'
       final Where where = (Where) clauses.removeFirst();
       final Expr branch = clauses.isEmpty() ? rtrn : this;
-      expr = new If(info, where.expr, branch, Empty.SEQ).optimize(cc);
+      expr = new If(info, where.expr, branch).optimize(cc);
     } else {
       calcType();
       expr = simplify(cc);

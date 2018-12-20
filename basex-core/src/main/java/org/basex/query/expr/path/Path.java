@@ -166,9 +166,19 @@ public abstract class Path extends ParseExpr {
     // return root if it returns no result (it may have side effects)
     if(root != null && root.seqType().zero()) return cc.replaceWith(this, root);
 
-    // check for empty sequence
-    for(final Expr step : steps) {
+    final int sl = steps.length;
+    final ExprList list = new ExprList(sl);
+    for(int s = 0; s < sl; s++) {
+      // step is empty sequence. example: $doc/NON-EXISTING-STEP -> $doc/() -> ()
+      final Expr step = steps[s];
       if(step == Empty.SEQ) return cc.emptySeq(this);
+      list.add(step);
+      // step yields no results: ignore remaining steps
+      // example: A/prof:void(.)/B -> A/prof:void(.)
+      if(step.seqType().zero() && s + 1 < sl) {
+        cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
+        return get(info, root, list.finish());
+      }
     }
 
     // simplify path with empty root expression or empty step

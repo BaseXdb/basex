@@ -58,7 +58,7 @@ public abstract class Preds extends Arr {
     final ExprList list = new ExprList(es);
     boolean pos = false;
     for(final Expr ex : exprs) {
-      Expr expr = ex.optimizeEbv(cc);
+      Expr ebv = ex.optimizeEbv(cc), expr = ebv;
       if(expr instanceof CmpG || expr instanceof CmpV) {
         final Cmp cmp = (Cmp) expr;
         final OpV opV = cmp.opV();
@@ -109,8 +109,7 @@ public abstract class Preds extends Arr {
 
       // predicate will not yield any results
       if(expr == Bln.FALSE) return cc.emptySeq(this);
-      // skip expression yielding true
-      if(ex != expr) cc.replaceWith(ex, expr);
+      if(expr != ebv) cc.replaceWith(ex, expr);
       pos = add(expr, list, pos, cc);
     }
     exprs = list.finish();
@@ -130,6 +129,7 @@ public abstract class Preds extends Arr {
 
     final boolean ps = pos || expr.seqType().mayBeNumber() || expr.has(Flag.POS);
     if(expr == Bln.TRUE) {
+      // skip predicate that yields true
       cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
     } else if(ps || !list.contains(expr) || expr.has(Flag.NDT)) {
       list.add(expr);

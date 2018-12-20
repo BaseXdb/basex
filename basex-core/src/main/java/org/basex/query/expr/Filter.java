@@ -102,14 +102,18 @@ public abstract class Filter extends Preds {
     if(!positional()) {
       // rewrite filter with document nodes to path; enables index rewritings
       // example: db:open('db')[.//text() = 'x'] -> db:open('db')/.[.//text() = 'x']
-      if(root instanceof Value && root.data() != null && root.seqType().type == NodeType.DOC)
-        return Path.get(info, root, Step.get(info, SELF, KindTest.NOD, exprs)).optimize(cc);
+      if(root instanceof Value && root.data() != null && root.seqType().type == NodeType.DOC) {
+        final Expr path = Path.get(info, root, Step.get(info, SELF, KindTest.NOD, exprs));
+        return cc.replaceWith(this, path.optimize(cc));
+      }
 
       // rewrite independent deterministic single filter to if expression:
       // example: (1 to 10)[$boolean] -> if($boolean) then (1 to 10) else ()
       final Expr expr = exprs[0];
-      if(exprs.length == 1 && expr.isSimple() && !expr.seqType().mayBeNumber())
-        return new If(info, expr, root, Empty.SEQ).optimize(cc);
+      if(exprs.length == 1 && expr.isSimple() && !expr.seqType().mayBeNumber()) {
+        final Expr iff = new If(info, expr, root).optimize(cc);
+        return cc.replaceWith(this, iff);
+      }
 
       // otherwise, return iterative filter
       return copyType(new IterFilter(info, root, exprs));
@@ -136,7 +140,8 @@ public abstract class Filter extends Preds {
           exp = len <= 0 ? Empty.SEQ : ((Value) rt).subSequence(size, len, cc.qc);
         } else if(pos.min == pos.max) {
           // expr[pos] -> util:item(expr, pos)
-          exp = cc.function(Function._UTIL_ITEM, info, rt, Int.get(pos.min));
+          exp = pos.min == 1 ? cc.function(Function.HEAD, info, rt) :
+            cc.function(Function._UTIL_ITEM, info, rt, Int.get(pos.min));
         } else {
           // expr[min..max] -> util:range(expr, min, max)
           exp = cc.function(Function._UTIL_RANGE, info, rt, Int.get(pos.min), Int.get(pos.max));
