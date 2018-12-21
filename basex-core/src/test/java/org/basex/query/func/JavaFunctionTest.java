@@ -190,4 +190,9 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
   @Test public void toJava() {
     query("import module namespace set = \"java:java.util.HashSet\"; set:add(true#0)", "true");
   }
+
+  /** Empty sequences. */
+  @Test public void emptySequence() {
+    error("Q{java.lang.String}new·java.lang.String(())", JAVAEVAL_X_X_X);
+  }
 }
