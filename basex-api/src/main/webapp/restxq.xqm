@@ -29,7 +29,7 @@ function page:start(
         <li>create web applications and services with
           <a href="http://docs.basex.org/wiki/RESTXQ">RESTXQ</a>,</li>
         <li>use full-duplex communication with
-          <a href="http://docs.basex.org/wiki/WebSocket">WebSockets</a>,</li>
+          <a href="http://docs.basex.org/wiki/WebSockets">WebSockets</a>,</li>
         <li>query and modify databases via <a href="http://docs.basex.org/wiki/REST">REST</a>
           (try <a href='rest'>here</a>), and</li>
         <li>browse and update resources via
