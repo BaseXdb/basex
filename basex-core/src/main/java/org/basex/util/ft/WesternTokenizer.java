@@ -20,7 +20,7 @@ public final class WesternTokenizer extends Tokenizer {
   private static final HashSet<Language> SUPPORTED = new HashSet<>();
 
   static {
-    final String[] nonw = { "ar", "ja", "ko", "th", "zh" };
+    final String[] nonw = { "ja", "ko", "th", "zh" };
     for(final Language l : Language.ALL.values()) {
       if(!Strings.eq(l.code(), nonw)) SUPPORTED.add(l);
     }
