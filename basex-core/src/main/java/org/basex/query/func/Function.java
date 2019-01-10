@@ -778,6 +778,8 @@ public enum Function {
   /** XQuery function. */
   _DB_DELETE(DbDelete.class, "delete(database,path)", arg(STR_O, STR_O), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
+  _DB_DIR(DbDir.class, "dir(database,path)", arg(STR_O, STR_O), ELM_ZM, flag(NDT), DB_URI),
+  /** XQuery function. */
   _DB_DROP(DbDrop.class, "drop(database)", arg(ITEM_O), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_DROP_BACKUP(DbDropBackup.class, "drop-backup(name)", arg(STR_O), EMP, flag(UPD), DB_URI),

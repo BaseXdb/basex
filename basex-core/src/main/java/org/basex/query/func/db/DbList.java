@@ -2,6 +2,8 @@ package org.basex.query.func.db;
 
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
@@ -9,7 +11,10 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.*;
+import org.basex.util.http.*;
 import org.basex.util.list.*;
 
 /**
@@ -19,6 +24,25 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class DbList extends DbFn {
+  /** Resource element name. */
+  static final String DATABASE = "database";
+  /** Resource element name. */
+  static final String RESOURCE = "resource";
+  /** Resource element name. */
+  static final String RESOURCES = "resources";
+  /** Path. */
+  static final String PATH = "path";
+  /** Raw. */
+  static final String RAW = "raw";
+  /** Size. */
+  static final String SIZE = "size";
+  /** Content type. */
+  static final String CTYPE = "content-type";
+  /** Modified date. */
+  static final String MDATE = "modified-date";
+  /** Directory flag. */
+  static final String DIR = "dir";
+
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return exprs.length == 0 ? list(qc).iter() : resources(qc);
@@ -80,5 +104,37 @@ public class DbList extends DbFn {
       if(!dataLock(visitor, 0)) return false;
     }
     return super.accept(visitor);
+  }
+
+  /**
+   * Creates a directory node.
+   * @param path path
+   * @param mdate modified date
+   * @return resource node
+   */
+  static FNode dir(final byte[] path, final long mdate) {
+    final FElem dir = new FElem(DIR);
+    dir.add(path).add(MDATE, DateTime.format(new Date(mdate)));
+    return dir;
+  }
+
+  /**
+   * Creates a resource node.
+   * @param path path
+   * @param raw raw flag
+   * @param type media type
+   * @param mdate modified date
+   * @param size size (can be {@code null})
+   * @return resource node
+   */
+  static FNode resource(final byte[] path, final boolean raw, final MediaType type,
+      final long mdate, final Long size) {
+
+    final FElem resource = new FElem(RESOURCE).add(path);
+    resource.add(RAW, token(raw));
+    resource.add(CTYPE, type.toString());
+    resource.add(MDATE, DateTime.format(new Date(mdate)));
+    if(size != null) resource.add(SIZE, token(size));
+    return resource;
   }
 }

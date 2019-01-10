@@ -24,25 +24,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class DbListDetails extends DbList {
-  /** Resource element name. */
-  private static final String DATABASE = "database";
-  /** Resource element name. */
-  private static final String RESOURCE = "resource";
-  /** Resource element name. */
-  private static final String RESOURCES = "resources";
-  /** Path element name. */
-  private static final String PATH = "path";
-  /** Raw element name. */
-  private static final String RAW = "raw";
-  /** Size element name. */
-  private static final String SIZE = "size";
-  /** Content type element name. */
-  private static final String CTYPE = "content-type";
-  /** Modified date element name. */
-  private static final String MDATE = "modified-date";
-
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    // overwrites implementation of the super class
     return exprs.length == 0 ? list(qc) : resources(qc);
   }
 
@@ -101,31 +85,16 @@ public final class DbListDetails extends DbList {
           final int pre = docs.get((int) i);
           final byte[] pt = data.text(pre, true);
           final int sz = data.size(pre, Data.DOC);
-          return resource(pt, false, sz, MediaType.APPLICATION_XML, data.meta.time);
+          return resource(pt, false, MediaType.APPLICATION_XML, data.meta.time, Long.valueOf(sz));
         }
         if(i < size) {
           final byte[] pt = bins.get((int) i - ds);
           final IOFile io = data.meta.binary(string(pt));
-          return resource(pt, true, io.length(), MediaType.get(io.path()), io.timeStamp());
+          return resource(pt, true, MediaType.get(io.path()), io.timeStamp(),
+              Long.valueOf(io.length()));
         }
         return null;
       }
     };
-  }
-
-  /**
-   * Creates a resource node.
-   * @param path path
-   * @param raw is the resource a raw file
-   * @param size size
-   * @param type media type
-   * @param mdate modified date
-   * @return resource  node
-   */
-  private static FNode resource(final byte[] path, final boolean raw, final long size,
-      final MediaType type, final long mdate) {
-
-    return new FElem(RESOURCE).add(path).add(RAW, token(raw)).add(CTYPE, type.toString()).
-        add(MDATE, DateTime.format(new Date(mdate))).add(SIZE, token(size));
   }
 }

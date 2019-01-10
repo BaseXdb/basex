@@ -197,13 +197,36 @@ public final class DbModuleTest extends AdvancedQueryTest {
     final String rawCall = func.args(NAME, "raw");
     query(rawCall + "/@raw/data()", true);
     query(rawCall + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
-    query(rawCall + "/@modified-date/xs:dateTime(.) > " +
-        "xs:dateTime('1971-01-01T00:00:01')", true);
+    query(rawCall + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", true);
     query(rawCall + "/@size/data()", 3);
     query(rawCall + "/text()", "raw");
 
     query(func.args(NAME, "test"), "");
-    error(func.args("mostProbablyNotAvailable"), DB_OPEN2_X);
+    error(func.args("notAvailable"), DB_OPEN2_X);
+  }
+
+  /** Test method. */
+  @Test public void dir() {
+    final Function func = _DB_DIR;
+    query(_DB_ADD.args(NAME, " <a/>", "xml/doc.xml"));
+    query(_DB_STORE.args(NAME, "raw/raw.data", "bla"));
+
+    final String xmlCall = func.args(NAME, "xml");
+    query(xmlCall + "/@raw/data()", false);
+    query(xmlCall + "/@content-type/data()", MediaType.APPLICATION_XML.toString());
+    query(xmlCall + "/@modified-date/xs:dateTime(.)");
+    query(xmlCall + "/@size/data()", "");
+    query(xmlCall + "/text()", "doc.xml");
+
+    final String rawCall = func.args(NAME, "raw");
+    query(rawCall + "/@raw/data()", true);
+    query(rawCall + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
+    query(rawCall + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", true);
+    query(rawCall + "/@size/data()", 3);
+    query(rawCall + "/text()", "raw.data");
+
+    query(func.args(NAME, "test"), "");
+    error(func.args("notAvailable", ""), DB_OPEN2_X);
   }
 
   /** Test method. */

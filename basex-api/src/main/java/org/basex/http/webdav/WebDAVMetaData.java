@@ -4,6 +4,7 @@ import static org.basex.http.webdav.WebDAVUtils.*;
 
 import java.util.*;
 
+import org.basex.util.*;
 import org.basex.util.http.*;
 
 /**
@@ -28,15 +29,15 @@ final class WebDAVMetaData {
 
   /** Default constructor. */
   WebDAVMetaData() {
-    this(null, 0L);
+    this(null, null);
   }
 
   /**
    * Constructor.
    * @param db database owning the resource (can be {@code null})
-   * @param ms resource last modification date in milliseconds
+   * @param ms resource last modification date (can be {@code null})
    */
-  WebDAVMetaData(final String db, final long ms) {
+  WebDAVMetaData(final String db, final String ms) {
     this(db, "", ms);
   }
 
@@ -44,9 +45,9 @@ final class WebDAVMetaData {
    * Constructor.
    * @param db database owning the resource (can be {@code null})
    * @param path resource path
-   * @param ms resource last modification date in milliseconds
+   * @param ms resource last modification date (can be {@code null})
    */
-  WebDAVMetaData(final String db, final String path, final long ms) {
+  WebDAVMetaData(final String db, final String path, final String ms) {
     this(db, path, ms, false, null, null);
   }
 
@@ -54,19 +55,19 @@ final class WebDAVMetaData {
    * Constructor.
    * @param db database owning the resource (can be {@code null})
    * @param path resource path
-   * @param ms resource last modification date in milliseconds
+   * @param ms resource last modification date (can be {@code null})
    * @param raw raw binary file flag
    * @param type resource media type (can be {@code null})
-   * @param size resource size in bytes (can be {@code null})
+   * @param size resource size in bytes (can be {@code null} or empty)
    */
-  WebDAVMetaData(final String db, final String path, final long ms, final boolean raw,
-      final MediaType type, final Long size) {
+  WebDAVMetaData(final String db, final String path, final String ms, final boolean raw,
+      final MediaType type, final String size) {
 
     this.db = db;
     this.path = stripLeadingSlash(path);
     this.raw = raw;
     this.type = type;
-    this.size = size;
-    mdate = ms == -1 ? null : new Date(ms);
+    this.size = size == null || size.isEmpty() ? null : Long.valueOf(size);
+    mdate = ms == null ? null : new Date(DateTime.parse(ms).getTime());
   }
 }

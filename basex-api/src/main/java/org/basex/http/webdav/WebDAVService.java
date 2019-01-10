@@ -17,7 +17,6 @@ import org.basex.io.serial.*;
 import org.basex.query.func.db.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
-import org.basex.util.list.*;
 
 /**
  * Service handling the various WebDAV operations.
@@ -91,10 +90,10 @@ final class WebDAVService {
    * @return timestamp in milliseconds
    * @throws IOException I/O exception
    */
-  long timestamp(final String db) throws IOException {
+  String timestamp(final String db) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(DATA.args(_DB_INFO.args(" $db") +
         "/descendant::" + DbFn.toName(Text.TIMESTAMP) + "[1]")).bind("db",  db);
-    return DateTime.parse(query.execute(session())).getTime();
+    return query.execute(session());
   }
 
   /**
@@ -107,17 +106,17 @@ final class WebDAVService {
   private WebDAVMetaData metaData(final String db, final String path) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(
       "let $a := " + _DB_LIST_DETAILS.args(" $db", " $path") + "[1] " +
-      "return string-join(($a/@raw, $a/@content-type, $a/@modified-date, $a/@size, $a),out:tab())");
+      "return string-join(($a, $a/(@raw, @content-type, @modified-date, @size)),out:tab())");
     query.bind("db", db);
     query.bind("path", path);
 
-    final String[] result = results(query);
-    final boolean raw = Boolean.parseBoolean(result[0]);
-    final MediaType type = new MediaType(result[1]);
-    final long mod = DateTime.parse(result[2]).getTime();
-    final Long size = raw ? Long.valueOf(result[3]) : null;
-    final String pth = stripLeadingSlash(result[4]);
-    return new WebDAVMetaData(db, pth, mod, raw, type, size);
+    final String[] result = Strings.split(query.execute(session()), '\t');
+    final String pth = stripLeadingSlash(result[0]);
+    final boolean raw = Boolean.parseBoolean(result[1]);
+    final MediaType type = new MediaType(result[2]);
+    final String ms = result[3];
+    final String size = raw ? result[4] : null;
+    return new WebDAVMetaData(db, pth, ms, raw, type, size);
   }
 
   /**
@@ -274,30 +273,27 @@ final class WebDAVService {
    */
   List<WebDAVResource> list(final String db, final String path) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(STRING_JOIN.args(
-      _DB_LIST_DETAILS.args(" $db", " $path") + " ! (" +
-      "@raw,@content-type,@modified-date,@size," + SUBSTRING_AFTER.args(" text()", " $path") + ')',
-      _OUT_TAB.args()));
+      " for $d in " + _DB_DIR.args(" $db", " $path") + " return ($d/text(), name($d) = 'dir', " +
+      " for $a in ('modified-date', 'raw', 'content-type', 'size') " +
+      " return string($d/@*[name() = $a]))", _OUT_TAB.args()));
     query.bind("db", db);
     query.bind("path", path);
-    final String[] result = results(query);
-
-    final HashSet<String> paths = new HashSet<>();
+    final String[] result = Strings.split(query.execute(session()), '\t');
     final List<WebDAVResource> ch = new ArrayList<>();
     final int rs = result.length;
-    for(int r = 0; r < rs; r += 5) {
-      final boolean raw = Boolean.parseBoolean(result[r]);
-      final MediaType ctype = new MediaType(result[r + 1]);
-      final long mod = DateTime.parse(result[r + 2]).getTime();
-      final Long size = raw ? Long.valueOf(result[r + 3]) : null;
-      final String pth = stripLeadingSlash(result[r + 4]);
-      final int ix = pth.indexOf(SEP);
+    for(int r = 0; r < rs; r += 6) {
+      final String name = result[r];
+      final boolean dir = Boolean.parseBoolean(result[r + 1]);
+      final String mod = result[r + 2];
       // check if document or folder
-      if(ix < 0) {
-        if(!pth.equals(DUMMY)) ch.add(WebDAVFactory.file(this,
-          new WebDAVMetaData(db, path + SEP + pth, mod, raw, ctype, size)));
-      } else {
-        final String dir = path + SEP + pth.substring(0, ix);
-        if(paths.add(dir)) ch.add(WebDAVFactory.folder(this, new WebDAVMetaData(db, dir, mod)));
+      final String p = path + SEP + name;
+      if(dir) {
+        ch.add(WebDAVFactory.folder(this, new WebDAVMetaData(db, p, mod)));
+      } else if(!name.equals(DUMMY)) {
+        final boolean raw = Boolean.parseBoolean(result[r + 3]);
+        final MediaType ctype = new MediaType(result[r + 4]);
+        final String size = result[r + 5];
+        ch.add(WebDAVFactory.file(this, new WebDAVMetaData(db, p, mod, raw, ctype, size)));
       }
     }
     return ch;
@@ -312,13 +308,13 @@ final class WebDAVService {
     final WebDAVQuery query = new WebDAVQuery(STRING_JOIN.args(
         _DB_LIST_DETAILS.args() + " ! (text(), @modified-date)", _OUT_TAB.args()));
 
-    final String[] result = results(query);
+    final String[] result = Strings.split(query.execute(session()), '\t');
     final List<WebDAVResource> dbs = new ArrayList<>();
     final int rs = result.length;
     for(int r = 0; r < rs; r += 2) {
       final String name = result[r];
-      final long mod = DateTime.parse(result[r + 1]).getTime();
-      dbs.add(WebDAVFactory.database(this, new WebDAVMetaData(name, mod)));
+      final String ms = result[r + 1];
+      dbs.add(WebDAVFactory.database(this, new WebDAVMetaData(name, ms)));
     }
     return dbs;
   }
@@ -523,20 +519,6 @@ final class WebDAVService {
     final LocalSession session = session();
     session.execute(new Open(db));
     session.store(path + SEP + DUMMY, new ArrayInput(Token.EMPTY));
-  }
-
-  /**
-   * Executes a query and returns all results as a list.
-   * @param query query to be executed
-   * @return result
-   * @throws IOException error during query execution
-   */
-  private String[] results(final WebDAVQuery query) throws IOException {
-    final StringList sl = new StringList();
-    for(final String result : Strings.split(query.execute(session()), '\t')) {
-      if(!result.isEmpty()) sl.add(result);
-    }
-    return sl.finish();
   }
 
   /**

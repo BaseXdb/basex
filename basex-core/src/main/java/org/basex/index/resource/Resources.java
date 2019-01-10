@@ -93,7 +93,17 @@ public final class Resources implements Index {
    * @return pre values (internal representation!)
    */
   public synchronized IntList docs(final String path) {
-    return docs.docs(path, false);
+    return docs(path, true);
+  }
+
+  /**
+   * Returns the pre values of all document nodes that start with the specified path.
+   * @param path input path
+   * @param desc descendant traversal
+   * @return pre values (internal representation!)
+   */
+  public synchronized IntList docs(final String path, final boolean desc) {
+    return docs.docs(path, desc);
   }
 
   /**

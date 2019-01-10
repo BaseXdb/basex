@@ -60,6 +60,14 @@ public final class Bln extends Item {
 
   @Override
   public byte[] string(final InputInfo info) {
+    return string();
+  }
+
+  /**
+   * Returns the string value.
+   * @return string value
+   */
+  public byte[] string() {
     return Token.token(value);
   }
 

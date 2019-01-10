@@ -215,33 +215,42 @@ final class Docs {
   /**
    * Returns the pre values of all document nodes matching the specified path.
    * @param path input path
-   * @param exact exact (no prefix) matches
+   * @param desc descendant traversal
    * @return pre values (can be internal representation!)
    */
-  synchronized IntList docs(final String path, final boolean exact) {
+  synchronized IntList docs(final String path, final boolean desc) {
     // invalid path, or no documents: return empty list
     final String pth = MetaData.normPath(path);
     if(pth == null) return new IntList(0);
 
     // empty path: return all documents
     final IntList docs = docs();
-    if(pth.isEmpty()) return docs;
+    if(desc && pth.isEmpty()) return docs;
 
     // normalize paths
-    byte[] exct = EMPTY, pref = normalize(token(pth));
+    byte[] exact = EMPTY, prefix = normalize(token(pth));
     // check for explicit directory indicator
-    if(!pth.endsWith("/")) {
-      exct = pref;
-      pref = concat(exct, SLASH);
+    if(!(pth.isEmpty() || Strings.endsWith(pth, '/'))) {
+      exact = prefix;
+      prefix = concat(exact, SLASH);
     }
 
     // relevant paths: exact hits and prefixes
+    final TokenSet set = new TokenSet();
     final IntList il = new IntList();
     final TokenList paths = paths();
     final int ps = paths.size();
     for(int p = 0; p < ps; p++) {
       final byte[] pt = paths.get(p);
-      if(eq(pt, exct) || !exact && startsWith(pt, pref)) il.add(docs.get(p));
+      boolean add = eq(pt, exact);
+      if(!add) {
+        add = startsWith(pt, prefix);
+        if(add && !desc) {
+          final int i = indexOf(pt, Token.SLASH, prefix.length + 1);
+          if(i != -1) add = set.add(substring(pt, prefix.length, i));
+        }
+      }
+      if(add) il.add(docs.get(p));
     }
     return il.sort();
   }
