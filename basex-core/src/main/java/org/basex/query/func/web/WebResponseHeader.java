@@ -47,6 +47,10 @@ public final class WebResponseHeader extends StandardFunc {
       if(so.option(entry) == null) throw INVALIDOPTION_X.get(info, entry);
 
     final FElem hresp = new FElem(new QNm(HTTP_PREFIX, "response", HTTP_URI)).declareNS();
+    for(final Option<?> o : response) {
+      if(response.contains(o)) hresp.add(o.name(), response.get(o).toString());
+    }
+
     headers.forEach((name, value) -> {
       if(!value.isEmpty()) hresp.add(new FElem(new QNm(HTTP_PREFIX, "header", HTTP_URI)).
           add("name", name).add("value", value));
@@ -60,9 +64,6 @@ public final class WebResponseHeader extends StandardFunc {
 
     // REST response
     final FElem rest = new FElem(new QNm(REST_PREFIX, "response", REST_URI)).declareNS();
-    for(final Option<?> o : response) {
-      if(response.contains(o)) rest.add(o.name(), response.get(o).toString());
-    }
 
     return rest.add(hresp).add(oseri);
   }

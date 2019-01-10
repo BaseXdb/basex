@@ -71,7 +71,7 @@ public final class WebModuleTest extends AdvancedQueryTest {
 
     // status/message arguments
     query(func.args(" map {}", " map {}", " map {'status':200,'message':'OK'}") +
-        " ! (@status, @message) ! string()", "200\nOK");
+        "/http:response ! (@status, @message) ! string()", "200\nOK");
 
     // GH1585
     query("count((" + func.args() + " update {})/http:response)", 1);
