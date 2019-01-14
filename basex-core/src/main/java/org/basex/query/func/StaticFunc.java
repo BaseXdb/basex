@@ -319,7 +319,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       final Item[] args = ann.args();
       limit = args.length > 0 ? ((ANum) args[0]).itr() : Long.MAX_VALUE;
     }
-    return expr instanceof Value || expr.exprSize() < limit;
+    return expr.exprSize() < limit;
   }
 
   @Override
