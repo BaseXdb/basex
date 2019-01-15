@@ -27,39 +27,81 @@ import org.basex.util.list.*;
 public final class FileReadTextLines extends FileRead {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
+    return new Iter() {
+      final TokenBuilder tb = new TokenBuilder();
+      NewlineInput ni;
+      long[] minMax;
+      long c;
+
+      @Override
+      public Str next() throws QueryException {
+        try {
+          if(ni == null) {
+            minMax = minMax(qc);
+            ni = input(qc);
+            qc.resources.add(ni);
+          }
+          while(++c < minMax[1] && ni.readLine(tb)) {
+            if(c >= minMax[0]) return Str.get(tb.toArray());
+          };
+          qc.resources.remove(ni);
+          return null;
+        } catch(final IOException ex) {
+          throw FILE_IO_ERROR_X.get(info, ex);
+        }
+      }
+    };
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    checkCreate(qc);
+    final TokenBuilder tb = new TokenBuilder();
+    final TokenList tl = new TokenList();
 
-    final Path path = toPath(0, qc);
-    final String encoding = toEncoding(1, FILE_UNKNOWN_ENCODING_X, qc);
-    final boolean validate = exprs.length < 3 || !toBoolean(exprs[2], qc);
-    final long start = exprs.length < 4 ? 1 : toLong(exprs[3], qc);
-    final long length = exprs.length < 5 ? Long.MAX_VALUE : toLong(exprs[4], qc);
-
-    if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
-    if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
-
-    try(NewlineInput ni = new NewlineInput(new IOFile(path.toFile()))) {
-      ni.encoding(encoding).validate(validate);
-
-      // end exceeds maximum: use maximum (too large to be reached)
-      final long end = start + length < 0 ? Long.MAX_VALUE : start + length;
-      final TokenBuilder tb = new TokenBuilder();
-      final TokenList tl = new TokenList();
-      for(long c = 1; c < end; c++) {
-        if(!ni.readLine(tb)) break;
-        if(c >= start) tl.add(tb.toArray());
+    final long[] minMax = minMax(qc);
+    try(NewlineInput ni = input(qc)) {
+      for(long c = 1; c < minMax[1] && ni.readLine(tb); c++) {
+        if(c >= minMax[0]) tl.add(tb.toArray());
       }
       return StrSeq.get(tl);
-
     } catch(final IOException ex) {
       throw FILE_IO_ERROR_X.get(info, ex);
     }
   }
+
+  /**
+   * Returns an input stream to the addressed file.
+   * @param qc query context.
+   * @return input stream
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  private NewlineInput input(final QueryContext qc) throws IOException, QueryException {
+    checkCreate(qc);
+    final Path path = toPath(0, qc);
+    final String encoding = toEncoding(1, FILE_UNKNOWN_ENCODING_X, qc);
+    final boolean validate = exprs.length < 3 || !toBoolean(exprs[2], qc);
+    if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
+    if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
+
+    final NewlineInput ni = new NewlineInput(new IOFile(path.toFile()));
+    ni.encoding(encoding).validate(validate);
+    return ni;
+  }
+
+  /**
+   * Returns the offset to the first and last line to be read.
+   * @param qc query context
+   * @return offsets
+   * @throws QueryException query exception
+   */
+  private long[] minMax(final QueryContext qc) throws QueryException {
+    final long start = exprs.length < 4 ? 1 : toLong(exprs[3], qc);
+    final long length = exprs.length < 5 ? Long.MAX_VALUE : toLong(exprs[4], qc);
+    final long end = start + length < 0 ? Long.MAX_VALUE : start + length;
+    return new long[] { start, end };
+  }
+
 
   /**
    * Creates an updated version of {@link FileReadTextLines}.
@@ -72,7 +114,6 @@ public final class FileReadTextLines extends FileRead {
   public Expr opt(final long start, final long length, final CompileContext cc)
       throws QueryException {
 
-    // [CG] merge start/length values
     final int al = exprs.length;
     if(al > 3) return this;
 

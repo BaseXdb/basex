@@ -50,7 +50,9 @@ public final class QueryResources {
   /** Opened databases (both temporary and persistent ones). */
   private final ArrayList<Data> datas = new ArrayList<>(1);
   /** External resources. */
-  private Map<Class<? extends QueryResource>, QueryResource> external;
+  private Map<Class<? extends QueryResource>, QueryResource> external = new HashMap<>();
+  /** Input references. */
+  private final ArrayList<InputStream> inputs = new ArrayList<>(1);
 
   /**
    * Constructor.
@@ -91,10 +93,19 @@ public final class QueryResources {
     datas.clear();
     // close dynamically loaded JAR files
     if(modules != null) modules.close();
+    modules = null;
     // close external resources
-    if(external != null) {
-      for(final QueryResource c : external.values()) c.close();
+    for(final QueryResource c : external.values()) c.close();
+    external.clear();
+    // close external resources
+    for(final InputStream is : inputs) {
+      try {
+        is.close();
+      } catch(final IOException ex) {
+        Util.debug(ex);
+      }
     }
+    inputs.clear();
   }
 
   /**
@@ -113,7 +124,6 @@ public final class QueryResources {
    */
   @SuppressWarnings("unchecked")
   public synchronized <R extends QueryResource> R index(final Class<? extends R> resource) {
-    if(external == null) external = new HashMap<>();
     QueryResource value = external.get(resource);
     if(value == null) {
       try {
@@ -124,6 +134,24 @@ public final class QueryResources {
       }
     }
     return (R) value;
+  }
+
+  /**
+   * Adds an input stream reference.
+   * @param input input stream
+   */
+  public synchronized void add(final InputStream input) {
+    inputs.add(input);
+  }
+
+  /**
+   * Closes and removes an input stream reference.
+   * @param input input stream
+   * @throws IOException I/O exception
+   */
+  public synchronized void remove(final InputStream input) throws IOException {
+    inputs.remove(input);
+    input.close();
   }
 
   /**
