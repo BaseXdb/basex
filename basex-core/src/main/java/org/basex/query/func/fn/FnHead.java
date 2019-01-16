@@ -46,7 +46,7 @@ public final class FnHead extends StandardFunc {
     if(Function.REVERSE.is(expr))
       return cc.function(Function._UTIL_LAST, info, args(expr));
     if(Function._FILE_READ_TEXT_LINES.is(expr))
-      return ((FileReadTextLines) expr).opt(0, 1, cc);
+      return FileReadTextLines.opt(this, 0, 1, cc);
 
     exprType.assign(st.type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
     return this;

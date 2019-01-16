@@ -71,7 +71,7 @@ public class UtilItem extends StandardFunc {
       if(Function.TAIL.is(expr))
         return cc.function(Function._UTIL_ITEM, info, args(expr)[0], Int.get(p + 2));
       if(Function._FILE_READ_TEXT_LINES.is(expr))
-        return ((FileReadTextLines) expr).opt(p, 1, cc);
+        return FileReadTextLines.opt(this, p, 1, cc);
     }
 
     if(Function._UTIL_INIT.is(expr))

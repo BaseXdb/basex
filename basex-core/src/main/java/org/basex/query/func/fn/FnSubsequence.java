@@ -207,7 +207,7 @@ public class FnSubsequence extends StandardFunc {
       if(sr.length == Long.MAX_VALUE && sr.start == 1)
         return cc.function(Function.TAIL, info, expr);
       if(Function._FILE_READ_TEXT_LINES.is(expr))
-        return ((FileReadTextLines) expr).opt(sr.start, sr.length, cc);
+        return FileReadTextLines.opt(this, sr.start, sr.length, cc);
     }
 
     exprType.assign(st.type, st.occ.union(Occ.ZERO), sz);
