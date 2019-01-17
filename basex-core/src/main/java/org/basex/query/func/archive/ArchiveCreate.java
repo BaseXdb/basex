@@ -25,10 +25,10 @@ public class ArchiveCreate extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter entries = exprs[0].iter(qc), contents = exprs[1].iter(qc);
-    final ArchOptions opts = toOptions(2, new ArchOptions(), qc);
+    final CreateOptions opts = toOptions(2, new CreateOptions(), qc);
 
     // check options
-    final String format = opts.get(ArchOptions.FORMAT);
+    final String format = opts.get(CreateOptions.FORMAT);
     final int level = level(opts);
 
     try(ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info)) {
@@ -46,7 +46,7 @@ public class ArchiveCreate extends ArchiveFn {
           }
           if(out instanceof GZIPOut && c > 0)
             throw ARCHIVE_SINGLE_X.get(info, format.toUpperCase(Locale.ENGLISH));
-          add(checkElemToken(en), cn, out, level, qc);
+          add(checkElemToken(en), cn, out, level, "", qc);
           e++;
           c++;
         }
@@ -63,14 +63,14 @@ public class ArchiveCreate extends ArchiveFn {
    * @return level
    * @throws QueryException query exception
    */
-  protected int level(final ArchOptions options) throws QueryException {
+  protected int level(final CreateOptions options) throws QueryException {
     int level = ZipEntry.DEFLATED;
-    final String format = options.get(ArchOptions.FORMAT);
-    final String alg = options.get(ArchOptions.ALGORITHM);
+    final String format = options.get(CreateOptions.FORMAT);
+    final String alg = options.get(CreateOptions.ALGORITHM);
     if(alg != null) {
       if(format.equals(ZIP)  && !Strings.eq(alg, STORED, DEFLATE) ||
          format.equals(GZIP) && !Strings.eq(alg, DEFLATE)) {
-        throw ARCHIVE_FORMAT_X_X.get(info, ArchOptions.ALGORITHM.name(), alg);
+        throw ARCHIVE_FORMAT_X_X.get(info, CreateOptions.ALGORITHM.name(), alg);
       }
       if(Strings.eq(alg, STORED)) level = ZipEntry.STORED;
     }
@@ -83,19 +83,21 @@ public class ArchiveCreate extends ArchiveFn {
    * @param content contents
    * @param out output archive
    * @param level default compression level
+   * @param root root path (empty, or ending with slash)
    * @param qc query context
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   protected final void add(final Item entry, final Item content, final ArchiveOut out,
-      final int level, final QueryContext qc) throws QueryException, IOException {
+      final int level, final String root, final QueryContext qc)
+      throws QueryException, IOException {
 
     // create new zip entry
     String name = string(entry.string(info));
     if(name.isEmpty()) throw ARCHIVE_DESCRIPTOR1.get(info);
     if(Prop.WIN) name = name.replace('\\', '/');
 
-    final ZipEntry ze = new ZipEntry(name);
+    final ZipEntry ze = new ZipEntry(root + name);
     String encoding = Strings.UTF8;
 
     // compression level

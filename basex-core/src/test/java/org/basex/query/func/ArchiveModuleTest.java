@@ -81,9 +81,14 @@ public final class ArchiveModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test public void createFrom() {
     final Function func = _ARCHIVE_CREATE_FROM;
-    count(func.args(DIR), 4);
-    count(func.args(DIR, " map { }"), 4);
-    count(func.args(DIR, " map { 'algorithm': 'stored' }"), 4);
+    count(func.args(DIR), 5);
+    count(func.args(DIR, " map { }"), 5);
+    count(func.args(DIR, " map { 'algorithm': 'stored' }"), 5);
+
+    count(func.args(DIR, " map { 'recursive': false() }"), 4);
+    query(_ARCHIVE_ENTRIES.args(func.args(DIR, " map { 'root-dir': true() }")) +
+        "[not(starts-with(., 'dir/'))]", "");
+
     query("parse-xml(" + _ARCHIVE_EXTRACT_TEXT.args(func.args(DIR, " map { }"),
         "input.xml") + ") instance of document-node()", true);
 

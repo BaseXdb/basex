@@ -35,7 +35,7 @@ public final class OptionsTest extends SandboxTest {
     new JsonParserOptions();
     new JsonSerialOptions();
     new TextOptions();
-    new ArchOptions();
+    new CreateOptions();
     new FtIndexOptions();
     new FtContainsOptions();
     new XQueryOptions();

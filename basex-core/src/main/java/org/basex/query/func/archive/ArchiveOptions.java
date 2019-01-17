@@ -39,8 +39,8 @@ public final class ArchiveOptions extends StandardFunc {
 
     // create result element
     final MapBuilder mb = new MapBuilder();
-    if(format != null) mb.put(ArchOptions.FORMAT.name(), format);
-    if(level >= 0) mb.put(ArchOptions.ALGORITHM.name(),
+    if(format != null) mb.put(CreateOptions.FORMAT.name(), format);
+    if(level >= 0) mb.put(CreateOptions.ALGORITHM.name(),
         level == 8 ? DEFLATE : level == 0 ? STORED : UNKNOWN);
 
     return mb.finish();

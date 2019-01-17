@@ -21,7 +21,7 @@ public final class AddRawOptionTest extends SandboxTest {
   /** Test directory. */
   private static final String DIR = "src/test/resources/dir";
   /** Test files from {@link AddRawOptionTest#DIR}}. */
-  private static final IOFile[] FILES = new IOFile(DIR).children();
+  private static final StringList FILES = new IOFile(DIR).descendants();
 
   /**
    * Class set up method.
@@ -59,10 +59,9 @@ public final class AddRawOptionTest extends SandboxTest {
   private static void assertAllFilesExist() {
     final StringList files = new StringList(query(Function._DB_LIST.args(NAME)).split(Prop.NL));
     assertFalse("No files were imported", files.isEmpty());
-    for(final IOFile f : FILES) {
-      final String fname = f.name();
-      assertTrue("File " + fname + " is not imported", files.contains(fname));
+    for(final String name : FILES) {
+      assertTrue("File " + name + " is not imported", files.contains(name));
     }
-    assertEquals("Expected number of imported files is different", FILES.length, files.size());
+    assertEquals("Expected number of imported files is different", FILES.size(), files.size());
   }
 }

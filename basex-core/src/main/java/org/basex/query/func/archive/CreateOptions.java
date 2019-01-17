@@ -10,7 +10,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-18, BSD License
  * @author Christian Gruen
  */
-public final class ArchOptions extends Options {
+public class CreateOptions extends Options {
   /** Archiving format. */
   public static final StringOption FORMAT = new StringOption("format", ZIP);
   /** Archiving algorithm. */

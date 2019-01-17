@@ -56,7 +56,7 @@ public final class ArchiveUpdate extends ArchiveCreate {
       for(final byte[] h : hm) {
         if(h == null) continue;
         final Item[] it = hm.get(h);
-        add(it[0], it[1], out, ZipEntry.DEFLATED, qc);
+        add(it[0], it[1], out, ZipEntry.DEFLATED, "", qc);
       }
       return B64.get(out.finish());
     } catch(final IOException ex) {
