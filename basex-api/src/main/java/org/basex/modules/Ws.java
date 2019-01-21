@@ -9,6 +9,7 @@ import org.basex.http.ws.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
 
 /**
@@ -23,18 +24,16 @@ public final class Ws extends QueryModule {
    * @return client id
    * @throws QueryException QueryException
    */
-  public String id() throws QueryException {
-    final Object ws = queryContext.getProperty(HTTPText.WEBSOCKET);
-    if(ws == null) throw BASEX_WS.get(null);
-    return ((WebSocket) ws).id;
+  public Str id() throws QueryException {
+    return Str.get(ws().id);
   }
 
   /**
    * Returns the ids of all connected clients.
    * @return client ids
    */
-  public String[] ids() {
-    return pool().ids().toArray();
+  public Value ids() {
+    return StrSeq.get(pool().ids());
   }
 
   /**
@@ -54,7 +53,7 @@ public final class Ws extends QueryModule {
    * @throws IOException I/O exception
    */
   public void broadcast(final Item message) throws QueryException, IOException {
-    pool().broadcast(message, id());
+    pool().broadcast(message, ws().id);
   }
 
   /**
@@ -129,8 +128,8 @@ public final class Ws extends QueryModule {
    * @return path
    * @throws QueryException query exception
    */
-  public String path(final Str id) throws QueryException {
-    return client(id).path.toString();
+  public Str path(final Str id) throws QueryException {
+    return Str.get(client(id).path.toString());
   }
 
   /**
@@ -140,6 +139,17 @@ public final class Ws extends QueryModule {
    */
   public void close(final Str id) throws QueryException {
     client(id).close();
+  }
+
+  /**
+   * Returns the current WebSocket.
+   * @return client id
+   * @throws QueryException QueryException
+   */
+  private WebSocket ws() throws QueryException {
+    final Object ws = queryContext.getProperty(HTTPText.WEBSOCKET);
+    if(ws == null) throw BASEX_WS.get(null);
+    return (WebSocket) ws;
   }
 
   /**

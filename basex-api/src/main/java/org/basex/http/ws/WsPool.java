@@ -8,7 +8,7 @@ import java.util.concurrent.*;
 
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.util.list.*;
 import org.eclipse.jetty.websocket.api.*;
 
@@ -42,8 +42,8 @@ public final class WsPool {
    * Returns the ids of all connected clients.
    * @return client ids
    */
-  public StringList ids() {
-    final StringList ids = new StringList(clients.size());
+  public TokenList ids() {
+    final TokenList ids = new TokenList(clients.size());
     for(final String key : clients.keySet()) ids.add(key);
     return ids;
   }
@@ -73,7 +73,7 @@ public final class WsPool {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public void emit(final Item message) throws QueryException, IOException {
+  public void emit(final Value message) throws QueryException, IOException {
     broadcast(message, null);
   }
 
@@ -84,7 +84,7 @@ public final class WsPool {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public void broadcast(final Item message, final String client)
+  public void broadcast(final Value message, final String client)
       throws QueryException, IOException {
 
     final ArrayList<WebSocket> list = new ArrayList<>();
@@ -102,7 +102,7 @@ public final class WsPool {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public void send(final Item message, final String... ids) throws QueryException, IOException {
+  public void send(final Value message, final String... ids) throws QueryException, IOException {
     final ArrayList<WebSocket> list = new ArrayList<>();
     for(final String id : ids) {
       final WebSocket ws = clients.get(id);
@@ -127,7 +127,7 @@ public final class WsPool {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private static void send(final Item message, final ArrayList<WebSocket> websockets)
+  private static void send(final Value message, final ArrayList<WebSocket> websockets)
       throws QueryException, IOException {
 
     final ArrayList<Object> values = WsResponse.serialize(message.iter(), new SerializerOptions());
