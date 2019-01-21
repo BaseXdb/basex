@@ -13,6 +13,7 @@ import org.basex.http.ws.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.util.*;
 
 /**
  * This class caches information on a single XQuery module with relevant annotations.
@@ -43,14 +44,12 @@ public final class WebModule {
    * Checks the module for relevant annotations.
    * @param ctx database context
    * @return {@code true} if module contains relevant annotations
-   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public boolean parse(final Context ctx) throws QueryException, IOException {
+  public boolean parse(final Context ctx) throws IOException {
     functions.clear();
     wsFunctions.clear();
 
-    // loop through all functions
     try(QueryContext qc = qc(ctx)) {
       // loop through all functions
       final String name = file.name();
@@ -63,6 +62,9 @@ public final class WebModule {
           if(wxq.parse(ctx)) wsFunctions.add(wxq);
         }
       }
+    } catch(final QueryException ex) {
+      // ignore modules that cannot be parsed
+      Util.debug(ex);
     }
     return !(functions.isEmpty() && wsFunctions.isEmpty());
   }
