@@ -8,7 +8,7 @@ import org.basex.util.*;
  * This is the starter class for the client console mode.
  * All input is sent to the server instance.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class BaseXClient extends BaseX {

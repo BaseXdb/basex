@@ -19,7 +19,7 @@ import org.junit.*;
  * <p>Write operations are tested by writing a value at a specified random
  * position.</p>
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Dimitar Popov
  */
 public class DataAccessTest {

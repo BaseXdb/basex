@@ -36,7 +36,7 @@ import org.w3c.dom.*;
  * This class contains common methods for executing Java code and mapping
  * Java objects to XQuery values.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public abstract class JavaCall extends Arr {

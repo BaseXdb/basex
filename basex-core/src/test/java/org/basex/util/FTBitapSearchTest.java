@@ -15,7 +15,7 @@ import org.junit.*;
 /**
  * Test {@link FTBitapSearch} methods.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Dimitar Popov
  */
 public final class FTBitapSearchTest {

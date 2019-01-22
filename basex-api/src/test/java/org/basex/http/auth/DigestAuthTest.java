@@ -7,7 +7,7 @@ import org.junit.*;
 /**
  * Digest HTTP authentication tests.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class DigestAuthTest extends AuthTest {

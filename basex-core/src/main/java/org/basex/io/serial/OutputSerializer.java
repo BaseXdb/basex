@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * This class serializes items to an output stream.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public abstract class OutputSerializer extends Serializer {

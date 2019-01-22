@@ -16,7 +16,7 @@ import org.basex.util.list.*;
 /**
  * Sequence, containing at least two items.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public abstract class Seq extends Value {

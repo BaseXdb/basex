@@ -9,7 +9,7 @@ import org.junit.*;
 /**
  * This class tests the functions of the Map Module.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class MapModuleTest extends QueryPlanTest {

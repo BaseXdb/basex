@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
 /**
  * FLWOR {@code let} clause, binding an expression to a variable.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Leo Woerteler
  */
 public final class Let extends ForLet {

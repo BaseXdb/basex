@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Functions on files and directories.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Rositsa Shadura
  * @author Christian Gruen
  */

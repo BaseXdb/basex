@@ -11,7 +11,7 @@ import org.basex.core.users.*;
 /**
  * Evaluates the 'create user' command and creates a new user.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class CreateUser extends AUser {

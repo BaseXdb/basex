@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 /**
  * This class contains functions for generating a plain XQuery documentation.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 final class PlainDoc extends Inspect {

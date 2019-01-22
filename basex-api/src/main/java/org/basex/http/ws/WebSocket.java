@@ -25,7 +25,7 @@ import org.eclipse.jetty.websocket.api.*;
 /**
  * This class defines an abstract WebSocket. It inherits the Jetty WebSocket adapter.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Johannes Finckh
  */
 public final class WebSocket extends WebSocketAdapter implements ClientInfo {

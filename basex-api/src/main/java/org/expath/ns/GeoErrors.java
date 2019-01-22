@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This module contains static error functions for the Geo module.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Masoumeh Seydi
  */
 final class GeoErrors {

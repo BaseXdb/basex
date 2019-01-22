@@ -18,7 +18,7 @@ import org.basex.util.*;
 /**
  * This class caches information on a single XQuery module with relevant annotations.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class WebModule {

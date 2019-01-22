@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Evaluates the 'repo delete' command.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Rositsa Shadura
  */
 public final class RepoDelete extends ARepo {

@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * Except expression.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class Except extends Set {

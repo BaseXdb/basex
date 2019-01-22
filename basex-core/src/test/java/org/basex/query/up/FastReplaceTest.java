@@ -11,7 +11,7 @@ import org.junit.Test;
  * Stress Testing the fast replace feature where blocks on disk are directly
  * overwritten.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Lukas Kircher
  */
 public final class FastReplaceTest extends AdvancedQueryTest {

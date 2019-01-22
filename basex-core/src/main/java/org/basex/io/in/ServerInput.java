@@ -10,7 +10,7 @@ import java.io.*;
  * <li> {@code 0xFF} is treated as encoding flag and skipped</li>
  * </ul>
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class ServerInput extends InputStream {

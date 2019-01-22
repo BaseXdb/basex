@@ -15,7 +15,7 @@ import org.basex.util.http.*;
 /**
  * REST-based evaluation of PUT operations.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 final class RESTPut {

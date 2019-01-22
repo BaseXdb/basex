@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Abstract tokenizer.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Jens Erat
  */
 public abstract class Tokenizer extends LanguageImpl {

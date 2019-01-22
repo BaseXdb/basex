@@ -5,7 +5,7 @@ import org.basex.util.hash.*;
 /**
  * <p>This class provides mapping tables for converting full-text tokens.</p>
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class FTToken {

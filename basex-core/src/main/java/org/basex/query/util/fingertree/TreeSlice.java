@@ -4,7 +4,7 @@ package org.basex.query.util.fingertree;
  * A slice of a finger tree, used as internal representation
  * for {@link FingerTree#slice(long, long)}.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Leo Woerteler
  *
  * @param <N> node type

@@ -1,7 +1,7 @@
 (:~
  : Common RESTXQ access points.
  :
- : @author Christian Grün, BaseX Team, 2014-18
+ : @author Christian Grün, BaseX Team 2005-19, BSD License
  :)
 module namespace dba = 'dba/common';
 

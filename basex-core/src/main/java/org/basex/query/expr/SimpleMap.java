@@ -19,7 +19,7 @@ import org.basex.util.*;
 /**
  * Simple map operator.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public abstract class SimpleMap extends Arr {

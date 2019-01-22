@@ -5,7 +5,7 @@ import org.basex.util.*;
 /**
  * An inner node containing nested sub-nodes.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Leo Woerteler
  *
  * @param <N> node type

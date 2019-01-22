@@ -13,7 +13,7 @@ import org.basex.util.options.*;
 /**
  * Replace document primitive.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class ReplaceDoc extends NodeUpdate {

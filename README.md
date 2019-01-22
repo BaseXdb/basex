@@ -1,11 +1,11 @@
 Introduction
 ------------
 
-Welcome to the BaseX open source project! We are interested in your feedback:
+Welcome to the BaseX open source project. We are interested in your feedback:
 
-* Our issue tracker is used for discussing confirmed bugs and features requests.
 * Please send new suggestions and bug reports to our
   [basex-talk](http://basex.org/open-source/) mailing list.
+* Confirmed bugs and feature requests are discussed in our issue tracker.
 * We invite you to contribute to our
   [Documentation](http://docs.basex.org/wiki/Main_Page).
 
@@ -168,8 +168,8 @@ For further information on using the Docker image, refer to the
 [BaseX Docker documentation]: http://docs.basex.org/wiki/Docker
 [BaseX Web Application documentation]: http://docs.basex.org/wiki/Web_Application
 
-All the best,  
-BaseX Team
+Best regards
+Your BaseX Team
 
 [documentation]: https://docs.basex.org
 [bug tracker]: https://github.com/BaseXdb/BaseX/issues

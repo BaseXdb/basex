@@ -10,7 +10,7 @@ import org.basex.core.cmd.*;
 /**
  * WebDAV query.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 final class WebDAVQuery {

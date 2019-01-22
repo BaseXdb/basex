@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * A sequence that defines a sub-range of another sequence.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Leo Woerteler
  */
 final class SubSeq extends Seq {

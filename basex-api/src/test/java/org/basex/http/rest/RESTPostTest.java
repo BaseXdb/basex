@@ -11,7 +11,7 @@ import org.junit.*;
 /**
  * This class tests the embedded REST API and the POST method.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class RESTPostTest extends RESTTest {

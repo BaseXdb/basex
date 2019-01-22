@@ -5,7 +5,7 @@ import org.basex.util.*;
 /**
  * This class indicates exceptions that happen during the decoding of an input stream.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class DecodingException extends InputException {

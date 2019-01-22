@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'drop database' command and deletes a database.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class DropDB extends ACreate {

@@ -8,7 +8,7 @@ import org.basex.gui.layout.*;
 /**
  * Editor preferences.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 final class DialogEditorPrefs extends BaseXBack {

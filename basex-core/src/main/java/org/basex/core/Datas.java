@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * This class organizes currently opened databases.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class Datas {

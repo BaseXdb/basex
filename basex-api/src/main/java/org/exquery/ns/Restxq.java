@@ -15,7 +15,7 @@ import org.basex.query.value.node.*;
  * The class name is {@code Restxq} instead of {@code RESTXQ}.
  * Otherwise, it would be resolved to {@code r-e-s-t-x-q} in XQuery.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class Restxq extends QueryModule {

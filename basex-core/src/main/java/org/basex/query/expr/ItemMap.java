@@ -9,7 +9,7 @@ import org.basex.util.hash.*;
 /**
  * Simple map expression: item-based evaluation.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 final class ItemMap extends SimpleMap {

@@ -21,7 +21,7 @@ import org.basex.util.http.*;
 /**
  * Service handling the various WebDAV operations.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Dimitar Popov
  */
 final class WebDAVService {

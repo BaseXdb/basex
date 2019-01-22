@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
 /**
  * Id functions.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 abstract class Ids extends StandardFunc {

@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
 /**
  * The GFLWOR {@code window} clause.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Leo Woerteler
  */
 public final class Window extends Clause {
@@ -360,7 +360,7 @@ public final class Window extends Clause {
   /**
    * Evaluator for the Window clause.
    *
-   * @author BaseX Team 2005-18, BSD License
+   * @author BaseX Team 2005-19, BSD License
    * @author Leo Woerteler
    */
   private abstract class WindowEval extends Eval {
@@ -403,7 +403,7 @@ public final class Window extends Clause {
   /**
    * Evaluator for the Tumbling Window clause.
    *
-   * @author BaseX Team 2005-18, BSD License
+   * @author BaseX Team 2005-19, BSD License
    * @author Leo Woerteler
    */
   private abstract class TumblingEval extends WindowEval {

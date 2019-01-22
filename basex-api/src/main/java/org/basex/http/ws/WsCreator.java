@@ -5,7 +5,7 @@ import org.eclipse.jetty.websocket.servlet.*;
 /**
  * Custom WebSocket creator.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Johannes Finckh
  */
 public final class WsCreator implements WebSocketCreator {

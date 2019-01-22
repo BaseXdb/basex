@@ -11,7 +11,7 @@ import org.junit.*;
 /**
  * Tests for the {@link XQArray} data structure.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Leo Woerteler
  */
 public final class VariousArrayTest extends ArrayTest {

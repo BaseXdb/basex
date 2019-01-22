@@ -5,7 +5,7 @@ import java.io.*;
 /**
  * This class is a wrapper for outputting text with specific newline characters.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class NewlineOutput extends PrintOutput {

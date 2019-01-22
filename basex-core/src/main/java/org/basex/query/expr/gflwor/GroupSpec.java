@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Grouping spec.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Leo Woerteler
  */
 public final class GroupSpec extends Single {

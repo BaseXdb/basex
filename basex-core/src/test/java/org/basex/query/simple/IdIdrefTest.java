@@ -17,7 +17,7 @@ import org.junit.runners.Parameterized.*;
 /**
  * Tests for {@code id} and {@code idref}.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Jens Erat
  */
 @RunWith(Parameterized.class)

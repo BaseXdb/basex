@@ -12,7 +12,7 @@ import org.basex.util.*;
  *     which supersede the macOS APIs and are platform-independent.</li>
  * </ul>
  *
- * @author BaseX Team 2018, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Alexander Holupirek
  */
 public abstract class GUIMacOS {

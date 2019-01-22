@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Migration of macOS-specific interface options using capabilities introduced with Java 9.
  *
- * @author BaseX Team 2018, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Alexander Holupirek
  */
 //public final class GUIMacOSX9 extends GUIMacOS implements AboutHandler {

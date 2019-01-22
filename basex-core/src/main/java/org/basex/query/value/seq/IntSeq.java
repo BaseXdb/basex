@@ -11,7 +11,7 @@ import org.basex.util.list.*;
 /**
  * Sequence of items of type {@link Int xs:integer}, containing at least two of them.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Leo Woerteler
  */
 public final class IntSeq extends NativeSeq {

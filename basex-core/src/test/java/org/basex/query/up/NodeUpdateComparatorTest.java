@@ -18,7 +18,7 @@ import org.junit.rules.*;
  * Tests {@link NodeUpdateComparator} that creates an order on update primitives
  * and is part of the XQuery Update Facility implementation.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Lukas Kircher
  */
 public final class NodeUpdateComparatorTest extends AdvancedQueryTest {

@@ -13,7 +13,7 @@ import org.junit.*;
 /**
  * Test index updates when using memory storage ({@link MemData}).
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Dimitar Popov
  */
 public class MemDataTest extends SandboxTest {

@@ -6,7 +6,7 @@ import java.awt.*;
  * This LayoutManager is a simplified version of the the TableLayout. The added components
  * will be rendered as rows.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class ColumnLayout implements LayoutManager {

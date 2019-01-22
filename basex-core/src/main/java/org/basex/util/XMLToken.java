@@ -8,7 +8,7 @@ import org.basex.util.hash.*;
  * This class provides convenience operations for XML-specific character
  * operations.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class XMLToken {

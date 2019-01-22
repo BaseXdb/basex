@@ -9,7 +9,7 @@ import org.junit.*;
 /**
  * Wild-card parsing and matching tests.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Dimitar Popov
  */
 public final class FTWildcardTest {

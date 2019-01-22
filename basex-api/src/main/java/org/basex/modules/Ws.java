@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * This module contains functions for processing WebSockets.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Johannes Finckh
  */
 public final class Ws extends QueryModule {

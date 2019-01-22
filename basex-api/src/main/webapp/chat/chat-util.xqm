@@ -1,6 +1,6 @@
 (:~
  : Simple WebSocket chat. Utility functions.
- : @author BaseX Team, 2014-18
+ : @author BaseX Team 2005-19, BSD License
  :)
 module namespace chat-util = 'chat/util';
 

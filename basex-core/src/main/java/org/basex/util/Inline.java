@@ -23,7 +23,7 @@ import org.basex.data.*;
  * - 11: 0x0D (carriage return)
  * </pre>
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class Inline {

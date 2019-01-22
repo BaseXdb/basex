@@ -6,7 +6,7 @@ import org.basex.util.*;
 /**
  * Atomic update operation that renames a node.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Lukas Kircher
  */
 final class Rename extends BasicUpdate {

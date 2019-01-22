@@ -8,7 +8,7 @@ import org.basex.util.list.*;
 /**
  * This class determines nodes per level and caches them.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Wolfgang Miller
  */
 final class TreeNodeCache {

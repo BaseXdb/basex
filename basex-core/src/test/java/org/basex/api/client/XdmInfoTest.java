@@ -17,7 +17,7 @@ import org.junit.*;
 /**
  * This class tests the correctness of the item types of the client API.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class XdmInfoTest extends SandboxTest {

@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Insert attribute primitive.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Lukas Kircher
  */
 public final class InsertAttribute extends NodeCopy {

@@ -11,7 +11,7 @@ import org.basex.query.util.pkg.*;
 
 /**
  * Evaluates the 'repo list' command.
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Rositsa Shadura
  */
 public final class RepoList extends ARepo {

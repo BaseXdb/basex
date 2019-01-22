@@ -7,7 +7,7 @@ import org.basex.gui.layout.*;
 /**
  * This class provides a default implementation for GUI popup commands.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public abstract class GUIPopupCmd implements GUICommand {

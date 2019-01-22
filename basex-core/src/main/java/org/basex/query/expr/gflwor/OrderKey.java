@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * Sort key.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Leo Woerteler
  */
 public final class OrderKey extends Single {

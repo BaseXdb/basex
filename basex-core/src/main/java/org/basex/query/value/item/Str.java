@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * String item ({@code xs:string}, {@code xs:normalizedString}, {@code xs:language}, etc.).
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class Str extends AStr {

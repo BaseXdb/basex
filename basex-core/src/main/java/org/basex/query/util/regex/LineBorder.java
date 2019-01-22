@@ -3,7 +3,7 @@ package org.basex.query.util.regex;
 /**
  * Line start ({@code ^}) or line end ({@code $}).
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Leo Woerteler
  */
 public final class LineBorder extends RegExp {

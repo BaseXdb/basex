@@ -26,7 +26,7 @@ import org.basex.util.list.*;
 /**
  * This is an interface for serializing XQuery values.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public abstract class Serializer implements Closeable {

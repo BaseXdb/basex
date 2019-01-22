@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
  * This is an efficient and memory-saving hash map for storing items. Items with identical hash
  * keys are checked for equivalence.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public class HashItemSet extends ASet implements ItemSet {

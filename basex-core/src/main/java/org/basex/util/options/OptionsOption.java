@@ -5,7 +5,7 @@ import org.basex.util.*;
 /**
  * Option containing another {@link Options} value.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  * @param <O> options value
  */

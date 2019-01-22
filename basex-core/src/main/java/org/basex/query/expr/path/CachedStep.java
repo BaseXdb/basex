@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * Step expression, caching all results.
  *
- * @author BaseX Team 2005-18, BSD License
+ * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 final class CachedStep extends Step {
