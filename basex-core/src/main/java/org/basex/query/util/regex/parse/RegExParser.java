@@ -33,36 +33,37 @@ public class RegExParser implements RegExParserConstants {
   /**
    * Compiles this regular expression to a {@link Pattern}.
    * @param regex regular expression to parse
-   * @param modifiers modifiers
+   * @param mod modifiers
    * @param info input info
    * @param check check result for empty strings
    * @return the pattern
    * @throws QueryException query exception
    */
-  public static Pattern parse(final byte[] regex, final byte[] modifiers, final InputInfo info,
+  public static Pattern parse(final byte[] regex, final byte[] mod, final InputInfo info,
       final boolean check) throws QueryException {
 
     // process modifiers
-    int flags = 0;
-    boolean strip = false, java = false;
-    for(final byte mod : modifiers) {
-      if(mod == 'i') flags |= CASE_INSENSITIVE | UNICODE_CASE;
-      else if(mod == 'm') flags |= MULTILINE;
-      else if(mod == 's') flags |= DOTALL;
-      else if(mod == 'q') flags |= LITERAL;
-      else if(mod == 'x') strip = true;
-      else if(mod == 'j' || mod == '!') java = true;
-      else if(mod != ';') throw REGMOD_X.get(info, (char) mod);
+    int m = 0;
+    boolean strip = false;
+    if(mod != null) {
+      for(final byte b : mod) {
+        if(b == 'i') m |= CASE_INSENSITIVE | UNICODE_CASE;
+        else if(b == 'm') m |= MULTILINE;
+        else if(b == 's') m |= DOTALL;
+        else if(b == 'q') m |= LITERAL;
+        else if(b == 'x') strip = true;
+        else throw REGMOD_X.get(info, (char) b);
+      }
     }
 
-    try {
-      // Java syntax, literal query: no need to change anything
-      if(java || (flags & LITERAL) != 0) return Pattern.compile(string(regex), flags);
+    // no need to change anything
+    if((m & LITERAL) != 0) return Pattern.compile(string(regex), m);
 
-      final RegExParser parser = new RegExParser(regex, strip, (flags & DOTALL) != 0,
-          (flags & MULTILINE) != 0);
+    try {
+      final RegExParser parser = new RegExParser(regex, strip, (m & DOTALL) != 0,
+          (m & MULTILINE) != 0);
       final String string = parser.parse().toString();
-      final Pattern pattern = Pattern.compile(string, flags);
+      final Pattern pattern = Pattern.compile(string, m);
       if(check) {
         // Circumvent Java RegEx behavior ("If MULTILINE mode is activated"...):
         // http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#lt
@@ -71,7 +72,10 @@ public class RegExParser implements RegExParserConstants {
         if(p.matcher("").matches()) throw REGROUP.get(info);
       }
       return pattern;
-    } catch(final ParseException | PatternSyntaxException | TokenMgrError ex) {
+    } catch(final ParseException ex) {
+      Util.debug(ex);
+      throw REGPAT_X.get(info, regex);
+    } catch(final TokenMgrError ex) {
       Util.debug(ex);
       throw REGPAT_X.get(info, regex);
     }
@@ -750,6 +754,7 @@ public class RegExParser implements RegExParserConstants {
   private int jj_gc = 0;
 
 
+  /** Constructor with user supplied Token Manager. */
   public RegExParser(TokenManager tm) {
     token_source = tm;
     token = new Token();
@@ -759,6 +764,7 @@ public class RegExParser implements RegExParserConstants {
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
+  /** Reinitialise. */
   public void ReInit(TokenManager tm) {
     token_source = tm;
     token = new Token();
@@ -816,6 +822,7 @@ public class RegExParser implements RegExParserConstants {
   }
 
 
+/** Get the next Token. */
   final public Token getNextToken() {
     if (token.next != null) token = token.next;
     else token = token.next = token_source.getNextToken();
@@ -824,6 +831,7 @@ public class RegExParser implements RegExParserConstants {
     return token;
   }
 
+/** Get the specific Token. */
   final public Token getToken(int index) {
     Token t = jj_lookingAhead ? jj_scanpos : token;
     for (int i = 0; i < index; i++) {
@@ -871,6 +879,7 @@ public class RegExParser implements RegExParserConstants {
     }
   }
 
+  /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
     boolean[] la1tokens = new boolean[25];
