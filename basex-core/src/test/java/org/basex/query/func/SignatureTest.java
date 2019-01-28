@@ -24,16 +24,16 @@ public final class SignatureTest extends SandboxTest {
    */
   @Test public void signatures() throws Exception {
     context.openDB(MemBuilder.build(new IOContent("<a/>")));
-    for(final Function f : Function.values()) check(f);
+    for(final FuncDefinition def : Functions.DEFINITIONS) check(def);
   }
 
   /**
    * Checks if the specified function correctly handles its argument types,
    * and returns the function name.
-   * @param def function definition
+   * @param def function signature
    * types are supported.
    */
-  private static void check(final Function def) {
+  private static void check(final FuncDefinition def) {
     final String desc = def.toString(), name = desc.replaceAll("\\(.*", "");
 
     // check that there are enough argument names

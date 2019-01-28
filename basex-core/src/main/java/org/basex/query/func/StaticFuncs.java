@@ -58,7 +58,7 @@ public final class StaticFuncs extends ExprInfo {
 
     final byte[] uri = nm.uri();
     if(uri.length == 0) throw FUNNONS_X.get(info, nm.string());
-    if(NSGlobal.reserved(uri) || Functions.get().getBuiltIn(nm) != null)
+    if(NSGlobal.reserved(uri) || Functions.getBuiltIn(nm) != null)
       throw FNRESERVED_X.get(info, nm.string());
 
     final StaticFunc sf = new StaticFunc(anns, nm, params, type, expr, doc, vs, info);
@@ -214,7 +214,7 @@ public final class StaticFuncs extends ExprInfo {
       }
     }
     // find global function
-    return Functions.get().similarError(name, info);
+    return Functions.similarError(name, info);
   }
 
   /**

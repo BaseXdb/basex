@@ -26,31 +26,30 @@ import org.basex.util.similarity.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class Functions extends TokenSet {
-  /** Singleton instance. */
-  private static final Functions INSTANCE = new Functions();
-  /** Function classes. */
-  private Function[] funcs = new Function[Array.CAPACITY];
+public final class Functions {
+  /** Signatures of built-in functions. */
+  public static final ArrayList<FuncDefinition> DEFINITIONS = new ArrayList<>();
 
-  /**
-   * Returns the singleton instance.
-   * @return instance
-   */
-  static Functions get() {
-    return INSTANCE;
-  }
+  /** Cached functions. */
+  private static final TokenSet CACHE = new TokenSet();
+  /** URIs of built-in functions. */
+  private static final TokenSet URIS = new TokenSet();
+
+  /** Private constructor. */
+  private Functions() { }
 
   /**
    * Constructor, registering built-in XQuery functions.
    */
-  private Functions() {
-    for(final Function sig : Function.VALUES) {
-      final String desc = sig.desc;
-      final byte[] ln = token(desc.substring(0, desc.indexOf('(')));
-      final int i = put(new QNm(ln, sig.uri()).id());
-      if(funcs[i] != null) throw Util.notExpected("Function defined twice: " + sig);
-      funcs[i] = sig;
+  static {
+    // add built-in core functions
+    Function.init(DEFINITIONS);
+
+    for(final FuncDefinition def : DEFINITIONS) {
+      URIS.add(def.uri);
+      CACHE.put(new QNm(def.local(), def.uri()).id());
     }
+    if(CACHE.size() < DEFINITIONS.size()) throw Util.notExpected("Duplicate function signatures!");
   }
 
   /**
@@ -94,11 +93,26 @@ public final class Functions extends TokenSet {
    * @param name function name
    * @return function if found, {@code null} otherwise
    */
-  Function getBuiltIn(final QNm name) {
-    final int id = id(name.id());
-    if(id == 0) return null;
-    final Function fn = funcs[id];
-    return eq(fn.uri(), name.uri()) ? fn : null;
+  static FuncDefinition getBuiltIn(final QNm name) {
+    final int i = CACHE.id(name.id());
+    if(i == 0) return null;
+    final FuncDefinition def = DEFINITIONS.get(i - 1);
+    if(!eq(def.uri(), name.uri())) {
+      throw Util.notExpected(name);
+    }
+    return eq(def.uri(), name.uri()) ? def : null;
+  }
+
+  /**
+   * Checks if the specific URI is statically available.
+   * @param uri URI to check
+   * @return result of check
+   */
+  public static boolean staticURI(final byte[] uri) {
+    for(final byte[] u : URIS) {
+      if(eq(uri, u)) return true;
+    }
+    return false;
   }
 
   /**
@@ -110,20 +124,20 @@ public final class Functions extends TokenSet {
    * @return function if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  private Function getBuiltIn(final QNm name, final long arity, final InputInfo info)
+  private static FuncDefinition getBuiltIn(final QNm name, final long arity, final InputInfo info)
       throws QueryException {
 
-    final Function fn = getBuiltIn(name);
-    if(fn == null) return null;
+    final FuncDefinition def = getBuiltIn(name);
+    if(def == null) return null;
 
-    final int min = fn.minMax[0], max = fn.minMax[1];
-    if(arity >= min && arity <= max) return fn;
+    final int min = def.minMax[0], max = def.minMax[1];
+    if(arity >= min && arity <= max) return def;
 
     final IntList arities = new IntList();
     if(max != Integer.MAX_VALUE) {
       for(int m = min; m <= max; m++) arities.add(m);
     }
-    throw wrongArity(fn, arity, arities, info);
+    throw wrongArity(def, arity, arities, info);
   }
 
   /**
@@ -168,10 +182,10 @@ public final class Functions extends TokenSet {
    * @return function instance
    * @throws QueryException query exception
    */
-  StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc, final InputInfo info)
-      throws QueryException {
-    final Function fn = getBuiltIn(name, args.length, info);
-    return fn == null ? null : fn.get(sc, info, args);
+  static StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
+      final InputInfo info) throws QueryException {
+    final FuncDefinition def = getBuiltIn(name, args.length, info);
+    return def == null ? null : def.get(sc, info, args);
   }
 
   /**
@@ -222,12 +236,12 @@ public final class Functions extends TokenSet {
     }
 
     // built-in functions
-    final Function fn = get().getBuiltIn(name, arity, info);
-    if(fn != null) {
+    final FuncDefinition def = getBuiltIn(name, arity, info);
+    if(def != null) {
       final AnnList anns = new AnnList();
       final VarScope vs = new VarScope(sc);
-      final FuncType ft = fn.type(arity, anns);
-      final QNm[] names = fn.paramNames(arity);
+      final FuncType ft = def.type(arity, anns);
+      final QNm[] names = def.paramNames(arity);
       final Var[] params = new Var[arity];
       final Expr[] args = new Expr[arity];
       for(int i = 0; i < arity; i++) {
@@ -235,7 +249,7 @@ public final class Functions extends TokenSet {
         args[i] = new VarRef(info, params[i]);
       }
 
-      final StandardFunc sf = fn.get(sc, info, args);
+      final StandardFunc sf = def.get(sc, info, args);
       final boolean upd = sf.has(Flag.UPD);
       if(upd) {
         anns.add(new Ann(info, Annotation.UPDATING));
@@ -245,7 +259,7 @@ public final class Functions extends TokenSet {
       // example for invalid query: let $f := last#0 return (1,2)[$f()]
       return sf.has(Flag.CTX, Flag.POS)
           ? new FuncLit(anns, name, params, sf, ft.seqType(), vs, info)
-          : closureOrFItem(anns, name, params, fn.type(arity, anns), sf, vs, info, runtime, upd);
+          : closureOrFItem(anns, name, params, def.type(arity, anns), sf, vs, info, runtime, upd);
     }
 
     // user-defined function
@@ -331,9 +345,9 @@ public final class Functions extends TokenSet {
     }
 
     // built-in functions
-    final StandardFunc sf = get().get(name, args, sc, info);
+    final StandardFunc sf = get(name, args, sc, info);
     if(sf != null) {
-      if(sf.sig.has(Flag.UPD)) qc.updating();
+      if(sf.def.has(Flag.UPD)) qc.updating();
       return sf;
     }
 
@@ -358,12 +372,12 @@ public final class Functions extends TokenSet {
    * @param info input info
    * @return query exception or {@code null}
    */
-  QueryException similarError(final QNm name, final InputInfo info) {
+  static QueryException similarError(final QNm name, final InputInfo info) {
     // find similar function in three runs
     final byte[] local = name.local(), uri = name.uri();
     final Levenshtein ls = new Levenshtein();
     for(int mode = 0; mode < 3; mode++) {
-      for(final byte[] key : this) {
+      for(final byte[] key : CACHE) {
         final int i = indexOf(key, '}');
         final byte[] slocal = substring(key, i + 1), suri = substring(key, 2, i);
         if(mode == 0 ?
@@ -381,9 +395,19 @@ public final class Functions extends TokenSet {
     return null;
   }
 
-  @Override
-  protected void rehash(final int s) {
-    super.rehash(s);
-    funcs = Array.copy(funcs, new Function[s]);
+  /*
+   * Returns the names of all functions. Used to update MediaWiki syntax highlighter.
+   * All function names are listed in reverse order to give precedence to longer names.
+   * @param args ignored
+  public static void main(final String... args) {
+    final org.basex.util.list.StringList sl = new org.basex.util.list.StringList();
+    for(FuncSignature sig : SIGNATURES) {
+      sl.add(sig.toString().replaceAll("^fn:|\\(.*", ""));
+    }
+    for(final String s : sl.sort(false, false)) {
+      Util.out(s + ' ');
+    }
+    Util.outln("fn:");
   }
+   */
 }

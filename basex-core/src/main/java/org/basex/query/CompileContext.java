@@ -274,6 +274,6 @@ public final class CompileContext {
    */
   public Expr function(final Function func, final InputInfo info, final Expr... exprs)
       throws QueryException {
-    return func.get(sc(), info, exprs).optimize(this);
+    return func.def.get(sc(), info, exprs).optimize(this);
   }
 }

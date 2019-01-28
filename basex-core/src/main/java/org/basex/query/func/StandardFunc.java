@@ -41,8 +41,8 @@ public abstract class StandardFunc extends Arr {
   /** Minimum size of a loop that should not be unrolled. */
   public static final int UNROLL_LIMIT = 10;
 
-  /** Function signature. */
-  public Function sig;
+  /** Function definition. */
+  public FuncDefinition def;
   /** Static context. */
   public StaticContext sc;
 
@@ -54,21 +54,19 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Constructor. Invoked by {@link Function#get(StaticContext, InputInfo, Expr...)}.
+   * Initializes the function.
    * @param ii input info
    * @param sctx static context
-   * @param func function definition
+   * @param df function definition
    * @param args function arguments
-   * @return self reference
    */
-  final StandardFunc init(final StaticContext sctx, final InputInfo ii, final Function func,
+  final void init(final StaticContext sctx, final InputInfo ii, final FuncDefinition df,
       final Expr[] args) {
     sc = sctx;
-    sig = func;
+    def = df;
     info = ii;
     exprs = args;
-    exprType.assign(func.seqType);
-    return this;
+    exprType.assign(df.seqType);
   }
 
   @Override
@@ -78,7 +76,7 @@ public abstract class StandardFunc extends Arr {
       // return optimized expression
       expr : preEval() ?
       // pre-evaluate function
-      (sig.seqType.zeroOrOne() ? item(cc.qc, info) : value(cc.qc)) :
+      (def.seqType.zeroOrOne() ? item(cc.qc, info) : value(cc.qc)) :
       // return original function
       this);
   }
@@ -93,7 +91,7 @@ public abstract class StandardFunc extends Arr {
    * @return result of check
    */
   protected boolean preEval() {
-    return allAreValues(sig.seqType.occ.max > 1) && isSimple();
+    return allAreValues(def.seqType.occ.max > 1) && isSimple();
   }
 
   /**
@@ -112,7 +110,7 @@ public abstract class StandardFunc extends Arr {
     final int es = exprs.length;
     final Expr[] arg = new Expr[es];
     for(int e = 0; e < es; e++) arg[e] = exprs[e].copy(cc, vm);
-    return copyType(sig.get(sc, info, arg));
+    return copyType(def.get(sc, info, arg));
   }
 
   /**
@@ -158,10 +156,10 @@ public abstract class StandardFunc extends Arr {
   public boolean has(final Flag... flags) {
     // check signature flags
     for(final Flag flag : flags) {
-      if(sig.has(flag)) return true;
+      if(def.has(flag)) return true;
     }
     // mix updates: higher-order function may be updating
-    if(Flag.UPD.in(flags) && sc.mixUpdates && sig.has(Flag.HOF)) return true;
+    if(Flag.UPD.in(flags) && sc.mixUpdates && def.has(Flag.HOF)) return true;
     // check arguments (without function invocation; it only applies to function itself)
     final Flag[] flgs = Flag.HOF.remove(flags);
     return flgs.length != 0 && super.has(flgs);
@@ -481,22 +479,22 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof StandardFunc && sig == ((StandardFunc) obj).sig &&
+    return this == obj || obj instanceof StandardFunc && def == ((StandardFunc) obj).def &&
         super.equals(obj);
   }
 
   @Override
   public final String description() {
-    return sig.toString();
+    return def.toString();
   }
 
   @Override
   public final void plan(final FElem plan) {
-    addPlan(plan, planElem(NAME, sig.desc), exprs);
+    addPlan(plan, planElem(NAME, def.desc), exprs);
   }
 
   @Override
   public final String toString() {
-    return new TokenBuilder().add(sig.id()).add('(').addSep(exprs, SEP).add(')').toString();
+    return new TokenBuilder().add(def.id()).add('(').addSep(exprs, SEP).add(')').toString();
   }
 }

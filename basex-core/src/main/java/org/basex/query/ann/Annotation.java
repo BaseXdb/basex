@@ -211,7 +211,7 @@ public enum Annotation {
     this.args = args;
     this.uri = uri;
     this.single = single;
-    minMax = Function.minMax(desc, args);
+    minMax = FuncDefinition.minMax(desc, args);
   }
 
   /**

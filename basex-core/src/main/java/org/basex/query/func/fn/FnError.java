@@ -49,7 +49,8 @@ public final class FnError extends StandardFunc {
   public static StandardFunc get(final QueryException ex, final SeqType st,
       final StaticContext sc) {
     Util.debug(ex);
-    final StandardFunc sf = ERROR.get(sc, ex.info(), ex.qname(), Str.get(ex.getLocalizedMessage()));
+    final Str msg = Str.get(ex.getLocalizedMessage());
+    final StandardFunc sf = ERROR.def.get(sc, ex.info(), ex.qname(), msg);
     sf.exprType.assign(st);
     return sf;
   }

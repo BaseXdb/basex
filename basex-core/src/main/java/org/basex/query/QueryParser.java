@@ -731,9 +731,7 @@ public class QueryParser extends InputParser {
     final byte[] uri = mi.uri;
     if(mi.paths.isEmpty()) {
       // no paths specified: skip statically available modules
-      for(final byte[] u : Function.URIS) {
-        if(eq(uri, u)) return;
-      }
+      if(Functions.staticURI(uri)) return;
       // try to resolve module uri
       if(qc.resources.modules().addImport(string(uri), mi.info, this)) return;
       // module not found
@@ -1405,7 +1403,7 @@ public class QueryParser extends InputParser {
   private Expr elvis() throws QueryException {
     final Expr ex = or();
     if(!wsConsumeWs(ELVIS)) return ex;
-    return Function._UTIL_OR.get(sc, info(), ex, check(or(), NOELVIS));
+    return Function._UTIL_OR.def.get(sc, info(), ex, check(or(), NOELVIS));
   }
 
   /**
@@ -1512,7 +1510,7 @@ public class QueryParser extends InputParser {
 
     final ExprList el = new ExprList(ex);
     do add(el, range()); while(wsConsume(CONCAT));
-    return Function.CONCAT.get(sc, info(), el.finish());
+    return Function.CONCAT.def.get(sc, info(), el.finish());
   }
 
   /**
@@ -2527,13 +2525,13 @@ public class QueryParser extends InputParser {
       final int p = pos;
       if(consume(']') && consume('`') && consume('`')) {
         if(!tb.isEmpty()) el.add(Str.get(tb.next()));
-        return el.size() == 1 ? el.get(0) : Function.CONCAT.get(sc, info(), el.finish());
+        return el.size() == 1 ? el.get(0) : Function.CONCAT.def.get(sc, info(), el.finish());
       }
       pos = p;
       if(consume('`') && consume('{')) {
         if(!tb.isEmpty()) el.add(Str.get(tb.next()));
         final Expr ex = expr();
-        if(ex != null) el.add(Function.STRING_JOIN.get(sc, info(), ex, Str.get(" ")));
+        if(ex != null) el.add(Function.STRING_JOIN.def.get(sc, info(), ex, Str.get(" ")));
         skipWs();
         check('}');
         check('`');

@@ -50,15 +50,15 @@ public final class UtilOr extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     // empty sequence: return default
-    final Expr items = exprs[0], def = exprs[1];
-    if(items == Empty.SEQ) return def;
+    final Expr items = exprs[0], dflt = exprs[1];
+    if(items == Empty.SEQ) return dflt;
 
     // at least one item: return items
     final SeqType st = items.seqType();
     if(st.oneOrMore()) return items;
 
     // otherwise, combine sequence types
-    exprType.assign(st.union(def.seqType()));
+    exprType.assign(st.union(dflt.seqType()));
     return this;
   }
 }

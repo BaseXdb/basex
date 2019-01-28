@@ -26,7 +26,7 @@ abstract class Format extends StandardFunc {
    */
   Item formatDate(final AtomType tp, final QueryContext qc) throws QueryException {
     final int el = exprs.length;
-    if(el == 3 || el == 4) throw Functions.wrongArity(sig, el, new IntList(), info);
+    if(el == 3 || el == 4) throw Functions.wrongArity(def, el, new IntList(), info);
 
     final Item item = exprs[0].atomItem(qc, info);
     final byte[] picture = toEmptyToken(exprs[1], qc);
