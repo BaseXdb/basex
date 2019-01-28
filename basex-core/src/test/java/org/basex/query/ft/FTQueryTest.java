@@ -1,6 +1,6 @@
 package org.basex.query.ft;
 
-import org.basex.query.*;
+import org.basex.*;
 import org.junit.*;
 
 /**
@@ -9,7 +9,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class FTQueryTest extends AdvancedQueryTest {
+public final class FTQueryTest extends SandboxTest {
   /** Checks optimizations of full-text operations. */
   @Test public void ftOptimize() {
     query("let $a := <a>x</a> "

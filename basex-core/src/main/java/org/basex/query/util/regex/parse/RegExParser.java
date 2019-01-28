@@ -33,37 +33,36 @@ public class RegExParser implements RegExParserConstants {
   /**
    * Compiles this regular expression to a {@link Pattern}.
    * @param regex regular expression to parse
-   * @param mod modifiers
+   * @param modifiers modifiers
    * @param info input info
    * @param check check result for empty strings
    * @return the pattern
    * @throws QueryException query exception
    */
-  public static Pattern parse(final byte[] regex, final byte[] mod, final InputInfo info,
+  public static Pattern parse(final byte[] regex, final byte[] modifiers, final InputInfo info,
       final boolean check) throws QueryException {
 
     // process modifiers
-    int m = 0;
-    boolean strip = false;
-    if(mod != null) {
-      for(final byte b : mod) {
-        if(b == 'i') m |= CASE_INSENSITIVE | UNICODE_CASE;
-        else if(b == 'm') m |= MULTILINE;
-        else if(b == 's') m |= DOTALL;
-        else if(b == 'q') m |= LITERAL;
-        else if(b == 'x') strip = true;
-        else throw REGMOD_X.get(info, (char) b);
-      }
+    int flags = 0;
+    boolean strip = false, java = false;
+    for(final byte mod : modifiers) {
+      if(mod == 'i') flags |= CASE_INSENSITIVE | UNICODE_CASE;
+      else if(mod == 'm') flags |= MULTILINE;
+      else if(mod == 's') flags |= DOTALL;
+      else if(mod == 'q') flags |= LITERAL;
+      else if(mod == 'x') strip = true;
+      else if(mod == 'j' || mod == '!') java = true;
+      else if(mod != ';') throw REGMOD_X.get(info, (char) mod);
     }
 
-    // no need to change anything
-    if((m & LITERAL) != 0) return Pattern.compile(string(regex), m);
-
     try {
-      final RegExParser parser = new RegExParser(regex, strip, (m & DOTALL) != 0,
-          (m & MULTILINE) != 0);
+      // Java syntax, literal query: no need to change anything
+      if(java || (flags & LITERAL) != 0) return Pattern.compile(string(regex), flags);
+
+      final RegExParser parser = new RegExParser(regex, strip, (flags & DOTALL) != 0,
+          (flags & MULTILINE) != 0);
       final String string = parser.parse().toString();
-      final Pattern pattern = Pattern.compile(string, m);
+      final Pattern pattern = Pattern.compile(string, flags);
       if(check) {
         // Circumvent Java RegEx behavior ("If MULTILINE mode is activated"...):
         // http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#lt
@@ -72,6 +71,9 @@ public class RegExParser implements RegExParserConstants {
         if(p.matcher("").matches()) throw REGROUP.get(info);
       }
       return pattern;
+    } catch(final PatternSyntaxException ex) {
+      Util.debug(ex);
+      throw REGPAT_X.get(info, regex);
     } catch(final ParseException ex) {
       Util.debug(ex);
       throw REGPAT_X.get(info, regex);
@@ -625,24 +627,6 @@ public class RegExParser implements RegExParserConstants {
     finally { jj_save(3, xla); }
   }
 
-  private boolean jj_3_1() {
-    if (jj_scan_token(DIGIT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_6() {
-    Token xsp;
-    xsp = jj_scanpos;
-    jj_lookingAhead = true;
-    jj_semLA = getToken(2).kind == CHAR && "-".equals(getToken(2).image);
-    jj_lookingAhead = false;
-    if (!jj_semLA || jj_3R_8()) {
-    jj_scanpos = xsp;
-    if (jj_3R_9()) return true;
-    }
-    return false;
-  }
-
   private boolean jj_3R_13() {
     if (jj_scan_token(SINGLE_ESC)) return true;
     return false;
@@ -725,6 +709,24 @@ public class RegExParser implements RegExParserConstants {
     if (jj_3R_10()) return true;
     if (jj_scan_token(CHAR)) return true;
     if (jj_3R_10()) return true;
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    if (jj_scan_token(DIGIT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_6() {
+    Token xsp;
+    xsp = jj_scanpos;
+    jj_lookingAhead = true;
+    jj_semLA = getToken(2).kind == CHAR && "-".equals(getToken(2).image);
+    jj_lookingAhead = false;
+    if (!jj_semLA || jj_3R_8()) {
+    jj_scanpos = xsp;
+    if (jj_3R_9()) return true;
+    }
     return false;
   }
 

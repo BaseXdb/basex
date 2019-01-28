@@ -2,8 +2,8 @@ package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
 
+import org.basex.*;
 import org.basex.core.cmd.*;
-import org.basex.query.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -13,7 +13,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-19, BSD License
  * @author Andreas Weiler
  */
-public final class IndexModuleTest extends AdvancedQueryTest {
+public final class IndexModuleTest extends SandboxTest {
   /** Test file. */
   private static final String FILE = "src/test/resources/input.xml";
 

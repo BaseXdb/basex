@@ -8,8 +8,8 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.util.zip.*;
 
+import org.basex.*;
 import org.basex.io.*;
-import org.basex.query.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -19,7 +19,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class ZipModuleTest extends AdvancedQueryTest {
+public final class ZipModuleTest extends SandboxTest {
   /** Test ZIP file. */
   private static final String ZIP = "src/test/resources/xml.zip";
   /** Temporary ZIP file. */

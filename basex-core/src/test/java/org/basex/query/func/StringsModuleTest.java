@@ -2,7 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
 
-import org.basex.query.*;
+import org.basex.*;
 import org.junit.*;
 
 /**
@@ -13,7 +13,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class StringsModuleTest extends AdvancedQueryTest {
+public final class StringsModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void levenshtein() {
     final Function func = _STRINGS_LEVENSHTEIN;

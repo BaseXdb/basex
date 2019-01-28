@@ -3,8 +3,8 @@ package org.basex.query.up;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
+import org.basex.*;
 import org.basex.core.*;
-import org.basex.query.*;
 import org.junit.*;
 
 /**
@@ -13,7 +13,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class MixUpdatesTest extends AdvancedQueryTest {
+public final class MixUpdatesTest extends SandboxTest {
   /**
    * Prepare tests.
    */

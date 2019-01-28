@@ -3,6 +3,7 @@ package org.basex.query.ast;
 import static org.basex.util.Prop.*;
 import static org.junit.Assert.*;
 
+import org.basex.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -15,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Leo Woerteler
  */
-public abstract class QueryPlanTest extends AdvancedQueryTest {
+public abstract class QueryPlanTest extends SandboxTest {
   /**
    * Checks the query plan and the result.
    * @param query query

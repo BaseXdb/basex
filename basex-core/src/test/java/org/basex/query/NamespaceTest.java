@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
@@ -23,7 +24,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-19, BSD License
  * @author Lukas Kircher
  */
-public final class NamespaceTest extends AdvancedQueryTest {
+public final class NamespaceTest extends SandboxTest {
   /** Test documents. */
   private static final String[][] DOCS = {
     { "d1", "<x/>" },

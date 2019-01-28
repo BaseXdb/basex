@@ -1,7 +1,5 @@
 package org.basex.local.single;
 
-import static org.junit.Assert.*;
-
 import java.util.*;
 import java.util.List;
 
@@ -149,14 +147,5 @@ public final class UpdIndexTest extends SandboxTest {
       query("replace value of node /* with '" + sb + '\'');
       query("string-length(/*)", sb.length());
     }
-  }
-
-  /**
-   * Checks if a query yields the specified string.
-   * @param query query to be run
-   * @param result query result
-   */
-  static void query(final String query, final Object result) {
-    assertEquals(result.toString(), query(query));
   }
 }

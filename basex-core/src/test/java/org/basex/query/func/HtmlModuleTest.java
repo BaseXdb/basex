@@ -2,7 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
 
-import org.basex.query.*;
+import org.basex.*;
 import org.junit.*;
 
 /**
@@ -11,7 +11,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class HtmlModuleTest extends AdvancedQueryTest {
+public final class HtmlModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void parser() {
     final Function func = _HTML_PARSER;

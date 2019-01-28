@@ -7,8 +7,8 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.nio.file.*;
 
+import org.basex.*;
 import org.basex.io.*;
-import org.basex.query.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -18,7 +18,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Rositsa Shadura
  */
-public final class FileModuleTest extends AdvancedQueryTest {
+public final class FileModuleTest extends SandboxTest {
   /** Test path. */
   private static final String PATH = Prop.TEMPDIR + NAME + '/';
   /** Test path. */

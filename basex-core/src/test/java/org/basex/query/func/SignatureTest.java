@@ -5,9 +5,9 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
+import org.basex.*;
 import org.basex.build.*;
 import org.basex.io.*;
-import org.basex.query.*;
 import org.basex.query.value.type.*;
 import org.junit.*;
 
@@ -17,7 +17,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class SignatureTest extends AdvancedQueryTest {
+public final class SignatureTest extends SandboxTest {
   /**
    * Tests the validity of all function signatures.
    * @throws Exception exception

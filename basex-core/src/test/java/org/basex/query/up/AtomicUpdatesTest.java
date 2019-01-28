@@ -5,10 +5,10 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
+import org.basex.*;
 import org.basex.build.*;
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.query.*;
 import org.basex.query.up.atomic.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -20,7 +20,7 @@ import org.junit.rules.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Lukas Kircher
  */
-public final class AtomicUpdatesTest extends AdvancedQueryTest {
+public final class AtomicUpdatesTest extends SandboxTest {
   /** Expected exception. */
   @Rule
   public final ExpectedException thrown = ExpectedException.none();

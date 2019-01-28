@@ -2,8 +2,8 @@ package org.basex.query.util;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.query.*;
-import org.basex.query.util.collation.BaseXCollationOptions.Strength;
+import org.basex.*;
+import org.basex.query.util.collation.BaseXCollationOptions.*;
 import org.junit.*;
 
 /**
@@ -12,7 +12,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class CollationTest extends AdvancedQueryTest {
+public final class CollationTest extends SandboxTest {
   /** Collation arguments used in the tests. */
   private static final String ARGS = "lang=de;strength=primary";
   /** Collation used in the tests. */

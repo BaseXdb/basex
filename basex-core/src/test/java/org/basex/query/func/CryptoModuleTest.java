@@ -2,7 +2,7 @@ package org.basex.query.func;
 
 import java.util.logging.*;
 
-import org.basex.query.*;
+import org.basex.*;
 import org.junit.*;
 
 /**
@@ -11,7 +11,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Lukas Kircher
  */
-public final class CryptoModuleTest extends AdvancedQueryTest {
+public final class CryptoModuleTest extends SandboxTest {
   /** Set higher log level to avoid INFO output. */
   public CryptoModuleTest() {
     Logger.getLogger("com.sun.org.apache.xml.internal").setLevel(Level.WARNING);

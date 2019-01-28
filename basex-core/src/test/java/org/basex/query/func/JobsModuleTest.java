@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
+import org.basex.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.util.*;
@@ -17,7 +18,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class JobsModuleTest extends AdvancedQueryTest {
+public final class JobsModuleTest extends SandboxTest {
   /** Very slow query. */
   private static final String VERY_SLOW_QUERY = "(1 to 10000000000)[.=1]";
   /** Slow query. */

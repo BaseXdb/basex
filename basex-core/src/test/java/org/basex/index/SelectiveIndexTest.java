@@ -4,9 +4,9 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.query.*;
 import org.junit.Test;
 
 /**
@@ -15,7 +15,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class SelectiveIndexTest extends AdvancedQueryTest {
+public final class SelectiveIndexTest extends SandboxTest {
   /** Test file. */
   private static final String FILE = "src/test/resources/selective.xml";
 

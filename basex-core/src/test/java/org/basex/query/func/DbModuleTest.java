@@ -7,12 +7,12 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
 import org.basex.core.parse.Commands.*;
 import org.basex.io.*;
-import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
@@ -26,7 +26,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class DbModuleTest extends AdvancedQueryTest {
+public final class DbModuleTest extends SandboxTest {
   /** Test file. */
   private static final String XML = "src/test/resources/input.xml";
   /** Test file. */

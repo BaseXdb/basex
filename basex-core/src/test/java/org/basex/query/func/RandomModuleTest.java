@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
+import org.basex.*;
 import org.basex.query.*;
 import org.junit.*;
 
@@ -14,7 +15,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Dirk Kirsten
  */
-public final class RandomModuleTest extends AdvancedQueryTest {
+public final class RandomModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void doubleTest() {
     final Function func = _RANDOM_DOUBLE;

@@ -4,10 +4,10 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.query.*;
 import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.node.*;
 import org.junit.*;
@@ -19,7 +19,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-19, BSD License
  * @author Lukas Kircher
  */
-public final class UpdateTest extends AdvancedQueryTest {
+public final class UpdateTest extends SandboxTest {
   /** Test document. */
   private static final String DOC = "src/test/resources/xmark.xml";
 

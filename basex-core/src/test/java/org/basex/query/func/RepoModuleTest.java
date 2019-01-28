@@ -3,9 +3,9 @@ package org.basex.query.func;
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.query.*;
 import org.junit.*;
 
 /**
@@ -14,7 +14,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Rositsa Shadura
  */
-public final class RepoModuleTest extends AdvancedQueryTest {
+public final class RepoModuleTest extends SandboxTest {
   /** Test repository. */
   private static final String REPO = "src/test/resources/repo/";
   /** Pkg3 name. */

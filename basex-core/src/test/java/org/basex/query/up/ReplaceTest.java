@@ -2,8 +2,8 @@ package org.basex.query.up;
 
 import static org.basex.query.func.Function.*;
 
+import org.basex.*;
 import org.basex.core.cmd.*;
-import org.basex.query.*;
 import org.junit.Test;
 
 /**
@@ -12,7 +12,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class ReplaceTest extends AdvancedQueryTest {
+public final class ReplaceTest extends SandboxTest {
   /**
    * Replaces the first document in a database, using lazy replace.
    */

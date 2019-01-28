@@ -93,6 +93,123 @@ public abstract class Sandbox {
   }
 
   /**
+   * Checks if a query yields the specified string.
+   * @param query query string
+   * @param expected expected result
+   */
+  protected static void query(final String query, final Object expected) {
+    final String res = query(query).replaceAll("(\r?\n|\r) *", "\n");
+    final String exp = expected.toString();
+    if(!res.equals(exp)) throw Util.notExpected(
+        "Wrong result:\n[Q] " + query + "\n[E] \u00bb" + exp +
+        "\u00ab\n[F] \u00bb" + res + "\u00ab\n");
+  }
+
+  /**
+   * Creates a transform expression from a given input, modification and return clause.
+   * @param input input XML fragment, target of the updating expression
+   * @param modify updating expression, make sure to address all target nodes via
+   * the $input variable, i.e. delete node $input/a
+   * @param rtrn return clause
+   * @return the query formulated with a transform expression
+   */
+  protected static String transform(final String input, final String modify, final String rtrn) {
+    return
+      "copy $input := " + input + ' ' +
+      "modify (" + modify + ") " +
+      "return (" + (rtrn.isEmpty() ? "$input" : rtrn) + ')';
+  }
+
+  /**
+   * Creates a transform expression from a given input and modification clause.
+   *
+   * @param input input XML fragment, target of the updating expression
+   * @param modification updating expression, make sure to address all target nodes via
+   * the $input variable, i.e. delete node $input/a
+   * @return the query formulated with a transform expression
+   */
+  protected static String transform(final String input, final String modification) {
+    return transform(input, modification, "");
+  }
+
+  /**
+   * Checks if a query yields the specified result.
+   * @param query query string
+   * @param result query result
+   */
+  protected static void contains(final String query, final String result) {
+    final String res = normNL(query(query));
+    if(!res.contains(result)) throw Util.notExpected("Result does not contain \"" + result +
+        "\":\n" + query + "\n[E] " + result + "\n[F] " + res);
+  }
+
+  /**
+   * Checks if a query yields the specified error code.
+   * @param query query string
+   * @param error expected error
+   */
+  protected static void error(final String query, final QueryError... error) {
+    try {
+      final String res = eval(query);
+      final TokenBuilder tb = new TokenBuilder().add("Query did not fail:\n");
+      tb.add(query).add("\n[E] Error: ");
+      for(final QueryError e : error) tb.add(' ').add(e.qname().prefixId());
+      throw Util.notExpected(tb.add("\n[F] ").add(res));
+    } catch(final QueryIOException ex) {
+      error(query, ex.getCause(), error);
+    } catch(final QueryException ex) {
+      error(query, ex, error);
+    } catch(final Exception ex) {
+      throw Util.notExpected(ex);
+    }
+  }
+
+  /**
+   * Checks if an exception yields one of the specified error codes.
+   * @param query query
+   * @param ex resulting query exception
+   * @param errors expected errors
+   */
+  protected static void error(final String query, final QueryException ex,
+      final QueryError... errors) {
+
+    boolean found = false;
+    final QueryError err = ex.error();
+    for(final QueryError e : errors) found |= err != null ? err == e : e.qname().eq(ex.qname());
+
+    if(!found) {
+      final TokenBuilder tb = new TokenBuilder().add('\n');
+      if(query != null) tb.add("Query: ").add(query).add('\n');
+      tb.add("Error(s): ");
+      if(err != null) {
+        int c = 0;
+        for(final QueryError er : errors) tb.add(c++ == 0 ? "" : "/").add(er.name());
+        ex.printStackTrace();
+        tb.add("\nResult: ").add(err.name() + " (" + ex.getLocalizedMessage() + ')');
+      } else {
+        int c = 0;
+        for(final QueryError er : errors) {
+          if(c++ > 0) tb.add('/');
+          tb.add(er.qname().local());
+        }
+        tb.add("\nResult: ").add(ex.qname().string());
+      }
+      throw Util.notExpected(tb);
+    }
+  }
+
+  /**
+   * Returns serialization parameters.
+   * @param arg serialization arguments
+   * @return parameter string
+   */
+  protected static String serialParams(final String arg) {
+    return "<serialization-parameters " +
+      "xmlns='http://www.w3.org/2010/xslt-xquery-serialization'>" + arg +
+      "</serialization-parameters>";
+  }
+
+  /**
    * Runs a query.
    * @param query query string
    * @return result

@@ -11,7 +11,6 @@ import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.serial.*;
-import org.basex.query.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -21,7 +20,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class ClientModuleTest extends AdvancedQueryTest {
+public final class ClientModuleTest extends SandboxTest {
   /** Server reference. */
   private static BaseXServer server;
 

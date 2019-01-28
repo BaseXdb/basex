@@ -8,6 +8,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
@@ -23,7 +24,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-19, BSD License
  * @author Rositsa Shadura
  */
-public final class PackageAPITest extends AdvancedQueryTest {
+public final class PackageAPITest extends SandboxTest {
   /** Test repository. */
   private static final String SOURCE = "src/test/resources/repo/";
   /** Test repository. */

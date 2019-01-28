@@ -5,9 +5,9 @@ import static org.junit.Assert.*;
 import java.util.*;
 import java.util.List;
 
+import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
-import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.node.*;
 import org.junit.*;
@@ -21,7 +21,7 @@ import org.junit.rules.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Lukas Kircher
  */
-public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
+public final class NodeUpdateComparatorTest extends SandboxTest {
   /** Expected exception. */
   @Rule
   public final ExpectedException thrown = ExpectedException.none();

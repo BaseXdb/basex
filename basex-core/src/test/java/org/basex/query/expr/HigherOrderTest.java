@@ -2,8 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
 
+import org.basex.*;
 import org.basex.io.*;
-import org.basex.query.*;
 import org.junit.*;
 
 /**
@@ -12,7 +12,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Leo Woerteler
  */
-public final class HigherOrderTest extends AdvancedQueryTest {
+public final class HigherOrderTest extends SandboxTest {
   /**
    * Test for name shadowing.
    */

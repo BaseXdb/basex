@@ -1,7 +1,7 @@
 package org.basex.query.expr;
 
+import org.basex.*;
 import org.basex.core.cmd.*;
-import org.basex.query.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -11,7 +11,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class PathTest extends AdvancedQueryTest {
+public final class PathTest extends SandboxTest {
   /** Test file. */
   private static final String FILE = "src/test/resources/input.xml";
   /** First result. */

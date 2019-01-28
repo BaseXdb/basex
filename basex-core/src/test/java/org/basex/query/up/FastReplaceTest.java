@@ -2,8 +2,8 @@ package org.basex.query.up;
 
 import static org.junit.Assert.*;
 
+import org.basex.*;
 import org.basex.core.cmd.*;
-import org.basex.query.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-19, BSD License
  * @author Lukas Kircher
  */
-public final class FastReplaceTest extends AdvancedQueryTest {
+public final class FastReplaceTest extends SandboxTest {
   /** Test document. */
   private static final String DOC = "src/test/resources/xmark.xml";
 

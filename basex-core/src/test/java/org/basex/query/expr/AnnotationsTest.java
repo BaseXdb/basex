@@ -2,7 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.query.*;
+import org.basex.*;
 import org.junit.*;
 
 /**
@@ -11,7 +11,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class AnnotationsTest extends AdvancedQueryTest {
+public final class AnnotationsTest extends SandboxTest {
   /** Parsing of function declarations. */
   @Test public void functionDecl() {
     query("declare namespace a='a';declare %a:a function local:x() {1}; local:x()", 1);

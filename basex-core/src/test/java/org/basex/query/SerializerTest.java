@@ -2,6 +2,7 @@ package org.basex.query;
 
 import static org.basex.query.QueryError.*;
 
+import org.basex.*;
 import org.basex.io.serial.*;
 import org.junit.*;
 
@@ -11,7 +12,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class SerializerTest extends AdvancedQueryTest {
+public final class SerializerTest extends SandboxTest {
   /** Test: method=xml. */
   @Test public void xml() {
     query(SerializerOptions.METHOD.arg("xml") + "<html/>", "<html/>");

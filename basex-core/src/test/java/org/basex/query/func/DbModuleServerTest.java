@@ -2,6 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
+
 import java.io.*;
 import java.util.concurrent.*;
 
@@ -9,7 +10,6 @@ import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.query.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -19,7 +19,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class DbModuleServerTest extends AdvancedQueryTest {
+public final class DbModuleServerTest extends SandboxTest {
   /** Number of clients. */
   private static final int NUM = 5;
   /** Test file. */

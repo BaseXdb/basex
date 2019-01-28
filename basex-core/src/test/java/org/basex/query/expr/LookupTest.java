@@ -3,7 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
-import org.basex.query.*;
+import org.basex.*;
 import org.junit.*;
 
 /**
@@ -12,7 +12,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class LookupTest extends AdvancedQueryTest {
+public final class LookupTest extends SandboxTest {
   /** Test. */
   @Test public void map() {
     query("map { 'a':'b' } ? a", "b");

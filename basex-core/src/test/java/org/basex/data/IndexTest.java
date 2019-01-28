@@ -5,9 +5,9 @@ import static org.basex.query.func.Function.*;
 import java.util.*;
 import java.util.List;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.query.*;
 import org.junit.*;
 import org.junit.Test;
 import org.junit.runner.*;
@@ -21,7 +21,7 @@ import org.junit.runners.Parameterized.*;
  * @author Christian Gruen
  */
 @RunWith(Parameterized.class)
-public final class IndexTest extends AdvancedQueryTest {
+public final class IndexTest extends SandboxTest {
   /** Main memory flag. */
   @Parameter
   public Object mainmem;

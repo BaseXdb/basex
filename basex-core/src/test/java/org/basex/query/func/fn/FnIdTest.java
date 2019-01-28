@@ -1,8 +1,8 @@
 package org.basex.query.func.fn;
 
+import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.index.*;
-import org.basex.query.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -12,7 +12,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-19, BSD License
  * @author Jens Erat
  */
-public final class FnIdTest extends AdvancedQueryTest {
+public final class FnIdTest extends SandboxTest {
   /** Test document. */
   private static final String DOC = "src/test/resources/xmark.xml";
 

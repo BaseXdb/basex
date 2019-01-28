@@ -2,7 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.query.*;
+import org.basex.*;
 import org.junit.*;
 
 /**
@@ -11,7 +11,7 @@ import org.junit.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Leo Woerteler
  */
-public final class JavaFunctionTest extends AdvancedQueryTest {
+public final class JavaFunctionTest extends SandboxTest {
   /** Tests calling some Java constructors from XQuery. */
   @Test public void constr() {
     // check java: prefix

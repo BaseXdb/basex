@@ -5,9 +5,9 @@ import static org.basex.query.func.Function.*;
 
 import java.io.*;
 
+import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.query.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class MixedTest extends AdvancedQueryTest {
+public final class MixedTest extends SandboxTest {
   /** Test XQuery module file. */
   private static final String XQMFILE = "src/test/resources/hello.xqm";
 
