@@ -44,9 +44,10 @@ public final class WebModule {
    * Checks the module for relevant annotations.
    * @param ctx database context
    * @return {@code true} if module contains relevant annotations
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public boolean parse(final Context ctx) throws IOException {
+  public boolean parse(final Context ctx) throws QueryException, IOException {
     functions.clear();
     wsFunctions.clear();
 
@@ -63,6 +64,7 @@ public final class WebModule {
         }
       }
     } catch(final QueryException ex) {
+      if(ctx.soptions.get(StaticOptions.RESTXQERRORS)) throw ex;
       // ignore modules that cannot be parsed
       Util.debug(ex);
     }

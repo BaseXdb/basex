@@ -57,6 +57,7 @@ public abstract class HTTPTest extends SandboxTest {
       throws Exception {
 
     assertTrue(new IOFile(CONTEXT.soptions.get(StaticOptions.WEBPATH)).md());
+    CONTEXT.soptions.set(StaticOptions.RESTXQERRORS, true);
     rootUrl = url;
 
     final StringList sl = new StringList();
