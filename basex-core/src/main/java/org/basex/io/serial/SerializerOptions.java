@@ -44,7 +44,7 @@ public final class SerializerOptions extends Options {
       new EnumOption<>("escape-uri-attributes", YesNo.NO);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> INCLUDE_CONTENT_TYPE =
-      new EnumOption<>("include-content-type", YesNo.NO);
+      new EnumOption<>("include-content-type", YesNo.YES);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> INDENT =
       new EnumOption<>("indent", YesNo.YES);

@@ -101,7 +101,7 @@ final class HTMLSerializer extends MarkupSerializer {
 
   @Override
   protected void startOpen(final QNm name) throws IOException {
-    doctype(null);
+    if(elems.isEmpty()) checkRoot(HTML);
     if(sep) indent();
     out.print(ELEM_O);
     out.print(name.string());
@@ -140,7 +140,7 @@ final class HTMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  protected void doctype(final QNm type) throws IOException {
+  protected void doctype(final byte[] type) throws IOException {
     final boolean doc = docpub != null || docsys != null;
     if(doc) {
       printDoctype(type, docpub, docsys);

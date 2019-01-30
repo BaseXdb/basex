@@ -63,7 +63,7 @@ final class XHTMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  protected void doctype(final QNm type) throws IOException {
+  protected void doctype(final byte[] type) throws IOException {
     if(html5 && docsys == null) {
       printDoctype(type, null, null);
     } else if(docsys != null) {

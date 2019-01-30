@@ -32,6 +32,8 @@ abstract class MarkupSerializer extends StandardSerializer {
   /** Flag for printing content type. */
   int ct;
 
+  /** Indicates if root element has been serialized. */
+  boolean root;
   /** Script flag. */
   boolean script;
 
@@ -136,6 +138,7 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   @Override
   protected void text(final byte[] value, final FTPos ftp) throws IOException {
+    if(elems.isEmpty()) checkRoot(null);
     final byte[] val = norm(value);
     if(ftp == null) {
       final ArrayList<QNm> qnames = cdata();
@@ -202,11 +205,25 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   @Override
   protected void startOpen(final QNm name) throws IOException {
-    doctype(name);
+    if(elems.isEmpty()) checkRoot(name.string());
     if(sep) indent();
     out.print(ELEM_O);
     out.print(name.string());
     sep = true;
+  }
+
+  /**
+   * Checks if document serialization is valid.
+   * @param name name of doctype (if {@code null}, no doctype declaration will be output)
+   * @throws IOException I/O exception
+   */
+  final void checkRoot(final byte[] name) throws IOException {
+    if(root) {
+      if(!saomit) throw SERSA.getIO();
+      if(docsys != null) throw SERDT.getIO();
+    }
+    if(name != null) doctype(name);
+    root = true;
   }
 
   @Override
@@ -226,6 +243,12 @@ abstract class MarkupSerializer extends StandardSerializer {
     out.print(elem.string());
     out.print(ELEM_C);
     sep = true;
+  }
+
+  @Override
+  protected void atomic(final Item item) throws IOException {
+    if(elems.isEmpty()) checkRoot(null);
+    super.atomic(item);
   }
 
   @Override
@@ -261,15 +284,15 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   /**
    * Prints the document type declaration.
-   * @param type document type or {@code null} for html type
+   * @param type document type
    * @throws IOException I/O exception
    */
-  protected abstract void doctype(QNm type) throws IOException;
+  protected abstract void doctype(byte[] type) throws IOException;
 
   @Override
   protected boolean ignore(final ANode node) {
     if(ct > 0 && node.type == NodeType.ELM && eq(node.name(), META)) {
-      final byte[] value = node.attribute(HTTPEQUIV);
+      final byte[] value = node.attribute(HTTP_EQUIV);
       return value != null && eq(trim(value), CONTENT_TYPE);
     }
     return false;
@@ -277,18 +300,18 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   /**
    * Prints the document type declaration.
-   * @param type document type or {@code null} for html type
+   * @param type document type
    * @param pub doctype-public parameter
    * @param sys doctype-system parameter
    * @throws IOException I/O exception
    */
-  protected final void printDoctype(final QNm type, final String pub, final String sys)
+  protected final void printDoctype(final byte[] type, final String pub, final String sys)
       throws IOException {
 
-    if(level != 0) return;
+    if(level != 0 || root) return;
     if(sep) indent();
     out.print(DOCTYPE);
-    out.print(type == null ? HTML : type.string());
+    out.print(type);
     if(sys != null || pub != null) {
       if(pub != null) out.print(' ' + PUBLIC + " \"" + pub + '"');
       else out.print(' ' + SYSTEM);
@@ -326,7 +349,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     if(empty) finishOpen();
     level++;
     startOpen(new QNm(META));
-    attribute(HTTPEQUIV, CONTENT_TYPE, false);
+    attribute(HTTP_EQUIV, CONTENT_TYPE, false);
     attribute(CONTENT, concat(media.isEmpty() ? MediaType.TEXT_HTML : media, "; ",
       CHARSET, '=', encoding), false);
     if(html) {

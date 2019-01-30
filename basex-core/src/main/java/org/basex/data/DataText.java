@@ -227,7 +227,7 @@ public interface DataText {
   /** HTML: meta element. */
   byte[] META = token("meta");
   /** HTML: http-equiv attribute. */
-  byte[] HTTPEQUIV = token("http-equiv");
+  byte[] HTTP_EQUIV = token("http-equiv");
   /** HTML: content attribute. */
   byte[] CONTENT = token("content");
   /** HTML: charset. */
