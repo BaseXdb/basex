@@ -1,9 +1,8 @@
 package org.basex.query.func.xquery;
 
-import static org.basex.util.Token.*;
-
 import org.basex.query.*;
-import org.basex.query.util.list.*;
+import org.basex.query.iter.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -11,9 +10,14 @@ import org.basex.query.util.list.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public class XQueryEvalUpdate extends XQueryEval {
+public final class XQueryEvalUpdate extends XQueryEval {
   @Override
-  protected ItemList eval(final QueryContext qc) throws QueryException {
-    return eval(qc, string(toToken(exprs[0], qc)), null, true);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return eval(true, qc).iter();
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    return eval(true, qc).value();
   }
 }

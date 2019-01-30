@@ -9,6 +9,7 @@ import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -24,18 +25,36 @@ import org.basex.util.*;
 public class JobsEval extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return eval(qc, string(toToken(exprs[0], qc)), null);
+    final Item item = toItem(exprs[0], qc);
+    return item instanceof Uri ? invoke(item.string(info), qc) : eval(qc, toToken(item), null);
   }
 
   /**
-   * Evaluates a job.
+   * Evaluates the specified URI.
+   * @param uri URI
+   * @param qc query context
+   * @return query string
+   * @throws QueryException query exception
+   */
+  final Str invoke(final byte[] uri, final QueryContext qc) throws QueryException {
+    checkCreate(qc);
+    final IO io = checkPath(uri);
+    try {
+      return eval(qc, io.read(), io.url());
+    } catch(final IOException ex) {
+      throw IOERR_X.get(info, ex);
+    }
+  }
+
+  /**
+   * Evaluates a query as job.
    * @param qc query context
    * @param query query
    * @param path path (can be {@code null})
    * @return resulting value
    * @throws QueryException query exception
    */
-  final Str eval(final QueryContext qc, final String query, final String path)
+  final Str eval(final QueryContext qc, final byte[] query, final String path)
       throws QueryException {
 
     checkAdmin(qc);
@@ -62,7 +81,7 @@ public class JobsEval extends StandardFunc {
       opts.put(JobsOptions.SERVICE, null);
     }
 
-    final QueryJobSpec spec = new QueryJobSpec(opts, bindings, query);
+    final QueryJobSpec spec = new QueryJobSpec(opts, bindings, string(query));
     final QueryJob job = new QueryJob(spec, info, qc.context);
 
     // add service

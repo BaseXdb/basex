@@ -74,6 +74,14 @@ public final class XQueryModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void evalURI() {
+    final Function func = _XQUERY_EVAL;
+    // queries
+    query(func.args(" xs:anyURI('src/test/resources/input.xq')"), "XML");
+    error(func.args(" xs:anyURI('src/test/resources/xxx.xq')"), WHICHRES_X);
+  }
+
+  /** Test method. */
   @Test public void evalUpdate() {
     final Function func = _XQUERY_EVAL_UPDATE;
     // queries
@@ -84,19 +92,11 @@ public final class XQueryModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void invoke() {
-    final Function func = _XQUERY_INVOKE;
+  @Test public void evalUpdateURI() {
+    final Function func = _XQUERY_EVAL_UPDATE;
     // queries
-    query(func.args("src/test/resources/input.xq"), "XML");
-    error(func.args("src/test/resources/xxx.xq"), WHICHRES_X);
-  }
-
-  /** Test method. */
-  @Test public void invokeUpdate() {
-    final Function func = _XQUERY_INVOKE_UPDATE;
-    // queries
-    error(func.args("src/test/resources/input.xq"), XQUERY_UPDATE2);
-    error(func.args("src/test/resources/xxx.xq"), WHICHRES_X);
+    error(func.args(" xs:anyURI('src/test/resources/input.xq')"), XQUERY_UPDATE2);
+    error(func.args(" xs:anyURI('src/test/resources/xxx.xq')"), WHICHRES_X);
   }
 
   /** Test method. */

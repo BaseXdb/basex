@@ -150,9 +150,11 @@ public final class JobsModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void invoke() {
-    query("starts-with(" + _JOBS_INVOKE.args("src/test/resources/input.xq") + ", 'job')", true);
-    error(_JOBS_INVOKE.args("src/test/resources/xxx.xq"), WHICHRES_X);
+  @Test public void evalURI() {
+    final Function func = _JOBS_EVAL;
+    final String uri = " xs:anyURI('src/test/resources/input.xq')";
+    query("starts-with(" + func.args(uri) + ", 'job')", true);
+    error(func.args(" xs:anyURI('src/test/resources/xxx.xq')"), WHICHRES_X);
   }
 
   /** Test method. */

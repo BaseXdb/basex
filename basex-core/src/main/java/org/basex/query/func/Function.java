@@ -1086,7 +1086,7 @@ public enum Function {
       arg(STR_O, MAP_ZO, MAP_ZO), STR_O, flag(NDT), JOBS_URI),
   /** XQuery function. */
   _JOBS_FINISHED(JobsFinished.class, "finished(id)", arg(STR_O), BLN_O, flag(NDT), JOBS_URI),
-  /** XQuery function. */
+  /** XQuery function (legacy, now: jobs:eval). */
   _JOBS_INVOKE(JobsInvoke.class, "invoke(uri[,bindings[,options]])",
       arg(STR_O, MAP_ZO, MAP_ZO), STR_O, flag(NDT), JOBS_URI),
   /** XQuery function. */
@@ -1319,15 +1319,8 @@ public enum Function {
   _UTIL_INIT(UtilInit.class, "init(items)", arg(ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_ITEM(UtilItem.class, "item(items,pos)", arg(ITEM_ZM, DBL_O), ITEM_ZO, UTIL_URI),
-  /** XQuery function (legacy, now: util:item). */
-  _UTIL_ITEM_AT(UtilItemAt.class, "item-at(items,pos)", arg(ITEM_ZM, DBL_O), ITEM_ZO, UTIL_URI),
-  /** XQuery function (legacy, now: util:sub). */
-  _UTIL_ITEM_RANGE(UtilItemRange.class, "item-range(items,first,last)",
-      arg(ITEM_ZM, DBL_O, DBL_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_LAST(UtilLast.class, "last(items)", arg(ITEM_ZM), ITEM_ZO, UTIL_URI),
-  /** XQuery function (legacy, now: util:last). */
-  _UTIL_LAST_FROM(UtilLastFrom.class, "last-from(items)", arg(ITEM_ZM), ITEM_ZO, UTIL_URI),
   /** XQuery function. */
   _UTIL_OR(UtilOr.class, "or(items,default)", arg(ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
@@ -1395,10 +1388,10 @@ public enum Function {
   /** XQuery function. */
   _XQUERY_FORK_JOIN(XQueryForkJoin.class, "fork-join(functions[,options])",
       arg(FUNC_ZM, MAP_ZO), ITEM_ZM, flag(HOF), XQUERY_URI),
-  /** XQuery function. */
+  /** XQuery function (legacy, now: xquery:eval). */
   _XQUERY_INVOKE(XQueryInvoke.class, "invoke(uri[,bindings[,options]])",
       arg(STR_O, MAP_ZO, MAP_ZO), ITEM_ZM, flag(NDT), XQUERY_URI),
-  /** XQuery function. */
+  /** XQuery function (legacy, now: jobs:eval-update). */
   _XQUERY_INVOKE_UPDATE(XQueryInvokeUpdate.class, "invoke-update(uri[,bindings[,options]])",
       arg(STR_O, MAP_ZO, MAP_ZO), EMP, flag(UPD), XQUERY_URI),
   /** XQuery function. */
