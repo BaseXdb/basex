@@ -1,8 +1,10 @@
 package org.basex.http;
 
-import java.util.*;
+import java.util.concurrent.*;
 
 import javax.servlet.http.*;
+
+import org.basex.util.list.*;
 
 /**
  * This class creates and destroys HTTP sessions.
@@ -12,25 +14,35 @@ import javax.servlet.http.*;
  */
 public final class SessionListener implements HttpSessionListener {
   /** Sessions. */
-  private static HashMap<String, HttpSession> sessions;
+  private static final ConcurrentHashMap<String, HttpSession> SESSIONS = new ConcurrentHashMap<>();
 
   @Override
   public void sessionCreated(final HttpSessionEvent event) {
     final HttpSession sess =  event.getSession();
-    sessions().put(sess.getId(), sess);
+    SESSIONS.put(sess.getId(), sess);
   }
 
   @Override
   public void sessionDestroyed(final HttpSessionEvent event) {
-    sessions().remove(event.getSession().getId());
+    SESSIONS.remove(event.getSession().getId());
   }
 
   /**
-   * Initializes the HTTP context.
-   * @return context;
+   * Returns the ids of all connected sessions.
+   * @return client ids
    */
-  public static synchronized HashMap<String, HttpSession> sessions() {
-    if(sessions == null) sessions = new HashMap<>();
-    return sessions;
+  public static TokenList ids() {
+    final TokenList ids = new TokenList(SESSIONS.size());
+    for(final String key : SESSIONS.keySet()) ids.add(key);
+    return ids;
+  }
+
+  /**
+   * Returns the session with the specified id.
+   * @param id session id
+   * @return session
+   */
+  public static HttpSession get(final String id) {
+    return SESSIONS.get(id);
   }
 }

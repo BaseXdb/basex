@@ -274,6 +274,21 @@ public enum QueryError {
   /** Error code. */
   FT_OPTIONS(FT, "options", "Wildcards and fuzzy option cannot be specified both."),
 
+  // Geo Module
+
+  /** Error code. */
+  GEO_WHICH(GEO, 1, "Unrecognized geometry type: %."),
+  /** Error code. */
+  GEO_READ(GEO, 2, "Parsing GML 2.0: %."),
+  /** Error code. */
+  GEO_TYPE(GEO, 3, "Wrong geometry: % expected, % found."),
+  /** Error code. */
+  GEO_RANGE(GEO, 4, "Out of range input index: %."),
+  /** Error code. */
+  GEO_WRITE(GEO, 5, "%."),
+  /** Error code. */
+  GEO_ARG(GEO, 6, "Illegal argument: %."),
+
   // Hashing Module
 
   /** Error code. */
@@ -383,17 +398,22 @@ public enum QueryError {
   /** Error code. */
   REPO_VERSION(REPO, "version", "Package version is not supported."),
 
+  // Request Module
+
+  /** Error code. */
+  REQUEST_PARAMETER(REQUEST, "parameter", "Query string cannot be decoded: %."),
+
   // Session Module
 
   /** Error code. */
-  SESSION_GET_X(SESSION, "get", "Stored attribute is no XQuery value: %."),
+  SESSION_GET(SESSION, "get", "Stored attribute is no XQuery value."),
   /** Error code. */
   SESSION_SET_X(SESSION, "set", "Item cannot be stored: %."),
 
   // Session Module
 
   /** Error code. */
-  SESSIONS_GET_X(SESSIONS, "get", "Stored attribute is no value: %."),
+  SESSIONS_GET(SESSIONS, "get", "Stored attribute is no XQuery value."),
   /** Error code. */
   SESSIONS_SET_X(SESSIONS, "set", "Function items cannot be stored: %."),
   /** Error code. */
@@ -1451,6 +1471,7 @@ public enum QueryError {
     /** Error type. */ DB(DB_PREFIX,             DB_URI),
     /** Error type. */ FETCH(FETCH_PREFIX,       FETCH_URI),
     /** Error type. */ FT(FT_PREFIX,             FT_URI),
+    /** Error type. */ GEO(GEO_PREFIX,           GEO_URI),
     /** Error type. */ HTML(HTML_PREFIX,         HTML_URI),
     /** Error type. */ HASH(HASH_PREFIX,         HASH_URI),
     /** Error type. */ INSPECT(INSPECT_PREFIX,   INSPECT_URI),
@@ -1461,6 +1482,7 @@ public enum QueryError {
     /** Error type. */ PROF(PROF_PREFIX,         PROF_URI),
     /** Error type. */ RANDOM(RANDOM_PREFIX,     RANDOM_URI),
     /** Error type. */ REPO(REPO_PREFIX,         REPO_URI),
+    /** Error type. */ REQUEST(REQUEST_PREFIX,   REQUEST_URI),
     /** Error type. */ SESSION(SESSION_PREFIX,   SESSION_URI),
     /** Error type. */ SESSIONS(SESSIONS_PREFIX, SESSIONS_URI),
     /** Error type. */ WS(WS_PREFIX,             WS_URI),

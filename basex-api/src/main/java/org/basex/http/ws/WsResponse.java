@@ -83,10 +83,10 @@ public final class WsResponse extends WebResponse {
    * @param opts serializer options
    * @return serialized values (byte arrays and strings)
    * @throws QueryException query exception
-   * @throws IOException I/O exception
+   * @throws QueryIOException query I/O exception
    */
   static ArrayList<Object> serialize(final Iter iter, final SerializerOptions opts)
-      throws QueryException, IOException {
+      throws QueryException, QueryIOException {
 
     final ArrayList<Object> list = new ArrayList<>();
     final SerialMethod method = opts.get(SerializerOptions.METHOD);

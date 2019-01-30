@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.lang.reflect.*;
 import java.util.*;
 
 import org.basex.query.*;
@@ -14,6 +15,7 @@ import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.Type;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -44,6 +46,10 @@ public final class Functions {
   static {
     // add built-in core functions
     Function.init(DEFINITIONS);
+    // add built-in API functions if available
+    final Class<?> clz = Reflect.find("org.basex.query.func.ApiFunction");
+    final Method mth = Reflect.method(clz, "init", ArrayList.class);
+    if(mth != null) Reflect.invoke(mth, null, DEFINITIONS);
 
     for(final FuncDefinition def : DEFINITIONS) {
       URIS.add(def.uri);

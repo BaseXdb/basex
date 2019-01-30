@@ -81,7 +81,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   @Override
   public void onWebSocketConnect(final Session sess) {
     super.onWebSocketConnect(sess);
-    id = WsPool.get().add(this);
+    id = WsPool.add(this);
 
     run("[WS-OPEN] " + req.getRequestURL(), null, () -> {
       // add headers (for binding them to the XQuery parameters in the corresponding bind method)
@@ -117,7 +117,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
       run("[WS-CLOSE] " + req.getRequestURL(), status,
           () -> findAndProcess(Annotation._WS_CLOSE, null));
     } finally {
-      WsPool.get().remove(id);
+      WsPool.remove(id);
       super.onWebSocketClose(status, message);
     }
   }
@@ -150,7 +150,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
    * Closes the WebSocket connection.
    */
   public void close() {
-    WsPool.get().remove(id);
+    WsPool.remove(id);
     getSession().close();
   }
 

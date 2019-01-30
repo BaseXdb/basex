@@ -1,6 +1,5 @@
 package org.basex.http.ws;
 
-import java.io.*;
 import java.nio.*;
 import java.util.*;
 import java.util.Map.*;
@@ -19,32 +18,23 @@ import org.eclipse.jetty.websocket.api.*;
  * @author Johannes Finckh
  */
 public final class WsPool {
-  /** Singleton pool. */
-  private static WsPool instance;
+  /** Clients of the pool. id -> adapter. */
+  private static final ConcurrentHashMap<String, WebSocket> CLIENTS = new ConcurrentHashMap<>();
   /** WebSocket prefix. */
   private static final String PREFIX = "websocket";
   /** Incrementing id. */
   private static long websocketId = -1;
 
-  /** Clients of the pool. id -> adapter. */
-  private final ConcurrentHashMap<String, WebSocket> clients = new ConcurrentHashMap<>();
-
-  /**
-   * Returns the pool instance.
-   * @return instance
-   */
-  public static synchronized WsPool get() {
-    if(instance == null) instance = new WsPool();
-    return instance;
-  }
+  /** Private constructor. */
+  private WsPool() { }
 
   /**
    * Returns the ids of all connected clients.
    * @return client ids
    */
-  public TokenList ids() {
-    final TokenList ids = new TokenList(clients.size());
-    for(final String key : clients.keySet()) ids.add(key);
+  public static TokenList ids() {
+    final TokenList ids = new TokenList(CLIENTS.size());
+    for(final String key : CLIENTS.keySet()) ids.add(key);
     return ids;
   }
 
@@ -53,9 +43,9 @@ public final class WsPool {
    * @param socket WebSocket
    * @return client id
    */
-  public String add(final WebSocket socket) {
+  public static String add(final WebSocket socket) {
     final String id = createId();
-    clients.put(id, socket);
+    CLIENTS.put(id, socket);
     return id;
   }
 
@@ -63,34 +53,29 @@ public final class WsPool {
    * Removes a WebSocket from the clients list.
    * @param id client id
    */
-  void remove(final String id) {
-    clients.remove(id);
+  static void remove(final String id) {
+    CLIENTS.remove(id);
   }
 
   /**
    * Sends a message to all connected clients.
    * @param message message
    * @throws QueryException query exception
-   * @throws IOException I/O exception
    */
-  public void emit(final Value message) throws QueryException, IOException {
-    broadcast(message, null);
+  public static void emit(final Value message) throws QueryException {
+    send(message, new ArrayList<>(CLIENTS.values()));
   }
 
   /**
    * Sends a message to all connected clients except to the one with the given id.
    * @param message message
-   * @param client The client id (can be {@code null})
+   * @param client client id
    * @throws QueryException query exception
-   * @throws IOException I/O exception
    */
-  public void broadcast(final Value message, final String client)
-      throws QueryException, IOException {
-
-    final ArrayList<WebSocket> list = new ArrayList<>();
-    for(final Entry<String, WebSocket> entry : clients.entrySet()) {
-      final String id = entry.getKey();
-      if(client == null || !client.equals(id)) list.add(entry.getValue());
+  public static void broadcast(final Value message, final String client) throws QueryException {
+    final List<WebSocket> list = new ArrayList<>();
+    for(final Entry<String, WebSocket> entry : CLIENTS.entrySet()) {
+      if(!client.equals(entry.getKey())) list.add(entry.getValue());
     }
     send(message, list);
   }
@@ -100,12 +85,11 @@ public final class WsPool {
    * @param message message
    * @param ids client ids
    * @throws QueryException query exception
-   * @throws IOException I/O exception
    */
-  public void send(final Value message, final String... ids) throws QueryException, IOException {
-    final ArrayList<WebSocket> list = new ArrayList<>();
+  public static void send(final Value message, final String... ids) throws QueryException {
+    final List<WebSocket> list = new ArrayList<>(ids.length);
     for(final String id : ids) {
-      final WebSocket ws = clients.get(id);
+      final WebSocket ws = CLIENTS.get(id);
       if(ws != null) list.add(ws);
     }
     send(message, list);
@@ -116,8 +100,8 @@ public final class WsPool {
    * @param id client id
    * @return client
    */
-  public WebSocket client(final String id) {
-    return clients.get(id);
+  public static WebSocket get(final String id) {
+    return CLIENTS.get(id);
   }
 
   /**
@@ -125,12 +109,19 @@ public final class WsPool {
    * @param message message
    * @param websockets clients
    * @throws QueryException query exception
-   * @throws IOException I/O exception
    */
-  private static void send(final Value message, final ArrayList<WebSocket> websockets)
-      throws QueryException, IOException {
+  private static void send(final Value message, final List<WebSocket> websockets)
+      throws QueryException {
 
-    final ArrayList<Object> values = WsResponse.serialize(message.iter(), new SerializerOptions());
+    // serialize contents once
+    final List<Object> values;
+    try {
+      values = WsResponse.serialize(message.iter(), new SerializerOptions());
+    } catch(final QueryIOException ex) {
+      throw ex.getCause();
+    }
+
+    // send result to all clients
     for(final WebSocket ws : websockets) {
       if(!ws.isConnected()) continue;
       final RemoteEndpoint remote = ws.getSession().getRemote();

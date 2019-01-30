@@ -43,6 +43,14 @@ public final class HTTPParams {
   }
 
   /**
+   * Returns the original query string.
+   * @return query string
+   */
+  public String queryString() {
+    return req.getQueryString();
+  }
+
+  /**
    * Returns the query parameters as string map.
    * @return map
    * @throws IOException I/O exception
@@ -51,8 +59,8 @@ public final class HTTPParams {
     try {
       if(strings == null) strings = req.getParameterMap();
       return strings;
-    } catch(final IllegalStateException ex) {
-      // may be caused by too large input (#884)
+    } catch(final RuntimeException ex) {
+      // may be caused by too large input (#884) or illegal query parameters
       throw new IOException(ex);
     }
   }
