@@ -17,7 +17,7 @@ import org.basex.server.*;
 import org.basex.util.*;
 
 /**
- * <p>Base class for all servlets.</p>
+ * Base class for various servlets.
  *
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
@@ -33,19 +33,21 @@ public abstract class BaseXServlet extends HttpServlet {
     super.init(config);
     try {
       HTTPContext.init(config.getServletContext());
-      final Enumeration<String> en = config.getInitParameterNames();
-      while(en.hasMoreElements()) {
-        String key = en.nextElement().toLowerCase(Locale.ENGLISH);
-        final String val = config.getInitParameter(key);
-        if(key.startsWith(Prop.DBPREFIX)) key = key.substring(Prop.DBPREFIX.length());
-        if(key.equalsIgnoreCase(StaticOptions.USER.name())) {
-          user = val;
-        } else if(key.equalsIgnoreCase(StaticOptions.AUTHMETHOD.name())) {
-          auth = AuthMethod.valueOf(val);
-        }
-      }
     } catch(final IOException ex) {
       throw new ServletException(ex);
+    }
+
+    // set user and authentication method
+    final Enumeration<String> en = config.getInitParameterNames();
+    while(en.hasMoreElements()) {
+      String key = en.nextElement().toLowerCase(Locale.ENGLISH);
+      final String val = config.getInitParameter(key);
+      if(key.startsWith(Prop.DBPREFIX)) key = key.substring(Prop.DBPREFIX.length());
+      if(key.equalsIgnoreCase(StaticOptions.USER.name())) {
+        user = val;
+      } else if(key.equalsIgnoreCase(StaticOptions.AUTHMETHOD.name())) {
+        auth = AuthMethod.valueOf(val);
+      }
     }
   }
 
