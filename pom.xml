@@ -29,7 +29,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
-    <jettyVersion>9.4.12.v20180830</jettyVersion>
+    <jettyVersion>9.4.14.v20181114</jettyVersion>
   </properties>
 
   <dependencyManagement>
