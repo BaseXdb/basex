@@ -233,18 +233,21 @@ public enum ApiFunction {
   /** XQuery function. */
   _WS_DELETE(WsDelete.class, "delete(id,key)", arg(STR_O, STR_O), EMP, flag(NDT), WS_URI),
   /** XQuery function. */
+  _WS_EMIT(WsEmit.class, "emit(message)", arg(ITEM_O), EMP, flag(NDT), WS_URI),
+  /** XQuery function. */
+  _WS_EVAL(WsEval.class, "eval(string[,bindings[,options]])",
+      arg(STR_O, MAP_ZO, MAP_ZO), STR_O, flag(NDT), WS_URI),
+  /** XQuery function. */
   _WS_GET(WsGet.class, "get(id,key[,default])",
       arg(STR_O, STR_O, ITEM_ZM), ITEM_ZM, flag(NDT), WS_URI),
-  /** XQuery function. */
-  _WS_SEND(WsSend.class, "send(message[,ids])", arg(ITEM_O, STR_ZM), EMP, flag(NDT), WS_URI),
- /** XQuery function. */
-  _WS_EMIT(WsEmit.class, "emit(message)", arg(ITEM_O), EMP, flag(NDT), WS_URI),
   /** XQuery function. */
   _WS_ID(WsId.class, "id()", arg(), STR_O, flag(NDT), WS_URI),
   /** XQuery function. */
   _WS_IDS(WsIds.class, "ids()", arg(), STR_ZM, flag(NDT), WS_URI),
   /** XQuery function. */
   _WS_PATH(WsPath.class, "path(id)", arg(STR_O), STR_O, flag(NDT), WS_URI),
+  /** XQuery function. */
+  _WS_SEND(WsSend.class, "send(message[,ids])", arg(ITEM_O, STR_ZM), EMP, flag(NDT), WS_URI),
   /** XQuery function. */
   _WS_SET(WsSet.class, "set(id,key,value)", arg(STR_O, STR_O, ITEM_ZM), EMP, flag(NDT), WS_URI);
 

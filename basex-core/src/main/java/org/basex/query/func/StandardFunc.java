@@ -1,6 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryError.normalize;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
@@ -18,12 +19,13 @@ import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.xquery.XQueryEval.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.XQMap;
+import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -288,6 +290,49 @@ public abstract class StandardFunc extends Arr {
     final QueryInput qi = new QueryInput(string(uri), sc);
     if(qi.io.exists()) return qi.io;
     throw WHICHRES_X.get(info, normalize(uri, info));
+  }
+
+  /**
+   * Evaluates the specified URI.
+   * @param i index of input argument
+   * @param qc query context
+   * @return query contents and URL
+   * @throws QueryException query exception
+   */
+  protected final IOContent toQuery(final int i, final QueryContext qc) throws QueryException {
+    final Item item = toItem(exprs[i], qc);
+    return item instanceof Uri ? toQuery(item.string(info), qc) : new IOContent(toToken(item));
+  }
+
+  /**
+   * Evaluates the specified URI.
+   * @param uri uri
+   * @param qc query context
+   * @return query contents and URL
+   * @throws QueryException query exception
+   */
+  protected final IOContent toQuery(final byte[] uri, final QueryContext qc)
+      throws QueryException {
+
+    checkAdmin(qc);
+    final IO io = checkPath(uri);
+    try {
+      return new IOContent(io.read(), io.url());
+    } catch(final IOException ex) {
+      throw IOERR_X.get(info, ex);
+    }
+  }
+
+  /**
+   * Evaluates the specified URI.
+   * @param path custom path
+   * @param options options with base-uri property
+   * @return query string
+   */
+  protected final String toBaseUri(final String path, final Options options) {
+    final String base = options.get(XQueryOptions.BASE_URI);
+    return base != null && !base.isEmpty() ? base :
+      path != null && !path.isEmpty() ? path : string(sc.baseURI().string());
   }
 
   /**

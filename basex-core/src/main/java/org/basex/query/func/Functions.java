@@ -53,9 +53,9 @@ public final class Functions {
 
     for(final FuncDefinition def : DEFINITIONS) {
       URIS.add(def.uri);
-      CACHE.put(new QNm(def.local(), def.uri()).id());
+      if(!CACHE.add(new QNm(def.local(), def.uri()).id())) {
+        throw Util.notExpected("Duplicate function definition: " + def);      }
     }
-    if(CACHE.size() < DEFINITIONS.size()) throw Util.notExpected("Duplicate function signatures!");
   }
 
   /**

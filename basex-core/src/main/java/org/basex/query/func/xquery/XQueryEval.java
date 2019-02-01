@@ -3,7 +3,6 @@ package org.basex.query.func.xquery;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import java.io.*;
 import java.util.*;
 import java.util.Map.*;
 
@@ -43,57 +42,24 @@ public class XQueryEval extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return eval(false, qc).iter();
+    return eval(toQuery(0, qc), false, qc).iter();
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return eval(false, qc).value();
-  }
-
-  /**
-   * Evaluates a query.
-   * @param updating updating
-   * @param qc query context
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  final ItemList eval(final boolean updating, final QueryContext qc) throws QueryException {
-    final Item item = toItem(exprs[0], qc);
-    return item instanceof Uri ? invoke(item.string(info), updating, qc) :
-      eval(qc, toToken(item), null, updating);
-  }
-
-  /**
-   * Evaluates the specified query URI.
-   * @param uri URI
-   * @param updating updating query
-   * @param qc query context
-   * @return query string
-   * @throws QueryException query exception
-   */
-  final ItemList invoke(final byte[] uri, final boolean updating, final QueryContext qc)
-      throws QueryException {
-    checkCreate(qc);
-    final IO io = checkPath(uri);
-    try {
-      return eval(qc, io.read(), io.url(), updating);
-    } catch(final IOException ex) {
-      throw IOERR_X.get(info, ex);
-    }
+    return eval(toQuery(0, qc), false, qc).value();
   }
 
   /**
    * Evaluates the specified string.
-   * @param qc query context
-   * @param query query string
-   * @param path path to query file (may be {@code null})
+   * @param query query
    * @param updating updating query
+   * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  final ItemList eval(final QueryContext qc, final byte[] query, final String path,
-      final boolean updating) throws QueryException {
+  final ItemList eval(final IOContent query, final boolean updating, final QueryContext qc)
+      throws QueryException {
 
     // bind variables and context value
     final HashMap<String, Value> bindings = toBindings(1, qc);
@@ -141,21 +107,17 @@ public class XQueryEval extends StandardFunc {
         }, ms);
       }
 
-      // base-uri: adopt specified uri, passed on uri, or uri from parent query
-      final String bu = opts.get(XQueryOptions.BASE_URI);
-      final String uri = bu != null ? bu : path != null ? path : string(sc.baseURI().string());
-
       // evaluate query
       try {
         final StaticContext sctx = new StaticContext(qctx);
-        sctx.baseURI(uri);
+        sctx.baseURI(toBaseUri(query.url(), opts));
         for(final Entry<String, Value> it : bindings.entrySet()) {
           final String key = it.getKey();
           final Value value = it.getValue();
           if(key.isEmpty()) qctx.context(value, sctx);
           else qctx.bind(key, value, sctx);
         }
-        qctx.parseMain(string(query), null, sctx);
+        qctx.parseMain(string(query.read()), null, sctx);
 
         if(updating) {
           if(!sc.mixUpdates && !qctx.updating && !qctx.root.expr.isVacuous())

@@ -26,11 +26,10 @@ public final class QueryJobSpec {
    * @param query query string
    */
   public QueryJobSpec(final JobsOptions options, final HashMap<String, Value> bindings,
-      final String query) {
-
+      final byte[] query) {
     this.options = options;
     this.bindings = bindings;
-    this.query = query;
+    this.query = Token.string(query);
   }
 
   @Override

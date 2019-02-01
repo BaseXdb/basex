@@ -1,13 +1,11 @@
 package org.basex.query.func.jobs;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
 import java.util.Map.*;
 
-import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.query.*;
@@ -25,64 +23,36 @@ import org.basex.util.*;
 public class JobsEval extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = toItem(exprs[0], qc);
-    return item instanceof Uri ? invoke(item.string(info), qc) : eval(qc, toToken(item), null);
-  }
-
-  /**
-   * Evaluates the specified URI.
-   * @param uri URI
-   * @param qc query context
-   * @return query string
-   * @throws QueryException query exception
-   */
-  final Str invoke(final byte[] uri, final QueryContext qc) throws QueryException {
-    checkCreate(qc);
-    final IO io = checkPath(uri);
-    try {
-      return eval(qc, io.read(), io.url());
-    } catch(final IOException ex) {
-      throw IOERR_X.get(info, ex);
-    }
+    return eval(toQuery(0, qc), qc);
   }
 
   /**
    * Evaluates a query as job.
-   * @param qc query context
    * @param query query
-   * @param path path (can be {@code null})
+   * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  final Str eval(final QueryContext qc, final byte[] query, final String path)
-      throws QueryException {
-
+  final Str eval(final IOContent query, final QueryContext qc) throws QueryException {
     checkAdmin(qc);
     final HashMap<String, Value> bindings = toBindings(1, qc);
     final JobsOptions opts = toOptions(2, new JobsOptions(), qc);
+    opts.set(JobsOptions.BASE_URI, toBaseUri(query.url(), opts));
 
-    // copy variable values
-    final Context ctx = qc.context;
-    for(final Entry<String, Value> it : bindings.entrySet()) {
-      bindings.put(it.getKey(), QueryJob.materialize(it.getValue().iter(), qc));
-    }
-
-    // check if number of maximum queries has been reached
-    if(ctx.jobs.active.size() >= JobPool.MAXQUERIES) throw JOBS_OVERFLOW.get(info);
-
-    final String base = opts.get(JobsOptions.BASE_URI);
-    final String uri = base != null ? base : path != null ? path : string(sc.baseURI().string());
-    opts.set(JobsOptions.BASE_URI, uri);
-
-    final boolean service = opts.contains(JobsOptions.SERVICE) && opts.get(JobsOptions.SERVICE);
+    final boolean service = Boolean.TRUE.equals(opts.get(JobsOptions.SERVICE));
     if(service) {
       if(!bindings.isEmpty()) throw JOBS_SERVICE.get(info);
       // invalidate option (not relevant for next steps, i.e., if services are written to disk)
       opts.put(JobsOptions.SERVICE, null);
     }
 
-    final QueryJobSpec spec = new QueryJobSpec(opts, bindings, string(query));
-    final QueryJob job = new QueryJob(spec, info, qc.context);
+    // copy variable values
+    for(final Entry<String, Value> it : bindings.entrySet()) {
+      bindings.put(it.getKey(), QueryJob.materialize(it.getValue().iter(), qc));
+    }
+
+    final QueryJobSpec spec = new QueryJobSpec(opts, bindings, query.read());
+    final QueryJob job = new QueryJob(spec, info, qc.context, null);
 
     // add service
     if(service) {

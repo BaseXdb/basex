@@ -172,16 +172,20 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
       final WsFunction func = WebModules.get(context).websocket(this, ann);
       if(func != null) new WsResponse(this).create(func, message);
     } catch(final Exception ex) {
-      Util.debug(ex);
-      try {
-        // in the case of an error, inform the client about it.
-        // workflow is analogous to QueryException handling in BaseXServlet class
-        getRemote().sendString(ex.getMessage());
-      } catch(final IOException e) {
-        Util.debug(e);
-      }
-      throw ex instanceof RuntimeException ? (RuntimeException) ex :
-        new CloseException(StatusCode.ABNORMAL, ex);
+      error(ex);
+    }
+  }
+
+  /**
+   * Sends an error to the client.
+   * @param ex exception
+   */
+  public void error(final Exception ex) {
+    Util.debug(ex);
+    try {
+      getRemote().sendString(ex.getMessage());
+    } catch(final IOException e) {
+      Util.debug(e);
     }
   }
 

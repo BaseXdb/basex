@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.math.*;
 import java.util.Map.*;
+import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
@@ -22,8 +23,10 @@ import org.basex.util.*;
 public final class QueryJob extends Job implements Runnable {
   /** Result. */
   private final QueryJobResult result = new QueryJobResult(this);
-  /** Job info. */
+  /** Job specification. */
   private final QueryJobSpec job;
+  /** Notify function. */
+  private final Consumer<QueryJobResult> notify;
 
   /** Query processor. */
   private QueryProcessor qp;
@@ -35,12 +38,14 @@ public final class QueryJob extends Job implements Runnable {
    * @param job job info
    * @param info input info
    * @param ctx database context
+   * @param notify notify function (ignored if {@code null})
    * @throws QueryException query exception
    */
-  public QueryJob(final QueryJobSpec job, final InputInfo info, final Context ctx)
-      throws QueryException {
+  public QueryJob(final QueryJobSpec job, final InputInfo info, final Context ctx,
+      final Consumer<QueryJobResult> notify) throws QueryException {
 
     this.job = job;
+    this.notify = notify;
     jc().context = ctx;
 
     // check when job is to be started
@@ -69,6 +74,9 @@ public final class QueryJob extends Job implements Runnable {
 
     final JobPool jobs = ctx.jobs;
     synchronized(jobs.tasks) {
+      // check if number of maximum queries has been reached
+      if(jobs.active.size() >= JobPool.MAXQUERIES) throw JOBS_OVERFLOW.get(info);
+
       // custom job id: check if it is invalid or has already been assigned
       String id = opts.get(JobsOptions.ID);
       if(id != null) {
@@ -189,6 +197,7 @@ public final class QueryJob extends Job implements Runnable {
       }
 
       if(remove) ctx.jobs.tasks.remove(jc.id());
+      if(notify != null) notify.accept(result);
     }
   }
 

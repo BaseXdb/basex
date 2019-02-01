@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class JobsInvoke extends JobsEval {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return invoke(toToken(exprs[0], qc), qc);
+    return eval(toQuery(toToken(exprs[0], qc), qc), qc);
   }
 }

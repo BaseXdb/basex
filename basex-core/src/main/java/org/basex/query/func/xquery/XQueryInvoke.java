@@ -13,11 +13,11 @@ import org.basex.query.value.*;
 public final class XQueryInvoke extends XQueryEval {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return invoke(toToken(exprs[0], qc), false, qc).iter();
+    return eval(toQuery(toToken(exprs[0], qc), qc), false, qc).iter();
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return invoke(toToken(exprs[0], qc), false, qc).value();
+    return eval(toQuery(toToken(exprs[0], qc), qc), false, qc).value();
   }
 }

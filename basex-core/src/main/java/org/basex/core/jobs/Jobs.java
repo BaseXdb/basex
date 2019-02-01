@@ -11,7 +11,6 @@ import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -60,10 +59,7 @@ public final class Jobs {
         final byte[] qname = child.qname().id();
         if(eq(qname, JOB)) {
           final JobsOptions opts = options(child);
-          if(opts != null) {
-            final HashMap<String, Value> bindings = new HashMap<>();
-            add(new QueryJobSpec(opts, bindings, Token.string(child.string())));
-          }
+          if(opts != null) add(new QueryJobSpec(opts, new HashMap<>(), child.string()));
         } else {
           Util.errln(file + ": invalid element: %.", qname);
         }
@@ -104,7 +100,7 @@ public final class Jobs {
     for(int l = 0; l < list.size(); l++) {
       final QueryJobSpec spec = list.get(l);
       try {
-        new QueryJob(spec, null, context);
+        new QueryJob(spec, null, context, null);
       } catch(final QueryException ex) {
         // drop failing jobs
         Util.errln(ex);
