@@ -66,9 +66,10 @@ final class Unit {
   /**
    * Runs all tests.
    * @param suites root element
+   * @param listener Object receiving events from fired tests in real time
    * @throws IOException query exception
    */
-  public void test(final FElem suites) throws IOException {
+  public void test(final FElem suites, final TestEventListener listener) throws IOException {
     final FElem suite = new FElem(TESTSUITE).add(NAME, file.url());
     final ArrayList<StaticFunc> beforeModule = new ArrayList<>(0);
     final ArrayList<StaticFunc> afterModule = new ArrayList<>(0);
@@ -142,6 +143,7 @@ final class Unit {
               if(name == null || name.eq(sf.name)) eval(before.get(i));
             }
             // call function
+            listener.fireTestStarted(sf);
             eval(sf);
             // call functions marked with "after"
             l = after.size();
@@ -152,18 +154,25 @@ final class Unit {
 
             if(code != null) {
               failures++;
-              testcase.add(new FElem(FAILURE).add(new FElem(EXPECTED).add(code.prefixId())));
+              byte[] prefixId = code.prefixId();
+              testcase.add(new FElem(FAILURE).add(new FElem(EXPECTED).add(prefixId)));
+              listener.fireTestFailure(sf, prefixId);
             }
           } catch(final QueryException ex) {
             addError(ex, testcase, code);
+            listener.fireTestFailure(sf, ex, code);
           }
         } else {
           // skip test
           final Item[] iargs = ignore.args();
-          testcase.add(SKIPPED, iargs.length == 0 ? EMPTY : iargs[0].string(null));
+          final byte[] ignoreArgs = iargs.length == 0 ? EMPTY : iargs[0].string(null);
+          testcase.add(SKIPPED, ignoreArgs);
+          listener.fireTestIgnored(sf, ignoreArgs);
           skipped++;
         }
-        testcase.add(TIME, time(perf2));
+        byte[] time = time(perf2);
+        testcase.add(TIME, time);
+        listener.fireTestFinished(sf, time);
         suite.add(testcase);
       }
 
