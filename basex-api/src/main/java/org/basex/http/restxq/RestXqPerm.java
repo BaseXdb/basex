@@ -40,7 +40,7 @@ public final class RestXqPerm implements Comparable<RestXqPerm> {
    */
   static XQMap map(final RestXqFunction func, final HTTPConnection conn) throws QueryException {
     final MapBuilder mb = new MapBuilder();
-    mb.put(ALLOW, StrSeq.get(func.allows));
+    mb.put(ALLOW, StrSeq.get(func.allows.toArray()));
     mb.put(PATH, conn.path());
     mb.put(METHOD, conn.method);
     mb.put(AUTHORIZATION, conn.req.getHeader(HttpText.AUTHORIZATION));
