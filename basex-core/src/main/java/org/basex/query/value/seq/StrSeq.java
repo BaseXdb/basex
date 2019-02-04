@@ -91,6 +91,6 @@ public final class StrSeq extends NativeSeq {
         for(final Item item : value) tmp.add(item.string(null));
       }
     }
-    return get(tmp.finish());
+    return get(tmp);
   }
 }

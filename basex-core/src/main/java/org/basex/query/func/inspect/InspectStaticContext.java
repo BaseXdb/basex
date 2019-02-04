@@ -67,10 +67,10 @@ public final class InspectStaticContext extends StandardFunc {
       case BOUNDARY_SPACE:
         return Str.get(sctx.spaces ? PRESERVE : STRIP);
       case COPY_NAMESPACES:
-        final TokenList sl = new TokenList(2);
-        sl.add(sctx.preserveNS ? PRESERVE : NO_PRESERVE);
-        sl.add(sctx.inheritNS ? INHERIT : NO_INHERIT);
-        return StrSeq.get(sl);
+        final TokenList tl = new TokenList(2);
+        tl.add(sctx.preserveNS ? PRESERVE : NO_PRESERVE);
+        tl.add(sctx.inheritNS ? INHERIT : NO_INHERIT);
+        return StrSeq.get(tl);
       case DECIMAL_FORMATS:
         map = XQMap.EMPTY;
         // enforce creation of default formatter

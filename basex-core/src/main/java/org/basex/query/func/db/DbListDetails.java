@@ -55,7 +55,7 @@ public final class DbListDetails extends DbList {
           // count number of raw files
           final int bin = new IOFile(ctx.soptions.dbPath(name), IO.RAW).descendants().size();
           database.add(RESOURCES, token(meta.ndocs + bin));
-          database.add(MDATE, DateTime.format(new Date(meta.dbtime())));
+          database.add(MODIFIED_DATE, DateTime.format(new Date(meta.dbtime())));
           database.add(SIZE, token(meta.dbsize()));
           if(ctx.perm(Perm.CREATE, name)) database.add(PATH, meta.original);
         } catch(final IOException ignore) {

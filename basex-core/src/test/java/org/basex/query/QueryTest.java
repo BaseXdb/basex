@@ -109,7 +109,7 @@ public abstract class QueryTest extends SandboxTest {
   protected static Value strings(final String... strings) {
     final TokenList tl = new TokenList(strings.length);
     for(final String s : strings) tl.add(s);
-    return StrSeq.get(tl.finish());
+    return StrSeq.get(tl);
   }
 
   /**

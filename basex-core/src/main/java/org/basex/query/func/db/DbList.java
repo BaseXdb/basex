@@ -37,9 +37,9 @@ public class DbList extends DbFn {
   /** Size. */
   static final String SIZE = "size";
   /** Content type. */
-  static final String CTYPE = "content-type";
+  static final String CONTENT_TYPE = "content-type";
   /** Modified date. */
-  static final String MDATE = "modified-date";
+  static final String MODIFIED_DATE = "modified-date";
   /** Directory flag. */
   static final String DIR = "dir";
 
@@ -114,7 +114,7 @@ public class DbList extends DbFn {
    */
   static FNode dir(final byte[] path, final long mdate) {
     final FElem dir = new FElem(DIR);
-    dir.add(path).add(MDATE, DateTime.format(new Date(mdate)));
+    dir.add(path).add(MODIFIED_DATE, DateTime.format(new Date(mdate)));
     return dir;
   }
 
@@ -132,8 +132,8 @@ public class DbList extends DbFn {
 
     final FElem resource = new FElem(RESOURCE).add(path);
     resource.add(RAW, token(raw));
-    resource.add(CTYPE, type.toString());
-    resource.add(MDATE, DateTime.format(new Date(mdate)));
+    resource.add(CONTENT_TYPE, type.toString());
+    resource.add(MODIFIED_DATE, DateTime.format(new Date(mdate)));
     if(size != null) resource.add(SIZE, token(size));
     return resource;
   }
