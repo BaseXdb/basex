@@ -445,7 +445,7 @@ public final class HTTPConnection implements ClientInfo {
   private void status(final int code, final String message, final String info) throws IOException {
     try {
       res.resetBuffer();
-      if(code == SC_UNAUTHORIZED) {
+      if(code == SC_UNAUTHORIZED && !res.containsHeader(WWW_AUTHENTICATE)) {
         final TokenBuilder header = new TokenBuilder();
         header.add(auth).add(' ').add(Request.REALM).add("=\"").add(Prop.NAME).add('"');
         if(auth == AuthMethod.DIGEST) {
