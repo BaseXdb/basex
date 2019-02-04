@@ -44,7 +44,7 @@ declare %private function util:query-options() as map(*) {
     'timeout'   : options:get($options:TIMEOUT),
     'memory'    : options:get($options:MEMORY),
     'permission': options:get($options:PERMISSION),
-    'base-uri'  : session:directory()
+    'base-uri'  : session:directory() || '/' || session:get($session:QUERY)
   }
 };
 
