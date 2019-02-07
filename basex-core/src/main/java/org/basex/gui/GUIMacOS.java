@@ -1,6 +1,5 @@
 package org.basex.gui;
 
-import java.awt.*;
 import org.basex.util.*;
 
 /**
@@ -26,7 +25,7 @@ public abstract class GUIMacOS {
    * @param main reference to main window
    * @return class instance, or {@code null} if no instance could be created
    */
-  static GUIMacOS get(final GUI main) {
+  static GUIMacOS init(final GUI main) {
     try {
       // show menu in the screen menu instead of inside the application window
       System.setProperty(P_SCREEN_MENU_BAR, "true");
@@ -45,40 +44,4 @@ public abstract class GUIMacOS {
   GUIMacOS(final GUI main) {
     this.main = main;
   }
-
-  /**
-   * Determines native full screen support.
-   * @return full screen support
-   */
-  public static boolean nativeFullscreen() {
-    if(Prop.JAVA8) {
-      try {
-        Class.forName("com.apple.eawt.FullScreenUtilities");
-      } catch(final ClassNotFoundException ex) {
-        Util.debug(ex);
-        return false;
-      }
-    }
-    return true;
-  }
-
-  // ABSTRACT METHODS =============================================================================
-
-  /**
-   * Sets a value for the badge in the dock.
-   * @param value string value
-   * @throws Exception if any error occurs
-   */
-  public abstract void setBadge(String value) throws Exception;
-
-  /**
-   * Initializes macOS-specific settings.
-   */
-  public abstract void init();
-
-  /**
-   * Enables native full screen.
-   * @param window the window
-   */
-  public abstract void enableOSXFullscreen(Window window);
 }
