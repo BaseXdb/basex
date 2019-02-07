@@ -106,8 +106,6 @@ public final class GUI extends JFrame implements BaseXWindow {
   private int menuHeight;
   /** Fullscreen Window. */
   private JFrame fullscr;
-  /** Custom macOS optimizations. */
-  private GUIMacOS osxGUI;
 
   /** Password reader. */
   private static volatile PasswordReader pwReader;
@@ -121,7 +119,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     this.context = context;
     this.gopts = gopts;
 
-    if(Prop.MAC) osxGUI = GUIMacOS.get(this);
+    if(Prop.MAC) GUIMacOS.init(this);
     setIconImage(BaseXImages.get("logo_64"));
     setTitle();
 
@@ -145,7 +143,6 @@ public final class GUI extends JFrame implements BaseXWindow {
 
     // add menu bar
     menu = new GUIMenu(this);
-    if(osxGUI != null) osxGUI.init();
     setJMenuBar(menu);
 
     buttons = new BaseXBack(new BorderLayout());

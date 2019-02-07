@@ -66,28 +66,11 @@ public final class GUIMacOSX extends GUIMacOS {
   }
 
   /**
-   * Initializes this mac gui with the main gui. Has to be called
-   * immediately after creating the gui.
-   */
-  @Override
-  public void init() { /* NOT IMPLEMENTED */ }
-
-  /**
    * Adds the project icon to the dock.
    * @throws Exception if any error occurs.
    */
   private void addDockIcon() throws Exception {
     invoke(appObj, "setDockIconImage", Image.class, BaseXImages.get("logo_256"));
-  }
-
-  /**
-   * Sets a value for the badge in the dock.
-   * @param value string value
-   * @throws Exception if any error occurs
-   */
-  @Override
-  public void setBadge(final String value) throws Exception {
-    invoke(appObj, "setDockIconBadge", String.class, value);
   }
 
   /**
@@ -183,17 +166,6 @@ public final class GUIMacOSX extends GUIMacOS {
     public void handleReOpenApplication() {
       if(main != null) main.setVisible(true);
     }
-  }
-
-  @Override
-  public void enableOSXFullscreen(final Window window) {
-    if(window == null) return;
-    try {
-      final Class<?> util = Class.forName("com.apple.eawt.FullScreenUtilities");
-      final Class<?>[] params = { Window.class, Boolean.TYPE };
-      final Method method = util.getMethod("setWindowCanFullScreen", params);
-      method.invoke(util, window, true);
-    } catch(final Exception ex) { Util.debug(ex); }
   }
 
   /**
