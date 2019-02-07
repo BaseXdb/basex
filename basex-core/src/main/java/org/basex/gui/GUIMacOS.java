@@ -23,17 +23,16 @@ public abstract class GUIMacOS {
   /**
    * Creates a Java-specific instance of this class.
    * @param main reference to main window
-   * @return class instance, or {@code null} if no instance could be created
    */
-  static GUIMacOS init(final GUI main) {
+  static void init(final GUI main) {
     try {
       // show menu in the screen menu instead of inside the application window
       System.setProperty(P_SCREEN_MENU_BAR, "true");
-      return Prop.JAVA8 ? new GUIMacOSX(main) : new GUIMacOSX9(main);
+      if(Prop.JAVA8) new GUIMacOSX(main);
+      else new GUIMacOSX9(main);
     } catch(final Exception ex) {
       Util.errln("Failed to initialize native Mac OS X interface:");
       Util.stack(ex);
-      return null;
     }
   }
 

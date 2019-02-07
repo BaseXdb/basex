@@ -60,7 +60,7 @@ public final class GUIMacOSX extends GUIMacOS {
       final Class<?> alc = Class.forName(C_APPLICATION_LISTENER);
       final Object listener = Proxy.newProxyInstance(
           Thread.currentThread().getContextClassLoader(),
-          new Class[] { alc}, new AppInvocationHandler());
+          new Class[] { alc }, new AppInvocationHandler());
       invoke(appObj, "addApplicationListener", alc, listener);
     }
   }

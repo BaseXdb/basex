@@ -1,10 +1,8 @@
 package org.basex.gui;
 
 import java.awt.*;
-//import java.awt.desktop.*;
 import java.lang.reflect.*;
 
-import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
 
 /**
@@ -24,19 +22,18 @@ public final class GUIMacOSX9 extends GUIMacOS implements InvocationHandler {
   GUIMacOSX9(final GUI main) throws Exception {
     super(main);
 
-    Desktop d = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
-
-    //tb = Taskbar.isTaskbarSupported() ? Taskbar.getTaskbar() : null;
-    Class<?> tbClass = Class.forName("java.awt.Taskbar");
-    Object tb = tbClass.getMethod("getTaskbar").invoke(null);
-
     final Class<?> aboutHandler = Class.forName("java.awt.desktop.AboutHandler");
     final Class<?> prefHandler = Class.forName("java.awt.desktop.PreferencesHandler");
-    final Object proxy = Proxy.newProxyInstance(GUIMacOSX9.class.getClassLoader(),
-        new Class<?>[] { aboutHandler, prefHandler}, this);
-    d.getClass().getDeclaredMethod("setAboutHandler", aboutHandler).invoke(d, proxy);
-    d.getClass().getDeclaredMethod("setPreferencesHandler", prefHandler).invoke(d, proxy);
+    final Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(),
+        new Class<?>[] { aboutHandler, prefHandler }, this);
 
+    final Class<?> d = Desktop.getDesktop().getClass();
+    d.getDeclaredMethod("setAboutHandler", aboutHandler).invoke(d, proxy);
+    d.getDeclaredMethod("setPreferencesHandler", prefHandler).invoke(d, proxy);
+
+    //tb = Taskbar.isTaskbarSupported() ? Taskbar.getTaskbar() : null;
+    final Class<?> tbClass = Class.forName("java.awt.Taskbar");
+    final Object tb = tbClass.getMethod("getTaskbar").invoke(null);
     tbClass.getMethod("setIconImage", Image.class).invoke(tb, BaseXImages.get("logo_256"));
   }
 
@@ -49,10 +46,11 @@ public final class GUIMacOSX9 extends GUIMacOS implements InvocationHandler {
   //public void handleAbout(final AboutEvent e) {
   //  new DialogAbout(main);
   //}
-@Override
+  @Override
   public Object invoke(final Object proxy, final Method method, final Object[] args) {
-    if("handleAbout".equals(method.getName())) new DialogAbout(main);
-    if("handlePreferences".equals(method.getName())) DialogPrefs.show(main);
+    final String name = method.getName();
+    if(name.equals("handleAbout")) GUIMenuCmd.C_ABOUT.execute(main);
+    if(name.equals("handlePreferences")) GUIMenuCmd.C_PREFS.execute(main);
     return null;
   }
 }

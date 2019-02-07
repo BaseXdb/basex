@@ -20,12 +20,15 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DialogAbout extends BaseXDialog {
+  /** Dialog. */
+  private static DialogAbout dialog;
+
   /**
    * Default constructor.
    * @param gui reference to the main window
    */
-  public DialogAbout(final GUI gui) {
-    super(gui, ABOUT);
+  private DialogAbout(final GUI gui) {
+    super(gui, ABOUT, false);
 
     BaseXBack p = new BaseXBack(new BorderLayout(12, 0));
     p.setBorder(new CompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
@@ -66,5 +69,14 @@ public final class DialogAbout extends BaseXDialog {
     add(p, BorderLayout.EAST);
 
     finish();
+  }
+
+  /**
+   * Activates the dialog window.
+   * @param gui reference to the main window
+   */
+  public static void show(final GUI gui) {
+    if(dialog == null) dialog = new DialogAbout(gui);
+    dialog.setVisible(true);
   }
 }

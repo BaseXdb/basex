@@ -817,7 +817,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_ABOUT(ABOUT + DOTS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
-      new DialogAbout(gui);
+      DialogAbout.show(gui);
     }
   },
 
