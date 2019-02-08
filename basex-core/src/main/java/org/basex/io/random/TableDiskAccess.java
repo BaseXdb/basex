@@ -242,11 +242,11 @@ public final class TableDiskAccess extends TableAccess {
     int from = pre - firstPre;
     final int last = pre + nr;
 
-    // check if all entries are in current page: handle and return
-    if(last - 1 < nextPre) {
-      final Buffer bf = bm.current();
-      copy(bf.data, from + nr, bf.data, from, nextPre - last);
-      updatePre(nr);
+    // check if all entries are in current page
+    if(last <= nextPre) {
+      // move entries in current page and decreases pointers to pre values
+      if(last < nextPre) delete(bm.current(), from, from + nr, nextPre - last);
+      decreasePre(nr);
 
       // if whole page was deleted, remove it from the index
       if(nextPre == firstPre) {
@@ -265,7 +265,7 @@ public final class TableDiskAccess extends TableAccess {
 
     // first count them
     int unused = 0;
-    while(nextPre < last) {
+    while(last > nextPre) {
       if(from == 0) {
         ++unused;
         // mark the pages as empty; range clear cannot be used because the
@@ -279,14 +279,14 @@ public final class TableDiskAccess extends TableAccess {
     // if the last page is empty, clear the corresponding bit
     read(pages[page]);
     final Buffer bf = bm.current();
-    if(nextPre == last) {
+    if(last == nextPre) {
       usedPages.clear((int) bf.pos);
       ++unused;
-      if(page < used - 1) readPage(page + 1);
+      if(page + 1 < used) readPage(page + 1);
       else ++page;
     } else {
       // delete entries at beginning of current (last) page
-      copy(bf.data, last - firstPre, bf.data, 0, nextPre - last);
+      delete(bf, 0, last - firstPre, nextPre - last);
     }
 
     // now remove them from the index
@@ -300,7 +300,7 @@ public final class TableDiskAccess extends TableAccess {
     // update index entry for this page
     fpres[page] = pre;
     firstPre = pre;
-    updatePre(nr);
+    decreasePre(nr);
   }
 
   @Override
@@ -420,16 +420,23 @@ public final class TableDiskAccess extends TableAccess {
   protected void dirty() {
     // initialize data structures required for performing updates
     if(fpres == null) {
-      final int b = size;
-      fpres = new int[b];
-      pages = new int[b];
-      for(int i = 0; i < b; i++) {
-        fpres[i] = i * IO.ENTRIES;
-        pages[i] = i;
-      }
+      fpres = new int[size];
+      for(int i = 0; i < size; i++) fpres[i] = i * IO.ENTRIES;
+      pages = new int[size];
+      for(int i = 0; i < size; i++) pages[i] = i;
       usedPages = new BitArray(used, true);
     }
     dirty = true;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(Util.className(this) + " (");
+    sb.append("size: " + size + ", used: " + used + ")");
+    if(fpres != null) sb.append("\nFPres: " + Arrays.toString(fpres));
+    if(pages != null) sb.append("\nPages: " + Arrays.toString(pages));
+    if(usedPages != null) sb.append("\nUsed Pages: " + usedPages);
+    return sb.toString();
   }
 
   // PRIVATE METHODS ==============================================================================
@@ -547,27 +554,27 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Updates the firstPre index entries.
+   * Decreases pointers to pre value.
    * @param nr number of entries to move
    */
-  private void updatePre(final int nr) {
-    // update index entries for all following pages and reduce counter
-    for(int i = page + 1; i < used; ++i) fpres[i] -= nr;
+  private void decreasePre(final int nr) {
+    final int nextPage = page + 1;
+    for(int i = nextPage; i < used; ++i) fpres[i] -= nr;
     meta.size -= nr;
-    nextPre = page + 1 < used && fpres[page + 1] < meta.size ? fpres[page + 1] : meta.size;
+    nextPre = nextPage < used && fpres[nextPage] < meta.size ? fpres[nextPage] : meta.size;
   }
 
   /**
-   * Convenience method for copying pages.
-   * @param s source array
-   * @param sp source position
-   * @param d destination array
-   * @param dp destination position
+   * Convenience method for delete buffer entries.
+   * @param buffer buffer
+   * @param from first entry to delete
+   * @param to last entry to delete
    * @param l source length
    */
-  private void copy(final byte[] s, final int sp, final byte[] d, final int dp, final int l) {
-    Array.copy(s, sp << IO.NODEPOWER, l << IO.NODEPOWER, d, dp << IO.NODEPOWER);
-    bm.current().dirty = true;
+  private void delete(final Buffer buffer, final int from, final int to, final int l) {
+    final byte[] array = buffer.data;
+    Array.copy(array, to << IO.NODEPOWER, l << IO.NODEPOWER, array, from << IO.NODEPOWER);
+    buffer.dirty = true;
   }
 
   /**

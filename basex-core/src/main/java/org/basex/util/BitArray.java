@@ -185,4 +185,11 @@ public final class BitArray {
   private void resize(final int s) {
     words = Arrays.copyOf(words, Math.max(words.length << 1, s));
   }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("BitArray. Size: " + size + ", Entries: ");
+    for(final long w : words) sb.append(Long.toBinaryString(w) + ' ');
+    return sb.toString();
+  }
 }
