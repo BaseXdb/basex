@@ -813,7 +813,7 @@ public abstract class Data {
     nsScope.close();
 
     // write final entries and reset buffer
-    if(bp != 0) insert(pre + c - 1 - (c - 1) % bSize);
+    if(bufferPos != 0) insert(pre + c - 1 - (c - 1) % bSize);
     bufferSize(1);
 
     // increase size of ancestors
@@ -935,9 +935,9 @@ public abstract class Data {
   // INSERTS WITHOUT TABLE UPDATES ================================================================
 
   /** Buffer for caching new table entries. */
-  private byte[] b = new byte[IO.NODESIZE];
+  private byte[] buffer = new byte[IO.NODESIZE];
   /** Buffer position. */
-  private int bp;
+  private int bufferPos;
 
   /**
    * Sets the update buffer to a new size.
@@ -945,7 +945,7 @@ public abstract class Data {
    */
   private void bufferSize(final int size) {
     final int bs = size << IO.NODEPOWER;
-    if(b.length != bs) b = new byte[bs];
+    if(buffer.length != bs) buffer = new byte[bs];
   }
 
   /**
@@ -1023,7 +1023,7 @@ public abstract class Data {
    * @param value value to be stored
    */
   private void s(final int value) {
-    b[bp++] = (byte) value;
+    buffer[bufferPos++] = (byte) value;
   }
 
   /**
@@ -1039,7 +1039,7 @@ public abstract class Data {
    * @param value value to be stored
    */
   private void s(final long value) {
-    b[bp++] = (byte) value;
+    buffer[bufferPos++] = (byte) value;
   }
 
   /**
@@ -1047,8 +1047,8 @@ public abstract class Data {
    * @return byte buffer
    */
   private byte[] buffer() {
-    final byte[] bb = bp == b.length ? b : Arrays.copyOf(b, bp);
-    bp = 0;
+    final byte[] bb = bufferPos == buffer.length ? buffer : Arrays.copyOf(buffer, bufferPos);
+    bufferPos = 0;
     return bb;
   }
 

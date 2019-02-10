@@ -23,7 +23,7 @@ public final class TableOutput extends OutputStream {
   /** Current filename. */
   private final String file;
 
-  /** Position inside buffer. */
+  /** Current buffer position. */
   private int pos;
   /** Number of pages. */
   private int pages;
@@ -43,13 +43,15 @@ public final class TableOutput extends OutputStream {
 
   @Override
   public void write(final int b) throws IOException {
-    if(pos == IO.BLOCKSIZE) flush();
+    if(pos == IO.BLOCKSIZE) writeBuffer();
     buffer[pos++] = (byte) b;
   }
 
-  @Override
-  public void flush() throws IOException {
-    if(pos == 0) return;
+  /**
+   * Writes a page to disk.
+   * @throws IOException I/O exception
+   */
+  private void writeBuffer() throws IOException {
     os.write(buffer);
     pages++;
     pos = 0;
@@ -57,16 +59,16 @@ public final class TableOutput extends OutputStream {
 
   @Override
   public void close() throws IOException {
-    // store at least one page on disk
+    // write at least one page on disk
     final boolean empty = pages == 0 && pos == 0;
-    if(empty) pos++;
-    flush();
+    if(empty || pos > 0) writeBuffer();
     os.close();
 
     // create table info file
     try(DataOutput out = new DataOutput(meta.dbfile(file + 'i'))) {
+      // total number of pages
       out.writeNum(pages);
-      // max value indicates that regular page table is not stored on disk
+      // number of used pages (0: no table entries; max: no page mapping)
       out.writeNum(empty ? 0 : Integer.MAX_VALUE);
     }
   }
