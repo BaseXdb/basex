@@ -286,6 +286,11 @@ public final class TableDiskAccess extends TableAccess {
       firstPre = pre;
       decreasePre(nr);
     }
+    if(used == 0) {
+      fPreIndex = null;
+      pageIndex = null;
+      pages = 1;
+    }
   }
 
   @Override
