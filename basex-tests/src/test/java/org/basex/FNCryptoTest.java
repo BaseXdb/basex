@@ -3,7 +3,6 @@ package org.basex;
 import static org.junit.Assert.*;
 
 import java.io.*;
-import java.security.*;
 
 import org.basex.core.*;
 import org.basex.io.serial.*;
@@ -74,30 +73,6 @@ public final class FNCryptoTest extends SandboxTest {
     query("crypto:validate-signature(crypto:generate-signature(<a><n/></a>," +
         "'exclusive','SHA512','RSA_SHA1','myPrefix','enveloped','/a/n'," + CT +
         "))", "true");
-  }
-
-  /**
-  * Test method for crypto:encrypt and crypto:decrypt with asymmetric keys.
-  */
-  @Test
-  public void encryptionAsym1() {
-   final String msg = "messagemessagemessagemessagemessagemessagemessage";
-
-   PublicKey puk = null;
-   PrivateKey prk = null;
-   try {
-
-     final KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
-     final KeyPair kp = gen.generateKeyPair();
-     puk = kp.getPublic();
-     prk = kp.getPrivate();
-
-   } catch(final NoSuchAlgorithmException e) {
-     e.printStackTrace();
-   }
-
-   query("let $e := crypto:encrypt('" + msg + "','asymmetric','" + prk + "','RSA')" +
-       "return crypto:decrypt($e,'asymmetric','" + puk + "','RSA')", msg);
   }
 
   /**

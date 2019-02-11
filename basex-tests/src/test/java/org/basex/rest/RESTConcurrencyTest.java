@@ -29,7 +29,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
   private static BaseXHTTP http;
 
   /** Time-out in (ms): increase if running on a slower system. */
-  private static final long TIMEOUT = 600;
+  private static final long TIMEOUT = 2000;
   /** Socket time-out in (ms). */
   private static final int SOCKET_TIMEOUT = 3000;
   /** BaseX HTTP base URL. */
@@ -327,9 +327,9 @@ public final class RESTConcurrencyTest extends SandboxTest {
     NOT_FOUND(403, "Not Found");
 
     /** HTTP response code. */
-    public final int code;
+    private final int code;
     /** HTTP response message. */
-    public final String message;
+    private final String message;
 
     /**
      * Constructor.
