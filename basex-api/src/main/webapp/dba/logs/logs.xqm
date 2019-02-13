@@ -27,8 +27,11 @@ function dba:jump-page(
   $time  as xs:string
 ) as element(rest:response) {
   let $page := head((
+    let $ignore-logs := options:get($options:IGNORE-LOGS)
     let $max := options:get($options:MAXROWS)
-    for $log at $pos in reverse(admin:logs($name, true()))
+    for $log at $pos in reverse(
+      admin:logs($name, true())[not($ignore-logs and matches(., $ignore-logs, 'i'))]
+    )
     where $log/@time = $time
     return ($pos - 1) idiv $max + 1,
     1
