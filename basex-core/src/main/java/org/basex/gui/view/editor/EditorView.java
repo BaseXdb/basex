@@ -561,7 +561,8 @@ public final class EditorView extends View {
         // execute query
         final XQuery cmd = new XQuery(input);
         if(doc != null) cmd.bind(null, doc);
-        gui.execute(true, cmd.baseURI(file.path()));
+        // file was saved: assign file path as base URI. otherwise, assign current query directory
+        gui.execute(true, cmd.baseURI(editor.opened() ? file.path() : file.dir()));
         execFile = file;
       } else {
         // parse: replace empty query with empty sequence (suppresses errors for plain text files)
