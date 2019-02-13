@@ -28,7 +28,7 @@ public final class WsEval extends WsFn {
     opts.set(JobsOptions.BASE_URI, toBaseUri(query.url(), wo));
     opts.set(JobsOptions.ID, wo.get(WsOptions.ID));
 
-    final QueryJobSpec spec = new QueryJobSpec(opts, bindings, query.read());
+    final QueryJobSpec spec = new QueryJobSpec(opts, bindings, query);
     final WebSocket ws = ws(qc);
     final Consumer<QueryJobResult> notify = result -> {
       try {

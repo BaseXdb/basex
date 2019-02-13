@@ -51,7 +51,7 @@ public class JobsEval extends StandardFunc {
       bindings.put(it.getKey(), QueryJob.materialize(it.getValue().iter(), qc));
     }
 
-    final QueryJobSpec spec = new QueryJobSpec(opts, bindings, query.read());
+    final QueryJobSpec spec = new QueryJobSpec(opts, bindings, query);
     final QueryJob job = new QueryJob(spec, info, qc.context, null);
 
     // add service

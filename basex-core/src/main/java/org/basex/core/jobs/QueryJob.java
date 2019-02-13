@@ -223,7 +223,6 @@ public final class QueryJob extends Job implements Runnable {
 
   @Override
   public String toString() {
-    final String uri = job.options.get(JobsOptions.BASE_URI);
-    return uri == null || uri.isEmpty() ? job.query : uri;
+    return job.simple ? job.query : job.options.get(JobsOptions.BASE_URI);
   }
 }

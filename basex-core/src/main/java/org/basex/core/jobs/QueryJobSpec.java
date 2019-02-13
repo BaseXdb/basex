@@ -2,6 +2,7 @@ package org.basex.core.jobs;
 
 import java.util.*;
 
+import org.basex.io.*;
 import org.basex.query.value.*;
 import org.basex.util.*;
 
@@ -18,18 +19,21 @@ public final class QueryJobSpec {
   public final JobsOptions options;
   /** Query. */
   public final String query;
+  /** Simple query without URI. */
+  public final boolean simple;
 
   /**
    * Constructor.
    * @param options options
    * @param bindings variable bindings
-   * @param query query string
+   * @param io query
    */
   public QueryJobSpec(final JobsOptions options, final HashMap<String, Value> bindings,
-      final byte[] query) {
+      final IOContent io) {
     this.options = options;
     this.bindings = bindings;
-    this.query = Token.string(query);
+    this.query = Token.string(io.read());
+    this.simple = io.url().isEmpty();
   }
 
   @Override

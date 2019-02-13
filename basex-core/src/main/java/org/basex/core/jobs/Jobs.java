@@ -59,7 +59,9 @@ public final class Jobs {
         final byte[] qname = child.qname().id();
         if(eq(qname, JOB)) {
           final JobsOptions opts = options(child);
-          if(opts != null) add(new QueryJobSpec(opts, new HashMap<>(), child.string()));
+          if(opts != null) {
+            add(new QueryJobSpec(opts, new HashMap<>(), new IOContent(child.string())));
+          }
         } else {
           Util.errln(file + ": invalid element: %.", qname);
         }
