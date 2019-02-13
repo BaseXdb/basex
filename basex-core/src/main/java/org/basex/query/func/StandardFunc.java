@@ -327,7 +327,7 @@ public abstract class StandardFunc extends Arr {
    * Evaluates the specified URI.
    * @param path custom path
    * @param options options with base-uri property
-   * @return query string
+   * @return base URI
    */
   protected final String toBaseUri(final String path, final Options options) {
     final String base = options.get(XQueryOptions.BASE_URI);
