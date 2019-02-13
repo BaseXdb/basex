@@ -83,7 +83,7 @@ public final class StaticOptions extends Options {
   /** Minimum timeout for parsing RESTXQ files. */
   public static final NumberOption PARSERESTXQ = new NumberOption("PARSERESTXQ", 3);
   /** Show errors in RESTXQ directory. */
-  public static final BooleanOption RESTXQERRORS = new BooleanOption("RESTXQERRORS", false);
+  public static final BooleanOption RESTXQERRORS = new BooleanOption("RESTXQERRORS", true);
   /** Local (embedded) mode. */
   public static final BooleanOption HTTPLOCAL = new BooleanOption("HTTPLOCAL", false);
   /** Port for stopping the web server. */
