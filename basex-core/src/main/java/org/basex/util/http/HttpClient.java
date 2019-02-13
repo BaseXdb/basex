@@ -116,7 +116,7 @@ public final class HttpClient {
     if(am == AuthMethod.BASIC) {
       if(challenge) {
         // send challenge, create new connection
-        if(challenge(conn, am) == null) return null;
+        if(challenge(conn, am) == null) return conn;
         conn = connection(url, request);
       }
       // send credentials
@@ -124,7 +124,7 @@ public final class HttpClient {
 
     } else if(am == AuthMethod.DIGEST) {
       final EnumMap<Request, String> map = challenge(conn, am);
-      if(map == null) return null;
+      if(map == null) return conn;
 
       // generate authorization string
       final String
