@@ -2,6 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
+import static org.junit.Assert.*;
 
 import org.basex.*;
 import org.junit.*;
@@ -23,127 +24,6 @@ public final class ValidateModuleTest extends SandboxTest {
   private static final String DTD = DIR + "validate.dtd";
   /** Test file. */
   private static final String INPUT = DIR + "input.xml";
-
-  /** Test method. */
-  @Test public void xsd() {
-    final Function func = _VALIDATE_XSD;
-    // specify arguments as file paths
-    query(func.args(FILE, XSD), "");
-    // specify arguments as document nodes
-    query(func.args(" doc(\"" + FILE + "\")", " doc(\"" + XSD + "\")"), "");
-    // specify arguments as file contents
-    query(func.args(_FILE_READ_TEXT.args(FILE), _FILE_READ_TEXT.args(XSD)), "");
-    // specify version
-    query(func.args(FILE, XSD, "1.0"), "");
-    // specify main-memory fragments as arguments
-    query(
-      "let $doc := <root/> " +
-      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
-      "<xs:element name='root'/> " +
-      "</xs:schema> " +
-      "return validate:xsd($doc, $schema)", "");
-
-    // invalid arguments
-    error(func.args("unknown"), WHICHRES_X);
-    error(func.args(FILE, "unknown.xsd"), WHICHRES_X);
-    error(func.args(FILE, XSD, "0.99"), VALIDATE_VERSION_X);
-    error(func.args(FILE), VALIDATE_ERROR_X);
-    error(
-      "let $doc := <root/> " +
-      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
-      "<xs:element name='unknown'/> " +
-      "</xs:schema> " +
-      "return validate:xsd($doc, $schema)", VALIDATE_ERROR_X);
-  }
-
-  /** Test method. */
-  @Test public void xsdInfo() {
-    final Function func = _VALIDATE_XSD_INFO;
-    // specify arguments as file paths
-    query(func.args(FILE, XSD), "");
-    // specify arguments as document nodes
-    query(func.args(" doc(\"" + FILE + "\")", " doc(\"" + XSD + "\")"), "");
-    // specify arguments as file contents
-    query(func.args(_FILE_READ_TEXT.args(FILE), _FILE_READ_TEXT.args(XSD)), "");
-    // specify version
-    query(func.args(FILE, XSD, "1.0"), "");
-    // specify main-memory fragments as arguments
-    query(
-      "let $doc := <root/> " +
-      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
-      "<xs:element name='root'/> " +
-      "</xs:schema> " +
-      "return " + func.args(" $doc", " $schema"), "");
-
-    // returned error
-    query("exists(" + func.args(FILE) + ')', true);
-    query("exists(" +
-      "let $doc := <root/> " +
-      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
-      "<xs:element name='unknown'/> " +
-      "</xs:schema> " +
-      "return " + func.args(" $doc", " $schema") + ')', true);
-
-    // invalid arguments
-    error(func.args("unknown"), WHICHRES_X);
-    error(func.args(FILE, "unknown.xsd"), WHICHRES_X);
-    error(func.args(FILE, XSD, "0.99"), VALIDATE_VERSION_X);
-  }
-
-  /** Test method. */
-  @Test public void xsdReport() {
-    final Function func = _VALIDATE_XSD_REPORT;
-    // check XML result
-    query(func.args(FILE, XSD), "<report>\n<status>valid</status>\n</report>");
-    // specify arguments as file paths
-    query(func.args(FILE, XSD) + "//status/string()", "valid");
-    // specify arguments as document nodes
-    query(func.args(" doc(\"" + FILE + "\")", " doc(\"" + XSD + "\")") +
-        "//status/string()", "valid");
-    // specify arguments as file contents
-    query(func.args(_FILE_READ_TEXT.args(FILE), _FILE_READ_TEXT.args(XSD)) +
-        "//status/string()", "valid");
-    // check XML result
-    query(func.args(FILE, XSD, "1.0"), "<report>\n<status>valid</status>\n</report>");
-    // specify main-memory fragments as arguments
-    query(
-      "let $doc := <root/> " +
-      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
-      "                 <xs:element name='root'/> " +
-      "               </xs:schema> " +
-      "return " + func.args(" $doc", " $schema") + "//status/string()", "valid");
-
-    // returned error
-    query(func.args(FILE) + "//status/string()", "invalid");
-    query(
-      "let $doc := <root/> " +
-      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
-      "                 <xs:element name='unknown'/> " +
-      "               </xs:schema> " +
-      "return " + func.args(" $doc", " $schema") + "//status/string()", "invalid");
-
-    // check XML result
-    query(
-      "let $doc := <root/> " +
-      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
-      "                 <xs:element name='unknown'/> " +
-      "               </xs:schema> " +
-      "let $report := " + func.args(" $doc", " $schema") +
-      "return $report update (" +
-      "  delete node .//message/text()," +
-      "  for $a in .//@* return replace value of node $a with ''" +
-        ')',
-      "<report>\n<status>invalid</status>\n" +
-      "<message level=\"\" line=\"\" column=\"\"/>\n" +
-      "</report>");
-    // check URL attribute
-    query("exists(" + func.args(INPUT, XSD) + "//@url)", true);
-
-    // invalid arguments
-    error(func.args("unknown"), WHICHRES_X);
-    error(func.args(FILE, "unknown.xsd"), WHICHRES_X);
-    error(func.args(FILE, XSD, "0.99"), VALIDATE_VERSION_X);
-  }
 
   /** Test method. */
   @Test public void dtd() {
@@ -243,5 +123,131 @@ public final class ValidateModuleTest extends SandboxTest {
     // invalid arguments
     error(func.args("unknown"), WHICHRES_X);
     error(func.args(FILE, "unknown.dtd"), WHICHRES_X);
+  }
+
+  /** Test method. */
+  @Test public void xsd() {
+    final Function func = _VALIDATE_XSD;
+    // specify arguments as file paths
+    query(func.args(FILE, XSD), "");
+    // specify arguments as document nodes
+    query(func.args(" doc(\"" + FILE + "\")", " doc(\"" + XSD + "\")"), "");
+    // specify arguments as file contents
+    query(func.args(_FILE_READ_TEXT.args(FILE), _FILE_READ_TEXT.args(XSD)), "");
+    // specify main-memory fragments as arguments
+    query(
+      "let $doc := <root/> " +
+      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
+      "<xs:element name='root'/> " +
+      "</xs:schema> " +
+      "return validate:xsd($doc, $schema)", "");
+
+    // invalid arguments
+    error(func.args("unknown"), WHICHRES_X);
+    error(func.args(FILE, "unknown.xsd"), WHICHRES_X);
+    // specify option
+    error(func.args(FILE, XSD, " map { 'unknown-argument': true() }"), VALIDATE_ERROR_X);
+    error(func.args(FILE), VALIDATE_ERROR_X);
+    error(
+      "let $doc := <root/> " +
+      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
+      "<xs:element name='unknown'/> " +
+      "</xs:schema> " +
+      "return validate:xsd($doc, $schema)", VALIDATE_ERROR_X);
+  }
+
+  /** Test method. */
+  @Test public void xsdInfo() {
+    final Function func = _VALIDATE_XSD_INFO;
+    // specify arguments as file paths
+    query(func.args(FILE, XSD), "");
+    // specify arguments as document nodes
+    query(func.args(" doc(\"" + FILE + "\")", " doc(\"" + XSD + "\")"), "");
+    // specify arguments as file contents
+    query(func.args(_FILE_READ_TEXT.args(FILE), _FILE_READ_TEXT.args(XSD)), "");
+    // specify main-memory fragments as arguments
+    query(
+      "let $doc := <root/> " +
+      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
+      "<xs:element name='root'/> " +
+      "</xs:schema> " +
+      "return " + func.args(" $doc", " $schema"), "");
+
+    // returned error
+    query("exists(" + func.args(FILE) + ')', true);
+    query("exists(" +
+      "let $doc := <root/> " +
+      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
+      "<xs:element name='unknown'/> " +
+      "</xs:schema> " +
+      "return " + func.args(" $doc", " $schema") + ')', true);
+
+    // invalid arguments
+    error(func.args("unknown"), WHICHRES_X);
+    error(func.args(FILE, "unknown.xsd"), WHICHRES_X);
+  }
+
+  /** Test method. */
+  @Test public void xsdProcessor() {
+    final Function func = _VALIDATE_XSD_PROCESSOR;
+    assertFalse(query(func.args()).isEmpty());
+  }
+
+  /** Test method. */
+  @Test public void xsdReport() {
+    final Function func = _VALIDATE_XSD_REPORT;
+    // check XML result
+    query(func.args(FILE, XSD), "<report>\n<status>valid</status>\n</report>");
+    // specify arguments as file paths
+    query(func.args(FILE, XSD) + "//status/string()", "valid");
+    // specify arguments as document nodes
+    query(func.args(" doc(\"" + FILE + "\")", " doc(\"" + XSD + "\")") +
+        "//status/string()", "valid");
+    // specify arguments as file contents
+    query(func.args(_FILE_READ_TEXT.args(FILE), _FILE_READ_TEXT.args(XSD)) +
+        "//status/string()", "valid");
+    // specify main-memory fragments as arguments
+    query(
+      "let $doc := <root/> " +
+      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
+      "                 <xs:element name='root'/> " +
+      "               </xs:schema> " +
+      "return " + func.args(" $doc", " $schema") + "//status/string()", "valid");
+
+    // returned error
+    query(func.args(FILE) + "//status/string()", "invalid");
+    query(
+      "let $doc := <root/> " +
+      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
+      "                 <xs:element name='unknown'/> " +
+      "               </xs:schema> " +
+      "return " + func.args(" $doc", " $schema") + "//status/string()", "invalid");
+
+    // check XML result
+    query(
+      "let $doc := <root/> " +
+      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
+      "                 <xs:element name='unknown'/> " +
+      "               </xs:schema> " +
+      "let $report := " + func.args(" $doc", " $schema") +
+      "return $report update (" +
+      "  delete node .//message/text()," +
+      "  for $a in .//@* return replace value of node $a with ''" +
+        ')',
+      "<report>\n<status>invalid</status>\n" +
+      "<message level=\"\" line=\"\" column=\"\"/>\n" +
+      "</report>");
+    // check URL attribute
+    query("exists(" + func.args(INPUT, XSD) + "//@url)", true);
+
+    // invalid arguments
+    error(func.args("unknown"), WHICHRES_X);
+    error(func.args(FILE, "unknown.xsd"), WHICHRES_X);
+  }
+
+  /** Test method. */
+  @Test public void xsdVersion() {
+    final Function func = _VALIDATE_XSD_VERSION;
+    assertFalse(query(func.args()).isEmpty());
   }
 }

@@ -497,8 +497,6 @@ public enum QueryError {
   VALIDATE_START_X(ErrType.VALIDATE, "init", "Validation could not be started: %"),
   /** Error code. */
   VALIDATE_NOTFOUND_X(ErrType.VALIDATE, "not-found", "RelaxNG validation is not available."),
-  /** Error code. */
-  VALIDATE_VERSION_X(ErrType.VALIDATE, "version", "No XML Schema implementation for version '%'."),
 
   // Web Module
 

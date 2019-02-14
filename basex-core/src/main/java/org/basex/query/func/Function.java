@@ -1351,14 +1351,19 @@ public enum Function {
   _VALIDATE_RNG_REPORT(ValidateRngReport.class, "rng-report(input,schema[,compact])",
       arg(ITEM_O, ITEM_O, BLN_O), ELM_O, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
-  _VALIDATE_XSD(ValidateXsd.class, "xsd(input[,schema[,version]])",
-      arg(ITEM_O, ITEM_O, STR_O), EMP, flag(NDT), VALIDATE_URI),
+  _VALIDATE_XSD(ValidateXsd.class, "xsd(input[,schema[,options]])",
+      arg(ITEM_O, ITEM_O, MAP_O), EMP, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
-  _VALIDATE_XSD_INFO(ValidateXsdInfo.class, "xsd-info(input[,schema[,version]])",
-      arg(ITEM_O, ITEM_O, STR_O), STR_ZM, flag(NDT), VALIDATE_URI),
+  _VALIDATE_XSD_INFO(ValidateXsdInfo.class, "xsd-info(input[,schema[,options]])",
+      arg(ITEM_O, ITEM_O, MAP_O), STR_ZM, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
-  _VALIDATE_XSD_REPORT(ValidateXsdReport.class, "xsd-report(input[,schema[,version]])",
-      arg(ITEM_O, ITEM_O, STR_O), ELM_O, flag(NDT), VALIDATE_URI),
+  _VALIDATE_XSD_PROCESSOR(ValidateXsdProcessor.class, "xsd-processor()",
+      arg(), STR_O, VALIDATE_URI),
+  /** XQuery function. */
+  _VALIDATE_XSD_REPORT(ValidateXsdReport.class, "xsd-report(input[,schema[,options]])",
+      arg(ITEM_O, ITEM_O, MAP_O), ELM_O, flag(NDT), VALIDATE_URI),
+  /** XQuery function. */
+  _VALIDATE_XSD_VERSION(ValidateXsdVersion.class, "xsd-version()", arg(), STR_O, VALIDATE_URI),
 
   // Web Module
 

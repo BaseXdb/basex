@@ -1,12 +1,10 @@
 package org.basex.query.func.validate;
 
-import static org.basex.query.QueryError.*;
-
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.Map.*;
 
-import javax.xml.*;
 import javax.xml.transform.stream.*;
 import javax.xml.validation.*;
 
@@ -15,6 +13,7 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 import org.xml.sax.*;
 
 /**
@@ -24,24 +23,33 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public class ValidateXsd extends ValidateFn {
-  /** XML Schema 1.1 Classpath. */
-  private static final String SCHEMA_FACTORY_CP = "javax.xml.validation.SchemaFactory";
-  /** XML Schema 1.0 URI. */
-  private static final String XSD10_URI = "http://www.w3.org/XML/XMLSchema/v1.0";
-  /** XML Schema 1.1 URI. */
-  private static final String XSD11_URI = "http://www.w3.org/XML/XMLSchema/v1.1";
-  /** Saxon schema factory. */
-  private static final String SAXON_CP = "com.saxonica.ee.jaxp.SchemaFactoryImpl";
-  /** Xerces schema factory. */
-  private static final String XERCES_CP = "org.apache.xerces.jaxp.validation.XMLSchemaFactory";
-  /** Xerces schema factory. */
-  private static final String XERCES11_CP = "org.apache.xerces.jaxp.validation.XMLSchema11Factory";
+  /** Schema factory. */
+  private static final String FACTORY = "http://www.w3.org/2001/XMLSchema";
   /** Saxon version URI. */
   private static final String SAXON_VERSION_URI = "http://saxon.sf.net/feature/xsd-version";
-  /** Version 1.0. */
-  private static final String VERSION_10 = "1.0";
-  /** Version 1.1. */
-  private static final String VERSION_11 = "1.1";
+
+  /** XSD implementations. */
+  static final String[] IMPL = {
+    "com.saxonica.ee.jaxp.SchemaFactoryImpl", "Saxon EE", "1.1",
+    "org.apache.xerces.jaxp.validation.XMLSchema11Factory", "Xerces", "1.1",
+    "org.apache.xerces.jaxp.validation.XMLSchemaFactory", "Xerces", "1.0",
+    "", "Java", "1.0",
+  };
+
+  /** Implementation offset. */
+  static final int OFFSET;
+  /** Saxon flag. */
+  static final boolean SAXON;
+  /** Java flag. */
+  static final boolean JAVA;
+
+  static {
+    int i = 0;
+    while(i + 3 < IMPL.length && Reflect.find(IMPL[i]) == null) i += 3;
+    OFFSET = i;
+    SAXON = i == 0;
+    JAVA = i == 9;
+  }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
@@ -59,31 +67,18 @@ public class ValidateXsd extends ValidateFn {
 
         final IO in = read(toNodeOrAtomItem(0, qc), null);
         final Item schema = toNodeOrAtomItem(1, qc);
-        final String version = exprs.length > 2 ? Token.string(toToken(exprs[2], qc)) : null;
-        final boolean xsd11 = VERSION_11.equals(version);
-
-        // find alternative validator (null: use default validator)
-        String cp = null;
-        if(Reflect.find(XERCES11_CP) != null) {
-          cp = xsd11 ? XERCES11_CP : XERCES_CP;
-        } else if(Reflect.find(SAXON_CP) != null) {
-          cp = SAXON_CP;
-        }
-
-        // find implementation URI
-        final String uri;
-        if(version == null || version.equals(VERSION_10)) {
-          uri = cp == null ? XMLConstants.W3C_XML_SCHEMA_NS_URI : XSD10_URI;
-        } else if(xsd11 && cp != null) {
-          uri = XSD11_URI;
-        } else {
-          throw VALIDATE_VERSION_X.get(info, version);
-        }
+        final HashMap<String, String> options = toOptions(2, new Options(), qc).free();
 
         // create schema factory and set version
-        if(cp != null) System.setProperty(SCHEMA_FACTORY_CP + ':' + uri, cp);
-        final SchemaFactory sf = SchemaFactory.newInstance(uri);
-        if(SAXON_CP.equals(cp)) sf.setProperty(SAXON_VERSION_URI, xsd11 ? VERSION_11 : VERSION_10);
+        final SchemaFactory sf = JAVA ? SchemaFactory.newInstance(FACTORY) :
+          (SchemaFactory) Reflect.get(Reflect.find(IMPL[OFFSET]));
+        // Saxon: use version 1.1
+        if(SAXON) sf.setProperty(SAXON_VERSION_URI, IMPL[OFFSET + 2]);
+
+        // assign parser features
+        for(final Entry<String, String> entry : options.entrySet()) {
+          sf.setFeature(entry.getKey(), Strings.toBoolean(entry.getValue()));
+        }
 
         // schema declaration is included in document, or specified as string
         final Schema s = schema == null ? sf.newSchema() :
