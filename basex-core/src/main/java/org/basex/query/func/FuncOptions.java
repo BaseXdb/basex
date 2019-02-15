@@ -196,27 +196,27 @@ public final class FuncOptions {
   /**
    * Converts the specified output parameter item to serialization parameters.
    * @param item input item
-   * @param info input info
+   * @param ii input info
    * @return serialization parameters
    * @throws QueryException query exception
    */
-  public static SerializerOptions serializer(final Item item, final InputInfo info)
+  public static SerializerOptions serializer(final Item item, final InputInfo ii)
       throws QueryException {
     final SerializerOptions so = new SerializerOptions();
     so.set(SerializerOptions.METHOD, SerialMethod.XML);
-    return serializer(item, so, info);
+    return serializer(item, so, ii);
   }
 
   /**
    * Converts the specified output parameter item to serializer options.
    * @param item input item
    * @param sopts serialization parameters
-   * @param info input info
+   * @param ii input info
    * @return serialization parameters
    * @throws QueryException query exception
    */
   public static SerializerOptions serializer(final Item item, final SerializerOptions sopts,
-      final InputInfo info) throws QueryException {
-    return new FuncOptions(Q_SPARAM, info).assign(item, sopts, SEROPT_X);
+      final InputInfo ii) throws QueryException {
+    return new FuncOptions(Q_SPARAM, ii).assign(item, sopts, SEROPT_X);
   }
 }

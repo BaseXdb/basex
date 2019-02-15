@@ -146,12 +146,12 @@ public final class WsFunction extends WebFunction {
 
   /**
    * Creates an exception with the specific message.
-   * @param info the StaticFunc info
-   * @param msg the message
+   * @param ii input info
+   * @param msg error message
    * @param ext error extension
    * @return exception
    */
-  private static QueryException error(final InputInfo info, final String msg, final Object... ext) {
-    return BASEX_WS_X.get(info, Util.info(msg, ext));
+  private static QueryException error(final InputInfo ii, final String msg, final Object... ext) {
+    return BASEX_WS_X.get(ii, Util.info(msg, ext));
   }
 }

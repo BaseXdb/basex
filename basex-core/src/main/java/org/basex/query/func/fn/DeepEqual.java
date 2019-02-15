@@ -111,11 +111,11 @@ public final class DeepEqual {
 
       // check functions
       if(item1 instanceof FItem) {
-        if(((FItem) item1).deep(item2, info, coll)) continue;
+        if(((FItem) item1).deep(item2, coll, info)) continue;
         return false;
       }
       if(item2 instanceof FItem) {
-        if(((FItem) item2).deep(item1, info, coll)) continue;
+        if(((FItem) item2).deep(item1, coll, info)) continue;
         return false;
       }
 

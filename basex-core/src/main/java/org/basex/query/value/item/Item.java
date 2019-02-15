@@ -57,7 +57,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final Item item(final QueryContext qc, final InputInfo info) {
+  public final Item item(final QueryContext qc, final InputInfo ii) {
     return this;
   }
 
@@ -72,71 +72,71 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final Item ebv(final QueryContext qc, final InputInfo info) {
+  public final Item ebv(final QueryContext qc, final InputInfo ii) {
     return this;
   }
 
   @Override
-  public Item test(final QueryContext qc, final InputInfo info) throws QueryException {
-    return bool(info) ? this : null;
+  public Item test(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return bool(ii) ? this : null;
   }
 
   /**
    * Returns a string representation of the value.
-   * @param info input info, use {@code null} if none is available
+   * @param ii input info, use {@code null} if none is available
    * @return string value
    * @throws QueryException if the item cannot be atomized (caused by function or streaming items)
    */
-  public abstract byte[] string(InputInfo info) throws QueryException;
+  public abstract byte[] string(InputInfo ii) throws QueryException;
 
   /**
    * Returns a boolean representation of the value.
-   * @param info input info
+   * @param ii input info
    * @return boolean value
    * @throws QueryException query exception
    */
-  public boolean bool(final InputInfo info) throws QueryException {
-    throw EBV_X_X.get(info, type, this);
+  public boolean bool(final InputInfo ii) throws QueryException {
+    throw EBV_X_X.get(ii, type, this);
   }
 
   /**
    * Returns a decimal representation of the value.
-   * @param info input info
+   * @param ii input info
    * @return decimal value
    * @throws QueryException query exception
    */
-  public BigDecimal dec(final InputInfo info) throws QueryException {
-    return Dec.parse(this, info);
+  public BigDecimal dec(final InputInfo ii) throws QueryException {
+    return Dec.parse(this, ii);
   }
 
   /**
    * Returns an integer (long) representation of the value.
-   * @param info input info
+   * @param ii input info
    * @return long value
    * @throws QueryException query exception
    */
-  public long itr(final InputInfo info) throws QueryException {
-    return Int.parse(this, info);
+  public long itr(final InputInfo ii) throws QueryException {
+    return Int.parse(this, ii);
   }
 
   /**
    * Returns a float representation of the value.
-   * @param info input info
+   * @param ii input info
    * @return float value
    * @throws QueryException query exception
    */
-  public float flt(final InputInfo info) throws QueryException {
-    return Flt.parse(string(info), info);
+  public float flt(final InputInfo ii) throws QueryException {
+    return Flt.parse(string(ii), ii);
   }
 
   /**
    * Returns a double representation of the value.
-   * @param info input info
+   * @param ii input info
    * @return double value
    * @throws QueryException query exception
    */
-  public double dbl(final InputInfo info) throws QueryException {
-    return Dbl.parse(string(info), info);
+  public double dbl(final InputInfo ii) throws QueryException {
+    return Dbl.parse(string(ii), ii);
   }
 
   /**
@@ -166,11 +166,11 @@ public abstract class Item extends Value {
    * @param item item to be compared
    * @param coll collation (can be {@code null})
    * @param sc static context; required for comparing items of type xs:QName
-   * @param info input info
+   * @param ii input info
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean eq(Item item, Collation coll, StaticContext sc, InputInfo info)
+  public abstract boolean eq(Item item, Collation coll, StaticContext sc, InputInfo ii)
       throws QueryException;
 
   /**
@@ -181,25 +181,25 @@ public abstract class Item extends Value {
    * </ul>
    * @param item item to be compared
    * @param coll collation (can be {@code null})
-   * @param info input info
+   * @param ii input info
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean equiv(final Item item, final Collation coll, final InputInfo info)
+  public final boolean equiv(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
     return (this == Dbl.NAN || this == Flt.NAN) && (item == Dbl.NAN || item == Flt.NAN) ||
-        comparable(item) && eq(item, coll, null, info);
+        comparable(item) && eq(item, coll, null, ii);
   }
 
   /**
    * Compares the items for equality.
    * @param item item to be compared
-   * @param info input info
+   * @param ii input info
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean sameKey(final Item item, final InputInfo info) throws QueryException {
-    return comparable(item) && eq(item, null, null, info);
+  public boolean sameKey(final Item item, final InputInfo ii) throws QueryException {
+    return comparable(item) && eq(item, null, null, ii);
   }
 
   /**
@@ -207,24 +207,24 @@ public abstract class Item extends Value {
    * This function is overwritten by the corresponding implementations.
    * @param item item to be compared
    * @param coll collation (can be {@code null})
-   * @param info input info
+   * @param ii input info
    * @return difference
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public int diff(final Item item, final Collation coll, final InputInfo info)
+  public int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    throw diffError(this, item, info);
+    throw diffError(this, item, ii);
   }
 
   /**
    * Returns an input stream.
-   * @param info input info
+   * @param ii input info
    * @return input stream
    * @throws QueryException query exception
    */
-  public BufferInput input(final InputInfo info) throws QueryException {
-    return new ArrayInput(string(info));
+  public BufferInput input(final InputInfo ii) throws QueryException {
+    return new ArrayInput(string(ii));
   }
 
   @Override
@@ -234,17 +234,17 @@ public abstract class Item extends Value {
 
   // Overwritten by Lazy, Map and Array.
   @Override
-  public void cache(final InputInfo info, final boolean lazy) throws QueryException { }
+  public void cache(final boolean lazy, final InputInfo ii) throws QueryException { }
 
   // Overwritten by Array, FItem and ANode
   @Override
-  public Value atomValue(final QueryContext qc, final InputInfo info) throws QueryException {
+  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     return this;
   }
 
   // Overwritten by Array, FItem and ANode
   @Override
-  public Item atomItem(final QueryContext qc, final InputInfo info) throws QueryException {
+  public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
     return this;
   }
 
@@ -307,8 +307,8 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public int hash(final InputInfo info) throws QueryException {
-    return Token.hash(string(info));
+  public int hash(final InputInfo ii) throws QueryException {
+    return Token.hash(string(ii));
   }
 
   @Override

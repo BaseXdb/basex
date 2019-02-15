@@ -101,7 +101,7 @@ public final class InputInfo {
 
   /**
    * Activates light-weight error handling (invoked e.g. by {@link SeqType#cast(
-   * org.basex.query.value.item.Item, QueryContext, StaticContext, InputInfo, boolean)}).
+   * org.basex.query.value.item.Item, boolean, QueryContext, StaticContext, InputInfo)}).
    * @param value value to set
    */
   public void internal(final boolean value) {

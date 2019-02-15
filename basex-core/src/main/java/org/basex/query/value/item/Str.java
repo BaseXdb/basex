@@ -85,7 +85,7 @@ public final class Str extends AStr {
   }
 
   @Override
-  public byte[] string(final InputInfo info) {
+  public byte[] string(final InputInfo ii) {
     return value;
   }
 

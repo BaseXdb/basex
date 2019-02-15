@@ -33,34 +33,34 @@ public final class B64Lazy extends B64 implements Lazy {
   }
 
   @Override
-  public byte[] binary(final InputInfo info) throws QueryException {
-    cache(info);
+  public byte[] binary(final InputInfo ii) throws QueryException {
+    cache(ii);
     return data;
   }
 
   @Override
-  public BufferInput input(final InputInfo info) throws QueryException {
-    if(cache) cache(info);
-    if(isCached()) return super.input(info);
+  public BufferInput input(final InputInfo ii) throws QueryException {
+    if(cache) cache(ii);
+    if(isCached()) return super.input(ii);
     try {
       return BufferInput.get(input);
     } catch(final IOException ex) {
-      throw error.get(info, ex);
+      throw error.get(ii, ex);
     }
   }
 
   @Override
-  public void cache(final InputInfo info, final  boolean lazy) throws QueryException {
+  public void cache(final  boolean lazy, final InputInfo ii) throws QueryException {
     if(lazy) cache = true;
-    else cache(info);
+    else cache(ii);
   }
 
   @Override
-  public void cache(final InputInfo info) throws QueryException {
+  public void cache(final InputInfo ii) throws QueryException {
     try {
       if(!isCached()) data = input.read();
     } catch(final IOException ex) {
-      throw error.get(info, ex);
+      throw error.get(ii, ex);
     }
   }
 

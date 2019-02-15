@@ -23,7 +23,7 @@ public final class FnCodepointsToString extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // input is single integer
-    if(singleInt) return toStr(exprs[0].item(qc, info).itr(ii), info);
+    if(singleInt) return toStr(exprs[0].item(qc, info).itr(info), info);
 
     // current input is single item
     final Iter iter = exprs[0].atomIter(qc, info);
@@ -45,28 +45,28 @@ public final class FnCodepointsToString extends StandardFunc {
   /**
    * Converts a single codepoint to a string.
    * @param value value
-   * @param info input info
+   * @param ii input info
    * @return codepoint as string
    * @throws QueryException query exception
    */
-  private static Str toStr(final long value, final InputInfo info) throws QueryException {
-    final int cp = check(value, info);
+  private static Str toStr(final long value, final InputInfo ii) throws QueryException {
+    final int cp = check(value, ii);
     return Str.get(cp <= 0x7F ? new byte[] { (byte) cp } :
-      new TokenBuilder(4).add(check(cp, info)).finish());
+      new TokenBuilder(4).add(check(cp, ii)).finish());
   }
 
   /**
    * Checks if the specified value is valid codepoint.
    * @param value codepoint
-   * @param info input info
+   * @param ii input info
    * @return codepoint as integer
    * @throws QueryException query exception
    */
-  private static int check(final long value, final InputInfo info) throws QueryException {
+  private static int check(final long value, final InputInfo ii) throws QueryException {
     if(value >= 0 && value <= Integer.MAX_VALUE) {
       final int cp = (int) value;
       if(XMLToken.valid(cp)) return cp;
     }
-    throw INVCODE_X.get(info, Long.toHexString(value));
+    throw INVCODE_X.get(ii, Long.toHexString(value));
   }
 }

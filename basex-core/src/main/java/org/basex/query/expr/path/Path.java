@@ -54,12 +54,12 @@ public abstract class Path extends ParseExpr {
   /**
    * Returns a new path instance.
    * A path implementation is chosen that works fastest for the given steps.
-   * @param info input info
+   * @param ii input info
    * @param root root expression (can be {@code null})
    * @param steps steps
    * @return path instance
    */
-  public static ParseExpr get(final InputInfo info, final Expr root, final Expr... steps) {
+  public static ParseExpr get(final InputInfo ii, final Expr root, final Expr... steps) {
     // new list with steps
     int sl = steps.length;
     final ExprList list = new ExprList(sl);
@@ -106,8 +106,8 @@ public abstract class Path extends ParseExpr {
       if(step instanceof Step) axes++;
     }
     sl = st.length;
-    if(axes == sl) return iterative(rt, st) ? new IterPath(info, rt, st) :
-      new CachedPath(info, rt, st);
+    if(axes == sl) return iterative(rt, st) ? new IterPath(ii, rt, st) :
+      new CachedPath(ii, rt, st);
 
     // if last expression yields no nodes, rewrite mixed path to simple map
     // example: $a/b/string -> $a/b ! string()
@@ -115,11 +115,11 @@ public abstract class Path extends ParseExpr {
     if(s1 != null && s1.seqType().type.instanceOf(NodeType.NOD) &&
         s2.seqType().type.instanceOf(AtomType.AAT)) {
       list.remove(sl - 1);
-      if(sl > 1) rt = Path.get(info, rt, list.finish());
-      return (SimpleMap) SimpleMap.get(info, rt, s2);
+      if(sl > 1) rt = Path.get(ii, rt, list.finish());
+      return (SimpleMap) SimpleMap.get(ii, rt, s2);
     }
 
-    return new MixedPath(info, rt, st);
+    return new MixedPath(ii, rt, st);
   }
 
   @Override

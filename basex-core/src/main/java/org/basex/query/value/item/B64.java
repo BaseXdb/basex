@@ -52,23 +52,23 @@ public class B64 extends Bin {
   /**
    * Returns an instance of this class.
    * @param bin binary input
-   * @param info input info
+   * @param ii input info
    * @return instance
    * @throws QueryException query exception
    */
-  public static B64 get(final Bin bin, final InputInfo info) throws QueryException {
-    return get(bin.binary(info));
+  public static B64 get(final Bin bin, final InputInfo ii) throws QueryException {
+    return get(bin.binary(ii));
   }
 
   /**
    * Returns an instance of this class.
    * @param value textual representation
-   * @param info input info
+   * @param ii input info
    * @return instance
    * @throws QueryException query exception
    */
-  public static B64 get(final byte[] value, final InputInfo info) throws QueryException {
-    return get(parse(value, info));
+  public static B64 get(final byte[] value, final InputInfo ii) throws QueryException {
+    return get(parse(value, ii));
   }
 
   /**
@@ -80,51 +80,51 @@ public class B64 extends Bin {
   }
 
   @Override
-  public byte[] string(final InputInfo info) throws QueryException {
-    return Base64.encode(binary(info));
+  public byte[] string(final InputInfo ii) throws QueryException {
+    return Base64.encode(binary(ii));
   }
 
   @Override
   public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo info) throws QueryException {
-    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(info) : parse(item, info);
-    return Token.eq(binary(info), bin);
+      final InputInfo ii) throws QueryException {
+    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
+    return Token.eq(binary(ii), bin);
   }
 
   @Override
-  public final int diff(final Item item, final Collation coll, final InputInfo info)
+  public final int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(info) : parse(item, info);
-    return Token.diff(binary(info), bin);
+    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
+    return Token.diff(binary(ii), bin);
   }
 
   /**
    * Converts the given item to a byte array.
    * @param item item to be converted
-   * @param info input info
+   * @param ii input info
    * @return byte array
    * @throws QueryException query exception
    */
-  public static byte[] parse(final Item item, final InputInfo info) throws QueryException {
+  public static byte[] parse(final Item item, final InputInfo ii) throws QueryException {
     try {
-      return Base64.decode(item.string(info));
+      return Base64.decode(item.string(ii));
     } catch(final IllegalArgumentException ex) {
-      throw AtomType.B64.castError(item, info);
+      throw AtomType.B64.castError(item, ii);
     }
   }
 
   /**
    * Converts the given token into a byte array.
    * @param value value to be converted
-   * @param info input info
+   * @param ii input info
    * @return byte array
    * @throws QueryException query exception
    */
-  public static byte[] parse(final byte[] value, final InputInfo info) throws QueryException {
+  public static byte[] parse(final byte[] value, final InputInfo ii) throws QueryException {
     try {
       return Base64.decode(value);
     } catch(final IllegalArgumentException ex) {
-      throw AtomType.B64.castError(value, info);
+      throw AtomType.B64.castError(value, ii);
     }
   }
 

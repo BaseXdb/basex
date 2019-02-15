@@ -35,13 +35,13 @@ public final class Pos extends Arr {
    * Returns an instance of this class, the original expression, or an optimized expression.
    * @param cmp2 position to be compared
    * @param op comparator
-   * @param info input info
+   * @param ii input info
    * @param cc compilation context
    * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
-  public static Expr get(final Expr cmp2, final OpV op, final InputInfo info,
-      final CompileContext cc) throws QueryException {
+  public static Expr get(final Expr cmp2, final OpV op, final InputInfo ii, final CompileContext cc)
+      throws QueryException {
 
     Expr min = null, max = null;
     final SeqType st2 = cmp2.seqType();
@@ -66,8 +66,8 @@ public final class Pos extends Arr {
             max = Int.MAX;
             break;
           case GT:
-            min = new Arith(info, st2.type.instanceOf(AtomType.ITR) ? cmp2 :
-              cc.function(Function.FLOOR, info, cmp2), Int.ONE, Calc.PLUS);
+            min = new Arith(ii, st2.type.instanceOf(AtomType.ITR) ? cmp2 :
+              cc.function(Function.FLOOR, ii, cmp2), Int.ONE, Calc.PLUS);
             max = Int.MAX;
             break;
           case LE:
@@ -76,14 +76,14 @@ public final class Pos extends Arr {
             break;
           case LT:
             min = Int.ONE;
-            max = new Arith(info, st2.type.instanceOf(AtomType.ITR) ? cmp2 :
-              cc.function(Function.CEILING, info, cmp2), Int.ONE, Calc.MINUS);
+            max = new Arith(ii, st2.type.instanceOf(AtomType.ITR) ? cmp2 :
+              cc.function(Function.CEILING, ii, cmp2), Int.ONE, Calc.MINUS);
             break;
           default:
         }
       }
     }
-    return min != null ? new Pos(info, min, max) : null;
+    return min != null ? new Pos(ii, min, max) : null;
   }
 
   @Override

@@ -20,10 +20,10 @@ public final class DBFlush extends DBUpdate {
   /**
    * Constructor.
    * @param data data
-   * @param info input info
    * @param qc query context
+   * @param info input info
    */
-  public DBFlush(final Data data, final InputInfo info, final QueryContext qc) {
+  public DBFlush(final Data data, final QueryContext qc, final InputInfo info) {
     super(UpdateType.DBFLUSH, data, info);
     autoflush = qc.context.options.get(MainOptions.AUTOFLUSH);
   }

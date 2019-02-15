@@ -25,33 +25,33 @@ public abstract class ANum extends Item {
   /* Removing "throws QueryException" */
 
   @Override
-  public final byte[] string(final InputInfo info) {
+  public final byte[] string(final InputInfo ii) {
     return string();
   }
 
   @Override
-  public final double dbl(final InputInfo info) {
+  public final double dbl(final InputInfo ii) {
     return dbl();
   }
 
   @Override
-  public final long itr(final InputInfo info) {
+  public final long itr(final InputInfo ii) {
     return itr();
   }
 
   @Override
-  public final float flt(final InputInfo info) {
+  public final float flt(final InputInfo ii) {
     return flt();
   }
 
   @Override
-  public boolean sameKey(final Item item, final InputInfo info) throws QueryException {
+  public boolean sameKey(final Item item, final InputInfo ii) throws QueryException {
     if(item instanceof ANum) {
-      final double d1 = dbl(info), d2 = item.dbl(info);
+      final double d1 = dbl(ii), d2 = item.dbl(ii);
       final boolean n1 = Double.isNaN(d1), n2 = Double.isNaN(d2);
       if(n1 || n2) return n1 == n2;
       if(Double.isInfinite(d1) || Double.isInfinite(d2)) return d1 == d2;
-      return dec(info).compareTo(item.dec(info)) == 0;
+      return dec(ii).compareTo(item.dec(ii)) == 0;
     }
     return false;
   }
@@ -107,15 +107,15 @@ public abstract class ANum extends Item {
   public abstract ANum round(int scale, boolean even);
 
   @Override
-  public Item test(final QueryContext qc, final InputInfo info) {
+  public Item test(final QueryContext qc, final InputInfo ii) {
     return dbl() == qc.focus.pos ? this : null;
   }
 
   @Override
-  public final int hash(final InputInfo info) {
+  public final int hash(final InputInfo ii) {
     // makes sure the hashing is good for very small and very big numbers
     final long l = itr();
-    final float f = flt(info);
+    final float f = flt(ii);
 
     // extract fractional part from a finite float
     final int frac = f == POSITIVE_INFINITY || f == NEGATIVE_INFINITY ||

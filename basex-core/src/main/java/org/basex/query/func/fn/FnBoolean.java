@@ -47,11 +47,11 @@ public final class FnBoolean extends StandardFunc {
    * If the specified expression yields a boolean value anyway, it will be
    * returned as is. Otherwise, it will be wrapped into a boolean function.
    * @param expr expression to be rewritten
-   * @param info input info
+   * @param ii input info
    * @param sc static context
    * @return expression
    */
-  public static Expr get(final Expr expr, final InputInfo info, final StaticContext sc) {
-    return expr.seqType().eq(SeqType.BLN_O) ? expr : Function.BOOLEAN.def.get(sc, info, expr);
+  public static Expr get(final Expr expr, final InputInfo ii, final StaticContext sc) {
+    return expr.seqType().eq(SeqType.BLN_O) ? expr : Function.BOOLEAN.def.get(sc, ii, expr);
   }
 }

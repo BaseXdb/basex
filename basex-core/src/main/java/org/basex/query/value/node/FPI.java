@@ -85,12 +85,12 @@ public final class FPI extends FNode {
   /**
    * Checks the specified token for validity.
    * @param atom token to be checked
-   * @param info input info
+   * @param ii input info
    * @return token
    * @throws QueryException query exception
    */
-  public static byte[] parse(final byte[] atom, final InputInfo info) throws QueryException {
-    if(contains(atom, CLOSE)) throw CPICONT_X.get(info, atom);
+  public static byte[] parse(final byte[] atom, final InputInfo ii) throws QueryException {
+    if(contains(atom, CLOSE)) throw CPICONT_X.get(ii, atom);
     return atom;
   }
 }

@@ -25,13 +25,13 @@ public final class DBCopy extends NameUpdate {
    * Constructor.
    * @param name database to be copied
    * @param newName name of new database
-   * @param info input info
    * @param qc query context
+   * @param info input info
    */
-  public DBCopy(final String name, final String newName, final InputInfo info,
-      final QueryContext qc) {
+  public DBCopy(final String name, final String newName, final QueryContext qc,
+      final InputInfo info) {
 
-    super(UpdateType.DBCOPY, name, info, qc);
+    super(UpdateType.DBCOPY, name, qc, info);
     this.newName = newName;
   }
 

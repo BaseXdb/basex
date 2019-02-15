@@ -38,7 +38,7 @@ public final class WsEval extends WsFn {
       }
     };
 
-    final QueryJob job = new QueryJob(spec, info, qc.context, notify);
+    final QueryJob job = new QueryJob(spec, qc.context, info, notify);
     return Str.get(job.jc().id());
   }
 }

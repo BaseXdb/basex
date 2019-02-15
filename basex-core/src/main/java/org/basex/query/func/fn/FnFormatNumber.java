@@ -41,6 +41,6 @@ public final class FnFormatNumber extends StandardFunc {
     final DecFormatter df = sc.decFormat(form.id());
     if(df == null) throw FORMNUM_X.get(info, form.prefixId(XML));
 
-    return Str.get(df.format(info, (ANum) item, pic));
+    return Str.get(df.format((ANum) item, pic, info));
   }
 }

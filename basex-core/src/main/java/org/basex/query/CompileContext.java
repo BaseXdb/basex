@@ -267,13 +267,13 @@ public final class CompileContext {
   /**
    * Creates and returns an optimized instance of the specified function.
    * @param func function
-   * @param info input info
+   * @param ii input info
    * @param exprs expressions
    * @return function
    * @throws QueryException query exception
    */
-  public Expr function(final Function func, final InputInfo info, final Expr... exprs)
+  public Expr function(final Function func, final InputInfo ii, final Expr... exprs)
       throws QueryException {
-    return func.def.get(sc(), info, exprs).optimize(this);
+    return func.def.get(sc(), ii, exprs).optimize(this);
   }
 }

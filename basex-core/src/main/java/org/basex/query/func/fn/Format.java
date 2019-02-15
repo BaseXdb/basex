@@ -43,7 +43,7 @@ abstract class Format extends StandardFunc {
 
     final ADate date = (ADate) checkType(item, tp);
     final Formatter form = Formatter.get(language);
-    return Str.get(form.formatDate(date, language, picture, calendar, place, info, sc));
+    return Str.get(form.formatDate(date, language, picture, calendar, place, sc, info));
   }
 
   @Override

@@ -98,13 +98,13 @@ public final class IndexInfo {
    * Tries to rewrite the specified input for index access.
    * @param search expression to find (can be {@code null})
    * @param type index type (can be {@code null})
-   * @param info input info (can be {@code null})
    * @param trim normalize second string
+   * @param ii input info (can be {@code null})
    * @return success flag
    * @throws QueryException query exception
    */
-  public boolean create(final Expr search, final IndexType type, final InputInfo info,
-      final boolean trim) throws QueryException {
+  public boolean create(final Expr search, final IndexType type, final boolean trim,
+      final InputInfo ii) throws QueryException {
 
     // no index or no search value: no optimization
     if(type == null || search == null) return false;
@@ -121,7 +121,7 @@ public final class IndexInfo {
         // only strings and untyped items are supported
         if(!item.type.isStringOrUntyped()) return false;
         // do not use text/attribute index if string is empty or too long
-        byte[] token = item.string(info);
+        byte[] token = item.string(ii);
         if(trim) token = Token.trim(token);
         final int sl = token.length;
         if(type != IndexType.TOKEN && (sl == 0 || data != null && sl > data.meta.maxlen))
@@ -146,7 +146,7 @@ public final class IndexInfo {
       }
 
       // create expression for index access
-      final ValueAccess va = new ValueAccess(info, tokens, type, test, db);
+      final ValueAccess va = new ValueAccess(ii, tokens, type, test, db);
       if(counts == 1) va.exprType.assign(Occ.ZERO_ONE);
       root = va;
 
@@ -162,10 +162,10 @@ public final class IndexInfo {
       // estimate costs (tend to worst case)
       if(data != null) costs = enforce() ? IndexCosts.ENFORCE_DYNAMIC :
         IndexCosts.get(Math.max(1, data.meta.size / 10));
-      root = new ValueAccess(info, search, type, test, db);
+      root = new ValueAccess(ii, search, type, test, db);
     }
 
-    create(root, false, info, Util.info(OPTINDEX_X_X, type, search));
+    create(root, false, Util.info(OPTINDEX_X_X, type, search), ii);
     return true;
   }
 
@@ -173,14 +173,14 @@ public final class IndexInfo {
    * Creates an index expression with an inverted axis path.
    * @param root new root expression
    * @param parent add parent step
-   * @param info input info
    * @param opt optimization info
+   * @param ii input info
    */
-  public void create(final ParseExpr root, final boolean parent, final InputInfo info,
-      final String opt) {
+  public void create(final ParseExpr root, final boolean parent, final String opt,
+      final InputInfo ii) {
 
     expr = invert(test == null || !parent ? root :
-      Path.get(info, root, Step.get(info, Axis.PARENT, test)));
+      Path.get(ii, root, Step.get(ii, Axis.PARENT, test)));
     optInfo = opt;
   }
 

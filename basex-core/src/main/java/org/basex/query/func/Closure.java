@@ -444,22 +444,22 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @param arity function arity
    * @param qc query context
    * @param sc static context
-   * @param info input info
+   * @param ii input info
    * @return function literal
    * @throws QueryException query exception
    */
   public static Closure undeclaredLiteral(final QNm name, final int arity, final QueryContext qc,
-      final StaticContext sc, final InputInfo info) throws QueryException {
+      final StaticContext sc, final InputInfo ii) throws QueryException {
 
     final VarScope vs = new VarScope(sc);
     final Var[] params = new Var[arity];
     final Expr[] args = new Expr[arity];
     for(int a = 0; a < arity; a++) {
-      params[a] = vs.addNew(new QNm(ARG + (a + 1), ""), null, true, qc, info);
-      args[a] = new VarRef(info, params[a]);
+      params[a] = vs.addNew(new QNm(ARG + (a + 1), ""), null, true, qc, ii);
+      args[a] = new VarRef(ii, params[a]);
     }
-    final TypedFunc tf = qc.funcs.undeclaredFuncCall(name, args, sc, info);
-    return new Closure(info, name, null, params, tf.func, new AnnList(), null, vs);
+    final TypedFunc tf = qc.funcs.undeclaredFuncCall(name, args, sc, ii);
+    return new Closure(ii, name, null, params, tf.func, new AnnList(), null, vs);
   }
 
   @Override

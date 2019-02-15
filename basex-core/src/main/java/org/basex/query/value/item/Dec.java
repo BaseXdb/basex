@@ -56,7 +56,7 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public boolean bool(final InputInfo info) {
+  public boolean bool(final InputInfo ii) {
     return value.signum() != 0;
   }
 
@@ -76,7 +76,7 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public BigDecimal dec(final InputInfo info) {
+  public BigDecimal dec(final InputInfo ii) {
     return value;
   }
 
@@ -104,17 +104,17 @@ public final class Dec extends ANum {
 
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
     return item.type == AtomType.DBL || item.type == AtomType.FLT ?
-        item.eq(this, coll, sc, info) : value.compareTo(item.dec(info)) == 0;
+        item.eq(this, coll, sc, ii) : value.compareTo(item.dec(ii)) == 0;
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo info)
+  public int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    final double d = item.dbl(info);
+    final double d = item.dbl(ii);
     return d == Double.NEGATIVE_INFINITY ? -1 : d == Double.POSITIVE_INFINITY ? 1 :
-      Double.isNaN(d) ? UNDEF : value.compareTo(item.dec(info));
+      Double.isNaN(d) ? UNDEF : value.compareTo(item.dec(ii));
   }
 
   @Override
@@ -130,16 +130,16 @@ public final class Dec extends ANum {
   /**
    * Converts the given token into a decimal value.
    * @param item item to be converted
-   * @param info input info
+   * @param ii input info
    * @return double value
    * @throws QueryException query exception
    */
-  public static BigDecimal parse(final Item item, final InputInfo info) throws QueryException {
-    final byte[] value = item.string(info);
+  public static BigDecimal parse(final Item item, final InputInfo ii) throws QueryException {
+    final byte[] value = item.string(ii);
     try {
       if(!contains(value, 'e') && !contains(value, 'E'))
         return new BigDecimal(Token.string(value).trim());
     } catch(final NumberFormatException ex) { Util.debug(ex); }
-    throw AtomType.DEC.castError(item, info);
+    throw AtomType.DEC.castError(item, ii);
   }
 }

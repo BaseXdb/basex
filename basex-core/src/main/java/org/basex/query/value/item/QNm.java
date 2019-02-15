@@ -148,12 +148,12 @@ public final class QNm extends Item {
    * @param name name to resolve
    * @param def default namespace (can be {@code null})
    * @param sc static context (can be {@code null})
-   * @param info input info
+   * @param ii input info
    * @return string
    * @throws QueryException query exception
    */
   public static QNm resolve(final byte[] name, final byte[] def, final StaticContext sc,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
 
     // check for namespace declaration
     final Matcher m = EQNAME.matcher(Token.string(name));
@@ -167,10 +167,10 @@ public final class QNm extends Item {
         uri = def;
       } else {
         if(sc != null) uri = sc.ns.uri(substring(nm, 0, i));
-        if(uri == null) throw NOURI_X.get(info, name);
+        if(uri == null) throw NOURI_X.get(ii, name);
       }
     }
-    if(!XMLToken.isQName(nm)) throw BINDNAME_X.get(info, name);
+    if(!XMLToken.isQName(nm)) throw BINDNAME_X.get(ii, name);
     return new QNm(nm, uri);
   }
 
@@ -199,7 +199,7 @@ public final class QNm extends Item {
   }
 
   @Override
-  public byte[] string(final InputInfo info) {
+  public byte[] string(final InputInfo ii) {
     return name;
   }
 
@@ -213,16 +213,16 @@ public final class QNm extends Item {
 
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
 
     final QNm nm;
     if(item instanceof QNm) {
       nm = (QNm) item;
     } else if(item.type.isUntyped() && sc != null) {
-      nm = new QNm(item.string(info), sc);
-      if(!nm.hasURI() && nm.hasPrefix()) throw NSDECL_X.get(info, nm.string());
+      nm = new QNm(item.string(ii), sc);
+      if(!nm.hasURI() && nm.hasPrefix()) throw NSDECL_X.get(ii, nm.string());
     } else {
-      throw diffError(this, item, info);
+      throw diffError(this, item, ii);
     }
     return eq(nm);
   }
@@ -237,9 +237,9 @@ public final class QNm extends Item {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo info)
+  public int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    throw diffError(item, this, info);
+    throw diffError(item, this, ii);
   }
 
   /**
@@ -326,7 +326,7 @@ public final class QNm extends Item {
   }
 
   @Override
-  public int hash(final InputInfo info) {
+  public int hash(final InputInfo ii) {
     return Token.hash(local());
   }
 

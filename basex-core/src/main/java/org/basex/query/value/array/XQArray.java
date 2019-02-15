@@ -192,8 +192,8 @@ public abstract class XQArray extends XQData {
   public abstract XQArray remove(long pos, QueryContext qc);
 
   @Override
-  public final void cache(final InputInfo info, final boolean lazy) throws QueryException {
-    for(final Value value : members()) value.cache(info, lazy);
+  public final void cache(final boolean lazy, final InputInfo ii) throws QueryException {
+    for(final Value value : members()) value.cache(lazy, ii);
   }
 
   /**
@@ -263,13 +263,13 @@ public abstract class XQArray extends XQData {
   abstract void checkInvariants();
 
   @Override
-  public final Value get(final Item key, final InputInfo info) throws QueryException {
+  public final Value get(final Item key, final InputInfo ii) throws QueryException {
     if(!key.type.instanceOf(AtomType.ITR) && !key.type.isUntyped())
-      throw typeError(key, AtomType.ITR, info);
+      throw typeError(key, AtomType.ITR, ii);
 
-    final long pos = key.itr(info), size = arraySize();
+    final long pos = key.itr(ii), size = arraySize();
     if(pos > 0 && pos <= size) return get(pos - 1);
-    throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(info, pos, size);
+    throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(ii, pos, size);
   }
 
   @Override
@@ -283,17 +283,17 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public final Value atomValue(final QueryContext qc, final InputInfo info) throws QueryException {
-    if(arraySize() == 1) return get(0).atomValue(qc, info);
+  public final Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+    if(arraySize() == 1) return get(0).atomValue(qc, ii);
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Value value : members()) vb.add(value.atomValue(qc, info));
+    for(final Value value : members()) vb.add(value.atomValue(qc, ii));
     return vb.value();
   }
 
   @Override
-  public final Item atomItem(final QueryContext qc, final InputInfo info) throws QueryException {
-    if(atomSize() > 1) throw SEQFOUND_X.get(info, this);
-    final Value value = atomValue(qc, info);
+  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    if(atomSize() > 1) throw SEQFOUND_X.get(ii, this);
+    final Value value = atomValue(qc, ii);
     return value.isEmpty() ? null : (Item) value;
   }
 
@@ -308,7 +308,7 @@ public abstract class XQArray extends XQData {
 
   @Override
   public final void string(final boolean indent, final TokenBuilder tb, final int level,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
 
     tb.add('[');
     int c = 0;
@@ -326,8 +326,8 @@ public abstract class XQArray extends XQData {
           if(indent) tb.add(' ');
         }
         final Item item = value.itemAt(i);
-        if(item instanceof XQArray) ((XQArray) item).string(indent, tb, level, info);
-        else if(item instanceof XQMap) ((XQMap) item).string(indent, tb, level + 1, info);
+        if(item instanceof XQArray) ((XQArray) item).string(indent, tb, level, ii);
+        else if(item instanceof XQMap) ((XQMap) item).string(indent, tb, level + 1, ii);
         else tb.add(item.toString());
       }
       if(vs != 1) tb.add(')');
@@ -368,10 +368,10 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public final boolean deep(final Item item, final InputInfo info, final Collation coll)
+  public final boolean deep(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
 
-    if(item instanceof FuncItem) throw FICMP_X.get(info, type);
+    if(item instanceof FuncItem) throw FICMP_X.get(ii, type);
     if(item instanceof XQArray) {
       final XQArray o = (XQArray) item;
       if(arraySize() != o.arraySize()) return false;
@@ -379,7 +379,7 @@ public abstract class XQArray extends XQData {
       while(iter1.hasNext()) {
         final Value value1 = iter1.next(), value2 = iter2.next();
         if(value1.size() != value2.size() ||
-            !new DeepEqual(info).collation(coll).equal(value1, value2)) return false;
+            !new DeepEqual(ii).collation(coll).equal(value1, value2)) return false;
       }
       return true;
     }

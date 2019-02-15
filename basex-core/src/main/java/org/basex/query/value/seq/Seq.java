@@ -78,13 +78,13 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final Item item(final QueryContext qc, final InputInfo info) throws QueryException {
-    throw SEQFOUND_X.get(info, this);
+  public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    throw SEQFOUND_X.get(ii, this);
   }
 
   @Override
-  public final Item test(final QueryContext qc, final InputInfo info) throws QueryException {
-    return ebv(qc, info);
+  public final Item test(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return ebv(qc, ii);
   }
 
   @Override
@@ -186,21 +186,21 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final int hash(final InputInfo info) throws QueryException {
+  public final int hash(final InputInfo ii) throws QueryException {
     // final hash function because equivalent sequences *must* produce the
     // same hash value, otherwise they get lost in hash maps.
     // example: hash(RangeSeq(1 to 3)) == hash(ItrSeq(1, 2, 3))
     //                                 == hash(ItemSeq(Itr(1), Itr(2), Itr(3)))
     int h = 1;
-    for(long v = Math.min(size, 5); --v >= 0;) h = 31 * h + itemAt(v).hash(info);
+    for(long v = Math.min(size, 5); --v >= 0;) h = 31 * h + itemAt(v).hash(ii);
     return h;
   }
 
   @Override
-  public final Item atomItem(final QueryContext qc, final InputInfo info) throws QueryException {
-    final Iter ir = atomIter(qc, info);
+  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Iter ir = atomIter(qc, ii);
     final Item it = ir.next();
-    if(it != null && ir.next() != null) throw SEQFOUND_X.get(info, this);
+    if(it != null && ir.next() != null) throw SEQFOUND_X.get(ii, this);
     return it;
   }
 

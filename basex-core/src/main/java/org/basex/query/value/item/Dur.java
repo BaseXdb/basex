@@ -38,11 +38,11 @@ public class Dur extends ADateDur {
   /**
    * Constructor.
    * @param value value
-   * @param info input info
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public Dur(final byte[] value, final InputInfo info) throws QueryException {
-    this(value, AtomType.DUR, info);
+  public Dur(final byte[] value, final InputInfo ii) throws QueryException {
+    this(value, AtomType.DUR, ii);
   }
 
   /**
@@ -76,35 +76,35 @@ public class Dur extends ADateDur {
    * Constructor.
    * @param value value
    * @param type item type
-   * @param info input info
+   * @param ii input info
    * @throws QueryException query exception
    */
-  private Dur(final byte[] value, final Type type, final InputInfo info) throws QueryException {
+  private Dur(final byte[] value, final Type type, final InputInfo ii) throws QueryException {
     this(type);
     final String val = Token.string(value).trim();
     final Matcher mt = DUR.matcher(val);
-    if(!mt.matches() || val.endsWith("P") || val.endsWith("T")) throw dateError(value, XDURR, info);
-    yearMonth(value, mt, info);
-    dayTime(value, mt, 6, info);
+    if(!mt.matches() || val.endsWith("P") || val.endsWith("T")) throw dateError(value, XDURR, ii);
+    yearMonth(value, mt, ii);
+    dayTime(value, mt, 6, ii);
   }
 
   /**
    * Initializes the yearMonth component.
    * @param vl value
    * @param mt matcher
-   * @param info input info
+   * @param ii input info
    * @throws QueryException query exception
    */
-  void yearMonth(final byte[] vl, final Matcher mt, final InputInfo info) throws QueryException {
-    final long y = mt.group(2) != null ? toLong(mt.group(3), true, info) : 0;
-    final long m = mt.group(4) != null ? toLong(mt.group(5), true, info) : 0;
+  void yearMonth(final byte[] vl, final Matcher mt, final InputInfo ii) throws QueryException {
+    final long y = mt.group(2) != null ? toLong(mt.group(3), true, ii) : 0;
+    final long m = mt.group(4) != null ? toLong(mt.group(5), true, ii) : 0;
     mon = y * 12 + m;
     double v = y * 12.0d + m;
     if(!mt.group(1).isEmpty()) {
       mon = -mon;
       v = -v;
     }
-    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(info, type, vl);
+    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(ii, type, vl);
   }
 
   /**
@@ -112,23 +112,23 @@ public class Dur extends ADateDur {
    * @param value value
    * @param match matcher
    * @param pos first matching position
-   * @param info input info
+   * @param ii input info
    * @throws QueryException query exception
    */
-  void dayTime(final byte[] value, final Matcher match, final int pos, final InputInfo info)
+  void dayTime(final byte[] value, final Matcher match, final int pos, final InputInfo ii)
       throws QueryException {
 
-    final long d = match.group(pos) != null ? toLong(match.group(pos + 1), true, info) : 0;
-    final long h = match.group(pos + 3) != null ? toLong(match.group(pos + 4), true, info) : 0;
-    final long m = match.group(pos + 5) != null ? toLong(match.group(pos + 6), true, info) : 0;
+    final long d = match.group(pos) != null ? toLong(match.group(pos + 1), true, ii) : 0;
+    final long h = match.group(pos + 3) != null ? toLong(match.group(pos + 4), true, ii) : 0;
+    final long m = match.group(pos + 5) != null ? toLong(match.group(pos + 6), true, ii) : 0;
     final BigDecimal s = match.group(pos + 7) != null ?
-      toDecimal(match.group(pos + 8), true, info) : BigDecimal.ZERO;
+      toDecimal(match.group(pos + 8), true, ii) : BigDecimal.ZERO;
     sec = s.add(BigDecimal.valueOf(d).multiply(DAYSECONDS)).
         add(BigDecimal.valueOf(h).multiply(BD3600)).
         add(BigDecimal.valueOf(m).multiply(BD60));
     if(!match.group(1).isEmpty()) sec = sec.negate();
     final double v = sec.doubleValue();
-    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(info, type, value);
+    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(ii, type, value);
   }
 
   @Override
@@ -170,7 +170,7 @@ public class Dur extends ADateDur {
   }
 
   @Override
-  public byte[] string(final InputInfo info) {
+  public byte[] string(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
     final int ss = sec.signum();
     if(mon < 0 || ss < 0) tb.add('-');
@@ -212,17 +212,17 @@ public class Dur extends ADateDur {
 
   @Override
   public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo info) throws QueryException {
-    final Dur dur = (Dur) (item instanceof Dur ? item : type.cast(item, null, null, info));
+      final InputInfo ii) throws QueryException {
+    final Dur dur = (Dur) (item instanceof Dur ? item : type.cast(item, null, null, ii));
     final BigDecimal dec1 = sec == null ? BigDecimal.ZERO : sec;
     final BigDecimal dec2 = dur.sec == null ? BigDecimal.ZERO : dur.sec;
     return mon == dur.mon && dec1.compareTo(dec2) == 0;
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo info)
+  public int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    throw diffError(item, this, info);
+    throw diffError(item, this, ii);
   }
 
   @Override
@@ -231,7 +231,7 @@ public class Dur extends ADateDur {
   }
 
   @Override
-  public final int hash(final InputInfo info) {
+  public final int hash(final InputInfo ii) {
     return (int) (31 * mon + (sec == null ? 0 : sec.doubleValue()));
   }
 

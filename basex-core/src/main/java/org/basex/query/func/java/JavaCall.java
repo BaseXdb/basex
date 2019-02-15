@@ -158,12 +158,12 @@ public abstract class JavaCall extends Arr {
    * @param args arguments
    * @param qc query context
    * @param sc static context
-   * @param info input info
+   * @param ii input info
    * @return Java function or {@code null}
    * @throws QueryException query exception
    */
   public static JavaCall get(final QNm qname, final Expr[] args, final QueryContext qc,
-      final StaticContext sc, final InputInfo info) throws QueryException {
+      final StaticContext sc, final InputInfo ii) throws QueryException {
 
     // rewrite function name, extract argument types
     String name = Strings.camelCase(string(qname.local()));
@@ -184,11 +184,11 @@ public abstract class JavaCall extends Arr {
     final ModuleLoader modules = qc.resources.modules();
     final Object module  = modules.findModule(className);
     if(module != null) {
-      final Method meth = moduleMethod(module, name, args.length, types, qname, qc, info);
+      final Method meth = moduleMethod(module, name, args.length, types, qname, qc, ii);
       final Requires req = meth.getAnnotation(Requires.class);
       final Perm perm = req == null ? Perm.ADMIN :
         Perm.get(req.value().name().toLowerCase(Locale.ENGLISH));
-      return new StaticJavaCall(module, meth, args, perm, sc, info);
+      return new StaticJavaCall(module, meth, args, perm, sc, ii);
     }
 
     /* skip Java class lookup if...
@@ -211,20 +211,20 @@ public abstract class JavaCall extends Arr {
         if(enforce) Util.debug(ex);
       } catch(final Throwable th) {
         // catch linkage and other errors as well
-        throw JAVAINIT_X_X.get(info, Util.className(th), th);
+        throw JAVAINIT_X_X.get(ii, Util.className(th), th);
       }
 
       if(clazz == null) {
         // class not found, java prefix was specified
-        if(enforce) throw WHICHCLASS_X.get(info, className);
+        if(enforce) throw WHICHCLASS_X.get(ii, className);
       } else {
         // constructor
         if(name.equals(NEW)) {
-          final DynJavaConstr djc = new DynJavaConstr(clazz, types, args, sc, info);
+          final DynJavaConstr djc = new DynJavaConstr(clazz, types, args, sc, ii);
           if(djc.init(enforce)) return djc;
         }
         // field or method
-        final DynJavaFunc djf = new DynJavaFunc(clazz, name, types, args, sc, info);
+        final DynJavaFunc djf = new DynJavaFunc(clazz, name, types, args, sc, ii);
         if(djf.init(enforce)) return djf;
       }
     }
@@ -240,12 +240,12 @@ public abstract class JavaCall extends Arr {
    * @param types types provided in the query (can be {@code null})
    * @param qname original name
    * @param qc query context
-   * @param info input info
+   * @param ii input info
    * @return method if found
    * @throws QueryException query exception
    */
   private static Method moduleMethod(final Object module, final String name, final int arity,
-      final String[] types, final QNm qname, final QueryContext qc, final InputInfo info)
+      final String[] types, final QNm qname, final QueryContext qc, final InputInfo ii)
       throws QueryException {
 
     // find method with identical name and arity
@@ -258,7 +258,7 @@ public abstract class JavaCall extends Arr {
       final int mArity = pTypes.length;
       if(mArity == arity) {
         if(typesMatch(pTypes, types)) {
-          if(method != null) throw JAVAMULTIFUNC_X_X.get(info, qname.string(), arguments(arity));
+          if(method != null) throw JAVAMULTIFUNC_X_X.get(ii, qname.string(), arguments(arity));
           method = m;
         }
       } else if(types == null) {
@@ -277,7 +277,7 @@ public abstract class JavaCall extends Arr {
     }
 
     // no suitable method found: check if method with correct name was found
-    throw noFunction(name, arity, string(qname.string()), arities, types, info,
+    throw noFunction(name, arity, string(qname.string()), arities, types, ii,
         (Consumer<TokenList>) list -> {
       for(final Method m : methods) list.add(m.getName());
     });
@@ -290,16 +290,16 @@ public abstract class JavaCall extends Arr {
    * @param full full name of field or method
    * @param arities arities of found methods
    * @param types types (can be {@code null})
-   * @param info input info
+   * @param ii input info
    * @param consumer list of available names
    * @return exception
    */
   static QueryException noFunction(final String name, final int arity, final String full,
-      final IntList arities, final String[] types, final InputInfo info,
+      final IntList arities, final String[] types, final InputInfo ii,
       final Consumer<TokenList> consumer) {
 
     // functions with different arities
-    if(!arities.isEmpty()) return Functions.wrongArity(full, arity, arities, info);
+    if(!arities.isEmpty()) return Functions.wrongArity(full, arity, arities, ii);
 
     // find similar field/method names
     final byte[] nm = token(name), similar = Levenshtein.similar(nm, consumer);
@@ -311,13 +311,13 @@ public abstract class JavaCall extends Arr {
           if(sb.length() != 0) sb.append(", ");
           sb.append(type.toString().replaceAll("^.*\\.", ""));
         }
-        return JAVAARGS_X_X.get(info, full, sb);
+        return JAVAARGS_X_X.get(ii, full, sb);
       }
       // show similar field/method name
-      return FUNCSIMILAR_X_X.get(info, full, similar);
+      return FUNCSIMILAR_X_X.get(ii, full, similar);
     }
     // no similar field/method found, show default error
-    return WHICHFUNC_X.get(info, full);
+    return WHICHFUNC_X.get(ii, full);
   }
 
   /**

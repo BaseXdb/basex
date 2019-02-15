@@ -34,9 +34,9 @@ final class BaseXCollation extends Collation {
 
   @Override
   protected int indexOf(final String string, final String contains, final Mode mode,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
 
-    if(!(collator instanceof RuleBasedCollator)) throw CHARCOLL.get(info);
+    if(!(collator instanceof RuleBasedCollator)) throw CHARCOLL.get(ii);
     final RuleBasedCollator rbc = (RuleBasedCollator) collator;
     final CollationElementIterator iterS = rbc.getCollationElementIterator(string);
     final CollationElementIterator iterC = rbc.getCollationElementIterator(contains);

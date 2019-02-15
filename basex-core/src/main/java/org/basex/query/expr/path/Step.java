@@ -36,19 +36,19 @@ public abstract class Step extends Preds {
 
   /**
    * This method returns the most efficient step implementation.
-   * @param info input info
+   * @param ii input info
    * @param axis axis
    * @param test node test
    * @param preds predicates
    * @return step
    */
-  public static Step get(final InputInfo info, final Axis axis, final Test test,
+  public static Step get(final InputInfo ii, final Axis axis, final Test test,
       final Expr... preds) {
 
     // optimize single last() functions
     Step step = null;
     if(preds.length == 1 && Function.LAST.is(preds[0])) {
-      step = new IterLastStep(info, axis, test, preds);
+      step = new IterLastStep(ii, axis, test, preds);
     } else {
       // check for simple positional predicates
       boolean pos = false;
@@ -57,13 +57,13 @@ public abstract class Step extends Preds {
           pos = true;
         } else if(pred.seqType().mayBeNumber() || pred.has(Flag.POS)) {
           // positional checks may be nested or non-deterministic: choose full evaluation
-          step = new CachedStep(info, axis, test, preds);
+          step = new CachedStep(ii, axis, test, preds);
           break;
         }
       }
       if(step == null) {
-        step = pos ? new IterPosStep(info, axis, test, preds) :
-          new IterStep(info, axis, test, preds);
+        step = pos ? new IterPosStep(ii, axis, test, preds) :
+          new IterStep(ii, axis, test, preds);
       }
     }
     return step;

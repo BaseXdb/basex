@@ -48,7 +48,7 @@ public final class CTxt extends CNode {
     // if possible, retrieve single item
     final Expr expr = exprs[0];
     if(simple) {
-      final Item item = expr.item(qc, ii);
+      final Item item = expr.item(qc, info);
       return new FTxt(item == null ? Token.EMPTY : item.string(info));
     }
 

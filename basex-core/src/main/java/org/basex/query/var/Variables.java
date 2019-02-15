@@ -64,15 +64,15 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
 
   /**
    * Returns a new reference to the (possibly not yet declared) variable with the given name.
-   * @param info input info
+   * @param ii input info
    * @param name variable name
    * @param sc static context
    * @return reference
    * @throws QueryException if the variable is not visible
    */
-  public StaticVarRef newRef(final QNm name, final StaticContext sc, final InputInfo info)
+  public StaticVarRef newRef(final QNm name, final StaticContext sc, final InputInfo ii)
       throws QueryException {
-    final StaticVarRef ref = new StaticVarRef(info, name, sc);
+    final StaticVarRef ref = new StaticVarRef(ii, name, sc);
     vars.computeIfAbsent(name, n -> new VarEntry()).addRef(ref);
     return ref;
   }

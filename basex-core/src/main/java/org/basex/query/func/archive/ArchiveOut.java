@@ -26,18 +26,18 @@ abstract class ArchiveOut implements Closeable {
   /**
    * Returns a new instance of an archive writer.
    * @param format archive format
-   * @param info input info
+   * @param ii input info
    * @return writer
    * @throws QueryException query exception
    */
-  static ArchiveOut get(final String format, final InputInfo info) throws QueryException {
+  static ArchiveOut get(final String format, final InputInfo ii) throws QueryException {
     try {
       if(format.equals(ZIP)) return new ZIPOut();
       if(format.equals(GZIP)) return new GZIPOut();
     } catch(final IOException ex) {
-      throw ARCHIVE_ERROR_X.get(info, ex);
+      throw ARCHIVE_ERROR_X.get(ii, ex);
     }
-    throw ARCHIVE_FORMAT.get(info);
+    throw ARCHIVE_FORMAT.get(ii);
   }
 
   /**

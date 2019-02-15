@@ -91,15 +91,15 @@ public abstract class TreeSeq extends Seq {
   public abstract BasicIter<Item> iter();
 
   @Override
-  public final void cache(final InputInfo info, final boolean lazy) throws QueryException {
-    for(final Item item : this) item.cache(info, lazy);
+  public final void cache(final boolean lazy, final InputInfo ii) throws QueryException {
+    for(final Item item : this) item.cache(lazy, ii);
   }
 
   @Override
-  public final Value atomValue(final QueryContext qc, final InputInfo info) throws QueryException {
+  public final Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     final BasicIter<?> iter = iter();
-    for(Item item; (item = iter.next()) != null;) vb.add(item.atomValue(qc, info));
+    for(Item item; (item = iter.next()) != null;) vb.add(item.atomValue(qc, ii));
     return vb.value();
   }
 
@@ -122,10 +122,10 @@ public abstract class TreeSeq extends Seq {
   }
 
   @Override
-  public final Item ebv(final QueryContext qc, final InputInfo info) throws QueryException {
+  public final Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item head = itemAt(0);
     if(head instanceof ANode) return head;
-    throw EBV_X.get(info, this);
+    throw EBV_X.get(ii, this);
   }
 
   /**

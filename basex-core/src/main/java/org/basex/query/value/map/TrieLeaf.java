@@ -40,11 +40,11 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  TrieNode put(final int hs, final Item ky, final Value vl, final int level, final InputInfo info)
+  TrieNode put(final int hs, final Item ky, final Value vl, final int level, final InputInfo ii)
       throws QueryException {
 
     // same hash, replace or merge
-    if(hs == hash) return key.sameKey(ky, info) ? new TrieLeaf(hs, ky, vl) :
+    if(hs == hash) return key.sameKey(ky, ii) ? new TrieLeaf(hs, ky, vl) :
       new TrieList(hash, key, value, ky, vl);
 
     // different hash, branch
@@ -52,7 +52,7 @@ final class TrieLeaf extends TrieNode {
     final int a = key(hs, level), b = key(hash, level);
     final int used;
     if(a == b) {
-      ch[a] = put(hs, ky, vl, level + 1, info);
+      ch[a] = put(hs, ky, vl, level + 1, ii);
       used = 1 << a;
     } else {
       ch[a] = new TrieLeaf(hs, ky, vl);
@@ -63,36 +63,36 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hs, final Item ky, final int level, final InputInfo info)
+  TrieNode delete(final int hs, final Item ky, final int level, final InputInfo ii)
       throws QueryException {
-    return hs == hash && key.sameKey(ky, info) ? null : this;
+    return hs == hash && key.sameKey(ky, ii) ? null : this;
   }
 
   @Override
-  Value get(final int hs, final Item ky, final int level, final InputInfo info)
+  Value get(final int hs, final Item ky, final int level, final InputInfo ii)
       throws QueryException {
-    return hs == hash && key.sameKey(ky, info) ? value : null;
+    return hs == hash && key.sameKey(ky, ii) ? value : null;
   }
 
   @Override
-  boolean contains(final int hs, final Item ky, final int level, final InputInfo info)
+  boolean contains(final int hs, final Item ky, final int level, final InputInfo ii)
       throws QueryException {
-    return hs == hash && key.sameKey(ky, info);
+    return hs == hash && key.sameKey(ky, ii);
   }
 
   @Override
   TrieNode addAll(final TrieNode node, final int level, final MergeDuplicates merge,
-      final InputInfo info, final QueryContext qc) throws QueryException {
-    return node.add(this, level, merge, info, qc);
+      final QueryContext qc, final InputInfo ii) throws QueryException {
+    return node.add(this, level, merge, qc, ii);
   }
 
   @Override
   TrieNode add(final TrieLeaf leaf, final int level, final MergeDuplicates merge,
-      final InputInfo info, final QueryContext qc) throws QueryException {
+      final QueryContext qc, final InputInfo ii) throws QueryException {
 
     qc.checkStop();
     if(hash == leaf.hash) {
-      if(!key.sameKey(leaf.key, info))
+      if(!key.sameKey(leaf.key, ii))
         return new TrieList(hash, key, value, leaf.key, leaf.value);
 
       switch(merge) {
@@ -104,7 +104,7 @@ final class TrieLeaf extends TrieNode {
         case COMBINE:
           return new TrieLeaf(hash, key, ValueBuilder.concat(leaf.value, value, qc));
         default:
-          throw MERGE_DUPLICATE_X.get(info, key);
+          throw MERGE_DUPLICATE_X.get(ii, key);
       }
     }
 
@@ -113,7 +113,7 @@ final class TrieLeaf extends TrieNode {
 
     // same key? add recursively
     if(k == ok) {
-      ch[k] = add(leaf, level + 1, merge, info, qc);
+      ch[k] = add(leaf, level + 1, merge, qc, ii);
       nu = 1 << k;
     } else {
       ch[k] = this;
@@ -125,12 +125,12 @@ final class TrieLeaf extends TrieNode {
 
   @Override
   TrieNode add(final TrieList list, final int level, final MergeDuplicates merge,
-      final InputInfo info, final QueryContext qc) throws QueryException {
+      final QueryContext qc, final InputInfo ii) throws QueryException {
 
     // same hash? insert binding
     if(hash == list.hash) {
       for(int i = 0; i < list.size; i++) {
-        if(key.sameKey(list.keys[i], info)) {
+        if(key.sameKey(list.keys[i], ii)) {
           final Item[] ks = list.keys.clone();
           final Value[] vs = list.values.clone();
           ks[i] = key;
@@ -146,7 +146,7 @@ final class TrieLeaf extends TrieNode {
               vs[i] = ValueBuilder.concat(list.values[i], value, qc);
               break;
             default:
-              throw MERGE_DUPLICATE_X.get(info, key);
+              throw MERGE_DUPLICATE_X.get(ii, key);
           }
           return new TrieList(hash, ks, vs);
         }
@@ -159,7 +159,7 @@ final class TrieLeaf extends TrieNode {
 
     // same key? add recursively
     if(k == ok) {
-      ch[k] = add(list, level + 1, merge, info, qc);
+      ch[k] = add(list, level + 1, merge, qc, ii);
       nu = 1 << k;
     } else {
       ch[k] = this;
@@ -171,12 +171,12 @@ final class TrieLeaf extends TrieNode {
 
   @Override
   TrieNode add(final TrieBranch branch, final int level, final MergeDuplicates merge,
-      final InputInfo info, final QueryContext qc) throws QueryException {
+      final QueryContext qc, final InputInfo ii) throws QueryException {
 
     final int k = key(hash, level);
     final TrieNode[] ch = branch.copyKids();
     final TrieNode old = ch[k];
-    ch[k] = old == null ? this : old.addAll(this, level + 1, merge, info, qc);
+    ch[k] = old == null ? this : old.addAll(this, level + 1, merge, qc, ii);
     return new TrieBranch(ch, branch.used | 1 << k,
         branch.size + ch[k].size - (old != null ? old.size : 0));
   }
@@ -202,9 +202,9 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  void cache(final InputInfo info, final boolean lazy) throws QueryException {
-    key.cache(info, lazy);
-    value.cache(info, lazy);
+  void cache(final boolean lazy, final InputInfo ii) throws QueryException {
+    key.cache(lazy, ii);
+    value.cache(lazy, ii);
   }
 
   @Override
@@ -216,9 +216,9 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  void forEach(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo info)
+  void forEach(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
       throws QueryException {
-    vb.add(func.invokeValue(qc, info, key, value));
+    vb.add(func.invokeValue(qc, ii, key, value));
   }
 
   @Override
@@ -227,15 +227,15 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  boolean deep(final InputInfo info, final TrieNode node, final Collation coll)
+  boolean deep(final TrieNode node, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return node instanceof TrieLeaf && key.sameKey(((TrieLeaf) node).key, info) &&
-        deep(value, ((TrieLeaf) node).value, coll, info);
+    return node instanceof TrieLeaf && key.sameKey(((TrieLeaf) node).key, ii) &&
+        deep(value, ((TrieLeaf) node).value, coll, ii);
   }
 
   @Override
-  int hash(final InputInfo info) throws QueryException {
-    return 31 * hash + value.hash(info);
+  int hash(final InputInfo ii) throws QueryException {
+    return 31 * hash + value.hash(ii);
   }
 
   @Override

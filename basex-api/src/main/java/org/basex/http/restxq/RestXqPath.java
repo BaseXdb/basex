@@ -21,12 +21,12 @@ final class RestXqPath extends WebPath implements Comparable<RestXqPath> {
   /**
    * Constructor.
    * @param path path
-   * @param info input info
+   * @param ii input info
    * @throws QueryException query exception
    */
-  RestXqPath(final String path, final InputInfo info) throws QueryException {
+  RestXqPath(final String path, final InputInfo ii) throws QueryException {
     super(path);
-    matcher = RestXqPathMatcher.parse(path, info);
+    matcher = RestXqPathMatcher.parse(path, ii);
   }
 
   /**

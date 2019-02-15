@@ -25,8 +25,8 @@ abstract class NativeSeq extends Seq {
   }
 
   @Override
-  public Item ebv(final QueryContext qc, final InputInfo info) throws QueryException {
-    throw EBV_X.get(info, this);
+  public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
+    throw EBV_X.get(ii, this);
   }
 
   @Override
@@ -35,10 +35,10 @@ abstract class NativeSeq extends Seq {
   }
 
   @Override
-  public final void cache(final InputInfo info, final boolean lazy) { }
+  public final void cache(final boolean lazy, final InputInfo ii) { }
 
   @Override
-  public Value atomValue(final QueryContext qc, final InputInfo info) {
+  public Value atomValue(final QueryContext qc, final InputInfo ii) {
     return this;
   }
 

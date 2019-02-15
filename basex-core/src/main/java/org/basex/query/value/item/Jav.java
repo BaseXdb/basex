@@ -29,30 +29,30 @@ public final class Jav extends Item {
   }
 
   @Override
-  public byte[] string(final InputInfo info) throws QueryException {
-    return Str.get(value, qc, info).value;
+  public byte[] string(final InputInfo ii) throws QueryException {
+    return Str.get(value, qc, ii).value;
   }
 
   @Override
-  public boolean bool(final InputInfo info) {
+  public boolean bool(final InputInfo ii) {
     return !value.toString().isEmpty();
   }
 
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo info) throws QueryException {
-    return Token.eq(string(info), item.string(info));
+      final InputInfo ii) throws QueryException {
+    return Token.eq(string(ii), item.string(ii));
   }
 
   @Override
-  public boolean sameKey(final Item item, final InputInfo info) {
+  public boolean sameKey(final Item item, final InputInfo ii) {
     return false;
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo info)
+  public int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return Token.diff(string(info), item.string(info));
+    return Token.diff(string(ii), item.string(ii));
   }
 
   @Override

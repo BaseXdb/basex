@@ -18,7 +18,7 @@ public final class ProfVoid extends StandardFunc {
     final Iter iter = exprs[0].iter(qc);
 
     // caches items; ensures that lazy items will be evaluated
-    for(Item item; (item = qc.next(iter)) != null;) item.cache(info, false);
+    for(Item item; (item = qc.next(iter)) != null;) item.cache(false, info);
     return null;
   }
 }

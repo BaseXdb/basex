@@ -48,20 +48,20 @@ public final class StaticFuncs extends ExprInfo {
    * @param expr function body (can be {@code null})
    * @param doc xqdoc string
    * @param vs variable scope
-   * @param info input info
+   * @param ii input info
    * @return static function reference
    * @throws QueryException query exception
    */
   public StaticFunc declare(final AnnList anns, final QNm nm, final Var[] params,
       final SeqType type, final Expr expr, final String doc, final VarScope vs,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
 
     final byte[] uri = nm.uri();
-    if(uri.length == 0) throw FUNNONS_X.get(info, nm.string());
+    if(uri.length == 0) throw FUNNONS_X.get(ii, nm.string());
     if(NSGlobal.reserved(uri) || Functions.getBuiltIn(nm) != null)
-      throw FNRESERVED_X.get(info, nm.string());
+      throw FNRESERVED_X.get(ii, nm.string());
 
-    final StaticFunc sf = new StaticFunc(anns, nm, params, type, expr, doc, vs, info);
+    final StaticFunc sf = new StaticFunc(anns, nm, params, type, expr, doc, vs, ii);
     final byte[] sig = sf.id();
     final FuncCache fc = funcs.get(sig);
     if(fc != null) fc.setFunc(sf);
@@ -74,16 +74,16 @@ public final class StaticFuncs extends ExprInfo {
    * @param name name of the function
    * @param args optional arguments
    * @param sc static context
-   * @param info input info
+   * @param ii input info
    * @return reference if the function is known, {@code null} otherwise
    * @throws QueryException query exception
    */
   TypedFunc funcCall(final QNm name, final Expr[] args, final StaticContext sc,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
 
     // check if function has already been declared
     final FuncCache fc = funcs.get(signature(name, args.length));
-    return fc == null ? null : fc.newCall(name, args, sc, info);
+    return fc == null ? null : fc.newCall(name, args, sc, ii);
   }
 
   /**
@@ -91,15 +91,15 @@ public final class StaticFuncs extends ExprInfo {
    * @param name function name
    * @param args arguments
    * @param sc static context of the function call
-   * @param info input info
+   * @param ii input info
    * @return function call
    * @throws QueryException query exception
    */
   TypedFunc undeclaredFuncCall(final QNm name, final Expr[] args, final StaticContext sc,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
 
     if(NSGlobal.reserved(name.uri())) {
-      final QueryException qe = similarError(name, info);
+      final QueryException qe = similarError(name, ii);
       if(qe != null) throw qe;
     }
     final byte[] sig = signature(name, args.length);
@@ -108,7 +108,7 @@ public final class StaticFuncs extends ExprInfo {
       fc = new FuncCache(null);
       funcs.put(sig, fc);
     }
-    return fc.newCall(name, args, sc, info);
+    return fc.newCall(name, args, sc, ii);
   }
 
   /**
@@ -200,21 +200,21 @@ public final class StaticFuncs extends ExprInfo {
   /**
    * Throws an exception if the name of a function is similar to the specified function name.
    * @param name function name
-   * @param info input info
+   * @param ii input info
    * @return exception
    */
-  public QueryException similarError(final QNm name, final InputInfo info) {
+  public QueryException similarError(final QNm name, final InputInfo ii) {
     // find local functions
     final Levenshtein ls = new Levenshtein();
     final byte[] nm = lc(name.local());
     for(final FuncCache fc : funcs.values()) {
       final StaticFunc sf = fc.func;
       if(sf != null && sf.expr != null && ls.similar(nm, lc(sf.name.local()))) {
-        return FUNCSIMILAR_X_X.get(info, name.prefixString(), sf.name.prefixString());
+        return FUNCSIMILAR_X_X.get(ii, name.prefixString(), sf.name.prefixString());
       }
     }
     // find global function
-    return Functions.similarError(name, info);
+    return Functions.similarError(name, ii);
   }
 
   /**
@@ -286,14 +286,14 @@ public final class StaticFuncs extends ExprInfo {
      * @param name function name
      * @param args arguments
      * @param sc static context
-     * @param info input info
+     * @param ii input info
      * @return function call
      * @throws QueryException query exception
      */
     public TypedFunc newCall(final QNm name, final Expr[] args, final StaticContext sc,
-        final InputInfo info) throws QueryException {
+        final InputInfo ii) throws QueryException {
 
-      final StaticFuncCall call = new StaticFuncCall(name, args, sc, info);
+      final StaticFuncCall call = new StaticFuncCall(name, args, sc, ii);
       calls.add(call);
       // [LW] should be deferred until the actual types are known (i.e. compile time)
       return func != null ? new TypedFunc(call.init(func), func.anns) : new TypedFunc(call);

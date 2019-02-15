@@ -58,7 +58,8 @@ public abstract class Preds extends Arr {
     final ExprList list = new ExprList(es);
     boolean pos = false;
     for(final Expr ex : exprs) {
-      Expr ebv = ex.optimizeEbv(cc), expr = ebv;
+      final Expr ebv = ex.optimizeEbv(cc);
+      Expr expr = ebv;
       if(expr instanceof CmpG || expr instanceof CmpV) {
         final Cmp cmp = (Cmp) expr;
         final OpV opV = cmp.opV();

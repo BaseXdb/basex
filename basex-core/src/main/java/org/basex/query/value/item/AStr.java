@@ -33,27 +33,27 @@ public abstract class AStr extends Item {
   }
 
   @Override
-  public final boolean bool(final InputInfo info) throws QueryException {
-    return string(info).length != 0;
+  public final boolean bool(final InputInfo ii) throws QueryException {
+    return string(ii).length != 0;
   }
 
   @Override
   public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo info) throws QueryException {
-    return coll == null ? Token.eq(string(info), item.string(info)) :
-      coll.compare(string(info), item.string(info)) == 0;
+      final InputInfo ii) throws QueryException {
+    return coll == null ? Token.eq(string(ii), item.string(ii)) :
+      coll.compare(string(ii), item.string(ii)) == 0;
   }
 
   @Override
-  public boolean sameKey(final Item item, final InputInfo info) throws QueryException {
-    return item.type.isStringOrUntyped() && eq(item, null, null, info);
+  public boolean sameKey(final Item item, final InputInfo ii) throws QueryException {
+    return item.type.isStringOrUntyped() && eq(item, null, null, ii);
   }
 
   @Override
-  public final int diff(final Item item, final Collation coll, final InputInfo info)
+  public final int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return coll == null ? Token.diff(string(info), item.string(info)) :
-      coll.compare(string(info), item.string(info));
+    return coll == null ? Token.diff(string(ii), item.string(ii)) :
+      coll.compare(string(ii), item.string(ii));
   }
 
   @Override

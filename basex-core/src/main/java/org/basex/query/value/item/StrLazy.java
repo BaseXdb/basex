@@ -43,8 +43,8 @@ public final class StrLazy extends AStr implements Lazy {
   }
 
   @Override
-  public byte[] string(final InputInfo info) throws QueryException {
-    cache(info);
+  public byte[] string(final InputInfo ii) throws QueryException {
+    cache(ii);
     return value;
   }
 
@@ -54,33 +54,33 @@ public final class StrLazy extends AStr implements Lazy {
   }
 
   @Override
-  public BufferInput input(final InputInfo info) throws QueryException {
-    if(cache) cache(info);
-    return isCached() ? super.input(info) : get(info);
+  public BufferInput input(final InputInfo ii) throws QueryException {
+    if(cache) cache(ii);
+    return isCached() ? super.input(ii) : get(ii);
   }
 
   @Override
-  public void cache(final InputInfo info, final  boolean lazy) throws QueryException {
+  public void cache(final  boolean lazy, final InputInfo ii) throws QueryException {
     if(lazy) cache = true;
-    else cache(info);
+    else cache(ii);
   }
 
   @Override
-  public void cache(final InputInfo info) throws QueryException {
+  public void cache(final InputInfo ii) throws QueryException {
     try {
-      if(!isCached()) value = get(info).content();
+      if(!isCached()) value = get(ii).content();
     } catch(final IOException ex) {
-      throw error.get(info, ex);
+      throw error.get(ii, ex);
     }
   }
 
   /**
    * Returns an input stream for the item.
-   * @param info input info
+   * @param ii input info
    * @return stream
    * @throws QueryException query exception
    */
-  private BufferInput get(final InputInfo info) throws QueryException {
+  private BufferInput get(final InputInfo ii) throws QueryException {
     TextInput ti = null;
     try {
       ti = new TextInput(input);
@@ -88,7 +88,7 @@ public final class StrLazy extends AStr implements Lazy {
       return ti;
     } catch(final IOException ex) {
       if(ti != null) try { ti.close(); } catch(final IOException e) { Util.debug(e); }
-      throw error.get(info, ex);
+      throw error.get(ii, ex);
     }
   }
 

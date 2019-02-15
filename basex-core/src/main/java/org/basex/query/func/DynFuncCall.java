@@ -161,7 +161,7 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem elem = planElem(TCL, tailCall);
+    final FElem elem = planElem(TCL, tco);
     addPlan(plan, elem, body());
     final int last = exprs.length - 1;
     for(int e = 0; e < last; e++) exprs[e].plan(elem);

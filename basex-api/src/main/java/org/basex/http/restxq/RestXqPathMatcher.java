@@ -89,11 +89,11 @@ final class RestXqPathMatcher {
   /**
    * Parses a path template.
    * @param path path template string to be parsed
-   * @param info input info
+   * @param ii input info
    * @return parsed path template
    * @throws QueryException query exception
    */
-  static RestXqPathMatcher parse(final String path, final InputInfo info) throws QueryException {
+  static RestXqPathMatcher parse(final String path, final InputInfo ii) throws QueryException {
     if(path.isEmpty()) return EMPTY;
 
     final ArrayList<QNm> varNames = new ArrayList<>();
@@ -111,11 +111,11 @@ final class RestXqPathMatcher {
     while(i.hasNext()) {
       char ch = i.next();
       if(ch == '{') {
-        decodeAndEscape(literals, result, info);
+        decodeAndEscape(literals, result, ii);
 
         // variable
         if(!i.hasNext() || i.nextNonWS() != '$')
-          throw RestXqFunction.error(info, INV_TEMPLATE_X, path);
+          throw RestXqFunction.error(ii, INV_TEMPLATE_X, path);
 
         // default variable regular expression
         regex.append("[^/]+?");
@@ -127,7 +127,7 @@ final class RestXqPathMatcher {
           if(ch == '=') {
             regex.setLength(0);
             addRegex(i, regex);
-            if(regex.length() == 0) throw RestXqFunction.error(info, INV_TEMPLATE_X, path);
+            if(regex.length() == 0) throw RestXqFunction.error(ii, INV_TEMPLATE_X, path);
             break;
           } else if(ch == '{') {
             ++braces;
@@ -140,7 +140,7 @@ final class RestXqPathMatcher {
         }
 
         final byte[] var = variable.toArray();
-        if(!XMLToken.isQName(var)) throw RestXqFunction.error(info, INV_VARNAME_X, variable);
+        if(!XMLToken.isQName(var)) throw RestXqFunction.error(ii, INV_VARNAME_X, variable);
         varNames.add(new QNm(var));
         variable.reset();
         varsPos.set(segment);
@@ -152,7 +152,7 @@ final class RestXqPathMatcher {
         literals.append(ch);
       }
     }
-    decodeAndEscape(literals, result, info);
+    decodeAndEscape(literals, result, ii);
 
     final BigInteger vp = varsPos.cardinality() == 0 ? ZERO : new BigInteger(varsPos.toByteArray());
     return new RestXqPathMatcher(result.toString(), varNames, segment + 1, vp);
@@ -176,16 +176,16 @@ final class RestXqPathMatcher {
   /**
    * Decodes the URL and escapes regex characters in path template literals.
    * @param literals literals to escape
-   * @param info input info
+   * @param ii input info
    * @param result string builder where the escaped literals will be appended to.
    * @throws QueryException query exception
    */
   private static void decodeAndEscape(final StringBuilder literals, final StringBuilder result,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
 
     if(literals.length() > 0) {
       final byte[] path = Token.decodeUri(Token.token(literals.toString()));
-      if(path == null) throw RestXqFunction.error(info, INV_ENCODING_X, literals);
+      if(path == null) throw RestXqFunction.error(ii, INV_ENCODING_X, literals);
       final TokenBuilder tb = new TokenBuilder(path.length);
       for(final byte b : path) {
         if(".^&!?-:<>()[]{}$=,*+|".indexOf(b) >= 0) tb.addByte((byte) '\\');

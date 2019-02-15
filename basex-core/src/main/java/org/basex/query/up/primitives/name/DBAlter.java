@@ -23,13 +23,13 @@ public final class DBAlter extends NameUpdate {
    * Constructor.
    * @param name database to be renamed
    * @param newName name of new database
-   * @param info input info
    * @param qc query context
+   * @param info input info
    */
-  public DBAlter(final String name, final String newName, final InputInfo info,
-      final QueryContext qc) {
+  public DBAlter(final String name, final String newName, final QueryContext qc,
+      final InputInfo info) {
 
-    super(UpdateType.DBALTER, name, info, qc);
+    super(UpdateType.DBALTER, name, qc, info);
     this.newName = newName;
   }
 

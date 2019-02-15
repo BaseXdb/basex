@@ -89,22 +89,22 @@ public class FuncType implements Type {
 
   @Override
   public FItem cast(final Item item, final QueryContext qc, final StaticContext sc,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
 
-    if(!(item instanceof FItem)) throw typeError(item, this, info);
+    if(!(item instanceof FItem)) throw typeError(item, this, ii);
     final FItem func = (FItem) item;
-    return this == SeqType.ANY_FUNC ? func : func.coerceTo(this, qc, info, false);
+    return this == SeqType.ANY_FUNC ? func : func.coerceTo(this, qc, ii, false);
   }
 
   @Override
   public final Item cast(final Object value, final QueryContext qc, final StaticContext sc,
-      final InputInfo info) {
+      final InputInfo ii) {
     throw Util.notExpected(value);
   }
 
   @Override
   public final Item castString(final String string, final QueryContext qc, final StaticContext sc,
-      final InputInfo info) {
+      final InputInfo ii) {
     throw Util.notExpected(string);
   }
 

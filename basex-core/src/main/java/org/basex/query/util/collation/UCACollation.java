@@ -44,7 +44,7 @@ final class UCACollation extends Collation {
 
   @Override
   protected int indexOf(final String string, final String contains, final Mode mode,
-      final InputInfo info) {
+      final InputInfo ii) {
 
     final Object iterS = Reflect.invoke(RBC_GCEI, collator, string);
     final Object iterC = Reflect.invoke(RBC_GCEI, collator, contains);

@@ -25,12 +25,12 @@ public final class Tim extends ADate {
   /**
    * Constructor.
    * @param value time
-   * @param info input info
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public Tim(final byte[] value, final InputInfo info) throws QueryException {
+  public Tim(final byte[] value, final InputInfo ii) throws QueryException {
     super(AtomType.TIM);
-    time(value, XTIME, info);
+    time(value, XTIME, ii);
     clean();
   }
 
@@ -47,9 +47,9 @@ public final class Tim extends ADate {
   }
 
   @Override
-  public void timeZone(final DTDur zone, final boolean spec, final InputInfo info)
+  public void timeZone(final DTDur zone, final boolean spec, final InputInfo ii)
       throws QueryException {
-    tz(zone, spec, info);
+    tz(zone, spec, ii);
     clean();
   }
 

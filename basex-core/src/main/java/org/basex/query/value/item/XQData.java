@@ -51,17 +51,17 @@ public abstract class XQData extends FItem {
   }
 
   @Override
-  public final Value invValue(final QueryContext qc, final InputInfo info, final Value... args)
+  public final Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    final Item key = args[0].atomItem(qc, info);
-    if(key == null) throw EMPTYFOUND.get(info);
-    return get(key, info);
+    final Item key = args[0].atomItem(qc, ii);
+    if(key == null) throw EMPTYFOUND.get(ii);
+    return get(key, ii);
   }
 
   @Override
-  public final Item invItem(final QueryContext qc, final InputInfo info, final Value... args)
+  public final Item invItem(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return invValue(qc, info, args).item(qc, info);
+    return invValue(qc, ii, args).item(qc, ii);
   }
 
   @Override
@@ -70,23 +70,23 @@ public abstract class XQData extends FItem {
   }
 
   @Override
-  public final Value invokeValue(final QueryContext qc, final InputInfo info, final Value... args)
+  public final Value invokeValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return FuncCall.value(this, args, qc, info);
+    return FuncCall.invoke(this, args, false, qc, ii);
   }
 
   @Override
-  public final Item invokeItem(final QueryContext qc, final InputInfo info, final Value... args)
+  public final Item invokeItem(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return FuncCall.item(this, args, qc, info);
+    return (Item) FuncCall.invoke(this, args, true, qc, ii);
   }
 
   @Override
-  public final FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo info,
+  public final FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean optimize) throws QueryException {
 
     if(instanceOf(ft, true)) return this;
-    throw typeError(this, ft, info);
+    throw typeError(this, ft, ii);
   }
 
   @Override
@@ -98,11 +98,11 @@ public abstract class XQData extends FItem {
   /**
    * Gets a value from this item.
    * @param key key to look for (must not be {@code null})
-   * @param info input info
+   * @param ii input info
    * @return bound value if found, the empty sequence {@code ()} otherwise
    * @throws QueryException query exception
    */
-  public abstract Value get(Item key, InputInfo info) throws QueryException;
+  public abstract Value get(Item key, InputInfo ii) throws QueryException;
 
   /**
    * Checks if this is an instance of the specified type.
@@ -117,9 +117,9 @@ public abstract class XQData extends FItem {
    * @param indent indent output
    * @param tb token builder
    * @param level current level
-   * @param info input info
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public abstract void string(boolean indent, TokenBuilder tb, int level, InputInfo info)
+  public abstract void string(boolean indent, TokenBuilder tb, int level, InputInfo ii)
       throws QueryException;
 }

@@ -321,7 +321,7 @@ public class CmpG extends Cmp {
     Expr expr1 = exprs[0];
     final boolean tokenize = Function.TOKENIZE.is(expr1);
     if(tokenize) expr1 = ((FnTokenize) expr1).input();
-    return ii.create(exprs[1], ii.type(expr1, tokenize ? IndexType.TOKEN : null), info, false);
+    return ii.create(exprs[1], ii.type(expr1, tokenize ? IndexType.TOKEN : null), false, info);
   }
 
   @Override

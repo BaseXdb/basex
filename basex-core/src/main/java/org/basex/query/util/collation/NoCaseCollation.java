@@ -24,7 +24,7 @@ final class NoCaseCollation extends Collation {
 
   @Override
   protected int indexOf(final String string, final String sub, final Mode mode,
-      final InputInfo info) {
+      final InputInfo ii) {
 
     final int tl = string.length(), sl = sub.length();
     if(sl == 0) return 0;

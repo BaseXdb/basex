@@ -30,7 +30,7 @@ public final class DBRestore extends NameUpdate {
   public DBRestore(final String name, final String backup, final QueryContext qc,
       final InputInfo info) {
 
-    super(UpdateType.DBRESTORE, name, info, qc);
+    super(UpdateType.DBRESTORE, name, qc, info);
     this.backup = backup;
   }
 

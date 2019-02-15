@@ -34,12 +34,12 @@ public class RegExParser implements RegExParserConstants {
    * Compiles this regular expression to a {@link Pattern}.
    * @param regex regular expression to parse
    * @param modifiers modifiers
-   * @param info input info
+   * @param ii input info
    * @param check check result for empty strings
    * @return the pattern
    * @throws QueryException query exception
    */
-  public static Pattern parse(final byte[] regex, final byte[] modifiers, final InputInfo info,
+  public static Pattern parse(final byte[] regex, final byte[] modifiers, final InputInfo ii,
       final boolean check) throws QueryException {
 
     // process modifiers
@@ -52,7 +52,7 @@ public class RegExParser implements RegExParserConstants {
       else if(mod == 'q') flags |= LITERAL;
       else if(mod == 'x') strip = true;
       else if(mod == 'j' || mod == '!') java = true;
-      else if(mod != ';') throw REGMOD_X.get(info, (char) mod);
+      else if(mod != ';') throw REGMOD_X.get(ii, (char) mod);
     }
 
     try {
@@ -68,18 +68,18 @@ public class RegExParser implements RegExParserConstants {
         // http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#lt
         final Pattern p = (pattern.flags() & Pattern.MULTILINE) == 0 ? pattern :
           Pattern.compile(pattern.pattern());
-        if(p.matcher("").matches()) throw REGROUP.get(info);
+        if(p.matcher("").matches()) throw REGROUP.get(ii);
       }
       return pattern;
     } catch(final PatternSyntaxException ex) {
       Util.debug(ex);
-      throw REGPAT_X.get(info, regex);
+      throw REGPAT_X.get(ii, regex);
     } catch(final ParseException ex) {
       Util.debug(ex);
-      throw REGPAT_X.get(info, regex);
+      throw REGPAT_X.get(ii, regex);
     } catch(final TokenMgrError ex) {
       Util.debug(ex);
-      throw REGPAT_X.get(info, regex);
+      throw REGPAT_X.get(ii, regex);
     }
   }
 

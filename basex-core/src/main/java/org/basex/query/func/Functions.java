@@ -62,11 +62,11 @@ public final class Functions {
    * Tries to resolve the specified function with xs namespace as a cast.
    * @param arity number of arguments
    * @param name function name
-   * @param info input info
+   * @param ii input info
    * @return cast type if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  private static Type getCast(final QNm name, final long arity, final InputInfo info)
+  private static Type getCast(final QNm name, final long arity, final InputInfo ii)
       throws QueryException {
 
     final byte[] ln = name.local();
@@ -76,7 +76,7 @@ public final class Functions {
     // no constructor function found, or abstract type specified
     if(type != null && type != AtomType.NOT && type != AtomType.AAT) {
       if(arity == 1) return type;
-      throw FUNCARITY_X_X_X.get(info, name.string(), arguments(arity), 1);
+      throw FUNCARITY_X_X_X.get(ii, name.string(), arguments(arity), 1);
     }
 
     // include similar function name in error message
@@ -86,12 +86,12 @@ public final class Functions {
       final byte[] u = tp.name.uri();
       if(eq(u, XS_URI) && tp != AtomType.NOT && tp != AtomType.AAT &&
           ls.similar(lc(ln), lc(tp.string()))) {
-        throw FUNCSIMILAR_X_X.get(info, name.prefixId(), tp.toString());
+        throw FUNCSIMILAR_X_X.get(ii, name.prefixId(), tp.toString());
       }
     }
 
     // no similar name: constructor function found, or abstract type specified
-    throw WHICHFUNC_X.get(info, name.prefixId());
+    throw WHICHFUNC_X.get(ii, name.prefixId());
   }
 
   /**
@@ -126,11 +126,11 @@ public final class Functions {
    * Raises an error if the function is found, but has a different arity.
    * @param name function name
    * @param arity number of arguments
-   * @param info input info
+   * @param ii input info
    * @return function if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  private static FuncDefinition getBuiltIn(final QNm name, final long arity, final InputInfo info)
+  private static FuncDefinition getBuiltIn(final QNm name, final long arity, final InputInfo ii)
       throws QueryException {
 
     final FuncDefinition def = getBuiltIn(name);
@@ -143,7 +143,7 @@ public final class Functions {
     if(max != Integer.MAX_VALUE) {
       for(int m = min; m <= max; m++) arities.add(m);
     }
-    throw wrongArity(def, arity, arities, info);
+    throw wrongArity(def, arity, arities, ii);
   }
 
   /**
@@ -151,14 +151,14 @@ public final class Functions {
    * @param function function
    * @param arity number of supplied arguments
    * @param arities expected arities
-   * @param info input info
+   * @param ii input info
    * @return error
    */
   public static QueryException wrongArity(final Object function, final long arity,
-      final IntList arities, final InputInfo info) {
+      final IntList arities, final InputInfo ii) {
 
     final int as = arities.sort().distinct().size();
-    if(as == 0) return FUNCARITY_X_X.get(info, function, arguments(arity));
+    if(as == 0) return FUNCARITY_X_X.get(ii, function, arguments(arity));
 
     int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
     for(int a = 0; a < as; a++) {
@@ -176,7 +176,7 @@ public final class Functions {
         ext.append(arities.get(a));
       }
     }
-    return FUNCARITY_X_X_X.get(info, function, arguments(arity), ext);
+    return FUNCARITY_X_X_X.get(ii, function, arguments(arity), ext);
   }
 
   /**
@@ -184,14 +184,14 @@ public final class Functions {
    * @param name function qname
    * @param args optional arguments
    * @param sc static context
-   * @param info input info
+   * @param ii input info
    * @return function instance
    * @throws QueryException query exception
    */
   static StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
-      final InputInfo info) throws QueryException {
-    final FuncDefinition def = getBuiltIn(name, args.length, info);
-    return def == null ? null : def.get(sc, info, args);
+      final InputInfo ii) throws QueryException {
+    final FuncDefinition def = getBuiltIn(name, args.length, ii);
+    return def == null ? null : def.get(sc, ii, args);
   }
 
   /**
@@ -204,16 +204,16 @@ public final class Functions {
    * @param ft function type
    * @param expr function body
    * @param vs variable scope
-   * @param info input info
+   * @param ii input info
    * @param runtime run-time flag
    * @param updating flag for updating functions
    * @return the function expression
    */
   private static Expr closureOrFItem(final AnnList anns, final QNm name, final Var[] params,
-      final FuncType ft, final Expr expr, final VarScope vs, final InputInfo info,
+      final FuncType ft, final Expr expr, final VarScope vs, final InputInfo ii,
       final boolean runtime, final boolean updating) {
-    return runtime ? new FuncItem(vs.sc, anns, name, params, ft, expr, vs.stackSize(), info) :
-      new Closure(info, name, updating ? SeqType.EMP : ft.declType, params, expr, anns, null, vs);
+    return runtime ? new FuncItem(vs.sc, anns, name, params, ft, expr, vs.stackSize(), ii) :
+      new Closure(ii, name, updating ? SeqType.EMP : ft.declType, params, expr, anns, null, vs);
   }
 
   /**
@@ -222,27 +222,27 @@ public final class Functions {
    * @param arity number of arguments
    * @param qc query context
    * @param sc static context
-   * @param info input info
+   * @param ii input info
    * @param runtime {@code true} if this method is called at run-time, {@code false} otherwise
    * @return function literal if found, {@code null} otherwise
    * @throws QueryException query exception
    */
   public static Expr getLiteral(final QNm name, final int arity, final QueryContext qc,
-      final StaticContext sc, final InputInfo info, final boolean runtime) throws QueryException {
+      final StaticContext sc, final InputInfo ii, final boolean runtime) throws QueryException {
 
     // parse type constructors
     if(eq(name.uri(), XS_URI)) {
-      final Type type = getCast(name, arity, info);
+      final Type type = getCast(name, arity, ii);
       final VarScope vs = new VarScope(sc);
-      final Var[] params = { vs.addNew(new QNm(ITEM, ""), SeqType.AAT_ZO, true, qc, info) };
-      final Expr expr = new Cast(sc, info, new VarRef(info, params[0]), type.seqType());
+      final Var[] params = { vs.addNew(new QNm(ITEM, ""), SeqType.AAT_ZO, true, qc, ii) };
+      final Expr expr = new Cast(sc, ii, new VarRef(ii, params[0]), type.seqType());
       final AnnList anns = new AnnList();
       final FuncType ft = FuncType.get(anns, expr.seqType(), params);
-      return closureOrFItem(anns, name, params, ft, expr, vs, info, runtime, false);
+      return closureOrFItem(anns, name, params, ft, expr, vs, ii, runtime, false);
     }
 
     // built-in functions
-    final FuncDefinition def = getBuiltIn(name, arity, info);
+    final FuncDefinition def = getBuiltIn(name, arity, ii);
     if(def != null) {
       final AnnList anns = new AnnList();
       final VarScope vs = new VarScope(sc);
@@ -251,21 +251,21 @@ public final class Functions {
       final Var[] params = new Var[arity];
       final Expr[] args = new Expr[arity];
       for(int i = 0; i < arity; i++) {
-        params[i] = vs.addNew(names[i], ft.argTypes[i], true, qc, info);
-        args[i] = new VarRef(info, params[i]);
+        params[i] = vs.addNew(names[i], ft.argTypes[i], true, qc, ii);
+        args[i] = new VarRef(ii, params[i]);
       }
 
-      final StandardFunc sf = def.get(sc, info, args);
+      final StandardFunc sf = def.get(sc, ii, args);
       final boolean upd = sf.has(Flag.UPD);
       if(upd) {
-        anns.add(new Ann(info, Annotation.UPDATING));
+        anns.add(new Ann(ii, Annotation.UPDATING));
         qc.updating();
       }
       // context/positional access must be bound to original focus
       // example for invalid query: let $f := last#0 return (1,2)[$f()]
       return sf.has(Flag.CTX, Flag.POS)
-          ? new FuncLit(anns, name, params, sf, ft.seqType(), vs, info)
-          : closureOrFItem(anns, name, params, def.type(arity, anns), sf, vs, info, runtime, upd);
+          ? new FuncLit(anns, name, params, sf, ft.seqType(), vs, ii)
+          : closureOrFItem(anns, name, params, def.type(arity, anns), sf, vs, ii, runtime, upd);
     }
 
     // user-defined function
@@ -276,12 +276,12 @@ public final class Functions {
       final Var[] params = new Var[arity];
       final Expr[] args = new Expr[arity];
       for(int a = 0; a < arity; a++) {
-        params[a] = vs.addNew(sf.paramName(a), ft.argTypes[a], true, qc, info);
-        args[a] = new VarRef(info, params[a]);
+        params[a] = vs.addNew(sf.paramName(a), ft.argTypes[a], true, qc, ii);
+        args[a] = new VarRef(ii, params[a]);
       }
       final boolean upd = sf.updating;
-      final TypedFunc tf = qc.funcs.undeclaredFuncCall(sf.name, args, sc, info);
-      final Expr func = closureOrFItem(tf.anns, sf.name, params, ft, tf.func, vs, info,
+      final TypedFunc tf = qc.funcs.undeclaredFuncCall(sf.name, args, sc, ii);
+      final Expr func = closureOrFItem(tf.anns, sf.name, params, ft, tf.func, vs, ii,
           runtime, upd);
       if(upd) qc.updating();
       return func;
@@ -297,11 +297,11 @@ public final class Functions {
     final Expr[] args = new Expr[arity];
     final int vl = params.length;
     for(int v = 0; v < vl; v++) {
-      params[v] = vs.addNew(new QNm(ARG + (v + 1), ""), null, true, qc, info);
-      args[v] = new VarRef(info, params[v]);
+      params[v] = vs.addNew(new QNm(ARG + (v + 1), ""), null, true, qc, ii);
+      args[v] = new VarRef(ii, params[v]);
     }
-    final JavaCall jf = JavaCall.get(name, args, qc, sc, info);
-    return jf == null ? null : new FuncLit(anns, name, params, jf, st, vs, info);
+    final JavaCall jf = JavaCall.get(name, args, qc, sc, ii);
+    return jf == null ? null : new FuncLit(anns, name, params, jf, st, vs, ii);
   }
 
   /**
@@ -309,12 +309,12 @@ public final class Functions {
    * @param sf static function
    * @param qc query context
    * @param sc static context
-   * @param info input info
+   * @param ii input info
    * @return resulting value
    * @throws QueryException query exception
    */
-  public static FuncItem getUser(final StaticFunc sf, final QueryContext qc,
-      final StaticContext sc, final InputInfo info) throws QueryException {
+  public static FuncItem getUser(final StaticFunc sf, final QueryContext qc, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
 
     final FuncType ft = sf.funcType();
     final VarScope vs = new VarScope(sc);
@@ -323,11 +323,11 @@ public final class Functions {
     final int al = args.length;
     final Expr[] calls = new Expr[al];
     for(int a = 0; a < al; a++) {
-      args[a] = vs.addNew(sf.paramName(a), ft.argTypes[a], true, qc, info);
-      calls[a] = new VarRef(info, args[a]);
+      args[a] = vs.addNew(sf.paramName(a), ft.argTypes[a], true, qc, ii);
+      calls[a] = new VarRef(ii, args[a]);
     }
-    final TypedFunc tf = qc.funcs.undeclaredFuncCall(sf.name, calls, sc, info);
-    return new FuncItem(sc, tf.anns, sf.name, args, ft, tf.func, vs.stackSize(), info);
+    final TypedFunc tf = qc.funcs.undeclaredFuncCall(sf.name, calls, sc, ii);
+    return new FuncItem(sc, tf.anns, sf.name, args, ft, tf.func, vs.stackSize(), ii);
   }
 
   /**
@@ -336,49 +336,49 @@ public final class Functions {
    * @param args optional arguments
    * @param qc query context
    * @param sc static context
-   * @param info input info
+   * @param ii input info
    * @return function call
    * @throws QueryException query exception
    */
   public static Expr get(final QNm name, final Expr[] args, final QueryContext qc,
-      final StaticContext sc, final InputInfo info) throws QueryException {
+      final StaticContext sc, final InputInfo ii) throws QueryException {
 
     // type constructors
     if(eq(name.uri(), XS_URI)) {
-      final Type type = getCast(name, args.length, info);
+      final Type type = getCast(name, args.length, ii);
       final SeqType to = SeqType.get(type, Occ.ZERO_ONE);
-      return new Cast(sc, info, args[0], to);
+      return new Cast(sc, ii, args[0], to);
     }
 
     // built-in functions
-    final StandardFunc sf = get(name, args, sc, info);
+    final StandardFunc sf = get(name, args, sc, ii);
     if(sf != null) {
       if(sf.def.has(Flag.UPD)) qc.updating();
       return sf;
     }
 
     // user-defined function
-    final TypedFunc tf = qc.funcs.funcCall(name, args, sc, info);
+    final TypedFunc tf = qc.funcs.funcCall(name, args, sc, ii);
     if(tf != null) {
       if(tf.anns.contains(Annotation.UPDATING)) qc.updating();
       return tf.func;
     }
 
     // Java function
-    final JavaCall jf = JavaCall.get(name, args, qc, sc, info);
+    final JavaCall jf = JavaCall.get(name, args, qc, sc, ii);
     if(jf != null) return jf;
 
     // user-defined function that has not been declared yet
-    return qc.funcs.undeclaredFuncCall(name, args, sc, info).func;
+    return qc.funcs.undeclaredFuncCall(name, args, sc, ii).func;
   }
 
   /**
    * Returns an exception if the name of a built-in function is similar to the specified name.
    * @param name name of input function
-   * @param info input info
+   * @param ii input info
    * @return query exception or {@code null}
    */
-  static QueryException similarError(final QNm name, final InputInfo info) {
+  static QueryException similarError(final QNm name, final InputInfo ii) {
     // find similar function in three runs
     final byte[] local = name.local(), uri = name.uri();
     final Levenshtein ls = new Levenshtein();
@@ -394,7 +394,7 @@ public final class Functions {
           // find functions with identical URIs and local names that start with the specified name
           eq(uri, substring(key, 2, i)) && startsWith(substring(key, i + 1), local)) {
           final QNm sim = new QNm(slocal, suri);
-          return FUNCSIMILAR_X_X.get(info, name.prefixId(), sim.prefixId());
+          return FUNCSIMILAR_X_X.get(ii, name.prefixId(), sim.prefixId());
         }
       }
     }

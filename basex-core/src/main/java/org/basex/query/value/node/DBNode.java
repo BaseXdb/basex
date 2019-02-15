@@ -132,7 +132,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final long itr(final InputInfo info) throws QueryException {
+  public final long itr(final InputInfo ii) throws QueryException {
     if(type == NodeType.ELM) {
       final int as = data.attSize(pre, Data.ELEM);
       if(data.size(pre, Data.ELEM) - as == 1 && data.kind(pre + as) == Data.TEXT) {
@@ -143,11 +143,11 @@ public class DBNode extends ANode {
       final long l = data.textItr(pre, type == NodeType.TXT);
       if(l != Long.MIN_VALUE) return l;
     }
-    return Int.parse(this, info);
+    return Int.parse(this, ii);
   }
 
   @Override
-  public final double dbl(final InputInfo info) throws QueryException {
+  public final double dbl(final InputInfo ii) throws QueryException {
     // try to directly retrieve inlined numeric value from XML storage
     double d = Double.NaN;
     if(type == NodeType.ELM) {
@@ -159,7 +159,7 @@ public class DBNode extends ANode {
       d = data.textDbl(pre, type == NodeType.TXT);
     }
     // GH-1206: parse invalid values again
-    return Double.isNaN(d) ? Dbl.parse(string(), info) : d;
+    return Double.isNaN(d) ? Dbl.parse(string(), ii) : d;
   }
 
   @Override

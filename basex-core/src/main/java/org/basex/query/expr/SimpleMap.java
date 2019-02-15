@@ -34,16 +34,16 @@ public abstract class SimpleMap extends Arr {
 
   /**
    * Returns a map instance.
-   * @param info input info
+   * @param ii input info
    * @param exprs expressions
    * @return instance
    */
-  public static Expr get(final InputInfo info, final Expr... exprs) {
+  public static Expr get(final InputInfo ii, final Expr... exprs) {
     if(exprs.length == 1) return exprs[0];
     for(final Expr expr : exprs) {
-      if(expr.has(Flag.POS)) return new CachedMap(info, exprs);
+      if(expr.has(Flag.POS)) return new CachedMap(ii, exprs);
     }
-    return new IterMap(info, exprs);
+    return new IterMap(ii, exprs);
   }
 
   @Override

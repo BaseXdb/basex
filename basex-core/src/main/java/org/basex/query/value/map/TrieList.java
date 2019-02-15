@@ -54,13 +54,13 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hs, final Item key, final int level, final InputInfo info)
+  TrieNode delete(final int hs, final Item key, final int level, final InputInfo ii)
       throws QueryException {
 
     if(hs == hash) {
       for(int i = size; i-- > 0;) {
         // still collisions?
-        if(key.sameKey(keys[i], info)) {
+        if(key.sameKey(keys[i], ii)) {
           // found entry
           if(size == 2) {
             // single leaf remains
@@ -84,12 +84,12 @@ final class TrieList extends TrieNode {
 
   @Override
   TrieNode put(final int hs, final Item key, final Value value, final int level,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
 
     // same hash, replace or merge
     if(hs == hash) {
       for(int i = keys.length; i-- > 0;) {
-        if(key.sameKey(keys[i], info)) {
+        if(key.sameKey(keys[i], ii)) {
           // replace value
           final Value[] vs = values.clone();
           vs[i] = value;
@@ -104,7 +104,7 @@ final class TrieList extends TrieNode {
     final int a = key(hs, level), b = key(hash, level);
     final int used;
     if(a == b) {
-      ch[a] = put(hs, key, value, level + 1, info);
+      ch[a] = put(hs, key, value, level + 1, ii);
       used = 1 << a;
     } else {
       ch[a] = new TrieLeaf(hs, key, value);
@@ -116,39 +116,39 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  Value get(final int hs, final Item key, final int level, final InputInfo info)
+  Value get(final int hs, final Item key, final int level, final InputInfo ii)
       throws QueryException {
     if(hs == hash) {
       for(int k = keys.length; k-- != 0;)
-      if(key.sameKey(keys[k], info)) return values[k];
+      if(key.sameKey(keys[k], ii)) return values[k];
     }
     return null;
   }
 
   @Override
-  boolean contains(final int hs, final Item key, final int level, final InputInfo info)
+  boolean contains(final int hs, final Item key, final int level, final InputInfo ii)
       throws QueryException {
     if(hs == hash) {
       for(int k = keys.length; k-- != 0;)
-        if(key.sameKey(keys[k], info)) return true;
+        if(key.sameKey(keys[k], ii)) return true;
     }
     return false;
   }
 
   @Override
   TrieNode addAll(final TrieNode node, final int level, final MergeDuplicates merge,
-      final InputInfo info, final QueryContext qc) throws QueryException {
-    return node.add(this, level, merge, info, qc);
+      final QueryContext qc, final InputInfo ii) throws QueryException {
+    return node.add(this, level, merge, qc, ii);
   }
 
   @Override
   TrieNode add(final TrieLeaf leaf, final int level, final MergeDuplicates merge,
-      final InputInfo info, final QueryContext qc) throws QueryException {
+      final QueryContext qc, final InputInfo ii) throws QueryException {
 
     qc.checkStop();
     if(hash == leaf.hash) {
       for(int k = keys.length; k-- > 0;) {
-        if(leaf.key.sameKey(keys[k], info)) {
+        if(leaf.key.sameKey(keys[k], ii)) {
           switch(merge) {
             case USE_FIRST:
             case UNSPECIFIED:
@@ -162,7 +162,7 @@ final class TrieList extends TrieNode {
               cm[k] = ValueBuilder.concat(leaf.value, cm[k], qc);
               return new TrieList(hash, keys, cm);
             default:
-              throw MERGE_DUPLICATE_X.get(info, leaf.key);
+              throw MERGE_DUPLICATE_X.get(ii, leaf.key);
           }
         }
       }
@@ -174,7 +174,7 @@ final class TrieList extends TrieNode {
 
     // same key? add recursively
     if(k == ok) {
-      ch[k] = add(leaf, level + 1, merge, info, qc);
+      ch[k] = add(leaf, level + 1, merge, qc, ii);
       nu = 1 << k;
     } else {
       ch[k] = this;
@@ -187,7 +187,7 @@ final class TrieList extends TrieNode {
 
   @Override
   TrieNode add(final TrieList list, final int level, final MergeDuplicates merge,
-      final InputInfo info, final QueryContext qc) throws QueryException {
+      final QueryContext qc, final InputInfo ii) throws QueryException {
 
     qc.checkStop();
     if(hash == list.hash) {
@@ -199,7 +199,7 @@ final class TrieList extends TrieNode {
         final Item ok = list.keys[i];
         // skip all entries that are overridden
         for(final Item k : keys) {
-          if(k.sameKey(ok, info)) continue OUTER;
+          if(k.sameKey(ok, ii)) continue OUTER;
         }
         // key is not in this list, add it
         ks = Array.add(ks, ok);
@@ -213,7 +213,7 @@ final class TrieList extends TrieNode {
 
     // same key? add recursively
     if(k == ok) {
-      ch[k] = add(list, level + 1, merge, info, qc);
+      ch[k] = add(list, level + 1, merge, qc, ii);
       nu = 1 << k;
     } else {
       ch[k] = this;
@@ -225,12 +225,12 @@ final class TrieList extends TrieNode {
 
   @Override
   TrieNode add(final TrieBranch branch, final int level, final MergeDuplicates merge,
-      final InputInfo info, final QueryContext qc) throws QueryException {
+      final QueryContext qc, final InputInfo ii) throws QueryException {
 
     final int k = key(hash, level);
     final TrieNode[] ch = branch.copyKids();
     final TrieNode old = ch[k];
-    ch[k] = old == null ? this : old.addAll(this, level + 1, merge, info, qc);
+    ch[k] = old == null ? this : old.addAll(this, level + 1, merge, qc, ii);
     return new TrieBranch(ch, branch.used | 1 << k,
         branch.size + size - (old != null ? old.size : 0));
   }
@@ -261,10 +261,10 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  void cache(final InputInfo info, final boolean lazy) throws QueryException {
+  void cache(final boolean lazy, final InputInfo ii) throws QueryException {
     for(int i = 0; i < size; i++) {
-      keys[i].cache(info, lazy);
-      values[i].cache(info, lazy);
+      keys[i].cache(lazy, ii);
+      values[i].cache(lazy, ii);
     }
   }
 
@@ -279,9 +279,9 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  void forEach(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo info)
+  void forEach(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
       throws QueryException {
-    for(int i = 0; i < size; i++) vb.add(func.invokeValue(qc, info, keys[i], values[i]));
+    for(int i = 0; i < size; i++) vb.add(func.invokeValue(qc, ii, keys[i], values[i]));
   }
 
   @Override
@@ -300,15 +300,15 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  int hash(final InputInfo info) throws QueryException {
+  int hash(final InputInfo ii) throws QueryException {
     int h = hash;
     // order isn't important, operation has to be commutative
-    for(int i = size; --i >= 0;) h ^= values[i].hash(info);
+    for(int i = size; --i >= 0;) h ^= values[i].hash(ii);
     return h;
   }
 
   @Override
-  boolean deep(final InputInfo info, final TrieNode node, final Collation coll)
+  boolean deep(final TrieNode node, final Collation coll, final InputInfo ii)
       throws QueryException {
     if(!(node instanceof TrieList) || size != node.size) return false;
     final TrieList ol = (TrieList) node;
@@ -318,9 +318,9 @@ final class TrieList extends TrieNode {
     for(int i = 0; i < size; i++) {
       final Item k = keys[i];
       for(int j = 0; j < size; j++) {
-        if(k.sameKey(ol.keys[j], info)) {
+        if(k.sameKey(ol.keys[j], ii)) {
           // check bound value, too
-          if(!deep(values[i], ol.values[j], coll, info)) return false;
+          if(!deep(values[i], ol.values[j], coll, ii)) return false;
           // value matched, continue with next key
           continue OUTER;
         }

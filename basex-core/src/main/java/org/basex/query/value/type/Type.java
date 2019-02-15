@@ -160,33 +160,33 @@ public interface Type {
    * @param item item to be converted
    * @param qc query context
    * @param sc static context
-   * @param info input info
+   * @param ii input info
    * @return cast value
    * @throws QueryException query exception
    */
-  Value cast(Item item, QueryContext qc, StaticContext sc, InputInfo info) throws QueryException;
+  Value cast(Item item, QueryContext qc, StaticContext sc, InputInfo ii) throws QueryException;
 
   /**
    * Casts the specified Java value to this type.
    * @param value Java value
    * @param qc query context
    * @param sc static context
-   * @param info input info
+   * @param ii input info
    * @return cast value
    * @throws QueryException query exception
    */
-  Value cast(Object value, QueryContext qc, StaticContext sc, InputInfo info) throws QueryException;
+  Value cast(Object value, QueryContext qc, StaticContext sc, InputInfo ii) throws QueryException;
 
   /**
    * Casts the specified string to this type.
    * @param value string object
    * @param qc query context
    * @param sc static context
-   * @param info input info
+   * @param ii input info
    * @return cast value
    * @throws QueryException query exception
    */
-  Value castString(String value, QueryContext qc, StaticContext sc, InputInfo info)
+  Value castString(String value, QueryContext qc, StaticContext sc, InputInfo ii)
       throws QueryException;
 
   /**

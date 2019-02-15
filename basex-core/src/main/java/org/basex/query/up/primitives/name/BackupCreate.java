@@ -20,11 +20,11 @@ public final class BackupCreate extends NameUpdate {
   /**
    * Constructor.
    * @param name name of database to be backed up
-   * @param info input info
    * @param qc query context
+   * @param info input info
    */
-  public BackupCreate(final String name, final InputInfo info, final QueryContext qc) {
-    super(UpdateType.BACKUPCREATE, name, info, qc);
+  public BackupCreate(final String name, final QueryContext qc, final InputInfo info) {
+    super(UpdateType.BACKUPCREATE, name, qc, info);
   }
 
   @Override

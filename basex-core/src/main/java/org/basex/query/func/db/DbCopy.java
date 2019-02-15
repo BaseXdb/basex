@@ -40,8 +40,8 @@ public class DbCopy extends DbFn {
     if(!qc.context.soptions.dbExists(name)) throw DB_OPEN1_X.get(info, name);
     if(name.equals(newname)) throw DB_CONFLICT4_X.get(info, name, newname);
 
-    qc.updates().add(keep ? new DBCopy(name, newname, info, qc) :
-      new DBAlter(name, newname, info, qc), qc);
+    qc.updates().add(keep ? new DBCopy(name, newname, qc, info) :
+      new DBAlter(name, newname, qc, info), qc);
     return null;
   }
 

@@ -41,24 +41,24 @@ public final class ItrPos extends Simple {
   /**
    * Returns a position expression for the specified index, or an optimized boolean item.
    * @param index index position
-   * @param info input info
+   * @param ii input info
    * @return expression
    */
-  public static Expr get(final long index, final InputInfo info) {
-    return get(index, index, info);
+  public static Expr get(final long index, final InputInfo ii) {
+    return get(index, index, ii);
   }
 
   /**
    * Returns a position expression for the specified range, or an optimized boolean item.
    * @param min minimum value
    * @param max minimum value
-   * @param info input info
+   * @param ii input info
    * @return expression
    */
-  private static Expr get(final long min, final long max, final InputInfo info) {
+  private static Expr get(final long min, final long max, final InputInfo ii) {
     // suppose that positions always fit in long values..
     return min > max || max < 1 ? Bln.FALSE : min <= 1 && max == Long.MAX_VALUE ? Bln.TRUE :
-      new ItrPos(Math.max(1, min), Math.max(1, max), info);
+      new ItrPos(Math.max(1, min), Math.max(1, max), ii);
   }
 
   /**
@@ -76,25 +76,25 @@ public final class ItrPos extends Simple {
    * Returns an instance of this class, the original expression, or an optimized expression.
    * @param pos position to be compared
    * @param op comparator
-   * @param info input info
+   * @param ii input info
    * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
-  public static Expr get(final Expr pos, final OpV op, final InputInfo info) throws QueryException {
+  public static Expr get(final Expr pos, final OpV op, final InputInfo ii) throws QueryException {
     if(pos instanceof RangeSeq && op == OpV.EQ) {
       final long[] range = ((RangeSeq) pos).range(false);
-      return get(range[0], range[1], info);
+      return get(range[0], range[1], ii);
     } else if(pos instanceof Item) {
       final Item item2 = (Item) pos;
-      final long p = item2.itr(info);
-      final boolean exact = p == item2.dbl(info);
+      final long p = item2.itr(ii);
+      final boolean exact = p == item2.dbl(ii);
       switch(op) {
-        case EQ: return exact ? get(p, info) : Bln.FALSE;
-        case GE: return get(exact ? p : p + 1, Long.MAX_VALUE, info);
-        case GT: return get(p + 1, Long.MAX_VALUE, info);
-        case LE: return get(1, p, info);
-        case LT: return get(1, exact ? p - 1 : p, info);
-        case NE: return exact ? p < 2 ? get(p + 1, Long.MAX_VALUE, info) : null : Bln.TRUE;
+        case EQ: return exact ? get(p, ii) : Bln.FALSE;
+        case GE: return get(exact ? p : p + 1, Long.MAX_VALUE, ii);
+        case GT: return get(p + 1, Long.MAX_VALUE, ii);
+        case LE: return get(1, p, ii);
+        case LT: return get(1, exact ? p - 1 : p, ii);
+        case NE: return exact ? p < 2 ? get(p + 1, Long.MAX_VALUE, ii) : null : Bln.TRUE;
         default:
       }
     }

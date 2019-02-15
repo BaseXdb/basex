@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class ConvertIntegersToHex extends ConvertIntegersToBase64 {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return new Hex(bytesToB64(qc).binary(ii));
+    return new Hex(bytesToB64(qc).binary(info));
   }
 }

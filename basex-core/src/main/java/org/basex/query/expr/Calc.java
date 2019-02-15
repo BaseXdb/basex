@@ -21,39 +21,39 @@ public enum Calc {
   /** Addition. */
   PLUS("+") {
     @Override
-    public Item eval(final Item item1, final Item item2, final InputInfo info)
+    public Item eval(final Item item1, final Item item2, final InputInfo ii)
         throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
-      if(num1 ^ num2) throw numberError(num1 ? item2 : item1, info);
+      if(num1 ^ num2) throw numberError(num1 ? item2 : item1, ii);
 
       if(num1) {
         // numbers or untyped values
         final Type type = numType(type1, type2);
         if(type == ITR) {
-          final long itr1 = item1.itr(info), itr2 = item2.itr(info);
+          final long itr1 = item1.itr(ii), itr2 = item2.itr(ii);
           if(itr2 > 0 ? itr1 > Long.MAX_VALUE - itr2 : itr1 < Long.MIN_VALUE - itr2)
-            throw RANGE_X.get(info, itr1 + " + " + itr2);
+            throw RANGE_X.get(ii, itr1 + " + " + itr2);
           return Int.get(itr1 + itr2);
         }
-        if(type == DBL) return Dbl.get(item1.dbl(info) + item2.dbl(info));
-        if(type == FLT) return Flt.get(item1.flt(info) + item2.flt(info));
-        return Dec.get(item1.dec(info).add(item2.dec(info)));
+        if(type == DBL) return Dbl.get(item1.dbl(ii) + item2.dbl(ii));
+        if(type == FLT) return Flt.get(item1.flt(ii) + item2.flt(ii));
+        return Dec.get(item1.dec(ii).add(item2.dec(ii)));
       }
 
       // dates or durations
       if(type1 == type2) {
-        if(!(item1 instanceof Dur)) throw numberError(item1, info);
-        if(type1 == YMD) return new YMDur((YMDur) item1, (YMDur) item2, true, info);
-        if(type1 == DTD) return new DTDur((DTDur) item1, (DTDur) item2, true, info);
+        if(!(item1 instanceof Dur)) throw numberError(item1, ii);
+        if(type1 == YMD) return new YMDur((YMDur) item1, (YMDur) item2, true, ii);
+        if(type1 == DTD) return new DTDur((DTDur) item1, (DTDur) item2, true, ii);
       }
-      if(type1 == DTM) return new Dtm((Dtm) item1, dur(info, item2), true, info);
-      if(type2 == DTM) return new Dtm((Dtm) item2, dur(info, item1), true, info);
-      if(type1 == DAT) return new Dat((Dat) item1, dur(info, item2), true, info);
-      if(type2 == DAT) return new Dat((Dat) item2, dur(info, item1), true, info);
+      if(type1 == DTM) return new Dtm((Dtm) item1, dur(ii, item2), true, ii);
+      if(type2 == DTM) return new Dtm((Dtm) item2, dur(ii, item1), true, ii);
+      if(type1 == DAT) return new Dat((Dat) item1, dur(ii, item2), true, ii);
+      if(type2 == DAT) return new Dat((Dat) item2, dur(ii, item1), true, ii);
       if(type1 == TIM && type2 == DTD) return new Tim((Tim) item1, (DTDur) item2, true);
       if(type2 == TIM && type1 == DTD) return new Tim((Tim) item2, (DTDur) item1, true);
-      throw typeError(info, type1, type2);
+      throw typeError(ii, type1, type2);
     }
 
     @Override
@@ -80,38 +80,38 @@ public enum Calc {
   /** Subtraction. */
   MINUS("-") {
     @Override
-    public Item eval(final Item item1, final Item item2, final InputInfo info)
+    public Item eval(final Item item1, final Item item2, final InputInfo ii)
         throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
-      if(num1 ^ num2) throw numberError(num1 ? item2 : item1, info);
+      if(num1 ^ num2) throw numberError(num1 ? item2 : item1, ii);
 
       if(num1) {
         // numbers or untyped values
         final Type type = numType(type1, type2);
         if(type == ITR) {
-          final long itr1 = item1.itr(info), itr2 = item2.itr(info);
+          final long itr1 = item1.itr(ii), itr2 = item2.itr(ii);
           if(itr2 < 0 ? itr1 > Long.MAX_VALUE + itr2 : itr1 < Long.MIN_VALUE + itr2)
-            throw RANGE_X.get(info, itr1 + " - " + itr2);
+            throw RANGE_X.get(ii, itr1 + " - " + itr2);
           return Int.get(itr1 - itr2);
         }
-        if(type == DBL) return Dbl.get(item1.dbl(info) - item2.dbl(info));
-        if(type == FLT) return Flt.get(item1.flt(info) - item2.flt(info));
-        return Dec.get(item1.dec(info).subtract(item2.dec(info)));
+        if(type == DBL) return Dbl.get(item1.dbl(ii) - item2.dbl(ii));
+        if(type == FLT) return Flt.get(item1.flt(ii) - item2.flt(ii));
+        return Dec.get(item1.dec(ii).subtract(item2.dec(ii)));
       }
 
       // dates or durations
       if(type1 == type2) {
         if(type1 == DTM || type1 == DAT || type1 == TIM)
-          return new DTDur((ADate) item1, (ADate) item2, info);
-        if(type1 == YMD) return new YMDur((YMDur) item1, (YMDur) item2, false, info);
-        if(type1 == DTD) return new DTDur((DTDur) item1, (DTDur) item2, false, info);
-        throw numberError(item1, info);
+          return new DTDur((ADate) item1, (ADate) item2, ii);
+        if(type1 == YMD) return new YMDur((YMDur) item1, (YMDur) item2, false, ii);
+        if(type1 == DTD) return new DTDur((DTDur) item1, (DTDur) item2, false, ii);
+        throw numberError(item1, ii);
       }
-      if(type1 == DTM) return new Dtm((Dtm) item1, dur(info, item2), false, info);
-      if(type1 == DAT) return new Dat((Dat) item1, dur(info, item2), false, info);
+      if(type1 == DTM) return new Dtm((Dtm) item1, dur(ii, item2), false, ii);
+      if(type1 == DAT) return new Dat((Dat) item1, dur(ii, item2), false, ii);
       if(type1 == TIM && type2 == DTD) return new Tim((Tim) item1, (DTDur) item2, false);
-      throw typeError(info, type1, type2);
+      throw typeError(ii, type1, type2);
     }
 
     @Override
@@ -136,45 +136,45 @@ public enum Calc {
   /** Multiplication. */
   MULT("*") {
     @Override
-    public Item eval(final Item item1, final Item item2, final InputInfo info)
+    public Item eval(final Item item1, final Item item2, final InputInfo ii)
         throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
 
       if(type1 == YMD) {
-        if(item2 instanceof ANum) return new YMDur((Dur) item1, item2.dbl(info), true, info);
-        throw numberError(item2, info);
+        if(item2 instanceof ANum) return new YMDur((Dur) item1, item2.dbl(ii), true, ii);
+        throw numberError(item2, ii);
       }
       if(type2 == YMD) {
-        if(item1 instanceof ANum) return new YMDur((Dur) item2, item1.dbl(info), true, info);
-        throw numberError(item1, info);
+        if(item1 instanceof ANum) return new YMDur((Dur) item2, item1.dbl(ii), true, ii);
+        throw numberError(item1, ii);
       }
       if(type1 == DTD) {
-        if(item2 instanceof ANum) return new DTDur((Dur) item1, item2.dbl(info), true, info);
-        throw numberError(item2, info);
+        if(item2 instanceof ANum) return new DTDur((Dur) item1, item2.dbl(ii), true, ii);
+        throw numberError(item2, ii);
       }
       if(type2 == DTD) {
-        if(item1 instanceof ANum) return new DTDur((Dur) item2, item1.dbl(info), true, info);
-        throw numberError(item1, info);
+        if(item1 instanceof ANum) return new DTDur((Dur) item2, item1.dbl(ii), true, ii);
+        throw numberError(item1, ii);
       }
 
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
-      if(num1 ^ num2) throw typeError(info, type1, type2);
+      if(num1 ^ num2) throw typeError(ii, type1, type2);
       if(num1) {
         final Type type = numType(type1, type2);
         if(type == ITR) {
-          final long l1 = item1.itr(info);
-          final long l2 = item2.itr(info);
+          final long l1 = item1.itr(ii);
+          final long l2 = item2.itr(ii);
           if(l2 > 0 ? l1 > Long.MAX_VALUE / l2 || l1 < Long.MIN_VALUE / l2
                     : l2 < -1 ? l1 > Long.MIN_VALUE / l2 || l1 < Long.MAX_VALUE / l2
                               : l2 == -1 && l1 == Long.MIN_VALUE)
-            throw RANGE_X.get(info, l1 + " * " + l2);
+            throw RANGE_X.get(ii, l1 + " * " + l2);
           return Int.get(l1 * l2);
         }
-        if(type == DBL) return Dbl.get(item1.dbl(info) * item2.dbl(info));
-        if(type == FLT) return Flt.get(item1.flt(info) * item2.flt(info));
-        return Dec.get(item1.dec(info).multiply(item2.dec(info)));
+        if(type == DBL) return Dbl.get(item1.dbl(ii) * item2.dbl(ii));
+        if(type == FLT) return Flt.get(item1.flt(ii) * item2.flt(ii));
+        return Dec.get(item1.dec(ii).multiply(item2.dec(ii)));
       }
-      throw numberError(item1, info);
+      throw numberError(item1, ii);
     }
 
     @Override
@@ -199,38 +199,38 @@ public enum Calc {
   /** Division. */
   DIV("div") {
     @Override
-    public Item eval(final Item item1, final Item item2, final InputInfo info)
+    public Item eval(final Item item1, final Item item2, final InputInfo ii)
         throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
       if(type1 == type2) {
         if(type1 == YMD) {
           final BigDecimal bd = BigDecimal.valueOf(((YMDur) item2).ymd());
-          if(bd.doubleValue() == 0.0) throw zeroError(info, item1);
+          if(bd.doubleValue() == 0.0) throw zeroError(ii, item1);
           return Dec.get(BigDecimal.valueOf(((YMDur) item1).ymd()).
               divide(bd, MathContext.DECIMAL64));
         }
         if(type1 == DTD) {
           final BigDecimal bd = ((DTDur) item2).dtd();
-          if(bd.doubleValue() == 0.0) throw zeroError(info, item1);
+          if(bd.doubleValue() == 0.0) throw zeroError(ii, item1);
           return Dec.get(((DTDur) item1).dtd().divide(bd, MathContext.DECIMAL64));
         }
       }
       if(type1 == YMD) {
-        if(item2 instanceof ANum) return new YMDur((Dur) item1, item2.dbl(info), false, info);
-        throw numberError(item2, info);
+        if(item2 instanceof ANum) return new YMDur((Dur) item1, item2.dbl(ii), false, ii);
+        throw numberError(item2, ii);
       }
       if(type1 == DTD) {
-        if(item2 instanceof ANum) return new DTDur((Dur) item1, item2.dbl(info), false, info);
-        throw numberError(item2, info);
+        if(item2 instanceof ANum) return new DTDur((Dur) item1, item2.dbl(ii), false, ii);
+        throw numberError(item2, ii);
       }
 
-      checkNum(info, item1, item2);
+      checkNum(ii, item1, item2);
       final Type type = numType(type1, type2);
-      if(type == DBL) return Dbl.get(item1.dbl(info) / item2.dbl(info));
-      if(type == FLT) return Flt.get(item1.flt(info) / item2.flt(info));
+      if(type == DBL) return Dbl.get(item1.dbl(ii) / item2.dbl(ii));
+      if(type == FLT) return Flt.get(item1.flt(ii) / item2.flt(ii));
 
-      final BigDecimal dec1 = item1.dec(info), dec2 = item2.dec(info);
-      if(dec2.signum() == 0) throw zeroError(info, item1);
+      final BigDecimal dec1 = item1.dec(ii), dec2 = item2.dec(ii);
+      if(dec2.signum() == 0) throw zeroError(ii, item1);
       final int scale = Math.max(18, Math.max(dec1.scale(), dec2.scale()));
       return Dec.get(dec1.divide(dec2, scale, RoundingMode.HALF_EVEN));
     }
@@ -255,33 +255,33 @@ public enum Calc {
   /** Integer division. */
   IDIV("idiv") {
     @Override
-    public Int eval(final Item item1, final Item item2, final InputInfo info)
+    public Int eval(final Item item1, final Item item2, final InputInfo ii)
         throws QueryException {
-      checkNum(info, item1, item2);
+      checkNum(ii, item1, item2);
       final Type type = numType(item1.type, item2.type);
       if(type == DBL || type == FLT) {
-        final double dbl1 = item1.dbl(info), dbl2 = item2.dbl(info);
-        if(dbl2 == 0) throw zeroError(info, item1);
+        final double dbl1 = item1.dbl(ii), dbl2 = item2.dbl(ii);
+        if(dbl2 == 0) throw zeroError(ii, item1);
         final double dbl = dbl1 / dbl2;
         if(Double.isNaN(dbl) || Double.isInfinite(dbl))
-          throw DIVFLOW_X.get(info, dbl1 + " idiv " + dbl2);
+          throw DIVFLOW_X.get(ii, dbl1 + " idiv " + dbl2);
         if(dbl < Long.MIN_VALUE || dbl > Long.MAX_VALUE)
-          throw RANGE_X.get(info, dbl1 + " idiv " + dbl2);
+          throw RANGE_X.get(ii, dbl1 + " idiv " + dbl2);
         return Int.get((long) dbl);
       }
 
       if(type == ITR) {
-        final long itr1 = item1.itr(info), itr2 = item2.itr(info);
-        if(itr2 == 0) throw zeroError(info, item1);
-        if(itr1 == Integer.MIN_VALUE && itr2 == -1) throw RANGE_X.get(info, itr1 + " idiv " + itr2);
+        final long itr1 = item1.itr(ii), itr2 = item2.itr(ii);
+        if(itr2 == 0) throw zeroError(ii, item1);
+        if(itr1 == Integer.MIN_VALUE && itr2 == -1) throw RANGE_X.get(ii, itr1 + " idiv " + itr2);
         return Int.get(itr1 / itr2);
       }
 
-      final BigDecimal dec1 = item1.dec(info), dec2 = item2.dec(info);
-      if(dec2.signum() == 0) throw zeroError(info, item1);
+      final BigDecimal dec1 = item1.dec(ii), dec2 = item2.dec(ii);
+      if(dec2.signum() == 0) throw zeroError(ii, item1);
       final BigDecimal res = dec1.divideToIntegralValue(dec2);
       if(!(MIN_LONG.compareTo(res) <= 0 && res.compareTo(MAX_LONG) <= 0))
-        throw RANGE_X.get(info, dec1 + " idiv " + dec2);
+        throw RANGE_X.get(ii, dec1 + " idiv " + dec2);
       return Int.get(res.longValueExact());
     }
 
@@ -301,20 +301,20 @@ public enum Calc {
   /** Modulo. */
   MOD("mod") {
     @Override
-    public Item eval(final Item item1, final Item item2, final InputInfo info)
+    public Item eval(final Item item1, final Item item2, final InputInfo ii)
         throws QueryException {
-      checkNum(info, item1, item2);
+      checkNum(ii, item1, item2);
       final Type type = numType(item1.type, item2.type);
-      if(type == DBL) return Dbl.get(item1.dbl(info) % item2.dbl(info));
-      if(type == FLT) return Flt.get(item1.flt(info) % item2.flt(info));
+      if(type == DBL) return Dbl.get(item1.dbl(ii) % item2.dbl(ii));
+      if(type == FLT) return Flt.get(item1.flt(ii) % item2.flt(ii));
       if(type == ITR) {
-        final long itr1 = item1.itr(info), itr2 = item2.itr(info);
-        if(itr2 == 0) throw zeroError(info, item1);
+        final long itr1 = item1.itr(ii), itr2 = item2.itr(ii);
+        if(itr2 == 0) throw zeroError(ii, item1);
         return Int.get(itr1 % itr2);
       }
 
-      final BigDecimal dec1 = item1.dec(info), dec2 = item2.dec(info);
-      if(dec2.signum() == 0) throw zeroError(info, item1);
+      final BigDecimal dec1 = item1.dec(ii), dec2 = item2.dec(ii);
+      if(dec2.signum() == 0) throw zeroError(ii, item1);
       final BigDecimal sub = dec1.divide(dec2, 0, RoundingMode.DOWN);
       return Dec.get(dec1.subtract(sub.multiply(dec2)));
     }
@@ -351,11 +351,11 @@ public enum Calc {
    * Performs the calculation.
    * @param item1 first item
    * @param item2 second item
-   * @param info input info
+   * @param ii input info
    * @return result type
    * @throws QueryException query exception
    */
-  public abstract Item eval(Item item1, Item item2, InputInfo info) throws QueryException;
+  public abstract Item eval(Item item1, Item item2, InputInfo ii) throws QueryException;
 
   /**
    * Optimizes the expressions.
@@ -411,51 +411,51 @@ public enum Calc {
 
   /**
    * Throws a division by zero exception.
-   * @param info input info
+   * @param ii input info
    * @param item item
    * @return query exception (indicates that an error is raised)
    */
-  private static QueryException zeroError(final InputInfo info, final Item item) {
-    return DIVZERO_X.get(info, normalize(item, info));
+  private static QueryException zeroError(final InputInfo ii, final Item item) {
+    return DIVZERO_X.get(ii, normalize(item, ii));
   }
 
   /**
    * Returns a type error.
-   * @param info input info
+   * @param ii input info
    * @param type1 first type
    * @param type2 second type
    * @return query exception
    */
-  final QueryException typeError(final InputInfo info, final Type type1, final Type type2) {
-    return CALCTYPE_X_X_X.get(info, info(), type1, type2);
+  final QueryException typeError(final InputInfo ii, final Type type1, final Type type2) {
+    return CALCTYPE_X_X_X.get(ii, info(), type1, type2);
   }
 
   /**
    * Returns a duration type error.
-   * @param info input info
+   * @param ii input info
    * @param item item
    * @return duration
    * @throws QueryException query exception
    */
-  static Dur dur(final InputInfo info, final Item item) throws QueryException {
+  static Dur dur(final InputInfo ii, final Item item) throws QueryException {
     if(item instanceof Dur) {
-      if(item.type == DUR) throw NOSUBDUR_X.get(info, item);
+      if(item.type == DUR) throw NOSUBDUR_X.get(ii, item);
       return (Dur) item;
     }
-    throw NODUR_X_X.get(info, item.type, item);
+    throw NODUR_X_X.get(ii, item.type, item);
   }
 
   /**
    * Checks if the specified items are numeric or untyped.
-   * @param info input info
+   * @param ii input info
    * @param item1 first item
    * @param item2 second item
    * @throws QueryException query exception
    */
-  static void checkNum(final InputInfo info, final Item item1, final Item item2)
+  static void checkNum(final InputInfo ii, final Item item1, final Item item2)
       throws QueryException {
-    if(!item1.type.isNumberOrUntyped()) throw numberError(item1, info);
-    if(!item2.type.isNumberOrUntyped()) throw numberError(item2, info);
+    if(!item1.type.isNumberOrUntyped()) throw numberError(item1, ii);
+    if(!item2.type.isNumberOrUntyped()) throw numberError(item2, ii);
   }
 
   /**

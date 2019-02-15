@@ -38,18 +38,18 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public final byte[] string(final InputInfo info) throws QueryException {
-    throw FIATOM_X.get(info, type);
+  public final byte[] string(final InputInfo ii) throws QueryException {
+    throw FIATOM_X.get(ii, type);
   }
 
   @Override
   public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo info) throws QueryException {
-    throw FIATOM_X.get(info, type);
+      final InputInfo ii) throws QueryException {
+    throw FIATOM_X.get(ii, type);
   }
 
   @Override
-  public final boolean sameKey(final Item item, final InputInfo info) {
+  public final boolean sameKey(final Item item, final InputInfo ii) {
     return false;
   }
 
@@ -57,23 +57,23 @@ public abstract class FItem extends Item implements XQFunction {
    * Coerces this function item to the given function type.
    * @param ft function type
    * @param qc query context
-   * @param info input info
+   * @param ii input info
    * @param optimize optimize resulting item
    * @return coerced item
    * @throws QueryException query exception
    */
-  public abstract FItem coerceTo(FuncType ft, QueryContext qc, InputInfo info, boolean optimize)
+  public abstract FItem coerceTo(FuncType ft, QueryContext qc, InputInfo ii, boolean optimize)
       throws QueryException;
 
   /**
    * Performs a deep comparison of two items.
    * @param item item to be compared
-   * @param info input info
    * @param coll collation (can be {@code null})
+   * @param ii input info
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean deep(Item item, InputInfo info, Collation coll) throws QueryException;
+  public abstract boolean deep(Item item, Collation coll, InputInfo ii) throws QueryException;
 
   @Override
   public abstract void plan(FElem root);

@@ -44,12 +44,12 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public final boolean bool(final InputInfo info) {
+  public final boolean bool(final InputInfo ii) {
     return true;
   }
 
   @Override
-  public final byte[] string(final InputInfo info) {
+  public final byte[] string(final InputInfo ii) {
     return string();
   }
 
@@ -61,30 +61,30 @@ public abstract class ANode extends Item {
 
   @Override
   public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo info) throws QueryException {
-    return item.type.isUntyped() ? coll == null ? Token.eq(string(), item.string(info)) :
-      coll.compare(string(), item.string(info)) == 0 : item.eq(this, coll, sc, info);
+      final InputInfo ii) throws QueryException {
+    return item.type.isUntyped() ? coll == null ? Token.eq(string(), item.string(ii)) :
+      coll.compare(string(), item.string(ii)) == 0 : item.eq(this, coll, sc, ii);
   }
 
   @Override
-  public boolean sameKey(final Item item, final InputInfo info) throws QueryException {
-    return item.type.isStringOrUntyped() && eq(item, null, null, info);
+  public boolean sameKey(final Item item, final InputInfo ii) throws QueryException {
+    return item.type.isStringOrUntyped() && eq(item, null, null, ii);
   }
 
   @Override
-  public final int diff(final Item item, final Collation coll, final InputInfo info)
+  public final int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return item.type.isUntyped() ? coll == null ? Token.diff(string(), item.string(info)) :
-      coll.compare(string(), item.string(info)) : -item.diff(this, coll, info);
+    return item.type.isUntyped() ? coll == null ? Token.diff(string(), item.string(ii)) :
+      coll.compare(string(), item.string(ii)) : -item.diff(this, coll, ii);
   }
 
   @Override
-  public final Item atomValue(final QueryContext qc, final InputInfo info) {
+  public final Item atomValue(final QueryContext qc, final InputInfo ii) {
     return atomItem();
   }
 
   @Override
-  public final Item atomItem(final QueryContext qc, final InputInfo info) {
+  public final Item atomItem(final QueryContext qc, final InputInfo ii) {
     return atomItem();
   }
 

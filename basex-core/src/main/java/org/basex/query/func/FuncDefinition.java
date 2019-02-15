@@ -92,13 +92,13 @@ public final class FuncDefinition {
   /**
    * Creates a new instance of the function.
    * @param sc static context
-   * @param info input info
+   * @param ii input info
    * @param exprs arguments
    * @return function
    */
-  public StandardFunc get(final StaticContext sc, final InputInfo info, final Expr... exprs) {
+  public StandardFunc get(final StaticContext sc, final InputInfo ii, final Expr... exprs) {
     final StandardFunc sf = Reflect.get(clazz);
-    sf.init(sc, info, this, exprs);
+    sf.init(sc, ii, this, exprs);
     return sf;
   }
 

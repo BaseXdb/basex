@@ -40,20 +40,20 @@ public abstract class Filter extends Preds {
 
   /**
    * Creates a filter or path expression for the given root and predicates.
-   * @param info input info
+   * @param ii input info
    * @param root root expression
    * @param exprs predicate expressions
    * @return filter expression
    */
-  public static Expr get(final InputInfo info, final Expr root, final Expr... exprs) {
+  public static Expr get(final InputInfo ii, final Expr root, final Expr... exprs) {
     final Expr expr = simplify(root, exprs);
     if(expr != null) return expr;
 
     // use simple filter for single deterministic predicate
     final Expr pred = exprs[0];
-    if(exprs.length == 1 && pred.isSimple()) return new SimpleFilter(info, root, exprs);
+    if(exprs.length == 1 && pred.isSimple()) return new SimpleFilter(ii, root, exprs);
 
-    return new CachedFilter(info, root, exprs);
+    return new CachedFilter(ii, root, exprs);
   }
 
   @Override

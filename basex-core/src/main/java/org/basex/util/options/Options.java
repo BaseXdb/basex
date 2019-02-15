@@ -224,7 +224,7 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Returns the original instance of the requested string array.
+   * Returns the requested string array.
    * @param option option to be found
    * @return value
    */
@@ -233,7 +233,7 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Returns the original instance of the requested integer array.
+   * Returns the requested integer array.
    * @param option option to be found
    * @return value
    */
@@ -242,7 +242,7 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Returns the original instance of the requested options.
+   * Returns the requested options.
    * @param option option to be found
    * @param <O> options
    * @return value
@@ -362,14 +362,14 @@ public class Options implements Iterable<Option<?>> {
    * @param name name of option
    * @param value value
    * @param error error
-   * @param info input info
+   * @param ii input info
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
   public synchronized void assign(final Item name, final Item value, final boolean error,
-      final InputInfo info) throws BaseXException, QueryException {
+      final InputInfo ii) throws BaseXException, QueryException {
 
-    final String key = string(name.string(info));
+    final String key = string(name.string(ii));
     if(options.isEmpty()) {
       final byte[] val;
       if(value instanceof XQMap) {
@@ -377,18 +377,18 @@ public class Options implements Iterable<Option<?>> {
         final XQMap map = (XQMap) value;
         for(final Item item : map.keys()) {
           if(!tb.isEmpty()) tb.add(',');
-          tb.add(item.string(info)).add('=');
-          final Value vl = map.get(item, info);
-          if(vl instanceof Item) tb.add(string(((Item) vl).string(info)).replace(",", ",,"));
+          tb.add(item.string(ii)).add('=');
+          final Value vl = map.get(item, ii);
+          if(vl instanceof Item) tb.add(string(((Item) vl).string(ii)).replace(",", ",,"));
           else throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.ITEM, vl.seqType(), vl);
         }
         val = tb.finish();
       } else {
-        val = value.string(info);
+        val = value.string(ii);
       }
       free.put(key, string(val));
     } else {
-      assign(key, value, error, info);
+      assign(key, value, error, ii);
     }
   }
 
@@ -526,22 +526,22 @@ public class Options implements Iterable<Option<?>> {
    * Parses and assigns options from the specified map.
    * @param map map
    * @param error raise error if option is unknown
-   * @param info input info
+   * @param ii input info
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  public final synchronized void assign(final XQMap map, final boolean error, final InputInfo info)
+  public final synchronized void assign(final XQMap map, final boolean error, final InputInfo ii)
       throws BaseXException, QueryException {
 
     for(final Item name : map.keys()) {
       if(!name.type.isStringOrUntyped())
         throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.STR, name.type, name);
 
-      final Value value = map.get(name, info);
+      final Value value = map.get(name, ii);
       if(!(value instanceof Item))
         throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.ITEM, value.seqType(), value);
 
-      assign(name, (Item) value, error, info);
+      assign(name, (Item) value, error, ii);
     }
   }
 
@@ -710,12 +710,12 @@ public class Options implements Iterable<Option<?>> {
    * @param name name of option
    * @param item value of option
    * @param error raise error if option is unknown
-   * @param info input info
+   * @param ii input info
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
   private synchronized void assign(final String name, final Item item, final boolean error,
-      final InputInfo info) throws BaseXException, QueryException {
+      final InputInfo ii) throws BaseXException, QueryException {
 
     final Option<?> option = options.get(name);
     if(option == null) {
@@ -761,7 +761,7 @@ public class Options implements Iterable<Option<?>> {
     } else if(option instanceof OptionsOption) {
       final Options o = ((OptionsOption<?>) option).newInstance();
       if(item instanceof XQMap) {
-        o.assign((XQMap) item, error, info);
+        o.assign((XQMap) item, error, ii);
       } else {
         throw new BaseXException(Text.OPT_MAP_X_X, option.name(), item);
       }

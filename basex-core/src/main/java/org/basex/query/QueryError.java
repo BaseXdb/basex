@@ -1425,13 +1425,13 @@ public enum QueryError {
   /**
    * Throws a query exception. If {@link InputInfo#internal()} returns {@code true},
    * a static error instance ({@link QueryException#ERROR}) will be returned.
-   * @param info input info (can be {@code null})
+   * @param ii input info (can be {@code null})
    * @param ext extended info
    * @return query exception
    */
-  public QueryException get(final InputInfo info, final Object... ext) {
-    return info != null && info.internal() ? QueryException.ERROR :
-      new QueryException(info, this, ext);
+  public QueryException get(final InputInfo ii, final Object... ext) {
+    return ii != null && ii.internal() ? QueryException.ERROR :
+      new QueryException(ii, this, ext);
   }
 
   /**
@@ -1581,12 +1581,12 @@ public enum QueryError {
    * Returns an error for the specified name.
    * @param name error name
    * @param msg error message
-   * @param info input info
+   * @param ii input info
    * @return exception or {@code null}
    */
-  public static QueryException get(final String name, final String msg, final InputInfo info) {
+  public static QueryException get(final String name, final String msg, final InputInfo ii) {
     for(final QueryError err : VALUES) {
-      if(err.toString().equals(name)) return new QueryException(info, err.qname(), msg).error(err);
+      if(err.toString().equals(name)) return new QueryException(ii, err.qname(), msg).error(err);
     }
     return null;
   }
@@ -1595,54 +1595,54 @@ public enum QueryError {
    * Throws a comparison exception.
    * @param item1 first item
    * @param item2 second item
-   * @param info input info
+   * @param ii input info
    * @return query exception
    */
-  public static QueryException diffError(final Item item1, final Item item2, final InputInfo info) {
+  public static QueryException diffError(final Item item1, final Item item2, final InputInfo ii) {
     final Type type1 = item1.type, type2 = item2.type;
-    return type1 == type2 ? CMPTYPE_X.get(info, type1, item1) :
-      CMPTYPES_X_X.get(info, type1, type2);
+    return type1 == type2 ? CMPTYPE_X.get(ii, type1, item1) :
+      CMPTYPES_X_X.get(ii, type1, type2);
   }
 
   /**
    * Throws a type exception.
-   * @param info input info
+   * @param ii input info
    * @param expr expression
    * @param type target type
    * @param name name (can be {@code null})
    * @return query exception
    */
   public static QueryException typeError(final Expr expr, final SeqType type, final QNm name,
-      final InputInfo info) {
+      final InputInfo ii) {
 
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) tb.add('$').add(name.string()).add(" := ");
-    final byte[] value = tb.add(normalize(expr, info)).finish();
-    return INVTYPE_X_X_X.get(info, expr.seqType(), type, value);
+    final byte[] value = tb.add(normalize(expr, ii)).finish();
+    return INVTYPE_X_X_X.get(ii, expr.seqType(), type, value);
   }
 
   /**
    * Throws a type exception.
-   * @param info input info
+   * @param ii input info
    * @param found found type
    * @param type target type
    * @param name name
    * @return query exception
    */
   public static QueryException typeError(final SeqType found, final SeqType type, final QNm name,
-      final InputInfo info) {
-    return INVTYPE_X_X_X.get(info, found, type, Token.concat('$', name.string()));
+      final InputInfo ii) {
+    return INVTYPE_X_X_X.get(ii, found, type, Token.concat('$', name.string()));
   }
 
   /**
    * Throws a type cast exception.
    * @param value value
    * @param type target type
-   * @param info input info
+   * @param ii input info
    * @return query exception
    */
-  public static QueryException typeError(final Value value, final Type type, final InputInfo info) {
-    return INVTYPE_X_X_X.get(info, value.type, type, value);
+  public static QueryException typeError(final Value value, final Type type, final InputInfo ii) {
+    return INVTYPE_X_X_X.get(ii, value.type, type, value);
   }
 
   /**
@@ -1658,23 +1658,22 @@ public enum QueryError {
   /**
    * Throws a number exception.
    * @param item found item
-   * @param info input info
+   * @param ii input info
    * @return query exception
    */
-  public static QueryException numberError(final Item item, final InputInfo info) {
-    return NONUMBER_X_X.get(info, item.type, item);
+  public static QueryException numberError(final Item item, final InputInfo ii) {
+    return NONUMBER_X_X.get(ii, item.type, item);
   }
 
   /**
    * Throws an invalid value exception.
    * @param type expected type
    * @param value value
-   * @param info input info
+   * @param ii input info
    * @return query exception
    */
-  public static QueryException valueError(final Type type, final byte[] value,
-      final InputInfo info) {
-    return INVALUE_X_X.get(info, type, value);
+  public static QueryException valueError(final Type type, final byte[] value, final InputInfo ii) {
+    return INVALUE_X_X.get(ii, type, value);
   }
 
   /**
@@ -1691,36 +1690,36 @@ public enum QueryError {
   /**
    * Removes whitespaces and chops the specified value to a maximum size.
    * @param value value
-   * @param info input info (can be {@code null}; an empty string will be returned if
+   * @param ii input info (can be {@code null}; an empty string will be returned if
    * {@link InputInfo#internal()} returns {@code true})
    * @return chopped or empty string
    */
-  public static byte[] normalize(final Object value, final InputInfo info) {
-    return info != null && info.internal() ? Token.EMPTY :
-           value instanceof byte[] ? normalize((byte[]) value, info) :
-             normalize(value.toString(), info);
+  public static byte[] normalize(final Object value, final InputInfo ii) {
+    return ii != null && ii.internal() ? Token.EMPTY :
+           value instanceof byte[] ? normalize((byte[]) value, ii) :
+             normalize(value.toString(), ii);
   }
 
   /**
    * Removes whitespaces and chops the specified string to a maximum size.
    * @param string string
-   * @param info input info (can be {@code null}; an empty string will be returned if
+   * @param ii input info (can be {@code null}; an empty string will be returned if
    * {@link InputInfo#internal()} returns {@code true})
    * @return chopped or empty string
    */
-  public static byte[] normalize(final String string, final InputInfo info) {
-    return info != null && info.internal() ? Token.EMPTY : normalize(Token.token(string), info);
+  public static byte[] normalize(final String string, final InputInfo ii) {
+    return ii != null && ii.internal() ? Token.EMPTY : normalize(Token.token(string), ii);
   }
 
   /**
    * Removes whitespaces and chops the specified token to a maximum size.
    * @param token token
-   * @param info input info (can be {@code null}; an empty string will be returned if
+   * @param ii input info (can be {@code null}; an empty string will be returned if
    * {@link InputInfo#internal()} returns {@code true})
    * @return chopped or empty string
    */
-  public static byte[] normalize(final byte[] token, final InputInfo info) {
-    if(info != null && info.internal()) return Token.EMPTY;
+  public static byte[] normalize(final byte[] token, final InputInfo ii) {
+    if(ii != null && ii.internal()) return Token.EMPTY;
 
     final TokenBuilder tb = new TokenBuilder();
     byte l = 0;

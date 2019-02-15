@@ -176,8 +176,8 @@ public final class CmpSR extends Single {
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add(mni ? '[' : '(').add(min).add(',').add(max).add(mxi ? ']' : ')');
-    ii.create(new StringRangeAccess(info, sr, ii.db), true, info,
-        Util.info(OPTINDEX_X_X, type + " string range", tb));
+    ii.create(new StringRangeAccess(info, sr, ii.db), true,
+        Util.info(OPTINDEX_X_X, type + " string range", tb), info);
     return true;
   }
 

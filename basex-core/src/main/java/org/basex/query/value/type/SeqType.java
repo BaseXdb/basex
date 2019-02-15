@@ -282,26 +282,26 @@ public final class SeqType {
   /**
    * Casts the given item to this sequence type.
    * @param item item to cast
+   * @param error raise error (return {@code null} otherwise)
    * @param qc query context
    * @param sc static context
-   * @param info input info
-   * @param error raise error (return {@code null} otherwise)
+   * @param ii input info
    * @return cast value or {@code null}
    * @throws QueryException query exception
    */
-  public Value cast(final Item item, final QueryContext qc, final StaticContext sc,
-      final InputInfo info, final boolean error) throws QueryException {
+  public Value cast(final Item item, final boolean error, final QueryContext qc,
+      final StaticContext sc, final InputInfo ii) throws QueryException {
 
     // kind test is ignored (simple casts have no kind test)
     if(item.type.eq(type)) return item;
     try {
-      if(!error && info != null) info.internal(true);
-      return type.cast(item, qc, sc, info);
+      if(!error && ii != null) ii.internal(true);
+      return type.cast(item, qc, sc, ii);
     } catch(final QueryException ex) {
       if(error) throw ex;
       return null;
     } finally {
-      if(!error && info != null) info.internal(false);
+      if(!error && ii != null) ii.internal(false);
     }
   }
 
@@ -310,22 +310,22 @@ public final class SeqType {
    * @param value value to cast
    * @param qc query context
    * @param sc static context
-   * @param info input info
+   * @param ii input info
    * @return cast value
    * @throws QueryException query exception
    */
   public Value cast(final Value value, final QueryContext qc, final StaticContext sc,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
 
     final long vs = value.size();
-    if(!occ.check(vs)) throw INVTYPE_X_X_X.get(info, value.seqType(), this, value);
+    if(!occ.check(vs)) throw INVTYPE_X_X_X.get(ii, value.seqType(), this, value);
 
     if(value.isEmpty()) return Empty.SEQ;
-    if(value instanceof Item) return cast((Item) value, qc, sc, info, true);
+    if(value instanceof Item) return cast((Item) value, true, qc, sc, ii);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     final BasicIter<?> iter = value.iter();
-    for(Item item; (item = qc.next(iter)) != null;) vb.add(cast(item, qc, sc, info, true));
+    for(Item item; (item = qc.next(iter)) != null;) vb.add(cast(item, true, qc, sc, ii));
     return vb.value();
   }
 
@@ -333,17 +333,17 @@ public final class SeqType {
    * Checks the specified value for this sequence type.
    * @param value value to be checked
    * @param name name of variable (can be {@code null})
-   * @param info input info
    * @param qc query context
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public void treat(final Value value, final QNm name, final InputInfo info, final QueryContext qc)
+  public void treat(final Value value, final QNm name, final QueryContext qc, final InputInfo ii)
       throws QueryException {
 
     if(value.seqType().instanceOf(this)) return;
 
     final int size = (int) value.size();
-    if(!occ.check(size)) throw typeError(value, this, name, info);
+    if(!occ.check(size)) throw typeError(value, this, name, ii);
 
     // empty sequence has all types
     if(size == 0) return;
@@ -357,7 +357,7 @@ public final class SeqType {
         ins = instance(value.itemAt(i));
       }
     }
-    if(!ins) throw typeError(value, this, name, info);
+    if(!ins) throw typeError(value, this, name, ii);
   }
 
   /**
@@ -366,16 +366,16 @@ public final class SeqType {
    * @param name variable name (can be {@code null})
    * @param qc query context
    * @param sc static context
-   * @param info input info
+   * @param ii input info
    * @param opt if the result should be optimized
    * @return converted value
    * @throws QueryException if the conversion was not possible
    */
   public Value promote(final Value value, final QNm name, final QueryContext qc,
-      final StaticContext sc, final InputInfo info, final boolean opt) throws QueryException {
+      final StaticContext sc, final InputInfo ii, final boolean opt) throws QueryException {
 
     final long size = value.size();
-    if(!occ.check(size)) throw typeError(value, this, name, info);
+    if(!occ.check(size)) throw typeError(value, this, name, ii);
     if(size == 0) return Empty.SEQ;
 
     ItemList items = null;
@@ -390,7 +390,7 @@ public final class SeqType {
           items = new ItemList(size);
           for(int j = 0; j < i; j++) items.add(value.itemAt(j));
         }
-        promote(item, name, items, qc, sc, info, opt);
+        promote(item, name, items, qc, sc, ii, opt);
       }
     }
     return items != null ? items.value(type) : value;
@@ -403,37 +403,37 @@ public final class SeqType {
    * @param items item cache
    * @param qc query context
    * @param sc static context
-   * @param info input info
+   * @param ii input info
    * @param opt if the result should be optimized
    * @throws QueryException query exception
    */
   public void promote(final Item item, final QNm name, final ItemList items, final QueryContext qc,
-      final StaticContext sc, final InputInfo info, final boolean opt) throws QueryException {
+      final StaticContext sc, final InputInfo ii, final boolean opt) throws QueryException {
 
     if(type instanceof AtomType) {
-      final Iter iter = item.atomValue(qc, info).iter();
+      final Iter iter = item.atomValue(qc, ii).iter();
       for(Item item1; (item1 = qc.next(iter)) != null;) {
         final Type tp = item1.type;
         if(tp.instanceOf(type)) {
           items.add(item1);
         } else if(tp == AtomType.ATM) {
-          if(type.nsSensitive()) throw NSSENS_X_X.get(info, item.type, type);
-          final Iter iter2 = type.cast(item1, qc, sc, info).iter();
+          if(type.nsSensitive()) throw NSSENS_X_X.get(ii, item.type, type);
+          final Iter iter2 = type.cast(item1, qc, sc, ii).iter();
           for(Item item2; (item2 = qc.next(iter2)) != null;) items.add(item2);
         } else if(type == AtomType.DBL && (tp == AtomType.FLT || tp.instanceOf(AtomType.DEC))) {
-          items.add(Dbl.get(item1.dbl(info)));
+          items.add(Dbl.get(item1.dbl(ii)));
         } else if(type == AtomType.FLT && tp.instanceOf(AtomType.DEC)) {
-          items.add(Flt.get(item1.flt(info)));
+          items.add(Flt.get(item1.flt(ii)));
         } else if(type == AtomType.STR && item1 instanceof Uri) {
-          items.add(Str.get(item1.string(info)));
+          items.add(Str.get(item1.string(ii)));
         } else {
-          throw typeError(item, with(Occ.ONE), name, info);
+          throw typeError(item, with(Occ.ONE), name, ii);
         }
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
-      items.add(((FItem) item).coerceTo((FuncType) type, qc, info, opt));
+      items.add(((FItem) item).coerceTo((FuncType) type, qc, ii, opt));
     } else {
-      throw typeError(item, with(Occ.ONE), name, info);
+      throw typeError(item, with(Occ.ONE), name, ii);
     }
   }
 

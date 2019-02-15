@@ -99,11 +99,11 @@ public abstract class ADateDur extends Item {
    * Throws a date format exception.
    * @param input input
    * @param ex example format
-   * @param info input info
+   * @param ii input info
    * @return date format exception
    */
-  final QueryException dateError(final byte[] input, final String ex, final InputInfo info) {
-    return DATEFORMAT_X_X_X.get(info, type, input, ex);
+  final QueryException dateError(final byte[] input, final String ex, final InputInfo ii) {
+    return DATEFORMAT_X_X_X.get(ii, type, input, ex);
   }
 
   /**
@@ -111,17 +111,17 @@ public abstract class ADateDur extends Item {
    * Returns an exception if the value is invalid.
    * @param string string to be converted
    * @param dur duration
-   * @param info input info
+   * @param ii input info
    * @return long value
    * @throws QueryException query exception
    */
-  final long toLong(final String string, final boolean dur, final InputInfo info)
+  final long toLong(final String string, final boolean dur, final InputInfo ii)
       throws QueryException {
     try {
       return Long.parseLong(string);
     } catch(final NumberFormatException ex) {
       Util.debug(ex);
-      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(info, type, normalize(string, info));
+      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(ii, type, normalize(string, ii));
     }
   }
 
@@ -130,18 +130,18 @@ public abstract class ADateDur extends Item {
    * Returns an exception if the value is invalid.
    * @param string string to be converted
    * @param dur duration
-   * @param info input info
+   * @param ii input info
    * @return decimal
    * @throws QueryException query exception
    */
-  final BigDecimal toDecimal(final String string, final boolean dur, final InputInfo info)
+  final BigDecimal toDecimal(final String string, final boolean dur, final InputInfo ii)
       throws QueryException {
 
     try {
       return new BigDecimal(string);
     } catch(final NumberFormatException ex) {
       Util.debug(ex);
-      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(info, type, normalize(string, info));
+      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(ii, type, normalize(string, ii));
     }
   }
 }

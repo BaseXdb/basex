@@ -58,12 +58,12 @@ public final class ModuleLoader {
   /**
    * Adds a package from the repository or a Java class.
    * @param uri module uri
-   * @param info input info
    * @param qp query parser
+   * @param ii input info
    * @return if the package has been found
    * @throws QueryException query exception
    */
-  public boolean addImport(final String uri, final InputInfo info, final QueryParser qp)
+  public boolean addImport(final String uri, final QueryParser qp, final InputInfo ii)
       throws QueryException {
 
     // add Java repository package
@@ -86,7 +86,7 @@ public final class ModuleLoader {
           }
         }
         if(id != null) {
-          addRepo(id, new HashSet<>(), new HashSet<>(), info, qp);
+          addRepo(id, new HashSet<>(), new HashSet<>(), qp, ii);
           return true;
         }
       }
@@ -95,7 +95,7 @@ public final class ModuleLoader {
       for(final String suffix : IO.XQSUFFIXES) {
         final IOFile file = new IOFile(repoPath, path + suffix);
         if(file.exists()) {
-          qp.module(file.path(), uri, info);
+          qp.module(file.path(), uri, ii);
           return true;
         }
       }
@@ -113,11 +113,11 @@ public final class ModuleLoader {
       clz = findClass(className);
     } catch(final ClassNotFoundException ex) {
       Util.debug(ex);
-      if(java) throw WHICHMODCLASS_X.get(info, className);
+      if(java) throw WHICHMODCLASS_X.get(ii, className);
       return false;
     } catch(final Throwable th) {
       final Throwable t = Util.rootException(th);
-      throw MODINIT_X_X_X.get(info, className, t.getMessage(), Util.className(t));
+      throw MODINIT_X_X_X.get(ii, className, t.getMessage(), Util.className(t));
     }
 
     // instantiate class
@@ -125,7 +125,7 @@ public final class ModuleLoader {
       javaModules.add(clz.getDeclaredConstructor().newInstance());
       return true;
     } catch(final Throwable ex) {
-      throw MODINST_X_X.get(info, className, ex);
+      throw MODINST_X_X.get(ii, className, ex);
     }
   }
 
@@ -165,26 +165,26 @@ public final class ModuleLoader {
    * @param id package id
    * @param toLoad list with packages to be loaded
    * @param loaded already loaded packages
-   * @param info input info
    * @param qp query parser
+   * @param ii input info
    * @throws QueryException query exception
    */
   private void addRepo(final String id, final HashSet<String> toLoad, final HashSet<String> loaded,
-      final InputInfo info, final QueryParser qp) throws QueryException {
+      final QueryParser qp, final InputInfo ii) throws QueryException {
 
     // return if package is already loaded
     if(loaded.contains(id)) return;
 
     // find package in package dictionary
     Pkg pkg = context.repo.pkgDict().get(id);
-    if(pkg == null) throw REPO_NOTFOUND_X.get(info, id);
+    if(pkg == null) throw REPO_NOTFOUND_X.get(ii, id);
     final IOFile pkgPath = context.repo.path(pkg.path());
 
     // parse package descriptor
     final IO pkgDesc = new IOFile(pkgPath, PkgText.DESCRIPTOR);
     if(!pkgDesc.exists()) Util.debug(PkgText.MISSDESC, id);
 
-    pkg = new PkgParser(info).parse(pkgDesc);
+    pkg = new PkgParser(ii).parse(pkgDesc);
     // check if package contains a jar descriptor
     final IOFile jarDesc = new IOFile(pkgPath, PkgText.JARDESC);
     // choose module directory (support for both 2010 and 2012 specs)
@@ -193,7 +193,7 @@ public final class ModuleLoader {
 
     // add jars to classpath
     if(jarDesc.exists()) {
-      final JarDesc desc = new JarParser(info).parse(jarDesc);
+      final JarDesc desc = new JarParser(ii).parse(jarDesc);
       for(final byte[] u : desc.jars) addURL(new IOFile(modDir, string(u)));
     }
 
@@ -203,14 +203,14 @@ public final class ModuleLoader {
     for(final PkgDep dep : pkg.dep) {
       if(dep.name != null) {
         // we consider only package dependencies here
-        final String depId = new PkgValidator(context.repo, info).depPkg(dep);
-        if(depId == null) throw REPO_NOTFOUND_X.get(info, dep.name);
-        if(toLoad.contains(depId)) throw CIRCMODULE.get(info);
-        addRepo(depId, toLoad, loaded, info, qp);
+        final String depId = new PkgValidator(context.repo, ii).depPkg(dep);
+        if(depId == null) throw REPO_NOTFOUND_X.get(ii, dep.name);
+        if(toLoad.contains(depId)) throw CIRCMODULE.get(ii);
+        addRepo(depId, toLoad, loaded, qp, ii);
       }
     }
     for(final PkgComponent comp : pkg.comps) {
-      qp.module(new IOFile(modDir, comp.file).path(), comp.uri, info);
+      qp.module(new IOFile(modDir, comp.file).path(), comp.uri, ii);
     }
     toLoad.remove(id);
     loaded.add(id);

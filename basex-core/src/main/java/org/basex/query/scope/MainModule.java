@@ -33,12 +33,12 @@ public final class MainModule extends AModule {
    * @param expr root expression
    * @param declType declared type (can be {@code null})
    * @param doc documentation (can be {@code null})
-   * @param info input info (can be {@code null})
+   * @param ii input info (can be {@code null})
    * @return main module
    */
   public static MainModule get(final VarScope vs, final Expr expr, final SeqType declType,
-      final String doc, final InputInfo info) {
-    return new MainModule(vs, expr, declType, doc, info, null, null, null);
+      final String doc, final InputInfo ii) {
+    return new MainModule(vs, expr, declType, doc, ii, null, null, null);
   }
 
   /**
@@ -98,7 +98,7 @@ public final class MainModule extends AModule {
       final Iter iter = expr.iter(qc);
       final ItemList items = new ItemList(iter.size());
       for(Item item; (item = qc.next(iter)) != null;) items.add(item);
-      if(declType != null) declType.treat(items.value(), null, info, qc);
+      if(declType != null) declType.treat(items.value(), null, qc, info);
       return items;
     } finally {
       VarScope.exit(fp, qc);

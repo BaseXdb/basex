@@ -33,28 +33,28 @@ public final class Dummy extends Item {
   }
 
   @Override
-  public byte[] string(final InputInfo info) {
+  public byte[] string(final InputInfo ii) {
     throw Util.notExpected();
   }
 
   @Override
-  public boolean bool(final InputInfo info) {
+  public boolean bool(final InputInfo ii) {
     throw Util.notExpected();
   }
 
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo info) {
+      final InputInfo ii) {
     throw Util.notExpected();
   }
 
   @Override
-  public boolean sameKey(final Item item, final InputInfo info) {
+  public boolean sameKey(final Item item, final InputInfo ii) {
     throw Util.notExpected();
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo info) {
+  public int diff(final Item item, final Collation coll, final InputInfo ii) {
     throw Util.notExpected();
   }
 

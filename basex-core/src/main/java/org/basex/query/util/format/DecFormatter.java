@@ -113,13 +113,13 @@ public final class DecFormatter extends FormatUtil {
 
   /**
    * Returns a formatted number.
-   * @param info input info
    * @param number number to be formatted
    * @param picture picture
+   * @param ii input info
    * @return string representation
    * @throws QueryException query exception
    */
-  public byte[] format(final InputInfo info, final ANum number, final byte[] picture)
+  public byte[] format(final ANum number, final byte[] picture, final InputInfo ii)
       throws QueryException {
 
     // find pattern separator and sub-patterns
@@ -134,17 +134,17 @@ public final class DecFormatter extends FormatUtil {
       tl.add(substring(pic, 0, i));
       pic = substring(pic, i + cl(pic, i));
       // "A picture-string must not contain more than one instance of the pattern-separator"
-      if(contains(pic, pattern)) throw PICNUM_X.get(info, picture);
+      if(contains(pic, pattern)) throw PICNUM_X.get(ii, picture);
       tl.add(pic);
     }
     final byte[][] patterns = tl.finish();
 
     // check and analyze patterns
-    if(!checkSyntax(patterns)) throw PICNUM_X.get(info, picture);
+    if(!checkSyntax(patterns)) throw PICNUM_X.get(ii, picture);
     final Picture[] pics = analyze(patterns);
 
     // return formatted string
-    return format(number, pics, info);
+    return format(number, pics, ii);
   }
 
   /**

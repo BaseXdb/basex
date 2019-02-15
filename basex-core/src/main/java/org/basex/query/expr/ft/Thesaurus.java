@@ -105,16 +105,16 @@ public final class Thesaurus {
 
   /**
    * Initializes the thesaurus.
-   * @param info input info
+   * @param ii input info
    * @throws QueryException query exception
    */
-  private void init(final InputInfo info) throws QueryException {
+  private void init(final InputInfo ii) throws QueryException {
     try {
       final Value entries = nodes("//*:entry", new DBNode(file));
       for(final Item entry : entries) build(entry);
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw NOTHES_X.get(info, file);
+      throw NOTHES_X.get(ii, file);
     }
   }
 

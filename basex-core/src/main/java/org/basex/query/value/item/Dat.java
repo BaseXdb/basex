@@ -26,12 +26,12 @@ public final class Dat extends ADate {
   /**
    * Constructor.
    * @param value date
-   * @param info input info
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public Dat(final byte[] value, final InputInfo info) throws QueryException {
+  public Dat(final byte[] value, final InputInfo ii) throws QueryException {
     super(AtomType.DAT);
-    date(value, XDATE, info);
+    date(value, XDATE, ii);
   }
 
   /**
@@ -39,26 +39,26 @@ public final class Dat extends ADate {
    * @param value date
    * @param dur duration
    * @param plus plus/minus flag
-   * @param info input info
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public Dat(final Dat value, final Dur dur, final boolean plus, final InputInfo info)
+  public Dat(final Dat value, final Dur dur, final boolean plus, final InputInfo ii)
       throws QueryException {
 
     this(value);
     if(dur instanceof DTDur) {
       calc((DTDur) dur, plus);
-      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE_X.get(info, yea);
+      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE_X.get(ii, yea);
     } else {
-      calc((YMDur) dur, plus, info);
+      calc((YMDur) dur, plus, ii);
     }
     clean();
   }
 
   @Override
-  public void timeZone(final DTDur zone, final boolean spec, final InputInfo info)
+  public void timeZone(final DTDur zone, final boolean spec, final InputInfo ii)
       throws QueryException {
-    tz(zone, spec, info);
+    tz(zone, spec, ii);
     clean();
   }
 

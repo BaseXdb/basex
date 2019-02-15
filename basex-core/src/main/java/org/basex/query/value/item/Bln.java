@@ -59,7 +59,7 @@ public final class Bln extends Item {
   }
 
   @Override
-  public byte[] string(final InputInfo info) {
+  public byte[] string(final InputInfo ii) {
     return string();
   }
 
@@ -72,40 +72,40 @@ public final class Bln extends Item {
   }
 
   @Override
-  public boolean bool(final InputInfo info) {
+  public boolean bool(final InputInfo ii) {
     return value;
   }
 
   @Override
-  public long itr(final InputInfo info) {
+  public long itr(final InputInfo ii) {
     return value ? 1 : 0;
   }
 
   @Override
-  public float flt(final InputInfo info) {
+  public float flt(final InputInfo ii) {
     return value ? 1 : 0;
   }
 
   @Override
-  public double dbl(final InputInfo info) {
+  public double dbl(final InputInfo ii) {
     return value ? 1 : 0;
   }
 
   @Override
-  public BigDecimal dec(final InputInfo info) {
+  public BigDecimal dec(final InputInfo ii) {
     return value ? BigDecimal.ONE : BigDecimal.ZERO;
   }
 
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo info) throws QueryException {
-    return value == (item.type == type ? item.bool(info) : parse(item, info));
+      final InputInfo ii) throws QueryException {
+    return value == (item.type == type ? item.bool(ii) : parse(item, ii));
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo info)
+  public int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    final boolean n = item.type == type ? item.bool(info) : parse(item, info);
+    final boolean n = item.type == type ? item.bool(ii) : parse(item, ii);
     return value ? n ? 0 : 1 : n ? -1 : 0;
   }
 
@@ -127,14 +127,14 @@ public final class Bln extends Item {
   /**
    * Converts the specified item to a boolean.
    * @param item item to be converted
-   * @param info input info
+   * @param ii input info
    * @return resulting boolean value
    * @throws QueryException query exception
    */
-  public static boolean parse(final Item item, final InputInfo info) throws QueryException {
-    final Boolean b = parse(item.string(info));
+  public static boolean parse(final Item item, final InputInfo ii) throws QueryException {
+    final Boolean b = parse(item.string(ii));
     if(b != null) return b;
-    throw AtomType.BLN.castError(item, info);
+    throw AtomType.BLN.castError(item, ii);
   }
 
   /**

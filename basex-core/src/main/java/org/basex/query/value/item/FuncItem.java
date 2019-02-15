@@ -145,13 +145,13 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public Value invokeValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return FuncCall.value(this, args, qc, info);
+    return FuncCall.invoke(this, args, false, qc, info);
   }
 
   @Override
   public Item invokeItem(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return FuncCall.item(this, args, qc, info);
+    return (Item) FuncCall.invoke(this, args, true, qc, info);
   }
 
   @Override
@@ -259,7 +259,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public boolean deep(final Item item, final InputInfo ii, final Collation coll)
+  public boolean deep(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
     throw FICMP_X.get(info, type);
   }

@@ -185,15 +185,15 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public Value invokeValue(final QueryContext qc, final InputInfo ii, final Value... arg)
+  public Value invokeValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return FuncCall.value(this, arg, qc, info);
+    return FuncCall.invoke(this, args, false, qc, info);
   }
 
   @Override
-  public Item invokeItem(final QueryContext qc, final InputInfo ii, final Value... arg)
+  public Item invokeItem(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return FuncCall.item(this, arg, qc, info);
+    return (Item) FuncCall.invoke(this, args, true, qc, info);
   }
 
   /**

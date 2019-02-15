@@ -79,7 +79,7 @@ public final class Int extends ANum {
   }
 
   @Override
-  public boolean bool(final InputInfo info) {
+  public boolean bool(final InputInfo ii) {
     return value != 0;
   }
 
@@ -99,12 +99,12 @@ public final class Int extends ANum {
   }
 
   @Override
-  public Item test(final QueryContext qc, final InputInfo info) {
+  public Item test(final QueryContext qc, final InputInfo ii) {
     return value == qc.focus.pos ? this : null;
   }
 
   @Override
-  public BigDecimal dec(final InputInfo info) {
+  public BigDecimal dec(final InputInfo ii) {
     return BigDecimal.valueOf(value);
   }
 
@@ -152,17 +152,17 @@ public final class Int extends ANum {
 
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
     return item instanceof Int ? value == ((Int) item).value :
-           item.type != AtomType.DEC ? value == item.dbl(info) :
-           item.eq(this, coll, sc, info);
+           item.type != AtomType.DEC ? value == item.dbl(ii) :
+           item.eq(this, coll, sc, ii);
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo info)
+  public int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
     if(item instanceof Int) return Long.compare(value, ((Int) item).value);
-    final double n = item.dbl(info);
+    final double n = item.dbl(ii);
     return Double.isNaN(n) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
   }
 
@@ -191,14 +191,14 @@ public final class Int extends ANum {
   /**
    * Converts the given item to a long primitive.
    * @param item item to be converted
-   * @param info input info
+   * @param ii input info
    * @return long value
    * @throws QueryException query exception
    */
-  public static long parse(final Item item, final InputInfo info) throws QueryException {
-    final byte[] value = item.string(info);
+  public static long parse(final Item item, final InputInfo ii) throws QueryException {
+    final byte[] value = item.string(ii);
     final long l = Token.toLong(value);
     if(l != Long.MIN_VALUE || Token.eq(Token.trim(value), Token.MINLONG)) return l;
-    throw AtomType.ITR.castError(item, info);
+    throw AtomType.ITR.castError(item, ii);
   }
 }

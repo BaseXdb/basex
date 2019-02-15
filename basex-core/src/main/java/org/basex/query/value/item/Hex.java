@@ -23,66 +23,66 @@ public final class Hex extends Bin {
   /**
    * Constructor.
    * @param value textual representation
-   * @param info input info
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public Hex(final byte[] value, final InputInfo info) throws QueryException {
-    super(parse(Token.trim(value), info), AtomType.HEX);
+  public Hex(final byte[] value, final InputInfo ii) throws QueryException {
+    super(parse(Token.trim(value), ii), AtomType.HEX);
   }
 
   /**
    * Constructor.
    * @param bin binary data
-   * @param info input info
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public Hex(final Bin bin, final InputInfo info) throws QueryException {
-    this(bin.binary(info));
+  public Hex(final Bin bin, final InputInfo ii) throws QueryException {
+    this(bin.binary(ii));
   }
 
   @Override
-  public byte[] string(final InputInfo info) throws QueryException {
-    return Token.hex(binary(info), true);
+  public byte[] string(final InputInfo ii) throws QueryException {
+    return Token.hex(binary(ii), true);
   }
 
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo info) throws QueryException {
-    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(info) : parse(item, info);
-    return Token.eq(binary(info), bin);
+      final InputInfo ii) throws QueryException {
+    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
+    return Token.eq(binary(ii), bin);
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo info)
+  public int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(info) : parse(item, info);
-    return Token.diff(binary(info), bin);
+    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
+    return Token.diff(binary(ii), bin);
   }
 
   /**
    * Converts the given item to a byte array.
    * @param item item to be converted
-   * @param info input info
+   * @param ii input info
    * @return byte array
    * @throws QueryException query exception
    */
-  public static byte[] parse(final Item item, final InputInfo info) throws QueryException {
-    final byte[] bytes = parse(item.string(info));
+  public static byte[] parse(final Item item, final InputInfo ii) throws QueryException {
+    final byte[] bytes = parse(item.string(ii));
     if(bytes != null) return bytes;
-    throw AtomType.HEX.castError(item, info);
+    throw AtomType.HEX.castError(item, ii);
   }
 
   /**
    * Converts the given token into a byte array.
    * @param value value to be converted
-   * @param info input info
+   * @param ii input info
    * @return byte array
    * @throws QueryException query exception
    */
-  public static byte[] parse(final byte[] value, final InputInfo info) throws QueryException {
+  public static byte[] parse(final byte[] value, final InputInfo ii) throws QueryException {
     final byte[] bytes = parse(value);
     if(bytes != null) return bytes;
-    throw AtomType.HEX.castError(value, info);
+    throw AtomType.HEX.castError(value, ii);
   }
 
   /**

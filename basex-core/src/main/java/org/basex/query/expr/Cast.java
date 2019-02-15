@@ -69,7 +69,7 @@ public final class Cast extends Single {
     final Value value = expr.atomValue(qc, info);
     final SeqType st = seqType();
     if(!st.occ.check(value.size())) throw INVTYPE_X_X_X.get(info, value.seqType(), st, value);
-    return value instanceof Item ? st.cast((Item) value, qc, sc, info, true) : value;
+    return value instanceof Item ? st.cast((Item) value, true, qc, sc, info) : value;
   }
 
   @Override

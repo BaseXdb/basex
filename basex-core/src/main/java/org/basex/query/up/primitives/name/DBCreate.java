@@ -40,7 +40,7 @@ public final class DBCreate extends NameUpdate {
   public DBCreate(final String name, final NewInput[] inputs, final Options opts,
       final QueryContext qc, final InputInfo info) throws QueryException {
 
-    super(UpdateType.DBCREATE, name, info, qc);
+    super(UpdateType.DBCREATE, name, qc, info);
     final List<Option<?>> supported = new ArrayList<>();
     Collections.addAll(supported, DBOptions.INDEXING);
     Collections.addAll(supported, DBOptions.PARSING);

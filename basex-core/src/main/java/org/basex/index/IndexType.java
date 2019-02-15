@@ -38,10 +38,10 @@ public enum IndexType {
   /**
    * Checks if the specified database has this index.
    * @param data data reference
-   * @param info input info
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public void check(final Data data, final InputInfo info) throws QueryException {
-    if(!data.meta.index(this)) throw DB_NOINDEX_X_X.get(info, data.meta.name, this);
+  public void check(final Data data, final InputInfo ii) throws QueryException {
+    if(!data.meta.index(this)) throw DB_NOINDEX_X_X.get(ii, data.meta.name, this);
   }
 }

@@ -28,7 +28,7 @@ public final class BaseXPragma extends Pragma {
   }
 
   @Override
-  Object init(final QueryContext qc, final InputInfo info) {
+  Object init(final QueryContext qc, final InputInfo ii) {
     return null;
   }
 

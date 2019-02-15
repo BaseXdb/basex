@@ -73,11 +73,11 @@ public final class Uri extends AStr {
    * Appends the specified address. If one of the URIs is invalid,
    * the original uri is returned.
    * @param add address to be appended
-   * @param info input info
+   * @param ii input info
    * @return new uri
    * @throws QueryException query exception
    */
-  public Uri resolve(final Uri add, final InputInfo info) throws QueryException {
+  public Uri resolve(final Uri add, final InputInfo ii) throws QueryException {
     if(add.value.length == 0) return this;
     try {
       final URI base = new URI(Token.string(value)), res = new URI(Token.string(add.value));
@@ -86,7 +86,7 @@ public final class Uri extends AStr {
         uri = uri.replaceAll('^' + IO.FILEPREF + "([^/])", IO.FILEPREF + "//$1");
       return uri(Token.token(uri), false);
     } catch(final URISyntaxException ex) {
-      throw URIARG_X.get(info, ex.getMessage());
+      throw URIARG_X.get(ii, ex.getMessage());
     }
   }
 
@@ -107,7 +107,7 @@ public final class Uri extends AStr {
   }
 
   @Override
-  public byte[] string(final InputInfo info) {
+  public byte[] string(final InputInfo ii) {
     return value;
   }
 

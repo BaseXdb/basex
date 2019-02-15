@@ -47,12 +47,12 @@ public final class Dbl extends ANum {
   /**
    * Returns an instance of this class.
    * @param value value
-   * @param info input info
+   * @param ii input info
    * @return instance
    * @throws QueryException query exception
    */
-  public static Dbl get(final byte[] value, final InputInfo info) throws QueryException {
-    return get(parse(value, info));
+  public static Dbl get(final byte[] value, final InputInfo ii) throws QueryException {
+    return get(parse(value, ii));
   }
 
   @Override
@@ -61,7 +61,7 @@ public final class Dbl extends ANum {
   }
 
   @Override
-  public boolean bool(final InputInfo info) {
+  public boolean bool(final InputInfo ii) {
     return !Double.isNaN(value) && value != 0;
   }
 
@@ -81,9 +81,9 @@ public final class Dbl extends ANum {
   }
 
   @Override
-  public BigDecimal dec(final InputInfo info) throws QueryException {
+  public BigDecimal dec(final InputInfo ii) throws QueryException {
     if(Double.isNaN(value) || Double.isInfinite(value))
-     throw valueError(AtomType.DEC, string(), info);
+     throw valueError(AtomType.DEC, string(), ii);
     return new BigDecimal(value);
   }
 
@@ -142,14 +142,14 @@ public final class Dbl extends ANum {
 
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo info) throws QueryException {
-    return value == item.dbl(info);
+      final InputInfo ii) throws QueryException {
+    return value == item.dbl(ii);
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo info)
+  public int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    final double n = item.dbl(info);
+    final double n = item.dbl(ii);
     return Double.isNaN(n) || Double.isNaN(value) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
   }
 
@@ -166,11 +166,11 @@ public final class Dbl extends ANum {
   /**
    * Converts the given token into a double value.
    * @param value value to be converted
-   * @param info input info
+   * @param ii input info
    * @return double value
    * @throws QueryException query exception
    */
-  public static double parse(final byte[] value, final InputInfo info) throws QueryException {
+  public static double parse(final byte[] value, final InputInfo ii) throws QueryException {
     final double d = Token.toDouble(value);
     if(!Double.isNaN(d)) return d;
 
@@ -179,6 +179,6 @@ public final class Dbl extends ANum {
     if(Token.eq(v, Token.INF)) return Double.POSITIVE_INFINITY;
     if(Token.eq(v, Token.NINF)) return Double.NEGATIVE_INFINITY;
 
-    throw AtomType.DBL.castError(value, info);
+    throw AtomType.DBL.castError(value, ii);
   }
 }

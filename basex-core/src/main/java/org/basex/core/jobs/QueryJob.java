@@ -36,53 +36,53 @@ public final class QueryJob extends Job implements Runnable {
   /**
    * Constructor.
    * @param job job info
-   * @param info input info
-   * @param ctx database context
+   * @param context database context
+   * @param ii input info
    * @param notify notify function (ignored if {@code null})
    * @throws QueryException query exception
    */
-  public QueryJob(final QueryJobSpec job, final InputInfo info, final Context ctx,
+  public QueryJob(final QueryJobSpec job, final Context context, final InputInfo ii,
       final Consumer<QueryJobResult> notify) throws QueryException {
 
     this.job = job;
     this.notify = notify;
-    jc().context = ctx;
+    jc().context = context;
 
     // check when job is to be started
     final JobsOptions opts = job.options;
     final String start = opts.get(JobsOptions.START);
-    long delay = start == null || start.isEmpty() ? 0 : delay(start, 0, info);
+    long delay = start == null || start.isEmpty() ? 0 : delay(start, 0, ii);
 
     // check when job is to be repeated
     long interval = 0;
     final String inter = opts.get(JobsOptions.INTERVAL);
     if(inter != null && !inter.isEmpty()) {
-      interval = ms(new DTDur(token(inter), info));
-      if(interval < 1000) throw JOBS_RANGE_X.get(info, inter);
+      interval = ms(new DTDur(token(inter), ii));
+      if(interval < 1000) throw JOBS_RANGE_X.get(ii, inter);
       while(delay < 0) delay += interval;
     }
-    if(delay < 0) throw JOBS_RANGE_X.get(info, start);
+    if(delay < 0) throw JOBS_RANGE_X.get(ii, start);
 
     // check when job is to be stopped
     final String end = opts.get(JobsOptions.END);
-    final long duration = end == null || end.isEmpty() ? Long.MAX_VALUE : delay(end, delay, info);
-    if(duration <= delay) throw JOBS_RANGE_X.get(info, end);
+    final long duration = end == null || end.isEmpty() ? Long.MAX_VALUE : delay(end, delay, ii);
+    if(duration <= delay) throw JOBS_RANGE_X.get(ii, end);
 
     // check job results are to be cached
     final boolean cache = opts.contains(JobsOptions.CACHE) && opts.get(JobsOptions.CACHE);
-    if(cache && interval > 0) throw JOBS_OPTIONS.get(info);
+    if(cache && interval > 0) throw JOBS_OPTIONS.get(ii);
 
-    final JobPool jobs = ctx.jobs;
+    final JobPool jobs = context.jobs;
     synchronized(jobs.tasks) {
       // check if number of maximum queries has been reached
-      if(jobs.active.size() >= JobPool.MAXQUERIES) throw JOBS_OVERFLOW.get(info);
+      if(jobs.active.size() >= JobPool.MAXQUERIES) throw JOBS_OVERFLOW.get(ii);
 
       // custom job id: check if it is invalid or has already been assigned
       String id = opts.get(JobsOptions.ID);
       if(id != null) {
-        if(id.startsWith(JobContext.PREFIX)) throw JOBS_ID_INVALID_X.get(info, id);
+        if(id.startsWith(JobContext.PREFIX)) throw JOBS_ID_INVALID_X.get(ii, id);
         if(jobs.tasks.containsKey(id) || jobs.active.containsKey(id) ||
-           jobs.results.containsKey(id)) throw JOBS_ID_EXISTS_X.get(info, id);
+           jobs.results.containsKey(id)) throw JOBS_ID_EXISTS_X.get(ii, id);
         jc().id(id);
       } else {
         id = jc().id();
@@ -104,25 +104,25 @@ public final class QueryJob extends Job implements Runnable {
    * Returns a delay.
    * @param string string with dayTimeDuration, date, or dateTime
    * @param min minimum time
-   * @param info input info
+   * @param ii input info
    * @return milliseconds to wait
    * @throws QueryException query exception
    */
-  private static long delay(final String string, final long min, final InputInfo info)
+  private static long delay(final String string, final long min, final InputInfo ii)
       throws QueryException {
 
     final QueryDateTime qdt = new QueryDateTime();
     long ms;
     if(Dur.DTD.matcher(string).matches()) {
       // dayTimeDuration
-      ms = ms(new DTDur(token(string), info));
+      ms = ms(new DTDur(token(string), ii));
     } else if(ADate.TIME.matcher(string).matches()) {
       // time
-      ms = ms(new DTDur(new Tim(token(string), info), qdt.time, info));
+      ms = ms(new DTDur(new Tim(token(string), ii), qdt.time, ii));
       while(ms <= min) ms += 86400000;
     } else {
       // dateTime
-      ms = ms(new DTDur(new Dtm(token(string), info), qdt.datm, info));
+      ms = ms(new DTDur(new Dtm(token(string), ii), qdt.datm, ii));
     }
     return ms;
   }

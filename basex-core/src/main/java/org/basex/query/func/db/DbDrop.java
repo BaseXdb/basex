@@ -21,7 +21,7 @@ public final class DbDrop extends DbAccess {
     final String name = string(toToken(exprs[0], qc));
     if(!Databases.validName(name)) throw DB_NAME_X.get(info, name);
     if(!qc.context.soptions.dbExists(name)) throw DB_OPEN1_X.get(info, name);
-    qc.updates().add(new DBDrop(name, info, qc), qc);
+    qc.updates().add(new DBDrop(name, qc, info), qc);
     return null;
   }
 }

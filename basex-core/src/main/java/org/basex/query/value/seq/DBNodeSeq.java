@@ -48,7 +48,7 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public Item ebv(final QueryContext qc, final InputInfo info) {
+  public Item ebv(final QueryContext qc, final InputInfo ii) {
     return itemAt(0);
   }
 
@@ -71,9 +71,9 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public Value atomValue(final QueryContext qc, final InputInfo info) {
+  public Value atomValue(final QueryContext qc, final InputInfo ii) {
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(int s = 0; s < size; s++) vb.add(itemAt(s).atomValue(qc, info));
+    for(int s = 0; s < size; s++) vb.add(itemAt(s).atomValue(qc, ii));
     return vb.value();
   }
 
