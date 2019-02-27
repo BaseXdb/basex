@@ -39,6 +39,41 @@ public final class CatalogWrapper {
   }
 
   /**
+   * Returns the resolver, which could be of any class that implements the
+   * CatalogManager interface.
+   */
+  public static Object getCM() {
+    return get(CRP, CM);
+  }
+
+  public static void setDefaults(final String path) {
+    if(CM == null) return;
+
+    // IgnoreMissingProperties - default is to print a warning if properties
+    // are unset; this is not usually what we want, but can be overridden
+    // for debugging. Not all resolvers produce errors even if this is false,
+    // so better to set it to true.
+    invoke(method(CMP, "setIgnoreMissingProperties", boolean.class), CM, true);
+
+    // CatalogFiles - semicolon-separated list of files
+    invoke(method(CMP, "setCatalogFiles", String.class), CM, path);
+
+    // StaticCatalog:
+    // If this manager uses static catalogs, the same static catalog will
+    // always be returned.   Otherwise a new catalog will be returned.
+    // We would probably get better performance by using true here. You get a
+    // new catalogmanager instance if you change PATH.
+    invoke(method(CMP, "setUseStaticCatalog", boolean.class), CM, false);
+
+    // You can also set Verbosity, but that's best left for the properties file,
+    // CatalogManager.propertie,  or system property, to help debugging.
+    // The higher the number, the more messages.
+    // NOTE messages go to output, not err stream!
+    // invoke(method(CMP, "setVerbosity", int.class), CM, 0);
+
+  }
+
+  /**
    * Decorates the {@link XMLReader} with the catalog resolver if it is found in the classpath.
    * Does nothing otherwise.
    * @param reader XML reader
@@ -46,11 +81,9 @@ public final class CatalogWrapper {
    */
   static void set(final XMLReader reader, final String path) {
     if(CM == null) return;
-    invoke(method(CMP, "setIgnoreMissingProperties", boolean.class), CM, true);
-    invoke(method(CMP, "setCatalogFiles", String.class), CM, path);
-    invoke(method(CMP, "setPreferPublic", boolean.class), CM, true);
-    invoke(method(CMP, "setUseStaticCatalog", boolean.class), CM, false);
-    invoke(method(CMP, "setVerbosity", int.class), CM, 0);
+
+    setDefaults(path);
+
     reader.setEntityResolver((EntityResolver) get(CRP, CM));
   }
 }
