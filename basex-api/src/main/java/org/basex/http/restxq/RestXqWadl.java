@@ -44,7 +44,8 @@ public final class RestXqWadl {
   public synchronized FElem create(final HashMap<String, WebModule> modules) {
     // create root nodes
     final FElem application = new FElem(WADL + "application", WADL_URI).declareNS();
-    final String base = req.getRequestURL().toString().replace(req.getRequestURI(), req.getContextPath());
+    final String base = req.getRequestURL().toString().replace(req.getRequestURI(),
+        req.getContextPath());
     final FElem resources = elem("resources", application).add("base", base);
 
     // create children
