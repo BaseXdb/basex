@@ -273,14 +273,15 @@ final class WebDAVService {
    */
   List<WebDAVResource> list(final String db, final String path) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(STRING_JOIN.args(
-      " for $d in " + _DB_DIR.args(" $db", " $path") + " return ($d/text(), name($d) = 'dir', " +
-      " for $a in ('modified-date', 'raw', 'content-type', 'size') " +
-      " return string($d/@*[name() = $a]))", _OUT_TAB.args()));
+      _DB_DIR.args(" $db", " $path") + " ! (string(), name() = 'dir', " +
+      "for $a in ('modified-date', 'raw', 'content-type', 'size') " +
+      "return string(@*[name() = $a]))", _OUT_TAB.args()));
     query.bind("db", db);
     query.bind("path", path);
+
     final String[] result = Strings.split(query.execute(session()), '\t');
     final List<WebDAVResource> ch = new ArrayList<>();
-    final int rs = result.length;
+    final int rs = result.length - 5;
     for(int r = 0; r < rs; r += 6) {
       final String name = result[r];
       final boolean dir = Boolean.parseBoolean(result[r + 1]);
@@ -306,11 +307,11 @@ final class WebDAVService {
    */
   List<WebDAVResource> listDbs() throws IOException {
     final WebDAVQuery query = new WebDAVQuery(STRING_JOIN.args(
-        _DB_LIST_DETAILS.args() + " ! (text(), @modified-date)", _OUT_TAB.args()));
+        _DB_LIST_DETAILS.args() + " ! (string(), @modified-date)", _OUT_TAB.args()));
 
     final String[] result = Strings.split(query.execute(session()), '\t');
     final List<WebDAVResource> dbs = new ArrayList<>();
-    final int rs = result.length;
+    final int rs = result.length - 1;
     for(int r = 0; r < rs; r += 2) {
       final String name = result[r];
       final String ms = result[r + 1];
