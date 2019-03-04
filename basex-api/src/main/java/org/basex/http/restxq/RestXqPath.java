@@ -65,14 +65,18 @@ final class RestXqPath extends WebPath implements Comparable<RestXqPath> {
   }
 
   @Override
-  public int compareTo(final RestXqPath rxs) {
-    final int ms = matcher.segments;
-    final int d = ms - rxs.matcher.segments;
+  public int compareTo(final RestXqPath rxp) {
+    // compare number of path segments: path with less segments is less specific
+    final int sl = matcher.segments, d = rxp.matcher.segments - sl;
     if(d != 0) return d;
-    for(int s = 0; s < ms; s++) {
-      final boolean wc1 = isTemplate(s), wc2 = rxs.isTemplate(s);
-      if(wc1 != wc2) return wc1 ? 1 : -1;
+
+    // look for templates: segment with template is less specific
+    for(int s = 0; s < sl; s++) {
+      final boolean t1 = isTemplate(s), t2 = rxp.isTemplate(s);
+      if(t1 != t2) return t1 ? 1 : -1;
     }
+
+    // identical specifity
     return 0;
   }
 }

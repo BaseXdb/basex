@@ -162,8 +162,13 @@ public final class RestXqPathTest extends RestXqTest {
     getE("declare %R:path('') function m:f($x) {()};", "");
     // variable must inherit xs:anyAtomicType
     getE("declare %R:path('{$x}') function m:f($x as node()) {$x};", "1");
+  }
 
-    // regular expression
+  /**
+   * Paths with regular expressions.
+   * @throws Exception exception
+   */
+  @Test public void regex() throws Exception {
     get("declare %R:path('p/{$x=.+}') function m:f($x) {$x};", "p/a/b/c", "a/b/c");
     get("declare %R:path('p/{$x=[0-9]+}') function m:f($x) {$x};", "p/123", "123");
     getE("declare %R:path('p/{$x=[0-9]+}') function m:f($x) {$x};", "p/123a");
@@ -171,6 +176,13 @@ public final class RestXqPathTest extends RestXqTest {
         "12ab3", "3ab12");
     getE("declare %R:path('{$a=\\d+}{$b=\\w+}{$c=\\d}') function m:f($a,$b,$c) {$c||$b||$a};",
         "12ab3x");
+
+    get("declare %R:path('{$p=.+}') function m:f1($p) { 1 }; " +
+        "declare %R:path('{$p=.+}/x') function m:f2($p) { 2 };",
+        "1/x", "2");
+    get("declare %R:path('{$p=.+}') function m:f1($p) { 1 }; " +
+        "declare %R:path('{$p=.+}/x') function m:f2($p) { 2 };",
+        "1", "1");
   }
 
   /**

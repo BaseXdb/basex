@@ -146,6 +146,7 @@ public final class WebModules {
         if(func.matches(conn, error, perm)) list.add(func);
       }
     }
+    // sort by specifity
     Collections.sort(list);
     return list;
   }
