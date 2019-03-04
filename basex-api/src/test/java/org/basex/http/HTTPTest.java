@@ -64,7 +64,6 @@ public abstract class HTTPTest extends SandboxTest {
     if(local) sl.add("-l");
     if(!auth) sl.add("-U" + ADMIN);
     http = new BaseXHTTP(sl.toArray());
-    http.context.soptions.set(StaticOptions.RESTXQERRORS, true);
   }
 
   /**
