@@ -56,8 +56,8 @@ public final class SAXWrapper extends SingleParser {
 
       saxh = new SAXHandler(builder, options.get(MainOptions.CHOP),
           options.get(MainOptions.STRIPNS));
-      final String path = options.get(MainOptions.CATFILE);
-      if(!path.isEmpty()) CatalogWrapper.set(reader, path);
+      final CatalogWrapper cw = CatalogWrapper.get(options.get(MainOptions.CATFILE));
+      if(cw != null) reader.setEntityResolver(cw.getEntityResolver());
 
       reader.setDTDHandler(saxh);
       reader.setContentHandler(saxh);

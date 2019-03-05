@@ -4,86 +4,84 @@ import static org.basex.util.Reflect.*;
 
 import java.lang.reflect.*;
 
+import javax.xml.transform.*;
+
+import org.basex.util.*;
 import org.xml.sax.*;
 
 /**
  * Wraps the CatalogResolver object.
- * Searches for presence of one of the xml resolver packages
+ * Searches for presence of one of the XML resolver packages
  * {@code org.apache.xml.resolver.tools.CatalogResolver} or
  * {@code code com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver}.
  *
+ * The catalog manager is part of Java 9; in future, we can possibly drop this class.
+ *
  * @author BaseX Team 2005-19, BSD License
  * @author Michael Seiferle
+ * @author Liam Quin
  */
 public final class CatalogWrapper {
   /** Package declaration for CatalogManager. */
-  private static final Class<?> CMP = find(new String[] {
-    "org.apache.xml.resolver.CatalogManager",
-    "com.sun.org.apache.xml.internal.resolver.CatalogManager" });
+  private static final Class<?> MANAGER;
   /** Package declaration for CatalogResolver constructor. */
-  private static final Constructor<?> CRP = find(find(new String[] {
-    "org.apache.xml.resolver.tools.CatalogResolver",
-    "com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver" }), CMP);
-  /** Instance of catalog manager. */
-  private static final Object CM = get(CMP);
+  private static final Constructor<?> RESOLVER;
 
-  /** Hidden constructor. */
-  private CatalogWrapper() { }
+  static {
+    // try to locate catalog manager from xml-resolver-1.2.jar library
+    Class<?> manager = find("org.apache.xml.resolver.CatalogManager"), resolver;
+    if(manager != null) {
+      resolver = find("org.apache.xml.resolver.tools.CatalogResolver");
+    } else {
+      // try to resort to internal catalog manager
+      manager = find("com.sun.org.apache.xml.internal.resolver.CatalogManager");
+      resolver = find("com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver");
+    }
+    MANAGER = manager;
+    RESOLVER = find(resolver, manager);
+  }
+
+  /** Instance of catalog manager. */
+  private final Object cm = Reflect.get(MANAGER);
 
   /**
-   * Checks if a CatalogResolver is available.
+   * Hidden constructor.
+   * @param paths semicolon-separated list of catalog files
+   */
+  private CatalogWrapper(final String paths) {
+    invoke(method(MANAGER, "setCatalogFiles", String.class), cm, paths);
+  }
+
+  /**
+   * Returns an instance of the catalog wrapper.
+   * @param paths semicolon-separated list of catalog files
+   * @return instance, or {@code null} if no catalog manager is available or if the list is empty
+   */
+  public static CatalogWrapper get(final String paths) {
+    return available() && !paths.isEmpty() ? new CatalogWrapper(paths) : null;
+  }
+
+  /**
+   * Checks if the catalog manager is available.
    * @return result of check
    */
   public static boolean available() {
-    return CM != null;
+    return MANAGER != null;
   }
 
   /**
-   * Returns the resolver, which could be of any class that implements the
-   * CatalogManager interface.
+   * Returns a URI resolver.
+   * @return URI resolver
    */
-  public static Object getCM() {
-    return get(CRP, CM);
-  }
-
-  public static void setDefaults(final String path) {
-    if(CM == null) return;
-
-    // IgnoreMissingProperties - default is to print a warning if properties
-    // are unset; this is not usually what we want, but can be overridden
-    // for debugging. Not all resolvers produce errors even if this is false,
-    // so better to set it to true.
-    invoke(method(CMP, "setIgnoreMissingProperties", boolean.class), CM, true);
-
-    // CatalogFiles - semicolon-separated list of files
-    invoke(method(CMP, "setCatalogFiles", String.class), CM, path);
-
-    // StaticCatalog:
-    // If this manager uses static catalogs, the same static catalog will
-    // always be returned.   Otherwise a new catalog will be returned.
-    // We would probably get better performance by using true here. You get a
-    // new catalogmanager instance if you change PATH.
-    invoke(method(CMP, "setUseStaticCatalog", boolean.class), CM, false);
-
-    // You can also set Verbosity, but that's best left for the properties file,
-    // CatalogManager.propertie,  or system property, to help debugging.
-    // The higher the number, the more messages.
-    // NOTE messages go to output, not err stream!
-    // invoke(method(CMP, "setVerbosity", int.class), CM, 0);
-
+  public URIResolver getURIResolver() {
+    return (URIResolver) Reflect.get(RESOLVER, cm);
   }
 
   /**
-   * Decorates the {@link XMLReader} with the catalog resolver if it is found in the classpath.
-   * Does nothing otherwise.
-   * @param reader XML reader
-   * @param path path to catalog file
+   * Returns an entity resolver.
+   * @return entity resolver
    */
-  static void set(final XMLReader reader, final String path) {
-    if(CM == null) return;
-
-    setDefaults(path);
-
-    reader.setEntityResolver((EntityResolver) get(CRP, CM));
+  public EntityResolver getEntityResolver() {
+    return (EntityResolver) Reflect.get(RESOLVER, cm);
   }
 }

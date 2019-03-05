@@ -25,6 +25,7 @@ import org.basex.build.xml.*; // for CatalogWrapper
  *
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
+ * @author Liam Quin
  */
 public class XsltTransform extends XsltFn {
   /** XSLT Options. */
@@ -94,27 +95,23 @@ public class XsltTransform extends XsltFn {
    * Uses Java's XSLT implementation to perform an XSL transformation.
    * @param in input
    * @param xsl style sheet
-   * @param par parameters
+   * @param params parameters
    * @param xopts XSLT options
    * @param qc query context
    * @return transformed result
    * @throws TransformerException transformer exception
    */
-  private static byte[] transform(final IO in, final IO xsl, final HashMap<String, String> par,
+  private static byte[] transform(final IO in, final IO xsl, final HashMap<String, String> params,
       final XsltOptions xopts, final QueryContext qc) throws TransformerException {
 
     // retrieve new or cached transformer
     final Transformer tr = transformer(xsl.streamSource(), xopts.get(XsltOptions.CACHE));
     // bind parameters
-    par.forEach(tr::setParameter);
+    params.forEach(tr::setParameter);
 
     // set URI resolver
-    final String path = qc.context.options.get(MainOptions.CATFILE);
-    if (!(path == null) && !path.isEmpty()) {
-      CatalogWrapper.setDefaults(path);
-
-      tr.setURIResolver((URIResolver) CatalogWrapper.getCM());
-    }
+    final CatalogWrapper cw = CatalogWrapper.get(qc.context.options.get(MainOptions.CATFILE));
+    if(cw != null) tr.setURIResolver(cw.getURIResolver());
 
     // do transformation and return result
     final ArrayOutput ao = new ArrayOutput();

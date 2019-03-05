@@ -97,19 +97,6 @@ public final class Reflect {
   }
 
   /**
-   * Returns a class reference to one of the specified classes.
-   * @param names fully qualified class names
-   * @return reference, or {@code null} if the class is not found
-   */
-  public static Class<?> find(final String[] names) {
-    for(final String n : names) {
-      final Class<?> c = find(n);
-      if(c != null) return c;
-    }
-    return null;
-  }
-
-  /**
    * Caches and returns a constructor by parameter types.
    * @param clazz class to search for the constructor
    * @param types constructor parameters
