@@ -9,6 +9,7 @@ import java.util.*;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -17,6 +18,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
+import org.basex.build.xml.*; // for CatalogWrapper
 
 /**
  * Function implementation.
@@ -56,7 +58,7 @@ public class XsltTransform extends XsltFn {
     final ArrayOutput ao = new ArrayOutput();
     try {
       System.setErr(new PrintStream(ao));
-      return transform(in, xsl, opts.free(), xopts);
+      return transform(in, xsl, opts.free(), xopts, qc);
     } catch(final TransformerException ex) {
       Util.debug(ex);
       throw XSLT_ERROR_X.get(info, trim(utf8(ao.finish(), Prop.ENCODING)));
@@ -87,22 +89,32 @@ public class XsltTransform extends XsltFn {
     throw STRNOD_X_X.get(info, item.type, item);
   }
 
+
   /**
    * Uses Java's XSLT implementation to perform an XSL transformation.
    * @param in input
    * @param xsl style sheet
    * @param par parameters
    * @param xopts XSLT options
+   * @param qc query context
    * @return transformed result
    * @throws TransformerException transformer exception
    */
   private static byte[] transform(final IO in, final IO xsl, final HashMap<String, String> par,
-      final XsltOptions xopts) throws TransformerException {
+      final XsltOptions xopts, final QueryContext qc) throws TransformerException {
 
     // retrieve new or cached transformer
     final Transformer tr = transformer(xsl.streamSource(), xopts.get(XsltOptions.CACHE));
     // bind parameters
     par.forEach(tr::setParameter);
+
+    // set URI resolver
+    final String path = qc.context.options.get(MainOptions.CATFILE);
+    if (!(path == null) && !path.isEmpty()) {
+      CatalogWrapper.setDefaults(path);
+
+      tr.setURIResolver((URIResolver) CatalogWrapper.getCM());
+    }
 
     // do transformation and return result
     final ArrayOutput ao = new ArrayOutput();
