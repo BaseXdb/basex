@@ -9,7 +9,6 @@ import java.util.*;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -32,6 +31,8 @@ public class XsltTransform extends XsltFn {
   public static final class XsltOptions extends Options {
     /** Cache flag. */
     public static final BooleanOption CACHE = new BooleanOption("cache", false);
+    /** Catalog files. */
+    public static final StringOption CATALOG = new StringOption("catalog", "");
   }
 
   @Override
@@ -59,7 +60,7 @@ public class XsltTransform extends XsltFn {
     final ArrayOutput ao = new ArrayOutput();
     try {
       System.setErr(new PrintStream(ao));
-      return transform(in, xsl, opts.free(), xopts, qc);
+      return transform(in, xsl, opts.free(), xopts);
     } catch(final TransformerException ex) {
       Util.debug(ex);
       throw XSLT_ERROR_X.get(info, trim(utf8(ao.finish(), Prop.ENCODING)));
@@ -97,12 +98,11 @@ public class XsltTransform extends XsltFn {
    * @param xsl style sheet
    * @param params parameters
    * @param xopts XSLT options
-   * @param qc query context
    * @return transformed result
    * @throws TransformerException transformer exception
    */
   private static byte[] transform(final IO in, final IO xsl, final HashMap<String, String> params,
-      final XsltOptions xopts, final QueryContext qc) throws TransformerException {
+      final XsltOptions xopts) throws TransformerException {
 
     // retrieve new or cached transformer
     final Transformer tr = transformer(xsl.streamSource(), xopts.get(XsltOptions.CACHE));
@@ -110,7 +110,7 @@ public class XsltTransform extends XsltFn {
     params.forEach(tr::setParameter);
 
     // set URI resolver
-    final CatalogWrapper cw = CatalogWrapper.get(qc.context.options.get(MainOptions.CATFILE));
+    final CatalogWrapper cw = CatalogWrapper.get(xopts.get(XsltOptions.CATALOG));
     if(cw != null) tr.setURIResolver(cw.getURIResolver());
 
     // do transformation and return result
