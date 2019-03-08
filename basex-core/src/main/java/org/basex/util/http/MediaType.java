@@ -23,8 +23,10 @@ public final class MediaType {
   private static final String CSV = "csv";
   /** CSV sub type. */
   private static final String COMMA_SEPARATED_VALUES = "comma-separated-values";
-  /** XML media types' suffix. */
+  /** XML media type suffix. */
   private static final String XML_SUFFIX = "+xml";
+  /** JSON media type suffix. */
+  private static final String JSON_SUFFIX = "+json";
 
   /** Media type: wildcards. */
   public static final MediaType ALL_ALL = new MediaType("*/*");
@@ -164,6 +166,14 @@ public final class MediaType {
   public boolean isXML() {
     return is(TEXT_XML) || is(TEXT_XML_EPE) || is(APPLICATION_XML) || is(APPLICATION_XML_EPE) ||
         sub.endsWith(XML_SUFFIX);
+  }
+
+  /**
+   * Checks if this is a JSON type.
+   * @return result of check
+   */
+  public boolean isJSON() {
+    return is(APPLICATION_JSON) || sub.endsWith(JSON_SUFFIX);
   }
 
   /**

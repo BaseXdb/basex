@@ -328,7 +328,7 @@ public final class HttpPayload {
       throws IOException, QueryException {
 
     Value value = null;
-    if(type.is(MediaType.APPLICATION_JSON)) {
+    if(type.isJSON()) {
       final JsonParserOptions opts = new JsonParserOptions(options.get(MainOptions.JSONPARSER));
       opts.assign(type);
       value = JsonConverter.get(opts).convert(input);

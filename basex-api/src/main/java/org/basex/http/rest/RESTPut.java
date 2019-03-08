@@ -43,7 +43,7 @@ final class RESTPut {
     // choose correct importer
     boolean xml = true;
     final String ct = mt.type();
-    if(mt.is(MediaType.APPLICATION_JSON)) {
+    if(mt.isJSON()) {
       final JsonParserOptions opts = new JsonParserOptions();
       opts.assign(mt);
       options.set(MainOptions.JSONPARSER, opts);
