@@ -56,9 +56,9 @@ public final class CElem extends CName {
     final int s = addNS();
     try {
       // adds in-scope namespaces
-      final Atts ns = new Atts();
+      final Atts inscopeNS = new Atts();
       final int nl = nspaces.size();
-      for(int i = 0; i < nl; i++) ns.add(nspaces.name(i), nspaces.value(i));
+      for(int i = 0; i < nl; i++) inscopeNS.add(nspaces.name(i), nspaces.value(i));
 
       // create and check QName
       final QNm nm = qname(qc, true);
@@ -68,26 +68,9 @@ public final class CElem extends CName {
       if(eq(cp, XMLNS)) throw CEINV_X.get(info, cp);
       if(!nm.hasURI() && nm.hasPrefix()) throw INVPREF_X.get(info, nm);
 
-      // analyze element namespace unless it is "xml"
-      if(!eq(cp, XML)) {
-        // request namespace for the specified uri
-        final byte[] uri = sc.ns.uri(cp);
-
-        // check if element has a namespace
-        if(nm.hasURI()) {
-          // add to statically known namespaces
-          if(!comp && (uri == null || !eq(uri, cu))) sc.ns.add(cp, cu);
-          // add to in-scope namespaces
-          if(!ns.contains(cp)) ns.add(cp, cu);
-        } else {
-          // element has no namespace: assign default uri
-          nm.uri(uri);
-        }
-      }
-
       // create node
       final Constr constr = new Constr(info, sc);
-      final FElem node = new FElem(nm, ns, constr.children, constr.atts);
+      final FElem node = new FElem(nm, inscopeNS, constr.children, constr.atts);
 
       // add child and attribute nodes
       constr.add(qc, exprs);
@@ -95,16 +78,31 @@ public final class CElem extends CName {
       if(constr.errNS != null) throw NONSALL_X.get(info, constr.errNS);
       if(constr.duplAtt != null) throw CATTDUPL_X.get(info, constr.duplAtt);
       if(constr.duplNS != null) throw DUPLNSCONS_X.get(info, constr.duplNS);
+      if(constr.nspaces.contains(EMPTY) && !nm.hasPrefix()) throw DUPLNSCONS_X.get(info, EMPTY);
 
-      // check namespaces
-      if(constr.nspaces.contains(EMPTY) && !nm.hasURI()) throw DUPLNSCONS_X.get(info, EMPTY);
+      // add namespace for element name (unless its prefix is "xml")
+      if(!eq(cp, XML)) {
+        // get URI for the specified prefix
+        final byte[] uri = sc.ns.uri(cp);
 
-      // add namespaces from constructor
+        // check if element has a namespace
+        if(nm.hasURI()) {
+          // add to statically known namespaces
+          if(!comp && (uri == null || !eq(uri, cu))) sc.ns.add(cp, cu);
+          // add to in-scope namespaces
+          if(!inscopeNS.contains(cp)) inscopeNS.add(cp, cu);
+        } else {
+          // element has no namespace: assign default uri
+          nm.uri(uri);
+        }
+      }
+
+      // add constructed namespaces
       final Atts cns = constr.nspaces;
       final int cl = cns.size();
-      for(int c = 0; c < cl; c++) addNS(cns.name(c), cns.value(c), ns);
+      for(int c = 0; c < cl; c++) addNS(cns.name(c), cns.value(c), inscopeNS);
 
-      // add namespaces
+      // add namespaces for attributes
       final int al = constr.atts.size();
       for(int a = 0; a < al; a++) {
         final ANode att = constr.atts.get(a);
@@ -117,7 +115,7 @@ public final class CElem extends CName {
         if(eq(apref, XML)) continue;
 
         final byte[] auri = qnm.uri();
-        final byte[] npref = addNS(apref, auri, ns);
+        final byte[] npref = addNS(apref, auri, inscopeNS);
         if(npref != null) {
           final QNm aname = new QNm(concat(npref, COLON, qnm.local()), auri);
           constr.atts.set(a, new FAttr(aname, att.string()));
