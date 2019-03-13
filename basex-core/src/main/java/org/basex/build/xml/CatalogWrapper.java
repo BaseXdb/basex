@@ -49,6 +49,9 @@ public final class CatalogWrapper {
    * @param paths semicolon-separated list of catalog files
    */
   private CatalogWrapper(final String paths) {
+    if(System.getProperty("xml.catalog.ignoreMissing") == null) {
+      invoke(method(MANAGER, "setIgnoreMissingProperties", boolean.class), cm, true);
+    }
     invoke(method(MANAGER, "setCatalogFiles", String.class), cm, paths);
   }
 

@@ -1,0 +1,3 @@
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+  <rewriteSystem systemIdStartString="http://document.dtd" rewritePrefix="document.dtd" />
+</catalog>

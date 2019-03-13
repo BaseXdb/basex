@@ -13,10 +13,12 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FetchModuleTest extends SandboxTest {
+  /** Test directory. */
+  private static final String DIR = "src/test/resources/";
   /** Test file. */
-  private static final String XML = "src/test/resources/input.xml";
+  private static final String XML = DIR + "input.xml";
   /** Test file. */
-  private static final String CSV = "src/test/resources/input.csv";
+  private static final String CSV = DIR + "input.csv";
 
   /** Test method. */
   @Test public void text() {
@@ -42,6 +44,12 @@ public final class FetchModuleTest extends SandboxTest {
         " map { 'parser':'csv','csvparser': map { 'header': true() } }") + "//City"), 3);
     query(COUNT.args(func.args(CSV,
         " map { 'parser':'csv','csvparser': map { 'header': 'true' } }") + "//City"), 3);
+
+    // catalog manager; requires resolver in lib/ directory
+    final String catalog = DIR + "catalog/";
+    query(func.args(catalog + "document.xml",
+        " map { 'catfile': '" + catalog + "catalog.xml', 'dtd': true() }"), "<x>X</x>");
+
     error(func.args(XML, " map { 'parser': 'unknown' }"), BASEX_OPTIONS_X_X);
     error(func.args(XML + 'x'), FETCH_OPEN_X);
   }
