@@ -1,11 +1,13 @@
 package org.basex.query.func.db;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.list.*;
 
 /**
@@ -33,5 +35,12 @@ public final class DbNodePre extends StandardFunc {
     final Iter iter = exprs[0].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) list.add(toDBNode(item).pre());
     return IntSeq.get(list.finish());
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final SeqType st = seqType();
+    exprType.assign(st.type, st.occ, exprs[0].size());
+    return this;
   }
 }

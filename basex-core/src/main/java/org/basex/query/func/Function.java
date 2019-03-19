@@ -806,9 +806,9 @@ public enum Function {
   /** XQuery function. */
   _DB_OPEN(DbOpen.class, "open(database[,path])", arg(STR_O, STR_O), DOC_ZM, DB_URI),
   /** XQuery function. */
-  _DB_OPEN_ID(DbOpenId.class, "open-id(database,id)", arg(STR_O, ITR_O), NOD_ZM, DB_URI),
+  _DB_OPEN_ID(DbOpenId.class, "open-id(database,id)", arg(STR_O, ITR_O), NOD_O, DB_URI),
   /** XQuery function. */
-  _DB_OPEN_PRE(DbOpenPre.class, "open-pre(database,pre)", arg(STR_O, ITR_O), NOD_ZM, DB_URI),
+  _DB_OPEN_PRE(DbOpenPre.class, "open-pre(database,pre)", arg(STR_O, ITR_O), NOD_O, DB_URI),
   /** XQuery function. */
   _DB_OPTIMIZE(DbOptimize.class, "optimize(database[,all[,options]])",
       arg(STR_O, BLN_O, MAP_ZO), EMP, flag(UPD), DB_URI),
