@@ -19,7 +19,6 @@ import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.io.serial.SerializerOptions.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -61,7 +60,7 @@ public final class HttpClient {
    * @return HTTP response
    * @throws QueryException query exception
    */
-  public BasicIter<Item> sendRequest(final byte[] href, final ANode request, final Value bodies)
+  public Value sendRequest(final byte[] href, final ANode request, final Value bodies)
       throws QueryException {
 
     final HttpRequest req = new HttpRequestParser(info).parse(request, bodies);
@@ -84,7 +83,7 @@ public final class HttpClient {
         writePayload(conn.getOutputStream(), req);
       }
 
-      return new HttpResponse(info, options).getResponse(conn, body, mediaType).iter();
+      return new HttpResponse(info, options).getResponse(conn, body, mediaType);
 
     } catch(final IOException ex) {
       throw HC_ERROR_X.get(info, ex);

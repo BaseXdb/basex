@@ -30,7 +30,7 @@ public final class Empty extends Value {
       return null;
     }
     @Override
-    public Value value() {
+    public Value iterValue() {
       return SEQ;
     }
     @Override
@@ -118,6 +118,11 @@ public final class Empty extends Value {
 
   @Override
   public void cache(final boolean lazy, final InputInfo ii) { }
+
+  @Override
+  public Iter atomIter(final QueryContext qc, final InputInfo ii) {
+    return ITER;
+  }
 
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) {

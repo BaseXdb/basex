@@ -77,12 +77,12 @@ public final class ItemList extends ObjectList<Item, ItemList> {
         return list[(int) i];
       }
       @Override
-      public Value value() {
+      public Value iterValue() {
         return ItemList.this.value();
       }
       @Override
       public Value value(final QueryContext qc) {
-        return value();
+        return ItemList.this.value();
       }
     };
   }

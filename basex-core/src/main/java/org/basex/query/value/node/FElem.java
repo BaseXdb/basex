@@ -369,12 +369,12 @@ public final class FElem extends FNode {
 
   @Override
   public BasicNodeIter attributes() {
-    return atts != null ? iter(atts) : super.attributes();
+    return atts != null ? atts.iter() : super.attributes();
   }
 
   @Override
   public BasicNodeIter children() {
-    return children != null ? iter(children) : super.children();
+    return children != null ? children.iter() : super.children();
   }
 
   @Override

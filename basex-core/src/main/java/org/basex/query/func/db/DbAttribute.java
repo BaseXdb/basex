@@ -3,6 +3,7 @@ package org.basex.query.func.db;
 import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -13,6 +14,16 @@ import org.basex.query.iter.*;
 public final class DbAttribute extends DbText {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return attribute(valueAccess(IndexType.ATTRIBUTE, qc), qc, 2);
+    return attribute(valueAccess(qc), qc, 2);
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    return iter(qc).value(qc);
+  }
+
+  @Override
+  IndexType type() {
+    return IndexType.ATTRIBUTE;
   }
 }

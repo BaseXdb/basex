@@ -1,7 +1,6 @@
 package org.basex.query.func.session;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 
 /**
@@ -11,11 +10,6 @@ import org.basex.query.value.*;
  * @author Christian Gruen
  */
 public final class SessionNames extends SessionFn {
-  @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
-  }
-
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return session(qc).names();

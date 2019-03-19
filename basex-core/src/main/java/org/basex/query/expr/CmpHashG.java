@@ -48,7 +48,7 @@ public final class CmpHashG extends CmpG {
       final QueryContext qc) throws QueryException {
 
     // check if iterator is based on value with more than one item
-    final Value value2 = iter2.value();
+    final Value value2 = iter2.iterValue();
     if(value2 != null && value2.size() > 1) {
       // retrieve cache (first call: initialize it)
       final CmpCache cache = qc.threads.get(this).get();

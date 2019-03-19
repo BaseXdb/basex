@@ -6,7 +6,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -44,8 +44,8 @@ public final class ConvertBinaryToIntegers extends StandardFunc {
     final int bl = bytes.length;
     if(bl == 1) return Int.get(bytes[0] & 0xFF);
 
-    final long[] tmp = new long[bl];
-    for(int b = 0; b < bl; b++) tmp[b] = bytes[b] & 0xFF;
-    return IntSeq.get(tmp, AtomType.ITR);
+    final LongList list = new LongList(bl);
+    for(final byte b : bytes) list.add(b & 0xFF);
+    return IntSeq.get(list.finish());
   }
 }

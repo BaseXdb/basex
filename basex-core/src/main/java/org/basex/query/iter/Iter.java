@@ -46,7 +46,7 @@ public abstract class Iter {
    * If available, returns a value on which the iterator is based on.
    * @return value or {@code null}
    */
-  public Value value() {
+  public Value iterValue() {
     return null;
   }
 

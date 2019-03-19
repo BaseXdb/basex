@@ -44,13 +44,11 @@ public final class FTWeight extends FTExpr {
     return super.compile(cc);
   }
 
-  // called by sequential variant
   @Override
   public FTNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return weight(exprs[0].item(qc, info), qc);
   }
 
-  // called by index variant
   @Override
   public FTIter iter(final QueryContext qc) {
     return new FTIter() {

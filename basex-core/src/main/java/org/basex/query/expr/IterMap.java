@@ -69,6 +69,11 @@ public final class IterMap extends SimpleMap {
   }
 
   @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    return iter(qc).value(qc);
+  }
+
+  @Override
   public IterMap copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return copyType(new IterMap(info, Arr.copyAll(cc, vm, exprs)));
   }

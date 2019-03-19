@@ -9,7 +9,6 @@ import java.util.regex.*;
 import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -24,11 +23,6 @@ import org.basex.util.*;
 public final class ClientQuery extends ClientFn {
   /** Query pattern. */
   private static final Pattern QUERYPAT = Pattern.compile("\\[(.*?)] (.*)", Pattern.MULTILINE);
-
-  @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
-  }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {

@@ -37,7 +37,7 @@ public class FnSubsequence extends StandardFunc {
     if(sr.length == 0) return Empty.ITER;
 
     if(size != -1) {
-      final Value value = iter.value();
+      final Value value = iter.iterValue();
       if(value != null) return value.subSequence(sr.start, sr.length, qc).iter();
 
       if(sr.length == size) return iter;
@@ -89,7 +89,7 @@ public class FnSubsequence extends StandardFunc {
 
     if(size != -1) {
       // return subsequence if iterator is value-based
-      final Value value = iter.value();
+      final Value value = iter.iterValue();
       if(value != null) return value.subSequence(sr.start, sr.length, qc);
 
       if(sr.length == size) return iter.value(qc);

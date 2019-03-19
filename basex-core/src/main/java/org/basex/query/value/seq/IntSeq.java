@@ -82,6 +82,15 @@ public final class IntSeq extends NativeSeq {
   // STATIC METHODS ===============================================================================
 
   /**
+   * Creates an xs:integer sequence with the specified items.
+   * @param values values
+   * @return value
+   */
+  public static Value get(final long[] values) {
+    return get(values, AtomType.ITR);
+  }
+
+  /**
    * Creates a sequence with the specified items.
    * @param values values
    * @param type type

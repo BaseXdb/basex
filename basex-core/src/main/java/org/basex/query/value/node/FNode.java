@@ -2,10 +2,8 @@ package org.basex.query.value.node;
 
 import java.util.*;
 import org.basex.api.dom.*;
-import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -102,27 +100,6 @@ public abstract class FNode extends ANode {
   @Override
   public final BasicNodeIter descendantOrSelf() {
     return desc(true);
-  }
-
-  /**
-   * Iterates all nodes of the specified iterator.
-   * @param iter iterator
-   * @return node iterator
-   */
-  static BasicNodeIter iter(final ANodeList iter) {
-    return new BasicNodeIter() {
-      int c;
-      @Override
-      public ANode next() { return iter != null && c != iter.size() ? iter.get(c++) : null; }
-      @Override
-      public ANode get(final long i) { return iter.get((int) i); }
-      @Override
-      public long size() { return iter.size(); }
-      @Override
-      public Value value() { return iter.value(); }
-      @Override
-      public Value value(final QueryContext qc) { return value(); }
-    };
   }
 
   /**

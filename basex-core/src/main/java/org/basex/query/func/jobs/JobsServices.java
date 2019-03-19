@@ -7,7 +7,7 @@ import java.io.*;
 import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -17,10 +17,10 @@ import org.basex.query.iter.*;
  */
 public final class JobsServices extends StandardFunc {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     checkAdmin(qc);
     try {
-      return new Jobs(qc.context).toXML().children();
+      return new Jobs(qc.context).toXML().children().value(qc);
     } catch(final IOException ex) {
       throw JOBS_SERVICE_X_X.get(info, ex);
     }

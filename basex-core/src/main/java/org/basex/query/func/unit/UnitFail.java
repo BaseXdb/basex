@@ -1,7 +1,7 @@
 package org.basex.query.func.unit;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -11,7 +11,7 @@ import org.basex.query.iter.*;
  */
 public final class UnitFail extends UnitFn {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     throw error(toNodeOrAtomItem(0, qc));
   }
 }

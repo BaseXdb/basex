@@ -3,7 +3,6 @@ package org.basex.query.func.ft;
 import static org.basex.util.ft.FTFlag.*;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -17,11 +16,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class FtTokenize extends FtAccess {
-  @Override
-  public final Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
-  }
-
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return StrSeq.get(tokens(qc, false));

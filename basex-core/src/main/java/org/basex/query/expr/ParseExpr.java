@@ -45,44 +45,23 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Item item = item(qc, info);
-    return item != null ? item.iter() : Empty.ITER;
-  }
-
-  @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = iter(qc);
-    final Item item = qc.next(iter);
-    // check next item if size of iterator is larger than one or unknown (-1)
-    if(item != null && iter.size() != 1) {
-      final Item next = iter.next();
-      if(next != null) {
-        final ValueBuilder vb = new ValueBuilder(qc, item, next);
-        if(iter.next() != null) vb.add(Str.get(DOTS));
-        throw SEQFOUND_X.get(info, vb.value());
-      }
-    }
-    return item;
+    return value(qc).iter();
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    if(seqType().zeroOrOne()) {
-      final Value value = item(qc, info);
-      return value == null ? Empty.SEQ : value;
-    }
-    return iter(qc).value(qc);
+    final Value value = item(qc, info);
+    return value == null ? Empty.SEQ : value;
   }
 
   @Override
-  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return value(qc).item(qc, ii);
+  }
+
+  @Override
+  public final Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     return value(qc).atomValue(qc, info);
-  }
-
-  @Override
-  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = item(qc, info);
-    return item == null ? null : item.atomItem(qc,  info);
   }
 
   @Override

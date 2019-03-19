@@ -292,9 +292,7 @@ public abstract class XQArray extends XQData {
 
   @Override
   public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    if(atomSize() > 1) throw SEQFOUND_X.get(ii, this);
-    final Value value = atomValue(qc, ii);
-    return value.isEmpty() ? null : (Item) value;
+    return atomValue(qc, ii).item(qc, ii);
   }
 
   @Override

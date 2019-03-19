@@ -25,11 +25,6 @@ final class CachedMap extends SimpleMap {
   }
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
-  }
-
-  @Override
   public Value value(final QueryContext qc) throws QueryException {
     Value result = exprs[0].value(qc);
 

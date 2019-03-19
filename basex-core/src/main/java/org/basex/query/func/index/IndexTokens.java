@@ -1,8 +1,6 @@
 package org.basex.query.func.index;
 
 import org.basex.index.*;
-import org.basex.query.*;
-import org.basex.query.iter.*;
 
 /**
  * Function implementation.
@@ -12,7 +10,7 @@ import org.basex.query.iter.*;
  */
 public final class IndexTokens extends IndexTexts {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return values(qc, IndexType.TOKEN);
+  IndexType type() {
+    return IndexType.TOKEN;
   }
 }

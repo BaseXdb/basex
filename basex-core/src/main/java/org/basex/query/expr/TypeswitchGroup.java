@@ -124,7 +124,7 @@ public final class TypeswitchGroup extends Single {
    * Evaluates the expression.
    * @param qc query context
    * @param seq sequence to be checked
-   * @return resulting item or {@code null}
+   * @return resulting iterator or {@code null}
    * @throws QueryException query exception
    */
   Iter iter(final QueryContext qc, final Value seq) throws QueryException {
@@ -132,7 +132,22 @@ public final class TypeswitchGroup extends Single {
 
     if(var == null) return expr.iter(qc);
     qc.set(var, seq);
+    // variable: evaluate full expression
     return expr.value(qc).iter();
+  }
+
+  /**
+   * Evaluates the expression.
+   * @param qc query context
+   * @param seq sequence to be checked
+   * @return resulting value or {@code null}
+   * @throws QueryException query exception
+   */
+  Value value(final QueryContext qc, final Value seq) throws QueryException {
+    if(!matches(seq)) return null;
+
+    if(var != null) qc.set(var, seq);
+    return expr.value(qc);
   }
 
   @Override

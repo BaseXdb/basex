@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -48,15 +49,6 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   /**
-   * This method is called by the sequential full-text evaluation.
-   * @param qc query context
-   * @return resulting item
-   * @throws QueryException query exception
-   */
-  @Override
-  public abstract FTNode item(QueryContext qc, InputInfo ii) throws QueryException;
-
-  /**
    * This method is called by the index-based full-text evaluation.
    * @param qc query context
    * @return resulting item
@@ -64,6 +56,21 @@ public abstract class FTExpr extends ParseExpr {
    */
   @Override
   public abstract FTIter iter(QueryContext qc) throws QueryException;
+
+  @Override
+  public Value value(final QueryContext qc) {
+    // will never be called
+    throw Util.notExpected();
+  }
+
+  /**
+   * This method is called by the sequential full-text evaluation.
+   * @param qc query context
+   * @return resulting item
+   * @throws QueryException query exception
+   */
+  @Override
+  public abstract FTNode item(QueryContext qc, InputInfo ii) throws QueryException;
 
   @Override
   public boolean has(final Flag... flags) {

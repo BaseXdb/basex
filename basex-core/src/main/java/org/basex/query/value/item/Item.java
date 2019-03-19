@@ -46,12 +46,12 @@ public abstract class Item extends Value {
         return Item.this;
       }
       @Override
-      public Value value() {
+      public Value iterValue() {
         return Item.this;
       }
       @Override
       public Value value(final QueryContext qc) {
-        return value();
+        return Item.this;
       }
     };
   }

@@ -54,22 +54,18 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
   public BasicNodeIter iter() {
     return new BasicNodeIter() {
       int pos;
-
       @Override
       public Value value(final QueryContext qc) {
         return ANodeList.this.value();
       }
-
       @Override
       public long size() {
         return size;
       }
-
       @Override
       public ANode next() {
         return pos < size ? list[pos++] : null;
       }
-
       @Override
       public ANode get(final long i) {
         return list[(int) i];

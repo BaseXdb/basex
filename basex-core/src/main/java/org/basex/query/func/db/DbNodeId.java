@@ -3,8 +3,11 @@ package org.basex.query.func.db;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -25,5 +28,16 @@ public final class DbNodeId extends StandardFunc {
         return Int.get(node.data().id(node.pre()));
       }
     };
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final LongList list = new LongList();
+    final Iter iter = exprs[0].iter(qc);
+    for(Item item; (item = qc.next(iter)) != null;) {
+      final DBNode node = toDBNode(item);
+      list.add(node.data().id(node.pre()));
+    }
+    return IntSeq.get(list.finish());
   }
 }

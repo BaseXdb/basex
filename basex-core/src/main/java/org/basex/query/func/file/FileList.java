@@ -10,7 +10,6 @@ import java.util.regex.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -23,11 +22,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class FileList extends FileRead {
-  @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
-  }
-
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     checkCreate(qc);

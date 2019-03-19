@@ -59,11 +59,6 @@ public abstract class JavaCall extends Arr {
   }
 
   @Override
-  public final Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
-  }
-
-  @Override
   public final Value value(final QueryContext qc) throws QueryException {
     // check permission
     if(!qc.context.user().has(perm)) throw BASEX_PERMISSION_X_X.get(info, perm, this);
@@ -105,7 +100,7 @@ public abstract class JavaCall extends Arr {
 
     // primitive arrays
     if(object instanceof byte[])    return BytSeq.get((byte[]) object);
-    if(object instanceof long[])    return IntSeq.get((long[]) object, AtomType.ITR);
+    if(object instanceof long[])    return IntSeq.get((long[]) object);
     if(object instanceof char[])    return Str.get(new String((char[]) object));
     if(object instanceof boolean[]) return BlnSeq.get((boolean[]) object);
     if(object instanceof double[])  return DblSeq.get((double[]) object);
@@ -146,9 +141,8 @@ public abstract class JavaCall extends Arr {
       return IntSeq.get(b, AtomType.INT);
     }
     // any other array (also nested ones)
-    final Object[] objects = (Object[]) object;
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Object obj : objects) vb.add(toValue(obj, qc, sc));
+    for(final Object obj : (Object[]) object) vb.add(toValue(obj, qc, sc));
     return vb.value();
   }
 

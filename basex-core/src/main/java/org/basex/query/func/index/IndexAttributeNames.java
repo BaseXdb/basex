@@ -1,8 +1,6 @@
 package org.basex.query.func.index;
 
 import org.basex.index.*;
-import org.basex.query.*;
-import org.basex.query.iter.*;
 
 /**
  * Function implementation.
@@ -12,7 +10,7 @@ import org.basex.query.iter.*;
  */
 public final class IndexAttributeNames extends IndexElementNames {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return names(qc, IndexType.ATTRNAME);
+  IndexType type() {
+    return IndexType.ATTRNAME;
   }
 }

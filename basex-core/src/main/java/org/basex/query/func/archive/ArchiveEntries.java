@@ -9,7 +9,6 @@ import java.util.zip.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -21,11 +20,6 @@ import org.basex.query.value.node.*;
  * @author Christian Gruen
  */
 public final class ArchiveEntries extends StandardFunc {
-  @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
-  }
-
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final B64 archive = toB64(exprs[0], qc, false);

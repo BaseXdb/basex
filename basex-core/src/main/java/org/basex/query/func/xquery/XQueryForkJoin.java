@@ -7,7 +7,6 @@ import java.util.concurrent.*;
 import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -16,6 +15,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
+ * @author BaseX Team 2005-19, BSD License
  * @author James Wright
  */
 public final class XQueryForkJoin extends StandardFunc {
@@ -45,10 +45,5 @@ public final class XQueryForkJoin extends StandardFunc {
       // required?
       pool.shutdown();
     }
-  }
-
-  @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
   }
 }

@@ -16,7 +16,7 @@ import org.basex.util.http.*;
  */
 public final class HttpSendRequest extends StandardFunc {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     checkCreate(qc);
 
     // get request node

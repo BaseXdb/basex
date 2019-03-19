@@ -82,17 +82,17 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
 
       @Override
       public Value value(final QueryContext qc) {
-        return ANodeBuilder.this.value();
+        return ValueBuilder.value(list, size, NodeType.NOD);
       }
     };
   }
 
   /**
    * Returns all nodes as value.
-   * The list must not be modified after the iterator has been requested.
    * @return the iterator
    */
   public Value value() {
+    check();
     return ValueBuilder.value(list, size, NodeType.NOD);
   }
 

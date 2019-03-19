@@ -20,13 +20,6 @@ import org.basex.query.value.type.*;
  */
 public final class ArrayFlatten extends ArrayFn {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc);
-    add(vb, exprs[0], qc);
-    return vb.value();
-  }
-
-  @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Deque<Iter> stack = new ArrayDeque<>();
     stack.push(exprs[0].iter(qc));
@@ -63,6 +56,13 @@ public final class ArrayFlatten extends ArrayFn {
         return null;
       }
     };
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(qc);
+    add(vb, exprs[0], qc);
+    return vb.value();
   }
 
   @Override

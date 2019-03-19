@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
@@ -27,6 +28,11 @@ public final class FnFilter extends StandardFunc {
         return null;
       }
     };
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    return iter(qc).value(qc);
   }
 
   @Override

@@ -35,9 +35,4 @@ public final class RandomSeededPermutation extends StandardFunc {
     }
     return items.value();
   }
-
-  @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
-  }
 }

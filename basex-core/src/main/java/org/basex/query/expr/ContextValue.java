@@ -2,10 +2,8 @@ package org.basex.query.expr;
 
 import org.basex.core.locks.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -39,18 +37,8 @@ public final class ContextValue extends Simple {
   }
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return ctxValue(qc).iter();
-  }
-
-  @Override
   public Value value(final QueryContext qc) throws QueryException {
     return ctxValue(qc);
-  }
-
-  @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return ctxValue(qc).item(qc, info);
   }
 
   @Override

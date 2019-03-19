@@ -29,12 +29,29 @@ public abstract class AxisPath extends Path {
 
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
+    final Value result = cache(qc);
+    return result != null ? result.iter() : iterator(qc);
+  }
+
+  @Override
+  public final Value value(final QueryContext qc) throws QueryException {
+    final Value result = cache(qc);
+    return result != null ? result : iterator(qc).value(qc);
+  }
+
+  /**
+   * Updates the cache and returns a cached value.
+   * @param qc query context
+   * @return cached value or {@code null}.
+   * @throws QueryException query context
+   */
+  private Value cache(final QueryContext qc) throws QueryException {
     final PathCache cache = qc.threads.get(this).get();
     switch(cache.state) {
       case INIT:
         // first invocation: initialize caching flag
         cache.state = !hasFreeVars() && !has(Flag.NDT) ? State.ENABLED : State.DISABLED;
-        return iter(qc);
+        return cache(qc);
       case ENABLED:
         // second invocation, caching is enabled: cache context value (copy light-weight db nodes)
         final Value value = qc.focus.value;
@@ -44,7 +61,7 @@ public abstract class AxisPath extends Path {
       case READY:
         // third invocation, ready for caching: cache result if context has not changed
         if(cache.sameContext(qc.focus.value, root)) {
-          cache.result = nodeIter(qc).value(qc);
+          cache.result = iterator(qc).value(qc);
           cache.state = State.CACHED;
         } else {
           // disable caching if context has changed
@@ -60,10 +77,7 @@ public abstract class AxisPath extends Path {
         break;
       case DISABLED:
     }
-
-    // iterate or return cached values
-    final Value result = cache.result;
-    return result == null ? nodeIter(qc) : result.iter();
+    return cache.result;
   }
 
   /**
@@ -72,7 +86,7 @@ public abstract class AxisPath extends Path {
    * @return iterator
    * @throws QueryException query exception
    */
-  protected abstract NodeIter nodeIter(QueryContext qc) throws QueryException;
+  protected abstract NodeIter iterator(QueryContext qc) throws QueryException;
 
   /**
    * Inverts a location path.

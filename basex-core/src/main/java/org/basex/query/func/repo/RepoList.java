@@ -1,9 +1,9 @@
 package org.basex.query.func.repo;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.pkg.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 
 /**
@@ -23,7 +23,7 @@ public final class RepoList extends RepoFn {
   private static final String VERSION = "version";
 
   @Override
-  public BasicNodeIter iter(final QueryContext qc) {
+  public Value value(final QueryContext qc) {
     final ANodeList list = new ANodeList();
     for(final Pkg pkg : new RepoManager(qc.context).packages()) {
       final FElem elem = new FElem(PACKAGE);
@@ -32,6 +32,6 @@ public final class RepoList extends RepoFn {
       elem.add(TYPE, pkg.type().toString());
       list.add(elem);
     }
-    return list.iter();
+    return list.value();
   }
 }

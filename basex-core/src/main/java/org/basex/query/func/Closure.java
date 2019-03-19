@@ -11,7 +11,6 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
-import org.basex.query.iter.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -318,11 +317,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return item(qc, info);
-  }
-
-  @Override
-  public BasicIter<?> iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
   }
 
   @Override

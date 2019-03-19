@@ -38,6 +38,11 @@ public final class HofScanLeft extends StandardFunc {
   }
 
   @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    return iter(qc).value(qc);
+  }
+
+  @Override
   protected Expr opt(final CompileContext cc) {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if(expr1 == Empty.SEQ) return expr2;

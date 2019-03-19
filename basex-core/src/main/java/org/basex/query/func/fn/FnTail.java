@@ -27,7 +27,7 @@ public final class FnTail extends StandardFunc {
     if(size == 0 || size == 1 || iter.next() == null) return Empty.ITER;
 
     // check if iterator is value-based
-    final Value value = iter.value();
+    final Value value = iter.iterValue();
     if(value != null) return value.subSequence(1, size - 1, qc).iter();
 
     // return optimized iterator if result size is known

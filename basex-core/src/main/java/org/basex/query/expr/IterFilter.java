@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -40,6 +41,16 @@ public final class IterFilter extends Filter {
         return null;
       }
     };
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(qc);
+    final Iter iter = root.iter(qc);
+    for(Item item; (item = qc.next(iter)) != null;) {
+      if(preds(item, qc)) vb.add(item);
+    }
+    return vb.value();
   }
 
   @Override

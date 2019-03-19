@@ -95,12 +95,12 @@ public abstract class Seq extends Value {
         return itemAt(i);
       }
       @Override
-      public Value value() {
+      public Value iterValue() {
         return Seq.this;
       }
       @Override
       public Value value(final QueryContext qc) {
-        return value();
+        return Seq.this;
       }
     };
   }
@@ -194,14 +194,6 @@ public abstract class Seq extends Value {
     int h = 1;
     for(long v = Math.min(size, 5); --v >= 0;) h = 31 * h + itemAt(v).hash(ii);
     return h;
-  }
-
-  @Override
-  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter ir = atomIter(qc, ii);
-    final Item it = ir.next();
-    if(it != null && ir.next() != null) throw SEQFOUND_X.get(ii, this);
-    return it;
   }
 
   @Override

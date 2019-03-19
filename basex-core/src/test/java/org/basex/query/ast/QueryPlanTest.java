@@ -44,6 +44,7 @@ public abstract class QueryPlanTest extends SandboxTest {
         }
       }
     } catch(final Exception ex) {
+      ex.printStackTrace();
       throw new AssertionError(query, ex);
     }
   }

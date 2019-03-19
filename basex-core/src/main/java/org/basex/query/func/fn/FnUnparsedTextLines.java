@@ -21,6 +21,12 @@ import org.basex.util.list.*;
  */
 public final class FnUnparsedTextLines extends Parse {
   @Override
+  public Iter iter(final QueryContext qc) throws QueryException {
+    final Item item = unparsedText(qc, false, true);
+    return item == null ? Empty.ITER : new LinesIter(item.string(info));
+  }
+
+  @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Item item = unparsedText(qc, false, true);
     if(item == null) return Empty.SEQ;
@@ -33,12 +39,6 @@ public final class FnUnparsedTextLines extends Parse {
     } catch(final IOException ex) {
       throw FILE_IO_ERROR_X.get(info, ex);
     }
-  }
-
-  @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    final Item item = unparsedText(qc, false, true);
-    return item == null ? Empty.ITER : new LinesIter(item.string(info));
   }
 
   /**

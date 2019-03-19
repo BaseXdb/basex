@@ -8,7 +8,6 @@ import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.Test;
@@ -136,7 +135,7 @@ public abstract class QueryTest extends SandboxTest {
    * @return iterator
    */
   protected static Value integers(final long... integers) {
-    return IntSeq.get(integers, AtomType.ITR);
+    return IntSeq.get(integers);
   }
 
   /**

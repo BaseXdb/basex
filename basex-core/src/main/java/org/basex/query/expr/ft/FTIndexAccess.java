@@ -6,6 +6,7 @@ import org.basex.query.expr.index.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -55,6 +56,11 @@ public final class FTIndexAccess extends Simple {
         return it;
       }
     };
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    return iter(qc).value(qc);
   }
 
   @Override

@@ -9,11 +9,15 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This index class retrieves numeric ranges from a value index.
@@ -40,14 +44,29 @@ public final class RangeAccess extends IndexAccess {
   public BasicNodeIter iter(final QueryContext qc) throws QueryException {
     final IndexType type = index.type();
     final Data data = db.data(qc, type);
+
     return new DBNodeIter(data) {
       final byte kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
       final IndexIterator ii = data.iter(index);
+
       @Override
       public DBNode next() {
         return ii.more() ? new DBNode(data, ii.pre(), kind) : null;
       }
     };
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final IndexType it = index.type();
+    final Data data = db.data(qc, it);
+
+    final NodeType type = it == IndexType.TEXT ? NodeType.TXT : NodeType.ATT;
+    final IndexIterator ii = data.iter(index);
+
+    final IntList list = new IntList();
+    while(ii.more()) list.add(ii.pre());
+    return DBNodeSeq.get(list.finish(), data, type, false);
   }
 
   @Override

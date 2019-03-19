@@ -30,6 +30,11 @@ public final class FnError extends StandardFunc {
   }
 
   @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    throw error(qc);
+  }
+
+  @Override
   public boolean isVacuous() {
     return true;
   }

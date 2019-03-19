@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.update.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -17,11 +16,6 @@ import org.basex.query.value.type.*;
  * @author Leo Woerteler
  */
 public class MapForEach extends StandardFunc {
-  @Override
-  public final Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
-  }
-
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(exprs[0], qc);

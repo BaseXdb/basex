@@ -81,8 +81,8 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
-   * If this method is not overwritten, {@link #item(QueryContext, InputInfo)} must be implemented
-   * by an expression, as it may be called by this method.
+   * If this method is not overwritten, {@link #value(QueryContext)} or
+   * {@link #item(QueryContext, InputInfo)} must be implemented, as it will be called instead.
    * @param qc query context
    * @return iterator
    * @throws QueryException query exception
@@ -90,10 +90,20 @@ public abstract class Expr extends ExprInfo {
   public abstract Iter iter(QueryContext qc) throws QueryException;
 
   /**
+   * Evaluates the expression and returns the resulting value.
+   * If this method is not overwritten, {@link #item(QueryContext, InputInfo)} must be implemented,
+   * as it will be called instead.
+   * @param qc query context
+   * @return value
+   * @throws QueryException query exception
+   */
+  public abstract Value value(QueryContext qc) throws QueryException;
+
+  /**
    * Evaluates the expression and returns the resulting item,
    * or a {@code null} reference if the expression yields an empty sequence.
-   * If this method is not overwritten, {@link #iter(QueryContext)} must be implemented by an
-   * expression, as it may be called by this method.
+   * If this method is not overwritten, {@link #value(QueryContext)} must be implemented,
+   * as it will be called instead.
    * @param qc query context
    * @param ii input info (only required by {@link Seq} instances, which have no input info)
    * @return item or {@code null}
@@ -102,22 +112,13 @@ public abstract class Expr extends ExprInfo {
   public abstract Item item(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
-   * Evaluates the expression and returns the resulting value.
-   * The implementation of this method is optional.
-   * @param qc query context
-   * @return value
-   * @throws QueryException query exception
-   */
-  public abstract Value value(QueryContext qc) throws QueryException;
-
-  /**
    * Evaluates the expression and returns an iterator on the resulting, atomized items.
    * @param qc query context
    * @param ii input info
    * @return iterator
    * @throws QueryException query exception
    */
-  public final Iter atomIter(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Iter atomIter(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = iter(qc);
     final SeqType st = seqType();
     return st.type.instanceOf(AtomType.AAT) ? iter :
@@ -132,7 +133,9 @@ public abstract class Expr extends ExprInfo {
    * @return item or {@code null}
    * @throws QueryException query exception
    */
-  public abstract Item atomItem(QueryContext qc, InputInfo ii) throws QueryException;
+  public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return atomValue(qc, ii).item(qc, ii);
+  }
 
   /**
    * Evaluates the expression and returns the atomized items.

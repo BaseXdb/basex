@@ -8,7 +8,6 @@ import java.util.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -27,12 +26,6 @@ public final class WebResponseHeader extends StandardFunc {
     public static final NumberOption STATUS = new NumberOption("status");
     /** Message. */
     public static final StringOption MESSAGE = new StringOption("message");
-  }
-
-
-  @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
   }
 
   @Override

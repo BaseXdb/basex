@@ -30,7 +30,7 @@ public final class IterPath extends AxisPath {
   }
 
   @Override
-  protected NodeIter nodeIter(final QueryContext qc) {
+  protected NodeIter iterator(final QueryContext qc) {
     return new NodeIter() {
       QueryFocus focus;
       Expr[] exprs;

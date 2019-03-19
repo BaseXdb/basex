@@ -20,11 +20,6 @@ import org.basex.util.*;
  */
 public class FnTrace extends StandardFunc {
   @Override
-  public final Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
-  }
-
-  @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value value = exprs[0].value(qc);
     final byte[] label = exprs.length > 1 ? toToken(exprs[1], qc) : null;

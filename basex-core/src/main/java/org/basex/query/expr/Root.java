@@ -42,15 +42,15 @@ public final class Root extends Simple {
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final Value value = ctxValue(qc);
-    return value.seqType().type == NodeType.DOC ? value : roots(value, qc).value();
-  }
-
-  @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Value value = ctxValue(qc);
     return value.seqType().type == NodeType.DOC ? value.iter() : roots(value, qc).iter();
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final Value value = ctxValue(qc);
+    return value.seqType().type == NodeType.DOC ? value : roots(value, qc).value();
   }
 
   /**

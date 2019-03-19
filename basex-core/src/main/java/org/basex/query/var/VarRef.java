@@ -5,10 +5,8 @@ import static org.basex.query.QueryText.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -45,16 +43,6 @@ public final class VarRef extends ParseExpr {
     final SeqType st = var.seqType();
     exprType.assign(st.type, st.occ, var.size());
     return this;
-  }
-
-  @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return qc.get(var).item(qc, info);
-  }
-
-  @Override
-  public Iter iter(final QueryContext qc) {
-    return qc.get(var).iter();
   }
 
   @Override

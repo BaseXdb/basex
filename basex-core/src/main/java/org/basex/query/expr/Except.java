@@ -50,29 +50,23 @@ public final class Except extends Set {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final Except ex = new Except(info, copyAll(cc, vm, exprs));
-    ex.iterable = iterable;
-    return copyType(ex);
-  }
-
-  @Override
-  protected ANodeBuilder eval(final Iter[] iters, final QueryContext qc) throws QueryException {
-    final ANodeBuilder list = new ANodeBuilder();
-    for(Item item; (item = qc.next(iters[0])) != null;) list.add(toNode(item));
-    list.check();
+  protected ANodeBuilder cache(final QueryContext qc) throws QueryException {
+    final ANodeBuilder nodes = new ANodeBuilder();
+    Iter iter = exprs[0].iter(qc);
+    for(Item item; (item = qc.next(iter)) != null;) nodes.add(toNode(item));
+    nodes.check();
 
     final int el = exprs.length;
-    for(int e = 1; e < el && !list.isEmpty(); e++) {
-      final Iter iter = iters[e];
-      for(Item item; (item = qc.next(iter)) != null;) list.removeAll(toNode(item));
+    for(int e = 1; e < el && !nodes.isEmpty(); e++) {
+      iter = exprs[e].iter(qc);
+      for(Item item; (item = qc.next(iter)) != null;) nodes.removeAll(toNode(item));
     }
-    return list;
+    return nodes;
   }
 
   @Override
-  protected NodeIter iter(final Iter[] iters, final QueryContext qc) {
-    return new SetIter(qc, iters) {
+  protected NodeIter iterate(final QueryContext qc) throws QueryException {
+    return new SetIter(qc, iters(qc)) {
       @Override
       public ANode next() throws QueryException {
         if(nodes == null) {
@@ -99,6 +93,13 @@ public final class Except extends Set {
         return temp;
       }
     };
+  }
+
+  @Override
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    final Except ex = new Except(info, copyAll(cc, vm, exprs));
+    ex.iterable = iterable;
+    return copyType(ex);
   }
 
   @Override

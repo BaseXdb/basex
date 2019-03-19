@@ -7,6 +7,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -51,29 +52,43 @@ abstract class Set extends Arr {
   }
 
   @Override
-  public final NodeIter iter(final QueryContext qc) throws QueryException {
+  public final Iter iter(final QueryContext qc) throws QueryException {
+    return iterable ? iterate(qc) : cache(qc).iter();
+  }
+
+  @Override
+  public final Value value(final QueryContext qc) throws QueryException {
+    return iterable ? iterate(qc).value(qc) : cache(qc).value();
+  }
+
+  /**
+   * Creates iterators for all expressions.
+   * @param qc query context
+   * @return iterators
+   * @throws QueryException query exception
+   */
+  Iter[] iters(final QueryContext qc) throws QueryException {
     final int el = exprs.length;
-    final Iter[] iter = new Iter[el];
-    for(int e = 0; e < el; e++) iter[e] = exprs[e].iter(qc);
-    return iterable ? iter(iter, qc) : eval(iter, qc).iter();
+    final Iter[] iters = new Iter[el];
+    for(int e = 0; e < el; e++) iters[e] = exprs[e].iter(qc);
+    return iters;
   }
 
   /**
    * Evaluates the specified iterators.
-   * @param iters iterators
    * @param qc query context
    * @return resulting node list
    * @throws QueryException query exception
    */
-  protected abstract ANodeBuilder eval(Iter[] iters, QueryContext qc) throws QueryException;
+  protected abstract ANodeBuilder cache(QueryContext qc) throws QueryException;
 
   /**
    * Evaluates the specified iterators in an iterative manner.
-   * @param iters iterators
    * @param qc query context
    * @return resulting iterator
+   * @throws QueryException query exception
    */
-  protected abstract NodeIter iter(Iter[] iters, QueryContext qc);
+  protected abstract Iter iterate(QueryContext qc) throws QueryException;
 
   @Override
   public final boolean iterable() {

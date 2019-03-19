@@ -3,7 +3,6 @@ package org.basex.query.func.session;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 
@@ -14,11 +13,6 @@ import org.basex.query.value.seq.*;
  * @author Christian Gruen
  */
 public final class SessionGet extends SessionFn {
-  @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
-  }
-
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value value = session(qc).get(toToken(exprs[0], qc),

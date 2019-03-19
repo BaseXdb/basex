@@ -2,6 +2,7 @@ package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -13,5 +14,10 @@ public final class FnIdref extends Ids {
   @Override
   public BasicNodeIter iter(final QueryContext qc) throws QueryException {
     return ids(qc, true);
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    return iter(qc).value(qc);
   }
 }

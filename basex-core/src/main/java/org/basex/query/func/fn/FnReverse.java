@@ -28,7 +28,7 @@ public final class FnReverse extends StandardFunc {
     if(size == 1) return iter;
 
     // value-based iterator
-    final Value value = iter.value();
+    final Value value = iter.iterValue();
     if(value != null) return value.reverse(qc).iter();
 
     // fast route if the size is known

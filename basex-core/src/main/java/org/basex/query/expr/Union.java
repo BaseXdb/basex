@@ -53,24 +53,18 @@ public final class Union extends Set {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final Union un = new Union(info, copyAll(cc, vm, exprs));
-    un.iterable = iterable;
-    return copyType(un);
-  }
-
-  @Override
-  protected ANodeBuilder eval(final Iter[] iters, final QueryContext qc) throws QueryException {
+  protected ANodeBuilder cache(final QueryContext qc) throws QueryException {
     final ANodeBuilder nodes = new ANodeBuilder();
-    for(final Iter iter : iters) {
+    for(final Expr expr : exprs) {
+      final Iter iter = expr.iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) nodes.add(toNode(item));
     }
     return nodes;
   }
 
   @Override
-  protected NodeIter iter(final Iter[] iters, final QueryContext qc) {
-    return new SetIter(qc, iters) {
+  protected NodeIter iterate(final QueryContext qc) throws QueryException {
+    return new SetIter(qc, iters(qc)) {
       @Override
       public ANode next() throws QueryException {
         if(nodes == null) {
@@ -97,6 +91,13 @@ public final class Union extends Set {
         return it;
       }
     };
+  }
+
+  @Override
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    final Union un = new Union(info, copyAll(cc, vm, exprs));
+    un.iterable = iterable;
+    return copyType(un);
   }
 
   @Override

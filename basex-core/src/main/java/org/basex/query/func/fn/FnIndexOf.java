@@ -6,8 +6,11 @@ import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -33,6 +36,21 @@ public final class FnIndexOf extends StandardFunc {
         return null;
       }
     };
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final Iter iter = exprs[0].atomIter(qc, info);
+    final Item srch = toAtomItem(exprs[1], qc);
+    final Collation coll = toCollation(2, qc);
+    int c = 0;
+
+    final LongList list = new LongList();
+    for(Item item; (item = qc.next(iter)) != null;) {
+      ++c;
+      if(item.comparable(srch) && OpV.EQ.eval(item, srch, coll, sc, info)) list.add(c);
+    }
+    return IntSeq.get(list.finish());
   }
 
   @Override

@@ -5,6 +5,7 @@ import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.hash.*;
 
@@ -17,21 +18,33 @@ import org.basex.util.hash.*;
 public class DbText extends DbAccess {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return valueAccess(IndexType.TEXT, qc).iter(qc);
+    return valueAccess(qc).iter(qc);
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    return valueAccess(qc).value(qc);
+  }
+
+  /**
+   * Returns the index type (overwritten by implementing functions).
+   * @return index type
+   */
+  IndexType type() {
+    return IndexType.TEXT;
   }
 
   /**
    * Returns an index accessor.
-   * @param type index type
    * @param qc query context
    * @return index accessor
    * @throws QueryException query exception
    */
-  final ValueAccess valueAccess(final IndexType type, final QueryContext qc) throws QueryException {
+  final ValueAccess valueAccess(final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
     final TokenSet set = new TokenSet();
     final Iter iter = exprs[1].iter(qc);
-    for(Item it; (it = qc.next(iter)) != null;) set.put(toToken(it));
-    return new ValueAccess(info, set, type, null, new IndexStaticDb(info, data));
+    for(Item item; (item = qc.next(iter)) != null;) set.put(toToken(item));
+    return new ValueAccess(info, set, type(), null, new IndexStaticDb(info, data));
   }
 }

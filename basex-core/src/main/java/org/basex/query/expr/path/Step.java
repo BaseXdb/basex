@@ -127,6 +127,12 @@ public abstract class Step extends Preds {
   }
 
   @Override
+  public final Value value(final QueryContext qc) throws QueryException {
+    // steps are exclusively evaluated via Step#iter(QueryContext)
+    throw Util.notExpected();
+  }
+
+  @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
     return inlineAll(var, ex, exprs, cc) ? optimize(cc) : null;
   }

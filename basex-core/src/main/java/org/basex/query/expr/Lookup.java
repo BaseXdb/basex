@@ -112,11 +112,6 @@ public final class Lookup extends Arr {
   }
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
-  }
-
-  @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Iter iter = exprs.length == 1 ? ctxValue(qc).iter() : exprs[1].iter(qc);
 

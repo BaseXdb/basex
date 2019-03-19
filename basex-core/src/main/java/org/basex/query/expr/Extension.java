@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -52,11 +51,6 @@ public final class Extension extends Single {
   @Override
   public Expr optimize(final CompileContext cc) {
     return adoptType(expr);
-  }
-
-  @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter(qc);
   }
 
   @Override

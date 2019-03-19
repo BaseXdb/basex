@@ -31,11 +31,6 @@ public final class MixedPath extends Path {
   }
 
   @Override
-  public boolean isVacuous() {
-    return steps[steps.length - 1].isVacuous();
-  }
-
-  @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     Iter iter;
     long size;
@@ -100,6 +95,16 @@ public final class MixedPath extends Path {
     } finally {
       qc.focus = qf;
     }
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    return iter(qc).value(qc);
+  }
+
+  @Override
+  public boolean isVacuous() {
+    return steps[steps.length - 1].isVacuous();
   }
 
   @Override

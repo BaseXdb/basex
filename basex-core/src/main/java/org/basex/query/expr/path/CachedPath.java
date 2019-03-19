@@ -31,7 +31,7 @@ public final class CachedPath extends AxisPath {
   }
 
   @Override
-  protected NodeIter nodeIter(final QueryContext qc) throws QueryException {
+  protected NodeIter iterator(final QueryContext qc) throws QueryException {
     final QueryFocus qf = qc.focus, focus = new QueryFocus();
     final Value rt = root != null ? root.value(qc) : qf.value;
     qc.focus = focus;
@@ -44,11 +44,11 @@ public final class CachedPath extends AxisPath {
           if(root != null && !(item instanceof ANode))
             throw PATHNODE_X_X_X.get(info, steps[0], item.type, item);
           focus.value = item;
-          iter(0, list, qc);
+          iterate(0, list, qc);
         }
       } else {
         focus.value = null;
-        iter(0, list, qc);
+        iterate(0, list, qc);
       }
     } finally {
       qc.focus = qf;
@@ -63,7 +63,7 @@ public final class CachedPath extends AxisPath {
    * @param qc query context
    * @throws QueryException query exception
    */
-  private void iter(final int step, final ANodeBuilder list, final QueryContext qc)
+  private void iterate(final int step, final ANodeBuilder list, final QueryContext qc)
       throws QueryException {
 
     // cast is safe (steps will always return a {@link NodeIter} instance)
@@ -72,7 +72,7 @@ public final class CachedPath extends AxisPath {
     for(ANode node; (node = ni.next()) != null;) {
       if(more) {
         qc.focus.value = node;
-        iter(step + 1, list, qc);
+        iterate(step + 1, list, qc);
       } else {
         qc.checkStop();
         list.add(node);

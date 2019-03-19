@@ -25,7 +25,7 @@ public final class FnRemove extends StandardFunc {
     if(pos <= 0 || size != -1 && pos > size) return iter;
 
     // check if iterator is value-based
-    final Value value = iter.value();
+    final Value value = iter.iterValue();
     if(value != null) return value(value, pos, qc).iter();
 
     // return optimized iterator if result size is known

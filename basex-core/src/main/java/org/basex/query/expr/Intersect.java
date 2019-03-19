@@ -32,34 +32,28 @@ public final class Intersect extends Set {
   }
 
   @Override
-  protected ANodeBuilder eval(final Iter[] iters, final QueryContext qc) throws QueryException {
-    ANodeBuilder list = new ANodeBuilder();
-    for(Item item; (item = qc.next(iters[0])) != null;) list.add(toNode(item));
+  protected ANodeBuilder cache(final QueryContext qc) throws QueryException {
+    ANodeBuilder nodes = new ANodeBuilder();
+    Iter iter = exprs[0].iter(qc);
+    for(Item item; (item = qc.next(iter)) != null;) nodes.add(toNode(item));
 
     final int el = exprs.length;
-    for(int e = 1; e < el && !list.isEmpty(); ++e) {
-      list.check();
-      final ANodeBuilder nt = new ANodeBuilder();
-      final Iter iter = iters[e];
+    for(int e = 1; e < el && !nodes.isEmpty(); ++e) {
+      nodes.check();
+      final ANodeBuilder tmp = new ANodeBuilder();
+      iter = exprs[e].iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
         final ANode node = toNode(item);
-        if(list.contains(node)) nt.add(node);
+        if(nodes.contains(node)) tmp.add(node);
       }
-      list = nt;
+      nodes = tmp;
     }
-    return list;
+    return nodes;
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final Intersect is = new Intersect(info, copyAll(cc, vm, exprs));
-    is.iterable = iterable;
-    return copyType(is);
-  }
-
-  @Override
-  protected NodeIter iter(final Iter[] iters, final QueryContext qc) {
-    return new SetIter(qc, iters) {
+  protected NodeIter iterate(final QueryContext qc) throws QueryException {
+    return new SetIter(qc, iters(qc)) {
       @Override
       public ANode next() throws QueryException {
         final int irl = iter.length;
@@ -84,6 +78,13 @@ public final class Intersect extends Set {
         return nodes[0];
       }
     };
+  }
+
+  @Override
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    final Intersect is = new Intersect(info, copyAll(cc, vm, exprs));
+    is.iterable = iterable;
+    return copyType(is);
   }
 
   @Override

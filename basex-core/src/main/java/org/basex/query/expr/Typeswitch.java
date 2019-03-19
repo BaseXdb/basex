@@ -98,7 +98,16 @@ public final class Typeswitch extends ParseExpr {
       final Iter iter = tg.iter(qc, seq);
       if(iter != null) return iter;
     }
-    // will never happen
+    throw Util.notExpected();
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final Value seq = cond.value(qc);
+    for(final TypeswitchGroup tg : groups) {
+      final Value value = tg.value(qc, seq);
+      if(value != null) return value;
+    }
     throw Util.notExpected();
   }
 

@@ -7,6 +7,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -16,19 +17,14 @@ import org.basex.query.value.seq.*;
  */
 public final class FtScore extends StandardFunc {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
-  }
-
-  @Override
   public Value value(final QueryContext qc) throws QueryException {
     final boolean s = qc.scoring;
     try {
       qc.scoring = true;
       final Iter iter = exprs[0].iter(qc);
-      final ValueList values = new ValueList(iter.size());
-      for(Item item; (item = qc.next(iter)) != null;) values.add(Dbl.get(item.score()));
-      return DblSeq.get(values.size(), values.finish());
+      final DoubleList values = new DoubleList(ValueList.capacity(iter.size()));
+      for(Item item; (item = qc.next(iter)) != null;) values.add(item.score());
+      return DblSeq.get(values.finish());
     } finally {
       qc.scoring = s;
     }

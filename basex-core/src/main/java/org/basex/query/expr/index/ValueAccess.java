@@ -15,6 +15,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -90,7 +91,7 @@ public final class ValueAccess extends IndexAccess {
     if(tokens == null) {
       cache = new TokenSet();
       final Iter ir = expr.iter(qc);
-      for(Item it; (it = qc.next(ir)) != null;) cache.add(toToken(it));
+      for(Item item; (item = qc.next(ir)) != null;) cache.add(toToken(item));
     } else {
       cache = tokens;
     }
@@ -112,6 +113,11 @@ public final class ValueAccess extends IndexAccess {
       }
     }
     return nodes.iter();
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    return iter(qc).value(qc);
   }
 
   /**

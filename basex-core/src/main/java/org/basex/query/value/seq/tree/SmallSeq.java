@@ -141,13 +141,13 @@ final class SmallSeq extends TreeSeq {
       }
 
       @Override
-      public Value value() {
+      public Value iterValue() {
         return SmallSeq.this;
       }
 
       @Override
       public Value value(final QueryContext qc) {
-        return value();
+        return SmallSeq.this;
       }
     };
   }

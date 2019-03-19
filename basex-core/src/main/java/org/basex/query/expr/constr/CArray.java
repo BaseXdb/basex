@@ -52,7 +52,7 @@ public final class CArray extends Arr {
       for(final Expr expr : exprs) builder.append(expr.value(qc));
     } else {
       for(final Expr expr : exprs) {
-        final Iter iter = expr.value(qc).iter();
+        final Iter iter = expr.iter(qc);
         for(Item item; (item = qc.next(iter)) != null;) builder.append(item);
       }
     }

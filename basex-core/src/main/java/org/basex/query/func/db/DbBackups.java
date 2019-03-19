@@ -9,6 +9,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -57,5 +58,10 @@ public final class DbBackups extends StandardFunc {
             add(SIZE, token(length));
       }
     };
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    return iter(qc).value(qc);
   }
 }

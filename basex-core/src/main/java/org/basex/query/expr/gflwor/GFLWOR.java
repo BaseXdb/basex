@@ -54,27 +54,6 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    Item out = null;
-    for(final Eval eval = newEval(); eval.next(qc);) {
-      final Item item = rtrn.item(qc, info);
-      if(item != null) {
-        if(out != null) throw QueryError.SEQFOUND_X.get(info, ValueBuilder.concat(out, item, qc));
-        out = item;
-      }
-    }
-    return out;
-  }
-
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final Eval eval = newEval();
-    final ValueBuilder vb = new ValueBuilder(qc);
-    while(eval.next(qc)) vb.add(rtrn.value(qc));
-    return vb.value();
-  }
-
-  @Override
   public Iter iter(final QueryContext qc) {
     return new Iter() {
       private final Eval ev = newEval();
@@ -93,6 +72,14 @@ public final class GFLWOR extends ParseExpr {
         }
       }
     };
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final Eval eval = newEval();
+    final ValueBuilder vb = new ValueBuilder(qc);
+    while(eval.next(qc)) vb.add(rtrn.value(qc));
+    return vb.value();
   }
 
   @Override

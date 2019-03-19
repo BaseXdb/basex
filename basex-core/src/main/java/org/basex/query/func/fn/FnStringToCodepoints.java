@@ -8,7 +8,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -43,9 +43,8 @@ public final class FnStringToCodepoints extends StandardFunc {
    * @return value
    */
   private static Value value(final int[] cps) {
-    final int cl = cps.length;
-    final long[] values = new long[cl];
-    for(int c = 0; c < cl; c++) values[c] = cps[c];
-    return IntSeq.get(values, AtomType.ITR);
+    final LongList list = new LongList(cps.length);
+    for(int cp : cps) list.add(cp);
+    return IntSeq.get(list.finish());
   }
 }

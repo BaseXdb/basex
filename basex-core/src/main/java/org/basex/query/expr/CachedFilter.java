@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -24,11 +23,6 @@ public class CachedFilter extends Filter {
    */
   public CachedFilter(final InputInfo info, final Expr root, final Expr... preds) {
     super(info, root, preds);
-  }
-
-  @Override
-  public final Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
   }
 
   @Override

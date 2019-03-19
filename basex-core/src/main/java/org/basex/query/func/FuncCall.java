@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -48,11 +47,6 @@ public abstract class FuncCall extends Arr {
   public final void markTailCalls(final CompileContext cc) {
     if(cc != null) cc.info(QueryText.OPTTCE_X, this);
     tco = true;
-  }
-
-  @Override
-  public final Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
   }
 
   @Override

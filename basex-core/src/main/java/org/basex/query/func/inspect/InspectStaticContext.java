@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.*;
@@ -96,11 +95,6 @@ public final class InspectStaticContext extends StandardFunc {
       default:
         throw INSPECT_UNKNOWN_X.get(info, name);
     }
-  }
-
-  @Override
-  public BasicIter<?> iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
   }
 
   /**

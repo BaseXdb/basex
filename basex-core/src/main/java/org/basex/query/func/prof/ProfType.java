@@ -6,7 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.util.*;
 
 /**
@@ -17,7 +17,7 @@ import org.basex.util.*;
  */
 public final class ProfType extends StandardFunc {
   @Override
-  public Iter iter(final QueryContext qc) {
+  public Value value(final QueryContext qc) {
     throw Util.notExpected();
   }
 

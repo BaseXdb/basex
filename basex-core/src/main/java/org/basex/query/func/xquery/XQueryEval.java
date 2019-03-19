@@ -13,7 +13,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -41,13 +40,8 @@ public class XQueryEval extends StandardFunc {
   }
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return eval(toQuery(0, qc), false, qc).iter();
-  }
-
-  @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return eval(toQuery(0, qc), false, qc).value();
+    return eval(toQuery(0, qc), false, qc);
   }
 
   /**
@@ -58,7 +52,7 @@ public class XQueryEval extends StandardFunc {
    * @return resulting value
    * @throws QueryException query exception
    */
-  final ItemList eval(final IOContent query, final boolean updating, final QueryContext qc)
+  final Value eval(final IOContent query, final boolean updating, final QueryContext qc)
       throws QueryException {
 
     // bind variables and context value
@@ -126,13 +120,13 @@ public class XQueryEval extends StandardFunc {
           if(qctx.updating) throw XQUERY_UPDATE1.get(info);
         }
 
-        final ItemList items = new ItemList();
+        final ValueBuilder vb = new ValueBuilder(qc);
         final Iter iter = qctx.iter();
         for(Item item; (item = qctx.next(iter)) != null;) {
           qc.checkStop();
-          items.add(item);
+          vb.add(item);
         }
-        return items;
+        return vb.value();
       } catch(final JobException ex) {
         if(qctx.state == JobState.TIMEOUT) throw XQUERY_TIMEOUT.get(info);
         if(qctx.state == JobState.MEMORY)  throw XQUERY_MEMORY.get(info);

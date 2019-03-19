@@ -7,7 +7,6 @@ import java.util.*;
 import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.util.*;
 
@@ -36,10 +35,5 @@ public final class JobsResult extends StandardFunc {
     } finally {
       results.remove(id);
     }
-  }
-
-  @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
   }
 }
