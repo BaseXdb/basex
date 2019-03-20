@@ -758,7 +758,7 @@ public enum Function {
   _DB_ATTRIBUTE_RANGE(DbAttributeRange.class, "attribute-range(database,from,to[,name])",
       arg(STR_O, ITEM_O, ITEM_O, STR_O), ATT_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
-  _DB_BACKUPS(DbBackups.class, "backups([database])", arg(ITEM_O), ELM_ZM, DB_URI),
+  _DB_BACKUPS(DbBackups.class, "backups([database])", arg(ITEM_O), ELM_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_CONTENT_TYPE(DbContentType.class, "content-type(database,path)",
       arg(STR_O, STR_O), STR_O, DB_URI),
