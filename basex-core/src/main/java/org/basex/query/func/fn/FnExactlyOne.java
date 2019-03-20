@@ -37,7 +37,9 @@ public final class FnExactlyOne extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
+    if(st.one()) return expr;
     if(st.zero() || st.occ.min > 1) throw EXACTLYONE.get(info);
-    return st.one() ? expr : adoptType(expr);
+    exprType.assign(st.type);
+    return this;
   }
 }
