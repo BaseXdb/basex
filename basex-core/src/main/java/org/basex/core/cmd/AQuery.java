@@ -81,9 +81,9 @@ public abstract class AQuery extends Command {
             final String name = entry.getKey();
             final Object value = entry.getValue();
             if(value instanceof Value) {
-              final Value v = (Value) value;
-              if(name == null) qp.context(v);
-              else qp.bind(name, v);
+              final Value val = (Value) value;
+              if(name == null) qp.context(val);
+              else qp.bind(name, val);
             } else {
               // will always be a string array
               final String[] strings = (String[]) value;

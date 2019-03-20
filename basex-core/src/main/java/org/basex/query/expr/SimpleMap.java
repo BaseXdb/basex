@@ -77,7 +77,7 @@ public abstract class SimpleMap extends Arr {
     // compute result size
     final ExprList list = new ExprList(exprs.length);
     long min = 1, max = 1;
-    boolean it = true;
+    boolean item = true;
     for(final Expr expr : exprs) {
       // no results: skip evaluation of remaining expressions
       if(max == 0) break;
@@ -89,13 +89,13 @@ public abstract class SimpleMap extends Arr {
       } else if(es > 0) {
         min *= es;
         if(max != -1) max *= es;
-        if(es > 1) it = false;
+        if(es > 1) item = false;
       } else {
         final Occ o = expr.seqType().occ;
         if(o.min == 0) min = 0;
         if(o.max > 1) {
           max = -1;
-          it = false;
+          item = false;
         }
       }
     }
@@ -142,7 +142,7 @@ public abstract class SimpleMap extends Arr {
       // no results, deterministic expressions: return empty sequence
       size() == 0 && !has(Flag.NDT) ? cc.emptySeq(this) :
       // item-based iteration
-      it ? copyType(new ItemMap(info, exprs)) :
+      item ? copyType(new ItemMap(info, exprs)) :
       // default evaluation
       this;
   }

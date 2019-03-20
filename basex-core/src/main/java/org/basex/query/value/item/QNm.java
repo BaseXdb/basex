@@ -385,7 +385,7 @@ public final class QNm extends Item {
    * @return QName as token
    */
   public static byte[] eqName(final byte[] uri, final byte[] local) {
-    return Token.concat(QueryText.EQNAME, uri, QueryText.CURLY2, local);
+    return concat(QueryText.EQNAME, uri, QueryText.CURLY2, local);
   }
 
   @Override

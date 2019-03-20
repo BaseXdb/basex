@@ -44,16 +44,16 @@ public final class FTIndexAccess extends Simple {
     return new NodeIter() {
       @Override
       public ANode next() throws QueryException {
-        final FTNode it = iter.next();
-        if(it != null) {
+        final FTNode item = iter.next();
+        if(item != null) {
           // assign scoring
-          if(qc.scoring) it.score();
+          if(qc.scoring) item.score();
           // cache entry for visualizations or ft:mark/ft:extract
-          if(qc.ftPosData != null) qc.ftPosData.add(it.data(), it.pre(), it.matches());
+          if(qc.ftPosData != null) qc.ftPosData.add(item.data(), item.pre(), item.matches());
           // remove matches reference to save memory
-          it.matches(null);
+          item.matches(null);
         }
-        return it;
+        return item;
       }
     };
   }

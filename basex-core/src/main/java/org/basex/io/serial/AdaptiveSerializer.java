@@ -71,12 +71,12 @@ public class AdaptiveSerializer extends OutputSerializer {
   }
 
   @Override
-  protected final void node(final ANode item) throws IOException {
-    final Type type = item.type;
+  protected final void node(final ANode node) throws IOException {
+    final Type type = node.type;
     final XMLSerializer ser = xml();
-    if(type == NodeType.ATT) ser.attribute(item.name(), item.string(), true);
-    else if(type == NodeType.NSP) ser.namespace(item.name(), item.string(), true);
-    else ser.node(item);
+    if(type == NodeType.ATT) ser.attribute(node.name(), node.string(), true);
+    else if(type == NodeType.NSP) ser.namespace(node.name(), node.string(), true);
+    else ser.node(node);
     ser.out.flush();
     ser.reset();
   }
@@ -91,13 +91,16 @@ public class AdaptiveSerializer extends OutputSerializer {
     } else if(type == AtomType.QNM) {
       tb.add(((QNm) item).eqName());
     } else if(type == AtomType.DBL) {
-      final double d = ((Dbl) item).dbl();
-      if(Double.isInfinite(d) || Double.isNaN(d)) tb.add(((Dbl) item).string());
+      final Dbl dbl = (Dbl) item;
+      final double d = dbl.dbl();
+      if(Double.isInfinite(d) || Double.isNaN(d)) tb.add(dbl.string());
       else tb.add(new DecimalFormat(DOUBLES, Token.LOC).format(d).toLowerCase(Locale.ENGLISH));
+    } else if(type.instanceOf(AtomType.DUR)) {
+      final Dur dur = new Dur((Dur) item);
+      tb.add(dur.type).add("(\"").add(dur.string(null)).add("\")");
     } else {
-      final Item it = type.instanceOf(AtomType.DUR) ? new Dur((Dur) item) : item;
       try {
-        tb.add(it.type).add('(').add(Item.toString(it.string(null), true, false)).add(')');
+        tb.add(item.type).add('(').add(Item.toToken(item.string(null), true, false)).add(')');
       } catch(final QueryException ex) {
         throw new QueryIOException(ex);
       }

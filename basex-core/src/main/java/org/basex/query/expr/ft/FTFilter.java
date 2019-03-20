@@ -40,9 +40,9 @@ public abstract class FTFilter extends FTExpr {
 
   @Override
   public final FTNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FTNode it = exprs[0].item(qc, info);
-    filter(qc, it, qc.ftLexer);
-    return it;
+    final FTNode item = exprs[0].item(qc, info);
+    filter(qc, item, qc.ftLexer);
+    return item;
   }
 
   @Override

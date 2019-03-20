@@ -28,7 +28,7 @@ public class KindTest extends Test {
   /** Generic node test. No other {@link NodeType#NOD} tests exist. */
   public static final KindTest NOD = new KindTest(NodeType.NOD) {
     @Override
-    public boolean eq(final ANode it) { return true; }
+    public boolean eq(final ANode node) { return true; }
   };
 
   /**

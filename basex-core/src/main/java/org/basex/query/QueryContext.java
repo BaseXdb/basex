@@ -379,13 +379,13 @@ public final class QueryContext extends Job implements Closeable {
 
     final long is = items.size();
     for(int i = 0; i < is; i++) {
-      final Item item = items.get(i);
-      final Data data = item.data();
+      final Item item1 = items.get(i);
+      final Data data = item1.data();
       final boolean copy = data != null &&
           (datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name));
-      final Item it = item.materialize(this, copy);
-      if(it == null) throw BASEX_FUNCTION_X.get(null, item);
-      items.set(i, it);
+      final Item item2 = item1.materialize(this, copy);
+      if(item2 == null) throw BASEX_FUNCTION_X.get(null, item1);
+      items.set(i, item2);
     }
   }
 

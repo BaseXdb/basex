@@ -62,8 +62,8 @@ public abstract class Seq extends Value {
         for(final Item item : this) tmp.add(item.string(null));
         return tmp.finish();
       }
-      final Value v = get((int) size, type, this);
-      if(v != null) return v.toJava();
+      final Value value = get((int) size, type, this);
+      if(value != null) return value.toJava();
     }
 
     int t = 0;

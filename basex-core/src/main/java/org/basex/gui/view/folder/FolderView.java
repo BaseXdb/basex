@@ -185,13 +185,13 @@ public final class FolderView extends View {
     startY = -scroll.pos();
     totalW = getWidth() - (treeH > getHeight() ? scroll.getWidth() : 0);
 
-    final FolderIterator it = new FolderIterator(this, startY + 5, getHeight());
+    final FolderIterator iter = new FolderIterator(this, startY + 5, getHeight());
     final Data data = gui.context.data();
-    while(it.more()) {
-      final int kind = data.kind(it.pre);
+    while(iter.more()) {
+      final int kind = data.kind(iter.pre);
       final boolean elem = kind == Data.ELEM || kind == Data.DOC;
-      final int x = OFFX + it.level * (lineH >> 1) + (elem ? lineH : boxW);
-      drawEntry(g, it.pre, x, it.y + boxW);
+      final int x = OFFX + iter.level * (lineH >> 1) + (elem ? lineH : boxW);
+      drawEntry(g, iter.pre, x, iter.y + boxW);
     }
     gui.painting = false;
   }
@@ -256,19 +256,19 @@ public final class FolderView extends View {
     if(opened == null) return false;
 
     final int fsz = fontSize;
-    final FolderIterator it = new FolderIterator(this, startY + 3, getHeight());
+    final FolderIterator iter = new FolderIterator(this, startY + 3, getHeight());
     final Data data = gui.context.data();
-    while(it.more()) {
-      if(y > it.y && y <= it.y + lineH) {
+    while(iter.more()) {
+      if(y > iter.y && y <= iter.y + lineH) {
         Cursor c = CURSORARROW;
-        final int kind = data.kind(it.pre);
+        final int kind = data.kind(iter.pre);
         if(kind == Data.ELEM || kind == Data.DOC) {
           // set cursor when moving over tree boxes
-          final int xx = OFFX + it.level * (lineH >> 1) + lineH - 6;
+          final int xx = OFFX + iter.level * (lineH >> 1) + lineH - 6;
           if(x > xx - fsz && x < xx) c = CURSORHAND;
         }
         gui.cursor(c);
-        gui.notify.focus(it.pre, this);
+        gui.notify.focus(iter.pre, this);
         repaint();
         return true;
       }
@@ -294,11 +294,11 @@ public final class FolderView extends View {
     }
 
     // find specified pre value
-    final FolderIterator it = new FolderIterator(this);
-    while(it.more() && pre != it.pre);
+    final FolderIterator iter = new FolderIterator(this);
+    while(iter.more() && pre != iter.pre);
 
     // set new vertical position
-    final int y = -it.y;
+    final int y = -iter.y;
     final int h = getHeight();
     if(y > startY || y + h < startY + lineH) {
       startY = Math.min(0, Math.max(-treeH + h - 5, y + lineH));
@@ -459,8 +459,8 @@ public final class FolderView extends View {
     gui.context.focused = -1;
     final DBNodes curr = gui.context.current();
     int pre = curr.pre(0);
-    final FolderIterator it = new FolderIterator(this);
-    while(it.more() && focus-- != 0) pre = it.pre;
+    final FolderIterator iter = new FolderIterator(this);
+    while(iter.more() && focus-- != 0) pre = iter.pre;
 
     if(pre == curr.pre(0) && down) ++pre;
     gui.notify.focus(pre, this);

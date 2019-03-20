@@ -199,12 +199,12 @@ public final class TableView extends View {
     int focused = -1;
     if(valid) {
       final int pre = tdata.rows.get(l);
-      final TableIterator it = new TableIterator(data, tdata);
+      final TableIterator iter = new TableIterator(data, tdata);
       final int c = tdata.column(getWidth() - scroll.getWidth(), tdata.mouseX);
-      it.init(pre);
-      while(it.more()) {
-        if(it.col == c) {
-          focused = it.pre;
+      iter.init(pre);
+      while(iter.more()) {
+        if(iter.col == c) {
+          focused = iter.pre;
           break;
         }
       }
@@ -252,12 +252,12 @@ public final class TableView extends View {
         gui.notify.context(nodes, false, null);
       }
     } else {
-      final TableIterator it = new TableIterator(data, tdata);
+      final TableIterator iter = new TableIterator(data, tdata);
       final int c = tdata.column(getWidth() - scroll.getWidth(), e.getX());
-      it.init(pre);
-      while(it.more()) {
-        if(it.col == c) {
-          gui.notify.mark(new DBNodes(data, it.pre), null);
+      iter.init(pre);
+      while(iter.more()) {
+        if(iter.col == c) {
+          gui.notify.mark(new DBNodes(data, iter.pre), null);
           return;
         }
       }

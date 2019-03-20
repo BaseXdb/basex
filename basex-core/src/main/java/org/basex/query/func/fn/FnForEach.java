@@ -29,11 +29,11 @@ public class FnForEach extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         do {
-          final Item it = qc.next(ir);
-          if(it != null) return it;
-          final Item item = iter.next();
-          if(item == null) return null;
-          ir = func.invokeValue(qc, info, item).iter();
+          final Item item1 = qc.next(ir);
+          if(item1 != null) return item1;
+          final Item item2 = iter.next();
+          if(item2 == null) return null;
+          ir = func.invokeValue(qc, info, item2).iter();
         } while(true);
       }
     };

@@ -116,10 +116,10 @@ public final class SingletonSeq extends Seq {
     if(val instanceof SingletonSeq) {
       val = ((SingletonSeq) val).value;
     } else if(vs > 1 && val.homogeneous()) {
-      final Item it = val.itemAt(0);
+      final Item item = val.itemAt(0);
       int v = 0;
-      while(++v < vs && it.equals(val.itemAt(v)));
-      if(v == vs) val = it;
+      while(++v < vs && item.equals(val.itemAt(v)));
+      if(v == vs) val = item;
     }
     return size == 1 ? val : new SingletonSeq(size, val);
   }

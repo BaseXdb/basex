@@ -109,16 +109,16 @@ public abstract class FuncCall extends Arr {
       final QueryContext qc, final InputInfo ii) throws QueryException {
 
     XQFunction fn = func;
-    Value[] vl = args;
+    Value[] values = args;
     final int fp = qc.stack.enterFrame(fn.stackFrameSize());
     try {
       while(true) {
         qc.checkStop();
-        final Value v = item ? fn.invItem(qc, ii, vl) : fn.invValue(qc, ii, vl);
+        final Value value = item ? fn.invItem(qc, ii, values) : fn.invValue(qc, ii, values);
         fn = qc.pollTailCall();
-        if(fn == null) return v;
+        if(fn == null) return value;
         qc.stack.reuseFrame(fn.stackFrameSize());
-        vl = qc.pollTailArgs();
+        values = qc.pollTailArgs();
       }
     } catch(final QueryException ex) {
       throw ex.add(ii);

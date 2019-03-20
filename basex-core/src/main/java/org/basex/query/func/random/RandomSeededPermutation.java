@@ -23,15 +23,15 @@ public final class RandomSeededPermutation extends StandardFunc {
     final Random r = new Random(seed);
 
     final Iter iter = exprs[1].iter(qc);
-    for(Item item; (item = qc.next(iter)) != null;) {
+    for(Item item1; (item1 = qc.next(iter)) != null;) {
       final int ls = items.size();
       final int l = r.nextInt(ls + 1);
       if(l < ls) {
-        final Item it = items.get(l);
-        items.set(l, item);
-        item = it;
+        final Item item2 = items.get(l);
+        items.set(l, item1);
+        item1 = item2;
       }
-      items.add(item);
+      items.add(item1);
     }
     return items.value();
   }

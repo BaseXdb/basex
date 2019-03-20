@@ -82,8 +82,8 @@ final class InvDocTest extends Test {
   @Override
   public boolean equals(final Object obj) {
     if(!(obj instanceof InvDocTest)) return false;
-    final InvDocTest it = (InvDocTest) obj;
-    return data == it.data && pres.equals(it.pres);
+    final InvDocTest test = (InvDocTest) obj;
+    return data == test.data && pres.equals(test.pres);
   }
 
   @Override

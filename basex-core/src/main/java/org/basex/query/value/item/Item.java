@@ -337,7 +337,7 @@ public abstract class Item extends Value {
   @Override
   public void plan(final FElem plan) {
     try {
-      addPlan(plan, planElem(TYPE, type), string(string(null), false, true));
+      addPlan(plan, planElem(TYPE, type), toToken(string(null), false, true));
     } catch(final QueryException ex) {
       // only function items throw exceptions in atomization, and they should
       // override plan(Serializer) sensibly
@@ -367,7 +367,7 @@ public abstract class Item extends Value {
    * @return string
    */
   public static String toString(final byte[] value, final boolean quotes, final boolean limit) {
-    return Token.string(string(value, quotes, limit));
+    return Token.string(toToken(value, quotes, limit));
   }
 
   /**
@@ -377,7 +377,7 @@ public abstract class Item extends Value {
    * @param limit limit output
    * @return string
    */
-  public static byte[] string(final byte[] value, final boolean quotes, final boolean limit) {
+  public static byte[] toToken(final byte[] value, final boolean quotes, final boolean limit) {
     final TokenBuilder tb = new TokenBuilder();
     if(quotes) tb.add('"');
     for(final byte v : value) {

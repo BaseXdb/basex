@@ -112,8 +112,8 @@ public final class FnDistinctValues extends StandardFunc {
       if(!StatsType.isCategory(pn.stats.type)) return this;
       // if yes, add them to the item set
       for(final byte[] c : pn.stats.values) {
-        final Atm it = new Atm(c);
-        if(set.add(it, info)) vb.add(it);
+        final Atm item = new Atm(c);
+        if(set.add(item, info)) vb.add(item);
       }
     }
     return vb.value();

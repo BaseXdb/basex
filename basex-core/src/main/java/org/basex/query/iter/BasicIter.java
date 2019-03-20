@@ -46,16 +46,16 @@ public abstract class BasicIter<I extends Item> extends Iter implements Iterable
   @Override
   public final Iterator<I> iterator() {
     return new Iterator<I>() {
-      private I it;
+      private I item;
 
       @Override
       public boolean hasNext() {
-        it = BasicIter.this.next();
-        return it != null;
+        item = BasicIter.this.next();
+        return item != null;
       }
       @Override
       public I next() {
-        return it;
+        return item;
       }
       @Override
       public void remove() {

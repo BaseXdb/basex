@@ -86,9 +86,9 @@ public final class Union extends Set {
         }
         if(m == -1) return null;
 
-        final ANode it = nodes[m];
+        final ANode node = nodes[m];
         next(m);
-        return it;
+        return node;
       }
     };
   }

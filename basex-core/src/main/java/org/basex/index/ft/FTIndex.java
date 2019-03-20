@@ -326,7 +326,7 @@ public final class FTIndex extends ValueIndex {
    * @return iterator
    */
   private IndexIterator fuzzy(final byte[] token, final int k) {
-    FTIndexIterator it = FTIndexIterator.FTEMPTY;
+    FTIndexIterator iter = FTIndexIterator.FTEMPTY;
     final int tokl = token.length, tl = tp.length;
     final int e = Math.min(tl - 1, tokl + k);
     int s = Math.max(1, tokl - k) - 1;
@@ -338,12 +338,12 @@ public final class FTIndex extends ValueIndex {
       while(t < tl && r == -1) r = tp[t++];
       while(p < r) {
         if(ls.similar(inY.readBytes(p, s), token, k)) {
-          it = FTIndexIterator.union(iter(pointer(p, s), size(p, s), inZ, token), it);
+          iter = FTIndexIterator.union(iter(pointer(p, s), size(p, s), inZ, token), iter);
         }
         p += s + ENTRY;
       }
     }
-    return it;
+    return iter;
   }
 
   /**
@@ -352,9 +352,9 @@ public final class FTIndex extends ValueIndex {
    * @return iterator
    */
   private IndexIterator wc(final byte[] token) {
-    final FTIndexIterator it = FTIndexIterator.FTEMPTY;
+    final FTIndexIterator iter = FTIndexIterator.FTEMPTY;
     final FTWildcard wc = new FTWildcard(token);
-    if(!wc.parse()) return it;
+    if(!wc.parse()) return iter;
 
     final IntList pr = new IntList();
     final IntList ps = new IntList();
