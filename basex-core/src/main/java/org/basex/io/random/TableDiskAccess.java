@@ -103,14 +103,28 @@ public final class TableDiskAccess extends TableAccess {
     if(!dirty || !all) return;
 
     try(DataOutput out = new DataOutput(meta.dbfile(DATATBL + 'i'))) {
-      final int sz = pages;
-      out.writeNum(sz);
-      out.writeNum(used);
+      final int p = pages;
+      boolean regular = true;
+
+      // check if page mapping is regular (are all pages used and in ascending order?)
       if(fPreIndex != null) {
-        out.writeNum(sz);
-        for(int s = 0; s < sz; s++) out.writeNum(fPreIndex[s]);
-        out.writeNum(sz);
-        for(int s = 0; s < sz; s++) out.writeNum(pageIndex[s]);
+        regular &= p == used;
+        for(int i = 0; i < p; i++) regular &= fPreIndex[i] == i * IO.ENTRIES;
+        for(int i = 0; i < p; i++) regular &= pageIndex[i] == i;
+        if(regular) removeMapping();
+      }
+
+      if(regular) {
+        // no mapping available or required (see TableOutput#close)
+        out.writeNum(p);
+        out.writeNum(used == 0 ? 0 : Integer.MAX_VALUE);
+      } else {
+        out.writeNum(p);
+        out.writeNum(used);
+        out.writeNum(p);
+        for(int s = 0; s < p; s++) out.writeNum(fPreIndex[s]);
+        out.writeNum(p);
+        for(int s = 0; s < p; s++) out.writeNum(pageIndex[s]);
         out.writeLongs(usedPages.toArray());
       }
     }
@@ -287,8 +301,7 @@ public final class TableDiskAccess extends TableAccess {
       decreasePre(nr);
     }
     if(used == 0) {
-      fPreIndex = null;
-      pageIndex = null;
+      removeMapping();
       pages = 1;
     }
   }
@@ -551,7 +564,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Convenience method for delete buffer entries.
+   * Convenience method for deleting buffer entries.
    * @param buffer buffer
    * @param from first entry to delete
    * @param to last entry to delete
@@ -564,7 +577,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Fill the current buffer with bytes from the specified array from the
+   * Fills the current buffer with bytes from the specified array from the
    * specified offset.
    * @param s source array
    * @param o offset from the beginning of the array
@@ -579,11 +592,20 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Calculate the occupied space in a page.
+   * Calculates the occupied space in a page.
    * @param i page index
    * @return occupied space in number of records
    */
   private int occSpace(final int i) {
     return (i + 1 < used ? fPreIndex[i + 1] : meta.size) - fPreIndex[i];
+  }
+
+  /**
+   * Removes the page index.
+   */
+  private void removeMapping() {
+    fPreIndex = null;
+    pageIndex = null;
+    usedPages = null;
   }
 }
