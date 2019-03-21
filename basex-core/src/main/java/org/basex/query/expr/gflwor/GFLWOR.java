@@ -356,7 +356,7 @@ public final class GFLWOR extends ParseExpr {
           if(!fr.empty && fr.pos == null && fr.expr instanceof GFLWOR) {
             final GFLWOR fl = (GFLWOR) fr.expr;
             if(fl.isFLW()) {
-              cc.info(QueryText.OPTFLAT_X_X, description(), fr.var);
+              cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, fr.var);
               iter.remove();
               for(final Clause cls : fl.clauses) iter.add(cls);
               fr.expr = fl.rtrn;
@@ -603,7 +603,7 @@ public final class GFLWOR extends ParseExpr {
         if(fst.expr instanceof GFLWOR) {
           // OLD: for $a at $p in for $x in (1 to 2) return $x + 1 return $p
           // NEW: for $a in (1 to 2) count $p return $p
-          cc.info(QueryText.OPTFLAT_X_X, description(), fst.var);
+          cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, fst.var);
           final GFLWOR sub = (GFLWOR) fst.expr;
           clauses.set(0, new For(fst.var, null, fst.score, sub.rtrn, false));
           if(fst.pos != null) clauses.add(1, new Count(fst.pos));
@@ -640,7 +640,7 @@ public final class GFLWOR extends ParseExpr {
         // NEW: for $a in (1 to 2) let $f := <a>1</a> return $f + 1
         final Clause clause = sub.clauses.getFirst();
         final ExprInfo var = clause instanceof ForLet ? ((ForLet) clause).var : clause;
-        cc.info(QueryText.OPTFLAT_X_X, description(), var);
+        cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, var);
         clauses.addAll(sub.clauses);
         rtrn = sub.rtrn;
         return true;
@@ -680,7 +680,7 @@ public final class GFLWOR extends ParseExpr {
           let $c := 1[. = 1]
           return ($c, if($a) then $a else $c))
           */
-          cc.info(QueryText.OPTFLAT_X_X, description(), ((Let) clause).var);
+          cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, ((Let) clause).var);
 
           // propagate all leading 'let' bindings into outer clauses
           final LinkedList<Clause> cls = sub.clauses;

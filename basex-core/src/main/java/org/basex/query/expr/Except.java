@@ -2,6 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -37,7 +39,7 @@ public final class Except extends Set {
       if(expr == Empty.SEQ) {
         // remove empty operands (return empty sequence if first value is empty)
         if(list.isEmpty()) return cc.emptySeq(this);
-        cc.info(OPTREMOVE_X_X, expr, description());
+        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else {
         list.add(expr);
       }

@@ -52,7 +52,7 @@ public final class TypeCheck extends Single {
 
     // return type is already correct
     if(at.instanceOf(st)) {
-      cc.info(OPTTYPE_X, st + " -> " + expr);
+      cc.info(OPTTYPE_X_X, st, expr);
       return expr;
     }
 
@@ -74,7 +74,7 @@ public final class TypeCheck extends Single {
 
     final Expr opt = expr.typeCheck(this, cc);
     if(opt != null) {
-      cc.info(OPTTYPE_X, st + " -> " + opt);
+      cc.info(OPTTYPE_X_X, st, opt);
       return opt;
     }
 

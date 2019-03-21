@@ -94,10 +94,10 @@ public final class Switch extends ParseExpr {
           // includes check for empty sequence (null reference)
           final Item cs = expr.atomItem(cc.qc, info);
           if(item == cs || cs != null && item != null && item.equiv(cs, null, info)) return rtrn;
-          cc.info(OPTREMOVE_X_X, expr, description());
+          cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
         } else if(cases.contains(expr)) {
           // case has already been checked before
-          cc.info(OPTREMOVE_X_X, expr, description());
+          cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
         } else {
           cases.add(expr);
           list.add(expr);
