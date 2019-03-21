@@ -1310,6 +1310,8 @@ public enum Function {
   // Utility Module
 
   /** XQuery function. */
+  _UTIL_CHARS(UtilChars.class, "chars(string)", arg(STR_O), STR_ZM, UTIL_URI),
+  /** XQuery function. */
   _UTIL_DEEP_EQUAL(UtilDeepEqual.class, "deep-equal(items1,items2[,options])",
       arg(ITEM_ZM, ITEM_ZM, ITEM_O), BLN_O, UTIL_URI),
   /** XQuery function. */
