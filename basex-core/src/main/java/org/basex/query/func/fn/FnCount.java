@@ -32,17 +32,25 @@ public final class FnCount extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // ignore non-deterministic expressions (e.g.: count(error()))
-    final Expr expr = exprs[0];
+    Expr expr = exprs[0];
+
+    // rewrite count(map:keys(...)) to map:size(...)
+    if(Function._MAP_KEYS.is(expr))
+      return cc.function(Function._MAP_SIZE, info, args(expr));
+    // rewrite count(string-to-codepoints(...)) to string-length(...)
+    if(Function.STRING_TO_CODEPOINTS.is(expr) || Function._UTIL_CHARS.is(expr))
+      return cc.function(Function.STRING_LENGTH, info, args(expr));
+    // rewrite count(reverse(...)) to count(...)
+    if(Function.REVERSE.is(expr))
+      expr = args(expr)[0];
+
+    // return statically known size (ignore non-deterministic expressions, e.g. count(error()))
     if(!expr.has(Flag.NDT)) {
       final long size = expr.size();
       if(size >= 0) return Int.get(size);
     }
 
-    // rewrite count(map:keys(...)) to map:size(...)
-    if(Function._MAP_KEYS.is(expr))
-      return cc.function(Function._MAP_SIZE, info, args(expr));
-
+    exprs[0] = expr;
     return this;
   }
 }

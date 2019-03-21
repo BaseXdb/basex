@@ -15,6 +15,28 @@ import org.junit.*;
  */
 public final class UtilModuleTest extends QueryPlanTest {
   /** Test method. */
+  @Test public void chars() {
+    final Function func = _UTIL_CHARS;
+
+    // test pre-evaluation
+    query(func.args(" ()"), "");
+    check(func.args(" ()"), "", empty());
+    query(func.args(""), "");
+    query(func.args("abc"), "a\nb\nc");
+    query("count(" + func.args(" string-join(util:replicate('A', 100000))") + ')', 100000);
+    check("count(" + func.args(" string-join(util:replicate('A', 100000))") + ')', 100000,
+        empty(func), empty(STRING_LENGTH));
+
+    // test iterative evaluation
+    query(func.args(" <_/>"), "");
+    query(func.args(" <_>abc</_>"), "a\nb\nc");
+    query(func.args(" <_>abc</_>") + "[2]", "b");
+    query(func.args(" <_>abc</_>") + "[last()]", "c");
+    check("count(" + func.args(" string-join(util:replicate(<_>A</_>, 100000))") + ')', 100000,
+        exists(STRING_LENGTH));
+  }
+
+  /** Test method. */
   @Test public void deepEquals() {
     final Function func = _UTIL_DEEP_EQUAL;
     query(func.args(1, 1), true);
