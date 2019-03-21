@@ -17,9 +17,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public class UtilItem extends StandardFunc {
+public final class UtilItem extends StandardFunc {
   @Override
-  public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // retrieve (possibly invalid) position
     final long pos = pos(qc);
     if(pos < 0) return null;
@@ -42,7 +42,7 @@ public class UtilItem extends StandardFunc {
   }
 
   @Override
-  protected final Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr = exprs[0], pos = exprs[1];
     final SeqType st = expr.seqType();
     if(st.zero()) return expr;

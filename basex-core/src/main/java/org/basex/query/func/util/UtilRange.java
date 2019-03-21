@@ -8,14 +8,14 @@ import org.basex.query.func.fn.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public class UtilRange extends FnSubsequence {
+public final class UtilRange extends FnSubsequence {
   @Override
-  public final long start(final double first) {
+  public long start(final double first) {
     return (long) Math.ceil(first);
   }
 
   @Override
-  public final long end(final long first, final double second) {
+  public long end(final long first, final double second) {
     return (long) Math.floor(second);
   }
 }
