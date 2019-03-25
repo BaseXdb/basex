@@ -1,9 +1,13 @@
 package org.basex.query.value.item;
 
+import java.util.*;
+
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.Base64;
 
 /**
  * Base64 item ({@code xs:base64Binary}).
@@ -130,6 +134,12 @@ public class B64 extends Bin {
 
   @Override
   public String toString() {
-    return Util.info("\"%\"", Base64.encode(data));
+    final TokenBuilder tb = new TokenBuilder().add('"');
+    if(data.length > 128) {
+      tb.add(Base64.encode(Arrays.copyOf(data, 128))).add(Text.DOTS);
+    } else {
+      tb.add(Base64.encode(data));
+    }
+    return tb.add('"').toString();
   }
 }
