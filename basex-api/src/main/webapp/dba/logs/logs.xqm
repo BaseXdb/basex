@@ -184,7 +184,7 @@ function dba:log(
     for $log in reverse(admin:logs($name, true()))
     let $user := data($log/@user)
     let $message := data($log/text())
-    let $user-found := $input-exists and contains($user, $input)
+    let $user-found := $input-exists and matches($user, $input, 'iq')
     let $message-found := $input-exists and not($user-found) and matches($message, $input, 'i')
     where (not($input-exists) or $user-found or $message-found) and (
       not($ignore-logs and matches($message, $ignore-logs, 'i'))
