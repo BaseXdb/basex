@@ -7,6 +7,7 @@ import java.nio.charset.*;
 import org.basex.query.*;
 import org.basex.query.func.convert.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -17,10 +18,10 @@ import org.basex.util.*;
  */
 public final class BinEncodeString extends BinFn {
   @Override
-  public B64 item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] token = token(0, qc);
     final String encoding = toEncoding(1, BIN_UE_X, qc);
-    if(token == null) return null;
+    if(token == null) return Empty.VALUE;
     try {
       return B64.get(encoding == null || encoding == Strings.UTF8 ? token :
         ConvertFn.toBinary(token, encoding));

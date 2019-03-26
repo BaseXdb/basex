@@ -31,7 +31,7 @@ public class FnMin extends StandardFunc {
    * Returns a minimum or maximum item.
    * @param cmp comparator
    * @param qc query context
-   * @return resulting item or {@code null}
+   * @return resulting item or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
   final Item minmax(final OpV cmp, final QueryContext qc) throws QueryException {
@@ -42,12 +42,12 @@ public class FnMin extends StandardFunc {
 
     if(expr instanceof Range) {
       final Value value = expr.value(qc);
-      return value.isEmpty() ? null : value.itemAt(cmp == OpV.GT ? 0 : value.size() - 1);
+      return value.isEmpty() ? Empty.VALUE : value.itemAt(cmp == OpV.GT ? 0 : value.size() - 1);
     }
 
     final Iter iter = expr.atomIter(qc, info);
     item1 = iter.next();
-    if(item1 == null) return null;
+    if(item1 == null) return Empty.VALUE;
 
     // ensure that item is sortable
     final Type type1 = item1.type;

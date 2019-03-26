@@ -9,6 +9,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -25,7 +26,7 @@ public class FnParseJson extends Parse {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = exprs[0].atomItem(qc, info);
-    return item == null ? null : parse(toToken(item), false, qc);
+    return item == Empty.VALUE ? Empty.VALUE : parse(toToken(item), false, qc);
   }
 
   @Override

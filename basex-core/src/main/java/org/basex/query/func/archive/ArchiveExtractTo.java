@@ -11,6 +11,7 @@ import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -48,6 +49,6 @@ public class ArchiveExtractTo extends ArchiveFn {
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);
     }
-    return null;
+    return Empty.VALUE;
   }
 }

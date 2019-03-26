@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -93,18 +94,18 @@ public final class CmpN extends Cmp {
     if(st1.one() && st2.one()) exprType.assign(Occ.ONE);
 
     Expr expr = emptyExpr();
-    if(expr == this) {
-      if(allAreValues(false)) expr = value(cc.qc);
+    if(expr == this && allAreValues(false)) {
+      expr = value(cc.qc);
     }
     return cc.replaceWith(this, expr);
   }
 
   @Override
-  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode n1 = toEmptyNode(exprs[0], qc);
-    if(n1 == null) return null;
+    if(n1 == null) return Empty.VALUE;
     final ANode n2 = toEmptyNode(exprs[1], qc);
-    if(n2 == null) return null;
+    if(n2 == null) return Empty.VALUE;
     return Bln.get(op.eval(n1, n2));
   }
 

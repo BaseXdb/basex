@@ -111,6 +111,6 @@ public final class StrLazy extends AStr implements Lazy {
 
   @Override
   public String toString() {
-    return isCached() ? toString(value) : Function._FILE_READ_TEXT.args(input).substring(1);
+    return isCached() ? super.toString() : Function._FILE_READ_TEXT.args(input).substring(1);
   }
 }

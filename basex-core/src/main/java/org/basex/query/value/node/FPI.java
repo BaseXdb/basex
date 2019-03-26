@@ -79,7 +79,7 @@ public final class FPI extends FNode {
 
   @Override
   public String toString() {
-    return Util.info("<?% %?>", name.string(), value);
+    return Util.info("<?% %?>", name.string(), toToken(value));
   }
 
   /**

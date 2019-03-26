@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -29,7 +30,7 @@ final class ItemMap extends SimpleMap {
     qc.focus = focus;
     try {
       final int el = exprs.length;
-      for(int e = 1; e < el && result != null; e++) {
+      for(int e = 1; e < el && result != Empty.VALUE; e++) {
         focus.value = result;
         result = exprs[e].item(qc, info);
       }

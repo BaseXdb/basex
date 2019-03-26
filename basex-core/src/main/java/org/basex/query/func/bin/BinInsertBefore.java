@@ -2,6 +2,7 @@ package org.basex.query.func.bin;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -16,7 +17,7 @@ public final class BinInsertBefore extends BinFn {
     final B64 b64 = toB64(exprs[0], qc, true);
     final Long off = toLong(exprs[1], qc);
     final B64 xtr = toB64(exprs[2], qc, true);
-    if(b64 == null) return null;
+    if(b64 == null) return Empty.VALUE;
 
     final byte[] bytes = b64.binary(info);
     final int bl = bytes.length;

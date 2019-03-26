@@ -93,6 +93,6 @@ public final class FAttr extends FNode {
 
   @Override
   public String toString() {
-    return Strings.concat(name.string(), '=', toString(value));
+    return Strings.concat(name.string(), '=', toQuotedToken(value));
   }
 }

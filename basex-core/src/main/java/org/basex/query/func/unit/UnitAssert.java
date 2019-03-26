@@ -2,6 +2,7 @@ package org.basex.query.func.unit;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -13,7 +14,7 @@ import org.basex.util.*;
 public final class UnitAssert extends UnitFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    if(exprs[0].ebv(qc, info).bool(info)) return null;
+    if(exprs[0].ebv(qc, info).bool(info)) return Empty.VALUE;
     throw error(toNodeOrAtomItem(1, qc));
   }
 }

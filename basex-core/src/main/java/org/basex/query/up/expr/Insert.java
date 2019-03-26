@@ -12,6 +12,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -102,7 +103,7 @@ public final class Insert extends Update {
       }
       updates.add(up, qc);
     }
-    return null;
+    return Empty.VALUE;
   }
 
   @Override

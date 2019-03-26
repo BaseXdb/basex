@@ -58,7 +58,7 @@ public final class Rename extends Update {
       throw UPWRTRGTYP_X.get(info, item);
     }
 
-    final QNm rename = ex.item(qc, info).qname();
+    final QNm rename = ((ANode) ex.item(qc, info)).qname();
     final ANode target = (ANode) item;
 
     // check namespace conflicts...
@@ -76,7 +76,7 @@ public final class Rename extends Update {
     final Updates updates = qc.updates();
     final DBNode dbn = updates.determineDataRef(target, qc);
     updates.add(new RenameNode(dbn.pre(), dbn.data(), info, rename), qc);
-    return null;
+    return Empty.VALUE;
   }
 
   @Override

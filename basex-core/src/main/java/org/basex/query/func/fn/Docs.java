@@ -11,7 +11,6 @@ import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -34,8 +33,8 @@ public abstract class Docs extends StandardFunc {
     // return default collection or parse specified collection
     QueryInput qi = queryInput;
     if(qi == null) {
-      final Item item = exprs.length == 0 ? null : exprs[0].atomItem(qc, info);
-      if(item != null) {
+      final Item item = exprs.length == 0 ? Empty.VALUE : exprs[0].atomItem(qc, info);
+      if(item != Empty.VALUE) {
         final byte[] uri = toToken(item);
         qi = queryInput(uri);
         if(qi == null) throw INVCOLL_X.get(info, uri);
@@ -47,14 +46,14 @@ public abstract class Docs extends StandardFunc {
   /**
    * Performs the doc function.
    * @param qc query context
-   * @return document or {@code null}
+   * @return document or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
-  ANode doc(final QueryContext qc) throws QueryException {
+  Item doc(final QueryContext qc) throws QueryException {
     QueryInput qi = queryInput;
     if(qi == null) {
       final Item item = exprs[0].atomItem(qc, info);
-      if(item == null) return null;
+      if(item == Empty.VALUE) return Empty.VALUE;
       final byte[] uri = toToken(item);
       qi = queryInput(uri);
       if(qi == null) throw INVDOC_X.get(info, uri);

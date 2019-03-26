@@ -152,7 +152,9 @@ public final class List extends Arr {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // special case: concatenate two sequences
-    if(exprs.length == 2) return ValueBuilder.concat(exprs[0].value(qc), exprs[1].value(qc), qc);
+    if(exprs.length == 2) {
+      return ValueBuilder.concat(exprs[0].value(qc), exprs[1].value(qc), qc);
+    }
     // general case: concatenate all sequences
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Expr expr : exprs) vb.add(expr.value(qc));

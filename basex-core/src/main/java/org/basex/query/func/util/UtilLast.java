@@ -6,6 +6,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -21,12 +22,12 @@ public final class UtilLast extends StandardFunc {
     // fast route if the size is known
     final Iter iter = exprs[0].iter(qc);
     final long size = iter.size();
-    if(size >= 0) return size > 0 ? iter.get(size - 1) : null;
+    if(size >= 0) return size > 0 ? iter.get(size - 1) : Empty.VALUE;
 
     // loop through all items
     Item last = null;
     for(Item item; (item = qc.next(iter)) != null;) last = item;
-    return last;
+    return last == null ? Empty.VALUE : last;
   }
 
   @Override

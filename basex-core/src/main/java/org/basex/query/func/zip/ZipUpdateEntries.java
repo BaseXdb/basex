@@ -11,6 +11,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -61,6 +62,6 @@ public final class ZipUpdateEntries extends ZipZipFile {
         out.delete();
       }
     }
-    return null;
+    return Empty.VALUE;
   }
 }

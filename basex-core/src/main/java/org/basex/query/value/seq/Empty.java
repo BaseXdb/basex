@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -16,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class Empty extends Value {
+public final class Empty extends Item {
   /** Single instance. */
   public static final Empty VALUE = new Empty();
   /** Empty iterator. */
@@ -67,11 +68,6 @@ public final class Empty extends Value {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) {
-    return null;
-  }
-
-  @Override
   public Item ebv(final QueryContext qc, final InputInfo ii) {
     return Bln.FALSE;
   }
@@ -79,6 +75,17 @@ public final class Empty extends Value {
   @Override
   public Item test(final QueryContext qc, final InputInfo ii) {
     return null;
+  }
+
+  @Override
+  public byte[] string(final InputInfo ii) {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+      final InputInfo ii) {
+    throw Util.notExpected();
   }
 
   @Override
@@ -92,46 +99,13 @@ public final class Empty extends Value {
   }
 
   @Override
-  public boolean iterable() {
-    return true;
-  }
-
-  @Override
   public int hash(final InputInfo ii) {
     return 0;
   }
 
   @Override
-  public Item itemAt(final long pos) {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public Value reverse(final QueryContext qc) {
-    return this;
-  }
-
-  @Override
-  public boolean homogeneous() {
-    return true;
-  }
-
-  @Override
-  public void cache(final boolean lazy, final InputInfo ii) { }
-
-  @Override
   public Iter atomIter(final QueryContext qc, final InputInfo ii) {
     return ITER;
-  }
-
-  @Override
-  public Value atomValue(final QueryContext qc, final InputInfo ii) {
-    return this;
-  }
-
-  @Override
-  public Item atomItem(final QueryContext qc, final InputInfo ii) {
-    return null;
   }
 
   @Override

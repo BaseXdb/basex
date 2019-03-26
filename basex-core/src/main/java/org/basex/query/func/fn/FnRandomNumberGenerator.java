@@ -5,6 +5,7 @@ import org.basex.query.func.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -47,8 +48,8 @@ public final class FnRandomNumberGenerator extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = exprs.length > 0 ? exprs[0].atomItem(qc, info) : null;
-    final long seed = item != null ? item.hash(info) : qc.dateTime().nano;
+    final Item item = exprs.length > 0 ? exprs[0].atomItem(qc, info) : Empty.VALUE;
+    final long seed = item != Empty.VALUE ? item.hash(info) : qc.dateTime().nano;
     return result(seed, qc);
   }
 

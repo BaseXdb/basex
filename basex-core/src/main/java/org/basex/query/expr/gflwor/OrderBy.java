@@ -12,6 +12,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -100,14 +101,14 @@ public final class OrderBy extends Clause {
               for(int k = 0; k < kl; k++) {
                 final OrderKey key = keys[k];
                 Item m = a[k], n = b[k];
-                if(m == Dbl.NAN || m == Flt.NAN) m = null;
-                if(n == Dbl.NAN || n == Flt.NAN) n = null;
-                if(m != null && n != null && !m.comparable(n))
+                if(m == Dbl.NAN || m == Flt.NAN) m = Empty.VALUE;
+                if(n == Dbl.NAN || n == Flt.NAN) n = Empty.VALUE;
+                if(m != Empty.VALUE && n != Empty.VALUE && !m.comparable(n))
                   throw typeError(n, m.type, key.info);
 
-                final int c = m == null
-                    ? n == null ? 0                 : key.least ? -1 : 1
-                    : n == null ? key.least ? 1 : -1 : m.diff(n, key.coll, key.info);
+                final int c = m == Empty.VALUE
+                    ? n == Empty.VALUE ? 0                 : key.least ? -1 : 1
+                    : n == Empty.VALUE ? key.least ? 1 : -1 : m.diff(n, key.coll, key.info);
                 if(c != 0) return key.desc ? -c : c;
               }
               return 0;

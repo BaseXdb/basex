@@ -3,6 +3,7 @@ package org.basex.query.func.ws;
 import org.basex.http.ws.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -15,6 +16,6 @@ public final class WsBroadcast extends WsFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     WsPool.broadcast(toItem(exprs[0], qc), ws(qc).id);
-    return null;
+    return Empty.VALUE;
   }
 }

@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -25,7 +26,7 @@ public final class UnitAssertEquals extends UnitFn {
       item1 = qc.next(iter1);
       item2 = iter2.next();
       final boolean empty1 = item1 == null, empty2 = item2 == null;
-      if(empty1 && empty2) return null;
+      if(empty1 && empty2) return Empty.VALUE;
       if(empty1 || empty2 || !comp.equal(item1.iter(), item2.iter())) break;
       c++;
     }

@@ -138,9 +138,10 @@ public final class GroupBy extends Clause {
               // If the values are compared using a special collation, we let them collide
               // here and let the comparison do all the work later.
               // This enables other non-collation specs to avoid the collision.
-              hash = 31 * hash + (atom == null || spec.coll != null ? 0 : atom.hash(info));
+              hash = 31 * hash + (atom == Empty.VALUE || spec.coll != null ? 0 :
+                atom.hash(info));
             }
-            qc.set(spec.var, atom == null ? Empty.VALUE : atom);
+            qc.set(spec.var, atom == Empty.VALUE ? Empty.VALUE : atom);
           }
 
           // find the group for this key
@@ -174,7 +175,9 @@ public final class GroupBy extends Clause {
           }
 
           // add values of non-grouping variables to the group
-          for(int g = 0; g < pl; g++) grp.ngv[g].add(preExpr[g].value(qc));
+          for(int g = 0; g < pl; g++) {
+            grp.ngv[g].add(preExpr[g].value(qc));
+          }
         }
 
         // we're finished, copy the array so the list can be garbage-collected
@@ -197,8 +200,8 @@ public final class GroupBy extends Clause {
     final int il = its1.length;
     for(int i = 0; i < il; i++) {
       final Item item1 = its1[i], item2 = its2[i];
-      if(item1 == null ^ item2 == null || item1 != null && !item1.equiv(item2, coll[i], info))
-        return false;
+      if(item1 == Empty.VALUE ^ item2 == Empty.VALUE ||
+         item1 != Empty.VALUE && !item1.equiv(item2, coll[i], info)) return false;
     }
     return true;
   }

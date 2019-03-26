@@ -145,7 +145,7 @@ public final class CmpR extends Single {
     // atomic evaluation of arguments (faster)
     if(atomic) {
       final Item item = expr.item(qc, info);
-      return Bln.get(item != null && inRange(item.dbl(info)));
+      return Bln.get(item != Empty.VALUE && inRange(item.dbl(info)));
     }
 
     // pre-evaluate ranges

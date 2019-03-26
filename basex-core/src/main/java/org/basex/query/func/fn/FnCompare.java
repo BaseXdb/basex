@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -21,7 +22,8 @@ public final class FnCompare extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item1 = exprs[0].atomItem(qc, info), item2 = exprs[1].atomItem(qc, info);
     final Collation coll = toCollation(2, qc);
-    if(item1 == null || item2 == null) return null;
+    if(item1 == Empty.VALUE || item2 == Empty.VALUE) return Empty.VALUE;
+
     final byte[] token1 = toToken(item1), token2 = toToken(item2);
     final long diff = coll == null ? diff(token1, token2) : coll.compare(token1, token2);
     return Int.get(diff < 0 ? -1 : diff > 0 ? 1 : 0);

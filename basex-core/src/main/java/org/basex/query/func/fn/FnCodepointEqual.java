@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -19,7 +20,8 @@ public final class FnCodepointEqual extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item1 = exprs[0].atomItem(qc, info), item2 = exprs[1].atomItem(qc, info);
-    return item1 == null || item2 == null ? null : Bln.get(eq(toToken(item1), toToken(item2)));
+    return item1 == Empty.VALUE || item2 == Empty.VALUE ? Empty.VALUE :
+      Bln.get(eq(toToken(item1), toToken(item2)));
   }
 
   @Override

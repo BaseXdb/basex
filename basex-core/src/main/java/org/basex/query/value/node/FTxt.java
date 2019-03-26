@@ -52,6 +52,6 @@ public final class FTxt extends FNode {
 
   @Override
   public String toString() {
-    return toString(value);
+    return Token.string(toQuotedToken(value));
   }
 }

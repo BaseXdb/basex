@@ -200,7 +200,7 @@ public final class SerializerOptions extends Options {
       try {
         // check parameters and add values to serialization parameters
         final ANode root = new DBNode(io).children().next();
-        FuncOptions.serializer(root, this, ii);
+        if(root != null) FuncOptions.serializer(root, this, ii);
 
         final HashMap<String, String> free = free();
         if(!free.isEmpty()) throw SEROPTION_X.get(ii, free.keySet().iterator().next());

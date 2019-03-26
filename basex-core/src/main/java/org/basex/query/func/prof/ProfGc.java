@@ -3,6 +3,7 @@ package org.basex.query.func.prof;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -16,6 +17,6 @@ public final class ProfGc extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final long l = exprs.length > 0 ? toLong(exprs[0], qc) : 1;
     Performance.gc((int) Math.min(Integer.MAX_VALUE, l));
-    return null;
+    return Empty.VALUE;
   }
 }

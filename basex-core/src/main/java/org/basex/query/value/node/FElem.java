@@ -434,7 +434,7 @@ public final class FElem extends FNode {
       tb.add('>');
       final ANode child = children.get(0);
       if(child.type == NodeType.TXT && children.size() == 1) {
-        tb.add(toString(child.value, false, true));
+        tb.add(toToken(child.value));
       } else {
         tb.add(DOTS);
       }

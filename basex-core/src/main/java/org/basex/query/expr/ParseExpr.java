@@ -13,9 +13,9 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.XQArray;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.XQMap;
+import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -50,8 +50,7 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = item(qc, info);
-    return value == null ? Empty.VALUE : value;
+    return item(qc, info);
   }
 
   @Override
@@ -66,22 +65,25 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public final Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item;
     if(seqType().zeroOrOne()) {
-      item = item(qc, info);
-    } else {
-      final Iter iter = iter(qc);
-      item = iter.next();
-      if(item != null && !(item instanceof ANode)) {
-        final Item next = iter.next();
-        if(next != null) {
-          final ValueBuilder vb = new ValueBuilder(qc, item, next);
-          if(iter.next() != null) vb.add(Str.get(DOTS));
-          throw EBV_X.get(info, vb.value());
-        }
+      final Item item = item(qc, info);
+      return item == Empty.VALUE ? Bln.FALSE : item;
+    }
+
+    final Iter iter = iter(qc);
+    final Item item = iter.next();
+    if(item == null) return Bln.FALSE;
+
+    // effective boolean value is only defined for node sequences or single items
+    if(!(item instanceof ANode)) {
+      final Item next = iter.next();
+      if(next != null) {
+        final ValueBuilder vb = new ValueBuilder(qc, item, next);
+        if(iter.next() != null) vb.add(Str.get(DOTS));
+        throw EBV_X.get(info, vb.value());
       }
     }
-    return item == null ? Bln.FALSE : item;
+    return item;
   }
 
   @Override
@@ -213,7 +215,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final byte[] toToken(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    if(item == null) throw EMPTYFOUND_X.get(info, AtomType.STR);
+    if(item == Empty.VALUE) throw EMPTYFOUND_X.get(info, AtomType.STR);
     return toToken(item);
   }
 
@@ -228,7 +230,7 @@ public abstract class ParseExpr extends Expr {
   protected final byte[] toEmptyToken(final Expr expr, final QueryContext qc)
       throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item == null ? EMPTY : toToken(item);
+    return item == Empty.VALUE ? EMPTY : toToken(item);
   }
 
   /**
@@ -242,7 +244,7 @@ public abstract class ParseExpr extends Expr {
   protected final byte[] toTokenOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item == null ? null : toToken(item);
+    return item == Empty.VALUE ? null : toToken(item);
   }
 
   /**
@@ -319,7 +321,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final ANum toNumber(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item == null ? null : toNumber(item);
+    return item == Empty.VALUE ? null : toNumber(item);
   }
 
   /**
@@ -396,7 +398,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final ANode toEmptyNode(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.item(qc, info);
-    return item == null ? null : toNode(item);
+    return item == Empty.VALUE ? null : toNode(item);
   }
 
   /**
@@ -409,17 +411,6 @@ public abstract class ParseExpr extends Expr {
   protected final ANode toNode(final Item item) throws QueryException {
     if(item instanceof ANode) return (ANode) item;
     throw typeError(item, NodeType.NOD, info);
-  }
-
-  /**
-   * Checks if the specified item is a node or {@code null}.
-   * Returns the node, {@code null}, or throws an exception.
-   * @param item item to be checked
-   * @return node or {@code null}
-   * @throws QueryException query exception
-   */
-  protected final ANode toEmptyNode(final Item item) throws QueryException {
-    return item == null ? null : toNode(item);
   }
 
   /**
@@ -525,11 +516,12 @@ public abstract class ParseExpr extends Expr {
    * Checks if the specified item is a Base64 item.
    * @param empty allow empty result
    * @param item item
-   * @return Bas64 item, or {@code null} if the item is {@code null} and {@code empty} is true
+   * @return Bas64 item, or {@code null} if the argument is an empty sequence and if
+   *   {@code empty} is true
    * @throws QueryException query exception
    */
   protected final B64 toB64(final Item item, final boolean empty) throws QueryException {
-    if(empty && item == null) return null;
+    if(empty && item == Empty.VALUE) return null;
     return (B64) checkType(item, AtomType.B64);
   }
 
@@ -568,7 +560,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final QNm toQNm(final Item item, final boolean empty) throws QueryException {
-    if(empty && item == null) return null;
+    if(empty && item == Empty.VALUE) return null;
     final Type type = checkNoEmpty(item, AtomType.QNM).type;
     if(type == AtomType.QNM) return (QNm) item;
     if(type.isUntyped()) throw NSSENS_X_X.get(info, type, AtomType.QNM);
@@ -667,7 +659,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final Item checkNoEmpty(final Item item) throws QueryException {
-    if(item != null) return item;
+    if(item != Empty.VALUE) return item;
     throw EMPTYFOUND.get(info);
   }
 
@@ -679,7 +671,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected Item checkNoEmpty(final Item item, final Type type) throws QueryException {
-    if(item != null) return item;
+    if(item != Empty.VALUE) return item;
     throw EMPTYFOUND_X.get(info, type);
   }
 

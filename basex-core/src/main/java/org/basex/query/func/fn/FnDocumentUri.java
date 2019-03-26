@@ -4,6 +4,7 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -17,12 +18,12 @@ public final class FnDocumentUri extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toEmptyNode(ctxArg(0, qc), qc);
-    if(node == null || node.type != NodeType.DOC) return null;
+    if(node == null || node.type != NodeType.DOC) return Empty.VALUE;
     // return empty sequence for documents constructed via parse-xml
     final Data data = node.data();
-    if(data != null && data.meta.name.isEmpty()) return null;
+    if(data != null && data.meta.name.isEmpty()) return Empty.VALUE;
 
     final byte[] uri = node.baseURI();
-    return uri.length == 0 ? null : Uri.uri(uri, false);
+    return uri.length == 0 ? Empty.VALUE : Uri.uri(uri, false);
   }
 }

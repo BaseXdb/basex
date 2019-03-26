@@ -11,6 +11,7 @@ import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.name.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
@@ -55,6 +56,6 @@ public final class DbCreate extends DbNew {
 
     final Options opts = toOptions(3, new Options(), qc);
     qc.updates().add(new DBCreate(name, inputs, opts, qc, info), qc);
-    return null;
+    return Empty.VALUE;
   }
 }

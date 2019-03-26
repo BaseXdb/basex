@@ -10,6 +10,7 @@ import org.basex.query.up.*;
 import org.basex.query.up.primitives.db.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -25,7 +26,7 @@ public final class FnPut extends StandardFunc {
     checkCreate(qc);
     final ANode nd = toNode(exprs[0], qc);
     final byte[] file = toEmptyToken(exprs[1], qc);
-    final Item so = exprs.length > 2 ? exprs[2].item(qc, info) : null;
+    final Item so = exprs.length > 2 ? exprs[2].item(qc, info) : Empty.VALUE;
     final SerializerOptions sopts = FuncOptions.serializer(so, info);
 
     if(nd.type != NodeType.DOC && nd.type != NodeType.ELM) throw UPFOTYPE_X.get(info, exprs[0]);
@@ -40,6 +41,6 @@ public final class FnPut extends StandardFunc {
     if(!updates.putPaths.add(path)) throw UPURIDUP_X.get(info, path);
 
     updates.add(new Put(target.pre(), target.data(), path, sopts, info), qc);
-    return null;
+    return Empty.VALUE;
   }
 }

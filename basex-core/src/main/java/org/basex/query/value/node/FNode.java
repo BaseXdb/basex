@@ -206,4 +206,13 @@ public abstract class FNode extends ANode {
   public final BXNode toJava() {
     return BXNode.get(this);
   }
+
+  /**
+   * Returns a chopped token representation of the specified value.
+   * @param value value
+   * @return string
+   */
+  public static byte[] toToken(final byte[] value) {
+    return toToken(value, false, true);
+  }
 }

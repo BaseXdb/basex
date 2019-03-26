@@ -63,4 +63,9 @@ public abstract class AStr extends Item {
     final AStr a = (AStr) obj;
     return type == a.type && Token.eq(value, a.value);
   }
+
+  @Override
+  public String toString() {
+    return Token.string(toQuotedToken(value));
+  }
 }

@@ -49,7 +49,9 @@ public final class CArray extends Arr {
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ArrayBuilder builder = new ArrayBuilder();
     if(seq) {
-      for(final Expr expr : exprs) builder.append(expr.value(qc));
+      for(final Expr expr : exprs) {
+        builder.append(expr.value(qc));
+      }
     } else {
       for(final Expr expr : exprs) {
         final Iter iter = expr.iter(qc);

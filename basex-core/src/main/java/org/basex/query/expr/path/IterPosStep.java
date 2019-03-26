@@ -6,6 +6,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -50,7 +51,7 @@ final class IterPosStep extends Step {
             } else if(numeric(pred)) {
               // pre-evaluate numeric position
               final Item item = pred.atomItem(qc, info);
-              if(item == null) return null;
+              if(item == Empty.VALUE) return null;
               final double dbl = toDouble(item);
               final long lng = (long) dbl;
               if(dbl != lng) return null;

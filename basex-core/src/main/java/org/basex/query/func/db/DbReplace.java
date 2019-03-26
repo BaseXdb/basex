@@ -11,6 +11,7 @@ import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.db.*;
 import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
@@ -53,6 +54,6 @@ public final class DbReplace extends DbNew {
     // delete old documents
     final int ds = docs.size();
     for(; d < ds; d++) updates.add(new DeleteNode(docs.get(d), data, info), qc);
-    return null;
+    return Empty.VALUE;
   }
 }

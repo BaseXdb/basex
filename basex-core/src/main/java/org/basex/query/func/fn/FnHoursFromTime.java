@@ -2,6 +2,7 @@ package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -15,6 +16,6 @@ public final class FnHoursFromTime extends DateTime {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = exprs[0].atomItem(qc, info);
-    return item == null ? null : Int.get(checkDate(item, AtomType.TIM, qc).hour());
+    return item == Empty.VALUE ? Empty.VALUE : Int.get(checkDate(item, AtomType.TIM, qc).hour());
   }
 }

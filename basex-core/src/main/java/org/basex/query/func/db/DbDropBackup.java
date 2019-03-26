@@ -8,6 +8,7 @@ import org.basex.query.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.name.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -28,6 +29,6 @@ public final class DbDropBackup extends DbAccess {
 
     final Updates updates = qc.updates();
     for(final String backup : backups) updates.add(new BackupDrop(backup, qc, info), qc);
-    return null;
+    return Empty.VALUE;
   }
 }

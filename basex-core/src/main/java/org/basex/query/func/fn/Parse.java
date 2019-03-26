@@ -14,6 +14,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Parse functions.
@@ -27,7 +28,8 @@ public abstract class Parse extends StandardFunc {
    * @param qc query context
    * @param check only check if text is available
    * @param encoding parse encoding
-   * @return content string, {@code null}, or boolean success flag
+   * @return content string, {@link Empty#VALUE} if no URL is supplied, or boolean success flag
+   *   if availability is checked
    * @throws QueryException query exception
    */
   Item unparsedText(final QueryContext qc, final boolean check, final boolean encoding)
@@ -35,7 +37,7 @@ public abstract class Parse extends StandardFunc {
 
     checkCreate(qc);
     final Item item = exprs[0].atomItem(qc, info);
-    if(item == null) return check ? Bln.FALSE : null;
+    if(item == Empty.VALUE) return check ? Bln.FALSE : Empty.VALUE;
 
     final byte[] path = toToken(item);
 
@@ -87,12 +89,12 @@ public abstract class Parse extends StandardFunc {
    * Returns a document node for the parsed XML input.
    * @param qc query context
    * @param frag parse fragments
-   * @return result or {@code null}
+   * @return result or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
-  ANode parseXml(final QueryContext qc, final boolean frag) throws QueryException {
+  Item parseXml(final QueryContext qc, final boolean frag) throws QueryException {
     final Item item = exprs[0].atomItem(qc, info);
-    if(item == null) return null;
+    if(item == Empty.VALUE) return Empty.VALUE;
 
     final IO io = new IOContent(toToken(item), string(sc.baseURI().string()));
     try {

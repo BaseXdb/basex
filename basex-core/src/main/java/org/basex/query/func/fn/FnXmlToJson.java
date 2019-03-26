@@ -9,6 +9,7 @@ import org.basex.query.*;
 import org.basex.query.func.json.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.options.Options.*;
 
@@ -23,7 +24,7 @@ public class FnXmlToJson extends FnParseJson {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toEmptyNode(exprs[0], qc);
     final JsonSerialOptions jopts = toOptions(1, new JsonSerialOptions(), qc);
-    if(node == null) return null;
+    if(node == null) return Empty.VALUE;
 
     jopts.set(JsonOptions.FORMAT, JsonFormat.BASIC);
     final Boolean indent = jopts.get(JsonSerialOptions.INDENT);

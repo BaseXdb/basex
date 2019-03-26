@@ -23,8 +23,8 @@ public final class FnQName extends StandardFunc {
     final byte[] name = toToken(exprs[1], qc);
     final byte[] str = !contains(name, ':') && eq(uri, XML_URI) ? concat(XMLC, name) : name;
     if(!XMLToken.isQName(str)) throw valueError(AtomType.QNM, name, info);
-    final QNm nm = new QNm(str, uri);
-    if(nm.hasPrefix() && uri.length == 0) throw valueError(AtomType.URI, nm.uri(), info);
-    return nm;
+    final QNm qname = new QNm(str, uri);
+    if(qname.hasPrefix() && uri.length == 0) throw valueError(AtomType.URI, qname.uri(), info);
+    return qname;
   }
 }

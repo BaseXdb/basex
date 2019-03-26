@@ -2,6 +2,7 @@ package org.basex.query.func.request;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -14,6 +15,6 @@ public final class RequestQuery extends RequestFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String query = request(qc).getQueryString();
-    return query == null ? null : Str.get(query);
+    return query == null ? Empty.VALUE : Str.get(query);
   }
 }

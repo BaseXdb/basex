@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.server.*;
 import org.basex.util.*;
 
@@ -23,6 +24,6 @@ public final class AdminDeleteLogs extends AdminFn {
     if(file == null) throw WHICHRES_X.get(info, name);
     if(file.current()) throw ADMIN_TODAY.get(info, name);
     if(!file.delete()) throw ADMIN_DELETE_X.get(info, name);
-    return null;
+    return Empty.VALUE;
   }
 }

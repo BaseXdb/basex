@@ -8,6 +8,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -128,9 +129,13 @@ abstract class Set extends Arr {
      * @throws QueryException query exception
      */
     final boolean next(final int i) throws QueryException {
-      final ANode n = toEmptyNode(qc.next(iter[i]));
-      nodes[i] = n;
-      return n != null;
+      final Item item = qc.next(iter[i]);
+      if(item == null) {
+        nodes[i] = null;
+        return false;
+      }
+      nodes[i] = toNode(item);
+      return true;
     }
   }
 }

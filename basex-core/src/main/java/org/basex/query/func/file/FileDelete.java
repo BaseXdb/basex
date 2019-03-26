@@ -5,6 +5,7 @@ import java.nio.file.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -21,7 +22,7 @@ public final class FileDelete extends FileFn {
     } else {
       Files.delete(path);
     }
-    return null;
+    return Empty.VALUE;
   }
 
   /**

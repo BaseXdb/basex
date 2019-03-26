@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -18,8 +19,8 @@ public final class FnBaseUri extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toEmptyNode(ctxArg(0, qc), qc);
-    if(node == null) return null;
-    if(node.type != NodeType.ELM && node.type != NodeType.DOC && node.parent() == null) return null;
+    if(node == null || node.type != NodeType.ELM && node.type != NodeType.DOC &&
+        node.parent() == null) return Empty.VALUE;
 
     Uri base = Uri.EMPTY;
     ANode nd = node;

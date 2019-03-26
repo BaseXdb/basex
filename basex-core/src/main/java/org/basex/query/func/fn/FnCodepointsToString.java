@@ -32,7 +32,9 @@ public final class FnCodepointsToString extends StandardFunc {
 
     // handle arbitrary input
     final TokenBuilder tb = new TokenBuilder(Math.max(8, (int) size));
-    for(Item item; (item = qc.next(iter)) != null;) tb.add(check(toLong(item), info));
+    for(Item item; (item = qc.next(iter)) != null;) {
+      tb.add(checkCp(toLong(item), info));
+    }
     return Str.get(tb.finish());
   }
 
@@ -50,9 +52,7 @@ public final class FnCodepointsToString extends StandardFunc {
    * @throws QueryException query exception
    */
   private static Str toStr(final long value, final InputInfo ii) throws QueryException {
-    final int cp = check(value, ii);
-    return Str.get(cp <= 0x7F ? new byte[] { (byte) cp } :
-      new TokenBuilder(4).add(check(cp, ii)).finish());
+    return Str.get(Token.cpToken(checkCp(value, ii)));
   }
 
   /**
@@ -62,7 +62,7 @@ public final class FnCodepointsToString extends StandardFunc {
    * @return codepoint as integer
    * @throws QueryException query exception
    */
-  private static int check(final long value, final InputInfo ii) throws QueryException {
+  private static int checkCp(final long value, final InputInfo ii) throws QueryException {
     if(value >= 0 && value <= Integer.MAX_VALUE) {
       final int cp = (int) value;
       if(XMLToken.valid(cp)) return cp;

@@ -14,6 +14,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -87,7 +88,7 @@ public final class Replace extends Update {
       // conforms to specification: insertion sequence may be empty
       updates.add(new ReplaceNode(dbn.pre(), dbn.data(), info, list), qc);
     }
-    return null;
+    return Empty.VALUE;
   }
 
   @Override

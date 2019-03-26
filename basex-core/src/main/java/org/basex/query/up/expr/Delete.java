@@ -10,6 +10,7 @@ import org.basex.query.up.*;
 import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -43,7 +44,7 @@ public final class Delete extends Update {
       final DBNode dbn = updates.determineDataRef(n, qc);
       updates.add(new DeleteNode(dbn.pre(), dbn.data(), info), qc);
     }
-    return null;
+    return Empty.VALUE;
   }
 
   @Override

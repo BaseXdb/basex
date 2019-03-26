@@ -22,23 +22,23 @@ public final class UtilItem extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // retrieve (possibly invalid) position
     final long pos = pos(qc);
-    if(pos < 0) return null;
+    if(pos < 0) return Empty.VALUE;
 
     // if possible, retrieve single item
     final Expr expr = exprs[0];
-    if(expr.seqType().zeroOrOne()) return pos == 0 ? expr.item(qc, info) : null;
+    if(expr.seqType().zeroOrOne()) return pos == 0 ? expr.item(qc, info) : Empty.VALUE;
 
     // fast route if the size is known
     final Iter iter = expr.iter(qc);
     final long size = iter.size();
-    if(size >= 0) return pos < size ? iter.get(pos) : null;
+    if(size >= 0) return pos < size ? iter.get(pos) : Empty.VALUE;
 
     // iterate until specified item is found
     long p = pos;
     for(Item item; (item = qc.next(iter)) != null;) {
       if(p-- == 0) return item;
     }
-    return null;
+    return Empty.VALUE;
   }
 
   @Override

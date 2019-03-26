@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.list.*;
 
@@ -21,7 +22,7 @@ abstract class Format extends StandardFunc {
    * Returns a formatted number.
    * @param qc query context
    * @param tp input type
-   * @return string or {@code null}
+   * @return string or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
   Item formatDate(final AtomType tp, final QueryContext qc) throws QueryException {
@@ -39,7 +40,7 @@ abstract class Format extends StandardFunc {
       if(calendar != null) calendar = trim(calendar);
     }
     final byte[] place = more ? toEmptyToken(exprs[4], qc) : EMPTY;
-    if(item == null) return null;
+    if(item == Empty.VALUE) return Empty.VALUE;
 
     final ADate date = (ADate) checkType(item, tp);
     final Formatter form = Formatter.get(language);

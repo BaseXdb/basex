@@ -54,21 +54,21 @@ public final class FTWeight extends FTExpr {
     return new FTIter() {
       @Override
       public FTNode next() throws QueryException {
-        return weight(exprs[0].iter(qc).next(), qc);
+        final FTNode node = exprs[0].iter(qc).next();
+        return node == null ? null : weight(node, qc);
       }
     };
   }
 
   /**
-   * Returns the item with weight calculation.
+   * Returns the item with an enriched score value.
    * @param item input item
    * @param qc query context
-   * @return item, or {@code null} if the specified item is {@code null}
+   * @return item
    * @throws QueryException query exception
    */
   private FTNode weight(final FTNode item, final QueryContext qc) throws QueryException {
     // evaluate weight
-    if(item == null) return null;
     final double d = toDouble(weight, qc);
     if(Math.abs(d) > 1000) throw FTWEIGHT_X.get(info, d);
     if(d == 0) item.matches().reset();

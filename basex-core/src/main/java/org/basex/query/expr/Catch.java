@@ -72,9 +72,9 @@ public final class Catch extends Single {
    * @throws QueryException query exception
    */
   Value value(final QueryContext qc, final QueryException qe) throws QueryException {
+    Util.debug(qe);
     int i = 0;
     for(final Value value : values(qe)) qc.set(vars[i++], value);
-    Util.debug(qe);
     return expr.value(qc);
   }
 

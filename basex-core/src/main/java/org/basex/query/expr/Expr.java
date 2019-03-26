@@ -81,8 +81,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
-   * If this method is not overwritten, {@link #value(QueryContext)} or
-   * {@link #item(QueryContext, InputInfo)} must be implemented, as it will be called instead.
+   * The implementation of this method is optional.
    * @param qc query context
    * @return iterator
    * @throws QueryException query exception
@@ -91,8 +90,8 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns the resulting value.
-   * If this method is not overwritten, {@link #item(QueryContext, InputInfo)} must be implemented,
-   * as it will be called instead.
+   * If this method is not implemented, {@link #item(QueryContext, InputInfo)} must be implemented
+   * instead.
    * @param qc query context
    * @return value
    * @throws QueryException query exception
@@ -101,12 +100,11 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns the resulting item,
-   * or a {@code null} reference if the expression yields an empty sequence.
-   * If this method is not overwritten, {@link #value(QueryContext)} must be implemented,
-   * as it will be called instead.
+   * or {@link Empty#VALUE} if the expression yields an empty sequence.
+   * If this method is not implemented, {@link #value(QueryContext)} must be implemented instead.
    * @param qc query context
    * @param ii input info (only required by {@link Seq} instances, which have no input info)
-   * @return item or {@code null}
+   * @return item or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
   public abstract Item item(QueryContext qc, InputInfo ii) throws QueryException;
@@ -127,10 +125,10 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns the resulting, atomized item,
-   * or {@code null} if the expression yields an empty sequence.
+   * or {@link Empty#VALUE} if the expression yields an empty sequence.
    * @param qc query context
    * @param ii input info (only required by {@link Seq} instances, which have no input info)
-   * @return item or {@code null}
+   * @return item or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
   public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -163,10 +161,11 @@ public abstract class Expr extends ExprInfo {
   public abstract Item ebv(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
-   * Performs a predicate test and returns the item the if test was successful.
+   * Performs a predicate test and returns the item if the test was successful.
+   * The returned item is required for full-text scoring.
    * @param qc query context
    * @param ii input info (required for {@link Seq} instances, which have no input info)
-   * @return item
+   * @return item or {@code null}
    * @throws QueryException query exception
    */
   public abstract Item test(QueryContext qc, InputInfo ii) throws QueryException;

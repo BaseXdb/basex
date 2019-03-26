@@ -6,6 +6,7 @@ import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -31,7 +32,7 @@ public final class DbOption extends DbFn {
    * @throws QueryException query exception
    */
   private Item item(final Object value) throws QueryException {
-    if(value == null) return null;
+    if(value == null) return Empty.VALUE;
     if(value instanceof Boolean) return Bln.get((Boolean) value);
     if(value instanceof Integer) return Int.get((Integer) value);
     if(value instanceof Options) {

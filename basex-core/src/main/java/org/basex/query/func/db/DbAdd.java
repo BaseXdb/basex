@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.db.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -24,6 +25,6 @@ public final class DbAdd extends DbNew {
     final NewInput input = checkInput(toNodeOrAtomItem(1, qc), path);
     final Options opts = toOptions(3, new Options(), qc);
     qc.updates().add(new DBAdd(data, input, opts, false, qc, info), qc);
-    return null;
+    return Empty.VALUE;
   }
 }

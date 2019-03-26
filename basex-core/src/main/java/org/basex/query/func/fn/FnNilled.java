@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -17,6 +18,6 @@ public final class FnNilled extends ContextFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toEmptyNode(ctxArg(0, qc), qc);
     // always false, as no schema information is given
-    return node == null || node.type != NodeType.ELM ? null : Bln.FALSE;
+    return node == null || node.type != NodeType.ELM ? Empty.VALUE : Bln.FALSE;
   }
 }

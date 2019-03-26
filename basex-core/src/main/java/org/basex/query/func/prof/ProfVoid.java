@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -19,6 +20,6 @@ public final class ProfVoid extends StandardFunc {
 
     // caches items; ensures that lazy items will be evaluated
     for(Item item; (item = qc.next(iter)) != null;) item.cache(false, info);
-    return null;
+    return Empty.VALUE;
   }
 }

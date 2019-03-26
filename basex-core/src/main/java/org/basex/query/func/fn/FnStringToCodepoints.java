@@ -44,7 +44,7 @@ public final class FnStringToCodepoints extends StandardFunc {
    */
   private static Value value(final int[] cps) {
     final LongList list = new LongList(cps.length);
-    for(int cp : cps) list.add(cp);
+    for(final int cp : cps) list.add(cp);
     return IntSeq.get(list.finish());
   }
 }

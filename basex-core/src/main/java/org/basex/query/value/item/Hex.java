@@ -1,5 +1,8 @@
 package org.basex.query.value.item;
 
+import java.util.*;
+
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
@@ -104,6 +107,12 @@ public final class Hex extends Bin {
 
   @Override
   public String toString() {
-    return Strings.concat('"', Token.hex(data, true), '"');
+    final TokenBuilder tb = new TokenBuilder().add('"');
+    if(data.length > 128) {
+      tb.add(Token.hex(Arrays.copyOf(data, 128), true)).add(Text.DOTS);
+    } else {
+      tb.add(Token.hex(data, true));
+    }
+    return tb.add('"').toString();
   }
 }

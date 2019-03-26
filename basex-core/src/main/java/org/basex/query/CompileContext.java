@@ -170,13 +170,13 @@ public final class CompileContext {
    * @return optimized expression
    */
   public Expr emptySeq(final Expr result) {
-    return replaceWith(result, null);
+    return replaceWith(result, Empty.VALUE);
   }
 
   /**
    * Replaces an EBV expression.
    * @param expr expression
-   * @param result resulting expression ({@code null} indicates empty sequence)
+   * @param result resulting expression
    * @return optimized expression
    */
   public Expr replaceEbv(final Expr expr, final Expr result) {
@@ -186,7 +186,7 @@ public final class CompileContext {
   /**
    * Replaces an expression with the specified one.
    * @param expr expression
-   * @param result resulting expression ({@code null} indicates empty sequence)
+   * @param result resulting expression
    * @return optimized expression
    */
   public Expr replaceWith(final Expr expr, final Expr result) {
@@ -196,41 +196,40 @@ public final class CompileContext {
   /**
    * Replaces an expression with the specified one.
    * @param expr expression
-   * @param result resulting expression ({@code null} indicates empty sequence)
+   * @param result resulting expression
    * @param refine refine type
    * @return optimized expression
    */
   private Expr replaceWith(final Expr expr, final Expr result, final boolean refine) {
-    final Expr res = result == null ? Empty.VALUE : result;
-    if(res != expr) {
+    if(result != expr) {
       final Supplier<String> f  = () -> {
         final TokenBuilder tb = new TokenBuilder();
-        final String exprDesc = expr.description(), resDesc = res.description();
-        tb.add(res instanceof ParseExpr ? OPTREWRITE : OPTPRE).add(' ').add(exprDesc);
+        final String exprDesc = expr.description(), resDesc = result.description();
+        tb.add(result instanceof ParseExpr ? OPTREWRITE : OPTPRE).add(' ').add(exprDesc);
         if(!exprDesc.equals(resDesc)) tb.add(" to ").add(resDesc);
 
         final byte[] exprString = QueryError.normalize(Token.token(expr.toString()), null);
-        final byte[] resString = QueryError.normalize(Token.token(res.toString()), null);
+        final byte[] resString = QueryError.normalize(Token.token(result.toString()), null);
         tb.add(": ").add(exprString);
         if(!Token.eq(exprString, resString)) tb.add(" -> ").add(resString);
         return tb.toString();
       };
       info("%", f);
 
-      if(res instanceof ParseExpr) {
+      if(result instanceof ParseExpr) {
         // refine type. required mostly for {@link Filter} rewritings
         if(refine) {
-          final ParseExpr re = (ParseExpr) res;
+          final ParseExpr re = (ParseExpr) result;
           final SeqType et = expr.seqType(), rt = re.seqType();
           if(et.refinable(rt)) {
             final SeqType st = et.intersect(rt);
             if(st != null) re.exprType.assign(st);
           }
         }
-      } else if(res != Empty.VALUE && refine) {
+      } else if(result != Empty.VALUE && refine) {
         // refine type. required because original type might have got lost in new sequence
-        if(res instanceof Seq) {
-          final Seq seq = (Seq) res;
+        if(result instanceof Seq) {
+          final Seq seq = (Seq) result;
           final Type et = expr.seqType().type, rt = seq.type;
           if(!et.eq(rt) && et.instanceOf(rt)) {
             final Type type = et.intersect(rt);
@@ -240,10 +239,10 @@ public final class CompileContext {
               seq.homo = false;
             }
           }
-        } else if(res instanceof FItem) {
+        } else if(result instanceof FItem) {
           // refine type of function items (includes maps and arrays)
-          final FItem fitem = (FItem) res;
-          final SeqType et = expr.seqType(), rt = res.seqType();
+          final FItem fitem = (FItem) result;
+          final SeqType et = expr.seqType(), rt = result.seqType();
           if(et.refinable(rt)) {
             final Type type = et.type.intersect(rt.type);
             if(type != null) fitem.type = type;
@@ -251,7 +250,7 @@ public final class CompileContext {
         }
       }
     }
-    return res;
+    return result;
   }
 
   /**

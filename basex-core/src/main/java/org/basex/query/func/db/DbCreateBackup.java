@@ -7,6 +7,7 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.name.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -23,6 +24,6 @@ public final class DbCreateBackup extends DbAccess {
     if(!qc.context.soptions.dbExists(name)) throw DB_OPEN1_X.get(info, name);
 
     qc.updates().add(new BackupCreate(name, qc, info), qc);
-    return null;
+    return Empty.VALUE;
   }
 }

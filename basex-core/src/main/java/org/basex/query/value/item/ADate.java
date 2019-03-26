@@ -235,13 +235,12 @@ public abstract class ADate extends ADateDur {
 
   /**
    * Adjusts the timezone.
-   * @param zone timezone
-   * @param spec indicates if zone has been specified (may be {@code null})
+   * @param zone timezone (may be {@code null})
+   * @param spec indicates if zone has been specified
    * @param ii input info
    * @throws QueryException query exception
    */
-  public abstract void timeZone(DTDur zone, boolean spec, InputInfo ii)
-      throws QueryException;
+  public abstract void timeZone(DTDur zone, boolean spec, InputInfo ii) throws QueryException;
 
   /**
    * Adjusts the timezone.
@@ -496,6 +495,6 @@ public abstract class ADate extends ADateDur {
 
   @Override
   public final String toString() {
-    return Util.info("\"%\"", string(null));
+    return Token.string(toQuotedToken(string(null)));
   }
 }

@@ -315,11 +315,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return item(qc, info);
-  }
-
-  @Override
   public boolean has(final Flag... flags) {
     // handle recursive calls: check which flags have already been assigned
     final ArrayList<Flag> flgs = new ArrayList<>();

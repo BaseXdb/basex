@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -20,6 +21,6 @@ public final class SqlInit extends StandardFunc {
     checkCreate(qc);
     final String driver = string(toToken(exprs[0], qc));
     if(Reflect.find(driver) == null) throw SQL_INIT_X.get(info, driver);
-    return null;
+    return Empty.VALUE;
   }
 }

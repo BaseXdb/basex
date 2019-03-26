@@ -7,6 +7,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -22,6 +23,6 @@ public class UpdateOutput extends StandardFunc {
     if(updates.mod instanceof TransformModifier) throw BASEX_UPDATE.get(info);
     final Iter iter = exprs[0].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) qc.updates.items.add(item);
-    return null;
+    return Empty.VALUE;
   }
 }

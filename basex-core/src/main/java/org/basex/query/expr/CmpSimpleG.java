@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -31,9 +32,9 @@ public final class CmpSimpleG extends CmpG {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item1 = exprs[0].item(qc, info);
-    if(item1 == null) return Bln.FALSE;
+    if(item1 == Empty.VALUE) return Bln.FALSE;
     final Item item2 = exprs[1].item(qc, info);
-    return Bln.get(item2 != null && eval(item1, item2));
+    return Bln.get(item2 != Empty.VALUE && eval(item1, item2));
   }
 
   @Override

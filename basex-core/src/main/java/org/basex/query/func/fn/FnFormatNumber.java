@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -20,7 +21,7 @@ public final class FnFormatNumber extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // evaluate arguments
     Item item = exprs[0].atomItem(qc, info);
-    if(item == null) item = Dbl.NAN;
+    if(item == Empty.VALUE) item = Dbl.NAN;
     else if(item.type.isUntyped()) item = Dbl.get(item.dbl(info));
     else if(!item.type.isNumberOrUntyped()) throw numberError(this, item);
 

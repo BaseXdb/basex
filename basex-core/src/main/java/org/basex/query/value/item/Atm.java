@@ -73,6 +73,6 @@ public final class Atm extends Item {
 
   @Override
   public String toString() {
-    return toString(value);
+    return Token.string(toQuotedToken(value));
   }
 }

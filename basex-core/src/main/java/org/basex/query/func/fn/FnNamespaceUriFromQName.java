@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -14,8 +15,8 @@ import org.basex.util.*;
 public final class FnNamespaceUriFromQName extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final QNm qnm = toQNm(exprs[0], qc, true);
-    return qnm == null ? null : Uri.uri(qnm.uri());
+    final QNm qname = toQNm(exprs[0], qc, true);
+    return qname == null ? Empty.VALUE : Uri.uri(qname.uri());
   }
 
   @Override

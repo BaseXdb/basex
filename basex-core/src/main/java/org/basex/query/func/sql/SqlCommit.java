@@ -6,6 +6,7 @@ import java.sql.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -20,7 +21,7 @@ public final class SqlCommit extends SqlFn {
     checkCreate(qc);
     try {
       connection(qc).commit();
-      return null;
+      return Empty.VALUE;
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
     }

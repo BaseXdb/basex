@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -21,8 +22,9 @@ public final class FnZeroOrOne extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
     final Item item = iter.next();
-    if(item != null && iter.next() != null) throw ZEROORONE.get(info);
-    return item;
+    if(item == null) return Empty.VALUE;
+    if(iter.next() == null) return item;
+    throw ZEROORONE.get(info);
   }
 
   @Override

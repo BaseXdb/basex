@@ -12,6 +12,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -82,7 +83,7 @@ public final class Switch extends ParseExpr {
   private Expr opt(final CompileContext cc) throws QueryException {
     // cached switch cases
     final ExprList cases = new ExprList();
-    final Item item = cond instanceof Value ? cond.atomItem(cc.qc, info) : null;
+    final Item item = cond instanceof Value ? cond.atomItem(cc.qc, info) : Empty.VALUE;
     final ArrayList<SwitchGroup> tmpGroups = new ArrayList<>();
     for(final SwitchGroup group : groups) {
       final int el = group.exprs.length;
@@ -93,7 +94,8 @@ public final class Switch extends ParseExpr {
         if(cond instanceof Value && expr instanceof Value) {
           // includes check for empty sequence (null reference)
           final Item cs = expr.atomItem(cc.qc, info);
-          if(item == cs || cs != null && item != null && item.equiv(cs, null, info)) return rtrn;
+          if(item == cs || cs != Empty.VALUE && item != Empty.VALUE && item.equiv(cs, null, info))
+            return rtrn;
           cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
         } else if(cases.contains(expr)) {
           // case has already been checked before
@@ -198,7 +200,7 @@ public final class Switch extends ParseExpr {
       for(int e = 1; e < gl; e++) {
         // includes check for empty sequence (null reference)
         final Item cs = group.exprs[e].atomItem(qc, info);
-        if(item == cs || item != null && cs != null && item.equiv(cs, null, info))
+        if(item == cs || item != Empty.VALUE && cs != Empty.VALUE && item.equiv(cs, null, info))
           return group.exprs[0];
       }
       if(gl == 1) return group.exprs[0];

@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -62,7 +63,7 @@ public final class CMap extends Arr {
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
       final Item k = exprs[e].atomItem(qc, info);
-      if(k == null) throw EMPTYFOUND.get(info);
+      if(k == Empty.VALUE) throw EMPTYFOUND.get(info);
       final Value v = exprs[e + 1].value(qc);
       if(map.contains(k, info)) throw MAPDUPLKEY_X_X_X.get(info, k, map.get(k, info), v);
       map = map.put(k, v, info);

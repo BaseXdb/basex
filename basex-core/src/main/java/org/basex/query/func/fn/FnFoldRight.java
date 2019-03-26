@@ -23,6 +23,7 @@ public final class FnFoldRight extends StandardFunc {
     final Value seq = exprs[0].value(qc);
     Value res = exprs[1].value(qc);
     final FItem func = checkArity(exprs[2], 2, qc);
+
     if(seq instanceof TreeSeq) {
       final ListIterator<Item> iter = ((TreeSeq) seq).iterator(seq.size());
       while(iter.hasPrevious()) {

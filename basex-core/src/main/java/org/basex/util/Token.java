@@ -312,6 +312,27 @@ public final class Token {
   }
 
   /**
+   * Converts a codepoint to a token.
+   * @param cp codepoint of the character
+   * @return token
+   */
+  public static byte[] cpToken(final int cp) {
+    if(cp <= 0x7F) return new byte[] {
+      (byte) cp
+    };
+    if(cp <= 0x7FF) return new byte[] {
+      (byte) (cp >>  6 & 0x1F | 0xC0), (byte) (cp & 0x3F | 0x80)
+    };
+    if(cp <= 0xFFFF) return new byte[] {
+      (byte) (cp >> 12 & 0x0F | 0xE0), (byte) (cp >>  6 & 0x3F | 0x80), (byte) (cp & 0x3F | 0x80)
+    };
+    return new byte[] {
+      (byte) (cp >> 18 & 0x07 | 0xF0), (byte) (cp >> 12 & 0x3F | 0x80),
+      (byte) (cp >>  6 & 0x3F | 0x80), (byte) (cp & 0x3F | 0x80)
+    };
+  }
+
+  /**
    * Returns the number of codepoints in the token.
    * @param token token
    * @return number of codepoints

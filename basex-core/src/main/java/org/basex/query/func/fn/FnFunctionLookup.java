@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -24,7 +25,7 @@ public final class FnFunctionLookup extends StandardFunc {
       } catch(final QueryException ignore) { }
     }
     // function not found
-    return null;
+    return Empty.VALUE;
   }
 
   @Override

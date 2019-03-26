@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -20,7 +21,7 @@ public final class FnResolveUri extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = exprs[0].atomItem(qc, info);
     final byte[] base = exprs.length > 1 ? toToken(exprs[1], qc) : null;
-    if(item == null) return null;
+    if(item == Empty.VALUE) return Empty.VALUE;
 
     // check relative uri
     final Uri rel = Uri.uri(toToken(item));

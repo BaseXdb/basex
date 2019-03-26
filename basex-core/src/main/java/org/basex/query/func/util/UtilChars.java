@@ -23,11 +23,9 @@ public final class UtilChars extends StandardFunc {
     final int[] cps = cps(toEmptyToken(exprs[0], qc));
 
     return new BasicIter<Str>(cps.length) {
-      final TokenBuilder tb = new TokenBuilder(4);
-
       @Override
       public Str get(final long i) {
-        return Str.get(tb.reset().add(cps[(int) i]).toArray());
+        return Str.get(Token.cpToken(cps[(int) i]));
       }
       @Override
       public Value value(final QueryContext q) {
@@ -42,14 +40,13 @@ public final class UtilChars extends StandardFunc {
   }
 
   /**
-   * Returns the specified codepoints as value.
-   * @param cps codepoints
+   * Returns the specified characters as sequence of strings.
+   * @param cps codepoints of characters
    * @return value
    */
   private static Value toValue(final int[] cps) {
     final TokenList list = new TokenList(cps.length);
-    final TokenBuilder tb = new TokenBuilder(4);
-    for(int cp : cps) list.add(tb.reset().add(cp).toArray());
+    for(final int cp : cps) list.add(Token.cpToken(cp));
     return StrSeq.get(list.finish());
   }
 }

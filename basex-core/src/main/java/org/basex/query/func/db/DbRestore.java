@@ -7,6 +7,7 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.name.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -30,6 +31,6 @@ public final class DbRestore extends DbAccess {
     final String backup = backups.get(0);
     final String db = Databases.name(backup);
     qc.updates().add(new DBRestore(db, backup, qc, info), qc);
-    return null;
+    return Empty.VALUE;
   }
 }

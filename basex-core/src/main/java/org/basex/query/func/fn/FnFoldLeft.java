@@ -22,7 +22,9 @@ public final class FnFoldLeft extends StandardFunc {
     final FItem func = checkArity(exprs[2], 2, qc);
 
     Value res = exprs[1].value(qc);
-    for(Item item; (item = qc.next(iter)) != null;) res = func.invokeValue(qc, info, res, item);
+    for(Item item; (item = qc.next(iter)) != null;) {
+      res = func.invokeValue(qc, info, res, item);
+    }
     return res;
   }
 
@@ -36,7 +38,9 @@ public final class FnFoldLeft extends StandardFunc {
     if(item == null) return exprs[1].iter(qc);
 
     Value res = exprs[1].value(qc);
-    do res = func.invokeValue(qc, info, res, item); while((item = qc.next(iter)) != null);
+    do {
+      res = func.invokeValue(qc, info, res, item);
+    } while((item = qc.next(iter)) != null);
     return res.iter();
   }
 

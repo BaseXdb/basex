@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -18,6 +19,6 @@ public final class ProfVariables extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
     FnTrace.trace(token(qc.stack.dump()), null, qc);
-    return null;
+    return Empty.VALUE;
   }
 }

@@ -7,6 +7,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.db.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -26,6 +27,6 @@ public final class DbStore extends DbAccess {
     final IOFile file = data.meta.binary(path);
     if(file == null || path.isEmpty()) throw RESINV_X.get(info, path);
     qc.updates().add(new DBStore(data, path, item, info), qc);
-    return null;
+    return Empty.VALUE;
   }
 }

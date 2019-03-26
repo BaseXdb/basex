@@ -7,6 +7,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -19,7 +20,7 @@ public final class BinOctal extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] token = token(0, qc);
-    if(token == null) return null;
+    if(token == null) return Empty.VALUE;
     final int tl = token.length;
     if(tl == 0) return B64.EMPTY;
 

@@ -3,6 +3,7 @@ package org.basex.query.func.proc;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -15,6 +16,6 @@ public final class ProcProperty extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = Token.string(toToken(exprs[0], qc)), value = Prop.get(name);
-    return value == null ? null : Str.get(value);
+    return value == null ? Empty.VALUE : Str.get(value);
   }
 }

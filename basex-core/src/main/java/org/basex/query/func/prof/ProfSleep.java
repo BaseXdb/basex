@@ -3,6 +3,7 @@ package org.basex.query.func.prof;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -21,6 +22,6 @@ public final class ProfSleep extends StandardFunc {
       Performance.sleep(1);
       qc.checkStop();
     }
-    return null;
+    return Empty.VALUE;
   }
 }

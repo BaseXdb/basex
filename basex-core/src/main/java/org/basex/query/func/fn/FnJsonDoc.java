@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -23,6 +24,6 @@ public final class FnJsonDoc extends FnParseJson {
       throw ex.error() == QueryError.INVCHARS_X ?
         PARSE_JSON_X.get(info, ex.getLocalizedMessage()) : ex;
     }
-    return item == null ? null : parse(item.string(info), false, qc);
+    return item == Empty.VALUE ? Empty.VALUE : parse(item.string(info), false, qc);
   }
 }

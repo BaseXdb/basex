@@ -11,6 +11,7 @@ import org.basex.query.up.*;
 import org.basex.query.up.primitives.db.*;
 import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -48,7 +49,7 @@ public final class DbRename extends DbAccess {
         updates.add(new DBDelete(data, source, info), qc);
       }
     }
-    return null;
+    return Empty.VALUE;
   }
 
   /**

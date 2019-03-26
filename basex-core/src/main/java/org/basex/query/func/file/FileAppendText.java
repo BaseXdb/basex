@@ -4,6 +4,7 @@ import java.io.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -14,6 +15,7 @@ import org.basex.query.value.item.*;
 public final class FileAppendText extends FileWriteText {
   @Override
   public Item item(final QueryContext qc) throws IOException, QueryException {
-    return write(true, qc);
+    write(true, qc);
+    return Empty.VALUE;
   }
 }

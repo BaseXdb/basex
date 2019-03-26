@@ -68,7 +68,7 @@ public final class ASession {
    * Returns a session attribute.
    * @param key key to be requested
    * @param value default value
-   * @return session attribute or {@code null}
+   * @return session attribute, or {@code null} if attribute is no XQuery value
    */
   public Value get(final byte[] key, final Value value) {
     final Object object = session.getAttribute(Token.string(key));

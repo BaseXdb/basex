@@ -9,6 +9,7 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.convert.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -24,7 +25,7 @@ public final class BinDecodeString extends BinFn {
     final String encoding = toEncoding(1, BIN_UE_X, qc);
     final Long off = exprs.length > 2 ? toLong(exprs[2], qc) : null;
     final Long len = exprs.length > 3 ? toLong(exprs[3], qc) : null;
-    if(b64 == null) return null;
+    if(b64 == null) return Empty.VALUE;
 
     byte[] bytes = b64.binary(info);
     final int bl = bytes.length;

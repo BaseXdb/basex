@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.Token.normalize;
 
 import org.basex.core.*;
 import org.basex.io.serial.*;
@@ -11,6 +12,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -67,7 +69,7 @@ public final class FuncOptions {
 
   /**
    * Assign options to the specified options.
-   * @param item item to be converted (can be {@code null})
+   * @param item item to be converted (can be {@link Empty#VALUE})
    * @param options options
    * @param <T> option type
    * @return specified options
@@ -79,7 +81,7 @@ public final class FuncOptions {
 
   /**
    * Assigns options to the specified options.
-   * @param item item to be parsed (can be {@code null})
+   * @param item item to be parsed (can be {@link Empty#VALUE})
    * @param options options
    * @param <T> option type
    * @param error raise error code
@@ -89,7 +91,7 @@ public final class FuncOptions {
   public <T extends Options> T assign(final Item item, final T options, final QueryError error)
       throws QueryException {
 
-    if(item != null) {
+    if(item != Empty.VALUE) {
       final TokenBuilder tb = new TokenBuilder();
       try {
         if(item instanceof XQMap) {

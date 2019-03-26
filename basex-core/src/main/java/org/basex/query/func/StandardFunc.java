@@ -27,6 +27,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -361,7 +362,7 @@ public abstract class StandardFunc extends Arr {
    * Returns the item or throws an exception.
    * @param i index of argument
    * @param qc query context
-   * @return node, atomized item or {@code null}
+   * @return node, atomized item, or {@code null} if argument does not exist
    * @throws QueryException query exception
    */
   protected final Item toNodeOrAtomItem(final int i, final QueryContext qc) throws QueryException {
@@ -398,7 +399,7 @@ public abstract class StandardFunc extends Arr {
     final int es = exprs.length;
     if(i < es) {
       final Item item = exprs[i].item(qc, info);
-      final XQMap map = item == null ? XQMap.EMPTY : toMap(item);
+      final XQMap map = item == Empty.VALUE ? XQMap.EMPTY : toMap(item);
       for(final Item it : map.keys()) {
         final byte[] key;
         if(it.type.isStringOrUntyped()) {

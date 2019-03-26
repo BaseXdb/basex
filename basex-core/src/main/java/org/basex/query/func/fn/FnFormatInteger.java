@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -25,7 +26,7 @@ public final class FnFormatInteger extends StandardFunc {
     final byte[] language = exprs.length == 2 ? EMPTY : toToken(exprs[2], qc);
 
     final Item item = exprs[0].atomItem(qc, info);
-    if(item == null) return Str.ZERO;
+    if(item == Empty.VALUE) return Str.ZERO;
     final long number = toLong(item);
 
     IntFormat format;

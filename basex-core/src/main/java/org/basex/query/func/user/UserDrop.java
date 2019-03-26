@@ -6,6 +6,7 @@ import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -22,7 +23,7 @@ public final class UserDrop extends UserFn {
     final StringList patterns = toPatterns(1, qc);
     if(user.name().equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
     qc.updates().add(new Drop(user, patterns, qc, info), qc);
-    return null;
+    return Empty.VALUE;
   }
 
   /** Update primitive. */

@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -53,7 +54,7 @@ public final class Unary extends Single {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    if(item == null) return null;
+    if(item == Empty.VALUE) return Empty.VALUE;
 
     final Type type = item.type;
     if(type.isUntyped()) {

@@ -140,9 +140,9 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds the specified integer as UTF8 codepoint.
+   * Adds the specified character.
    * Call {@link #addInt(int)} to add the string value of an integer.
-   * @param cp the codepoint to be added
+   * @param cp codepoint of the character
    * @return self reference
    */
   public TokenBuilder add(final int cp) {

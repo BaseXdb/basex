@@ -16,6 +16,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -53,7 +54,7 @@ public class ZipZipFile extends ZipFn {
     } finally {
       if(!ok) file.delete();
     }
-    return null;
+    return Empty.VALUE;
   }
 
   /**

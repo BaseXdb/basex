@@ -7,6 +7,7 @@ import java.nio.file.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -29,6 +30,6 @@ public final class FileCreateDir extends FileFn {
     }
 
     Files.createDirectories(path);
-    return null;
+    return Empty.VALUE;
   }
 }

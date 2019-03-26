@@ -64,7 +64,7 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   /**
-   * This method is called by the sequential full-text evaluation.
+   * This method is called by the sequential full-text evaluation. It always returns an item.
    * @param qc query context
    * @return resulting item
    * @throws QueryException query exception

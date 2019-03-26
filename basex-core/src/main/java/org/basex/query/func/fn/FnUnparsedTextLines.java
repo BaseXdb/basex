@@ -23,13 +23,13 @@ public final class FnUnparsedTextLines extends Parse {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Item item = unparsedText(qc, false, true);
-    return item == null ? Empty.ITER : new LinesIter(item.string(info));
+    return item == Empty.VALUE ? Empty.ITER : new LinesIter(item.string(info));
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Item item = unparsedText(qc, false, true);
-    if(item == null) return Empty.VALUE;
+    if(item == Empty.VALUE) return Empty.VALUE;
 
     try(NewlineInput ni = new NewlineInput(item.string(info))) {
       final TokenList tl = new TokenList();

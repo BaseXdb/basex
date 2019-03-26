@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -33,7 +34,9 @@ public class FnEmpty extends StandardFunc {
    */
   final boolean empty(final QueryContext qc) throws QueryException {
     final Expr expr = exprs[0];
-    return (expr.seqType().zeroOrOne() ? expr.item(qc, info) : expr.iter(qc).next()) == null;
+    return expr.seqType().zeroOrOne() ?
+      expr.item(qc, info) == Empty.VALUE :
+      expr.iter(qc).next() == null;
   }
 
   /**

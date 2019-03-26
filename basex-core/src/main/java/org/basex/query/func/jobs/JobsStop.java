@@ -8,6 +8,7 @@ import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -44,6 +45,6 @@ public final class JobsStop extends StandardFunc {
         throw JOBS_SERVICE_X_X.get(info, ex);
       }
     }
-    return null;
+    return Empty.VALUE;
   }
 }

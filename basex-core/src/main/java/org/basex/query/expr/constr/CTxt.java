@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -44,12 +45,12 @@ public final class CTxt extends CNode {
   }
 
   @Override
-  public FTxt item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // if possible, retrieve single item
     final Expr expr = exprs[0];
     if(simple) {
       final Item item = expr.item(qc, info);
-      return new FTxt(item == null ? Token.EMPTY : item.string(info));
+      return new FTxt(item == Empty.VALUE ? Token.EMPTY : item.string(info));
     }
 
     final TokenBuilder tb = new TokenBuilder();
@@ -60,7 +61,7 @@ public final class CTxt extends CNode {
       tb.add(item.string(info));
       more = true;
     }
-    return more ? new FTxt(tb.finish()) : null;
+    return more ? new FTxt(tb.finish()) : Empty.VALUE;
   }
 
   @Override

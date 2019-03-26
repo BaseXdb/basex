@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -18,7 +19,7 @@ public final class FnConcat extends StandardFunc {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr expr : exprs) {
       final Item item = expr.atomItem(qc, info);
-      if(item != null) tb.add(item.string(info));
+      if(item != Empty.VALUE) tb.add(item.string(info));
     }
     return Str.get(tb.finish());
   }

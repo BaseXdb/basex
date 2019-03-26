@@ -15,10 +15,11 @@ import org.basex.util.similarity.*;
 public final class StringsSoundex extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final int[] cps = Soundex.encode(new TokenParser(toToken(exprs[0], qc)).toArray());
+    final int[] cps = new TokenParser(toToken(exprs[0], qc)).toArray();
+    final int[] encoded = Soundex.encode(cps);
 
-    final TokenBuilder tb = new TokenBuilder(cps.length);
-    for(final int cp : cps) tb.add(cp);
+    final TokenBuilder tb = new TokenBuilder(encoded.length);
+    for(final int cp : encoded) tb.add(cp);
     return Str.get(tb.finish());
   }
 }

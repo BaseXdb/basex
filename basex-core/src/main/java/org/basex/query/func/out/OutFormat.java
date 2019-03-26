@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -22,7 +23,7 @@ public final class OutFormat extends StandardFunc {
     final Object[] args = new Object[es - 1];
     for(int e = 1; e < es; e++) {
       final Item item = exprs[e].item(qc, info);
-      args[e - 1] = item == null ? null : item.type.isUntyped() ? string(item.string(info)) :
+      args[e - 1] = item == Empty.VALUE ? null : item.type.isUntyped() ? string(item.string(info)) :
         item.toJava();
     }
     try {

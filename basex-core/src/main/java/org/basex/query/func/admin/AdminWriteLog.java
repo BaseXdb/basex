@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.server.Log.LogType;
 import org.basex.util.*;
 
@@ -24,6 +25,6 @@ public final class AdminWriteLog extends AdminFn {
     if(!type.matches("^[A-Z]+$")) throw ADMIN_TYPE_X.get(info, type);
 
     qc.context.log.write(type, msg, null, qc.context);
-    return null;
+    return Empty.VALUE;
   }
 }

@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -59,9 +60,9 @@ public final class Arith extends Arr {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item1 = exprs[0].atomItem(qc, info);
-    if(item1 == null) return null;
+    if(item1 == Empty.VALUE) return Empty.VALUE;
     final Item item2 = exprs[1].atomItem(qc, info);
-    return item2 == null ? null : calc.eval(item1, item2, info);
+    return item2 == Empty.VALUE ? Empty.VALUE : calc.eval(item1, item2, info);
   }
 
   @Override

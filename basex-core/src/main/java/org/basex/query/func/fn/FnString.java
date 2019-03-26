@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -18,8 +19,10 @@ public final class FnString extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = ctxArg(0, qc).item(qc, info);
+    if(item == Empty.VALUE) return Str.ZERO;
+
     if(item instanceof FItem) throw FISTRING_X.get(info, item.type);
-    return item == null ? Str.ZERO : item.type == AtomType.STR ? item : Str.get(item.string(info));
+    return item.type == AtomType.STR ? item : Str.get(item.string(info));
   }
 
   @Override

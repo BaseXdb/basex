@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.QueryError.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -15,7 +16,7 @@ public final class FnDocAvailable extends Docs {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     try {
-      return Bln.get(doc(qc) != null);
+      return Bln.get(doc(qc) != Empty.VALUE);
     } catch(final QueryException ex) {
       final QueryError error = ex.error();
       if(error != null && error.code.matches("^.*\\d+$")) {

@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -45,10 +46,10 @@ abstract class DateTime extends StandardFunc {
   /**
    * Returns the timezone.
    * @param it input item
-   * @return timezone
+   * @return timezone or {@link Empty#VALUE}
    */
-  protected static DTDur zon(final ADate it) {
-    return it.hasTz() ? new DTDur(0, it.tz()) : null;
+  protected static Item zon(final ADate it) {
+    return it.hasTz() ? new DTDur(0, it.tz()) : Empty.VALUE;
   }
 
   /**
@@ -71,8 +72,8 @@ abstract class DateTime extends StandardFunc {
       ad = type == AtomType.TIM ? new Tim(a) : type == AtomType.DAT ? new Dat(a) : new Dtm(a);
     }
     final boolean spec = exprs.length == 2;
-    final Item zon = spec ? exprs[1].atomItem(qc, info) : null;
-    ad.timeZone(zon == null ? null : (DTDur) checkType(zon, AtomType.DTD), spec, info);
+    final Item zon = spec ? exprs[1].atomItem(qc, info) : Empty.VALUE;
+    ad.timeZone(zon == Empty.VALUE ? null : (DTDur) checkType(zon, AtomType.DTD), spec, info);
     return ad;
   }
 

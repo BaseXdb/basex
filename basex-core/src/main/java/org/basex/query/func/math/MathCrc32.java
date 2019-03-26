@@ -5,6 +5,7 @@ import java.util.zip.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -17,7 +18,7 @@ public final class MathCrc32 extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = exprs[0].atomItem(qc, info);
-    if(item == null) return null;
+    if(item == Empty.VALUE) return Empty.VALUE;
 
     final CRC32 crc = new CRC32();
     crc.update(toToken(item));

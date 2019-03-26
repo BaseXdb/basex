@@ -8,6 +8,7 @@ import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -33,7 +34,7 @@ public final class UserGrant extends UserFn {
     }
 
     qc.updates().add(new Grant(user, perms, patterns, qc, info), qc);
-    return null;
+    return Empty.VALUE;
   }
 
   /** Update primitive. */

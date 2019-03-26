@@ -8,7 +8,6 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -104,11 +103,6 @@ public final class PartFunc extends Arr {
   @Override
   public void checkUp() throws QueryException {
     checkNoneUp(Arrays.copyOf(exprs, exprs.length - 1));
-  }
-
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return item(qc, info);
   }
 
   @Override

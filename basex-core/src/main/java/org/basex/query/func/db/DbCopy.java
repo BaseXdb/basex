@@ -8,6 +8,7 @@ import org.basex.query.*;
 import org.basex.query.up.primitives.name.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -19,17 +20,17 @@ import org.basex.util.*;
 public class DbCopy extends DbFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return copy(qc, true);
+    copy(qc, true);
+    return Empty.VALUE;
   }
 
   /**
    * Performs the copy function.
    * @param qc query context
    * @param keep keep copied database
-   * @return {@code null}
    * @throws QueryException query exception
    */
-  final Item copy(final QueryContext qc, final boolean keep) throws QueryException {
+  final void copy(final QueryContext qc, final boolean keep) throws QueryException {
     final String name = string(toToken(exprs[0], qc));
     final String newname = string(toToken(exprs[1], qc));
 
@@ -42,7 +43,6 @@ public class DbCopy extends DbFn {
 
     qc.updates().add(keep ? new DBCopy(name, newname, qc, info) :
       new DBAlter(name, newname, qc, info), qc);
-    return null;
   }
 
   @Override

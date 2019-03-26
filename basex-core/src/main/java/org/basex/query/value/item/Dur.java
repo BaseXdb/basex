@@ -246,6 +246,6 @@ public class Dur extends ADateDur {
 
   @Override
   public final String toString() {
-    return Util.info("\"%\"", string(null));
+    return Token.string(toQuotedToken(string(null)));
   }
 }

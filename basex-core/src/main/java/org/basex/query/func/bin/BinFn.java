@@ -9,6 +9,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -84,10 +85,10 @@ abstract class BinFn extends StandardFunc {
    * @return result or {@code null}
    * @throws QueryException query exception
    */
-  final B64 bit(final Bit op, final QueryContext qc) throws QueryException {
+  final Item bit(final Bit op, final QueryContext qc) throws QueryException {
     final B64 b1 = toB64(exprs[0], qc, true);
     final B64 b2 = toB64(exprs[1], qc, true);
-    if(b1 == null || b2 == null) return null;
+    if(b1 == null || b2 == null) return Empty.VALUE;
 
     final byte[] bytes1 = b1.binary(info);
     final byte[] bytes2 = b2.binary(info);
@@ -110,11 +111,11 @@ abstract class BinFn extends StandardFunc {
    * @return result or {@code null}
    * @throws QueryException query exception
    */
-  final B64 pad(final QueryContext qc, final boolean left) throws QueryException {
+  final Item pad(final QueryContext qc, final boolean left) throws QueryException {
     final B64 b64 = toB64(exprs[0], qc, true);
     final long size = toLong(exprs[1], qc);
     final long octet = exprs.length > 2 ? toLong(exprs[2], qc) : 0;
-    if(b64 == null) return null;
+    if(b64 == null) return Empty.VALUE;
 
     final byte[] bytes = b64.binary(info);
     final int bl = bytes.length;
@@ -204,6 +205,6 @@ abstract class BinFn extends StandardFunc {
    */
   final byte[] token(final int offset, final QueryContext qc) throws QueryException {
     final Item item = exprs[offset].atomItem(qc, info);
-    return item == null ? null : toToken(item);
+    return item == Empty.VALUE ? null : toToken(item);
   }
 }

@@ -29,7 +29,7 @@ public class FnAvg extends FnSum {
     }
     final Iter iter = expr.atomIter(qc, info);
     final Item item = iter.next();
-    return item == null ? null : sum(iter, item, true, qc);
+    return item == null ? Empty.VALUE : sum(iter, item, true, qc);
   }
 
   @Override
@@ -68,11 +68,11 @@ public class FnAvg extends FnSum {
   /**
    * Compute result from range value.
    * @param value sequence
-   * @return result, or {@code null} if sequence is empty
+   * @return result, or {@link Empty#VALUE} if sequence is empty
    * @throws QueryException query exception
    */
   private Item range(final Value value) throws QueryException {
-    if(value.isEmpty()) return null;
+    if(value.isEmpty()) return Empty.VALUE;
     final long min = value.itemAt(0).itr(info), max = value.itemAt(value.size() - 1).itr(info);
     final BigDecimal sum = BigDecimal.valueOf(min).add(BigDecimal.valueOf(max));
     return Dec.get(sum.divide(BigDecimal.valueOf(2), MathContext.DECIMAL64));

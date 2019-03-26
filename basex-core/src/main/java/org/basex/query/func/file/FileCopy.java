@@ -7,6 +7,7 @@ import java.nio.file.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -17,18 +18,18 @@ import org.basex.query.value.item.*;
 public class FileCopy extends FileFn {
   @Override
   public Item item(final QueryContext qc) throws IOException, QueryException {
-    return relocate(true, qc);
+    relocate(true, qc);
+    return Empty.VALUE;
   }
 
   /**
    * Transfers a file path, given a source and a target.
    * @param copy copy flag (no move)
    * @param qc query context
-   * @return {@code null}
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  final synchronized Item relocate(final boolean copy, final QueryContext qc)
+  final synchronized void relocate(final boolean copy, final QueryContext qc)
       throws QueryException, IOException {
 
     final Path source = toPath(0, qc);
@@ -50,7 +51,6 @@ public class FileCopy extends FileFn {
 
     // ignore operations on identical, canonical source and target path
     relocate(src, trg, copy);
-    return null;
   }
 
   /**

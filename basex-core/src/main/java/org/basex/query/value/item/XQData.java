@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -54,7 +55,7 @@ public abstract class XQData extends FItem {
   public final Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
     final Item key = args[0].atomItem(qc, ii);
-    if(key == null) throw EMPTYFOUND.get(ii);
+    if(key == Empty.VALUE) throw EMPTYFOUND.get(ii);
     return get(key, ii);
   }
 

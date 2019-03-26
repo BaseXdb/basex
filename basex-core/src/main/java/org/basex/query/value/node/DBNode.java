@@ -460,7 +460,7 @@ public class DBNode extends ANode {
     switch((NodeType) type) {
       case ATT:
       case PI:
-        tb.add(name()).add(" {\"").add(Token.chop(string(), 32)).add("\"}");
+        tb.add(name()).add(" {").add(toQuotedToken(string())).add('}');
         break;
       case ELM:
         tb.add(name()).add(" {");
@@ -468,10 +468,10 @@ public class DBNode extends ANode {
         tb.add('}');
         break;
       case DOC:
-        tb.add("{\"").add(data.text(pre, true)).add("\"}");
+        tb.add('{').add(toQuotedToken(data.text(pre, true))).add('}');
         break;
       default:
-        tb.add("{\"").add(Token.chop(string(), 32)).add("\"}");
+        tb.add('{').add(toQuotedToken(string())).add('}');
         break;
     }
     return tb.toString();

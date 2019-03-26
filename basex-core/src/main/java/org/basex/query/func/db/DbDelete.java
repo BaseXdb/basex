@@ -9,6 +9,7 @@ import org.basex.query.up.*;
 import org.basex.query.up.primitives.db.*;
 import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -37,6 +38,6 @@ public final class DbDelete extends DbAccess {
       if(bin == null) throw DB_PATH_X.get(info, path);
       updates.add(new DBDelete(data, path, info), qc);
     }
-    return null;
+    return Empty.VALUE;
   }
 }

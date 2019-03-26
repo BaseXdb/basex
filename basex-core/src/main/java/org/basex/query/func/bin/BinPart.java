@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -18,7 +19,7 @@ public final class BinPart extends BinFn {
     final B64 b64 = toB64(exprs[0], qc, true);
     final Long off = toLong(exprs[1], qc);
     final Long len = exprs.length > 2 ? toLong(exprs[2], qc) : null;
-    if(b64 == null) return null;
+    if(b64 == null) return Empty.VALUE;
 
     final byte[] bytes = b64.binary(info);
     final int[] bounds = bounds(off, len, bytes.length);

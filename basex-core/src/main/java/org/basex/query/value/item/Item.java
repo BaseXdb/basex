@@ -39,7 +39,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final BasicIter<Item> iter() {
+  public BasicIter<Item> iter() {
     return new BasicIter<Item>(1) {
       @Override
       public Item get(final long i) {
@@ -72,7 +72,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final Item ebv(final QueryContext qc, final InputInfo ii) {
+  public Item ebv(final QueryContext qc, final InputInfo ii) {
     return this;
   }
 
@@ -83,7 +83,7 @@ public abstract class Item extends Value {
 
   /**
    * Returns a string representation of the value.
-   * @param ii input info, use {@code null} if none is available
+   * @param ii input info (can be {@code null})
    * @return string value
    * @throws QueryException if the item cannot be atomized (caused by function or streaming items)
    */
@@ -91,7 +91,7 @@ public abstract class Item extends Value {
 
   /**
    * Returns a boolean representation of the value.
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return boolean value
    * @throws QueryException query exception
    */
@@ -101,7 +101,7 @@ public abstract class Item extends Value {
 
   /**
    * Returns a decimal representation of the value.
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return decimal value
    * @throws QueryException query exception
    */
@@ -111,7 +111,7 @@ public abstract class Item extends Value {
 
   /**
    * Returns an integer (long) representation of the value.
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return long value
    * @throws QueryException query exception
    */
@@ -121,7 +121,7 @@ public abstract class Item extends Value {
 
   /**
    * Returns a float representation of the value.
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return float value
    * @throws QueryException query exception
    */
@@ -131,7 +131,7 @@ public abstract class Item extends Value {
 
   /**
    * Returns a double representation of the value.
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return double value
    * @throws QueryException query exception
    */
@@ -166,7 +166,7 @@ public abstract class Item extends Value {
    * @param item item to be compared
    * @param coll collation (can be {@code null})
    * @param sc static context; required for comparing items of type xs:QName
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
@@ -181,7 +181,7 @@ public abstract class Item extends Value {
    * </ul>
    * @param item item to be compared
    * @param coll collation (can be {@code null})
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
@@ -194,7 +194,7 @@ public abstract class Item extends Value {
   /**
    * Compares the items for equality.
    * @param item item to be compared
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
@@ -207,7 +207,7 @@ public abstract class Item extends Value {
    * This function is overwritten by the corresponding implementations.
    * @param item item to be compared
    * @param coll collation (can be {@code null})
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return difference
    * @throws QueryException query exception
    */
@@ -219,7 +219,7 @@ public abstract class Item extends Value {
 
   /**
    * Returns an input stream.
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return input stream
    * @throws QueryException query exception
    */
@@ -228,27 +228,27 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final Value subSequence(final long start, final long length, final QueryContext qc) {
+  public Value subSequence(final long start, final long length, final QueryContext qc) {
     return length == 1 ? this : Empty.VALUE;
   }
 
-  // Overwritten by Lazy, Map and Array.
+  // Overwritten by Lazy, XQMap and XQArray.
   @Override
   public void cache(final boolean lazy, final InputInfo ii) throws QueryException { }
 
-  // Overwritten by Array, FItem and ANode
+  // Overwritten by XQArray, FuncItem and ANode
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     return this;
   }
 
-  // Overwritten by Array, FItem and ANode
+  // Overwritten by XQArray, FuncItem and ANode
   @Override
   public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
     return this;
   }
 
-  // Overwritten by Array
+  // Overwritten by XQArray
   @Override
   public long atomSize() {
     return 1;
@@ -266,12 +266,12 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final SeqType seqType() {
+  public SeqType seqType() {
     return type.seqType();
   }
 
   @Override
-  public final long size() {
+  public long size() {
     return 1;
   }
 
@@ -351,37 +351,26 @@ public abstract class Item extends Value {
   }
 
   /**
-   * Returns a string representation of the specified value.
+   * Returns a chopped and quoted token representation of the specified value.
    * @param value value
-   * @return string
+   * @return token
    */
-  public static String toString(final byte[] value) {
-    return toString(value, true, true);
+  public static byte[] toQuotedToken(final byte[] value) {
+    return toToken(value, true, true);
   }
 
   /**
-   * Returns a string representation of the specified value.
+   * Returns a chopped token representation of the specified value.
    * @param value value
    * @param quotes wrap with quotes
    * @param limit limit output
-   * @return string
-   */
-  public static String toString(final byte[] value, final boolean quotes, final boolean limit) {
-    return Token.string(toToken(value, quotes, limit));
-  }
-
-  /**
-   * Returns a string representation of the specified value.
-   * @param value value
-   * @param quotes wrap with quotes
-   * @param limit limit output
-   * @return string
+   * @return token
    */
   public static byte[] toToken(final byte[] value, final boolean quotes, final boolean limit) {
     final TokenBuilder tb = new TokenBuilder();
     if(quotes) tb.add('"');
     for(final byte v : value) {
-      if(limit && tb.size() > 255) {
+      if(limit && tb.size() > 127) {
         tb.add(DOTS);
         break;
       }

@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -19,7 +20,7 @@ public final class FnPath extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     ANode node = toEmptyNode(ctxArg(0, qc), qc);
-    if(node == null) return null;
+    if(node == null) return Empty.VALUE;
 
     final TokenList tl = new TokenList();
     while(node.parent() != null) {

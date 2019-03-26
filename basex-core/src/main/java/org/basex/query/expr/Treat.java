@@ -79,9 +79,9 @@ public final class Treat extends Single {
     final SeqType st = seqType();
     final Value value = expr.value(qc);
 
-    final long len = value.size();
+    final long size = value.size();
     // input is empty
-    if(len == 0) {
+    if(size == 0) {
       if(st.mayBeEmpty()) return value;
       throw NOTREAT_X_X_X.get(info, Empty.VALUE.seqType(), st, Empty.VALUE);
     }
@@ -89,13 +89,13 @@ public final class Treat extends Single {
     if(st.zero()) throw NOTREAT_X_X_X.get(info, value.type, st, value);
 
     if(st.zeroOrOne()) {
-      if(len > 1) throw NOTREAT_X_X_X.get(info, value.seqType(), st, value);
+      if(size > 1) throw NOTREAT_X_X_X.get(info, value.seqType(), st, value);
       final Item item = value.itemAt(0);
       if(!item.type.instanceOf(st.type)) throw NOTREAT_X_X_X.get(info, item.type, st, item);
       return item;
     }
 
-    for(long i = 0; i < len; i++) {
+    for(long i = 0; i < size; i++) {
       qc.checkStop();
       final Item item = value.itemAt(i);
       if(!item.type.instanceOf(st.type)) throw NOTREAT_X_X_X.get(info, item.type, st, item);

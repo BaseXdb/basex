@@ -8,6 +8,7 @@ import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -91,13 +92,13 @@ public final class Pos extends Arr {
     ctxValue(qc);
 
     final Item item1 = exprs[0].atomItem(qc, info);
-    if(item1 == null) return Bln.FALSE;
+    if(item1 == Empty.VALUE) return Bln.FALSE;
     final long pos = qc.focus.pos;
     final double start = toDouble(item1);
     if(eq()) return Bln.get(pos == start);
 
     final Item item2 = exprs[1].atomItem(qc, info);
-    if(item2 == null) return Bln.FALSE;
+    if(item2 == Empty.VALUE) return Bln.FALSE;
     final double end = toDouble(item2);
     return Bln.get(pos >= start && pos <= end);
   }

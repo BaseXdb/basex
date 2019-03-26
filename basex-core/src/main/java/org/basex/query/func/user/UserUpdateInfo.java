@@ -8,6 +8,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -29,7 +30,7 @@ public final class UserUpdateInfo extends UserFn {
     if(!T_INFO.eq(node)) throw ELM_X_X.get(info, Q_INFO.prefixId(), node);
 
     qc.updates().add(new UpdateInfo(node.materialize(qc, true), qc, info), qc);
-    return null;
+    return Empty.VALUE;
   }
 
   /** Update primitive. */

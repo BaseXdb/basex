@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -22,13 +23,13 @@ public class FnRound extends StandardFunc {
    * Rounds values.
    * @param qc query context
    * @param even half-to-even flag
-   * @return number or {@code null}
+   * @return number or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
-  final ANum round(final QueryContext qc, final boolean even) throws QueryException {
+  final Item round(final QueryContext qc, final boolean even) throws QueryException {
     final ANum num = toNumber(exprs[0], qc);
     final long p = exprs.length == 1 ? 0 : Math.max(Integer.MIN_VALUE, toLong(exprs[1], qc));
-    return num == null ? null : p > Integer.MAX_VALUE ? num : num.round((int) p, even);
+    return num == null ? Empty.VALUE : p > Integer.MAX_VALUE ? num : num.round((int) p, even);
   }
 
   @Override

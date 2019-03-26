@@ -4,6 +4,7 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.db.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -20,6 +21,6 @@ public final class DbOptimize extends DbNew {
     final boolean all = exprs.length > 1 && toBoolean(exprs[1], qc);
     final Options opts = toOptions(2, new Options(), qc);
     qc.updates().add(new DBOptimize(data, all, opts, qc, info), qc);
-    return null;
+    return Empty.VALUE;
   }
 }

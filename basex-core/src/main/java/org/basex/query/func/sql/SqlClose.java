@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -24,6 +25,6 @@ public final class SqlClose extends SqlFn {
     } catch(final Exception ex) {
       throw SQL_ERROR_X.get(info, ex);
     }
-    return null;
+    return Empty.VALUE;
   }
 }

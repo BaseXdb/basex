@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -23,6 +24,6 @@ public final class FnNamespaceUriForPrefix extends StandardFunc {
     if(eq(pref, XML)) return Uri.uri(XML_URI, false);
     final Atts at = an.nsScope(sc);
     final byte[] s = at.value(pref);
-    return s == null || s.length == 0 ? null : Uri.uri(s, false);
+    return s == null || s.length == 0 ? Empty.VALUE : Uri.uri(s, false);
   }
 }
