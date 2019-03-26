@@ -137,7 +137,7 @@ public abstract class Filter extends Preds {
         if(rt instanceof Value) {
           // value: replace with subsequence
           final long size = pos.min - 1, len = Math.min(pos.max, rt.size()) - size;
-          exp = len <= 0 ? Empty.SEQ : ((Value) rt).subSequence(size, len, cc.qc);
+          exp = len <= 0 ? Empty.VALUE : ((Value) rt).subSequence(size, len, cc.qc);
         } else if(pos.min == pos.max) {
           // expr[pos] -> util:item(expr, pos)
           exp = pos.min == 1 ? cc.function(Function.HEAD, info, rt) :

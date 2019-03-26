@@ -239,7 +239,7 @@ public final class RestXqFunction extends WebFunction {
     // bind cookie parameters
     final Cookie[] ck = conn.req.getCookies();
     for(final WebParam rxp : cookieParams) {
-      Value value = Empty.SEQ;
+      Value value = Empty.VALUE;
       if(ck != null) {
         for(final Cookie c : ck) {
           if(rxp.name.equals(c.getName())) value = Str.get(c.getValue());

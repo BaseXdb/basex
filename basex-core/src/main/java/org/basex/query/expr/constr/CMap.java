@@ -61,9 +61,8 @@ public final class CMap extends Arr {
     XQMap map = XQMap.EMPTY;
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
-      final Value key = exprs[e].atomValue(qc, info);
-      if(!(key instanceof Item)) throw SEQFOUND_X.get(info, key);
-      final Item k = (Item) key;
+      final Item k = exprs[e].atomItem(qc, info);
+      if(k == null) throw EMPTYFOUND.get(info);
       final Value v = exprs[e + 1].value(qc);
       if(map.contains(k, info)) throw MAPDUPLKEY_X_X_X.get(info, k, map.get(k, info), v);
       map = map.put(k, v, info);

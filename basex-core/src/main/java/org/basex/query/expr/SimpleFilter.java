@@ -38,7 +38,7 @@ final class SimpleFilter extends CachedFilter {
         if(pred.bool(info)) return value;
       }
     }
-    return Empty.SEQ;
+    return Empty.VALUE;
   }
 
   @Override

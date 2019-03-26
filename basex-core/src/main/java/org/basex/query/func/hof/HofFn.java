@@ -27,8 +27,8 @@ abstract class HofFn extends StandardFunc {
     final FItem lt = checkArity(exprs[pos], 2, qc);
     return (a, b) -> {
       try {
-        return toBoolean(lt.invokeItem(qc, info, a == null ? Empty.SEQ : a,
-            b == null ? Empty.SEQ : b)) ? -1 : 1;
+        return toBoolean(lt.invokeItem(qc, info, a == null ? Empty.VALUE : a,
+            b == null ? Empty.VALUE : b)) ? -1 : 1;
       } catch(final QueryException qe) {
         throw new QueryRTException(qe);
       }

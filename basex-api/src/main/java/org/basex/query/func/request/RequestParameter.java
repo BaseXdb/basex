@@ -25,7 +25,7 @@ public final class RequestParameter extends RequestFn {
       final Value query = hp.query().get(name);
       final Value form = hp.form(qc.context.options).get(name);
       if(query == null && form == null)
-        return exprs.length == 1 ? Empty.SEQ : exprs[1].value(qc);
+        return exprs.length == 1 ? Empty.VALUE : exprs[1].value(qc);
       if(query == null) return form;
       if(form == null) return query;
       return ValueBuilder.concat(query, form, qc);

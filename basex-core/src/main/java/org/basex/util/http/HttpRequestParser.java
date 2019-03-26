@@ -161,7 +161,7 @@ public final class HttpRequestParser {
       if(payload == null) break;
       // content is set from <http:body/> children or from $bodies parameter
       final Item body = bodies.next();
-      parseBody(payload, body == null ? Empty.SEQ : body, part.bodyAtts, part.bodyContents);
+      parseBody(payload, body == null ? Empty.VALUE : body, part.bodyAtts, part.bodyContents);
       parts.add(part);
     }
   }

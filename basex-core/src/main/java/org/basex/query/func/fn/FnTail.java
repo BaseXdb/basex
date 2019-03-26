@@ -60,7 +60,7 @@ public final class FnTail extends StandardFunc {
     // return empty sequence if value has 0 or 1 items
     final Value value = exprs[0].value(qc);
     final long size = value.size();
-    return size <= 1 ? Empty.SEQ : value.subSequence(1, size - 1, qc);
+    return size <= 1 ? Empty.VALUE : value.subSequence(1, size - 1, qc);
   }
 
   @Override
@@ -72,7 +72,7 @@ public final class FnTail extends StandardFunc {
     final long size = expr.size();
     final SeqType st = expr.seqType();
     // zero or one result: return empty sequence
-    if(size == 0 || size == 1 || st.zeroOrOne()) return Empty.SEQ;
+    if(size == 0 || size == 1 || st.zeroOrOne()) return Empty.VALUE;
     // two results: return last item
     if(size == 2) return cc.function(Function._UTIL_LAST, info, expr);
 

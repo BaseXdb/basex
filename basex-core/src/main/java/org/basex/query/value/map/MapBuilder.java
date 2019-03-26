@@ -46,7 +46,7 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public MapBuilder put(final String key, final String value) throws QueryException {
-    return put(Str.get(key), value != null ? Str.get(value) : Empty.SEQ);
+    return put(Str.get(key), value != null ? Str.get(value) : Empty.VALUE);
   }
 
   /**

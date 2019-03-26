@@ -51,9 +51,9 @@ public final class Rename extends Update {
     if(item.type == NodeType.ELM) {
       ex = new CElem(sc, info, exprs[1], null);
     } else if(item.type == NodeType.ATT) {
-      ex = new CAttr(sc, info, false, exprs[1], Empty.SEQ);
+      ex = new CAttr(sc, info, false, exprs[1], Empty.VALUE);
     } else if(item.type == NodeType.PI) {
-      ex = new CPI(sc, info, exprs[1], Empty.SEQ);
+      ex = new CPI(sc, info, exprs[1], Empty.VALUE);
     } else {
       throw UPWRTRGTYP_X.get(info, item);
     }

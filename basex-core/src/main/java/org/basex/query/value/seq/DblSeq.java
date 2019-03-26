@@ -59,8 +59,8 @@ public final class DblSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final double[] values) {
-    return values.length == 0 ? Empty.SEQ : values.length == 1 ? Dbl.get(values[0]) :
-      new DblSeq(values);
+    final int vl = values.length;
+    return vl == 0 ? Empty.VALUE : vl == 1 ? Dbl.get(values[0]) : new DblSeq(values);
   }
 
   /**

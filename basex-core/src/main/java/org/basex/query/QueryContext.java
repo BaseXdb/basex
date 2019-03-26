@@ -625,7 +625,7 @@ public final class QueryContext extends Job implements Closeable {
       // all results processed: return compact node sequence
       final int ps = pres.size();
       if(item == null || ps == mx) {
-        return ps == 0 ? Empty.SEQ : new DBNodes(data, pres.finish()).ftpos(ftPosData);
+        return ps == 0 ? Empty.VALUE : new DBNodes(data, pres.finish()).ftpos(ftPosData);
       }
 
       // otherwise, add nodes to standard iterator
@@ -700,7 +700,7 @@ public final class QueryContext extends Job implements Closeable {
     }
 
     // test for empty sequence
-    if(type.equals(QueryText.EMPTY_SEQUENCE + "()")) return Empty.SEQ;
+    if(type.equals(QueryText.EMPTY_SEQUENCE + "()")) return Empty.VALUE;
 
     // convert to the specified type
     // [LW] type should be parsed properly

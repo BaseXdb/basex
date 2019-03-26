@@ -38,7 +38,7 @@ public final class MapFind extends StandardFunc {
       if(item instanceof XQMap) {
         final XQMap map = (XQMap) item;
         final Value value = map.get(key, info);
-        if(value != Empty.SEQ) builder.append(value);
+        if(value != Empty.VALUE) builder.append(value);
         for(final Item it : map.keys()) {
           find(map.get(it, info).iter(), key, builder, qc);
         }

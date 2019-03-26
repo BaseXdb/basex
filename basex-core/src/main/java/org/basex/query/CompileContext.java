@@ -201,7 +201,7 @@ public final class CompileContext {
    * @return optimized expression
    */
   private Expr replaceWith(final Expr expr, final Expr result, final boolean refine) {
-    final Expr res = result == null ? Empty.SEQ : result;
+    final Expr res = result == null ? Empty.VALUE : result;
     if(res != expr) {
       final Supplier<String> f  = () -> {
         final TokenBuilder tb = new TokenBuilder();
@@ -227,7 +227,7 @@ public final class CompileContext {
             if(st != null) re.exprType.assign(st);
           }
         }
-      } else if(res != Empty.SEQ && refine) {
+      } else if(res != Empty.VALUE && refine) {
         // refine type. required because original type might have got lost in new sequence
         if(res instanceof Seq) {
           final Seq seq = (Seq) res;

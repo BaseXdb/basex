@@ -51,7 +51,7 @@ public final class UtilOr extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     // empty sequence: return default
     final Expr items = exprs[0], dflt = exprs[1];
-    if(items == Empty.SEQ) return dflt;
+    if(items == Empty.VALUE) return dflt;
 
     // at least one item: return items
     final SeqType st = items.seqType();

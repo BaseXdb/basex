@@ -109,7 +109,7 @@ public final class SingletonSeq extends Seq {
     if(count == 1) return value;
     // zero results: return empty sequence
     final long vs = value.size(), size = vs * count;
-    if(size == 0) return Empty.SEQ;
+    if(size == 0) return Empty.VALUE;
 
     // if all items are equal, reduce value to single item
     Value val = value;

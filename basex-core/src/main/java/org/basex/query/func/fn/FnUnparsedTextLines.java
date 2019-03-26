@@ -29,7 +29,7 @@ public final class FnUnparsedTextLines extends Parse {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Item item = unparsedText(qc, false, true);
-    if(item == null) return Empty.SEQ;
+    if(item == null) return Empty.VALUE;
 
     try(NewlineInput ni = new NewlineInput(item.string(info))) {
       final TokenList tl = new TokenList();

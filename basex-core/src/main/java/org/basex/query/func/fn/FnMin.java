@@ -109,12 +109,14 @@ public class FnMin extends StandardFunc {
     if(expr instanceof Value && exprs.length < 2) {
       Item item = null;
       final Value value = (Value) expr;
+      final long size = value.size();
       if(value instanceof RangeSeq) {
         final RangeSeq seq = (RangeSeq) value;
-        item = seq.itemAt((cmp == OpV.GT ^ seq.asc) ? seq.size() - 1 : 0);
-      }
-      if(expr instanceof SingletonSeq || expr instanceof Item) {
-        item = value.itemAt(cmp == OpV.GT ? 0 : expr.size() - 1);
+        item = seq.itemAt((cmp == OpV.GT ^ seq.asc) ? size - 1 : 0);
+      } else if(value instanceof SingletonSeq) {
+        item = value.itemAt(cmp == OpV.GT ? 0 : size - 1);
+      } else if(value instanceof Item) {
+        item = (Item) value;
       }
       if(item != null) {
         final Type type = item.seqType().type;

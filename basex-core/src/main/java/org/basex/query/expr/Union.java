@@ -36,7 +36,7 @@ public final class Union extends Set {
 
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
-      if(expr == Empty.SEQ) {
+      if(expr == Empty.VALUE) {
         // remove empty operands
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else {
@@ -44,7 +44,7 @@ public final class Union extends Set {
       }
     }
     // no expressions: return empty sequence
-    if(list.isEmpty()) return Empty.SEQ;
+    if(list.isEmpty()) return Empty.VALUE;
     // ensure that results are always sorted
     if(list.size() == 1 && iterable) return list.get(0);
     // replace expressions with optimized list

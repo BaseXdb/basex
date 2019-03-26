@@ -69,7 +69,7 @@ public final class ValueBuilder {
    * @return the value
    */
   public static Value value(final Item[] items, final int size, final Type type) {
-    return size == 0 ? Empty.SEQ : size == 1 ? items[0] : TreeSeqBuilder.value(items, size, type);
+    return size == 0 ? Empty.VALUE : size == 1 ? items[0] : TreeSeqBuilder.value(items, size, type);
   }
 
   /**
@@ -160,7 +160,7 @@ public final class ValueBuilder {
     final Value first = firstValue;
     if(first != null) return first;
     final TreeSeqBuilder tree = builder;
-    return tree != null ? tree.seq(type) : Empty.SEQ;
+    return tree != null ? tree.seq(type) : Empty.VALUE;
   }
 
   @Override

@@ -36,7 +36,7 @@ public final class Except extends Set {
 
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
-      if(expr == Empty.SEQ) {
+      if(expr == Empty.VALUE) {
         // remove empty operands (return empty sequence if first value is empty)
         if(list.isEmpty()) return cc.emptySeq(this);
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);

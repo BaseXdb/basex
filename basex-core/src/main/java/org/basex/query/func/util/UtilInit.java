@@ -77,7 +77,7 @@ public final class UtilInit extends StandardFunc {
     if(expr instanceof Value) return value(cc.qc);
 
     final SeqType st = expr.seqType();
-    if(st.zeroOrOne()) return Empty.SEQ;
+    if(st.zeroOrOne()) return Empty.VALUE;
 
     final long size = expr.size();
     if(size != -1) {

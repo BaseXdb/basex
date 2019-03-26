@@ -16,7 +16,7 @@ public final class SessionGet extends SessionFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value value = session(qc).get(toToken(exprs[0], qc),
-        exprs.length == 1 ? Empty.SEQ : exprs[1].value(qc));
+        exprs.length == 1 ? Empty.VALUE : exprs[1].value(qc));
     if(value == null) throw SESSION_GET.get(info);
     return value;
   }

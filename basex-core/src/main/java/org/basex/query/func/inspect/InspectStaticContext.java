@@ -52,9 +52,9 @@ public final class InspectStaticContext extends StandardFunc {
         }
         return map;
       case ELEMENT_NAMESPACE:
-        return sctx.elemNS == null ? Empty.SEQ : Uri.uri(sctx.elemNS);
+        return sctx.elemNS == null ? Empty.VALUE : Uri.uri(sctx.elemNS);
       case FUNCTION_NAMESPACE:
-        return sctx.funcNS == null ? Empty.SEQ : Uri.uri(sctx.funcNS);
+        return sctx.funcNS == null ? Empty.VALUE : Uri.uri(sctx.funcNS);
       case COLLATION:
         return Uri.uri(sctx.collation == null ? COLLATION_URI : sctx.collation.uri());
       case ORDERING:

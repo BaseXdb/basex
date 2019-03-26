@@ -43,7 +43,7 @@ public final class FnFoldLeft extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(expr1 == Empty.SEQ) return expr2;
+    if(expr1 == Empty.VALUE) return expr2;
 
     opt(this, cc, false, true);
 

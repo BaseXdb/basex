@@ -27,9 +27,9 @@ public final class XQueryForkJoin extends StandardFunc {
         throw ZEROFUNCS_X_X.get(info, func.type, func);
     }
     // no functions specified: return empty sequence
-    if(funcs.isEmpty()) return Empty.SEQ;
+    if(funcs.isEmpty()) return Empty.VALUE;
     // single function: invoke directly
-    if(funcs.size() == 1) return ((FItem) funcs.itemAt(0)).invokeValue(qc, info);
+    if(funcs instanceof Item) return ((FItem) funcs).invokeValue(qc, info);
 
     final ForkJoinPool pool = new ForkJoinPool();
     final XQueryTask task = new XQueryTask(funcs, qc, info);

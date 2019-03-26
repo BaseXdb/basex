@@ -80,7 +80,7 @@ public abstract class FuncCall extends Arr {
     if(max >= 0 && calls >= max) {
       // too many tail calls on the stack, eliminate them
       qc.registerTailCall(func, arg);
-      return item ? null : Empty.SEQ;
+      return item ? null : Empty.VALUE;
     }
 
     qc.tailCalls++;

@@ -97,8 +97,8 @@ public final class IntSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final long[] values, final Type type) {
-    return values.length == 0 ? Empty.SEQ : values.length == 1 ? Int.get(values[0], type) :
-      new IntSeq(values, type);
+    final int vl = values.length;
+    return vl == 0 ? Empty.VALUE : vl == 1 ? Int.get(values[0], type) : new IntSeq(values, type);
   }
 
   /**

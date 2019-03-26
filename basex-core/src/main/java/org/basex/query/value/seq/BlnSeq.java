@@ -59,8 +59,8 @@ public final class BlnSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final boolean[] values) {
-    return values.length == 0 ? Empty.SEQ : values.length == 1 ? Bln.get(values[0]) :
-      new BlnSeq(values);
+    final int vl = values.length;
+    return vl == 0 ? Empty.VALUE : vl == 1 ? Bln.get(values[0]) : new BlnSeq(values);
   }
 
   /**

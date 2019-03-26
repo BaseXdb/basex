@@ -50,18 +50,18 @@ public final class UtilItem extends StandardFunc {
     if(pos instanceof Value) {
       // retrieve (possibly invalid) position
       final long p = pos(cc.qc);
-      if(p < 0) return Empty.SEQ;
+      if(p < 0) return Empty.VALUE;
 
       // pre-evaluate single expression with static position
-      if(st.zeroOrOne()) return p == 0 ? expr : Empty.SEQ;
+      if(st.zeroOrOne()) return p == 0 ? expr : Empty.VALUE;
       // pre-evaluate values
       final long size = expr.size();
       if(size != -1) {
         if(expr instanceof Value) {
-          return p < size ? ((Value) expr).itemAt(p) : Empty.SEQ;
+          return p < size ? ((Value) expr).itemAt(p) : Empty.VALUE;
         }
         if(p + 1 == size) return cc.function(Function._UTIL_LAST, info, expr);
-        if(p + 1 > size) return Empty.SEQ;
+        if(p + 1 > size) return Empty.VALUE;
         if(Function.REVERSE.is(expr))
           return cc.function(Function._UTIL_ITEM, info, args(expr)[0], Int.get(size - p));
       }

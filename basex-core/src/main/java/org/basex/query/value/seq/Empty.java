@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class Empty extends Value {
   /** Single instance. */
-  public static final Empty SEQ = new Empty();
+  public static final Empty VALUE = new Empty();
   /** Empty iterator. */
   public static final BasicIter<Item> ITER = new BasicIter<Item>(0) {
     @Override
@@ -31,11 +31,11 @@ public final class Empty extends Value {
     }
     @Override
     public Value iterValue() {
-      return SEQ;
+      return VALUE;
     }
     @Override
     public Value value(final QueryContext qc) {
-      return SEQ;
+      return VALUE;
     }
   };
 
@@ -141,7 +141,7 @@ public final class Empty extends Value {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj == SEQ;
+    return obj == VALUE;
   }
 
   @Override

@@ -51,7 +51,7 @@ public abstract class ParseExpr extends Expr {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value value = item(qc, info);
-    return value == null ? Empty.SEQ : value;
+    return value == null ? Empty.VALUE : value;
   }
 
   @Override

@@ -50,7 +50,7 @@ public final class ValueAccess extends IndexAccess {
    */
   public ValueAccess(final InputInfo info, final TokenSet tokens, final IndexType type,
       final NameTest test, final IndexDb db) {
-    this(info, type, test, db, Empty.SEQ, tokens);
+    this(info, type, test, db, Empty.VALUE, tokens);
   }
 
   /**

@@ -150,7 +150,7 @@ public final class GFLWOR extends ParseExpr {
     final long size = size();
     if(size != -1 && !has(Flag.NDT, Flag.UPD)) {
       // return empty sequence if expression will yield no results
-      if(size == 0) return Empty.SEQ;
+      if(size == 0) return Empty.VALUE;
       // skip expression that relies on the context
       if(!varsInReturn.getAsBoolean()) {
         // single result: return expression of 'return' clause

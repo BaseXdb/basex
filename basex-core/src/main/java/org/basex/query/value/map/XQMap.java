@@ -71,7 +71,7 @@ public final class XQMap extends XQData {
   @Override
   public Value get(final Item key, final InputInfo ii) throws QueryException {
     final Value value = root.get(key.hash(ii), key, 0, ii);
-    return value == null ? Empty.SEQ : value;
+    return value == null ? Empty.VALUE : value;
   }
 
   /**

@@ -83,7 +83,7 @@ public final class For extends ForLet {
           }
           if(empty && iter != null && p == 0) {
             // expression yields no items, bind the empty sequence instead
-            qc.set(var, Empty.SEQ);
+            qc.set(var, Empty.VALUE);
             if(pos != null) qc.set(pos, Int.get(p));
             if(score != null) qc.set(score, Dbl.ZERO);
             iter = null;

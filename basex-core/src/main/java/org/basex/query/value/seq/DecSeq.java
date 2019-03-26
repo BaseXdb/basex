@@ -59,8 +59,8 @@ public final class DecSeq extends NativeSeq {
    * @return value
    */
   private static Value get(final BigDecimal[] values) {
-    return values.length == 0 ? Empty.SEQ : values.length == 1 ? Dec.get(values[0]) :
-      new DecSeq(values);
+    final int vl = values.length;
+    return vl == 0 ? Empty.VALUE : vl == 1 ? Dec.get(values[0]) : new DecSeq(values);
   }
 
   /**

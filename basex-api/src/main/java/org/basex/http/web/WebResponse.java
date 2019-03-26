@@ -77,8 +77,7 @@ public abstract class WebResponse {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  protected abstract void bind(Expr[] args, Object data)
-      throws QueryException, IOException;
+  protected abstract void bind(Expr[] args, Object data) throws QueryException, IOException;
 
   /**
    * Serializes the response.

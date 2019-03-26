@@ -107,7 +107,7 @@ public abstract class Seq extends Value {
 
   @Override
   public final Value subSequence(final long start, final long length, final QueryContext qc) {
-    return length == 0 ? Empty.SEQ :
+    return length == 0 ? Empty.VALUE :
            length == 1 ? itemAt(start) :
            length == size() ? this :
            subSeq(start, length, qc);

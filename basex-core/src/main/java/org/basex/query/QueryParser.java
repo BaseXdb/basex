@@ -928,7 +928,7 @@ public class QueryParser extends InputParser {
     wsCheck(CURLY1);
     final Expr ex = expr();
     wsCheck(CURLY2);
-    return ex == null ? Empty.SEQ : ex;
+    return ex == null ? Empty.VALUE : ex;
   }
 
   /**
@@ -1375,7 +1375,7 @@ public class QueryParser extends InputParser {
     wsCheck(PAREN2);
     if(!wsConsumeWs(THEN)) throw error(NOIF);
     final Expr thn = check(single(), NOIF);
-    final Expr els = wsConsumeWs(ELSE) ? check(single(), NOIF) : Empty.SEQ;
+    final Expr els = wsConsumeWs(ELSE) ? check(single(), NOIF) : Empty.VALUE;
     return new If(ii, iff, thn, els);
   }
 
@@ -2440,7 +2440,7 @@ public class QueryParser extends InputParser {
     check('(');
     final Expr ex = expr();
     wsCheck(PAREN2);
-    return ex == null ? Empty.SEQ : ex;
+    return ex == null ? Empty.VALUE : ex;
   }
 
   /**

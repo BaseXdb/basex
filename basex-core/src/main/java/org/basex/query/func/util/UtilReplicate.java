@@ -34,7 +34,7 @@ public final class UtilReplicate extends StandardFunc {
     long sz = -1, m = -1;
     if(mult instanceof Value) {
       m = toLong(mult, cc.qc);
-      if(m == 0) return Empty.SEQ;
+      if(m == 0) return Empty.VALUE;
       if(m == 1) return expr;
       sz = expr.size();
       if(sz != -1) sz *= m;

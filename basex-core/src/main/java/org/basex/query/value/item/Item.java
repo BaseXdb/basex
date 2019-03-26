@@ -229,7 +229,7 @@ public abstract class Item extends Value {
 
   @Override
   public final Value subSequence(final long start, final long length, final QueryContext qc) {
-    return length == 1 ? this : Empty.SEQ;
+    return length == 1 ? this : Empty.VALUE;
   }
 
   // Overwritten by Lazy, Map and Array.

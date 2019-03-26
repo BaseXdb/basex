@@ -33,7 +33,7 @@ public final class If extends Arr {
    * @param branch1 'then' branch
    */
   public If(final InputInfo info, final Expr cond, final Expr branch1) {
-    this(info, cond, branch1, Empty.SEQ);
+    this(info, cond, branch1, Empty.VALUE);
   }
 
   /**

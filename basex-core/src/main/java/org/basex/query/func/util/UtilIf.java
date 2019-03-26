@@ -21,6 +21,7 @@ public final class UtilIf extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    return new If(info, exprs[0], exprs[1], exprs.length == 2 ? Empty.SEQ : exprs[2]).optimize(cc);
+    return new If(info, exprs[0], exprs[1], exprs.length == 2 ? Empty.VALUE :
+      exprs[2]).optimize(cc);
   }
 }

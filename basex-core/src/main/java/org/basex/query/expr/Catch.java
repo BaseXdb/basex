@@ -132,7 +132,7 @@ public final class Catch extends Single {
     return new Value[] {
       qe.qname(),
       Str.get(qe.getLocalizedMessage()),
-      value == null ? Empty.SEQ : value,
+      value == null ? Empty.VALUE : value,
       Str.get(io),
       Int.get(qe.line()),
       Int.get(qe.column()),

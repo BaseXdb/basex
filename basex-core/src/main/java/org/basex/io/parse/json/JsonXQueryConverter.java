@@ -122,7 +122,7 @@ public final class JsonXQueryConverter extends JsonConverter {
 
   @Override
   public void nullLit() {
-    stack.push(Empty.SEQ);
+    stack.push(Empty.VALUE);
   }
 
   @Override

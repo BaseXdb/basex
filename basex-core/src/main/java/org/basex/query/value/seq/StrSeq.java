@@ -60,7 +60,7 @@ public final class StrSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final TokenList items) {
-    return items.isEmpty() ? Empty.SEQ : items.size() == 1 ? Str.get(items.get(0)) :
+    return items.isEmpty() ? Empty.VALUE : items.size() == 1 ? Str.get(items.get(0)) :
       new StrSeq(items.finish());
   }
 
@@ -70,8 +70,8 @@ public final class StrSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final byte[][] values) {
-    return values.length == 0 ? Empty.SEQ : values.length == 1 ? Str.get(values[0]) :
-      new StrSeq(values);
+    final int vl = values.length;
+    return vl == 0 ? Empty.VALUE : vl == 1 ? Str.get(values[0]) : new StrSeq(values);
   }
 
   /**

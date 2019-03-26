@@ -48,12 +48,12 @@ public final class List extends Arr {
     // remove empty sequences
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
-      if(expr != Empty.SEQ) list.add(expr);
+      if(expr != Empty.VALUE) list.add(expr);
     }
     final int ls = list.size();
     if(ls != exprs.length) {
-      if(ls < 2) return cc.replaceWith(this, ls == 0 ? Empty.SEQ : list.get(0));
-      cc.info(OPTREMOVE_X_X, Empty.SEQ, (Supplier<?>) this::description);
+      if(ls < 2) return cc.replaceWith(this, ls == 0 ? Empty.VALUE : list.get(0));
+      cc.info(OPTREMOVE_X_X, Empty.VALUE, (Supplier<?>) this::description);
       exprs = list.finish();
     }
 

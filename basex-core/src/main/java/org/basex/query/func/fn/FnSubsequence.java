@@ -77,7 +77,7 @@ public class FnSubsequence extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final SeqRange sr = range(qc);
-    if(sr == EMPTY) return Empty.SEQ;
+    if(sr == EMPTY) return Empty.VALUE;
 
     final Expr expr = exprs[0];
     if(sr == ALL) return expr.value(qc);
@@ -85,7 +85,7 @@ public class FnSubsequence extends StandardFunc {
 
     // take fast route if result size is known
     final long size = sr.adjust(iter.size());
-    if(sr.length == 0) return Empty.SEQ;
+    if(sr.length == 0) return Empty.VALUE;
 
     if(size != -1) {
       // return subsequence if iterator is value-based
@@ -175,7 +175,7 @@ public class FnSubsequence extends StandardFunc {
     final SeqRange sr = range(cc);
     if(sr != null) {
       // no results
-      if(sr == EMPTY) return Empty.SEQ;
+      if(sr == EMPTY) return Empty.VALUE;
       // all values?
       if(sr == ALL) return expr;
       // pre-evaluate value
@@ -196,7 +196,7 @@ public class FnSubsequence extends StandardFunc {
         sz = sr.length;
       } else if(st.zeroOrOne()) {
         // sr.length is always larger than 0 at this point
-        return sr.start == 0 ? expr : Empty.SEQ;
+        return sr.start == 0 ? expr : Empty.VALUE;
       }
 
       // rewrite nested function calls

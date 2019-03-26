@@ -58,7 +58,7 @@ public class FnSum extends StandardFunc {
       // sequence is empty: check if it also deterministic
       if(!expr1.has(Flag.NDT)) {
         if(expr2 == null) return Int.ZERO;
-        if(expr2 == Empty.SEQ) return expr1;
+        if(expr2 == Empty.VALUE) return expr1;
         if(st2.instanceOf(SeqType.ITR_O)) return expr2;
       }
     } else if(st1.oneOrMore() && !st1.mayBeArray()) {

@@ -55,7 +55,7 @@ abstract class ValidateFn extends StandardFunc {
    */
   protected final Empty check(final QueryContext qc) throws QueryException {
     final ArrayList<ErrorInfo> errors = errors(qc);
-    if(errors.isEmpty()) return Empty.SEQ;
+    if(errors.isEmpty()) return Empty.VALUE;
     throw VALIDATE_ERROR_X.get(info, errors.get(0).toString());
   }
 

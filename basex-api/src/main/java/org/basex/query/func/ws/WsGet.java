@@ -19,6 +19,6 @@ public final class WsGet extends WsFn {
     final String key = Token.string(toToken(exprs[1], qc));
 
     final Value value = client.atts.get(key);
-    return value != null ? value : exprs.length == 2 ? Empty.SEQ : exprs[2].value(qc);
+    return value != null ? value : exprs.length == 2 ? Empty.VALUE : exprs[2].value(qc);
   }
 }

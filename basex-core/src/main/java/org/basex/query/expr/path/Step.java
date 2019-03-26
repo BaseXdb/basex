@@ -100,7 +100,7 @@ public abstract class Step extends Preds {
       // check if test will never yield results
       if(!test.optimize(value)) {
         cc.info(OPTNAME_X, test);
-        return Empty.SEQ;
+        return Empty.VALUE;
       }
     }
 

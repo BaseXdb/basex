@@ -171,7 +171,7 @@ public abstract class Path extends ParseExpr {
     for(int s = 0; s < sl; s++) {
       // step is empty sequence. example: $doc/NON-EXISTING-STEP -> $doc/() -> ()
       final Expr step = steps[s];
-      if(step == Empty.SEQ) return cc.emptySeq(this);
+      if(step == Empty.VALUE) return cc.emptySeq(this);
       list.add(step);
       // step yields no results: ignore remaining steps
       // example: A/prof:void(.)/B -> A/prof:void(.)
@@ -634,7 +634,7 @@ public abstract class Path extends ParseExpr {
     final ArrayList<PathNode> nodes = pathNodes(cc);
     if(nodes != null && nodes.isEmpty()) {
       cc.info(QueryText.OPTPATH_X, path);
-      return Empty.SEQ;
+      return Empty.VALUE;
     }
 
     return path;
@@ -700,7 +700,7 @@ public abstract class Path extends ParseExpr {
           if(ii.costs.results() == 0) {
             // no results...
             cc.info(QueryText.OPTNORESULTS_X, ii.step);
-            return Empty.SEQ;
+            return Empty.VALUE;
           }
 
           if(index == null || index.costs.compareTo(ii.costs) > 0) {

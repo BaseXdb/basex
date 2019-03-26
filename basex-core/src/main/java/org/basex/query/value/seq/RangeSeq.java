@@ -43,7 +43,7 @@ public final class RangeSeq extends Seq {
    * @return resulting item or sequence
    */
   public static Value get(final long min, final long size, final boolean asc) {
-    return size < 1 ? Empty.SEQ : size == 1 ? Int.get(min) : new RangeSeq(min, size, asc);
+    return size < 1 ? Empty.VALUE : size == 1 ? Int.get(min) : new RangeSeq(min, size, asc);
   }
 
   /**

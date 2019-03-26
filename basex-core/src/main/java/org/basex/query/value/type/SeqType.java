@@ -320,7 +320,7 @@ public final class SeqType {
     final long vs = value.size();
     if(!occ.check(vs)) throw INVTYPE_X_X_X.get(ii, value.seqType(), this, value);
 
-    if(value.isEmpty()) return Empty.SEQ;
+    if(value.isEmpty()) return Empty.VALUE;
     if(value instanceof Item) return cast((Item) value, true, qc, sc, ii);
 
     final ValueBuilder vb = new ValueBuilder(qc);
@@ -376,7 +376,7 @@ public final class SeqType {
 
     final long size = value.size();
     if(!occ.check(size)) throw typeError(value, this, name, ii);
-    if(size == 0) return Empty.SEQ;
+    if(size == 0) return Empty.VALUE;
 
     ItemList items = null;
     for(long i = 0; i < size; i++) {

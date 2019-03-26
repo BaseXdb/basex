@@ -234,7 +234,7 @@ public class FnHttpTest extends HTTPTest {
         + "</http:body>" + "</http:request>";
     final DBNode dbNode = new DBNode(new IOContent(req));
     final HttpRequestParser rp = new HttpRequestParser(null);
-    final HttpRequest r = rp.parse(dbNode.children().next(), Empty.SEQ);
+    final HttpRequest r = rp.parse(dbNode.children().next(), Empty.VALUE);
 
     assertEquals(2, r.attributes.size());
     assertEquals(2, r.headers.size());
@@ -265,7 +265,7 @@ public class FnHttpTest extends HTTPTest {
 
     final DBNode dbNode1 = new DBNode(new IOContent(multiReq));
     final HttpRequestParser rp = new HttpRequestParser(null);
-    final HttpRequest r = rp.parse(dbNode1.children().next(), Empty.SEQ);
+    final HttpRequest r = rp.parse(dbNode1.children().next(), Empty.VALUE);
 
     assertEquals(2, r.attributes.size());
     assertEquals(2, r.headers.size());
@@ -394,7 +394,7 @@ public class FnHttpTest extends HTTPTest {
       final DBNode dbNode = new DBNode(new IOContent(query));
       try {
         final HttpRequestParser rp = new HttpRequestParser(null);
-        rp.parse(dbNode.children().next(), Empty.SEQ);
+        rp.parse(dbNode.children().next(), Empty.VALUE);
         error.append(name + ": Request did not fail.");
       } catch (final QueryException ex) {
         if(!ex.getMessage().contains(ErrType.HC.toString())) {

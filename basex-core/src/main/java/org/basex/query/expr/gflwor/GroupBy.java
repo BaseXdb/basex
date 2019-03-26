@@ -106,7 +106,7 @@ public final class GroupBy extends Clause {
         for(final GroupSpec spec : specs) {
           if(!spec.occluded) {
             final Item key = curr.key[p++];
-            qc.set(spec.var, key == null ? Empty.SEQ : key);
+            qc.set(spec.var, key == null ? Empty.VALUE : key);
           }
         }
         final int pl = post.length;
@@ -140,7 +140,7 @@ public final class GroupBy extends Clause {
               // This enables other non-collation specs to avoid the collision.
               hash = 31 * hash + (atom == null || spec.coll != null ? 0 : atom.hash(info));
             }
-            qc.set(spec.var, atom == null ? Empty.SEQ : atom);
+            qc.set(spec.var, atom == null ? Empty.VALUE : atom);
           }
 
           // find the group for this key

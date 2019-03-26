@@ -59,8 +59,8 @@ public final class FltSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final float[] values) {
-    return values.length == 0 ? Empty.SEQ : values.length == 1 ? Flt.get(values[0]) :
-      new FltSeq(values);
+    final int vl = values.length;
+    return vl == 0 ? Empty.VALUE : vl == 1 ? Flt.get(values[0]) : new FltSeq(values);
   }
 
   /**

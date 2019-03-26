@@ -91,7 +91,7 @@ public final class HttpPayload {
           ? new NewlineInput(in).encoding(type.parameters().get(CHARSET))
           : BufferInput.get(in)
         ).content();
-        Value value = Empty.SEQ;
+        Value value = Empty.VALUE;
         try {
           value = parse(pl, type);
         } catch(final QueryException ex) {
@@ -121,7 +121,7 @@ public final class HttpPayload {
    * @throws QueryException query exception
    */
   private Value parse(final byte[] payload, final MediaType type) throws QueryException {
-    if(payload.length == 0) return Empty.SEQ;
+    if(payload.length == 0) return Empty.VALUE;
     try {
       return value(new IOContent(payload), options, type);
     } catch(final IOException ex) {

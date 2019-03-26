@@ -91,7 +91,7 @@ public abstract class JavaCall extends Arr {
   public static Value toValue(final Object object, final QueryContext qc, final StaticContext sc)
       throws QueryException {
 
-    if(object == null) return Empty.SEQ;
+    if(object == null) return Empty.VALUE;
     if(object instanceof Value) return (Value) object;
     if(object instanceof Iter) return ((Iter) object).value(qc);
     // find XQuery mapping for specified type
@@ -111,7 +111,7 @@ public abstract class JavaCall extends Arr {
 
     // empty array
     final int s = Array.getLength(object);
-    if(s == 0) return Empty.SEQ;
+    if(s == 0) return Empty.VALUE;
     // string array
     if(object instanceof String[]) {
       final String[] r = (String[]) object;

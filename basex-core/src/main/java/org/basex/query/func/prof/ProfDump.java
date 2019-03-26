@@ -16,7 +16,7 @@ public final class ProfDump extends FnTrace {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     super.value(qc);
-    return Empty.SEQ;
+    return Empty.VALUE;
   }
 
   @Override

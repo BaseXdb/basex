@@ -135,7 +135,7 @@ public class DBNodeSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final int[] pres, final Data data, final Type type, final boolean all) {
-    return pres.length == 0 ? Empty.SEQ : pres.length == 1 ? new DBNode(data, pres[0]) :
+    return pres.length == 0 ? Empty.VALUE : pres.length == 1 ? new DBNode(data, pres[0]) :
       new DBNodeSeq(pres, data, type, all);
   }
 

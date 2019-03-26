@@ -44,7 +44,7 @@ public final class Treat extends Single {
     // input is empty
     if(item == null) {
       if(st.mayBeEmpty()) return Empty.ITER;
-      throw NOTREAT_X_X_X.get(info, Empty.SEQ.seqType(), st, Empty.SEQ);
+      throw NOTREAT_X_X_X.get(info, Empty.VALUE.seqType(), st, Empty.VALUE);
     }
     // treat as empty sequence
     if(st.zero()) throw NOTREAT_X_X_X.get(info, item.type, st, item);
@@ -83,7 +83,7 @@ public final class Treat extends Single {
     // input is empty
     if(len == 0) {
       if(st.mayBeEmpty()) return value;
-      throw NOTREAT_X_X_X.get(info, Empty.SEQ.seqType(), st, Empty.SEQ);
+      throw NOTREAT_X_X_X.get(info, Empty.VALUE.seqType(), st, Empty.VALUE);
     }
     // treat as empty sequence
     if(st.zero()) throw NOTREAT_X_X_X.get(info, value.type, st, value);

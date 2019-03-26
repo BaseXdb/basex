@@ -54,7 +54,7 @@ public final class XdmEmpty extends XdmValue {
 
   @Override
   public Value internal() {
-    return Empty.SEQ;
+    return Empty.VALUE;
   }
 
   @Override

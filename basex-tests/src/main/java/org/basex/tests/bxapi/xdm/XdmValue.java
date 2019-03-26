@@ -23,7 +23,8 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return result
    */
   public static XdmValue get(final Value val) {
-    return val instanceof Empty ? XdmEmpty.EMPTY : val instanceof Item ? XdmItem.get((Item) val) :
+    final long size = val.size();
+    return size == 0 ? XdmEmpty.EMPTY : size == 1 ? XdmItem.get((Item) val) :
       new XdmSequence((Seq) val);
   }
 

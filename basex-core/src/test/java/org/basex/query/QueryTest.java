@@ -88,7 +88,7 @@ public abstract class QueryTest extends SandboxTest {
    * @return node array
    */
   protected static Value empty() {
-    return Empty.SEQ;
+    return Empty.VALUE;
   }
 
   /**

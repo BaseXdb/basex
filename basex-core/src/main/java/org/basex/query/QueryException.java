@@ -30,7 +30,7 @@ public class QueryException extends Exception {
   /** Error QName. */
   private final QNm name;
   /** Error value. */
-  private Value value = Empty.SEQ;
+  private Value value = Empty.VALUE;
   /** Error reference ({@code null} for dynamic error messages). */
   private QueryError error;
   /** Code suggestions. */
