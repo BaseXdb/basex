@@ -320,8 +320,8 @@ public final class SeqType {
     final long vs = value.size();
     if(!occ.check(vs)) throw INVTYPE_X_X_X.get(ii, value.seqType(), this, value);
 
-    if(value.isEmpty()) return Empty.VALUE;
-    if(value instanceof Item) return cast((Item) value, true, qc, sc, ii);
+    if(vs == 0) return Empty.VALUE;
+    if(vs == 1) return cast((Item) value, true, qc, sc, ii);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     final BasicIter<?> iter = value.iter();

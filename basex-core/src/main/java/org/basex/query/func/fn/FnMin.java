@@ -115,7 +115,7 @@ public class FnMin extends StandardFunc {
         item = seq.itemAt((cmp == OpV.GT ^ seq.asc) ? size - 1 : 0);
       } else if(value instanceof SingletonSeq) {
         item = value.itemAt(cmp == OpV.GT ? 0 : size - 1);
-      } else if(value instanceof Item) {
+      } else if(value.isItem()) {
         item = (Item) value;
       }
       if(item != null) {

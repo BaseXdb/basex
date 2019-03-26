@@ -141,14 +141,10 @@ public abstract class Cmp extends Arr {
    */
   final Expr optCount(final OpV op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(!(Function.COUNT.is(expr1) && expr2 instanceof Item)) return this;
-
-    // evaluate argument
-    final Item item2 = (Item) expr2;
-    if(!item2.type.isNumberOrUntyped()) return this;
+    if(!(Function.COUNT.is(expr1) && expr2 instanceof ANum)) return this;
 
     // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)
-    final int type = check(op, item2);
+    final int type = check(op, (ANum) expr2);
     if(type >= 2) {
       final Function func = type == 2 ? Function.EXISTS : Function.EMPTY;
       return cc.function(func, info, ((Arr) expr1).exprs);
@@ -168,15 +164,11 @@ public abstract class Cmp extends Arr {
    */
   final Expr optStringLength(final OpV op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(!(Function.STRING_LENGTH.is(expr1) && expr2 instanceof Item)) return this;
-
-    // evaluate argument
-    final Item item2 = (Item) expr2;
-    if(!item2.type.isNumberOrUntyped()) return this;
+    if(!(Function.STRING_LENGTH.is(expr1) && expr2 instanceof ANum)) return this;
 
     // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)
     final Expr[] args = ((Arr) expr1).exprs;
-    final int type = check(op, item2);
+    final int type = check(op, (ANum) expr2);
     if(type >= 2) {
       final Function func = type == 2 ? Function.BOOLEAN : Function.NOT;
       return cc.function(func, info, cc.function(Function.STRING, info, args));
@@ -224,12 +216,11 @@ public abstract class Cmp extends Arr {
    *   <li>-1: none of them</li>
    * </ul>
    * @param op operator
-   * @param item input item
+   * @param num input number
    * @return comparison type
-   * @throws QueryException query exception
    */
-  private int check(final OpV op, final Item item) throws QueryException {
-    final double v = item.dbl(info);
+  private int check(final OpV op, final ANum num) {
+    final double v = num.dbl();
     // > (v<0), != (v<0), >= (v<=0), != integer(v)
     if((op == OpV.GT || op == OpV.NE) && v < 0 || op == OpV.GE && v <= 0 ||
        op == OpV.NE && v != (long) v) return 0;

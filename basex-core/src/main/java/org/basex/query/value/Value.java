@@ -79,6 +79,14 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
+   * Tests if this is an item.
+   * @return result of check
+   */
+  public final boolean isItem() {
+    return size() == 1;
+  }
+
+  /**
    * Returns a sub sequence of this value with the given start and length.
    * The following properties must hold:
    * <ul>

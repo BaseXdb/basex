@@ -151,8 +151,9 @@ public final class CmpR extends Single {
     // pre-evaluate ranges
     if(expr instanceof Range || expr instanceof RangeSeq) {
       final Value value = expr.value(qc);
-      if(value.isEmpty()) return Bln.FALSE;
-      if(value instanceof Item) return Bln.get(inRange(((Item) value).dbl(info)));
+      final long size = value.size();
+      if(size == 0) return Bln.FALSE;
+      if(size == 1) return Bln.get(inRange(((Item) value).dbl(info)));
       final long[] range = ((RangeSeq) value).range(false);
       return Bln.get(range[1] >= min && range[0] <= max);
     }

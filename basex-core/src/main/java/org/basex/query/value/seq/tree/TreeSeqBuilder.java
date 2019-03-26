@@ -129,7 +129,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
    */
   public TreeSeqBuilder add(final Value val, final QueryContext qc) {
     // shortcut for adding single items
-    if(val instanceof Item) return add((Item) val);
+    if(val.isItem()) return add((Item) val);
 
     if(!(val instanceof BigSeq)) {
       final BasicIter<?> iter = val.iter();

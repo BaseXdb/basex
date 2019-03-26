@@ -41,7 +41,7 @@ public final class ArrayFlatten extends ArrayFn {
                   if(item != null) return item;
                   if(!members.hasNext()) return null;
                   final Value value = members.next();
-                  if(value instanceof Item) {
+                  if(value.isItem()) {
                     iter = Empty.ITER;
                     return (Item) value;
                   }

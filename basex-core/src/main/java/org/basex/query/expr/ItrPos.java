@@ -3,9 +3,10 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.CmpV.OpV;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -74,28 +75,31 @@ public final class ItrPos extends Simple {
   /**
    * Tries to rewrite {@code fn:position() CMP number(s)} to this expression.
    * Returns an instance of this class, the original expression, or an optimized expression.
-   * @param pos position to be compared
+   * @param expr expression to be checked
    * @param op comparator
    * @param ii input info
    * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
-  public static Expr get(final Expr pos, final OpV op, final InputInfo ii) throws QueryException {
-    if(pos instanceof RangeSeq && op == OpV.EQ) {
-      final long[] range = ((RangeSeq) pos).range(false);
-      return get(range[0], range[1], ii);
-    } else if(pos instanceof Item) {
-      final Item item2 = (Item) pos;
-      final long p = item2.itr(ii);
-      final boolean exact = p == item2.dbl(ii);
-      switch(op) {
-        case EQ: return exact ? get(p, ii) : Bln.FALSE;
-        case GE: return get(exact ? p : p + 1, Long.MAX_VALUE, ii);
-        case GT: return get(p + 1, Long.MAX_VALUE, ii);
-        case LE: return get(1, p, ii);
-        case LT: return get(1, exact ? p - 1 : p, ii);
-        case NE: return exact ? p < 2 ? get(p + 1, Long.MAX_VALUE, ii) : null : Bln.TRUE;
-        default:
+  public static Expr get(final Expr expr, final OpV op, final InputInfo ii) throws QueryException {
+    if(expr instanceof Value) {
+      final Value value = (Value) expr;
+      if(value instanceof RangeSeq && op == OpV.EQ) {
+        final long[] range = ((RangeSeq) value).range(false);
+        return get(range[0], range[1], ii);
+      } else if(value.isItem()) {
+        final Item item = (Item) value;
+        final long p = item.itr(ii);
+        final boolean exact = p == item.dbl(ii);
+        switch(op) {
+          case EQ: return exact ? get(p, ii) : Bln.FALSE;
+          case GE: return get(exact ? p : p + 1, Long.MAX_VALUE, ii);
+          case GT: return get(p + 1, Long.MAX_VALUE, ii);
+          case LE: return get(1, p, ii);
+          case LT: return get(1, exact ? p - 1 : p, ii);
+          case NE: return exact ? p < 2 ? get(p + 1, Long.MAX_VALUE, ii) : null : Bln.TRUE;
+          default:
+        }
       }
     }
     return null;

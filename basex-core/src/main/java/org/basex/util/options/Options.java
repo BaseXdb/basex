@@ -379,8 +379,9 @@ public class Options implements Iterable<Option<?>> {
           if(!tb.isEmpty()) tb.add(',');
           tb.add(item.string(ii)).add('=');
           final Value vl = map.get(item, ii);
-          if(vl instanceof Item) tb.add(string(((Item) vl).string(ii)).replace(",", ",,"));
-          else throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.ITEM, vl.seqType(), vl);
+          if(!vl.isItem()) throw new BaseXException(
+              Text.OPT_EXPECT_X_X_X, AtomType.ITEM, vl.seqType(), vl);
+          tb.add(string(((Item) vl).string(ii)).replace(",", ",,"));
         }
         val = tb.finish();
       } else {
@@ -538,8 +539,8 @@ public class Options implements Iterable<Option<?>> {
         throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.STR, name.type, name);
 
       final Value value = map.get(name, ii);
-      if(!(value instanceof Item))
-        throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.ITEM, value.seqType(), value);
+      if(value.size() != 1)
+        throw new BaseXException(Text.OPT_EXPECT_X_X_X, SeqType.ITEM_O, value.seqType(), value);
 
       assign(name, (Item) value, error, ii);
     }

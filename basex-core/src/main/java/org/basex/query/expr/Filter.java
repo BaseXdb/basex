@@ -170,10 +170,9 @@ public abstract class Filter extends Preds {
           if(opV == OpV.LT || opV == OpV.NE && Function.LAST.is(ex)) {
             // expr[position() < last()] -> util:init(expr)
             exp = cc.function(Function._UTIL_INIT, info, rt);
-          } else if(opV == OpV.NE && ex instanceof Item) {
+          } else if(opV == OpV.NE && ex instanceof Int) {
             // expr[position() != INT] -> remove(expr, INT)
-            final long p = ((Item) ex).itr(info);
-            if(p == ((Item) ex).dbl(info)) exp = cc.function(Function.REMOVE, info, rt, ex);
+            exp = cc.function(Function.REMOVE, info, rt, ex);
           }
         }
       }

@@ -719,10 +719,10 @@ public final class QueryContext extends Job implements Closeable {
 
     // cast XDM values
     if(object instanceof Value) {
-      // cast single item
-      if(object instanceof Item) return tp.cast((Item) object, this, sc, null);
-      // cast sequence
       final Value vl = (Value) object;
+      // cast single item
+      if(vl.isItem()) return tp.cast((Item) object, this, sc, null);
+      // cast sequence
       final ValueBuilder vb = new ValueBuilder(this);
       final BasicIter<?> iter = vl.iter();
       for(Item item; (item = iter.next()) != null;) vb.add(tp.cast(item, this, sc, null));

@@ -22,14 +22,15 @@ public final class XQueryForkJoin extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value funcs = exprs[0].value(qc);
+    final long size = funcs.size();
+    if(size == 0) return Empty.VALUE;
+
     for(final Item func : funcs) {
       if(!(func instanceof FItem) || ((FItem) func).arity() != 0)
         throw ZEROFUNCS_X_X.get(info, func.type, func);
     }
-    // no functions specified: return empty sequence
-    if(funcs.isEmpty()) return Empty.VALUE;
     // single function: invoke directly
-    if(funcs instanceof Item) return ((FItem) funcs).invokeValue(qc, info);
+    if(size == 1) return ((FItem) funcs).invokeValue(qc, info);
 
     final ForkJoinPool pool = new ForkJoinPool();
     final XQueryTask task = new XQueryTask(funcs, qc, info);

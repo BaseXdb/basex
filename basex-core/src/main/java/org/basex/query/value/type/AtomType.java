@@ -1,8 +1,10 @@
 package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryError.normalize;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.Token.normalize;
 
 import java.math.*;
 import java.util.*;
@@ -12,6 +14,7 @@ import javax.xml.namespace.*;
 
 import org.basex.query.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -398,8 +401,9 @@ public enum AtomType implements Type {
     @Override
     public Uln cast(final Object value, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      final Item item = value instanceof Item ? (Item) value : Str.get(value.toString());
-      final BigDecimal v = checkNum(item, ii).dec(ii), i = v.setScale(0, RoundingMode.DOWN);
+
+      final Item item = checkNum(value, ii);
+      final BigDecimal v = item.dec(ii), i = v.setScale(0, RoundingMode.DOWN);
       // equals() used to also test fractional digits
       if(v.signum() < 0 || v.compareTo(Uln.MAXULN) > 0 ||
         item.type.isStringOrUntyped() && !v.equals(i)) throw castError(item, ii);
@@ -925,9 +929,7 @@ public enum AtomType implements Type {
   final long checkLong(final Object value, final long min, final long max, final InputInfo ii)
       throws QueryException {
 
-    final Item item = value instanceof Item ? (Item) value : Str.get(value.toString());
-    checkNum(item, ii);
-
+    final Item item = checkNum(value, ii);
     final Type type = item.type;
     if(type == DBL || type == FLT) {
       final double d = item.dbl(ii);
@@ -940,6 +942,25 @@ public enum AtomType implements Type {
     final long l = item.itr(ii);
     if(min != max && (l < min || l > max)) throw castError(item, ii);
     return l;
+  }
+
+  /**
+   * Checks the validity of the specified object and returns it as item.
+   * @param value value to be checked
+   * @param ii input info
+   * @return integer value
+   * @throws QueryException query exception
+   */
+  final Item checkNum(final Object value, final InputInfo ii) throws QueryException {
+    final Item item;
+    if(value instanceof Value) {
+      final Value v = (Value) value;
+      if(v.size() != 1) throw typeError(v, this, ii);
+      item = (Item) v;
+    } else {
+      item = Str.get(value.toString());
+    }
+    return checkNum(item, ii);
   }
 
   /**
