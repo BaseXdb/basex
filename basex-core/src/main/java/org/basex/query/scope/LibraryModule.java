@@ -42,6 +42,6 @@ public final class LibraryModule extends AModule {
   }
 
   @Override
-  public void plan(final FElem e) {
+  public void plan(final FElem root) {
   }
 }

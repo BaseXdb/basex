@@ -232,8 +232,7 @@ public final class StaticFuncs extends ExprInfo {
   @Override
   public void plan(final FElem plan) {
     if(!funcs.isEmpty()) {
-      final FElem elem = planElem();
-      plan.add(elem);
+      final FElem elem = addPlan(plan, planElem());
       for(final StaticFunc f : funcs()) {
         if(f != null) f.plan(elem);
       }

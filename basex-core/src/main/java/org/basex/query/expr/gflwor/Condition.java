@@ -1,6 +1,7 @@
 package org.basex.query.expr.gflwor;
 
 import static org.basex.query.QueryText.*;
+
 import java.util.*;
 
 import org.basex.query.*;
@@ -64,6 +65,21 @@ public final class Condition extends Single {
     return this;
   }
 
+  /**
+   * Compiles the condition.
+   * @param ex iterated expression
+   * @param cc compilation context
+   * @throws QueryException query exception
+   */
+  void compile(final Expr ex, final CompileContext cc) throws QueryException {
+    final SeqType st = ex.seqType();
+    if(item != null) item.refineType(st.with(Occ.ONE), 1, cc);
+    if(pos  != null) pos.refineType(SeqType.ITR_O, 1, cc);
+    if(prev != null) prev.refineType(st.with(Occ.ZERO_ONE), -1, cc);
+    if(next != null) next.refineType(st.with(Occ.ZERO_ONE), -1, cc);
+    compile(cc);
+  }
+
   @Override
   public Condition inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
@@ -116,8 +132,8 @@ public final class Condition extends Single {
    * @param qc query context for variable binding
    * @param it current item
    * @param ps position in the input sequence
-   * @param pr previous item
-   * @param nx next item
+   * @param pr previous item (can be {@code null})
+   * @param nx next item (can be {@code null})
    * @return {@code true} if {@code it} matches the condition, {@code false} otherwise
    * @throws QueryException query exception
    */
@@ -134,13 +150,13 @@ public final class Condition extends Single {
    * @param qc query context
    * @param it current item
    * @param ps position
-   * @param pr previous item
-   * @param nx next item
+   * @param pr previous item (can be {@code null})
+   * @param nx next item (can be {@code null})
    * @throws QueryException query exception
    */
   void bind(final QueryContext qc, final Item it, final long ps, final Item pr, final Item nx)
       throws QueryException {
-    if(item != null) qc.set(item, it == null ? Empty.VALUE : it);
+    if(item != null) qc.set(item, it);
     if(pos  != null) qc.set(pos,  Int.get(ps));
     if(prev != null) qc.set(prev, pr == null ? Empty.VALUE : pr);
     if(next != null) qc.set(next, nx == null ? Empty.VALUE : nx);
@@ -172,21 +188,14 @@ public final class Condition extends Single {
   @Override
   public void plan(final FElem plan) {
     final FElem elem = new FElem(start ? START : END);
+    if(item != null) item.planAttributes(elem, true);
 
     // mapping variable names to roles
-    if(item != null) elem.add(planAttr(VAR, item));
-    if(pos  != null) elem.add(planAttr(AT, pos));
-    if(prev != null) elem.add(planAttr(PREVIOUS, prev));
-    if(next != null) elem.add(planAttr(NEXT, next));
+    if(pos  != null) elem.add(pos.planAttributes(new FElem(POS), true));
+    if(prev != null) elem.add(prev.planAttributes(new FElem(PREVIOUS), true));
+    if(next != null) elem.add(next.planAttributes(new FElem(NEXT), true));
 
-    // IDs and stack slots
-    if(item != null) item.plan(elem);
-    if(pos  != null) pos.plan(elem);
-    if(prev != null) prev.plan(elem);
-    if(next != null) next.plan(elem);
-
-    expr.plan(elem);
-    plan.add(elem);
+    addPlan(plan, elem, expr);
   }
 
   @Override

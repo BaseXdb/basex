@@ -175,7 +175,7 @@ public final class TypeswitchGroup extends Single {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem elem = planElem();
+    final FElem elem = addPlan(plan, planElem(), expr);
     if(types.length == 0) {
       elem.add(planAttr(DEFAULT, true));
     } else {
@@ -186,9 +186,7 @@ public final class TypeswitchGroup extends Single {
       }
       elem.add(planAttr(CASE, tb.finish()));
     }
-    if(var != null) elem.add(planAttr(VAR, var));
-    expr.plan(elem);
-    plan.add(elem);
+    if(var != null) var.planAttributes(elem, false);
   }
 
   @Override

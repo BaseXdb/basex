@@ -263,11 +263,22 @@ public final class Var extends ExprInfo {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem elem = planElem(QueryText.NAME, toErrorString(),
-        Token.ID, Token.token(id), QueryText.TYPE, seqType());
+    addPlan(plan, planAttributes(planElem(), true));
+  }
+
+  /**
+   * Returns the query plan attribute.
+   * @param elem element to which attributes will be added
+   * @param type include type
+   * @return specified element
+   */
+  public FElem planAttributes(final FElem elem, final boolean type) {
+    elem.add(QueryText.NAME, toErrorString());
+    elem.add(Token.ID, Token.token(id));
     if(declType != null) elem.add(planAttr(QueryText.AS, declType));
     if(promote) elem.add(planAttr(QueryText.PROMOTE, true));
-    addPlan(plan, elem);
+    if(type) addPlanType(elem, seqType(), size(), null);
+    return elem;
   }
 
   @Override

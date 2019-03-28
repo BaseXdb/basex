@@ -110,9 +110,7 @@ public final class Count extends Clause {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem elem = planElem();
-    var.plan(elem);
-    plan.add(elem);
+    addPlan(plan, var.planAttributes(planElem(), false));
   }
 
   @Override

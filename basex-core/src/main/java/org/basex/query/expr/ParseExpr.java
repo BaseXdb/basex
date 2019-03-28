@@ -4,9 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.func.*;
@@ -677,20 +674,6 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   protected final FElem planElem(final Object... atts) {
-    final ArrayList<Object> tmp = new ArrayList<>(Arrays.asList(atts));
-    if(!seqType().eq(SeqType.ITEM_ZM)) {
-      tmp.add(TYPE);
-      tmp.add(seqType());
-    }
-    if(size() != -1) {
-      tmp.add(SIZE);
-      tmp.add(size());
-    }
-    final Data data = data();
-    if(data != null) {
-      tmp.add(DATABASE);
-      tmp.add(data.meta.name);
-    }
-    return super.planElem(tmp.toArray());
+    return addPlanType(super.planElem(atts), seqType(), size(), data());
   }
 }

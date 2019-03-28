@@ -70,10 +70,8 @@ public final class OrderKey extends Single {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem elem = planElem(DIR, Token.token(desc ? DESCENDING : ASCENDING),
-        Token.token(EMPTYY), Token.token(least ? LEAST : GREATEST));
-    expr.plan(elem);
-    plan.add(elem);
+    addPlan(plan, planElem(DIR, Token.token(desc ? DESCENDING : ASCENDING),
+        Token.token(EMPTYY), Token.token(least ? LEAST : GREATEST)), expr);
   }
 
   @Override

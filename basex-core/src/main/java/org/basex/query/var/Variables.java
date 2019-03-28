@@ -120,7 +120,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
     for(final VarEntry ve : vars.values()) {
       if(ve.var != null) ve.var.plan(elem);
     }
-    plan.add(elem);
+    addPlan(plan, elem);
   }
 
   @Override

@@ -1,6 +1,10 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
+
+import org.basex.data.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -66,9 +70,10 @@ public abstract class ExprInfo {
    * Adds trees of the specified expressions to the root node.
    * @param plan root node
    * @param child new element
-   * @param exprs expressions
+   * @param exprs expressions ({@code null} references will be ignored)
+   * @return child element
    */
-  protected static void addPlan(final FElem plan, final FElem child, final Object... exprs) {
+  protected static FElem addPlan(final FElem plan, final FElem child, final Object... exprs) {
     plan.add(child);
     for(final Object expr : exprs) {
       if(expr instanceof ExprInfo) {
@@ -83,16 +88,18 @@ public abstract class ExprInfo {
         child.add(expr.toString());
       }
     }
+    return child;
   }
 
   /**
    * Adds trees of the specified expressions to the root node.
    * @param plan root node
    * @param child new element
-   * @param expr expressions
+   * @param expr expressions ({@code null} references will be ignored)
+   * @return child element
    */
-  protected static void addPlan(final FElem plan, final FElem child, final ExprInfo... expr) {
-    addPlan(plan, child, (Object) expr);
+  protected static FElem addPlan(final FElem plan, final FElem child, final ExprInfo... expr) {
+    return addPlan(plan, child, (Object[]) expr);
   }
 
   /**
@@ -103,5 +110,21 @@ public abstract class ExprInfo {
    */
   protected static FAttr planAttr(final Object name, final Object value) {
     return new FAttr(Util.inf(name), Util.inf(value));
+  }
+
+  /**
+   * Returns the query plan attribute.
+   * @param elem element to which attributes will be added
+   * @param seqType sequence type
+   * @param size result size
+   * @param data data reference (can be {@code null})
+   * @return specified element
+   */
+  protected FElem addPlanType(final FElem elem, final SeqType seqType, final long size,
+      final Data data) {
+    if(!seqType.eq(SeqType.ITEM_ZM)) elem.add(planAttr(TYPE, seqType));
+    if(size != -1) elem.add(planAttr(SIZE, size));
+    if(data != null) elem.add(planAttr(DATABASE, data.meta.name));
+    return elem;
   }
 }

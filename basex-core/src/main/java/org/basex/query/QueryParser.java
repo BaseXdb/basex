@@ -1174,10 +1174,10 @@ public class QueryParser extends InputParser {
   private Condition windowCond(final boolean start) throws QueryException {
     skipWs();
     final InputInfo ii = info();
-    final Var var = curr('$')             ? newVar(SeqType.ITEM_ZM) : null;
-    final Var at  = wsConsumeWs(AT)       ? newVar(SeqType.ITEM_ZM) : null;
-    final Var prv = wsConsumeWs(PREVIOUS) ? newVar(SeqType.ITEM_ZM) : null;
-    final Var nxt = wsConsumeWs(NEXT)     ? newVar(SeqType.ITEM_ZM) : null;
+    final Var var = curr('$')             ? newVar(SeqType.ITEM_O)  : null;
+    final Var at  = wsConsumeWs(AT)       ? newVar(SeqType.ITR_O)   : null;
+    final Var prv = wsConsumeWs(PREVIOUS) ? newVar(SeqType.ITEM_ZO) : null;
+    final Var nxt = wsConsumeWs(NEXT)     ? newVar(SeqType.ITEM_ZO) : null;
     wsCheck(WHEN);
     return new Condition(start, localVars.add(var), localVars.add(at), localVars.add(prv),
         localVars.add(nxt), check(single(), NOEXPR), ii);

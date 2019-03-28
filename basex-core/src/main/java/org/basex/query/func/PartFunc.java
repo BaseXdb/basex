@@ -119,7 +119,7 @@ public final class PartFunc extends Arr {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem elem = planElem();
+    final FElem elem = addPlan(plan, planElem());
     final int es = exprs.length, hs = holes.length;
     exprs[es - 1].plan(elem);
     int p = -1;
@@ -129,7 +129,6 @@ public final class PartFunc extends Arr {
       elem.add(a.add(planAttr(QueryText.POS, Token.token(h))));
     }
     while(++p < es + hs - 1) exprs[p - hs].plan(elem);
-    plan.add(elem);
   }
 
   @Override

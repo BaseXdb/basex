@@ -144,8 +144,8 @@ public final class MainModule extends AModule {
   }
 
   @Override
-  public void plan(final FElem e) {
-    expr.plan(e);
+  public void plan(final FElem root) {
+    expr.plan(root);
   }
 
   @Override

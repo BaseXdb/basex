@@ -252,8 +252,8 @@ public final class Window extends Clause {
   @Override
   public Clause compile(final CompileContext cc) throws QueryException {
     expr = expr.compile(cc);
-    start.compile(cc);
-    if(end != null) end.compile(cc);
+    start.compile(expr, cc);
+    if(end != null) end.compile(expr, cc);
     return optimize(cc);
   }
 
@@ -337,12 +337,10 @@ public final class Window extends Clause {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem elem = planElem(token(SLIDING), token(sliding));
-    var.plan(elem);
-    expr.plan(elem);
+    final FElem elem = var.planAttributes(planElem(token(SLIDING), token(sliding)), true);
     start.plan(elem);
     if(end != null) end.plan(elem);
-    plan.add(elem);
+    addPlan(plan, elem, expr);
   }
 
   @Override

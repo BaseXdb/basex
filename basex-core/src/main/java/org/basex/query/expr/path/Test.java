@@ -72,7 +72,7 @@ public abstract class Test extends ExprInfo {
   public abstract Test copy();
 
   @Override
-  public void plan(final FElem e) {
+  public void plan(final FElem root) {
     throw Util.notExpected();
   }
 

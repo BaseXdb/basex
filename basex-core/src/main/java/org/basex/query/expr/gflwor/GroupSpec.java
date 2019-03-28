@@ -89,10 +89,7 @@ public final class GroupSpec extends Single {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem elem = planElem();
-    var.plan(elem);
-    expr.plan(elem);
-    plan.add(elem);
+    addPlan(plan, var.planAttributes(planElem(), false), expr);
   }
 
   @Override

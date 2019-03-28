@@ -908,10 +908,7 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem elem = planElem();
-    for(final Clause clause : clauses) clause.plan(elem);
-    rtrn.plan(elem);
-    plan.add(elem);
+    addPlan(plan, planElem(), clauses.toArray(new Clause[0]), rtrn);
   }
 
   @Override
