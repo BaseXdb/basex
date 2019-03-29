@@ -11,10 +11,8 @@ import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
-import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.io.serial.dot.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -226,14 +224,6 @@ public abstract class AQuery extends Command {
   private void queryPlan() {
     if(!plan && qp != null) {
       try {
-        // show dot plan
-        if(options.get(MainOptions.DOTPLAN)) {
-          try(BufferOutput bo = new BufferOutput(new IOFile("plan.dot"))) {
-            try(DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT))) {
-              d.serialize(qp.plan());
-            }
-          }
-        }
         // show XML plan
         if(options.get(MainOptions.XMLPLAN)) {
           info(NL + QUERY_PLAN + COL);

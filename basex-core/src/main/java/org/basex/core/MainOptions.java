@@ -159,10 +159,6 @@ public final class MainOptions extends Options {
   public static final BooleanOption XMLPLAN = new BooleanOption("XMLPLAN", false);
   /** Creates the query plan before or after compilation. */
   public static final BooleanOption COMPPLAN = new BooleanOption("COMPPLAN", true);
-  /** Dots the query plan. */
-  public static final BooleanOption DOTPLAN = new BooleanOption("DOTPLAN", false);
-  /** Compact dot representation. */
-  public static final BooleanOption DOTCOMPACT = new BooleanOption("DOTCOMPACT", false);
 
   /** Flushes the database after each update. */
   public static final BooleanOption AUTOFLUSH = new BooleanOption("AUTOFLUSH", true);

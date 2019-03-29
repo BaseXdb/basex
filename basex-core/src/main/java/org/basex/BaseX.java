@@ -79,10 +79,6 @@ public class BaseX extends CLI {
             console = false;
             if(!execute(input(value))) return;
             break;
-          case 'D':
-            // hidden: toggle output of dot query graph
-            execute(new Set(MainOptions.DOTPLAN, null), false);
-            break;
           case 'i':
             execute(new Set(MainOptions.MAINMEM, true), false);
             execute(new Check(value), verbose);
