@@ -52,8 +52,8 @@ public final class GFLWORTest extends QueryPlanTest {
         "let $a as xs:string := $seq[$i] " +
         "return concat($i, $j, $a, $a)",
         "12aa\n13aa\n23bb",
-        "let $a := //Let[Var/@name eq '$a'] return " +
-        "//For[Var/@name eq '$i'] << $a and $a << //For[Var/@name eq '$j']"
+        "let $a := //Let[@name eq '$a'] return " +
+        "//For[@name eq '$i'] << $a and $a << //For[@name eq '$j']"
     );
   }
 
@@ -65,7 +65,7 @@ public final class GFLWORTest extends QueryPlanTest {
         "let $b as xs:string := $seq[$j] " +
         "return concat($i, $j, $b, $b)",
         "12bb\n13cc\n23cc",
-        Util.info("every $f in //% satisfies $f << //%[starts-with(Var/@name, '$b')]",
+        Util.info("every $f in //% satisfies $f << //%[starts-with(@name, '$b')]",
             For.class, Let.class)
     );
   }
@@ -75,8 +75,8 @@ public final class GFLWORTest extends QueryPlanTest {
     check("let $a := <a/>, $b := <b/>, $c := ($a,$a)[1] " +
         "for $i in 1 to 2 return ($c,$b)",
         "<a/>\n<b/>\n<a/>\n<b/>",
-        Util.info("//Let[Var/@name='$a'] << //Let[Var/@name='$b'] and " +
-            "//Let[Var/@name='$b'] << //Let[Var/@name='$c']")
+        Util.info("//Let[@name='$a'] << //Let[@name='$b'] and " +
+            "//Let[@name='$b'] << //Let[@name='$c']")
     );
   }
 
@@ -99,7 +99,7 @@ public final class GFLWORTest extends QueryPlanTest {
         "for $b as element(x) in $x " +
         "return ($b, $b)[1]",
         "<x/>\n<x/>",
-        "//(For | Let)[Var/@name='$b'] << //For[Var/@name='$a']",
+        "//(For | Let)[@name='$b'] << //For[@name='$a']",
         "every $let in //Let, $for in //For satisfies $let << $for"
     );
   }
@@ -185,7 +185,7 @@ public final class GFLWORTest extends QueryPlanTest {
         "13\n13\n52\n52",
         exists("For[every $let in //Let satisfies . << $let]"),
         exists("For[every $let in //Let satisfies . >> $let]"),
-        "//Let[Var/@name='$a'] << //Let[Var/@name='$b']"
+        "//Let[@name='$a'] << //Let[@name='$b']"
     );
   }
 
