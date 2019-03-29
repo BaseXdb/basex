@@ -35,7 +35,7 @@ public final class Prop {
   /** URL. */
   public static final String URL = "http://" + PROJECT_NAME + ".org";
   /** URL of the community page. */
-  public static final String COMMUNITY_URL = URL + "/community";
+  public static final String COMMUNITY_URL = URL + "/open-source";
   /** URL of the documentation. */
   public static final String DOC_URL = "http://docs." + PROJECT_NAME + ".org";
   /** URL of the update page. */
