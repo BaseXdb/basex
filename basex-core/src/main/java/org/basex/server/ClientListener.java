@@ -229,7 +229,7 @@ public final class ClientListener extends Thread implements ClientInfo {
     context.sessions.remove(this);
 
     try {
-      Close.close(context);
+      if(context.user() != null) Close.close(context);
       socket.close();
     } catch(final Throwable ex) {
       log(LogType.ERROR, Util.message(ex));
