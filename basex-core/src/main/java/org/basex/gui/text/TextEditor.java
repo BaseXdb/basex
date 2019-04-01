@@ -658,18 +658,25 @@ public final class TextEditor {
    */
   private void sort(final TokenList tokens) {
     final GUIOptions gopts = gui.gopts;
-    final boolean asc = gopts.get(GUIOptions.ASCSORT), cs = gopts.get(GUIOptions.CASESORT);
-    final Collator coll = gopts.get(GUIOptions.UNICODE) ? null : Collator.getInstance();
+    final boolean unicode = gopts.get(GUIOptions.UNICODE);
     final int column = gopts.get(GUIOptions.COLUMN) - 1;
 
-    // stable sort: before custom sort, use default sort
-    if(coll != null || column > 0) tokens.sort(true, true);
-    final Comparator<byte[]> cc = (token1, token2) -> {
-      final byte[] tok1 = sub(token1, column), tok2 = sub(token2, column);
-      return coll != null ? coll.compare(string(tok1), string(tok2)) :
-       diff(cs ? lc(tok1) : tok1, cs ? lc(tok2) : tok2);
-    };
-    tokens.sort(cc, asc);
+    // stable sort: before custom sort, apply default sort
+    if(!unicode || column > 0) tokens.sort(true, true);
+
+    // choose cheapest comparator
+    final Comparator<byte[]> cc;
+    if(!unicode) {
+      final Collator coll = Collator.getInstance();
+      cc = (t1, t2) -> coll.compare(string(sub(t1, column)), string(sub(t2, column)));
+    } else if(gopts.get(GUIOptions.CASESORT)) {
+      cc = (t1, t2) -> diff(sub(t1, column), sub(t2, column));
+    } else {
+      cc = (t1, t2) -> diff(lc(sub(t1, column)), lc(sub(t2, column)));
+    }
+    tokens.sort(cc, gopts.get(GUIOptions.ASCSORT));
+
+    // remove duplicates
     if(gopts.get(GUIOptions.MERGEDUPL)) tokens.unique();
   }
 

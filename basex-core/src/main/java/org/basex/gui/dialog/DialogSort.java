@@ -38,9 +38,9 @@ public final class DialogSort extends BaseXDialog {
 
     final GUIOptions gopts = gui.gopts;
     asc = new BaseXCheckBox(this, ASCENDING_ORDER, GUIOptions.ASCSORT, gopts);
-    cs = new BaseXCheckBox(this, CASE_SENSITIVE, GUIOptions.CASESORT, gopts);
     merge = new BaseXCheckBox(this, MERGE_DUPLICATES, GUIOptions.MERGEDUPL, gopts);
     unicode = new BaseXCheckBox(this, UNICODE_ORDER, GUIOptions.UNICODE, gopts);
+    cs = new BaseXCheckBox(this, CASE_SENSITIVE, GUIOptions.CASESORT, gopts);
     column = new BaseXTextField(this, GUIOptions.COLUMN, gopts);
     column.setColumns(4);
 
@@ -49,10 +49,10 @@ public final class DialogSort extends BaseXDialog {
     pp.add(new BaseXLabel(COLUMN + COLS));
     pp.add(column);
 
-    p.add(cs);
     p.add(asc);
     p.add(merge);
     p.add(unicode);
+    p.add(cs);
     p.add(pp);
     set(p, BorderLayout.CENTER);
 
@@ -66,6 +66,7 @@ public final class DialogSort extends BaseXDialog {
   public void action(final Object source) {
     ok = column.check();
     enableOK(buttons, B_OK, ok);
+    cs.setEnabled(unicode.isSelected());
   }
 
   @Override
