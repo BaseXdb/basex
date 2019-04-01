@@ -5,13 +5,12 @@ import static org.basex.http.HTTPText.*;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
+import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.http.*;
 import org.basex.io.*;
-import org.basex.server.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.eclipse.jetty.server.*;
@@ -62,65 +61,67 @@ public final class BaseXHTTP extends CLI {
    */
   public BaseXHTTP(final String... args) throws Exception {
     super(null, args);
+
+    if(!quiet) Util.outln(header());
+
     // context must be initialized after parsing of arguments
     context = HTTPContext.context();
 
-    // create jetty instance and set default context to HTTP path
     final StaticOptions sopts = context.soptions;
-    final String webapp = sopts.get(StaticOptions.WEBPATH);
-    final WebAppContext wac = new WebAppContext(webapp, "/");
-    jetty = (Server) new XmlConfiguration(initJetty(webapp).inputStream()).configure();
-    jetty.setHandler(wac);
-
-    final ArrayList<ServerConnector> conns = new ArrayList<>(1);
-    for(final Connector conn : jetty.getConnectors()) {
-      if(conn instanceof ServerConnector) conns.add((ServerConnector) conn);
-    }
-    if(conns.isEmpty())
-      throw new BaseXException("No Jetty connectors defined in " + JETTYCONF + '.');
-
     stopPort = sopts.get(StaticOptions.STOPPORT);
     host = sopts.get(StaticOptions.SERVERHOST);
-    final ServerConnector conn1 = conns.get(0);
-    if(port != 0) conn1.setPort(port);
+    final int serverPort = sopts.get(StaticOptions.SERVERPORT);
+
+    // create jetty instance and set default context to HTTP path
+    final String webapp = sopts.get(StaticOptions.WEBPATH);
+    final WebAppContext wac = new WebAppContext(webapp, "/");
+    locate(WEBCONF, webapp);
+    final IOFile url = locate(JETTYCONF, webapp);
+    jetty = (Server) new XmlConfiguration(url.inputStream()).configure();
+    jetty.setHandler(wac);
+
+    ServerConnector sc = null;
+    for(final Connector conn : jetty.getConnectors()) {
+      if(conn instanceof ServerConnector) sc = (ServerConnector) conn;
+    }
+    if(sc == null) throw new BaseXException("No Jetty connectors defined in " + JETTYCONF + '.');
+    if(port != 0) sc.setPort(port);
+    else port = sc.getPort();
 
     // info strings
-    final String startX = HTTP + ' ' + SRV_STARTED_PORT_X;
-    final String stopX = HTTP + ' ' + SRV_STOPPED_PORT_X;
+    final Function<Boolean, String> msg1 = start -> start ? SRV_STARTED_PORT_X : SRV_STOPPED_PORT_X;
+    final Function<Boolean, String> msg2 = start -> Util.info(HTTP + ' ' + msg1.apply(start), port);
+    // output user info, keep message visible for a while
+    final Consumer<Boolean> info = start -> {
+      Util.outln(msg2.apply(start));
+      if(!sopts.get(StaticOptions.HTTPLOCAL)) Util.outln(msg1.apply(start), serverPort);
+      Performance.sleep(2000);
+    };
 
+    // stop web server
     if(stop) {
       stop();
-      if(!quiet) for(final ServerConnector conn : conns) Util.outln(stopX, conn.getPort());
-      // keep message visible for a while
-      Performance.sleep(1000);
+      if(!quiet) info.accept(false);
       return;
     }
 
-    // start web server in a new process
+    // start web server in a new Java process
     if(service) {
       start(args);
-      if(!quiet) for(final ServerConnector conn : conns) Util.outln(startX, conn.getPort());
-      // keep message visible for a while
-      Performance.sleep(1000);
+      if(!quiet) info.accept(true);
       return;
     }
 
     // start web server
-    if(!quiet) Util.outln(header());
     try {
       jetty.start();
     } catch(final BindException ex) {
       Util.debug(ex);
-      throw new BaseXException(HTTP + ' ' + SRV_RUNNING_X, conn1.getPort());
+      throw new BaseXException(HTTP + ' ' + SRV_RUNNING_X, port);
     }
     // throw cached exception that did not break the servlet architecture
     final IOException ex = HTTPContext.exception();
     if(ex != null) throw ex;
-
-    // show start message
-    if(!quiet) {
-      for(final ServerConnector conn : conns) Util.outln(startX, conn.getPort());
-    }
 
     // initialize web.xml settings, assign system properties and run database server.
     // the call of this function may already have been triggered during the start of jetty
@@ -132,22 +133,17 @@ public final class BaseXHTTP extends CLI {
     // show info when HTTP server is aborted. needs to be called in constructor:
     // otherwise, it may only be called if the JVM process is already shut down
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-      if(!quiet) {
-        for(final ServerConnector conn : conns) Util.outln(stopX, conn.getPort());
-      }
-      final Log log = context.log;
-      if(log != null) {
-        for(final ServerConnector conn : conns) {
-          log.writeServer(LogType.OK, Util.info(stopX, conn.getPort()));
-        }
-      }
+      final String message = msg2.apply(false);
+      if(!quiet) Util.outln(message);
+      context.log.writeServer(LogType.OK, message);
       context.close();
     }));
 
+    // show start message
+    if(!quiet) Util.outln(msg2.apply(true));
+
     // log server start at very end (logging flag could have been updated by web.xml)
-    for(final ServerConnector conn : conns) {
-      context.log.writeServer(LogType.OK, Util.info(startX, conn.getPort()));
-    }
+    context.log.writeServer(LogType.OK, msg2.apply(true));
 
     // execute initial command-line arguments
     for(final Pair<String, String> cmd : commands) {
@@ -164,17 +160,6 @@ public final class BaseXHTTP extends CLI {
    */
   public void stop() throws Exception {
     if(stopPort > 0) stop(host.isEmpty() ? S_LOCALHOST : host, stopPort);
-  }
-
-  /**
-   * Returns a reference to the Jetty configuration file.
-   * @param root target root directory
-   * @return input stream
-   * @throws IOException I/O exception
-   */
-  private static IOFile initJetty(final String root) throws IOException {
-    locate(WEBCONF, root);
-    return locate(JETTYCONF, root);
   }
 
   /**

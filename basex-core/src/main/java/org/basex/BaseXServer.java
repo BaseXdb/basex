@@ -74,6 +74,9 @@ public final class BaseXServer extends CLI implements Runnable {
   public BaseXServer(final Context ctx, final String... args) throws IOException {
     super(ctx, args);
 
+    // do not output header if called by HTTP server
+    if(!quiet && !daemon) Util.outln(header());
+
     final StaticOptions sopts = context.soptions;
     final int port = sopts.get(StaticOptions.SERVERPORT);
     final String host = sopts.get(StaticOptions.SERVERHOST);
@@ -115,10 +118,7 @@ public final class BaseXServer extends CLI implements Runnable {
 
     // show info that server has been started
     final String startX = Util.info(SRV_STARTED_PORT_X, port);
-    if(!quiet) {
-      if(!daemon) Util.outln(header());
-      Util.outln(startX);
-    }
+    if(!quiet) Util.outln(startX);
     context.log.writeServer(LogType.OK, startX);
 
     // show info when server is aborted
