@@ -94,9 +94,10 @@ public final class BaseXGUI extends Main {
    */
   private static JFrame splash() {
     final JFrame f = new JFrame();
-    f.setUndecorated(true);
-    f.setAlwaysOnTop(true);
     f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    f.setAlwaysOnTop(true);
+    f.setUndecorated(true);
+    f.setIconImage(BaseXImages.get("logo_64"));
     f.add(new JLabel(BaseXImages.icon("logo_256")));
     f.pack();
     f.setLocationRelativeTo(null);
