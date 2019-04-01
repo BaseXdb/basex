@@ -50,16 +50,21 @@ public final class BaseXGUI extends Main {
     super(args);
     parseArgs();
 
+    // create splash screen
+    final JFrame splash = splash();
+
     // read options
     final GUIOptions gopts = new GUIOptions();
     // initialize look and feel
     init(gopts);
+
     // initialize fonts and colors
     GUIConstants.init(gopts);
 
     SwingUtilities.invokeLater(() -> {
-      // open main window
+      // open main window and close splash screen
       final GUI gui = new GUI(context, gopts);
+      splash.dispose();
 
       // open specified file
       final ArrayList<IOFile> xqfiles = new ArrayList<>();
@@ -78,9 +83,26 @@ public final class BaseXGUI extends Main {
       }
       gui.editor.init(xqfiles);
     });
+
     // guarantee correct shutdown of database context
     Runtime.getRuntime().addShutdownHook(new Thread(context::close));
   }
+
+  /**
+   * Creates a splash screen.
+   * @return splash screen
+   */
+  private static JFrame splash() {
+    final JFrame f = new JFrame();
+    f.setUndecorated(true);
+    f.setAlwaysOnTop(true);
+    f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    f.add(new JLabel(BaseXImages.icon("logo_256")));
+    f.pack();
+    f.setLocationRelativeTo(null);
+    f.setVisible(true);
+    return f;
+  };
 
   /**
    * Initializes the GUI.
