@@ -109,7 +109,7 @@ public final class DialogBindings extends BaseXDialog {
    * @param map map with bindings
    * @param gui GUI reference
    */
-  public static void assign(final HashMap<String, String> map, final GUI gui) {
+  public static void assign(final Map<String, String> map, final GUI gui) {
     final StringBuilder sb = new StringBuilder();
     for(final Entry<String, String> entry : map.entrySet()) {
       final String name = entry.getKey(), value = entry.getValue();

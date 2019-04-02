@@ -1273,8 +1273,6 @@ public enum QueryError {
   /** Error code. */
   OPTDECL_X(XQST, 108, "Output declaration not allowed library module: %."),
   /** Error code. */
-  OUTMAP_X(XQST, 109, "Character map '%' is not defined."),
-  /** Error code. */
   OUTINVALID_X(XQST, 109, "%"),
   /** Error code. */
   OUTDUPL_X(XQST, 110, "Duplicate declaration of 'output:%'."),

@@ -309,7 +309,7 @@ public final class EditorView extends View {
     // close database
     if(Close.close(gui.context)) gui.notify.init();
     // remove context item binding
-    final HashMap<String, String> map = gui.context.options.toMap(MainOptions.BINDINGS);
+    final Map<String, String> map = gui.context.options.toMap(MainOptions.BINDINGS);
     map.remove("");
     DialogBindings.assign(map, gui);
     // remove context label
