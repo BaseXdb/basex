@@ -71,6 +71,7 @@ public final class SerializerTest extends SandboxTest {
     query(option + "1,2", "1 2");
     query(option + "<a>1</a>", 1);
     query(option + "1,<a>2</a>,3", 123);
+    query(option + SerializerOptions.USE_CHARACTER_MAPS.arg(";=,,") + "'1;2'", "1,2");
   }
 
   /** Test: item-separator. */

@@ -8,7 +8,6 @@ import java.io.*;
 import java.nio.charset.*;
 
 import org.basex.io.out.*;
-import org.basex.query.*;
 import org.basex.util.*;
 
 /**
@@ -36,10 +35,10 @@ public abstract class OutputSerializer extends Serializer {
    * Constructor.
    * @param os output stream
    * @param sopts serializer options
-   * @throws QueryIOException query I/O exception
+   * @throws IOException I/O exception
    */
   protected OutputSerializer(final OutputStream os, final SerializerOptions sopts)
-      throws QueryIOException {
+      throws IOException {
 
     this.sopts = sopts;
     indent = sopts.yes(INDENT);
@@ -69,6 +68,18 @@ public abstract class OutputSerializer extends Serializer {
 
     final String is = sopts.get(ITEM_SEPARATOR);
     if(is != null) itemsep = token(is);
+
+    final boolean bom  = sopts.yes(BYTE_ORDER_MARK);
+    if(bom) {
+      // comparison by reference
+      if(encoding == Strings.UTF8) {
+        out.write(0xEF); out.write(0xBB); out.write(0xBF);
+      } else if(encoding == Strings.UTF16LE) {
+        out.write(0xFF); out.write(0xFE);
+      } else if(encoding == Strings.UTF16BE) {
+        out.write(0xFE); out.write(0xFF);
+      }
+    }
   }
 
   @Override
@@ -110,8 +121,8 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   /**
-   * Encodes the specified characters before printing.
-   * @param text characters to be encoded and printed
+   * Encodes and prints characters.
+   * @param text characters to be printed
    * @throws IOException I/O exception
    */
   protected final void printChars(final byte[] text) throws IOException {
@@ -120,13 +131,11 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   /**
-   * Encodes the specified codepoint before printing.
-   * @param cp codepoint to be encoded and printed
+   * Encodes and prints a character.
+   * @param cp codepoint to be printed
    * @throws IOException I/O exception
    */
-  protected void printChar(final int cp) throws IOException {
-    out.print(cp);
-  }
+  protected abstract void printChar(int cp) throws IOException;
 
   /**
    * Returns a hex entity for the specified codepoint.

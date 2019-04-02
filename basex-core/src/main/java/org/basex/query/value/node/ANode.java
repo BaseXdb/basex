@@ -287,16 +287,16 @@ public abstract class ANode extends Item {
   public abstract boolean hasChildren();
 
   /**
-   * Returns the value of the specified attribute or {@code null}.
+   * Returns the value of the specified attribute.
    * @param name attribute to be found
-   * @return attribute value
+   * @return attribute value or {@code null}
    */
   public byte[] attribute(final byte[] name) {
     return attribute(new QNm(name));
   }
 
   /**
-   * Returns the value of the specified attribute or {@code null}.
+   * Returns the value of the specified attribute.
    * @param name attribute to be found
    * @return attribute value or {@code null}
    */

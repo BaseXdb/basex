@@ -685,6 +685,10 @@ public final class FnModuleTest extends QueryPlanTest {
     contains(func.args(" <x/>"), "<x/>");
     contains(func.args(" <x/>", " " + serialParams("")), "<x/>");
     contains(func.args(" <x>a</x>", " " + serialParams("<method value='text'/>")), "a");
+
+    // character maps
+    query(func.args("1;2", " map { 'use-character-maps': ';=,,' }"), "1,2");
+    query(func.args("1;2", " map { 'use-character-maps': map { ';': ',' } }"), "1,2");
   }
 
   /** Test method. */

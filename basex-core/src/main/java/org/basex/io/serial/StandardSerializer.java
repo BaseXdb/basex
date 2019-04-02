@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.text.*;
 import java.text.Normalizer.*;
+import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -26,8 +27,8 @@ import org.basex.util.hash.*;
 public abstract class StandardSerializer extends OutputSerializer {
   /** Normalization form. */
   protected final Form form;
-  /** WebDAV flag. */
-  protected final IntObjMap<byte[]> map;
+  /** Character map. */
+  private final IntObjMap<byte[]> map;
 
   /** Include separator. */
   protected boolean sep;
@@ -63,22 +64,10 @@ public abstract class StandardSerializer extends OutputSerializer {
       map = null;
     } else {
       map = new IntObjMap<>();
-      for(final String s : Strings.split(maps, ',')) {
-        final String[] kv = Strings.split(s, '=', 2);
-        if(kv.length < 2) throw SERMAP_X.getIO(maps);
-        map.put(kv[0].charAt(0), token(kv[1]));
-      }
-    }
-
-    final boolean bom  = sopts.yes(BYTE_ORDER_MARK);
-    if(bom) {
-      // comparison by reference
-      if(encoding == Strings.UTF8) {
-        out.write(0xEF); out.write(0xBB); out.write(0xBF);
-      } else if(encoding == Strings.UTF16LE) {
-        out.write(0xFF); out.write(0xFE);
-      } else if(encoding == Strings.UTF16BE) {
-        out.write(0xFE); out.write(0xFF);
+      for(final Map.Entry<String, String> entry : sopts.toMap(USE_CHARACTER_MAPS).entrySet()) {
+        final String key = entry.getKey();
+        if(key.length() != 1) throw SERMAP_X.getIO(key);
+        map.put(key.charAt(0), token(entry.getValue()));
       }
     }
   }
@@ -130,6 +119,20 @@ public abstract class StandardSerializer extends OutputSerializer {
     atomic = true;
   }
 
+  @Override
+  protected final void printChar(final int cp) throws IOException {
+    if(!characterMap(cp)) print(cp);
+  }
+
+  /**
+   * Prints a single character.
+   * @param cp codepoint
+   * @throws IOException I/O exception
+   */
+  protected void print(final int cp) throws IOException {
+    out.print(cp);
+  }
+
   /**
    * Normalizes the specified text.
    * @param text text to be normalized
@@ -137,5 +140,22 @@ public abstract class StandardSerializer extends OutputSerializer {
    */
   protected final byte[] norm(final byte[] text) {
     return form == null || ascii(text) ? text : token(Normalizer.normalize(string(text), form));
+  }
+
+  /**
+   * Replaces a character with an entry from the character map.
+   * @param cp codepoint
+   * @return {@code true} if replacement was found
+   * @throws IOException I/O exception
+   */
+  protected final boolean characterMap(final int cp) throws IOException {
+    if(map != null) {
+      final byte[] value = map.get(cp);
+      if(value != null) {
+        out.print(value);
+        return true;
+      }
+    }
+    return false;
   }
 }

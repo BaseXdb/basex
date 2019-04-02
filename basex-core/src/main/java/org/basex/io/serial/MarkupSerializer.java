@@ -252,16 +252,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   }
 
   @Override
-  protected void printChar(final int cp) throws IOException {
-    if(map != null) {
-      // character map
-      final byte[] value = map.get(cp);
-      if(value != null) {
-        out.print(value);
-        return;
-      }
-    }
-
+  protected void print(final int cp) throws IOException {
     if(cp < ' ' && cp != '\n' && cp != '\t' || cp >= 0x7F && cp < 0xA0) {
       printHex(cp);
     } else if(cp == '&') {
@@ -274,7 +265,7 @@ abstract class MarkupSerializer extends StandardSerializer {
       out.print(E_2028);
     } else {
       try {
-        out.print(cp);
+        super.print(cp);
       } catch(final QueryIOException ex) {
         if(ex.getCause().error() == SERENC_X_X) printHex(cp);
         else throw ex;

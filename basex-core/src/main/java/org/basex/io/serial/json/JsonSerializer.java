@@ -154,16 +154,7 @@ public abstract class JsonSerializer extends StandardSerializer {
   }
 
   @Override
-  protected final void printChar(final int cp) throws IOException {
-    if(map != null) {
-      // character map
-      final byte[] value = map.get(cp);
-      if(value != null) {
-        out.print(value);
-        return;
-      }
-    }
-
+  protected final void print(final int cp) throws IOException {
     if(escape) {
       switch(cp) {
         case '\b': out.print("\\b");  break;
@@ -177,7 +168,7 @@ public abstract class JsonSerializer extends StandardSerializer {
         default  : out.print(cp);     break;
       }
     } else {
-      out.print(cp);
+      super.print(cp);
     }
   }
 

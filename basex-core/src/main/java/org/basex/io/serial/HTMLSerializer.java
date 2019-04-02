@@ -92,11 +92,11 @@ final class HTMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  protected void printChar(final int cp) throws IOException {
+  protected void print(final int cp) throws IOException {
     if(script) out.print(cp);
     else if(cp > 0x7F && cp < 0xA0 && !html5) throw SERILL_X.getIO(Integer.toHexString(cp));
     else if(cp == 0xA0) out.print(E_NBSP);
-    else super.printChar(cp);
+    else super.print(cp);
   }
 
   @Override

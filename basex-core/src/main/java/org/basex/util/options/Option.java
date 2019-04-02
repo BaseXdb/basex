@@ -55,6 +55,6 @@ public abstract class Option<O> {
    * @return string representation
    */
   public final String arg(final String arg) {
-    return "declare option output:" + name() + '\'' + arg.replace("'", "''") + "';";
+    return "declare option output:" + name() + " '" + arg.replace("'", "''") + "';";
   }
 }

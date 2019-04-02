@@ -92,15 +92,13 @@ public final class FuncOptions {
       throws QueryException {
 
     if(item != Empty.VALUE) {
-      final TokenBuilder tb = new TokenBuilder();
       try {
         if(item instanceof XQMap) {
           options.assign((XQMap) item, !acceptUnknown, info);
         } else {
           if(test == null) throw MAP_X_X.get(info, item.type, item);
           if(!test.eq(item)) throw ELMMAP_X_X_X.get(info, root.prefixId(XML), item.type, item);
-          final String opts = optString((ANode) item, error);
-          options.assign(tb.add(opts).toString());
+          options.assign(toString((ANode) item, error));
         }
       } catch(final BaseXException ex) {
         throw error.get(info, ex);
@@ -116,7 +114,7 @@ public final class FuncOptions {
    * @return string
    * @throws QueryException query exception
    */
-  private String optString(final ANode node, final QueryError error) throws QueryException {
+  private String toString(final ANode node, final QueryError error) throws QueryException {
     final ANode n = node.attributes().next();
     if(n != null) throw error.get(info, Util.info("Invalid attribute: '%'", n.name()));
 
@@ -133,25 +131,29 @@ public final class FuncOptions {
         continue;
       }
       // retrieve key from element name and value from "value" attribute or text node
-      byte[] value = null;
       final String name = string(qname.local());
-      if(hasElements(child)) {
-        value = token(optString(child, error));
+      String value = null;
+
+      if(name.equals(SerializerOptions.USE_CHARACTER_MAPS.name())) {
+        value = SerializerOptions.characterMap(child);
+        if(value == null) throw error.get(info, "Character map is invalid.");
+      } else if(hasElements(child)) {
+        value = toString(child, error);
       } else {
         for(final ANode attr : child.attributes()) {
           if(eq(attr.name(), VALUE)) {
-            value = attr.string();
+            value = string(attr.string());
             if(name.equals(SerializerOptions.CDATA_SECTION_ELEMENTS.name())) {
-              value = resolve(child, value);
+              value = cDataSectionElements(child, value);
             }
           } else {
             // Conflicts with QT3TS, Serialization-json-34 etc.
-            //throw error.get(info, Util.info("Invalid attribute: '%'", attr.name()));
+            throw error.get(info, Util.info("Invalid attribute: '%'", attr.name()));
           }
         }
-        if(value == null) value = child.string();
+        if(value == null) value = string(child.string());
       }
-      tb.add(name).add('=').add(string(value).trim().replace(",", ",,")).add(',');
+      tb.add(name).add('=').add(value.trim().replace(",", ",,")).add(',');
     }
     return tb.toString();
   }
@@ -162,11 +164,11 @@ public final class FuncOptions {
    * @param value value
    * @return name with resolved QNames
    */
-  private static byte[] resolve(final ANode elem, final byte[] value) {
-    if(!contains(value, ':')) return value;
+  private static String cDataSectionElements(final ANode elem, final String value) {
+    if(!Strings.contains(value, ':')) return value;
 
     final TokenBuilder tb = new TokenBuilder();
-    for(final byte[] name : split(normalize(value), ' ')) {
+    for(final byte[] name : split(normalize(token(value)), ' ')) {
       final int i = indexOf(name, ':');
       if(i == -1) {
         tb.add(name);
@@ -180,8 +182,9 @@ public final class FuncOptions {
       }
       tb.add(' ');
     }
-    return tb.finish();
+    return tb.toString();
   }
+
 
   /**
    * Checks if the specified node has elements as children.

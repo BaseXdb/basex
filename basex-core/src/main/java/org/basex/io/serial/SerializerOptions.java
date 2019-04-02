@@ -1,6 +1,7 @@
 package org.basex.io.serial;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -14,7 +15,9 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.options.*;
 
 /**
@@ -192,37 +195,69 @@ public final class SerializerOptions extends Options {
       throw OUTINVALID_X.get(ii, ex);
     }
 
+    // parse parameters and character map
     if(name.equals(PARAMETER_DOCUMENT.name())) {
       Uri uri = Uri.uri(value);
       if(!uri.isValid()) throw INVURI_X.get(ii, value);
       if(!uri.isAbsolute()) uri = sc.baseURI().resolve(uri, ii);
       final IO io = IO.get(string(uri.string()));
+      final ANode root;
       try {
-        // check parameters and add values to serialization parameters
-        final ANode root = new DBNode(io).children().next();
-        if(root != null) FuncOptions.serializer(root, this, ii);
-
-        final HashMap<String, String> free = free();
-        if(!free.isEmpty()) throw SEROPTION_X.get(ii, free.keySet().iterator().next());
-
-        final byte[] mapsId = new QNm(USE_CHARACTER_MAPS.name(), QueryText.OUTPUT_URI).id();
-        final byte[] mapId = new QNm(QueryText.CHARACTER_MAP, QueryText.OUTPUT_URI).id();
-        if(!get(USE_CHARACTER_MAPS).isEmpty()) {
-          final TokenBuilder tb = new TokenBuilder();
-          for(final ANode option : XMLAccess.children(root, mapsId)) {
-            for(final ANode child : XMLAccess.children(option, mapId)) {
-              if(!tb.isEmpty()) tb.add(',');
-              tb.add(child.attribute(QueryText.CHARACTER)).add('=');
-              tb.add(child.attribute(QueryText.MAP_STRING));
-            }
-          }
-          set(USE_CHARACTER_MAPS, tb.toString());
-        }
-
+        root = new DBNode(io).children().next();
       } catch(final IOException ex) {
-        Util.debug(ex);
-        throw OUTDOC_X.get(ii, value);
+        throw OUTDOC_X.get(ii, ex);
+      }
+
+      if(root != null) FuncOptions.serializer(root, this, ii);
+
+      final HashMap<String, String> free = free();
+      if(!free.isEmpty()) throw SEROPTION_X.get(ii, free.keySet().iterator().next());
+
+      for(final ANode child : root.children()) {
+        if(child.type != NodeType.ELM) continue;
+        if(string(child.qname().local()).equals(USE_CHARACTER_MAPS.name())) {
+          final String map = characterMap(child);
+          if(map == null) throw SEROPTION_X.get(ii, USE_CHARACTER_MAPS.name());
+          set(USE_CHARACTER_MAPS, map);
+        }
       }
     }
+  }
+
+  /**
+   * Extracts a character map.
+   * @param elem child node
+   * @return character map or {@code null} if map is invalid
+   */
+  public static String characterMap(final ANode elem) {
+    if(elem.attributes().next() != null) return null;
+
+    // parse characters
+    final TokenMap map = new TokenMap();
+    for(final ANode child : elem.children()) {
+      if(child.type != NodeType.ELM) continue;
+      final byte[] name = child.qname().local();
+      if(eq(name, CHARACTER_MAP)) {
+        byte[] key = null, val = null;
+        for(final ANode attr : child.attributes()) {
+          final byte[] att = attr.name();
+          if(eq(att, CHARACTER)) key = attr.string();
+          else if(eq(att, MAP_STRING)) val = attr.string();
+          else return null;
+        }
+        if(key == null || val == null || map.get(key) != null) return null;
+        map.put(key, val);
+      } else {
+        return null;
+      }
+    }
+
+    // return string representation
+    final TokenBuilder tb = new TokenBuilder();
+    for(final byte[] key : map) {
+      if(!tb.isEmpty()) tb.add(',');
+      tb.add(key).add('=').add(string(map.get(key)).replace(",", ",,"));
+    }
+    return tb.toString();
   }
 }

@@ -811,7 +811,7 @@ public enum QueryError {
   /** Error code. */
   SER_X(SEPM, 16, "%"),
   /** Error code. */
-  SERMAP_X(SEPM, 17, "Character map '%' is not defined."),
+  SERMAP_X(SEPM, 17, "Character map is not valid: %."),
   /** Error code. */
   SEROPT_X(SEPM, 17, "%"),
   /** Error code. */
@@ -1287,7 +1287,7 @@ public enum QueryError {
   /** Error code. */
   TAGWRONG_X_X(XQST, 118, "Different start and end tag: <%>...</%>."),
   /** Error code. */
-  OUTDOC_X(XQST, 119, "Serialization document '%' cannot be parsed."),
+  OUTDOC_X(XQST, 119, "Parameter document cannot be parsed: %."),
   /** Error code. */
   NOVISALLOWED(XQST, 125, "No visibility annotation allowed in inline function."),
   /** Error code. */

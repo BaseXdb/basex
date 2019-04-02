@@ -360,37 +360,44 @@ public class Options implements Iterable<Option<?>> {
    * Assigns a value after casting it to the correct type. If the option is unknown,
    * it will be added as free option.
    * @param name name of option
-   * @param value value
+   * @param item value to be assigned
    * @param error error
    * @param ii input info
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  public synchronized void assign(final Item name, final Item value, final boolean error,
+  public synchronized void assign(final Item name, final Item item, final boolean error,
       final InputInfo ii) throws BaseXException, QueryException {
 
-    final String key = string(name.string(ii));
+    final String nm = string(name.string(ii));
     if(options.isEmpty()) {
-      final byte[] val;
-      if(value instanceof XQMap) {
-        final TokenBuilder tb = new TokenBuilder();
-        final XQMap map = (XQMap) value;
-        for(final Item item : map.keys()) {
-          if(!tb.isEmpty()) tb.add(',');
-          tb.add(item.string(ii)).add('=');
-          final Value vl = map.get(item, ii);
-          if(!vl.isItem()) throw new BaseXException(
-              Text.OPT_EXPECT_X_X_X, AtomType.ITEM, vl.seqType(), vl);
-          tb.add(string(((Item) vl).string(ii)).replace(",", ",,"));
-        }
-        val = tb.finish();
-      } else {
-        val = value.string(ii);
-      }
-      free.put(key, string(val));
+      free.put(nm, (item instanceof XQMap) ? toString((XQMap) item, ii) : string(item.string(ii)));
     } else {
-      assign(key, value, error, ii);
+      assign(nm, item, error, ii);
     }
+  }
+
+  /**
+   * Creates a string representation of the specified map.
+   * @param map map
+   * @param ii input info
+   * @return string
+   * @throws BaseXException database exception
+   * @throws QueryException query exception
+   */
+  private String toString(final XQMap map, final InputInfo ii)
+      throws BaseXException, QueryException {
+
+    final TokenBuilder tb = new TokenBuilder();
+    for(final Item key : map.keys()) {
+      if(!tb.isEmpty()) tb.add(',');
+      tb.add(key.string(ii)).add('=');
+      final Value vl = map.get(key, ii);
+      if(!vl.isItem()) throw new BaseXException(
+          Text.OPT_EXPECT_X_X_X, AtomType.STR, vl.seqType(), vl);
+      tb.add(string(((Item) vl).string(ii)).replace(",", ",,"));
+    }
+    return tb.toString();
   }
 
   /**
@@ -401,33 +408,42 @@ public class Options implements Iterable<Option<?>> {
     return free;
   }
 
+
   /**
    * Returns a map representation of the entries of the requested string (separated by commas).
    * @param option option to be found
    * @return map
    */
-  public final HashMap<String, String> toMap(final StringOption option) {
-    final String input = get(option).trim();
+  public final Map<String, String> toMap(final StringOption option) {
+    return toMap(get(option));
+  }
+
+  /**
+   * Returns a map representation of the comma-separated options string.
+   * @param opts options string
+   * @return map
+   */
+  public final Map<String, String> toMap(final String opts) {
     final HashMap<String, String> map = new HashMap<>();
-    final StringBuilder key = new StringBuilder();
-    final StringBuilder value = new StringBuilder();
-    boolean first = true;
-    final int sl = input.length();
+    final StringBuilder key = new StringBuilder(), value = new StringBuilder();
+
+    boolean left = true;
+    final int sl = opts.length();
     for(int s = 0; s < sl; s++) {
-      final char ch = input.charAt(s);
-      if(first) {
+      final char ch = opts.charAt(s);
+      if(left) {
         if(ch == '=') {
-          first = false;
+          left = false;
         } else {
           key.append(ch);
         }
       } else {
         if(ch == ',') {
-          if(s + 1 == sl || input.charAt(s + 1) != ',') {
+          if(s + 1 == sl || opts.charAt(s + 1) != ',') {
             map.put(key.toString().trim(), value.toString());
             key.setLength(0);
             value.setLength(0);
-            first = true;
+            left = true;
             continue;
           }
           // literal commas are escaped by a second comma
@@ -436,7 +452,7 @@ public class Options implements Iterable<Option<?>> {
         value.append(ch);
       }
     }
-    if(!first) map.put(key.toString().trim(), value.toString());
+    if(!left) map.put(key.toString().trim(), value.toString());
     return map;
   }
 
@@ -506,20 +522,8 @@ public class Options implements Iterable<Option<?>> {
    * @throws BaseXException database exception
    */
   public final synchronized void assign(final String string) throws BaseXException {
-    final int sl = string.length();
-    int i = 0;
-    while(i < sl) {
-      int k = string.indexOf('=', i);
-      if(k == -1) k = sl;
-      final String key = string.substring(i, k).trim();
-      final StringBuilder val = new StringBuilder();
-      i = k;
-      while(++i < sl) {
-        final char ch = string.charAt(i);
-        if(ch == ',' && (++i == sl || string.charAt(i) != ',')) break;
-        val.append(ch);
-      }
-      assign(key, val.toString());
+    for(final Map.Entry<String, String> entry : toMap(string).entrySet()) {
+      assign(entry.getKey(), entry.getValue());
     }
   }
 
@@ -537,11 +541,9 @@ public class Options implements Iterable<Option<?>> {
     for(final Item name : map.keys()) {
       if(!name.type.isStringOrUntyped())
         throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.STR, name.type, name);
-
       final Value value = map.get(name, ii);
-      if(value.size() != 1)
+      if(!value.isItem())
         throw new BaseXException(Text.OPT_EXPECT_X_X_X, SeqType.ITEM_O, value.seqType(), value);
-
       assign(name, (Item) value, error, ii);
     }
   }
@@ -709,7 +711,7 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Assigns the specified name and value.
    * @param name name of option
-   * @param item value of option
+   * @param item value to be assigned
    * @param error raise error if option is unknown
    * @param ii input info
    * @throws BaseXException database exception
@@ -727,32 +729,34 @@ public class Options implements Iterable<Option<?>> {
     if(option instanceof BooleanOption) {
       final boolean v;
       if(item.type.isStringOrUntyped()) {
-        final String string = string(item.string(null));
+        final String string = string(item.string(ii));
         v = Strings.toBoolean(string);
         if(!v && !Strings.no(string))
           throw new BaseXException(Text.OPT_BOOLEAN_X_X, option.name(), string);
       } else if(item instanceof Bln) {
-        v = ((Bln) item).bool(null);
+        v = ((Bln) item).bool(ii);
       } else {
         throw new BaseXException(Text.OPT_BOOLEAN_X_X, option.name(), item);
       }
       put(option, v);
     } else if(option instanceof NumberOption) {
       if(item instanceof ANum) {
-        put(option, (int) ((ANum) item).itr(null));
+        put(option, (int) ((ANum) item).itr(ii));
       } else {
         throw new BaseXException(Text.OPT_NUMBER_X_X, option.name(), item);
       }
     } else if(option instanceof StringOption) {
-      if(item.type.isStringOrUntyped()) {
-        put(option, string(item.string(null)));
+      if(item instanceof XQMap) {
+        put(option, toString((XQMap) item, ii));
+      } else if(item.type.isStringOrUntyped()) {
+        put(option, string(item.string(ii)));
       } else {
         throw new BaseXException(Text.OPT_STRING_X_X, option.name(), item);
       }
     } else if(option instanceof EnumOption) {
       if(item.type.isStringOrUntyped()) {
         final EnumOption<?> eo = (EnumOption<?>) option;
-        final String string = string(item.string(null));
+        final String string = string(item.string(ii));
         final Object v = eo.get(string);
         if(v == null) throw new BaseXException(allowed(option, string, (Object[]) eo.values()));
         put(option, v);
