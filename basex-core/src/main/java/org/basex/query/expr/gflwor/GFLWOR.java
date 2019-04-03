@@ -174,8 +174,8 @@ public final class GFLWOR extends ParseExpr {
     if(minMax[1] != 0) {
       final long size = rtrn.size();
       minMax[0] *= Math.max(size, 0);
-      final long max = minMax[1];
-      if(max > 0) minMax[1] = size < 0 ? -1 : max * size;
+      if(minMax[1] > 0) minMax[1] = size >= 0 ? minMax[1] * size : -1;
+      else if(size == 0) minMax[1] = 0;
     }
     exprType.assign(rtrn.seqType().type, minMax);
   }
