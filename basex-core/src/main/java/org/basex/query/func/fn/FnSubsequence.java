@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.file.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -208,6 +209,15 @@ public class FnSubsequence extends StandardFunc {
         return cc.function(Function.TAIL, info, expr);
       if(Function._FILE_READ_TEXT_LINES.is(expr))
         return FileReadTextLines.opt(this, sr.start, sr.length, cc);
+    } else {
+      // subsequence(expr, 1, count(expr) - 1)  ->  util:init(expr)
+      if(exprs[1] == Int.get(1) && exprs[2] instanceof Arith && !exprs[0].has(Flag.NDT)) {
+        final Arith ar = (Arith) exprs[2];
+        if(Function.COUNT.is(ar.exprs[0]) && ar.calc == Calc.MINUS && ar.exprs[1] == Int.get(1) &&
+            exprs[0].equals(args(ar.exprs[0])[0])) {
+          return cc.function(Function._UTIL_INIT, info, expr);
+        }
+      }
     }
 
     exprType.assign(st.type, st.occ.union(Occ.ZERO), sz);
