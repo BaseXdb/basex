@@ -17,7 +17,6 @@ import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -92,14 +91,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     expr.markTailCalls(cc);
 
     compiling = false;
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    final FElem elem = planElem(NAME, name.string(), TYPE, seqType());
-    addPlan(plan, elem, expr);
-    final int pl = params.length;
-    for(int p = 0; p < pl; ++p) elem.add(planAttr(ARG + p, params[p].name.string()));
   }
 
   /**
@@ -325,6 +316,11 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   @Override
   public String description() {
     return "function declaration";
+  }
+
+  @Override
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, NAME, name.string()), params, expr);
   }
 
   @Override

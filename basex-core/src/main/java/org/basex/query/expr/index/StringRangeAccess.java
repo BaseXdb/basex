@@ -116,8 +116,8 @@ public final class StringRangeAccess extends IndexAccess {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(INDEX, index.type(), MIN, index.min, MAX, index.max), db);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, INDEX, index.type(), MIN, index.min, MAX, index.max), db);
   }
 
   @Override

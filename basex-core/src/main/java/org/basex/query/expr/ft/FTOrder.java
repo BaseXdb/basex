@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
-import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -44,8 +43,8 @@ public final class FTOrder extends FTFilter {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(QueryText.ORDERED, TRUE), exprs);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, QueryText.ORDERED, TRUE), exprs);
   }
 
   @Override

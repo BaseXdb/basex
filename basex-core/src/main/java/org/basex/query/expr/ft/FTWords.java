@@ -506,8 +506,8 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), occ, query);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), ftOpt, occ, query);
   }
 
   @Override

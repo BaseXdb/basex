@@ -68,8 +68,8 @@ public final class FTOptions extends FTExpr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), opt, exprs[0]);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), opt, exprs[0]);
   }
 
   @Override

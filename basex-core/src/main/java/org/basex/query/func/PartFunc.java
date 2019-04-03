@@ -9,7 +9,6 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -115,20 +114,6 @@ public final class PartFunc extends Arr {
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof PartFunc && Arrays.equals(holes, ((PartFunc) obj).holes) &&
         super.equals(obj);
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    final FElem elem = addPlan(plan, planElem());
-    final int es = exprs.length, hs = holes.length;
-    exprs[es - 1].plan(elem);
-    int p = -1;
-    for(int h = 0; h < hs; h++) {
-      while(++p < holes[h]) exprs[p - h].plan(elem);
-      final FElem a = new FElem(QueryText.ARG);
-      elem.add(a.add(planAttr(QueryText.POS, Token.token(h))));
-    }
-    while(++p < es + hs - 1) exprs[p - hs].plan(elem);
   }
 
   @Override

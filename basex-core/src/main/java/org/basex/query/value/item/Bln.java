@@ -124,6 +124,8 @@ public final class Bln extends Item {
     return Strings.concat(value ? Token.TRUE : Token.FALSE, "()");
   }
 
+  // STATIC METHODS ===============================================================================
+
   /**
    * Converts the specified item to a boolean.
    * @param item item to be converted

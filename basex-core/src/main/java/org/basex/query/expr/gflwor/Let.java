@@ -126,9 +126,10 @@ public final class Let extends ForLet {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem elem = addPlan(plan, var.planAttributes(planElem(), false), expr);
-    if(scoring) elem.add(planAttr(SCORE, true));
+  public void plan(final QueryPlan plan) {
+    final FElem elem = plan.attachVariable(plan.create(this), var, false);
+    if(scoring) plan.addAttribute(elem, SCORE, true);
+    plan.add(elem, expr);
   }
 
   @Override

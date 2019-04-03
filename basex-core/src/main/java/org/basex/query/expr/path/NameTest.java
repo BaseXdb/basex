@@ -115,6 +115,11 @@ public final class NameTest extends Test {
   }
 
   @Override
+  public Test intersect(final Test other) {
+    throw Util.notExpected(other);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     if(!(obj instanceof NameTest)) return false;
     final NameTest nt = (NameTest) obj;
@@ -129,11 +134,6 @@ public final class NameTest extends Test {
       // check everything
       default: return name.eq(nt.name);
     }
-  }
-
-  @Override
-  public Test intersect(final Test other) {
-    throw Util.notExpected(other);
   }
 
   @Override

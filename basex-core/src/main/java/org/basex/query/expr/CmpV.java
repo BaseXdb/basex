@@ -7,7 +7,6 @@ import org.basex.query.*;
 import org.basex.query.expr.CmpG.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -242,13 +241,13 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(OP, opV.name), exprs);
+  public String description() {
+    return "'" + opV + "' comparison";
   }
 
   @Override
-  public String description() {
-    return "'" + opV + "' comparison";
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, OP, opV.name), exprs);
   }
 
   @Override

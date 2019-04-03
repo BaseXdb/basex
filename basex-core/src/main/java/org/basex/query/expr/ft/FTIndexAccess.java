@@ -116,8 +116,8 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), db, ftexpr);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), db, ftexpr);
   }
 
   @Override

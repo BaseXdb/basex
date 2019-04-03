@@ -146,6 +146,11 @@ public final class TypeCheck extends Single {
   }
 
   @Override
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new TypeCheck(sc, info, expr.copy(cc, vm), seqType(), promote);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof TypeCheck)) return false;
@@ -154,15 +159,10 @@ public final class TypeCheck extends Single {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new TypeCheck(sc, info, expr.copy(cc, vm), seqType(), promote);
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    final FElem elem = planElem(AS, seqType());
-    if(promote) elem.add(planAttr(PROMOTE, true));
-    addPlan(plan, elem, expr);
+  public void plan(final QueryPlan plan) {
+    final FElem elem = plan.create(this, AS, seqType());
+    if(promote) plan.addAttribute(elem, PROMOTE, true);
+    plan.add(elem, expr);
   }
 
   @Override

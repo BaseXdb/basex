@@ -1,5 +1,6 @@
 package org.basex.query.expr.path;
 
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -71,11 +72,6 @@ public abstract class Test extends ExprInfo {
    */
   public abstract Test copy();
 
-  @Override
-  public void plan(final FElem root) {
-    throw Util.notExpected();
-  }
-
   /**
    * Checks if this test is namespace-sensitive.
    * @return result of check
@@ -90,4 +86,9 @@ public abstract class Test extends ExprInfo {
    * @return intersection if it exists, {@code null} otherwise
    */
   public abstract Test intersect(Test other);
+
+  @Override
+  public void plan(final QueryPlan plan) {
+    throw Util.notExpected();
+  }
 }

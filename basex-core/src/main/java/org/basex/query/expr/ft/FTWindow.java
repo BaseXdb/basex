@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.ft.*;
-import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -107,11 +106,6 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(QueryText.WINDOW, unit), win, exprs);
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     return super.accept(visitor) && win.accept(visitor);
   }
@@ -121,6 +115,11 @@ public final class FTWindow extends FTFilter {
     int size = 1;
     for(final FTExpr expr : exprs) size += expr.exprSize();
     return size + win.exprSize();
+  }
+
+  @Override
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, QueryText.WINDOW, unit), win, exprs);
   }
 
   @Override

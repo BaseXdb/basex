@@ -40,14 +40,6 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof FTStringMatch)) return false;
-    final FTStringMatch sm = (FTStringMatch) obj;
-    return start == sm.start && end == sm.end;
-  }
-
-  @Override
   public int compareTo(final FTStringMatch sm) {
     final int s = start - sm.start;
     return s == 0 ? end - sm.end : s;
@@ -57,6 +49,14 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
   public int hashCode() {
     final int h = start + 1;
     return (h << 5) - h + end;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof FTStringMatch)) return false;
+    final FTStringMatch sm = (FTStringMatch) obj;
+    return start == sm.start && end == sm.end;
   }
 
   @Override

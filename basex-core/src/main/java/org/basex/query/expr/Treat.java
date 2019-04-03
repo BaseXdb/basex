@@ -7,7 +7,6 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -115,8 +114,8 @@ public final class Treat extends Single {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(AS, seqType()), expr);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, AS, seqType()), expr);
   }
 
   @Override

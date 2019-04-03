@@ -535,8 +535,8 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final void plan(final FElem plan) {
-    addPlan(plan, planElem(NAME, def.desc), exprs);
+  public final void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, NAME, def.id()), exprs);
   }
 
   @Override

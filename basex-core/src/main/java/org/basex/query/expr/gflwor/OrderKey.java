@@ -7,7 +7,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.collation.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -69,8 +68,8 @@ public final class OrderKey extends Single {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(DIR, Token.token(desc ? DESCENDING : ASCENDING),
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, DIR, Token.token(desc ? DESCENDING : ASCENDING),
         Token.token(EMPTYY), Token.token(least ? LEAST : GREATEST)), expr);
   }
 

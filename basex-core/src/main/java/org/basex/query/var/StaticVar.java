@@ -10,7 +10,6 @@ import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -172,13 +171,13 @@ public final class StaticVar extends StaticDecl {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAME, name.string(), TYPE, seqType()), expr);
+  public String description() {
+    return "variable declaration";
   }
 
   @Override
-  public String description() {
-    return "variable declaration";
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, NAME, name.string()), expr);
   }
 
   @Override

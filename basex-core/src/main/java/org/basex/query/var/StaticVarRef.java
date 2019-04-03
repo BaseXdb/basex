@@ -8,7 +8,6 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -119,12 +118,12 @@ final class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(QueryText.VAR, name));
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, QueryText.VAR, name));
   }
 
   @Override
   public String toString() {
-    return '$' + Token.string(name.string());
+    return Strings.concat('$', name.string());
   }
 }

@@ -8,7 +8,6 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -182,8 +181,8 @@ public final class Typeswitch extends ParseExpr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), groups, cond);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), groups, cond);
   }
 
   @Override

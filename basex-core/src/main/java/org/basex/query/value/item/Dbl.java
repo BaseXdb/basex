@@ -163,6 +163,8 @@ public final class Dbl extends ANum {
     return this == obj || obj instanceof Dbl && value == ((Dbl) obj).value;
   }
 
+  // STATIC METHODS ===============================================================================
+
   /**
    * Converts the given token into a double value.
    * @param value value to be converted

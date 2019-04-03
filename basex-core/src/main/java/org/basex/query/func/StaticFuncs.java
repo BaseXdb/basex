@@ -11,7 +11,6 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -230,13 +229,8 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    if(!funcs.isEmpty()) {
-      final FElem elem = addPlan(plan, planElem());
-      for(final StaticFunc f : funcs()) {
-        if(f != null) f.plan(elem);
-      }
-    }
+  public void plan(final QueryPlan plan) {
+    if(!funcs.isEmpty()) plan.add(plan.create(this), funcs);
   }
 
   @Override

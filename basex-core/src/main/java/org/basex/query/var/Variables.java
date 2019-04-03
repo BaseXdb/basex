@@ -3,14 +3,13 @@ package org.basex.query.var;
 import static org.basex.query.QueryError.*;
 
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -114,13 +113,12 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   }
 
   @Override
-  public void plan(final FElem plan) {
+  public void plan(final QueryPlan plan) {
     if(vars.isEmpty()) return;
-    final FElem elem = planElem();
-    for(final VarEntry ve : vars.values()) {
-      if(ve.var != null) ve.var.plan(elem);
-    }
-    addPlan(plan, elem);
+
+    final ArrayList<ExprInfo> list = new ArrayList<>();
+    for(final VarEntry ve : vars.values()) list.add(ve.var);
+    plan.add(plan.create(this), list.toArray());
   }
 
   @Override

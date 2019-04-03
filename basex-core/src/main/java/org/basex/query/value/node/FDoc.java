@@ -1,7 +1,5 @@
 package org.basex.query.value.node;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -116,19 +114,6 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof FDoc)) return false;
-    final FDoc f = (FDoc) obj;
-    return children.equals(f.children) && Token.eq(uri, f.uri) && super.equals(obj);
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(QueryText.BASE, uri, TYPE, seqType()));
-  }
-
-  @Override
   public byte[] xdmInfo() {
     return new ByteList().add(typeId().asByte()).add(uri).add(0).finish();
   }
@@ -138,6 +123,19 @@ public final class FDoc extends FNode {
     // check if a document has a single element as child
     return (children.size() == 1 && children.get(0).type == NodeType.ELM ?
       NodeType.DEL : type).id();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof FDoc)) return false;
+    final FDoc f = (FDoc) obj;
+    return children.equals(f.children) && Token.eq(uri, f.uri) && super.equals(obj);
+  }
+
+  @Override
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, QueryText.BASE, uri));
   }
 
   @Override

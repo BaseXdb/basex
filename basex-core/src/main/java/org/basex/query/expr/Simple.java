@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.util.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -53,11 +52,6 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem());
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     return true;
   }
@@ -65,5 +59,10 @@ public abstract class Simple extends ParseExpr {
   @Override
   public int exprSize() {
     return 1;
+  }
+
+  @Override
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this));
   }
 }

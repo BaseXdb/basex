@@ -272,8 +272,8 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(INDEX, type, NAME, test), db, toExpr());
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, INDEX, type, NAME, test), db, toExpr());
   }
 
   @Override

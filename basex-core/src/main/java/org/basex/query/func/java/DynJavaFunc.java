@@ -196,12 +196,6 @@ final class DynJavaFunc extends DynJavaCall {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof DynJavaFunc && name.equals(((DynJavaFunc) obj).name) &&
-        super.equals(obj);
-  }
-
-  @Override
   String desc() {
     return EQNAME + JAVAPREF + clazz.getName() + CURLY2 + name;
   }
@@ -209,5 +203,11 @@ final class DynJavaFunc extends DynJavaCall {
   @Override
   String name() {
     return clazz.getName() + COL + name;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof DynJavaFunc && name.equals(((DynJavaFunc) obj).name) &&
+        super.equals(obj);
   }
 }

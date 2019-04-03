@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -67,8 +66,8 @@ public final class Castable extends Single {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(AS, castType), expr);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, AS, castType), expr);
   }
 
   @Override

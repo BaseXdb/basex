@@ -149,8 +149,8 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), copies, exprs);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), copies, exprs);
   }
 
   @Override

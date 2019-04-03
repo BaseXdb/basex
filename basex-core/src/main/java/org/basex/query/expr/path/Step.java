@@ -238,14 +238,6 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Step)) return false;
-    final Step s = (Step) obj;
-    return axis == s.axis && test.equals(s.test) && super.equals(obj);
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     for(final Expr pred : exprs) {
       visitor.enterFocus();
@@ -263,8 +255,16 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public final void plan(final FElem plan) {
-    addPlan(plan, planElem(AXIS, axis.name, TEST, test), exprs);
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof Step)) return false;
+    final Step s = (Step) obj;
+    return axis == s.axis && test.equals(s.test) && super.equals(obj);
+  }
+
+  @Override
+  public final void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, AXIS, axis.name, TEST, test), exprs);
   }
 
   @Override

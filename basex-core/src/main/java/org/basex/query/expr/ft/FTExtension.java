@@ -53,8 +53,8 @@ public final class FTExtension extends FTExpr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), pragma, exprs);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), pragma, exprs);
   }
 
   @Override

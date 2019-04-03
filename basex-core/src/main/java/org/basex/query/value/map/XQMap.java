@@ -12,7 +12,6 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -213,30 +212,6 @@ public final class XQMap extends XQData {
   }
 
   @Override
-  public String description() {
-    return MAP;
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    final int size = mapSize();
-    final FElem elem = planElem(ENTRIES, size, TYPE, seqType());
-    final Value keys = keys();
-    try {
-      final int max = Math.min(size, 5);
-      for(long i = 0; i < max; i++) {
-        final Item key = keys.itemAt(i);
-        final Value value = get(key, null);
-        key.plan(elem);
-        value.plan(elem);
-      }
-    } catch(final QueryException ex) {
-      throw Util.notExpected(ex);
-    }
-    addPlan(plan, elem);
-  }
-
-  @Override
   public void string(final boolean indent, final TokenBuilder tb, final int level,
       final InputInfo ii) throws QueryException {
 
@@ -273,6 +248,28 @@ public final class XQMap extends XQData {
       addWS.accept(level);
     }
     tb.add('}');
+  }
+
+  @Override
+  public String description() {
+    return MAP;
+  }
+
+  @Override
+  public void plan(final QueryPlan plan) {
+    try {
+      final int size = mapSize();
+      final Value keys = keys();
+      final ExprList list = new ExprList();
+      final int max = Math.min(size, 5);
+      for(long i = 0; i < max; i++) {
+        final Item key = keys.itemAt(i);
+        list.add(key).add(get(key, null));
+      }
+      plan.add(plan.create(this, ENTRIES, size));
+    } catch(final QueryException ex) {
+      throw Util.notExpected(ex);
+    }
   }
 
   @Override

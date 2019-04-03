@@ -9,7 +9,6 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -158,13 +157,13 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAME, name.string(), TCL, tco), exprs);
+  public String description() {
+    return "function";
   }
 
   @Override
-  public String description() {
-    return "function";
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, NAME, name.string(), TCL, tco), exprs);
   }
 
   @Override

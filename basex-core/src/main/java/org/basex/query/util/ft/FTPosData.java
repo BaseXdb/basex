@@ -81,18 +81,6 @@ public final class FTPosData {
     return c;
   }
 
-  @Override
-  public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof FTPosData)) return false;
-    final FTPosData ft = (FTPosData) obj;
-    if(size != ft.size) return false;
-    for(int p = 0; p < size; p++) {
-      if(pos[p].pre != ft.pos[p].pre || !pos[p].equals(ft.pos[p])) return false;
-    }
-    return true;
-  }
-
   /**
    * Returns the index of the specified pre value.
    * @param pre int pre value
@@ -109,5 +97,17 @@ public final class FTPosData {
       else h = m - 1;
     }
     return -l - 1;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof FTPosData)) return false;
+    final FTPosData ft = (FTPosData) obj;
+    if(size != ft.size) return false;
+    for(int p = 0; p < size; p++) {
+      if(pos[p].pre != ft.pos[p].pre || !pos[p].equals(ft.pos[p])) return false;
+    }
+    return true;
   }
 }

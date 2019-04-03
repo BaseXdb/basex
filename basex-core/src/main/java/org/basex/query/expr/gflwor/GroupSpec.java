@@ -9,7 +9,6 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -82,14 +81,14 @@ public final class GroupSpec extends Single {
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof GroupSpec)) return false;
-    final GroupSpec s = (GroupSpec) obj;
-    return var.equals(s.var) && occluded == s.occluded && Objects.equals(coll, s.coll) &&
+    final GroupSpec gs = (GroupSpec) obj;
+    return var.equals(gs.var) && occluded == gs.occluded && Objects.equals(coll, gs.coll) &&
         super.equals(obj);
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, var.planAttributes(planElem(), false), expr);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.attachVariable(plan.create(this), var, false), expr);
   }
 
   @Override

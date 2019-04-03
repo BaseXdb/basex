@@ -167,16 +167,16 @@ public final class List extends Arr {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof List && super.equals(obj);
-  }
-
-  @Override
   public boolean isVacuous() {
     for(final Expr expr : exprs) {
       if(!expr.isVacuous()) return false;
     }
     return true;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof List && super.equals(obj);
   }
 
   @Override

@@ -1,0 +1,158 @@
+package org.basex.query;
+
+import static org.basex.query.QueryText.*;
+import static org.basex.util.Token.*;
+
+import java.util.*;
+
+import org.basex.data.*;
+import org.basex.query.expr.*;
+import org.basex.query.scope.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
+import org.basex.query.var.*;
+import org.basex.util.*;
+
+/**
+ * Query plan.
+ *
+ * @author BaseX Team 2005-19, BSD License
+ * @author Christian Gruen
+ */
+public final class QueryPlan {
+  /** Root node. */
+  public final FElem root;
+  /** Node stack. */
+  public final Stack<FElem> nodes = new Stack<>();
+
+  /**
+   * Constructor.
+   * @param compiled compiled flag
+   * @param updating updating flag
+   */
+  public QueryPlan(final boolean compiled, final boolean updating) {
+    root = new FElem(QueryText.QUERY_PLAN);
+    root.add(QueryText.COMPILED, token(compiled));
+    root.add(QueryText.UPDATING, token(updating));
+    nodes.add(root);
+  }
+
+  /**
+   * Adds children to the specified element.
+   * @param elem new element
+   * @param children expressions to be added ({@code null} references will be ignored)
+   */
+  public void add(final FElem elem, final Object... children) {
+    final FElem plan = nodes.peek();
+    plan.add(elem);
+    nodes.add(elem);
+
+    for(final Object child : children) {
+      if(child instanceof ExprInfo) {
+        ((ExprInfo) child).plan(this);
+      } else if(child instanceof ExprInfo[]) {
+        for(final ExprInfo ex : (ExprInfo[]) child) {
+          if(ex != null) ex.plan(this);
+        }
+      } else if(child instanceof byte[]) {
+        elem.add((byte[]) child);
+      } else if(child != null) {
+        elem.add(child.toString());
+      }
+    }
+
+    nodes.pop();
+  }
+
+  /**
+   * Adds children to the specified element.
+   * @param elem new element
+   * @param children expressions ({@code null} references will be ignored)
+   */
+  public void add(final FElem elem, final ExprInfo... children) {
+    add(elem, (Object[]) children);
+  }
+
+  /**
+   * Creates a new element node to be added to the query plan.
+   * @param expr calling expression
+   * @param atts attribute names and values
+   * @return element
+   */
+  public FElem create(final ExprInfo expr, final Object... atts) {
+    final FElem elem = new FElem(Util.className(expr));
+    final int al = atts.length;
+    for(int a = 0; a < al - 1; a += 2) {
+      addAttribute(elem, atts[a], atts[a + 1]);
+    }
+    if(expr instanceof Expr) {
+      final Expr ex = (Expr) expr;
+      attachType(elem, ex.seqType(), ex.size(), ex.data());
+    } else if(expr instanceof StaticDecl) {
+      attachType(elem, ((StaticDecl) expr).seqType(), -1, null);
+    }
+    return elem;
+  }
+
+  /**
+   * Creates a new element node to be added to the query plan.
+   * @param name name of element
+   * @param var variable to attach to (can be {@code null})
+   * @return element
+   */
+  public FElem create(final String name, final Var var) {
+    return attachVariable(new FElem(Strings.capitalize(name)), var, true);
+  }
+
+  /**
+   * Adds an attribute to the specified element if the specified value is not {@code null}.
+   * @param elem element to which the attribute will be added
+   * @param name name
+   * @param value value or {@code null}
+   */
+  public void addAttribute(final FElem elem, final Object name, final Object value) {
+    if(value != null) elem.add(Util.inf(name), Util.inf(value));
+  }
+
+  /**
+   * Adds a child element to the specified element.
+   * @param elem element to which the attribute will be added
+   * @param child child element
+   */
+  public void addElement(final FElem elem, final FElem child) {
+    elem.add(child);
+  }
+
+  /**
+   * Adds variable information to the specified element.
+   * @param elem element to which attributes will be added
+   * @param var variable (can be {@code null})
+   * @param type include type information
+   * @return specified element
+   */
+  public FElem attachVariable(final FElem elem, final Var var, final boolean type) {
+    if(var != null) {
+      addAttribute(elem, QueryText.NAME, var.toErrorString());
+      addAttribute(elem, Token.ID, var.id);
+      if(var.declType != null) addAttribute(elem, QueryText.AS, var.declType);
+      if(var.promote) addAttribute(elem, QueryText.PROMOTE, true);
+      if(type) attachType(elem, var.seqType(), var.size(), var.data());
+    }
+    return elem;
+  }
+
+  /**
+   * Attaches type information to the specified element.
+   * @param elem element to which attributes will be added
+   * @param seqType sequence type
+   * @param size result size
+   * @param data data reference (can be {@code null})
+   */
+  private void attachType(final FElem elem, final SeqType seqType, final long size,
+      final Data data) {
+
+    addAttribute(elem, TYPE, seqType);
+    if(size != -1) addAttribute(elem, SIZE, size);
+    if(data != null) addAttribute(elem, DATABASE, data.meta.name);
+  }
+}

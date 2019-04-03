@@ -51,12 +51,12 @@ public final class BaseXPragma extends Pragma {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return obj instanceof BaseXPragma && super.equals(obj);
+  public Pragma copy() {
+    return new BaseXPragma(name, value);
   }
 
   @Override
-  public Pragma copy() {
-    return new BaseXPragma(name, value);
+  public boolean equals(final Object obj) {
+    return obj instanceof BaseXPragma && super.equals(obj);
   }
 }

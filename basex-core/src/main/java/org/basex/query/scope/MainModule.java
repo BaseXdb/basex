@@ -11,7 +11,6 @@ import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -138,21 +137,6 @@ public final class MainModule extends AModule {
     };
   }
 
-  @Override
-  public String toString() {
-    return expr.toString();
-  }
-
-  @Override
-  public void plan(final FElem root) {
-    expr.plan(root);
-  }
-
-  @Override
-  public boolean visit(final ASTVisitor visitor) {
-    return expr.accept(visitor);
-  }
-
   /**
    * Adds the names of the databases that may be touched by the module.
    * @param locks lock result
@@ -161,6 +145,21 @@ public final class MainModule extends AModule {
    */
   public boolean databases(final Locks locks, final QueryContext qc) {
     return expr.accept(new LockVisitor(locks, qc));
+  }
+
+  @Override
+  public boolean visit(final ASTVisitor visitor) {
+    return expr.accept(visitor);
+  }
+
+  @Override
+  public void plan(final QueryPlan plan) {
+    expr.plan(plan);
+  }
+
+  @Override
+  public String toString() {
+    return expr.toString();
   }
 
   /**

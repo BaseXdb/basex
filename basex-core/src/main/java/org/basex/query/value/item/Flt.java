@@ -122,6 +122,8 @@ public final class Flt extends ANum {
     return this == obj || obj instanceof Flt && value == ((Flt) obj).value;
   }
 
+  // STATIC METHODS ===============================================================================
+
   /**
    * Converts the given item to a float value.
    * @param value value to be converted

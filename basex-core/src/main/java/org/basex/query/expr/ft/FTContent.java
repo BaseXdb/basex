@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
-import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -68,8 +67,8 @@ public final class FTContent extends FTFilter {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(CONTENT, content), exprs);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, CONTENT, content), exprs);
   }
 
   @Override

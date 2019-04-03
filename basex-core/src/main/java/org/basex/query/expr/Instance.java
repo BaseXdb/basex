@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -58,8 +57,8 @@ public final class Instance extends Single {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(OF, instType), expr);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, OF, instType), expr);
   }
 
   @Override

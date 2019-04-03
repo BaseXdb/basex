@@ -334,22 +334,6 @@ public abstract class Item extends Value {
     return type.id();
   }
 
-  @Override
-  public void plan(final FElem plan) {
-    try {
-      addPlan(plan, planElem(TYPE, type), toToken(string(null), false, true));
-    } catch(final QueryException ex) {
-      // only function items throw exceptions in atomization, and they should
-      // override plan(Serializer) sensibly
-      throw Util.notExpected(ex);
-    }
-  }
-
-  @Override
-  public String description() {
-    return type + " " + ITEM;
-  }
-
   /**
    * Returns a chopped and quoted token representation of the specified value.
    * @param value value
@@ -382,5 +366,21 @@ public abstract class Item extends Value {
     }
     if(quotes) tb.add('"');
     return tb.finish();
+  }
+
+  @Override
+  public String description() {
+    return type + " " + ITEM;
+  }
+
+  @Override
+  public void plan(final QueryPlan plan) {
+    try {
+      plan.add(plan.create(this), toToken(string(null), false, true));
+    } catch(final QueryException ex) {
+      // only function items throw exceptions in atomization, and they should
+      // override plan(Serializer) sensibly
+      throw Util.notExpected(ex);
+    }
   }
 }

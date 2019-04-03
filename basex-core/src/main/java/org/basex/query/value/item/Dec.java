@@ -127,6 +127,8 @@ public final class Dec extends ANum {
     return this == obj || obj instanceof Dec && value.compareTo(((Dec) obj).value) == 0;
   }
 
+  // STATIC METHODS ===============================================================================
+
   /**
    * Converts the given token into a decimal value.
    * @param item item to be converted

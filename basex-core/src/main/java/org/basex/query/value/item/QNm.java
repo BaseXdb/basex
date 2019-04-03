@@ -336,14 +336,21 @@ public final class QNm extends Item {
   }
 
   @Override
+  public int hashCode() {
+    return Token.hash(id());
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     return obj instanceof QNm && eq((QNm) obj);
   }
 
   @Override
-  public int hashCode() {
-    return Token.hash(id());
+  public String toString() {
+    return Token.string(id());
   }
+
+  // STATIC METHODS ===============================================================================
 
   /**
    * Constructs an internal string representation for the components of a QName.
@@ -386,10 +393,5 @@ public final class QNm extends Item {
    */
   public static byte[] eqName(final byte[] uri, final byte[] local) {
     return concat(QueryText.EQNAME, uri, QueryText.CURLY2, local);
-  }
-
-  @Override
-  public String toString() {
-    return Token.string(id());
   }
 }

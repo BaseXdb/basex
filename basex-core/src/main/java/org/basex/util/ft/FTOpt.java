@@ -7,9 +7,11 @@ import static org.basex.util.ft.FTFlag.*;
 import java.util.*;
 
 import org.basex.data.*;
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.value.node.*;
+import org.basex.util.list.*;
 
 /**
  * This class contains all full-text options.
@@ -98,28 +100,29 @@ public final class FTOpt extends ExprInfo {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    if(is(WC)) plan.add(planAttr(WILDCARDS, TRUE));
-    if(is(FZ)) plan.add(planAttr(FUZZY, TRUE));
-    if(cs != FTCase.INSENSITIVE) plan.add(planAttr(CASE, cs));
-    if(is(DC)) plan.add(planAttr(DIACRITICS, TRUE));
-    if(is(ST)) plan.add(planAttr(STEMMING, TRUE));
-    if(ln != null) plan.add(planAttr(LANGUAGE, ln));
-    if(th != null) plan.add(planAttr(THESAURUS, TRUE));
+  public void plan(final QueryPlan plan) {
+    final FElem elem = plan.create(this,
+      WILDCARDS, is(WC) ? TRUE : null, FUZZY, is(FZ) ? TRUE : null, CASE, cs,
+      STEMMING, is(ST) || sd != null ? TRUE : null, LANGUAGE, ln,
+      THESAURUS, th != null ? TRUE : null);
+    if(elem.attributes().next() != null) plan.add(elem);
   }
 
   @Override
   public String toString() {
-    final StringBuilder s = new StringBuilder();
-    if(is(WC)) s.append(' ' + USING + ' ' + WILDCARDS);
-    if(is(FZ)) s.append(' ' + USING + ' ' + FUZZY);
-    if(cs == FTCase.LOWER) s.append(' ' + USING + ' ' + LOWERCASE);
-    else if(cs == FTCase.UPPER) s.append(' ' + USING + ' ' + UPPERCASE);
-    else if(cs == FTCase.SENSITIVE) s.append(' ' + USING + ' ' + CASE + ' ' + SENSITIVE);
-    if(is(DC)) s.append(' ' + USING + ' ' + DIACRITICS + ' ' + SENSITIVE);
-    if(is(ST) || sd != null) s.append(' ' + USING + ' ' + STEMMING);
-    if(ln != null) s.append(' ' + USING + ' ' + LANGUAGE + " '").append(ln).append('\'');
-    if(th != null) s.append(' ' + USING + ' ' + THESAURUS);
-    return s.toString();
+    final StringList list = new StringList();
+    if(is(WC)) list.add(WILDCARDS);
+    if(is(FZ)) list.add(FUZZY);
+    if(cs == FTCase.LOWER) list.add(LOWERCASE);
+    else if(cs == FTCase.UPPER) list.add(UPPERCASE);
+    else if(cs == FTCase.SENSITIVE) list.add(CASE + ' ' + SENSITIVE);
+    if(is(DC)) list.add(DIACRITICS + ' ' + SENSITIVE);
+    if(is(ST) || sd != null) list.add(STEMMING);
+    if(ln != null) list.add(LANGUAGE + " '" + ln + "'");
+    if(th != null) list.add(THESAURUS);
+
+    final StringBuilder sb = new StringBuilder();
+    for(final String opt : list) sb.append(' ').append(USING).append(' ').append(opt);
+    return sb.toString();
   }
 }

@@ -62,15 +62,6 @@ public final class DBNodes extends DBNodeSeq {
     return ftpos;
   }
 
-  @Override
-  public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof DBNodes)) return false;
-    final DBNodes n = (DBNodes) obj;
-    return data == n.data && Arrays.equals(pres, n.pres) &&
-        (ftpos == null ? n.ftpos == null : ftpos.equals(n.ftpos));
-  }
-
   /**
    * Returns {@code null} if the pre values reference all documents of the database.
    * @return self reference or {@code null}
@@ -202,5 +193,14 @@ public final class DBNodes extends DBNodeSeq {
   public DBNode itemAt(final long pos) {
     final int pre = pres[(int) pos];
     return ftpos == null ? new DBNode(data, pre) : new FTPosNode(data, pre, ftpos);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof DBNodes)) return false;
+    final DBNodes n = (DBNodes) obj;
+    return data == n.data && Arrays.equals(pres, n.pres) &&
+        (ftpos == null ? n.ftpos == null : ftpos.equals(n.ftpos));
   }
 }

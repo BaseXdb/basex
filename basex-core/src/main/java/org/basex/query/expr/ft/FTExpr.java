@@ -131,8 +131,8 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), exprs);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), exprs);
   }
 
   /**

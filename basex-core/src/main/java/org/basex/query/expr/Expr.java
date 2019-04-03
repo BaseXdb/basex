@@ -28,32 +28,6 @@ import org.basex.util.hash.*;
  */
 public abstract class Expr extends ExprInfo {
   /**
-   * {@inheritDoc}
-   * <div>
-   * This function is e.g. called by:
-   * <ul>
-   *   <li>{@link If#optimize(CompileContext)}, {@link Switch#optimize(CompileContext)},
-   *     {@link Typeswitch#optimize(CompileContext)}, in order to discard identical expressions.
-   *   </li>
-   *   <li>{@link CmpR#intersect(CmpR)} or {@link CmpSR#intersect(CmpSR)},
-   *     in order to merge expressions with identical input.
-   *   </li>
-   *   <li>{@link CmpG#optimize(CompileContext)} or {@link CmpV#optimize(CompileContext)},
-   *     in order to pre-evaluate equality tests.
-   *   </li>
-   *   <li>{@link CmpG#optimize(CompileContext)} or
-   *     {@link Pos#get(Expr, CmpV.OpV, InputInfo, CompileContext)},
-   *     in order to compare the start and end value.
-   *   </li>
-   *   <li>{@link PathCache}, in order to find identical root values at runtime.
-   *   </li>
-   * </ul>
-   * </div>
-   */
-  @Override
-  public abstract boolean equals(Object obj);
-
-  /**
    * Checks if the updating semantics are satisfied.
    * This function is only called if any updating expression was found in the query.
    * @throws QueryException query exception
@@ -446,4 +420,29 @@ public abstract class Expr extends ExprInfo {
   protected Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
     return null;
   }
+  /**
+   * {@inheritDoc}
+   * <div>
+   * This function is e.g. called by:
+   * <ul>
+   *   <li>{@link If#optimize(CompileContext)}, {@link Switch#optimize(CompileContext)},
+   *     {@link Typeswitch#optimize(CompileContext)}, in order to discard identical expressions.
+   *   </li>
+   *   <li>{@link CmpR#intersect(CmpR)} or {@link CmpSR#intersect(CmpSR)},
+   *     in order to merge expressions with identical input.
+   *   </li>
+   *   <li>{@link CmpG#optimize(CompileContext)} or {@link CmpV#optimize(CompileContext)},
+   *     in order to pre-evaluate equality tests.
+   *   </li>
+   *   <li>{@link CmpG#optimize(CompileContext)} or
+   *     {@link Pos#get(Expr, CmpV.OpV, InputInfo, CompileContext)},
+   *     in order to compare the start and end value.
+   *   </li>
+   *   <li>{@link PathCache}, in order to find identical root values at runtime.
+   *   </li>
+   * </ul>
+   * </div>
+   */
+  @Override
+  public abstract boolean equals(Object obj);
 }

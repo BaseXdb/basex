@@ -33,17 +33,17 @@ public final class DblSeq extends NativeSeq {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof DblSeq ? Arrays.equals(values, ((DblSeq) obj).values) :
-      super.equals(obj));
-  }
-
-  @Override
   public Value reverse(final QueryContext qc) {
     final int sz = (int) size;
     final double[] tmp = new double[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = values[i];
     return get(tmp);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || (obj instanceof DblSeq ? Arrays.equals(values, ((DblSeq) obj).values) :
+      super.equals(obj));
   }
 
   @Override

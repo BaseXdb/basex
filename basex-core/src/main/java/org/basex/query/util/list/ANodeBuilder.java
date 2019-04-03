@@ -284,12 +284,12 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return obj == this || obj instanceof ANodeBuilder && super.equals(obj);
+  protected ANode[] newList(final int s) {
+    return new ANode[s];
   }
 
   @Override
-  protected ANode[] newList(final int s) {
-    return new ANode[s];
+  public boolean equals(final Object obj) {
+    return obj == this || obj instanceof ANodeBuilder && super.equals(obj);
   }
 }

@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -80,17 +79,6 @@ public final class Extension extends Single {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Extension &&
-        pragma.equals(((Extension) obj).pragma) && super.equals(obj);
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), pragma, expr);
-  }
-
-  @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     final Object state = pragma.init(ii.qc, info);
     try {
@@ -98,6 +86,17 @@ public final class Extension extends Single {
     } finally {
       pragma.finish(ii.qc, state);
     }
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof Extension &&
+        pragma.equals(((Extension) obj).pragma) && super.equals(obj);
+  }
+
+  @Override
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), pragma, expr);
   }
 
   @Override

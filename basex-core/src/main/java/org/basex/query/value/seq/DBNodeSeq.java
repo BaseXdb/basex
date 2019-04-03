@@ -58,14 +58,6 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof DBNodeSeq)) return super.equals(obj);
-    final DBNodeSeq ds = (DBNodeSeq) obj;
-    return size == ds.size && Arrays.equals(pres, ds.pres);
-  }
-
-  @Override
   public DBNode itemAt(final long pos) {
     return new DBNode(data, pres[(int) pos]);
   }
@@ -108,6 +100,14 @@ public class DBNodeSeq extends NativeSeq {
     final int[] tmp = new int[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = pres[i];
     return get(tmp, data, type, false);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof DBNodeSeq)) return super.equals(obj);
+    final DBNodeSeq ds = (DBNodeSeq) obj;
+    return size == ds.size && Arrays.equals(pres, ds.pres);
   }
 
   @Override

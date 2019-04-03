@@ -7,7 +7,6 @@ import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.map.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -74,7 +73,4 @@ public abstract class FItem extends Item implements XQFunction {
    * @throws QueryException query exception
    */
   public abstract boolean deep(Item item, Collation coll, InputInfo ii) throws QueryException;
-
-  @Override
-  public abstract void plan(FElem root);
 }

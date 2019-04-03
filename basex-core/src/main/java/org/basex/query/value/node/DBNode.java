@@ -409,16 +409,6 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final boolean equals(final Object obj) {
-    return obj instanceof DBNode && is((DBNode) obj);
-  }
-
-  @Override
-  public final void plan(final FElem plan) {
-    addPlan(plan, planElem(DATABASE, data.meta.name, PRE, pre, TYPE, type));
-  }
-
-  @Override
   public final byte[] xdmInfo() {
     final ByteList bl = new ByteList().add(typeId().asByte());
     if(type == NodeType.DOC) bl.add(baseURI()).add(0);
@@ -436,6 +426,21 @@ public class DBNode extends ANode {
       if(n != null && n.type == NodeType.ELM && iter.next() == null) i = NodeType.DEL.id();
     }
     return i;
+  }
+
+  @Override
+  public final BXNode toJava() {
+    return BXNode.get(copy(new MainOptions(), null));
+  }
+
+  @Override
+  public final boolean equals(final Object obj) {
+    return obj instanceof DBNode && is((DBNode) obj);
+  }
+
+  @Override
+  public final void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, PRE, pre));
   }
 
   @Override
@@ -475,10 +480,5 @@ public class DBNode extends ANode {
         break;
     }
     return tb.toString();
-  }
-
-  @Override
-  public final BXNode toJava() {
-    return BXNode.get(copy(new MainOptions(), null));
   }
 }

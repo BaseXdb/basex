@@ -140,8 +140,8 @@ public final class FTContains extends Single {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), expr, ftexpr);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), expr, ftexpr);
   }
 
   @Override

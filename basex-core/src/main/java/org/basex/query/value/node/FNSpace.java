@@ -50,8 +50,8 @@ public final class FNSpace extends FNode {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAME, name, VALUEE, value, TYPE, seqType()));
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, NAME, name, VALUEE, value));
   }
 
   @Override

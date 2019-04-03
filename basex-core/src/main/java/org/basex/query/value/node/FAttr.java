@@ -76,19 +76,19 @@ public final class FAttr extends FNode {
   }
 
   @Override
+  public byte[] xdmInfo() {
+    return new ByteList().add(typeId().asByte()).add(name.uri()).add(0).finish();
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof FAttr && name.eq(((FAttr) obj).name) &&
         super.equals(obj);
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAME, name.string(), VALUEE, value, TYPE, seqType()));
-  }
-
-  @Override
-  public byte[] xdmInfo() {
-    return new ByteList().add(typeId().asByte()).add(name.uri()).add(0).finish();
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, NAME, name.string(), VALUEE, value));
   }
 
   @Override

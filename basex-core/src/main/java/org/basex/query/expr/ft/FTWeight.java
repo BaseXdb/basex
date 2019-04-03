@@ -133,8 +133,8 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), weight, exprs[0]);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), weight, exprs[0]);
   }
 
   @Override

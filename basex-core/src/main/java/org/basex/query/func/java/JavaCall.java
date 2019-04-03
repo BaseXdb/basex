@@ -23,7 +23,6 @@ import org.basex.query.util.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.Type;
@@ -384,13 +383,13 @@ public abstract class JavaCall extends Arr {
   abstract String name();
 
   @Override
-  public final void plan(final FElem plan) {
-    addPlan(plan, planElem(NAME, name()), exprs);
+  public final String description() {
+    return desc() + "(...)";
   }
 
   @Override
-  public final String description() {
-    return desc() + "(...)";
+  public final void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, NAME, name()), exprs);
   }
 
   @Override

@@ -40,11 +40,6 @@ final class NoCaseCollation extends Collation {
     return -1;
   }
 
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof NoCaseCollation;
-  }
-
   /**
    * Compares two characters.
    * @param ch1 first character
@@ -58,5 +53,10 @@ final class NoCaseCollation extends Collation {
       if(c1 != c2) return c1 - c2;
     }
     return 0;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof NoCaseCollation;
   }
 }

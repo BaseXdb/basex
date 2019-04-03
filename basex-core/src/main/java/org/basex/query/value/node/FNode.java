@@ -196,16 +196,18 @@ public abstract class FNode extends ANode {
   }
 
   @Override
+  public final BXNode toJava() {
+    return BXNode.get(this);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     if(!(obj instanceof FNode)) return false;
     final FNode n = (FNode) obj;
     return type.eq(n.type) && Token.eq(value, n.value) && parent == n.parent;
   }
 
-  @Override
-  public final BXNode toJava() {
-    return BXNode.get(this);
-  }
+  // STATIC METHODS ===============================================================================
 
   /**
    * Returns a chopped token representation of the specified value.

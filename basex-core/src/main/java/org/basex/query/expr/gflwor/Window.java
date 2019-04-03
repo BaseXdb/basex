@@ -2,7 +2,6 @@ package org.basex.query.expr.gflwor;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 
 import java.util.*;
 
@@ -12,7 +11,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -336,11 +334,8 @@ public final class Window extends Clause {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem elem = var.planAttributes(planElem(token(SLIDING), token(sliding)), true);
-    start.plan(elem);
-    if(end != null) end.plan(elem);
-    addPlan(plan, elem, expr);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.attachVariable(plan.create(this, SLIDING, sliding), var, true), start, end, expr);
   }
 
   @Override

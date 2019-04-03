@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -160,8 +159,8 @@ public final class Try extends Single {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), expr, catches);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), expr, catches);
   }
 
   @Override

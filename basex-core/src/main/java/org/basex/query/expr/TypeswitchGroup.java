@@ -174,19 +174,19 @@ public final class TypeswitchGroup extends Single {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem elem = addPlan(plan, planElem(), expr);
+  public void plan(final QueryPlan plan) {
+    final FElem elem = plan.attachVariable(plan.create(this), var, false);
     if(types.length == 0) {
-      elem.add(planAttr(DEFAULT, true));
+      plan.addAttribute(elem, DEFAULT, true);
     } else {
       final TokenBuilder tb = new TokenBuilder();
       for(final SeqType st : types) {
         if(!tb.isEmpty()) tb.add('|');
         tb.add(st);
       }
-      elem.add(planAttr(CASE, tb.finish()));
+      plan.addAttribute(elem, CASE, tb);
     }
-    if(var != null) var.planAttributes(elem, false);
+    plan.add(elem, expr);
   }
 
   @Override

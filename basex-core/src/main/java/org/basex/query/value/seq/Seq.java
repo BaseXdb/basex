@@ -5,9 +5,9 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -197,6 +197,11 @@ public abstract class Seq extends Value {
   }
 
   @Override
+  public final SeqType seqType() {
+    return SeqType.get(type, Occ.ONE_MORE);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof Seq)) return false;
@@ -210,26 +215,16 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem elem = planElem(SIZE, size, TYPE, seqType());
-    addPlan(plan, elem);
-    for(long i = 0; i < size; i++) {
-      if(i == 3 && i + 1 < size) {
-        elem.add(new FElem("etc"));
-        break;
-      }
-      itemAt(i).plan(elem);
-    }
-  }
-
-  @Override
-  public final SeqType seqType() {
-    return SeqType.get(type, Occ.ONE_MORE);
-  }
-
-  @Override
   public String description() {
     return type + " " + SEQUENCE;
+  }
+
+  @Override
+  public void plan(final QueryPlan plan) {
+    final int max = (int) Math.min(size, 5);
+    final ExprList list = new ExprList(max);
+    for(long i = 0; i < max; i++) list.add(itemAt(i));
+    plan.add(plan.create(this), list.finish());
   }
 
   @Override
@@ -261,6 +256,8 @@ public abstract class Seq extends Value {
     }
     return tb.add(PAREN2).toString();
   }
+
+  // STATIC METHODS ===============================================================================
 
   /**
    * Tries to create a typed sequence with the items of the specified values.

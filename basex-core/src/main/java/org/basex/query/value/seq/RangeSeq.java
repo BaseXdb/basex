@@ -7,7 +7,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -69,14 +68,6 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof RangeSeq)) return super.equals(obj);
-    final RangeSeq seq = (RangeSeq) obj;
-    return start == seq.start && size == seq.size && asc == seq.asc;
-  }
-
-  @Override
   public Item itemAt(final long pos) {
     return Int.get(start + (asc ? pos : -pos));
   }
@@ -121,14 +112,22 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final long[] range = range(true);
-    addPlan(plan, planElem(FROM, range[0], TO, range[1], SIZE, size, TYPE, seqType()));
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof RangeSeq)) return super.equals(obj);
+    final RangeSeq seq = (RangeSeq) obj;
+    return start == seq.start && size == seq.size && asc == seq.asc;
   }
 
   @Override
   public String description() {
     return "range " + SEQUENCE;
+  }
+
+  @Override
+  public void plan(final QueryPlan plan) {
+    final long[] range = range(true);
+    plan.add(plan.create(this, FROM, range[0], TO, range[1]));
   }
 
   @Override

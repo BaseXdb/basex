@@ -32,12 +32,6 @@ public final class StrSeq extends NativeSeq {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof StrSeq ? Array.equals(values, ((StrSeq) obj).values) :
-      super.equals(obj));
-  }
-
-  @Override
   public Value reverse(final QueryContext qc) {
     final int sz = (int) size;
     final byte[][] tmp = new byte[sz][];
@@ -50,6 +44,12 @@ public final class StrSeq extends NativeSeq {
     final String[] tmp = new String[(int) size];
     for(int v = 0; v < size; v++) tmp[v] = Token.string(values[v]);
     return tmp;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || (obj instanceof StrSeq ? Array.equals(values, ((StrSeq) obj).values) :
+      super.equals(obj));
   }
 
   // STATIC METHODS ===============================================================================

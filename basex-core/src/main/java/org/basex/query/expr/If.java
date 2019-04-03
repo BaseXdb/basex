@@ -9,7 +9,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -237,8 +236,8 @@ public final class If extends Arr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), cond, exprs);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), cond, exprs);
   }
 
   @Override

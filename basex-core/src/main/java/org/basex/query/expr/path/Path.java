@@ -975,8 +975,8 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final void plan(final FElem plan) {
-    addPlan(plan, planElem(), root, steps);
+  public final void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), root, steps);
   }
 
   @Override

@@ -130,13 +130,13 @@ public final class CmpN extends Cmp {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(OP, op.name), exprs);
+  public String description() {
+    return "'" + op + "' comparison";
   }
 
   @Override
-  public String description() {
-    return "'" + op + "' comparison";
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, OP, op.name), exprs);
   }
 
   @Override

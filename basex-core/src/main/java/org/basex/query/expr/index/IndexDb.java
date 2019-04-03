@@ -63,13 +63,13 @@ public abstract class IndexDb extends ParseExpr {
   public abstract IndexDb copy(CompileContext cc, IntObjMap<Var> vm);
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof IndexDb && iterable == ((IndexDb) obj).iterable;
+  public final boolean iterable() {
+    return iterable;
   }
 
   @Override
-  public final boolean iterable() {
-    return iterable;
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof IndexDb && iterable == ((IndexDb) obj).iterable;
   }
 
   @Override

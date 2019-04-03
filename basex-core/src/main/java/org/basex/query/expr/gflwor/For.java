@@ -224,12 +224,12 @@ public final class For extends ForLet {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem elem = addPlan(plan, var.planAttributes(planElem(), false));
-    if(empty) elem.add(planAttr(EMPTYY, true));
-    if(pos != null) elem.add(pos.planAttributes(new FElem(AT), true));
-    if(score != null) elem.add(score.planAttributes(new FElem(SCORE), true));
-    expr.plan(elem);
+  public void plan(final QueryPlan plan) {
+    final FElem elem = plan.attachVariable(plan.create(this), var, false);
+    if(empty) plan.addAttribute(elem, EMPTYY, true);
+    if(pos != null) plan.addElement(elem, plan.create(AT, pos));
+    if(score != null) plan.addElement(elem, plan.create(SCORE, score));
+    plan.add(elem, expr);
   }
 
   @Override

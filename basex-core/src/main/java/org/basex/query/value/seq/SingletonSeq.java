@@ -1,12 +1,10 @@
 package org.basex.query.value.seq;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -80,15 +78,13 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem elem = planElem(SIZE, size, TYPE, seqType());
-    addPlan(plan, elem);
-    value.plan(elem);
+  public String description() {
+    return "singleton " + super.description();
   }
 
   @Override
-  public String description() {
-    return "singleton " + super.description();
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), value);
   }
 
   @Override

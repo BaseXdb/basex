@@ -7,7 +7,6 @@ import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -144,13 +143,13 @@ public final class Pos extends Arr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), exprs);
+  public String description() {
+    return "positional access";
   }
 
   @Override
-  public String description() {
-    return "positional access";
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), exprs);
   }
 
   @Override

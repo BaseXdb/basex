@@ -8,10 +8,10 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -385,26 +385,26 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public final String description() {
-    return ARRAY;
-  }
-
-  @Override
-  public final void plan(final FElem plan) {
-    final long size = arraySize();
-    final FElem elem = planElem(ENTRIES, size, TYPE, seqType());
-    final int max = (int) Math.min(size, 5);
-    for(int i = 0; i < max; i++) get(i).plan(elem);
-    addPlan(plan, elem);
-  }
-
-  @Override
   public final Object[] toJava() throws QueryException {
     final long size = arraySize();
     final ArrayList<Object> list = new ArrayList<>((int) size);
     final Iterator<Value> iter = iterator(0);
     while(iter.hasNext()) list.add(iter.next().toJava());
     return list.toArray();
+  }
+
+  @Override
+  public final String description() {
+    return ARRAY;
+  }
+
+  @Override
+  public final void plan(final QueryPlan plan) {
+    final ExprList list = new ExprList();
+    final long size = arraySize();
+    final int max = (int) Math.min(size, 5);
+    for(int i = 0; i < max; i++) list.add(get(i));
+    plan.add(plan.create(this, ENTRIES, size), list.finish());
   }
 
   @Override

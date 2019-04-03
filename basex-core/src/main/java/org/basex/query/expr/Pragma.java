@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -28,11 +27,6 @@ public abstract class Pragma extends ExprInfo {
   Pragma(final QNm name, final byte[] value) {
     this.name = name;
     this.value = value;
-  }
-
-  @Override
-  public final void plan(final FElem plan) {
-    addPlan(plan, planElem(VALUEE, value), name);
   }
 
   /**
@@ -81,6 +75,11 @@ public abstract class Pragma extends ExprInfo {
     if(!(obj instanceof Pragma)) return false;
     final Pragma p = (Pragma) obj;
     return name.eq(p.name) && Token.eq(value, p.value);
+  }
+
+  @Override
+  public final void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, VALUEE, value), name);
   }
 
   @Override

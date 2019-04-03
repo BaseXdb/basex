@@ -8,7 +8,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -134,8 +133,8 @@ abstract class CName extends CNode {
   }
 
   @Override
-  public final void plan(final FElem plan) {
-    addPlan(plan, planElem(), name, exprs);
+  public boolean equals(final Object obj) {
+    return obj instanceof CName && name.equals(((CName) obj).name) && super.equals(obj);
   }
 
   @Override
@@ -144,8 +143,8 @@ abstract class CName extends CNode {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return obj instanceof CName && name.equals(((CName) obj).name) && super.equals(obj);
+  public final void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), name, exprs);
   }
 
   @Override

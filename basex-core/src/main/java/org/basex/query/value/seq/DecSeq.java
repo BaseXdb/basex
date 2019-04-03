@@ -33,12 +33,6 @@ public final class DecSeq extends NativeSeq {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof DecSeq ? Array.equals(values, ((DecSeq) obj).values) :
-      super.equals(obj));
-  }
-
-  @Override
   public Value reverse(final QueryContext qc) {
     final int sz = (int) size;
     final BigDecimal[] tmp = new BigDecimal[sz];
@@ -49,6 +43,12 @@ public final class DecSeq extends NativeSeq {
   @Override
   public BigDecimal[] toJava() {
     return values;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || (obj instanceof DecSeq ? Array.equals(values, ((DecSeq) obj).values) :
+      super.equals(obj));
   }
 
   // STATIC METHODS ===============================================================================

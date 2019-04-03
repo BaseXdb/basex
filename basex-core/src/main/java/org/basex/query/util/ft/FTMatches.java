@@ -97,13 +97,13 @@ public final class FTMatches extends ObjectList<FTMatch, FTMatches> {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FTMatches &&
-        pos == ((FTMatches) obj).pos && super.equals(obj);
+  protected FTMatch[] newList(final int s) {
+    return new FTMatch[s];
   }
 
   @Override
-  protected FTMatch[] newList(final int s) {
-    return new FTMatch[s];
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FTMatches &&
+        pos == ((FTMatches) obj).pos && super.equals(obj);
   }
 }

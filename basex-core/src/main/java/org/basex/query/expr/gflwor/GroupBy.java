@@ -10,7 +10,6 @@ import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -329,8 +328,8 @@ public final class GroupBy extends Clause {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(), specs);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), specs);
   }
 
   @Override

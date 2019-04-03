@@ -671,9 +671,4 @@ public abstract class ParseExpr extends Expr {
     if(item != Empty.VALUE) return item;
     throw EMPTYFOUND_X.get(info, type);
   }
-
-  @Override
-  protected final FElem planElem(final Object... atts) {
-    return addPlanType(super.planElem(atts), seqType(), size(), data());
-  }
 }

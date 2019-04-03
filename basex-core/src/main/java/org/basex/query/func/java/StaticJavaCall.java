@@ -94,15 +94,6 @@ final class StaticJavaCall extends JavaCall {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof StaticJavaCall)) return false;
-    final StaticJavaCall j = (StaticJavaCall) obj;
-    return module.equals(j.module) && method.equals(j.method) && Array.equals(params, j.params) &&
-        super.equals(obj);
-  }
-
-  @Override
   String desc() {
     return name();
   }
@@ -110,5 +101,14 @@ final class StaticJavaCall extends JavaCall {
   @Override
   String name() {
     return Util.className(module) + COL + method.getName();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof StaticJavaCall)) return false;
+    final StaticJavaCall j = (StaticJavaCall) obj;
+    return module.equals(j.module) && method.equals(j.method) && Array.equals(params, j.params) &&
+        super.equals(obj);
   }
 }

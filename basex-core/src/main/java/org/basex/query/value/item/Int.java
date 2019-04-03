@@ -188,6 +188,8 @@ public final class Int extends ANum {
     return type == i.type && value == i.value;
   }
 
+  // STATIC METHODS ===============================================================================
+
   /**
    * Converts the given item to a long primitive.
    * @param item item to be converted

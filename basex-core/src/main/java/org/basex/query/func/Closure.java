@@ -458,15 +458,17 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem elem = planElem();
+  public void plan(final QueryPlan plan) {
+    final ArrayList<Object> list = new ArrayList<>();
     global.forEach((key, value) -> {
-      key.plan(elem);
-      value.plan(elem);
+      list.add(key);
+      list.add(value);
     });
-    addPlan(plan, elem, expr);
+
+    final FElem elem = plan.create(this);
     final int pl = params.length;
-    for(int p = 0; p < pl; p++) elem.add(planAttr(ARG + p, params[p].name.string()));
+    for(int p = 0; p < pl; p++) plan.addAttribute(elem, ARG + p, params[p].name.string());
+    plan.add(elem, list.toArray());
   }
 
   @Override
@@ -474,7 +476,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final StringBuilder sb = new StringBuilder();
     if(!global.isEmpty()) {
       sb.append("((: inline-closure :) ");
-      global.forEach((k, v) -> sb.append("let ").append(k).append(" := ").append(v).append(' '));
+      global.forEach((k, v) -> sb.append(LET + ' ' + k + ' ' + ASSIGN + ' ' + v + ' '));
       sb.append(RETURN).append(' ');
     }
     sb.append(FUNCTION).append(PAREN1);
@@ -484,9 +486,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       sb.append(params[p]);
     }
     sb.append(PAREN2).append(' ');
-    sb.append("as ").append(declType != null ? declType : SeqType.ITEM_ZM).append(' ');
-    sb.append("{ ").append(expr).append(" }");
-    if(!global.isEmpty()) sb.append(')');
+    sb.append(AS).append(' ').append(declType != null ? declType : SeqType.ITEM_ZM).append(' ');
+    sb.append(CURLY1).append(' ').append(expr).append(' ').append(CURLY2);
+    if(!global.isEmpty()) sb.append(PAREN2);
     return sb.toString();
   }
 }

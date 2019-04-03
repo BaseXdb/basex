@@ -33,12 +33,6 @@ public final class BlnSeq extends NativeSeq {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof BlnSeq ? Arrays.equals(values, ((BlnSeq) obj).values) :
-      super.equals(obj));
-  }
-
-  @Override
   public Value reverse(final QueryContext qc) {
     final int sz = (int) size;
     final boolean[] tmp = new boolean[sz];
@@ -49,6 +43,12 @@ public final class BlnSeq extends NativeSeq {
   @Override
   public boolean[] toJava() {
     return values;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || (obj instanceof BlnSeq ? Arrays.equals(values, ((BlnSeq) obj).values) :
+      super.equals(obj));
   }
 
   // STATIC METHODS ===============================================================================

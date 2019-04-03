@@ -19,7 +19,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -280,13 +279,13 @@ public final class CmpR extends Single {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(MIN, min, MAX, max), expr);
+  public String description() {
+    return "range comparison";
   }
 
   @Override
-  public String description() {
-    return "range comparison";
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, MIN, min, MAX, max), expr);
   }
 
   @Override

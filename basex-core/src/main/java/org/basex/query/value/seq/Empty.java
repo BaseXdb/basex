@@ -7,7 +7,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -119,13 +118,13 @@ public final class Empty extends Item {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(SIZE, 0, TYPE, seqType()));
+  public String description() {
+    return EMPTYY + ' ' + SEQUENCE;
   }
 
   @Override
-  public String description() {
-    return EMPTYY + ' ' + SEQUENCE;
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this));
   }
 
   @Override

@@ -6,7 +6,6 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -84,13 +83,13 @@ public final class Unary extends Single {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(VALUEE, minus), expr);
+  public String description() {
+    return "unary expression";
   }
 
   @Override
-  public String description() {
-    return "unary expression";
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, VALUEE, minus), expr);
   }
 
   @Override

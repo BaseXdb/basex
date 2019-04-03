@@ -13,7 +13,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.XQMap;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -162,19 +161,6 @@ public final class DynFuncCall extends FuncCall {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem elem = planElem(TCL, tco);
-    addPlan(plan, elem, body());
-    final int last = exprs.length - 1;
-    for(int e = 0; e < last; e++) exprs[e].plan(elem);
-  }
-
-  @Override
-  public String description() {
-    return body().description() + "(...)";
-  }
-
-  @Override
   FItem evalFunc(final QueryContext qc) throws QueryException {
     final Item item = toItem(body(), qc);
     if(!(item instanceof FItem)) throw INVFUNCITEM_X_X.get(info, item.type, item);
@@ -195,17 +181,27 @@ public final class DynFuncCall extends FuncCall {
   }
 
   @Override
+  public boolean has(final Flag... flags) {
+    if(Flag.UPD.in(flags) && updating) return true;
+    if(Flag.NDT.in(flags) && ndt) return true;
+    final Flag[] flgs = Flag.NDT.remove(Flag.UPD.remove(flags));
+    return flgs.length != 0 && super.has(flgs);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof DynFuncCall && updating == ((DynFuncCall) obj).updating &&
         super.equals(obj);
   }
 
   @Override
-  public boolean has(final Flag... flags) {
-    if(Flag.UPD.in(flags) && updating) return true;
-    if(Flag.NDT.in(flags) && ndt) return true;
-    final Flag[] flgs = Flag.NDT.remove(Flag.UPD.remove(flags));
-    return flgs.length != 0 && super.has(flgs);
+  public String description() {
+    return body().description() + "(...)";
+  }
+
+  @Override
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, TCL, tco), exprs);
   }
 
   @Override

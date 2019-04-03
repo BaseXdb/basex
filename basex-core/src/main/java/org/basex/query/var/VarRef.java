@@ -7,7 +7,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -52,7 +51,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public Data data() {
-    return var.data;
+    return var.data();
   }
 
   @Override
@@ -78,37 +77,12 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof VarRef && var.is(((VarRef) obj).var);
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, var.planAttributes(planElem(), false));
-  }
-
-  @Override
-  public String description() {
-    return "variable";
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     return visitor.used(this);
   }
 
   @Override
   public void checkUp() {
-  }
-
-  @Override
-  public String toErrorString() {
-    return Strings.concat(DOLLAR, var.name.string());
-  }
-
-  @Override
-  public String toString() {
-    return Strings.concat(DOLLAR, var.name.string(), '_', var.id);
   }
 
   @Override
@@ -119,5 +93,30 @@ public final class VarRef extends ParseExpr {
   @Override
   public int exprSize() {
     return 1;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof VarRef && var.is(((VarRef) obj).var);
+  }
+
+  @Override
+  public String description() {
+    return "variable";
+  }
+
+  @Override
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.attachVariable(plan.create(this), var, false));
+  }
+
+  @Override
+  public String toErrorString() {
+    return Strings.concat(DOLLAR, var.name.string());
+  }
+
+  @Override
+  public String toString() {
+    return Strings.concat(DOLLAR, var.name.string(), '_', var.id);
   }
 }

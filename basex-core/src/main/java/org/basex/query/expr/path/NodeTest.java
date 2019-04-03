@@ -58,15 +58,6 @@ public final class NodeTest extends Test {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    if(!(obj instanceof NodeTest)) return false;
-    final NodeTest nt = (NodeTest) obj;
-    return type == nt.type &&
-        (name == null ? nt.name == null : (nt.name != null && name.eq(nt.name))) &&
-        (ext == null ? nt.ext == null : (nt.ext != null && ext.eq(nt.ext)));
-  }
-
-  @Override
   public NodeTest intersect(final Test other) {
     if(other instanceof NodeTest) {
       final NodeTest o = (NodeTest) other;
@@ -85,6 +76,15 @@ public final class NodeTest extends Test {
       throw Util.notExpected(other);
     }
     return null;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(!(obj instanceof NodeTest)) return false;
+    final NodeTest nt = (NodeTest) obj;
+    return type == nt.type &&
+        (name == null ? nt.name == null : (nt.name != null && name.eq(nt.name))) &&
+        (ext == null ? nt.ext == null : (nt.ext != null && ext.eq(nt.ext)));
   }
 
   @Override

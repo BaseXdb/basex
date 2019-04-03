@@ -186,16 +186,12 @@ public final class Condition extends Single {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem elem = new FElem(start ? START : END);
-    if(item != null) item.planAttributes(elem, true);
-
-    // mapping variable names to roles
-    if(pos  != null) elem.add(pos.planAttributes(new FElem(POS), true));
-    if(prev != null) elem.add(prev.planAttributes(new FElem(PREVIOUS), true));
-    if(next != null) elem.add(next.planAttributes(new FElem(NEXT), true));
-
-    addPlan(plan, elem, expr);
+  public void plan(final QueryPlan plan) {
+    final FElem elem = plan.create(start ? START : END, item);
+    if(pos  != null) plan.addElement(elem, plan.create(AT, pos));
+    if(prev != null) plan.addElement(elem, plan.create(PREVIOUS, prev));
+    if(next != null) plan.addElement(elem, plan.create(NEXT, next));
+    plan.add(elem, expr);
   }
 
   @Override

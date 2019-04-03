@@ -15,7 +15,6 @@ import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -276,9 +275,13 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final byte[] nm = name == null ? null : name.prefixId();
-    addPlan(plan, planElem(NAME, nm, TYPE, type), params, expr);
+  public String description() {
+    return FUNCTION + ' ' + ITEM;
+  }
+
+  @Override
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, NAME, name == null ? null : name.prefixId()), params, expr);
   }
 
   @Override
@@ -289,11 +292,6 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public String toString() {
     return toString(false);
-  }
-
-  @Override
-  public String description() {
-    return FUNCTION + ' ' + ITEM;
   }
 
   /**

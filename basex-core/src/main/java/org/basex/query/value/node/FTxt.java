@@ -1,7 +1,5 @@
 package org.basex.query.value.node;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.query.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -46,8 +44,8 @@ public final class FTxt extends FNode {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYPE, seqType()), value);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), value);
   }
 
   @Override

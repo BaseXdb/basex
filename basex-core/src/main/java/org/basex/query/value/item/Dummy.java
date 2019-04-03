@@ -3,7 +3,6 @@ package org.basex.query.value.item;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -59,17 +58,17 @@ public final class Dummy extends Item {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    throw Util.notExpected();
-  }
-
-  @Override
   public String toJava() {
     throw Util.notExpected();
   }
 
   @Override
-  public void plan(final FElem plan) {
+  public boolean equals(final Object obj) {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public void plan(final QueryPlan plan) {
     throw Util.notExpected();
   }
 

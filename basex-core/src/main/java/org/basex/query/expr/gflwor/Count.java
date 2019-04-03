@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.hash.*;
@@ -109,8 +108,8 @@ public final class Count extends Clause {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, var.planAttributes(planElem(), false));
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.attachVariable(plan.create(this), var, false));
   }
 
   @Override

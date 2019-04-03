@@ -7,7 +7,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -28,6 +27,8 @@ public final class Var extends ExprInfo {
 
   /** Declared type, {@code null} if not specified. */
   public SeqType declType;
+  /** Flag for function conversion. */
+  public boolean promote;
   /** Data reference. */
   public Data data;
 
@@ -40,9 +41,6 @@ public final class Var extends ExprInfo {
   private final StaticContext sc;
   /** Flag for function parameters. */
   private final boolean param;
-
-  /** Flag for function conversion. */
-  private boolean promote;
 
   /**
    * Constructor for a variable with an already known stack slot.
@@ -108,6 +106,13 @@ public final class Var extends ExprInfo {
    */
   public long size() {
     return exprType.size();
+  }
+  /**
+   * Returns the data reference bound to this variable.
+   * @return data reference (can be {@code null})
+   */
+  public Data data() {
+    return data;
   }
 
   /**
@@ -236,11 +241,6 @@ public final class Var extends ExprInfo {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return obj instanceof Var && is((Var) obj);
-  }
-
-  @Override
   public int hashCode() {
     return id;
   }
@@ -262,23 +262,13 @@ public final class Var extends ExprInfo {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planAttributes(planElem(), true));
+  public boolean equals(final Object obj) {
+    return obj instanceof Var && is((Var) obj);
   }
 
-  /**
-   * Returns the query plan attribute.
-   * @param elem element to which attributes will be added
-   * @param type include type
-   * @return specified element
-   */
-  public FElem planAttributes(final FElem elem, final boolean type) {
-    elem.add(QueryText.NAME, toErrorString());
-    elem.add(Token.ID, Token.token(id));
-    if(declType != null) elem.add(planAttr(QueryText.AS, declType));
-    if(promote) elem.add(planAttr(QueryText.PROMOTE, true));
-    if(type) addPlanType(elem, seqType(), size(), null);
-    return elem;
+  @Override
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.attachVariable(plan.create(this), this, true));
   }
 
   @Override

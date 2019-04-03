@@ -3,7 +3,6 @@ package org.basex.query.scope;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
-import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.hash.*;
 
@@ -42,6 +41,6 @@ public final class LibraryModule extends AModule {
   }
 
   @Override
-  public void plan(final FElem root) {
+  public void plan(final QueryPlan plan) {
   }
 }

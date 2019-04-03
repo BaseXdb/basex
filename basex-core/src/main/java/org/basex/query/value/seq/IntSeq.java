@@ -34,19 +34,19 @@ public final class IntSeq extends NativeSeq {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof IntSeq)) return super.equals(obj);
-    final IntSeq is = (IntSeq) obj;
-    return type == is.type && Arrays.equals(values, is.values);
-  }
-
-  @Override
   public Value reverse(final QueryContext qc) {
     final int sz = (int) size;
     final long[] tmp = new long[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = values[i];
     return get(tmp, type);
+  }
+
+  /**
+   * Returns the internal values.
+   * @return values
+   */
+  public long[] values() {
+    return values;
   }
 
   @Override
@@ -71,12 +71,12 @@ public final class IntSeq extends NativeSeq {
     }
   }
 
-  /**
-   * Returns the internal values.
-   * @return values
-   */
-  public long[] values() {
-    return values;
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof IntSeq)) return super.equals(obj);
+    final IntSeq is = (IntSeq) obj;
+    return type == is.type && Arrays.equals(values, is.values);
   }
 
   // STATIC METHODS ===============================================================================

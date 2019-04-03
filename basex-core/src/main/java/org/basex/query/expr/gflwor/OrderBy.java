@@ -11,7 +11,6 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -220,9 +219,8 @@ public final class OrderBy extends Clause {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem elem = addPlan(plan, planElem());
-    for(final OrderKey key : keys) key.plan(elem);
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this), keys);
   }
 
   @Override

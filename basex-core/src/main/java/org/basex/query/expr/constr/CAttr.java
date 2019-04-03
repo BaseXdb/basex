@@ -64,12 +64,12 @@ public final class CAttr extends CName {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof CAttr && comp == ((CAttr) obj).comp && super.equals(obj);
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return new CAttr(sc, info, comp, name.copy(cc, vm), copyAll(cc, vm, exprs));
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new CAttr(sc, info, comp, name.copy(cc, vm), copyAll(cc, vm, exprs));
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof CAttr && comp == ((CAttr) obj).comp && super.equals(obj);
   }
 }
