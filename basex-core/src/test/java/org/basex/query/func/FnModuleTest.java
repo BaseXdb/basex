@@ -71,10 +71,10 @@ public final class FnModuleTest extends QueryPlanTest {
     // no pre-evaluation (higher-order arguments), but type adjustment
     check(func.args(" true#0", " []"), true, type(func, "xs:boolean"));
     check(func.args(" count#1", " [1]"), 1, type(func, "xs:integer"));
-    check(func.args(" abs#1", " [1]"), 1, type(func, "xs:numeric?"));
-    check(func.args(" reverse#1", " [()]"), "", type(func, ""));
+    check(func.args(" abs#1", " [1]"), 1, type(func, "xs:integer"));
+    check(func.args(" reverse#1", " [()]"), "", type(func, "empty-sequence()"));
     check("(true#0, 1)[. instance of function(*)] ! " + func.args(" .", " []"), true,
-        type(func, ""));
+        type(func, "item()*"));
 
     // code coverage tests
     query("string-length(" + func.args(" reverse#1", " ['a']") + ")", 1);

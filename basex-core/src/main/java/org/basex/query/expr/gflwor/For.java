@@ -212,7 +212,7 @@ public final class For extends ForLet {
     final long size = expr.size(), factor = size > 0 ? size : empty ? 1 : 0;
     minMax[0] *= factor;
     final long max = minMax[1];
-    if(max > 0) minMax[1] = size < 0 ? -1 : max * factor;
+    if(max > 0) minMax[1] = size >= 0 ? max * factor : -1;
   }
 
   @Override

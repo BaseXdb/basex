@@ -52,7 +52,7 @@ public class FnApply extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    final FuncType ft1 = expr1.funcType(), ft2 = expr2.funcType();
+    FuncType ft1 = expr1.funcType(), ft2 = expr2.funcType();
 
     // try to pass on types of array argument to function item
     if(ft2 instanceof ArrayType) {
@@ -77,6 +77,7 @@ public class FnApply extends StandardFunc {
     }
 
     final boolean updating = this instanceof UpdateApply;
+    ft1 = exprs[0].funcType();
     if(ft1 != null && !updating) exprType.assign(ft1.declType);
     return this;
   }

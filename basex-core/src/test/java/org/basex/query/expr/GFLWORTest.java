@@ -227,7 +227,7 @@ public final class GFLWORTest extends QueryPlanTest {
     );
     check("let $x := 0 where $x != <x>0</x> return 42 idiv $x", "",
         exists(If.class),
-        "starts-with(//If/*[2]/@name, 'error(')");
+        "//If/*[2]/@name = 'error'");
   }
 
   /** Tests if {@code for $x in E return $x} is rewritten to {@code E} inside FLWORs. */
