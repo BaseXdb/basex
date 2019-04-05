@@ -2,8 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.util.function.*;
-
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -31,32 +29,7 @@ public final class Or extends Logical {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    return optimize(cc, false, ex -> new And(info, ex));
-  }
-
-  @Override
-  void simplify(final CompileContext cc, final ExprList list) throws QueryException {
-    final int es = exprs.length;
-    for(int e = 0; e < es; e++) {
-      Expr expr = exprs[e];
-      if(expr instanceof CmpG) {
-        // merge adjacent comparisons
-        while(e + 1 < es && exprs[e + 1] instanceof CmpG) {
-          final Expr tmp = ((CmpG) expr).union((CmpG) exprs[e + 1], cc);
-          if(tmp != null) {
-            expr = tmp;
-            e++;
-          } else {
-            break;
-          }
-        }
-      }
-      if(!list.contains(expr) || expr.has(Flag.NDT)) {
-        list.add(cc.replaceWith(exprs[e], expr));
-      } else {
-        cc.info(OPTREMOVE_X_X, exprs[e], (Supplier<?>) this::description);
-      }
-    }
+    return optimize(cc, true, ex -> new And(info, ex));
   }
 
   @Override

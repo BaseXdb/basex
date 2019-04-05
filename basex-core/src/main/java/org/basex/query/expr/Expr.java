@@ -374,6 +374,20 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Tries to merge two expressions.
+   * @param expr second expression
+   * @param union union or intersection
+   * @param cc compilation context
+   * @return optimized expression or {@code null}
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public Expr merge(final Expr expr, final boolean union, final CompileContext cc)
+      throws QueryException {
+    return null;
+  }
+
+  /**
    * Finds and marks tail calls, enabling TCO.
    * @param cc compilation context, {@code null} if the changes should not be reported
    */
@@ -428,7 +442,8 @@ public abstract class Expr extends ExprInfo {
    *   <li>{@link If#optimize(CompileContext)}, {@link Switch#optimize(CompileContext)},
    *     {@link Typeswitch#optimize(CompileContext)}, in order to discard identical expressions.
    *   </li>
-   *   <li>{@link CmpR#intersect(CmpR)} or {@link CmpSR#intersect(CmpSR)},
+   *   <li>{@link CmpR#merge(Expr, boolean, CompileContext)} or
+   *     {@link CmpSR#merge(Expr, boolean, CompileContext)},
    *     in order to merge expressions with identical input.
    *   </li>
    *   <li>{@link CmpG#optimize(CompileContext)} or {@link CmpV#optimize(CompileContext)},

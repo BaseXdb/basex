@@ -32,7 +32,7 @@ public final class Pos extends Arr {
 
   /**
    * Tries to rewrite {@code fn:position() CMP number(s)} to this expression.
-   * Returns an instance of this class, the original expression, or an optimized expression.
+   * Returns an instance of this class, an optimized expression, or {@code null}
    * @param cmp2 position to be compared
    * @param op comparator
    * @param ii input info
@@ -67,7 +67,7 @@ public final class Pos extends Arr {
             break;
           case GT:
             min = new Arith(ii, st2.type.instanceOf(AtomType.ITR) ? cmp2 :
-              cc.function(Function.FLOOR, ii, cmp2), Int.ONE, Calc.PLUS);
+              cc.function(Function.FLOOR, ii, cmp2), Int.ONE, Calc.PLUS).optimize(cc);
             max = Int.MAX;
             break;
           case LE:
@@ -77,10 +77,12 @@ public final class Pos extends Arr {
           case LT:
             min = Int.ONE;
             max = new Arith(ii, st2.type.instanceOf(AtomType.ITR) ? cmp2 :
-              cc.function(Function.CEILING, ii, cmp2), Int.ONE, Calc.MINUS);
+              cc.function(Function.CEILING, ii, cmp2), Int.ONE, Calc.MINUS).optimize(cc);
             break;
           default:
         }
+      } else if(cmp2 == Empty.VALUE) {
+        return Bln.FALSE;
       }
     }
     return min != null ? new Pos(ii, min, max) : null;
@@ -107,18 +109,17 @@ public final class Pos extends Arr {
     return new Pos(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm));
   }
 
-  /**
-   * Creates an intersection of the existing and the specified position expressions.
-   * @param pos second position expression
-   * @param ii input info
-   * @return resulting expression, or {@code null} if intersection is not possible
-   */
-  Expr intersect(final Pos pos, final InputInfo ii) {
-    final Expr[] r1 = exprs, r2 = pos.exprs;
+  @Override
+  public Expr merge(final Expr ex, final boolean union, final CompileContext cc)
+      throws QueryException {
+
+    if(union || !(ex instanceof Pos)) return null;
+    final Pos pos = (Pos) ex;
+    final Expr[] posExpr = pos.exprs;
     if(!eq() && !pos.eq()) {
-      final Expr min = r1[0] == Int.ONE ? r2[0] : r2[0] == Int.ONE ? r1[0] : null;
-      final Expr max = r1[1] == Int.MAX ? r2[1] : r2[1] == Int.MAX ? r1[1] : null;
-      if(min != null && max != null) return new Pos(ii, min, max);
+      final Expr min = exprs[0] == Int.ONE ? posExpr[0] : posExpr[0] == Int.ONE ? exprs[0] : null;
+      final Expr max = exprs[1] == Int.MAX ? posExpr[1] : posExpr[1] == Int.MAX ? exprs[1] : null;
+      if(min != null && max != null) return new Pos(info, min, max);
     }
     return null;
   }

@@ -105,8 +105,10 @@ public final class Dec extends ANum {
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return item.type == AtomType.DBL || item.type == AtomType.FLT ?
-        item.eq(this, coll, sc, ii) : value.compareTo(item.dec(ii)) == 0;
+    final Type t = item.type;
+    return t.isUntyped() ? dbl() == item.dbl(ii) :
+      t == AtomType.DBL || t == AtomType.FLT ? item.eq(this, coll, sc, ii) :
+      value.compareTo(item.dec(ii)) == 0;
   }
 
   @Override

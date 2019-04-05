@@ -41,7 +41,7 @@ public final class CmpR extends Single {
   final double max;
 
   /** Evaluation flag: atomic evaluation. */
-  private boolean atomic;
+  private boolean single;
 
   /**
    * Constructor.
@@ -58,64 +58,49 @@ public final class CmpR extends Single {
 
   /**
    * Tries to convert the specified expression into a range expression.
+   * @param expr expression to be compared
+   * @param min minimum position
+   * @param max minimum position (inclusive)
+   * @param info input info
+   * @return expression
+   */
+  static Expr get(final Expr expr, final double min, final double max, final InputInfo info) {
+    return min > max ? Bln.FALSE : min == NEGATIVE_INFINITY && max == POSITIVE_INFINITY ? Bln.TRUE :
+      new CmpR(expr, min, max, info);
+  }
+
+  /**
+   * Tries to convert the specified expression into a range expression.
    * @param cmp expression to be converted
    * @param cc compilation context
    * @return new or original expression
    * @throws QueryException query exception
    */
   static Expr get(final CmpG cmp, final CompileContext cc) throws QueryException {
-    final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
-    final Type type1 = cmp1.seqType().type;
-    if(cmp1.has(Flag.NDT) || (type1.isNumber() ? type1 == AtomType.DEC : !type1.isUntyped())) {
-      return cmp;
-    }
+    final Expr op1 = cmp.exprs[0], op2 = cmp.exprs[1];
+    final Type type1 = op1.seqType().type, type2 = op2.seqType().type;
 
-    // range sequence: retrieve start and end value
-    if(cmp2 instanceof RangeSeq) {
-      final RangeSeq seq = (RangeSeq) cmp2;
-      final long[] range = seq.range(false);
-      return get(cmp, range[0], range[1], cc);
-    }
-    // numbers: do not rewrite decimals that will be compared against numbers with fractional digits
-    if(cmp2 instanceof ANum && (!(cmp2 instanceof Dec) || type1.isUntyped() ||
-        type1.instanceOf(AtomType.ITR))) {
-      final double d = ((ANum) cmp2).dbl();
-      return get(cmp, d, d, cc);
-    }
-    return cmp;
-  }
+    // only rewrite deterministic comparisons if input is not decimal
+    if(cmp.has(Flag.NDT) || !type1.isNumberOrUntyped() || type1 == AtomType.DEC) return cmp;
 
-  /**
-   * Tries to convert the specified expression into a range expression.
-   * @param cmp expression to be converted
-   * @param min minimum value
-   * @param max maximum value (must be larger than end)
-   * @param cc compilation context
-   * @return new or original expression
-   * @throws QueryException query exception
-   */
-  private static Expr get(final CmpG cmp, final double min, final double max,
-      final CompileContext cc) throws QueryException {
+    // if value to be compared is a decimal, input must be untyped or integer
+    if(!(op2 instanceof ANum) || type2 == AtomType.DEC && !type1.isUntyped() &&
+        !type1.instanceOf(AtomType.ITR)) return cmp;
 
-    /* reject:
-     * - input that cannot be compared as number
-     * - numbers that are too large or small to be safely compared as doubles */
-    final Expr cmp1 = cmp.exprs[0];
-    if(!cmp1.seqType().type.isNumberOrUntyped() ||
-        min < -MAX_INTEGER || min > MAX_INTEGER ||
-        max < -MAX_INTEGER || max > MAX_INTEGER) return cmp;
+    // reject numbers that are too large or small to be safely compared as doubles
+    final double d = ((ANum) op2).dbl();
+    if(d < -MAX_INTEGER || d > MAX_INTEGER) return cmp;
 
-    ParseExpr expr = null;
-    final InputInfo ii = cmp.info;
+    double mn = d, mx = d;
     switch(cmp.op) {
-      case EQ: expr = new CmpR(cmp1, min, max, ii); break;
-      case GE: expr = new CmpR(cmp1, min, POSITIVE_INFINITY, ii); break;
-      case GT: expr = new CmpR(cmp1, Math.nextUp(min), POSITIVE_INFINITY, ii); break;
-      case LE: expr = new CmpR(cmp1, NEGATIVE_INFINITY, max, ii); break;
-      case LT: expr = new CmpR(cmp1, NEGATIVE_INFINITY, Math.nextDown(max), ii); break;
-      default:
+      case GE: mx = POSITIVE_INFINITY; break;
+      case GT: mn = Math.nextUp(d); mx = POSITIVE_INFINITY; break;
+      case LE: mn = NEGATIVE_INFINITY; break;
+      case LT: mn = NEGATIVE_INFINITY; mx = Math.nextDown(d); break;
+      // do not rewrite (non-)equality comparisons
+      default: return cmp;
     }
-    return expr != null ? expr.optimize(cc) : cmp;
+    return get(op1, mn, mx, cmp.info).optimize(cc);
   }
 
   @Override
@@ -126,14 +111,13 @@ public final class CmpR extends Single {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st = expr.seqType();
-    atomic = st.zeroOrOne() && !st.mayBeArray();
+    single = st.zeroOrOne() && !st.mayBeArray();
 
     Expr ex = this;
     if(expr instanceof Value) {
       ex = item(cc.qc, info);
     } else if(Function.POSITION.is(expr)) {
-      final int mn = Math.max((int) Math.ceil(min), 1);
-      final int mx = (int) Math.floor(max);
+      final long mn = Math.max((long) Math.ceil(min), 1), mx = (long) Math.floor(max);
       ex = ItrPos.get(RangeSeq.get(mn, mx - mn + 1, true), OpV.EQ, info);
     }
     return cc.replaceWith(this, ex);
@@ -142,7 +126,7 @@ public final class CmpR extends Single {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // atomic evaluation of arguments (faster)
-    if(atomic) {
+    if(single) {
       final Item item = expr.item(qc, info);
       return Bln.get(item != Empty.VALUE && inRange(item.dbl(info)));
     }
@@ -174,21 +158,23 @@ public final class CmpR extends Single {
     return value >= min && value <= max;
   }
 
-  /**
-   * Creates an intersection of the existing and the specified expressions.
-   * @param c range comparison
-   * @return resulting expression or {@code null}
-   */
-  Expr intersect(final CmpR c) {
-    // skip intersection if expressions to be compared are different
-    if(!c.expr.equals(expr)) return null;
+  @Override
+  public Expr merge(final Expr ex, final boolean union, final CompileContext cc)
+      throws QueryException {
 
-    // remove comparisons that will never yield results
-    final double mn = Math.max(min, c.min), mx = Math.min(max, c.max);
-    if(mn > mx) return Bln.FALSE;
+    if(!(ex instanceof CmpR)) return null;
 
-    // do not rewrite checks for identical values (will be evaluated faster by index)
-    return new CmpR(c.expr, mn, mx, info);
+    // do not merge if expressions to be compared are different
+    final CmpR cmp = (CmpR) ex;
+    if(!expr.equals(cmp.expr)) return null;
+
+    // do not merge if ranges are exclusive
+    if(union && (max < cmp.min || cmp.max < cmp.min)) return null;
+
+    // merge min and max values
+    final double mn = union ? Math.min(min, cmp.min) : Math.max(min, cmp.min);
+    final double mx = union ? Math.max(max, cmp.max) : Math.min(max, cmp.max);
+    return get(expr, mn, mx, info);
   }
 
   @Override
@@ -266,7 +252,7 @@ public final class CmpR extends Single {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final CmpR cmp = new CmpR(expr.copy(cc, vm), min, max, info);
-    cmp.atomic = atomic;
+    cmp.single = single;
     return cmp;
   }
 
@@ -285,19 +271,19 @@ public final class CmpR extends Single {
 
   @Override
   public void plan(final QueryPlan plan) {
-    plan.add(plan.create(this, MIN, min, MAX, max), expr);
+    plan.add(plan.create(this, MIN, min, MAX, max, SINGLE, single), expr);
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(PAREN1);
+    final TokenBuilder tb = new TokenBuilder().add(PAREN1);
     if(min == max) {
-      sb.append(expr).append(" = ").append(min);
+      tb.add(expr).add(" = ").add(min);
     } else {
-      if(min != NEGATIVE_INFINITY) sb.append(min).append(" <= ");
-      sb.append(expr);
-      if(max != POSITIVE_INFINITY) sb.append(" <= ").append(max);
+      if(min != NEGATIVE_INFINITY) tb.add(expr).add(" >= ").add(min);
+      if(min != NEGATIVE_INFINITY && max != POSITIVE_INFINITY) tb.add(' ').add(AND).add(' ');
+      if(max != POSITIVE_INFINITY) tb.add(expr).add(" <= ").add(max);
     }
-    return sb.append(PAREN2).toString();
+    return tb.add(PAREN2).toString();
   }
 }

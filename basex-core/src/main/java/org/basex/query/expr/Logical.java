@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -48,57 +49,75 @@ abstract class Logical extends Arr {
   /**
    * Optimizes the expression.
    * @param cc compilation context
-   * @param and and/or flag
+   * @param or and/or flag
    * @param negate negated constructor
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public final Expr optimize(final CompileContext cc, final boolean and,
+  public final Expr optimize(final CompileContext cc, final boolean or,
       final java.util.function.Function<Expr[], Logical> negate) throws QueryException {
 
     ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       final Expr ex = expr.optimizeEbv(cc);
-      if(and ? ex instanceof And : ex instanceof Or) {
+      if(or ? ex instanceof Or : ex instanceof And) {
         // flatten nested expressions
         for(final Expr exp : ((Logical) ex).exprs) list.add(exp);
         cc.info(OPTFLAT_X_X, (Supplier<?>) this::description, ex);
       } else if(ex instanceof Value) {
         // pre-evaluate values
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-        if(ex.ebv(cc.qc, info).bool(info) ^ and) return Bln.get(!and);
+        if(ex.ebv(cc.qc, info).bool(info) ^ !or) return Bln.get(or);
       } else {
         list.add(ex);
       }
     }
     // no operands left: return result
-    if(list.isEmpty()) return Bln.get(and);
+    if(list.isEmpty()) return Bln.get(!or);
     exprs = list.finish();
 
-    // perform operator-specific optimizations
+    // remove duplicate entries
     list = new ExprList(exprs.length);
-    simplify(cc, list);
-    if(list.size() == 1) return cc.replaceWith(this, FnBoolean.get(list.get(0), info, cc.sc()));
+    for(int e = 0; e < exprs.length; e++) {
+      final Expr expr = exprs[e];
+      if(list.contains(expr) && !expr.has(Flag.NDT)) {
+        cc.info(OPTREMOVE_X_X, exprs[e], (Supplier<?>) this::description);
+      } else {
+        list.add(expr);
+      }
+    }
     exprs = list.finish();
 
-    // negate expressions
+    // merge adjacent expressions
+    list = new ExprList(exprs.length);
+    for(int e = 0; e < exprs.length; e++) {
+      Expr expr = exprs[e];
+      if(e > 0) {
+        final Expr merged = list.peek().merge(expr, or, cc);
+        if(merged != null) {
+          expr = merged;
+          list.pop();
+        }
+      }
+      list.add(expr);
+    }
+    if(list.size() != exprs.length) {
+      exprs = list.finish();
+      cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
+    }
+
+    if(exprs.length == 1) return cc.replaceWith(this, FnBoolean.get(exprs[0], info, cc.sc()));
+
+    // check if expression can be negated
     for(final Expr expr : exprs) {
       if(!Function.NOT.is(expr)) return this;
     }
+
     list = new ExprList(exprs.length);
     for(final Expr expr : exprs) list.add(((FnNot) expr).exprs[0]);
-    exprs = list.finish();
-    final Expr expr = negate.apply(exprs).optimize(cc);
+    final Expr expr = negate.apply(list.finish()).optimize(cc);
     return cc.replaceWith(this, cc.function(Function.NOT, info, expr));
   }
-
-  /**
-   * Simplifies the logical expression.
-   * @param cc compilation context
-   * @param list expression list
-   * @throws QueryException query exception
-   */
-  abstract void simplify(CompileContext cc, ExprList list) throws QueryException;
 
   @Override
   public final void markTailCalls(final CompileContext cc) {

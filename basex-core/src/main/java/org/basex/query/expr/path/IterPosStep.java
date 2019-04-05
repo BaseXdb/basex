@@ -45,19 +45,16 @@ final class IterPosStep extends Step {
           iter = axis.iter(checkNode(qc));
           final int el = exprs.length;
           for(int e = 0; e < el; e++) {
-            final Expr pred = exprs[e];
-            if(pred instanceof ItrPos) {
-              posExpr[e] = (ItrPos) pred;
-            } else if(numeric(pred)) {
+            final Expr expr = exprs[e];
+            if(expr instanceof ItrPos) {
+              posExpr[e] = (ItrPos) expr;
+            } else if(numeric(expr)) {
               // pre-evaluate numeric position
-              final Item item = pred.atomItem(qc, info);
+              final Item item = expr.atomItem(qc, info);
               if(item == Empty.VALUE) return null;
-              final double dbl = toDouble(item);
-              final long lng = (long) dbl;
-              if(dbl != lng) return null;
-              final Expr expr = ItrPos.get(lng, info);
-              if(expr instanceof ItrPos) posExpr[e] = (ItrPos) expr;
-              else return null;
+              final Expr ex = ItrPos.get(toDouble(item), info);
+              if(!(ex instanceof ItrPos)) return null;
+              posExpr[e] = (ItrPos) ex;
             }
           }
         }

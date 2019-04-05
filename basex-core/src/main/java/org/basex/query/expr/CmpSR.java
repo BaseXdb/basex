@@ -31,24 +31,24 @@ import org.basex.util.hash.*;
 public final class CmpSR extends Single {
   /** Collation (can be {@code null}). */
   private final Collation coll;
-  /** Minimum. */
+  /** Minimum (can be {@code null} if {@link #max} is assigned). */
   private final byte[] min;
   /** Include minimum value. */
   private final boolean mni;
-  /** Maximum. */
+  /** Maximum (can be {@code null} if {@link #min} is assigned). */
   private final byte[] max;
   /** Include maximum value. */
   private final boolean mxi;
 
   /** Flag for atomic evaluation. */
-  private boolean atomic;
+  private boolean single;
 
   /**
    * Constructor.
    * @param expr (compiled) expression
-   * @param min minimum value
+   * @param min minimum value (can be {@code null} if {@code max} is assigned)
    * @param mni include minimum value
-   * @param max maximum value
+   * @param max maximum value (can be {@code null} if {@code min} is assigned)
    * @param mxi include maximum value
    * @param coll collation (can be {@code null})
    * @param info input info
@@ -72,7 +72,8 @@ public final class CmpSR extends Single {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st = expr.seqType();
-    atomic = st.zeroOrOne() && !st.mayBeArray();
+    single = st.zeroOrOne() && !st.mayBeArray();
+
     return expr instanceof Value ? cc.preEval(this) : this;
   }
 
@@ -102,7 +103,7 @@ public final class CmpSR extends Single {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // atomic evaluation of arguments (faster)
-    if(atomic) {
+    if(single) {
       final Item item = expr.item(qc, info);
       return Bln.get(item != Empty.VALUE && eval(item));
     }
@@ -131,14 +132,16 @@ public final class CmpSR extends Single {
     return (mni ? mn >= 0 : mn > 0) && (mxi ? mx <= 0 : mx < 0);
   }
 
-  /**
-   * Creates an intersection of the existing and the specified expressions.
-   * @param cmp range comparison
-   * @return resulting expression or {@code null}
-   */
-  Expr intersect(final CmpSR cmp) {
+
+  @Override
+  public Expr merge(final Expr ex, final boolean union, final CompileContext cc)
+      throws QueryException {
+
+    if(union || !(ex instanceof CmpSR)) return null;
+
     // skip intersection if expressions to be compared are different
-    if(!(coll == null && cmp.expr.equals(expr))) return null;
+    final CmpSR cmp = (CmpSR) ex;
+    if(!(coll == null && expr.equals(cmp.expr))) return null;
 
     // find common minimum and maximum value
     final byte[] mn = min == null ? cmp.min : cmp.min == null ? min : Token.max(min, cmp.min);
@@ -184,7 +187,7 @@ public final class CmpSR extends Single {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final CmpSR cmp = new CmpSR(expr.copy(cc, vm), min, mni, max, mxi, coll, info);
-    cmp.atomic = atomic;
+    cmp.single = single;
     return cmp;
   }
 
@@ -204,15 +207,15 @@ public final class CmpSR extends Single {
 
   @Override
   public void plan(final QueryPlan plan) {
-    plan.add(plan.create(this, MIN, min != null ? min : "", MAX, max != null ? max : ""), expr);
+    plan.add(plan.create(this, MIN, min, MAX, max, SINGLE, single), expr);
   }
 
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder().add(PAREN1);
-    if(min != null) tb.add('"').add(min).add('"').add(mni ? " <= " : " < ");
-    tb.add(expr);
-    if(max != null) tb.add(mxi ? " <= " : " < ").add('"').add(max).add('"');
+    if(min != null) tb.add(expr).add(mni ? " >= " : " > ").add(Item.toQuotedToken(min));
+    if(min == null && max == null) tb.add(' ').add(AND).add(' ');
+    if(max != null) tb.add(expr).add(mxi ? " <= " : " < ").add(Item.toQuotedToken(max));
     return tb.add(PAREN2).toString();
   }
 }

@@ -163,6 +163,7 @@ public class CmpG extends Cmp {
       expr = opt(cc);
 
       // range comparisons
+      if(expr == this) expr = CmpIR.get(this, cc);
       if(expr == this) expr = CmpR.get(this, cc);
       if(expr == this) expr = CmpSR.get(this, cc);
 
@@ -298,14 +299,13 @@ public class CmpG extends Cmp {
     return op.opV;
   }
 
-  /**
-   * Creates a union of the existing and the specified expressions.
-   * @param g general comparison
-   * @param cc compilation context
-   * @return resulting expression or {@code null}
-   * @throws QueryException query exception
-   */
-  final Expr union(final CmpG g, final CompileContext cc) throws QueryException {
+  @Override
+  public Expr merge(final Expr ex, final boolean union, final CompileContext cc)
+      throws QueryException {
+
+    if(!(union && ex instanceof CmpG)) return null;
+
+    final CmpG g = (CmpG) ex;
     if(op != g.op || coll != g.coll || !exprs[0].equals(g.exprs[0])) return null;
 
     final Expr list = new List(info, exprs[1], g.exprs[1]).optimize(cc);

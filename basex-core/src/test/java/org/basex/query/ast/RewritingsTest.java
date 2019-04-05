@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
+import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -123,41 +124,69 @@ public final class RewritingsTest extends QueryPlanTest {
     check("('x' = 'x' and <x>x</x> = 'x')", true, empty(And.class));
   }
 
-  /** Checks {@link CmpR} optimizations. */
-  @Test public void cmpR() {
-    check("<a>5</a>[text() > 1 and text() < 9]", "<a>5</a>", count(CmpR.class, 1));
-    check("<a>5</a>[text() > 1 and text() < 9 and <b/>]", "<a>5</a>", count(CmpR.class, 1));
-    check("<a>5</a>[text() > 1 and . < 9]", "<a>5</a>", count(CmpR.class, 2));
-    check("<a>5</a>[text() > 800000000]", "", exists(CmpR.class));
-    check("<a>5</a>[text() < -800000000]", "", exists(CmpR.class));
-    check("exists(<x>1234567890.12345678</x>[. = 1234567890.1234567])", true, exists(CmpR.class));
+  /** Checks {@link CmpIR} optimizations. */
+  @Test public void cmpIR() {
+    final Class<CmpIR> cmpir = CmpIR.class;
+    check("1[. = 1] = 1 to 2", true, exists(cmpir));
+    check("1[. = 2] = 1 to 2", false, exists(cmpir));
+    check("1[. = 2] = 1 to 2", false, exists(cmpir));
 
-    check("exists(<x>123456789012345678</x> [. = 123456789012345679])", true, empty(CmpR.class));
-    check("<a>5</a>[text() > 8000000000000000000]", "", empty(CmpR.class));
-    check("<a>5</a>[text() < -8000000000000000000]", "", empty(CmpR.class));
-    check("(1234567890.12345678)[. = 1234567890.1234567]", "", empty(CmpR.class));
-    check("(123456789012345678 )[. = 123456789012345679]", "", empty(CmpR.class));
-
-    check("1[. = 1] = 1", true, exists(CmpR.class));
-    check("1[. = 1] = 1.0", true, exists(CmpR.class));
-    check("1[. = 1] = 1e0", true, exists(CmpR.class));
-    check("1e0[. = 1] = 1", true, exists(CmpR.class));
-    check("1e0[. = 1] = 1.0", true, exists(CmpR.class));
-    check("1e0[. = 1] = 1e0", true, exists(CmpR.class));
-    check("1[. = 1] = 1 to 2", true, exists(CmpR.class));
-    check("1[. = 2] = 1 to 2", false, exists(CmpR.class));
-    check("<_>1.1</_> = 1.1", true, exists(CmpR.class));
-
-    // suppressed rewritings
-    check("random:double() = 2", false, empty(CmpR.class));
-    check("1.1[. != 0] = 1.3", false, empty(CmpR.class));
-    check("'x'[. = 'x'] = 'x'", true, empty(CmpR.class));
-    check("'x'[. != 'x'] = 1.3", false, empty(CmpR.class));
-
-    check("1.1[. = 1.1] = 1.1", true, empty(CmpR.class));
+    // do not rewrite equality comparisons against single integers
+    check("1[. = 1] = 1", true, empty(cmpir));
 
     // rewrite to positional test
-    check("(1 to 5)[let $p := position() return $p = 2]", 2, empty(CmpR.class));
+    check("(1 to 5)[let $p := position() return $p = 2]", 2,
+        empty(cmpir), empty(Let.class), empty(POSITION));
+    check("1[let $p := position() return $p = 0]", "", empty());
+    check("1[let $p := position() return $p = (-5 to -1)]", "", empty());
+  }
+
+  /** Checks {@link CmpR} optimizations. */
+  @Test public void cmpR() {
+    final Class<CmpR> cmpr = CmpR.class;
+    check("<a>5</a>[text() > 1 and text() < 9]", "<a>5</a>", count(cmpr, 1));
+    check("<a>5</a>[text() > 1 and text() < 9 and <b/>]", "<a>5</a>", count(cmpr, 1));
+    check("<a>5</a>[text() > 1 and . < 9]", "<a>5</a>", count(cmpr, 2));
+    check("<a>5</a>[text() > 800000000]", "", exists(cmpr));
+    check("<a>5</a>[text() < -800000000]", "", exists(cmpr));
+    check("<a>5</a>[text() <= -800000000]", "", exists(cmpr));
+    check("exists(<x>1234567890.12345678</x>[. = 1234567890.1234567])", true, empty(cmpr));
+
+    check("exists(<x>123456789012345678</x> [. = 123456789012345679])", true, empty(cmpr));
+    check("<a>5</a>[text() > 8000000000000000000]", "", empty(cmpr));
+    check("<a>5</a>[text() < -8000000000000000000]", "", empty(cmpr));
+    check("(1234567890.12345678)[. = 1234567890.1234567]", "", empty(cmpr));
+    check("(123456789012345678 )[. = 123456789012345679]", "", empty(cmpr));
+
+    // rewrite equality comparisons
+    check("1[. = 1] >= 1.0", true, exists(cmpr));
+    check("1[. = 1] >= 1e0", true, exists(cmpr));
+    check("1e0[. = 1] >= 1", true, exists(cmpr));
+    check("1e0[. = 1] >= 1e0", true, exists(cmpr));
+    check("<_>1.1</_> >= 1.1", true, exists(cmpr));
+
+    // do not rewrite decimal/double comparisons
+    check("1e0[. = 1] >= 1.0", true, empty(cmpr));
+    check("1.0[. = 1] >= 1e0", true, empty(cmpr));
+
+    // do not rewrite equality comparisons
+    check("1[. = 1] = 1.0", true, empty(cmpr));
+    check("1[. = 1] = 1e0", true, empty(cmpr));
+    check("1e0[. = 1] = 1", true, empty(cmpr));
+    check("1e0[. = 1] = 1.0", true, empty(cmpr));
+    check("1e0[. = 1] = 1e0", true, empty(cmpr));
+    check("<_>1.1</_> = 1.1", true, empty(cmpr));
+
+    // suppressed rewritings
+    check("random:double() = 2", false, empty(cmpr));
+    check("1.1[. != 0] = 1.3", false, empty(cmpr));
+    check("'x'[. = 'x'] = 'x'", true, empty(cmpr));
+    check("'x'[. != 'x'] = 1.3", false, empty(cmpr));
+
+    check("1.1[. = 1.1] = 1.1", true, empty(cmpr));
+
+    // rewrite to positional test
+    check("1[let $p := position() return $p = 0.0]", "", empty());
   }
 
   /** Checks {@link CmpSR} optimizations. */

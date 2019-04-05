@@ -48,7 +48,7 @@ public final class RangeSeq extends Seq {
   /**
    * Returns the range as long values.
    * @param order respect ascending/descending order
-   * @return range
+   * @return minimum and maximum value (inclusive)
    */
   public long[] range(final boolean order) {
     final long end = asc ? start + size - 1 : start - size + 1;

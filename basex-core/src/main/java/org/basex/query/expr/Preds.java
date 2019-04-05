@@ -97,13 +97,7 @@ public abstract class Preds extends Arr {
           }
         }
       } else if(expr instanceof ANum) {
-        final ANum item = (ANum) expr;
-        final long i = item.itr();
-        // example: ....[1.2]
-        if(i != item.dbl()) return cc.emptySeq(this);
-        expr = ItrPos.get(i, info);
-        // example: ....[0]
-        if(!(expr instanceof ItrPos)) return cc.emptySeq(this);
+        expr = ItrPos.get(((ANum) expr).dbl(), info);
       } else if(expr instanceof Value) {
         expr = Bln.get(expr.ebv(cc.qc, info).bool(info));
       }

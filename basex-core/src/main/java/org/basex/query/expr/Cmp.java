@@ -190,7 +190,7 @@ public abstract class Cmp extends Arr {
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  final Expr optPos(final OpV op, final CompileContext cc) throws QueryException {
+  private Expr optPos(final OpV op, final CompileContext cc) throws QueryException {
     if(!positional()) return this;
 
     Expr expr = ItrPos.get(exprs[1], op, info);
