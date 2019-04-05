@@ -77,18 +77,18 @@ public final class CmpR extends Single {
    * @throws QueryException query exception
    */
   static Expr get(final CmpG cmp, final CompileContext cc) throws QueryException {
-    final Expr op1 = cmp.exprs[0], op2 = cmp.exprs[1];
-    final Type type1 = op1.seqType().type, type2 = op2.seqType().type;
+    final Expr expr1 = cmp.exprs[0], expr2 = cmp.exprs[1];
+    final Type type1 = expr1.seqType().type, type2 = expr2.seqType().type;
 
     // only rewrite deterministic comparisons if input is not decimal
     if(cmp.has(Flag.NDT) || !type1.isNumberOrUntyped() || type1 == AtomType.DEC) return cmp;
 
     // if value to be compared is a decimal, input must be untyped or integer
-    if(!(op2 instanceof ANum) || type2 == AtomType.DEC && !type1.isUntyped() &&
+    if(!(expr2 instanceof ANum) || type2 == AtomType.DEC && !type1.isUntyped() &&
         !type1.instanceOf(AtomType.ITR)) return cmp;
 
     // reject numbers that are too large or small to be safely compared as doubles
-    final double d = ((ANum) op2).dbl();
+    final double d = ((ANum) expr2).dbl();
     if(d < -MAX_INTEGER || d > MAX_INTEGER) return cmp;
 
     double mn = d, mx = d;
@@ -100,7 +100,7 @@ public final class CmpR extends Single {
       // do not rewrite (non-)equality comparisons
       default: return cmp;
     }
-    return get(op1, mn, mx, cmp.info).optimize(cc);
+    return get(expr1, mn, mx, cmp.info).optimize(cc);
   }
 
   @Override

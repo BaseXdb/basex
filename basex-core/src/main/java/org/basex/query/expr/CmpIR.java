@@ -66,19 +66,19 @@ public final class CmpIR extends Single {
    * @throws QueryException query exception
    */
   static Expr get(final CmpG cmp, final CompileContext cc) throws QueryException {
-    final Expr op1 = cmp.exprs[0], op2 = cmp.exprs[1];
+    final Expr expr1 = cmp.exprs[0], expr2 = cmp.exprs[1];
 
     // only rewrite deterministic integer comparisons
-    if(cmp.has(Flag.NDT) || !op1.seqType().type.instanceOf(AtomType.ITR)) return cmp;
+    if(cmp.has(Flag.NDT) || !expr1.seqType().type.instanceOf(AtomType.ITR)) return cmp;
 
     long mn = 0, mx = 0;
-    if(op2 instanceof RangeSeq) {
-      final long[] range = ((RangeSeq) op2).range(false);
+    if(expr2 instanceof RangeSeq) {
+      final long[] range = ((RangeSeq) expr2).range(false);
       mn = range[0];
       mx = range[1];
-    } else if(op2 instanceof Int && cmp.op != OpG.EQ) {
+    } else if(expr2 instanceof Int && cmp.op != OpG.EQ) {
       // do not rewrite equality comparisons if single integer is compared
-      mn = ((Int) op2).itr();
+      mn = ((Int) expr2).itr();
       mx = mn;
     } else {
       return cmp;
@@ -92,7 +92,7 @@ public final class CmpIR extends Single {
       case LT: mn = MIN_VALUE; mx--; break;
       default: return cmp;
     }
-    return get(op1, mn, mx, cmp.info).optimize(cc);
+    return get(expr1, mn, mx, cmp.info).optimize(cc);
   }
 
   @Override
