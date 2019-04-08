@@ -689,6 +689,13 @@ public final class FnModuleTest extends QueryPlanTest {
     // character maps
     query(func.args("1;2", " map { 'use-character-maps': ';=,,' }"), "1,2");
     query(func.args("1;2", " map { 'use-character-maps': map { ';': ',' } }"), "1,2");
+
+    // boolean arguments
+    query(func.args("1", " map { 'indent': 'yes' }"), 1);
+    query(func.args("1", " map { 'indent': false() }"), 1);
+    query(func.args("1", " map { 'indent': true() }"), 1);
+    query(func.args("1", " map { 'indent': 1 }"), 1);
+    error(func.args("1", " map { 'indent': 2 }"), SEROPT_X);
   }
 
   /** Test method. */

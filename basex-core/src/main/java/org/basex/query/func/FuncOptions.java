@@ -84,7 +84,7 @@ public final class FuncOptions {
    * @param item item to be parsed (can be {@link Empty#VALUE})
    * @param options options
    * @param <T> option type
-   * @param error raise error code
+   * @param error error to be raised
    * @return specified options
    * @throws QueryException query exception
    */
@@ -110,7 +110,7 @@ public final class FuncOptions {
   /**
    * Builds a string representation of the specified node.
    * @param node node
-   * @param error raise error code
+   * @param error error to be raised
    * @return string
    * @throws QueryException query exception
    */

@@ -726,58 +726,56 @@ public class Options implements Iterable<Option<?>> {
       return;
     }
 
+    Object value = null;
+    String expected = null;
     if(option instanceof BooleanOption) {
-      final boolean v;
-      if(item.type.isStringOrUntyped()) {
-        final String string = string(item.string(ii));
-        v = Strings.toBoolean(string);
-        if(!v && !Strings.no(string))
-          throw new BaseXException(Text.OPT_BOOLEAN_X_X, option.name(), string);
-      } else if(item instanceof Bln) {
-        v = ((Bln) item).bool(ii);
+      if(item.type.eq(AtomType.BLN)) {
+        value = item.bool(ii);
       } else {
-        throw new BaseXException(Text.OPT_BOOLEAN_X_X, option.name(), item);
+        final String s = string(item.string(ii));
+        value = Strings.toBoolean(s) ? Boolean.TRUE : Strings.no(s) ? Boolean.FALSE : null;
       }
-      put(option, v);
+      if(value == null) expected = Text.OPT_BOOLEAN_X_X;
     } else if(option instanceof NumberOption) {
-      if(item instanceof ANum) {
-        put(option, (int) ((ANum) item).itr(ii));
-      } else {
-        throw new BaseXException(Text.OPT_NUMBER_X_X, option.name(), item);
-      }
+      value = (int) item.itr(ii);
     } else if(option instanceof StringOption) {
-      if(item instanceof XQMap) {
-        put(option, toString((XQMap) item, ii));
-      } else if(item.type.isStringOrUntyped()) {
-        put(option, string(item.string(ii)));
-      } else {
-        throw new BaseXException(Text.OPT_STRING_X_X, option.name(), item);
-      }
+      value = item instanceof XQMap ? toString((XQMap) item, ii) : string(item.string(ii));
     } else if(option instanceof EnumOption) {
-      if(item.type.isStringOrUntyped()) {
-        final EnumOption<?> eo = (EnumOption<?>) option;
-        final String string = string(item.string(ii));
-        final Object v = eo.get(string);
-        if(v == null) throw new BaseXException(allowed(option, string, (Object[]) eo.values()));
-        put(option, v);
+      String string = null;
+      if(item.type.eq(AtomType.BLN)) {
+        string = item.bool(ii) ? Text.YES : Text.NO;
+      } else if(item.type.isNumber()) {
+        final long l = item.itr(ii);
+        string = l == 1 ? Text.YES : l == 0 ? Text.NO : null;
       } else {
-        throw new BaseXException(Text.OPT_STRING_X_X, option.name(), item);
+        string = string(item.string(ii));
+      }
+      if(string == null) {
+        expected = Text.OPT_BOOLEAN_X_X;
+      } else {
+        final EnumOption<?> eo = (EnumOption<?>) option;
+        value = eo.get(string);
+        if(value == null) throw new BaseXException(allowed(option, string, (Object[]) eo.values()));
       }
     } else if(option instanceof OptionsOption) {
-      final Options o = ((OptionsOption<?>) option).newInstance();
       if(item instanceof XQMap) {
-        o.assign((XQMap) item, error, ii);
+        value = ((OptionsOption<?>) option).newInstance();
+        ((Options) value).assign((XQMap) item, error, ii);
       } else {
-        throw new BaseXException(Text.OPT_MAP_X_X, option.name(), item);
+        expected = Text.OPT_MAP_X_X;
       }
-      put(option, o);
     } else if(option instanceof FuncOption) {
-      if(!(item instanceof FuncItem))
-        throw new BaseXException(Text.OPT_FUNC_X_X, option.name(), item);
-      put(option, item);
+      if(item instanceof FuncItem) {
+        value = item;
+      } else {
+        expected = Text.OPT_FUNC_X_X;
+      }
     } else {
       throw Util.notExpected("Unsupported option: " + option);
     }
+
+    if(expected != null) throw new BaseXException(expected, option.name(), item);
+    put(option, value);
   }
 
   /**
