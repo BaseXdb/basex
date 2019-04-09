@@ -34,8 +34,8 @@ public final class EditorArea extends TextPanel {
 
   /** View reference. */
   private final EditorView view;
-  /** Timestamp. Set to {@code 0} if it has not been stored to disk. */
-  private long tstamp;
+  /** Timestamp. Set to {@code 0} if the editor contents are not saved on disk. */
+  private long timeStamp;
 
   /**
    * Constructor.
@@ -59,15 +59,15 @@ public final class EditorArea extends TextPanel {
   }
 
   /**
-   * Returns {@code true} if the tab content was opened from disk, or was saved to disk.
+   * Returns {@code true} if the editor contents are saved on disk.
    * @return result of check
    */
   public boolean opened() {
-    return tstamp != 0;
+    return timeStamp != 0;
   }
 
   /**
-   * Returns {@code true} if the tab content was modified.
+   * Returns {@code true} if the editor contents were modified.
    * @return result of check
    */
   public boolean modified() {
@@ -149,22 +149,27 @@ public final class EditorArea extends TextPanel {
    * @param enforce enforce reload
    */
   public void reopen(final boolean enforce) {
-    if(opened()) {
-      final long ts = file.timeStamp();
-      if((tstamp != ts || enforce) && (!modified ||
-          BaseXDialog.confirm(gui, Util.info(REOPEN_FILE_X, file.name())))) {
-        try {
-          setText(file.read());
-          file(file, false);
-          release(Action.PARSE);
-          tstamp = ts;
-        } catch(final IOException ex) {
-          tstamp = 0;
-          view.refreshControls(this, true);
-          Util.debug(ex);
-          BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, file));
-        }
-      }
+    // skip if editor contents are saved on disk, or if they are up-to-date
+    final long ts = file.timeStamp();
+    if(!opened() || timeStamp == ts && !enforce) return;
+
+    // reset timestamp if file will not be reopened
+    if(modified && !BaseXDialog.confirm(gui, Util.info(REOPEN_FILE_X, file.name()))) {
+      timeStamp = 0;
+      return;
+    }
+
+    try {
+      // reopens the file
+      setText(file.read());
+      file(file, false);
+      release(Action.PARSE);
+      timeStamp = ts;
+    } catch(final IOException ex) {
+      // reset timestamp if file could not be opened
+      timeStamp = 0;
+      Util.debug(ex);
+      BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, file));
     }
   }
 
@@ -183,7 +188,7 @@ public final class EditorArea extends TextPanel {
    */
   boolean save(final IOFile io) {
     final boolean rename = io != file;
-    if(rename || modified || tstamp == 0) {
+    if(rename || modified || timeStamp == 0) {
       try {
         io.write(getText());
         file(io, true);
@@ -218,7 +223,7 @@ public final class EditorArea extends TextPanel {
       setSyntax(io, true);
       repaint();
     }
-    tstamp = file.timeStamp();
+    timeStamp = file.timeStamp();
     hist.save();
     view.refreshHistory(file);
     view.refreshControls(this, true);
