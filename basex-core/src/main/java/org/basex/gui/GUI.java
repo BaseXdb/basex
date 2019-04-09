@@ -266,11 +266,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     final TokenBuilder tb = new TokenBuilder();
     final EditorArea ea = editor == null ? null : editor.getEditor();
     if(ea != null) {
-      if(ea.opened()) {
-        tb.add(ea.file().path());
-      } else {
-        tb.add(ea.file().name());
-      }
+      tb.add(ea.opened() ? ea.file().path() : ea.file().name());
       if(ea.modified()) tb.add('*');
     }
     final Data data = context.data();

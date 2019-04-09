@@ -79,27 +79,27 @@ final class Docs {
   }
 
   /**
-   * Returns the {@code pre} values of all document nodes.
-   * @return document nodes (internal representation!)
+   * Returns a list with the {@code pre} values of all document nodes.
+   * @return pre values
    */
   synchronized IntList docs() {
     if(docList == null) {
-      final IntList il = new IntList();
+      final IntList pres = new IntList();
       final int is = data.meta.size;
-      for(int i = 0; i < is;) {
-        final int k = data.kind(i);
-        if(k == Data.DOC) il.add(i);
-        i += data.size(i, k);
+      for(int pre = 0; pre < is;) {
+        final int k = data.kind(pre);
+        if(k == Data.DOC) pres.add(pre);
+        pre += data.size(pre, k);
       }
       update();
-      docList = il;
+      docList = pres;
     }
     return docList;
   }
 
   /**
-   * Returns the document paths, and initializes them if necessary.
-   * @return document paths (internal representation!)
+   * Returns a list with the document paths.
+   * @return document paths
    */
   private synchronized TokenList paths() {
     if(pathList == null && pathIndex) {
@@ -126,8 +126,8 @@ final class Docs {
   }
 
   /**
-   * Returns the document path order, and initialize the array if necessary.
-   * @return path order (internal representation!)
+   * Returns an array with offsets to the sorted document paths.
+   * @return path order
    */
   private synchronized int[] order() {
     if(pathOrder == null) pathOrder = Array.createOrder(paths().toArray(), false, true);
