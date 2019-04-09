@@ -397,6 +397,8 @@ public interface QueryText {
   /** Query Info. */ String PROMOTE = "promote";
   /** Query Info. */ String DATABASE = "database";
   /** Query Info. */ String SINGLE = "single";
+  /** Query Info. */ String LINE = "line";
+  /** Query Info. */ String COLUMN = "column";
 
   /** Query Info. */ String MAPASG = ": ";
   /** Query Info. */ String SEP = ", ";

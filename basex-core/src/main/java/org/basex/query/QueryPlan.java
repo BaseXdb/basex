@@ -91,6 +91,9 @@ public final class QueryPlan {
     } else if(expr instanceof StaticDecl) {
       attachType(elem, ((StaticDecl) expr).seqType(), -1, null);
     }
+    if(expr instanceof ParseExpr) {
+      attachInputInfo(elem, ((ParseExpr) expr).info);
+    }
     return elem;
   }
 
@@ -101,7 +104,8 @@ public final class QueryPlan {
    * @return element
    */
   public FElem create(final String name, final Var var) {
-    return attachVariable(new FElem(Strings.capitalize(name)), var, true);
+    final FElem elem = new FElem(Strings.capitalize(name));
+    return attachInputInfo(attachVariable(elem, var, true), var.info);
   }
 
   /**
@@ -147,12 +151,26 @@ public final class QueryPlan {
    * @param seqType sequence type
    * @param size result size
    * @param data data reference (can be {@code null})
+   * @return specified element
    */
-  private void attachType(final FElem elem, final SeqType seqType, final long size,
+  private FElem attachType(final FElem elem, final SeqType seqType, final long size,
       final Data data) {
 
     addAttribute(elem, TYPE, seqType);
     if(size != -1) addAttribute(elem, SIZE, size);
     if(data != null) addAttribute(elem, DATABASE, data.meta.name);
+    return elem;
+  }
+
+  /**
+   * Attaches type information to the specified element.
+   * @param elem element to which attributes will be added
+   * @param ii input info
+   * @return specified element
+   */
+  private FElem attachInputInfo(final FElem elem, final InputInfo ii) {
+    addAttribute(elem, LINE, ii.line());
+    addAttribute(elem, COLUMN, ii.column());
+    return elem;
   }
 }
