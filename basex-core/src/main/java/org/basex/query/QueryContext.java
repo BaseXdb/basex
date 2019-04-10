@@ -156,7 +156,7 @@ public final class QueryContext extends Job implements Closeable {
    * Constructor.
    * @param context database context
    * @param parent parent context (can be {@code null})
-   * @param info query info
+   * @param info query info (can be {@code null})
    * @param props external properties
    */
   private QueryContext(final Context context, final QueryContext parent, final QueryInfo info,
@@ -552,11 +552,12 @@ public final class QueryContext extends Job implements Closeable {
 
   /**
    * Creates and returns an XML query plan (expression tree) for this query.
+   * @param full include comprehensive information
    * @return query plan
    */
-  public FElem plan() {
+  public FElem plan(final boolean full) {
     // only show root node if functions or variables exist
-    final QueryPlan plan = new QueryPlan(compiled, closed);
+    final QueryPlan plan = new QueryPlan(compiled, closed, full);
     if(root != null) {
       for(final StaticScope ss : QueryCompiler.usedDecls(root)) ss.plan(plan);
       root.plan(plan);

@@ -399,6 +399,7 @@ public interface QueryText {
   /** Query Info. */ String SINGLE = "single";
   /** Query Info. */ String LINE = "line";
   /** Query Info. */ String COLUMN = "column";
+  /** Query Info. */ String PATH = "path";
 
   /** Query Info. */ String MAPASG = ": ";
   /** Query Info. */ String SEP = ", ";

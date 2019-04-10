@@ -320,7 +320,7 @@ public final class QueryProcessor extends Job implements Closeable {
    * @return root node
    */
   public FDoc plan() {
-    return new FDoc().add(qc.plan());
+    return new FDoc().add(qc.plan(qc.context.options.get(MainOptions.FULLPLAN)));
   }
 
   @Override

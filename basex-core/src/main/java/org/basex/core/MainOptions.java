@@ -157,6 +157,8 @@ public final class MainOptions extends Options {
 
   /** Prints an XML plan. */
   public static final BooleanOption XMLPLAN = new BooleanOption("XMLPLAN", false);
+  /** Creates comprehensive query plan information. */
+  public static final BooleanOption FULLPLAN = new BooleanOption("FULLPLAN", false);
   /** Creates the query plan before or after compilation. */
   public static final BooleanOption COMPPLAN = new BooleanOption("COMPPLAN", true);
 

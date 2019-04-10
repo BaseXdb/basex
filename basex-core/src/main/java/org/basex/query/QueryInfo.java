@@ -27,8 +27,6 @@ public final class QueryInfo {
   /** Verbose info. */
   private final boolean verbose;
 
-  /** Read locked databases. */
-  public Locks locks;
   /** Parsing time (nano seconds). */
   public long parsing;
   /** Compilation time (nano seconds). */
@@ -102,16 +100,15 @@ public final class QueryInfo {
    * @param qp query processor
    * @param printed printed bytes
    * @param hits number of returned hits
-   * @param detailed return detailed query info
+   * @param locks read and write locks
    * @return query string
    */
   public String toString(final QueryProcessor qp, final long printed, final long hits,
-      final boolean detailed) {
-
+      final Locks locks) {
     final int runs = Math.max(1, qp.qc.context.options.get(MainOptions.RUNS));
     final TokenBuilder tb = new TokenBuilder();
     final long total = parsing + compiling + evaluating + serializing;
-    if(detailed) {
+    if(qp.qc.context.options.get(MainOptions.QUERYINFO)) {
       final int up = qp.updates();
       tb.add(toString(qp.qc)).add(NL);
       tb.add(PARSING_CC).add(Performance.getTime(parsing, runs)).add(NL);

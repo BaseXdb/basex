@@ -1,5 +1,6 @@
 package org.basex.server;
 
+import static org.basex.core.Text.*;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
@@ -31,7 +32,7 @@ public final class ServerQuery extends Job {
   /** Parsing flag. */
   private boolean parsed;
   /** Query info. */
-  private String info = "";
+  private StringBuilder info = new StringBuilder();
 
   /**
    * Constructor.
@@ -78,7 +79,7 @@ public final class ServerQuery extends Job {
    * @return query info
    */
   public String info() {
-    return info;
+    return info.toString();
   }
 
   /**
@@ -112,21 +113,28 @@ public final class ServerQuery extends Job {
   public void execute(final OutputStream out, final boolean iterative, final boolean encode,
       final boolean full) throws IOException {
 
+    final boolean compplan = ctx.options.get(MainOptions.COMPPLAN);
+
     try {
       // parses the query and registers the process
       parse();
       qp.register(ctx);
-      // create serializer
+
       final Performance perf = jc().performance;
+
+      if(!compplan) queryPlan();
       qp.compile();
+      if(compplan) queryPlan();
+
       final QueryContext qc = qp.qc;
       final QueryInfo qi = qc.info;
+
       qi.compiling = perf.ns();
       final Iter iter = qp.iter();
       qi.evaluating = perf.ns();
 
       // iterate through results
-      int c = 0;
+      int hits = 0;
       final PrintOutput po = PrintOutput.get(encode ? new ServerOutput(out) : out);
       final SerializerOptions sopts = full ? SerializerMode.API.get() : qc.serParams();
       try(Serializer ser = Serializer.get(po, sopts)) {
@@ -141,13 +149,13 @@ public final class ServerQuery extends Job {
           } else {
             ser.serialize(item);
           }
-          c++;
+          hits++;
         }
       }
       qi.serializing = perf.ns();
 
       // generate query info
-      info = qi.toString(qp, po.size(), c, ctx.options.get(MainOptions.QUERYINFO));
+      info.append(qi.toString(qp, po.size(), hits, jc().locks));
 
     } catch(final QueryException | JobException ex) {
       throw new BaseXException(ex);
@@ -165,6 +173,16 @@ public final class ServerQuery extends Job {
         qp = null;
         popJob();
       }
+    }
+  }
+
+  /**
+   * Generates a query plan.
+   * @throws QueryIOException query I/O exception
+   */
+  private void queryPlan() throws QueryIOException {
+    if(ctx.options.get(MainOptions.XMLPLAN)) {
+      info.append(NL + QUERY_PLAN + COL + NL).append(qp.plan().serialize()).append(NL);
     }
   }
 

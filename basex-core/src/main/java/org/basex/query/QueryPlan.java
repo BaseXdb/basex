@@ -24,17 +24,21 @@ public final class QueryPlan {
   public final FElem root;
   /** Node stack. */
   public final Stack<FElem> nodes = new Stack<>();
+  /** Include comprehensive information. */
+  public final boolean full;
 
   /**
    * Constructor.
    * @param compiled compiled flag
    * @param updating updating flag
+   * @param full include comprehensive information
    */
-  public QueryPlan(final boolean compiled, final boolean updating) {
+  public QueryPlan(final boolean compiled, final boolean updating, final boolean full) {
     root = new FElem(QueryText.QUERY_PLAN);
     root.add(QueryText.COMPILED, token(compiled));
     root.add(QueryText.UPDATING, token(updating));
     nodes.add(root);
+    this.full = full;
   }
 
   /**
@@ -100,12 +104,13 @@ public final class QueryPlan {
   /**
    * Creates a new element node to be added to the query plan.
    * @param name name of element
-   * @param var variable to attach to (can be {@code null})
+   * @param var variable to attach (can be {@code null})
    * @return element
    */
   public FElem create(final String name, final Var var) {
     final FElem elem = new FElem(Strings.capitalize(name));
-    return attachInputInfo(attachVariable(elem, var, true), var.info);
+    if(var != null) attachInputInfo(attachVariable(elem, var, true), var.info);
+    return elem;
   }
 
   /**
@@ -128,7 +133,7 @@ public final class QueryPlan {
   }
 
   /**
-   * Adds variable information to the specified element.
+   * Attaches variable information to the specified element.
    * @param elem element to which attributes will be added
    * @param var variable (can be {@code null})
    * @param type include type information
@@ -151,26 +156,25 @@ public final class QueryPlan {
    * @param seqType sequence type
    * @param size result size
    * @param data data reference (can be {@code null})
-   * @return specified element
    */
-  private FElem attachType(final FElem elem, final SeqType seqType, final long size,
+  private void attachType(final FElem elem, final SeqType seqType, final long size,
       final Data data) {
 
     addAttribute(elem, TYPE, seqType);
     if(size != -1) addAttribute(elem, SIZE, size);
     if(data != null) addAttribute(elem, DATABASE, data.meta.name);
-    return elem;
   }
 
   /**
-   * Attaches type information to the specified element.
+   * Attaches input information to the specified element.
    * @param elem element to which attributes will be added
    * @param ii input info
-   * @return specified element
    */
-  private FElem attachInputInfo(final FElem elem, final InputInfo ii) {
-    addAttribute(elem, LINE, ii.line());
-    addAttribute(elem, COLUMN, ii.column());
-    return elem;
+  private void attachInputInfo(final FElem elem, final InputInfo ii) {
+    if(full) {
+      addAttribute(elem, LINE, ii.line());
+      addAttribute(elem, COLUMN, ii.column());
+      addAttribute(elem, PATH, ii.path());
+    }
   }
 }

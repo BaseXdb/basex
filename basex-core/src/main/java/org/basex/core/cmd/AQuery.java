@@ -116,7 +116,7 @@ public abstract class AQuery extends Command {
           qp.close();
           info.serializing += perf.ns();
         }
-        return info(info.toString(qp, out.size(), hits, options.get(MainOptions.QUERYINFO)));
+        return info(info.toString(qp, out.size(), hits, jc().locks));
 
       } catch(final QueryException | IOException ex) {
         exception = ex;
@@ -165,10 +165,7 @@ public abstract class AQuery extends Command {
   private void init(final String query, final Context ctx) throws QueryException {
     final Performance perf = new Performance();
     if(qp == null) qp = pushJob(new QueryProcessor(query, uri, ctx));
-    if(info == null) {
-      info = qp.qc.info;
-      info.locks = jc().locks;
-    }
+    if(info == null) info = qp.qc.info;
 
     for(final Map.Entry<String, Object> entry : props.entrySet())
       qp.qc.putProperty(entry.getKey(), entry.getValue());
@@ -219,7 +216,7 @@ public abstract class AQuery extends Command {
   }
 
   /**
-   * Creates query plans.
+   * Generates a query plan.
    */
   private void queryPlan() {
     if(!plan && qp != null) {
