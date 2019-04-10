@@ -68,7 +68,7 @@ public enum QueryError {
   /** Error code. */
   ADMIN_TODAY(ADMIN, "today", "Today's log file cannot be deleted."),
   /** Error code. */
-  ADMIN_TYPE_X(ADMIN, "type", "Log type must only consist of word characters: %."),
+  ADMIN_TYPE_X(ADMIN, "type", "Type string contains whitespaces: '%'."),
 
   // Archive Module
 

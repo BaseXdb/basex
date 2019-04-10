@@ -121,7 +121,7 @@ declare
 function dba:logout(
 ) as element(rest:response) {
   (: write log entry, redirect to login page :)
-  admin:write-log('DBA user was logged out: ' || $session:VALUE),
+  admin:write-log('Logout: ' || $session:VALUE, 'DBA'),
   web:redirect("/dba/login", map { '_name': $session:VALUE }),
   (: closes the DBA session :)
   session:close()
@@ -139,7 +139,7 @@ declare %private function dba:accept(
 ) as element(rest:response) {
   (: register user, write log entry :)
   session:set($session:ID, $name),
-  admin:write-log('DBA user was logged in: ' || $name),
+  admin:write-log('Login: ' || $name, 'DBA'),
 
   (: redirect to supplied page or main page :)
   web:redirect(if($page) then $page else 'logs', dba:params(map { }))
@@ -158,7 +158,7 @@ declare %private function dba:reject(
   $page     as xs:string?
 ) as element(rest:response) {
   (: write log entry, redirect to login page :)
-  admin:write-log('DBA login was denied: ' || $name),
+  admin:write-log('Login denied: ' || $name, 'DBA'),
   web:redirect(
     "login",
     dba:params(map { '_name': $name, '_error': $message, '_page': $page })

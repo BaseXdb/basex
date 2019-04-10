@@ -26,10 +26,10 @@ public final class AdminModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void sessions() {
-    final Function func = _ADMIN_SESSIONS;
-    // can only be tested in client/server mode
-    query(func.args(), "");
+  @Test public void deleteLogs() {
+    final Function func = _ADMIN_DELETE_LOGS;
+    // no logging data exists in the sandbox
+    error(func.args("2001-01-01"), WHICHRES_X);
   }
 
   /** Test method. */
@@ -41,9 +41,17 @@ public final class AdminModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void deleteLogs() {
-    final Function func = _ADMIN_DELETE_LOGS;
+  @Test public void sessions() {
+    final Function func = _ADMIN_SESSIONS;
+    // can only be tested in client/server mode
+    query(func.args(), "");
+  }
+
+  /** Test method. */
+  @Test public void writeLog() {
+    final Function func = _ADMIN_WRITE_LOG;
     // no logging data exists in the sandbox
-    error(func.args("2001-01-01"), WHICHRES_X);
+    error(func.args("", "X "), ADMIN_TYPE_X);
+    error(func.args("", "X\r"), ADMIN_TYPE_X);
   }
 }

@@ -165,29 +165,31 @@ function dba:log(
     map { 'key': 'time', 'label': 'Time', 'type': 'xml', 'order': 'desc' },
     map { 'key': 'address', 'label': 'Address' },
     map { 'key': 'user', 'label': 'User', 'type': 'xml' },
-    map { 'key': 'type', 'label': 'Type' },
+    map { 'key': 'type', 'label': 'Type', 'type': 'xml' },
     map { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc' },
-    map { 'key': 'message', 'label': 'Message', 'type': 'xml' }
+    map { 'key': 'text', 'label': 'Text', 'type': 'xml' }
   )
   let $entries :=
     let $ignore-logs := options:get($options:IGNORE-LOGS)
-    let $input-exists := boolean($input)
+    let $search := boolean($input)
     let $highlight := function($string, $found) {
       if($found) then (
         for $match in analyze-string($string, $input, 'i')/*
-        let $text := string($match)
-        return if(local-name($match) = 'match') then element b { $text } else $text
+        let $value := string($match)
+        return if(local-name($match) = 'match') then element b { $value } else $value
       ) else (
         $string
       )
     }
     for $log in reverse(admin:logs($name, true()))
-    let $user := data($log/@user)
-    let $message := data($log/text())
-    let $user-found := $input-exists and matches($user, $input, 'iq')
-    let $message-found := $input-exists and not($user-found) and matches($message, $input, 'i')
-    where (not($input-exists) or $user-found or $message-found) and (
-      not($ignore-logs and matches($message, $ignore-logs, 'i'))
+    let $user := string($log/@user)
+    let $type := string($log/@type)
+    let $msg := string($log)
+    let $user-hit := $search and matches($user, $input, 'iq')
+    let $type-hit := $search and not($user-hit) and matches($type, $input, 'iq')
+    let $text-hit := $search and not($user-hit or $type-hit) and matches($msg, $input, 'i')
+    where (not($search) or $user-hit or $type-hit or $text-hit) and (
+      not($ignore-logs and matches($msg, $ignore-logs, 'i'))
     )
     return map {
       'time': function() {
@@ -201,10 +203,10 @@ function dba:log(
         )
       },
       'address': $log/@address,
-      'user': function() { $highlight($user, $user-found) },
-      'type': $log/@type,
+      'user': function() { $highlight($user, $user-hit) },
+      'type': function() { $highlight($type, $type-hit) },
       'ms': $log/@ms,
-      'message': function() { $highlight($message, $message-found) }
+      'text': function() { $highlight($msg, $text-hit) }
     }
   let $params := map { 'name': $name, 'input': $input }
   let $options := map { 'sort': $sort, 'page': xs:integer($page) }
