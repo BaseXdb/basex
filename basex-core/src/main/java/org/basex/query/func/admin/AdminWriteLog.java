@@ -22,7 +22,7 @@ public final class AdminWriteLog extends AdminFn {
 
     final String msg = string(toToken(exprs[0], qc));
     final String type = exprs.length > 1 ? string(toToken(exprs[1], qc)) : LogType.INFO.toString();
-    if(!type.matches("^[A-Z]+$")) throw ADMIN_TYPE_X.get(info, type);
+    if(!type.matches("^[-_a-zA-Z0-9]+$")) throw ADMIN_TYPE_X.get(info, type);
 
     qc.context.log.write(type, msg, null, qc.context);
     return Empty.VALUE;
