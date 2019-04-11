@@ -117,22 +117,30 @@ public abstract class SimpleMap extends Arr {
       if(es != -1 && !expr.has(Flag.NDT)) {
         if(next instanceof Value) {
           // rewrite expression with next value as singleton sequence
+          // (1 to 2) ! 3  ->  (3, 3)
           rep = SingletonSeq.get((Value) next, es);
         } else if(!next.has(Flag.CTX, Flag.POS)) {
           // skip expression that relies on the context
           if(es == 1) {
             // replace expression with next expression
+            // <x/> ! 'ok'  ->  'ok'
             rep = next;
           } else if(!next.has(Flag.NDT, Flag.CNS)) {
             // replace expression with replicated expression
+            // (1 to 2) ! 'ok'  ->  util:replicate('ok', 2)
             rep = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es));
+          } else {
+            // (1 to 2) ! <x/>  ->  util:replicate('ok', 2)
+            exprs[e] = SingletonSeq.get(Str.ZERO, es);
           }
         }
       }
+
       if(rep != null) {
         exprs[e] = cc.replaceWith(expr, rep);
       } else if(!(next instanceof ContextValue)) {
-        exprs[++e] = exprs[n];
+        // context item expression can be ignored
+        exprs[++e] = next;
       }
     }
     if(++e != el) exprs = Arrays.copyOf(exprs, e);

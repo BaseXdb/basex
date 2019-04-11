@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.up.expr.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -163,7 +164,7 @@ public final class GFLWORTest extends QueryPlanTest {
     );
     check("<x/>/(for $i in 1 to 3 let $x := . where $x return $x)",
         "<x/>",
-        empty(Let.class),
+        empty(GFLWOR.class),
         exists(_UTIL_REPLICATE)
     );
     check("for $len in 1 to 3 " +
@@ -173,6 +174,20 @@ public final class GFLWORTest extends QueryPlanTest {
         "return count($w) div ($x + $x)",
         "1\n1\n1\n1\n1\n1",
         "//For << //Let and //Let << //Window"
+    );
+  }
+
+  /** Tests if let clauses are moved out of any loop they don't depend on. */
+  @Test public void replicate() {
+    check("for $r in 1 to 2 return (3,4)",
+        "3\n4\n3\n4",
+        empty(For.class),
+        exists(SingletonSeq.class)
+    );
+    check("for $r in 1 to 2 return 3[. = 4]",
+        "",
+        empty(For.class),
+        exists(_UTIL_REPLICATE)
     );
   }
 

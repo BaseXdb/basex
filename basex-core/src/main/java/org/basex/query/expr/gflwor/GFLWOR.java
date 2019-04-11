@@ -119,7 +119,7 @@ public final class GFLWOR extends ParseExpr {
       final Expr branch = clauses.isEmpty() ? rtrn : this;
       expr = new If(info, where.expr, branch).optimize(cc);
     } else {
-      calcType();
+      exprType.assign(rtrn.seqType().type, calcSize(true));
       expr = simplify(cc);
     }
 
@@ -137,47 +137,64 @@ public final class GFLWOR extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr simplify(final CompileContext cc) throws QueryException {
-    final BooleanSupplier varsInReturn = () -> {
-      for(final Clause clause : clauses) {
-        for(final Var var : clause.vars()) {
-          if(rtrn.count(var) != VarUsage.NEVER) return true;
-        }
-      }
-      return false;
-    };
+    // skip non-leave if iterated items are non-deterministic
+    for(final Clause clause : clauses) {
+      if(clause.has(Flag.NDT, Flag.UPD)) return this;
+    }
 
+    // return empty sequence if expression will yield no results
+    // for $i in 1 to 2 return ()  ->  ()
     final long size = size();
-    if(size != -1 && !has(Flag.NDT, Flag.UPD)) {
-      // return empty sequence if expression will yield no results
-      if(size == 0) return Empty.VALUE;
-      // skip expression that relies on the context
-      if(!varsInReturn.getAsBoolean()) {
-        // single result: return expression of 'return' clause
-        if(size == 1) return rtrn;
-        // return result replicator (exclude node constructors)
-        if(!rtrn.has(Flag.CNS)) {
-          return cc.function(Function._UTIL_REPLICATE, info, rtrn, Int.get(size / rtrn.size()));
-        }
+    if(size == 0 && !rtrn.has(Flag.CNS, Flag.NDT, Flag.UPD)) {
+      System.out.println("=> " + this);
+      return Empty.VALUE;
+    }
+
+    // leave if return clause relies on variables
+    for(final Clause clause : clauses) {
+      for(final Var var : clause.vars()) {
+        if(rtrn.count(var) != VarUsage.NEVER) return this;
       }
     }
-    return this;
+
+    // single result: return expression of return clause
+    // for $i in 1 return <x/>  ->  <x/>
+    if(size == 1) {
+      System.out.println("=> " + this);
+      return rtrn;
+    }
+
+    // leave if exact number of iterated items is unknown
+    final long[] minMax = calcSize(false);
+    final long min = minMax[0], max = minMax[1];
+    if(min != max) return this;
+
+    // leave if return clause creates new nodes
+    if(rtrn.has(Flag.CNS, Flag.NDT, Flag.UPD)) return this;
+
+    // create replicator
+    // for $i in 1 to 2 return (3,4)  ->  util:replicate((3, 4), 2)
+    System.out.println("=> " + this);
+    return cc.function(Function._UTIL_REPLICATE, info, rtrn, Int.get(min));
   }
 
   /**
-   * Computes the number of results of this FLWOR expression and assigns the sequence type.
+   * Computes the number of results of this FLWOR expression.
+   * @param ret include return clause
+   * @return min/max values (min: 0 or more, max: -1 or more)
    */
-  private void calcType() {
+  private long[] calcSize(final boolean ret) {
     final long[] minMax = { 1, 1 };
     for(final Clause clause : clauses) {
       if(minMax[1] != 0) clause.calcSize(minMax);
     }
-    if(minMax[1] != 0) {
+    if(ret && minMax[1] != 0) {
       final long size = rtrn.size();
       minMax[0] *= Math.max(size, 0);
       if(minMax[1] > 0) minMax[1] = size >= 0 ? minMax[1] * size : -1;
       else if(size == 0) minMax[1] = 0;
     }
-    exprType.assign(rtrn.seqType().type, minMax);
+    return minMax;
   }
 
   /**
