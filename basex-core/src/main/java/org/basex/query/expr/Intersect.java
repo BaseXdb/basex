@@ -40,7 +40,7 @@ public final class Intersect extends Set {
 
     final int el = exprs.length;
     for(int e = 1; e < el && !nodes.isEmpty(); ++e) {
-      nodes.check();
+      nodes.ddo();
       final ANodeBuilder tmp = new ANodeBuilder();
       iter = exprs[e].iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {

@@ -1,6 +1,7 @@
 package org.basex.query.util.list;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -50,21 +51,28 @@ public final class ItemList extends ObjectList<Item, ItemList> {
 
   /**
    * Returns a value containing the items in this list.
-   * The internal list will be invalidated by this call.
    * @return the value
    */
   public Value value() {
-    return value(null);
+    return value((Type) null);
   }
 
   /**
    * Returns a value with the type of the given expression.
-   * The internal list will be invalidated by this call.
    * @param type type (can be {@code null}, only considered if new sequence is created)
    * @return the value
    */
   public Value value(final Type type) {
     return ItemSeq.get(list, size, type);
+  }
+
+  /**
+   * Returns a value with the type of the given expression.
+   * @param expr expression (can be {@code null})
+   * @return the value
+   */
+  public Value value(final Expr expr) {
+    return ItemSeq.get(list, size, expr);
   }
 
   @Override

@@ -1,15 +1,12 @@
 package org.basex.query.util.list;
 
-import static org.basex.query.QueryText.*;
-
 import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
-import org.basex.util.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
 
 /**
@@ -20,16 +17,10 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
-  /** State. */
-  private enum State {
-    /** Initial step.     */ BUILD,
-    /** Sorting required. */ SORT,
-    /** List is sorted.   */ SORTED,
-  }
-  /** Current state. */
-  private State state = State.BUILD;
-  /** Indicates if all nodes are {@link DBNode}s and refer to the same database. */
-  private boolean dbnodes;
+  /** Distinct document order. */
+  private boolean ddo = true;
+  /** Shared database (can be {@code null}). */
+  private Data data;
 
   /**
    * Constructor.
@@ -40,65 +31,78 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
 
   @Override
   public ANodeBuilder add(final ANode node) {
-    if(size != 0 && state != State.SORT) {
-      final int d = node.diff(list[size - 1]);
-      if(d == 0) return this;
-      if(d < 0) {
-        state = State.SORT;
-        dbnodes = false;
+    if(isEmpty()) {
+      // empty list: assign initial database reference (may be null)
+      data = node.data();
+    } else {
+      // check if new node is in same database
+      final Data dt = data;
+      if(dt != null && dt != node.data()) data = null;
+
+      // check if new node is identical to last one, or destroys distinct document order
+      if(ddo) {
+        final int d = node.diff(peek());
+        if(d == 0) return this;
+        if(d < 0) ddo = false;
       }
     }
     return super.add(node);
   }
 
-  @Override
-  public Iterator<ANode> iterator() {
-    check();
-    return super.iterator();
-  }
-
   /**
-   * Returns a value with the type of the given expression.
+   * Returns a value with the type of the given expression and invalidates the internal array.
+   * Warning: the function must only be called if the builder is discarded afterwards.
    * @param expr expression
    * @return the iterator
    */
   public Value value(final Expr expr) {
-    check();
+    ddo();
 
-    Type type = NodeType.NOD;
-    if(expr != null) type = type.intersect(expr.seqType().type);
-    return ValueBuilder.value(list, size, type);
+    final int sz = size;
+    final ANode[] nodes = finish();
+
+    // create standard sequence
+    if(data == null) return ItemSeq.get(nodes, sz, expr);
+
+    // same database: create compact sequence
+    final int[] pres = new int[sz];
+    for(int l = 0; l < sz; l++) pres[l] = ((DBNode) nodes[l]).pre();
+    return DBNodeSeq.get(pres, data, expr);
   }
 
   /**
-   * Sorts the nodes and finalizes the list.
+   * Sorts the nodes and removes distinct nodes.
    */
-  public void check() {
-    sort();
-    final int s = size;
-    final ANode[] nodes = list;
-    final Data data = s > 0 ? nodes[0].data() : null;
-    if(data == null) return;
-    for(int l = 1; l < s; ++l) {
-      if(data != nodes[l].data()) return;
+  public void ddo() {
+    if(ddo) return;
+
+    final int sz = size;
+    if(sz > 1) {
+      sort(0, sz);
+
+      // remove duplicates
+      int i = 1;
+      final ANode[] nodes = list;
+      for(int j = 1; j < sz; ++j) {
+        while(j < sz && nodes[i - 1].is(nodes[j])) j++;
+        if(j < sz) nodes[i++] = nodes[j];
+      }
+      size(i);
     }
-    dbnodes = true;
+    ddo = true;
   }
 
   /**
-   * Indicate if binary search can be used.
-   * This is the case if all nodes are {@link DBNode}s and refer to the same database.
-   * @return result of check
+   * Returns the shared database.
+   * @return database or {@code null}
    */
-  public boolean dbnodes() {
-    check();
-    return dbnodes;
+  public Data data() {
+    return data;
   }
 
   @Override
   public boolean removeAll(final ANode node) {
-    if(dbnodes) {
-      if(!(node instanceof DBNode)) return false;
+    if(data != null && ddo && node instanceof DBNode) {
       final int p = binarySearch((DBNode) node, 0, size);
       if(p < 0) return false;
       remove(p);
@@ -109,27 +113,22 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
 
   @Override
   public boolean contains(final ANode node) {
-    if(dbnodes) {
+    if(data != null && ddo) {
       return node instanceof DBNode && binarySearch((DBNode) node, 0, size) > -1;
     }
     return super.contains(node);
   }
 
-  @Override
-  public boolean eq(final ANode node1, final ANode node2) {
-    return node1.is(node2);
-  }
-
   /**
    * Performs a binary search on the given range of this sequence iterator.
-   * This works if {@link #dbnodes} is set to true.
+   * This works if {@link #data} is assigned.
    * @param node node to find
    * @param start start of the search interval
    * @param length length of the search interval
    * @return position of the item or {@code -insertPosition - 1} if not found
    */
   public int binarySearch(final DBNode node, final int start, final int length) {
-    if(size == 0 || node.data() != list[0].data()) return -start - 1;
+    if(node.data() != data) return -start - 1;
     int l = start, r = start + length - 1;
     final ANode[] nodes = list;
     while(l <= r) {
@@ -141,26 +140,10 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
     return -(l + 1);
   }
 
-  /**
-   * Sorts the nodes.
-   */
-  private void sort() {
-    if(state == State.SORTED) return;
-
-    final int s = size;
-    if(s > 1) {
-      if(state == State.SORT) sort(0, s);
-
-      // remove duplicates
-      int i = 1;
-      final ANode[] nodes = list;
-      for(int j = 1; j < s; ++j) {
-        while(j < s && nodes[i - 1].is(nodes[j])) j++;
-        if(j < s) nodes[i++] = nodes[j];
-      }
-      size = i;
-    }
-    state = State.SORTED;
+  @Override
+  public Iterator<ANode> iterator() {
+    ddo();
+    return super.iterator();
   }
 
   @Override
@@ -169,19 +152,13 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return obj == this || obj instanceof ANodeBuilder && super.equals(obj);
+  public boolean eq(final ANode node1, final ANode node2) {
+    return node1.is(node2);
   }
 
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
-    final int is = Math.min(5, size);
-    for(int i = 0; i < is; i++) {
-      sb.append(i == 0 ? "" : SEP);
-      sb.append(list[i]);
-    }
-    return sb.append(']').toString();
+  public boolean equals(final Object obj) {
+    return obj == this || obj instanceof ANodeBuilder && super.equals(obj);
   }
 
   // PRIVATE METHODS ==============================================================================

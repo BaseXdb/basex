@@ -3,6 +3,7 @@ package org.basex.query.value.seq;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -97,5 +98,16 @@ public final class ItemSeq extends Seq {
   public static Value get(final Item[] values, final int size, final Type type) {
     return size == 0 ? Empty.VALUE : size == 1 ? values[0] :
       new ItemSeq(values, size, type != null ? type : AtomType.ITEM);
+  }
+
+  /**
+   * Creates a typed sequence with the items of the specified values.
+   * @param size size of resulting sequence
+   * @param values values
+   * @param expr expression (can be {@code null})
+   * @return value
+   */
+  public static Value get(final Item[] values, final int size, final Expr expr) {
+    return get(values, size, expr != null ? expr.seqType().type : null);
   }
 }

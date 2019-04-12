@@ -38,7 +38,7 @@ public class FnOutermost extends StandardFunc {
     final Iter iter = exprs[0].iter(qc);
     final ANodeBuilder list = new ANodeBuilder();
     for(Item item; (item = qc.next(iter)) != null;) list.add(toNode(item));
-    list.check();
+    list.ddo();
 
     // only go further if there are at least two nodes
     final int len = list.size();
@@ -46,11 +46,11 @@ public class FnOutermost extends StandardFunc {
 
     // after this, the iterator is sorted and duplicate free
     final ANodeBuilder res = new ANodeBuilder();
-    if(list.dbnodes()) {
+    final Data data = list.data();
+    if(data != null) {
       // nodes are sorted, so ancestors always come before their descendants
       // the first/last node is thus always included in the output
       final DBNode fst = (DBNode) list.get(outer ? 0 : len - 1);
-      final Data data = fst.data();
 
       if(outer) {
         // skip the subtree of the last added node

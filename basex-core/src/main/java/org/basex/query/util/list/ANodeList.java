@@ -8,7 +8,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.util.list.*;
 
 /**
@@ -56,9 +55,7 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
       }
       @Override
       public Value value(final QueryContext qc, final Expr expr) {
-        Type type = NodeType.NOD;
-        if(expr != null) type = type.intersect(expr.seqType().type);
-        return ItemSeq.get(list, size, type);
+        return ItemSeq.get(list, size, expr);
       }
     };
   }
@@ -73,7 +70,17 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
   }
 
   @Override
+  public boolean eq(final ANode node1, final ANode node2) {
+    return node1.is(node2);
+  }
+
+  @Override
   protected ANode[] newList(final int s) {
     return new ANode[s];
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return obj == this || obj instanceof ANodeList && super.equals(obj);
   }
 }
