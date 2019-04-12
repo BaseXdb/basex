@@ -34,8 +34,9 @@ public final class RandomSeededPermutation extends StandardFunc {
       }
       items.add(item1);
     }
-    return items.value();
+    return items.value(seqType().type);
   }
+
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     return adoptType(exprs[1]);

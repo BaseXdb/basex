@@ -3,6 +3,7 @@ package org.basex.query.value;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.seq.tree.*;
@@ -147,7 +148,7 @@ public final class ValueBuilder {
    * @return value
    */
   public Value value() {
-    return value(null);
+    return value((Type) null);
   }
 
   /**
@@ -161,6 +162,16 @@ public final class ValueBuilder {
     if(first != null) return first;
     final TreeSeqBuilder tree = builder;
     return tree != null ? tree.seq(type) : Empty.VALUE;
+  }
+
+  /**
+   * Returns a {@link Value} representation of the items currently stored in this builder
+   * annotated with the type of the given expression.
+   * @param expr expression
+   * @return value
+   */
+  public Value value(final Expr expr) {
+    return value(expr != null ? expr.seqType().type : null);
   }
 
   @Override

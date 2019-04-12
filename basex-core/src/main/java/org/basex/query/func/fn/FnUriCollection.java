@@ -30,6 +30,6 @@ public final class FnUriCollection extends Docs {
   public Value value(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Item item : collection(qc)) vb.add(Uri.uri(((ANode) item).baseURI(), false));
-    return vb.value();
+    return vb.value(this);
   }
 }

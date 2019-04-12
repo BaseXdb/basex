@@ -44,6 +44,6 @@ public final class JobsListDetails extends StandardFunc {
       elem.add(entry.get(entry.size() - 1));
       vb.add(elem);
     }
-    return vb.value();
+    return vb.value(this);
   }
 }

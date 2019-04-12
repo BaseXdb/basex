@@ -97,7 +97,7 @@ public class FnSubsequence extends StandardFunc {
 
       final ValueBuilder vb = new ValueBuilder(qc);
       for(long i = sr.start; i < sr.end; i++) vb.add(iter.get(i));
-      return vb.value();
+      return vb.value(this);
     }
 
     // otherwise, retrieve all items
@@ -106,7 +106,7 @@ public class FnSubsequence extends StandardFunc {
     for(Item item; c < sr.end && (item = qc.next(iter)) != null; c++) {
       if(c >= sr.start) vb.add(item);
     }
-    return vb.value();
+    return vb.value(this);
   }
 
   /**

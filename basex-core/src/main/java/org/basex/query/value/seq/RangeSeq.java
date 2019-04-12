@@ -107,11 +107,6 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public boolean homogeneous() {
-    return true;
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof RangeSeq)) return super.equals(obj);

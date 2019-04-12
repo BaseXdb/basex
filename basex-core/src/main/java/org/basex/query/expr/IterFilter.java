@@ -50,7 +50,7 @@ public final class IterFilter extends Filter {
     for(Item item; (item = qc.next(iter)) != null;) {
       if(preds(item, qc)) vb.add(item);
     }
-    return vb.value();
+    return vb.value(this);
   }
 
   @Override

@@ -38,7 +38,7 @@ public final class HofTakeWhile extends StandardFunc {
       if(!pred.invokeValue(qc, info, item).ebv(qc, info).bool(info)) break;
       vb.add(item);
     }
-    return vb.value();
+    return vb.value(this);
   }
 
   @Override

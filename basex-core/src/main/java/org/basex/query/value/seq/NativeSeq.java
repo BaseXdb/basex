@@ -30,11 +30,6 @@ abstract class NativeSeq extends Seq {
   }
 
   @Override
-  public final boolean homogeneous() {
-    return true;
-  }
-
-  @Override
   public final void cache(final boolean lazy, final InputInfo ii) { }
 
   @Override

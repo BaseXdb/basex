@@ -216,36 +216,16 @@ public final class CompileContext {
       };
       info("%", f);
 
-      if(result instanceof ParseExpr) {
-        // refine type. required mostly for {@link Filter} rewritings
-        if(refine) {
+      if(refine) {
+        if(result instanceof Value) {
+          ((Value) result).refineType(expr);
+        } else {
+          // refine type. required mostly for {@link Filter} rewritings
           final ParseExpr re = (ParseExpr) result;
           final SeqType et = expr.seqType(), rt = re.seqType();
           if(et.refinable(rt)) {
             final SeqType st = et.intersect(rt);
             if(st != null) re.exprType.assign(st);
-          }
-        }
-      } else if(result != Empty.VALUE && refine) {
-        // refine type. required because original type might have got lost in new sequence
-        if(result instanceof Seq) {
-          final Seq seq = (Seq) result;
-          final Type et = expr.seqType().type, rt = seq.type;
-          if(!et.eq(rt) && et.instanceOf(rt)) {
-            final Type type = et.intersect(rt);
-            if(type != null) {
-              seq.type = type;
-              // intersected type may not be exact anymore: invalidate homogeneous flag
-              seq.homo = false;
-            }
-          }
-        } else if(result instanceof FItem) {
-          // refine type of function items (includes maps and arrays)
-          final FItem fitem = (FItem) result;
-          final SeqType et = expr.seqType(), rt = result.seqType();
-          if(et.refinable(rt)) {
-            final Type type = et.type.intersect(rt.type);
-            if(type != null) fitem.type = type;
           }
         }
       }

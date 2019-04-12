@@ -61,7 +61,7 @@ public final class MixedPath extends Path {
 
         // loop through all input items; cache nodes and items
         final ANodeBuilder nodes = new ANodeBuilder();
-        final ItemList items = new ItemList();
+        final ValueBuilder items = new ValueBuilder(qc);
         final Expr step = steps[s];
         for(Item item; (item = iter.next()) != null;) {
           if(!(item instanceof ANode)) throw PATHNODE_X_X_X.get(info, step, item.type, item);
@@ -76,16 +76,17 @@ public final class MixedPath extends Path {
           focus.pos++;
         }
 
-        if(items.isEmpty()) {
+        final Value value = items.value(this);
+        if(value.isEmpty()) {
           // all results are nodes: create new iterator
           iter = nodes.iter();
         } else {
           // raise error if this is not the final result
           if(s + 1 < sl)
-            throw PATHNODE_X_X_X.get(info, steps[s + 1], items.get(0).type, items.get(0));
+            throw PATHNODE_X_X_X.get(info, steps[s + 1], value.itemAt(0).type, value.itemAt(0));
           // result contains non-nodes: raise error if result any contains nodes
           if(!nodes.isEmpty()) throw MIXEDRESULTS.get(info);
-          iter = items.iter();
+          iter = value.iter();
         }
         size = iter.size();
       }
@@ -97,7 +98,7 @@ public final class MixedPath extends Path {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc);
+    return refinedValue(qc);
   }
 
   @Override

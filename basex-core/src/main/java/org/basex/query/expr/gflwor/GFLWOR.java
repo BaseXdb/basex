@@ -78,7 +78,7 @@ public final class GFLWOR extends ParseExpr {
     final Eval eval = newEval();
     final ValueBuilder vb = new ValueBuilder(qc);
     while(eval.next(qc)) vb.add(rtrn.value(qc));
-    return vb.value();
+    return vb.value(this);
   }
 
   @Override

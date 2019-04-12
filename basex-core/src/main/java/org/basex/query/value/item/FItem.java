@@ -3,6 +3,7 @@ package org.basex.query.value.item;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
@@ -50,6 +51,17 @@ public abstract class FItem extends Item implements XQFunction {
   @Override
   public final boolean sameKey(final Item item, final InputInfo ii) {
     return false;
+  }
+
+  @Override
+  public final FItem refineType(final Expr expr) {
+    // type refinement is mostly relevant for maps and arrays
+    final SeqType et = expr.seqType(), rt = seqType();
+    if(et.refinable(rt)) {
+      final Type t = et.type.intersect(rt.type);
+      if(t != null) type = t;
+    }
+    return this;
   }
 
   /**

@@ -33,11 +33,6 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public boolean homogeneous() {
-    return value.homogeneous();
-  }
-
-  @Override
   public void cache(final boolean lazy, final InputInfo ii) throws QueryException {
     value.cache(lazy, ii);
   }
@@ -111,7 +106,7 @@ public final class SingletonSeq extends Seq {
     Value val = value;
     if(val instanceof SingletonSeq) {
       val = ((SingletonSeq) val).value;
-    } else if(vs > 1 && val.homogeneous()) {
+    } else if(vs > 1) {
       final Item item = val.itemAt(0);
       int v = 0;
       while(++v < vs && item.equals(val.itemAt(v)));

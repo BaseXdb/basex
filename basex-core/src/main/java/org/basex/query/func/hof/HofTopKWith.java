@@ -34,7 +34,7 @@ public final class HofTopKWith extends HofFn {
 
     final ValueBuilder vb = new ValueBuilder(qc);
     while(!heap.isEmpty()) vb.addFront(heap.removeMin());
-    return vb.value();
+    return vb.value(this);
   }
 
   @Override

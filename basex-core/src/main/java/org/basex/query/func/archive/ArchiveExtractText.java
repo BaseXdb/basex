@@ -4,7 +4,8 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -16,8 +17,8 @@ public final class ArchiveExtractText extends ArchiveExtractBinary {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final String encoding = toEncoding(2, ARCHIVE_ENCODE1_X, qc);
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(final byte[] bytes : extract(qc)) vb.add(Str.get(encode(bytes, encoding, qc)));
-    return vb.value();
+    final TokenList tl = new TokenList();
+    for(final byte[] bytes : extract(qc)) tl.add(encode(bytes, encoding, qc));
+    return StrSeq.get(tl);
   }
 }

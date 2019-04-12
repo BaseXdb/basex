@@ -49,7 +49,7 @@ final class CachedMap extends SimpleMap {
       qc.focus = qf;
     }
 
-    return value;
+    return value.refineType(this);
   }
 
   @Override

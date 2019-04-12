@@ -24,7 +24,7 @@ public class ArchiveExtractBinary extends ArchiveFn {
   public Value value(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final byte[] bytes : extract(qc)) vb.add(B64.get(bytes));
-    return vb.value();
+    return vb.value(this);
   }
 
   /**

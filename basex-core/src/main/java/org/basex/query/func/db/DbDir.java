@@ -78,6 +78,6 @@ public final class DbDir extends DbList {
       }
     }
 
-    return vb.value();
+    return vb.value(this);
   }
 }

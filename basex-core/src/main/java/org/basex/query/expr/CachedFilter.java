@@ -79,7 +79,7 @@ public class CachedFilter extends Filter {
       qc.focus = qf;
     }
 
-    return items.value();
+    return items.value(seqType().type);
   }
 
   @Override

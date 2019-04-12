@@ -38,7 +38,7 @@ public final class FtSearch extends FtAccess {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc);
+    return refinedValue(qc);
   }
 
   @Override

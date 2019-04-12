@@ -57,7 +57,7 @@ abstract class Ids extends StandardFunc {
         if(XMLToken.isId(attr.name(), idref) && (data.meta.ndocs == 1 || attr.root().is(root)))
           vb.add(idref ? attr : attr.parent());
       }
-      return vb.value().iter();
+      return vb.value(this).iter();
     }
 
     // otherwise, do sequential scan: parse node and its descendants

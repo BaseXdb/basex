@@ -41,7 +41,7 @@ public final class InspectFunctions extends StandardFunc {
     for(final StaticFunc sf : qc.funcs.funcs()) {
       if(!old.contains(sf)) vb.add(Functions.getUser(sf, qc, sf.sc, info));
     }
-    return vb.value();
+    return vb.value(this);
   }
 
   @Override

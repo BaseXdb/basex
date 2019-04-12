@@ -3,7 +3,6 @@ package org.basex.query.expr.index;
 import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -30,9 +29,6 @@ public abstract class IndexAccess extends Simple {
       SeqType.ATT_ZM);
     this.db = db;
   }
-
-  @Override
-  public abstract Iter iter(QueryContext qc) throws QueryException;
 
   @Override
   public boolean has(final Flag... flags) {

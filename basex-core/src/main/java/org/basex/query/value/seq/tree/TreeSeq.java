@@ -110,11 +110,6 @@ public abstract class TreeSeq extends Seq {
   }
 
   @Override
-  public final boolean homogeneous() {
-    return homo;
-  }
-
-  @Override
   public final Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item head = itemAt(0);
     if(head instanceof ANode) return head;

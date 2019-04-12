@@ -89,7 +89,7 @@ public final class List extends Arr {
       if(value == null) {
         final ValueBuilder vb = new ValueBuilder(cc.qc);
         for(int v = 0; v < vl; v++) vb.add(values[v]);
-        value = vb.value();
+        value = vb.value(this);
       }
       return cc.replaceWith(this, value);
     }
@@ -158,7 +158,7 @@ public final class List extends Arr {
     // general case: concatenate all sequences
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Expr expr : exprs) vb.add(expr.value(qc));
-    return vb.value();
+    return vb.value(this);
   }
 
   @Override

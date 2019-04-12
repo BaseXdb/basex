@@ -69,7 +69,7 @@ public final class AdminLogs extends AdminFn {
         qc.checkStop();
       }
     }
-    return vb.value();
+    return vb.value(this);
   }
 
   /**

@@ -53,17 +53,12 @@ final class SubSeq extends Seq {
   public Value reverse(final QueryContext qc) {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(long i = 0; i < size; i++) vb.addFront(itemAt(i));
-    return vb.value();
+    return vb.value(this);
   }
 
   @Override
   public Item itemAt(final long pos) {
     return sub.itemAt(start + pos);
-  }
-
-  @Override
-  public boolean homogeneous() {
-    return sub.homogeneous();
   }
 
   @Override

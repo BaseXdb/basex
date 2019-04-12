@@ -47,7 +47,7 @@ public class FnForEachPair extends StandardFunc {
     for(Item item1, item2; (item1 = iter1.next()) != null && (item2 = iter2.next()) != null;) {
       vb.add(func.invokeValue(qc, info, item1, item2));
     }
-    return vb.value();
+    return vb.value(this);
   }
 
   @Override

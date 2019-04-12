@@ -1,7 +1,6 @@
 package org.basex.query.func.repo;
 
 import org.basex.query.*;
-import org.basex.query.util.list.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -24,14 +23,14 @@ public final class RepoList extends RepoFn {
 
   @Override
   public Value value(final QueryContext qc) {
-    final ANodeList list = new ANodeList();
+    final ValueBuilder vb  = new ValueBuilder(qc);
     for(final Pkg pkg : new RepoManager(qc.context).packages()) {
       final FElem elem = new FElem(PACKAGE);
       elem.add(NAME, pkg.name());
       elem.add(VERSION, pkg.version());
       elem.add(TYPE, pkg.type().toString());
-      list.add(elem);
+      vb.add(elem);
     }
-    return list.value();
+    return vb.value(this);
   }
 }

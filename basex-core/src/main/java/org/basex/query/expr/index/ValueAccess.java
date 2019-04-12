@@ -117,7 +117,7 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc);
+    return refinedValue(qc);
   }
 
   /**

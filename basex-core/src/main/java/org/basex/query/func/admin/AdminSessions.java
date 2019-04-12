@@ -30,6 +30,6 @@ public final class AdminSessions extends AdminFn {
       if(data != null) elem.add(DATABASE, data.meta.name);
       vb.add(elem);
     }
-    return vb.value();
+    return vb.value(this);
   }
 }

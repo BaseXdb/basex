@@ -56,7 +56,7 @@ public class SqlExecute extends SqlFn {
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc);
+    return refinedValue(qc);
   }
 
   /**

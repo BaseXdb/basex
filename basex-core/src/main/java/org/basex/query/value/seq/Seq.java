@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -20,8 +21,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class Seq extends Value {
-  /** Indicates if all items have exactly the same type. */
-  public boolean homo;
   /** Length. */
   protected long size;
 
@@ -33,36 +32,31 @@ public abstract class Seq extends Value {
   protected Seq(final long size, final Type type) {
     super(type);
     this.size = size;
-    homo = type != AtomType.ITEM;
   }
 
   @Override
   public Object toJava() throws QueryException {
     // Java representation may consume much memory: check again whether sequence is homogeneous
-    if(!homo) {
-      Type tp = null;
-      for(final Item item : this) {
-        if(tp == null) {
-          tp = item.type;
-        } else if(tp != item.type) {
-          tp = null;
-          break;
-        }
-      }
-      if(tp != null) {
-        homo = true;
-        type = tp;
+    Type tp = null;
+    for(final Item item : this) {
+      if(tp == null) {
+        tp = item.type;
+      } else if(tp != item.type) {
+        tp = null;
+        break;
       }
     }
+
     // try to create custom Java representation
-    if(homo) {
+    if(tp != null) {
+      type = tp;
       // shortcut for strings (avoid intermediate token representation)
-      if(type == AtomType.STR) {
+      if(tp == AtomType.STR) {
         final StringList tmp = new StringList((int) size);
         for(final Item item : this) tmp.add(item.string(null));
         return tmp.finish();
       }
-      final Value value = get((int) size, type, this);
+      final Value value = get((int) size, tp, this);
       if(value != null) return value.toJava();
     }
 
@@ -188,6 +182,16 @@ public abstract class Seq extends Value {
     for(long i = 0; i < pos; i++) vb.add(itemAt(i));
     for(long i = pos + 1; i < size; i++) vb.add(itemAt(i));
     return vb.value(type);
+  }
+
+  @Override
+  public Seq refineType(final Expr expr) {
+    final Type tp = expr.seqType().type;
+    if(!tp.eq(type) && tp.instanceOf(type)) {
+      final Type t = tp.intersect(type);
+      if(t != null) type = t;
+    }
+    return this;
   }
 
   @Override

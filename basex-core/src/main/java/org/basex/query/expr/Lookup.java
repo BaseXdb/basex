@@ -134,7 +134,7 @@ public final class Lookup extends Arr {
         for(Item key; (key = qc.next(ir)) != null;) vb.add(fit.invokeValue(qc, info, key));
       }
     }
-    return vb.value();
+    return vb.value(this);
   }
 
   @Override

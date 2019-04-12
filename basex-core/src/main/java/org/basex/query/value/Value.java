@@ -87,6 +87,15 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
+   * Refines the value type.
+   * @param expr original expression
+   * @return self reference
+   */
+  public Value refineType(@SuppressWarnings("unused") final Expr expr) {
+    return this;
+  }
+
+  /**
    * Returns a sub sequence of this value with the given start and length.
    * The following properties must hold:
    * <ul>
@@ -206,12 +215,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @return item
    */
   public abstract Item itemAt(long pos);
-
-  /**
-   * Checks if all items of this value share the same type.
-   * @return result of check
-   */
-  public abstract boolean homogeneous();
 
   /**
    * Returns all items of this value in reverse order.

@@ -265,13 +265,11 @@ public final class SeqType {
     if(value.seqType().instanceOf(this)) return true;
 
     // check cardinality
-    final long size = value.size();
-    if(!occ.check(size)) return false;
+    if(!occ.check(value.size())) return false;
 
     // value type may be too general: check type of each item
-    for(long i = 0; i < size; i++) {
-      if(!instance(value.itemAt(i))) return false;
-      if(i == 0 && value.homogeneous()) break;
+    for(final Item item : value) {
+      if(!instance(item)) return false;
     }
     return true;
   }
@@ -336,7 +334,7 @@ public final class SeqType {
       qc.checkStop();
       vb.add(cast(item, true, qc, sc, ii));
     }
-    return vb.value();
+    return vb.value(type);
   }
 
   /**
@@ -354,22 +352,12 @@ public final class SeqType {
     if(value.seqType().instanceOf(this)) return;
 
     // check cardinality
-    final int size = (int) value.size();
-    if(!occ.check(size)) throw typeError(value, this, name, ii);
+    if(!occ.check(value.size())) throw typeError(value, this, name, ii);
 
-    // empty sequence has all types
-    if(size == 0) return;
-    // check first item
-    boolean ins = instance(value.itemAt(0));
-
-    // check heterogeneous sequences
-    if(!value.homogeneous()) {
-      for(int i = 1; ins && i < size; i++) {
-        qc.checkStop();
-        ins = instance(value.itemAt(i));
-      }
+    for(final Item item : value) {
+      qc.checkStop();
+      if(!instance(item)) throw typeError(value, this, name, ii);
     }
-    if(!ins) throw typeError(value, this, name, ii);
   }
 
   /**
@@ -395,7 +383,6 @@ public final class SeqType {
       qc.checkStop();
       final Item item = value.itemAt(i);
       if(instance(item)) {
-        if(i == 0 && value.homogeneous()) return value;
         if(items != null) items.add(item);
       } else {
         if(items == null) {

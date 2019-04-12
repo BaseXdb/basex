@@ -59,7 +59,7 @@ public final class FnDistinctValues extends StandardFunc {
     for(Item item; (item = qc.next(iter)) != null;) {
       if(set.add(item, info)) vb.add(item);
     }
-    return vb.value();
+    return vb.value(this);
   }
 
   @Override
@@ -116,6 +116,6 @@ public final class FnDistinctValues extends StandardFunc {
         if(set.add(item, info)) vb.add(item);
       }
     }
-    return vb.value();
+    return vb.value(this);
   }
 }

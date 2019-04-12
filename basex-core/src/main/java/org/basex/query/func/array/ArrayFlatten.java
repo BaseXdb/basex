@@ -62,7 +62,7 @@ public final class ArrayFlatten extends ArrayFn {
   public Value value(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     add(vb, exprs[0], qc);
-    return vb.value();
+    return vb.value(this);
   }
 
   @Override

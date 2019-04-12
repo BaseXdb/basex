@@ -311,11 +311,6 @@ public abstract class Item extends Value {
     return Token.hash(string(ii));
   }
 
-  @Override
-  public final boolean homogeneous() {
-    return true;
-  }
-
   /**
    * Returns data model info.
    * Overwritten by xs:QName, attribute() and document-node().

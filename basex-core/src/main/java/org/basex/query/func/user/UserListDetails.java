@@ -34,6 +34,6 @@ public final class UserListDetails extends UserList {
           new FElem(DATABASE).add(PATTERN, key).add(PERMISSION, value.toString())));
       vb.add(user);
     }
-    return vb.value();
+    return vb.value(this);
   }
 }

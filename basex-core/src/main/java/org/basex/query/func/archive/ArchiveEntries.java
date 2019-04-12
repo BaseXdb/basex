@@ -38,7 +38,7 @@ public final class ArchiveEntries extends StandardFunc {
         elem.add(ze.getName());
         vb.add(elem);
       }
-      return vb.value();
+      return vb.value(this);
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);
     }

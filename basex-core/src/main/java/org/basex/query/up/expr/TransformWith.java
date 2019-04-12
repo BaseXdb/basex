@@ -86,7 +86,7 @@ public final class TransformWith extends Arr {
       qc.updates = upd;
       qf.value = cv;
     }
-    return vb.value();
+    return vb.value(this);
   }
 
   @Override

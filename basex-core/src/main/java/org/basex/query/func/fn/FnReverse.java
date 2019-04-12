@@ -52,7 +52,7 @@ public final class FnReverse extends StandardFunc {
     // standard iterator
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = qc.next(iter)) != null;) vb.addFront(item);
-    return vb.value().iter();
+    return vb.value(this).iter();
   }
 
   @Override
