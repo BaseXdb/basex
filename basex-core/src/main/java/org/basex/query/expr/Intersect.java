@@ -49,7 +49,7 @@ public final class Intersect extends Set {
       }
       nodes = tmp;
     }
-    return nodes.value();
+    return nodes.value(this);
   }
 
   @Override

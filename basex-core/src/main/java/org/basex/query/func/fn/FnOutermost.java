@@ -42,7 +42,7 @@ public class FnOutermost extends StandardFunc {
 
     // only go further if there are at least two nodes
     final int len = list.size();
-    if(len < 2) return list.iter();
+    if(len < 2) return list.value(this).iter();
 
     // after this, the iterator is sorted and duplicate free
     final ANodeBuilder res = new ANodeBuilder();
@@ -87,6 +87,6 @@ public class FnOutermost extends StandardFunc {
         res.add(nd);
       }
     }
-    return res.iter();
+    return res.value(this).iter();
   }
 }

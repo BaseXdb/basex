@@ -5,9 +5,7 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 
 import org.basex.data.*;
-import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -41,16 +39,16 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
   }
 
   @Override
-  public ANodeBuilder add(final ANode element) {
+  public ANodeBuilder add(final ANode node) {
     if(size != 0 && state != State.SORT) {
-      final int d = element.diff(list[size - 1]);
+      final int d = node.diff(list[size - 1]);
       if(d == 0) return this;
       if(d < 0) {
         state = State.SORT;
         dbnodes = false;
       }
     }
-    return super.add(element);
+    return super.add(node);
   }
 
   @Override
@@ -60,44 +58,16 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
   }
 
   /**
-   * Returns an iterator over the items in this list.
-   * The list must not be modified after the iterator has been requested.
+   * Returns a value with the type of the given expression.
+   * @param expr expression
    * @return the iterator
    */
-  public BasicNodeIter iter() {
+  public Value value(final Expr expr) {
     check();
-    return new BasicNodeIter() {
-      int pos;
 
-      @Override
-      public ANode next() {
-        return pos < size ? list[pos++] : null;
-      }
-
-      @Override
-      public ANode get(final long i) {
-        return list[(int) i];
-      }
-
-      @Override
-      public long size() {
-        return size;
-      }
-
-      @Override
-      public Value value(final QueryContext qc, final Expr expr) {
-        return ValueBuilder.value(list, size, NodeType.NOD);
-      }
-    };
-  }
-
-  /**
-   * Returns all nodes as value.
-   * @return the iterator
-   */
-  public Value value() {
-    check();
-    return ValueBuilder.value(list, size, NodeType.NOD);
+    Type type = NodeType.NOD;
+    if(expr != null) type = type.intersect(expr.seqType().type);
+    return ValueBuilder.value(list, size, type);
   }
 
   /**
@@ -191,6 +161,16 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
       size = i;
     }
     state = State.SORTED;
+  }
+
+  @Override
+  protected ANode[] newList(final int s) {
+    return new ANode[s];
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return obj == this || obj instanceof ANodeBuilder && super.equals(obj);
   }
 
   @Override
@@ -297,15 +277,5 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
     final ANode tmp = nodes[a];
     nodes[a] = nodes[b];
     nodes[b] = tmp;
-  }
-
-  @Override
-  protected ANode[] newList(final int s) {
-    return new ANode[s];
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return obj == this || obj instanceof ANodeBuilder && super.equals(obj);
   }
 }

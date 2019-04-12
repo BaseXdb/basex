@@ -85,7 +85,7 @@ public class FtMark extends StandardFunc {
             final IntList il = new IntList();
             final int s = md.meta.size;
             for(int p = 0; p < s; p += md.size(p, md.kind(p))) il.add(p);
-            ir = DBNodeSeq.get(il.finish(), md).iter();
+            ir = DBNodeSeq.get(il.finish(), md, FtMark.this).iter();
           } finally {
             qc.ftPosData = tmp;
           }

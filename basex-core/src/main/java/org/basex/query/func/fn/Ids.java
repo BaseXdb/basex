@@ -63,7 +63,7 @@ abstract class Ids extends StandardFunc {
     // otherwise, do sequential scan: parse node and its descendants
     final ANodeBuilder list = new ANodeBuilder();
     add(idSet, list, root, idref);
-    return list.iter();
+    return list.value(this).iter();
   }
 
   /**

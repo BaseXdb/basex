@@ -13,7 +13,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -61,12 +60,10 @@ public final class RangeAccess extends IndexAccess {
     final IndexType it = index.type();
     final Data data = db.data(qc, it);
 
-    final NodeType type = it == IndexType.TEXT ? NodeType.TXT : NodeType.ATT;
     final IndexIterator ii = data.iter(index);
-
     final IntList list = new IntList();
     while(ii.more()) list.add(ii.pre());
-    return DBNodeSeq.get(list.finish(), data, type, false);
+    return DBNodeSeq.get(list.finish(), data, this);
   }
 
   @Override

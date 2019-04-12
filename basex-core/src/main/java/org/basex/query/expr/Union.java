@@ -60,7 +60,7 @@ public final class Union extends Set {
       final Iter iter = expr.iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) nodes.add(toNode(item));
     }
-    return nodes.value();
+    return nodes.value(this);
   }
 
   @Override

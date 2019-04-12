@@ -7,6 +7,7 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -130,23 +131,24 @@ public class DBNodeSeq extends NativeSeq {
    * Creates a sequence with the specified items.
    * @param pres pre values
    * @param data data reference
-   * @param type node type
+   * @param type node type (can be {@code null})
    * @param all pre values reference all documents of the database
    * @return value
    */
-  public static Value get(final int[] pres, final Data data, final Type type, final boolean all) {
+  private static Value get(final int[] pres, final Data data, final Type type, final boolean all) {
     return pres.length == 0 ? Empty.VALUE : pres.length == 1 ? new DBNode(data, pres[0]) :
-      new DBNodeSeq(pres, data, type, all);
+      new DBNodeSeq(pres, data, type == null ? NodeType.NOD : type, all);
   }
 
   /**
    * Creates a sequence with the specified items.
    * @param pres pre values
    * @param data data reference
+   * @param expr expression (can be {@code null})
    * @return value
    */
-  public static Value get(final int[] pres, final Data data) {
-    return get(pres, data, NodeType.NOD, false);
+  public static Value get(final int[] pres, final Data data, final Expr expr) {
+    return get(pres, data, expr != null ? expr.seqType().type : null, false);
   }
 
   /**
@@ -159,6 +161,6 @@ public class DBNodeSeq extends NativeSeq {
    */
   public static Value get(final IntList pres, final Data data, final boolean docs,
       final boolean all) {
-    return get(pres.toArray(), data, docs ? NodeType.DOC : NodeType.NOD, all);
+    return get(pres.toArray(), data, docs ? NodeType.DOC : null, all);
   }
 }

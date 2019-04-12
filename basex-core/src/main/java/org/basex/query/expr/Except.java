@@ -64,7 +64,7 @@ public final class Except extends Set {
       iter = exprs[e].iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) nodes.removeAll(toNode(item));
     }
-    return nodes.value();
+    return nodes.value(this);
   }
 
   @Override

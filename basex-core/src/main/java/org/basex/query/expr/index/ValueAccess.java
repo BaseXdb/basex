@@ -112,7 +112,7 @@ public final class ValueAccess extends IndexAccess {
         nodes.add(node);
       }
     }
-    return nodes.iter();
+    return nodes.value(this).iter();
   }
 
   @Override

@@ -97,7 +97,7 @@ public abstract class QueryTest extends SandboxTest {
    * @return node array
    */
   protected static Value nodes(final int... nodes) {
-    return DBNodeSeq.get(nodes, context.data());
+    return DBNodeSeq.get(nodes, context.data(), null);
   }
 
   /**

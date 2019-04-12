@@ -60,7 +60,7 @@ public final class CachedPath extends AxisPath {
       qc.focus = qf;
     }
 
-    return list.value();
+    return list.value(this);
   }
 
   /**

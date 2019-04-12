@@ -57,7 +57,7 @@ final class CachedStep extends Step {
       }
       list.size(c);
     }
-    return list.iter();
+    return list.clean().iter();
   }
 
   @Override

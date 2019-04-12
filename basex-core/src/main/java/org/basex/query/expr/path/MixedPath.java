@@ -79,7 +79,7 @@ public final class MixedPath extends Path {
         final Value value = items.value(this);
         if(value.isEmpty()) {
           // all results are nodes: create new iterator
-          iter = nodes.iter();
+          iter = nodes.value(this).iter();
         } else {
           // raise error if this is not the final result
           if(s + 1 < sl)

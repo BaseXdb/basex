@@ -1,10 +1,13 @@
 package org.basex.query.util.list;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.list.*;
 
@@ -55,9 +58,18 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
       public Value value(final QueryContext qc, final Expr expr) {
         Type type = NodeType.NOD;
         if(expr != null) type = type.intersect(expr.seqType().type);
-        return ValueBuilder.value(list, size, type);
+        return ItemSeq.get(list, size, type);
       }
     };
+  }
+
+  /**
+   * Invalidates all entries that are not referenced in the list.
+   * @return the iterator
+   */
+  public ANodeList clean() {
+    Arrays.fill(list, size, list.length, null);
+    return this;
   }
 
   @Override

@@ -36,6 +36,6 @@ public abstract class DBNodeIter extends BasicNodeIter {
       qc.checkStop();
       il.add(node.pre());
     }
-    return DBNodeSeq.get(il.finish(), data);
+    return DBNodeSeq.get(il.finish(), data, expr);
   }
 }

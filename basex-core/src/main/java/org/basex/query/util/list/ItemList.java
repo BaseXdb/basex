@@ -1,10 +1,9 @@
 package org.basex.query.util.list;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.list.*;
 
@@ -51,6 +50,7 @@ public final class ItemList extends ObjectList<Item, ItemList> {
 
   /**
    * Returns a value containing the items in this list.
+   * The internal list will be invalidated by this call.
    * @return the value
    */
   public Value value() {
@@ -58,34 +58,13 @@ public final class ItemList extends ObjectList<Item, ItemList> {
   }
 
   /**
-   * Returns a value with the given element type containing the items in this list.
+   * Returns a value with the type of the given expression.
+   * The internal list will be invalidated by this call.
    * @param type type (can be {@code null}, only considered if new sequence is created)
    * @return the value
    */
   public Value value(final Type type) {
-    return ValueBuilder.value(list, size, type);
-  }
-
-  /**
-   * Returns an iterator over the items in this list.
-   * The list must not be modified after the iterator has been requested.
-   * @return the iterator
-   */
-  public BasicIter<Item> iter() {
-    return new BasicIter<Item>(size) {
-      @Override
-      public Item get(final long i) {
-        return list[(int) i];
-      }
-      @Override
-      public Value iterValue() {
-        return ItemList.this.value();
-      }
-      @Override
-      public Value value(final QueryContext qc, final Expr expr) {
-        return ItemList.this.value();
-      }
-    };
+    return ItemSeq.get(list, size, type);
   }
 
   @Override
