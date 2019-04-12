@@ -58,7 +58,7 @@ public final class ItemList extends ObjectList<Item, ItemList> {
 
   /**
    * Returns a value with the given element type containing the items in this list.
-   * @param type item type (not checked), may be {@code null}
+   * @param type type (can be {@code null}, only considered if new sequence is created)
    * @return the value
    */
   public Value value(final Type type) {

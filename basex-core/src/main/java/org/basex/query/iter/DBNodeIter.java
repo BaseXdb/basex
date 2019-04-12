@@ -31,10 +31,10 @@ public abstract class DBNodeIter extends BasicNodeIter {
   @Override
   public Value value(final QueryContext qc) {
     final IntList il = new IntList();
-    for(DBNode n; (n = next()) != null;) {
+    for(DBNode node; (node = next()) != null;) {
       qc.checkStop();
-      il.add(n.pre());
+      il.add(node.pre());
     }
-    return DBNodeSeq.get(il, data, false, false);
+    return DBNodeSeq.get(il.finish(), data);
   }
 }

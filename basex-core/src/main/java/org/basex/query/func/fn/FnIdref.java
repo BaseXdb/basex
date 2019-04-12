@@ -12,7 +12,7 @@ import org.basex.query.value.*;
  */
 public final class FnIdref extends Ids {
   @Override
-  public BasicNodeIter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     return ids(qc, true);
   }
 

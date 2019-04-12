@@ -32,7 +32,7 @@ public abstract class IndexAccess extends Simple {
   }
 
   @Override
-  public abstract NodeIter iter(QueryContext qc) throws QueryException;
+  public abstract Iter iter(QueryContext qc) throws QueryException;
 
   @Override
   public boolean has(final Flag... flags) {

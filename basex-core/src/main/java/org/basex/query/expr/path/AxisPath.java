@@ -36,7 +36,7 @@ public abstract class AxisPath extends Path {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     final Value result = cache(qc);
-    return result != null ? result : iterator(qc).value(qc);
+    return result != null ? result : nodes(qc);
   }
 
   /**
@@ -86,7 +86,15 @@ public abstract class AxisPath extends Path {
    * @return iterator
    * @throws QueryException query exception
    */
-  protected abstract NodeIter iterator(QueryContext qc) throws QueryException;
+  protected abstract Iter iterator(QueryContext qc) throws QueryException;
+
+  /**
+   * Returns a node sequence.
+   * @param qc query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  protected abstract Value nodes(QueryContext qc) throws QueryException;
 
   /**
    * Inverts a location path.

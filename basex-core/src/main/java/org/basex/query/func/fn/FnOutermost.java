@@ -34,7 +34,7 @@ public class FnOutermost extends StandardFunc {
    * @return outermost/innermost nodes
    * @throws QueryException exception
    */
-  NodeIter most(final QueryContext qc, final boolean outer) throws QueryException {
+  Iter most(final QueryContext qc, final boolean outer) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
     final ANodeBuilder list = new ANodeBuilder();
     for(Item item; (item = qc.next(iter)) != null;) list.add(toNode(item));

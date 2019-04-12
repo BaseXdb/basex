@@ -98,27 +98,20 @@ public abstract class TreeSeq extends Seq {
   @Override
   public final Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
-    final BasicIter<?> iter = iter();
-    for(Item item; (item = iter.next()) != null;) vb.add(item.atomValue(qc, ii));
-    return vb.value();
+    for(final Item item : this) vb.add(item.atomValue(qc, ii));
+    return vb.value(AtomType.AAT);
   }
 
   @Override
   public final long atomSize() {
     long sz = 0;
-    final BasicIter<?> iter = iter();
-    for(Item item; (item = iter.next()) != null;) sz += item.atomSize();
+    for(final Item item : this) sz += item.atomSize();
     return sz;
   }
 
   @Override
   public final boolean homogeneous() {
     return homo;
-  }
-
-  @Override
-  public final boolean iterable() {
-    return false;
   }
 
   @Override

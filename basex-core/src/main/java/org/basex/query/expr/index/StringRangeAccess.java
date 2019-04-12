@@ -41,7 +41,7 @@ public final class StringRangeAccess extends IndexAccess {
   }
 
   @Override
-  public BasicNodeIter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     final IndexType type = index.type();
     final Data data = db.data(qc, type);
 

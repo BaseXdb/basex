@@ -146,7 +146,6 @@ public final class GFLWOR extends ParseExpr {
     // for $i in 1 to 2 return ()  ->  ()
     final long size = size();
     if(size == 0 && !rtrn.has(Flag.CNS, Flag.NDT, Flag.UPD)) {
-      System.out.println("=> " + this);
       return Empty.VALUE;
     }
 
@@ -159,10 +158,7 @@ public final class GFLWOR extends ParseExpr {
 
     // single result: return expression of return clause
     // for $i in 1 return <x/>  ->  <x/>
-    if(size == 1) {
-      System.out.println("=> " + this);
-      return rtrn;
-    }
+    if(size == 1) return rtrn;
 
     // leave if exact number of iterated items is unknown
     final long[] minMax = calcSize(false);
@@ -174,7 +170,6 @@ public final class GFLWOR extends ParseExpr {
 
     // create replicator
     // for $i in 1 to 2 return (3,4)  ->  util:replicate((3, 4), 2)
-    System.out.println("=> " + this);
     return cc.function(Function._UTIL_REPLICATE, info, rtrn, Int.get(min));
   }
 

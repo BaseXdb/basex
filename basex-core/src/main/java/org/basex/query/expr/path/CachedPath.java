@@ -31,11 +31,17 @@ public final class CachedPath extends AxisPath {
   }
 
   @Override
-  protected NodeIter iterator(final QueryContext qc) throws QueryException {
+  protected Iter iterator(final QueryContext qc) throws QueryException {
+    return nodes(qc).iter();
+  }
+
+  @Override
+  protected Value nodes(final QueryContext qc) throws QueryException {
+    final ANodeBuilder list = new ANodeBuilder();
+
     final QueryFocus qf = qc.focus, focus = new QueryFocus();
     final Value rt = root != null ? root.value(qc) : qf.value;
     qc.focus = focus;
-    final ANodeBuilder list = new ANodeBuilder();
     try {
       if(rt != null) {
         final Iter iter = rt.iter(qc);
@@ -53,7 +59,8 @@ public final class CachedPath extends AxisPath {
     } finally {
       qc.focus = qf;
     }
-    return list.iter();
+
+    return list.value();
   }
 
   /**

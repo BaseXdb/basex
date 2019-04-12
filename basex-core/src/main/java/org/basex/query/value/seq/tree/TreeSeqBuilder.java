@@ -40,7 +40,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
    * Returns a {@link Value} representation of the given items.
    * @param items array containing the items
    * @param size number of items (must be {@code 2} or more)
-   * @param type item type of the resulting value (not checked), may be {@code null}
+   * @param type type (can be {@code null})
    * @return the value
    */
   public static Seq value(final Item[] items, final int size, final Type type) {

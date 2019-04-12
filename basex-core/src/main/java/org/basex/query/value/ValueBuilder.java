@@ -65,7 +65,7 @@ public final class ValueBuilder {
    * Returns a {@link Value} representation of the given items.
    * @param items array containing the items
    * @param size number of items
-   * @param type item type of the resulting value (not checked), may be {@code null}
+   * @param type type (can be {@code null}, only considered if new sequence is created)
    * @return the value
    */
   public static Value value(final Item[] items, final int size, final Type type) {
@@ -144,7 +144,7 @@ public final class ValueBuilder {
 
   /**
    * Returns a {@link Value} representation of the items currently stored in this builder.
-   * @return contents of this builder
+   * @return value
    */
   public Value value() {
     return value(null);
@@ -153,8 +153,8 @@ public final class ValueBuilder {
   /**
    * Returns a {@link Value} representation of the items currently stored in this builder
    * annotated with the given item type.
-   * @param type item type, may be {@code null}
-   * @return contents of this builder
+   * @param type type (can be {@code null}, only considered if new sequence is created)
+   * @return value
    */
   public Value value(final Type type) {
     final Value first = firstValue;

@@ -27,14 +27,14 @@ public final class FnStringToCodepoints extends StandardFunc {
       }
       @Override
       public Value value(final QueryContext q) {
-        return FnStringToCodepoints.value(cps);
+        return toValue(cps);
       }
     };
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return value(cps(toEmptyToken(exprs[0], qc)));
+    return toValue(cps(toEmptyToken(exprs[0], qc)));
   }
 
   /**
@@ -42,7 +42,7 @@ public final class FnStringToCodepoints extends StandardFunc {
    * @param cps codepoints
    * @return value
    */
-  private static Value value(final int[] cps) {
+  private static Value toValue(final int[] cps) {
     final LongList list = new LongList(cps.length);
     for(final int cp : cps) list.add(cp);
     return IntSeq.get(list.finish());

@@ -14,6 +14,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -37,7 +38,7 @@ abstract class Ids extends StandardFunc {
    * @return referenced nodes
    * @throws QueryException query exception
    */
-  protected BasicNodeIter ids(final QueryContext qc, final boolean idref) throws QueryException {
+  protected Iter ids(final QueryContext qc, final boolean idref) throws QueryException {
     final TokenSet idSet = ids(exprs[0].atomIter(qc, info), qc);
     final ANode root = checkRoot(toNode(ctxArg(1, qc), qc));
 
@@ -48,13 +49,15 @@ abstract class Ids extends StandardFunc {
         IndexType.ATTRIBUTE, null, new IndexStaticDb(info, data));
 
       // collect and return index results, filtered by id/idref attributes
-      final ANodeList results = new ANodeList();
-      for(final ANode attr : va.iter(qc)) {
+      final ValueBuilder vb = new ValueBuilder(qc);
+      final Iter iter = va.iter(qc);
+      for(Item item; (item = iter.next()) != null;) {
         // check attribute name; check root if database has more than one document
+        final ANode attr = (ANode) item;
         if(XMLToken.isId(attr.name(), idref) && (data.meta.ndocs == 1 || attr.root().is(root)))
-          results.add(idref ? attr : attr.parent());
+          vb.add(idref ? attr : attr.parent());
       }
-      return results.iter();
+      return vb.value().iter();
     }
 
     // otherwise, do sequential scan: parse node and its descendants

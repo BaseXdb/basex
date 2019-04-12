@@ -245,11 +245,11 @@ public final class FElem extends FNode {
    */
   public FElem add(final ANode node) {
     if(node.type == NodeType.ATT) {
-      if(atts == null) atts = new ANodeList(node);
-      else atts.add(node);
+      if(atts == null) atts = new ANodeList();
+      atts.add(node);
     } else {
-      if(children == null) children = new ANodeList(node);
-      else children.add(node);
+      if(children == null) children = new ANodeList();
+      children.add(node);
     }
     node.parent(this);
     return this;
@@ -333,8 +333,8 @@ public final class FElem extends FNode {
   public FElem add(final byte[] text) {
     if(text.length != 0) {
       final FTxt txt = new FTxt(text);
-      if(children == null) children = new ANodeList(txt);
-      else children.add(txt);
+      if(children == null) children = new ANodeList();
+      children.add(txt);
       txt.parent(this);
     }
     return this;
@@ -369,12 +369,12 @@ public final class FElem extends FNode {
 
   @Override
   public BasicNodeIter attributes() {
-    return atts != null ? atts.iter() : super.attributes();
+    return atts != null ? atts.iter() : BasicNodeIter.EMPTY;
   }
 
   @Override
   public BasicNodeIter children() {
-    return children != null ? children.iter() : super.children();
+    return children != null ? children.iter() : BasicNodeIter.EMPTY;
   }
 
   @Override
@@ -409,8 +409,8 @@ public final class FElem extends FNode {
     if(this == obj) return true;
     if(!(obj instanceof FElem)) return false;
     final FElem f = (FElem) obj;
-    return Objects.equals(children, f.children) && Objects.equals(atts, f.atts) &&
-        Objects.equals(ns, f.ns) && super.equals(obj);
+    return name.eq(f.name) && Objects.equals(children, f.children) &&
+        Objects.equals(atts, f.atts) && Objects.equals(ns, f.ns) && super.equals(obj);
   }
 
   @Override

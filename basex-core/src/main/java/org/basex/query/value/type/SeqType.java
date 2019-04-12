@@ -261,8 +261,14 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instance(final Value value) {
+    // try shortcut (but value type may be too general)
+    if(value.seqType().instanceOf(this)) return true;
+
+    // check cardinality
     final long size = value.size();
     if(!occ.check(size)) return false;
+
+    // value type may be too general: check type of each item
     for(long i = 0; i < size; i++) {
       if(!instance(value.itemAt(i))) return false;
       if(i == 0 && value.homogeneous()) break;
@@ -271,7 +277,7 @@ public final class SeqType {
   }
 
   /**
-   * Checks if the specified item can be part of a sequence that is instance of this type.
+   * Checks if the specified item is an instance of this sequence type.
    * @param item item to check
    * @return result of check
    */
@@ -317,15 +323,19 @@ public final class SeqType {
   public Value cast(final Value value, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
 
-    final long vs = value.size();
-    if(!occ.check(vs)) throw INVTYPE_X_X_X.get(ii, value.seqType(), this, value);
+    // check cardinality
+    final long size = value.size();
+    if(!occ.check(size)) throw INVTYPE_X_X_X.get(ii, value.seqType(), this, value);
 
-    if(vs == 0) return Empty.VALUE;
-    if(vs == 1) return cast((Item) value, true, qc, sc, ii);
+    // handle simple types
+    if(size == 0) return Empty.VALUE;
+    if(size == 1) return cast((Item) value, true, qc, sc, ii);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    final BasicIter<?> iter = value.iter();
-    for(Item item; (item = qc.next(iter)) != null;) vb.add(cast(item, true, qc, sc, ii));
+    for(final Item item : value) {
+      qc.checkStop();
+      vb.add(cast(item, true, qc, sc, ii));
+    }
     return vb.value();
   }
 
@@ -340,8 +350,10 @@ public final class SeqType {
   public void treat(final Value value, final QNm name, final QueryContext qc, final InputInfo ii)
       throws QueryException {
 
+    // try shortcut (but value type may be too general)
     if(value.seqType().instanceOf(this)) return;
 
+    // check cardinality
     final int size = (int) value.size();
     if(!occ.check(size)) throw typeError(value, this, name, ii);
 

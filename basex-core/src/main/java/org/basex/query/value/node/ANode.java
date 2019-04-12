@@ -409,8 +409,7 @@ public abstract class ANode extends Item {
       public ANode next() {
         if(iter == null) {
           final ANodeList list = new ANodeList();
-          ANode n = ANode.this;
-          ANode p = n.parent();
+          ANode n = ANode.this, p = n.parent();
           while(p != null) {
             if(n.type != NodeType.ATT) {
               final ANodeList tmp = new ANodeList();

@@ -26,7 +26,7 @@ final class CachedMap extends SimpleMap {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    Value result = exprs[0].value(qc);
+    Value value = exprs[0].value(qc);
 
     final QueryFocus qf = qc.focus, focus = new QueryFocus();
     qc.focus = focus;
@@ -35,20 +35,21 @@ final class CachedMap extends SimpleMap {
       for(int e = 1; e < el; e++) {
         final Expr expr = exprs[e];
         focus.pos = 0;
-        focus.size = result.size();
+        focus.size = value.size();
         final ValueBuilder vb = new ValueBuilder(qc);
-        final Iter iter = result.iter();
+        final Iter iter = value.iter();
         for(Item item; (item = qc.next(iter)) != null;) {
           focus.pos++;
           focus.value = item;
           vb.add(expr.value(qc));
         }
-        result = vb.value();
+        value = vb.value();
       }
-      return result;
     } finally {
       qc.focus = qf;
     }
+
+    return value;
   }
 
   @Override

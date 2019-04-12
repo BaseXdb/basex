@@ -6,7 +6,6 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -54,12 +53,12 @@ abstract class Set extends Arr {
 
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    return iterable ? iterate(qc) : cache(qc).iter();
+    return iterable ? iterate(qc) : nodes(qc).iter();
   }
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    return iterable ? iterate(qc).value(qc) : cache(qc).value();
+    return iterable ? iterate(qc).value(qc) : nodes(qc);
   }
 
   /**
@@ -81,7 +80,7 @@ abstract class Set extends Arr {
    * @return resulting node list
    * @throws QueryException query exception
    */
-  protected abstract ANodeBuilder cache(QueryContext qc) throws QueryException;
+  protected abstract Value nodes(QueryContext qc) throws QueryException;
 
   /**
    * Evaluates the specified iterators in an iterative manner.

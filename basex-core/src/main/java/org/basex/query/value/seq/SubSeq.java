@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -81,7 +82,7 @@ final class SubSeq extends Seq {
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(long i = 0; i < size; i++) vb.add(itemAt(i).atomValue(qc, ii));
-    return vb.value();
+    return vb.value(AtomType.AAT);
   }
 
   @Override

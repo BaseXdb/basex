@@ -1,5 +1,7 @@
 package org.basex.query.util.list;
 
+import static org.basex.query.QueryText.*;
+
 import java.util.*;
 
 import org.basex.data.*;
@@ -8,6 +10,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -189,9 +192,21 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
     state = State.SORTED;
   }
 
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
+    final int is = Math.min(5, size);
+    for(int i = 0; i < is; i++) {
+      sb.append(i == 0 ? "" : SEP);
+      sb.append(list[i]);
+    }
+    return sb.append(']').toString();
+  }
+
+  // PRIVATE METHODS ==============================================================================
+
   /**
-   * Recursively sorts the specified items via QuickSort
-   * (derived from Java's sort algorithms).
+   * Recursively sorts the specified items via QuickSort (derived from Java's sort algorithms).
    * @param s start position
    * @param e end position
    */

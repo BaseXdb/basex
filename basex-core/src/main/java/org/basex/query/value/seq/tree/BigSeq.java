@@ -64,14 +64,14 @@ final class BigSeq extends TreeSeq {
   }
 
   @Override
-  public TreeSeq insert(final long pos, final Item value, final QueryContext qc) {
+  public TreeSeq insert(final long pos, final Item item, final QueryContext qc) {
     qc.checkStop();
     final int l = left.length;
     if(pos <= l) {
       final int p = (int) pos;
       final Item[] temp = slice(left, 0, l + 1);
       Array.copy(temp, p, l - p, temp, p + 1);
-      temp[p] = value;
+      temp[p] = item;
       if(l < MAX_DIGIT) return new BigSeq(temp, middle, right, null);
 
       final int m = (l + 1) / 2;
@@ -80,13 +80,13 @@ final class BigSeq extends TreeSeq {
     }
 
     final long midSize = middle.size();
-    if(pos - l < midSize) return new BigSeq(left, middle.insert(pos - l, value, qc), right, null);
+    if(pos - l < midSize) return new BigSeq(left, middle.insert(pos - l, item, qc), right, null);
 
     final int r = right.length;
     final int p = (int) (pos - l - midSize);
     final Item[] temp = slice(right, 0, r + 1);
     Array.copy(temp, p, r - p, temp, p + 1);
-    temp[p] = value;
+    temp[p] = item;
     if(r < MAX_DIGIT) return new BigSeq(left, middle, temp, null);
 
     final int m = (r + 1) / 2;

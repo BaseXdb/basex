@@ -76,8 +76,7 @@ public final class TransformWith extends Arr {
         qc.updates = updates;
         updates.addData(item.data());
 
-        final Value value = exprs[1].value(qc);
-        if(!value.isEmpty()) throw UPMODIFY.get(info);
+        if(!exprs[1].value(qc).isEmpty()) throw UPMODIFY.get(info);
 
         updates.prepare(qc);
         updates.apply(qc);

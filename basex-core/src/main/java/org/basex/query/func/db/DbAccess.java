@@ -11,7 +11,6 @@ import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -59,13 +58,13 @@ abstract class DbAccess extends DbFn {
     if(!nt.optimize(qc.focus.value)) return Empty.ITER;
 
     // wrap iterator with name test
-    return new NodeIter() {
-      final NodeIter iter = ia.iter(qc);
+    final Iter iter = ia.iter(qc);
+    return new Iter() {
       @Override
-      public ANode next() throws QueryException {
-        ANode n;
-        while((n = iter.next()) != null && !nt.eq(n)) qc.checkStop();
-        return n;
+      public Item next() throws QueryException {
+        Item item;
+        while((item = iter.next()) != null && !nt.eq(item)) qc.checkStop();
+        return item;
       }
     };
   }

@@ -83,8 +83,7 @@ public final class Transform extends Arr {
         qc.set(copy.var, item);
         updates.addData(item.data());
       }
-      final Value value = exprs[0].value(qc);
-      if(!value.isEmpty()) throw UPMODIFY.get(info);
+      if(!exprs[0].value(qc).isEmpty()) throw UPMODIFY.get(info);
 
       updates.prepare(qc);
       updates.apply(qc);

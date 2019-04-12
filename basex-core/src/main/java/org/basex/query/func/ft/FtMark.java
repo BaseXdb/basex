@@ -31,7 +31,7 @@ public class FtMark extends StandardFunc {
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public final Value value(final QueryContext qc) throws QueryException {
     return iter(qc).value(qc);
   }
 
@@ -85,7 +85,7 @@ public class FtMark extends StandardFunc {
             final IntList il = new IntList();
             final int s = md.meta.size;
             for(int p = 0; p < s; p += md.size(p, md.kind(p))) il.add(p);
-            ir = DBNodeSeq.get(il, md, false, false).iter();
+            ir = DBNodeSeq.get(il.finish(), md).iter();
           } finally {
             qc.ftPosData = tmp;
           }

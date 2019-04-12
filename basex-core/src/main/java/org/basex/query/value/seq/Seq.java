@@ -106,6 +106,11 @@ public abstract class Seq extends Value {
   }
 
   @Override
+  public boolean iterable() {
+    return false;
+  }
+
+  @Override
   public final Value subSequence(final long start, final long length, final QueryContext qc) {
     return length == 0 ? Empty.VALUE :
            length == 1 ? itemAt(start) :
@@ -140,11 +145,11 @@ public abstract class Seq extends Value {
   /**
    * Inserts an item at the given position into this sequence and returns the resulting sequence.
    * @param pos position at which the item should be inserted, must be between 0 and {@link #size}
-   * @param value value to insert
+   * @param item item to insert
    * @param qc query context
    * @return resulting value
    */
-  public abstract Value insert(long pos, Item value, QueryContext qc);
+  public abstract Value insert(long pos, Item item, QueryContext qc);
 
   /**
    * Helper for {@link #insertBefore(long, Value, QueryContext)} that copies all items into a
@@ -161,7 +166,7 @@ public abstract class Seq extends Value {
     for(long i = 0; i < pos; i++) vb.add(itemAt(i));
     vb.add(value);
     for(long i = pos; i < size; i++) vb.add(itemAt(i));
-    return vb.value(type);
+    return vb.value(type.union(value.seqType().type));
   }
 
   /**

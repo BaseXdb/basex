@@ -27,12 +27,13 @@ public class CachedFilter extends Filter {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    final ItemList items = new ItemList();
     Value value = root.value(qc);
+
     final QueryFocus qf = qc.focus, focus = new QueryFocus();
     qc.focus = focus;
     try {
       // evaluate first predicate, based on incoming value
-      final ItemList items = new ItemList();
       Expr pred = exprs[0];
       long vs = value.size();
       focus.size = vs;
@@ -74,12 +75,11 @@ public class CachedFilter extends Filter {
         }
         items.size(c);
       }
-
-      // return resulting values
-      return items.value();
     } finally {
       qc.focus = qf;
     }
+
+    return items.value();
   }
 
   @Override

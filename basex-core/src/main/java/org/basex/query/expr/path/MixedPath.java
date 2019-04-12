@@ -41,14 +41,12 @@ public final class MixedPath extends Path {
         iter = rt;
         size = sz;
       } else {
-        final Value value = rt.value(qc);
-        iter = value.iter();
-        size = value.size();
+        iter = rt.value(qc).iter();
+        size = iter.size();
       }
     } else {
-      final Value rt = ctxValue(qc);
-      iter = rt.iter();
-      size = rt.size();
+      iter = ctxValue(qc).iter();
+      size = iter.size();
     }
 
     final QueryFocus qf = qc.focus, focus = new QueryFocus();
@@ -63,7 +61,7 @@ public final class MixedPath extends Path {
 
         // loop through all input items; cache nodes and items
         final ANodeBuilder nodes = new ANodeBuilder();
-        final ItemList atomics = new ItemList();
+        final ItemList items = new ItemList();
         final Expr step = steps[s];
         for(Item item; (item = iter.next()) != null;) {
           if(!(item instanceof ANode)) throw PATHNODE_X_X_X.get(info, step, item.type, item);
@@ -73,28 +71,28 @@ public final class MixedPath extends Path {
           final Iter ir = step.iter(qc);
           for(Item it; (it = qc.next(ir)) != null;) {
             if(it instanceof ANode) nodes.add((ANode) it);
-            else atomics.add(it);
+            else items.add(it);
           }
           focus.pos++;
         }
 
-        if(atomics.isEmpty()) {
+        if(items.isEmpty()) {
           // all results are nodes: create new iterator
           iter = nodes.iter();
         } else {
           // raise error if this is not the final result
           if(s + 1 < sl)
-            throw PATHNODE_X_X_X.get(info, steps[s + 1], atomics.get(0).type, atomics.get(0));
+            throw PATHNODE_X_X_X.get(info, steps[s + 1], items.get(0).type, items.get(0));
           // result contains non-nodes: raise error if result any contains nodes
           if(!nodes.isEmpty()) throw MIXEDRESULTS.get(info);
-          iter = atomics.iter();
+          iter = items.iter();
         }
         size = iter.size();
       }
-      return iter;
     } finally {
       qc.focus = qf;
     }
+    return iter;
   }
 
   @Override

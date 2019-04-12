@@ -57,7 +57,7 @@ public final class DataBuilder {
    * @param node node
    */
   public void build(final ANode node) {
-    build(new ANodeList(node));
+    build(new ANodeList().add(node));
   }
 
   /**

@@ -54,7 +54,6 @@ abstract class NativeSeq extends Seq {
    */
   @Override
   public final Value insert(final long pos, final Item item, final QueryContext qc) {
-    // no native implementation, because this
     return copyInsert(pos, item, qc);
   }
 

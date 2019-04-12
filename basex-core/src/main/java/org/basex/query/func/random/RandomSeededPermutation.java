@@ -3,6 +3,7 @@ package org.basex.query.func.random;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -34,5 +35,9 @@ public final class RandomSeededPermutation extends StandardFunc {
       items.add(item1);
     }
     return items.value();
+  }
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    return adoptType(exprs[1]);
   }
 }

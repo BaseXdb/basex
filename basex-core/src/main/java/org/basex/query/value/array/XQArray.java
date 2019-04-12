@@ -287,7 +287,7 @@ public abstract class XQArray extends XQData {
     if(arraySize() == 1) return get(0).atomValue(qc, ii);
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Value value : members()) vb.add(value.atomValue(qc, ii));
-    return vb.value();
+    return vb.value(AtomType.AAT);
   }
 
   @Override

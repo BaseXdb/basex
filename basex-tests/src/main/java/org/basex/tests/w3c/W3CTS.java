@@ -506,7 +506,7 @@ public abstract class W3CTS extends Main {
       final Data d = new DBNode(IO.get(str)).data();
       final IntList il = new IntList();
       for(int p = frag ? 2 : 0; p < d.meta.size; p += d.size(p, d.kind(p))) il.add(p);
-      return DBNodeSeq.get(il, d, false, false);
+      return DBNodeSeq.get(il.finish(), d);
     } catch(final IOException ex) {
       Util.debug(ex);
       return Str.get(Long.toString(System.nanoTime()));

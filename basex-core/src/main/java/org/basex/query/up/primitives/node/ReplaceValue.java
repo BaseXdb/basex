@@ -122,7 +122,7 @@ public final class ReplaceValue extends NodeUpdate {
         tmp.text(1, value, Data.TEXT);
         tmp.insert(p);
         // add the substituting insertInto statement to the list
-        final ANodeList nl = new ANodeList(new DBNode(tmp, p));
+        final ANodeList nl = new ANodeList().add(new DBNode(tmp, p));
         l.add(new ReplaceContent(pre, data, info, nl));
       }
       return l.toArray(new NodeUpdate[0]);

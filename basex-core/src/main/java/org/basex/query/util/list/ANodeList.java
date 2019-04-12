@@ -30,23 +30,6 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
   }
 
   /**
-   * Lightweight constructor, assigning the specified array.
-   * @param elements initial array
-   */
-  public ANodeList(final ANode... elements) {
-    super(elements);
-    size = elements.length;
-  }
-
-  /**
-   * Returns a {@link Value} representation of all items.
-   * @return array
-   */
-  public Value value() {
-    return ValueBuilder.value(list, size, NodeType.NOD);
-  }
-
-  /**
    * Returns an iterator over the items in this list.
    * The list must not be modified after the iterator has been requested.
    * @return the iterator
@@ -54,10 +37,6 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
   public BasicNodeIter iter() {
     return new BasicNodeIter() {
       int pos;
-      @Override
-      public Value value(final QueryContext qc) {
-        return ANodeList.this.value();
-      }
       @Override
       public long size() {
         return size;
@@ -70,7 +49,19 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
       public ANode get(final long i) {
         return list[(int) i];
       }
+      @Override
+      public Value value(final QueryContext qc) {
+        return ANodeList.this.value();
+      }
     };
+  }
+
+  /**
+   * Returns a {@link Value} representation of all items.
+   * @return array
+   */
+  public Value value() {
+    return ValueBuilder.value(list, size, NodeType.NOD);
   }
 
   @Override

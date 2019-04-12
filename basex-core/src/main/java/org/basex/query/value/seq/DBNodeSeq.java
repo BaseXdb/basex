@@ -65,8 +65,8 @@ public class DBNodeSeq extends NativeSeq {
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) {
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(int s = 0; s < size; s++) vb.add(itemAt(s).atomValue(qc, ii));
-    return vb.value();
+    for(int i = 0; i < size; i++) vb.add(itemAt(i).atomValue(qc, ii));
+    return vb.value(AtomType.AAT);
   }
 
   /**
@@ -99,7 +99,7 @@ public class DBNodeSeq extends NativeSeq {
     final int sz = (int) size;
     final int[] tmp = new int[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = pres[i];
-    return get(tmp, data, type, false);
+    return new DBNodeSeq(tmp, data, type, false);
   }
 
   @Override
@@ -140,12 +140,22 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   /**
+   * Creates a sequence with the specified items.
+   * @param pres pre values
+   * @param data data reference
+   * @return value
+   */
+  public static Value get(final int[] pres, final Data data) {
+    return get(pres, data, NodeType.NOD, false);
+  }
+
+  /**
    * Creates a node sequence with the given data reference and pre values.
    * @param pres pre values
    * @param data data reference
    * @param docs all values reference document nodes
    * @param all pre values reference all documents of the database
-   * @return resulting item or sequence
+   * @return value
    */
   public static Value get(final IntList pres, final Data data, final boolean docs,
       final boolean all) {

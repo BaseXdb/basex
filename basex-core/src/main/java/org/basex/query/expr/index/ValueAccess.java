@@ -85,7 +85,7 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public BasicNodeIter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     // cache distinct search terms
     final TokenSet cache;
     if(tokens == null) {
@@ -98,7 +98,7 @@ public final class ValueAccess extends IndexAccess {
 
     // no search terms: return empty iterator
     final int c = cache.size();
-    if(c == 0) return BasicNodeIter.EMPTY;
+    if(c == 0) return Empty.ITER;
 
     // single search term: return single iterator
     final Data data = db.data(qc, type);

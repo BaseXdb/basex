@@ -46,11 +46,11 @@ final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  public TreeSeq insert(final long pos, final Item value, final QueryContext qc) {
+  public TreeSeq insert(final long pos, final Item item, final QueryContext qc) {
     final int p = (int) pos, n = items.length;
     final Item[] out = new Item[n + 1];
     Array.copy(items, p, out);
-    out[p] = value;
+    out[p] = item;
     Array.copy(items, p, n - p, out, p + 1);
 
     if(n < MAX_SMALL) return new SmallSeq(out, null);
