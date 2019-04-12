@@ -1,6 +1,7 @@
 package org.basex.query.iter;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -57,7 +58,19 @@ public abstract class Iter {
    * @return value
    * @throws QueryException query exception
    */
-  public Value value(final QueryContext qc) throws QueryException {
+  public final Value value(final QueryContext qc) throws QueryException {
+    return value(qc, null);
+  }
+
+  /**
+   * Returns a value with all iterated items. This method returns all items
+   * that have not been requested yet, or all values if the result size is known.
+   * @param qc query context
+   * @param expr expression (can be {@code null})
+   * @return value
+   * @throws QueryException query exception
+   */
+  public Value value(final QueryContext qc, final Expr expr) throws QueryException {
     // check if sequence is empty
     final Item item1 = next();
     if(item1 == null) return Empty.VALUE;
@@ -69,6 +82,6 @@ public abstract class Iter {
     // more results: build sequence
     final ValueBuilder vb = new ValueBuilder(qc, item1, item2);
     for(Item item; (item = qc.next(this)) != null;) vb.add(item);
-    return vb.value();
+    return vb.value(expr);
   }
 }

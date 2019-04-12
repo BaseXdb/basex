@@ -2,6 +2,7 @@ package org.basex.query.iter;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -29,7 +30,7 @@ public abstract class DBNodeIter extends BasicNodeIter {
   public abstract DBNode next();
 
   @Override
-  public Value value(final QueryContext qc) {
+  public Value value(final QueryContext qc, final Expr expr) {
     final IntList il = new IntList();
     for(DBNode node; (node = next()) != null;) {
       qc.checkStop();

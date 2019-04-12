@@ -8,7 +8,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -86,32 +85,13 @@ public final class MainModule extends AModule {
   }
 
   /**
-   * Evaluates this module and returns the result as a cached value iterator.
-   * @param qc query context
-   * @return result
-   * @throws QueryException evaluation exception
-   */
-  public ItemList cache(final QueryContext qc) throws QueryException {
-    final int fp = vs.enter(qc);
-    try {
-      final Iter iter = expr.iter(qc);
-      final ItemList items = new ItemList(iter.size());
-      for(Item item; (item = qc.next(iter)) != null;) items.add(item);
-      if(declType != null) declType.treat(items.value(), null, qc, info);
-      return items;
-    } finally {
-      VarScope.exit(fp, qc);
-    }
-  }
-
-  /**
    * Creates a result iterator which lazily evaluates this module.
    * @param qc query context
    * @return result iterator
    * @throws QueryException query exception
    */
   public Iter iter(final QueryContext qc) throws QueryException {
-    if(declType != null) return cache(qc).iter();
+    if(declType != null) return value(qc).iter();
 
     final int fp = vs.enter(qc);
     final Iter iter = expr.iter(qc);
@@ -131,10 +111,27 @@ public final class MainModule extends AModule {
         return iter.get(i);
       }
       @Override
-      public Value value(final QueryContext q) throws QueryException {
-        return iter.value(qc);
+      public Value value(final QueryContext q, final Expr ex) throws QueryException {
+        return iter.value(qc, ex);
       }
     };
+  }
+
+  /**
+   * Creates the result.
+   * @param qc query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  public Value value(final QueryContext qc) throws QueryException {
+    final int fp = vs.enter(qc);
+    try {
+      final Value value = expr.value(qc);
+      if(declType != null) declType.treat(value, null, qc, info);
+      return value;
+    } finally {
+      VarScope.exit(fp, qc);
+    }
   }
 
   /**

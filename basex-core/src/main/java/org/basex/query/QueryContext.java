@@ -66,7 +66,7 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Query resources. */
   public QueryResources resources;
-  /** Update container. */
+  /** Update container; will be created if the first update is evaluated. */
   public Updates updates;
 
   /** Global database options (will be reassigned after query execution). */
@@ -285,7 +285,7 @@ public final class QueryContext extends Job implements Closeable {
         // evaluate initial expression
         try {
           ctxItem.comp(cc);
-          focus.value = ctxItem.cache(this).value();
+          focus.value = ctxItem.value(this);
         } catch(final QueryException ex) {
           // only {@link ParseExpr} instances may lead to a missing context
           throw ex.error() == NOCTX_X ? CIRCCTX.get(ctxItem.info) : ex;
@@ -329,64 +329,17 @@ public final class QueryContext extends Job implements Closeable {
    */
   public Iter iter() throws QueryException {
     compile();
-
-    try {
-      // no updates: iterate through results
-      if(!updating) return root.iter(this);
-
-      // cache results
-      ItemList items = root.cache(this);
-
-      // only perform updates if no parent context exists
-      if(updates != null && parent == null) {
-        // create copies of results that will be modified by an update operation
-        final ItemList items2 = updates.items;
-        final HashSet<Data> datas = updates.prepare(this);
-        final StringList dbs = updates.databases();
-        materialize(items, datas, dbs);
-        materialize(items2, datas, dbs);
-
-        // invalidate current node set in context, apply updates
-        if(context.data() != null) context.invalidate();
-        updates.apply(this);
-
-        // append cached outputs
-        if(!items2.isEmpty()) {
-          if(items.isEmpty()) {
-            items = items2;
-          } else {
-            for(final Item item : items2) items.add(item);
-          }
-        }
-      }
-      return items.iter();
-
-    } catch(final StackOverflowError ex) {
-      Util.debug(ex);
-      throw BASEX_OVERFLOW.get(null);
-    }
+    return updating ? update().iter() : root.iter(this);
   }
 
   /**
-   * Replaces all nodes that will be affected by updates by copies.
-   * @param items node cache
-   * @param datas data references
-   * @param dbs database names
+   * Returns the result.
+   * @return result iterator
    * @throws QueryException query exception
    */
-  private void materialize(final ItemList items, final HashSet<Data> datas, final StringList dbs)
-      throws QueryException {
-
-    final long is = items.size();
-    for(int i = 0; i < is; i++) {
-      final Item item1 = items.get(i);
-      final Data data = item1.data();
-      final boolean copy = data != null &&
-          (datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name));
-      final Item item2 = item1.materialize(this, copy);
-      if(item2 == null) throw BASEX_FUNCTION_X.get(null, item1);
-      items.set(i, item2);
-    }
+  public Value value() throws QueryException {
+    compile();
+    return updating ? update() : root.value(this);
   }
 
   /**
@@ -596,6 +549,70 @@ public final class QueryContext extends Job implements Closeable {
     return SAVE;
   }
 
+  /**
+   * Gets the value currently bound to the given variable.
+   * @param var variable
+   * @return bound value
+   */
+  public Value get(final Var var) {
+    return stack.get(var);
+  }
+
+  /**
+   * Binds an expression to a local variable.
+   * @param var variable
+   * @param val expression to be bound
+   * @throws QueryException exception
+   */
+  public void set(final Var var, final Value val) throws QueryException {
+    stack.set(var, val, this);
+  }
+
+  /**
+   * Registers a tail-called function and its arguments to this query context.
+   * @param fn function to call
+   * @param arg arguments to pass to {@code fn}
+   */
+  public void registerTailCall(final XQFunction fn, final Value[] arg) {
+    tailFunc = fn;
+    args = arg;
+  }
+
+  /**
+   * Returns and clears the currently registered tail-call function.
+   * @return function to call if present, {@code null} otherwise
+   */
+  public XQFunction pollTailCall() {
+    final XQFunction fn = tailFunc;
+    tailFunc = null;
+    return fn;
+  }
+
+  /**
+   * Returns and clears registered arguments of a tail-called function.
+   * @return argument values if a tail call was registered, {@code null} otherwise
+   */
+  public Value[] pollTailArgs() {
+    final Value[] as = args;
+    args = null;
+    return as;
+  }
+
+  /**
+   * Initializes the static date and time context of a query if not done yet.
+   * @return self reference
+   * @throws QueryException query exception
+   */
+  public QueryDateTime dateTime() throws QueryException {
+    if(dateTime == null) dateTime = new QueryDateTime();
+    return dateTime;
+  }
+
+  @Override
+  public String toString() {
+    return root != null ? QueryInfo.usedDecls(root) : info.query;
+  }
+
   // CLASS METHODS ================================================================================
 
   /**
@@ -621,7 +638,7 @@ public final class QueryContext extends Job implements Closeable {
         pres.add(((DBNode) item).pre());
       }
 
-      // all results processed: return compact node sequence
+      // all results processed: return compact node sequence, attach full-text positions
       final int ps = pres.size();
       if(item == null || ps == mx) {
         return ps == 0 ? Empty.VALUE : new DBNodes(data, pres.finish()).ftpos(ftPosData);
@@ -644,6 +661,52 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   // PRIVATE METHODS ==============================================================================
+
+  /**
+   * Returns the result of an updating expression.
+   * @return result iterator
+   * @throws QueryException query exception
+   */
+  private Value update() throws QueryException {
+    try {
+      // retrieve result
+      final Value value = root.value(this);
+      // only perform updates if no parent context exists
+      if(updates == null || parent != null) return value;
+
+      // create copies of results that will be modified by an update operation
+      final HashSet<Data> datas = updates.prepare(this);
+      final StringList dbs = updates.databases();
+      final QueryFunction<Item, Item> materialize = item -> {
+        final Data data = item.data();
+        final boolean copy = data != null &&
+            (datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name));
+        final Item mat = item.materialize(this, copy);
+        if(mat == null) throw BASEX_FUNCTION_X.get(null, item);
+        return mat;
+      };
+
+      final ValueBuilder vb = new ValueBuilder(this);
+      for(final Item item : value) {
+        checkStop();
+        vb.add(materialize.apply(item));
+      }
+      for(final Item item : updates.items) {
+        checkStop();
+        vb.add(materialize.apply(item));
+      }
+
+      // invalidate current node set in context, apply updates
+      if(context.data() != null) context.invalidate();
+      updates.apply(this);
+
+      return vb.value(value);
+
+    } catch(final StackOverflowError ex) {
+      Util.debug(ex);
+      throw BASEX_OVERFLOW.get(null);
+    }
+  }
 
   /**
    * Casts a value to the specified type.
@@ -723,84 +786,19 @@ public final class QueryContext extends Job implements Closeable {
       if(vl.isItem()) return tp.cast((Item) object, this, sc, null);
       // cast sequence
       final ValueBuilder vb = new ValueBuilder(this);
-      final BasicIter<?> iter = vl.iter();
-      for(Item item; (item = iter.next()) != null;) vb.add(tp.cast(item, this, sc, null));
-      return vb.value();
+      for(final Item item : vl) vb.add(tp.cast(item, this, sc, null));
+      return vb.value(tp);
     }
 
     if(object instanceof String[]) {
       // cast string array
       final ValueBuilder vb = new ValueBuilder(this);
       for(final String string : (String[]) object) vb.add(tp.cast(string, this, sc, null));
-      return vb.value();
+      return vb.value(tp);
     }
 
     // cast any other object to XDM
     return tp.cast(object, this, sc, null);
-  }
-
-  /**
-   * Gets the value currently bound to the given variable.
-   * @param var variable
-   * @return bound value
-   */
-  public Value get(final Var var) {
-    return stack.get(var);
-  }
-
-  /**
-   * Binds an expression to a local variable.
-   * @param var variable
-   * @param val expression to be bound
-   * @throws QueryException exception
-   */
-  public void set(final Var var, final Value val) throws QueryException {
-    stack.set(var, val, this);
-  }
-
-  /**
-   * Registers a tail-called function and its arguments to this query context.
-   * @param fn function to call
-   * @param arg arguments to pass to {@code fn}
-   */
-  public void registerTailCall(final XQFunction fn, final Value[] arg) {
-    tailFunc = fn;
-    args = arg;
-  }
-
-  /**
-   * Returns and clears the currently registered tail-call function.
-   * @return function to call if present, {@code null} otherwise
-   */
-  public XQFunction pollTailCall() {
-    final XQFunction fn = tailFunc;
-    tailFunc = null;
-    return fn;
-  }
-
-  /**
-   * Returns and clears registered arguments of a tail-called function.
-   * @return argument values if a tail call was registered, {@code null} otherwise
-   */
-  public Value[] pollTailArgs() {
-    final Value[] as = args;
-    args = null;
-    return as;
-  }
-
-  /**
-   * Initializes the static date and time context of a query if not done yet.
-   * @return self reference
-   * @throws QueryException query exception
-   */
-  public QueryDateTime dateTime() throws QueryException {
-    if(dateTime == null) dateTime = new QueryDateTime();
-    return dateTime;
-  }
-
-  @Override
-  public String toString() {
-    return root != null ? QueryInfo.usedDecls(root) : info.query;
   }
 
   /**

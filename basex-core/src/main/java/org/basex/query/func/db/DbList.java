@@ -7,6 +7,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -50,7 +51,7 @@ public class DbList extends DbFn {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return exprs.length == 0 ? list(qc) : resources(qc).value(qc);
+    return exprs.length == 0 ? list(qc) : resources(qc).value(qc, this);
   }
 
   /**
@@ -85,7 +86,7 @@ public class DbList extends DbFn {
         return i < size ? Str.get(tokenAt((int) i)) : null;
       }
       @Override
-      public Value value(final QueryContext q) {
+      public Value value(final QueryContext q, final Expr expr) {
         final TokenList tl = new TokenList(size);
         for(int i = 0; i < size; i++) tl.add(tokenAt(i));
         return StrSeq.get(tl);

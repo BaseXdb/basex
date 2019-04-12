@@ -3,6 +3,7 @@ package org.basex.query.func.util;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -28,7 +29,7 @@ public final class UtilChars extends StandardFunc {
         return Str.get(Token.cpToken(cps[(int) i]));
       }
       @Override
-      public Value value(final QueryContext q) {
+      public Value value(final QueryContext q, final Expr expr) {
         return toValue(cps);
       }
     };

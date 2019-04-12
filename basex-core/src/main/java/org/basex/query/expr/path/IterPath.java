@@ -84,7 +84,7 @@ public final class IterPath extends AxisPath {
 
   @Override
   protected Value nodes(final QueryContext qc) throws QueryException {
-    return iterator(qc).value(qc);
+    return iterator(qc).value(qc, this);
   }
 
   @Override

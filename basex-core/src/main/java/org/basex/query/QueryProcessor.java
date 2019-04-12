@@ -80,8 +80,8 @@ public final class QueryProcessor extends Job implements Closeable {
   }
 
   /**
-   * Returns a memory-efficient result iterator. In most cases, the query will only be fully
-   * evaluated if all items of this iterator are requested.
+   * Returns a memory-efficient result iterator. The query will only be fully evaluated if all items
+   * of this iterator are requested.
    * @return result iterator
    * @throws QueryException query exception
    */
@@ -96,7 +96,8 @@ public final class QueryProcessor extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public Value value() throws QueryException {
-    return iter().value(qc);
+    parse();
+    return qc.value();
   }
 
   /**

@@ -208,15 +208,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
 
   /**
    * Creates a sequence containing the current elements of this builder.
-   * @return resulting sequence
-   */
-  public Seq seq() {
-    return seq(null);
-  }
-
-  /**
-   * Creates a sequence containing the current elements of this builder.
-   * @param type type of all elements, may be {@code null}
+   * @param type type of all items in this sequence, can be {@code null}
    * @return resulting sequence
    */
   public Seq seq(final Type type) {

@@ -1,6 +1,7 @@
 package org.basex.query.util.list;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -81,7 +82,7 @@ public final class ItemList extends ObjectList<Item, ItemList> {
         return ItemList.this.value();
       }
       @Override
-      public Value value(final QueryContext qc) {
+      public Value value(final QueryContext qc, final Expr expr) {
         return ItemList.this.value();
       }
     };

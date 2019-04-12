@@ -3,6 +3,7 @@ package org.basex.query.value.seq;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
@@ -34,7 +35,7 @@ public final class Empty extends Item {
       return VALUE;
     }
     @Override
-    public Value value(final QueryContext qc) {
+    public Value value(final QueryContext qc, final Expr expr) {
       return VALUE;
     }
   };

@@ -1,6 +1,7 @@
 package org.basex.query.util.list;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -37,6 +38,7 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
   public BasicNodeIter iter() {
     return new BasicNodeIter() {
       int pos;
+
       @Override
       public long size() {
         return size;
@@ -50,18 +52,12 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
         return list[(int) i];
       }
       @Override
-      public Value value(final QueryContext qc) {
-        return ANodeList.this.value();
+      public Value value(final QueryContext qc, final Expr expr) {
+        Type type = NodeType.NOD;
+        if(expr != null) type = type.intersect(expr.seqType().type);
+        return ValueBuilder.value(list, size, type);
       }
     };
-  }
-
-  /**
-   * Returns a {@link Value} representation of all items.
-   * @return array
-   */
-  public Value value() {
-    return ValueBuilder.value(list, size, NodeType.NOD);
   }
 
   @Override

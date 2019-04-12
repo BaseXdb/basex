@@ -1,6 +1,7 @@
 package org.basex.query.func.convert;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -24,7 +25,7 @@ public final class ConvertBinaryToIntegers extends StandardFunc {
         return Int.get(bytes[(int) i] & 0xFF);
       }
       @Override
-      public Value value(final QueryContext q) {
+      public Value value(final QueryContext q, final Expr expr) {
         return toValue(bytes);
       }
     };

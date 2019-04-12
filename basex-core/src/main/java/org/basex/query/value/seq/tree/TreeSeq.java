@@ -63,7 +63,7 @@ public abstract class TreeSeq extends Seq {
       tsb.add(subSequence(pos, right, qc), qc);
     }
 
-    return tsb.seq();
+    return tsb.seq(type.union(value.type));
   }
 
   /**

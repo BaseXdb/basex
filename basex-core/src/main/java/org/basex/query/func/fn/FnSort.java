@@ -31,7 +31,7 @@ public final class FnSort extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value value = exprs[0].value(qc), v = value(value);
-    return v != null ? v : iter(value, qc).value(qc);
+    return v != null ? v : iter(value, qc).value(qc, this);
   }
 
   /**

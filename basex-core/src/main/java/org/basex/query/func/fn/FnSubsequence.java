@@ -93,7 +93,7 @@ public class FnSubsequence extends StandardFunc {
       final Value value = iter.iterValue();
       if(value != null) return value.subSequence(sr.start, sr.length, qc);
 
-      if(sr.length == size) return iter.value(qc);
+      if(sr.length == size) return iter.value(qc, this);
 
       final ValueBuilder vb = new ValueBuilder(qc);
       for(long i = sr.start; i < sr.end; i++) vb.add(iter.get(i));

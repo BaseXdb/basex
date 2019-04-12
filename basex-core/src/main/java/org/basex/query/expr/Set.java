@@ -58,7 +58,7 @@ abstract class Set extends Arr {
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    return iterable ? iterate(qc).value(qc) : nodes(qc);
+    return iterable ? iterate(qc).value(qc, this) : nodes(qc);
   }
 
   /**

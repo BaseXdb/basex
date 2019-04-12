@@ -167,7 +167,7 @@ public final class ValueBuilder {
   /**
    * Returns a {@link Value} representation of the items currently stored in this builder
    * annotated with the type of the given expression.
-   * @param expr expression
+   * @param expr expression (can be {@code null})
    * @return value
    */
   public Value value(final Expr expr) {

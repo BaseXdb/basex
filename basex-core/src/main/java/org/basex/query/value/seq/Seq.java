@@ -93,7 +93,7 @@ public abstract class Seq extends Value {
         return Seq.this;
       }
       @Override
-      public Value value(final QueryContext qc) {
+      public Value value(final QueryContext qc, final Expr expr) {
         return Seq.this;
       }
     };
@@ -154,13 +154,14 @@ public abstract class Seq extends Value {
    * @return resulting value
    */
   protected Value copyInsert(final long pos, final Value value, final QueryContext qc) {
-    if(pos == size) return new TreeSeqBuilder().add(this, qc).add(value, qc).seq();
+    final Type tp = type.union(value.type);
+    if(pos == size) return new TreeSeqBuilder().add(this, qc).add(value, qc).seq(tp);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     for(long i = 0; i < pos; i++) vb.add(itemAt(i));
     vb.add(value);
     for(long i = pos; i < size; i++) vb.add(itemAt(i));
-    return vb.value(type.union(value.seqType().type));
+    return vb.value(tp);
   }
 
   /**

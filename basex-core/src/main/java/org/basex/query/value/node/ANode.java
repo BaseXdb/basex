@@ -6,6 +6,7 @@ import org.basex.api.dom.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -385,7 +386,7 @@ public abstract class ANode extends Item {
         return parent();
       }
       @Override
-      public ANode value(final QueryContext qc) {
+      public ANode value(final QueryContext qc, final Expr expr) {
         return parent();
       }
       @Override
