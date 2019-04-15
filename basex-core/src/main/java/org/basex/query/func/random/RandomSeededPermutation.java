@@ -34,7 +34,7 @@ public final class RandomSeededPermutation extends StandardFunc {
       }
       items.add(item1);
     }
-    return items.value(seqType().type);
+    return items.value(this);
   }
 
   @Override

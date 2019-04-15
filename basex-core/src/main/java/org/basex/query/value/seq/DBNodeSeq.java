@@ -135,7 +135,7 @@ public class DBNodeSeq extends NativeSeq {
    * @param all pre values reference all documents of the database
    * @return value
    */
-  private static Value get(final int[] pres, final Data data, final Type type, final boolean all) {
+  public static Value get(final int[] pres, final Data data, final Type type, final boolean all) {
     return pres.length == 0 ? Empty.VALUE : pres.length == 1 ? new DBNode(data, pres[0]) :
       new DBNodeSeq(pres, data, type == null ? NodeType.NOD : type, all);
   }

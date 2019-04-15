@@ -61,65 +61,57 @@ public abstract class Path extends ParseExpr {
    */
   public static ParseExpr get(final InputInfo ii, final Expr root, final Expr... steps) {
     // new list with steps
-    int sl = steps.length;
-    final ExprList list = new ExprList(sl);
+    final int sl = steps.length;
+    final ExprList tmp = new ExprList(sl);
 
     // merge nested paths
     Expr rt = root;
     if(rt instanceof Path) {
       final Path path = (Path) rt;
-      list.add(path.steps);
+      tmp.add(path.steps);
       rt = path.root;
     }
     // remove redundant context reference
     if(rt instanceof ContextValue) rt = null;
 
     // add steps of input array
-    for(final Expr expr : steps) {
-      Expr step = expr;
-      if(step instanceof ContextValue) {
+    for(final Expr step : steps) {
+      Expr ex = step;
+      if(ex instanceof ContextValue) {
         // remove redundant context references
-        if(sl > 1) continue;
         // single step: rewrite to axis step (required to sort results of path)
-        step = Step.get(((ContextValue) step).info, SELF, KindTest.NOD);
-      } else if(step instanceof Filter) {
+        ex = Step.get(((ContextValue) ex).info, SELF);
+      } else if(ex instanceof Filter) {
         // rewrite filter to axis step
-        final Filter f = (Filter) step;
-        if(f.root instanceof ContextValue) {
-          step = Step.get(f.info, SELF, KindTest.NOD, f.exprs);
-        }
-      } else if(step instanceof Path) {
+        final Filter f = (Filter) ex;
+        if(f.root instanceof ContextValue) ex = Step.get(f.info, SELF, KindTest.NOD, f.exprs);
+      } else if(ex instanceof Path) {
         // rewrite path to axis steps
-        final Path p = (Path) step;
-        if(p.root != null && !(p.root instanceof ContextValue)) list.add(p.root);
+        final Path p = (Path) ex;
+        if(p.root != null && !(p.root instanceof ContextValue)) tmp.add(p.root);
         final int pl = p.steps.length - 1;
-        for(int i = 0; i < pl; i++) list.add(p.steps[i]);
-        step = p.steps[pl];
+        for(int i = 0; i < pl; i++) tmp.add(p.steps[i]);
+        ex = p.steps[pl];
       }
-      list.add(step);
+      tmp.add(ex);
     }
 
-    // check if all steps are axis steps
+    // count axis steps, remove self steps (one step must survive)
     int axes = 0;
-    final Expr[] st = list.toArray();
-    for(final Expr step : st) {
-      if(step instanceof Step) axes++;
+    for(int l = 0; l < tmp.size(); l++) {
+      if(tmp.get(l) instanceof Step) {
+        final Step s = (Step) tmp.get(l);
+        if(tmp.size() > 1 && s.axis == Axis.SELF && s.test == KindTest.NOD && s.exprs.length == 0) {
+          tmp.remove(l--);
+        } else {
+          axes++;
+        }
+      }
     }
-    sl = st.length;
-    if(axes == sl) return iterative(rt, st) ? new IterPath(ii, rt, st) :
-      new CachedPath(ii, rt, st);
-
-    // if last expression yields no nodes, rewrite mixed path to simple map
-    // example: $a/b/string -> $a/b ! string()
-    final Expr s1 = sl > 1 ? st[sl - 2] : rt, s2 = st[sl - 1];
-    if(s1 != null && s1.seqType().type.instanceOf(NodeType.NOD) &&
-        s2.seqType().type.instanceOf(AtomType.AAT)) {
-      list.remove(sl - 1);
-      if(sl > 1) rt = Path.get(ii, rt, list.finish());
-      return (SimpleMap) SimpleMap.get(ii, rt, s2);
-    }
-
-    return new MixedPath(ii, rt, st);
+    final Expr[] stps = tmp.finish();
+    return axes < stps.length ? new MixedPath(ii, rt, stps) :
+           iterative(rt, stps) ? new IterPath(ii, rt, stps) :
+           new CachedPath(ii, rt, stps);
   }
 
   @Override
@@ -177,27 +169,38 @@ public abstract class Path extends ParseExpr {
       // example: A/prof:void(.)/B -> A/prof:void(.)
       if(step.seqType().zero() && s + 1 < sl) {
         cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
-        return get(info, root, list.finish());
+        return get(info, root, list.finish()).optimize(cc);
       }
     }
 
     // simplify path with empty root expression or empty step
-    final Value rt = rootValue(cc);
-    if(emptyPath(!cc.nestedFocus() || cc.qc.focus.value == null ? rt : null))
+    final Value rootValue = rootValue(cc);
+    if(emptyPath(!cc.nestedFocus() || cc.qc.focus.value == null ? rootValue : null))
       return cc.emptySeq(this);
 
-    seqType(cc, rt);
+    seqType(cc, rootValue);
 
     // merge descendant steps
     Expr expr = mergeSteps(cc);
     // check index access
-    if(expr == this) expr = index(cc, rt);
+    if(expr == this) expr = index(cc, rootValue);
     /* rewrite descendant to child steps. this optimization is called after the index rewritings,
      * as it is cheaper to invert a descendant step. examples:
      * - //B [. = '...'] -> IA('...', B)
      * - /A/B[. = '...'] -> IA('...', B)/parent::A *[parent::document-node()] */
-    if(expr == this) expr = children(cc, rt);
+    if(expr == this) expr = children(cc, rootValue);
     if(expr != this) return expr.optimize(cc);
+
+    // if last expression yields no nodes, rewrite mixed path to simple map
+    // example: $a/b/string -> $a/b ! string()
+    final Expr s1 = sl > 1 ? steps[sl - 2] : rootValue, s2 = steps[sl - 1];
+    if(s1 != null && s1.seqType().type.instanceOf(NodeType.NOD) &&
+        s2.seqType().type.instanceOf(AtomType.AAT)) {
+      // remove last step from new root expression
+      Expr rt = root;
+      if(sl > 1) rt = get(info, root, Arrays.copyOfRange(steps, 0, sl - 1)).optimize(cc);
+      return SimpleMap.get(info, rt, s2).optimize(cc);
+    }
 
     // choose best path implementation and set type information
     return copyType(get(info, root, steps));

@@ -68,7 +68,7 @@ public final class ItemList extends ObjectList<Item, ItemList> {
 
   /**
    * Returns a value with the type of the given expression.
-   * @param expr expression (can be {@code null})
+   * @param expr expression
    * @return the value
    */
   public Value value(final Expr expr) {

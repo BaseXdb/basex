@@ -23,7 +23,7 @@ public final class IterStep extends Step {
    * @param test node test
    * @param preds predicates
    */
-  IterStep(final InputInfo info, final Axis axis, final Test test, final Expr[] preds) {
+  IterStep(final InputInfo info, final Axis axis, final Test test, final Expr... preds) {
     super(info, axis, test, preds);
   }
 

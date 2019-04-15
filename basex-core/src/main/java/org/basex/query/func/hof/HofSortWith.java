@@ -31,7 +31,7 @@ public final class HofSortWith extends HofFn {
     } catch(final QueryRTException ex) {
       throw ex.getCause();
     }
-    return items.value(seqType().type);
+    return items.value(this);
   }
 
   @Override

@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
@@ -210,13 +211,11 @@ public abstract class Preds extends Arr {
         // E [ . ! ... ] -> E [ ... ]
         // E [ E ! ... ] -> E [ ... ]
         final SimpleMap map = (SimpleMap) ex;
-        final Expr first = map.exprs[0], second = map.exprs[1];
-        if(!second.has(Flag.POS) && (first instanceof ContextValue ||
-            root.equals(first) && root.isSimple() && st.one())) {
-          final int ml = map.exprs.length;
-          final ExprList el = new ExprList(ml - 1);
-          for(int m = 1; m < ml; m++) el.add(map.exprs[m]);
-          ex = SimpleMap.get(map.info, el.finish());
+        final Expr[] mexprs = map.exprs;
+        if(!mexprs[1].has(Flag.POS) && (mexprs[0] instanceof ContextValue ||
+            root.equals(mexprs[0]) && root.isSimple() && st.one())) {
+          final int ml = mexprs.length;
+          ex = ml == 1 ? mexprs[1] : SimpleMap.get(map.info, Arrays.copyOfRange(mexprs, 1, ml));
         }
       } else if(ex instanceof Path) {
         // E [ . / ... ] -> E [ ... ]

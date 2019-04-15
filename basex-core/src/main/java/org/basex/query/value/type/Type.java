@@ -1,6 +1,7 @@
 package org.basex.query.value.type;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -302,6 +303,19 @@ public interface Type {
    * @return result of check
    */
   boolean nsSensitive();
+
+  /**
+   * Returns the given type, or the type of the specified expression if it is more specific.
+   * @param expr expression
+   * @return node type
+   */
+  default Type refine(final Expr expr) {
+    if(expr != null) {
+      final Type t = expr.seqType().type.intersect(this);
+      if(t != null) return t;
+    }
+    return this;
+  }
 
   @Override
   String toString();

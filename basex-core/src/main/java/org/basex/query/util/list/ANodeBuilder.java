@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.list.*;
 
 /**
@@ -60,14 +61,15 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
 
     final int sz = size;
     final ANode[] nodes = finish();
+    final Type type = NodeType.NOD.refine(expr);
 
     // create standard sequence
-    if(data == null) return ItemSeq.get(nodes, sz, expr);
+    if(data == null) return ItemSeq.get(nodes, sz, type);
 
     // same database: create compact sequence
     final int[] pres = new int[sz];
     for(int l = 0; l < sz; l++) pres[l] = ((DBNode) nodes[l]).pre();
-    return DBNodeSeq.get(pres, data, expr);
+    return DBNodeSeq.get(pres, data, type, false);
   }
 
   /**

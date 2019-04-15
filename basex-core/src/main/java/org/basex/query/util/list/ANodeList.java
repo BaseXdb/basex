@@ -8,6 +8,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.list.*;
 
 /**
@@ -55,7 +56,7 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
       }
       @Override
       public Value value(final QueryContext qc, final Expr expr) {
-        return ItemSeq.get(list, size, expr);
+        return ItemSeq.get(list, size, NodeType.NOD.refine(expr));
       }
     };
   }

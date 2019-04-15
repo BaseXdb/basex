@@ -149,6 +149,13 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void deepEqual() {
+    final Function func = DEEP_EQUAL;
+
+    query("let $a := reverse((<a/>, <b/>)) return " + func.args(" $a/.", " $a/."), true);
+  }
+
+  /** Test method. */
   @Test public void distinctValues() {
     final Function func = DISTINCT_VALUES;
 

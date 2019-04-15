@@ -24,7 +24,7 @@ final class CachedStep extends Step {
    * @param test node test
    * @param preds predicates
    */
-  CachedStep(final InputInfo info, final Axis axis, final Test test, final Expr[] preds) {
+  CachedStep(final InputInfo info, final Axis axis, final Test test, final Expr... preds) {
     super(info, axis, test, preds);
   }
 

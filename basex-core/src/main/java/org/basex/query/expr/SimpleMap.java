@@ -35,11 +35,10 @@ public abstract class SimpleMap extends Arr {
   /**
    * Returns a map instance.
    * @param ii input info
-   * @param exprs expressions
+   * @param exprs two or more expressions
    * @return instance
    */
-  public static Expr get(final InputInfo ii, final Expr... exprs) {
-    if(exprs.length == 1) return exprs[0];
+  public static SimpleMap get(final InputInfo ii, final Expr... exprs) {
     for(final Expr expr : exprs) {
       if(expr.has(Flag.POS)) return new CachedMap(ii, exprs);
     }

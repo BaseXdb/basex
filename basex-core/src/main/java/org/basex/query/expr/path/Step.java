@@ -46,27 +46,33 @@ public abstract class Step extends Preds {
       final Expr... preds) {
 
     // optimize single last() functions
-    Step step = null;
-    if(preds.length == 1 && Function.LAST.is(preds[0])) {
-      step = new IterLastStep(ii, axis, test, preds);
-    } else {
-      // check for simple positional predicates
-      boolean pos = false;
-      for(final Expr pred : preds) {
-        if(pred instanceof ItrPos || numeric(pred)) {
-          pos = true;
-        } else if(pred.seqType().mayBeNumber() || pred.has(Flag.POS)) {
-          // positional checks may be nested or non-deterministic: choose full evaluation
-          step = new CachedStep(ii, axis, test, preds);
-          break;
-        }
-      }
-      if(step == null) {
-        step = pos ? new IterPosStep(ii, axis, test, preds) :
-          new IterStep(ii, axis, test, preds);
+    if(preds.length == 1 && Function.LAST.is(preds[0]))
+      return new IterLastStep(ii, axis, test, preds);
+
+    // check for simple positional predicates
+    boolean pos = false;
+    for(final Expr pred : preds) {
+      if(pred instanceof ItrPos || numeric(pred)) {
+        // predicate is known to be positional check; can be optimized
+        pos = true;
+      } else if(pred.seqType().mayBeNumber() || pred.has(Flag.POS)) {
+        // choose cached evaluation if check *may* be positional
+        return new CachedStep(ii, axis, test, preds);
       }
     }
-    return step;
+    return pos ?
+      new IterPosStep(ii, axis, test, preds) :
+      new IterStep(ii, axis, test, preds);
+  }
+
+  /**
+   * This method returns a standard step without kind test and predicates.
+   * @param ii input info input info
+   * @param axis axis axis
+   * @return step step
+   */
+  public static IterStep get(final InputInfo ii, final Axis axis) {
+    return new IterStep(ii, axis, KindTest.NOD);
   }
 
   /**
