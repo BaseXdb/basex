@@ -113,13 +113,13 @@ public final class InputInfo {
   public boolean equals(final Object object) {
     if(!(object instanceof InputInfo)) return false;
     final InputInfo ii = (InputInfo) object;
-    return (path != null ? path.equals(ii.path) : input.equals(ii.input)) && col == ii.col &&
-        line == ii.line;
+    return (path != null ? path.equals(ii.path) : input.equals(ii.input)) &&
+        column() == ii.column() && line() == ii.line();
   }
 
   @Override
   public int hashCode() {
-    return (path != null ? path.hashCode() : input.hashCode()) + col + (line << 16);
+    return (path != null ? path.hashCode() : input.hashCode()) + column() + (line() << 16);
   }
 
   @Override
