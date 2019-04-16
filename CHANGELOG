@@ -1,3 +1,37 @@
+VERSION 9.2 (April 16, 2019) -------------------------------------------
+
+ XQUERY PERFORMANCE
+ - comparisons will more often be rewritten to hash joins
+ - optimized access to subsequences and single sequence items
+ - consistent propagation of static types to evaluation results
+ - improved static typing of function items (maps, arrays)
+ - more aggressive pre-evaluation at compile time
+
+ STORAGE PERFORMANCE
+ - large databases will be opened faster
+ - regular storage offset will be computed at runtime
+
+ GENERAL XQUERY FEATURES
+ - no need to import basex-api modules anymore!
+ - Archive Module: archive:create-from, new options
+ - Database Module: directory-based access via db:dir
+ - Profiling Module: new functions (prof:gc, prof:runtime)
+ - Validation Module: assign XSD validation features
+ - WebSocket Module: query scheduling via ws:eval
+ - Utility Module: various new helper functions
+ - XSLT Module: support for XML Catalogs (thank you Liam)
+
+ NEW OPTIONS
+ - RESTXQERRORS: Suppress parsing errors at runtime
+ - FULLPLAN: comprehensive query plan information
+
+ FULLTEXT FEATURES
+ - stemmer for Arabic texts added
+
+ USER INTERFACES
+ - GUI: better support for latest JDK versions (incl. OpenJDK)
+ - DBA: revised search features in log panel
+
 VERSION 9.1.2 (January 22, 2019) ---------------------------------------
 
  Minor bug fixes; performance tweaks (faster WebDAV access).
