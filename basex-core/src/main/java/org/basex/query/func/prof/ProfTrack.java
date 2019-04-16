@@ -1,5 +1,7 @@
 package org.basex.query.func.prof;
 
+import java.math.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -24,8 +26,11 @@ public final class ProfTrack extends StandardFunc {
     /** Time. */
     public static final BooleanOption TIME = new BooleanOption("time", true);
     /** Memory. */
-    public static final BooleanOption MEMORY = new BooleanOption("memory", true);
+    public static final BooleanOption MEMORY = new BooleanOption("memory", false);
   }
+
+  /** Decimal representing a million. */
+  private static final BigDecimal MILLION = BigDecimal.valueOf(1000000);
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -48,7 +53,7 @@ public final class ProfTrack extends StandardFunc {
       // retrieve and assign value
       value = exprs[0].value(qc);
     } else {
-      // iterate through results; skip iteration if iterator is already a value
+      // iterate through results; skip iteration if iterator is based on a value
       final Iter iter = exprs[0].iter(qc);
       if(iter.iterValue() == null) {
         while(qc.next(iter) != null);
@@ -57,7 +62,9 @@ public final class ProfTrack extends StandardFunc {
 
     final MapBuilder mb = new MapBuilder();
     // execution time (called before garbage collection)
-    if(perf != null) mb.put(TrackOptions.TIME.name(), Dbl.get(Performance.ms(perf.ns(), 1)));
+    if(perf != null) {
+      mb.put(TrackOptions.TIME.name(), Dec.get(BigDecimal.valueOf(perf.ns()).divide(MILLION)));
+    }
     // memory consumption
     if(min != -1) {
       Performance.gc(2);
