@@ -97,7 +97,7 @@ public final class HTTPConnection implements ClientInfo {
     username = servlet.username(this);
 
     // generate log entry
-    final StringBuilder uri = new StringBuilder(req.getRequestURL());
+    final StringBuilder uri = new StringBuilder(req.getRequestURI());
     final String qs = req.getQueryString();
     if(qs != null) uri.append('?').append(qs);
     context.log.write(LogType.REQUEST, '[' + method + "] " + uri, null, context);
