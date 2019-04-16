@@ -122,16 +122,6 @@ public abstract class ParseExpr extends Expr {
     return this;
   }
 
-  /**
-   * Evaluates the expression and returns the resulting value with refined type information.
-   * @param qc query context
-   * @return value
-   * @throws QueryException query exception
-   */
-  protected final Value refinedValue(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc).refineType(this);
-  }
-
   // VALIDITY CHECKS ==============================================================================
 
   /**

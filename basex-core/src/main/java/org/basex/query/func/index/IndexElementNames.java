@@ -18,12 +18,15 @@ import org.basex.query.value.*;
 public class IndexElementNames extends IndexFn {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    return values(qc);
+    final Data data = checkData(qc);
+    final IndexType type = type();
+    return entries(type == IndexType.ELEMNAME ? data.elemNames : data.attrNames,
+      new IndexEntries(EMPTY, type));
   }
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    return values(qc).value(qc, this);
+    return iter(qc).value(qc, this);
   }
 
   /**
@@ -32,18 +35,5 @@ public class IndexElementNames extends IndexFn {
    */
   IndexType type() {
     return IndexType.ELEMNAME;
-  }
-
-  /**
-   * Returns all entries of the specified name index.
-   * @param qc query context
-   * @return text entries
-   * @throws QueryException query exception
-   */
-  final Iter values(final QueryContext qc) throws QueryException {
-    final Data data = checkData(qc);
-    final IndexType type = type();
-    return entries(type == IndexType.ELEMNAME ? data.elemNames : data.attrNames,
-      new IndexEntries(EMPTY, type));
   }
 }

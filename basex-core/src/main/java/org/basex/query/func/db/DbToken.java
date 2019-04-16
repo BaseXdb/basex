@@ -19,7 +19,7 @@ public final class DbToken extends DbText {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return refinedValue(qc);
+    return iter(qc).value(qc, this);
   }
 
   @Override

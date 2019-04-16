@@ -43,13 +43,13 @@ final class CachedMap extends SimpleMap {
           focus.value = item;
           vb.add(expr.value(qc));
         }
-        value = vb.value();
+        value = vb.value(expr);
       }
     } finally {
       qc.focus = qf;
     }
 
-    return value.refineType(this);
+    return value;
   }
 
   @Override

@@ -52,21 +52,11 @@ public abstract class Iter {
   }
 
   /**
-   * Returns a value with all iterated items. This method returns all items
-   * that have not been requested yet, or all values if the result size is known.
+   * Returns a value with all iterated items. This method should always be called before single
+   * items have been requested. Otherwise, it might not return all items.
    * @param qc query context
-   * @return value
-   * @throws QueryException query exception
-   */
-  public final Value value(final QueryContext qc) throws QueryException {
-    return value(qc, null);
-  }
-
-  /**
-   * Returns a value with all iterated items. This method returns all items
-   * that have not been requested yet, or all values if the result size is known.
-   * @param qc query context
-   * @param expr expression (can be {@code null})
+   * @param expr original expression (can be {@code null}; if assigned,
+   *   type of result sequence will be refined)
    * @return value
    * @throws QueryException query exception
    */

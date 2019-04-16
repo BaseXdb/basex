@@ -32,7 +32,7 @@ public final class ServerQuery extends Job {
   /** Parsing flag. */
   private boolean parsed;
   /** Query info. */
-  private StringBuilder info = new StringBuilder();
+  private final StringBuilder info = new StringBuilder();
 
   /**
    * Constructor.

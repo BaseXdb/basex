@@ -24,13 +24,13 @@ import org.basex.query.value.type.*;
 public final class FnSort extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Value value = exprs[0].value(qc), v = value(value);
+    final Value value = exprs[0].value(qc), v = quickValue(value);
     return v != null ? v.iter() : iter(value, qc);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = exprs[0].value(qc), v = value(value);
+    final Value value = exprs[0].value(qc), v = quickValue(value);
     return v != null ? v : iter(value, qc).value(qc, this);
   }
 
@@ -38,7 +38,7 @@ public final class FnSort extends StandardFunc {
    * Sort the input data and returns an iterator.
    * @param value value
    * @param qc query context
-   * @return item order
+   * @return iterator with ordered items
    * @throws QueryException query exception
    */
   private Iter iter(final Value value, final QueryContext qc) throws QueryException {
@@ -116,7 +116,7 @@ public final class FnSort extends StandardFunc {
     if(st1.zero()) return expr1;
 
     if(expr1 instanceof Value) {
-      final Value value = value((Value) expr1);
+      final Value value = quickValue((Value) expr1);
       if(value != null) return value;
     }
     if(exprs.length == 3) {
@@ -131,7 +131,7 @@ public final class FnSort extends StandardFunc {
    * @param value value
    * @return sorted value or {@code null}
    */
-  private Value value(final Value value) {
+  private Value quickValue(final Value value) {
     if(exprs.length < 2) {
       // range values
       if(value instanceof RangeSeq) {
@@ -142,7 +142,7 @@ public final class FnSort extends StandardFunc {
       final SeqType st = value.seqType();
       if(st.type.isSortable() && (st.one() || value instanceof SingletonSeq)) return value;
     }
-    // no pre-evaluation possible
+    // no quick evaluation possible
     return null;
   }
 }

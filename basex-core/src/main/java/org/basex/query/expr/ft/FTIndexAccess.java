@@ -60,7 +60,7 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return refinedValue(qc);
+    return iter(qc).value(qc, this);
   }
 
   @Override

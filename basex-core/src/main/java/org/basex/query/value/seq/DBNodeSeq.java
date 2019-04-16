@@ -148,7 +148,7 @@ public class DBNodeSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final int[] pres, final Data data, final Expr expr) {
-    return get(pres, data, expr != null ? expr.seqType().type : null, false);
+    return get(pres, data, NodeType.NOD.refine(expr), false);
   }
 
   /**

@@ -33,7 +33,7 @@ public final class DbListDetails extends DbList {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // overwrites implementation of the super class
-    return refinedValue(qc);
+    return iter(qc).value(qc, this);
   }
 
   /**

@@ -186,7 +186,7 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public Seq refineType(final Expr expr) {
+  public final Seq refineType(final Expr expr) {
     final Type t = expr.seqType().type.intersect(type);
     if(t != null) type = t;
     return this;

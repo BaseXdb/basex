@@ -33,7 +33,7 @@ public final class FtTokens extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return refinedValue(qc);
+    return iter(qc).value(qc, this);
   }
 
   @Override

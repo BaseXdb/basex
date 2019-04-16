@@ -92,7 +92,7 @@ public abstract class JavaCall extends Arr {
 
     if(object == null) return Empty.VALUE;
     if(object instanceof Value) return (Value) object;
-    if(object instanceof Iter) return ((Iter) object).value(qc);
+    if(object instanceof Iter) return ((Iter) object).value(qc, null);
     // find XQuery mapping for specified type
     final Type type = type(object);
     if(type != null) return type.cast(object, qc, sc, null);

@@ -32,20 +32,12 @@ public final class MixedPath extends Path {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    Iter iter;
-    long size;
-    if(root != null) {
-      final Iter rt = root.iter(qc);
-      final long sz = rt.size();
-      if(sz >= 0) {
-        iter = rt;
-        size = sz;
-      } else {
-        iter = rt.value(qc).iter();
-        size = iter.size();
-      }
-    } else {
-      iter = ctxValue(qc).iter();
+    final Expr rt = root != null ? root : ctxValue(qc);
+    Iter iter = rt.iter(qc);
+    long size = iter.size();
+    // if result size is unknown, root is fully evaluated (required for requests on query focus)
+    if(size < 0) {
+      iter = iter.value(qc, rt).iter();
       size = iter.size();
     }
 
@@ -76,10 +68,10 @@ public final class MixedPath extends Path {
           focus.pos++;
         }
 
-        final Value value = items.value(this);
+        final Value value = items.value(step);
         if(value.isEmpty()) {
           // all results are nodes: create new iterator
-          iter = nodes.value(this).iter();
+          iter = nodes.value(step).iter();
         } else {
           // raise error if this is not the final result
           if(s + 1 < sl)
@@ -98,7 +90,7 @@ public final class MixedPath extends Path {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return refinedValue(qc);
+    return iter(qc).value(qc, this);
   }
 
   @Override

@@ -28,7 +28,7 @@ public class IndexTexts extends IndexFn {
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    return refinedValue(qc);
+    return iter(qc).value(qc, this);
   }
 
   /**

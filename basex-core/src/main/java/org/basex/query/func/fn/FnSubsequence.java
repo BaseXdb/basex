@@ -84,10 +84,10 @@ public class FnSubsequence extends StandardFunc {
     if(sr == ALL) return expr.value(qc);
     final Iter iter = expr.iter(qc);
 
-    // take fast route if result size is known
     final long size = sr.adjust(iter.size());
     if(sr.length == 0) return Empty.VALUE;
 
+    // take fast route if result size is known
     if(size != -1) {
       // return subsequence if iterator is value-based
       final Value value = iter.iterValue();

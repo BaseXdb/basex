@@ -78,10 +78,9 @@ abstract class Logical extends Arr {
 
     // remove duplicate entries
     list = new ExprList(exprs.length);
-    for(int e = 0; e < exprs.length; e++) {
-      final Expr expr = exprs[e];
+    for(final Expr expr : exprs) {
       if(list.contains(expr) && !expr.has(Flag.NDT)) {
-        cc.info(OPTREMOVE_X_X, exprs[e], (Supplier<?>) this::description);
+        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else {
         list.add(expr);
       }

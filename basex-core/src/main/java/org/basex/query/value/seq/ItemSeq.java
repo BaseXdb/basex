@@ -11,7 +11,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Node sequence.
+ * Flat item sequence.
  *
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
@@ -92,7 +92,7 @@ public final class ItemSeq extends Seq {
    * Creates a typed sequence with the items of the specified values.
    * @param size size of resulting sequence
    * @param values values
-   * @param type type (can be {@code null})
+   * @param type type (can be {@code null}, only considered if new sequence is created)
    * @return value
    */
   public static Value get(final Item[] values, final int size, final Type type) {
@@ -104,7 +104,7 @@ public final class ItemSeq extends Seq {
    * Creates a typed sequence with the items of the specified values.
    * @param size size of resulting sequence
    * @param values values
-   * @param expr expression (can be {@code null})
+   * @param expr expression (can be {@code null}, only considered if new sequence is created)
    * @return value
    */
   public static Value get(final Item[] values, final int size, final Expr expr) {

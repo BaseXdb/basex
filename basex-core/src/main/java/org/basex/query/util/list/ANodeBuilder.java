@@ -61,15 +61,14 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
 
     final int sz = size;
     final ANode[] nodes = finish();
-    final Type type = NodeType.NOD.refine(expr);
 
     // create standard sequence
-    if(data == null) return ItemSeq.get(nodes, sz, type);
+    if(data == null) return ItemSeq.get(nodes, sz, NodeType.NOD.refine(expr));
 
     // same database: create compact sequence
     final int[] pres = new int[sz];
     for(int l = 0; l < sz; l++) pres[l] = ((DBNode) nodes[l]).pre();
-    return DBNodeSeq.get(pres, data, type, false);
+    return DBNodeSeq.get(pres, data, expr);
   }
 
   /**
