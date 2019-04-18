@@ -48,8 +48,8 @@ public final class AdminLogs extends AdminFn {
             final ElementNodes<LogEntry>.NodeIterator iter2 = iter.copy();
             while(iter2.hasNext()) {
               final LogEntry l2 = iter2.next();
-              if(l1.address.equals(l2.address) && (l2.type.matches("^\\d+$")) ||
-                  Strings.eq(l2.type, LogType.OK.name(), LogType.ERROR.name())) {
+              if(l1.address.equals(l2.address) && (l2.type.matches("^\\d+$") ||
+                  Strings.eq(l2.type, LogType.OK.name(), LogType.ERROR.name()))) {
                 l1.type = l2.type;
                 l1.ms = l1.ms.add(l2.ms);
                 if(!l2.message.isEmpty()) l1.message += "; " + l2.message;
