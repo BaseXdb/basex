@@ -170,7 +170,7 @@ public final class TypeswitchGroup extends Single {
     if(this == obj) return true;
     if(!(obj instanceof TypeswitchGroup)) return false;
     final TypeswitchGroup tg = (TypeswitchGroup) obj;
-    return Array.equals(types, tg.types) && var.equals(tg.var) && super.equals(obj);
+    return Array.equals(types, tg.types) && Objects.equals(var, tg.var) && super.equals(obj);
   }
 
   @Override
