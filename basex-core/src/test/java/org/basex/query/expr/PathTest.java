@@ -258,4 +258,11 @@ public final class PathTest extends SandboxTest {
     query(".[/a]", "<a/>");
     query(".[/b]", "<b/>");
   }
+
+  /**
+   * Path to map rewritings.
+   */
+  @Test public void pathToMap() {
+    query("<a/>[./name()]", "<a/>");
+  }
 }
