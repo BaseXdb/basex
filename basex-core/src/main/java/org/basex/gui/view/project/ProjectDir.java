@@ -35,9 +35,11 @@ final class ProjectDir extends ProjectNode {
   @Override
   void expand() {
     final ArrayList<IOFile> newDirs = new ArrayList<>(), newFiles = new ArrayList<>();
-    final boolean hidden = view.gui.gopts.get(GUIOptions.HIDDENFILES);
+    final boolean showHidden = view.gui.gopts.get(GUIOptions.SHOWHIDDEN);
     for(final IOFile child : file.children()) {
-      if(hidden || !child.file().isHidden()) (child.isDir() ? newDirs : newFiles).add(child);
+      if(showHidden || !(child.name().startsWith(".") && child.file().isHidden())) {
+        (child.isDir() ? newDirs : newFiles).add(child);
+      }
     }
     newDirs.sort(COMP);
     newFiles.sort(COMP);

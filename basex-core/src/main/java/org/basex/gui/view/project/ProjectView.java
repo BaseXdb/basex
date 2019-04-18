@@ -26,7 +26,7 @@ import org.basex.util.*;
  */
 public final class ProjectView extends BaseXPanel {
   /** Cached file paths. */
-  final ProjectFiles files = new ProjectFiles();
+  final ProjectFiles files;
   /** Root directory. */
   final ProjectDir root;
   /** Tree. */
@@ -56,6 +56,8 @@ public final class ProjectView extends BaseXPanel {
   public ProjectView(final EditorView ev) {
     super(ev.gui);
     setLayout(new BorderLayout());
+
+    files = new ProjectFiles(this);
 
     final String project = gui.gopts.get(GUIOptions.PROJECTPATH);
     final IOFile dir = new IOFile(project.isEmpty() ? Prop.HOMEDIR : project).normalize();

@@ -146,8 +146,8 @@ public final class GUIOptions extends Options {
   public static final BooleanOption AUTO = new BooleanOption("AUTO", true);
   /** Default file filter. */
   public static final StringOption FILES = new StringOption("FILES", "*.xml, *.xq*");
-  /** Flag for activated project structure. */
-  public static final BooleanOption HIDDENFILES = new BooleanOption("HIDDENFILES", true);
+  /** Show hidden files. */
+  public static final BooleanOption SHOWHIDDEN = new BooleanOption("SHOWHIDDEN", false);
 
   /** Current input mode in global text field (Search, XQuery, Command). */
   public static final NumberOption SEARCHMODE = new NumberOption("SEARCHMODE", 0);

@@ -1,10 +1,13 @@
 package org.basex.gui.view.project;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
+import java.util.function.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
+import org.basex.gui.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
@@ -25,10 +28,21 @@ final class ProjectFiles {
   /** Filter id. */
   private static long filterId;
 
+  /** Project view. */
+  private final ProjectView view;
+
   /** Files with errors. */
   private TreeMap<String, InputInfo> errors = new TreeMap<>();
   /** Current file cache (can be {@code null}). */
   private ProjectCache cache;
+
+  /**
+   * Project files.
+   * @param view project view
+   */
+  ProjectFiles(final ProjectView view) {
+    this.view = view;
+  }
 
   /**
    * Invalidates the file cache.
@@ -139,9 +153,8 @@ final class ProjectFiles {
     final ProjectCache pc = cache;
     if(pc == null) {
       // no file cache available: create and return new one
-      cache = new ProjectCache();
-      add(root, cache);
-      cache.finish();
+      cache = new ProjectCache(!view.gui.gopts.get(GUIOptions.SHOWHIDDEN));
+      cache.scan(Paths.get(root.path()), (Predicate<ProjectCache>) p -> p != cache);
     } else {
       // wait until file cache is initialized
       while(!pc.valid()) {
@@ -152,29 +165,6 @@ final class ProjectFiles {
     }
     // return existing file cache
     return cache;
-  }
-
-  /**
-   * Recursively populates the cache.
-   * @param root root directory
-   * @param pc file cache
-   * @throws InterruptedException interruption
-   */
-  private void add(final IOFile root, final ProjectCache pc) throws InterruptedException {
-    // check if file cache was replaced or invalidated
-    if(pc != cache) throw new InterruptedException();
-
-    final IOFile[] files = root.children();
-    for(final IOFile file : files) {
-      if(file.name().equals(IO.IGNORESUFFIX)) return;
-    }
-    for(final IOFile file : files) {
-      if(file.isDir()) {
-        add(file, pc);
-      } else {
-        pc.add(file.path());
-      }
-    }
   }
 
   /**

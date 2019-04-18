@@ -59,7 +59,7 @@ final class DialogEditorPrefs extends BaseXBack {
     saverun = new BaseXCheckBox(dialog, SAVE_BEFORE_EXECUTE, GUIOptions.SAVERUN, gopts);
     parseproj = new BaseXCheckBox(dialog, PARSE_PROJECT_FILES, GUIOptions.PARSEPROJ, gopts);
     files = new BaseXTextField(dialog, GUIOptions.FILES, gopts);
-    showHidden = new BaseXCheckBox(dialog, SHOW_HIDDEN_FILES, GUIOptions.HIDDENFILES, gopts);
+    showHidden = new BaseXCheckBox(dialog, SHOW_HIDDEN_FILES, GUIOptions.SHOWHIDDEN, gopts);
     margin.setColumns(4);
     indent.setColumns(3);
     files.setColumns(18);
