@@ -3,6 +3,7 @@ package org.basex.query.func.prof;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -19,7 +20,12 @@ public final class ProfVoid extends StandardFunc {
     final Iter iter = exprs[0].iter(qc);
 
     // caches items; ensures that lazy items will be evaluated
-    for(Item item; (item = qc.next(iter)) != null;) item.cache(false, info);
+    final Value value = iter.iterValue();
+    if(value == null) {
+      for(Item item; (item = qc.next(iter)) != null;) item.cache(false, info);
+    } else {
+      value.cache(false, ii);
+    }
     return Empty.VALUE;
   }
 }
