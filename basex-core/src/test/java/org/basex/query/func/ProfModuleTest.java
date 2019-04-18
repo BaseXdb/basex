@@ -32,7 +32,7 @@ public final class ProfModuleTest extends SandboxTest {
   @Test public void track() {
     final Function func = _PROF_TRACK;
     query(func.args(" ()"));
-    query("exists(" + func.args("A") + "?memory)", "true");
+    query("exists(" + func.args("A") + "?memory)", "false");
     query("exists(" + func.args("A") + "?time)", "true");
     query("exists(" + func.args("A") + "?value)", "true");
     query("count(" + func.args("A") + "?*)", "3");
