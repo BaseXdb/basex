@@ -83,12 +83,16 @@ function dba:files(
             let $dir := file:is-dir($file)
             let $name := file:name($file)
             order by $dir descending, $name != '..', $name collation '?lang=en'
+
+            (: skip files without access permissions :)
+            for $modified in try { file:last-modified($file) } catch * { }
+            let $size := file:size($file)
             return map {
               'name': function() {
                 if($dir) then html:link($name, 'dir-change', map { 'dir': $name }) else $name
               },
-              'date': file:last-modified($file),
-              'bytes': file:size($file),
+              'date': $modified,
+              'bytes': $size,
               'action': function() {
                 util:item-join(
                   if($dir) then () else (
