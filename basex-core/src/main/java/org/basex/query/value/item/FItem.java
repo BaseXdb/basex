@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -54,7 +55,7 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public final FItem refineType(final Expr expr) {
+  public FItem refineType(final Expr expr) {
     // type refinement is mostly relevant for maps and arrays
     final SeqType et = expr.seqType(), rt = seqType();
     if(et.refinable(rt)) {

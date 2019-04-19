@@ -3,7 +3,9 @@ package org.basex.query.value.array;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -18,6 +20,11 @@ final class EmptyArray extends XQArray {
 
   /** Hidden constructor. */
   private EmptyArray() {
+  }
+
+  @Override
+  public FItem refineType(final Expr expr) {
+    return this;
   }
 
   @Override

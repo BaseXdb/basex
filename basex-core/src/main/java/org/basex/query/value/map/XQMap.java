@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -48,6 +49,11 @@ public final class XQMap extends XQData {
   @Override
   public FuncType funcType() {
     return MapType.get(AtomType.AAT, SeqType.ITEM_ZM);
+  }
+
+  @Override
+  public FItem refineType(final Expr expr) {
+    return root.size == 0 ? this : super.refineType(expr);
   }
 
   @Override
