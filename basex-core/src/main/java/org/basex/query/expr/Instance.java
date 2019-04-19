@@ -17,17 +17,17 @@ import org.basex.util.hash.*;
  */
 public final class Instance extends Single {
   /** Sequence type to check for. */
-  private final SeqType instType;
+  private final SeqType seqType;
 
   /**
    * Constructor.
    * @param info input info
    * @param expr expression
-   * @param instType sequence type to check for
+   * @param seqType sequence type to check for
    */
-  public Instance(final InputInfo info, final Expr expr, final SeqType instType) {
+  public Instance(final InputInfo info, final Expr expr, final SeqType seqType) {
     super(info, expr, SeqType.BLN_O);
-    this.instType = instType;
+    this.seqType = seqType;
   }
 
   @Override
@@ -37,32 +37,32 @@ public final class Instance extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    return expr.seqType().instanceOf(instType) ? cc.replaceWith(this, Bln.TRUE) : this;
+    return expr.seqType().instanceOf(seqType) ? cc.replaceWith(this, Bln.TRUE) : this;
   }
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(instType.instance(expr.value(qc)));
+    return Bln.get(seqType.instance(expr.value(qc)));
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Instance(info, expr.copy(cc, vm), instType);
+    return new Instance(info, expr.copy(cc, vm), seqType);
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Instance && instType.eq(((Instance) obj).instType) &&
+    return this == obj || obj instanceof Instance && seqType.eq(((Instance) obj).seqType) &&
         super.equals(obj);
   }
 
   @Override
   public void plan(final QueryPlan plan) {
-    plan.add(plan.create(this, OF, instType), expr);
+    plan.add(plan.create(this, OF, seqType), expr);
   }
 
   @Override
   public String toString() {
-    return Util.info("% instance of %", expr, instType);
+    return Util.info("% instance of %", expr, seqType);
   }
 }

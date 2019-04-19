@@ -20,20 +20,20 @@ public final class Castable extends Single {
   /** Static context. */
   private final StaticContext sc;
   /** Sequence type to check for. */
-  private final SeqType castType;
+  private final SeqType seqType;
 
   /**
    * Constructor.
    * @param sc static context
    * @param info input info
    * @param expr expression
-   * @param castType sequence type to check for
+   * @param seqType sequence type to check
    */
   public Castable(final StaticContext sc, final InputInfo info, final Expr expr,
-      final SeqType castType) {
+      final SeqType seqType) {
     super(info, expr, SeqType.BLN_O);
     this.sc = sc;
-    this.castType = castType;
+    this.seqType = seqType;
   }
 
   @Override
@@ -43,35 +43,35 @@ public final class Castable extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    return expr.seqType().instanceOf(castType) ? cc.replaceWith(this, Bln.TRUE) : this;
+    return expr.seqType().instanceOf(seqType) ? cc.replaceWith(this, Bln.TRUE) : this;
   }
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value value = expr.value(qc);
     final long size = value.size();
-    return Bln.get(castType.occ.check(size) &&
-        (size == 0 || castType.cast((Item) value, false, qc, sc, info) != null));
+    return Bln.get(seqType.occ.check(size) &&
+        (size == 0 || seqType.cast((Item) value, false, qc, sc, info) != null));
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Castable(sc, info, expr.copy(cc, vm), castType);
+    return new Castable(sc, info, expr.copy(cc, vm), seqType);
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Castable && castType.eq(((Castable) obj).castType) &&
+    return this == obj || obj instanceof Castable && seqType.eq(((Castable) obj).seqType) &&
         super.equals(obj);
   }
 
   @Override
   public void plan(final QueryPlan plan) {
-    plan.add(plan.create(this, AS, castType), expr);
+    plan.add(plan.create(this, AS, seqType), expr);
   }
 
   @Override
   public String toString() {
-    return expr + " " + CASTABLE + ' ' + AS + ' ' + castType;
+    return expr + " " + CASTABLE + ' ' + AS + ' ' + seqType;
   }
 }
