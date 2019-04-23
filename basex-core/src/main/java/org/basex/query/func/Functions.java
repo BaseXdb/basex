@@ -346,8 +346,8 @@ public final class Functions {
     // type constructors
     if(eq(name.uri(), XS_URI)) {
       final Type type = getCast(name, args.length, ii);
-      final SeqType to = SeqType.get(type, Occ.ZERO_ONE);
-      return new Cast(sc, ii, args[0], to);
+      final SeqType st = SeqType.get(type, Occ.ZERO_ONE);
+      return new Cast(sc, ii, args[0], st);
     }
 
     // built-in functions

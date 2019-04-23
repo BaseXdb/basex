@@ -423,7 +423,7 @@ public interface QueryText {
   /** Optimization info. */ String OPTREMOVE_X_X = "remove % from %";
   /** Optimization info. */ String OPTWHERE = "rewrite where clause(s)";
   /** Optimization info. */ String OPTPRED_X = "rewrite % to predicate(s)";
-  /** Optimization info. */ String OPTVAR_X = "remove variable %";
+  /** Optimization info. */ String OPTVAR_X = "remove unused variable %";
   /** Optimization info. */ String OPTNAME_X = "remove unknown element/attribute %";
   /** Optimization info. */ String OPTPATH_X = "remove non-existing path %";
   /** Optimization info. */ String OPTINDEX_X_X = "apply % index for %";

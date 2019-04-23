@@ -43,6 +43,15 @@ public enum Occ {
   }
 
   /**
+   * Checks if this occurrence indicator could be an instance of the given one.
+   * @param other other occurrence indicator
+   * @return result of check
+   */
+  public boolean couldBe(final Occ other) {
+    return intersect(other) != null;
+  }
+
+  /**
    * Computes the intersection between this occurrence indicator and the given one.
    * If none exists (e.g. between {@link #ZERO} and {@link #ONE}), {@code null} is returned.
    * @param other other occurrence indicator

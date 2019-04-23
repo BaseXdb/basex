@@ -301,12 +301,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       checked = declType.instance(value) ? value :
         declType.promote(value, null, qc, vs.sc, info, false);
     } else {
-      // check at each call
-      if(argType.type.instanceOf(declType.type) && !body.has(Flag.NDT)) {
-        // reject impossible arities
-        final Occ occ = argType.occ.intersect(declType.occ);
-        if(occ == null) throw typeError(body, declType, null, info);
-      }
+      // check at each call: reject impossible arities
+      if(argType.type.instanceOf(declType.type) && !argType.occ.couldBe(declType.occ) &&
+          !body.has(Flag.NDT)) throw typeError(body, declType, null, info);
+
       checked = new TypeCheck(vs.sc, info, body, declType, true);
     }
 

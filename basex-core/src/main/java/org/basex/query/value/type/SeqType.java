@@ -442,25 +442,25 @@ public final class SeqType {
    * @return result of check
    */
   public boolean promotable(final SeqType st) {
-    if(intersect(st) != null) return true;
-    if(occ.intersect(st.occ) == null) return false;
-    final Type to = st.type;
-    if(to instanceof AtomType) {
-      if(type.isUntyped()) return !to.nsSensitive();
-      return to == AtomType.DBL && (couldBe(AtomType.FLT) || couldBe(AtomType.DEC))
-          || to == AtomType.FLT && couldBe(AtomType.DEC)
-          || to == AtomType.STR && couldBe(AtomType.URI);
+    if(couldBe(st)) return true;
+    if(!occ.couldBe(st.occ)) return false;
+    final Type tp = st.type;
+    if(tp instanceof AtomType) {
+      if(type.isUntyped()) return !tp.nsSensitive();
+      return tp == AtomType.DBL && (type.couldBe(AtomType.FLT) || type.couldBe(AtomType.DEC))
+          || tp == AtomType.FLT && type.couldBe(AtomType.DEC)
+          || tp == AtomType.STR && type.couldBe(AtomType.URI);
     }
     return st.type instanceof FuncType && type instanceof FuncType;
   }
 
   /**
-   * Checks if this type's item type could be instance of the given one.
-   * @param tp other type
+   * Checks if this type could be an instance of the given one.
+   * @param st sequence type
    * @return result of check
    */
-  private boolean couldBe(final Type tp) {
-    return type.intersect(tp) != null;
+  public boolean couldBe(final SeqType st) {
+    return intersect(st) != null;
   }
 
   /**

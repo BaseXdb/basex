@@ -144,8 +144,7 @@ public final class Var extends ExprInfo {
       throws QueryException {
 
     if(declType != null) {
-      if(declType.occ.intersect(st.occ) == null)
-        throw typeError(st, declType, name, info);
+      if(!declType.occ.couldBe(st.occ)) throw typeError(st, declType, name, info);
       if(st.instanceOf(declType)) {
         if(cc != null) cc.info(QueryText.OPTTYPE_X, this);
         declType = null;
