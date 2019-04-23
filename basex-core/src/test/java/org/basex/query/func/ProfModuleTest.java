@@ -35,7 +35,7 @@ public final class ProfModuleTest extends SandboxTest {
     query("exists(" + func.args("A") + "?memory)", "false");
     query("exists(" + func.args("A") + "?time)", "true");
     query("exists(" + func.args("A") + "?value)", "true");
-    query("count(" + func.args("A") + "?*)", "3");
+    query("count(" + func.args("A") + "?*)", 2);
     query("empty(" + func.args("A",
         " map { 'memory': false(), 'time': false(), 'value': false() }") + "?*)", "true");
   }
