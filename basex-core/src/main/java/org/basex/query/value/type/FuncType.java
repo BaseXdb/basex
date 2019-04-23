@@ -126,17 +126,24 @@ public class FuncType implements Type {
 
   @Override
   public boolean instanceOf(final Type type) {
-    // the only non-function super-type of function is item()
-    if(type == AtomType.ITEM || type == SeqType.ANY_FUNC) return true;
-    if(!(type instanceof FuncType) || type instanceof MapType || type instanceof ArrayType ||
-        this == SeqType.ANY_FUNC) return false;
+    return type == AtomType.ITEM || type == SeqType.ANY_FUNC || this != SeqType.ANY_FUNC &&
+      type instanceof FuncType && !(type instanceof MapType || type instanceof ArrayType) &&
+      instanceOf((FuncType) type, this);
+  }
 
-    final FuncType ft = (FuncType) type;
-    final int al = argTypes.length;
-    if(al != ft.argTypes.length || !declType.instanceOf(ft.declType)) return false;
+  /**
+   * Checks if the current type is an instance of the specified function type.
+   * @param ft function type to be checked
+   * @param gt general function type
+   * @return result of check
+   */
+  protected final boolean instanceOf(final FuncType ft, final FuncType gt) {
+    if(!declType.instanceOf(ft.declType)) return false;
 
+    final int al = gt.argTypes.length;
+    if(al != ft.argTypes.length) return false;
     for(int a = 0; a < al; a++) {
-      if(!ft.argTypes[a].instanceOf(argTypes[a])) return false;
+      if(!ft.argTypes[a].instanceOf(gt.argTypes[a])) return false;
     }
     for(final Ann ann : ft.anns) {
       if(!anns.contains(ann)) return false;
