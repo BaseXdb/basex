@@ -17,7 +17,7 @@ final class RestXqSingleton {
   private static final Object MUTEX = new Object();
 
   /** Id of singleton function. */
-  private final String singleton;
+  private final String id;
   /** Query context. */
   private final QueryContext qc;
   /** HTTP session. */
@@ -26,12 +26,12 @@ final class RestXqSingleton {
   /**
    * Constructor for singleton functions.
    * @param conn HTTP connection
-   * @param singleton id of singleton function
+   * @param id id of singleton function
    * @param qc query context
    */
-  RestXqSingleton(final HTTPConnection conn, final String singleton, final QueryContext qc) {
+  RestXqSingleton(final HTTPConnection conn, final String id, final QueryContext qc) {
     this.qc = qc;
-    this.singleton = singleton;
+    this.id = id;
     session = conn.req.getSession();
     queue();
     register();
@@ -53,7 +53,7 @@ final class RestXqSingleton {
    */
   void register() {
     synchronized(MUTEX) {
-      session.setAttribute(singleton, qc);
+      session.setAttribute(id, qc);
     }
   }
 
@@ -62,7 +62,7 @@ final class RestXqSingleton {
    */
   void unregister() {
     synchronized(MUTEX) {
-      if(qc == qc()) session.removeAttribute(singleton);
+      if(qc == qc()) session.removeAttribute(id);
     }
   }
 
@@ -72,7 +72,7 @@ final class RestXqSingleton {
    */
   private QueryContext qc() {
     synchronized(MUTEX) {
-      final Object obj = session.getAttribute(singleton);
+      final Object obj = session.getAttribute(id);
       return obj instanceof QueryContext ? (QueryContext) obj : null;
     }
   }

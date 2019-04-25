@@ -35,7 +35,7 @@ public abstract class WebResponse {
    * Creates the Response.
    * @param function function to be evaluated
    * @param data additional data (result, function, error, can be {@code null})
-   * @return result flag (ignored)
+   * @return {@code true} if response was created
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    * @throws ServletException servlet exception
@@ -81,7 +81,7 @@ public abstract class WebResponse {
 
   /**
    * Serializes the response.
-   * @return {@code true} if data was serialized
+   * @return {@code true} if response was created
    * @throws QueryException query exception
    * @throws IOException I/O exception
    * @throws ServletException servlet exception

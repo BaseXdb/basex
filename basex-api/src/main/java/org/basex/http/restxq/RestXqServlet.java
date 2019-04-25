@@ -46,7 +46,7 @@ public final class RestXqServlet extends BaseXServlet {
     final RestXqResponse response = new RestXqResponse(conn);
     try {
       for(final RestXqFunction check : modules.checks(conn)) {
-        // skip further checks if function results a result
+        // skip further checks if function produces a response
         if(response.create(check, func)) return;
       }
 

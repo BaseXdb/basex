@@ -32,8 +32,6 @@ public final class RestXqResponse extends WebResponse {
 
   /** Function. */
   private RestXqFunction func;
-  /** Output stream. */
-  private OutputStream out;
   /** Status message. */
   private String message;
   /** Status code. */
@@ -63,40 +61,60 @@ public final class RestXqResponse extends WebResponse {
 
   @Override
   public boolean serialize() throws QueryException, IOException, ServletException {
-    final String sngl = func.singleton;
-    final RestXqSingleton singleton = sngl != null ? new RestXqSingleton(conn, sngl, qc) : null;
+    final String id = func.singleton;
+    final RestXqSingleton singleton = id != null ? new RestXqSingleton(conn, id, qc) : null;
     String redirect = null, forward = null;
+    OutputStream out = null;
+    boolean response;
 
     qc.register(ctx);
     try {
       // evaluate query
       final Iter iter = qc.iter();
-      // handle response element
-      final Item first = iter.next();
-      if(first instanceof ANode) {
-        final ANode node = (ANode) first;
+      Item item = iter.next();
+      response = item != null;
+
+      SerializerOptions so = func.output;
+      boolean head = true;
+
+      // handle special cases
+      if(item != null && item.type == NodeType.ELM) {
+        final ANode node = (ANode) item;
         if(REST_REDIRECT.eq(node)) {
           // send redirect to browser
           final ANode ch = node.children().next();
           if(ch == null || ch.type != NodeType.TXT) throw func.error(NO_VALUE_X, node.name());
           redirect = string(ch.string()).trim();
+          item = null;
         } else if(REST_FORWARD.eq(node)) {
           // server-side forwarding
           final ANode ch = node.children().next();
           if(ch == null || ch.type != NodeType.TXT) throw func.error(NO_VALUE_X, node.name());
           forward = string(ch.string()).trim();
+          item = null;
         } else if(REST_RESPONSE.eq(node)) {
           // custom response
-          build(node, iter);
-        } else {
-          // standard serialization
-          serialize(first, iter, false);
+          so = build(node);
+          item = iter.next();
+          head = item != null;
         }
-      } else {
-        // standard serialization (cache singleton requests)
-        serialize(first, iter, singleton != null);
       }
-      return first != null;
+      if(head && func.methods.size() == 1 && func.methods.contains(HttpMethod.HEAD.name()))
+        throw func.error(HEAD_METHOD);
+
+      // initialize serializer
+      conn.sopts(so);
+      conn.initResponse();
+      if(status != null) conn.status(status, message);
+
+      // serialize result
+      if(item != null) {
+        out = id != null ? new ArrayOutput() : conn.res.getOutputStream();
+        try(Serializer ser = Serializer.get(out, so)) {
+          for(; item != null; item = qc.next(iter)) ser.serialize(item);
+        }
+      }
+
     } finally {
       qc.close();
       qc.unregister(ctx);
@@ -108,19 +126,25 @@ public final class RestXqResponse extends WebResponse {
         conn.forward(forward);
       } else {
         qc.checkStop();
-        finish();
       }
     }
+
+    // write cached result
+    if(out instanceof ArrayOutput) {
+      final ArrayOutput ao = (ArrayOutput) out;
+      final int size = (int) ao.size();
+      if(size > 0) conn.res.getOutputStream().write(ao.buffer(), 0, size);
+    }
+    return response;
   }
 
   /**
    * Builds a response element and creates the serialization parameters.
    * @param response response element
-   * @param iter result iterator
+   * @return serialization parameters
    * @throws QueryException query exception (including unexpected ones)
-   * @throws IOException I/O exception
    */
-  private void build(final ANode response, final Iter iter) throws QueryException, IOException {
+  private SerializerOptions build(final ANode response) throws QueryException {
     // don't allow attributes
     final BasicNodeIter atts = response.attributes();
     final ANode attr = atts.next();
@@ -172,64 +196,6 @@ public final class RestXqResponse extends WebResponse {
     }
     // set content type and serialize data
     if(cType != null) sp.set(SerializerOptions.MEDIA_TYPE, cType);
-
-    final Item first = iter.next();
-    if(first != null) checkHead();
-    serialize(first, iter, sp, true);
-  }
-
-  /**
-   * Serializes the first and all remaining items.
-   * @param first first item
-   * @param iter iterator
-   * @param cache cache result
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
-   */
-  private void serialize(final Item first, final Iter iter, final boolean cache)
-      throws QueryException, IOException {
-    checkHead();
-    serialize(first, iter, func.output, cache);
-  }
-
-  /**
-   * Serializes the first and all remaining items.
-   * @param first first item
-   * @param iter iterator
-   * @param sp serialization parameters
-   * @param cache cache result
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
-   */
-  private void serialize(final Item first, final Iter iter, final SerializerOptions sp,
-      final boolean cache) throws QueryException, IOException {
-    conn.sopts(sp);
-    conn.initResponse();
-    out = cache ? new ArrayOutput() : conn.res.getOutputStream();
-    Item item = first;
-    try(Serializer ser = Serializer.get(out, sp)) {
-      for(; item != null; item = qc.next(iter)) ser.serialize(item);
-    }
-  }
-
-  /**
-   * Checks if the HEAD method was specified.
-   * @throws QueryException query exception
-   */
-  private void checkHead() throws QueryException {
-    if(func.methods.size() == 1 && func.methods.contains(HttpMethod.HEAD.name()))
-      throw func.error(HEAD_METHOD);
-  }
-
-  /**
-   * Finalizes result generation.
-   * @throws IOException I/O exception
-   */
-  private void finish() throws IOException {
-    if(status != null) conn.status(status, message);
-    if(out instanceof ArrayOutput) {
-      final ArrayOutput ao = (ArrayOutput) out;
-      if(ao.size() > 0) conn.res.getOutputStream().write(ao.finish());
-    }
+    return sp;
   }
 }
