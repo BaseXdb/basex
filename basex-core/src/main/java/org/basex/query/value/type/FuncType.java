@@ -126,38 +126,30 @@ public class FuncType implements Type {
 
   @Override
   public boolean instanceOf(final Type type) {
-    return type == AtomType.ITEM || type == SeqType.ANY_FUNC || this != SeqType.ANY_FUNC &&
-      type instanceof FuncType && !(type instanceof MapType || type instanceof ArrayType) &&
-      instanceOf((FuncType) type, this);
-  }
+    if(type == AtomType.ITEM || type == SeqType.ANY_FUNC) return true;
+    if(this == SeqType.ANY_FUNC || !(type instanceof FuncType) || type instanceof MapType ||
+        type instanceof ArrayType) return false;
 
-  /**
-   * Checks if the current type is an instance of the specified function type.
-   * @param ft function type to be checked
-   * @param gt general function type
-   * @return result of check
-   */
-  protected final boolean instanceOf(final FuncType ft, final FuncType gt) {
-    if(!declType.instanceOf(ft.declType)) return false;
-
-    final int al = gt.argTypes.length;
+    final FuncType ft = (FuncType) type;
+    final int al = argTypes.length;
     if(al != ft.argTypes.length) return false;
     for(int a = 0; a < al; a++) {
-      if(!ft.argTypes[a].instanceOf(gt.argTypes[a])) return false;
+      if(!ft.argTypes[a].instanceOf(argTypes[a])) return false;
     }
     for(final Ann ann : ft.anns) {
       if(!anns.contains(ann)) return false;
     }
-    return true;
+    return declType.instanceOf(ft.declType);
   }
 
   @Override
   public Type union(final Type type) {
+    if(instanceOf(type)) return type;
+    if(type.instanceOf(this)) return this;
+
     if(!(type instanceof FuncType)) return AtomType.ITEM;
 
     final FuncType ft = (FuncType) type;
-    if(this == SeqType.ANY_FUNC || ft == SeqType.ANY_FUNC) return SeqType.ANY_FUNC;
-
     final int al = argTypes.length;
     if(al != ft.argTypes.length) return SeqType.ANY_FUNC;
 
@@ -166,31 +158,32 @@ public class FuncType implements Type {
       arg[a] = argTypes[a].intersect(ft.argTypes[a]);
       if(arg[a] == null) return SeqType.ANY_FUNC;
     }
-    return get(anns.union(ft.anns), declType.union(ft.declType), arg);
+
+    final AnnList an = anns.union(ft.anns);
+    final SeqType dt = declType.union(ft.declType);
+    return get(an, dt, arg);
   }
 
   @Override
   public Type intersect(final Type type) {
-    // ensure commutativity
-    if(type instanceof MapType || type instanceof ArrayType) return type.intersect(this);
-
-    // the easy cases
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
 
-    if(type instanceof FuncType) {
-      final FuncType ft = (FuncType) type;
-      // ANY_FUN is excluded by the easy cases
-      final SeqType dt = declType.intersect(ft.declType);
-      final int al = argTypes.length;
-      if(dt != null && al == ft.argTypes.length) {
-        final SeqType[] arg = new SeqType[al];
-        for(int a = 0; a < al; a++) arg[a] = argTypes[a].union(ft.argTypes[a]);
-        final AnnList list = anns.intersect(ft.anns);
-        return list == null ? null : get(list, dt, arg);
-      }
-    }
-    return null;
+    if(!(type instanceof FuncType)) return null;
+    if(type instanceof MapType || type instanceof ArrayType) return type.intersect(this);
+
+    final FuncType ft = (FuncType) type;
+    final int al = argTypes.length;
+    if(al != ft.argTypes.length) return null;
+
+    final AnnList an = anns.intersect(ft.anns);
+    if(an == null) return null;
+    final SeqType dt = declType.intersect(ft.declType);
+    if(dt == null) return null;
+
+    final SeqType[] arg = new SeqType[al];
+    for(int a = 0; a < al; a++) arg[a] = argTypes[a].union(ft.argTypes[a]);
+    return get(an, dt, arg);
   }
 
   /**

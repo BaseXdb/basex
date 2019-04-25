@@ -344,25 +344,19 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  protected boolean instanceOf(final FuncType ft, final boolean coerce) {
-    if(ft instanceof MapType) return false;
-    if(type.instanceOf(ft)) return true;
+  public boolean instanceOf(final Type tp) {
+    if(type.instanceOf(tp)) return true;
+    if(!(tp instanceof FuncType) || tp instanceof MapType) return false;
 
-    final SeqType[] at = ft.argTypes;
-    if(at != null && (at.length != 1 || !at[0].instanceOf(SeqType.ITR_O))) return false;
+    final FuncType ft = (FuncType) tp;
+    if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(SeqType.ITR_O)) return false;
 
-    final SeqType dt = ft.declType;
-    if(ft instanceof ArrayType) {
-      // no argument and return type: no check required
-      if(dt.eq(SeqType.ITEM_ZM)) return true;
-      // check types of members
-      for(final Value value : members()) {
-        if(!dt.instance(value)) return false;
-      }
-      return true;
-    }
-    // allow coercion
-    return coerce || dt.eq(SeqType.ITEM_ZM);
+    SeqType dt = ft.declType;
+    if(dt.eq(SeqType.ITEM_ZM)) return true;
+
+    // check types of members
+    for(final Value value : members()) if(!dt.instance(value)) return false;
+    return true;
   }
 
   @Override

@@ -5,7 +5,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -23,8 +22,7 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public FItem refineType(final Expr expr) {
-    return this;
+  public void refineType(final Expr expr) {
   }
 
   @Override

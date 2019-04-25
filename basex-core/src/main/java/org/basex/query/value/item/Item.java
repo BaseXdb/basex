@@ -13,6 +13,8 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -142,6 +144,7 @@ public abstract class Item extends Value {
 
   /**
    * Checks if this item is instance of the specified type.
+   * Overwritten by {@link XQMap} and {@link XQArray}.
    * @param tp type
    * @return result of check
    */
@@ -233,23 +236,35 @@ public abstract class Item extends Value {
     return length == 1 ? this : Empty.VALUE;
   }
 
-  // Overwritten by Lazy, XQMap and XQArray.
+  /**
+   * {@inheritDoc}
+   * Overwritten by {@link Lazy}, {@link XQMap} and {@link XQArray}.
+   */
   @Override
   public void cache(final boolean lazy, final InputInfo ii) throws QueryException { }
 
-  // Overwritten by XQArray, FuncItem and ANode
+  /**
+   * {@inheritDoc}
+   * Overwritten by {@link XQArray}, {@link FuncItem} and {@link ANode}.
+   */
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     return this;
   }
 
-  // Overwritten by XQArray, FuncItem and ANode
+  /**
+   * {@inheritDoc}
+   * Overwritten by {@link XQArray}, {@link FuncItem} and {@link ANode}.
+   */
   @Override
   public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
     return this;
   }
 
-  // Overwritten by XQArray
+  /**
+   * {@inheritDoc}
+   * Overwritten by {@link XQArray}.
+   */
   @Override
   public long atomSize() {
     return 1;
@@ -314,7 +329,7 @@ public abstract class Item extends Value {
 
   /**
    * Returns data model info.
-   * Overwritten by xs:QName, attribute() and document-node().
+   * Overwritten by {@link QNm}, {@link DBNode}, {@link FTxt} and {@link FDoc}.
    * @return type string
    */
   public byte[] xdmInfo() {
@@ -323,7 +338,7 @@ public abstract class Item extends Value {
 
   /**
    * Returns a type id.
-   * Overwritten by document-node() to check if document has an element as child.
+   * Overwritten by {@link DBNode} and {@link FDoc}.
    * @return type string
    */
   public ID typeId() {

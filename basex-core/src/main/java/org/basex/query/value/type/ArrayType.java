@@ -46,16 +46,24 @@ public final class ArrayType extends FuncType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    return instanceOf(type, true);
+    if(type == AtomType.ITEM || type == SeqType.ANY_FUNC || type == SeqType.ANY_ARRAY) return true;
+    if(!(type instanceof FuncType) || type instanceof MapType) return false;
+
+    final FuncType ft = (FuncType) type;
+    return declType.instanceOf(ft.declType) && (
+      type instanceof ArrayType ||
+      ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.ITR_O)
+    );
   }
 
   @Override
   public Type union(final Type type) {
-    if(instanceOf(type, false)) return type;
+    if(instanceOf(type)) return type;
+    if(type.instanceOf(this)) return this;
 
     if(type instanceof ArrayType) {
       final ArrayType at = (ArrayType) type;
-      return at.instanceOf(this, false) ? this : get(declType.union(at.declType));
+      return get(declType.union(at.declType));
     }
     return type instanceof MapType  ? SeqType.ANY_FUNC :
            type instanceof FuncType ? type.union(this) : AtomType.ITEM;
@@ -63,33 +71,19 @@ public final class ArrayType extends FuncType {
 
   @Override
   public Type intersect(final Type type) {
-    if(instanceOf(type, false)) return this;
+    if(instanceOf(type)) return this;
+    if(type.instanceOf(this)) return type;
 
-    if(type instanceof ArrayType) {
-      final ArrayType at = (ArrayType) type;
-      if(at.instanceOf(this, false)) return at;
-      final SeqType dt = declType.intersect(at.declType);
-      if(dt != null) return get(dt);
-    } else if(type instanceof FuncType) {
-      final FuncType ft = (FuncType) type;
-      if(ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.ITR_O)) {
-        final SeqType dt = declType.intersect(ft.declType);
-        if(dt != null) return get(dt);
-      }
-    }
-    return null;
-  }
+    if(!(type instanceof FuncType) || type instanceof MapType) return null;
 
-  /**
-   * Instance test.
-   * @param type type to be compared
-   * @param generic check against generic array type
-   * @return result of check
-   */
-  private boolean instanceOf(final Type type, final boolean generic) {
-    return type == AtomType.ITEM || type == SeqType.ANY_FUNC || type == SeqType.ANY_ARRAY ||
-        type instanceof FuncType && !(type instanceof MapType) &&
-        instanceOf((FuncType) type, generic ? SeqType.ANY_ARRAY : this);
+    final FuncType ft = (FuncType) type;
+    final SeqType dt = declType.intersect(ft.declType);
+    if(dt == null) return null;
+
+    if(type instanceof ArrayType) return get(dt);
+
+    return ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.ITR_O) ?
+      new FuncType(dt, ft.argTypes[0].union(SeqType.ITR_O)) : null;
   }
 
   /**

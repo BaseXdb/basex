@@ -66,11 +66,6 @@ public abstract class XQData extends FItem {
   }
 
   @Override
-  public final boolean instanceOf(final Type tp) {
-    return tp == AtomType.ITEM || tp instanceof FuncType && instanceOf((FuncType) tp, false);
-  }
-
-  @Override
   public final Value invokeValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
     return FuncCall.invoke(this, args, false, qc, ii);
@@ -85,8 +80,7 @@ public abstract class XQData extends FItem {
   @Override
   public final FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean optimize) throws QueryException {
-
-    if(instanceOf(ft, true)) return this;
+    if(instanceOf(ft)) return this;
     throw typeError(this, ft, ii);
   }
 
@@ -98,14 +92,6 @@ public abstract class XQData extends FItem {
    * @throws QueryException query exception
    */
   public abstract Value get(Item key, InputInfo ii) throws QueryException;
-
-  /**
-   * Checks if this is an instance of the specified type.
-   * @param ft type
-   * @param coerce coerce value
-   * @return result of check
-   */
-  protected abstract boolean instanceOf(FuncType ft, boolean coerce);
 
   /**
    * Returns a string representation of the item.

@@ -54,14 +54,13 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public FItem refineType(final Expr expr) {
+  public void refineType(final Expr expr) {
     // type refinement is mostly relevant for maps and arrays
     final SeqType et = expr.seqType(), rt = seqType();
     if(et.refinable(rt)) {
       final Type t = et.type.intersect(rt.type);
       if(t != null) type = t;
     }
-    return this;
   }
 
   /**

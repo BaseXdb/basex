@@ -4,6 +4,8 @@ import static org.basex.query.value.type.Occ.*;
 import static org.basex.query.value.type.SeqType.*;
 import static org.junit.Assert.*;
 
+import java.util.function.*;
+
 import org.basex.query.value.type.*;
 import org.junit.*;
 
@@ -80,6 +82,7 @@ public final class SeqTypeTest {
     final SeqType f = FuncType.get(DEC_ZO, BLN_O).seqType();
     assertFalse(f.instanceOf(ITR_O));
     assertTrue(f.instanceOf(ITEM_O));
+    assertTrue(f.instanceOf(FUNC_O));
     assertTrue(f.instanceOf(f));
     assertTrue(f.instanceOf(FUNC_ZO));
     assertFalse(FUNC_O.instanceOf(f));
@@ -96,7 +99,7 @@ public final class SeqTypeTest {
     assertTrue(m.instanceOf(MapType.get(AtomType.AAT, ITR_O)));
     assertTrue(m.instanceOf(MapType.get(AtomType.STR, ITR_O)));
     assertTrue(m.instanceOf(MapType.get(AtomType.STR, ITR_ZO)));
-    assertTrue(m.instanceOf(MapType.get(AtomType.ITR, ITEM_ZM)));
+    assertFalse(m.instanceOf(MapType.get(AtomType.ITR, ITEM_ZM)));
     assertFalse(m.instanceOf(ANY_ARRAY));
     assertFalse(m.instanceOf(MapType.get(AtomType.STR, BLN_O)));
 
@@ -123,23 +126,39 @@ public final class SeqTypeTest {
 
   /** Tests for {@link SeqType#union(SeqType)}. */
   @Test public void union() {
-    assertTrue(STR_O.union(ITR_O).eq(AAT_O));
-    assertTrue(STR_O.union(STR_O).eq(STR_O));
-    assertTrue(STR_O.union(ATT_O).eq(ITEM_O));
-    assertTrue(AtomType.NST.seqType().union(STR_O).eq(STR_O));
-    assertTrue(STR_O.union(AtomType.NST.seqType()).eq(STR_O));
-    assertTrue(STR_O.union(AtomType.JAVA.seqType()).eq(ITEM_O));
+    final BiFunction<SeqType, SeqType, SeqType> op = (s1, s2) -> s1.union(s2);
 
-    assertTrue(ATT_O.union(ELM_O).eq(NOD_O));
-    assertTrue(NOD_O.union(ELM_O).eq(NOD_O));
-    assertTrue(ELM_O.union(NOD_O).eq(NOD_O));
-    assertTrue(ELM_O.union(ELM_O).eq(ELM_O));
-    assertTrue(ELM_O.union(STR_O).eq(ITEM_O));
+    combine(EMP, op);
+    combine(STR_O, op);
+    combine(ITR_O, op);
+    combine(ATT_O, op);
+    combine(ITEM_O, op);
+    combine(AtomType.NST.seqType(), op);
+    combine(AtomType.JAVA.seqType(), op);
+    combine(ATT_O, op);
+    combine(ELM_O, op);
+    combine(NOD_O, op);
+
+    combine(STR_O, ITR_O, AAT_O, op);
+    combine(STR_O, STR_O, STR_O, op);
+    combine(STR_O, ATT_O, ITEM_O, op);
+    combine(AtomType.NST.seqType(), STR_O, STR_O, op);
+    combine(STR_O, AtomType.NST.seqType(), STR_O, op);
+    combine(STR_O, AtomType.JAVA.seqType(), ITEM_O, op);
+
+    combine(ATT_O, ELM_O, NOD_O, op);
+    combine(NOD_O, ELM_O, NOD_O, op);
+    combine(ELM_O, ELM_O, ELM_O, op);
+    combine(ELM_O, STR_O, ITEM_O, op);
+
+    combine(MAP_O, ITEM_O, ITEM_O, op);
+    combine(MAP_O, FUNC_O, FUNC_O, op);
+    combine(MAP_O, ARRAY_O, FUNC_O, op);
 
     // functions
     final SeqType
       // function(xs:boolean) as xs:decimal?
-      f = FuncType.get(DEC_ZO, BLN_O).seqType(),
+      f1 = FuncType.get(DEC_ZO, BLN_O).seqType(),
       // function(xs:boolean) as xs:nonNegativeInteger
       f2 = FuncType.get(AtomType.NNI.seqType(), BLN_O).seqType(),
       // function(xs:boolean, xs:boolean) as xs:nonNegativeInteger
@@ -149,66 +168,100 @@ public final class SeqTypeTest {
       // function(xs:boolean) as xs:integer
       f5 = FuncType.get(ITR_O, BLN_O).seqType();
 
-    union(f, ITR_O, ITEM_O);
-    union(f, FUNC_O, FUNC_O);
-    union(f2, f3, FUNC_O);
-    union(f2, f4, FUNC_O);
+    combine(f1, op);
+    combine(f2, op);
+    combine(f3, op);
+    combine(f4, op);
+    combine(f5, op);
+
+    combine(f1, ITR_O, ITEM_O, op);
+    combine(f1, FUNC_O, FUNC_O, op);
+    combine(f1, f2, f1, op);
+    combine(f1, f3, FUNC_O, op);
+    combine(f1, f4, FUNC_O, op);
+    combine(f1, f5, f1, op);
+    combine(f2, f3, FUNC_O, op);
+    combine(f2, f4, FUNC_O, op);
+    combine(f2, f5, f5, op);
+    combine(f3, f4, FUNC_O, op);
+    combine(f3, f5, FUNC_O, op);
+    combine(f4, f5, FUNC_O, op);
 
     final SeqType
       // map(xs:anyAtomicType, xs:integer)
-      m = MapType.get(AtomType.AAT, ITR_O).seqType(),
+      m1 = MapType.get(AtomType.AAT, ITR_O).seqType(),
       // map(xs:boolean, xs:integer)
-      m2 = MapType.get(AtomType.BLN, ITR_O).seqType();
+      m2 = MapType.get(AtomType.BLN, ITR_O).seqType(),
       // map(xs:boolean, xs:nonNegativeInteger)
-      //m3 = MapType.get(AtomType.BLN, AtomType.NNI.seqType()).seqType(),
+      m3 = MapType.get(AtomType.BLN, AtomType.NNI.seqType()).seqType(),
       // map(xs:integer, xs:integer)
-      //m4 = MapType.get(AtomType.ITR, ITR_O).seqType();
+      m4 = MapType.get(AtomType.ITR, ITR_O).seqType();
 
-    union(MAP_O, m, MAP_O);
-    union(m, ITR_O, ITEM_O);
-    union(m, f, f);
-    union(m, f2, f5);
-    union(m, m2, m2);
-    //union(m, m3, m2);
-    //union(m2, m4, FUNC_O);
+    combine(m1, op);
+    combine(m2, op);
+    combine(m3, op);
+    combine(m4, op);
+
+    combine(MAP_O, m1, MAP_O, op);
+    combine(m1, ITR_O, ITEM_O, op);
+    combine(m1, f1, f1, op);
+    combine(m1, f2, f5, op);
+    combine(m1, m2, m1, op);
+    combine(m1, m3, m1, op);
+    combine(m2, m4, m1, op);
 
     final SeqType
       // array(xs:integer)
-      a = ArrayType.get(ITR_O).seqType(),
+      a1 = ArrayType.get(ITR_O).seqType(),
       // array(xs:integer)
-      a2 = ArrayType.get(ITR_O).seqType(),
+      a2 = ArrayType.get(AAT_O).seqType(),
       // array(xs:nonNegativeInteger)
-      a3 = ArrayType.get(AtomType.NNI.seqType()).seqType();
-      // array(xs:integer)
-      //a4 = ArrayType.get(ITR_O).seqType();
+      a3 = ArrayType.get(AtomType.NNI.seqType()).seqType(),
+      // array(xs:boolean)
+      a4 = ArrayType.get(BLN_O).seqType();
 
-    union(ARRAY_O, a, ARRAY_O);
-    union(a, ITR_O, ITEM_O);
-    union(a, a2, a2);
-    union(a, a3, a2);
+    combine(a1, op);
+    combine(a2, op);
+    combine(a3, op);
+    combine(a4, op);
 
-    //union(a, f, f);
-    //union(a, f2, f5);
-    //union(a2, a4, FUNC_O);
-  }
-
-  /**
-   * Union test method.
-   * @param st1 one argument
-   * @param st2 other argument
-   * @param expected result
-   */
-  private static void union(final SeqType st1, final SeqType st2, final SeqType expected) {
-    eq(st1.union(st2), expected);
-    eq(st2.union(st1), expected);
+    combine(ARRAY_O, a1, ARRAY_O, op);
+    combine(a1, ITR_O, ITEM_O, op);
+    combine(a1, a2, a2, op);
+    combine(a1, a3, a1, op);
+    combine(a1, f1, FUNC_O, op);
+    combine(a1, f2, FUNC_O, op);
+    combine(a2, a4, a2, op);
   }
 
   /** Tests for {@link SeqType#intersect(SeqType)}. */
   @Test public void intersect() {
+    final BiFunction<SeqType, SeqType, SeqType> op = (s1, s2) -> s1.intersect(s2);
+
+    combine(EMP, op);
+    combine(STR_O, op);
+    combine(ITR_O, op);
+    combine(ATT_O, op);
+    combine(ITEM_O, op);
+    combine(AtomType.NST.seqType(), op);
+    combine(AtomType.JAVA.seqType(), op);
+    combine(ATT_O, op);
+    combine(ELM_O, op);
+    combine(NOD_O, op);
+
+    combine(EMP, ITEM_O, null, op);
+    combine(ATT_O, ATT_O, ATT_O, op);
+    combine(ATT_O, NOD_O, ATT_O, op);
+    combine(ATT_O, ELM_O, null, op);
+
+    combine(MAP_O, ITEM_O, MAP_O, op);
+    combine(MAP_O, FUNC_O, MAP_O, op);
+    combine(MAP_O, ARRAY_O, null, op);
+
     // functions
     final SeqType
       // function(xs:boolean) as xs:decimal?
-      f = FuncType.get(DEC_ZO, BLN_O).seqType(),
+      f1 = FuncType.get(DEC_ZO, BLN_O).seqType(),
       // function(xs:boolean) as xs:nonNegativeInteger
       f2 = FuncType.get(AtomType.NNI.seqType(), BLN_O).seqType(),
       // function(xs:boolean, xs:boolean) as xs:nonNegativeInteger
@@ -220,47 +273,53 @@ public final class SeqTypeTest {
       // function(xs:boolean) as xs:boolean
       f6 = FuncType.get(BLN_O, BLN_O).seqType();
 
-    intersect(get(AtomType.ITEM, ZERO), ITEM_O, null);
-    intersect(ATT_O, ATT_O, ATT_O);
-    intersect(ATT_O, NOD_O, ATT_O);
-    intersect(ATT_O, ELM_O, null);
-    intersect(NOD_O, ITR_O, null);
-    intersect(f, ITR_O, null);
-    intersect(f, f, f);
-    intersect(f, f2, f2);
-    intersect(f, f5, f5);
-    intersect(f, f4, FuncType.get(AtomType.NNI.seqType(), AAT_O).seqType());
-    intersect(f2, f3, null);
-    intersect(f5, f6, null);
+    combine(f1, op);
+    combine(f2, op);
+    combine(f3, op);
+    combine(f4, op);
+    combine(f5, op);
+    combine(f6, op);
+
+    combine(NOD_O, ITR_O, null, op);
+    combine(f1, ITR_O, null, op);
+    combine(f1, f1, f1, op);
+    combine(f1, f2, f2, op);
+    combine(f1, f5, f5, op);
+    combine(f1, f4, FuncType.get(AtomType.NNI.seqType(), AAT_O).seqType(), op);
+    combine(f2, f3, null, op);
+    combine(f5, f6, null, op);
 
     final SeqType
       // map(xs:anyAtomicType, xs:integer)
-      m = MapType.get(AtomType.AAT, ITR_O).seqType(),
+      m1 = MapType.get(AtomType.AAT, ITR_O).seqType(),
       // map(xs:boolean, xs:integer)
-      m2 = MapType.get(AtomType.BLN, ITR_O).seqType();
+      m2 = MapType.get(AtomType.BLN, ITR_O).seqType(),
       // map(xs:boolean, xs:nonNegativeInteger)
-      //m3 = MapType.get(AtomType.BLN, AtomType.NNI.seqType()).seqType(),
+      m3 = MapType.get(AtomType.BLN, AtomType.NNI.seqType()).seqType(),
       // map(xs:integer, xs:integer)
-      //m4 = MapType.get(AtomType.ITR, ITR_O).seqType();
+      m4 = MapType.get(AtomType.ITR, ITR_O).seqType();
 
-    intersect(m, f, m);
-    intersect(m, ITEM_O, m);
-    intersect(m, ITR_O, null);
-    intersect(m, m2, m);
-    intersect(m2, MapType.get(AtomType.BLN, BLN_O).seqType(), null);
-    intersect(m, FUNC_O, m);
-    intersect(m, f, m);
-    intersect(m, f3, null);
-    intersect(m, f6, null);
-    intersect(m, FuncType.get(ITR_O, ITEM_O).seqType(), null);
+    combine(m1, op);
+    combine(m2, op);
+    combine(m3, op);
+    combine(m4, op);
 
-    //intersect(m, m3, MapType.get(AtomType.AAT, AtomType.NNI.seqType()).seqType());
-    //intersect(m2, m4, m);
-    //intersect(m4, f5, m);
+    combine(m1, f1, m1, op);
+    combine(m1, ITEM_O, m1, op);
+    combine(m1, ITR_O, null, op);
+    combine(m1, m2, m2, op);
+    combine(m2, MapType.get(AtomType.BLN, BLN_O).seqType(), null, op);
+    combine(m1, FUNC_O, m1, op);
+    combine(m1, f3, null, op);
+    combine(m1, f6, null, op);
+    combine(m1, FuncType.get(ITR_O, ITEM_O).seqType(), null, op);
+    combine(m1, m3, MapType.get(AtomType.BLN, AtomType.NNI.seqType()).seqType(), op);
+    combine(m2, m4, null, op);
+    combine(m4, f5, m4, op);
 
     final SeqType
       // array(xs:integer)
-      a = ArrayType.get(ITR_O).seqType(),
+      a1 = ArrayType.get(ITR_O).seqType(),
       // array(xs:integer)
       a2 = ArrayType.get(ITR_O).seqType(),
       // array(xs:nonNegativeInteger)
@@ -268,43 +327,65 @@ public final class SeqTypeTest {
       // array(xs:integer)
       a4 = ArrayType.get(ITR_O).seqType();
 
-    intersect(a, ITEM_O, a);
-    intersect(a, ITR_O, null);
-    intersect(a, a2, a);
-    intersect(a, a3, ArrayType.get(AtomType.NNI.seqType()).seqType());
-    intersect(a2, a4, a);
-    intersect(a2, ArrayType.get(BLN_O).seqType(), null);
-    intersect(a, FUNC_O, a);
-    intersect(a, f3, null);
-    intersect(a, f6, null);
-    intersect(a, FuncType.get(ITEM_O).seqType(), null);
+    combine(a1, op);
+    combine(a2, op);
+    combine(a3, op);
+    combine(a4, op);
 
-    //intersect(a, f, a);
-    //intersect(a4, f5, a);
+    combine(a1, ITEM_O, a1, op);
+    combine(a1, ITR_O, null, op);
+    combine(a1, a2, a1, op);
+    combine(a1, a3, ArrayType.get(AtomType.NNI.seqType()).seqType(), op);
+    combine(a2, a4, a1, op);
+    combine(a2, ArrayType.get(BLN_O).seqType(), null, op);
+    combine(a1, FUNC_O, a1, op);
+    combine(a1, f3, null, op);
+    combine(a1, f6, null, op);
+    combine(a1, FuncType.get(ITEM_O).seqType(), null, op);
+    combine(a1, f1, null, op);
+    combine(a4, f5, null, op);
   }
 
   /**
-   * Intersect test method.
-   * @param st1 one argument
-   * @param st2 other argument
+   * Combines two sequences types.
+   * @param st1 first type
+   * @param st2 second type
    * @param expected expected result or {@code null}
+   * @param func combining function
    */
-  private static void intersect(final SeqType st1, final SeqType st2, final SeqType expected) {
-    eq(st1.intersect(st2), expected);
-    eq(st2.intersect(st1), expected);
+  private static void combine(final SeqType st1, final SeqType st2,
+      final SeqType expected, final BiFunction<SeqType, SeqType, SeqType> func) {
+
+    final String message = "\nType 1: " + st1 + "\nType 2: " + st2 +
+        "\nExpected: " + expected + "\nReturned: ";
+
+    final SeqType result1 = func.apply(st1, st2), result2 = func.apply(st2, st1);
+    if(result1 == null ^ result2 == null || result1 != null && !result1.eq(result2)) {
+      fail("Operation is not commutative:" + message + result1 + " vs " + result2 + '\n');
+    }
+
+    final Consumer<SeqType> check = result -> {
+      final String msg = message + result + '\n';
+      if(expected == null) {
+        assertNull(msg, result);
+      } else {
+        assertNotNull(msg, result);
+        assertTrue(msg, result.eq(expected));
+      }
+    };
+    check.accept(result1);
+    check.accept(result2);
   }
 
   /**
-   * Intersect test method.
-   * @param s returned type
-   * @param r expected result or {@code null}
+   * Combines a sequence type with itself.
+   * @param st sequence type
+   * @param func combining function
    */
-  private static void eq(final SeqType s, final SeqType r) {
-    if(r == null) {
-      assertNull("\nExpected: null\nReturned: " + s, s);
-    } else {
-      assertNotNull("\nExpected: " + r + "\nReturned: " + s, s);
-      assertTrue("\nExpected: " + r + "\nReturned: " + s, s.eq(r));
-    }
+  private static void combine(final SeqType st, final BiFunction<SeqType, SeqType, SeqType> func) {
+    final SeqType result = func.apply(st, st);
+    final String msg = "\nType: " + st + "\nReturned: " + result + '\n';
+    assertNotNull(msg, result);
+    assertTrue(msg, st.eq(result));
   }
 }

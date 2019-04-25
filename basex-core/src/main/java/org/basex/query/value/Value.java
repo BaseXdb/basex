@@ -89,10 +89,8 @@ public abstract class Value extends Expr implements Iterable<Item> {
   /**
    * Refines the value type.
    * @param expr original expression
-   * @return self reference
    */
-  public Value refineType(@SuppressWarnings("unused") final Expr expr) {
-    return this;
+  public void refineType(@SuppressWarnings("unused") final Expr expr) {
   }
 
   /**

@@ -223,13 +223,13 @@ public enum NodeType implements Type {
 
   @Override
   public final Type union(final Type type) {
-    return type instanceof NodeType ? this == type ? this : NOD : AtomType.ITEM;
+    return this == type ? this : type instanceof NodeType ? NOD : AtomType.ITEM;
   }
 
   @Override
   public final NodeType intersect(final Type type) {
-    if(!(type instanceof NodeType)) return instanceOf(type) ? this : null;
-    return this == type ? this : this == NOD ? (NodeType) type : type == NOD ? this : null;
+    return this == type || type == NOD ? this : this == NOD && type instanceof NodeType ?
+      (NodeType) type : null;
   }
 
   @Override

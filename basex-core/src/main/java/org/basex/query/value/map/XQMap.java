@@ -52,8 +52,8 @@ public final class XQMap extends XQData {
   }
 
   @Override
-  public FItem refineType(final Expr expr) {
-    return root.size == 0 ? this : super.refineType(expr);
+  public void refineType(final Expr expr) {
+    if(root.size != 0) super.refineType(expr);
   }
 
   @Override
@@ -123,23 +123,23 @@ public final class XQMap extends XQData {
   }
 
   @Override
-  protected boolean instanceOf(final FuncType ft, final boolean coerce) {
-    if(ft instanceof ArrayType) return false;
-    if(type.instanceOf(ft)) return true;
+  public boolean instanceOf(final Type tp) {
+    if(type.instanceOf(tp)) return true;
+    if(!(tp instanceof FuncType) || tp instanceof ArrayType) return false;
 
-    final SeqType[] at = ft.argTypes;
-    if(at != null && (at.length != 1 || !at[0].one())) return false;
+    final FuncType ft = (FuncType) tp;
+    if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(SeqType.AAT_O)) return false;
+
+    AtomType kt = null;
+    if(ft instanceof MapType) {
+      kt = ((MapType) ft).keyType();
+      if(kt == AtomType.AAT) kt = null;
+    }
 
     SeqType dt = ft.declType;
-    if(ft instanceof MapType) {
-      AtomType arg = ((MapType) ft).keyType();
-      if(arg == AtomType.AAT) arg = null;
-      if(dt.eq(SeqType.ITEM_ZM)) dt = null;
-      // map { ... } instance of function(...) as item() -> false (result may be empty sequence)
-      return (arg == null && dt == null) || root.instanceOf(arg, dt);
-    }
-    // allow coercion
-    return coerce || dt.eq(SeqType.ITEM_ZM);
+    if(dt.eq(SeqType.ITEM_ZM)) dt = null;
+
+    return kt == null && dt == null || root.instanceOf(kt, dt);
   }
 
   /**
