@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.gflwor.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -25,7 +26,7 @@ public final class TypeswitchGroup extends Single {
   /** Variable. */
   Var var;
   /** Matched sequence types (default switch if array is empty). */
-  private SeqType[] seqTypes;
+  SeqType[] seqTypes;
 
   /**
    * Constructor.
@@ -75,6 +76,22 @@ public final class TypeswitchGroup extends Single {
     if(var == null) return;
     final Expr ex = expr.inline(var, var.checkType(value, cc.qc, true), cc);
     if(ex != null) expr = ex;
+  }
+
+  /**
+   * Rewrites the group expression to a standalone expression.
+   * @param cond condition
+   * @param cc compilation context
+   * @return new expression
+   * @throws QueryException query exception
+   */
+  Expr rewrite(final Expr cond, final CompileContext cc) throws QueryException {
+    if(var == null) return expr;
+    final IntObjMap<Var> vm = new IntObjMap<>();
+    final LinkedList<Clause> clauses = new LinkedList<>();
+    clauses.add(new Let(cc.copy(var, vm), cond, false).optimize(cc));
+    final Expr rtrn = expr.copy(cc, vm).optimize(cc);
+    return new GFLWOR(info, clauses, rtrn).optimize(cc);
   }
 
   /**
@@ -152,7 +169,7 @@ public final class TypeswitchGroup extends Single {
    * @param seqType sequence type to be matched
    * @return result of check
    */
-  boolean canMatch(final SeqType seqType) {
+  boolean couldBe(final SeqType seqType) {
     if(seqTypes.length == 0) return true;
     for(final SeqType st : seqTypes) {
       if(st.couldBe(seqType)) return true;

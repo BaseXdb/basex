@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -38,7 +39,15 @@ public final class Instance extends Single {
   @Override
   public Expr optimize(final CompileContext cc) {
     final SeqType st = expr.seqType();
-    final Expr ex = st.instanceOf(seqType) ? Bln.TRUE : !st.couldBe(seqType) ? Bln.FALSE : this;
+    Expr ex = this;
+    if(!ex.has(Flag.NDT)) {
+      if(st.instanceOf(seqType)) {
+        ex = Bln.TRUE;
+      } else if(!st.couldBe(seqType)) {
+        // if no intersection is possible at compile time, final type cannot be an instance either
+        ex = Bln.FALSE;
+      }
+    }
     return cc.replaceWith(this, ex);
   }
 
