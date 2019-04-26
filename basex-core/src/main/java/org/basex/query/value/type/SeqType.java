@@ -455,7 +455,8 @@ public final class SeqType {
   }
 
   /**
-   * Checks if this type could be an instance of the given one.
+   * Checks if this type could be an instance of the given one. This function is called at compile
+   * time (the static type may be less specific than the eventual one).
    * @param st sequence type
    * @return result of check
    */

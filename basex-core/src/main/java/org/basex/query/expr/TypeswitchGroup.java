@@ -23,26 +23,26 @@ import org.basex.util.hash.*;
  */
 public final class TypeswitchGroup extends Single {
   /** Variable. */
-  final Var var;
+  Var var;
   /** Matched sequence types (default switch if array is empty). */
-  private SeqType[] types;
+  private SeqType[] seqTypes;
 
   /**
    * Constructor.
    * @param info input info
    * @param var variable
-   * @param types sequence types this case matches, the empty array means {@code default}
+   * @param seqTypes sequence types this case matches, the empty array means {@code default}
    * @param rtrn return expression
    */
-  public TypeswitchGroup(final InputInfo info, final Var var, final SeqType[] types,
+  public TypeswitchGroup(final InputInfo info, final Var var, final SeqType[] seqTypes,
       final Expr rtrn) {
     super(info, rtrn, SeqType.ITEM_ZM);
     this.var = var;
-    this.types = types;
+    this.seqTypes = seqTypes;
   }
 
   @Override
-  public Expr compile(final CompileContext cc) {
+  public Expr compile(final CompileContext cc) throws QueryException {
     try {
       super.compile(cc);
     } catch(final QueryException ex) {
@@ -53,7 +53,15 @@ public final class TypeswitchGroup extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) {
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    if(var != null) {
+      if(expr.count(var) == VarUsage.NEVER) {
+        cc.info(OPTVAR_X, var);
+        var = null;
+      } else {
+        refineType(cc);
+      }
+    }
     return adoptType(expr);
   }
 
@@ -70,26 +78,44 @@ public final class TypeswitchGroup extends Single {
   }
 
   /**
-   * Removes redundant types.
+   * Removes checks that will never match.
+   * @param ct type of condition
+   * @param cache types checked so far
    * @param cc compilation context
-   * @param cache cached types
    * @return {@code true} if the group is here to stay
+   * @throws QueryException query exception
    */
-  boolean removeTypes(final CompileContext cc, final ArrayList<SeqType> cache) {
-    // default branch must be preserved
-    if(types.length == 0) return true;
-    // remove redundant types
-    final ArrayList<SeqType> tmp = new ArrayList<>();
-    for(final SeqType st : types) {
-      if(cache.contains(st)) {
+  boolean removeTypes(final SeqType ct, final ArrayList<SeqType> cache, final CompileContext cc)
+      throws QueryException {
+
+    // preserve default branch
+    final int sl = seqTypes.length;
+    if(sl == 0) return true;
+
+    final Predicate<SeqType> remove = seqType -> {
+      for(final SeqType st : cache) if(seqType.instanceOf(st)) return true;
+      return !seqType.couldBe(ct);
+    };
+
+    // remove specific types
+    final ArrayList<SeqType> tmp = new ArrayList<>(sl);
+    for(final SeqType st : seqTypes) {
+      if(remove.test(st)) {
         cc.info(OPTREMOVE_X_X, st, (Supplier<?>) this::description);
       } else {
         tmp.add(st);
         cache.add(st);
       }
     }
-    if(types.length != tmp.size()) types = tmp.toArray(new SeqType[0]);
-    return types.length != 0;
+
+    // replace types
+    if(sl != tmp.size()) {
+      if(tmp.isEmpty()) return false;
+      seqTypes = tmp.toArray(new SeqType[0]);
+      refineType(cc);
+    }
+
+    return true;
   }
 
   @Override
@@ -104,18 +130,32 @@ public final class TypeswitchGroup extends Single {
 
   @Override
   public TypeswitchGroup copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new TypeswitchGroup(info, cc.copy(var, vm), types.clone(), expr.copy(cc, vm)));
+    return copyType(new TypeswitchGroup(info, cc.copy(var, vm), seqTypes.clone(),
+        expr.copy(cc, vm)));
   }
 
   /**
    * Checks if the given value matches this case.
    * @param val value to be matched
-   * @return {@code true} if it matches, {@code false} otherwise
+   * @return result of check
    */
   boolean matches(final Value val) {
-    if(types.length == 0) return true;
-    for(final SeqType st : types) {
+    if(seqTypes.length == 0) return true;
+    for(final SeqType st : seqTypes) {
       if(st.instance(val)) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Checks if the given type can match this case at runtime.
+   * @param seqType sequence type to be matched
+   * @return result of check
+   */
+  boolean canMatch(final SeqType seqType) {
+    if(seqTypes.length == 0) return true;
+    for(final SeqType st : seqTypes) {
+      if(st.couldBe(seqType)) return true;
     }
     return false;
   }
@@ -150,6 +190,18 @@ public final class TypeswitchGroup extends Single {
     return expr.value(qc);
   }
 
+  /**
+   * Refines the variable type, based on the available sequence types.
+   * @param cc compilation context
+   * @throws QueryException query exception
+   */
+  private void refineType(final CompileContext cc) throws QueryException {
+    if(seqTypes.length == 0) return;
+    SeqType st = seqTypes[0];
+    for(int s = 1; s < seqTypes.length; s++) st = st.union(seqTypes[s]);
+    var.refineType(st, cc);
+  }
+
   @Override
   public void markTailCalls(final CompileContext cc) {
     expr.markTailCalls(cc);
@@ -170,17 +222,17 @@ public final class TypeswitchGroup extends Single {
     if(this == obj) return true;
     if(!(obj instanceof TypeswitchGroup)) return false;
     final TypeswitchGroup tg = (TypeswitchGroup) obj;
-    return Array.equals(types, tg.types) && Objects.equals(var, tg.var) && super.equals(obj);
+    return Array.equals(seqTypes, tg.seqTypes) && Objects.equals(var, tg.var) && super.equals(obj);
   }
 
   @Override
   public void plan(final QueryPlan plan) {
     final FElem elem = plan.attachVariable(plan.create(this), var, false);
-    if(types.length == 0) {
+    if(seqTypes.length == 0) {
       plan.addAttribute(elem, DEFAULT, true);
     } else {
       final TokenBuilder tb = new TokenBuilder();
-      for(final SeqType st : types) {
+      for(final SeqType st : seqTypes) {
         if(!tb.isEmpty()) tb.add('|');
         tb.add(st);
       }
@@ -191,7 +243,7 @@ public final class TypeswitchGroup extends Single {
 
   @Override
   public String toString() {
-    final int tl = types.length;
+    final int tl = seqTypes.length;
     final TokenBuilder tb = new TokenBuilder().add(tl == 0 ? DEFAULT : CASE);
     if(var != null) {
       tb.add(' ').add(var);
@@ -200,7 +252,7 @@ public final class TypeswitchGroup extends Single {
     if(tl != 0) {
       for(int t = 0; t < tl; t++) {
         if(t > 0) tb.add(" |");
-        tb.add(' ').add(types[t]);
+        tb.add(' ').add(seqTypes[t]);
       }
     }
     return tb.add(' ' + RETURN + ' ' + expr).toString();

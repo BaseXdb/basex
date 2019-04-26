@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.gflwor.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -66,22 +67,44 @@ public final class Typeswitch extends ParseExpr {
       }
     }
 
-    // remove redundant types
+    // remove checks that will never match
+    final SeqType ct = cond.seqType();
     final ArrayList<SeqType> types = new ArrayList<>();
     final ArrayList<TypeswitchGroup> newGroups = new ArrayList<>(groups.length);
     for(final TypeswitchGroup group : groups) {
-      if(group.removeTypes(cc, types)) newGroups.add(group);
+      if(group.removeTypes(ct, types, cc)) newGroups.add(group);
     }
-    if(groups.length != newGroups.size()) {
-      groups = newGroups.toArray(new TypeswitchGroup[0]);
-    }
+    groups = newGroups.toArray(new TypeswitchGroup[0]);
 
-    // return first expression if all return expressions are equal and use no variables
-    final TypeswitchGroup tg = groups[0];
-    boolean eq = tg.var == null;
     final int gl = groups.length;
-    for(int g = 1; eq && g < gl; g++) eq = tg.expr.equals(groups[g].expr);
-    if(eq) return cc.replaceWith(this, tg.expr);
+    if(!cond.has(Flag.NDT)) {
+      // check if it's always the default branch that will be evaluated
+      TypeswitchGroup tg = null;
+      boolean opt = true;
+      for(int g = 0; opt && g < gl - 1; g++) opt = !groups[g].canMatch(ct);
+      if(opt) tg = groups[gl - 1];
+
+      // return first expression if all return expressions are equal
+      if(tg == null) {
+        opt = true;
+        for(int g = 1; opt && g < gl; g++) opt = groups[0].expr.equals(groups[g].expr);
+        if(opt) tg = groups[0];
+      }
+
+      if(tg != null) {
+        final Expr expr;
+        if(tg.var != null) {
+          final IntObjMap<Var> vm = new IntObjMap<>();
+          final LinkedList<Clause> clauses = new LinkedList<>();
+          clauses.add(new Let(cc.copy(tg.var, vm), cond, false).optimize(cc));
+          final Expr rtrn = tg.expr.copy(cc, vm).optimize(cc);
+          expr = new GFLWOR(info, clauses, rtrn).optimize(cc);
+        } else {
+          expr = tg.expr;
+        }
+        return cc.replaceWith(this, expr);
+      }
+    }
 
     // combine types of return expressions
     SeqType st = groups[0].seqType();

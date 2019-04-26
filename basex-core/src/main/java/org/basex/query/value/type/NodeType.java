@@ -218,7 +218,8 @@ public enum NodeType implements Type {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    return this == type || parent.instanceOf(type);
+    return this == type || type == AtomType.ITEM ||
+        type instanceof NodeType && parent.instanceOf(type);
   }
 
   @Override
@@ -227,9 +228,8 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public final NodeType intersect(final Type type) {
-    return this == type || type == NOD ? this : this == NOD && type instanceof NodeType ?
-      (NodeType) type : null;
+  public final Type intersect(final Type type) {
+    return instanceOf(type) ? this : type.instanceOf(this) ? type : null;
   }
 
   @Override

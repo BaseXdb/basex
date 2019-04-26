@@ -126,7 +126,7 @@ public class FuncType implements Type {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(type == AtomType.ITEM || type == SeqType.ANY_FUNC) return true;
+    if(this == type || type == AtomType.ITEM || type == SeqType.ANY_FUNC) return true;
     if(this == SeqType.ANY_FUNC || !(type instanceof FuncType) || type instanceof MapType ||
         type instanceof ArrayType) return false;
 
