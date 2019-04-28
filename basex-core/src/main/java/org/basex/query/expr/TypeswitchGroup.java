@@ -152,25 +152,23 @@ public final class TypeswitchGroup extends Single {
   }
 
   /**
-   * Checks if the given value matches this case.
-   * @param val value to be matched
+   * Checks if the given sequence type matches this group.
+   * @param seqType sequence type
    * @return result of check
    */
-  boolean matches(final Value val) {
-    if(seqTypes.length == 0) return true;
+  boolean instance(final SeqType seqType) {
     for(final SeqType st : seqTypes) {
-      if(st.instance(val)) return true;
+      if(seqType.instanceOf(st)) return true;
     }
     return false;
   }
 
   /**
-   * Checks if the given type can match this case at runtime.
+   * Checks if the given type can match this group at runtime.
    * @param seqType sequence type to be matched
    * @return result of check
    */
   boolean couldBe(final SeqType seqType) {
-    if(seqTypes.length == 0) return true;
     for(final SeqType st : seqTypes) {
       if(st.couldBe(seqType)) return true;
     }
@@ -178,32 +176,45 @@ public final class TypeswitchGroup extends Single {
   }
 
   /**
+   * Checks if the given value matches this group.
+   * @param value value to be matched
+   * @return result of check ({@code true} is returned for the default case
+   */
+  boolean instance(final Value value) {
+    if(seqTypes.length == 0) return true;
+    for(final SeqType st : seqTypes) {
+      if(st.instance(value)) return true;
+    }
+    return false;
+  }
+
+  /**
    * Evaluates the expression.
    * @param qc query context
-   * @param seq sequence to be checked
+   * @param value sequence to be checked
    * @return resulting iterator or {@code null}
    * @throws QueryException query exception
    */
-  Iter iter(final QueryContext qc, final Value seq) throws QueryException {
-    if(!matches(seq)) return null;
+  Iter iter(final QueryContext qc, final Value value) throws QueryException {
+    if(!instance(value)) return null;
     if(var == null) return expr.iter(qc);
 
     // evaluate full expression if variable needs to be bound
-    qc.set(var, seq);
+    qc.set(var, value);
     return expr.value(qc).iter();
   }
 
   /**
    * Evaluates the expression.
    * @param qc query context
-   * @param seq sequence to be checked
+   * @param value sequence to be checked
    * @return resulting value or {@code null}
    * @throws QueryException query exception
    */
-  Value value(final QueryContext qc, final Value seq) throws QueryException {
-    if(!matches(seq)) return null;
+  Value value(final QueryContext qc, final Value value) throws QueryException {
+    if(!instance(value)) return null;
 
-    if(var != null) qc.set(var, seq);
+    if(var != null) qc.set(var, value);
     return expr.value(qc);
   }
 

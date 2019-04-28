@@ -49,7 +49,7 @@ public final class Typeswitch extends ParseExpr {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     cond = cond.compile(cc);
-    for(final TypeswitchGroup tg : groups) tg.compile(cc);
+    for(final TypeswitchGroup group : groups) group.compile(cc);
     return optimize(cc);
   }
 
@@ -58,10 +58,10 @@ public final class Typeswitch extends ParseExpr {
     // pre-evaluate expression
     if(cond instanceof Value) {
       final Value value = (Value) cond;
-      for(final TypeswitchGroup tg : groups) {
-        if(tg.matches(value)) {
-          tg.inline(cc, value);
-          return cc.replaceWith(this, tg.expr);
+      for(final TypeswitchGroup group : groups) {
+        if(group.instance(value)) {
+          group.inline(cc, value);
+          return cc.replaceWith(this, group.expr);
         }
       }
     }
@@ -70,23 +70,30 @@ public final class Typeswitch extends ParseExpr {
     final SeqType ct = cond.seqType();
     final ArrayList<SeqType> types = new ArrayList<>();
     final ArrayList<TypeswitchGroup> newGroups = new ArrayList<>(groups.length);
-    for(final TypeswitchGroup tg : groups) {
-      if(tg.removeTypes(ct, types, cc)) newGroups.add(tg);
+    for(final TypeswitchGroup group : groups) {
+      if(group.removeTypes(ct, types, cc)) newGroups.add(group);
     }
     groups = newGroups.toArray(new TypeswitchGroup[0]);
 
     Expr expr = this;
     final int gl = groups.length;
     if(!cond.has(Flag.NDT)) {
-      // check if it's always the default branch that will be evaluated
+      // check if always the same branch will be chosen (most specific branches occur first)
       TypeswitchGroup tg = null;
-      boolean opt = true;
-      for(int g = 0; opt && g < gl - 1; g++) opt = !groups[g].couldBe(ct);
-      if(opt) tg = groups[gl - 1];
+      for(final TypeswitchGroup group : groups) {
+        if(tg == null && group.instance(ct)) tg = group;
+      }
+
+      // check if it's always the default branch that will be evaluated
+      if(tg == null) {
+        boolean opt = true;
+        for(int g = 0; opt && g < gl - 1; g++) opt = !groups[g].couldBe(ct);
+        if(opt) tg = groups[gl - 1];
+      }
 
       // return first expression if all return expressions are equal
       if(tg == null) {
-        opt = true;
+        boolean opt = true;
         for(int g = 1; opt && g < gl; g++) opt = groups[0].expr.equals(groups[g].expr);
         if(opt) tg = groups[0];
       }
@@ -113,8 +120,8 @@ public final class Typeswitch extends ParseExpr {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Value seq = cond.value(qc);
-    for(final TypeswitchGroup tg : groups) {
-      final Iter iter = tg.iter(qc, seq);
+    for(final TypeswitchGroup group : groups) {
+      final Iter iter = group.iter(qc, seq);
       if(iter != null) return iter;
     }
     throw Util.notExpected();
@@ -123,8 +130,8 @@ public final class Typeswitch extends ParseExpr {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value seq = cond.value(qc);
-    for(final TypeswitchGroup tg : groups) {
-      final Value value = tg.value(qc, seq);
+    for(final TypeswitchGroup group : groups) {
+      final Value value = group.value(qc, seq);
       if(value != null) return value;
     }
     throw Util.notExpected();
@@ -132,24 +139,24 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public boolean isVacuous() {
-    for(final TypeswitchGroup tg : groups) {
-      if(!tg.expr.isVacuous()) return false;
+    for(final TypeswitchGroup group : groups) {
+      if(!group.expr.isVacuous()) return false;
     }
     return true;
   }
 
   @Override
   public boolean has(final Flag... flags) {
-    for(final TypeswitchGroup tg : groups) {
-      if(tg.has(flags)) return true;
+    for(final TypeswitchGroup group : groups) {
+      if(group.has(flags)) return true;
     }
     return cond.has(flags);
   }
 
   @Override
   public boolean inlineable(final Var var) {
-    for(final TypeswitchGroup tg : groups) {
-      if(!tg.inlineable(var)) return false;
+    for(final TypeswitchGroup group : groups) {
+      if(!group.inlineable(var)) return false;
     }
     return cond.inlineable(var);
   }
@@ -172,7 +179,7 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public void markTailCalls(final CompileContext cc) {
-    for(final TypeswitchGroup tg : groups) tg.markTailCalls(cc);
+    for(final TypeswitchGroup group : groups) group.markTailCalls(cc);
   }
 
   @Override
