@@ -145,10 +145,10 @@ public enum ApiFunction {
   _REQUEST_METHOD(RequestMethod.class, "method()", arg(), STR_O, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_PARAMETER(RequestParameter.class, "parameter(name[,default])",
-      arg(STR_O, ITEM_ZM), ITEM_ZM, REQUEST_URI),
+      arg(STR_O, ITEM_ZM), ITEM_ZM, flag(NDT), REQUEST_URI),
   /** XQuery function. */
   _REQUEST_PARAMETER_NAMES(RequestParameterNames.class, "parameter-names()",
-      arg(), STR_ZM, REQUEST_URI),
+      arg(), STR_ZM, flag(NDT), REQUEST_URI),
   /** XQuery function. */
   _REQUEST_PATH(RequestPath.class, "path()", arg(), STR_O, REQUEST_URI),
   /** XQuery function. */
