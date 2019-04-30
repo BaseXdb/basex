@@ -51,8 +51,6 @@ public final class HTTPConnection implements ClientInfo {
 
   /** Serialization parameters. */
   private SerializerOptions serializer;
-  /** User name. */
-  private String username;
 
   /**
    * Constructor.
@@ -94,7 +92,6 @@ public final class HTTPConnection implements ClientInfo {
 
     // successful authentication: assign user
     context.user(user);
-    username = servlet.username(this);
 
     // generate log entry
     final StringBuilder uri = new StringBuilder(req.getRequestURI());
@@ -276,7 +273,7 @@ public final class HTTPConnection implements ClientInfo {
 
   @Override
   public String clientName() {
-    return username;
+    return servlet.username(this);
   }
 
   /**
