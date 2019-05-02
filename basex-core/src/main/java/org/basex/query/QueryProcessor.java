@@ -274,11 +274,11 @@ public final class QueryProcessor extends Job implements Closeable {
 
   /**
    * Checks if the specified XQuery string is a library module.
-   * @param qu query string
+   * @param query query string
    * @return result of check
    */
-  public static boolean isLibrary(final String qu) {
-    return LIBMOD_PATTERN.matcher(removeComments(qu, 80)).matches();
+  public static boolean isLibrary(final String query) {
+    return LIBMOD_PATTERN.matcher(removeComments(query, 80)).matches();
   }
 
   /**

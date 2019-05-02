@@ -5,6 +5,7 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -76,13 +77,14 @@ final class ProjectCache implements Iterable<String> {
           if(files.size() == MAX) return;
 
           // skip hidden files
-          if(hide && (file.getFileName().toString().startsWith(".") || Files.isHidden(file)))
+          final IOFile io = new IOFile(file.toFile());
+          if(hide && (io.name().toString().startsWith(".") || Files.isHidden(file)))
             continue;
 
-          if(Files.isDirectory(file)) {
+          if(io.isDir()) {
             dirs.add(file);
           } else {
-            files.add(file.toString());
+            files.add(io.path());
           }
         }
       }

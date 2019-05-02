@@ -12,6 +12,7 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -49,7 +50,7 @@ final class ProjectFiles {
    */
   void reset() {
     cache = null;
-    // stop existing operations
+    // stop currently running operations
     ++filterId;
     ++parseId;
   }
@@ -105,40 +106,53 @@ final class ProjectFiles {
     final HashSet<String> parsed = new HashSet<>();
     final TreeMap<String, InputInfo> errs = new TreeMap<>();
 
-    // collect files to be parsed
-    final ProjectCache pc = cache(root);
-    final StringList mods = new StringList(), lmods = new StringList();
-    for(final String path : pc) {
+    // collect files to be parsed (parse main modules first)
+    final StringList paths = new StringList(), libs = new StringList();
+    for(final String path : cache(root)) {
       final IOFile file = new IOFile(path);
-      if(file.hasSuffix(IO.XQSUFFIXES)) (file.hasSuffix(IO.XQMSUFFIX) ? lmods : mods).add(path);
+      if(file.hasSuffix(IO.XQSUFFIXES)) {
+        (file.hasSuffix(IO.XQMSUFFIX) ? libs : paths).add(path);
+      }
     }
-    mods.add(lmods);
+    paths.add(libs);
 
     // parse modules
-    for(final String path : mods) {
+    for(final String path : paths) {
       if(id != parseId) throw new InterruptedException();
       if(parsed.contains(path)) continue;
 
-      try(TextInput ti = new TextInput(new IOFile(path))) {
-        // parse query
-        try(QueryContext qc = new QueryContext(ctx)) {
-          final String input = ti.cache().toString();
-          final boolean library = QueryProcessor.isLibrary(input);
-          qc.parse(input, library, path);
-          // parsing was successful: remember path
-          parsed.add(path);
-          for(final byte[] mod : qc.modParsed) parsed.add(Token.string(mod));
-        } catch(final QueryException ex) {
-          // parsing failed: remember path
-          errs.put(path, ex.info());
-          parsed.add(path);
-        }
-      } catch(final IOException ex) {
-        // file may not be accessible
-        Util.debug(ex);
+      final TokenMap modules = parse(path, ctx, errs);
+      if(modules != null) {
+        for(final byte[] mod : modules) parsed.add(Token.string(mod));
       }
     }
     errors = errs;
+  }
+
+  /**
+   * Parses a single file.
+   * @param path file path
+   * @param ctx database context
+   * @param errs files with errors
+   * @return parsed modules or {@code null}
+   */
+  TokenMap parse(final String path, final Context ctx, final TreeMap<String, InputInfo> errs) {
+    try(TextInput ti = new TextInput(new IOFile(path))) {
+      // parse query
+      try(QueryContext qc = new QueryContext(ctx)) {
+        final String input = ti.cache().toString();
+        final boolean library = QueryProcessor.isLibrary(input);
+        qc.parse(input, library, path);
+        errs.remove(path);
+        return qc.modParsed;
+      } catch(final QueryException ex) {
+        errs.put(path, ex.info());
+      }
+    } catch(final IOException ex) {
+      // file may not be accessible
+      Util.debug(ex);
+    }
+    return null;
   }
 
   // PRIVATE METHODS ==============================================================================

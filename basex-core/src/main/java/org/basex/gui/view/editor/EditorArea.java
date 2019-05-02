@@ -14,6 +14,7 @@ import org.basex.gui.listener.*;
 import org.basex.gui.text.*;
 import org.basex.gui.text.SearchBar.*;
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.util.*;
 
 /**
@@ -190,9 +191,12 @@ public final class EditorArea extends TextPanel {
     final boolean rename = io != file;
     if(rename || modified || timeStamp == 0) {
       try {
-        io.write(getText());
+        final byte[] text = getText();
+        final boolean xquery = io.hasSuffix(IO.XQSUFFIXES);
+        final boolean library = xquery && QueryProcessor.isLibrary(Token.string(text));
+        io.write(text);
         file(io, true);
-        view.project.save(io, rename);
+        view.project.save(io, rename, xquery, library);
         return true;
       } catch(final Exception ex) {
         Util.debug(ex);

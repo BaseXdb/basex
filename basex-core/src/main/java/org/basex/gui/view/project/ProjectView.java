@@ -138,12 +138,19 @@ public final class ProjectView extends BaseXPanel {
    * Refreshes the view after a file has been saved.
    * @param file file to be opened
    * @param rename file has been renamed
+   * @param xquery file is XQuery module
+   * @param library XQuery module is a library
    */
-  public void save(final IOFile file, final boolean rename) {
+  public void save(final IOFile file, final boolean rename, final boolean xquery,
+      final boolean library) {
+
     SwingUtilities.invokeLater(() -> {
-      final IOFile path = file.normalize();
-      if(path.path().startsWith(root.file.path())) refreshTree(path);
-      refresh(rename, file.hasSuffix(IO.XQSUFFIXES));
+      final IOFile io = file.normalize();
+      if(io.path().startsWith(root.file.path())) {
+        if(xquery) files.parse(file.path(), gui.context, files.errors());
+        refreshTree(io);
+      }
+      refresh(rename, library);
     });
   }
 
@@ -201,26 +208,24 @@ public final class ProjectView extends BaseXPanel {
     if(reset) files.reset();
     filter.refresh(true);
 
-    if(gui.gopts.get(GUIOptions.PARSEPROJ) && (!parsed || enforce)) {
-      parsed = false;
-      // do not parse if project view is hidden
-      if(getWidth() == 0) return;
+    // do not parse if project view is not visible, or if it has already been parsed
+    if(!gui.gopts.get(GUIOptions.PARSEPROJ) || getWidth() == 0 || parsed && !enforce) return;
 
-      new GUIWorker<Boolean>() {
-        @Override
-        protected Boolean doInBackground() throws InterruptedException {
-          final Performance perf = new Performance();
-          files.parse(root.file, gui.context);
-          parsed = true;
-          gui.status.setText(PARSING_CC + perf.getTime());
-          return true;
-        }
-        @Override
-        protected void done(final Boolean refresh) {
-          if(refresh) refreshHighlight(root);
-        }
-      }.execute();
-    }
+    parsed = false;
+    new GUIWorker<Boolean>() {
+      @Override
+      protected Boolean doInBackground() throws InterruptedException {
+        final Performance perf = new Performance();
+        files.parse(root.file, gui.context);
+        parsed = true;
+        gui.status.setText(PARSING_CC + perf.getTime());
+        return true;
+      }
+      @Override
+      protected void done(final Boolean refresh) {
+        if(refresh) refreshHighlight(root);
+      }
+    }.execute();
   }
 
   /**
