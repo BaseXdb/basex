@@ -75,20 +75,11 @@ public final class DBNew {
   public void prepare(final String name) throws QueryException {
     if(inputs.isEmpty()) return;
 
-    // cache data if at least one input needs to be cached
-    boolean cache = false;
-    for(final DBOptions dbopts : dboptions) {
-      final Object obj = dbopts.get(MainOptions.ADDCACHE);
-      if(obj instanceof Boolean && (Boolean) obj) {
-        cache = true;
-        break;
-      }
-    }
-
     // choose first options instance (relevant options are the same)
     final Context ctx = qc.context;
     final MainOptions mopts = ctx.options;
     final StaticOptions sopts = ctx.soptions;
+    final boolean cache = cache();
     try {
       data = cache ? CreateDB.create(sopts.randomDbName(name),
           Parser.emptyParser(mopts), ctx, mopts) : new MemData(mopts);
@@ -96,8 +87,6 @@ public final class DBNew {
       final long is = inputs.size();
       for(int i = 0; i < is; i++) {
         final DataClip clip = data(name, i);
-        // clear list to recover memory
-        inputs.set(i, null);
         try {
           data.insert(data.meta.size, -1, clip);
         } finally {
@@ -118,6 +107,18 @@ public final class DBNew {
   }
 
   /**
+   * Checks if caching was enabled for at least one document.
+   * @return result of check
+   */
+  private boolean cache() {
+    for(final DBOptions dbopts : dboptions) {
+      final Object obj = dbopts.get(MainOptions.ADDCACHE);
+      if(obj instanceof Boolean && (Boolean) obj) return true;
+    }
+    return false;
+  }
+
+  /**
    * Creates a {@link DataClip} instance for the specified document.
    * @param name name of database
    * @param i index of current input
@@ -125,13 +126,13 @@ public final class DBNew {
    * @throws IOException I/O exception
    */
   private DataClip data(final String name, final int i) throws IOException {
-    // add document node
-    final Context ctx = qc.context;
-    final StaticOptions soptions = ctx.soptions;
+    // free memory: clear list entries after retrieval
     final NewInput input = inputs.get(i);
     final MainOptions mopts = dboptions.get(i).assignTo(new MainOptions(qc.context.options, true));
-    final boolean addcache = mopts.get(MainOptions.ADDCACHE);
+    inputs.set(i, null);
+    dboptions.set(i, null);
 
+    // existing node: create data clip for copied instance
     ANode node = input.node;
     if(node != null) {
       if(node.type != NodeType.DOC) node = new FDoc(name).add(node);
@@ -140,10 +141,12 @@ public final class DBNew {
       return new DataClip(mdata);
     }
 
-    // add input
-    final String dbpath = soptions.randomDbName(name);
+    // create data instance for file input
+    final StaticOptions sopts = qc.context.soptions;
+    final String dbpath = sopts.randomDbName(name);
     final Parser parser = new DirParser(input.io, mopts, new IOFile(dbpath)).target(input.path);
-    return (addcache ? new DiskBuilder(dbpath, parser, soptions, mopts)
-                     : new MemBuilder(name, parser)).dataClip();
+    return (mopts.get(MainOptions.ADDCACHE) ?
+      new DiskBuilder(dbpath, parser, sopts, mopts) :
+      new MemBuilder(name, parser)).dataClip();
   }
 }
