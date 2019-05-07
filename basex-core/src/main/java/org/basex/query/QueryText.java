@@ -281,7 +281,6 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] PKG_PREFIX = token("pkg");
   /** XQuery prefix. */ byte[] PROC_PREFIX = token("proc");
   /** XQuery prefix. */ byte[] PROF_PREFIX = token("prof");
-  /** XQuery prefix. */ byte[] QUERY_PREFIX = token("query");
   /** XQuery prefix. */ byte[] RANDOM_PREFIX = token("random");
   /** XQuery prefix. */ byte[] REPO_PREFIX = token("repo");
   /** XQuery prefix. */ byte[] REQUEST_PREFIX = token("request");
@@ -358,7 +357,6 @@ public interface QueryText {
   /** BaseX URI. */ byte[] PERM_URI = token(BXMODULES_URI + "perm");
   /** BaseX URI. */ byte[] PROC_URI = token(BXMODULES_URI + "proc");
   /** BaseX URI. */ byte[] PROF_URI = token(BXMODULES_URI + "prof");
-  /** BaseX URI. */ byte[] QUERY_URI = token(BXMODULES_URI + "query");
   /** BaseX URI. */ byte[] RANDOM_URI = token(BXMODULES_URI + "random");
   /** BaseX URI. */ byte[] REPO_URI = token(BXMODULES_URI + "repo");
   /** BaseX URI. */ byte[] SQL_URI = token(BXMODULES_URI + "sql");

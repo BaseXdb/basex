@@ -534,8 +534,7 @@ public class QueryParser extends InputParser {
       if(sc.module != null) throw error(BASEX_OPTIONS3_X, qnm.local());
       qc.options.add(name, value, this);
 
-      // legacy: query prefix and uri will disappear in future version
-    } else if(eq(qnm.uri(), BASEX_URI) || eq(qnm.uri(), QUERY_URI)) {
+    } else if(eq(qnm.uri(), BASEX_URI)) {
       // query-specific options
       switch(name) {
         case READ_LOCK:

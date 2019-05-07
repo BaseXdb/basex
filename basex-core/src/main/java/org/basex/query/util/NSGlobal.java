@@ -75,8 +75,6 @@ public final class NSGlobal {
     NS.add(PERM_PREFIX, PERM_URI);
     NS.add(PROC_PREFIX, PROC_URI);
     NS.add(PROF_PREFIX, PROF_URI);
-    // legacy: query prefix and uri will disappear in future version
-    NS.add(QUERY_PREFIX, QUERY_URI);
     NS.add(RANDOM_PREFIX, RANDOM_URI);
     NS.add(REPO_PREFIX, REPO_URI);
     NS.add(SESSION_PREFIX, SESSION_URI);
