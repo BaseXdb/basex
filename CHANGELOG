@@ -1,3 +1,10 @@
+VERSION 9.2.1 (May 7, 2019) --------------------------------------------
+
+ - GUI: faster and smarter parsing of project files
+ - RESTXQ: custom reponses are now sent as streams
+ - Performance tweaks (static typing: typeswitch, instance of)
+ - Minor bug fixes
+
 VERSION 9.2 (April 16, 2019) -------------------------------------------
 
  XQUERY PERFORMANCE
