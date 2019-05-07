@@ -185,7 +185,7 @@ public class CmpG extends Cmp {
         } else if(op == OpG.EQ && coll == null && (type1.isNumber() && type2.isNumber() ||
             (type1.isStringOrUntyped() && type2.isStringOrUntyped())) && !st2.zeroOrOne()) {
           // hash-based comparisons
-          expr = new CmpHashG(expr1, expr2, op, coll, sc, info);
+          expr = new CmpHashG(expr1, expr2, op, null, sc, info);
         }
       }
     }

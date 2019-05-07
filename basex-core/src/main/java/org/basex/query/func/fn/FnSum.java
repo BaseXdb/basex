@@ -136,10 +136,10 @@ public class FnSum extends StandardFunc {
       final Type type = it.type;
       Type tp = null;
       if(type.isNumberOrUntyped()) {
-        if(!num) tp = AtomType.DUR;
+        if(!num) tp = DUR;
       } else {
-        if(num) tp = AtomType.NUM;
-        else if(dtd && type != DTD || ymd && type != YMD) tp = AtomType.DUR;
+        if(num) tp = NUM;
+        else if(dtd && type != DTD || ymd && type != YMD) tp = DUR;
       }
       if(tp != null) throw CMP_X_X_X.get(info, tp, type, it);
       res = Calc.PLUS.eval(res, it, info);

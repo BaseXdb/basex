@@ -11,8 +11,8 @@ import java.util.*;
  * @param <V> value type
  */
 public final class MinHeap<K, V> {
-  /** value array. */
-  private Object[] vals;
+  /** Value array. */
+  private Object[] vals = new Object[Array.CAPACITY << 1];
   /** Comparator. */
   private final Comparator<K> comp;
   /** Size of the heap. */
@@ -20,20 +20,10 @@ public final class MinHeap<K, V> {
 
   /**
    * Constructs a heap with the given initial capacity and order.
-   * @param cmp comparator
+   * @param comp comparator
    */
-  public MinHeap(final Comparator<K> cmp) {
-    this(Array.CAPACITY, cmp);
-  }
-
-  /**
-   * Constructs a heap with the given initial capacity and order.
-   * @param cap initial capacity
-   * @param cmp comparator
-   */
-  public MinHeap(final int cap, final Comparator<K> cmp) {
-    vals = new Object[2 * cap];
-    comp = cmp;
+  public MinHeap(final Comparator<K> comp) {
+    this.comp = comp;
   }
 
   /**

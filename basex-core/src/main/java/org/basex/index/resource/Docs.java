@@ -246,7 +246,7 @@ final class Docs {
       if(!add) {
         add = startsWith(pt, prefix);
         if(add && !desc) {
-          final int i = indexOf(pt, Token.SLASH, prefix.length + 1);
+          final int i = indexOf(pt, SLASH, prefix.length + 1);
           if(i != -1) add = set.add(substring(pt, prefix.length, i));
         }
       }

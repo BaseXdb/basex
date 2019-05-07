@@ -24,12 +24,12 @@ public enum Occ {
    * Constructor.
    * @param min minimal result size
    * @param max maximal result size
-   * @param str string representation
+   * @param string string representation
    */
-  Occ(final int min, final int max, final String str) {
+  Occ(final int min, final int max, final String string) {
     this.min = min;
     this.max = max;
-    this.string = str;
+    this.string = string;
   }
 
   /**

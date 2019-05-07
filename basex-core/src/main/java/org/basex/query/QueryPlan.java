@@ -34,9 +34,9 @@ public final class QueryPlan {
    * @param full include comprehensive information
    */
   public QueryPlan(final boolean compiled, final boolean updating, final boolean full) {
-    root = new FElem(QueryText.QUERY_PLAN);
-    root.add(QueryText.COMPILED, token(compiled));
-    root.add(QueryText.UPDATING, token(updating));
+    root = new FElem(QUERY_PLAN);
+    root.add(COMPILED, token(compiled));
+    root.add(UPDATING, token(updating));
     nodes.add(root);
     this.full = full;
   }
@@ -141,10 +141,10 @@ public final class QueryPlan {
    */
   public FElem attachVariable(final FElem elem, final Var var, final boolean type) {
     if(var != null) {
-      addAttribute(elem, QueryText.NAME, var.toErrorString());
-      addAttribute(elem, Token.ID, var.id);
-      if(var.declType != null) addAttribute(elem, QueryText.AS, var.declType);
-      if(var.promote) addAttribute(elem, QueryText.PROMOTE, true);
+      addAttribute(elem, NAME, var.toErrorString());
+      addAttribute(elem, ID, var.id);
+      if(var.declType != null) addAttribute(elem, AS, var.declType);
+      if(var.promote) addAttribute(elem, PROMOTE, true);
       if(type) attachType(elem, var.seqType(), var.size(), var.data());
     }
     return elem;

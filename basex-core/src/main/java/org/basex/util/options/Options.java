@@ -385,7 +385,7 @@ public class Options implements Iterable<Option<?>> {
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  private String toString(final XQMap map, final InputInfo ii)
+  private static String toString(final XQMap map, final InputInfo ii)
       throws BaseXException, QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
@@ -423,7 +423,7 @@ public class Options implements Iterable<Option<?>> {
    * @param opts options string
    * @return map
    */
-  public final Map<String, String> toMap(final String opts) {
+  public static Map<String, String> toMap(final String opts) {
     final HashMap<String, String> map = new HashMap<>();
     final StringBuilder key = new StringBuilder(), value = new StringBuilder();
 
@@ -741,7 +741,7 @@ public class Options implements Iterable<Option<?>> {
     } else if(option instanceof StringOption) {
       value = item instanceof XQMap ? toString((XQMap) item, ii) : string(item.string(ii));
     } else if(option instanceof EnumOption) {
-      String string = null;
+      String string;
       if(item.type.eq(AtomType.BLN)) {
         string = item.bool(ii) ? Text.YES : Text.NO;
       } else if(item.type.isNumber()) {

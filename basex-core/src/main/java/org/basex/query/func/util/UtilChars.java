@@ -9,7 +9,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -26,7 +25,7 @@ public final class UtilChars extends StandardFunc {
     return new BasicIter<Str>(cps.length) {
       @Override
       public Str get(final long i) {
-        return Str.get(Token.cpToken(cps[(int) i]));
+        return Str.get(cpToken(cps[(int) i]));
       }
       @Override
       public Value value(final QueryContext q, final Expr expr) {
@@ -47,7 +46,7 @@ public final class UtilChars extends StandardFunc {
    */
   private static Value toValue(final int[] cps) {
     final TokenList list = new TokenList(cps.length);
-    for(final int cp : cps) list.add(Token.cpToken(cp));
+    for(final int cp : cps) list.add(cpToken(cp));
     return StrSeq.get(list.finish());
   }
 }

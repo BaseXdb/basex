@@ -101,7 +101,7 @@ public abstract class Path extends ParseExpr {
     for(int l = 0; l < tmp.size(); l++) {
       if(tmp.get(l) instanceof Step) {
         final Step s = (Step) tmp.get(l);
-        if(tmp.size() > 1 && s.axis == Axis.SELF && s.test == KindTest.NOD && s.exprs.length == 0) {
+        if(tmp.size() > 1 && s.axis == SELF && s.test == KindTest.NOD && s.exprs.length == 0) {
           tmp.remove(l--);
         } else {
           axes++;
@@ -691,9 +691,9 @@ public abstract class Path extends ParseExpr {
       final int el = step.exprs.length;
       if(el > 0) {
         // check if path is iterable (i.e., will be duplicate-free)
-        final boolean iter = pathNodes(data, s) != null;
-        final IndexDb db = data != null ? new IndexStaticDb(data, iter, info) :
-          new IndexDynDb(info, iter, root == null ? new ContextValue(info) : root);
+        final IndexDb db = data != null ?
+          new IndexStaticDb(data, pathNodes(data, s) != null, info) :
+          new IndexDynDb(info, false, root == null ? new ContextValue(info) : root);
 
         // choose cheapest index access
         for(int e = 0; e < el; e++) {

@@ -71,10 +71,8 @@ public abstract class CsvConverter extends Job {
    * @return CSV converter
    */
   public static CsvConverter get(final CsvParserOptions copts) {
-    switch(copts.get(CsvOptions.FORMAT)) {
-      case XQUERY: return new CsvXQueryConverter(copts);
-      default:     return new CsvDirectConverter(copts);
-    }
+    return copts.get(CsvOptions.FORMAT) == CsvFormat.XQUERY ?
+      new CsvXQueryConverter(copts) : new CsvDirectConverter(copts);
   }
 
   /**

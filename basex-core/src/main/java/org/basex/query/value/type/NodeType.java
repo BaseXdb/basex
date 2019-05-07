@@ -239,7 +239,7 @@ public enum NodeType implements Type {
 
   @Override
   public final AtomType atomic() {
-    return this == NodeType.PI || this == NodeType.COM ? AtomType.STR : AtomType.ATM;
+    return this == PI || this == COM ? AtomType.STR : AtomType.ATM;
   }
 
   @Override

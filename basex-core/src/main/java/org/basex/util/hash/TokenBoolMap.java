@@ -51,7 +51,7 @@ public final class TokenBoolMap extends TokenSet {
   @Override
   public String toString() {
     final List<Object> v = new ArrayList<>();
-    for(final boolean value : values) v.add(Boolean.valueOf(value));
+    for(final boolean value : values) v.add(value);
     return toString(keys, v.toArray());
   }
 }

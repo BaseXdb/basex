@@ -155,7 +155,7 @@ public class BaseXCombo extends JComboBox<Object> {
     SwingUtilities.invokeLater(() -> {
       final BaseXTextField tf = textField();
       if(tf == null) {
-        addActionListener(e -> dialog.action(BaseXCombo.this));
+        addActionListener(e -> dialog.action(this));
       } else {
         tf.getDocument().addDocumentListener(new DocumentListener() {
           @Override

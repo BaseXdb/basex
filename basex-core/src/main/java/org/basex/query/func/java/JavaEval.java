@@ -58,7 +58,7 @@ final class JavaEval {
     this.call = call;
     this.qc = qc;
     this.clazz = clazz;
-    this.exprs = call.exprs.clone();
+    exprs = call.exprs.clone();
   }
 
   /**

@@ -56,7 +56,7 @@ public final class Inline {
       return value;
     }
     // compressed whitespace token
-    if(tl < 16 && Token.ws(token)) {
+    if(tl < 16 && ws(token)) {
       value = INLINE | STRING | Compress.COMPRESS | tl << 32;
       int c = 32;
       // upper bit: 09/0A = 0, 0D/20 = 1
@@ -107,7 +107,7 @@ public final class Inline {
    * @return unpacked integer
    */
   public static long unpackLong(final long value) {
-    return (value & STRING) == 0 ? (value & Inline.INLINE - 1) : toLong(unpackString(value));
+    return (value & STRING) == 0 ? (value & INLINE - 1) : toLong(unpackString(value));
   }
 
   /**
@@ -116,7 +116,7 @@ public final class Inline {
    * @return unpacked double
    */
   public static double unpackDouble(final long value) {
-    return (value & STRING) == 0 ? (value & Inline.INLINE - 1) : toDouble(unpackString(value));
+    return (value & STRING) == 0 ? (value & INLINE - 1) : toDouble(unpackString(value));
   }
 
   /**

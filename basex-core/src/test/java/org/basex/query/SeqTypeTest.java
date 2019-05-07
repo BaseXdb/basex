@@ -126,7 +126,7 @@ public final class SeqTypeTest {
 
   /** Tests for {@link SeqType#union(SeqType)}. */
   @Test public void union() {
-    final BiFunction<SeqType, SeqType, SeqType> op = (s1, s2) -> s1.union(s2);
+    final BiFunction<SeqType, SeqType, SeqType> op = SeqType::union;
 
     combine(EMP, op);
     combine(STR_O, op);
@@ -236,7 +236,7 @@ public final class SeqTypeTest {
 
   /** Tests for {@link SeqType#intersect(SeqType)}. */
   @Test public void intersect() {
-    final BiFunction<SeqType, SeqType, SeqType> op = (s1, s2) -> s1.intersect(s2);
+    final BiFunction<SeqType, SeqType, SeqType> op = SeqType::intersect;
 
     combine(EMP, op);
     combine(STR_O, op);

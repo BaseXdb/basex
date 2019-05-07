@@ -53,7 +53,7 @@ public final class IndexCosts implements Comparable<IndexCosts> {
    */
   public static IndexCosts add(final IndexCosts ic1, final IndexCosts ic2) {
     final int r1 = ic1 == null ? 0 : ic1.results, r2 = ic2 == null ? 0 : ic2.results, r = r1 + r2;
-    return r1 < 0 || r2 < 0 ? IndexCosts.ENFORCE_DYNAMIC : get(r >= 0 ? r : Integer.MAX_VALUE);
+    return r1 < 0 || r2 < 0 ? ENFORCE_DYNAMIC : get(r >= 0 ? r : Integer.MAX_VALUE);
   }
 
   /**

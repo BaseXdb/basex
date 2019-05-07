@@ -24,7 +24,7 @@ public final class ProfRuntime extends StandardFunc {
       case "total":      return Int.get(rt.totalMemory());
       case "used":       return Int.get(rt.totalMemory() - rt.freeMemory());
       case "processors": return Int.get(rt.availableProcessors());
-    };
+    }
     throw PROF_OPTION_X.get(info, name);
   }
 }

@@ -30,7 +30,7 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
   /** Position stack. */
   private int[] poss;
   /** Stack pointer. */
-  private int nTop = -1;
+  private int nTop;
 
   /** Current leaf node. */
   private Node<E, E> leaf;
@@ -55,6 +55,7 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
     } else {
       leaf = (Node<E, E>) root;
       leafPos = (int) start;
+      nTop = -1;
     }
 
     assert start >= 0 && start <= n;

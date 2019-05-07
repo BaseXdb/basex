@@ -26,13 +26,13 @@ import org.eclipse.jetty.xml.*;
  */
 public final class BaseXHTTP extends CLI {
   /** HTTP server. */
-  private Server jetty;
+  private final Server jetty;
   /** HTTP port. */
   private int port;
   /** HTTP host. */
-  private String host;
+  private final String host;
   /** HTTP stop port. */
-  private int stopPort;
+  private final int stopPort;
   /** Start as daemon. */
   private boolean service;
   /** Quiet flag. */

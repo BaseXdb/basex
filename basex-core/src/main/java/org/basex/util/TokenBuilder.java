@@ -231,7 +231,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder addInt(final int value) {
-    return add(Token.token(value));
+    return add(token(value));
   }
 
   /**
@@ -240,7 +240,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder addLong(final long value) {
-    return add(Token.token(value));
+    return add(token(value));
   }
 
   /**
@@ -278,7 +278,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder add(final String string) {
-    return add(Token.token(string));
+    return add(token(string));
   }
 
   /**

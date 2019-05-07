@@ -92,8 +92,8 @@ public final class MemData extends Data {
   @Override
   public void dropIndex(final IndexType type) throws BaseXException {
     switch(type) {
-      case TEXT:      break;
-      case ATTRIBUTE: break;
+      case TEXT:
+      case ATTRIBUTE:
       case TOKEN:     break;
       case FULLTEXT:  throw new BaseXException(NO_MAINMEM);
       default:        throw Util.notExpected();

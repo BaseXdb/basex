@@ -74,7 +74,7 @@ public final class Strings {
    * @return true if one test is successful
    */
   public static boolean eq(final String str1, final String str2) {
-    return str1 == null ? str2 == null : str1.equals(str2);
+    return Objects.equals(str1, str2);
   }
 
   /**
@@ -85,7 +85,7 @@ public final class Strings {
    */
   public static boolean eq(final String str, final String... strings) {
     for(final String s : strings) {
-      if(str == null ? s == null : str.equals(s)) return true;
+      if(Objects.equals(str, s)) return true;
     }
     return false;
   }
@@ -328,22 +328,6 @@ public final class Strings {
   }
 
   /**
-   * Checks if a string starts with the specified substring.
-   * If the query character is lower case, search case insensitive.
-   * @param string string
-   * @param sub substring
-   * @return result of check
-   */
-  public static boolean startsWith(final String string, final String sub) {
-    final int sl = string.length(), tl = sub.length();
-    if(tl > sl) return false;
-    for(int t = 0; t < tl; t++) {
-      if(!equals(string.charAt(t), sub.charAt(t))) return false;
-    }
-    return true;
-  }
-
-  /**
    * Checks if a string starts with the specified character.
    * @param string string
    * @param ch character to be found
@@ -361,51 +345,6 @@ public final class Strings {
    */
   public static boolean endsWith(final String string, final char ch) {
     return string.lastIndexOf(ch) == string.length() - 1;
-  }
-
-  /**
-   * Checks if a string contains the specified substring.
-   * If the query character is lower case, search case insensitive.
-   * @param string string
-   * @param sub substring
-   * @return result of check
-   */
-  public static boolean contains(final String string, final String sub) {
-    final int tl = sub.length();
-    if(tl == 0) return true;
-    final int sl = string.length() - tl;
-    for(int s = 0; s <= sl; s++) {
-      int t = 0;
-      while(equals(string.charAt(s + t), sub.charAt(t))) {
-        if(++t == tl) return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Checks if all characters of the specified substring occur in a string in the given order.
-   * @param string string
-   * @param sub substring
-   * @return result of check
-   */
-  public static boolean matches(final String string, final String sub) {
-    final int sl = string.length(), tl = sub.length();
-    int t = 0;
-    for(int s = 0; s < sl && t < tl; s++) {
-      if(equals(string.charAt(s), sub.charAt(t))) t++;
-    }
-    return t == tl;
-  }
-
-  /**
-   * Compares two characters. If the query character is lower case, search case insensitive.
-   * @param input input character
-   * @param query query character
-   * @return result of check
-   */
-  private static boolean equals(final char input, final char query) {
-    return query == (Character.isUpperCase(query) ? input : Character.toLowerCase(input));
   }
 
   /**

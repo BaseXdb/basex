@@ -3,6 +3,7 @@ package org.basex.gui.view;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
+import java.util.Objects;
 
 import org.basex.core.*;
 import org.basex.data.*;
@@ -183,7 +184,7 @@ public final class ViewNotifier {
     final DBNodes empty = new DBNodes(ctx.data()).ftpos(ctx.marked.ftpos());
     final DBNodes curr = quick ? ctx.current() : null;
     final DBNodes cmp = quick ? curr : ctx.marked;
-    if(cont[hist] == null ? cmp != null : !cont[hist].equals(cmp)) {
+    if(!Objects.equals(cont[hist], cmp)) {
       checkHist();
       if(quick) {
         // store history entry

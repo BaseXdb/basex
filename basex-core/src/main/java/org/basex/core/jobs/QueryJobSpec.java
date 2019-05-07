@@ -32,8 +32,8 @@ public final class QueryJobSpec {
       final IOContent io) {
     this.options = options;
     this.bindings = bindings;
-    this.query = Token.string(io.read());
-    this.simple = io.url().isEmpty();
+    query = Token.string(io.read());
+    simple = io.url().isEmpty();
   }
 
   @Override

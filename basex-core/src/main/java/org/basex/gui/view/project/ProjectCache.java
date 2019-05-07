@@ -78,8 +78,7 @@ final class ProjectCache implements Iterable<String> {
 
           // skip hidden files
           final IOFile io = new IOFile(file.toFile());
-          if(hide && (io.name().toString().startsWith(".") || Files.isHidden(file)))
-            continue;
+          if(hide && (io.name().startsWith(".") || Files.isHidden(file))) continue;
 
           if(io.isDir()) {
             dirs.add(file);

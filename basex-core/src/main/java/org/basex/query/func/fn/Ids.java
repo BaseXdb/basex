@@ -75,7 +75,7 @@ abstract class Ids extends StandardFunc {
   private boolean index(final ANode root, final boolean idref) {
     // check if index exists
     final Data data = root.data();
-    if(data == null || !(idref ? data.meta.tokenindex : data.meta.attrindex)) return false;
+    if(data == null || (idref ? !data.meta.tokenindex : !data.meta.attrindex)) return false;
     // check if index names contain id attributes
     synchronized(indexed) {
       return indexed.computeIfAbsent(data, d -> new IndexNames(IndexType.ATTRIBUTE, d).

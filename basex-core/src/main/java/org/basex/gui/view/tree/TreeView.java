@@ -797,16 +797,13 @@ public final class TreeView extends View {
         drawDescendantsConn(g, lvv, new TreeRect(df, ww), cen, t);
 
       cen = (2 * df + ww) / 2;
-      switch(t) {
-        case CONNECTION:
-          break;
-        default:
-          g.setColor(color(7));
-          if(nodeHeight > 2) {
-            g.drawRect(df, getYperLevel(lvv) + 1, ww, nodeHeight - 2);
-          } else {
-            g.drawRect(df, getYperLevel(lvv), ww, nodeHeight);
-          }
+      if(t != Draw.CONNECTION) {
+        g.setColor(color(7));
+        if(nodeHeight > 2) {
+          g.drawRect(df, getYperLevel(lvv) + 1, ww, nodeHeight - 2);
+        } else {
+          g.drawRect(df, getYperLevel(lvv), ww, nodeHeight);
+        }
       }
 
       if(lvv + 1 < sub.subtreeHeight(rn) && !tr.bigRect(sub, rn, lvv + 1)) {
@@ -826,19 +823,17 @@ public final class TreeView extends View {
 
   /**
    * Returns connection color.
-   * @param t draw type
+   * @param type draw type
    * @return color
    */
-  private static Color getConnectionColor(final Draw t) {
+  private static Color getConnectionColor(final Draw type) {
     final int alpha, index;
-    switch(t) {
-      case CONNECTION:
-        alpha = 0x20000000;
-        index = 4;
-        break;
-     default:
-        alpha = 0x60000000;
-        index = 8;
+    if(type == Draw.CONNECTION) {
+      alpha = 0x20000000;
+      index = 4;
+    } else {
+      alpha = 0x60000000;
+      index = 8;
     }
     return new Color(color(index).getRGB() + alpha, true);
   }

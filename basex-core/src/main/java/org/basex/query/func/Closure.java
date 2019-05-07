@@ -474,7 +474,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final StringBuilder sb = new StringBuilder();
     if(!global.isEmpty()) {
       sb.append("((: inline-closure :) ");
-      global.forEach((k, v) -> sb.append(LET + ' ' + k + ' ' + ASSIGN + ' ' + v + ' '));
+      global.forEach((k, v) -> sb.append(LET + ' ').append(k).append(' ').append(ASSIGN).
+          append(' ').append(v).append(' '));
       sb.append(RETURN).append(' ');
     }
     sb.append(FUNCTION).append(PAREN1);

@@ -84,7 +84,7 @@ public final class PkgParser {
    * @param node node <dependency/> to be parsed
    * @return dependency container
    */
-  private PkgDep parseDependency(final ANode node) {
+  private static PkgDep parseDependency(final ANode node) {
     final Function<byte[], String> attribute = att -> {
       final byte[] v = node.attribute(att);
       return v == null ? null : string(v);

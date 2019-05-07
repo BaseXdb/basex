@@ -12,6 +12,7 @@ import javax.servlet.http.*;
 import org.basex.core.*;
 import org.basex.core.StaticOptions.*;
 import org.basex.core.jobs.*;
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.server.*;
 import org.basex.util.*;
@@ -100,6 +101,7 @@ public abstract class BaseXServlet extends HttpServlet {
    * @return user name or {@code null}
    */
   public String username(final HTTPConnection http) {
-    return http.context.user().name();
+    final User u = http.context.user();
+    return u != null ? u.name() : null;
   }
 }

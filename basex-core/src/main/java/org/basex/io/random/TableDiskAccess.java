@@ -108,7 +108,7 @@ public final class TableDiskAccess extends TableAccess {
 
       // check if page mapping is regular (are all pages used and in ascending order?)
       if(fPreIndex != null) {
-        regular &= p == used;
+        regular = p == used;
         for(int i = 0; i < p; i++) regular &= fPreIndex[i] == i * IO.ENTRIES;
         for(int i = 0; i < p; i++) regular &= pageIndex[i] == i;
         if(regular) removeMapping();
@@ -439,10 +439,10 @@ public final class TableDiskAccess extends TableAccess {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(Util.className(this) + " (");
-    sb.append("size: " + pages + ", used: " + used + ")");
-    if(fPreIndex != null) sb.append("\nFPres: " + Arrays.toString(fPreIndex));
-    if(pageIndex != null) sb.append("\nPages: " + Arrays.toString(pageIndex));
-    if(usedPages != null) sb.append("\nUsed Pages: " + usedPages);
+    sb.append("size: ").append(pages).append(", used: ").append(used).append(")");
+    if(fPreIndex != null) sb.append("\nFPres: ").append(Arrays.toString(fPreIndex));
+    if(pageIndex != null) sb.append("\nPages: ").append(Arrays.toString(pageIndex));
+    if(usedPages != null) sb.append("\nUsed Pages: ").append(usedPages);
     return sb.toString();
   }
 
@@ -570,7 +570,7 @@ public final class TableDiskAccess extends TableAccess {
    * @param to last entry to delete
    * @param l source length
    */
-  private void delete(final Buffer buffer, final int from, final int to, final int l) {
+  private static void delete(final Buffer buffer, final int from, final int to, final int l) {
     final byte[] array = buffer.data;
     Array.copy(array, to << IO.NODEPOWER, l << IO.NODEPOWER, array, from << IO.NODEPOWER);
     buffer.dirty = true;

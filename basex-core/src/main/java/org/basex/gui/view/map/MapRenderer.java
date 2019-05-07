@@ -8,7 +8,6 @@ import java.awt.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.query.util.ft.*;
 import org.basex.util.ft.*;
@@ -23,7 +22,7 @@ import org.basex.util.list.*;
  */
 final class MapRenderer {
   /** Font size. */
-  private final int fs = GUIConstants.fontSize;
+  private final int fs = fontSize;
   /** Graphics reference. */
   private final Graphics g;
 
@@ -297,8 +296,7 @@ final class MapRenderer {
           ++pp;
         }
         ++count;
-        if(i < dl0) ++i;
-        else break;
+        ++i;
       }
 
       if(ct == 0) {
@@ -491,7 +489,7 @@ final class MapRenderer {
       cc += data0[i];
 
       // find hovered thumbnail and corresponding text
-      boolean ir = false;
+      boolean ir;
       if(ll + wl + (ds && psl < dl1 && data1[psl] == sl ? rect.thumbsw : 0) >= ww) {
         if(ds) {
           // do not split token
@@ -508,7 +506,7 @@ final class MapRenderer {
           (psl < dl1 && data1[psl] == sl ? rect.thumbsw :  rect.thumbf);
         }
       } else {
-        ir |= inRect(rect.x + ll, yy, wl, rect.thumbfh, x, y);
+        ir = inRect(rect.x + ll, yy, wl, rect.thumbfh, x, y);
         ll += wl + (ds ? rect.thumbf : 0);
       }
 

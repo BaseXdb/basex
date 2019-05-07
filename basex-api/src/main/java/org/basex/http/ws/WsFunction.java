@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.http.restxq.*;
 import org.basex.http.web.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
@@ -127,8 +126,8 @@ public final class WsFunction extends WebFunction {
   }
 
   @Override
-  public int compareTo(final WebFunction wsxf) {
-    return wsxf instanceof RestXqFunction ? path.compareTo(((WsFunction) wsxf).path) : 1;
+  public int compareTo(final WebFunction func) {
+    return func instanceof WsFunction ? path.compareTo(((WsFunction) func).path) : 1;
   }
 
   /**

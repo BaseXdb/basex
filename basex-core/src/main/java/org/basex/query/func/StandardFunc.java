@@ -245,7 +245,7 @@ public abstract class StandardFunc extends Arr {
    * Converts the specified argument to a file path.
    * @param i index of argument
    * @param qc query context
-   * @return file instance
+   * @return file instance, or {@code null} if the argument does not exist
    * @throws QueryException query exception
    */
   protected final Path toPath(final int i, final QueryContext qc) throws QueryException {
@@ -519,7 +519,7 @@ public abstract class StandardFunc extends Arr {
    * @param func functions argument
    * @return arguments
    */
-  protected static final Expr[] args(final Expr func) {
+  protected static Expr[] args(final Expr func) {
     return ((StandardFunc) func).exprs;
   }
 

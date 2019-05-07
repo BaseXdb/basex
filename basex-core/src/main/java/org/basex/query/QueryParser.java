@@ -2392,7 +2392,7 @@ public class QueryParser extends InputParser {
     final byte[] ns = normalize(tok.toArray());
     if(eq(ns, XMLNS_URI)) {
       pos = p;
-      throw error(QueryError.ILLEGALEQNAME_X, info(), ns);
+      throw error(ILLEGALEQNAME_X, info(), ns);
     }
     return ns;
   }

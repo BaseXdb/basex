@@ -129,7 +129,7 @@ public final class Jobs {
     final JobsOptions opts = new JobsOptions();
     for(final ANode attr : job.attributes()) {
       try {
-        opts.assign(Token.string(attr.name()), Token.string(attr.string()));
+        opts.assign(string(attr.name()), string(attr.string()));
       } catch(final BaseXException ex) {
         Util.errln(file + ": Job attribute cannot be assigned: %", ex);
         return null;

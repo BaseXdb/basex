@@ -110,7 +110,7 @@ public final class GFLWOR extends ParseExpr {
     mergeWheres();
 
     // replace with expression of 'return' clause if all clauses were removed
-    Expr expr = this;
+    Expr expr;
     if(clauses.isEmpty()) {
       expr = rtrn;
     } else if(clauses.getFirst() instanceof Where) {

@@ -159,9 +159,7 @@ public final class CmpR extends Single {
   }
 
   @Override
-  public Expr merge(final Expr ex, final boolean union, final CompileContext cc)
-      throws QueryException {
-
+  public Expr merge(final Expr ex, final boolean union, final CompileContext cc) {
     if(!(ex instanceof CmpR)) return null;
 
     // do not merge if expressions to be compared are different

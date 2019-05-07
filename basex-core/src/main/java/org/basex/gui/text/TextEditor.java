@@ -859,7 +859,7 @@ public final class TextEditor {
         if(cp == '<' && pos < p - 1) {
           // add closing element
           next();
-          sb.append("</").append(Token.string(text, pos, p - pos)).append('>');
+          sb.append("</").append(string(text, pos, p - pos)).append('>');
         }
         break;
       }

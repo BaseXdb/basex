@@ -1,7 +1,6 @@
 package org.basex.http.web;
 
 import static org.basex.http.web.WebText.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
@@ -79,7 +78,7 @@ public abstract class WebFunction implements Comparable<WebFunction> {
 
     final Matcher m = TEMPLATE.matcher(tmp);
     if(!m.find()) throw error(INV_TEMPLATE_X, tmp);
-    final byte[] vn = token(m.group(1));
+    final byte[] vn = Token.token(m.group(1));
     if(!XMLToken.isQName(vn)) throw error(INV_VARNAME_X, vn);
     final QNm name = new QNm(vn);
     return checkVariable(name, AtomType.ITEM, declared);

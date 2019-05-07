@@ -71,7 +71,7 @@ public final class CmpIR extends Single {
     // only rewrite deterministic integer comparisons
     if(cmp.has(Flag.NDT) || !expr1.seqType().type.instanceOf(AtomType.ITR)) return cmp;
 
-    long mn = 0, mx = 0;
+    long mn, mx;
     if(expr2 instanceof RangeSeq) {
       final long[] range = ((RangeSeq) expr2).range(false);
       mn = range[0];
@@ -151,9 +151,7 @@ public final class CmpIR extends Single {
   }
 
   @Override
-  public Expr merge(final Expr ex, final boolean union, final CompileContext cc)
-      throws QueryException {
-
+  public Expr merge(final Expr ex, final boolean union, final CompileContext cc) {
     if(!(ex instanceof CmpIR)) return null;
 
     // do not merge if expressions to be compared are different

@@ -319,12 +319,6 @@ final class IndonesianStemmer extends InternalStemmer {
         flags |= REMOVED_PE;
         numSyllables--;
         tb.delete(0, 3);
-      } else if(c1 == 'b' && c2 == 'e' && c3 == 'l' && c4 == 'a' && tl > 7) {
-        if(tb.get(4) == 'j' && tb.get(5) == 'a' && tb.get(6) == 'r') {
-          flags |= REMOVED_PE;
-          numSyllables--;
-          tb.delete(0, 3);
-        }
       } else if(c1 == 'p' && c2 == 'e') {
         flags |= REMOVED_PE;
         numSyllables--;

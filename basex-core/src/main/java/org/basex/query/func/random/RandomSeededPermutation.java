@@ -38,7 +38,7 @@ public final class RandomSeededPermutation extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     return adoptType(exprs[1]);
   }
 }

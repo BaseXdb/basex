@@ -832,7 +832,7 @@ public enum AtomType implements Type {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    return this == type || type == AtomType.ITEM ||
+    return this == type || type == ITEM ||
         type instanceof AtomType && parent != null && parent.instanceOf(type);
   }
 
@@ -887,7 +887,7 @@ public enum AtomType implements Type {
 
   @Override
   public final AtomType atomic() {
-    return instanceOf(AtomType.AAT) ? this : null;
+    return instanceOf(AAT) ? this : null;
   }
 
   @Override

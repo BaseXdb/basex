@@ -158,7 +158,7 @@ public final class FuncItem extends FItem implements Scope {
       final boolean optimize) throws QueryException {
 
     final int pl = params.length;
-    if(pl != ft.argTypes.length) throw QueryError.typeError(this, ft.seqType(), null, ii);
+    if(pl != ft.argTypes.length) throw typeError(this, ft.seqType(), null, ii);
 
     // optimize: continue with coercion if current type is only an instance of new type
     final FuncType tp = funcType();

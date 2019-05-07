@@ -34,6 +34,6 @@ public final class NumbersOption extends Option<int[]> {
 
   @Override
   public String toString() {
-    return name() + Arrays.asList(value);
+    return name() + Collections.singletonList(value);
   }
 }

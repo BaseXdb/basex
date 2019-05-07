@@ -997,7 +997,7 @@ public class TextPanel extends BaseXPanel {
       for(int i = 0; i < il; i++) {
         if(i > 0) pairs.add(null);
         for(final Pair<String, String> pair : LISTS.get(i)) {
-          if(Strings.matches(pair.name(), input)) pairs.add(pair);
+          if(SmartStrings.matches(pair.name(), input)) pairs.add(pair);
         }
       }
     }

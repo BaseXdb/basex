@@ -395,10 +395,10 @@ public class FnHttpTest extends HTTPTest {
       try {
         final HttpRequestParser rp = new HttpRequestParser(null);
         rp.parse(dbNode.children().next(), Empty.VALUE);
-        error.append(name + ": Request did not fail.");
+        error.append(name).append(": Request did not fail.");
       } catch (final QueryException ex) {
         if(!ex.getMessage().contains(ErrType.HC.toString())) {
-          error.append(name + ": Wrong error code (" + ex.getMessage() + ")");
+          error.append(name).append(": Wrong error code (").append(ex.getMessage()).append(")");
         }
       }
     }

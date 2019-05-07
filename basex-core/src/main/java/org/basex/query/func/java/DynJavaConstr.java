@@ -48,7 +48,6 @@ final class DynJavaConstr extends DynJavaCall {
     constrs = new ArrayList<>();
     for(final Constructor<?> c : clazz.getConstructors()) {
       final Class<?>[] params = c.getParameterTypes();
-      if(params.length != el) continue;
       if(params.length == el && typesMatch(params, types)) constrs.add(c);
     }
     if(!constrs.isEmpty()) return true;

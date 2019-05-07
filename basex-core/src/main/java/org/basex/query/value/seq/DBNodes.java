@@ -200,7 +200,6 @@ public final class DBNodes extends DBNodeSeq {
     if(this == obj) return true;
     if(!(obj instanceof DBNodes)) return false;
     final DBNodes n = (DBNodes) obj;
-    return data == n.data && Arrays.equals(pres, n.pres) &&
-        (ftpos == null ? n.ftpos == null : ftpos.equals(n.ftpos));
+    return data == n.data && Arrays.equals(pres, n.pres) && Objects.equals(ftpos, n.ftpos);
   }
 }

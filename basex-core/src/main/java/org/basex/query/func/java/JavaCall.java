@@ -270,8 +270,7 @@ public abstract class JavaCall extends Arr {
     }
 
     // no suitable method found: check if method with correct name was found
-    throw noFunction(name, arity, string(qname.string()), arities, types, ii,
-        (Consumer<TokenList>) list -> {
+    throw noFunction(name, arity, string(qname.string()), arities, types, ii, list -> {
       for(final Method m : methods) list.add(m.getName());
     });
   }
@@ -302,7 +301,7 @@ public abstract class JavaCall extends Arr {
         final StringBuilder sb = new StringBuilder();
         for(final String type : types) {
           if(sb.length() != 0) sb.append(", ");
-          sb.append(type.toString().replaceAll("^.*\\.", ""));
+          sb.append(type.replaceAll("^.*\\.", ""));
         }
         return JAVAARGS_X_X.get(ii, full, sb);
       }

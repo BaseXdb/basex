@@ -137,10 +137,9 @@ public final class GroupBy extends Clause {
               // If the values are compared using a special collation, we let them collide
               // here and let the comparison do all the work later.
               // This enables other non-collation specs to avoid the collision.
-              hash = 31 * hash + (atom == Empty.VALUE || spec.coll != null ? 0 :
-                atom.hash(info));
+              hash = 31 * hash + (atom == Empty.VALUE || spec.coll != null ? 0 : atom.hash(info));
             }
-            qc.set(spec.var, atom == Empty.VALUE ? Empty.VALUE : atom);
+            qc.set(spec.var, atom);
           }
 
           // find the group for this key

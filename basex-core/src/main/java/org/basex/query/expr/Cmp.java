@@ -230,7 +230,7 @@ public abstract class Cmp extends Arr {
    * @param num input number
    * @return comparison type
    */
-  private int check(final OpV op, final ANum num) {
+  private static int check(final OpV op, final ANum num) {
     final double v = num.dbl();
     // > (v<0), != (v<0), >= (v<=0), != integer(v)
     if((op == OpV.GT || op == OpV.NE) && v < 0 || op == OpV.GE && v <= 0 ||

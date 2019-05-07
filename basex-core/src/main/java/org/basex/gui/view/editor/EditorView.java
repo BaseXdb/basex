@@ -144,7 +144,7 @@ public final class EditorView extends View {
     buttons.add(test);
 
     context = new BaseXLabel("").resize(1.2f);
-    context.setForeground(GUIConstants.dgray);
+    context.setForeground(dgray);
 
     final BaseXBack north = new BaseXBack(false).layout(new BorderLayout(10, 0));
     north.add(buttons, BorderLayout.WEST);

@@ -137,7 +137,6 @@ public final class Pkg {
    * @return package version
    */
   public static String version(final String pkg) {
-    final int idx = pkg.lastIndexOf('-');
-    return pkg.substring(idx + 1, pkg.length());
+    return pkg.substring(pkg.lastIndexOf('-') + 1);
   }
 }

@@ -3,7 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
-import org.basex.query.*;
 import org.basex.query.ast.*;
 import org.junit.*;
 
@@ -41,7 +40,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     final Function func = _UTIL_DEEP_EQUAL;
     query(func.args(1, 1), true);
     query(func.args(1, 1, "ALLNODES"), true);
-    error(func.args("(1 to 2)", "(1 to 2)", "X"), QueryError.INVALIDOPTION_X);
+    error(func.args("(1 to 2)", "(1 to 2)", "X"), INVALIDOPTION_X);
   }
 
   /** Test method. */
@@ -247,6 +246,6 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" <a/>", 2), "<a/>\n<a/>", type(func, "element()+"));
     check(func.args(" <a/>", " <_>2</_>"), "<a/>\n<a/>", type(func, "element()*"));
 
-    error(func.args(1, -1), QueryError.UTIL_NEGATIVE_X);
+    error(func.args(1, -1), UTIL_NEGATIVE_X);
   }
 }

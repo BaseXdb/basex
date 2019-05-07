@@ -40,9 +40,7 @@ public final class Functions {
   /** Private constructor. */
   private Functions() { }
 
-  /**
-   * Constructor, registering built-in XQuery functions.
-   */
+  // initializes built-in XQuery functions
   static {
     // add built-in core functions
     Function.init(DEFINITIONS);

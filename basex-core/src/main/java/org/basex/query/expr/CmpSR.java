@@ -134,9 +134,7 @@ public final class CmpSR extends Single {
 
 
   @Override
-  public Expr merge(final Expr ex, final boolean union, final CompileContext cc)
-      throws QueryException {
-
+  public Expr merge(final Expr ex, final boolean union, final CompileContext cc) {
     if(union || !(ex instanceof CmpSR)) return null;
 
     // skip intersection if expressions to be compared are different

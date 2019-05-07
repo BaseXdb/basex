@@ -482,7 +482,7 @@ public final class SeqType {
    * @return resulting type
    */
   public SeqType add(final SeqType st) {
-    return zero() ? st : st.zero() ? this : SeqType.get(type.union(st.type), occ.add(st.occ));
+    return zero() ? st : st.zero() ? this : get(type.union(st.type), occ.add(st.occ));
   }
 
   /**

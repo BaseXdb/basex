@@ -53,7 +53,7 @@ public final class EditorArea extends TextPanel {
 
     addFocusListener((FocusGainedListener) e -> {
       // refresh query path and working directory
-      gui.gopts.setFile(GUIOptions.WORKPATH, EditorArea.this.file.parent());
+      gui.gopts.setFile(GUIOptions.WORKPATH, this.file.parent());
       // reload file if it has been changed
       SwingUtilities.invokeLater(() -> reopen(false));
     });

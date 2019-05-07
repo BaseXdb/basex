@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
-import org.basex.query.*;
 import org.basex.query.ast.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -78,8 +77,8 @@ public final class FnModuleTest extends QueryPlanTest {
 
     // code coverage tests
     query("string-length(" + func.args(" reverse#1", " ['a']") + ")", 1);
-    error(func.args(" true#0", " [1]"), QueryError.APPLY_X_X);
-    error(func.args(" put#2", " [<_/>,'']"), QueryError.FUNCUP_X);
+    error(func.args(" true#0", " [1]"), APPLY_X_X);
+    error(func.args(" put#2", " [<_/>,'']"), FUNCUP_X);
   }
 
   /** Test method. */
@@ -498,8 +497,8 @@ public final class FnModuleTest extends QueryPlanTest {
     check("for $d in (1e0, 2e-1) return $d[" + func.args() + " = 1]", 1, empty(func));
     check("for $d in (1, 2.34) return $d[" + func.args() + ']', 1, exists(func));
 
-    error(func.args(), QueryError.NOCTX_X);
-    error(func.args(" true#0"), QueryError.FIATOM_X);
+    error(func.args(), NOCTX_X);
+    error(func.args(" true#0"), FIATOM_X);
   }
 
   /** Test method. */
@@ -759,8 +758,8 @@ public final class FnModuleTest extends QueryPlanTest {
     check("for $s in ('a' ,'b') return $s[" + func.args() + " = 'a']", "a", empty(func));
     check("for $s in (<a/> ,<b/>) return $s[" + func.args() + ']', "", exists(func));
 
-    error(func.args(), QueryError.NOCTX_X);
-    error(func.args(" true#0"), QueryError.FISTRING_X);
+    error(func.args(), NOCTX_X);
+    error(func.args(" true#0"), FISTRING_X);
   }
 
   /** Test method. */
@@ -770,7 +769,7 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args("A"), 1);
     query("'A'[" + func.args() + ']', "A");
     query(func.args(" ([()], 'a')"), 1);
-    error("true#0[" + func.args() + ']', QueryError.FISTRING_X);
+    error("true#0[" + func.args() + ']', FISTRING_X);
   }
 
   /** Test method. */

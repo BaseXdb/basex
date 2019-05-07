@@ -55,8 +55,8 @@ public final class CmpV extends Cmp {
       @Override
       public boolean eval(final Item item1, final Item item2, final Collation coll,
           final StaticContext sc, final InputInfo ii) throws QueryException {
-        final int v = item1.diff(item2, coll, ii);
-        return v != Item.UNDEF && v >= 0;
+        // includes UNDEF check
+        return item1.diff(item2, coll, ii) >= 0;
       }
       @Override
       public OpV swap() { return LE; }
@@ -69,8 +69,8 @@ public final class CmpV extends Cmp {
       @Override
       public boolean eval(final Item item1, final Item item2, final Collation coll,
           final StaticContext sc, final InputInfo ii) throws QueryException {
-        final int v = item1.diff(item2, coll, ii);
-        return v != Item.UNDEF && v > 0;
+        // includes UNDEF check
+        return item1.diff(item2, coll, ii) > 0;
       }
       @Override
       public OpV swap() { return LT; }

@@ -25,7 +25,7 @@ import org.basex.util.list.*;
  */
 public final class FileReadTextLines extends FileRead {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) {
     return new Iter() {
       final TokenBuilder tb = new TokenBuilder();
       NewlineInput ni;
@@ -42,7 +42,7 @@ public final class FileReadTextLines extends FileRead {
           }
           while(++c < minMax[1] && ni.readLine(tb)) {
             if(c >= minMax[0]) return Str.get(tb.toArray());
-          };
+          }
           qc.resources.remove(ni);
           return null;
         } catch(final IOException ex) {

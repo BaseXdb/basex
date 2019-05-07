@@ -147,7 +147,7 @@ public final class ProjectView extends BaseXPanel {
     SwingUtilities.invokeLater(() -> {
       final IOFile io = file.normalize();
       if(io.path().startsWith(root.file.path())) {
-        if(xquery) files.parse(file.path(), gui.context, files.errors());
+        if(xquery) ProjectFiles.parse(file.path(), gui.context, files.errors());
         refreshTree(io);
       }
       refresh(rename, library);

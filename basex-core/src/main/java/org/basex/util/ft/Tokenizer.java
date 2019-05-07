@@ -47,11 +47,11 @@ public abstract class Tokenizer extends LanguageImpl {
    * Gets full-text info for the specified token.
    * Needed for visualizations; does not have to be implemented by all tokenizers.
    * <ul>
-   * <li/>int[0]: length of each token
-   * <li/>int[1]: sentence info, length of each sentence
-   * <li/>int[2]: paragraph info, length of each paragraph
-   * <li/>int[3]: each token as int[]
-   * <li/>int[4]: punctuation marks of each sentence
+   *   <li> int[0]: length of each token</li>
+   *   <li> int[1]: sentence info, length of each sentence</li>
+   *   <li> int[2]: paragraph info, length of each paragraph</li>
+   *   <li> int[3]: each token as int[]</li>
+   *   <li> int[4]: punctuation marks of each sentence</li>
    * </ul>
    * @return int arrays or empty array if not implemented
    */

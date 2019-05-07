@@ -85,13 +85,12 @@ public final class DbListDetails extends DbList {
           final int pre = docs.get((int) i);
           final byte[] pt = data.text(pre, true);
           final int sz = data.size(pre, Data.DOC);
-          return resource(pt, false, MediaType.APPLICATION_XML, data.meta.time, Long.valueOf(sz));
+          return resource(pt, false, MediaType.APPLICATION_XML, data.meta.time, (long) sz);
         }
         if(i < size) {
           final byte[] pt = bins.get((int) i - ds);
           final IOFile io = data.meta.binary(string(pt));
-          return resource(pt, true, MediaType.get(io.path()), io.timeStamp(),
-              Long.valueOf(io.length()));
+          return resource(pt, true, MediaType.get(io.path()), io.timeStamp(), io.length());
         }
         return null;
       }

@@ -160,7 +160,7 @@ abstract class BinFn extends StandardFunc {
   final int[] bounds(final Long off, final Long len, final int size) throws QueryException {
     int of = 0;
     if(off != null) {
-      if(off < 0 || off > size || off > Integer.MAX_VALUE) throw BIN_IOOR_X_X.get(info, off, size);
+      if(off < 0 || off > size) throw BIN_IOOR_X_X.get(info, off, size);
       of = (int) off.longValue();
     }
     final int sz;

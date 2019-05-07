@@ -103,7 +103,7 @@ public final class BaseXGUI extends Main {
     f.setLocationRelativeTo(null);
     f.setVisible(true);
     return f;
-  };
+  }
 
   /**
    * Initializes the GUI.

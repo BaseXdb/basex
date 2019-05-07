@@ -338,16 +338,13 @@ public final class PlotView extends View {
 
     // draw selection box
     if(dragging) {
-      final int selW = selectionBox.w;
-      final int selH = selectionBox.h;
-      final int x1 = selectionBox.x;
-      final int y1 = selectionBox.y;
+      final int selW = selectionBox.w, selH = selectionBox.h;
+      final int x1 = selectionBox.x, y1 = selectionBox.y;
+      final int x = selW > 0 ? x1 : x1 + selW, y = selH > 0 ? y1 : y1 + selH;
       g.setColor(colormark2A);
-      g.fillRect(selW > 0 ? x1 : x1 + selW, selH > 0 ? y1 : y1 + selH,
-          Math.abs(selW), Math.abs(selH));
+      g.fillRect(x, y, Math.abs(selW), Math.abs(selH));
       g.setColor(colormark1A);
-      g.drawRect(selW > 0 ? x1 : x1 + selW, selH > 0 ? y1 : y1 + selH,
-          Math.abs(selW), Math.abs(selH));
+      g.drawRect(x, y, Math.abs(selW), Math.abs(selH));
     }
     markingChanged = false;
     plotChanged = false;

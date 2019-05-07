@@ -32,6 +32,11 @@ final class BaseXSplitSep extends BaseXBack {
       public void mouseDragged(final MouseEvent e) {
         ((BaseXSplit) getParent()).drag(BaseXSplitSep.this, pos(e));
       }
+
+      private double pos(final MouseEvent e) {
+        final Point p = getLocationOnScreen();
+        return horizontal ? p.x + e.getX() : p.y + e.getY();
+      }
     };
     addMouseListener(mouse);
     addMouseMotionListener(mouse);
@@ -47,15 +52,5 @@ final class BaseXSplitSep extends BaseXBack {
     g.drawLine(0, 0, horizontal ? 0 : w, horizontal ? h : 0);
     g.drawLine(horizontal ? w - 1 : 0, horizontal ? 0 : h - 1,
                horizontal ? w - 1 : w, horizontal ? h : h - 1);
-  }
-
-  /**
-   * Returns absolute cursor position.
-   * @param e mouse event
-   * @return absolute cursor position
-   */
-  private double pos(final MouseEvent e) {
-    final Point p = getLocationOnScreen();
-    return horizontal ? p.x + e.getX() : p.y + e.getY();
   }
 }

@@ -249,7 +249,7 @@ public final class Token {
     } else {
       s = object.toString();
     }
-    return Token.token(s);
+    return token(s);
   }
 
   /**

@@ -121,7 +121,7 @@ public class IntSet extends ASet {
   @Override
   public String toString() {
     final List<Object> k = new ArrayList<>();
-    for(final int key : keys) k.add(Integer.valueOf(key));
+    for(final int key : keys) k.add(key);
     return toString(k.toArray());
   }
 }

@@ -43,7 +43,7 @@ public final class InlineTest extends SandboxTest {
 
     // first 65536 Unicode characters
     for(char ch = 0; ch < 65535; ch++) run(String.valueOf(ch));
-    for(char ch = 0; ch < 2047; ch++) run(String.valueOf(ch) + String.valueOf(ch));
+    for(char ch = 0; ch < 2047; ch++) run(String.valueOf(ch) + ch);
     run("\u067e");
     run("\u0631");
     run("\u067e\u0631");

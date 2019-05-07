@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public final class RestInit extends RestFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) {
     WebModules.get(qc.context).init();
     return Empty.VALUE;
   }

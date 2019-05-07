@@ -3,7 +3,6 @@ package org.basex.gui.view.project;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
-import java.util.function.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -136,7 +135,9 @@ final class ProjectFiles {
    * @param errs files with errors
    * @return parsed modules or {@code null}
    */
-  TokenMap parse(final String path, final Context ctx, final TreeMap<String, InputInfo> errs) {
+  static TokenMap parse(final String path, final Context ctx,
+      final TreeMap<String, InputInfo> errs) {
+
     try(TextInput ti = new TextInput(new IOFile(path))) {
       // parse query
       try(QueryContext qc = new QueryContext(ctx)) {
@@ -168,7 +169,7 @@ final class ProjectFiles {
     if(pc == null) {
       // no file cache available: create and return new one
       cache = new ProjectCache(!view.gui.gopts.get(GUIOptions.SHOWHIDDEN));
-      cache.scan(Paths.get(root.path()), (Predicate<ProjectCache>) p -> p != cache);
+      cache.scan(Paths.get(root.path()), p -> p != cache);
     } else {
       // wait until file cache is initialized
       while(!pc.valid()) {
@@ -202,9 +203,9 @@ final class ProjectFiles {
           if(exclude.contains(path)) continue;
           // check if current file matches the pattern
           final String file = onlyName ? path.substring(path.lastIndexOf('/') + 1) : path;
-          if(mode == 0 ? Strings.startsWith(file, query) :
-             mode == 1 ? Strings.contains(file, query) :
-             Strings.matches(file, query)) {
+          if(mode == 0 ? SmartStrings.startsWith(file, query) :
+             mode == 1 ? SmartStrings.contains(file, query) :
+             SmartStrings.matches(file, query)) {
 
             // check file contents
             if(filterContent(path, search)) {

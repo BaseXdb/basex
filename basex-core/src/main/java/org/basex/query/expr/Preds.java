@@ -215,7 +215,7 @@ public abstract class Preds extends Arr {
         if(!mexprs[1].has(Flag.POS) && (mexprs[0] instanceof ContextValue ||
             root.equals(mexprs[0]) && root.isSimple() && st.one())) {
           final int ml = mexprs.length;
-          ex = ml == 1 ? mexprs[1] : SimpleMap.get(map.info, Arrays.copyOfRange(mexprs, 1, ml));
+          ex = SimpleMap.get(map.info, Arrays.copyOfRange(mexprs, 1, ml));
         }
       } else if(ex instanceof Path) {
         // E [ . / ... ] -> E [ ... ]

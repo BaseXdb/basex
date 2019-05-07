@@ -69,15 +69,11 @@ public abstract class OutputSerializer extends Serializer {
     final String is = sopts.get(ITEM_SEPARATOR);
     if(is != null) itemsep = token(is);
 
-    final boolean bom  = sopts.yes(BYTE_ORDER_MARK);
-    if(bom) {
-      // comparison by reference
-      if(encoding == Strings.UTF8) {
-        out.write(0xEF); out.write(0xBB); out.write(0xBF);
-      } else if(encoding == Strings.UTF16LE) {
-        out.write(0xFF); out.write(0xFE);
-      } else if(encoding == Strings.UTF16BE) {
-        out.write(0xFE); out.write(0xFF);
+    if(sopts.yes(BYTE_ORDER_MARK)) {
+      switch (encoding) {
+        case Strings.UTF8:    out.write(0xEF); out.write(0xBB); out.write(0xBF); break;
+        case Strings.UTF16LE: out.write(0xFF); out.write(0xFE); break;
+        case Strings.UTF16BE: out.write(0xFE); out.write(0xFF); break;
       }
     }
   }

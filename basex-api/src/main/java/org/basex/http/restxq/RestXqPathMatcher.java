@@ -191,7 +191,7 @@ final class RestXqPathMatcher {
         if(".^&!?-:<>()[]{}$=,*+|".indexOf(b) >= 0) tb.addByte((byte) '\\');
         tb.addByte(b);
       }
-      result.append(tb.toString());
+      result.append(tb);
       literals.setLength(0);
     }
   }

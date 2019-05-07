@@ -59,7 +59,7 @@ public class FnMin extends StandardFunc {
         if(!(item2 instanceof AStr)) throw CMP_X_X_X.get(info, type1, item2.type, item2);
         final Type type2 = item2.type;
         if(cmp.eval(item1, item2, coll, sc, info)) item1 = item2;
-        if(type1 != type2 && item1.type == AtomType.URI) item1 = STR.cast(item1, qc, sc, info);
+        if(type1 != type2 && item1.type == URI) item1 = STR.cast(item1, qc, sc, info);
       }
       return item1;
     }
@@ -120,7 +120,7 @@ public class FnMin extends StandardFunc {
       }
       if(item != null) {
         final Type type = item.seqType().type;
-        if(type.isNumber() || type.instanceOf(AtomType.STR)) return item;
+        if(type.isNumber() || type.instanceOf(STR)) return item;
       }
     }
     return null;
@@ -142,7 +142,7 @@ public class FnMin extends StandardFunc {
     Type type = st.type;
     if(type.isSortable()) {
       if(type.isUntyped()) {
-        type = AtomType.DBL;
+        type = DBL;
       } else if(st.one() && exprs.length < 2) {
         return expr;
       }

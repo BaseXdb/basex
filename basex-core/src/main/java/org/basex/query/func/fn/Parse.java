@@ -41,8 +41,8 @@ public abstract class Parse extends StandardFunc {
 
     final byte[] path = toToken(item);
 
-    String enc = null;
-    IO io = null;
+    String enc;
+    IO io;
     try {
       enc = encoding ? toEncoding(1, ENCODING_X, qc) : null;
 

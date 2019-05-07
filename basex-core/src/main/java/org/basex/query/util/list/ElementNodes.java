@@ -41,7 +41,7 @@ public final class ElementNodes<E> implements Iterable<E> {
    * @param node node to be deleted
    * @return next node
    */
-  private Node<E> delete(final Node<E> node) {
+  public Node<E> delete(final Node<E> node) {
     final Node<E> n = node.next, p = node.prev;
     if(p != null) {
       p.next = n;

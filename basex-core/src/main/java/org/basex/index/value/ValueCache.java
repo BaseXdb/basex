@@ -61,7 +61,7 @@ public final class ValueCache implements Iterable<byte[]> {
       if(data.kind(pre) == kind && in.contains(pre, text)) {
         if(type == IndexType.TOKEN) {
           int ps = 0;
-          for(final byte[] token : distinctTokens(data.text(pre, text))) {
+          for(final byte[] token : distinctTokens(data.text(pre, false))) {
             addId(token, pre, ps++, data);
           }
         } else if(data.textLen(pre, text) <= data.meta.maxlen) {

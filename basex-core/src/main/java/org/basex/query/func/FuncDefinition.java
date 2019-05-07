@@ -38,7 +38,7 @@ public final class FuncDefinition {
 
   /**
    * Constructs a function signature.
-   * @param func reference to the class containing the function implementation
+   * @param clazz reference to the class containing the function implementation
    * @param desc descriptive function string, containing the function name and its
    *             arguments in parentheses. Optional arguments are represented in nested
    *             square brackets; three dots indicate that the number of arguments of a
@@ -48,10 +48,10 @@ public final class FuncDefinition {
    * @param flags static function properties
    * @param uri uri
    */
-  FuncDefinition(final Class<? extends StandardFunc> func, final String desc,
+  FuncDefinition(final Class<? extends StandardFunc> clazz, final String desc,
       final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri) {
 
-    this.clazz = func;
+    this.clazz = clazz;
     this.desc = desc;
     this.seqType = seqType;
     this.params = params;

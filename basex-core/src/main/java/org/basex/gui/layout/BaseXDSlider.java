@@ -61,8 +61,8 @@ public final class BaseXDSlider extends BaseXPanel {
     this.listener = listener;
     this.min = min;
     this.max = max;
-    this.currMin = min;
-    this.currMax = max;
+    currMin = min;
+    currMax = max;
 
     // choose logarithmic scaling for larger ranges
     log = StrictMath.log(max) - StrictMath.log(min) > 5 && max - min > 100;

@@ -42,7 +42,7 @@ public final class DbDir extends DbList {
     final Data data = checkData(qc);
     byte[] path = toToken(exprs[1], qc);
     String root = MetaData.normPath(string(path));
-    if(root == null) throw DB_PATH_X.get(info, root);
+    if(root == null) throw DB_PATH_X.get(info, path);
 
     if(!root.isEmpty() && !Strings.endsWith(root, '/')) root += '/';
     path = token(root);
