@@ -217,7 +217,7 @@ public enum ApiFunction {
   _SESSIONS_GET(SessionsGet.class, "get(id,key[,default])",
       arg(STR_O, STR_O, ITEM_ZM), ITEM_ZM, flag(NDT), SESSIONS_URI),
   /** XQuery function. */
-  _SESSIONS_IDS(SessionsIds.class, "ids()", arg(), STR_O, flag(NDT), SESSIONS_URI),
+  _SESSIONS_IDS(SessionsIds.class, "ids()", arg(), STR_ZM, flag(NDT), SESSIONS_URI),
   /** XQuery function. */
   _SESSIONS_NAMES(SessionsNames.class, "names(id)", arg(STR_O), STR_ZM, flag(NDT), SESSIONS_URI),
   /** XQuery function. */
