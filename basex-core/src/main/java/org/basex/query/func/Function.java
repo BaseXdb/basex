@@ -1372,14 +1372,15 @@ public enum Function {
   /** XQuery function. */
   _WEB_CONTENT_TYPE(WebContentType.class, "content-type(path)", arg(STR_O), STR_O, WEB_URI),
   /** XQuery function. */
-  _WEB_CREATE_URL(WebCreateUrl.class, "create-url(url,params)", arg(STR_O, MAP_O), STR_O, WEB_URI),
+  _WEB_CREATE_URL(WebCreateUrl.class, "create-url(url,params[,anchor])",
+      arg(STR_O, MAP_O, STR_O), STR_O, WEB_URI),
   /** XQuery function. */
   _WEB_DECODE_URL(WebDecodeUrl.class, "decode-url(string)", arg(STR_O), STR_O, WEB_URI),
   /** XQuery function. */
   _WEB_ENCODE_URL(WebEncodeUrl.class, "encode-url(string)", arg(STR_O), STR_O, WEB_URI),
   /** XQuery function. */
-  _WEB_REDIRECT(WebRedirect.class, "redirect(location[,params])",
-      arg(STR_O, MAP_O), ELM_O, WEB_URI),
+  _WEB_REDIRECT(WebRedirect.class, "redirect(location[,params[,anchor]])",
+      arg(STR_O, MAP_O, STR_O), ELM_O, WEB_URI),
   /** XQuery function. */
   _WEB_RESPONSE_HEADER(WebResponseHeader.class, "response-header([output[,headers[,attributes]]])",
       arg(MAP_ZO, MAP_ZO, MAP_ZO), ELM_O, WEB_URI),

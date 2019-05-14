@@ -17,10 +17,13 @@ abstract class WebFn extends StandardFunc {
    * Returns a URL for the specified main URL and the query parameters.
    * @param url url
    * @param map query parameters
+   * @param anchor anchor
    * @return generated url
    * @throws QueryException query exception
    */
-  protected byte[] createUrl(final byte[] url, final XQMap map) throws QueryException {
+  protected byte[] createUrl(final byte[] url, final XQMap map, final byte[] anchor)
+      throws QueryException {
+
     final TokenBuilder tb = new TokenBuilder().add(url);
     int c = 0;
     for(final Item key : map.keys()) {
@@ -30,6 +33,7 @@ abstract class WebFn extends StandardFunc {
         tb.add('=').add(Token.encodeUri(value.string(info), false));
       }
     }
+    if(anchor.length > 0) tb.add('#').add(Token.encodeUri(anchor, false));
     return tb.finish();
   }
 }
