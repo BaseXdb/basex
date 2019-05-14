@@ -415,6 +415,7 @@ declare function html:table(
         let $link := $options?link
         for $entry in $shown-entries[position() <= $max]
         return element tr {
+          $entry?id ! attribute id { . },
           for $header at $pos in $headers
           let $name := $header?key
           let $type := $header?type

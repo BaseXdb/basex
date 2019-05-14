@@ -36,7 +36,9 @@ function dba:jump-page(
     return ($pos - 1) idiv $max + 1,
     1
   ))
-  return web:redirect('/dba/logs', map { 'name': $name, 'page': $page, 'time': $time })
+  return web:redirect('/dba/logs', map { 'name': $name, 'page': $page, 'time': $time }) update {
+    .//*:header/@value ! (replace value of node . with . || '#' || $time)
+  }
 };
 
 (:~
@@ -191,15 +193,16 @@ function dba:log(
     where (not($search) or $user-hit or $type-hit or $text-hit) and (
       not($ignore-logs and matches($msg, $ignore-logs, 'i'))
     )
+    let $id := string($log/@time)
     return map {
+      'id': $id,
       'time': function() {
-        let $value := string($log/@time)
-        return if($input or $sort) then (
-          html:link($value, $dba:CAT || '-jump', map { 'name': $name, 'time': $value })
-        ) else if($value = $time) then (
-          <b>{ $value }</b>
+        if($input or $sort) then (
+          html:link($id, $dba:CAT || '-jump', map { 'name': $name, 'time': $id })
+        ) else if($id = $time) then (
+          <b>{ $id }</b>
         ) else (
-          $value
+          $id
         )
       },
       'address': $log/@address,

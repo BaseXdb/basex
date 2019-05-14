@@ -174,6 +174,8 @@ function logEntries(enforce, reset) {
   _logInput = input;
   query("log", input, function(text) {
     document.getElementById("output").innerHTML = text;
+    var e = document.getElementById(window.location.hash.replace(/^#/, ""));
+    if(e) e.scrollIntoView();
     if(reset) window.history.replaceState(null, "", replaceParam(window.location.href, "page", 1));
   }, reset);
 
