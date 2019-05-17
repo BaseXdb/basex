@@ -96,11 +96,17 @@ public final class MainModule extends AModule {
     final int fp = vs.enter(qc);
     final Iter iter = expr.iter(qc);
     return new Iter() {
+      boolean more = true;
+
       @Override
       public Item next() throws QueryException {
-        final Item item = qc.next(iter);
-        if(item == null) VarScope.exit(fp, qc);
-        return item;
+        if(more) {
+          final Item item = qc.next(iter);
+          if(item != null) return item;
+          more = false;
+          VarScope.exit(fp, qc);
+        }
+        return null;
       }
       @Override
       public long size() throws QueryException {
