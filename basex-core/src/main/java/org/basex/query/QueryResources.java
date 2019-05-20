@@ -187,10 +187,13 @@ public final class QueryResources {
    * database and node.
    * @param qi query input
    * @param ii input info
+   * @param db open database
    * @return document
    * @throws QueryException query exception
    */
-  public synchronized DBNode doc(final QueryInput qi, final InputInfo ii) throws QueryException {
+  public synchronized DBNode doc(final QueryInput qi, final InputInfo ii, final boolean db)
+      throws QueryException {
+
     // favor default database
     Data data = globalData();
     if(data != null && qc.context.options.get(MainOptions.DEFAULTDB)) {
@@ -199,7 +202,7 @@ public final class QueryResources {
     }
 
     // access open database or create new one
-    data = data(true, qi, ii);
+    data = data(true, qi, ii, db);
     // ensure that database contains a single document
     final IntList docs = data.resources.docs(qi.dbPath);
     if(docs.size() == 1) return new DBNode(data, docs.get(0), Data.DOC);
@@ -211,10 +214,11 @@ public final class QueryResources {
    * or creates a new data reference.
    * @param qi query input (set to {@code null} if default collection is requested)
    * @param ii input info
+   * @param db open database
    * @return collection
    * @throws QueryException query exception
    */
-  public synchronized Value collection(final QueryInput qi, final InputInfo ii)
+  public synchronized Value collection(final QueryInput qi, final InputInfo ii, final boolean db)
       throws QueryException {
 
     // return default collection
@@ -240,7 +244,7 @@ public final class QueryResources {
     }
 
     // access open database or create new one
-    data = data(false, qi, ii);
+    data = data(false, qi, ii, db);
     final IntList docs = data.resources.docs(qi.dbPath);
     return DBNodeSeq.get(docs, data, true, qi.dbPath.isEmpty());
   }
@@ -360,32 +364,33 @@ public final class QueryResources {
    * @param single single document
    * @param qi query input
    * @param ii input info
+   * @param db open database
    * @return document
    * @throws QueryException query exception
    */
-  private Data data(final boolean single, final QueryInput qi, final InputInfo ii)
+  private Data data(final boolean single, final QueryInput qi, final InputInfo ii, final boolean db)
       throws QueryException {
 
     // check opened databases
+    final String dbName = qi.dbName;
     for(final Data data : datas) {
       // compare input path
-      final String orig = data.meta.original;
-      if(!orig.isEmpty() && IO.get(orig).eq(qi.io)) {
+      final String original = data.meta.original;
+      if(!original.isEmpty() && IO.get(original).eq(qi.io)) {
         // reset database path: indicates that database includes all files of the original path
         qi.dbPath = "";
         return data;
       }
       // compare database name
-      final String name = data.meta.name, dbName = qi.dbName;
+      final String name = data.meta.name;
       if(Prop.CASE ? name.equals(dbName) : name.equalsIgnoreCase(dbName)) return data;
     }
 
     // try to open existing database
-    final String name = qi.dbName;
-    if(name != null) {
+    if(db && dbName != null) {
       try {
         final Context ctx = qc.context;
-        return addData(Open.open(name, ctx, ctx.options));
+        return addData(Open.open(dbName, ctx, ctx.options));
       } catch(final IOException ex) {
         Util.debug(ex);
       }

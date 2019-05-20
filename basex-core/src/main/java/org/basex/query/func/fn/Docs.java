@@ -26,10 +26,11 @@ public abstract class Docs extends StandardFunc {
   /**
    * Returns a collection.
    * @param qc query context
+   * @param db open database
    * @return collection
    * @throws QueryException query exception
    */
-  Value collection(final QueryContext qc) throws QueryException {
+  public Value collection(final QueryContext qc, final boolean db) throws QueryException {
     // return default collection or parse specified collection
     QueryInput qi = queryInput;
     if(qi == null) {
@@ -40,16 +41,17 @@ public abstract class Docs extends StandardFunc {
         if(qi == null) throw INVCOLL_X.get(info, uri);
       }
     }
-    return qc.resources.collection(qi, info);
+    return qc.resources.collection(qi, info, db);
   }
 
   /**
    * Performs the doc function.
    * @param qc query context
+   * @param db open database
    * @return document or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
-  Item doc(final QueryContext qc) throws QueryException {
+  public Item doc(final QueryContext qc, final boolean db) throws QueryException {
     QueryInput qi = queryInput;
     if(qi == null) {
       final Item item = exprs[0].atomItem(qc, info);
@@ -58,11 +60,11 @@ public abstract class Docs extends StandardFunc {
       qi = queryInput(uri);
       if(qi == null) throw INVDOC_X.get(info, uri);
     }
-    return qc.resources.doc(qi, info);
+    return qc.resources.doc(qi, info, db);
   }
 
   @Override
-  public final boolean accept(final ASTVisitor visitor) {
+  public boolean accept(final ASTVisitor visitor) {
     if(exprs.length == 0) {
       // lock default collection (only collection functions can have 0 arguments)
       visitor.lock(Locking.COLLECTION, false);

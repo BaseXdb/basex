@@ -16,7 +16,7 @@ public final class FnDocAvailable extends Docs {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     try {
-      return Bln.get(doc(qc) != Empty.VALUE);
+      return Bln.get(doc(qc, true) != Empty.VALUE);
     } catch(final QueryException ex) {
       final QueryError error = ex.error();
       if(error != null && error.code.matches("^.*\\d+$")) {
