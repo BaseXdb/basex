@@ -191,12 +191,12 @@ public final class MainModule extends AModule {
     }
 
     @Override
-    public boolean lock(final String db, final boolean up) {
+    public boolean lock(final String lock, final boolean update) {
       // name is unknown at compile time: return false
-      if(db == null) return false;
+      if(lock == null) return false;
       // if context item is found on top level, it will refer to currently opened database
-      if(level == 0 || db != Locking.CONTEXT) {
-        (updating || up ? locks.writes : locks.reads).add(db);
+      if(level == 0 || lock != Locking.CONTEXT) {
+        (updating || update ? locks.writes : locks.reads).add(lock);
       }
       return true;
     }

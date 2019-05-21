@@ -21,36 +21,6 @@ public final class FetchModuleTest extends SandboxTest {
   private static final String CSV = DIR + "input.csv";
 
   /** Test method. */
-  @Test public void binary() {
-    final Function func = _FETCH_BINARY;
-    // successful queries
-    query(func.args(XML));
-    error(func.args(XML + 'x'), FETCH_OPEN_X);
-  }
-
-  /** Test method. */
-  @Test public void collection() {
-    final Function func = _FETCH_COLLECTION;
-    query(func.args(XML));
-    query(func.args(XML) + " is " + func.args(XML), true);
-  }
-
-  /** Test method. */
-  @Test public void contentType() {
-    final Function func = _FETCH_CONTENT_TYPE;
-    // successful queries
-    query(func.args(XML));
-    error(func.args(XML + 'x'), FETCH_OPEN_X);
-  }
-
-  /** Test method. */
-  @Test public void doc() {
-    final Function func = _FETCH_DOC;
-    query(func.args(XML));
-    query(func.args(XML) + " is " + func.args(XML), true);
-  }
-
-  /** Test method. */
   @Test public void text() {
     final Function func = _FETCH_TEXT;
     // successful queries
@@ -93,5 +63,21 @@ public final class FetchModuleTest extends SandboxTest {
     final String xml = "<x>Ä</x>";
     final String data = "<?xml version=''1.0'' encoding=''" + encoding + "''?>" + xml;
     query(func.args(_CONVERT_STRING_TO_BASE64.args(" '" + data + '\'', encoding)), xml);
+  }
+
+  /** Test method. */
+  @Test public void binary() {
+    final Function func = _FETCH_BINARY;
+    // successful queries
+    query(func.args(XML));
+    error(func.args(XML + 'x'), FETCH_OPEN_X);
+  }
+
+  /** Test method. */
+  @Test public void contentType() {
+    final Function func = _FETCH_CONTENT_TYPE;
+    // successful queries
+    query(func.args(XML));
+    error(func.args(XML + 'x'), FETCH_OPEN_X);
   }
 }

@@ -12,7 +12,7 @@ import org.basex.query.value.*;
 public final class FnCollection extends Docs {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return collection(qc, true);
+    return collection(qc);
   }
 
   @Override

@@ -848,12 +848,8 @@ public enum Function {
   /** XQuery function. */
   _FETCH_BINARY(FetchBinary.class, "binary(uri)", arg(STR_O), B64_O, flag(NDT), FETCH_URI),
   /** XQuery function. */
-  _FETCH_COLLECTION(FetchCollection.class, "collection(uri)", arg(STR_ZO), DOC_ZM, FETCH_URI),
-  /** XQuery function. */
   _FETCH_CONTENT_TYPE(FetchContentType.class, "content-type(uri)", arg(STR_O), STR_O, flag(NDT),
       FETCH_URI),
-  /** XQuery function. */
-  _FETCH_DOC(FetchDoc.class, "doc(uri)", arg(STR_ZO), DOC_ZO, FETCH_URI),
   /** XQuery function. */
   _FETCH_TEXT(FetchText.class, "text(uri[,encoding[,fallback]])",
       arg(STR_O, STR_O, BLN_O), STR_O, flag(NDT), FETCH_URI),

@@ -15,7 +15,7 @@ import org.basex.query.value.node.*;
 public final class FnUriCollection extends Docs {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter coll = collection(qc, true).iter();
+    final Iter coll = collection(qc).iter();
     return new Iter() {
       @Override
       public Item next() throws QueryException {
@@ -29,7 +29,7 @@ public final class FnUriCollection extends Docs {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Item item : collection(qc, true)) vb.add(Uri.uri(((ANode) item).baseURI(), false));
+    for(final Item item : collection(qc)) vb.add(Uri.uri(((ANode) item).baseURI(), false));
     return vb.value(this);
   }
 }

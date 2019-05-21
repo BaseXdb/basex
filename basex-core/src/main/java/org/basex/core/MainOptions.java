@@ -127,6 +127,8 @@ public final class MainOptions extends Options {
   public static final NumberOption INLINELIMIT = new NumberOption("INLINELIMIT", 100);
   /** Flag for tail-call optimization. */
   public static final NumberOption TAILCALLS = new NumberOption("TAILCALLS", 256);
+  /** Look up documents in databases. */
+  public static final BooleanOption WITHDB = new BooleanOption("WITHDB", true);
   /** Favor global database when opening resources. */
   public static final BooleanOption DEFAULTDB = new BooleanOption("DEFAULTDB", false);
   /** Forces database creation for unknown documents. */

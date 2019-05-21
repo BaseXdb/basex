@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class FnDoc extends Docs {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return doc(qc, true);
+    return doc(qc);
   }
 
   @Override

@@ -26,11 +26,10 @@ public abstract class Docs extends StandardFunc {
   /**
    * Returns a collection.
    * @param qc query context
-   * @param db open database
    * @return collection
    * @throws QueryException query exception
    */
-  public Value collection(final QueryContext qc, final boolean db) throws QueryException {
+  Value collection(final QueryContext qc) throws QueryException {
     // return default collection or parse specified collection
     QueryInput qi = queryInput;
     if(qi == null) {
@@ -41,17 +40,16 @@ public abstract class Docs extends StandardFunc {
         if(qi == null) throw INVCOLL_X.get(info, uri);
       }
     }
-    return qc.resources.collection(qi, info, db);
+    return qc.resources.collection(qi, info);
   }
 
   /**
    * Performs the doc function.
    * @param qc query context
-   * @param db open database
    * @return document or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
-  public Item doc(final QueryContext qc, final boolean db) throws QueryException {
+  Item doc(final QueryContext qc) throws QueryException {
     QueryInput qi = queryInput;
     if(qi == null) {
       final Item item = exprs[0].atomItem(qc, info);
@@ -60,24 +58,26 @@ public abstract class Docs extends StandardFunc {
       qi = queryInput(uri);
       if(qi == null) throw INVDOC_X.get(info, uri);
     }
-    return qc.resources.doc(qi, info, db);
+    return qc.resources.doc(qi, info);
   }
 
   @Override
-  public boolean accept(final ASTVisitor visitor) {
-    if(exprs.length == 0) {
-      // lock default collection (only collection functions can have 0 arguments)
-      visitor.lock(Locking.COLLECTION, false);
-    } else {
-      // check if input argument is a static string
-      final Expr expr = exprs[0];
-      if(expr instanceof Str) {
-        // add local lock if argument may reference a database
-        queryInput = queryInput(((Str) expr).string());
-        if(queryInput != null) visitor.lock(queryInput.dbName, false);
-      } else if(expr != Empty.VALUE) {
-        // otherwise, database cannot be locked statically
-        if(!visitor.lock(null, false)) return false;
+  public final boolean accept(final ASTVisitor visitor) {
+    if(sc.withdb) {
+      if(exprs.length == 0) {
+        // lock default collection (only collection functions can have 0 arguments)
+        visitor.lock(Locking.COLLECTION, false);
+      } else {
+        // check if input argument is a static string
+        final Expr expr = exprs[0];
+        if(expr instanceof Str) {
+          // add local lock if argument may reference a database
+          queryInput = queryInput(((Str) expr).string());
+          if(queryInput != null) visitor.lock(queryInput.dbName, false);
+        } else if(expr != Empty.VALUE) {
+          // otherwise, database cannot be locked statically
+          if(!visitor.lock(null, false)) return false;
+        }
       }
     }
     return super.accept(visitor);

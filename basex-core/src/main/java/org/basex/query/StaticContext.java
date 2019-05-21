@@ -26,6 +26,8 @@ public final class StaticContext {
   public final NSContext ns = new NSContext();
   /** Mix updates flag. */
   public final boolean mixUpdates;
+  /** Look up documents in databases. */
+  public final boolean withdb;
 
   /** Default collation (default collection ({@link QueryText#COLLATION_URI}): {@code null}). */
   public Collation collation;
@@ -65,6 +67,7 @@ public final class StaticContext {
    */
   public StaticContext(final QueryContext qc) {
     mixUpdates = qc.context.options.get(MainOptions.MIXUPDATES);
+    withdb = qc.context.options.get(MainOptions.WITHDB);
   }
 
   /**

@@ -187,22 +187,24 @@ public final class QueryResources {
    * database and node.
    * @param qi query input
    * @param ii input info
-   * @param db open database
    * @return document
    * @throws QueryException query exception
    */
-  public synchronized DBNode doc(final QueryInput qi, final InputInfo ii, final boolean db)
-      throws QueryException {
-
-    // favor default database
-    Data data = globalData();
-    if(data != null && qc.context.options.get(MainOptions.DEFAULTDB)) {
-      final int pre = data.resources.doc(qi.original);
-      if(pre != -1) return new DBNode(data, pre, Data.DOC);
+  public synchronized DBNode doc(final QueryInput qi, final InputInfo ii) throws QueryException {
+    final MainOptions options = qc.context.options;
+    if(options.get(MainOptions.WITHDB)) {
+      // favor default database
+      if(options.get(MainOptions.DEFAULTDB)) {
+        final Data data = globalData();
+        if(data != null) {
+          final int pre = data.resources.doc(qi.original);
+          if(pre != -1) return new DBNode(data, pre, Data.DOC);
+        }
+      }
     }
 
     // access open database or create new one
-    data = data(true, qi, ii, db);
+    final Data data = data(true, qi, ii);
     // ensure that database contains a single document
     final IntList docs = data.resources.docs(qi.dbPath);
     if(docs.size() == 1) return new DBNode(data, docs.get(0), Data.DOC);
@@ -214,37 +216,42 @@ public final class QueryResources {
    * or creates a new data reference.
    * @param qi query input (set to {@code null} if default collection is requested)
    * @param ii input info
-   * @param db open database
    * @return collection
    * @throws QueryException query exception
    */
-  public synchronized Value collection(final QueryInput qi, final InputInfo ii, final boolean db)
+  public synchronized Value collection(final QueryInput qi, final InputInfo ii)
       throws QueryException {
+
+    final Context ctx = qc.context;
+    final boolean withdb = ctx.options.get(MainOptions.WITHDB);
 
     // return default collection
     if(qi == null) {
-      if(colls.isEmpty()) throw NODEFCOLL.get(ii);
+      if(!withdb || colls.isEmpty()) throw NODEFCOLL.get(ii);
       return colls.get(0);
     }
 
-    // favor default database
-    Data data = globalData();
-    if(data != null && qc.context.options.get(MainOptions.DEFAULTDB)) {
-      final IntList pres = data.resources.docs(qi.original);
-      return DBNodeSeq.get(pres, data, true, qi.original.isEmpty());
-    }
+    final MainOptions options = qc.context.options;
+    if(withdb) {
+      // favor default database
+      if(options.get(MainOptions.DEFAULTDB)) {
+        final Data data = globalData();
+        if(data != null) {
+          final IntList pres = data.resources.docs(qi.original);
+          return DBNodeSeq.get(pres, data, true, qi.original.isEmpty());
+        }
+      }
 
-    // check currently opened collections (required for tests)
-    final int cs = colls.size();
-    for(int c = 0; c < cs; c++) {
-      final String name = collNames.get(c), path = qi.io.path();
-      if(Prop.CASE ? name.equals(path) : name.equalsIgnoreCase(path)) {
-        return colls.get(c);
+      // check currently opened collections (required for tests)
+      final int cs = colls.size();
+      for(int c = 0; c < cs; c++) {
+        final String name = collNames.get(c), path = qi.io.path();
+        if(Prop.CASE ? name.equals(path) : name.equalsIgnoreCase(path)) return colls.get(c);
       }
     }
 
     // access open database or create new one
-    data = data(false, qi, ii, db);
+    final Data data = data(false, qi, ii);
     final IntList docs = data.resources.docs(qi.dbPath);
     return DBNodeSeq.get(docs, data, true, qi.dbPath.isEmpty());
   }
@@ -364,32 +371,35 @@ public final class QueryResources {
    * @param single single document
    * @param qi query input
    * @param ii input info
-   * @param db open database
    * @return document
    * @throws QueryException query exception
    */
-  private Data data(final boolean single, final QueryInput qi, final InputInfo ii, final boolean db)
+  private Data data(final boolean single, final QueryInput qi, final InputInfo ii)
       throws QueryException {
 
-    // check opened databases
+    final Context ctx = qc.context;
+    final boolean withdb = ctx.options.get(MainOptions.WITHDB);
     final String dbName = qi.dbName;
+
+    // check opened databases
     for(final Data data : datas) {
-      // compare input path
-      final String original = data.meta.original;
-      if(!original.isEmpty() && IO.get(original).eq(qi.io)) {
-        // reset database path: indicates that database includes all files of the original path
-        qi.dbPath = "";
-        return data;
+      if(withdb || data.inMemory()) {
+        // compare input path
+        final String orig = data.meta.original;
+        if(!orig.isEmpty() && IO.get(orig).eq(qi.io)) {
+          // reset database path: indicates that database includes all files of the original path
+          qi.dbPath = "";
+          return data;
+        }
+        // compare database name
+        final String name = data.meta.name;
+        if(Prop.CASE ? name.equals(dbName) : name.equalsIgnoreCase(dbName)) return data;
       }
-      // compare database name
-      final String name = data.meta.name;
-      if(Prop.CASE ? name.equals(dbName) : name.equalsIgnoreCase(dbName)) return data;
     }
 
     // try to open existing database
-    if(db && dbName != null) {
+    if(withdb && dbName != null) {
       try {
-        final Context ctx = qc.context;
         return addData(Open.open(dbName, ctx, ctx.options));
       } catch(final IOException ex) {
         Util.debug(ex);
