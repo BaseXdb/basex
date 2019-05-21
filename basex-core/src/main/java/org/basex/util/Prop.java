@@ -21,7 +21,7 @@ public final class Prop {
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Code version (may contain major, minor and optional patch number). */
-  public static final String VERSION = version("9.2.2");
+  public static final String VERSION = version("9.2.3 beta");
   /** Main author. */
   public static final String AUTHOR = "Christian Gr\u00FCn";
   /** Co-authors (1). */
