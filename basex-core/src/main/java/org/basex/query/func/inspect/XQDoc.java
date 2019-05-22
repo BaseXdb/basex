@@ -62,15 +62,15 @@ final class XQDoc extends Inspect {
     }
     comment(module, mod);
 
-    // namespaces
-    final FElem namespaces = elem("namespaces", xqdoc);
-    for(final byte[] pref : qp.namespaces) nsCache.put(pref, qp.namespaces.get(pref));
-
     // imports
     final FElem imports = elem("imports", xqdoc);
     for(final byte[] imp : qp.modules) {
       elem("uri", elem("import", imports).add("type", "library")).add(imp);
     }
+
+    // namespaces
+    final FElem namespaces = elem("namespaces", xqdoc);
+    for(final byte[] pref : qp.namespaces) nsCache.put(pref, qp.namespaces.get(pref));
 
     // variables
     final FElem variables = elem("variables", xqdoc);
