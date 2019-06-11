@@ -11,3 +11,4 @@ basex-api
 !basex-api/pom.xml
 !basex-api/src/main/java
 !basex-api/src/main/webapp/WEB-INF
+basex-parent.iml
