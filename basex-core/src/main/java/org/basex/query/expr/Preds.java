@@ -212,10 +212,11 @@ public abstract class Preds extends Arr {
         // E [ E ! ... ] -> E [ ... ]
         final SimpleMap map = (SimpleMap) ex;
         final Expr[] mexprs = map.exprs;
-        if(!mexprs[1].has(Flag.POS) && (mexprs[0] instanceof ContextValue ||
-            root.equals(mexprs[0]) && root.isSimple() && st.one())) {
+        final Expr first = mexprs[0], second = mexprs[1];
+        if((first instanceof ContextValue || root.equals(first) && root.isSimple() && st.one()) &&
+            !second.has(Flag.POS)) {
           final int ml = mexprs.length;
-          ex = SimpleMap.get(map.info, Arrays.copyOfRange(mexprs, 1, ml));
+          ex = ml == 2 ? second : SimpleMap.get(map.info, Arrays.copyOfRange(mexprs, 1, ml));
         }
       } else if(ex instanceof Path) {
         // E [ . / ... ] -> E [ ... ]

@@ -358,4 +358,17 @@ public final class GFLWORTest extends QueryPlanTest {
     check("let $x := <x>0</x> let $b := $x/text() return $b + 1", 1, count(Let.class, 1));
     error("let $x := <x>false</x> let $b as xs:boolean := $x/text() return $b", INVTYPE_X_X_X);
   }
+
+  /** Tests flattening. */
+  @Test public void gh1684() {
+    query(
+      "let $a := <x/>\n" +
+      "let $b := $a/.\n" +
+      "return\n" +
+      "  for $c in $b\n" +
+      "  where $c/(. = '')\n" +
+      "  return $c",
+      "<x/>"
+    );
+  }
 }
