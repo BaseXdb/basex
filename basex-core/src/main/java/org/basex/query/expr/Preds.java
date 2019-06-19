@@ -134,7 +134,7 @@ public abstract class Preds extends Arr {
   }
 
   /**
-   * Assigns the sequence type and {@link #size} value.
+   * Assigns the sequence type and result size.
    * @param seqType sequence type of input
    * @param size size of input ({@code -1} if unknown)
    * @return if predicate will yield any results
