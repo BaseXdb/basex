@@ -290,8 +290,8 @@
       <xsd:sequence>
         <xsd:element name="control" type="control"/>
         <xsd:element name="module" type="module"/>
-        <xsd:element name="namespaces" type="namespaces" minOccurs="0"/>
         <xsd:element name="imports" type="imports" minOccurs="0"/>
+        <xsd:element name="namespaces" type="namespaces" minOccurs="0"/>
         <xsd:element name="variables" type="variables" minOccurs="0"/>
         <xsd:element name="functions" type="functions" minOccurs="0"/>
       </xsd:sequence>
