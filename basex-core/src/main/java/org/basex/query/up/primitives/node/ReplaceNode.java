@@ -44,4 +44,9 @@ public final class ReplaceNode extends NodeCopy {
   public void addAtomics(final AtomicUpdateCache auc) {
     auc.addReplace(pre, insseq);
   }
+
+  @Override
+  public int size() {
+    return Math.max(1, insseq.fragments);
+  }
 }

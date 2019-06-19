@@ -96,7 +96,7 @@ abstract class NodeCopy extends NodeUpdate {
   }
 
   @Override
-  public final int size() {
+  public int size() {
     return insseq.fragments;
   }
 
