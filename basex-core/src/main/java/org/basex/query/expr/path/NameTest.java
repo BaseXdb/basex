@@ -124,9 +124,19 @@ public final class NameTest extends Test {
 
   @Override
   public String toString() {
-    if(kind == Kind.NAME) return "*:" + Token.string(name.string());
-    final String uri = name.uri().length == 0 || name.hasPrefix() ? "" :
-      '{' + Token.string(name.uri()) + '}';
-    return uri + (kind == Kind.URI ? "*" : Token.string(name.string()));
+    final TokenBuilder tb = new TokenBuilder();
+    if(kind == Kind.NAME) {
+      tb.add('*').add(':');
+    } else if(name.hasPrefix()) {
+      tb.add(name.prefix()).add(':');
+    } else if(name.uri().length != 0) {
+      tb.add('{').add(name.uri()).add('}');
+    }
+    if(kind == Kind.URI) {
+      tb.add('*');
+    } else {
+      tb.add(name.local());
+    }
+    return tb.toString();
   }
 }

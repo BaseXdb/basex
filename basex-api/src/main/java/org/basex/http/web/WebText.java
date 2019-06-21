@@ -77,9 +77,9 @@ public interface WebText {
   /** Error message. */
   String INV_CODE_X = "Invalid error code: %.";
   /** Error message. */
-  String INV_PRIORITY_X_X = "Errors must be of the same priority (\"%\" vs \"%\").";
+  String INV_PRECEDENCE_X_X = "Errors must be of the same precedence (\"%\" vs \"%\").";
   /** Error message. */
-  String INV_ERR_SAME_X = "The same error has been specified twice: \"%\".";
+  String INV_ERR_TWICE_X = "The same error has been specified twice: \"%\".";
   /** Error message. */
   String INV_NONS_X = "No namespace declared for '%'.";
   /** Error message. */

@@ -8,6 +8,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.*;
 
 import javax.servlet.http.*;
@@ -440,7 +441,6 @@ public final class RestXqFunction extends WebFunction {
     if(error == null) error = new RestXqError();
 
     // name of parameter
-    Test last = error.get(0);
     for(final Item arg : ann.args()) {
       final String err = toString(arg);
       final Kind kind;
@@ -460,8 +460,7 @@ public final class RestXqFunction extends WebFunction {
       } else {
         final Matcher m = EQNAME.matcher(err);
         if(m.matches()) {
-          final byte[] uri = token(m.group(1));
-          final byte[] local = token(m.group(2));
+          final byte[] uri = token(m.group(1)), local = token(m.group(2));
           if(local.length == 1 && local[0] == '*') {
             qnm = new QNm(COLON, uri);
             kind = Kind.URI;
@@ -477,12 +476,19 @@ public final class RestXqFunction extends WebFunction {
           kind = Kind.URI_NAME;
         }
       }
+
       // message
       if(qnm != null && qnm.hasPrefix() && !qnm.hasURI()) throw error(INV_NONS_X, qnm);
       final NameTest test = kind != null ? new NameTest(false, kind, qnm, null) : null;
-      if(last != null && last.kind != kind) throw error(INV_PRIORITY_X_X, last, test);
-      if(!error.add(test)) throw error(INV_ERR_SAME_X, last);
-      last = test;
+
+      final Function<NameTest, String> toString = t -> t != null ? t.toString() : "*";
+      if(!error.isEmpty()) {
+        final NameTest first = error.get(0);
+        if(first != null ? first.kind != kind : kind != null) {
+          throw error(INV_PRECEDENCE_X_X, toString.apply(first), toString.apply(test));
+        }
+      }
+      if(!error.add(test)) throw error(INV_ERR_TWICE_X, toString.apply(test));
     }
   }
 }

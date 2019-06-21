@@ -32,21 +32,21 @@ public final class Catch extends Single {
     SeqType.ITR_ZO, SeqType.ITR_ZO, SeqType.ITEM_ZM
   };
 
+  /** Error tests. */
+  private final NameTest[] tests;
   /** Error variables. */
   private final Var[] vars;
-  /** Supported codes. */
-  private final NameTest[] codes;
 
   /**
    * Constructor.
    * @param info input info
-   * @param codes supported error codes
+   * @param tests error tests
    * @param vars variables to be bound
    */
-  public Catch(final InputInfo info, final NameTest[] codes, final Var[] vars) {
+  public Catch(final InputInfo info, final NameTest[] tests, final Var[] vars) {
     super(info, null, SeqType.ITEM_ZM);
+    this.tests = tests;
     this.vars = vars;
-    this.codes = codes;
   }
 
   @Override
@@ -83,7 +83,7 @@ public final class Catch extends Single {
     final Var[] vrs = new Var[NAMES.length];
     final int vl = vrs.length;
     for(int v = 0; v < vl; v++) vrs[v] = cc.vs().addNew(NAMES[v], TYPES[v], false, cc.qc, info);
-    final Catch ctch = new Catch(info, codes.clone(), vrs);
+    final Catch ctch = new Catch(info, tests.clone(), vrs);
     final int val = vars.length;
     for(int v = 0; v < val; v++) vm.put(vars[v].id, ctch.vars[v]);
     ctch.expr = expr.copy(cc, vm);
@@ -147,8 +147,8 @@ public final class Catch extends Single {
    */
   boolean matches(final QueryException qe) {
     final QNm c = qe.qname();
-    for(final NameTest code : codes) {
-      if(code == null || code.eq(c)) return true;
+    for(final NameTest test : tests) {
+      if(test == null || test.eq(c)) return true;
     }
     return false;
   }
@@ -180,11 +180,16 @@ public final class Catch extends Single {
     if(this == obj) return true;
     if(!(obj instanceof Catch)) return false;
     final Catch c = (Catch) obj;
-    return Array.equals(vars, c.vars) && Array.equals(codes, c.codes) && super.equals(obj);
+    return Array.equals(vars, c.vars) && Array.equals(tests, c.tests) && super.equals(obj);
   }
 
   @Override
   public String toString() {
-    return "catch * { " + expr + " }";
+    final StringBuilder sb = new StringBuilder();
+    for(final NameTest test : tests) {
+      if(sb.length() != 0) sb.append(" | ");
+      sb.append(test == null ? " * " : test);
+    }
+    return "catch " + sb.append(" { ").append(expr).append(" }");
   }
 }

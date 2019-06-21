@@ -39,6 +39,14 @@ final class RestXqError implements Comparable<RestXqError> {
   }
 
   /**
+   * Tests whether the error has no tests.
+   * @return result of check
+   */
+  public boolean isEmpty() {
+    return tests.isEmpty();
+  }
+
+  /**
    * Checks if the specified name matches the test.
    * @param name name
    * @return result of check
