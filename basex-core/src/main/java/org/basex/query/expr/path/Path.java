@@ -156,25 +156,41 @@ public abstract class Path extends ParseExpr {
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     // return root if it returns no result (it may have side effects)
-    if(root != null && root.seqType().zero()) return cc.replaceWith(this, root);
+    final SeqType st = root != null ? root.seqType() : SeqType.ITEM_ZM;
+    if(st.zero()) return cc.replaceWith(this, root);
 
     final int sl = steps.length;
     final ExprList list = new ExprList(sl);
     for(int s = 0; s < sl; s++) {
       // step is empty sequence. example: $doc/NON-EXISTING-STEP -> $doc/() -> ()
-      final Expr step = steps[s];
-      if(step == Empty.VALUE) return cc.emptySeq(this);
-      list.add(step);
-      // step yields no results: ignore remaining steps
+      final Expr expr = steps[s];
+      if(expr == Empty.VALUE) return cc.emptySeq(this);
+
+      // remove redundant self reference
+      if(list.isEmpty() && expr instanceof Step) {
+        final Step step = (Step) expr;
+        // remove redundant step. example: <xml/>/self::node() -> <xml/>
+        if(step.axis == SELF && step.exprs.length == 0 && step.test instanceof KindTest &&
+            st.instanceOf(((KindTest) step.test).type.seqType())) continue;
+      }
+
+      // add step to list
+      list.add(expr);
+
+      // ignore remaining steps if step yields no results
       // example: A/prof:void(.)/B -> A/prof:void(.)
-      if(step.seqType().zero() && s + 1 < sl) {
+      if(expr.seqType().zero() && s + 1 < sl) {
         cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
         return get(info, root, list.finish()).optimize(cc);
       }
     }
 
+    // no steps left: return root
+    if(list.isEmpty()) return cc.replaceEbv(this, root);
+
     // simplify path with empty root expression or empty step
     final Value rootValue = rootValue(cc);
+
     if(emptyPath(!cc.nestedFocus() || cc.qc.focus.value == null ? rootValue : null))
       return cc.emptySeq(this);
 

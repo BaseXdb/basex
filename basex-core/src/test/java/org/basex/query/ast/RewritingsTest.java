@@ -368,6 +368,18 @@ public final class RewritingsTest extends QueryPlanTest {
     check("declare function local:f() { document {}/.. }; local:f()", "", empty(CDoc.class));
   }
 
+
+  /**
+   * Remove redundant self steps.
+   */
+  @Test public void selfSteps() {
+    check("<a/>/.", "<a/>", root(CElem.class));
+    check("<a/>/./././.", "<a/>", root(CElem.class));
+    check("<a/>[.]", "<a/>", root(CElem.class));
+    check("<a/>/self::element()", "<a/>", root(CElem.class));
+    check("attribute a { 0 }/self::attribute()", "a=\"0\"", root(CAttr.class));
+  }
+
   /** Static optimizations of paths without results (see also gh1630). */
   @Test public void emptyPath() {
     check("<a/>/<a/>", "<a/>", exists(MixedPath.class));
@@ -380,14 +392,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<e a='A'/>/parent::*", "", exists(IterPath.class));
     check("attribute a { 0 }/child::attribute()", "", empty());
     check("<e a='A'/>/attribute::a/child::attribute()", "", empty());
-    check("attribute a { 0 }/self::attribute()", "a=\"0\"", exists(IterPath.class));
 
     // check step after expression that yields document nodes
     check("document { <a/> }/self::*", "", empty());
     check("document { <a/> }/self::*", "", empty());
     check("document { <a/> }/self::text()", "", empty());
-    check("document { <a/> }/self::node()", "<a/>", exists(IterPath.class));
-    check("document { <a/> }/self::document-node()", "<a/>", exists(IterPath.class));
 
     check("document { <a/> }/child::document-node()", "", empty());
     check("document { <a/> }/child::attribute()", "", empty());

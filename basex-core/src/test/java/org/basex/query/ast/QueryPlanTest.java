@@ -112,6 +112,33 @@ public abstract class QueryPlanTest extends SandboxTest {
   }
 
   /**
+   * Returns a test to check if the root is an instance of the specified expression.
+   * @param expr expression
+   * @return test string
+   */
+  protected static String root(final String expr) {
+    return "QueryPlan/*/name() = '" + expr + "'";
+  }
+
+  /**
+   * Returns a test to check if the root is an instance of the specified expression.
+   * @param func function
+   * @return test string
+   */
+  protected static String root(final Function func) {
+    return root(func.def.clazz);
+  }
+
+  /**
+   * Returns a test to check if the root is an instance of the specified expression.
+   * @param clazz name of expression
+   * @return test string
+   */
+  protected static String root(final Class<?> clazz) {
+    return root(Util.className(clazz));
+  }
+
+  /**
    * Counts the number of results.
    * @param clazz expression class
    * @param count number of results
