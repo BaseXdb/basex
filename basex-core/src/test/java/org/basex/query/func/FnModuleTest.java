@@ -129,7 +129,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" ()"), false, empty(func));
 
     // function is replaced with fn:exists
-    check(func.args(" <a/>/self::*"), true, exists(EXISTS));
+    check(func.args(" <a/>/self::a"), true, exists(EXISTS));
     // function is replaced by its argument (argument yields no result)
     check("(false(), true())[" + func.args(" .") + "]", true, empty(func));
     // no replacement
@@ -466,7 +466,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" empty(1[.=1])"), true, exists(EXISTS));
     // function is replaced with fn:empty
     check(func.args(" exists(1[.=1])"), false, exists(EMPTY));
-    check(func.args(" <a/>/self::*"), false, exists(EMPTY));
+    check(func.args(" <a/>/self::a"), false, exists(EMPTY));
     // function is replaced with fn:boolean
     check(func.args(func.args(" (1[.=1])")), true, exists(BOOLEAN));
 

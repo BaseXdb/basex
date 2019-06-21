@@ -148,7 +148,7 @@ public final class Catch extends Single {
   boolean matches(final QueryException qe) {
     final QNm c = qe.qname();
     for(final NameTest code : codes) {
-      if(code.eq(c)) return true;
+      if(code == null || code.eq(c)) return true;
     }
     return false;
   }

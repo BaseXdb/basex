@@ -20,14 +20,6 @@ public final class NameTest extends Test {
   private final byte[] defNS;
 
   /**
-   * Empty constructor ('*').
-   * @param attr attribute flag (element otherwise)
-   */
-  public NameTest(final boolean attr) {
-    this(attr, Kind.WILDCARD, null, null);
-  }
-
-  /**
    * Constructor.
    * @param attr attribute flag (element otherwise)
    * @param kind kind of name test
@@ -84,8 +76,6 @@ public final class NameTest extends Test {
     if(node.type != type) return false;
 
     switch(kind) {
-      // wildcard: accept all nodes
-      case WILDCARD: return true;
       // namespaces wildcard: only check local name
       case NAME: return Token.eq(local, Token.local(node.name()));
       // name wildcard: only check namespace
@@ -103,8 +93,6 @@ public final class NameTest extends Test {
    */
   public boolean eq(final QNm nm) {
     switch(kind) {
-      // wildcard: accept all nodes
-      case WILDCARD: return true;
       // namespaces wildcard: only check local name
       case NAME: return Token.eq(local, nm.local());
       // name wildcard: only check namespace
@@ -125,8 +113,6 @@ public final class NameTest extends Test {
     final NameTest nt = (NameTest) obj;
     if(kind != nt.kind) return false;
     switch(kind) {
-      // wildcard: accept all nodes
-      case WILDCARD: return true;
       // namespaces wildcard: only check local name
       case NAME: return Token.eq(local, nt.local);
       // name wildcard: only check namespace
@@ -138,7 +124,6 @@ public final class NameTest extends Test {
 
   @Override
   public String toString() {
-    if(kind == Kind.WILDCARD) return "*";
     if(kind == Kind.NAME) return "*:" + Token.string(name.string());
     final String uri = name.uri().length == 0 || name.hasPrefix() ? "" :
       '{' + Token.string(name.uri()) + '}';

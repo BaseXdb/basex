@@ -17,7 +17,6 @@ import org.basex.util.*;
 public abstract class Test extends ExprInfo {
   /** Kind of name test. */
   public enum Kind {
-    /** Accept all nodes (*).            */ WILDCARD,
     /** Test name (*:name).              */ NAME,
     /** Test uri (prefix:*).             */ URI,
     /** Test uri and name (prefix:name). */ URI_NAME

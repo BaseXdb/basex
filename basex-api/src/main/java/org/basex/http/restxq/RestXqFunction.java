@@ -440,13 +440,13 @@ public final class RestXqFunction extends WebFunction {
     if(error == null) error = new RestXqError();
 
     // name of parameter
-    NameTest last = error.get(0);
+    Test last = error.get(0);
     for(final Item arg : ann.args()) {
       final String err = toString(arg);
       final Kind kind;
       QNm qnm = null;
       if(err.equals("*")) {
-        kind = Kind.WILDCARD;
+        kind = null;
       } else if(err.startsWith("*:")) {
         final byte[] local = token(err.substring(2));
         if(!XMLToken.isNCName(local)) throw error(INV_CODE_X, err);
@@ -479,7 +479,7 @@ public final class RestXqFunction extends WebFunction {
       }
       // message
       if(qnm != null && qnm.hasPrefix() && !qnm.hasURI()) throw error(INV_NONS_X, qnm);
-      final NameTest test = new NameTest(false, kind, qnm, null);
+      final NameTest test = kind != null ? new NameTest(false, kind, qnm, null) : null;
       if(last != null && last.kind != kind) throw error(INV_PRIORITY_X_X, last, test);
       if(!error.add(test)) throw error(INV_ERR_SAME_X, last);
       last = test;

@@ -2027,7 +2027,7 @@ public class QueryParser extends InputParser {
       }
       // name test: *
       pos = p;
-      return new NameTest(attr);
+      return attr ? KindTest.ATT : KindTest.ELM;
     }
 
     if(consume(EQNAME)) {
@@ -3231,9 +3231,9 @@ public class QueryParser extends InputParser {
       NameTest[] codes = { };
       do {
         skipWs();
-        final NameTest test = (NameTest) nodeTest(false, false);
+        final Test test = nodeTest(false, false);
         if(test == null) throw error(NOCATCH);
-        codes = Array.add(codes, test);
+        codes = Array.add(codes, test instanceof NameTest ? (NameTest) test : null);
       } while(wsConsumeWs(PIPE));
 
       final int s = localVars.openScope();

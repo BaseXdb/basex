@@ -640,8 +640,7 @@ public abstract class Path extends ParseExpr {
       for(int t = 0; t < ts; t++) {
         final Expr[] preds = t == ts - 1 ? ((Preds) steps[s]).exprs : new Expr[0];
         final QNm nm = qnm.get(ts - t - 1);
-        final NameTest nt = nm == null ? new NameTest(false) :
-          new NameTest(false, Kind.NAME, nm, null);
+        final Test nt = nm == null ? KindTest.ELM : new NameTest(false, Kind.NAME, nm, null);
         stps[t] = Step.get(info, CHILD, nt, preds);
       }
       while(++s < sl) stps[ts++] = steps[s];
@@ -813,7 +812,7 @@ public abstract class Path extends ParseExpr {
     for(int s = i; s >= 0; s--) {
       final Step step = axisStep(s);
       // ensure that the index step does not use wildcard
-      if(step.test.kind == Kind.WILDCARD && s != i) continue;
+      if(step.test instanceof KindTest && s != i) continue;
       // consider child steps with name test and without predicates
       if(step.test.kind != Kind.NAME || step.axis != CHILD ||
           s != i && step.exprs.length > 0) return true;

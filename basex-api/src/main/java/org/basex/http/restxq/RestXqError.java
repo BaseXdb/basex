@@ -1,6 +1,7 @@
 package org.basex.http.restxq;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
@@ -22,7 +23,7 @@ final class RestXqError implements Comparable<RestXqError> {
    */
   boolean add(final NameTest test) {
     for(final NameTest nt : tests) {
-      if(nt.equals(test)) return false;
+      if(Objects.equals(nt, test)) return false;
     }
     tests.add(test);
     return true;
@@ -44,15 +45,15 @@ final class RestXqError implements Comparable<RestXqError> {
    */
   boolean matches(final QNm name) {
     for(final NameTest nt : tests) {
-      if(nt.eq(name)) return true;
+      if(nt == null || nt.eq(name)) return true;
     }
     return false;
   }
 
   @Override
   public int compareTo(final RestXqError error) {
-    final NameTest nt1 = tests.get(0), nt2 = error.tests.get(0);
-    return nt1 == null || nt2 == null ? 0 : nt2.kind.ordinal() - nt1.kind.ordinal();
+    final Function<NameTest, Integer> prec = test -> test == null ? -1 : test.kind.ordinal();
+    return prec.apply(error.tests.get(0)) - prec.apply(tests.get(0));
   }
 
   @Override
@@ -60,7 +61,7 @@ final class RestXqError implements Comparable<RestXqError> {
     final StringBuilder sb = new StringBuilder();
     for(final NameTest test : tests) {
       if(sb.length() != 0) sb.append(", ");
-      sb.append(test);
+      sb.append(test != null ? test : "*");
     }
     return sb.toString();
   }

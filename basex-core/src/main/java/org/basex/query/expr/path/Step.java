@@ -172,7 +172,7 @@ public abstract class Step extends Preds {
         // element/attribute test (*:ln)
         final Names names = kind == Data.ATTR ? dt.attrNames : dt.elemNames;
         name = names.id(((NameTest) test).local);
-      } else if(test.kind != null && test.kind != Kind.WILDCARD) {
+      } else if(test.kind != null) {
         // skip namespace and standard tests
         return null;
       }

@@ -378,6 +378,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[.]", "<a/>", root(CElem.class));
     check("<a/>/self::element()", "<a/>", root(CElem.class));
     check("attribute a { 0 }/self::attribute()", "a=\"0\"", root(CAttr.class));
+    check("<a/>/self::*", "<a/>", root(CElem.class));
   }
 
   /** Static optimizations of paths without results (see also gh1630). */
