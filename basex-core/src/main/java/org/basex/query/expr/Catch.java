@@ -3,6 +3,9 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.util.*;
@@ -33,7 +36,7 @@ public final class Catch extends Single {
   };
 
   /** Error tests. */
-  private final NameTest[] tests;
+  private final ArrayList<NameTest> tests;
   /** Error variables. */
   private final Var[] vars;
 
@@ -45,7 +48,7 @@ public final class Catch extends Single {
    */
   public Catch(final InputInfo info, final NameTest[] tests, final Var[] vars) {
     super(info, null, SeqType.ITEM_ZM);
-    this.tests = tests;
+    this.tests = new ArrayList<>(Arrays.asList(tests));
     this.vars = vars;
   }
 
@@ -83,7 +86,7 @@ public final class Catch extends Single {
     final Var[] vrs = new Var[NAMES.length];
     final int vl = vrs.length;
     for(int v = 0; v < vl; v++) vrs[v] = cc.vs().addNew(NAMES[v], TYPES[v], false, cc.qc, info);
-    final Catch ctch = new Catch(info, tests.clone(), vrs);
+    final Catch ctch = new Catch(info, tests.toArray(new NameTest[0]), vrs);
     final int val = vars.length;
     for(int v = 0; v < val; v++) vm.put(vars[v].id, ctch.vars[v]);
     ctch.expr = expr.copy(cc, vm);
@@ -141,25 +144,63 @@ public final class Catch extends Single {
   }
 
   /**
+   * Removes redundant tests.
+   * @param list current tests
+   * @param cc compilation context
+   * @return if catch clause contains relevant tests
+   */
+  boolean simplify(final ArrayList<NameTest> list, final CompileContext cc) {
+    // check if all errors are already caught
+    if(list.contains(null)) {
+      cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, "*");
+      return false;
+    }
+
+    // check if the current clause will catch all errors
+    for(final NameTest test : tests) {
+      if(test == null) {
+        list.add(null);
+        cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, "*");
+        tests.clear();
+        tests.add(null);
+        return true;
+      }
+    }
+
+    // remove redundant tests
+    final Iterator<NameTest> iter = tests.iterator();
+    while(iter.hasNext()) {
+      final NameTest test = iter.next();
+      if(list.contains(test)) {
+        cc.info(OPTREMOVE_X_X, test != null ? test : "*", (Supplier<?>) this::description);
+        iter.remove();
+      } else {
+        list.add(test);
+      }
+    }
+    return !tests.isEmpty();
+  }
+
+  /**
    * Checks if one of the specified errors match the thrown error.
    * @param qe thrown error
    * @return result of check
    */
   boolean matches(final QueryException qe) {
-    final QNm c = qe.qname();
+    final QNm name = qe.qname();
     for(final NameTest test : tests) {
-      if(test == null || test.eq(c)) return true;
+      if(test == null || test.eq(name)) return true;
     }
     return false;
   }
 
   /**
    * Creates an error QName with the specified name.
-   * @param n name
+   * @param name name
    * @return QName
    */
-  private static QNm create(final byte[] n) {
-    return new QNm(concat(ERR_PREFIX, COLON, n), ERROR_URI);
+  private static QNm create(final byte[] name) {
+    return new QNm(concat(ERR_PREFIX, COLON, name), ERROR_URI);
   }
 
   @Override
@@ -179,8 +220,8 @@ public final class Catch extends Single {
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof Catch)) return false;
-    final Catch c = (Catch) obj;
-    return Array.equals(vars, c.vars) && Array.equals(tests, c.tests) && super.equals(obj);
+    final Catch ctch = (Catch) obj;
+    return Array.equals(vars, ctch.vars) && tests.equals(ctch.tests) && super.equals(obj);
   }
 
   @Override
@@ -188,7 +229,7 @@ public final class Catch extends Single {
     final StringBuilder sb = new StringBuilder();
     for(final NameTest test : tests) {
       if(sb.length() != 0) sb.append(" | ");
-      sb.append(test == null ? " * " : test);
+      sb.append(test != null ? test : "*");
     }
     return "catch " + sb.append(" { ").append(expr).append(" }");
   }

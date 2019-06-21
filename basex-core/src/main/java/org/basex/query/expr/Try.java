@@ -1,6 +1,9 @@
 package org.basex.query.expr;
 
+import java.util.*;
+
 import org.basex.query.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -17,7 +20,7 @@ import org.basex.util.hash.*;
  */
 public final class Try extends Single {
   /** Catch clauses. */
-  private final Catch[] catches;
+  private Catch[] catches;
 
   /**
    * Constructor.
@@ -60,6 +63,15 @@ public final class Try extends Single {
   public Expr optimize(final CompileContext cc) {
     if(expr instanceof Value) return cc.replaceWith(this, expr);
 
+    // remove duplicates and too specific catch clauses
+    final ArrayList<Catch> list = new ArrayList<>();
+    final ArrayList<NameTest> tests = new ArrayList<>();
+    for(final Catch ctch : catches) {
+      if(ctch.simplify(tests, cc)) list.add(ctch);
+    }
+    catches = list.toArray(new Catch[0]);
+
+    // join types of try and catch expressions
     SeqType st = expr.seqType();
     for(final Catch ctch : catches) {
       if(!Function.ERROR.is(ctch.expr)) st = st.union(ctch.seqType());
