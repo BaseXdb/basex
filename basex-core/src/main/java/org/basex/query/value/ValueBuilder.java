@@ -63,17 +63,6 @@ public final class ValueBuilder {
   }
 
   /**
-   * Returns a {@link Value} representation of the given items.
-   * @param items array containing the items
-   * @param size number of items
-   * @param type type (can be {@code null}, only considered if new sequence is created)
-   * @return the value
-   */
-  public static Value value(final Item[] items, final int size, final Type type) {
-    return size == 0 ? Empty.VALUE : size == 1 ? items[0] : TreeSeqBuilder.value(items, size, type);
-  }
-
-  /**
    * Adds an item to the front of the built value.
    * @param item item to add
    * @return reference to this builder for convenience

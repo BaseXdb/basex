@@ -198,8 +198,6 @@ public interface Text {
   /** Options error. */
   String OPT_NUMBER_X_X = OPT_INVALID_X_X + "a number.";
   /** Options error. */
-  String OPT_STRING_X_X = OPT_INVALID_X_X + "a string.";
-  /** Options error. */
   String OPT_MAP_X_X = OPT_INVALID_X_X + "a map.";
   /** Options error. */
   String OPT_FUNC_X_X = OPT_INVALID_X_X + "a function.";

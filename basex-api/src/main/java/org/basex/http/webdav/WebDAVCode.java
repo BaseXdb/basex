@@ -41,19 +41,6 @@ abstract class WebDAVCode<E> {
   }
 
   /**
-   * Runs the contained code, throwing no exception.
-   * @return result (can be {@code null})
-   */
-  final E evalNoEx() {
-    try {
-      return eval();
-    } catch(final BadRequestException ex) {
-      Util.stack(ex);
-      return null;
-    }
-  }
-
-  /**
    * Method to run, returning some output.
    * @return result
    * @throws IOException I/O exception

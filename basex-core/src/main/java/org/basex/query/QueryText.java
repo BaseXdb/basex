@@ -378,7 +378,6 @@ public interface QueryText {
   /** Query Info. */ String QUERY_PLAN = "QueryPlan";
   /** Query Info. */ String COMPILED = "compiled";
   /** Query Info. */ String OP = "op";
-  /** Query Info. */ String POS = "pos";
   /** Query Info. */ String VAR = "var";
   /** Query Info. */ String INDEX = "index";
   /** Query Info. */ String NAME = "name";
