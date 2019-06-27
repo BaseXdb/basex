@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 
 import java.util.*;
 
-import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -19,12 +18,15 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FuncDefinition {
+  /** Function reference. */
+  public final AFunction function;
+  /** Function class. */
+  public final Class<? extends StandardFunc> clazz;
+
   /** Minimum and maximum number of arguments. */
   final int[] minMax;
   /** Parameter types. */
   final SeqType[] params;
-  /** Function class. */
-  public final Class<? extends StandardFunc> clazz;
 
   /** Description. */
   final String desc;
@@ -38,6 +40,7 @@ public final class FuncDefinition {
 
   /**
    * Constructs a function signature.
+   * @param function function reference
    * @param clazz reference to the class containing the function implementation
    * @param desc descriptive function string, containing the function name and its
    *             arguments in parentheses. Optional arguments are represented in nested
@@ -48,9 +51,11 @@ public final class FuncDefinition {
    * @param flags static function properties
    * @param uri uri
    */
-  FuncDefinition(final Class<? extends StandardFunc> clazz, final String desc,
-      final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri) {
+  FuncDefinition(final AFunction function, final Class<? extends StandardFunc> clazz,
+      final String desc, final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags,
+      final byte[] uri) {
 
+    this.function = function;
     this.clazz = clazz;
     this.desc = desc;
     this.seqType = seqType;
@@ -87,19 +92,6 @@ public final class FuncDefinition {
    */
   public byte[] uri() {
     return uri;
-  }
-
-  /**
-   * Creates a new instance of the function.
-   * @param sc static context
-   * @param ii input info
-   * @param exprs arguments
-   * @return function
-   */
-  public StandardFunc get(final StaticContext sc, final InputInfo ii, final Expr... exprs) {
-    final StandardFunc sf = Reflect.get(clazz);
-    sf.init(sc, ii, this, exprs);
-    return sf;
   }
 
   /**

@@ -49,10 +49,10 @@ public final class Functions {
     final Method mth = Reflect.method(clz, "init", ArrayList.class);
     if(mth != null) Reflect.invoke(mth, null, DEFINITIONS);
 
-    for(final FuncDefinition def : DEFINITIONS) {
-      URIS.add(def.uri);
-      if(!CACHE.add(new QNm(def.local(), def.uri()).id())) {
-        throw Util.notExpected("Duplicate function definition: " + def);      }
+    for(final FuncDefinition fd : DEFINITIONS) {
+      URIS.add(fd.uri);
+      if(!CACHE.add(new QNm(fd.local(), fd.uri()).id())) {
+        throw Util.notExpected("Duplicate function definition: " + fd);      }
     }
   }
 
@@ -100,11 +100,11 @@ public final class Functions {
   static FuncDefinition getBuiltIn(final QNm name) {
     final int i = CACHE.id(name.id());
     if(i == 0) return null;
-    final FuncDefinition def = DEFINITIONS.get(i - 1);
-    if(!eq(def.uri(), name.uri())) {
+    final FuncDefinition fd = DEFINITIONS.get(i - 1);
+    if(!eq(fd.uri(), name.uri())) {
       throw Util.notExpected(name);
     }
-    return eq(def.uri(), name.uri()) ? def : null;
+    return eq(fd.uri(), name.uri()) ? fd : null;
   }
 
   /**
@@ -131,17 +131,17 @@ public final class Functions {
   private static FuncDefinition getBuiltIn(final QNm name, final long arity, final InputInfo ii)
       throws QueryException {
 
-    final FuncDefinition def = getBuiltIn(name);
-    if(def == null) return null;
+    final FuncDefinition fd = getBuiltIn(name);
+    if(fd == null) return null;
 
-    final int min = def.minMax[0], max = def.minMax[1];
-    if(arity >= min && arity <= max) return def;
+    final int min = fd.minMax[0], max = fd.minMax[1];
+    if(arity >= min && arity <= max) return fd;
 
     final IntList arities = new IntList();
     if(max != Integer.MAX_VALUE) {
       for(int m = min; m <= max; m++) arities.add(m);
     }
-    throw wrongArity(def, arity, arities, ii);
+    throw wrongArity(fd, arity, arities, ii);
   }
 
   /**
@@ -188,8 +188,8 @@ public final class Functions {
    */
   static StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    final FuncDefinition def = getBuiltIn(name, args.length, ii);
-    return def == null ? null : def.get(sc, ii, args);
+    final FuncDefinition fd = getBuiltIn(name, args.length, ii);
+    return fd == null ? null : fd.function.get(sc, ii, args);
   }
 
   /**
@@ -240,12 +240,12 @@ public final class Functions {
     }
 
     // built-in functions
-    final FuncDefinition def = getBuiltIn(name, arity, ii);
-    if(def != null) {
+    final FuncDefinition fd = getBuiltIn(name, arity, ii);
+    if(fd != null) {
       final AnnList anns = new AnnList();
       final VarScope vs = new VarScope(sc);
-      final FuncType ft = def.type(arity, anns);
-      final QNm[] names = def.paramNames(arity);
+      final FuncType ft = fd.type(arity, anns);
+      final QNm[] names = fd.paramNames(arity);
       final Var[] params = new Var[arity];
       final Expr[] args = new Expr[arity];
       for(int i = 0; i < arity; i++) {
@@ -253,7 +253,7 @@ public final class Functions {
         args[i] = new VarRef(ii, params[i]);
       }
 
-      final StandardFunc sf = def.get(sc, ii, args);
+      final StandardFunc sf = fd.function.get(sc, ii, args);
       final boolean upd = sf.has(Flag.UPD);
       if(upd) {
         anns.add(new Ann(ii, Annotation.UPDATING));
@@ -263,7 +263,7 @@ public final class Functions {
       // example for invalid query: let $f := last#0 return (1,2)[$f()]
       return sf.has(Flag.CTX, Flag.POS)
           ? new FuncLit(anns, name, params, sf, ft.seqType(), vs, ii)
-          : closureOrFItem(anns, name, params, def.type(arity, anns), sf, vs, ii, runtime, upd);
+          : closureOrFItem(anns, name, params, fd.type(arity, anns), sf, vs, ii, runtime, upd);
     }
 
     // user-defined function
@@ -351,7 +351,7 @@ public final class Functions {
     // built-in functions
     final StandardFunc sf = get(name, args, sc, ii);
     if(sf != null) {
-      if(sf.def.has(Flag.UPD)) qc.updating();
+      if(sf.definition.has(Flag.UPD)) qc.updating();
       return sf;
     }
 

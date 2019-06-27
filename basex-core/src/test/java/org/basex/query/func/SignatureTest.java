@@ -24,25 +24,25 @@ public final class SignatureTest extends SandboxTest {
    */
   @Test public void signatures() throws Exception {
     context.openDB(MemBuilder.build(new IOContent("<a/>")));
-    for(final FuncDefinition def : Functions.DEFINITIONS) check(def);
+    for(final FuncDefinition fd : Functions.DEFINITIONS) check(fd);
   }
 
   /**
    * Checks if the specified function correctly handles its argument types,
    * and returns the function name.
-   * @param def function signature
+   * @param fd function signature
    * types are supported.
    */
-  private static void check(final FuncDefinition def) {
-    final String desc = def.toString(), name = desc.replaceAll("\\(.*", "");
+  private static void check(final FuncDefinition fd) {
+    final String desc = fd.toString(), name = desc.replaceAll("\\(.*", "");
 
     // check that there are enough argument names
-    final String[] names = def.names();
-    final int min = def.minMax[0], max = def.minMax[1];
-    assertEquals(def + Arrays.toString(names), names.length, max == Integer.MAX_VALUE ? min : max);
+    final String[] names = fd.names();
+    final int min = fd.minMax[0], max = fd.minMax[1];
+    assertEquals(fd + Arrays.toString(names), names.length, max == Integer.MAX_VALUE ? min : max);
     // all variable names must be distinct
     final Set<String> set = new HashSet<>(Arrays.asList(names));
-    assertEquals("Duplicate argument names: " + def, names.length, set.size());
+    assertEquals("Duplicate argument names: " + fd, names.length, set.size());
     // var-arg functions must have a number at the end
     if(max == Integer.MAX_VALUE) assertTrue(names[names.length - 1].matches(".*\\d+$"));
 
@@ -55,11 +55,11 @@ public final class SignatureTest extends SandboxTest {
         if(p != 0) qu.append(", ");
         if(in) {
           // test arguments
-          if(def.params[p].type == AtomType.STR) {
+          if(fd.params[p].type == AtomType.STR) {
             qu.append('1');
           } else { // any type (skip test)
             qu.append("'X'");
-            if(SeqType.STR_O.instanceOf(def.params[p])) any++;
+            if(SeqType.STR_O.instanceOf(fd.params[p])) any++;
           }
         } else {
           // test wrong number of arguments

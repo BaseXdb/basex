@@ -1080,11 +1080,11 @@ public class TextPanel extends BaseXPanel {
       }
     }
     // add functions (default functions first)
-    for(final FuncDefinition def : Functions.DEFINITIONS) {
-      final String func = def.toString();
+    for(final FuncDefinition fd : Functions.DEFINITIONS) {
+      final String func = fd.toString();
       final String name = func.replaceAll("^fn:|\\(.*", "");
       final String value = name + (func.contains("()") ? "()" : "(_)");
-      if(def.uri() == QueryText.FN_URI) {
+      if(fd.uri() == QueryText.FN_URI) {
         if(name.contains("-")) LISTS.get(1).add(
             new Pair<>(name.replaceAll("(.)[^-A-Z]*-?", "$1").
             toLowerCase(Locale.ENGLISH), value));

@@ -11,13 +11,21 @@ import org.basex.query.util.*;
  * @author Christian Gruen
  */
 public abstract class ContextFn extends StandardFunc {
+  /**
+   * Indicates if the function access the current context.
+   * @return result of check
+   */
+  boolean contextAccess() {
+    return exprs.length == 0;
+  }
+
   @Override
   public final boolean has(final Flag... flags) {
-    return Flag.CTX.in(flags) && exprs.length == 0 || super.has(flags);
+    return Flag.CTX.in(flags) && contextAccess() || super.has(flags);
   }
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    return (exprs.length != 0 || visitor.lock(Locking.CONTEXT, false)) && super.accept(visitor);
+    return (!contextAccess() || visitor.lock(Locking.CONTEXT, false)) && super.accept(visitor);
   }
 }

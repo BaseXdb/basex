@@ -66,8 +66,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public Expr inline(final Var v, final Expr ex, final CompileContext cc) {
-    // [LW] Is copying always necessary?
-    return var.is(v) ? ex instanceof Value ? ex : ex.copy(cc, new IntObjMap<>()) : null;
+    return !var.is(v) ? null : ex instanceof Value ? ex : ex.copy(cc, new IntObjMap<>());
   }
 
   @Override

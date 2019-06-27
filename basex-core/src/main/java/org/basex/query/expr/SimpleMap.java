@@ -143,7 +143,7 @@ public abstract class SimpleMap extends Arr {
             // (1 to 2) ! 'ok'  ->  util:replicate('ok', 2)
             rep = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es));
           } else {
-            // (1 to 2) ! <x/>  ->  util:replicate('ok', 2)
+            // (1 to 2) ! <x/>  ->  util:replicate('', 2) ! <x/>
             exprs[e] = SingletonSeq.get(Str.ZERO, es);
           }
         }

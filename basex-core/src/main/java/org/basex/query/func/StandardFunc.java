@@ -45,7 +45,7 @@ public abstract class StandardFunc extends Arr {
   public static final int UNROLL_LIMIT = 10;
 
   /** Function definition. */
-  public FuncDefinition def;
+  public FuncDefinition definition;
   /** Static context. */
   public StaticContext sc;
 
@@ -66,8 +66,8 @@ public abstract class StandardFunc extends Arr {
   final void init(final StaticContext sctx, final InputInfo ii, final FuncDefinition df,
       final Expr[] args) {
     sc = sctx;
-    def = df;
     info = ii;
+    definition = df;
     exprs = args;
     exprType.assign(df.seqType);
   }
@@ -79,7 +79,7 @@ public abstract class StandardFunc extends Arr {
       // return optimized expression
       expr : preEval() ?
       // pre-evaluate function
-      (def.seqType.zeroOrOne() ? item(cc.qc, info) : value(cc.qc)) :
+      (definition.seqType.zeroOrOne() ? item(cc.qc, info) : value(cc.qc)) :
       // return original function
       this);
   }
@@ -94,7 +94,7 @@ public abstract class StandardFunc extends Arr {
    * @return result of check
    */
   protected boolean preEval() {
-    return allAreValues(def.seqType.occ.max > 1) && isSimple();
+    return allAreValues(definition.seqType.occ.max > 1) && isSimple();
   }
 
   /**
@@ -113,7 +113,7 @@ public abstract class StandardFunc extends Arr {
     final int es = exprs.length;
     final Expr[] arg = new Expr[es];
     for(int e = 0; e < es; e++) arg[e] = exprs[e].copy(cc, vm);
-    return copyType(def.get(sc, info, arg));
+    return copyType(definition.function.get(sc, info, arg));
   }
 
   /**
@@ -159,10 +159,10 @@ public abstract class StandardFunc extends Arr {
   public boolean has(final Flag... flags) {
     // check signature flags
     for(final Flag flag : flags) {
-      if(def.has(flag)) return true;
+      if(definition.has(flag)) return true;
     }
     // mix updates: higher-order function may be updating
-    if(Flag.UPD.in(flags) && sc.mixUpdates && def.has(Flag.HOF)) return true;
+    if(Flag.UPD.in(flags) && sc.mixUpdates && definition.has(Flag.HOF)) return true;
     // check arguments (without function invocation; it only applies to function itself)
     final Flag[] flgs = Flag.HOF.remove(flags);
     return flgs.length != 0 && super.has(flgs);
@@ -525,22 +525,22 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof StandardFunc && def == ((StandardFunc) obj).def &&
-        super.equals(obj);
+    return this == obj || obj instanceof StandardFunc &&
+        definition == ((StandardFunc) obj).definition && super.equals(obj);
   }
 
   @Override
   public final String description() {
-    return def.toString();
+    return definition.toString();
   }
 
   @Override
   public final void plan(final QueryPlan plan) {
-    plan.add(plan.create(this, NAME, def.id()), exprs);
+    plan.add(plan.create(this, NAME, definition.id()), exprs);
   }
 
   @Override
   public final String toString() {
-    return new TokenBuilder().add(def.id()).add('(').addSep(exprs, SEP).add(')').toString();
+    return new TokenBuilder().add(definition.id()).add('(').addSep(exprs, SEP).add(')').toString();
   }
 }

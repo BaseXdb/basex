@@ -47,8 +47,8 @@ final class SyntaxXQuery extends Syntax {
         if("IGNORE".equals(f.getName())) break;
         Collections.addAll(KEYWORDS, ((String) f.get(null)).split("-"));
       }
-      for(final FuncDefinition def : Functions.DEFINITIONS) {
-        Collections.addAll(KEYWORDS, string(def.local()).split("-"));
+      for(final FuncDefinition fd : Functions.DEFINITIONS) {
+        Collections.addAll(KEYWORDS, string(fd.local()).split("-"));
       }
       for(final Axis a : Axis.VALUES) Collections.addAll(KEYWORDS, a.name);
       for(final OpV o : OpV.VALUES) Collections.addAll(KEYWORDS, o.name);

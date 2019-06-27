@@ -55,7 +55,7 @@ public final class FnError extends StandardFunc {
       final StaticContext sc) {
     Util.debug(ex);
     final Str msg = Str.get(ex.getLocalizedMessage());
-    final StandardFunc sf = ERROR.def.get(sc, ex.info(), ex.qname(), msg);
+    final StandardFunc sf = ERROR.get(sc, ex.info(), ex.qname(), msg);
     sf.exprType.assign(st);
     return sf;
   }

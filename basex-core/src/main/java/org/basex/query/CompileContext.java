@@ -9,7 +9,6 @@ import org.basex.data.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
-import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.value.*;
@@ -245,14 +244,14 @@ public final class CompileContext {
 
   /**
    * Creates and returns an optimized instance of the specified function.
-   * @param func function
+   * @param function function
    * @param ii input info
    * @param exprs expressions
    * @return function
    * @throws QueryException query exception
    */
-  public Expr function(final Function func, final InputInfo ii, final Expr... exprs)
+  public Expr function(final AFunction function, final InputInfo ii, final Expr... exprs)
       throws QueryException {
-    return func.def.get(sc(), ii, exprs).optimize(this);
+    return function.get(sc(), ii, exprs).optimize(this);
   }
 }

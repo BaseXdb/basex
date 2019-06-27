@@ -52,6 +52,6 @@ public final class FnBoolean extends StandardFunc {
    * @return expression
    */
   public static Expr get(final Expr expr, final InputInfo ii, final StaticContext sc) {
-    return expr.seqType().eq(SeqType.BLN_O) ? expr : Function.BOOLEAN.def.get(sc, ii, expr);
+    return expr.seqType().eq(SeqType.BLN_O) ? expr : Function.BOOLEAN.get(sc, ii, expr);
   }
 }

@@ -5,14 +5,11 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 
-import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.index.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -27,7 +24,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-abstract class Ids extends StandardFunc {
+abstract class Ids extends ContextFn {
   /** Hash map for data references and id flags. */
   private final IdentityHashMap<Data, Boolean> indexed = new IdentityHashMap<>();
 
@@ -136,12 +133,7 @@ abstract class Ids extends StandardFunc {
   }
 
   @Override
-  public final boolean has(final Flag... flags) {
-    return Flag.CTX.in(flags) && exprs.length == 1 || super.has(flags);
-  }
-
-  @Override
-  public final boolean accept(final ASTVisitor visitor) {
-    return (exprs.length != 1 || visitor.lock(Locking.CONTEXT, false)) && super.accept(visitor);
+  boolean contextAccess() {
+    return exprs.length == 1;
   }
 }

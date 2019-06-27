@@ -73,7 +73,7 @@ public abstract class QueryPlanTest extends SandboxTest {
    * @return test string
    */
   protected static String empty(final Function func) {
-    return empty(func.def.clazz);
+    return empty(func.definition().clazz);
   }
 
   /**
@@ -100,7 +100,7 @@ public abstract class QueryPlanTest extends SandboxTest {
    * @return test string
    */
   protected static String exists(final Function func) {
-    return exists(func.def.clazz);
+    return exists(func.definition().clazz);
   }
 
   /**
@@ -126,7 +126,7 @@ public abstract class QueryPlanTest extends SandboxTest {
    * @return test string
    */
   protected static String root(final Function func) {
-    return root(func.def.clazz);
+    return root(func.definition().clazz);
   }
 
   /**
@@ -155,7 +155,7 @@ public abstract class QueryPlanTest extends SandboxTest {
    * @return test string
    */
   protected static String count(final Function func, final int count) {
-    return count(func.def.clazz, count);
+    return count(func.definition().clazz, count);
   }
 
   /**
@@ -195,6 +195,6 @@ public abstract class QueryPlanTest extends SandboxTest {
    * @return test string
    */
   protected static String type(final Function func, final String type) {
-    return type(func.def.clazz, type);
+    return type(func.definition().clazz, type);
   }
 }

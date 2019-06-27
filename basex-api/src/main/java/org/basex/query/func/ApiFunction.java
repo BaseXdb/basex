@@ -6,7 +6,6 @@ import static org.basex.query.value.type.SeqType.*;
 
 import java.util.*;
 
-import org.basex.query.expr.*;
 import org.basex.query.func.geo.*;
 import org.basex.query.func.request.*;
 import org.basex.query.func.rest.*;
@@ -24,7 +23,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public enum ApiFunction {
+public enum ApiFunction implements AFunction {
 
   // Geo Module
 
@@ -252,7 +251,7 @@ public enum ApiFunction {
   _WS_SET(WsSet.class, "set(id,key,value)", arg(STR_O, STR_O, ITEM_ZM), EMP, flag(NDT), WS_URI);
 
   /** Function definition. */
-  public final FuncDefinition def;
+  private final FuncDefinition definition;
 
   /**
    * Constructs a function signature; calls
@@ -309,7 +308,12 @@ public enum ApiFunction {
    */
   ApiFunction(final Class<? extends StandardFunc> func, final String desc, final SeqType[] params,
       final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri) {
-    def = new FuncDefinition(func, desc, params, seqType, flags, uri);
+    definition = new FuncDefinition(this, func, desc, params, seqType, flags, uri);
+  }
+
+  @Override
+  public FuncDefinition definition() {
+    return definition;
   }
 
   /**
@@ -333,34 +337,15 @@ public enum ApiFunction {
   }
 
   /**
-   * Checks if the specified expression is an instance of this function.
-   * @param ex expression
-   * @return result of check
-   */
-  public final boolean is(final Expr ex) {
-    return ex instanceof StandardFunc && ((StandardFunc) ex).def == def;
-  }
-
-  /**
    * Adds function signatures to the list. Called via reflection during initialization.
    * @param list list of function signatures
    */
   public static void init(final ArrayList<FuncDefinition> list) {
-    for(final ApiFunction func : values()) list.add(func.def);
-  }
-
-  /**
-   * Returns a string representation of the function with the specified arguments
-   * (see {@link FuncDefinition}).
-   * @param args arguments
-   * @return string representation
-   */
-  public final String args(final Object... args) {
-    return def.args(args);
+    for(final ApiFunction func : values()) list.add(func.definition);
   }
 
   @Override
   public final String toString() {
-    return def.toString();
+    return definition.toString();
   }
 }
