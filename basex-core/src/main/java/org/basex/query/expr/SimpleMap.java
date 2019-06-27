@@ -73,8 +73,22 @@ public abstract class SimpleMap extends Arr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    // compute result size
+    // flatten nested map operators (without positional access)
     final ExprList list = new ExprList(exprs.length);
+    for(final Expr expr : exprs) {
+      if(expr instanceof IterMap) {
+        list.add(((IterMap) expr).exprs);
+      } else {
+        list.add(expr);
+      }
+    }
+    if(exprs.length != list.size()) {
+      exprs = list.toArray();
+      cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, this);
+    }
+
+    // compute result size
+    list.reset();
     long min = 1, max = 1;
     boolean item = true;
     for(final Expr expr : exprs) {

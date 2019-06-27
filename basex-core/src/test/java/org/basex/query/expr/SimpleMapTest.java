@@ -68,6 +68,13 @@ public final class SimpleMapTest extends QueryPlanTest {
     check("4[. = 4] ! (4, 5)[. = 4]", 4, type(IterMap.class, "xs:integer*"));
   }
 
+  /** Flatten nested operators. */
+  @Test public void flatten() {
+    check("(1, 2) ! ((.+.) ! (.*.))", "4\n16", count(IterMap.class, 1));
+    // do not rewrite positional access
+    check("(1, 2) ! ((1 to .) ! position())", "1\n1\n2", count(CachedMap.class, 1));
+  }
+
   /** Errors. */
   @Test public void error() {
     error("(1 + 'a') ! 2", NONUMBER_X_X);
