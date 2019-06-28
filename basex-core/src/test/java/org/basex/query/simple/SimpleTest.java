@@ -154,6 +154,9 @@ public final class SimpleTest extends QueryTest {
           + "  if($a castable as xs:double and xs:double($a) gt 0) then $a else 'bar'"
           + "};"
           + "local:shortcircuit('foo')" },
+      { "Cast 6", empty(), "xs:integer(())" },
+      { "Cast 7", empty(), "xs:integer#1(())" },
+      { "Cast 8", empty(), "xs:integer(?)(())" },
 
       { "Mixed 1", "(<a/>,<b/>)/(if(name() = 'a') then <a/> else 2)/." },
 

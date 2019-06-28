@@ -233,7 +233,8 @@ public final class Functions {
       final Type type = getCast(name, arity, ii);
       final VarScope vs = new VarScope(sc);
       final Var[] params = { vs.addNew(new QNm(ITEM, ""), SeqType.AAT_ZO, true, qc, ii) };
-      final Expr expr = new Cast(sc, ii, new VarRef(ii, params[0]), type.seqType());
+      final SeqType st = SeqType.get(type, Occ.ZERO_ONE);
+      final Expr expr = new Cast(sc, ii, new VarRef(ii, params[0]), st);
       final AnnList anns = new AnnList();
       final FuncType ft = FuncType.get(anns, expr.seqType(), params);
       return closureOrFItem(anns, name, params, ft, expr, vs, ii, runtime, false);
