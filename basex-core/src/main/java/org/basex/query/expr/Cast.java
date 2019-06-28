@@ -20,6 +20,8 @@ import org.basex.util.hash.*;
 public final class Cast extends Single {
   /** Static context. */
   private final StaticContext sc;
+  /** Sequence type to cast to. */
+  private final SeqType seqType;
 
   /**
    * Function constructor.
@@ -30,8 +32,9 @@ public final class Cast extends Single {
    */
   public Cast(final StaticContext sc, final InputInfo info, final Expr expr,
       final SeqType seqType) {
-    super(info, expr, seqType);
+    super(info, expr, SeqType.ITEM_ZM);
     this.sc = sc;
+    this.seqType = seqType;
   }
 
   @Override
@@ -41,18 +44,19 @@ public final class Cast extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    // skip cast if input and target type is equal
     final SeqType st = expr.seqType();
-    if(st.oneNoArray()) exprType.assign(Occ.ONE);
+    final Type type = seqType.type;
+    if(st.one() && st.type.eq(type)) return cc.replaceWith(this, expr);
 
-    // pre-evaluate value
+    // pre-evaluate value argument
     if(expr instanceof Value) return cc.preEval(this);
 
-    // skip cast if specified and return types are equal
-    // (the following types will always be correct)
-    final Type type = seqType().type;
-    if((type == AtomType.BLN || type == AtomType.FLT || type == AtomType.DBL ||
-        type == AtomType.QNM || type == AtomType.URI) && seqType().eq(expr.seqType())) {
-      return cc.replaceWith(this, expr);
+    // assign target type
+    if(type instanceof ListType) {
+      exprType.assign(type.atomic());
+    } else {
+      exprType.assign(type, st.oneNoArray() ? Occ.ONE : Occ.ZERO_ONE);
     }
     return this;
   }
@@ -60,30 +64,29 @@ public final class Cast extends Single {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value value = expr.atomValue(qc, info);
-    final SeqType st = seqType();
     final long size = value.size();
-    if(!st.occ.check(size)) throw INVTYPE_X_X_X.get(info, value.seqType(), st, value);
-    return size == 1 ? st.cast((Item) value, true, qc, sc, info) : value;
+    if(!seqType.occ.check(size)) throw INVTYPE_X_X_X.get(info, value.seqType(), seqType, value);
+    return size == 1 ? seqType.cast((Item) value, true, qc, sc, info) : value;
   }
 
   @Override
   public Cast copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return copyType(new Cast(sc, info, expr.copy(cc, vs), seqType()));
+    return copyType(new Cast(sc, info, expr.copy(cc, vs), seqType));
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Cast && seqType().eq(((Cast) obj).seqType()) &&
+    return this == obj || obj instanceof Cast && seqType.eq(((Cast) obj).seqType) &&
         super.equals(obj);
   }
 
   @Override
   public void plan(final QueryPlan plan) {
-    plan.add(plan.create(this, AS, seqType()), expr);
+    plan.add(plan.create(this, AS, seqType), expr);
   }
 
   @Override
   public String toString() {
-    return expr + " " + CAST + ' ' + AS + ' ' + seqType();
+    return expr + " " + CAST + ' ' + AS + ' ' + seqType;
   }
 }

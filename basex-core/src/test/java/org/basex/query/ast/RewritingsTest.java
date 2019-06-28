@@ -432,4 +432,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(<a/>,comment{})/self::namespace-node()", "", exists(IterStep.class));
     check("(<a/>,comment{})/descendant-or-self::namespace-node()", "", exists(IterStep.class));
   }
+
+  /** Casts. */
+  @Test public void cast() {
+    check("for $n in 1 to 3 return xs:integer($n)[. = 1]", 1, empty(Cast.class));
+    check("('a','b') ! xs:string(.)", "a\nb", empty(Cast.class), root(StrSeq.class));
+  }
 }

@@ -157,6 +157,8 @@ public final class SimpleTest extends QueryTest {
       { "Cast 6", empty(), "xs:integer(())" },
       { "Cast 7", empty(), "xs:integer#1(())" },
       { "Cast 8", empty(), "xs:integer(?)(())" },
+      { "Cast 9", strings("1", "2"), "('1', '2 3') ! xs:NMTOKENS(.)[1]" },
+      { "Cast 10", "exactly-one(xs:NMTOKENS(<x>1 2</x>))" },
 
       { "Mixed 1", "(<a/>,<b/>)/(if(name() = 'a') then <a/> else 2)/." },
 

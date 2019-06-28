@@ -127,7 +127,7 @@ public enum ListType implements Type {
 
   @Override
   public final AtomType atomic() {
-    return null;
+    return type;
   }
 
   @Override
