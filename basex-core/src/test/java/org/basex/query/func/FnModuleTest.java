@@ -41,7 +41,7 @@ public final class FnModuleTest extends QueryPlanTest {
     // but type is adjusted
     check(func.args(" <_>1</_>"), 1, type(func, "xs:double"));
     // no adjustment of type
-    check(func.args(" 1 ! array { . }"), 1, type(func, "xs:numeric?"));
+    check(func.args(" <_>1</_> ! array { . }"), 1, type(func, "xs:numeric?"));
   }
 
   /** Test method. */

@@ -938,7 +938,6 @@ public abstract class Path extends ParseExpr {
   public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
 
-    // #1202: during inlining, expressions will be optimized, which are based on the context value
     boolean changed = false;
     if(root != null) {
       final Expr rt = root.inline(var, ex, cc);
@@ -948,13 +947,14 @@ public abstract class Path extends ParseExpr {
       }
     }
 
+    // #1202: during inlining, expressions will be optimized, which are based on the context value
     cc.pushFocus(root != null ? root : cc.qc.focus.value);
     try {
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
-        final Expr exp = steps[s].inline(var, ex, cc);
-        if(exp != null) {
-          steps[s] = exp;
+        final Expr step = steps[s].inline(var, ex, cc);
+        if(step != null) {
+          steps[s] = step;
           changed = true;
         }
         cc.updateFocus(steps[s]);

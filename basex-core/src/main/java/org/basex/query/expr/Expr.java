@@ -251,20 +251,20 @@ public abstract class Expr extends ExprInfo {
    * Inlines the given expression into all elements of the given array.
    * @param var variable to replace
    * @param expr expression to inline
-   * @param array array
+   * @param exprs expressions to process
    * @param cc compilation context
    * @return {@code true} if the array has changed, {@code false} otherwise
    * @throws QueryException query exception
    */
-  protected static boolean inlineAll(final Var var, final Expr expr, final Expr[] array,
+  protected static boolean inlineAll(final Var var, final Expr expr, final Expr[] exprs,
       final CompileContext cc) throws QueryException {
 
     boolean changed = false;
-    final int al = array.length;
-    for(int a = 0; a < al; a++) {
-      final Expr ex = array[a].inline(var, expr, cc);
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
+      final Expr ex = exprs[e].inline(var, expr, cc);
       if(ex != null) {
-        array[a] = ex;
+        exprs[e] = ex;
         changed = true;
       }
     }

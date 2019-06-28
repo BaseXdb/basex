@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-final class StaticJavaCall extends JavaCall {
+public final class StaticJavaCall extends JavaCall {
   /** Java module. */
   private final Object module;
   /** Method to be called. */
