@@ -3,10 +3,10 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
+import org.basex.query.func.Function;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -207,6 +207,31 @@ public abstract class SimpleMap extends Arr {
       if(exprs[e].uses(var)) return false;
     }
     return exprs[0].inlineable(var);
+  }
+
+  @Override
+  public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
+      throws QueryException {
+
+    boolean changed = false;
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
+      Expr expr = null;
+      try {
+        expr = exprs[e].inline(var, ex, cc);
+      } catch(final QueryException qe) {
+        // replace original expression with error
+        expr = cc.error(qe, this);
+      }
+      if(expr != null) {
+        exprs[e] = expr;
+        changed = true;
+      }
+      if(e == 0) cc.pushFocus(expr);
+      else cc.updateFocus(expr);
+    }
+    cc.removeFocus();
+    return changed ? optimize(cc) : null;
   }
 
   @Override

@@ -229,7 +229,8 @@ public final class PathTest extends SandboxTest {
    */
   @Test public void nameIndex() {
     execute(new CreateDB(NAME, "<x/>"));
-    query("let $x := 'e' return element e {}/self::e[name() = $x]", "<e/>");
+    query("let $x := 'e' return element e {} / self::e[name() = $x]", "<e/>");
+    query("let $x := 'e' return element e {} ! self::e[name() = $x]", "<e/>");
   }
 
   /**

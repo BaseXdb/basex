@@ -249,13 +249,19 @@ public abstract class Filter extends Preds {
   public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
 
-    boolean changed = inlineAll(var, ex, exprs, cc);
+    boolean changed = false;
     if(root != null) {
       final Expr rt = root.inline(var, ex, cc);
       if(rt != null) {
         root = rt;
         changed = true;
       }
+    }
+    cc.pushFocus(root);
+    try {
+      if(inlineAll(var, ex, exprs, cc)) changed = true;
+    } finally {
+      cc.removeFocus();
     }
     return changed ? optimize(cc) : null;
   }
