@@ -31,11 +31,6 @@ public final class Treat extends Single {
   }
 
   @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
-    return super.compile(cc).optimize(cc);
-  }
-
-  @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final SeqType st = seqType();
     final Iter iter = expr.iter(qc);

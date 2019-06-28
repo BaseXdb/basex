@@ -31,7 +31,7 @@ public final class FnNumber extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final boolean context = exprs.length == 0;
+    final boolean context = contextAccess();
     final Expr expr = context ? cc.qc.focus.value : exprs[0];
     if(expr != null && expr.seqType().eq(SeqType.DBL_O)) {
       // number(1e1) -> 1e1

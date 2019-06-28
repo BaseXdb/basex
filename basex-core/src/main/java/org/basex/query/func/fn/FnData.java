@@ -32,7 +32,7 @@ public final class FnData extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final boolean context = exprs.length == 0;
+    final boolean context = contextAccess();
     final Expr expr = context ? cc.qc.focus.value : exprs[0];
     if(expr != null) {
       final SeqType st = expr.seqType();
