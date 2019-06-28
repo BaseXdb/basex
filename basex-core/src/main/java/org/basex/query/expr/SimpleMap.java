@@ -121,8 +121,18 @@ public abstract class SimpleMap extends Arr {
     // simplify static expressions
     int e = 0;
     final int el = exprs.length;
+    boolean pushed = false;
     for(int n = 1; n < el; n++) {
       final Expr expr = exprs[e], next = exprs[n];
+      if(e > 0) {
+        if(pushed) {
+          cc.updateFocus(expr);
+        } else {
+          cc.pushFocus(expr);
+          pushed = true;
+        }
+      }
+
       final long es = expr.size();
       Expr rep = null;
       // check if deterministic expressions with known result size can be removed
@@ -132,30 +142,54 @@ public abstract class SimpleMap extends Arr {
           // rewrite expression with next value as singleton sequence
           // (1 to 2) ! 3  ->  (3, 3)
           rep = SingletonSeq.get((Value) next, es);
-        } else if(!next.has(Flag.CTX, Flag.POS)) {
-          // skip expression that relies on the context
-          if(es == 1) {
-            // replace expression with next expression
-            // <x/> ! 'ok'  ->  'ok'
-            rep = next;
-          } else if(!next.has(Flag.NDT, Flag.CNS)) {
-            // replace expression with replicated expression
-            // (1 to 2) ! 'ok'  ->  util:replicate('ok', 2)
-            rep = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es));
+        } else if(!next.has(Flag.POS)) {
+          // check if expression relies on the context
+          if(next.has(Flag.CTX)) {
+            // single item: inline values and variable references
+            if(es == 1 && (expr instanceof Value || expr instanceof VarRef)) {
+              // examples:
+              // 'a' ! (. = 'a')  ->  'a  = 'a'
+              // map {} ! ?*      ->  map {}?*
+              // 123 ! number()   ->  number(123)
+              // $doc ! /         ->  $doc
+              try {
+                rep = next.inline(null, expr, cc);
+                // ignore rewritten expression that is identical to original one
+                if(rep instanceof SimpleMap) {
+                  final Expr[] ex = ((SimpleMap) rep).exprs;
+                  if(ex[0] == expr && ex[1] == next) rep = null;
+                }
+              } catch(final QueryException qe) {
+                // replace original expression with error
+                rep = cc.error(qe, this);
+              }
+            }
           } else {
-            // (1 to 2) ! <x/>  ->  util:replicate('', 2) ! <x/>
-            exprs[e] = SingletonSeq.get(Str.ZERO, es);
+            if(es == 1) {
+              // replace expression with next expression
+              // <x/> ! 'ok'  ->  'ok'
+              rep = next;
+            } else if(!next.has(Flag.NDT, Flag.CNS)) {
+              // replace expression with replicated expression
+              // (1 to 2) ! 'ok'  ->  util:replicate('ok', 2)
+              rep = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es));
+            } else {
+              // (1 to 2) ! <x/>  ->  util:replicate('', 2) ! <x/>
+              exprs[e] = SingletonSeq.get(Str.ZERO, es);
+            }
           }
         }
       }
 
       if(rep != null) {
-        exprs[e] = cc.replaceWith(expr, rep);
+        exprs[e] = cc.replaceWith(next, rep);
       } else if(!(next instanceof ContextValue)) {
         // context item expression can be ignored
         exprs[++e] = next;
       }
     }
+    if(pushed) cc.removeFocus();
+
     if(++e != el) exprs = Arrays.copyOf(exprs, e);
 
     // single expression: return this expression
@@ -214,7 +248,8 @@ public abstract class SimpleMap extends Arr {
       throws QueryException {
 
     boolean changed = false;
-    final int el = exprs.length;
+    // context inlining: only consider first expression
+    final int el = var == null ? 1 : exprs.length;
     for(int e = 0; e < el; e++) {
       Expr expr = null;
       try {

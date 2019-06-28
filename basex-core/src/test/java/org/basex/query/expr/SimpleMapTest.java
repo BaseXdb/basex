@@ -7,6 +7,7 @@ import org.basex.query.ast.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.var.*;
 import org.junit.*;
 
 /**
@@ -73,6 +74,13 @@ public final class SimpleMapTest extends QueryPlanTest {
     check("(1, 2) ! ((.+.) ! (.*.))", "4\n16", count(IterMap.class, 1));
     // do not rewrite positional access
     check("(1, 2) ! ((1 to .) ! position())", "1\n1\n2", count(CachedMap.class, 1));
+  }
+
+  /** Inline simple expressions into next operand. */
+  @Test public void inline() {
+    check("'1' ! (., number())", "1\n1", empty(IterMap.class));
+    check("let $a := document { <a/> } return $a ! (.,/)", "<a/>\n<a/>",
+        count(VarRef.class, 2));
   }
 
   /** Errors. */

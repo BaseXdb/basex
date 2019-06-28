@@ -8,6 +8,7 @@ import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
+import org.basex.query.func.java.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -225,7 +226,7 @@ public abstract class Expr extends ExprInfo {
   public abstract VarUsage count(Var var);
 
   /**
-   * Inlines an expression into this one, replacing all references to the given variable.
+   * Inlines an expression into this one, replacing all variable or context references.
    * This function is called by:
    * <ul>
    *   <li> {@link Catch#inline(QueryException, CompileContext)}</li>
@@ -233,11 +234,20 @@ public abstract class Expr extends ExprInfo {
    *   <li> {@link For#toPredicate}</li>
    *   <li> {@link GFLWOR#inlineLets}</li>
    *   <li> {@link TypeswitchGroup#inline}</li>
+   *   <li> {@link SimpleMap#optimize}</li> (for the context)
    * </ul>
    * The variable reference is replaced in:
    * <ul>
    *   <li> {@link VarRef#inline}</li>
    *   <li> {@link OrderBy#inline}</li>
+   * </ul>
+   * The context is replaced in:
+   * <ul>
+   *   <li> {@link ContextFn#inline}</li>
+   *   <li> {@link ContextValue#inline}</li>
+   *   <li> {@link Lookup#inline}</li>
+   *   <li> {@link Root#inline}</li>
+   *   <li> {@link StaticJavaCall#inline}</li>
    * </ul>
    * @param var variable to replace
    * @param ex expression to inline

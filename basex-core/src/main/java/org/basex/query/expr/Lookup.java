@@ -10,9 +10,9 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.XQArray;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.XQMap;
+import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -140,6 +140,12 @@ public final class Lookup extends Arr {
   @Override
   public boolean has(final Flag... flags) {
     return Flag.CTX.in(flags) && exprs.length == 1 || super.has(flags);
+  }
+
+  @Override
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+    return inline(var, ex, cc, v ->
+      exprs.length == 1 ? new Lookup(info, exprs[0], ex).optimize(cc) : null);
   }
 
   @Override

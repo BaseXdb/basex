@@ -67,6 +67,12 @@ public final class Root extends Simple {
   }
 
   @Override
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+    return var != null ? null : ex.seqType().instanceOf(SeqType.DOC_ZO) ? ex :
+      SimpleMap.get(info, ex, this);
+  }
+
+  @Override
   public boolean accept(final ASTVisitor visitor) {
     return visitor.lock(Locking.CONTEXT, false);
   }

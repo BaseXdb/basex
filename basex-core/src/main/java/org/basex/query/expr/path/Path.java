@@ -939,7 +939,10 @@ public abstract class Path extends ParseExpr {
       throws QueryException {
 
     boolean changed = false;
-    if(root != null) {
+    if(root == null) {
+      // no root, no context: return simple map
+      if(var == null) return SimpleMap.get(info, ex, this);
+    } else {
       final Expr rt = root.inline(var, ex, cc);
       if(rt != null) {
         root = rt;
