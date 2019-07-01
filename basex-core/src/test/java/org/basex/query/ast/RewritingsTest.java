@@ -438,4 +438,17 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $n in 1 to 3 return xs:integer($n)[. = 1]", 1, empty(Cast.class));
     check("('a','b') ! xs:string(.)", "a\nb", empty(Cast.class), root(StrSeq.class));
   }
+
+  /** Casts. */
+  @Test public void typeCheck() {
+    check("declare function local:a($e) as xs:string? { local:b($e) }; " +
+        "declare function local:b($e) as xs:string? { $e }; local:a(<_>X</_>)", "X",
+        count(TypeCheck.class, 1));
+    check("declare function local:a($e) as xs:string? { local:b($e) }; " +
+        "declare function local:b($e) as xs:string* { $e }; local:a(<_>X</_>)", "X",
+        count(TypeCheck.class, 1));
+    check("declare function local:a($e) as xs:string* { local:b($e) }; " +
+        "declare function local:b($e) as xs:string? { $e }; local:a(<_>X</_>)", "X",
+        count(TypeCheck.class, 1));
+  }
 }

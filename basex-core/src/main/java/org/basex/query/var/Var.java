@@ -86,7 +86,6 @@ public final class Var extends ExprInfo {
    */
   public Var(final Var var, final QueryContext qc, final StaticContext sc) {
     this(var.name, var.declType, var.param, qc, sc, var.info);
-    promote = var.promote;
     exprType.assign(var.exprType);
   }
 

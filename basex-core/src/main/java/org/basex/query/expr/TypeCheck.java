@@ -50,7 +50,15 @@ public final class TypeCheck extends Single {
   public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType at = expr.seqType(), st = seqType();
 
-    // return type is already correct
+    // remove redundant type check
+    if(expr instanceof TypeCheck) {
+      final TypeCheck tc = (TypeCheck) expr;
+      if(promote == tc.promote && st.instanceOf(at)) {
+        return cc.replaceWith(this, new TypeCheck(sc, info, tc.expr, st, promote).optimize(cc));
+      }
+    }
+
+    // skip check if return type is already correct
     if(at.instanceOf(st)) {
       cc.info(OPTTYPE_X_X, st, expr);
       return expr;
