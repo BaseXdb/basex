@@ -266,14 +266,16 @@ public final class QueryResources {
   }
 
   /**
-   * Removes and closes a database. Called during updates.
+   * Removes and closes the specified database. Called during updates.
    * @param name name of database to be removed
    */
   public void remove(final String name) {
+    final boolean mainmem = qc.context.options.get(MainOptions.MAINMEM);
     final int ds = datas.size();
     for(int d = globalData ? 1 : 0; d < ds; d++) {
       final Data data = datas.get(d);
-      if(data.meta.name.equals(name)) {
+      // default mode: skip main-memory database instances (which may result from fn:doc calls)
+      if(data.meta.name.equals(name) && !(data.inMemory() || mainmem)) {
         Close.close(data, qc.context);
         datas.remove(d);
         break;
