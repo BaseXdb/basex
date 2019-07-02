@@ -55,7 +55,7 @@ public abstract class Path extends ParseExpr {
    * Returns a new path instance.
    * A path implementation is chosen that works fastest for the given steps.
    * @param ii input info
-   * @param root root expression (can be {@code null})
+   * @param root root expression (can be {@link Dummy} or {@code null})
    * @param steps steps
    * @return path instance
    */
@@ -71,8 +71,6 @@ public abstract class Path extends ParseExpr {
       tmp.add(path.steps);
       rt = path.root;
     }
-    // remove redundant context reference
-    if(rt instanceof ContextValue) rt = null;
 
     // add steps of input array
     for(final Expr step : steps) {
@@ -108,9 +106,14 @@ public abstract class Path extends ParseExpr {
         }
       }
     }
+
+    // check if path can be traversed in iterative manner; normalize root context
     final Expr[] stps = tmp.finish();
-    return axes < stps.length ? new MixedPath(ii, rt, stps) :
-           iterative(rt, stps) ? new IterPath(ii, rt, stps) :
+    final boolean iterative = iterative(rt, stps);
+    if(rt instanceof ContextValue || rt instanceof Dummy) rt = null;
+
+    return iterative ? new IterPath(ii, rt, stps) :
+           axes < stps.length ? new MixedPath(ii, rt, stps) :
            new CachedPath(ii, rt, stps);
   }
 
@@ -190,7 +193,6 @@ public abstract class Path extends ParseExpr {
 
     // simplify path with empty root expression or empty step
     final Value rootValue = rootValue(cc);
-
     if(emptyPath(!cc.nestedFocus() || cc.qc.focus.value == null ? rootValue : null))
       return cc.emptySeq(this);
 
@@ -219,7 +221,8 @@ public abstract class Path extends ParseExpr {
     }
 
     // choose best path implementation and set type information
-    return copyType(get(info, root, steps));
+    final Expr rt = root == null && rootValue instanceof Dummy ? rootValue : root;
+    return copyType(get(info, rt, steps));
   }
 
   @Override
@@ -355,6 +358,8 @@ public abstract class Path extends ParseExpr {
     boolean sameDepth = atMostOne || st.type == NodeType.DOC || st.type == NodeType.DEL;
 
     for(final Expr expr : steps) {
+      if(!(expr instanceof Step)) return false;
+
       final Step step = (Step) expr;
       switch(step.axis) {
         case ANCESTOR:
