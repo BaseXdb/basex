@@ -144,8 +144,8 @@ public final class Lookup extends Arr {
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    return inline(var, ex, cc, v ->
-      exprs.length == 1 ? new Lookup(info, exprs[0], ex).optimize(cc) : null);
+    return inline(var, ex, cc, v -> exprs.length == 1 ?
+      new Lookup(info, exprs[0], ex).optimize(cc) : null);
   }
 
   @Override

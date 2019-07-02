@@ -51,12 +51,12 @@ public final class SimpleMapTest extends QueryPlanTest {
     query("(1,2) ! last()", "2\n2");
     query("map {} ! head(?_) ! string()", "");
 
-    final String nomap = empty("*[contains(name(), 'Map')]");
-    check("1 ! .", 1, nomap);
-    check("(1, 2)[. = 1] ! .", 1, nomap);
-    check("(1,(2, 3)[. = 2]) ! .", "1\n2", nomap);
-    check("(1,2) !.!.!.!.!.!.!.!.!.!.!.", "1\n2", nomap);
-    check("<a/> ! . ! .", "<a/>", nomap);
+    check("1 ! .", 1, empty(IterMap.class));
+    check("(1, 2)[. = 1] ! .", 1, empty(IterMap.class));
+    check("(1,(2, 3)[. = 2]) ! .", "1\n2", empty(IterMap.class));
+    check("(1,2) !.!.!.!.!.!.!.!.!.!.!.", "1\n2", empty(IterMap.class));
+    check("<a/> ! . ! .", "<a/>", empty(IterMap.class));
+    check("(1,2)[. ! number() = 2]", 2, empty("*[name() = 'IterMap']"));
 
     check("trace(1) ! (. + 1)", 2, exists(ItemMap.class));
     check("1[.= 1] ! trace(.)", 1, exists(TRACE));
@@ -79,8 +79,10 @@ public final class SimpleMapTest extends QueryPlanTest {
   /** Inline simple expressions into next operand. */
   @Test public void inline() {
     check("'1' ! (., number())", "1\n1", empty(IterMap.class));
-    check("let $a := document { <a/> } return $a ! (.,/)", "<a/>\n<a/>",
-        count(VarRef.class, 2));
+    check("let $a := document { <a/> } return $a ! (.,/)", "<a/>\n<a/>", count(VarRef.class, 2));
+    check("let $d := document{} return $d ! /", "", root(CDoc.class));
+    check("map { 1:2 } ! ?*", 2, root(Int.class));
+    check("let $n := map { 1:2 } return $n ! ?*", 2, root(Int.class));
   }
 
   /** Errors. */

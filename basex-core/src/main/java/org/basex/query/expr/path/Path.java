@@ -941,7 +941,7 @@ public abstract class Path extends ParseExpr {
     boolean changed = false;
     if(root == null) {
       // no root, no context: return simple map
-      if(var == null) return SimpleMap.get(info, ex, this);
+      if(var == null) return copyType(SimpleMap.get(info, ex, this));
     } else {
       final Expr rt = root.inline(var, ex, cc);
       if(rt != null) {

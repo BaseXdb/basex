@@ -143,11 +143,14 @@ public abstract class SimpleMap extends Arr {
           // (1 to 2) ! 3  ->  (3, 3)
           rep = SingletonSeq.get((Value) next, es);
         } else if(!next.has(Flag.POS)) {
-          // check if expression relies on the context
+          // check if next expression relies on the context
           if(next.has(Flag.CTX)) {
-            // single item: inline values and variable references
-            if(es == 1 && (expr instanceof Value || expr instanceof VarRef)) {
-              // examples:
+            if(expr instanceof ContextValue) {
+              // replace leading context reference
+              // ('1','2')[. ! number() = 2]  ->  ('1','2')[number() = 2]
+              rep = next;
+            } else if(es == 1 && (expr instanceof Value || expr instanceof VarRef)) {
+              // single item: inline values and variable references
               // 'a' ! (. = 'a')  ->  'a  = 'a'
               // map {} ! ?*      ->  map {}?*
               // 123 ! number()   ->  number(123)
