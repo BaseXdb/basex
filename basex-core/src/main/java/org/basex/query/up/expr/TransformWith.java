@@ -108,7 +108,7 @@ public final class TransformWith extends Arr {
 
   @Override
   public String toString() {
-    return toString(' ' + QueryText.UPDATE + ' ');
+    return exprs[0] + " " + QueryText.UPDATE + " { " + exprs[1] + " }";
   }
 
   @Override
