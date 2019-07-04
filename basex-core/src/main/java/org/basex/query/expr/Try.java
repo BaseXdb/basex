@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -36,11 +37,9 @@ public final class Try extends Single {
   @Override
   public void checkUp() throws QueryException {
     // check if no or all try/catch expressions are updating
-    final int cl = catches.length;
-    final Expr[] tmp = new Expr[cl + 1];
-    tmp[0] = expr;
-    for(int c = 0; c < cl; ++c) tmp[c + 1] = catches[c].expr;
-    checkAllUp(tmp);
+    final ExprList exprs = new ExprList(catches.length + 1).add(expr);
+    for(final Catch ctch : catches) exprs.add(ctch.expr);
+    checkAllUp(exprs.finish());
   }
 
   @Override
@@ -129,6 +128,14 @@ public final class Try extends Single {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return copyType(new Try(info, expr.copy(cc, vm), Arr.copyAll(cc, vm, catches)));
+  }
+
+  @Override
+  public boolean isVacuous() {
+    for(final Catch ctch : catches) {
+      if(!ctch.expr.isVacuous()) return false;
+    }
+    return expr.isVacuous();
   }
 
   @Override

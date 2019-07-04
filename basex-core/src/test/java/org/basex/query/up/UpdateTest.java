@@ -1181,4 +1181,11 @@ public final class UpdateTest extends SandboxTest {
     error("update:output([1,(2,[3,true#0])])", BASEX_FUNCTION_X);
     error("update:output(map { 1: map { 2: true#0 }})", BASEX_FUNCTION_X);
   }
+
+  /**
+   * GH1693.
+   */
+  @Test public void gh1693() {
+    query("try { () } catch * { () }, delete node <a/>");
+  }
 }
