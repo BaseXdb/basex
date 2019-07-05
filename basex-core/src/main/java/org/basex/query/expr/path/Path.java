@@ -45,7 +45,7 @@ public abstract class Path extends ParseExpr {
    * @param root root expression (can be {@code null})
    * @param steps steps
    */
-  protected Path(final InputInfo info, final Expr root, final Expr[] steps) {
+  protected Path(final InputInfo info, final Expr root, final Expr... steps) {
     super(info, SeqType.ITEM_ZM);
     this.root = root;
     this.steps = steps;
@@ -111,8 +111,9 @@ public abstract class Path extends ParseExpr {
     final Expr[] stps = tmp.finish();
     final boolean iterative = iterative(rt, stps);
     if(rt instanceof ContextValue || rt instanceof Dummy) rt = null;
-
-    return iterative ? new IterPath(ii, rt, stps) :
+    final boolean single = iterative && rt == null && stps.length == 1 && !stps[0].has(Flag.POS);
+    return single ? new SingleIterPath(ii, stps[0]) :
+           iterative ? new IterPath(ii, rt, stps) :
            axes < stps.length ? new MixedPath(ii, rt, stps) :
            new CachedPath(ii, rt, stps);
   }
@@ -354,8 +355,6 @@ public abstract class Path extends ParseExpr {
 
     final long size = root.size();
     final SeqType st = root.seqType();
-    if(!(st.type instanceof NodeType)) return false;
-
     boolean atMostOne = size == 0 || size == 1 || st.zeroOrOne();
     boolean sameDepth = atMostOne || st.type == NodeType.DOC || st.type == NodeType.DEL;
 

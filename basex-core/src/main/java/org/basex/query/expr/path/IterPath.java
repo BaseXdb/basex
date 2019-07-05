@@ -90,6 +90,6 @@ public final class IterPath extends AxisPath {
   @Override
   public IterPath copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final Expr rt = root == null ? null : root.copy(cc, vm);
-    return copyType(new IterPath(info, rt,  Arr.copyAll(cc, vm, steps)));
+    return copyType(new IterPath(info, rt, Arr.copyAll(cc, vm, steps)));
   }
 }

@@ -138,6 +138,11 @@ public abstract class Step extends Preds {
   }
 
   @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    return iter(qc).value(qc, this);
+  }
+
+  @Override
   public abstract Step copy(CompileContext cc, IntObjMap<Var> vm);
 
   /**
