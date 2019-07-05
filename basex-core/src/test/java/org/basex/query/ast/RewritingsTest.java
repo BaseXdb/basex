@@ -451,4 +451,20 @@ public final class RewritingsTest extends QueryPlanTest {
         "declare function local:b($e) as xs:string? { $e }; local:a(<_>X</_>)", "X",
         count(TypeCheck.class, 1));
   }
+
+  /** GH1694. */
+  @Test public void gh1694() {
+    check("count(1)", 1, exists(Int.class));
+    execute(new CreateDB(NAME, "<_/>"));
+    final String query =
+      "declare function local:b($e) as xs:string { $e };\n" +
+      "declare function local:a($db) {\n" +
+      "  let $ids := local:b(db:open($db))\n" +
+      "  return db:open('" + NAME + "')[*[1] = $ids]\n" +
+      "};\n" +
+      "local:a('" + NAME + "')";
+
+    query(query, "<_/>");
+    execute(new DropDB(NAME));
+  }
 }
