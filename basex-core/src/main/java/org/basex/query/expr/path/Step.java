@@ -66,16 +66,6 @@ public abstract class Step extends Preds {
   }
 
   /**
-   * This method returns a standard step without kind test and predicates.
-   * @param ii input info input info
-   * @param axis axis axis
-   * @return step step
-   */
-  public static IterStep get(final InputInfo ii, final Axis axis) {
-    return new IterStep(ii, axis, KindTest.NOD);
-  }
-
-  /**
    * Constructor.
    * @param info input info
    * @param axis axis

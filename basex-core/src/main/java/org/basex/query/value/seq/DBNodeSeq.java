@@ -16,7 +16,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Sequence, containing at least two ordered database nodes.
+ * Sequence, containing at least two nodes in distinct document order (DDO).
  *
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen

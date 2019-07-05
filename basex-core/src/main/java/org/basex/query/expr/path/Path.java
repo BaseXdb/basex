@@ -13,6 +13,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.Test.*;
+import org.basex.query.func.Function;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -37,7 +38,7 @@ public abstract class Path extends ParseExpr {
   /** Root expression (can be {@code null}). */
   public Expr root;
   /** Path steps. */
-  public final Expr[] steps;
+  public Expr[] steps;
 
   /**
    * Constructor.
@@ -78,7 +79,7 @@ public abstract class Path extends ParseExpr {
       if(ex instanceof ContextValue) {
         // remove redundant context references
         // single step: rewrite to axis step (required to sort results of path)
-        ex = Step.get(((ContextValue) ex).info, SELF);
+        ex = Step.get(((ContextValue) ex).info, SELF, KindTest.NOD);
       } else if(ex instanceof Filter) {
         // rewrite filter to axis step
         final Filter f = (Filter) ex;
@@ -159,23 +160,27 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    // return root if it returns no result (it may have side effects)
-    final SeqType st = root != null ? root.seqType() : SeqType.ITEM_ZM;
-    if(st.zero()) return cc.replaceWith(this, root);
+    // no root: assign context value
+    if(root == null && !cc.nestedFocus()) root = cc.qc.focus.value;
 
-    final int sl = steps.length;
+    // return root if it returns no result
+    if(root != null && root.seqType().zero()) return cc.replaceWith(this, root);
+
+    int sl = steps.length;
     final ExprList list = new ExprList(sl);
     for(int s = 0; s < sl; s++) {
       // step is empty sequence. example: $doc/NON-EXISTING-STEP -> $doc/() -> ()
       final Expr expr = steps[s];
       if(expr == Empty.VALUE) return cc.emptySeq(this);
 
-      // remove redundant self reference
-      if(list.isEmpty() && expr instanceof Step) {
+      // remove redundant steps
+      if(expr instanceof Step) {
         final Step step = (Step) expr;
         // remove redundant step. example: <xml/>/self::node() -> <xml/>
-        if(step.axis == SELF && step.exprs.length == 0 && step.test instanceof KindTest &&
-            st.instanceOf(((KindTest) step.test).type.seqType())) continue;
+        if(step.axis == SELF && step.exprs.length == 0 && step.test instanceof KindTest) {
+          final Expr prev = list.isEmpty() ? root : list.peek();
+          if(prev != null && prev.seqType().type.instanceOf(step.test.type)) continue;
+        }
       }
 
       // add step to list
@@ -189,8 +194,13 @@ public abstract class Path extends ParseExpr {
       }
     }
 
-    // no steps left: return root
-    if(list.isEmpty()) return cc.replaceEbv(this, root);
+    // no steps left: return root if nodes are in distinct document order
+    if(list.isEmpty()) return cc.replaceWith(this,
+        root instanceof DBNodeSeq || root.seqType().zeroOrOne() ? root :
+        cc.function(Function._UTIL_DDO, info, root));
+
+    steps = list.finish();
+    sl = steps.length;
 
     // simplify path with empty root expression or empty step
     final Value rootValue = rootValue(cc);

@@ -1858,7 +1858,7 @@ public class QueryParser extends InputParser {
       if(consume('/')) {
         // two slashes: absolute descendant path
         checkAxis(Axis.DESCENDANT);
-        add(el, Step.get(info(), Axis.DESCENDANT_OR_SELF));
+        add(el, Step.get(info(), Axis.DESCENDANT_OR_SELF, KindTest.NOD));
         mark();
         ex = step(true);
       } else {
@@ -1895,7 +1895,7 @@ public class QueryParser extends InputParser {
     while(true) {
       if(consume('/')) {
         if(consume('/')) {
-          add(el, Step.get(info(), Axis.DESCENDANT_OR_SELF));
+          add(el, Step.get(info(), Axis.DESCENDANT_OR_SELF, KindTest.NOD));
           checkAxis(Axis.DESCENDANT);
         } else {
           checkAxis(Axis.CHILD);
