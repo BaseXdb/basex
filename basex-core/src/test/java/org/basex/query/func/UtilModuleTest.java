@@ -36,6 +36,15 @@ public final class UtilModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void ddo() {
+    final Function func = _UTIL_DDO;
+    query(func.args(" <a/>"), "<a/>");
+    query(func.args(" (<a/>,<b/>)"), "<a/>\n<b/>");
+    query(func.args(" reverse((<a/>,<b/>))"), "<a/>\n<b/>");
+    error(func.args(1), INVTYPE_X_X_X);
+  }
+
+  /** Test method. */
   @Test public void deepEquals() {
     final Function func = _UTIL_DEEP_EQUAL;
     query(func.args(1, 1), true);

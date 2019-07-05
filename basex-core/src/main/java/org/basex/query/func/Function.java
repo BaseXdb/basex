@@ -1314,6 +1314,8 @@ public enum Function implements AFunction {
   _UTIL_DEEP_EQUAL(UtilDeepEqual.class, "deep-equal(items1,items2[,options])",
       arg(ITEM_ZM, ITEM_ZM, ITEM_O), BLN_O, UTIL_URI),
   /** XQuery function. */
+  _UTIL_DDO(UtilDdo.class, "ddo(nodes)", arg(NOD_ZM), NOD_ZM, UTIL_URI),
+  /** XQuery function. */
   _UTIL_IF(UtilIf.class, "if(condition,then[,else])",
       arg(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
