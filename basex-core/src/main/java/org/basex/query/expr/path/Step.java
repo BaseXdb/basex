@@ -217,6 +217,7 @@ public abstract class Step extends Preds {
 
   /**
    * Adds predicates to the step.
+   * After the call, a new instance of the resulting path must be created.
    * @param add predicates to be added
    * @return resulting step instance
    */

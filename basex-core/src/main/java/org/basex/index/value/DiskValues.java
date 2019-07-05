@@ -474,7 +474,7 @@ public class DiskValues extends ValueIndex {
   /**
    * Returns a string representation of the index structure.
    * @param all include database contents in the representation. During updates, database lookups
-   *        must be avoided, as the data structures will be inconsistent.
+   *        must be avoided, as the data structures will be inconsistent
    * @return string
    */
   public final String toString(final boolean all) {

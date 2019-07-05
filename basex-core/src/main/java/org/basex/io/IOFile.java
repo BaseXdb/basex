@@ -170,7 +170,7 @@ public final class IOFile extends IO {
 
   /**
    * Recursively creates the directory if it does not exist yet.
-   * @return {@code true} if the directory exists or has been created.
+   * @return {@code true} if the directory exists or has been created
    */
   public boolean md() {
     return file.exists() || file.mkdirs();
@@ -281,7 +281,7 @@ public final class IOFile extends IO {
 
   /**
    * Deletes the file, or the directory and its children.
-   * @return {@code true} if the file does not exist or has been deleted.
+   * @return {@code true} if the file does not exist or has been deleted
    */
   public boolean delete() {
     boolean ok = true;

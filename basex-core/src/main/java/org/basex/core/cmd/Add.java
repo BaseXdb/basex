@@ -40,7 +40,7 @@ public final class Add extends ACreate {
 
   /**
    * Constructor, specifying a target path and an input.
-   * @param path target path, optionally terminated by a new file name.
+   * @param path target path, optionally terminated by a new file name
    * If {@code null}, the name of the input will be set as path.
    * @param input input file or XML string
    */

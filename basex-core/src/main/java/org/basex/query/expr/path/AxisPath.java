@@ -42,7 +42,7 @@ public abstract class AxisPath extends Path {
   /**
    * Updates the cache and returns a cached value.
    * @param qc query context
-   * @return cached value or {@code null}.
+   * @return cached value or {@code null}
    * @throws QueryException query context
    */
   private Value cache(final QueryContext qc) throws QueryException {

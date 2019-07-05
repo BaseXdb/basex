@@ -138,7 +138,7 @@ public final class HTTPConnection implements ClientInfo {
 
   /**
    * Returns the addressed database (i.e., the first path entry).
-   * @return database, or {@code null} if the root directory was specified.
+   * @return database, or {@code null} if the root directory was specified
    */
   public String db() {
     final int i = path.indexOf('/', 1);
@@ -209,7 +209,7 @@ public final class HTTPConnection implements ClientInfo {
 
   /**
    * Assigns serialization parameters.
-   * @param opts serialization parameters.
+   * @param opts serialization parameters
    */
   public void sopts(final SerializerOptions opts) {
     serializer = opts;
@@ -217,7 +217,7 @@ public final class HTTPConnection implements ClientInfo {
 
   /**
    * Returns the serialization parameters.
-   * @return serialization parameters.
+   * @return serialization parameters
    */
   public SerializerOptions sopts() {
     if(serializer == null) serializer = new SerializerOptions();

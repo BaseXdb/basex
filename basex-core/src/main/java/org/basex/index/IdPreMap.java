@@ -280,7 +280,7 @@ public class IdPreMap {
 
   /**
    * Returns the size of the map.
-   * @return number of stored tuples.
+   * @return number of stored tuples
    */
   public int size() {
     return rows;

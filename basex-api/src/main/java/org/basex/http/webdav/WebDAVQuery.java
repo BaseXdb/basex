@@ -41,7 +41,7 @@ final class WebDAVQuery {
 
   /**
    * Binds a variable.
-   * @param name name of variable (without '$' sign).
+   * @param name name of variable (without '$' sign)
    * @param value value of variable
    * @return self reference
    */

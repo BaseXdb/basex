@@ -695,7 +695,7 @@ public final class PlotView extends View {
    * @param g Graphics reference
    * @param drawX draw line for x axis
    * @param d relative position of grid line
-   * @param caption caption to draw. if cap = null, no caption is drawn
+   * @param caption caption to draw (if {@code null}, no caption is drawn)
    */
   private void drawIntermediateGridLine(final Graphics g, final boolean drawX, final double d,
       final String caption) {

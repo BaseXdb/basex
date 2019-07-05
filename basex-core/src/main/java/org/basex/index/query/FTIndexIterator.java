@@ -90,7 +90,7 @@ public abstract class FTIndexIterator implements IndexIterator {
    * Merges two index array iterators.
    * @param i1 first index array iterator to merge
    * @param i2 second index array iterator to merge
-   * @param dis word distance. Ignored if {@code 0}
+   * @param dis word distance (ignored if {@code 0})
    * @return IndexArrayIterator
    */
   public static FTIndexIterator intersect(final FTIndexIterator i1, final FTIndexIterator i2,

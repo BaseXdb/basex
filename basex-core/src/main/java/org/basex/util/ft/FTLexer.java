@@ -175,7 +175,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
   /**
    * Returns the original token. Inherited from {@link IndexToken};
    * use {@link #next} or {@link #nextToken} if not using this interface.
-   * @return current token.
+   * @return current token
    */
   @Override
   public byte[] get() {

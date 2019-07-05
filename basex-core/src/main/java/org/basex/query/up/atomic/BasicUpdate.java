@@ -27,7 +27,7 @@ public abstract class BasicUpdate {
 
   /**
    * Getter for accumulated shifts.
-   * @return accumulated shifts, or zero if non-structural update.
+   * @return accumulated shifts, or zero if non-structural update
    */
   int accumulatedShifts() {
     return 0;

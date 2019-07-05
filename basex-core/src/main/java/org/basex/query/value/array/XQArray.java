@@ -175,7 +175,7 @@ public abstract class XQArray extends XQData {
   /**
    * Inserts the given element at the given position into this array.
    * Running time: <i>O(log n)</i>
-   * @param pos insertion position, must be between {@code 0} and {@code this.arraySize()}
+   * @param pos insertion position, must be between {@code 0} and {@code arraySize()}
    * @param value element to insert
    * @param qc query context
    * @return resulting array
@@ -185,7 +185,7 @@ public abstract class XQArray extends XQData {
   /**
    * Removes the element at the given position in this array.
    * Running time: <i>O(log n)</i>
-   * @param pos deletion position, must be between {@code 0} and {@code this.arraySize() - 1}
+   * @param pos deletion position, must be between {@code 0} and {@code arraySize() - 1}
    * @param qc query context
    * @return resulting array
    */

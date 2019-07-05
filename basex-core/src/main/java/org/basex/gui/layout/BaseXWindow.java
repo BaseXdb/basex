@@ -25,7 +25,7 @@ public interface BaseXWindow {
 
   /**
    * Returns the dialog.
-   * @return dialog (can be {@code null}).
+   * @return dialog (can be {@code null})
    */
   BaseXDialog dialog();
 }

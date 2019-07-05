@@ -62,7 +62,7 @@ public abstract class Tokenizer extends LanguageImpl {
   /**
    * Checks if current token is a paragraph.
    * Needed for visualizations; Does not have to be implemented by all tokenizers.
-   * @return whether current token is a paragraph, or {@code false} if not implemented.
+   * @return whether current token is a paragraph, or {@code false} if not implemented
    */
   boolean paragraph() {
     return false;

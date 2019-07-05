@@ -41,7 +41,7 @@ public abstract class BXNode implements Node {
   /**
    * Creates a new DOM node instance for the input node.
    * @param node input node
-   * @return DOM node, or {@code null} if input is {@code null} as well.
+   * @return DOM node, or {@code null} if input is {@code null} as well
    */
   public static BXNode get(final ANode node) {
     if(node == null) return null;
