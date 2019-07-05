@@ -160,8 +160,8 @@ final class RestXqPathMatcher {
 
   /**
    * Parses a regular expression defined for a template variable.
-   * @param i character iterator positioned before the first character of the regex.
-   * @param result string builder where the parsed regular expression will be appended to.
+   * @param i character iterator positioned before the first character of the regex
+   * @param result string builder where the parsed regular expression will be appended to
    */
   private static void addRegex(final CharIterator i, final StringBuilder result) {
     int braces = 1;
@@ -177,7 +177,7 @@ final class RestXqPathMatcher {
    * Decodes the URL and escapes regex characters in path template literals.
    * @param literals literals to escape
    * @param ii input info
-   * @param result string builder where the escaped literals will be appended to.
+   * @param result string builder where the escaped literals will be appended to
    * @throws QueryException query exception
    */
   private static void decodeAndEscape(final StringBuilder literals, final StringBuilder result,
@@ -207,7 +207,7 @@ final class RestXqPathMatcher {
 
     /**
      * Construct a new character iterator for the given input text.
-     * @param input input text to iterator over.
+     * @param input input text to iterator over
      */
     CharIterator(final String input) {
       this.input = input;

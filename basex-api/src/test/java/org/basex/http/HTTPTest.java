@@ -88,7 +88,7 @@ public abstract class HTTPTest extends SandboxTest {
   /**
    * Executes the specified GET request and returns the result.
    * @param query request
-   * @return string result, or {@code null} for a failure.
+   * @return string result, or {@code null} for a failure
    * @throws IOException I/O exception
    */
   protected static String get(final String query) throws IOException {
@@ -108,7 +108,7 @@ public abstract class HTTPTest extends SandboxTest {
   /**
    * Executes the specified HEAD request and returns the result.
    * @param query request
-   * @return string result, or {@code null} for a failure.
+   * @return string result, or {@code null} for a failure
    * @throws IOException I/O exception
    */
   protected static String head(final String query) throws IOException {
@@ -119,7 +119,7 @@ public abstract class HTTPTest extends SandboxTest {
    * Executes the specified HTTP request and returns the result.
    * @param query request
    * @param method HTTP method
-   * @return string result, or {@code null} for a failure.
+   * @return string result, or {@code null} for a failure
    * @throws IOException I/O exception
    */
   private static String request(final String query, final HttpMethod method)throws IOException {
@@ -130,7 +130,7 @@ public abstract class HTTPTest extends SandboxTest {
    * Executes the specified HTTP request and returns the result.
    * @param query request
    * @param method HTTP method
-   * @return string result, or {@code null} for a failure.
+   * @return string result, or {@code null} for a failure
    * @throws IOException I/O exception
    */
   protected static String request(final String query, final String method) throws IOException {
@@ -142,7 +142,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @param root root URL
    * @param query request
    * @param method HTTP method
-   * @return string result, or {@code null} for a failure.
+   * @return string result, or {@code null} for a failure
    * @throws IOException I/O exception
    */
   protected static String request(final String root, final String query, final String method)
@@ -165,7 +165,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @param query path
    * @param request request
    * @param type media type
-   * @return string result, or {@code null} for a failure.
+   * @return string result, or {@code null} for a failure
    * @throws IOException I/O exception
    */
   protected static String post(final String query, final String request, final MediaType type)

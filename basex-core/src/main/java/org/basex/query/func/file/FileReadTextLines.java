@@ -70,7 +70,7 @@ public final class FileReadTextLines extends FileRead {
 
   /**
    * Returns an input stream to the addressed file.
-   * @param qc query context.
+   * @param qc query context
    * @return input stream
    * @throws IOException I/O exception
    * @throws QueryException query exception

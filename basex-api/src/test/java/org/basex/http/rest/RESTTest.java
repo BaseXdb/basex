@@ -64,7 +64,7 @@ public abstract class RESTTest extends HTTPTest {
   /**
    * Executes the specified GET request and returns the media type.
    * @param query request
-   * @return string result, or {@code null} for a failure.
+   * @return string result, or {@code null} for a failure
    * @throws IOException I/O exception
    */
   protected static MediaType mediaType(final String query) throws IOException {

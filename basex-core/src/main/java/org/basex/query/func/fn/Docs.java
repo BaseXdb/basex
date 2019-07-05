@@ -99,7 +99,7 @@ public abstract class Docs extends StandardFunc {
   /**
    * Converts the specified URI to a query input reference.
    * @param uri URI
-   * @return query input, or {@code null} if the URI is invalid.
+   * @return query input, or {@code null} if the URI is invalid
    */
   private QueryInput queryInput(final byte[] uri) {
     return queryInput != null ? queryInput :

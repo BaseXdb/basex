@@ -181,7 +181,7 @@ public class ClientSession extends Session {
 
   /**
    * Receives the info string.
-   * @param output output stream to send result to. If {@code null}, no result will be requested
+   * @param output output stream to send result to (if {@code null}, no result will be requested)
    * @throws IOException I/O exception
    */
   @SuppressWarnings("resource")

@@ -127,7 +127,7 @@ public final class AtomicUpdateCache {
   /**
    * Adds an update to the corresponding list.
    * @param candidate atomic update
-   * @param slack skip consistency checks etc. if true (used during text node merging)
+   * @param slack skip consistency checks etc. if {@code true} (used during text node merging)
    */
   private void considerAtomic(final BasicUpdate candidate, final boolean slack) {
     // fill the one-atomic-update buffer

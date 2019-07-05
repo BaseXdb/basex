@@ -217,7 +217,7 @@ public abstract class Path extends ParseExpr {
       // remove last step from new root expression
       Expr rt = root;
       if(sl > 1) rt = get(info, root, Arrays.copyOfRange(steps, 0, sl - 1)).optimize(cc);
-      return cc.replaceWith(rt == null ? s2 : this, SimpleMap.get(info, rt, s2).optimize(cc));
+      return cc.replaceWith(this, rt == null ? s2 : SimpleMap.get(info, rt, s2).optimize(cc));
     }
 
     // choose best path implementation and set type information

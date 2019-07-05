@@ -897,7 +897,7 @@ public final class QT3TS extends Main {
 
   /**
    * Returns the path to a given file.
-   * @param base base flag.
+   * @param base base flag
    * @param file file name
    * @return path to the file
    */

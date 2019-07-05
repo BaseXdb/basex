@@ -145,7 +145,7 @@ public abstract class Query implements Closeable {
 
   /**
    * Returns the serialization options.
-   * @return serialization options.
+   * @return serialization options
    * @throws IOException I/O exception
    */
   public abstract String options() throws IOException;

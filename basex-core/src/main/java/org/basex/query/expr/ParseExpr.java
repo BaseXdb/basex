@@ -129,7 +129,7 @@ public abstract class ParseExpr extends Expr {
    * Otherwise, throws an exception.
    * @param <T> expression type
    * @param expr expression (may be {@code null})
-   * @param updating indicates if expression is expected to be updating.
+   * @param updating indicates if expression is expected to be updating
    * @param sc static context
    * @return specified expression
    * @throws QueryException query exception

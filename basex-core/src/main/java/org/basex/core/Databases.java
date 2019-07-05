@@ -150,8 +150,8 @@ public final class Databases {
   /**
    * Extracts the name of a database from the name of a backup.
    * @param backup Name of the backup file. Valid formats:
-   *               {@code [dbname]-yyyy-mm-dd-hh-mm-ss},
-   *               {@code [dbname]}
+   *   {@code [dbname]-yyyy-mm-dd-hh-mm-ss},
+   *   {@code [dbname]}
    * @return name of the database ({@code [dbname]})
    */
   public static String name(final String backup) {

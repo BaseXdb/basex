@@ -30,7 +30,7 @@ public final class BaseXGUI extends Main {
 
   /**
    * Main method.
-   * @param args text files to open: XML documents, queries, etc.
+   * @param args text files to open (XML documents, queries, text files)
    */
   public static void main(final String... args) {
     try {

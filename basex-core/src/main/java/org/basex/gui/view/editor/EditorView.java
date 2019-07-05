@@ -680,7 +680,7 @@ public final class EditorView extends View {
 
   /**
    * Closes an editor.
-   * @param edit editor to be closed. {@code null} closes the currently opened editor.
+   * @param edit editor to be closed (if {@code null}, the currently opened editor will be closed)
    */
   public void close(final EditorArea edit) {
     closeEditor(edit);
@@ -689,7 +689,7 @@ public final class EditorView extends View {
 
   /**
    * Closes an editor.
-   * @param edit editor to be closed. {@code null} closes the currently opened editor.
+   * @param edit editor to be closed (if {@code null}, the currently opened editor will be closed)
    */
   private void closeEditor(final EditorArea edit) {
     final EditorArea ea = edit != null ? edit : getEditor();

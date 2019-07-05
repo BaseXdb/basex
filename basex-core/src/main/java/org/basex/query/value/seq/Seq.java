@@ -270,7 +270,7 @@ public abstract class Seq extends Value {
    * @param size size of resulting sequence
    * @param values values
    * @param type type
-   * @return value, or {@code null} if sequence could not be created.
+   * @return value, or {@code null} if sequence could not be created
    * @throws QueryException query exception
    */
   public static Value get(final int size, final Type type, final Value... values)

@@ -163,7 +163,7 @@ public final class Namespaces {
    * Returns the id of a namespace URI for the specified prefix and node.
    * @param prefix prefix
    * @param node node to start with
-   * @return id of the namespace uri, or {@code 0} if namespace is not found.
+   * @return id of the namespace uri, or {@code 0} if namespace is not found
    */
   private int uriId(final byte[] prefix, final NSNode node) {
     final int prefId = prefixes.id(prefix);

@@ -121,7 +121,7 @@ public final class WebModule {
 
   /**
    * Returns the specified function from the given query context.
-   * @param qc query context.
+   * @param qc query context
    * @param func function to be found
    * @return function or {@code null}
    * @throws HTTPException HTTP exception

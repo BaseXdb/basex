@@ -302,7 +302,7 @@ final class WebDAVService {
 
   /**
    * Lists all databases.
-   * @return a list of database resources.
+   * @return a list of database resources
    * @throws IOException I/O exception
    */
   List<WebDAVResource> listDbs() throws IOException {

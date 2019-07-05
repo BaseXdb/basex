@@ -43,7 +43,7 @@ public final class UpdIndexTest extends SandboxTest {
 
   /**
    * Constructor.
-   * @param updindex incremental index update flag.
+   * @param updindex incremental index update flag
    * @param mainmem main memory flag
    */
   public UpdIndexTest(final boolean updindex, final boolean mainmem) {
