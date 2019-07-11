@@ -681,9 +681,9 @@ public final class QueryContext extends Job implements Closeable {
         final Data data = item.data();
         final boolean copy = data != null &&
             (datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name));
-        final Item mat = item.materialize(this, copy);
-        if(mat == null) throw BASEX_FUNCTION_X.get(null, item);
-        return mat;
+        final Item it = item.materialize(this, copy);
+        if(it == null) throw BASEX_FUNCTION_X.get(null, item);
+        return it;
       };
 
       final ValueBuilder vb = new ValueBuilder(this);

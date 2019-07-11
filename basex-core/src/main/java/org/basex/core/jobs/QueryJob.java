@@ -9,7 +9,6 @@ import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -168,7 +167,8 @@ public final class QueryJob extends Job implements Runnable {
       if(remove) ctx.jobs.tasks.remove(jc.id());
 
       // retrieve result
-      result.value = materialize(qp.iter(), qp.qc);
+      result.value = qp.value().materialize(qp.qc, BASEX_FUNCTION_X, null);
+
     } catch(final JobException ex) {
       // query was interrupted: remove cached result
       ctx.jobs.results.remove(jc.id());
@@ -204,21 +204,6 @@ public final class QueryJob extends Job implements Runnable {
   @Override
   public void addLocks() {
     qp.addLocks();
-  }
-
-  /**
-   * Creates a materialized, context-independent version of the iterator results.
-   * @param iter result iterator
-   * @param qc query context
-   * @return result
-   * @throws QueryException query exception
-   */
-  public static Value materialize(final Iter iter, final QueryContext qc) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item item; (item = qc.next(iter)) != null;) {
-      vb.add(item.materialize(qc, item.persistent()));
-    }
-    return vb.value();
   }
 
   @Override

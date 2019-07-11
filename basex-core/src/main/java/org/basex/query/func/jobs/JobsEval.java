@@ -48,7 +48,7 @@ public class JobsEval extends StandardFunc {
 
     // copy variable values
     for(final Entry<String, Value> it : bindings.entrySet()) {
-      bindings.put(it.getKey(), QueryJob.materialize(it.getValue().iter(), qc));
+      bindings.put(it.getKey(), it.getValue().materialize(qc, BASEX_FUNCTION_X, info));
     }
 
     final QueryJobSpec spec = new QueryJobSpec(opts, bindings, query);

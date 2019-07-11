@@ -71,6 +71,26 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
+   * Returns a materialized, context-independent version of this value.
+   * @param qc query context (if {@code null}, process cannot be interrupted)
+   * @param error query error
+   * @param info input info
+   * @return item copy, or {@code null}) if the value cannot be materialized
+   * @throws QueryException query exception
+   */
+  public Value materialize(final QueryContext qc, final QueryError error, final InputInfo info)
+      throws QueryException {
+
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(Item item : this) {
+      final Item it = item.materialize(qc, item.persistent());
+      if(it == null) throw error.get(info, item);
+      vb.add(it);
+    }
+    return vb.value();
+  }
+
+  /**
    * Tests if this is an empty sequence.
    * @return result of check
    */

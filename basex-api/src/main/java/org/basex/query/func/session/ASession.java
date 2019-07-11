@@ -4,7 +4,6 @@ import java.util.*;
 
 import javax.servlet.http.*;
 
-import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -79,20 +78,11 @@ public final class ASession {
 
   /**
    * Updates a session attribute.
-   * @param key key of the attribute
+   * @param name name of the attribute
    * @param value value to be stored
-   * @param qc query context
-   * @return item that cannot be stored, or {@code null} if everything is alright
    */
-  public Item set(final byte[] key, final Value value, final QueryContext qc) {
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Item item : value) {
-      final Item it = item.materialize(qc, item.persistent());
-      if(it == null) return item;
-      vb.add(it);
-    }
-    session.setAttribute(Token.string(key), vb.value());
-    return null;
+  public void set(final byte[] name, final Value value) {
+    session.setAttribute(Token.string(name), value);
   }
 
   /**
