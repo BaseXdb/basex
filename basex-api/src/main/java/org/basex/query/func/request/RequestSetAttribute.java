@@ -1,4 +1,4 @@
-package org.basex.query.func.sessions;
+package org.basex.query.func.request;
 
 import static org.basex.query.QueryError.*;
 
@@ -14,13 +14,15 @@ import org.basex.util.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class SessionsSet extends SessionsFn {
+public final class RequestSetAttribute extends RequestFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] name = toToken(exprs[1], qc);
-    final Value value = exprs[2].value(qc);
+    checkAdmin(qc);
 
-    session(qc).set(name, value.materialize(qc, SESSIONS_SET_X, info));
+    final String name = Token.string(toToken(exprs[0], qc));
+    final Value value = exprs[1].value(qc);
+
+    request(qc).setAttribute(name, value.materialize(qc, REQUEST_ATTRIBUTE_X, info));
     return Empty.VALUE;
   }
 }

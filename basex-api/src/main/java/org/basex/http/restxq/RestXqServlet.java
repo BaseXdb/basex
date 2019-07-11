@@ -2,12 +2,9 @@ package org.basex.http.restxq;
 
 import static org.basex.http.web.WebText.*;
 
-import javax.servlet.http.*;
-
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.query.*;
-import org.basex.util.*;
 
 /**
  * <p>This servlet receives and processes REST requests.
@@ -59,17 +56,5 @@ public final class RestXqServlet extends BaseXServlet {
       if(func == null) throw ex;
       response.create(func, ex);
     }
-  }
-
-  @Override
-  public String username(final HTTPConnection http) {
-    // try to retrieve session id (DBA, global one)
-    final HttpSession session = http.req.getSession(false);
-    if(session != null) {
-      final String id = (http.path() + '/').contains('/' + DBA + '/') ? DBA : ID;
-      final byte[] value = HTTPContext.token(session.getAttribute(id));
-      if(value != null) return Token.string(value);
-    }
-    return super.username(http);
   }
 }

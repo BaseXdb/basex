@@ -153,6 +153,36 @@ public final class RequestModuleTest extends HTTPTest {
     assertEquals("0", get(queryString("count(" + func.args("X") + ")")));
   }
 
+  /**
+   * Function test.
+   * @throws Exception exception
+   */
+  @Test public void attribute() throws Exception {
+    final ApiFunction func = _REQUEST_ATTRIBUTE;
+    assertEquals("", get(queryString(func.args("A"))));
+    assertEquals("B", get(queryString("request:set-attribute('A','B')," + func.args("A"))));
+  }
+
+  /**
+   * Function test.
+   * @throws Exception exception
+   */
+  @Test public void attributeNames() throws Exception {
+    final ApiFunction func = _REQUEST_ATTRIBUTE_NAMES;
+    assertEquals("", get(queryString(func.args())));
+    assertEquals("A", get(queryString("request:set-attribute('A',1)," + func.args())));
+  }
+
+  /**
+   * Function test.
+   * @throws Exception exception
+   */
+  @Test public void setAttribute() throws Exception {
+    final ApiFunction func = _REQUEST_SET_ATTRIBUTE;
+    assertEquals("1", get(queryString(func.args("A", 1) + "," +
+        "request:attribute('A')")));
+  }
+
   // PRIVATE METHODS ==============================================================================
 
   /**

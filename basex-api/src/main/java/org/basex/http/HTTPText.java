@@ -26,4 +26,9 @@ public interface HTTPText {
   String WRONGAUTH_X = "% authentication expected.";
   /** Unexpected error. */
   String UNEXPECTED_X = "Unexpected error: %";
+
+  /** DBA client id. */
+  String DBA_CLIENT_ID = "dba";
+  /** Client id. */
+  String CLIENT_ID = "id";
 }

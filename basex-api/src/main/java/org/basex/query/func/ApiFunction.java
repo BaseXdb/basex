@@ -125,7 +125,11 @@ public enum ApiFunction implements AFunction {
   /** XQuery function. */
   _REQUEST_ADDRESS(RequestAddress.class, "address()", arg(), STR_O, REQUEST_URI),
   /** XQuery function. */
-  _REQUEST_ATTRIBUTE(RequestAttribute.class, "attribute(name)", arg(STR_O), STR_O, REQUEST_URI),
+  _REQUEST_ATTRIBUTE(RequestAttribute.class, "attribute(name)",
+      arg(STR_O), STR_O, flag(NDT), REQUEST_URI),
+  /** XQuery function. */
+  _REQUEST_ATTRIBUTE_NAMES(RequestAttributeNames.class, "attribute-names()",
+      arg(), STR_ZM, flag(NDT), REQUEST_URI),
   /** XQuery function. */
   _REQUEST_CONTEXT_PATH(RequestContextPath.class, "context-path()", arg(), STR_O, REQUEST_URI),
   /** XQuery function. */
@@ -164,6 +168,9 @@ public enum ApiFunction implements AFunction {
   _REQUEST_REMOTE_PORT(RequestRemotePort.class, "remote-port()", arg(), ITR_O, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_SCHEME(RequestScheme.class, "scheme()", arg(), STR_O, REQUEST_URI),
+  /** XQuery function. */
+  _REQUEST_SET_ATTRIBUTE(RequestSetAttribute.class, "set-attribute(name,value)",
+      arg(STR_O, ITEM_ZM), EMP, flag(NDT), REQUEST_URI),
   /** XQuery function. */
   _REQUEST_URI(RequestUri.class, "uri()", arg(), URI_O, REQUEST_URI),
 

@@ -402,18 +402,16 @@ public enum QueryError {
 
   /** Error code. */
   REQUEST_PARAMETER(REQUEST, "parameter", "Query string cannot be decoded: %."),
+  /** Error code. */
+  REQUEST_ATTRIBUTE_X(REQUEST, "attribute", "Attribute cannot be stored: %."),
 
   // Session Module
 
-  /** Error code. */
-  SESSION_GET(SESSION, "get", "Stored attribute is no XQuery value."),
   /** Error code. */
   SESSION_SET_X(SESSION, "set", "Item cannot be stored: %."),
 
   // Session Module
 
-  /** Error code. */
-  SESSIONS_GET(SESSIONS, "get", "Stored attribute is no XQuery value."),
   /** Error code. */
   SESSIONS_SET_X(SESSIONS, "set", "Function items cannot be stored: %."),
   /** Error code. */

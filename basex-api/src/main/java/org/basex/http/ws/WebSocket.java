@@ -1,6 +1,6 @@
 package org.basex.http.ws;
 
-import static org.basex.http.web.WebText.*;
+import static org.basex.http.HTTPText.*;
 
 import java.io.*;
 import java.util.*;
@@ -140,8 +140,8 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
 
   @Override
   public String clientName() {
-    Object obj = atts.get(ID);
-    if(obj == null && session != null) obj = session.getAttribute(ID);
+    Object obj = atts.get(CLIENT_ID);
+    if(obj == null && session != null) obj = session.getAttribute(CLIENT_ID);
     final byte[] value = HTTPContext.token(obj);
     return value != null ? Token.string(value) : context.user().name();
   }

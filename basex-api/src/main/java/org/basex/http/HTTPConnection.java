@@ -56,10 +56,11 @@ public final class HTTPConnection implements ClientInfo {
    * Constructor.
    * @param req request
    * @param res response
+   * @param auth authentication method (can be {@code null})
    * @param servlet calling servlet instance
    */
   HTTPConnection(final HttpServletRequest req, final HttpServletResponse res,
-      final BaseXServlet servlet) {
+      final BaseXServlet servlet, final AuthMethod auth) {
 
     this.req = req;
     this.res = res;
@@ -73,17 +74,18 @@ public final class HTTPConnection implements ClientInfo {
     res.setCharacterEncoding(Strings.UTF8);
     path = normalize(req.getPathInfo());
 
-    // authentication method
-    auth = servlet.auth != null ? servlet.auth : context.soptions.get(StaticOptions.AUTHMETHOD);
+    // authentication method (servlet-specific or global)
+    this.auth = auth != null ? auth : context.soptions.get(StaticOptions.AUTHMETHOD);
   }
 
   /**
    * Authorizes a request. Initializes the user if it is called for the first time.
+   * @param username name of default servlet user (can be {@code null})
    * @throws IOException I/O exception
    */
-  public void authenticate() throws IOException {
+  public void authenticate(final String username) throws IOException {
     // choose admin user for OPTIONS requests, servlet-specific user, or global user (can be empty)
-    String name = method.equals(HttpMethod.OPTIONS.name()) ? UserText.ADMIN : servlet.user;
+    String name = method.equals(HttpMethod.OPTIONS.name()) ? UserText.ADMIN : username;
     if(name == null) name = context.soptions.get(StaticOptions.USER);
 
     // look for existing user. if it does not exist, try to authenticate
@@ -273,7 +275,27 @@ public final class HTTPConnection implements ClientInfo {
 
   @Override
   public String clientName() {
-    return servlet.username(this);
+    // check for request id
+    Object value = req.getAttribute(HTTPText.CLIENT_ID);
+
+    // check for session id (DBA, global)
+    if(value == null) {
+      final HttpSession session = req.getSession(false);
+      if(session != null) {
+        final boolean dba = (path() + '/').contains('/' + HTTPText.DBA_CLIENT_ID + '/');
+        value = session.getAttribute(dba ? HTTPText.DBA_CLIENT_ID : HTTPText.CLIENT_ID);
+      }
+    }
+
+    final byte[] token = HTTPContext.token(value);
+    if(token != null) return Token.string(token);
+
+    // check for authenticated user
+    final User user = context.user();
+    if(user != null) return user.name();
+
+    // user is unknown
+    return null;
   }
 
   /**

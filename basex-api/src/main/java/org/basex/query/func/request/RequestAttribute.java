@@ -1,7 +1,8 @@
 package org.basex.query.func.request;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.func.java.*;
+import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
@@ -13,9 +14,11 @@ import org.basex.util.*;
  */
 public final class RequestAttribute extends RequestFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final String name = Token.string(toToken(exprs[0], qc));
-    final Object value = request(qc).getAttribute(name);
-    return value == null ? Empty.VALUE : Str.get(value.toString());
+    final Value dflt = exprs.length == 1 ? Empty.VALUE : exprs[1].value(qc);
+
+    final Object object = request(qc).getAttribute(name);
+    return object != null ? JavaCall.toValue(object, qc, sc) : dflt;
   }
 }

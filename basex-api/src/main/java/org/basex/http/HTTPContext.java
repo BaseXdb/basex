@@ -61,14 +61,14 @@ public final class HTTPContext {
     // set all parameters that start with "org.basex." as global options
     final Enumeration<String> en = sc.getInitParameterNames();
     while(en.hasMoreElements()) {
-      final String key = en.nextElement();
-      String val = sc.getInitParameter(key);
-      if(key.startsWith(Prop.DBPREFIX) && key.endsWith("path") && !new File(val).isAbsolute()) {
+      final String name = en.nextElement();
+      String value = sc.getInitParameter(name);
+      if(name.startsWith(Prop.DBPREFIX) && name.endsWith("path") && !new File(value).isAbsolute()) {
         // prefix relative path with absolute servlet path
-        Util.debug(key.toUpperCase(Locale.ENGLISH) + ": " + val);
-        val = new IOFile(webapp, val).path();
+        Util.debug(name.toUpperCase(Locale.ENGLISH) + ": " + value);
+        value = new IOFile(webapp, value).path();
       }
-      Prop.put(key, val);
+      Prop.put(name, value);
     }
 
     // create context, update options

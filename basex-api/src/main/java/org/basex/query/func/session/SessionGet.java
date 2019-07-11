@@ -1,8 +1,7 @@
 package org.basex.query.func.session;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
+import org.basex.query.func.java.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 
@@ -15,9 +14,10 @@ import org.basex.query.value.seq.*;
 public final class SessionGet extends SessionFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = session(qc).get(toToken(exprs[0], qc),
-        exprs.length == 1 ? Empty.VALUE : exprs[1].value(qc));
-    if(value == null) throw SESSION_GET.get(info);
-    return value;
+    final byte[] name = toToken(exprs[0], qc);
+    final Value dflt = exprs.length == 1 ? Empty.VALUE : exprs[1].value(qc);
+
+    final Object object = session(qc).get(name);
+    return object != null ? JavaCall.toValue(object, qc, sc) : dflt;
   }
 }

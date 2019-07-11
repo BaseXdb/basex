@@ -12,7 +12,6 @@ import javax.servlet.http.*;
 import org.basex.core.*;
 import org.basex.core.StaticOptions.*;
 import org.basex.core.jobs.*;
-import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -27,9 +26,9 @@ import org.basex.util.*;
  */
 public abstract class BaseXServlet extends HttpServlet {
   /** Servlet-specific user. */
-  String user;
+  private String username;
   /** Servlet-specific authentication method. */
-  AuthMethod auth;
+  private AuthMethod auth;
 
   @Override
   public void init(final ServletConfig config) throws ServletException {
@@ -40,16 +39,18 @@ public abstract class BaseXServlet extends HttpServlet {
       throw new ServletException(ex);
     }
 
-    // set user and authentication method
+    // parse servlet-specific user and authentication method
     final Enumeration<String> en = config.getInitParameterNames();
     while(en.hasMoreElements()) {
-      String key = en.nextElement().toLowerCase(Locale.ENGLISH);
-      final String val = config.getInitParameter(key);
-      if(key.startsWith(Prop.DBPREFIX)) key = key.substring(Prop.DBPREFIX.length());
-      if(key.equalsIgnoreCase(StaticOptions.USER.name())) {
-        user = val;
-      } else if(key.equalsIgnoreCase(StaticOptions.AUTHMETHOD.name())) {
-        auth = AuthMethod.valueOf(val);
+      String name = en.nextElement();
+      final String value = config.getInitParameter(name);
+      if(name.startsWith(Prop.DBPREFIX)) {
+        name = name.substring(Prop.DBPREFIX.length());
+        if(name.equalsIgnoreCase(StaticOptions.USER.name())) {
+          username = value;
+        } else if(name.equalsIgnoreCase(StaticOptions.AUTHMETHOD.name())) {
+          auth = AuthMethod.valueOf(value);
+        }
       }
     }
   }
@@ -58,9 +59,9 @@ public abstract class BaseXServlet extends HttpServlet {
   public final void service(final HttpServletRequest req, final HttpServletResponse res)
       throws IOException {
 
-    final HTTPConnection conn = new HTTPConnection(req, res, this);
+    final HTTPConnection conn = new HTTPConnection(req, res, this, auth);
     try {
-      conn.authenticate();
+      conn.authenticate(username);
       run(conn);
       conn.log(SC_OK, "");
     } catch(final HTTPException ex) {
@@ -98,14 +99,4 @@ public abstract class BaseXServlet extends HttpServlet {
    * @throws Exception any exception
    */
   protected abstract void run(HTTPConnection conn) throws Exception;
-
-  /**
-   * Returns a servlet-specific user name. By default, it returns the name of the database user.
-   * @param http HTTP connection
-   * @return user name or {@code null}
-   */
-  public String username(final HTTPConnection http) {
-    final User u = http.context.user();
-    return u != null ? u.name() : null;
-  }
 }
