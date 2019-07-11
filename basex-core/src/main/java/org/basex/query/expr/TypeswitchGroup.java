@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class TypeswitchGroup extends Single {
-  /** Variable. */
+  /** Variable (can be {@code null}). */
   Var var;
   /** Matched sequence types (default switch if array is empty). */
   SeqType[] seqTypes;
@@ -31,7 +31,7 @@ public final class TypeswitchGroup extends Single {
   /**
    * Constructor.
    * @param info input info
-   * @param var variable
+   * @param var variable (can be {@code null})
    * @param seqTypes sequence types this case matches, the empty array means {@code default}
    * @param rtrn return expression
    */
@@ -227,7 +227,7 @@ public final class TypeswitchGroup extends Single {
     if(seqTypes.length == 0) return;
     SeqType st = seqTypes[0];
     for(int s = 1; s < seqTypes.length; s++) st = st.union(seqTypes[s]);
-    var.refineType(st, cc);
+    if(var != null) var.refineType(st, cc);
   }
 
   @Override
