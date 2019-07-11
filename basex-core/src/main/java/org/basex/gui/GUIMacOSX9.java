@@ -27,9 +27,10 @@ public final class GUIMacOSX9 extends GUIMacOS implements InvocationHandler {
     final Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(),
         new Class<?>[] { aboutHandler, prefHandler }, this);
 
-    final Class<?> d = Desktop.getDesktop().getClass();
-    d.getDeclaredMethod("setAboutHandler", aboutHandler).invoke(d, proxy);
-    d.getDeclaredMethod("setPreferencesHandler", prefHandler).invoke(d, proxy);
+    final Desktop d = Desktop.getDesktop();
+    final Class<?> dc = d.getClass();
+    dc.getDeclaredMethod("setAboutHandler", aboutHandler).invoke(d, proxy);
+    dc.getDeclaredMethod("setPreferencesHandler", prefHandler).invoke(d, proxy);
 
     //tb = Taskbar.isTaskbarSupported() ? Taskbar.getTaskbar() : null;
     final Class<?> tbClass = Class.forName("java.awt.Taskbar");
