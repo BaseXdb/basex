@@ -224,10 +224,12 @@ public final class TypeswitchGroup extends Single {
    * @throws QueryException query exception
    */
   private void refineType(final CompileContext cc) throws QueryException {
-    if(seqTypes.length == 0) return;
+    final int sl = seqTypes.length;
+    if(var == null || sl == 0) return;
+
     SeqType st = seqTypes[0];
-    for(int s = 1; s < seqTypes.length; s++) st = st.union(seqTypes[s]);
-    if(var != null) var.refineType(st, cc);
+    for(int s = 1; s < sl; s++) st = st.union(seqTypes[s]);
+    var.refineType(st, cc);
   }
 
   @Override
@@ -271,16 +273,16 @@ public final class TypeswitchGroup extends Single {
 
   @Override
   public String toString() {
-    final int tl = seqTypes.length;
-    final TokenBuilder tb = new TokenBuilder().add(tl == 0 ? DEFAULT : CASE);
+    final int sl = seqTypes.length;
+    final TokenBuilder tb = new TokenBuilder().add(sl == 0 ? DEFAULT : CASE);
     if(var != null) {
       tb.add(' ').add(var);
-      if(tl != 0) tb.add(' ').add(AS);
+      if(sl != 0) tb.add(' ').add(AS);
     }
-    if(tl != 0) {
-      for(int t = 0; t < tl; t++) {
-        if(t > 0) tb.add(" |");
-        tb.add(' ').add(seqTypes[t]);
+    if(sl != 0) {
+      for(int s = 0; s < sl; s++) {
+        if(s > 0) tb.add(" |");
+        tb.add(' ').add(seqTypes[s]);
       }
     }
     return tb.add(' ' + RETURN + ' ' + expr).toString();
