@@ -226,10 +226,15 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   @Test public void pragma() {
     createDoc();
     final String pragma = "(# db:enforceindex #) { ";
-    check(pragma + _DB_OPEN.args(" <_>" + NAME + "</_>") + "//a[text() = '1']/text() }", 1,
-        exists(ValueAccess.class));
-    check(pragma + _DB_OPEN.args(" <x>" + NAME + "</x>") + "//a/text()[. = '1'] }", 1,
-        exists(ValueAccess.class));
+    final String db = _DB_OPEN.args(" <x>" + NAME + "</x>");
+
+    // rewritings possible
+    check(pragma + db + "//a[text() = '1']/text() }", 1, exists(ValueAccess.class));
+    check(pragma + db + "//a/text()[. = '1'] }", 1, exists(ValueAccess.class));
+    check(pragma + db + "/*/@*[. = <_/> ] }", "", exists(ValueAccess.class));
+
+    // no rewriting possible (database is referenced before index enforcement). GH-1696
+    check(db + "/*/@*[" + pragma + ". = <_/> }]", "", empty(ValueAccess.class));
   }
 
   /** Optimizations of predicates that are changed by optimizations. */

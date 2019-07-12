@@ -159,8 +159,8 @@ public final class IndexInfo {
       if(!search.seqType().type.isStringOrUntyped() || search.has(Flag.CTX, Flag.NDT))
         return false;
 
-      // estimate costs (tend to worst case)
-      if(data != null) costs = enforce() ? IndexCosts.ENFORCE_DYNAMIC :
+      // estimate costs for dynamic query terms
+      costs = enforce() ? IndexCosts.ENFORCE_DYNAMIC :
         IndexCosts.get(Math.max(1, data.meta.size / 10));
       root = new ValueAccess(ii, search, type, test, db);
     }
@@ -191,7 +191,7 @@ public final class IndexInfo {
    * @return costs costs, or {@code null} if index access is not possible
    */
   public IndexCosts costs(final Data data, final IndexToken token) {
-    return enforce() ? IndexCosts.ENFORCE_STATIC : data.costs(token);
+    return data != null ? data.costs(token) : IndexCosts.ENFORCE_STATIC;
   }
 
   /**
