@@ -126,7 +126,7 @@ public enum ApiFunction implements AFunction {
   _REQUEST_ADDRESS(RequestAddress.class, "address()", arg(), STR_O, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_ATTRIBUTE(RequestAttribute.class, "attribute(name)",
-      arg(STR_O), STR_O, flag(NDT), REQUEST_URI),
+      arg(STR_O), ITEM_ZM, flag(NDT), REQUEST_URI),
   /** XQuery function. */
   _REQUEST_ATTRIBUTE_NAMES(RequestAttributeNames.class, "attribute-names()",
       arg(), STR_ZM, flag(NDT), REQUEST_URI),
