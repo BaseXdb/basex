@@ -1,9 +1,11 @@
 package org.basex.http.restxq;
 
+import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.http.web.WebText.*;
 
 import org.basex.http.*;
 import org.basex.http.web.*;
+import org.basex.http.web.WebResponse.*;
 import org.basex.query.*;
 
 /**
@@ -44,16 +46,17 @@ public final class RestXqServlet extends BaseXServlet {
     try {
       for(final RestXqFunction check : modules.checks(conn)) {
         // skip further checks if function produces a response
-        if(response.create(check, func)) return;
+        if(response.create(check, func) != Response.NONE) return;
       }
 
       // process function
-      response.create(func, null);
+      if(response.create(func, null) != Response.CUSTOM) conn.log(SC_OK, "");
 
     } catch(final QueryException ex) {
       // run optional error function
       func = modules.restxq(conn, ex.qname());
       if(func == null) throw ex;
+
       response.create(func, ex);
     }
   }

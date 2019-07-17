@@ -1,5 +1,7 @@
 package org.basex.http.webdav;
 
+import static javax.servlet.http.HttpServletResponse.*;
+
 import javax.servlet.*;
 
 import org.basex.http.*;
@@ -32,6 +34,7 @@ public final class WebDAVServlet extends BaseXServlet {
     final WebDAVResponse response = new WebDAVResponse(conn);
     try {
       manager.process(request, response);
+      conn.log(SC_OK, "");
     } finally {
       WebDAVFactory.close();
       response.close();

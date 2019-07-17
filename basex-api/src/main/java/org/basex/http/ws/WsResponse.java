@@ -54,7 +54,7 @@ public final class WsResponse extends WebResponse {
   }
 
   @Override
-  public boolean serialize() throws QueryException, IOException {
+  public Response serialize() throws QueryException, IOException {
     qc.register(ctx);
     try {
       final ArrayList<Object> values = serialize(qc.iter(), func.output);
@@ -74,7 +74,7 @@ public final class WsResponse extends WebResponse {
       qc.close();
       qc.unregister(ctx);
     }
-    return true;
+    return Response.STANDARD;
   }
 
   /**

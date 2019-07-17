@@ -60,7 +60,7 @@ public final class RestXqResponse extends WebResponse {
   }
 
   @Override
-  public boolean serialize() throws QueryException, IOException, ServletException {
+  public Response serialize() throws QueryException, IOException, ServletException {
     final String id = func.singleton;
     final RestXqSingleton singleton = id != null ? new RestXqSingleton(conn, id, qc) : null;
     String redirect = null, forward = null;
@@ -135,7 +135,7 @@ public final class RestXqResponse extends WebResponse {
       final int size = (int) ao.size();
       if(size > 0) conn.res.getOutputStream().write(ao.buffer(), 0, size);
     }
-    return response;
+    return response ? status != null ? Response.CUSTOM : Response.STANDARD : Response.NONE;
   }
 
   /**

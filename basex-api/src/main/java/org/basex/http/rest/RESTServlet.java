@@ -1,5 +1,7 @@
 package org.basex.http.rest;
 
+import static javax.servlet.http.HttpServletResponse.*;
+
 import java.io.*;
 
 import org.basex.core.*;
@@ -25,6 +27,7 @@ public final class RESTServlet extends BaseXServlet {
     final RESTCmd cmd = command(session);
     try {
       cmd.execute(conn.context);
+      conn.log(SC_OK, "");
     } catch(final BaseXException ex) {
       // ignore error if code was assigned (same error message)
       if(cmd.code == null) throw ex;

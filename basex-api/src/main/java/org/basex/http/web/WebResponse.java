@@ -18,6 +18,13 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class WebResponse {
+  /** Response type. */
+  public enum Response {
+    /** No response.       */ NONE,
+    /** Standard response. */ STANDARD,
+    /** Custom response.   */   CUSTOM
+  };
+
   /** Database context. */
   protected final Context ctx;
   /** Query context. */
@@ -35,12 +42,12 @@ public abstract class WebResponse {
    * Creates the Response.
    * @param function function to be evaluated
    * @param data additional data (result, function, error, can be {@code null})
-   * @return {@code true} if response was created
+   * @return response type
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    * @throws ServletException servlet exception
    */
-  public boolean create(final WebFunction function, final Object data)
+  public final Response create(final WebFunction function, final Object data)
       throws QueryException, IOException, ServletException {
 
     final WebModule module = function.module;
@@ -81,12 +88,12 @@ public abstract class WebResponse {
 
   /**
    * Serializes the response.
-   * @return {@code true} if response was created
+   * @return response type
    * @throws QueryException query exception
    * @throws IOException I/O exception
    * @throws ServletException servlet exception
    */
-  protected abstract boolean serialize() throws QueryException, IOException, ServletException;
+  protected abstract Response serialize() throws QueryException, IOException, ServletException;
 
   /**
    * Returns a job description for the specified function.

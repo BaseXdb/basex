@@ -63,7 +63,6 @@ public abstract class BaseXServlet extends HttpServlet {
     try {
       conn.authenticate(username);
       run(conn);
-      conn.log(SC_OK, "");
     } catch(final HTTPException ex) {
       conn.error(ex.getStatus(), Util.message(ex));
     } catch(final LoginException ex) {
