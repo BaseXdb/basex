@@ -1260,7 +1260,7 @@ public enum Function implements AFunction {
   _UPDATE_APPLY(UpdateApply.class, "apply(function,args)", arg(FUNC_O, ARRAY_O), EMP,
       flag(Flag.POS, UPD, NDT, HOF), UPDATE_URI),
   /** XQuery function. */
-  _UPDATE_CACHE(UpdateCache.class, "cache()", arg(), ITEM_ZM, flag(NDT), UPDATE_URI),
+  _UPDATE_CACHE(UpdateCache.class, "cache([reset])", arg(BLN_O), ITEM_ZM, flag(NDT), UPDATE_URI),
   /** XQuery function. */
   _UPDATE_FOR_EACH(UpdateForEach.class, "for-each(items,function)",
       arg(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O).seqType()), EMP, flag(UPD, HOF), UPDATE_URI),
@@ -1272,7 +1272,7 @@ public enum Function implements AFunction {
   _UPDATE_MAP_FOR_EACH(UpdateMapForEach.class, "map-for-each(map,function)",
       arg(MAP_O, FuncType.get(ITEM_ZM, AAT_O, ITEM_ZM).seqType()), EMP, flag(UPD, HOF), UPDATE_URI),
   /** XQuery function. */
-  _UPDATE_OUTPUT(UpdateOutput.class, "output(result)", arg(ITEM_ZM), EMP, flag(UPD), UPDATE_URI),
+  _UPDATE_OUTPUT(UpdateOutput.class, "output(items)", arg(ITEM_ZM), EMP, flag(UPD), UPDATE_URI),
 
   // User Module
 

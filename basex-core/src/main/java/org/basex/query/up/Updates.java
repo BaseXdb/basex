@@ -8,8 +8,9 @@ import org.basex.query.iter.*;
 import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.node.*;
-import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
@@ -63,7 +64,7 @@ public final class Updates {
   /** All file paths that are targeted during a snapshot by an fn:put expression. */
   public final TokenSet putPaths = new TokenSet();
   /** Cached outputs. */
-  public final ItemList items = new ItemList();
+  private ValueBuilder output;
 
   /** Mapping between fragment IDs and the temporary data instances
    * to apply updates on the corresponding fragments. */
@@ -94,6 +95,27 @@ public final class Updates {
    */
   public void add(final Update up, final QueryContext qc) throws QueryException {
     mod.add(up, qc);
+  }
+
+  /**
+   * Adds output.
+   * @param value value to be added
+   * @param qc query context
+   */
+  public synchronized void addOutput(final Value value, final QueryContext qc) {
+    if(output == null) output = new ValueBuilder(qc);
+    output.add(value);
+  }
+
+  /**
+   * Returns value to be output.
+   * @param reset reset cache
+   * @return value
+   */
+  public synchronized Value output(final boolean reset) {
+    final ValueBuilder vb = output;
+    if(reset) output = null;
+    return vb != null ? vb.value() : Empty.VALUE;
   }
 
   /**

@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -21,8 +20,8 @@ public class UpdateOutput extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Updates updates = qc.updates();
     if(updates.mod instanceof TransformModifier) throw BASEX_UPDATE.get(info);
-    final Iter iter = exprs[0].iter(qc);
-    for(Item item; (item = qc.next(iter)) != null;) qc.updates.items.add(item);
+
+    qc.updates.addOutput(exprs[0].value(qc), qc);
     return Empty.VALUE;
   }
 }

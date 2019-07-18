@@ -18,10 +18,8 @@ declare function util:query(
   $query    as xs:string?,
   $context  as item()*
 ) as xs:string {
-  let $limit := options:get($options:MAXCHARS)
   let $result := xquery:eval($query, map { '': $context }, util:query-options())
-  (: serialize more characters than requested, because limit represents number of bytes :)
-  return util:chop(serialize($result, map { 'limit': $limit * 2 + 1, 'method': 'basex' }), $limit)
+  return util:finalize($result)
 };
 
 (:~
@@ -32,7 +30,24 @@ declare function util:query(
 declare %updating function util:update-query(
   $query  as xs:string?
 ) as empty-sequence() {
-  xquery:eval-update($query, map { }, util:query-options())
+  xquery:eval-update($query, map { }, util:query-options()),
+  
+  let $result := update:cache(true())
+  return update:output(util:finalize($result))
+};
+
+(:~
+ : Finalizes the result of an evaluated query.
+ : @param  $result   query result
+ : @return empty sequence
+ :)
+declare %private function util:finalize(
+  $result   as item()*
+) as xs:string {
+  (: serialize more characters than requested, because limit represents number of bytes :)
+  let $limit := options:get($options:MAXCHARS)
+  let $string := serialize($result, map { 'limit': $limit * 2 + 1, 'method': 'basex' })
+  return util:chop($string, $limit)
 };
 
 (:~

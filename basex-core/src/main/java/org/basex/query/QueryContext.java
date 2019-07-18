@@ -691,7 +691,7 @@ public final class QueryContext extends Job implements Closeable {
         checkStop();
         vb.add(materialize.apply(item));
       }
-      for(final Item item : updates.items) {
+      for(final Item item : updates.output(true)) {
         checkStop();
         vb.add(materialize.apply(item));
       }
@@ -700,7 +700,7 @@ public final class QueryContext extends Job implements Closeable {
       if(context.data() != null) context.invalidate();
       updates.apply(this);
 
-      return vb.value(value);
+      return vb.value((Type) null);
 
     } catch(final StackOverflowError ex) {
       Util.debug(ex);

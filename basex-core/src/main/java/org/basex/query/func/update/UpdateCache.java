@@ -12,7 +12,8 @@ import org.basex.query.value.*;
  */
 public class UpdateCache extends StandardFunc {
   @Override
-  public Value value(final QueryContext qc) {
-    return qc.updates().items.value();
+  public Value value(final QueryContext qc) throws QueryException {
+    final boolean reset = exprs.length > 0 && toBoolean(exprs[0], qc);
+    return qc.updates().output(reset);
   }
 }
