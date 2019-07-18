@@ -68,9 +68,11 @@ public abstract class BaseXServlet extends HttpServlet {
     } catch(final LoginException ex) {
       conn.error(SC_UNAUTHORIZED, Util.message(ex));
     } catch(final QueryException ex) {
-      final Value v = ex.value();
-      final int code = v instanceof Int ? (int) ((Int) v).itr() : SC_BAD_REQUEST;
-      conn.error(code, ex.getMessage(), Util.message(ex));
+      final Value value = ex.value();
+      final int code = value instanceof ANum ? (int) ((ANum) value).itr() : SC_BAD_REQUEST;
+      final boolean rest = Token.eq(ex.qname().uri(), QueryText.REST_URI);
+      final String info = rest ? ex.getLocalizedMessage() : Util.message(ex);
+      conn.error(code, info);
     } catch(final IOException ex) {
       conn.error(SC_BAD_REQUEST, Util.message(ex));
     } catch(final JobException ex) {

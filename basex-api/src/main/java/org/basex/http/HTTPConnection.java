@@ -176,21 +176,9 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Handles an error with a short and a detailed info message.
-   * @param code status code
-   * @param info detailed information
-   * @param log log message
-   * @throws IOException I/O exception
-   */
-  public void error(final int code, final String info, final String log) throws IOException {
-    log(code, log);
-    status(code, null, info);
-  }
-
-  /**
    * Handles an error with an info message.
    * @param code status code
-   * @param info info, sent as body
+   * @param info info, will additionally be logged
    * @throws IOException I/O exception
    */
   public void error(final int code, final String info) throws IOException {
@@ -201,7 +189,7 @@ public final class HTTPConnection implements ClientInfo {
   /**
    * Handles an HTTP status code and message.
    * @param code status code
-   * @param message status message
+   * @param message status message, will additionally be logged
    * @throws IOException I/O exception
    */
   public void status(final int code, final String message) throws IOException {
