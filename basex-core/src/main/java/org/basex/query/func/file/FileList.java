@@ -32,7 +32,7 @@ public final class FileList extends FileRead {
           string(toToken(exprs[2], qc))), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE) : null;
 
       final TokenList tl = new TokenList();
-      list(dir.getNameCount(), dir, tl, recursive, pattern);
+      list(dir.getNameCount(), dir, tl, recursive, pattern, qc);
       return StrSeq.get(tl);
     } catch(final NoSuchFileException | NotDirectoryException ex) {
       throw FILE_NO_DIR_X.get(info, ex);
@@ -50,15 +50,19 @@ public final class FileList extends FileRead {
    * @param list file list
    * @param rec recursive flag
    * @param pat file name pattern; ignored if {@code null}
+   * @param qc query context
    * @throws IOException I/O exception
    */
   private static void list(final int index, final Path dir, final TokenList list, final boolean rec,
-      final Pattern pat) throws IOException {
+      final Pattern pat, final QueryContext qc) throws IOException {
 
     // skip invalid directories
     final ArrayList<Path> children = new ArrayList<>();
     try(DirectoryStream<Path> paths = Files.newDirectoryStream(dir)) {
-      for(final Path child : paths) children.add(child);
+      for(final Path path : paths) {
+        qc.checkStop();
+        children.add(path);
+      }
     } catch(final IOException ex) {
       // only throw exception on root level
       if(index == dir.getNameCount()) throw ex;
@@ -67,7 +71,9 @@ public final class FileList extends FileRead {
     // parse directories, do not follow links
     if(rec) {
       for(final Path child : children) {
-        if(Files.isDirectory(child)) list(index, child, list, true, pat);
+        if(Files.isDirectory(child)) {
+          list(index, child, list, true, pat, qc);
+        }
       }
     }
 

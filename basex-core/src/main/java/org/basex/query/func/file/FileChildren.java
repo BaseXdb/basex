@@ -23,7 +23,10 @@ public final class FileChildren extends FileRead {
     try {
       final TokenList tl = new TokenList();
       try(DirectoryStream<Path> paths = Files.newDirectoryStream(toPath(0, qc))) {
-        for(final Path path : paths) tl.add(get(path, Files.isDirectory(path)).string());
+        for(final Path path : paths) {
+          qc.checkStop();
+          tl.add(get(path, Files.isDirectory(path)).string());
+        }
       }
       return StrSeq.get(tl);
     } catch(final NoSuchFileException | NotDirectoryException ex) {

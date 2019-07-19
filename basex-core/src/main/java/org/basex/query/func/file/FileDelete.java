@@ -18,7 +18,7 @@ public final class FileDelete extends FileFn {
   public Item item(final QueryContext qc) throws QueryException, IOException {
     final Path path = toPath(0, qc);
     if(optionalBool(1, qc)) {
-      delete(path);
+      delete(path, qc);
     } else {
       Files.delete(path);
     }
@@ -28,12 +28,16 @@ public final class FileDelete extends FileFn {
   /**
    * Recursively deletes a file path.
    * @param path path to be deleted
+   * @param qc query context
    * @throws IOException I/O exception
    */
-  private synchronized void delete(final Path path) throws IOException {
+  private synchronized void delete(final Path path, final QueryContext qc) throws IOException {
     if(Files.isDirectory(path)) {
-      try(DirectoryStream<Path> paths = Files.newDirectoryStream(path)) {
-        for(final Path p : paths) delete(p);
+      try(DirectoryStream<Path> children = Files.newDirectoryStream(path)) {
+        qc.checkStop();
+        for(final Path child : children) {
+          delete(child, qc);
+        }
       }
     }
     Files.delete(path);

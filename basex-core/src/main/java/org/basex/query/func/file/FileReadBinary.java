@@ -35,6 +35,7 @@ public final class FileReadBinary extends FileFn {
       if(exprs.length == 2) len = dlen - off;
       if(off < 0 || off > dlen || len < 0 || off + len > dlen)
         throw FILE_OUT_OF_RANGE_X_X.get(info, off, off + len);
+
       da.cursor(off);
       return B64.get(da.readBytes((int) len));
     }

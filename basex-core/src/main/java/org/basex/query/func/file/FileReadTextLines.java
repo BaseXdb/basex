@@ -60,6 +60,7 @@ public final class FileReadTextLines extends FileRead {
     final long[] minMax = minMax(qc);
     try(NewlineInput ni = input(qc)) {
       for(long c = 1; c < minMax[1] && ni.readLine(tb); c++) {
+        qc.checkStop();
         if(c >= minMax[0]) tl.add(tb.toArray());
       }
       return StrSeq.get(tl);

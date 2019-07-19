@@ -50,6 +50,7 @@ public class FileWriteTextLines extends FileFn {
       final Iter iter = exprs[1].iter(qc);
       for(Item item; (item = iter.next()) != null;) {
         if(!item.type.isStringOrUntyped()) throw typeError(item, AtomType.STR, info);
+
         final byte[] s = item.string(info);
         out.write(cs == null ? s : string(s).getBytes(cs));
         out.write(cs == null ? NL : Prop.NL.getBytes(cs));

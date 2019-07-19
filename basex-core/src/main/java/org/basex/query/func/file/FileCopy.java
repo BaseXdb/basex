@@ -50,7 +50,7 @@ public class FileCopy extends FileFn {
     }
 
     // ignore operations on identical, canonical source and target path
-    relocate(src, trg, copy);
+    relocate(src, trg, copy, qc);
   }
 
   /**
@@ -58,15 +58,19 @@ public class FileCopy extends FileFn {
    * @param src source path
    * @param trg target path
    * @param copy copy flag
+   * @param qc query context
    * @throws IOException I/O exception
    */
-  private synchronized void relocate(final Path src, final Path trg, final boolean copy)
-      throws IOException {
+  private synchronized void relocate(final Path src, final Path trg, final boolean copy,
+      final QueryContext qc) throws IOException {
 
     if(Files.isDirectory(src)) {
       Files.createDirectory(trg);
-      try(DirectoryStream<Path> paths = Files.newDirectoryStream(src)) {
-        for(final Path p : paths) relocate(p, trg.resolve(p.getFileName()), copy);
+      try(DirectoryStream<Path> children = Files.newDirectoryStream(src)) {
+        qc.checkStop();
+        for(final Path child : children) {
+          relocate(child, trg.resolve(child.getFileName()), copy, qc);
+        }
       }
       if(!copy) Files.delete(src);
     } else if(copy) {

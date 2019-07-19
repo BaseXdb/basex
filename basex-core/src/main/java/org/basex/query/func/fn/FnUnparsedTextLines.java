@@ -34,7 +34,10 @@ public final class FnUnparsedTextLines extends Parse {
     try(NewlineInput ni = new NewlineInput(item.string(info))) {
       final TokenList tl = new TokenList();
       final TokenBuilder tb = new TokenBuilder();
-      while(ni.readLine(tb)) tl.add(tb.toArray());
+      while(ni.readLine(tb)) {
+        qc.checkStop();
+        tl.add(tb.toArray());
+      }
       return StrSeq.get(tl);
     } catch(final IOException ex) {
       throw FILE_IO_ERROR_X.get(info, ex);
