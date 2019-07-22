@@ -15,13 +15,13 @@ import org.basex.util.*;
 public abstract class UserUpdate extends Update {
   /** Users. */
   protected final Users users;
-  /** User. */
+  /** User ({@code null} if operation is global). */
   protected final User user;
 
   /**
    * Constructor.
    * @param type type of this operation
-   * @param user user
+   * @param user user ({@code null} if operation is global)
    * @param qc query context
    * @param info input info
    */
@@ -33,11 +33,11 @@ public abstract class UserUpdate extends Update {
   }
 
   /**
-   * Returns the name of the database.
-   * @return name
+   * Returns the name of the user.
+   * @return name (can be {@code null})
    */
   public final String name() {
-    return user.name();
+    return user != null ? user.name() : null;
   }
 
   /**
@@ -59,6 +59,6 @@ public abstract class UserUpdate extends Update {
   @Override
   public void merge(final Update update) throws QueryException {
     final UserUpdate up = (UserUpdate) update;
-    if(user.equals(up.user)) throw USER_UPDATE1_X_X.get(info, user.name(), operation());
+    if(user.equals(up.user)) throw USER_UPDATE1_X_X.get(info, name(), operation());
   }
 }

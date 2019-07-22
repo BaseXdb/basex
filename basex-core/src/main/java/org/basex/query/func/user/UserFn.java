@@ -8,6 +8,7 @@ import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -23,6 +24,11 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 abstract class UserFn extends StandardFunc {
+  /** Root node test. */
+  static final QNm Q_INFO = new QNm(UserText.INFO);
+  /** Root node test. */
+  static final NodeTest T_INFO = new NodeTest(Q_INFO);
+
   /**
    * Checks if the specified expression contains valid database patterns.
    * @param i expression index
@@ -119,7 +125,7 @@ abstract class UserFn extends StandardFunc {
    */
   protected final String toSafeName(final int i, final QueryContext qc) throws QueryException {
     final String name = toName(i, qc);
-    checkSafe(qc.context.users.get(name), qc);
+    checkInactive(qc.context.users.get(name), qc);
     return name;
   }
 
@@ -130,8 +136,8 @@ abstract class UserFn extends StandardFunc {
    * @return user
    * @throws QueryException query exception
    */
-  protected final User toSafeUser(final int i, final QueryContext qc) throws QueryException {
-    return checkSafe(toUser(i, qc), qc);
+  protected final User toInactiveUser(final int i, final QueryContext qc) throws QueryException {
+    return checkInactive(toUser(i, qc), qc);
   }
 
   /**
@@ -141,7 +147,7 @@ abstract class UserFn extends StandardFunc {
    * @return specified user
    * @throws QueryException query exception
    */
-  private User checkSafe(final User user, final QueryContext qc) throws QueryException {
+  private User checkInactive(final User user, final QueryContext qc) throws QueryException {
     if(user != null) {
       final String name = user.name();
       for(final ClientListener s : qc.context.sessions) {

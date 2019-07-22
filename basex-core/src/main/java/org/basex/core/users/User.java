@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.basex.core.*;
+import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -23,12 +24,14 @@ public final class User {
   /** Stored password codes. */
   private final EnumMap<Algorithm, EnumMap<Code, String>> passwords =
       new EnumMap<>(Algorithm.class);
-  /** Local permissions, using database names or glob patterns as key. */
-  private final LinkedHashMap<String, Perm> locals = new LinkedHashMap<>();
+  /** Database patterns for local permissions. */
+  private final LinkedHashMap<String, Perm> patterns = new LinkedHashMap<>();
   /** User name. */
   private String name;
   /** Permission. */
   private Perm perm;
+  /** Info node (can be {@code null}). */
+  private ANode info;
 
   /**
    * Constructor.
@@ -75,7 +78,9 @@ public final class User {
         // parse local permissions
         final String nm = string(attribute(name, child, PATTERN));
         final Perm prm = attribute(name, child, PERMISSION, Perm.values());
-        locals.put(nm, prm);
+        patterns.put(nm, prm);
+      } else if(eq(child.qname().id(), INFO)) {
+        info = child.finish();
       } else {
         throw new BaseXException(name + ": invalid element: <" + child.qname() + "/>.");
       }
@@ -89,10 +94,11 @@ public final class User {
   }
 
   /**
-   * Writes permissions to the specified XML builder.
-   * @param root root element
+   * Returns user information as XML.
+   * @param qc query context ({@code null} if element will only be created for serialization)
+   * @return user element
    */
-  synchronized void toXML(final FElem root) {
+  public synchronized FElem toXML(final QueryContext qc) {
     final FElem user = new FElem(USER).add(NAME, name).add(PERMISSION, perm.toString());
     passwords.forEach((key, value) -> {
       final FElem pw = new FElem(PASSWORD).add(ALGORITHM, key.toString());
@@ -101,16 +107,26 @@ public final class User {
       });
       user.add(pw);
     });
-    locals.forEach((key, value) -> user.add(new FElem(DATABASE).add(PATTERN, key).
+    patterns.forEach((key, value) -> user.add(new FElem(DATABASE).add(PATTERN, key).
         add(PERMISSION, value.toString())));
-    root.add(user);
+    if(info != null) {
+      if(qc != null) {
+        // create copy of the info node if query context is available
+        user.add(info.materialize(qc, true));
+      } else {
+        // otherwise, referenced original info node and invalidate parent reference
+        user.add(info);
+        info.parent(null);
+      }
+    }
+    return user;
   }
 
   /**
    * Sets the user name.
    * @param nm name
    */
-  synchronized void name(final String nm) {
+  public synchronized void name(final String nm) {
     name = nm;
   }
 
@@ -119,15 +135,15 @@ public final class User {
    * @param pattern database pattern
    */
   public synchronized void drop(final String pattern) {
-    locals.remove(pattern);
+    patterns.remove(pattern);
   }
 
   /**
-   * Returns the local permissions.
-   * @return local permissions
+   * Returns the database patterns.
+   * @return database patterns
    */
-  public synchronized Map<String, Perm> locals() {
-    return locals;
+  public synchronized Map<String, Perm> patterns() {
+    return patterns;
   }
 
   /**
@@ -166,7 +182,7 @@ public final class User {
    * Returns algorithms.
    * @return algorithms
    */
-  public synchronized EnumMap<Algorithm, EnumMap<Code, String>> alg() {
+  public synchronized EnumMap<Algorithm, EnumMap<Code, String>> passwords() {
     return passwords;
   }
 
@@ -189,7 +205,7 @@ public final class User {
    * @return entry, or {@code null} if no entry exists
    */
   synchronized Entry<String, Perm> find(final String db) {
-    for(final Entry<String, Perm> entry : locals.entrySet()) {
+    for(final Entry<String, Perm> entry : patterns.entrySet()) {
       if(Databases.regex(entry.getKey()).matcher(db).matches()) return entry;
     }
     return null;
@@ -215,7 +231,7 @@ public final class User {
     if(pattern.isEmpty()) {
       perm(prm);
     } else {
-      locals.put(pattern, prm);
+      patterns.put(pattern, prm);
     }
     return this;
   }
@@ -248,6 +264,22 @@ public final class User {
   public synchronized boolean matches(final String password) {
     final EnumMap<Code, String> alg = passwords.get(Algorithm.SALTED_SHA256);
     return sha256(alg.get(Code.SALT) + password).equals(alg.get(Code.HASH));
+  }
+
+  /**
+   * Returns the info element.
+   * @return info element (can be {@code null})
+   */
+  public ANode info() {
+    return info;
+  }
+
+  /**
+   * Sets the info element.
+   * @param elem info element
+   */
+  public void info(final ANode elem) {
+    info = elem.hasChildren() || elem.attributes().size() != 0 ? elem : null;
   }
 
   /**

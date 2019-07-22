@@ -1281,8 +1281,8 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _USER_CHECK(UserCheck.class, "check(name,password)", arg(STR_O, STR_O), EMP, flag(NDT), USER_URI),
   /** XQuery function. */
-  _USER_CREATE(UserCreate.class, "create(name,password[,permissions[,patterns]])",
-      arg(STR_O, STR_O, STR_ZM, STR_ZM), EMP, flag(UPD), USER_URI),
+  _USER_CREATE(UserCreate.class, "create(name,password[,permissions[,patterns[,info]]])",
+      arg(STR_O, STR_O, STR_ZM, STR_ZM, ELM_O), EMP, flag(UPD), USER_URI),
   /** XQuery function. */
   _USER_CURRENT(UserCurrent.class, "current()", arg(), STR_O, USER_URI),
   /** XQuery function. */
@@ -1293,7 +1293,7 @@ public enum Function implements AFunction {
   _USER_GRANT(UserGrant.class, "grant(name,permissions[,patterns])",
       arg(STR_O, STR_ZM, STR_ZM), EMP, flag(UPD), USER_URI),
   /** XQuery function. */
-  _USER_INFO(UserInfo.class, "info()", arg(), ELM_O, USER_URI),
+  _USER_INFO(UserInfo.class, "info([name])", arg(STR_O), ELM_O, USER_URI),
   /** XQuery function. */
   _USER_LIST(UserList.class, "list()", arg(), ELM_ZM, flag(NDT), USER_URI),
   /** XQuery function. */
@@ -1303,8 +1303,8 @@ public enum Function implements AFunction {
   _USER_PASSWORD(UserPassword.class, "password(name,password)",
       arg(STR_O, STR_O), EMP, flag(UPD), USER_URI),
   /** XQuery function. */
-  _USER_UPDATE_INFO(UserUpdateInfo.class, "update-info(element)",
-      arg(ELM_O), EMP, flag(UPD), USER_URI),
+  _USER_UPDATE_INFO(UserUpdateInfo.class, "update-info(element[,name])",
+      arg(ELM_O, STR_O), EMP, flag(UPD), USER_URI),
 
   // Utility Module
 

@@ -8,6 +8,7 @@ import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -29,6 +30,12 @@ public final class UserCreate extends UserFn {
 
     final User user = new User(name, pw);
     if(name.equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
+
+    if(exprs.length > 4) {
+      final ANode node = toElem(exprs[4], qc);
+      if(!T_INFO.eq(node)) throw ELM_X_X.get(info, Q_INFO.prefixId(), node);
+      user.info(node.materialize(qc, true));
+    }
 
     qc.updates().add(new Create(user, perms, patterns, qc, info), qc);
     return Empty.VALUE;

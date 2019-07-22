@@ -34,44 +34,34 @@ public final class UserModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void current() {
-    final Function func = _USER_CURRENT;
-    query(func.args(), UserText.ADMIN);
-  }
+  @Test public void alter() {
+    final Function func = _USER_ALTER;
+    // rename user
+    query(func.args(NAME, NAME + '2'));
 
-  /** Test method. */
-  @Test public void exists() {
-    final Function func = _USER_EXISTS;
-    query(func.args(UserText.ADMIN), true);
-    query(func.args(NAME), true);
-    query(func.args("unknown"), false);
+    // overwrite user
+    query(_USER_CREATE.args(NAME, ""));
+    query(func.args(NAME + '2', NAME));
 
+    // admin cannot be modified
+    error(func.args(UserText.ADMIN, NAME), USER_ADMIN);
+    error(func.args(NAME, UserText.ADMIN), USER_ADMIN);
     // invalid name
-    error(func.args(""), USER_NAME_X);
+    error(func.args("", NAME), USER_NAME_X);
+    error(func.args(NAME, ""), USER_NAME_X);
+    // redundant operations
+    error(func.args(NAME, "X") + ',' + func.args(NAME, "X"), USER_UPDATE1_X_X);
+    // redundant operations
+    error(func.args(NAME, "X") + ',' + _USER_DROP.args(NAME), USER_CONFLICT_X);
   }
 
   /** Test method. */
-  @Test public void list() {
-    final Function func = _USER_LIST;
-    query(func.args(), UserText.ADMIN + '\n' + NAME);
-  }
-
-  /** Test method. */
-  @Test public void listDetails() {
-    final Function func = _USER_LIST_DETAILS;
-    // check if the admin user exists
-    query(func.args() + "/@name = '" + UserText.ADMIN + '\'', true);
-    // check if the temporarily created user is found
-    query(func.args() + "/@name = '" + NAME + '\'', true);
-    // check if local permission is found
-    query(func.args() + "/database/@pattern = '" + NAME + '\'', true);
-    // check if user has been removed
-    query(_USER_DROP.args(NAME));
-    query(func.args() + "/database/@pattern = '" + NAME + '\'', false);
-    query(func.args() + "/@name = '" + NAME + '\'', false);
-    // specify user
-    query("exists(" + func.args("admin") + ")", true);
-    error("exists(" + func.args("unknown") + ")", USER_UNKNOWN_X);
+  @Test public void check() {
+    final Function func = _USER_CHECK;
+    query(func.args(UserText.ADMIN, UserText.ADMIN));
+    error(func.args("", "x"), USER_NAME_X);
+    error(func.args("x", "x"), USER_UNKNOWN_X);
+    error(func.args(UserText.ADMIN, "x"), USER_PASSWORD_X);
   }
 
   /** Test method. */
@@ -82,6 +72,7 @@ public final class UserModuleTest extends SandboxTest {
     // specify permissions
     query(func.args(NAME, NAME, Perm.ADMIN));
     query(func.args(NAME, NAME, " ('admin','none')", " ('','x')"));
+    query(func.args(NAME, NAME, " ('admin','none')", " ('','x')", " <info a='x'/>"));
 
     // invalid permission
     error(func.args(NAME, NAME, ""), USER_PERMISSION_X);
@@ -95,6 +86,52 @@ public final class UserModuleTest extends SandboxTest {
     error(func.args(NAME, "") + ',' + func.args(NAME, ""), USER_UPDATE1_X_X);
     error(func.args(NAME, "", " ('admin','admin')", " ('','')"), USER_UPDATE3_X_X);
     error(func.args(NAME, "", " ('admin','admin')", " ('x','x')"), USER_UPDATE2_X);
+  }
+
+  /** Test method. */
+  @Test public void current() {
+    final Function func = _USER_CURRENT;
+    query(func.args(), UserText.ADMIN);
+  }
+
+  /** Test method. */
+  @Test public void drop() {
+    final Function func = _USER_DROP;
+    // create and drop local permission
+    query(func.args(NAME, NAME));
+    query(_USER_LIST_DETAILS.args() + "/database/@pattern = '" + NAME + '\'', false);
+
+    // drop list of permissions
+    query(func.args(NAME, "('x','y')"));
+
+    // invalid database pattern
+    error(func.args(NAME, ";"), USER_PATTERN_X);
+    // redundant operations
+    error(func.args(NAME) + ',' + func.args(NAME), USER_UPDATE1_X_X);
+    error(func.args(NAME, 'x') + ',' + func.args(NAME, 'x'), USER_UPDATE2_X);
+    error(func.args(NAME) + ',' + _USER_ALTER.args(NAME, "X"), USER_CONFLICT_X);
+
+    // drop user
+    query(func.args(NAME));
+    query(_USER_EXISTS.args(NAME), false);
+
+    // admin cannot be modified
+    error(func.args(UserText.ADMIN), USER_ADMIN);
+    // invalid name
+    error(func.args(NAME, ""), USER_UNKNOWN_X);
+    error(func.args(""), USER_NAME_X);
+    error(func.args("", NAME), USER_NAME_X);
+  }
+
+  /** Test method. */
+  @Test public void exists() {
+    final Function func = _USER_EXISTS;
+    query(func.args(UserText.ADMIN), true);
+    query(func.args(NAME), true);
+    query(func.args("unknown"), false);
+
+    // invalid name
+    error(func.args(""), USER_NAME_X);
   }
 
   /** Test method. */
@@ -132,54 +169,34 @@ public final class UserModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void drop() {
-    final Function func = _USER_DROP;
-    // create and drop local permission
-    query(func.args(NAME, NAME));
-    query(_USER_LIST_DETAILS.args() + "/database/@pattern = '" + NAME + '\'', false);
-
-    // drop list of permissions
-    query(func.args(NAME, "('x','y')"));
-
-    // invalid database pattern
-    error(func.args(NAME, ";"), USER_PATTERN_X);
-    // redundant operations
-    error(func.args(NAME) + ',' + func.args(NAME), USER_UPDATE1_X_X);
-    error(func.args(NAME, 'x') + ',' + func.args(NAME, 'x'), USER_UPDATE2_X);
-    error(func.args(NAME) + ',' + _USER_ALTER.args(NAME, "X"), USER_CONFLICT_X);
-
-    // drop user
-    query(func.args(NAME));
-    query(_USER_EXISTS.args(NAME), false);
-
-    // admin cannot be modified
-    error(func.args(UserText.ADMIN), USER_ADMIN);
-    // invalid name
-    error(func.args(NAME, ""), USER_UNKNOWN_X);
-    error(func.args(""), USER_NAME_X);
-    error(func.args("", NAME), USER_NAME_X);
+  @Test public void info() {
+    final Function func = _USER_INFO;
+    query(func.args(), "<info/>");
+    error(func.args("dummy"), USER_UNKNOWN_X);
   }
 
   /** Test method. */
-  @Test public void alter() {
-    final Function func = _USER_ALTER;
-    // rename user
-    query(func.args(NAME, NAME + '2'));
+  @Test public void list() {
+    final Function func = _USER_LIST;
+    query(func.args(), UserText.ADMIN + '\n' + NAME);
+  }
 
-    // overwrite user
-    query(_USER_CREATE.args(NAME, ""));
-    query(func.args(NAME + '2', NAME));
-
-    // admin cannot be modified
-    error(func.args(UserText.ADMIN, NAME), USER_ADMIN);
-    error(func.args(NAME, UserText.ADMIN), USER_ADMIN);
-    // invalid name
-    error(func.args("", NAME), USER_NAME_X);
-    error(func.args(NAME, ""), USER_NAME_X);
-    // redundant operations
-    error(func.args(NAME, "X") + ',' + func.args(NAME, "X"), USER_UPDATE1_X_X);
-    // redundant operations
-    error(func.args(NAME, "X") + ',' + _USER_DROP.args(NAME), USER_CONFLICT_X);
+  /** Test method. */
+  @Test public void listDetails() {
+    final Function func = _USER_LIST_DETAILS;
+    // check if the admin user exists
+    query(func.args() + "/@name = '" + UserText.ADMIN + '\'', true);
+    // check if the temporarily created user is found
+    query(func.args() + "/@name = '" + NAME + '\'', true);
+    // check if local permission is found
+    query(func.args() + "/database/@pattern = '" + NAME + '\'', true);
+    // check if user has been removed
+    query(_USER_DROP.args(NAME));
+    query(func.args() + "/database/@pattern = '" + NAME + '\'', false);
+    query(func.args() + "/@name = '" + NAME + '\'', false);
+    // specify user
+    query("exists(" + func.args("admin") + ")", true);
+    error(func.args("unknown"), USER_UNKNOWN_X);
   }
 
   /** Test method. */
@@ -195,28 +212,17 @@ public final class UserModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void info() {
-    final Function func = _USER_INFO;
-    query(func.args(), "<info/>");
-  }
-
-  /** Test method. */
   @Test public void updateInfo() {
     final Function func = _USER_UPDATE_INFO;
     query(func.args(" <info>A</info>"));
     query(_USER_INFO.args(), "<info>A</info>");
     query(func.args(" <info/>"));
 
+    query(func.args(" <info>B</info>", "admin"));
+    query(_USER_INFO.args("admin"), "<info>B</info>");
+    query(func.args(" <info/>", "admin"));
+
     // invalid input
     error(func.args(" <abc/>"), ELM_X_X);
-  }
-
-  /** Test method. */
-  @Test public void check() {
-    final Function func = _USER_CHECK;
-    query(func.args(UserText.ADMIN, UserText.ADMIN));
-    error(func.args("", "x"), USER_NAME_X);
-    error(func.args("x", "x"), USER_UNKNOWN_X);
-    error(func.args(UserText.ADMIN, "x"), USER_PASSWORD_X);
   }
 }

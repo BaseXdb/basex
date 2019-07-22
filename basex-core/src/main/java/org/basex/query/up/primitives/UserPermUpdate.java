@@ -24,7 +24,7 @@ public abstract class UserPermUpdate extends UserUpdate {
   /**
    * Constructor.
    * @param type type of this operation
-   * @param user user
+   * @param user user ({@code null} if operation is global)
    * @param perms permissions (can be {@code null})
    * @param patterns patterns
    * @param qc query context

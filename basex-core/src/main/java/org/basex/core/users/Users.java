@@ -27,7 +27,7 @@ public final class Users {
   private final LinkedHashMap<String, User> users = new LinkedHashMap<>();
   /** Filename. */
   private final IOFile file;
-  /** Info node. */
+  /** Info node (can be {@code null}). */
   private ANode info;
 
   /**
@@ -88,21 +88,19 @@ public final class Users {
    */
   public void write() {
     synchronized(users) {
-      if(store()) {
-        file.parent().md();
-        final FElem root = new FElem(USERS);
-        for(final User user : users.values()) user.toXML(root);
-        if(info != null) {
-          root.add(info);
-          info.parent(null);
-        }
-        try {
-          file.write(root.serialize().finish());
-        } catch(final IOException ex) {
-          Util.errln(ex);
-        }
-      } else if(file.exists()) {
-        file.delete();
+      file.parent().md();
+      final FElem root = new FElem(USERS);
+      for(final User user : users.values()) {
+        root.add(user.toXML(null));
+      }
+      if(info != null) {
+        root.add(info);
+        info.parent(null);
+      }
+      try {
+        file.write(root.serialize().finish());
+      } catch(final IOException ex) {
+        Util.errln(ex);
       }
     }
   }
@@ -213,7 +211,7 @@ public final class Users {
 
   /**
    * Returns the info element.
-   * @return info element
+   * @return info element (can be {@code null})
    */
   public ANode info() {
     return info;
@@ -225,17 +223,5 @@ public final class Users {
    */
   public void info(final ANode elem) {
     info = elem.hasChildren() || elem.attributes().size() != 0 ? elem : null;
-  }
-
-  /**
-   * Checks if permissions need to be stored.
-   * @return result of check
-   */
-  private boolean store() {
-    if(info != null) return true;
-    if(users.size() != 1) return !users.isEmpty();
-    final User user = users.values().iterator().next();
-    return !user.name().equals(ADMIN) ||
-           !user.code(Algorithm.DIGEST, Code.HASH).equals(User.digest(ADMIN, ADMIN));
   }
 }

@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 public final class UserDrop extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final User user = toSafeUser(0, qc);
+    final User user = toInactiveUser(0, qc);
     final StringList patterns = toPatterns(1, qc);
     if(user.name().equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
     qc.updates().add(new Drop(user, patterns, qc, info), qc);
@@ -53,6 +53,8 @@ public final class UserDrop extends UserFn {
     }
 
     @Override
-    public String operation() { return "dropped"; }
+    public String operation() {
+      return "dropped";
+    }
   }
 }
