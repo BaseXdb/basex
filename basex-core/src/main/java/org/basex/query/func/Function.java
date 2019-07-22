@@ -182,11 +182,11 @@ public enum Function implements AFunction {
   FOR_EACH_PAIR(FnForEachPair.class, "for-each-pair(items1,items2,function)",
       arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_O).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
-  FORMAT_DATE(FnFormatDate.class, "format-date(date,picture,[language,calendar,place])",
+  FORMAT_DATE(FnFormatDate.class, "format-date(date,picture[,language,calendar,place])",
       arg(DAT_ZO, STR_O, STR_ZO, STR_ZO, STR_ZO), STR_ZO),
   /** XQuery function. */
   FORMAT_DATETIME(FnFormatDateTime.class,
-      "format-dateTime(number,picture,[language,calendar,place])",
+      "format-dateTime(number,picture[,language,calendar,place])",
       arg(DTM_ZO, STR_O, STR_ZO, STR_ZO, STR_ZO), STR_ZO),
   /** XQuery function. */
   FORMAT_INTEGER(FnFormatInteger.class, "format-integer(number,picture[,language])",
@@ -195,7 +195,7 @@ public enum Function implements AFunction {
   FORMAT_NUMBER(FnFormatNumber.class, "format-number(number,picture[,format])",
       arg(NUM_ZO, STR_O, STR_ZO), STR_O),
   /** XQuery function. */
-  FORMAT_TIME(FnFormatTime.class, "format-time(number,picture,[language,calendar,place])",
+  FORMAT_TIME(FnFormatTime.class, "format-time(number,picture[,language,calendar,place])",
       arg(TIM_ZO, STR_O, STR_ZO, STR_ZO, STR_ZO), STR_ZO),
   /** XQuery function. */
   FUNCTION_ARITY(FnFunctionArity.class, "function-arity(function)", arg(FUNC_O), ITR_O),
@@ -1032,7 +1032,7 @@ public enum Function implements AFunction {
   // HTTP Module
 
   /** XQuery function. */
-  _HTTP_SEND_REQUEST(HttpSendRequest.class, "send-request(request[,href,[bodies]])",
+  _HTTP_SEND_REQUEST(HttpSendRequest.class, "send-request(request[,href[,bodies]])",
       arg(NOD_O, STR_ZO, ITEM_ZM), ITEM_ZM, flag(NDT), HTTP_URI),
 
   // Index Module
