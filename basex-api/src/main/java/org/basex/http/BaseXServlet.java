@@ -34,7 +34,7 @@ public abstract class BaseXServlet extends HttpServlet {
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
     try {
-      HTTPContext.init(config.getServletContext());
+      HTTPContext.get().init(config.getServletContext());
     } catch(final IOException ex) {
       throw new ServletException(ex);
     }

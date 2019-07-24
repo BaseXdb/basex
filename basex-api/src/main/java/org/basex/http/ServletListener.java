@@ -15,6 +15,6 @@ public final class ServletListener implements ServletContextListener {
 
   @Override
   public void contextDestroyed(final ServletContextEvent event) {
-    HTTPContext.close();
+    HTTPContext.get().close();
   }
 }

@@ -27,8 +27,6 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public abstract class HTTPTest extends SandboxTest {
-  /** Database context. */
-  private static final Context CONTEXT = HTTPContext.context();
   /** HTTP server. */
   private static BaseXHTTP http;
   /** Root path. */
@@ -56,14 +54,15 @@ public abstract class HTTPTest extends SandboxTest {
   protected static void init(final String url, final boolean local, final boolean auth)
       throws Exception {
 
-    assertTrue(new IOFile(CONTEXT.soptions.get(StaticOptions.WEBPATH)).md());
-    rootUrl = url;
-
     final StringList sl = new StringList();
     sl.add("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT, "-z", "-q");
     if(local) sl.add("-l");
     if(!auth) sl.add("-U" + ADMIN);
     http = new BaseXHTTP(sl.toArray());
+    rootUrl = url;
+
+    final StaticOptions sopts = HTTPContext.get().context().soptions;
+    assertTrue(new IOFile(sopts.get(StaticOptions.WEBPATH)).md());
   }
 
   /**

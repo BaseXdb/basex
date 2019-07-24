@@ -113,7 +113,7 @@ public final class Context {
    * Private constructor.
    * @param soptions static options
    */
-  private Context(final StaticOptions soptions) {
+  public Context(final StaticOptions soptions) {
     this.soptions = soptions;
     options = new MainOptions();
     datas = new Datas();

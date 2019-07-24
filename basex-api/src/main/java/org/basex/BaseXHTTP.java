@@ -25,20 +25,21 @@ import org.eclipse.jetty.xml.*;
  * @author Dirk Kirsten
  */
 public final class BaseXHTTP extends CLI {
+  /** Static options. */
+  private final StaticOptions soptions;
+  /** HTTP context. */
+  private final HTTPContext hc;
   /** HTTP server. */
   private final Server jetty;
-  /** HTTP port. */
-  private int port;
-  /** HTTP host. */
-  private final String host;
-  /** HTTP stop port. */
-  private final int stopPort;
+
   /** Start as daemon. */
   private boolean service;
   /** Quiet flag. */
   private boolean quiet;
   /** Stop flag. */
   private boolean stop;
+  /** HTTP port. */
+  private int port;
 
   /**
    * Main method, launching the HTTP services.
@@ -62,18 +63,16 @@ public final class BaseXHTTP extends CLI {
   public BaseXHTTP(final String... args) throws Exception {
     super(null, args);
 
+    // context must be initialized after parsing of arguments
+    soptions = new StaticOptions(true);
+
     if(!quiet) Util.outln(header());
 
-    // context must be initialized after parsing of arguments
-    context = HTTPContext.context();
-
-    final StaticOptions sopts = context.soptions;
-    stopPort = sopts.get(StaticOptions.STOPPORT);
-    host = sopts.get(StaticOptions.SERVERHOST);
-    final int serverPort = sopts.get(StaticOptions.SERVERPORT);
+    hc = HTTPContext.get();
+    hc.init(soptions);
 
     // create jetty instance and set default context to HTTP path
-    final String webapp = sopts.get(StaticOptions.WEBPATH);
+    final String webapp = soptions.get(StaticOptions.WEBPATH);
     final WebAppContext wac = new WebAppContext(webapp, "/");
     locate(WEBCONF, webapp);
     final IOFile url = locate(JETTYCONF, webapp);
@@ -84,7 +83,7 @@ public final class BaseXHTTP extends CLI {
     for(final Connector conn : jetty.getConnectors()) {
       if(conn instanceof ServerConnector) sc = (ServerConnector) conn;
     }
-    if(sc == null) throw new BaseXException("No Jetty connectors defined in " + JETTYCONF + '.');
+    if(sc == null) throw new BaseXException("No Jetty connector defined in " + JETTYCONF + '.');
     if(port != 0) sc.setPort(port);
     else port = sc.getPort();
 
@@ -94,7 +93,10 @@ public final class BaseXHTTP extends CLI {
     // output user info, keep message visible for a while
     final Consumer<Boolean> info = start -> {
       Util.outln(msg2.apply(start));
-      if(!sopts.get(StaticOptions.HTTPLOCAL)) Util.outln(msg1.apply(start), serverPort);
+      if(!soptions.get(StaticOptions.HTTPLOCAL)) {
+        final int serverPort = soptions.get(StaticOptions.SERVERPORT);
+        Util.outln(msg1.apply(start), serverPort);
+      }
       Performance.sleep(2000);
     };
 
@@ -120,15 +122,16 @@ public final class BaseXHTTP extends CLI {
       throw new BaseXException(HTTP + ' ' + SRV_RUNNING_X, port);
     }
     // throw cached exception that did not break the servlet architecture
-    final IOException ex = HTTPContext.exception();
+    final IOException ex = hc.exception();
     if(ex != null) throw ex;
 
     // initialize web.xml settings, assign system properties and run database server.
     // the call of this function may already have been triggered during the start of jetty
-    HTTPContext.init(wac.getServletContext());
+    context = hc.init(wac.getServletContext());
 
-    // start daemon for stopping web server
-    if(stopPort > 0) new StopServer().start();
+    // start daemon for stopping the HTTP server
+    final int stopPort = soptions.get(StaticOptions.STOPPORT);
+    if(stopPort > 0) new StopServer(stopPort).start();
 
     // show info when HTTP server is aborted. needs to be called in constructor:
     // otherwise, it may only be called if the JVM process is already shut down
@@ -159,6 +162,8 @@ public final class BaseXHTTP extends CLI {
    * @throws Exception exception
    */
   public void stop() throws Exception {
+    final String host = soptions.get(StaticOptions.SERVERHOST);
+    final int stopPort = soptions.get(StaticOptions.STOPPORT);
     if(stopPort > 0) stop(host.isEmpty() ? S_LOCALHOST : host, stopPort);
   }
 
@@ -174,10 +179,10 @@ public final class BaseXHTTP extends CLI {
     final boolean create = !trg.exists();
 
     // try to locate file from development branch
-    final IO in = new IOFile("src/main/webapp", file);
+    final IO io = new IOFile("src/main/webapp", file);
     final byte[] data;
-    if(in.exists()) {
-      data = in.read();
+    if(io.exists()) {
+      data = io.read();
       // check if resource path exists
       IOFile res = new IOFile("src/main/resources");
       if(res.exists()) {
@@ -186,13 +191,13 @@ public final class BaseXHTTP extends CLI {
         if(!res.exists() || !Token.eq(data, res.read())) {
           Util.errln("Updating " +  res);
           res.parent().md();
-          res.write(in.read());
+          res.write(data);
         }
       }
     } else if(create) {
       // try to locate file from resource path
       try(InputStream is = BaseXHTTP.class.getResourceAsStream('/' + file)) {
-        if(is == null) throw new BaseXException(in + " not found.");
+        if(is == null) throw new BaseXException(io + " not found.");
         data = new IOStream(is).read();
       }
     } else {
@@ -323,12 +328,18 @@ public final class BaseXHTTP extends CLI {
     private final ServerSocket socket;
     /** Stop file. */
     private final IOFile stopFile;
+    /** Port. */
+    private final int stopPort;
 
     /**
      * Constructor.
+     * @param port port to stop server
      * @throws IOException I/O exception
      */
-    StopServer() throws IOException {
+    StopServer(final int port) throws IOException {
+      stopPort = port;
+
+      final String host = soptions.get(StaticOptions.SERVERHOST);
       final InetAddress addr = host.isEmpty() ? null : InetAddress.getByName(host);
       socket = new ServerSocket();
       socket.setReuseAddress(true);
@@ -340,13 +351,13 @@ public final class BaseXHTTP extends CLI {
     public void run() {
       try {
         while(true) {
-          Util.outln(HTTP + ' ' + STOP + ' ' + SRV_STARTED_PORT_X, stopPort);
+          Util.outln(HTTP + " STOP " + SRV_STARTED_PORT_X, stopPort);
           try(Socket s = socket.accept()) { /* no action */ }
           if(stopFile.exists()) {
             socket.close();
-            Util.outln(HTTP + ' ' + STOP + ' ' + SRV_STOPPED_PORT_X, stopPort);
+            Util.outln(HTTP + " STOP " + SRV_STOPPED_PORT_X, stopPort);
             jetty.stop();
-            HTTPContext.close();
+            hc.close();
             Prop.clear();
             if(!stopFile.delete()) {
               context.log.writeServer(LogType.ERROR, Util.info(FILE_NOT_DELETED_X, stopFile));

@@ -57,7 +57,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
     path = new WsPath(pi != null ? pi : "/");
     session = req.getSession();
 
-    final Context ctx = HTTPContext.context();
+    final Context ctx = HTTPContext.get().context();
     context = new Context(ctx, this);
     context.user(ctx.user());
   }
@@ -140,10 +140,9 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
 
   @Override
   public String clientName() {
-    Object obj = atts.get(CLIENT_ID);
-    if(obj == null && session != null) obj = session.getAttribute(CLIENT_ID);
-    final byte[] value = HTTPContext.token(obj);
-    return value != null ? Token.string(value) : context.user().name();
+    Object value = atts.get(CLIENT_ID);
+    if(value == null && session != null) value = session.getAttribute(CLIENT_ID);
+    return clientName(value, context);
   }
 
   /**

@@ -484,7 +484,7 @@ public class Options implements Iterable<Option<?>> {
    * Overwrites the options with global options and system properties.
    * All properties starting with {@code org.basex.} will be assigned as options.
    */
-  public final void setSystem() {
+  public void setSystem() {
     // assign global options
     for(final Entry<String, String> entry : entries()) {
       String name = entry.getKey();

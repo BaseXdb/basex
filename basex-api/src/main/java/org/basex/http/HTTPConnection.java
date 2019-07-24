@@ -66,7 +66,7 @@ public final class HTTPConnection implements ClientInfo {
     this.res = res;
     this.servlet = servlet;
 
-    context = new Context(HTTPContext.context(), this);
+    context = new Context(HTTPContext.get().context(), this);
     method = req.getMethod();
     params = new HTTPParams(req);
 
@@ -274,16 +274,7 @@ public final class HTTPConnection implements ClientInfo {
         value = session.getAttribute(dba ? HTTPText.DBA_CLIENT_ID : HTTPText.CLIENT_ID);
       }
     }
-
-    final byte[] token = HTTPContext.token(value);
-    if(token != null) return Token.string(token);
-
-    // check for authenticated user
-    final User user = context.user();
-    if(user != null) return user.name();
-
-    // user is unknown
-    return null;
+    return clientName(value, context);
   }
 
   /**
