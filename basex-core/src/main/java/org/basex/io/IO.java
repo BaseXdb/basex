@@ -43,8 +43,6 @@ public abstract class IO {
   public static final String JSONSUFFIX = ".json";
   /** JAR file suffix. */
   public static final String JARSUFFIX = ".jar";
-  /** JS file suffix. */
-  public static final String JSSUFFIX = ".js";
   /** TGZIP file suffix. */
   public static final String TARGZSUFFIX = ".tar.gz";
   /** TGZIP file suffix. */
@@ -78,6 +76,8 @@ public abstract class IO {
   public static final String[] HTMLSUFFIXES = { ".html", ".htm" };
   /** Text suffixes. */
   public static final String[] TXTSUFFIXES = { ".txt", ".text", ".ini", ".conf", ".md", ".log" };
+  /** JS file suffixes. */
+  public static final String[] JSSUFFIXES = { ".js", ".ts" };
 
   /** Disk block/page size (4096). */
   public static final int BLOCKSIZE = 1 << 12;
