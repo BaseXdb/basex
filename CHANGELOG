@@ -1,3 +1,8 @@
+VERSION 9.2.4 (July 26, 2019) ------------------------------------------
+
+ - Minor bug fixes
+ - Preview implementations of new 9.3 features
+
 VERSION 9.2.3 (July 5, 2019) -------------------------------------------
 
  - Numerous query optimization tweaks (paths, simple maps, try/catch)
