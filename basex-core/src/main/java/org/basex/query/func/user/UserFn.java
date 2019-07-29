@@ -150,8 +150,8 @@ abstract class UserFn extends StandardFunc {
   private User checkInactive(final User user, final QueryContext qc) throws QueryException {
     if(user != null) {
       final String name = user.name();
-      for(final ClientListener s : qc.context.sessions) {
-        if(s.context().user().name().equals(name)) throw USER_LOGGEDIN_X.get(info, name);
+      for(final ClientListener cl : qc.context.sessions) {
+        if(cl.context().user().name().equals(name)) throw USER_LOGGEDIN_X.get(info, name);
       }
     }
     return user;

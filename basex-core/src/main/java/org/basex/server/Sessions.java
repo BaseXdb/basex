@@ -23,8 +23,8 @@ public final class Sessions extends CopyOnWriteArrayList<ClientListener> {
     tb.addExt(SESSIONS_X, size()).add(size() == 0 ? DOT : COL);
 
     final StringList sl = new StringList();
-    for(final ClientListener sp : this) {
-      sl.add(sp.context().user().name() + ' ' + sp);
+    for(final ClientListener cl : this) {
+      sl.add(cl.context().user().name() + ' ' + cl);
     }
     for(final String sp : sl.sort()) tb.add(NL).add(LI).add(sp);
     return tb.toString();
@@ -34,6 +34,8 @@ public final class Sessions extends CopyOnWriteArrayList<ClientListener> {
    * Closes all sessions.
    */
   public synchronized void close() {
-    while(!isEmpty()) get(size() - 1).close();
+    while(!isEmpty()) {
+      get(size() - 1).close();
+    }
   }
 }

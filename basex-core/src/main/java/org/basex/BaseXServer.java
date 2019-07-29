@@ -144,8 +144,8 @@ public final class BaseXServer extends CLI implements Runnable {
           final long ka = context.soptions.get(StaticOptions.KEEPALIVE) * 1000L;
           if(ka > 0) {
             final long ms = System.currentTimeMillis();
-            for(final ClientListener cs : context.sessions) {
-              if(ms - cs.last > ka) cs.close();
+            for(final ClientListener cl : context.sessions) {
+              if(ms - cl.last > ka) cl.close();
             }
           }
           // create client listener, stop authentication after timeout

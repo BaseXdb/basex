@@ -47,8 +47,8 @@ public final class DropUser extends AUser {
     final User user = users.get(name);
     if(user != null) {
       if(pattern.isEmpty()) {
-        for(final ClientListener s : context.sessions) {
-          if(s.context().user().name().equals(name)) return !info(USER_LOGGED_IN_X, name);
+        for(final ClientListener cl : context.sessions) {
+          if(cl.context().user().name().equals(name)) return !info(USER_LOGGED_IN_X, name);
         }
         users.drop(user);
       } else {
