@@ -44,11 +44,10 @@ public final class DbReplace extends DbNew {
     } else {
       if(disk && bin.exists()) updates.add(new DBDelete(data, path, info), qc);
       final NewInput input = checkInput(item, token(path));
-      if(docs.isEmpty()) {
-        updates.add(new DBAdd(data, input, opts, true, qc, info), qc);
-      } else {
-        updates.add(new ReplaceDoc(docs.get(d++), data, input, opts, qc, info), qc);
-      }
+      final Update update = docs.isEmpty() ?
+        new DBAdd(data, input, opts, true, qc, info) :
+        new ReplaceDoc(docs.get(d++), data, input, opts, qc, info);
+      updates.add(update, qc);
     }
 
     // delete old documents

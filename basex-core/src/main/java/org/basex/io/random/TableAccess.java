@@ -49,67 +49,67 @@ public abstract class TableAccess {
 
   /**
    * Reads a byte value and returns it as an integer value.
-   * @param p pre value
-   * @param o offset
+   * @param pre pre value
+   * @param offset offset
    * @return integer value
    */
-  public abstract int read1(int p, int o);
+  public abstract int read1(int pre, int offset);
 
   /**
    * Reads a short value and returns it as an integer value.
-   * @param p pre value
-   * @param o offset
+   * @param pre pre value
+   * @param offset offset
    * @return integer value
    */
-  public abstract int read2(int p, int o);
+  public abstract int read2(int pre, int offset);
 
   /**
    * Reads an integer value.
-   * @param p pre value
-   * @param o offset
+   * @param pre pre value
+   * @param offset offset
    * @return integer value
    */
-  public abstract int read4(int p, int o);
+  public abstract int read4(int pre, int offset);
 
   /**
    * Reads a 5-byte value and returns it as a long value.
-   * @param p pre value
-   * @param o offset
+   * @param pre pre value
+   * @param offset offset
    * @return integer value
    */
-  public abstract long read5(int p, int o);
+  public abstract long read5(int pre, int offset);
 
   /**
    * Writes a byte value to the specified position.
-   * @param p pre value
-   * @param o offset
-   * @param v value to be written
+   * @param pre pre value
+   * @param offset offset
+   * @param value value to be written
    */
-  public abstract void write1(int p, int o, int v);
+  public abstract void write1(int pre, int offset, int value);
 
   /**
    * Writes a short value to the specified position.
-   * @param p pre value
-   * @param o offset
-   * @param v value to be written
+   * @param pre pre value
+   * @param offset offset
+   * @param value value to be written
    */
-  public abstract void write2(int p, int o, int v);
+  public abstract void write2(int pre, int offset, int value);
 
   /**
    * Writes an integer value to the specified position.
-   * @param p pre value
-   * @param o offset
-   * @param v value to be written
+   * @param pre pre value
+   * @param offset offset
+   * @param value value to be written
    */
-  public abstract void write4(int p, int o, int v);
+  public abstract void write4(int pre, int offset, int value);
 
   /**
    * Writes a 5-byte value to the specified position.
-   * @param p pre value
-   * @param o offset
-   * @param v value to be written
+   * @param pre pre value
+   * @param offset offset
+   * @param value value to be written
    */
-  public abstract void write5(int p, int o, long v);
+  public abstract void write5(int pre, int offset, long value);
 
   /**
    * Replaces entries in the database.

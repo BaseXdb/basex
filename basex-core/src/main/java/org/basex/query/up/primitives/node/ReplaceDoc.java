@@ -34,7 +34,6 @@ public final class ReplaceDoc extends NodeUpdate {
       final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.REPLACENODE, pre, data, info);
-
     final DBOptions options = new DBOptions(opts, DBOptions.PARSING, info);
     newDocs = new DBNew(qc, options, info, input);
   }

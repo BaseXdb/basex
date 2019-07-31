@@ -38,55 +38,59 @@ public final class TableMemAccess extends TableAccess {
   public boolean lock(final boolean lock) { return true; }
 
   @Override
-  public int read1(final int p, final int o) {
-    return (int) ((o < 8 ? buf1 : buf2)[p] >> ((o < 8 ? 7 : 15) - o << 3) & 0xFF);
+  public int read1(final int pre, final int offset) {
+    return (int) ((offset < 8 ? buf1 : buf2)[pre] >>
+      ((offset < 8 ? 7 : 15) - offset << 3) & 0xFF);
   }
 
   @Override
-  public int read2(final int p, final int o) {
-    return (int) ((o < 8 ? buf1 : buf2)[p] >> ((o < 8 ? 6 : 14) - o << 3) & 0xFFFF);
+  public int read2(final int pre, final int offset) {
+    return (int) ((offset < 8 ? buf1 : buf2)[pre] >>
+      ((offset < 8 ? 6 : 14) - offset << 3) & 0xFFFF);
   }
 
   @Override
-  public int read4(final int p, final int o) {
-    return (int) ((o < 8 ? buf1 : buf2)[p] >> ((o < 8 ? 4 : 12) - o << 3));
+  public int read4(final int pre, final int offset) {
+    return (int) ((offset < 8 ? buf1 : buf2)[pre] >>
+      ((offset < 8 ? 4 : 12) - offset << 3));
   }
 
   @Override
-  public long read5(final int p, final int o) {
-    return (o < 8 ? buf1 : buf2)[p] >> ((o < 8 ? 3 : 11) - o << 3) & 0xFFFFFFFFFFL;
+  public long read5(final int pre, final int offset) {
+    return (offset < 8 ? buf1 : buf2)[pre] >>
+      ((offset < 8 ? 3 : 11) - offset << 3) & 0xFFFFFFFFFFL;
   }
 
   @Override
-  public void write1(final int p, final int o, final int v) {
+  public void write1(final int pre, final int offset, final int value) {
     dirty();
-    final long[] buf = o < 8 ? buf1 : buf2;
-    final long d = (o < 8 ? 7 : 15) - o << 3;
-    buf[p] = buf[p] & ~(0xFFL << d) | (long) v << d;
+    final long[] buf = offset < 8 ? buf1 : buf2;
+    final long d = (offset < 8 ? 7 : 15) - offset << 3;
+    buf[pre] = buf[pre] & ~(0xFFL << d) | (long) value << d;
   }
 
   @Override
-  public void write2(final int p, final int o, final int v) {
+  public void write2(final int pre, final int offset, final int value) {
     dirty();
-    final long[] buf = o < 8 ? buf1 : buf2;
-    final long d = (o < 8 ? 6 : 14) - o << 3;
-    buf[p] = buf[p] & ~(0xFFFFL << d) | (long) v << d;
+    final long[] buf = offset < 8 ? buf1 : buf2;
+    final long d = (offset < 8 ? 6 : 14) - offset << 3;
+    buf[pre] = buf[pre] & ~(0xFFFFL << d) | (long) value << d;
   }
 
   @Override
-  public void write4(final int p, final int o, final int v) {
+  public void write4(final int pre, final int offset, final int value) {
     dirty();
-    final long[] buf = o < 8 ? buf1 : buf2;
-    final long d = (o < 8 ? 4 : 12) - o << 3;
-    buf[p] = buf[p] & ~(0xFFFFFFFFL << d) | (long) v << d;
+    final long[] buf = offset < 8 ? buf1 : buf2;
+    final long d = (offset < 8 ? 4 : 12) - offset << 3;
+    buf[pre] = buf[pre] & ~(0xFFFFFFFFL << d) | (long) value << d;
   }
 
   @Override
-  public void write5(final int p, final int o, final long v) {
+  public void write5(final int pre, final int offset, final long value) {
     dirty();
-    final long[] buf = o < 8 ? buf1 : buf2;
-    final long d = (o < 8 ? 3 : 11) - o << 3;
-    buf[p] = buf[p] & ~(0xFFFFFFFFFFL << d) | v << d;
+    final long[] buf = offset < 8 ? buf1 : buf2;
+    final long d = (offset < 8 ? 3 : 11) - offset << 3;
+    buf[pre] = buf[pre] & ~(0xFFFFFFFFFFL << d) | value << d;
   }
 
   @Override
@@ -120,32 +124,32 @@ public final class TableMemAccess extends TableAccess {
 
   /**
    * Moves data inside the value arrays.
-   * @param op source position
-   * @param np destination position
+   * @param source source position
+   * @param target target position
    */
-  private void move(final int op, final int np) {
+  private void move(final int source, final int target) {
     dirty();
-    final int l = meta.size - op;
-    while(l + np >= buf1.length) {
+    final int l = meta.size - source;
+    while(l + target >= buf1.length) {
       final int s = Array.newSize(buf1.length);
       buf1 = Arrays.copyOf(buf1, s);
       buf2 = Arrays.copyOf(buf2, s);
     }
-    Array.copy(buf1, op, l, buf1, np);
-    Array.copy(buf2, op, l, buf2, np);
-    meta.size += np - op;
+    Array.copy(buf1, source, l, buf1, target);
+    Array.copy(buf2, source, l, buf2, target);
+    meta.size += target - source;
   }
 
   /**
    * Returns a long value from the specified array.
-   * @param v array input
-   * @param i index
+   * @param entry array input
+   * @param index index
    * @return long value
    */
-  private static long getLong(final byte[] v, final int i) {
-    return (v[i] & 0xFFL) << 56 | (v[i + 1] & 0xFFL) << 48 |
-       (v[i + 2] & 0xFFL) << 40 | (v[i + 3] & 0xFFL) << 32 |
-       (v[i + 4] & 0xFFL) << 24 | (v[i + 5] & 0xFFL) << 16 |
-       (v[i + 6] & 0xFFL) <<  8 | v[i + 7] & 0xFFL;
+  private static long getLong(final byte[] entry, final int index) {
+    return (entry[index] & 0xFFL) << 56 | (entry[index + 1] & 0xFFL) << 48 |
+       (entry[index + 2] & 0xFFL) << 40 | (entry[index + 3] & 0xFFL) << 32 |
+       (entry[index + 4] & 0xFFL) << 24 | (entry[index + 5] & 0xFFL) << 16 |
+       (entry[index + 6] & 0xFFL) <<  8 | entry[index + 7] & 0xFFL;
   }
 }
