@@ -24,6 +24,6 @@ public final class RequestCookie extends RequestFn {
         if(c.getName().equals(name)) return Str.get(c.getValue());
       }
     }
-    return exprs.length == 1 ? Empty.VALUE : exprs[1].value(qc);
+    return exprs.length == 1 ? Empty.VALUE : Str.get(toToken(exprs[1], qc));
   }
 }

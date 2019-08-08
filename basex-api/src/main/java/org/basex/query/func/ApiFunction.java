@@ -134,12 +134,12 @@ public enum ApiFunction implements AFunction {
   _REQUEST_CONTEXT_PATH(RequestContextPath.class, "context-path()", arg(), STR_O, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_COOKIE(RequestCookie.class, "cookie(name[,default])",
-      arg(STR_O, STR_O), STR_O, REQUEST_URI),
+      arg(STR_O, STR_O), STR_ZO, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_COOKIE_NAMES(RequestCookieNames.class, "cookie-names()", arg(), STR_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_HEADER(RequestHeader.class, "header(name[,default])",
-      arg(STR_O, STR_O), STR_O, REQUEST_URI),
+      arg(STR_O, STR_O), STR_ZO, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_HEADER_NAMES(RequestHeaderNames.class, "header-names()", arg(), STR_ZM, REQUEST_URI),
   /** XQuery function. */
@@ -157,7 +157,7 @@ public enum ApiFunction implements AFunction {
   /** XQuery function. */
   _REQUEST_PORT(RequestPort.class, "port()", arg(), ITR_O, REQUEST_URI),
   /** XQuery function. */
-  _REQUEST_QUERY(RequestQuery.class, "query()", arg(), STR_O, REQUEST_URI),
+  _REQUEST_QUERY(RequestQuery.class, "query()", arg(), STR_ZO, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_REMOTE_ADDRESS(RequestRemoteAddress.class,
       "remote-address()", arg(), STR_O, REQUEST_URI),

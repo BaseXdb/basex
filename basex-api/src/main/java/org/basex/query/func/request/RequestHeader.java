@@ -17,6 +17,8 @@ public final class RequestHeader extends RequestFn {
   public Value value(final QueryContext qc) throws QueryException {
     final String name = Token.string(toToken(exprs[0], qc));
     final String value = request(qc).getHeader(name);
-    return value != null ? Str.get(value) : exprs.length == 1 ? Empty.VALUE : exprs[1].value(qc);
+    if(value != null) return Str.get(value);
+
+    return exprs.length == 1 ? Empty.VALUE : Str.get(toToken(exprs[1], qc));
   }
 }
