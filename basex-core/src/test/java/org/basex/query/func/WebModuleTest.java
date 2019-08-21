@@ -38,6 +38,31 @@ public final class WebModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void decodeUrl() {
+    final Function func = _WEB_DECODE_URL;
+    query(func.args("a+-._*"), "a -._*");
+    query("let $s := codepoints-to-string((9, 10, 13, 32 to 55295, 57344 to 65533, 65536)) " +
+        "return $s = web:decode-url(web:encode-url($s))", true);
+
+    error(func.args("%1"), WEB_INVALID2_X);
+    error(func.args("%1F"), WEB_INVALID1_X);
+    error(func.args("%D8%00"), WEB_INVALID1_X);
+  }
+
+  /** Test method. */
+  @Test public void encodeUrl() {
+    final Function func = _WEB_ENCODE_URL;
+    query(func.args("a&#xd; *-._"), "a%0D+*-._");
+  }
+
+  /** Test method. */
+  @Test public void error() {
+    final Function func = _WEB_ERROR;
+    query("try { " + func.args(400, "x") + " } catch rest:error { 'x' }", "x");
+    error(func.args(-1, "x"), WEB_STATUS_X);
+  }
+
+  /** Test method. */
   @Test public void redirect() {
     final Function func = _WEB_REDIRECT;
     query(func.args("a/b") + "/*:response/*:header/@value = 'a/b'", true);
@@ -79,23 +104,5 @@ public final class WebModuleTest extends SandboxTest {
     // GH1585
     query("count((" + func.args() + " update {})/http:response)", 1);
     query("count((" + func.args() + " update {})/output:*)", 1);
-  }
-
-  /** Test method. */
-  @Test public void encodeUrl() {
-    final Function func = _WEB_ENCODE_URL;
-    query(func.args("a&#xd; *-._"), "a%0D+*-._");
-  }
-
-  /** Test method. */
-  @Test public void decodeUrl() {
-    final Function func = _WEB_DECODE_URL;
-    query(func.args("a+-._*"), "a -._*");
-    query("let $s := codepoints-to-string((9, 10, 13, 32 to 55295, 57344 to 65533, 65536)) " +
-        "return $s = web:decode-url(web:encode-url($s))", true);
-
-    error(func.args("%1"), WEB_INVALID2_X);
-    error(func.args("%1F"), WEB_INVALID1_X);
-    error(func.args("%D8%00"), WEB_INVALID1_X);
   }
 }

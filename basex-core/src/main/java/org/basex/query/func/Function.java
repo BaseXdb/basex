@@ -154,7 +154,7 @@ public enum Function implements AFunction {
   ENVIRONMENT_VARIABLE(FnEnvironmentVariable.class, "environment-variable(string)",
       arg(STR_O), STR_ZO),
   /** XQuery function. */
-  ERROR(FnError.class, "error([code[,desc[,object]]])",
+  ERROR(FnError.class, "error([code[,description[,object]]])",
       arg(QNM_ZO, STR_O, ITEM_ZM), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
   ESCAPE_HTML_URI(FnEscapeHtmlUri.class, "escape-html-uri(string)", arg(STR_ZO), STR_O),
@@ -1379,6 +1379,9 @@ public enum Function implements AFunction {
   _WEB_DECODE_URL(WebDecodeUrl.class, "decode-url(string)", arg(STR_O), STR_O, WEB_URI),
   /** XQuery function. */
   _WEB_ENCODE_URL(WebEncodeUrl.class, "encode-url(string)", arg(STR_O), STR_O, WEB_URI),
+  /** XQuery function. */
+  _WEB_ERROR(WebError.class, "error(code[,message])",
+      arg(ITR_O, STR_O), ITEM_ZM, flag(NDT), WEB_URI),
   /** XQuery function. */
   _WEB_REDIRECT(WebRedirect.class, "redirect(location[,params[,anchor]])",
       arg(STR_O, MAP_O, STR_O), ELM_O, WEB_URI),

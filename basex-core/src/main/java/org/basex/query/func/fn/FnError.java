@@ -24,14 +24,22 @@ public final class FnError extends StandardFunc {
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        throw error(qc);
+        return item(qc, info);
       }
     };
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    throw error(qc);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final int al = exprs.length;
+    if(al == 0) throw FUNERR1.get(info);
+
+    QNm name = toQNm(exprs[0], qc, true);
+    if(name == null) name = FUNERR1.qname();
+
+    final String msg = al > 1 ? Token.string(toToken(exprs[1], qc)) : FUNERR1.desc;
+    final Value value = al > 2 ? exprs[2].value(qc) : null;
+    throw new QueryException(info, name, msg).value(value);
   }
 
   @Override
@@ -58,23 +66,5 @@ public final class FnError extends StandardFunc {
     final StandardFunc sf = ERROR.get(sc, ex.info(), ex.qname(), msg);
     sf.exprType.assign(st);
     return sf;
-  }
-
-  /**
-   * Raises an error.
-   * @param qc query context
-   * @return query exception
-   * @throws QueryException query exception
-   */
-  public QueryException error(final QueryContext qc) throws QueryException {
-    final int al = exprs.length;
-    if(al == 0) return FUNERR1.get(info);
-
-    QNm name = toQNm(exprs[0], qc, true);
-    if(name == null) name = FUNERR1.qname();
-
-    final String msg = al > 1 ? Token.string(toToken(exprs[1], qc)) : FUNERR1.desc;
-    final Value value = al > 2 ? exprs[2].value(qc) : null;
-    return new QueryException(info, name, msg).value(value);
   }
 }

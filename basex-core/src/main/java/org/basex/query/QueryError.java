@@ -502,6 +502,8 @@ public enum QueryError {
   WEB_INVALID1_X(WEB, "invalid", "URL contains invalid characters: %"),
   /** Error code. */
   WEB_INVALID2_X(WEB, "invalid", "%."),
+  /** Error code. */
+  WEB_STATUS_X(WEB, "status", "Invalid status code: %"),
 
   // WebSocket Module
 

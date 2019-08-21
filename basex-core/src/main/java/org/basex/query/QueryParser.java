@@ -409,7 +409,8 @@ public class QueryParser extends InputParser {
           do {
             final Expr ex = literal();
             if(!(ex instanceof Item)) {
-              throw Function.ERROR.is(ex) ? ((FnError) ex).error(qc) : error(ANNVALUE);
+              if(Function.ERROR.is(ex)) ((FnError) ex).item(qc, ii);
+              throw error(ANNVALUE);
             }
             items.add((Item) ex);
           } while(wsConsumeWs(COMMA));
