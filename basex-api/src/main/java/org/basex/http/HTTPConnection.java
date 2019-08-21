@@ -420,7 +420,7 @@ public final class HTTPConnection implements ClientInfo {
     try {
       res.resetBuffer();
       res.setStatus(code);
-      res.setContentType(MediaType.TEXT_PLAIN.toString());
+      res.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
       // client directive: do not cache result (HTTP 1.1, old clients)
       res.setHeader(CACHE_CONTROL, "no-cache, no-store, must-revalidate");
       res.setHeader(PRAGMA, "no-cache");
@@ -464,7 +464,7 @@ public final class HTTPConnection implements ClientInfo {
       }
 
       if(info != null) {
-        res.setContentType(MediaType.TEXT_PLAIN.toString());
+        res.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
         res.getOutputStream().write(new TokenBuilder(token(info)).normalize().finish());
       }
     } catch(final IllegalStateException | IllegalArgumentException ex) {
