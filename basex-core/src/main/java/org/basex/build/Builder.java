@@ -199,13 +199,6 @@ public abstract class Builder extends Job {
   public abstract Data build() throws IOException;
 
   /**
-   * Returns a data clip with the parsed input.
-   * @return data data clip
-   * @throws IOException I/O exception
-   */
-  public abstract DataClip dataClip() throws IOException;
-
-  /**
    * Adds a document node to the database.
    * @param value name of the document
    * @throws IOException I/O exception

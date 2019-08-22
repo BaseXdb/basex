@@ -103,11 +103,6 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  public DataClip dataClip() throws IOException {
-    return new DataClip(build());
-  }
-
-  @Override
   protected void addDoc(final byte[] value) throws IOException {
     tout.write1(Data.DOC);
     tout.write2(0);

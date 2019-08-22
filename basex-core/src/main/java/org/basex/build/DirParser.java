@@ -86,7 +86,7 @@ public final class DirParser extends Parser {
    * Constructor.
    * @param source source path
    * @param options main options
-   * @param dbpath future database path (required for binary resources)
+   * @param dbpath future database path (required for binary resources; can be {@code null})
    */
   public DirParser(final IO source, final MainOptions options, final IOFile dbpath) {
     this(source, options);

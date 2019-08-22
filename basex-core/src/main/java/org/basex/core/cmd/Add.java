@@ -119,7 +119,7 @@ public final class Add extends ACreate {
       } else {
         build = new MemBuilder(name, parser);
       }
-      clip = build.dataClip();
+      clip = new DataClip(build.build());
       return true;
     } catch(final IOException ex) {
       return error(Util.message(ex));

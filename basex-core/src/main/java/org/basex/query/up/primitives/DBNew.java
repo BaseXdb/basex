@@ -11,7 +11,6 @@ import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -81,16 +80,17 @@ public final class DBNew {
     final StaticOptions sopts = ctx.soptions;
     final boolean cache = cache();
     try {
-      data = cache ? CreateDB.create(sopts.randomDbName(name),
-          Parser.emptyParser(mopts), ctx, mopts) : new MemData(mopts);
+      final String dbname = cache ? sopts.randomDbName(name) : name;
+      data = cache ? CreateDB.create(dbname, Parser.emptyParser(mopts), ctx, mopts) :
+        new MemData(mopts);
       data.startUpdate(mopts);
       final long is = inputs.size();
       for(int i = 0; i < is; i++) {
-        final DataClip clip = data(name, i);
+        final Data tmp = tmpData(dbname, i);
         try {
-          data.insert(data.meta.size, -1, clip);
+          data.insert(data.meta.size, -1, new DataClip(tmp));
         } finally {
-          DropDB.drop(clip.data, sopts);
+          DropDB.drop(tmp, sopts);
         }
       }
       data.finishUpdate(mopts);
@@ -112,20 +112,20 @@ public final class DBNew {
    */
   private boolean cache() {
     for(final DBOptions dbopts : dboptions) {
-      final Object obj = dbopts.get(MainOptions.ADDCACHE);
-      if(obj instanceof Boolean && (Boolean) obj) return true;
+      final Object cache = dbopts.get(MainOptions.ADDCACHE);
+      if(cache instanceof Boolean && (Boolean) cache) return true;
     }
     return false;
   }
 
   /**
-   * Creates a {@link DataClip} instance for the specified document.
+   * Creates a temporary database instance with the contents of the specified input.
    * @param name name of database
    * @param i index of current input
-   * @return database clip
+   * @return database
    * @throws IOException I/O exception
    */
-  private DataClip data(final String name, final int i) throws IOException {
+  private Data tmpData(final String name, final int i) throws IOException {
     // free memory: clear list entries after retrieval
     final NewInput input = inputs.get(i);
     final MainOptions mopts = dboptions.get(i).assignTo(new MainOptions(qc.context.options, true));
@@ -138,15 +138,15 @@ public final class DBNew {
       if(node.type != NodeType.DOC) node = new FDoc(name).add(node);
       final MemData mdata = (MemData) node.copy(mopts, qc).data();
       mdata.update(0, Data.DOC, token(input.path));
-      return new DataClip(mdata);
+      return mdata;
     }
 
     // create data instance for file input
     final StaticOptions sopts = qc.context.soptions;
-    final String dbpath = sopts.randomDbName(name);
-    final Parser parser = new DirParser(input.io, mopts, new IOFile(dbpath)).target(input.path);
+    final String tmpName = sopts.randomDbName(name);
+    final Parser parser = new DirParser(input.io, mopts, sopts.dbPath(name)).target(input.path);
     return (mopts.get(MainOptions.ADDCACHE) ?
-      new DiskBuilder(dbpath, parser, sopts, mopts) :
-      new MemBuilder(name, parser)).dataClip();
+      new DiskBuilder(tmpName, parser, sopts, mopts) :
+      new MemBuilder(name, parser)).build();
   }
 }

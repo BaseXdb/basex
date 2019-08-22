@@ -61,12 +61,6 @@ public final class MemBuilder extends Builder {
 
   @Override
   public MemData build() throws IOException {
-    dataClip();
-    return data;
-  }
-
-  @Override
-  public DataClip dataClip() throws IOException {
     init();
     meta.assign(parser);
     try {
@@ -74,7 +68,7 @@ public final class MemBuilder extends Builder {
     } finally {
       if(data.meta.updindex) data.idmap.finish(data.meta.lastid);
     }
-    return new DataClip(data);
+    return data;
   }
 
   /**

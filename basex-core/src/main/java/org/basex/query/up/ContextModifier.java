@@ -129,7 +129,9 @@ abstract class ContextModifier {
     }
 
     // apply remaining updates based on database names
-    for(final NameUpdates up : nameUpdates.values()) up.apply(false);
+    for(final NameUpdates up : nameUpdates.values()) {
+      up.apply(false);
+    }
   }
 
   /**

@@ -54,7 +54,7 @@ public final class DropDB extends ACreate {
   }
 
   /**
-   * Deletes the specified database.
+   * Deletes the specified database. Calls for main-memory database instances are ignored.
    * @param data data reference
    * @param sopts static options
    * @return success flag
