@@ -88,10 +88,11 @@ public final class Replace extends ACreate {
         add.init(context, out);
         if(!add.build()) return error(add.info());
 
+        final DataClip clip = new DataClip(add.tmpData);
         if(docs.isEmpty()) {
-          auc.addInsert(data.meta.size, -1, add.clip);
+          auc.addInsert(data.meta.size, -1, clip);
         } else {
-          auc.addReplace(docs.get(d++), add.clip);
+          auc.addReplace(docs.get(d++), clip);
         }
         context.invalidate();
       } finally {

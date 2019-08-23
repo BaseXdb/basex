@@ -135,18 +135,18 @@ public final class ArrayBuilderTest extends ArrayTest {
     final XQArray a = fromInts(0, 1, 2, 3, 4);
     final XQArray b = fromInts(5);
 
-    final ArrayBuilder ab = new ArrayBuilder();
+    ArrayBuilder ab = new ArrayBuilder();
     for(int i = 0; i < 39; i++) ab.append(Int.get(i));
     XQArray c = ab.freeze();
     for(int i = 0; i < 6; i++) c = c.tail();
 
-    final ArrayBuilder build = new ArrayBuilder();
-    build.append(a);
-    build.freeze().checkInvariants();
-    build.append(b);
-    build.freeze().checkInvariants();
-    build.append(c);
-    build.freeze().checkInvariants();
+    ab = new ArrayBuilder();
+    ab.append(a);
+    ab.freeze().checkInvariants();
+    ab.append(b);
+    ab.freeze().checkInvariants();
+    ab.append(c);
+    ab.freeze().checkInvariants();
   }
 
   /** Test for {@link ArrayBuilder#append(XQArray)}. */

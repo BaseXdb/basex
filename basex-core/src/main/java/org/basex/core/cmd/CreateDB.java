@@ -96,7 +96,8 @@ public final class CreateDB extends ACreate {
         if(context.pinned(name)) return error(DB_PINNED_X, name);
 
         // create disk-based instance
-        final DiskBuilder builder = pushJob(new DiskBuilder(name, parser, soptions, options));
+        final DiskBuilder builder = new DiskBuilder(name, parser, soptions, options);
+        pushJob(builder);
         try {
           builder.build().close();
         } finally {

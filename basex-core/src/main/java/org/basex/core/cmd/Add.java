@@ -24,10 +24,10 @@ import org.basex.util.*;
  */
 public final class Add extends ACreate {
   /** Builder. */
-  private Builder build;
+  private Builder builder;
 
-  /** Data clip to insert. */
-  DataClip clip;
+  /** Data to insert. */
+  Data tmpData;
 
   /**
    * Constructor, specifying a target path.
@@ -57,10 +57,10 @@ public final class Add extends ACreate {
         @Override
         boolean run() {
           // skip update if fragment is empty
-          if(clip.data.meta.size > 1) {
+          if(tmpData.meta.size > 1) {
             context.invalidate();
             final AtomicUpdateCache auc = new AtomicUpdateCache(data);
-            auc.addInsert(data.meta.size, -1, clip);
+            auc.addInsert(data.meta.size, -1, new DataClip(tmpData));
             auc.execute(false);
           }
           return info(RES_ADDED_X, jc().performance);
@@ -110,16 +110,15 @@ public final class Add extends ACreate {
 
     try {
       final Data data = context.data();
-      final Parser parser = new DirParser(source, options, data.meta.path);
-      parser.target(target);
+      final Parser parser = new DirParser(source, options, data.meta.path).target(target);
 
       // create random database name for disk-based creation
       if(cache(parser)) {
-        build = new DiskBuilder(soptions.randomDbName(data.meta.name), parser, soptions, options);
+        builder = new DiskBuilder(soptions.randomDbName(data.meta.name), parser, soptions, options);
       } else {
-        build = new MemBuilder(name, parser);
+        builder = new MemBuilder(name, parser);
       }
-      clip = new DataClip(build.build());
+      tmpData = builder.build();
       return true;
     } catch(final IOException ex) {
       return error(Util.message(ex));
@@ -130,7 +129,10 @@ public final class Add extends ACreate {
    * Finalizes an add operation.
    */
   void finish() {
-    if(clip != null) DropDB.drop(clip.data, soptions);
+    if(tmpData != null) {
+      DropDB.drop(tmpData, soptions);
+      tmpData = null;
+    }
   }
 
   /**
@@ -175,6 +177,6 @@ public final class Add extends ACreate {
 
   @Override
   public double progressInfo() {
-    return build != null ? build.progressInfo() : 0;
+    return builder != null ? builder.progressInfo() : 0;
   }
 }

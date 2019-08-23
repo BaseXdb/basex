@@ -84,26 +84,32 @@ public final class DBNew {
       data = cache ? CreateDB.create(dbname, Parser.emptyParser(mopts), ctx, mopts) :
         new MemData(mopts);
       data.startUpdate(mopts);
-      final long is = inputs.size();
-      for(int i = 0; i < is; i++) {
-        final Data tmp = tmpData(dbname, i);
-        try {
-          data.insert(data.meta.size, -1, new DataClip(tmp));
-        } finally {
-          DropDB.drop(tmp, sopts);
+      try {
+        final long is = inputs.size();
+        for(int i = 0; i < is; i++) {
+          final Data tmpData = tmpData(dbname, i);
+          try {
+            data.insert(data.meta.size, -1, new DataClip(tmpData));
+          } finally {
+            DropDB.drop(tmpData, sopts);
+          }
         }
+      } finally {
+        data.finishUpdate(mopts);
       }
-      data.finishUpdate(mopts);
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);
     }
   }
 
   /**
-   * Drops a temporary database instance (on disk or in main-memory).
+   * Drops the temporary database instance.
    */
   public void finish() {
-    if(data != null) DropDB.drop(data, qc.context.soptions);
+    if(data != null) {
+      DropDB.drop(data, qc.context.soptions);
+      data = null;
+    }
   }
 
   /**
@@ -141,12 +147,16 @@ public final class DBNew {
       return mdata;
     }
 
-    // create data instance for file input
     final StaticOptions sopts = qc.context.soptions;
-    final String tmpName = sopts.randomDbName(name);
     final Parser parser = new DirParser(input.io, mopts, sopts.dbPath(name)).target(input.path);
-    return (mopts.get(MainOptions.ADDCACHE) ?
-      new DiskBuilder(tmpName, parser, sopts, mopts) :
-      new MemBuilder(name, parser)).build();
+
+    final Builder builder;
+
+    if(mopts.get(MainOptions.ADDCACHE)) {
+      builder = new DiskBuilder(sopts.randomDbName(name), parser, sopts, mopts);
+    } else {
+      builder = new MemBuilder(name, parser);
+    }
+    return builder.build();
   }
 }
