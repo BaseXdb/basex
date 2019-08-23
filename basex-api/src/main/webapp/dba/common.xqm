@@ -26,6 +26,7 @@ function dba:redirect(
  :)
 declare
   %rest:path("/dba/static/{$file=.+}")
+  %output:method("basex")
   %perm:allow("all")
 function dba:file(
   $file  as xs:string
