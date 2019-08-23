@@ -110,7 +110,7 @@ public final class Add extends ACreate {
 
     try {
       final Data data = context.data();
-      final Parser parser = new DirParser(source, options, data.meta.path).target(target);
+      final Parser parser = new DirParser(source, options).target(target);
 
       // create random database name for disk-based creation
       if(cache(parser)) {
@@ -118,7 +118,7 @@ public final class Add extends ACreate {
       } else {
         builder = new MemBuilder(name, parser);
       }
-      tmpData = builder.build();
+      tmpData = builder.binaryDir(data.meta.path).build();
       return true;
     } catch(final IOException ex) {
       return error(Util.message(ex));

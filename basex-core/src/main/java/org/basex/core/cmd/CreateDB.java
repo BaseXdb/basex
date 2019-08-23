@@ -74,7 +74,7 @@ public final class CreateDB extends ACreate {
       // create parser instance
       if(source != null) {
         if(!source.exists()) return error(RES_NOT_FOUND_X, source);
-        parser = new DirParser(source, options, soptions.dbPath(name));
+        parser = new DirParser(source, options);
       } else if(parser == null) {
         parser = Parser.emptyParser(options);
       }
@@ -99,7 +99,7 @@ public final class CreateDB extends ACreate {
         final DiskBuilder builder = new DiskBuilder(name, parser, soptions, options);
         pushJob(builder);
         try {
-          builder.build().close();
+          builder.binaryDir(soptions.dbPath(name)).build().close();
         } finally {
           popJob();
         }

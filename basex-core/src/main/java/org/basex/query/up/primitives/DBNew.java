@@ -148,15 +148,16 @@ public final class DBNew {
     }
 
     final StaticOptions sopts = qc.context.soptions;
-    final Parser parser = new DirParser(input.io, mopts, sopts.dbPath(name)).target(input.path);
+    final DirParser parser = new DirParser(input.io, mopts);
+    parser.target(input.path);
 
     final Builder builder;
-
-    if(mopts.get(MainOptions.ADDCACHE)) {
+    // create temporary database on disk if requested, or if binary data needs to be written
+    if(mopts.get(MainOptions.ADDCACHE) || parser.binary()) {
       builder = new DiskBuilder(sopts.randomDbName(name), parser, sopts, mopts);
     } else {
       builder = new MemBuilder(name, parser);
     }
-    return builder.build();
+    return builder.binaryDir(sopts.dbPath(name)).build();
   }
 }

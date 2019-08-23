@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class MetaData {
-  /** Database path. Set to {@code null} if database is in main memory. */
+  /** Database directory. Set to {@code null} if database is in main memory. */
   public final IOFile path;
 
   /** Database name. */
@@ -108,8 +108,8 @@ public final class MetaData {
    * Constructor for a main-memory database instance.
    * @param options database options
    */
-  MetaData(final MainOptions options) {
-    this("", options, null);
+  public MetaData(final MainOptions options) {
+    this("", null, options);
   }
 
   /**
@@ -119,8 +119,18 @@ public final class MetaData {
    * @param sopts static options
    */
   public MetaData(final String name, final MainOptions options, final StaticOptions sopts) {
+    this(name, sopts.dbPath(name), options);
+  }
+
+  /**
+   * Constructor.
+   * @param name name of the database
+   * @param path database path ({@code null} if database is in main memory)
+   * @param options database options
+   */
+  private MetaData(final String name, final IOFile path, final MainOptions options) {
     this.name = name;
-    path = sopts != null ? sopts.dbPath(name) : null;
+    this.path = path;
     createtext = options.get(MainOptions.TEXTINDEX);
     createattr = options.get(MainOptions.ATTRINDEX);
     createtoken = options.get(MainOptions.TOKENINDEX);

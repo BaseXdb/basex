@@ -9,7 +9,6 @@ import java.util.zip.*;
 
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
-import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -46,8 +45,6 @@ public final class DirParser extends Parser {
   private final boolean rawParser;
   /** Archive name. */
   private final boolean archiveName;
-  /** Database path for storing binary files. */
-  private IOFile rawPath;
 
   /** Last source. */
   private IO lastSrc;
@@ -83,14 +80,11 @@ public final class DirParser extends Parser {
   }
 
   /**
-   * Constructor.
-   * @param source source path
-   * @param options main options
-   * @param dbpath future database path (required for binary resources; can be {@code null})
+   * Indicates if binary data might be parsed.
+   * @return result of check
    */
-  public DirParser(final IO source, final MainOptions options, final IOFile dbpath) {
-    this(source, options);
-    if(dbpath != null && (addRaw || rawParser)) rawPath = new IOFile(dbpath, IO.RAW);
+  public boolean binary() {
+    return addRaw || rawParser;
   }
 
   @Override
@@ -192,9 +186,7 @@ public final class DirParser extends Parser {
 
     if(include ? rawParser : addRaw) {
       // store input in raw format if raw parser was chosen, or if file was included otherwise
-      if(rawPath != null) {
-        Store.store(source.inputSource(), new IOFile(rawPath, targ + name));
-      }
+      builder.binary(targ + name, source);
     } else if(include) {
       // store input as XML
       boolean ok = true;
