@@ -34,7 +34,7 @@ public final class StoreTest extends SandboxTest {
    */
   @Test public void replace() {
     execute(new CreateDB(NAME, "<X><A>q</A><A>q</A></X>"));
-    final long size = context.data().meta.dbfile(DataText.DATATXT).length();
+    final long size = context.data().meta.dbFile(DataText.DATATXT).length();
     for(int n = 0; n < NQUERIES; n++) {
       query("for $a in //text() return replace node $a with random:double()");
     }
@@ -46,7 +46,7 @@ public final class StoreTest extends SandboxTest {
    */
   @Test public void deleteInsertTwo() {
     execute(new CreateDB(NAME, "<X><A>q</A><A>q</A></X>"));
-    final long size = context.data().meta.dbfile(DataText.DATATXT).length();
+    final long size = context.data().meta.dbFile(DataText.DATATXT).length();
 
     for(int n = 0; n < NQUERIES; n++) {
       String qu = "for $a in //text() return delete node $a";
@@ -64,7 +64,7 @@ public final class StoreTest extends SandboxTest {
    */
   @Test public void deleteInsert() {
     execute(new CreateDB(NAME, "<X>abc</X>"));
-    final long size = context.data().meta.dbfile(DataText.DATATXT).length();
+    final long size = context.data().meta.dbFile(DataText.DATATXT).length();
 
     for(int i = 0; i < NQUERIES; i++) {
       query("delete node //text()");
@@ -103,6 +103,6 @@ public final class StoreTest extends SandboxTest {
    * @param old old size
    */
   private static void check(final long old) {
-    assertEquals(old, context.data().meta.dbfile(DataText.DATATXT).length());
+    assertEquals(old, context.data().meta.dbFile(DataText.DATATXT).length());
   }
 }

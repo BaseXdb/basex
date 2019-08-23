@@ -105,9 +105,9 @@ public final class FTBuilder extends IndexBuilder {
     if(!partial) return;
 
     // merges temporary index files
-    try(DataOutput outX = new DataOutput(data.meta.dbfile(DATAFTX + 'x'));
-        DataOutput outY = new DataOutput(data.meta.dbfile(DATAFTX + 'y'));
-        DataOutput outZ = new DataOutput(data.meta.dbfile(DATAFTX + 'z'))) {
+    try(DataOutput outX = new DataOutput(data.meta.dbFile(DATAFTX + 'x'));
+        DataOutput outY = new DataOutput(data.meta.dbFile(DATAFTX + 'y'));
+        DataOutput outZ = new DataOutput(data.meta.dbFile(DATAFTX + 'z'))) {
 
       final IntList ind = new IntList();
 
@@ -178,9 +178,9 @@ public final class FTBuilder extends IndexBuilder {
    */
   private void writeIndex(final boolean partial) throws IOException {
     final String name = DATAFTX + (partial ? splits : "");
-    try(DataOutput outX = new DataOutput(data.meta.dbfile(name + 'x'));
-        DataOutput outY = new DataOutput(data.meta.dbfile(name + 'y'));
-        DataOutput outZ = new DataOutput(data.meta.dbfile(name + 'z'))) {
+    try(DataOutput outX = new DataOutput(data.meta.dbFile(name + 'x'));
+        DataOutput outY = new DataOutput(data.meta.dbFile(name + 'y'));
+        DataOutput outZ = new DataOutput(data.meta.dbFile(name + 'z'))) {
 
       final IntList ind = new IntList();
       tree.init();

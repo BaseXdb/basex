@@ -77,11 +77,11 @@ public final class Restore extends ABackup {
     // drop target database
     DropDB.drop(db, sopts);
 
-    final IOFile dbpath = sopts.dbPath();
-    final Zip zip = new Zip(new IOFile(dbpath, backup + IO.ZIPSUFFIX));
+    final IOFile dbPath = sopts.dbPath();
+    final Zip zip = new Zip(new IOFile(dbPath, backup + IO.ZIPSUFFIX));
     try {
       if(cmd != null) cmd.pushJob(zip);
-      zip.unzip(dbpath);
+      zip.unzip(dbPath);
     } finally {
       if(cmd != null) cmd.popJob();
     }

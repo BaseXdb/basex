@@ -65,7 +65,7 @@ public final class DiskData extends Data {
   public DiskData(final MetaData meta) throws IOException {
     super(meta);
 
-    try(DataInput in = new DataInput(meta.dbfile(DATAINF))) {
+    try(DataInput in = new DataInput(meta.dbFile(DATAINF))) {
       meta.read(in);
       while(true) {
         final String k = string(in.readToken());
@@ -83,7 +83,7 @@ public final class DiskData extends Data {
     // open data and indexes
     init();
     if(meta.updindex) {
-      idmap = new IdPreMap(meta.dbfile(DATAIDP));
+      idmap = new IdPreMap(meta.dbFile(DATAIDP));
       if(meta.textindex) textIndex = new UpdatableDiskValues(this, IndexType.TEXT);
       if(meta.attrindex) attrIndex = new UpdatableDiskValues(this, IndexType.ATTRIBUTE);
       if(meta.tokenindex) tokenIndex = new UpdatableDiskValues(this, IndexType.TOKEN);
@@ -123,8 +123,8 @@ public final class DiskData extends Data {
    */
   private void init() throws IOException {
     table = new TableDiskAccess(meta, false);
-    texts = new DataAccess(meta.dbfile(DATATXT));
-    values = new DataAccess(meta.dbfile(DATAATV));
+    texts = new DataAccess(meta.dbFile(DATATXT));
+    values = new DataAccess(meta.dbFile(DATAATV));
   }
 
   /**
@@ -134,7 +134,7 @@ public final class DiskData extends Data {
   private void write() throws IOException {
     if(!meta.dirty) return;
 
-    try(DataOutput out = new DataOutput(meta.dbfile(DATAINF))) {
+    try(DataOutput out = new DataOutput(meta.dbFile(DATAINF))) {
       meta.write(out);
       out.writeToken(token(DBTAGS));
       elemNames.write(out);
@@ -148,7 +148,7 @@ public final class DiskData extends Data {
       resources.write(out);
       out.write(0);
     }
-    if(meta.updindex) idmap.write(meta.dbfile(DATAIDP));
+    if(meta.updindex) idmap.write(meta.dbFile(DATAIDP));
     meta.dirty = false;
   }
 

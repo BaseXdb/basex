@@ -36,7 +36,7 @@ public final class TableOutput extends OutputStream {
    * @throws IOException I/O exception
    */
   public TableOutput(final MetaData md, final String fn) throws IOException {
-    os = md.dbfile(fn).outputStream();
+    os = md.dbFile(fn).outputStream();
     meta = md;
     file = fn;
   }
@@ -65,7 +65,7 @@ public final class TableOutput extends OutputStream {
     os.close();
 
     // create table info file
-    try(DataOutput out = new DataOutput(meta.dbfile(file + 'i'))) {
+    try(DataOutput out = new DataOutput(meta.dbFile(file + 'i'))) {
       // total number of pages
       out.writeNum(pages);
       // number of used pages (0: no table entries; max: no page mapping)

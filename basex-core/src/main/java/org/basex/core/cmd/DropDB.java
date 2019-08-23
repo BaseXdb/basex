@@ -27,11 +27,12 @@ public final class DropDB extends ACreate {
 
   @Override
   protected boolean run() {
-    if(!Databases.validName(args[0], true)) return error(NAME_INVALID_X, args[0]);
+    final String pattern = args[0];
+    if(!Databases.validPattern(pattern)) return error(NAME_INVALID_X, pattern);
 
     // retrieve all databases; return true if no database is found (no error)
-    final StringList dbs = context.listDBs(args[0]);
-    if(dbs.isEmpty()) return info(NO_DB_DROPPED, args[0]);
+    final StringList dbs = context.listDBs(pattern);
+    if(dbs.isEmpty()) return info(NO_DB_DROPPED);
 
     // loop through all databases
     boolean ok = true;

@@ -56,7 +56,7 @@ public final class TableDiskAccess extends TableAccess {
     super(md);
 
     // read meta and index data
-    try(DataInput in = new DataInput(meta.dbfile(DATATBL + 'i'))) {
+    try(DataInput in = new DataInput(meta.dbFile(DATATBL + 'i'))) {
       // total number of pages
       pages = in.readNum();
       // number of used pages (max: no page mapping; 0: empty table)
@@ -75,7 +75,7 @@ public final class TableDiskAccess extends TableAccess {
     }
 
     // initialize data file
-    file = new RandomAccessFile(meta.dbfile(DATATBL).file(), "rw");
+    file = new RandomAccessFile(meta.dbFile(DATATBL).file(), "rw");
     if(!lock(write)) throw new BaseXException(Text.DB_PINNED_X, md.name);
   }
 
@@ -102,7 +102,7 @@ public final class TableDiskAccess extends TableAccess {
     for(final Buffer b : buffers.all()) write(b);
     if(!dirty || !all) return;
 
-    try(DataOutput out = new DataOutput(meta.dbfile(DATATBL + 'i'))) {
+    try(DataOutput out = new DataOutput(meta.dbFile(DATATBL + 'i'))) {
       final int p = pages;
       boolean regular = true;
 

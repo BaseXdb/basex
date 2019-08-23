@@ -40,7 +40,7 @@ public final class Delete extends ACreate {
 
         // delete binaries
         final TokenList bins = data.resources.binaries(target);
-        delete(data, target);
+        deleteBinary(data, target);
 
         return info(RES_DELETED_X_X, docs.size() + bins.size(), jc().performance);
       }
@@ -48,13 +48,13 @@ public final class Delete extends ACreate {
   }
 
   /**
-   * Deletes the specified resources.
+   * Deletes the specified binaries.
    * @param data data reference
-   * @param res resource to be deleted
+   * @param path resource to be deleted
    */
-  public static void delete(final Data data, final String res) {
+  public static void deleteBinary(final Data data, final String path) {
     if(data.inMemory()) return;
-    final IOFile file = data.meta.binary(res);
+    final IOFile file = data.meta.binary(path);
     if(file != null) file.delete();
   }
 }

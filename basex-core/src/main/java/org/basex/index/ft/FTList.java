@@ -58,14 +58,14 @@ final class FTList {
    * @throws IOException I/O exception
    */
   FTList(final Data data, final int prefix) throws IOException {
-    files = data.meta.dbfile(DATAFTX + prefix + 'y');
-    filed = data.meta.dbfile(DATAFTX + prefix + 'z');
+    files = data.meta.dbFile(DATAFTX + prefix + 'y');
+    filed = data.meta.dbFile(DATAFTX + prefix + 'z');
     str = new DataAccess(files);
     dat = new DataAccess(filed);
     tp = new int[data.meta.maxlen + 3];
     final int tl = tp.length;
     for(int t = 0; t < tl; t++) tp[t] = -1;
-    sizes = data.meta.dbfile(DATAFTX + prefix + 'x');
+    sizes = data.meta.dbFile(DATAFTX + prefix + 'x');
     try(DataAccess li = new DataAccess(sizes)) {
       int is = li.readNum();
       while(--is >= 0) {

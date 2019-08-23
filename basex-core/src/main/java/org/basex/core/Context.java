@@ -245,7 +245,7 @@ public final class Context {
   /**
    * Checks if the current user has the specified permission.
    * @param perm requested permission
-   * @param db database (can be {@code null})
+   * @param db database pattern (can be {@code null})
    * @return result of check
    */
   public boolean perm(final Perm perm, final String db) {
@@ -278,11 +278,11 @@ public final class Context {
 
   /**
    * Returns all databases for which the current user has read access.
-   * @param name database pattern (can be {@code null})
+   * @param pattern database pattern (can be {@code null})
    * @return resulting list
    */
-  public StringList listDBs(final String name) {
-    final StringList dbs = databases.listDBs(name);
+  public StringList listDBs(final String pattern) {
+    final StringList dbs = databases.listDBs(pattern);
     final StringList sl = new StringList(dbs.size());
     for(final String db : dbs) {
       if(perm(Perm.READ, db)) sl.add(db);

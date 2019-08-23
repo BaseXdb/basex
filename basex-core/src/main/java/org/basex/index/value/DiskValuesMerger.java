@@ -38,7 +38,7 @@ final class DiskValuesMerger {
    */
   DiskValuesMerger(final Data data, final IndexType type, final int i) throws IOException {
     pref = DiskValues.fileSuffix(type) + i;
-    dk = new DataInput(data.meta.dbfile(pref + 't'));
+    dk = new DataInput(data.meta.dbFile(pref + 't'));
     dv = new DiskValues(data, type, pref);
     this.data = data;
     next();

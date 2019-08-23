@@ -27,11 +27,11 @@ public final class Resources implements Index {
 
   /**
    * Constructor.
-   * @param d data reference
+   * @param data data reference
    */
-  public Resources(final Data d) {
-    docs = new Docs(d);
-    bins = new Binaries(d);
+  public Resources(final Data data) {
+    docs = new Docs(data);
+    bins = new Binaries(data);
   }
 
   /**

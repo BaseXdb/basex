@@ -188,7 +188,7 @@ public final class User {
 
   /**
    * Returns the global permission, or the permission for the specified database.
-   * @param db database (can be {@code null})
+   * @param db database pattern (can be {@code null})
    * @return permission
    */
   public synchronized Perm perm(final String db) {
@@ -201,12 +201,12 @@ public final class User {
 
   /**
    * Returns the first entry for the specified database.
-   * @param db database
+   * @param pattern database pattern
    * @return entry, or {@code null} if no entry exists
    */
-  synchronized Entry<String, Perm> find(final String db) {
+  synchronized Entry<String, Perm> find(final String pattern) {
     for(final Entry<String, Perm> entry : patterns.entrySet()) {
-      if(Databases.regex(entry.getKey()).matcher(db).matches()) return entry;
+      if(Databases.regex(entry.getKey()).matcher(pattern).matches()) return entry;
     }
     return null;
   }
@@ -249,7 +249,7 @@ public final class User {
   /**
    * Tests if the user has the specified permission.
    * @param prm permission to be checked
-   * @param db database (can be {@code null})
+   * @param db database pattern (can be {@code null})
    * @return result of check
    */
   public synchronized boolean has(final Perm prm, final String db) {

@@ -103,8 +103,8 @@ public final class DiskValuesBuilder extends ValuesBuilder {
   private void merge() throws IOException {
     final String f = DiskValues.fileSuffix(type);
     int entries = 0;
-    try(DataOutput outL = new DataOutput(data.meta.dbfile(f + 'l'));
-        DataOutput outR = new DataOutput(data.meta.dbfile(f + 'r'))) {
+    try(DataOutput outL = new DataOutput(data.meta.dbFile(f + 'l'));
+        DataOutput outR = new DataOutput(data.meta.dbFile(f + 'r'))) {
       outL.write4(0);
 
       // initialize cached index iterators
@@ -157,7 +157,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
     }
 
     // write number of entries to first position
-    try(DataAccess da = new DataAccess(data.meta.dbfile(f + 'l'))) {
+    try(DataAccess da = new DataAccess(data.meta.dbFile(f + 'l'))) {
       da.write4(entries);
     }
   }
@@ -170,8 +170,8 @@ public final class DiskValuesBuilder extends ValuesBuilder {
   private void writeIndex(final boolean partial) throws IOException {
     // write id arrays and references
     final String name = DiskValues.fileSuffix(type) + (partial ? splits : "");
-    try(DataOutput outL = new DataOutput(data.meta.dbfile(name + 'l'));
-        DataOutput outR = new DataOutput(data.meta.dbfile(name + 'r'))) {
+    try(DataOutput outL = new DataOutput(data.meta.dbFile(name + 'l'));
+        DataOutput outR = new DataOutput(data.meta.dbFile(name + 'r'))) {
       outL.write4(index.size());
 
       final IntList id = new IntList(), pos = tokenize ? new IntList() : null;
@@ -201,7 +201,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
 
     // temporarily write texts
     if(partial) {
-      try(DataOutput outT = new DataOutput(data.meta.dbfile(name + 't'))) {
+      try(DataOutput outT = new DataOutput(data.meta.dbFile(name + 't'))) {
         index.init();
         while(index.more()) outT.writeToken(index.keys.get(index.next()));
       }

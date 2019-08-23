@@ -60,8 +60,8 @@ public class DiskValues extends ValueIndex {
    */
   DiskValues(final Data data, final IndexType type, final String pref) throws IOException {
     super(data, type);
-    idxl = new DataAccess(data.meta.dbfile(pref + 'l'));
-    idxr = new DataAccess(data.meta.dbfile(pref + 'r'));
+    idxl = new DataAccess(data.meta.dbFile(pref + 'l'));
+    idxr = new DataAccess(data.meta.dbFile(pref + 'r'));
     size.set(idxl.read4());
   }
 

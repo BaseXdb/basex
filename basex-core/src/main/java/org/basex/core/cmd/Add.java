@@ -118,7 +118,7 @@ public final class Add extends ACreate {
       } else {
         builder = new MemBuilder(name, parser);
       }
-      tmpData = builder.binaryDir(data.meta.path).build();
+      tmpData = builder.binaryDir(data.meta.dir).build();
       return true;
     } catch(final IOException ex) {
       return error(Util.message(ex));

@@ -36,12 +36,12 @@ public final class DbBackups extends StandardFunc {
     final StringList backups = name == null ? qc.context.databases.backups() :
       qc.context.databases.backups(name);
     return new BasicIter<FElem>(backups.size()) {
-      final IOFile dbpath = qc.context.soptions.dbPath();
+      final IOFile dbPath = qc.context.soptions.dbPath();
 
       @Override
       public FElem get(final long i) {
         final String backup = backups.get((int) i);
-        final long length = new IOFile(dbpath, backup + IO.ZIPSUFFIX).length();
+        final long length = new IOFile(dbPath, backup + IO.ZIPSUFFIX).length();
         final String db = Databases.name(backup);
         final Dtm dtm = Dtm.get(Databases.date(backup).getTime());
         return new FElem(BACKUP).add(backup).add(DATABASE, db).add(DATE, dtm.string(info)).

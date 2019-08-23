@@ -53,10 +53,10 @@ public final class DbListDetails extends DbList {
         try {
           meta.read();
           // count number of raw files
-          final int bin = meta.binaries().descendants().size();
+          final int bin = meta.binaryDir().descendants().size();
           database.add(RESOURCES, token(meta.ndocs + bin));
-          database.add(MODIFIED_DATE, DateTime.format(new Date(meta.dbtime())));
-          database.add(SIZE, token(meta.dbsize()));
+          database.add(MODIFIED_DATE, DateTime.format(new Date(meta.dbTime())));
+          database.add(SIZE, token(meta.dbSize()));
           if(ctx.perm(Perm.CREATE, name)) database.add(PATH, meta.original);
         } catch(final IOException ignore) {
           // invalid database will be ignored

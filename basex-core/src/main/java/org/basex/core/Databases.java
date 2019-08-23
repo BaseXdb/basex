@@ -55,33 +55,33 @@ public final class Databases {
 
   /**
    * Lists all available databases matching the given name. Supports glob patterns.
-   * @param name database pattern (may be {@code null})
+   * @param pattern database pattern (may be {@code null})
    * @return database list
    */
-  public StringList listDBs(final String name) {
-    return list(false, name);
+  public StringList listDBs(final String pattern) {
+    return list(false, pattern);
   }
 
   /**
    * Returns the sorted names of all available databases and, optionally, backups.
    * Filters for {@code name} if not {@code null} with glob support.
    * @param backup return backups?
-   * @param name database pattern (may be {@code null})
+   * @param pattern database pattern (may be {@code null})
    * @return database and backups list
    */
-  private StringList list(final boolean backup, final String name) {
-    final Pattern pt = name == null ? null : regex(name);
-    final IOFile[] children = soptions.dbPath().children();
-    final StringList list = new StringList(children.length);
-    final HashSet<String> map = new HashSet<>(children.length);
-    for(final IOFile f : children) {
-      final String fn = f.name();
+  private StringList list(final boolean backup, final String pattern) {
+    final Pattern pt = pattern == null ? null : regex(pattern);
+    final IOFile[] files = soptions.dbPath().children();
+    final StringList list = new StringList(files.length);
+    final HashSet<String> map = new HashSet<>(files.length);
+    for(final IOFile file : files) {
+      final String name = file.name();
       String add = null;
-      if(backup && fn.endsWith(IO.ZIPSUFFIX)) {
-        final String nn = ZIPPATTERN.split(fn)[0];
-        if(!nn.equals(fn)) add = nn;
-      } else if(f.isDir() && !fn.startsWith(".")) {
-        add = fn;
+      if(backup && name.endsWith(IO.ZIPSUFFIX)) {
+        final String n = ZIPPATTERN.split(name)[0];
+        if(!n.equals(name)) add = n;
+      } else if(file.isDir() && !name.startsWith(".")) {
+        add = name;
       }
       // add entry if it matches the pattern, and has not already been added
       if(add != null && (pt == null || pt.matcher(add).matches()) && map.add(add)) {
@@ -119,9 +119,9 @@ public final class Databases {
    */
   public StringList backups() {
     final StringList backups = new StringList();
-    for(final IOFile f : soptions.dbPath().children()) {
-      final String n = f.name();
-      if(n.endsWith(IO.ZIPSUFFIX)) backups.add(n.substring(0, n.lastIndexOf('.')));
+    for(final IOFile file : soptions.dbPath().children()) {
+      final String name = file.name();
+      if(name.endsWith(IO.ZIPSUFFIX)) backups.add(name.substring(0, name.lastIndexOf('.')));
     }
     return backups;
   }
@@ -134,14 +134,14 @@ public final class Databases {
    */
   public StringList backups(final String db) {
     final StringList backups = new StringList();
-    final IOFile file = soptions.dbPath(db + IO.ZIPSUFFIX);
-    if(file.exists()) {
+    final IOFile path = soptions.dbPath(db + IO.ZIPSUFFIX);
+    if(path.exists()) {
       backups.add(db);
     } else {
       final Pattern regex = regex(db, '-' + DATE + '\\' + IO.ZIPSUFFIX);
-      for(final IOFile f : soptions.dbPath().children()) {
-        final String n = f.name();
-        if(regex.matcher(n).matches()) backups.add(n.substring(0, n.lastIndexOf('.')));
+      for(final IOFile file : soptions.dbPath().children()) {
+        final String name = file.name();
+        if(regex.matcher(name).matches()) backups.add(name.substring(0, name.lastIndexOf('.')));
       }
     }
     return backups.sort(Prop.CASE, false);
@@ -183,7 +183,16 @@ public final class Databases {
    * @return result of check
    */
   public static boolean validName(final String name) {
-    return validName(name, false);
+    return valid(name, false);
+  }
+
+  /**
+   * Checks if the specified string is a valid database pattern.
+   * @param pattern pattern to be checked (can be {@code null})
+   * @return result of check
+   */
+  public static boolean validPattern(final String pattern) {
+    return valid(pattern, true);
   }
 
   /**
@@ -192,7 +201,7 @@ public final class Databases {
    * @param glob allow glob syntax
    * @return result of check
    */
-  public static boolean validName(final String name, final boolean glob) {
+  private static boolean valid(final String name, final boolean glob) {
     if(name == null) return false;
     final int nl = name.length();
     for(int n = 0; n < nl; n++) {

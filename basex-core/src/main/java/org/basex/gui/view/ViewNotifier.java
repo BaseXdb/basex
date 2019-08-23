@@ -64,7 +64,7 @@ public final class ViewNotifier {
     if(data != null) {
       // if a large database is opened, the user is asked if complex
       /// visualizations should be closed first
-      final long size = data.meta.dbsize();
+      final long size = data.meta.dbSize();
       boolean open = false;
       for(final View view : views) open |= view.visible() && view.db();
       if(open && size > LARGEDB && BaseXDialog.confirm(gui,

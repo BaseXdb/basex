@@ -22,10 +22,10 @@ final class Binaries {
 
   /**
    * Constructor.
-   * @param d data reference
+   * @param data data reference
    */
-  Binaries(final Data d) {
-    data = d;
+  Binaries(final Data data) {
+    this.data = data;
   }
 
   /**
@@ -41,7 +41,7 @@ final class Binaries {
 
     final String exct = Prop.CASE ? np : np.toLowerCase(Locale.ENGLISH);
     final String pref = exct.endsWith("/") ? exct : exct + '/';
-    for(final String f : data.meta.binaries().descendants()) {
+    for(final String f : data.meta.binaryDir().descendants()) {
       final String lc = Prop.CASE ? f : f.toLowerCase(Locale.ENGLISH);
       if(exct.isEmpty() || lc.equals(exct) || lc.startsWith(pref)) tl.add(f);
     }

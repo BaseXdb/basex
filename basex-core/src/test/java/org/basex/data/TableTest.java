@@ -33,7 +33,7 @@ public final class TableTest extends SandboxTest {
    */
   @Before public void setUp() {
     execute(new CreateDB(NAME, DBFILE));
-    tbl = context.data().meta.dbfile(DataText.DATATBL);
+    tbl = context.data().meta.dbFile(DataText.DATATBL);
   }
 
   /**

@@ -81,10 +81,10 @@ public final class List extends Command {
       try {
         final MetaData meta = new MetaData(name, options, soptions);
         meta.read();
-        dbsize = meta.dbsize();
+        dbsize = meta.dbSize();
         file = meta.original;
         // add number of raw files
-        count = meta.ndocs + meta.binaries().descendants().size();
+        count = meta.ndocs + meta.binaryDir().descendants().size();
       } catch(final IOException ex) {
         Util.debug(ex);
         file = ERROR;
@@ -121,27 +121,26 @@ public final class List extends Command {
     try {
       // add xml documents
       final Data data = Open.open(db, context, options);
-      final Resources res = data.resources;
-      final IntList il = res.docs(path);
+      final Resources resources = data.resources;
+      final IntList il = resources.docs(path);
       final int ds = il.size();
       for(int i = 0; i < ds; i++) {
         final int pre = il.get(i);
-        final TokenList tl = new TokenList(3);
-        final byte[] file = data.text(pre, true);
-        tl.add(file);
+        final TokenList tl = new TokenList(4);
+        tl.add(data.text(pre, true));
         tl.add(XML);
         tl.add(MediaType.APPLICATION_XML.toString());
         tl.add(data.size(pre, Data.DOC));
         table.contents.add(tl);
       }
       // add binary resources
-      for(final byte[] file : res.binaries(path)) {
-        final String f = string(file);
-        final TokenList tl = new TokenList(3);
+      for(final byte[] file : resources.binaries(path)) {
+        final String bin = string(file);
+        final TokenList tl = new TokenList(4);
         tl.add(file);
         tl.add(IO.RAW);
-        tl.add(MediaType.get(f).toString());
-        tl.add(data.meta.binary(f).length());
+        tl.add(MediaType.get(bin).toString());
+        tl.add(data.meta.binary(bin).length());
         table.contents.add(tl);
       }
       Close.close(data, context);

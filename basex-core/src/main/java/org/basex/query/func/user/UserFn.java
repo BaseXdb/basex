@@ -42,7 +42,7 @@ abstract class UserFn extends StandardFunc {
       final Iter iter = exprs[i].iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
         final String pattern = Token.string(toToken(item));
-        if(!pattern.isEmpty() && !Databases.validName(pattern, true))
+        if(!pattern.isEmpty() && !Databases.validPattern(pattern))
           throw USER_PATTERN_X.get(info, pattern);
         patterns.add(pattern);
       }

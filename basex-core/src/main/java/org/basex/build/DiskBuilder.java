@@ -71,9 +71,9 @@ public final class DiskBuilder extends Builder {
     try {
       try {
         tout = new DataOutput(new TableOutput(meta, DATATBL));
-        xout = new DataOutput(meta.dbfile(DATATXT), bs);
-        vout = new DataOutput(meta.dbfile(DATAATV), bs);
-        sout = new DataOutput(meta.dbfile(DATATMP), bs);
+        xout = new DataOutput(meta.dbFile(DATATXT), bs);
+        vout = new DataOutput(meta.dbFile(DATAATV), bs);
+        sout = new DataOutput(meta.dbFile(DATATMP), bs);
         parse();
       } finally {
         if(tout != null) tout.close();
@@ -83,7 +83,7 @@ public final class DiskBuilder extends Builder {
       }
 
       // copy temporary values into database table
-      try(DataInput in = new DataInput(meta.dbfile(DATATMP))) {
+      try(DataInput in = new DataInput(meta.dbFile(DATATMP))) {
         final TableAccess ta = new TableDiskAccess(meta, true);
         try {
           for(; spos < ssize; ++spos) ta.write4(in.readNum(), 8, in.readNum());
@@ -91,7 +91,7 @@ public final class DiskBuilder extends Builder {
           ta.close();
         }
       }
-      meta.dbfile(DATATMP).delete();
+      meta.dbFile(DATATMP).delete();
 
       // return database instance
       return new DiskData(meta, elemNames, attrNames, path, nspaces);

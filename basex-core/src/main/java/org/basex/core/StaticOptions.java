@@ -163,7 +163,7 @@ public final class StaticOptions extends Options {
   }
 
   /**
-   * Returns the current database path.
+   * Returns the path to the directory that contains all databases.
    * @return database filename
    */
   public IOFile dbPath() {

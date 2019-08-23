@@ -57,14 +57,14 @@ public final class Grant extends AUser {
   }
 
   @Override
-  protected boolean run(final String name, final String pattern) {
+  protected boolean run(final String name, final String db) {
     // admin cannot be modified
     if(name.equals(UserText.ADMIN)) return !info(ADMIN_STATIC);
 
     final Users users = context.users;
     final User user = users.get(name);
-    user.perm(prm, pattern);
-    return info(pattern.isEmpty() ? GRANTED_X_X : GRANTED_ON_X_X_X, args[0], name, pattern);
+    user.perm(prm, db);
+    return info(db.isEmpty() ? GRANTED_X_X : GRANTED_ON_X_X_X, args[0], name, db);
   }
 
   @Override

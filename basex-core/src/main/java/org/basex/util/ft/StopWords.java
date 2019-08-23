@@ -36,7 +36,7 @@ public final class StopWords {
    */
   public StopWords(final Data data, final String file) throws IOException {
     if(!file.isEmpty()) read(IO.get(file), false);
-    try(DataOutput out = new DataOutput(data.meta.dbfile(DATASWL))) {
+    try(DataOutput out = new DataOutput(data.meta.dbFile(DATASWL))) {
       set.write(out);
     }
   }
@@ -49,9 +49,9 @@ public final class StopWords {
     // stop words have not been initialized, database is on disk...
     if(set.isEmpty() && data != null && !data.inMemory()) {
       // try to parse the stop words file of the current database
-      final IOFile file = data.meta.dbfile(DATASWL);
+      final IOFile file = data.meta.dbFile(DATASWL);
       if(!file.exists()) return;
-      try(DataInput in = new DataInput(data.meta.dbfile(DATASWL))) {
+      try(DataInput in = new DataInput(data.meta.dbFile(DATASWL))) {
         set.read(in);
       } catch(final Exception ex) {
         Util.debug(ex);

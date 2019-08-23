@@ -27,11 +27,10 @@ public final class ShowBackups extends ABackup {
     table.header.add(NAME);
     table.header.add(SIZE);
 
-    final IOFile dbpath = soptions.dbPath();
     for(final String name : context.databases.backups()) {
       final TokenList tl = new TokenList();
       tl.add(name);
-      tl.add(new IOFile(dbpath, name + IO.ZIPSUFFIX).length());
+      tl.add(soptions.dbPath(name + IO.ZIPSUFFIX).length());
       table.contents.add(tl);
     }
     out.println(table.sort().finish());

@@ -25,7 +25,7 @@ import org.basex.util.list.*;
  */
 public final class MetaData {
   /** Database directory. Set to {@code null} if database is in main memory. */
-  public final IOFile path;
+  public final IOFile dir;
 
   /** Database name. */
   public String name;
@@ -125,12 +125,12 @@ public final class MetaData {
   /**
    * Constructor.
    * @param name name of the database
-   * @param path database path ({@code null} if database is in main memory)
+   * @param dir database directory ({@code null} if database is in main memory)
    * @param options database options
    */
-  private MetaData(final String name, final IOFile path, final MainOptions options) {
+  private MetaData(final String name, final IOFile dir, final MainOptions options) {
     this.name = name;
-    this.path = path;
+    this.dir = dir;
     createtext = options.get(MainOptions.TEXTINDEX);
     createattr = options.get(MainOptions.ATTRINDEX);
     createtoken = options.get(MainOptions.TOKENINDEX);
@@ -209,10 +209,10 @@ public final class MetaData {
    * @param file current file
    * @return file length
    */
-  private static long dbsize(final IOFile file) {
+  private static long dbSize(final IOFile file) {
     long s = 0;
     if(file.isDir()) {
-      for(final IOFile f : file.children()) s += dbsize(f);
+      for(final IOFile f : file.children()) s += dbSize(f);
     } else {
       s += file.length();
     }
@@ -243,16 +243,16 @@ public final class MetaData {
    * Returns the disk size of the database.
    * @return database size
    */
-  public long dbsize() {
-    return path != null ? dbsize(path) : 0;
+  public long dbSize() {
+    return dir != null ? dbSize(dir) : 0;
   }
 
   /**
    * Returns the disk timestamp of the database.
    * @return database size
    */
-  public long dbtime() {
-    return path != null ? path.timeStamp() : 0;
+  public long dbTime() {
+    return dir != null ? dir.timeStamp() : 0;
   }
 
   /**
@@ -261,16 +261,16 @@ public final class MetaData {
    * @param filename filename
    * @return database filename
    */
-  public IOFile dbfile(final String filename) {
-    return file(path, filename);
+  public IOFile dbFile(final String filename) {
+    return file(dir, filename);
   }
 
   /**
    * Returns the binary directory.
    * @return binary directory
    */
-  public IOFile binaries() {
-    return new IOFile(path, IO.RAW);
+  public IOFile binaryDir() {
+    return new IOFile(dir, IO.RAW);
   }
 
   /**
@@ -278,20 +278,20 @@ public final class MetaData {
    * @return updating file
    */
   public IOFile updateFile() {
-    return dbfile(DATAUPD);
+    return dbFile(DATAUPD);
   }
 
   /**
    * Returns a reference to the specified binary file.
-   * @param pth internal file path
-   * @return binary directory, or {@code null} if the resource path cannot be resolved
-   * (e.g. if it points to a parent directory).
+   * @param path internal file path
+   * @return path, or {@code null} if the resource path cannot be resolved
+   *   (e.g. if it points to a parent directory).
    */
-  public IOFile binary(final String pth) {
-    if(path == null) return null;
-    final IOFile dir = binaries();
-    final IOFile file = new IOFile(dir, pth);
-    return file.path().startsWith(dir.path()) ? file : null;
+  public IOFile binary(final String path) {
+    if(dir == null) return null;
+    final IOFile bin = binaryDir();
+    final IOFile file = new IOFile(bin, path);
+    return file.path().startsWith(bin.path()) ? file : null;
   }
 
   /**
@@ -301,7 +301,7 @@ public final class MetaData {
    * @return result of check
    */
   public synchronized boolean drop(final String pattern) {
-    return path != null && DropDB.drop(path, pattern + IO.BASEXSUFFIX);
+    return dir != null && DropDB.drop(dir, pattern + IO.BASEXSUFFIX);
   }
 
   /**
@@ -309,7 +309,7 @@ public final class MetaData {
    * @throws IOException exception
    */
   public void read() throws IOException {
-    try(DataInput di = new DataInput(dbfile(DATAINF))) {
+    try(DataInput di = new DataInput(dbFile(DATAINF))) {
       read(di);
     }
   }
@@ -428,7 +428,7 @@ public final class MetaData {
     // check version of database indexes
     oldindex = !istorage.equals(ISTORAGE) &&
         new Version(istorage).compareTo(new Version(ISTORAGE)) > 0;
-    corrupt = dbfile(DATAUPD).exists();
+    corrupt = dbFile(DATAUPD).exists();
   }
 
   /**

@@ -80,9 +80,9 @@ public final class FTIndex extends ValueIndex {
   public FTIndex(final Data data) throws IOException {
     super(data, IndexType.FULLTEXT);
     // cache token length index
-    inY = new DataAccess(data.meta.dbfile(DATAFTX + 'y'));
-    inZ = new DataAccess(data.meta.dbfile(DATAFTX + 'z'));
-    inX = new DataAccess(data.meta.dbfile(DATAFTX + 'x'));
+    inY = new DataAccess(data.meta.dbFile(DATAFTX + 'y'));
+    inZ = new DataAccess(data.meta.dbFile(DATAFTX + 'z'));
+    inX = new DataAccess(data.meta.dbFile(DATAFTX + 'x'));
     tp = new int[data.meta.maxlen + 3];
     final int tl = tp.length;
     for(int i = 0; i < tl; ++i) tp[i] = -1;

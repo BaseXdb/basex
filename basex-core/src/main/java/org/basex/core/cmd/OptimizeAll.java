@@ -146,8 +146,8 @@ public final class OptimizeAll extends ACreate {
     }
 
     // move binary files
-    final IOFile bin = ometa.binaries();
-    if(bin.exists()) bin.rename(nmeta.binaries());
+    final IOFile bin = ometa.binaryDir();
+    if(bin.exists()) bin.rename(nmeta.binaryDir());
 
     // drop old database, rename temporary database
     if(!DropDB.drop(name, sopts)) throw new BaseXException(DB_NOT_DROPPED_X, name);

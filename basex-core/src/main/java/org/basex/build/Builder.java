@@ -90,11 +90,11 @@ public abstract class Builder extends Job {
   /**
    * Sets the path to the raw database files. The path might differ from the actual database path
    * if XML data is written to a temporary instance.
-   * @param dbDir path to database (can be {@code null})
+   * @param dir database directory (can be {@code null})
    * @return self reference
    */
-  public final Builder binaryDir(final IOFile dbDir) {
-    if(dbDir != null) binDir = new IOFile(dbDir, IO.RAW);
+  public final Builder binaryDir(final IOFile dir) {
+    if(dir != null) binDir = new IOFile(dir, IO.RAW);
     return this;
   }
 

@@ -32,12 +32,12 @@ public final class CreateBackup extends ABackup {
 
   @Override
   protected boolean run() {
-    final String name = args[0];
-    if(!Databases.validName(name, true)) return error(NAME_INVALID_X, name);
+    final String pattern = args[0];
+    if(!Databases.validPattern(pattern)) return error(NAME_INVALID_X, pattern);
 
     // retrieve all databases
-    final StringList dbs = context.listDBs(name);
-    if(dbs.isEmpty()) return error(DB_NOT_FOUND_X, name);
+    final StringList dbs = context.listDBs(pattern);
+    if(dbs.isEmpty()) return error(DB_NOT_FOUND_X, pattern);
 
     // loop through all databases
     boolean ok = true;

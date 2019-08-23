@@ -33,24 +33,26 @@ abstract class AUser extends Command {
   /**
    * Runs the command for all users and databases.
    * @param off offset for users and optional databases ({@code off + 1})
-   * @param opt indicates if user/database argument is optional
+   * @param optional indicates if user/database argument is optional
    * @return success flag
    */
-  final boolean run(final int off, final boolean opt) {
+  final boolean run(final int off, final boolean optional) {
     final String name = args[off];
-    final String pattern = off + 1 < args.length ? args[off + 1] : "";
+    final String db = off + 1 < args.length ? args[off + 1] : "";
 
-    if(!Databases.validName(name, true)) return error(NAME_INVALID_X, name);
-    if(!pattern.isEmpty() && !Databases.validName(pattern, true))
-      return error(NAME_INVALID_X, pattern);
+    if(!Databases.validPattern(name)) return error(NAME_INVALID_X, name);
+    if(!db.isEmpty() && !Databases.validPattern(db))
+      return error(NAME_INVALID_X, db);
 
     // retrieve all users; stop if no user is found
-    final String[] users = users(name);
-    if(users.length == 0) return info(UNKNOWN_USER_X, name) && opt;
+    final String[] users = context.users.find(Databases.regex(name));
+    if(users.length == 0) return info(UNKNOWN_USER_X, name) && optional;
 
     // loop through all users
     boolean ok = true;
-    for(final String user : users) ok &= run(user, pattern);
+    for(final String user : users) {
+      ok &= run(user, db);
+    }
     context.users.write();
     return ok;
   }
@@ -58,23 +60,12 @@ abstract class AUser extends Command {
   /**
    * Runs the command for the specified user and database pattern.
    * @param user user to be modified
-   * @param pattern database pattern
+   * @param db database pattern
    * @return success flag
    */
   @SuppressWarnings("unused")
-  boolean run(final String user, final String pattern) {
+  boolean run(final String user, final String db) {
     return true;
-  }
-
-  /**
-   * Returns all users matching the specified glob pattern.
-   * If the specified pattern does not contain any special characters,
-   * it is treated as literal.
-   * @param name user name pattern
-   * @return array with database names
-   */
-  private String[] users(final String name) {
-    return context.users.find(Databases.regex(name));
   }
 
   @Override
