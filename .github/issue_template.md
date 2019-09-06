@@ -1,6 +1,7 @@
-Welcome to the BaseX issue tracker! We appreciate your feedback. Please mind the following guidelines:
+We appreciate your feedback on BaseX. Please mind the following guidelines:
 
-* Before adding new feature requests and bug reports, please write to our
+* Our issue tracker is used to discuss confirmed bugs and feature requests.
+* For general questions, new feature requests and bug reports, please write to our
    basex-talk mailing list: http://basex.org/open-source/.
 * You may as well find it helpful to browse through our documentation:
    http://docs.basex.org/.
