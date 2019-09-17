@@ -745,7 +745,7 @@ public enum QueryError {
   /** Error code. */
   UPDBERROR_X_X(FOUP, 2, "Database '%' could not be %."),
   /** Error code. */
-  UPDBOPTERR_X(FOUP, 2, "%"),
+  UPDBERROR_X(FOUP, 2, "%"),
 
   /** Error code. */
   RESNF_X(FOUT, 1170, "Resource '%' cannot be retrieved."),

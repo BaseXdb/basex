@@ -606,7 +606,7 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(NAME));
     query(func.args(NAME));
     // opened database cannot be fully optimized
-    error(func.args(NAME, true), UPDBOPTERR_X);
+    error(func.args(NAME, true), UPDBERROR_X);
     execute(new Close());
     query(func.args(NAME, true));
 

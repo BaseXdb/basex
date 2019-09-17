@@ -267,10 +267,10 @@ public final class MetaData {
 
   /**
    * Returns the binary directory.
-   * @return binary directory
+   * @return binary directory, or {@code null} if this is a main-memory database
    */
   public IOFile binaryDir() {
-    return new IOFile(dir, IO.RAW);
+    return dir == null ? null : new IOFile(dir, IO.RAW);
   }
 
   /**
@@ -284,8 +284,8 @@ public final class MetaData {
   /**
    * Returns a reference to the specified binary file.
    * @param path internal file path
-   * @return path, or {@code null} if the resource path cannot be resolved
-   *   (e.g. if it points to a parent directory).
+   * @return path, or {@code null} if this is a main-memory database of
+   *   if the resource path cannot be resolved (e.g. because it points to a parent directory).
    */
   public IOFile binary(final String path) {
     if(dir == null) return null;

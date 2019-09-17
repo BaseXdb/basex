@@ -182,7 +182,7 @@ final class DataUpdates {
     try {
       Optimize.finish(data);
     } catch(final IOException ex) {
-      throw UPDBOPTERR_X.get(null, ex);
+      throw UPDBERROR_X.get(null, ex);
     }
 
     /* optional: export file if...
@@ -196,7 +196,7 @@ final class DataUpdates {
         try {
           Export.export(data, original, qc.context.options, null);
         } catch(final IOException ex) {
-          throw UPDBOPTERR_X.get(null, ex);
+          throw UPDBERROR_X.get(null, ex);
         }
       } else {
         FnTrace.trace(Token.token(original + ": Updates are not written back."), null, qc);

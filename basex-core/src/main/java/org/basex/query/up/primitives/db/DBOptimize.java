@@ -124,7 +124,7 @@ public final class DBOptimize extends DBUpdate {
       if(all) OptimizeAll.optimizeAll(data, qc.context, opts, null);
       else Optimize.optimize(data, rebuildText, rebuildAttr, rebuildToken, rebuildFt, null);
     } catch(final IOException ex) {
-      throw UPDBOPTERR_X.get(info, ex);
+      throw UPDBERROR_X.get(info, ex);
     }
 
     // remove old database reference

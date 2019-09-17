@@ -32,7 +32,7 @@ public final class BackupCreate extends NameUpdate {
     try {
       CreateBackup.backup(name, qc.context.soptions, null);
     } catch(final IOException ex) {
-      throw UPDBOPTERR_X.get(info, ex);
+      throw UPDBERROR_X.get(info, ex);
     }
   }
 

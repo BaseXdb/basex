@@ -23,10 +23,10 @@ import org.basex.util.options.*;
  * @author Lukas Kircher
  */
 public final class DBCreate extends NameUpdate {
-  /** Container for new database documents. */
-  private final DBNew newDocs;
   /** Database update options. */
   private final DBOptions options;
+  /** Container for new database documents. */
+  private final DBNew newDocs;
 
   /**
    * Constructor.
@@ -77,7 +77,7 @@ public final class DBCreate extends NameUpdate {
       Close.close(data, qc.context);
 
     } catch(final IOException ex) {
-      throw UPDBOPTERR_X.get(info, ex);
+      throw UPDBERROR_X.get(info, ex);
     } finally {
       // drop temporary database instance
       newDocs.finish();

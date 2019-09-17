@@ -25,7 +25,7 @@ import org.basex.util.*;
 public final class DBNew {
   /** Inputs to be added. */
   public final List<NewInput> inputs;
-  /** Insertion sequence. */
+  /** New database nodes. */
   public Data data;
 
   /** Query context. */

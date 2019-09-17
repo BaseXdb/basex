@@ -114,7 +114,8 @@ public final class Add extends ACreate {
 
       // create random database name for disk-based creation
       if(cache(parser)) {
-        builder = new DiskBuilder(soptions.randomDbName(data.meta.name), parser, soptions, options);
+        final String tmpName = soptions.randomDbName(data.meta.name);
+        builder = new DiskBuilder(tmpName, parser, soptions, options);
       } else {
         builder = new MemBuilder(name, parser);
       }
