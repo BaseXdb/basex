@@ -355,6 +355,11 @@ public final class DbModuleTest extends SandboxTest {
     error(func.args(NAME, CSV, "csv.xml",
         " map { 'parser':'csv','csvparser': 'headr=true' }"), BASEX_OPTIONS2_X);
 
+    error(func.args(NAME, " <a/>"), RESINV_X);
+    error(func.args(NAME, " <a/>", " ()"), RESINV_X);
+    error(func.args(NAME, " <a/>", ""), RESINV_X);
+    error(func.args(NAME, " <a/>", "/"), RESINV_X);
+
     // add document with namespaces
     query(_DB_ADD.args(NAME, " document { <x xmlns:a='a' a:y='' /> }", "x"));
   }

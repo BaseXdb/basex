@@ -21,9 +21,14 @@ public final class DbAdd extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = checkData(qc);
-    final byte[] path = exprs.length < 3 ? EMPTY : token(path(2, qc));
-    final NewInput input = checkInput(toNodeOrAtomItem(1, qc), path);
+    byte[] path = null;
+    if(exprs.length > 2) {
+      path = toTokenOrNull(exprs[2], qc);
+      if(path != null) path = token(path(path));
+    }
+    final NewInput input = checkInput(toNodeOrAtomItem(1, qc), path == null ? EMPTY : path);
     final Options opts = toOptions(3, new Options(), qc);
+
     qc.updates().add(new DBAdd(data, input, opts, false, qc, info), qc);
     return Empty.VALUE;
   }
