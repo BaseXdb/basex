@@ -15,8 +15,8 @@ import org.basex.query.func.*;
  * @author Christian Gruen
  */
 abstract class XsltFn extends StandardFunc {
-  /** Transformer cache. */
-  static final ConcurrentHashMap<String, Transformer> MAP = new ConcurrentHashMap<>();
+  /** Templates cache. */
+  static final ConcurrentHashMap<String, Templates> MAP = new ConcurrentHashMap<>();
 
   /** XSLT implementations. */
   static final String[] IMPL = {

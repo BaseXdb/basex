@@ -90,7 +90,6 @@ public class XsltTransform extends XsltFn {
     throw STRNOD_X_X.get(info, item.type, item);
   }
 
-
   /**
    * Performs an XSLT implementation.
    * @param in input
@@ -104,11 +103,24 @@ public class XsltTransform extends XsltFn {
   private static byte[] transform(final IO in, final IO xsl, final HashMap<String, String> params,
       final XsltOptions xopts, final QueryContext qc) throws TransformerException {
 
-    // retrieve new or cached transformer
-    final Transformer tr = transformer(xsl.streamSource(), xopts.get(XsltOptions.CACHE));
-
-    // set URI resolver
     final CatalogWrapper cw = CatalogWrapper.get(qc.context.options.get(MainOptions.CATFILE));
+
+    // retrieve new or cached templates object
+    Templates tmp = null;
+    final StreamSource ss = xsl.streamSource();
+    final String key = xopts.get(XsltOptions.CACHE) ? ss.getSystemId() : null;
+    if(key != null) tmp = MAP.get(key);
+    if(tmp == null) {
+      // no templates object cached: create new instance
+      final TransformerFactory tf = TransformerFactory.newInstance();
+      // assign catalog resolver (if defined)
+      if(cw != null) tf.setURIResolver(cw.getURIResolver());
+      tmp = tf.newTemplates(ss);
+      if(key != null) MAP.put(key, tmp);
+    }
+
+    // create transformer, assign catalog resolver (if defined)
+    final Transformer tr = tmp.newTransformer();
     if(cw != null) tr.setURIResolver(cw.getURIResolver());
 
     // bind parameters
@@ -118,24 +130,5 @@ public class XsltTransform extends XsltFn {
     final ArrayOutput ao = new ArrayOutput();
     tr.transform(in.streamSource(), new StreamResult(ao));
     return ao.finish();
-  }
-
-  /**
-   * Returns a new or cached transformer instance.
-   * @param ss stream source
-   * @param cache caching flag
-   * @return transformer
-   * @throws TransformerException transformer exception
-   */
-  private static Transformer transformer(final StreamSource ss, final boolean cache)
-      throws TransformerException {
-
-    // system id may be null
-    final String key = cache ? ss.getSystemId() : null;
-    Transformer tr = null;
-    if(key != null) tr = MAP.get(key);
-    if(tr == null) tr = TransformerFactory.newInstance().newTransformer(ss);
-    if(key != null) MAP.put(key, tr);
-    return tr;
   }
 }
