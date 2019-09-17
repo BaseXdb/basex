@@ -18,7 +18,6 @@ import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -31,10 +30,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Path extends ParseExpr {
-  /** XPath axes that are expected to be expensive when at the start of a path. */
-  private static final EnumSet<Axis> EXPENSIVE = EnumSet.of(
-      DESCENDANT, DESCENDANT_OR_SELF, PRECEDING, PRECEDING_SIBLING, FOLLOWING, FOLLOWING_SIBLING);
-
   /** Root expression (can be {@code null}). */
   public Expr root;
   /** Path steps. */
@@ -335,23 +330,6 @@ public abstract class Path extends ParseExpr {
     if(root instanceof Value) return (Value) root;
     // otherwise, create dummy item
     return cc.dummyItem(root);
-  }
-
-  /**
-   * Estimates the cost to evaluate this path. This is used to determine if the path
-   * can be inlined into a loop to enable index rewritings.
-   * @return guess
-   */
-  public final boolean cheap() {
-    if(!(root instanceof ANode) || ((Value) root).type != NodeType.DOC) return false;
-    final int sl = steps.length;
-    for(int i = 0; i < sl; i++) {
-      final Step s = axisStep(i);
-      if(s == null || i < 2 && EXPENSIVE.contains(s.axis)) return false;
-      final Expr[] ps = s.exprs;
-      if(!(ps.length == 0 || ps.length == 1 && ps[0] instanceof ItrPos)) return false;
-    }
-    return true;
   }
 
   /**

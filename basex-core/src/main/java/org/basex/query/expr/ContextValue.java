@@ -47,11 +47,6 @@ public final class ContextValue extends Simple {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
-    return false;
-  }
-
-  @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) {
     return var != null ? null : ex;
   }

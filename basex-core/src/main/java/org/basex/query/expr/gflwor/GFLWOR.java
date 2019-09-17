@@ -311,27 +311,29 @@ public final class GFLWOR extends ParseExpr {
 
         // inline simple values
         boolean inline = expr instanceof Value;
-        if(!inline) {
+
+        if(!inline && expr instanceof VarRef) {
           // inline variable references without type checks
-          inline = expr instanceof VarRef && !var.checksType();
+          inline = !var.checksType();
         }
-        if(!inline) {
-          // inline cheap axis paths
-          inline = expr instanceof AxisPath && ((AxisPath) expr).cheap();
-        }
-        if(!inline) {
+        if(!inline && expr instanceof ContextValue) {
           // inline context values
           // allowed: 1[let $x := . return $x] -> 1[.]
           // illegal: 1[let $x := . return <a/>[$x = 1]]
-          inline = expr instanceof ContextValue && inlineable.getAsBoolean();
+          inline = inlineable.getAsBoolean();
         }
-        if(!inline) {
+        if(!inline && count(var, next) == VarUsage.ONCE && !expr.has(Flag.CNS)) {
           // inline expressions that occur once, but do not construct nodes
           // e.g. let $x := <X/> return <X xmlns='xx'>{ $x/self::X }</X>
-          inline = count(var, next) == VarUsage.ONCE && !expr.has(Flag.CNS);
           // inline top-level context references
           // e.g. (1 to 5)[let $p := position() return $p = 1] -> (1 to 5)[position() = 1]
-          if(inline && expr.has(Flag.CTX)) inline = inlineable.getAsBoolean();
+          inline = !expr.has(Flag.CTX) || inlineable.getAsBoolean();
+        }
+        if(!inline && expr instanceof Path) {
+          // inline cheap path expressions with single result
+          // e.g. doc('x.xml')/root
+          inline = expr.size() == 1 && !expr.has(Flag.NDT, Flag.CNS) &&
+              (!expr.has(Flag.CTX) || inlineable.getAsBoolean());
         }
 
         if(inline) {

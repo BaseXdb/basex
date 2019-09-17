@@ -205,9 +205,9 @@ public abstract class Expr extends ExprInfo {
    * </ul>
    * The following tests might return false:
    * <ul>
-   *   <li>{@link Preds#inlineable} if one of the variables is used within a predicate.</li>
-   *   <li>{@link Path#inlineable} if the variable occurs within the path.</li>
-   *   <li>{@link SimpleMap#inlineable} if the variable occurs in a right-hand expression.</li>
+   *   <li>{@link Preds#inlineable} if the variable is used in a predicate</li>
+   *   <li>{@link Path#inlineable} if the variable occurs within the path</li>
+   *   <li>{@link SimpleMap#inlineable} if the variable occurs in a right-hand expression</li>
    * </ul>
    * @param var variable to be inlined
    * @return result of check
