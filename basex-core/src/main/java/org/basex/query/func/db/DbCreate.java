@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.primitives.*;
@@ -31,11 +30,7 @@ public final class DbCreate extends DbNew {
     final TokenList paths = new TokenList();
     if(exprs.length > 2) {
       final Iter iter = exprs[2].iter(qc);
-      for(Item item; (item = qc.next(iter)) != null;) {
-        final String path = string(toToken(item)), norm = MetaData.normPath(path);
-        if(norm == null) throw RESINV_X.get(info, path);
-        paths.add(norm);
-      }
+      for(Item item; (item = qc.next(iter)) != null;) paths.add(path(toToken(item)));
     }
 
     final NewInput[] inputs;

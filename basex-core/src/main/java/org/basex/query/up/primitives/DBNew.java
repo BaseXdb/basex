@@ -4,13 +4,16 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.List;
 
 import org.basex.build.*;
 import org.basex.core.*;
+import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -69,27 +72,29 @@ public final class DBNew {
   /**
    * Inserts all documents to be added to a temporary database.
    * @param name name of database
+   * @param create create new database
    * @throws QueryException query exception
    */
-  public void prepare(final String name) throws QueryException {
-    if(inputs.isEmpty()) return;
+  public void prepare(final String name, final boolean create) throws QueryException {
+    final long is = inputs.size();
+    if(is == 0) return;
 
-    // choose first options instance (relevant options are the same)
-    final Context ctx = qc.context;
-    final MainOptions mopts = ctx.options;
-    final StaticOptions sopts = ctx.soptions;
-    final boolean cache = cache();
+    // check if new resources will be cached on disk
+    final boolean cache = cache(create);
     try {
-      final String dbname = cache ? sopts.randomDbName(name) : name;
+      // multiple input: create temporary database and insert inputs
+      final Context ctx = qc.context;
+      final MainOptions mopts = ctx.options;
+      final StaticOptions sopts = ctx.soptions;
+      final String dbname = cache ? sopts.createRandomDb(name) : name;
       data = cache ? CreateDB.create(dbname, Parser.emptyParser(mopts), ctx, mopts) :
         new MemData(mopts);
       data.startUpdate(mopts);
       try {
-        final long is = inputs.size();
         for(int i = 0; i < is; i++) {
-          final Data tmpData = tmpData(dbname, i);
+          final Data tmpData = tmpData(dbname, i, cache);
           try {
-            data.insert(data.meta.size, -1, new DataClip(tmpData));
+            copy(tmpData, data);
           } finally {
             DropDB.drop(tmpData, sopts);
           }
@@ -98,28 +103,56 @@ public final class DBNew {
         data.finishUpdate(mopts);
       }
     } catch(final IOException ex) {
-      throw IOERR_X.get(info, ex);
+      finish();
+      throw UPDBERROR_X.get(info, ex);
     }
   }
 
   /**
-   * Drops the temporary database instance.
+   * Adds the contents of the temporary database to the target database.
+   * @param target database instance
+   * @throws QueryException exception
+   */
+  public void add(final Data target) throws QueryException {
+    try {
+      copy(data, target);
+    } catch(final IOException ex) {
+      throw UPDBERROR_X.get(info, ex);
+    } finally {
+      finish();
+    }
+  }
+
+  /**
+   * Drops a temporary database instance.
    */
   public void finish() {
     if(data != null) {
-      DropDB.drop(data, qc.context.soptions);
+      final Context ctx = qc.context;
+      Close.close(data, ctx);
+      DropDB.drop(data, ctx.soptions);
+      // free memory
+      dboptions.clear();
+      inputs.clear();
       data = null;
     }
   }
 
   /**
-   * Checks if caching was enabled for at least one document.
+   * Checks if disk caching is requested or required for at least one document.
+   * @param create create new database
    * @return result of check
    */
-  private boolean cache() {
+  private boolean cache(final boolean create) {
     for(final DBOptions dbopts : dboptions) {
-      final Object cache = dbopts.get(MainOptions.ADDCACHE);
-      if(cache instanceof Boolean && (Boolean) cache) return true;
+      Object v = dbopts.get(MainOptions.ADDCACHE);
+      if(v instanceof Boolean && (Boolean) v) return true;
+      if(create) {
+        v = dbopts.get(MainOptions.ADDRAW);
+        if(v instanceof Boolean && (Boolean) v) return true;
+        v = dbopts.get(MainOptions.PARSER);
+        if(v instanceof MainParser && ((MainParser) v) == MainParser.RAW) return true;
+      }
     }
     return false;
   }
@@ -128,10 +161,11 @@ public final class DBNew {
    * Creates a temporary database instance with the contents of the specified input.
    * @param name name of database
    * @param i index of current input
+   * @param cache cache data to disk
    * @return database
    * @throws IOException I/O exception
    */
-  private Data tmpData(final String name, final int i) throws IOException {
+  private Data tmpData(final String name, final int i, final boolean cache) throws IOException {
     // free memory: clear list entries after retrieval
     final NewInput input = inputs.get(i);
     final MainOptions mopts = dboptions.get(i).assignTo(new MainOptions(qc.context.options, true));
@@ -148,16 +182,39 @@ public final class DBNew {
     }
 
     final StaticOptions sopts = qc.context.soptions;
-    final DirParser parser = new DirParser(input.io, mopts);
-    parser.target(input.path);
+    final Parser parser = new DirParser(input.io, mopts).target(input.path);
 
-    final Builder builder;
     // create temporary database on disk if requested, or if binary data needs to be written
-    if(mopts.get(MainOptions.ADDCACHE) || parser.binary()) {
-      builder = new DiskBuilder(sopts.randomDbName(name), parser, sopts, mopts);
+    final Builder builder;
+    final String dbname = cache ? sopts.createRandomDb(name) : name;
+    if(cache) {
+      builder = new DiskBuilder(dbname, parser, sopts, mopts);
     } else {
-      builder = new MemBuilder(name, parser);
+      builder = new MemBuilder(dbname, parser);
     }
-    return builder.binaryDir(sopts.dbPath(name)).build();
+    return builder.binaryDir(sopts.dbPath(dbname)).build();
+  }
+
+  /**
+   * Adds the contents of the source database to the target database.
+   * @param source source database
+   * @param target target database
+   * @throws IOException I/O exception
+   */
+  private static void copy(final Data source, final Data target) throws IOException {
+    // insert documents
+    target.insert(target.meta.size, -1, new DataClip(source));
+    // move binary resources
+    final IOFile srcDir = source.meta.binaryDir(), trgDir = target.meta.binaryDir();
+    if(srcDir != null && srcDir.exists()) {
+      trgDir.md();
+      for(final String file : srcDir.descendants()) {
+        final IOFile srcFile = new IOFile(srcDir, file);
+        final IOFile trgFile = new IOFile(trgDir, file);
+        trgFile.delete();
+        trgFile.parent().md();
+        Files.move(Paths.get(srcFile.path()), Paths.get(trgFile.path()));
+      }
+    }
   }
 }

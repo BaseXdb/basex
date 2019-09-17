@@ -58,16 +58,12 @@ public final class DBAdd extends DBUpdate {
   @Override
   public void prepare() throws QueryException {
     size = newDocs.inputs.size();
-    newDocs.prepare(data.meta.name);
+    newDocs.prepare(data.meta.name, false);
   }
 
   @Override
-  public void apply() {
-    try {
-      data.insert(data.meta.size, -1, new DataClip(newDocs.data));
-    } finally {
-      newDocs.finish();
-    }
+  public void apply() throws QueryException {
+    newDocs.add(data);
   }
 
   @Override

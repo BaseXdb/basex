@@ -111,7 +111,7 @@ public final class OptimizeAll extends ACreate {
 
     // build database and index structures
     final StaticOptions sopts = context.soptions;
-    final String tmpName = sopts.randomDbName(name);
+    final String tmpName = sopts.createRandomDb(name);
     final DBParser parser = new DBParser(odata, options);
     final DiskBuilder builder = new DiskBuilder(tmpName, parser, sopts, options);
     if(cmd != null) cmd.pushJob(builder);

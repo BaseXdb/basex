@@ -150,16 +150,21 @@ public final class StaticOptions extends Options {
   }
 
   /**
-   * Returns a random temporary name for the specified database name.
-   * @param db name of database
-   * @return random database name
+   * Creates a random database directory and returns its name.
+   * @param name name of the original database
+   * @return name of random database
    */
-  public String randomDbName(final String db) {
-    String nm;
+  public String createRandomDb(final String name) {
+    String db;
+    int c = 0;
     do {
-      nm = db + '_' + new Random().nextInt(0x7FFFFFFF);
-    } while(dbPath(nm).exists());
-    return nm;
+      db = name + '.' + c++;
+      final IOFile io = dbPath(db);
+      if(!io.exists()) {
+        io.md();
+        return db;
+      }
+    } while(true);
   }
 
   /**

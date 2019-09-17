@@ -50,7 +50,7 @@ public final class DBCreate extends NameUpdate {
 
   @Override
   public void prepare() throws QueryException {
-    newDocs.prepare(name);
+    newDocs.prepare(name, true);
   }
 
   @Override
@@ -64,11 +64,10 @@ public final class DBCreate extends NameUpdate {
       final Data data = CreateDB.create(name, Parser.emptyParser(mopts), qc.context, mopts);
 
       // add initial documents and optimize database
-      final Data newData = newDocs.data;
-      if(newData != null) {
+      if(newDocs.data != null) {
         data.startUpdate(mopts);
         try {
-          data.insert(data.meta.size, -1, new DataClip(newData));
+          newDocs.add(data);
           Optimize.optimize(data, null);
         } finally {
           data.finishUpdate(mopts);
@@ -77,10 +76,8 @@ public final class DBCreate extends NameUpdate {
       Close.close(data, qc.context);
 
     } catch(final IOException ex) {
-      throw UPDBERROR_X.get(info, ex);
-    } finally {
-      // drop temporary database instance
       newDocs.finish();
+      throw UPDBERROR_X.get(info, ex);
     }
   }
 

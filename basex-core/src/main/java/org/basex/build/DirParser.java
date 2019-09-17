@@ -79,14 +79,6 @@ public final class DirParser extends Parser {
       Pattern.compile(IOFile.regex(options.get(MainOptions.CREATEFILTER)));
   }
 
-  /**
-   * Indicates if binary data might be parsed.
-   * @return result of check
-   */
-  public boolean binary() {
-    return addRaw || rawParser;
-  }
-
   @Override
   public void parse(final Builder build) throws IOException {
     build.meta.inputsize = 0;
