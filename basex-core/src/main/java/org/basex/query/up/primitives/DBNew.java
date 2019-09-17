@@ -82,25 +82,30 @@ public final class DBNew {
     // check if new resources will be cached on disk
     final boolean cache = cache(create);
     try {
-      // multiple input: create temporary database and insert inputs
-      final Context ctx = qc.context;
-      final MainOptions mopts = ctx.options;
-      final StaticOptions sopts = ctx.soptions;
-      final String dbname = cache ? sopts.createRandomDb(name) : name;
-      data = cache ? CreateDB.create(dbname, Parser.emptyParser(mopts), ctx, mopts) :
-        new MemData(mopts);
-      data.startUpdate(mopts);
-      try {
-        for(int i = 0; i < is; i++) {
-          final Data tmpData = tmpData(dbname, i, cache);
-          try {
-            copy(tmpData, data);
-          } finally {
-            DropDB.drop(tmpData, sopts);
+      if(is == 1) {
+        // single input: create temporary database
+        data = tmpData(name, 0, cache);
+      } else {
+        // multiple input: create temporary database and insert inputs
+        final Context ctx = qc.context;
+        final MainOptions mopts = ctx.options;
+        final StaticOptions sopts = ctx.soptions;
+        final String dbname = cache ? sopts.createRandomDb(name) : name;
+        data = cache ? CreateDB.create(dbname, Parser.emptyParser(mopts), ctx, mopts) :
+          new MemData(mopts);
+        data.startUpdate(mopts);
+        try {
+          for(int i = 0; i < is; i++) {
+            final Data tmpData = tmpData(dbname, i, cache);
+            try {
+              copy(tmpData, data);
+            } finally {
+              DropDB.drop(tmpData, sopts);
+            }
           }
+        } finally {
+          data.finishUpdate(mopts);
         }
-      } finally {
-        data.finishUpdate(mopts);
       }
     } catch(final IOException ex) {
       finish();
