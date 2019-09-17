@@ -31,7 +31,6 @@ public final class ProcModuleTest extends SandboxTest {
   @Test public void execute() {
     final Function func = _PROC_EXECUTE;
     // queries
-    query("contains(" + func.args("java", "-version") + "/error, 'java')", true);
     query("exists(" + func.args("java", "x") + "/code)", true);
     query("exists(" + func.args("a b c") + "/error)", true);
     query("empty(" + func.args("a b c") + "/(output, code))", true);
