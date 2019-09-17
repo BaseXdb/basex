@@ -92,7 +92,7 @@ public class XsltTransform extends XsltFn {
 
 
   /**
-   * Uses Java's XSLT implementation to perform an XSL transformation.
+   * Performs an XSLT implementation.
    * @param in input
    * @param xsl style sheet
    * @param params parameters
@@ -106,12 +106,13 @@ public class XsltTransform extends XsltFn {
 
     // retrieve new or cached transformer
     final Transformer tr = transformer(xsl.streamSource(), xopts.get(XsltOptions.CACHE));
-    // bind parameters
-    params.forEach(tr::setParameter);
 
     // set URI resolver
     final CatalogWrapper cw = CatalogWrapper.get(qc.context.options.get(MainOptions.CATFILE));
     if(cw != null) tr.setURIResolver(cw.getURIResolver());
+
+    // bind parameters
+    params.forEach(tr::setParameter);
 
     // do transformation and return result
     final ArrayOutput ao = new ArrayOutput();
