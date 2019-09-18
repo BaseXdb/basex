@@ -20,7 +20,12 @@ ENV MAVEN_CONFIG=/srv/.m2
 # 8984/tcp: HTTP
 # 8985/tcp: HTTP stop
 EXPOSE 1984 8984 8985
-VOLUME ["/srv/basex/data", "/srv/basex/repo","/srv/basex/webapp"]
+
+#
+# At HG we do not want to use these volumes
+#
+#VOLUME ["/srv/basex/data", "/srv/basex/repo","/srv/basex/webapp"]
+
 WORKDIR /srv
 
 # Run BaseX HTTP server by default
