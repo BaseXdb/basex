@@ -29,7 +29,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
-    <jettyVersion>9.4.18.v20190429</jettyVersion>
+    <jettyVersion>9.4.20.v20190813</jettyVersion>
   </properties>
 
   <dependencyManagement>
@@ -180,7 +180,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
-        <version>1.7.26</version>
+        <version>1.7.28</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -351,7 +351,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.1.0</version>
+            <version>3.1.1</version>
             <inherited>true</inherited>
             <configuration>
               <additionalparam>-Xdoclint:none</additionalparam>
@@ -458,7 +458,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
-          <version>3.0.1</version>
+          <version>3.1.0</version>
           <inherited>true</inherited>
           <configuration>
             <outputDirectory>target</outputDirectory>
@@ -529,7 +529,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.0.0</version>
+          <version>3.1.0</version>
           <inherited>true</inherited>
           <executions>
             <execution>
@@ -567,7 +567,7 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
-        <version>3.3.2</version>
+        <version>3.3.3</version>
       </extension>
     </extensions>
   </build>
