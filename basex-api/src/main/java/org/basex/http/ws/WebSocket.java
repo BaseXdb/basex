@@ -169,7 +169,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
     try {
       // find function to evaluate
       final WsFunction func = WebModules.get(context).websocket(this, ann);
-      if(func != null) new WsResponse(this).create(func, message);
+      if(func != null) new WsResponse(this).create(func, message, true);
     } catch(final Exception ex) {
       error(ex);
     }

@@ -37,8 +37,6 @@ public final class HTTPConnection implements ClientInfo {
 
   /** Current database context. */
   public final Context context;
-  /** Request method. */
-  public final String method;
   /** Request parameters. */
   public final HTTPParams params;
 
@@ -49,6 +47,8 @@ public final class HTTPConnection implements ClientInfo {
   /** Path, starting with a slash. */
   private final String path;
 
+  /** Request method. */
+  public String method;
   /** Serialization parameters. */
   private SerializerOptions serializer;
 
@@ -436,11 +436,11 @@ public final class HTTPConnection implements ClientInfo {
    * Sets a status and sends an info message.
    * @param code status code
    * @param message status message (can be {@code null})
-   * @param info detailed information (can be {@code null})
+   * @param body message for response body (can be {@code null})
    * @throws IOException I/O exception
    */
   @SuppressWarnings("deprecation")
-  private void status(final int code, final String message, final String info) throws IOException {
+  private void status(final int code, final String message, final String body) throws IOException {
     try {
       res.resetBuffer();
       if(code == SC_UNAUTHORIZED && !res.containsHeader(WWW_AUTHENTICATE)) {
@@ -463,12 +463,12 @@ public final class HTTPConnection implements ClientInfo {
         res.setStatus(c, message.replaceAll("[^\\x20-\\x7F]", "?"));
       }
 
-      if(info != null) {
+      if(body != null) {
         res.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
-        res.getOutputStream().write(new TokenBuilder(token(info)).normalize().finish());
+        res.getOutputStream().write(new TokenBuilder(token(body)).normalize().finish());
       }
     } catch(final IllegalStateException | IllegalArgumentException ex) {
-      logError(code, message, info, ex);
+      logError(code, message, body, ex);
     }
   }
 

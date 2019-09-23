@@ -115,6 +115,16 @@ public abstract class HTTPTest extends SandboxTest {
   }
 
   /**
+   * Executes the specified OPTIONS request and returns the result.
+   * @param query request
+   * @return string result, or {@code null} for a failure
+   * @throws IOException I/O exception
+   */
+  protected static String options(final String query) throws IOException {
+    return request(query, OPTIONS);
+  }
+
+  /**
    * Executes the specified HTTP request and returns the result.
    * @param query request
    * @param method HTTP method

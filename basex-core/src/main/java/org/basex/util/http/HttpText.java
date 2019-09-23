@@ -34,6 +34,8 @@ public interface HttpText {
   String LOCATION = "Location";
   /** HTTP header string. */
   String ACCEPT = "Accept";
+  /** HTTP header string. */
+  String ALLOW = "Allow";
 
   /** Content-Disposition. */
   byte[] CONTENT_DISPOSITION = token("Content-Disposition");

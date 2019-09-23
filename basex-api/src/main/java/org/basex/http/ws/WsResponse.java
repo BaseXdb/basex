@@ -54,7 +54,7 @@ public final class WsResponse extends WebResponse {
   }
 
   @Override
-  public Response serialize() throws QueryException, IOException {
+  public Response serialize(final boolean body) throws QueryException, IOException {
     qc.register(ctx);
     try {
       final ArrayList<Object> values = serialize(qc.iter(), func.output);

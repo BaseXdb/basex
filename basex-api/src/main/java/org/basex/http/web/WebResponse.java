@@ -42,12 +42,13 @@ public abstract class WebResponse {
    * Creates the Response.
    * @param function function to be evaluated
    * @param data additional data (result, function, error, can be {@code null})
+   * @param body serialize body
    * @return response type
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    * @throws ServletException servlet exception
    */
-  public final Response create(final WebFunction function, final Object data)
+  public final Response create(final WebFunction function, final Object data, final boolean body)
       throws QueryException, IOException, ServletException {
 
     final WebModule module = function.module;
@@ -60,7 +61,7 @@ public abstract class WebResponse {
       bind(args, data);
       qc.jc().description(toString(func, args));
       qc.mainModule(MainModule.get(sf, args));
-      return serialize();
+      return serialize(body);
     } catch(final QueryException ex) {
       if(ex.file() == null) ex.info(func.info);
       throw ex;
@@ -88,12 +89,14 @@ public abstract class WebResponse {
 
   /**
    * Serializes the response.
+   * @param body serialize body (if {@code false}, only the headers will be assigned)
    * @return response type
    * @throws QueryException query exception
    * @throws IOException I/O exception
    * @throws ServletException servlet exception
    */
-  protected abstract Response serialize() throws QueryException, IOException, ServletException;
+  protected abstract Response serialize(boolean body) throws QueryException, IOException,
+      ServletException;
 
   /**
    * Returns a job description for the specified function.

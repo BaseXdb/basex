@@ -89,11 +89,38 @@ public final class RestXqMethodTest extends RestXqTest {
     headE("declare %R:HEAD %R:path('') function m:f() { () };");
     headE("declare %R:HEAD %R:path('') function m:f() { <response/> };");
     headE("declare %R:HEAD %R:path('') function m:f() as element(R:response)* {()};");
+
+    // correct return type
+    headR("declare %R:GET %R:path('') function m:f() { () };");
+    headR("declare %R:GET %R:path('') function m:f() { 1 to 5 };");
+  }
+
+
+  /**
+   * {@code %OPTIONS} method.
+   * @throws Exception exception
+   */
+  @Test public void options() throws Exception {
+    options("declare %R:OPTIONS %R:path('') function m:f() { };", "");
+    options("declare %R:OPTIONS %R:path('') function m:f() { 1 };", "1");
+
+    options("declare %R:GET %R:path('') function m:f() { <R:response/> };", "");
+    options("declare %R:GET %R:path('sdfdfs') function m:f() { <R:response/> };", "");
   }
 
   /**
-   * Executes the specified POST request and tests the result.
-   *
+   * Executes the specified OPTIONS request and tests the result.
+   * @param function function to test
+   * @param exp expected result
+   * @throws IOException I/O exception
+   */
+  private static void options(final String function, final String exp) throws IOException {
+    install(function);
+    assertEquals(exp, options(""));
+  }
+
+  /**
+   * Executes the specified OPTIONS request and tests the result.
    * @param function function to test
    * @param exp expected result
    * @param request request body
@@ -108,7 +135,6 @@ public final class RestXqMethodTest extends RestXqTest {
 
   /**
    * Executes the specified HEAD request and tests the result.
-   *
    * @param function function to test
    * @throws IOException I/O exception
    */
@@ -119,7 +145,6 @@ public final class RestXqMethodTest extends RestXqTest {
 
   /**
    * Executes the specified HEAD request and tests for an error.
-   *
    * @param function function to test
    * @throws IOException I/O exception
    */
