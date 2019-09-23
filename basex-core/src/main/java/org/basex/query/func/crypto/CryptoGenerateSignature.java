@@ -35,6 +35,6 @@ public final class CryptoGenerateSignature extends StandardFunc {
         arg6Str ? arg6.string(info) : Token.token(""),
         exprs.length > 7 ? toNode(exprs[7], qc) :
           exprs.length == 7 && !arg6Str ? toNode(exprs[6], qc) : null,
-        qc, info);
+        qc);
   }
 }

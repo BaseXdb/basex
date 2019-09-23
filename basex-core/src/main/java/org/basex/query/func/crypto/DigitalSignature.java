@@ -94,14 +94,12 @@ final class DigitalSignature {
    * @param expr XPath expression which specifies node to be signed
    * @param cert certificate which contains keystore information for signing the node, may be null
    * @param qc query context
-   * @param ii input info
-   *
    * @return signed node
    * @throws QueryException query exception
    */
   Item generateSignature(final ANode node, final byte[] can, final byte[] dig, final byte[] sig,
-      final byte[] ns, final byte[] tp, final byte[] expr, final ANode cert, final QueryContext qc,
-      final InputInfo ii) throws QueryException {
+      final byte[] ns, final byte[] tp, final byte[] expr, final ANode cert, final QueryContext qc)
+      throws QueryException {
 
     // checking input variables
     byte[] b = can;
@@ -245,21 +243,21 @@ final class DigitalSignature {
 
       // actually sign the document
       xmlSig.sign(signContext);
-      signedNode = NodeType.DOC.cast(inputNode, qc, null, ii);
+      signedNode = NodeType.DOC.cast(inputNode, qc, null, info);
 
-    } catch(final XPathExpressionException e) {
-      throw CX_XPINV.get(info, e);
-    } catch(final SAXException | IOException | ParserConfigurationException e) {
-      throw CX_IOEXC.get(info, e);
-    } catch(final KeyStoreException e) {
-      throw CX_KSEXC.get(info, e);
-    } catch(final MarshalException |  XMLSignatureException e) {
-      throw CX_SIGEXC.get(info, e);
+    } catch(final XPathExpressionException ex) {
+      throw CX_XPINV.get(info, ex);
+    } catch(final SAXException | IOException | ParserConfigurationException ex) {
+      throw CX_IOEXC.get(info, ex);
+    } catch(final KeyStoreException ex) {
+      throw CX_KSEXC.get(info, ex);
+    } catch(final MarshalException |  XMLSignatureException ex) {
+      throw CX_SIGEXC.get(info, ex);
     } catch(final NoSuchAlgorithmException | CertificateException |
-        InvalidAlgorithmParameterException e) {
-      throw CX_ALGEXC.get(info, e);
-    } catch(final UnrecoverableKeyException | KeyException e) {
-      throw CX_NOKEY.get(info, e);
+        InvalidAlgorithmParameterException ex) {
+      throw CX_ALGEXC.get(info, ex);
+    } catch(final UnrecoverableKeyException | KeyException ex) {
+      throw CX_NOKEY.get(info, ex);
     }
     return signedNode;
   }
@@ -283,10 +281,10 @@ final class DigitalSignature {
       return Bln.get(signature.validate(valContext));
 
     } catch(final XMLSignatureException | SAXException | ParserConfigurationException |
-        IOException e) {
-      throw CX_IOEXC.get(info, e);
-    } catch(final MarshalException e) {
-      throw CX_SIGEXC.get(info, e);
+        IOException ex) {
+      throw CX_IOEXC.get(info, ex);
+    } catch(final MarshalException ex) {
+      throw CX_SIGEXC.get(info, ex);
     }
   }
 
@@ -312,8 +310,8 @@ final class DigitalSignature {
    * @throws IOException exception
    * @throws ParserConfigurationException exception
    */
-  private static Document toDOMNode(final ANode node)
-      throws SAXException, IOException, ParserConfigurationException {
+  private static Document toDOMNode(final ANode node) throws SAXException, IOException,
+  ParserConfigurationException {
 
     final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     dbf.setNamespaceAware(true);

@@ -719,17 +719,17 @@ public enum Function implements AFunction {
   // Cryptographic Module
 
   /** XQuery function. */
-  _CRYPTO_DECRYPT(CryptoDecrypt.class, "decrypt(input,type,key,algorithm)",
+  _CRYPTO_DECRYPT(CryptoDecrypt.class, "decrypt(data,type,key,algorithm)",
       arg(STR_O, STR_O, STR_O, STR_O), STR_O, CRYPTO_URI),
   /** XQuery function. */
-  _CRYPTO_ENCRYPT(CryptoEncrypt.class, "encrypt(input,encryption,key,algorithm)",
+  _CRYPTO_ENCRYPT(CryptoEncrypt.class, "encrypt(data,type,key,algorithm)",
       arg(STR_O, STR_O, STR_O, STR_O), STR_O, CRYPTO_URI),
   /** XQuery function. */
-  _CRYPTO_HMAC(CryptoHmac.class, "hmac(message,key,algorithm[,encoding])",
+  _CRYPTO_HMAC(CryptoHmac.class, "hmac(data,key,algorithm[,encoding])",
       arg(STR_O, STR_O, STR_O, STR_ZO), STR_O, CRYPTO_URI),
   /** XQuery function. */
   _CRYPTO_GENERATE_SIGNATURE(CryptoGenerateSignature.class, "generate-signature" +
-      "(input,canonicalization,digest,signature,prefix,type[,item1][,item2])",
+      "(data,canonicalization,digest,signature,prefix,type[,item1][,item2])",
       arg(NOD_O, STR_O, STR_O, STR_O, STR_O, STR_O, ITEM_ZO, ITEM_ZO), NOD_O, CRYPTO_URI),
   /** XQuery function. */
   _CRYPTO_VALIDATE_SIGNATURE(CryptoValidateSignature.class, "validate-signature(node)",

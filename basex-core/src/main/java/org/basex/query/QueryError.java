@@ -159,23 +159,23 @@ public enum QueryError {
   /** Error code. */
   CX_NOKEY(CX, 12, "Cannot find key for alias in given keystore."),
   /** Error code. */
-  CX_INVHASH(CX, 13, "Hashing algorithm is not supported."),
+  CX_INVHASH_X(CX, 13, "Hashing algorithm is not supported: %."),
   /** Error code. */
-  CX_ENC(CX, 14, "The encoding method is not supported."),
+  CX_ENC_X(CX, 14, "The encoding method is not supported: %."),
   /** Error code. */
   CX_NOSIG(CX, 15, "Cannot find signature element."),
   /** Error code. */
-  CX_NOPAD(CX, 16, "No such padding."),
+  CX_NOPAD_X(CX, 16, "No such padding: %."),
   /** Error code. */
-  CX_BADPAD(CX, 17, "Incorrect padding."),
+  CX_BADPAD_X(CX, 17, "Incorrect padding: %."),
   /** Error code. */
-  CX_ENCTYP(CX, 18, "Encryption type is not supported."),
+  CX_ENCTYP_X(CX, 18, "Encryption type is not supported: %."),
   /** Error code. */
-  CX_KEYINV(CX, 19, "Secret key is invalid."),
+  CX_KEYINV_X(CX, 19, "Secret key is invalid: %."),
   /** Error code. */
-  CX_ILLBLO(CX, 20, "Illegal block size."),
+  CX_ILLBLO_X(CX, 20, "Illegal block size: %."),
   /** Error code. */
-  CX_INVALGO(CX, 21, "Algorithm is not supported."),
+  CX_INVALGO_X(CX, 21, "Algorithm is not supported: %."),
   /** Error code. */
   CX_ALINV_X(CX, 23, "Invalid certificate alias %."),
   /** Error code. */
