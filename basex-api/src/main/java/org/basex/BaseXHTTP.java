@@ -14,6 +14,7 @@ import org.basex.io.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.util.resource.*;
 import org.eclipse.jetty.webapp.*;
 import org.eclipse.jetty.xml.*;
 
@@ -76,7 +77,7 @@ public final class BaseXHTTP extends CLI {
     final WebAppContext wac = new WebAppContext(webapp, "/");
     locate(WEBCONF, webapp);
     final IOFile url = locate(JETTYCONF, webapp);
-    jetty = (Server) new XmlConfiguration(url.inputStream()).configure();
+    jetty = (Server) new XmlConfiguration(new PathResource(url.file())).configure();
     jetty.setHandler(wac);
 
     ServerConnector sc = null;
