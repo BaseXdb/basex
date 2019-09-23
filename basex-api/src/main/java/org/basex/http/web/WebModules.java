@@ -33,15 +33,13 @@ public final class WebModules {
 
   /** RESTXQ path. */
   private final IOFile path;
-  /** Indicates if modules should be parsed with every call. */
-  private final boolean cached;
 
   /** Module cache. */
   private HashMap<String, WebModule> modules = new HashMap<>();
   /** Current parsing state. */
   private boolean parsed;
-  /** Last access. */
-  private long last;
+  /** Last access time. */
+  private long access;
 
   /**
    * Private constructor.
@@ -54,17 +52,19 @@ public final class WebModules {
     path = new IOFile(webpath).resolve(rxqpath);
 
     // RESTXQ parsing
-    final int ms = sopts.get(StaticOptions.PARSERESTXQ) * 1000;
-    // = 0: parse every time
-    cached = ms != 0;
-    // >= 0: activate timer
-    if(ms >= 0) {
+    final int sec = sopts.get(StaticOptions.PARSERESTXQ);
+    // < 0: process until cache is invalidated
+    if(sec >= 0) {
+      // speed up permission checks: keep cache for a minimum of time even if caching is disabled
+      final int ms = sec == 0 ? 10 : sec * 1000;
       new Timer(true).scheduleAtFixedRate(new TimerTask() {
         @Override
         public void run() {
-          if(System.currentTimeMillis() - last >= ms) init();
+          synchronized(WebModules.this) {
+            if(System.currentTimeMillis() - access >= ms) init();
+          }
         }
-      }, 0, 500);
+      }, 0, 100);
     }
   }
 
@@ -292,7 +292,7 @@ public final class WebModules {
   }
 
   /**
-   * Updates the module cache. Parses new modules and discards obsolete ones.
+   * Returns the module cache.
    * @param ctx database context
    * @return module cache
    * @throws QueryException query exception
@@ -301,16 +301,23 @@ public final class WebModules {
   private synchronized HashMap<String, WebModule> cache(final Context ctx)
       throws QueryException, IOException {
 
-    if(!parsed) {
+    final HashMap<String, WebModule> cache;
+    if(parsed) {
+      // module cache is still up-to-date
+      cache = modules;
+    } else {
+      // module cache needs to be updated
       if(!path.exists()) throw HTTPCode.NO_RESTXQ.get();
 
-      final HashMap<String, WebModule> map = new HashMap<>();
-      cache(ctx, path, map, modules);
-      modules = map;
-      parsed = cached;
+      cache = new HashMap<>();
+      parse(ctx, path, cache, modules);
+      modules = cache;
+      parsed = true;
     }
-    last = System.currentTimeMillis();
-    return modules;
+
+    // update last access time
+    access = System.currentTimeMillis();
+    return cache;
   }
 
   /**
@@ -322,7 +329,7 @@ public final class WebModules {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private static void cache(final Context ctx, final IOFile root,
+  private static void parse(final Context ctx, final IOFile root,
       final HashMap<String, WebModule> cache, final HashMap<String, WebModule> old)
       throws QueryException, IOException {
 
@@ -334,11 +341,11 @@ public final class WebModules {
 
     for(final IOFile file : files) {
       if(file.isDir()) {
-        cache(ctx, file, cache, old);
+        parse(ctx, file, cache, old);
       } else {
         final String path = file.path();
         if(file.hasSuffix(IO.XQSUFFIXES)) {
-          WebModule module = old.get(path);
+          WebModule module = old != null ? old.get(path) : null;
           boolean parsed = false;
           if(module != null) {
             // check if module has been modified

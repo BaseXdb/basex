@@ -22,7 +22,7 @@ public abstract class WebResponse {
   public enum Response {
     /** No response.       */ NONE,
     /** Standard response. */ STANDARD,
-    /** Custom response.   */   CUSTOM
+    /** Custom response.   */ CUSTOM
   };
 
   /** Database context. */
