@@ -9,9 +9,9 @@ import org.basex.query.value.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class FileChildren extends FileList {
+public final class FileDescendants extends FileList {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return paths(false, qc);
+    return paths(true, qc);
   }
 }

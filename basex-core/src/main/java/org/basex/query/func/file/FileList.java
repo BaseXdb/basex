@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
+import java.util.function.*;
 import java.util.regex.*;
 
 import org.basex.io.*;
@@ -21,7 +22,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class FileList extends FileRead {
+public class FileList extends FileFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     checkCreate(qc);
@@ -32,7 +33,29 @@ public final class FileList extends FileRead {
           string(toToken(exprs[2], qc))), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE) : null;
 
       final TokenList tl = new TokenList();
-      list(dir.getNameCount(), dir, tl, recursive, pattern, qc);
+      list(dir, recursive, pattern, tl, dir.getNameCount(), qc);
+      return StrSeq.get(tl);
+    } catch(final NoSuchFileException | NotDirectoryException ex) {
+      throw FILE_NO_DIR_X.get(info, ex);
+    } catch(final AccessDeniedException ex) {
+      throw FILE_IE_ERROR_ACCESS_X.get(info, ex);
+    } catch(final IOException ex) {
+      throw FILE_IO_ERROR_X.get(info, ex);
+    }
+  }
+
+  /**
+   * Returns full file paths.
+   * @param recursive recursive flag
+   * @param qc query context
+   * @return file paths
+   * @throws QueryException query exception
+   */
+  Value paths(final boolean recursive, final QueryContext qc) throws QueryException {
+    checkCreate(qc);
+    try {
+      final TokenList tl = new TokenList();
+      list(toPath(0, qc), recursive, null, tl, -1, qc);
       return StrSeq.get(tl);
     } catch(final NoSuchFileException | NotDirectoryException ex) {
       throw FILE_NO_DIR_X.get(info, ex);
@@ -45,44 +68,49 @@ public final class FileList extends FileRead {
 
   /**
    * Collects the sub-directories and files of the specified directory.
-   * @param index index of root path
-   * @param dir root path
+   * @param root root path
+   * @param recursive recursive flag
+   * @param pattern file name pattern; ignored if {@code null}
    * @param list file list
-   * @param rec recursive flag
-   * @param pat file name pattern; ignored if {@code null}
+   * @param index index of root path
    * @param qc query context
    * @throws IOException I/O exception
    */
-  private static void list(final int index, final Path dir, final TokenList list, final boolean rec,
-      final Pattern pat, final QueryContext qc) throws IOException {
+  static void list(final Path root, final boolean recursive, final Pattern pattern,
+      final TokenList list, final int index, final QueryContext qc) throws IOException {
 
-    // skip invalid directories
-    final ArrayList<Path> children = new ArrayList<>();
-    try(DirectoryStream<Path> paths = Files.newDirectoryStream(dir)) {
+    // filter function for adding results
+    final BiConsumer<Path, Boolean> add = (child, dir) -> {
+      if(pattern == null || pattern.matcher(child.getFileName().toString()).matches()) {
+        final Path path = index < 0 ? child : child.subpath(index, child.getNameCount());
+        list.add(get(path, dir).string());
+      }
+    };
+
+    // collect directories and files first (reduces number of open directory streams)
+    final ArrayList<Path> dirs = new ArrayList<>(), files = new ArrayList<>();
+    try(DirectoryStream<Path> paths = Files.newDirectoryStream(root)) {
       for(final Path path : paths) {
         qc.checkStop();
-        children.add(path);
+        (Files.isDirectory(path) ? dirs : files).add(path);
       }
     } catch(final IOException ex) {
-      // only throw exception on root level
-      if(index == dir.getNameCount()) throw ex;
+      // skip entries that cannot be accessed; throw exception only on root level
+      if(index == -1 || index == root.getNameCount()) throw ex;
     }
 
-    // parse directories, do not follow links
-    if(rec) {
-      for(final Path child : children) {
-        if(Files.isDirectory(child)) {
-          list(index, child, list, true, pat, qc);
-        }
+    // add directories
+    for(final Path dir : dirs) {
+      add.accept(dir, true);
+      // recursive traversal: do not follow links
+      if(recursive && !Files.isSymbolicLink(dir)) {
+        list(dir, true, pattern, list, index == -1 ? -2 : index, qc);
       }
     }
 
-    // parse files. ignore directories if a pattern is specified
-    for(final Path child : children) {
-      if(pat == null || pat.matcher(child.getFileName().toString()).matches()) {
-        final Path path = child.subpath(index, child.getNameCount());
-        list.add(get(path, Files.isDirectory(child)).string());
-      }
+    // add files
+    for(final Path file : files) {
+      add.accept(file, false);
     }
   }
 }

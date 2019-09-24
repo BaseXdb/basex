@@ -892,6 +892,9 @@ public enum Function implements AFunction {
   _FILE_DELETE(FileDelete.class, "delete(path[,recursive])",
       arg(STR_O, BLN_O), EMP, flag(NDT), FILE_URI),
   /** XQuery function. */
+  _FILE_DESCENDANTS(FileDescendants.class, "descendants(path)",
+      arg(STR_O), STR_ZM, flag(NDT), FILE_URI),
+  /** XQuery function. */
   _FILE_DIR_SEPARATOR(FileDirSeparator.class, "dir-separator()", arg(), STR_O, FILE_URI),
   /** XQuery function. */
   _FILE_EXISTS(FileExists.class, "exists(path)", arg(STR_O), BLN_O, flag(NDT), FILE_URI),

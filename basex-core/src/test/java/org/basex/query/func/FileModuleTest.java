@@ -190,6 +190,17 @@ public final class FileModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void descendants() {
+    final Function func = _FILE_DESCENDANTS;
+    query(_FILE_CREATE_DIR.args(PATH1));
+    query(_FILE_WRITE.args(PATH3, "abcd"));
+
+    error(func.args(PATH3), FILE_NO_DIR_X);
+    error(func.args(PATH3 + NAME), FILE_NO_DIR_X);
+    contains(func.args(PATH1), "x");
+  }
+
+  /** Test method. */
   @Test public void dirSeparator() {
     final Function func = _FILE_DIR_SEPARATOR;
     // successful queries
