@@ -59,16 +59,23 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
   public Value value(final Expr expr) {
     ddo();
 
+    // return empty sequence or single node
     final int sz = size;
-    final ANode[] nodes = finish();
+    if(sz == 0) return Empty.VALUE;
+    if(sz == 1) return list[0];
 
-    // create standard sequence
-    if(data == null) return ItemSeq.get(nodes, sz, NodeType.NOD.refine(expr));
+    // check if compact sequence with single database instance can be created
+    if(data != null) {
+      final ANode parent = list[0].parent();
+      if(parent == null || parent.data() == data) {
+        final int[] pres = new int[sz];
+        for(int l = 0; l < sz; l++) pres[l] = ((DBNode) list[l]).pre();
+        return DBNodeSeq.get(pres, data, expr);
+      }
+    }
 
-    // same database: create compact sequence
-    final int[] pres = new int[sz];
-    for(int l = 0; l < sz; l++) pres[l] = ((DBNode) nodes[l]).pre();
-    return DBNodeSeq.get(pres, data, expr);
+    // otherwise, create default sequence
+    return ItemSeq.get(finish(), sz, NodeType.NOD.refine(expr));
   }
 
   /**

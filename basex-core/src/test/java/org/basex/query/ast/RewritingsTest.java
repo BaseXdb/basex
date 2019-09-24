@@ -467,4 +467,18 @@ public final class RewritingsTest extends QueryPlanTest {
     query(query, "<_/>");
     execute(new DropDB(NAME));
   }
+
+  /** GH1726. */
+  @Test public void gh1726() {
+    final String query =
+      "let $xml := if(1[.]) then ( " +
+      "  element a { element b { } update { } } " +
+      ") else ( " +
+      "  error() " +
+      ") " +
+      "let $b := $xml/* " +
+      "return ($b, $b/..)";
+
+    query(query, "<b/>\n<a>\n<b/>\n</a>");
+  }
 }
