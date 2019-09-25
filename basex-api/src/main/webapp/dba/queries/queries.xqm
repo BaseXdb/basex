@@ -88,7 +88,7 @@ function dba:queries(
           </tr>
         </table>,
         <textarea name='output' id='output' readonly=''/>,
-        html:js('loadCodeMirror(true);'),
+        html:js('loadCodeMirror("xquery", true);'),
         for $name in (($file, session:get($session:QUERY))[.])[1]
         return html:js('openQuery("' || $name || '");')
       }</td>

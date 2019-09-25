@@ -266,15 +266,16 @@ var _edit;
 
 /**
  * Loads the code mirror editor extension.
+ * @param {string}  language programming language (syntax highlighting)
  * @param {boolean}  edit editor flag (vs. read-only view)
  */
-function loadCodeMirror(edit) {
+function loadCodeMirror(language, edit) {
   _edit = edit;
   if (CodeMirror && dispatchEvent) {
     if(edit) {
       var editorArea = document.getElementById("editor");
       _editorMirror = CodeMirror.fromTextArea(editorArea, {
-        mode: "xquery",
+        mode: language,
         lineNumbers: true,
         extraKeys: {
           "Ctrl-Enter"      : function(cm) { runQuery(); },

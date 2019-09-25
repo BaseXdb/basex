@@ -30,7 +30,12 @@ function dba:users(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
-  html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
+  html:wrap(
+    map {
+      'header': $dba:CAT, 'info': $info, 'error': $error,
+      'css': 'codemirror/lib/codemirror.css',
+      'scripts': ('codemirror/lib/codemirror.js', 'codemirror/mode/xml/xml.js')
+    },
     <tr>
       <td>
         <form action="{ $dba:CAT }" method="post" class="update">
@@ -59,6 +64,18 @@ function dba:users(
         }
         </form>
         <div>&#xa0;</div>
+      </td>
+      <td class='vertical'/>
+      <td>
+        <form action='users-info' method='post'>{
+          <h3>Extra Information</h3>,
+          html:button('save', 'Save'),
+          <div class='small'/>,
+          <textarea name='info' id='editor' spellcheck='false'>{
+            serialize(user:info())
+          }</textarea>,
+          html:js('loadCodeMirror("xml", true);')
+        }</form>
       </td>
     </tr>
   )

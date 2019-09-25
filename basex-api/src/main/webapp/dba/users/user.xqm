@@ -43,7 +43,12 @@ function dba:user(
 ) as element(html) {
   let $user := user:list-details($name)
   let $admin := $name eq 'admin'
-  return html:wrap(map { 'header': ($dba:CAT, $name), 'info': $info, 'error': $error },
+  return html:wrap(
+    map {
+      'header': ($dba:CAT, $name), 'info': $info, 'error': $error,
+      'css': 'codemirror/lib/codemirror.css',
+      'scripts': ('codemirror/lib/codemirror.js', 'codemirror/mode/xml/xml.js')
+    },
     <tr>
       <td width='49%'>
         <form action="user-edit" method="post" autocomplete="off">
@@ -91,13 +96,23 @@ function dba:user(
                     <div class='small'/>
                   </td>
                 </tr>
-              )
+              ),
+              <tr>
+                <td>Information:</td>
+                <td>
+                  <textarea name='info' id='editor' rows='10' spellcheck='false'>{
+                    serialize(user:info($name))
+                  }</textarea>
+                </td>
+              </tr>,
+              html:js('loadCodeMirror("xml", true);')
             )
           }</table>
         </form>
-      {
+      </td>
+      <td class='vertical'/>
+      <td width='49%'>{
         if($admin) then () else <_>
-          <hr/>
           <h3>Local Permissions</h3>
           <form action="{ $dba:SUB }" method="post" id="{ $dba:SUB }" class="update">
             <input type="hidden" name="name" value="{ $name }" id="name"/>

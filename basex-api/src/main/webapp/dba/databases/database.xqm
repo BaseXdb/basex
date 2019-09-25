@@ -143,7 +143,7 @@ function dba:database(
           <div class='small'/>,
           <textarea name='output' id='output' rows='20' readonly='' spellcheck='false'/>,
           html:focus('input'),
-          html:js('loadCodeMirror(false); queryResource(true);')
+          html:js('loadCodeMirror("xml", false); queryResource(true);')
         ) else if($db-exists) then (
           html:properties(db:info($name))
         ) else ()
