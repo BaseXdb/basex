@@ -134,7 +134,7 @@ public final class DeepEqual {
 
       ANode node1 = (ANode) item1, node2 = (ANode) item2;
       if(node1.is(node2)) continue;
-      BasicNodeIter ch1 = node1.children(), ch2 = node2.children();
+      BasicNodeIter ch1 = node1.childIter(), ch2 = node2.childIter();
 
       final Stack<BasicNodeIter> stack = new Stack<>();
       stack.push(ch1);
@@ -177,8 +177,8 @@ public final class DeepEqual {
             if(!eq(node1.string(), node2.string())) return false;
           } else if(type1 == NodeType.ELM) {
             // compare attributes
-            final BasicNodeIter ir1 = node1.attributes();
-            BasicNodeIter ir2 = node2.attributes();
+            final BasicNodeIter ir1 = node1.attributeIter();
+            BasicNodeIter ir2 = node2.attributeIter();
             if(ir1.size() != ir2.size()) return false;
 
             // compare names, values and prefixes
@@ -192,7 +192,7 @@ public final class DeepEqual {
                     !eq(a1.string(), a2.string())) {
                   return false;
                 }
-                ir2 = node2.attributes();
+                ir2 = node2.attributeIter();
                 continue LOOP;
               }
               return false;
@@ -217,8 +217,8 @@ public final class DeepEqual {
             // check children
             stack.push(ch1);
             stack.push(ch2);
-            ch1 = node1.children();
-            ch2 = node2.children();
+            ch1 = node1.childIter();
+            ch2 = node2.childIter();
           }
         }
 

@@ -18,7 +18,7 @@ public enum Axis {
   ANCESTOR_OR_SELF("ancestor-or-self", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.ancestorOrSelf();
+      return n.ancestorOrSelfIter();
     }
   },
 
@@ -26,7 +26,7 @@ public enum Axis {
   ANCESTOR("ancestor", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.ancestor();
+      return n.ancestorIter();
     }
   },
 
@@ -34,15 +34,15 @@ public enum Axis {
   ATTRIBUTE("attribute", true) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.attributes();
+      return n.attributeIter();
     }
   },
 
-  /** Child Axis. */
+  /** Child axis. */
   CHILD("child", true) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.children();
+      return n.childIter();
     }
   },
 
@@ -50,7 +50,7 @@ public enum Axis {
   DESCENDANT_OR_SELF("descendant-or-self", true) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.descendantOrSelf();
+      return n.descendantOrSelfIter();
     }
   },
 
@@ -58,15 +58,15 @@ public enum Axis {
   DESCENDANT("descendant", true) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.descendant();
+      return n.descendantIter();
     }
   },
 
-  /** Following-Sibling axis. */
+  /** Following-sibling axis. */
   FOLLOWING_SIBLING("following-sibling", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.followingSibling();
+      return n.followingSiblingIter();
     }
   },
 
@@ -74,7 +74,7 @@ public enum Axis {
   FOLLOWING("following", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.following();
+      return n.followingIter();
     }
   },
 
@@ -86,11 +86,11 @@ public enum Axis {
     }
   },
 
-  /** Preceding-Sibling axis. */
+  /** Preceding-sibling axis. */
   PRECEDING_SIBLING("preceding-sibling", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.precedingSibling();
+      return n.precedingSiblingIter();
     }
   },
 
@@ -98,7 +98,7 @@ public enum Axis {
   PRECEDING("preceding", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.preceding();
+      return n.precedingIter();
     }
   },
 
@@ -106,21 +106,21 @@ public enum Axis {
   SELF("self", true) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.self();
+      return n.selfIter();
     }
   };
 
   /** Cached enums (faster). */
   public static final Axis[] VALUES = values();
-  /** Axis string. */
+  /** Name of axis. */
   public final String name;
-  /** Descendant axis flag. */
+  /** Downward axis. */
   public final boolean down;
 
   /**
    * Constructor.
    * @param name axis string
-   * @param down descendant flag
+   * @param down downward axis
    */
   Axis(final String name, final boolean down) {
     this.name = name;

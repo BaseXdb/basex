@@ -61,7 +61,7 @@ public enum NodeType implements Type {
       if(value instanceof BXElem)  return ((BXNode) value).getNode();
       if(value instanceof Element) return new FElem((Element) value, null, new TokenMap());
       try {
-        return new DBNode(new IOContent(value.toString())).children().next();
+        return new DBNode(new IOContent(value.toString())).childIter().next();
       } catch(final IOException ex) {
         throw NODEERR_X_X.get(ii, this, ex);
       }

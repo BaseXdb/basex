@@ -351,7 +351,7 @@ public abstract class XQArray extends XQData {
     final FuncType ft = (FuncType) tp;
     if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(SeqType.ITR_O)) return false;
 
-    SeqType dt = ft.declType;
+    final SeqType dt = ft.declType;
     if(dt.eq(SeqType.ITEM_ZM)) return true;
 
     // check types of members

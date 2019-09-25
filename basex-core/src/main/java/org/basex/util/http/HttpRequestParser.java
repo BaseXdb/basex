@@ -47,7 +47,7 @@ public final class HttpRequestParser {
     final HttpRequest hr = new HttpRequest();
 
     if(request != null) {
-      for(final ANode attr : request.attributes()) {
+      for(final ANode attr : request.attributeIter()) {
         final String key = string(attr.name());
         final Request r = Request.get(key);
         if(r == null) throw HC_REQ_X.get(info, "Unknown attribute: " + key);
@@ -56,7 +56,7 @@ public final class HttpRequestParser {
       checkRequest(hr);
 
       // it is an error if content is set for HTTP methods that do not allow bodies
-      final ANode body = parseHeaders(request.children(), hr.headers);
+      final ANode body = parseHeaders(request.childIter(), hr.headers);
       final String method = hr.attribute(Request.METHOD);
       if(Strings.eq(method, TRACE, DELETE) && (body != null || !bodies.isEmpty()))
         throw HC_REQ_X.get(info, "Body not expected for method " + method);
@@ -85,7 +85,7 @@ public final class HttpRequestParser {
    * @param atts map for parsed attributes
    */
   private static void parseAtts(final ANode element, final Map<String, String> atts) {
-    for(final ANode attr : element.attributes()) {
+    for(final ANode attr : element.attributeIter()) {
       atts.put(string(attr.name()), string(attr.string()));
     }
   }
@@ -103,7 +103,7 @@ public final class HttpRequestParser {
       if(!nm.eq(Q_HEADER)) return node;
 
       String name = "", value = "";
-      for(final ANode attr : node.attributes()) {
+      for(final ANode attr : node.attributeIter()) {
         final String qn = string(attr.qname().local());
         if(qn.equals(NAME)) name = string(attr.string());
         else if(qn.equals(VALUE)) value = string(attr.string());
@@ -131,7 +131,7 @@ public final class HttpRequestParser {
       // no linked resource for setting request content
       if(items.isEmpty()) {
         // payload is taken from children of <http:body/> element
-        for(final ANode node : body.children()) payload.add(node);
+        for(final ANode node : body.childIter()) payload.add(node);
       } else {
         // payload is taken from $bodies parameter
         for(final Item item : items) payload.add(item);
@@ -154,7 +154,7 @@ public final class HttpRequestParser {
     if(atts.get(SerializerOptions.MEDIA_TYPE.name()) == null)
       throw HC_REQ_X.get(info, "Attribute media-type of http:multipart is mandatory");
 
-    final BasicNodeIter iter = multipart.children();
+    final BasicNodeIter iter = multipart.childIter();
     while(true) {
       final Part part = new Part();
       final ANode payload = parseHeaders(iter, part.headers);
@@ -220,7 +220,7 @@ public final class HttpRequestParser {
 
     // if src attribute is used to set the content of the body, no
     // other attributes must be specified and no content must be present
-    if(bodyAtts.get(SRC) != null && (bodyAtts.size() > 2 || body.children().next() != null))
+    if(bodyAtts.get(SRC) != null && (bodyAtts.size() > 2 || body.childIter().next() != null))
       throw HC_ATTR.get(info);
   }
 }

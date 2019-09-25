@@ -106,18 +106,18 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXNList getChildNodes() {
-    return new BXNList(finish(nd.children()));
+    return new BXNList(finish(nd.childIter()));
   }
 
   @Override
   public BXNode getFirstChild() {
-    return get(nd.children().next());
+    return get(nd.childIter().next());
   }
 
   @Override
   public final BXNode getLastChild() {
     ANode node = null;
-    for(final ANode n : nd.children()) node = n;
+    for(final ANode n : nd.childIter()) node = n;
     return node != null ? get(node) : null;
   }
 
@@ -128,12 +128,12 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXNode getNextSibling() {
-    return get(nd.followingSibling().next());
+    return get(nd.followingSiblingIter().next());
   }
 
   @Override
   public BXNode getPreviousSibling() {
-    return get(nd.precedingSibling().next());
+    return get(nd.precedingSiblingIter().next());
   }
 
   @Override
@@ -267,7 +267,7 @@ public abstract class BXNode implements Node {
   final BXNList getElements(final String name) {
     final ANodeList nb = new ANodeList();
     final byte[] nm = "*".equals(name) ? null : token(name);
-    for(final ANode n : nd.descendant()) {
+    for(final ANode n : nd.descendantIter()) {
       if(n.type == NodeType.ELM && (nm == null || eq(nm, n.name()))) nb.add(n.finish());
     }
     return new BXNList(nb);

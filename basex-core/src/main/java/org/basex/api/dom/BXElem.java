@@ -31,7 +31,7 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public BXNNode getAttributes() {
-    return new BXNNode(finish(nd.attributes()));
+    return new BXNNode(finish(nd.attributeIter()));
   }
 
   @Override
@@ -148,7 +148,7 @@ public final class BXElem extends BXNode implements Element {
    */
   private ANode attribute(final String name) {
     final byte[] nm = Token.token(name);
-    for(final ANode n : nd.attributes()) {
+    for(final ANode n : nd.attributeIter()) {
       if(Token.eq(nm, n.name())) return n.finish();
     }
     return null;

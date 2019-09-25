@@ -90,7 +90,7 @@ abstract class Ids extends ContextFn {
   private static void add(final TokenSet idSet, final ANodeBuilder results, final ANode node,
       final boolean idref) {
 
-    for(final ANode attr : node.attributes()) {
+    for(final ANode attr : node.attributeIter()) {
       if(XMLToken.isId(attr.name(), idref)) {
         // id/idref found
         for(final byte[] token : distinctTokens(attr.string())) {
@@ -102,7 +102,7 @@ abstract class Ids extends ContextFn {
         }
       }
     }
-    for(final ANode child : node.children()) add(idSet, results, child, idref);
+    for(final ANode child : node.childIter()) add(idSet, results, child, idref);
   }
 
   /**

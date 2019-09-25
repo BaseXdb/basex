@@ -127,7 +127,7 @@ public final class Jobs {
    */
   private JobsOptions options(final ANode job) {
     final JobsOptions opts = new JobsOptions();
-    for(final ANode attr : job.attributes()) {
+    for(final ANode attr : job.attributeIter()) {
       try {
         opts.assign(string(attr.name()), string(attr.string()));
       } catch(final BaseXException ex) {

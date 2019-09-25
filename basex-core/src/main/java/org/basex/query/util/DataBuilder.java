@@ -102,7 +102,7 @@ public final class DataBuilder {
     final int last = data.meta.size;
     data.insert(last);
     int next = pre + 1;
-    for(final ANode child : node.children()) next = addNode(child, next, pre);
+    for(final ANode child : node.childIter()) next = addNode(child, next, pre);
     if(size != next - pre) data.size(last, Data.DOC, next - pre);
     return next;
   }
@@ -223,8 +223,8 @@ public final class DataBuilder {
 
     // add attributes and child nodes
     int cPre = pre + 1;
-    for(final ANode attr : node.attributes()) cPre = addAttr(attr, cPre, pre);
-    for(final ANode child : node.children()) cPre = addNode(child, cPre, pre);
+    for(final ANode attr : node.attributeIter()) cPre = addAttr(attr, cPre, pre);
+    for(final ANode child : node.childIter()) cPre = addNode(child, cPre, pre);
 
     // finalize namespace structure
     data.nspaces.close(last);
@@ -250,10 +250,10 @@ public final class DataBuilder {
     }
 
     int size = 1;
-    final BasicNodeIter iter = node.attributes();
+    final BasicNodeIter iter = node.attributeIter();
     while(iter.next() != null) ++size;
     if(!att) {
-      for(final ANode child : node.children()) size += size(child, false);
+      for(final ANode child : node.childIter()) size += size(child, false);
     }
     return size;
   }

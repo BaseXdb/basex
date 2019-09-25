@@ -82,7 +82,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
       throws QueryException {
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item item : this) {
+    for(final Item item : this) {
       final Item it = item.materialize(qc, item.persistent());
       if(it == null) throw error.get(info, item);
       vb.add(it);

@@ -222,6 +222,6 @@ public final class Users {
    * @param elem info element
    */
   public void info(final ANode elem) {
-    info = elem.hasChildren() || elem.attributes().size() != 0 ? elem : null;
+    info = elem.hasChildren() || elem.attributeIter().size() != 0 ? elem : null;
   }
 }

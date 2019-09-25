@@ -50,7 +50,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final BasicNodeIter ancestor() {
+  public final BasicNodeIter ancestorIter() {
     return new BasicNodeIter() {
       private ANode node = FNode.this;
 
@@ -63,7 +63,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final BasicNodeIter ancestorOrSelf() {
+  public final BasicNodeIter ancestorOrSelfIter() {
     return new BasicNodeIter() {
       private ANode node = FNode.this;
 
@@ -78,12 +78,12 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public BasicNodeIter attributes() {
+  public BasicNodeIter attributeIter() {
     return BasicNodeIter.EMPTY;
   }
 
   @Override
-  public BasicNodeIter children() {
+  public BasicNodeIter childIter() {
     return BasicNodeIter.EMPTY;
   }
 
@@ -93,12 +93,12 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final BasicNodeIter descendant() {
+  public final BasicNodeIter descendantIter() {
     return desc(false);
   }
 
   @Override
-  public final BasicNodeIter descendantOrSelf() {
+  public final BasicNodeIter descendantOrSelfIter() {
     return desc(true);
   }
 
@@ -130,8 +130,8 @@ public abstract class FNode extends ANode {
 
       @Override
       public ANode next() {
-        final BasicNodeIter iter = last != null ? last.children() : self ? self() : children();
-        last = iter.next();
+        final BasicNodeIter ir = last != null ? last.childIter() : self ? selfIter() : childIter();
+        last = ir.next();
         if(last == null) {
           while(!iters.isEmpty()) {
             last = iters.peek().next();
@@ -139,7 +139,7 @@ public abstract class FNode extends ANode {
             iters.pop();
           }
         } else {
-          iters.add(iter);
+          iters.add(ir);
         }
         return last;
       }
@@ -147,7 +147,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final BasicNodeIter followingSibling() {
+  public final BasicNodeIter followingSiblingIter() {
     return new BasicNodeIter() {
       private BasicNodeIter iter;
 
@@ -156,7 +156,7 @@ public abstract class FNode extends ANode {
         if(iter == null) {
           final ANode r = parent();
           if(r == null) return null;
-          iter = r.children();
+          iter = r.childIter();
           for(ANode n; (n = iter.next()) != null && !n.is(FNode.this););
         }
         return iter.next();
@@ -165,7 +165,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final BasicNodeIter following() {
+  public final BasicNodeIter followingIter() {
     return new BasicNodeIter() {
       private BasicNodeIter iter;
 
@@ -175,7 +175,7 @@ public abstract class FNode extends ANode {
           final ANodeList list = new ANodeList();
           ANode node = FNode.this, par = node.parent();
           while(par != null) {
-            final BasicNodeIter ir = par.children();
+            final BasicNodeIter ir = par.childIter();
             if(node.type != NodeType.ATT) {
               for(final ANode nd : ir) {
                 if(nd.is(node)) break;
@@ -183,7 +183,7 @@ public abstract class FNode extends ANode {
             }
             for(final ANode nd : ir) {
               list.add(nd.finish());
-              addDesc(nd.children(), list);
+              addDesc(nd.childIter(), list);
             }
             node = par;
             par = par.parent();

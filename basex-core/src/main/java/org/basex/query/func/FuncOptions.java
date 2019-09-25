@@ -115,12 +115,12 @@ public final class FuncOptions {
    * @throws QueryException query exception
    */
   private String toString(final ANode node, final QueryError error) throws QueryException {
-    final ANode n = node.attributes().next();
+    final ANode n = node.attributeIter().next();
     if(n != null) throw error.get(info, Util.info("Invalid attribute: '%'", n.name()));
 
     final TokenBuilder tb = new TokenBuilder();
     // interpret options
-    for(final ANode child : node.children()) {
+    for(final ANode child : node.childIter()) {
       if(child.type != NodeType.ELM) continue;
 
       // ignore elements in other namespace
@@ -140,7 +140,7 @@ public final class FuncOptions {
       } else if(hasElements(child)) {
         value = toString(child, error);
       } else {
-        for(final ANode attr : child.attributes()) {
+        for(final ANode attr : child.attributeIter()) {
           if(eq(attr.name(), VALUE)) {
             value = string(attr.string());
             if(name.equals(SerializerOptions.CDATA_SECTION_ELEMENTS.name())) {
@@ -192,7 +192,7 @@ public final class FuncOptions {
    * @return result of check
    */
   private static boolean hasElements(final ANode node) {
-    for(final ANode n : node.children()) {
+    for(final ANode n : node.childIter()) {
       if(n.type == NodeType.ELM) return true;
     }
     return false;

@@ -65,7 +65,7 @@ public final class SqlExecutePrepared extends SqlExecute {
 
     try {
       stmt.setQueryTimeout(options.get(StatementOptions.TIMEOUT));
-      if(params != null) setParameters(params.children(), stmt);
+      if(params != null) setParameters(params.childIter(), stmt);
       // If execute returns false, statement was updating: return number of updated rows
       return iter(stmt, false, stmt.execute());
     } catch(final QueryException ex) {
@@ -91,7 +91,7 @@ public final class SqlExecutePrepared extends SqlExecute {
     for(ANode next; (next = params.next()) != null;) {
       // Check name
       if(!next.qname().eq(Q_PARAMETER)) throw INVALIDOPTION_X.get(info, next.qname().local());
-      final BasicNodeIter attrs = next.attributes();
+      final BasicNodeIter attrs = next.attributeIter();
       byte[] paramType = null;
       boolean isNull = false;
       for(ANode attr; (attr = attrs.next()) != null;) {

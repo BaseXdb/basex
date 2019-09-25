@@ -447,7 +447,7 @@ public abstract class Serializer implements Closeable {
       namespace(node.name(), node.string(), true);
     } else if(type == NodeType.DOC) {
       openDoc(node.baseURI());
-      for(final ANode n : node.children()) node(n);
+      for(final ANode n : node.childIter()) node(n);
       closeDoc();
     } else {
       // serialize elements (code will never be called for attributes)
@@ -462,7 +462,7 @@ public abstract class Serializer implements Closeable {
 
       // serialize attributes
       final boolean i = indent;
-      BasicNodeIter iter = node.attributes();
+      BasicNodeIter iter = node.attributeIter();
       for(ANode nd; (nd = iter.next()) != null;) {
         final byte[] n = nd.name();
         final byte[] v = nd.string();
@@ -471,7 +471,7 @@ public abstract class Serializer implements Closeable {
       }
 
       // serialize children
-      iter = node.children();
+      iter = node.childIter();
       for(ANode n; (n = iter.next()) != null;) node(n);
       closeElement();
       indent = i;

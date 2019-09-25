@@ -128,7 +128,7 @@ public final class PkgParser {
    */
   private static BasicNodeIter childElements(final ANode node) {
     return new BasicNodeIter() {
-      final BasicNodeIter ch = node.children();
+      final BasicNodeIter ch = node.childIter();
       @Override
       public ANode next() {
         while(true) {

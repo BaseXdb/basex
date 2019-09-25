@@ -203,7 +203,7 @@ public final class SerializerOptions extends Options {
       final IO io = IO.get(string(uri.string()));
       final ANode root;
       try {
-        root = new DBNode(io).children().next();
+        root = new DBNode(io).childIter().next();
       } catch(final IOException ex) {
         throw OUTDOC_X.get(ii, ex);
       }
@@ -213,7 +213,7 @@ public final class SerializerOptions extends Options {
       final HashMap<String, String> free = free();
       if(!free.isEmpty()) throw SEROPTION_X.get(ii, free.keySet().iterator().next());
 
-      for(final ANode child : root.children()) {
+      for(final ANode child : root.childIter()) {
         if(child.type != NodeType.ELM) continue;
         if(string(child.qname().local()).equals(USE_CHARACTER_MAPS.name())) {
           final String map = characterMap(child);
@@ -230,16 +230,16 @@ public final class SerializerOptions extends Options {
    * @return character map or {@code null} if map is invalid
    */
   public static String characterMap(final ANode elem) {
-    if(elem.attributes().next() != null) return null;
+    if(elem.attributeIter().next() != null) return null;
 
     // parse characters
     final TokenMap map = new TokenMap();
-    for(final ANode child : elem.children()) {
+    for(final ANode child : elem.childIter()) {
       if(child.type != NodeType.ELM) continue;
       final byte[] name = child.qname().local();
       if(eq(name, CHARACTER_MAP)) {
         byte[] key = null, val = null;
-        for(final ANode attr : child.attributes()) {
+        for(final ANode attr : child.attributeIter()) {
           final byte[] att = attr.name();
           if(eq(att, CHARACTER)) key = attr.string();
           else if(eq(att, MAP_STRING)) val = attr.string();

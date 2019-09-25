@@ -105,7 +105,7 @@ public final class FTOpt extends ExprInfo {
       WILDCARDS, is(WC) ? TRUE : null, FUZZY, is(FZ) ? TRUE : null, CASE, cs,
       STEMMING, is(ST) || sd != null ? TRUE : null, LANGUAGE, ln,
       THESAURUS, th != null ? TRUE : null);
-    if(elem.attributes().next() != null) plan.add(elem);
+    if(elem.attributeIter().next() != null) plan.add(elem);
   }
 
   @Override

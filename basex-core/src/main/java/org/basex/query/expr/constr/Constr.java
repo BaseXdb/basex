@@ -148,7 +148,7 @@ public final class Constr {
       } else if(type == NodeType.DOC) {
         // type: document node
 
-        final BasicNodeIter iter = node.children();
+        final BasicNodeIter iter = node.childIter();
         for(Item it; (it = qc.next(iter)) != null && add(qc, it););
 
       } else {

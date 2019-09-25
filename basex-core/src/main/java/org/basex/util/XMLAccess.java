@@ -33,7 +33,7 @@ public final class XMLAccess {
    * @return iterator
    */
   public static BasicNodeIter children(final ANode node, final byte[] name) {
-    final BasicNodeIter children = node.children();
+    final BasicNodeIter children = node.childIter();
     return new BasicNodeIter() {
       @Override
       public ANode next() {

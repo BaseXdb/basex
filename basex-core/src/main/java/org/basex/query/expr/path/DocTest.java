@@ -32,7 +32,7 @@ public final class DocTest extends Test {
   @Override
   public boolean eq(final ANode node) {
     if(node.type != NodeType.DOC) return false;
-    final BasicNodeIter iter = node.children();
+    final BasicNodeIter iter = node.childIter();
     boolean found = false;
     for(ANode n; (n = iter.next()) != null;) {
       if(n.type == NodeType.COM || n.type == NodeType.PI) continue;

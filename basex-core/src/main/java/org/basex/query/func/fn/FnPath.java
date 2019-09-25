@@ -30,7 +30,7 @@ public final class FnPath extends ContextFn {
         tb.add('@').add(node.qname().id());
       } else if(node.type == NodeType.ELM) {
         final QNm qnm = node.qname();
-        final BasicNodeIter iter = node.precedingSibling();
+        final BasicNodeIter iter = node.precedingSiblingIter();
         for(ANode fs; (fs = iter.next()) != null;) {
           qc.checkStop();
           final QNm q = fs.qname();
@@ -38,7 +38,7 @@ public final class FnPath extends ContextFn {
         }
         tb.add(qnm.eqName()).add('[').add(Integer.toString(i)).add(']');
       } else if(node.type == NodeType.COM || node.type == NodeType.TXT) {
-        final BasicNodeIter iter = node.precedingSibling();
+        final BasicNodeIter iter = node.precedingSiblingIter();
         for(ANode fs; (fs = iter.next()) != null;) {
           qc.checkStop();
           if(fs.type == node.type) i++;
@@ -46,7 +46,7 @@ public final class FnPath extends ContextFn {
         tb.addExt(node.seqType() + "[%]", i);
       } else if(node.type == NodeType.PI) {
         final QNm qnm = node.qname();
-        final BasicNodeIter iter = node.precedingSibling();
+        final BasicNodeIter iter = node.precedingSiblingIter();
         for(ANode fs; (fs = iter.next()) != null;) {
           qc.checkStop();
           if(fs.type == node.type && fs.qname().eq(qnm)) i++;

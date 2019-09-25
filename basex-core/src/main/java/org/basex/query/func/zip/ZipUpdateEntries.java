@@ -45,7 +45,7 @@ public final class ZipUpdateEntries extends ZipZipFile {
       try(FileOutputStream fos = new FileOutputStream(out.path());
           ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(fos))) {
         // fill new zip file with entries from old file and description
-        create(zos, elm.children(), "", zf, qc);
+        create(zos, elm.childIter(), "", zf, qc);
       } catch(final IOException ex) {
         ok = false;
         throw ZIP_FAIL_X.get(info, ex);

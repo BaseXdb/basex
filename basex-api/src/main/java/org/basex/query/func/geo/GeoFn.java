@@ -110,7 +110,7 @@ abstract class GeoFn extends StandardFunc {
 
     try {
       final XMLParser parser = new XMLParser(new IOContent(geo), qc.context.options);
-      return new DBNode(MemBuilder.build(parser)).children().next();
+      return new DBNode(MemBuilder.build(parser)).childIter().next();
     } catch(final IOException ex) {
       throw IOERR_X.get(null, ex);
     }

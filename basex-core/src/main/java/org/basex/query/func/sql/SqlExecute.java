@@ -104,7 +104,7 @@ public class SqlExecute extends SqlFn {
                 // add XML value as child element
                 final String xml = ((SQLXML) value).getString();
                 try {
-                  col.add(new DBNode(new IOContent(xml)).children().next());
+                  col.add(new DBNode(new IOContent(xml)).childIter().next());
                 } catch(final IOException ex) {
                   // fallback: add string representation
                   Util.debug(ex);

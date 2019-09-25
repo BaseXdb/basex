@@ -84,13 +84,13 @@ public final class RestXqResponse extends WebResponse {
         final ANode node = (ANode) item;
         if(REST_REDIRECT.eq(node)) {
           // send redirect to browser
-          final ANode ch = node.children().next();
+          final ANode ch = node.childIter().next();
           if(ch == null || ch.type != NodeType.TXT) throw func.error(NO_VALUE_X, node.name());
           redirect = string(ch.string()).trim();
           item = null;
         } else if(REST_FORWARD.eq(node)) {
           // server-side forwarding
-          final ANode ch = node.children().next();
+          final ANode ch = node.childIter().next();
           if(ch == null || ch.type != NodeType.TXT) throw func.error(NO_VALUE_X, node.name());
           forward = string(ch.string()).trim();
           item = null;
@@ -148,19 +148,19 @@ public final class RestXqResponse extends WebResponse {
    */
   private SerializerOptions build(final ANode response) throws QueryException {
     // don't allow attributes
-    final BasicNodeIter atts = response.attributes();
+    final BasicNodeIter atts = response.attributeIter();
     final ANode attr = atts.next();
     if(attr != null) throw func.error(UNEXP_NODE_X, attr);
 
     // parse response and serialization parameters
     SerializerOptions sp = func.output;
     String cType = null;
-    for(final ANode n : response.children()) {
+    for(final ANode n : response.childIter()) {
       // process http:response element
       if(HTTP_RESPONSE.eq(n)) {
         // check status and reason
         byte[] sta = null, msg = null;
-        for(final ANode a : n.attributes()) {
+        for(final ANode a : n.attributeIter()) {
           final QNm qnm = a.qname();
           if(qnm.eq(Q_STATUS)) sta = a.string();
           else if(qnm.eq(Q_REASON) || qnm.eq(Q_MESSAGE)) msg = a.string();
@@ -171,7 +171,7 @@ public final class RestXqResponse extends WebResponse {
           message = msg != null ? string(msg) : null;
         }
 
-        for(final ANode c : n.children()) {
+        for(final ANode c : n.childIter()) {
           // process http:header elements
           if(HTTP_HEADER.eq(c)) {
             final byte[] nam = c.attribute(Q_NAME);

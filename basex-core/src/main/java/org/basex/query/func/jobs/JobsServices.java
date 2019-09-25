@@ -20,7 +20,7 @@ public final class JobsServices extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     checkAdmin(qc);
     try {
-      return new Jobs(qc.context).toXML().children().value(qc, this);
+      return new Jobs(qc.context).toXML().childIter().value(qc, this);
     } catch(final IOException ex) {
       throw JOBS_SERVICE_X_X.get(info, ex);
     }

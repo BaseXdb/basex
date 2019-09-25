@@ -45,7 +45,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
   protected void node(final ANode node) throws IOException {
     if(level > 0) indent();
 
-    final BasicNodeIter iter = node.children();
+    final BasicNodeIter iter = node.childIter();
     if(node.type == NodeType.DOC || node.type == NodeType.DEL) {
       for(ANode child; (child = iter.next()) != null;) node(child);
     } else if(node.type == NodeType.ELM) {
@@ -56,7 +56,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
       byte[] key = null;
       boolean escaped = false, escapedKey = false;
-      for(final ANode attr : node.attributes()) {
+      for(final ANode attr : node.attributeIter()) {
         final QNm qnm = attr.qname();
         final byte[] au = qnm.uri(), an = qnm.local(), av = attr.string();
         if(au.length != 0) {

@@ -234,7 +234,7 @@ public class FnHttpTest extends HTTPTest {
         + "</http:body>" + "</http:request>";
     final DBNode dbNode = new DBNode(new IOContent(req));
     final HttpRequestParser rp = new HttpRequestParser(null);
-    final HttpRequest r = rp.parse(dbNode.children().next(), Empty.VALUE);
+    final HttpRequest r = rp.parse(dbNode.childIter().next(), Empty.VALUE);
 
     assertEquals(2, r.attributes.size());
     assertEquals(2, r.headers.size());
@@ -265,7 +265,7 @@ public class FnHttpTest extends HTTPTest {
 
     final DBNode dbNode1 = new DBNode(new IOContent(multiReq));
     final HttpRequestParser rp = new HttpRequestParser(null);
-    final HttpRequest r = rp.parse(dbNode1.children().next(), Empty.VALUE);
+    final HttpRequest r = rp.parse(dbNode1.childIter().next(), Empty.VALUE);
 
     assertEquals(2, r.attributes.size());
     assertEquals(2, r.headers.size());
@@ -317,7 +317,7 @@ public class FnHttpTest extends HTTPTest {
     bodies.add("Part3");
 
     final HttpRequestParser rp = new HttpRequestParser(null);
-    final HttpRequest r = rp.parse(dbNode1.children().next(), StrSeq.get(bodies));
+    final HttpRequest r = rp.parse(dbNode1.childIter().next(), StrSeq.get(bodies));
 
     assertEquals(2, r.attributes.size());
     assertEquals(2, r.headers.size());
@@ -394,7 +394,7 @@ public class FnHttpTest extends HTTPTest {
       final DBNode dbNode = new DBNode(new IOContent(query));
       try {
         final HttpRequestParser rp = new HttpRequestParser(null);
-        rp.parse(dbNode.children().next(), Empty.VALUE);
+        rp.parse(dbNode.childIter().next(), Empty.VALUE);
         error.append(name).append(": Request did not fail.");
       } catch (final QueryException ex) {
         if(!ex.getMessage().contains(ErrType.HC.toString())) {
@@ -705,7 +705,7 @@ public class FnHttpTest extends HTTPTest {
         + "<http:header name='Content-Type' value='text/x-whatever'/>"
         + "<http:body media-type='text/x-whatever'/>"
         + "</http:multipart>" + "</http:response> ";
-    expected.add(new DBNode(new IOContent(response)).children().next());
+    expected.add(new DBNode(new IOContent(response)).childIter().next());
     expected.add(Str.get("...plain text....\n"));
     expected.add(Str.get(".... richtext..."));
     expected.add(Str.get(".... fanciest formatted version  \n..."));
@@ -781,7 +781,7 @@ public class FnHttpTest extends HTTPTest {
         + "charset=us-ascii'/>"
         + "<http:body media-type='text/plain; charset=us-ascii'/>"
         + "</http:multipart>" + "</http:response>";
-    expected.add(new DBNode(new IOContent(response)).children().next());
+    expected.add(new DBNode(new IOContent(response)).childIter().next());
     expected.add(Str.get("This is implicitly typed plain ASCII text.\n"
         + "It does NOT end with a linebreak."));
     expected.add(Str.get("This is explicitly typed plain ASCII text.\n"
@@ -864,7 +864,7 @@ public class FnHttpTest extends HTTPTest {
     assertEquals(itemsCount, value.size());
     assertTrue(value.itemAt(0) instanceof FElem);
     final FElem response = (FElem) value.itemAt(0);
-    assertNotNull(response.attributes());
+    assertNotNull(response.attributeIter());
     if(!eq(response.attribute(STATUS), token(expStatus))) {
       fail("Expected: " + expStatus + "\nFound: " + response);
     }

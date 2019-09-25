@@ -47,7 +47,7 @@ public class ZipZipFile extends ZipFn {
     // write zip file
     boolean ok = true;
     try(ZipOutputStream zos = new ZipOutputStream(new BufferOutput(file))) {
-      create(zos, elm.children(), "", null, qc);
+      create(zos, elm.childIter(), "", null, qc);
     } catch(final IOException ex) {
       ok = false;
       throw ZIP_FAIL_X.get(info, ex);
@@ -97,7 +97,7 @@ public class ZipZipFile extends ZipFn {
       zos.putNextEntry(new ZipEntry(root + name));
 
       if(dir) {
-        create(zos, node.children(), root + name, zf, qc);
+        create(zos, node.childIter(), root + name, zf, qc);
       } else {
         if(src != null) {
           // write file to zip archive
@@ -107,7 +107,7 @@ public class ZipZipFile extends ZipFn {
           }
         } else {
           // no source reference: the child nodes are treated as file contents
-          final BasicNodeIter ch = node.children();
+          final BasicNodeIter ch = node.childIter();
           final String m = attribute(node, METHOD, false);
           // retrieve first child (might be null)
           ANode n = ch.next();
@@ -175,7 +175,7 @@ public class ZipZipFile extends ZipFn {
   private static SerializerOptions sopts(final ANode node) throws BaseXException {
     // interpret query parameters
     final SerializerOptions sopts = new SerializerOptions();
-    final BasicNodeIter ati = node.attributes();
+    final BasicNodeIter ati = node.attributeIter();
     for(ANode at; (at = ati.next()) != null;) {
       final byte[] name = at.qname().string();
       if(eq(name, NAME, SRC)) continue;

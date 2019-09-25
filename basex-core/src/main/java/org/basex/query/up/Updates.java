@@ -135,7 +135,7 @@ public final class Updates {
 
     // determine highest ancestor node
     ANode anc = target;
-    final BasicNodeIter iter = target.ancestor();
+    final BasicNodeIter iter = target.ancestorIter();
     for(ANode n; (n = iter.next()) != null;) anc = n;
 
     /* See if this ancestor has already been added to the pending update list.
@@ -207,12 +207,12 @@ public final class Updates {
     if(node.id == trgID) return 0;
 
     int s = 1;
-    for(final ANode n : node.attributes()) {
+    for(final ANode n : node.attributeIter()) {
       final int st = preSteps(n, trgID);
       if(st == 0) return s;
       s += st;
     }
-    for(final ANode n : node.children()) {
+    for(final ANode n : node.childIter()) {
       // n.id <= trgID: rewritten to catch ID overflow
       if(trgID - n.id < 0) break;
       s += preSteps(n, trgID);
