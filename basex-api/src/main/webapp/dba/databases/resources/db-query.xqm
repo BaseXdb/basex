@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace util = 'dba/util' at '../../modules/util.xqm';
+import module namespace util = 'dba/util' at '../../lib/util.xqm';
 
 (:~
  : Runs a query on a document and returns the result as string.
@@ -15,12 +15,12 @@ import module namespace util = 'dba/util' at '../../modules/util.xqm';
  : @return result string
  :)
 declare
-  %rest:POST("{$query}")
-  %rest:path("/dba/db-query")
-  %rest:query-param("name",     "{$name}")
-  %rest:query-param("resource", "{$resource}")
+  %rest:POST('{$query}')
+  %rest:path('/dba/db-query')
+  %rest:query-param('name',     '{$name}')
+  %rest:query-param('resource', '{$resource}')
   %rest:single
-  %output:method("text")
+  %output:method('text')
 function dba:db-query(
   $name      as xs:string,
   $resource  as xs:string,

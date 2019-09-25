@@ -19,10 +19,10 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %rest:POST
-  %rest:path("/dba/resource")
-  %rest:form-param("action",   "{$action}")
-  %rest:form-param("name",     "{$name}")
-  %rest:form-param("resource", "{$resource}")
+  %rest:path('/dba/resource')
+  %rest:form-param('action',   '{$action}')
+  %rest:form-param('name',     '{$name}')
+  %rest:form-param('resource', '{$resource}')
 function dba:resource-redirect(
   $action    as xs:string,
   $name      as xs:string,

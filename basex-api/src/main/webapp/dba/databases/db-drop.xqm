@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -18,8 +18,8 @@ declare variable $dba:CAT := 'databases';
 declare
   %updating
   %rest:GET
-  %rest:path("/dba/db-drop")
-  %rest:query-param("name", "{$names}")
+  %rest:path('/dba/db-drop')
+  %rest:query-param('name', '{$names}')
 function dba:db-drop(
   $names  as xs:string*
 ) as empty-sequence() {

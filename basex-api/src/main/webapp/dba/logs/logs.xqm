@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/logs';
 
-import module namespace options = 'dba/options' at '../modules/options.xqm';
-import module namespace html = 'dba/html' at '../modules/html.xqm';
+import module namespace html = 'dba/html' at '../lib/html.xqm';
+import module namespace options = 'dba/options' at '../lib/options.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'logs';
@@ -19,10 +19,10 @@ declare variable $dba:CAT := 'logs';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/logs-jump")
-  %rest:query-param("name", "{$name}")
-  %rest:query-param("time", "{$time}")
-function dba:jump-page(
+  %rest:path('/dba/logs-jump')
+  %rest:query-param('name', '{$name}')
+  %rest:query-param('time', '{$time}')
+function dba:logs-jump(
   $name  as xs:string,
   $time  as xs:string
 ) as element(rest:response) {
@@ -54,15 +54,15 @@ function dba:jump-page(
  :)
 declare
   %rest:GET
-  %rest:path("/dba/logs")
-  %rest:query-param("input", "{$input}")
-  %rest:query-param("name",  "{$name}")
-  %rest:query-param("sort",  "{$sort}", "")
-  %rest:query-param("error", "{$error}")
-  %rest:query-param("info",  "{$info}")
-  %rest:query-param("page",  "{$page}", "1")
-  %rest:query-param("time",  "{$time}")
-  %output:method("html")
+  %rest:path('/dba/logs')
+  %rest:query-param('input', '{$input}')
+  %rest:query-param('name',  '{$name}')
+  %rest:query-param('sort',  '{$sort}', '')
+  %rest:query-param('error', '{$error}')
+  %rest:query-param('info',  '{$info}')
+  %rest:query-param('page',  '{$page}', '1')
+  %rest:query-param('time',  '{$time}')
+  %output:method('html')
 function dba:logs(
   $input  as xs:string?,
   $name   as xs:string?,
@@ -82,7 +82,7 @@ function dba:logs(
     <tr>
       <td width='205'>
         <h2>{ html:link('Logs', $dba:CAT) }</h2>
-        <form action="{ $dba:CAT }" method="post" class="update">
+        <form action='{ $dba:CAT }' method='post' class='update'>
           <input type='hidden' name='name' id='name' value='{ $name }'/>
           <input type='hidden' name='sort' id='sort' value='{ $sort }'/>
           <input type='hidden' name='page' id='page' value='{ $page }'/>
@@ -146,14 +146,14 @@ function dba:logs(
  : @return html elements
  :)
 declare
-  %rest:POST("{$input}")
-  %rest:path("/dba/log")
-  %rest:query-param("name", "{$name}")
-  %rest:query-param("sort", "{$sort}", "")
-  %rest:query-param("page", "{$page}", "1")
-  %rest:query-param("time", "{$time}")
-  %output:method("html")
-  %output:indent("no")
+  %rest:POST('{$input}')
+  %rest:path('/dba/log')
+  %rest:query-param('name', '{$name}')
+  %rest:query-param('sort', '{$sort}', '')
+  %rest:query-param('page', '{$page}', '1')
+  %rest:query-param('time', '{$time}')
+  %output:method('html')
+  %output:indent('no')
   %rest:single
 function dba:log(
   $input  as xs:string?,
@@ -224,9 +224,9 @@ function dba:log(
  :)
 declare
   %rest:POST
-  %rest:path("/dba/logs")
-  %rest:query-param("action", "{$action}")
-  %rest:query-param("name",   "{$names}")
+  %rest:path('/dba/logs')
+  %rest:query-param('action', '{$action}')
+  %rest:query-param('name',   '{$names}')
 function dba:logs-redirect(
   $action  as xs:string,
   $names   as xs:string*

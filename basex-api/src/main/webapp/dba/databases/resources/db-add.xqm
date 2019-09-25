@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace html = 'dba/html' at '../../modules/html.xqm';
-import module namespace util = 'dba/util' at '../../modules/util.xqm';
+import module namespace html = 'dba/html' at '../../lib/html.xqm';
+import module namespace util = 'dba/util' at '../../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -24,13 +24,13 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/db-add")
-  %rest:query-param("name",   "{$name}")
-  %rest:query-param("opts",   "{$opts}")
-  %rest:query-param("path",   "{$path}")
-  %rest:query-param("binary", "{$binary}")
-  %rest:query-param("error",  "{$error}")
-  %output:method("html")
+  %rest:path('/dba/db-add')
+  %rest:query-param('name',   '{$name}')
+  %rest:query-param('opts',   '{$opts}')
+  %rest:query-param('path',   '{$path}')
+  %rest:query-param('binary', '{$binary}')
+  %rest:query-param('error',  '{$error}')
+  %output:method('html')
 function dba:db-add(
   $name    as xs:string,
   $opts    as xs:string*,
@@ -42,27 +42,27 @@ function dba:db-add(
   return html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
-        <form action="db-add" method="post" enctype="multipart/form-data" autocomplete="off">
+        <form action='db-add' method='post' enctype='multipart/form-data' autocomplete='off'>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
             html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
             html:button('db-add', 'Add')
           }</h2>
           <!-- dummy value; prevents reset of options when nothing is selected -->
-          <input type="hidden" name="opts" value="x"/>
-          <input type="hidden" name="name" value="{ $name }"/>
+          <input type='hidden' name='opts' value='x'/>
+          <input type='hidden' name='name' value='{ $name }'/>
           <table>
             <tr>
               <td>Input:</td>
               <td>{
-                <input type="file" name="file" id="file"/>,
+                <input type='file' name='file' id='file'/>,
                 html:focus('file')
               }</td>
             </tr>
             <tr>
               <td>Database Path:</td>
               <td>
-                <input type="text" name="path" value="{ $path }"/>
+                <input type='text' name='path' value='{ $path }'/>
               </td>
             </tr>
             <tr>
@@ -70,7 +70,7 @@ function dba:db-add(
               <td>{ html:checkbox('binary', 'true', $binary = 'true', '') }</td>
             </tr>
             <tr>
-              <td colspan="2">{
+              <td colspan='2'>{
                 <h3>Parsing Options</h3>,
                 html:option('intparse', 'Use internal XML parser', $opts),
                 html:option('dtd', 'Parse DTDs and entities', $opts),
@@ -98,12 +98,12 @@ function dba:db-add(
 declare
   %updating
   %rest:POST
-  %rest:path("/dba/db-add")
-  %rest:form-param("name",   "{$name}")
-  %rest:form-param("opts",   "{$opts}")
-  %rest:form-param("path",   "{$path}")
-  %rest:form-param("file",   "{$file}")
-  %rest:form-param("binary", "{$binary}")
+  %rest:path('/dba/db-add')
+  %rest:form-param('name',   '{$name}')
+  %rest:form-param('opts',   '{$opts}')
+  %rest:form-param('path',   '{$path}')
+  %rest:form-param('file',   '{$file}')
+  %rest:form-param('binary', '{$binary}')
 function dba:db-add-post(
   $name    as xs:string,
   $opts    as xs:string*,

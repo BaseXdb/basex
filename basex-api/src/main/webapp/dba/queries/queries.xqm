@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/queries';
 
-import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace session = 'dba/session' at '../modules/session.xqm';
+import module namespace config = 'dba/config' at '../lib/config.xqm';
+import module namespace html = 'dba/html' at '../lib/html.xqm';
 
 (:~ Top category. :)
 declare variable $dba:CAT := 'queries';
@@ -20,11 +20,11 @@ declare variable $dba:CAT := 'queries';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/queries")
-  %rest:query-param("error", "{$error}")
-  %rest:query-param("info",  "{$info}")
-  %rest:query-param("file",  "{$file}")
-  %output:method("html")
+  %rest:path('/dba/queries')
+  %rest:query-param('error', '{$error}')
+  %rest:query-param('info',  '{$info}')
+  %rest:query-param('file',  '{$file}')
+  %output:method('html')
 function dba:queries(
   $error  as xs:string?,
   $info   as xs:string?,
@@ -63,7 +63,7 @@ function dba:queries(
                   <input id='file' name='file' placeholder='Name of query' size='35'
                          list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>
                   <datalist id='files'>{
-                    for $file in session:query-files()
+                    for $file in config:query-files()
                     return element option { $file }
                   }</datalist>{ ' ' }
                   <button type='submit' name='open' id='open' disabled=''
@@ -89,7 +89,7 @@ function dba:queries(
         </table>,
         <textarea name='output' id='output' readonly=''/>,
         html:js('loadCodeMirror("xquery", true);'),
-        for $name in (($file, session:get($session:QUERY))[.])[1]
+        for $name in head(($file, config:query())[.])
         return html:js('openQuery("' || $name || '");')
       }</td>
     </tr>

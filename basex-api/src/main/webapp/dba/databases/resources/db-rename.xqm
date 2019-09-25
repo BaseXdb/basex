@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace html = 'dba/html' at '../../modules/html.xqm';
-import module namespace util = 'dba/util' at '../../modules/util.xqm';
+import module namespace html = 'dba/html' at '../../lib/html.xqm';
+import module namespace util = 'dba/util' at '../../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -23,12 +23,12 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/db-rename")
-  %rest:query-param("name",     "{$name}")
-  %rest:query-param("resource", "{$resource}")
-  %rest:query-param("target",   "{$target}")
-  %rest:query-param("error",    "{$error}")
-  %output:method("html")
+  %rest:path('/dba/db-rename')
+  %rest:query-param('name',     '{$name}')
+  %rest:query-param('resource', '{$resource}')
+  %rest:query-param('target',   '{$target}')
+  %rest:query-param('error',    '{$error}')
+  %output:method('html')
 function dba:db-rename(
   $name      as xs:string,
   $resource  as xs:string,
@@ -38,9 +38,9 @@ function dba:db-rename(
   html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
-        <form action="db-rename" method="post" autocomplete="off">
-          <input type="hidden" name="name" value="{ $name }"/>
-          <input type="hidden" name="resource" value="{ $resource }"/>
+        <form action='db-rename' method='post' autocomplete='off'>
+          <input type='hidden' name='name' value='{ $name }'/>
+          <input type='hidden' name='resource' value='{ $resource }'/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
             html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
@@ -51,8 +51,8 @@ function dba:db-rename(
             <tr>
               <td>New path:</td>
               <td>
-                <input type="text" name="target" id="target"
-                       value="{ head(($target, $resource)) }"/>
+                <input type='text' name='target' id='target'
+                       value='{ head(($target, $resource)) }'/>
                 { html:focus('target') }
                 <div class='small'/>
               </td>
@@ -74,10 +74,10 @@ function dba:db-rename(
 declare
   %updating
   %rest:POST
-  %rest:path("/dba/db-rename")
-  %rest:query-param("name",     "{$name}")
-  %rest:query-param("resource", "{$resource}")
-  %rest:query-param("target",   "{$target}")
+  %rest:path('/dba/db-rename')
+  %rest:query-param('name',     '{$name}')
+  %rest:query-param('resource', '{$resource}')
+  %rest:query-param('target',   '{$target}')
 function dba:db-rename(
   $name      as xs:string,
   $resource  as xs:string,

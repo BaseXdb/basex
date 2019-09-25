@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/queries';
 
-import module namespace session = 'dba/session' at '../modules/session.xqm';
+import module namespace config = 'dba/config' at '../lib/config.xqm';
 
 (:~
  : Saves a query file and returns the list of stored queries.
@@ -14,15 +14,15 @@ import module namespace session = 'dba/session' at '../modules/session.xqm';
  : @return names of stored queries
  :)
 declare
-  %rest:POST("{$query}")
-  %rest:path("/dba/query-save")
-  %rest:query-param("name", "{$name}")
-  %output:method("text")
+  %rest:POST('{$query}')
+  %rest:path('/dba/query-save')
+  %rest:query-param('name', '{$name}')
+  %output:method('text')
 function dba:query-save(
   $name   as xs:string,
   $query  as xs:string
 ) as xs:string {
-  let $path := session:directory() || $name
+  let $path := config:directory() || $name
   return (
     try {
       prof:void(xquery:parse($query, map {
@@ -31,8 +31,8 @@ function dba:query-save(
     } catch * {
       error($err:code, 'Query was not stored: ' || $err:description, $err:value)
     },
-    session:set($session:QUERY, $name),
+    config:query($name),
     file:write-text($path, $query),
-    string-join(session:query-files(), '/')
+    string-join(config:query-files(), '/')
   )
 };

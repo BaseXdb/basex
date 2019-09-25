@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace session = 'dba/session' at '../modules/session.xqm';
+import module namespace config = 'dba/config' at '../lib/config.xqm';
 
 (:~
  : Downloads a file.
@@ -14,11 +14,11 @@ import module namespace session = 'dba/session' at '../modules/session.xqm';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/file/{$name}")
-function dba:files(
+  %rest:path('/dba/file/{$name}')
+function dba:file-download(
   $name  as xs:string
 ) as item()+ {
-  let $path := session:directory() || $name
+  let $path := config:directory() || $name
   return (
     web:response-header(
       map { 'media-type': 'application/octet-stream' },

@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/jobs';
 
-import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace html = 'dba/html' at '../lib/html.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'jobs';
@@ -21,12 +21,12 @@ declare variable $dba:CAT := 'jobs';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/jobs")
-  %rest:query-param("sort",  "{$sort}", "")
-  %rest:query-param("job",   "{$job}")
-  %rest:query-param("error", "{$error}")
-  %rest:query-param("info",  "{$info}")
-  %output:method("html")
+  %rest:path('/dba/jobs')
+  %rest:query-param('sort',  '{$sort}', '')
+  %rest:query-param('job',   '{$job}')
+  %rest:query-param('error', '{$error}')
+  %rest:query-param('info',  '{$info}')
+  %output:method('html')
 function dba:jobs(
   $sort   as xs:string,
   $job    as xs:string?,
@@ -36,7 +36,7 @@ function dba:jobs(
   html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>{
       <td width='60%'>
-        <form action="{ $dba:CAT }" method="post" class="update">
+        <form action='{ $dba:CAT }' method='post' class='update'>
         <h2>Jobs</h2>
         {
           let $headers := (
@@ -89,8 +89,8 @@ function dba:jobs(
           <td width='40%'>{
             <h3>{ $job }</h3>,
             if($details) then (
-              <form action="jobs" method="post" id="jobs">
-                <input type="hidden" name="id" value="{ $job }"/>
+              <form action='jobs' method='post' id='jobs'>
+                <input type='hidden' name='id' value='{ $job }'/>
                 {
                   let $disabled := map { 'disabled': '' }
                   return (
@@ -130,9 +130,9 @@ function dba:jobs(
  :)
 declare
   %rest:POST
-  %rest:path("/dba/jobs")
-  %rest:query-param("action", "{$action}")
-  %rest:query-param("id",     "{$ids}")
+  %rest:path('/dba/jobs')
+  %rest:query-param('action', '{$action}')
+  %rest:query-param('id',     '{$ids}')
 function dba:jobs-redirect(
   $action  as xs:string,
   $ids     as xs:string*

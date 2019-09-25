@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace html = 'dba/html' at '../lib/html.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -25,14 +25,14 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/database")
-  %rest:query-param("name",     "{$name}", "")
-  %rest:query-param("resource", "{$resource}")
-  %rest:query-param("sort",     "{$sort}", "")
-  %rest:query-param("page",     "{$page}", 1)
-  %rest:query-param("info",     "{$info}")
-  %rest:query-param("error",    "{$error}")
-  %output:method("html")
+  %rest:path('/dba/database')
+  %rest:query-param('name',     '{$name}', '')
+  %rest:query-param('resource', '{$resource}')
+  %rest:query-param('sort',     '{$sort}', '')
+  %rest:query-param('page',     '{$page}', 1)
+  %rest:query-param('info',     '{$info}')
+  %rest:query-param('error',    '{$error}')
+  %output:method('html')
 function dba:database(
   $name      as xs:string,
   $resource  as xs:string?,
@@ -41,7 +41,7 @@ function dba:database(
   $info      as xs:string?,
   $error     as xs:string?
 ) as element() {
-  if(not($name)) then web:redirect("databases") else
+  if(not($name)) then web:redirect('databases') else
 
   let $db-exists := db:exists($name)
   return html:wrap(
@@ -52,8 +52,8 @@ function dba:database(
     },
     <tr>
       <td>
-        <form action="{ $dba:SUB }" method="post" id="{ $dba:SUB }" class="update">
-          <input type="hidden" name="name" value="{ $name }" id="name"/>
+        <form action='{ $dba:SUB }' method='post' id='{ $dba:SUB }' class='update'>
+          <input type='hidden' name='name' value='{ $name }' id='name'/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
             $name ! (if(empty($resource)) then . else html:link(., $dba:SUB, map { 'name': . } ))
@@ -94,8 +94,8 @@ function dba:database(
             ) else ()
           }
         </form>
-        <form action="{ $dba:SUB }" method="post" class="update">
-          <input type="hidden" name="name" value="{ $name }"/>
+        <form action='{ $dba:SUB }' method='post' class='update'>
+          <input type='hidden' name='name' value='{ $name }'/>
           <h3>Backups</h3>
           {
             let $headers := (
@@ -129,9 +129,9 @@ function dba:database(
       <td>{
         if($resource) then (
           <h3>{ $resource }</h3>,
-          <form action="resource" method="post" id="resources">
-            <input type="hidden" name="name" value="{ $name }"/>
-            <input type="hidden" name="resource" value="{ $resource }" id="resource"/>
+          <form action='resource' method='post' id='resources'>
+            <input type='hidden' name='name' value='{ $name }'/>
+            <input type='hidden' name='resource' value='{ $resource }' id='resource'/>
             {
               html:button('db-rename', 'Rename…'), ' ',
               html:button('db-download', 'Download'), ' ',
@@ -139,9 +139,9 @@ function dba:database(
             }
           </form>,
           <h4>Enter your query…</h4>,
-          <input style="width:100%" name="input" id="input" onkeyup='queryResource(false)'/>,
+          <input style='width:100%' name='input' id='input' onkeyup='queryResource(false)'/>,
           <div class='small'/>,
-          <textarea name='output' id='output' rows='20' readonly='' spellcheck='false'/>,
+          <textarea name='output' id='output' readonly='' spellcheck='false'/>,
           html:focus('input'),
           html:js('loadCodeMirror("xml", false); queryResource(true);')
         ) else if($db-exists) then (
@@ -162,11 +162,11 @@ function dba:database(
  :)
 declare
   %rest:POST
-  %rest:path("/dba/database")
-  %rest:form-param("action",   "{$action}")
-  %rest:form-param("name",     "{$name}")
-  %rest:form-param("resource", "{$resources}")
-  %rest:form-param("backup",   "{$backups}")
+  %rest:path('/dba/database')
+  %rest:form-param('action',   '{$action}')
+  %rest:form-param('name',     '{$name}')
+  %rest:form-param('resource', '{$resources}')
+  %rest:form-param('backup',   '{$backups}')
 function dba:database-redirect(
   $action     as xs:string,
   $name       as xs:string,

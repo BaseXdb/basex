@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/jobs';
 
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'jobs';
@@ -17,8 +17,8 @@ declare variable $dba:CAT := 'jobs';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/job-stop")
-  %rest:query-param("id", "{$ids}")
+  %rest:path('/dba/job-stop')
+  %rest:query-param('id', '{$ids}')
 function dba:job-stop(
   $ids  as xs:string*
 ) as element(rest:response) {
@@ -32,8 +32,8 @@ function dba:job-stop(
  :)
 declare
   %rest:GET
-  %rest:path("/dba/job-discard")
-  %rest:query-param("id", "{$ids}")
+  %rest:path('/dba/job-discard')
+  %rest:query-param('id', '{$ids}')
 function dba:job-discard(
   $ids  as xs:string*
 ) as element(rest:response) {

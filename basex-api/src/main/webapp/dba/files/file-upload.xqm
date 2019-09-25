@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace session = 'dba/session' at '../modules/session.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace config = 'dba/config' at '../lib/config.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
@@ -18,13 +18,13 @@ declare variable $dba:CAT := 'files';
  :)
 declare
   %rest:POST
-  %rest:path("/dba/file-upload")
-  %rest:form-param("files", "{$files}")
+  %rest:path('/dba/file-upload')
+  %rest:form-param('files', '{$files}')
 function dba:file-upload(
   $files  as map(xs:string, xs:base64Binary)
 ) as element(rest:response) {
   (: save files :)
-  let $dir := session:directory()
+  let $dir := config:directory()
   return try {
     (: Parse all XQuery files; reject files that cannot be parsed :)
     map:for-each($files, function($file, $content) {

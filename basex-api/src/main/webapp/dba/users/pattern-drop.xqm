@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/users';
 
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:SUB := 'user';
@@ -19,9 +19,9 @@ declare variable $dba:SUB := 'user';
 declare
   %updating
   %rest:GET
-  %rest:path("/dba/pattern-drop")
-  %rest:query-param("name",    "{$name}")
-  %rest:query-param("pattern", "{$patterns}")
+  %rest:path('/dba/pattern-drop')
+  %rest:query-param('name',    '{$name}')
+  %rest:query-param('pattern', '{$patterns}')
 function dba:pattern-drop(
   $name      as xs:string,
   $patterns  as xs:string*

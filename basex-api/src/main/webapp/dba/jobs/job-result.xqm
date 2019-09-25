@@ -15,8 +15,8 @@ declare variable $dba:CAT := 'jobs';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/job-result")
-  %rest:query-param("id", "{$id}", "")
+  %rest:path('/dba/job-result')
+  %rest:query-param('id', '{$id}', '')
 function dba:job-result(
   $id  as xs:string
 ) as item()+ {

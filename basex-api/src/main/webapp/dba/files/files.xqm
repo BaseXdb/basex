@@ -5,10 +5,10 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace options = 'dba/options' at '../modules/options.xqm';
-import module namespace session = 'dba/session' at '../modules/session.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace config = 'dba/config' at '../lib/config.xqm';
+import module namespace html = 'dba/html' at '../lib/html.xqm';
+import module namespace options = 'dba/options' at '../lib/options.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
@@ -22,25 +22,25 @@ declare variable $dba:CAT := 'files';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/files")
-  %rest:query-param("sort",  "{$sort}", "")
-  %rest:query-param("error", "{$error}")
-  %rest:query-param("info",  "{$info}")
-  %rest:query-param("page",  "{$page}", "1")
-  %output:method("html")
+  %rest:path('/dba/files')
+  %rest:query-param('sort',  '{$sort}', '')
+  %rest:query-param('error', '{$error}')
+  %rest:query-param('info',  '{$info}')
+  %rest:query-param('page',  '{$page}', '1')
+  %output:method('html')
 function dba:files(
   $sort   as xs:string,
   $error  as xs:string?,
   $info   as xs:string?,
   $page   as xs:string
 ) as element(html) {
-  let $dir := session:directory()
+  let $dir := config:directory()
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>
         <h2>Directory</h2>
-        <form action="dir-change" method="post">
-          <select name="dir" style="width: 350px;" onchange="this.form.submit();">{
+        <form action='dir-change' method='post'>
+          <select name='dir' style='width: 350px;' onchange='this.form.submit();'>{
             let $webapp := dba:dir(db:option('webpath'))[.]
             let $options := (
               ['DBA'       , $options:DBA-DIRECTORY],
@@ -69,7 +69,7 @@ function dba:files(
           }</select><![CDATA[ ]]>
         </form>
 
-        <form action="{ $dba:CAT }" method="post" class="update">{
+        <form action='{ $dba:CAT }' method='post' class='update'>{
           let $headers := (
             map { 'key': 'name', 'label': 'Name', 'type': 'xml' },
             map { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc' },
@@ -123,15 +123,15 @@ function dba:files(
         }</form>
 
         <h3>Upload Files</h3>
-        <form action="file-upload" method="post" enctype="multipart/form-data">
-          <input type="file" name="files" multiple="multiple"/>
-          <input type="submit" value='Send'/>
+        <form action='file-upload' method='post' enctype='multipart/form-data'>
+          <input type='file' name='files' multiple='multiple'/>
+          <input type='submit' value='Send'/>
         </form>
 
         <h3>Create Directory</h3>
-        <form action="dir-create" method="post">
-          <input type="text" name="name"/><![CDATA[ ]]>
-          <input type="submit" value='Create'/>
+        <form action='dir-create' method='post'>
+          <input type='text' name='name'/><![CDATA[ ]]>
+          <input type='submit' value='Create'/>
         </form>
       </td>
     </tr>
@@ -147,9 +147,9 @@ function dba:files(
  :)
 declare
   %rest:POST
-  %rest:path("/dba/files")
-  %rest:query-param("action", "{$action}")
-  %rest:query-param("name",   "{$names}")
+  %rest:path('/dba/files')
+  %rest:query-param('action', '{$action}')
+  %rest:query-param('name',   '{$names}')
 function dba:files-redirect(
   $action  as xs:string,
   $names   as xs:string*
@@ -162,7 +162,7 @@ function dba:files-redirect(
  : @param  $dir  directory
  : @return native path (or empty sequence)
  :)
-declare function dba:dir(
+declare %private function dba:dir(
   $dir  as xs:string
 ) as xs:string? {
   try {

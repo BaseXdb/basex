@@ -16,10 +16,10 @@ declare variable $dba:CAT := 'logs';
  :)
 declare
   %rest:POST
-  %rest:path("/dba/log-download")
-  %rest:query-param("name",  "{$name}")
-  %rest:query-param("input", "{$input}")
-function dba:drop(
+  %rest:path('/dba/log-download')
+  %rest:query-param('name',  '{$name}')
+  %rest:query-param('input', '{$input}')
+function dba:log-download(
   $name   as xs:string,
   $input  as xs:string
 ) as element()+ {

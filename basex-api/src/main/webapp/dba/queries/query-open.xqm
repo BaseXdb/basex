@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/queries';
 
-import module namespace session = 'dba/session' at '../modules/session.xqm';
+import module namespace config = 'dba/config' at '../lib/config.xqm';
 
 (:~
  : Returns the contents of a query file.
@@ -13,12 +13,12 @@ import module namespace session = 'dba/session' at '../modules/session.xqm';
  : @return query string
  :)
 declare
-  %rest:path("/dba/query-open")
-  %rest:query-param("name", "{$name}")
-  %output:method("text")
+  %rest:path('/dba/query-open')
+  %rest:query-param('name', '{$name}')
+  %output:method('text')
 function dba:query-open(
   $name  as xs:string
 ) as xs:string {
-  session:set($session:QUERY, $name),
-  file:read-text(session:directory() || $name)
+  config:query($name),
+  file:read-text(config:directory() || $name)
 };

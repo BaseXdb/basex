@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
@@ -17,8 +17,8 @@ declare variable $dba:CAT := 'files';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/file-stop")
-  %rest:query-param("id",  "{$id}")
+  %rest:path('/dba/file-stop')
+  %rest:query-param('id',  '{$id}')
 function dba:file-stop(
   $id  as xs:string
 ) as element(rest:response) {

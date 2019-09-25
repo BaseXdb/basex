@@ -6,7 +6,7 @@
 module namespace util = 'dba/util';
 
 import module namespace options = 'dba/options' at 'options.xqm';
-import module namespace session = 'dba/session' at 'session.xqm';
+import module namespace config = 'dba/config' at 'config.xqm';
 
 (:~
  : Evaluates a query and returns the result.
@@ -59,7 +59,7 @@ declare %private function util:query-options() as map(*) {
     'timeout'   : options:get($options:TIMEOUT),
     'memory'    : options:get($options:MEMORY),
     'permission': options:get($options:PERMISSION),
-    'base-uri'  : session:directory() || '/' || session:get($session:QUERY)
+    'base-uri'  : config:directory() || '/' || config:query()
   }
 };
 

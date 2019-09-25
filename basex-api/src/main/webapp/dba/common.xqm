@@ -5,18 +5,17 @@
  :)
 module namespace dba = 'dba/common';
 
-import module namespace Request = 'http://exquery.org/ns/request';
-import module namespace html = 'dba/html' at 'modules/html.xqm';
+import module namespace html = 'dba/html' at 'lib/html.xqm';
 
 (:~
  : Redirects to the start page.
  : @return redirection
  :)
 declare
-  %rest:path("/dba")
+  %rest:path('/dba')
 function dba:redirect(
 ) as element(rest:response) {
-  web:redirect("/dba/logs")
+  web:redirect('/dba/logs')
 };
 
 (:~
@@ -25,9 +24,9 @@ function dba:redirect(
  : @return rest binary data
  :)
 declare
-  %rest:path("/dba/static/{$file=.+}")
-  %output:method("basex")
-  %perm:allow("all")
+  %rest:path('/dba/static/{$file=.+}')
+  %output:method('basex')
+  %perm:allow('all')
 function dba:file(
   $file  as xs:string
 ) as item()+ {
@@ -42,13 +41,13 @@ function dba:file(
 };
 
 (:~
- : Shows a "page not found" error.
+ : Shows a 'page not found' error.
  : @param  $path  path to unknown page
  : @return page
  :)
 declare
-  %rest:path("/dba/{$path}")
-  %output:method("html")
+  %rest:path('/dba/{$path}')
+  %output:method('html')
 function dba:unknown(
   $path  as xs:string
 ) as element(html) {
@@ -58,7 +57,7 @@ function dba:unknown(
         <h2>Page not found:</h2>
         <ul>
           <li>Page: dba/{ $path }</li>
-          <li>Method: { Request:method() }</li>
+          <li>Method: { request:method() }</li>
         </ul>
       </td>
     </tr>

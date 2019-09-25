@@ -5,9 +5,8 @@
  :)
 module namespace dba = 'dba/settings';
 
-import module namespace Request = 'http://exquery.org/ns/request';
-import module namespace options = 'dba/options' at '../modules/options.xqm';
-import module namespace html = 'dba/html' at '../modules/html.xqm';
+import module namespace options = 'dba/options' at '../lib/options.xqm';
+import module namespace html = 'dba/html' at '../lib/html.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'settings';
@@ -20,10 +19,10 @@ declare variable $dba:CAT := 'settings';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/settings")
-  %rest:query-param("error", "{$error}")
-  %rest:query-param("info",  "{$info}")
-  %output:method("html")
+  %rest:path('/dba/settings')
+  %rest:query-param('error', '{$error}')
+  %rest:query-param('info',  '{$info}')
+  %output:method('html')
 function dba:settings(
   $error  as xs:string?,
   $info   as xs:string?
@@ -36,7 +35,7 @@ function dba:settings(
     $table-row((
       $label,
       <br/>,
-      <input name="{ $key }" type="number" value="{ options:get($key) }"/>
+      <input name='{ $key }' type='number' value='{ options:get($key) }'/>
     ))
   }
   let $string := function($key, $label) {
@@ -49,7 +48,7 @@ function dba:settings(
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='33%'>
-        <form action="settings" method="post">
+        <form action='settings' method='post'>
           <h2>Settings » { html:button('save', 'Save') }</h2>
           <h3>Queries</h3>
           <table>
@@ -63,7 +62,7 @@ function dba:settings(
             </tr>
             <tr>
               <td>
-                <select name="permission">{
+                <select name='permission'>{
                   let $pm := options:get($options:PERMISSION)
                   for $p in $options:PERMISSIONS
                   return element option { attribute selected { }[$p = $pm], $p }
@@ -83,7 +82,7 @@ function dba:settings(
       </td>
       <td class='vertical'/>
       <td width='33%'>
-        <form action="settings-gc" method="post">
+        <form action='settings-gc' method='post'>
           <h2>Global Options » { html:button('gc', 'GC') }</h2>
           <table>{
             $system/tr[th][3]/preceding-sibling::tr[not(th)]
@@ -107,9 +106,9 @@ function dba:settings(
  :)
 declare
   %rest:POST
-  %rest:path("/dba/settings")
+  %rest:path('/dba/settings')
 function dba:settings-save(
 ) as element(rest:response) {
-  options:save(map:merge(Request:parameter-names() ! map:entry(., Request:parameter(.)))),
+  options:save(html:parameters()),
   web:redirect($dba:CAT, map { 'info': 'Settings were saved.' })
 };

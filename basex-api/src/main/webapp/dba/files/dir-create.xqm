@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace session = 'dba/session' at '../modules/session.xqm';
+import module namespace config = 'dba/config' at '../lib/config.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
@@ -17,11 +17,11 @@ declare variable $dba:CAT := 'files';
  :)
 declare
   %rest:POST
-  %rest:path("/dba/dir-create")
-  %rest:query-param("name", "{$name}")
-function dba:file-delete(
+  %rest:path('/dba/dir-create')
+  %rest:query-param('name', '{$name}')
+function dba:dir-create(
   $name  as xs:string
 ) as element(rest:response) {
-  file:create-dir(session:directory() || $name),
+  file:create-dir(config:directory() || $name),
   web:redirect($dba:CAT, map { 'info': 'Directory "' || $name || '" was created.' })
 };

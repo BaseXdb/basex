@@ -1,12 +1,12 @@
 (:~
- : Provides HTML components.
+ : HTML components.
  :
  : @author Christian Grün, BaseX Team 2005-19, BSD License
  :)
 module namespace html = 'dba/html';
 
 import module namespace options = 'dba/options' at 'options.xqm';
-import module namespace session = 'dba/session' at 'session.xqm';
+import module namespace config = 'dba/config' at 'config.xqm';
 import module namespace util = 'dba/util' at 'util.xqm';
 
 (: Number formats. :)
@@ -41,17 +41,17 @@ declare function html:wrap(
   $rows     as element(tr)+
 ) as element(html) {
   let $header := head($options?header) ! util:capitalize(.)
-  let $user := $session:VALUE
-  return <html xml:space="preserve">
+  let $user := session:get($config:SESSION-KEY)
+  return <html xml:space='preserve'>
     <head>
-      <meta charset="utf-8"/>
+      <meta charset='utf-8'/>
       <title>DBA{ ($header, tail($options?header)) ! (' » ' || .) }</title>
-      <meta name="description" content="Database Administration"/>
-      <meta name="author" content="BaseX Team 2005-19, BSD License"/>
-      <link rel="stylesheet" type="text/css" href="static/style.css"/>
-      { $options?css ! <link rel="stylesheet" type="text/css" href="static/{ . }"/> }
-      <script type="text/javascript" src="static/js.js"/>
-      { $options?scripts ! <script type="text/javascript" src="static/{ . }"/> }
+      <meta name='description' content='Database Administration'/>
+      <meta name='author' content='BaseX Team 2005-19, BSD License'/>
+      <link rel='stylesheet' type='text/css' href='static/style.css'/>
+      { $options?css ! <link rel='stylesheet' type='text/css' href='static/{ . }'/> }
+      <script type='text/javascript' src='static/js.js'/>
+      { $options?scripts ! <script type='text/javascript' src='static/{ . }'/> }
     </head>
     <body>
       <table cellpadding='0' cellspacing='0'>
@@ -77,7 +77,7 @@ declare function html:wrap(
                       let $cats := (
                         for $cat in ('Logs', 'Databases', 'Queries', 'Files', 'Jobs',
                           'Users', 'Sessions', 'Settings')
-                        let $link := <a href="{ lower-case($cat) }">{ $cat }</a>
+                        let $link := <a href='{ lower-case($cat) }'>{ $cat }</a>
                         return if($link = $header) then (
                           <b>{ $link }</b>
                         ) else (
@@ -534,4 +534,32 @@ declare function html:js(
   <script type='text/javascript'>{
     '(function() { ' || $js || ' })();'
   }</script>
+};
+
+(:~
+ : Creates a new map with the current query parameters.
+ : @return map with query parameters
+ :)
+declare function html:parameters() as map(*) {
+  map:merge(
+    for $param in request:parameter-names()[not(starts-with(., '_'))]
+    return map { $param: request:parameter($param) }
+  )
+};
+
+(:~
+ : Creates a new map with query parameters. The returned map contains all
+ : current query parameters, : and the given ones, prefixed with an underscore.
+ : @param  $map  predefined parameters
+ : @return map with query parameters
+ :)
+declare function html:parameters(
+  $map  as map(*)?
+) as map(*) {
+  map:merge((
+    html:parameters(),
+    map:for-each($map, function($name, $value) {
+      map:entry('_' || $name, $value)
+    })
+  ))
 };

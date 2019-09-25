@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/users';
 
-import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace options = 'dba/options' at '../modules/options.xqm';
+import module namespace html = 'dba/html' at '../lib/html.xqm';
+import module namespace options = 'dba/options' at '../lib/options.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -25,14 +25,14 @@ declare variable $dba:SUB := 'user';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/user")
-  %rest:query-param("name",     "{$name}")
-  %rest:query-param("newname",  "{$newname}")
-  %rest:query-param("pw",       "{$pw}")
-  %rest:query-param("perm",     "{$perm}")
-  %rest:query-param("error",    "{$error}")
-  %rest:query-param("info",     "{$info}")
-  %output:method("html")
+  %rest:path('/dba/user')
+  %rest:query-param('name',     '{$name}')
+  %rest:query-param('newname',  '{$newname}')
+  %rest:query-param('pw',       '{$pw}')
+  %rest:query-param('perm',     '{$perm}')
+  %rest:query-param('error',    '{$error}')
+  %rest:query-param('info',     '{$info}')
+  %output:method('html')
 function dba:user(
   $name     as xs:string,
   $newname  as xs:string?,
@@ -51,24 +51,24 @@ function dba:user(
     },
     <tr>
       <td width='49%'>
-        <form action="user-edit" method="post" autocomplete="off">
+        <form action='user-edit' method='post' autocomplete='off'>
           <!--  force chrome not to autocomplete form -->
-          <input style="display:none" type="text" name="fake1"/>
-          <input style="display:none" type="password" name="fake2"/>
+          <input style='display:none' type='text' name='fake1'/>
+          <input style='display:none' type='password' name='fake2'/>
           <h2>{
             html:link('Users', $dba:CAT), ' » ',
             $name, ' » ',
             html:button('save', 'Save')
           }</h2>
-          <input type="hidden" name="name" value="{ $name }"/>
+          <input type='hidden' name='name' value='{ $name }'/>
           <table>{
             let $admin := $name eq 'admin' return (
               if($admin) then <input type='hidden' name='newname' value='admin'/> else (
                 <tr>
                   <td>Name:</td>
                   <td>
-                    <input type="text" name="newname"
-                      value="{ head(($newname, $name)) }" id="newname"/>
+                    <input type='text' name='newname'
+                      value='{ head(($newname, $name)) }' id='newname'/>
                     { html:focus('newname') }
                     <div class='small'/>
                   </td>
@@ -77,7 +77,7 @@ function dba:user(
               <tr>
                 <td>Password:</td>
                 <td>
-                  <input type="password" name="pw" value="{ $pw }" id="pw"/> &#xa0;
+                  <input type='password' name='pw' value='{ $pw }' id='pw'/> &#xa0;
                   <span class='note'>
                     …only changed if a new one is entered<br/>
                   </span>
@@ -88,7 +88,7 @@ function dba:user(
                 <tr>
                   <td>Permission:</td>
                   <td>
-                    <select name="perm" size="5">{
+                    <select name='perm' size='5'>{
                       let $perm := head(($perm, $user/@permission))
                       for $p in $options:PERMISSIONS
                       return element option { attribute selected { }[$p = $perm], $p }
@@ -100,7 +100,7 @@ function dba:user(
               <tr>
                 <td>Information:</td>
                 <td>
-                  <textarea name='info' id='editor' rows='10' spellcheck='false'>{
+                  <textarea name='info' id='editor' spellcheck='false'>{
                     serialize(user:info($name))
                   }</textarea>
                 </td>
@@ -114,8 +114,8 @@ function dba:user(
       <td width='49%'>{
         if($admin) then () else <_>
           <h3>Local Permissions</h3>
-          <form action="{ $dba:SUB }" method="post" id="{ $dba:SUB }" class="update">
-            <input type="hidden" name="name" value="{ $name }" id="name"/>
+          <form action='{ $dba:SUB }' method='post' id='{ $dba:SUB }' class='update'>
+            <input type='hidden' name='name' value='{ $name }' id='name'/>
             <div class='small'/>
             {
               let $headers := (
@@ -154,10 +154,10 @@ function dba:user(
  :)
 declare
   %rest:POST
-  %rest:path("/dba/user")
-  %rest:form-param("action",  "{$action}")
-  %rest:form-param("name",    "{$name}")
-  %rest:form-param("pattern", "{$patterns}")
+  %rest:path('/dba/user')
+  %rest:form-param('action',  '{$action}')
+  %rest:form-param('name',    '{$name}')
+  %rest:form-param('pattern', '{$patterns}')
 function dba:user-redirect(
   $action    as xs:string,
   $name      as xs:string,

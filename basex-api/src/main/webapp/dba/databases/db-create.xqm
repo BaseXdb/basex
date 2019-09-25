@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace html = 'dba/html' at '../lib/html.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -23,12 +23,12 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/db-create")
-  %rest:query-param("name",  "{$name}")
-  %rest:query-param("opts",  "{$opts}")
-  %rest:query-param("lang",  "{$lang}", "en")
-  %rest:query-param("error", "{$error}")
-  %output:method("html")
+  %rest:path('/dba/db-create')
+  %rest:query-param('name',  '{$name}')
+  %rest:query-param('opts',  '{$opts}')
+  %rest:query-param('lang',  '{$lang}', 'en')
+  %rest:query-param('error', '{$error}')
+  %output:method('html')
 function dba:db-create(
   $name   as xs:string?,
   $opts   as xs:string*,
@@ -39,25 +39,25 @@ function dba:db-create(
   return html:wrap(map { 'header': $dba:CAT, 'error': $error },
     <tr>
       <td>
-        <form action="db-create" method="post" autocomplete="off">
+        <form action='db-create' method='post' autocomplete='off'>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
             html:button('create', 'Create')
           }</h2>
           <!-- dummy value; prevents reset of options when nothing is selected -->
-          <input type="hidden" name="opts" value="x"/>
+          <input type='hidden' name='opts' value='x'/>
           <table>
             <tr>
               <td>Name:</td>
               <td>
-                <input type="hidden" name="opts" value="x"/>
-                <input type="text" name="name" value="{ $name }" id="name"/>
+                <input type='hidden' name='opts' value='x'/>
+                <input type='text' name='name' value='{ $name }' id='name'/>
                 { html:focus('name') }
                 <div class='small'/>
               </td>
             </tr>
             <tr>
-              <td colspan="2">{
+              <td colspan='2'>{
                 <h3>{ html:option('textindex', 'Text Index', $opts) }</h3>,
                 <h3>{ html:option('attrindex', 'Attribute Index', $opts) }</h3>,
                 <h3>{ html:option('tokenindex', 'Token Index', $opts) }</h3>,
@@ -67,7 +67,7 @@ function dba:db-create(
               }</td>
             </tr>
             <tr>
-              <td colspan="2">{
+              <td colspan='2'>{
                 html:option('stemming', 'Stemming', $opts),
                 html:option('casesens', 'Case Sensitivity', $opts),
                 html:option('diacritics', 'Diacritics', $opts)
@@ -75,7 +75,7 @@ function dba:db-create(
             </tr>
             <tr>
               <td>Language:</td>
-              <td><input type="text" name="language" value="{ $lang }"/></td>
+              <td><input type='text' name='language' value='{ $lang }'/></td>
             </tr>
           </table>
         </form>
@@ -94,11 +94,11 @@ function dba:db-create(
 declare
   %updating
   %rest:POST
-  %rest:path("/dba/db-create")
-  %rest:query-param("name", "{$name}")
-  %rest:query-param("opts", "{$opts}")
-  %rest:query-param("lang", "{$lang}")
-function dba:create(
+  %rest:path('/dba/db-create')
+  %rest:query-param('name', '{$name}')
+  %rest:query-param('opts', '{$opts}')
+  %rest:query-param('lang', '{$lang}')
+function dba:db-create(
   $name  as xs:string,
   $opts  as xs:string*,
   $lang  as xs:string?
@@ -114,7 +114,7 @@ function dba:create(
         $lang ! map:entry('language', .)))
       ),
       util:redirect($dba:SUB, map { 'name': $name,
-        'info': 'Database "' || $name || '"  was created.' })
+        'info': 'Database "' || $name || '" was created.' })
     )
   } catch * {
     util:redirect('db-create', map {

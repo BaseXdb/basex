@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace html = 'dba/html' at '../lib/html.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -24,12 +24,12 @@ declare variable $dba:BACKUP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d
  :)
 declare
   %rest:GET
-  %rest:path("/dba/databases")
-  %rest:query-param("sort",  "{$sort}", "")
-  %rest:query-param("page",  "{$page}", 1)
-  %rest:query-param("info",  "{$info}")
-  %rest:query-param("error", "{$error}")
-  %output:method("html")
+  %rest:path('/dba/databases')
+  %rest:query-param('sort',  '{$sort}', '')
+  %rest:query-param('page',  '{$page}', 1)
+  %rest:query-param('info',  '{$info}')
+  %rest:query-param('error', '{$error}')
+  %output:method('html')
 function dba:databases(
   $sort   as xs:string,
   $page   as xs:integer,
@@ -62,7 +62,7 @@ function dba:databases(
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='49%'>
-        <form action="{ $dba:CAT }" method="post" class="update">
+        <form action='{ $dba:CAT }' method='post' class='update'>
           <h2>Databases</h2>
           {
             let $headers := (
@@ -100,9 +100,9 @@ function dba:databases(
  :)
 declare
   %rest:POST
-  %rest:path("/dba/databases")
-  %rest:query-param("action", "{$action}")
-  %rest:query-param("name",   "{$names}")
+  %rest:path('/dba/databases')
+  %rest:query-param('action', '{$action}')
+  %rest:query-param('name',   '{$names}')
 function dba:databases-redirect(
   $action  as xs:string,
   $names   as xs:string*

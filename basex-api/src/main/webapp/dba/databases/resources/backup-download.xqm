@@ -12,7 +12,7 @@ module namespace dba = 'dba/databases';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/backup/{$backup}")
+  %rest:path('/dba/backup/{$backup}')
 function dba:backup-download(
   $backup  as xs:string
 ) as item()+ {

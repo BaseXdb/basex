@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace session = 'dba/session' at '../modules/session.xqm';
+import module namespace config = 'dba/config' at '../lib/config.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
@@ -16,18 +16,18 @@ declare variable $dba:CAT := 'files';
  : @return redirection
  :)
 declare
-  %rest:path("/dba/dir-change")
-  %rest:query-param("dir", "{$dir}")
+  %rest:path('/dba/dir-change')
+  %rest:query-param('dir', '{$dir}')
 function dba:dir-change(
   $dir  as xs:string
 ) as element(rest:response) {
-  session:set($session:DIRECTORY,
+  config:directory(
     if(contains($dir, file:dir-separator())) then (
       $dir
     ) else (
-      file:path-to-native(session:directory() || $dir || '/')
+      file:path-to-native(config:directory() || $dir || '/')
     )
   ),
-  session:set($session:QUERY, ''),
+  config:query(''),
   web:redirect($dba:CAT)
 };

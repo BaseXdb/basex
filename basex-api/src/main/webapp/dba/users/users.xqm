@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/users';
 
-import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace session = 'dba/session' at '../modules/session.xqm';
+import module namespace config = 'dba/config' at '../lib/config.xqm';
+import module namespace html = 'dba/html' at '../lib/html.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -20,11 +20,11 @@ declare variable $dba:CAT := 'users';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/users")
-  %rest:query-param("sort",  "{$sort}", "")
-  %rest:query-param("error", "{$error}")
-  %rest:query-param("info",  "{$info}")
-  %output:method("html")
+  %rest:path('/dba/users')
+  %rest:query-param('sort',  '{$sort}', '')
+  %rest:query-param('error', '{$error}')
+  %rest:query-param('info',  '{$info}')
+  %output:method('html')
 function dba:users(
   $sort   as xs:string,
   $error  as xs:string?,
@@ -38,7 +38,7 @@ function dba:users(
     },
     <tr>
       <td>
-        <form action="{ $dba:CAT }" method="post" class="update">
+        <form action='{ $dba:CAT }' method='post' class='update'>
         <h2>Users</h2>
         {
           let $headers := (
@@ -47,12 +47,13 @@ function dba:users(
             map { 'key': 'you', 'label': 'You' }
           )
           let $entries := (
+            let $current := session:get($config:SESSION-KEY)
             for $user in user:list-details()
             let $name := string($user/@name)
             return map {
               'name': $name,
               'permission': $user/@permission,
-              'you': if($session:VALUE = $name) then '✓' else '–'
+              'you': if($current = $name) then '✓' else '–'
             }
           )
           let $buttons := (
@@ -90,10 +91,10 @@ function dba:users(
  :)
 declare
   %rest:POST
-  %rest:path("/dba/users")
-  %rest:query-param("action", "{$action}")
-  %rest:query-param("name",   "{$names}")
-  %rest:query-param("id",     "{$ids}")
+  %rest:path('/dba/users')
+  %rest:query-param('action', '{$action}')
+  %rest:query-param('name',   '{$names}')
+  %rest:query-param('id',     '{$ids}')
 function dba:users-redirect(
   $action  as xs:string,
   $names   as xs:string*,

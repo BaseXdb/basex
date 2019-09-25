@@ -14,7 +14,7 @@ declare variable $dba:CAT := 'settings';
  :)
 declare
   %rest:POST
-  %rest:path("/dba/settings-gc")
+  %rest:path('/dba/settings-gc')
 function dba:settings-gc(
 ) as element(rest:response) {
   Q{java.lang.System}gc(),

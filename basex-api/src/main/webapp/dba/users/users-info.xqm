@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -18,8 +18,8 @@ declare variable $dba:CAT := 'users';
 declare
   %updating
   %rest:POST
-  %rest:path("/dba/users-info")
-  %rest:form-param("info", "{$info}")
+  %rest:path('/dba/users-info')
+  %rest:form-param('info', '{$info}')
 function dba:users-info(
   $info  as xs:string
 ) as empty-sequence() {

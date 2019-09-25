@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/users';
 
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Sub category :)
 declare variable $dba:SUB := 'user';
@@ -21,12 +21,12 @@ declare variable $dba:SUB := 'user';
 declare
   %updating
   %rest:POST
-  %rest:path("/dba/user-edit")
-  %rest:form-param("name",    "{$name}")
-  %rest:form-param("newname", "{$newname}")
-  %rest:form-param("pw",      "{$pw}")
-  %rest:form-param("perm",    "{$perm}")
-  %rest:form-param("info",    "{$info}")
+  %rest:path('/dba/user-edit')
+  %rest:form-param('name',    '{$name}')
+  %rest:form-param('newname', '{$newname}')
+  %rest:form-param('pw',      '{$pw}')
+  %rest:form-param('perm',    '{$perm}')
+  %rest:form-param('info',    '{$info}')
 function dba:user-edit(
   $name     as xs:string,
   $newname  as xs:string,

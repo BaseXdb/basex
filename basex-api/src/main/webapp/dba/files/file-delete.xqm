@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace session = 'dba/session' at '../modules/session.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace config = 'dba/config' at '../lib/config.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
@@ -18,8 +18,8 @@ declare variable $dba:CAT := 'files';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/file-delete")
-  %rest:query-param("name", "{$names}")
+  %rest:path('/dba/file-delete')
+  %rest:query-param('name', '{$names}')
 function dba:file-delete(
   $names  as xs:string*
 ) as element(rest:response) {
@@ -27,7 +27,7 @@ function dba:file-delete(
     (: delete all files, ignore reference to parent directory :)
     for $name in $names
     where $name != '..'
-    return file:delete(session:directory() || $name),
+    return file:delete(config:directory() || $name),
     web:redirect($dba:CAT, map { 'info': util:info($names, 'file', 'deleted') })
   } catch * {
     web:redirect($dba:CAT, map { 'error': $err:description })

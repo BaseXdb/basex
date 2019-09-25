@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/queries';
 
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~
  : Evaluates a query and returns the result.
@@ -13,10 +13,10 @@ import module namespace util = 'dba/util' at '../modules/util.xqm';
  : @return result of query
  :)
 declare
-  %rest:POST("{$query}")
-  %rest:path("/dba/query-eval")
+  %rest:POST('{$query}')
+  %rest:path('/dba/query-eval')
   %rest:single
-  %output:method("text")
+  %output:method('text')
 function dba:query-eval(
   $query  as xs:string?
 ) as xs:string {
@@ -30,10 +30,10 @@ function dba:query-eval(
  :)
 declare
   %updating
-  %rest:POST("{$query}")
-  %rest:path("/dba/query-update")
+  %rest:POST('{$query}')
+  %rest:path('/dba/query-update')
   %rest:single
-  %output:method("text")
+  %output:method('text')
 function dba:query-update(
   $query  as xs:string?
 ) as empty-sequence() {

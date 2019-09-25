@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace session = 'dba/session' at '../modules/session.xqm';
+import module namespace config = 'dba/config' at '../lib/config.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
@@ -17,8 +17,8 @@ declare variable $dba:CAT := 'files';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/file-start")
-  %rest:query-param("file", "{$file}", "")
+  %rest:path('/dba/file-start')
+  %rest:query-param('file', '{$file}', '')
 function dba:file-start(
   $file  as xs:string
 ) as element(rest:response) {
@@ -26,7 +26,7 @@ function dba:file-start(
   let $params := try {
     (: stop running job before starting new job :)
     jobs:stop($id),
-    prof:void(jobs:invoke(session:directory() || $id, (), map { 'cache': 'true', 'id': $file })),
+    prof:void(jobs:invoke(config:directory() || $id, (), map { 'cache': 'true', 'id': $file })),
     map { 'info': 'Job was started.', 'job': $id }
   } catch * {
     map { 'error': $err:description }

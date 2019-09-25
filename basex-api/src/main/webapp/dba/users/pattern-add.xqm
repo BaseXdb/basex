@@ -5,9 +5,9 @@
  :)
 module namespace dba = 'dba/users';
 
-import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace options = 'dba/options' at '../modules/options.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace html = 'dba/html' at '../lib/html.xqm';
+import module namespace options = 'dba/options' at '../lib/options.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -24,12 +24,12 @@ declare variable $dba:SUB := 'user';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/pattern-add")
-  %rest:query-param("name",    "{$name}")
-  %rest:query-param("pattern", "{$pattern}")
-  %rest:query-param("perm",    "{$perm}", "write")
-  %rest:query-param("error",   "{$error}")
-  %output:method("html")
+  %rest:path('/dba/pattern-add')
+  %rest:query-param('name',    '{$name}')
+  %rest:query-param('pattern', '{$pattern}')
+  %rest:query-param('perm',    '{$perm}', 'write')
+  %rest:query-param('error',   '{$error}')
+  %output:method('html')
 function dba:pattern-add(
   $name     as xs:string,
   $pattern  as xs:string?,
@@ -39,18 +39,18 @@ function dba:pattern-add(
   html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
-        <form action="pattern-add" method="post" autocomplete="off">
+        <form action='pattern-add' method='post' autocomplete='off'>
           <h2>{
             html:link('Users', $dba:CAT), ' » ',
             html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
             html:button('create', 'Add Pattern')
           }</h2>
-          <input type="hidden" name="name" value="{ $name }"/>
+          <input type='hidden' name='name' value='{ $name }'/>
           <table>
             <tr>
               <td>Pattern:</td>
               <td>
-                <input type="text" name="pattern" value="{ $pattern }" id="pattern"/>
+                <input type='text' name='pattern' value='{ $pattern }' id='pattern'/>
                 { html:focus('pattern') } &#xa0;
                 <span class='note'>…support for <a target='_blank'
                   href='http://docs.basex.org/wiki/Commands#Glob_Syntax'>glob syntax</a>.</span>
@@ -60,7 +60,7 @@ function dba:pattern-add(
             <tr>
               <td>Permission:</td>
               <td>
-                <select name="perm" size="3">{
+                <select name='perm' size='3'>{
                   for $p in $options:PERMISSIONS[position() = 1 to 3]
                   return element option { attribute selected { }[$p = $perm], $p }
                 }</select>
@@ -84,10 +84,10 @@ function dba:pattern-add(
 declare
   %updating
   %rest:POST
-  %rest:path("/dba/pattern-add")
-  %rest:query-param("name",    "{$name}")
-  %rest:query-param("perm",    "{$perm}")
-  %rest:query-param("pattern", "{$pattern}")
+  %rest:path('/dba/pattern-add')
+  %rest:query-param('name',    '{$name}')
+  %rest:query-param('perm',    '{$perm}')
+  %rest:query-param('pattern', '{$pattern}')
 function dba:create(
   $name     as xs:string,
   $perm     as xs:string,

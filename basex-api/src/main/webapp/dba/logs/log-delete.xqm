@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/logs';
 
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'logs';
@@ -17,9 +17,9 @@ declare variable $dba:CAT := 'logs';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/log-delete")
-  %rest:query-param("name", "{$names}")
-function dba:drop(
+  %rest:path('/dba/log-delete')
+  %rest:query-param('name', '{$names}')
+function dba:log-delete(
   $names  as xs:string*
 ) as element(rest:response) {
   try {

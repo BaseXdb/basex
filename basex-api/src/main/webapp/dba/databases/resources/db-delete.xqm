@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace util = 'dba/util' at '../../modules/util.xqm';
+import module namespace util = 'dba/util' at '../../lib/util.xqm';
 
 (:~ Sub category :)
 declare variable $dba:SUB := 'database';
@@ -19,9 +19,9 @@ declare variable $dba:SUB := 'database';
 declare
   %updating
   %rest:GET
-  %rest:path("/dba/db-delete")
-  %rest:query-param("name",     "{$name}")
-  %rest:query-param("resource", "{$resources}")
+  %rest:path('/dba/db-delete')
+  %rest:query-param('name',     '{$name}')
+  %rest:query-param('resource', '{$resources}')
 function dba:db-delete(
   $name       as xs:string,
   $resources  as xs:string*

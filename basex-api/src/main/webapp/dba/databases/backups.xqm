@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Sub category :)
 declare variable $dba:SUB := 'database';
@@ -18,8 +18,8 @@ declare variable $dba:SUB := 'database';
 declare
   %updating
   %rest:GET
-  %rest:path("/dba/backup-create")
-  %rest:query-param("name", "{$name}")
+  %rest:path('/dba/backup-create')
+  %rest:query-param('name', '{$name}')
 function dba:backup-create(
   $name  as xs:string
 ) as empty-sequence() {
@@ -37,9 +37,9 @@ function dba:backup-create(
 declare
   %updating
   %rest:GET
-  %rest:path("/dba/backup-drop")
-  %rest:query-param("name",   "{$name}")
-  %rest:query-param("backup", "{$backups}")
+  %rest:path('/dba/backup-drop')
+  %rest:query-param('name',   '{$name}')
+  %rest:query-param('backup', '{$backups}')
 function dba:backup-drop(
   $name     as xs:string,
   $backups  as xs:string*
@@ -58,14 +58,16 @@ function dba:backup-drop(
 declare
   %updating
   %rest:GET
-  %rest:path("/dba/backup-restore")
-  %rest:query-param("name",   "{$name}")
-  %rest:query-param("backup", "{$backup}")
+  %rest:path('/dba/backup-restore')
+  %rest:query-param('name',   '{$name}')
+  %rest:query-param('backup', '{$backup}')
 function dba:backup-restore(
   $name    as xs:string,
   $backup  as xs:string
 ) as empty-sequence() {
-  dba:action($name, 'Database was restored.', function() { db:restore($backup) })
+  dba:action($name, 'Database was restored.', function() {
+    db:restore($backup)
+  })
 };
 
 (:~
@@ -75,7 +77,7 @@ function dba:backup-restore(
  : @param  $action  updating function
  : @return redirection
  :)
-declare %updating function dba:action(
+declare %private %updating function dba:action(
   $name    as xs:string,
   $info    as xs:string,
   $action  as %updating function(*)

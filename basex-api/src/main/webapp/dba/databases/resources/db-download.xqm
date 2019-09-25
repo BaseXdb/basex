@@ -13,9 +13,9 @@ module namespace dba = 'dba/databases';
  : @return rest response and file content
  :)
 declare
-  %rest:path("/dba/db-download")
-  %rest:query-param("name",     "{$name}")
-  %rest:query-param("resource", "{$resource}")
+  %rest:path('/dba/db-download')
+  %rest:query-param('name',     '{$name}')
+  %rest:query-param('resource', '{$resource}')
 function dba:db-download(
   $name      as xs:string,
   $resource  as xs:string
@@ -32,7 +32,7 @@ function dba:db-download(
     )
   } catch * {
     <rest:response>
-      <http:response status="400" message="{ $err:description }"/>
+      <http:response status='400' message='{ $err:description }'/>
     </rest:response>
   }
 };

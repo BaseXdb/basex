@@ -5,9 +5,9 @@
  :)
 module namespace dba = 'dba/users';
 
-import module namespace html = 'dba/html' at '../modules/html.xqm';
-import module namespace options = 'dba/options' at '../modules/options.xqm';
-import module namespace util = 'dba/util' at '../modules/util.xqm';
+import module namespace html = 'dba/html' at '../lib/html.xqm';
+import module namespace options = 'dba/options' at '../lib/options.xqm';
+import module namespace util = 'dba/util' at '../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -22,12 +22,12 @@ declare variable $dba:CAT := 'users';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/user-create")
-  %rest:query-param("name",  "{$name}")
-  %rest:query-param("pw",    "{$pw}")
-  %rest:query-param("perm",  "{$perm}", "none")
-  %rest:query-param("error", "{$error}")
-  %output:method("html")
+  %rest:path('/dba/user-create')
+  %rest:query-param('name',  '{$name}')
+  %rest:query-param('pw',    '{$pw}')
+  %rest:query-param('perm',  '{$perm}', 'none')
+  %rest:query-param('error', '{$error}')
+  %output:method('html')
 function dba:user-create(
   $name   as xs:string?,
   $pw     as xs:string?,
@@ -91,10 +91,10 @@ function dba:user-create(
 declare
   %updating
   %rest:POST
-  %rest:path("/dba/user-create")
-  %rest:query-param("name", "{$name}")
-  %rest:query-param("pw",   "{$pw}")
-  %rest:query-param("perm", "{$perm}")
+  %rest:path('/dba/user-create')
+  %rest:query-param('name', '{$name}')
+  %rest:query-param('pw',   '{$pw}')
+  %rest:query-param('perm', '{$perm}')
 function dba:user-create(
   $name  as xs:string,
   $pw    as xs:string,

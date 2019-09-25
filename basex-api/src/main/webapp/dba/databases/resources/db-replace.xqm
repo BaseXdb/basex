@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace html = 'dba/html' at '../../modules/html.xqm';
-import module namespace util = 'dba/util' at '../../modules/util.xqm';
+import module namespace html = 'dba/html' at '../../lib/html.xqm';
+import module namespace util = 'dba/util' at '../../lib/util.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -22,11 +22,11 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %rest:GET
-  %rest:path("/dba/db-replace")
-  %rest:query-param("name",     "{$name}")
-  %rest:query-param("resource", "{$resource}")
-  %rest:query-param("error",    "{$error}")
-  %output:method("html")
+  %rest:path('/dba/db-replace')
+  %rest:query-param('name',     '{$name}')
+  %rest:query-param('resource', '{$resource}')
+  %rest:query-param('error',    '{$error}')
+  %output:method('html')
 function dba:db-replace(
   $name      as xs:string,
   $resource  as xs:string,
@@ -35,9 +35,9 @@ function dba:db-replace(
   html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
-        <form action="db-replace" method="post" enctype="multipart/form-data">
-          <input type="hidden" name="name" value="{ $name }"/>
-          <input type="hidden" name="resource" value="{ $resource }"/>
+        <form action='db-replace' method='post' enctype='multipart/form-data'>
+          <input type='hidden' name='name' value='{ $name }'/>
+          <input type='hidden' name='resource' value='{ $resource }'/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
             html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
@@ -47,7 +47,7 @@ function dba:db-replace(
           <table>
             <tr>
               <td>
-                <input type="file" name="file"/>
+                <input type='file' name='file'/>
                 { html:focus('file') }
                 <div class='small'/>
               </td>
@@ -69,10 +69,10 @@ function dba:db-replace(
 declare
   %updating
   %rest:POST
-  %rest:path("/dba/db-replace")
-  %rest:form-param("name",     "{$name}")
-  %rest:form-param("resource", "{$resource}")
-  %rest:form-param("file",     "{$file}")
+  %rest:path('/dba/db-replace')
+  %rest:form-param('name',     '{$name}')
+  %rest:form-param('resource', '{$resource}')
+  %rest:form-param('file',     '{$file}')
 function dba:db-replace-post(
   $name      as xs:string,
   $resource  as xs:string,
