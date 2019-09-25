@@ -73,7 +73,7 @@ public abstract class Step extends Preds {
    * @param exprs predicates
    */
   Step(final InputInfo info, final Axis axis, final Test test, final Expr... exprs) {
-    super(info, SeqType.get(test.type, Occ.ZERO_MORE), exprs);
+    super(info, axis == Axis.ATTRIBUTE ? NodeType.ATT : test.type, exprs);
     this.axis = axis;
     this.test = test;
   }
@@ -100,9 +100,6 @@ public abstract class Step extends Preds {
       }
     }
 
-    // simplifies the predicates
-    simplify(cc, this);
-
     // optimize predicates
     cc.pushFocus(this);
     try {
@@ -112,11 +109,13 @@ public abstract class Step extends Preds {
       cc.removeFocus();
     }
 
-    // compute result size
-    if(!exprType(seqType(), size())) return cc.emptySeq(this);
+    // simplifies the predicates
+    simplify(cc, this);
 
-    // attribute axis will always yield attributes
-    if(axis == Axis.ATTRIBUTE) exprType.assign(NodeType.ATT);
+    // compute result size; check if step will yield at most one result per node
+    final boolean one = axis == Axis.SELF || axis == Axis.PARENT ||
+        axis == Axis.ATTRIBUTE && test.kind == Kind.URI_NAME;
+    if(!exprType(seqType().type, -1, one)) return cc.emptySeq(this);
 
     // choose best implementation
     return copyType(get(info, axis, test, exprs));

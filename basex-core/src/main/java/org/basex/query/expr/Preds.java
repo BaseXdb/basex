@@ -29,11 +29,11 @@ public abstract class Preds extends Arr {
   /**
    * Constructor.
    * @param info input info
-   * @param seqType sequence type
+   * @param type type
    * @param exprs predicates
    */
-  protected Preds(final InputInfo info, final SeqType seqType, final Expr... exprs) {
-    super(info, seqType, exprs);
+  protected Preds(final InputInfo info, final Type type, final Expr... exprs) {
+    super(info, type.seqType(Occ.ZERO_MORE), exprs);
   }
 
   @Override
@@ -135,11 +135,12 @@ public abstract class Preds extends Arr {
 
   /**
    * Assigns the sequence type and result size.
-   * @param seqType sequence type of input
+   * @param type type of input
    * @param size size of input ({@code -1} if unknown)
-   * @return if predicate will yield any results
+   * @param one at most one result
+   * @return whether expression may yield results
    */
-  protected final boolean exprType(final SeqType seqType, final long size) {
+  protected final boolean exprType(final Type type, final long size, final boolean one) {
     boolean exact = size != -1;
     long max = exact ? size : Long.MAX_VALUE;
 
@@ -161,9 +162,9 @@ public abstract class Preds extends Arr {
     }
 
     // we only know if there will be at most 1 result
-    final Occ occ = max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE;
+    final Occ occ = max == 1 || one ? Occ.ZERO_ONE : Occ.ZERO_MORE;
     final long sz = exact || max == 0 ? max : -1;
-    exprType.assign(seqType.type, occ, sz);
+    exprType.assign(type, occ, sz);
     return max != 0;
   }
 

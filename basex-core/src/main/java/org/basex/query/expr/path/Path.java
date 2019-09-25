@@ -404,32 +404,35 @@ public abstract class Path extends ParseExpr {
    * @param cc compilation context
    */
   private void seqType(final CompileContext cc, final Value rt) {
-    // assign data reference
-    final int sl = steps.length;
-    final long size = size(cc, rt);
-    final Expr last = steps[sl - 1];
-    final SeqType st = last.seqType();
-    final Type type = st.type;
+    final Type type = steps[steps.length - 1].seqType().type;
     Occ occ = Occ.ZERO_MORE;
+    long size = size(cc, rt);
 
-    // unknown result size: single attribute with exact name test will return at most one result
-    if(size < 0 && root == null && sl == 1 && last instanceof Step && cc.nestedFocus()) {
-      final Step step = (Step) last;
-      if(step.axis == ATTRIBUTE && step.test.one) {
-        occ = Occ.ZERO_ONE;
-        step.exprType.assign(occ);
+    if(size == -1 && (root != null || cc.nestedFocus())) {
+      size = root != null ? root.size() : 1;
+      occ = root != null ? root.seqType().occ : Occ.ONE;
+
+      for(final Expr step : steps) {
+        final long sz = step.size();
+        size = size != -1 && sz != -1 ? size * sz : -1;
+        occ = occ.union(step.seqType().occ);
       }
+
+      // more than one result: result size may be smaller due to DDO
+      if(size > 1) size = -1;
     }
+
     exprType.assign(type, occ, size);
   }
 
   /**
-   * Computes the number of results.
+   * Computes the result size via database statistics.
    * @param rt root value (can be {@code null})
    * @param cc compilation context
-   * @return number of results
+   * @return number of results (or {@code -1})
    */
   private long size(final CompileContext cc, final Value rt) {
+    // check if path will yield any results
     if(root != null && root.size() == 0) return 0;
     for(final Expr step : steps) {
       if(step.size() == 0) return 0;

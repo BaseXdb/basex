@@ -481,4 +481,11 @@ public final class RewritingsTest extends QueryPlanTest {
 
     query(query, "<b/>\n<a>\n<b/>\n</a>");
   }
+
+  /** GH1723. */
+  @Test public void gh1723() {
+    check("count(<a/>)", 1, root(Int.class));
+    check("count(<a/>/<b/>)", 1, root(Int.class));
+    check("count(<a/>/<b/>/<c/>/<d/>)", 1, root(Int.class));
+  }
 }

@@ -28,8 +28,6 @@ public abstract class Test extends ExprInfo {
   public Kind kind;
   /** Name test (can be {@code null}). */
   public QNm name;
-  /** Indicates if test will match exactly one node (e.g.: @id). */
-  public boolean one;
 
   /**
    * Constructor.

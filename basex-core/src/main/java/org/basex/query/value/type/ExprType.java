@@ -100,7 +100,7 @@ public final class ExprType {
 
   /**
    * Assigns the specified type and result size. The occurrence indicator is ignored if the exact
-   * result size is available.
+   * result size is known.
    * @param type type
    * @param occ occurrence indicator
    * @param sz exact result size ({@code -1} if unknown)

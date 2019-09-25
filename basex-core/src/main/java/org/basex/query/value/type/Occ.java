@@ -13,9 +13,9 @@ public enum Occ {
   /** One or more.  */ ONE_MORE(1, Integer.MAX_VALUE, "+"),
   /** Zero or more. */ ZERO_MORE(0, Integer.MAX_VALUE, "*");
 
-  /** Minimal result size. */
+  /** Minimal result size ({@code 0} or more). */
   public final int min;
-  /** Maximal result size. */
+  /** Maximal result size (equal to {@link #min} or more). */
   public final int max;
   /** String representation. */
   private final String string;

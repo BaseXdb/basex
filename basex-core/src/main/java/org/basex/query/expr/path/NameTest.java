@@ -32,7 +32,6 @@ public final class NameTest extends Test {
     this.name = name;
     this.defNS = defNS != null ? defNS : Token.EMPTY;
     local = name != null ? name.local() : null;
-    one = kind == Kind.URI_NAME;
   }
 
   @Override
