@@ -14,7 +14,7 @@ final class MapLayout {
   /** List of rectangles. */
   final MapRects rectangles = new MapRects();
   /** Font size. */
-  private final int off;
+  private final int size;
   /** Data reference. */
   private final Data data;
   /** Map algorithm to use in this layout. */
@@ -37,7 +37,7 @@ final class MapLayout {
     this.data = data;
     this.textLen = textLen;
     this.gopts = gopts;
-    off = GUIConstants.fontSize + 4;
+    size = GUIConstants.fontSize + 4;
 
     switch(gopts.get(GUIOptions.MAPOFFSETS)) {
       // no title, small border
@@ -45,13 +45,13 @@ final class MapLayout {
         layout = new MapRect(0, 2, 0, 2); break;
       // title, no border
       case 2 :
-        layout = new MapRect(0, off, 0, off); break;
+        layout = new MapRect(0, size, 0, size); break;
       // title, border
       case 3 :
-        layout = new MapRect(2, off - 1, 4, off + 1); break;
+        layout = new MapRect(2, size - 1, 4, size + 1); break;
       // title, large border
       case 4 :
-        layout = new MapRect(off >> 2, off, off >> 1, off + (off >> 2)); break;
+        layout = new MapRect(size >> 2, size, size >> 1, size + (size >> 2)); break;
       // no title, no border
       default:
         layout = new MapRect(0, 0, 0, 0); break;
@@ -129,7 +129,7 @@ final class MapLayout {
     final int h = r.h - layout.h;
 
     // skip too small rectangles and meta data in file systems
-    if(w < off && h < off || w <= 2 || h <= 2) {
+    if(w < size && h < size || w <= 2 || h <= 2) {
       rectangles.add(r);
       return;
     }

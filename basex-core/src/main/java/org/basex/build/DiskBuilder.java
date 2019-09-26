@@ -54,7 +54,6 @@ public final class DiskBuilder extends Builder {
   @Override
   public DiskData build() throws IOException {
     meta.assign(parser);
-    meta.dirty = true;
 
     // calculate optimized output buffer sizes to reduce disk fragmentation
     final Runtime rt = Runtime.getRuntime();
@@ -83,7 +82,8 @@ public final class DiskBuilder extends Builder {
       }
 
       // copy temporary values into database table
-      try(DataInput in = new DataInput(meta.dbFile(DATATMP))) {
+      final IOFile tmpFile = meta.dbFile(DATATMP);
+      try(DataInput in = new DataInput(tmpFile)) {
         final TableAccess ta = new TableDiskAccess(meta, true);
         try {
           for(; spos < ssize; ++spos) ta.write4(in.readNum(), 8, in.readNum());
@@ -91,9 +91,10 @@ public final class DiskBuilder extends Builder {
           ta.close();
         }
       }
-      meta.dbFile(DATATMP).delete();
+      tmpFile.delete();
 
-      // return database instance
+      // return database instance. build will be finalized when this instance is closed
+      meta.dirty = true;
       return new DiskData(meta, elemNames, attrNames, path, nspaces);
 
     } catch(final Throwable th) {

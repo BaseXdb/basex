@@ -8,6 +8,7 @@ import org.basex.util.*;
 
 /**
  * This class allows main memory access to the database table representation.
+ * All table entries are stored in arrays
  *
  * NOTE: this class is not thread-safe.
  *
@@ -15,17 +16,17 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class TableMemAccess extends TableAccess {
-  /** Long buffer array. */
-  private long[] buf1 = new long[Array.CAPACITY];
-  /** Long buffer array. */
-  private long[] buf2 = new long[Array.CAPACITY];
+  /** Table data (first half). */
+  private long[] data1 = new long[Array.CAPACITY];
+  /** Table data (second half). */
+  private long[] data2 = new long[Array.CAPACITY];
 
   /**
-   * Stores the table in long arrays.
-   * @param md meta data
+   * Constructor.
+   * @param meta meta data
    */
-  public TableMemAccess(final MetaData md) {
-    super(md);
+  public TableMemAccess(final MetaData meta) {
+    super(meta);
   }
 
   @Override
@@ -35,36 +36,38 @@ public final class TableMemAccess extends TableAccess {
   public void close() { }
 
   @Override
-  public boolean lock(final boolean lock) { return true; }
+  public boolean lock(final boolean lock) {
+    return true;
+  }
 
   @Override
   public int read1(final int pre, final int offset) {
-    return (int) ((offset < 8 ? buf1 : buf2)[pre] >>
+    return (int) ((offset < 8 ? data1 : data2)[pre] >>
       ((offset < 8 ? 7 : 15) - offset << 3) & 0xFF);
   }
 
   @Override
   public int read2(final int pre, final int offset) {
-    return (int) ((offset < 8 ? buf1 : buf2)[pre] >>
+    return (int) ((offset < 8 ? data1 : data2)[pre] >>
       ((offset < 8 ? 6 : 14) - offset << 3) & 0xFFFF);
   }
 
   @Override
   public int read4(final int pre, final int offset) {
-    return (int) ((offset < 8 ? buf1 : buf2)[pre] >>
+    return (int) ((offset < 8 ? data1 : data2)[pre] >>
       ((offset < 8 ? 4 : 12) - offset << 3));
   }
 
   @Override
   public long read5(final int pre, final int offset) {
-    return (offset < 8 ? buf1 : buf2)[pre] >>
+    return (offset < 8 ? data1 : data2)[pre] >>
       ((offset < 8 ? 3 : 11) - offset << 3) & 0xFFFFFFFFFFL;
   }
 
   @Override
   public void write1(final int pre, final int offset, final int value) {
     dirty();
-    final long[] buf = offset < 8 ? buf1 : buf2;
+    final long[] buf = offset < 8 ? data1 : data2;
     final long d = (offset < 8 ? 7 : 15) - offset << 3;
     buf[pre] = buf[pre] & ~(0xFFL << d) | (long) value << d;
   }
@@ -72,7 +75,7 @@ public final class TableMemAccess extends TableAccess {
   @Override
   public void write2(final int pre, final int offset, final int value) {
     dirty();
-    final long[] buf = offset < 8 ? buf1 : buf2;
+    final long[] buf = offset < 8 ? data1 : data2;
     final long d = (offset < 8 ? 6 : 14) - offset << 3;
     buf[pre] = buf[pre] & ~(0xFFFFL << d) | (long) value << d;
   }
@@ -80,7 +83,7 @@ public final class TableMemAccess extends TableAccess {
   @Override
   public void write4(final int pre, final int offset, final int value) {
     dirty();
-    final long[] buf = offset < 8 ? buf1 : buf2;
+    final long[] buf = offset < 8 ? data1 : data2;
     final long d = (offset < 8 ? 4 : 12) - offset << 3;
     buf[pre] = buf[pre] & ~(0xFFFFFFFFL << d) | (long) value << d;
   }
@@ -88,7 +91,7 @@ public final class TableMemAccess extends TableAccess {
   @Override
   public void write5(final int pre, final int offset, final long value) {
     dirty();
-    final long[] buf = offset < 8 ? buf1 : buf2;
+    final long[] buf = offset < 8 ? data1 : data2;
     final long d = (offset < 8 ? 3 : 11) - offset << 3;
     buf[pre] = buf[pre] & ~(0xFFFFFFFFFFL << d) | value << d;
   }
@@ -97,15 +100,15 @@ public final class TableMemAccess extends TableAccess {
   protected void copy(final byte[] entries, final int pre, final int last) {
     dirty();
     for(int o = 0, i = pre; i < last; ++i, o += IO.NODESIZE) {
-      buf1[i] = getLong(entries, o);
-      buf2[i] = getLong(entries, o + 8);
+      data1[i] = getLong(entries, o);
+      data2[i] = getLong(entries, o + 8);
     }
   }
 
   @Override
-  public void delete(final int pre, final int nr) {
-    if(nr == 0) return;
-    move(pre + nr, pre);
+  public void delete(final int pre, final int count) {
+    if(count == 0) return;
+    move(pre + count, pre);
   }
 
   @Override
@@ -130,13 +133,13 @@ public final class TableMemAccess extends TableAccess {
   private void move(final int source, final int target) {
     dirty();
     final int l = meta.size - source;
-    while(l + target >= buf1.length) {
-      final int s = Array.newSize(buf1.length);
-      buf1 = Arrays.copyOf(buf1, s);
-      buf2 = Arrays.copyOf(buf2, s);
+    while(l + target >= data1.length) {
+      final int s = Array.newSize(data1.length);
+      data1 = Arrays.copyOf(data1, s);
+      data2 = Arrays.copyOf(data2, s);
     }
-    Array.copy(buf1, source, l, buf1, target);
-    Array.copy(buf2, source, l, buf2, target);
+    Array.copy(data1, source, l, data1, target);
+    Array.copy(data2, source, l, data2, target);
     meta.size += target - source;
   }
 

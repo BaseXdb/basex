@@ -10,15 +10,24 @@ final class Buffers {
   /** Number of buffers (must be 1 << n). */
   private static final int BUFFERS = 1 << 4;
   /** Buffers. */
-  private final Buffer[] buf = new Buffer[BUFFERS];
+  private final Buffer[] buffer = new Buffer[BUFFERS];
   /** Current buffer offset. */
-  private int off;
+  private int offset;
 
   /**
    * Constructor.
    */
   Buffers() {
-    for(int b = 0; b < BUFFERS; ++b) buf[b] = new Buffer();
+    init();
+  }
+
+  /**
+   * Initializes the buffers.
+   */
+  void init() {
+    for(int b = 0; b < BUFFERS; ++b) {
+      buffer[b] = new Buffer();
+    }
   }
 
   /**
@@ -26,7 +35,7 @@ final class Buffers {
    * @return buffers
    */
   Buffer[] all() {
-    return buf;
+    return buffer;
   }
 
   /**
@@ -34,20 +43,22 @@ final class Buffers {
    * @return current buffer
    */
   Buffer current() {
-    return buf[off];
+    return buffer[offset];
   }
 
   /**
    * Chooses a buffer and sets the offset.
-   * @param p buffer pointer
+   * @param pos buffer position
    * @return true if cursor has changed
    */
-  boolean cursor(final long p) {
-    final int o = off;
+  boolean cursor(final long pos) {
+    final int o = offset;
     do {
-      if(buf[off].pos == p) return false;
-    } while((off = off + 1 & BUFFERS - 1) != o);
-    off = o + 1 & BUFFERS - 1;
+      if(buffer[offset].pos == pos) return false;
+      offset = offset + 1 & BUFFERS - 1;
+    } while(offset != o);
+
+    offset = o + 1 & BUFFERS - 1;
     return true;
   }
 }

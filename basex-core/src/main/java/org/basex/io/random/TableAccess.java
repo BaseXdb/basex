@@ -115,12 +115,12 @@ public abstract class TableAccess {
    * Replaces entries in the database.
    * @param pre node to be replaced
    * @param entries new entries
-   * @param sub size of the subtree that is replaced
+   * @param count number of entries to be replaced
    */
-  public final void replace(final int pre, final byte[] entries, final int sub) {
+  public final void replace(final int pre, final byte[] entries, final int count) {
     dirty();
     final int nsize = entries.length >>> IO.NODEPOWER;
-    final int diff = sub - nsize;
+    final int diff = count - nsize;
     final int last = diff <= 0 ? pre + nsize - Math.abs(diff) : pre + nsize;
     copy(entries, pre, last);
     final int off = last - pre << IO.NODEPOWER;
@@ -161,9 +161,9 @@ public abstract class TableAccess {
   /**
    * Deletes the specified number of entries from the database.
    * @param pre pre value of the first node to delete
-   * @param nr number of entries to be deleted
+   * @param count number of entries to be deleted
    */
-  public abstract void delete(int pre, int nr);
+  public abstract void delete(int pre, int count);
 
   /**
    * Inserts the specified entries into the database.

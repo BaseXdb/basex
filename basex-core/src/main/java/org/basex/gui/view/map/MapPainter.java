@@ -80,7 +80,7 @@ final class MapPainter {
     final Data data = view.gui.context.data();
     final FTPosData ftpos = view.gui.context.marked.ftpos();
 
-    final int off = gopts.get(GUIOptions.MAPOFFSETS);
+    final int o = gopts.get(GUIOptions.MAPOFFSETS);
     final int rs = rects.size;
     for(int ri = 0; ri < rs; ++ri) {
       // get rectangle information
@@ -96,7 +96,7 @@ final class MapPainter {
       rect.pos = ftpos != null ? ftpos.get(data, pre) : null;
       g.setColor(mark ? col : GUIConstants.color(lvl));
 
-      if(rect.w < l.x + l.w || rect.h < l.y + l.h || off < 2 || ViewData.leaf(gopts, data, pre)) {
+      if(rect.w < l.x + l.w || rect.h < l.y + l.h || o < 2 || ViewData.leaf(gopts, data, pre)) {
         g.fillRect(rect.x, rect.y, rect.w, rect.h);
       } else {
         // painting only border for non-leaf nodes..

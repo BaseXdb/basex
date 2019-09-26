@@ -59,16 +59,16 @@ public final class TableOutput extends OutputStream {
 
   @Override
   public void close() throws IOException {
-    // write at least one page on disk
+    // write last entries, or single empty page, to disk
     final boolean empty = pages == 0 && pos == 0;
-    if(empty || pos > 0) writeBuffer();
+    if(pos > 0 || empty) writeBuffer();
     os.close();
 
     // create table info file
     try(DataOutput out = new DataOutput(meta.dbFile(file + 'i'))) {
       // total number of pages
       out.writeNum(pages);
-      // number of used pages (0: no table entries; max: no page mapping)
+      // number of used pages (0: empty table; MAX: no mapping)
       out.writeNum(empty ? 0 : Integer.MAX_VALUE);
     }
   }

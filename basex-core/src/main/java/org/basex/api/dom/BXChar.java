@@ -36,30 +36,30 @@ abstract class BXChar extends BXNode implements CharacterData {
   }
 
   @Override
-  public final String substringData(final int off, final int count) {
+  public final String substringData(final int offset, final int count) {
     final String val = getNodeValue();
-    if(count < 0 || off < 0 || off >= val.length()) throw new DOMException(
+    if(count < 0 || offset < 0 || offset >= val.length()) throw new DOMException(
         DOMException.INDEX_SIZE_ERR, "Invalid size values.");
-    return val.substring(off, Math.min(val.length(), off + count));
+    return val.substring(offset, Math.min(val.length(), offset + count));
   }
 
   @Override
-  public final void appendData(final String value) {
+  public final void appendData(final String arg) {
     throw notImplemented();
   }
 
   @Override
-  public final void deleteData(final int off, final int count) {
+  public final void deleteData(final int offset, final int count) {
     throw notImplemented();
   }
 
   @Override
-  public final void insertData(final int off, final String value) {
+  public final void insertData(final int offset, final String arg) {
     throw notImplemented();
   }
 
   @Override
-  public final void replaceData(final int off, final int count, final String value) {
+  public final void replaceData(final int offset, final int count, final String arg) {
     throw notImplemented();
   }
 

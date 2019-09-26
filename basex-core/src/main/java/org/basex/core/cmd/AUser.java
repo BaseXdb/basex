@@ -32,13 +32,13 @@ abstract class AUser extends Command {
 
   /**
    * Runs the command for all users and databases.
-   * @param off offset for users and optional databases ({@code off + 1})
+   * @param offset offset for users and optional databases ({@code offset + 1})
    * @param optional indicates if user/database argument is optional
    * @return success flag
    */
-  final boolean run(final int off, final boolean optional) {
-    final String name = args[off];
-    final String db = off + 1 < args.length ? args[off + 1] : "";
+  final boolean run(final int offset, final boolean optional) {
+    final String name = args[offset];
+    final String db = offset + 1 < args.length ? args[offset + 1] : "";
 
     if(!Databases.validPattern(name)) return error(NAME_INVALID_X, name);
     if(!db.isEmpty() && !Databases.validPattern(db))

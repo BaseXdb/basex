@@ -217,7 +217,7 @@ public abstract class Builder extends Job {
   // ABSTRACT METHODS =============================================================================
 
   /**
-   * Builds the database.
+   * Builds the database and returns the resulting database instance.
    * @return data database instance
    * @throws IOException I/O exception
    */

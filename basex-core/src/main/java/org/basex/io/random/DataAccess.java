@@ -13,10 +13,10 @@ import org.basex.util.*;
  */
 public final class DataAccess implements Closeable {
   /** Buffer manager. */
-  private final Buffers bm = new Buffers();
+  private final Buffers buffers = new Buffers();
   /** Reference to the data input stream. */
   private final RandomAccessFile raf;
-  /** File length. */
+  /** File size. */
   private long length;
   /** Changed flag. */
   private boolean changed;
@@ -46,8 +46,8 @@ public final class DataAccess implements Closeable {
    */
   public synchronized void flush() {
     try {
-      for(final Buffer b : bm.all()) {
-        if(b.dirty) writeBlock(b);
+      for(final Buffer buffer : buffers.all()) {
+        if(buffer.dirty) writeBlock(buffer);
       }
       if(changed) {
         raf.setLength(length);
@@ -148,21 +148,21 @@ public final class DataAccess implements Closeable {
 
   /**
    * Reads a {@link Num} value from disk.
-   * @param p text position
+   * @param pos text position
    * @return read num
    */
-  public synchronized int readNum(final long p) {
-    cursor(p);
+  public synchronized int readNum(final long pos) {
+    cursor(pos);
     return readNum();
   }
 
   /**
    * Reads a token from disk.
-   * @param p text position
+   * @param pos text position
    * @return text as byte array
    */
-  public synchronized byte[] readToken(final long p) {
-    cursor(p);
+  public synchronized byte[] readToken(final long pos) {
+    cursor(pos);
     return readToken();
   }
 
@@ -193,19 +193,19 @@ public final class DataAccess implements Closeable {
    */
   public synchronized byte[] readBytes(final int len) {
     int l = len, ll = IO.BLOCKSIZE - off;
-    final byte[] b = new byte[l];
-    Array.copyToStart(buffer(false).data, off, Math.min(l, ll), b);
+    final byte[] data = new byte[l];
+    Array.copyToStart(buffer(false).data, off, Math.min(l, ll), data);
     if(l > ll) {
       l -= ll;
       while(l > IO.BLOCKSIZE) {
-        Array.copyFromStart(buffer(true).data, IO.BLOCKSIZE, b, ll);
+        Array.copyFromStart(buffer(true).data, IO.BLOCKSIZE, data, ll);
         ll += IO.BLOCKSIZE;
         l -= IO.BLOCKSIZE;
       }
-      Array.copyFromStart(buffer(true).data, l, b, ll);
+      Array.copyFromStart(buffer(true).data, l, data, ll);
     }
     off += l;
-    return b;
+    return data;
   }
 
   /**
@@ -215,15 +215,15 @@ public final class DataAccess implements Closeable {
   public void cursor(final long pos) {
     off = (int) (pos & IO.BLOCKSIZE - 1);
     final long b = pos - off;
-    if(!bm.cursor(b)) return;
+    if(!buffers.cursor(b)) return;
 
-    final Buffer bf = bm.current();
+    final Buffer buffer = buffers.current();
     try {
-      if(bf.dirty) writeBlock(bf);
-      bf.pos = b;
-      raf.seek(bf.pos);
-      if(bf.pos < raf.length())
-        raf.readFully(bf.data, 0, (int) Math.min(length - bf.pos, IO.BLOCKSIZE));
+      if(buffer.dirty) writeBlock(buffer);
+      buffer.pos = b;
+      raf.seek(buffer.pos);
+      if(buffer.pos < raf.length())
+        raf.readFully(buffer.data, 0, (int) Math.min(length - buffer.pos, IO.BLOCKSIZE));
     } catch(final IOException ex) {
       Util.stack(ex);
     }
@@ -272,7 +272,7 @@ public final class DataAccess implements Closeable {
   }
 
   /**
-   * Writes an integer value to the current position.
+   * Writes an integer value to the file.
    * @param value value to be written
    */
   public void write4(final int value) {
@@ -283,8 +283,8 @@ public final class DataAccess implements Closeable {
   }
 
   /**
-   * Appends a value to the file and return it's offset.
-   * @param value number to be appended
+   * Writes a number to the file.
+   * @param value value to be written
    */
   public void writeNum(final int value) {
     if(value < 0 || value > 0x3FFFFFFF) {
@@ -301,35 +301,37 @@ public final class DataAccess implements Closeable {
 
   /**
    * Writes a byte array to the file.
-   * @param buffer buffer containing the token
-   * @param offset offset in the buffer where the token starts
-   * @param len token length
+   * @param data data containing the bytes to be written
+   * @param offset offset of first byte
+   * @param len number of bytes to be written
    */
-  public void writeBytes(final byte[] buffer, final int offset, final int len) {
+  public void writeBytes(final byte[] data, final int offset, final int len) {
     final int last = offset + len;
     int o = offset;
 
     while(o < last) {
-      final Buffer bf = buffer();
+      final Buffer buffer = buffer();
       final int l = Math.min(last - o, IO.BLOCKSIZE - off);
-      Array.copy(buffer, o, l, bf.data, off);
-      bf.dirty = true;
+      Array.copy(data, o, l, buffer.data, off);
+      buffer.dirty = true;
       off += l;
       o += l;
       // adjust file size
-      final long nl = bf.pos + off;
+      final long nl = buffer.pos + off;
       if(nl > length) length(nl);
     }
   }
 
   /**
-   * Appends a value to the file and return it's offset.
+   * Writes a token to the file.
    * @param pos write position
-   * @param values byte array to be appended
+   * @param value value to be written
    */
-  public void writeToken(final long pos, final byte[] values) {
+  public void writeToken(final long pos, final byte[] value) {
     cursor(pos);
-    writeToken(values, 0, values.length);
+    final int len = value.length;
+    writeNum(len);
+    writeBytes(value, 0, len);
   }
 
   /**
@@ -388,8 +390,8 @@ public final class DataAccess implements Closeable {
    * @return next byte
    */
   private int read() {
-    final Buffer bf = buffer();
-    return bf.data[off++] & 0xFF;
+    final Buffer buffer = buffer();
+    return buffer.data[off++] & 0xFF;
   }
 
   /**
@@ -397,22 +399,11 @@ public final class DataAccess implements Closeable {
    * @param value byte to be written
    */
   private void write(final int value) {
-    final Buffer bf = buffer();
-    bf.dirty = true;
-    bf.data[off++] = (byte) value;
-    final long nl = bf.pos + off;
+    final Buffer buffer = buffer();
+    buffer.dirty = true;
+    buffer.data[off++] = (byte) value;
+    final long nl = buffer.pos + off;
     if(nl > length) length(nl);
-  }
-
-  /**
-   * Write a token to the file.
-   * @param buffer buffer containing the token
-   * @param offset offset in the buffer where the token starts
-   * @param len token length
-   */
-  private void writeToken(final byte[] buffer, final int offset, final int len) {
-    writeNum(len);
-    writeBytes(buffer, offset, len);
   }
 
   /**
@@ -441,7 +432,7 @@ public final class DataAccess implements Closeable {
    * @return buffer
    */
   private Buffer buffer(final boolean next) {
-    if(next) cursor(bm.current().pos + IO.BLOCKSIZE);
-    return bm.current();
+    if(next) cursor(buffers.current().pos + IO.BLOCKSIZE);
+    return buffers.current();
   }
 }

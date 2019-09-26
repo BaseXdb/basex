@@ -48,18 +48,18 @@ public final class TableDiskAccess extends TableAccess {
 
   /**
    * Constructor.
-   * @param md meta data
+   * @param meta meta data
    * @param write write lock
    * @throws IOException I/O exception
    */
-  public TableDiskAccess(final MetaData md, final boolean write) throws IOException {
-    super(md);
+  public TableDiskAccess(final MetaData meta, final boolean write) throws IOException {
+    super(meta);
 
     // read meta and index data
     try(DataInput in = new DataInput(meta.dbFile(DATATBL + 'i'))) {
       // total number of pages
       pages = in.readNum();
-      // number of used pages (max: no page mapping; 0: empty table)
+      // number of used pages (0: empty table; MAX: no mapping)
       used = in.readNum();
       if(used == Integer.MAX_VALUE) {
         // no mapping: total and used number of pages is identical
@@ -76,7 +76,7 @@ public final class TableDiskAccess extends TableAccess {
 
     // initialize data file
     file = new RandomAccessFile(meta.dbFile(DATATBL).file(), "rw");
-    if(!lock(write)) throw new BaseXException(Text.DB_PINNED_X, md.name);
+    if(!lock(write)) throw new BaseXException(Text.DB_PINNED_X, meta.name);
   }
 
   /**
@@ -99,7 +99,9 @@ public final class TableDiskAccess extends TableAccess {
 
   @Override
   public synchronized void flush(final boolean all) throws IOException {
-    for(final Buffer b : buffers.all()) write(b);
+    for(final Buffer buffer : buffers.all()) {
+      write(buffer);
+    }
     if(!dirty || !all) return;
 
     try(DataOutput out = new DataOutput(meta.dbFile(DATATBL + 'i'))) {
@@ -109,13 +111,13 @@ public final class TableDiskAccess extends TableAccess {
       // check if page mapping is regular (are all pages used and in ascending order?)
       if(fPreIndex != null) {
         regular = p == used;
-        for(int i = 0; i < p; i++) regular &= fPreIndex[i] == i * IO.ENTRIES;
-        for(int i = 0; i < p; i++) regular &= pageIndex[i] == i;
+        for(int i = 0; i < p && regular; i++) regular = fPreIndex[i] == i * IO.ENTRIES;
+        for(int i = 0; i < p && regular; i++) regular = pageIndex[i] == i;
         if(regular) removeMapping();
       }
 
       if(regular) {
-        // no mapping available or required (see TableOutput#close)
+        // no mapping available or required (0: empty table; MAX: no mapping, see TableOutput#close)
         out.writeNum(p);
         out.writeNum(used == 0 ? 0 : Integer.MAX_VALUE);
       } else {
@@ -152,92 +154,91 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public synchronized int read1(final int pre, final int off) {
-    final int o = off + cursor(pre);
-    final byte[] b = buffers.current().data;
-    return b[o] & 0xFF;
+  public synchronized int read1(final int pre, final int offset) {
+    final int o = offset + cursor(pre);
+    final byte[] data = buffers.current().data;
+    return data[o] & 0xFF;
   }
 
   @Override
-  public synchronized int read2(final int pre, final int off) {
-    final int o = off + cursor(pre);
-    final byte[] b = buffers.current().data;
-    return ((b[o] & 0xFF) << 8) + (b[o + 1] & 0xFF);
+  public synchronized int read2(final int pre, final int offset) {
+    final int o = offset + cursor(pre);
+    final byte[] data = buffers.current().data;
+    return ((data[o] & 0xFF) << 8) + (data[o + 1] & 0xFF);
   }
 
   @Override
-  public synchronized int read4(final int pre, final int off) {
-    final int o = off + cursor(pre);
-    final byte[] b = buffers.current().data;
-    return ((b[o] & 0xFF) << 24) + ((b[o + 1] & 0xFF) << 16) +
-      ((b[o + 2] & 0xFF) << 8) + (b[o + 3] & 0xFF);
+  public synchronized int read4(final int pre, final int offset) {
+    final int o = offset + cursor(pre);
+    final byte[] data = buffers.current().data;
+    return ((data[o] & 0xFF) << 24) + ((data[o + 1] & 0xFF) << 16) +
+      ((data[o + 2] & 0xFF) << 8) + (data[o + 3] & 0xFF);
   }
 
   @Override
-  public synchronized long read5(final int pre, final int off) {
-    final int o = off + cursor(pre);
-    final byte[] b = buffers.current().data;
-    return ((long) (b[o] & 0xFF) << 32) + ((long) (b[o + 1] & 0xFF) << 24) +
-      ((b[o + 2] & 0xFF) << 16) + ((b[o + 3] & 0xFF) << 8) + (b[o + 4] & 0xFF);
+  public synchronized long read5(final int pre, final int offset) {
+    final int o = offset + cursor(pre);
+    final byte[] data = buffers.current().data;
+    return ((long) (data[o] & 0xFF) << 32) + ((long) (data[o + 1] & 0xFF) << 24) +
+      ((data[o + 2] & 0xFF) << 16) + ((data[o + 3] & 0xFF) << 8) + (data[o + 4] & 0xFF);
   }
 
   @Override
-  public void write1(final int pre, final int off, final int value) {
-    final int o = off + cursor(pre);
-    final Buffer bf = buffers.current();
-    final byte[] b = bf.data;
-    b[o] = (byte) value;
-    bf.dirty = true;
+  public void write1(final int pre, final int offset, final int value) {
+    final int o = offset + cursor(pre);
+    final Buffer buffer = buffers.current();
+    buffer.data[o] = (byte) value;
+    buffer.dirty = true;
   }
 
   @Override
-  public void write2(final int pre, final int off, final int value) {
-    final int o = off + cursor(pre);
-    final Buffer bf = buffers.current();
-    final byte[] b = bf.data;
-    b[o] = (byte) (value >>> 8);
-    b[o + 1] = (byte) value;
-    bf.dirty = true;
+  public void write2(final int pre, final int offset, final int value) {
+    final int o = offset + cursor(pre);
+    final Buffer buffer = buffers.current();
+    final byte[] data = buffer.data;
+    data[o] = (byte) (value >>> 8);
+    data[o + 1] = (byte) value;
+    buffer.dirty = true;
   }
 
   @Override
-  public void write4(final int pre, final int off, final int value) {
-    final int o = off + cursor(pre);
-    final Buffer bf = buffers.current();
-    final byte[] b = bf.data;
-    b[o]     = (byte) (value >>> 24);
-    b[o + 1] = (byte) (value >>> 16);
-    b[o + 2] = (byte) (value >>> 8);
-    b[o + 3] = (byte) value;
-    bf.dirty = true;
+  public void write4(final int pre, final int offset, final int value) {
+    final int o = offset + cursor(pre);
+    final Buffer buffer = buffers.current();
+    final byte[] data = buffer.data;
+    data[o]     = (byte) (value >>> 24);
+    data[o + 1] = (byte) (value >>> 16);
+    data[o + 2] = (byte) (value >>> 8);
+    data[o + 3] = (byte) value;
+    buffer.dirty = true;
   }
 
   @Override
-  public void write5(final int pre, final int off, final long value) {
-    final int o = off + cursor(pre);
-    final Buffer bf = buffers.current();
-    final byte[] b = bf.data;
-    b[o]     = (byte) (value >>> 32);
-    b[o + 1] = (byte) (value >>> 24);
-    b[o + 2] = (byte) (value >>> 16);
-    b[o + 3] = (byte) (value >>> 8);
-    b[o + 4] = (byte) value;
-    bf.dirty = true;
+  public void write5(final int pre, final int offset, final long value) {
+    final int o = offset + cursor(pre);
+    final Buffer buffer = buffers.current();
+    final byte[] data = buffer.data;
+    data[o]     = (byte) (value >>> 32);
+    data[o + 1] = (byte) (value >>> 24);
+    data[o + 2] = (byte) (value >>> 16);
+    data[o + 3] = (byte) (value >>> 8);
+    data[o + 4] = (byte) value;
+    buffer.dirty = true;
   }
 
   @Override
   protected void copy(final byte[] entries, final int pre, final int last) {
     for(int o = 0, i = pre; i < last; ++i, o += IO.NODESIZE) {
       final int off = cursor(i);
-      final Buffer bf = buffers.current();
-      Array.copy(entries, o, IO.NODESIZE, bf.data, off);
-      bf.dirty = true;
+      final Buffer buffer = buffers.current();
+      Array.copy(entries, o, IO.NODESIZE, buffer.data, off);
+      buffer.dirty = true;
     }
   }
 
   @Override
-  public void delete(final int pre, final int nr) {
-    if(nr == 0) return;
+  public void delete(final int pre, final int count) {
+    if(count == 0) return;
 
     // get first page
     dirty();
@@ -245,13 +246,13 @@ public final class TableDiskAccess extends TableAccess {
 
     // some useful variables to make code more readable
     int from = pre - firstPre;
-    final int last = pre + nr;
+    final int last = pre + count;
 
     // check if all entries are in current page
     if(last <= nextPre) {
       // move entries in current page and decreases pointers to pre values
-      if(last < nextPre) delete(buffers.current(), from, from + nr, nextPre - last);
-      decreasePre(nr);
+      if(last < nextPre) delete(buffers.current(), from, from + count, nextPre - last);
+      decreasePre(count);
 
       // if whole page was deleted, remove it from the index
       if(firstPre == nextPre) {
@@ -278,15 +279,15 @@ public final class TableDiskAccess extends TableAccess {
 
       // if the last page is empty, clear the corresponding bit
       read(pageIndex[page]);
-      final Buffer bf = buffers.current();
+      final Buffer buffer = buffers.current();
       if(last == nextPre) {
-        usedPages.clear((int) bf.pos);
+        usedPages.clear((int) buffer.pos);
         ++unused;
         if(page + 1 < used) readPage(page + 1);
         else ++page;
       } else {
         // delete entries at beginning of current (last) page
-        delete(bf, 0, last - firstPre, nextPre - last);
+        delete(buffer, 0, last - firstPre, nextPre - last);
       }
 
       // now remove them from the index
@@ -298,7 +299,7 @@ public final class TableDiskAccess extends TableAccess {
       // update index entry for this page
       fPreIndex[page] = pre;
       firstPre = pre;
-      decreasePre(nr);
+      decreasePre(count);
     }
     if(used == 0) {
       removeMapping();
@@ -332,10 +333,10 @@ public final class TableDiskAccess extends TableAccess {
     final int moved = nold - split;
 
     // special case: all entries fit in the current page
-    Buffer bf = buffers.current();
+    Buffer buffer = buffers.current();
     if(nold + nnew <= IO.BLOCKSIZE) {
-      Array.insert(bf.data, split, nnew, nold, entries);
-      bf.dirty = true;
+      Array.insert(buffer.data, split, nnew, nold, entries);
+      buffer.dirty = true;
 
       // increment first pre-values of pages after the last modified page
       for(int i = page + 1; i < used; ++i) fPreIndex[i] += nr;
@@ -348,14 +349,14 @@ public final class TableDiskAccess extends TableAccess {
     // append old entries at the end of the new entries
     final byte[] all = new byte[nnew + moved];
     Array.copy(entries, nnew, all);
-    Array.copy(bf.data, split, moved, all, nnew);
+    Array.copy(buffer.data, split, moved, all, nnew);
 
     // fill in the current page with new entries
     // number of bytes which fit in the first page
     int nrem = IO.BLOCKSIZE - split;
     if(nrem > 0) {
-      Array.copyFromStart(all, nrem, bf.data, split);
-      bf.dirty = true;
+      Array.copyFromStart(all, nrem, buffer.data, split);
+      buffer.dirty = true;
     }
 
     // number of new required pages and remaining bytes
@@ -370,10 +371,10 @@ public final class TableDiskAccess extends TableAccess {
         if(remain <= IO.BLOCKSIZE - o) {
           // copy the last records
           readPage(page + 1);
-          bf = buffers.current();
-          Array.copyFromStart(bf.data, o, bf.data, remain);
-          Array.copyToStart(all, all.length - remain, remain, bf.data);
-          bf.dirty = true;
+          buffer = buffers.current();
+          Array.copyFromStart(buffer.data, o, buffer.data, remain);
+          Array.copyToStart(all, all.length - remain, remain, buffer.data);
+          buffer.dirty = true;
           // reduce the pre value, since it will be later incremented with nr
           fPreIndex[page] -= remain >>> IO.NODEPOWER;
           // go back to the previous page
@@ -438,11 +439,12 @@ public final class TableDiskAccess extends TableAccess {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(Util.className(this) + " (");
-    sb.append("size: ").append(pages).append(", used: ").append(used).append(")");
-    if(fPreIndex != null) sb.append("\nFPres: ").append(Arrays.toString(fPreIndex));
-    if(pageIndex != null) sb.append("\nPages: ").append(Arrays.toString(pageIndex));
-    if(usedPages != null) sb.append("\nUsed Pages: ").append(usedPages);
+    final StringBuilder sb = new StringBuilder();
+    sb.append(Util.className(this) + " (" + "pages: " + pages + ", used: " + used);
+    sb.append(", page: " + page + ", firstPre: " + firstPre + ", nextPre: " + nextPre + ")");
+    if(fPreIndex != null) sb.append("\n- FPres: " + Arrays.toString(fPreIndex));
+    if(pageIndex != null) sb.append("\n- Pages: " + Arrays.toString(pageIndex));
+    if(usedPages != null) sb.append("\n- Used Pages: " + usedPages);
     return sb.toString();
   }
 
@@ -514,15 +516,15 @@ public final class TableDiskAccess extends TableAccess {
   private void read(final int pre) {
     if(!buffers.cursor(pre)) return;
 
-    final Buffer bf = buffers.current();
+    final Buffer buffer = buffers.current();
     try {
-      write(bf);
-      bf.pos = pre;
+      write(buffer);
+      buffer.pos = pre;
       if(pre >= pages) {
         pages = pre + 1;
       } else {
-        file.seek(bf.pos * IO.BLOCKSIZE);
-        file.readFully(bf.data);
+        file.seek(buffer.pos * IO.BLOCKSIZE);
+        file.readFully(buffer.data);
       }
     } catch(final IOException ex) {
       Util.stack(ex);
@@ -544,22 +546,22 @@ public final class TableDiskAccess extends TableAccess {
 
   /**
    * Deletes pages in the page mapping.
-   * @param nr number of pages to delete
+   * @param count number of pages to delete
    */
-  private void deletePages(final int nr) {
-    Array.remove(fPreIndex, page, nr, used);
-    Array.remove(pageIndex, page, nr, used);
-    used -= nr;
+  private void deletePages(final int count) {
+    Array.remove(fPreIndex, page, count, used);
+    Array.remove(pageIndex, page, count, used);
+    used -= count;
   }
 
   /**
    * Decreases pointers to pre value.
-   * @param nr number of entries to move
+   * @param count number of entries to move
    */
-  private void decreasePre(final int nr) {
+  private void decreasePre(final int count) {
     final int nextPage = page + 1;
-    for(int i = nextPage; i < used; ++i) fPreIndex[i] -= nr;
-    meta.size -= nr;
+    for(int i = nextPage; i < used; ++i) fPreIndex[i] -= count;
+    meta.size -= count;
     nextPre = nextPage < used && fPreIndex[nextPage] < meta.size ? fPreIndex[nextPage] : meta.size;
   }
 
@@ -577,17 +579,16 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Fills the current buffer with bytes from the specified array from the
-   * specified offset.
-   * @param arraz source array
-   * @param offset offset from the beginning of the array
+   * Fills the current buffer with bytes from the specified array and offset.
+   * @param array source array
+   * @param offset array offset
    * @return number of written bytes
    */
-  private int write(final byte[] arraz, final int offset) {
-    final Buffer bf = buffers.current();
-    final int len = Math.min(IO.BLOCKSIZE, arraz.length - offset);
-    Array.copyToStart(arraz, offset, len, bf.data);
-    bf.dirty = true;
+  private int write(final byte[] array, final int offset) {
+    final Buffer buffer = buffers.current();
+    final int len = Math.min(IO.BLOCKSIZE, array.length - offset);
+    Array.copyToStart(array, offset, len, buffer.data);
+    buffer.dirty = true;
     return len;
   }
 

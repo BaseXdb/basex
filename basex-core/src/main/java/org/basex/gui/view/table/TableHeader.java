@@ -122,16 +122,16 @@ final class TableHeader extends BaseXPanel {
       g.setColor(TEXT);
       g.setFont(bfont);
 
-      final int off = clicked ? 1 : 0;
+      final int o = clicked ? 1 : 0;
       final byte[] text = tdata.cols[n].name;
-      BaseXLayout.chopString(g, text, (int) x + 4 + off, 2 + off, (int) cw, fsz);
+      BaseXLayout.chopString(g, text, (int) x + 4 + o, 2 + o, (int) cw, fsz);
 
       if(n == tdata.sortCol) {
-        if(tdata.asc) g.fillPolygon(new int[] { (int) ce - 9 + off, (int) ce - 3 + off,
-            (int) ce - 6 + off },
-            new int[] { 4 + off, 4 + off, 8 + off }, 3);
-        else g.fillPolygon(new int[] { (int) ce - 9 + off, (int) ce - 3 + off,
-            (int) ce - 6 + off }, new int[] { 8 + off, 8 + off, 4 + off }, 3);
+        if(tdata.asc) g.fillPolygon(new int[] { (int) ce - 9 + o, (int) ce - 3 + o,
+            (int) ce - 6 + o },
+            new int[] { 4 + o, 4 + o, 8 + o }, 3);
+        else g.fillPolygon(new int[] { (int) ce - 9 + o, (int) ce - 3 + o,
+            (int) ce - 6 + o }, new int[] { 8 + o, 8 + o, 4 + o }, 3);
       }
 
       // draw filter texts

@@ -156,10 +156,10 @@ public final class TableView extends View {
    * @param pre pre value
    */
   private void setPos(final int pre) {
-    final int off = getOff(pre);
-    if(off == -1) return;
+    final int o = getOff(pre);
+    if(o == -1) return;
     final int h = getHeight() - header.getHeight() - 2 * tdata.rowH;
-    final int y = (off - 1) * tdata.rowH;
+    final int y = (o - 1) * tdata.rowH;
     final int s = scroll.pos();
     if(y < s || y > s + h) scroll.pos(y);
   }
