@@ -284,7 +284,7 @@ public final class IndexInfo {
       if(at.test.name != null) {
         final ExprList steps = new ExprList(invPath.steps.length + 1);
         steps.add(Step.get(at.info, Axis.SELF, at.test)).add(invPath.steps);
-        invPath = (Path) Path.get(invPath.info, invPath.root, steps.finish());
+        invPath = Path.get(invPath.info, invPath.root, steps.finish());
       }
     }
     return invPath;

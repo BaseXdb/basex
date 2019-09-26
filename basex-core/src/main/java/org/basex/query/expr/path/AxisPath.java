@@ -113,7 +113,7 @@ public abstract class AxisPath extends Path {
       stps.add(Step.get(info, step(s + 1).axis.invert(), step(s).test, step(s).exprs));
     }
     stps.add(Step.get(info, step(s + 1).axis.invert(), curr.test));
-    return (Path) Path.get(info, r, stps.finish());
+    return Path.get(info, r, stps.finish());
   }
 
   /**

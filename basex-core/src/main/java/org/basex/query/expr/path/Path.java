@@ -55,12 +55,12 @@ public abstract class Path extends ParseExpr {
    * @param steps steps
    * @return path instance
    */
-  public static ParseExpr get(final InputInfo ii, final Expr root, final Expr... steps) {
+  public static Path get(final InputInfo ii, final Expr root, final Expr... steps) {
     // new list with steps
     final int sl = steps.length;
     final ExprList tmp = new ExprList(sl);
 
-    // merge nested paths
+    // flatten nested path
     Expr rt = root;
     if(rt instanceof Path) {
       final Path path = (Path) rt;
@@ -72,15 +72,14 @@ public abstract class Path extends ParseExpr {
     for(final Expr step : steps) {
       Expr ex = step;
       if(ex instanceof ContextValue) {
-        // remove redundant context references
-        // single step: rewrite to axis step (required to sort results of path)
+        // normalize context item to self step
         ex = Step.get(((ContextValue) ex).info, SELF, KindTest.NOD);
       } else if(ex instanceof Filter) {
-        // rewrite filter to axis step
+        // rewrite filter expression to self step with predicates
         final Filter f = (Filter) ex;
         if(f.root instanceof ContextValue) ex = Step.get(f.info, SELF, KindTest.NOD, f.exprs);
       } else if(ex instanceof Path) {
-        // rewrite path to axis steps
+        // rewrite nested path to axis steps
         final Path p = (Path) ex;
         if(p.root != null && !(p.root instanceof ContextValue)) tmp.add(p.root);
         final int pl = p.steps.length - 1;
@@ -90,28 +89,21 @@ public abstract class Path extends ParseExpr {
       tmp.add(ex);
     }
 
-    // count axis steps, remove self steps (one step must survive)
-    int axes = 0;
-    for(int l = 0; l < tmp.size(); l++) {
-      if(tmp.get(l) instanceof Step) {
-        final Step s = (Step) tmp.get(l);
-        if(tmp.size() > 1 && s.axis == SELF && s.test == KindTest.NOD && s.exprs.length == 0) {
-          tmp.remove(l--);
-        } else {
-          axes++;
-        }
-      }
-    }
-
-    // check if path can be traversed in iterative manner; normalize root context
+    // check if path can be evaluated iteratively
     final Expr[] stps = tmp.finish();
-    final boolean iterative = iterative(rt, stps);
+    boolean axes = true;
+    for(final Expr expr : stps) axes &= expr instanceof Step;
+    final boolean iterative = axes && iterative(rt, stps);
+
+    // normalize root context
     if(rt instanceof ContextValue || rt instanceof Dummy) rt = null;
+
     final boolean single = iterative && rt == null && stps.length == 1 && !stps[0].has(Flag.POS);
+
     return single ? new SingleIterPath(ii, stps[0]) :
-           iterative ? new IterPath(ii, rt, stps) :
-           axes < stps.length ? new MixedPath(ii, rt, stps) :
-           new CachedPath(ii, rt, stps);
+      iterative ? new IterPath(ii, rt, stps) :
+      axes ? new CachedPath(ii, rt, stps) :
+      new MixedPath(ii, rt, stps);
   }
 
   @Override
@@ -155,28 +147,30 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    // no root: assign context value
+    // no root: assign context value (may be null)
     if(root == null && !cc.nestedFocus()) root = cc.qc.focus.value;
 
-    // return root if it returns no result
+    // return root if it yields no result
     if(root != null && root.seqType().zero()) return cc.replaceWith(this, root);
 
+    // find empty results, remove redundant steps
     int sl = steps.length;
+    Step self = null;
     final ExprList list = new ExprList(sl);
     for(int s = 0; s < sl; s++) {
+      // remove redundant steps. example: <xml/>/self::node() -> <xml/>
+      final Step st = axisStep(s);
+      if(st != null && st.axis == SELF && st.exprs.length == 0 && st.test instanceof KindTest) {
+        final Expr prev = list.isEmpty() ? root : list.peek();
+        if(prev != null && prev.seqType().type.instanceOf(st.test.type)) {
+          self = st;
+          continue;
+        }
+      }
+
       // step is empty sequence. example: $doc/NON-EXISTING-STEP -> $doc/() -> ()
       final Expr expr = steps[s];
       if(expr == Empty.VALUE) return cc.emptySeq(this);
-
-      // remove redundant steps
-      if(expr instanceof Step) {
-        final Step step = (Step) expr;
-        // remove redundant step. example: <xml/>/self::node() -> <xml/>
-        if(step.axis == SELF && step.exprs.length == 0 && step.test instanceof KindTest) {
-          final Expr prev = list.isEmpty() ? root : list.peek();
-          if(prev != null && prev.seqType().type.instanceOf(step.test.type)) continue;
-        }
-      }
 
       // add step to list
       list.add(expr);
@@ -185,14 +179,20 @@ public abstract class Path extends ParseExpr {
       // example: A/prof:void(.)/B -> A/prof:void(.)
       if(expr.seqType().zero() && s + 1 < sl) {
         cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
-        return get(info, root, list.finish()).optimize(cc);
+        break;
       }
     }
 
-    // no steps left: return root if nodes are in distinct document order
-    if(list.isEmpty()) return cc.replaceWith(this,
-        root instanceof DBNodeSeq || root.seqType().zeroOrOne() ? root :
-        cc.function(Function._UTIL_DDO, info, root));
+    // self step was removed: ensure that result will be in distinct document order
+    if(self != null && (list.isEmpty() || !list.get(0).seqType().type.instanceOf(NodeType.NOD))) {
+      if(root == null) root = new ContextValue(info).optimize(cc);
+      if(!root.seqType().zeroOrOne() || root instanceof DBNodeSeq) {
+        root = cc.replaceWith(root, cc.function(Function._UTIL_DDO, info, root));
+      }
+    }
+
+    // no steps left: return root
+    if(list.isEmpty()) return cc.replaceWith(this, root);
 
     steps = list.finish();
     sl = steps.length;
@@ -333,22 +333,19 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Checks if the path can be rewritten for iterative evaluation.
-   * @param root root expression; can be a {@code null} reference
+   * Checks if the specified axis steps can be evaluated iteratively.
+   * @param root root expression (can be {@code null})
    * @param steps path steps
    * @return result of check
    */
   private static boolean iterative(final Expr root, final Expr... steps) {
     if(root == null || !root.iterable()) return false;
 
-    final long size = root.size();
     final SeqType st = root.seqType();
-    boolean atMostOne = size == 0 || size == 1 || st.zeroOrOne();
+    boolean atMostOne = st.zeroOrOne();
     boolean sameDepth = atMostOne || st.type == NodeType.DOC || st.type == NodeType.DEL;
 
     for(final Expr expr : steps) {
-      if(!(expr instanceof Step)) return false;
-
       final Step step = (Step) expr;
       switch(step.axis) {
         case ANCESTOR:

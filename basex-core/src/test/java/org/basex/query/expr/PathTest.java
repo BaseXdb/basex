@@ -266,4 +266,11 @@ public final class PathTest extends SandboxTest {
   @Test public void pathToMap() {
     query("<a/>[./name()]", "<a/>");
   }
+
+  /**
+   * Path tests.
+   */
+  @Test public void gh1728() {
+    query("<a/> ! (.,.)/./1[. = 1]", 1);
+  }
 }
