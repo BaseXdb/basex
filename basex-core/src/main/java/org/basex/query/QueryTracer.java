@@ -10,7 +10,7 @@ import org.basex.util.*;
  */
 public interface QueryTracer {
   /** Prints trace output to the standard error. */
-  QueryTracer ERRLN = Util::errln;
+  QueryTracer ERRLN = (string, qc) -> Util.errln(string);
   /** Prints trace output to the evaluation info. */
   QueryTracer EVALINFO = (string, qc) -> qc.evalInfo(string);
 
