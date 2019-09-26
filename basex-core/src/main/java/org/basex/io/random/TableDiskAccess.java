@@ -302,6 +302,7 @@ public final class TableDiskAccess extends TableAccess {
       decreasePre(count);
     }
     if(used == 0) {
+      buffers.init();
       removeMapping();
       pages = 1;
     }

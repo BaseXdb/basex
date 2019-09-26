@@ -1,5 +1,6 @@
 package org.basex.data;
 
+import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
 import org.basex.*;
@@ -10,14 +11,14 @@ import org.junit.*;
 import org.junit.Test;
 
 /**
- * This class tests the stability of the database text store.
+ * This class tests the stability of the database store.
  *
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
 public final class StoreTest extends SandboxTest {
-  /** Number of runs per client. */
-  private static final int NQUERIES = 100;
+  /** Test file. */
+  private static final String GH1711 = "src/test/resources/gh1711.xml";
 
   /**
    * Initializes the tests.
@@ -35,10 +36,10 @@ public final class StoreTest extends SandboxTest {
   @Test public void replace() {
     execute(new CreateDB(NAME, "<X><A>q</A><A>q</A></X>"));
     final long size = context.data().meta.dbFile(DataText.DATATXT).length();
-    for(int n = 0; n < NQUERIES; n++) {
+    for(int n = 0; n < 500; n++) {
       query("for $a in //text() return replace node $a with random:double()");
     }
-    check(size);
+    assertEquals(size, context.data().meta.dbFile(DataText.DATATXT).length());
   }
 
   /**
@@ -48,7 +49,7 @@ public final class StoreTest extends SandboxTest {
     execute(new CreateDB(NAME, "<X><A>q</A><A>q</A></X>"));
     final long size = context.data().meta.dbFile(DataText.DATATXT).length();
 
-    for(int n = 0; n < NQUERIES; n++) {
+    for(int n = 0; n < 500; n++) {
       String qu = "for $a in //text() return delete node $a";
       query(qu);
       qu = "for $a in //text() " +
@@ -56,7 +57,7 @@ public final class StoreTest extends SandboxTest {
           "return insert node $a into $d";
       query(qu);
     }
-    check(size);
+    assertEquals(size, context.data().meta.dbFile(DataText.DATATXT).length());
   }
 
   /**
@@ -66,11 +67,11 @@ public final class StoreTest extends SandboxTest {
     execute(new CreateDB(NAME, "<X>abc</X>"));
     final long size = context.data().meta.dbFile(DataText.DATATXT).length();
 
-    for(int i = 0; i < NQUERIES; i++) {
+    for(int i = 0; i < 500; i++) {
       query("delete node //text()");
       query("insert node 'abc' into /X");
     }
-    check(size);
+    assertEquals(size, context.data().meta.dbFile(DataText.DATATXT).length());
   }
 
   /**
@@ -99,10 +100,38 @@ public final class StoreTest extends SandboxTest {
   }
 
   /**
-   * Tests if the size of the text store has not changed.
-   * @param old old size
+   * Add, delete and replace documents in an empty database.
    */
-  private static void check(final long old) {
-    assertEquals(old, context.data().meta.dbFile(DataText.DATATXT).length());
+  @Test public void gh1662() {
+    final String[] adds = {
+      _DB_ADD.args(NAME, " element x { (1 to 254) ! element y {} }", "a"),
+      _DB_ADD.args(NAME, " element x {}", "b")
+    };
+    final String[] deletes = {
+      _DB_DELETE.args(NAME, "a"),
+      _DB_DELETE.args(NAME, "b")
+    };
+
+    for(int i = 0; i < 4; i++) {
+      execute(new CreateDB(NAME));
+      query(adds[i / 2]);
+      query(adds[1 - i / 2]);
+      query("count(//y)", 254);
+      query(deletes[i % 2]);
+      query(deletes[1 - i % 2]);
+      query(_DB_ADD.args(NAME, " element x { (1 to 256) ! element y {} }", "a"));
+      query("count(//y)", 256);
+      assertTrue(execute(new Inspect()).contains("No inconsistencies found."));
+      execute(new Close());
+    }
+  }
+
+  /**
+   * Add, delete and replace document with namespace in an empty database.
+   */
+  @Test public void gh1711() {
+    query(_DB_CREATE.args(NAME, GH1711));
+    query(_DB_REPLACE.args(NAME, "/", GH1711));
+    query(_DB_OPEN.args(NAME));
   }
 }
