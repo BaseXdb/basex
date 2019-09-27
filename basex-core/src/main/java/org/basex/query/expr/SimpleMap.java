@@ -264,6 +264,8 @@ public abstract class SimpleMap extends Arr {
       if(expr != null) {
         exprs[e] = expr;
         changed = true;
+      } else {
+        expr = exprs[e];
       }
       if(e == 0) cc.pushFocus(expr);
       else cc.updateFocus(expr);
