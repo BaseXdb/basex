@@ -29,7 +29,7 @@ public final class Var extends ExprInfo {
   public SeqType declType;
   /** Flag for function conversion. */
   public boolean promote;
-  /** Data reference. */
+  /** Data reference (can be {@code null}). */
   public Data data;
 
   /** Stack slot number. */

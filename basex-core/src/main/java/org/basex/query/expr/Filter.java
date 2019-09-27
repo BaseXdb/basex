@@ -251,12 +251,10 @@ public abstract class Filter extends Preds {
       throws QueryException {
 
     boolean changed = false;
-    if(root != null) {
-      final Expr rt = root.inline(var, ex, cc);
-      if(rt != null) {
-        root = rt;
-        changed = true;
-      }
+    final Expr rt = root.inline(var, ex, cc);
+    if(rt != null) {
+      root = rt;
+      changed = true;
     }
     if(var != null) {
       cc.pushFocus(root);

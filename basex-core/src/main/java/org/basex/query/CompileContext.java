@@ -91,10 +91,10 @@ public final class CompileContext {
 
   /**
    * Assigns a new dummy item to the query focus.
-   * @param expr context expression (can be {@code null})
+   * @param expr context expression
    */
   public void updateFocus(final Expr expr) {
-    if(expr != null) qc.focus.value = dummyItem(expr);
+    qc.focus.value = dummyItem(expr);
   }
 
   /**
