@@ -19,23 +19,17 @@ public final class PathTest extends SandboxTest {
   /** Second result. */
   private static final String LI2 = "<li>Exercise 2</li>";
 
-  /**
-   * Creates a database.
-   */
+  /** Creates a database. */
   @Before public void setUp() {
     execute(new CreateDB(NAME, FILE));
   }
 
-  /**
-   * Drops the database.
-   */
+  /** Drops the database. */
   @After public void tearDown() {
     execute(new DropDB(NAME));
   }
 
-  /**
-   * Filter expressions with a single predicate.
-   */
+  /** Filter expressions with a single predicate. */
   @Test public void onePredicate() {
     query("//ul/li['']", "");
     query("//ul/li['x']", LI1 + '\n' + LI2);
@@ -48,18 +42,14 @@ public final class PathTest extends SandboxTest {
     query("//ul/li[last()]", LI2);
   }
 
-  /**
-   * Following axis with multiple documents.
-   */
+  /** Following axis with multiple documents. */
   @Test public void following() {
     execute(new Add(NAME, FILE));
     query("(//ul)[1]/following::ul", "");
     query("//li/following::li", LI2 + '\n' + LI2);
   }
 
-  /**
-   * Preceding axis with multiple documents.
-   */
+  /** Preceding axis with multiple documents. */
   @Test public void preceding() {
     execute(new Add(NAME, FILE));
     query("(//ul)[last()]/preceding::ul", "");
@@ -68,9 +58,7 @@ public final class PathTest extends SandboxTest {
     query("//li/preceding::li", LI1 + '\n' + LI1);
   }
 
-  /**
-   * Filter expressions with two predicates (the last being a positional one).
-   */
+  /** Filter expressions with two predicates (the last being a positional one). */
   @Test public void posAsLastPredicate() {
     // return first
     query("//ul/li[''][1]", "");
@@ -137,9 +125,7 @@ public final class PathTest extends SandboxTest {
     query("for $i in (1,'a') return //ul/li[last()][$i]", LI2 + '\n' + LI2);
   }
 
-  /**
-   * Filter expressions with two predicates (the first being a positional one).
-   */
+  /** Filter expressions with two predicates (the first being a positional one). */
   @Test public void posAsFirstPredicate() {
     // return first
     query("//ul/li[1]['']", "");
@@ -214,45 +200,35 @@ public final class PathTest extends SandboxTest {
     query("for $i in (1,'a') return //ul/li[$i][last()]", LI1 + '\n' + LI2);
   }
 
-  /**
-   * Caching of path expression results (GH-1197).
-   */
-  @Test public void pathCaching() {
+  /** Caching of path expression results. */
+  @Test public void gh1197() {
     execute(new CreateDB(NAME));
     execute(new Add("a.xml", "<a><b/><b/></a>"));
     execute(new Add("a.xml", "<c><b/></c>"));
     query("//b[/a]", "<b/>\n<b/>");
   }
 
-  /**
-   * Utilization of database statistics (GH-1202).
-   */
-  @Test public void nameIndex() {
+  /** Utilization of database statistics. */
+  @Test public void gh1202() {
     execute(new CreateDB(NAME, "<x/>"));
     query("let $x := 'e' return element e {} / self::e[name() = $x]", "<e/>");
-    query("let $x := 'e' return element e {} ! self::e[name() = $x]", "<e/>");
+    query("let $x := 'f' return element f {} ! self::f[name() = $x]", "<f/>");
   }
 
-  /**
-   * Retrieve double values from disk (GH-1206).
-   */
-  @Test public void diskDoubles() {
+  /** Retrieve double values from disk. */
+  @Test public void gh1206() {
     execute(new CreateDB(NAME, "<x>a</x>"));
     query("/* castable as xs:double", false);
   }
 
-  /**
-   * Index rewritings in nested XPath expressions (GH-1210).
-   */
-  @Test public void indexContext() {
+  /** Index rewritings in nested XPath expressions. */
+  @Test public void gh1210() {
     execute(new CreateDB(NAME, "<a><b>x</b></a>"));
     query("/a[b = .[b = 'x']/b]/b/text()", "x");
   }
 
-  /**
-   * Single root expressions (GH-1231).
-   */
-  @Test public void singleRoot() {
+  /** Single root expressions. */
+  @Test public void gh1231() {
     execute(new CreateDB(NAME));
     execute(new Add("a.xml", "<a/>"));
     execute(new Add("b.xml", "<b/>"));
@@ -260,16 +236,12 @@ public final class PathTest extends SandboxTest {
     query(".[/b]", "<b/>");
   }
 
-  /**
-   * Path to map rewritings.
-   */
+  /** Path to map rewritings. */
   @Test public void pathToMap() {
     query("<a/>[./name()]", "<a/>");
   }
 
-  /**
-   * Path tests.
-   */
+  /** Path tests. */
   @Test public void gh1728() {
     query("<a/> ! (.,.)/./1[. = 1]", 1);
   }
