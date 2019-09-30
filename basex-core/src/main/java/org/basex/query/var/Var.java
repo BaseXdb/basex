@@ -136,7 +136,7 @@ public final class Var extends ExprInfo {
   /**
    * Tries to refine the type of this variable through the type of the bound expression.
    * @param st sequence type of the bound expression
-   * @param size size
+   * @param size size (can be {@code -1})
    * @param cc compilation context (can be {@code null})
    * @throws QueryException query exception
    */
@@ -157,7 +157,7 @@ public final class Var extends ExprInfo {
     if(!dt.instanceOf(st)) {
       // the new type provides new information
       final SeqType it = dt.intersect(st);
-      if(it != null) exprType.assign(it, size);
+      if(it != null) exprType.assign(it.type, it.occ, size);
     }
   }
 

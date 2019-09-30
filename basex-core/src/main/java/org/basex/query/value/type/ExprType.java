@@ -40,16 +40,6 @@ public final class ExprType {
   }
 
   /**
-   * Assigns the specified sequence type and result size.
-   * @param st sequence type
-   * @param sz result size
-   */
-  public void assign(final SeqType st, final long sz) {
-    seqType = st;
-    size = sz;
-  }
-
-  /**
    * Assigns the specified type, updates the result size.
    * @param st sequence type
    */
@@ -103,7 +93,7 @@ public final class ExprType {
    * result size is known.
    * @param type type
    * @param occ occurrence indicator
-   * @param sz exact result size ({@code -1} if unknown)
+   * @param sz exact result size (unknown if negative)
    */
   public void assign(final Type type, final Occ occ, final long sz) {
     if(sz >= 0) {
@@ -122,6 +112,16 @@ public final class ExprType {
     final long min = minMax[0], max = minMax[1], sz = min == max ? min : -1;
     final Occ occ = min == 0 ? max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE : Occ.ONE_MORE;
     assign(type, occ, sz);
+  }
+
+  /**
+   * Assigns the specified sequence type and result size.
+   * @param st sequence type
+   * @param sz result size
+   */
+  private void assign(final SeqType st, final long sz) {
+    seqType = st;
+    size = sz;
   }
 
   @Override

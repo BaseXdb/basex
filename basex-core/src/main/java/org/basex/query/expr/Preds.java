@@ -162,9 +162,9 @@ public abstract class Preds extends Arr {
 
 
     // choose exact result size; if not available, work with occurrence indicator
-    final long sz = exact || max == 0 ? max : -1;
+    final long size = exact || max == 0 ? max : -1;
     final Occ occ = max > 1 ? root.seqType().occ.union(Occ.ZERO) : Occ.ZERO_ONE;
-    exprType.assign(root.seqType().type, occ, sz);
+    exprType.assign(root.seqType().type, occ, size);
     return max > 0;
   }
 
