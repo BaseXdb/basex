@@ -158,7 +158,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Returns the data reference bound to this expression. This method is currently overwritten
-   * by {@link DBNode}, {@link DBNodeSeq}, {@link Path} and {@link VarRef}.
+   * by {@link DBNode}, {@link DBNodeSeq}, {@link AxisPath} and {@link VarRef}.
    * @return data reference (can be {@code null})
    */
   public Data data() {

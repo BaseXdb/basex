@@ -92,26 +92,27 @@ public final class FnDistinctValues extends StandardFunc {
     if(exprs.length > 1 || !(expr instanceof AxisPath)) return this;
 
     // try to get statistics for resulting nodes
-    final ArrayList<PathNode> nodes = ((AxisPath) expr).pathNodes(cc);
+    final AxisPath path = (AxisPath) expr;
+    final ArrayList<PathNode> nodes = path.pathNodes(path.root);
     if(nodes == null) return this;
 
     // loop through all nodes
     final ValueBuilder vb = new ValueBuilder(cc.qc);
     final HashItemSet set = new HashItemSet(false);
-    for(PathNode pn : nodes) {
+    for(PathNode node : nodes) {
       // retrieve text child if addressed node is an element
-      if(pn.kind == Data.ELEM) {
-        if(!pn.stats.isLeaf()) return this;
-        for(final PathNode n : pn.children) {
-          if(n.kind == Data.TEXT) pn = n;
+      if(node.kind == Data.ELEM) {
+        if(!node.stats.isLeaf()) return this;
+        for(final PathNode nd : node.children) {
+          if(nd.kind == Data.TEXT) node = nd;
         }
       }
       // skip nodes others than texts and attributes
-      if(pn.kind != Data.TEXT && pn.kind != Data.ATTR) return this;
+      if(node.kind != Data.TEXT && node.kind != Data.ATTR) return this;
       // check if distinct values are available
-      if(!StatsType.isCategory(pn.stats.type)) return this;
+      if(!StatsType.isCategory(node.stats.type)) return this;
       // if yes, add them to the item set
-      for(final byte[] c : pn.stats.values) {
+      for(final byte[] c : node.stats.values) {
         final Atm item = new Atm(c);
         if(set.add(item, info)) vb.add(item);
       }

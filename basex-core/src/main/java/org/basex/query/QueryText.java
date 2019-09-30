@@ -407,7 +407,7 @@ public interface QueryText {
 
   /** Optimization info. */ String OPTREWRITE = "rewrite";
   /** Optimization info. */ String OPTPRE = "pre-evaluate";
-  /** Optimization info. */ String OPTDESC = "rewrite descendant-or-self step(s)";
+  /** Optimization info. */ String OPTDESC_X = "rewrite descendant-or-self step(s): %";
   /** Optimization info. */ String OPTTYPE_X = "remove type check: %";
   /** Optimization info. */ String OPTTYPE_X_X = "remove type check: % -> %";
   /** Optimization info. */ String OPTFLAT_X_X = "flatten nested %: %";
@@ -420,9 +420,9 @@ public interface QueryText {
   /** Optimization info. */ String OPTREMOVE_X_X = "remove % from %";
   /** Optimization info. */ String OPTWHERE = "rewrite where clause(s)";
   /** Optimization info. */ String OPTPRED_X = "rewrite % to predicate(s)";
-  /** Optimization info. */ String OPTVAR_X = "remove unused variable %";
-  /** Optimization info. */ String OPTNAME_X = "remove unknown element/attribute %";
-  /** Optimization info. */ String OPTPATH_X = "remove non-existing path %";
+  /** Optimization info. */ String OPTVAR_X = "remove unused variable: %";
+  /** Optimization info. */ String OPTNAME_X = "remove unknown element/attribute: %";
+  /** Optimization info. */ String OPTPATH_X = "remove path without results: %";
   /** Optimization info. */ String OPTINDEX_X_X = "apply % index for %";
   /** Optimization info. */ String OPTNORESULTS_X = "no index results: %";
   /** Optimization info. */ String OPTCHILD_X = "convert to child steps: %";

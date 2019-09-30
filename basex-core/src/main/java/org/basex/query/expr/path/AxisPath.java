@@ -1,5 +1,6 @@
 package org.basex.query.expr.path;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.PathCache.*;
@@ -123,6 +124,11 @@ public abstract class AxisPath extends Path {
    */
   public final Step step(final int i) {
     return (Step) steps[i];
+  }
+
+  @Override
+  public final Data data() {
+    return root != null ? root.data() : null;
   }
 
   /**

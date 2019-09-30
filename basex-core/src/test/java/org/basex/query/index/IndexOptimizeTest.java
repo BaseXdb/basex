@@ -142,7 +142,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   }
 
   /** Checks index optimizations inside functions. */
-  @Test public void functionTest() {
+  @Test public void functionInlining() {
     createColl();
     // document access after inlining
     check("declare function db:x($d) { collection($d)//text()[. = '1'] }; "
@@ -157,10 +157,17 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     // full-text: search term may have any type
     check("declare function db:x() {" + db + "//text()[. contains text '1'] }; db:x()", 1);
     check("declare function db:x($x) {" + db + "//text()[. contains text { $x }] }; db:x('1')", 1);
+  }
+
+  /** Checks index optimizations inside functions. */
+  @Test public void gh1553() {
+    createColl();
 
     // optimization in functions. GH-1553
-    check("declare function db:f() { " + db + "//a[text() = '1'] }; db:f()", "<a>1</a>");
-    check("declare function db:f() { collection('" + NAME + "')//text()[. = '1'] }; db:f()", "1");
+    check("declare function db:f() { " + _DB_OPEN.args(NAME) + "//a[text() = '1'] }; db:f()",
+        "<a>1</a>");
+    check("declare function db:f() { collection('" + NAME + "')//text()[. = '1'] }; db:f()",
+        "1");
   }
 
   /** Checks predicate tests for empty strings. */
@@ -222,19 +229,16 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     query("//c[../preceding-sibling::a[1]/b = 'A']", "<c>correct</c>");
   }
 
-  /** Checks expressions with the pragma for enforcing index rewritings. */
+  /** Checks if expressions are rewritten for enforced index access. */
   @Test public void pragma() {
     createDoc();
     final String pragma = "(# db:enforceindex #) { ";
     final String db = _DB_OPEN.args(" <x>" + NAME + "</x>");
 
-    // rewritings possible
     check(pragma + db + "//a[text() = '1']/text() }", 1, exists(ValueAccess.class));
     check(pragma + db + "//a/text()[. = '1'] }", 1, exists(ValueAccess.class));
     check(pragma + db + "/*/@*[. = <_/> ] }", "", exists(ValueAccess.class));
-
-    // no rewriting possible (database is referenced before index enforcement). GH-1696
-    check(db + "/*/@*[" + pragma + ". = <_/> }]", "", empty(ValueAccess.class));
+    check(db + "/*/@*[" + pragma + ". = <_/> }]", "", exists(ValueAccess.class));
   }
 
   /** Optimizations of predicates that are changed by optimizations. */

@@ -29,11 +29,11 @@ public abstract class Preds extends Arr {
   /**
    * Constructor.
    * @param info input info
-   * @param type type
+   * @param seqType sequence type
    * @param exprs predicates
    */
-  protected Preds(final InputInfo info, final Type type, final Expr... exprs) {
-    super(info, type.seqType(Occ.ZERO_MORE), exprs);
+  protected Preds(final InputInfo info, final SeqType seqType, final Expr... exprs) {
+    super(info, seqType, exprs);
   }
 
   @Override
@@ -135,14 +135,13 @@ public abstract class Preds extends Arr {
 
   /**
    * Assigns the sequence type and result size.
-   * @param type type of input
-   * @param size size of input ({@code -1} if unknown)
-   * @param one at most one result
+   * @param root root expression
    * @return whether expression may yield results
    */
-  protected final boolean exprType(final Type type, final long size, final boolean one) {
-    boolean exact = size != -1;
-    long max = exact ? size : Long.MAX_VALUE;
+  protected final boolean exprType(final Expr root) {
+    long max = root.size();
+    boolean exact = max != -1;
+    if(!exact) max = Long.MAX_VALUE;
 
     // check positional predicates
     for(final Expr expr : exprs) {
@@ -161,11 +160,12 @@ public abstract class Preds extends Arr {
       }
     }
 
-    // we only know if there will be at most 1 result
-    final Occ occ = max == 1 || one ? Occ.ZERO_ONE : Occ.ZERO_MORE;
+
+    // choose exact result size; if not available, work with occurrence indicator
     final long sz = exact || max == 0 ? max : -1;
-    exprType.assign(type, occ, sz);
-    return max != 0;
+    final Occ occ = max > 1 ? root.seqType().occ.union(Occ.ZERO) : Occ.ZERO_ONE;
+    exprType.assign(root.seqType().type, occ, sz);
+    return max > 0;
   }
 
   /**

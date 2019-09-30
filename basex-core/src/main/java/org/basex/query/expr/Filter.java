@@ -33,7 +33,7 @@ public abstract class Filter extends Preds {
    * @param exprs predicates
    */
   protected Filter(final InputInfo info, final Expr root, final Expr... exprs) {
-    super(info, AtomType.ITEM, exprs);
+    super(info, SeqType.ITEM_ZM, exprs);
     this.root = root;
   }
 
@@ -92,7 +92,7 @@ public abstract class Filter extends Preds {
     }
 
     // check result size
-    if(!exprType(rt.type, root.size(), rt.zeroOrOne())) return cc.emptySeq(this);
+    if(!exprType(root)) return cc.emptySeq(this);
 
     // if possible, convert filter to root or path expression
     Expr exp = simplify(root, exprs);

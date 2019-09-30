@@ -73,13 +73,24 @@ public abstract class Step extends Preds {
    * @param exprs predicates
    */
   Step(final InputInfo info, final Axis axis, final Test test, final Expr... exprs) {
-    super(info, axis == Axis.ATTRIBUTE ? NodeType.ATT : test.type, exprs);
+    super(info, SeqType.get(
+      axis == Axis.ATTRIBUTE ? NodeType.ATT : test.type,
+      axis == Axis.SELF && test == KindTest.NOD && exprs.length == 0 ? Occ.ONE :
+      axis == Axis.SELF || axis == Axis.PARENT || axis == Axis.ATTRIBUTE &&
+        test.kind == Kind.URI_NAME ? Occ.ZERO_ONE : Occ.ZERO_MORE), exprs);
+
     this.axis = axis;
     this.test = test;
   }
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
+    // self step: assign type of input
+    final Value value = cc.qc.focus.value;
+    if(value != null && axis == Axis.SELF && test == KindTest.NOD) {
+      exprType.assign(value.seqType().type);
+    }
+
     cc.pushFocus(this);
     try {
       super.compile(cc);
@@ -112,10 +123,8 @@ public abstract class Step extends Preds {
     // simplifies the predicates
     simplify(cc, this);
 
-    // compute result size; check if step will yield at most one result per node
-    final boolean one = axis == Axis.SELF || axis == Axis.PARENT ||
-        axis == Axis.ATTRIBUTE && test.kind == Kind.URI_NAME;
-    if(!exprType(seqType().type, -1, one)) return cc.emptySeq(this);
+    // determine type (if result is empty, return empty sequence)
+    if(!exprType(this)) return cc.emptySeq(this);
 
     // choose best implementation
     return copyType(get(info, axis, test, exprs));
@@ -123,7 +132,14 @@ public abstract class Step extends Preds {
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    return inlineAll(var, ex, exprs, cc) ? optimize(cc) : null;
+    boolean changed = false;
+    cc.pushFocus(this);
+    try {
+      changed = inlineAll(var, ex, exprs, cc);
+    } finally {
+      cc.removeFocus();
+    }
+    return changed ? optimize(cc) : null;
   }
 
   @Override
