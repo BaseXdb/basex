@@ -155,15 +155,28 @@ public abstract class Cmp extends Arr {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if(!(Function.COUNT.is(expr1) && expr2 instanceof ANum)) return this;
 
-    // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)
-    final int type = check(op, (ANum) expr2);
-    if(type >= 2) {
-      final Function func = type == 2 ? Function.EXISTS : Function.EMPTY;
+    final double count = ((ANum) expr2).dbl();
+    final int check = check(op, count);
+    if(check >= 2) {
+      // count(A) > 0  ->  exists(A)
+      final Function func = check == 2 ? Function.EXISTS : Function.EMPTY;
       return cc.function(func, info, ((Arr) expr1).exprs);
     }
-    if(type >= 0) {
-      return Bln.get(type == 0);
+    if(check >= 0) {
+      // count(A) >= 0  ->  true()
+      return Bln.get(check == 0);
     }
+
+    final SeqType st1 = ((Arr) expr1).exprs[0].seqType();
+    if(st1.zeroOrOne()) {
+      // count($zeroOrOne) < 2  ->  true()
+      if(op == OpV.LT && count > 1 || op == OpV.LE && count >= 1 ||
+        op == OpV.NE && count != 0 && count != 1) return Bln.TRUE;
+      // count($zeroOrOne) = 2  ->  false()
+      if(op == OpV.GT && count >= 1 || op == OpV.GE && count > 1 ||
+        op == OpV.EQ && count != 0 && count != 1) return Bln.FALSE;
+    }
+
     return this;
   }
 
@@ -178,18 +191,20 @@ public abstract class Cmp extends Arr {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if(!(Function.STRING_LENGTH.is(expr1) && expr2 instanceof ANum)) return this;
 
-    // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)
     final Expr[] args = ((Arr) expr1).exprs;
-    final int type = check(op, (ANum) expr2);
-    if(type >= 2) {
-      final Function func = type == 2 ? Function.BOOLEAN : Function.NOT;
+    final double count = ((ANum) expr2).dbl();
+    final int check = check(op, count);
+    if(check >= 2) {
+      // string-length(A) > 0  ->  boolean(string(A))
+      final Function func = check == 2 ? Function.BOOLEAN : Function.NOT;
       return cc.function(func, info, cc.function(Function.STRING, info, args));
     }
-    if(type >= 0) {
+    if(check >= 0) {
+      // string-length(A) >= 0  ->  true()
       final Expr arg1 = args.length > 0 ? args[0] : cc.qc.focus.value;
       if(arg1 != null) {
         final SeqType st1 = arg1.seqType();
-        if(st1.zero() || st1.one() && st1.type.isStringOrUntyped()) return Bln.get(type == 0);
+        if(st1.zero() || st1.one() && st1.type.isStringOrUntyped()) return Bln.get(check == 0);
       }
     }
     return this;
@@ -228,21 +243,23 @@ public abstract class Cmp extends Arr {
    *   <li>-1: none of them</li>
    * </ul>
    * @param op operator
-   * @param num input number
-   * @return comparison type
+   * @param count count to compare against
+   * @return comparison type ({@code -1}: no optimization possible)
    */
-  private static int check(final OpV op, final ANum num) {
-    final double v = num.dbl();
+  private static int check(final OpV op, final double count) {
     // > (v<0), != (v<0), >= (v<=0), != integer(v)
-    if((op == OpV.GT || op == OpV.NE) && v < 0 || op == OpV.GE && v <= 0 ||
-       op == OpV.NE && v != (long) v) return 0;
+    if((op == OpV.GT || op == OpV.NE) && count < 0 || op == OpV.GE && count <= 0 ||
+      op == OpV.NE && count != (long) count) return 0;
     // < (v<=0), <= (v<0), = (v<0), != integer(v)
-    if(op == OpV.LT && v <= 0 || (op == OpV.LE || op == OpV.EQ) && v < 0 ||
-       op == OpV.EQ && v != (long) v) return 1;
+    if(op == OpV.LT && count <= 0 || (op == OpV.LE || op == OpV.EQ) && count < 0 ||
+      op == OpV.EQ && count != (long) count) return 1;
     // > (v<1), >= (v<=1), != (v=0)
-    if(op == OpV.GT && v < 1 || op == OpV.GE && v <= 1 || op == OpV.NE && v == 0) return 2;
+    if(op == OpV.GT && count < 1 || op == OpV.GE && count <= 1 || op == OpV.NE && count == 0)
+      return 2;
     // < (v<=1), <= (v<1), = (v=0)
-    if(op == OpV.LT && v <= 1 || op == OpV.LE && v < 1 || op == OpV.EQ && v == 0) return 3;
+    if(op == OpV.LT && count <= 1 || op == OpV.LE && count < 1 || op == OpV.EQ && count == 0)
+      return 3;
+
     return -1;
   }
 }

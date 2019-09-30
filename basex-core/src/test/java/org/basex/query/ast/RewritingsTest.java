@@ -220,6 +220,55 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[string-length() = <a>1</a>]", "", exists(STRING_LENGTH));
   }
 
+  /** Checks count optimizations. */
+  @Test public void count() {
+    // static occurrence: zero-or-one
+    String count = "count(1[. = 1])";
+
+    // static result: no need to evaluate count
+    check(count + " <    0", false, root(Bln.class));
+    check(count + " <= -.1", false, root(Bln.class));
+    check(count + " >=   0", true, root(Bln.class));
+    check(count + " > -0.1", true, root(Bln.class));
+    check(count + " =  1.1", false, root(Bln.class));
+    check(count + " != 1.1", true, root(Bln.class));
+    check(count + " =   -1", false, root(Bln.class));
+    check(count + " !=  -1", true, root(Bln.class));
+
+    // rewrite to empty/exists (faster)
+    check(count + " >  0", true, root(EXISTS));
+    check(count + " >= 1", true, root(EXISTS));
+    check(count + " != 0", true, root(EXISTS));
+    check(count + " <  1", false, root(EMPTY));
+    check(count + " <= 0", false, root(EMPTY));
+    check(count + " =  0", false, root(EMPTY));
+
+    // zero-or-one result: no need to evaluate count
+    check(count + " <  2", true, root(Bln.class));
+    check(count + " <= 1", true, root(Bln.class));
+    check(count + " != 2", true, root(Bln.class));
+    check(count + " >  1", false, root(Bln.class));
+    check(count + " >= 2", false, root(Bln.class));
+    check(count + " =  2", false, root(Bln.class));
+
+    // no rewritings possible
+    check(count + " != 1", false, exists(COUNT));
+    check(count + " =  1", true, exists(COUNT));
+
+    // one-or-more results: no need to evaluate count
+    count = "count((1, 1[. = 1]))";
+    check(count + " >  0", true, root(Bln.class));
+    check(count + " >= 1", true, root(Bln.class));
+    check(count + " != 0", true, root(Bln.class));
+    check(count + " <  1", false, root(Bln.class));
+    check(count + " <= 0", false, root(Bln.class));
+    check(count + " =  0", false, root(Bln.class));
+
+    // no rewritings possible
+    check(count + " =  1", false, exists(COUNT));
+    check(count + " =  2", true, exists(COUNT));
+  }
+
   /** Checks that empty sequences are eliminated and that singleton lists are flattened. */
   @Test public void list() {
     check("((), <x/>, ())", "<x/>", empty(List.class), empty(Empty.class), exists(CElem.class));
