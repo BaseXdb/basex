@@ -150,6 +150,7 @@ public abstract class Path extends ParseExpr {
     Expr expr = simplify(cc);
     // merge descendant steps
     if(expr == this) expr = mergeSteps(cc);
+    // return optimized expression
     if(expr != this) return expr;
 
     // assign sequence type, compute result size
@@ -158,6 +159,8 @@ public abstract class Path extends ParseExpr {
 
     // remove paths that will yield no result
     expr = removeEmpty(cc, rt);
+    // rewrite to simple map
+    if(expr == this) expr = toMap(cc);
     // check index access
     if(expr == this) expr = index(cc, rt);
     /* rewrite descendant to child steps. this optimization is called after the index rewritings,
@@ -165,8 +168,6 @@ public abstract class Path extends ParseExpr {
      * - //B [. = '...'] -> IA('...', B)
      * - /A/B[. = '...'] -> IA('...', B)/parent::A *[parent::document-node()] */
     if(expr == this) expr = children(cc, rt);
-    // rewrite to simple map
-    if(expr == this) expr = toMap(cc, rt);
     // return optimized expression
     if(expr != this) return expr.optimize(cc);
 
@@ -231,7 +232,7 @@ public abstract class Path extends ParseExpr {
     if(root != null && root.seqType().zero()) return cc.replaceWith(this, root);
 
     // find empty results, remove redundant steps
-    int sl = steps.length;
+    final int sl = steps.length;
     Step self = null;
     final ExprList list = new ExprList(sl);
     for(int s = 0; s < sl; s++) {
@@ -626,23 +627,30 @@ public abstract class Path extends ParseExpr {
   /**
    * Tries to rewrite the path to a simple map expression.
    * @param cc compilation context
-   * @param rt compile time root (can be {@code null})
    * @return original or new expression
    * @throws QueryException query exception
    */
-  private Expr toMap(final CompileContext cc, final Expr rt) throws QueryException {
-    // if last step yields no nodes, rewrite mixed path to simple map
-    // example: $a/b/string -> $a/b ! string()
+  private Expr toMap(final CompileContext cc) throws QueryException {
+    // do not rewrite relative paths with single step
     final int sl = steps.length;
-    final Expr s1 = sl > 1 ? steps[sl - 2] : rt, s2 = steps[sl - 1];
-    if(s1 != null && s1.seqType().type.instanceOf(NodeType.NOD) &&
-        s2.seqType().type.instanceOf(AtomType.AAT)) {
-      // remove last step from new root expression
-      Expr r = root;
-      if(sl > 1) r = get(info, root, Arrays.copyOfRange(steps, 0, sl - 1)).optimize(cc);
-      return cc.replaceWith(this, r == null ? s2 : SimpleMap.get(info, r, s2));
-    }
-    return this;
+    if(root == null && sl == 1) return this;
+
+    Expr s1 = sl > 1 ? steps[sl - 2] : root, s2 = steps[sl - 1];
+    final Type type1 = s1.seqType().type, type2 = s2.seqType().type;
+
+    /* rewrite if:
+     * - previous expression yields nodes (otherwise, an error must be raised at runtime)
+     * - last expression is no step, and yields a single result or no node */
+    if(!type1.instanceOf(NodeType.NOD) || s2 instanceof Step || size() != 1 &&
+       !type2.instanceOf(AtomType.AAT) && !type2.instanceOf(SeqType.ANY_FUNC)) return this;
+
+    /* remove last step from new root expression. examples:
+     * - (<a/>, <b/>)/map { name(): . }  ->  (<a/>, <b/>) ! map { name(): . }
+     * - <a/>/<b/>  ->  <a/> ! <b/>
+     * - $a/b/string  ->  $a/b ! string() */
+    if(sl > 1) s1 = get(info, root, Arrays.copyOfRange(steps, 0, sl - 1)).optimize(cc);
+    if(s1 != null) s2 = SimpleMap.get(info, s1, s2);
+    return cc.replaceWith(this, s2);
   }
 
   /**

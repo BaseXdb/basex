@@ -108,7 +108,7 @@ public abstract class QueryPlanTest extends SandboxTest {
    * @return test string
    */
   protected static String empty() {
-    return "not(QueryPlan/*/name() != 'Empty')";
+    return root("Empty");
   }
 
   /**
@@ -117,7 +117,7 @@ public abstract class QueryPlanTest extends SandboxTest {
    * @return test string
    */
   protected static String root(final String expr) {
-    return "QueryPlan/*/name() = '" + expr + "'";
+    return "name(QueryPlan/*) = '" + expr + "'";
   }
 
   /**

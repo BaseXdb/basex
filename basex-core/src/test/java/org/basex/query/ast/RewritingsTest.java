@@ -432,8 +432,6 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Static optimizations of paths without results (see also gh1630). */
   @Test public void emptyPath() {
-    check("<a/>/<a/>", "<a/>", exists(MixedPath.class));
-
     // check combination of axis and node test and axis
     check("<e a='A'/>/attribute::text()", "", empty());
     check("<e a='A'/>/attribute::attribute()", "a=\"A\"", exists(IterPath.class));
@@ -536,5 +534,17 @@ public final class RewritingsTest extends QueryPlanTest {
     check("count(<a/>)", 1, root(Int.class));
     check("count(<a/>/<b/>)", 1, root(Int.class));
     check("count(<a/>/<b/>/<c/>/<d/>)", 1, root(Int.class));
+  }
+
+  /** GH1733. */
+  @Test public void gh1733() {
+    check("(<a/>, <b/>)/1", "1\n1", root(SingletonSeq.class));
+    check("<a/>/1", 1, root(Int.class));
+    check("<a/>/<a/>", "<a/>", root(CElem.class));
+    check("(<a/>/map { 1:2 })?1", 2, root(Int.class));
+    check("<a/>/self::a/count(.)", 1, root("ItemMap"));
+
+    // no rewriting possible
+    check("(<a/>, <b/>)/<c/>", "<c/>\n<c/>", root(MixedPath.class));
   }
 }
