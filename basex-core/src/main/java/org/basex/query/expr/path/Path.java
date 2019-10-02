@@ -493,7 +493,7 @@ public abstract class Path extends ParseExpr {
       final NodeType type = step.test.type;
 
       // check combination of axis and node test
-      if(!type.oneOf(NodeType.NOD, NodeType.SCA, NodeType.SCE) && ((BooleanSupplier) () -> {
+      if(!type.oneOf(NodeType.NOD, NodeType.SCA, NodeType.SCE) && ((Check) () -> {
         switch(axis) {
           // attribute::element()
           case ATTRIBUTE:
@@ -513,7 +513,7 @@ public abstract class Path extends ParseExpr {
           default:
             return false;
         }
-      }).getAsBoolean()) return true;
+      }).ok()) return true;
 
       // skip further tests if previous expression is unknown or is no axis step
       final Expr prev = s > 0 ? axisStep(s - 1) : rt;
@@ -521,7 +521,7 @@ public abstract class Path extends ParseExpr {
 
       // check step after expression that yields document nodes
       final Type prevType = prev.seqType().type;
-      if(prevType.instanceOf(NodeType.DOC) && ((BooleanSupplier) () -> {
+      if(prevType.instanceOf(NodeType.DOC) && ((Check) () -> {
         switch(axis) {
           case SELF:
           case ANCESTOR_OR_SELF:
@@ -535,13 +535,13 @@ public abstract class Path extends ParseExpr {
           default:
             return true;
         }
-      }).getAsBoolean()) return true;
+      }).ok()) return true;
 
       // skip further tests if previous node type is unknown, or if current test accepts all nodes
       if(!prevType.instanceOf(NodeType.NOD)) continue;
 
       // check step after any other expression
-      if(((BooleanSupplier) () -> {
+      if(((Check) () -> {
         switch(axis) {
           // type of current step will not accept any nodes of previous step
           // example: <a/>/self::text()
@@ -560,7 +560,7 @@ public abstract class Path extends ParseExpr {
           default:
             return false;
         }
-      }).getAsBoolean()) return true;
+      }).ok()) return true;
     }
 
     return false;
