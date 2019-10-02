@@ -161,6 +161,8 @@ public abstract class Path extends ParseExpr {
     expr = removeEmpty(cc, rt);
     // rewrite to simple map
     if(expr == this) expr = toMap(cc);
+    // rewrite list to union expressions
+    if(expr == this) expr = union(cc);
     // check index access
     if(expr == this) expr = index(cc, rt);
     /* rewrite descendant to child steps. this optimization is called after the index rewritings,
@@ -651,6 +653,27 @@ public abstract class Path extends ParseExpr {
     if(sl > 1) s1 = get(info, root, Arrays.copyOfRange(steps, 0, sl - 1)).optimize(cc);
     if(s1 != null) s2 = SimpleMap.get(info, s1, s2);
     return cc.replaceWith(this, s2);
+  }
+
+  /**
+   * Tries to rewrite steps to union expressions.
+   * @param cc compilation context
+   * @return original or new expression
+   * @throws QueryException query exception
+   */
+  private Expr union(final CompileContext cc) throws QueryException {
+    boolean changed = false;
+    final int sl = steps.length;
+    for(int s = 0; s < sl; s++) {
+      if(steps[s] instanceof List) {
+        final List list = (List) steps[s];
+        if(((Checks<Expr>) expr -> expr.seqType().instanceOf(SeqType.NOD_ZM)).all(list.exprs)) {
+          steps[s] = cc.replaceWith(steps[s], new Union(list.info, list.exprs)).optimize(cc);
+          changed = true;
+        }
+      }
+    }
+    return changed ? get(info, root, steps) : this;
   }
 
   /**
