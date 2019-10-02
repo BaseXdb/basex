@@ -8,7 +8,7 @@ import java.util.*;
 import javax.swing.*;
 
 import org.basex.core.*;
-import org.basex.core.cmd.*;
+import org.basex.core.cmd.Check;
 import org.basex.gui.*;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
