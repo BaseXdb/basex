@@ -96,6 +96,11 @@ abstract class Set extends Arr {
   }
 
   @Override
+  public void plan(final QueryPlan plan) {
+    plan.add(plan.create(this, ITERABLE, iterable), exprs);
+  }
+
+  @Override
   public final String toString() {
     return PAREN1 + toString(' ' + Util.className(this).toLowerCase(Locale.ENGLISH) + ' ') + PAREN2;
   }
