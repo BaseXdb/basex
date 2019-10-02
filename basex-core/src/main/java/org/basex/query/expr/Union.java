@@ -5,12 +5,15 @@ import static org.basex.query.QueryText.*;
 import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.func.Function;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -39,18 +42,22 @@ public final class Union extends Set {
     for(final Expr expr : exprs) {
       if(expr == Empty.VALUE) {
         // remove empty operands
+        // example: * union ()  ->  *
+        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+      } else if(expr.seqType().instanceOf(SeqType.NOD_ZM) && !expr.has(Flag.CNS, Flag.NDT) &&
+         ((Checks<Expr>) ex -> ex.equals(expr)).any(list)) {
+        // remove duplicate
+        // example: * union *  ->  *
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else {
         list.add(expr);
       }
     }
-    // no expressions: return empty sequence
-    if(list.isEmpty()) return Empty.VALUE;
-    // ensure that results are always sorted
-    if(list.size() == 1 && iterable) return list.get(0);
-    // replace expressions with optimized list
     exprs = list.finish();
-    return this;
+
+    // ensure that results are always sorted
+    return exprs.length > 1 ? this : exprs.length == 0 ? Empty.VALUE :
+      iterable ? exprs[0] : cc.function(Function._UTIL_DDO, info, exprs[0]);
   }
 
   @Override

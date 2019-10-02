@@ -30,6 +30,20 @@ public interface Checks<T> {
   }
 
   /**
+   * Returns the index of the first successful check.
+   * @param values values to check
+   * @return index, {@code -1} otherwise
+   */
+  default int index(Iterable<T> values) {
+    int i = 0;
+    for(final T value : values) {
+      if(ok(value)) return i;
+      i++;
+    }
+    return -1;
+  }
+
+  /**
    * Returns {@code true} if at least one value check is successful.
    * @param values values to check
    * @return result of check
@@ -47,6 +61,20 @@ public interface Checks<T> {
   default boolean all(T[] values) {
     for(final T value : values) if(!ok(value)) return false;
     return true;
+  }
+
+  /**
+   * Returns the index of the first successful check.
+   * @param values values to check
+   * @return index, {@code -1} otherwise
+   */
+  default int index(T[] values) {
+    int i = 0;
+    for(final T value : values) {
+      if(ok(value)) return i;
+      i++;
+    }
+    return -1;
   }
 
   /**
