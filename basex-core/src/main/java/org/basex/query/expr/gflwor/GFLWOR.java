@@ -302,7 +302,7 @@ public final class GFLWOR extends ParseExpr {
         if(expr.has(Flag.NDT)) continue;
 
         final Var var = lt.var;
-        final BooleanSupplier inlineable = () -> {
+        final Check inlineable = () -> {
           for(final ListIterator<Clause> i = clauses.listIterator(next); i.hasNext();) {
             if(!i.next().inlineable(var)) return false;
           }
@@ -320,20 +320,20 @@ public final class GFLWOR extends ParseExpr {
           // inline context values
           // allowed: 1[let $x := . return $x] -> 1[.]
           // illegal: 1[let $x := . return <a/>[$x = 1]]
-          inline = inlineable.getAsBoolean();
+          inline = inlineable.ok();
         }
         if(!inline && count(var, next) == VarUsage.ONCE && !expr.has(Flag.CNS)) {
           // inline expressions that occur once, but do not construct nodes
           // e.g. let $x := <X/> return <X xmlns='xx'>{ $x/self::X }</X>
           // inline top-level context references
           // e.g. (1 to 5)[let $p := position() return $p = 1] -> (1 to 5)[position() = 1]
-          inline = !expr.has(Flag.CTX) || inlineable.getAsBoolean();
+          inline = !expr.has(Flag.CTX) || inlineable.ok();
         }
         if(!inline && expr instanceof Path) {
           // inline cheap path expressions with single result
           // e.g. doc('x.xml')/root
           inline = expr.size() == 1 && !expr.has(Flag.NDT, Flag.CNS) &&
-              (!expr.has(Flag.CTX) || inlineable.getAsBoolean());
+              (!expr.has(Flag.CTX) || inlineable.ok());
         }
 
         if(inline) {

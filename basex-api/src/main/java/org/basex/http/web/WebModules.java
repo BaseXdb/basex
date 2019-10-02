@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.function.*;
 
 import javax.servlet.http.*;
 
@@ -262,20 +261,18 @@ public final class WebModules {
 
     final ArrayList<RestXqFunction> list = new ArrayList<>();
     for(final RestXqFunction func : funcs) {
-      final BooleanSupplier s = () -> {
-        for(final MediaType accept : accepts) {
-          if(func.produces.isEmpty()) {
-            if(qf(accept, "q") == clientQf) return true;
-          } else {
-            for(final MediaType produce : func.produces) {
-              if(produce.matches(accept) && qf(accept, "q") == clientQf &&
-                  (serverQf == -1 || qf(produce, "qs") == serverQf)) return true;
-            }
-          }
+      final Checks<MediaType> check = accept -> {
+        if(func.produces.isEmpty()) {
+          if(qf(accept, "q") == clientQf) return true;
+        } else {
+          final Checks<MediaType> checkProduce = produce ->
+            produce.matches(accept) && qf(accept, "q") == clientQf &&
+            (serverQf == -1 || qf(produce, "qs") == serverQf);
+          if(checkProduce.any(func.produces)) return true;
         }
         return false;
       };
-      if(s.getAsBoolean()) list.add(func);
+      if(check.any(accepts)) list.add(func);
     }
     return list;
   }
