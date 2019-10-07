@@ -249,6 +249,13 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     check("let $s := 1 return *[if($s) then () else .//text() = 'A']", "", empty());
   }
 
+  /** Optimizations of predicates that are changed by optimizations. */
+  @Test public void gh1738() {
+    execute(new CreateDB(NAME, "<x a='A'/>"));
+    check("(# db:enforceindex #) { <_>" + NAME + "</_> ! db:open(.)//*[comment() = 'A'] }", "",
+        empty(ValueAccess.class));
+  }
+
   /**
    * Creates a test database.
    */

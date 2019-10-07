@@ -64,9 +64,8 @@ public final class IndexInfo {
    * Checks if the specified expression can be rewritten for index access, and returns
    * the applicable index type.
    * @param input input (if {@code null}, no optimization will be possible)
-   * @param type proposed index type ({@link IndexType#TOKEN}, {@link IndexType#FULLTEXT},
-   * or {@code null})
-   * @return type of applicable index or {@code null}
+   * @param type index type, predefined by the called expression (can be {@code null})
+   * @return resulting index type, or {@code null} if index access is not possible
    */
   public IndexType type(final Expr input, final IndexType type) {
     pred = input;
@@ -76,8 +75,10 @@ public final class IndexInfo {
     if(last == null) return null;
 
     final Data data = db.data();
-    final boolean elem = last.test.type == NodeType.ELM;
-    if(elem) {
+    if(last.test.type == NodeType.TXT) {
+      text = true;
+    } else if(last.test.type == NodeType.ELM) {
+      // ensure that addressed elements only have text nodes as children
       // stop if database is unknown/out-dated, if namespaces occur, or if name test is not simple
       if(data == null || !(data.meta.uptodate && data.nspaces.isEmpty() &&
           last.test.kind == Kind.NAME)) return null;
@@ -85,13 +86,20 @@ public final class IndexInfo {
       test = (NameTest) last.test;
       final Stats stats = data.elemNames.stats(data.elemNames.id(test.name.local()));
       if(stats == null || !stats.isLeaf()) return null;
+      text = true;
+    } else if(last.test.type != NodeType.ATT) {
+      // other tests cannot be rewritten for index access
+      return null;
     }
-    text = elem || last.test.type == NodeType.TXT;
 
     // check if the index contains result for the specified elements or attributes
     final IndexType it = type != null ? type : text ? IndexType.TEXT : IndexType.ATTRIBUTE;
-    return data == null ||
-        new IndexNames(it, data).contains(qname()) && check(it, last) ? it : null;
+    if(text ? (it != IndexType.TEXT && it != IndexType.FULLTEXT) :
+      (it != IndexType.TOKEN && it != IndexType.ATTRIBUTE)) return null;
+
+    // reject index access if database is known at runtime, and if it does not match all criteria
+    return data == null || new IndexNames(it, data).contains(qname()) && data.meta.index(it) ?
+      it : null;
   }
 
   /**
@@ -205,21 +213,6 @@ public final class IndexInfo {
   // PRIVATE METHODS ==============================================================================
 
   /**
-   * Checks if the specified expression can be rewritten for index access.
-   * @param type index type
-   * @param last last step
-   * @return type of index that can be used; {@code null} otherwise
-   */
-  private boolean check(final IndexType type, final Step last) {
-    return db.data().meta.index(type) && (
-      type == IndexType.FULLTEXT ? text :
-      type == IndexType.TOKEN ? !text :
-      type == IndexType.TEXT ? text :
-      !text && last.test.type == NodeType.ATT
-    );
-  }
-
-  /**
    * Returns the local name and namespace uri of the last name test.
    * If the returned name or uri is {@code null}, it represents a wildcard.
    * <ul>
@@ -235,29 +228,24 @@ public final class IndexInfo {
    *         {@code null} will be returned if the test is not a name test
    */
   private byte[][] qname() {
-    Step s = step;
-    if(text) {
-      if(pred instanceof AxisPath) {
-        // predicate is context value: return global step
-        final AxisPath path = (AxisPath) pred;
-        final int pl = path.steps.length;
-        s = path.step(pl - 1);
-        if(s.axis == Axis.CHILD && s.test == KindTest.TXT) {
-          s = pl > 1 ? path.step(pl - 2) : step;
-        }
-      }
-    } else {
-      // expression in predicate is context value: return global step
-      if(pred instanceof AxisPath) {
-        final AxisPath path = (AxisPath) pred;
-        s = path.step(path.steps.length - 1);
+    Step st = step;
+
+    // if predicate is axis path, extract last step
+    if(pred instanceof AxisPath) {
+      final AxisPath path = (AxisPath) pred;
+      final int pl = path.steps.length;
+      st = path.step(pl - 1);
+      // if last step matches text nodes: use previous step
+      if(text && st.axis == Axis.CHILD && st.test == KindTest.TXT) {
+        st = pl > 1 ? path.step(pl - 2) : step;
       }
     }
+
     // give up if test is not a name test
-    if(!(s.test instanceof NameTest)) return null;
+    if(!(st.test instanceof NameTest)) return null;
 
     // return local name and namespace uri (null represents wildcards)
-    final NameTest nt = (NameTest) s.test;
+    final NameTest nt = (NameTest) st.test;
     return new byte[][] { nt.local, nt.name == null ? null : nt.name.uri() };
   }
 
@@ -306,7 +294,7 @@ public final class IndexInfo {
     if(pred instanceof ContextValue) return step;
     // give up if expression is not an axis path
     if(!(pred instanceof AxisPath)) return null;
-    // give up if path contains is not relative
+    // give up if path is not relative
     final AxisPath path = (AxisPath) pred;
     if(path.root != null) return null;
     // give up if one of the steps contains positional predicates
