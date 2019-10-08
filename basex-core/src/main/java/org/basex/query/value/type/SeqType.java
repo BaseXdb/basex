@@ -183,7 +183,7 @@ public final class SeqType {
   /** Occurrence indicator. */
   public final Occ occ;
   /** Kind test (can be {@code null}). */
-  private final Test kind;
+  private final Test test;
 
   /**
    * Private constructor.
@@ -198,12 +198,12 @@ public final class SeqType {
    * Private constructor.
    * @param type type
    * @param occ occurrence indicator
-   * @param kind kind test (can be {@code null})
+   * @param test kind test (can be {@code null})
    */
-  private SeqType(final Type type, final Occ occ, final Test kind) {
+  private SeqType(final Type type, final Occ occ, final Test test) {
     this.type = type;
     this.occ = occ;
-    this.kind = kind;
+    this.test = test;
   }
 
   /**
@@ -220,11 +220,11 @@ public final class SeqType {
    * Returns a sequence type.
    * @param type type
    * @param occ occurrence indicator
-   * @param kind kind test (can be {@code null})
+   * @param test kind test (can be {@code null})
    * @return sequence type
    */
-  public static SeqType get(final Type type, final Occ occ, final Test kind) {
-    return occ == Occ.ZERO || kind == null ? get(type, occ) : new SeqType(type, occ, kind);
+  public static SeqType get(final Type type, final Occ occ, final Test test) {
+    return occ == Occ.ZERO || test == null ? get(type, occ) : new SeqType(type, occ, test);
   }
 
   /**
@@ -234,7 +234,7 @@ public final class SeqType {
    * @return sequence type
    */
   public SeqType with(final Type tp, final Occ oc) {
-    return type.eq(tp) && occ == oc && kind == null ? this : get(tp, oc);
+    return type.eq(tp) && occ == oc && test == null ? this : get(tp, oc);
   }
 
   /**
@@ -243,7 +243,7 @@ public final class SeqType {
    * @return sequence type
    */
   public SeqType with(final Occ oc) {
-    return oc == occ ? this : get(type, oc, kind);
+    return oc == occ ? this : get(type, oc, test);
   }
 
   /**
@@ -252,7 +252,7 @@ public final class SeqType {
    * @return sequence type
    */
   public SeqType with(final Type tp) {
-    return type.eq(tp) ? this : get(tp, occ, kind);
+    return type.eq(tp) ? this : get(tp, occ, test);
   }
 
   /**
@@ -280,7 +280,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instance(final Item item) {
-    return item.instanceOf(type) && (kind == null || kind.eq(item));
+    return item.instanceOf(type) && (test == null || test.matches(item));
   }
 
   /**
@@ -496,9 +496,9 @@ public final class SeqType {
     if(tp == null) return null;
     final Occ oc = occ.intersect(st.occ);
     if(oc == null) return null;
-    if(kind == null || st.kind == null || kind.equals(st.kind))
-      return get(tp, oc, kind != null ? kind : st.kind);
-    final Test kn = kind.intersect(st.kind);
+    if(test == null || st.test == null || test.equals(st.test))
+      return get(tp, oc, test != null ? test : st.test);
+    final Test kn = test.intersect(st.test);
     return kn == null ? null : get(tp, oc, kn);
   }
 
@@ -586,7 +586,7 @@ public final class SeqType {
     // empty sequence: only check cardinality
     return zero() ? st.mayBeEmpty() :
       (st.type == AtomType.ITEM || type.instanceOf(st.type)) && occ.instanceOf(st.occ) &&
-      (st.kind == null || kind != null && kind.intersect(st.kind) != null);
+      (st.test == null || test != null && test.intersect(st.test) != null);
   }
 
   /**
@@ -595,7 +595,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean eq(final SeqType st) {
-    return this == st || type.eq(st.type) && occ == st.occ && Objects.equals(kind, st.kind);
+    return this == st || type.eq(st.type) && occ == st.occ && Objects.equals(test, st.test);
   }
 
   /**
@@ -603,7 +603,7 @@ public final class SeqType {
    * @return string
    */
   public String typeString() {
-    return zero() ? EMPTY_SEQUENCE + "()" : kind != null ? kind.toString() : type.toString();
+    return zero() ? EMPTY_SEQUENCE + "()" : test != null ? test.toString() : type.toString();
   }
 
   @Override

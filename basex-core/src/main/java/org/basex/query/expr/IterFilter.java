@@ -36,7 +36,7 @@ public final class IterFilter extends Filter {
         if(iter == null) iter = root.iter(qc);
         // filter sequence
         for(Item item; (item = qc.next(iter)) != null;) {
-          if(preds(item, qc)) return item;
+          if(match(item, qc)) return item;
         }
         return null;
       }
@@ -48,7 +48,7 @@ public final class IterFilter extends Filter {
     final ValueBuilder vb = new ValueBuilder(qc);
     final Iter iter = root.iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
-      if(preds(item, qc)) vb.add(item);
+      if(match(item, qc)) vb.add(item);
     }
     return vb.value(this);
   }

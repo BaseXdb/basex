@@ -990,15 +990,18 @@ public enum QueryError {
   ARROWSPEC(XPST, 3, "No specifier after arrow operator: '%'."),
 
   /** Error code. */
-  VARUNDEF_X(XPST, 8, "Undeclared variable %."),
+  STATIC_X(XPST, 5, "No XML Schema support: %."),
+
+  /** Error code. */
+  VARUNDEF_X(XPST, 8, "Undeclared variable: %."),
   /** Error code. */
   CIRCREF_X(XPST, 8, "Static variable references itself: %"),
   /** Error code. */
   VARPRIVATE_X(XPST, 8, "Variable % is not visible from this module."),
   /** Error code. */
-  TYPEUNDEF_X(XPST, 8, "Undefined type '%'."),
+  TYPEUNDEF_X(XPST, 8, "Undefined type annotation: %."),
   /** Error code. */
-  SCHEMAINV_X(XPST, 8, "Undefined schema name '%'."),
+  SCHEMAINV_X(XPST, 8, "Undefined schema name: %."),
 
   /** Error code. */
   FUNCPRIVATE_X(XPST, 17, "Function not visible: %."),
@@ -1163,7 +1166,7 @@ public enum QueryError {
   MAPDUPLKEY_X_X_X(XQDY, 137, "Key % already exists in map (values: % vs. %)."),
 
   /** Error code. */
-  IMPLSCHEMA(XQST, 9, "Schema import not supported."),
+  IMPLSCHEMA(XQST, 9, "No XML Schema support."),
   /** Error code. */
   NSCONS(XQST, 22, "Constant namespace value expected."),
   /** Error code. */

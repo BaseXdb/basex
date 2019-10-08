@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public final class DocTest extends Test {
   /** Child test. */
-  private final Test test;
+  private final Test child;
 
   /**
    * Constructor.
@@ -21,53 +21,48 @@ public final class DocTest extends Test {
    */
   public DocTest(final Test test) {
     super(NodeType.DOC);
-    this.test = test;
+    this.child = test;
   }
 
   @Override
   public Test copy() {
-    return new DocTest(test);
+    return new DocTest(child);
   }
 
   @Override
-  public boolean eq(final ANode node) {
+  public boolean matches(final ANode node) {
     if(node.type != NodeType.DOC) return false;
     final BasicNodeIter iter = node.childIter();
     boolean found = false;
     for(ANode n; (n = iter.next()) != null;) {
       if(n.type == NodeType.COM || n.type == NodeType.PI) continue;
-      if(found || !test.eq(n)) return false;
+      if(found || !child.matches(n)) return false;
       found = true;
     }
     return true;
   }
 
   @Override
-  public boolean nsSensitive() {
-    return test != null && test.nsSensitive();
-  }
-
-  @Override
-  public Test intersect(final Test other) {
-    if(other instanceof DocTest) {
-      final DocTest dt = (DocTest) other;
-      if(test == null || dt.test == null || test.equals(dt.test))
-        return test != null ? this : other;
-      final Test tp = test.intersect(dt.test);
+  public Test intersect(final Test test) {
+    if(test instanceof DocTest) {
+      final DocTest dt = (DocTest) test;
+      if(child == null || dt.child == null || child.equals(dt.child))
+        return child != null ? this : test;
+      final Test tp = child.intersect(dt.child);
       return tp == null ? null : new DocTest(tp);
     }
-    if(other instanceof KindTest) return NodeType.DOC.instanceOf(other.type) ? this : null;
-    if(other instanceof InvDocTest) return this;
+    if(test instanceof KindTest) return NodeType.DOC.instanceOf(test.type) ? this : null;
+    if(test instanceof InvDocTest) return this;
     return null;
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof DocTest && obj.equals(((DocTest) obj).test);
+    return obj instanceof DocTest && obj.equals(((DocTest) obj).child);
   }
 
   @Override
   public String toString() {
-    return Strings.concat(type.string(), '(', test, ')');
+    return Strings.concat(type.string(), '(', child, ')');
   }
 }

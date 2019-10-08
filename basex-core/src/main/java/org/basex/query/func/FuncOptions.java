@@ -31,8 +31,8 @@ public final class FuncOptions {
 
   /** Root element. */
   private final QNm root;
-  /** Root node test ( can be {@code null}). */
-  private final NodeTest test;
+  /** Root node test (can be {@code null}). */
+  private final NameTest test;
   /** Input info. */
   private final InputInfo info;
 
@@ -53,7 +53,7 @@ public final class FuncOptions {
    * @param info input info
    */
   public FuncOptions(final QNm root, final InputInfo info) {
-    test = root == null ? null : new NodeTest(root);
+    test = root == null ? null : new NameTest(root);
     this.root = root;
     this.info = info;
   }
@@ -97,7 +97,7 @@ public final class FuncOptions {
           options.assign((XQMap) item, !acceptUnknown, info);
         } else {
           if(test == null) throw MAP_X_X.get(info, item.type, item);
-          if(!test.eq(item)) throw ELMMAP_X_X_X.get(info, root.prefixId(XML), item.type, item);
+          if(!test.matches(item)) throw ELMMAP_X_X_X.get(info, root.prefixId(XML), item.type, item);
           options.assign(toString((ANode) item, error));
         }
       } catch(final BaseXException ex) {

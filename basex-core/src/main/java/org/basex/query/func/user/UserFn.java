@@ -27,7 +27,7 @@ abstract class UserFn extends StandardFunc {
   /** Root node test. */
   static final QNm Q_INFO = new QNm(UserText.INFO);
   /** Root node test. */
-  static final NodeTest T_INFO = new NodeTest(Q_INFO);
+  static final NameTest T_INFO = new NameTest(Q_INFO);
 
   /**
    * Checks if the specified expression contains valid database patterns.

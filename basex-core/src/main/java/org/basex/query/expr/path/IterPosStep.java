@@ -61,7 +61,7 @@ final class IterPosStep extends Step {
 
         for(final ANode node : iter) {
           qc.checkStop();
-          if(test.eq(node) && preds(node)) return node.finish();
+          if(test.matches(node) && preds(node)) return node.finish();
         }
         return null;
       }

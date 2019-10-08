@@ -116,15 +116,15 @@ public interface WebText {
   QNm Q_VALUE = new QNm(VALUE);
 
   /** Serializer node test. */
-  NodeTest OUTPUT_SERIAL = new NodeTest(FuncOptions.Q_SPARAM);
+  NameTest OUTPUT_SERIAL = new NameTest(FuncOptions.Q_SPARAM);
   /** HTTP Response test. */
-  NodeTest HTTP_RESPONSE = new NodeTest(new QNm(RESPONSE, HTTP_URI));
+  NameTest HTTP_RESPONSE = new NameTest(new QNm(RESPONSE, HTTP_URI));
   /** RESTXQ Response test. */
-  NodeTest REST_RESPONSE = new NodeTest(new QNm(RESPONSE, REST_URI));
+  NameTest REST_RESPONSE = new NameTest(new QNm(RESPONSE, REST_URI));
   /** RESTXQ Redirect test. */
-  NodeTest REST_REDIRECT = new NodeTest(new QNm(REDIRECT, REST_URI));
+  NameTest REST_REDIRECT = new NameTest(new QNm(REDIRECT, REST_URI));
   /** RESTXQ Forward test. */
-  NodeTest REST_FORWARD = new NodeTest(new QNm(FORWARD, REST_URI));
+  NameTest REST_FORWARD = new NameTest(new QNm(FORWARD, REST_URI));
   /** HTTP Header test. */
-  NodeTest HTTP_HEADER = new NodeTest(new QNm(HEADER, HTTP_URI));
+  NameTest HTTP_HEADER = new NameTest(new QNm(HEADER, HTTP_URI));
 }

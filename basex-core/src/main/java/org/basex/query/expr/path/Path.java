@@ -12,7 +12,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.index.*;
-import org.basex.query.expr.path.Test.*;
 import org.basex.query.func.Function;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -334,7 +333,7 @@ public abstract class Path extends ParseExpr {
           break;
         case ATTRIBUTE:
           // only unique for exact QName matching
-          atMostOne &= step.test.kind == Kind.URI_NAME;
+          atMostOne &= step.test.part() == NamePart.FULL;
           break;
         case CHILD:
           // order is only ensured if all nodes are on the same level
@@ -447,10 +446,9 @@ public abstract class Path extends ParseExpr {
       if(curr == null) return null;
 
       final boolean desc = curr.axis == DESCENDANT;
-      if(!desc && curr.axis != CHILD || curr.test.kind != Kind.NAME) return null;
+      if(!desc && curr.axis != CHILD || curr.test.part() != NamePart.LOCAL) return null;
 
-      final int name = data.elemNames.id(curr.test.name.local());
-
+      final int name = data.elemNames.id(curr.test.name().local());
       final ArrayList<PathNode> tmp = new ArrayList<>();
       for(final PathNode node : PathIndex.desc(nodes, desc)) {
         if(node.kind == Data.ELEM && name == node.name) {
@@ -597,27 +595,28 @@ public abstract class Path extends ParseExpr {
       if(nodes == null) continue;
 
       // cache child steps
-      final ArrayList<QNm> qnm = new ArrayList<>();
+      final ArrayList<QNm> qNames = new ArrayList<>();
       while(nodes.get(0).parent != null) {
-        QNm nm = new QNm(data.elemNames.key(nodes.get(0).name));
+        QNm qName = new QNm(data.elemNames.key(nodes.get(0).name));
         // skip children with prefixes
-        if(nm.hasPrefix()) return this;
+        if(qName.hasPrefix()) return this;
         for(final PathNode node : nodes) {
-          if(nodes.get(0).name != node.name) nm = null;
+          if(nodes.get(0).name != node.name) qName = null;
         }
-        qnm.add(nm);
+        qNames.add(qName);
         nodes = PathIndex.parent(nodes);
       }
       cc.info(QueryText.OPTCHILD_X, steps[s]);
 
       // build new steps
-      int ts = qnm.size();
+      int ts = qNames.size();
       final Expr[] stps = new Expr[ts + sl - s - 1];
       for(int t = 0; t < ts; t++) {
         final Expr[] preds = t == ts - 1 ? ((Preds) steps[s]).exprs : new Expr[0];
-        final QNm nm = qnm.get(ts - t - 1);
-        final Test nt = nm == null ? KindTest.ELM : new NameTest(false, Kind.NAME, nm, null);
-        stps[t] = Step.get(info, CHILD, nt, preds);
+        final QNm qName = qNames.get(ts - t - 1);
+        final Test test = qName == null ? KindTest.ELM :
+          new NameTest(NodeType.ELM, qName, NamePart.LOCAL, null);
+        stps[t] = Step.get(info, CHILD, test, preds);
       }
       while(++s < sl) stps[ts++] = steps[s];
 
@@ -829,11 +828,11 @@ public abstract class Path extends ParseExpr {
       // ensure that the index step does not use wildcard
       if(step.test instanceof KindTest && s != i) continue;
       // consider child steps with name test and without predicates
-      if(step.test.kind != Kind.NAME || step.axis != CHILD ||
+      if(step.test.part() != NamePart.LOCAL || step.axis != CHILD ||
           s != i && step.exprs.length > 0) return true;
 
       // support only unique paths with nodes on the correct level
-      final ArrayList<PathNode> pn = data.paths.desc(step.test.name.local());
+      final ArrayList<PathNode> pn = data.paths.desc(step.test.name().local());
       if(pn.size() != 1 || pn.get(0).level() != s + 1) return true;
     }
     return false;

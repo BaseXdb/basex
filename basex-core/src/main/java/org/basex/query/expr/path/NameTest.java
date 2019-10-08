@@ -14,24 +14,38 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class NameTest extends Test {
-  /** Local name (can be {@code null}). */
+  /** Default element namespace. */
+  private final byte[] defaultNs;
+  /** Local name. */
   public final byte[] local;
-  /** Default element namespace (can be {@code null}). */
-  private final byte[] defNS;
+  /** Part of name to be tested. */
+  private NamePart part;
+  /** QName test. */
+  private QNm name;
+
+  /**
+   * Convenience constructor for element tests.
+   * @param name node name
+   */
+  public NameTest(final QNm name) {
+    this(NodeType.ELM, name, NamePart.FULL, null);
+  }
 
   /**
    * Constructor.
-   * @param attr attribute flag (element otherwise)
-   * @param kind kind of name test
-   * @param name name (may be {@code null})
-   * @param defNS default element namespace (may be {@code null})
+   * @param type node type
+   * @param name name
+   * @param part part of name to be tested
+   * @param defaultNs default element namespace (required for optimizations, can be {@code null})
    */
-  public NameTest(final boolean attr, final Kind kind, final QNm name, final byte[] defNS) {
-    super(attr ? NodeType.ATT : NodeType.ELM);
-    this.kind = kind;
+  public NameTest(final NodeType type, final QNm name, final NamePart part,
+      final byte[] defaultNs) {
+
+    super(type);
+    this.defaultNs = defaultNs != null ? defaultNs : Token.EMPTY;
+    this.part = part;
     this.name = name;
-    this.defNS = defNS != null ? defNS : Token.EMPTY;
-    local = name != null ? name.local() : null;
+    local = name.local();
   }
 
   @Override
@@ -42,26 +56,34 @@ public final class NameTest extends Test {
     if(data == null) return true;
 
     // skip optimizations if more than one namespace is defined in the database
-    final byte[] dataNS = data.nspaces.globalUri();
-    if(dataNS == null) return true;
+    final byte[] dataNs = data.nspaces.globalUri();
+    if(dataNs == null) return true;
 
     // check if test may yield results
-    boolean results = true;
-    if(kind == Kind.URI_NAME && !name.hasURI()) {
-      if(type == NodeType.ATT || Token.eq(dataNS, defNS)) {
+    if(part == NamePart.FULL && !name.hasURI()) {
+      if(type == NodeType.ATT || Token.eq(dataNs, defaultNs)) {
         // namespace is irrelevant/identical: only check local name
-        kind = Kind.NAME;
+        part = NamePart.LOCAL;
       } else {
         // element and db default namespaces are different: no results
-        results = false;
+        return false;
       }
     }
 
-    // check existence of element/attribute names
-    if(results) results = kind != Kind.NAME ||
-        (type == NodeType.ELM ? data.elemNames : data.attrNames).contains(local);
+    // check existence of local element/attribute names
+    return type == NodeType.PI || part != NamePart.LOCAL ||
+      (type == NodeType.ELM ? data.elemNames : data.attrNames).contains(local);
+  }
 
-    return results;
+
+  @Override
+  public NamePart part() {
+    return part;
+  }
+
+  @Override
+  public QNm name() {
+    return name;
   }
 
   @Override
@@ -70,72 +92,70 @@ public final class NameTest extends Test {
   }
 
   @Override
-  public boolean eq(final ANode node) {
-    // only elements and attributes will yield results
+  public boolean matches(final ANode node) {
     if(node.type != type) return false;
 
-    switch(kind) {
+    switch(part) {
       // namespaces wildcard: only check local name
-      case NAME: return Token.eq(local, Token.local(node.name()));
+      case LOCAL: return Token.eq(local, Token.local(node.name()));
       // name wildcard: only check namespace
       case URI: return Token.eq(name.uri(), node.qname().uri());
       // check attributes, or check everything
-      default: return type == NodeType.ATT && name.uri().length == 0 ?
-        Token.eq(local, node.name()) : name.eq(node.qname());
+      default: return name.eq(node.qname());
     }
   }
 
   /**
    * Checks if the specified name matches the test.
-   * @param nm name
+   * @param qName name
    * @return result of check
    */
-  public boolean eq(final QNm nm) {
-    switch(kind) {
+  public boolean matches(final QNm qName) {
+    switch(part) {
       // namespaces wildcard: only check local name
-      case NAME: return Token.eq(local, nm.local());
+      case LOCAL: return Token.eq(local, qName.local());
       // name wildcard: only check namespace
-      case URI: return Token.eq(name.uri(), nm.uri());
+      case URI: return Token.eq(name.uri(), qName.uri());
       // check everything
-      default: return name.eq(nm);
+      default: return name.eq(qName);
     }
   }
 
   @Override
-  public Test intersect(final Test other) {
-    throw Util.notExpected(other);
+  public Test intersect(final Test test) {
+    if(test instanceof NameTest) {
+      final NameTest nt = (NameTest) test;
+      return type == nt.type && name.eq(nt.name) ? this : null;
+    }
+    if(test instanceof KindTest) {
+      return type.instanceOf(test.type) ? this : null;
+    }
+    return null;
   }
 
   @Override
   public boolean equals(final Object obj) {
     if(!(obj instanceof NameTest)) return false;
     final NameTest nt = (NameTest) obj;
-    if(kind != nt.kind) return false;
-    switch(kind) {
-      // namespaces wildcard: only check local name
-      case NAME: return Token.eq(local, nt.local);
-      // name wildcard: only check namespace
-      case URI: return Token.eq(name.uri(), nt.name.uri());
-      // check everything
-      default: return name.eq(nt.name);
-    }
+    return type == nt.type && name.eq(nt.name);
   }
 
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
-    if(kind == Kind.NAME) {
+    tb.add(type.string()).add('(');
+    if(part == NamePart.LOCAL) {
       tb.add('*').add(':');
     } else if(name.hasPrefix()) {
       tb.add(name.prefix()).add(':');
     } else if(name.uri().length != 0) {
       tb.add('{').add(name.uri()).add('}');
     }
-    if(kind == Kind.URI) {
+    if(part == NamePart.URI) {
       tb.add('*');
     } else {
       tb.add(name.local());
     }
-    return tb.toString();
+    return tb.add(')').toString();
   }
 }

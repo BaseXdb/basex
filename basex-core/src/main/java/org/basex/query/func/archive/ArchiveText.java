@@ -21,7 +21,7 @@ interface ArchiveText {
   /** QName. */
   QNm Q_ENTRY = new QNm(ARCHIVE_PREFIX, "entry", ARCHIVE_URI);
   /** Root node test. */
-  NodeTest ENTRY = new NodeTest(Q_ENTRY);
+  NameTest ENTRY = new NameTest(Q_ENTRY);
 
   /** Level. */
   byte[] LEVEL = token("compression-level");

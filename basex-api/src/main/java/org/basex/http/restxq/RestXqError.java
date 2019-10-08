@@ -53,14 +53,14 @@ final class RestXqError implements Comparable<RestXqError> {
    */
   boolean matches(final QNm name) {
     for(final NameTest nt : tests) {
-      if(nt == null || nt.eq(name)) return true;
+      if(nt == null || nt.matches(name)) return true;
     }
     return false;
   }
 
   @Override
   public int compareTo(final RestXqError error) {
-    final Function<NameTest, Integer> prec = test -> test == null ? -1 : test.kind.ordinal();
+    final Function<NameTest, Integer> prec = test -> test == null ? -1 : test.part().ordinal();
     return prec.apply(error.tests.get(0)) - prec.apply(tests.get(0));
   }
 

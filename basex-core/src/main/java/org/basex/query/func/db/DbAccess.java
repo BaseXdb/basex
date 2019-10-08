@@ -7,11 +7,11 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -60,10 +60,10 @@ abstract class DbAccess extends DbFn {
     if(exprs.length <= a) return ia.iter(qc);
 
     // parse and compile the name test
-    final QNm nm = new QNm(toToken(exprs[a], qc), sc);
-    if(!nm.hasPrefix()) nm.uri(sc.ns.uri(EMPTY));
+    final QNm qName = new QNm(toToken(exprs[a], qc), sc);
+    if(!qName.hasPrefix()) qName.uri(sc.ns.uri(EMPTY));
 
-    final NameTest nt = new NameTest(true, Kind.URI_NAME, nm, sc.elemNS);
+    final NameTest nt = new NameTest(NodeType.ATT, qName, NamePart.FULL, sc.elemNS);
     // return empty sequence if test will yield no results
     if(!nt.optimize(qc.focus.value)) return Empty.ITER;
 
@@ -73,7 +73,7 @@ abstract class DbAccess extends DbFn {
       @Override
       public Item next() throws QueryException {
         Item item;
-        while((item = iter.next()) != null && !nt.eq(item)) qc.checkStop();
+        while((item = iter.next()) != null && !nt.matches(item)) qc.checkStop();
         return item;
       }
     };

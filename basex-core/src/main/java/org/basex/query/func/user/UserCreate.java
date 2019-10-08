@@ -33,7 +33,7 @@ public final class UserCreate extends UserFn {
 
     if(exprs.length > 4) {
       final ANode node = toElem(exprs[4], qc);
-      if(!T_INFO.eq(node)) throw ELM_X_X.get(info, Q_INFO.prefixId(), node);
+      if(!T_INFO.matches(node)) throw ELM_X_X.get(info, Q_INFO.prefixId(), node);
       user.info(node.materialize(qc, true));
     }
 

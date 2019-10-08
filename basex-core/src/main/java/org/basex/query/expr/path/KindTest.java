@@ -28,7 +28,7 @@ public class KindTest extends Test {
   /** Generic node test. No other {@link NodeType#NOD} tests exist. */
   public static final KindTest NOD = new KindTest(NodeType.NOD) {
     @Override
-    public boolean eq(final ANode node) { return true; }
+    public boolean matches(final ANode node) { return true; }
   };
 
   /**
@@ -64,20 +64,20 @@ public class KindTest extends Test {
   }
 
   @Override
-  public boolean eq(final ANode node) {
+  public boolean matches(final ANode node) {
     return node.type == type;
   }
 
   @Override
-  public Test intersect(final Test other) {
-    if(other instanceof NodeTest || other instanceof DocTest) {
-      return other.type.instanceOf(type) ? other : null;
+  public Test intersect(final Test test) {
+    if(test instanceof NameTest || test instanceof DocTest) {
+      return test.type.instanceOf(type) ? test : null;
     }
-    if(other instanceof KindTest) {
-      return type.instanceOf(other.type) ? this : other.type.instanceOf(type) ? other : null;
+    if(test instanceof KindTest) {
+      return type.instanceOf(test.type) ? this : test.type.instanceOf(type) ? test : null;
     }
-    if(other instanceof NameTest || other instanceof InvDocTest) {
-      throw Util.notExpected(other);
+    if(test instanceof InvDocTest) {
+      throw Util.notExpected(test);
     }
     return null;
   }
@@ -89,6 +89,6 @@ public class KindTest extends Test {
 
   @Override
   public String toString() {
-    return String.valueOf(type);
+    return type.toString();
   }
 }

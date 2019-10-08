@@ -15,19 +15,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Test extends ExprInfo {
-  /** Kind of name test. */
-  public enum Kind {
-    /** Test name (*:name).              */ NAME,
-    /** Test uri (prefix:*).             */ URI,
-    /** Test uri and name (prefix:name). */ URI_NAME
-  }
-
-  /** Node kind. */
+  /** Node type. */
   public final NodeType type;
-  /** Kind of name test (can be {@code null}). */
-  public Kind kind;
-  /** Name test (can be {@code null}). */
-  public QNm name;
 
   /**
    * Constructor.
@@ -35,6 +24,22 @@ public abstract class Test extends ExprInfo {
    */
   Test(final NodeType type) {
     this.type = type;
+  }
+
+  /**
+   * Returns a node test, a name test or {@code null}.
+   * @param type node type (element, attribute, processing instruction)
+   * @param name node name
+   * @param ann type annotation
+   * @param ns default element namespace (may be {@code null})
+   * @return test or {@code null}
+   */
+  public static Test get(final NodeType type, final QNm name, final Type ann, final byte[] ns) {
+    if(!(ann == null || ann == AtomType.ATY || ann == AtomType.UTY || type == NodeType.ATT &&
+      (ann == AtomType.AST || ann == AtomType.AAT || ann == AtomType.ATM))) return null;
+
+    return name == null ? KindTest.get(type) :
+      new NameTest(type, name, type == NodeType.PI ? NamePart.LOCAL : NamePart.FULL, ns);
   }
 
   /**
@@ -48,19 +53,35 @@ public abstract class Test extends ExprInfo {
   }
 
   /**
-   * Tests if the test yields true.
+   * Checks if the specified node matches the test.
    * @param node node to be checked
    * @return result of check
    */
-  public abstract boolean eq(ANode node);
+  public abstract boolean matches(ANode node);
 
   /**
-   * Tests if the test yields true.
+   * Checks if the specified item matches the test.
    * @param item item to be checked
    * @return result of check
    */
-  public boolean eq(final Item item) {
-    return item instanceof ANode && eq((ANode) item);
+  public final boolean matches(final Item item) {
+    return item instanceof ANode && matches((ANode) item);
+  }
+
+  /**
+   * Returns the name part.
+   * @return part of name to be tested (can be {@code null})
+   */
+  public NamePart part() {
+    return null;
+  }
+
+  /**
+   * Returns the name test.
+   * @return name test (can be {@code null})
+   */
+  public QNm name() {
+    return null;
   }
 
   /**
@@ -70,19 +91,11 @@ public abstract class Test extends ExprInfo {
   public abstract Test copy();
 
   /**
-   * Checks if this test is namespace-sensitive.
-   * @return result of check
-   */
-  boolean nsSensitive() {
-    return name != null;
-  }
-
-  /**
    * Computes the intersection between two tests.
-   * @param other other test
+   * @param test other test
    * @return intersection if it exists, {@code null} otherwise
    */
-  public abstract Test intersect(Test other);
+  public abstract Test intersect(Test test);
 
   @Override
   public void plan(final QueryPlan plan) {

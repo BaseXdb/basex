@@ -11,7 +11,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.expr.path.Test.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -81,10 +80,10 @@ public final class IndexInfo {
       // ensure that addressed elements only have text nodes as children
       // stop if database is unknown/out-dated, if namespaces occur, or if name test is not simple
       if(data == null || !(data.meta.uptodate && data.nspaces.isEmpty() &&
-          last.test.kind == Kind.NAME)) return null;
+          last.test.part() == NamePart.LOCAL)) return null;
 
       test = (NameTest) last.test;
-      final Stats stats = data.elemNames.stats(data.elemNames.id(test.name.local()));
+      final Stats stats = data.elemNames.stats(data.elemNames.id(test.name().local()));
       if(stats == null || !stats.isLeaf()) return null;
       text = true;
     } else if(last.test.type != NodeType.ATT) {
@@ -246,7 +245,8 @@ public final class IndexInfo {
 
     // return local name and namespace uri (null represents wildcards)
     final NameTest nt = (NameTest) st.test;
-    return new byte[][] { nt.local, nt.name == null ? null : nt.name.uri() };
+    final QNm name = nt.name();
+    return new byte[][] { nt.local, name == null ? null : name.uri() };
   }
 
   /**
@@ -258,9 +258,9 @@ public final class IndexInfo {
     // handle context node
     if(pred instanceof ContextValue) {
       // add attribute step
-      if(text || step.test.name == null) return root;
-      final Step as = Step.get(step.info, Axis.SELF, step.test);
-      return Path.get(root.info, root, as);
+      if(text || step.test.name() == null) return root;
+      final Step st = Step.get(step.info, Axis.SELF, step.test);
+      return Path.get(root.info, root, st);
     }
 
     final AxisPath origPath = (AxisPath) pred;
@@ -268,10 +268,10 @@ public final class IndexInfo {
 
     if(!text) {
       // add attribute test as first step
-      final Step at = origPath.step(origPath.steps.length - 1);
-      if(at.test.name != null) {
+      final Step st = origPath.step(origPath.steps.length - 1);
+      if(st.test.name() != null) {
         final ExprList steps = new ExprList(invPath.steps.length + 1);
-        steps.add(Step.get(at.info, Axis.SELF, at.test)).add(invPath.steps);
+        steps.add(Step.get(st.info, Axis.SELF, st.test)).add(invPath.steps);
         invPath = Path.get(invPath.info, invPath.root, steps.finish());
       }
     }

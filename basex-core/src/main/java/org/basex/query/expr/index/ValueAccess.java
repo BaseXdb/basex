@@ -152,7 +152,7 @@ public final class ValueAccess extends IndexAccess {
             tmp.pre(ii.pre());
           } else {
             tmp.pre(data.parent(ii.pre(), kind));
-            if(!test.eq(tmp)) continue;
+            if(!test.matches(tmp)) continue;
           }
           return tmp.finish();
         }
@@ -217,7 +217,7 @@ public final class ValueAccess extends IndexAccess {
         while(++pre < sz) {
           if(data.kind(pre) == Data.ELEM && data.size(pre, Data.ELEM) == 1) {
             tmp.pre(pre);
-            if(test == null || test.eq(tmp)) return tmp.finish();
+            if(test == null || test.matches(tmp)) return tmp.finish();
           }
         }
         return null;

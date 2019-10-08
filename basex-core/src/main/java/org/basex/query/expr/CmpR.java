@@ -13,7 +13,6 @@ import org.basex.query.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.expr.path.Test.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -234,7 +233,7 @@ public final class CmpR extends Single {
       final int st = path.steps.length - 1;
       if(type == IndexType.TEXT) {
         step = st == 0 ? ii.step : path.step(st - 1);
-        if(step.test.kind != Kind.NAME) return null;
+        if(step.test.part() != NamePart.LOCAL) return null;
       } else {
         step = path.step(st);
         if(!step.simple(Axis.ATTRIBUTE, true)) return null;
@@ -243,7 +242,7 @@ public final class CmpR extends Single {
     }
 
     final Names names = type == IndexType.TEXT ? data.elemNames : data.attrNames;
-    final Stats stats = names.stats(names.id(test.name.local()));
+    final Stats stats = names.stats(names.id(test.name().local()));
     return stats == null || StatsType.isNumeric(stats.type) ? stats : null;
   }
 

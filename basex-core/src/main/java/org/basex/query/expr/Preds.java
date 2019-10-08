@@ -169,13 +169,13 @@ public abstract class Preds extends Arr {
   }
 
   /**
-   * Checks if the predicates are successful for the specified item.
+   * Checks if the specified item matches the predicates.
    * @param item item to be checked
    * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  protected final boolean preds(final Item item, final QueryContext qc) throws QueryException {
+  protected final boolean match(final Item item, final QueryContext qc) throws QueryException {
     // set context value and position
     final QueryFocus qf = qc.focus;
     final Value cv = qf.value;

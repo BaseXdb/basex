@@ -24,7 +24,6 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.expr.path.Test.*;
 import org.basex.query.func.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -443,48 +442,50 @@ public final class RestXqFunction extends WebFunction {
     // name of parameter
     for(final Item arg : ann.args()) {
       final String err = toString(arg);
-      final Kind kind;
-      QNm qnm = null;
+      final QNm name;
+      final NamePart part;
       if(err.equals("*")) {
-        kind = null;
+        name = null;
+        part = null;
       } else if(err.startsWith("*:")) {
         final byte[] local = token(err.substring(2));
         if(!XMLToken.isNCName(local)) throw error(INV_CODE_X, err);
-        qnm = new QNm(local);
-        kind = Kind.NAME;
+        name = new QNm(local);
+        part = NamePart.LOCAL;
       } else if(err.endsWith(":*")) {
         final byte[] prefix = token(err.substring(0, err.length() - 2));
         if(!XMLToken.isNCName(prefix)) throw error(INV_CODE_X, err);
-        qnm = new QNm(concat(prefix, COLON), function.sc);
-        kind = Kind.URI;
+        name = new QNm(concat(prefix, COLON), function.sc);
+        part = NamePart.URI;
       } else {
         final Matcher m = EQNAME.matcher(err);
         if(m.matches()) {
           final byte[] uri = token(m.group(1)), local = token(m.group(2));
           if(local.length == 1 && local[0] == '*') {
-            qnm = new QNm(COLON, uri);
-            kind = Kind.URI;
+            name = new QNm(COLON, uri);
+            part = NamePart.URI;
           } else {
             if(!XMLToken.isNCName(local) || !Uri.uri(uri).isValid()) throw error(INV_CODE_X, err);
-            qnm = new QNm(local, uri);
-            kind = Kind.URI_NAME;
+            name = new QNm(local, uri);
+            part = NamePart.FULL;
           }
         } else {
           final byte[] nm = token(err);
           if(!XMLToken.isQName(nm)) throw error(INV_CODE_X, err);
-          qnm = new QNm(nm, function.sc);
-          kind = Kind.URI_NAME;
+          name = new QNm(nm, function.sc);
+          part = NamePart.FULL;
         }
       }
 
       // message
-      if(qnm != null && qnm.hasPrefix() && !qnm.hasURI()) throw error(INV_NONS_X, qnm);
-      final NameTest test = kind != null ? new NameTest(false, kind, qnm, null) : null;
+      if(name != null && name.hasPrefix() && !name.hasURI()) throw error(INV_NONS_X, name);
+      final NameTest test = part != null ?
+        new NameTest(NodeType.ELM, name, part, null) : null;
 
       final Function<NameTest, String> toString = t -> t != null ? t.toString() : "*";
       if(!error.isEmpty()) {
         final NameTest first = error.get(0);
-        if(first != null ? first.kind != kind : kind != null) {
+        if(first != null ? first.part() != part : part != null) {
           throw error(INV_PRECEDENCE_X_X, toString.apply(first), toString.apply(test));
         }
       }

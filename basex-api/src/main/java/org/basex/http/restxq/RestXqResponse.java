@@ -82,19 +82,19 @@ public final class RestXqResponse extends WebResponse {
       // handle special cases
       if(item != null && item.type == NodeType.ELM) {
         final ANode node = (ANode) item;
-        if(REST_REDIRECT.eq(node)) {
+        if(REST_REDIRECT.matches(node)) {
           // send redirect to browser
           final ANode ch = node.childIter().next();
           if(ch == null || ch.type != NodeType.TXT) throw func.error(NO_VALUE_X, node.name());
           redirect = string(ch.string()).trim();
           item = null;
-        } else if(REST_FORWARD.eq(node)) {
+        } else if(REST_FORWARD.matches(node)) {
           // server-side forwarding
           final ANode ch = node.childIter().next();
           if(ch == null || ch.type != NodeType.TXT) throw func.error(NO_VALUE_X, node.name());
           forward = string(ch.string()).trim();
           item = null;
-        } else if(REST_RESPONSE.eq(node)) {
+        } else if(REST_RESPONSE.matches(node)) {
           // custom response
           so = build(node);
           item = iter.next();
@@ -157,7 +157,7 @@ public final class RestXqResponse extends WebResponse {
     String cType = null;
     for(final ANode n : response.childIter()) {
       // process http:response element
-      if(HTTP_RESPONSE.eq(n)) {
+      if(HTTP_RESPONSE.matches(n)) {
         // check status and reason
         byte[] sta = null, msg = null;
         for(final ANode a : n.attributeIter()) {
@@ -173,7 +173,7 @@ public final class RestXqResponse extends WebResponse {
 
         for(final ANode c : n.childIter()) {
           // process http:header elements
-          if(HTTP_HEADER.eq(c)) {
+          if(HTTP_HEADER.matches(c)) {
             final byte[] nam = c.attribute(Q_NAME);
             final byte[] val = c.attribute(Q_VALUE);
             if(nam != null && val != null) {
@@ -189,7 +189,7 @@ public final class RestXqResponse extends WebResponse {
             throw func.error(UNEXP_NODE_X, c);
           }
         }
-      } else if(OUTPUT_SERIAL.eq(n)) {
+      } else if(OUTPUT_SERIAL.matches(n)) {
         // parse output:serialization-parameters
         sp = FuncOptions.serializer(n, func.output, func.function.info);
       } else {

@@ -63,7 +63,7 @@ final class InvDocTest extends Test {
   }
 
   @Override
-  public boolean eq(final ANode node) {
+  public boolean matches(final ANode node) {
     // no database node
     if(!(node instanceof DBNode)) return false;
     // ensure that the pre value is contained in the target documents
@@ -77,7 +77,7 @@ final class InvDocTest extends Test {
   }
 
   @Override
-  public Test intersect(final Test other) {
+  public Test intersect(final Test test) {
     throw Util.notExpected(this);
   }
 

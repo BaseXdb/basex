@@ -10,7 +10,6 @@ import org.basex.index.name.*;
 import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.path.Test.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -30,7 +29,7 @@ import org.basex.util.hash.*;
  */
 public abstract class Step extends Preds {
   /** Kind test. */
-  public final Test test;
+  public Test test;
   /** Axis. */
   public Axis axis;
 
@@ -77,7 +76,7 @@ public abstract class Step extends Preds {
       axis == Axis.ATTRIBUTE ? NodeType.ATT : test.type,
       axis == Axis.SELF && test == KindTest.NOD && exprs.length == 0 ? Occ.ONE :
       axis == Axis.SELF || axis == Axis.PARENT || axis == Axis.ATTRIBUTE &&
-        test.kind == Kind.URI_NAME ? Occ.ZERO_ONE : Occ.ZERO_MORE), exprs);
+        test.part() == NamePart.FULL ? Occ.ZERO_ONE : Occ.ZERO_MORE), exprs);
 
     this.axis = axis;
     this.test = test;
@@ -157,7 +156,7 @@ public abstract class Step extends Preds {
    * @return result of check
    */
   public final boolean simple(final Axis ax, final boolean name) {
-    return axis == ax && (name ? test.kind == Kind.NAME : test == KindTest.NOD) &&
+    return axis == ax && (name ? test.part() == NamePart.LOCAL : test == KindTest.NOD) &&
         exprs.length == 0;
   }
 
@@ -178,11 +177,12 @@ public abstract class Step extends Preds {
       // no index available for processing instructions
       if(kind == Data.PI) return null;
 
-      if(test.kind == Kind.NAME) {
+      final NamePart part = test.part();
+      if(part == NamePart.LOCAL) {
         // element/attribute test (*:ln)
         final Names names = kind == Data.ATTR ? dt.attrNames : dt.elemNames;
         name = names.id(((NameTest) test).local);
-      } else if(test.kind != null) {
+      } else if(part != null) {
         // skip namespace and standard tests
         return null;
       }
@@ -214,13 +214,13 @@ public abstract class Step extends Preds {
   private void add(final PathNode node, final ArrayList<PathNode> nodes, final int name,
       final int kind) {
 
-    for(final PathNode n : node.children) {
+    for(final PathNode pn : node.children) {
       if(axis == Axis.DESCENDANT || axis == Axis.DESCENDANT_OR_SELF) {
-        add(n, nodes, name, kind);
+        add(pn, nodes, name, kind);
       }
-      if(kind == -1 && n.kind != Data.ATTR ^ axis == Axis.ATTRIBUTE ||
-         kind == n.kind && (name == 0 || name == n.name)) {
-        if(!nodes.contains(n)) nodes.add(n);
+      if(kind == -1 && pn.kind != Data.ATTR ^ axis == Axis.ATTRIBUTE ||
+         kind == pn.kind && (name == 0 || name == pn.name)) {
+        if(!nodes.contains(pn)) nodes.add(pn);
       }
     }
   }
@@ -269,8 +269,8 @@ public abstract class Step extends Preds {
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof Step)) return false;
-    final Step s = (Step) obj;
-    return axis == s.axis && test.equals(s.test) && super.equals(obj);
+    final Step st = (Step) obj;
+    return axis == st.axis && test.equals(st.test) && super.equals(obj);
   }
 
   @Override
