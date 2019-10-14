@@ -141,7 +141,16 @@ public class Options implements Iterable<Option<?>> {
       final TokenBuilder tb = new TokenBuilder();
       for(final String line : lines) tb.add(line).add(NL);
       final byte[] contents = tb.finish();
-      if(!file.exists() || !eq(file.read(), contents)) {
+
+      boolean skip = file.exists();
+      if(skip) {
+        final TokenBuilder tmp = new TokenBuilder(contents.length);
+        try(NewlineInput nli = new NewlineInput(file)) {
+          for(String line; (line = nli.readLine()) != null;) tmp.add(line).add(NL);
+        }
+        skip = eq(contents, tmp.finish());
+      }
+      if(!skip) {
         file.parent().md();
         file.write(contents);
       }
