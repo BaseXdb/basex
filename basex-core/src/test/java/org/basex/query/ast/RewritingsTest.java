@@ -547,4 +547,15 @@ public final class RewritingsTest extends QueryPlanTest {
     // no rewriting possible
     check("(<a/>, <b/>)/<c/>", "<c/>\n<c/>", root(MixedPath.class));
   }
+
+  /** GH1741. */
+  @Test public void gh1741() {
+    check("<a/>/<b/>[1]", "<b/>", root(CElem.class));
+    check("<a/>/.[1]", "<a/>", root(CElem.class));
+    check("<doc><x/><y/></doc>/*/..[1] ! name()", "doc", empty(ItrPos.class));
+
+    check("<a/>/<b/>[2]", "", root(Empty.class));
+    check("<a/>/.[2]", "", root(Empty.class));
+    check("<doc><x/><y/></doc>/*/..[2] ! name()", "", root(Empty.class));
+  }
 }

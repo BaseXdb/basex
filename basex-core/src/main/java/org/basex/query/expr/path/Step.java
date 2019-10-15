@@ -110,23 +110,9 @@ public abstract class Step extends Preds {
       }
     }
 
-    // optimize predicates
-    cc.pushFocus(this);
-    try {
-      final Expr expr = super.optimize(cc);
-      if(expr != this) return expr;
-    } finally {
-      cc.removeFocus();
-    }
-
-    // simplifies the predicates
-    simplify(cc, this);
-
-    // determine type (if result is empty, return empty sequence)
-    if(!exprType(this)) return cc.emptySeq(this);
-
-    // choose best implementation
-    return copyType(get(info, axis, test, exprs));
+    // optimize predicate, choose best implementation
+    final Expr expr = optimize(cc, this);
+    return expr != this ? expr : copyType(get(info, axis, test, exprs));
   }
 
   @Override

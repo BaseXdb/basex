@@ -80,23 +80,12 @@ public abstract class Filter extends Preds {
     if(rt.zero()) return cc.replaceWith(this, root);
 
     // simplify predicates
-    simplify(cc, root);
-
-    // remember current context value (will be temporarily overwritten)
-    cc.pushFocus(root);
-    try {
-      final Expr expr = super.optimize(cc);
-      if(expr != this) return expr;
-    } finally {
-      cc.removeFocus();
-    }
-
-    // check result size
-    if(!exprType(root)) return cc.emptySeq(this);
+    Expr expr = optimize(cc, root);
+    if(expr != this) return expr;
 
     // if possible, convert filter to root or path expression
-    Expr exp = simplify(root, exprs);
-    if(exp != null) return exp.optimize(cc);
+    expr = simplify(root, exprs);
+    if(expr != null) return expr.optimize(cc);
 
     // no numeric predicates..
     if(!positional()) {
@@ -109,7 +98,7 @@ public abstract class Filter extends Preds {
 
       // rewrite independent deterministic single filter to if expression:
       // example: (1 to 10)[$boolean] -> if($boolean) then (1 to 10) else ()
-      final Expr expr = exprs[0];
+      expr = exprs[0];
       if(exprs.length == 1 && expr.isSimple() && !expr.seqType().mayBeNumber()) {
         final Expr iff = new If(info, expr, root).optimize(cc);
         return cc.replaceWith(this, iff);
@@ -123,44 +112,44 @@ public abstract class Filter extends Preds {
     Expr r = root;
     boolean opt = false;
     for(final Expr pred : exprs) {
-      exp = null;
+      expr = null;
       if(Function.LAST.is(pred)) {
         if(r instanceof Value) {
           // value: replace with last item
-          exp = ((Value) r).itemAt(r.size() - 1);
+          expr = ((Value) r).itemAt(r.size() - 1);
         } else {
           // rewrite positional predicate to util:last
-          exp = cc.function(Function._UTIL_LAST, info, r);
+          expr = cc.function(Function._UTIL_LAST, info, r);
         }
       } else if(pred instanceof ItrPos) {
         final ItrPos pos = (ItrPos) pred;
         if(r instanceof Value) {
           // value: replace with subsequence
           final long size = pos.min - 1, len = Math.min(pos.max, r.size()) - size;
-          exp = len <= 0 ? Empty.VALUE : ((Value) r).subSequence(size, len, cc.qc);
+          expr = len <= 0 ? Empty.VALUE : ((Value) r).subSequence(size, len, cc.qc);
         } else if(pos.min == pos.max) {
           // expr[pos] -> util:item(expr, pos)
-          exp = pos.min == 1 ? cc.function(Function.HEAD, info, r) :
+          expr = pos.min == 1 ? cc.function(Function.HEAD, info, r) :
             cc.function(Function._UTIL_ITEM, info, r, Int.get(pos.min));
         } else {
           // expr[min..max] -> util:range(expr, min, max)
-          exp = cc.function(Function._UTIL_RANGE, info, r, Int.get(pos.min), Int.get(pos.max));
+          expr = cc.function(Function._UTIL_RANGE, info, r, Int.get(pos.min), Int.get(pos.max));
         }
       } else if(pred instanceof Pos) {
         final Pos pos = (Pos) pred;
         if(pos.eq()) {
           // expr[pos] -> util:item(expr, pos.min)
-          exp = cc.function(Function._UTIL_ITEM, info, r, pos.exprs[0]);
+          expr = cc.function(Function._UTIL_ITEM, info, r, pos.exprs[0]);
         } else {
           // expr[min..max] -> util:range(expr, pos.min, pos.max)
-          exp = cc.function(Function._UTIL_RANGE, info, r, pos.exprs[0], pos.exprs[1]);
+          expr = cc.function(Function._UTIL_RANGE, info, r, pos.exprs[0], pos.exprs[1]);
         }
       } else if(numeric(pred)) {
         /* - rewrite positional predicate to util:item
          *   expr[pos] -> util:item(expr, pos)
          * - only choose deterministic and context-independent offsets
          *   illegal examples: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
-        exp = cc.function(Function._UTIL_ITEM, info, r, pred);
+        expr = cc.function(Function._UTIL_ITEM, info, r, pred);
       } else if(pred instanceof Cmp) {
         // rewrite positional predicate to fn:remove
         final Cmp cmp = (Cmp) pred;
@@ -169,17 +158,17 @@ public abstract class Filter extends Preds {
           final Expr ex = cmp.exprs[1];
           if(opV == OpV.LT || opV == OpV.NE && Function.LAST.is(ex)) {
             // expr[position() < last()] -> util:init(expr)
-            exp = cc.function(Function._UTIL_INIT, info, r);
+            expr = cc.function(Function._UTIL_INIT, info, r);
           } else if(opV == OpV.NE && ex instanceof Int) {
             // expr[position() != INT] -> remove(expr, INT)
-            exp = cc.function(Function.REMOVE, info, r, ex);
+            expr = cc.function(Function.REMOVE, info, r, ex);
           }
         }
       }
 
-      if(exp != null) {
+      if(expr != null) {
         // predicate was optimized: replace old with new expression
-        r = exp;
+        r = expr;
         opt = true;
       } else {
         // no optimization: create new filter expression, or add predicate to temporary filter
@@ -190,8 +179,8 @@ public abstract class Filter extends Preds {
     // return optimized expression or standard iterator
     if(opt) return cc.replaceWith(this, r);
 
-    exp = get(info, root, exprs);
-    return exp instanceof ParseExpr ? copyType((ParseExpr) exp) : exp;
+    expr = get(info, root, exprs);
+    return expr instanceof ParseExpr ? copyType((ParseExpr) expr) : expr;
   }
 
   /**

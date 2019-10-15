@@ -53,65 +53,6 @@ public abstract class Preds extends Arr {
     return this;
   }
 
-  @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
-    final int es = exprs.length;
-    final ExprList list = new ExprList(es);
-    boolean pos = false;
-    for(final Expr ex : exprs) {
-      final Expr ebv = ex.optimizeEbv(cc);
-      Expr expr = ebv;
-      if(expr instanceof CmpG || expr instanceof CmpV) {
-        final Cmp cmp = (Cmp) expr;
-        final OpV opV = cmp.opV();
-        if(opV != null) {
-          final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
-          if(Function.POSITION.is(cmp1)) {
-            if(numeric(cmp2) && opV == OpV.EQ) {
-              // position() = NUMBER -> NUMBER
-              expr = cmp2;
-            } else if(Function.LAST.is(cmp2)) {
-              switch(opV) {
-                // position() =/>= last() -> last()
-                case EQ: case GE: expr = cmp2; break;
-                // position() <= last() -> true()
-                case LE: expr = Bln.TRUE; break;
-                // position() > last() -> false()
-                case GT: expr = Bln.FALSE; break;
-                // position() </!= last() -> handled in {@link Filter} expression
-                default:
-              }
-            }
-          }
-        }
-      } else if(expr instanceof And) {
-        if(!expr.has(Flag.POS)) {
-          // replace AND expression with predicates (don't rewrite position tests)
-          cc.info(OPTPRED_X, expr);
-          final Expr[] ands = ((Arr) expr).exprs;
-          final int m = ands.length;
-          for (int a = 0; a < m; a++) {
-            // wrap test with boolean() if the result is numeric
-            expr = ands[a];
-            if(expr.seqType().mayBeNumber()) expr = cc.function(Function.BOOLEAN, info, expr);
-            if(a + 1 < m) pos = add(expr, list, pos, cc);
-          }
-        }
-      } else if(expr instanceof ANum) {
-        expr = ItrPos.get(((ANum) expr).dbl(), info);
-      } else if(expr instanceof Value) {
-        expr = Bln.get(expr.ebv(cc.qc, info).bool(info));
-      }
-
-      // predicate will not yield any results
-      if(expr == Bln.FALSE) return cc.emptySeq(this);
-      if(expr != ebv) cc.replaceWith(ex, expr);
-      pos = add(expr, list, pos, cc);
-    }
-    exprs = list.finish();
-    return this;
-  }
-
   /**
    * Adds an expression to the new expression list.
    * @param expr expression
@@ -138,7 +79,7 @@ public abstract class Preds extends Arr {
    * @param root root expression
    * @return whether expression may yield results
    */
-  protected final boolean exprType(final Expr root) {
+  private boolean exprType(final Expr root) {
     long max = root.size();
     boolean exact = max != -1;
     if(!exact) max = Long.MAX_VALUE;
@@ -159,7 +100,6 @@ public abstract class Preds extends Arr {
         exact = false;
       }
     }
-
 
     // choose exact result size; if not available, work with occurrence indicator
     final long size = exact || max == 0 ? max : -1;
@@ -195,12 +135,94 @@ public abstract class Preds extends Arr {
   }
 
   /**
+   * Optimizes the expression.
+   * @param cc compilation context
+   * @param root root expression
+   * @return optimized or original expression
+   * @throws QueryException query exception
+   */
+  protected final Expr optimize(final CompileContext cc, final Expr root) throws QueryException {
+    simplify(cc, root);
+
+    // remember current context value (will be temporarily overwritten)
+    cc.pushFocus(root);
+    try {
+      final int es = exprs.length;
+      final ExprList list = new ExprList(es);
+      boolean pos = false;
+      for(final Expr ex : exprs) {
+        final Expr ebv = ex.optimizeEbv(cc);
+        Expr expr = ebv;
+        if(expr instanceof CmpG || expr instanceof CmpV) {
+          final Cmp cmp = (Cmp) expr;
+          final OpV opV = cmp.opV();
+          if(opV != null) {
+            final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
+            if(Function.POSITION.is(cmp1)) {
+              if(numeric(cmp2) && opV == OpV.EQ) {
+                // position() = NUMBER -> NUMBER
+                expr = cmp2;
+              } else if(Function.LAST.is(cmp2)) {
+                switch(opV) {
+                  // position() =/>= last() -> last()
+                  case EQ: case GE: expr = cmp2; break;
+                  // position() <= last() -> true()
+                  case LE: expr = Bln.TRUE; break;
+                  // position() > last() -> false()
+                  case GT: expr = Bln.FALSE; break;
+                  // position() </!= last() -> handled in {@link Filter} expression
+                  default:
+                }
+              }
+            }
+          }
+        } else if(expr instanceof And) {
+          if(!expr.has(Flag.POS)) {
+            // replace AND expression with predicates (don't rewrite position tests)
+            cc.info(OPTPRED_X, expr);
+            final Expr[] ands = ((Arr) expr).exprs;
+            final int m = ands.length;
+            for (int a = 0; a < m; a++) {
+              // wrap test with boolean() if the result is numeric
+              expr = ands[a];
+              if(expr.seqType().mayBeNumber()) expr = cc.function(Function.BOOLEAN, info, expr);
+              if(a + 1 < m) pos = add(expr, list, pos, cc);
+            }
+          }
+        } else if(expr instanceof ANum) {
+          expr = ItrPos.get(((ANum) expr).dbl(), info);
+        } else if(expr instanceof Value) {
+          expr = Bln.get(expr.ebv(cc.qc, info).bool(info));
+        }
+
+        // example: <a/>/.[1]  ->  <a/>/.[true()]
+        // example: $child/..[2]  ->  $child/..[false()]
+        if(root instanceof Step && expr instanceof ItrPos) {
+          final Axis axis = ((Step) root).axis;
+          if(axis == Axis.SELF || axis == Axis.PARENT) expr = Bln.get(((ItrPos) expr).min == 1);
+        }
+
+        // predicate will not yield any results
+        if(expr == Bln.FALSE) return cc.emptySeq(this);
+        if(expr != ebv) cc.replaceWith(ex, expr);
+        pos = add(expr, list, pos, cc);
+      }
+      exprs = list.finish();
+    } finally {
+      cc.removeFocus();
+    }
+
+    // check result size
+    return exprType(root) ? this : cc.emptySeq(this);
+  }
+
+  /**
    * Simplifies the predicates.
    * @param cc compilation context
    * @param root root expression
    */
-  public final void simplify(final CompileContext cc, final Expr root) {
-    final ExprList list = new ExprList();
+  private void simplify(final CompileContext cc, final Expr root) {
+    final ExprList list = new ExprList(exprs.length);
     final SeqType st = root.seqType();
     for(final Expr expr : exprs) {
       Expr ex = expr;

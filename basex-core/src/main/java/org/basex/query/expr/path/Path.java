@@ -379,13 +379,10 @@ public abstract class Path extends ParseExpr {
         size = size != -1 && sz != -1 ? size * sz : -1;
         occ = occ.union(step.seqType().occ);
       }
-
       // more than one result: final size is unknown due to DDO
       if(size > 1) size = -1;
     }
-
     exprType.assign(type, occ, size);
-
   }
 
   /**
@@ -418,6 +415,7 @@ public abstract class Path extends ParseExpr {
         if(nodes == null) return -1;
       } else if(s + 1 == sl) {
         lastSize = steps[s].size();
+        if(lastSize == -1) return -1;
       } else {
         // stop if a non-axis step is not placed last
         return -1;

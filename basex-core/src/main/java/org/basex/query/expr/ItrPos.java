@@ -23,9 +23,9 @@ import org.basex.util.hash.*;
  */
 public final class ItrPos extends Simple {
   /** Minimum position (1 or larger). */
-  final long min;
+  public final long min;
   /** Maximum position (inclusive, 1 or larger, never smaller than {@link #min}). */
-  final long max;
+  public final long max;
 
   /**
    * Constructor.
