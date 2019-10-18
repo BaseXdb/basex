@@ -15,7 +15,6 @@ import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -101,15 +100,11 @@ public abstract class Step extends Preds {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final Value value = cc.qc.focus.value;
-    if(value != null) {
-      // check if test will never yield results
-      if(!test.optimize(value)) {
-        cc.info(OPTNAME_X, test);
-        return Empty.VALUE;
-      }
+    // check if step or test will never yield results
+    if(emptyStep() || !test.optimize(cc.qc.focus.value)) {
+      cc.info(QueryText.OPTSTEP_X, this);
+      return cc.emptySeq(this);
     }
-
     // optimize predicate, choose best implementation
     final Expr expr = optimize(cc, this);
     return expr != this ? expr : copyType(get(info, axis, test, exprs));
@@ -188,6 +183,79 @@ public abstract class Step extends Preds {
       if(axis != Axis.SELF) add(pn, tmp, name, kind);
     }
     return tmp;
+  }
+
+  /**
+   * Checks if the step will never yield results.
+   * @return {@code true} if steps will never yield results
+   */
+  private boolean emptyStep() {
+    final NodeType type = test.type;
+    if(type.oneOf(NodeType.NOD, NodeType.SCA, NodeType.SCE)) return false;
+
+    switch(axis) {
+      // attribute::element()
+      case ATTRIBUTE:
+        return type != NodeType.ATT;
+      case ANCESTOR:
+      // parent::comment()
+      case PARENT:
+        return type.oneOf(NodeType.ATT, NodeType.COM, NodeType.NSP, NodeType.PI, NodeType.TXT);
+      // child::attribute()
+      case CHILD:
+      case DESCENDANT:
+      case FOLLOWING:
+      case FOLLOWING_SIBLING:
+      case PRECEDING:
+      case PRECEDING_SIBLING:
+        return type.oneOf(NodeType.ATT, NodeType.DEL, NodeType.DOC, NodeType.NSP);
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Checks if the step will never yield results.
+   * @param prevType type of incoming nodes
+   * @return {@code true} if steps will never yield results
+   */
+  boolean emptyStep(final NodeType prevType) {
+    // checks steps on document nodes
+    final NodeType type = test.type;
+    if(prevType.instanceOf(NodeType.DOC) && ((Check) () -> {
+      switch(axis) {
+        case SELF:
+        case ANCESTOR_OR_SELF:
+          return !type.oneOf(NodeType.NOD, NodeType.DOC);
+        case CHILD:
+        case DESCENDANT:
+          return type.oneOf(NodeType.DOC, NodeType.ATT);
+        case DESCENDANT_OR_SELF:
+          return type == NodeType.ATT;
+        // document {}/parent::, ...
+        default:
+          return true;
+      }
+    }).ok()) return true;
+
+    // check step after any other expression
+    switch(axis) {
+      // type of current step will not accept any nodes of previous step
+      // example: <a/>/self::text()
+      case SELF:
+        return type != NodeType.NOD && !type.instanceOf(prevType);
+      // .../descendant::, .../child::, .../attribute::
+      case DESCENDANT:
+      case CHILD:
+      case ATTRIBUTE:
+        return prevType.oneOf(NodeType.ATT, NodeType.TXT, NodeType.COM, NodeType.PI, NodeType.NSP);
+      // .../following-sibling::, .../preceding-sibling::
+      case FOLLOWING_SIBLING:
+      case PRECEDING_SIBLING:
+        return prevType == NodeType.ATT;
+      default:
+        return false;
+    }
   }
 
   /**

@@ -21,7 +21,7 @@ public final class NameTest extends Test {
   /** Part of name to be tested. */
   private NamePart part;
   /** QName test. */
-  private QNm name;
+  private final QNm name;
 
   /**
    * Convenience constructor for element tests.

@@ -468,100 +468,24 @@ public abstract class Path extends ParseExpr {
    * @return original or new expression
    */
   private Expr removeEmpty(final CompileContext cc, final Expr rt) {
+    final Check emptySteps = () -> {
+      Expr prev = rt;
+      for(final Expr step : steps) {
+        if(step instanceof Step && prev != null) {
+          final Type type = prev.seqType().type;
+          if(type instanceof NodeType && ((Step) step).emptyStep((NodeType) type)) return true;
+        }
+        prev = step;
+      }
+      return false;
+    };
+
     final ArrayList<PathNode> nodes = pathNodes(rt);
-    if(nodes != null ? nodes.isEmpty() : pathEmpty(rt)) {
+    if(nodes != null ? nodes.isEmpty() : emptySteps.ok()) {
       cc.info(QueryText.OPTPATH_X, this);
       return Empty.VALUE;
     }
     return this;
-  }
-
-  /**
-   * Checks if the path will never yield results.
-   * @param rt compile time root (can be {@code null})
-   * @return {@code true} if steps will never yield results
-   */
-  private boolean pathEmpty(final Expr rt) {
-    final int sl = steps.length;
-    for(int s = 0; s < sl; s++) {
-      final Step step = axisStep(s);
-      if(step == null) continue;
-
-      final Axis axis = step.axis;
-      final NodeType type = step.test.type;
-
-      // check combination of axis and node test
-      if(!type.oneOf(NodeType.NOD, NodeType.SCA, NodeType.SCE) && ((Check) () -> {
-        switch(axis) {
-          // attribute::element()
-          case ATTRIBUTE:
-            return type != NodeType.ATT;
-          case ANCESTOR:
-          // parent::comment()
-          case PARENT:
-            return type.oneOf(NodeType.ATT, NodeType.COM, NodeType.NSP, NodeType.PI, NodeType.TXT);
-          // child::attribute()
-          case CHILD:
-          case DESCENDANT:
-          case FOLLOWING:
-          case FOLLOWING_SIBLING:
-          case PRECEDING:
-          case PRECEDING_SIBLING:
-            return type.oneOf(NodeType.ATT, NodeType.DEL, NodeType.DOC, NodeType.NSP);
-          default:
-            return false;
-        }
-      }).ok()) return true;
-
-      // skip further tests if previous expression is unknown or is no axis step
-      final Expr prev = s > 0 ? axisStep(s - 1) : rt;
-      if(prev == null) continue;
-
-      // check step after expression that yields document nodes
-      final Type prevType = prev.seqType().type;
-      if(prevType.instanceOf(NodeType.DOC) && ((Check) () -> {
-        switch(axis) {
-          case SELF:
-          case ANCESTOR_OR_SELF:
-            return !type.oneOf(NodeType.NOD, NodeType.DOC);
-          case CHILD:
-          case DESCENDANT:
-            return type.oneOf(NodeType.DOC, NodeType.ATT);
-          case DESCENDANT_OR_SELF:
-            return type == NodeType.ATT;
-          // document {}/parent::, ...
-          default:
-            return true;
-        }
-      }).ok()) return true;
-
-      // skip further tests if previous node type is unknown, or if current test accepts all nodes
-      if(!prevType.instanceOf(NodeType.NOD)) continue;
-
-      // check step after any other expression
-      if(((Check) () -> {
-        switch(axis) {
-          // type of current step will not accept any nodes of previous step
-          // example: <a/>/self::text()
-          case SELF:
-            return type != NodeType.NOD && !type.instanceOf(prevType);
-          // .../descendant::, .../child::, .../attribute::
-          case DESCENDANT:
-          case CHILD:
-          case ATTRIBUTE:
-            return prevType.oneOf(NodeType.ATT, NodeType.TXT, NodeType.COM, NodeType.PI,
-                NodeType.NSP);
-          // .../following-sibling::, .../preceding-sibling::
-          case FOLLOWING_SIBLING:
-          case PRECEDING_SIBLING:
-            return prevType == NodeType.ATT;
-          default:
-            return false;
-        }
-      }).ok()) return true;
-    }
-
-    return false;
   }
 
   /**
