@@ -386,7 +386,8 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Tries to merge two expressions.
+   * Tries to merge two expressions. Overwritten by {@link CmpG}, {@link CmpIR}, {@link CmpR},
+   * {@link CmpSR}, {@link ItrPos} and {@link Pos}.
    * @param expr second expression
    * @param union union or intersection
    * @param cc compilation context

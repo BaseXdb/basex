@@ -166,7 +166,7 @@ public final class CmpR extends Single {
     if(!expr.equals(cmp.expr)) return null;
 
     // do not merge if ranges are exclusive
-    if(union && (max < cmp.min || cmp.max < cmp.min)) return null;
+    if(union && (max < cmp.min || cmp.max < min)) return null;
 
     // merge min and max values
     final double mn = union ? Math.min(min, cmp.min) : Math.max(min, cmp.min);

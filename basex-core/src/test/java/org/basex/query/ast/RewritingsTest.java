@@ -147,6 +147,13 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a>5</a>[text() > 1 and text() < 9]", "<a>5</a>", count(cmpr, 1));
     check("<a>5</a>[text() > 1 and text() < 9 and <b/>]", "<a>5</a>", count(cmpr, 1));
     check("<a>5</a>[text() > 1 and . < 9]", "<a>5</a>", count(cmpr, 2));
+
+    // GH-1744
+    check("<a>5</a>[text() < 5 or text() > 5]", "", count(cmpr, 2));
+    check("<a>5</a>[text() > 5 or text() < 5]", "", count(cmpr, 2));
+    check("<a>5</a>[5 > text() or 5 < text()]", "", count(cmpr, 2));
+    check("<a>5</a>[5 < text() or 5 > text()]", "", count(cmpr, 2));
+
     check("<a>5</a>[text() > 800000000]", "", exists(cmpr));
     check("<a>5</a>[text() < -800000000]", "", exists(cmpr));
     check("<a>5</a>[text() <= -800000000]", "", exists(cmpr));
