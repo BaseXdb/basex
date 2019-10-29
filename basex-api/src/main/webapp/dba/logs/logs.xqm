@@ -89,7 +89,6 @@ function dba:logs(
           <input type='hidden' name='time' id='time' value='{ $time }'/>
           <div id='list'>{
             let $buttons := html:button('log-delete', 'Delete', true())
-            let $params := map { 'sort': $sort }
             let $headers := (
               map { 'key': 'name', 'label': 'Name', 'type': 'xml' },
               map { 'key': 'size', 'label': 'Size', 'type': 'bytes' }
@@ -99,7 +98,7 @@ function dba:logs(
               return map {
                 'name': function() {
                   let $link := html:link(
-                    $entry, $dba:CAT, ($params, map { 'name': $entry })
+                    $entry, $dba:CAT, (map { 'sort': $sort }, map { 'name': $entry })
                   ) update {
                     (: enrich link targets with current search string :)
                     insert node attribute onclick { 'addInput(this);' } into .
@@ -108,7 +107,7 @@ function dba:logs(
                 },
                 'size': $entry/@size
               }
-            return html:table($headers, $entries, $buttons, $params, map { })
+            return html:table($headers, $entries, $buttons, map { }, map { })
           }</div>
         </form>
       </td>
@@ -149,7 +148,7 @@ declare
   %rest:POST('{$input}')
   %rest:path('/dba/log')
   %rest:query-param('name', '{$name}')
-  %rest:query-param('sort', '{$sort}', '')
+  %rest:query-param('sort', '{$sort}', 'time')
   %rest:query-param('page', '{$page}', '1')
   %rest:query-param('time', '{$time}')
   %output:method('html')
@@ -162,7 +161,6 @@ function dba:log(
   $page   as xs:string,
   $time   as xs:string?
 ) as element()+ {
-  let $sort := if($sort = 'time') then '' else $sort
   let $headers := (
     map { 'key': 'time', 'label': 'Time', 'type': 'xml', 'order': 'desc' },
     map { 'key': 'address', 'label': 'Address' },
@@ -197,7 +195,7 @@ function dba:log(
     return map {
       'id': $id,
       'time': function() {
-        if($input or $sort) then (
+        if($input or $sort != 'time') then (
           html:link($id, $dba:CAT || '-jump', map { 'name': $name, 'time': $id })
         ) else if($id = $time) then (
           <b>{ $id }</b>
@@ -212,7 +210,7 @@ function dba:log(
       'text': function() { $highlight($msg, $text-hit) }
     }
   let $params := map { 'name': $name, 'input': $input }
-  let $options := map { 'sort': $sort, 'page': xs:integer($page) }
+  let $options := map { 'sort': $sort, 'presort': 'time', 'page': xs:integer($page) }
   return html:table($headers, $entries, (), $params, $options)
 };
 

@@ -21,7 +21,7 @@ declare variable $dba:CAT := 'users';
 declare
   %rest:GET
   %rest:path('/dba/users')
-  %rest:query-param('sort',  '{$sort}', '')
+  %rest:query-param('sort',  '{$sort}', 'name')
   %rest:query-param('error', '{$error}')
   %rest:query-param('info',  '{$info}')
   %output:method('html')

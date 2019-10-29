@@ -22,7 +22,7 @@ declare variable $dba:CAT := 'jobs';
 declare
   %rest:GET
   %rest:path('/dba/jobs')
-  %rest:query-param('sort',  '{$sort}', '')
+  %rest:query-param('sort',  '{$sort}', 'duration')
   %rest:query-param('job',   '{$job}')
   %rest:query-param('error', '{$error}')
   %rest:query-param('info',  '{$info}')
@@ -69,7 +69,7 @@ function dba:jobs(
           let $buttons := (
             html:button('job-stop', 'Stop', true())
           )
-          let $options := map { 'sort': $sort }
+          let $options := map { 'sort': $sort, 'presort': 'duration' }
           return html:table($headers, $entries, $buttons, map { }, $options) update {
             (: replace job ids with links :)
             for $tr at $p in tr[not(th)]

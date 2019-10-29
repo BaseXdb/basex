@@ -22,7 +22,7 @@ declare variable $dba:CAT := 'sessions';
 declare
   %rest:GET
   %rest:path('/dba/sessions')
-  %rest:query-param('sort',  '{$sort}', '')
+  %rest:query-param('sort',  '{$sort}', 'access')
   %rest:query-param('error', '{$error}')
   %rest:query-param('info',  '{$info}')
   %output:method('html')
@@ -38,11 +38,11 @@ function dba:sessions(
         <h2>Web Sessions</h2>
         {
           let $headers := (
-            map { 'key': 'id', 'label': 'ID', 'type': 'id' },
             map { 'key': 'name', 'label': 'Name' },
             map { 'key': 'value', 'label': 'Value' },
             map { 'key': 'access', 'label': 'Last Access', 'type': 'dateTime', 'order': 'desc' },
-            map { 'key': 'you', 'label': 'You' }
+            map { 'key': 'you', 'label': 'You' },
+            map { 'key': 'id', 'label': 'ID', 'type': 'id' }
           )
           let $entries :=
             for $id in sessions:ids()
@@ -58,16 +58,16 @@ function dba:sessions(
             let $string := util:chop(serialize($value, map { 'method': 'basex' }), 20)
             order by $access descending
             return map {
-              'id': $id || '|' || $name,
               'name': $name,
               'value': $string,
               'access': $access,
-              'you': $you
+              'you': $you,
+              'id': $id || '|' || $name
             }
           let $buttons := (
             html:button('session-kill', 'Kill', true())
           )
-          let $options := map { 'sort': $sort }
+          let $options := map { 'sort': $sort, 'presort': 'access' }
           return html:table($headers, $entries, $buttons, map { }, $options)
         }
         </form>

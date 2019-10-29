@@ -286,8 +286,9 @@ declare function html:properties(
  : * Supplied buttons will placed on top of the table.
  : * Query parameters will be included in table links.
  : * The options argument can have the following keys:
- :   * 'sort': argument contains the key of the ordered column.
- :   * 'link': argument contains a function for generating a link reference.
+ :   * 'sort': key of the ordered column. if empty, sorting will be disabled
+ :   * 'presort': key of pre-sorted column. if identical to sort, entries will not be resorted
+ :   * 'link': function for generating a link reference.
  :   * 'page': currently displayed page
  :   * 'count': maximum number of results
  :
@@ -316,7 +317,7 @@ declare function html:table(
   (: sort entries :)
   let $sort := $options?sort
   let $sort-key := head(($sort[.], $headers[1]?key))
-  let $sorted-entries := if($sort) then (
+  let $sorted-entries := if($sort and not($sort-key = $options?presort)) then (
     let $sort-header := $headers[?key = $sort-key]
     let $sort-xml := $sort-header?type = 'xml'
     let $sort-value := (
@@ -402,7 +403,7 @@ declare function html:table(
 
             if($header?type = 'id') then (
               (: id columns: empty header column :)
-            ) else if(empty($sort) or $name = $sort-key) then (
+            ) else if(empty($sort) or $name = $sort) then (
               (: sorted column, xml column: only display label :)
               $label
             ) else (

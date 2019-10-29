@@ -115,18 +115,12 @@ function query(path, query, func, reset) {
     }
   }, 500);
 
-  var name = document.getElementById("name");
-  var resource = document.getElementById("resource");
-  var sort = document.getElementById("sort");
-  var page = document.getElementById("page");
-  var time = document.getElementById("time");
-  var params =
-    (name ? "&name=" + encodeURIComponent(name.value) : "") +
-    (resource ? "&resource=" + encodeURIComponent(resource.value) : "") +
-    (sort ? "&sort=" + encodeURIComponent(sort.value) : "") +
-    (page && !reset ? "&page=" + encodeURIComponent(page.value) : "" ) +
-    (time && !reset ? "&time=" + encodeURIComponent(time.value) : "");
-  var url = path + params.replace(/^&/, "?");
+  var append = function(name, reset) {
+    var e = document.getElementById(name);
+    return !reset && e && e.value ? "&" + name + "=" + encodeURIComponent(e.value) : "";
+  };
+  var url = path + (append("name") + append("resource") + append("sort") + append("page", reset) +
+    append("time", reset)).replace(/^&/, "?");
 
   request("POST", url, query,
     function(request) {
