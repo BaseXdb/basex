@@ -236,6 +236,7 @@ public final class DbModuleTest extends SandboxTest {
     execute(new CreateBackup(NAME));
     query("count(" + func.args() + ")", 1);
     query("count(" + func.args(NAME) + ")", 1);
+    query("count(" + func.args(NAME) + "/(@database | @date | @size))", 3);
     query("count(" + func.args(NAME) + "/(@database, @date, @size))", 3);
     query("count(" + func.args(NAME + 'X') + ")", 0);
     execute(new DropBackup(NAME));

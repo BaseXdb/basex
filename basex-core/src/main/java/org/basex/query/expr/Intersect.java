@@ -56,8 +56,11 @@ public final class Intersect extends Set {
     exprs = list.finish();
 
     // ensure that results are always sorted
-    return exprs.length > 1 ? this :
-      iterable ? exprs[0] : cc.function(Function._UTIL_DDO, info, exprs[0]);
+    switch(exprs.length) {
+      case 0:  return Empty.VALUE;
+      case 1:  return iterable ? exprs[0] : cc.function(Function._UTIL_DDO, info, exprs[0]);
+      default: return this;
+    }
   }
 
   @Override

@@ -151,28 +151,25 @@ public abstract class Step extends Preds {
     // skip steps with predicates or different namespaces
     if(exprs.length != 0 || dt.nspaces.globalUri() == null) return null;
 
-    // check restrictions on node type
-    int kind = -1, name = 0;
-    if(test.type != null) {
-      kind = ANode.kind(test.type);
-      // no index available for processing instructions
-      if(kind == Data.PI) return null;
-
-      final NamePart part = test.part();
-      if(part == NamePart.LOCAL) {
-        // element/attribute test (*:ln)
-        final Names names = kind == Data.ATTR ? dt.attrNames : dt.elemNames;
-        name = names.id(((NameTest) test).local);
-      } else if(part != null) {
-        // skip namespace and standard tests
-        return null;
-      }
-    }
-
     // skip axes other than descendant, child, and attribute
     if(axis != Axis.ATTRIBUTE && axis != Axis.CHILD && axis != Axis.DESCENDANT &&
        axis != Axis.DESCENDANT_OR_SELF && axis != Axis.SELF) return null;
+    // skip tests other than processing instructions, skip union tests
+    if(test.type == NodeType.PI || test instanceof UnionTest) return null;
 
+    // check node type
+    int name = 0;
+    final NamePart part = test.part();
+    if(part == NamePart.LOCAL) {
+      // element/attribute test (*:ln)
+      final Names names = test.type == NodeType.ATT ? dt.attrNames : dt.elemNames;
+      name = names.id(((NameTest) test).local);
+    } else if(part != null) {
+      // skip namespace and standard tests
+      return null;
+    }
+
+    final int kind = ANode.kind(test.type);
     final ArrayList<PathNode> tmp = new ArrayList<>();
     for(final PathNode pn : nodes) {
       if(axis == Axis.SELF || axis == Axis.DESCENDANT_OR_SELF) {
@@ -183,6 +180,27 @@ public abstract class Step extends Preds {
       if(axis != Axis.SELF) add(pn, tmp, name, kind);
     }
     return tmp;
+  }
+
+  /**
+   * Adds path nodes to the list if they comply with the given test conditions.
+   * @param node root node
+   * @param nodes output nodes
+   * @param name name id, or {@code 0} as wildcard
+   * @param kind node kind, or {@code -1} for all types
+   */
+  private void add(final PathNode node, final ArrayList<PathNode> nodes, final int name,
+      final int kind) {
+
+    for(final PathNode pn : node.children) {
+      if(axis == Axis.DESCENDANT || axis == Axis.DESCENDANT_OR_SELF) {
+        add(pn, nodes, name, kind);
+      }
+      if(kind == -1 && pn.kind != Data.ATTR ^ axis == Axis.ATTRIBUTE ||
+         kind == pn.kind && (name == 0 || name == pn.name)) {
+        if(!nodes.contains(pn)) nodes.add(pn);
+      }
+    }
   }
 
   /**
@@ -259,27 +277,6 @@ public abstract class Step extends Preds {
   }
 
   /**
-   * Adds path nodes to the list if they comply with the given test conditions.
-   * @param node root node
-   * @param nodes output nodes
-   * @param name name id, or {@code 0} as wildcard
-   * @param kind node kind, or {@code -1} for all types
-   */
-  private void add(final PathNode node, final ArrayList<PathNode> nodes, final int name,
-      final int kind) {
-
-    for(final PathNode pn : node.children) {
-      if(axis == Axis.DESCENDANT || axis == Axis.DESCENDANT_OR_SELF) {
-        add(pn, nodes, name, kind);
-      }
-      if(kind == -1 && pn.kind != Data.ATTR ^ axis == Axis.ATTRIBUTE ||
-         kind == pn.kind && (name == 0 || name == pn.name)) {
-        if(!nodes.contains(pn)) nodes.add(pn);
-      }
-    }
-  }
-
-  /**
    * Adds predicates to the step.
    * After the call, a new instance of the resulting path must be created.
    * @param add predicates to be added
@@ -340,9 +337,19 @@ public abstract class Step extends Preds {
       if(axis == Axis.SELF) sb.append('.');
     }
     if(sb.length() == 0) {
-      if(axis == Axis.ATTRIBUTE && test instanceof NameTest) sb.append('@');
-      else if(axis != Axis.CHILD) sb.append(axis).append("::");
-      sb.append(test);
+      final java.util.function.Function<Test, StringBuilder> add = t -> {
+        if(axis == Axis.ATTRIBUTE && t instanceof NameTest) sb.append('@');
+        else if(axis != Axis.CHILD) sb.append(axis).append("::");
+        return sb.append(t);
+      };
+
+      if(test instanceof UnionTest) {
+        sb.append('(');
+        for(final Test t : ((UnionTest) test).tests) add.apply(t).append(" | ");
+        sb.delete(sb.length() - 3, sb.length()).append(')');
+      } else {
+        add.apply(test);
+      }
     }
     return sb.append(super.toString()).toString();
   }

@@ -54,41 +54,24 @@ public abstract class Path extends ParseExpr {
    * @return path instance
    */
   public static Path get(final InputInfo ii, final Expr root, final Expr... steps) {
-    // new list with steps
-    final int sl = steps.length;
-    final ExprList tmp = new ExprList(sl);
-
-    // flatten nested path
-    Expr rt = root;
-    if(rt instanceof Path) {
-      final Path path = (Path) rt;
-      tmp.add(path.steps);
-      rt = path.root;
-    }
-
     // add steps of input array
+    final ExprList tmp = new ExprList(steps.length);
     for(final Expr step : steps) {
-      Expr ex = step;
-      if(ex instanceof ContextValue) {
-        // normalize context item to self step
-        ex = Step.get(((ContextValue) ex).info, SELF, KindTest.NOD);
-      } else if(ex instanceof Filter) {
+      Expr expr = step;
+      if(expr instanceof ContextValue) {
+        // rewrite context item to self step
+        expr = Step.get(((ContextValue) expr).info, SELF, KindTest.NOD);
+      } else if(expr instanceof Filter) {
         // rewrite filter expression to self step with predicates
-        final Filter f = (Filter) ex;
-        if(f.root instanceof ContextValue) ex = Step.get(f.info, SELF, KindTest.NOD, f.exprs);
-      } else if(ex instanceof Path) {
-        // rewrite nested path to axis steps
-        final Path p = (Path) ex;
-        if(p.root != null && !(p.root instanceof ContextValue)) tmp.add(p.root);
-        final int pl = p.steps.length - 1;
-        for(int i = 0; i < pl; i++) tmp.add(p.steps[i]);
-        ex = p.steps[pl];
+        final Filter f = (Filter) expr;
+        if(f.root instanceof ContextValue) expr = Step.get(f.info, SELF, KindTest.NOD, f.exprs);
       }
-      tmp.add(ex);
+      tmp.add(expr);
     }
+    final Expr[] stps = tmp.finish();
 
     // check if path can be evaluated iteratively
-    final Expr[] stps = tmp.finish();
+    Expr rt = root;
     boolean axes = true;
     for(final Expr expr : stps) axes &= expr instanceof Step;
     final boolean iterative = axes && iterative(rt, stps);
@@ -132,8 +115,8 @@ public abstract class Path extends ParseExpr {
         // replace original expression with error
         step = cc.error(ex, this);
       }
-      cc.updateFocus(step);
       steps[s] = step;
+      cc.updateFocus(step);
     }
     cc.removeFocus();
 
@@ -147,10 +130,16 @@ public abstract class Path extends ParseExpr {
 
     // remove redundant steps, find empty steps
     Expr expr = simplify(cc);
-    // merge descendant steps
-    if(expr == this) expr = mergeSteps(cc);
-    // return optimized expression
     if(expr != this) return expr;
+
+    // flatten nested path expressions
+    expr = flatten(cc);
+    // rewrite list to union expressions
+    if(expr == this) expr = toUnion(cc);
+    // merge descendant-or-self steps
+    if(expr == this) expr = mergeDesc(cc);
+    // return optimized expression
+    if(expr != this) return expr.optimize(cc);
 
     // assign sequence type, compute result size
     Expr rt = root != null ? root : cc.qc.focus.value;
@@ -160,8 +149,6 @@ public abstract class Path extends ParseExpr {
     expr = removeEmpty(cc, rt);
     // rewrite to simple map
     if(expr == this) expr = toMap(cc);
-    // rewrite list to union expressions
-    if(expr == this) expr = union(cc);
     // check index access
     if(expr == this) expr = index(cc, rt);
     /* rewrite descendant to child steps. this optimization is called after the index rewritings,
@@ -220,6 +207,44 @@ public abstract class Path extends ParseExpr {
    */
   private Step axisStep(final int index) {
     return steps[index] instanceof Step ? (Step) steps[index] : null;
+  }
+
+  /**
+   * Flattens nested path expressions.
+   * @param cc compilation context
+   * @return original or optimized expression
+   */
+  public final Expr flatten(final CompileContext cc) {
+    // new list with steps
+    boolean changed = false;
+    final ExprList tmp = new ExprList(steps.length);
+
+    // flatten nested path
+    Expr rt = root;
+    if(rt instanceof Path) {
+      final Path path = (Path) rt;
+      tmp.add(path.steps);
+      rt = path.root;
+      cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) path::description, path);
+      changed = true;
+    }
+
+    // add steps of input array
+    for(final Expr step : steps) {
+      Expr expr = step;
+      if(expr instanceof Path) {
+        // rewrite nested path to axis steps
+        final Path path = (Path) expr;
+        if(path.root != null && !(path.root instanceof ContextValue)) tmp.add(path.root);
+        final int pl = path.steps.length - 1;
+        for(int i = 0; i < pl; i++) tmp.add(path.steps[i]);
+        expr = path.steps[pl];
+        cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) path::description, path);
+        changed = true;
+      }
+      tmp.add(expr);
+    }
+    return changed ? get(info, rt, tmp.finish()) : this;
   }
 
   /**
@@ -577,27 +602,6 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Tries to rewrite steps to union expressions.
-   * @param cc compilation context
-   * @return original or new expression
-   * @throws QueryException query exception
-   */
-  private Expr union(final CompileContext cc) throws QueryException {
-    boolean changed = false;
-    final int sl = steps.length;
-    for(int s = 0; s < sl; s++) {
-      if(steps[s] instanceof List) {
-        final List list = (List) steps[s];
-        if(((Checks<Expr>) expr -> expr.seqType().instanceOf(SeqType.NOD_ZM)).all(list.exprs)) {
-          steps[s] = cc.replaceWith(steps[s], new Union(list.info, list.exprs)).optimize(cc);
-          changed = true;
-        }
-      }
-    }
-    return changed ? get(info, root, steps) : this;
-  }
-
-  /**
    * Returns an equivalent expression which accesses an index.
    * If the expression cannot be rewritten, the original expression is returned.
    *
@@ -761,13 +765,40 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Merges expensive descendant-or-self::node() steps.
+   * Tries to rewrite lists to union expressions.
    * @param cc compilation context
    * @return original or new expression
    * @throws QueryException query exception
    */
-  private Expr mergeSteps(final CompileContext cc) throws QueryException {
-    boolean opt = false;
+  private Expr toUnion(final CompileContext cc) throws QueryException {
+    boolean changed = false;
+
+    final int sl = steps.length;
+    for(int s = 0; s < sl; s++) {
+      if(steps[s] instanceof List) {
+        final List list = (List) steps[s];
+        if(((Checks<Expr>) ex -> ex.seqType().instanceOf(SeqType.NOD_ZM)).all(list.exprs)) {
+          cc.pushFocus(s == 0 ? root : steps[s - 1]);
+          try {
+            steps[s] = cc.replaceWith(list, new Union(list.info, list.exprs)).optimize(cc);
+          } finally {
+            cc.removeFocus();
+          }
+          changed = true;
+        }
+      }
+    }
+    return changed ? get(info, root, steps) : this;
+  }
+
+  /**
+   * Rewrites descendant-or-self to descendant steps.
+   * @param cc compilation context
+   * @return original or new expression
+   * @throws QueryException query exception
+   */
+  private Expr mergeDesc(final CompileContext cc) throws QueryException {
+    boolean changed = false;
     final int sl = steps.length;
     final ExprList stps = new ExprList(sl);
     for(int s = 0; s < sl; s++) {
@@ -781,34 +812,37 @@ public abstract class Path extends ParseExpr {
           // descendant-or-self::node()/child::X -> descendant::X
           if(simpleChild(next)) {
             ((Step) next).axis = DESCENDANT;
-            opt = true;
+            changed = true;
             continue;
           }
-          // descendant-or-self::node()/(X, Y) -> (descendant::X | descendant::Y)
-          Expr expr = mergeList(next);
+          // descendant-or-self::node()/(*|text()) -> (descendant::* | descendant::text())
+          Expr expr = mergeList(next, cc);
           if(expr != null) {
             steps[s + 1] = expr;
-            opt = true;
+            changed = true;
             continue;
           }
-          // //(X, Y)[text()] -> (/descendant::X | /descendant::Y)[text()]
-          if(next instanceof Filter && !((Filter) next).positional()) {
+          // //(X|Y)[text()] -> (/descendant::X | /descendant::Y)[text()]
+          if(next instanceof Filter) {
             final Filter f = (Filter) next;
-            expr = mergeList(f.root);
-            if(expr != null) {
-              f.root = expr;
-              opt = true;
-              continue;
+            if(f.positional()) {
+              expr = mergeList(f.root, cc);
+              if(expr != null) {
+                f.root = expr;
+                changed = true;
+                continue;
+              }
             }
           }
         }
       }
       stps.add(step);
     }
+    steps = stps.finish();
 
-    if(opt) {
+    if(changed) {
       cc.info(QueryText.OPTDESC_X, this);
-      return stps.isEmpty() ? root : get(info, root, stps.finish()).optimize(cc);
+      return changed ? get(info, root, steps) : this;
     }
     return this;
   }
@@ -816,33 +850,26 @@ public abstract class Path extends ParseExpr {
   /**
    * Tries to rewrite union or list expressions.
    * @param expr input expression
+   * @param cc compilation context
    * @return rewriting flag or {@code null}
+   * @throws QueryException query exception
    */
-  private static Expr mergeList(final Expr expr) {
-    if(expr instanceof Union || expr instanceof List) {
-      final Arr array = (Arr) expr;
-      if(childSteps(array)) {
-        for(final Expr ex : array.exprs) {
-          ((Step) ((Path) ex).steps[0]).axis = DESCENDANT;
-        }
-        return new Union(array.info, array.exprs);
+  private static Expr mergeList(final Expr expr, final CompileContext cc) throws QueryException {
+    if(!(expr instanceof Union)) return null;
+
+    final Checks<Expr> startWithChild = ex -> {
+      if(!(ex instanceof Path)) return false;
+      final Path path = (Path) ex;
+      return path.root == null && simpleChild(path.steps[0]);
+    };
+    final Union union = (Union) expr;
+    if(startWithChild.all(union.exprs)) {
+      for(final Expr ex : union.exprs) {
+        ((Step) ((Path) ex).steps[0]).axis = DESCENDANT;
       }
+      return new Union(union.info, union.exprs).optimize(cc);
     }
     return null;
-  }
-
-  /**
-   * Checks if the expressions in the specified array start with child steps.
-   * @param array array expression to be checked
-   * @return result of check
-   */
-  private static boolean childSteps(final Arr array) {
-    for(final Expr expr : array.exprs) {
-      if(!(expr instanceof Path)) return false;
-      final Path path = (Path) expr;
-      if(path.root != null || !simpleChild(path.steps[0])) return false;
-    }
-    return true;
   }
 
   /**
@@ -944,11 +971,7 @@ public abstract class Path extends ParseExpr {
     if(root != null) sb.append(root);
     for(final Expr step : steps) {
       if(sb.length() != 0) sb.append('/');
-      final String s = step.toString();
-      final boolean par = !s.contains("[") && s.contains(" ");
-      if(par) sb.append('(');
       sb.append(step);
-      if(par) sb.append(')');
     }
     return sb.toString();
   }

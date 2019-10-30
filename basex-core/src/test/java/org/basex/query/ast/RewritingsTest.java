@@ -45,9 +45,10 @@ public final class RewritingsTest extends QueryPlanTest {
     execute(new CreateDB(NAME, "<a><b>B</b><b><c>C</c></b></a>"));
 
     check("//*", null, "//@axis = 'descendant'");
-    check("//(b,*)", null, exists(Union.class), "//@axis = 'descendant'");
-    check("//(b|*)", null, exists(Union.class), "//@axis = 'descendant'");
-    check("//(b|*)[text()]", null, exists(Union.class), "//@axis = 'descendant'");
+    check("//(b,*)", null, exists(IterPath.class), "//@axis = 'descendant'");
+    check("//(b|*)", null, exists(IterPath.class), "//@axis = 'descendant'");
+    check("//(b|*)[text()]", null, exists(IterPath.class), empty(Union.class),
+        "//@axis = 'descendant'");
     check("//(b,*)[1]", null, "not(//@axis = 'descendant')");
   }
 
@@ -564,5 +565,28 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>/<b/>[2]", "", root(Empty.class));
     check("<a/>/.[2]", "", root(Empty.class));
     check("<doc><x/><y/></doc>/*/..[2] ! name()", "", root(Empty.class));
+  }
+
+  /** GH1737: combined kind tests. */
+  @Test public void gh1737() {
+    // merge identical steps, rewrite to iterative path
+    check("<a/>/(*|*)", "", root(IterPath.class), empty(Union.class));
+    check("<a/>/(*,*)", "", root(IterPath.class), empty(List.class));
+
+    // rewrite to single union node test, rewrite to iterative path
+    check("<a/>/(a|b)", "", root(IterPath.class), empty(Union.class));
+    check("<a/>/(a,b)", "", root(IterPath.class), empty(List.class));
+
+    // merge descendant-or-self step, rewrite to iterative path
+    check("<a/>//(a|b)", "", root(IterPath.class), empty(Union.class));
+    check("<a/>/(a,b)", "", root(IterPath.class), empty(List.class));
+
+    // rewrite to single union node test, rewrite to iterative path
+    check("<a/>/(a|b)[text()]", "", root(IterPath.class), empty(Union.class));
+    //check("<a/>/(a,b)[text()]", "", root(IterPath.class), empty(List.class));
+
+    // rewrite to union expression
+    check("<a/>/(*,@*)", "", root(MixedPath.class), exists(Union.class));
+
   }
 }

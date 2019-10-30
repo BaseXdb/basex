@@ -504,7 +504,7 @@ public abstract class ANode extends Item {
   /**
    * Returns a database kind for the specified node type.
    * @param type node type
-   * @return node kind
+   * @return node kind, or {@code -1} if no corresponding database kind exists
    */
   public static int kind(final NodeType type) {
     switch(type) {
