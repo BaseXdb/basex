@@ -140,6 +140,6 @@ public final class FDoc extends FNode {
 
   @Override
   public String toString() {
-    return Strings.concat(QueryText.DOCUMENT, " { ", uri, " }");
+    return Strings.concat(QueryText.DOCUMENT, " { ", uri.length == 0 ? "..." : uri, " }");
   }
 }
