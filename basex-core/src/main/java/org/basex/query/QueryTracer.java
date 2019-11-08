@@ -1,7 +1,5 @@
 package org.basex.query;
 
-import org.basex.util.*;
-
 /**
  * Query tracer.
  *
@@ -9,15 +7,10 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public interface QueryTracer {
-  /** Prints trace output to the standard error. */
-  QueryTracer ERRLN = (string, qc) -> Util.errln(string);
-  /** Prints trace output to the evaluation info. */
-  QueryTracer EVALINFO = (string, qc) -> qc.evalInfo(string);
-
   /**
-   * Prints trace output.
-   * @param string string to be output
-   * @param qc query context
+   * Processes tracing output.
+   * @param info string to be output
+   * @return {@code true} if string shall be further processed by the calling function
    */
-  void print(String string, QueryContext qc);
+  boolean print(String info);
 }

@@ -44,8 +44,6 @@ public final class QueryInfo {
   private final TokenList compile = new TokenList(0);
   /** Evaluation info. */
   private final TokenList evaluate = new TokenList(0);
-  /** String length of evaluation info. */
-  private int evalSize;
 
   /**
    * Constructor.
@@ -85,11 +83,9 @@ public final class QueryInfo {
    */
   void evalInfo(final String string) {
     if(verbose) {
-     final byte[] token = chop(token(string.replaceAll("\r?\n", "|")), 1 << 14);
       synchronized(evaluate) {
-        if(evalSize < (1 << 22)) {
-          evaluate.add(token);
-          evalSize += token.length;
+        if(evaluate.size() < 500000) {
+          evaluate.add(chop(token(string.replaceAll("\r?\n", "|")), 1 << 14));
         }
       }
     }

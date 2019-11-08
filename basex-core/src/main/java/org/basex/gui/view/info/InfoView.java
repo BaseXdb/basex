@@ -400,8 +400,8 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
   }
 
   @Override
-  public void print(final String string, final QueryContext qc) {
-    setInfo(string, null, true, false);
-    qc.evalInfo(string);
+  public boolean print(final String info) {
+    if(clear || all.length < 50000) setInfo(info, null, true, false);
+    return true;
   }
 }

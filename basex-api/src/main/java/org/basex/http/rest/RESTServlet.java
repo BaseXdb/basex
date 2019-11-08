@@ -25,6 +25,8 @@ public final class RESTServlet extends BaseXServlet {
 
     // generate and run commands
     final RESTCmd cmd = command(session);
+    cmd.jc().tracer = conn.context.log;
+
     try {
       cmd.execute(conn.context);
       conn.log(SC_OK, "");

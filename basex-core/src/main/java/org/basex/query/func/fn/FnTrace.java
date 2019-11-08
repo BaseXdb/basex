@@ -53,7 +53,7 @@ public class FnTrace extends StandardFunc {
   public static void trace(final byte[] value, final byte[] label, final QueryContext qc) {
     final TokenBuilder tb = new TokenBuilder();
     if(label != null) tb.add(label);
-    tb.add(value);
-    qc.jc().tracer.print(tb.toString(), qc);
+    final String info = tb.add(value).toString();
+    if(qc.jc().tracer.print(info)) qc.evalInfo(info);
   }
 }

@@ -12,22 +12,25 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class JobContext {
+  /** Prints trace output to the standard error. */
+  private static final QueryTracer ERRLN = info -> { Util.errln(info); return false; };
+
   /** Job prefix. */
   public static final String PREFIX = "job";
   /** Query id. */
   private static long jobId = -1;
 
-  /** Performance measurements. */
-  public Performance performance;
-  /** Query tracer. */
-  public QueryTracer tracer = QueryTracer.ERRLN;
-  /** Database context. */
-  public Context context;
   /** Registered locks. */
   public final Locks locks = new Locks();
   /** Time of creation. */
   public final long time = System.currentTimeMillis();
 
+  /** Performance measurements. */
+  public Performance performance;
+  /** Query tracer. */
+  public QueryTracer tracer = ERRLN;
+  /** Database context. */
+  public Context context;
   /** Root job. */
   private final Job job;
 

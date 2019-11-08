@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.util.*;
 
 /**
@@ -25,12 +26,13 @@ import org.basex.util.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class Log {
+public final class Log implements QueryTracer {
   /** Server string. */
   public static final String SERVER = "SERVER";
   /** Log types. */
   public enum LogType {
     /** Request. */ REQUEST,
+    /** Trace.   */ TRACE,
     /** Info.    */ INFO,
     /** Error.   */ ERROR,
     /** OK.      */ OK
@@ -164,5 +166,11 @@ public final class Log {
    */
   private IOFile dir() {
     return sopts.dbPath(".").resolve(sopts.get(StaticOptions.LOGPATH));
+  }
+
+  @Override
+  public boolean print(final String info) {
+    writeServer(LogType.TRACE, info);
+    return false;
   }
 }

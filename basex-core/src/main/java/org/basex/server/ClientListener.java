@@ -26,6 +26,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class ClientListener extends Thread implements ClientInfo {
+  /** Prints trace output to the evaluation info. */
+  private static final QueryTracer PASS = info -> true;
+
   /** Timer for authentication time out. */
   public final Timer timeout = new Timer();
   /** Timestamp of last interaction. */
@@ -115,7 +118,7 @@ public final class ClientListener extends Thread implements ClientInfo {
         // parse input and create command instance
         try {
           command = CommandParser.get(cmd, context).parseSingle();
-          command.jc().tracer = QueryTracer.EVALINFO;
+          command.jc().tracer = PASS;
           log(LogType.REQUEST, command.toString(true));
         } catch(final QueryException ex) {
           // log invalid command
@@ -364,7 +367,7 @@ public final class ClientListener extends Thread implements ClientInfo {
       if(sc == ServerCmd.QUERY) {
         final String query = arg;
         qp = new ServerQuery(query, context);
-        qp.jc().tracer = QueryTracer.EVALINFO;
+        qp.jc().tracer = PASS;
         arg = Integer.toString(id++);
         queries.put(arg, qp);
         // send {ID}0
