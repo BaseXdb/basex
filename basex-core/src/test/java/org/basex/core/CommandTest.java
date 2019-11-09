@@ -76,6 +76,23 @@ public class CommandTest extends SandboxTest {
     ok(new Add("test.xml", "<x>te est</x>"));
   }
 
+  /** Create Backup Test.
+   * Using glob Syntax. */
+  @Test public final void alterBackup() {
+    no(new AlterBackup("unknown", NAME));
+
+    ok(new CreateDB(NAME));
+    ok(new Close());
+    ok(new CreateBackup(NAME));
+
+    ok(new AlterBackup(NAME, NAME2));
+    ok(new AlterBackup(NAME2, NAME));
+    no(new AlterBackup(NAME2, NAME));
+    no(new AlterBackup(NAME2, "?"));
+    no(new AlterBackup("?", NAME2));
+    ok(new DropBackup(NAME));
+  }
+
   /** Command test. */
   @Test public final void alterDB() {
     no(new AlterDB("unknown", NAME));

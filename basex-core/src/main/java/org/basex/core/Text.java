@@ -592,7 +592,7 @@ public interface Text {
   String NO_DB_DROPPED = lang("no_db_dropped");
   /** Database not dropped. */
   String DB_NOT_DROPPED_X = lang("db_not_dropped_%");
-  /** Database altered. */
+  /** Database renamed. */
   String DB_RENAMED_X = lang("db_renamed_%");
   /** Database not dropped. */
   String DB_NOT_RENAMED_X = lang("db_not_renamed_%");
@@ -616,7 +616,11 @@ public interface Text {
   String DB_EXPORTED_X = lang("db_exported_%");
   /** Database already exists. */
   String DB_EXISTS_X = lang("db_exists_%");
-  /** Database was dropped. */
+  /** Database was renamed. */
+  String BACKUP_RENAMED_X = lang("backup_renamed_%");
+  /** Database was not renamed. */
+  String BACKUP_NOT_RENAMED_X = lang("backup_not_renamed_%");
+ /** Database was dropped. */
   String BACKUP_DROPPED_X = lang("backup_dropped_%");
   /** Backup was not found. */
   String BACKUP_NOT_FOUND_X = lang("backup_not_found_%");
@@ -721,7 +725,7 @@ public interface Text {
   String USER_CREATED_X = lang("user_created_%");
   /** Password changed. */
   String PW_CHANGED_X = lang("pw_changed_%");
-  /** User altered. */
+  /** User renamed. */
   String USER_RENAMED_X_X = lang("user_renamed_%_%");
   /** User unknown. */
   String USER_EXISTS_X = lang("user_exists_%");

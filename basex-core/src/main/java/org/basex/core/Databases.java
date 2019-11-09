@@ -163,8 +163,8 @@ public final class Databases {
    * @param backup name of the backup file, including the date
    * @return date string
    */
-  public static Date date(final String backup) {
-    return DateTime.parse(backup.replaceAll("^.+-(" + DATE + ")$", "$1"));
+  public static String date(final String backup) {
+    return backup.replaceAll("^.+-(" + DATE + ")$", "$1");
   }
 
   /**

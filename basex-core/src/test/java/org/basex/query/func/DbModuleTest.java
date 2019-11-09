@@ -157,6 +157,31 @@ public final class DbModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void alterBackup() {
+    // close database in global context
+    final Function func = _DB_ALTER_BACKUP;
+    execute(new Close());
+
+    query(_DB_CREATE_BACKUP.args(NAME));
+
+    // rename database to new name and vice versa
+    query(func.args(NAME, NAME + 'a'));
+    query(func.args(NAME + 'a', NAME));
+
+    // invalid names
+    error(func.args("x", " ''"), DB_NAME_X);
+    error(func.args(" ''", "x"), DB_NAME_X);
+
+    // same name is disallowed
+    error(func.args(NAME, NAME), DB_CONFLICT4_X);
+    // source database does not exist
+    error(func.args(NAME + "alter", NAME), DB_NOBACKUP_X);
+
+    execute(new DropBackup(NAME));
+    error(func.args(NAME, NAME + "alter"), DB_NOBACKUP_X);
+  }
+
+  /** Test method. */
   @Test public void attribute() {
     // run function without and with index
     final Function func = _DB_ATTRIBUTE;

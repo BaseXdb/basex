@@ -68,6 +68,8 @@ final class XMLParser extends CommandParser {
     final String e = ((ANode) root).qname().toJava().toString();
     if(e.equals(ADD) && check(root, PATH + '?', '<' + INPUT))
       return new Add(value(root, PATH), xml(root));
+    if(e.equals(ALTER_BACKUP) && check(root, NAME, NEWNAME))
+      return new AlterBackup(value(root, NAME), value(root, NEWNAME));
     if(e.equals(ALTER_DB) && check(root, NAME, NEWNAME))
       return new AlterDB(value(root, NAME), value(root, NEWNAME));
     if(e.equals(ALTER_PASSWORD) && check(root, NAME, '#' + PASSWORD + '?'))

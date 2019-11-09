@@ -77,6 +77,8 @@ final class StringParser extends CommandParser {
         return new Copy(name(cmd), name(cmd));
       case ALTER:
         switch(consume(CmdAlter.class, cmd)) {
+          case BACKUP:
+            return new AlterBackup(name(cmd), name(cmd));
           case DATABASE: case DB:
             return new AlterDB(name(cmd), name(cmd));
           case PASSWORD:

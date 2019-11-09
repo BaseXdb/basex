@@ -10,6 +10,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -43,7 +44,7 @@ public final class DbBackups extends StandardFunc {
         final String backup = backups.get((int) i);
         final long length = new IOFile(dbPath, backup + IO.ZIPSUFFIX).length();
         final String db = Databases.name(backup);
-        final Dtm dtm = Dtm.get(Databases.date(backup).getTime());
+        final Dtm dtm = Dtm.get(DateTime.parse(Databases.date(backup)).getTime());
         return new FElem(BACKUP).add(backup).add(DATABASE, db).add(DATE, dtm.string(info)).
             add(SIZE, token(length));
       }

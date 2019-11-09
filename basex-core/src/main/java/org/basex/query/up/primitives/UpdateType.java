@@ -23,6 +23,7 @@ public enum UpdateType {
 
   // Backup operation
 
+  /** Alter backup.         */ BACKUPALTER,
   /** Create backup.        */ BACKUPCREATE,
 
   // Operations on nodes of existing databases

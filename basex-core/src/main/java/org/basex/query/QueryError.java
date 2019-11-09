@@ -207,7 +207,7 @@ public enum QueryError {
   /** Error code. */
   DB_CONFLICT3_X(DB, "conflict", "Database '%' cannot be both altered and dropped."),
   /** Error code. */
-  DB_CONFLICT4_X(DB, "conflict", "Name of source and target database is equal: %."),
+  DB_CONFLICT4_X(DB, "conflict", "Name of source and target is equal: %."),
   /** Error code. */
   DB_LOCK1_X(DB, "lock", "Database '%' cannot be updated, it is opened by another process."),
   /** Error code. */

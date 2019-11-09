@@ -751,6 +751,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _DB_ALTER(DbAlter.class, "alter(database, new-name)", arg(STR_O, STR_O), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
+  _DB_ALTER_BACKUP(DbAlterBackup.class, "alter-backup(name, new-name)",
+      arg(STR_O, STR_O), EMP, flag(UPD), DB_URI),
+  /** XQuery function. */
   _DB_ATTRIBUTE(DbAttribute.class, "attribute(database,strings[,name])",
       arg(STR_O, ITEM_ZM, STR_O), ATT_ZM, flag(NDT), DB_URI),
   /** XQuery function. */

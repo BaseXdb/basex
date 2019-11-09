@@ -282,8 +282,7 @@ public final class Context {
    * @return resulting list
    */
   public StringList listDBs(final String pattern) {
-    final StringList dbs = databases.listDBs(pattern);
-    final StringList sl = new StringList(dbs.size());
+    final StringList dbs = databases.listDBs(pattern), sl = new StringList(dbs.size());
     for(final String db : dbs) {
       if(perm(Perm.READ, db)) sl.add(db);
     }
