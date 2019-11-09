@@ -59,235 +59,6 @@ public final class DbModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void open() {
-    final Function func = _DB_OPEN;
-    query("count(" + func.args(NAME) + ")", 1);
-    query("count(" + func.args(NAME, "") + ")", 1);
-    query("count(" + func.args(NAME, "unknown") + ")", 0);
-
-    // close database instance
-    execute(new Close());
-    query("count(" + func.args(NAME, "unknown") + ")", 0);
-    query(func.args(NAME) + "//title/text()", "XML");
-
-    // reference invalid path
-    if(Prop.WIN) error(func.args(NAME, "*"), RESINV_X);
-
-    // run function on non-existing database
-    execute(new DropDB(NAME));
-    error(func.args(NAME), DB_OPEN2_X);
-  }
-
-  /** Test method. */
-  @Test public void openPre() {
-    final Function func = _DB_OPEN_PRE;
-    query(func.args(NAME, 0) + "//title/text()", "XML");
-    error(func.args(NAME, -1), DB_RANGE_X_X_X);
-    error(func.args(NAME, Integer.MAX_VALUE), DB_RANGE_X_X_X);
-  }
-
-  /** Test method. */
-  @Test public void openId() {
-    final Function func = _DB_OPEN_ID;
-    query(func.args(NAME, 0) + "//title/text()", "XML");
-    error(func.args(NAME, -1), DB_RANGE_X_X_X);
-    error(func.args(NAME, Integer.MAX_VALUE), DB_RANGE_X_X_X);
-  }
-
-  /** Test method. */
-  @Test public void text() {
-    // run function without and with index
-    final Function func = _DB_TEXT;
-    execute(new DropIndex(CmdIndex.TEXT));
-    error(func.args(NAME, "XML"), DB_NOINDEX_X_X);
-
-    execute(new CreateIndex(CmdIndex.TEXT));
-    query(func.args(NAME, "XML"), "XML");
-    query(func.args(NAME, "XXX"), "");
-  }
-
-  /** Test method. */
-  @Test public void textRange() {
-    // run function without and with index
-    final Function func = _DB_TEXT_RANGE;
-    execute(new DropIndex(CmdIndex.TEXT));
-    error(func.args(NAME, "Exercise", "Fun"), DB_NOINDEX_X_X);
-
-    execute(new CreateIndex(CmdIndex.TEXT));
-    query(func.args(NAME, "Exercise", "Fun"), "Exercise 1\nExercise 2");
-    query(func.args(NAME, "XXX", "XXX"), "");
-  }
-
-  /** Test method. */
-  @Test public void attribute() {
-    // run function without and with index
-    final Function func = _DB_ATTRIBUTE;
-    execute(new DropIndex(CmdIndex.ATTRIBUTE));
-    error(func.args(NAME, "0"), DB_NOINDEX_X_X);
-
-    execute(new CreateIndex(CmdIndex.ATTRIBUTE));
-    query(func.args(NAME, "0"), "id=\"0\"");
-    query(func.args(NAME, "0", "id"), "id=\"0\"");
-    query(func.args(NAME, "0", "XXX"), "");
-    query(func.args(NAME, "XXX"), "");
-  }
-
-  /** Test method. */
-  @Test public void attributeRange() {
-    // run function without and with index
-    final Function func = _DB_ATTRIBUTE_RANGE;
-    execute(new DropIndex(CmdIndex.ATTRIBUTE));
-    error(func.args(NAME, "0", "9") + "/data()", DB_NOINDEX_X_X);
-
-    execute(new CreateIndex(CmdIndex.ATTRIBUTE));
-    query(func.args(NAME, "0", "9") + "/data()", "0\n1");
-    query(func.args(NAME, "XXX", "XXX"), "");
-  }
-
-  /** Test method. */
-  @Test public void token() {
-    // run function without and with index
-    final Function func = _DB_TOKEN;
-    execute(new DropIndex(CmdIndex.TOKEN));
-    error("data(" + func.args(NAME, "0") + ")", DB_NOINDEX_X_X);
-
-    execute(new CreateIndex(CmdIndex.TOKEN));
-    query("data(" + func.args(NAME, "0") + ")", 0);
-    query("data(" + func.args(NAME, "0", "id") + ")", 0);
-    query("data(" + func.args(NAME, "0", "XXX") + ")", "");
-    query("data(" + func.args(NAME, "XXX") + ")", "");
-  }
-
-  /** Test method. */
-  @Test public void list() {
-    // add documents
-    final Function func = _DB_LIST;
-    execute(new Add("test/docs", FLDR));
-    contains(func.args(NAME), "test/docs");
-    contains(func.args(NAME, "test/"), "test/docs");
-    contains(func.args(NAME, "test/docs/input.xml"), "input.xml");
-
-    query(_DB_STORE.args(NAME, "bin/b", "b"));
-    query(func.args(NAME, "bin/"), "bin/b");
-    query(func.args(NAME, "bin/b"), "bin/b");
-
-    // create two other database and compare substring
-    execute(new CreateDB(NAME + 1));
-    execute(new CreateDB(NAME + 2));
-    contains(func.args(), NAME + 1 + '\n' + NAME + 2);
-    execute(new DropDB(NAME + 1));
-    execute(new DropDB(NAME + 2));
-  }
-
-  /** Test method. */
-  @Test public void listDetails() {
-    final Function func = _DB_LIST_DETAILS;
-    query(func.args() + "/@resources/string()", 1);
-
-    query(_DB_ADD.args(NAME, " <a/>", "xml"));
-    query(_DB_STORE.args(NAME, "raw", "bla"));
-
-    final String xmlCall = func.args(NAME, "xml");
-    query(xmlCall + "/@raw/data()", false);
-    query(xmlCall + "/@content-type/data()", MediaType.APPLICATION_XML.toString());
-    query(xmlCall + "/@modified-date/xs:dateTime(.)");
-    query(xmlCall + "/@size/data()", 2);
-    query(xmlCall + "/text()", "xml");
-
-    final String rawCall = func.args(NAME, "raw");
-    query(rawCall + "/@raw/data()", true);
-    query(rawCall + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
-    query(rawCall + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", true);
-    query(rawCall + "/@size/data()", 3);
-    query(rawCall + "/text()", "raw");
-
-    query(func.args(NAME, "test"), "");
-    error(func.args("notAvailable"), DB_OPEN2_X);
-  }
-
-  /** Test method. */
-  @Test public void dir() {
-    final Function func = _DB_DIR;
-    query(_DB_ADD.args(NAME, " <a/>", "xml/doc.xml"));
-    query(_DB_STORE.args(NAME, "raw/raw.data", "bla"));
-
-    final String xmlCall = func.args(NAME, "xml");
-    query(xmlCall + "/@raw/data()", false);
-    query(xmlCall + "/@content-type/data()", MediaType.APPLICATION_XML.toString());
-    query(xmlCall + "/@modified-date/xs:dateTime(.)");
-    query(xmlCall + "/@size/data()", "");
-    query(xmlCall + "/text()", "doc.xml");
-
-    final String rawCall = func.args(NAME, "raw");
-    query(rawCall + "/@raw/data()", true);
-    query(rawCall + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
-    query(rawCall + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", true);
-    query(rawCall + "/@size/data()", 3);
-    query(rawCall + "/text()", "raw.data");
-
-    query(func.args(NAME, "test"), "");
-    error(func.args("notAvailable", ""), DB_OPEN2_X);
-  }
-
-  /** Test method. */
-  @Test public void backups() {
-    final Function func = _DB_BACKUPS;
-    query("count(" + func.args(NAME) + ")", 0);
-    execute(new CreateBackup(NAME));
-    query("count(" + func.args() + ")", 1);
-    query("count(" + func.args(NAME) + ")", 1);
-    query("count(" + func.args(NAME) + "/(@database | @date | @size))", 3);
-    query("count(" + func.args(NAME) + "/(@database, @date, @size))", 3);
-    query("count(" + func.args(NAME + 'X') + ")", 0);
-    execute(new DropBackup(NAME));
-    query("count(" + func.args(NAME) + ")", 0);
-  }
-
-  /** Test method. */
-  @Test public void system() {
-    final Function func = _DB_SYSTEM;
-    contains(func.args(), Prop.VERSION);
-  }
-
-  /** Test method. */
-  @Test public void option() {
-    final Function func = _DB_OPTION;
-    query(func.args("addraw"), false);
-    query(func.args("ADDRAW"), false);
-    query(func.args("runs"), 1);
-    query(func.args("bindings"), "");
-    error(func.args("XYZ"), DB_OPTION_X);
-  }
-
-  /** Test method. */
-  @Test public void info() {
-    final Function func = _DB_INFO;
-    query("count(" + func.args(NAME) + "//" +
-        SIZE.replaceAll("[- ]", "").toLowerCase(Locale.ENGLISH) + ')', 1);
-  }
-
-  /** Test method. */
-  @Test public void property() {
-    final Function func = _DB_PROPERTY;
-    query(func.args(NAME, "name"), NAME);
-    error(func.args(NAME, "xyz"), DB_PROPERTY_X);
-  }
-
-  /** Test method. */
-  @Test public void nodeID() {
-    final Function func = _DB_NODE_ID;
-    query(func.args(" /html"), 1);
-    query(func.args(" / | /html"), "0\n1");
-  }
-
-  /** Test method. */
-  @Test public void nodePre() {
-    final Function func = _DB_NODE_PRE;
-    query(func.args(" /html"), 1);
-    query(func.args(" / | /html"), "0\n1");
-  }
-
-  /** Test method. */
   @Test public void add() {
     final Function func = _DB_ADD;
     query("count(" + COLLECTION.args(NAME) + ")", 1);
@@ -366,11 +137,97 @@ public final class DbModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void delete() {
-    final Function func = _DB_DELETE;
-    execute(new Add("test/docs", FLDR));
-    query(func.args(NAME, "test"));
-    query("count(" + COLLECTION.args(NAME + "/test") + ")", 0);
+  @Test public void alter() {
+    // close database in global context
+    final Function func = _DB_ALTER;
+    execute(new Close());
+
+    // rename database to new name and vice versa
+    query(func.args(NAME, NAME + 'a'));
+    query(func.args(NAME + 'a', NAME));
+
+    // invalid names
+    error(func.args("x", " ''"), DB_NAME_X);
+    error(func.args(" ''", "x"), DB_NAME_X);
+
+    // same name is disallowed
+    error(func.args(NAME, NAME), DB_CONFLICT4_X);
+    // source database does not exist
+    error(func.args(NAME + "alter", NAME), DB_OPEN1_X);
+  }
+
+  /** Test method. */
+  @Test public void attribute() {
+    // run function without and with index
+    final Function func = _DB_ATTRIBUTE;
+    execute(new DropIndex(CmdIndex.ATTRIBUTE));
+    error(func.args(NAME, "0"), DB_NOINDEX_X_X);
+
+    execute(new CreateIndex(CmdIndex.ATTRIBUTE));
+    query(func.args(NAME, "0"), "id=\"0\"");
+    query(func.args(NAME, "0", "id"), "id=\"0\"");
+    query(func.args(NAME, "0", "XXX"), "");
+    query(func.args(NAME, "XXX"), "");
+  }
+
+  /** Test method. */
+  @Test public void attributeRange() {
+    // run function without and with index
+    final Function func = _DB_ATTRIBUTE_RANGE;
+    execute(new DropIndex(CmdIndex.ATTRIBUTE));
+    error(func.args(NAME, "0", "9") + "/data()", DB_NOINDEX_X_X);
+
+    execute(new CreateIndex(CmdIndex.ATTRIBUTE));
+    query(func.args(NAME, "0", "9") + "/data()", "0\n1");
+    query(func.args(NAME, "XXX", "XXX"), "");
+  }
+
+  /** Test method. */
+  @Test public void backups() {
+    final Function func = _DB_BACKUPS;
+    query("count(" + func.args(NAME) + ")", 0);
+    execute(new CreateBackup(NAME));
+    query("count(" + func.args() + ")", 1);
+    query("count(" + func.args(NAME) + ")", 1);
+    query("count(" + func.args(NAME) + "/(@database | @date | @size))", 3);
+    query("count(" + func.args(NAME) + "/(@database, @date, @size))", 3);
+    query("count(" + func.args(NAME + 'X') + ")", 0);
+    execute(new DropBackup(NAME));
+    query("count(" + func.args(NAME) + ")", 0);
+  }
+
+  /** Test method. */
+  @Test public void contentType() {
+    final Function func = _DB_CONTENT_TYPE;
+    query(_DB_ADD.args(NAME, " <a/>", "xml"));
+    query(_DB_STORE.args(NAME, "raw", "bla"));
+    query(func.args(NAME, "xml"), MediaType.APPLICATION_XML.toString());
+    query(func.args(NAME, "raw"), MediaType.APPLICATION_OCTET_STREAM.toString());
+    error(func.args(NAME, "test"), WHICHRES_X);
+  }
+
+  /** Test method. */
+  @Test public void copy() {
+    // close database in global context
+    final Function func = _DB_COPY;
+    execute(new Close());
+
+    // copy database to new name and vice versa
+    query(func.args(NAME, NAME + 'c'));
+    try {
+      query(func.args(NAME + 'c', NAME));
+    } finally {
+      query(_DB_DROP.args(NAME + 'c'));
+    }
+
+    // invalid names
+    error(func.args("x", " ''"), DB_NAME_X);
+    error(func.args(" ''", "x"), DB_NAME_X);
+
+    // same name is disallowed
+    error(func.args(NAME, NAME), DB_CONFLICT4_X);
+    // source database does not exist
+    error(func.args(NAME + "copy", NAME), DB_OPEN1_X);
   }
 
   /** Test method. */
@@ -500,6 +357,51 @@ public final class DbModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void createBackup() {
+    final Function func = _DB_CREATE_BACKUP;
+    query("count(" + _DB_BACKUPS.args(NAME) + ")", 0);
+    query(func.args(NAME));
+    query("count(" + _DB_BACKUPS.args(NAME) + ")", 1);
+
+    // invalid name
+    error(func.args(""), DB_NAME_X);
+    // try to backup non-existing database
+    error(func.args(NAME + "backup"), DB_OPEN1_X);
+  }
+
+  /** Test method. */
+  @Test public void delete() {
+    final Function func = _DB_DELETE;
+    execute(new Add("test/docs", FLDR));
+    query(func.args(NAME, "test"));
+    query("count(" + COLLECTION.args(NAME + "/test") + ")", 0);
+  }
+
+  /** Test method. */
+  @Test public void dir() {
+    final Function func = _DB_DIR;
+    query(_DB_ADD.args(NAME, " <a/>", "xml/doc.xml"));
+    query(_DB_STORE.args(NAME, "raw/raw.data", "bla"));
+
+    final String xmlCall = func.args(NAME, "xml");
+    query(xmlCall + "/@raw/data()", false);
+    query(xmlCall + "/@content-type/data()", MediaType.APPLICATION_XML.toString());
+    query(xmlCall + "/@modified-date/xs:dateTime(.)");
+    query(xmlCall + "/@size/data()", "");
+    query(xmlCall + "/text()", "doc.xml");
+
+    final String rawCall = func.args(NAME, "raw");
+    query(rawCall + "/@raw/data()", true);
+    query(rawCall + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
+    query(rawCall + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", true);
+    query(rawCall + "/@size/data()", 3);
+    query(rawCall + "/text()", "raw.data");
+
+    query(func.args(NAME, "test"), "");
+    error(func.args("notAvailable", ""), DB_OPEN2_X);
+  }
+
+  /** Test method. */
   @Test public void drop() {
     final Function func = _DB_DROP;
     final String dbName = NAME + "DBCreate";
@@ -513,6 +415,305 @@ public final class DbModuleTest extends SandboxTest {
     error(func.args(" ''"), DB_NAME_X);
     // try to drop non-existing DB
     error(func.args(dbName), DB_OPEN1_X);
+  }
+
+  /** Test method. */
+  @Test public void dropBackup() {
+    // create and drop backup
+    final Function func = _DB_DROP_BACKUP;
+    query(_DB_CREATE_BACKUP.args(NAME));
+    query(func.args(NAME));
+    query("count(" + _DB_BACKUPS.args(NAME) + ")", 0);
+
+    // create and drop backup file
+    query(_DB_CREATE_BACKUP.args(NAME));
+    query(func.args(' ' + query(_DB_BACKUPS.args(NAME))));
+
+    // invalid name
+    error(func.args(""), DB_NAME_X);
+    // backup file does not exist
+    error(func.args(NAME), DB_NOBACKUP_X);
+    // check if drop is called before create
+    error(_DB_CREATE_BACKUP.args(NAME) + ',' + func.args(NAME), DB_NOBACKUP_X);
+  }
+
+  /** Test method. */
+  @Test public void exists() {
+    final Function func = _DB_EXISTS;
+    query(_DB_ADD.args(NAME, " <a/>", "x/xml"));
+    query(_DB_STORE.args(NAME, "x/raw", "bla"));
+    // checks if the specified resources exist (false expected for directories)
+    query(func.args(NAME), true);
+    query(func.args(NAME, "x/xml"), true);
+    query(func.args(NAME, "x/raw"), true);
+    query(func.args(NAME, "xxx"), false);
+    query(func.args(NAME, "x"), false);
+    query(func.args(NAME, ""), false);
+    // false expected for missing database
+    execute(new DropDB(NAME));
+    query(func.args(NAME), false);
+  }
+
+  /** Test method. */
+  @Test public void export() {
+    final Function func = _DB_EXPORT;
+    // exports the database
+    query(func.args(NAME, new IOFile(Prop.TEMPDIR, NAME)));
+    final IOFile path = new IOFile(new IOFile(Prop.TEMPDIR, NAME), XML.replaceAll(".*/", ""));
+    query(_FILE_EXISTS.args(path));
+    // serializes as text; ensures that the output contains no angle bracket
+    query(func.args(NAME, new IOFile(Prop.TEMPDIR, NAME), " map {'method':'text'}"));
+    query("0[contains(" + _FILE_READ_TEXT.args(path) + ", '&lt;')]", "");
+    // deletes the exported file
+    query(_FILE_DELETE.args(path));
+  }
+
+  /** Test method. */
+  @Test public void flush() {
+    final Function func = _DB_FLUSH;
+    query(func.args(NAME));
+    error(func.args(NAME + "unknown"), DB_OPEN2_X);
+  }
+
+  /** Test method. */
+  @Test public void info() {
+    final Function func = _DB_INFO;
+    query("count(" + func.args(NAME) + "//" +
+        SIZE.replaceAll("[- ]", "").toLowerCase(Locale.ENGLISH) + ')', 1);
+  }
+
+  /** Test method. */
+  @Test public void isRaw() {
+    final Function func = _DB_IS_RAW;
+    query(_DB_ADD.args(NAME, " <a/>", "xml"));
+    query(_DB_STORE.args(NAME, "raw", "bla"));
+    query(func.args(NAME, "xml"), false);
+    query(func.args(NAME, "raw"), true);
+    query(func.args(NAME, "xxx"), false);
+  }
+
+  /** Test method. */
+  @Test public void isXML() {
+    final Function func = _DB_IS_XML;
+    query(_DB_ADD.args(NAME, " <a/>", "xml"));
+    query(_DB_STORE.args(NAME, "raw", "bla"));
+    query(func.args(NAME, "xml"), true);
+    query(func.args(NAME, "raw"), false);
+    query(func.args(NAME, "xxx"), false);
+  }
+
+  /** Test method. */
+  @Test public void list() {
+    // add documents
+    final Function func = _DB_LIST;
+    execute(new Add("test/docs", FLDR));
+    contains(func.args(NAME), "test/docs");
+    contains(func.args(NAME, "test/"), "test/docs");
+    contains(func.args(NAME, "test/docs/input.xml"), "input.xml");
+
+    query(_DB_STORE.args(NAME, "bin/b", "b"));
+    query(func.args(NAME, "bin/"), "bin/b");
+    query(func.args(NAME, "bin/b"), "bin/b");
+
+    // create two other database and compare substring
+    execute(new CreateDB(NAME + 1));
+    execute(new CreateDB(NAME + 2));
+    contains(func.args(), NAME + 1 + '\n' + NAME + 2);
+    execute(new DropDB(NAME + 1));
+    execute(new DropDB(NAME + 2));
+  }
+
+  /** Test method. */
+  @Test public void listDetails() {
+    final Function func = _DB_LIST_DETAILS;
+    query(func.args() + "/@resources/string()", 1);
+
+    query(_DB_ADD.args(NAME, " <a/>", "xml"));
+    query(_DB_STORE.args(NAME, "raw", "bla"));
+
+    final String xmlCall = func.args(NAME, "xml");
+    query(xmlCall + "/@raw/data()", false);
+    query(xmlCall + "/@content-type/data()", MediaType.APPLICATION_XML.toString());
+    query(xmlCall + "/@modified-date/xs:dateTime(.)");
+    query(xmlCall + "/@size/data()", 2);
+    query(xmlCall + "/text()", "xml");
+
+    final String rawCall = func.args(NAME, "raw");
+    query(rawCall + "/@raw/data()", true);
+    query(rawCall + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
+    query(rawCall + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", true);
+    query(rawCall + "/@size/data()", 3);
+    query(rawCall + "/text()", "raw");
+
+    query(func.args(NAME, "test"), "");
+    error(func.args("notAvailable"), DB_OPEN2_X);
+  }
+
+  /** Test method. */
+  @Test public void name() {
+    final Function func = _DB_NAME;
+    query(func.args(_DB_OPEN.args(NAME)), NAME);
+    query(func.args(_DB_OPEN.args(NAME) + "/*"), NAME);
+  }
+
+  /** Test method. */
+  @Test public void nodeID() {
+    final Function func = _DB_NODE_ID;
+    query(func.args(" /html"), 1);
+    query(func.args(" / | /html"), "0\n1");
+  }
+
+  /** Test method. */
+  @Test public void nodePre() {
+    final Function func = _DB_NODE_PRE;
+    query(func.args(" /html"), 1);
+    query(func.args(" / | /html"), "0\n1");
+  }
+
+  /** Test method. */
+  @Test public void open() {
+    final Function func = _DB_OPEN;
+    query("count(" + func.args(NAME) + ")", 1);
+    query("count(" + func.args(NAME, "") + ")", 1);
+    query("count(" + func.args(NAME, "unknown") + ")", 0);
+
+    // close database instance
+    execute(new Close());
+    query("count(" + func.args(NAME, "unknown") + ")", 0);
+    query(func.args(NAME) + "//title/text()", "XML");
+
+    // reference invalid path
+    if(Prop.WIN) error(func.args(NAME, "*"), RESINV_X);
+
+    // run function on non-existing database
+    execute(new DropDB(NAME));
+    error(func.args(NAME), DB_OPEN2_X);
+  }
+
+  /** Test method. */
+  @Test public void openId() {
+    final Function func = _DB_OPEN_ID;
+    query(func.args(NAME, 0) + "//title/text()", "XML");
+    error(func.args(NAME, -1), DB_RANGE_X_X_X);
+    error(func.args(NAME, Integer.MAX_VALUE), DB_RANGE_X_X_X);
+  }
+
+  /** Test method. */
+  @Test public void openPre() {
+    final Function func = _DB_OPEN_PRE;
+    query(func.args(NAME, 0) + "//title/text()", "XML");
+    error(func.args(NAME, -1), DB_RANGE_X_X_X);
+    error(func.args(NAME, Integer.MAX_VALUE), DB_RANGE_X_X_X);
+  }
+
+  /** Test method. */
+  @Test public void optimize() {
+    final Function func = _DB_OPTIMIZE;
+
+    // simple optimize call
+    query(func.args(NAME));
+    query(func.args(NAME));
+    // opened database cannot be fully optimized
+    error(func.args(NAME, true), UPDBERROR_X);
+    execute(new Close());
+    query(func.args(NAME, true));
+
+    // commands
+    final CmdIndex[] cis = { CmdIndex.TEXT, CmdIndex.ATTRIBUTE, CmdIndex.TOKEN, CmdIndex.FULLTEXT };
+    // options
+    final String[] indexes = lc(MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
+        MainOptions.TOKENINDEX, MainOptions.FTINDEX);
+    final String[] includes = lc(MainOptions.TEXTINCLUDE, MainOptions.ATTRINCLUDE,
+        MainOptions.TOKENINCLUDE, MainOptions.FTINCLUDE);
+    final String[] boolOptions = new StringList(indexes).add(lc(MainOptions.STEMMING,
+        MainOptions.CASESENS, MainOptions.DIACRITICS)).finish();
+    final String[] stringOptions = lc(MainOptions.LANGUAGE, MainOptions.STOPWORDS);
+    final String[] numberOptions = lc(MainOptions.MAXCATS, MainOptions.MAXLEN,
+        MainOptions.SPLITSIZE);
+
+    // check single options
+    for(final String option : numberOptions)
+      query(func.args(NAME, false, " map { '" + option + "': 1 }"));
+    for(final String option : boolOptions) {
+      for(final boolean bool : new boolean[] { true, false })
+        query(func.args(NAME, false, " map { '" + option + "':" + bool + "() }"));
+    }
+    for(final String option : stringOptions)
+      query(func.args(NAME, false, " map { '" + option + "':'' }"));
+    // ensure that option in context was not changed
+    assertEquals(context.options.get(MainOptions.TEXTINDEX), true);
+
+    // check invalid options
+    error(func.args(NAME, false, " map { 'xyz': 'abc' }"), BASEX_OPTIONS1_X);
+    error(func.args(NAME, false, " map { '" + lc(MainOptions.UPDINDEX) + "': 1 }"),
+        BASEX_OPTIONS1_X);
+    error(func.args(NAME, false, " map { '" + lc(MainOptions.MAXLEN) + "': -1 }"),
+        BASEX_OPTIONS_X_X);
+    error(func.args(NAME, false, " map { '" + lc(MainOptions.MAXLEN) + "': 'a' }"),
+        BASEX_OPTIONS_X_X);
+    error(func.args(NAME, false, " map { '" + lc(MainOptions.TEXTINDEX) + "':'nope' }"),
+        BASEX_OPTIONS_X_X);
+
+    // check if optimize call adopts original options
+    query(func.args(NAME));
+    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", false);
+    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "");
+
+    // check if options in context are adopted
+    execute(new Open(NAME));
+    for(final String inc : includes) execute(new Set(inc, "a"));
+    for(final CmdIndex ci : cis) execute(new CreateIndex(ci));
+    execute(new Close());
+    query(func.args(NAME));
+    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", true);
+    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "a");
+
+    // check if options in context are adopted, even if database is closed (reset options)
+    execute(new Open(NAME));
+    for(final String inc : includes) execute(new Set(inc, ""));
+    for(final CmdIndex cmd : cis) execute(new DropIndex(cmd));
+    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", false);
+    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "");
+    execute(new Close());
+    query(func.args(NAME));
+    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", false);
+    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "");
+
+    // check if options specified in map are adopted
+    final StringBuilder options = new StringBuilder();
+    for(final String option : indexes) options.append('\'').append(option).append("':true(),");
+    for(final String option : includes) options.append('\'').append(option).append("':'a',");
+    options.append('\'').append(lc(MainOptions.UPDINDEX)).append("':true()");
+    query(func.args(NAME, true, " map { " + options + '}'));
+
+    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", true);
+    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "a");
+    query(_DB_INFO.args(NAME) + "//" + lc(MainOptions.UPDINDEX) + "/text()", true);
+  }
+
+  /** Test method. */
+  @Test public void option() {
+    final Function func = _DB_OPTION;
+    query(func.args("addraw"), false);
+    query(func.args("ADDRAW"), false);
+    query(func.args("runs"), 1);
+    query(func.args("bindings"), "");
+    error(func.args("XYZ"), DB_OPTION_X);
+  }
+
+  /** Test method. */
+  @Test public void path() {
+    final Function func = _DB_PATH;
+    query(func.args(_DB_OPEN.args(NAME)), XML.replaceAll(".*/", ""));
+    query(func.args(_DB_OPEN.args(NAME) + "/*"), XML.replaceAll(".*/", ""));
+    query(func.args(" <x/> update ()"), "");
+  }
+
+  /** Test method. */
+  @Test public void property() {
+    final Function func = _DB_PROPERTY;
+    query(func.args(NAME, "name"), NAME);
+    error(func.args(NAME, "xyz"), DB_PROPERTY_X);
   }
 
   /** Test method. */
@@ -605,88 +806,21 @@ public final class DbModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void optimize() {
-    final Function func = _DB_OPTIMIZE;
-
-    // simple optimize call
-    query(func.args(NAME));
-    query(func.args(NAME));
-    // opened database cannot be fully optimized
-    error(func.args(NAME, true), UPDBERROR_X);
+  @Test public void restore() {
+    final Function func = _DB_RESTORE;
     execute(new Close());
-    query(func.args(NAME, true));
 
-    // commands
-    final CmdIndex[] cis = { CmdIndex.TEXT, CmdIndex.ATTRIBUTE, CmdIndex.TOKEN, CmdIndex.FULLTEXT };
-    // options
-    final String[] indexes = lc(MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
-        MainOptions.TOKENINDEX, MainOptions.FTINDEX);
-    final String[] includes = lc(MainOptions.TEXTINCLUDE, MainOptions.ATTRINCLUDE,
-        MainOptions.TOKENINCLUDE, MainOptions.FTINCLUDE);
-    final String[] boolOptions = new StringList(indexes).add(lc(MainOptions.STEMMING,
-        MainOptions.CASESENS, MainOptions.DIACRITICS)).finish();
-    final String[] stringOptions = lc(MainOptions.LANGUAGE, MainOptions.STOPWORDS);
-    final String[] numberOptions = lc(MainOptions.MAXCATS, MainOptions.MAXLEN,
-        MainOptions.SPLITSIZE);
-
-    // check single options
-    for(final String option : numberOptions)
-      query(func.args(NAME, false, " map { '" + option + "': 1 }"));
-    for(final String option : boolOptions) {
-      for(final boolean bool : new boolean[] { true, false })
-        query(func.args(NAME, false, " map { '" + option + "':" + bool + "() }"));
-    }
-    for(final String option : stringOptions)
-      query(func.args(NAME, false, " map { '" + option + "':'' }"));
-    // ensure that option in context was not changed
-    assertEquals(context.options.get(MainOptions.TEXTINDEX), true);
-
-    // check invalid options
-    error(func.args(NAME, false, " map { 'xyz': 'abc' }"), BASEX_OPTIONS1_X);
-    error(func.args(NAME, false, " map { '" + lc(MainOptions.UPDINDEX) + "': 1 }"),
-        BASEX_OPTIONS1_X);
-    error(func.args(NAME, false, " map { '" + lc(MainOptions.MAXLEN) + "': -1 }"),
-        BASEX_OPTIONS_X_X);
-    error(func.args(NAME, false, " map { '" + lc(MainOptions.MAXLEN) + "': 'a' }"),
-        BASEX_OPTIONS_X_X);
-    error(func.args(NAME, false, " map { '" + lc(MainOptions.TEXTINDEX) + "':'nope' }"),
-        BASEX_OPTIONS_X_X);
-
-    // check if optimize call adopts original options
+    // backup and restore file
+    query(_DB_CREATE_BACKUP.args(NAME));
     query(func.args(NAME));
-    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", false);
-    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "");
-
-    // check if options in context are adopted
-    execute(new Open(NAME));
-    for(final String inc : includes) execute(new Set(inc, "a"));
-    for(final CmdIndex ci : cis) execute(new CreateIndex(ci));
-    execute(new Close());
     query(func.args(NAME));
-    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", true);
-    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "a");
 
-    // check if options in context are adopted, even if database is closed (reset options)
-    execute(new Open(NAME));
-    for(final String inc : includes) execute(new Set(inc, ""));
-    for(final CmdIndex cmd : cis) execute(new DropIndex(cmd));
-    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", false);
-    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "");
-    execute(new Close());
-    query(func.args(NAME));
-    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", false);
-    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "");
+    // drop backups
+    query(_DB_DROP_BACKUP.args(NAME));
+    error(func.args(NAME), DB_NOBACKUP_X);
 
-    // check if options specified in map are adopted
-    final StringBuilder options = new StringBuilder();
-    for(final String option : indexes) options.append('\'').append(option).append("':true(),");
-    for(final String option : includes) options.append('\'').append(option).append("':'a',");
-    options.append('\'').append(lc(MainOptions.UPDINDEX)).append("':true()");
-    query(func.args(NAME, true, " map { " + options + '}'));
-
-    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", true);
-    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "a");
-    query(_DB_INFO.args(NAME) + "//" + lc(MainOptions.UPDINDEX) + "/text()", true);
+    // invalid names
+    error(func.args(" ''"), DB_NAME_X);
   }
 
   /** Test method. */
@@ -710,181 +844,56 @@ public final class DbModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void flush() {
-    final Function func = _DB_FLUSH;
-    query(func.args(NAME));
-    error(func.args(NAME + "unknown"), DB_OPEN2_X);
+  @Test public void system() {
+    final Function func = _DB_SYSTEM;
+    contains(func.args(), Prop.VERSION);
   }
 
   /** Test method. */
-  @Test public void isRaw() {
-    final Function func = _DB_IS_RAW;
-    query(_DB_ADD.args(NAME, " <a/>", "xml"));
-    query(_DB_STORE.args(NAME, "raw", "bla"));
-    query(func.args(NAME, "xml"), false);
-    query(func.args(NAME, "raw"), true);
-    query(func.args(NAME, "xxx"), false);
+  @Test public void text() {
+    // run function without and with index
+    final Function func = _DB_TEXT;
+    execute(new DropIndex(CmdIndex.TEXT));
+    error(func.args(NAME, "XML"), DB_NOINDEX_X_X);
+
+    execute(new CreateIndex(CmdIndex.TEXT));
+    query(func.args(NAME, "XML"), "XML");
+    query(func.args(NAME, "XXX"), "");
   }
 
   /** Test method. */
-  @Test public void exists() {
-    final Function func = _DB_EXISTS;
-    query(_DB_ADD.args(NAME, " <a/>", "x/xml"));
-    query(_DB_STORE.args(NAME, "x/raw", "bla"));
-    // checks if the specified resources exist (false expected for directories)
-    query(func.args(NAME), true);
-    query(func.args(NAME, "x/xml"), true);
-    query(func.args(NAME, "x/raw"), true);
-    query(func.args(NAME, "xxx"), false);
-    query(func.args(NAME, "x"), false);
-    query(func.args(NAME, ""), false);
-    // false expected for missing database
-    execute(new DropDB(NAME));
-    query(func.args(NAME), false);
+  @Test public void textRange() {
+    // run function without and with index
+    final Function func = _DB_TEXT_RANGE;
+    execute(new DropIndex(CmdIndex.TEXT));
+    error(func.args(NAME, "Exercise", "Fun"), DB_NOINDEX_X_X);
+
+    execute(new CreateIndex(CmdIndex.TEXT));
+    query(func.args(NAME, "Exercise", "Fun"), "Exercise 1\nExercise 2");
+    query(func.args(NAME, "XXX", "XXX"), "");
   }
 
   /** Test method. */
-  @Test public void isXML() {
-    final Function func = _DB_IS_XML;
-    query(_DB_ADD.args(NAME, " <a/>", "xml"));
-    query(_DB_STORE.args(NAME, "raw", "bla"));
-    query(func.args(NAME, "xml"), true);
-    query(func.args(NAME, "raw"), false);
-    query(func.args(NAME, "xxx"), false);
+  @Test public void token() {
+    // run function without and with index
+    final Function func = _DB_TOKEN;
+    execute(new DropIndex(CmdIndex.TOKEN));
+    error("data(" + func.args(NAME, "0") + ")", DB_NOINDEX_X_X);
+
+    execute(new CreateIndex(CmdIndex.TOKEN));
+    query("data(" + func.args(NAME, "0") + ")", 0);
+    query("data(" + func.args(NAME, "0", "id") + ")", 0);
+    query("data(" + func.args(NAME, "0", "XXX") + ")", "");
+    query("data(" + func.args(NAME, "XXX") + ")", "");
   }
 
-  /** Test method. */
-  @Test public void contentType() {
-    final Function func = _DB_CONTENT_TYPE;
-    query(_DB_ADD.args(NAME, " <a/>", "xml"));
-    query(_DB_STORE.args(NAME, "raw", "bla"));
-    query(func.args(NAME, "xml"), MediaType.APPLICATION_XML.toString());
-    query(func.args(NAME, "raw"), MediaType.APPLICATION_OCTET_STREAM.toString());
-    error(func.args(NAME, "test"), WHICHRES_X);
-  }
-
-  /** Test method. */
-  @Test public void export() {
-    final Function func = _DB_EXPORT;
-    // exports the database
-    query(func.args(NAME, new IOFile(Prop.TEMPDIR, NAME)));
-    final IOFile path = new IOFile(new IOFile(Prop.TEMPDIR, NAME), XML.replaceAll(".*/", ""));
-    query(_FILE_EXISTS.args(path));
-    // serializes as text; ensures that the output contains no angle bracket
-    query(func.args(NAME, new IOFile(Prop.TEMPDIR, NAME), " map {'method':'text'}"));
-    query("0[contains(" + _FILE_READ_TEXT.args(path) + ", '&lt;')]", "");
-    // deletes the exported file
-    query(_FILE_DELETE.args(path));
-  }
-
-  /** Test method. */
-  @Test public void name() {
-    final Function func = _DB_NAME;
-    query(func.args(_DB_OPEN.args(NAME)), NAME);
-    query(func.args(_DB_OPEN.args(NAME) + "/*"), NAME);
-  }
-
-  /** Test method. */
-  @Test public void path() {
-    final Function func = _DB_PATH;
-    query(func.args(_DB_OPEN.args(NAME)), XML.replaceAll(".*/", ""));
-    query(func.args(_DB_OPEN.args(NAME) + "/*"), XML.replaceAll(".*/", ""));
-    query(func.args(" <x/> update ()"), "");
-  }
-
-  /** Test method. */
-  @Test public void createBackup() {
-    final Function func = _DB_CREATE_BACKUP;
-    query("count(" + _DB_BACKUPS.args(NAME) + ")", 0);
-    query(func.args(NAME));
-    query("count(" + _DB_BACKUPS.args(NAME) + ")", 1);
-
-    // invalid name
-    error(func.args(""), DB_NAME_X);
-    // try to backup non-existing database
-    error(func.args(NAME + "backup"), DB_OPEN1_X);
-  }
-
-  /** Test method. */
-  @Test public void dropBackup() {
-    // create and drop backup
-    final Function func = _DB_DROP_BACKUP;
-    query(_DB_CREATE_BACKUP.args(NAME));
-    query(func.args(NAME));
-    query("count(" + _DB_BACKUPS.args(NAME) + ")", 0);
-
-    // create and drop backup file
-    query(_DB_CREATE_BACKUP.args(NAME));
-    query(func.args(' ' + query(_DB_BACKUPS.args(NAME))));
-
-    // invalid name
-    error(func.args(""), DB_NAME_X);
-    // backup file does not exist
-    error(func.args(NAME), DB_NOBACKUP_X);
-    // check if drop is called before create
-    error(_DB_CREATE_BACKUP.args(NAME) + ',' + func.args(NAME), DB_NOBACKUP_X);
-  }
-
-  /** Test method. */
-  @Test public void copy() {
-    // close database in global context
-    final Function func = _DB_COPY;
-    execute(new Close());
-
-    // copy database to new name and vice versa
-    query(func.args(NAME, NAME + 'c'));
-    try {
-      query(func.args(NAME + 'c', NAME));
-    } finally {
-      query(_DB_DROP.args(NAME + 'c'));
-    }
-
-    // invalid names
-    error(func.args("x", " ''"), DB_NAME_X);
-    error(func.args(" ''", "x"), DB_NAME_X);
-
-    // same name is disallowed
-    error(func.args(NAME, NAME), DB_CONFLICT4_X);
-    // source database does not exist
-    error(func.args(NAME + "copy", NAME), DB_OPEN1_X);
-  }
-
-  /** Test method. */
-  @Test public void alter() {
-    // close database in global context
-    final Function func = _DB_ALTER;
-    execute(new Close());
-
-    // rename database to new name and vice versa
-    query(func.args(NAME, NAME + 'a'));
-    query(func.args(NAME + 'a', NAME));
-
-    // invalid names
-    error(func.args("x", " ''"), DB_NAME_X);
-    error(func.args(" ''", "x"), DB_NAME_X);
-
-    // same name is disallowed
-    error(func.args(NAME, NAME), DB_CONFLICT4_X);
-    // source database does not exist
-    error(func.args(NAME + "alter", NAME), DB_OPEN1_X);
-  }
-
-  /** Test method. */
-  @Test public void restore() {
-    final Function func = _DB_RESTORE;
-    execute(new Close());
-
-    // backup and restore file
-    query(_DB_CREATE_BACKUP.args(NAME));
-    query(func.args(NAME));
-    query(func.args(NAME));
-
-    // drop backups
-    query(_DB_DROP_BACKUP.args(NAME));
-    error(func.args(NAME), DB_NOBACKUP_X);
-
-    // invalid names
-    error(func.args(" ''"), DB_NAME_X);
+  /**
+   * Returns a lower-case representation of the specified option.
+   * @param option option
+   * @return string
+   */
+  private static String lc(final Option<?> option) {
+    return option.name().toLowerCase(Locale.ENGLISH);
   }
 
   /**
@@ -896,14 +905,5 @@ public final class DbModuleTest extends SandboxTest {
     final StringList sl = new StringList();
     for(final Option<?> option : options) sl.add(lc(option));
     return sl.finish();
-  }
-
-  /**
-   * Returns a lower-case representation of the specified option.
-   * @param option option
-   * @return string
-   */
-  private static String lc(final Option<?> option) {
-    return option.name().toLowerCase(Locale.ENGLISH);
   }
 }
