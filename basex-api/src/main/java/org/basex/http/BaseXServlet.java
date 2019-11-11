@@ -83,13 +83,15 @@ public abstract class BaseXServlet extends HttpServlet {
       conn.error(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED_X, msg));
     } finally {
       if(Prop.debug) {
-        Util.outln("_ REQUEST _________________________________" + Prop.NL + req);
-        final Enumeration<String> en = req.getHeaderNames();
-        while(en.hasMoreElements()) {
-          final String key = en.nextElement();
-          Util.outln(Text.LI + key + Text.COLS + req.getHeader(key));
+        Util.errln("Request: " + req.getMethod() + ' ' + req.getRequestURL());
+        for(final Enumeration<String> en = req.getHeaderNames(); en.hasMoreElements();) {
+          final String name = en.nextElement();
+          Util.errln("* " + name + ": " + req.getHeader(name));
         }
-        Util.out("_ RESPONSE ________________________________" + Prop.NL + res);
+        Util.errln("Response: " + res.getStatus());
+        for(final String name : res.getHeaderNames()) {
+          Util.errln("* " + name + ": " + res.getHeader(name));
+        }
       }
     }
   }
