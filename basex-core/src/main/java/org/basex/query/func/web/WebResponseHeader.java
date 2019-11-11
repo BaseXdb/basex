@@ -19,6 +19,6 @@ public final class WebResponseHeader extends WebFn {
     final HashMap<String, String> headers = toOptions(1, new Options(), qc).free();
     final ResponseOptions response = toOptions(2, new ResponseOptions(), qc);
 
-    return createResponse(output, headers, response);
+    return createResponse(response, headers, output);
   }
 }
