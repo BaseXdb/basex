@@ -175,6 +175,13 @@ public final class GUIConstants {
     }
   }
 
+  // DUMMY OBJECTS ============================================================
+
+  /** Dummy text field. */
+  private static final JTextField TEXTFIELD = new JTextField();
+  /** Dummy label, used for size calculations. */
+  private static final JLabel LABEL = new JLabel();
+
   // COLORS =======================================================================================
 
   /** UI defaults. */
