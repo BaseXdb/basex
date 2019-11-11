@@ -1,12 +1,12 @@
 package org.basex.query.func.web;
 
-import static org.basex.query.QueryText.*;
+import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 
 /**
  * Function implementation.
@@ -22,13 +22,12 @@ public final class WebRedirect extends WebFn {
     final byte[] anchor = exprs.length < 3 ? Token.EMPTY : toToken(exprs[2], qc);
     final byte[] location = createUrl(path, map, anchor);
 
-    final FElem hhead = new FElem(new QNm(HTTP_PREFIX, "header", HTTP_URI));
-    hhead.add("name", "location").add("value", location);
-    final FElem hresp = new FElem(new QNm(HTTP_PREFIX, "response", HTTP_URI)).declareNS();
-    hresp.add("status", "302").add(hhead);
-    final FElem rresp = new FElem(new QNm(REST_PREFIX, "response", REST_URI)).declareNS();
-    rresp.add(hresp);
+    final HashMap<String, String> output = new HashMap<>();
+    final HashMap<String, String> headers = new HashMap<>();
+    headers.put(HttpText.LOCATION, Token.string(location));
+    final ResponseOptions response = new ResponseOptions();
+    response.set(ResponseOptions.STATUS, 302);
 
-    return rresp;
+    return createResponse(output, headers, response);
   }
 }
