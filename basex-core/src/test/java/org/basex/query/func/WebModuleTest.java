@@ -66,12 +66,12 @@ public final class WebModuleTest extends SandboxTest {
   @Test public void redirect() {
     final Function func = _WEB_REDIRECT;
     query(func.args("a/b") + "/*:response/*:header/@value = 'a/b'", true);
-    query(func.args("a/b") + "/*:response/*:header/@name = 'location'", true);
+    query(func.args("a/b") + "/*:response/*:header/@name = 'Location'", true);
     query(func.args("a/b") + "/*:response/@status = 302", true);
     query(func.args("a/b", " map { }", "a") + "/*:response/*:header/@value = 'a/b#a'", true);
 
     query(func.args("a/b", " map { 'a':'b' }") +
-        "/*:response/*:header[@name = 'location']/@value/string()", "a/b?a=b");
+        "/*:response/*:header[@name = 'Location']/@value/string()", "a/b?a=b");
 
     // GH1585
     query("count((" + func.args("a") + " update {})/http:response)", 1);
