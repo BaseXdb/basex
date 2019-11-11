@@ -1,5 +1,6 @@
 package org.basex.http.restxq;
 
+import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.http.web.WebText.*;
 import static org.basex.util.Token.*;
 
@@ -65,7 +66,7 @@ public final class RestXqResponse extends WebResponse {
 
     final String id = func.singleton;
     final RestXqSingleton singleton = id != null ? new RestXqSingleton(conn, id, qc) : null;
-    String redirect = null, forward = null;
+    String forward = null;
     OutputStream out = null;
     boolean response;
 
@@ -82,18 +83,12 @@ public final class RestXqResponse extends WebResponse {
       // handle special cases
       if(item != null && item.type == NodeType.ELM) {
         final ANode node = (ANode) item;
-        if(REST_REDIRECT.matches(node)) {
-          // send redirect to browser
-          final ANode ch = node.childIter().next();
-          if(ch == null || ch.type != NodeType.TXT) throw func.error(NO_VALUE_X, node.name());
-          redirect = string(ch.string()).trim();
-          item = null;
-        } else if(REST_FORWARD.matches(node)) {
+        if(REST_FORWARD.matches(node)) {
           // server-side forwarding
           final ANode ch = node.childIter().next();
           if(ch == null || ch.type != NodeType.TXT) throw func.error(NO_VALUE_X, node.name());
           forward = string(ch.string()).trim();
-          item = null;
+          item = iter.next();
         } else if(REST_RESPONSE.matches(node)) {
           // custom response
           so = build(node);
@@ -107,7 +102,18 @@ public final class RestXqResponse extends WebResponse {
       // initialize serializer
       conn.sopts(so);
       conn.initResponse();
-      if(status != null) conn.status(status, message);
+
+      if(status != null) {
+        final int s = status;
+        final StringBuilder msg = new StringBuilder();
+        if(message != null) msg.append(message);
+        if(s == 302) {
+          if(msg.length() != 0) msg.append("; ");
+          msg.append(HttpText.LOCATION + ": " + conn.res.getHeader(HttpText.LOCATION));
+        }
+        conn.log(s, msg.toString());
+        conn.status(s, message, null);
+      }
 
       // serialize result
       if(item != null && body) {
@@ -122,9 +128,7 @@ public final class RestXqResponse extends WebResponse {
       qc.unregister(ctx);
       if(singleton != null) singleton.unregister();
 
-      if(redirect != null) {
-        conn.redirect(redirect);
-      } else if(forward != null) {
+      if(forward != null) {
         conn.forward(forward);
       } else {
         qc.checkStop();
@@ -137,7 +141,9 @@ public final class RestXqResponse extends WebResponse {
       final int size = (int) ao.size();
       if(size > 0) conn.res.getOutputStream().write(ao.buffer(), 0, size);
     }
-    return response ? status != null ? Response.CUSTOM : Response.STANDARD : Response.NONE;
+
+    return status != null || forward != null ? Response.CUSTOM :
+      response ? Response.STANDARD : Response.NONE;
   }
 
   /**
@@ -196,6 +202,8 @@ public final class RestXqResponse extends WebResponse {
         throw func.error(UNEXP_NODE_X, n);
       }
     }
+    if(status == null) status = SC_OK;
+
     // set content type and serialize data
     if(cType != null) sp.set(SerializerOptions.MEDIA_TYPE, cType);
     return sp;

@@ -14,7 +14,7 @@ public final class RestXqRedirectTest extends RestXqTest {
    * @throws Exception exception */
   @Test public void redirect() throws Exception {
     final String f =
-      "declare %R:path('')  function m:a() { element R:redirect { 'a' } };" +
+      "declare %R:path('')  function m:a() { web:redirect('a') };" +
       "declare %R:path('a') function m:b() { 'R' };";
     get(f, "", "R");
   }
@@ -24,7 +24,7 @@ public final class RestXqRedirectTest extends RestXqTest {
    * @throws Exception exception */
   @Test public void forward() throws Exception {
     final String f =
-      "declare %R:path('')  function m:a() { element R:forward { 'a' } };" +
+      "declare %R:path('')  function m:a() { web:forward('a') };" +
       "declare %R:path('a') function m:b() { 'F' };";
     get(f, "", "F");
   }

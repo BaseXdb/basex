@@ -63,6 +63,13 @@ public final class WebModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void forward() {
+    final Function func = _WEB_FORWARD;
+    query(func.args("a/b") + "/text() = 'a/b'", true);
+    query(func.args("a/b", " map { 'c': 'd' }") + "/text() = 'a/b?c=d'", true);
+  }
+
+  /** Test method. */
   @Test public void redirect() {
     final Function func = _WEB_REDIRECT;
     query(func.args("a/b") + "/*:response/*:header/@value = 'a/b'", true);

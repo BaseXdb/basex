@@ -1,11 +1,11 @@
 package org.basex.query.func.web;
 
-import java.util.*;
+import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.http.*;
 
 /**
  * Function implementation.
@@ -13,15 +13,10 @@ import org.basex.util.http.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class WebRedirect extends WebFn {
+public final class WebForward extends WebFn {
   @Override
   public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String location = createUrl(qc);
-
-    final HashMap<String, String> headers = new HashMap<>();
-    headers.put(HttpText.LOCATION, location);
-    final ResponseOptions response = new ResponseOptions();
-    response.set(ResponseOptions.STATUS, 302);
-    return createResponse(response, headers, null);
+    return new FElem(new QNm(REST_PREFIX, "forward", REST_URI)).declareNS().add(location);
   }
 }

@@ -187,17 +187,6 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Handles an HTTP status code and message.
-   * @param code status code
-   * @param message status message, will additionally be logged
-   * @throws IOException I/O exception
-   */
-  public void status(final int code, final String message) throws IOException {
-    log(code, message);
-    status(code, message, null);
-  }
-
-  /**
    * Assigns serialization parameters.
    * @param opts serialization parameters
    */
@@ -440,7 +429,7 @@ public final class HTTPConnection implements ClientInfo {
    * @throws IOException I/O exception
    */
   @SuppressWarnings("deprecation")
-  private void status(final int code, final String message, final String body) throws IOException {
+  public void status(final int code, final String message, final String body) throws IOException {
     try {
       res.resetBuffer();
       if(code == SC_UNAUTHORIZED && !res.containsHeader(WWW_AUTHENTICATE)) {

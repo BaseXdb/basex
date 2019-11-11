@@ -1389,6 +1389,8 @@ public enum Function implements AFunction {
   _WEB_ERROR(WebError.class, "error(code[,message])",
       arg(ITR_O, STR_O), ITEM_ZM, flag(NDT), WEB_URI),
   /** XQuery function. */
+  _WEB_FORWARD(WebForward.class, "forward(location[,params])", arg(STR_O, MAP_O), ELM_O, WEB_URI),
+  /** XQuery function. */
   _WEB_REDIRECT(WebRedirect.class, "redirect(location[,params[,anchor]])",
       arg(STR_O, MAP_O, STR_O), ELM_O, WEB_URI),
   /** XQuery function. */

@@ -78,7 +78,7 @@ abstract class WebFn extends StandardFunc {
     });
     rrest.add(hresp);
 
-    // Serialization parameters
+    // serialization parameters
     if(output != null) {
       final SerializerOptions so = SerializerMode.DEFAULT.get();
       for(final String entry : output.keySet())

@@ -121,8 +121,6 @@ public interface WebText {
   NameTest HTTP_RESPONSE = new NameTest(new QNm(RESPONSE, HTTP_URI));
   /** RESTXQ Response test. */
   NameTest REST_RESPONSE = new NameTest(new QNm(RESPONSE, REST_URI));
-  /** RESTXQ Redirect test. */
-  NameTest REST_REDIRECT = new NameTest(new QNm(REDIRECT, REST_URI));
   /** RESTXQ Forward test. */
   NameTest REST_FORWARD = new NameTest(new QNm(FORWARD, REST_URI));
   /** HTTP Header test. */
