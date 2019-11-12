@@ -74,8 +74,11 @@ public final class StaticOptions extends Options {
   /** Comment: written to options file. */
   public static final Comment C_HTTP = new Comment("HTTP Services");
 
-  /** Web path. */
+  /** Web path (cannot be specified in web.xml). */
   public static final StringOption WEBPATH = new StringOption("WEBPATH", Prop.HOMEDIR + "webapp");
+  /** Enable GZIP support (cannot be specified in web.xml). */
+  public static final BooleanOption GZIP = new BooleanOption("GZIP", false);
+
   /** REST path (relative to web path). */
   public static final StringOption RESTPATH = new StringOption("RESTPATH", "");
   /** RESTXQ path (relative to web path). */

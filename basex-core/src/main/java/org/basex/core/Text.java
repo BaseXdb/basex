@@ -118,8 +118,8 @@ public interface Text {
   String S_GUI = "GUI";
   /** GUI start information. */
   String S_GUIINFO =
-    " [-d] [file]" + NL +
-    "  [file]  Open specified XML or XQuery file" + NL +
+    " [-d] [files]" + NL +
+    "  [files]  Open specified files" + NL +
     "  -d  Enable debugging";
 
   /** HTTP server mode. */
@@ -130,6 +130,7 @@ public interface Text {
     "  stop       Stop running server" + NL +
     "  -c<input>  Execute commands from file or string" + NL +
     "  -d         Enable debugging output" + NL +
+    "  -g         Enable GZIP support" + NL +
     "  -h<port>   Set port of HTTP server" + NL +
     "  -l         Start in local mode" + NL +
     "  -n<name>   Set host name of database server" + NL +

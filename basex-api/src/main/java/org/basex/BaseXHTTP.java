@@ -14,6 +14,7 @@ import org.basex.io.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.handler.gzip.*;
 import org.eclipse.jetty.util.resource.*;
 import org.eclipse.jetty.webapp.*;
 import org.eclipse.jetty.xml.*;
@@ -78,7 +79,15 @@ public final class BaseXHTTP extends CLI {
     locate(WEBCONF, webapp);
     final IOFile url = locate(JETTYCONF, webapp);
     jetty = (Server) new XmlConfiguration(new PathResource(url.file())).configure();
-    jetty.setHandler(wac);
+
+    // enable GZIP support
+    if(soptions.get(StaticOptions.GZIP)) {
+      final GzipHandler gzip = new GzipHandler();
+      gzip.setHandler(wac);
+      jetty.setHandler(gzip);
+    } else {
+      jetty.setHandler(wac);
+    }
 
     ServerConnector sc = null;
     for(final Connector conn : jetty.getConnectors()) {
@@ -233,6 +242,9 @@ public final class BaseXHTTP extends CLI {
             break;
           case 'D': // hidden flag: daemon mode
             daemon = false;
+            break;
+          case 'g': // enable GZIP compression
+            Prop.put(StaticOptions.GZIP, Boolean.toString(true));
             break;
           case 'h': // parse HTTP port
             port = arg.number();
