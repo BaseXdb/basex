@@ -5,6 +5,8 @@ import static org.basex.util.http.HttpText.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
+import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
@@ -60,12 +62,12 @@ public final class HttpResponse {
     response.add(STATUS, token(conn.getResponseCode()));
     response.add(MESSAGE, msg == null ? "" : msg);
     // add <http:header/> elements
-    for(final String header : conn.getHeaderFields().keySet()) {
-      if(header != null) {
-        final FElem hdr = new FElem(Q_HEADER);
-        hdr.add(NAME, header);
-        hdr.add(VALUE, conn.getHeaderField(header));
-        response.add(hdr);
+    for(final Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
+      final String name = entry.getKey();
+      if(name != null) {
+        for(final String value : entry.getValue()) {
+          response.add(new FElem(Q_HEADER).add(NAME, name).add(VALUE, value));
+        }
       }
     }
 
