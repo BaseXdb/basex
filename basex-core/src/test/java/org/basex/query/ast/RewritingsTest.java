@@ -589,4 +589,14 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>/(*,@*)", "", root(MixedPath.class), exists(Union.class));
 
   }
+
+  /** Path tests. */
+  @Test public void gh1729() {
+    check("let $x := 'g' return <g/> ! self::g[name() = $x]", "<g/>", empty(CachedPath.class));
+  }
+
+  /** Path tests. */
+  @Test public void gh1752() {
+    check("'1' ! json:parse(.)/descendant::*[text()] = 1", true, empty(IterMap.class));
+  }
 }

@@ -905,8 +905,10 @@ public abstract class Path extends ParseExpr {
 
     boolean changed = false;
     if(root == null) {
-      // no root, no context: return simple map
-      if(var == null) return copyType(SimpleMap.get(info, ex, this));
+      if(var == null) {
+        root = ex;
+        changed = true;
+      }
     } else {
       final Expr rt = root.inline(var, ex, cc);
       if(rt != null) {
@@ -916,19 +918,21 @@ public abstract class Path extends ParseExpr {
     }
 
     // #1202: during inlining, expressions will be optimized, which are based on the context value
-    cc.pushFocus(root != null ? root : cc.qc.focus.value);
-    try {
-      final int sl = steps.length;
-      for(int s = 0; s < sl; s++) {
-        final Expr step = steps[s].inline(var, ex, cc);
-        if(step != null) {
-          steps[s] = step;
-          changed = true;
+    if(var != null) {
+      cc.pushFocus(root != null ? root : cc.qc.focus.value);
+      try {
+        final int sl = steps.length;
+        for(int s = 0; s < sl; s++) {
+          final Expr step = steps[s].inline(var, ex, cc);
+          if(step != null) {
+            steps[s] = step;
+            changed = true;
+          }
+          cc.updateFocus(steps[s]);
         }
-        cc.updateFocus(steps[s]);
+      } finally {
+        cc.removeFocus();
       }
-    } finally {
-      cc.removeFocus();
     }
     return changed ? optimize(cc) : null;
   }

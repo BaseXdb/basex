@@ -113,11 +113,13 @@ public abstract class Step extends Preds {
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
     boolean changed = false;
-    cc.pushFocus(this);
-    try {
-      changed = inlineAll(var, ex, exprs, cc);
-    } finally {
-      cc.removeFocus();
+    if(var != null) {
+      cc.pushFocus(this);
+      try {
+        changed = inlineAll(var, ex, exprs, cc);
+      } finally {
+        cc.removeFocus();
+      }
     }
     return changed ? optimize(cc) : null;
   }

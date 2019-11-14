@@ -5,7 +5,6 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.ast.*;
 import org.basex.query.expr.constr.*;
-import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
@@ -106,10 +105,5 @@ public final class SimpleMapTest extends QueryPlanTest {
     check("(1 to 2) ! ('a', 'a')", "a\na\na\na", exists(SingletonSeq.class) + " and .//@size = 4");
     check("(1 to 2) ! util:replicate('a', 2) ! util:replicate('a', 2)", "a\na\na\na\na\na\na\na",
         exists(SingletonSeq.class) + " and .//@size = 8");
-  }
-
-  /** Path tests. */
-  @Test public void gh1729() {
-    check("let $x := 'g' return <g/> ! self::g[name() = $x]", "<g/>", empty(CachedPath.class));
   }
 }
