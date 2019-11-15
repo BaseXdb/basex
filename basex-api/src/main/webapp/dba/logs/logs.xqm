@@ -169,46 +169,43 @@ function dba:log(
     map { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc' },
     map { 'key': 'text', 'label': 'Text', 'type': 'xml' }
   )
-  let $entries :=
+  let $entries := (
     let $ignore-logs := options:get($options:IGNORE-LOGS)
     let $search := boolean($input)
-    let $highlight := function($string, $found) {
-      if($found) then (
-        for $match in analyze-string($string, $input, 'i')/*
-        let $value := string($match)
-        return if(local-name($match) = 'match') then element b { $value } else $value
-      ) else (
-        $string
-      )
+    let $highlight := function($string) {
+      for $match in analyze-string($string, $input, 'i')/*
+      let $value := string($match)
+      return if(local-name($match) = 'match') then element b { $value } else $value
     }
+
     for $log in reverse(admin:logs($name, true()))
     let $user := string($log/@user)
     let $type := string($log/@type)
-    let $msg := string($log)
+    let $text := string($log)
     let $user-hit := $search and matches($user, $input, 'iq')
     let $type-hit := $search and not($user-hit) and matches($type, $input, 'iq')
-    let $text-hit := $search and not($user-hit or $type-hit) and matches($msg, $input, 'i')
+    let $text-hit := $search and not($user-hit or $type-hit) and matches($text, $input, 'i')
     where (not($search) or $user-hit or $type-hit or $text-hit) and (
-      not($ignore-logs and matches($msg, $ignore-logs, 'i'))
+      not($ignore-logs and matches($text, $ignore-logs, 'i'))
     )
     let $id := string($log/@time)
+    let $time := if($input or $sort != 'time') then (
+      function() { html:link($id, $dba:CAT || '-jump', map { 'name': $name, 'time': $id }) }
+    ) else if($id = $time) then (
+      element b { $id }
+    ) else (
+      $id
+    )
     return map {
       'id': $id,
-      'time': function() {
-        if($input or $sort != 'time') then (
-          html:link($id, $dba:CAT || '-jump', map { 'name': $name, 'time': $id })
-        ) else if($id = $time) then (
-          <b>{ $id }</b>
-        ) else (
-          $id
-        )
-      },
-      'address': $log/@address,
-      'user': function() { $highlight($user, $user-hit) },
-      'type': function() { $highlight($type, $type-hit) },
-      'ms': $log/@ms,
-      'text': function() { $highlight($msg, $text-hit) }
+      'time': $time,
+      'address': string($log/@address),
+      'user': if($user-hit) then function() { $highlight($user) } else $user,
+      'type': if($type-hit) then function() { $highlight($type) } else $type,
+      'ms': xs:decimal($log/@ms),
+      'text': if($text-hit) then function() { $highlight($text) } else $text
     }
+  )
   let $params := map { 'name': $name, 'input': $input }
   let $options := map { 'sort': $sort, 'presort': 'time', 'page': xs:integer($page) }
   return html:table($headers, $entries, (), $params, $options)
