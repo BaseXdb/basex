@@ -5,10 +5,10 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.math.*;
+import java.util.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.server.*;
@@ -29,42 +29,60 @@ public final class AdminLogs extends AdminFn {
     final ValueBuilder vb = new ValueBuilder(qc);
     if(exprs.length == 0) {
       // return list of all log files
-      for(final IOFile f : qc.context.log.files()) {
-        final String date = f.name().replace(IO.LOGSUFFIX, "");
-        vb.add(new FElem(FILE).add(date).add(SIZE, Token.token(f.length())));
+      for(final IOFile file : qc.context.log.files()) {
+        final String date = file.name().replace(IO.LOGSUFFIX, "");
+        vb.add(new FElem(FILE).add(date).add(SIZE, Token.token(file.length())));
       }
     } else {
       // return content of single log file
       final String name = Token.string(toToken(exprs[0], qc));
       final boolean merge = exprs.length > 1 && toBoolean(exprs[1], qc);
 
-      final ElementNodes<LogEntry>.NodeIterator iter = logs(name, qc).iterator();
-      while(iter.hasNext()) {
-        final LogEntry l1 = iter.next();
-        final FElem elem = new FElem(ENTRY);
-        if(l1.address != null) {
-          if(merge && l1.type.equals(LogType.REQUEST.name())) {
-            // merge REQUEST entry: find next OK, ERROR or status code entry from same address
-            final ElementNodes<LogEntry>.NodeIterator iter2 = iter.copy();
-            while(iter2.hasNext()) {
-              final LogEntry l2 = iter2.next();
-              if(l1.address.equals(l2.address) && (l2.type.matches("^\\d+$") ||
-                  Strings.eq(l2.type, LogType.OK.name(), LogType.ERROR.name()))) {
-                l1.type = l2.type;
-                l1.user = l2.user;
-                l1.ms = l1.ms.add(l2.ms);
-                if(!l2.message.isEmpty()) l1.message += "; " + l2.message;
-                iter2.remove();
+      // parse log file
+      final LinkedList<LogEntry> list = logs(name, qc);
+      final HashMap<String, LinkedList<LogEntry>> map = new HashMap<>();
+      if(merge) {
+        // group entries by address
+        for(final LogEntry entry : list) {
+          map.computeIfAbsent(entry.address, address -> new LinkedList<>()).add(entry);
+        }
+      }
+
+      // scan and merge entries
+      for(LogEntry entry; (entry = list.pollFirst()) != null;) {
+        // REQUEST entries: find concluding entries (status code, OK, error)
+        if(merge) {
+          // skip entries that have already been consumed
+          final LinkedList<LogEntry> entries = map.get(entry.address);
+          if(entries.peekFirst() != entry) continue;
+          entries.removeFirst();
+
+          if(entry.type.equals(LogType.REQUEST.name())) {
+            final Iterator<LogEntry> iter = entries.iterator();
+            while(iter.hasNext()) {
+              final LogEntry next = iter.next();
+              final String et = next.type;
+              // REQUEST entry with identical address: no concluding entry exists
+              if(et.equals(LogType.REQUEST.name())) break;
+              if(et.matches("^\\d+$") || Strings.eq(et, LogType.OK.name(), LogType.ERROR.name())) {
+                entry.type = et;
+                entry.user = next.user;
+                entry.ms = entry.ms.add(next.ms);
+                if(!next.message.isEmpty()) entry.message += "; " + next.message;
+                iter.remove();
                 break;
               }
             }
           }
-          elem.add(TIME, l1.time).add(ADDRESS, l1.address).add(USER, l1.user);
-          if(l1.type != null) elem.add(TYPE, l1.type);
-          if(l1.ms.compareTo(BigDecimal.ZERO) != 0) elem.add(MS, l1.ms.toString());
-          if(l1.message != null) elem.add(l1.message);
-        } else {
-          elem.add(l1.message);
+        }
+
+        // add new element
+        final FElem elem = new FElem(ENTRY);
+        if(entry.message != null) elem.add(entry.message);
+        if(entry.address != null) {
+          elem.add(TIME, entry.time).add(ADDRESS, entry.address).add(USER, entry.user);
+          if(entry.type != null) elem.add(TYPE, entry.type);
+          if(entry.ms != BigDecimal.ZERO) elem.add(MS, entry.ms.toString());
         }
         vb.add(elem);
         qc.checkStop();
@@ -80,7 +98,7 @@ public final class AdminLogs extends AdminFn {
    * @return list
    * @throws QueryException query exception
    */
-  private ElementNodes<LogEntry> logs(final String name, final QueryContext qc)
+  private LinkedList<LogEntry> logs(final String name, final QueryContext qc)
       throws QueryException {
 
     final Log log = qc.context.log;
@@ -88,7 +106,7 @@ public final class AdminLogs extends AdminFn {
     if(file == null) throw WHICHRES_X.get(info, name);
 
     try {
-      final ElementNodes<LogEntry> logs = new ElementNodes<>();
+      final LinkedList<LogEntry> logs = new LinkedList<>();
       for(final String line : file.read()) {
         qc.checkStop();
         final LogEntry entry = new LogEntry();
