@@ -163,6 +163,17 @@ public final class InspectModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void type() {
+    final Function func = _INSPECT_TYPE;
+    // queries
+    query(func.args(" ()"), "empty-sequence()");
+    query(func.args(1), "xs:integer");
+    query(func.args(" 1 to 2"), "xs:integer+");
+    query(func.args(" map { 'a': (1, 2)[. = 1] }"), "map(*)");
+    query(func.args(" <_/>"), "element()");
+  }
+
+  /** Test method. */
   @Test public void xqdoc() {
     final Function func = _INSPECT_XQDOC;
     // queries

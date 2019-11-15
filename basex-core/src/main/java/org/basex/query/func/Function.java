@@ -1077,6 +1077,8 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _INSPECT_MODULE(InspectModule.class, "module(uri)", arg(STR_O), ELM_O, INSPECT_URI),
   /** XQuery function. */
+  _INSPECT_TYPE(InspectType.class, "type(value)", arg(ITEM_ZM), STR_O, INSPECT_URI),
+  /** XQuery function. */
   _INSPECT_STATIC_CONTEXT(InspectStaticContext.class, "static-context(function,name)",
       arg(FUNC_O, STR_O), ITEM_ZM, INSPECT_URI),
   /** XQuery function. */
