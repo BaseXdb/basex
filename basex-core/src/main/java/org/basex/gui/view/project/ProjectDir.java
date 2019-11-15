@@ -37,7 +37,14 @@ final class ProjectDir extends ProjectNode {
     final ArrayList<IOFile> newDirs = new ArrayList<>(), newFiles = new ArrayList<>();
     final boolean showHidden = view.gui.gopts.get(GUIOptions.SHOWHIDDEN);
     for(final IOFile child : file.children()) {
-      if(showHidden || !(child.name().startsWith(".") && child.file().isHidden())) {
+      final String name = child.name();
+      if(name.equals(".ignore")) {
+        newDirs.clear();
+        newFiles.clear();
+        newFiles.add(child);
+        break;
+      }
+      if(showHidden || !(name.startsWith(".") && child.file().isHidden())) {
         (child.isDir() ? newDirs : newFiles).add(child);
       }
     }
@@ -48,8 +55,8 @@ final class ProjectDir extends ProjectNode {
       removeChildren();
       dirs.addAll(newDirs);
       files.addAll(newFiles);
-      for(final IOFile f : dirs) add(new ProjectDir(f, view));
-      for(final IOFile f : files) add(new ProjectFile(f, view));
+      for(final IOFile child : dirs) add(new ProjectDir(child, view));
+      for(final IOFile child : files) add(new ProjectFile(child, view));
       updateTree();
     }
     view.refreshHighlight(this);

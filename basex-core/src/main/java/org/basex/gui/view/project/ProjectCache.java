@@ -20,7 +20,7 @@ final class ProjectCache implements Iterable<String> {
   private static final int MAX = 50000;
 
   /** Cached file paths (all with forward slashes). */
-  private final StringList files = new StringList();
+  private final StringList cache = new StringList();
   /** Hide files. */
   private final boolean hide;
   /** Valid flag. */
@@ -66,38 +66,47 @@ final class ProjectCache implements Iterable<String> {
     // check if file cache was replaced or invalidated
     if(stop.test(this)) throw new InterruptedException();
 
-    final ArrayList<Path> dirs = new ArrayList<>();
     try {
       // follow symbolic links only once
       if(Files.isSymbolicLink(root) && !links.add(root.toRealPath().toString())) return;
 
-      try(DirectoryStream<Path> stream = Files.newDirectoryStream(root)) {
-        for(final Path file : stream) {
-          // stop traversal if maximum has been exceeded
-          if(files.size() == MAX) return;
+      final ArrayList<Path> dirs = new ArrayList<>();
+      final ArrayList<IOFile> files = new ArrayList<>();
+      try(DirectoryStream<Path> paths = Files.newDirectoryStream(root)) {
+        for(final Path path : paths) {
+          // skip hidden files, cancel parsing if directory contains .ignore file
+          final IOFile io = new IOFile(path.toFile());
+          final String name = io.name();
+          if(name.equals(".ignore")) return;
+          if(hide && (name.startsWith(".") || Files.isHidden(path))) continue;
 
-          // skip hidden files
-          final IOFile io = new IOFile(file.toFile());
-          if(hide && (io.name().startsWith(".") || Files.isHidden(file))) continue;
-
-          if(io.isDir()) {
-            dirs.add(file);
+          if(Files.isDirectory(path)) {
+            dirs.add(path);
           } else {
-            files.add(io.path());
+            files.add(io);
           }
         }
+      }
+
+      // traverse directories
+      for(final Path dir : dirs) {
+        add(dir, stop, links);
+      }
+
+      // add files; stop traversal if maximum has been exceeded
+      for(final IOFile file : files) {
+        if(cache.size() == MAX) return;
+        cache.add(file.path());
       }
 
     } catch(final IOException ex) {
       Util.debug(ex);
     }
 
-    // traverse directory in second step (reduces number of opened files)
-    for(final Path dir : dirs) add(dir, stop, links);
   }
 
   @Override
   public Iterator<String> iterator() {
-    return files.iterator();
+    return cache.iterator();
   }
 }
