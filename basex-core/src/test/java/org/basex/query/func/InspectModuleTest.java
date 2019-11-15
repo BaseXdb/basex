@@ -14,6 +14,16 @@ import org.junit.*;
  */
 public final class InspectModuleTest extends SandboxTest {
   /** Test method. */
+  @Test public void context() {
+    final Function func = _INSPECT_CONTEXT;
+    // queries
+    final String query = query("declare function local:x() { 1 }; " + func.args());
+    query(query + "/name()", "context");
+    query("count(" + query + "/function)", 1);
+    query(query + "/function/@name/string()", "local:x");
+  }
+
+  /** Test method. */
   @Test public void function() {
     final Function func = _INSPECT_FUNCTION;
     // queries
@@ -57,6 +67,39 @@ public final class InspectModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void functionAnnotations() {
+    final Function func = _INSPECT_FUNCTION_ANNOTATIONS;
+    // queries
+    query(func.args(" true#0"), "map {\n}");
+    query(func.args(" %local:x function() { }") +
+        "=> " + _MAP_CONTAINS.args(" xs:QName('local:x')"), true);
+    query(func.args(" %Q{uri}name('a','b') function() {}") +
+        " (QName('uri','name'))", "a\nb");
+    query(_MAP_SIZE.args(func.args(" %basex:inline %basex:lazy function() {}")), 2);
+  }
+
+  /** Test method. */
+  @Test public void functions() {
+    final Function func = _INSPECT_FUNCTIONS;
+    // queries
+    final String url = "src/test/resources/hello.xqm";
+    query("declare function local:x() { 1 }; " + COUNT.args(func.args()), 1);
+    query("declare function local:x() { 2 }; " + func.args() + "()", 2);
+    query("import module namespace hello='world' at '" + url + "';" +
+        func.args() + "[last()] instance of function(*)", true);
+
+    query("for $f in " + func.args(url)
+        + "where local-name-from-QName(function-name($f)) = 'world' "
+        + "return $f()", "hello world");
+
+    // ensure that closures will be compiled (GH-1194)
+    query(func.args(url)
+        + "[function-name(.) = QName('world','closure')]()", 1);
+    query("import module namespace hello='world' at '" + url + "';"
+        + func.args() + "[function-name(.) = xs:QName('hello:closure')]()", 1);
+  }
+
+  /** Test method. */
   @Test public void module() {
     final Function func = _INSPECT_MODULE;
     // queries
@@ -93,61 +136,6 @@ public final class InspectModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void xqdoc() {
-    final Function func = _INSPECT_XQDOC;
-    // queries
-    error(func.args("src/test/resources/non-existent.xqm"), WHICHRES_X);
-
-    // validate against xqDoc schema
-    final String result = query(func.args("src/test/resources/hello.xqm")).
-        replace("{", "{{").replace("}", "}}");
-    query(_VALIDATE_XSD.args(' ' + result, "src/test/resources/xqdoc.xsd"));
-  }
-
-  /** Test method. */
-  @Test public void context() {
-    final Function func = _INSPECT_CONTEXT;
-    // queries
-    final String query = query("declare function local:x() { 1 }; " + func.args());
-    query(query + "/name()", "context");
-    query("count(" + query + "/function)", 1);
-    query(query + "/function/@name/string()", "local:x");
-  }
-
-  /** Test method. */
-  @Test public void functions() {
-    final Function func = _INSPECT_FUNCTIONS;
-    // queries
-    final String url = "src/test/resources/hello.xqm";
-    query("declare function local:x() { 1 }; " + COUNT.args(func.args()), 1);
-    query("declare function local:x() { 2 }; " + func.args() + "()", 2);
-    query("import module namespace hello='world' at '" + url + "';" +
-        func.args() + "[last()] instance of function(*)", true);
-
-    query("for $f in " + func.args(url)
-        + "where local-name-from-QName(function-name($f)) = 'world' "
-        + "return $f()", "hello world");
-
-    // ensure that closures will be compiled (GH-1194)
-    query(func.args(url)
-        + "[function-name(.) = QName('world','closure')]()", 1);
-    query("import module namespace hello='world' at '" + url + "';"
-        + func.args() + "[function-name(.) = xs:QName('hello:closure')]()", 1);
-  }
-
-  /** Test method. */
-  @Test public void functionAnnotations() {
-    final Function func = _INSPECT_FUNCTION_ANNOTATIONS;
-    // queries
-    query(func.args(" true#0"), "map {\n}");
-    query(func.args(" %local:x function() { }") +
-        "=> " + _MAP_CONTAINS.args(" xs:QName('local:x')"), true);
-    query(func.args(" %Q{uri}name('a','b') function() {}") +
-        " (QName('uri','name'))", "a\nb");
-    query(_MAP_SIZE.args(func.args(" %basex:inline %basex:lazy function() {}")), 2);
-  }
-
-  /** Test method. */
   @Test public void staticContext() {
     final Function func = _INSPECT_STATIC_CONTEXT;
     // queries
@@ -172,5 +160,17 @@ public final class InspectModuleTest extends SandboxTest {
 
     // errors
     error(func.args(" ()", "unknown"), INSPECT_UNKNOWN_X);
+  }
+
+  /** Test method. */
+  @Test public void xqdoc() {
+    final Function func = _INSPECT_XQDOC;
+    // queries
+    error(func.args("src/test/resources/non-existent.xqm"), WHICHRES_X);
+
+    // validate against xqDoc schema
+    final String result = query(func.args("src/test/resources/hello.xqm")).
+        replace("{", "{{").replace("}", "}}");
+    query(_VALIDATE_XSD.args(' ' + result, "src/test/resources/xqdoc.xsd"));
   }
 }
