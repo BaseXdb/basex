@@ -4,9 +4,11 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
-import org.basex.util.*;
+import org.basex.query.value.seq.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -16,7 +18,7 @@ import org.basex.util.*;
  */
 public class DbOpenPre extends DbAccess {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     return open(qc, false);
   }
 
@@ -27,11 +29,19 @@ public class DbOpenPre extends DbAccess {
    * @return result
    * @throws QueryException query exception
    */
-  final DBNode open(final QueryContext qc, final boolean id) throws QueryException {
+  final Value open(final QueryContext qc, final boolean id) throws QueryException {
     final Data data = checkData(qc);
-    final int v = (int) toLong(exprs[1], qc);
-    final int pre = id ? data.pre(v) : v;
-    if(pre >= 0 && pre < data.meta.size) return new DBNode(data, pre);
-    throw DB_RANGE_X_X_X.get(info, data.meta.name, id ? "ID" : "pre", v);
+    final Iter iter = exprs[1].atomIter(qc, info);
+
+    // handle arbitrary input
+    final IntList il = new IntList(Math.max(8, (int) iter.size()));
+    for(Item item; (item = qc.next(iter)) != null;) {
+      final int v = (int) toLong(item);
+      final int pre = id ? data.pre(v) : v;
+      if(pre < 0 || pre >= data.meta.size)
+        throw DB_RANGE_X_X_X.get(info, data.meta.name, id ? "ID" : "pre", v);
+      il.add(pre);
+    }
+    return DBNodeSeq.get(il.sort().finish(), data, this);
   }
 }

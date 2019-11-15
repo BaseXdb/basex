@@ -1,8 +1,7 @@
 package org.basex.query.func.db;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
-import org.basex.util.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -12,7 +11,7 @@ import org.basex.util.*;
  */
 public final class DbOpenId extends DbOpenPre {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return open(qc, true);
+  public Value value(final QueryContext qc) throws QueryException {
+    return open(qc, false);
   }
 }

@@ -33,7 +33,9 @@ public final class DbNodePre extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final LongList list = new LongList();
     final Iter iter = exprs[0].iter(qc);
-    for(Item item; (item = qc.next(iter)) != null;) list.add(toDBNode(item).pre());
+    for(Item item; (item = qc.next(iter)) != null;) {
+      list.add(toDBNode(item).pre());
+    }
     return IntSeq.get(list.finish());
   }
 
