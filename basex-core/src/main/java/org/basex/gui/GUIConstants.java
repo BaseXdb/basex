@@ -184,14 +184,12 @@ public final class GUIConstants {
 
   // COLORS =======================================================================================
 
-  /** UI defaults. */
-  private static final UIDefaults DEFAULTS = UIManager.getDefaults();
   /** Background color. */
-  public static final Color BACK = DEFAULTS.getColor("TextPane.background");
+  public static final Color BACK = new Color(TEXTFIELD.getBackground().getRGB());
   /** Text color. */
-  public static final Color TEXT = DEFAULTS.getColor("TextPane.foreground");
+  public static final Color TEXT = new Color(TEXTFIELD.getForeground().getRGB());
   /** Panel color. */
-  public static final Color PANEL = DEFAULTS.getColor("Label.background");
+  public static final Color PANEL = new Color(LABEL.getBackground().getRGB());
 
   /** Color: red. */
   public static final Color RED = color(224, 0, 0);
@@ -268,9 +266,6 @@ public final class GUIConstants {
 
   // FONTS ========================================================================================
 
-  /** Dummy component for adjusting font sizes. */
-  public static final JLabel LABEL = new JLabel();
-
   /** Font. */
   public static Font font;
   /** Bold Font. */
@@ -344,7 +339,7 @@ public final class GUIConstants {
     font  = new Font(name, type, fontSize);
     mfont = new Font(opts.get(GUIOptions.MONOFONT), type, fontSize);
     bfont = new Font(name, Font.BOLD, fontSize);
-    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, LABEL.getFont().getSize());
+    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, fontSize());
   }
 
   /**
@@ -354,6 +349,14 @@ public final class GUIConstants {
    */
   public static Color color(final int i) {
     return COLORS[Math.min(COLORS.length - 1, i)];
+  }
+
+  /**
+   * Returns the standard font size.
+   * @return font size
+   */
+  public static int fontSize() {
+    return LABEL.getFont().getSize();
   }
 
   // PRIVATE METHODS ==============================================================================
