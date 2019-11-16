@@ -18,7 +18,7 @@ import org.basex.gui.listener.*;
  * @author Lukas Kircher
  */
 public final class BaseXPopup extends JPopupMenu {
-  /** reference to the main window. */
+  /** Reference to the main window. */
   private final GUI gui;
   /** Popup commands. */
   private final GUICommand[] commands;

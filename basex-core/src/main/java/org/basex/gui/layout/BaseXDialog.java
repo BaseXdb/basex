@@ -23,7 +23,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class BaseXDialog extends JDialog implements BaseXWindow {
-  /** reference to the main window. */
+  /** Reference to the main window. */
   public GUI gui;
   /** Used mnemonics. */
   final StringBuilder mnem = new StringBuilder();

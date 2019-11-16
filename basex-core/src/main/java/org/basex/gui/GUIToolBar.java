@@ -14,7 +14,7 @@ import org.basex.gui.layout.*;
 final class GUIToolBar extends JToolBar {
   /** Toolbar commands. */
   private final GUICommand[] commands;
-  /** reference to the main window. */
+  /** Reference to the main window. */
   private final GUI gui;
 
   /**

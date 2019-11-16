@@ -26,7 +26,7 @@ public final class ViewNotifier {
   public static final int MAXHIST = 20;
   /** History pointer. */
   public int hist;
-  /** reference to the main window. */
+  /** Reference to the main window. */
   final GUI gui;
 
   /** Zoomed rectangle history. */
