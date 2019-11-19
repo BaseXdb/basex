@@ -34,7 +34,7 @@ final class WebDAVResponse extends AbstractResponse {
    * @param conn HTTP connection
    */
   WebDAVResponse(final HTTPConnection conn) {
-    res = conn.res;
+    res = conn.response;
   }
 
   @Override

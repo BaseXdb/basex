@@ -32,7 +32,7 @@ final class RestXqSingleton {
   RestXqSingleton(final HTTPConnection conn, final String id, final QueryContext qc) {
     this.qc = qc;
     this.id = id;
-    session = conn.req.getSession();
+    session = conn.request.getSession();
     queue();
     register();
   }

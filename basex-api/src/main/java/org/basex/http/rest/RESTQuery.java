@@ -55,7 +55,7 @@ class RESTQuery extends RESTCmd {
         if(value != null) xq.bind(null, value, NodeType.DOC.toString());
 
         // bind HTTP context and external variables
-        xq.putExternal(HTTPText.REQUEST, conn.req);
+        xq.putExternal(HTTPText.REQUEST, conn.request);
         vars.forEach((key, val) -> {
           if(val.length == 2) xq.bind(key, val[0], val[1]);
           if(val.length == 1) xq.bind(key, val[0]);
@@ -66,7 +66,7 @@ class RESTQuery extends RESTCmd {
         conn.initResponse();
       }
       // run command
-      run(cmd, conn.res.getOutputStream());
+      run(cmd, conn.response.getOutputStream());
     }
   }
 

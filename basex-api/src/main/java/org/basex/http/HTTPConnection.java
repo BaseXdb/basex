@@ -29,9 +29,9 @@ import org.basex.util.http.*;
  */
 public final class HTTPConnection implements ClientInfo {
   /** Servlet request. */
-  public final HttpServletRequest req;
+  public final HttpServletRequest request;
   /** Servlet response. */
-  public final HttpServletResponse res;
+  public final HttpServletResponse response;
   /** Servlet instance. */
   public final BaseXServlet servlet;
 
@@ -54,25 +54,25 @@ public final class HTTPConnection implements ClientInfo {
 
   /**
    * Constructor.
-   * @param req request
-   * @param res response
+   * @param request request
+   * @param response response
    * @param auth authentication method (can be {@code null})
    * @param servlet calling servlet instance
    */
-  HTTPConnection(final HttpServletRequest req, final HttpServletResponse res,
+  HTTPConnection(final HttpServletRequest request, final HttpServletResponse response,
       final BaseXServlet servlet, final AuthMethod auth) {
 
-    this.req = req;
-    this.res = res;
+    this.request = request;
+    this.response = response;
     this.servlet = servlet;
 
     context = new Context(HTTPContext.get().context(), this);
-    method = req.getMethod();
-    params = new HTTPParams(req);
+    method = request.getMethod();
+    params = new HTTPParams(request);
 
     // set UTF8 as default encoding (can be overwritten)
-    res.setCharacterEncoding(Strings.UTF8);
-    path = normalize(req.getPathInfo());
+    response.setCharacterEncoding(Strings.UTF8);
+    path = normalize(request.getPathInfo());
 
     // authentication method (servlet-specific or global)
     this.auth = auth != null ? auth : context.soptions.get(StaticOptions.AUTHMETHOD);
@@ -96,8 +96,8 @@ public final class HTTPConnection implements ClientInfo {
     context.user(user);
 
     // generate log entry
-    final StringBuilder uri = new StringBuilder(req.getRequestURI());
-    final String qs = req.getQueryString();
+    final StringBuilder uri = new StringBuilder(request.getRequestURI());
+    final String qs = request.getQueryString();
     if(qs != null) uri.append('?').append(qs);
     context.log.write(LogType.REQUEST, '[' + method + "] " + uri, null, context);
   }
@@ -107,18 +107,18 @@ public final class HTTPConnection implements ClientInfo {
    * @return content type
    */
   public MediaType contentType() {
-    return mediaType(req);
+    return mediaType(request);
   }
 
   /**
    * Initializes the output. Sets the expected encoding and content type.
    */
   public void initResponse() {
-    // set content type and encoding
     final SerializerOptions opts = sopts();
     final String encoding = opts.get(SerializerOptions.ENCODING);
-    res.setCharacterEncoding(encoding);
-    res.setContentType(new MediaType(mediaType(opts) + "; " + CHARSET + '=' + encoding).toString());
+    final MediaType mt = new MediaType(mediaType(opts) + "; " + CHARSET + '=' + encoding);
+    response.setCharacterEncoding(encoding);
+    response.setContentType(mt.toString());
   }
 
   /**
@@ -152,7 +152,7 @@ public final class HTTPConnection implements ClientInfo {
    * @return accepted media types
    */
   public ArrayList<MediaType> accepts() {
-    final String accepts = req.getHeader(ACCEPT);
+    final String accepts = request.getHeader(ACCEPT);
     final ArrayList<MediaType> list = new ArrayList<>();
     if(accepts == null) {
       list.add(MediaType.ALL_ALL);
@@ -220,7 +220,7 @@ public final class HTTPConnection implements ClientInfo {
   public String resolve(final String location) {
     String loc = location;
     if(location.startsWith("/")) {
-      final String uri = req.getRequestURI(), info = req.getPathInfo();
+      final String uri = request.getRequestURI(), info = request.getPathInfo();
       loc = (info == null ? uri : uri.substring(0, uri.length() - info.length())) + location;
     }
     return loc;
@@ -232,7 +232,7 @@ public final class HTTPConnection implements ClientInfo {
    * @throws IOException I/O exception
    */
   public void redirect(final String location) throws IOException {
-    res.sendRedirect(resolve(location));
+    response.sendRedirect(resolve(location));
   }
 
   /**
@@ -242,22 +242,22 @@ public final class HTTPConnection implements ClientInfo {
    * @throws ServletException servlet exception
    */
   public void forward(final String location) throws IOException, ServletException {
-    req.getRequestDispatcher(resolve(location)).forward(req, res);
+    request.getRequestDispatcher(resolve(location)).forward(request, response);
   }
 
   @Override
   public String clientAddress() {
-    return req.getRemoteAddr() + ':' + req.getRemotePort();
+    return request.getRemoteAddr() + ':' + request.getRemotePort();
   }
 
   @Override
   public String clientName() {
     // check for request id
-    Object value = req.getAttribute(HTTPText.CLIENT_ID);
+    Object value = request.getAttribute(HTTPText.CLIENT_ID);
 
     // check for session id (DBA, global)
     if(value == null) {
-      final HttpSession session = req.getSession(false);
+      final HttpSession session = request.getSession(false);
       if(session != null) {
         final boolean dba = (path() + '/').contains('/' + HTTPText.DBA_CLIENT_ID + '/');
         value = session.getAttribute(dba ? HTTPText.DBA_CLIENT_ID : HTTPText.CLIENT_ID);
@@ -329,7 +329,7 @@ public final class HTTPConnection implements ClientInfo {
    * @throws IOException I/O exception
    */
   private User login() throws IOException {
-    final byte[] address = token(req.getRemoteAddr());
+    final byte[] address = token(request.getRemoteAddr());
     try {
       final User user;
       if(auth == AuthMethod.CUSTOM) {
@@ -337,7 +337,7 @@ public final class HTTPConnection implements ClientInfo {
         user = user(UserText.ADMIN);
       } else {
         // request authorization header, check authentication method
-        final String header = req.getHeader(AUTHORIZATION);
+        final String header = request.getHeader(AUTHORIZATION);
         final String[] am = header != null ? Strings.split(header, ' ', 2) : new String[] { "" };
         final AuthMethod meth = StaticOptions.AUTHMETHOD.get(am[0]);
         if(auth != meth) throw new LoginException(HTTPText.WRONGAUTH_X, auth);
@@ -362,14 +362,14 @@ public final class HTTPConnection implements ClientInfo {
           if(Strings.eq(qop, AUTH_INT)) h2 += ':' + Strings.md5(params.body().toString());
           final String ha2 = Strings.md5(h2);
 
-          final StringBuilder response = new StringBuilder(ha1).append(':').append(nonce);
+          final StringBuilder sb = new StringBuilder(ha1).append(':').append(nonce);
           if(Strings.eq(qop, AUTH, AUTH_INT)) {
-            response.append(':').append(map.get(Request.NC));
-            response.append(':').append(cnonce).append(':').append(qop);
+            sb.append(':').append(map.get(Request.NC));
+            sb.append(':').append(cnonce).append(':').append(qop);
           }
-          response.append(':').append(ha2);
+          sb.append(':').append(ha2);
 
-          if(!Strings.md5(response.toString()).equals(map.get(Request.RESPONSE)))
+          if(!Strings.md5(sb.toString()).equals(map.get(Request.RESPONSE)))
             throw new LoginException();
         }
       }
@@ -407,14 +407,14 @@ public final class HTTPConnection implements ClientInfo {
     final String info = ex.getMessage();
     log(code, info);
     try {
-      res.resetBuffer();
-      res.setStatus(code);
-      res.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
+      response.resetBuffer();
+      response.setStatus(code);
+      response.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
       // client directive: do not cache result (HTTP 1.1, old clients)
-      res.setHeader(CACHE_CONTROL, "no-cache, no-store, must-revalidate");
-      res.setHeader(PRAGMA, "no-cache");
-      res.setHeader(EXPIRES, "0");
-      res.getOutputStream().write(token(info));
+      response.setHeader(CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+      response.setHeader(PRAGMA, "no-cache");
+      response.setHeader(EXPIRES, "0");
+      response.getOutputStream().write(token(info));
     } catch(final IllegalStateException e) {
       // too late (response has already been committed)
       logError(code, null, info, e);
@@ -431,8 +431,8 @@ public final class HTTPConnection implements ClientInfo {
   @SuppressWarnings("deprecation")
   public void status(final int code, final String message, final String body) throws IOException {
     try {
-      res.resetBuffer();
-      if(code == SC_UNAUTHORIZED && !res.containsHeader(WWW_AUTHENTICATE)) {
+      response.resetBuffer();
+      if(code == SC_UNAUTHORIZED && !response.containsHeader(WWW_AUTHENTICATE)) {
         final TokenBuilder header = new TokenBuilder();
         header.add(auth).add(' ').add(Request.REALM).add("=\"").add(Prop.NAME).add('"');
         if(auth == AuthMethod.DIGEST) {
@@ -440,21 +440,21 @@ public final class HTTPConnection implements ClientInfo {
           header.add(",").add(Request.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT);
           header.add('"').add(',').add(Request.NONCE).add("=\"").add(nonce).add('"');
         }
-        res.setHeader(WWW_AUTHENTICATE, header.toString());
+        response.setHeader(WWW_AUTHENTICATE, header.toString());
       }
 
       final int c = code < 0 || code > 999 ? 500 : code;
       if(message == null) {
-        res.setStatus(c);
+        response.setStatus(c);
       } else {
         // do not allow Jetty to create a custom error html page
         // control characters and non-ASCII codes will be removed (GH-1632)
-        res.setStatus(c, message.replaceAll("[^\\x20-\\x7F]", "?"));
+        response.setStatus(c, message.replaceAll("[^\\x20-\\x7F]", "?"));
       }
 
       if(body != null) {
-        res.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
-        res.getOutputStream().write(new TokenBuilder(token(body)).normalize().finish());
+        response.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
+        response.getOutputStream().write(new TokenBuilder(token(body)).normalize().finish());
       }
     } catch(final IllegalStateException | IllegalArgumentException ex) {
       logError(code, message, body, ex);

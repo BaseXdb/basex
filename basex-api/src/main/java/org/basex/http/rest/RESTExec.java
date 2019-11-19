@@ -29,7 +29,7 @@ final class RESTExec extends RESTCmd {
   @Override
   protected void run0() throws IOException {
     for(final Command cmd : session) run(cmd);
-    session.conn.res.getOutputStream().write(Token.token(info()));
+    session.conn.response.getOutputStream().write(Token.token(info()));
     if(create) code = HTTPCode.CREATED_X;
   }
 }

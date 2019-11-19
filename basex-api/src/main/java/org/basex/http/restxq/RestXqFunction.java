@@ -229,7 +229,7 @@ public final class RestXqFunction extends WebFunction {
     // bind header parameters
     for(final WebParam rxp : headerParams) {
       final TokenList tl = new TokenList();
-      final Enumeration<?> en = conn.req.getHeaders(rxp.name);
+      final Enumeration<?> en = conn.request.getHeaders(rxp.name);
       while(en.hasMoreElements()) {
         for(final String s : en.nextElement().toString().split(", *")) tl.add(s);
       }
@@ -237,7 +237,7 @@ public final class RestXqFunction extends WebFunction {
     }
 
     // bind cookie parameters
-    final Cookie[] ck = conn.req.getCookies();
+    final Cookie[] ck = conn.request.getCookies();
     for(final WebParam rxp : cookieParams) {
       Value value = Empty.VALUE;
       if(ck != null) {

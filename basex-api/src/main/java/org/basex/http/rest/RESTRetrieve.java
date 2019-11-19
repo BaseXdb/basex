@@ -42,7 +42,7 @@ final class RESTRetrieve extends RESTCmd {
       conn.initResponse();
 
       context.options.set(MainOptions.SERIALIZER, sopts);
-      run(query(raw ? _DB_RETRIEVE : _DB_OPEN), conn.res.getOutputStream());
+      run(query(raw ? _DB_RETRIEVE : _DB_OPEN), conn.response.getOutputStream());
 
     } else {
       // list database resources
@@ -52,7 +52,7 @@ final class RESTRetrieve extends RESTCmd {
       list(table, elem, RESTText.Q_RESOURCE, 0);
 
       conn.initResponse();
-      try(Serializer ser = Serializer.get(conn.res.getOutputStream(), sopts)) {
+      try(Serializer ser = Serializer.get(conn.response.getOutputStream(), sopts)) {
         ser.serialize(elem);
       }
     }

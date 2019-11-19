@@ -39,7 +39,7 @@ final class WebDAVFactory implements ResourceFactory {
   public Resource getResource(final String host, final String dbpath) {
     try {
       final WebDAVService service = SERVICES.get();
-      final HttpServletRequest req = service.conn.req;
+      final HttpServletRequest req = service.conn.request;
       Path path = Path.path(dbpath);
       if(!req.getContextPath().isEmpty()) path = path.getStripFirst();
       if(!req.getServletPath().isEmpty()) path = path.getStripFirst();

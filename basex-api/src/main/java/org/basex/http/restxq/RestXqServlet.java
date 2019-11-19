@@ -26,7 +26,7 @@ public final class RestXqServlet extends BaseXServlet {
   @Override
   protected void run(final HTTPConnection conn) throws Exception {
     // no trailing slash: send redirect
-    if(conn.req.getPathInfo() == null) {
+    if(conn.request.getPathInfo() == null) {
       conn.redirect("/");
       return;
     }
@@ -48,7 +48,7 @@ public final class RestXqServlet extends BaseXServlet {
     if(func == null) {
       // OPTIONS: no custom response required
       if(conn.method.equals(HttpMethod.OPTIONS.name())) {
-        conn.res.setHeader(HttpText.ALLOW, Stream.of(HttpMethod.values()).map(Enum::name).
+        conn.response.setHeader(HttpText.ALLOW, Stream.of(HttpMethod.values()).map(Enum::name).
             collect(Collectors.joining(",")));
         return;
       }

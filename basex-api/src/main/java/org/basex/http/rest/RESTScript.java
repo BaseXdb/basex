@@ -30,7 +30,7 @@ final class RESTScript extends RESTCmd {
     conn.sopts().set(SerializerOptions.METHOD, SerialMethod.TEXT);
     conn.initResponse();
 
-    for(final Command cmd : session) run(cmd, conn.res.getOutputStream());
+    for(final Command cmd : session) run(cmd, conn.response.getOutputStream());
   }
 
   /**

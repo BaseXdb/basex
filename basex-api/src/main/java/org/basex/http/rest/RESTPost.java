@@ -34,12 +34,12 @@ final class RESTPost {
    */
   public static RESTCmd get(final RESTSession session) throws IOException {
     final HTTPConnection conn = session.conn;
-    String encoding = conn.req.getCharacterEncoding();
+    String encoding = conn.request.getCharacterEncoding();
     if(encoding == null) encoding = Strings.UTF8;
 
     // perform queries
     final DBNode doc;
-    try(NewlineInput ni = new NewlineInput(conn.req.getInputStream())) {
+    try(NewlineInput ni = new NewlineInput(conn.request.getInputStream())) {
       doc = new DBNode(new IOContent(ni.encoding(encoding).content()));
     } catch(final IOException ex) {
       throw HTTPCode.BAD_REQUEST_X.get(ex);

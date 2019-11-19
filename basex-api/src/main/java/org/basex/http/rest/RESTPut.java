@@ -37,7 +37,7 @@ final class RESTPut {
     RESTCmd.parseOptions(session);
 
     final MainOptions options = conn.context.options;
-    final InputStream is = conn.req.getInputStream();
+    final InputStream is = conn.request.getInputStream();
     final MediaType mt = conn.contentType();
 
     // choose correct importer

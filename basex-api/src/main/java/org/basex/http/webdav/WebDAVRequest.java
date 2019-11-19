@@ -58,7 +58,7 @@ final class WebDAVRequest extends AbstractRequest {
    * @param conn HTTP connection
    */
   WebDAVRequest(final HTTPConnection conn) {
-    req = conn.req;
+    req = conn.request;
     method = Method.valueOf(req.getMethod());
     url = decode(req.getRequestURL().toString());
     auth = new Auth(conn.clientName(), null);

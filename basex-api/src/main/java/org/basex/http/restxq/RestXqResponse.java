@@ -50,7 +50,7 @@ public final class RestXqResponse extends WebResponse {
   @Override
   protected void init(final WebFunction function) throws QueryException, IOException {
     func = new RestXqFunction(function.function, qc, function.module);
-    qc.putProperty(HTTPText.REQUEST, conn.req);
+    qc.putProperty(HTTPText.REQUEST, conn.request);
     qc.jc().type(RESTXQ);
     func.parse(ctx);
   }
@@ -109,7 +109,7 @@ public final class RestXqResponse extends WebResponse {
         if(message != null) msg.append(message);
         if(s == 302) {
           if(msg.length() != 0) msg.append("; ");
-          msg.append(HttpText.LOCATION + ": " + conn.res.getHeader(HttpText.LOCATION));
+          msg.append(HttpText.LOCATION + ": " + conn.response.getHeader(HttpText.LOCATION));
         }
         conn.log(s, msg.toString());
         conn.status(s, message, null);
@@ -117,7 +117,7 @@ public final class RestXqResponse extends WebResponse {
 
       // serialize result
       if(item != null && body) {
-        out = id != null ? new ArrayOutput() : conn.res.getOutputStream();
+        out = id != null ? new ArrayOutput() : conn.response.getOutputStream();
         try(Serializer ser = Serializer.get(out, so)) {
           for(; item != null; item = qc.next(iter)) ser.serialize(item);
         }
@@ -139,7 +139,7 @@ public final class RestXqResponse extends WebResponse {
     if(out instanceof ArrayOutput) {
       final ArrayOutput ao = (ArrayOutput) out;
       final int size = (int) ao.size();
-      if(size > 0) conn.res.getOutputStream().write(ao.buffer(), 0, size);
+      if(size > 0) conn.response.getOutputStream().write(ao.buffer(), 0, size);
     }
 
     return status != null || forward != null ? Response.CUSTOM :
@@ -187,7 +187,7 @@ public final class RestXqResponse extends WebResponse {
               if(key.equalsIgnoreCase(HttpText.CONTENT_TYPE)) {
                 cType = value;
               } else {
-                conn.res.setHeader(key, key.equalsIgnoreCase(HttpText.LOCATION) ?
+                conn.response.setHeader(key, key.equalsIgnoreCase(HttpText.LOCATION) ?
                   conn.resolve(value) : value);
               }
             }
