@@ -20,6 +20,7 @@ import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
@@ -209,10 +210,11 @@ public final class RestXqFunction extends WebFunction {
     }
 
     // bind request body in the correct format
-    final MainOptions mo = conn.context.options;
+    final MainOptions mopts = conn.context.options;
     if(requestBody != null) {
       try {
-        bind(requestBody, args, HttpPayload.value(conn.params.body(), mo, conn.contentType()), qc);
+        final IOContent payload = conn.requestCtx.payload();
+        bind(requestBody, args, HttpPayload.value(payload, mopts, conn.contentType()), qc);
       } catch(final IOException ex) {
         throw error(INPUT_CONV_X, ex);
       }
@@ -220,10 +222,10 @@ public final class RestXqFunction extends WebFunction {
 
     // bind query and form parameters
     for(final WebParam rxp : queryParams) {
-      bind(rxp, args, conn.params.query().get(rxp.name), qc);
+      bind(rxp, args, conn.requestCtx.queryValues().get(rxp.name), qc);
     }
     for(final WebParam rxp : formParams) {
-      bind(rxp, args, conn.params.form(mo).get(rxp.name), qc);
+      bind(rxp, args, conn.requestCtx.formValues(mopts).get(rxp.name), qc);
     }
 
     // bind header parameters

@@ -27,36 +27,35 @@ final class RESTGet {
    * @throws IOException I/O exception
    */
   public static RESTCmd get(final RESTSession session) throws IOException {
-    final Map<String, String[]> vars = new HashMap<>();
+    final Map<String, String[]> variables = new HashMap<>();
 
     // parse query string
     String op = null, input = null, value = null;
     final HTTPConnection conn = session.conn;
     final SerializerOptions sopts = conn.sopts();
-    for(final Entry<String, String[]> param : conn.params.stringMap().entrySet()) {
+    for(final Entry<String, String[]> param : conn.requestCtx.queryStrings().entrySet()) {
       final String key = param.getKey();
-      final String[] vals = param.getValue();
-      final String val = vals[0];
+      final String[] values = param.getValue();
 
       if(Strings.eqic(key, COMMAND, QUERY, RUN)) {
-        if(op != null || vals.length > 1) throw HTTPCode.ONEOP.get();
+        if(op != null || values.length > 1) throw HTTPCode.ONEOP.get();
         op = key;
-        input = val;
+        input = values[0];
       } else if(key.equalsIgnoreCase(CONTEXT)) {
         // context parameter
-        value = val;
+        value = values[0];
       } else if(sopts.option(key) != null) {
         // serialization parameters
-        for(final String v : vals) sopts.assign(key, v);
+        for(final String val : values) sopts.assign(key, val);
       } else if(!RESTCmd.parseOption(session, param, false)) {
         // options or (if not found) external variables
-        vars.put(key, new String[] { val });
+        variables.put(key, new String[] { values[0] });
       }
     }
 
     if(op == null) return RESTRetrieve.get(session);
-    if(op.equals(QUERY)) return RESTQuery.get(session, input, vars, value);
-    if(op.equals(RUN)) return RESTRun.get(session, input, vars, value);
+    if(op.equals(QUERY)) return RESTQuery.get(session, input, variables, value);
+    if(op.equals(RUN)) return RESTRun.get(session, input, variables, value);
     return RESTCommand.get(session, input);
   }
 }

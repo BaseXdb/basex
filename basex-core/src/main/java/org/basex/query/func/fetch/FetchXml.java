@@ -40,10 +40,10 @@ public class FetchXml extends StandardFunc {
   protected DBNode fetch(final IO io, final QueryContext qc) throws QueryException {
     final Options opts = toOptions(1, new Options(), qc);
 
-    final MainOptions mo = MainOptions.get();
-    new DBOptions(opts, DBOptions.PARSING, info).assignTo(mo);
+    final MainOptions mopts = MainOptions.get();
+    new DBOptions(opts, DBOptions.PARSING, info).assignTo(mopts);
     try {
-      return new DBNode(Parser.singleParser(io, mo, ""));
+      return new DBNode(Parser.singleParser(io, mopts, ""));
     } catch(final IOException ex) {
       throw FETCH_OPEN_X.get(info, ex);
     }

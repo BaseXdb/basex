@@ -231,8 +231,8 @@ public final class MainOptions extends Options {
    * @return main options
    */
   public static MainOptions get() {
-    final MainOptions mo = new MainOptions(false);
-    mo.set(CHOP, false);
-    return mo;
+    final MainOptions mopts = new MainOptions(false);
+    mopts.set(CHOP, false);
+    return mopts;
   }
 }

@@ -50,7 +50,7 @@ public final class RestXqResponse extends WebResponse {
   @Override
   protected void init(final WebFunction function) throws QueryException, IOException {
     func = new RestXqFunction(function.function, qc, function.module);
-    qc.putProperty(HTTPText.REQUEST, conn.request);
+    qc.putProperty(HTTPText.REQUEST, conn.requestCtx);
     qc.jc().type(RESTXQ);
     func.parse(ctx);
   }

@@ -28,9 +28,9 @@ import org.basex.util.http.*;
  * @author Christian Gruen
  */
 public final class HTTPConnection implements ClientInfo {
-  /** Servlet request. */
+  /** HTTP servlet request. */
   public final HttpServletRequest request;
-  /** Servlet response. */
+  /** HTTP servlet response. */
   public final HttpServletResponse response;
   /** Servlet instance. */
   public final BaseXServlet servlet;
@@ -38,7 +38,7 @@ public final class HTTPConnection implements ClientInfo {
   /** Current database context. */
   public final Context context;
   /** Request parameters. */
-  public final HTTPParams params;
+  public final RequestContext requestCtx;
 
   /** Performance. */
   private final Performance perf = new Performance();
@@ -68,7 +68,7 @@ public final class HTTPConnection implements ClientInfo {
 
     context = new Context(HTTPContext.get().context(), this);
     method = request.getMethod();
-    params = new HTTPParams(request);
+    requestCtx = new RequestContext(request);
 
     // set UTF8 as default encoding (can be overwritten)
     response.setCharacterEncoding(Strings.UTF8);
@@ -359,7 +359,7 @@ public final class HTTPConnection implements ClientInfo {
 
           String h2 = method + ':' + map.get(Request.URI);
           final String qop = map.get(Request.QOP);
-          if(Strings.eq(qop, AUTH_INT)) h2 += ':' + Strings.md5(params.body().toString());
+          if(Strings.eq(qop, AUTH_INT)) h2 += ':' + Strings.md5(requestCtx.payload().toString());
           final String ha2 = Strings.md5(h2);
 
           final StringBuilder sb = new StringBuilder(ha1).append(':').append(nonce);

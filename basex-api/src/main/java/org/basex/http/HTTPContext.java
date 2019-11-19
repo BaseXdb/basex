@@ -11,7 +11,7 @@ import org.basex.io.*;
 import org.basex.util.*;
 
 /**
- * HTTP context information.
+ * Global HTTP context information.
  *
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen

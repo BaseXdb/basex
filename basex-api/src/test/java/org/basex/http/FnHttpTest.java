@@ -668,8 +668,7 @@ public class FnHttpTest extends HTTPTest {
     // Subject: Formatted text mail
     hdrs.put("Subject", subjVal);
     final List<String> contTypeVal = new ArrayList<>();
-    contTypeVal.add("multipart/alternative");
-    contTypeVal.add("boundary=\"boundary42\"");
+    contTypeVal.add("multipart/alternative;boundary=\"boundary42\"");
     // Content-Type: multipart/alternative; boundary=boundary42
     hdrs.put("Content-Type", contTypeVal);
 
@@ -738,8 +737,7 @@ public class FnHttpTest extends HTTPTest {
     // Subject: Formatted text mail
     hdrs.put("Subject", subjVal);
     final List<String> contTypeVal = new ArrayList<>();
-    contTypeVal.add("multipart/mixed");
-    contTypeVal.add("boundary=\"simple boundary\"");
+    contTypeVal.add("multipart/mixed;boundary=\"simple boundary\"");
     // Content-Type: multipart/alternative; boundary=boundary42
     hdrs.put("Content-Type", contTypeVal);
     conn.headers = hdrs;
@@ -843,8 +841,7 @@ public class FnHttpTest extends HTTPTest {
     final FakeHttpConnection conn = new FakeHttpConnection();
     final Map<String, List<String>> hdrs = new HashMap<>();
     final List<String> contTypeVal = new ArrayList<>();
-    contTypeVal.add("multipart/mixed");
-    contTypeVal.add("boundary=\"" + boundary + '"');
+    contTypeVal.add("multipart/mixed;boundary=\"" + boundary + '"');
     hdrs.put("Content-Type", contTypeVal);
 
     conn.headers = hdrs;

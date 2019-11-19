@@ -17,14 +17,15 @@ import org.basex.util.*;
 import org.basex.util.http.*;
 
 /**
- * Bundles parameters of an HTTP request.
+ * Request of an HTTP or WebSocket connection.
  *
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class HTTPParams {
-  /** HTTP request. */
-  private final HttpServletRequest request;
+public final class RequestContext {
+  /** HTTP servlet request. */
+  public final HttpServletRequest request;
+
   /** Query parameters with string values. */
   private Map<String, String[]> strings;
   /** Query parameters with XQuery values. */
@@ -38,7 +39,7 @@ public final class HTTPParams {
    * Returns an immutable map with all query parameters.
    * @param request HTTP request
    */
-  public HTTPParams(final HttpServletRequest request) {
+  public RequestContext(final HttpServletRequest request) {
     this.request = request;
   }
 
@@ -51,11 +52,11 @@ public final class HTTPParams {
   }
 
   /**
-   * Returns the query parameters as string map.
+   * Returns the query parameters as strings.
    * @return map
    * @throws IOException I/O exception
    */
-  public Map<String, String[]> stringMap() throws IOException {
+  public Map<String, String[]> queryStrings() throws IOException {
     try {
       if(strings == null) strings = request.getParameterMap();
       return strings;
@@ -66,13 +67,32 @@ public final class HTTPParams {
   }
 
   /**
-   * Returns form parameters.
+   * Returns query parameters as XQuery values.
+   * @return query parameters
+   * @throws IOException I/O exception
+   */
+  public Map<String, Value> queryValues() throws IOException {
+    if(values == null) {
+      values = new HashMap<>();
+      queryStrings().forEach((key, value) -> {
+        final ItemList items = new ItemList();
+        for(final String string : value) items.add(new Atm(string));
+        values.put(key, items.value());
+      });
+    }
+    return values;
+  }
+
+  /**
+   * Returns form parameters as XQuery Values.
    * @param options main options
    * @return parameters
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public Map<String, Value> form(final MainOptions options) throws QueryException, IOException {
+  public Map<String, Value> formValues(final MainOptions options)
+      throws QueryException, IOException {
+
     if(form == null) {
       form = new HashMap<>();
       final MediaType mt = HTTPConnection.mediaType(request);
@@ -88,28 +108,11 @@ public final class HTTPParams {
   }
 
   /**
-   * Returns query parameters.
-   * @return query parameters
-   * @throws IOException I/O exception
-   */
-  public Map<String, Value> query() throws IOException {
-    if(values == null) {
-      values = new HashMap<>();
-      stringMap().forEach((key, value) -> {
-        final ItemList items = new ItemList();
-        for(final String string : value) items.add(new Atm(string));
-        values.put(key, items.value());
-      });
-    }
-    return values;
-  }
-
-  /**
-   * Returns the cached body.
+   * Returns the cached payload.
    * @return value
    * @throws IOException I/O exception
    */
-  public IOContent body() throws IOException {
+  public IOContent payload() throws IOException {
     if(content == null) {
       content = new IOContent(BufferInput.get(request.getInputStream()).content());
     }
@@ -129,7 +132,7 @@ public final class HTTPParams {
   private void addMultipart(final MediaType type, final MainOptions options,
       final Map<String, Value> map) throws QueryException, IOException {
 
-    try(InputStream is = body().inputStream()) {
+    try(InputStream is = payload().inputStream()) {
       final HttpPayload hp = new HttpPayload(is, true, null, options);
       hp.multiForm(type).forEach(map::put);
     }
@@ -141,7 +144,7 @@ public final class HTTPParams {
    * @throws IOException I/O exception
    */
   private void addURLEncoded(final Map<String, Value> map) throws IOException {
-    for(final String param : Strings.split(body().toString(), '&')) {
+    for(final String param : Strings.split(payload().toString(), '&')) {
       final String[] parts = Strings.split(param, '=', 2);
       if(parts.length == 2) {
         final Atm atm = new Atm(URLDecoder.decode(parts[1], Strings.UTF8));

@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-abstract class SessionsFn extends StandardFunc {
+abstract class SessionsFn extends ApiFunc {
   /**
    * Checks permissions.
    * @param qc query context
@@ -24,10 +24,8 @@ abstract class SessionsFn extends StandardFunc {
    */
   final void check(final QueryContext qc) throws QueryException {
     checkAdmin(qc);
-
     // check if HTTP connection is available
-    final Object request = qc.getProperty(HTTPText.REQUEST);
-    if(request == null) throw BASEX_HTTP.get(info);
+    request(qc);
   }
 
   /**

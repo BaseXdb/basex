@@ -142,8 +142,9 @@ abstract class RESTCmd extends Command {
    * @throws IOException I/O exception
    */
   static void parseOptions(final RESTSession session) throws IOException {
-    for(final Entry<String, String[]> param : session.conn.params.stringMap().entrySet())
+    for(final Entry<String, String[]> param : session.conn.requestCtx.queryStrings().entrySet()) {
       parseOption(session, param, true);
+    }
   }
 
   /**

@@ -55,7 +55,7 @@ class RESTQuery extends RESTCmd {
         if(value != null) xq.bind(null, value, NodeType.DOC.toString());
 
         // bind HTTP context and external variables
-        xq.putExternal(HTTPText.REQUEST, conn.request);
+        xq.putExternal(HTTPText.REQUEST, conn.requestCtx);
         vars.forEach((key, val) -> {
           if(val.length == 2) xq.bind(key, val[0], val[1]);
           if(val.length == 1) xq.bind(key, val[0]);
@@ -74,17 +74,17 @@ class RESTQuery extends RESTCmd {
    * Creates a new instance of this command.
    * @param session REST session
    * @param query query
-   * @param vars external variables
-   * @param val context value
+   * @param variables external variables
+   * @param value context value
    * @return command
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
   static RESTQuery get(final RESTSession session, final String query,
-      final Map<String, String[]> vars, final String val) throws IOException {
+      final Map<String, String[]> variables, final String value) throws IOException {
 
     final String uri = session.conn.context.soptions.get(StaticOptions.WEBPATH);
     session.add(new XQuery(query).baseURI(uri));
-    return new RESTQuery(session, vars, val);
+    return new RESTQuery(session, variables, value);
   }
 }

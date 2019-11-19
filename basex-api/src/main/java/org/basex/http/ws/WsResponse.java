@@ -18,7 +18,7 @@ import org.basex.query.value.item.*;
 import org.eclipse.jetty.websocket.api.*;
 
 /**
- * Creates WebSocket reponses.
+ * Creates WebSocket responses.
  *
  * @author BaseX Team 2005-19, BSD License
  * @author Johannes Finckh
@@ -43,7 +43,7 @@ public final class WsResponse extends WebResponse {
   protected void init(final WebFunction function) throws QueryException {
     func = new WsFunction(function.function, qc, function.module);
     qc.putProperty(HTTPText.WEBSOCKET, ws);
-    qc.putProperty(HTTPText.REQUEST, ws.request);
+    qc.putProperty(HTTPText.REQUEST, new RequestContext(ws.request));
     qc.jc().type(WEBSOCKET);
     func.parse(ctx);
   }

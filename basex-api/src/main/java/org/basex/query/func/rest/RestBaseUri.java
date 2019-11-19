@@ -3,6 +3,7 @@ package org.basex.query.func.rest;
 import javax.servlet.http.*;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -12,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class RestBaseUri extends RestFn {
+public final class RestBaseUri extends ApiFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final HttpServletRequest request = request(qc);
