@@ -14,9 +14,9 @@ import org.xmldb.api.modules.*;
  */
 public final class ResourceIteratorTest extends XMLDBBaseTest {
   /** Collection. */
-  private Collection coll;
+  private Collection collection;
   /** Resource. */
-  private XPathQueryService serv;
+  private XPathQueryService service;
 
   /**
    * Initializes a test.
@@ -24,10 +24,10 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
    */
   @Before public void setUp() throws Exception {
     createDB();
-    final Class<?> c = Class.forName(DRIVER);
-    final Database database = (Database) c.getDeclaredConstructor().newInstance();
-    coll = database.getCollection(PATH, LOGIN, PW);
-    serv = (XPathQueryService) coll.getService("XPathQueryService", "1.0");
+    final Class<?> clzz = Class.forName(DRIVER);
+    final Database database = (Database) clzz.getDeclaredConstructor().newInstance();
+    collection = database.getCollection(PATH, LOGIN, PW);
+    service = (XPathQueryService) collection.getService("XPathQueryService", "1.0");
   }
 
   /**
@@ -35,7 +35,7 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @After public void tearDown() throws Exception {
-    coll.close();
+    collection.close();
     dropDB();
   }
 
@@ -45,11 +45,11 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
    */
   @Test public void testHasMoreResources() throws Exception {
     // test result
-    ResourceIterator iter = serv.query("/").getIterator();
+    ResourceIterator iter = service.query("/").getIterator();
     assertTrue("Result expected.", iter.hasMoreResources());
 
     // test empty result
-    iter = serv.query("//Unknown").getIterator();
+    iter = service.query("//Unknown").getIterator();
     assertFalse("Result expected.", iter.hasMoreResources());
   }
 
@@ -59,7 +59,7 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
    */
   @Test public void testNextResource() throws Exception {
     // count down number of results
-    final ResourceSet set = serv.query("//node()");
+    final ResourceSet set = service.query("//node()");
     final ResourceIterator iter = set.getIterator();
     long size = set.getSize();
     while(iter.hasMoreResources()) {

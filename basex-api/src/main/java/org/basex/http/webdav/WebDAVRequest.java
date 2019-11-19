@@ -34,7 +34,7 @@ final class WebDAVRequest extends AbstractRequest {
   private static final String DESTINATION = "Destination";
 
   /** HTTP servlet request. */
-  private final HttpServletRequest req;
+  private final HttpServletRequest request;
   /** Request method. */
   private final Method method;
   /** Request URL. */
@@ -58,20 +58,20 @@ final class WebDAVRequest extends AbstractRequest {
    * @param conn HTTP connection
    */
   WebDAVRequest(final HTTPConnection conn) {
-    req = conn.request;
-    method = Method.valueOf(req.getMethod());
-    url = decode(req.getRequestURL().toString());
+    request = conn.request;
+    method = Method.valueOf(request.getMethod());
+    url = decode(request.getRequestURL().toString());
     auth = new Auth(conn.clientName(), null);
   }
 
   @Override
   public String getFromAddress() {
-    return req.getRemoteHost();
+    return request.getRemoteHost();
   }
 
   @Override
   public String getRequestHeader(final Header header) {
-    final String value = req.getHeader(header.code);
+    final String value = request.getHeader(header.code);
     return header.code.equals(DESTINATION) ? decode(value) : value;
   }
 
@@ -87,7 +87,7 @@ final class WebDAVRequest extends AbstractRequest {
 
   @Override
   public String getRemoteAddr() {
-    return req.getRemoteAddr();
+    return request.getRemoteAddr();
   }
 
   @Override
@@ -102,16 +102,16 @@ final class WebDAVRequest extends AbstractRequest {
 
   @Override
   public InputStream getInputStream() throws IOException {
-    return req.getInputStream();
+    return request.getInputStream();
   }
 
   @Override
   public Map<String, String> getHeaders() {
     final Map<String, String> map = new HashMap<>();
-    final Enumeration<String> en = req.getHeaderNames();
+    final Enumeration<String> en = request.getHeaderNames();
     while(en.hasMoreElements()) {
       final String name = en.nextElement();
-      final String val = req.getHeader(name);
+      final String val = request.getHeader(name);
       map.put(name, val);
     }
     return map;
@@ -119,7 +119,7 @@ final class WebDAVRequest extends AbstractRequest {
 
   @Override
   public Cookie getCookie(final String name) {
-    for(final javax.servlet.http.Cookie c : req.getCookies()) {
+    for(final javax.servlet.http.Cookie c : request.getCookies()) {
       if(c.getName().equals(name)) return new WebDAVCookie(c);
     }
     return null;
@@ -128,7 +128,7 @@ final class WebDAVRequest extends AbstractRequest {
   @Override
   public List<Cookie> getCookies() {
     final List<Cookie> list = new ArrayList<>();
-    for(final javax.servlet.http.Cookie c : req.getCookies()) {
+    for(final javax.servlet.http.Cookie c : request.getCookies()) {
       list.add(new WebDAVCookie(c));
     }
     return list;
@@ -139,8 +139,8 @@ final class WebDAVRequest extends AbstractRequest {
       final Map<String, com.bradmcevoy.http.FileItem> files) throws RequestParseException {
     try {
       if(isMultiPart()) {
-        parseQueryString(params, req.getQueryString());
-        final List<FileItem> items = new ServletFileUpload().parseRequest(req);
+        parseQueryString(params, request.getQueryString());
+        final List<FileItem> items = new ServletFileUpload().parseRequest(request);
         for(final FileItem item : items) {
           if(item.isFormField())
             params.put(item.getFieldName(), item.getString());
@@ -148,10 +148,10 @@ final class WebDAVRequest extends AbstractRequest {
             files.put(item.getFieldName(), new FileItemWrapper(item));
         }
       } else {
-        final Enumeration<String> en = req.getParameterNames();
+        final Enumeration<String> en = request.getParameterNames();
         while(en.hasMoreElements()) {
           final String nm = en.nextElement();
-          final String val = req.getParameter(nm);
+          final String val = request.getParameter(nm);
           params.put(nm, val);
         }
       }
@@ -189,7 +189,7 @@ final class WebDAVRequest extends AbstractRequest {
    * @return the content type of the current request
    */
   private ContentType getRequestContentType() {
-    final String s = req.getContentType();
+    final String s = request.getContentType();
     if(s == null) return null;
     if(s.contains(Response.MULTIPART)) return ContentType.MULTIPART;
     return TYPE_CONTENTS.get(s);

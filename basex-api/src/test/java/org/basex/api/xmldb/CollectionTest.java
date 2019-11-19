@@ -20,7 +20,7 @@ import org.xmldb.api.modules.*;
  */
 public final class CollectionTest extends XMLDBBaseTest {
   /** Collection. */
-  Collection coll;
+  Collection collection;
 
   /**
    * Initializes a test.
@@ -30,7 +30,7 @@ public final class CollectionTest extends XMLDBBaseTest {
     createDB();
     final Class<?> c = Class.forName(DRIVER);
     final Database database = (Database) c.getDeclaredConstructor().newInstance();
-    coll = database.getCollection(PATH, LOGIN, PW);
+    collection = database.getCollection(PATH, LOGIN, PW);
   }
 
   /**
@@ -38,7 +38,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @After public void tearDown() throws Exception {
-    coll.close();
+    collection.close();
     dropDB();
   }
 
@@ -47,7 +47,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @Test public void testGetName() throws Exception {
-    assertEquals(COLL, coll.getName());
+    assertEquals(COLL, collection.getName());
   }
 
   /**
@@ -58,7 +58,7 @@ public final class CollectionTest extends XMLDBBaseTest {
     // get all services
     final Code code = new Code() {
       @Override
-      Object run() throws XMLDBException { return coll.getServices(); }
+      Object run() throws XMLDBException { return collection.getServices(); }
     };
 
     // find XPath implementation
@@ -77,16 +77,16 @@ public final class CollectionTest extends XMLDBBaseTest {
   @Test public void testGetService() throws Exception {
     // assume existence of XPath service
     assertNotNull("XPath Implementation expected.",
-        coll.getService("XPathQueryService", "1.0"));
+        collection.getService("XPathQueryService", "1.0"));
 
     // assume null reference for unknown version
-    assertNull("Unknown version.", coll.getService("XPathQueryService", "3.8"));
+    assertNull("Unknown version.", collection.getService("XPathQueryService", "3.8"));
 
     // get unknown service
     final Code code = new Code() {
       @Override
       Object run() throws XMLDBException {
-        return coll.getService("Unknown", "0.0");
+        return collection.getService("Unknown", "0.0");
       }
     };
     assertNull("No 'Unknown' service expected.", code.run());
@@ -101,7 +101,7 @@ public final class CollectionTest extends XMLDBBaseTest {
     // assume there's no parent collection
     final Code code = new Code() {
       @Override
-      Object run() throws XMLDBException { return coll.getParentCollection(); }
+      Object run() throws XMLDBException { return collection.getParentCollection(); }
     };
     assertNull("No parent collection expected.", code.run());
     checkClosed(code);
@@ -116,7 +116,7 @@ public final class CollectionTest extends XMLDBBaseTest {
     final Code code = new Code() {
       @Override
       Object run() throws XMLDBException {
-        return coll.getChildCollectionCount();
+        return collection.getChildCollectionCount();
       }
     };
     assertEquals("No child collection expected.", 0, code.num());
@@ -131,7 +131,7 @@ public final class CollectionTest extends XMLDBBaseTest {
     // assume there's no child collection
     final Code code = new Code() {
       @Override
-      Object run() throws XMLDBException { return coll.listChildCollections(); }
+      Object run() throws XMLDBException { return collection.listChildCollections(); }
     };
     assertEquals("No child collection expected.", 0, code.strings().length);
     checkClosed(code);
@@ -146,7 +146,7 @@ public final class CollectionTest extends XMLDBBaseTest {
     final Code code = new Code() {
       @Override
       Object run() throws XMLDBException {
-        return coll.getChildCollection("X");
+        return collection.getChildCollection("X");
       }
     };
     assertNull("No child collection expected.", code.run());
@@ -161,7 +161,7 @@ public final class CollectionTest extends XMLDBBaseTest {
     // tests could be added for here multiple documents
     final Code code = new Code() {
       @Override
-      Object run() throws XMLDBException { return coll.getResourceCount(); }
+      Object run() throws XMLDBException { return collection.getResourceCount(); }
     };
     assertEquals("One document expected.", 1, code.num());
     checkClosed(code);
@@ -174,11 +174,11 @@ public final class CollectionTest extends XMLDBBaseTest {
   @Test public void testListResources() throws Exception {
     final Code code = new Code() {
       @Override
-      Object run() throws XMLDBException { return coll.listResources(); }
+      Object run() throws XMLDBException { return collection.listResources(); }
     };
-    final String[] res = code.strings();
-    assertEquals("One document expected.", 1, res.length);
-    assertEquals("Wrong document name.", DOC1, res[0]);
+    final String[] resources = code.strings();
+    assertEquals("One document expected.", 1, resources.length);
+    assertEquals("Wrong document name.", DOC1, resources[0]);
     checkClosed(code);
   }
 
@@ -189,25 +189,25 @@ public final class CollectionTest extends XMLDBBaseTest {
   @Test public void testCreateResource() throws Exception {
     // test unknown resource type
     try {
-      coll.createResource("hans", "UnknownResource");
+      collection.createResource("hans", "UnknownResource");
       fail("Resource Type is expected to be unknown.");
     } catch(final XMLDBException ignored) { }
 
     // test xml resource and ID creation
-    Resource res = coll.createResource(null, XMLResource.RESOURCE_TYPE);
-    assertTrue("XMLResource expected.", res instanceof XMLResource);
-    assertNotNull("No ID was created.", res.getId());
+    Resource resource = collection.createResource(null, XMLResource.RESOURCE_TYPE);
+    assertTrue("XMLResource expected.", resource instanceof XMLResource);
+    assertNotNull("No ID was created.", resource.getId());
 
     // test adoption of specified id
     final String id = DOC2;
-    res = coll.createResource(id, XMLResource.RESOURCE_TYPE);
-    assertEquals("Resource has wrong ID.", id, res.getId());
+    resource = collection.createResource(id, XMLResource.RESOURCE_TYPE);
+    assertEquals("Resource has wrong ID.", id, resource.getId());
 
     // tests could be added for here multiple documents
     final Code code = new Code() {
       @Override
       Object run() throws XMLDBException {
-        return coll.createResource(null, BinaryResource.RESOURCE_TYPE);
+        return collection.createResource(null, BinaryResource.RESOURCE_TYPE);
       }
     };
 
@@ -225,61 +225,61 @@ public final class CollectionTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @Test public void testStoreResource() throws Exception {
-    Resource res = coll.createResource("NoContent", XMLResource.RESOURCE_TYPE);
+    Resource resource = collection.createResource("NoContent", XMLResource.RESOURCE_TYPE);
 
     // try to store resource with missing content
     try {
-      coll.storeResource(res);
+      collection.storeResource(resource);
       fail("Resource has no contents.");
     } catch(final XMLDBException ex) {
       checkCode(ErrorCodes.INVALID_RESOURCE, ex);
     }
 
     // try to store erroneous content
-    res = coll.createResource("Faulty", XMLResource.RESOURCE_TYPE);
-    res.setContent("<xml");
+    resource = collection.createResource("Faulty", XMLResource.RESOURCE_TYPE);
+    resource.setContent("<xml");
     try {
-      coll.storeResource(res);
+      collection.storeResource(resource);
       fail("Resource are faulty.");
     } catch(final XMLDBException ex) {
       checkCode(ErrorCodes.INVALID_RESOURCE, ex);
     }
 
     // try to store resource with missing contents
-    res = coll.createResource("Correct", XMLResource.RESOURCE_TYPE);
-    res.setContent("<xml/>");
-    coll.storeResource(res);
+    resource = collection.createResource("Correct", XMLResource.RESOURCE_TYPE);
+    resource.setContent("<xml/>");
+    collection.storeResource(resource);
 
     // store DOM instance
-    final XMLResource xml1 = (XMLResource) coll.createResource(
+    final XMLResource xml1 = (XMLResource) collection.createResource(
         DOC2, XMLResource.RESOURCE_TYPE);
     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     final DocumentBuilder builder = factory.newDocumentBuilder();
     final Node node = builder.parse(new File(DOCPATH, DOC2));
     xml1.setContentAsDOM(node);
-    coll.storeResource(xml1);
+    collection.storeResource(xml1);
 
     // store SAX stream
-    final XMLResource xml2 = (XMLResource) coll.createResource(
+    final XMLResource xml2 = (XMLResource) collection.createResource(
         DOC3, XMLResource.RESOURCE_TYPE);
     final XMLReader reader = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
     reader.setContentHandler(xml2.setContentAsSAX());
     reader.parse(new InputSource(DOCPATH + DOC3));
-    coll.storeResource(xml2);
+    collection.storeResource(xml2);
     // check number of documents
-    assertEquals("Wrong number of documents.", 4, coll.getResourceCount());
+    assertEquals("Wrong number of documents.", 4, collection.getResourceCount());
 
     // update document with known id
-    res = coll.createResource("Correct", XMLResource.RESOURCE_TYPE);
-    res.setContent("<XML/>");
-    coll.storeResource(res);
+    resource = collection.createResource("Correct", XMLResource.RESOURCE_TYPE);
+    resource.setContent("<XML/>");
+    collection.storeResource(resource);
     // check number of documents
-    assertEquals("Wrong number of documents.", 4, coll.getResourceCount());
+    assertEquals("Wrong number of documents.", 4, collection.getResourceCount());
 
     checkClosed(new Code() {
       @Override
       Object run() throws XMLDBException {
-        return coll.createResource("id", null);
+        return collection.createResource("id", null);
       }
     });
   }
@@ -289,24 +289,24 @@ public final class CollectionTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @Test public void testRemoveResource() throws Exception {
-    final Resource res =
-        coll.createResource("Correct", XMLResource.RESOURCE_TYPE);
-    res.setContent("<xml/>");
-    coll.storeResource(res);
+    final Resource resource =
+        collection.createResource("Correct", XMLResource.RESOURCE_TYPE);
+    resource.setContent("<xml/>");
+    collection.storeResource(resource);
 
-    coll.removeResource(coll.getResource("Correct"));
+    collection.removeResource(collection.getResource("Correct"));
     // check number of documents
-    assertEquals("Wrong number of documents.", 1, coll.getResourceCount());
+    assertEquals("Wrong number of documents.", 1, collection.getResourceCount());
 
     try {
-      coll.removeResource(coll.getResource("test"));
+      collection.removeResource(collection.getResource("test"));
       fail("Document does not exist.");
     } catch(final XMLDBException ex) {
       checkCode(ErrorCodes.NO_SUCH_RESOURCE, ex);
     }
 
     try {
-      coll.removeResource(coll.getResource(null));
+      collection.removeResource(collection.getResource(null));
       fail("Document does not exist.");
     } catch(final XMLDBException ex) {
       checkCode(ErrorCodes.NO_SUCH_RESOURCE, ex);
@@ -315,7 +315,7 @@ public final class CollectionTest extends XMLDBBaseTest {
     checkClosed(new Code() {
       @Override
       Object run() throws XMLDBException {
-        coll.removeResource(null); return null;
+        collection.removeResource(null); return null;
       }
     });
   }
@@ -327,12 +327,12 @@ public final class CollectionTest extends XMLDBBaseTest {
   @Test public void testCreateId() throws Exception {
     final Code code = new Code() {
       @Override
-      Object run() throws XMLDBException { return coll.createId(); }
+      Object run() throws XMLDBException { return collection.createId(); }
     };
 
     // check some ids for their uniqueness
     for(int i = 0; i < 10; ++i) {
-      if(coll.getResource(code.run().toString()) != null) {
+      if(collection.getResource(code.run().toString()) != null) {
         fail("Returned ID not unique.");
       }
     }
@@ -344,9 +344,9 @@ public final class CollectionTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @Test public void testIsOpen() throws Exception {
-    assertTrue(coll.isOpen());
-    coll.close();
-    assertFalse(coll.isOpen());
+    assertTrue(collection.isOpen());
+    collection.close();
+    assertFalse(collection.isOpen());
   }
 
   /**
@@ -354,9 +354,9 @@ public final class CollectionTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @Test public void testClose() throws Exception {
-    coll.close();
-    coll.close();
-    assertFalse(coll.isOpen());
+    collection.close();
+    collection.close();
+    assertFalse(collection.isOpen());
   }
 
   /**
@@ -364,11 +364,11 @@ public final class CollectionTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @Test public void testGetProperty() throws Exception {
-    assertNull(coll.getProperty("ProbablyUnknown"));
+    assertNull(collection.getProperty("ProbablyUnknown"));
 
     // the following tests are database specific...
-    assertEquals(COLL, coll.getProperty("name"));
-    assertEquals("false", coll.getProperty("casesens"));
+    assertEquals(COLL, collection.getProperty("name"));
+    assertEquals("false", collection.getProperty("casesens"));
   }
 
   /**
@@ -377,18 +377,18 @@ public final class CollectionTest extends XMLDBBaseTest {
    */
   @Test public void testSetProperty() throws Exception {
     try {
-      coll.setProperty("ProbablyUnknown", "on");
+      collection.setProperty("ProbablyUnknown", "on");
       fail("Invalid key was assigned.");
     } catch(final XMLDBException ex) {
       checkCode(ErrorCodes.VENDOR_ERROR, ex);
     }
 
     // the following tests are database specific...
-    coll.setProperty("name", "NewName");
-    coll.setProperty("name", COLL);
+    collection.setProperty("name", "NewName");
+    collection.setProperty("name", COLL);
 
     try {
-      coll.setProperty("time", "ABC");
+      collection.setProperty("time", "ABC");
       fail("Invalid value was assigned.");
     } catch(final XMLDBException ex) {
       checkCode(ErrorCodes.VENDOR_ERROR, ex);
@@ -410,7 +410,7 @@ public final class CollectionTest extends XMLDBBaseTest {
    */
   private void checkClosed(final Code code) {
     try {
-      coll.close();
+      collection.close();
       code.run();
       fail("Database was closed.");
     } catch(final XMLDBException ex) {

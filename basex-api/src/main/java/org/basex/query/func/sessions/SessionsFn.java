@@ -26,8 +26,8 @@ abstract class SessionsFn extends StandardFunc {
     checkAdmin(qc);
 
     // check if HTTP connection is available
-    final Object req = qc.getProperty(HTTPText.REQUEST);
-    if(req == null) throw BASEX_HTTP.get(info);
+    final Object request = qc.getProperty(HTTPText.REQUEST);
+    if(request == null) throw BASEX_HTTP.get(info);
   }
 
   /**

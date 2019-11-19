@@ -26,14 +26,14 @@ import org.basex.util.list.*;
  */
 public final class RestXqWadl {
   /** HTTP request. */
-  private final HttpServletRequest req;
+  private final HttpServletRequest request;
 
   /**
    * Constructor.
-   * @param req HTTP request
+   * @param request HTTP request
    */
-  public RestXqWadl(final HttpServletRequest req) {
-    this.req = req;
+  public RestXqWadl(final HttpServletRequest request) {
+    this.request = request;
   }
 
   /**
@@ -44,8 +44,8 @@ public final class RestXqWadl {
   public synchronized FElem create(final HashMap<String, WebModule> modules) {
     // create root nodes
     final FElem application = new FElem(WADL + "application", WADL_URI).declareNS();
-    final String base = req.getRequestURL().toString().replace(req.getRequestURI(),
-        req.getContextPath());
+    final String base = request.getRequestURL().toString().replace(request.getRequestURI(),
+        request.getContextPath());
     final FElem resources = elem("resources", application).add("base", base);
 
     // create children
@@ -74,13 +74,13 @@ public final class RestXqWadl {
         if(descs != null) for(final byte[] desc : descs) addDoc(desc, method);
 
         // create request
-        final FElem request = elem("request", method);
+        final FElem rqst = elem("request", method);
         for(final WebParam rxp : func.queryParams)
-          addParam(rxp.name, "query",  request, xqdoc, func);
+          addParam(rxp.name, "query",  rqst, xqdoc, func);
         for(final WebParam rxp : func.formParams)
-          addParam(rxp.name, "query",  request, xqdoc, func);
+          addParam(rxp.name, "query",  rqst, xqdoc, func);
         for(final WebParam rxp : func.headerParams)
-          addParam(rxp.name, "header",  request, xqdoc, func);
+          addParam(rxp.name, "header",  rqst, xqdoc, func);
 
         // create response
         final FElem response = elem("response", method);

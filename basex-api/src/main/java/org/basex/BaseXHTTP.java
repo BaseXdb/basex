@@ -194,14 +194,14 @@ public final class BaseXHTTP extends CLI {
     if(io.exists()) {
       data = io.read();
       // check if resource path exists
-      IOFile res = new IOFile("src/main/resources");
-      if(res.exists()) {
-        res = new IOFile(res, file);
+      IOFile dir = new IOFile("src/main/resources");
+      if(dir.exists()) {
+        dir = new IOFile(dir, file);
         // update file in resource path if it has changed
-        if(!res.exists() || !Token.eq(data, res.read())) {
-          Util.errln("Updating " +  res);
-          res.parent().md();
-          res.write(data);
+        if(!dir.exists() || !Token.eq(data, dir.read())) {
+          Util.errln("Updating " +  dir);
+          dir.parent().md();
+          dir.write(data);
         }
       }
     } else if(create) {

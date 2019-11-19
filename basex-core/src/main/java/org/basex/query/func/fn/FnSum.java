@@ -127,9 +127,9 @@ public class FnSum extends StandardFunc {
   Item sum(final Iter iter, final Item item, final boolean avg, final QueryContext qc)
       throws QueryException {
 
-    Item res = item.type.isUntyped() ? Dbl.get(item.dbl(info)) : item;
-    final boolean num = res instanceof ANum, dtd = res.type == DTD, ymd = res.type == YMD;
-    if(!num && !dtd && !ymd) throw SUM_X_X.get(info, res.type, res);
+    Item result = item.type.isUntyped() ? Dbl.get(item.dbl(info)) : item;
+    final boolean num = result instanceof ANum, dtd = result.type == DTD, ymd = result.type == YMD;
+    if(!num && !dtd && !ymd) throw SUM_X_X.get(info, result.type, result);
 
     int c = 1;
     for(Item it; (it = qc.next(iter)) != null;) {
@@ -142,9 +142,9 @@ public class FnSum extends StandardFunc {
         else if(dtd && type != DTD || ymd && type != YMD) tp = DUR;
       }
       if(tp != null) throw CMP_X_X_X.get(info, tp, type, it);
-      res = Calc.PLUS.eval(res, it, info);
+      result = Calc.PLUS.eval(result, it, info);
       c++;
     }
-    return avg ? Calc.DIV.eval(res, Int.get(c), info) : res;
+    return avg ? Calc.DIV.eval(result, Int.get(c), info) : result;
   }
 }

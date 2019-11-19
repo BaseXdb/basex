@@ -7,6 +7,7 @@ import static org.basex.util.http.HttpText.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.StaticOptions.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -168,38 +169,39 @@ public final class HttpRequestParser {
 
   /**
    * Checks consistency of attributes for <http:request/>.
-   * @param req request
+   * @param request request
    * @throws QueryException query exception
    */
-  private void checkRequest(final HttpRequest req) throws QueryException {
+  private void checkRequest(final HttpRequest request) throws QueryException {
     // method denotes the HTTP verb and is mandatory
-    final String mth = req.attribute(Request.METHOD);
+    final String mth = request.attribute(Request.METHOD);
     if(mth == null) throw HC_REQ_X.get(info, "Missing attribute: " + Request.METHOD);
-    req.attributes.put(Request.METHOD, mth.toUpperCase(Locale.ENGLISH));
+    request.attributes.put(Request.METHOD, mth.toUpperCase(Locale.ENGLISH));
 
     // check parameters needed in case of authorization
-    final String us = req.attribute(Request.USERNAME);
+    final String us = request.attribute(Request.USERNAME);
     if(us != null) {
       // check if password is supplied
-      final String pw = req.attribute(Request.PASSWORD);
+      final String pw = request.attribute(Request.PASSWORD);
       if(pw == null) throw HC_REQ_X.get(info, "Missing attribute: " + Request.PASSWORD);
       // check if authorization method is supplied (default is 'Basic')
-      final String am = req.attribute(Request.AUTH_METHOD);
+      final String am = request.attribute(Request.AUTH_METHOD);
       if(am != null) {
-        req.authMethod = StaticOptions.AUTHMETHOD.get(am);
-        if(req.authMethod == null) throw HC_REQ_X.get(info, "Invalid authentication method: " + am);
+        final AuthMethod method = StaticOptions.AUTHMETHOD.get(am);
+        if(method == null) throw HC_REQ_X.get(info, "Invalid authentication method: " + am);
+        request.authMethod = method;
       }
     }
 
     // check other parameters
-    final String timeout = req.attribute(Request.TIMEOUT);
+    final String timeout = request.attribute(Request.TIMEOUT);
     if(timeout != null && Strings.toInt(timeout) < 0)
       throw HC_REQ_X.get(info, "Invalid timeout: " + timeout);
 
     for(final Request r : new Request[] {
       Request.FOLLOW_REDIRECT, Request.STATUS_ONLY, Request.SEND_AUTHORIZATION
     }) {
-      final String s = req.attribute(r);
+      final String s = request.attribute(r);
       if(s != null && !Strings.eq(s, Text.TRUE, Text.FALSE))
         throw HC_REQ_X.get(info, "Value of '" + r + "' attribute is no boolean: " + s);
     }

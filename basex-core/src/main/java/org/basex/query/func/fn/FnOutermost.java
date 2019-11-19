@@ -45,7 +45,7 @@ public class FnOutermost extends StandardFunc {
     if(len < 2) return list.value(this).iter();
 
     // after this, the iterator is sorted and duplicate free
-    final ANodeBuilder res = new ANodeBuilder();
+    final ANodeBuilder nodes = new ANodeBuilder();
     final Data data = list.data();
     if(data != null) {
       // nodes are sorted, so ancestors always come before their descendants
@@ -60,17 +60,17 @@ public class FnOutermost extends StandardFunc {
           final int pre = nd.pre();
           dummy.pre(pre + data.size(pre, data.kind(pre)));
           p = list.binarySearch(dummy, next + 1, len - next - 1);
-          res.add(nd);
+          nodes.add(nd);
         }
       } else {
         // skip ancestors of the last added node
-        res.add(fst);
+        nodes.add(fst);
         int before = fst.pre();
         for(int l = len - 1; l-- != 0;) {
           final DBNode nd = (DBNode) list.get(l);
           final int pre = nd.pre();
           if(pre + data.size(pre, data.kind(pre)) <= before) {
-            res.add(nd);
+            nodes.add(nd);
             before = pre;
           }
         }
@@ -84,9 +84,9 @@ public class FnOutermost extends StandardFunc {
           qc.checkStop();
           if(list.contains(a)) continue OUTER;
         }
-        res.add(nd);
+        nodes.add(nd);
       }
     }
-    return res.value(this).iter();
+    return nodes.value(this).iter();
   }
 }

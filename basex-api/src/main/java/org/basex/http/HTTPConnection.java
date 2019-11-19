@@ -287,11 +287,11 @@ public final class HTTPConnection implements ClientInfo {
 
   /**
    * Returns the content type of a request, or an empty string.
-   * @param req servlet request
+   * @param request servlet request
    * @return content type
    */
-  public static MediaType mediaType(final HttpServletRequest req) {
-    final String ct = req.getContentType();
+  public static MediaType mediaType(final HttpServletRequest request) {
+    final String ct = request.getContentType();
     return new MediaType(ct == null ? "" : ct);
   }
 

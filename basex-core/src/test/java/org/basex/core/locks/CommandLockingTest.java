@@ -314,12 +314,15 @@ public final class CommandLockingTest extends SandboxTest {
    * Pass empty string for currently opened database, {@code null} for all.
    * @param cmd command to test
    * @param up updating command?
-   * @param req required databases (can be {@code null})
-   * @param allow allowed databases (can be {@code null})
+   * @param required required databases (can be {@code null})
+   * @param allowed allowed databases (can be {@code null})
    */
-  private static void ckDBs(final Command cmd, final boolean up, final LockList req,
-      final LockList allow) {
-    ckDBs(cmd, up ? NONE : req, up ? NONE : allow, up ? req : NONE, up ? allow : NONE);
+  private static void ckDBs(final Command cmd, final boolean up, final LockList required,
+      final LockList allowed) {
+
+    final LockList reqRd = up ? NONE : required, allowRd = up ? NONE : allowed;
+    final LockList reqWt = up ? required : NONE, allowWt = up ? allowed : NONE;
+    ckDBs(cmd, reqRd, allowRd, reqWt, allowWt);
   }
 
   /**

@@ -136,11 +136,11 @@ public final class BXCollection implements Collection {
   }
 
   @Override
-  public void removeResource(final Resource res) throws XMLDBException {
+  public void removeResource(final Resource resource) throws XMLDBException {
     check();
 
     // check if the resource is an xml resource
-    final BXXMLResource del = checkXML(res);
+    final BXXMLResource del = checkXML(resource);
 
     // check if data instance refers to another database
     if(del.data != data && del.data != null) throw new XMLDBException(
@@ -158,16 +158,16 @@ public final class BXCollection implements Collection {
   }
 
   @Override
-  public void storeResource(final Resource res) throws XMLDBException {
+  public void storeResource(final Resource resource) throws XMLDBException {
     check();
 
     // check if resource has any contents
-    final BXXMLResource xml = checkXML(res);
-    if(res.getContent() == null)
+    final BXXMLResource xml = checkXML(resource);
+    if(resource.getContent() == null)
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE, ERR_EMPTY);
 
     // disallow storage of resources without id
-    final String id = res.getId();
+    final String id = resource.getId();
     if(id == null) throw new XMLDBException(ErrorCodes.INVALID_RESOURCE, ERR_ID);
 
     // document exists - delete old one first
@@ -209,11 +209,11 @@ public final class BXCollection implements Collection {
 
   @Override
   public String createId() throws XMLDBException {
-    final String[] res = listResources();
+    final String[] resources = listResources();
     String id;
     do {
       id = Long.toString(System.currentTimeMillis());
-    } while(contains(res, id));
+    } while(contains(resources, id));
     return id;
   }
 
@@ -287,14 +287,14 @@ public final class BXCollection implements Collection {
   /**
    * Returns the specified resource as a project specific XML resource.
    * If that's not possible, throws an exception
-   * @param res input resource
+   * @param resource input resource
    * @return xml resource
    * @throws XMLDBException exception
    */
-  private static BXXMLResource checkXML(final Resource res) throws XMLDBException {
-    if(!(res instanceof BXXMLResource)) {
-      throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + res);
+  private static BXXMLResource checkXML(final Resource resource) throws XMLDBException {
+    if(!(resource instanceof BXXMLResource)) {
+      throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + resource);
     }
-    return (BXXMLResource) res;
+    return (BXXMLResource) resource;
   }
 }

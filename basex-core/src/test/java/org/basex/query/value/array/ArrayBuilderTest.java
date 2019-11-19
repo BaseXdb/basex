@@ -163,10 +163,10 @@ public final class ArrayBuilderTest extends ArrayTest {
     resBuilder.append(left);
     resBuilder.append(XQArray.singleton(Int.get(999)));
     resBuilder.append(right);
-    final XQArray res = resBuilder.freeze();
-    res.checkInvariants();
+    final XQArray result = resBuilder.freeze();
+    result.checkInvariants();
 
-    assertEquals(left.arraySize() + 1 + right.arraySize(), res.arraySize());
+    assertEquals(left.arraySize() + 1 + right.arraySize(), result.arraySize());
   }
 
   /**

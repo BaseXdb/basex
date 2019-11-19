@@ -15,8 +15,8 @@ import org.basex.util.*;
 public final class RestBaseUri extends RestFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final HttpServletRequest req = request(qc);
-    final String uri = req.getRequestURI(), path = req.getPathInfo();
+    final HttpServletRequest request = request(qc);
+    final String uri = request.getRequestURI(), path = request.getPathInfo();
     return Uri.uri(path != null ? uri.substring(0, uri.length() - path.length()) : uri);
   }
 }

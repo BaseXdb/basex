@@ -22,9 +22,9 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
   /** Collection. */
   private Database db;
   /** Collection. */
-  private Collection coll;
+  private Collection collection;
   /** Resource. */
-  private CollectionManagementService serv;
+  private CollectionManagementService service;
 
   /**
    * Initializes a test.
@@ -34,8 +34,8 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
     createDB();
     final Class<?> c = Class.forName(DRIVER);
     db = (Database) c.getDeclaredConstructor().newInstance();
-    coll = db.getCollection(PATH, LOGIN, PW);
-    serv = (CollectionManagementService) coll.getService(CMS, "1.0");
+    collection = db.getCollection(PATH, LOGIN, PW);
+    service = (CollectionManagementService) collection.getService(CMS, "1.0");
   }
 
   /**
@@ -43,7 +43,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @After public void tearDown() throws Exception {
-    coll.close();
+    collection.close();
     dropDB();
   }
 
@@ -53,11 +53,11 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
    */
   @Test public void testCreateCollection() throws Exception {
     // create a collection
-    final Collection coll1 = serv.createCollection(TEMP);
-    assertNotSame(coll, coll1);
+    final Collection coll1 = service.createCollection(TEMP);
+    assertNotSame(collection, coll1);
 
     // add a document
-    final Resource res1 = coll.createResource(TEST, XMLResource.RESOURCE_TYPE);
+    final Resource res1 = collection.createResource(TEST, XMLResource.RESOURCE_TYPE);
     res1.setContent("<xml/>");
     coll1.storeResource(res1);
     coll1.close();
@@ -68,7 +68,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @Test public void testRemoveCollection() throws Exception {
-    serv.removeCollection(TEMP);
+    service.removeCollection(TEMP);
     assertNull("Collection was not removed.", db.getCollection(URL + TEMP, null, null));
   }
 
@@ -77,7 +77,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @Test public void testGetName() throws Exception {
-    assertEquals(CMS, serv.getName());
+    assertEquals(CMS, service.getName());
   }
 
   /**
@@ -85,6 +85,6 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @Test public void testGetVersion() throws Exception {
-    assertEquals("1.0", serv.getVersion());
+    assertEquals("1.0", service.getVersion());
   }
 }

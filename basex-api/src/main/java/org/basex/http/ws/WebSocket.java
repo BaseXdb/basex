@@ -39,7 +39,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   /** Header parameters. */
   final Map<String, Value> headers = new HashMap<>();
   /** Servlet request. */
-  final HttpServletRequest req;
+  final HttpServletRequest request;
 
   /** Client WebSocket id. */
   public String id;
@@ -48,14 +48,14 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
 
   /**
    * Constructor.
-   * @param req request
+   * @param request request
    */
-  WebSocket(final HttpServletRequest req) {
-    this.req = req;
+  WebSocket(final HttpServletRequest request) {
+    this.request = request;
 
-    final String pi = req.getPathInfo();
+    final String pi = request.getPathInfo();
     path = new WsPath(pi != null ? pi : "/");
-    session = req.getSession();
+    session = request.getSession();
 
     final Context ctx = HTTPContext.get().context();
     context = new Context(ctx, this);
@@ -64,11 +64,11 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
 
   /**
    * Creates a new WebSocket instance.
-   * @param req request
+   * @param request request
    * @return WebSocket or {@code null}
    */
-  static WebSocket get(final HttpServletRequest req) {
-    final WebSocket ws = new WebSocket(req);
+  static WebSocket get(final HttpServletRequest request) {
+    final WebSocket ws = new WebSocket(request);
     try {
       if(!WebModules.get(ws.context).findWs(ws, null).isEmpty()) return ws;
     } catch(final Exception ex) {
@@ -83,7 +83,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
     super.onWebSocketConnect(sess);
     id = WsPool.add(this);
 
-    run("[WS-OPEN] " + req.getRequestURL(), null, () -> {
+    run("[WS-OPEN] " + request.getRequestURL(), null, () -> {
       // add headers (for binding them to the XQuery parameters in the corresponding bind method)
       final UpgradeRequest ur = sess.getUpgradeRequest();
       final BiConsumer<String, String> addHeader = (k, v) -> {
@@ -107,14 +107,14 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
 
   @Override
   public void onWebSocketError(final Throwable cause) {
-    run("[WS-ERROR] " + req.getRequestURL() + ": " + cause.getMessage(), null,
+    run("[WS-ERROR] " + request.getRequestURL() + ": " + cause.getMessage(), null,
         () -> findAndProcess(Annotation._WS_ERROR, cause.getMessage()));
   }
 
   @Override
   public void onWebSocketClose(final int status, final String message) {
     try {
-      run("[WS-CLOSE] " + req.getRequestURL(), status,
+      run("[WS-CLOSE] " + request.getRequestURL(), status,
           () -> findAndProcess(Annotation._WS_CLOSE, null));
     } finally {
       WsPool.remove(id);

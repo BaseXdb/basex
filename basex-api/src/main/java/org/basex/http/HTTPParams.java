@@ -24,7 +24,7 @@ import org.basex.util.http.*;
  */
 public final class HTTPParams {
   /** HTTP request. */
-  private final HttpServletRequest req;
+  private final HttpServletRequest request;
   /** Query parameters with string values. */
   private Map<String, String[]> strings;
   /** Query parameters with XQuery values. */
@@ -36,10 +36,10 @@ public final class HTTPParams {
 
   /**
    * Returns an immutable map with all query parameters.
-   * @param req HTTP request
+   * @param request HTTP request
    */
-  public HTTPParams(final HttpServletRequest req) {
-    this.req = req;
+  public HTTPParams(final HttpServletRequest request) {
+    this.request = request;
   }
 
   /**
@@ -47,7 +47,7 @@ public final class HTTPParams {
    * @return query string
    */
   public String queryString() {
-    return req.getQueryString();
+    return request.getQueryString();
   }
 
   /**
@@ -57,7 +57,7 @@ public final class HTTPParams {
    */
   public Map<String, String[]> stringMap() throws IOException {
     try {
-      if(strings == null) strings = req.getParameterMap();
+      if(strings == null) strings = request.getParameterMap();
       return strings;
     } catch(final RuntimeException ex) {
       // may be caused by too large input (#884) or illegal query parameters
@@ -75,7 +75,7 @@ public final class HTTPParams {
   public Map<String, Value> form(final MainOptions options) throws QueryException, IOException {
     if(form == null) {
       form = new HashMap<>();
-      final MediaType mt = HTTPConnection.mediaType(req);
+      final MediaType mt = HTTPConnection.mediaType(request);
       if(mt.is(MediaType.MULTIPART_FORM_DATA)) {
         // convert multipart parameters encoded in a form
         addMultipart(mt, options, form);
@@ -111,7 +111,7 @@ public final class HTTPParams {
    */
   public IOContent body() throws IOException {
     if(content == null) {
-      content = new IOContent(BufferInput.get(req.getInputStream()).content());
+      content = new IOContent(BufferInput.get(request.getInputStream()).content());
     }
     return content;
   }

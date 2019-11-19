@@ -86,11 +86,11 @@ public final class WebModules {
 
   /**
    * Returns a WADL description for all available URIs.
-   * @param req HTTP request
+   * @param request HTTP request
    * @return WADL description
    */
-  public FElem wadl(final HttpServletRequest req) {
-    return new RestXqWadl(req).create(modules);
+  public FElem wadl(final HttpServletRequest request) {
+    return new RestXqWadl(request).create(modules);
   }
 
   /**

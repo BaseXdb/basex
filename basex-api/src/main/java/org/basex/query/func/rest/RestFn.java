@@ -22,8 +22,8 @@ abstract class RestFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final HttpServletRequest request(final QueryContext qc) throws QueryException {
-    final Object req = qc.getProperty(HTTPText.REQUEST);
-    if(req == null) throw BASEX_HTTP.get(info);
-    return (HttpServletRequest) req;
+    final Object request = qc.getProperty(HTTPText.REQUEST);
+    if(request == null) throw BASEX_HTTP.get(info);
+    return (HttpServletRequest) request;
   }
 }

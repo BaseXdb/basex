@@ -56,10 +56,10 @@ public abstract class BaseXServlet extends HttpServlet {
   }
 
   @Override
-  public final void service(final HttpServletRequest req, final HttpServletResponse res)
+  public final void service(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
 
-    final HTTPConnection conn = new HTTPConnection(req, res, this, auth);
+    final HTTPConnection conn = new HTTPConnection(request, response, this, auth);
     try {
       conn.authenticate(username);
       run(conn);
@@ -83,14 +83,14 @@ public abstract class BaseXServlet extends HttpServlet {
       conn.error(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED_X, msg));
     } finally {
       if(Prop.debug) {
-        Util.errln("Request: " + req.getMethod() + ' ' + req.getRequestURL());
-        for(final Enumeration<String> en = req.getHeaderNames(); en.hasMoreElements();) {
+        Util.errln("Request: " + request.getMethod() + ' ' + request.getRequestURL());
+        for(final Enumeration<String> en = request.getHeaderNames(); en.hasMoreElements();) {
           final String name = en.nextElement();
-          Util.errln("* " + name + ": " + req.getHeader(name));
+          Util.errln("* " + name + ": " + request.getHeader(name));
         }
-        Util.errln("Response: " + res.getStatus());
-        for(final String name : res.getHeaderNames()) {
-          Util.errln("* " + name + ": " + res.getHeader(name));
+        Util.errln("Response: " + response.getStatus());
+        for(final String name : response.getHeaderNames()) {
+          Util.errln("* " + name + ": " + response.getHeader(name));
         }
       }
     }

@@ -23,7 +23,7 @@ import com.bradmcevoy.http.Cookie;
  */
 final class WebDAVResponse extends AbstractResponse {
   /** HTTP servlet response. */
-  private final HttpServletResponse res;
+  private final HttpServletResponse response;
   /** Response headers. */
   private final Map<String, String> headers = new HashMap<>();
   /** Response status. */
@@ -34,12 +34,12 @@ final class WebDAVResponse extends AbstractResponse {
    * @param conn HTTP connection
    */
   WebDAVResponse(final HTTPConnection conn) {
-    res = conn.response;
+    response = conn.response;
   }
 
   @Override
   protected void setAnyDateHeader(final Header name, final Date date) {
-    res.setDateHeader(name.code, date.getTime());
+    response.setDateHeader(name.code, date.getTime());
   }
 
   @Override
@@ -49,13 +49,13 @@ final class WebDAVResponse extends AbstractResponse {
 
   @Override
   public void setNonStandardHeader(final String name, final String value) {
-    res.addHeader(name, value);
+    response.addHeader(name, value);
     headers.put(name, value);
   }
 
   @Override
   public void setStatus(final Status s) {
-    res.setStatus(s.code);
+    response.setStatus(s.code);
     status = s;
   }
 
@@ -67,7 +67,7 @@ final class WebDAVResponse extends AbstractResponse {
   @Override
   public OutputStream getOutputStream() {
     try {
-      return res.getOutputStream();
+      return response.getOutputStream();
     } catch(final IOException ex) {
       throw new RuntimeException(ex);
     }
@@ -76,8 +76,8 @@ final class WebDAVResponse extends AbstractResponse {
   @Override
   public void close() {
     try {
-      res.flushBuffer();
-      res.getOutputStream().flush();
+      response.flushBuffer();
+      response.getOutputStream().flush();
     } catch(final IOException ex) {
       throw new RuntimeException(ex);
     }
@@ -86,7 +86,7 @@ final class WebDAVResponse extends AbstractResponse {
   @Override
   public void sendRedirect(final String url) {
     try {
-      res.sendRedirect(res.encodeRedirectURL(url));
+      response.sendRedirect(response.encodeRedirectURL(url));
     } catch(final IOException ex) {
       throw new RuntimeException(ex);
     }
@@ -100,14 +100,14 @@ final class WebDAVResponse extends AbstractResponse {
   @Override
   public void setAuthenticateHeader(final List<String> challenges) {
     for(final String ch : challenges) {
-      res.addHeader(Header.WWW_AUTHENTICATE.code, ch);
+      response.addHeader(Header.WWW_AUTHENTICATE.code, ch);
     }
   }
 
   @Override
   public Cookie setCookie(final Cookie cookie) {
     if(cookie instanceof WebDAVCookie) {
-      res.addCookie(((WebDAVCookie) cookie).cookie);
+      response.addCookie(((WebDAVCookie) cookie).cookie);
       return cookie;
     }
 
@@ -119,14 +119,14 @@ final class WebDAVResponse extends AbstractResponse {
     c.setSecure(cookie.getSecure());
     c.setVersion(cookie.getVersion());
 
-    res.addCookie(c);
+    response.addCookie(c);
     return new WebDAVCookie(c);
   }
 
   @Override
   public Cookie setCookie(final String name, final String value) {
     final javax.servlet.http.Cookie c = new javax.servlet.http.Cookie(name, value);
-    res.addCookie(c);
+    response.addCookie(c);
     return new WebDAVCookie(c);
   }
 }

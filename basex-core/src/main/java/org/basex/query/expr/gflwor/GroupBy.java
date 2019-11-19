@@ -78,10 +78,10 @@ public final class GroupBy extends Clause {
    */
   private static Var[] vars(final GroupSpec[] gs, final Var[] vs) {
     final int gl = gs.length, vl = vs.length;
-    final Var[] res = new Var[gl + vl];
-    for(int g = 0; g < gl; g++) res[g] = gs[g].var;
-    Array.copyFromStart(vs, vl, res, gl);
-    return res;
+    final Var[] vars = new Var[gl + vl];
+    for(int g = 0; g < gl; g++) vars[g] = gs[g].var;
+    Array.copyFromStart(vs, vl, vars, gl);
+    return vars;
   }
 
   @Override

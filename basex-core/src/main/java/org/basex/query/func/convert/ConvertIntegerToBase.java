@@ -53,9 +53,9 @@ public final class ConvertIntegerToBase extends StandardFunc {
       n /= base;
     }
 
-    final byte[] res = tb.finish();
-    Array.reverse(res);
-    return Str.get(res);
+    final byte[] bytes = tb.finish();
+    Array.reverse(bytes);
+    return Str.get(bytes);
   }
 
   /**

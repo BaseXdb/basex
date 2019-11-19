@@ -279,10 +279,10 @@ public enum Calc {
 
       final BigDecimal dec1 = item1.dec(ii), dec2 = item2.dec(ii);
       if(dec2.signum() == 0) throw zeroError(ii, item1);
-      final BigDecimal res = dec1.divideToIntegralValue(dec2);
-      if(!(MIN_LONG.compareTo(res) <= 0 && res.compareTo(MAX_LONG) <= 0))
+      final BigDecimal dec = dec1.divideToIntegralValue(dec2);
+      if(!(MIN_LONG.compareTo(dec) <= 0 && dec.compareTo(MAX_LONG) <= 0))
         throw RANGE_X.get(ii, dec1 + " idiv " + dec2);
-      return Int.get(res.longValueExact());
+      return Int.get(dec.longValueExact());
     }
 
     @Override

@@ -21,22 +21,22 @@ public final class FnFoldRight extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value seq = exprs[0].value(qc);
-    Value res = exprs[1].value(qc);
+    Value value = exprs[1].value(qc);
     final FItem func = checkArity(exprs[2], 2, qc);
 
     if(seq instanceof TreeSeq) {
       final ListIterator<Item> iter = ((TreeSeq) seq).iterator(seq.size());
       while(iter.hasPrevious()) {
         qc.checkStop();
-        res = func.invokeValue(qc, info, iter.previous(), res);
+        value = func.invokeValue(qc, info, iter.previous(), value);
       }
     } else {
       for(long i = seq.size(); --i >= 0;) {
         qc.checkStop();
-        res = func.invokeValue(qc, info, seq.itemAt(i), res);
+        value = func.invokeValue(qc, info, seq.itemAt(i), value);
       }
     }
-    return res;
+    return value;
   }
 
   @Override
@@ -47,20 +47,20 @@ public final class FnFoldRight extends StandardFunc {
     // evaluate start value lazily if it's passed straight through
     if(seq.isEmpty()) return exprs[1].iter(qc);
 
-    Value res = exprs[1].value(qc);
+    Value value = exprs[1].value(qc);
     if(seq instanceof TreeSeq) {
       final ListIterator<Item> iter = ((TreeSeq) seq).iterator(seq.size());
       while(iter.hasPrevious()) {
         qc.checkStop();
-        res = func.invokeValue(qc, info, iter.previous(), res);
+        value = func.invokeValue(qc, info, iter.previous(), value);
       }
     } else {
       for(long i = seq.size(); --i >= 0;) {
         qc.checkStop();
-        res = func.invokeValue(qc, info, seq.itemAt(i), res);
+        value = func.invokeValue(qc, info, seq.itemAt(i), value);
       }
     }
-    return res.iter();
+    return value.iter();
   }
 
   @Override

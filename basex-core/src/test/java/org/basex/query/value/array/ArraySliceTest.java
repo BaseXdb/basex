@@ -28,9 +28,9 @@ public final class ArraySliceTest extends ArrayTest {
           sub.checkInvariants();
           final Iterator<Value> iter = sub.iterator(0);
           for(int i = 0; i < k; i++) {
-            final long res = ((Int) iter.next()).itr();
-            if(res != pos + i) {
-              fail("Wrong value: " + res + " vs. " + (pos + i));
+            final long result = ((Int) iter.next()).itr();
+            if(result != pos + i) {
+              fail("Wrong value: " + result + " vs. " + (pos + i));
             }
           }
         }

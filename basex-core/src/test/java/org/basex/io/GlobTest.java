@@ -60,11 +60,11 @@ public final class GlobTest {
       final String regex = IOFile.regex(test.glob);
       final int sl = STRINGS.length;
       for(int s = 0; s < sl; s++) {
-        final boolean exp = test.results[s];
-        final boolean res = STRINGS[s].matches(regex);
-        if(exp != res) fail(test + " #" + s + " failed.\n" +
+        final boolean expected = test.results[s];
+        final boolean result = STRINGS[s].matches(regex);
+        if(expected != result) fail(test + " #" + s + " failed.\n" +
             "Query: \"" + test.glob + "\" matches \"" + STRINGS[s] +
-            "\" \u2192 " + res + "\nExpected: " + exp +
+            "\" \u2192 " + result + "\nExpected: " + expected +
             "\nRegex: " + regex);
       }
     }

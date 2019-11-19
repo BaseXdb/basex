@@ -24,15 +24,15 @@ abstract class SessionFn extends StandardFunc {
    */
   final ASession session(final QueryContext qc) throws QueryException {
     // check if HTTP connection is available
-    final Object req = qc.getProperty(HTTPText.REQUEST);
-    if(req == null) throw BASEX_HTTP.get(info);
+    final Object request = qc.getProperty(HTTPText.REQUEST);
+    if(request == null) throw BASEX_HTTP.get(info);
 
     // WebSocket context: access existing session
     HttpSession session = null;
     final Object ws = qc.getProperty(HTTPText.WEBSOCKET);
     if(ws != null) session = ((WebSocket) ws).session;
     // HTTP context: get/create session
-    if(session == null) session = ((HttpServletRequest) req).getSession();
+    if(session == null) session = ((HttpServletRequest) request).getSession();
     // raise error if no session could be created (may happen in the WebSocket context)
     if(session == null) throw SESSIONS_NOTFOUND.get(info);
 
