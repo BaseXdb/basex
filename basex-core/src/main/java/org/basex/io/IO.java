@@ -77,7 +77,7 @@ public abstract class IO {
   /** Text suffixes. */
   public static final String[] TXTSUFFIXES = { ".txt", ".text", ".ini", ".conf", ".md", ".log" };
   /** JS file suffixes. */
-  public static final String[] JSSUFFIXES = { ".js", ".ts" };
+  public static final String[] JSSUFFIXES = { ".js", ".ts", ".java" };
 
   /** Disk block/page size (4096). */
   public static final int BLOCKSIZE = 1 << 12;
