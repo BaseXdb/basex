@@ -68,7 +68,7 @@ public abstract class IO {
   /** Archive suffixes. */
   public static final String[] ZIPSUFFIXES = {
     ZIPSUFFIX, GZSUFFIX, TGZSUFFIX, TARSUFFIX, XARSUFFIX,
-    ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods", ".epub"
+    ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods", ".epub", ".idml"
   };
   /** XSL suffixes. */
   public static final String[] XSLSUFFIXES = { ".xsl", ".xslt", ".fo", ".fob" };
