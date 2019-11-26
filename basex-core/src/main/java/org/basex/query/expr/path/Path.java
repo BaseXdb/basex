@@ -815,27 +815,26 @@ public abstract class Path extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr mergeDesc(final CompileContext cc) throws QueryException {
-    boolean changed = false;
     final int sl = steps.length;
     final ExprList stps = new ExprList(sl);
 
     cc.pushFocus(root);
     try {
       for(int s = 0; s < sl; s++) {
-        final Expr curr = steps[s], next = s < sl - 1 ? mergeDesc(curr, steps[s + 1], cc) : null;
+        Expr curr = steps[s], next = s < sl - 1 ? mergeDesc(curr, steps[s + 1], cc) : null;
         if(next != null) {
-          steps[s + 1] = next;
-          changed = true;
-        } else {
-          stps.add(curr);
-          cc.updateFocus(curr);
+          // steps can be merged; skip next step
+          curr = next;
+          s++;
         }
+        stps.add(curr);
+        cc.updateFocus(curr);
       }
     } finally {
       cc.removeFocus();
     }
 
-    if(changed) {
+    if(stps.size() != steps.length) {
       cc.info(QueryText.OPTDESC_X, this);
       return get(info, root, stps.finish());
     }
