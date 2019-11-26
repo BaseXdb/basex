@@ -63,6 +63,10 @@ public class XsltTransform extends XsltFn {
     } catch(final TransformerException ex) {
       Util.debug(ex);
       throw XSLT_ERROR_X.get(info, trim(utf8(ao.finish(), Prop.ENCODING)));
+    } catch(final IllegalArgumentException ex) {
+      // Saxon raises runtime exceptions for illegal parameters
+      Util.debug(ex);
+      throw XSLT_ERROR_X.get(info, ex.getMessage());
     } finally {
       System.setErr(tmp);
     }
