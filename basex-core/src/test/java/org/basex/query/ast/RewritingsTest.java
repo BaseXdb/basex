@@ -583,7 +583,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // rewrite to single union node test, rewrite to iterative path
     check("<a/>/(a|b)[text()]", "", root(IterPath.class), empty(Union.class));
-    //check("<a/>/(a,b)[text()]", "", root(IterPath.class), empty(List.class));
+    check("<a/>/(a,b)[text()]", "", root(IterPath.class), empty(List.class));
+    check("<_><a>x</a><b/></_>/(a,b)[text()]", "<a>x</a>", root(IterPath.class), empty(List.class));
 
     // rewrite to union expression
     check("<a/>/(*,@*)", "", root(MixedPath.class), exists(Union.class));

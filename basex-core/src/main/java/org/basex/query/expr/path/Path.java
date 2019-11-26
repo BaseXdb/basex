@@ -771,22 +771,39 @@ public abstract class Path extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr toUnion(final CompileContext cc) throws QueryException {
-    boolean changed = false;
-
-    final int sl = steps.length;
-    for(int s = 0; s < sl; s++) {
-      if(steps[s] instanceof List) {
-        final List list = (List) steps[s];
+    // function for rewriting a list to a union expression
+    final QueryFunction<Expr, Expr> rewrite = step -> {
+      if(step instanceof List) {
+        final List list = (List) step;
         if(((Checks<Expr>) ex -> ex.seqType().instanceOf(SeqType.NOD_ZM)).all(list.exprs)) {
-          cc.pushFocus(s == 0 ? root : steps[s - 1]);
-          try {
-            steps[s] = cc.replaceWith(list, new Union(list.info, list.exprs)).optimize(cc);
-          } finally {
-            cc.removeFocus();
-          }
-          changed = true;
+          return cc.replaceWith(list, new Union(list.info, list.exprs)).optimize(cc);
         }
       }
+      return null;
+    };
+
+    boolean changed = false;
+    final int sl = steps.length;
+
+    cc.pushFocus(root);
+    try {
+      for(int s = 0; s < sl; s++) {
+        Expr step = rewrite.apply(steps[s]);
+        if(step == null && steps[s] instanceof Filter) {
+          final Filter filter = (Filter) steps[s];
+          if(!filter.positional()) {
+            step = rewrite.apply(filter.root);
+            if(step != null) step = Filter.get(filter.info, step, filter.exprs).optimize(cc);
+          }
+        }
+        if(step != null) {
+          changed = true;
+          steps[s] = step;
+        }
+        cc.updateFocus(steps[s]);
+      }
+    } finally {
+      cc.removeFocus();
     }
     return changed ? get(info, root, steps) : this;
   }
@@ -801,73 +818,80 @@ public abstract class Path extends ParseExpr {
     boolean changed = false;
     final int sl = steps.length;
     final ExprList stps = new ExprList(sl);
-    for(int s = 0; s < sl; s++) {
-      final Expr step = steps[s];
-      // check for simple descendants-or-self step with succeeding step
-      if(s < sl - 1 && step instanceof Step) {
-        final Step curr = (Step) step;
-        if(curr.simple(DESCENDANT_OR_SELF, false)) {
-          // check succeeding step
-          final Expr next = steps[s + 1];
-          // descendant-or-self::node()/child::X -> descendant::X
-          if(simpleChild(next)) {
-            ((Step) next).axis = DESCENDANT;
-            changed = true;
-            continue;
-          }
-          // descendant-or-self::node()/(*|text()) -> (descendant::* | descendant::text())
-          Expr expr = mergeList(next, cc);
-          if(expr != null) {
-            steps[s + 1] = expr;
-            changed = true;
-            continue;
-          }
-          // //(X|Y)[text()] -> (/descendant::X | /descendant::Y)[text()]
-          if(next instanceof Filter) {
-            final Filter f = (Filter) next;
-            if(f.positional()) {
-              expr = mergeList(f.root, cc);
-              if(expr != null) {
-                f.root = expr;
-                changed = true;
-                continue;
-              }
-            }
-          }
+
+    cc.pushFocus(root);
+    try {
+      for(int s = 0; s < sl; s++) {
+        final Expr curr = steps[s], next = s < sl - 1 ? mergeDesc(curr, steps[s + 1], cc) : null;
+        if(next != null) {
+          steps[s + 1] = next;
+          changed = true;
+        } else {
+          stps.add(curr);
+          cc.updateFocus(curr);
         }
       }
-      stps.add(step);
+    } finally {
+      cc.removeFocus();
     }
-    steps = stps.finish();
 
     if(changed) {
       cc.info(QueryText.OPTDESC_X, this);
-      return changed ? get(info, root, steps) : this;
+      return get(info, root, stps.finish());
     }
     return this;
   }
 
   /**
-   * Tries to rewrite union or list expressions.
-   * @param expr input expression
+   * Merges descendant-or-self and child steps.
+   * @param curr current step
+   * @param next next step
    * @param cc compilation context
-   * @return rewriting flag or {@code null}
+   * @return original or new expression
    * @throws QueryException query exception
    */
-  private static Expr mergeList(final Expr expr, final CompileContext cc) throws QueryException {
-    if(!(expr instanceof Union)) return null;
+  private Expr mergeDesc(final Expr curr, final Expr next, final CompileContext cc)
+      throws QueryException {
 
-    final Checks<Expr> startWithChild = ex -> {
-      if(!(ex instanceof Path)) return false;
-      final Path path = (Path) ex;
-      return path.root == null && simpleChild(path.steps[0]);
-    };
-    final Union union = (Union) expr;
-    if(startWithChild.all(union.exprs)) {
-      for(final Expr ex : union.exprs) {
-        ((Step) ((Path) ex).steps[0]).axis = DESCENDANT;
+    if(!(curr instanceof Step)) return null;
+    final Step step = (Step) curr;
+    if(!step.simple(DESCENDANT_OR_SELF, false)) return null;
+
+    // function for merging steps inside union expressions
+    final QueryFunction<Expr, Expr> rewrite = expr -> {
+      final Checks<Expr> startWithChild = ex -> {
+        if(!(ex instanceof Path)) return false;
+        final Path path = (Path) ex;
+        return path.root == null && simpleChild(path.steps[0]);
+      };
+      if(expr instanceof Union) {
+        final Union union = (Union) expr;
+        if(startWithChild.all(union.exprs)) {
+          for(final Expr path : union.exprs) {
+            ((Step) ((Path) path).steps[0]).axis = DESCENDANT;
+          }
+          return new Union(union.info, union.exprs).optimize(cc);
+        }
       }
-      return new Union(union.info, union.exprs).optimize(cc);
+      return null;
+    };
+
+    // example: //child::* -> descendant::*
+    if(simpleChild(next)) {
+      ((Step) next).axis = DESCENDANT;
+      return next;
+    }
+    // example: //(text()|*) -> (descendant::text() | descendant::*)
+    if(next instanceof Union) {
+      return rewrite.apply(next);
+    }
+    // example: //(text()|*)[..] -> (/descendant::text() | /descendant::*)[..]
+    if(next instanceof Filter) {
+      final Filter filter = (Filter) next;
+      if(!filter.positional()) {
+        final Expr expr = rewrite.apply(filter.root);
+        if(expr != null) return Filter.get(filter.info, expr, filter.exprs).optimize(cc);
+      }
     }
     return null;
   }
