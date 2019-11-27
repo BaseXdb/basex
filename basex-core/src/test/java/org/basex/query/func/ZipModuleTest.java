@@ -57,6 +57,12 @@ public final class ZipModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void entries() {
+    final Function func = _ZIP_ENTRIES;
+    query(func.args(ZIP));
+  }
+
+  /** Test method. */
   @Test public void textEntry() {
     final Function func = _ZIP_TEXT_ENTRY;
     query(func.args(ZIP, ENTRY1));
@@ -71,12 +77,6 @@ public final class ZipModuleTest extends SandboxTest {
     final Function func = _ZIP_XML_ENTRY;
     query(func.args(ZIP, ENTRY2));
     query(func.args(ZIP, ENTRY2) + "//title/text()", "XML");
-  }
-
-  /** Test method. */
-  @Test public void entries() {
-    final Function func = _ZIP_ENTRIES;
-    query(func.args(ZIP));
   }
 
   /**
@@ -113,7 +113,7 @@ public final class ZipModuleTest extends SandboxTest {
    * Test method.
    * @throws IOException I/O exception
    */
-  @Test public void zipFileNS() throws IOException {
+  @Test public void zipFileNamespaces() throws IOException {
     final Function func = _ZIP_ZIP_FILE;
     // ZIP namespace must be removed from zipped node
     query(func.args(params("<entry name='1'><a/></entry>")));

@@ -71,6 +71,82 @@ public final class FtModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void count() {
+    final Function func = _FT_COUNT;
+    query(func.args(" ()"), 0);
+    query(func.args(" //*[text() contains text '1']"), 1);
+    query(func.args(" //li[text() contains text 'exercise']"), 2);
+    query("for $i in //li[text() contains text 'exercise'] return " +
+       func.args(" $i[text() contains text 'exercise']"), "1\n1");
+  }
+
+  /** Test method. */
+  @Test public void extract() {
+    final Function func = _FT_EXTRACT;
+    query(func.args(" //*[text() contains text '1']"),
+      "<li>Exercise <mark>1</mark>\n</li>");
+    query(func.args(" //*[text() contains text '2'], 'b', 20"),
+      "<li>Exercise <b>2</b>\n</li>");
+    query(func.args(" //*[text() contains text '2'], '_o_', 1"),
+      "<li>...<_o_>2</_o_>\n</li>");
+    contains(func.args(" //*[text() contains text 'Exercise'], 'b', 1"),
+      "<li>...</li>");
+  }
+
+  /** Test method. */
+  @Test public void mark() {
+    final Function func = _FT_MARK;
+    query(func.args(" //*[text() contains text '1']"),
+      "<li>Exercise <mark>1</mark>\n</li>");
+    query(func.args(" //*[text() contains text '2'], 'b'"),
+      "<li>Exercise <b>2</b>\n</li>");
+    contains(func.args(" //*[text() contains text 'Exercise']"),
+      "<li>\n<mark>Exercise</mark> 1</li>");
+    query("copy $a := text { 'a b' } modify () return " +
+        func.args(" $a[. contains text 'a']", "b"), "<b>a</b>\nb");
+    query("copy $a := text { 'ab' } modify () return " +
+        func.args(" $a[. contains text 'ab'], 'b'"), "<b>ab</b>");
+    query("copy $a := text { 'a b' } modify () return " +
+        func.args(" $a[. contains text 'a b'], 'b'"), "<b>a</b>\n\n<b>b</b>");
+
+    query(COUNT.args(func.args(" //*[text() contains text '1']/../../../../..")), 1);
+
+    execute(new CreateDB(NAME, "<a:a xmlns:a='A'>C</a:a>"));
+    query(func.args(" /descendant::*[text() contains text 'C']", "b"),
+        "<a:a xmlns:a=\"A\">\n<b>C</b>\n</a:a>");
+    execute(new DropDB(NAME));
+    query("copy $c := <A xmlns='A'>A</A> modify () return <X>{ " +
+        func.args(" $c[text() contains text 'A']") + " }</X>/*");
+  }
+
+  /** Test method. */
+  @Test public void normalize() {
+    final Function func = _FT_NORMALIZE;
+
+    query(func.args(" ()"), "");
+    query(func.args(" []"), "");
+
+    query(func.args("A bc"), "a bc");
+    query(func.args("A bc", " map { 'case': 'sensitive' }"), "A bc");
+    query(func.args("\u00e4", " map { 'diacritics': 'sensitive' }"), "\u00e4");
+    query(func.args("gifts", " map { 'stemming': 'true' }"), "gift");
+
+    query("declare ft-option using stemming; " + func.args("Gifts"), "gift");
+    query(func.args(""), "");
+    query(func.args("a!b:c"), "a!b:c");
+
+    query("ft:normalize('&#778;', map { 'stemming': true(), 'language': 'de' })", "");
+    query("'/' ! " + func.args(" ."), "/");
+  }
+
+  /** Test method. */
+  @Test public void score() {
+    final Function func = _FT_SCORE;
+    query(func.args(_FT_SEARCH.args(NAME, "2")), 1);
+    query(func.args(_FT_SEARCH.args(NAME, "XML")), "1\n0.5");
+  }
+
+  /** Test method. */
   @Test public void search() {
     final Function func = _FT_SEARCH;
 
@@ -113,78 +189,6 @@ public final class FtModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void count() {
-    final Function func = _FT_COUNT;
-    query(func.args(" ()"), 0);
-    query(func.args(" //*[text() contains text '1']"), 1);
-    query(func.args(" //li[text() contains text 'exercise']"), 2);
-    query("for $i in //li[text() contains text 'exercise'] return " +
-       func.args(" $i[text() contains text 'exercise']"), "1\n1");
-  }
-
-  /** Test method. */
-  @Test public void mark() {
-    final Function func = _FT_MARK;
-    query(func.args(" //*[text() contains text '1']"),
-      "<li>Exercise <mark>1</mark>\n</li>");
-    query(func.args(" //*[text() contains text '2'], 'b'"),
-      "<li>Exercise <b>2</b>\n</li>");
-    contains(func.args(" //*[text() contains text 'Exercise']"),
-      "<li>\n<mark>Exercise</mark> 1</li>");
-    query("copy $a := text { 'a b' } modify () return " +
-        func.args(" $a[. contains text 'a']", "b"), "<b>a</b>\nb");
-    query("copy $a := text { 'ab' } modify () return " +
-        func.args(" $a[. contains text 'ab'], 'b'"), "<b>ab</b>");
-    query("copy $a := text { 'a b' } modify () return " +
-        func.args(" $a[. contains text 'a b'], 'b'"), "<b>a</b>\n\n<b>b</b>");
-
-    query(COUNT.args(func.args(" //*[text() contains text '1']/../../../../..")), 1);
-
-    execute(new CreateDB(NAME, "<a:a xmlns:a='A'>C</a:a>"));
-    query(func.args(" /descendant::*[text() contains text 'C']", "b"),
-        "<a:a xmlns:a=\"A\">\n<b>C</b>\n</a:a>");
-    execute(new DropDB(NAME));
-    query("copy $c := <A xmlns='A'>A</A> modify () return <X>{ " +
-        func.args(" $c[text() contains text 'A']") + " }</X>/*");
-  }
-
-  /** Test method. */
-  @Test public void extract() {
-    final Function func = _FT_EXTRACT;
-    query(func.args(" //*[text() contains text '1']"),
-      "<li>Exercise <mark>1</mark>\n</li>");
-    query(func.args(" //*[text() contains text '2'], 'b', 20"),
-      "<li>Exercise <b>2</b>\n</li>");
-    query(func.args(" //*[text() contains text '2'], '_o_', 1"),
-      "<li>...<_o_>2</_o_>\n</li>");
-    contains(func.args(" //*[text() contains text 'Exercise'], 'b', 1"),
-      "<li>...</li>");
-  }
-
-  /** Test method. */
-  @Test public void score() {
-    final Function func = _FT_SCORE;
-    query(func.args(_FT_SEARCH.args(NAME, "2")), 1);
-    query(func.args(_FT_SEARCH.args(NAME, "XML")), "1\n0.5");
-  }
-
-  /** Test method. */
-  @Test public void tokens() {
-    final Function func = _FT_TOKENS;
-    execute(new CreateIndex(IndexType.FULLTEXT));
-
-    String entries = func.args(NAME);
-    query("count(" + entries + ')', 7);
-    query("exists(" + entries + "/self::entry)", true);
-    query(entries + "/@count = 1", true);
-    query(entries + "/@count = 2", true);
-    query(entries + "/@count = 3", false);
-
-    entries = func.args(NAME, "a");
-    query("count(" + entries + ')', 2);
-  }
-
-  /** Test method. */
   @Test public void tokenize() {
     final Function func = _FT_TOKENIZE;
 
@@ -202,22 +206,18 @@ public final class FtModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void normalize() {
-    final Function func = _FT_NORMALIZE;
+  @Test public void tokens() {
+    final Function func = _FT_TOKENS;
+    execute(new CreateIndex(IndexType.FULLTEXT));
 
-    query(func.args(" ()"), "");
-    query(func.args(" []"), "");
+    String entries = func.args(NAME);
+    query("count(" + entries + ')', 7);
+    query("exists(" + entries + "/self::entry)", true);
+    query(entries + "/@count = 1", true);
+    query(entries + "/@count = 2", true);
+    query(entries + "/@count = 3", false);
 
-    query(func.args("A bc"), "a bc");
-    query(func.args("A bc", " map { 'case': 'sensitive' }"), "A bc");
-    query(func.args("\u00e4", " map { 'diacritics': 'sensitive' }"), "\u00e4");
-    query(func.args("gifts", " map { 'stemming': 'true' }"), "gift");
-
-    query("declare ft-option using stemming; " + func.args("Gifts"), "gift");
-    query(func.args(""), "");
-    query(func.args("a!b:c"), "a!b:c");
-
-    query("ft:normalize('&#778;', map { 'stemming': true(), 'language': 'de' })", "");
-    query("'/' ! " + func.args(" ."), "/");
+    entries = func.args(NAME, "a");
+    query("count(" + entries + ')', 2);
   }
 }

@@ -13,13 +13,6 @@ import org.junit.*;
  */
 public final class HtmlModuleTest extends SandboxTest {
   /** Test method. */
-  @Test public void parser() {
-    final Function func = _HTML_PARSER;
-    // check if function returns a string
-    query(func.args() + " instance of xs:string", true);
-  }
-
-  /** Test method. */
   @Test public void parse() {
     final Function func = _HTML_PARSE;
     query(func.args(" ()"), "");
@@ -29,5 +22,12 @@ public final class HtmlModuleTest extends SandboxTest {
     query("exists(" + func.args("&lt;html/&gt;") + "/*:html)", true);
     // check if the function returns <html/>
     query(func.args("&lt;html/&gt;", " map {'nons': true()}"), "<html/>");
+  }
+
+  /** Test method. */
+  @Test public void parser() {
+    final Function func = _HTML_PARSER;
+    // check if function returns a string
+    query(func.args() + " instance of xs:string", true);
   }
 }

@@ -14,44 +14,6 @@ import org.junit.*;
  */
 public final class ConvertModuleTest extends SandboxTest {
   /** Test method. */
-  @Test public void integerToBase() {
-    final Function func = _CONVERT_INTEGER_TO_BASE;
-    // successful queries
-    query(func.args(4, 2), 100);
-    query(func.args(65535, 2), "1111111111111111");
-    query(func.args(65536, 2), "10000000000000000");
-    query(func.args(4, 16), 4);
-    query(func.args(65535, 16), "ffff");
-    query(func.args(65536, 16), "10000");
-    query(func.args(4, 10), 4);
-    query(func.args(65535, 10), 65535);
-    query(func.args(65536, 10), 65536);
-    error(func.args(1, 1), CONVERT_BASE_X);
-    error(func.args(1, 100), CONVERT_BASE_X);
-    error(func.args(1, 100), CONVERT_BASE_X);
-  }
-
-  /** Test method. */
-  @Test public void integerFromBase() {
-    final Function func = _CONVERT_INTEGER_FROM_BASE;
-    // successful queries
-    query(func.args("100", 2), 4);
-    query(func.args("1111111111111111", 2), 65535);
-    query(func.args("10000000000000000", 2), 65536);
-    query(func.args("4", 16), 4);
-    query(func.args("ffff", 16), 65535);
-    query(func.args("FFFF", 16), 65535);
-    query(func.args("10000", 16), 65536);
-    query(func.args("4", 10), 4);
-    query(func.args("65535", 10), 65535);
-    query(func.args("65536", 10), 65536);
-    error(func.args("1", 1), CONVERT_BASE_X);
-    error(func.args("1", 100), CONVERT_BASE_X);
-    error(func.args("abc", 10), CONVERT_INTEGER_X_X);
-    error(func.args("012", 2), CONVERT_INTEGER_X_X);
-  }
-
-  /** Test method. */
   @Test public void binaryToBytes() {
     final Function func = _CONVERT_BINARY_TO_BYTES;
     // successful queries
@@ -87,6 +49,51 @@ public final class ConvertModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void dateTimeToInteger() {
+    final Function func = _CONVERT_DATETIME_TO_INTEGER;
+    // successful queries
+    query(func.args(" xs:dateTime('1970-01-01T00:00:00Z')"), 0);
+    error(func.args(" xs:dateTime('600000000-01-01T00:00:00Z')"), INTRANGE_X);
+  }
+
+  /** Test method. */
+  @Test public void dayTimeDurationToInteger() {
+    final Function func = _CONVERT_DAYTIME_TO_INTEGER;
+    // successful queries
+    query(func.args(" xs:dayTimeDuration('PT0S')"), 0);
+    error(func.args(" xs:dayTimeDuration('PT10000000000000000S')"), INTRANGE_X);
+  }
+
+  /** Test method. */
+  @Test public void integerFromBase() {
+    final Function func = _CONVERT_INTEGER_FROM_BASE;
+    // successful queries
+    query(func.args("100", 2), 4);
+    query(func.args("1111111111111111", 2), 65535);
+    query(func.args("10000000000000000", 2), 65536);
+    query(func.args("4", 16), 4);
+    query(func.args("ffff", 16), 65535);
+    query(func.args("FFFF", 16), 65535);
+    query(func.args("10000", 16), 65536);
+    query(func.args("4", 10), 4);
+    query(func.args("65535", 10), 65535);
+    query(func.args("65536", 10), 65536);
+    error(func.args("1", 1), CONVERT_BASE_X);
+    error(func.args("1", 100), CONVERT_BASE_X);
+    error(func.args("abc", 10), CONVERT_INTEGER_X_X);
+    error(func.args("012", 2), CONVERT_INTEGER_X_X);
+  }
+
+  /** Test method. */
+  @Test public void integersToBase64() {
+    final Function func = _CONVERT_INTEGERS_TO_BASE64;
+    // successful queries
+    query(func.args(" xs:byte(97)"), "a");
+    query(func.args(" 97"), "a");
+    query(func.args(" ()"), "");
+  }
+
+  /** Test method. */
   @Test public void integersToHex() {
     final Function func = _CONVERT_INTEGERS_TO_HEX;
     // successful queries
@@ -97,12 +104,35 @@ public final class ConvertModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void integersToBase64() {
-    final Function func = _CONVERT_INTEGERS_TO_BASE64;
+  @Test public void integerToBase() {
+    final Function func = _CONVERT_INTEGER_TO_BASE;
     // successful queries
-    query(func.args(" xs:byte(97)"), "a");
-    query(func.args(" 97"), "a");
-    query(func.args(" ()"), "");
+    query(func.args(4, 2), 100);
+    query(func.args(65535, 2), "1111111111111111");
+    query(func.args(65536, 2), "10000000000000000");
+    query(func.args(4, 16), 4);
+    query(func.args(65535, 16), "ffff");
+    query(func.args(65536, 16), "10000");
+    query(func.args(4, 10), 4);
+    query(func.args(65535, 10), 65535);
+    query(func.args(65536, 10), 65536);
+    error(func.args(1, 1), CONVERT_BASE_X);
+    error(func.args(1, 100), CONVERT_BASE_X);
+    error(func.args(1, 100), CONVERT_BASE_X);
+  }
+
+  /** Test method. */
+  @Test public void integerToDateTime() {
+    final Function func = _CONVERT_INTEGER_TO_DATETIME;
+    // successful queries
+    query(func.args(" 0"), "1970-01-01T00:00:00Z");
+  }
+
+  /** Test method. */
+  @Test public void integerToDateTimeDuration() {
+    final Function func = _CONVERT_INTEGER_TO_DAYTIME;
+    // successful queries
+    query(func.args(" 0"), "PT0S");
   }
 
   /** Test method. */
@@ -125,35 +155,5 @@ public final class ConvertModuleTest extends SandboxTest {
     query("string( " + func.args("a", "US-ASCII") + ')', 61);
     error(func.args("\u00fc", "US-ASCII"), CONVERT_BINARY_X_X);
     error(func.args("a", "X"), CONVERT_ENCODING_X);
-  }
-
-  /** Test method. */
-  @Test public void integerToDateTime() {
-    final Function func = _CONVERT_INTEGER_TO_DATETIME;
-    // successful queries
-    query(func.args(" 0"), "1970-01-01T00:00:00Z");
-  }
-
-  /** Test method. */
-  @Test public void dateTimeToInteger() {
-    final Function func = _CONVERT_DATETIME_TO_INTEGER;
-    // successful queries
-    query(func.args(" xs:dateTime('1970-01-01T00:00:00Z')"), 0);
-    error(func.args(" xs:dateTime('600000000-01-01T00:00:00Z')"), INTRANGE_X);
-  }
-
-  /** Test method. */
-  @Test public void integerToDatyTimeDuration() {
-    final Function func = _CONVERT_INTEGER_TO_DAYTIME;
-    // successful queries
-    query(func.args(" 0"), "PT0S");
-  }
-
-  /** Test method. */
-  @Test public void dayTimeDurationToInteger() {
-    final Function func = _CONVERT_DAYTIME_TO_INTEGER;
-    // successful queries
-    query(func.args(" xs:dayTimeDuration('PT0S')"), 0);
-    error(func.args(" xs:dayTimeDuration('PT10000000000000000S')"), INTRANGE_X);
   }
 }

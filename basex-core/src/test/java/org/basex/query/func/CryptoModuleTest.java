@@ -120,6 +120,15 @@ public final class CryptoModuleTest extends SandboxTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
+  @Test public void validateSignatureFullySpecified() {
+    query("crypto:validate-signature(crypto:generate-signature(<a><n/></a>," +
+        "'exclusive','SHA512','RSA_SHA1','myPrefix','enveloped','/a/n'))", true);
+  }
+
+  /**
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
+   */
   @Test public void validateSignatureWithCanonicalization() {
     query("crypto:validate-signature(crypto:generate-signature(<a/>," +
         "'exclusive','','','',''))", true);
@@ -232,14 +241,5 @@ public final class CryptoModuleTest extends SandboxTest {
   @Test public void validateSignatureWithXPath() {
     query("crypto:validate-signature(crypto:generate-signature(<a><n/><n/></a>," +
         "'','','','','','/a/n'))", true);
-  }
-
-  /**
-   * Tests whether validate-signature returns true for a certificate created
-   * with generate-signature.
-   */
-  @Test public void validateSignatureFullySpecified() {
-    query("crypto:validate-signature(crypto:generate-signature(<a><n/></a>," +
-        "'exclusive','SHA512','RSA_SHA1','myPrefix','enveloped','/a/n'))", true);
   }
 }

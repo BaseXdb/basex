@@ -14,12 +14,6 @@ import org.junit.*;
  */
 public final class UnitModuleTest extends SandboxTest {
   /** Test method. */
-  @Test public void faill() {
-    final Function func = _UNIT_FAIL;
-    error(func.args(1), UNIT_FAIL_X);
-  }
-
-  /** Test method. */
   @Test public void assrt() {
     final Function func = _UNIT_ASSERT;
     query(func.args(1), "");
@@ -33,5 +27,11 @@ public final class UnitModuleTest extends SandboxTest {
     final Function func = _UNIT_ASSERT_EQUALS;
     query(func.args(1, 1), "");
     error(func.args(1, 2), UNIT_FAIL_X_X_X);
+  }
+
+  /** Test method. */
+  @Test public void faill() {
+    final Function func = _UNIT_FAIL;
+    error(func.args(1), UNIT_FAIL_X);
   }
 }

@@ -12,15 +12,15 @@ import org.junit.*;
  */
 public final class SqlModuleTest extends SandboxTest {
   /** Test method. */
-  @Test public void init() {
+  @Test public void close() {
+  }
+
+  /** Test method. */
+  @Test public void commit() {
   }
 
   /** Test method. */
   @Test public void connect() {
-  }
-
-  /** Test method. */
-  @Test public void prepare() {
   }
 
   /** Test method. */
@@ -32,11 +32,11 @@ public final class SqlModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void close() {
+  @Test public void init() {
   }
 
   /** Test method. */
-  @Test public void commit() {
+  @Test public void prepare() {
   }
 
   /** Test method. */

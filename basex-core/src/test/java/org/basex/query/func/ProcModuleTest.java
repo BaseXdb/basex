@@ -17,17 +17,6 @@ import org.junit.*;
  */
 public final class ProcModuleTest extends SandboxTest {
   /** Test method. */
-  @Test public void system() {
-    final Function func = _PROC_SYSTEM;
-    // queries
-    query(func.args("java", "-version"), "");
-    query("try { " + func.args("java", "x") + "} catch proc:* { 'error' }", "error");
-
-    error(func.args("java", "-version", " map {'encoding': 'xx'}"), PROC_ENCODING_X);
-    error(func.args("a b c"), PROC_ERROR_X);
-  }
-
-  /** Test method. */
   @Test public void execute() {
     final Function func = _PROC_EXECUTE;
     // queries
@@ -75,5 +64,16 @@ public final class ProcModuleTest extends SandboxTest {
     } finally {
       Prop.clear();
     }
+  }
+
+  /** Test method. */
+  @Test public void system() {
+    final Function func = _PROC_SYSTEM;
+    // queries
+    query(func.args("java", "-version"), "");
+    query("try { " + func.args("java", "x") + "} catch proc:* { 'error' }", "error");
+
+    error(func.args("java", "-version", " map {'encoding': 'xx'}"), PROC_ENCODING_X);
+    error(func.args("a b c"), PROC_ERROR_X);
   }
 }

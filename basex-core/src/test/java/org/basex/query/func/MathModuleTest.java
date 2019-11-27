@@ -22,9 +22,9 @@ public final class MathModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void pi() {
-    final Function func = _MATH_PI;
-    query(func.args(), StrictMath.PI);
+  @Test public void cosh() {
+    final Function func = _MATH_COSH;
+    query(func.args(" 0"), 1);
   }
 
   /** Test method. */
@@ -34,15 +34,15 @@ public final class MathModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void sinh() {
-    final Function func = _MATH_SINH;
-    query(func.args(" 0"), 0);
+  @Test public void pi() {
+    final Function func = _MATH_PI;
+    query(func.args(), StrictMath.PI);
   }
 
   /** Test method. */
-  @Test public void cosh() {
-    final Function func = _MATH_COSH;
-    query(func.args(" 0"), 1);
+  @Test public void sinh() {
+    final Function func = _MATH_SINH;
+    query(func.args(" 0"), 0);
   }
 
   /** Test method. */

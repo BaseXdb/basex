@@ -14,32 +14,6 @@ import org.junit.*;
  */
 public final class HashModuleTest extends SandboxTest {
   /** Test method. */
-  @Test public void md5() {
-    final Function func = _HASH_MD5;
-    // queries
-    query("string(" + func.args("") + ")", "1B2M2Y8AsgTpgAmY7PhCfg==");
-    query("string(" + func.args("BaseX") + ")", "DWUYXJ4pYxHAoiABeeR5og==");
-    query("string(" + func.args(" <x/>") + ")", "1B2M2Y8AsgTpgAmY7PhCfg==");
-  }
-
-  /** Test method. */
-  @Test public void sha1() {
-    final Function func = _HASH_SHA1;
-    // queries
-    query("string(" + func.args("") + ")", "2jmj7l5rSw0yVb/vlWAYkK/YBwk=");
-    query("string(" + func.args("BaseX") + ")", "OtWVjw8n1a/9yilXVg8SHQWXpO0=");
-    query("string(" + func.args(" <x/>") + ")", "2jmj7l5rSw0yVb/vlWAYkK/YBwk=");
-  }
-
-  /** Test method. */
-  @Test public void sha256() {
-    final Function func = _HASH_SHA256;
-    // queries
-    query("string(" + func.args("") + ")", "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=");
-    query("string(" + func.args("BaseX") + ")", "FdVwdj3rddcou2lkM5KHO4NczMlKLx6IGQnaR2YoIaM=");
-  }
-
-  /** Test method. */
   @Test public void hash() {
     final Function func = _HASH_HASH;
     // queries
@@ -63,5 +37,31 @@ public final class HashModuleTest extends SandboxTest {
     }
 
     error(func.args("", ""), HASH_ALGORITHM_X);
+  }
+
+  /** Test method. */
+  @Test public void md5() {
+    final Function func = _HASH_MD5;
+    // queries
+    query("string(" + func.args("") + ")", "1B2M2Y8AsgTpgAmY7PhCfg==");
+    query("string(" + func.args("BaseX") + ")", "DWUYXJ4pYxHAoiABeeR5og==");
+    query("string(" + func.args(" <x/>") + ")", "1B2M2Y8AsgTpgAmY7PhCfg==");
+  }
+
+  /** Test method. */
+  @Test public void sha1() {
+    final Function func = _HASH_SHA1;
+    // queries
+    query("string(" + func.args("") + ")", "2jmj7l5rSw0yVb/vlWAYkK/YBwk=");
+    query("string(" + func.args("BaseX") + ")", "OtWVjw8n1a/9yilXVg8SHQWXpO0=");
+    query("string(" + func.args(" <x/>") + ")", "2jmj7l5rSw0yVb/vlWAYkK/YBwk=");
+  }
+
+  /** Test method. */
+  @Test public void sha256() {
+    final Function func = _HASH_SHA256;
+    // queries
+    query("string(" + func.args("") + ")", "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=");
+    query("string(" + func.args("BaseX") + ")", "FdVwdj3rddcou2lkM5KHO4NczMlKLx6IGQnaR2YoIaM=");
   }
 }

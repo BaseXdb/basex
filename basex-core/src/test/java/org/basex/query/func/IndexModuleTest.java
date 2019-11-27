@@ -28,6 +28,41 @@ public final class IndexModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void attributeNames() {
+    final Function func = _INDEX_ATTRIBUTE_NAMES;
+    // queries
+    final String entries = func.args(NAME);
+    query("count(" + entries + ')', 5);
+    query("exists(" + entries + "/self::entry)", true);
+  }
+
+  /** Test method. */
+  @Test public void attributes() {
+    final Function func = _INDEX_ATTRIBUTES;
+    // complete search
+    final String entries = func.args(NAME);
+    query("count(" + entries + ')', 6);
+    query("exists(" + entries + "/self::entry)", true);
+    query(entries + "/@count = 1", true);
+    query(entries + "/@count != 1", false);
+    // prefix search
+    query(func.args(NAME, "1") + "/text()", 1);
+    // ascending traversal
+    query(func.args(NAME, "X", true) + "/text()", "right");
+    // descending traversal
+    query(func.args(NAME, "#000099", false) + "/text()", "#000000");
+  }
+
+  /** Test method. */
+  @Test public void elementNames() {
+    final Function func = _INDEX_ELEMENT_NAMES;
+    // queries
+    final String entries = func.args(NAME);
+    query("count(" + entries + ')', 9);
+    query("exists(" + entries + "/self::entry)", true);
+  }
+
+  /** Test method. */
   @Test public void facets() {
     final Function func = _INDEX_FACETS;
     // queries
@@ -61,40 +96,5 @@ public final class IndexModuleTest extends SandboxTest {
     query(COUNT.args(func.args(NAME, "X", true)), 1);
     // descending traversal
     query(func.args(NAME, "B", false) + "/text()", "Assignments");
-  }
-
-  /** Test method. */
-  @Test public void attributes() {
-    final Function func = _INDEX_ATTRIBUTES;
-    // complete search
-    final String entries = func.args(NAME);
-    query("count(" + entries + ')', 6);
-    query("exists(" + entries + "/self::entry)", true);
-    query(entries + "/@count = 1", true);
-    query(entries + "/@count != 1", false);
-    // prefix search
-    query(func.args(NAME, "1") + "/text()", 1);
-    // ascending traversal
-    query(func.args(NAME, "X", true) + "/text()", "right");
-    // descending traversal
-    query(func.args(NAME, "#000099", false) + "/text()", "#000000");
-  }
-
-  /** Test method. */
-  @Test public void elementNames() {
-    final Function func = _INDEX_ELEMENT_NAMES;
-    // queries
-    final String entries = func.args(NAME);
-    query("count(" + entries + ')', 9);
-    query("exists(" + entries + "/self::entry)", true);
-  }
-
-  /** Test method. */
-  @Test public void attributeNames() {
-    final Function func = _INDEX_ATTRIBUTE_NAMES;
-    // queries
-    final String entries = func.args(NAME);
-    query("count(" + entries + ')', 5);
-    query("exists(" + entries + "/self::entry)", true);
   }
 }

@@ -582,7 +582,7 @@ public final class DbModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void nodeID() {
+  @Test public void nodeId() {
     final Function func = _DB_NODE_ID;
     query(func.args(" /html"), 1);
     query(func.args(" / | /html"), "0\n1");

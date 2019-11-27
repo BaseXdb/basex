@@ -14,24 +14,15 @@ import org.junit.*;
  */
 public final class BinModuleTest extends SandboxTest {
   /** Test method. */
-  @Test public void hex() {
-    final Function func = _BIN_HEX;
+  @Test public void and() {
+    final Function func = _BIN_AND;
     // successful queries
-    hexQuery(func.args(" ()"),            "");
-    hexQuery(func.args(""),               "");
-    hexQuery(func.args("1"),              "01");
-    hexQuery(func.args("FF"),             "FF");
-    hexQuery(func.args("111"),            "0111");
-    hexQuery(func.args("FFF"),            "0FFF");
-    hexQuery(func.args("000"),            "0000");
-    hexQuery(func.args("FFFFF"),          "0FFFFF");
-    hexQuery(func.args("FFFFFFFFFFFFF"),  "0FFFFFFFFFFFFF");
-    hexQuery(func.args("10000000000000"), "10000000000000");
-    hexQuery(func.args("10000000000000"), "10000000000000");
-    hexQuery(func.args("11223F4E"),       "11223F4E");
-    hexQuery(func.args("1223F4E"),        "01223F4E");
+    hexQuery(func.args(" ()", base64("00")),            "");
+    hexQuery(func.args(base64("00"), " ()"),            "");
+    hexQuery(func.args(base64(""), base64("")),         "");
+    hexQuery(func.args(base64("8081"), base64("7F7E")), "0000");
     // errors
-    error(func.args("X"), BIN_NNC);
+    error(func.args(base64("00"), base64("")), BIN_DLA_X_X);
   }
 
   /** Test method. */
@@ -51,137 +42,6 @@ public final class BinModuleTest extends SandboxTest {
     hexQuery(func.args("1000111010101"),    "11D5");
     // errors
     error(func.args("X"), BIN_NNC);
-  }
-
-  /** Test method. */
-  @Test public void octal() {
-    final Function func = _BIN_OCTAL;
-    // successful queries
-    hexQuery(func.args(" ()"),      "");
-    hexQuery(func.args(""),         "");
-    hexQuery(func.args("0"),        "00");
-    hexQuery(func.args("00"),       "00");
-    hexQuery(func.args("000"),      "0000");
-    hexQuery(func.args("007"),      "0007");
-    hexQuery(func.args("1"),        "01");
-    hexQuery(func.args("10"),       "08");
-    hexQuery(func.args("77"),       "3F");
-    hexQuery(func.args("11223047"), "252627");
-    // errors
-    error(func.args("X"), BIN_NNC);
-  }
-
-  /** Test method. */
-  @Test public void toOctets() {
-    final Function func = _BIN_TO_OCTETS;
-    // successful queries
-    query(func.args(base64("")),     "");
-    query(func.args(base64("00")),   0);
-    query(func.args(base64("FF")),   255);
-    query(func.args(base64("1122")), "17\n34");
-  }
-
-  /** Test method. */
-  @Test public void fromOctets() {
-    final Function func = _BIN_FROM_OCTETS;
-    // successful queries
-    hexQuery(func.args(0),            "00");
-    hexQuery(func.args(" (1,127)"),   "017F");
-    hexQuery(func.args(" (128,255)"), "80FF");
-    // errors
-    error(func.args(-1),  BIN_OOR_X);
-    error(func.args(256), BIN_OOR_X);
-  }
-
-  /** Test method. */
-  @Test public void length() {
-    final Function func = _BIN_LENGTH;
-    // successful queries
-    query(func.args(base64("")),         0);
-    query(func.args(base64("FF")),       1);
-    query(func.args(base64("12345678")), 4);
-  }
-
-  /** Test method. */
-  @Test public void part() {
-    final Function func = _BIN_PART;
-    // successful queries
-    hexQuery(func.args(" ()",        0),    "");
-    hexQuery(func.args(base64("FF"), 0),    "FF");
-    hexQuery(func.args(base64("FF"), 0, 1), "FF");
-    hexQuery(func.args(base64("FF"), 1),    "");
-    hexQuery(func.args(base64("FF"), 1, 0), "");
-    // errors
-    error(func.args(base64("FF"), -1),    BIN_IOOR_X_X);
-    error(func.args(base64("FF"), 0, -1), BIN_NS_X);
-    error(func.args(base64("FF"), 2),     BIN_IOOR_X_X);
-    error(func.args(base64("FF"), 0, 2),  BIN_IOOR_X_X);
-  }
-
-  /** Test method. */
-  @Test public void join() {
-    final Function func = _BIN_JOIN;
-    // successful queries
-    hexQuery(func.args(" ()"),                                          "");
-    hexQuery(func.args(" (" + base64("") + ')'),                        "");
-    hexQuery(func.args(" (" + base64("FF") + ')'),                      "FF");
-    hexQuery(func.args(" (" + base64("FF") + ',' + base64("FF") + ')'), "FFFF");
-    hexQuery(func.args(" (1 to 3) ! " + base64("11")),                 "111111");
-  }
-
-  /** Test method. */
-  @Test public void insertBefore() {
-    final Function func = _BIN_INSERT_BEFORE;
-    // successful queries
-    hexQuery(func.args(" ()", 0, " ()"),                   "");
-    hexQuery(func.args(base64("12"),   0, " ()"),          "12");
-    hexQuery(func.args(base64("12"),   1, " ()"),          "12");
-    hexQuery(func.args(base64("1234"), 0, base64("00")),   "001234");
-    hexQuery(func.args(base64("1234"), 1, base64("56")),   "125634");
-    hexQuery(func.args(base64("1234"), 2, base64("56")),   "123456");
-    hexQuery(func.args(base64("12"),   0, base64("3456")), "345612");
-    hexQuery(func.args(base64("12"),   1, base64("3456")), "123456");
-    hexQuery(func.args(base64("12"),   1, base64("34")),   "1234");
-    // errors
-    error(func.args(base64(""), -1, " ()"), BIN_IOOR_X_X);
-    error(func.args(base64(""),  1, " ()"), BIN_IOOR_X_X);
-  }
-
-  /** Test method. */
-  @Test public void padLeft() {
-    final Function func = _BIN_PAD_LEFT;
-    // successful queries
-    hexQuery(func.args(base64(""),   1),      "00");
-    hexQuery(func.args(base64(""),   1, 255), "FF");
-    hexQuery(func.args(base64("01"), 2, 127), "7F7F01");
-    // errors
-    error(func.args(base64(""), -1),     BIN_NS_X);
-    error(func.args(base64(""), 0, 256), BIN_OOR_X);
-  }
-
-  /** Test method. */
-  @Test public void padRight() {
-    final Function func = _BIN_PAD_RIGHT;
-    // successful queries
-    hexQuery(func.args(base64(""),   1), "00");
-    hexQuery(func.args(base64(""),   1, 255), "FF");
-    hexQuery(func.args(base64("01"), 2, 127), "017F7F");
-    // errors
-    error(func.args(base64(""), -1),      BIN_NS_X);
-    error(func.args(base64(""),  0, 256), BIN_OOR_X);
-  }
-
-  /** Test method. */
-  @Test public void find() {
-    final Function func = _BIN_FIND;
-    // successful queries
-    query(func.args(base64("1122"),   0, base64("11")), 0);
-    query(func.args(base64("1122"),   1, base64("11")), "");
-    query(func.args(base64("112233"), 0, base64("22")), 1);
-    query(func.args(base64(""), 0, base64("")), 0);
-    // errors
-    error(func.args(base64(""), -1, base64("11")), BIN_IOOR_X_X);
-    error(func.args(base64(""), 1, base64("11")),  BIN_IOOR_X_X);
   }
 
   /** Test method. */
@@ -216,40 +76,87 @@ public final class BinModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void or() {
-    final Function func = _BIN_OR;
+  @Test public void find() {
+    final Function func = _BIN_FIND;
     // successful queries
-    hexQuery(func.args(" ()", base64("00")),            "");
-    hexQuery(func.args(base64("00"), " ()"),            "");
-    hexQuery(func.args(base64(""), base64("")),         "");
-    hexQuery(func.args(base64("8081"), base64("7F7E")), "FFFF");
+    query(func.args(base64("1122"),   0, base64("11")), 0);
+    query(func.args(base64("1122"),   1, base64("11")), "");
+    query(func.args(base64("112233"), 0, base64("22")), 1);
+    query(func.args(base64(""), 0, base64("")), 0);
     // errors
-    error(func.args(base64("00"), base64("")), BIN_DLA_X_X);
+    error(func.args(base64(""), -1, base64("11")), BIN_IOOR_X_X);
+    error(func.args(base64(""), 1, base64("11")),  BIN_IOOR_X_X);
   }
 
   /** Test method. */
-  @Test public void xor() {
-    final Function func = _BIN_XOR;
+  @Test public void fromOctets() {
+    final Function func = _BIN_FROM_OCTETS;
     // successful queries
-    hexQuery(func.args(" ()", base64("00")),            "");
-    hexQuery(func.args(base64("00"), " ()"),            "");
-    hexQuery(func.args(base64(""), base64("")),         "");
-    hexQuery(func.args(base64("80"), base64("7F")),     "FF");
-    hexQuery(func.args(base64("1234"), base64("4321")), "5115");
+    hexQuery(func.args(0),            "00");
+    hexQuery(func.args(" (1,127)"),   "017F");
+    hexQuery(func.args(" (128,255)"), "80FF");
     // errors
-    error(func.args(base64("00"), base64("")), BIN_DLA_X_X);
+    error(func.args(-1),  BIN_OOR_X);
+    error(func.args(256), BIN_OOR_X);
   }
 
   /** Test method. */
-  @Test public void and() {
-    final Function func = _BIN_AND;
+  @Test public void hex() {
+    final Function func = _BIN_HEX;
     // successful queries
-    hexQuery(func.args(" ()", base64("00")),            "");
-    hexQuery(func.args(base64("00"), " ()"),            "");
-    hexQuery(func.args(base64(""), base64("")),         "");
-    hexQuery(func.args(base64("8081"), base64("7F7E")), "0000");
+    hexQuery(func.args(" ()"),            "");
+    hexQuery(func.args(""),               "");
+    hexQuery(func.args("1"),              "01");
+    hexQuery(func.args("FF"),             "FF");
+    hexQuery(func.args("111"),            "0111");
+    hexQuery(func.args("FFF"),            "0FFF");
+    hexQuery(func.args("000"),            "0000");
+    hexQuery(func.args("FFFFF"),          "0FFFFF");
+    hexQuery(func.args("FFFFFFFFFFFFF"),  "0FFFFFFFFFFFFF");
+    hexQuery(func.args("10000000000000"), "10000000000000");
+    hexQuery(func.args("10000000000000"), "10000000000000");
+    hexQuery(func.args("11223F4E"),       "11223F4E");
+    hexQuery(func.args("1223F4E"),        "01223F4E");
     // errors
-    error(func.args(base64("00"), base64("")), BIN_DLA_X_X);
+    error(func.args("X"), BIN_NNC);
+  }
+
+  /** Test method. */
+  @Test public void insertBefore() {
+    final Function func = _BIN_INSERT_BEFORE;
+    // successful queries
+    hexQuery(func.args(" ()", 0, " ()"),                   "");
+    hexQuery(func.args(base64("12"),   0, " ()"),          "12");
+    hexQuery(func.args(base64("12"),   1, " ()"),          "12");
+    hexQuery(func.args(base64("1234"), 0, base64("00")),   "001234");
+    hexQuery(func.args(base64("1234"), 1, base64("56")),   "125634");
+    hexQuery(func.args(base64("1234"), 2, base64("56")),   "123456");
+    hexQuery(func.args(base64("12"),   0, base64("3456")), "345612");
+    hexQuery(func.args(base64("12"),   1, base64("3456")), "123456");
+    hexQuery(func.args(base64("12"),   1, base64("34")),   "1234");
+    // errors
+    error(func.args(base64(""), -1, " ()"), BIN_IOOR_X_X);
+    error(func.args(base64(""),  1, " ()"), BIN_IOOR_X_X);
+  }
+
+  /** Test method. */
+  @Test public void join() {
+    final Function func = _BIN_JOIN;
+    // successful queries
+    hexQuery(func.args(" ()"),                                          "");
+    hexQuery(func.args(" (" + base64("") + ')'),                        "");
+    hexQuery(func.args(" (" + base64("FF") + ')'),                      "FF");
+    hexQuery(func.args(" (" + base64("FF") + ',' + base64("FF") + ')'), "FFFF");
+    hexQuery(func.args(" (1 to 3) ! " + base64("11")),                 "111111");
+  }
+
+  /** Test method. */
+  @Test public void length() {
+    final Function func = _BIN_LENGTH;
+    // successful queries
+    query(func.args(base64("")),         0);
+    query(func.args(base64("FF")),       1);
+    query(func.args(base64("12345678")), 4);
   }
 
   /** Test method. */
@@ -262,17 +169,33 @@ public final class BinModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void shift() {
-    final Function func = _BIN_SHIFT;
+  @Test public void octal() {
+    final Function func = _BIN_OCTAL;
     // successful queries
-    hexQuery(func.args(" ()", 1),                "");
-    hexQuery(func.args(base64("77"), 0),         "77");
-    hexQuery(func.args(base64("33"), 1),         "66");
-    hexQuery(func.args(base64("66"), -1),        "33");
-    hexQuery(func.args(base64("0066"), 8),       "6600");
-    hexQuery(func.args(base64("6600"), -8),      "0066");
-    hexQuery(func.args(base64("12345678"), 16),  "56780000");
-    hexQuery(func.args(base64("12345678"), -16), "00001234");
+    hexQuery(func.args(" ()"),      "");
+    hexQuery(func.args(""),         "");
+    hexQuery(func.args("0"),        "00");
+    hexQuery(func.args("00"),       "00");
+    hexQuery(func.args("000"),      "0000");
+    hexQuery(func.args("007"),      "0007");
+    hexQuery(func.args("1"),        "01");
+    hexQuery(func.args("10"),       "08");
+    hexQuery(func.args("77"),       "3F");
+    hexQuery(func.args("11223047"), "252627");
+    // errors
+    error(func.args("X"), BIN_NNC);
+  }
+
+  /** Test method. */
+  @Test public void or() {
+    final Function func = _BIN_OR;
+    // successful queries
+    hexQuery(func.args(" ()", base64("00")),            "");
+    hexQuery(func.args(base64("00"), " ()"),            "");
+    hexQuery(func.args(base64(""), base64("")),         "");
+    hexQuery(func.args(base64("8081"), base64("7F7E")), "FFFF");
+    // errors
+    error(func.args(base64("00"), base64("")), BIN_DLA_X_X);
   }
 
   /** Test method. */
@@ -338,6 +261,70 @@ public final class BinModuleTest extends SandboxTest {
     // errors
     error(func.args(1, -1), BIN_NS_X);
     error(func.args(1, 1, "X"), BIN_USO_X);
+  }
+
+  /** Test method. */
+  @Test public void padLeft() {
+    final Function func = _BIN_PAD_LEFT;
+    // successful queries
+    hexQuery(func.args(base64(""),   1),      "00");
+    hexQuery(func.args(base64(""),   1, 255), "FF");
+    hexQuery(func.args(base64("01"), 2, 127), "7F7F01");
+    // errors
+    error(func.args(base64(""), -1),     BIN_NS_X);
+    error(func.args(base64(""), 0, 256), BIN_OOR_X);
+  }
+
+  /** Test method. */
+  @Test public void padRight() {
+    final Function func = _BIN_PAD_RIGHT;
+    // successful queries
+    hexQuery(func.args(base64(""),   1), "00");
+    hexQuery(func.args(base64(""),   1, 255), "FF");
+    hexQuery(func.args(base64("01"), 2, 127), "017F7F");
+    // errors
+    error(func.args(base64(""), -1),      BIN_NS_X);
+    error(func.args(base64(""),  0, 256), BIN_OOR_X);
+  }
+
+  /** Test method. */
+  @Test public void part() {
+    final Function func = _BIN_PART;
+    // successful queries
+    hexQuery(func.args(" ()",        0),    "");
+    hexQuery(func.args(base64("FF"), 0),    "FF");
+    hexQuery(func.args(base64("FF"), 0, 1), "FF");
+    hexQuery(func.args(base64("FF"), 1),    "");
+    hexQuery(func.args(base64("FF"), 1, 0), "");
+    // errors
+    error(func.args(base64("FF"), -1),    BIN_IOOR_X_X);
+    error(func.args(base64("FF"), 0, -1), BIN_NS_X);
+    error(func.args(base64("FF"), 2),     BIN_IOOR_X_X);
+    error(func.args(base64("FF"), 0, 2),  BIN_IOOR_X_X);
+  }
+
+  /** Test method. */
+  @Test public void shift() {
+    final Function func = _BIN_SHIFT;
+    // successful queries
+    hexQuery(func.args(" ()", 1),                "");
+    hexQuery(func.args(base64("77"), 0),         "77");
+    hexQuery(func.args(base64("33"), 1),         "66");
+    hexQuery(func.args(base64("66"), -1),        "33");
+    hexQuery(func.args(base64("0066"), 8),       "6600");
+    hexQuery(func.args(base64("6600"), -8),      "0066");
+    hexQuery(func.args(base64("12345678"), 16),  "56780000");
+    hexQuery(func.args(base64("12345678"), -16), "00001234");
+  }
+
+  /** Test method. */
+  @Test public void toOctets() {
+    final Function func = _BIN_TO_OCTETS;
+    // successful queries
+    query(func.args(base64("")),     "");
+    query(func.args(base64("00")),   0);
+    query(func.args(base64("FF")),   255);
+    query(func.args(base64("1122")), "17\n34");
   }
 
   /** Test method. */
@@ -438,6 +425,19 @@ public final class BinModuleTest extends SandboxTest {
     error(func.args(base64("00"), 0, -1),     BIN_NS_X);
     error(func.args(base64("00"), 0, 2),      BIN_IOOR_X_X);
     error(func.args(base64("00"), 0, 0, "X"), BIN_USO_X);
+  }
+
+  /** Test method. */
+  @Test public void xor() {
+    final Function func = _BIN_XOR;
+    // successful queries
+    hexQuery(func.args(" ()", base64("00")),            "");
+    hexQuery(func.args(base64("00"), " ()"),            "");
+    hexQuery(func.args(base64(""), base64("")),         "");
+    hexQuery(func.args(base64("80"), base64("7F")),     "FF");
+    hexQuery(func.args(base64("1234"), base64("4321")), "5115");
+    // errors
+    error(func.args(base64("00"), base64("")), BIN_DLA_X_X);
   }
 
   /**

@@ -92,6 +92,18 @@ public final class JsonModuleTest extends SandboxTest {
     query(func.args("null", map), "");
   }
 
+  /** Tests the configuration argument of {@code json:parse(...)}. */
+  @Test public void parseConfig() {
+    query("json:parse('[\"foo\",{\"test\":\"asdf\"}]', map {'format':'jsonml'})",
+        "<foo test=\"asdf\"/>");
+    query("array:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', map {'format':'xquery'}))", 2);
+    query("json:parse('\"\\t\\u000A\"', map {'format':'xquery','escape':true(),'liberal':true()})",
+        "\\t\\n");
+    query("string-to-codepoints(json:parse('\"\\t\\u000A\"'," +
+        "  map {'format':'xquery','escape':false(),'liberal':true()}))", "9\n10");
+    error("json:parse('42', map {'spec':'garbage'})", INVALIDOPT_X);
+  }
+
   /** Test method. */
   @Test public void serialize() {
     serial("<json type='object'/>", "", "{\n}");
@@ -111,21 +123,9 @@ public final class JsonModuleTest extends SandboxTest {
     serialError("<json type='array'><_ type='null'>x</_></json>", ""); // no value
   }
 
-  /** Test method with namespaces. */
-  @Test public void ns() {
+  /** Bidirectional tests. */
+  @Test public void serializeParse() {
     query("json:serialize(<x xmlns='X'>{ json:parse('{}') }</x>/*)", "{\n}");
-  }
-
-  /** Tests the configuration argument of {@code json:parse(...)}. */
-  @Test public void config() {
-    query("json:parse('[\"foo\",{\"test\":\"asdf\"}]', map {'format':'jsonml'})",
-        "<foo test=\"asdf\"/>");
-    query("array:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', map {'format':'xquery'}))", 2);
-    query("json:parse('\"\\t\\u000A\"', map {'format':'xquery','escape':true(),'liberal':true()})",
-        "\\t\\n");
-    query("string-to-codepoints(json:parse('\"\\t\\u000A\"'," +
-        "  map {'format':'xquery','escape':false(),'liberal':true()}))", "9\n10");
-    error("json:parse('42', map {'spec':'garbage'})", INVALIDOPT_X);
   }
 
   /**

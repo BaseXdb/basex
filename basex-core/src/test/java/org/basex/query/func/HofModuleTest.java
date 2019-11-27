@@ -17,27 +17,11 @@ import org.junit.*;
  */
 public final class HofModuleTest extends QueryPlanTest {
   /** Test method. */
-  @Test public void idTest() {
-    final Function func = _HOF_ID;
-    query(func.args(" ()"), "");
-    query(func.args(" <x/>"), "<x/>");
-    query(func.args(" 1 to 10"), "1\n2\n3\n4\n5\n6\n7\n8\n9\n10");
-  }
-
-  /** Test method. */
   @Test public void constTest() {
     final Function func = _HOF_CONST;
     query(func.args(" (), error()"), "");
     query(func.args(" <x/>, 123"), "<x/>");
     query(func.args(" 1 to 10", " error('foo')"), "1\n2\n3\n4\n5\n6\n7\n8\n9\n10");
-  }
-
-  /** Test method. */
-  @Test public void sortWithTest() {
-    final Function func = _HOF_SORT_WITH;
-    query(func.args(" ()", " function($a, $b) { $a < $b }"), "");
-    query(func.args(" 1 to 5", " function($a, $b) { $a > $b }"), "5\n4\n3\n2\n1");
-    error(func.args(" 1 to 5", " <x/>"), INVTYPE_X_X_X);
   }
 
   /** Test method. */
@@ -65,10 +49,19 @@ public final class HofModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void untilTest() {
-    final Function func = _HOF_UNTIL;
-    query(func.args(" function($x) { $x >= 1000 }, function($x) { $x * 2 }, 1"), 1024);
-    query(func.args(" function($xs) { count($xs) > 3 }, function($x) {$x, $x}, 1"), "1\n1\n1\n1");
+  @Test public void idTest() {
+    final Function func = _HOF_ID;
+    query(func.args(" ()"), "");
+    query(func.args(" <x/>"), "<x/>");
+    query(func.args(" 1 to 10"), "1\n2\n3\n4\n5\n6\n7\n8\n9\n10");
+  }
+
+  /** Test method. */
+  @Test public void sortWithTest() {
+    final Function func = _HOF_SORT_WITH;
+    query(func.args(" ()", " function($a, $b) { $a < $b }"), "");
+    query(func.args(" 1 to 5", " function($a, $b) { $a > $b }"), "5\n4\n3\n2\n1");
+    error(func.args(" 1 to 5", " <x/>"), INVTYPE_X_X_X);
   }
 
   /** Test method. */
@@ -85,5 +78,12 @@ public final class HofModuleTest extends QueryPlanTest {
     query(func.args(" 1 to 1000", " function($x, $y) { $x > $y }", 0), "");
     query(func.args(" ()", " function($x, $y) { $x > $y }", 5), "");
     query(func.args(" 1 to 5", " function($x, $y) { $x > $y }", 5), "1\n2\n3\n4\n5");
+  }
+
+  /** Test method. */
+  @Test public void untilTest() {
+    final Function func = _HOF_UNTIL;
+    query(func.args(" function($x) { $x >= 1000 }, function($x) { $x * 2 }, 1"), 1024);
+    query(func.args(" function($xs) { count($xs) > 3 }, function($x) {$x, $x}, 1"), "1\n1\n1\n1");
   }
 }

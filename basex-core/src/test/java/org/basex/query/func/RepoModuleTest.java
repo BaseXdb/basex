@@ -31,20 +31,6 @@ public final class RepoModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void install() {
-    final Function func = _REPO_INSTALL;
-    // queries
-    query(func.args(REPO + "pkg3.xar"));
-    final String dir = normalize(PKG3ID);
-    assertTrue(dir(dir));
-    assertTrue(file(dir + "/expath-pkg.xml"));
-    assertTrue(dir(dir + "/pkg3"));
-    assertTrue(dir(dir + "/pkg3/mod"));
-    assertTrue(file(dir + "/pkg3/mod/pkg3mod1.xql"));
-    query(_REPO_DELETE.args(PKG3));
-  }
-
-  /** Test method. */
   @Test public void delete() {
     final Function func = _REPO_DELETE;
     // install
@@ -60,6 +46,20 @@ public final class RepoModuleTest extends SandboxTest {
     // delete by name and version
     query(func.args(PKG3ID));
     assertFalse(dir(dir));
+  }
+
+  /** Test method. */
+  @Test public void install() {
+    final Function func = _REPO_INSTALL;
+    // queries
+    query(func.args(REPO + "pkg3.xar"));
+    final String dir = normalize(PKG3ID);
+    assertTrue(dir(dir));
+    assertTrue(file(dir + "/expath-pkg.xml"));
+    assertTrue(dir(dir + "/pkg3"));
+    assertTrue(dir(dir + "/pkg3/mod"));
+    assertTrue(file(dir + "/pkg3/mod/pkg3mod1.xql"));
+    query(_REPO_DELETE.args(PKG3));
   }
 
   /** Test method. */

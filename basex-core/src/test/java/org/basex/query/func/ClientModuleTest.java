@@ -38,6 +38,17 @@ public final class ClientModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void close() {
+    final Function func = _CLIENT_CLOSE;
+    // successful queries
+    query(connection() + " ! " + func.args(" ."));
+    // BXCL0002: session not available
+    error(func.args(" xs:anyURI('unknown')"), CLIENT_ID_X);
+    // BXCL0002: session has already been closed
+    error(connection() + " ! (" + func.args(" .") + ", " + func.args(" .") + ')', CLIENT_ID_X);
+  }
+
+  /** Test method. */
   @Test public void connect() {
     final Function func = _CLIENT_CONNECT;
     // successful queries
@@ -111,17 +122,6 @@ public final class ClientModuleTest extends SandboxTest {
       query(SerializerOptions.BINARY.arg("no") +
           _CLIENT_QUERY.args(connection(), " \"" + type[1] + '"'), type[2]);
     }
-  }
-
-  /** Test method. */
-  @Test public void close() {
-    final Function func = _CLIENT_CLOSE;
-    // successful queries
-    query(connection() + " ! " + func.args(" ."));
-    // BXCL0002: session not available
-    error(func.args(" xs:anyURI('unknown')"), CLIENT_ID_X);
-    // BXCL0002: session has already been closed
-    error(connection() + " ! (" + func.args(" .") + ", " + func.args(" .") + ')', CLIENT_ID_X);
   }
 
   /**

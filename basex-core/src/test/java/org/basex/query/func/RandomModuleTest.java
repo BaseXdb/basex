@@ -26,11 +26,11 @@ public final class RandomModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void seededDouble() {
-    final Function func = _RANDOM_SEEDED_DOUBLE;
+  @Test public void gaussian() {
+    final Function func = _RANDOM_GAUSSIAN;
     // queries
-    final int s = 12345;
-    query(func.args(s, 1), new Random(s).nextDouble());
+    final int num = 50;
+    query(func.args(num));
   }
 
   /** Test method. */
@@ -45,6 +45,14 @@ public final class RandomModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void seededDouble() {
+    final Function func = _RANDOM_SEEDED_DOUBLE;
+    // queries
+    final int s = 12345;
+    query(func.args(s, 1), new Random(s).nextDouble());
+  }
+
+  /** Test method. */
   @Test public void seededInteger() {
     final Function func = _RANDOM_SEEDED_INTEGER;
     // queries
@@ -54,14 +62,6 @@ public final class RandomModuleTest extends SandboxTest {
     error(func.args(1, -1), QueryError.RANGE_NEGATIVE_X);
     error(func.args(1, 1, -1), QueryError.RANDOM_BOUNDS_X);
     error(func.args(1, 1, 8000000000L), QueryError.RANDOM_BOUNDS_X);
-  }
-
-  /** Test method. */
-  @Test public void gaussian() {
-    final Function func = _RANDOM_GAUSSIAN;
-    // queries
-    final int num = 50;
-    query(func.args(num));
   }
 
   /** Test method. */

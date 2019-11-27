@@ -20,12 +20,6 @@ public final class XsltModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void version() {
-    final Function func = _XSLT_VERSION;
-    assertFalse(query(func.args()).isEmpty());
-  }
-
-  /** Test method. */
   @Test public void transform() {
     final Function func = _XSLT_TRANSFORM;
     final String doc = " <a/>";
@@ -66,6 +60,12 @@ public final class XsltModuleTest extends SandboxTest {
     style = wrap("<xsl:param name='t'/><xsl:output omit-xml-declaration='yes'/>" +
       "<xsl:template match='/'><xsl:value-of select='$t'/></xsl:template>");
     query(func.args(doc, ' ' + style, " map { 't': '1' }"), 1);
+  }
+
+  /** Test method. */
+  @Test public void version() {
+    final Function func = _XSLT_VERSION;
+    assertFalse(query(func.args()).isEmpty());
   }
 
   /**

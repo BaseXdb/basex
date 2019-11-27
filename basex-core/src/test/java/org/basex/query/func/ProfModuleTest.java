@@ -13,11 +13,36 @@ import org.junit.*;
  */
 public final class ProfModuleTest extends SandboxTest {
   /** Test method. */
+  @Test public void dump() {
+    final Function func = _PROF_DUMP;
+    query(func.args("a"), "");
+  }
+
+  /** Test method. */
+  @Test public void human() {
+    final Function func = _PROF_HUMAN;
+    query(func.args(" 1"), "1 b");
+    query(func.args(" 2"), "2 b");
+    query(func.args(" 512"), "512 b");
+    query(func.args(" 32768"), "32 kB");
+    query(func.args(" 1048576"), "1024 kB");
+  }
+
+  /** Test method. */
   @Test public void memory() {
     final Function func = _PROF_MEMORY;
     query(func.args(" ()"));
     query("count(" + func.args(" 1 to 100 ") + ")", 100);
     query("count(" + func.args(" 1 to 100 ", "label") + ")", 100);
+  }
+
+  /** Test method. */
+  @Test public void sleep() {
+    final Function func = _PROF_SLEEP;
+    query(func.args(" 10"));
+    query(func.args(" 1"));
+    query(func.args(" 0"));
+    query(func.args(" -1"));
   }
 
   /** Test method. */
@@ -41,28 +66,12 @@ public final class ProfModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void sleep() {
-    final Function func = _PROF_SLEEP;
-    query(func.args(" 10"));
-    query(func.args(" 1"));
-    query(func.args(" 0"));
-    query(func.args(" -1"));
-  }
-
-  /** Test method. */
-  @Test public void human() {
-    final Function func = _PROF_HUMAN;
-    query(func.args(" 1"), "1 b");
-    query(func.args(" 2"), "2 b");
-    query(func.args(" 512"), "512 b");
-    query(func.args(" 32768"), "32 kB");
-    query(func.args(" 1048576"), "1024 kB");
-  }
-
-  /** Test method. */
-  @Test public void dump() {
-    final Function func = _PROF_DUMP;
-    query(func.args("a"), "");
+  @Test public void type() {
+    final Function func = _PROF_TYPE;
+    query(func.args(" ()"), "");
+    query(func.args(1), 1);
+    query(func.args(" (1, 2, 3)"), "1\n2\n3");
+    query(func.args(" <x a='1' b='2' c='3'/>/@*/data()"), "1\n2\n3");
   }
 
   /** Test method. */
@@ -78,14 +87,5 @@ public final class ProfModuleTest extends SandboxTest {
     query(func.args(" ()"), "");
     query(func.args(1), "");
     query(func.args("1,2"), "");
-  }
-
-  /** Test method. */
-  @Test public void type() {
-    final Function func = _PROF_TYPE;
-    query(func.args(" ()"), "");
-    query(func.args(1), 1);
-    query(func.args(" (1, 2, 3)"), "1\n2\n3");
-    query(func.args(" <x a='1' b='2' c='3'/>/@*/data()"), "1\n2\n3");
   }
 }
