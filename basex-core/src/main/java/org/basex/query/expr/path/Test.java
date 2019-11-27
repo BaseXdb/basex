@@ -77,14 +77,6 @@ public abstract class Test extends ExprInfo {
   }
 
   /**
-   * Returns the name test.
-   * @return name test (can be {@code null})
-   */
-  public QNm name() {
-    return null;
-  }
-
-  /**
    * Copies this test.
    * @return deep copy
    */

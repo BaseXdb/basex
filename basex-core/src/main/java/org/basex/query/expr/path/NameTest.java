@@ -18,10 +18,10 @@ public final class NameTest extends Test {
   private final byte[] defaultNs;
   /** Local name. */
   public final byte[] local;
+  /** QName test. */
+  public final QNm name;
   /** Part of name to be tested. */
   private NamePart part;
-  /** QName test. */
-  private final QNm name;
 
   /**
    * Convenience constructor for element tests.
@@ -75,15 +75,9 @@ public final class NameTest extends Test {
       (type == NodeType.ELM ? data.elemNames : data.attrNames).contains(local);
   }
 
-
   @Override
   public NamePart part() {
     return part;
-  }
-
-  @Override
-  public QNm name() {
-    return name;
   }
 
   @Override

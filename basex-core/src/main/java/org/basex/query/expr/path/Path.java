@@ -469,9 +469,10 @@ public abstract class Path extends ParseExpr {
       if(curr == null) return null;
 
       final boolean desc = curr.axis == DESCENDANT;
-      if(!desc && curr.axis != CHILD || curr.test.part() != NamePart.LOCAL) return null;
+      if(!desc && curr.axis != CHILD || curr.test.part() != NamePart.LOCAL ||
+          !(curr.test instanceof NameTest)) return null;
 
-      final int name = data.elemNames.id(curr.test.name().local());
+      final int name = data.elemNames.id(((NameTest) curr.test).name.local());
       final ArrayList<PathNode> tmp = new ArrayList<>();
       for(final PathNode node : PathIndex.desc(nodes, desc)) {
         if(node.kind == Data.ELEM && name == node.name) {
@@ -754,11 +755,11 @@ public abstract class Path extends ParseExpr {
       // ensure that the index step does not use wildcard
       if(step.test instanceof KindTest && s != i) continue;
       // consider child steps with name test and without predicates
-      if(step.test.part() != NamePart.LOCAL || step.axis != CHILD ||
-          s != i && step.exprs.length > 0) return true;
+      if(step.axis != CHILD || s != i && step.exprs.length > 0 ||
+          step.test.part() != NamePart.LOCAL || !(step.test instanceof NameTest)) return true;
 
       // support only unique paths with nodes on the correct level
-      final ArrayList<PathNode> pn = data.paths.desc(step.test.name().local());
+      final ArrayList<PathNode> pn = data.paths.desc(((NameTest) step.test).name.local());
       if(pn.size() != 1 || pn.get(0).level() != s + 1) return true;
     }
     return false;

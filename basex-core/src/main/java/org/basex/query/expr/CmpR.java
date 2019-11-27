@@ -238,11 +238,12 @@ public final class CmpR extends Single {
         step = path.step(st);
         if(!step.simple(Axis.ATTRIBUTE, true)) return null;
       }
+      if(!(step.test instanceof NameTest)) return null;
       test = (NameTest) step.test;
     }
 
     final Names names = type == IndexType.TEXT ? data.elemNames : data.attrNames;
-    final Stats stats = names.stats(names.id(test.name().local()));
+    final Stats stats = names.stats(names.id(test.name.local()));
     return stats == null || StatsType.isNumeric(stats.type) ? stats : null;
   }
 

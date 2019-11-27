@@ -41,13 +41,22 @@ public final class UnionTest extends Test {
     return new UnionTest(type, tests);
   }
 
-
   @Override
   public boolean matches(final ANode node) {
     for(final Test test : tests) {
       if(test.matches(node)) return true;
     }
     return false;
+  }
+
+  @Override
+  public NamePart part() {
+    final int tl = tests.length;
+    final NamePart part = tests[0].part();
+    for(int t = 1; t < tl; t++) {
+      if(part != tests[t].part()) return null;
+    }
+    return part;
   }
 
   @Override
