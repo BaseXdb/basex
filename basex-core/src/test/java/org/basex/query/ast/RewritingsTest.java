@@ -592,10 +592,6 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** GH1761: merge adjacent steps in path expressions. */
   @Test public void gh1761() {
-    // steps without results
-    check("<a/>/self::a/self::b", "", empty());
-    check("<a/>/self::element()/self::text()", "", empty());
-
     // merge self steps
     check("<a/>/self::*/self::a", "<a/>", count(IterStep.class, 1));
     check("<a/>/self::*/self::b", "", count(IterStep.class, 1));
@@ -611,6 +607,21 @@ public final class RewritingsTest extends QueryPlanTest {
     check("document { <a/>,<b/> }/a/(self::a, self::b)", "<a/>", count(IterStep.class, 1));
     check("document { <a/>,<b/> }/(a,b)/(self::b, self::a)", "<a/>\n<b/>",
         count(IterStep.class, 1));
+  }
+
+  /** GH1762: merge steps and predicates with self steps. */
+  @Test public void gh1762() {
+    // merge self steps
+    check("<a/>/self::*[self::a]", "<a/>", count(IterStep.class, 1));
+    check("<a/>/self::*[self::b]", "", count(IterStep.class, 1));
+    check("<a/>/self::a[self::*]", "<a/>", count(IterStep.class, 1));
+    check("<a/>/self::a[self::node()]", "<a/>", count(IterStep.class, 1));
+
+    // nested predicates
+    check("<a/>/self::a[self::a[self::a[self::a]]]", "<a/>", count(IterStep.class, 1));
+
+    // combined kind test
+    check("document { <a/>,<b/> }/a[self::a|self::b]", "<a/>", count(IterStep.class, 1));
   }
 
   /** Path tests. */

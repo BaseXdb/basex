@@ -70,6 +70,9 @@ public class KindTest extends Test {
 
   @Override
   public Test intersect(final Test test) {
+    if(test instanceof UnionTest) {
+      return test.intersect(this);
+    }
     if(test instanceof NameTest || test instanceof DocTest) {
       return test.type.instanceOf(type) ? test : null;
     }

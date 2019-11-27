@@ -44,6 +44,9 @@ public final class DocTest extends Test {
 
   @Override
   public Test intersect(final Test test) {
+    if(test instanceof UnionTest) {
+      return test.intersect(this);
+    }
     if(test instanceof DocTest) {
       final DocTest dt = (DocTest) test;
       if(child == null || dt.child == null || child.equals(dt.child))

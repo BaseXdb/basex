@@ -860,7 +860,7 @@ public abstract class Path extends ParseExpr {
     // merge self steps
     if(nxt != null && nxt.axis == SELF && !nxt.positional()) {
       final Test test = crr.test.intersect(nxt.test);
-      if(test == null) return Empty.VALUE;
+      if(test == null) return null;
       crr.test = test;
       return crr.addPreds(nxt.exprs);
     }

@@ -241,6 +241,18 @@ public abstract class Preds extends Arr {
           final int ml = mexprs.length;
           ex = ml == 2 ? second : SimpleMap.get(map.info, Arrays.copyOfRange(mexprs, 1, ml));
         }
+      } else if(ex instanceof SingleIterPath && root instanceof Step && !positional()) {
+        // node() [ self:* ] -> *
+        final Step rootStep = (Step) root, predStep = (Step) ((Path) ex).steps[0];
+        if(predStep.axis == Axis.SELF && !predStep.positional()) {
+          final Test test = rootStep.test.intersect(predStep.test);
+          if(test != null) {
+            cc.info(OPTMERGE_X, predStep);
+            rootStep.test = test;
+            list.add(predStep.exprs);
+            continue;
+          }
+        }
       } else if(ex instanceof Path) {
         // E [ . / ... ] -> E [ ... ]
         // E [ E / ... ] -> E [ ... ]
