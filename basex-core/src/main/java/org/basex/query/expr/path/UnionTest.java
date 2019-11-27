@@ -1,5 +1,7 @@
 package org.basex.query.expr.path;
 
+import java.util.*;
+
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -56,7 +58,12 @@ public final class UnionTest extends Test {
 
   @Override
   public Test intersect(final Test test) {
-    throw Util.notExpected(test);
+    final ArrayList<Test> list = new ArrayList<>(1);
+    for(final Test t : tests) {
+      final Test t2 = t.intersect(test);
+      if(t2 != null) list.add(t2);
+    }
+    return get(list.toArray(new Test[0]));
   }
 
   @Override

@@ -408,7 +408,7 @@ public interface QueryText {
 
   /** Optimization info. */ String OPTREWRITE = "rewrite";
   /** Optimization info. */ String OPTPRE = "pre-evaluate";
-  /** Optimization info. */ String OPTDESC_X = "rewrite descendant-or-self step(s): %";
+  /** Optimization info. */ String OPTMERGE_X = "merge steps: %";
   /** Optimization info. */ String OPTTYPE_X = "remove type check: %";
   /** Optimization info. */ String OPTTYPE_X_X = "remove type check: % -> %";
   /** Optimization info. */ String OPTFLAT_X_X = "flatten nested %: %";

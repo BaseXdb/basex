@@ -588,7 +588,19 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // rewrite to union expression
     check("<a/>/(*,@*)", "", root(MixedPath.class), exists(Union.class));
+  }
 
+  /** GH1761: merge adjacent steps in path expressions. */
+  @Test public void gh1761() {
+    check("<a/>/self::a/self::b", "", empty());
+
+    check("<a/>/self::*/self::a", "<a/>", count(IterStep.class, 1));
+    check("<a/>/self::*/self::b", "", count(IterStep.class, 1));
+    check("<a/>/self::a/self::*", "<a/>", count(IterStep.class, 1));
+    check("<a/>/self::a/self::node()", "<a/>", count(IterStep.class, 1));
+
+    check("document { <a/> }//self::a", "<a/>", count(IterStep.class, 1));
+    check("document { <a/> }//*/self::a", "<a/>", count(IterStep.class, 1));
   }
 
   /** Path tests. */

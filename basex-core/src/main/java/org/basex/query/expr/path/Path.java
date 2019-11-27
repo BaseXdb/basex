@@ -137,7 +137,7 @@ public abstract class Path extends ParseExpr {
     // rewrite list to union expressions
     if(expr == this) expr = toUnion(cc);
     // merge descendant-or-self steps
-    if(expr == this) expr = mergeDesc(cc);
+    if(expr == this) expr = mergeSteps(cc);
     // return optimized expression
     if(expr != this) return expr.optimize(cc);
 
@@ -815,21 +815,21 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Rewrites descendant-or-self to descendant steps.
+   * Merges adjacent steps.
    * @param cc compilation context
    * @return original or new expression
    * @throws QueryException query exception
    */
-  private Expr mergeDesc(final CompileContext cc) throws QueryException {
+  private Expr mergeSteps(final CompileContext cc) throws QueryException {
     final int sl = steps.length;
     final ExprList stps = new ExprList(sl);
 
     cc.pushFocus(root);
     try {
       for(int s = 0; s < sl; s++) {
-        Expr curr = steps[s], next = s < sl - 1 ? mergeDesc(curr, steps[s + 1], cc) : null;
+        Expr curr = steps[s], next = s < sl - 1 ? mergeStep(curr, steps[s + 1], cc) : null;
         if(next != null) {
-          // steps can be merged; skip next step
+          cc.info(QueryText.OPTMERGE_X, next);
           curr = next;
           s++;
         }
@@ -840,27 +840,33 @@ public abstract class Path extends ParseExpr {
       cc.removeFocus();
     }
 
-    if(stps.size() != steps.length) {
-      cc.info(QueryText.OPTDESC_X, this);
-      return get(info, root, stps.finish());
-    }
-    return this;
+    return stps.size() != steps.length ? get(info, root, stps.finish()) : this;
   }
 
   /**
-   * Merges descendant-or-self and child steps.
+   * Merges adjacent steps.
    * @param curr current step
    * @param next next step
    * @param cc compilation context
-   * @return original or new expression
+   * @return merged expression or {@code null}
    * @throws QueryException query exception
    */
-  private Expr mergeDesc(final Expr curr, final Expr next, final CompileContext cc)
+  private Expr mergeStep(final Expr curr, final Expr next, final CompileContext cc)
       throws QueryException {
 
     if(!(curr instanceof Step)) return null;
-    final Step step = (Step) curr;
-    if(step.axis != DESCENDANT_OR_SELF || step.test != KindTest.NOD || step.exprs.length > 0)
+    final Step crr = (Step) curr, nxt = next instanceof Step ? (Step) next : null;
+
+    // merge self steps
+    if(nxt != null && nxt.axis == SELF && !nxt.positional()) {
+      System.out.println("=> " + this);
+      final Test test = crr.test.intersect(nxt.test);
+      if(test == null) return Empty.VALUE;
+      crr.test = test;
+      return crr.addPreds(nxt.exprs);
+    }
+
+    if(crr.axis != DESCENDANT_OR_SELF || crr.test != KindTest.NOD || crr.exprs.length > 0)
       return null;
 
     // function for merging steps inside union expressions
@@ -883,13 +889,13 @@ public abstract class Path extends ParseExpr {
     };
 
     // example: //child::* -> descendant::*
-    if(simpleChild(next)) {
-      ((Step) next).axis = DESCENDANT;
-      return next;
+    if(simpleChild(nxt)) {
+      nxt.axis = DESCENDANT;
+      return nxt;
     }
     // example: //(text()|*) -> (descendant::text() | descendant::*)
     if(next instanceof Union) {
-      return rewrite.apply(next);
+      return rewrite.apply(nxt);
     }
     // example: //(text()|*)[..] -> (/descendant::text() | /descendant::*)[..]
     if(next instanceof Filter) {

@@ -112,6 +112,9 @@ public final class NameTest extends Test {
 
   @Override
   public Test intersect(final Test test) {
+    if(test instanceof UnionTest) {
+      return test.intersect(this);
+    }
     if(test instanceof NameTest) {
       final NameTest nt = (NameTest) test;
       return type == nt.type && name.eq(nt.name) ? this : null;

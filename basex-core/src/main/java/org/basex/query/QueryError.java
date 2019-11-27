@@ -1726,7 +1726,7 @@ public enum QueryError {
     byte l = 0;
     for(byte b : token) {
       final int ts = tb.size();
-      if(ts == 40) {
+      if(ts == 100) {
         tb.add(Text.DOTS);
         break;
       }
