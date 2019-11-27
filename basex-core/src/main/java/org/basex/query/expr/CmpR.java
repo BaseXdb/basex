@@ -233,13 +233,13 @@ public final class CmpR extends Single {
       final int st = path.steps.length - 1;
       if(type == IndexType.TEXT) {
         step = st == 0 ? ii.step : path.step(st - 1);
-        if(step.test.part() != NamePart.LOCAL) return null;
       } else {
         step = path.step(st);
-        if(!step.simple(Axis.ATTRIBUTE, true)) return null;
+        if(step.axis != Axis.ATTRIBUTE || step.exprs.length > 0) return null;
       }
       if(!(step.test instanceof NameTest)) return null;
       test = (NameTest) step.test;
+      if(test.part != NamePart.LOCAL) return null;
     }
 
     final Names names = type == IndexType.TEXT ? data.elemNames : data.attrNames;

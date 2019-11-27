@@ -79,10 +79,12 @@ public final class IndexInfo {
     } else if(last.test.type == NodeType.ELM) {
       // ensure that addressed elements only have text nodes as children
       // stop if database is unknown/out-dated, if namespaces occur, or if name test is not simple
-      if(data == null || !(data.meta.uptodate && data.nspaces.isEmpty() &&
-          last.test.part() == NamePart.LOCAL) || !(last.test instanceof NameTest)) return null;
+      if(data == null || !(data.meta.uptodate && data.nspaces.isEmpty()) ||
+          !(last.test instanceof NameTest)) return null;
 
       test = (NameTest) last.test;
+      if(test.part != NamePart.LOCAL) return null;
+
       final Stats stats = data.elemNames.stats(data.elemNames.id(test.name.local()));
       if(stats == null || !stats.isLeaf()) return null;
       text = true;
@@ -254,21 +256,20 @@ public final class IndexInfo {
    * @return index access
    */
   private ParseExpr invert(final ParseExpr root) {
-    // handle context node
+    // rewrite context node
     if(pred instanceof ContextValue) {
-      // add attribute step
-      if(text || !(step.test instanceof NameTest)) return root;
-      final Step st = Step.get(step.info, Axis.SELF, step.test);
-      return Path.get(root.info, root, st);
+      if(text || !(step.test instanceof NameTest || step.test instanceof UnionTest)) return root;
+      // attribute index request: add attribute step
+      return Path.get(root.info, root, Step.get(step.info, Axis.SELF, step.test));
     }
 
-    final AxisPath origPath = (AxisPath) pred;
-    Path invPath = origPath.invertPath(root, step);
-
+    // rewrite axis path
+    final AxisPath path = (AxisPath) pred;
+    Path invPath = path.invertPath(root, step);
     if(!text) {
-      // add attribute test as first step
-      final Step st = origPath.step(origPath.steps.length - 1);
-      if(st.test instanceof NameTest) {
+      // attribute index request: start inverted path with attribute step
+      final Step st = path.step(path.steps.length - 1);
+      if(st.test instanceof NameTest || st.test instanceof UnionTest) {
         final ExprList steps = new ExprList(invPath.steps.length + 1);
         steps.add(Step.get(st.info, Axis.SELF, st.test)).add(invPath.steps);
         invPath = Path.get(invPath.info, invPath.root, steps.finish());

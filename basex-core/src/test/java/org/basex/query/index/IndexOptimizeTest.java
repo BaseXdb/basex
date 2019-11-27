@@ -233,6 +233,21 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     query("//c[../preceding-sibling::a[1]/b = 'A']", "<c>correct</c>");
   }
 
+  /** Combined kind tests. */
+  @Test public void gh1737() {
+    execute(new CreateDB(NAME, "<xml><a y='Y'>A</a><b z='Z'>B</b></xml>"));
+
+    // texts
+    indexCheck("//(a,b)[text() = 'A']/name()", "a");
+    indexCheck("//(a|b)[text() = 'A']/name()", "a");
+    indexCheck("//*[(a|b)/text() = 'A']/name()", "xml");
+    indexCheck("//(a|b)/text()[. = 'A']", "A");
+
+    // attributes
+    indexCheck("//*[(@y|@z) = 'Y']/name()", "a");
+    indexCheck("//(@y|@z)[. = 'Y']/name()", "y");
+  }
+
   /** Checks if expressions are rewritten for enforced index access. */
   @Test public void pragma() {
     createDoc();

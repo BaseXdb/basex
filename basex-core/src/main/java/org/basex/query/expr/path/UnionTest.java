@@ -50,16 +50,6 @@ public final class UnionTest extends Test {
   }
 
   @Override
-  public NamePart part() {
-    final int tl = tests.length;
-    final NamePart part = tests[0].part();
-    for(int t = 1; t < tl; t++) {
-      if(part != tests[t].part()) return null;
-    }
-    return part;
-  }
-
-  @Override
   public Test copy() {
     return get(tests);
   }

@@ -487,7 +487,7 @@ public final class RestXqFunction extends WebFunction {
       final Function<NameTest, String> toString = t -> t != null ? t.toString() : "*";
       if(!error.isEmpty()) {
         final NameTest first = error.get(0);
-        if(first != null ? first.part() != part : part != null) {
+        if(first != null ? first.part != part : part != null) {
           throw error(INV_PRECEDENCE_X_X, toString.apply(first), toString.apply(test));
         }
       }

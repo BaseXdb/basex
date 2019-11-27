@@ -21,7 +21,7 @@ public final class NameTest extends Test {
   /** QName test. */
   public final QNm name;
   /** Part of name to be tested. */
-  private NamePart part;
+  public NamePart part;
 
   /**
    * Convenience constructor for element tests.
@@ -73,11 +73,6 @@ public final class NameTest extends Test {
     // check existence of local element/attribute names
     return type == NodeType.PI || part != NamePart.LOCAL ||
       (type == NodeType.ELM ? data.elemNames : data.attrNames).contains(local);
-  }
-
-  @Override
-  public NamePart part() {
-    return part;
   }
 
   @Override

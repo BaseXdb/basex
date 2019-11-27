@@ -358,7 +358,8 @@ public abstract class Path extends ParseExpr {
           break;
         case ATTRIBUTE:
           // only unique for exact QName matching
-          atMostOne &= step.test.part() == NamePart.FULL;
+          atMostOne &= step.test instanceof NameTest &&
+            ((NameTest) step.test).part == NamePart.FULL;
           break;
         case CHILD:
           // order is only ensured if all nodes are on the same level
@@ -469,10 +470,12 @@ public abstract class Path extends ParseExpr {
       if(curr == null) return null;
 
       final boolean desc = curr.axis == DESCENDANT;
-      if(!desc && curr.axis != CHILD || curr.test.part() != NamePart.LOCAL ||
-          !(curr.test instanceof NameTest)) return null;
+      if(!desc && curr.axis != CHILD || !(curr.test instanceof NameTest)) return null;
 
-      final int name = data.elemNames.id(((NameTest) curr.test).name.local());
+      final NameTest test = (NameTest) curr.test;
+      if(test.part != NamePart.LOCAL) return null;
+
+      final int name = data.elemNames.id(test.name.local());
       final ArrayList<PathNode> tmp = new ArrayList<>();
       for(final PathNode node : PathIndex.desc(nodes, desc)) {
         if(node.kind == Data.ELEM && name == node.name) {
@@ -684,7 +687,7 @@ public abstract class Path extends ParseExpr {
     final Test rootTest = InvDocTest.get(rt);
     final ExprList invSteps = new ExprList();
     if(rootTest != KindTest.DOC || data == null || !data.meta.uptodate ||
-        predSteps(data, indexStep)) {
+        invertSteps(data, indexStep)) {
       for(int s = indexStep; s >= 0; s--) {
         final Axis invAxis = axisStep(s).axis.invert();
         if(s == 0) {
@@ -749,17 +752,19 @@ public abstract class Path extends ParseExpr {
    * @param i index step
    * @return result of check
    */
-  private boolean predSteps(final Data data, final int i) {
+  private boolean invertSteps(final Data data, final int i) {
     for(int s = i; s >= 0; s--) {
       final Step step = axisStep(s);
       // ensure that the index step does not use wildcard
       if(step.test instanceof KindTest && s != i) continue;
       // consider child steps with name test and without predicates
       if(step.axis != CHILD || s != i && step.exprs.length > 0 ||
-          step.test.part() != NamePart.LOCAL || !(step.test instanceof NameTest)) return true;
-
-      // support only unique paths with nodes on the correct level
-      final ArrayList<PathNode> pn = data.paths.desc(((NameTest) step.test).name.local());
+          !(step.test instanceof NameTest)) return true;
+      // only consider local name tests
+      final NameTest test = (NameTest) step.test;
+      if(test.part != NamePart.LOCAL) return true;
+      // only support unique paths with nodes on the correct level
+      final ArrayList<PathNode> pn = data.paths.desc(test.name.local());
       if(pn.size() != 1 || pn.get(0).level() != s + 1) return true;
     }
     return false;
@@ -855,7 +860,8 @@ public abstract class Path extends ParseExpr {
 
     if(!(curr instanceof Step)) return null;
     final Step step = (Step) curr;
-    if(!step.simple(DESCENDANT_OR_SELF, false)) return null;
+    if(step.axis != DESCENDANT_OR_SELF || step.test != KindTest.NOD || step.exprs.length > 0)
+      return null;
 
     // function for merging steps inside union expressions
     final QueryFunction<Expr, Expr> rewrite = expr -> {

@@ -69,14 +69,6 @@ public abstract class Test extends ExprInfo {
   }
 
   /**
-   * Returns the name part.
-   * @return part of name to be tested (can be {@code null})
-   */
-  public NamePart part() {
-    return null;
-  }
-
-  /**
    * Copies this test.
    * @return deep copy
    */

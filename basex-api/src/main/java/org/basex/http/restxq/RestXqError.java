@@ -60,7 +60,7 @@ final class RestXqError implements Comparable<RestXqError> {
 
   @Override
   public int compareTo(final RestXqError error) {
-    final Function<NameTest, Integer> prec = test -> test == null ? -1 : test.part().ordinal();
+    final Function<NameTest, Integer> prec = test -> test == null ? -1 : test.part.ordinal();
     return prec.apply(error.tests.get(0)) - prec.apply(tests.get(0));
   }
 

@@ -75,7 +75,8 @@ public abstract class Step extends Preds {
       axis == Axis.ATTRIBUTE ? NodeType.ATT : test.type,
       axis == Axis.SELF && test == KindTest.NOD && exprs.length == 0 ? Occ.ONE :
       axis == Axis.SELF || axis == Axis.PARENT || axis == Axis.ATTRIBUTE &&
-        test.part() == NamePart.FULL ? Occ.ZERO_ONE : Occ.ZERO_MORE), exprs);
+        test instanceof NameTest && ((NameTest) test).part == NamePart.FULL ?
+        Occ.ZERO_ONE : Occ.ZERO_MORE), exprs);
 
     this.axis = axis;
     this.test = test;
@@ -133,17 +134,6 @@ public abstract class Step extends Preds {
   public abstract Step copy(CompileContext cc, IntObjMap<Var> vm);
 
   /**
-   * Checks if this step uses the specified axis test and has no predicates.
-   * @param ax axis to be checked
-   * @param name name/node test
-   * @return result of check
-   */
-  public final boolean simple(final Axis ax, final boolean name) {
-    return axis == ax && (name ? test.part() == NamePart.LOCAL : test == KindTest.NOD) &&
-        exprs.length == 0;
-  }
-
-  /**
    * Returns the path nodes that are the result of this step.
    * @param nodes initial path nodes
    * @param dt data reference
@@ -161,13 +151,18 @@ public abstract class Step extends Preds {
 
     // check node type
     int name = 0;
-    final NamePart part = test.part();
-    if(part == NamePart.LOCAL) {
-      // element/attribute test (*:ln)
-      final Names names = test.type == NodeType.ATT ? dt.attrNames : dt.elemNames;
-      name = names.id(((NameTest) test).local);
-    } else if(part != null) {
-      // skip namespace and standard tests
+
+    if(test instanceof NameTest) {
+      final NamePart part = ((NameTest) test).part;
+      if(part == NamePart.LOCAL && test instanceof NameTest) {
+        // element/attribute test (*:ln)
+        final Names names = test.type == NodeType.ATT ? dt.attrNames : dt.elemNames;
+        name = names.id(((NameTest) test).local);
+      } else if(part != null) {
+        // skip namespace and standard tests
+        return null;
+      }
+    } else if(test instanceof UnionTest) {
       return null;
     }
 
