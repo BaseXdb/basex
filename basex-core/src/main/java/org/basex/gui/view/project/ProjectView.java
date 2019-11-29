@@ -51,10 +51,10 @@ public final class ProjectView extends BaseXPanel {
 
   /**
    * Constructor.
-   * @param ev editor view
+   * @param view editor view
    */
-  public ProjectView(final EditorView ev) {
-    super(ev.gui);
+  public ProjectView(final EditorView view) {
+    super(view.gui);
     setLayout(new BorderLayout());
 
     files = new ProjectFiles(this);
@@ -242,18 +242,16 @@ public final class ProjectView extends BaseXPanel {
   }
 
   /**
-   * Refreshes the rendering of the specified file, or its parent, in the tree.
+   * Refreshes the rendering of the specified file, and its parents, in the tree.
    * It may possibly be hidden in the current tree.
    * @param file file to be refreshed
    */
   private void refreshTree(final IOFile file) {
     final ProjectNode node = find(file.path());
-    if(node != null) {
-      node.refresh();
-    } else {
-      final IOFile parent = file.parent();
-      if(parent != null) refreshTree(parent);
-    }
+    if(node != null) node.refresh();
+
+    final IOFile parent = file.parent();
+    if(parent != null) refreshTree(parent);
   }
 
   /**
