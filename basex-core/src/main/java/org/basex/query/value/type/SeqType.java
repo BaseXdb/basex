@@ -519,7 +519,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if expressions of this type yield exactly one item.
+   * Tests if expressions of this type yield one item.
    * @return result of check
    */
   public boolean one() {
@@ -527,7 +527,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if expressions of this type yield exactly one item and is no array.
+   * Tests if expressions of this type yield one item and is no array.
    * @return result of check
    */
   public boolean oneNoArray() {
@@ -535,19 +535,11 @@ public final class SeqType {
   }
 
   /**
-   * Tests if expressions of this type yield exactly one or more items.
+   * Tests if expressions of this type yield one or more items.
    * @return result of check
    */
   public boolean oneOrMore() {
     return occ.min >= 1;
-  }
-
-  /**
-   * Tests if expressions of this type may yield zero items.
-   * @return result of check
-   */
-  public boolean mayBeEmpty() {
-    return occ.min == 0;
   }
 
   /**
@@ -584,7 +576,7 @@ public final class SeqType {
    */
   public boolean instanceOf(final SeqType st) {
     // empty sequence: only check cardinality
-    return zero() ? st.mayBeEmpty() :
+    return zero() ? !st.oneOrMore() :
       (st.type == AtomType.ITEM || type.instanceOf(st.type)) && occ.instanceOf(st.occ) &&
       (st.test == null || test != null && test.intersect(st.test) != null);
   }

@@ -104,7 +104,7 @@ public final class FnFoldLeft extends StandardFunc {
         } while(true);
       }
 
-      sf.exprType.assign(array || seq.mayBeEmpty() ? output.union(zero) : output);
+      sf.exprType.assign(array || !seq.oneOrMore() ? output.union(zero) : output);
       exprs[2] = optFunc;
     }
   }

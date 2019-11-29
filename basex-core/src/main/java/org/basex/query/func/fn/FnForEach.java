@@ -63,9 +63,9 @@ public class FnForEach extends StandardFunc {
     final FuncType ft = expr2.funcType();
     if(ft != null && !updating) {
       final SeqType declType = ft.declType;
-      final boolean mayBeEmpty = st1.mayBeEmpty() || declType.mayBeEmpty();
+      final boolean oneOrMore = st1.oneOrMore() && declType.oneOrMore();
       final long size = declType.zero() ? 0 : declType.one() ? expr1.size() : -1;
-      exprType.assign(declType.type, mayBeEmpty ? Occ.ZERO_MORE : Occ.ONE_MORE, size);
+      exprType.assign(declType.type, oneOrMore ? Occ.ONE_MORE : Occ.ZERO_MORE, size);
     }
 
     final long size1 = expr1.size();
