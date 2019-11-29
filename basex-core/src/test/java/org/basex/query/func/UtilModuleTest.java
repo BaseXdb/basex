@@ -4,6 +4,9 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.ast.*;
+import org.basex.query.expr.*;
+import org.basex.query.expr.constr.*;
+import org.basex.query.value.item.*;
 import org.junit.*;
 
 /**
@@ -201,6 +204,29 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" tokenize(<a>1</a>)", 2), 1);
     query("sort(" + func.args(" tokenize(<a>1</a>)", 2) + ")", 1);
     query("sort(" + func.args(" tokenize(<a/>)", 2) + ")", 2);
+
+    query("count(" + func.args(" 1[.=1]", 2) + ')', 1);
+    query("count(" + func.args(" (1,2)[.=1]", 3) + ')', 1);
+    query("count(" + func.args(" (1,2,3)[.=1]", 4) + ')', 1);
+    query("count(" + func.args(" (1,2,3)[.=4]", 4) + ')', 1);
+    query("count(" + func.args(" (1,2,3)[.=4]", " (4,5)") + ')', 2);
+
+    check(func.args(null, null), "", empty());
+    check(func.args(null, 1), 1, root(Int.class));
+    check(func.args(1, null), 1, root(Int.class));
+    check(func.args(null, " <x/>"), "<x/>", root(CElem.class));
+    check(func.args(" <x/>", null), "<x/>", root(CElem.class));
+
+    check(func.args(" (1,2[.=3])", null), 1, root(List.class));
+    check(func.args(" (2,3[.=4])", "<z/>"), 2, root(List.class));
+
+    check(func.args(" (3,4)[.=3]", null), 3, root(IterFilter.class));
+    check(func.args(" (4,5)[.=4]", "<z/>"), 4, root(_UTIL_OR));
+
+    check(func.args(" prof:void(1)", 2), 2, root(_UTIL_OR));
+    check(func.args(" prof:void(2)", " prof:void(3)"), "", root(_UTIL_OR));
+
+    check(func.args(" 6[.=6]", 7), 6, root(_UTIL_OR));
   }
 
   /** Test method. */

@@ -53,12 +53,15 @@ public final class UtilOr extends StandardFunc {
     final Expr items = exprs[0], dflt = exprs[1];
     if(items == Empty.VALUE) return dflt;
 
-    // at least one item: return items
+    // at least one item, or default is empty: return items
     final SeqType st = items.seqType();
-    if(st.oneOrMore()) return items;
+    if(st.oneOrMore() || dflt == Empty.VALUE) return items;
 
     // otherwise, combine sequence types
-    exprType.assign(st.union(dflt.seqType()));
+    SeqType ut = dflt.seqType();
+    if(!st.zero()) ut = st.with(st.zeroOrOne() ? Occ.ONE : Occ.ONE_MORE).union(ut);
+
+    exprType.assign(ut);
     return this;
   }
 }
