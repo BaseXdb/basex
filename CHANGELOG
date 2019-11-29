@@ -1,3 +1,46 @@
+VERSION 9.3 (November 29, 2019) ----------------------------------------
+
+ RESTXQ
+ - seamless streaming of custom responses to the client
+ - Request Module: bind attributes to current request
+ - better support for the OPTIONS and HEAD methods
+ - enforce premature HTTP response with web:error
+ - optional GZIP compression of HTTP responses
+ - trace output is now stored in database logs
+ - server-side forwarding with web:forward
+ 
+ USER INTERFACES
+ - GUI: project view: skip directories with .ignore file
+ - GUI: project view: do now follow symbolic links
+ - DBA: user panel updated to show user info
+ - DBA: faster processing of log entries
+ 
+ STORAGE
+ - hot fix for replacing single documents with namespaces
+ - improved XQuery processing of binary resources
+ - ADDCACHE: faster caching of single documents
+ - WITHDB: less locking when using fn:doc
+ 
+ XQUERY FUNCTIONS
+ - user:info/user:update-info: process user-specific data
+ - db:open-id, db:open-pre: support for multiple ids
+ - file:descendants: return descendant file paths
+ - inspect:type: return type of a value as string
+ - db:alter-backup: rename database backups
+ - xsl:transform: support for catalog files
+ 
+ XQUERY PERFORMANCE
+ - merge of adjacent/redundant steps in paths and predicates
+ - removal of redundant switch, typeswitch and catch clauses
+ - interruption of side-effecting code (Files Modul etc.)
+ - fn:count: pre-evaluation of zero-or-one arguments
+ - faster processing of alternative steps: a/(b,c)
+ - rewriting of paths to simple map expressions
+ - inlining of values in simple map expressions
+ - flattening of nested simple map expressions
+ - rewriting of lists to union expressions
+ - removal of superfluous predicates
+
 VERSION 9.2.4 (July 26, 2019) ------------------------------------------
 
  - Minor bug fixes
