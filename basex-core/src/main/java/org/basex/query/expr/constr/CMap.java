@@ -31,7 +31,7 @@ public final class CMap extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // key type
+    // determine static key type (all keys must be single items)
     final int el = exprs.length;
     Type key = null;
     for(int e = 0; e < el; e += 2) {
@@ -43,16 +43,17 @@ public final class CMap extends Arr {
       }
       key = key == null ? type : key.union(type);
     }
+    if(key == null) key = AtomType.AAT;
 
-    // value type
+    // determine static value type
     SeqType vt = null;
     for(int e = 1; e < el; e += 2) {
       final SeqType dst = exprs[e].seqType();
       vt = vt == null ? dst : vt.union(dst);
     }
+    vt = vt != null ? vt.union(SeqType.EMP) : SeqType.ITEM_ZM;
 
-    // assign type if at least one key/value pair exists, and if all keys are single items
-    if(key != null) exprType.assign(MapType.get((AtomType) key, vt));
+    exprType.assign(MapType.get((AtomType) key, vt));
 
     return allAreValues(true) ? cc.preEval(this) : this;
   }

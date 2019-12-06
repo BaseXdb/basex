@@ -633,4 +633,9 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1752() {
     check("'1' ! json:parse(.)/descendant::*[text()] = 1", true, empty(IterMap.class));
   }
+
+  /** Static typing of computed maps. */
+  @Test public void gh1766() {
+    check("let $map := map { 'c': 'x' } return count($map?(('a','b')))", 0, root(Int.class));
+  }
 }
