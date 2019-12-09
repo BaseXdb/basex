@@ -9,7 +9,9 @@ import java.util.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.server.*;
 import org.basex.server.Log.*;
@@ -23,72 +25,94 @@ import org.basex.util.*;
  */
 public final class AdminLogs extends AdminFn {
   @Override
+  public Iter iter(final QueryContext qc) throws QueryException {
+    checkAdmin(qc);
+    return exprs.length == 0 ? list(qc).iter() : logs(qc);
+  }
+
+  @Override
   public Value value(final QueryContext qc) throws QueryException {
     checkAdmin(qc);
+    return exprs.length == 0 ? list(qc) : logs(qc).value(qc, this);
+  }
 
+  /**
+   * Returns a list of all log files.
+   * @param qc query context
+   * @return list
+   */
+  private static Value list(final QueryContext qc) {
     final ValueBuilder vb = new ValueBuilder(qc);
-    if(exprs.length == 0) {
-      // return list of all log files
-      for(final IOFile file : qc.context.log.files()) {
-        final String date = file.name().replace(IO.LOGSUFFIX, "");
-        vb.add(new FElem(FILE).add(date).add(SIZE, Token.token(file.length())));
+    for(final IOFile file : qc.context.log.files()) {
+      final String date = file.name().replace(IO.LOGSUFFIX, "");
+      vb.add(new FElem(FILE).add(date).add(SIZE, Token.token(file.length())));
+    }
+    return vb.value();
+  }
+
+  /**
+   * Returns the logs from the specified log file.
+   * @param qc query context
+   * @return list
+   * @throws QueryException query exception
+   */
+  private Iter logs(final QueryContext qc) throws QueryException {
+    // return content of single log file
+    final String name = Token.string(toToken(exprs[0], qc));
+    final boolean merge = exprs.length > 1 && toBoolean(exprs[1], qc);
+
+    final LinkedList<LogEntry> list = logs(name, qc);
+    final HashMap<String, LinkedList<LogEntry>> map = new HashMap<>();
+    if(merge) {
+      // group entries by address
+      for(final LogEntry entry : list) {
+        map.computeIfAbsent(entry.address, address -> new LinkedList<>()).add(entry);
       }
-    } else {
-      // return content of single log file
-      final String name = Token.string(toToken(exprs[0], qc));
-      final boolean merge = exprs.length > 1 && toBoolean(exprs[1], qc);
+    }
+    return new Iter() {
+      @Override
+      public Item next() throws QueryException {
+        // scan and merge entries
+        for(LogEntry entry; (entry = list.pollFirst()) != null;) {
+          // REQUEST entries: find concluding entries (status code, OK, error)
+          if(merge) {
+            // skip entries that have already been consumed
+            final LinkedList<LogEntry> entries = map.get(entry.address);
+            if(entries.peekFirst() != entry) continue;
+            entries.removeFirst();
 
-      // parse log file
-      final LinkedList<LogEntry> list = logs(name, qc);
-      final HashMap<String, LinkedList<LogEntry>> map = new HashMap<>();
-      if(merge) {
-        // group entries by address
-        for(final LogEntry entry : list) {
-          map.computeIfAbsent(entry.address, address -> new LinkedList<>()).add(entry);
-        }
-      }
-
-      // scan and merge entries
-      for(LogEntry entry; (entry = list.pollFirst()) != null;) {
-        // REQUEST entries: find concluding entries (status code, OK, error)
-        if(merge) {
-          // skip entries that have already been consumed
-          final LinkedList<LogEntry> entries = map.get(entry.address);
-          if(entries.peekFirst() != entry) continue;
-          entries.removeFirst();
-
-          if(entry.type.equals(LogType.REQUEST.name())) {
-            final Iterator<LogEntry> iter = entries.iterator();
-            while(iter.hasNext()) {
-              final LogEntry next = iter.next();
-              final String et = next.type;
-              // REQUEST entry with identical address: no concluding entry exists
-              if(et.equals(LogType.REQUEST.name())) break;
-              if(et.matches("^\\d+$") || Strings.eq(et, LogType.OK.name(), LogType.ERROR.name())) {
-                entry.type = et;
-                entry.user = next.user;
-                entry.ms = entry.ms.add(next.ms);
-                if(!next.message.isEmpty()) entry.message += "; " + next.message;
-                iter.remove();
-                break;
+            if(entry.type.equals(LogType.REQUEST.name())) {
+              final Iterator<LogEntry> iter = entries.iterator();
+              while(iter.hasNext()) {
+                final LogEntry next = iter.next();
+                final String t = next.type;
+                // REQUEST entry with identical address: no concluding entry exists
+                if(t.equals(LogType.REQUEST.name())) break;
+                if(t.matches("^\\d+$") || Strings.eq(t, LogType.OK.name(), LogType.ERROR.name())) {
+                  entry.type = t;
+                  entry.user = next.user;
+                  entry.ms = entry.ms.add(next.ms);
+                  if(!next.message.isEmpty()) entry.message += "; " + next.message;
+                  iter.remove();
+                  break;
+                }
               }
             }
           }
+          // add new element
+          final FElem elem = new FElem(ENTRY);
+          if(entry.message != null) elem.add(entry.message);
+          if(entry.address != null) {
+            elem.add(TIME, entry.time).add(ADDRESS, entry.address).add(USER, entry.user);
+            if(entry.type != null) elem.add(TYPE, entry.type);
+            if(entry.ms != BigDecimal.ZERO) elem.add(MS, entry.ms.toString());
+          }
+          return elem;
         }
 
-        // add new element
-        final FElem elem = new FElem(ENTRY);
-        if(entry.message != null) elem.add(entry.message);
-        if(entry.address != null) {
-          elem.add(TIME, entry.time).add(ADDRESS, entry.address).add(USER, entry.user);
-          if(entry.type != null) elem.add(TYPE, entry.type);
-          if(entry.ms != BigDecimal.ZERO) elem.add(MS, entry.ms.toString());
-        }
-        vb.add(elem);
-        qc.checkStop();
+        return null;
       }
-    }
-    return vb.value(this);
+    };
   }
 
   /**
