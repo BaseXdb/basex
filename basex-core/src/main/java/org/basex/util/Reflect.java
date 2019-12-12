@@ -199,4 +199,19 @@ public final class Reflect {
       return null;
     }
   }
+
+  /**
+   * Returns the value of a field.
+   * @param field field to access
+   * @param object object ({@code null} for static methods)
+   * @return value of field
+   */
+  public static Object get(final Field field, final Object object) {
+    try {
+      return field != null ? field.get(object) : null;
+    } catch(final Throwable ex) {
+      Util.debug(ex);
+      return null;
+    }
+  }
 }

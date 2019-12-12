@@ -18,32 +18,48 @@ abstract class XsltFn extends StandardFunc {
   /** Templates cache. */
   static final ConcurrentHashMap<String, Templates> MAP = new ConcurrentHashMap<>();
 
-  /** XSLT implementations. */
-  static final String[] IMPL = {
-    "", "Java", "1.0",
-    "net.sf.saxon.TransformerFactoryImpl", "Saxon HE", "3.0",
-    "com.saxonica.config.ProfessionalTransformerFactory", "Saxon PE", "3.0",
-    "com.saxonica.config.EnterpriseTransformerFactory", "Saxon EE", "3.0"
+  /** Saxon implementations. */
+  static final String[] SAXON = {
+    "com.saxonica.config.EnterpriseTransformerFactory",
+    "com.saxonica.config.ProfessionalTransformerFactory",
+    "net.sf.saxon.TransformerFactoryImpl"
   };
-  /** Implementation offset. */
-  static final int OFFSET;
+
+  /** Processor. */
+  static final String PROCESSOR;
+  /** Version. */
+  static final String VERSION;
+  /** Implementation. */
+  static final String FACTORY;
 
   static {
+    String factory = null, processor = "Java", version = "1.0";
+
+    // check if system property has been assigned by the user
     final String fac = TransformerFactory.class.getName();
     final String impl = System.getProperty(fac);
-    // system property has already been set
-    if(System.getProperty(fac) != null) {
-      // modify processor and version
-      IMPL[1] = impl;
-      IMPL[2] = "Unknown";
-      OFFSET = 0;
+    if(impl != null) {
+      processor = "unknown";
+      version = "unknown";
+      factory = impl;
     } else {
-      // search for existing processors
-      int s = IMPL.length - 3;
-      while(s != 0 && find(IMPL[s]) == null) s -= 3;
-      OFFSET = s;
-      // set processor, or use default processor
-      if(s != 0) System.setProperty(fac, IMPL[s]);
+      // search classpath for Saxon processors, retrieve edition and XSL version
+      for(final String saxon : SAXON) {
+        if(find(saxon) != null) {
+          factory = saxon;
+          processor = "Saxon";
+          System.setProperty(fac, saxon);
+          final Class<?> vrsn = find("net.sf.saxon.Version");
+          final Object se = get(field(vrsn, "softwareEdition"), null);
+          if(se != null) processor += " " + se;
+          final Object xsl = invoke(method(vrsn, "getXSLVersionString"), null);
+          version = xsl != null ? xsl.toString() : "3.0";
+          break;
+        }
+      }
     }
+    PROCESSOR = processor;
+    VERSION = version;
+    FACTORY = factory;
   }
 }

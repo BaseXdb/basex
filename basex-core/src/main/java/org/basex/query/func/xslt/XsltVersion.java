@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class XsltVersion extends XsltFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return Str.get(IMPL[OFFSET + 2]);
+    return Str.get(VERSION);
   }
 }
