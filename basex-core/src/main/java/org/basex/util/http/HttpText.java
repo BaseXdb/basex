@@ -37,8 +37,8 @@ public interface HttpText {
   /** HTTP header string. */
   String ALLOW = "Allow";
 
-  /** Content-Disposition. */
-  byte[] CONTENT_DISPOSITION = token("Content-Disposition");
+  /** Content-Disposition (lower case). */
+  byte[] CONTENT_DISPOSITION = token("content-disposition");
   /** Dashes. */
   byte[] DASHES = token("--");
 

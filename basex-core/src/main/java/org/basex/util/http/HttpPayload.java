@@ -273,7 +273,7 @@ public final class HttpPayload {
     final HashMap<String, Value> data = new HashMap<>();
     final ByteList cont = new ByteList();
     int lines = -1;
-    String name = null, filename = null;
+    String name = "", filename = null;
     for(byte[] line; (line = readLine()) != null;) {
       if(lines >= 0) {
         if(startsWith(line, bound)) {
@@ -299,7 +299,7 @@ public final class HttpPayload {
           if(lines++ > 0) cont.add(CRLF);
           cont.add(line);
         }
-      } else if(startsWith(line, CONTENT_DISPOSITION)) {
+      } else if(startsWith(lc(line), CONTENT_DISPOSITION)) {
         // get key and file name
         name = contains(line, token(NAME + '=')) ?
           string(line).replaceAll("^.*?" + NAME + "=\"|\".*", "").replaceAll("\\[]", "") : null;
