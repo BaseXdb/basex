@@ -21,17 +21,17 @@ final class ProjectCache implements Iterable<String> {
 
   /** Cached file paths (all with forward slashes). */
   private final StringList cache = new StringList();
-  /** Hide files. */
-  private final boolean hide;
+  /** Show hidden files. */
+  private final boolean showHidden;
   /** Valid flag. */
   private boolean valid;
 
   /**
    * Constructor.
-   * @param hide hide files
+   * @param showHidden show hidden files
    */
-  ProjectCache(final boolean hide) {
-    this.hide = hide;
+  ProjectCache(final boolean showHidden) {
+    this.showHidden = showHidden;
   }
 
   /**
@@ -76,14 +76,13 @@ final class ProjectCache implements Iterable<String> {
         for(final Path path : paths) {
           // skip hidden files, cancel parsing if directory contains .ignore file
           final IOFile io = new IOFile(path.toFile());
-          final String name = io.name();
-          if(name.equals(".ignore")) return;
-          if(hide && (name.startsWith(".") || Files.isHidden(path))) continue;
-
-          if(Files.isDirectory(path)) {
-            dirs.add(path);
-          } else {
-            files.add(io);
+          if(io.ignore()) return;
+          if(showHidden || !io.isHidden()) {
+            if(Files.isDirectory(path)) {
+              dirs.add(path);
+            } else {
+              files.add(io);
+            }
           }
         }
       }

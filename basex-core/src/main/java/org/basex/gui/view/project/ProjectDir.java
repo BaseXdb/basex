@@ -37,14 +37,13 @@ final class ProjectDir extends ProjectNode {
     final ArrayList<IOFile> newDirs = new ArrayList<>(), newFiles = new ArrayList<>();
     final boolean showHidden = view.gui.gopts.get(GUIOptions.SHOWHIDDEN);
     for(final IOFile child : file.children()) {
-      final String name = child.name();
-      if(name.equals(".ignore")) {
+      if(child.ignore()) {
         newDirs.clear();
         newFiles.clear();
         newFiles.add(child);
         break;
       }
-      if(showHidden || !(name.startsWith(".") && child.file().isHidden())) {
+      if(showHidden || !child.isHidden()) {
         (child.isDir() ? newDirs : newFiles).add(child);
       }
     }

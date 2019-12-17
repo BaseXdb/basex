@@ -373,6 +373,22 @@ public final class IOFile extends IO {
     }
   }
 
+  /**
+   * Checks if a file is hidden.
+   * @return result of check
+   */
+  public boolean isHidden() {
+    return file.isHidden() || Strings.startsWith(name(), '.') || name().equals("node_modules");
+  }
+
+  /**
+   * Checks if the parent directory of this file can be ignored.
+   * @return result of check
+   */
+  public boolean ignore() {
+    return name().equals(".ignore");
+  }
+
   // STATIC METHODS ===============================================================================
 
   /**

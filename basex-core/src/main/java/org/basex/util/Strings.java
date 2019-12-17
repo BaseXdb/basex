@@ -69,36 +69,36 @@ public final class Strings {
 
   /**
    * Compares two strings for equality. The arguments may be {@code null}.
-   * @param str1 first string
-   * @param str2 strings to be compared
+   * @param string1 first string
+   * @param string2 strings to be compared
    * @return true if one test is successful
    */
-  public static boolean eq(final String str1, final String str2) {
-    return Objects.equals(str1, str2);
+  public static boolean eq(final String string1, final String string2) {
+    return Objects.equals(string1, string2);
   }
 
   /**
    * Compares several strings for equality. The arguments may be {@code null}.
-   * @param str first string
+   * @param string first string
    * @param strings strings to be compared
    * @return true if one test is successful
    */
-  public static boolean eq(final String str, final String... strings) {
-    for(final String s : strings) {
-      if(Objects.equals(str, s)) return true;
+  public static boolean eq(final String string, final String... strings) {
+    for(final String str : strings) {
+      if(Objects.equals(string, str)) return true;
     }
     return false;
   }
 
   /**
    * Compares several strings for equality, ignoring the case.
-   * @param str first string
+   * @param string first string
    * @param strings strings to be compared
    * @return true if one test is successful
    */
-  public static boolean eqic(final String str, final String... strings) {
-    for(final String s : strings) {
-      if(str == null ? s == null : str.equalsIgnoreCase(s)) return true;
+  public static boolean eqic(final String string, final String... strings) {
+    for(final String str : strings) {
+      if(string == null ? str == null : string.equalsIgnoreCase(str)) return true;
     }
     return false;
   }
