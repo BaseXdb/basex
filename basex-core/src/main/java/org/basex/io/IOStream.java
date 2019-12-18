@@ -5,6 +5,7 @@ import java.io.*;
 import javax.xml.transform.stream.*;
 
 import org.basex.io.in.*;
+import org.basex.util.*;
 import org.xml.sax.*;
 
 /**
@@ -53,5 +54,10 @@ public final class IOStream extends IO {
   @Override
   public InputStream inputStream() {
     return input;
+  }
+
+  @Override
+  public String toString() {
+    return Util.className(this) + '[' + input + ']';
   }
 }

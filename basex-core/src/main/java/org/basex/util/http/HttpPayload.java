@@ -121,9 +121,8 @@ public final class HttpPayload {
    * @throws QueryException query exception
    */
   private Value parse(final byte[] payload, final MediaType type) throws QueryException {
-    if(payload.length == 0) return Empty.VALUE;
     try {
-      return value(new IOContent(payload), options, type);
+      return payload.length == 0 ? Empty.VALUE : value(new IOContent(payload), options, type);
     } catch(final IOException ex) {
       throw HC_PARSE_X.get(info, ex);
     }
@@ -166,7 +165,7 @@ public final class HttpPayload {
       throws IOException, QueryException {
 
     // check if last line is reached
-    final byte[] line = readLine();
+    byte[] line = readLine();
     if(line == null || eq(line, end)) return false;
 
     // content type of part payload - if not defined by header 'Content-Type',
@@ -193,9 +192,25 @@ public final class HttpPayload {
       parts.add(new FElem(Q_BODY).add(SerializerOptions.MEDIA_TYPE.name(), type.toString()));
     }
 
-    final byte[] payload = extractPart(sep, end, type.parameters().get(CHARSET));
+    // extract payload
+    final ByteList bl = new ByteList();
+    while(true) {
+      line = readLine();
+      if(line == null || eq(line, sep)) break;
+
+      // RFC 1341: Epilogue is to be ignored
+      if(eq(line, end)) {
+        while(readLine() != null);
+        break;
+      }
+      if(!bl.isEmpty()) bl.add(CRLF);
+      bl.add(line);
+    }
+
     if(payloads != null) {
-      payloads.add(parse(base64 ? Base64.decode(payload) : payload, type));
+      final String encoding = type.parameters().get(CHARSET);
+      final byte[] part = new TextInput(bl.finish()).encoding(encoding).content();
+      payloads.add(parse(base64 ? Base64.decode(part) : part, type));
     }
     return true;
   }
@@ -218,33 +233,6 @@ public final class HttpPayload {
       bl.add(b);
     }
     return bl.isEmpty() ? null : bl.finish();
-  }
-
-  /**
-   * Reads the next part of a payload.
-   * @param sep separation boundary
-   * @param end closing boundary
-   * @param enc part content encoding
-   * @return payload part content
-   * @throws IOException I/O Exception
-   */
-  private byte[] extractPart(final byte[] sep, final byte[] end, final String enc)
-      throws IOException {
-
-    final ByteList bl = new ByteList();
-    while(true) {
-      final byte[] line = readLine();
-      if(line == null || eq(line, sep)) break;
-
-      // RFC 1341: Epilogue is to be ignored
-      if(eq(line, end)) {
-        while(readLine() != null);
-        break;
-      }
-      if(!bl.isEmpty()) bl.add(CRLF);
-      bl.add(line);
-    }
-    return new TextInput(bl.finish()).encoding(enc).content();
   }
 
   /**
@@ -320,41 +308,41 @@ public final class HttpPayload {
    * @param input input source
    * @param options database options
    * @param type media type
-   * @return xml parser
+   * @return value
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public static Value value(final IOContent input, final MainOptions options, final MediaType type)
+  public static Value value(final IO input, final MainOptions options, final MediaType type)
       throws IOException, QueryException {
 
-    Value value = null;
     if(type.isJSON()) {
       final JsonParserOptions opts = new JsonParserOptions(options.get(MainOptions.JSONPARSER));
       opts.assign(type);
-      value = JsonConverter.get(opts).convert(input);
+      return JsonConverter.get(opts).convert(input);
     } else if(type.isCSV()) {
       final CsvParserOptions opts = new CsvParserOptions(options.get(MainOptions.CSVPARSER));
       opts.assign(type);
-      value = CsvConverter.get(opts).convert(input);
+      return CsvConverter.get(opts).convert(input);
     } else if(type.is(MediaType.TEXT_HTML)) {
       final HtmlOptions opts = new HtmlOptions(options.get(MainOptions.HTMLPARSER));
       opts.assign(type);
-      value = new DBNode(new HtmlParser(input, options, opts));
+      return new DBNode(new HtmlParser(input, options, opts));
     } else if(type.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
       String encoding = type.parameters().get(CHARSET);
       if(encoding == null) encoding = Strings.UTF8;
-      value = Str.get(URLDecoder.decode(string(input.read()), encoding));
+      return Str.get(URLDecoder.decode(string(input.read()), encoding));
     } else if(type.isXML()) {
-      value = new DBNode(input);
+      return new DBNode(input);
     } else if(type.isText()) {
-      value = Str.get(new NewlineInput(input).content());
+      return Str.get(new NewlineInput(input).content());
     } else if(type.isMultipart()) {
       try(InputStream is = input.inputStream()) {
         final HttpPayload hp = new HttpPayload(is, true, null, options);
         hp.extractParts(concat(DASHES, hp.boundary(type)), null);
-        value = hp.payloads();
+        return hp.payloads();
       }
+    } else {
+      return B64.get(input.read());
     }
-    return value == null ? B64.get(input.read()) : value;
   }
 }
