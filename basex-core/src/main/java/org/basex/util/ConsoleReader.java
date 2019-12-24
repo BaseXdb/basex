@@ -53,8 +53,8 @@ public abstract class ConsoleReader implements AutoCloseable {
     if(JLineConsoleReader.isAvailable()) {
       try {
         return new JLineConsoleReader();
-      } catch(final Exception ex) {
-        Util.errln(ex);
+      } catch(final Throwable th) {
+        Util.debug(th);
       }
     }
     return new SimpleConsoleReader();
