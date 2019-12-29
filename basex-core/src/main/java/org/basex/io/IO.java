@@ -130,8 +130,8 @@ public abstract class IO {
     final String s = location.trim();
     return s.indexOf('<') == 0 ? new IOContent(s) :
            IOUrl.isFileURL(s)  ? new IOFile(IOUrl.toFile(s)) :
-           IOFile.isValid(s)   ? new IOFile(s) :
            IOUrl.isValid(s)    ? new IOUrl(s) :
+           IOFile.isValid(s)   ? new IOFile(s) :
            new IOContent(s);
   }
 

@@ -99,18 +99,19 @@ public final class IOUrl extends IO {
   }
 
   /**
-   * Checks if the specified uri starts with a valid scheme.
-   * @param url url to be converted
+   * Checks if the specified string is a valid URL.
+   * @param url url string
    * @return file path
    */
   static boolean isValid(final String url) {
-    int u = -1;
-    final int us = url.length();
-    while(++u < us) {
+    final int ul = url.length();
+    int u = url.indexOf(':');
+    if(u < 2 || u + 1 == ul || url.charAt(u + 1) != '/') return false;
+    while(--u >= 0) {
       final char c = url.charAt(u);
-      if(!Token.letterOrDigit(c) && c != '+' && c != '-' && c != '.') break;
+      if(!(c >= 'a' && c <= 'z' || c == '+' || c == '-' || c == '.' || c == '_')) return false;
     }
-    return u > 2 && u + 1 < us && url.charAt(u) == ':' && url.charAt(u + 1) == '/';
+    return true;
   }
 
   /**

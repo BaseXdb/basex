@@ -440,14 +440,10 @@ public final class IOFile extends IO {
    * @return result of check
    */
   public static boolean isValid(final String path) {
-    // no colon: treat as file path
+    // check if path starts with Windows drive letter
     final int c = path.indexOf(':');
-    if(c == -1) return true;
-    // Windows drive letter?
-    final int fs = path.indexOf('/'), bs = path.indexOf('\\');
-    if(Prop.WIN && c == 1 && Token.letter(path.charAt(0)) && (fs == 2 || bs == 2)) return true;
-    // ensure that slash occurs before colon
-    return fs != -1 && fs < c || bs != -1 && bs < c;
+    return c == -1 || !Prop.WIN || c == 1 && Token.letter(path.charAt(0)) &&
+        (path.indexOf('/') == 2 || path.indexOf('\\') == 2);
   }
 
   /**
