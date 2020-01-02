@@ -189,6 +189,7 @@ install              = Install
 install_from_url     = Install from URL
 int_parser           = Дотоод XML Parser-р хөрвүүлэх
 interrupted          = Interrupted.
+interval             = Interval
 invalid_%            = % нь хүчинтэй.
 italics              = Налуу
 jobs_%               = % Job(s)

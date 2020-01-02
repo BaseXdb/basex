@@ -26,8 +26,8 @@ public final class QueryJobTask extends TimerTask {
    * @param job job
    * @param jobs job pool
    * @param delay delay (ms)
-   * @param interval interval (ms)
-   * @param duration total duration (ms)
+   * @param interval interval (ms; no repetition: {@code 0})
+   * @param duration total duration (ms; no limit: {@link Long#MAX_VALUE})
    */
   public QueryJobTask(final QueryJob job, final JobPool jobs, final long delay,
       final long interval, final long duration) {

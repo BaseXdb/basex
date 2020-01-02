@@ -43,6 +43,7 @@ public final class JobsList extends Command {
     table.header.add(DURATION);
     table.header.add(START);
     table.header.add(END);
+    table.header.add(INTERVAL);
     table.header.add(READS);
     table.header.add(WRITES);
     table.header.add(TIME);
@@ -101,6 +102,7 @@ public final class JobsList extends Command {
     tl.add(ms >= 0 ? DTDur.get(ms).string(null) : EMPTY);
     tl.add(jt != null ? dateTime(jt.start) : EMPTY);
     tl.add(jt != null && jt.end != Long.MAX_VALUE ? dateTime(jt.end) : EMPTY);
+    tl.add(jt != null && jt.interval != 0 ? DTDur.get(jt.interval).string(null) : EMPTY);
     tl.add(jc.locks.reads.toString());
     tl.add(jc.locks.writes.toString());
     tl.add(dateTime(jc.time));

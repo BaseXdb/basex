@@ -25,6 +25,8 @@ public interface JobsText {
   byte[] START = token("start");
   /** End. */
   byte[] END = token("end");
+  /** Interval. */
+  byte[] INTERVAL = token("interval");
   /** User. */
   byte[] USER = token("user");
   /** Read locks. */

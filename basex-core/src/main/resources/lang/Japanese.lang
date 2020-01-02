@@ -189,6 +189,7 @@ install              = インストール
 install_from_url     = URLからインストール
 int_parser           = 内部XMLパーサーを使用
 interrupted          = 中断されました。
+interval             = Interval
 invalid_%            = % は不正です。
 italics              = 斜体
 jobs_%               = % Job(s)

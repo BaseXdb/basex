@@ -189,6 +189,7 @@ install              = Установить
 install_from_url     = Установить по ссылке
 int_parser           = Использовать встроенный парсер XML
 interrupted          = Прервано
+interval             = Interval
 invalid_%            = % введено неверно
 italics              = Наклонный
 jobs_%               = Задачи: %

@@ -30,7 +30,9 @@ public final class JobsListDetails extends StandardFunc {
     final JobPool jobs = ctx.jobs;
     final ValueBuilder vb = new ValueBuilder(qc);
 
-    final byte[][] atts = { ID, TYPE, STATE, USER, DURATION, START, END, READS, WRITES, TIME };
+    final byte[][] atts = {
+      ID, TYPE, STATE, USER, DURATION, START, END, INTERVAL, READS, WRITES, TIME
+    };
     for(final byte[] key : ids) {
       final TokenList entry = JobsList.entry(key, jobs, max);
       if(entry == null) continue;

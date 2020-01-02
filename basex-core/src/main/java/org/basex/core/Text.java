@@ -789,6 +789,8 @@ public interface Text {
   String START = lang("start");
   /** "End". */
   String END = lang("end");
+  /** "Interval". */
+  String INTERVAL = lang("interval");
   /** "User". */
   String USER = lang("user");
   /** "Reads". */

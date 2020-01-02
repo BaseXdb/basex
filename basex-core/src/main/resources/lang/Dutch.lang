@@ -189,6 +189,7 @@ install              = Installeer
 install_from_url     = Installer vanaf URL
 int_parser           = Gebruik interne XML parser
 interrupted          = Onderbroken.
+interval             = Interval
 invalid_%            = % is ongeldig.
 italics              = Cursief
 jobs_%               = % Job(s)

@@ -189,6 +189,7 @@ install              = Instalar
 install_from_url     = Instalar vía URL
 int_parser           = Utilice el analizador sintáctico (parser) de XML interno
 interrupted          = Interrumpido.
+interval             = Intervalo
 invalid_%            = % es inválido.
 italics              = Itálica
 jobs_%               = % Job(s)

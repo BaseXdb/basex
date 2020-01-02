@@ -189,6 +189,7 @@ install              = 安装
 install_from_url     = 从URL安装
 int_parser           = 使用内部XML解析器
 interrupted          = 被中断
+interval             = Interval
 invalid_%            = % 无效
 italics              = 斜体
 jobs_%               = % 作业

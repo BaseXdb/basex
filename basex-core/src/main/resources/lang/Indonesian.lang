@@ -189,6 +189,7 @@ install              = Pasang
 install_from_url     = Pasang dari URL
 int_parser           = Gunakan pengurai XML internal
 interrupted          = Terganggu.
+interval             = Interval
 invalid_%            = % tidak sah.
 italics              = Miring
 jobs_%               = % Job(s)
