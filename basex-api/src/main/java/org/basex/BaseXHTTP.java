@@ -162,9 +162,6 @@ public final class BaseXHTTP extends CLI {
     for(final Pair<String, String> cmd : commands) {
       if(!execute(cmd)) return;
     }
-
-    // start persistent jobs
-    new Jobs(context).run();
   }
 
   /**

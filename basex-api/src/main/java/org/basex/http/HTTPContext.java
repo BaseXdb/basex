@@ -7,6 +7,7 @@ import javax.servlet.*;
 
 import org.basex.*;
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.util.*;
 
@@ -104,6 +105,10 @@ public final class HTTPContext {
         throw ex;
       }
     }
+
+    // start persistent jobs
+    new Jobs(context).run();
+
     return context;
   }
 
