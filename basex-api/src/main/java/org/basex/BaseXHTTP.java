@@ -8,7 +8,6 @@ import java.net.*;
 import java.util.function.*;
 
 import org.basex.core.*;
-import org.basex.core.jobs.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.server.Log.*;

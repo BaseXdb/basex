@@ -1,7 +1,5 @@
 package org.basex.io.in;
 
-import org.basex.util.*;
-
 /**
  * This class indicates exceptions that happen during the decoding of an input stream.
  *
