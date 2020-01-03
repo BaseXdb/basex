@@ -234,6 +234,9 @@ public final class ProjectView extends BaseXPanel {
    * @param focus focus tree
    */
   public void jumpTo(final IOFile file, final boolean focus) {
+    // ignore call if project view is not visible
+    if(getWidth() == 0) return;
+
     if(file != null) {
       final IOFile fl = file.normalize();
       if(fl.path().startsWith(root.file.path())) tree.expand(root, fl.path());

@@ -381,8 +381,7 @@ public final class EditorView extends View {
    * Focuses the currently edited file in the project view.
    */
   public void jumpToFile() {
-    final EditorArea editor = getEditor();
-    project.jumpTo(editor.file(), true);
+    project.jumpTo(getEditor().file(), true);
   }
 
   /**
@@ -832,26 +831,26 @@ public final class EditorView extends View {
     if(path == null) return;
 
     final IOFile file = new IOFile(path);
-    final EditorArea ea = find(file);
-    final EditorArea edit;
+    final EditorArea found = find(file), opened;
     if(jump) {
-      edit = open(file, error, true);
-      // only update error information if file was not already opened
-      if(ea == null && error) ii = inputInfo;
+      opened = open(file, error, true);
+      // update error information if file was not already opened
+      if(found == null && error) ii = inputInfo;
     } else {
-      edit = ea;
+      opened = found;
     }
     // no editor available, no input info
-    if(edit == null || ii == null) return;
+    if(opened == null || ii == null) return;
 
     // mark error, jump to error position
-    final int ep = pos(edit.last, ii.line(), ii.column());
-    edit.error(ep);
+    final int ep = pos(opened.last, ii.line(), ii.column());
+    opened.error(ep);
+
     if(jump) {
-      edit.setCaret(ep);
+      opened.setCaret(ep);
       posCode.invokeLater();
-      // open file in project view if it's visible and if new file was opened
-      if(ea == null && project.getWidth() != 0) project.jumpTo(edit.file(), false);
+      // jump to file in project view if file was opened by this function call
+      if(found == null) project.jumpTo(opened.file(), false);
     }
   }
 
