@@ -319,6 +319,7 @@ resources            = Нөөцүүд
 resources_%          = % Resource(s)
 restore              = Сэргээх
 result               = Үр дүн
+result_%             = % Үр дүн
 results_%            = % Үр дүнгүүд
 rt_execution         = Тухайн агшинд хөрвүүлэлт (Real-Time)
 rt_filtering         = Тухайн агшинд шүүлт хийх (Real-Time)

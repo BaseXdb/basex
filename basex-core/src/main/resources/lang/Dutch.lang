@@ -319,6 +319,7 @@ resources            = Resources
 resources_%          = % Resource(s)
 restore              = Herstel
 result               = Resultaat
+result_%             = % Resultaat
 results_%            = % Resultaten
 rt_execution         = Realtime uitvoering
 rt_filtering         = Realtime filteren

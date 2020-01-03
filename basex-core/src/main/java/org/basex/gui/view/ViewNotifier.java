@@ -116,7 +116,7 @@ public final class ViewNotifier {
       if(view != vw && view.visible()) view.refreshMark();
     }
     gui.filter.setEnabled(!mark.isEmpty());
-    gui.refreshControls();
+    gui.refreshControls(true);
   }
 
   /**
@@ -167,7 +167,7 @@ public final class ViewNotifier {
     for(final View view : views) {
       if(view.visible()) view.refreshContext(forward, false);
     }
-    gui.refreshControls();
+    gui.refreshControls(true);
   }
 
   /**
@@ -209,7 +209,7 @@ public final class ViewNotifier {
     for(final View view : views) {
       if(view != vw && view.visible()) view.refreshContext(true, quick);
     }
-    gui.refreshControls();
+    gui.refreshControls(true);
   }
 
   /**
@@ -222,7 +222,7 @@ public final class ViewNotifier {
     for(final View view : views) {
       if(view.visible()) view.refreshUpdate();
     }
-    gui.refreshControls();
+    gui.refreshControls(true);
   }
 
   /**

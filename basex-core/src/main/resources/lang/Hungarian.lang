@@ -319,6 +319,7 @@ resources            = Erőforrások
 resources_%          = % erőforrás
 restore              = Visszaállítás
 result               = Végeredmény
+result_%             = % eredmény
 results_%            = % eredmény
 rt_execution         = Valósidejű futás
 rt_filtering         = Valósidejű szűrés

@@ -319,6 +319,7 @@ resources            = Resurse
 resources_%          = % Resurse
 restore              = Restabilire
 result               = Rezultat
+result_%             = Rezultat %
 results_%            = Rezultate %
 rt_execution         = În timp real de executie
 rt_filtering         = Filtrarea in timp real

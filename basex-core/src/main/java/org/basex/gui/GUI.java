@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
-import java.text.*;
 import java.util.concurrent.atomic.*;
 import java.util.regex.*;
 
@@ -91,7 +90,7 @@ public final class GUI extends JFrame implements BaseXWindow {
   /** Control panel. */
   private final BaseXBack control;
   /** Results label. */
-  private final BaseXLabel hits;
+  private final BaseXLabel results;
   /** Buttons. */
   private final GUIToolBar toolbar;
 
@@ -149,12 +148,11 @@ public final class GUI extends JFrame implements BaseXWindow {
     toolbar = new GUIToolBar(TOOLBAR, this);
     buttons.add(toolbar, BorderLayout.WEST);
 
-    hits = new BaseXLabel(" ");
-    hits.resize(1.7f);
-    hits.setHorizontalAlignment(SwingConstants.RIGHT);
+    results = new BaseXLabel(" ").border(0, 0, 0, 4).resize(1.7f);
+    results.setHorizontalAlignment(SwingConstants.RIGHT);
 
     BaseXBack b = new BaseXBack();
-    b.add(hits);
+    b.add(results);
 
     buttons.add(b, BorderLayout.EAST);
     if(this.gopts.get(GUIOptions.SHOWBUTTONS)) control.add(buttons, BorderLayout.CENTER);
@@ -171,7 +169,6 @@ public final class GUI extends JFrame implements BaseXWindow {
 
       gopts.set(GUIOptions.SEARCHMODE, s);
       input.mode(mode.getSelectedItem());
-      refreshControls();
     });
 
     b = new BaseXBack(new BorderLayout(4, 0));
@@ -227,11 +224,10 @@ public final class GUI extends JFrame implements BaseXWindow {
 
     setVisible(true);
     views.updateViews();
-    refreshControls();
+    refreshControls(true);
 
     // check version
     checkVersion();
-    input.requestFocusInWindow();
   }
 
   @Override
@@ -281,20 +277,20 @@ public final class GUI extends JFrame implements BaseXWindow {
 
   /**
    * Sets a cursor.
-   * @param c cursor to be set
+   * @param cursor cursor to be set
    */
-  public void cursor(final Cursor c) {
-    cursor(c, false);
+  public void cursor(final Cursor cursor) {
+    cursor(cursor, false);
   }
 
   /**
-   * Sets a cursor, forcing a new look if necessary.
-   * @param c cursor to be set
-   * @param force new cursor
+   * Sets a cursor, enforcing a new look if necessary.
+   * @param cursor cursor to be set
+   * @param enforce enforce new cursor
    */
-  public void cursor(final Cursor c, final boolean force) {
+  public void cursor(final Cursor cursor, final boolean enforce) {
     final Cursor cc = getCursor();
-    if(cc != c && (cc != CURSORWAIT || force)) setCursor(c);
+    if(cc != cursor && (cc != CURSORWAIT || enforce)) setCursor(cursor);
   }
 
   /**
@@ -353,16 +349,16 @@ public final class GUI extends JFrame implements BaseXWindow {
    * Launches the specified commands in a separate thread.
    * Commands are ignored if an update operation takes place.
    * @param edit call from editor view
-   * @param cmd commands to be executed
+   * @param cmds commands to be executed
    */
-  public void execute(final boolean edit, final Command... cmd) {
+  public void execute(final boolean edit, final Command... cmds) {
     // ignore command if updates take place
     if(updating) return;
 
     new Thread(() -> {
-      if(cmd.length == 0) info.setInfo("", null, true, true);
-      for(final Command c : cmd) {
-        if(!exec(c, edit)) break;
+      if(cmds.length == 0) info.setInfo("", null, true, true);
+      for(final Command cmd : cmds) {
+        if(!exec(cmd, edit)) break;
       }
     }).start();
   }
@@ -399,8 +395,8 @@ public final class GUI extends JFrame implements BaseXWindow {
     command = cmd;
 
     // execute command and cache result
-    final ArrayOutput ao = new ArrayOutput();
-    ao.setLimit(gopts.get(GUIOptions.MAXTEXT));
+    final ArrayOutput output = new ArrayOutput();
+    output.setLimit(gopts.get(GUIOptions.MAXTEXT));
     // sets the maximum number of hits
     cmd.maxResults(gopts.get(GUIOptions.MAXRESULTS));
     // attaches the info listener to the command
@@ -419,7 +415,7 @@ public final class GUI extends JFrame implements BaseXWindow {
       String inf;
       Throwable cause = null;
       try {
-        cmd.execute(context, ao);
+        cmd.execute(context, output);
         inf = cmd.info();
       } catch(final BaseXException ex) {
         cause = ex.getCause();
@@ -441,14 +437,14 @@ public final class GUI extends JFrame implements BaseXWindow {
       DBNodes nodes = result instanceof DBNodes ? (DBNodes) result : null;
 
       // show text view if a non-empty result does not reference the currently opened database
-      if(!text.visible() && ao.size() != 0 && nodes == null) {
+      if(!text.visible() && output.size() != 0 && nodes == null) {
         GUIMenuCmd.C_SHOWRESULT.execute(this);
       }
 
       // check if query feedback was evaluated in the query view
       if(!ok && !stopped) {
         // display error in info view
-        text.setText(ao);
+        text.setText(output, 0);
         if(!info.visible() && (!edit || inf.startsWith(S_BUGINFO))) {
           GUIMenuCmd.C_SHOWINFO.execute(this);
         }
@@ -490,11 +486,11 @@ public final class GUI extends JFrame implements BaseXWindow {
           // show status info
           status.setText(TIME_REQUIRED + COLS + time);
           // show number of hits
-          if(result != null) setResults(result.size());
+          if(result != null) results.setText(gopts.results(result.size(), 0));
           // assign textual output if no node result was created
-          if(nodes == null) text.setText(ao);
+          if(nodes == null) text.setText(output, result != null ? result.size() : 0);
           // only cache output if data has not been updated (in which case notifyUpdate was called)
-          if(!updated) text.cache(ao, cmd, result);
+          if(!updated) text.cache(output, cmd, result);
         }
       }
     } catch(final Exception ex) {
@@ -588,7 +584,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     setContentBorder();
     final Component frame = fullscr == null ? getRootPane() : fullscr;
     frame.validate();
-    refreshControls();
+    refreshControls(false);
   }
 
   /**
@@ -596,16 +592,18 @@ public final class GUI extends JFrame implements BaseXWindow {
    */
   public void layoutViews() {
     views.updateViews();
-    refreshControls();
-    repaint();
+    refreshControls(true);
   }
 
   /**
    * Refreshes the menu and the buttons.
+   * @param result update number of results
    */
-  public void refreshControls() {
+  public void refreshControls(final boolean result) {
     final DBNodes marked = context.marked;
-    if(marked != null) setResults(marked.size());
+    if(result && marked != null) {
+      results.setText(gopts.results((marked.isEmpty() ? context.current() : marked).size(), 0));
+    }
 
     filter.setEnabled(marked != null && !marked.isEmpty());
 
@@ -614,30 +612,15 @@ public final class GUI extends JFrame implements BaseXWindow {
     context.options.set(MainOptions.XMLPLAN, inf);
 
     final Data data = context.data();
-    final int t = mode.getSelectedIndex();
-    final int s = data == null ? 2 : gopts.get(GUIOptions.SEARCHMODE);
-
     mode.setEnabled(data != null);
-    go.setEnabled(s == 2 || !gopts.get(GUIOptions.EXECRT));
-
-    if(s != t) {
-      mode.setSelectedIndex(s);
+    final int m = data == null ? 2 : gopts.get(GUIOptions.SEARCHMODE);
+    if(mode.getSelectedIndex() != m) {
+      mode.setSelectedIndex(m);
       input.mode(mode.getSelectedItem());
-      input.requestFocusInWindow();
     }
 
     toolbar.refresh();
     menu.refresh();
-  }
-
-  /**
-   * Sets results information.
-   * @param count number of results
-   */
-  private void setResults(final long count) {
-    final int max = gopts.get(GUIOptions.MAXRESULTS);
-    final String num = new DecimalFormat("#,###,###").format(count);
-    hits.setText(Util.info(RESULTS_X, (count >= max ? "\u2265" : "") + num));
   }
 
   /**
@@ -687,7 +670,6 @@ public final class GUI extends JFrame implements BaseXWindow {
     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(
         fullscr);
     setContentBorder();
-    refreshControls();
     updateControl(menu, !full, BorderLayout.NORTH);
     setVisible(!full);
   }

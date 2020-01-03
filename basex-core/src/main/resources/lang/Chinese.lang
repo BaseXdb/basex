@@ -319,6 +319,7 @@ resources            = 资源
 resources_%          = % 资源
 restore              = 恢复
 result               = 结果
+result_%             = % 结果
 results_%            = % 结果
 rt_execution         = 实时执行
 rt_filtering         = 实时过滤

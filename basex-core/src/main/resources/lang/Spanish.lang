@@ -319,6 +319,7 @@ resources            = Recursos
 resources_%          = % Recurso(s)
 restore              = Restaurar
 result               = Resultado
+result_%             = % Resultado
 results_%            = % Resultados
 rt_execution         = Ejecución en Tiempo Real
 rt_filtering         = Filtrado en Tiempo Real

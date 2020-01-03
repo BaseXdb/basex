@@ -130,7 +130,7 @@ public final class EditorView extends View {
         BaseXKeys.UNIT.toString()), false, gui);
 
     final BaseXBack buttons = new BaseXBack(false);
-    buttons.layout(new ColumnLayout()).border(0, 0, 4, 0);
+    buttons.layout(new ColumnLayout());
     buttons.add(newB);
     buttons.add(openB);
     buttons.add(saveB);
@@ -146,22 +146,24 @@ public final class EditorView extends View {
     context = new BaseXLabel("").resize(1.2f);
     context.setForeground(dgray);
 
-    final BaseXBack north = new BaseXBack(false).layout(new BorderLayout(10, 0));
-    north.add(buttons, BorderLayout.WEST);
-    north.add(context, BorderLayout.CENTER);
+    final BaseXBack top = new BaseXBack(false);
+    top.layout(new ColumnLayout(10));
+    top.add(buttons);
+    top.add(context);
+
+    final BaseXBack north = new BaseXBack(false).layout(new BorderLayout());
+    north.add(top, BorderLayout.WEST);
     north.add(new BaseXHeader(EDITOR), BorderLayout.EAST);
 
     // status and query pane
     search.editor(addTab(), false);
 
-    info = new BaseXLabel().setText(OK, Msg.SUCCESS);
-    info.resize(1.2f);
-    pos = new BaseXLabel(" ");
-    pos.resize(1.2f);
+    info = new BaseXLabel().setText(OK, Msg.SUCCESS).resize(1.2f);
+    pos = new BaseXLabel(" ").resize(1.2f);
 
     posCode.invokeLater();
 
-    final BaseXBack south = new BaseXBack(false).border(4, 0, 0, 0);
+    final BaseXBack south = new BaseXBack(false).border(8, 0, 0, 0);
     south.layout(new BorderLayout(4, 0));
     south.add(info, BorderLayout.CENTER);
     south.add(pos, BorderLayout.EAST);
@@ -238,7 +240,7 @@ public final class EditorView extends View {
       final EditorArea ea = getEditor();
       if(ea == null) return;
       search.editor(ea, true);
-      gui.refreshControls();
+      gui.refreshControls(false);
       posCode.invokeLater();
       refreshMark();
       run(ea, Action.PARSE);
@@ -258,10 +260,7 @@ public final class EditorView extends View {
 
   @Override
   public void refreshMark() {
-    final boolean script = getEditor().file().hasSuffix(IO.BXSSUFFIX);
-    final boolean realtime = gui.gopts.get(GUIOptions.EXECRT);
-    go.setEnabled(script || !realtime);
-    test.setEnabled(!script);
+    test.setEnabled(!getEditor().file().hasSuffix(IO.BXSSUFFIX));
   }
 
   @Override
@@ -942,12 +941,12 @@ public final class EditorView extends View {
   /**
    * Refreshes the query modification flag.
    * @param edit editor
-   * @param force action
+   * @param enforce enforce action
    */
-  void refreshControls(final EditorArea edit, final boolean force) {
+  void refreshControls(final EditorArea edit, final boolean enforce) {
     // update modification flag
     final boolean mod = edit.hist != null && edit.hist.modified();
-    if(mod == edit.modified() && !force) return;
+    if(mod == edit.modified() && !enforce) return;
 
     edit.modified(mod);
 
@@ -957,7 +956,7 @@ public final class EditorView extends View {
     edit.label.setText(title);
 
     // update components
-    gui.refreshControls();
+    gui.refreshControls(false);
     gui.setTitle();
     posCode.invokeLater();
     refreshMark();

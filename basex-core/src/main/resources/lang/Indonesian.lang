@@ -319,6 +319,7 @@ resources            = Sumber daya
 resources_%          = % Sumber daya
 restore              = Kembalikan
 result               = Hasil
+result_%             = % Hasil
 results_%            = % Hasil
 rt_execution         = Eksekusi dengan waktu nyata
 rt_filtering         = Penyaringan dengan waktu nyata

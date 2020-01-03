@@ -319,6 +319,7 @@ resources            = リソース
 resources_%          = % リソース
 restore              = リストア
 result               = 結果
+result_%             = % 結果
 results_%            = % 結果
 rt_execution         = リアルタイムでの実行
 rt_filtering         = リアルタイムフィルタリング

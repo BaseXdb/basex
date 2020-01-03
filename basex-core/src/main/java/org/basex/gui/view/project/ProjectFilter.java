@@ -56,12 +56,12 @@ final class ProjectFilter extends BaseXBack {
 
   /**
    * Refreshes the filter view.
-   * @param force force refresh
+   * @param enforce enforce refresh
    */
-  void refresh(final boolean force) {
+  void refresh(final boolean enforce) {
     final String files = filesFilter.getText();
     final String contents = contentsFilter.getText();
-    if(!force && fileFilter.equals(files) && contentFilter.equals(contents)) return;
+    if(!enforce && fileFilter.equals(files) && contentFilter.equals(contents)) return;
     fileFilter = files;
     contentFilter = contents;
 

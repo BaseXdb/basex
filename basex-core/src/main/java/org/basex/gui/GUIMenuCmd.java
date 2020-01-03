@@ -715,10 +715,6 @@ public enum GUIMenuCmd implements GUICommand {
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.EXECRT);
       gui.stop();
-      // refresh buttons in input bar
-      gui.refreshControls();
-      // refresh editor buttons
-      gui.editor.refreshMark();
     }
 
     @Override
@@ -733,10 +729,6 @@ public enum GUIMenuCmd implements GUICommand {
     public void execute(final GUI gui) {
       final boolean rt = gui.gopts.invert(GUIOptions.FILTERRT);
       gui.stop();
-      // refresh buttons in input bar
-      gui.refreshControls();
-      // refresh editor buttons
-      gui.editor.refreshMark();
 
       final Context ctx = gui.context;
       final boolean root = ctx.root();
@@ -880,8 +872,7 @@ public enum GUIMenuCmd implements GUICommand {
 
     @Override
     public boolean enabled(final GUI gui) {
-      return !gui.gopts.get(GUIOptions.FILTERRT) &&
-          gui.context.data() != null && !gui.context.root();
+      return super.enabled(gui) && !gui.context.root();
     }
   },
 
@@ -895,11 +886,6 @@ public enum GUIMenuCmd implements GUICommand {
       // jump to database root
       ctx.invalidate();
       gui.notify.context(ctx.current(), false, null);
-    }
-
-    @Override
-    public boolean enabled(final GUI gui) {
-      return gui.context.data() != null && !gui.context.root();
     }
   },
 

@@ -610,15 +610,15 @@ final class XMLScanner extends Job {
 
   /**
    * Consumes an XML name. [5]
-   * @param force force parsing
+   * @param enforce enforce parsing
    * @return name or {@code null}
    * @throws IOException I/O exception
    */
-  private byte[] name(final boolean force) throws IOException {
+  private byte[] name(final boolean enforce) throws IOException {
     final TokenBuilder name = new TokenBuilder();
     int c = consume();
     if(!isStartChar(c)) {
-      if(force) throw error(INVNAME);
+      if(enforce) throw error(INVNAME);
       prev(1);
       return null;
     }

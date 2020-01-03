@@ -319,6 +319,7 @@ resources            = Ressourcen
 resources_%          = % Ressource(n)
 restore              = Wiederherstellen
 result               = Ergebnis
+result_%             = % Ergebnis
 results_%            = % Ergebnisse
 rt_execution         = Echtzeit-Ausführung
 rt_filtering         = Echtzeit-Filter

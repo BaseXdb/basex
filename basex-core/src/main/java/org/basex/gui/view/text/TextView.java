@@ -32,12 +32,14 @@ import org.basex.util.*;
  */
 public final class TextView extends View {
   /** Search editor. */
-  private final SearchEditor search;
+  private final SearchEditor editor;
 
   /** Header string. */
   private final BaseXHeader header;
   /** Home button. */
   private final AbstractButton home;
+  /** Info label for total time. */
+  private final BaseXLabel label;
   /** Text Area. */
   private final TextPanel text;
 
@@ -59,27 +61,32 @@ public final class TextView extends View {
     home = BaseXButton.command(GUIMenuCmd.C_HOME, gui);
     home.setEnabled(false);
 
+    label = new BaseXLabel(" ").resize(1.2f);
+
     text = new TextPanel(gui, false);
     text.setSyntax(new SyntaxXML());
-    search = new SearchEditor(gui, text);
+    editor = new SearchEditor(gui, text);
 
     final AbstractButton save = BaseXButton.get("c_save", SAVE, false, gui);
-    final AbstractButton find = search.button(FIND);
+    save.addActionListener(e -> save());
 
     final BaseXBack buttons = new BaseXBack(false);
     buttons.layout(new ColumnLayout());
     buttons.add(save);
     buttons.add(home);
-    buttons.add(find);
+    buttons.add(editor.button(FIND));
 
-    final BaseXBack b = new BaseXBack(false).layout(new BorderLayout());
-    b.add(buttons, BorderLayout.WEST);
-    b.add(header, BorderLayout.EAST);
-    add(b, BorderLayout.NORTH);
+    final BaseXBack top = new BaseXBack(false);
+    top.layout(new ColumnLayout(10));
+    top.add(buttons);
+    top.add(label);
 
-    add(search, BorderLayout.CENTER);
+    final BaseXBack north = new BaseXBack(false).layout(new BorderLayout());
+    north.add(top, BorderLayout.WEST);
+    north.add(header, BorderLayout.EAST);
+    add(north, BorderLayout.NORTH);
 
-    save.addActionListener(e -> save());
+    add(editor, BorderLayout.CENTER);
     refreshLayout();
   }
 
@@ -94,7 +101,8 @@ public final class TextView extends View {
 
   @Override
   public void refreshMark() {
-    setText(gui.context.marked);
+    final DBNodes nodes = gui.context.marked;
+    setText(nodes != null && nodes.isEmpty() ? gui.context.current() : nodes);
   }
 
   @Override
@@ -105,7 +113,7 @@ public final class TextView extends View {
   @Override
   public void refreshLayout() {
     text.setFont(mfont);
-    search.bar().refreshLayout();
+    editor.bar().refreshLayout();
   }
 
   @Override
@@ -130,7 +138,7 @@ public final class TextView extends View {
 
   /**
    * Serializes the specified nodes.
-   * @param nodes nodes to display
+   * @param nodes nodes to display (can be {@code null})
    */
   private void setText(final DBNodes nodes) {
     if(visible()) {
@@ -138,7 +146,7 @@ public final class TextView extends View {
         final ArrayOutput ao = new ArrayOutput();
         ao.setLimit(gui.gopts.get(GUIOptions.MAXTEXT));
         if(nodes != null) nodes.serialize(Serializer.get(ao));
-        setText(ao);
+        setText(ao, nodes != null ? nodes.size() : 0);
         cachedCmd = null;
         cachedNodes = ao.finished() ? nodes : null;
       } catch(final IOException ex) {
@@ -186,17 +194,19 @@ public final class TextView extends View {
   /**
    * Sets the output text.
    * @param out cached output
+   * @param results number of results
    */
-  public void setText(final ArrayOutput out) {
-    final byte[] buf = out.buffer();
+  public void setText(final ArrayOutput out, final long results) {
+    final byte[] buffer = out.buffer();
     // will never exceed integer range as the underlying array is limited to 2^31 bytes
     final int size = (int) out.size();
     final byte[] chop = token(DOTS);
     final int cl = chop.length;
-    if(out.finished() && size >= cl) Array.copyFromStart(chop, cl, buf, size - cl);
-    text.setText(buf, size);
+    if(out.finished() && size >= cl) Array.copyFromStart(chop, cl, buffer, size - cl);
+    text.setText(buffer, size);
     header.setText((out.finished() ? CHOPPED : "") + RESULT);
     home.setEnabled(gui.context.data() != null);
+    label.setText(gui.gopts.results(results, size));
   }
 
   /**

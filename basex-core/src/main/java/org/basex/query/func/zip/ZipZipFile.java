@@ -153,16 +153,15 @@ public class ZipZipFile extends ZipFn {
    * Returns the value of the specified attribute.
    * @param elm element node
    * @param name attribute to be found
-   * @param force if set to {@code true}, an exception is thrown if the
-   * attribute is not found
+   * @param enforce if set to {@code true}, an exception is thrown if the attribute is not found
    * @return attribute value
    * @throws QueryException query exception
    */
-  final String attribute(final ANode elm, final byte[] name, final boolean force)
+  final String attribute(final ANode elm, final byte[] name, final boolean enforce)
       throws QueryException {
 
     final byte[] val = elm.attribute(name);
-    if(val == null && force) throw ZIP_INVALID_X_X.get(info, elm.qname(), name);
+    if(val == null && enforce) throw ZIP_INVALID_X_X.get(info, elm.qname(), name);
     return val == null ? null : string(val);
   }
 

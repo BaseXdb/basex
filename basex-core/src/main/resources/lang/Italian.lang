@@ -319,6 +319,7 @@ resources            = Risorse
 resources_%          = % Risorsa(e)
 restore              = Ripristina
 result               = Risultato
+result_%             = % Risultato
 results_%            = % Risultati
 rt_execution         = Esecuzione in tempo reale
 rt_filtering         = Filtro in tempo reale

@@ -319,6 +319,7 @@ resources            = Ресурсы
 resources_%          = Ресурсы: %
 restore              = Восстановить
 result               = Результат
+result_%             = Результатов: %
 results_%            = Результатов: %
 rt_execution         = Немедленное выполнение
 rt_filtering         = Немедленная фильтрация

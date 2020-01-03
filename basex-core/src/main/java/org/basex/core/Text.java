@@ -686,7 +686,9 @@ public interface Text {
   String UPDATED_CC = lang("updated") + COLS;
   /** "Printed: ". */
   String PRINTED_CC = lang("printed") + COLS;
-  /** "Results: %". */
+  /** "% Result". */
+  String RESULT_X = lang("result_%");
+  /** "% Results". */
   String RESULTS_X = lang("results_%");
   /** "Query executed in %". */
   String QUERY_EXECUTED_X_X = lang("query_executed_%_%");

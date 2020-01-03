@@ -6,8 +6,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
 
-import javax.swing.*;
-
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
@@ -36,12 +34,12 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
   /** Header label. */
   private final BaseXHeader header;
-  /** Timer label. */
-  private final BaseXLabel timer;
   /** Categories. */
   private final BaseXCombo cats;
+  /** Info label for total time. */
+  private final BaseXLabel label;
   /** Text Area. */
-  private final TextPanel area;
+  private final TextPanel text;
 
   /** Painting flag. */
   private boolean paint;
@@ -78,12 +76,6 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
     header = new BaseXHeader(INFO);
 
-    timer = new BaseXLabel(" ").border(0, 4, 0, 0).resize(1.2f);
-
-    area = new TextPanel(gui, false);
-    area.setLinkListener(this);
-    editor = new SearchEditor(gui, area);
-
     // first assign values, then assign maximal width
     cats = new BaseXCombo(gui, ALL);
     String maxString = "";
@@ -107,24 +99,28 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
       repaint();
     });
 
-    final AbstractButton find = editor.button(FIND);
+    label = new BaseXLabel(" ").resize(1.2f);
+
+    text = new TextPanel(gui, false);
+    text.setLinkListener(this);
+    editor = new SearchEditor(gui, text);
+
+    final BaseXBack buttons = new BaseXBack(false);
+    buttons.layout(new ColumnLayout());
+    buttons.add(editor.button(FIND));
+
     final BaseXBack top = new BaseXBack(false);
-    top.layout(new ColumnLayout(6));
-    top.add(find);
+    top.layout(new ColumnLayout(10));
+    top.add(buttons);
     top.add(cats);
-    top.add(timer);
+    top.add(label);
 
     final BaseXBack north = new BaseXBack(false).layout(new BorderLayout());
     north.add(top, BorderLayout.WEST);
     north.add(header, BorderLayout.EAST);
     add(north, BorderLayout.NORTH);
 
-    final BaseXBack center = new BaseXBack(false).layout(new BorderLayout());
     add(editor, BorderLayout.CENTER);
-
-    center.add(area, BorderLayout.CENTER);
-    center.add(editor, BorderLayout.SOUTH);
-    add(center, BorderLayout.CENTER);
     refreshLayout();
   }
 
@@ -145,7 +141,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
   @Override
   public void refreshLayout() {
-    area.setFont(GUIConstants.font);
+    text.setFont(GUIConstants.font);
     editor.bar().refreshLayout();
   }
 
@@ -303,7 +299,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     if(!times.isEmpty()) {
       total = Performance.getTime(times.get(times.size() - 1) * 10000L * runs, runs);
     }
-    if(total != null) timer.setText(TOTAL_TIME_CC + total);
+    if(total != null) label.setText(TOTAL_TIME_CC + total);
     all = tb.finish();
     newText = all;
 
@@ -350,7 +346,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     }
 
     final int f = focus == -1 ? l - 1 : focus;
-    timer.setText(strings.get(f).replace(LI, ""));
+    label.setText(strings.get(f).replace(LI, ""));
     repaint();
   }
 
@@ -358,7 +354,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
   public void paintComponent(final Graphics g) {
     paint = true;
     if(newText != null) {
-      area.setText(newText);
+      text.setText(newText);
       newText = null;
     }
 
@@ -366,7 +362,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     final int l = stat.size();
     if(l != 0) {
       final int fs = GUIConstants.fontSize;
-      h = header.getHeight() + 4;
+      h = header.getHeight() - 4;
       w = (int) (getWidth() * 0.98 - fs / 2.0d - header.getWidth());
       bw = (fs << 1) + w / 10;
       bs = bw / (l - 1);
