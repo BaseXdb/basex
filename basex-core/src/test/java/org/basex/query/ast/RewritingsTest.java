@@ -638,4 +638,13 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1766() {
     check("let $map := map { 'c': 'x' } return count($map?(('a','b')))", 0, root(Int.class));
   }
+
+  /** Rewrite boolean comparisons. */
+  @Test public void gh1775() {
+    check("(false(), true()) ! (.  = true())", "false\ntrue", root(BlnSeq.class));
+    check("(false(), true()) ! (. != false())", "false\ntrue", root(BlnSeq.class));
+
+    check("(false(), true()) ! (.  = false())", "true\nfalse", exists(NOT));
+    check("(false(), true()) ! (. != true())", "true\nfalse", exists(NOT));
+  }
 }

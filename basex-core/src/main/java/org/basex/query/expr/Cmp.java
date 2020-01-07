@@ -94,7 +94,7 @@ public abstract class Cmp extends Arr {
   final Expr opt(final CompileContext cc) throws QueryException {
     final OpV op = opV();
     Expr expr = optEqual(op, this instanceof CmpV, cc);
-    if(expr == this) expr = optFalse(op, cc);
+    if(expr == this) expr = optBoolean(op, cc);
     if(expr == this) expr = optCount(op, cc);
     if(expr == this) expr = optStringLength(op, cc);
     if(expr == this) expr = optPos(op, cc);
@@ -114,7 +114,7 @@ public abstract class Cmp extends Arr {
    * @param single single arguments
    * @return resulting expression
    */
-  final Expr optEqual(final OpV op, final boolean single, final CompileContext cc) {
+  private Expr optEqual(final OpV op, final boolean single, final CompileContext cc) {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if((op == OpV.EQ || single && op == OpV.NE) && expr1.equals(expr2) && !expr1.has(Flag.NDT) &&
         (!expr1.has(Flag.CTX) || cc.qc.focus.value != null)) {
@@ -132,16 +132,22 @@ public abstract class Cmp extends Arr {
   }
 
   /**
-   * Tries to rewrite {@code A = false()} to {@code not(A)}.
+   * Tries to rewrite boolean comparisons.
    * @param op operator
    * @param cc compilation context
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  final Expr optFalse(final OpV op, final CompileContext cc) throws QueryException {
+  private Expr optBoolean(final OpV op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    return expr1.seqType().eq(SeqType.BLN_O) && (op == OpV.EQ && expr2 == Bln.FALSE ||
-        op == OpV.NE && expr2 == Bln.TRUE) ?  cc.function(Function.NOT, info, expr1) : this;
+    if(expr1.seqType().eq(SeqType.BLN_O)) {
+      // boolean(A) = true()   ->  boolean(A)
+      if(op == OpV.EQ && expr2 == Bln.TRUE || op == OpV.NE && expr2 == Bln.FALSE) return expr1;
+      // boolean(A) = false()  ->  not(boolean(A))
+      if(op == OpV.EQ && expr2 == Bln.FALSE || op == OpV.NE && expr2 == Bln.TRUE)
+        return cc.function(Function.NOT, info, expr1);
+    }
+    return this;
   }
 
   /**
@@ -151,7 +157,7 @@ public abstract class Cmp extends Arr {
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  final Expr optCount(final OpV op, final CompileContext cc) throws QueryException {
+  private Expr optCount(final OpV op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if(!(Function.COUNT.is(expr1) && expr2 instanceof ANum)) return this;
 
@@ -187,7 +193,7 @@ public abstract class Cmp extends Arr {
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  final Expr optStringLength(final OpV op, final CompileContext cc) throws QueryException {
+  private Expr optStringLength(final OpV op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if(!(Function.STRING_LENGTH.is(expr1) && expr2 instanceof ANum)) return this;
 
