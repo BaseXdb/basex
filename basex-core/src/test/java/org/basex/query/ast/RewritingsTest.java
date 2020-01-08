@@ -653,4 +653,14 @@ public final class RewritingsTest extends QueryPlanTest {
     check("6[. > 5][. < 7]", 6, count(CmpIR.class, 1));
     check("('a', 'b')[2][2]", "", empty());
   }
+
+  /** Merge conjunctions. */
+  @Test public void gh1776() {
+    check("for $n in (1,2,3) where $n != 2 and $n != 3 return $n", 1,
+        exists(NOT), exists(IntSeq.class));
+
+    check("'A'[. = <a>A</a> and . = 'A']", "A", exists(NOT), exists(List.class));
+    check("(<a/>, <b/>, <c/>)[name() = 'a' and name() = 'b']", "",
+        exists(NOT), exists(StrSeq.class));
+  }
 }

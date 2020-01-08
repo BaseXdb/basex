@@ -295,13 +295,19 @@ public class CmpG extends Cmp {
   public Expr merge(final Expr ex, final boolean union, final CompileContext cc)
       throws QueryException {
 
-    if(!(union && ex instanceof CmpG)) return null;
+    if(!(ex instanceof CmpG)) return null;
 
     final CmpG g = (CmpG) ex;
     if(op != g.op || coll != g.coll || !exprs[0].equals(g.exprs[0])) return null;
 
+    // merge comparisons:
+    // E = 'a' or E = 'b'  ->  E = ('a', 'b')
+    // conjunctions: invert operator, wrap with not()
+    // E != 'a' and E != 'b'  ->  not(E = ('a', 'b'))
     final Expr list = new List(info, exprs[1], g.exprs[1]).optimize(cc);
-    return new CmpG(exprs[0], list, op, coll, sc, info).optimize(cc);
+    final OpG oop = union ? op : op.invert();
+    final Expr oexpr = new CmpG(exprs[0], list, oop, coll, sc, info).optimize(cc);
+    return union ? oexpr : cc.function(Function.NOT, info, oexpr);
   }
 
   @Override
