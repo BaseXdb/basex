@@ -195,14 +195,6 @@ public class CmpG extends Cmp {
   }
 
   @Override
-  public Expr optimizeEbv(final CompileContext cc) {
-    // e.g.: exists(...) = true() -> exists(...)
-    // checking one direction is sufficient, as operators may have been swapped
-    return (op == OpG.EQ && exprs[1] == Bln.TRUE || op == OpG.NE && exprs[1] == Bln.FALSE) &&
-      exprs[0].seqType().eq(SeqType.BLN_O) ? cc.replaceEbv(this, exprs[0]) : this;
-  }
-
-  @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter1 = exprs[0].atomIter(qc, info);
     final long size1 = iter1.size();

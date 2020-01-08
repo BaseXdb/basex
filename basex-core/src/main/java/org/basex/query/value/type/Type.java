@@ -297,7 +297,7 @@ public interface Type {
 
   /**
    * Returns the atomic type.
-   * @return atomic type (can be {@code null})
+   * @return atomic type (can be {@code null}, e.g. for function types)
    */
   AtomType atomic();
 

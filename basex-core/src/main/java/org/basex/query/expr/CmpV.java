@@ -200,14 +200,6 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Expr optimizeEbv(final CompileContext cc) {
-    // e.g.: if($x eq true()) -> if($x)
-    // checking one direction is sufficient, as operators may have been swapped
-    return (opV == OpV.EQ && exprs[1] == Bln.TRUE || opV == OpV.NE && exprs[1] == Bln.FALSE) &&
-      exprs[0].seqType().eq(SeqType.BLN_O) ? cc.replaceEbv(this, exprs[0]) : this;
-  }
-
-  @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item1 = exprs[0].atomItem(qc, info);
     if(item1 == Empty.VALUE) return Empty.VALUE;
