@@ -652,6 +652,7 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1777() {
     check("6[. > 5][. < 7]", 6, count(CmpIR.class, 1));
     check("('a', 'b')[2][2]", "", empty());
+    check("('a', 'b')[1][1]", "a", root(Str.class));
   }
 
   /** Merge conjunctions. */
@@ -662,5 +663,17 @@ public final class RewritingsTest extends QueryPlanTest {
     check("'A'[. = <a>A</a> and . = 'A']", "A", exists(NOT), exists(List.class));
     check("(<a/>, <b/>, <c/>)[name() = 'a' and name() = 'b']", "",
         exists(NOT), exists(StrSeq.class));
+  }
+
+  /** Merge of consecutive operations. */
+  @Test public void gh1778() {
+    check("(1 to 3)[. = 1 or . != 2 or . = 3 or . != 4]", "1\n2\n3", count(IntSeq.class, 2));
+
+    check("for $n in (<a/>, <b/>, <c/>) " +
+        "where name($n) != 'a' where $n = '' where name($n) != 'b' " +
+        "return $n", "<c/>", exists(NOT), exists(StrSeq.class));
+    check("for $n in (<a/>, <b/>, <c/>) " +
+        "where name($n) != 'a' and $n = '' and name($n) != 'b' " +
+        "return $n", "<c/>", exists(NOT), exists(StrSeq.class));
   }
 }

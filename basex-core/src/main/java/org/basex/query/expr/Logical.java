@@ -49,35 +49,37 @@ abstract class Logical extends Arr {
   /**
    * Optimizes the expression.
    * @param cc compilation context
-   * @param or and/or flag
+   * @param union union or intersection
    * @param negate negated constructor
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public final Expr optimize(final CompileContext cc, final boolean or,
+  public final Expr optimize(final CompileContext cc, final boolean union,
       final java.util.function.Function<Expr[], Logical> negate) throws QueryException {
 
     ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       final Expr ex = expr.optimizeEbv(cc);
-      if(or ? ex instanceof Or : ex instanceof And) {
+      if(union ? ex instanceof Or : ex instanceof And) {
         // flatten nested expressions
         for(final Expr exp : ((Logical) ex).exprs) list.add(exp);
         cc.info(OPTFLAT_X_X, (Supplier<?>) this::description, ex);
       } else if(ex instanceof Value) {
         // pre-evaluate values
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-        if(ex.ebv(cc.qc, info).bool(info) ^ !or) return Bln.get(or);
+        if(ex.ebv(cc.qc, info).bool(info) ^ !union) return Bln.get(union);
       } else {
         list.add(ex);
       }
     }
     // no operands left: return result
-    if(list.isEmpty()) return Bln.get(!or);
+    if(list.isEmpty()) return Bln.get(!union);
+
     exprs = list.finish();
 
     // remove duplicate entries
     list = new ExprList(exprs.length);
+    // 'a'[. = 'a' or . = 'a']  ->  'a'[. = 'a']
     for(final Expr expr : exprs) {
       if(list.contains(expr) && !expr.has(Flag.NDT)) {
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
@@ -86,28 +88,12 @@ abstract class Logical extends Arr {
       }
     }
     exprs = list.finish();
-
-    // merge adjacent expressions
-    list = new ExprList(exprs.length);
-    for(int e = 0; e < exprs.length; e++) {
-      Expr expr = exprs[e];
-      if(e > 0) {
-        final Expr merged = list.peek().merge(expr, or, cc);
-        if(merged != null) {
-          expr = merged;
-          list.pop();
-        }
-      }
-      list.add(expr);
-    }
-    if(list.size() != exprs.length) {
-      exprs = list.finish();
-      cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
-    }
+    merge(true, union, cc);
 
     if(exprs.length == 1) return cc.replaceWith(this, FnBoolean.get(exprs[0], info, cc.sc()));
 
     // check if expression can be negated
+    // 'e'[not(. > 'a') and not(. < 'z')]  ->  'e'[not(. > 'a' or . < 'z')]
     for(final Expr expr : exprs) {
       if(!Function.NOT.is(expr)) return this;
     }

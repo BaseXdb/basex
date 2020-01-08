@@ -61,7 +61,7 @@ public abstract class Preds extends Arr {
    * @param cc compilation context
    * @return this, or a previous expression, uses positional access
    */
-  private boolean add(final Expr expr, final ExprList list, final boolean pos,
+  private boolean addUnique(final Expr expr, final ExprList list, final boolean pos,
       final CompileContext cc) {
 
     final boolean ps = pos || expr.seqType().mayBeNumber() || expr.has(Flag.POS);
@@ -186,7 +186,7 @@ public abstract class Preds extends Arr {
               // wrap test with boolean() if the result is numeric
               expr = ands[a];
               if(expr.seqType().mayBeNumber()) expr = cc.function(Function.BOOLEAN, info, expr);
-              if(a + 1 < m) pos = add(expr, list, pos, cc);
+              if(a + 1 < m) pos = addUnique(expr, list, pos, cc);
             }
           }
         } else if(expr instanceof ANum) {
@@ -206,27 +206,10 @@ public abstract class Preds extends Arr {
         if(expr == Bln.FALSE) return cc.emptySeq(this);
         if(expr != ebv) cc.replaceWith(ex, expr);
 
-        pos = add(expr, list, pos, cc);
+        pos = addUnique(expr, list, pos, cc);
       }
-      exprs = list.toArray();
-
-      // merge adjacent expressions
-      list.reset();
-      for(int e = 0; e < exprs.length; e++) {
-        Expr expr = exprs[e];
-        if(e > 0 && !expr.has(Flag.POS)) {
-          final Expr merged = list.peek().merge(expr, false, cc);
-          if(merged != null) {
-            expr = merged;
-            list.pop();
-          }
-        }
-        list.add(expr);
-      }
-      if(list.size() != exprs.length) {
-        exprs = list.finish();
-        cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
-      }
+      exprs = list.finish();
+      merge(false, false, cc);
 
     } finally {
       cc.removeFocus();

@@ -2,8 +2,11 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -130,13 +133,40 @@ public abstract class Arr extends ParseExpr {
    * results, the original expression is returned.
    * @return empty or original expression
    */
-  protected final Expr emptyExpr() {
+  final Expr emptyExpr() {
     // pre-evaluate if one value is empty (e.g.: () = local:expensive() )
     for(final Expr expr : exprs) {
       if(expr.seqType().zero()) return expr;
     }
     return this;
   }
+
+  /**
+   * Tries to merge consecutive expressions.
+   * @param pos allow positional expressions
+   * @param union merge as union expression
+   * @param cc compilation context
+   * @throws QueryException query exception
+   */
+  void merge(final boolean pos, final boolean union, final CompileContext cc)
+      throws QueryException {
+    // 'a'[. = 'a' or . = 'b']  ->  'a'[. = ('a', 'b')]
+    final ExprList list = new ExprList().add(exprs);
+    for(int l = 0; l < list.size(); l++) {
+      for(int m = l + 1; m < list.size();) {
+        final Expr merged = list.get(l).merge(list.get(m), union, cc);
+        if(merged != null && (pos || !merged.has(Flag.POS))) {
+          cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
+          list.set(l, merged);
+          list.remove(m);
+        } else {
+          m++;
+        }
+      }
+    }
+    exprs = list.finish();
+  }
+
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
