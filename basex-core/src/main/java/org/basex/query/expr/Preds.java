@@ -147,7 +147,7 @@ public abstract class Preds extends Arr {
     // remember current context value (will be temporarily overwritten)
     cc.pushFocus(root);
     try {
-      final int es = exprs.length;
+      int es = exprs.length;
       final ExprList list = new ExprList(es);
       boolean pos = false;
       for(final Expr ex : exprs) {
@@ -205,9 +205,29 @@ public abstract class Preds extends Arr {
         // predicate will not yield any results
         if(expr == Bln.FALSE) return cc.emptySeq(this);
         if(expr != ebv) cc.replaceWith(ex, expr);
+
         pos = add(expr, list, pos, cc);
       }
-      exprs = list.finish();
+      exprs = list.toArray();
+
+      // merge adjacent expressions
+      list.reset();
+      for(int e = 0; e < exprs.length; e++) {
+        Expr expr = exprs[e];
+        if(e > 0 && !expr.has(Flag.POS)) {
+          final Expr merged = list.peek().merge(expr, false, cc);
+          if(merged != null) {
+            expr = merged;
+            list.pop();
+          }
+        }
+        list.add(expr);
+      }
+      if(list.size() != exprs.length) {
+        exprs = list.finish();
+        cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
+      }
+
     } finally {
       cc.removeFocus();
     }

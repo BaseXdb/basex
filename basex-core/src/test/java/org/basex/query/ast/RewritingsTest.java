@@ -647,4 +647,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(false(), true()) ! (.  = false())", "true\nfalse", exists(NOT));
     check("(false(), true()) ! (. != true())", "true\nfalse", exists(NOT));
   }
+
+  /** Merge predicates. */
+  @Test public void gh1777() {
+    check("6[. > 5][. < 7]", 6, count(CmpIR.class, 1));
+    check("('a', 'b')[2][2]", "", empty());
+  }
 }
