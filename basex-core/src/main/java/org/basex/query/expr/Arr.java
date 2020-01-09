@@ -153,20 +153,20 @@ public abstract class Arr extends ParseExpr {
     // 'a'[. = 'a' or . = 'b']  ->  'a'[. = ('a', 'b')]
     final ExprList list = new ExprList().add(exprs);
     for(int l = 0; l < list.size(); l++) {
-      for(int m = l + 1; m < list.size();) {
-        final Expr merged = list.get(l).merge(list.get(m), union, cc);
-        if(merged != null && (pos || !merged.has(Flag.POS))) {
-          cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
-          list.set(l, merged);
-          list.remove(m);
-        } else {
-          m++;
+      for(int m = l + 1; m < list.size(); m++) {
+        final Expr expr = list.get(l);
+        if(pos || !expr.has(Flag.POS)) {
+          final Expr merged = expr.merge(list.get(m), union, cc);
+          if(merged != null) {
+            cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
+            list.set(l, merged);
+            list.remove(m--);
+          }
         }
       }
     }
     exprs = list.finish();
   }
-
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
