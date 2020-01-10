@@ -142,6 +142,8 @@ public class CmpG extends Cmp {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    cc.simplifyAtom(exprs);
+
     // swap operands
     if(swap()) {
       cc.info(OPTSWAP_X, this);

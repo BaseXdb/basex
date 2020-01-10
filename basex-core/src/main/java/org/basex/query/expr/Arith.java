@@ -34,6 +34,8 @@ public final class Arith extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    cc.simplifyAtom(exprs);
+
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     final Type type1 = st1.type, type2 = st2.type;

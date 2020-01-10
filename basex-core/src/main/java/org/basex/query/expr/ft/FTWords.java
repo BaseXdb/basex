@@ -94,7 +94,13 @@ public final class FTWords extends FTExpr {
     }
     query = query.compile(cc);
 
-    return init(cc.qc, cc.qc.ftOpt());
+    return init(cc.qc, cc.qc.ftOpt()).optimize(cc);
+  }
+
+  @Override
+  public FTWords optimize(final CompileContext cc) throws QueryException {
+    if(occ != null) cc.simplifyAtom(occ);
+    return this;
   }
 
   /**
@@ -251,11 +257,11 @@ public final class FTWords extends FTExpr {
    */
   private TokenList tokens(final QueryContext qc) throws QueryException {
     final TokenList tl = new TokenList();
-    final Iter iter = query.iter(qc);
+    final Iter iter = query.atomIter(qc, info);
     for(Item item; (item = qc.next(iter)) != null;) {
       // skip empty tokens if not all results are needed
-      final byte[] qu = toToken(item);
-      if(qu.length != 0 || mode == FTMode.ALL || mode == FTMode.ALL_WORDS) tl.add(qu);
+      final byte[] token = toToken(item);
+      if(token.length != 0 || mode == FTMode.ALL || mode == FTMode.ALL_WORDS) tl.add(token);
     }
     return tl;
   }

@@ -48,7 +48,14 @@ public final class FTDistance extends FTFilter {
   public FTExpr compile(final CompileContext cc) throws QueryException {
     min = min.compile(cc);
     max = max.compile(cc);
-    return super.compile(cc);
+    return super.compile(cc).optimize(cc);
+  }
+
+  @Override
+  public FTExpr optimize(final CompileContext cc) throws QueryException {
+    min = cc.simplifyAtom(min);
+    max = cc.simplifyAtom(max);
+    return this;
   }
 
   @Override

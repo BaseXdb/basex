@@ -44,7 +44,7 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public FTExpr optimize(final CompileContext cc) {
+  public FTExpr optimize(final CompileContext cc) throws QueryException {
     return this;
   }
 

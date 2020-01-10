@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -52,6 +51,13 @@ abstract class CName extends CNode {
     return super.compile(cc);
   }
 
+  @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    name = cc.simplifyAtom(name);
+    cc.simplifyAtom(exprs);
+    return this;
+  }
+
   /**
    * Returns the atomized value of the constructor.
    * @param qc query context
@@ -61,9 +67,8 @@ abstract class CName extends CNode {
   final byte[] atomValue(final QueryContext qc) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr expr : exprs) {
-      final Value value = expr.value(qc);
       boolean more = false;
-      final Iter iter = value.atomValue(qc, info).iter();
+      final Iter iter = expr.atomIter(qc, info);
       for(Item item; (item = qc.next(iter)) != null;) {
         if(more) tb.add(' ');
         tb.add(item.string(info));

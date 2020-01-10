@@ -48,7 +48,13 @@ public final class OrderKey extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) {
+  public Expr compile(final CompileContext cc) throws QueryException {
+    return super.compile(cc).optimize(cc);
+  }
+
+  @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    expr = cc.simplifyAtom(expr);
     // override pre-evaluation
     return this;
   }

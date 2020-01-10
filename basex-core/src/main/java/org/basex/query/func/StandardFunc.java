@@ -74,6 +74,14 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
+    // simplify atomized parameters
+    int el = exprs.length;
+    for(int e = 0; e < el; e++) {
+      // consider variable-size parameters
+      final int p = Math.min(e, definition.params.length - 1);
+      if(definition.params[p].type.instanceOf(AtomType.AAT)) exprs[e] = cc.simplifyAtom(exprs[e]);
+    }
+
     final Expr expr = opt(cc);
     return cc.replaceWith(this, expr != this ?
       // return optimized expression

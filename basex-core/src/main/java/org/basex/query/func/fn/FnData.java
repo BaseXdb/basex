@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -46,5 +47,18 @@ public final class FnData extends ContextFn {
       if(type != null) exprType.assign(type, st.occ, expr.size());
     }
     return this;
+  }
+
+  @Override
+  public Expr simplify(final CompileContext cc, final Simplify simplify)
+      throws QueryException {
+
+    if(simplify == Simplify.ATOM) {
+      // data(<a/>) = ''  ->  <a/> = ''
+      if(!contextAccess()) return cc.simplify(this, exprs[0]);
+      // A[B ! data() = '']  ->  A[B = '']
+      if(cc.nestedFocus()) return new ContextValue(info).optimize(cc);
+    }
+    return super.simplify(cc, simplify);
   }
 }

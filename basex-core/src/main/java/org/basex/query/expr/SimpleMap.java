@@ -6,7 +6,9 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.func.Function;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -203,6 +205,21 @@ public abstract class SimpleMap extends Arr {
       item ? copyType(new ItemMap(info, exprs)) :
       // default evaluation
       this;
+  }
+
+
+  @Override
+  public final Expr simplify(final CompileContext cc, final Simplify simplify)
+      throws QueryException {
+
+    if(simplify == Simplify.ATOM) {
+      final int el = exprs.length - 1;
+      if(exprs[el] instanceof FnData) {
+        return cc.simplify(this, el == 1 ? exprs[0] :
+          SimpleMap.get(info, Arrays.copyOf(exprs, el)).optimize(cc));
+      }
+    }
+    return super.simplify(cc, simplify);
   }
 
   @Override

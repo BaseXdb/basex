@@ -30,6 +30,12 @@ public final class CComm extends CNode {
   }
 
   @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    cc.simplifyAtom(exprs);
+    return this;
+  }
+
+  @Override
   public FComm item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = exprs[0].atomIter(qc, info);
 

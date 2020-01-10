@@ -31,7 +31,7 @@ public final class SwitchGroup extends Arr {
   }
 
   @Override
-  public Expr compile(final CompileContext cc) {
+  public Expr compile(final CompileContext cc) throws QueryException {
     // compile and simplify branches
     final int es = exprs.length;
     for(int e = 0; e < es; e++) {
@@ -42,6 +42,13 @@ public final class SwitchGroup extends Arr {
         exprs[e] = cc.error(ex, exprs[e]);
       }
     }
+    return optimize(cc);
+  }
+
+  @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    final int es = exprs.length;
+    for(int e = 1; e < es; e++) exprs[e] = cc.simplifyAtom(exprs[e]);
     return this;
   }
 

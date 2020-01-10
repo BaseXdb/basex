@@ -40,7 +40,13 @@ public final class FTWindow extends FTFilter {
   @Override
   public FTExpr compile(final CompileContext cc) throws QueryException {
     win = win.compile(cc);
-    return super.compile(cc);
+    return super.compile(cc).optimize(cc);
+  }
+
+  @Override
+  public FTExpr optimize(final CompileContext cc) throws QueryException {
+    win = cc.simplifyAtom(win);
+    return this;
   }
 
   @Override

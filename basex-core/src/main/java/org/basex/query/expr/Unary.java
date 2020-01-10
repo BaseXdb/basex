@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -40,6 +39,8 @@ public final class Unary extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    expr = cc.simplifyAtom(expr);
+
     final SeqType st = expr.seqType();
     final Type type = st.type;
     exprType.assign(type.isUntyped() ? AtomType.DBL : type.isNumber() ? type : AtomType.ITR,
@@ -47,7 +48,7 @@ public final class Unary extends Single {
 
     // no negation, numeric value: return operand
     return !minus && st.instanceOf(SeqType.NUM_ZO) ? cc.replaceWith(this, expr) :
-      expr instanceof Value ? cc.preEval(this) : this;
+      super.optimize(cc);
   }
 
   @Override

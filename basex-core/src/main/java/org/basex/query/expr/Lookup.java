@@ -36,6 +36,8 @@ public final class Lookup extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    exprs[0] = cc.simplifyAtom(exprs[0]);
+
     final Expr keys = exprs[0];
     final long ks = keys.seqType().mayBeArray() ? -1 : keys.size();
     if(exprs.length == 1) {
@@ -113,10 +115,10 @@ public final class Lookup extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter iter = exprs.length == 1 ? ctxValue(qc).iter() : exprs[1].iter(qc);
+    final Expr keys = exprs[0];
+    final Iter iter = (exprs.length == 1 ? ctxValue(qc) : exprs[1]).iter(qc);
 
     // iterate through all map/array inputs
-    final Expr keys = exprs[0];
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
       if(!(item instanceof XQMap || item instanceof XQArray)) throw LOOKUP_X.get(info, item);

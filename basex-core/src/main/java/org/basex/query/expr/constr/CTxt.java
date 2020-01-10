@@ -34,7 +34,9 @@ public final class CTxt extends CNode {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) {
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    cc.simplifyAtom(exprs);
+
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
     if(st.zero()) return cc.replaceWith(this, expr);

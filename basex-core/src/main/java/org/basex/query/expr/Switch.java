@@ -61,6 +61,8 @@ public final class Switch extends ParseExpr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    cond = cc.simplifyAtom(cond);
+
     // check if expression can be pre-evaluated
     final Expr expr = opt(cc);
     if(expr != this) return cc.replaceWith(this, expr);

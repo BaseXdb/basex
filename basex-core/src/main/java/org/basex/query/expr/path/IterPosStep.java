@@ -50,7 +50,7 @@ final class IterPosStep extends Step {
               posExpr[e] = (ItrPos) expr;
             } else if(numeric(expr)) {
               // pre-evaluate numeric position
-              final Item item = expr.atomItem(qc, info);
+              final Item item = expr.item(qc, info);
               if(item == Empty.VALUE) return null;
               final Expr ex = ItrPos.get(toDouble(item), info);
               if(!(ex instanceof ItrPos)) return null;

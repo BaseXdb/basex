@@ -33,8 +33,10 @@ public final class CMap extends Arr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     // determine static key type (all keys must be single items)
     final int el = exprs.length;
+
     Type key = null;
     for(int e = 0; e < el; e += 2) {
+      exprs[e] = cc.simplifyAtom(exprs[e]);
       final SeqType st = exprs[e].seqType();
       final Type type = st.type.atomic();
       if(type == null || !st.one()) {
@@ -63,11 +65,11 @@ public final class CMap extends Arr {
     XQMap map = XQMap.EMPTY;
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
-      final Item k = exprs[e].atomItem(qc, info);
-      if(k == Empty.VALUE) throw EMPTYFOUND.get(info);
-      final Value v = exprs[e + 1].value(qc);
-      if(map.contains(k, info)) throw MAPDUPLKEY_X_X_X.get(info, k, map.get(k, info), v);
-      map = map.put(k, v, info);
+      final Item key = exprs[e].atomItem(qc, info);
+      if(key == Empty.VALUE) throw EMPTYFOUND.get(info);
+      final Value value = exprs[e + 1].value(qc);
+      if(map.contains(key, info)) throw MAPDUPLKEY_X_X_X.get(info, key, map.get(key, info), value);
+      map = map.put(key, value, info);
     }
     return map;
   }

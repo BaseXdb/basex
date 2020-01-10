@@ -41,7 +41,13 @@ public final class FTWeight extends FTExpr {
   @Override
   public FTExpr compile(final CompileContext cc) throws QueryException {
     weight = weight.compile(cc);
-    return super.compile(cc);
+    return super.compile(cc).optimize(cc);
+  }
+
+  @Override
+  public FTExpr optimize(final CompileContext cc) throws QueryException {
+    weight = cc.simplifyAtom(weight);
+    return this;
   }
 
   @Override

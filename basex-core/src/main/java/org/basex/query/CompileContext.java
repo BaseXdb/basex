@@ -26,9 +26,10 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class CompileContext {
-  /** Modes for simplifying operands of expressions at compile time. */
+  /** Compile-time optimizations. */
   public enum Simplify {
-    /** Effective boolean values. */ EBV
+    /** Effective boolean values. */ EBV,
+    /** Atomization. */              ATOM
   };
 
   /** Limit for the size of sequences that are pre-evaluated. */
@@ -271,4 +272,23 @@ public final class CompileContext {
     return expr.simplify(this, Simplify.EBV);
   }
 
+  /**
+   * Simplifies an expression for atomizations.
+   * @param expr expression to simplify
+   * @return simplified expression
+   * @throws QueryException query exception
+   */
+  public Expr simplifyAtom(final Expr expr) throws QueryException {
+    return expr.simplify(this, Simplify.ATOM);
+  }
+
+  /**
+   * Simplifies all expressions for atomizations.
+   * @param exprs expressions to simplify
+   * @throws QueryException query exception
+   */
+  public void simplifyAtom(final Expr[] exprs) throws QueryException {
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) exprs[e] = simplifyAtom(exprs[e]);
+  }
 }

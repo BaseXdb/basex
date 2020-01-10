@@ -48,13 +48,13 @@ public final class CPI extends CName {
       qnm = new QNm(nm);
     }
 
-    byte[] v = atomValue(qc);
+    byte[] value = atomValue(qc);
     int i = -1;
-    final int vl = v.length;
-    while(++i < vl && v[i] >= 0 && v[i] <= ' ');
-    v = substring(v, i);
+    final int vl = value.length;
+    while(++i < vl && value[i] >= 0 && value[i] <= ' ');
+    value = substring(value, i);
 
-    return new FPI(qnm, FPI.parse(v, info));
+    return new FPI(qnm, FPI.parse(value, info));
   }
 
   @Override
