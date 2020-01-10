@@ -3,6 +3,8 @@ package org.basex.query.value.map;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
@@ -191,21 +193,46 @@ final class TrieList extends TrieNode {
 
     qc.checkStop();
     if(hash == list.hash) {
-      Item[] ks = keys;
-      Value[] vs = values;
+      final Value[] vs0 = list.values;
+      Item[] ks = list.keys;
+      Value[] vs = vs0;
+      final BitSet unmatched = new BitSet(list.size);
+      unmatched.set(0, list.size);
 
       OUTER:
       for(int i = 0; i < size; i++) {
-        final Item ok = list.keys[i];
-        // skip all entries that are overridden
-        for(final Item k : keys) {
-          if(k.sameKey(ok, ii)) continue OUTER;
+        final Item ok = keys[i];
+        // check if the key is already in the list
+        for(int j = unmatched.nextSetBit(0); j >= 0; j = unmatched.nextSetBit(j + 1)) {
+          final Item k = list.keys[j];
+          if(k.sameKey(ok, ii)) {
+            unmatched.clear(j);
+            switch(merge) {
+              case USE_FIRST:
+              case UNSPECIFIED:
+                // no change, skip the entry
+                break;
+              case USE_LAST:
+                // left value is overwritten
+                if(vs == vs0) vs = vs0.clone();
+                vs[j] = values[i];
+                break;
+              case COMBINE:
+                // right value is appended
+                if(vs == vs0) vs = vs0.clone();
+                vs[j] = ValueBuilder.concat(vs[j], values[i], qc);
+                break;
+              default:
+                throw MERGE_DUPLICATE_X.get(ii, k);
+            }
+            continue OUTER;
+          }
         }
         // key is not in this list, add it
         ks = Array.add(ks, ok);
-        vs = Array.add(vs, list.values[i]);
+        vs = Array.add(vs, values[i]);
       }
-      return ks == keys ? this : new TrieList(hash, ks, vs);
+      return vs == vs0 ? list : new TrieList(hash, ks, vs);
     }
 
     final TrieNode[] ch = new TrieNode[KIDS];

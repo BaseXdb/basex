@@ -2,8 +2,12 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
+import static org.junit.Assert.*;
 
+import org.basex.query.*;
 import org.basex.query.ast.*;
+import org.basex.query.value.item.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -113,6 +117,67 @@ public final class MapModuleTest extends QueryPlanTest {
     // GH1602
     query("let $_ := 'combine' return " + func.args(" map { 0:1 }",
         " map { 'duplicates': $_ }") + "?0", 1);
+  }
+
+  /**
+   * Regression tests for {@code map:merge(...)} in the presence of hash collisions.
+   *
+   * @throws QueryException exception
+   */
+  @Test public void gh1779() throws QueryException {
+    final Function func = _MAP_MERGE;
+    final Str[] keys = { Str.get("DENW21AL100077Hs"), Str.get("DENW21AL100076i5"),
+        Str.get("DENW21AL100076hT") };
+    assertEquals(keys[0].hash(null), keys[1].hash(null));
+    assertEquals(keys[1].hash(null), keys[2].hash(null));
+
+    final String mapAB = Util.info("map{'%':%,'%':%}", keys[0], 1, keys[1], 1);
+    final String mapABC = Util.info("map{'%':%,'%':%,'%':%}", keys[0], 2, keys[2], 2, keys[1], 2);
+    // use-first
+    query(
+        DEEP_EQUAL.args(
+            func.args(" (" + mapAB + "," + mapABC + ")", " map{'duplicates':'use-first'}"),
+            Util.info(" map{'%':%,'%':%,'%':%}", keys[0], 1, keys[1], 1, keys[2], 2)
+        ),
+        true
+    );
+    query(
+        DEEP_EQUAL.args(
+            func.args(" (" + mapABC + "," + mapAB + ")", " map{'duplicates':'use-first'}"),
+            Util.info(" map{'%':%,'%':%,'%':%}", keys[0], 2, keys[1], 2, keys[2], 2)
+        ),
+        true
+    );
+    // use-last
+    query(
+        DEEP_EQUAL.args(
+            func.args(" (" + mapAB + "," + mapABC + ")", " map{'duplicates':'use-last'}"),
+            Util.info(" map{'%':%,'%':%,'%':%}", keys[0], 2, keys[1], 2, keys[2], 2)
+        ),
+        true
+    );
+    query(
+        DEEP_EQUAL.args(
+            func.args(" (" + mapABC + "," + mapAB + ")", " map{'duplicates':'use-last'}"),
+            Util.info(" map{'%':%,'%':%,'%':%}", keys[0], 1, keys[1], 1, keys[2], 2)
+        ),
+        true
+    );
+    // merge
+    query(
+        DEEP_EQUAL.args(
+            func.args(" (" + mapAB + "," + mapABC + ")", " map{'duplicates':'combine'}"),
+            Util.info(" map{'%':(%,%),'%':(%,%),'%':%}", keys[0], 1, 2, keys[1], 1, 2, keys[2], 2)
+        ),
+        true
+    );
+    query(
+        DEEP_EQUAL.args(
+            func.args(" (" + mapABC + "," + mapAB + ")", " map{'duplicates':'combine'}"),
+            Util.info(" map{'%':(%,%),'%':(%,%),'%':%}", keys[0], 2, 1, keys[1], 2, 1, keys[2], 2)
+        ),
+        true
+    );
   }
 
   /** Test method. */
