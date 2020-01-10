@@ -26,15 +26,15 @@ public final class SwitchGroup extends Arr {
 
   @Override
   public void checkUp() throws QueryException {
-    final int es = exprs.length;
-    for(int e = 1; e < es; ++e) checkNoUp(exprs[e]);
+    final int el = exprs.length;
+    for(int e = 1; e < el; ++e) checkNoUp(exprs[e]);
   }
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     // compile and simplify branches
-    final int es = exprs.length;
-    for(int e = 0; e < es; e++) {
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
       try {
         exprs[e] = exprs[e].compile(cc);
       } catch(final QueryException ex) {
@@ -47,8 +47,8 @@ public final class SwitchGroup extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final int es = exprs.length;
-    for(int e = 1; e < es; e++) exprs[e] = cc.simplifyAtom(exprs[e]);
+    final int el = exprs.length;
+    for(int e = 1; e < el; e++) exprs[e] = cc.simplifyAtom(exprs[e]);
     return this;
   }
 
@@ -60,8 +60,8 @@ public final class SwitchGroup extends Arr {
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
     boolean changed = false;
-    final int es = exprs.length;
-    for(int e = 0; e < es; e++) {
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
       Expr nw;
       try {
         nw = exprs[e].inline(var, ex, cc);
@@ -93,8 +93,8 @@ public final class SwitchGroup extends Arr {
    */
   VarUsage countCases(final Var var) {
     VarUsage all = VarUsage.NEVER;
-    final int es = exprs.length;
-    for(int e = 1; e < es; e++) {
+    final int el = exprs.length;
+    for(int e = 1; e < el; e++) {
       if((all = all.plus(exprs[e].count(var))) == VarUsage.MORE_THAN_ONCE) break;
     }
     return all;
@@ -115,9 +115,9 @@ public final class SwitchGroup extends Arr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    final int es = exprs.length;
-    for(int e = 1; e < es; ++e) sb.append(' ').append(CASE).append(' ').append(exprs[e]);
-    if(es == 1) sb.append(' ').append(DEFAULT);
+    final int el = exprs.length;
+    for(int e = 1; e < el; ++e) sb.append(' ').append(CASE).append(' ').append(exprs[e]);
+    if(el == 1) sb.append(' ').append(DEFAULT);
     return sb.append(' ').append(RETURN).append(' ').append(exprs[0]).toString();
   }
 }

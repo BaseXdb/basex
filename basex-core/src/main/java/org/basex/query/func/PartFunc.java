@@ -120,7 +120,7 @@ public final class PartFunc extends Arr {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder().add(body()).add('(');
     int p = -1;
-    final int es = exprs.length, hs = holes.length;
+    final int el = exprs.length, hs = holes.length;
     for(int i = 0; i < hs; i++) {
       while(++p < holes[i]) {
         if(p > 0) tb.add(QueryText.SEP);
@@ -129,7 +129,7 @@ public final class PartFunc extends Arr {
       if(p > 0) tb.add(QueryText.SEP);
       tb.add('?');
     }
-    while(++p < es + hs - 1) tb.add(QueryText.SEP).add(exprs[p - hs]);
+    while(++p < el + hs - 1) tb.add(QueryText.SEP).add(exprs[p - hs]);
     return tb.add(')').toString();
   }
 }

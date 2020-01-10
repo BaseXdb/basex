@@ -38,8 +38,8 @@ public final class List extends Arr {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    final int es = exprs.length;
-    for(int e = 0; e < es; e++) exprs[e] = exprs[e].compile(cc);
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) exprs[e] = exprs[e].compile(cc);
     return optimize(cc);
   }
 

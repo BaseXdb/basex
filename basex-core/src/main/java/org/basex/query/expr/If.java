@@ -168,8 +168,8 @@ public final class If extends Arr {
       cond = sub;
       changed = true;
     }
-    final int es = exprs.length;
-    for(int e = 0; e < es; e++) {
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
       Expr exp;
       try {
         exp = exprs[e].inline(var, ex, cc);

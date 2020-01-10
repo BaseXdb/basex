@@ -118,9 +118,9 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final StandardFunc copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final int es = exprs.length;
-    final Expr[] arg = new Expr[es];
-    for(int e = 0; e < es; e++) arg[e] = exprs[e].copy(cc, vm);
+    final int el = exprs.length;
+    final Expr[] arg = new Expr[el];
+    for(int e = 0; e < el; e++) arg[e] = exprs[e].copy(cc, vm);
     return copyType(definition.function.get(sc, info, arg));
   }
 
@@ -411,8 +411,8 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
 
     final HashMap<String, Value> hm = new HashMap<>();
-    final int es = exprs.length;
-    if(i < es) {
+    final int el = exprs.length;
+    if(i < el) {
       final Item item = exprs[i].item(qc, info);
       final XQMap map = item == Empty.VALUE ? XQMap.EMPTY : toMap(item);
       for(final Item it : map.keys()) {

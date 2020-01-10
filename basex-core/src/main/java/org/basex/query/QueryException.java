@@ -272,8 +272,8 @@ public class QueryException extends Exception {
    * @return argument
    */
   private static String message(final String text, final Object[] ext) {
-    final int es = ext.length;
-    for(int e = 0; e < es; e++) {
+    final int el = ext.length;
+    for(int e = 0; e < el; e++) {
       if(ext[e] instanceof ExprInfo) {
         ext[e] = normalize(((ExprInfo) ext[e]).toErrorString(), null);
       }

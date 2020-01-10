@@ -37,8 +37,8 @@ public final class FTAnd extends FTExpr {
     for(final FTExpr expr : exprs) not &= expr instanceof FTNot;
     if(not) {
       // convert (!A and !B and ...) to !(A or B or ...)
-      final int es = exprs.length;
-      for(int e = 0; e < es; e++) exprs[e] = exprs[e].exprs[0];
+      final int el = exprs.length;
+      for(int e = 0; e < el; e++) exprs[e] = exprs[e].exprs[0];
       return (FTExpr) cc.replaceWith(this, new FTNot(info, new FTOr(info, exprs)));
     }
     return this;
@@ -47,18 +47,18 @@ public final class FTAnd extends FTExpr {
   @Override
   public FTNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FTNode item = exprs[0].item(qc, info);
-    final int es = exprs.length;
-    for(int e = 1; e < es; e++) and(item, exprs[e].item(qc, info));
+    final int el = exprs.length;
+    for(int e = 1; e < el; e++) and(item, exprs[e].item(qc, info));
     return item;
   }
 
   @Override
   public FTIter iter(final QueryContext qc) throws QueryException {
     // initialize iterators
-    final int es = exprs.length;
-    final FTIter[] iters = new FTIter[es];
-    final FTNode[] nodes = new FTNode[es];
-    for(int e = 0; e < es; e++) {
+    final int el = exprs.length;
+    final FTIter[] iters = new FTIter[el];
+    final FTNode[] nodes = new FTNode[el];
+    for(int e = 0; e < el; e++) {
       iters[e] = exprs[e].iter(qc);
       nodes[e] = iters[e].next();
     }
