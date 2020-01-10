@@ -15,7 +15,7 @@ import org.basex.util.*;
  */
 public final class FnStringLength extends ContextFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] token;
     if(exprs.length == 0) {
       final Item item = ctxValue(qc).item(qc, info);

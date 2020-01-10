@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public final class FnFunctionArity extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return Int.get(toFunc(exprs[0], qc).arity());
   }
 }

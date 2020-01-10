@@ -15,7 +15,6 @@ public class FnJsonToXml extends FnParseJson {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = exprs[0].atomItem(qc, info);
-    if(item == Empty.VALUE) return Empty.VALUE;
-    return parse(toToken(item), true, qc);
+    return item == Empty.VALUE ? Empty.VALUE : parse(toToken(item), true, qc);
   }
 }

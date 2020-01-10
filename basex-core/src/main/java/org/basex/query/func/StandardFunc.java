@@ -117,16 +117,23 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Optimizes a function that returns an empty sequence when the first argument is empty as well.
-   * Sets the occurrence indicator to 1 if the first expression returns at least one non-array item.
-   * Replaces the function with the argument if it yields no results.
+   * Optimizes a function that returns an empty sequence when the first argument is empty.
+   * <ul>
+   *   <li> Return the first argument if it yields an empty sequence.</li>
+   *   <li> Sets the occurrence indicator to 1 if the first expression returns at least one
+   *     non-array item.</li>
+   * </ul>
+   * @param occ assign occurrence indicator
+   *   ({@code true} if function will always yield a result if first argument is non-empty)
    * @return original expression, or function argument (if it yields no results)
    */
-  protected Expr optFirst() {
-    final Expr expr = exprs[0];
-    final SeqType st = expr.seqType();
-    if(st.zero()) return expr;
-    if(st.oneOrMore() && !st.mayBeArray()) exprType.assign(Occ.ONE);
+  protected Expr optFirst(final boolean occ) {
+    if(exprs.length > 0) {
+      final Expr expr = exprs[0];
+      final SeqType st = expr.seqType();
+      if(st.zero()) return expr;
+      if(occ && st.oneOrMore() && !st.mayBeArray()) exprType.assign(Occ.ONE);
+    }
     return this;
   }
 

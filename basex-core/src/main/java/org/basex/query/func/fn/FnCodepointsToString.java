@@ -21,7 +21,7 @@ public final class FnCodepointsToString extends StandardFunc {
   private boolean singleInt;
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // input is single integer
     if(singleInt) return toStr(exprs[0].item(qc, info).itr(info), info);
 

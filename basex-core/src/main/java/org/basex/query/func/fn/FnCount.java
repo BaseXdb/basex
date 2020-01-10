@@ -17,7 +17,7 @@ import org.basex.util.*;
  */
 public final class FnCount extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // if possible, retrieve single item
     final Expr expr = exprs[0];
     if(expr.seqType().zeroOrOne()) return expr.item(qc, info) == Empty.VALUE ? Int.ZERO : Int.ONE;

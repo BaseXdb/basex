@@ -34,23 +34,20 @@ public class FnAvg extends FnSum {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0];
+    Expr expr = optFirst(true);
+    if(expr != this) return expr;
+
+    expr = exprs[0];
     if(expr instanceof RangeSeq) return range((Value) expr);
     if(expr instanceof SingletonSeq) {
       final Item item = singleton((SingletonSeq) expr);
       if(item != null) return item;
     }
 
-    // empty sequence: replace with default item
     final SeqType st = expr.seqType();
-    if(st.zero()) return expr;
+    if(!st.mayBeArray()) exprType.assign(Calc.DIV.type(st.type, st.type));
 
-    if(!st.mayBeArray()) {
-      // sequence is not empty: assign result type
-      final Type type = Calc.DIV.type(st.type, st.type);
-      exprType.assign(type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
-    }
-    return optFirst();
+    return this;
   }
 
   /**

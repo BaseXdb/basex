@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public final class FnExists extends FnEmpty {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return Bln.get(!empty(qc));
   }
 

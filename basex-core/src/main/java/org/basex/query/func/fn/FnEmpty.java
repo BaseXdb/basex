@@ -16,7 +16,7 @@ import org.basex.util.*;
  */
 public class FnEmpty extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return Bln.get(empty(qc));
   }
 
@@ -41,7 +41,7 @@ public class FnEmpty extends StandardFunc {
 
   /**
    * Optimizes an existence check.
-   * @return boolean result or {@code null}
+   * @return boolean result, or {@code null} if no optimization is possible
    */
   final Bln opt() {
     // ignore non-deterministic expressions (e.g.: empty(error()))

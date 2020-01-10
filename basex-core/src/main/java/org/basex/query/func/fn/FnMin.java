@@ -137,7 +137,10 @@ public class FnMin extends StandardFunc {
    * @return optimized or original item
    */
   final Expr optMinmax(final OpV cmp) {
-    final Expr expr = exprs[0];
+    Expr expr = optFirst(true);
+    if(expr != this) return expr;
+
+    expr = exprs[0];
     final SeqType st = expr.seqType();
     Type type = st.type;
     if(type.isSortable()) {
@@ -150,6 +153,6 @@ public class FnMin extends StandardFunc {
       final Item item = value(cmp);
       if(item != null) return item;
     }
-    return optFirst();
+    return this;
   }
 }

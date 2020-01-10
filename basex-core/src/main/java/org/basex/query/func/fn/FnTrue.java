@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class FnTrue extends StandardFunc {
   // will always be pre-evaluated
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) {
+  public Bln item(final QueryContext qc, final InputInfo ii) {
     return Bln.TRUE;
   }
 }

@@ -20,9 +20,10 @@ public final class FnString extends ContextFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = ctxArg(0, qc).item(qc, info);
     if(item == Empty.VALUE) return Str.ZERO;
+    if(item.type == AtomType.STR) return item;
 
     if(item instanceof FItem) throw FISTRING_X.get(info, item.type);
-    return item.type == AtomType.STR ? item : Str.get(item.string(info));
+    return Str.get(item.string(info));
   }
 
   @Override

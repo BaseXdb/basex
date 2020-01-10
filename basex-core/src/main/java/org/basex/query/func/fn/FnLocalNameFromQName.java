@@ -23,6 +23,6 @@ public final class FnLocalNameFromQName extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return optFirst();
+    return optFirst(true);
   }
 }

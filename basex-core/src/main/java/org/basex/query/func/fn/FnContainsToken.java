@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 public final class FnContainsToken extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] token = trim(toToken(exprs[1], qc));
     final Collation coll = toCollation(2, qc);
     if(token.length != 0) {

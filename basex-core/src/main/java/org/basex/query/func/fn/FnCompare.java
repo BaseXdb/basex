@@ -35,7 +35,8 @@ public final class FnCompare extends StandardFunc {
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     if(st1.zero()) return expr1;
     if(st2.zero()) return expr2;
-    if(st1.oneNoArray() && st2.oneNoArray()) exprType.assign(Occ.ONE);
+    if(st1.oneOrMore() && !st1.mayBeArray() && st2.oneOrMore() && !st2.mayBeArray())
+      exprType.assign(Occ.ONE);
     return this;
   }
 }

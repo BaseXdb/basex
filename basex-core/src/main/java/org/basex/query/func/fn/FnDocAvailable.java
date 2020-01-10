@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public final class FnDocAvailable extends Docs {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     try {
       return Bln.get(doc(qc) != Empty.VALUE);
     } catch(final QueryException ex) {

@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public final class FnCurrentDate extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Dat item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return qc.dateTime().date;
   }
 }

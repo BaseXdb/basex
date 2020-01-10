@@ -15,7 +15,7 @@ import org.basex.util.*;
  */
 public final class FnNot extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return Bln.get(!exprs[0].ebv(qc, info).bool(info));
   }
 

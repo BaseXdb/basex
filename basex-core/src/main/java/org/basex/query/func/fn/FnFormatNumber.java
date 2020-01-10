@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class FnFormatNumber extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // evaluate arguments
     Item item = exprs[0].atomItem(qc, info);
     if(item == Empty.VALUE) item = Dbl.NAN;

@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -24,5 +25,16 @@ public final class FnDateTime extends DateTime {
     final Tim time = zone.type.isUntyped() ? new Tim(zone.string(info), info) :
       (Tim) checkType(zone, AtomType.TIM);
     return new Dtm(date, time, info);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final Expr expr1 = exprs[0], expr2 = exprs.length == 2 ? exprs[1] : Str.ZERO;
+    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
+    if(st1.zero()) return expr1;
+    if(st2.zero()) return expr2;
+    if(st1.oneOrMore() && !st1.mayBeArray() && st2.oneOrMore() && !st2.mayBeArray())
+      exprType.assign(Occ.ONE);
+    return this;
   }
 }

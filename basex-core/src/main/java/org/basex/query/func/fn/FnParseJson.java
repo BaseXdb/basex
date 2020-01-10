@@ -31,7 +31,7 @@ public class FnParseJson extends Parse {
 
   @Override
   protected final Expr opt(final CompileContext cc) {
-    return optFirst();
+    return optFirst(true);
   }
 
   /**

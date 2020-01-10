@@ -17,7 +17,7 @@ import org.basex.util.*;
  */
 public final class FnSubstring extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // normalize positions
     final byte[] string = toEmptyToken(exprs[0], qc);
 

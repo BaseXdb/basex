@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public final class FnGenerateId extends ContextFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toEmptyNode(ctxArg(0, qc), qc);
     if(node == null) return Str.ZERO;
 

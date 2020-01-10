@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 public final class FnNormalizeUnicode extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] str = toEmptyToken(exprs[0], qc);
 
     Form form = Form.NFC;

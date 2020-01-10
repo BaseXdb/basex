@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -42,6 +43,12 @@ public final class FnUnparsedTextLines extends Parse {
     } catch(final IOException ex) {
       throw FILE_IO_ERROR_X.get(info, ex);
     }
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr expr = exprs[0];
+    return expr.seqType().zero() ? expr : this;
   }
 
   /**

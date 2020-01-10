@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -19,5 +20,10 @@ public final class FnNilled extends ContextFn {
     final ANode node = toEmptyNode(ctxArg(0, qc), qc);
     // always false, as no schema information is given
     return node == null || node.type != NodeType.ELM ? Empty.VALUE : Bln.FALSE;
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    return optFirst(false);
   }
 }

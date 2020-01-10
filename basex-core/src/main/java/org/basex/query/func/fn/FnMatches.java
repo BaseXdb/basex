@@ -16,7 +16,7 @@ import org.basex.util.*;
  */
 public final class FnMatches extends RegEx {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toEmptyToken(exprs[0], qc);
     final Pattern pattern = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc, false);
     return Bln.get(pattern.matcher(string(value)).find());

@@ -38,6 +38,6 @@ public final class FnResolveQName extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return optFirst();
+    return optFirst(true);
   }
 }

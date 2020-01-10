@@ -36,6 +36,7 @@ public final class FnData extends ContextFn {
     final Expr expr = context ? cc.qc.focus.value : exprs[0];
     if(expr != null) {
       final SeqType st = expr.seqType();
+      if(st.zero()) return expr;
       final AtomType type = st.type.atomic();
       if(type == st.type) {
         // data('x') -> 'x'

@@ -33,7 +33,7 @@ public class FnRound extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    return optFirst();
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    return optFirst(true);
   }
 }

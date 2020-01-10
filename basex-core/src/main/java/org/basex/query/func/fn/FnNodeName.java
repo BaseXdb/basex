@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -18,5 +19,10 @@ public final class FnNodeName extends ContextFn {
     final ANode node = toEmptyNode(ctxArg(0, qc), qc);
     final QNm qname = node != null ? node.qname() : null;
     return qname != null && qname.string().length != 0 ? qname : Empty.VALUE;
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    return optFirst(false);
   }
 }

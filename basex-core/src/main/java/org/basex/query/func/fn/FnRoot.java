@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -17,5 +18,10 @@ public final class FnRoot extends ContextFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toEmptyNode(ctxArg(0, qc), qc);
     return node == null ? Empty.VALUE : node.root();
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    return optFirst(true);
   }
 }

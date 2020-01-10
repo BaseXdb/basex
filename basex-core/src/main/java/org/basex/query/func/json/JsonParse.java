@@ -3,6 +3,7 @@ package org.basex.query.func.json;
 import org.basex.build.json.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -26,5 +27,10 @@ public final class JsonParse extends StandardFunc {
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);
     }
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    return optFirst(true);
   }
 }

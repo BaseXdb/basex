@@ -2,6 +2,7 @@ package org.basex.query.func.fn;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -25,5 +26,10 @@ public final class FnDocumentUri extends ContextFn {
 
     final byte[] uri = node.baseURI();
     return uri.length == 0 ? Empty.VALUE : Uri.uri(uri, false);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    return optFirst(false);
   }
 }

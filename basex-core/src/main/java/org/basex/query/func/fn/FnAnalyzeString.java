@@ -29,7 +29,7 @@ public final class FnAnalyzeString extends RegEx {
   private static final String NR = "nr";
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toEmptyToken(exprs[0], qc);
     final Pattern pattern = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc, true);
     final String string = string(value);

@@ -21,7 +21,7 @@ public final class FnFormatInteger extends StandardFunc {
   private final TokenObjMap<IntFormat> formats = new TokenObjMap<>();
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] pic = toToken(exprs[1], qc);
     final byte[] language = exprs.length == 2 ? EMPTY : toToken(exprs[2], qc);
 

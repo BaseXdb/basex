@@ -54,11 +54,9 @@ public final class FnInsertBefore extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr expr1 = exprs[0], expr2 = exprs[1], expr3 = exprs[2];
-    if(expr2.seqType().oneNoArray()) {
-      if(expr1 == Empty.VALUE) return expr3;
-      if(expr3 == Empty.VALUE) return expr1;
-    }
+    final Expr expr1 = exprs[0], expr3 = exprs[2];
+    if(expr1 == Empty.VALUE) return expr3;
+    if(expr3 == Empty.VALUE) return expr1;
     exprType.assign(expr1.seqType().add(expr3.seqType()));
     return this;
   }

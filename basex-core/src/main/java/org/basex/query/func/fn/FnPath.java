@@ -60,8 +60,7 @@ public final class FnPath extends ContextFn {
 
     final TokenBuilder tb = new TokenBuilder();
     // add root function
-    if(node.type != NodeType.DOC)
-      tb.add(QNm.eqName(QueryText.FN_URI, Token.token("root()")));
+    if(node.type != NodeType.DOC) tb.add(QNm.eqName(QueryText.FN_URI, Token.token("root()")));
     // add all steps in reverse order
     for(int i = tl.size() - 1; i >= 0; --i) tb.add('/').add(tl.get(i));
     return Str.get(tb.isEmpty() ? Token.SLASH : tb.finish());
@@ -69,6 +68,6 @@ public final class FnPath extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return exprs.length > 0 ? optFirst() : this;
+    return optFirst(true);
   }
 }

@@ -30,6 +30,8 @@ abstract class Format extends StandardFunc {
     if(el == 3 || el == 4) throw Functions.wrongArity(definition, el, new IntList(), info);
 
     final Item item = exprs[0].atomItem(qc, info);
+    if(item == Empty.VALUE) return Empty.VALUE;
+
     final byte[] picture = toEmptyToken(exprs[1], qc);
 
     final boolean more = el == 5;
@@ -40,7 +42,6 @@ abstract class Format extends StandardFunc {
       if(calendar != null) calendar = trim(calendar);
     }
     final byte[] place = more ? toEmptyToken(exprs[4], qc) : EMPTY;
-    if(item == Empty.VALUE) return Empty.VALUE;
 
     final ADate date = (ADate) checkType(item, tp);
     final Formatter form = Formatter.get(language);
@@ -49,6 +50,6 @@ abstract class Format extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return optFirst();
+    return optFirst(true);
   }
 }

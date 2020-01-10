@@ -21,8 +21,7 @@ public final class FnJsonDoc extends FnParseJson {
       item = unparsedText(qc, false, false);
     } catch(final QueryException ex) {
       Util.debug(ex);
-      throw ex.error() == INVCHARS_X ?
-        PARSE_JSON_X.get(info, ex.getLocalizedMessage()) : ex;
+      throw ex.error() == INVCHARS_X ? PARSE_JSON_X.get(info, ex.getLocalizedMessage()) : ex;
     }
     return item == Empty.VALUE ? Empty.VALUE : parse(item.string(info), false, qc);
   }

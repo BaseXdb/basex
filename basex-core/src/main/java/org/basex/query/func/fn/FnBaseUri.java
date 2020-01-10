@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -33,5 +34,10 @@ public final class FnBaseUri extends ContextFn {
       nd = nd.parent();
     } while(!base.isAbsolute());
     return base;
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    return optFirst(false);
   }
 }

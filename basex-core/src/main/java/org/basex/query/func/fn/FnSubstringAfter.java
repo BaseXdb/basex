@@ -16,7 +16,7 @@ import org.basex.util.*;
  */
 public final class FnSubstringAfter extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] string = toEmptyToken(exprs[0], qc), sub = toEmptyToken(exprs[1], qc);
     final Collation coll = toCollation(2, qc);
     if(coll == null) {

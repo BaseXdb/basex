@@ -100,7 +100,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   COMPARE(FnCompare.class, "compare(first,second[,collation])", arg(STR_ZO, STR_ZO, STR_O), ITR_ZO),
   /** XQuery function. */
-  CONCAT(FnConcat.class, "concat(atom1,atom2[,...])", arg(AAT_ZO, AAT_ZO), STR_O),
+  CONCAT(FnConcat.class, "concat(value1,value2[,...])", arg(AAT_ZO, AAT_ZO), STR_O),
   /** XQuery function. */
   CONTAINS(FnContains.class, "contains(string,sub[,collation])", arg(STR_ZO, STR_ZO, STR_O), BLN_O),
   /** XQuery function. */
@@ -361,7 +361,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   STRING(FnString.class, "string([item])", arg(ITEM_ZO), STR_O),
   /** XQuery function. */
-  STRING_JOIN(FnStringJoin.class, "string-join(items[,sep])", arg(ITEM_ZM, STR_O), STR_O),
+  STRING_JOIN(FnStringJoin.class, "string-join(items[,sep])", arg(AAT_ZM, STR_O), STR_O),
   /** XQuery function. */
   STRING_LENGTH(FnStringLength.class, "string-length([string])", arg(STR_ZO), ITR_O),
   /** XQuery function. */
@@ -1320,7 +1320,7 @@ public enum Function implements AFunction {
   _UTIL_CHARS(UtilChars.class, "chars(string)", arg(STR_O), STR_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_DEEP_EQUAL(UtilDeepEqual.class, "deep-equal(items1,items2[,options])",
-      arg(ITEM_ZM, ITEM_ZM, ITEM_O), BLN_O, UTIL_URI),
+      arg(ITEM_ZM, ITEM_ZM, STR_ZM), BLN_O, UTIL_URI),
   /** XQuery function. */
   _UTIL_DDO(UtilDdo.class, "ddo(nodes)", arg(NOD_ZM), NOD_ZM, UTIL_URI),
   /** XQuery function. */

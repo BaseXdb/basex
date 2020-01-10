@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public final class FnName extends ContextFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toEmptyNode(ctxArg(0, qc), qc);
     final QNm qname = node != null ? node.qname() : null;
     return qname != null ? Str.get(qname.string()) : Str.ZERO;

@@ -8,6 +8,7 @@ import org.basex.build.html.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -34,5 +35,10 @@ public final class HtmlParse extends StandardFunc {
     } catch(final IOException ex) {
       throw HTML_PARSE_X.get(info, ex);
     }
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    return optFirst(true);
   }
 }
