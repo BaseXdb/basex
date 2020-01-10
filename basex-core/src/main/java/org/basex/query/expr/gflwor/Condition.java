@@ -61,7 +61,7 @@ public final class Condition extends Single {
 
   @Override
   public Condition optimize(final CompileContext cc) throws QueryException {
-    expr = expr.optimizeEbv(cc);
+    expr = cc.simplifyEbv(expr);
     return this;
   }
 

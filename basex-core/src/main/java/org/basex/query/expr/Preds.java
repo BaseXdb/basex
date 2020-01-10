@@ -151,7 +151,7 @@ public abstract class Preds extends Arr {
       final ExprList list = new ExprList(es);
       boolean pos = false;
       for(final Expr ex : exprs) {
-        final Expr ebv = ex.optimizeEbv(cc);
+        final Expr ebv = cc.simplifyEbv(ex);
         Expr expr = ebv;
         if(expr instanceof CmpG || expr instanceof CmpV) {
           final Cmp cmp = (Cmp) expr;
@@ -279,7 +279,7 @@ public abstract class Preds extends Arr {
    * @return expression
    * @throws QueryException query exception
    */
-  public final Expr optimizeEbv(final Expr root, final CompileContext cc) throws QueryException {
+  public final Expr simplify(final Expr root, final CompileContext cc) throws QueryException {
     // only single predicate can be rewritten; root expression must yield nodes
     if(exprs.length != 1 || !(root.seqType().type instanceof NodeType)) return this;
 
@@ -301,7 +301,8 @@ public abstract class Preds extends Arr {
         if(expr instanceof ContextValue) expr1 = root;
         // a[text() = 'x'] -> a/text() = 'x'
         if(expr instanceof Path) expr1 = Path.get(info, root, expr).optimize(cc);
-        if(expr1 != null) return new CmpG(expr1, expr2, cmp.op, cmp.coll, cmp.sc, cmp.info);
+        if(expr1 != null)
+          return new CmpG(expr1, expr2, cmp.op, cmp.coll, cmp.sc, cmp.info).optimize(cc);
       }
     }
 
@@ -317,7 +318,7 @@ public abstract class Preds extends Arr {
         // a[text() contains text 'x'] -> a/text() contains text 'x'
         if(expr instanceof Path) expr1 = Path.get(info, root, expr).optimize(cc);
 
-        if(expr1 != null) return new FTContains(expr1, ftexpr, cmp.info);
+        if(expr1 != null) return new FTContains(expr1, ftexpr, cmp.info).optimize(cc);
       }
     }
     return this;

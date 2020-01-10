@@ -9,6 +9,7 @@ import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.index.path.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.index.*;
@@ -164,21 +165,25 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final Expr optimizeEbv(final CompileContext cc) throws QueryException {
-    final Expr last = steps[steps.length - 1];
-    if(last instanceof Step) {
-      final Step step = (Step) last;
-      if(step.exprs.length == 1 && step.seqType().type instanceof NodeType &&
-          !step.exprs[0].seqType().mayBeNumber()) {
-        // merge nested predicates. example: if(a[b]) ->  if(a/b)
-        final Expr s = step.optimizeEbv(this, cc);
-        if(s != step) {
-          step.exprs = new Expr[0];
-          return cc.replaceEbv(this, s);
+  public final Expr simplify(final CompileContext cc, final Simplify simplify)
+      throws QueryException {
+
+    if(simplify == Simplify.EBV) {
+      final Expr last = steps[steps.length - 1];
+      if(last instanceof Step) {
+        final Step step = (Step) last;
+        if(step.exprs.length == 1 && step.seqType().type instanceof NodeType &&
+            !step.exprs[0].seqType().mayBeNumber()) {
+          // merge nested predicates. example: if(a[b]) ->  if(a/b)
+          final Expr s = step.simplify(this, cc);
+          if(s != step) {
+            step.exprs = new Expr[0];
+            return cc.simplify(this, s);
+          }
         }
       }
     }
-    return super.optimizeEbv(cc);
+    return super.simplify(cc, simplify);
   }
 
   @Override

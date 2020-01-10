@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -295,25 +296,29 @@ public abstract class Expr extends ExprInfo {
   public abstract Expr copy(CompileContext cc, IntObjMap<Var> vm);
 
   /**
-   * <p>This method is e.g. overwritten by expressions like {@link CmpG}, {@link CmpV},
-   * {@link FnBoolean}, {@link FnExists}, {@link Path} or {@link Filter}.
-   * It is called at compile time by expressions that perform
-   * effective boolean value tests (e.g. {@link If} or {@link Preds}).
-   * If the arguments of the called expression return a boolean anyway,
-   * the expression will be simplified.</p>
-   * <p>Example in {@link CmpV}:
-   * <code>if($x eq true())</code> is rewritten to <code>if($x)</code> if {@code $x}
-   * is known to return a single boolean.</p>
+   * This function is called during compile-time for expressions whose operands might be simplified.
+   * Different types of simplifications are supported:
+   * <ul>
+   *   <li> {@link Simplify#EBV}: Simplify effective boolean tests.
+   *   Called by {@link If}, {@link Logical}, {@link Preds}, {@link Condition}, {@link Where},
+   *   {@link FnBoolean}, {@link FnNot};
+   *   overwritten by {@link CmpG}, {@link CmpV}, {@link FnBoolean}, {@link FnExists},
+   *   {@link Path} or {@link Filter}</li>
+   * </ul>
    * @param cc compilation context
+   * @param simplify type of simplification
    * @return optimized expression
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr optimizeEbv(final CompileContext cc) throws QueryException {
-    // return true if a deterministic expression returns at least one node
-    final SeqType st = seqType();
-    return st.type instanceof NodeType && st.oneOrMore() && !has(Flag.NDT) ?
-      cc.replaceEbv(this, Bln.TRUE) : this;
+  public Expr simplify(final CompileContext cc, final Simplify simplify) throws QueryException {
+    if(simplify == Simplify.EBV) {
+      // return true if a deterministic expression returns at least one node
+      final SeqType st = seqType();
+      if(st.type instanceof NodeType && st.oneOrMore() && !has(Flag.NDT))
+        return cc.simplify(this, Bln.TRUE);
+    }
+    return this;
   }
 
   /**

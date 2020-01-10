@@ -72,7 +72,7 @@ public final class If extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // static condition: return branch in question
-    cond = cond.optimizeEbv(cc);
+    cond = cc.simplifyEbv(cond);
     if(cond instanceof Value) return cc.replaceWith(this, exprs[branch(cc.qc)]);
 
     // if A then B else B -> B (errors in A will be ignored)

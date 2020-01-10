@@ -26,6 +26,11 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class CompileContext {
+  /** Modes for simplifying operands of expressions at compile time. */
+  public enum Simplify {
+    /** Effective boolean values. */ EBV
+  };
+
   /** Limit for the size of sequences that are pre-evaluated. */
   public static final int MAX_PREEVAL = 1 << 18;
 
@@ -173,12 +178,13 @@ public final class CompileContext {
   }
 
   /**
-   * Replaces an EBV expression.
+   * Replaces an expression with a simplified one.
+   * As the simplified expression may have a different type, no type refinement is performed.
    * @param expr expression
    * @param result resulting expression
    * @return optimized expression
    */
-  public Expr replaceEbv(final Expr expr, final Expr result) {
+  public Expr simplify(final Expr expr, final Expr result) {
     return replaceWith(expr, result, false);
   }
 
@@ -254,4 +260,15 @@ public final class CompileContext {
       throws QueryException {
     return function.get(sc(), ii, exprs).optimize(this);
   }
+
+  /**
+   * Simplifies an expression for EBV tests.
+   * @param expr expression to simplify
+   * @return simplified expression
+   * @throws QueryException query exception
+   */
+  public Expr simplifyEbv(final Expr expr) throws QueryException {
+    return expr.simplify(this, Simplify.EBV);
+  }
+
 }

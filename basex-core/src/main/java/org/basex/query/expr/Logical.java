@@ -59,7 +59,7 @@ abstract class Logical extends Arr {
 
     ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
-      final Expr ex = expr.optimizeEbv(cc);
+      final Expr ex = cc.simplifyEbv(expr);
       if(union ? ex instanceof Or : ex instanceof And) {
         // flatten nested expressions
         for(final Expr exp : ((Logical) ex).exprs) list.add(exp);

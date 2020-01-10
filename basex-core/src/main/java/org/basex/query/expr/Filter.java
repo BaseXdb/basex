@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.expr.path.Axis.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
@@ -195,9 +196,14 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final Expr optimizeEbv(final CompileContext cc) throws QueryException {
-    final Expr expr = optimizeEbv(root, cc);
-    return expr == this ? super.optimizeEbv(cc) : cc.replaceEbv(this, expr);
+  public final Expr simplify(final CompileContext cc, final Simplify simplify)
+      throws QueryException {
+
+    if(simplify == Simplify.EBV) {
+      final Expr expr = simplify(root, cc);
+      if(expr != this) return cc.simplify(this, expr);
+    }
+    return super.simplify(cc, simplify);
   }
 
   /**

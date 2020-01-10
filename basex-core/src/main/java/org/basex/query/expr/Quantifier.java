@@ -58,6 +58,9 @@ public final class Quantifier extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    // example: ... satisfies $v[. = '']  ->  satisfies $v = ''
+    expr = cc.simplifyEbv(expr);
+
     // return pre-evaluated result
     if(expr instanceof Value) return cc.preEval(this);
 
