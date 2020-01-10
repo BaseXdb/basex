@@ -832,7 +832,8 @@ public abstract class Path extends ParseExpr {
     cc.pushFocus(root);
     try {
       for(int s = 0; s < sl; s++) {
-        Expr curr = steps[s], next = s < sl - 1 ? mergeStep(curr, steps[s + 1], cc) : null;
+        Expr curr = steps[s];
+        final Expr next = s < sl - 1 ? mergeStep(curr, steps[s + 1], cc) : null;
         if(next != null) {
           cc.info(QueryText.OPTMERGE_X, next);
           curr = next;

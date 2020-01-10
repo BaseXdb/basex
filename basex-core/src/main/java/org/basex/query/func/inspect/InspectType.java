@@ -20,7 +20,7 @@ public final class InspectType extends StandardFunc {
 
     // combine types of all items to get more specific type
     Type type = null;
-    for(Item item : value) {
+    for(final Item item : value) {
       type = type == null ? item.type : type.union(item.type);
     }
     return Str.get(SeqType.get(type, value.seqType().occ).toString());

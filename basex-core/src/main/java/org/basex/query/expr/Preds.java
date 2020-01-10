@@ -147,7 +147,7 @@ public abstract class Preds extends Arr {
     // remember current context value (will be temporarily overwritten)
     cc.pushFocus(root);
     try {
-      int el = exprs.length;
+      final int el = exprs.length;
       final ExprList list = new ExprList(el);
       boolean pos = false;
       for(final Expr ex : exprs) {

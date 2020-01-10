@@ -14,7 +14,7 @@ public interface Checks<T> {
    * @param values values to check
    * @return result of check
    */
-  default boolean any(Iterable<T> values) {
+  default boolean any(final Iterable<T> values) {
     for(final T value : values) if(ok(value)) return true;
     return false;
   }
@@ -24,7 +24,7 @@ public interface Checks<T> {
    * @param values values to check
    * @return result of check
    */
-  default boolean all(Iterable<T> values) {
+  default boolean all(final Iterable<T> values) {
     for(final T value : values) if(!ok(value)) return false;
     return true;
   }
@@ -34,7 +34,7 @@ public interface Checks<T> {
    * @param values values to check
    * @return index, {@code -1} otherwise
    */
-  default int index(Iterable<T> values) {
+  default int index(final Iterable<T> values) {
     int i = 0;
     for(final T value : values) {
       if(ok(value)) return i;
@@ -48,7 +48,7 @@ public interface Checks<T> {
    * @param values values to check
    * @return result of check
    */
-  default boolean any(T[] values) {
+  default boolean any(final T[] values) {
     for(final T value : values) if(ok(value)) return true;
     return false;
   }
@@ -58,7 +58,7 @@ public interface Checks<T> {
    * @param values values to check
    * @return result of check
    */
-  default boolean all(T[] values) {
+  default boolean all(final T[] values) {
     for(final T value : values) if(!ok(value)) return false;
     return true;
   }
@@ -68,7 +68,7 @@ public interface Checks<T> {
    * @param values values to check
    * @return index, {@code -1} otherwise
    */
-  default int index(T[] values) {
+  default int index(final T[] values) {
     int i = 0;
     for(final T value : values) {
       if(ok(value)) return i;
