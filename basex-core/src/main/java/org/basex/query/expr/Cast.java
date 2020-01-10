@@ -58,7 +58,7 @@ public final class Cast extends Single {
     if(type instanceof ListType) {
       exprType.assign(type.atomic());
     } else {
-      exprType.assign(type, st.oneNoArray() ? Occ.ONE : Occ.ZERO_ONE);
+      exprType.assign(type, st.oneOrMore() && !st.mayBeArray() ? Occ.ONE : Occ.ZERO_ONE);
     }
     return this;
   }

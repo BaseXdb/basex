@@ -41,14 +41,15 @@ public final class Unary extends Single {
   public Expr optimize(final CompileContext cc) throws QueryException {
     expr = cc.simplifyAtom(expr);
 
+    // no negation, numeric value: return operand
     final SeqType st = expr.seqType();
+    if(!minus && st.instanceOf(SeqType.NUM_ZO)) return cc.replaceWith(this, expr);
+
     final Type type = st.type;
     exprType.assign(type.isUntyped() ? AtomType.DBL : type.isNumber() ? type : AtomType.ITR,
-      st.oneNoArray() ? Occ.ONE : Occ.ZERO_ONE);
+      st.oneOrMore() && !st.mayBeArray() ? Occ.ONE : Occ.ZERO_ONE);
 
-    // no negation, numeric value: return operand
-    return !minus && st.instanceOf(SeqType.NUM_ZO) ? cc.replaceWith(this, expr) :
-      super.optimize(cc);
+    return super.optimize(cc);
   }
 
   @Override

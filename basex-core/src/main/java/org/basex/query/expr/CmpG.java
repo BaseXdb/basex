@@ -284,7 +284,7 @@ public class CmpG extends Cmp {
   public final Expr invert(final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    return st1.oneNoArray() && st2.oneNoArray() ?
+    return st1.one() && !st1.mayBeArray() && st2.one() && !st2.mayBeArray() ?
       new CmpG(expr1, expr2, op.invert(), coll, sc, info).optimize(cc) : this;
   }
 

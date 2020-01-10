@@ -65,10 +65,10 @@ public class FnSum extends StandardFunc {
       // sequence is not empty: assign result type
       final Type type1 = st1.type;
       if(type1.isNumber()) exprType.assign(type1.seqType());
-      if(type1.isUntyped()) exprType.assign(SeqType.DBL_O);
+      else if(type1.isUntyped()) exprType.assign(SeqType.DBL_O);
     } else if(st2 != null && !st2.zero() && !st2.mayBeArray()) {
-      // sequence may be empty: include non-empty default argument in tests
-      exprType.assign(Calc.PLUS.type(st1.type, st2.type), st2.one() ? Occ.ONE : Occ.ZERO_ONE);
+      // if input may be empty: consider default argument in static type
+      exprType.assign(Calc.PLUS.type(st1.type, st2.type), st2.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
     }
     return this;
   }

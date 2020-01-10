@@ -527,14 +527,6 @@ public final class SeqType {
   }
 
   /**
-   * Tests if expressions of this type yield one item and is no array.
-   * @return result of check
-   */
-  public boolean oneNoArray() {
-    return one() && !mayBeArray();
-  }
-
-  /**
    * Tests if expressions of this type yield one or more items.
    * @return result of check
    */
@@ -556,8 +548,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeArray() {
-    return !(zero() || type.instanceOf(AtomType.AAT) || type instanceof ListType ||
-      type instanceof MapType || type instanceof NodeType);
+    return !(zero() || type.atomic() != null || type instanceof MapType);
   }
 
   /**

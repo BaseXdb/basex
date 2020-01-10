@@ -101,7 +101,7 @@ public final class Lookup extends Arr {
     // derive type from input expression
     final SeqType st = ft.declType;
     Occ occ = st.occ;
-    if(keys == Str.WC || ctx.size() != 1 || !keys.seqType().oneNoArray()) {
+    if(keys == Str.WC || ctx.size() != 1 || !keys.seqType().one() || keys.seqType().mayBeArray()) {
       // key is wildcard, or expression yields no single item
       occ = occ.union(Occ.ZERO_MORE);
     } else if(map) {

@@ -42,14 +42,14 @@ public final class Arith extends Arr {
     final boolean nums = type1.isNumberOrUntyped() && type2.isNumberOrUntyped();
 
     final Type type = calc.type(type1, type2);
-    final boolean one = st1.oneNoArray() && st2.oneNoArray();
-    exprType.assign(type, one ? Occ.ONE : Occ.ZERO_ONE);
+    final boolean noarray = !st1.mayBeArray() && !st2.mayBeArray();
+    exprType.assign(type, noarray && st1.oneOrMore() && st2.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
 
     Expr expr = emptyExpr();
     if(expr == this) {
       if(allAreValues(false)) {
         expr = value(cc.qc);
-      } else if(nums && one) {
+      } else if(nums && noarray && st1.one() && st2.one()) {
         // example: number($a) + 0 -> number($a)
         final Expr ex = calc.optimize(expr1, expr2);
         if(ex != null && ex.seqType().type.eq(type)) expr = ex;

@@ -182,16 +182,18 @@ public final class CmpV extends Cmp {
         // check if operands will always yield a single item
         final Expr expr1 = exprs[0], expr2 = exprs[1];
         final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-        if(st1.oneNoArray() && st2.oneNoArray()) {
+        if(st1.oneOrMore() && !st1.mayBeArray() && st2.oneOrMore() && !st2.mayBeArray()) {
           exprType.assign(Occ.ONE);
 
           // no type check: rewrite to general expression (faster evaluation)
           final Type type1 = st1.type, type2 = st2.type;
-          if(type1 == type2 && !AtomType.AAT.instanceOf(type1) &&
+          if(st1.one() && st2.one() && (
+            type1 == type2 && !AtomType.AAT.instanceOf(type1) &&
               (type1.isSortable() || opV != OpV.EQ && opV != OpV.NE) ||
-              type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
-              type1.instanceOf(AtomType.NUM) && type2.instanceOf(AtomType.NUM) ||
-              type1.instanceOf(AtomType.DUR) && type2.instanceOf(AtomType.DUR)) {
+            type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
+            type1.instanceOf(AtomType.NUM) && type2.instanceOf(AtomType.NUM) ||
+            type1.instanceOf(AtomType.DUR) && type2.instanceOf(AtomType.DUR))
+          ) {
             expr = new CmpG(expr1, expr2, OpG.get(opV), coll, sc, info).optimize(cc);
           }
         }
@@ -215,7 +217,7 @@ public final class CmpV extends Cmp {
   public Expr invert(final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    return st1.oneNoArray() && st2.oneNoArray() ?
+    return st1.one() && !st1.mayBeArray() && st2.one() && !st2.mayBeArray() ?
       new CmpV(expr1, expr2, opV.invert(), coll, sc, info).optimize(cc) : this;
   }
 

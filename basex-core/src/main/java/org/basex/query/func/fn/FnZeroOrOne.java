@@ -32,7 +32,7 @@ public final class FnZeroOrOne extends StandardFunc {
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
     if(st.zeroOrOne()) return expr;
-    if(st.occ.min > 1) throw ZEROORONE.get(info);
+    if(expr.size() > 1) throw ZEROORONE.get(info);
     exprType.assign(st.type);
     return this;
   }

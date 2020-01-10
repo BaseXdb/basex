@@ -40,7 +40,7 @@ public final class FnExactlyOne extends StandardFunc {
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
     if(st.one()) return expr;
-    if(st.zero() || st.occ.min > 1) throw EXACTLYONE.get(info);
+    if(st.zero() || expr.size() > 1) throw EXACTLYONE.get(info);
     exprType.assign(st.type);
     return this;
   }

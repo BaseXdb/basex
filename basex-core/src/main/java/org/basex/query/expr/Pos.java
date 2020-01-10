@@ -55,7 +55,7 @@ public final class Pos extends Arr {
           min = start;
           max = start.equals(end) ? start : end;
         }
-      } else if(st2.oneNoArray()) {
+      } else if(st2.one() && !st2.mayBeArray()) {
         switch(op) {
           case EQ:
             min = cmp2;
