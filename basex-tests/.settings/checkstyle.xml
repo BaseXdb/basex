@@ -10,6 +10,11 @@
 -->
 <module name="Checker">
   <property name="severity" value="warning"/>
+  <module name="LineLength">
+    <property name="ignorePattern" value="^(import| \*)"/>
+    <property name="max" value="100"/>
+    <property name="tabWidth" value="2"/>
+  </module>
   <module name="TreeWalker">
     <module name="JavadocStyle">
       <property name="checkEmptyJavadoc" value="true"/>
@@ -25,11 +30,6 @@
     <module name="TypeName"/>
     <module name="IllegalImport"/>
     <module name="RedundantImport"/>
-    <module name="LineLength">
-      <property name="ignorePattern" value="^(import| \*)"/>
-      <property name="max" value="100"/>
-      <property name="tabWidth" value="2"/>
-    </module>
     <module name="EmptyForIteratorPad"/>
     <module name="MethodParamPad"/>
     <module name="NoWhitespaceAfter">
