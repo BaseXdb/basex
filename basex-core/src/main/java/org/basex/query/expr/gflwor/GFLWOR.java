@@ -483,9 +483,9 @@ public final class GFLWOR extends ParseExpr {
     final HashSet<For> fors = new HashSet<>();
     for(int i = 0; i < clauses.size(); i++) {
       final Clause clause = clauses.get(i);
-      if(!(clause instanceof Where) || clause.has(Flag.NDT)) continue;
-      final Where where = (Where) clause;
+      if(!(clause instanceof Where)) continue;
 
+      final Where where = (Where) clause;
       if(where.expr instanceof Value) {
         // if test is always false, skip remaining tests (no results possible)
         if(!where.expr.ebv(cc.qc, where.info).bool(where.info)) {
@@ -495,7 +495,7 @@ public final class GFLWOR extends ParseExpr {
         // test is always true: remove it
         clauses.remove(i--);
         changed = true;
-      } else {
+      } else if(!clause.has(Flag.NDT, Flag.POS, Flag.CTX)) {
         // find insertion position
         int insert = -1;
         for(int j = i; --j >= 0;) {

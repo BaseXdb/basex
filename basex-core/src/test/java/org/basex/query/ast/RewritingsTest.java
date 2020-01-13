@@ -690,4 +690,10 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("<A>A</A> ! data() = data(<A>B</A>)", false, empty(DATA));
   }
+
+  /** Inlining of where clauses. */
+  @Test public void gh1782() {
+    check("1 ! (for $a in (1,2) where $a = last() return $a)", 1, exists(GFLWOR.class));
+    check("(3,4) ! (for $a in (1,2) where . = $a return $a)", "", exists(GFLWOR.class));
+  }
 }
