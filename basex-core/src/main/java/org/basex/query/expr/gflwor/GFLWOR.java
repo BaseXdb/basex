@@ -495,7 +495,7 @@ public final class GFLWOR extends ParseExpr {
         // test is always true: remove it
         clauses.remove(i--);
         changed = true;
-      } else if(!clause.has(Flag.NDT, Flag.CTX)) {
+      } else if(!clause.has(Flag.NDT)) {
         // find insertion position
         int insert = -1;
         for(int j = i; --j >= 0;) {
@@ -513,22 +513,24 @@ public final class GFLWOR extends ParseExpr {
         }
 
         // try to rewrite where clause to predicate
-        final int newPos = insert < 0 ? i : insert;
-        for(int b4 = newPos; --b4 >= 0;) {
-          final Clause before = clauses.get(b4);
-          if(before instanceof For) {
-            final For fr = (For) before;
-            if(fr.toPredicate(cc, where.expr)) {
-              // for $i in ('a', 'b') where $i return $i -> for $i in ('a', 'b')[.] return $i
-              fors.add((For) before);
-              clauses.remove(newPos);
-              i--;
-              changed = true;
+        if(!clause.has(Flag.CTX)) {
+          final int newPos = insert < 0 ? i : insert;
+          for(int b4 = newPos; --b4 >= 0;) {
+            final Clause before = clauses.get(b4);
+            if(before instanceof For) {
+              final For fr = (For) before;
+              if(fr.toPredicate(cc, where.expr)) {
+                // for $i in ('a', 'b') where $i return $i -> for $i in ('a', 'b')[.] return $i
+                fors.add((For) before);
+                clauses.remove(newPos);
+                changed = true;
+                i--;
+              }
+            } else if(before instanceof Where) {
+              continue;
             }
-          } else if(before instanceof Where) {
-            continue;
+            break;
           }
-          break;
         }
       }
     }
