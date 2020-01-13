@@ -137,7 +137,8 @@ public abstract class AxisPath extends Path {
    * @return resulting path instance
    */
   public final ParseExpr addPreds(final Expr... preds) {
-    steps[steps.length - 1] = step(steps.length - 1).addPreds(preds);
+    final int sl = steps.length - 1;
+    steps[sl] = step(sl).addPreds(preds);
     return copyType(get(info, root, steps));
   }
 

@@ -77,7 +77,7 @@ public final class CmpIR extends Single {
       mn = range[0];
       mx = range[1];
     } else if(expr2 instanceof Int && cmp.op != OpG.EQ) {
-      // do not rewrite equality comparisons if single integer is compared
+      // do not rewrite equality comparisons of single integers
       mn = ((Int) expr2).itr();
       mx = mn;
     } else {

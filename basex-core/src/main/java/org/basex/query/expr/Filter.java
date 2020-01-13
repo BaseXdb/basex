@@ -216,8 +216,8 @@ public abstract class Filter extends Preds {
     // no predicates: return root
     if(exprs.length == 0) return root;
     /* axis path: attach non-positional predicates to last step.
-     * example: (//x)[text() = 'a'] != //x[text() = 'a']
-     * illegal: (//x)[1] != //x[1] */
+     * example: (//x)[text() = 'a']  ->  //x[text() = 'a']
+     * illegal: (//x)[1]  ->  //x[1] */
     if(root instanceof AxisPath && !positional(exprs)) return ((AxisPath) root).addPreds(exprs);
     return null;
   }
