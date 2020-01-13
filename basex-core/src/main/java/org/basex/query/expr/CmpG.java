@@ -165,7 +165,7 @@ public class CmpG extends Cmp {
       expr = opt(cc);
 
       // range comparisons
-      if(expr == this) expr = CmpIR.get(this, cc);
+      if(expr == this) expr = CmpIR.get(this, false, cc);
       if(expr == this) expr = CmpR.get(this, cc);
       if(expr == this) expr = CmpSR.get(this, cc);
 

@@ -62,10 +62,13 @@ public final class CmpIR extends Single {
    * Tries to convert the specified expression into a range expression.
    * @param cmp expression to be converted
    * @param cc compilation context
+   * @param eq also rewrite equality comparisons of single integers
    * @return new or original expression
    * @throws QueryException query exception
    */
-  static Expr get(final CmpG cmp, final CompileContext cc) throws QueryException {
+  public static Expr get(final CmpG cmp, final boolean eq, final CompileContext cc)
+      throws QueryException {
+
     final Expr expr1 = cmp.exprs[0], expr2 = cmp.exprs[1];
 
     // only rewrite deterministic integer comparisons
@@ -76,8 +79,7 @@ public final class CmpIR extends Single {
       final long[] range = ((RangeSeq) expr2).range(false);
       mn = range[0];
       mx = range[1];
-    } else if(expr2 instanceof Int && cmp.op != OpG.EQ) {
-      // do not rewrite equality comparisons of single integers
+    } else if(expr2 instanceof Int && (eq || cmp.op != OpG.EQ)) {
       mn = ((Int) expr2).itr();
       mx = mn;
     } else {

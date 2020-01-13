@@ -563,9 +563,12 @@ public final class GFLWOR extends ParseExpr {
           if(!(cl instanceof For || cl instanceof Let) || cl.has(Flag.NDT)) break;
           continue;
         }
-        final Where where = (Where) cl;
-        if(!(where.expr instanceof CmpIR)) continue;
-        final CmpIR cmp = (CmpIR) where.expr;
+
+        Expr expr = ((Where) cl).expr;
+        if(expr instanceof CmpG) expr = CmpIR.get((CmpG) expr, true, cc);
+        if(!(expr instanceof CmpIR)) continue;
+
+        final CmpIR cmp = (CmpIR) expr;
         if(!(cmp.expr instanceof VarRef)) continue;
 
         // remove clause and ensure that the positional variable is only used once
@@ -575,7 +578,7 @@ public final class GFLWOR extends ParseExpr {
            * NEW: for $v in E[position() = P] ... */
           pos.addPredicate(ItrPos.get(cmp.min, cmp.max, cmp.info));
           pos.expr = pos.expr.optimize(cc);
-          cc.info(QueryText.OPTPRED_X, cmp);
+          cc.info(QueryText.OPTPRED_X, expr);
           changed = true;
         } else {
           // re-add variable, give up

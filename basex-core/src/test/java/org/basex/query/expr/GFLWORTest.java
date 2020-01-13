@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.up.expr.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -370,5 +371,10 @@ public final class GFLWORTest extends QueryPlanTest {
       "  return $c",
       "<x/>"
     );
+  }
+
+  /** Inlining of positional variable. */
+  @Test public void posVar() {
+    check("for $v at $p in (1, 2) where $p = 2 return $v", 2, root(Int.class));
   }
 }
