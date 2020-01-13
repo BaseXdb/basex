@@ -495,7 +495,7 @@ public final class GFLWOR extends ParseExpr {
         // test is always true: remove it
         clauses.remove(i--);
         changed = true;
-      } else if(!clause.has(Flag.NDT, Flag.POS, Flag.CTX)) {
+      } else if(!clause.has(Flag.NDT, Flag.CTX)) {
         // find insertion position
         int insert = -1;
         for(int j = i; --j >= 0;) {

@@ -262,7 +262,7 @@ public final class Functions {
       }
       // context/positional access must be bound to original focus
       // example for invalid query: let $f := last#0 return (1,2)[$f()]
-      return sf.has(Flag.CTX, Flag.POS)
+      return sf.has(Flag.CTX)
           ? new FuncLit(anns, name, params, sf, ft.seqType(), vs, ii)
           : closureOrFItem(anns, name, params, fd.type(arity, anns), sf, vs, ii, runtime, upd);
     }

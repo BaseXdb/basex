@@ -93,7 +93,7 @@ public abstract class Cmp extends Arr {
    */
   final Expr opt(final CompileContext cc) throws QueryException {
     final OpV op = opV();
-    Expr expr = optEqual(op, this instanceof CmpV, cc);
+    Expr expr = optEqual(op, cc);
     if(expr == this) expr = optBoolean(op, cc);
     if(expr == this) expr = optCount(op, cc);
     if(expr == this) expr = optStringLength(op, cc);
@@ -111,11 +111,11 @@ public abstract class Cmp extends Arr {
    * </ul>
    * @param op operator
    * @param cc compilation context
-   * @param single single arguments
    * @return resulting expression
    */
-  private Expr optEqual(final OpV op, final boolean single, final CompileContext cc) {
+  private Expr optEqual(final OpV op, final CompileContext cc) {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final boolean single = this instanceof CmpV;
     if((op == OpV.EQ || single && op == OpV.NE) && expr1.equals(expr2) && !expr1.has(Flag.NDT) &&
         (!expr1.has(Flag.CTX) || cc.qc.focus.value != null)) {
       /* consider query flags

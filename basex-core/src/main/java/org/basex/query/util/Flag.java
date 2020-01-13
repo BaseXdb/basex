@@ -27,6 +27,7 @@ public enum Flag {
   NDT,
   /**
    * Positional access. Prevents simple iterative evaluation.
+   * Each expression that contains this flag must also contain {@link #CTX}.
    * Examples: position(), last().
    */
   POS,

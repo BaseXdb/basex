@@ -139,7 +139,7 @@ public final class Pos extends Arr {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.POS.in(flags);
+    return Flag.POS.in(flags) || Flag.CTX.in(flags);
   }
 
   @Override

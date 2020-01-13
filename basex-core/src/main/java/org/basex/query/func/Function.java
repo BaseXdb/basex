@@ -1266,7 +1266,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _UPDATE_APPLY(UpdateApply.class, "apply(function,args)", arg(FUNC_O, ARRAY_O), EMP,
-      flag(Flag.POS, UPD, NDT, HOF), UPDATE_URI),
+      flag(Flag.POS, CTX, UPD, NDT, HOF), UPDATE_URI),
   /** XQuery function. */
   _UPDATE_CACHE(UpdateCache.class, "cache([reset])", arg(BLN_O), ITEM_ZM, flag(NDT), UPDATE_URI),
   /** XQuery function. */
