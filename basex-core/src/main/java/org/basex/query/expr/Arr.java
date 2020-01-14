@@ -148,7 +148,7 @@ public abstract class Arr extends ParseExpr {
    * @param cc compilation context
    * @throws QueryException query exception
    */
-  void merge(final boolean pos, final boolean union, final CompileContext cc)
+  public void merge(final boolean pos, final boolean union, final CompileContext cc)
       throws QueryException {
     // 'a'[. = 'a' or . = 'b']  ->  'a'[. = ('a', 'b')]
     final ExprList list = new ExprList().add(exprs);

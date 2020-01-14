@@ -138,10 +138,10 @@ public abstract class Preds extends Arr {
    * Optimizes the expression.
    * @param cc compilation context
    * @param root root expression
-   * @return optimized or original expression
+   * @return whether expression may yield results
    * @throws QueryException query exception
    */
-  protected final Expr optimize(final CompileContext cc, final Expr root) throws QueryException {
+  protected final boolean optimize(final CompileContext cc, final Expr root) throws QueryException {
     simplify(cc, root);
 
     // remember current context value (will be temporarily overwritten)
@@ -203,7 +203,7 @@ public abstract class Preds extends Arr {
         }
 
         // predicate will not yield any results
-        if(expr == Bln.FALSE) return cc.emptySeq(this);
+        if(expr == Bln.FALSE) return false;
         if(expr != ebv) cc.replaceWith(ex, expr);
 
         pos = addUnique(expr, list, pos, cc);
@@ -216,7 +216,7 @@ public abstract class Preds extends Arr {
     }
 
     // check result size
-    return exprType(root) ? this : cc.emptySeq(this);
+    return exprType(root);
   }
 
   /**

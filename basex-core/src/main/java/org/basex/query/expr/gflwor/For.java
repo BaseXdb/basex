@@ -164,11 +164,15 @@ public final class For extends ForLet {
   /**
    * Adds a predicate to the looped expression.
    * @param ex expression to add as predicate
+   * @param cc compilation context
+   * @throws QueryException query exception
    */
-  void addPredicate(final Expr ex) {
+  void addPredicate(final Expr ex, final CompileContext cc) throws QueryException {
     if(expr instanceof AxisPath && !ex.has(Flag.POS)) {
-      // add to last step of path, provided that predicate is not positional
-      expr = ((AxisPath) expr).addPreds(ex);
+      // add to last step of path, provided that predicate is not positional; merge predicates
+      final AxisPath path = (AxisPath) expr;
+      expr = path.addPreds(ex);
+      path.step(path.steps.length - 1).merge(false, false, cc);
     } else if(expr instanceof Filter) {
       // add to existing filter expression
       expr = ((Filter) expr).addPred(ex);
@@ -203,7 +207,7 @@ public final class For extends ForLet {
     // attach predicates to axis path or filter, or create a new filter
     if(pred.seqType().mayBeNumber()) pred = cc.function(Function.BOOLEAN, info, pred);
 
-    addPredicate(pred);
+    addPredicate(pred, cc);
     expr = expr.optimize(cc);
     return true;
   }

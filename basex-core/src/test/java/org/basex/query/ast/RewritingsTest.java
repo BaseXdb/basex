@@ -653,6 +653,16 @@ public final class RewritingsTest extends QueryPlanTest {
     check("6[. > 5][. < 7]", 6, count(CmpIR.class, 1));
     check("('a', 'b')[2][2]", "", empty());
     check("('a', 'b')[1][1]", "a", root(Str.class));
+
+    check("for $n in <x a='1'/>/@* where $n >= 1 where $n <= 2 return $n",
+      "a=\"1\"",
+      root(IterPath.class), count(CmpR.class, 1));
+    check("for $n in <x a='1'/>/@* where data($n) >= 1 where data($n) <= 2 return $n",
+      "a=\"1\"",
+      root(IterPath.class), count(CmpR.class, 1));
+    check("for $n in <x a='1'/>/@* where $n/data() >= 1 where $n/data() <= 2 return $n",
+      "a=\"1\"",
+      root(IterPath.class), count(CmpR.class, 1));
   }
 
   /** Merge conjunctions. */

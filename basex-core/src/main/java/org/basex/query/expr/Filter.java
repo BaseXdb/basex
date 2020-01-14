@@ -43,11 +43,13 @@ public abstract class Filter extends Preds {
    * @param ii input info
    * @param root root expression
    * @param exprs predicate expressions
-   * @return filter expression
+   * @return filter root, path or filter expression
    */
   public static Expr get(final InputInfo ii, final Expr root, final Expr... exprs) {
-    final Expr expr = simplify(root, exprs);
-    if(expr != null) return expr;
+    // no predicates: return root
+    if(exprs.length == 0) return root;
+    // return axis path
+    if(root instanceof AxisPath && !positional(exprs)) return ((AxisPath) root).addPreds(exprs);
 
     // use simple filter for single deterministic predicate
     final Expr pred = exprs[0];
@@ -81,15 +83,15 @@ public abstract class Filter extends Preds {
     if(rt.zero()) return cc.replaceWith(this, root);
 
     // simplify predicates
-    Expr expr = optimize(cc, root);
-    if(expr != this) return expr;
+    if(!optimize(cc, root)) return cc.emptySeq(this);
+    // no predicates: return root
+    if(exprs.length == 0) return root;
 
-    // if possible, convert filter to root or path expression
-    expr = simplify(root, exprs);
-    if(expr != null) return expr.optimize(cc);
-
-    // no numeric predicates..
+    // no positional access..
     if(!positional()) {
+      // convert to axis path: (//x)[text() = 'a'] -> //x[text() = 'a']
+      if(root instanceof AxisPath) return ((AxisPath) root).addPreds(exprs).optimize(cc);
+
       // rewrite filter with document nodes to path; enables index rewritings
       // example: db:open('db')[.//text() = 'x'] -> db:open('db')/.[.//text() = 'x']
       if(root instanceof Value && root.data() != null && rt.type == NodeType.DOC) {
@@ -99,7 +101,7 @@ public abstract class Filter extends Preds {
 
       // rewrite independent deterministic single filter to if expression:
       // example: (1 to 10)[$boolean] -> if($boolean) then (1 to 10) else ()
-      expr = exprs[0];
+      final Expr expr = exprs[0];
       if(exprs.length == 1 && expr.isSimple() && !expr.seqType().mayBeNumber()) {
         final Expr iff = new If(info, expr, root).optimize(cc);
         return cc.replaceWith(this, iff);
@@ -113,7 +115,7 @@ public abstract class Filter extends Preds {
     Expr r = root;
     boolean opt = false;
     for(final Expr pred : exprs) {
-      expr = null;
+      Expr expr = null;
       if(Function.LAST.is(pred)) {
         if(r instanceof Value) {
           // value: replace with last item
@@ -171,16 +173,19 @@ public abstract class Filter extends Preds {
         // predicate was optimized: replace old with new expression
         r = expr;
         opt = true;
+      } else if(r != root && r instanceof Filter) {
+        // otherwise, if root has changed: add predicate to temporary filter
+        r = ((Filter) r).addPred(pred);
       } else {
-        // no optimization: create new filter expression, or add predicate to temporary filter
-        r = r != root && r instanceof Filter ? ((Filter) r).addPred(pred) : get(info, r, pred);
+        // otherwise, create new filter expression
+        r = get(info, r, pred);
       }
     }
 
     // return optimized expression or standard iterator
     if(opt) return cc.replaceWith(this, r);
 
-    expr = get(info, root, exprs);
+    final Expr expr = get(info, root, exprs);
     return expr instanceof ParseExpr ? copyType((ParseExpr) expr) : expr;
   }
 
@@ -204,22 +209,6 @@ public abstract class Filter extends Preds {
       if(expr != this) return cc.simplify(this, expr);
     }
     return super.simplify(cc, simplify);
-  }
-
-  /**
-   * Checks if the specified filter input can be rewritten to the root or an axis path.
-   * @param root root expression
-   * @param exprs predicate expressions
-   * @return filter expression or {@code null}
-   */
-  private static Expr simplify(final Expr root, final Expr... exprs) {
-    // no predicates: return root
-    if(exprs.length == 0) return root;
-    /* axis path: attach non-positional predicates to last step.
-     * example: (//x)[text() = 'a']  ->  //x[text() = 'a']
-     * illegal: (//x)[1]  ->  //x[1] */
-    if(root instanceof AxisPath && !positional(exprs)) return ((AxisPath) root).addPreds(exprs);
-    return null;
   }
 
   @Override
