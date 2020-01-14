@@ -49,7 +49,8 @@ public abstract class Filter extends Preds {
     // no predicates: return root
     if(exprs.length == 0) return root;
     // return axis path
-    if(root instanceof AxisPath && !positional(exprs)) return ((AxisPath) root).addPreds(exprs);
+    if(root instanceof AxisPath && !positional(exprs))
+      return ((AxisPath) root).addPredicates(exprs);
 
     // use simple filter for single deterministic predicate
     final Expr pred = exprs[0];
@@ -90,7 +91,7 @@ public abstract class Filter extends Preds {
     // no positional access..
     if(!positional()) {
       // convert to axis path: (//x)[text() = 'a'] -> //x[text() = 'a']
-      if(root instanceof AxisPath) return ((AxisPath) root).addPreds(exprs).optimize(cc);
+      if(root instanceof AxisPath) return ((AxisPath) root).addPredicates(exprs).optimize(cc);
 
       // rewrite filter with document nodes to path; enables index rewritings
       // example: db:open('db')[.//text() = 'x'] -> db:open('db')/.[.//text() = 'x']
@@ -175,7 +176,7 @@ public abstract class Filter extends Preds {
         opt = true;
       } else if(r != root && r instanceof Filter) {
         // otherwise, if root has changed: add predicate to temporary filter
-        r = ((Filter) r).addPred(pred);
+        r = ((Filter) r).addPredicate(pred);
       } else {
         // otherwise, create new filter expression
         r = get(info, r, pred);
@@ -195,7 +196,7 @@ public abstract class Filter extends Preds {
    * @param pred predicate to be added
    * @return new filter
    */
-  public final CachedFilter addPred(final Expr pred) {
+  public final CachedFilter addPredicate(final Expr pred) {
     exprs = new ExprList(exprs.length + 1).add(exprs).add(pred).finish();
     return copyType(new CachedFilter(info, root, exprs));
   }

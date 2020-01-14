@@ -23,9 +23,9 @@ import org.basex.util.hash.*;
  */
 public final class ItrPos extends Simple {
   /** Minimum position (1 or larger). */
-  public final long min;
+  final long min;
   /** Maximum position (inclusive, 1 or larger, never smaller than {@link #min}). */
-  public final long max;
+  final long max;
 
   /**
    * Constructor.
@@ -72,7 +72,7 @@ public final class ItrPos extends Simple {
    * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
-  public static Expr get(final Expr expr, final OpV op, final InputInfo ii) throws QueryException {
+  static Expr get(final Expr expr, final OpV op, final InputInfo ii) throws QueryException {
     if(expr instanceof Value) {
       final Value value = (Value) expr;
       if(value instanceof RangeSeq && op == OpV.EQ) {

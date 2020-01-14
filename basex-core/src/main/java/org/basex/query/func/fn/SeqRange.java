@@ -12,18 +12,18 @@ import org.basex.util.*;
  */
 public final class SeqRange {
   /** Start position (inclusive, starting from 0). */
-  public long start;
+  long start;
   /** End position (exclusive, starting from 0, larger than or equal to start). */
-  public long end;
+  long end;
   /** Length (larger than or equal to 0). */
-  public long length;
+  long length;
 
   /**
    * Constructor.
    * @param start start value
    * @param end end value
    */
-  public SeqRange(final long start, final long end) {
+  SeqRange(final long start, final long end) {
     assign(start, end);
   }
 
@@ -34,7 +34,7 @@ public final class SeqRange {
    * @return range or {@code null}
    * @throws QueryException query exception
    */
-  public static SeqRange get(final Expr expr, final CompileContext cc) throws QueryException {
+  static SeqRange get(final Expr expr, final CompileContext cc) throws QueryException {
     return expr instanceof FnSubsequence ? ((FnSubsequence) expr).range(cc) : null;
   }
 

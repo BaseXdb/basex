@@ -2,6 +2,8 @@ package org.basex.query;
 
 import static org.junit.Assert.*;
 
+import java.math.*;
+
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.query.func.fn.*;
@@ -121,12 +123,12 @@ public abstract class QueryTest extends SandboxTest {
   }
 
   /**
-   * Creates an iterator for the specified decimal.
-   * @param d decimal value
+   * Creates an iterator for the specified integer.
+   * @param integer integer value
    * @return iterator
    */
-  protected static Item decimal(final double d) {
-    return Dec.get(d);
+  protected static Item decimal(final int integer) {
+    return Dec.get(new BigDecimal(integer));
   }
 
   /**
@@ -140,10 +142,10 @@ public abstract class QueryTest extends SandboxTest {
 
   /**
    * Creates an iterator for the specified boolean.
-   * @param b boolean value
+   * @param bool boolean value
    * @return iterator
    */
-  protected static Value booleans(final boolean... b) {
-    return BlnSeq.get(b);
+  protected static Value booleans(final boolean... bool) {
+    return BlnSeq.get(bool);
   }
 }

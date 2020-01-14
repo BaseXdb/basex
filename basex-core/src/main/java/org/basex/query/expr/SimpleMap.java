@@ -86,7 +86,7 @@ public abstract class SimpleMap extends Arr {
     }
     if(exprs.length != list.size()) {
       exprs = list.toArray();
-      cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, this);
+      cc.info(OPTFLAT_X_X, (Supplier<?>) this::description, this);
     }
 
     // compute result size
@@ -216,7 +216,7 @@ public abstract class SimpleMap extends Arr {
       final int el = exprs.length - 1;
       if(exprs[el] instanceof FnData) {
         return cc.simplify(this, el == 1 ? exprs[0] :
-          SimpleMap.get(info, Arrays.copyOf(exprs, el)).optimize(cc));
+          get(info, Arrays.copyOf(exprs, el)).optimize(cc));
       }
     }
     return super.simplify(cc, simplify);
@@ -271,7 +271,7 @@ public abstract class SimpleMap extends Arr {
     // context inlining: only consider first expression
     final int el = var == null ? 1 : exprs.length;
     for(int e = 0; e < el; e++) {
-      Expr expr = null;
+      Expr expr;
       try {
         expr = exprs[e].inline(var, ex, cc);
       } catch(final QueryException qe) {

@@ -171,11 +171,11 @@ public final class For extends ForLet {
     if(expr instanceof AxisPath && !ex.has(Flag.POS)) {
       // add to last step of path, provided that predicate is not positional; merge predicates
       final AxisPath path = (AxisPath) expr;
-      expr = path.addPreds(ex);
+      expr = path.addPredicates(ex);
       path.step(path.steps.length - 1).merge(false, false, cc);
     } else if(expr instanceof Filter) {
       // add to existing filter expression
-      expr = ((Filter) expr).addPred(ex);
+      expr = ((Filter) expr).addPredicate(ex);
     } else {
       // create new filter expression
       expr = Filter.get(info, expr, ex);
@@ -190,7 +190,7 @@ public final class For extends ForLet {
    * @return success flag
    * @throws QueryException query exception
    */
-  public boolean toPredicate(final CompileContext cc, final Expr ex) throws QueryException {
+  boolean toPredicate(final CompileContext cc, final Expr ex) throws QueryException {
     if(empty || !(vars().length == 1 && ex.uses(var) && ex.inlineable(var))) return false;
 
     // reset context value (will not be accessible in predicate)
@@ -218,14 +218,14 @@ public final class For extends ForLet {
    * @param vr variable to be removed
    */
   void remove(final CompileContext cc, final Var vr) {
-    cc.info(QueryText.OPTVAR_X, vr);
+    cc.info(OPTVAR_X, vr);
     if(vr == score) {
       score = null;
       scoring = false;
     } else {
       pos = null;
     }
-    vars = For.vars(var, pos, score);
+    vars = vars(var, pos, score);
   }
 
   @Override

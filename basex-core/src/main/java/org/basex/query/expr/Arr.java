@@ -93,7 +93,7 @@ public abstract class Arr extends ParseExpr {
     if(var != null) return opt;
 
     // inline again if context was inlined
-    final Expr inlined = opt.inline(var, ex, cc);
+    final Expr inlined = opt.inline(null, ex, cc);
     return inlined != null ? inlined : opt;
   }
 

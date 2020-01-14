@@ -28,8 +28,6 @@ public interface WebText {
   byte[] NAME = token("name");
   /** Token "value". */
   byte[] VALUE = token("value");
-  /** Token "redirect". */
-  byte[] REDIRECT = token("redirect");
   /** Token "forward". */
   byte[] FORWARD = token("forward");
 

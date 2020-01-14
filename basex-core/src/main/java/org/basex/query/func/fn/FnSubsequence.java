@@ -115,7 +115,7 @@ public class FnSubsequence extends StandardFunc {
    * @return range or {@code null}
    * @throws QueryException query exception
    */
-  public SeqRange range(final CompileContext cc) throws QueryException {
+  SeqRange range(final CompileContext cc) throws QueryException {
     return exprs[1] instanceof Value && (exprs.length < 3 || exprs[2] instanceof Value) ?
       range(cc.qc) : null;
   }

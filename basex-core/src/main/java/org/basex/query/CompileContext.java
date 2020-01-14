@@ -30,7 +30,7 @@ public final class CompileContext {
   public enum Simplify {
     /** Effective boolean values. */ EBV,
     /** Atomization. */              ATOM
-  };
+  }
 
   /** Limit for the size of sequences that are pre-evaluated. */
   public static final int MAX_PREEVAL = 1 << 18;

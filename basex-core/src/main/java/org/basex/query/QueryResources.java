@@ -298,7 +298,7 @@ public final class QueryResources {
    * @param sc static context
    * @return file reference
    */
-  public IO stopWords(final String path, final StaticContext sc) {
+  IO stopWords(final String path, final StaticContext sc) {
     return stop != null ? stop.get(path) : sc.resolve(path, null);
   }
 
@@ -308,7 +308,7 @@ public final class QueryResources {
    * @param sc static context
    * @return file reference
    */
-  public IO thesaurus(final String path, final StaticContext sc) {
+  IO thesaurus(final String path, final StaticContext sc) {
     return thes != null ? thes.get(path) : sc.resolve(path, null);
   }
 
@@ -458,7 +458,7 @@ public final class QueryResources {
    * @param data data reference to be added
    * @return argument
    */
-  public Data addData(final Data data) {
+  private Data addData(final Data data) {
     datas.add(data);
     return data;
   }

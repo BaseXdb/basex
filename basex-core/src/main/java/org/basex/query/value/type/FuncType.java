@@ -45,7 +45,7 @@ public class FuncType implements Type {
    * @param declType declared return type (can be {@code null})
    * @param argTypes argument types (can be {@code null})
    */
-  FuncType(final AnnList anns, final SeqType declType, final SeqType... argTypes) {
+  private FuncType(final AnnList anns, final SeqType declType, final SeqType... argTypes) {
     this.anns = anns;
     this.declType = declType == null ? SeqType.ITEM_ZM : declType;
     this.argTypes = argTypes;

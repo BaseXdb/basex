@@ -16,15 +16,7 @@ public final class VarStack extends ObjectList<Var, VarStack> {
    * Default constructor.
    */
   public VarStack() {
-    this(Array.CAPACITY);
-  }
-
-  /**
-   * Default constructor.
-   * @param c initial capacity
-   */
-  public VarStack(final int c) {
-    super(new Var[c]);
+    super(new Var[Array.CAPACITY]);
   }
 
   /**

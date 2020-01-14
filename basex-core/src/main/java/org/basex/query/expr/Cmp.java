@@ -235,7 +235,7 @@ public abstract class Cmp extends Arr {
    * Indicates if this is a positional comparison.
    * @return result of check
    */
-  public boolean positional() {
+  boolean positional() {
     return Function.POSITION.is(exprs[0]);
   }
 

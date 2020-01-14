@@ -128,16 +128,13 @@ public final class DecFormatter extends FormatUtil {
     // "A picture-string consists either of a sub-picture, or of two sub-pictures separated by
     // the pattern-separator"
     final int i = indexOf(pic, pattern);
-    if(i == -1) {
-      tl.add(pic);
-    } else {
+    if(i != -1) {
       tl.add(substring(pic, 0, i));
       pic = substring(pic, i + cl(pic, i));
       // "A picture-string must not contain more than one instance of the pattern-separator"
-      if(contains(pic, pattern)) throw PICNUM_X.get(ii, picture);
-      tl.add(pic);
+      if (contains(pic, pattern)) throw PICNUM_X.get(ii, picture);
     }
-    final byte[][] patterns = tl.finish();
+    final byte[][] patterns = tl.add(pic).finish();
 
     // check and analyze patterns
     if(!checkSyntax(patterns)) throw PICNUM_X.get(ii, picture);

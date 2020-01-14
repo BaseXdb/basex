@@ -161,7 +161,7 @@ public abstract class Path extends ParseExpr {
     if(expr != this) return expr.optimize(cc);
 
     // choose best path implementation (dummy will be used for type checking)
-    return copyType(get(info, rt = root == null && rt instanceof Dummy ? rt : root, steps));
+    return copyType(get(info, root == null && rt instanceof Dummy ? rt : root, steps));
   }
 
   @Override
@@ -219,7 +219,7 @@ public abstract class Path extends ParseExpr {
    * @param cc compilation context
    * @return original or optimized expression
    */
-  public final Expr flatten(final CompileContext cc) {
+  private Expr flatten(final CompileContext cc) {
     // new list with steps
     boolean changed = false;
     final ExprList tmp = new ExprList(steps.length);
@@ -258,7 +258,7 @@ public abstract class Path extends ParseExpr {
    * @return original or optimized expression
    * @throws QueryException query exception
    */
-  public final Expr simplify(final CompileContext cc) throws QueryException {
+  private Expr simplify(final CompileContext cc) throws QueryException {
     // return root if it yields no result
     if(root != null && root.seqType().zero()) return cc.replaceWith(this, root);
 
@@ -557,7 +557,10 @@ public abstract class Path extends ParseExpr {
         // skip children with prefixes
         if(qName.hasPrefix()) return this;
         for(final PathNode node : nodes) {
-          if(nodes.get(0).name != node.name) qName = null;
+          if(nodes.get(0).name != node.name) {
+            qName = null;
+            break;
+          }
         }
         qNames.add(qName);
         nodes = PathIndex.parent(nodes);
@@ -857,7 +860,7 @@ public abstract class Path extends ParseExpr {
    * @return merged expression or {@code null}
    * @throws QueryException query exception
    */
-  private Expr mergeStep(final Expr curr, final Expr next, final CompileContext cc)
+  private static Expr mergeStep(final Expr curr, final Expr next, final CompileContext cc)
       throws QueryException {
 
     if(!(curr instanceof Step)) return null;
@@ -900,7 +903,7 @@ public abstract class Path extends ParseExpr {
     }
     // example: //(text()|*) -> (descendant::text() | descendant::*)
     if(next instanceof Union) {
-      return rewrite.apply(nxt);
+      return rewrite.apply(next);
     }
     // example: //(text()|*)[..] -> (/descendant::text() | /descendant::*)[..]
     if(next instanceof Filter) {

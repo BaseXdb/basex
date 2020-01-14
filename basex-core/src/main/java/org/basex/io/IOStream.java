@@ -58,6 +58,6 @@ public final class IOStream extends IO {
 
   @Override
   public String toString() {
-    return Util.className(this) + '[' + input + ']';
+    return Util.className(this) + '[' + pth + ']';
   }
 }

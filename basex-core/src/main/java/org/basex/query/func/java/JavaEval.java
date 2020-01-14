@@ -197,7 +197,7 @@ final class JavaEval {
    */
   private static String type(final Object arg) {
     return
-      arg == null ? Util.info(arg) :
+      arg == null ? Util.info(null) :
       arg instanceof Jav ? Util.className(((Jav) arg).toJava()) :
       arg instanceof Value ? ((Value) arg).seqType().toString() :
       Util.className(arg);

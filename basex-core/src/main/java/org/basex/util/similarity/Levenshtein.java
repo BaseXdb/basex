@@ -169,8 +169,7 @@ public final class Levenshtein {
    * @return minimum
    */
   private static int m(final int a, final int b, final int c) {
-    final int d = a < b ? a : b;
-    return d < c ? d : c;
+    return Math.min(Math.min(a, b), c);
   }
 
   /**

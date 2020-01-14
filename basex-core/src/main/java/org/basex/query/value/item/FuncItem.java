@@ -30,8 +30,7 @@ public final class FuncItem extends FItem implements Scope {
   /** Static context. */
   public final StaticContext sc;
   /** Function expression. */
-  public final Expr expr;
-
+  private final Expr expr;
   /** Function name (may be {@code null}). */
   private final QNm name;
   /** Formal parameters. */
@@ -41,7 +40,7 @@ public final class FuncItem extends FItem implements Scope {
   /** Size of the stack frame needed for this function. */
   private final int stackSize;
   /** Input information. */
-  public final InputInfo info;
+  private final InputInfo info;
 
   /**
    * Constructor.

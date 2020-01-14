@@ -226,11 +226,12 @@ public final class Catch extends Single {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder("catch ");
+    int c = 0;
     for(final NameTest test : tests) {
-      if(sb.length() != 0) sb.append(" | ");
-      sb.append(test != null ? test : "*");
+      if(c++ > 0) sb.append(" | ");
+      sb.append(test != null ? test.toString(false) : "*");
     }
-    return "catch " + sb.append(" { ").append(expr).append(" }");
+    return sb.append(" { ").append(expr).append(" }").toString();
   }
 }

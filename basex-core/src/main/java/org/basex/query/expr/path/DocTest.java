@@ -21,7 +21,7 @@ public final class DocTest extends Test {
    */
   public DocTest(final Test test) {
     super(NodeType.DOC);
-    this.child = test;
+    child = test;
   }
 
   @Override

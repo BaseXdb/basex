@@ -139,14 +139,6 @@ public final class User {
   }
 
   /**
-   * Returns the database patterns.
-   * @return database patterns
-   */
-  public synchronized Map<String, Perm> patterns() {
-    return patterns;
-  }
-
-  /**
    * Returns the user name.
    * @return name
    */
@@ -176,14 +168,6 @@ public final class User {
    */
   public synchronized String code(final Algorithm alg, final Code code) {
     return passwords.get(alg).get(code);
-  }
-
-  /**
-   * Returns algorithms.
-   * @return algorithms
-   */
-  public synchronized EnumMap<Algorithm, EnumMap<Code, String>> passwords() {
-    return passwords;
   }
 
   /**

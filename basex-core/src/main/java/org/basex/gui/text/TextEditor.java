@@ -1168,8 +1168,8 @@ public final class TextEditor {
    * @return string
    */
   String selected() {
-    final int e = start < end ? end : start;
-    int s = start < end ? start : end;
+    final int e = Math.max(start, end);
+    int s = Math.min(start, end);
     final TokenBuilder tb = new TokenBuilder(e - s);
     for(; s < e; s += cl(text, s)) {
       final int cp = cp(text, s);

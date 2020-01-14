@@ -123,7 +123,7 @@ public class CmpG extends Cmp {
   /** Operator. */
   OpG op;
   /** Type check at runtime. */
-  boolean check = true;
+  private boolean check = true;
 
   /**
    * Constructor.

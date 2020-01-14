@@ -153,10 +153,9 @@ public final class DBNew {
       Object v = dbopts.get(MainOptions.ADDCACHE);
       if(v instanceof Boolean && (Boolean) v) return true;
       if(create) {
+        if(dbopts.get(MainOptions.PARSER) == MainParser.RAW) return true;
         v = dbopts.get(MainOptions.ADDRAW);
         if(v instanceof Boolean && (Boolean) v) return true;
-        v = dbopts.get(MainOptions.PARSER);
-        if(v instanceof MainParser && ((MainParser) v) == MainParser.RAW) return true;
       }
     }
     return false;

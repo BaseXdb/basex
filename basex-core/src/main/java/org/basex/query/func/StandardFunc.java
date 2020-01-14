@@ -85,24 +85,11 @@ public abstract class StandardFunc extends Arr {
     final Expr expr = opt(cc);
     return cc.replaceWith(this, expr != this ?
       // return optimized expression
-      expr : preEval() ?
+      expr : allAreValues(definition.seqType.occ.max > 1) && isSimple() ?
       // pre-evaluate function
       (definition.seqType.zeroOrOne() ? item(cc.qc, info) : value(cc.qc)) :
       // return original function
       this);
-  }
-
-  /**
-   * Checks if the function can be pre-evaluated.
-   * <ul>
-   *   <li> All arguments must be values. If the function may return multiple items,
-   *     the arguments must be of small size.</li>
-   *   <li> Function must be {@link #isSimple() simple}.</li>
-   * </ul>
-   * @return result of check
-   */
-  protected boolean preEval() {
-    return allAreValues(definition.seqType.occ.max > 1) && isSimple();
   }
 
   /**

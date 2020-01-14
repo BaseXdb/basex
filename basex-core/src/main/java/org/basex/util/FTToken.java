@@ -55,7 +55,7 @@ public final class FTToken {
    * @param type character type
    * @return result of check
    */
-  public static boolean isLOD(final int type) {
+  private static boolean isLOD(final int type) {
     return ((1 << Character.UPPERCASE_LETTER |
       1 << Character.LOWERCASE_LETTER |
       1 << Character.TITLECASE_LETTER |

@@ -26,7 +26,7 @@ public final class CmpHashG extends CmpG {
    * @param sc static context
    * @param info input info
    */
-  public CmpHashG(final Expr expr1, final Expr expr2, final OpG op, final Collation coll,
+  CmpHashG(final Expr expr1, final Expr expr2, final OpG op, final Collation coll,
       final StaticContext sc, final InputInfo info) {
     super(expr1, expr2, op, coll, sc, info);
   }

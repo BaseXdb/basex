@@ -23,7 +23,7 @@ public abstract class WebResponse {
     /** No response.       */ NONE,
     /** Standard response. */ STANDARD,
     /** Custom response.   */ CUSTOM
-  };
+  }
 
   /** Database context. */
   protected final Context ctx;

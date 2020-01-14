@@ -77,8 +77,6 @@ public final class GUI extends JFrame implements BaseXWindow {
   /** Content panel, containing all views. */
   private final ViewContainer views;
   /** Execution Button. */
-  private final AbstractButton go;
-  /** Execution Button. */
   private final AbstractButton stop;
   /** Current input Mode. */
   private final BaseXCombo mode;
@@ -187,7 +185,7 @@ public final class GUI extends JFrame implements BaseXWindow {
       }
     });
 
-    go = BaseXButton.get("c_go", RUN_QUERY, false, this);
+    final AbstractButton go = BaseXButton.get("c_go", RUN_QUERY, false, this);
     go.addActionListener(e -> execute());
 
     filter = BaseXButton.command(GUIMenuCmd.C_FILTER, this);

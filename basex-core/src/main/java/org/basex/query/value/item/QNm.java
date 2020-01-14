@@ -353,13 +353,23 @@ public final class QNm extends Item {
   // STATIC METHODS ===============================================================================
 
   /**
+   * Returns an EQName representation.
+   * @param uri URI
+   * @param local local name
+   * @return QName as token
+   */
+  public static byte[] eqName(final byte[] uri, final byte[] local) {
+    return concat(QueryText.EQNAME, uri, CURLY2, local);
+  }
+
+  /**
    * Constructs an internal string representation for the components of a QName.
    * @param prefix prefix
    * @param local name (can be {@code null})
    * @param uri uri (can be {@code null})
    * @return EQName representation
    */
-  public static byte[] internal(final byte[] prefix, final byte[] local, final byte[] uri) {
+  private static byte[] internal(final byte[] prefix, final byte[] local, final byte[] uri) {
     // optimized for speed, as it is called quite frequently
     final int ul = uri == null ? 0 : uri.length;
     final int pl = prefix == null ? 0 : prefix.length;
@@ -383,15 +393,5 @@ public final class QNm extends Item {
     }
     Array.copyFromStart(local, local.length, key, i);
     return key;
-  }
-
-  /**
-   * Returns an EQName representation.
-   * @param uri URI
-   * @param local local name
-   * @return QName as token
-   */
-  public static byte[] eqName(final byte[] uri, final byte[] local) {
-    return concat(QueryText.EQNAME, uri, CURLY2, local);
   }
 }

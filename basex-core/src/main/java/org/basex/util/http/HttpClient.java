@@ -325,7 +325,7 @@ public final class HttpClient {
    * @param out output stream
    * @throws IOException I/O exception
    */
-  public static void writeHeader(final String key, final String value, final OutputStream out)
+  private static void writeHeader(final String key, final String value, final OutputStream out)
       throws IOException {
     out.write(concat(key, ": ", value, CRLF));
   }

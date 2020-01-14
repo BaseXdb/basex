@@ -46,7 +46,7 @@ public final class FnUnparsedTextLines extends Parse {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr expr = exprs[0];
     return expr.seqType().zero() ? expr : this;
   }

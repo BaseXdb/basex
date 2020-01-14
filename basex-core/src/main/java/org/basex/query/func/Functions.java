@@ -186,7 +186,7 @@ public final class Functions {
    * @return function instance
    * @throws QueryException query exception
    */
-  static StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
+  private static StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     final FuncDefinition fd = getBuiltIn(name, args.length, ii);
     return fd == null ? null : fd.function.get(sc, ii, args);

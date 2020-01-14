@@ -37,7 +37,7 @@ public final class RandomModuleTest extends SandboxTest {
   @Test public void integer() {
     final Function func = _RANDOM_INTEGER;
     // queries
-    final Integer i = Integer.valueOf(query(func.args(5)));
+    final int i = Integer.parseInt(query(func.args(5)));
     assertTrue(i >= 0 && i < 5);
     error(func.args(0), QueryError.RANDOM_BOUNDS_X);
     error(func.args(-1), QueryError.RANDOM_BOUNDS_X);

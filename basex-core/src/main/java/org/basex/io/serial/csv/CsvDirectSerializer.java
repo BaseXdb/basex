@@ -81,12 +81,11 @@ public final class CsvDirectSerializer extends CsvSerializer {
       }
       // print data, sorted by headers
       for(int i = 0; i < size; i++) tl.add(data.get(headers.get(i)));
-      record(tl);
     } else {
       // no headers available: print data
       for(final byte[] value : data.values()) tl.add(value);
-      record(tl);
     }
+    record(tl);
   }
 
   @Override

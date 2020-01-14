@@ -103,7 +103,7 @@ public abstract class Step extends Preds {
   public Expr optimize(final CompileContext cc) throws QueryException {
     // check if step or test will never yield results
     if(emptyStep() || !test.optimize(cc.qc.focus.value)) {
-      cc.info(QueryText.OPTSTEP_X, this);
+      cc.info(OPTSTEP_X, this);
       return cc.emptySeq(this);
     }
     // optimize predicate, choose best implementation
@@ -150,10 +150,9 @@ public abstract class Step extends Preds {
 
     // check node type
     int name = 0;
-
     if(test instanceof NameTest) {
       final NamePart part = ((NameTest) test).part;
-      if(part == NamePart.LOCAL && test instanceof NameTest) {
+      if(part == NamePart.LOCAL) {
         // element/attribute test (*:ln)
         final Names names = test.type == NodeType.ATT ? dt.attrNames : dt.elemNames;
         name = names.id(((NameTest) test).local);
@@ -161,8 +160,6 @@ public abstract class Step extends Preds {
         // skip namespace and standard tests
         return null;
       }
-    } else if(test instanceof UnionTest) {
-      return null;
     }
 
     final int kind = ANode.kind(test.type);

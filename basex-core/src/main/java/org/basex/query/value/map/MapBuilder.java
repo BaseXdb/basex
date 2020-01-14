@@ -50,7 +50,7 @@ public final class MapBuilder {
   }
 
   /**
-   * Returns and invalidates the resulting map.
+   * Returns the resulting map and invalidates the internal reference.
    * @return map
    */
   public XQMap finish() {

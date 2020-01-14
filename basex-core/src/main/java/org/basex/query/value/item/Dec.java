@@ -41,15 +41,6 @@ public final class Dec extends ANum {
     return value.signum() == 0 ? ZERO : new Dec(value);
   }
 
-  /**
-   * Constructor.
-   * @param value big decimal value
-   * @return value
-   */
-  public static Dec get(final double value) {
-    return get(new BigDecimal(value));
-  }
-
   @Override
   public byte[] string() {
     return chopNumber(token(value.toPlainString()));

@@ -151,11 +151,10 @@ public class IdPreMap {
             incs[prev] -= prevcnt - split;
 
             oid = oids[prev];
-            inc += incs[prev];
           } else {
             oid = pre - incs[prev];
-            inc += incs[prev];
           }
+          inc += incs[prev];
         }
       } else if(pos > 0) {
         oid = oids[pos];

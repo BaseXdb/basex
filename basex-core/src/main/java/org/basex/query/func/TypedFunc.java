@@ -11,9 +11,9 @@ import org.basex.query.util.list.*;
  */
 public final class TypedFunc {
   /** Function expression. */
-  public final Expr func;
+  final Expr func;
   /** Annotations. */
-  public final AnnList anns;
+  final AnnList anns;
 
   /**
    * Constructor.

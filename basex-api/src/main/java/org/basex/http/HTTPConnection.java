@@ -32,8 +32,6 @@ public final class HTTPConnection implements ClientInfo {
   public final HttpServletRequest request;
   /** HTTP servlet response. */
   public final HttpServletResponse response;
-  /** Servlet instance. */
-  public final BaseXServlet servlet;
 
   /** Current database context. */
   public final Context context;
@@ -57,14 +55,12 @@ public final class HTTPConnection implements ClientInfo {
    * @param request request
    * @param response response
    * @param auth authentication method (can be {@code null})
-   * @param servlet calling servlet instance
    */
   HTTPConnection(final HttpServletRequest request, final HttpServletResponse response,
-      final BaseXServlet servlet, final AuthMethod auth) {
+      final AuthMethod auth) {
 
     this.request = request;
     this.response = response;
-    this.servlet = servlet;
 
     context = new Context(HTTPContext.get().context(), this);
     method = request.getMethod();

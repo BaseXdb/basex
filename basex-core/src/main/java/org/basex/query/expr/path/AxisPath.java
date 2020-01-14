@@ -133,10 +133,10 @@ public abstract class AxisPath extends Path {
 
   /**
    * Adds predicates to the last step.
-   * @param preds predicate to be added
+   * @param preds predicates to be added
    * @return resulting path instance
    */
-  public final ParseExpr addPreds(final Expr... preds) {
+  public final ParseExpr addPredicates(final Expr... preds) {
     final int sl = steps.length - 1;
     steps[sl] = step(sl).addPreds(preds);
     return copyType(get(info, root, steps));

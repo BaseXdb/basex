@@ -262,15 +262,12 @@ public final class WebModules {
     final ArrayList<RestXqFunction> list = new ArrayList<>();
     for(final RestXqFunction func : funcs) {
       final Checks<MediaType> check = accept -> {
-        if(func.produces.isEmpty()) {
-          if(qf(accept, "q") == clientQf) return true;
-        } else {
-          final Checks<MediaType> checkProduce = produce ->
-            produce.matches(accept) && qf(accept, "q") == clientQf &&
-            (serverQf == -1 || qf(produce, "qs") == serverQf);
-          if(checkProduce.any(func.produces)) return true;
-        }
-        return false;
+        if(func.produces.isEmpty()) return qf(accept, "q") == clientQf;
+
+        final Checks<MediaType> checkProduce = produce ->
+          produce.matches(accept) && qf(accept, "q") == clientQf &&
+          (serverQf == -1 || qf(produce, "qs") == serverQf);
+        return checkProduce.any(func.produces);
       };
       if(check.any(accepts)) list.add(func);
     }

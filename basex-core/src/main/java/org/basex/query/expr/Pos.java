@@ -40,7 +40,7 @@ public final class Pos extends Arr {
    * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
-  public static Expr get(final Expr cmp2, final OpV op, final InputInfo ii, final CompileContext cc)
+  static Expr get(final Expr cmp2, final OpV op, final InputInfo ii, final CompileContext cc)
       throws QueryException {
 
     Expr min = null, max = null;
@@ -132,7 +132,7 @@ public final class Pos extends Arr {
    * Checks if minimum and maximum expressions are identical.
    * @return result of check
    */
-  public boolean eq() {
+  boolean eq() {
     final Expr[] ex = exprs;
     return ex[0] == ex[1];
   }

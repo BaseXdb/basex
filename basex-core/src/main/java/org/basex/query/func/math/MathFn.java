@@ -12,7 +12,7 @@ import org.basex.query.func.*;
  */
 public abstract class MathFn extends StandardFunc {
   @Override
-  protected final Expr opt(final CompileContext cc) throws QueryException {
+  protected final Expr opt(final CompileContext cc) {
     return optFirst(true);
   }
 }

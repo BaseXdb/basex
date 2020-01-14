@@ -45,7 +45,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
 
   /**
    * Default constructor.
-   * @param ftOpt full-text options
+   * @param ftOpt full-text options (can be {@code null})
    */
   public FTLexer(final FTOpt ftOpt) {
     this.ftOpt = ftOpt;
@@ -191,14 +191,6 @@ public final class FTLexer extends FTIterator implements IndexToken {
   }
 
   /**
-   * Returns the text to be processed.
-   * @return text
-   */
-  public byte[] text() {
-    return text;
-  }
-
-  /**
    * Returns if the current token starts a new paragraph. Needed for visualizations.
    * Does not have to be implemented by all tokenizers.
    * Returns false if not implemented.
@@ -244,7 +236,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
     // only change case in insensitive mode
     to.cs = opt.cs != null && opt.cs != FTCase.INSENSITIVE ? FTCase.SENSITIVE :
       FTCase.INSENSITIVE;
-    return new FTLexer(to).init(text());
+    return new FTLexer(to).init(text);
   }
 
   /**

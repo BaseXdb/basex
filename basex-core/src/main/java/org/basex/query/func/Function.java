@@ -77,7 +77,7 @@ public enum Function implements AFunction {
       arg(STR_ZO, STR_O, STR_O), ELM_O, flag(CNS)),
   /** XQuery function. */
   APPLY(FnApply.class, "apply(function,args)", arg(FUNC_O, ARRAY_O), ITEM_ZM,
-      flag(Flag.POS, CTX, NDT, HOF)),
+      flag(POS, CTX, NDT, HOF)),
   /** XQuery function. */
   AVAILABLE_ENVIRONMENT_VARIABLES(FnAvailableEnvironmentVariables.class,
       "available-environment-variables()", arg(), STR_ZM),
@@ -201,7 +201,7 @@ public enum Function implements AFunction {
   FUNCTION_ARITY(FnFunctionArity.class, "function-arity(function)", arg(FUNC_O), ITR_O),
   /** XQuery function. */
   FUNCTION_LOOKUP(FnFunctionLookup.class, "function-lookup(name,arity)",
-      arg(QNM_O, ITR_O), FUNC_ZO, flag(Flag.POS, CTX, NDT, HOF)),
+      arg(QNM_O, ITR_O), FUNC_ZO, flag(POS, CTX, NDT, HOF)),
   /** XQuery function. */
   FUNCTION_NAME(FnFunctionName.class, "function-name(function)", arg(FUNC_O), QNM_ZO),
   /** XQuery function. */
@@ -243,7 +243,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   LANG(FnLang.class, "lang(ids[,node])", arg(STR_ZO, NOD_O), BLN_O),
   /** XQuery function. */
-  LAST(FnLast.class, "last()", arg(), ITR_O, flag(Flag.POS, CTX)),
+  LAST(FnLast.class, "last()", arg(), ITR_O, flag(POS, CTX)),
   /** XQuery function. */
   LOCAL_NAME(FnLocalName.class, "local-name([node])", arg(NOD_ZO), STR_O),
   /** XQuery function. */
@@ -312,7 +312,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   PATH(FnPath.class, "path([node])", arg(NOD_ZO), STR_ZO),
   /** XQuery function. */
-  POSITION(FnPosition.class, "position()", arg(), ITR_O, flag(Flag.POS, CTX)),
+  POSITION(FnPosition.class, "position()", arg(), ITR_O, flag(POS, CTX)),
   /** XQuery function. */
   PREFIX_FROM_QNAME(FnPrefixFromQName.class, "prefix-from-QName(qname)", arg(QNM_ZO), NCN_ZO),
   /** XQuery function. */
@@ -1266,7 +1266,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _UPDATE_APPLY(UpdateApply.class, "apply(function,args)", arg(FUNC_O, ARRAY_O), EMP,
-      flag(Flag.POS, CTX, UPD, NDT, HOF), UPDATE_URI),
+      flag(POS, CTX, UPD, NDT, HOF), UPDATE_URI),
   /** XQuery function. */
   _UPDATE_CACHE(UpdateCache.class, "cache([reset])", arg(BLN_O), ITEM_ZM, flag(NDT), UPDATE_URI),
   /** XQuery function. */

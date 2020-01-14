@@ -21,8 +21,6 @@ import org.basex.util.list.*;
  * @author Sebastian Gath
  */
 final class MapRenderer {
-  /** Font size. */
-  private final int fs = fontSize;
   /** Graphics reference. */
   private final Graphics g;
 
@@ -66,7 +64,7 @@ final class MapRenderer {
    * @param w width
    */
   void chopText(final byte[] string, final int x, final int y, final int w) {
-    BaseXLayout.chopString(g, string, x, y, w, fs);
+    BaseXLayout.chopString(g, string, x, y, w, fontSize);
   }
 
   /**
@@ -78,7 +76,7 @@ final class MapRenderer {
    */
   private int drawText(final MapRect rect, final byte[] string, final boolean draw) {
     // limit string to given space
-    final int fh = (int) (1.2 * fs);
+    final int fh = (int) (1.2 * fontSize);
     final Color textc = g.getColor();
 
     int xx = rect.x;
@@ -157,10 +155,11 @@ final class MapRenderer {
     // thumbnail width and height, empty line height
     final double ffmax = 0.25, ffhmax = 0.5, flhmax = 0.3;
     double ff = ffmax, ffh = ffhmax, flh = flhmax;
-    byte lhmi = (byte) Math.max(3, ffh * fs), fhmi = (byte) Math.max(6, (flh + ffh) * fs);
+    byte lhmi = (byte) Math.max(3, ffh * fontSize);
+    byte fhmi = (byte) Math.max(6, (flh + ffh) * fontSize);
 
     int h = rect.h;
-    rect.thumbf = ff * fs;
+    rect.thumbf = ff * fontSize;
     rect.thumbal = 0;
 
     final int[][] data = new FTLexer().init(string).info();
@@ -171,11 +170,11 @@ final class MapRenderer {
     while(rect.thumbal < 2) {
       // find parameter setting for the available space
       ff = round(fftmax, fftmin);
-      rect.thumbf = ff * fs;
+      rect.thumbf = ff * fontSize;
       ffh = round(ffhtmax, ffhtmin);
-      rect.thumbfh = (byte) Math.max(1, ffh * fs);
+      rect.thumbfh = (byte) Math.max(1, ffh * fontSize);
       flh = round(flhtmax, flhtmin);
-      rect.thumblh = (byte) Math.max(1, (flh + ffh) * fs);
+      rect.thumblh = (byte) Math.max(1, (flh + ffh) * fontSize);
       rect.thumbsw = rect.thumbf;
 
       switch(rect.thumbal) {
@@ -190,9 +189,9 @@ final class MapRenderer {
       if(h >= rect.h || le(ffmax, ff) || le(ffhmax, ffh) || le(flhmax, flh)) {
         if(l) {
           // use last setup to draw
-          rect.thumbf = bff * fs;
-          rect.thumbfh = (byte) Math.max(1, bffh * fs);
-          rect.thumblh = (byte) Math.max(1, (bflh + bffh) * fs);
+          rect.thumbf = bff * fontSize;
+          rect.thumbfh = (byte) Math.max(1, bffh * fontSize);
+          rect.thumblh = (byte) Math.max(1, (bflh + bffh) * fontSize);
           rect.thumbsw = rect.thumbf;
           switch(rect.thumbal) {
             case 0:
@@ -489,22 +488,13 @@ final class MapRenderer {
       cc += data0[i];
 
       // find hovered thumbnail and corresponding text
-      boolean ir;
+      final boolean ir;
       if(ll + wl + (ds && psl < dl1 && data1[psl] == sl ? rect.thumbsw : 0) >= ww) {
-        if(ds) {
-          // do not split token
-          yy += rect.thumblh;
-          ir = inRect(rect.x, yy, wl, rect.thumbfh, x, y);
-          ll = wl + (psl < dl1 && data1[psl] == sl ?
-              rect.thumbsw : rect.thumbf);
-        } else {
-          // split token to safe space
-          yy += rect.thumblh;
-          wl -= ww - ll;
-          ir = inRect(rect.x, yy, wl, rect.thumbfh, x, y);
-          ll = wl +
-          (psl < dl1 && data1[psl] == sl ? rect.thumbsw :  rect.thumbf);
-        }
+        // split token to safe space
+        if(!ds) wl -= ww - ll;
+        yy += rect.thumblh;
+        ir = inRect(rect.x, yy, wl, rect.thumbfh, x, y);
+        ll = wl + (psl < dl1 && data1[psl] == sl ? rect.thumbsw : rect.thumbf);
       } else {
         ir = inRect(rect.x + ll, yy, wl, rect.thumbfh, x, y);
         ll += wl + (ds ? rect.thumbf : 0);
@@ -671,20 +661,20 @@ final class MapRenderer {
     final int ww = nl == 1 && wl < wi ? wl : wi;
     // find optimal position for the tooltip
     final int xx = x + 10 + ww >= rect.x + rect.w ? rect.x + rect.w - ww - 2 : x + 10;
-    int yy = y + 28 + fs * nl + 4 < rect.y + rect.h ? y + 28 :
-      y - rect.y - 4 > fs * nl ? y - fs * nl : rect.y + rect.h - 4 - fs * nl;
+    int yy = y + 28 + fontSize * nl + 4 < rect.y + rect.h ? y + 28 :
+      y - rect.y - 4 > fontSize * nl ? y - fontSize * nl : rect.y + rect.h - 4 - fontSize * nl;
 
     g.setColor(color(10));
-    g.drawRect(xx - 3, yy - fs - 1, ww + 3, fs * nl + 7);
+    g.drawRect(xx - 3, yy - fontSize - 1, ww + 3, fontSize * nl + 7);
     g.setColor(color(0));
-    g.fillRect(xx - 2, yy - fs, ww + 2, fs * nl + 6);
+    g.fillRect(xx - 2, yy - fontSize, ww + 2, fontSize * nl + 6);
     g.setColor(color(20));
     wl = 0;
     final int is = tl.size();
     for(int i = 0; i < is; ++i) {
       final int l = len.get(i);
       if(wl + l + sw >= wi) {
-        yy += fs + 1;
+        yy += fontSize + 1;
         wl = 0;
       }
       final boolean pm = !lod(tl.get(i)[tl.get(i).length - 1]);

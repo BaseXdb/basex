@@ -64,8 +64,7 @@ public final class SAXWrapper extends SingleParser {
       reader.setProperty("http://xml.org/sax/properties/lexical-handler", saxh);
       reader.setErrorHandler(saxh);
 
-      if(is != null) reader.parse(is);
-      else reader.parse(saxs.getSystemId());
+      reader.parse(is);
     } catch(final SAXParseException ex) {
       final String msg = Util.info(SCANPOS_X_X, source.path(), ex.getLineNumber(),
           ex.getColumnNumber()) + COLS + Util.message(ex);
@@ -78,10 +77,8 @@ public final class SAXWrapper extends SingleParser {
       // wrap and return original message
       throw new IOException('"' + source.path() + '"' + Util.message(ex), ex);
     } finally {
-      if(is != null) {
-        try(Reader r = is.getCharacterStream()) { /* no action */ }
-        try(InputStream ist = is.getByteStream()) { /* no action */ }
-      }
+      try(Reader r = is.getCharacterStream()) { /* no action */ }
+      try(InputStream ist = is.getByteStream()) { /* no action */ }
     }
   }
 

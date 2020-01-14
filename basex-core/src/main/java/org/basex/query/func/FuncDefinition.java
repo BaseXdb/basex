@@ -27,16 +27,15 @@ public final class FuncDefinition {
   final int[] minMax;
   /** Parameter types. */
   final SeqType[] params;
-
-  /** Description. */
-  final String desc;
   /** Sequence type. */
   final SeqType seqType;
-
-  /** Compiler flags. */
-  final EnumSet<Flag> flags;
   /** URI. */
   final byte[] uri;
+
+  /** Description. */
+  private final String desc;
+  /** Compiler flags. */
+  private final EnumSet<Flag> flags;
 
   /**
    * Constructs a function signature.
@@ -163,7 +162,7 @@ public final class FuncDefinition {
    * Returns the prefixed name of the annotation.
    * @return name
    */
-  public byte[] id() {
+  byte[] id() {
     final TokenBuilder tb = new TokenBuilder();
     if(!Token.eq(uri, FN_URI)) tb.add(NSGlobal.prefix(uri)).add(':');
     return tb.add(local()).finish();
@@ -180,7 +179,7 @@ public final class FuncDefinition {
    * @param args arguments
    * @return string representation (prefixed with a space to simplify nesting of returned string)
    */
-  public String args(final Object... args) {
+  String args(final Object... args) {
     final TokenBuilder tb = new TokenBuilder();
     for(final Object arg : args) {
       if(!tb.isEmpty()) tb.add(", ");

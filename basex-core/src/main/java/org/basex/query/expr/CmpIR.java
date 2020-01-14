@@ -53,7 +53,7 @@ public final class CmpIR extends Single {
    * @param info input info
    * @return expression
    */
-  static Expr get(final Expr expr, final long min, final long max, final InputInfo info) {
+  private static Expr get(final Expr expr, final long min, final long max, final InputInfo info) {
     return min > max ? Bln.FALSE : min == MIN_VALUE && max == MAX_VALUE ? Bln.TRUE :
       new CmpIR(expr, min, max, info);
   }

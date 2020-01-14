@@ -155,7 +155,7 @@ public final class QueryInfo {
    * @param mod module to start from
    * @return the string representation
    */
-  public static String usedDecls(final MainModule mod) {
+  static String usedDecls(final MainModule mod) {
     final IdentityHashMap<Scope, Object> map = new IdentityHashMap<>();
     final StringBuilder sb = new StringBuilder();
     mod.visit(new ASTVisitor() {

@@ -71,7 +71,7 @@ public final class AdminLogs extends AdminFn {
     }
     return new Iter() {
       @Override
-      public Item next() throws QueryException {
+      public Item next() {
         // scan and merge entries
         for(LogEntry entry; (entry = list.pollFirst()) != null;) {
           // REQUEST entries: find concluding entries (status code, OK, error)

@@ -59,7 +59,7 @@ public abstract class BaseXServlet extends HttpServlet {
   public final void service(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
 
-    final HTTPConnection conn = new HTTPConnection(request, response, this, auth);
+    final HTTPConnection conn = new HTTPConnection(request, response, auth);
     try {
       conn.authenticate(username);
       run(conn);

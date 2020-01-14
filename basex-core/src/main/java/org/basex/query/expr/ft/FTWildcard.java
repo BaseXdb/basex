@@ -138,7 +138,7 @@ public final class FTWildcard {
    * Indicates if the input contains no wildcard characters.
    * @return result of check
    */
-  public boolean simple() {
+  boolean simple() {
     return simple;
   }
 

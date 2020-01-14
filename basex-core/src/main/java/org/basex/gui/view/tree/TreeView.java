@@ -465,7 +465,7 @@ public final class TreeView extends View {
    * @return draw color
    */
   private static Color getColorPerLevel(final int l, final boolean fill) {
-    final int till = l < CHANGE_COLOR_TILL ? l : CHANGE_COLOR_TILL;
+    final int till = Math.min(l, CHANGE_COLOR_TILL);
     return color(fill ? till : till + 2);
   }
 
@@ -484,7 +484,7 @@ public final class TreeView extends View {
 
     final int rs = treePerX(x), re = treePerX(x + w);
 
-    for(int r = rs < 0 ? 0 : rs; r <= re; ++r) {
+    for(int r = Math.max(rs, 0); r <= re; ++r) {
       for(int i = 0; i < size; ++i) {
         final int yL = getYperLevel(i);
 

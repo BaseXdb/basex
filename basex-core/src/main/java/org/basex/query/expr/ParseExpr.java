@@ -37,7 +37,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected ParseExpr(final InputInfo info, final SeqType seqType) {
     this.info = info;
-    this.exprType = new ExprType(seqType);
+    exprType = new ExprType(seqType);
   }
 
   @Override

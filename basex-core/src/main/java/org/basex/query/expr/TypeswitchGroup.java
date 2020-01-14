@@ -23,10 +23,10 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class TypeswitchGroup extends Single {
-  /** Variable (can be {@code null}). */
-  Var var;
   /** Matched sequence types (default switch if array is empty). */
   SeqType[] seqTypes;
+  /** Variable (can be {@code null}). */
+  private Var var;
 
   /**
    * Constructor.

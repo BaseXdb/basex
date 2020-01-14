@@ -347,7 +347,7 @@ public abstract class Preds extends Arr {
    * @param exprs expressions
    * @return result of check
    */
-  public static boolean positional(final Expr[] exprs) {
+  static boolean positional(final Expr[] exprs) {
     for(final Expr expr : exprs) {
       if(expr.seqType().mayBeNumber() || expr.has(Flag.POS)) return true;
     }

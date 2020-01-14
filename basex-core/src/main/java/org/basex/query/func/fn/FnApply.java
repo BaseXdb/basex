@@ -39,7 +39,7 @@ public class FnApply extends StandardFunc {
    * @return values
    * @throws QueryException query exception
    */
-  protected Value[] values(final FItem func, final QueryContext qc) throws QueryException {
+  private Value[] values(final FItem func, final QueryContext qc) throws QueryException {
     final XQArray array = toArray(exprs[1], qc);
     final long ar = checkUp(func, this instanceof UpdateApply, sc).arity(), as = array.arraySize();
     if(ar != as) throw APPLY_X_X.get(info, ar, as);

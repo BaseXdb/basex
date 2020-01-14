@@ -288,11 +288,11 @@ public final class GUIOptions extends Options {
     final BiFunction<Long, Integer, String> more = (num, max) -> num >= max ? "\u2265" : "";
     final StringBuilder sb = new StringBuilder();
     final String num = new DecimalFormat("#,###,###").format(results);
-    final String text = more.apply(results, get(GUIOptions.MAXRESULTS)) + num;
+    final String text = more.apply(results, get(MAXRESULTS)) + num;
     sb.append(Util.info(results == 1 ? Text.RESULT_X : Text.RESULTS_X, text));
     if(bytes > 0) {
       sb.append(", ");
-      sb.append(more.apply(bytes, get(GUIOptions.MAXTEXT)) + Performance.format(bytes));
+      sb.append(more.apply(bytes, get(MAXTEXT))).append(Performance.format(bytes));
     }
     return sb.toString();
   }

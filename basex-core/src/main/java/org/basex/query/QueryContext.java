@@ -518,7 +518,7 @@ public final class QueryContext extends Job implements Closeable {
       funcs.plan(plan);
       vars.plan(plan);
     }
-    return plan.root;
+    return plan.root();
   }
 
   /**

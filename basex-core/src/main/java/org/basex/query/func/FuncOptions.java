@@ -52,7 +52,7 @@ public final class FuncOptions {
    * @param root name of root node (can be {@code null})
    * @param info input info
    */
-  public FuncOptions(final QNm root, final InputInfo info) {
+  private FuncOptions(final QNm root, final InputInfo info) {
     test = root == null ? null : new NameTest(root);
     this.root = root;
     this.info = info;
@@ -88,7 +88,7 @@ public final class FuncOptions {
    * @return specified options
    * @throws QueryException query exception
    */
-  public <T extends Options> T assign(final Item item, final T options, final QueryError error)
+  private <T extends Options> T assign(final Item item, final T options, final QueryError error)
       throws QueryException {
 
     if(item != Empty.VALUE) {

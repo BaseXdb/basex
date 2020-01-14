@@ -46,7 +46,7 @@ public final class FTTokenizer {
    * @param qc query context
    * @param info input info
    */
-  public FTTokenizer(final FTOpt opt, final QueryContext qc, final InputInfo info) {
+  FTTokenizer(final FTOpt opt, final QueryContext qc, final InputInfo info) {
     this(opt, new Levenshtein(qc.context.options.get(MainOptions.LSERROR)), info);
   }
 

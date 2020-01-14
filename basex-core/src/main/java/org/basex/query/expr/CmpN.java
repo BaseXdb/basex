@@ -73,7 +73,7 @@ public final class CmpN extends Cmp {
   }
 
   /** Comparator. */
-  final OpN op;
+  private final OpN op;
 
   /**
    * Constructor.

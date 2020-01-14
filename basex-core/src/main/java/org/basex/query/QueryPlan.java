@@ -21,11 +21,11 @@ import org.basex.util.*;
  */
 public final class QueryPlan {
   /** Root node. */
-  public final FElem root;
+  private final FElem root;
   /** Node stack. */
-  public final Stack<FElem> nodes = new Stack<>();
+  private final Stack<FElem> nodes = new Stack<>();
   /** Include comprehensive information. */
-  public final boolean full;
+  private final boolean full;
 
   /**
    * Constructor.
@@ -39,6 +39,14 @@ public final class QueryPlan {
     root.add(UPDATING, token(updating));
     nodes.add(root);
     this.full = full;
+  }
+
+  /**
+   * Returns the root node.
+   * @return root node
+   */
+  public FElem root() {
+    return root;
   }
 
   /**

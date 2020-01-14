@@ -147,7 +147,7 @@ public final class CmpV extends Cmp {
   }
 
   /** Operator. */
-  OpV opV;
+  private OpV opV;
 
   /**
    * Constructor.

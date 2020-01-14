@@ -441,11 +441,12 @@ public final class TableDiskAccess extends TableAccess {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(Util.className(this) + " (" + "pages: " + pages + ", used: " + used);
-    sb.append(", page: " + page + ", firstPre: " + firstPre + ", nextPre: " + nextPre + ")");
-    if(fPreIndex != null) sb.append("\n- FPres: " + Arrays.toString(fPreIndex));
-    if(pageIndex != null) sb.append("\n- Pages: " + Arrays.toString(pageIndex));
-    if(usedPages != null) sb.append("\n- Used Pages: " + usedPages);
+    sb.append(Util.className(this)).append(" (").append("pages: ").append(pages);
+    sb.append(", used: ").append(used).append(", page: ").append(page);
+    sb.append(", firstPre: ").append(firstPre).append(", nextPre: ").append(nextPre).append(")");
+    if(fPreIndex != null) sb.append("\n- FPres: ").append(Arrays.toString(fPreIndex));
+    if(pageIndex != null) sb.append("\n- Pages: ").append(Arrays.toString(pageIndex));
+    if(usedPages != null) sb.append("\n- Used Pages: ").append(usedPages);
     return sb.toString();
   }
 

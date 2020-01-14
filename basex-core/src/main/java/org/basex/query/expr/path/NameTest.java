@@ -132,10 +132,14 @@ public final class NameTest extends Test {
     return type == nt.type && name.eq(nt.name);
   }
 
-  @Override
-  public String toString() {
+  /**
+   * Returns a string representation of the name test.
+   * @param full include node type
+   * @return string
+   */
+  public String toString(final boolean full) {
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(type.string()).add('(');
+    if(full) tb.add(type.string()).add('(');
     if(part == NamePart.LOCAL) {
       tb.add('*').add(':');
     } else if(name.hasPrefix()) {
@@ -148,6 +152,12 @@ public final class NameTest extends Test {
     } else {
       tb.add(name.local());
     }
-    return tb.add(')').toString();
+    if(full) tb.add(')');
+    return tb.toString();
+  }
+
+  @Override
+  public String toString() {
+    return toString(true);
   }
 }
