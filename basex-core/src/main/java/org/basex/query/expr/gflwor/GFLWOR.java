@@ -265,15 +265,13 @@ public final class GFLWOR extends ParseExpr {
         // remove scoring variable (include current iteration in count)
         // for $i score $s in <a/> return $i -> for $i in <a/> return $i
         if(fr.score != null && count(fr.score, pos) == VarUsage.NEVER) {
-          cc.info(QueryText.OPTVAR_X, fr.score);
-          fr.score = null;
+          fr.remove(cc, fr.score);
           changed = true;
         }
         // remove positional variable (include current iteration in count)
         // for $i pos $p in () return $p -> for $i in () return $p; later -> ()
         if(fr.pos != null && count(fr.pos, pos) == VarUsage.NEVER) {
-          cc.info(QueryText.OPTVAR_X, fr.pos);
-          fr.pos = null;
+          fr.remove(cc, fr.pos);
           changed = true;
         }
       }

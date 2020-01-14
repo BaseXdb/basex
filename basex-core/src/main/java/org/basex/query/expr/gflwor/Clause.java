@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
  */
 public abstract class Clause extends ParseExpr {
   /** All variables declared in this clause. */
-  private final Var[] vars;
+  Var[] vars;
 
   /**
    * Constructor.

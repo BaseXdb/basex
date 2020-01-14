@@ -204,7 +204,24 @@ public final class For extends ForLet {
     if(pred.seqType().mayBeNumber()) pred = cc.function(Function.BOOLEAN, info, pred);
 
     addPredicate(pred);
+    expr = expr.optimize(cc);
     return true;
+  }
+
+  /**
+   * Removes a variable reference.
+   * @param cc compilation context
+   * @param vr variable to be removed
+   */
+  void remove(final CompileContext cc, final Var vr) {
+    cc.info(QueryText.OPTVAR_X, vr);
+    if(vr == score) {
+      score = null;
+      scoring = false;
+    } else {
+      pos = null;
+    }
+    vars = For.vars(var, pos, score);
   }
 
   @Override

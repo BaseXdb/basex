@@ -19,7 +19,7 @@ abstract class ForLet extends Clause {
   /** Bound expression. */
   public Expr expr;
   /** Scoring flag. */
-  final boolean scoring;
+  boolean scoring;
 
   /**
    * Constructor.

@@ -108,17 +108,40 @@ public final class GFLWORTest extends QueryPlanTest {
 
   /** Tests the relocation of a where clause. */
   @Test public void slideWhere() {
-    check("for $i at $p in 1 to 1000 " +
-        "let $sum as xs:integer := sum(1 to $i * $i) " +
+    check("for $i at $p in (1, 2)\n" +
+        "where $i = 1\n" +
+        "return $i",
+        1,
+        root(IterFilter.class), empty(Where.class)
+    );
+
+    check("for $i in 1 to 1000 " +
+        "let $sum := sum(1 to $i * $i) " +
         "where $i lt 5 " +
-        "return ($sum,$sum)[1]",
+        "return ($sum, $sum)[1]",
         "1\n10\n45\n136",
-        "//For << //Where and //Where << //Let"
+        empty(Where.class)
+    );
+
+    check("for $i at $p in 1 to 1000 " +
+        "let $sum := sum(1 to $i * $i) " +
+        "where $i lt 5 " +
+        "return ($sum, $sum)[1]",
+        "1\n10\n45\n136",
+        empty(Where.class)
+    );
+
+    check("for $i score $s in 1 to 1000 " +
+        "let $sum := sum(1 to $i * $i) " +
+        "where $i lt 5 " +
+        "return ($sum, $sum)[1]",
+        "1\n10\n45\n136",
+        empty(Where.class)
     );
 
     check("for $len in 1 to 3 " +
         "for sliding window $w in 1 to 3 start at $p when true() only " +
-        "end at $q when $q - $p + 1 eq $len where $len > 2 return <window>{$w}</window>",
+        "end at $q when $q - $p + 1 eq $len where $len > 2 return <window>{ $w }</window>",
         "<window>1 2 3</window>",
         "//For << //Window",
         exists("For/*[ends-with(name(), 'Filter')]")
