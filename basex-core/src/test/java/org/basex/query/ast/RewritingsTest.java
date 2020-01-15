@@ -712,4 +712,12 @@ public final class RewritingsTest extends QueryPlanTest {
     error("(position() = 3) = (position() = 3)", QueryError.NOCTX_X);
     error(". = .", QueryError.NOCTX_X);
   }
+
+  /** XQuery: Pre-evaluate predicates in filter expressions. */
+  @Test public void gh1785() {
+    check("<a/>[self::node()]", "<a/>", root(CElem.class));
+    check("<a/>[self::*]", "<a/>", root(CElem.class));
+    check("<a/>[self::*[name(..) = 'a']]", "", root(IterFilter.class));
+    check("<a/>[self::text()]", "", empty());
+  }
 }
