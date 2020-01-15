@@ -143,7 +143,7 @@ public abstract class AxisPath extends Path {
   }
 
   @Override
-  public final boolean iterable() {
+  public final boolean ddo() {
     return true;
   }
 }

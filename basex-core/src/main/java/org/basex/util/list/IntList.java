@@ -218,7 +218,7 @@ public class IntList extends ElementList {
   }
 
   /**
-   * Sorts the integer and removes distinct values.
+   * Sorts the data and removes distinct values.
    * @return self reference
    */
   public final IntList ddo() {

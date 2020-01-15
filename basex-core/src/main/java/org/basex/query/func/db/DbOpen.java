@@ -20,7 +20,7 @@ public final class DbOpen extends DbAccess {
   }
 
   @Override
-  public boolean iterable() {
+  public boolean ddo() {
     return true;
   }
 }

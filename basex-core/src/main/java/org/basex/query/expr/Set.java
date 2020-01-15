@@ -19,8 +19,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 abstract class Set extends Arr {
-  /** Iterable flag. */
-  boolean iterable;
+  /** Distinct document order flag. */
+  boolean ddo;
 
   /**
    * Constructor.
@@ -33,10 +33,10 @@ abstract class Set extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    iterable = true;
+    ddo = true;
     for(final Expr expr : exprs) {
-      if(!expr.iterable()) {
-        iterable = false;
+      if(!expr.ddo()) {
+        ddo = false;
         break;
       }
     }
@@ -53,12 +53,12 @@ abstract class Set extends Arr {
 
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    return iterable ? iterate(qc) : nodes(qc).iter();
+    return ddo ? iterate(qc) : nodes(qc).iter();
   }
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    return iterable ? iterate(qc).value(qc, this) : nodes(qc);
+    return ddo ? iterate(qc).value(qc, this) : nodes(qc);
   }
 
   /**
@@ -91,13 +91,13 @@ abstract class Set extends Arr {
   protected abstract Iter iterate(QueryContext qc) throws QueryException;
 
   @Override
-  public final boolean iterable() {
-    return iterable;
+  public final boolean ddo() {
+    return true;
   }
 
   @Override
   public void plan(final QueryPlan plan) {
-    plan.add(plan.create(this, ITERABLE, iterable), exprs);
+    plan.add(plan.create(this, ITERABLE, ddo), exprs);
   }
 
   @Override

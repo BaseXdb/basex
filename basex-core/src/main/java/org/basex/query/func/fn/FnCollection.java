@@ -16,7 +16,7 @@ public final class FnCollection extends Docs {
   }
 
   @Override
-  public boolean iterable() {
+  public boolean ddo() {
     return true;
   }
 }

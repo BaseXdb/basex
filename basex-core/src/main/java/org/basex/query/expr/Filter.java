@@ -95,7 +95,7 @@ public abstract class Filter extends Preds {
 
       // rewrite filter with document nodes to path; enables index rewritings
       // example: db:open('db')[.//text() = 'x'] -> db:open('db')/.[.//text() = 'x']
-      if(root instanceof Value && root.data() != null && rt.type == NodeType.DOC) {
+      if(rt.type == NodeType.DOC && root.ddo()) {
         final Expr path = Path.get(info, root, Step.get(info, SELF, KindTest.NOD, exprs));
         return cc.replaceWith(this, path.optimize(cc));
       }

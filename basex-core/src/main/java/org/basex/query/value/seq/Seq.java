@@ -100,7 +100,7 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public boolean iterable() {
+  public boolean ddo() {
     return false;
   }
 

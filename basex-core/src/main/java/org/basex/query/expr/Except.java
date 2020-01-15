@@ -62,7 +62,7 @@ public final class Except extends Set {
     // ensure that results are always sorted
     switch(exprs.length) {
       case 0:  return Empty.VALUE;
-      case 1:  return iterable ? exprs[0] : cc.function(Function._UTIL_DDO, info, exprs[0]);
+      case 1:  return ddo ? exprs[0] : cc.function(Function._UTIL_DDO, info, exprs[0]);
       default: return this;
     }
   }
@@ -116,7 +116,7 @@ public final class Except extends Set {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final Except ex = new Except(info, copyAll(cc, vm, exprs));
-    ex.iterable = iterable;
+    ex.ddo = ddo;
     return copyType(ex);
   }
 

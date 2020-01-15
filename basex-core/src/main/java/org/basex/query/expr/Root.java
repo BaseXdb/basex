@@ -78,7 +78,7 @@ public final class Root extends Simple {
   }
 
   @Override
-  public boolean iterable() {
+  public boolean ddo() {
     return true;
   }
 

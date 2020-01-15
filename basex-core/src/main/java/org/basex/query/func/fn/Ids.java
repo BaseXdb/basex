@@ -35,7 +35,7 @@ abstract class Ids extends ContextFn {
    * @return referenced nodes
    * @throws QueryException query exception
    */
-  protected Iter ids(final QueryContext qc, final boolean idref) throws QueryException {
+  protected Value ids(final QueryContext qc, final boolean idref) throws QueryException {
     final TokenSet idSet = ids(exprs[0].atomIter(qc, info), qc);
     final ANode root = checkRoot(toNode(ctxArg(1, qc), qc));
 
@@ -54,13 +54,13 @@ abstract class Ids extends ContextFn {
         if(XMLToken.isId(attr.name(), idref) && (data.meta.ndocs == 1 || attr.root().is(root)))
           vb.add(idref ? attr : attr.parent());
       }
-      return vb.value(this).iter();
+      return vb.value(this);
     }
 
     // otherwise, do sequential scan: parse node and its descendants
     final ANodeBuilder list = new ANodeBuilder();
     add(idSet, list, root, idref);
-    return list.value(this).iter();
+    return list.value(this);
   }
 
   /**
@@ -135,5 +135,10 @@ abstract class Ids extends ContextFn {
   @Override
   boolean contextAccess() {
     return exprs.length == 1;
+  }
+
+  @Override
+  public boolean ddo() {
+    return true;
   }
 }

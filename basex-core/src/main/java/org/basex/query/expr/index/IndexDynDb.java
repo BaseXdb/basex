@@ -25,11 +25,11 @@ public final class IndexDynDb extends IndexDb {
   /**
    * Constructor.
    * @param info input info
-   * @param iterable iterable flag
+   * @param ddo nodes are in distinct document order
    * @param expr expression
    */
-  public IndexDynDb(final InputInfo info, final boolean iterable, final Expr expr) {
-    super(info, iterable);
+  public IndexDynDb(final InputInfo info, final boolean ddo, final Expr expr) {
+    super(info, ddo);
     this.expr = expr;
   }
 
@@ -79,7 +79,7 @@ public final class IndexDynDb extends IndexDb {
 
   @Override
   public IndexDynDb copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new IndexDynDb(info, iterable, expr.copy(cc, vm));
+    return new IndexDynDb(info, ddo, expr.copy(cc, vm));
   }
 
   @Override

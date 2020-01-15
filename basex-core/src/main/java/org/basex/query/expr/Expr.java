@@ -337,13 +337,11 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Indicates if the items returned by this expression are iterable, i.e., if returned nodes are
-   * in document order and contain no duplicates. This will also be guaranteed if zero or one
-   * item is returned.
-   * It is e.g. called by {@link AxisPath}.
+   * Indicates if returned nodes are in document order and contain no duplicates.
+   * The function is only called if nodes are processed: {@link Path}, {@link Set}, {@link Filter}.
    * @return result of check
    */
-  public boolean iterable() {
+  public boolean ddo() {
     return seqType().zeroOrOne();
   }
 

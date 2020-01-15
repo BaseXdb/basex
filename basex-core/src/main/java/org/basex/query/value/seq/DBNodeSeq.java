@@ -54,7 +54,7 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public boolean iterable() {
+  public boolean ddo() {
     return true;
   }
 
