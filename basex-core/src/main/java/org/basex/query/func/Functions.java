@@ -155,7 +155,7 @@ public final class Functions {
   public static QueryException wrongArity(final Object function, final long arity,
       final IntList arities, final InputInfo ii) {
 
-    final int as = arities.sort().distinct().size();
+    final int as = arities.ddo().size();
     if(as == 0) return FUNCARITY_X_X.get(ii, function, arguments(arity));
 
     int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;

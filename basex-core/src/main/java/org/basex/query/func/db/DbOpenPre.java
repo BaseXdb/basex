@@ -42,6 +42,6 @@ public class DbOpenPre extends DbAccess {
         throw DB_RANGE_X_X_X.get(info, data.meta.name, id ? "ID" : "pre", v);
       il.add(pre);
     }
-    return DBNodeSeq.get(il.sort().finish(), data, this);
+    return DBNodeSeq.get(il.ddo().finish(), data, this);
   }
 }

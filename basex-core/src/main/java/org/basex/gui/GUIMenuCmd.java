@@ -864,7 +864,7 @@ public enum GUIMenuCmd implements GUICommand {
           final int k = data.kind(pre);
           pres.add(k == Data.DOC ? pre : data.parent(pre, k));
         }
-        nodes = new DBNodes(data, pres.sort().distinct().finish());
+        nodes = new DBNodes(data, pres.ddo().finish());
         ctx.current(nodes);
       }
       gui.notify.context(nodes, false, null);

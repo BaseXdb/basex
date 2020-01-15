@@ -218,11 +218,12 @@ public class IntList extends ElementList {
   }
 
   /**
-   * Removes duplicate entries.
+   * Sorts the integer and removes distinct values.
    * @return self reference
    */
-  public final IntList distinct() {
+  public final IntList ddo() {
     if(!isEmpty()) {
+      sort();
       int i = 1;
       for(int j = 1; j < size; ++j) {
         while(j < size && list[i - 1] == list[j]) j++;

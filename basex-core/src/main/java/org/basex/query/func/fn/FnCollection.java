@@ -17,7 +17,6 @@ public final class FnCollection extends Docs {
 
   @Override
   public boolean iterable() {
-    // collections will never yield duplicates
     return true;
   }
 }
