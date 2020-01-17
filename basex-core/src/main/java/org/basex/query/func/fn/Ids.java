@@ -133,8 +133,8 @@ abstract class Ids extends ContextFn {
   }
 
   @Override
-  boolean contextAccess() {
-    return exprs.length == 1;
+  int contextArg() {
+    return 1;
   }
 
   @Override

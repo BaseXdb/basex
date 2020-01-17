@@ -33,10 +33,9 @@ public final class Root extends Simple {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final Value value = cc.qc.focus.value;
-    if(cc.nestedFocus()) {
+    if(value != null) {
+      if(!cc.nestedFocus()) return cc.replaceWith(this, value(cc.qc));
       exprType.assign(Occ.ONE);
-    } else {
-      if(value != null) return cc.replaceWith(this, value(cc.qc));
     }
     return this;
   }

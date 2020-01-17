@@ -27,11 +27,10 @@ public final class ContextValue extends Simple {
   @Override
   public Expr optimize(final CompileContext cc) {
     final Value value = cc.qc.focus.value;
-    if(cc.nestedFocus()) {
+    if(value != null) {
+      if(!cc.nestedFocus()) return cc.replaceWith(this, value);
       exprType.assign(Occ.ONE);
-      if(value != null) adoptType(value);
-    } else {
-      if(value != null) return cc.replaceWith(this, value);
+      adoptType(value);
     }
     return this;
   }

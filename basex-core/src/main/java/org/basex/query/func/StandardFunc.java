@@ -83,11 +83,11 @@ public abstract class StandardFunc extends Arr {
     }
 
     final Expr expr = opt(cc);
-    return cc.replaceWith(this, expr != this ?
+    return cc.replaceWith(this,
       // return optimized expression
-      expr : allAreValues(definition.seqType.occ.max > 1) && isSimple() ?
+      expr != this ? expr :
       // pre-evaluate function
-      (definition.seqType.zeroOrOne() ? item(cc.qc, info) : value(cc.qc)) :
+      allAreValues(definition.seqType.occ.max > 1) && isSimple() ? value(cc.qc) :
       // return original function
       this);
   }

@@ -6,6 +6,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 
 /**
@@ -16,11 +17,19 @@ import org.basex.query.var.*;
  */
 public abstract class ContextFn extends StandardFunc {
   /**
+   * Argument that provides the context.
+   * @return context argument.
+   */
+  int contextArg() {
+    return 0;
+  }
+
+  /**
    * Indicates if the function access the current context.
    * @return result of check
    */
-  boolean contextAccess() {
-    return exprs.length == 0;
+  final boolean contextAccess() {
+    return exprs.length == contextArg();
   }
 
   @Override
