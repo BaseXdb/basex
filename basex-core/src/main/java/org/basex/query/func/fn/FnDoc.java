@@ -19,6 +19,6 @@ public final class FnDoc extends Docs {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return optFirst(true);
+    return optFirst();
   }
 }

@@ -112,22 +112,33 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Optimizes a function that returns an empty sequence when the first argument is empty.
+   * Optimizes a function that returns an empty sequence when the first atomized argument is empty,
+   * and adjusts the occurrence indicator if the argument will always yield one item.
+   * @return original expression or function argument
+   */
+  protected Expr optFirst() {
+    return optFirst(true, true, null);
+  }
+
+  /**
+   * Optimizes a function that returns an empty sequence when the first argument or the
+   * context value is empty.
    * <ul>
-   *   <li> Return the first argument if it yields an empty sequence.</li>
-   *   <li> Sets the occurrence indicator to 1 if the first expression returns at least one
-   *     non-array item.</li>
+   *   <li> Returns the first argument (or the context) if it yields an empty sequence.</li>
+   *   <li> Sets the occurrence indicator to 1 if the argument returns at least one item.</li>
    * </ul>
    * @param occ assign occurrence indicator
    *   ({@code true} if function will always yield a result if first argument is non-empty)
-   * @return original expression, or function argument (if it yields no results)
+   * @param atom argument will be atomized
+   * @param value context value (ignored if {@code null})
+   * @return original expression or function argument
    */
-  protected Expr optFirst(final boolean occ) {
-    if(exprs.length > 0) {
-      final Expr expr = exprs[0];
+  protected Expr optFirst(final boolean occ, final boolean atom, final Value value) {
+    final Expr expr = exprs.length > 0 ? exprs[0] : value;
+    if(expr != null) {
       final SeqType st = expr.seqType();
       if(st.zero()) return expr;
-      if(occ && st.oneOrMore() && !st.mayBeArray()) exprType.assign(Occ.ONE);
+      if(occ && st.oneOrMore() && !(atom && st.mayBeArray())) exprType.assign(Occ.ONE);
     }
     return this;
   }

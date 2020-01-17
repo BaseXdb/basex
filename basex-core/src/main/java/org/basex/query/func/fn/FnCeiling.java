@@ -22,6 +22,6 @@ public final class FnCeiling extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return optFirst(true);
+    return optFirst();
   }
 }

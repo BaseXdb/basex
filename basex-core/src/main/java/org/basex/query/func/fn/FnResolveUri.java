@@ -39,6 +39,6 @@ public final class FnResolveUri extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return optFirst(true);
+    return optFirst();
   }
 }

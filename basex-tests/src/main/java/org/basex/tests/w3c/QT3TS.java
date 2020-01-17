@@ -626,8 +626,8 @@ public final class QT3TS extends Main {
   private String assertQuery(final QT3Result result, final XdmValue expected) {
     final String exp = expected.getString();
     try {
-      final String qu = "declare variable $result external; " + exp;
-      return environment(new XQuery(qu, ctx), result.env).bind("$result", result.value).
+      final String query = "declare variable $result external; " + exp;
+      return environment(new XQuery(query, ctx), result.env).bind("$result", result.value).
           value().getBoolean() ? null : exp;
     } catch(final XQueryException ex) {
       // should not occur
@@ -656,13 +656,13 @@ public final class QT3TS extends Main {
   private String assertEq(final QT3Result result, final XdmValue expected) {
     final String exp = expected.getString();
     try {
-      final String qu = "declare variable $returned external; $returned eq " + exp;
-      return environment(new XQuery(qu, ctx), result.env).bind("$returned", result.value).
+      final String query = "declare variable $returned external; $returned eq " + exp;
+      return environment(new XQuery(query, ctx), result.env).bind("$returned", result.value).
           value().getBoolean() ? null : exp;
     } catch(final XQueryException err) {
       // numeric overflow: try simple string comparison
-      return err.getCode().equals("FOAR0002") && exp.equals(expected.getString())
-          ? null : err.getException().getMessage();
+      return err.getCode().equals("FOAR0002") && exp.equals(result.value.getString()) ?
+        null : err.getException().getMessage();
     }
   }
 
@@ -751,12 +751,12 @@ public final class QT3TS extends Main {
   private String serializationMatches(final QT3Result result, final XdmValue expected) {
     try {
       final String flags = asString("@flags", expected);
-      final XdmValue ret = XdmValue.get(Str.get(serialize(result)));
-      final String qu = "declare variable $returned external;"
+      final XdmValue returned = XdmValue.get(Str.get(serialize(result)));
+      final String query = "declare variable $returned external;"
           + "declare variable $expected external;"
           + "matches($returned, string($expected), '" + flags + "')";
 
-      return environment(new XQuery(qu, ctx), result.env).bind("returned", ret).
+      return environment(new XQuery(query, ctx), result.env).bind("returned", returned).
           bind("expected", expected).value().getBoolean() ? null : expected.getString();
     } catch(final Exception err) {
       return Util.info("% (found: %)", expected.getString(), err);
@@ -862,11 +862,10 @@ public final class QT3TS extends Main {
   private String assertType(final QT3Result result, final XdmValue expected) {
     final String exp = expected.getString();
     try {
-      final String qu = "declare variable $returned external; $returned instance of " + exp;
-      final XQuery query = environment(new XQuery(qu, ctx), result.env);
-
+      final String query = "declare variable $returned external; $returned instance of " + exp;
+      final XQuery xquery = environment(new XQuery(query, ctx), result.env);
       final XdmValue returned = result.value;
-      return query.bind("returned", returned).value().getBoolean() ? null :
+      return xquery.bind("returned", returned).value().getBoolean() ? null :
         Util.info("Type '%' (found: '%')", exp, returned.getType().toString());
     } catch(final XQueryException ex) {
       // should not occur

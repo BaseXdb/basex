@@ -19,6 +19,6 @@ public final class FnParseXmlFragment extends Parse {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return optFirst(true);
+    return optFirst();
   }
 }

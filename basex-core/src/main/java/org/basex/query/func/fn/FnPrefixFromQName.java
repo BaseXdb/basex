@@ -24,6 +24,6 @@ public final class FnPrefixFromQName extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return optFirst(false);
+    return optFirst(false, true, null);
   }
 }

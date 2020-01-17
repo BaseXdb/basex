@@ -191,6 +191,7 @@ public final class CmpV extends Cmp {
             type1 == type2 && !AtomType.AAT.instanceOf(type1) &&
               (type1.isSortable() || opV != OpV.EQ && opV != OpV.NE) ||
             type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
+            type1 == AtomType.QNM && type2 == AtomType.QNM ||
             type1.instanceOf(AtomType.NUM) && type2.instanceOf(AtomType.NUM) ||
             type1.instanceOf(AtomType.DUR) && type2.instanceOf(AtomType.DUR))
           ) {

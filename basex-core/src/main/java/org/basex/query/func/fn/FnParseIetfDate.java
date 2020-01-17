@@ -26,7 +26,7 @@ public final class FnParseIetfDate extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return optFirst(true);
+    return optFirst();
   }
 
   /** Date parser. */

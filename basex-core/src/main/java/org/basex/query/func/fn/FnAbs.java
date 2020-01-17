@@ -23,7 +23,7 @@ public final class FnAbs extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr expr = optFirst(true);
+    final Expr expr = optFirst();
     if(expr != this) return expr;
 
     Type type = exprs[0].seqType().type;

@@ -42,6 +42,19 @@ public abstract class ContextFn extends StandardFunc {
     return (!contextAccess() || visitor.lock(Locking.CONTEXT, false)) && super.accept(visitor);
   }
 
+  /**
+   * Optimizes a context-based function call.
+   * @param cc compilation context
+   */
+  protected void optContext(final CompileContext cc) {
+    final boolean context = contextAccess();
+    final Expr expr = context ? cc.qc.focus.value : exprs[contextArg()];
+    if(expr != null) {
+      final SeqType st = expr.seqType();
+      if(st.oneOrMore() && !st.mayBeArray()) exprType.assign(Occ.ONE);
+    }
+  }
+
   @Override
   public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {

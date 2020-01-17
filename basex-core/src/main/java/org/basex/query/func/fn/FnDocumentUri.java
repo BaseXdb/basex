@@ -30,6 +30,6 @@ public final class FnDocumentUri extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return optFirst(false);
+    return optFirst(false, false, cc.qc.focus.value);
   }
 }

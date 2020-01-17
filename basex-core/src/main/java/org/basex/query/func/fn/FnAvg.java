@@ -34,7 +34,7 @@ public class FnAvg extends FnSum {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    Expr expr = optFirst(true);
+    Expr expr = optFirst();
     if(expr != this) return expr;
 
     expr = exprs[0];

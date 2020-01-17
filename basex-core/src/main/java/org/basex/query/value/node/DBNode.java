@@ -165,7 +165,7 @@ public class DBNode extends ANode {
   @Override
   public final byte[] name() {
     return type == NodeType.ELM || type == NodeType.ATT || type == NodeType.PI ?
-      data.name(pre, kind(nodeType())) : Token.EMPTY;
+      data.name(pre, kind(nodeType())) : null;
   }
 
   @Override

@@ -129,8 +129,9 @@ public abstract class ANode extends Item {
   public abstract ANode finish();
 
   /**
-   * Returns the name of the node, composed of an optional prefix and the local name.
-   * It is more efficient than calling {@link #qname}, as no {@link QNm} instance must be created.
+   * Returns the name (optional prefix, local name) of an attribute, element or
+   * processing instruction. This function is possibly evaluated faster than {@link #qname},
+   * as no {@link QNm} instance may need to be created.
    * @return name, or {@code null} if node has no name
    */
   public byte[] name() {
@@ -138,8 +139,9 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns the QName of the node.
-   * @return name, or {@code null} if node has no name
+   * Returns the QName (optional prefix, local name) of an attribute, element or
+   * processing instruction.
+   * @return name, or {@code null} if node has no QName
    */
   public QNm qname() {
     return null;

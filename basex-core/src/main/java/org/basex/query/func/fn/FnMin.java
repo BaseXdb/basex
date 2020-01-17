@@ -137,7 +137,7 @@ public class FnMin extends StandardFunc {
    * @return optimized or original item
    */
   final Expr optMinmax(final OpV cmp) {
-    Expr expr = optFirst(true);
+    Expr expr = optFirst();
     if(expr != this) return expr;
 
     expr = exprs[0];

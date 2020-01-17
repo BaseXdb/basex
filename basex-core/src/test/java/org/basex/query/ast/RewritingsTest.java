@@ -713,11 +713,23 @@ public final class RewritingsTest extends QueryPlanTest {
     error(". = .", QueryError.NOCTX_X);
   }
 
-  /** XQuery: Pre-evaluate predicates in filter expressions. */
+  /** Pre-evaluate predicates in filter expressions. */
   @Test public void gh1785() {
     check("<a/>[self::node()]", "<a/>", root(CElem.class));
     check("<a/>[self::*]", "<a/>", root(CElem.class));
     check("<a/>[self::*[name(..) = 'a']]", "", root(IterFilter.class));
     check("<a/>[self::text()]", "", empty());
+  }
+
+  /** Better typing of functions with context arguments. */
+  @Test public void gh1787() {
+    check("path(<a/>) instance of xs:string", true, root(Bln.class));
+    check("<a/>[path() instance of xs:string]", "<a/>", root(CElem.class));
+    check("<a/>[node-name() eq xs:QName('a')]", "<a/>", exists(CmpSimpleG.class));
+    check("<a/>[local-name() eq 'a']", "<a/>", exists(CmpSimpleG.class));
+    check("<a/>[name() = 'a']", "<a/>", exists(CmpSimpleG.class));
+
+    check("node-name(prof:void(()))", "", root(_PROF_VOID));
+    check("prefix-from-QName(prof:void(()))", "", root(_PROF_VOID));
   }
 }
