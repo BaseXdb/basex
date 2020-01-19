@@ -76,7 +76,7 @@ public final class DeepEqual {
    * @throws QueryException query exception
    */
   public boolean equal(final Value value1, final Value value2) throws QueryException {
-    return value1 == value2 || equal(value1.iter(), value2.iter());
+    return equal(value1.iter(), value2.iter());
   }
 
 
