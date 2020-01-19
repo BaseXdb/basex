@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
@@ -142,49 +141,28 @@ public abstract class Preds extends Arr {
    * @throws QueryException query exception
    */
   protected final boolean optimize(final CompileContext cc, final Expr root) throws QueryException {
-    simplify(cc, root);
-
     // remember current context value (will be temporarily overwritten)
     cc.pushFocus(root);
     try {
+      simplify(cc, root);
+
       final int el = exprs.length;
       final ExprList list = new ExprList(el);
       boolean pos = false;
       for(final Expr ex : exprs) {
         final Expr ebv = cc.simplifyEbv(ex);
         Expr expr = ebv;
-        if(expr instanceof CmpG || expr instanceof CmpV) {
-          final Cmp cmp = (Cmp) expr;
-          final OpV opV = cmp.opV();
-          final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
-          if(Function.POSITION.is(cmp1)) {
-            if(numeric(cmp2) && opV == OpV.EQ) {
-              // position() = NUMBER -> NUMBER
-              expr = cmp2;
-            } else if(Function.LAST.is(cmp2)) {
-              switch(opV) {
-                // position() =/>= last() -> last()
-                case EQ: case GE: expr = cmp2; break;
-                // position() <= last() -> true()
-                case LE: expr = Bln.TRUE; break;
-                // position() > last() -> false()
-                case GT: expr = Bln.FALSE; break;
-                // position() </!= last() -> handled in {@link Filter} expression
-                default:
-              }
-            }
-          }
-        } else if(expr instanceof And) {
+        if(expr instanceof And) {
           if(!expr.has(Flag.POS)) {
             // replace AND expression with predicates (don't rewrite position tests)
             cc.info(OPTPRED_X, expr);
             final Expr[] ands = ((Arr) expr).exprs;
-            final int m = ands.length;
-            for (int a = 0; a < m; a++) {
+            final int al = ands.length;
+            for (int a = 0; a < al; a++) {
               // wrap test with boolean() if the result is numeric
               expr = ands[a];
               if(expr.seqType().mayBeNumber()) expr = cc.function(Function.BOOLEAN, info, expr);
-              if(a + 1 < m) pos = addUnique(expr, list, pos, cc);
+              if(a + 1 < al) pos = addUnique(expr, list, pos, cc);
             }
           }
         } else if(expr instanceof ANum) {
@@ -221,8 +199,9 @@ public abstract class Preds extends Arr {
    * Simplifies the predicates.
    * @param cc compilation context
    * @param root root expression
+   * @throws QueryException query exception
    */
-  private void simplify(final CompileContext cc, final Expr root) {
+  private void simplify(final CompileContext cc, final Expr root) throws QueryException {
     final ExprList list = new ExprList(exprs.length);
     final SeqType st = root.seqType();
     for(final Expr expr : exprs) {
@@ -242,28 +221,38 @@ public abstract class Preds extends Arr {
           final int ml = mexprs.length;
           ex = ml == 2 ? second : SimpleMap.get(map.info, Arrays.copyOfRange(mexprs, 1, ml));
         }
-      } else if(ex instanceof SingleIterPath) {
-        final Step predStep = (Step) ((Path) ex).steps[0];
-        if(predStep.axis == Axis.SELF && !predStep.positional()) {
-          if(root instanceof Step && !positional()) {
-            final Step rootStep = (Step) root;
-            final Test test = rootStep.test.intersect(predStep.test);
-            if(test != null) {
-              // child::node() [ self:* ]  ->  child::*
-              cc.info(OPTMERGE_X, predStep);
-              rootStep.test = test;
-              list.add(predStep.exprs);
+      }
+
+      // comparisons
+      if(ex instanceof CmpG || ex instanceof CmpV) {
+        ex = ((Cmp) ex).optPred(root, cc);
+      }
+
+      // paths
+      if(ex instanceof Path) {
+        if(ex instanceof SingleIterPath) {
+          final Step predStep = (Step) ((Path) ex).steps[0];
+          if(predStep.axis == Axis.SELF && !predStep.positional()) {
+            if(root instanceof Step && !positional()) {
+              final Step rootStep = (Step) root;
+              final Test test = rootStep.test.intersect(predStep.test);
+              if(test != null) {
+                // child::node() [ self:* ]  ->  child::*
+                cc.info(OPTMERGE_X, predStep);
+                rootStep.test = test;
+                list.add(predStep.exprs);
+                continue;
+              }
+            }
+            if(predStep.test instanceof KindTest && predStep.exprs.length == 0 &&
+                st.type.instanceOf(predStep.test.type)) {
+              // <a/> [ self:* ]  ->  <a/>
+              cc.info(OPTREMOVE_X_X, ex, (Supplier<?>) this::description);
               continue;
             }
           }
-          if(predStep.test instanceof KindTest && predStep.exprs.length == 0 &&
-              st.type.instanceOf(predStep.test.type)) {
-            // <a/> [ self:* ]  ->  <a/>
-            cc.info(OPTREMOVE_X_X, ex, (Supplier<?>) this::description);
-            continue;
-          }
         }
-      } else if(ex instanceof Path) {
+
         // E [ . / ... ] -> E [ ... ]
         // E [ E / ... ] -> E [ ... ]
         final Path path = (Path) ex;
@@ -273,6 +262,7 @@ public abstract class Preds extends Arr {
           ex = Path.get(path.info, null, path.steps);
         }
       }
+
       list.add(cc.replaceWith(expr, ex));
     }
     exprs = list.finish();

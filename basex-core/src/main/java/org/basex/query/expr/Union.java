@@ -74,7 +74,7 @@ public final class Union extends Set {
     Expr root = null;
     Axis axis = null;
     Expr[] preds = null;
-    final ArrayList<Test> tests = new ArrayList<>();
+    final ArrayList<Test> tests = new ArrayList<>(2);
 
     for(final Expr expr : exprs) {
       if(!(expr instanceof Path)) return false;
@@ -94,7 +94,7 @@ public final class Union extends Set {
       tests.add(step.test);
     }
 
-    final Test test = UnionTest.get(tests.toArray(new Test[0]));
+    final Test test = Test.get(tests);
     if(test == null) return false;
 
     exprs[0] = Path.get(info, root, Step.get(info, axis, test, preds)).optimize(cc);

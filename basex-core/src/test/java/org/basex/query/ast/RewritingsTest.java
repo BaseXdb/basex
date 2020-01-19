@@ -725,11 +725,39 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1787() {
     check("path(<a/>) instance of xs:string", true, root(Bln.class));
     check("<a/>[path() instance of xs:string]", "<a/>", root(CElem.class));
-    check("<a/>[node-name() eq xs:QName('a')]", "<a/>", exists(CmpSimpleG.class));
-    check("<a/>[local-name() eq 'a']", "<a/>", exists(CmpSimpleG.class));
     check("<a/>[name() = 'a']", "<a/>", exists(CmpSimpleG.class));
 
     check("node-name(prof:void(()))", "", root(_PROF_VOID));
     check("prefix-from-QName(prof:void(()))", "", root(_PROF_VOID));
+  }
+
+  /** Rewrite name tests to self steps. */
+  @Test public void gh1770() {
+    check("<a/>[node-name() eq xs:QName('a')]", "<a/>", exists(SingleIterPath.class));
+    check("<a/>[local-name() eq 'a']", "<a/>", exists(SingleIterPath.class));
+    check("<a/>[namespace-uri() eq '']", "<a/>", exists(SingleIterPath.class));
+
+    check("<a/>[local-name() = ('a', 'b', '')]", "<a/>", exists(SingleIterPath.class));
+    check("<a/>[local-name() = 'a' or local-name() = 'b']", "<a/>", exists(SingleIterPath.class));
+    check("<a/>[node-name() = (xs:QName('a'), xs:QName('b'))]", "<a/>",
+        exists(SingleIterPath.class));
+
+    check("<a/>[local-name() eq '']", "", empty());
+    check("<a/>[local-name() = ('', '', '')]", "", empty());
+    check("attribute { 'a' } { '' }[local-name() = '']", "", empty());
+    check("comment {}[local-name() = '']", "<!---->", root(CComm.class));
+    check("text { 'a' }[local-name() = '']", "a", root(CTxt.class));
+
+    final String prolog = "declare default element namespace 'A'; ";
+    check(prolog + "<a/>[node-name() eq QName('A','a')]",
+        "<a xmlns=\"A\"/>", exists(SingleIterPath.class));
+    check(prolog + "<a/>[namespace-uri() eq 'A']",
+        "<a xmlns=\"A\"/>", exists(SingleIterPath.class));
+
+    // no rewritings
+    check("1[. = 2][local-name() = 'a']", "", exists(LOCAL_NAME));
+    check("<a/>[local-name() != 'a']", "", exists(LOCAL_NAME));
+    check("<a/>[local-name() = <_>a</_>]", "<a/>", exists(LOCAL_NAME));
+    check("<a/>[node-name() = xs:QName(<_>a</_>)]", "<a/>", exists(NODE_NAME));
   }
 }

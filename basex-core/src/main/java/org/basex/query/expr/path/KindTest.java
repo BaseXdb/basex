@@ -60,7 +60,7 @@ public class KindTest extends Test {
 
   @Override
   public KindTest copy() {
-    return get(type);
+    return this;
   }
 
   @Override

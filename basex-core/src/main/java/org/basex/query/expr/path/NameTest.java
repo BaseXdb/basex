@@ -36,7 +36,7 @@ public final class NameTest extends Test {
    * @param type node type
    * @param qname name
    * @param part part of name to be tested
-   * @param defaultNs default element namespace (required for optimizations, can be {@code null})
+   * @param defaultNs default element namespace (used for optimizations, can be {@code null})
    */
   public NameTest(final NodeType type, final QNm qname, final NamePart part,
       final byte[] defaultNs) {

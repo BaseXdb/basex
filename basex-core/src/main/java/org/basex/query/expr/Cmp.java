@@ -1,13 +1,20 @@
 package org.basex.query.expr;
 
+import static org.basex.util.Token.*;
+
+import java.util.*;
+
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -99,6 +106,84 @@ public abstract class Cmp extends Arr {
     if(expr == this) expr = optStringLength(op, cc);
     if(expr == this) expr = optPos(op, cc);
     return expr;
+  }
+
+  /**
+   * Optimizes this expression as predicate.
+   * @param root root expression
+   * @param cc compilation context
+   * @return resulting expression
+   * @throws QueryException query exception
+   */
+  public final Expr optPred(final Expr root, final CompileContext cc) throws QueryException {
+    final Type type = root.seqType().type;
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final OpV opV = opV();
+    if(positional()) {
+      if(Preds.numeric(expr2) && opV == OpV.EQ) {
+        // position() = NUMBER -> NUMBER
+        return expr2;
+      } else if(Function.LAST.is(expr2)) {
+        switch(opV) {
+          // position() =/>= last() -> last()
+          case EQ: case GE: return expr2;
+          // position() <= last() -> true()
+          case LE: return Bln.TRUE;
+          // position() > last() -> false()
+          case GT: return Bln.FALSE;
+          // position() </!= last() -> handled in {@link Filter} expression
+          default:
+        }
+      }
+    } else if(type instanceof NodeType && type != NodeType.NOD && opV == OpV.EQ &&
+        (this instanceof CmpG ? expr2 instanceof Value : expr2 instanceof Item)) {
+      final ArrayList<QNm> qnames = new ArrayList<>();
+      NamePart part = null;
+      if(expr2.seqType().type.isStringOrUntyped()) {
+        // local-name() eq 'a'  ->  self::*:a
+        if(Function.LOCAL_NAME.is(expr1)) {
+          part = NamePart.LOCAL;
+          for(final Item item : (Value) expr2) {
+            final byte[] name = item.string(info);
+            if(XMLToken.isNCName(name)) qnames.add(new QNm(name));
+          }
+        } else if(Function.NAMESPACE_URI.is(expr1)) {
+          // namespace-uri() = ('URI1', 'URI2')  ->  self::Q{URI1} | self::Q{URI2}*
+          part = NamePart.URI;
+          for(final Item item : (Value) expr2) {
+            qnames.add(new QNm(COLON, item.string(info)));
+          }
+        } else if(Function.NAME.is(expr1)) {
+          // (db-without-ns)[name() = 'city']  ->  (db-without-ns)[self::city]
+          final Data data = cc.qc.focus.value.data();
+          final byte[] dataNs = data != null ? data.nspaces.globalUri() : null;
+          if(dataNs != null && dataNs.length == 0) {
+            part = NamePart.LOCAL;
+            for(final Item item : (Value) expr2) {
+              final byte[] name = item.string(info);
+              if(XMLToken.isNCName(name)) qnames.add(new QNm(name));
+            }
+          }
+        }
+      } else if(Function.NODE_NAME.is(expr1) && expr2.seqType().type == AtomType.QNM) {
+        // node-name() = xs:QName('pref:local')  ->  self::pref:local
+        part = NamePart.FULL;
+        for(final Item item : (Value) expr2) {
+          qnames.add((QNm) item);
+        }
+      }
+      if(part != null) {
+        final ExprList paths = new ExprList(2);
+        for(final QNm qname : qnames) {
+          final Test test = new NameTest((NodeType) type, qname, part, cc.sc().elemNS);
+          final Expr step = Step.get(info, Axis.SELF, test).optimize(cc);
+          if(step != Empty.VALUE) paths.add(Path.get(info, null, step).optimize(cc));
+        }
+        return paths.isEmpty() ? Bln.FALSE : paths.size() == 1 ? paths.get(0) :
+          new Union(info, paths.finish()).optimize(cc);
+      }
+    }
+    return this;
   }
 
   /**
