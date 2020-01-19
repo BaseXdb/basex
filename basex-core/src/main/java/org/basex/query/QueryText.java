@@ -393,7 +393,7 @@ public interface QueryText {
   /** Query Info. */ String ENTRIES = "entries";
   /** Query Info. */ String PROMOTE = "promote";
   /** Query Info. */ String DATABASE = "database";
-  /** Query Info. */ String ITERABLE = "iterable";
+  /** Query Info. */ String ITERATIVE = "iterative";
   /** Query Info. */ String SINGLE = "single";
   /** Query Info. */ String LINE = "line";
   /** Query Info. */ String COLUMN = "column";

@@ -39,27 +39,25 @@ abstract class Ids extends ContextFn {
     final TokenSet idSet = ids(exprs[0].atomIter(qc, info), qc);
     final ANode root = checkRoot(toNode(ctxArg(1, qc), qc));
 
+    final ANodeBuilder list = new ANodeBuilder();
     if(index(root, idref)) {
       // create index iterator
       final Data data = root.data();
       final ValueAccess va = new ValueAccess(info, idSet, idref ? IndexType.TOKEN :
-        IndexType.ATTRIBUTE, null, new IndexStaticDb(info, data));
+        IndexType.ATTRIBUTE, null, new IndexStaticDb(data, info));
 
       // collect and return index results, filtered by id/idref attributes
-      final ValueBuilder vb = new ValueBuilder(qc);
       final Iter iter = va.iter(qc);
       for(Item item; (item = iter.next()) != null;) {
         // check attribute name; check root if database has more than one document
         final ANode attr = (ANode) item;
         if(XMLToken.isId(attr.name(), idref) && (data.meta.ndocs == 1 || attr.root().is(root)))
-          vb.add(idref ? attr : attr.parent());
+          list.add(idref ? attr : attr.parent());
       }
-      return vb.value(this);
+    } else {
+      // otherwise, do sequential scan: parse node and its descendants
+      add(idSet, list, root, idref);
     }
-
-    // otherwise, do sequential scan: parse node and its descendants
-    final ANodeBuilder list = new ANodeBuilder();
-    add(idSet, list, root, idref);
     return list.value(this);
   }
 

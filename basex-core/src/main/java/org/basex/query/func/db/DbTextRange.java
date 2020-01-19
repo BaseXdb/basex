@@ -49,6 +49,6 @@ public class DbTextRange extends DbAccess {
     final Data data = checkData(qc);
     final byte[] min = toToken(exprs[1], qc), max = toToken(exprs[2], qc);
     final StringRange sr = new StringRange(type(), min, true, max, true);
-    return new StringRangeAccess(info, sr, new IndexStaticDb(info, data));
+    return new StringRangeAccess(info, sr, new IndexStaticDb(data, info));
   }
 }

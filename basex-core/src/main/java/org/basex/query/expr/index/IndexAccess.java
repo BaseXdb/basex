@@ -68,7 +68,7 @@ public abstract class IndexAccess extends Simple {
 
   @Override
   public final boolean ddo() {
-    return seqType().zeroOrOne() || db.ddo();
+    return true;
   }
 
   @Override

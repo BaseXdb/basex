@@ -56,7 +56,7 @@ public class DbText extends DbAccess {
     final TokenSet set = new TokenSet();
     final Iter iter = exprs[1].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) set.put(toToken(item));
-    return new ValueAccess(info, set, type(), null, new IndexStaticDb(info, data));
+    return new ValueAccess(info, set, type(), null, new IndexStaticDb(data, info));
   }
   /**
    * Performs the attribute function.

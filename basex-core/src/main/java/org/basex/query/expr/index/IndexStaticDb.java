@@ -21,21 +21,11 @@ public final class IndexStaticDb extends IndexDb {
 
   /**
    * Constructor.
-   * @param info input info
    * @param data data reference
-   */
-  public IndexStaticDb(final InputInfo info, final Data data) {
-    this(data, false, info);
-  }
-
-  /**
-   * Constructor.
-   * @param data data reference
-   * @param ddo nodes are in distinct document order
    * @param info input info
    */
-  public IndexStaticDb(final Data data, final boolean ddo, final InputInfo info) {
-    super(info, ddo);
+  public IndexStaticDb(final Data data, final InputInfo info) {
+    super(info);
     this.data = data;
   }
 
@@ -80,7 +70,7 @@ public final class IndexStaticDb extends IndexDb {
 
   @Override
   public IndexDb copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new IndexStaticDb(data, ddo, info);
+    return new IndexStaticDb(data, info);
   }
 
   @Override

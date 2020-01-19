@@ -26,7 +26,7 @@ public final class FtSearch extends FtAccess {
     final Value terms = exprs[1].value(qc);
     final FtIndexOptions opts = toOptions(2, new FtIndexOptions(), qc);
 
-    final IndexDb db = new IndexStaticDb(info, data);
+    final IndexDb db = new IndexStaticDb(data, info);
     final FTOpt opt = new FTOpt().assign(data.meta);
     final FTMode mode = opts.get(FtIndexOptions.MODE);
     opt.set(FZ, opts.get(FtIndexOptions.FUZZY));

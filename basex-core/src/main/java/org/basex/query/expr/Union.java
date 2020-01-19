@@ -59,7 +59,7 @@ public final class Union extends Set {
 
     switch(exprs.length) {
       case 0:  return Empty.VALUE;
-      case 1:  return ddo ? exprs[0] : cc.function(Function._UTIL_DDO, info, exprs[0]);
+      case 1:  return iterative ? exprs[0] : cc.function(Function._UTIL_DDO, info, exprs[0]);
       default: return merge(cc) ? cc.replaceWith(this, exprs[0]) : this;
     }
   }
@@ -145,7 +145,7 @@ public final class Union extends Set {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final Union un = new Union(info, copyAll(cc, vm, exprs));
-    un.ddo = ddo;
+    un.iterative = iterative;
     return copyType(un);
   }
 

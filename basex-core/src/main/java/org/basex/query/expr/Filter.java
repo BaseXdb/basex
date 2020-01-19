@@ -80,8 +80,8 @@ public abstract class Filter extends Preds {
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     // return empty root
-    final SeqType rt = root.seqType();
-    if(rt.zero()) return cc.replaceWith(this, root);
+    final SeqType st = root.seqType();
+    if(st.zero()) return cc.replaceWith(this, root);
 
     // simplify predicates
     if(!optimize(cc, root)) return cc.emptySeq(this);
@@ -95,7 +95,7 @@ public abstract class Filter extends Preds {
 
       // rewrite filter with document nodes to path; enables index rewritings
       // example: db:open('db')[.//text() = 'x'] -> db:open('db')/.[.//text() = 'x']
-      if(rt.type == NodeType.DOC && root.ddo()) {
+      if(st.type == NodeType.DOC && root.ddo()) {
         final Expr path = Path.get(info, root, Step.get(info, SELF, KindTest.NOD, exprs));
         return cc.replaceWith(this, path.optimize(cc));
       }
@@ -260,6 +260,11 @@ public abstract class Filter extends Preds {
       visitor.exitFocus();
     }
     return root.accept(visitor);
+  }
+
+  @Override
+  public boolean ddo() {
+    return root.ddo();
   }
 
   @Override

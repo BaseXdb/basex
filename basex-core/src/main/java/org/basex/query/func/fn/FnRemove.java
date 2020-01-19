@@ -104,4 +104,9 @@ public final class FnRemove extends StandardFunc {
     exprType.assign(st.type, st.occ.union(Occ.ZERO), sz);
     return this;
   }
+
+  @Override
+  public boolean ddo() {
+    return exprs[0].ddo();
+  }
 }

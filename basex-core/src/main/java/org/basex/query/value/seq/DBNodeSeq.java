@@ -55,7 +55,7 @@ public class DBNodeSeq extends NativeSeq {
 
   @Override
   public boolean ddo() {
-    return type == NodeType.DOC;
+    return true;
   }
 
   @Override

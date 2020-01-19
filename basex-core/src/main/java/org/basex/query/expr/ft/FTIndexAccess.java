@@ -99,7 +99,7 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public boolean ddo() {
-    return seqType().zeroOrOne() || db.ddo();
+    return true;
   }
 
   @Override

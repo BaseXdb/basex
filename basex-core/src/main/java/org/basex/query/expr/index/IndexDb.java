@@ -16,17 +16,12 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public abstract class IndexDb extends ParseExpr {
-  /** Flag for iterative evaluation. */
-  final boolean ddo;
-
   /**
    * Constructor.
    * @param info input info
-   * @param ddo nodes are in distinct document order
    */
-  IndexDb(final InputInfo info, final boolean ddo) {
+  IndexDb(final InputInfo info) {
     super(info, SeqType.ITEM_ZM);
-    this.ddo = ddo;
   }
 
   /**
@@ -63,13 +58,8 @@ public abstract class IndexDb extends ParseExpr {
   public abstract IndexDb copy(CompileContext cc, IntObjMap<Var> vm);
 
   @Override
-  public final boolean ddo() {
-    return ddo;
-  }
-
-  @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof IndexDb && ddo == ((IndexDb) obj).ddo;
+    return this == obj || obj instanceof IndexDb;
   }
 
   @Override

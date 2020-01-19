@@ -657,10 +657,10 @@ public abstract class Path extends ParseExpr {
 
       final int el = step.exprs.length;
       if(el > 0) {
-        // check if path is iterable (i.e., will be duplicate-free)
+        // static vs dynamic access
         final IndexDb db = data != null ?
-          new IndexStaticDb(data, pathNodes(data, s) != null, info) :
-          new IndexDynDb(info, false, root == null ? new ContextValue(info) : root);
+          new IndexStaticDb(data, info) :
+          new IndexDynDb(root == null ? new ContextValue(info) : root, info);
 
         // choose cheapest index access
         for(int e = 0; e < el; e++) {

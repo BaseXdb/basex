@@ -223,4 +223,9 @@ public class FnSubsequence extends StandardFunc {
     exprType.assign(st.type, st.occ.union(Occ.ZERO), sz);
     return this;
   }
+
+  @Override
+  public final boolean ddo() {
+    return exprs[0].ddo();
+  }
 }

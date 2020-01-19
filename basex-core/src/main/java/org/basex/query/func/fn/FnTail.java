@@ -95,4 +95,9 @@ public final class FnTail extends StandardFunc {
     exprType.assign(st.type, Occ.ZERO_MORE, size - 1);
     return this;
   }
+
+  @Override
+  public boolean ddo() {
+    return exprs[0].ddo();
+  }
 }
