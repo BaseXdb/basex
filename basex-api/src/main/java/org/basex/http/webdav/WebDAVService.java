@@ -92,7 +92,7 @@ final class WebDAVService {
    */
   String timestamp(final String db) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(DATA.args(_DB_INFO.args(" $db") +
-        "/descendant::" + DbFn.toName(Text.TIMESTAMP) + "[1]")).bind("db",  db);
+        "/descendant::" + DbInfo.toName(Text.TIMESTAMP) + "[1]")).bind("db",  db);
     return query.execute(session());
   }
 

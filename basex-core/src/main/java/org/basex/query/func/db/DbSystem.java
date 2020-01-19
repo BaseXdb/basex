@@ -2,6 +2,7 @@ package org.basex.query.func.db;
 
 import org.basex.core.cmd.*;
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -11,12 +12,12 @@ import org.basex.util.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class DbSystem extends DbFn {
+public final class DbSystem extends StandardFunc {
   /** Resource element name. */
   private static final String SYSTEM = "system";
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return toNode(Info.info(qc.context), SYSTEM);
+    return DbInfo.toNode(Info.info(qc.context), SYSTEM);
   }
 }

@@ -1,5 +1,6 @@
 package org.basex.query.expr.index;
 
+import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -68,6 +69,11 @@ public abstract class IndexAccess extends Simple {
   @Override
   public final boolean ddo() {
     return seqType().zeroOrOne() || db.ddo();
+  }
+
+  @Override
+  public final Data data() {
+    return db.data();
   }
 
   @Override

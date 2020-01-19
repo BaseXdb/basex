@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -20,6 +21,11 @@ public class DbOpenPre extends DbAccess {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return open(qc, false);
+  }
+
+  @Override
+  protected final Expr opt(final CompileContext cc) throws QueryException {
+    return compileData(cc);
   }
 
   /**

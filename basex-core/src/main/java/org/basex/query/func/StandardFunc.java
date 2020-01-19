@@ -49,6 +49,9 @@ public abstract class StandardFunc extends Arr {
   /** Static context. */
   public StaticContext sc;
 
+  /** Data opened at compile time. */
+  protected Data compiledData;
+
   /**
    * Constructor.
    */
@@ -217,6 +220,26 @@ public abstract class StandardFunc extends Arr {
 
     // new type is more specific: coerce to new function type
     return !newType.eq(oldType) ? func.coerceTo(newType, cc.qc, info, true) : expr;
+  }
+
+  /**
+   * Opens a database at compile time.
+   * @param cc compilation context
+   * @return self reference
+   * @throws QueryException query exception
+   */
+  protected final Expr compileData(final CompileContext cc)
+      throws QueryException {
+    if(exprs.length > 0 && exprs[0] instanceof Value) {
+      compiledData = checkData(cc.qc);
+      cc.info(QueryText.OPTOPEN_X, compiledData.meta.name);
+    }
+    return this;
+  }
+
+  @Override
+  public final Data data() {
+    return compiledData;
   }
 
   /**
@@ -437,6 +460,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final Data checkData(final QueryContext qc) throws QueryException {
+    if(compiledData != null) return compiledData;
     final String name = string(toToken(exprs[0], qc));
     if(!Databases.validName(name)) throw INVDB_X.get(info, name);
     return qc.resources.database(name, info);

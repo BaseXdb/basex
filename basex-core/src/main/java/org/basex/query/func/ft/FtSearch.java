@@ -5,6 +5,7 @@ import static org.basex.util.ft.FTFlag.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
@@ -20,7 +21,7 @@ import org.basex.util.ft.*;
  */
 public final class FtSearch extends FtAccess {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public NodeIter iter(final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
     final Value terms = exprs[1].value(qc);
     final FtIndexOptions opts = toOptions(2, new FtIndexOptions(), qc);
@@ -44,5 +45,10 @@ public final class FtSearch extends FtAccess {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     return dataLock(visitor, 0) && super.accept(visitor);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    return compileData(cc);
   }
 }

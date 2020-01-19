@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.up.primitives.name.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -17,7 +18,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public class DbCopy extends DbFn {
+public class DbCopy extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     copy(qc, true);

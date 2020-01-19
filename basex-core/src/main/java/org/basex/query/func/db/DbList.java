@@ -8,6 +8,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -24,7 +25,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public class DbList extends DbFn {
+public class DbList extends StandardFunc {
   /** Resource element name. */
   static final String DATABASE = "database";
   /** Resource element name. */

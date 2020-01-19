@@ -2,6 +2,7 @@ package org.basex.query.func.db;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 
@@ -22,5 +23,10 @@ public final class DbOpen extends DbAccess {
   @Override
   public boolean ddo() {
     return true;
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    return compileData(cc);
   }
 }

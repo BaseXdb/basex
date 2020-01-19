@@ -37,7 +37,6 @@ public final class RewritingsTest extends QueryPlanTest {
     check("count(//node())", 6, exists(Int.class));
     check("count(//comment())", 0, exists(Int.class));
     check("count(/self::document-node())", 1, exists(Int.class));
-    execute(new DropDB(NAME));
   }
 
   /** Checks if descendant-or-self::node() steps are rewritten. */
@@ -759,5 +758,12 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[local-name() != 'a']", "", exists(LOCAL_NAME));
     check("<a/>[local-name() = <_>a</_>]", "<a/>", exists(LOCAL_NAME));
     check("<a/>[node-name() = xs:QName(<_>a</_>)]", "<a/>", exists(NODE_NAME));
+  }
+
+  /** Functions with database access. */
+  @Test public void gh1788() {
+    execute(new CreateDB(NAME, "<x>A</x>"));
+    check("db:text('" + NAME + "', 'A')/parent::x", "<x>A</x>", exists(_DB_TEXT));
+    check("db:text('" + NAME + "', 'A')/parent::unknown", "", empty());
   }
 }
