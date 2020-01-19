@@ -19,7 +19,7 @@ public final class NameTest extends Test {
   /** Local name. */
   public final byte[] local;
   /** QName test. */
-  public final QNm name;
+  public final QNm qname;
   /** Part of name to be tested. */
   public NamePart part;
 
@@ -34,18 +34,18 @@ public final class NameTest extends Test {
   /**
    * Constructor.
    * @param type node type
-   * @param name name
+   * @param qname name
    * @param part part of name to be tested
    * @param defaultNs default element namespace (required for optimizations, can be {@code null})
    */
-  public NameTest(final NodeType type, final QNm name, final NamePart part,
+  public NameTest(final NodeType type, final QNm qname, final NamePart part,
       final byte[] defaultNs) {
 
     super(type);
     this.defaultNs = defaultNs != null ? defaultNs : Token.EMPTY;
     this.part = part;
-    this.name = name;
-    local = name.local();
+    this.qname = qname;
+    local = qname.local();
   }
 
   @Override
@@ -60,7 +60,7 @@ public final class NameTest extends Test {
     if(dataNs == null) return true;
 
     // check if test may yield results
-    if(part == NamePart.FULL && !name.hasURI()) {
+    if(part == NamePart.FULL && !qname.hasURI()) {
       if(type == NodeType.ATT || Token.eq(dataNs, defaultNs)) {
         // namespace is irrelevant/identical: only check local name
         part = NamePart.LOCAL;
@@ -88,9 +88,9 @@ public final class NameTest extends Test {
       // namespaces wildcard: only check local name
       case LOCAL: return Token.eq(local, Token.local(node.name()));
       // name wildcard: only check namespace
-      case URI: return Token.eq(name.uri(), node.qname().uri());
+      case URI: return Token.eq(qname.uri(), node.qname().uri());
       // check attributes, or check everything
-      default: return name.eq(node.qname());
+      default: return qname.eq(node.qname());
     }
   }
 
@@ -104,9 +104,9 @@ public final class NameTest extends Test {
       // namespaces wildcard: only check local name
       case LOCAL: return Token.eq(local, qName.local());
       // name wildcard: only check namespace
-      case URI: return Token.eq(name.uri(), qName.uri());
+      case URI: return Token.eq(qname.uri(), qName.uri());
       // check everything
-      default: return name.eq(qName);
+      default: return qname.eq(qName);
     }
   }
 
@@ -117,7 +117,7 @@ public final class NameTest extends Test {
     }
     if(test instanceof NameTest) {
       final NameTest nt = (NameTest) test;
-      return type == nt.type && name.eq(nt.name) ? this : null;
+      return type == nt.type && qname.eq(nt.qname) ? this : null;
     }
     if(test instanceof KindTest) {
       return type.instanceOf(test.type) ? this : null;
@@ -129,7 +129,7 @@ public final class NameTest extends Test {
   public boolean equals(final Object obj) {
     if(!(obj instanceof NameTest)) return false;
     final NameTest nt = (NameTest) obj;
-    return type == nt.type && name.eq(nt.name);
+    return type == nt.type && qname.eq(nt.qname);
   }
 
   /**
@@ -142,15 +142,15 @@ public final class NameTest extends Test {
     if(full) tb.add(type.string()).add('(');
     if(part == NamePart.LOCAL) {
       tb.add('*').add(':');
-    } else if(name.hasPrefix()) {
-      tb.add(name.prefix()).add(':');
-    } else if(name.uri().length != 0) {
-      tb.add('{').add(name.uri()).add('}');
+    } else if(qname.hasPrefix()) {
+      tb.add(qname.prefix()).add(':');
+    } else if(qname.uri().length != 0) {
+      tb.add('{').add(qname.uri()).add('}');
     }
     if(part == NamePart.URI) {
       tb.add('*');
     } else {
-      tb.add(name.local());
+      tb.add(qname.local());
     }
     if(full) tb.add(')');
     return tb.toString();

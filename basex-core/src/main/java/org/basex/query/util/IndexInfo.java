@@ -85,7 +85,7 @@ public final class IndexInfo {
       test = (NameTest) last.test;
       if(test.part != NamePart.LOCAL) return null;
 
-      final Stats stats = data.elemNames.stats(data.elemNames.id(test.name.local()));
+      final Stats stats = data.elemNames.stats(data.elemNames.id(test.qname.local()));
       if(stats == null || !stats.isLeaf()) return null;
       text = true;
     } else if(last.test.type != NodeType.ATT) {
@@ -247,7 +247,7 @@ public final class IndexInfo {
 
     // return local name and namespace uri (null represents wildcards)
     final NameTest nt = (NameTest) st.test;
-    return new byte[][] { nt.local, nt.name == null ? null : nt.name.uri() };
+    return new byte[][] { nt.local, nt.qname == null ? null : nt.qname.uri() };
   }
 
   /**

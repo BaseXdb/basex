@@ -130,7 +130,7 @@ public abstract class ANode extends Item {
 
   /**
    * Returns the name (optional prefix, local name) of an attribute, element or
-   * processing instruction. This function is possibly evaluated faster than {@link #qname},
+   * processing instruction. This function is possibly evaluated faster than {@link #qname()},
    * as no {@link QNm} instance may need to be created.
    * @return name, or {@code null} if node has no name
    */

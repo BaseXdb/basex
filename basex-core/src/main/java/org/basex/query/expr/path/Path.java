@@ -480,7 +480,7 @@ public abstract class Path extends ParseExpr {
       final NameTest test = (NameTest) curr.test;
       if(test.part != NamePart.LOCAL) return null;
 
-      final int name = data.elemNames.id(test.name.local());
+      final int name = data.elemNames.id(test.qname.local());
       final ArrayList<PathNode> tmp = new ArrayList<>();
       for(final PathNode node : PathIndex.desc(nodes, desc)) {
         if(node.kind == Data.ELEM && name == node.name) {
@@ -772,7 +772,7 @@ public abstract class Path extends ParseExpr {
       final NameTest test = (NameTest) step.test;
       if(test.part != NamePart.LOCAL) return true;
       // only support unique paths with nodes on the correct level
-      final ArrayList<PathNode> pn = data.paths.desc(test.name.local());
+      final ArrayList<PathNode> pn = data.paths.desc(test.qname.local());
       if(pn.size() != 1 || pn.get(0).level() != s + 1) return true;
     }
     return false;
