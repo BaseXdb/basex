@@ -156,23 +156,21 @@ public abstract class Preds extends Arr {
         if(expr instanceof CmpG || expr instanceof CmpV) {
           final Cmp cmp = (Cmp) expr;
           final OpV opV = cmp.opV();
-          if(opV != null) {
-            final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
-            if(Function.POSITION.is(cmp1)) {
-              if(numeric(cmp2) && opV == OpV.EQ) {
-                // position() = NUMBER -> NUMBER
-                expr = cmp2;
-              } else if(Function.LAST.is(cmp2)) {
-                switch(opV) {
-                  // position() =/>= last() -> last()
-                  case EQ: case GE: expr = cmp2; break;
-                  // position() <= last() -> true()
-                  case LE: expr = Bln.TRUE; break;
-                  // position() > last() -> false()
-                  case GT: expr = Bln.FALSE; break;
-                  // position() </!= last() -> handled in {@link Filter} expression
-                  default:
-                }
+          final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
+          if(Function.POSITION.is(cmp1)) {
+            if(numeric(cmp2) && opV == OpV.EQ) {
+              // position() = NUMBER -> NUMBER
+              expr = cmp2;
+            } else if(Function.LAST.is(cmp2)) {
+              switch(opV) {
+                // position() =/>= last() -> last()
+                case EQ: case GE: expr = cmp2; break;
+                // position() <= last() -> true()
+                case LE: expr = Bln.TRUE; break;
+                // position() > last() -> false()
+                case GT: expr = Bln.FALSE; break;
+                // position() </!= last() -> handled in {@link Filter} expression
+                default:
               }
             }
           }

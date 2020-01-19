@@ -81,7 +81,7 @@ public abstract class Cmp extends Arr {
 
   /**
    * Returns the value operator of the expression.
-   * @return operator, or {@code null} if not defined
+   * @return operator, or {@code null} for node comparisons
    */
   public abstract OpV opV();
 
