@@ -90,7 +90,7 @@ public final class Pos extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    simplifyAll(AtomType.ATM, cc);
+    simplifyAll(AtomType.NUM, cc);
     return this;
   }
 

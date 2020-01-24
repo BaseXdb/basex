@@ -54,8 +54,8 @@ public final class FTDistance extends FTFilter {
 
   @Override
   public FTExpr optimize(final CompileContext cc) throws QueryException {
-    min = min.simplifyFor(AtomType.ATM, cc);
-    max = max.simplifyFor(AtomType.ATM, cc);
+    min = min.simplifyFor(AtomType.NUM, cc);
+    max = max.simplifyFor(AtomType.NUM, cc);
     return this;
   }
 

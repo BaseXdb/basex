@@ -686,8 +686,14 @@ public final class RewritingsTest extends QueryPlanTest {
         "return $n", "<c/>", exists(NOT), exists(StrSeq.class));
   }
 
+  /** EBV checks. */
+  @Test public void gh1769ebv() {
+    check("if((<a/>, <b/>)) then 1 else 2", 1, root(Int.class));
+    check("if(data(<a/>)) then 1 else 2", 2, exists(DATA));
+  }
+
   /** Remove redundant atomizations. */
-  @Test public void gh1769() {
+  @Test public void gh1769data() {
     check("data(<_>1</_>) + 2", 3, empty(DATA));
     check("string-join(data(<_>X</_>))", "X", empty(DATA));
     check("data(data(<_>X</_>))", "X", count(DATA, 1));
@@ -698,6 +704,39 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<x>A</x>[data() = 'A']", "<x>A</x>", empty(DATA));
 
     check("<A>A</A> ! data() = data(<A>B</A>)", false, empty(DATA));
+  }
+
+  /** Remove redundant atomizations. */
+  @Test public void gh1769string() {
+    check("'a'[string() = 'a']", "a", empty(STRING));
+    check("'b'[string(.) = 'b']", "b", empty(STRING));
+
+    check("<x>A</x>[string() = 'A']", "<x>A</x>", empty(STRING));
+    check("<x>A</x>[string(.) = 'A']", "<x>A</x>", empty(STRING));
+    check("<A>A</A> ! string() = data(<A>B</A>)", false, empty(STRING));
+
+    check("max(<_>1</_> ! string(@a))", "", root(ItemMap.class));
+    check("max((<_>1</_>,<_>2</_>) ! string(@a))", "", root(MAX));
+    check("min(<_ _='A'/>/@_ ! string())", "A", root(MIN));
+
+    check("string(1[.= 1]) = <_>1</_>", true, exists(STRING));
+
+  }
+
+  /** Remove redundant atomizations. */
+  @Test public void gh1769number() {
+    check("1e0[number() = 1]", 1, empty(NUMBER));
+    check("1e0[number(.) = 1]", 1, empty(NUMBER));
+
+    check("<_>1</_>[number() = 1]", "<_>1</_>", empty(NUMBER));
+    check("<_>1</_>[number(.) = 1]", "<_>1</_>", empty(NUMBER));
+
+    check("number(<_>1</_>) + 2", 3, empty(NUMBER));
+    check("(1e0, 2e0) ! (number() + 1)", "2\n3", empty(NUMBER));
+    check("for $v in (1e0, 2e0) return number($v) + 1", "2\n3", empty(NUMBER));
+
+    check("for $n in (10000000000000000, 1) return number($n) = 10000000000000001",
+        "true\nfalse", exists(NUMBER));
   }
 
   /** Inlining of where clauses. */

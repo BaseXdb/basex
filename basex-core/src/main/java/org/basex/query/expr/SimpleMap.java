@@ -210,12 +210,16 @@ public abstract class SimpleMap extends Arr {
   public final Expr simplifyFor(final AtomType type, final CompileContext cc)
       throws QueryException {
 
-    if(type == AtomType.ATM) {
+    if(type != AtomType.BLN) {
       final int el = exprs.length - 1;
-      if(Function.DATA.is(exprs[el])) {
-        return cc.simplify(this, el == 1 ? exprs[0] :
-          get(info, Arrays.copyOf(exprs, el)).optimize(cc));
+      cc.pushFocus(exprs[el - 1]);
+      Expr expr = exprs[el];
+      try {
+        exprs[el] = expr.simplifyFor(type, cc);
+      } finally {
+        cc.removeFocus();
       }
+      if(expr != exprs[el]) return optimize(cc);
     }
     return super.simplifyFor(type, cc);
   }

@@ -31,7 +31,7 @@ public final class Range extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    simplifyAll(AtomType.ATM, cc);
+    simplifyAll(AtomType.NUM, cc);
 
     Expr expr = emptyExpr();
     if(expr == this) {

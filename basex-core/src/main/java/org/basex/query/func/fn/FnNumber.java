@@ -40,4 +40,20 @@ public final class FnNumber extends ContextFn {
     }
     return this;
   }
+
+  @Override
+  public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
+    final boolean context = contextAccess();
+    final Expr expr = context ? cc.qc.focus.value : exprs[0];
+    if(type == AtomType.NUM && expr != null) {
+      final SeqType st = expr.seqType();
+      if(st.one() && (st.type.isUntyped() || st.type == AtomType.DBL)) {
+        // number(<a>1</a>) + 2  ->  <a>1</a> + 2
+        if(!context) return cc.simplify(this, exprs[0]);
+        // A[number() = 1]  ->  A[. = 0]
+        if(cc.nestedFocus()) return new ContextValue(info).optimize(cc);
+      }
+    }
+    return super.simplifyFor(type, cc);
+  }
 }

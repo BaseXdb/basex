@@ -44,6 +44,11 @@ public class FnSum extends StandardFunc {
   }
 
   @Override
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    // do not simplify summed-up items and zero argument
+  }
+
+  @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs.length == 2 ? exprs[1] : null;
     if(expr1 instanceof RangeSeq) return range((Value) expr1);

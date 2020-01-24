@@ -102,7 +102,7 @@ public final class FTWords extends FTExpr {
   public FTWords optimize(final CompileContext cc) throws QueryException {
     if(occ != null) {
       final int ol = occ.length;
-      for(int o = 0; o < ol; o++) occ[o] = occ[o].simplifyFor(AtomType.ATM, cc);
+      for(int o = 0; o < ol; o++) occ[o] = occ[o].simplifyFor(AtomType.NUM, cc);
     }
     return this;
   }

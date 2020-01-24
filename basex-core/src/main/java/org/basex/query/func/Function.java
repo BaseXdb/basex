@@ -368,10 +368,11 @@ public enum Function implements AFunction {
   STRING_TO_CODEPOINTS(FnStringToCodepoints.class, "string-to-codepoints(string)",
       arg(STR_ZO), ITR_ZM),
   /** XQuery function. */
-  SUBSEQUENCE(FnSubsequence.class, "subsequence(items,first[,len])",
+  SUBSEQUENCE(FnSubsequence.class, "subsequence(items,first[,length])",
       arg(ITEM_ZM, DBL_O, DBL_O), ITEM_ZM),
   /** XQuery function. */
-  SUBSTRING(FnSubstring.class, "substring(string,start[,len])", arg(STR_ZO, DBL_O, DBL_O), STR_O),
+  SUBSTRING(FnSubstring.class, "substring(string,start[,length])",
+      arg(STR_ZO, DBL_O, DBL_O), STR_O),
   /** XQuery function. */
   SUBSTRING_AFTER(FnSubstringAfter.class, "substring-after(string,sub[,collation])",
       arg(STR_ZO, STR_ZO, STR_O), STR_O),
@@ -677,14 +678,14 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _CONVERT_BINARY_TO_BYTES(ConvertBinaryToBytes.class, "binary-to-bytes(binary)",
-      arg(AAT_O), BYT_ZM, CONVERT_URI),
+      arg(BIN_O), BYT_ZM, CONVERT_URI),
   /** XQuery function. */
   _CONVERT_BINARY_TO_INTEGERS(ConvertBinaryToIntegers.class, "binary-to-integers(binary)",
-      arg(AAT_O), ITR_ZM, CONVERT_URI),
+      arg(BIN_O), ITR_ZM, CONVERT_URI),
   /** XQuery function. */
   _CONVERT_BINARY_TO_STRING(ConvertBinaryToString.class,
       "binary-to-string(binary[,encoding[,fallback]])",
-      arg(ITEM_O, STR_O, BLN_O), STR_O, CONVERT_URI),
+      arg(BIN_O, STR_O, BLN_O), STR_O, CONVERT_URI),
   /** XQuery function. */
   _CONVERT_INTEGER_FROM_BASE(ConvertIntegerFromBase.class, "integer-from-base(string,base)",
       arg(STR_O, ITR_O), ITR_O, CONVERT_URI),

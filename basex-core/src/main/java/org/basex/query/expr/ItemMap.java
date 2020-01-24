@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-final class ItemMap extends SimpleMap {
+public final class ItemMap extends SimpleMap {
   /**
    * Constructor.
    * @param info input info

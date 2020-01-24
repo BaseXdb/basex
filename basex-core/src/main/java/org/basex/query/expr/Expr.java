@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.ft.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -304,9 +305,13 @@ public abstract class Expr extends ExprInfo {
    *     Overwritten by {@link CmpG}, {@link CmpV}, {@link FnBoolean}, {@link FnExists},
    *     {@link Path} or {@link Filter}
    *   </li>
-   *   <li> {@link AtomType#BLN}: Simplify atomizations.
+   *   <li> {@link AtomType#ATM}: Simplify atomizations.
    *     Called by {@link Cast}, {@link CmpG}, {@link StandardFunc} and many other expressions.
    *     Overwritten by {@link FnData}, {@link SimpleMap}.
+   *   </li>
+   *   <li> {@link AtomType#NUM}: Simplify atomizations for numeric operation.
+   *     Called by {@link Arith}, {@link CmpIR}, {@link FTWeight} and others.
+   *     Overwritten by {@link FnData}, {@link SimpleMap}, {@link FnNumber}.
    *   </li>
    * </ul>
    * @param type target type

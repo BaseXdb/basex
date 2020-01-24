@@ -162,6 +162,12 @@ public final class List extends Arr {
   }
 
   @Override
+  public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
+    return type != AtomType.BLN && simplifyAll(type, cc) ? optimize(cc) :
+      super.simplifyFor(type, cc);
+  }
+
+  @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return copyType(new List(info, copyAll(cc, vm, exprs)));
   }

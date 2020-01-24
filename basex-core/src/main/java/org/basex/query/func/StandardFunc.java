@@ -77,15 +77,7 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    // simplify atomized parameters
-    final int el = exprs.length;
-    for(int e = 0; e < el; e++) {
-      // consider variable-size parameters
-      final int p = Math.min(e, definition.params.length - 1);
-      if(definition.params[p].type.instanceOf(AtomType.AAT)) {
-        exprs[e] = exprs[e].simplifyFor(AtomType.ATM, cc);
-      }
-    }
+    simplifyArgs(cc);
 
     final Expr expr = opt(cc);
     return cc.replaceWith(this,
@@ -95,6 +87,25 @@ public abstract class StandardFunc extends Arr {
       allAreValues(definition.seqType.occ.max > 1) && isSimple() ? value(cc.qc) :
       // return original function
       this);
+  }
+
+  /**
+   * Simplifies the types of all arguments. This function is overwritten by functions which
+   * process different types.
+   * @param cc compilation context
+   * @throws QueryException query exception
+   */
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
+      // consider variable-size parameters
+      final int p = Math.min(e, definition.params.length - 1);
+      final Type type = definition.params[p].type;
+      if(type.instanceOf(AtomType.AAT)) {
+        final AtomType at = type.instanceOf(AtomType.NUM) ? AtomType.NUM : AtomType.ATM;
+        exprs[e] = exprs[e].simplifyFor(at, cc);
+      }
+    }
   }
 
   /**

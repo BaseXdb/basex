@@ -127,6 +127,12 @@ public class FnMin extends StandardFunc {
   }
 
   @Override
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    // do not simplify input arguments
+    if(exprs.length > 1) exprs[1] = exprs[1].simplifyFor(AtomType.ATM, cc);
+  }
+
+  @Override
   protected Expr opt(final CompileContext cc) {
     return optMinmax(OpV.GT);
   }

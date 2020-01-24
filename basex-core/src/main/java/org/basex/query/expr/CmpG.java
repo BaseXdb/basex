@@ -142,7 +142,12 @@ public class CmpG extends Cmp {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    simplifyAll(AtomType.ATM, cc);
+    final Type t1 = exprs[0].seqType().type, t2 = exprs[1].seqType().type;
+    if(t1.isStringOrUntyped() && t2.isStringOrUntyped()) {
+      simplifyAll(AtomType.ATM, cc);
+    } else if(t1.isNumber() && t2.isNumber()) {
+      simplifyAll(AtomType.NUM, cc);
+    }
 
     // swap operands
     if(swap()) {

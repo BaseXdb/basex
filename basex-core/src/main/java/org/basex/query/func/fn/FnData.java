@@ -50,7 +50,7 @@ public final class FnData extends ContextFn {
 
   @Override
   public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
-    if(type == AtomType.ATM) {
+    if(type != AtomType.BLN) {
       // data(<a/>) = ''  ->  <a/> = ''
       if(!contextAccess()) return cc.simplify(this, exprs[0]);
       // A[B ! data() = '']  ->  A[B = '']

@@ -886,6 +886,10 @@ public final class FnModuleTest extends QueryPlanTest {
   @Test public void substring() {
     final Function func = SUBSTRING;
     contains(func.args("'ab'", " [2]"), "b");
+    check(func.args(" <a>A</a>", 1), "A", empty(SUBSTRING), exists(STRING));
+    check(func.args(" <a>A</a>", 0), "A", empty(SUBSTRING), exists(STRING));
+    check(func.args(" <a>A</a>", " xs:double('NaN')"), "", root(Str.class));
+    check(func.args(" <a>A</a>", 1, 0), "", root(Str.class));
   }
 
   /** Test method. */

@@ -41,10 +41,7 @@ public final class Lookup extends Arr {
     final Expr keys = exprs[0];
     final long ks = keys.seqType().mayBeArray() ? -1 : keys.size();
     if(exprs.length == 1) {
-      if(exprType(cc.qc.focus.value, keys)) {
-        if(ks == 0) return cc.replaceWith(this, keys);
-      }
-      return this;
+      return ks == 0 && exprType(cc.qc.focus.value, keys) ? cc.replaceWith(this, keys) : this;
     }
 
     // postfix expression

@@ -132,11 +132,20 @@ public abstract class Arr extends ParseExpr {
    * Simplifies all expressions for requests of the specified type.
    * @param type target type
    * @param cc compilation context
+   * @return {@code true} if expressions have changed
    * @throws QueryException query exception
    */
-  protected void simplifyAll(final AtomType type, final CompileContext cc) throws QueryException {
+  protected boolean simplifyAll(final AtomType type, final CompileContext cc)
+      throws QueryException {
+
+    boolean changed = false;
     final int el = exprs.length;
-    for(int e = 0; e < el; e++) exprs[e] = exprs[e].simplifyFor(type, cc);
+    for(int e = 0; e < el; e++) {
+      final Expr expr = exprs[e];
+      exprs[e] = expr.simplifyFor(type, cc);
+      changed |= expr != exprs[e];
+    }
+    return changed;
   }
 
   /**
