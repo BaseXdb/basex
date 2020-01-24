@@ -129,6 +129,17 @@ public abstract class Arr extends ParseExpr {
   }
 
   /**
+   * Simplifies all expressions for requests of the specified type.
+   * @param type target type
+   * @param cc compilation context
+   * @throws QueryException query exception
+   */
+  protected void simplifyAll(final AtomType type, final CompileContext cc) throws QueryException {
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) exprs[e] = exprs[e].simplifyFor(type, cc);
+  }
+
+  /**
    * Returns the first expression that yields an empty sequence. If all expressions return non-empty
    * results, the original expression is returned.
    * @return empty or original expression

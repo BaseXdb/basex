@@ -53,7 +53,7 @@ public final class CElem extends CName {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    name = cc.simplifyAtom(name);
+    name = name.simplifyFor(AtomType.ATM, cc);
     return this;
   }
 

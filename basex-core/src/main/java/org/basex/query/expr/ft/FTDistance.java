@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.ft.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -53,8 +54,8 @@ public final class FTDistance extends FTFilter {
 
   @Override
   public FTExpr optimize(final CompileContext cc) throws QueryException {
-    min = cc.simplifyAtom(min);
-    max = cc.simplifyAtom(max);
+    min = min.simplifyFor(AtomType.ATM, cc);
+    max = max.simplifyFor(AtomType.ATM, cc);
     return this;
   }
 

@@ -261,34 +261,4 @@ public final class CompileContext {
       throws QueryException {
     return function.get(sc(), ii, exprs).optimize(this);
   }
-
-  /**
-   * Simplifies an expression for EBV tests.
-   * @param expr expression to simplify
-   * @return simplified expression
-   * @throws QueryException query exception
-   */
-  public Expr simplifyEbv(final Expr expr) throws QueryException {
-    return expr.simplify(this, Simplify.EBV);
-  }
-
-  /**
-   * Simplifies an expression for atomizations.
-   * @param expr expression to simplify
-   * @return simplified expression
-   * @throws QueryException query exception
-   */
-  public Expr simplifyAtom(final Expr expr) throws QueryException {
-    return expr.simplify(this, Simplify.ATOM);
-  }
-
-  /**
-   * Simplifies all expressions for atomizations.
-   * @param exprs expressions to simplify
-   * @throws QueryException query exception
-   */
-  public void simplifyAtom(final Expr[] exprs) throws QueryException {
-    final int el = exprs.length;
-    for(int e = 0; e < el; e++) exprs[e] = simplifyAtom(exprs[e]);
-  }
 }

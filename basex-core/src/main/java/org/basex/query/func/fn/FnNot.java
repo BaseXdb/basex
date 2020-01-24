@@ -22,7 +22,7 @@ public final class FnNot extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // e.g.: not(boolean(A)) -> not(A)
-    final Expr expr = cc.simplifyEbv(exprs[0]);
+    final Expr expr = exprs[0].simplifyFor(AtomType.BLN, cc);
 
     // not(empty(A)) -> exists(A)
     if(Function.EMPTY.is(expr)) {

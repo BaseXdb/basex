@@ -44,7 +44,7 @@ public final class Cast extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = cc.simplifyAtom(expr);
+    expr = expr.simplifyFor(AtomType.ATM, cc);
 
     // skip cast if input and target type is equal
     final SeqType st = expr.seqType();

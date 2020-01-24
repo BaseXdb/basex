@@ -18,6 +18,7 @@ import org.basex.query.util.ft.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -99,7 +100,10 @@ public final class FTWords extends FTExpr {
 
   @Override
   public FTWords optimize(final CompileContext cc) throws QueryException {
-    if(occ != null) cc.simplifyAtom(occ);
+    if(occ != null) {
+      final int ol = occ.length;
+      for(int o = 0; o < ol; o++) occ[o] = occ[o].simplifyFor(AtomType.ATM, cc);
+    }
     return this;
   }
 

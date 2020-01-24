@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.ft.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -45,7 +46,7 @@ public final class FTWindow extends FTFilter {
 
   @Override
   public FTExpr optimize(final CompileContext cc) throws QueryException {
-    win = cc.simplifyAtom(win);
+    win = win.simplifyFor(AtomType.ATM, cc);
     return this;
   }
 

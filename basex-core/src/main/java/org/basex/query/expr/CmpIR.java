@@ -104,7 +104,7 @@ public final class CmpIR extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = cc.simplifyAtom(expr);
+    expr = expr.simplifyFor(AtomType.ATM, cc);
 
     final SeqType st = expr.seqType();
     single = st.zeroOrOne() && !st.mayBeArray();

@@ -36,7 +36,7 @@ public final class Lookup extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    exprs[0] = cc.simplifyAtom(exprs[0]);
+    exprs[0] = exprs[0].simplifyFor(AtomType.ATM, cc);
 
     final Expr keys = exprs[0];
     final long ks = keys.seqType().mayBeArray() ? -1 : keys.size();

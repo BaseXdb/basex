@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -46,7 +47,7 @@ public final class FTWeight extends FTExpr {
 
   @Override
   public FTExpr optimize(final CompileContext cc) throws QueryException {
-    weight = cc.simplifyAtom(weight);
+    weight = weight.simplifyFor(AtomType.ATM, cc);
     return this;
   }
 

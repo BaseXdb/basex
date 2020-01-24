@@ -82,7 +82,9 @@ public abstract class StandardFunc extends Arr {
     for(int e = 0; e < el; e++) {
       // consider variable-size parameters
       final int p = Math.min(e, definition.params.length - 1);
-      if(definition.params[p].type.instanceOf(AtomType.AAT)) exprs[e] = cc.simplifyAtom(exprs[e]);
+      if(definition.params[p].type.instanceOf(AtomType.AAT)) {
+        exprs[e] = exprs[e].simplifyFor(AtomType.ATM, cc);
+      }
     }
 
     final Expr expr = opt(cc);

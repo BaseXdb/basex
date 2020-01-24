@@ -150,7 +150,7 @@ public abstract class Preds extends Arr {
       final ExprList list = new ExprList(el);
       boolean pos = false;
       for(final Expr ex : exprs) {
-        final Expr ebv = cc.simplifyEbv(ex);
+        final Expr ebv = ex.simplifyFor(AtomType.BLN, cc);
         Expr expr = ebv;
         if(expr instanceof And) {
           if(!expr.has(Flag.POS)) {

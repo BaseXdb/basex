@@ -4,7 +4,6 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -296,23 +295,28 @@ public abstract class Expr extends ExprInfo {
   public abstract Expr copy(CompileContext cc, IntObjMap<Var> vm);
 
   /**
-   * This function is called during compile-time for expressions whose operands might be simplified.
+   * This function is called at compile time for expressions whose operands might be simplified.
    * Different types of simplifications are supported:
    * <ul>
-   *   <li> {@link Simplify#EBV}: Simplify effective boolean tests.
-   *   Called by {@link If}, {@link Logical}, {@link Preds}, {@link Condition}, {@link Where},
-   *   {@link FnBoolean}, {@link FnNot};
-   *   overwritten by {@link CmpG}, {@link CmpV}, {@link FnBoolean}, {@link FnExists},
-   *   {@link Path} or {@link Filter}</li>
+   *   <li> {@link AtomType#BLN}: Simplify effective boolean tests.
+   *     Called by {@link If}, {@link Logical}, {@link Preds}, {@link Condition}, {@link Where},
+   *     {@link FnBoolean}, {@link FnNot}.
+   *     Overwritten by {@link CmpG}, {@link CmpV}, {@link FnBoolean}, {@link FnExists},
+   *     {@link Path} or {@link Filter}
+   *   </li>
+   *   <li> {@link AtomType#BLN}: Simplify atomizations.
+   *     Called by {@link Cast}, {@link CmpG}, {@link StandardFunc} and many other expressions.
+   *     Overwritten by {@link FnData}, {@link SimpleMap}.
+   *   </li>
    * </ul>
+   * @param type target type
    * @param cc compilation context
-   * @param simplify type of simplification
-   * @return optimized expression
+   * @return simplified or original expression
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr simplify(final CompileContext cc, final Simplify simplify) throws QueryException {
-    if(simplify == Simplify.EBV) {
+  public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
+    if(type == AtomType.BLN) {
       // return true if a deterministic expression returns at least one node
       final SeqType st = seqType();
       if(st.type instanceof NodeType && st.oneOrMore() && !has(Flag.NDT))

@@ -48,7 +48,7 @@ public final class SwitchGroup extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final int el = exprs.length;
-    for(int e = 1; e < el; e++) exprs[e] = cc.simplifyAtom(exprs[e]);
+    for(int e = 1; e < el; e++) exprs[e] = exprs[e].simplifyFor(AtomType.ATM, cc);
     return this;
   }
 

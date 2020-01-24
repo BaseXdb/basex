@@ -166,7 +166,7 @@ public final class CmpV extends Cmp {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    cc.simplifyAtom(exprs);
+    simplifyAll(AtomType.ATM, cc);
 
     // swap operands
     if(swap()) {

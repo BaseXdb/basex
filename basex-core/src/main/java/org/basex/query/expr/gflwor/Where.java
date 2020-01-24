@@ -56,7 +56,7 @@ public final class Where extends Clause {
 
   @Override
   public Where optimize(final CompileContext cc) throws QueryException {
-    expr = cc.simplifyEbv(expr);
+    expr = expr.simplifyFor(AtomType.BLN, cc);
     if(expr instanceof Value && !(expr instanceof Bln)) {
       expr = cc.replaceWith(expr, Bln.get(expr.ebv(cc.qc, info).bool(info)));
     }

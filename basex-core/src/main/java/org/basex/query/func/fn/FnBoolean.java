@@ -1,7 +1,6 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -23,7 +22,7 @@ public final class FnBoolean extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // e.g.: boolean(exists(<a/>)) -> boolean(<a/>)
-    final Expr expr = cc.simplifyEbv(exprs[0]);
+    final Expr expr = exprs[0].simplifyFor(AtomType.BLN, cc);
 
     // boolean($node/text()) -> exists($node/text())
     final SeqType st = expr.seqType();
@@ -37,9 +36,9 @@ public final class FnBoolean extends StandardFunc {
   }
 
   @Override
-  public Expr simplify(final CompileContext cc, final Simplify simplify) {
+  public Expr simplifyFor(final AtomType type, final CompileContext cc) {
     // if A is not numeric: expr[boolean(A)] -> expr[A]
-    if(simplify == Simplify.EBV) {
+    if(type == AtomType.BLN) {
       final Expr expr = exprs[0];
       if(!expr.seqType().mayBeNumber()) return cc.simplify(this, expr);
     }

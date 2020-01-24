@@ -53,8 +53,8 @@ abstract class CName extends CNode {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    name = cc.simplifyAtom(name);
-    cc.simplifyAtom(exprs);
+    name = name.simplifyFor(AtomType.ATM, cc);
+    simplifyAll(AtomType.ATM, cc);
     return this;
   }
 

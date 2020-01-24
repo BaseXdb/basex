@@ -39,7 +39,7 @@ public final class Unary extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = cc.simplifyAtom(expr);
+    expr = expr.simplifyFor(AtomType.ATM, cc);
 
     // no negation, numeric value: return operand
     final SeqType st = expr.seqType();
