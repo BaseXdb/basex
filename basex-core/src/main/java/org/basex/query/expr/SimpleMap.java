@@ -167,19 +167,17 @@ public abstract class SimpleMap extends Arr {
                 rep = cc.error(qe, this);
               }
             }
+          } else if(es == 1) {
+            // replace expression with next expression
+            // <x/> ! 'ok'  ->  'ok'
+            rep = next;
+          } else if(!next.has(Flag.NDT, Flag.CNS)) {
+            // replace expression with replicated expression
+            // (1 to 2) ! 'ok'  ->  util:replicate('ok', 2)
+            rep = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es));
           } else {
-            if(es == 1) {
-              // replace expression with next expression
-              // <x/> ! 'ok'  ->  'ok'
-              rep = next;
-            } else if(!next.has(Flag.NDT, Flag.CNS)) {
-              // replace expression with replicated expression
-              // (1 to 2) ! 'ok'  ->  util:replicate('ok', 2)
-              rep = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es));
-            } else {
-              // (1 to 2) ! <x/>  ->  util:replicate('', 2) ! <x/>
-              exprs[e] = SingletonSeq.get(Str.ZERO, es);
-            }
+            // (1 to 2) ! <x/>  ->  util:replicate('', 2) ! <x/>
+            exprs[e] = SingletonSeq.get(Str.ZERO, es);
           }
         }
       }

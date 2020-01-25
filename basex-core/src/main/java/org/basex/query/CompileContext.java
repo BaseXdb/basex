@@ -103,8 +103,12 @@ public final class CompileContext {
    * @return dummy item
    */
   public Item dummyItem(final Expr expr) {
-    final Value value = qc.focus.value;
-    final Data data = (value != null && expr instanceof Step ? value : expr).data();
+    Data data = expr.data();
+    // no data reference: if expression is a step, use data from current focus
+    if(data == null && expr instanceof Step) {
+      final Value value = qc.focus.value;
+      if(value != null) data = value.data();
+    }
     return new Dummy(expr.seqType().type, data);
   }
 

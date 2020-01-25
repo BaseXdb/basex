@@ -99,7 +99,6 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(exactly-one(/a/b)/following-sibling::*) ! name()", "c\nd\ne", exists(IterPath.class));
     check("(/*/@id/../*) ! name()", "b\nc\nd\ne", empty(IterPath.class));
     check("(exactly-one(/a)/@id/../*) ! name()", "b\nc\nd\ne", exists(IterPath.class));
-    execute(new DropDB(NAME));
   }
 
   /** Checks OR optimizations. */
@@ -519,7 +518,6 @@ public final class RewritingsTest extends QueryPlanTest {
       "local:a('" + NAME + "')";
 
     query(query, "<_/>");
-    execute(new DropDB(NAME));
   }
 
   /** GH1726. */
@@ -747,6 +745,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Rewriting of positional tests that might yield an error. */
   @Test public void gh1783() {
+    execute(new Close());
     error("(position() = 3) = (position() = 3)", QueryError.NOCTX_X);
     error(". = .", QueryError.NOCTX_X);
   }

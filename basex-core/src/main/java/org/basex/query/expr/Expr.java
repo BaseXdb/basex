@@ -252,7 +252,7 @@ public abstract class Expr extends ExprInfo {
    *   <li> {@link Root#inline}</li>
    *   <li> {@link StaticJavaCall#inline}</li>
    * </ul>
-   * @param var variable to replace
+   * @param var variable to replace ({@code null} for context replacement)
    * @param ex expression to inline
    * @param cc compilation context
    * @return resulting expression if something changed, {@code null} otherwise
