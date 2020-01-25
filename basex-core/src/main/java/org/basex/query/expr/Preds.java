@@ -206,11 +206,19 @@ public abstract class Preds extends Arr {
     final SeqType st = root.seqType();
     for(final Expr expr : exprs) {
       Expr ex = expr;
-      if(ex instanceof ContextValue && st.instanceOf(SeqType.NOD_ZM)) {
+      if(ex instanceof ContextValue && st.type instanceof NodeType) {
         // E [ . ] -> E
         cc.info(OPTREMOVE_X_X, ex, (Supplier<?>) this::description);
         continue;
-      } else if(ex instanceof SimpleMap) {
+      }
+
+      // comparisons
+      if(ex instanceof CmpG || ex instanceof CmpV) {
+        ex = ((Cmp) ex).optPred(root, cc);
+      }
+
+      // map operator
+      if(ex instanceof SimpleMap) {
         // E [ . ! ... ] -> E [ ... ]
         // E [ E ! ... ] -> E [ ... ]
         final SimpleMap map = (SimpleMap) ex;
@@ -221,11 +229,6 @@ public abstract class Preds extends Arr {
           final int ml = mexprs.length;
           ex = ml == 2 ? second : SimpleMap.get(map.info, Arrays.copyOfRange(mexprs, 1, ml));
         }
-      }
-
-      // comparisons
-      if(ex instanceof CmpG || ex instanceof CmpV) {
-        ex = ((Cmp) ex).optPred(root, cc);
       }
 
       // paths
@@ -261,6 +264,13 @@ public abstract class Preds extends Arr {
             root.equals(first) && root.isSimple() && st.one())) {
           ex = Path.get(path.info, null, path.steps);
         }
+      }
+
+      // inline root item (ignore nodes)
+      // 1[. = 1] -> 1[1 = 1]
+      if(root instanceof Item && !(st.type instanceof NodeType)) {
+        final Expr inlined = ex.inline(null, root, cc);
+        if(inlined != null) ex = inlined;
       }
 
       list.add(cc.replaceWith(expr, ex));

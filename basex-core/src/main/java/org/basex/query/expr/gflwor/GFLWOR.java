@@ -260,6 +260,7 @@ public final class GFLWOR extends ParseExpr {
         if(fs > 1 && fr.var.declType == null && !(fr.expr instanceof SingletonSeq) &&
             !fr.has(Flag.NDT) && count(fr.var, pos + 1) == VarUsage.NEVER) {
           fr.expr = cc.replaceWith(fr.expr, SingletonSeq.get(Str.ZERO, fs));
+          fr.exprType.assign(AtomType.STR);
           changed = true;
         }
         // remove scoring variable (include current iteration in count)

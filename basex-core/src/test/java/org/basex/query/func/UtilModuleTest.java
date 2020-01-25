@@ -42,8 +42,8 @@ public final class UtilModuleTest extends QueryPlanTest {
   @Test public void ddo() {
     final Function func = _UTIL_DDO;
     query(func.args(" <a/>"), "<a/>");
-    query(func.args(" (<a/>,<b/>)"), "<a/>\n<b/>");
-    query(func.args(" reverse((<a/>,<b/>))"), "<a/>\n<b/>");
+    query(func.args(" (<a/>, <b/>)"), "<a/>\n<b/>");
+    query(func.args(" reverse((<a/>, <b/>))"), "<a/>\n<b/>");
     error(func.args(1), INVTYPE_X_X_X);
   }
 
@@ -63,8 +63,8 @@ public final class UtilModuleTest extends QueryPlanTest {
 
     query(func.args(" 1", 1, 2), 1);
     query(func.args(" ()", 1, 2), 2);
-    query(func.args(" (<a/>,<b/>)", 1, 2), 1);
-    error(func.args(" (1,2)", 1, 2), EBV_X);
+    query(func.args(" (<a/>, <b/>)", 1, 2), 1);
+    error(func.args(" (1, 2)", 1, 2), EBV_X);
   }
 
   /** Test method. */
@@ -74,7 +74,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     // static rewrites
     query(func.args(" ()"), "");
     query(func.args("A"), "");
-    query(func.args(" (1,2)"), 1);
+    query(func.args(" (1, 2)"), 1);
     query(func.args(" (1 to 3)"), "1\n2");
 
     // known result size
@@ -95,16 +95,16 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" tokenize(<_>X Y Z</_>)"), "X\nY");
 
     // iterator with known result size
-    check(func.args(" (<a/>,<b/>)"), "<a/>", exists(HEAD));
+    check(func.args(" (<a/>, <b/>)"), "<a/>", exists(HEAD));
     check(func.args(" sort((1 to 3) ! <_>{ . }</_>)"), "<_>1</_>\n<_>2</_>", exists(func));
-    check("reverse(" + func.args(" (<a/>,<b/>,<c/>))"), "<b/>\n<a/>", exists(func));
+    check("reverse(" + func.args(" (<a/>, <b/>, <c/>))"), "<b/>\n<a/>", exists(func));
 
     // nested function calls
     check(func.args(func.args(" ()")), "", empty());
     check(func.args(func.args(" (<a/>)")), "", empty());
-    check(func.args(func.args(" (<a/>,<b/>)")), "", empty());
-    check(func.args(func.args(" (<a/>,<b/>,<c/>)")), "<a/>", exists(HEAD));
-    check(func.args(func.args(" (<a/>,<b/>,<c/>,<d/>)")), "<a/>\n<b/>", exists(SUBSEQUENCE));
+    check(func.args(func.args(" (<a/>, <b/>)")), "", empty());
+    check(func.args(func.args(" (<a/>, <b/>, <c/>)")), "<a/>", exists(HEAD));
+    check(func.args(func.args(" (<a/>, <b/>, <c/>, <d/>)")), "<a/>\n<b/>", exists(SUBSEQUENCE));
   }
 
   /** Test method. */
@@ -122,16 +122,16 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" 1 to 2", 1.5), "");
 
     query("for $i in 1 to 2 return " + func.args(" $i", 1), "1\n2");
-    query(func.args(" (<a/>,<b/>)", 1), "<a/>");
-    query(func.args(" (<a/>,<b/>)", 3), "");
+    query(func.args(" (<a/>, <b/>)", 1), "<a/>");
+    query(func.args(" (<a/>, <b/>)", 3), "");
 
-    query(func.args(" (<a/>,<b/>)[name()]", 1), "<a/>");
-    query(func.args(" (<a/>,<b/>)[name()]", 2), "<b/>");
-    query(func.args(" (<a/>,<b/>)[name()]", 3), "");
+    query(func.args(" (<a/>, <b/>)[name()]", 1), "<a/>");
+    query(func.args(" (<a/>, <b/>)[name()]", 2), "<b/>");
+    query(func.args(" (<a/>, <b/>)[name()]", 3), "");
 
-    query(func.args(" (<a/>,<b/>)", 1.5), "");
+    query(func.args(" (<a/>, <b/>)", 1.5), "");
     query(func.args(" <a/>", 2), "");
-    query(func.args(" (<a/>,<b/>)", " <_>1</_>"), "<a/>");
+    query(func.args(" (<a/>, <b/>)", " <_>1</_>"), "<a/>");
     query(func.args(" tokenize(<_>1</_>)", 2), "");
 
     query(func.args(" 1", " <_>0</_>"), "");
@@ -145,11 +145,11 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" 1[. = 1]", 1), 1, empty(func));
     check(func.args(" 1[. = 1]", 2), "", empty());
 
-    check(func.args(" (1,2,<_/>)", 3), "<_/>", exists(_UTIL_LAST));
-    check(func.args(" reverse((1,2,<_/>))", 2), 2, empty(REVERSE));
+    check(func.args(" (1, 2, <_/>)", 3), "<_/>", exists(_UTIL_LAST));
+    check(func.args(" reverse((1, 2, <_/>))", 2), 2, empty(REVERSE));
 
-    check(func.args(" tail((1,2,3,<_/>))", 2), 3, empty(TAIL));
-    check(func.args(" util:init((1,2,3,<_/>))", 2), 2, empty(_UTIL_INIT));
+    check(func.args(" tail((1, 2, 3, <_/>))", 2), 3, empty(TAIL));
+    check(func.args(" util:init((1, 2, 3, <_/>))", 2), 2, empty(_UTIL_INIT));
 
     check(func.args(" (7 to 9)[. = 8]", 1), 8, exists(HEAD), type(HEAD, "xs:integer?"));
   }
@@ -163,15 +163,15 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" 1 to 2"), 2);
 
     query("for $i in 1 to 2 return " + func.args(" $i"), "1\n2");
-    query(func.args(" (<a/>,<b/>)"), "<b/>");
-    query(func.args(" (<a/>,<b/>)[position() > 2]"), "");
+    query(func.args(" (<a/>, <b/>)"), "<b/>");
+    query(func.args(" (<a/>, <b/>)[position() > 2]"), "");
 
     query("for $i in 1 to 2 return " + func.args(" $i"), "1\n2");
-    query(func.args(" (<a/>,<b/>)"), "<b/>");
+    query(func.args(" (<a/>, <b/>)"), "<b/>");
 
     check(func.args(" prof:void(())"), "", empty(func));
     check(func.args(" <a/>"), "<a/>", empty(func));
-    check(func.args(" (<a/>,<b/>)[name()]"), "<b/>", type(func, "element()?"));
+    check(func.args(" (<a/>, <b/>)[name()]"), "<b/>", type(func, "element()?"));
     check(func.args(" reverse((1, 2, 3)[. > 1])"), 2, exists(HEAD));
 
     check(func.args(" tokenize(<_/>)"), "", exists(_UTIL_LAST));
@@ -205,11 +205,11 @@ public final class UtilModuleTest extends QueryPlanTest {
     query("sort(" + func.args(" tokenize(<a>1</a>)", 2) + ")", 1);
     query("sort(" + func.args(" tokenize(<a/>)", 2) + ")", 2);
 
-    query("count(" + func.args(" 1[.=1]", 2) + ')', 1);
-    query("count(" + func.args(" (1,2)[.=1]", 3) + ')', 1);
-    query("count(" + func.args(" (1,2,3)[.=1]", 4) + ')', 1);
-    query("count(" + func.args(" (1,2,3)[.=4]", 4) + ')', 1);
-    query("count(" + func.args(" (1,2,3)[.=4]", " (4,5)") + ')', 2);
+    query("count(" + func.args(" <_>1</_>[. = 1]", 2) + ')', 1);
+    query("count(" + func.args(" (1, 2)[. = 1]", 3) + ')', 1);
+    query("count(" + func.args(" (1, 2, 3)[. = 1]", 4) + ')', 1);
+    query("count(" + func.args(" (1, 2, 3)[. = 4]", 4) + ')', 1);
+    query("count(" + func.args(" (1, 2, 3)[. = 4]", " (4, 5)") + ')', 2);
 
     check(func.args(null, null), "", empty());
     check(func.args(null, 1), 1, root(Int.class));
@@ -217,16 +217,16 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(null, " <x/>"), "<x/>", root(CElem.class));
     check(func.args(" <x/>", null), "<x/>", root(CElem.class));
 
-    check(func.args(" (1,2[.=3])", null), 1, root(List.class));
-    check(func.args(" (2,3[.=4])", "<z/>"), 2, root(List.class));
+    check(func.args(" (1, <_>2</_>[. = 3])", null), 1, root(List.class));
+    check(func.args(" (2, <_>3</_>[. = 4])", "<z/>"), 2, root(List.class));
 
-    check(func.args(" (3,4)[.=3]", null), 3, root(IterFilter.class));
-    check(func.args(" (4,5)[.=4]", "<z/>"), 4, root(_UTIL_OR));
+    check(func.args(" (3, <_>4</_>)[. = 3]", null), 3, root(IterFilter.class));
+    check(func.args(" (4, <_>5</_>)[. = 4]", "<z/>"), 4, root(_UTIL_OR));
 
     check(func.args(" prof:void(1)", 2), 2, root(_UTIL_OR));
     check(func.args(" prof:void(2)", " prof:void(3)"), "", root(_UTIL_OR));
 
-    check(func.args(" 6[.=6]", 7), 6, root(_UTIL_OR));
+    check(func.args(" <_>6</_>[. = 6]", 7), "<_>6</_>", root(_UTIL_OR));
   }
 
   /** Test method. */
@@ -243,12 +243,12 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" 1 to 2", 1.5, 2), 2);
 
     query("for $i in 1 to 2 return " + func.args(" $i", 1, 2), "1\n2");
-    query(func.args(" (<a/>,<b/>)", 0, 2), "<a/>\n<b/>");
-    query(func.args(" (<a/>,<b/>)", 1, 2), "<a/>\n<b/>");
-    query(func.args(" (<a/>,<b/>)", 2.5, 3.5), "");
-    query(func.args(" (<a/>,<b/>)", 3, 4), "");
+    query(func.args(" (<a/>, <b/>)", 0, 2), "<a/>\n<b/>");
+    query(func.args(" (<a/>, <b/>)", 1, 2), "<a/>\n<b/>");
+    query(func.args(" (<a/>, <b/>)", 2.5, 3.5), "");
+    query(func.args(" (<a/>, <b/>)", 3, 4), "");
 
-    query(func.args(" (<a/>,<b/>)[name()]", 1, 9223372036854775807L), "<a/>\n<b/>");
+    query(func.args(" (<a/>, <b/>)[name()]", 1, 9223372036854775807L), "<a/>\n<b/>");
   }
 
   /** Test method. */
@@ -260,8 +260,8 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(1, 0), "");
     query(func.args("A", 1), "A");
     query(func.args("A", 2), "A\nA");
-    query(func.args(" (0,'A')", 1), "0\nA");
-    query(func.args(" (0,'A')", 2), "0\nA\n0\nA");
+    query(func.args(" (0, 'A')", 1), "0\nA");
+    query(func.args(" (0, 'A')", 2), "0\nA\n0\nA");
     query(func.args(" 1 to 10000", 10000) + "[last()]", "10000");
     query(func.args(" 1 to 10000", 10000) + "[1]", "1");
     query(func.args(" 1 to 10000", 10000) + "[10000]", "10000");

@@ -25,11 +25,11 @@ public final class FnModuleTest extends QueryPlanTest {
 
     check(func.args(" ()"), "", empty());
     check("for $i in 1 to 2 return " + func.args(" $i"), "1\n2", type(func, "xs:integer"));
-    check("for $i in (1,2.0) return " + func.args(" $i"), "1\n2", type(func, "xs:decimal"));
+    check("for $i in (1, 2.0) return " + func.args(" $i"), "1\n2", type(func, "xs:decimal"));
     check(func.args(" <a>1</a>"), 1, type(func, "xs:double"));
 
-    check("for $i in ([],[]) return " + func.args(" $i"), "", type(func, "xs:numeric?"));
-    check("for $i in (1,<a>2</a>) return " + func.args(" $i"), "1\n2", type(func, "xs:numeric?"));
+    check("for $i in ([], []) return " + func.args(" $i"), "", type(func, "xs:numeric?"));
+    check("for $i in (1, <a>2</a>) return " + func.args(" $i"), "1\n2", type(func, "xs:numeric?"));
 
     // pre-evaluate empty sequence
     check(func.args(" ()"), "", empty(func));
@@ -56,16 +56,16 @@ public final class FnModuleTest extends QueryPlanTest {
     final Function func = APPLY;
 
     query(func.args(" true#0", " []"), true);
-    query(func.args(" count#1", " [(1,2,3)]"));
+    query(func.args(" count#1", " [(1, 2, 3)]"));
     query(func.args(" string-join#1", " [ reverse(1 to 5) ! string() ]"), 54321);
-    query("let $func := function($a, $b,$c) { $a + $b + $c } "
+    query("let $func := function($a, $b, $c) { $a + $b + $c } "
         + "let $args := [ 1, 2, 3 ] "
         + "return " + func.args(" $func", " $args"), 6);
     query("for $a in 2 to 3 "
         + "let $f := function-lookup(xs:QName('fn:concat'), $a) "
         + "return " + func.args(" $f", " array { 1 to $a }"), "12\n123");
     error(func.args(" false#0", " ['x']"), APPLY_X_X);
-    error(func.args(" string-length#1", " [ ('a','b') ]"), INVTYPE_X_X_X);
+    error(func.args(" string-length#1", " [ ('a', 'b') ]"), INVTYPE_X_X_X);
 
     // no pre-evaluation (higher-order arguments), but type adjustment
     check(func.args(" true#0", " []"), true, type(func, "xs:boolean"));
@@ -78,7 +78,7 @@ public final class FnModuleTest extends QueryPlanTest {
     // code coverage tests
     query("string-length(" + func.args(" reverse#1", " ['a']") + ")", 1);
     error(func.args(" true#0", " [1]"), APPLY_X_X);
-    error(func.args(" put#2", " [<_/>,'']"), FUNCUP_X);
+    error(func.args(" put#2", " [<_/>, '']"), FUNCUP_X);
   }
 
   /** Test method. */
@@ -93,13 +93,13 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" 1e0"), 1, empty(func));
     check(func.args(" xs:float('1')"), 1, empty(func));
 
-    check(func.args(" 1[. = 1]"), 1, type(func, "xs:decimal?"));
-    check(func.args(" 1.0[. = 1]"), 1, type(func, "xs:decimal?"));
-    check(func.args(" 1e0[. = 1]"), 1, type(func, "xs:double?"));
-    check(func.args(" xs:float('1')[. = 1]"), 1, type(func, "xs:float?"));
+    check(func.args(" (1, 2)[. = 1]"), 1, type(func, "xs:decimal?"));
+    check(func.args(" (1.0, 2.0)[. = 1]"), 1, type(func, "xs:decimal?"));
+    check(func.args(" (1e0, 2e0)[. = 1]"), 1, type(func, "xs:double?"));
+    check(func.args(" (xs:float('1'), xs:float('2'))[. = 1]"), 1, type(func, "xs:float?"));
 
-    check(func.args(" (1,3[. = 5])"), 1, type(func, "xs:decimal"));
-    check(func.args(" (1,3.0[. = 5])"), 1, type(func, "xs:decimal"));
+    check(func.args(" (1, (3, 4)[. = 5])"), 1, type(func, "xs:decimal"));
+    check(func.args(" (1, (3.0, 4.0)[. = 5])"), 1, type(func, "xs:decimal"));
     check(func.args(" (<a>1</a>, <a>3</a>)"), 2, type(func, "xs:double"));
 
     check(func.args(" (1 to 3)"), 2, empty(func));
@@ -136,7 +136,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check("(false(), 1)[" + func.args(" .") + "]", 1, exists(func));
 
     // optimize ebv
-    check("[][. instance of xs:int][" + func.args(" .") + "]", "", empty(EXISTS));
+    check("([], [])[. instance of xs:int][" + func.args(" .") + "]", "", empty(EXISTS));
   }
 
   /** Test method. */
@@ -169,10 +169,10 @@ public final class FnModuleTest extends QueryPlanTest {
     // pre-evaluate empty sequence
     error(func.args(), FUNERR1);
     error(func.args(" ()"), FUNERR1);
-    query("(1," + func.args() + ")[1]", 1);
+    query("(1, " + func.args() + ")[1]", 1);
 
     // errors: defer error if not requested; adjust declared sequence type of {@link TypeCheck}
-    query("head((1," + func.args() + "))", 1);
+    query("head((1, " + func.args() + "))", 1);
     query("head((1, function() { error() }()))", 1);
     query("declare function local:e() { error() }; head((1, local:e()))", 1);
     query("declare function local:e() as empty-sequence() { error() }; head((1, local:e()))", 1);
@@ -187,9 +187,9 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" ()", " boolean#1"), "", empty());
     check(func.args(" 1 to 9", " function($_) { $_ = 0 }"), "",
         type(FuncItem.class, "function(xs:integer) as xs:boolean"));
-    check(func.args(" ('a',<a/>)", " function($_ as xs:string) { $_ = 'a' }"), "a",
+    check(func.args(" ('a', <a/>)", " function($_ as xs:string) { $_ = 'a' }"), "a",
         type(FuncItem.class, "function(xs:string) as xs:boolean"));
-    check(func.args(" ('a',<a/>)", " function($_ as xs:string) as xs:boolean? { $_ = 'a' }"), "a",
+    check(func.args(" ('a', <a/>)", " function($_ as xs:string) as xs:boolean? { $_ = 'a' }"), "a",
         type(FuncItem.class, "function(xs:string) as xs:boolean"));
 
     check(func.args(" (<a/>, <b/>)", " boolean#1"), "<a/>\n<b/>", type(FILTER, "element()*"));
@@ -200,7 +200,7 @@ public final class FnModuleTest extends QueryPlanTest {
   @Test public void foldLeft() {
     final Function func = FOLD_LEFT;
 
-    query("(1,'a')[. instance of xs:integer] ! " +
+    query("(1, 'a')[. instance of xs:integer] ! " +
         func.args(" .", 0, " function($a, $b) { $b }"), 1);
     query("(1, function($a, $b) { $b })[. instance of function(*)] ! " +
         func.args("A", 1, " ."), "A");
@@ -226,11 +226,11 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" 1 to 11", 0, " function($a, $b) { $a + $b }"), 66, exists(func));
 
     // type inference
-    check(func.args(" 1[. = 1]", " ()", " function($r, $a) { $r, $a }"), 1,
+    check(func.args(" (1, 2)[. = 1]", " ()", " function($r, $a) { $r, $a }"), 1,
         type(func, "xs:integer*"));
-    check(func.args(" 1[. = 0]", 1, " function($r, $a) { $r, $a }"), 1,
+    check(func.args(" (1, 2)[. = 0]", 1, " function($r, $a) { $r, $a }"), 1,
         type(func, "xs:integer+"));
-    check(func.args(" 1[. = 1]", "a", " function($r, $a) { $r, $a }"), "a\n1",
+    check(func.args(" (1, 2)[. = 1]", "a", " function($r, $a) { $r, $a }"), "a\n1",
         type(func, "xs:anyAtomicType+"));
 
     check(func.args(" <a>1</a>", " xs:byte(1)", " function($n, $_) {" +
@@ -242,7 +242,7 @@ public final class FnModuleTest extends QueryPlanTest {
         "}"), 1,
         type(func, "xs:decimal"));
 
-    check(func.args(" 1[. = 0]", 1, " function($r as xs:integer, $a) { $r + $r }"), 1,
+    check(func.args(" (1, 2)[. = 0]", 1, " function($r as xs:integer, $a) { $r + $r }"), 1,
         type(func, "xs:integer"));
   }
 
@@ -270,7 +270,7 @@ public final class FnModuleTest extends QueryPlanTest {
   @Test public void forEach() {
     final Function func = FOR_EACH;
 
-    query("(1,not#1)[. instance of function(*)] ! " + func.args(" 1", " ."), false);
+    query("(1, not#1)[. instance of function(*)] ! " + func.args(" 1", " ."), false);
     query("sort(" + func.args(" (1 to 2)[. > 0]", " string#1") + ')', "1\n2");
     check(func.args(" ()", " boolean#1"), "", empty());
 
@@ -299,27 +299,27 @@ public final class FnModuleTest extends QueryPlanTest {
   @Test public void forEachPair() {
     final Function func = FOR_EACH_PAIR;
 
-    query("(0,concat#2)[. instance of function(*)] ! " +
+    query("(0, concat#2)[. instance of function(*)] ! " +
         func.args("A", "B", " ."), "AB");
 
-    query("sort(" + func.args(" ('aa','bb')", " (2,2)", " substring#2") + ')', "a\nb");
+    query("sort(" + func.args(" ('aa', 'bb')", " (2, 2)", " substring#2") + ')', "a\nb");
 
     // pre-compute result size
     check("count(" + func.args(" 1 to 10000000000", " 1 to 10000000000",
-        " function($a,$b) { 'a' }") + ')', 10000000000L, empty(func));
+        " function($a, $b) { 'a' }") + ')', 10000000000L, empty(func));
     check("count(" + func.args(" 1 to 20000000000", " 1 to 10000000000",
-        " function($a,$b) { 'a' }") + ')', 10000000000L, empty(func));
+        " function($a, $b) { 'a' }") + ')', 10000000000L, empty(func));
     check("count(" + func.args(" 1 to 10000000000", " 1 to 20000000000",
-        " function($a,$b) { 'a' }") + ')', 10000000000L, empty(func));
-    check("count(" + func.args(" 1 to 20", " 1 to 20", " function($a,$b) { $a,$b }") + ')', 40,
+        " function($a, $b) { 'a' }") + ')', 10000000000L, empty(func));
+    check("count(" + func.args(" 1 to 20", " 1 to 20", " function($a, $b) { $a, $b }") + ')', 40,
         exists(func));
 
     check(func.args(" ()", "a", " matches#2"), "", empty());
     check(func.args("aa", " ()", " matches#2"), "", empty());
 
     query(func.args("aa", "a", " matches#2"), true);
-    query(func.args(" ('aa','bb')", "a", " matches#2"), true);
-    query(func.args("aa", " ('a','b')", " matches#2"), true);
+    query(func.args(" ('aa', 'bb')", "a", " matches#2"), true);
+    query(func.args("aa", " ('a', 'b')", " matches#2"), true);
   }
 
   /** Test method. */
@@ -327,8 +327,8 @@ public final class FnModuleTest extends QueryPlanTest {
     final Function func = FUNCTION_LOOKUP;
 
     check("for $f in ('fn:true', 'fn:position') ! function-lookup(xs:QName(.), 0) " +
-        "return (8,9)[$f()]", "8\n9\n9", exists(func));
-    check("for $f in xs:QName('fn:position') return (8,9)[function-lookup($f, 0)()]", "8\n9",
+        "return (8, 9)[$f()]", "8\n9\n9", exists(func));
+    check("for $f in xs:QName('fn:position') return (8, 9)[function-lookup($f, 0)()]", "8\n9",
         exists(func));
   }
 
@@ -348,24 +348,24 @@ public final class FnModuleTest extends QueryPlanTest {
     // pre-evaluate empty sequence
     check(func.args(" ()"), "", empty(func));
     check(func.args(1), 1, empty(func));
-    check(func.args(" (1,2)"), 1, empty(func));
+    check(func.args(" (1, 2)"), 1, empty(func));
     check(func.args(" <a/>"), "<a/>", empty(func));
     check(func.args(" <a/>[name()]"), "<a/>", empty(func));
     check(func.args(" (<a/>, <b/>)[name()]"), "<a/>", exists(func));
-    check(func.args(" (1,error())"), 1, exists(Int.class));
+    check(func.args(" (1, error())"), 1, exists(Int.class));
     check(func.args(" reverse((1, 2, 3)[. > 1])"), 3, exists(_UTIL_LAST));
 
-    check(func.args(" util:init((<a/>,<b/>,<c/>))"), "<a/>", empty(_UTIL_INIT));
-    check(func.args(" util:init((<a/>,<b/>))"), "<a/>", empty(_UTIL_INIT));
+    check(func.args(" util:init((<a/>, <b/>, <c/>))"), "<a/>", empty(_UTIL_INIT));
+    check(func.args(" util:init((<a/>, <b/>))"), "<a/>", empty(_UTIL_INIT));
     check(func.args(" util:init((<a/>))"), "", empty());
     check(func.args(" util:init((1, 2)[. = 0])"), "", exists(_UTIL_INIT));
 
-    check(func.args(" tail((<a/>,<b/>,<c/>))"), "<b/>", exists(_UTIL_ITEM));
+    check(func.args(" tail((<a/>, <b/>, <c/>))"), "<b/>", exists(_UTIL_ITEM));
 
-    check(func.args(" subsequence((<a/>,<b/>), <_>1</_>)"), "<a/>", exists(SUBSEQUENCE));
-    check(func.args(" subsequence((<a/>,<b/>,<c/>,<d/>), 2, 2)"), "<b/>", exists(_UTIL_ITEM));
+    check(func.args(" subsequence((<a/>, <b/>), <_>1</_>)"), "<a/>", exists(SUBSEQUENCE));
+    check(func.args(" subsequence((<a/>, <b/>, <c/>, <d/>), 2, 2)"), "<b/>", exists(_UTIL_ITEM));
 
-    check(func.args(" util:range((<a/>,<b/>,<c/>,<d/>), 2, 3)"), "<b/>", exists(_UTIL_ITEM));
+    check(func.args(" util:range((<a/>, <b/>, <c/>, <d/>), 2, 3)"), "<b/>", exists(_UTIL_ITEM));
   }
 
   /** Test method. */
@@ -423,7 +423,7 @@ public final class FnModuleTest extends QueryPlanTest {
         " ! (. = 'a' and . instance of xs:string)", true);
     query(func.args(" ('b', xs:anyURI('a'))") +
         " ! (. = 'a' and . instance of xs:string)", true);
-    query(func.args(" (2,3,1)"), 1);
+    query(func.args(" (2, 3, 1)"), 1);
     query(func.args(" (xs:date('2002-01-01'), xs:date('2003-01-01'), xs:date('2001-01-01'))"),
         "2001-01-01");
     query(func.args(" (xs:dayTimeDuration('PT1S'), xs:dayTimeDuration('PT0S'))"), "PT0S");
@@ -463,21 +463,21 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" ()"), true,  empty(func));
 
     // function is replaced with fn:exists
-    check(func.args(" empty(1[.=1])"), true, exists(EXISTS));
+    check(func.args(" empty((1, 2)[. = 1])"), true, exists(EXISTS));
     // function is replaced with fn:empty
-    check(func.args(" exists(1[.=1])"), false, exists(EMPTY));
+    check(func.args(" exists((1, 2)[. = 1])"), false, exists(EMPTY));
     check(func.args(" <a/>/self::a"), false, exists(EMPTY));
     // function is replaced with fn:boolean
-    check(func.args(func.args(" (1[.=1])")), true, exists(BOOLEAN));
+    check(func.args(func.args(" ((1, 2)[. = 1])")), true, exists(BOOLEAN));
 
     // function is replaced with fn:boolean
-    check("for $i in (1,2) return " + func.args(" $i = $i + 1"),
+    check("for $i in (1, 2) return " + func.args(" $i = $i + 1"),
         "true\ntrue", exists("*[@op != '=']"));
-    check("for $i in (1,2) return " + func.args(" $i eq $i + 1"),
+    check("for $i in (1, 2) return " + func.args(" $i eq $i + 1"),
         "true\ntrue", exists("*[@op != 'eq']"));
-    check("for $i in (1,2) return " + func.args(" [$i] eq $i + 1"),
+    check("for $i in (1, 2) return " + func.args(" [$i] eq $i + 1"),
         "true\ntrue", exists("*[@op != 'eq']"));
-    check("for $i in (1,2) return " + func.args(" $i = ($i, $i)"),
+    check("for $i in (1, 2) return " + func.args(" $i = ($i, $i)"),
         "false\nfalse", exists(func));
   }
 
@@ -575,8 +575,8 @@ public final class FnModuleTest extends QueryPlanTest {
         + "let $m1 := " + func.args() + " "
         + "let $m2 := " + func.args() + " "
         + "return every $test in ("
-        + "  $m1('number') = $m2('number'),"
-        + "  $m2('next')()('number') = $m1('next')()('number'),"
+        + "  $m1('number') = $m2('number'), "
+        + "  $m2('next')()('number') = $m1('next')()('number'), "
         + "  deep-equal($m1('permute')($seq), $m2('permute')($seq))"
         + ") satisfies true()", true);
     // ensure that the generator has no mutable state
@@ -593,7 +593,7 @@ public final class FnModuleTest extends QueryPlanTest {
     // static rewrites
     query(func.args(" ()", 1), "");
     query(func.args("A", 1), "");
-    query(func.args(" (1,2)", 1), 2);
+    query(func.args(" (1, 2)", 1), 2);
     query(func.args(" (1 to 3)", 1), "2\n3");
 
     // known result size
@@ -602,8 +602,8 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" prof:void(())", 1), "");
 
     // unknown result size
-    query(func.args(" 1[. = 0]", 1), "");
-    query(func.args(" 1[. = 1]", 1), "");
+    query(func.args(" <_>1</_>[. = 0]", 1), "");
+    query(func.args(" <_>1</_>[. = 1]", 1), "");
     query(func.args(" (1 to 2)[. = 0]", 1), "");
     query(func.args(" (1 to 4)[. < 3]", 1), 2);
 
@@ -616,7 +616,7 @@ public final class FnModuleTest extends QueryPlanTest {
     // static rewrites, dynamic position
     query(func.args(" ()", " <_>1</_>"), "");
     query(func.args("A", " <_>1</_>"), "");
-    query(func.args(" (1,2)", " <_>1</_>"), 2);
+    query(func.args(" (1, 2)", " <_>1</_>"), 2);
     query(func.args(" (1 to 3)", " <_>1</_>"), "2\n3");
 
     // known result size, dynamic position
@@ -625,8 +625,8 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" prof:void(())", " <_>1</_>"), "");
 
     // unknown result size, dynamic position
-    query(func.args(" 1[. = 0]", " <_>1</_>"), "");
-    query(func.args(" 1[. = 1]", " <_>1</_>"), "");
+    query(func.args(" <_>1</_>[. = 0]", " <_>1</_>"), "");
+    query(func.args(" <_>1</_>[. = 1]", " <_>1</_>"), "");
     query(func.args(" (1 to 2)[. = 0]", " <_>1</_>"), "");
     query(func.args(" (1 to 4)[. < 3]", " <_>1</_>"), 2);
 
@@ -649,7 +649,7 @@ public final class FnModuleTest extends QueryPlanTest {
     final Function func = REPLACE;
     query(func.args("aaaaa bbbbbbbb ddd ", "(.{6,15}) ", "$1@"), "aaaaa bbbbbbbb@ddd ");
     query(func.args("aaaa AAA 123", "(\\s+\\P{Ll}{3,280}?)", "$1@"), "aaaa AAA@ 123@");
-    error(func.args("asdf", "a{12,3}", ""), REGPAT_X);
+    error(func.args("asdf", "a{12, 3}", ""), REGPAT_X);
 
     query(func.args("a", "", "x", "j"), "xax");
     error(func.args("a", "", "x"), REGROUP);
@@ -667,21 +667,21 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" ()"), "");
     query(func.args(" 1"), 1);
     query(func.args(" 1 to 3"), "3\n2\n1");
-    query(func.args(" (<a/>,<b/>)"), "<b/>\n<a/>");
-    query(func.args(" 1[. = 1]"), 1);
+    query(func.args(" (<a/>, <b/>)"), "<b/>\n<a/>");
+    query(func.args(" <_>1</_>[. = 1]"), "<_>1</_>");
     query(func.args(" (1, 2)[. != 2]"), 1);
     query(func.args(" tokenize(<a/>)"), "");
     query(func.args(" tokenize(<a>1</a>)"), 1);
     query(func.args(" tokenize(<a>1 2</a>)"), "2\n1");
     query(func.args(" (1 to 2) ! 1"), "1\n1");
-    query(func.args(" (1 to 2) ! (1,2)"), "2\n1\n2\n1");
+    query(func.args(" (1 to 2) ! (1, 2)"), "2\n1\n2\n1");
 
-    check(func.args(" tail((<a/>,<b/>,<c/>))"), "<c/>\n<b/>", empty(_UTIL_INIT));
-    check(func.args(" (<a/>,<b/>,<c/>)[position() < last()]"), "<b/>\n<a/>", empty(TAIL));
+    check(func.args(" tail((<a/>, <b/>, <c/>))"), "<c/>\n<b/>", empty(_UTIL_INIT));
+    check(func.args(" (<a/>, <b/>, <c/>)[position() < last()]"), "<b/>\n<a/>", empty(TAIL));
 
-    check(func.args(" tail(" + func.args(" (<a/>,<b/>,<c/>)") + ")"), "<a/>\n<b/>",
+    check(func.args(" tail(" + func.args(" (<a/>, <b/>, <c/>)") + ")"), "<a/>\n<b/>",
         exists(_UTIL_INIT));
-    check(func.args(" (" + func.args(" (<a/>,<b/>,<c/>)") + ")[position() < last()]"),
+    check(func.args(" (" + func.args(" (<a/>, <b/>, <c/>)") + ")[position() < last()]"),
         "<b/>\n<c/>", exists(TAIL));
   }
 
@@ -707,22 +707,22 @@ public final class FnModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test public void sort() {
     final Function func = SORT;
-    query(func.args(" ('b','a')", "http://www.w3.org/2005/xpath-functions/collation/codepoint"),
+    query(func.args(" ('b', 'a')", "http://www.w3.org/2005/xpath-functions/collation/codepoint"),
         "a\nb");
 
     query(func.args(" (1, 4, 6, 5, 3)"), "1\n3\n4\n5\n6");
-    query(func.args(" (1,-2,5,10,-10,10,8)", " ()", " abs#1"), "1\n-2\n5\n8\n10\n-10\n10");
-    query(func.args(" ((1,0), (1,1), (0,1), (0,0))"), "0\n0\n0\n0\n1\n1\n1\n1");
+    query(func.args(" (1, -2, 5, 10, -10, 10, 8)", " ()", " abs#1"), "1\n-2\n5\n8\n10\n-10\n10");
+    query(func.args(" ((1, 0), (1, 1), (0, 1), (0, 0))"), "0\n0\n0\n0\n1\n1\n1\n1");
     query(func.args(" ('9','8','29','310','75','85','36-37','93','72','185','188','86','87','83',"
         + "'79','82','71','67','63','58','57','53','31','26','22','21','20','15','10')", " ()",
         " function($s) { number($s) }") + "[1]",
         "36-37");
-    query(func.args(" (1,2)", " ()", " function($s) { [$s] }"), "1\n2");
+    query(func.args(" (1, 2)", " ()", " function($s) { [$s] }"), "1\n2");
 
-    query("for $i in (10000,10001) return " + func.args(" 1 to $i") + "[1]", "1\n1");
-    query("for $i in (10000,10001) return " + func.args(" reverse(1 to $i)") + "[1]", "1\n1");
-    query("for $i in (10000,10001) return " + func.args(func.args(" reverse(1 to $i)")) + "[1]");
-    query("for $i in (1,2) return " + func.args(func.args(" (1,$i)")) + "[1]", "1\n1");
+    query("for $i in (10000, 10001) return " + func.args(" 1 to $i") + "[1]", "1\n1");
+    query("for $i in (10000, 10001) return " + func.args(" reverse(1 to $i)") + "[1]", "1\n1");
+    query("for $i in (10000, 10001) return " + func.args(func.args(" reverse(1 to $i)")) + "[1]");
+    query("for $i in (1, 2) return " + func.args(func.args(" (1, $i)")) + "[1]", "1\n1");
 
     check(func.args(" ()"), "", empty());
     check(func.args(1), 1, empty(func));
@@ -755,8 +755,8 @@ public final class FnModuleTest extends QueryPlanTest {
     check("for $s in ('a', 'b') return " + func.args(" $s"), "a\nb", empty(func));
     check("for $s in (<a/>, <b/>) return " + func.args(" $s"), "\n", exists(func));
     check("for $s in ('a', 'b') return $s[" + func.args() + ']', "a\nb", empty(func));
-    check("for $s in ('a' ,'b') return $s[" + func.args() + " = 'a']", "a", empty(func));
-    check("for $s in (<a/> ,<b/>) return $s[" + func.args() + ']', "", exists(func));
+    check("for $s in ('a', 'b') return $s[" + func.args() + " = 'a']", "a", empty(func));
+    check("for $s in (<a/>, <b/>) return $s[" + func.args() + ']', "", exists(func));
 
     error(func.args(), NOCTX_X);
     error(func.args(" true#0"), FISTRING_X);
@@ -767,9 +767,9 @@ public final class FnModuleTest extends QueryPlanTest {
     final Function func = STRING_LENGTH;
     query(func.args(" ()"), 0);
     query(func.args("A"), 1);
-    query("'A'[" + func.args() + ']', "A");
+    query("<_>A</_>[" + func.args() + ']', "<_>A</_>");
     query(func.args(" ([()], 'a')"), 1);
-    error("true#0[" + func.args() + ']', FISTRING_X);
+    error("true#0[" + func.args() + ']', FIATOM_X);
   }
 
   /** Test method. */
@@ -818,10 +818,10 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" prof:void(())", 2), "");
 
     // unknown result size
-    query(func.args(" 1[. = 0]", 1), "");
-    query(func.args(" 1[. = 1]", 1), 1);
-    query(func.args(" 1[. = 0]", 2), "");
-    query(func.args(" 1[. = 1]", 2), "");
+    query(func.args(" <_>1</_>[. = 0]", 1), "");
+    query(func.args(" <_>1</_>[. = 1]", 1), "<_>1</_>");
+    query(func.args(" <_>1</_>[. = 0]", 2), "");
+    query(func.args(" <_>1</_>[. = 1]", 2), "");
     query(func.args(" (1 to 2)[. = 0]", 1), "");
     query(func.args(" (1 to 4)[. < 3]", 1), "1\n2");
     query(func.args(" (1 to 2)[. = 0]", 2), "");
@@ -841,20 +841,22 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" (1 to 4)[. != 1]", " <_>2</_>"), "3\n4");
     query(func.args(" (1 to 5)[. != 1]", " <_>2</_>", 2), "3\n4");
     query(func.args(" (1 to 4) ! (.*.)", 3), "9\n16");
-    query(func.args(" reverse((<a/>,<b/>,<c/>,<d/>))", 3), "<b/>\n<a/>");
-    query(func.args(" reverse((<a/>,<b/>,<c/>,<d/>))", " <_>1</_>"), "<d/>\n<c/>\n<b/>\n<a/>");
-    query(func.args(" reverse((<a/>,<b/>,<c/>,<d/>))", " <_>1</_>", 4), "<d/>\n<c/>\n<b/>\n<a/>");
-    query(func.args(" reverse((<a/>,<b/>,<c/>,<d/>))", " <_>2</_>") + "[2]", "<b/>");
+    query(func.args(" reverse((<a/>, <b/>, <c/>, <d/>))", 3), "<b/>\n<a/>");
+    query(func.args(" reverse((<a/>, <b/>, <c/>, <d/>))", " <_>1</_>"),
+        "<d/>\n<c/>\n<b/>\n<a/>");
+    query(func.args(" reverse((<a/>, <b/>, <c/>, <d/>))", " <_>1</_>", 4),
+        "<d/>\n<c/>\n<b/>\n<a/>");
+    query(func.args(" reverse((<a/>, <b/>, <c/>, <d/>))", " <_>2</_>") + "[2]", "<b/>");
 
-    query("xs:integer(" + func.args(" (1,2,3)[. != 0]", 3) + ')', 3);
-    query(func.args(" (1 to 6)[.!=0]", 3) + " instance of xs:integer+", true);
-    query(func.args(" (1 to 6)[.!=0]", 3, 2) + " instance of xs:integer+", true);
+    query("xs:integer(" + func.args(" (1, 2, 3)[. != 0]", 3) + ')', 3);
+    query(func.args(" (1 to 6)[. != 0]", 3) + " instance of xs:integer+", true);
+    query(func.args(" (1 to 6)[. != 0]", 3, 2) + " instance of xs:integer+", true);
 
-    check(func.args(" 1[.!=0]", 1, 2), 1, empty(func));
-    check(func.args(" 1[.!=0]", 2), "", empty());
+    check(func.args(" <_>1</_>[. != 0]", 1, 2), "<_>1</_>", empty(func));
+    check(func.args(" <_>1</_>[. != 0]", 2), "", empty());
 
-    query(func.args(" reverse((<a/>,<b/>,<c/>))", " <_>2</_>") + " instance of node()+", true);
-    query(func.args(" reverse((<a/>,<b/>,<c/>))", " <_>1</_>, 3") + " instance of node()+", true);
+    query(func.args(" reverse((<a/>, <b/>, <c/>))", " <_>2</_>") + " instance of node()+", true);
+    query(func.args(" reverse((<a/>, <b/>, <c/>))", " <_>1</_>, 3") + " instance of node()+", true);
 
     query(func.args(" <_/>", " xs:double('-INF')", " xs:double('-INF')"), "");
     query(func.args(" <_/>", " xs:double('-INF')", " xs:double('INF')"), "");
@@ -866,18 +868,18 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(1, " <_>1</_>") + " instance of xs:integer", true);
 
     query(func.args(" <_/>", 1, 1), "<_/>");
-    query(func.args(" (<_/>,<_/>,<_/>,<_/>)", 1, 2), "<_/>\n<_/>");
+    query(func.args(" (<_/>, <_/>, <_/>, <_/>)", 1, 2), "<_/>\n<_/>");
 
-    query(func.args(" (<_/>,<_/>,<_/>)", 1, 0), "");
-    query(func.args(" (<_/>,<_/>,<_/>)", 1, 1), "<_/>");
-    query(func.args(" (<_/>,<_/>,<_/>)", 1, 2), "<_/>\n<_/>");
-    query(func.args(" (<_/>,<_/>,<_/>)", 1, 3), "<_/>\n<_/>\n<_/>");
-    query(func.args(" (<_/>,<_/>,<_/>)", 2, 1), "<_/>");
-    query(func.args(" (<_/>,<_/>,<_/>)", 2, 2), "<_/>\n<_/>");
-    query(func.args(" (<_/>,<_/>,<_/>)", 3, 1), "<_/>");
-    query(func.args(" (<_/>,<_/>,<_/>)", 3, 2), "<_/>");
-    query(func.args(" (<_/>,<_/>,<_/>)", 4, 0), "");
-    query(func.args(" (<_/>,<_/>,<_/>)", 4, 1), "");
+    query(func.args(" (<_/>, <_/>, <_/>)", 1, 0), "");
+    query(func.args(" (<_/>, <_/>, <_/>)", 1, 1), "<_/>");
+    query(func.args(" (<_/>, <_/>, <_/>)", 1, 2), "<_/>\n<_/>");
+    query(func.args(" (<_/>, <_/>, <_/>)", 1, 3), "<_/>\n<_/>\n<_/>");
+    query(func.args(" (<_/>, <_/>, <_/>)", 2, 1), "<_/>");
+    query(func.args(" (<_/>, <_/>, <_/>)", 2, 2), "<_/>\n<_/>");
+    query(func.args(" (<_/>, <_/>, <_/>)", 3, 1), "<_/>");
+    query(func.args(" (<_/>, <_/>, <_/>)", 3, 2), "<_/>");
+    query(func.args(" (<_/>, <_/>, <_/>)", 4, 0), "");
+    query(func.args(" (<_/>, <_/>, <_/>)", 4, 1), "");
 
     query("sort(" + func.args(" tokenize(<_/>)", 3) + ')', "");
   }
@@ -932,18 +934,18 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" -3037000500 to 3037000500"), 0);
     query(func.args(" ()", " ()"), "");
     query(func.args(1, "x"), 1);
-    error(func.args(" ()", " (1,2)"), SEQFOUND_X);
+    error(func.args(" ()", " (1, 2)"), SEQFOUND_X);
 
-    query(func.args(" (1,3,5)"), 9);
-    query(func.args(" (-3,-1,1,3)"), 0);
-    query(func.args(" (1,1.1,1e0)"), 3.1);
+    query(func.args(" (1, 3, 5)"), 9);
+    query(func.args(" (-3, -1, 1, 3)"), 0);
+    query(func.args(" (1, 1.1, 1e0)"), 3.1);
 
     check("for $i in 1 to 2 return " + func.args(" $i"), "1\n2", type(SUM, "xs:integer"));
     check("for $i in 1 to 2 return " + func.args(" $i", "a"), "1\n2", type(SUM, "xs:integer"));
-    check(func.args(" 1[. = 1]", " 0.0"), 1, type(SUM, "xs:decimal"));
-    check(func.args(" 1[. = 1]", "a"), 1, type(SUM, "xs:anyAtomicType"));
-    check(func.args(" 1[. = 1]", " 1[. = 1]"), 1, type(SUM, "xs:integer?"));
-    check(func.args(" 1[. = 1]", " 'a'[. = 'a']"), 1, type(SUM, "xs:anyAtomicType?"));
+    check(func.args(" (1, 2)[. = 1]", " 0.0"), 1, type(SUM, "xs:decimal"));
+    check(func.args(" (1, 2)[. = 1]", "a"), 1, type(SUM, "xs:anyAtomicType"));
+    check(func.args(" (1, 2)[. = 1]", " (1, 2)[. = 1]"), 1, type(SUM, "xs:integer?"));
+    check(func.args(" (1, 2)[. = 1]", " ('a', 'b')[. = 'a']"), 1, type(SUM, "xs:anyAtomicType?"));
   }
 
   /** Test method. */
@@ -953,7 +955,7 @@ public final class FnModuleTest extends QueryPlanTest {
     // static rewrites
     query(func.args(" ()"), "");
     query(func.args("A"), "");
-    query(func.args(" (1,2)"), 2);
+    query(func.args(" (1, 2)"), 2);
     query(func.args(" (1 to 3)"), "2\n3");
 
     // known result size
@@ -962,8 +964,8 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" prof:void(())"), "");
 
     // unknown result size
-    query(func.args(" 1[. = 0]"), "");
-    query(func.args(" 1[. = 1]"), "");
+    query(func.args(" <_>1</_>[. = 0]"), "");
+    query(func.args(" <_>1</_>[. = 1]"), "");
     query(func.args(" (1 to 2)[. = 0]"), "");
     query(func.args(" (1 to 4)[. < 3]"), 2);
 

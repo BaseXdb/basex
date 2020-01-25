@@ -33,6 +33,7 @@ public final class UpdateModuleTest extends SandboxTest {
     final Function func = _UPDATE_FOR_EACH;
     query(func.args(1, " update:output#1"), 1);
     query(func.args(" 1[. = 0]", " update:output#1"), "");
+    query(func.args(" (1, 2)[. = 0]", " update:output#1"), "");
     query(func.args(1, " prof:void#1"), "");
     error(func.args(1, " count#1"), FUNCNOTUP_X);
   }

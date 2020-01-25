@@ -243,6 +243,7 @@ public final class PathTest extends SandboxTest {
 
   /** Path tests. */
   @Test public void gh1728() {
-    query("<a/> ! (.,.)/./1[. = 1]", 1);
+    query("<a/> ! (., .)/./(1, 2)[. = 1]", 1);
+    query("<a/> ! (., .)/./1[. = 1]", 1);
   }
 }

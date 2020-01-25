@@ -32,7 +32,7 @@ public final class GFLWORTest extends QueryPlanTest {
 
   /** Positional optimization. */
   @Test public void posOptimizationTest() {
-    assertEquals("<a/>", query("for $a at $p in (<a/>,<b/>)/. where $p < 2 return $a"));
+    assertEquals("<a/>", query("for $a at $p in (<a/>, <b/>)/. where $p < 2 return $a"));
   }
 
   /** Tests the relocation of a static let clause. */
@@ -74,11 +74,11 @@ public final class GFLWORTest extends QueryPlanTest {
 
   /** Tests the relocation of a let clause. */
   @Test public void dontMove2() {
-    check("let $a := <a/>, $b := <b/>, $c := ($a,$a)[1] " +
-        "for $i in 1 to 2 return ($c,$b)",
+    check("let $a := <a/>, $b := <b/>, $c := ($a, $a)[1] " +
+        "for $i in 1 to 2 return ($c, $b)",
         "<a/>\n<b/>\n<a/>\n<b/>",
-        Util.info("//Let[@name='$a'] << //Let[@name='$b'] and " +
-            "//Let[@name='$b'] << //Let[@name='$c']")
+        Util.info("//Let[@name = '$a'] << //Let[@name = '$b'] and " +
+            "//Let[@name = '$b'] << //Let[@name = '$c']")
     );
   }
 
@@ -101,7 +101,7 @@ public final class GFLWORTest extends QueryPlanTest {
         "for $b as element(x) in $x " +
         "return ($b, $b)[1]",
         "<x/>\n<x/>",
-        "//(For | Let)[@name='$b'] << //For[@name='$a']",
+        "//(For | Let)[@name = '$b'] << //For[@name = '$a']",
         "every $let in //Let, $for in //For satisfies $let << $for"
     );
   }
@@ -203,15 +203,24 @@ public final class GFLWORTest extends QueryPlanTest {
 
   /** Tests if let clauses are moved out of any loop they don't depend on. */
   @Test public void replicate() {
-    check("for $r in 1 to 2 return (3,4)",
+    check("for $r in 1 to 2 return (3, 4)",
         "3\n4\n3\n4",
         empty(For.class),
         exists(SingletonSeq.class)
     );
-    check("for $r in 1 to 2 return 3[. = 4]",
+    check("for $r in 1 to 2 return (3, 4)[. = 5]",
         "",
         empty(For.class),
         exists(_UTIL_REPLICATE)
+    );
+    check("for $r in 1 to 2 return <_>3</_>",
+        "<_>3</_>\n<_>3</_>",
+        exists(For.class),
+        exists(SingletonSeq.class)
+    );
+    check("for $r in 1 to 2 return 3[. = 4]",
+        "",
+        empty()
     );
   }
 
@@ -224,7 +233,7 @@ public final class GFLWORTest extends QueryPlanTest {
         "13\n13\n52\n52",
         exists("For[every $let in //Let satisfies . << $let]"),
         exists("For[every $let in //Let satisfies . >> $let]"),
-        "//Let[@name='$a'] << //Let[@name='$b']"
+        "//Let[@name = '$a'] << //Let[@name = '$b']"
     );
   }
 

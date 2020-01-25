@@ -39,6 +39,8 @@ public final class SimpleMapTest extends QueryPlanTest {
 
     check("prof:void('x') ! 1", "", empty(Int.class));
     check("() ! 'a'[.]", "", empty());
+    check("() ! ('a', 'b')[.]", "", empty());
+    check("() ! <_>a</_>[.]", "", empty());
   }
 
   /** Context item. */
@@ -47,31 +49,31 @@ public final class SimpleMapTest extends QueryPlanTest {
     query("3 ! number(.)", 3);
     query("4 ! string()", "4");
     query("5 ! string(.)", "5");
-    query("(1,2) ! position()", "1\n2");
-    query("(1,2) ! last()", "2\n2");
+    query("(1, 2) ! position()", "1\n2");
+    query("(1, 2) ! last()", "2\n2");
     query("map {} ! head(?_) ! string()", "");
 
     check("1 ! .", 1, empty(IterMap.class));
     check("(1, 2)[. = 1] ! .", 1, empty(IterMap.class));
-    check("(1,(2, 3)[. = 2]) ! .", "1\n2", empty(IterMap.class));
-    check("(1,2) !.!.!.!.!.!.!.!.!.!.!.", "1\n2", empty(IterMap.class));
+    check("(1, (2, 3)[. = 2]) ! .", "1\n2", empty(IterMap.class));
+    check("(1, 2) !.!.!.!.!.!.!.!.!.!.!.", "1\n2", empty(IterMap.class));
     check("<a/> ! . ! .", "<a/>", empty(IterMap.class));
-    check("(1,2)[. ! number() = 2]", 2, empty("*[name() = 'IterMap']"));
+    check("(1, 2)[. ! number() = 2]", 2, empty("*[name() = 'IterMap']"));
 
     check("trace(1) ! (. + 1)", 2, exists(ItemMap.class));
-    check("1[.= 1] ! trace(.)", 1, exists(TRACE));
+    check("<_>1</_>[. = 1] ! trace(.)", "<_>1</_>", exists(TRACE));
   }
 
   /** Typing. */
   @Test public void types() {
     check("(1, 2) ! .[. = 1]", 1, exists(IterMap.class));
-    check("1[. = 1] ! 2", "2", type(ItemMap.class, "xs:integer?"));
-    check("4[. = 4] ! (4, 5)[. = 4]", 4, type(IterMap.class, "xs:integer*"));
+    check("<_>1</_>[. = 1] ! 2", "2", type(ItemMap.class, "xs:integer?"));
+    check("<_>4</_>[. = 4] ! (4, 5)[. = 4]", 4, type(IterMap.class, "xs:integer*"));
   }
 
   /** Flatten nested operators. */
   @Test public void flatten() {
-    check("(1, 2) ! ((.+.) ! (.*.))", "4\n16", count(IterMap.class, 1));
+    check("(1, 2) ! ((. + .) ! (. * .))", "4\n16", count(IterMap.class, 1));
     // do not rewrite positional access
     check("(1, 2) ! ((1 to .) ! position())", "1\n1\n2", count(CachedMap.class, 1));
   }
@@ -79,10 +81,10 @@ public final class SimpleMapTest extends QueryPlanTest {
   /** Inline simple expressions into next operand. */
   @Test public void inline() {
     check("'1' ! (., number())", "1\n1", empty(IterMap.class));
-    check("let $a := document { <a/> } return $a ! (.,/)", "<a/>\n<a/>", count(VarRef.class, 2));
+    check("let $a := document { <a/> } return $a ! (., /)", "<a/>\n<a/>", count(VarRef.class, 2));
     check("let $d := document{} return $d ! /", "", root(CDoc.class));
-    check("map { 1:2 } ! ?*", 2, root(Int.class));
-    check("let $n := map { 1:2 } return $n ! ?*", 2, root(Int.class));
+    check("map { 1: 2 } ! ?*", 2, root(Int.class));
+    check("let $n := map { 1: 2 } return $n ! ?*", 2, root(Int.class));
   }
 
   /** Errors. */
@@ -92,13 +94,15 @@ public final class SimpleMapTest extends QueryPlanTest {
 
   /** Replicate results. */
   @Test public void replicate() {
-    check("<x/> ! 2[. = 2]", "2", empty(CElem.class));
-    check("(1 to 2) ! 'a'[.]", "a\na", exists(_UTIL_REPLICATE));
+    check("<x/> ! (2, 3)[. = 2]", "2", empty(CElem.class));
+    check("(1 to 2) ! ('a', 'a')[.]", "a\na\na\na", exists(_UTIL_REPLICATE));
     check("(1 to 2) ! (4, 5)[. = 4]", "4\n4", exists(_UTIL_REPLICATE));
+    check("(1 to 2) ! ('a', '')[.]", "a\na", exists(_UTIL_REPLICATE));
     check("(1 to 2) ! prof:void(.)", "", empty(_UTIL_REPLICATE));
 
     // replace first or both expressions with singleton sequence
     check("(1 to 2) ! 3", "3\n3", exists(SingletonSeq.class), empty(IterMap.class));
+    check("(1 to 2) ! 'a'[.]", "a\na", exists(SingletonSeq.class), empty(IterMap.class));
     check("(1 to 2) ! <x/>", "<x/>\n<x/>", exists(SingletonSeq.class), exists(IterMap.class));
 
     // combine identical values in singleton sequence

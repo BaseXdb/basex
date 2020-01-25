@@ -136,17 +136,15 @@ public abstract class Cmp extends Arr {
           default:
         }
       }
-    } else if(type instanceof NodeType && type != NodeType.NOD && opV == OpV.EQ &&
-        (this instanceof CmpG ? expr2 instanceof Value : expr2 instanceof Item) &&
-        expr1 instanceof ContextFn) {
+    } else if(type instanceof NodeType && type != NodeType.NOD && expr1 instanceof ContextFn &&
+        (this instanceof CmpG ? expr2 instanceof Value : expr2 instanceof Item) && opV == OpV.EQ) {
 
-      // skip functions that do not refer to current context item
+      // skip functions that do not refer to the current context item
       final ContextFn func = (ContextFn) expr1;
       if(func.exprs.length > 0 && !(func.exprs[0] instanceof ContextValue)) return this;
 
       final ArrayList<QNm> qnames = new ArrayList<>();
       NamePart part = null;
-
       if(expr2.seqType().type.isStringOrUntyped()) {
         // local-name() eq 'a'  ->  self::*:a
         if(Function.LOCAL_NAME.is(func)) {
@@ -180,6 +178,7 @@ public abstract class Cmp extends Arr {
           qnames.add((QNm) item);
         }
       }
+
       if(part != null) {
         final ExprList paths = new ExprList(2);
         for(final QNm qname : qnames) {
