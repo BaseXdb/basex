@@ -50,7 +50,10 @@ final class StaticVarRef extends ParseExpr {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    if(var.value != null) return var.value;
+    if(var.value != null) {
+      cc.info(QueryText.OPTINLINE_X, this);
+      return var.value;
+    }
     exprType.assign(var.seqType());
     return this;
   }
