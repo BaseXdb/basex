@@ -9,6 +9,7 @@ import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -796,6 +797,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[local-name() != 'a']", "", exists(LOCAL_NAME));
     check("<a/>[local-name() = <_>a</_>]", "<a/>", exists(LOCAL_NAME));
     check("<a/>[node-name() = xs:QName(<_>a</_>)]", "<a/>", exists(NODE_NAME));
+    check("parse-xml('<a/>')[name(*) = 'a']", "<a/>", exists(Function.NAME));
   }
 
   /** Functions with database access. */

@@ -9,6 +9,7 @@ import org.basex.query.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
@@ -136,24 +137,31 @@ public abstract class Cmp extends Arr {
         }
       }
     } else if(type instanceof NodeType && type != NodeType.NOD && opV == OpV.EQ &&
-        (this instanceof CmpG ? expr2 instanceof Value : expr2 instanceof Item)) {
+        (this instanceof CmpG ? expr2 instanceof Value : expr2 instanceof Item) &&
+        expr1 instanceof ContextFn) {
+
+      // skip functions that do not refer to current context item
+      final ContextFn func = (ContextFn) expr1;
+      if(func.exprs.length > 0 && !(func.exprs[0] instanceof ContextValue)) return this;
+
       final ArrayList<QNm> qnames = new ArrayList<>();
       NamePart part = null;
+
       if(expr2.seqType().type.isStringOrUntyped()) {
         // local-name() eq 'a'  ->  self::*:a
-        if(Function.LOCAL_NAME.is(expr1)) {
+        if(Function.LOCAL_NAME.is(func)) {
           part = NamePart.LOCAL;
           for(final Item item : (Value) expr2) {
             final byte[] name = item.string(info);
             if(XMLToken.isNCName(name)) qnames.add(new QNm(name));
           }
-        } else if(Function.NAMESPACE_URI.is(expr1)) {
+        } else if(Function.NAMESPACE_URI.is(func)) {
           // namespace-uri() = ('URI1', 'URI2')  ->  self::Q{URI1} | self::Q{URI2}*
           part = NamePart.URI;
           for(final Item item : (Value) expr2) {
             qnames.add(new QNm(COLON, item.string(info)));
           }
-        } else if(Function.NAME.is(expr1)) {
+        } else if(Function.NAME.is(func)) {
           // (db-without-ns)[name() = 'city']  ->  (db-without-ns)[self::city]
           final Data data = cc.qc.focus.value.data();
           final byte[] dataNs = data != null ? data.nspaces.globalUri() : null;
@@ -165,7 +173,7 @@ public abstract class Cmp extends Arr {
             }
           }
         }
-      } else if(Function.NODE_NAME.is(expr1) && expr2.seqType().type == AtomType.QNM) {
+      } else if(Function.NODE_NAME.is(func) && expr2.seqType().type == AtomType.QNM) {
         // node-name() = xs:QName('pref:local')  ->  self::pref:local
         part = NamePart.FULL;
         for(final Item item : (Value) expr2) {
