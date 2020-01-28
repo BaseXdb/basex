@@ -1,6 +1,7 @@
 package org.basex.query.ast;
 
 import static org.basex.query.func.Function.*;
+import static org.basex.query.QueryError.*;
 
 import org.basex.core.cmd.*;
 import org.basex.query.*;
@@ -489,9 +490,17 @@ public final class RewritingsTest extends QueryPlanTest {
   }
 
   /** Casts. */
-  @Test public void cast() {
+  @Test public void gh1795() {
     check("for $n in 1 to 3 return xs:integer($n)[. = 1]", 1, empty(Cast.class));
     check("('a', 'b') ! xs:string(.)", "a\nb", empty(Cast.class), root(StrSeq.class));
+    check("xs:string(''[. = <_/>])", "", empty(Cast.class), root(If.class));
+
+    check("xs:string(<_/>[. = '']) = ''", true, empty(Cast.class), root(CmpSimpleG.class));
+    check("xs:double(<_>1</_>) + 2", 3, empty(Cast.class), type(Arith.class, "xs:double"));
+    check("(1, 2) ! (xs:byte(.)) ! (xs:integer(.) + 2)", "3\n4",
+        count(Cast.class, 1), type(Arith.class, "xs:integer"));
+
+    error("(if(<_>!</_> = 'a') then 'b') cast as xs:string", INVTYPE_X_X_X);
   }
 
   /** Casts. */
@@ -827,6 +836,5 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("<_/>[data()]", "", root(IterFilter.class));
     check("(1, 2)[. = 3]", "", root(IterFilter.class));
-
   }
 }

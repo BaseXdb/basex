@@ -46,21 +46,27 @@ public final class Cast extends Single {
   public Expr optimize(final CompileContext cc) throws QueryException {
     expr = expr.simplifyFor(AtomType.ATM, cc);
 
-    // skip cast if input and target type is equal
-    final SeqType st = expr.seqType();
-    final Type type = seqType.type;
-    if(st.one() && st.type.eq(type)) return cc.replaceWith(this, expr);
-
     // pre-evaluate value argument
     if(expr instanceof Value) return cc.preEval(this);
 
     // assign target type
-    if(type instanceof ListType) {
-      exprType.assign(type.atomic());
+    final SeqType ast = expr.seqType();
+    Type dt = seqType.type;
+    if(dt instanceof ListType) {
+      dt = dt.atomic();
+      exprType.assign(dt);
     } else {
-      exprType.assign(type, st.oneOrMore() && !st.mayBeArray() ? Occ.ONE : Occ.ZERO_ONE);
+      Occ occ = seqType.occ;
+      if(occ == Occ.ZERO_ONE && ast.oneOrMore() && !ast.mayBeArray()) occ = Occ.ONE;
+      exprType.assign(dt, occ);
     }
-    return this;
+
+    // skip cast if input and target types are equal
+    // ('a' cast as xs:string)  ->  'a'
+    // xs:string(''[. = <_/>])  ->  ''[. = <_/>]
+    final SeqType dst = exprType.seqType();
+    return (ast.one() || ast.zeroOrOne() && !dst.one()) && ast.type.eq(dt) ?
+      cc.replaceWith(this, expr) : this;
   }
 
   @Override
@@ -69,6 +75,23 @@ public final class Cast extends Single {
     final long size = value.size();
     if(!seqType.occ.check(size)) throw INVTYPE_X_X_X.get(info, value.seqType(), seqType, value);
     return size == 1 ? seqType.cast((Item) value, true, qc, sc, info) : value;
+  }
+
+  @Override
+  public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
+    final SeqType ast = expr.seqType(), dst = exprType.seqType();
+    if(ast.one() || ast.zeroOrOne() && !dst.one()) {
+      final Type at = ast.type, dt = dst.type;
+      // xs:string($xml) = 'string'  ->  $xml = 'string'
+      // xs:double($xml) + 1e0  ->  $xml + 1e0
+      // xs:short($byte) + 1  ->  $byte + 1
+      if(type == AtomType.ATM && at.isStringOrUntyped() && dt.oneOf(AtomType.STR, AtomType.ATM) ||
+         type == AtomType.NUM && (at.isUntyped() && dt == AtomType.DBL ||
+           at.instanceOf(AtomType.INT) && at.instanceOf(dt))) {
+        return cc.replaceWith(this, expr);
+      }
+    }
+    return super.simplifyFor(type, cc);
   }
 
   @Override
