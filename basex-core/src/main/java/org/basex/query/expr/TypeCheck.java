@@ -75,7 +75,7 @@ public final class TypeCheck extends Single {
     if(expr instanceof Value) return cc.preEval(this);
 
     // check at each call
-    if(at.type.instanceOf(st.type) && !at.occ.couldBe(st.occ))
+    if(at.type.instanceOf(st.type) && at.occ.intersect(st.occ) == null)
       throw typeError(expr, st, null, info);
 
     final Expr opt = expr.typeCheck(this, cc);

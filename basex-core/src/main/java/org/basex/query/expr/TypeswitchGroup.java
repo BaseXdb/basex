@@ -111,7 +111,7 @@ public final class TypeswitchGroup extends Single {
 
     final Predicate<SeqType> remove = seqType -> {
       for(final SeqType st : cache) if(seqType.instanceOf(st)) return true;
-      return !seqType.couldBe(ct);
+      return seqType.intersect(ct) == null;
     };
 
     // remove specific types
@@ -164,15 +164,15 @@ public final class TypeswitchGroup extends Single {
   }
 
   /**
-   * Checks if the given type can match this group at runtime.
+   * Checks if the given type never matches this group at runtime.
    * @param seqType sequence type to be matched
    * @return result of check
    */
-  boolean couldBe(final SeqType seqType) {
+  boolean isNever(final SeqType seqType) {
     for(final SeqType st : seqTypes) {
-      if(st.couldBe(seqType)) return true;
+      if(st.intersect(seqType) != null) return false;
     }
-    return false;
+    return true;
   }
 
   /**

@@ -65,8 +65,7 @@ public final class Cast extends Single {
     // ('a' cast as xs:string)  ->  'a'
     // xs:string(''[. = <_/>])  ->  ''[. = <_/>]
     final SeqType dst = exprType.seqType();
-    return (ast.one() || ast.zeroOrOne() && !dst.one()) && ast.type.eq(dt) ?
-      cc.replaceWith(this, expr) : this;
+    return ast.occ.instanceOf(dst.occ) && ast.type.eq(dt) ? cc.replaceWith(this, expr) : this;
   }
 
   @Override
@@ -80,7 +79,7 @@ public final class Cast extends Single {
   @Override
   public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
     final SeqType ast = expr.seqType(), dst = exprType.seqType();
-    if(ast.one() || ast.zeroOrOne() && !dst.one()) {
+    if(ast.occ.instanceOf(dst.occ)) {
       final Type at = ast.type, dt = dst.type;
       // xs:string($xml) = 'string'  ->  $xml = 'string'
       // xs:double($xml) + 1e0  ->  $xml + 1e0

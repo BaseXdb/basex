@@ -87,7 +87,7 @@ public final class Typeswitch extends ParseExpr {
       // check if it's always the default branch that will be evaluated
       if(tg == null) {
         boolean opt = true;
-        for(int g = 0; opt && g < gl - 1; g++) opt = !groups[g].couldBe(ct);
+        for(int g = 0; opt && g < gl - 1; g++) opt = groups[g].isNever(ct);
         if(opt) tg = groups[gl - 1];
       }
 

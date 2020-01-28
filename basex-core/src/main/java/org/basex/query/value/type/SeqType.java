@@ -442,26 +442,17 @@ public final class SeqType {
    * @return result of check
    */
   public boolean promotable(final SeqType st) {
-    if(couldBe(st)) return true;
-    if(!occ.couldBe(st.occ)) return false;
+    if(intersect(st) != null) return true;
+    if(occ.intersect(st.occ) == null) return false;
     final Type tp = st.type;
     if(tp instanceof AtomType) {
       if(type.isUntyped()) return !tp.nsSensitive();
-      return tp == AtomType.DBL && (type.couldBe(AtomType.FLT) || type.couldBe(AtomType.DEC))
-          || tp == AtomType.FLT && type.couldBe(AtomType.DEC)
-          || tp == AtomType.STR && type.couldBe(AtomType.URI);
+      return tp == AtomType.DBL && (type.intersect(AtomType.FLT) != null ||
+               type.intersect(AtomType.DEC) != null) ||
+             tp == AtomType.FLT && type.intersect(AtomType.DEC) != null ||
+             tp == AtomType.STR && type.intersect(AtomType.URI) != null;
     }
     return st.type instanceof FuncType && type instanceof FuncType;
-  }
-
-  /**
-   * Checks if this type could be an instance of the given one. This function is called at compile
-   * time (the static type may be less specific than the eventual one).
-   * @param st sequence type
-   * @return result of check
-   */
-  public boolean couldBe(final SeqType st) {
-    return intersect(st) != null;
   }
 
   /**

@@ -250,15 +250,6 @@ public interface Type {
   Type intersect(Type type);
 
   /**
-   * Checks if this type's item type could be an instance of the given one.
-   * @param tp other type
-   * @return result of check
-   */
-  default boolean couldBe(final Type tp) {
-    return intersect(tp) != null;
-  }
-
-  /**
    * Checks if items with this type are numbers.
    * @return result of check
    */
