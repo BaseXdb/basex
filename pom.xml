@@ -29,7 +29,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
-    <jettyVersion>9.4.24.v20191120</jettyVersion>
+    <jettyVersion>9.4.26.v20200117</jettyVersion>
   </properties>
 
   <dependencyManagement>
@@ -242,7 +242,7 @@
     <repository>
       <id>central</id>
       <name>Central Maven Repository</name>
-      <url>http://repo2.maven.org/maven2/</url>
+      <url>https://repo1.maven.org/maven2/</url>
     </repository>
   </repositories>
 
@@ -308,7 +308,7 @@
         <plugins>
           <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
-            <version>3.1.1</version>
+            <version>3.2.0</version>
             <inherited>true</inherited>
             <executions>
               <execution>
@@ -428,7 +428,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.1.2</version>
+          <version>3.2.0</version>
           <inherited>true</inherited>
           <configuration>
             <archive>
@@ -458,7 +458,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>3.2.1</version>
           <inherited>true</inherited>
           <configuration>
             <outputDirectory>target</outputDirectory>
@@ -567,7 +567,7 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
-        <version>3.3.3</version>
+        <version>3.3.4</version>
       </extension>
     </extensions>
   </build>
