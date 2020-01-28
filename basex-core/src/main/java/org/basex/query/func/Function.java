@@ -62,7 +62,7 @@ public enum Function implements AFunction {
   // Standard functions
 
   /** XQuery function. */
-  ABS(FnAbs.class, "abs(num)", arg(NUM_ZO), NUM_ZO),
+  ABS(FnAbs.class, "abs(number)", arg(NUM_ZO), NUM_ZO),
   /** XQuery function. */
   ADJUST_DATE_TO_TIMEZONE(FnAdjustDateToTimezone.class, "adjust-date-to-timezone(date[,zone])",
       arg(DAT_ZO, DTD_ZO), DAT_ZO),
@@ -73,7 +73,7 @@ public enum Function implements AFunction {
   ADJUST_TIME_TO_TIMEZONE(FnAdjustTimeToTimezone.class, "adjust-time-to-timezone(date[,zone])",
       arg(TIM_ZO, DTD_ZO), TIM_ZO),
   /** XQuery function. */
-  ANALYZE_STRING(FnAnalyzeString.class, "analyze-string(input,pattern[,mod])",
+  ANALYZE_STRING(FnAnalyzeString.class, "analyze-string(input,pattern[,modifier])",
       arg(STR_ZO, STR_O, STR_O), ELM_O, flag(CNS)),
   /** XQuery function. */
   APPLY(FnApply.class, "apply(function,args)", arg(FUNC_O, ARRAY_O), ITEM_ZM,
@@ -88,7 +88,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   BOOLEAN(FnBoolean.class, "boolean(items)", arg(ITEM_ZM), BLN_O),
   /** XQuery function. */
-  CEILING(FnCeiling.class, "ceiling(num)", arg(NUM_ZO), NUM_ZO),
+  CEILING(FnCeiling.class, "ceiling(number)", arg(NUM_ZO), NUM_ZO),
   /** XQuery function. */
   CODEPOINT_EQUAL(FnCodepointEqual.class, "codepoint-equal(string1,string2)",
       arg(STR_ZO, STR_ZO), BLN_ZO),
@@ -102,7 +102,8 @@ public enum Function implements AFunction {
   /** XQuery function. */
   CONCAT(FnConcat.class, "concat(value1,value2[,...])", arg(AAT_ZO, AAT_ZO), STR_O),
   /** XQuery function. */
-  CONTAINS(FnContains.class, "contains(string,sub[,collation])", arg(STR_ZO, STR_ZO, STR_O), BLN_O),
+  CONTAINS(FnContains.class, "contains(string,substring[,collation])",
+      arg(STR_ZO, STR_ZO, STR_O), BLN_O),
   /** XQuery function. */
   CONTAINS_TOKEN(FnContainsToken.class, "contains-token(strings,token[,collation])",
       arg(STR_ZM, STR_O, STR_O), BLN_O),
@@ -148,7 +149,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   ENCODE_FOR_URI(FnEncodeForUri.class, "encode-for-uri(string)", arg(STR_ZO), STR_O),
   /** XQuery function. */
-  ENDS_WITH(FnEndsWith.class, "ends-with(string,sub[,collation])",
+  ENDS_WITH(FnEndsWith.class, "ends-with(string,substring[,collation])",
       arg(STR_ZO, STR_ZO, STR_O), BLN_O),
   /** XQuery function. */
   ENVIRONMENT_VARIABLE(FnEnvironmentVariable.class, "environment-variable(string)",
@@ -168,7 +169,7 @@ public enum Function implements AFunction {
   FILTER(FnFilter.class, "filter(items,function)",
       arg(ITEM_ZM, FuncType.get(BLN_O, ITEM_O).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
-  FLOOR(FnFloor.class, "floor(num)", arg(NUM_ZO), NUM_ZO),
+  FLOOR(FnFloor.class, "floor(number)", arg(NUM_ZO), NUM_ZO),
   /** XQuery function. */
   FOLD_LEFT(FnFoldLeft.class, "fold-left(items,zero,function)",
       arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O).seqType()), ITEM_ZM, flag(HOF)),
@@ -225,13 +226,13 @@ public enum Function implements AFunction {
   /** XQuery function. */
   IMPLICIT_TIMEZONE(FnImplicitTimezone.class, "implicit-timezone()", arg(), DTD_O),
   /** XQuery function. */
-  IN_SCOPE_PREFIXES(FnInScopePrefixes.class, "in-scope-prefixes(elem)", arg(ELM_O), STR_ZM),
+  IN_SCOPE_PREFIXES(FnInScopePrefixes.class, "in-scope-prefixes(element)", arg(ELM_O), STR_ZM),
   /** XQuery function. */
   INDEX_OF(FnIndexOf.class, "index-of(items,item[,collation])", arg(AAT_ZM, AAT_O, STR_O), ITR_ZM),
   /** XQuery function. */
   INNERMOST(FnInnermost.class, "innermost(nodes)", arg(NOD_ZM), NOD_ZM),
   /** XQuery function. */
-  INSERT_BEFORE(FnInsertBefore.class, "insert-before(items,pos,insert)",
+  INSERT_BEFORE(FnInsertBefore.class, "insert-before(items,position,insert)",
       arg(ITEM_ZM, ITR_O, ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   IRI_TO_URI(FnIriToUri.class, "iri-to-uri(string)", arg(STR_ZO), STR_O),
@@ -252,7 +253,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   LOWER_CASE(FnLowerCase.class, "lower-case(string)", arg(STR_ZO), STR_O),
   /** XQuery function. */
-  MATCHES(FnMatches.class, "matches(string,pattern[,mod])", arg(STR_ZO, STR_O, STR_O), BLN_O),
+  MATCHES(FnMatches.class, "matches(string,pattern[,modifier])", arg(STR_ZO, STR_O, STR_O), BLN_O),
   /** XQuery function. */
   MAX(FnMax.class, "max(items[,collation])", arg(AAT_ZM, STR_O), AAT_ZO),
   /** XQuery function. */
@@ -278,8 +279,8 @@ public enum Function implements AFunction {
   /** XQuery function. */
   NAMESPACE_URI(FnNamespaceUri.class, "namespace-uri([node])", arg(NOD_ZO), URI_O),
   /** XQuery function. */
-  NAMESPACE_URI_FOR_PREFIX(FnNamespaceUriForPrefix.class, "namespace-uri-for-prefix(pref,elem)",
-      arg(STR_ZO, ELM_O), URI_ZO),
+  NAMESPACE_URI_FOR_PREFIX(FnNamespaceUriForPrefix.class,
+      "namespace-uri-for-prefix(prefix,element)", arg(STR_ZO, ELM_O), URI_ZO),
   /** XQuery function. */
   NAMESPACE_URI_FROM_QNAME(FnNamespaceUriFromQName.class, "namespace-uri-from-QName(qname)",
       arg(QNM_ZO), URI_ZO),
@@ -323,22 +324,22 @@ public enum Function implements AFunction {
   RANDOM_NUMBER_GENERATOR(FnRandomNumberGenerator.class, "random-number-generator([seed])",
       arg(AAT_O), MAP_O),
   /** XQuery function. */
-  REMOVE(FnRemove.class, "remove(items,pos)", arg(ITEM_ZM, ITR_O), ITEM_ZM),
+  REMOVE(FnRemove.class, "remove(items,position)", arg(ITEM_ZM, ITR_O), ITEM_ZM),
   /** XQuery function. */
-  REPLACE(FnReplace.class, "replace(string,pattern,replace[,mod])",
+  REPLACE(FnReplace.class, "replace(string,pattern,replace[,modifier])",
       arg(STR_ZO, STR_O, STR_O, STR_O), STR_O),
   /** XQuery function. */
   RESOLVE_QNAME(FnResolveQName.class, "resolve-QName(name,base)", arg(STR_ZO, ELM_O), QNM_ZO),
   /** XQuery function. */
-  RESOLVE_URI(FnResolveUri.class, "resolve-uri(name[,elem])", arg(STR_ZO, STR_O), URI_ZO),
+  RESOLVE_URI(FnResolveUri.class, "resolve-uri(name[,element])", arg(STR_ZO, STR_O), URI_ZO),
   /** XQuery function. */
   REVERSE(FnReverse.class, "reverse(items)", arg(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   ROOT(FnRoot.class, "root([node])", arg(NOD_ZO), NOD_ZO),
   /** XQuery function. */
-  ROUND(FnRound.class, "round(num[,prec])", arg(NUM_ZO, ITR_O), NUM_ZO),
+  ROUND(FnRound.class, "round(number[,precision])", arg(NUM_ZO, ITR_O), NUM_ZO),
   /** XQuery function. */
-  ROUND_HALF_TO_EVEN(FnRoundHalfToEven.class, "round-half-to-even(num[,prec])",
+  ROUND_HALF_TO_EVEN(FnRoundHalfToEven.class, "round-half-to-even(number[,precision])",
       arg(NUM_ZO, ITR_O), NUM_ZO),
   /** XQuery function. */
   SECONDS_FROM_DATETIME(FnSecondsFromDateTime.class, "seconds-from-dateTime(datetime)",
@@ -354,14 +355,14 @@ public enum Function implements AFunction {
   SORT(FnSort.class, "sort(items[,collation[,function]])",
       arg(ITEM_ZM, STR_ZO, FuncType.get(AAT_ZM, ITEM_O).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
-  STARTS_WITH(FnStartsWith.class, "starts-with(string,sub[,collation])",
+  STARTS_WITH(FnStartsWith.class, "starts-with(string,substring[,collation])",
       arg(STR_ZO, STR_ZO, STR_O), BLN_O),
   /** XQuery function. */
   STATIC_BASE_URI(FnStaticBaseUri.class, "static-base-uri()", arg(), URI_ZO),
   /** XQuery function. */
   STRING(FnString.class, "string([item])", arg(ITEM_ZO), STR_O),
   /** XQuery function. */
-  STRING_JOIN(FnStringJoin.class, "string-join(items[,sep])", arg(AAT_ZM, STR_O), STR_O),
+  STRING_JOIN(FnStringJoin.class, "string-join(items[,separator])", arg(AAT_ZM, STR_O), STR_O),
   /** XQuery function. */
   STRING_LENGTH(FnStringLength.class, "string-length([string])", arg(STR_ZO), ITR_O),
   /** XQuery function. */
@@ -374,10 +375,10 @@ public enum Function implements AFunction {
   SUBSTRING(FnSubstring.class, "substring(string,start[,length])",
       arg(STR_ZO, DBL_O, DBL_O), STR_O),
   /** XQuery function. */
-  SUBSTRING_AFTER(FnSubstringAfter.class, "substring-after(string,sub[,collation])",
+  SUBSTRING_AFTER(FnSubstringAfter.class, "substring-after(string,separator[,collation])",
       arg(STR_ZO, STR_ZO, STR_O), STR_O),
   /** XQuery function. */
-  SUBSTRING_BEFORE(FnSubstringBefore.class, "substring-before(string,sub[,collation])",
+  SUBSTRING_BEFORE(FnSubstringBefore.class, "substring-before(string,separator[,collation])",
       arg(STR_ZO, STR_ZO, STR_O), STR_O),
   /** XQuery function. */
   SUM(FnSum.class, "sum(items[,zero])", arg(AAT_ZM, AAT_ZO), AAT_ZO),
@@ -391,11 +392,12 @@ public enum Function implements AFunction {
   /** XQuery function. */
   TIMEZONE_FROM_TIME(FnTimezoneFromTime.class, "timezone-from-time(time)", arg(TIM_ZO), DTD_ZO),
   /** XQuery function. */
-  TOKENIZE(FnTokenize.class, "tokenize(string[,pattern[,mod]])", arg(STR_ZO, STR_O, STR_O), STR_ZM),
+  TOKENIZE(FnTokenize.class, "tokenize(string[,pattern[,modifier]])",
+      arg(STR_ZO, STR_O, STR_O), STR_ZM),
   /** XQuery function. */
   TRACE(FnTrace.class, "trace(value[,label])", arg(ITEM_ZM, STR_O), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
-  TRANSLATE(FnTranslate.class, "translate(string,map,trans)", arg(STR_ZO, STR_O, STR_O), STR_O),
+  TRANSLATE(FnTranslate.class, "translate(string,map1,map2)", arg(STR_ZO, STR_O, STR_O), STR_O),
   /** XQuery function. */
   TRUE(FnTrue.class, "true()", arg(), BLN_O),
   /** XQuery function. */
@@ -474,19 +476,20 @@ public enum Function implements AFunction {
       arg(ARRAY_O, ARRAY_O, FuncType.get(ITEM_ZM, ITEM_O, ITEM_O).seqType()), ARRAY_O,
       flag(HOF), ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_GET(ArrayGet.class, "get(array,pos)", arg(ARRAY_O, ITR_O), ITEM_ZM, ARRAY_URI),
+  _ARRAY_GET(ArrayGet.class, "get(array,position)", arg(ARRAY_O, ITR_O), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_HEAD(ArrayHead.class, "head(array)", arg(ARRAY_O), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_INSERT_BEFORE(ArrayInsertBefore.class, "insert-before(array,pos,value)",
+  _ARRAY_INSERT_BEFORE(ArrayInsertBefore.class, "insert-before(array,position,value)",
       arg(ARRAY_O, ITR_O, ITEM_ZO), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_JOIN(ArrayJoin.class, "join(arrays)", arg(ARRAY_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_PUT(ArrayPut.class, "put(array,pos,value)", arg(ARRAY_O, ITR_O, ITEM_ZM),
+  _ARRAY_PUT(ArrayPut.class, "put(array,position,value)", arg(ARRAY_O, ITR_O, ITEM_ZM),
       ARRAY_O, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_REMOVE(ArrayRemove.class, "remove(array,pos)", arg(ARRAY_O, ITR_ZM), ARRAY_O, ARRAY_URI),
+  _ARRAY_REMOVE(ArrayRemove.class, "remove(array,position)",
+      arg(ARRAY_O, ITR_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_REVERSE(ArrayReverse.class, "reverse(array)", arg(ARRAY_O), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
@@ -495,7 +498,8 @@ public enum Function implements AFunction {
   _ARRAY_SORT(ArraySort.class, "sort(array[,collation[,function]])",
       arg(ARRAY_O, STR_ZO, FuncType.get(AAT_ZM, ITEM_O).seqType()), ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_SUBARRAY(ArraySubarray.class, "subarray(array,pos[,length])", arg(ARRAY_O, ITR_O, ITR_O),
+  _ARRAY_SUBARRAY(ArraySubarray.class,
+      "subarray(array,position[,length])", arg(ARRAY_O, ITR_O, ITR_O),
       ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_TAIL(ArrayTail.class, "tail(array)", arg(ARRAY_O), ARRAY_O, ARRAY_URI),
@@ -1012,20 +1016,20 @@ public enum Function implements AFunction {
       arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O).seqType()), ITEM_ZM, flag(HOF),
       HOF_URI),
   /** XQuery function. */
-  _HOF_SORT_WITH(HofSortWith.class, "sort-with(items,lt-fun)",
+  _HOF_SORT_WITH(HofSortWith.class, "sort-with(items,function)",
       arg(ITEM_ZM, FuncType.get(BLN_O, ITEM_O, ITEM_O).seqType()), ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
-  _HOF_TAKE_WHILE(HofTakeWhile.class, "take-while(items,pred)",
+  _HOF_TAKE_WHILE(HofTakeWhile.class, "take-while(items,predicate)",
       arg(ITEM_ZM, FuncType.get(BLN_O, ITEM_O).seqType()), ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
-  _HOF_TOP_K_BY(HofTopKBy.class, "top-k-by(items,key-func,k)",
+  _HOF_TOP_K_BY(HofTopKBy.class, "top-k-by(items,function,k)",
       arg(ITEM_ZM, FuncType.get(ITEM_O, ITEM_O).seqType(), ITR_O), ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
-  _HOF_TOP_K_WITH(HofTopKWith.class, "top-k-with(items,less-than-func,k)",
+  _HOF_TOP_K_WITH(HofTopKWith.class, "top-k-with(items,function,k)",
       arg(ITEM_ZM, FuncType.get(BLN_O, ITEM_ZO, ITEM_ZO).seqType(), ITR_O), ITEM_ZM, flag(HOF),
       HOF_URI),
   /** XQuery function. */
-  _HOF_UNTIL(HofUntil.class, "until(pred,function,start)",
+  _HOF_UNTIL(HofUntil.class, "until(predicate,function,start)",
       arg(FuncType.get(BLN_O, ITEM_ZM).seqType(),
       FuncType.get(ITEM_ZM, ITEM_ZM).seqType(), ITEM_ZM), ITEM_ZM, flag(HOF), HOF_URI),
 
@@ -1193,15 +1197,15 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _RANDOM_DOUBLE(RandomDouble.class, "double()", arg(), DBL_O, flag(NDT), RANDOM_URI),
   /** XQuery function. */
-  _RANDOM_GAUSSIAN(RandomGaussian.class, "gaussian(num)",
+  _RANDOM_GAUSSIAN(RandomGaussian.class, "gaussian(number)",
       arg(ITR_O), DBL_ZM, flag(NDT), RANDOM_URI),
   /** XQuery function. */
   _RANDOM_INTEGER(RandomInteger.class, "integer([max])", arg(ITR_O), ITR_O, flag(NDT), RANDOM_URI),
   /** XQuery function. */
-  _RANDOM_SEEDED_DOUBLE(RandomSeededDouble.class, "seeded-double(seed,num)",
+  _RANDOM_SEEDED_DOUBLE(RandomSeededDouble.class, "seeded-double(seed,number)",
       arg(ITR_O, ITR_O), DBL_ZM, RANDOM_URI),
   /** XQuery function. */
-  _RANDOM_SEEDED_INTEGER(RandomSeededInteger.class, "seeded-integer(seed,num[,max])",
+  _RANDOM_SEEDED_INTEGER(RandomSeededInteger.class, "seeded-integer(seed,number[,max])",
       arg(ITR_O, ITR_O, ITR_O), ITR_ZM, RANDOM_URI),
   /** XQuery function. */
   _RANDOM_SEEDED_PERMUTATION(RandomSeededPermutation.class, "seeded-permutation(seed,items)",
@@ -1330,7 +1334,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UTIL_INIT(UtilInit.class, "init(items)", arg(ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
-  _UTIL_ITEM(UtilItem.class, "item(items,pos)", arg(ITEM_ZM, DBL_O), ITEM_ZO, UTIL_URI),
+  _UTIL_ITEM(UtilItem.class, "item(items,position)", arg(ITEM_ZM, DBL_O), ITEM_ZO, UTIL_URI),
   /** XQuery function. */
   _UTIL_LAST(UtilLast.class, "last(items)", arg(ITEM_ZM), ITEM_ZO, UTIL_URI),
   /** XQuery function. */
