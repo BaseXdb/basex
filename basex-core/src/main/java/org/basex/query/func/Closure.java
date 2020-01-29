@@ -287,14 +287,19 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     final SeqType argType = body.seqType();
     final Expr checked;
+
+    if(declType != null && !argType.instanceOf(declType)) {
+      //System.out.println("[CLOSURE] " + declType.type);
+      //throw Util.notExpected(this);
+    }
+
     if(declType == null || argType.instanceOf(declType)) {
       // return type is already correct
       checked = body;
     } else if(body instanceof FuncItem && declType.type instanceof FuncType) {
       // function item coercion
-      if(!declType.occ.check(1)) throw typeError(body, declType, null, info);
-      final FuncItem fi = (FuncItem) body;
-      checked = fi.coerceTo((FuncType) declType.type, qc, info, true);
+      if(!declType.occ.check(1)) throw typeError(body, declType, null, info, true);
+      checked = ((FuncItem) body).coerceTo((FuncType) declType.type, qc, info, true);
     } else if(body instanceof Value) {
       // we can type check immediately
       final Value value = (Value) body;
@@ -303,7 +308,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     } else {
       // check at each call: reject impossible arities
       if(argType.type.instanceOf(declType.type) && argType.occ.intersect(declType.occ) == null &&
-          !body.has(Flag.NDT)) throw typeError(body, declType, null, info);
+        !body.has(Flag.NDT)) throw typeError(body, declType, null, info, true);
 
       checked = new TypeCheck(vs.sc, info, body, declType, true);
     }

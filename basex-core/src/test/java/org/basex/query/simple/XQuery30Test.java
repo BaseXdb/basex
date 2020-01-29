@@ -62,7 +62,7 @@ public final class XQuery30Test extends QueryTest {
           "group by $g as xs:integer := $i mod 2 order by $g return $i" },
       { "FLWOR 18", integers(1, 2), "for $i in 1 to 2 group by $g as item() := 5 return $i" },
       { "FLWOR 19", "for $i in 1 to 2 group by $g as node() := 5 return $i" },
-      { "FLWOR 19", "for $i in 1 to 2 let $g := $i group by $i as xs:integer return $i" },
+      { "FLWOR 20", "for $i in 1 to 2 let $g := $i group by $i as xs:integer return $i" },
 
       { "Concat 1", strings("ab"), "'a'||'b'" },
       { "Concat 2", strings("ab"), "'a' || 'b'" },

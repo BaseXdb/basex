@@ -1071,6 +1071,10 @@ public enum QueryError {
   /** Error code. */
   INVTYPE_X_X_X(XPTY, 4, "Cannot convert % to %: %."),
   /** Error code. */
+  INVPROMOTE_X_X_X(XPTY, 4, "Cannot promote % to %: %."),
+  /** Error code. */
+  INVTREAT_X_X_X(XPTY, 4, "Cannot treat % as %: %."),
+  /** Error code. */
   CALCTYPE_X_X_X(XPTY, 4, "% not defined for % and %."),
   /** Error code. */
   INVFUNCITEM_X_X(XPTY, 4, "Function expected, % found: %."),
@@ -1611,28 +1615,30 @@ public enum QueryError {
    * @param expr expression
    * @param type target type
    * @param name name (can be {@code null})
+   * @param promote promote or treat as
    * @return query exception
    */
   public static QueryException typeError(final Expr expr, final SeqType type, final QNm name,
-      final InputInfo ii) {
-
-    final TokenBuilder tb = new TokenBuilder();
-    if(name != null) tb.add('$').add(name.string()).add(" := ");
-    final byte[] value = tb.add(normalize(expr, ii)).finish();
-    return INVTYPE_X_X_X.get(ii, expr.seqType(), type, value);
+      final InputInfo ii, final boolean promote) {
+    return typeError(expr, type, name, ii, promote ? INVPROMOTE_X_X_X : INVTREAT_X_X_X);
   }
 
   /**
    * Throws a type exception.
    * @param ii input info
-   * @param found found type
+   * @param expr expression
    * @param type target type
-   * @param name name
+   * @param name name (can be {@code null})
+   * @param error error code
    * @return query exception
    */
-  public static QueryException typeError(final SeqType found, final SeqType type, final QNm name,
-      final InputInfo ii) {
-    return INVTYPE_X_X_X.get(ii, found, type, Token.concat('$', name.string()));
+  public static QueryException typeError(final Expr expr, final SeqType type, final QNm name,
+      final InputInfo ii, final QueryError error) {
+
+    final TokenBuilder tb = new TokenBuilder();
+    if(name != null) tb.add('$').add(name.string()).add(" := ");
+    final byte[] value = tb.add(normalize(expr, ii)).finish();
+    return error.get(ii, expr.seqType(), type, value);
   }
 
   /**

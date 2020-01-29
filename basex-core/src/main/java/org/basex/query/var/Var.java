@@ -144,7 +144,8 @@ public final class Var extends ExprInfo {
       throws QueryException {
 
     if(declType != null) {
-      if(declType.occ.intersect(st.occ) == null) throw typeError(st, declType, name, info);
+      if(declType.occ.intersect(st.occ) == null)
+        throw INVTREAT_X_X_X.get(info, st, declType, Token.concat('$', name.string()));
       if(st.instanceOf(declType)) {
         if(cc != null) cc.info(QueryText.OPTTYPE_X, this);
         declType = null;
@@ -193,7 +194,7 @@ public final class Var extends ExprInfo {
 
     if(!checksType() || declType.instance(value)) return value;
     if(promote) return declType.promote(value, name, qc, sc, info, opt);
-    throw typeError(value, declType, name, info);
+    throw typeError(value, declType, name, info, promote);
   }
 
   /**
@@ -217,8 +218,8 @@ public final class Var extends ExprInfo {
         et.type.instanceOf(vt.type) && et.occ.instanceOf(vt.occ)) return;
 
     if(!promote || !(et.type instanceof NodeType) && !et.promotable(vt)) {
-      if(vt.type.nsSensitive()) throw NSSENS_X_X.get(info, et, vt);
-      throw typeError(expr, vt, name, info);
+      throw vt.type.nsSensitive() ? NSSENS_X_X.get(info, et, vt) :
+        typeError(expr, vt, name, info, promote);
     }
   }
 

@@ -352,11 +352,11 @@ public final class SeqType {
     if(value.seqType().instanceOf(this)) return;
 
     // check cardinality
-    if(!occ.check(value.size())) throw typeError(value, this, name, ii);
+    if(!occ.check(value.size())) throw typeError(value, this, name, ii, false);
 
     for(final Item item : value) {
       qc.checkStop();
-      if(!instance(item)) throw typeError(value, this, name, ii);
+      if(!instance(item)) throw typeError(value, this, name, ii, false);
     }
   }
 
@@ -375,7 +375,7 @@ public final class SeqType {
       final StaticContext sc, final InputInfo ii, final boolean opt) throws QueryException {
 
     final long size = value.size();
-    if(!occ.check(size)) throw typeError(value, this, name, ii);
+    if(!occ.check(size)) throw typeError(value, this, name, ii, true);
     if(size == 0) return Empty.VALUE;
 
     ItemList items = null;
@@ -426,13 +426,13 @@ public final class SeqType {
         } else if(type == AtomType.STR && item1 instanceof Uri) {
           items.add(Str.get(item1.string(ii)));
         } else {
-          throw typeError(item, with(Occ.ONE), name, ii);
+          throw typeError(item, with(Occ.ONE), name, ii, true);
         }
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
       items.add(((FItem) item).coerceTo((FuncType) type, qc, ii, opt));
     } else {
-      throw typeError(item, with(Occ.ONE), name, ii);
+      throw typeError(item, with(Occ.ONE), name, ii, true);
     }
   }
 

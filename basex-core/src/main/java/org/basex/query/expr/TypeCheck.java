@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
  */
 public class TypeCheck extends Single {
   /** Static context. */
-  private final StaticContext sc;
+  final StaticContext sc;
   /** Flag for function conversion. */
   public final boolean promote;
 
@@ -42,19 +42,19 @@ public class TypeCheck extends Single {
   }
 
   @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
+  public final Expr compile(final CompileContext cc) throws QueryException {
     return super.compile(cc).optimize(cc);
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public final Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType at = expr.seqType(), st = seqType();
 
     // remove redundant type check
     if(expr instanceof TypeCheck) {
       final TypeCheck tc = (TypeCheck) expr;
       if(promote == tc.promote && st.instanceOf(at)) {
-        return cc.replaceWith(this, new TypeCheck(sc, info, tc.expr, st, promote).optimize(cc));
+        return cc.replaceWith(this, get(tc.expr, st).optimize(cc));
       }
     }
 
@@ -67,7 +67,7 @@ public class TypeCheck extends Single {
     // function item coercion
     final FuncType ft = expr.funcType();
     if(ft != null && expr instanceof FuncItem) {
-      if(!st.occ.check(1)) throw typeError(expr, st, null, info);
+      if(!st.occ.check(1)) throw typeError(expr, st, null, info, error());
       return cc.replaceWith(this, ((FuncItem) expr).coerceTo(ft, cc.qc, info, true));
     }
 
@@ -76,7 +76,7 @@ public class TypeCheck extends Single {
 
     // check at each call
     if(at.type.instanceOf(st.type) && at.occ.intersect(st.occ) == null)
-      throw typeError(expr, st, null, info);
+      throw typeError(expr, st, null, info, error());
 
     final Expr opt = expr.typeCheck(this, cc);
     if(opt != null) {
@@ -88,7 +88,7 @@ public class TypeCheck extends Single {
   }
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public final Iter iter(final QueryContext qc) throws QueryException {
     final SeqType st = seqType();
     final Iter iter = expr.iter(qc);
 
@@ -99,7 +99,7 @@ public class TypeCheck extends Single {
       @Override
       public Item next() throws QueryException {
         while(c == items.size()) {
-          items.size(0);
+          items.reset();
           c = 0;
 
           final Item item = qc.next(iter);
@@ -108,13 +108,14 @@ public class TypeCheck extends Single {
           } else if(promote) {
             st.promote(item, null, items, qc, sc, info, false);
           } else {
-            throw typeError(expr, st, null, info);
+            throw typeError(expr, st, null, info, error());
           }
         }
 
         final Item item = items.get(c);
         items.set(c++, null);
-        if(item == null && i < st.occ.min || i > st.occ.max) throw typeError(expr, st, null, info);
+        if(item == null && i < st.occ.min || i > st.occ.max)
+          typeError(expr, st, null, info, error());
         i++;
         return item;
       }
@@ -122,16 +123,17 @@ public class TypeCheck extends Single {
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public final Value value(final QueryContext qc) throws QueryException {
     final Value value = expr.value(qc);
     final SeqType st = seqType();
     if(st.instance(value)) return value;
     if(promote) return st.promote(value, null, qc, sc, info, false);
-    throw typeError(value, st, null, info);
+    throw typeError(value, st, null, info, error());
   }
 
   @Override
-  public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
+  public final Expr simplifyFor(final AtomType type, final CompileContext cc)
+      throws QueryException {
     return promote ? simplifyCast(type, cc) : super.simplifyFor(type, cc);
   }
 
@@ -140,7 +142,7 @@ public class TypeCheck extends Single {
    * @param var variable
    * @return result of check
    */
-  public boolean isRedundant(final Var var) {
+  public final boolean isRedundant(final Var var) {
     return (!promote || var.promotes()) && var.declaredType().instanceOf(seqType());
   }
 
@@ -151,18 +153,36 @@ public class TypeCheck extends Single {
    * @return the resulting expression
    * @throws QueryException query exception
    */
-  public Expr check(final Expr ex, final CompileContext cc) throws QueryException {
+  public final Expr check(final Expr ex, final CompileContext cc) throws QueryException {
     final SeqType at = ex.seqType(), st = seqType();
-    return at.instanceOf(st) ? ex : new TypeCheck(sc, info, ex, st, promote).optimize(cc);
+    return at.instanceOf(st) ? ex : get(ex, st).optimize(cc);
+  }
+
+  /**
+   * Return the used error code.
+   * @return error code
+   */
+  public QueryError error() {
+    return promote ? INVPROMOTE_X_X_X : INVTREAT_X_X_X;
+  }
+
+  /**
+   * Return a new instance of this class.
+   * @param ex expression
+   * @param st sequence type
+   * @return error code
+   */
+  public TypeCheck get(final Expr ex, final SeqType st) {
+    return new TypeCheck(sc, info, ex, st, promote);
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new TypeCheck(sc, info, expr.copy(cc, vm), seqType(), promote);
+  public final Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return get(expr.copy(cc, vm), seqType());
   }
 
   @Override
-  public boolean equals(final Object obj) {
+  public final boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof TypeCheck)) return false;
     final TypeCheck tc = (TypeCheck) obj;
@@ -170,14 +190,14 @@ public class TypeCheck extends Single {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public final void plan(final QueryPlan plan) {
     final FElem elem = plan.create(this, AS, seqType());
     if(promote) plan.addAttribute(elem, PROMOTE, true);
     plan.add(elem, expr);
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     final StringBuilder sb = new StringBuilder().append('(').append(expr).append(' ');
     if(promote) sb.append(PROMOTE).append(' ').append(TO);
     else sb.append(TREAT).append(' ').append(AS);

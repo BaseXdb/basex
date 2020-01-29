@@ -864,7 +864,13 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(1,2) promote to xs:double+", "1\n2",
         empty(TypeCheck.class), root(ItemSeq.class), count(Dbl.class, 2));
 
-    error("<a/> promote to empty-sequence()", INVTYPE_X_X_X);
-    error("(1,2) promote to xs:byte+", INVTYPE_X_X_X);
+    error("<a/> promote to empty-sequence()", INVPROMOTE_X_X_X);
+    error("(1,2) promote to xs:byte+", INVPROMOTE_X_X_X);
+  }
+
+  /** Treats and promotions, error messages. */
+  @Test public void gh1799() {
+    error("'a' promote to node()", INVPROMOTE_X_X_X);
+    error("'a' treat as  node()", NOTREAT_X_X_X);
   }
 }

@@ -191,7 +191,7 @@ public final class FuncItemTest extends QueryPlanTest {
   /** Tests for coercion of function items. */
   @Test public void funcItemCoercion() {
     error("let $f := function($g as function() as item()) { $g() }" +
-        "return $f(function() { 1, 2 })", INVTYPE_X_X_X);
+        "return $f(function() { 1, 2 })", INVPROMOTE_X_X_X);
   }
 
   /** Checks if nested closures are inlined. */

@@ -1634,7 +1634,7 @@ public class QueryParser extends InputParser {
     final Expr ex = promote();
     if(!wsConsumeWs(TREAT)) return ex;
     wsCheck(AS);
-    return new Treat(info(), ex, sequenceType());
+    return new Treat(sc, info(), ex, sequenceType());
   }
 
   /**
