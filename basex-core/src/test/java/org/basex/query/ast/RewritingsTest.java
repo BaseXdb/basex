@@ -846,4 +846,15 @@ public final class RewritingsTest extends QueryPlanTest {
     check("declare function local:f($s as xs:string) { tokenize($s) };\n" +
         "<x/> ! local:f(.)", "", empty(TypeCheck.class));
   }
+
+  /** Unary expression. */
+  @Test public void gh1796() {
+    check("-xs:byte(-128) instance of xs:byte", false, empty(Unary.class), empty(Cast.class));
+    check("for $i in -128 return --xs:byte($i) instance of xs:byte", false,
+        empty(Unary.class), empty(Cast.class));
+    check("let $i := -128 return --xs:byte($i) instance of xs:byte", false,
+        empty(Unary.class), empty(Cast.class));
+
+    check("--xs:byte(<_>-128</_>)", -128, empty(Unary.class), count(Cast.class, 2));
+  }
 }

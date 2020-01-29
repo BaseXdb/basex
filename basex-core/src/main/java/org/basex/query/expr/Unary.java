@@ -43,11 +43,16 @@ public final class Unary extends Single {
 
     // no negation, numeric value: return operand
     final SeqType st = expr.seqType();
-    if(!minus && st.instanceOf(SeqType.NUM_ZO)) return cc.replaceWith(this, expr);
+    final Type type = st.type.isUntyped() ? AtomType.DBL :
+      st.type.instanceOf(AtomType.ITR) ? AtomType.ITR : st.type;
+    final Occ occ = st.oneOrMore() && !st.mayBeArray() ? Occ.ONE : Occ.ZERO_ONE;
+    exprType.assign(type, occ);
 
-    final Type type = st.type;
-    exprType.assign(type.isUntyped() ? AtomType.DBL : type.isNumber() ? type : AtomType.ITR,
-      st.oneOrMore() && !st.mayBeArray() ? Occ.ONE : Occ.ZERO_ONE);
+    // --123  ->  123
+    // --$byte  ->  xs:byte($byte)
+    if(!minus && st.instanceOf(SeqType.NUM_ZO)) {
+      return cc.replaceWith(this, new Cast(cc.sc(), info, expr, type.seqType(st.occ)).optimize(cc));
+    }
 
     return super.optimize(cc);
   }
