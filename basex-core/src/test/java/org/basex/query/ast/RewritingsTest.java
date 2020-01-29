@@ -857,4 +857,14 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("--xs:byte(<_>-128</_>)", -128, empty(Unary.class), count(Cast.class, 2));
   }
+
+  /** Promote to expression. */
+  @Test public void gh1798() {
+    check("<a>1</a> promote to xs:string", 1, root(TypeCheck.class));
+    check("(1,2) promote to xs:double+", "1\n2",
+        empty(TypeCheck.class), root(ItemSeq.class), count(Dbl.class, 2));
+
+    error("<a/> promote to empty-sequence()", INVTYPE_X_X_X);
+    error("(1,2) promote to xs:byte+", INVTYPE_X_X_X);
+  }
 }

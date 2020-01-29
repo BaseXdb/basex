@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Leo Woerteler
  */
-public final class TypeCheck extends Single {
+public class TypeCheck extends Single {
   /** Static context. */
   private final StaticContext sc;
   /** Flag for function conversion. */
@@ -178,6 +178,9 @@ public final class TypeCheck extends Single {
 
   @Override
   public String toString() {
-    return "((: " + seqType() + ", " + promote + " :) " + expr + ')';
+    final StringBuilder sb = new StringBuilder().append('(').append(expr).append(' ');
+    if(promote) sb.append(PROMOTE).append(' ').append(TO);
+    else sb.append(TREAT).append(' ').append(AS);
+    return sb.append(' ').append(seqType()).append(')').toString();
   }
 }
