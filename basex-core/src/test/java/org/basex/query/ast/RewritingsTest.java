@@ -837,4 +837,13 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_/>[data()]", "", root(IterFilter.class));
     check("(1, 2)[. = 3]", "", root(IterFilter.class));
   }
+
+  /** Type checks. */
+  @Test public void gh1791() {
+    check("function() as xs:double { <x>1</x> }() + 2", 3, empty(TypeCheck.class));
+    check("declare function local:_() as xs:string { <x>A</x> }; local:_() = 'A'",
+        true, empty(TypeCheck.class));
+    check("declare function local:f($s as xs:string) { tokenize($s) };\n" +
+        "<x/> ! local:f(.)", "", empty(TypeCheck.class));
+  }
 }

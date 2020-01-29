@@ -130,6 +130,11 @@ public final class TypeCheck extends Single {
     throw typeError(value, st, null, info);
   }
 
+  @Override
+  public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
+    return promote ? simplifyCast(type, cc) : super.simplifyFor(type, cc);
+  }
+
   /**
    * Checks if this type check is redundant if the result is bound to the given variable.
    * @param var variable

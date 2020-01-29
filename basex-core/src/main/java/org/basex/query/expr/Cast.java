@@ -78,19 +78,7 @@ public final class Cast extends Single {
 
   @Override
   public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
-    final SeqType ast = expr.seqType(), dst = exprType.seqType();
-    if(ast.occ.instanceOf(dst.occ)) {
-      final Type at = ast.type, dt = dst.type;
-      // xs:string($xml) = 'string'  ->  $xml = 'string'
-      // xs:double($xml) + 1e0  ->  $xml + 1e0
-      // xs:short($byte) + 1  ->  $byte + 1
-      if(type == AtomType.ATM && at.isStringOrUntyped() && dt.oneOf(AtomType.STR, AtomType.ATM) ||
-         type == AtomType.NUM && (at.isUntyped() && dt == AtomType.DBL ||
-           at.instanceOf(AtomType.INT) && at.instanceOf(dt))) {
-        return cc.replaceWith(this, expr);
-      }
-    }
-    return super.simplifyFor(type, cc);
+    return simplifyCast(type, cc);
   }
 
   @Override

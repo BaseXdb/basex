@@ -78,6 +78,26 @@ public abstract class Single extends ParseExpr {
   }
 
   /**
+   * Simplify casts.
+   * @param type target type
+   * @param cc compilation context
+   * @return simplified expression
+   * @throws QueryException query exception
+   */
+  Expr simplifyCast(final AtomType type, final CompileContext cc) throws QueryException {
+    final SeqType ast = expr.seqType(), dst = exprType.seqType();
+    if(ast.occ.instanceOf(dst.occ)) {
+      final Type at = ast.type, dt = dst.type;
+      if(type == AtomType.ATM && at.isStringOrUntyped() && dt.oneOf(AtomType.STR, AtomType.ATM) ||
+         type == AtomType.NUM && (at.isUntyped() && dt == AtomType.DBL ||
+           at.instanceOf(AtomType.INT) && at.instanceOf(dt))) {
+        return cc.replaceWith(this, expr);
+      }
+    }
+    return super.simplifyFor(type, cc);
+  }
+
+  /**
    * {@inheritDoc}
    * Must be overwritten by implementing class.
    */
