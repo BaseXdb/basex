@@ -51,7 +51,7 @@ import org.basex.util.similarity.*;
  * @author Christian Gruen
  */
 public final class FTIndex extends ValueIndex {
-  /** Entry size. */
+  /** Minimum fixed size for each token entry. */
   private static final int ENTRY = 9;
 
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
@@ -61,16 +61,16 @@ public final class FTIndex extends ValueIndex {
 
   /** Index storing each unique token length and pointer
    * on the first token with this length. */
-  private final DataAccess inX;
+  private final DataAccess dataX;
   /** Index storing each token, its data size and pointer on the data. */
-  private final DataAccess inY;
+  private final DataAccess dataY;
   /** Storing pre and pos values for each token. */
-  private final DataAccess inZ;
+  private final DataAccess dataZ;
 
   /** Cache for number of hits and data reference per token. */
   private final IndexCache cache = new IndexCache();
   /** Token positions. */
-  private final int[] tp;
+  private final int[] positions;
 
   /**
    * Constructor, initializing the index structure.
@@ -80,17 +80,17 @@ public final class FTIndex extends ValueIndex {
   public FTIndex(final Data data) throws IOException {
     super(data, IndexType.FULLTEXT);
     // cache token length index
-    inY = new DataAccess(data.meta.dbFile(DATAFTX + 'y'));
-    inZ = new DataAccess(data.meta.dbFile(DATAFTX + 'z'));
-    inX = new DataAccess(data.meta.dbFile(DATAFTX + 'x'));
-    tp = new int[data.meta.maxlen + 3];
-    final int tl = tp.length;
-    for(int i = 0; i < tl; ++i) tp[i] = -1;
-    for(int is = inX.readNum(); --is >= 0;) {
-      final int p = inX.readNum();
-      tp[p] = inX.read4();
+    dataX = new DataAccess(data.meta.dbFile(DATAFTX + 'x'));
+    dataY = new DataAccess(data.meta.dbFile(DATAFTX + 'y'));
+    dataZ = new DataAccess(data.meta.dbFile(DATAFTX + 'z'));
+    positions = new int[data.meta.maxlen + 3];
+    final int pl = positions.length;
+    for(int p = 0; p < pl; p++) positions[p] = -1;
+    for(int is = dataX.readNum(); --is >= 0;) {
+      final int p = dataX.readNum();
+      positions[p] = dataX.read4();
     }
-    tp[tl - 1] = (int) inY.length();
+    positions[pl - 1] = (int) dataY.length();
   }
 
   @Override
@@ -126,7 +126,7 @@ public final class FTIndex extends ValueIndex {
     // return cached or new result
     final IndexEntry entry = entry(token);
     if(entry.size > 0) {
-      return iter(entry.offset, entry.size, inZ, token);
+      return iter(entry.offset, entry.size, dataZ, token);
     }
 
     // no results
@@ -151,33 +151,33 @@ public final class FTIndex extends ValueIndex {
   public EntryIterator entries(final IndexEntries entries) {
     final byte[] token = entries.token();
     return new EntryIterator() {
-      int ti = token.length - 1, i, e, nr;
+      int p = token.length - 1, start, end, nr;
       boolean inner;
 
       @Override
       public byte[] next() {
         synchronized(FTIndex.this) {
-          if(inner && i < e) {
+          if(inner && start < end) {
             // loop through all entries with the same character length
-            final byte[] entry = inY.readBytes(i, ti);
+            final byte[] entry = dataY.readBytes(start, p);
             if(startsWith(entry, token)) {
-              final long poi = inY.read5();
-              nr = inY.read4();
+              final long poi = dataY.read5();
+              nr = dataY.read4();
               if(token.length != 0) cache.add(entry, nr, poi);
-              i += ti + ENTRY;
+              start += p + ENTRY;
               return entry;
             }
           }
           // find next available entry group
-          final int tl = tp.length;
-          while(++ti < tl - 1) {
-            i = tp[ti];
-            if(i == -1) continue;
-            int c = ti + 1;
-            do e = tp[c++]; while(e == -1);
+          final int pl = positions.length;
+          while(++p < pl - 1) {
+            start = positions[p];
+            if(start == -1) continue;
+            int c = p + 1;
+            do end = positions[c++]; while(end == -1);
             nr = 0;
             inner = true;
-            i = find(token, i, e, ti);
+            start = find(token, start, end, p);
             // jump to inner loop
             final byte[] n = next();
             if(n != null) return n;
@@ -203,26 +203,26 @@ public final class FTIndex extends ValueIndex {
    */
   private int find(final byte[] token, final int start, final int end, final int ti) {
     final int tl = ti + ENTRY;
-    int l = 0, h = (end - start) / tl;
-    while(l <= h) {
-      final int m = l + h >>> 1, p = start + m * tl;
-      byte[] txt = ctext.get(p);
+    int s = 0, e = (end - start) / tl;
+    while(s <= e) {
+      final int m = s + e >>> 1, pos = start + m * tl;
+      byte[] txt = ctext.get(pos);
       if(txt == null) {
-        txt = inY.readBytes(p, ti);
-        ctext.put(p, txt);
+        txt = dataY.readBytes(pos, ti);
+        ctext.put(pos, txt);
       }
       final int d = diff(txt, token);
       if(d == 0) return start + m * tl;
-      if(d < 0) l = m + 1;
-      else h = m - 1;
+      if(d < 0) s = m + 1;
+      else e = m - 1;
     }
-    return start + l * tl;
+    return start + s * tl;
   }
 
   @Override
   public synchronized byte[] info(final MainOptions options) {
     final TokenBuilder tb = new TokenBuilder();
-    final long l = inX.length() + inY.length() + inZ.length();
+    final long l = dataX.length() + dataY.length() + dataZ.length();
     tb.add(LI_NAMES).add(data.meta.ftinclude).add(NL);
     tb.add(LI_SIZE).add(Performance.format(l)).add(NL);
 
@@ -239,21 +239,21 @@ public final class FTIndex extends ValueIndex {
 
   @Override
   public synchronized void close() {
-    inX.close();
-    inY.close();
-    inZ.close();
+    dataX.close();
+    dataY.close();
+    dataZ.close();
   }
 
   @Override
   public int size() {
-    final int tl = tp.length;
-    int size = 0, t = tl - 1;
+    final int pl = positions.length;
+    int size = 0, t = pl - 1;
     while(true) {
       final int e = t;
-      while(tp[--t] == -1) {
+      while(positions[--t] == -1) {
         if(t == 0) return size;
       }
-      size += (tp[e] - tp[t]) / (t + ENTRY);
+      size += (positions[e] - positions[t]) / (t + ENTRY);
     }
   }
 
@@ -265,24 +265,24 @@ public final class FTIndex extends ValueIndex {
   private int token(final byte[] token) {
     final int tl = token.length;
     // left limit
-    int l = tp[tl];
-    if(l == -1) return -1;
+    int s = positions[tl];
+    if(s == -1) return -1;
 
     // find right limit
-    int i = 1, r;
-    do r = tp[tl + i++]; while(r == -1);
-    final int x = r;
+    int i = 1, e;
+    do e = positions[tl + i++]; while(e == -1);
+    final int x = e;
 
     // binary search
     final int o = tl + ENTRY;
-    while(l < r) {
-      final int m = l + (r - l >> 1) / o * o, c = diff(inY.readBytes(m, tl), token);
-      if(c == 0) return m;
-      if(c < 0) l = m + o;
-      else r = m - o;
+    while(s < e) {
+      final int m = s + (e - s >> 1) / o * o, d = diff(dataY.readBytes(m, tl), token);
+      if(d == 0) return m;
+      if(d < 0) s = m + o;
+      else e = m - o;
     }
     // accept entry if pointer is inside relevant tokens
-    return r != x && l == r && eq(inY.readBytes(l, tl), token) ? l : -1;
+    return e != x && s == e && eq(dataY.readBytes(s, tl), token) ? s : -1;
   }
 
   /**
@@ -291,19 +291,19 @@ public final class FTIndex extends ValueIndex {
    */
   private void addOccs(final IndexStats stats) {
     int i = 0;
-    final int tl = tp.length;
-    while(i < tl && tp[i] == -1) ++i;
-    int p = tp[i], j = i + 1;
-    while(j < tl && tp[j] == -1) ++j;
+    final int pl = positions.length;
+    while(i < pl && positions[i] == -1) ++i;
+    int p = positions[i], j = i + 1;
+    while(j < pl && positions[j] == -1) ++j;
 
-    final int max = tp[tl - 1];
+    final int max = positions[pl - 1];
     while(p < max) {
       final int oc = size(p, i);
-      if(stats.adding(oc)) stats.add(inY.readBytes(p, i), oc);
+      if(stats.adding(oc)) stats.add(dataY.readBytes(p, i), oc);
       p += i + ENTRY;
-      if(p == tp[j]) {
+      if(p == positions[j]) {
         i = j;
-        while(j + 1 < tl && tp[++j] == -1);
+        while(j + 1 < pl && positions[++j] == -1);
       }
     }
   }
@@ -315,7 +315,7 @@ public final class FTIndex extends ValueIndex {
    * @return int pointer on ftdata
    */
   private long pointer(final long pt, final int lt) {
-    return inY.read5(pt + lt);
+    return dataY.read5(pt + lt);
   }
 
   /**
@@ -325,7 +325,7 @@ public final class FTIndex extends ValueIndex {
    * @return size of the ftdata
    */
   private int size(final long pt, final int lt) {
-    return inY.read4(pt + lt + 5);
+    return dataY.read4(pt + lt + 5);
   }
 
   /**
@@ -336,16 +336,16 @@ public final class FTIndex extends ValueIndex {
    */
   private IndexIterator fuzzy(final byte[] token, final int k) {
     FTIndexIterator iter = FTIndexIterator.FTEMPTY;
-    final int tokl = token.length, tl = tp.length, e = Math.min(tl - 1, tokl + k);
+    final int tokl = token.length, pl = positions.length, e = Math.min(pl - 1, tokl + k);
     int s = Math.max(1, tokl - k) - 1;
     while(++s <= e) {
-      int p = tp[s];
+      int p = positions[s];
       if(p == -1) continue;
       int t = s + 1, r = -1;
-      while(t < tl && r == -1) r = tp[t++];
+      while(t < pl && r == -1) r = positions[t++];
       while(p < r) {
-        if(ls.similar(inY.readBytes(p, s), token, k)) {
-          iter = FTIndexIterator.union(iter(pointer(p, s), size(p, s), inZ, token), iter);
+        if(ls.similar(dataY.readBytes(p, s), token, k)) {
+          iter = FTIndexIterator.union(iter(pointer(p, s), size(p, s), dataZ, token), iter);
         }
         p += s + ENTRY;
       }
@@ -361,26 +361,26 @@ public final class FTIndex extends ValueIndex {
   private IndexIterator wildcards(final FTWildcard wc) {
     final IntList pr = new IntList(), ps = new IntList();
     final byte[] pref = wc.prefix();
-    final int pl = pref.length, tl = tp.length, l = Math.min(tl - 1, wc.max());
-    for(int ti = pl; ti <= l; ti++) {
-      int i = tp[ti];
-      if(i == -1) continue;
-      int c = ti + 1, e = -1;
-      while(c < tl && e == -1) e = tp[c++];
-      i = find(pref, i, e, ti);
+    final int pl = positions.length, l = Math.min(pl - 1, wc.max());
+    for(int p = pref.length; p <= l; p++) {
+      int start = positions[p];
+      if(start == -1) continue;
+      int c = p + 1, end = -1;
+      while(c < pl && end == -1) end = positions[c++];
+      start = find(pref, start, end, p);
 
-      while(i < e) {
-        final byte[] t = inY.readBytes(i, ti);
+      while(start < end) {
+        final byte[] t = dataY.readBytes(start, p);
         if(!startsWith(t, pref)) break;
         if(wc.match(t)) {
-          inZ.cursor(pointer(i, ti));
-          final int s = size(i, ti);
+          dataZ.cursor(pointer(start, p));
+          final int s = size(start, p);
           for(int d = 0; d < s; d++) {
-            pr.add(inZ.readNum());
-            ps.add(inZ.readNum());
+            pr.add(dataZ.readNum());
+            ps.add(dataZ.readNum());
           }
         }
-        i += ti + ENTRY;
+        start += p + ENTRY;
       }
     }
     return iter(new FTCache(pr, ps), wc.query());
@@ -475,7 +475,7 @@ public final class FTIndex extends ValueIndex {
      */
     private FTCache(final IntList pr, final IntList ps) {
       final int s = pr.size();
-      final double[] v = new double[s];
+      final long[] v = new long[s];
       for(int i = 0; i < s; i++) v[i] = (long) pr.get(i) << 32 | ps.get(i);
       order = Array.createOrder(v, true);
       pre = pr;
