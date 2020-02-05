@@ -178,21 +178,21 @@ public abstract class Data {
 
   /**
    * Returns an index iterator for the specified token.
-   * @param token index token reference
+   * @param search index search definition
    * @return index iterator
    */
-  public final IndexIterator iter(final IndexToken token) {
-    return index(token.type()).iter(token);
+  public final IndexIterator iter(final IndexSearch search) {
+    return index(search.type()).iter(search);
   }
 
   /**
    * Returns a cost estimation for searching the specified token.
    * Smaller values are better, a value of zero indicates that no results will be returned.
-   * @param token text to be found
+   * @param search index search definition
    * @return cost estimation, or {@code null} if index access is not possible
    */
-  public final IndexCosts costs(final IndexToken token) {
-    return index(token.type()).costs(token);
+  public final IndexCosts costs(final IndexSearch search) {
+    return index(search.type()).costs(search);
   }
 
   /**

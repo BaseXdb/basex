@@ -157,12 +157,12 @@ public final class Resources implements Index {
   public void close() { }
 
   @Override
-  public IndexIterator iter(final IndexToken token) {
+  public IndexIterator iter(final IndexSearch search) {
     throw Util.notExpected();
   }
 
   @Override
-  public IndexCosts costs(final IndexToken token) {
+  public IndexCosts costs(final IndexSearch search) {
     throw Util.notExpected();
   }
 

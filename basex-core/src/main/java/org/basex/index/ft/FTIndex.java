@@ -94,52 +94,64 @@ public final class FTIndex extends ValueIndex {
   }
 
   @Override
-  public synchronized IndexCosts costs(final IndexToken it) {
-    final byte[] tok = it.get();
-    if(tok.length > data.meta.maxlen) return null;
+  public synchronized IndexCosts costs(final IndexSearch search) {
+    final byte[] token = search.token();
+    if(token.length > data.meta.maxlen) return null;
 
     // estimate costs for queries which stretch over multiple index entries
-    final FTOpt opt = ((FTLexer) it).ftOpt();
+    final FTOpt opt = ((FTLexer) search).ftOpt();
     return IndexCosts.get(opt.is(FZ) || opt.is(WC) ? Math.max(1, data.meta.size >> 4) :
-      entry(tok).size);
+      entry(token).size);
   }
 
   @Override
-  public synchronized IndexIterator iter(final IndexToken it) {
-    final byte[] tok = it.get();
+  public synchronized IndexIterator iter(final IndexSearch search) {
+    // current search token
+    final FTLexer lexer = (FTLexer) search;
+    final FTOpt opt = lexer.ftOpt();
+    final byte[] token = lexer.token();
 
     // wildcard search
-    final FTLexer lexer = (FTLexer) it;
-    final FTOpt opt = lexer.ftOpt();
-    if(opt.is(WC)) return wc(tok);
+    if(opt.is(WC)) {
+      final FTWildcard wc = new FTWildcard(token);
+      if(!wc.parse()) return FTIndexIterator.FTEMPTY;
+      if(!wc.simple()) return wildcards(wc);
+    }
 
     // fuzzy search
-    if(opt.is(FZ)) return fuzzy(tok, lexer.lserror(tok));
+    if(opt.is(FZ)) {
+      return fuzzy(token, lexer.lserror(token));
+    }
 
     // return cached or new result
-    final IndexEntry e = entry(tok);
-    return e.size > 0 ? iter(e.offset, e.size, inZ, tok) : FTIndexIterator.FTEMPTY;
+    final IndexEntry entry = entry(token);
+    if(entry.size > 0) {
+      return iter(entry.offset, entry.size, inZ, token);
+    }
+
+    // no results
+    return FTIndexIterator.FTEMPTY;
   }
 
   /**
-   * Returns a cache entry.
+   * Returns a cached index entry.
    * @param token token to be found or cached
    * @return cache entry
    */
   private IndexEntry entry(final byte[] token) {
-    final IndexEntry e = cache.get(token);
-    if(e != null) return e;
+    final IndexEntry entry = cache.get(token);
+    if(entry != null) return entry;
 
-    final long p = token(token);
-    return p == -1 ? new IndexEntry(token, 0, 0) :
-      cache.add(token, size(p, token.length), pointer(p, token.length));
+    final long pt = token(token);
+    return pt == -1 ? new IndexEntry(token, 0, 0) :
+      cache.add(token, size(pt, token.length), pointer(pt, token.length));
   }
 
   @Override
   public EntryIterator entries(final IndexEntries entries) {
-    final byte[] prefix = entries.get();
+    final byte[] token = entries.token();
     return new EntryIterator() {
-      int ti = prefix.length - 1, i, e, nr;
+      int ti = token.length - 1, i, e, nr;
       boolean inner;
 
       @Override
@@ -148,10 +160,10 @@ public final class FTIndex extends ValueIndex {
           if(inner && i < e) {
             // loop through all entries with the same character length
             final byte[] entry = inY.readBytes(i, ti);
-            if(startsWith(entry, prefix)) {
+            if(startsWith(entry, token)) {
               final long poi = inY.read5();
               nr = inY.read4();
-              if(prefix.length != 0) cache.add(entry, nr, poi);
+              if(token.length != 0) cache.add(entry, nr, poi);
               i += ti + ENTRY;
               return entry;
             }
@@ -165,7 +177,7 @@ public final class FTIndex extends ValueIndex {
             do e = tp[c++]; while(e == -1);
             nr = 0;
             inner = true;
-            i = find(prefix, i, e, ti);
+            i = find(token, i, e, ti);
             // jump to inner loop
             final byte[] n = next();
             if(n != null) return n;
@@ -193,8 +205,7 @@ public final class FTIndex extends ValueIndex {
     final int tl = ti + ENTRY;
     int l = 0, h = (end - start) / tl;
     while(l <= h) {
-      final int m = l + h >>> 1;
-      final int p = start + m * tl;
+      final int m = l + h >>> 1, p = start + m * tl;
       byte[] txt = ctext.get(p);
       if(txt == null) {
         txt = inY.readBytes(p, ti);
@@ -257,17 +268,15 @@ public final class FTIndex extends ValueIndex {
     int l = tp[tl];
     if(l == -1) return -1;
 
-    int i = 1;
-    int r;
     // find right limit
+    int i = 1, r;
     do r = tp[tl + i++]; while(r == -1);
     final int x = r;
 
     // binary search
     final int o = tl + ENTRY;
     while(l < r) {
-      final int m = l + (r - l >> 1) / o * o;
-      final int c = diff(inY.readBytes(m, tl), token);
+      final int m = l + (r - l >> 1) / o * o, c = diff(inY.readBytes(m, tl), token);
       if(c == 0) return m;
       if(c < 0) l = m + o;
       else r = m - o;
@@ -327,10 +336,8 @@ public final class FTIndex extends ValueIndex {
    */
   private IndexIterator fuzzy(final byte[] token, final int k) {
     FTIndexIterator iter = FTIndexIterator.FTEMPTY;
-    final int tokl = token.length, tl = tp.length;
-    final int e = Math.min(tl - 1, tokl + k);
+    final int tokl = token.length, tl = tp.length, e = Math.min(tl - 1, tokl + k);
     int s = Math.max(1, tokl - k) - 1;
-
     while(++s <= e) {
       int p = tp[s];
       if(p == -1) continue;
@@ -348,24 +355,17 @@ public final class FTIndex extends ValueIndex {
 
   /**
    * Performs a wildcard search for the specified token.
-   * @param token token to look for
+   * @param wc wildcard matcher
    * @return iterator
    */
-  private IndexIterator wc(final byte[] token) {
-    final FTIndexIterator iter = FTIndexIterator.FTEMPTY;
-    final FTWildcard wc = new FTWildcard(token);
-    if(!wc.parse()) return iter;
-
-    final IntList pr = new IntList();
-    final IntList ps = new IntList();
+  private IndexIterator wildcards(final FTWildcard wc) {
+    final IntList pr = new IntList(), ps = new IntList();
     final byte[] pref = wc.prefix();
-    final int pl = pref.length, tl = tp.length;
-    final int l = Math.min(tl - 1, wc.max());
+    final int pl = pref.length, tl = tp.length, l = Math.min(tl - 1, wc.max());
     for(int ti = pl; ti <= l; ti++) {
       int i = tp[ti];
       if(i == -1) continue;
-      int c = ti + 1;
-      int e = -1;
+      int c = ti + 1, e = -1;
       while(c < tl && e == -1) e = tp[c++];
       i = find(pref, i, e, ti);
 
@@ -383,7 +383,7 @@ public final class FTIndex extends ValueIndex {
         i += ti + ENTRY;
       }
     }
-    return iter(new FTCache(pr, ps), token);
+    return iter(new FTCache(pr, ps), wc.query());
   }
 
   /**
@@ -484,12 +484,12 @@ public final class FTIndex extends ValueIndex {
   }
 
   @Override
-  public void add(final ValueCache vc) {
+  public void add(final ValueCache values) {
     throw Util.notExpected();
   }
 
   @Override
-  public void delete(final ValueCache vc) {
+  public void delete(final ValueCache values) {
     throw Util.notExpected();
   }
 

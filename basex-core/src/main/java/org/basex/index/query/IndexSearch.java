@@ -3,12 +3,12 @@ package org.basex.index.query;
 import org.basex.index.*;
 
 /**
- * This class defines access to index tokens.
+ * This class provides an index search definition.
  *
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public interface IndexToken {
+public interface IndexSearch {
   /**
    * Returns the index type.
    * @return type
@@ -19,5 +19,5 @@ public interface IndexToken {
    * Returns the current token.
    * @return token
    */
-  byte[] get();
+  byte[] token();
 }

@@ -34,7 +34,7 @@ final class InvDocTest extends Test {
   }
 
   /**
-   * Returns a document test. This test will only be called by {@link AxisPath#index}
+   * Returns a document test. This test will only be called by the {@link AxisPath} expression
    * if the root is no value, or if it only contains database nodes.
    * @param rt compile time root (can be {@code null})
    * @return document test

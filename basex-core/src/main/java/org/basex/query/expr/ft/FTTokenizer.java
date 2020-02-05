@@ -88,25 +88,25 @@ public final class FTTokenizer {
 
   /**
    * Returns cached query tokens.
-   * @param query query token
+   * @param token query token
    * @return number of occurrences
    * @throws QueryException query exception
    */
-  FTTokens cache(final byte[] query) throws QueryException {
-    FTTokens tokens = cache.get(query);
+  FTTokens cache(final byte[] token) throws QueryException {
+    FTTokens tokens = cache.get(token);
     if(tokens == null) {
       tokens = new FTTokens();
-      cache.put(query, tokens);
+      cache.put(token, tokens);
 
       // cache query tokens:
-      final FTIterator quLex = new FTLexer(opt).init(query);
+      final FTIterator quLex = new FTLexer(opt).init(token);
       final TokenList quList = new TokenList(1);
       while(quLex.hasNext()) quList.add(quLex.nextToken());
       tokens.add(quList);
 
       // if thesaurus is required, add the terms which extend the query:
       if(opt.th != null) {
-        for(final byte[] ext : opt.th.find(info, query)) {
+        for(final byte[] ext : opt.th.find(info, token)) {
           // parse each extension term to a set of tokens:
           final TokenList tl = new TokenList(1);
           quLex.init(ext);

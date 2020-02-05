@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Jens Erat
  */
-public final class FTLexer extends FTIterator implements IndexToken {
+public final class FTLexer extends FTIterator implements IndexSearch {
   /** Tokenizer. */
   private final Tokenizer tokens;
   /** Full-text options. */
@@ -173,12 +173,12 @@ public final class FTLexer extends FTIterator implements IndexToken {
   }
 
   /**
-   * Returns the original token. Inherited from {@link IndexToken};
+   * Returns the original token. Inherited from {@link IndexSearch};
    * use {@link #next} or {@link #nextToken} if not using this interface.
    * @return current token
    */
   @Override
-  public byte[] get() {
+  public byte[] token() {
     return ctxt != null ? ctxt : curr.text;
   }
 

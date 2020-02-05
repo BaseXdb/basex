@@ -9,7 +9,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class StringRange implements IndexToken {
+public final class StringRange implements IndexSearch {
   /** Index type. */
   private final IndexType type;
   /** Minimum value. */
@@ -44,7 +44,7 @@ public final class StringRange implements IndexToken {
   }
 
   @Override
-  public byte[] get() {
+  public byte[] token() {
     return Token.EMPTY;
   }
 }

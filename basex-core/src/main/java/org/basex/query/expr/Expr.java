@@ -357,7 +357,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Checks if an expression can be rewritten to an index access.
    * If so, the index expression will be bound to {@link IndexInfo#expr}.
-   * This method will be called by {@link Path#index}.
+   * This method will be called by the {@link Path} expression.
    * @param ii index info
    * @return true if an index can be used
    * @throws QueryException query exception

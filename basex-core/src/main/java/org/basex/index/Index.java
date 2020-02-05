@@ -28,23 +28,23 @@ public interface Index {
 
   /**
    * Returns an iterator for the index results.
-   * @param token token to be found
+   * @param search index search definition
    * @return sorted pre values for the token
    */
-  IndexIterator iter(IndexToken token);
+  IndexIterator iter(IndexSearch search);
 
   /**
-   * Computes costs for accessing the specified token. An integer is returned:
+   * Computes costs for performing the specified search. An integer is returned:
    * <ul>
    *   <li> A negative value indicates that index access is not possible.</li>
    *   <li> A value of zero indicates that no results will be returned.</li>
    *   <li> A small value indicates that index access is fast.</li>
    * </ul>
    * Smaller values are better, a value of zero indicates that no results will be returned.
-   * @param token token to be found
+   * @param search index search definition
    * @return cost estimation
    */
-  IndexCosts costs(IndexToken token);
+  IndexCosts costs(IndexSearch search);
 
   /**
    * Drops the index. Also returns true if the index does not exist.

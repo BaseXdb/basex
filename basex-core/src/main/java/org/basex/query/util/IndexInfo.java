@@ -138,10 +138,10 @@ public final class IndexInfo {
 
         // only cache distinct tokens that have not been requested before
         if(!cache.contains(token)) {
-          final IndexCosts c = costs(data, new StringToken(type, token));
-          if(c == null) return false;
-          cache.put(token, c.results());
-          costs = IndexCosts.add(costs, c);
+          final IndexCosts ic = costs(data, new StringToken(type, token));
+          if(ic == null) return false;
+          cache.put(token, ic.results());
+          costs = IndexCosts.add(costs, ic);
         }
       }
 
@@ -196,11 +196,11 @@ public final class IndexInfo {
   /**
    * Computes costs if the specified data reference exists.
    * @param data data reference
-   * @param token index token
+   * @param search index search definition
    * @return costs costs, or {@code null} if index access is not possible
    */
-  public IndexCosts costs(final Data data, final IndexToken token) {
-    return data != null ? data.costs(token) : IndexCosts.ENFORCE_STATIC;
+  public IndexCosts costs(final Data data, final IndexSearch search) {
+    return data != null ? data.costs(search) : IndexCosts.ENFORCE_STATIC;
   }
 
   /**

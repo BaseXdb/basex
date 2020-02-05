@@ -21,9 +21,9 @@ public class IndexTexts extends IndexFn {
     final Data data = checkData(qc);
     final byte[] entry = exprs.length < 2 ? EMPTY : toToken(exprs[1], qc);
 
-    final IndexEntries et = exprs.length < 3 ? new IndexEntries(entry, type()) :
+    final IndexEntries entries = exprs.length < 3 ? new IndexEntries(entry, type()) :
       new IndexEntries(entry, toBoolean(exprs[2], qc), type());
-    return entries(data, et, this);
+    return entries(data, entries, this);
   }
 
   @Override

@@ -40,41 +40,41 @@ final class MapRenderer {
   /**
    * Calculates the height of the specified text.
    * @param rect rectangle
-   * @param string string to be drawn
+   * @param text text to be drawn
    * @return last height that was occupied
    */
-  int calcHeight(final MapRect rect, final byte[] string) {
-    return drawText(rect, string, false);
+  int calcHeight(final MapRect rect, final byte[] text) {
+    return drawText(rect, text, false);
   }
 
   /**
    * Draws a text.
    * @param rect rectangle
-   * @param string string to be drawn
+   * @param text text to be drawn
    */
-  void drawText(final MapRect rect, final byte[] string) {
-    drawText(rect, string, true);
+  void drawText(final MapRect rect, final byte[] text) {
+    drawText(rect, text, true);
   }
 
   /**
    * Draws the specified string. Chops the last character if space is not enough space.
-   * @param string string to be drawn
+   * @param text text to be drawn
    * @param x x coordinate
    * @param y y coordinate
    * @param w width
    */
-  void chopText(final byte[] string, final int x, final int y, final int w) {
-    BaseXLayout.chopString(g, string, x, y, w, fontSize);
+  void chopText(final byte[] text, final int x, final int y, final int w) {
+    BaseXLayout.chopString(g, text, x, y, w, fontSize);
   }
 
   /**
    * Draws a text.
    * @param rect rectangle
-   * @param string string to be drawn
+   * @param text text to be drawn
    * @param draw draw text (otherwise: just calculate space)
    * @return height of the text
    */
-  private int drawText(final MapRect rect, final byte[] string, final boolean draw) {
+  private int drawText(final MapRect rect, final byte[] text, final boolean draw) {
     // limit string to given space
     final int fh = (int) (1.2 * fontSize);
     final Color textc = g.getColor();
@@ -85,7 +85,7 @@ final class MapRenderer {
 
     // get index on first pre value
     int ll = 0;
-    final FTLexer lexer = new FTLexer().original().init(string);
+    final FTLexer lexer = new FTLexer().original().init(text);
     while(lexer.hasNext()) {
       final FTSpan span = lexer.next();
       byte[] token = span.text;
@@ -149,9 +149,9 @@ final class MapRenderer {
    * Calculates the needed space and chooses an abstraction level.
    * Token/Sentence/Paragraphs
    * @param rect rectangle
-   * @param string string to be drawn
+   * @param text text to be drawn
    */
-  void drawThumbnails(final MapRect rect, final byte[] string) {
+  void drawThumbnails(final MapRect rect, final byte[] text) {
     // thumbnail width and height, empty line height
     final double ffmax = 0.25, ffhmax = 0.5, flhmax = 0.3;
     double ff = ffmax, ffh = ffhmax, flh = flhmax;
@@ -162,7 +162,7 @@ final class MapRenderer {
     rect.thumbf = ff * fontSize;
     rect.thumbal = 0;
 
-    final int[][] data = new FTLexer().init(string).info();
+    final int[][] data = new FTLexer().init(text).info();
     boolean l = false;
     final double flhmin = 0.168, ffhmin = 0.28, ffmin = 0.14;
     double flhtmin = flhmin, ffhtmax = ffhmax, ffhtmin = ffhmin, fftmax = ffmax, fftmin = ffmin;

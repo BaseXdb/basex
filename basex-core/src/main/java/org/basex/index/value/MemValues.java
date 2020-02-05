@@ -48,8 +48,8 @@ public final class MemValues extends ValueIndex {
   }
 
   @Override
-  public IndexIterator iter(final IndexToken token) {
-    final int id = values.id(token.get());
+  public IndexIterator iter(final IndexSearch search) {
+    final int id = values.id(search.token());
     if(id == 0) return IndexIterator.EMPTY;
 
     final int len = lenList.get(id);
@@ -74,13 +74,13 @@ public final class MemValues extends ValueIndex {
   }
 
   @Override
-  public IndexCosts costs(final IndexToken it) {
-    return IndexCosts.get(lenList.get(values.id(it.get())));
+  public IndexCosts costs(final IndexSearch search) {
+    return IndexCosts.get(lenList.get(values.id(search.token())));
   }
 
   @Override
   public EntryIterator entries(final IndexEntries entries) {
-    final byte[] prefix = entries.get();
+    final byte[] token = entries.token();
     return new EntryIterator() {
       final int s = values.size();
       int p;
@@ -89,7 +89,7 @@ public final class MemValues extends ValueIndex {
         while(++p <= s) {
           if(lenList.get(p) == 0) continue;
           final byte[] key = values.key(p);
-          if(startsWith(key, prefix)) return key;
+          if(startsWith(key, token)) return key;
         }
         return null;
       }
@@ -137,8 +137,8 @@ public final class MemValues extends ValueIndex {
   @Override
   public void add(final ValueCache cache) {
     for(final byte[] key : cache) {
-      final IntList vals = cache.ids(key);
-      if(!vals.isEmpty()) add(key, vals.sort().finish());
+      final IntList ids = cache.ids(key);
+      if(!ids.isEmpty()) add(key, ids.sort().finish());
     }
     finish();
   }

@@ -8,7 +8,7 @@ import org.basex.index.*;
  * @author BaseX Team 2005-19, BSD License
  * @author Christian Gruen
  */
-public final class IndexEntries implements IndexToken {
+public final class IndexEntries implements IndexSearch {
   /** Index type. */
   private final IndexType type;
   /** Text. */
@@ -55,7 +55,7 @@ public final class IndexEntries implements IndexToken {
   }
 
   @Override
-  public byte[] get() {
+  public byte[] token() {
     return text;
   }
 }

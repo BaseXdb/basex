@@ -92,22 +92,22 @@ public class DiskValues extends ValueIndex {
   }
 
   @Override
-  public final IndexCosts costs(final IndexToken it) {
+  public final IndexCosts costs(final IndexSearch search) {
     return IndexCosts.get(
-      it instanceof StringRange ? Math.max(1, data.meta.size / 10) :
-      it instanceof NumericRange ? Math.max(1, data.meta.size / 3) :
-      entry(it.get()).size);
+      search instanceof StringRange ? Math.max(1, data.meta.size / 10) :
+      search instanceof NumericRange ? Math.max(1, data.meta.size / 3) :
+      entry(search.token()).size);
   }
 
   @Override
-  public final IndexIterator iter(final IndexToken token) {
+  public final IndexIterator iter(final IndexSearch search) {
     final IntList pres;
-    if(token instanceof StringRange) {
-      pres = idRange((StringRange) token);
-    } else if(token instanceof NumericRange) {
-      pres = idRange((NumericRange) token);
+    if(search instanceof StringRange) {
+      pres = idRange((StringRange) search);
+    } else if(search instanceof NumericRange) {
+      pres = idRange((NumericRange) search);
     } else {
-      final IndexEntry ie = entry(token.get());
+      final IndexEntry ie = entry(search.token());
       pres = pres(ie.size, ie.offset);
     }
 
@@ -137,21 +137,21 @@ public class DiskValues extends ValueIndex {
   }
 
   @Override
-  public void add(final ValueCache vc) {
+  public void add(final ValueCache values) {
     throw Util.notExpected();
   }
 
   @Override
-  public void delete(final ValueCache vc) {
+  public void delete(final ValueCache values) {
     throw Util.notExpected();
   }
 
   @Override
-  public final EntryIterator entries(final IndexEntries input) {
-    final byte[] key = input.get();
-    if(key.length == 0) return allKeys(input.descending);
-    if(input.prefix) return keysWithPrefix(key);
-    return keysFrom(key, input.descending);
+  public final EntryIterator entries(final IndexEntries entries) {
+    final byte[] token = entries.token();
+    if(token.length == 0) return allKeys(entries.descending);
+    if(entries.prefix) return keysWithPrefix(token);
+    return keysFrom(token, entries.descending);
   }
 
   @Override
@@ -207,15 +207,15 @@ public class DiskValues extends ValueIndex {
   /**
    * Returns an index entry.
    * <p><em>Important:</em> This method is thread-safe.</p>
-   * @param key key to be found or cached
+   * @param token token to be found or cached
    * @return cache entry
    */
-  private IndexEntry entry(final byte[] key) {
-    final IndexEntry entry = cache.get(key);
+  private IndexEntry entry(final byte[] token) {
+    final IndexEntry entry = cache.get(token);
     if(entry != null) return entry;
 
-    final long index = get(key);
-    if(index < 0) return new IndexEntry(key, 0, 0);
+    final long index = get(token);
+    if(index < 0) return new IndexEntry(token, 0, 0);
 
     final int count;
     final long offset;
@@ -227,7 +227,7 @@ public class DiskValues extends ValueIndex {
       offset = idxl.cursor();
     }
 
-    return cache.add(key, count, offset);
+    return cache.add(token, count, offset);
   }
 
   /**
@@ -262,8 +262,8 @@ public class DiskValues extends ValueIndex {
     final int i = get(prefix);
     return new EntryIterator() {
       final int s = size();
-      int ix = (i < 0 ? -i - 1 : i) - 1; // -1 in order to use the faster ++ix operator
-      int count = -1;
+      // -1 in order to use the faster ++ix operator
+      int ix = (i < 0 ? -i - 1 : i) - 1, count = -1;
 
       @Override
       public byte[] next() {

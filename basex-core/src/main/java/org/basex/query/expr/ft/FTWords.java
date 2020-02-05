@@ -167,7 +167,7 @@ public final class FTWords extends FTExpr {
               if(sw != null && sw.contains(tok)) {
                 ++d;
               } else {
-                final FTIndexIterator iter = lexer.get().length > data.meta.maxlen ?
+                final FTIndexIterator iter = lexer.token().length > data.meta.maxlen ?
                   scan(lexer, ftt, data) : (FTIndexIterator) data.iter(lexer);
                 iter.pos(++qc.ftPos);
                 if(ii == null) {
@@ -214,7 +214,7 @@ public final class FTWords extends FTExpr {
       throws QueryException {
 
     final FTLexer input = new FTLexer(ftOpt);
-    final FTTokens fttokens = ftt.cache(lexer.get());
+    final FTTokens fttokens = ftt.cache(lexer.token());
     return new FTIndexIterator() {
       final int sz = data.meta.size;
       int pre = -1, ps;
@@ -419,7 +419,7 @@ public final class FTWords extends FTExpr {
 
           if(ftOpt.is(WC)) {
             // don't use index if one of the terms starts with a wildcard
-            token = lexer.get();
+            token = lexer.token();
             if(token[0] == '.') return false;
             // don't use index if certain characters or more than 1 dot are found
             int d = 0;
@@ -428,9 +428,9 @@ public final class FTWords extends FTExpr {
             }
           }
           // favor full-text index requests over exact queries
-          final IndexCosts c = ii.costs(data, lexer);
-          if(c == null) return false;
-          final int r = c.results();
+          final IndexCosts ic = ii.costs(data, lexer);
+          if(ic == null) return false;
+          final int r = ic.results();
           if(r != 0) ii.costs = IndexCosts.add(ii.costs, IndexCosts.get(Math.max(2, r / 100)));
         }
       }

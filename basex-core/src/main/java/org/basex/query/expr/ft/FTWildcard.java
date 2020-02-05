@@ -14,8 +14,8 @@ import org.basex.util.*;
 public final class FTWildcard {
   /** Value encoding the wildcard dot. */
   private static final int DOT = -1;
-  /** Original query. */
-  private final byte[] query;
+  /** Query token. */
+  private final byte[] token;
   /** Simple flag: query contains no wildcard characters. */
   private final boolean simple;
   /** Characters. */
@@ -29,11 +29,11 @@ public final class FTWildcard {
 
   /**
    * Constructor.
-   * @param query query
+   * @param token query token
    */
-  public FTWildcard(final byte[] query) {
-    this.query = query;
-    simple = !contains(query, '.') && !contains(query, '\\');
+  public FTWildcard(final byte[] token) {
+    this.token = token;
+    simple = !contains(token, '.') && !contains(token, '\\');
   }
 
   /**
@@ -41,7 +41,7 @@ public final class FTWildcard {
    * @return success flag
    */
   public boolean parse() {
-    final int[] q = cps(query);
+    final int[] q = cps(token);
     wc = new int[q.length];
     min = new int[q.length];
     max = new int[q.length];
@@ -49,8 +49,7 @@ public final class FTWildcard {
 
     final int ql = q.length;
     for(int qi = 0; qi < ql;) {
-      int n = 1;
-      int m = 1;
+      int n = 1, m = 1;
       // parse wildcards
       if(q[qi] == '.') {
         int c = ++qi < ql ? q[qi] : 0;
@@ -127,43 +126,51 @@ public final class FTWildcard {
 
   /**
    * Checks if the wildcard can match a sub-string in a string.
-   * @param t token to search for match
+   * @param tok token to search for match
    * @return {@code true} if a match is found
    */
-  public boolean match(final byte[] t) {
-    return match(cps(t), 0, 0);
+  public boolean match(final byte[] tok) {
+    return match(cps(tok), 0, 0);
   }
 
   /**
    * Indicates if the input contains no wildcard characters.
    * @return result of check
    */
-  boolean simple() {
+  public boolean simple() {
     return simple;
   }
 
   /**
+   * Returns the query term.
+   * @return query term
+   */
+  public byte[] query() {
+    return token;
+  }
+
+  /**
    * Checks if the wildcard can match a sub-string in a string.
-   * @param token token to search for match
+   * @param tok token to search for match
    * @param tp input position
    * @param qp query position
    * @return {@code true} if a match is found
    */
-  private boolean match(final int[] token, final int tp, final int qp) {
-    final int tl = token.length;
+  private boolean match(final int[] tok, final int tp, final int qp) {
+    final int tl = tok.length;
     int qi = qp, ti = tp;
     while(qi < size) {
       if(wc[qi] == DOT) {
         int n = min[qi];
         final int m = max[qi++];
         // recursively evaluates wildcards (non-greedy)
-        while(!match(token, ti + n, qi)) {
+        while(!match(tok, ti + n, qi)) {
           if(ti + ++n > tl) return false;
         }
         if(n > m) return false;
         ti += n;
       } else {
-        if(ti >= tl || token[ti++] != wc[qi++]) return false;
+        if(ti >= tl || tok[ti++] != wc[qi++]) return false;
       }
     }
     return ti == tl;
