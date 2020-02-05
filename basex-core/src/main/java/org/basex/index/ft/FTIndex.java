@@ -205,18 +205,32 @@ public final class FTIndex extends ValueIndex {
     final int tl = ti + ENTRY;
     int s = 0, e = (end - start) / tl;
     while(s <= e) {
-      final int m = s + e >>> 1, pos = start + m * tl;
-      byte[] txt = ctext.get(pos);
-      if(txt == null) {
-        txt = dataY.readBytes(pos, ti);
-        ctext.put(pos, txt);
-      }
-      final int d = diff(txt, token);
+      final int m = s + e >>> 1, pos = start + m * tl, d = diff(cache(pos, ti), token);
       if(d == 0) return start + m * tl;
       if(d < 0) s = m + 1;
       else e = m - 1;
     }
     return start + s * tl;
+  }
+
+  /**
+   * Caches the text at the specified position and with the specified length.
+   * @param pos position
+   * @param ti text length
+   * @return text
+   */
+  private byte[] cache(final int pos, final int ti) {
+    // do not cache texts if the fulltext index contains unusually long tokens
+    if(ti >= 128) return dataY.readBytes(pos, ti);
+
+    // try to find cached text (requested length may vary in full-text requests)
+    final int key = (ti << 24) + pos;
+    byte[] text = ctext.get(key);
+    if(text == null) {
+      text = dataY.readBytes(pos, ti);
+      ctext.put(key, text);
+    }
+    return text;
   }
 
   @Override
