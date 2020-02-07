@@ -46,7 +46,7 @@ public final class FTWords extends FTExpr {
   /** Input database (can be {@code null}). */
   private IndexDb db;
   /** Pre-evaluated query tokens. */
-  private TokenList tokens;
+  private TokenList inputs;
   /** Full-text options. */
   private FTOpt ftOpt;
 
@@ -117,9 +117,10 @@ public final class FTWords extends FTExpr {
   public FTWords init(final QueryContext qc, final FTOpt opt) throws QueryException {
     // pre-evaluate tokens, choose fast evaluation for default search options
     if(query instanceof Value) {
-      tokens = tokens(qc);
+      inputs = inputs(qc);
       simple = mode == FTMode.ANY && occ == null;
     }
+
     ftOpt = opt;
     return this;
   }
@@ -154,17 +155,17 @@ public final class FTWords extends FTExpr {
           // length distinct tokens
           int len = 0;
           // loop through unique tokens
-          for(final byte[] txt : unique(tokens != null ? tokens : tokens(qc))) {
-            lexer.init(txt);
+          for(final byte[] input : unique(inputs != null ? inputs : inputs(qc))) {
+            lexer.init(input);
             if(!lexer.hasNext()) return null;
 
             int d = 0;
             FTIndexIterator ii = null;
             final StopWords sw = ftOpt.sw;
             do {
-              final byte[] tok = lexer.nextToken();
-              len += tok.length;
-              if(sw != null && sw.contains(tok)) {
+              final byte[] token = lexer.nextToken();
+              len += token.length;
+              if(sw != null && sw.contains(token)) {
                 ++d;
               } else {
                 final FTIndexIterator iter = lexer.token().length > data.meta.maxlen ?
@@ -254,12 +255,12 @@ public final class FTWords extends FTExpr {
   }
 
   /**
-   * Returns all tokens of the query.
+   * Returns all tokens of the query input.
    * @param qc query context
    * @return token list
    * @throws QueryException query exception
    */
-  private TokenList tokens(final QueryContext qc) throws QueryException {
+  private TokenList inputs(final QueryContext qc) throws QueryException {
     final TokenList tl = new TokenList();
     final Iter iter = query.atomIter(qc, info);
     for(Item item; (item = qc.next(iter)) != null;) {
@@ -284,9 +285,9 @@ public final class FTWords extends FTExpr {
     // use faster evaluation for default options
     int num = 0;
     if(simple) {
-      for(final byte[] token : tokens) {
-        final FTTokens qtok = ftt.cache(token);
-        num = Math.max(num, contains(qtok, lexer, ftt) * qtok.firstSize());
+      for(final byte[] input : inputs) {
+        final FTTokens tokens = ftt.cache(input);
+        num = Math.max(num, contains(tokens, lexer, ftt) * tokens.firstSize());
       }
       return num;
     }
@@ -294,11 +295,11 @@ public final class FTWords extends FTExpr {
     // find and count all occurrences
     final boolean all = mode == FTMode.ALL || mode == FTMode.ALL_WORDS;
     int oc = 0;
-    for(final byte[] w : unique(tokens(qc))) {
-      final FTTokens qtok = ftt.cache(w);
-      final int o = contains(qtok, lexer, ftt);
+    for(final byte[] input : unique(inputs(qc))) {
+      final FTTokens tokens = ftt.cache(input);
+      final int o = contains(tokens, lexer, ftt);
       if(all && o == 0) return 0;
-      num = Math.max(num, o * qtok.firstSize());
+      num = Math.max(num, o * tokens.firstSize());
       oc += o;
     }
 
@@ -311,21 +312,21 @@ public final class FTWords extends FTExpr {
 
   /**
    * Checks if the first token contains the second full-text term.
-   * @param tok cached query tokens
+   * @param tokens cached query tokens
    * @param input input text
    * @param ftt full-text tokenizer
    * @return number of occurrences
    * @throws QueryException query exception
    */
-  private int contains(final FTTokens tok, final FTLexer input, final FTTokenizer ftt)
+  private int contains(final FTTokens tokens, final FTLexer input, final FTTokenizer ftt)
       throws QueryException {
 
     int count = 0;
     final FTMatches matches = ftt.matches;
     final boolean and = !ftt.first && (mode == FTMode.ALL || mode == FTMode.ALL_WORDS);
-    final FTBitapSearch bs = new FTBitapSearch(input.init(), tok, ftt.cmp);
+    final FTBitapSearch bs = new FTBitapSearch(input.init(), tokens, ftt.cmp);
     while(bs.hasNext()) {
-      final int s = bs.next(), e = s + tok.firstSize() - 1;
+      final int s = bs.next(), e = s + tokens.firstSize() - 1;
       if(and) matches.and(s, e);
       else matches.or(s, e);
       count++;
@@ -337,29 +338,29 @@ public final class FTWords extends FTExpr {
   }
 
   /**
-   * Caches and returns all unique tokens specified in a query.
-   * @param tl token list
+   * Caches and returns the unique query tokens for the given search mode.
+   * @param tokens token list
    * @return token set
    */
-  private TokenSet unique(final TokenList tl) {
+  private TokenSet unique(final TokenList tokens) {
     // cache all query tokens in a set (duplicates are removed)
     final TokenSet ts = new TokenSet();
     switch(mode) {
       case ALL:
       case ANY:
-        for(final byte[] token : tl) ts.add(token);
+        for(final byte[] token : tokens) ts.add(token);
         break;
       case ALL_WORDS:
       case ANY_WORD:
         final FTLexer lexer = new FTLexer(ftOpt);
-        for(final byte[] token : tl) {
+        for(final byte[] token : tokens) {
           lexer.init(token);
           while(lexer.hasNext()) ts.add(lexer.nextToken());
         }
         break;
       case PHRASE:
         final TokenBuilder tb = new TokenBuilder();
-        for(final byte[] token : tl) tb.add(token).add(' ');
+        for(final byte[] token : tokens) tb.add(token).add(' ');
         ts.add(tb.trim().finish());
     }
     return ts;
@@ -404,22 +405,22 @@ public final class FTWords extends FTExpr {
     }
 
     // estimate costs if text is not known at compile time
-    if(tokens == null) {
+    if(inputs == null) {
       ii.costs = data == null ? null : IndexCosts.get(Math.max(2, data.meta.size / 30));
     } else {
       // summarize number of hits; break loop if no hits are expected
-      final FTLexer lexer = new FTLexer(ftOpt);
       ii.costs = IndexCosts.ZERO;
+      final FTLexer lexer = new FTLexer(ftOpt);
+      final TokenSet ts = new TokenSet();
       final StopWords sw = ftOpt.sw;
-      for(byte[] token : tokens) {
-        lexer.init(token);
+      for(final byte[] input : inputs) {
+        lexer.init(input);
         while(lexer.hasNext()) {
-          final byte[] tok = lexer.nextToken();
-          if(sw != null && sw.contains(tok)) continue;
+          final byte[] token = lexer.nextToken();
+          if(!ts.add(token) || sw != null && sw.contains(token)) continue;
 
           if(ftOpt.is(WC)) {
             // don't use index if one of the terms starts with a wildcard
-            token = lexer.token();
             if(token[0] == '.') return false;
             // don't use index if certain characters or more than 1 dot are found
             int d = 0;
@@ -486,7 +487,7 @@ public final class FTWords extends FTExpr {
         occ == null ? null : Arr.copyAll(cc, vm, occ));
     ftw.simple = simple;
     ftw.compiled = compiled;
-    ftw.tokens = tokens;
+    ftw.inputs = inputs;
     ftw.ftOpt = ftOpt;
     if(db != null) ftw.db = db.copy(cc, vm);
     return ftw;

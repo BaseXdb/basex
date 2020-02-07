@@ -88,29 +88,29 @@ public final class FTTokenizer {
 
   /**
    * Returns cached query tokens.
-   * @param token query token
+   * @param input query token
    * @return number of occurrences
    * @throws QueryException query exception
    */
-  FTTokens cache(final byte[] token) throws QueryException {
-    FTTokens tokens = cache.get(token);
+  FTTokens cache(final byte[] input) throws QueryException {
+    FTTokens tokens = cache.get(input);
     if(tokens == null) {
       tokens = new FTTokens();
-      cache.put(token, tokens);
+      cache.put(input, tokens);
 
       // cache query tokens:
-      final FTIterator quLex = new FTLexer(opt).init(token);
-      final TokenList quList = new TokenList(1);
-      while(quLex.hasNext()) quList.add(quLex.nextToken());
-      tokens.add(quList);
+      final FTIterator lexer = new FTLexer(opt).init(input);
+      final TokenList list = new TokenList(1);
+      while(lexer.hasNext()) list.add(lexer.nextToken());
+      tokens.add(list);
 
       // if thesaurus is required, add the terms which extend the query:
       if(opt.th != null) {
-        for(final byte[] ext : opt.th.find(info, token)) {
+        for(final byte[] thes : opt.th.find(info, input)) {
           // parse each extension term to a set of tokens:
           final TokenList tl = new TokenList(1);
-          quLex.init(ext);
-          while(quLex.hasNext()) tl.add(quLex.nextToken());
+          lexer.init(thes);
+          while(lexer.hasNext()) tl.add(lexer.nextToken());
           // add each thesaurus term as an additional query term:
           tokens.add(tl);
         }
