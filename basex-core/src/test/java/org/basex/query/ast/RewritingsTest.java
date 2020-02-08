@@ -503,6 +503,12 @@ public final class RewritingsTest extends QueryPlanTest {
     error("(if(<_>!</_> = 'a') then 'b') cast as xs:string", INVTYPE_X_X_X);
   }
 
+  /** Type promotions. */
+  @Test public void gh1801() {
+    check("map { xs:string(<_/>): '' } instance of map(xs:string, xs:string)", true);
+    check("map { string(<_/>): '' } instance of map(xs:string, xs:string)", true);
+  }
+
   /** Casts. */
   @Test public void typeCheck() {
     check("declare function local:a($e) as xs:string? { local:b($e) }; " +

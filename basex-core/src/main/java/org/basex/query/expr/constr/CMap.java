@@ -36,7 +36,6 @@ public final class CMap extends Arr {
 
     Type key = null;
     for(int e = 0; e < el; e += 2) {
-      exprs[e] = exprs[e].simplifyFor(AtomType.ATM, cc);
       final SeqType st = exprs[e].seqType();
       final Type type = st.type.atomic();
       if(type == null || !st.one()) {
