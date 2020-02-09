@@ -114,8 +114,8 @@ public final class FTIndex extends ValueIndex {
     // wildcard search
     if(opt.is(WC)) {
       final FTWildcard wc = new FTWildcard(token);
-      if(!wc.parse()) return FTIndexIterator.FTEMPTY;
-      if(!wc.simple()) return wildcards(wc);
+      if(!wc.valid()) return FTIndexIterator.FTEMPTY;
+      if(!wc.simple()) return wildcards(wc, opt.is(DC), token);
     }
 
     // fuzzy search
@@ -370,22 +370,24 @@ public final class FTIndex extends ValueIndex {
   /**
    * Performs a wildcard search for the specified token.
    * @param wc wildcard matcher
+   * @param full support full range of Unicode characters
+   * @param token original search token
    * @return iterator
    */
-  private IndexIterator wildcards(final FTWildcard wc) {
+  private IndexIterator wildcards(final FTWildcard wc, final boolean full, final byte[] token) {
     final IntList pr = new IntList(), ps = new IntList();
-    final byte[] pref = wc.prefix();
-    final int pl = positions.length, l = Math.min(pl - 1, wc.max());
-    for(int p = pref.length; p <= l; p++) {
+    final byte[] prefix = wc.prefix();
+    final int pl = positions.length, l = Math.min(pl - 1, wc.max(full));
+    for(int p = prefix.length; p <= l; p++) {
       int start = positions[p];
       if(start == -1) continue;
       int c = p + 1, end = -1;
       while(c < pl && end == -1) end = positions[c++];
-      start = find(pref, start, end, p);
+      start = find(prefix, start, end, p);
 
       while(start < end) {
         final byte[] t = dataY.readBytes(start, p);
-        if(!startsWith(t, pref)) break;
+        if(!startsWith(t, prefix)) break;
         if(wc.match(t)) {
           dataZ.cursor(pointer(start, p));
           final int s = size(start, p);
@@ -397,7 +399,7 @@ public final class FTIndex extends ValueIndex {
         start += p + ENTRY;
       }
     }
-    return iter(new FTCache(pr, ps), wc.query());
+    return iter(new FTCache(pr, ps), token);
   }
 
   /**

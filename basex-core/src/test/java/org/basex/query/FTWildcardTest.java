@@ -58,8 +58,8 @@ public final class FTWildcardTest {
 
   /** Test if wild-card expressions are correctly parsed. */
   @Test public void testParse() {
-    for(final String wc : VALIDWC) assertTrue(new FTWildcard(token(wc)).parse());
-    for(final String wc : INVALIDWC) assertFalse(new FTWildcard(token(wc)).parse());
+    for(final String wc : VALIDWC) assertTrue(new FTWildcard(token(wc)).valid());
+    for(final String wc : INVALIDWC) assertFalse(new FTWildcard(token(wc)).valid());
   }
 
   /**
@@ -70,7 +70,7 @@ public final class FTWildcardTest {
     for(int i = 0; i < vl; i++) {
       final String q = VALIDWC[i];
       final FTWildcard wc = new FTWildcard(token(q));
-      assertTrue(wc.parse());
+      assertTrue(wc.valid());
 
       final String[] good = TEXTS_GOOD[i];
       for(final String g : good) {

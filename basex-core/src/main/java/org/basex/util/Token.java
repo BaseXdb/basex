@@ -96,7 +96,7 @@ public final class Token {
   }
 
   /**
-   * Returns the specified token as string.
+   * Converts the specified token to a string.
    * @param token token
    * @param start start position
    * @param length length
@@ -116,7 +116,7 @@ public final class Token {
   }
 
   /**
-   * Returns a string of the specified UTF8 token.
+   * Converts the specified UTF8 token to a string.
    * @param token token
    * @param start start position
    * @param length length
@@ -289,7 +289,7 @@ public final class Token {
   }
 
   /**
-   * Returns the length of a UTF8 character at the specified position.
+   * Returns the byte length of a codepoint at the specified position.
    * @param token token
    * @param pos position
    * @return character length
@@ -330,6 +330,15 @@ public final class Token {
       (byte) (cp >> 18 & 0x07 | 0xF0), (byte) (cp >> 12 & 0x3F | 0x80),
       (byte) (cp >>  6 & 0x3F | 0x80), (byte) (cp & 0x3F | 0x80)
     };
+  }
+
+  /**
+   * Returns the byte length of a codepoint.
+   * @param cp codepoint of the character
+   * @return length
+   */
+  public static int cpLength(final int cp) {
+    return cp <= 0x7F ? 1 : cp <= 0x7FF ? 2 : cp <= 0xFFFF ? 3 : 4;
   }
 
   /**

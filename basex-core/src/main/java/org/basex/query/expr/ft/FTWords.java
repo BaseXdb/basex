@@ -419,15 +419,8 @@ public final class FTWords extends FTExpr {
           final byte[] token = lexer.nextToken();
           if(!ts.add(token) || sw != null && sw.contains(token)) continue;
 
-          if(ftOpt.is(WC)) {
-            // don't use index if one of the terms starts with a wildcard
-            if(token[0] == '.') return false;
-            // don't use index if certain characters or more than 1 dot are found
-            int d = 0;
-            for(final byte b : token) {
-              if(b == '{' || b == '\\' || b == '.' && ++d > 1) return false;
-            }
-          }
+          // don't use index if token starts with a wildcard
+          if(ftOpt.is(WC) && token[0] == '.') return false;
           // favor full-text index requests over exact queries
           final IndexCosts ic = ii.costs(data, lexer);
           if(ic == null) return false;
