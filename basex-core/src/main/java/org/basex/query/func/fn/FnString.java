@@ -27,7 +27,9 @@ public final class FnString extends ContextFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    simplifyAll(AtomType.ATM, cc);
+
     final boolean context = contextAccess();
     final Expr expr = context ? cc.qc.focus.value : exprs[0];
     if(expr != null && expr.seqType().eq(SeqType.STR_O)) {

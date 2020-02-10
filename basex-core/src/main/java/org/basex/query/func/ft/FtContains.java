@@ -4,9 +4,11 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 
@@ -39,5 +41,12 @@ public final class FtContains extends FtAccess {
 
     final FTWords ftw = new FTWords(info, query, mode, null).init(qc, opt);
     return new FTContains(input, options(ftw, opts), info).item(qc, info);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    exprs[0] = exprs[0].simplifyFor(AtomType.ATM, cc);
+    exprs[1] = exprs[1].simplifyFor(AtomType.ATM, cc);
+    return this;
   }
 }

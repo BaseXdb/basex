@@ -968,7 +968,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _FT_CONTAINS(FtContains.class, "contains(input,terms[,options])",
-      arg(ITEM_O, ITEM_ZM, MAP_ZO), BLN_O, flag(NDT), FT_URI),
+      arg(ITEM_ZM, ITEM_ZM, MAP_ZO), BLN_O, flag(NDT), FT_URI),
   /** XQuery function. */
   _FT_COUNT(FtCount.class, "count(nodes)", arg(NOD_ZM), ITR_O, FT_URI),
   /** XQuery function. */
