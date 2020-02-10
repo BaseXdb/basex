@@ -6,8 +6,8 @@ import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.index.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 

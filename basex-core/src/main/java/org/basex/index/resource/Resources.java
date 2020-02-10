@@ -8,7 +8,7 @@ import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.query.util.*;
+import org.basex.query.util.index.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;

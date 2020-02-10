@@ -287,12 +287,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     final SeqType argType = body.seqType();
     final Expr checked;
-
-    if(declType != null && !argType.instanceOf(declType)) {
-      //System.out.println("[CLOSURE] " + declType.type);
-      //throw Util.notExpected(this);
-    }
-
     if(declType == null || argType.instanceOf(declType)) {
       // return type is already correct
       checked = body;

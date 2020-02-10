@@ -1,4 +1,4 @@
-package org.basex.query.util;
+package org.basex.query.util.index;
 
 import static org.basex.query.QueryText.*;
 
@@ -12,7 +12,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -41,11 +41,11 @@ public final class IndexInfo {
   public Expr expr;
   /** Costs of index access ({@code null}) if no index access is possible). */
   public IndexCosts costs;
+  /** Indicates if the last step addresses a text node. */
+  boolean text;
 
   /** Predicate expression. */
-  private Expr pred;
-  /** Indicates if the last step refers to a text step. */
-  private boolean text;
+  private IndexPred pred;
 
   /**
    * Constructor.
@@ -67,10 +67,12 @@ public final class IndexInfo {
    * @return resulting index type, or {@code null} if index access is not possible
    */
   public IndexType type(final Expr input, final IndexType type) {
-    pred = input;
+    pred = IndexPred.get(input);
+    if(pred == null) return null;
 
     // find last step that will be evaluated before doing a comparison
-    final Step last = lastStep();
+    System.out.println(pred);
+    final Step last = pred.step(this);
     if(last == null) return null;
 
     final Data data = db.data();
@@ -98,9 +100,20 @@ public final class IndexInfo {
     if(text ? (it != IndexType.TEXT && it != IndexType.FULLTEXT) :
       (it != IndexType.TOKEN && it != IndexType.ATTRIBUTE)) return null;
 
-    // reject index access if database is known at runtime, and if it does not match all criteria
-    return data == null || new IndexNames(it, data).contains(qname()) && data.meta.index(it) ?
-      it : null;
+    // database is known at compile time: perform additional checks
+    if(data != null) {
+      // check if required index exists
+      if(!data.meta.index(it)) return null;
+      // check if targeted name is contained in the index
+      final Step st = pred.qname(this);
+      byte[][] qname = null;
+      if(st.test instanceof NameTest) {
+        final NameTest nt = (NameTest) st.test;
+        qname = new byte[][] { nt.local, nt.qname == null ? null : nt.qname.uri() };
+      }
+      if(!new IndexNames(it, data).contains(qname)) return null;
+    }
+    return it;
   }
 
   /**
@@ -188,8 +201,9 @@ public final class IndexInfo {
   public void create(final ParseExpr root, final boolean parent, final String opt,
       final InputInfo ii) {
 
-    expr = invert(test == null || !parent ? root :
-      Path.get(ii, root, Step.get(ii, Axis.PARENT, test)));
+    final ParseExpr rt = test == null || !parent ? root :
+      Path.get(ii, root, Step.get(ii, Axis.PARENT, test));
+    expr = pred.invert(rt, this);
     optInfo = opt;
   }
 
@@ -209,100 +223,5 @@ public final class IndexInfo {
    */
   public boolean enforce() {
     return qc.context.options.get(MainOptions.ENFORCEINDEX);
-  }
-
-  // PRIVATE METHODS ==============================================================================
-
-  /**
-   * Returns the local name and namespace uri of the last name test.
-   * If the returned name or uri is {@code null}, it represents a wildcard.
-   * <ul>
-   *   <li> //*[x = 'TEXT']         -> x </li>
-   *   <li> //*[x /text() = 'TEXT'] -> x </li>
-   *   <li> //x[. = 'TEXT']         -> x </li>
-   *   <li> //x[text() = 'TEXT']    -> x </li>
-   *   <li> //*[* /@x = 'TEXT']     -> x </li>
-   *   <li> //*[@x = 'TEXT']        -> x </li>
-   *   <li> //@x[. = 'TEXT']        -> x </lI>
-   * </ul>
-   * @return local name and namespace uri. Either result, name, and uri can be {@code null}.
-   *         {@code null} will be returned if the test is not a name test
-   */
-  private byte[][] qname() {
-    Step st = step;
-
-    // if predicate is axis path, extract last step
-    if(pred instanceof AxisPath) {
-      final AxisPath path = (AxisPath) pred;
-      final int pl = path.steps.length;
-      st = path.step(pl - 1);
-      // if last step matches text nodes: use previous step
-      if(text && st.axis == Axis.CHILD && st.test == KindTest.TXT) {
-        st = pl > 1 ? path.step(pl - 2) : step;
-      }
-    }
-
-    // give up if test is not a name test
-    if(!(st.test instanceof NameTest)) return null;
-
-    // return local name and namespace uri (null represents wildcards)
-    final NameTest nt = (NameTest) st.test;
-    return new byte[][] { nt.local, nt.qname == null ? null : nt.qname.uri() };
-  }
-
-  /**
-   * Rewrites the expression for index access.
-   * @param root new root expression
-   * @return index access
-   */
-  private ParseExpr invert(final ParseExpr root) {
-    // rewrite context node
-    if(pred instanceof ContextValue) {
-      if(text || !(step.test instanceof NameTest || step.test instanceof UnionTest)) return root;
-      // attribute index request: add attribute step
-      return Path.get(root.info, root, Step.get(step.info, Axis.SELF, step.test));
-    }
-
-    // rewrite axis path
-    final AxisPath path = (AxisPath) pred;
-    Path invPath = path.invertPath(root, step);
-    if(!text) {
-      // attribute index request: start inverted path with attribute step
-      final Step st = path.step(path.steps.length - 1);
-      if(st.test instanceof NameTest || st.test instanceof UnionTest) {
-        final ExprList steps = new ExprList(invPath.steps.length + 1);
-        steps.add(Step.get(st.info, Axis.SELF, st.test)).add(invPath.steps);
-        invPath = Path.get(invPath.info, invPath.root, steps.finish());
-      }
-    }
-    return invPath;
-  }
-
-  /**
-   * Returns the last step pointing to the requested nodes. Examples:
-   * <ul>
-   *   <li>{@code /xml/a[b = 'A']} -> {@code b}</li>
-   *   <li>{@code /xml/a[b/text() = 'A']} -> {@code text()}</li>
-   *   <li>{@code /xml/a[. = 'A']} -> {@code a}</li>
-   *   <li>{@code /xml/a[text() = 'A']} -> {@code text()}</li>
-   *   <li>{@code /xml/a/text()[. = 'A']} -> {@code text()}</li>
-   * </ul>
-   * @return step or {@code null}
-   */
-  private Step lastStep() {
-    // expression in predicate is context value: return global step
-    if(pred instanceof ContextValue) return step;
-    // give up if expression is not an axis path
-    if(!(pred instanceof AxisPath)) return null;
-    // give up if path is not relative
-    final AxisPath path = (AxisPath) pred;
-    if(path.root != null) return null;
-    // give up if one of the steps contains positional predicates
-    final int sl = path.steps.length;
-    for(int s = 0; s < sl; s++) {
-      if(path.step(s).positional()) return null;
-    }
-    // return last step
-    return path.step(sl - 1);
   }
 }

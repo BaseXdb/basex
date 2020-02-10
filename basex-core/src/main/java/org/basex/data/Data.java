@@ -15,7 +15,7 @@ import org.basex.index.resource.*;
 import org.basex.index.value.*;
 import org.basex.io.*;
 import org.basex.io.random.*;
-import org.basex.query.util.*;
+import org.basex.query.util.index.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 

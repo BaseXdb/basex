@@ -2,7 +2,7 @@ package org.basex.index;
 
 import org.basex.core.*;
 import org.basex.index.query.*;
-import org.basex.query.util.*;
+import org.basex.query.util.index.*;
 
 /**
  * This interface defines the methods which have to be implemented

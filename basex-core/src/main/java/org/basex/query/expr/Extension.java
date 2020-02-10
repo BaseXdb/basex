@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.util.*;
+import org.basex.query.util.index.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
