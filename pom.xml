@@ -237,7 +237,7 @@
     <repository>
       <id>basex</id>
       <name>BaseX Maven Repository</name>
-      <url>http://files.basex.org/maven</url>
+      <url>https://files.basex.org/maven</url>
     </repository>
     <repository>
       <id>central</id>
