@@ -388,6 +388,8 @@ public interface QueryText {
   /** Query Info. */ String TEST = "test";
   /** Query Info. */ String MIN = "min";
   /** Query Info. */ String MAX = "max";
+  /** Query Info. */ String INCLUDE_MIN = "include-min";
+  /** Query Info. */ String INCLUDE_MAX = "include-max";
   /** Query Info. */ String INF = "inf";
   /** Query Info. */ String TCL = "tailCall";
   /** Query Info. */ String ENTRIES = "entries";

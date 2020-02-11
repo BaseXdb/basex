@@ -208,7 +208,8 @@ public final class CmpSR extends Single {
 
   @Override
   public void plan(final QueryPlan plan) {
-    plan.add(plan.create(this, MIN, min, MAX, max, SINGLE, single), expr);
+    plan.add(plan.create(this, MIN, min, MAX, max, INCLUDE_MIN, mni, INCLUDE_MAX, mxi,
+        SINGLE, single), expr);
   }
 
   @Override
