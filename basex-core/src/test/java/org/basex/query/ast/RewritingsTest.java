@@ -879,4 +879,10 @@ public final class RewritingsTest extends QueryPlanTest {
     error("'a' promote to node()", INVPROMOTE_X_X_X);
     error("'a' treat as  node()", NOTREAT_X_X_X);
   }
+
+  /** Merge fn:not. */
+  @Test public void gh1805() {
+    check("<_/>[not(. = ('A', 'B'))][not(. = ('C', 'D'))]", "<_/>", count(CmpHashG.class, 1));
+    check("<_/>[. != 'A'][. != 'B'][. != 'C'][. != 'D']", "<_/>", count(CmpHashG.class, 1));
+  }
 }

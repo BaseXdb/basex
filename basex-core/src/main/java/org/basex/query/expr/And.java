@@ -29,7 +29,7 @@ public final class And extends Logical {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    return optimize(cc, false, ex -> new Or(info, ex));
+    return optimize(cc, false);
   }
 
   @Override

@@ -2,10 +2,9 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -50,13 +49,10 @@ abstract class Logical extends Arr {
    * Optimizes the expression.
    * @param cc compilation context
    * @param union union or intersection
-   * @param negate negated constructor
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public final Expr optimize(final CompileContext cc, final boolean union,
-      final java.util.function.Function<Expr[], Logical> negate) throws QueryException {
-
+  public final Expr optimize(final CompileContext cc, final boolean union) throws QueryException {
     ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       final Expr ex = expr.simplifyFor(AtomType.BLN, cc);
@@ -89,19 +85,7 @@ abstract class Logical extends Arr {
     }
     exprs = list.finish();
     merge(true, union, cc);
-
-    if(exprs.length == 1) return cc.replaceWith(this, FnBoolean.get(exprs[0], info, cc.sc()));
-
-    // check if expression can be negated
-    // 'e'[not(. > 'a') and not(. < 'z')]  ->  'e'[not(. > 'a' or . < 'z')]
-    for(final Expr expr : exprs) {
-      if(!Function.NOT.is(expr)) return this;
-    }
-
-    list = new ExprList(exprs.length);
-    for(final Expr expr : exprs) list.add(((FnNot) expr).exprs[0]);
-    final Expr expr = negate.apply(list.finish()).optimize(cc);
-    return cc.replaceWith(this, cc.function(Function.NOT, info, expr));
+    return exprs.length == 1 ? cc.replaceWith(this, FnBoolean.get(exprs[0], info, cc.sc())) : this;
   }
 
   @Override

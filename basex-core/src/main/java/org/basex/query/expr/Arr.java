@@ -5,6 +5,8 @@ import static org.basex.query.QueryText.*;
 import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.func.Function;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -170,8 +172,10 @@ public abstract class Arr extends ParseExpr {
    */
   public void merge(final boolean pos, final boolean union, final CompileContext cc)
       throws QueryException {
+
     // 'a'[. = 'a' or . = 'b']  ->  'a'[. = ('a', 'b')]
-    final ExprList list = new ExprList().add(exprs);
+    // $v[. != 'a'][. != 'b']  ->  $v[not(. = ('a', 'b')]
+    final ExprList list = new ExprList(exprs.length).add(exprs);
     for(int l = 0; l < list.size(); l++) {
       for(int m = l + 1; m < list.size(); m++) {
         final Expr expr = list.get(l);
@@ -186,6 +190,15 @@ public abstract class Arr extends ParseExpr {
       }
     }
     exprs = list.finish();
+
+    // not($a) and not($b)  ->  not($a or $b)
+    final Checks<Expr> fnNot = ex -> Function.NOT.is(ex) && (pos || !ex.has(Flag.POS));
+    if(exprs.length > 1 && fnNot.all(exprs)) {
+      final ExprList tmp = new ExprList(exprs.length);
+      for(final Expr expr : exprs) tmp.add(((FnNot) expr).exprs[0]);
+      final Expr expr = union ? new And(info, tmp.finish()) : new Or(info, tmp.finish());
+      exprs = new Expr[] { cc.function(Function.NOT, info, expr.optimize(cc)) };
+    }
   }
 
   @Override

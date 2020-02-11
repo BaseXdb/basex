@@ -71,7 +71,6 @@ public final class IndexInfo {
     if(pred == null) return null;
 
     // find last step that will be evaluated before doing a comparison
-    System.out.println(pred);
     final Step last = pred.step(this);
     if(last == null) return null;
 
