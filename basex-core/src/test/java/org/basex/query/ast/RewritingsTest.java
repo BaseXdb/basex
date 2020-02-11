@@ -379,7 +379,6 @@ public final class RewritingsTest extends QueryPlanTest {
     check("('a', 'b')[position()[position() ! .]]", "a\nb", count(POSITION, 2));
     check("('a', 'b')[. ! position()]", "a", exists("*[contains(name(), 'Map')]"));
     check("(1, 0)[.]", 1, exists(ContextValue.class));
-    check("let $x := (<a/>, <a/>) where $x[. eq ''] return $x", "<a/>\n<a/>", exists(CmpG.class));
     error("true#0[.]", QueryError.EBV_X_X);
     error("(true#0, false#0)[.]", QueryError.EBV_X_X);
 
@@ -786,18 +785,15 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1770() {
     check("<a/>[node-name() eq xs:QName('a')]", "<a/>", exists(SingleIterPath.class));
     check("<a/>[local-name() eq 'a']", "<a/>", exists(SingleIterPath.class));
-    check("<a/>[namespace-uri() eq '']", "<a/>", exists(SingleIterPath.class));
 
     check("<a/>[local-name() = ('a', 'b', '')]", "<a/>", exists(SingleIterPath.class));
     check("<a/>[local-name() = 'a' or local-name() = 'b']", "<a/>", exists(SingleIterPath.class));
     check("<a/>[node-name() = (xs:QName('a'), xs:QName('b'))]", "<a/>",
         exists(SingleIterPath.class));
 
-    check("<a/>[local-name() eq '']", "", empty());
     check("<a/>[local-name() = ('', '', '')]", "", empty());
     check("(<a/>, <b/>)[. = '!'][local-name() = 'a']", "", empty(LOCAL_NAME));
 
-    check("attribute { 'a' } { '' }[local-name() = '']", "", empty());
     check("comment {}[local-name() = '']", "<!---->", root(CComm.class));
     check("text { 'a' }[local-name() = '']", "a", root(CTxt.class));
 
@@ -889,5 +885,23 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(3, 4)[not(. = 1) or not(. = (2, 3))]", "3\n4", empty(NOT), count(CmpG.class, 1));
     check("(3, 4)[not(. = (2, 3)) and . != 1]", 4, count(NOT, 1), count(CmpHashG.class, 1));
     check("(3, 4)[not(. = (2, 3)) or . != 1]", "3\n4", empty(NOT), count(CmpG.class, 1));
+  }
+
+  /** Comparisons with empty strings. */
+  @Test public void gh1803() {
+    check("<a/>[namespace-uri() eq '']", "<a/>", exists(NOT), exists(STRING));
+    check("<a/>[local-name() eq '']", "", exists(NOT), empty(STRING));
+    check("attribute { 'a' } { '' }[local-name() = '']", "", exists(NOT), empty(STRING));
+    check("let $x := (<a/>, <a/>) where $x[. eq ''] return $x", "<a/>\n<a/>",
+        exists(NOT), exists(STRING));
+
+    check("string(<_/>) != ''", false, root(BOOLEAN));
+    check("string(<_/>) = ''", true, root(NOT), exists(STRING));
+    check("string(<_/>) <= ''", true, root(NOT), exists(STRING));
+    check("string(<_/>) >= ''", true, root(Bln.class));
+    check("string(<_/>) < ''", false, root(Bln.class));
+
+    check("('', 'a')[string() != '']", "a", root(IterFilter.class), empty(CmpG.class));
+    check("('', 'a')[string() = '']", "", root(IterFilter.class), exists(NOT));
   }
 }

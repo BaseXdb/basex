@@ -101,11 +101,12 @@ public abstract class Cmp extends Arr {
    */
   final Expr opt(final CompileContext cc) throws QueryException {
     final OpV op = opV();
-    Expr expr = optEqual(op, cc);
-    if(expr == this) expr = optBoolean(op, cc);
+    Expr expr = optPos(op, cc);
+    if(expr == this) expr = optEqual(op, cc);
     if(expr == this) expr = optCount(op, cc);
+    if(expr == this) expr = optBoolean(op, cc);
+    if(expr == this) expr = optEmptyString(op, cc);
     if(expr == this) expr = optStringLength(op, cc);
-    if(expr == this) expr = optPos(op, cc);
     return expr;
   }
 
@@ -303,6 +304,30 @@ public abstract class Cmp extends Arr {
       if(arg1 != null) {
         final SeqType st1 = arg1.seqType();
         if(st1.zero() || st1.one() && st1.type.isStringOrUntyped()) return Bln.get(check == 0);
+      }
+    }
+    return this;
+  }
+
+  /**
+   * Tries to rewrite comparisons with empty strings.
+   * @param op operator
+   * @param cc compilation context
+   * @return optimized or original expression
+   * @throws QueryException query exception
+   */
+  private Expr optEmptyString(final OpV op, final CompileContext cc) throws QueryException {
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final SeqType st1 = expr1.seqType();
+    if(st1.one() && st1.type.isStringOrUntyped() && expr2 == Str.ZERO) {
+      if(op == OpV.LT) return Bln.FALSE;
+      if(op == OpV.GE) return Bln.TRUE;
+      // do not rewrite GT, as it may be rewritten to a range expression later on
+      OpV oop = op;
+      if(op != OpV.GT) {
+        // EQ and LE can be treated identically
+        final Function func = oop == OpV.NE ? Function.BOOLEAN : Function.NOT;
+        return cc.function(func, info, cc.function(Function.STRING, info, exprs[0]));
       }
     }
     return this;
