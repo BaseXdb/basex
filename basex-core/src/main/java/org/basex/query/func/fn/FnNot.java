@@ -48,4 +48,11 @@ public final class FnNot extends StandardFunc {
     exprs[0] = expr;
     return this;
   }
+
+  @Override
+  public Expr merge(final Expr ex, final boolean union, final CompileContext cc)
+      throws QueryException {
+    // negation: operator may be inverted in general comparison merge
+    return ex instanceof FnNot ? this : ex.merge(this, union, cc);
+  }
 }

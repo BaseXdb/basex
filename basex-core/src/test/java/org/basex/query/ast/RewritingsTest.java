@@ -880,9 +880,14 @@ public final class RewritingsTest extends QueryPlanTest {
     error("'a' treat as  node()", NOTREAT_X_X_X);
   }
 
-  /** Merge fn:not. */
+  /** Merge of operations with fn:not. */
   @Test public void gh1805() {
     check("<_/>[not(. = ('A', 'B'))][not(. = ('C', 'D'))]", "<_/>", count(CmpHashG.class, 1));
-    check("<_/>[. != 'A'][. != 'B'][. != 'C'][. != 'D']", "<_/>", count(CmpHashG.class, 1));
+    check("<_/>[. != 'A'][. != 'B'][. != 'C'][. != 'D']", "<_/>",   count(CmpHashG.class, 1));
+
+    check("(3, 4)[not(. = 1) and not(. = (2, 3))]", 4, count(NOT, 1), count(CmpHashG.class, 1));
+    check("(3, 4)[not(. = 1) or not(. = (2, 3))]", "3\n4", empty(NOT), count(CmpG.class, 1));
+    check("(3, 4)[not(. = (2, 3)) and . != 1]", 4, count(NOT, 1), count(CmpHashG.class, 1));
+    check("(3, 4)[not(. = (2, 3)) or . != 1]", "3\n4", empty(NOT), count(CmpG.class, 1));
   }
 }

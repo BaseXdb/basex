@@ -299,18 +299,23 @@ public class CmpG extends Cmp {
   }
 
   @Override
-  public Expr merge(final Expr ex, final boolean union, final CompileContext cc)
+  public Expr merge(final Expr expr, final boolean union, final CompileContext cc)
       throws QueryException {
 
+    // OR: merge comparisons
+    // E = 'a' or E = 'b'  ->  E = ('a', 'b')
+    // AND: invert operator, wrap with not()
+    // E != 'a' and E != 'b'  ->  not(E = ('a', 'b'))
+    // negation: invert operator
+    // E != 'a' or not(E = 'b')  ->  E != ('a', 'b')
+    final boolean not = expr instanceof FnNot;
+    final Expr ex = not ? ((FnNot) expr).exprs[0] : expr;
     if(!(ex instanceof CmpG)) return null;
 
     final CmpG g = (CmpG) ex;
-    if(op != g.op || coll != g.coll || !exprs[0].equals(g.exprs[0])) return null;
+    final OpG gop = not ? g.op.invert() : g.op;
+    if(op != gop || coll != g.coll || !exprs[0].equals(g.exprs[0])) return null;
 
-    // merge comparisons:
-    // E = 'a' or E = 'b'  ->  E = ('a', 'b')
-    // conjunctions: invert operator, wrap with not()
-    // E != 'a' and E != 'b'  ->  not(E = ('a', 'b'))
     final Expr list = new List(info, exprs[1], g.exprs[1]).optimize(cc);
     final OpG oop = union ? op : op.invert();
     final Expr oexpr = new CmpG(exprs[0], list, oop, coll, sc, info).optimize(cc);
