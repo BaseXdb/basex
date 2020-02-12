@@ -38,11 +38,11 @@ function dba:sessions(
         <h2>Web Sessions</h2>
         {
           let $headers := (
+            map { 'key': 'id', 'label': 'ID', 'type': 'id' },
             map { 'key': 'name', 'label': 'Name' },
             map { 'key': 'value', 'label': 'Value' },
             map { 'key': 'access', 'label': 'Last Access', 'type': 'dateTime', 'order': 'desc' },
-            map { 'key': 'you', 'label': 'You' },
-            map { 'key': 'id', 'label': 'ID', 'type': 'id' }
+            map { 'key': 'you', 'label': 'You' }
           )
           let $entries :=
             for $id in sessions:ids()
@@ -58,11 +58,11 @@ function dba:sessions(
             let $string := util:chop(serialize($value, map { 'method': 'basex' }), 20)
             order by $access descending
             return map {
+              'id': $id || '|' || $name,
               'name': $name,
               'value': $string,
               'access': $access,
-              'you': $you,
-              'id': $id || '|' || $name
+              'you': $you
             }
           let $buttons := (
             html:button('session-kill', 'Kill', true())
