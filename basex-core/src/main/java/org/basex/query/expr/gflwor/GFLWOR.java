@@ -105,7 +105,7 @@ public final class GFLWOR extends ParseExpr {
     // apply all optimizations in a row until nothing changes anymore
     while(flattenReturn(cc) | flattenFor(cc) | unnestFLWR(cc) | forToLet(cc) | inlineLets(cc) |
         slideLetsOut(cc) | unusedVars(cc) | cleanDeadVars() | optimizeWhere(cc) | optimizePos(cc) |
-        unnestLets(cc) | mergeLastClause());
+        unnestLets(cc) | mergeLastClause() | ifToWhere(cc));
 
     mergeWheres();
 
@@ -604,6 +604,30 @@ public final class GFLWOR extends ParseExpr {
       }
     }
     return false;
+  }
+
+  /**
+   * Rewrites an if expression in the return clause to a where clause.
+   * @param cc compilation context
+   * @return change flag
+   * @throws QueryException query exception
+   */
+  private boolean ifToWhere(final CompileContext cc) throws QueryException {
+    if(!(rtrn instanceof If)) return false;
+
+    // invert condition if first branch is empty
+    final If iff = (If) rtrn;
+    Expr cond = iff.cond, thn = iff.exprs[0], els = iff.exprs[1];
+    if(thn == Empty.VALUE) {
+      thn = els;
+      cond = cc.function(Function.NOT, info, iff.cond);
+    } else if(els != Empty.VALUE) {
+      return false;
+    }
+
+    clauses.add(new Where(cond, iff.info));
+    rtrn = thn;
+    return true;
   }
 
   /**

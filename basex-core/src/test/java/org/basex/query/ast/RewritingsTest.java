@@ -392,9 +392,6 @@ public final class RewritingsTest extends QueryPlanTest {
     // path expression
     check("let $a := <a/> return $a[$a/self::a]", "<a/>", count(VarRef.class, 1));
     check("let $a := <a/> return $a[$a]", "<a/>", empty(VarRef.class));
-
-    // if expression
-    check("for $t in ('a', 'b') return $t[$t]", "a\nb", exists(If.class));
   }
 
   /** Comparison expressions. */
@@ -903,6 +900,19 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("('', 'a')[string() != '']", "a", root(IterFilter.class), empty(CmpG.class));
     check("('', 'a')[string() = '']", "", root(IterFilter.class), exists(NOT));
+  }
+
+  /** Rewrite if to where. */
+  public void gh1806() {
+    check("let $a := <_/> return if ($a = '') then $a else ()", "<_/>",
+        empty(If.class), exists(Where.class));
+    check("for $a in (1, 2) return if ($a = 3) then $a else ()", "",
+        empty(If.class), exists(Where.class), root(IterFilter.class));
+
+    check("for $t in ('a', 'b') return if($t) then $t else ()", "a\nb",
+        root(IterFilter.class), exists(ContextValue.class));
+    check("for $t in ('a', 'b') return $t[$t]", "a\nb",
+        root(IterFilter.class), exists(ContextValue.class));
   }
 
   /** If expression with empty branches. */
