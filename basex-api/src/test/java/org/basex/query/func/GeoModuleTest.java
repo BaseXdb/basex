@@ -13,7 +13,7 @@ import org.junit.*;
 /**
  * This class tests the XQuery Geo functions prefixed with "geo".
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Masoumeh Seydi
  */
 public final class GeoModuleTest extends SandboxTest {

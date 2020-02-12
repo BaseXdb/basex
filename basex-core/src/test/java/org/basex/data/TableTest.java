@@ -11,7 +11,7 @@ import org.junit.Test;
 /**
  * This class tests the stability of the data storage.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Dimitar Popov
  */
 public final class TableTest extends SandboxTest {

@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * A sequence containing more elements than fit into a {@link SmallSeq}.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  */
 final class BigSeq extends TreeSeq {

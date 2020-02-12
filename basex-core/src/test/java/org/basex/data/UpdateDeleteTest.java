@@ -9,7 +9,7 @@ import org.junit.*;
 /**
  * This class tests the update features of the {@link Data} class.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Tim Petrowsky
  */
 public final class UpdateDeleteTest extends DataUpdateTest {

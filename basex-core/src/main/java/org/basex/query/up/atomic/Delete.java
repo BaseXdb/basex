@@ -5,7 +5,7 @@ import org.basex.data.*;
 /**
  * Atomic update operation that deletes a node.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Lukas Kircher
  */
 final class Delete extends StructuralUpdate {

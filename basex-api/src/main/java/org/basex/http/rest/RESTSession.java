@@ -9,7 +9,7 @@ import org.basex.http.*;
 /**
  * REST session.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 final class RESTSession implements Iterable<Command> {

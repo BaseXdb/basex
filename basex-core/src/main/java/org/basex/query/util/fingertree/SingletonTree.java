@@ -5,7 +5,7 @@ import org.basex.query.*;
 /**
  * A tree consisting of a single value.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  *
  * @param <N> node type

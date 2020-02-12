@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Function item with a known data structure (map, array).
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public abstract class XQData extends FItem {

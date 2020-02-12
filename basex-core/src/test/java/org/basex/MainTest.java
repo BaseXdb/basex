@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Tests the command-line arguments of the starter classes.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 abstract class MainTest extends SandboxTest {

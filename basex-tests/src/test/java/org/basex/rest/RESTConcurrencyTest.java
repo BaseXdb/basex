@@ -21,7 +21,7 @@ import org.junit.Test;
 /**
  * Concurrency tests of BaseX REST API.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Dimitar Popov
  */
 public final class RESTConcurrencyTest extends SandboxTest {

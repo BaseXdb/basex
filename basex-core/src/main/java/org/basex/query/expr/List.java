@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * List of expressions that have been separated by commas.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public final class List extends Arr {

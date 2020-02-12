@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  * Function implementation.
  *
  * @author Christian Gruen
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  */
 public final class FnUnparsedTextLines extends Parse {
   @Override
@@ -54,7 +54,7 @@ public final class FnUnparsedTextLines extends Parse {
   /**
    * Line iterator.
    * @author Christian Gruen
-   * @author BaseX Team 2005-19, BSD License
+   * @author BaseX Team 2005-20, BSD License
    */
   private static final class LinesIter extends Iter {
     /** Token builder. */

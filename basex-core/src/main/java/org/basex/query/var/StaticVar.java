@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Static variable to which an expression can be assigned.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  */
 public final class StaticVar extends StaticDecl {

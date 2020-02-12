@@ -6,7 +6,7 @@ import org.basex.util.*;
 /**
  * Expression information, used for debugging and logging.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public abstract class ExprInfo {

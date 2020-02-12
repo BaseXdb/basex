@@ -15,7 +15,7 @@ import org.basex.util.*;
  * Abstract super class for function items.
  * This class is inherited by {@link XQMap}, {@link Array}, and {@link FuncItem}.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  */
 public abstract class FItem extends Item implements XQFunction {

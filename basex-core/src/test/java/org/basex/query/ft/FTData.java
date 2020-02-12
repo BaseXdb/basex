@@ -5,7 +5,7 @@ import org.basex.query.*;
 /**
  * Full-text document and queries.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 abstract class FTData extends QueryTest {

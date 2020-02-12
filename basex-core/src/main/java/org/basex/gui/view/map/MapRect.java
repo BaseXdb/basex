@@ -6,7 +6,7 @@ import org.basex.query.util.ft.*;
 /**
  * View rectangle.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 final class MapRect extends ViewRect implements Comparable<MapRect> {

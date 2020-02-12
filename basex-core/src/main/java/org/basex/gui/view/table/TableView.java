@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * This view creates a flat table view on the database contents.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public final class TableView extends View {

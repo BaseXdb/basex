@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * A leaf node containing {@link Value}s.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  */
 final class LeafNode implements Node<Value, Value> {

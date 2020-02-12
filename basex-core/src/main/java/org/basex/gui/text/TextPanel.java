@@ -29,7 +29,7 @@ import org.basex.util.*;
 /**
  * Renders and provides edit capabilities for text.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public class TextPanel extends BaseXPanel {

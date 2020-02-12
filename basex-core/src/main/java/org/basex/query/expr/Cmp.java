@@ -23,7 +23,7 @@ import org.basex.util.*;
 /**
  * Abstract comparison.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public abstract class Cmp extends Arr {

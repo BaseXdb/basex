@@ -9,7 +9,7 @@ import org.junit.Test;
 /**
  * General test of the XQuery Update Facility implementation.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Jens Erat
  */
 public final class FnIdTest extends SandboxTest {

@@ -14,7 +14,7 @@ import org.basex.util.*;
  * A builder for efficiently creating a {@link Value} by prepending and appending
  * {@link Item}s and {@link Value}s.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  */
 public final class ValueBuilder {

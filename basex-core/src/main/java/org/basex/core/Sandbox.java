@@ -21,7 +21,7 @@ import org.basex.util.options.*;
 /**
  * If this class is extended, tests will be run in a sandbox.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public abstract class Sandbox {

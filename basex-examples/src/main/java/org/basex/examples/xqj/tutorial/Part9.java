@@ -13,7 +13,7 @@ import javax.xml.xquery.*;
  *
  * Part 9: Creating XDM Instances.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  */
 public final class Part9 extends Main {
   /**

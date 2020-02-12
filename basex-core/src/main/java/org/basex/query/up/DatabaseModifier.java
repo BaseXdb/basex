@@ -12,7 +12,7 @@ import org.basex.query.up.primitives.name.*;
  * The database modifier holds all database updates during a snapshot.
  * Database permissions are checked to ensure that a user has enough privileges.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Lukas Kircher
  */
 final class DatabaseModifier extends ContextModifier {

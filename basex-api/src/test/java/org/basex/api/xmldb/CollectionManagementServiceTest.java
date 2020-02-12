@@ -9,7 +9,7 @@ import org.xmldb.api.modules.*;
 /**
  * This class tests the XMLDB/API CollectionManagementService implementation.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public final class CollectionManagementServiceTest extends XMLDBBaseTest {

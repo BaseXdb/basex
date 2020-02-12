@@ -17,7 +17,7 @@ import org.basex.util.*;
 /**
  * Functions on zip files.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public final class ZipUpdateEntries extends ZipZipFile {

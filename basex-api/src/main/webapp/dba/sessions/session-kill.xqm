@@ -1,7 +1,7 @@
 (:~
  : Kill web sessions.
  :
- : @author Christian Grün, BaseX Team 2005-19, BSD License
+ : @author Christian Grün, BaseX Team 2005-20, BSD License
  :)
 module namespace dba = 'dba/sessions';
 

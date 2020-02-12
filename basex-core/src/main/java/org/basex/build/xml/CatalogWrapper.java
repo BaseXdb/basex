@@ -17,7 +17,7 @@ import org.xml.sax.*;
  *
  * The catalog manager is part of Java 9; in future, we can possibly drop this class.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Michael Seiferle
  * @author Liam Quin
  */

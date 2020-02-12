@@ -13,7 +13,7 @@ import org.basex.data.*;
  * Evaluates the 'info storage' command and returns the table representation
  * of the currently opened database.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public final class InfoStorage extends AInfo {

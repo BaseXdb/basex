@@ -22,7 +22,7 @@ import org.junit.runners.Parameterized.Parameters;
 /**
  * Tests for the value index.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Jens Erat
  */
 @RunWith(Parameterized.class)

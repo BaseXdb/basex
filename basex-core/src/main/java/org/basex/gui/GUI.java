@@ -37,7 +37,7 @@ import org.basex.util.options.*;
 /**
  * This class is the main window of the GUI. It is the central instance for user interactions.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public final class GUI extends JFrame implements BaseXWindow {

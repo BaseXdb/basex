@@ -7,7 +7,7 @@ import org.basex.io.*;
 /**
  * EXPath or internal package. Internal packages have no version.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Rositsa Shadura
  */
 public final class Pkg {

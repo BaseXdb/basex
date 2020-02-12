@@ -17,7 +17,7 @@ import org.basex.query.value.seq.*;
 /**
  * This class is an entry point for evaluating XQuery strings.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public final class QueryProcessor extends Job implements Closeable {

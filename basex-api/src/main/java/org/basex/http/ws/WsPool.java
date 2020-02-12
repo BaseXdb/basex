@@ -14,7 +14,7 @@ import org.eclipse.jetty.websocket.api.*;
 /**
  * This class defines a pool for WebSockets. It manages all connected WebSockets.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Johannes Finckh
  */
 public final class WsPool {

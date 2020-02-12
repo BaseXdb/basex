@@ -8,7 +8,7 @@ import org.basex.util.*;
  * This LayoutManager is similar to the GridLayout. The added components
  * keep their minimum size even when the parent container is resized.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public final class TableLayout implements LayoutManager {

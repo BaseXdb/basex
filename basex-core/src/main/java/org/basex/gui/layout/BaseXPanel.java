@@ -7,7 +7,7 @@ import org.basex.gui.*;
 /**
  * Abstract panel implementation with a number of predefined listeners.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public abstract class BaseXPanel extends BaseXBack implements MouseListener, MouseMotionListener,

@@ -11,7 +11,7 @@ import org.basex.query.func.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 abstract class XsltFn extends StandardFunc {

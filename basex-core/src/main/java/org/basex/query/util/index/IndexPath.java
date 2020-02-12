@@ -7,7 +7,7 @@ import org.basex.query.util.list.*;
 /**
  * Index predicate: path expression.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public class IndexPath extends IndexPred {

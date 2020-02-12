@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
 /**
  * Dynamic function call.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  */
 public final class DynFuncCall extends FuncCall {

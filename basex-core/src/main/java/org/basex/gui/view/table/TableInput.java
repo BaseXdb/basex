@@ -12,7 +12,7 @@ import org.basex.gui.layout.*;
 /**
  * This class allows simple text input for the table headers.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 final class TableInput {

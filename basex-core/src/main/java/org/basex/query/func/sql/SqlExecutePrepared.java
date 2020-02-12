@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Functions on relational databases.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Rositsa Shadura
  */
 public final class SqlExecutePrepared extends SqlExecute {

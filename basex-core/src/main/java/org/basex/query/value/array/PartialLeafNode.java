@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * A partial leaf node containing fewer elements than required in a node.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  */
 final class PartialLeafNode implements NodeLike<Value, Value> {

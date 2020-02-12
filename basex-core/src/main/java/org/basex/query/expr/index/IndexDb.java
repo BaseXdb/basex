@@ -12,7 +12,7 @@ import org.basex.util.hash.*;
 /**
  * This class defines the database source for index operations.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public abstract class IndexDb extends ParseExpr {

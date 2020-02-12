@@ -5,7 +5,7 @@ import java.awt.event.*;
 /**
  * Listener interface for handling mouse clicks.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public interface MouseClickedListener extends MouseListener {

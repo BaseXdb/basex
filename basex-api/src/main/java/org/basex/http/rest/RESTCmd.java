@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Abstract class for performing REST operations.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 abstract class RESTCmd extends Command {

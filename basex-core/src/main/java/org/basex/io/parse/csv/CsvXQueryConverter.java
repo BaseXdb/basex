@@ -10,7 +10,7 @@ import org.basex.query.value.map.*;
 /**
  * This class converts CSV data to an XQuery representation.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public final class CsvXQueryConverter extends CsvConverter {

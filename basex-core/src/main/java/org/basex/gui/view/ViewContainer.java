@@ -13,7 +13,7 @@ import org.basex.util.*;
  * This class manages all visible and invisible views and allows drag and
  * drop operations inside the panel.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public final class ViewContainer extends BaseXBack {

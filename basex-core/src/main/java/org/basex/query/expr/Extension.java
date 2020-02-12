@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Pragma extension.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  */
 public final class Extension extends Single {

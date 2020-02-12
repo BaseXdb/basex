@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * This collations is based on a standard Java collator.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 final class BaseXCollation extends Collation {

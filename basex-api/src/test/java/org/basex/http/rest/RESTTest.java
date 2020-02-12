@@ -14,7 +14,7 @@ import org.junit.*;
 /**
  * This class tests the embedded REST API.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public abstract class RESTTest extends HTTPTest {

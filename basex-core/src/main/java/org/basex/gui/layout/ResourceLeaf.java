@@ -6,7 +6,7 @@ import org.basex.core.*;
  * JTree node which represents a leaf (which represents either a raw file
  * or a document).
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Lukas Kircher
  */
 public final class ResourceLeaf extends ResourceNode {

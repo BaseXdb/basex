@@ -6,7 +6,7 @@ import org.basex.util.*;
 /**
  * Costs of index request.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public final class IndexCosts implements Comparable<IndexCosts> {

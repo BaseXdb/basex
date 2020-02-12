@@ -37,7 +37,7 @@ import org.basex.util.options.*;
 /**
  * Built-in functions.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public abstract class StandardFunc extends Arr {

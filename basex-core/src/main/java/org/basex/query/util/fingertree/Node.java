@@ -3,7 +3,7 @@ package org.basex.query.util.fingertree;
 /**
  * A node inside a digit.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  *
  * @param <N> node type

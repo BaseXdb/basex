@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
 /**
  * Higher-order function.
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  */
 abstract class HofFn extends StandardFunc {

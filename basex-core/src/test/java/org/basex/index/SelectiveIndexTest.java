@@ -12,7 +12,7 @@ import org.junit.Test;
 /**
  * Storage tests for the selective index feature (#59).
  *
- * @author BaseX Team 2005-19, BSD License
+ * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
 public final class SelectiveIndexTest extends SandboxTest {
