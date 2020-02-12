@@ -1,6 +1,7 @@
 package org.basex.query.func.prof;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -27,5 +28,10 @@ public final class ProfVoid extends StandardFunc {
       value.cache(false, ii);
     }
     return Empty.VALUE;
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    return Function._PROF_VOID.is(exprs[0]) ? exprs[0] : this;
   }
 }

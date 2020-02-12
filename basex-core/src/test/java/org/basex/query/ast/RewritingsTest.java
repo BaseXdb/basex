@@ -904,4 +904,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("('', 'a')[string() != '']", "a", root(IterFilter.class), empty(CmpG.class));
     check("('', 'a')[string() = '']", "", root(IterFilter.class), exists(NOT));
   }
+
+  /** If expression with empty branches. */
+  @Test public void gh1809() {
+    check("if(<_>1</_>[. = 1]) then () else ()", "", empty());
+    check("if(prof:void(1)) then () else ()", "", root(_PROF_VOID), count(_PROF_VOID, 1));
+  }
 }

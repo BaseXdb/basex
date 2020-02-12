@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
  */
 public final class If extends Arr {
   /** If expression. */
-  private Expr cond;
+  public Expr cond;
 
   /**
    * Constructor with empty 'else' branch.
@@ -76,7 +76,12 @@ public final class If extends Arr {
     if(cond instanceof Value) return cc.replaceWith(this, exprs[branch(cc.qc)]);
 
     // if A then B else B -> B (errors in A will be ignored)
-    if(exprs[0].equals(exprs[1]) && !cond.has(Flag.NDT)) return cc.replaceWith(this, exprs[0]);
+    if(exprs[0].equals(exprs[1])) {
+      if(!cond.has(Flag.NDT))
+        return cc.replaceWith(this, exprs[0]);
+      if(exprs[0] == Empty.VALUE)
+        return cc.replaceWith(this, cc.function(Function._PROF_VOID, info, cond));
+    }
 
     // if not(A) then B else C -> if A then C else B
     if(Function.NOT.is(cond)) {
@@ -90,30 +95,30 @@ public final class If extends Arr {
     // rewritings for constant booleans
     final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
     if(st1.eq(SeqType.BLN_O) && st2.eq(SeqType.BLN_O)) {
-      final Expr a = cond, b = exprs[0], c = exprs[1];
-      if(b == Bln.TRUE) {
+      final Expr br1 = exprs[0], br2 = exprs[1];
+      if(br1 == Bln.TRUE) {
         // if(A) then true() else false() -> xs:boolean(A)
-        if(c == Bln.FALSE) return cc.replaceWith(this, FnBoolean.get(a, info, cc.sc()));
+        if(br2 == Bln.FALSE) return cc.replaceWith(this, FnBoolean.get(cond, info, cc.sc()));
         // if(A) then true() else C -> A or C
-        return cc.replaceWith(this, new Or(info, a, c).optimize(cc));
+        return cc.replaceWith(this, new Or(info, cond, br2).optimize(cc));
       }
 
-      if(c == Bln.TRUE) {
+      if(br2 == Bln.TRUE) {
         // if(A) then false() else true() -> not(A)
-        if(b == Bln.FALSE) return cc.replaceWith(this, cc.function(Function.NOT, info, a));
+        if(br1 == Bln.FALSE) return cc.replaceWith(this, cc.function(Function.NOT, info, cond));
         // if(A) then B else true() -> not(A) or B
-        final Expr expr = new Or(info, cc.function(Function.NOT, info, a), b).optimize(cc);
+        final Expr expr = new Or(info, cc.function(Function.NOT, info, cond), br1).optimize(cc);
         return cc.replaceWith(this, expr);
       }
 
       // if(A) then false() else C -> not(A) and C
-      if(b == Bln.FALSE) {
-        final Expr expr = new And(info, cc.function(Function.NOT, info, a), c).optimize(cc);
+      if(br1 == Bln.FALSE) {
+        final Expr expr = new And(info, cc.function(Function.NOT, info, cond), br2).optimize(cc);
         return cc.replaceWith(this, expr);
       }
 
       // if(A) then B else false() -> A and B
-      if(c == Bln.FALSE) return cc.replaceWith(this, new And(info, a, b).optimize(cc));
+      if(br2 == Bln.FALSE) return cc.replaceWith(this, new And(info, cond, br1).optimize(cc));
     }
 
     exprType.assign(st1.union(st2));
