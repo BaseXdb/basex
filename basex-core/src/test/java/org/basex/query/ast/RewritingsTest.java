@@ -902,6 +902,21 @@ public final class RewritingsTest extends QueryPlanTest {
     check("('', 'a')[string() = '']", "", root(IterFilter.class), exists(NOT));
   }
 
+  /** Comparisons with simple map operands. */
+  @Test public void gh1804() {
+    // rewritings in comparisons
+    check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class), empty(IterMap.class));
+    check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class), empty(IterMap.class));
+    check("let $a := <_>A</_> return $a ! text() = $a ! text()", true,
+        count(IterPath.class, 2), empty(IterMap.class));
+
+    // EBV rewritings
+    check("<a><b/></a>[b ! ..]", "<a>\n<b/>\n</a>", exists(CachedPath.class), empty(IterMap.class));
+
+    // do not rewrite absolute paths
+    check("<a>a</a>/string() ! <x>{ . }</x>/text() = 'a'", true, exists(IterMap.class));
+  }
+
   /** Rewrite if to where. */
   public void gh1806() {
     check("let $a := <_/> return if ($a = '') then $a else ()", "<_/>",

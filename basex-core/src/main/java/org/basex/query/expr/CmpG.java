@@ -175,6 +175,11 @@ public class CmpG extends Cmp {
       if(expr == this) expr = CmpSR.get(this, cc);
 
       if(expr == this) {
+        // convert maps to paths
+        for(int e = 0; e < 2; e++) {
+          if(exprs[e] instanceof SimpleMap) exprs[e] = ((SimpleMap) exprs[e]).toPath(cc);
+        }
+
         final Expr expr1 = exprs[0], expr2 = exprs[1];
         final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
         final Type type1 = st1.type, type2 = st2.type;

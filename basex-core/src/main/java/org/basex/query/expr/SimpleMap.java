@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -218,12 +219,38 @@ public abstract class SimpleMap extends Arr {
     return item;
   }
 
+  /**
+   * Converts the map to a path expression.
+   * @param cc compilation context
+   * @return converted or original expression
+   * @throws QueryException query context
+   */
+  public Expr toPath(final CompileContext cc) throws QueryException {
+    Expr root = exprs[0];
+    final ExprList steps = new ExprList();
+    if(root instanceof AxisPath) {
+      final AxisPath path = (AxisPath) root;
+      root = path.root;
+      steps.add(path.steps);
+    }
+    final int el = exprs.length;
+    for(int e = 1; e < el; e++) {
+      if(!(exprs[e] instanceof AxisPath)) return this;
+      final AxisPath path = (AxisPath) exprs[e];
+      if(path.root != null) return this;
+      steps.add(path.steps);
+    }
+    return cc.replaceWith(this, Path.get(info, root, steps.finish()).optimize(cc));
+  }
 
   @Override
   public final Expr simplifyFor(final AtomType type, final CompileContext cc)
       throws QueryException {
 
-    if(type != AtomType.BLN) {
+    if(type == AtomType.BLN) {
+      final Expr expr = toPath(cc);
+      if(expr != this) return expr;
+    } else {
       final int el = exprs.length - 1;
       cc.pushFocus(exprs[el - 1]);
       Expr expr = exprs[el];
