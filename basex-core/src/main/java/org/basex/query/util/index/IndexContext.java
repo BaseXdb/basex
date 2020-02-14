@@ -1,7 +1,9 @@
 package org.basex.query.util.index;
 
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
+import org.basex.util.*;
 
 /**
  * Index predicate: context expression.
@@ -11,16 +13,23 @@ import org.basex.query.expr.path.*;
  */
 public class IndexContext extends IndexPred {
   /**
+   * Constructor.
+   * @param ii index info
+   */
+  IndexContext(final IndexInfo ii) {
+    super(ii);
+  }
+
+  /**
    * Returns the last step pointing to the requested nodes. Examples:
    * <ul>
    *   <li>{@code /xml/a[. = 'A']}        -> {@code a}</li>
    *   <li>{@code /xml/a/text()[. = 'A']} -> {@code text()}</li>
    * </ul>
-   * @param ii index info
    * @return parent step
    */
   @Override
-  Step step(final IndexInfo ii) {
+  Step step() {
     return ii.step;
   }
 
@@ -30,19 +39,21 @@ public class IndexContext extends IndexPred {
    *   <li> //x[. = 'TEXT']  -> x </li>
    *   <li> //@x[. = 'TEXT'] -> x </lI>
    * </ul>
-   * @param ii index info
    * @return parent step
    */
   @Override
-  Step qname(final IndexInfo ii) {
+  Step qname() {
     return ii.step;
   }
 
   @Override
-  ParseExpr invert(final ParseExpr root, final IndexInfo ii) {
-    final Step step = ii.step;
-    if(ii.text || !(step.test instanceof NameTest || step.test instanceof UnionTest)) return root;
+  Expr invert(final Expr root) throws QueryException {
+    final Step st = ii.step;
+    if(ii.text || !(st.test instanceof NameTest || st.test instanceof UnionTest)) return root;
+
     // attribute index request: add attribute step
-    return Path.get(root.info, root, Step.get(step.info, Axis.SELF, step.test));
+    final InputInfo info = root instanceof ParseExpr ? ((ParseExpr) root).info : null;
+    final Expr step = new StepBuilder(st.info).test(st.test).finish(ii.cc, root);
+    return Path.get(info, root, step);
   }
 }

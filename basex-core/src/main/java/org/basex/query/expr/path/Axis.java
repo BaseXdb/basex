@@ -143,7 +143,7 @@ public enum Axis {
    * Inverts the axis.
    * @return inverted axis
    */
-  final Axis invert() {
+  public final Axis invert() {
     switch(this) {
       case ANCESTOR:           return DESCENDANT;
       case ANCESTOR_OR_SELF:   return DESCENDANT_OR_SELF;

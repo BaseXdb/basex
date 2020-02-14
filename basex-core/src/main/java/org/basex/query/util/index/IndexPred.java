@@ -1,5 +1,6 @@
 package org.basex.query.util.index;
 
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 
@@ -10,36 +11,46 @@ import org.basex.query.expr.path.*;
  * @author Christian Gruen
  */
 abstract class IndexPred {
+  /** Index info. */
+  final IndexInfo ii;
+
+  /**
+   * Constructor.
+   * @param ii index info
+   */
+  IndexPred(final IndexInfo ii) {
+    this.ii = ii;
+  }
+
   /**
    * Creates an index predicate instance.
    * @param expr predicate expression
+   * @param ii index info
    * @return index predicate or {@code null}
    */
-  static IndexPred get(final Expr expr) {
-    if(expr instanceof ContextValue) return new IndexContext();
-    if(expr instanceof AxisPath) return new IndexPath((AxisPath) expr);
+  static IndexPred get(final Expr expr, final IndexInfo ii) {
+    if(expr instanceof ContextValue) return new IndexContext(ii);
+    if(expr instanceof AxisPath) return new IndexPath((AxisPath) expr, ii);
     return null;
   }
 
   /**
    * Returns the most specific step in the path that points to the index values.
-   * @param ii index info
    * @return step or {@code null}
    */
-  abstract Step step(IndexInfo ii);
+  abstract Step step();
 
   /**
    * Returns the step pointing to the element or attribute node.
-   * @param ii index info
    * @return step with name
    */
-  abstract Step qname(IndexInfo ii);
+  abstract Step qname();
 
   /**
    * Rewrites an inverted path expression.
    * @param root new root expression
-   * @param ii index info
    * @return path
+   * @throws QueryException query exception
    */
-  abstract ParseExpr invert(ParseExpr root, IndexInfo ii);
+  abstract Expr invert(Expr root) throws QueryException;
 }

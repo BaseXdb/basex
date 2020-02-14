@@ -179,7 +179,7 @@ public final class CmpR extends Single {
   }
 
   @Override
-  public boolean indexAccessible(final IndexInfo ii) {
+  public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     // accept only location path, string and equality expressions
     final Data data = ii.db.data();
     // sequential main memory scan is usually faster than range index access

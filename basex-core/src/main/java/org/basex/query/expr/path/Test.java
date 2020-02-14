@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -63,11 +62,11 @@ public abstract class Test extends ExprInfo {
 
   /**
    * Optimizes the expression.
-   * @param value context value (can be {@code null})
+   * @param expr root expression (can be {@code null})
    * @return false if test always returns false
    */
   @SuppressWarnings("unused")
-  public boolean optimize(final Value value) {
+  public boolean optimize(final Expr expr) {
     return true;
   }
 

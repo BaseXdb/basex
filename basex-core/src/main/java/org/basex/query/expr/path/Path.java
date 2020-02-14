@@ -33,6 +33,8 @@ public abstract class Path extends ParseExpr {
   public Expr root;
   /** Path steps. */
   public Expr[] steps;
+  /** Data reference (can be {@code null}). */
+  private Data data;
 
   /**
    * Constructor.
@@ -161,7 +163,9 @@ public abstract class Path extends ParseExpr {
     if(expr != this) return expr.optimize(cc);
 
     // choose best path implementation (dummy will be used for type checking)
-    return copyType(get(info, root == null && rt instanceof Dummy ? rt : root, steps));
+    final Path path = get(info, root == null && rt instanceof Dummy ? rt : root, steps);
+    path.data = data;
+    return copyType(path);
   }
 
   @Override
@@ -312,10 +316,8 @@ public abstract class Path extends ParseExpr {
    */
   public final ArrayList<PathNode> pathNodes(final Expr rt) {
     // ensure that path starts with document nodes
-    if(rt == null || !rt.seqType().instanceOf(SeqType.DOC_ZM)) return null;
-
-    final Data data = rt.data();
-    if(data == null || !data.meta.uptodate) return null;
+    if(rt == null || !rt.seqType().instanceOf(SeqType.DOC_ZM) || data == null ||
+        !data.meta.uptodate) return null;
 
     ArrayList<PathNode> nodes = data.paths.root();
     final int sl = steps.length;
@@ -397,6 +399,8 @@ public abstract class Path extends ParseExpr {
    * @param rt compile time root (can be {@code null})
    */
   private void seqType(final Expr rt) {
+    if(rt != null) data = rt.data();
+
     final Type type = steps[steps.length - 1].seqType().type;
     Occ occ = Occ.ZERO_MORE;
     long size = size(rt);
@@ -428,13 +432,12 @@ public abstract class Path extends ParseExpr {
       if(step.size() == 0) return 0;
     }
 
-    // skip computation if path does not start with document nodes
-    if(rt == null || !rt.seqType().instanceOf(SeqType.DOC_ZM)) return -1;
-
-    // skip computation if no database instance is available, is outdated, or
-    // if context does not contain all database nodes
-    final Data data = rt.data();
-    if(data == null || !data.meta.uptodate || data.meta.ndocs != rt.size()) return -1;
+    // skip computation if:
+    // - path does not start with document nodes,
+    // - no database instance is available, outdated, or
+    // - if context does not contain all database nodes
+    if(rt == null || !rt.seqType().instanceOf(SeqType.DOC_ZM) ||
+        data == null || !data.meta.uptodate || data.meta.ndocs != rt.size()) return -1;
 
     ArrayList<PathNode> nodes = data.paths.root();
     long lastSize = 1;
@@ -460,11 +463,10 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Returns all summary path nodes for the specified location step.
-   * @param data data reference (can be {@code null})
    * @param last last step to be checked
    * @return path nodes, or {@code null} if nodes cannot be retrieved
    */
-  private ArrayList<PathNode> pathNodes(final Data data, final int last) {
+  private ArrayList<PathNode> pathNodes(final int last) {
     // skip request if no path index exists or might be out-of-date
     if(data == null || !data.meta.uptodate) return null;
 
@@ -527,14 +529,15 @@ public abstract class Path extends ParseExpr {
    * @param cc compilation context
    * @param rt compile time root (can be {@code null})
    * @return original or new expression
+   * @throws QueryException query exception
    */
-  private Expr children(final CompileContext cc, final Expr rt) {
-    // skip optimization if path does not start with document nodes
-    if(rt == null || !rt.seqType().instanceOf(SeqType.DOC_ZM)) return this;
-
-    // skip if index does not exist or is out-dated, or if several namespaces occur in the input
-    final Data data = rt.data();
-    if(data == null || !data.meta.uptodate || data.nspaces.globalUri() == null) return this;
+  private Expr children(final CompileContext cc, final Expr rt) throws QueryException {
+    // skip optimization...
+    // - if path does not start with document nodes
+    // - if index does not exist or is out-dated
+    // - if several namespaces occur in the input
+    if(rt == null || !rt.seqType().instanceOf(SeqType.DOC_ZM) ||
+        data == null || !data.meta.uptodate || data.nspaces.globalUri() == null) return this;
 
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
@@ -547,7 +550,7 @@ public abstract class Path extends ParseExpr {
       if(curr == null || curr.axis != DESCENDANT || curr.positional()) continue;
 
       // check if child steps can be retrieved for current step
-      ArrayList<PathNode> nodes = pathNodes(data, s);
+      ArrayList<PathNode> nodes = pathNodes(s);
       if(nodes == null) continue;
 
       // cache child steps
@@ -575,7 +578,7 @@ public abstract class Path extends ParseExpr {
         final QNm qName = qNames.get(ts - t - 1);
         final Test test = qName == null ? KindTest.ELM :
           new NameTest(NodeType.ELM, qName, NamePart.LOCAL, null);
-        stps[t] = Step.get(info, CHILD, test, preds);
+        stps[t] = new StepBuilder(curr.info).axis(CHILD).test(test).preds(preds).finish(cc, root);
       }
       while(++s < sl) stps[ts++] = steps[s];
 
@@ -647,7 +650,6 @@ public abstract class Path extends ParseExpr {
     int indexPred = 0, indexStep = 0;
 
     // check if path can be converted to an index access
-    final Data data = rt.data();
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
       // only accept descendant steps without positional predicates
@@ -664,7 +666,7 @@ public abstract class Path extends ParseExpr {
 
         // choose cheapest index access
         for(int e = 0; e < el; e++) {
-          final IndexInfo ii = new IndexInfo(db, cc.qc, step);
+          final IndexInfo ii = new IndexInfo(db, cc, step);
           if(!step.exprs[e].indexAccessible(ii)) continue;
 
           if(ii.costs.results() == 0) {
@@ -694,18 +696,20 @@ public abstract class Path extends ParseExpr {
     final ExprList newPreds = new ExprList();
     final Test rootTest = InvDocTest.get(rt);
     final ExprList invSteps = new ExprList();
-    if(rootTest != KindTest.DOC || data == null || !data.meta.uptodate ||
-        invertSteps(data, indexStep)) {
+    if(rootTest != KindTest.DOC || data == null || !data.meta.uptodate || invertSteps(indexStep)) {
       for(int s = indexStep; s >= 0; s--) {
         final Axis invAxis = axisStep(s).axis.invert();
         if(s == 0) {
           // add document test for collections and axes other than ancestors
-          if(rootTest != KindTest.DOC || invAxis != ANCESTOR && invAxis != ANCESTOR_OR_SELF)
-            invSteps.add(Step.get(info, invAxis, rootTest));
+          if(rootTest != KindTest.DOC || invAxis != ANCESTOR && invAxis != ANCESTOR_OR_SELF) {
+            invSteps.add(new StepBuilder(info).axis(invAxis).test(rootTest).finish(cc, root));
+          }
         } else {
           final Step prevStep = axisStep(s - 1);
           final Axis newAxis = prevStep.axis == ATTRIBUTE ? ATTRIBUTE : invAxis;
-          invSteps.add(Step.get(info, newAxis, prevStep.test, prevStep.exprs));
+          final Expr newStep = new StepBuilder(prevStep.info).axis(newAxis).test(prevStep.test).
+              preds(prevStep.exprs).finish(cc, root);
+          invSteps.add(newStep);
         }
       }
     }
@@ -737,16 +741,16 @@ public abstract class Path extends ParseExpr {
 
     if(!newPreds.isEmpty()) {
       int ls = resultSteps.size() - 1;
-      final Step step;
+      final Expr step;
       if(ls < 0 || !(resultSteps.get(ls) instanceof Step)) {
         // add at least one self axis step
-        step = Step.get(info, SELF, KindTest.NOD);
+        step = new StepBuilder(info).preds(newPreds.finish()).finish(cc, root);
         ls++;
       } else {
-        step = (Step) resultSteps.get(ls);
+        step = ((Step) resultSteps.get(ls)).addPreds(newPreds.finish());
       }
       // add remaining predicates to last step
-      resultSteps.set(ls, step.addPreds(newPreds.finish()));
+      resultSteps.set(ls, step);
     }
 
     // add remaining steps
@@ -756,11 +760,10 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Checks if steps before index step need to be inverted and traversed.
-   * @param data data reference
    * @param i index step
    * @return result of check
    */
-  private boolean invertSteps(final Data data, final int i) {
+  private boolean invertSteps(final int i) {
     for(int s = i; s >= 0; s--) {
       final Step step = axisStep(s);
       // ensure that the index step does not use wildcard
@@ -999,6 +1002,11 @@ public abstract class Path extends ParseExpr {
     int size = 1;
     for(final Expr step : steps) size += step.exprSize();
     return root == null ? size : size + root.exprSize();
+  }
+
+  @Override
+  public final Data data() {
+    return data;
   }
 
   @Override

@@ -9,6 +9,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -934,5 +935,12 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1809() {
     check("if(<_>1</_>[. = 1]) then () else ()", "", empty());
     check("if(prof:void(1)) then () else ()", "", root(_PROF_VOID), count(_PROF_VOID, 1));
+  }
+
+  /** Simple map, index rewritings. */
+  @Test public void gh1814() {
+    execute(new CreateDB(NAME, "<x><y><z>A</z></y></x>"));
+    check("exists(x[y/z = 'A'])", true, exists(ValueAccess.class));
+    check("exists(x[y ! z = 'A'])", true, exists(ValueAccess.class));
   }
 }

@@ -37,20 +37,36 @@ public abstract class Preds extends Arr {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    final QueryFocus focus = cc.qc.focus;
-    final Value init = focus.value;
+    type(cc.qc.focus.value, cc);
+
     final int pl = exprs.length;
-    for(int p = 0; p < pl; ++p) {
+    if(pl != 0) {
+      cc.pushFocus(this);
       try {
-        exprs[p] = exprs[p].compile(cc);
-      } catch(final QueryException ex) {
-        // replace original expression with error
-        exprs[p] = cc.error(ex, this);
+        final QueryFocus focus = cc.qc.focus;
+        final Value init = focus.value;
+        for(int p = 0; p < pl; ++p) {
+          try {
+            exprs[p] = exprs[p].compile(cc);
+          } catch(final QueryException ex) {
+            // replace original expression with error
+            exprs[p] = cc.error(ex, this);
+          }
+        }
+        focus.value = init;
+      } finally {
+        cc.removeFocus();
       }
     }
-    focus.value = init;
-    return this;
+    return optimize(cc);
   }
+
+  /**
+   * Assigns the expression type. Needs to be called before the predicates are compiled.
+   * @param expr root expression
+   * @param cc compilation context
+   */
+  protected abstract void type(Expr expr, CompileContext cc);
 
   /**
    * Adds an expression to the new expression list.
@@ -134,10 +150,10 @@ public abstract class Preds extends Arr {
   }
 
   /**
-   * Optimizes the expression.
+   * Optimizes all predicates.
    * @param cc compilation context
    * @param root root expression
-   * @return whether expression may yield results
+   * @return {@code true} if expression may yield results
    * @throws QueryException query exception
    */
   protected final boolean optimize(final CompileContext cc, final Expr root) throws QueryException {

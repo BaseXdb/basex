@@ -49,8 +49,8 @@ public abstract class StandardFunc extends Arr {
   /** Static context. */
   public StaticContext sc;
 
-  /** Data opened at compile time. */
-  protected Data compiledData;
+  /** Data reference (can be {@code null}). */
+  private Data data;
 
   /**
    * Constructor.
@@ -125,7 +125,7 @@ public abstract class StandardFunc extends Arr {
     final Expr[] arg = new Expr[el];
     for(int e = 0; e < el; e++) arg[e] = exprs[e].copy(cc, vm);
     final StandardFunc sf = definition.function.get(sc, info, arg);
-    sf.compiledData = compiledData;
+    sf.data = data;
     return copyType(sf);
   }
 
@@ -245,15 +245,15 @@ public abstract class StandardFunc extends Arr {
    */
   protected final Expr compileData(final CompileContext cc) throws QueryException {
     if(exprs.length > 0 && exprs[0] instanceof Value) {
-      compiledData = checkData(cc.qc);
-      cc.info(QueryText.OPTOPEN_X, compiledData.meta.name);
+      data = checkData(cc.qc);
+      cc.info(QueryText.OPTOPEN_X, data.meta.name);
     }
     return this;
   }
 
   @Override
   public final Data data() {
-    return compiledData;
+    return data;
   }
 
   /**
@@ -474,7 +474,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final Data checkData(final QueryContext qc) throws QueryException {
-    if(compiledData != null) return compiledData;
+    if(data != null) return data;
     final String name = string(toToken(exprs[0], qc));
     if(!Databases.validName(name)) throw INVDB_X.get(info, name);
     return qc.resources.database(name, info);

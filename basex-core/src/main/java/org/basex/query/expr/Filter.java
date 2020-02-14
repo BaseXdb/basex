@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
-import static org.basex.query.expr.path.Axis.*;
-
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.gflwor.*;
@@ -67,13 +66,7 @@ public abstract class Filter extends Preds {
   @Override
   public final Expr compile(final CompileContext cc) throws QueryException {
     root = root.compile(cc);
-    cc.pushFocus(root);
-    try {
-      super.compile(cc);
-    } finally {
-      cc.removeFocus();
-    }
-    return optimize(cc);
+    return super.compile(cc);
   }
 
   @Override
@@ -95,8 +88,8 @@ public abstract class Filter extends Preds {
       // rewrite filter with document nodes to path; enables index rewritings
       // example: db:open('db')[.//text() = 'x'] -> db:open('db')/.[.//text() = 'x']
       if(st.type == NodeType.DOC && root.ddo()) {
-        final Expr path = Path.get(info, root, Step.get(info, SELF, KindTest.NOD, exprs));
-        return cc.replaceWith(this, path.optimize(cc));
+        final Expr step = new StepBuilder(info).preds(exprs).finish(cc, root);
+        return cc.replaceWith(this, Path.get(info, root, step).optimize(cc));
       }
 
       // rewrite independent deterministic single filter to if expression:
@@ -189,6 +182,11 @@ public abstract class Filter extends Preds {
     return expr instanceof ParseExpr ? copyType((ParseExpr) expr) : expr;
   }
 
+  @Override
+  protected final void type(final Expr expr, final CompileContext cc) {
+    exprType.assign(root.seqType().type);
+  }
+
   /**
    * Adds a predicate to the filter.
    * This function is e.g. called by {@link For#addPredicate}.
@@ -249,6 +247,11 @@ public abstract class Filter extends Preds {
       }
     }
     return changed ? optimize(cc) : null;
+  }
+
+  @Override
+  public final Data data() {
+    return root.data();
   }
 
   @Override

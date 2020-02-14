@@ -26,8 +26,8 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class IndexInfo {
-  /** Query context. */
-  public final QueryContext qc;
+  /** Compilation context. */
+  public final CompileContext cc;
   /** Index database. */
   public final IndexDb db;
   /** Step with predicate that can be rewritten for index access. */
@@ -50,11 +50,11 @@ public final class IndexInfo {
   /**
    * Constructor.
    * @param db index database
-   * @param qc query context
+   * @param cc compilation context
    * @param step step containing the rewritable predicate
    */
-  public IndexInfo(final IndexDb db, final QueryContext qc, final Step step) {
-    this.qc = qc;
+  public IndexInfo(final IndexDb db, final CompileContext cc, final Step step) {
+    this.cc = cc;
     this.db = db;
     this.step = step;
   }
@@ -67,11 +67,11 @@ public final class IndexInfo {
    * @return resulting index type, or {@code null} if index access is not possible
    */
   public IndexType type(final Expr input, final IndexType type) {
-    pred = IndexPred.get(input);
+    pred = IndexPred.get(input, this);
     if(pred == null) return null;
 
     // find last step that will be evaluated before doing a comparison
-    final Step last = pred.step(this);
+    final Step last = pred.step();
     if(last == null) return null;
 
     final Data data = db.data();
@@ -104,7 +104,7 @@ public final class IndexInfo {
       // check if required index exists
       if(!data.meta.index(it)) return null;
       // check if targeted name is contained in the index
-      final Step st = pred.qname(this);
+      final Step st = pred.qname();
       byte[][] qname = null;
       if(st.test instanceof NameTest) {
         final NameTest nt = (NameTest) st.test;
@@ -136,9 +136,9 @@ public final class IndexInfo {
     final ParseExpr root;
     if(search instanceof Value) {
       // loop through all items
-      final Iter iter = search.iter(qc);
+      final Iter iter = search.iter(cc.qc);
       final TokenIntMap cache = new TokenIntMap();
-      for(Item item; (item = qc.next(iter)) != null;) {
+      for(Item item; (item = cc.qc.next(iter)) != null;) {
         // only strings and untyped items are supported
         if(!item.type.isStringOrUntyped()) return false;
         // do not use text/attribute index if string is empty or too long
@@ -196,13 +196,19 @@ public final class IndexInfo {
    * @param parent add parent step
    * @param opt optimization info
    * @param ii input info
+   * @throws QueryException query exception
    */
   public void create(final ParseExpr root, final boolean parent, final String opt,
-      final InputInfo ii) {
+      final InputInfo ii) throws QueryException {
 
-    final ParseExpr rt = test == null || !parent ? root :
-      Path.get(ii, root, Step.get(ii, Axis.PARENT, test));
-    expr = pred.invert(rt, this);
+    final Expr rt;
+    if(test == null || !parent) {
+      rt = root;
+    } else {
+      final Expr st = new StepBuilder(ii).axis(Axis.PARENT).test(test).finish(cc, root);
+      rt = Path.get(ii, root, st).optimize(cc);
+    }
+    expr = pred.invert(rt);
     optInfo = opt;
   }
 
@@ -221,6 +227,6 @@ public final class IndexInfo {
    * @return result of check
    */
   public boolean enforce() {
-    return qc.context.options.get(MainOptions.ENFORCEINDEX);
+    return cc.qc.context.options.get(MainOptions.ENFORCEINDEX);
   }
 }

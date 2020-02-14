@@ -1,12 +1,10 @@
 package org.basex.query.expr.path;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.PathCache.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -98,37 +96,12 @@ public abstract class AxisPath extends Path {
   protected abstract Value nodes(QueryContext qc) throws QueryException;
 
   /**
-   * Inverts a location path.
-   * @param rt new root node
-   * @param curr current location step
-   * @return inverted path
-   */
-  public final Path invertPath(final Expr rt, final Step curr) {
-    // add predicates of last step to new root node
-    int s = steps.length - 1;
-    final Expr r = step(s).exprs.length == 0 ? rt : Filter.get(info, rt, step(s).exprs);
-
-    // add inverted steps in a backward manner
-    final ExprList stps = new ExprList();
-    while(--s >= 0) {
-      stps.add(Step.get(info, step(s + 1).axis.invert(), step(s).test, step(s).exprs));
-    }
-    stps.add(Step.get(info, step(s + 1).axis.invert(), curr.test));
-    return Path.get(info, r, stps.finish());
-  }
-
-  /**
    * Returns the specified axis step.
-   * @param i index
+   * @param index index
    * @return step
    */
-  public final Step step(final int i) {
-    return (Step) steps[i];
-  }
-
-  @Override
-  public final Data data() {
-    return root != null ? root.data() : null;
+  public final Step step(final int index) {
+    return (Step) steps[index];
   }
 
   /**

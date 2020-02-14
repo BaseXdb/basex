@@ -161,7 +161,7 @@ public final class CmpSR extends Single {
   }
 
   @Override
-  public boolean indexAccessible(final IndexInfo ii) {
+  public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     // only default collation is supported, and min/max values are required
     if(coll != null || min == null || max == null) return false;
 

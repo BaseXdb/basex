@@ -72,37 +72,37 @@ public abstract class Step extends Preds {
    */
   Step(final InputInfo info, final Axis axis, final Test test, final Expr... exprs) {
     super(info, SeqType.get(
+      // type
       axis == Axis.ATTRIBUTE ? NodeType.ATT : test.type,
+      // occurrence
       axis == Axis.SELF && test == KindTest.NOD && exprs.length == 0 ? Occ.ONE :
       axis == Axis.SELF || axis == Axis.PARENT || axis == Axis.ATTRIBUTE &&
         test instanceof NameTest && ((NameTest) test).part == NamePart.FULL ?
-        Occ.ZERO_ONE : Occ.ZERO_MORE), exprs);
+        Occ.ZERO_ONE : Occ.ZERO_MORE
+    ), exprs);
 
     this.axis = axis;
     this.test = test;
   }
 
   @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
-    // self step: assign type of input
-    final Value value = cc.qc.focus.value;
-    if(value != null && axis == Axis.SELF && test == KindTest.NOD) {
-      exprType.assign(value.seqType().type);
-    }
-
-    cc.pushFocus(this);
-    try {
-      super.compile(cc);
-    } finally {
-      cc.removeFocus();
-    }
-    return optimize(cc);
+  public final Expr optimize(final CompileContext cc) throws QueryException {
+    return optimize(null, cc);
   }
 
-  @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  /**
+   * Optimizes the step for the given root expression.
+   * @param cc compilation context
+   * @param expr input expression (can be {@code null})
+   * @return optimized step
+   * @throws QueryException query exception
+   */
+  final Expr optimize(final Expr expr, final CompileContext cc) throws QueryException {
+    // updates the static type
+    final Expr ex = expr != null ? expr : cc.qc.focus.value;
+    type(ex, cc);
     // check if step or test will never yield results
-    if(emptyStep() || !test.optimize(cc.qc.focus.value)) {
+    if(emptyStep() || !test.optimize(ex)) {
       cc.info(OPTSTEP_X, this);
       return cc.emptySeq(this);
     }
@@ -111,7 +111,17 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+  protected final void type(final Expr expr, final CompileContext cc) {
+    // assign input type if step will return identical nodes
+    if(expr != null && axis == Axis.SELF && test == KindTest.NOD) {
+      exprType.assign(expr.seqType().type);
+    }
+  }
+
+  @Override
+  public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
+      throws QueryException {
+
     boolean changed = false;
     if(var != null) {
       cc.pushFocus(this);
@@ -230,7 +240,7 @@ public abstract class Step extends Preds {
    * @param prevType type of incoming nodes
    * @return {@code true} if steps will never yield results
    */
-  boolean emptyStep(final NodeType prevType) {
+  final boolean emptyStep(final NodeType prevType) {
     // checks steps on document nodes
     final NodeType type = test.type;
     if(prevType.instanceOf(NodeType.DOC) && ((Check) () -> {

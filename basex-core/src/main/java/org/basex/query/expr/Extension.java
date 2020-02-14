@@ -81,11 +81,12 @@ public final class Extension extends Single {
 
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
-    final Object state = pragma.init(ii.qc, info);
+    final QueryContext qc = ii.cc.qc;
+    final Object state = pragma.init(qc, info);
     try {
       return expr.indexAccessible(ii);
     } finally {
-      pragma.finish(ii.qc, state);
+      pragma.finish(qc, state);
     }
   }
 

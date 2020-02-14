@@ -97,7 +97,8 @@ public final class Union extends Set {
     final Test test = Test.get(tests);
     if(test == null) return false;
 
-    exprs[0] = Path.get(info, root, Step.get(info, axis, test, preds)).optimize(cc);
+    final Expr step = new StepBuilder(info).axis(axis).test(test).preds(preds).finish(cc, root);
+    exprs[0] = Path.get(info, root, step).optimize(cc);
     return true;
   }
 
