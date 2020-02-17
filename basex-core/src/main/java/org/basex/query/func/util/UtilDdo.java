@@ -32,9 +32,10 @@ public final class UtilDdo extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
-    if(st.instanceOf(SeqType.NOD_ZM)) {
+    final Type type = st.type;
+    if(type instanceof NodeType) {
       if(st.zeroOrOne()) return expr;
-      exprType.assign(st.type);
+      exprType.assign(type);
     }
     return this;
   }

@@ -62,7 +62,7 @@ public abstract class Cmp extends Arr {
       expr1 instanceof Value && !(expr2 instanceof Value) ||
       // hashed comparisons: move larger sequences to the right -> $small = $large
       expr1.size() > 1 && expr1.size() > expr2.size() &&
-      expr1.seqType().instanceOf(SeqType.AAT_ZM) ||
+      expr1.seqType().type.instanceOf(AtomType.AAT) ||
       // index rewritings: move path to the left -> word/text() = $word
       !(expr1 instanceof Path && ((Path) expr1).root == null) &&
         expr2 instanceof Path && ((Path) expr2).root == null ||

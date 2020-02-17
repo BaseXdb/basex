@@ -44,7 +44,7 @@ public final class Intersect extends Set {
       if(expr == Empty.VALUE) {
         // example: * intersect ()  ->  ()
         return cc.emptySeq(this);
-      } else if(expr.seqType().instanceOf(SeqType.NOD_ZM) && !expr.has(Flag.CNS, Flag.NDT) &&
+      } else if(expr.seqType().type instanceof NodeType && !expr.has(Flag.CNS, Flag.NDT) &&
          ((Checks<Expr>) ex -> ex.equals(expr)).any(list)) {
         // remove duplicate
         // example: * intersect *  ->  *

@@ -129,6 +129,8 @@ public final class SeqType {
   public static final SeqType NOD_ZO = NodeType.NOD.seqType(Occ.ZERO_ONE);
   /** Zero or more nodes. */
   public static final SeqType NOD_ZM = NodeType.NOD.seqType(Occ.ZERO_MORE);
+  /** One or more nodes. */
+  public static final SeqType NOD_OM = NodeType.NOD.seqType(Occ.ONE_MORE);
   /** One attribute node. */
   public static final SeqType ATT_O = NodeType.ATT.seqType();
   /** Zero or more attributes. */

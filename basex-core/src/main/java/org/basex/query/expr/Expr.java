@@ -324,8 +324,7 @@ public abstract class Expr extends ExprInfo {
   public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
     if(type == AtomType.BLN) {
       // return true if a deterministic expression returns at least one node
-      final SeqType st = seqType();
-      if(st.type instanceof NodeType && st.oneOrMore() && !has(Flag.NDT))
+      if(seqType().instanceOf(SeqType.NOD_OM) && !has(Flag.NDT))
         return cc.simplify(this, Bln.TRUE);
     }
     return this;

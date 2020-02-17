@@ -316,7 +316,7 @@ public abstract class Path extends ParseExpr {
    */
   public final ArrayList<PathNode> pathNodes(final Expr rt) {
     // ensure that path starts with document nodes
-    if(rt == null || !rt.seqType().instanceOf(SeqType.DOC_ZM) || data == null ||
+    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOC) || data == null ||
         !data.meta.uptodate) return null;
 
     ArrayList<PathNode> nodes = data.paths.root();
@@ -341,7 +341,7 @@ public abstract class Path extends ParseExpr {
 
     final SeqType st = root.seqType();
     boolean atMostOne = st.zeroOrOne();
-    boolean sameDepth = atMostOne || st.instanceOf(SeqType.DOC_ZM);
+    boolean sameDepth = atMostOne || st.type.instanceOf(NodeType.DOC);
 
     for(final Expr expr : steps) {
       final Step step = (Step) expr;
@@ -436,7 +436,7 @@ public abstract class Path extends ParseExpr {
     // - path does not start with document nodes,
     // - no database instance is available, outdated, or
     // - if context does not contain all database nodes
-    if(rt == null || !rt.seqType().instanceOf(SeqType.DOC_ZM) ||
+    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOC) ||
         data == null || !data.meta.uptodate || data.meta.ndocs != rt.size()) return -1;
 
     ArrayList<PathNode> nodes = data.paths.root();
@@ -536,7 +536,7 @@ public abstract class Path extends ParseExpr {
     // - if path does not start with document nodes
     // - if index does not exist or is out-dated
     // - if several namespaces occur in the input
-    if(rt == null || !rt.seqType().instanceOf(SeqType.DOC_ZM) ||
+    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOC) ||
         data == null || !data.meta.uptodate || data.nspaces.globalUri() == null) return this;
 
     final int sl = steps.length;
@@ -642,7 +642,7 @@ public abstract class Path extends ParseExpr {
    */
   private Expr index(final CompileContext cc, final Expr rt) throws QueryException {
     // skip optimization if path does not start with document nodes
-    if(rt == null || !rt.seqType().instanceOf(SeqType.DOC_ZM)) return this;
+    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOC)) return this;
 
     // cache index access costs
     IndexInfo index = null;

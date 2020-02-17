@@ -46,7 +46,7 @@ public final class Union extends Set {
         // remove empty operands
         // example: * union ()  ->  *
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-      } else if(expr.seqType().instanceOf(SeqType.NOD_ZM) && !expr.has(Flag.CNS, Flag.NDT) &&
+      } else if(expr.seqType().type instanceof NodeType && !expr.has(Flag.CNS, Flag.NDT) &&
          ((Checks<Expr>) ex -> ex.equals(expr)).any(list)) {
         // remove duplicate
         // example: * union *  ->  *

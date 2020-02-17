@@ -44,7 +44,7 @@ public final class Except extends Set {
         // remove empty operands (return empty sequence if first value is empty)
         if(list.isEmpty()) return cc.emptySeq(this);
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-      } else if(expr.seqType().instanceOf(SeqType.NOD_ZM) && !expr.has(Flag.CNS, Flag.NDT)) {
+      } else if(expr.seqType().type instanceof NodeType && !expr.has(Flag.CNS, Flag.NDT)) {
         final int same = ((Checks<Expr>) ex -> ex.equals(expr)).index(list);
         // identical to first operand: return empty sequence
         // example: text() except text()  ->  ()
