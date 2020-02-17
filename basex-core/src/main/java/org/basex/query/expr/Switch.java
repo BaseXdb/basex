@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -73,6 +74,13 @@ public final class Switch extends ParseExpr {
     for(int g = 1; g < gl; g++) st = st.union(groups[g].exprs[0].seqType());
     exprType.assign(st);
     return this;
+  }
+
+  @Override
+  public Data data() {
+    final ExprList list = new ExprList(groups.length);
+    for(final SwitchGroup group : groups) list.add(group.exprs[0]);
+    return data(list.finish());
   }
 
   /**

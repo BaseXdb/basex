@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import java.util.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -77,6 +78,13 @@ public final class Try extends Single {
     }
     exprType.assign(st);
     return this;
+  }
+
+  @Override
+  public Data data() {
+    final ExprList list = new ExprList(catches.length).add(expr);
+    for(final Catch ctch : catches) list.add(ctch);
+    return data(list.finish());
   }
 
   @Override

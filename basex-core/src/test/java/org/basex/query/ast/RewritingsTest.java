@@ -944,6 +944,25 @@ public final class RewritingsTest extends QueryPlanTest {
     check("exists(x[y ! z = 'A'])", true, exists(ValueAccess.class));
   }
 
+  /** Typing: data references. */
+  @Test public void gh1816() {
+    execute(new CreateDB(NAME, "<x><y/></x>"));
+    check("x/z", "", empty());
+    check("(x, y)/z", "", empty());
+    check("(x | y)/z", "", empty());
+    check("(if(random:double()) then x else y)/z", "", empty());
+    check("(let $_ := random:double() return x)/z", "", empty());
+    check("((# bla #) { x })/z", "", empty());
+    check("(switch (random:double())\n" +
+      "  case 1 return ()\n" +
+      "  default return x\n" +
+      ")/z", "", empty());
+
+    check("(x, prof:void(()))/z", "", empty());
+    check("(x | prof:void(()))/z", "", empty());
+    check("(if(random:double()) then x)/z", "", empty());
+  }
+
   /** List to union in root of path expression. */
   @Test public void gh1817() {
     check("<a/>[(b, c)/d]", "", empty(List.class), count(IterPath.class, 1));

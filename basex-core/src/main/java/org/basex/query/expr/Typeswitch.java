@@ -4,9 +4,11 @@ import static org.basex.query.QueryText.*;
 
 import java.util.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -115,6 +117,13 @@ public final class Typeswitch extends ParseExpr {
     exprType.assign(st);
 
     return this;
+  }
+
+  @Override
+  public Data data() {
+    final ExprList list = new ExprList(groups.length);
+    for(final TypeswitchGroup group : groups) list.add(group);
+    return data(list.finish());
   }
 
   @Override

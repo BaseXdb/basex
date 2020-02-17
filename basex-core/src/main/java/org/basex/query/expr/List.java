@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -188,6 +189,11 @@ public final class List extends Arr {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return copyType(new List(info, copyAll(cc, vm, exprs)));
+  }
+
+  @Override
+  public Data data() {
+    return data(exprs);
   }
 
   @Override

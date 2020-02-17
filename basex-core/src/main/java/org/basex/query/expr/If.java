@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
@@ -202,6 +203,11 @@ public final class If extends Arr {
   @Override
   public void markTailCalls(final CompileContext cc) {
     for(final Expr expr : exprs) expr.markTailCalls(cc);
+  }
+
+  @Override
+  public Data data() {
+    return data(exprs);
   }
 
   @Override

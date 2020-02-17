@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -179,6 +180,11 @@ public class TypeCheck extends Single {
   @Override
   public final Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return get(expr.copy(cc, vm), seqType());
+  }
+
+  @Override
+  public final Data data() {
+    return seqType().type instanceof NodeType ? expr.data() : null;
   }
 
   @Override

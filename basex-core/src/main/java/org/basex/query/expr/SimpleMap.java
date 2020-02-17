@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
@@ -160,6 +161,11 @@ public abstract class SimpleMap extends Arr {
       item ? copyType(new ItemMap(info, exprs)) :
       // default evaluation
       this;
+  }
+
+  @Override
+  public Data data() {
+    return exprs[exprs.length - 1].data();
   }
 
   /**

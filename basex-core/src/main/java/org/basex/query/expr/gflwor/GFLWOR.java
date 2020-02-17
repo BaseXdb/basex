@@ -3,6 +3,7 @@ package org.basex.query.expr.gflwor;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
@@ -790,6 +791,11 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public VarUsage count(final Var var) {
     return count(var, 0);
+  }
+
+  @Override
+  public Data data() {
+    return rtrn.data();
   }
 
   /**

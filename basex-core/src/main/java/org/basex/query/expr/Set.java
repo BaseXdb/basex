@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import java.util.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -87,6 +88,11 @@ abstract class Set extends Arr {
   @Override
   public final boolean ddo() {
     return true;
+  }
+
+  @Override
+  public final Data data() {
+    return data(exprs);
   }
 
   @Override

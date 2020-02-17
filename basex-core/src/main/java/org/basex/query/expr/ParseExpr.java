@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.func.*;
@@ -120,6 +121,24 @@ public abstract class ParseExpr extends Expr {
   public final ParseExpr adoptType(final Expr expr) {
     exprType.assign(expr);
     return this;
+  }
+
+  /**
+   * Returns the common data reference for all expressions.
+   * @param exprs expressions
+   * @return data reference or {@code null}
+   */
+  public Data data(final Expr... exprs) {
+    Data data1 = null;
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
+      final Expr expr = exprs[e];
+      if(expr.seqType().zero()) continue;
+      final Data data2 = expr.data();
+      if(data1 == null) data1 = data2;
+      if(data1 == null || data1 != data2) return null;
+    }
+    return data1;
   }
 
   // VALIDITY CHECKS ==============================================================================
