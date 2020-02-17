@@ -788,21 +788,36 @@ public abstract class Path extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr toUnion(final CompileContext cc) throws QueryException {
+    // function for rewriting a list to a union expression
+    final QueryFunction<Expr, Expr> rewrite = step -> {
+      if(step instanceof List) {
+        return ((List) step).toUnion(cc);
+      }
+      if(step instanceof Filter) {
+        final Filter filter = (Filter) step;
+        if(!filter.positional() && filter.root instanceof List) {
+          final Expr st = ((List) filter.root).toUnion(cc);
+          if(st != filter.root) return Filter.get(filter.info, st, filter.exprs).optimize(cc);
+        }
+      }
+      return step;
+    };
+
+    // only rewrite root expression if subsequent step yields nodes
     boolean changed = false;
+    if(steps[0].seqType().type instanceof NodeType) {
+      final Expr rt = rewrite.apply(root);
+      if(rt != root) {
+        root = rt;
+        changed = true;
+      }
+    }
+
     cc.pushFocus(root);
     try {
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
-        Expr step = steps[s];
-        if(step instanceof List) {
-          step = ((List) step).toUnion(cc);
-        } else if(step instanceof Filter) {
-          final Filter filter = (Filter) step;
-          if(!filter.positional() && filter.root instanceof List) {
-            final Expr st = ((List) filter.root).toUnion(cc);
-            if(st != filter.root) step = Filter.get(filter.info, st, filter.exprs).optimize(cc);
-          }
-        }
+        final Expr step = rewrite.apply(steps[s]);
         if(step != steps[s]) {
           steps[s] = step;
           changed = true;

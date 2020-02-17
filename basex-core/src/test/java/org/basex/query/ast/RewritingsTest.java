@@ -944,6 +944,15 @@ public final class RewritingsTest extends QueryPlanTest {
     check("exists(x[y ! z = 'A'])", true, exists(ValueAccess.class));
   }
 
+  /** List to union in root of path expression. */
+  @Test public void gh1817() {
+    check("<a/>[(b, c)/d]", "", empty(List.class), count(IterPath.class, 1));
+
+    // do not rewrite paths that yield no nodes
+    check("(<a/>, <b/>)/name()", "a\nb", exists(List.class));
+    check("let $_ := <_/> return ($_, $_)/0", "0\n0", exists(SingletonSeq.class));
+  }
+
   /** List to union. */
   @Test public void gh1818() {
     check("<a/>[b, text()]", "", exists(Union.class), count(SingleIterPath.class, 2));
