@@ -788,36 +788,26 @@ public abstract class Path extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr toUnion(final CompileContext cc) throws QueryException {
-    // function for rewriting a list to a union expression
-    final QueryFunction<Expr, Expr> rewrite = step -> {
-      if(step instanceof List) {
-        final List list = (List) step;
-        if(((Checks<Expr>) ex -> ex.seqType().instanceOf(SeqType.NOD_ZM)).all(list.exprs)) {
-          return cc.replaceWith(list, new Union(list.info, list.exprs)).optimize(cc);
-        }
-      }
-      return null;
-    };
-
     boolean changed = false;
-    final int sl = steps.length;
-
     cc.pushFocus(root);
     try {
+      final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
-        Expr step = rewrite.apply(steps[s]);
-        if(step == null && steps[s] instanceof Filter) {
-          final Filter filter = (Filter) steps[s];
-          if(!filter.positional()) {
-            step = rewrite.apply(filter.root);
-            if(step != null) step = Filter.get(filter.info, step, filter.exprs).optimize(cc);
+        Expr step = steps[s];
+        if(step instanceof List) {
+          step = ((List) step).toUnion(cc);
+        } else if(step instanceof Filter) {
+          final Filter filter = (Filter) step;
+          if(!filter.positional() && filter.root instanceof List) {
+            final Expr st = ((List) filter.root).toUnion(cc);
+            if(st != filter.root) step = Filter.get(filter.info, st, filter.exprs).optimize(cc);
           }
         }
-        if(step != null) {
-          changed = true;
+        if(step != steps[s]) {
           steps[s] = step;
+          changed = true;
         }
-        cc.updateFocus(steps[s]);
+        cc.updateFocus(step);
       }
     } finally {
       cc.removeFocus();
@@ -893,7 +883,7 @@ public abstract class Path extends ParseExpr {
           for(final Expr path : union.exprs) {
             ((Step) ((Path) path).steps[0]).axis = DESCENDANT;
           }
-          return new Union(union.info, union.exprs).optimize(cc);
+          return union.optimize(cc);
         }
       }
       return null;

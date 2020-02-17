@@ -943,4 +943,14 @@ public final class RewritingsTest extends QueryPlanTest {
     check("exists(x[y/z = 'A'])", true, exists(ValueAccess.class));
     check("exists(x[y ! z = 'A'])", true, exists(ValueAccess.class));
   }
+
+  /** List to union. */
+  @Test public void gh1818() {
+    check("<a/>[b, text()]", "", exists(Union.class), count(SingleIterPath.class, 2));
+
+    // union expression will be further rewritten to single path
+    check("<a/>[b, c]", "", empty(List.class), count(SingleIterPath.class, 1));
+    check("<a/>[(b, c) = '']", "", empty(List.class), count(SingleIterPath.class, 1));
+    check("<a/>[(b, c) = (b, c)]", "", empty(List.class), count(SingleIterPath.class, 2));
+  }
 }

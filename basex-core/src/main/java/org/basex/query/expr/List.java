@@ -163,8 +163,26 @@ public final class List extends Arr {
 
   @Override
   public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
-    return type != AtomType.BLN && simplifyAll(type, cc) ? optimize(cc) :
-      super.simplifyFor(type, cc);
+    if(type == AtomType.BLN) {
+      if(!seqType().oneOrMore()) {
+        final Expr union = toUnion(cc);
+        if(union != this) return union;
+      }
+    } else {
+      if(simplifyAll(type, cc)) return optimize(cc);
+    }
+    return super.simplifyFor(type, cc);
+  }
+
+  /**
+   * If possible, rewrites the list to a union expression.
+   * @param cc compilation context
+   * @return union or original expression
+   * @throws QueryException query exception
+   */
+  public Expr toUnion(final CompileContext cc) throws QueryException {
+    return seqType().type instanceof NodeType ?
+      cc.replaceWith(this, new Union(info, exprs)).optimize(cc) : this;
   }
 
   @Override
