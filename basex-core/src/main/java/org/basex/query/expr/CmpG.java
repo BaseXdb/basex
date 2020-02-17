@@ -175,9 +175,11 @@ public class CmpG extends Cmp {
       if(expr == this) expr = CmpSR.get(this, cc);
 
       if(expr == this) {
-        // convert maps to paths
+        // convert maps to paths and lists to unions
         for(int e = 0; e < 2; e++) {
-          if(exprs[e] instanceof SimpleMap) exprs[e] = ((SimpleMap) exprs[e]).toPath(cc);
+          final Expr ex = exprs[e];
+          if(ex instanceof SimpleMap) exprs[e] = ((SimpleMap) ex).toPath(cc);
+          else if(ex instanceof List) exprs[e] = ((List) ex).toUnion(cc);
         }
 
         final Expr expr1 = exprs[0], expr2 = exprs[1];
