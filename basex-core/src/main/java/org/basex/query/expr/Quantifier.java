@@ -8,7 +8,6 @@ import org.basex.query.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -30,24 +29,24 @@ public final class Quantifier extends Single {
    * Constructor.
    * @param info input info
    * @param inputs variable inputs
-   * @param expr satisfier
+   * @param satisfier satisfier
    * @param every every flag
    * @param sc static context
    */
-  public Quantifier(final InputInfo info, final For[] inputs, final Expr expr,
+  public Quantifier(final InputInfo info, final For[] inputs, final Expr satisfier,
       final boolean every, final StaticContext sc) {
     this(info, new GFLWOR(info, new LinkedList<>(Arrays.asList(inputs)),
-        FnBoolean.get(expr, info, sc)), every);
+        FnBoolean.get(satisfier, info, sc)), every);
   }
 
   /**
    * Copy constructor.
    * @param info input info
-   * @param tests expression
+   * @param expr test expression
    * @param every every flag
    */
-  private Quantifier(final InputInfo info, final Expr tests, final boolean every) {
-    super(info, tests, SeqType.BLN_O);
+  private Quantifier(final InputInfo info, final Expr expr, final boolean every) {
+    super(info, expr, SeqType.BLN_O);
     this.every = every;
   }
 
@@ -58,20 +57,11 @@ public final class Quantifier extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // example: ... satisfies $v[. = '']  ->  satisfies $v = ''
-    expr = expr.simplifyFor(AtomType.BLN, cc);
-
     // return pre-evaluated result
     if(expr instanceof Value) return cc.preEval(this);
-
-    // pre-evaluate satisfy clause if its return expression is a value and returned at least once
-    // example: some $x in (1, 2) satisfies true() -> true()
-    if(expr instanceof GFLWOR && !expr.has(Flag.NDT)) {
-      final GFLWOR gflwor = (GFLWOR) expr;
-      if(gflwor.size() > 0 && gflwor.rtrn instanceof Value) {
-        final Value value = (Value) gflwor.rtrn;
-        return cc.replaceWith(this, Bln.get(value.ebv(cc.qc, info).bool(info)));
-      }
+    // non-deterministic expression: rewrite to list (ensure evaluation)
+    if(expr.size() == 0) {
+      return cc.replaceWith(this, new List(info, expr, Bln.get(every)).optimize(cc));
     }
     return this;
   }
@@ -80,7 +70,7 @@ public final class Quantifier extends Single {
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = expr.iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
-      // resulting item will always be boolean (no ebv check required)
+      // resulting item will always be boolean (no EBV check required)
       if(every ^ item.bool(info)) return Bln.get(!every);
     }
     return Bln.get(every);

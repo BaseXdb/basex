@@ -248,6 +248,20 @@ public final class TypeswitchGroup extends Single {
     return expr.exprSize();
   }
 
+  /**
+   * Simplifies all expressions for requests of the specified type.
+   * @param type target type
+   * @param cc compilation context
+   * @return {@code true} if expression has changed
+   * @throws QueryException query exception
+   */
+  public boolean simplify(final AtomType type, final CompileContext cc) throws QueryException {
+    final Expr ex = expr.simplifyFor(type, cc);
+    if(ex == expr) return false;
+    expr = ex;
+    return true;
+  }
+
   @Override
   public Data data() {
     return expr.data();

@@ -573,9 +573,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>/.[1]", "<a/>", root(CElem.class));
     check("<doc><x/><y/></doc>/*/..[1] ! name()", "doc", empty(ItrPos.class));
 
-    check("<a/>/<b/>[2]", "", root(Empty.class));
-    check("<a/>/.[2]", "", root(Empty.class));
-    check("<doc><x/><y/></doc>/*/..[2] ! name()", "", root(Empty.class));
+    check("<a/>/<b/>[2]", "", empty());
+    check("<a/>/.[2]", "", empty());
+    check("<doc><x/><y/></doc>/*/..[2] ! name()", "", empty());
   }
 
   /** GH1737: combined kind tests. */
@@ -935,6 +935,37 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1809() {
     check("if(<_>1</_>[. = 1]) then () else ()", "", empty());
     check("if(prof:void(1)) then () else ()", "", root(_PROF_VOID), count(_PROF_VOID, 1));
+  }
+
+  /** EBV simplifications: if, switch, typeswitch. */
+  @Test public void gh1813() {
+    // if expression
+    check("(1, 2) ! boolean(if(.) then 'a' else <a/>)", "true\ntrue", root(SingletonSeq.class));
+    check("(1 to 2) ! boolean(if(.) then '' else ())", "false\nfalse", root(SingletonSeq.class));
+    check("boolean(if(random:double()) then '' else 0)", "false",
+        root(List.class), exists(_PROF_VOID));
+
+    check("(1, 2)[if(.) then 0.0e0 else 0.0]", "", empty());
+    check("(1, 2)[if(.) then '' else xs:anyURI('')]", "", empty());
+
+    // no rewriting of numbers > 0
+    check("(1,2) ! boolean(if(.) then 'a' else 1)", "true\ntrue", exists(If.class));
+
+    // switch expression
+    check("for $i in (1 to 3)\n" +
+        "return if(switch($i)\n" +
+        "  case 1 return 0\n" +
+        "  case 2 return ''\n" +
+        "  default return ()\n" +
+        ") then 'fail' else ''", "\n\n", root(SingletonSeq.class));
+
+    // typeswitch expression
+    check("for $i in ('a', 1)\n" +
+        "return if(typeswitch($i)\n" +
+        "  case xs:integer return 0\n" +
+        "  case xs:string  return ''\n" +
+        "  default return ()\n" +
+        ") then 'fail' else ''", "\n", root(SingletonSeq.class));
   }
 
   /** Simple map, index rewritings. */

@@ -120,6 +120,15 @@ public final class Typeswitch extends ParseExpr {
   }
 
   @Override
+  public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
+    boolean changed = false;
+    for(final TypeswitchGroup group : groups) {
+      changed |= group.simplify(type, cc);
+    }
+    return changed ? optimize(cc) : super.simplifyFor(type, cc);
+  }
+
+  @Override
   public Data data() {
     final ExprList list = new ExprList(groups.length);
     for(final TypeswitchGroup group : groups) list.add(group);

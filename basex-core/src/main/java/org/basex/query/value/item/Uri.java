@@ -6,6 +6,7 @@ import java.net.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.UriParser.*;
 import org.basex.query.value.type.*;
@@ -117,6 +118,11 @@ public final class Uri extends AStr {
    */
   public byte[] string() {
     return value;
+  }
+
+  @Override
+  public Expr simplifyFor(final AtomType tp, final CompileContext cc) throws QueryException {
+    return tp == AtomType.BLN ? cc.simplify(this, Bln.get(value.length != 0)) : this;
   }
 
   /**

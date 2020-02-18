@@ -3,6 +3,7 @@ package org.basex.query.value.item;
 import static java.lang.Float.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -109,6 +110,11 @@ public abstract class ANum extends Item {
   @Override
   public Item test(final QueryContext qc, final InputInfo ii) {
     return dbl() == qc.focus.pos ? this : null;
+  }
+
+  @Override
+  public final Expr simplifyFor(final AtomType tp, final CompileContext cc) throws QueryException {
+    return tp == AtomType.BLN && dbl() == 0 ? cc.simplify(this, Bln.FALSE) : this;
   }
 
   @Override

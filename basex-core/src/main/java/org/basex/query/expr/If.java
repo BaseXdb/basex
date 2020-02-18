@@ -78,10 +78,9 @@ public final class If extends Arr {
 
     // if A then B else B -> B (errors in A will be ignored)
     if(exprs[0].equals(exprs[1])) {
-      if(!cond.has(Flag.NDT))
-        return cc.replaceWith(this, exprs[0]);
-      if(exprs[0] == Empty.VALUE)
-        return cc.replaceWith(this, cc.function(Function._PROF_VOID, info, cond));
+      if(!cond.has(Flag.NDT)) return cc.replaceWith(this, exprs[0]);
+      cond = cc.function(Function._PROF_VOID, info, cond);
+      return cc.replaceWith(this, new List(info, cond, exprs[0]).optimize(cc));
     }
 
     // if not(A) then B else C -> if A then C else B
@@ -203,6 +202,11 @@ public final class If extends Arr {
   @Override
   public void markTailCalls(final CompileContext cc) {
     for(final Expr expr : exprs) expr.markTailCalls(cc);
+  }
+
+  @Override
+  public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
+    return simplifyAll(type, cc) ? optimize(cc) : super.simplifyFor(type, cc);
   }
 
   @Override

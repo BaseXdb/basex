@@ -100,6 +100,20 @@ public final class SwitchGroup extends Arr {
     return all;
   }
 
+  /**
+   * Simplifies all expressions for requests of the specified type.
+   * @param type target type
+   * @param cc compilation context
+   * @return {@code true} if expression has changed
+   * @throws QueryException query exception
+   */
+  public boolean simplify(final AtomType type, final CompileContext cc) throws QueryException {
+    final Expr expr = exprs[0].simplifyFor(type, cc);
+    if(expr == exprs[0]) return false;
+    exprs[0] = expr;
+    return true;
+  }
+
   @Override
   public int exprSize() {
     int size = 0;

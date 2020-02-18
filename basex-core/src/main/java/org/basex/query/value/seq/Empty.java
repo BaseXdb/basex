@@ -114,6 +114,11 @@ public final class Empty extends Item {
   }
 
   @Override
+  public Expr simplifyFor(final AtomType tp, final CompileContext cc) throws QueryException {
+    return tp == AtomType.BLN ? cc.simplify(this, Bln.FALSE) : this;
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     return obj == VALUE;
   }
