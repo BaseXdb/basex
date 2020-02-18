@@ -322,12 +322,9 @@ public abstract class Expr extends ExprInfo {
    */
   @SuppressWarnings("unused")
   public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
-    if(type == AtomType.BLN) {
-      // return true if a deterministic expression returns at least one node
-      if(seqType().instanceOf(SeqType.NOD_OM) && !has(Flag.NDT))
-        return cc.simplify(this, Bln.TRUE);
-    }
-    return this;
+    // return true if a deterministic expression returns at least one node
+    return type == AtomType.BLN && seqType().instanceOf(SeqType.NOD_OM) && !has(Flag.NDT) ?
+      cc.simplify(this, Bln.TRUE) : this;
   }
 
   /**

@@ -327,7 +327,7 @@ public abstract class Cmp extends Arr {
       if(op != OpV.GT) {
         // EQ and LE can be treated identically
         final Function func = oop == OpV.NE ? Function.BOOLEAN : Function.NOT;
-        return cc.function(func, info, cc.function(Function.STRING, info, exprs[0]));
+        return cc.function(func, info, cc.function(Function.DATA, info, exprs[0]));
       }
     }
     return this;
