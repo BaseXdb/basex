@@ -887,15 +887,15 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Comparisons with empty strings. */
   @Test public void gh1803() {
-    check("<a/>[namespace-uri() eq '']", "<a/>", exists(NOT), exists(STRING));
+    check("<a/>[namespace-uri() eq '']", "<a/>", exists(NOT), empty(STRING));
     check("<a/>[local-name() eq '']", "", exists(NOT), empty(STRING));
     check("attribute { 'a' } { '' }[local-name() = '']", "", exists(NOT), empty(STRING));
     check("let $x := (<a/>, <a/>) where $x[. eq ''] return $x", "<a/>\n<a/>",
-        exists(NOT), exists(STRING));
+        exists(NOT), exists(DATA));
 
     check("string(<_/>) != ''", false, root(BOOLEAN));
-    check("string(<_/>) = ''", true, root(NOT), exists(STRING));
-    check("string(<_/>) <= ''", true, root(NOT), exists(STRING));
+    check("string(<_/>) = ''", true, root(NOT), exists(DATA));
+    check("string(<_/>) <= ''", true, root(NOT), exists(DATA));
     check("string(<_/>) >= ''", true, root(Bln.class));
     check("string(<_/>) < ''", false, root(Bln.class));
 
