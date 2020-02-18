@@ -1012,4 +1012,18 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[(b, c) = '']", "", empty(List.class), count(SingleIterPath.class, 1));
     check("<a/>[(b, c) = (b, c)]", "", empty(List.class), count(SingleIterPath.class, 2));
   }
+
+  /** FLWOR, no results, non-deterministic expressions. */
+  @Test public void gh1819() {
+    check("for $_ in () return <x/>", "", empty());
+    check("for $_ in prof:void(1) return 1", "", root(_PROF_VOID));
+    check("let $_ := 1 return <x/>", "<x/>", root(CElem.class));
+    check("let $_ := prof:void(1) return 1", 1, root(List.class), exists(_PROF_VOID));
+    check("for $_ in 1 to 2 return 3", "3\n3", root(SingletonSeq.class));
+    check("for $_ in 1 to 2 return ()", "", empty());
+
+    // skip rewriting
+    check("for $_ in 1 to 2 return <a/>", "<a/>\n<a/>", root(GFLWOR.class));
+    check("for $_ in 1 to 2 return prof:void(1)", "", root(GFLWOR.class));
+  }
 }

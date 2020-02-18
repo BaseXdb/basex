@@ -6,6 +6,7 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
 import org.basex.query.iter.*;
@@ -120,15 +121,15 @@ public final class GFLWOR extends ParseExpr {
       final Expr branch = clauses.isEmpty() ? rtrn : this;
       expr = new If(info, where.expr, branch).optimize(cc);
     } else {
-      exprType.assign(rtrn.seqType().type, calcSize(true));
       expr = simplify(cc);
     }
-
-    if(expr == rtrn) {
+    if(expr != this) {
       cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, expr);
       return expr;
     }
-    return cc.replaceWith(this, expr);
+
+    exprType.assign(rtrn.seqType().type, calcSize(true));
+    return expr;
   }
 
   /**
@@ -138,40 +139,49 @@ public final class GFLWOR extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr simplify(final CompileContext cc) throws QueryException {
-    // skip non-leave if iterated items are non-deterministic
-    for(final Clause clause : clauses) {
-      if(clause.has(Flag.NDT, Flag.UPD)) return this;
-    }
-
-    // return empty sequence if expression will yield no results
-    // for $i in 1 to 2 return ()  ->  ()
-    final long size = size();
-    if(size == 0 && !rtrn.has(Flag.CNS, Flag.NDT, Flag.UPD)) {
-      return Empty.VALUE;
-    }
-
-    // leave if return clause relies on variables
-    for(final Clause clause : clauses) {
+    // checks if clauses have side-effects
+    final Checks<Clause> ndt = clause -> clause.has(Flag.NDT, Flag.UPD);
+    // checks if the return expression references the variable of a clause
+    final Checks<Clause> varrefs = clause -> {
       for(final Var var : clause.vars()) {
-        if(rtrn.count(var) != VarUsage.NEVER) return this;
+        if(rtrn.count(var) != VarUsage.NEVER) return true;
+      }
+      return false;
+    };
+
+    // calculate exact number of iterated items
+    final long[] minMax = calcSize(false);
+    final long min = minMax[0], max = minMax[1];
+    if(min == max) {
+      // zero iterations:
+      if(min == 0) {
+        // for $_ in () return <x/>  ->  ()
+        if(!has(Flag.NDT, Flag.UPD)) return Empty.VALUE;
+        // for $_ in file:write(...) return 1  ->  file:write(...)
+        if(clauses.size() == 1 && clauses.get(0) instanceof ForLet) {
+          return ((ForLet) clauses.get(0)).expr;
+        }
+      } else if(!varrefs.any(clauses)) {
+        // single iteration, no referenced variables in return clause:
+        if(min == 1) {
+          // let $_ := 1 return <x/>  ->  <x/>
+          if(!ndt.any(clauses)) return rtrn;
+          // let $_ := file:write(...) return 1  ->  (file:write(...), 1)
+          if(clauses.size() == 1 && clauses.get(0) instanceof ForLet) {
+            Expr expr = ((ForLet) clauses.get(0)).expr;
+            expr = cc.function(Function._PROF_VOID, info, expr);
+            expr = new List(info, expr, rtrn).optimize(cc);
+            return cc.replaceWith(this, expr);
+          }
+        } else if(!ndt.any(clauses) && !rtrn.has(Flag.CNS, Flag.NDT, Flag.UPD)) {
+          // for $_ in 1 to 2 return 3  ->  util:replicate(3, 2)
+          return cc.function(Function._UTIL_REPLICATE, info, rtrn, Int.get(min));
+        }
       }
     }
 
-    // single result: return expression of return clause
-    // for $i in 1 return <x/>  ->  <x/>
-    if(size == 1) return rtrn;
-
-    // leave if exact number of iterated items is unknown
-    final long[] minMax = calcSize(false);
-    final long min = minMax[0], max = minMax[1];
-    if(min != max) return this;
-
-    // leave if return clause creates new nodes
-    if(rtrn.has(Flag.CNS, Flag.NDT, Flag.UPD)) return this;
-
-    // create replicator
-    // for $i in 1 to 2 return (3,4)  ->  util:replicate((3, 4), 2)
-    return cc.function(Function._UTIL_REPLICATE, info, rtrn, Int.get(min));
+    // for $_ in 1 to 2 return ()  ->  ()
+    return rtrn == Empty.VALUE && !ndt.any(clauses) ? rtrn : this;
   }
 
   /**

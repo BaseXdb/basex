@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -32,6 +33,7 @@ public final class ProfVoid extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    return Function._PROF_VOID.is(exprs[0]) ? exprs[0] : this;
+    final Expr expr = exprs[0];
+    return expr.has(Flag.NDT) && expr.size() == 0 ? expr : this;
   }
 }
