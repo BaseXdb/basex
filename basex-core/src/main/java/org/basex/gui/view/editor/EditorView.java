@@ -230,8 +230,6 @@ public final class EditorView extends View {
     info.addMouseListener((MouseClickedListener) e -> markError(true));
     stop.addActionListener(e -> {
       stop.setEnabled(false);
-      go.setEnabled(false);
-      test.setEnabled(false);
       gui.stop();
     });
     go.addActionListener(e -> run(getEditor(), Action.EXECUTE));
