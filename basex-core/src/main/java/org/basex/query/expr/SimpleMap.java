@@ -137,13 +137,14 @@ public abstract class SimpleMap extends Arr {
             rep = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es));
           } else {
             // (1 to 2) ! <x/>  ->  util:replicate('', 2) ! <x/>
-            exprs[e] = SingletonSeq.get(Str.ZERO, es);
+            exprs[e] = cc.replaceWith(exprs[e], SingletonSeq.get(Str.ZERO, es));
           }
         }
       }
 
       if(rep != null) {
-        exprs[e] = cc.replaceWith(next, rep);
+        cc.info(OPTMERGE_X, rep);
+        exprs[e] = rep;
       } else if(!(next instanceof ContextValue)) {
         // context item expression can be ignored
         exprs[++e] = next;
