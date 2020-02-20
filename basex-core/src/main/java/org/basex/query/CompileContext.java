@@ -209,7 +209,7 @@ public final class CompileContext {
       final Supplier<String> f  = () -> {
         final TokenBuilder tb = new TokenBuilder();
         final String exprDesc = expr.description(), resDesc = result.description();
-        tb.add(result instanceof ParseExpr ? OPTREWRITE : OPTPRE).add(' ').add(exprDesc);
+        tb.add(OPTREWRITE).add(' ').add(exprDesc);
         if(!exprDesc.equals(resDesc)) tb.add(" to ").add(resDesc);
 
         final byte[] exprString = QueryError.normalize(Token.token(expr.toString()), null);
