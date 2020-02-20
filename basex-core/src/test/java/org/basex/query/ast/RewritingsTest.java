@@ -883,6 +883,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(3, 4)[not(. = 1) or not(. = (2, 3))]", "3\n4", empty(NOT), count(CmpG.class, 1));
     check("(3, 4)[not(. = (2, 3)) and . != 1]", 4, count(NOT, 1), count(CmpHashG.class, 1));
     check("(3, 4)[not(. = (2, 3)) or . != 1]", "3\n4", empty(NOT), count(CmpG.class, 1));
+
+    check("(3, 4)[not(. = (2, 3)) and not(. = (1,4))]", "",
+        count(NOT, 1), count(CmpHashG.class, 1));
   }
 
   /** Comparisons with empty strings. */
@@ -1025,5 +1028,13 @@ public final class RewritingsTest extends QueryPlanTest {
     // skip rewriting
     check("for $_ in 1 to 2 return <a/>", "<a/>\n<a/>", root(GFLWOR.class));
     check("for $_ in 1 to 2 return prof:void(1)", "", root(GFLWOR.class));
+  }
+
+  /** Merge and/or expressions. */
+  @Test public void gh1820() {
+    check("exists(let $x := <a><b>c</b><b>d</b></a> return $x[b = 'c' and b = 'd'])", true,
+        count(CmpG.class, 2));
+    check("exists(let $x := <a><b>c</b><b>d</b></a> return $x[b = 'c' or b = 'd'])", true,
+        count(CmpHashG.class, 1));
   }
 }

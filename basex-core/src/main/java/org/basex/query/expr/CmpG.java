@@ -319,11 +319,15 @@ public class CmpG extends Cmp {
     final Expr ex = not ? ((FnNot) expr).exprs[0] : expr;
     if(!(ex instanceof CmpG)) return null;
 
-    final CmpG g = (CmpG) ex;
-    final OpG gop = not ? g.op.invert() : g.op;
-    if(op != gop || coll != g.coll || !exprs[0].equals(g.exprs[0])) return null;
+    final CmpG cmp = (CmpG) ex;
+    final OpG cmpOp = not ? cmp.op.invert() : cmp.op;
+    if(op != cmpOp || coll != cmp.coll || !exprs[0].equals(cmp.exprs[0])) return null;
 
-    final Expr list = new List(info, exprs[1], g.exprs[1]).optimize(cc);
+    // AND: skip merge if operands of comparisons have more than a single item
+    if(!(union || exprs[0].seqType().one() && exprs[1].seqType().one() &&
+        cmp.exprs[1].seqType().one())) return null;
+
+    final Expr list = new List(info, exprs[1], cmp.exprs[1]).optimize(cc);
     final OpG oop = union ? op : op.invert();
     final Expr oexpr = new CmpG(exprs[0], list, oop, coll, sc, info).optimize(cc);
     return union ? oexpr : cc.function(Function.NOT, info, oexpr);
