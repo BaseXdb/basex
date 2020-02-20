@@ -57,20 +57,19 @@ public abstract class Cmp extends Arr {
     // move value, or path without root, to second position
     final Expr expr1 = exprs[0], expr2 = exprs[1];
 
-    final boolean swap =
+    final boolean swap = Function.POSITION.is(expr2) || !(expr2 instanceof Value) && (
       // move static value to the right -> $words = 'words'
-      expr1 instanceof Value && !(expr2 instanceof Value) ||
+      expr1 instanceof Value ||
       // hashed comparisons: move larger sequences to the right -> $small = $large
       expr1.size() > 1 && expr1.size() > expr2.size() &&
       expr1.seqType().type.instanceOf(AtomType.AAT) ||
-      // index rewritings: move path to the left -> word/text() = $word
-      !(expr1 instanceof Path && ((Path) expr1).root == null) &&
-        expr2 instanceof Path && ((Path) expr2).root == null ||
       // hashed comparisons -> . = $words
       expr1 instanceof VarRef && expr1.seqType().occ.max > 1 &&
-        !(expr2 instanceof VarRef && expr2.seqType().occ.max > 1) && !(expr2 instanceof Value) ||
-      // positional checks -> position() > 1
-      Function.POSITION.is(expr2);
+        !(expr2 instanceof VarRef && expr2.seqType().occ.max > 1) ||
+      // index rewritings: move path to the left -> word/text() = $word
+      !(expr1 instanceof Path && ((Path) expr1).root == null) &&
+        expr2 instanceof Path && ((Path) expr2).root == null
+    );
 
     if(swap) {
       exprs[0] = expr2;
