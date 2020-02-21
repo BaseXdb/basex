@@ -880,9 +880,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_/>[. != 'A'][. != 'B'][. != 'C'][. != 'D']", "<_/>",   count(CmpHashG.class, 1));
 
     check("(3, 4)[not(. = 1) and not(. = (2, 3))]", 4, count(NOT, 1), count(CmpHashG.class, 1));
-    check("(3, 4)[not(. = 1) or not(. = (2, 3))]", "3\n4", empty(NOT), count(CmpG.class, 1));
     check("(3, 4)[not(. = (2, 3)) and . != 1]", 4, count(NOT, 1), count(CmpHashG.class, 1));
-    check("(3, 4)[not(. = (2, 3)) or . != 1]", "3\n4", empty(NOT), count(CmpG.class, 1));
 
     check("(3, 4)[not(. = (2, 3)) and not(. = (1,4))]", "",
         count(NOT, 1), count(CmpHashG.class, 1));
@@ -1036,5 +1034,10 @@ public final class RewritingsTest extends QueryPlanTest {
         count(CmpG.class, 2));
     check("exists(let $x := <a><b>c</b><b>d</b></a> return $x[b = 'c' or b = 'd'])", true,
         count(CmpHashG.class, 1));
+
+    check("<_>a</_>[. = 'c' or not(. != ('a', 'b'))]", "", exists(Or.class));
+
+    //check("(3, 4)[not(. = 1) or not(. = (2, 3))]", "3\n4", empty(NOT), count(CmpG.class, 1));
+    //check("(3, 4)[not(. = (2, 3)) or . != 1]", "3\n4", empty(NOT), count(CmpG.class, 1));
   }
 }

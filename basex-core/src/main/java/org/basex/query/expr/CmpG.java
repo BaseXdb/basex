@@ -315,22 +315,31 @@ public class CmpG extends Cmp {
     // E != 'a' and E != 'b'  ->  not(E = ('a', 'b'))
     // negation: invert operator
     // E != 'a' or not(E = 'b')  ->  E != ('a', 'b')
+
     final boolean not = expr instanceof FnNot;
-    final Expr ex = not ? ((FnNot) expr).exprs[0] : expr;
+    Expr ex = not ? ((FnNot) expr).exprs[0] : expr;
     if(!(ex instanceof CmpG)) return null;
 
     final CmpG cmp = (CmpG) ex;
     final OpG cmpOp = not ? cmp.op.invert() : cmp.op;
     if(op != cmpOp || coll != cmp.coll || !exprs[0].equals(cmp.exprs[0])) return null;
 
-    // AND: skip merge if operands of comparisons have more than a single item
-    if(!(union || exprs[0].seqType().one() && exprs[1].seqType().one() &&
-        cmp.exprs[1].seqType().one())) return null;
+    final Expr expr1 = exprs[1], expr2 = cmp.exprs[1];
+    final QueryFunction<OpG, Expr> newList = newOp -> {
+      final Expr list = new List(info, expr1, expr2).optimize(cc);
+      return new CmpG(exprs[0], list, newOp, coll, sc, info).optimize(cc);
+    };
 
-    final Expr list = new List(info, exprs[1], cmp.exprs[1]).optimize(cc);
-    final OpG oop = union ? op : op.invert();
-    final Expr oexpr = new CmpG(exprs[0], list, oop, coll, sc, info).optimize(cc);
-    return union ? oexpr : cc.function(Function.NOT, info, oexpr);
+    final boolean one = exprs[0].seqType().one();
+    final boolean one1 = expr1.seqType().one(), one2 = expr2.seqType().one();
+    if(union) {
+      if(!one && not || !one2 && not) return null;
+      ex = newList.apply(op);
+    } else {
+      if(!one || !one1 || !one2 && !not) return null;
+      ex = cc.function(Function.NOT, info, newList.apply(op.invert()));
+    }
+    return ex;
   }
 
   @Override
