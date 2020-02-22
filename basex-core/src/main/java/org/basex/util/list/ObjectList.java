@@ -52,7 +52,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
     final E[] lst = list;
     final int s = size;
     for(int l = 0; l < s; l++) {
-      if(eq(lst[l], element)) return true;
+      if(equals(lst[l], element)) return true;
     }
     return false;
   }
@@ -169,7 +169,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
     final int sz = size;
     int s = 0;
     for(int i = 0; i < sz; ++i) {
-      if(!eq(lst[i], element)) lst[s++] = lst[i];
+      if(!equals(lst[i], element)) lst[s++] = lst[i];
     }
     for(int i = s; i < sz; i++) lst[i] = null;
     size = s;
@@ -263,7 +263,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * @param element2 second element
    * @return result of check
    */
-  public boolean eq(final E element1, final E element2) {
+  public boolean equals(final E element1, final E element2) {
     return Objects.equals(element1, element2);
   }
 
@@ -278,7 +278,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
     if(s != 0) {
       int ns = 0;
       for(int l = 1; l < s; l++) {
-        if(!eq(lst[l], lst[ns])) lst[++ns] = lst[l];
+        if(!equals(lst[l], lst[ns])) lst[++ns] = lst[l];
       }
       size = ns + 1;
     }
@@ -300,7 +300,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
     if(s != f.size) return false;
     final E[] lst1 = list, lst2 = (E[]) f.list;
     for(int l = 0; l < s; l++) {
-      if(!eq(lst1[l], lst2[l])) return false;
+      if(!equals(lst1[l], lst2[l])) return false;
     }
     return true;
   }

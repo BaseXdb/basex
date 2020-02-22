@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -25,9 +26,9 @@ public final class FnExists extends FnEmpty {
   }
 
   @Override
-  public Expr simplifyFor(final AtomType type, final CompileContext cc) {
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // if(exists(node*)) -> if(node*)
-    if(type == AtomType.BLN) {
+    if(mode == Simplify.EBV) {
       final Expr expr = exprs[0];
       if(expr.seqType().type instanceof NodeType) return cc.simplify(this, expr);
     }

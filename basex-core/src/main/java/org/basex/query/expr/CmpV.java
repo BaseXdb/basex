@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpG.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
@@ -166,7 +167,7 @@ public final class CmpV extends Cmp {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    simplifyAll(AtomType.ATM, cc);
+    simplifyAll(Simplify.ATOM, cc);
 
     // swap operands
     if(swap()) {

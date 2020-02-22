@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
@@ -54,7 +55,7 @@ public final class OrderKey extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(AtomType.ATM, cc);
+    expr = expr.simplifyFor(Simplify.ATOM, cc);
     // override pre-evaluation
     return this;
   }

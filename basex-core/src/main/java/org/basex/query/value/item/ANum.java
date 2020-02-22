@@ -3,6 +3,7 @@ package org.basex.query.value.item;
 import static java.lang.Float.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -113,8 +114,9 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public final Expr simplifyFor(final AtomType tp, final CompileContext cc) throws QueryException {
-    return tp == AtomType.BLN && dbl() == 0 ? cc.simplify(this, Bln.FALSE) : this;
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
+      throws QueryException {
+    return mode == Simplify.EBV && dbl() == 0 ? cc.simplify(this, Bln.FALSE) : this;
   }
 
   @Override

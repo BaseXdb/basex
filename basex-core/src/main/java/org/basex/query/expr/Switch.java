@@ -7,6 +7,7 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -62,7 +63,7 @@ public final class Switch extends ParseExpr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    cond = cond.simplifyFor(AtomType.ATM, cc);
+    cond = cond.simplifyFor(Simplify.ATOM, cc);
 
     // check if expression can be pre-evaluated
     final Expr expr = opt(cc);
@@ -77,12 +78,12 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     boolean changed = false;
     for(final SwitchGroup group : groups) {
-      changed |= group.simplify(type, cc);
+      changed |= group.simplify(mode, cc);
     }
-    return changed ? optimize(cc) : super.simplifyFor(type, cc);
+    return changed ? optimize(cc) : super.simplifyFor(mode, cc);
   }
 
   @Override

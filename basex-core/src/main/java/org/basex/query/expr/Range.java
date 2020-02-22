@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -31,7 +32,7 @@ public final class Range extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    simplifyAll(AtomType.NUM, cc);
+    simplifyAll(Simplify.NUMBER, cc);
 
     Expr expr = emptyExpr();
     if(expr == this) {

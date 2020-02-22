@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.index.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
@@ -81,7 +82,7 @@ public final class FTContains extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(AtomType.ATM, cc);
+    expr = expr.simplifyFor(Simplify.ATOM, cc);
     return expr.seqType().zero() ? FnBoolean.get(expr, info, cc.sc()) : this;
   }
 

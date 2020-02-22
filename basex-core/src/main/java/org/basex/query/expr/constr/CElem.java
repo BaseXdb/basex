@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -53,7 +54,7 @@ public final class CElem extends CName {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    name = name.simplifyFor(AtomType.ATM, cc);
+    name = name.simplifyFor(Simplify.ATOM, cc);
     return this;
   }
 

@@ -478,6 +478,8 @@ public final class FnModuleTest extends QueryPlanTest {
     check("for $i in (1, 2) return " + func.args(" [$i] eq $i + 1"),
         "true\ntrue", exists("*[@op != 'eq']"));
     check("for $i in (1, 2) return " + func.args(" $i = ($i, $i)"),
+        "false\nfalse", exists("*[@op = '!=']"));
+    check("for $i in (1, 2) return " + func.args(" $i = ($i, <_>{ $i }</_>)"),
         "false\nfalse", exists(func));
   }
 

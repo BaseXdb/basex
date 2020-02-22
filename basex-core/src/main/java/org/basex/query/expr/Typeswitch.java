@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -120,12 +121,12 @@ public final class Typeswitch extends ParseExpr {
   }
 
   @Override
-  public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     boolean changed = false;
     for(final TypeswitchGroup group : groups) {
-      changed |= group.simplify(type, cc);
+      changed |= group.simplify(mode, cc);
     }
-    return changed ? optimize(cc) : super.simplifyFor(type, cc);
+    return changed ? optimize(cc) : super.simplifyFor(mode, cc);
   }
 
   @Override

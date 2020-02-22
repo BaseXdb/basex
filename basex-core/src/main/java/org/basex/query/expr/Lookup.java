@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -36,7 +37,7 @@ public final class Lookup extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    exprs[0] = exprs[0].simplifyFor(AtomType.ATM, cc);
+    exprs[0] = exprs[0].simplifyFor(Simplify.ATOM, cc);
 
     final Expr keys = exprs[0];
     final long ks = keys.seqType().mayBeArray() ? -1 : keys.size();

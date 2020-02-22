@@ -26,6 +26,14 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class CompileContext {
+  /** Compile-time optimizations. */
+  public enum Simplify {
+    /** Effective boolean value. */ EBV,
+    /** Untyped atomic.          */ ATOM,
+    /** Numbers.                 */ NUMBER,
+    /** Distinct values.         */ DISTINCT
+  }
+
   /** Limit for the size of sequences that are pre-evaluated. */
   public static final int MAX_PREEVAL = 1 << 18;
 

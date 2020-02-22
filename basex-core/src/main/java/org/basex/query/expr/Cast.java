@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -44,7 +45,7 @@ public final class Cast extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(AtomType.ATM, cc);
+    expr = expr.simplifyFor(Simplify.ATOM, cc);
 
     // pre-evaluate value argument
     if(expr instanceof Value) return cc.preEval(this);
@@ -77,8 +78,8 @@ public final class Cast extends Single {
   }
 
   @Override
-  public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
-    return simplifyCast(type, cc);
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    return simplifyCast(mode, cc);
   }
 
   @Override

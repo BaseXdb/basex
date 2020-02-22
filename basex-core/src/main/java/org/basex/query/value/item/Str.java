@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -99,8 +100,8 @@ public final class Str extends AStr {
   }
 
   @Override
-  public Expr simplifyFor(final AtomType tp, final CompileContext cc) throws QueryException {
-    return tp == AtomType.BLN ? cc.simplify(this, Bln.get(this != ZERO)) : this;
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) {
+    return mode == Simplify.EBV ? cc.simplify(this, Bln.get(this != ZERO)) : this;
   }
 
   @Override

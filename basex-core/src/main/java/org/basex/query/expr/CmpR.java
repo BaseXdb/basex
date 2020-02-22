@@ -10,6 +10,7 @@ import org.basex.index.name.*;
 import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
@@ -111,7 +112,7 @@ public final class CmpR extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(AtomType.NUM, cc);
+    expr = expr.simplifyFor(Simplify.NUMBER, cc);
 
     final SeqType st = expr.seqType();
     single = st.zeroOrOne() && !st.mayBeArray();

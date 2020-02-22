@@ -77,7 +77,7 @@ public final class TokenList extends ObjectList<byte[], TokenList> {
   }
 
   @Override
-  public boolean eq(final byte[] element1, final byte[] element2) {
+  public boolean equals(final byte[] element1, final byte[] element2) {
     return Token.eq(element1, element2);
   }
 

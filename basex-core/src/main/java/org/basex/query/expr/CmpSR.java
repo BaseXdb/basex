@@ -9,6 +9,7 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
@@ -72,7 +73,7 @@ public final class CmpSR extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(AtomType.ATM, cc);
+    expr = expr.simplifyFor(Simplify.ATOM, cc);
 
     final SeqType st = expr.seqType();
     single = st.zeroOrOne() && !st.mayBeArray();

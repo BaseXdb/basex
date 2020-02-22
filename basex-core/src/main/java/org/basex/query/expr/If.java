@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
@@ -73,7 +74,7 @@ public final class If extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // static condition: return branch in question
-    cond = cond.simplifyFor(AtomType.BLN, cc);
+    cond = cond.simplifyFor(Simplify.EBV, cc);
     if(cond instanceof Value) return cc.replaceWith(this, exprs[branch(cc.qc)]);
 
     // if A then B else B -> B (errors in A will be ignored)
@@ -205,8 +206,8 @@ public final class If extends Arr {
   }
 
   @Override
-  public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
-    return simplifyAll(type, cc) ? optimize(cc) : super.simplifyFor(type, cc);
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    return simplifyAll(mode, cc) ? optimize(cc) : super.simplifyFor(mode, cc);
   }
 
   @Override

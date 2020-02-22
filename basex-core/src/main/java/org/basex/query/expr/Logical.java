@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -55,7 +56,7 @@ abstract class Logical extends Arr {
   public final Expr optimize(final CompileContext cc, final boolean union) throws QueryException {
     ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
-      final Expr ex = expr.simplifyFor(AtomType.BLN, cc);
+      final Expr ex = expr.simplifyFor(Simplify.EBV, cc);
       if(union ? ex instanceof Or : ex instanceof And) {
         // flatten nested expressions
         for(final Expr exp : ((Logical) ex).exprs) list.add(exp);

@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -61,7 +62,7 @@ public final class GroupSpec extends Single {
 
   @Override
   public GroupSpec optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(AtomType.ATM, cc);
+    expr = expr.simplifyFor(Simplify.ATOM, cc);
 
     adoptType(expr);
     final AtomType type = expr.seqType().type.atomic();

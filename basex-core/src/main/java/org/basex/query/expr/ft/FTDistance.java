@@ -3,10 +3,10 @@ package org.basex.query.expr.ft;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.ft.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -54,8 +54,8 @@ public final class FTDistance extends FTFilter {
 
   @Override
   public FTExpr optimize(final CompileContext cc) throws QueryException {
-    min = min.simplifyFor(AtomType.NUM, cc);
-    max = max.simplifyFor(AtomType.NUM, cc);
+    min = min.simplifyFor(Simplify.NUMBER, cc);
+    max = max.simplifyFor(Simplify.NUMBER, cc);
     return this;
   }
 

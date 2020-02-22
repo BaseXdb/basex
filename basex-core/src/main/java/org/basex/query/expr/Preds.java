@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
@@ -166,7 +167,7 @@ public abstract class Preds extends Arr {
       final ExprList list = new ExprList(el);
       boolean pos = false;
       for(final Expr ex : exprs) {
-        final Expr ebv = ex.simplifyFor(AtomType.BLN, cc);
+        final Expr ebv = ex.simplifyFor(Simplify.EBV, cc);
         Expr expr = ebv;
         if(expr instanceof And) {
           if(!expr.has(Flag.POS)) {

@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -42,10 +43,10 @@ public final class FnNumber extends ContextFn {
   }
 
   @Override
-  public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     final boolean context = contextAccess();
     final Expr expr = context ? cc.qc.focus.value : exprs[0];
-    if(type == AtomType.NUM && expr != null) {
+    if(mode == Simplify.NUMBER && expr != null) {
       final SeqType st = expr.seqType();
       if(st.one() && (st.type.isUntyped() || st.type == AtomType.DBL)) {
         // number(<a>1</a>) + 2  ->  <a>1</a> + 2
@@ -54,6 +55,6 @@ public final class FnNumber extends ContextFn {
         if(cc.nestedFocus()) return new ContextValue(info).optimize(cc);
       }
     }
-    return super.simplifyFor(type, cc);
+    return super.simplifyFor(mode, cc);
   }
 }

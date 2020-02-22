@@ -4,6 +4,7 @@ import static java.lang.Long.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
@@ -104,7 +105,7 @@ public final class CmpIR extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(AtomType.NUM, cc);
+    expr = expr.simplifyFor(Simplify.NUMBER, cc);
 
     final SeqType st = expr.seqType();
     single = st.zeroOrOne() && !st.mayBeArray();

@@ -7,6 +7,7 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -250,13 +251,13 @@ public final class TypeswitchGroup extends Single {
 
   /**
    * Simplifies all expressions for requests of the specified type.
-   * @param type target type
+   * @param mode mode of simplification
    * @param cc compilation context
    * @return {@code true} if expression has changed
    * @throws QueryException query exception
    */
-  public boolean simplify(final AtomType type, final CompileContext cc) throws QueryException {
-    final Expr ex = expr.simplifyFor(type, cc);
+  public boolean simplify(final Simplify mode, final CompileContext cc) throws QueryException {
+    final Expr ex = expr.simplifyFor(mode, cc);
     if(ex == expr) return false;
     expr = ex;
     return true;

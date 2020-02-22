@@ -10,6 +10,7 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
@@ -19,7 +20,6 @@ import org.basex.query.util.index.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -103,7 +103,7 @@ public final class FTWords extends FTExpr {
   public FTWords optimize(final CompileContext cc) throws QueryException {
     if(occ != null) {
       final int ol = occ.length;
-      for(int o = 0; o < ol; o++) occ[o] = occ[o].simplifyFor(AtomType.NUM, cc);
+      for(int o = 0; o < ol; o++) occ[o] = occ[o].simplifyFor(Simplify.NUMBER, cc);
     }
     return this;
   }

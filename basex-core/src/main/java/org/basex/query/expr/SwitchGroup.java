@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -48,7 +49,7 @@ public final class SwitchGroup extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final int el = exprs.length;
-    for(int e = 1; e < el; e++) exprs[e] = exprs[e].simplifyFor(AtomType.ATM, cc);
+    for(int e = 1; e < el; e++) exprs[e] = exprs[e].simplifyFor(Simplify.ATOM, cc);
     return this;
   }
 
@@ -102,13 +103,13 @@ public final class SwitchGroup extends Arr {
 
   /**
    * Simplifies all expressions for requests of the specified type.
-   * @param type target type
+   * @param mode mode of simplification
    * @param cc compilation context
    * @return {@code true} if expression has changed
    * @throws QueryException query exception
    */
-  public boolean simplify(final AtomType type, final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0].simplifyFor(type, cc);
+  public boolean simplify(final Simplify mode, final CompileContext cc) throws QueryException {
+    final Expr expr = exprs[0].simplifyFor(mode, cc);
     if(expr == exprs[0]) return false;
     exprs[0] = expr;
     return true;

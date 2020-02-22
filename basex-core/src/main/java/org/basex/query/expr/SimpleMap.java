@@ -7,6 +7,7 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
 import org.basex.query.util.*;
@@ -251,10 +252,10 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
-  public final Expr simplifyFor(final AtomType type, final CompileContext cc)
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
 
-    if(type == AtomType.BLN) {
+    if(mode == Simplify.EBV || mode == Simplify.DISTINCT) {
       final Expr expr = toPath(cc);
       if(expr != this) return expr;
     } else {
@@ -262,13 +263,13 @@ public abstract class SimpleMap extends Arr {
       cc.pushFocus(exprs[el - 1]);
       Expr expr = exprs[el];
       try {
-        exprs[el] = expr.simplifyFor(type, cc);
+        exprs[el] = expr.simplifyFor(mode, cc);
       } finally {
         cc.removeFocus();
       }
       if(expr != exprs[el]) return optimize(cc);
     }
-    return super.simplifyFor(type, cc);
+    return super.simplifyFor(mode, cc);
   }
 
   @Override

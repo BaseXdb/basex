@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -34,7 +35,7 @@ public final class Arith extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    simplifyAll(AtomType.NUM, cc);
+    simplifyAll(Simplify.NUMBER, cc);
 
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();

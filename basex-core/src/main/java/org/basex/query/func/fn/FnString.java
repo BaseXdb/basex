@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -28,7 +29,7 @@ public final class FnString extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    simplifyAll(AtomType.ATM, cc);
+    simplifyAll(Simplify.ATOM, cc);
 
     final boolean context = contextAccess();
     final Expr expr = context ? cc.qc.focus.value : exprs[0];
@@ -41,10 +42,10 @@ public final class FnString extends ContextFn {
   }
 
   @Override
-  public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     final boolean context = contextAccess();
     final Expr expr = context ? cc.qc.focus.value : exprs[0];
-    if(type == AtomType.ATM && expr != null) {
+    if(mode == Simplify.ATOM && expr != null) {
       final SeqType st = expr.seqType();
       if(st.one() && st.type.isStringOrUntyped()) {
         // string(<a>1</a>) = '1'  ->  <a>1</a> = '1'
@@ -53,6 +54,6 @@ public final class FnString extends ContextFn {
         if(cc.nestedFocus()) return new ContextValue(info).optimize(cc);
       }
     }
-    return super.simplifyFor(type, cc);
+    return super.simplifyFor(mode, cc);
   }
 }

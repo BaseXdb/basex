@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
@@ -199,14 +200,14 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final Expr simplifyFor(final AtomType type, final CompileContext cc)
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
 
-    if(type == AtomType.BLN) {
+    if(mode == Simplify.EBV) {
       final Expr expr = simplify(root, cc);
       if(expr != this) return cc.simplify(this, expr);
     }
-    return super.simplifyFor(type, cc);
+    return super.simplifyFor(mode, cc);
   }
 
   @Override

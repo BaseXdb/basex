@@ -342,6 +342,7 @@ public final class QNm extends Item {
 
   @Override
   public boolean equals(final Object obj) {
+    // prefix is ignored in equality check!
     return obj instanceof QNm && eq((QNm) obj);
   }
 

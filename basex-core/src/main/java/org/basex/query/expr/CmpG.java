@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.index.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
@@ -12,7 +13,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.index.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -142,11 +142,18 @@ public class CmpG extends Cmp {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    // pre-evaluate if one value is empty:
+    // () eq local:expensive()  ->  ()
+    // prof:void(123) = 1  ->  boolean(prof:void('123'))
+    Expr expr = emptyExpr();
+    if(expr != this) return cc.replaceWith(this, cc.function(Function.BOOLEAN, info, expr));
+
+    // remove redundant type conversions
     final Type t1 = exprs[0].seqType().type, t2 = exprs[1].seqType().type;
     if(t1.isStringOrUntyped() && t2.isStringOrUntyped()) {
-      simplifyAll(AtomType.ATM, cc);
+      simplifyAll(Simplify.ATOM, cc);
     } else if(t1.isNumber() && t2.isNumber()) {
-      simplifyAll(AtomType.NUM, cc);
+      simplifyAll(Simplify.NUMBER, cc);
     }
 
     // swap operands
@@ -155,52 +162,37 @@ public class CmpG extends Cmp {
       op = op.swap();
     }
 
-    // simplify singleton sequences
-    for(int e = 0; e < 2; e++) {
-      if(exprs[e] instanceof SingletonSeq) exprs[e] = ((SingletonSeq) exprs[e]).value;
-    }
+    // simplify operands
+    for(int e = 0; e < 2; e++) exprs[e] = exprs[e].simplifyFor(Simplify.DISTINCT, cc);
 
-    // pre-evaluate if one value is empty (e.g.: () eq local:expensive() )
-    Expr expr = emptyExpr();
-    if(expr != this) {
-      // prof:void(123) = 1 -> boolean(prof:void('123'))
-      expr = cc.function(Function.BOOLEAN, info, expr);
-    } else {
-      // optimize expression
-      expr = opt(cc);
+    // optimize expression
+    expr = opt(cc);
 
-      // range comparisons
-      if(expr == this) expr = CmpIR.get(this, false, cc);
-      if(expr == this) expr = CmpR.get(this, cc);
-      if(expr == this) expr = CmpSR.get(this, cc);
+    // range comparisons
+    if(expr == this) expr = CmpIR.get(this, false, cc);
+    if(expr == this) expr = CmpR.get(this, cc);
+    if(expr == this) expr = CmpSR.get(this, cc);
 
-      if(expr == this) {
-        // convert maps to paths and lists to unions
-        for(int e = 0; e < 2; e++) {
-          final Expr ex = exprs[e];
-          if(ex instanceof SimpleMap) exprs[e] = ((SimpleMap) ex).toPath(cc);
-          else if(ex instanceof List) exprs[e] = ((List) ex).toUnion(cc);
-        }
+    if(expr == this) {
+      // determine types, choose best implementation
+      final Expr expr1 = exprs[0], expr2 = exprs[1];
+      final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
+      final Type type1 = st1.type, type2 = st2.type;
+      // skip type check if types are identical (and a child instance of of any atomic type)
+      check = !(type1 == type2 && !AtomType.AAT.instanceOf(type1) &&
+          (type1.isSortable() || op != OpG.EQ && op != OpG.NE) ||
+          type1.isUntyped() || type2.isUntyped() ||
+          type1.instanceOf(AtomType.STR) && type2.instanceOf(AtomType.STR) ||
+          type1.instanceOf(AtomType.NUM) && type2.instanceOf(AtomType.NUM) ||
+          type1.instanceOf(AtomType.DUR) && type2.instanceOf(AtomType.DUR));
 
-        final Expr expr1 = exprs[0], expr2 = exprs[1];
-        final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-        final Type type1 = st1.type, type2 = st2.type;
-        // skip type check if types are identical (and a child instance of of any atomic type)
-        check = !(type1 == type2 && !AtomType.AAT.instanceOf(type1) &&
-            (type1.isSortable() || op != OpG.EQ && op != OpG.NE) ||
-            type1.isUntyped() || type2.isUntyped() ||
-            type1.instanceOf(AtomType.STR) && type2.instanceOf(AtomType.STR) ||
-            type1.instanceOf(AtomType.NUM) && type2.instanceOf(AtomType.NUM) ||
-            type1.instanceOf(AtomType.DUR) && type2.instanceOf(AtomType.DUR));
-
-        if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
-          // simple comparisons
-          expr = new CmpSimpleG(expr1, expr2, op, coll, sc, info);
-        } else if(op == OpG.EQ && coll == null && (type1.isNumber() && type2.isNumber() ||
-            (type1.isStringOrUntyped() && type2.isStringOrUntyped())) && !st2.zeroOrOne()) {
-          // hash-based comparisons
-          expr = new CmpHashG(expr1, expr2, op, null, sc, info);
-        }
+      if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
+        // simple comparisons
+        expr = new CmpSimpleG(expr1, expr2, op, coll, sc, info);
+      } else if(op == OpG.EQ && coll == null && (type1.isNumber() && type2.isNumber() ||
+          (type1.isStringOrUntyped() && type2.isStringOrUntyped())) && !st2.zeroOrOne()) {
+        // hash-based comparisons
+        expr = new CmpHashG(expr1, expr2, op, null, sc, info);
       }
     }
 

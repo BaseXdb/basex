@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -61,7 +62,7 @@ public final class Condition extends Single {
 
   @Override
   public Condition optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(AtomType.BLN, cc);
+    expr = expr.simplifyFor(Simplify.EBV, cc);
     return this;
   }
 

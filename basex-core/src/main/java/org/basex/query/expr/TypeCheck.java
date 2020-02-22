@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -133,9 +134,9 @@ public class TypeCheck extends Single {
   }
 
   @Override
-  public final Expr simplifyFor(final AtomType type, final CompileContext cc)
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
-    return promote ? simplifyCast(type, cc) : super.simplifyFor(type, cc);
+    return promote ? simplifyCast(mode, cc) : super.simplifyFor(mode, cc);
   }
 
   /**

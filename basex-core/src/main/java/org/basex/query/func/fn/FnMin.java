@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.AtomType.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
@@ -129,7 +130,7 @@ public class FnMin extends StandardFunc {
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
     // do not simplify input arguments
-    if(exprs.length > 1) exprs[1] = exprs[1].simplifyFor(AtomType.ATM, cc);
+    if(exprs.length > 1) exprs[1] = exprs[1].simplifyFor(Simplify.ATOM, cc);
   }
 
   @Override

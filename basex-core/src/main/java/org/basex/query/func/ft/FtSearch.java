@@ -5,13 +5,13 @@ import static org.basex.util.ft.FTFlag.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.type.*;
 import org.basex.util.ft.*;
 
 /**
@@ -50,7 +50,7 @@ public final class FtSearch extends FtAccess {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    exprs[1] = exprs[1].simplifyFor(AtomType.ATM, cc);
+    exprs[1] = exprs[1].simplifyFor(Simplify.ATOM, cc);
     return compileData(cc);
   }
 }

@@ -3,12 +3,12 @@ package org.basex.query.expr.ft;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.index.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -48,7 +48,7 @@ public final class FTWeight extends FTExpr {
 
   @Override
   public FTExpr optimize(final CompileContext cc) throws QueryException {
-    weight = weight.simplifyFor(AtomType.NUM, cc);
+    weight = weight.simplifyFor(Simplify.NUMBER, cc);
     return this;
   }
 

@@ -71,7 +71,7 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
   }
 
   @Override
-  public boolean eq(final ANode node1, final ANode node2) {
+  public boolean equals(final ANode node1, final ANode node2) {
     return node1.is(node2);
   }
 

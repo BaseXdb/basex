@@ -6,6 +6,7 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -163,16 +164,25 @@ public final class List extends Arr {
   }
 
   @Override
-  public Expr simplifyFor(final AtomType type, final CompileContext cc) throws QueryException {
-    if(type == AtomType.BLN) {
-      if(!seqType().oneOrMore()) {
-        final Expr union = toUnion(cc);
-        if(union != this) return union;
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    Expr expr = this;
+    if(mode == Simplify.EBV) {
+      // otherwise, rewrite list to union
+      expr = toUnion(cc);
+    } else if(mode == Simplify.DISTINCT) {
+      final ExprList list = new ExprList(exprs.length);
+      for(final Expr ex : exprs) list.addUnique(ex);
+      if(list.size() != exprs.length) {
+        // remove duplicate list expressions
+        expr = cc.replaceWith(this, new List(info, list.finish()).optimize(cc));
+      } else {
+        // otherwise, rewrite list to union
+        expr = toUnion(cc);
       }
     } else {
-      if(simplifyAll(type, cc)) return optimize(cc);
+      if(simplifyAll(mode, cc)) expr = optimize(cc);
     }
-    return super.simplifyFor(type, cc);
+    return expr == this ? super.simplifyFor(mode, cc) : expr.simplifyFor(mode, cc);
   }
 
   /**

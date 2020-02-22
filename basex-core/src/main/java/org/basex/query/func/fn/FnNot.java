@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -22,7 +23,7 @@ public final class FnNot extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // e.g.: not(boolean(A)) -> not(A)
-    final Expr expr = exprs[0].simplifyFor(AtomType.BLN, cc);
+    final Expr expr = exprs[0].simplifyFor(Simplify.EBV, cc);
 
     // not(empty(A)) -> exists(A)
     if(Function.EMPTY.is(expr)) {

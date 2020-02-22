@@ -6,6 +6,7 @@ import org.basex.data.*;
 import org.basex.index.path.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -64,6 +65,8 @@ public final class FnDistinctValues extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
+    exprs[0] = exprs[0].simplifyFor(Simplify.DISTINCT, cc);
+
     Expr expr = exprs[0];
     if(expr instanceof RangeSeq) return expr;
     if(expr instanceof SingletonSeq) {

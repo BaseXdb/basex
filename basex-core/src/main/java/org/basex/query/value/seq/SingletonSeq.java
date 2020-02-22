@@ -3,6 +3,8 @@ package org.basex.query.value.seq;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -70,6 +72,14 @@ public final class SingletonSeq extends Seq {
   @Override
   public Item itemAt(final long pos) {
     return value.itemAt(pos % value.size());
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    if(mode == Simplify.DISTINCT) {
+      return cc.replaceWith(this, value);
+    }
+    return super.simplifyFor(mode, cc);
   }
 
   @Override

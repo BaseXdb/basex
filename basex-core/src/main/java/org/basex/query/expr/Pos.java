@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
@@ -90,7 +91,7 @@ public final class Pos extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    simplifyAll(AtomType.NUM, cc);
+    simplifyAll(Simplify.NUMBER, cc);
     return this;
   }
 

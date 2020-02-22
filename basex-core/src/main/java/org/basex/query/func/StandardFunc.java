@@ -18,6 +18,7 @@ import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.xquery.XQueryEval.*;
 import org.basex.query.iter.*;
@@ -102,8 +103,8 @@ public abstract class StandardFunc extends Arr {
       final int p = Math.min(e, definition.params.length - 1);
       final Type type = definition.params[p].type;
       if(type.instanceOf(AtomType.AAT)) {
-        final AtomType at = type.instanceOf(AtomType.NUM) ? AtomType.NUM : AtomType.ATM;
-        exprs[e] = exprs[e].simplifyFor(at, cc);
+        final Simplify mode = type.instanceOf(AtomType.NUM) ? Simplify.NUMBER : Simplify.ATOM;
+        exprs[e] = exprs[e].simplifyFor(mode, cc);
       }
     }
   }

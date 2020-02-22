@@ -87,12 +87,13 @@ public final class InlineTest extends QueryPlanTest {
 
   /** Checks that the simple map operator prohibits inlining a context item into its RHS. */
   @Test public void gh1055() {
-    check("let $d := for-each(1 to 100, function($a) { $a }) "
-        + "return ((1 to 2) ! $d) = 1",
-        true,
+    check("(let $d := for-each(1 to 100, function($a) { $a }) "
+        + "return (1 to 2) ! $d)[. = 0]",
+        "",
         exists(_UTIL_REPLICATE));
-    check("let $d := for-each(1 to 11, function($a) { $a }) return ((1 to 2) ! $d[1]) = 12",
-        false,
+    check("(let $d := for-each(1 to 11, function($a) { $a }) "
+        + "return (1 to 2) ! $d[1])[. = 0]",
+        "",
         exists(_UTIL_REPLICATE));
     check("for $x in (<x/>, <x/>) where (1, 2) ! $x return $x",
         "<x/>\n<x/>",

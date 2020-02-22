@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -39,7 +40,7 @@ public final class Unary extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(AtomType.NUM, cc);
+    expr = expr.simplifyFor(Simplify.NUMBER, cc);
 
     // no negation, numeric value: return operand
     final SeqType st = expr.seqType();

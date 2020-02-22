@@ -9,6 +9,7 @@ import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.index.path.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.index.*;
@@ -169,10 +170,10 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final Expr simplifyFor(final AtomType type, final CompileContext cc)
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
 
-    if(type == AtomType.BLN) {
+    if(mode == Simplify.EBV) {
       final Expr last = steps[steps.length - 1];
       if(last instanceof Step) {
         final Step step = (Step) last;
@@ -187,7 +188,7 @@ public abstract class Path extends ParseExpr {
         }
       }
     }
-    return super.simplifyFor(type, cc);
+    return super.simplifyFor(mode, cc);
   }
 
   @Override

@@ -3,6 +3,7 @@ package org.basex.query.func.util;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -43,5 +44,18 @@ public final class UtilReplicate extends StandardFunc {
     // adopt sequence type
     exprType.assign(st.type, st.occ.union(m > 0 ? Occ.ONE_MORE : Occ.ZERO_MORE), sz);
     return this;
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    final Expr expr = exprs[0], mult = exprs[1];
+    if(mode == Simplify.DISTINCT) {
+      if(mult instanceof Value && toLong(mult, cc.qc) > 0) {
+        return cc.replaceWith(this, expr);
+      }
+    } else if(mode == Simplify.ATOM || mode == Simplify.NUMBER) {
+      exprs[0] = expr.simplifyFor(mode, cc);
+    }
+    return super.simplifyFor(mode, cc);
   }
 }
