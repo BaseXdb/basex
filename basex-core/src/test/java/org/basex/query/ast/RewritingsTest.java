@@ -1030,14 +1030,43 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Merge and/or expressions. */
   @Test public void gh1820() {
-    check("exists(let $x := <a><b>c</b><b>d</b></a> return $x[b = 'c' and b = 'd'])", true,
-        count(CmpG.class, 2));
+    // OR: merge
+    check("(<_/>, <_/>) = 'a' or (<_/>, <_/>) = 'b'", false, empty(Or.class));
+    check("(<_/>, <_/>) = 'a' or (<_/>, <_/>) = ('b', 'c')", false, empty(Or.class));
+    check("<_>1</_>[. = 1 or . = (2, 3)]", "<_>1</_>", empty(Or.class), exists(CmpG.class));
+    check("<_>1</_>[not(. = 1) or . != (2, 3)]", "<_>1</_>", empty(Or.class));
     check("exists(let $x := <a><b>c</b><b>d</b></a> return $x[b = 'c' or b = 'd'])", true,
         count(CmpHashG.class, 1));
 
-    check("<_>a</_>[. = 'c' or not(. != ('a', 'b'))]", "", exists(Or.class));
+    // OR: no merge
+    check("<_>1</_>[not(. = 1) or not(. = (2, 3))]", "<_>1</_>", exists(Or.class));
+    check("<_>1</_>[. = 1 or not(. != (2, 3))]", "<_>1</_>", exists(Or.class));
+    check("<_>1</_>[not(. = 1) or . = (2, 3)]", "", exists(Or.class));
+    check("<_>1</_>[. = 1 or not(. = (2, 3))]", "<_>1</_>", exists(Or.class));
 
-    //check("(3, 4)[not(. = 1) or not(. = (2, 3))]", "3\n4", empty(NOT), count(CmpG.class, 1));
-    //check("(3, 4)[not(. = (2, 3)) or . != 1]", "3\n4", empty(NOT), count(CmpG.class, 1));
+    check("<_>a</_>[. = 'a' or . != 'b']", "<_>a</_>", exists(Or.class));
+    check("<_>a</_>[. = 'a' or .. != 'b']", "<_>a</_>", exists(Or.class));
+
+    // AND: merge
+    check("(<_/>, <_/>) = 'a' and (<_/>, <_/>) = 'b'", false, empty(And.class));
+    check("<_>1</_>[not(. = 1) and not(. = (2, 3))]", "",
+        exists(CmpG.class), empty(CmpSimpleG.class));
+    check("not((<_/>, <_/>) != 'a') and not((<_/>, <_/>) != 'b')", false,
+        exists(CmpG.class), empty(CmpSimpleG.class));
+
+    // AND: no merge
+    check("(<_/>, <_/>) = 'a' and (<_/>, <_/>) = ('b', 'c')", false, exists(And.class));
+
+    check("exists(let $x := <a><b>c</b><b>d</b></a> return $x[b = 'c' and b = 'd'])", true,
+        count(CmpG.class, 2));
+
+    check("<_>1</_>[. = 1 and . = (2, 3)]", "",
+        exists(CmpG.class), exists(CmpSimpleG.class));
+    check("<_>1</_>[not(. = 1) and . = (2, 3)]", "",
+        exists(CmpG.class), exists(CmpSimpleG.class));
+    check("<_>1</_>[. = 1 and not(. = (2, 3))]", "<_>1</_>",
+        exists(CmpG.class), exists(CmpSimpleG.class));
+
+    check("(<_/>, <_/>) = '' and (<_/>, <_/>) = 'a'", false, exists(And.class));
   }
 }
