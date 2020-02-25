@@ -301,37 +301,58 @@ public class CmpG extends Cmp {
   public Expr merge(final Expr expr, final boolean union, final CompileContext cc)
       throws QueryException {
 
-    // OR: merge comparisons
-    // E = 'a' or E = 'b'  ->  E = ('a', 'b')
-    // AND: invert operator, wrap with not()
-    // E != 'a' and E != 'b'  ->  not(E = ('a', 'b'))
-    // negation: invert operator
-    // E != 'a' or not(E = 'b')  ->  E != ('a', 'b')
+    /* OR: merge comparisons
+     * E = 'a' or E = 'b'  ->  E = ('a', 'b')
+     * AND: invert operator, wrap with not()
+     * E != 'a' and E != 'b'  ->  not(E = ('a', 'b'))
+     * negation: invert operator
+     * E != 'a' or not(E = 'b')  ->  E != ('a', 'b')  */
 
-    final boolean not = expr instanceof FnNot;
-    Expr ex = not ? ((FnNot) expr).exprs[0] : expr;
-    if(!(ex instanceof CmpG)) return null;
+    // if required, invert second operator (first operator need never be inverted)
+    final boolean not2 = expr instanceof FnNot;
+    Expr expr2 = not2 ? ((FnNot) expr).exprs[0] : expr;
+    if(!(expr2 instanceof CmpG)) return null;
 
-    final CmpG cmp = (CmpG) ex;
-    final OpG cmpOp = not ? cmp.op.invert() : cmp.op;
-    if(op != cmpOp || coll != cmp.coll || !exprs[0].equals(cmp.exprs[0])) return null;
+    // compare first and second comparison
+    final CmpG cmp2 = (CmpG) expr2;
+    final OpG cmpOp = not2 ? cmp2.op.invert() : cmp2.op;
+    if(op != cmpOp || coll != cmp2.coll || !exprs[0].equals(cmp2.exprs[0])) return null;
 
-    final Expr expr1 = exprs[1], expr2 = cmp.exprs[1];
+    // function for creating new comparison
+    final Expr exprL = exprs[0], exprR1 = exprs[1], exprR2 = cmp2.exprs[1];
     final QueryFunction<OpG, Expr> newList = newOp -> {
-      final Expr list = new List(info, expr1, expr2).optimize(cc);
-      return new CmpG(exprs[0], list, newOp, coll, sc, info).optimize(cc);
+      final Expr exprR = new List(info, exprR1, exprR2).optimize(cc);
+      return new CmpG(exprL, exprR, newOp, coll, sc, info).optimize(cc);
     };
 
-    final boolean one = exprs[0].seqType().one();
-    final boolean one1 = expr1.seqType().one(), one2 = expr2.seqType().one();
+    // check if comparisons can be merged
+    final boolean seqL = !exprL.seqType().one();
+    final boolean seqR1 = !exprR1.seqType().one(), seqR2 = !exprR2.seqType().one();
     if(union) {
-      if(!one && not || !one2 && not) return null;
-      ex = newList.apply(op);
+      /* do not merge if second comparison was inverted and left operand or
+       * second right operand contain are not a single item. examples:
+       * $number  = 2  or  not($number  = 4)
+       * $numbers = 3  or  not($numbers = 4)  */
+      if(not2 && (seqR2 || seqL)) return null;
+      /* rewriting is possible in all other cases. examples:
+       * $number != 1  or  not($number = 2)   ->  $number != (1, 2)
+       * $numbers = 2  or  $numbers = (3, 4)  ->  $numbers = (2, 3, 4)  */
+      expr2 = newList.apply(op);
     } else {
-      if(!one || !one1 || !one2 && !not) return null;
-      ex = cc.function(Function.NOT, info, newList.apply(op.invert()));
+      /* do not merge if left operand or first right operand is not a single item, or if
+       * second comparison was inverted and right operand is not a single item. examples:
+       * $numbers = 2      and  $numbers = 2
+       * $number = (1, 2)  and  $number  = 3
+       * $number = 1       and  not($number = (2, 3)  */
+      if(seqL || seqR1 || seqR2 && !not2) return null;
+      /* rewriting is possible in all other cases. examples:
+       * $number != 1  and  $number != 2             ->  not($number = (1, 2))
+       * $numbers = 2  and  not($numbers != (3, 4))  ->  not($numbers != (2, 3, 4))  */
+      expr2 = cc.function(Function.NOT, info, newList.apply(op.invert()));
     }
-    return ex;
+
+    // no merge possible
+    return expr2;
   }
 
   @Override
