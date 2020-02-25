@@ -70,9 +70,9 @@ public final class Lookup extends Arr {
           // keys are constant, so we do not duplicate work in the inner loop
           final LinkedList<Clause> clauses = new LinkedList<>();
           final Var c = cc.vs().addNew(new QNm("c"), null, false, cc.qc, info);
-          clauses.add(new For(c, null, null, ctx, false));
+          clauses.add(new For(c, ctx));
           final Var k = cc.vs().addNew(new QNm("k"), null, false, cc.qc, info);
-          clauses.add(new For(k, null, null, keys, false));
+          clauses.add(new For(k, keys));
           final VarRef rc = new VarRef(info, c), rk = new VarRef(info, k);
           final DynFuncCall rtrn = new DynFuncCall(info, cc.sc(), rc, rk);
           expr = new GFLWOR(info, clauses, rtrn).optimize(cc);

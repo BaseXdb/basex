@@ -258,10 +258,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final IntObjMap<Var> vm = new IntObjMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
-      clauses.add(new Let(cc.copy(params[p], vm), exprs[p], false).optimize(cc));
+      clauses.add(new Let(cc.copy(params[p], vm), exprs[p]).optimize(cc));
     }
     for(final Entry<Var, Expr> e : global.entrySet()) {
-      clauses.add(new Let(cc.copy(e.getKey(), vm), e.getValue(), false).optimize(cc));
+      clauses.add(new Let(cc.copy(e.getKey(), vm), e.getValue()).optimize(cc));
     }
 
     // create the return clause
@@ -280,7 +280,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       // collect closure
       final LinkedList<Clause> clauses = new LinkedList<>();
       for(final Entry<Var, Expr> entry : global.entrySet()) {
-        clauses.add(new Let(entry.getKey(), entry.getValue().value(qc), false));
+        clauses.add(new Let(entry.getKey(), entry.getValue().value(qc)));
       }
       body = new GFLWOR(info, clauses, expr);
     }

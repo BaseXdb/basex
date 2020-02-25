@@ -35,6 +35,15 @@ public final class For extends ForLet {
   /**
    * Constructor.
    * @param var item variable
+   * @param expr bound expression
+   */
+  public For(final Var var, final Expr expr) {
+    this(var, null, null, expr, false);
+  }
+
+  /**
+   * Constructor.
+   * @param var item variable
    * @param pos position variable or {@code null}
    * @param score score variable or {@code null}
    * @param expr bound expression
@@ -157,7 +166,7 @@ public final class For extends ForLet {
     if(!expr.seqType().one()) return false;
     clauses.set(p, Let.fromFor(this));
     if(score != null) clauses.add(p + 1, Let.fromForScore(this));
-    if(pos != null) clauses.add(p + 1, new Let(pos, Int.ONE, false));
+    if(pos != null) clauses.add(p + 1, new Let(pos, Int.ONE));
     return true;
   }
 

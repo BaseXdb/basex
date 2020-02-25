@@ -28,6 +28,15 @@ public final class Let extends ForLet {
    * Constructor.
    * @param var variable
    * @param expr expression
+   */
+  public Let(final Var var, final Expr expr) {
+    this(var, expr, false);
+  }
+
+  /**
+   * Constructor.
+   * @param var variable
+   * @param expr expression
    * @param scoring scoring flag
    */
   public Let(final Var var, final Expr expr, final boolean scoring) {
@@ -40,7 +49,7 @@ public final class Let extends ForLet {
    * @return let binding
    */
   static Let fromFor(final For fr) {
-    final Let lt = new Let(fr.var, fr.expr, false);
+    final Let lt = new Let(fr.var, fr.expr);
     lt.adoptType(fr.expr);
     return lt;
   }

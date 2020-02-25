@@ -1278,7 +1278,7 @@ public class QueryParser extends InputParser {
       final Var var = newVar();
       wsCheck(IN);
       final Expr ex = check(single(), NOSOME);
-      fl = Array.add(fl, new For(localVars.add(var), null, null, ex, false));
+      fl = Array.add(fl, new For(localVars.add(var), ex));
     } while(wsConsumeWs(COMMA));
 
     wsCheck(SATISFIES);
@@ -3758,7 +3758,7 @@ public class QueryParser extends InputParser {
       final Var var = newVar(SeqType.NOD_O);
       wsCheck(ASSIGN);
       final Expr ex = check(single(), INCOMPLETE);
-      fl = Array.add(fl, new Let(localVars.add(var), ex, false));
+      fl = Array.add(fl, new Let(localVars.add(var), ex));
     } while(wsConsumeWs(COMMA));
     wsCheck(MODIFY);
 

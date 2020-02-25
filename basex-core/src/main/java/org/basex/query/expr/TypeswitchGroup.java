@@ -91,7 +91,7 @@ public final class TypeswitchGroup extends Single {
     if(var == null) return expr;
     final IntObjMap<Var> vm = new IntObjMap<>();
     final LinkedList<Clause> clauses = new LinkedList<>();
-    clauses.add(new Let(cc.copy(var, vm), cond, false).optimize(cc));
+    clauses.add(new Let(cc.copy(var, vm), cond).optimize(cc));
     final Expr rtrn = expr.copy(cc, vm).optimize(cc);
     return new GFLWOR(info, clauses, rtrn).optimize(cc);
   }

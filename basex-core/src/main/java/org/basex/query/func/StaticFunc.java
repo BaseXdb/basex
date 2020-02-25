@@ -286,7 +286,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final IntObjMap<Var> vm = new IntObjMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
-      clauses.add(new Let(cc.copy(params[p], vm), exprs[p], false).optimize(cc));
+      clauses.add(new Let(cc.copy(params[p], vm), exprs[p]).optimize(cc));
     }
 
     // create the return clause

@@ -666,7 +666,7 @@ public final class GFLWOR extends ParseExpr {
           final Count cnt = (Count) clauses.get(1);
           if(fst.pos != null) {
             final VarRef vr = new VarRef(cnt.info, fst.pos);
-            clauses.set(1, new Let(cnt.var, vr.optimize(cc), false).optimize(cc));
+            clauses.set(1, new Let(cnt.var, vr.optimize(cc)).optimize(cc));
           } else {
             clauses.set(0, new For(fst.var, cnt.var, fst.score, fst.expr, false).optimize(cc));
             clauses.remove(1);
