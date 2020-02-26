@@ -1,15 +1,21 @@
 package org.basex.query.func.fn;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
+import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.func.update.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -19,68 +25,40 @@ import org.basex.query.value.type.*;
  */
 public class FnForEach extends StandardFunc {
   @Override
-  public final Iter iter(final QueryContext qc) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
-    final FItem func = checkArity(exprs[1], 1, this instanceof UpdateForEach, qc);
-
-    return new Iter() {
-      Iter ir = Empty.ITER;
-
-      @Override
-      public Item next() throws QueryException {
-        do {
-          final Item item1 = qc.next(ir);
-          if(item1 != null) return item1;
-          final Item item2 = iter.next();
-          if(item2 == null) return null;
-          ir = func.invokeValue(qc, info, item2).iter();
-        } while(true);
-      }
-    };
-  }
-
-  @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
-    final FItem func = checkArity(exprs[1], 1, this instanceof UpdateForEach, qc);
-
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item item; (item = qc.next(iter)) != null;) vb.add(func.invokeValue(qc, info, item));
-    return vb.value(this);
+    throw Util.notExpected();
   }
 
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0];
-    final SeqType st1 = expr1.seqType();
-    if(st1.zero()) return expr1;
-
-    exprs[1] = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, st1.with(Occ.ONE));
+    final Expr items = exprs[0];
+    final SeqType st = items.seqType();
+    if(st.zero()) return items;
 
     // assign type after coercion (expression might have changed)
     final boolean updating = this instanceof UpdateForEach;
-    final Expr expr2 = exprs[1];
-    final FuncType ft = expr2.funcType();
-    if(ft != null && !updating) {
-      final SeqType declType = ft.declType;
-      final boolean oneOrMore = st1.oneOrMore() && declType.oneOrMore();
-      final long size = declType.zero() ? 0 : declType.one() ? expr1.size() : -1;
-      exprType.assign(declType.type, oneOrMore ? Occ.ONE_MORE : Occ.ZERO_MORE, size);
-    }
+    final long size = items.size();
+    final Expr func = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, st.with(Occ.ONE));
 
-    final long size1 = expr1.size();
-    if(allAreValues(false) && size1 <= UNROLL_LIMIT) {
+    final boolean ndt = func.has(Flag.NDT);
+    if(allAreValues(false) && size <= UNROLL_LIMIT) {
       // unroll the loop
-      final boolean ndt = expr2.has(Flag.NDT);
-      final Value seq = (Value) expr1;
-      final Expr[] results = new Expr[(int) size1];
-      for(int i = 0; i < size1; i++) {
-        results[i] = new DynFuncCall(info, sc, updating, ndt, expr2, seq.itemAt(i)).optimize(cc);
+      final ExprList results = new ExprList((int) size);
+      for(final Item item : (Value) items) {
+        results.add(new DynFuncCall(info, sc, updating, ndt, func, item).optimize(cc));
       }
       cc.info(QueryText.OPTUNROLL_X, this);
-      return new List(info, results).optimize(cc);
+      return new List(info, results.finish()).optimize(cc);
     }
 
-    return this;
+    // otherwise, create FLWOR expression
+    final LinkedList<Clause> clauses = new LinkedList<>();
+    final IntObjMap<Var> vm = new IntObjMap<>();
+    final Var var = cc.copy(new Var(new QNm("each"), null, false, cc.qc, sc, info), vm);
+    clauses.add(new For(var, items).optimize(cc));
+
+    final ParseExpr ref = new VarRef(info, var).optimize(cc);
+    final Expr rtrn = new DynFuncCall(info, sc, updating, ndt, func, ref).optimize(cc);
+    return new GFLWOR(info, clauses, rtrn).optimize(cc);
   }
 }

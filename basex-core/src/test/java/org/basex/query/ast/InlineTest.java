@@ -1,12 +1,11 @@
 package org.basex.query.ast;
 
-import static org.basex.query.func.Function.*;
-
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -90,11 +89,11 @@ public final class InlineTest extends QueryPlanTest {
     check("(let $d := for-each(1 to 100, function($a) { $a }) "
         + "return (1 to 2) ! $d)[. = 0]",
         "",
-        exists(_UTIL_REPLICATE));
-    check("(let $d := for-each(1 to 11, function($a) { $a }) "
+        exists(SingletonSeq.class));
+    check("(let $d := for-each(1 to 11, hof:id#1) "
         + "return (1 to 2) ! $d[1])[. = 0]",
         "",
-        exists(_UTIL_REPLICATE));
+        exists(SingletonSeq.class));
     check("for $x in (<x/>, <x/>) where (1, 2) ! $x return $x",
         "<x/>\n<x/>",
         empty(ContextValue.class));

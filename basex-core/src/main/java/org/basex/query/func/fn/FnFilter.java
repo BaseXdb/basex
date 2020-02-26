@@ -3,10 +3,9 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -16,33 +15,26 @@ import org.basex.query.value.type.*;
  */
 public final class FnFilter extends StandardFunc {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    final FItem func = checkArity(exprs[1], 1, qc);
-    final Iter iter = exprs[0].iter(qc);
-    return new Iter() {
-      @Override
-      public Item next() throws QueryException {
-        for(Item item; (item = qc.next(iter)) != null;) {
-          if(toBoolean(func.invokeItem(qc, info, item))) return item;
-        }
-        return null;
-      }
-    };
-  }
-
-  @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc, this);
+    throw Util.notExpected();
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0];
-    final SeqType st = expr.seqType();
-    if(st.zero()) return expr;
+    final Expr items = exprs[0];
+    final SeqType st = items.seqType();
+    if(st.zero()) return items;
 
-    exprs[1] = coerceFunc(exprs[1], cc, SeqType.BLN_O, st.with(Occ.ONE));
-    exprType.assign(st.type, st.occ.union(Occ.ZERO));
-    return this;
+    // create filter expression
+    Expr pred = coerceFunc(exprs[1], cc, SeqType.BLN_O, st.with(Occ.ONE));
+    cc.pushFocus(items);
+    try {
+      pred = new ContextValue(info).optimize(cc);
+      pred = new DynFuncCall(info, sc, exprs[1], pred).optimize(cc);
+      pred = new TypeCheck(sc, info, pred, SeqType.BLN_O, true).optimize(cc);
+    } finally {
+      cc.removeFocus();
+    }
+    return Filter.get(info, items, cc.function(Function.BOOLEAN, info, pred)).optimize(cc);
   }
 }

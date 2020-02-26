@@ -5,6 +5,9 @@ import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
 import org.basex.query.ast.*;
+import org.basex.query.expr.*;
+import org.basex.query.expr.constr.*;
+import org.basex.query.expr.gflwor.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.junit.*;
@@ -185,15 +188,14 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" (0, 1)", " boolean#1"), 1);
 
     check(func.args(" ()", " boolean#1"), "", empty());
-    check(func.args(" 1 to 9", " function($_) { $_ = 0 }"), "",
-        type(FuncItem.class, "function(xs:integer) as xs:boolean"));
+    check(func.args(" 1 to 9", " function($_) { $_ = 0 }"), "", exists(IterFilter.class));
     check(func.args(" ('a', <a/>)", " function($_ as xs:string) { $_ = 'a' }"), "a",
-        type(FuncItem.class, "function(xs:string) as xs:boolean"));
+        exists(IterFilter.class));
     check(func.args(" ('a', <a/>)", " function($_ as xs:string) as xs:boolean? { $_ = 'a' }"), "a",
-        type(FuncItem.class, "function(xs:string) as xs:boolean"));
+        exists(IterFilter.class));
 
-    check(func.args(" (<a/>, <b/>)", " boolean#1"), "<a/>\n<b/>", type(FILTER, "element()*"));
-    check(func.args(" <a/>", " boolean#1"), "<a/>", type(FILTER, "element()?"));
+    check(func.args(" (<a/>, <b/>)", " boolean#1"), "<a/>\n<b/>", root(List.class));
+    check(func.args(" <a/>", " boolean#1"), "<a/>", root(CElem.class));
   }
 
   /** Test method. */
@@ -276,7 +278,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
     // pre-compute result size
     query("count(" + func.args(" 1 to 10000000000", " string#1") + ')', 10000000000L);
-    check("count(" + func.args(" 1 to 20", " function($a) { $a, $a }") + ')', 40, exists(FOR_EACH));
+    check("count(" + func.args(" 1 to 20", " function($a) { $a, $a }") + ')', 40, root(Int.class));
 
     // should be unrolled and evaluated at compile time
     check(func.args(" 0 to 8", " function($x) { $x + 1 }"),
@@ -287,12 +289,14 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" 1 to 9", " function($x) { $x[random:double()] }"), "",
         empty(func),
         exists(_RANDOM_DOUBLE));
-    // should not be unrolled
+
+    // should be rewritten to FLWOR expression
     check(func.args(" 0 to 10", " function($x) { $x + 1 }"),
         "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11",
-        exists(func));
+        exists(GFLWOR.class));
 
-    check(func.args(" (1 to 2)[. = 2]", " function($a) { $a * $a }"), 4, type(func, "xs:integer*"));
+    check(func.args(" (1 to 2)[. = 2]", " function($a) { $a * $a }"), 4,
+        type(GFLWOR.class, "xs:integer*"));
   }
 
   /** Test method. */

@@ -648,7 +648,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Static typing of computed maps. */
   @Test public void gh1766() {
-    check("let $map := map { 'c': 'x' } return count($map?(('a', 'b')))", 0, root(Int.class));
+    check("let $map := map { 'c': 'x' } return count($map?(('a', 'b')))", 0,
+        type(For.class, "xs:string"));
   }
 
   /** Rewrite boolean comparisons. */
