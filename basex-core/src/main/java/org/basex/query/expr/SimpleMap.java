@@ -261,7 +261,7 @@ public abstract class SimpleMap extends Arr {
     } else {
       final int el = exprs.length - 1;
       cc.pushFocus(exprs[el - 1]);
-      Expr expr = exprs[el];
+      final Expr expr = exprs[el];
       try {
         exprs[el] = expr.simplifyFor(mode, cc);
       } finally {

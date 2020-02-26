@@ -146,7 +146,7 @@ public abstract class Path extends ParseExpr {
     if(expr != this) return expr.optimize(cc);
 
     // assign sequence type, compute result size
-    Expr rt = root != null ? root : cc.qc.focus.value;
+    final Expr rt = root != null ? root : cc.qc.focus.value;
     seqType(rt);
 
     // remove paths that will yield no result

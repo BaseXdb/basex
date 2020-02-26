@@ -628,7 +628,8 @@ public final class GFLWOR extends ParseExpr {
 
     // invert condition if first branch is empty
     final If iff = (If) rtrn;
-    Expr cond = iff.cond, thn = iff.exprs[0], els = iff.exprs[1];
+    Expr cond = iff.cond, thn = iff.exprs[0];
+    final Expr els = iff.exprs[1];
     if(thn == Empty.VALUE) {
       thn = els;
       cond = cc.function(Function.NOT, info, iff.cond);
