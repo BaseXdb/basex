@@ -70,6 +70,8 @@ public final class StaticOptions extends Options {
   public static final BooleanOption LOG = new BooleanOption("LOG", true);
   /** Log message cut-off. */
   public static final NumberOption LOGMSGMAXLEN = new NumberOption("LOGMSGMAXLEN", 1000);
+  /** Write trace output to logs. */
+  public static final BooleanOption LOGTRACE = new BooleanOption("LOGTRACE", true);
 
   /** Comment: written to options file. */
   public static final Comment C_HTTP = new Comment("HTTP Services");
