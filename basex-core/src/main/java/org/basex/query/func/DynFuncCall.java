@@ -79,16 +79,18 @@ public final class DynFuncCall extends FuncCall {
     final int nargs = exprs.length - 1;
     final FuncType ft = func.funcType();
     if(ft != null) {
-      if(ft.argTypes != null && ft.argTypes.length != nargs) throw INVARITY_X_X_X.get(info,
-          arguments(nargs), ft.argTypes.length, func.toErrorString());
+      if(ft.argTypes != null && ft.argTypes.length != nargs) {
+        throw INVARITY_X_X_X.get(info, arguments(nargs), ft.argTypes.length, func.toErrorString());
+      }
       SeqType dt = ft.declType;
       if(ft instanceof MapType) dt = dt.with(dt.occ.union(Occ.ZERO));
       exprType.assign(dt);
     }
 
     // maps and arrays can only contain evaluated values, so this is safe
-    if((func instanceof XQMap || func instanceof XQArray) && allAreValues(false))
+    if((func instanceof XQMap || func instanceof XQArray) && allAreValues(false)) {
       return cc.preEval(this);
+    }
 
     if(func instanceof XQFunctionExpr) {
       // try to inline the function

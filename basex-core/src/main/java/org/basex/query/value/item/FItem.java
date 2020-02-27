@@ -63,6 +63,11 @@ public abstract class FItem extends Item implements XQFunction {
     }
   }
 
+  @Override
+  public final FuncType funcType() {
+    return (FuncType) type;
+  }
+
   /**
    * Coerces this function item to the given function type.
    * @param ft function type

@@ -278,11 +278,6 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public final FuncType funcType() {
-    return ArrayType.get(SeqType.ITEM_ZM);
-  }
-
-  @Override
   public final Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     if(arraySize() == 1) return get(0).atomValue(qc, ii);
     final ValueBuilder vb = new ValueBuilder(qc);

@@ -1070,4 +1070,13 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("(<_/>, <_/>) = '' and (<_/>, <_/>) = 'a'", false, exists(And.class));
   }
+
+  /** Map/array lookups: better typing. */
+  @Test public void gh1825() {
+    check("[ 1 ](<_>1</_>) instance of xs:integer", true, root(Bln.class));
+
+    check("map { 'a': 2 }(<_>a</_>) instance of xs:integer?", true, root(Bln.class));
+    check("map { 1: 2 }(<_/>) instance of xs:integer?", true, root(Bln.class));
+    check("map { 1: (2, 'a') }(<_/>) instance of xs:anyAtomicType*", true, root(Bln.class));
+  }
 }

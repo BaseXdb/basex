@@ -47,11 +47,6 @@ public final class XQMap extends XQData {
   }
 
   @Override
-  public FuncType funcType() {
-    return MapType.get(AtomType.AAT, SeqType.ITEM_ZM);
-  }
-
-  @Override
   public void refineType(final Expr expr) {
     if(root.size != 0) super.refineType(expr);
   }

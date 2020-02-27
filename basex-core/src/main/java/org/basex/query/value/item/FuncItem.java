@@ -100,11 +100,6 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public FuncType funcType() {
-    return (FuncType) type;
-  }
-
-  @Override
   public int stackFrameSize() {
     return stackSize;
   }
