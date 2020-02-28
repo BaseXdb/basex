@@ -693,6 +693,22 @@ public abstract class Path extends ParseExpr {
     // rewrite for index access
     cc.info(index.optInfo);
 
+    // create new root expression
+    final ExprList resultSteps = new ExprList();
+    final Expr resultRoot;
+    if(index.expr instanceof Path) {
+      final Path path = (Path) index.expr;
+      resultRoot = path.root;
+      resultSteps.add(path.steps);
+    } else {
+      resultRoot = index.expr;
+    }
+    // only one hit: update sequence type
+    if(index.costs.results() == 1 && resultRoot instanceof ParseExpr) {
+      final Occ occ = resultRoot instanceof IndexAccess ? Occ.ONE : Occ.ZERO_ONE;
+      ((ParseExpr) resultRoot).exprType.assign(occ);
+    }
+
     // invert steps that occur before index step and add them as predicate
     final ExprList newPreds = new ExprList();
     final Test rootTest = InvDocTest.get(rt);
@@ -703,13 +719,13 @@ public abstract class Path extends ParseExpr {
         if(s == 0) {
           // add document test for collections and axes other than ancestors
           if(rootTest != KindTest.DOC || invAxis != ANCESTOR && invAxis != ANCESTOR_OR_SELF) {
-            invSteps.add(new StepBuilder(info).axis(invAxis).test(rootTest).finish(cc, root));
+            invSteps.add(new StepBuilder(info).axis(invAxis).test(rootTest).finish(cc, resultRoot));
           }
         } else {
           final Step prevStep = axisStep(s - 1);
           final Axis newAxis = prevStep.axis == ATTRIBUTE ? ATTRIBUTE : invAxis;
           final Expr newStep = new StepBuilder(prevStep.info).axis(newAxis).test(prevStep.test).
-              preds(prevStep.exprs).finish(cc, root);
+              preds(prevStep.exprs).finish(cc, resultRoot);
           invSteps.add(newStep);
         }
       }
@@ -723,39 +739,25 @@ public abstract class Path extends ParseExpr {
       if(p != indexPred) newPreds.add(preds[p]);
     }
 
-    // create resulting expression
-    final ExprList resultSteps = new ExprList();
-    final Expr resultRoot;
-    if(index.expr instanceof Path) {
-      final Path path = (Path) index.expr;
-      resultRoot = path.root;
-      resultSteps.add(path.steps);
-    } else {
-      resultRoot = index.expr;
-    }
-
-    // only one hit: update sequence type
-    if(index.costs.results() == 1) {
-      final Occ occ = resultRoot instanceof IndexAccess ? Occ.ONE : Occ.ZERO_ONE;
-      ((ParseExpr) resultRoot).exprType.assign(occ);
-    }
-
+    // add predicates to end of path
     if(!newPreds.isEmpty()) {
       int ls = resultSteps.size() - 1;
       final Expr step;
       if(ls < 0 || !(resultSteps.get(ls) instanceof Step)) {
         // add at least one self axis step
-        step = new StepBuilder(info).preds(newPreds.finish()).finish(cc, root);
+        step = new StepBuilder(info).preds(newPreds.finish()).finish(cc, resultRoot);
         ls++;
       } else {
         step = ((Step) resultSteps.get(ls)).addPreds(newPreds.finish());
       }
-      // add remaining predicates to last step
       resultSteps.set(ls, step);
     }
 
     // add remaining steps
-    for(int s = indexStep + 1; s < sl; s++) resultSteps.add(steps[s]);
+    for(int s = indexStep + 1; s < sl; s++) {
+      resultSteps.add(steps[s]);
+    }
+
     return resultSteps.isEmpty() ? resultRoot : get(info, resultRoot, resultSteps.finish());
   }
 
