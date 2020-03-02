@@ -77,15 +77,15 @@ public final class Union extends Set {
     final ArrayList<Test> tests = new ArrayList<>(2);
 
     for(final Expr expr : exprs) {
-      if(!(expr instanceof Path)) return false;
-      final Path path = (Path) expr;
+      if(!(expr instanceof AxisPath)) return false;
+      final AxisPath path = (AxisPath) expr;
       if(path.steps.length > 1) return false;
       if(root != null ? !Objects.equals(root, path.root) :
         path.root != null && path.root.has(Flag.CNS, Flag.NDT, Flag.POS)) return false;
 
       root = path.root;
 
-      final Step step = (Step) path.steps[0];
+      final Step step = path.step(0);
       if(axis != null && axis != step.axis || step.has(Flag.CNS, Flag.NDT, Flag.POS)) return false;
       if(preds != null && !Arrays.equals(preds, step.exprs)) return false;
 
