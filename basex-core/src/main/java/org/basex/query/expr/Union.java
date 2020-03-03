@@ -76,24 +76,31 @@ public final class Union extends Set {
     Expr[] preds = null;
     final ArrayList<Test> tests = new ArrayList<>(2);
 
+    // check if all expressions are paths that can be merged
     for(final Expr expr : exprs) {
-      if(!(expr instanceof AxisPath)) return false;
-      final AxisPath path = (AxisPath) expr;
-      if(path.steps.length > 1) return false;
-      if(root != null ? !Objects.equals(root, path.root) :
-        path.root != null && path.root.has(Flag.CNS, Flag.NDT, Flag.POS)) return false;
+      if(!(expr instanceof Path)) return false;
+      final Path path = (Path) expr;
+      if(path.steps.length > 1 || !(path.steps[0] instanceof Step)) return false;
 
-      root = path.root;
+      final Step step = (Step) path.steps[0];
+      if(axis == null) {
+        // first pass: assign root, axis and predicates
+        root = path.root;
+        axis = step.axis;
+        preds = step.exprs;
+        if(root != null && root.has(Flag.CNS, Flag.NDT, Flag.POS) ||
+          step.has(Flag.CNS, Flag.NDT, Flag.POS)) return false;
+      } else {
+        // further passes: compare with first root and step
+        if(!(Objects.equals(root, path.root) && axis == step.axis &&
+          Arrays.equals(preds, step.exprs))) return false;
+      }
 
-      final Step step = path.step(0);
-      if(axis != null && axis != step.axis || step.has(Flag.CNS, Flag.NDT, Flag.POS)) return false;
-      if(preds != null && !Arrays.equals(preds, step.exprs)) return false;
-
-      axis = step.axis;
-      preds = step.exprs;
+      // collect tests
       tests.add(step.test);
     }
 
+    // try to merge tests
     final Test test = Test.get(tests);
     if(test == null) return false;
 
