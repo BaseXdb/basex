@@ -153,7 +153,7 @@ public abstract class Filter extends Preds {
         final OpV opV = cmp.opV();
         if(cmp.positional() && opV != null) {
           final Expr ex = cmp.exprs[1];
-          if(opV == OpV.LT || opV == OpV.NE && Function.LAST.is(ex)) {
+          if((opV == OpV.LT || opV == OpV.NE) && Function.LAST.is(ex)) {
             // expr[position() < last()] -> util:init(expr)
             expr = cc.function(Function._UTIL_INIT, info, r);
           } else if(opV == OpV.NE && ex instanceof Int) {

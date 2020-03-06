@@ -1079,4 +1079,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("map { 1: 2 }(<_/>) instance of xs:integer?", true, root(Bln.class));
     check("map { 1: (2, 'a') }(<_/>) instance of xs:anyAtomicType*", true, root(Bln.class));
   }
+
+  /** Rewriting of positional predicate. */
+  @Test public void gh1827() {
+    check("declare function local:f($pos) { (1,2)[position() < $pos] };\n" +
+        "local:f(1)", "", empty());
+  }
 }
