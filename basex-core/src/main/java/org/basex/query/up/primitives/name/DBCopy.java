@@ -18,29 +18,32 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class DBCopy extends NameUpdate {
-  /** Name of the new database. */
-  private final String newName;
+  /** Names of the new databases. */
+  private final StringList targets = new StringList();
 
   /**
    * Constructor.
    * @param name database to be copied
-   * @param newName name of new database
+   * @param target name of new database
    * @param qc query context
    * @param info input info
    */
-  public DBCopy(final String name, final String newName, final QueryContext qc,
+  public DBCopy(final String name, final String target, final QueryContext qc,
       final InputInfo info) {
 
     super(UpdateType.DBCOPY, name, qc, info);
-    this.newName = newName;
+    targets.add(target);
   }
 
   @Override
   public void apply() throws QueryException {
     close();
-    close(newName, qc, info);
+
     try {
-      Copy.copy(name, newName, qc.context.soptions, null);
+      for(final String target : targets) {
+        close(target, qc, info);
+        Copy.copy(name, target, qc.context.soptions, null);
+      }
     } catch(final IOException ex) {
       throw UPDBERROR_X.get(info, ex);
     }
@@ -50,11 +53,19 @@ public final class DBCopy extends NameUpdate {
   public void prepare() { }
 
   @Override
+  public void merge(final Update update) throws QueryException {
+    for(final String target : ((DBCopy) update).targets) {
+      if(targets.contains(target)) throw DB_CONFLICT1_X_X.get(info, target, operation());
+      targets.add(target);
+    }
+  }
+
+  @Override
   public String operation() { return "copied"; }
 
   @Override
   public void databases(final StringList db) {
     super.databases(db);
-    db.add(newName);
+    for(final String target : targets) db.add(target);
   }
 }
