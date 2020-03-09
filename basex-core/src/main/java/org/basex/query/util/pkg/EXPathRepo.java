@@ -98,10 +98,12 @@ public final class EXPathRepo {
     for(final PkgComponent comp : pkg.comps) {
       final String uri = comp.uri;
       final HashSet<String> pkgs = nsDict.get(uri);
-      if(pkgs.size() > 1) {
-        pkgs.remove(id);
-      } else {
-        nsDict.remove(uri);
+      if(pkgs != null) {
+        if(pkgs.size() > 1) {
+          pkgs.remove(id);
+        } else {
+          nsDict.remove(uri);
+        }
       }
     }
     // delete package from package dictionary
