@@ -2,13 +2,15 @@ package org.basex.query.expr.constr;
 
 import static org.basex.query.QueryError.*;
 
+import java.util.*;
+
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.XQArray;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -65,10 +67,11 @@ public final class Constr {
   public Constr add(final QueryContext qc, final Expr... exprs) throws QueryException {
     final int size = sc.ns.size();
     try {
+      final HashSet<QNm> qnames = new HashSet<>();
       for(final Expr expr : exprs) {
         more = false;
         final Iter iter = expr.iter(qc);
-        for(Item item; (item = qc.next(iter)) != null && add(qc, item););
+        for(Item item; (item = qc.next(iter)) != null && add(qc, item, qnames););
       }
       if(!text.isEmpty()) children.add(new FTxt(text.toArray()));
       return this;
@@ -81,14 +84,17 @@ public final class Constr {
    * Recursively adds nodes to the element arrays.
    * @param qc query context
    * @param item current item
+   * @param qnames assigned attributes (required for duplicate check)
    * @return true if item was added
    * @throws QueryException query exception
    */
-  private boolean add(final QueryContext qc, final Item item) throws QueryException {
+  private boolean add(final QueryContext qc, final Item item, final HashSet<QNm> qnames)
+      throws QueryException {
+
     if(item instanceof XQArray) {
       for(final Value value : ((XQArray) item).members()) {
         for(final Item it : value) {
-          if(!add(qc, it)) return false;
+          if(!add(qc, it, qnames)) return false;
         }
       }
       return true;
@@ -115,11 +121,9 @@ public final class Constr {
           return false;
         }
         // check for duplicate attribute names
-        for(final ANode att : atts) {
-          if(name.eq(att.qname())) {
-            duplAtt = name;
-            return false;
-          }
+        if(!qnames.add(name)) {
+          duplAtt = name;
+          return false;
         }
         // add attribute
         atts.add(new FAttr(name, node.string()));
@@ -149,7 +153,7 @@ public final class Constr {
         // type: document node
 
         final BasicNodeIter iter = node.childIter();
-        for(Item it; (it = qc.next(iter)) != null && add(qc, it););
+        for(Item it; (it = qc.next(iter)) != null && add(qc, it, qnames););
 
       } else {
         // type: element/comment/processing instruction node
