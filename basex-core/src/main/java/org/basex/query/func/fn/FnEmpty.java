@@ -6,6 +6,7 @@ import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -21,7 +22,13 @@ public class FnEmpty extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    if(exprs[0] instanceof List) {
+      final List list = (List) exprs[0];
+      if(list.seqType().type instanceof NodeType) {
+        exprs[0] = new Union(info, list.exprs).optimize(cc);
+      }
+    }
     final Bln empty = opt();
     return empty == null ? this : empty;
   }
@@ -50,6 +57,17 @@ public class FnEmpty extends StandardFunc {
       final long size = expr.size();
       if(size != -1) return Bln.get(size == 0);
       if(expr.seqType().oneOrMore()) return Bln.FALSE;
+    }
+    return null;
+  }
+
+  @Override
+  public Expr mergeEbv(final Expr expr, final boolean union, final CompileContext cc)
+      throws QueryException {
+
+    if(!union && Function.EMPTY.is(expr)) {
+      exprs[0] = new List(info, exprs[0], ((FnEmpty) expr).exprs[0]).optimize(cc);
+      return optimize(cc);
     }
     return null;
   }

@@ -117,7 +117,7 @@ public final class Pos extends Arr {
   }
 
   @Override
-  public Expr merge(final Expr ex, final boolean union, final CompileContext cc) {
+  public Expr mergeEbv(final Expr ex, final boolean union, final CompileContext cc) {
     if(union || !(ex instanceof Pos)) return null;
     final Pos pos = (Pos) ex;
     final Expr[] posExpr = pos.exprs;

@@ -85,7 +85,7 @@ abstract class Logical extends Arr {
       }
     }
     exprs = list.finish();
-    merge(true, union, cc);
+    mergeEbv(true, union, cc);
     return exprs.length == 1 ? cc.replaceWith(this, FnBoolean.get(exprs[0], info, cc.sc())) : this;
   }
 

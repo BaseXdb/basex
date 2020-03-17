@@ -167,13 +167,13 @@ public abstract class Arr extends ParseExpr {
   }
 
   /**
-   * Tries to merge consecutive expressions.
-   * @param pos allow positional expressions
-   * @param union merge as union expression
+   * Tries to merge consecutive EBV tests.
+   * @param pos allow positional tests
+   * @param union union or intersection
    * @param cc compilation context
    * @throws QueryException query exception
    */
-  public void merge(final boolean pos, final boolean union, final CompileContext cc)
+  public void mergeEbv(final boolean pos, final boolean union, final CompileContext cc)
       throws QueryException {
 
     // 'a'[. = 'a' or . = 'b']  ->  'a'[. = ('a', 'b')]
@@ -183,7 +183,7 @@ public abstract class Arr extends ParseExpr {
       for(int m = l + 1; m < list.size(); m++) {
         final Expr expr = list.get(l);
         if(pos || !expr.has(Flag.POS)) {
-          final Expr merged = expr.merge(list.get(m), union, cc);
+          final Expr merged = expr.mergeEbv(list.get(m), union, cc);
           if(merged != null) {
             cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
             list.set(l, merged);

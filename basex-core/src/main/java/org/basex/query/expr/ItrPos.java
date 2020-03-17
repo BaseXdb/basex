@@ -128,7 +128,7 @@ public final class ItrPos extends Simple {
   }
 
   @Override
-  public Expr merge(final Expr ex, final boolean union, final CompileContext cc) {
+  public Expr mergeEbv(final Expr ex, final boolean union, final CompileContext cc) {
     if(!(ex instanceof ItrPos)) return null;
 
     final ItrPos pos = (ItrPos) ex;

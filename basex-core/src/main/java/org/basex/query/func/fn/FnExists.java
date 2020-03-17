@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -33,5 +34,16 @@ public final class FnExists extends FnEmpty {
       if(expr.seqType().type instanceof NodeType) return cc.simplify(this, expr);
     }
     return this;
+  }
+
+  @Override
+  public Expr mergeEbv(final Expr expr, final boolean union, final CompileContext cc)
+      throws QueryException {
+
+    if(union && Function.EXISTS.is(expr)) {
+      exprs[0] = new List(info, exprs[0], ((FnExists) expr).exprs[0]).optimize(cc);
+      return optimize(cc);
+    }
+    return null;
   }
 }

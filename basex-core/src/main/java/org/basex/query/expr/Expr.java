@@ -400,8 +400,9 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Tries to merge two expressions. Overwritten by {@link CmpG}, {@link CmpIR}, {@link CmpR},
-   * {@link CmpSR}, {@link ItrPos} and {@link Pos}.
+   * Tries to merge two expressions. Called by {@link And}, {@link Or}), {@link Step} and
+   * {@link Filter}. Overwritten by {@link CmpG}, {@link CmpIR}, {@link CmpR},
+   * {@link CmpSR}, {@link ItrPos}, {@link Pos} and others.
    * @param expr second expression
    * @param union union or intersection
    * @param cc compilation context
@@ -409,7 +410,7 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr merge(final Expr expr, final boolean union, final CompileContext cc)
+  public Expr mergeEbv(final Expr expr, final boolean union, final CompileContext cc)
       throws QueryException {
     return null;
   }
@@ -469,8 +470,8 @@ public abstract class Expr extends ExprInfo {
    *   <li>{@link If#optimize(CompileContext)}, {@link Switch#optimize(CompileContext)},
    *     {@link Typeswitch#optimize(CompileContext)}, in order to discard identical expressions.
    *   </li>
-   *   <li>{@link CmpR#merge(Expr, boolean, CompileContext)} or
-   *     {@link CmpSR#merge(Expr, boolean, CompileContext)},
+   *   <li>{@link CmpR#mergeEbv(Expr, boolean, CompileContext)} or
+   *     {@link CmpSR#mergeEbv(Expr, boolean, CompileContext)},
    *     in order to merge expressions with identical input.
    *   </li>
    *   <li>{@link CmpG#optimize(CompileContext)} or {@link CmpV#optimize(CompileContext)},

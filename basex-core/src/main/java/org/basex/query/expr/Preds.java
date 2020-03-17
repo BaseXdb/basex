@@ -202,7 +202,7 @@ public abstract class Preds extends Arr {
         pos = addUnique(expr, list, pos, cc);
       }
       exprs = list.finish();
-      merge(false, false, cc);
+      mergeEbv(false, false, cc);
 
     } finally {
       cc.removeFocus();

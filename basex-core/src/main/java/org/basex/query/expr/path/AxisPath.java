@@ -119,4 +119,14 @@ public abstract class AxisPath extends Path {
   public final boolean ddo() {
     return true;
   }
+
+  @Override
+  public Expr mergeEbv(final Expr expr, final boolean union, final CompileContext cc)
+      throws QueryException {
+
+    if(union && expr instanceof AxisPath) {
+      return new Union(info, this, expr).optimize(cc);
+    }
+    return null;
+  }
 }

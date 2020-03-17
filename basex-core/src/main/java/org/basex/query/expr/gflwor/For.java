@@ -181,7 +181,7 @@ public final class For extends ForLet {
       // add to last step of path, provided that predicate is not positional; merge predicates
       final AxisPath path = (AxisPath) expr;
       expr = path.addPredicates(ex);
-      path.step(path.steps.length - 1).merge(false, false, cc);
+      path.step(path.steps.length - 1).mergeEbv(false, false, cc);
     } else if(expr instanceof Filter) {
       // add to existing filter expression
       expr = ((Filter) expr).addPredicate(ex);

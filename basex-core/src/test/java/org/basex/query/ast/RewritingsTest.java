@@ -1085,4 +1085,30 @@ public final class RewritingsTest extends QueryPlanTest {
     check("declare function local:f($pos) { (1,2)[position() < $pos] };\n" +
         "local:f(1)", "", empty());
   }
+
+  /** Merge fn:empty and fn:exist functions. */
+  @Test public void gh1829() {
+    check("exists(<a/>/a) or exists(<b/>/b)", false,
+        root(BOOLEAN), empty(Or.class), empty(EXISTS), exists(Union.class));
+    check("for $i in 1 to 2 return exists($i[. = 1]) or exists($i[. = 2])", "true\ntrue",
+        empty(Or.class), count(EXISTS, 1));
+
+    check("<a/>/a or <b/>/b", false, root(BOOLEAN), empty(Or.class), exists(Union.class));
+    check("<a/>[a or b]", "", empty(Or.class), count(SingleIterPath.class, 1));
+
+    check("<a/>[empty(b)][empty(c)]", "<a/>", count(EMPTY, 1), count(SingleIterPath.class, 1));
+    check("<a/>[empty((b, c))]", "<a/>", count(SingleIterPath.class, 1));
+    check("for $a in (<b/>, <c/>) return <a/>[empty(($a[. = 'a'], $a[. = 'b']))]", "<a/>\n<a/>",
+        count(Union.class, 1));
+
+    // no rewritings
+    query("for $a in 1 to 2 return <a/>[empty(($a[. = 1], $a[. = 1]))]", "<a/>");
+    check("exists(<a/>/a) and exists(<b/>/b)", false, exists(And.class));
+    check("for $i in 1 to 2 return exists($i[. = 1]) and exists($i[. = 2])", "false\nfalse",
+        exists(And.class));
+    check("<a/>/a and <b/>/b", false, exists(And.class));
+    check("<a/>[a and b]", "", count(SingleIterPath.class, 2));
+
+    check("<a/>[empty(b) or empty(c)]", "<a/>", exists(Or.class));
+  }
 }

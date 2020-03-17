@@ -298,7 +298,7 @@ public class CmpG extends Cmp {
   }
 
   @Override
-  public Expr merge(final Expr expr, final boolean union, final CompileContext cc)
+  public Expr mergeEbv(final Expr expr, final boolean union, final CompileContext cc)
       throws QueryException {
 
     /* OR: merge comparisons
@@ -309,7 +309,7 @@ public class CmpG extends Cmp {
      * E != 'a' or not(E = 'b')  ->  E != ('a', 'b')  */
 
     // if required, invert second operator (first operator need never be inverted)
-    final boolean not2 = expr instanceof FnNot;
+    final boolean not2 = Function.NOT.is(expr);
     Expr expr2 = not2 ? ((FnNot) expr).exprs[0] : expr;
     if(!(expr2 instanceof CmpG)) return null;
 
@@ -351,7 +351,7 @@ public class CmpG extends Cmp {
       expr2 = cc.function(Function.NOT, info, newList.apply(op.invert()));
     }
 
-    // no merge possible
+    // return merged expression
     return expr2;
   }
 
