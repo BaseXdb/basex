@@ -3,7 +3,6 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.io.*;
-import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
@@ -19,8 +18,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Copy extends Command {
-  /** Pattern to exclude locking files from database transfer operations. */
-  private static final Pattern FILES = Pattern.compile(".{3,5}" + IO.BASEXSUFFIX);
   /** Counter for outstanding files. */
   private int of;
   /** Counter of total files. */
@@ -63,28 +60,27 @@ public final class Copy extends Command {
    * @param source name of the database
    * @param target new database name
    * @param sopts static options
-   * @param cmd calling command
+   * @param cmd calling command (can be {@code null})
    * @throws IOException I/O exception
    */
   public static void copy(final String source, final String target, final StaticOptions sopts,
       final Copy cmd) throws IOException {
 
-    final IOFile src = sopts.dbPath(source);
-    final IOFile trg = sopts.dbPath(target);
-
     // drop target database
     DropDB.drop(target, sopts);
 
-    // return false if source cannot be opened, or target cannot be created
+    final IOFile src = sopts.dbPath(source), trg = sopts.dbPath(target);
     final StringList files = src.descendants();
     if(cmd != null) cmd.tf = files.size();
+
+    // copy all files
     try {
       for(final String file : files) {
-        if(FILES.matcher(file).matches()) new IOFile(src, file).copyTo(new IOFile(trg, file));
+        new IOFile(src, file).copyTo(new IOFile(trg, file));
         if(cmd != null) cmd.of++;
       }
     } catch(final IOException ex) {
-      // drop new database if error occurred
+      // error: drop new database
       Util.debug(ex);
       DropDB.drop(target, sopts);
       throw ex;
