@@ -162,7 +162,7 @@ public abstract class Cmp extends Arr {
         } else if(Function.NAME.is(func)) {
           // (db-without-ns)[name() = 'city']  ->  (db-without-ns)[self::city]
           final Data data = cc.qc.focus.value.data();
-          final byte[] dataNs = data != null ? data.nspaces.globalUri() : null;
+          final byte[] dataNs = data != null ? data.defaultNs() : null;
           if(dataNs != null && dataNs.length == 0) {
             part = NamePart.LOCAL;
             for(final Item item : (Value) expr2) {

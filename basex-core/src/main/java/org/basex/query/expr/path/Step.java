@@ -145,12 +145,12 @@ public abstract class Step extends Preds {
   /**
    * Returns the path nodes that are the result of this step.
    * @param nodes initial path nodes
-   * @param dt data reference
+   * @param data data reference
    * @return resulting path nodes or {@code null} if nodes cannot be collected
    */
-  final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes, final Data dt) {
+  final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes, final Data data) {
     // skip steps with predicates or different namespaces
-    if(exprs.length != 0 || dt.nspaces.globalUri() == null) return null;
+    if(exprs.length != 0 || data.defaultNs() == null) return null;
 
     // skip axes other than descendant, child, and attribute
     if(axis != Axis.ATTRIBUTE && axis != Axis.CHILD && axis != Axis.DESCENDANT &&
@@ -164,7 +164,7 @@ public abstract class Step extends Preds {
       final NamePart part = ((NameTest) test).part;
       if(part == NamePart.LOCAL) {
         // element/attribute test (*:ln)
-        final Names names = test.type == NodeType.ATT ? dt.attrNames : dt.elemNames;
+        final Names names = test.type == NodeType.ATT ? data.attrNames : data.elemNames;
         name = names.id(((NameTest) test).local);
       } else if(part != null) {
         // skip namespace and standard tests

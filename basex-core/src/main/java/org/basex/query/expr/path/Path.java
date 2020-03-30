@@ -538,7 +538,7 @@ public abstract class Path extends ParseExpr {
     // - if index does not exist or is out-dated
     // - if several namespaces occur in the input
     if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOC) ||
-        data == null || !data.meta.uptodate || data.nspaces.globalUri() == null) return this;
+        data == null || !data.meta.uptodate || data.defaultNs() == null) return this;
 
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {

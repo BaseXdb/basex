@@ -440,7 +440,7 @@ public final class NamespaceTest extends SandboxTest {
     context.data().startUpdate(context.options);
     context.data().delete(0);
     context.data().finishUpdate(context.options);
-    final byte[] ns = context.data().nspaces.globalUri();
+    final byte[] ns = context.data().defaultNs();
     assertTrue(ns != null && ns.length == 0);
   }
 

@@ -1111,4 +1111,12 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("<a/>[empty(b) or empty(c)]", "<a/>", exists(Or.class));
   }
+
+  /** Documents with different default namespaces. */
+  @Test public void gh1831() {
+    execute(new CreateDB(NAME));
+    execute(new Add("a.xml", "<x xmlns='x'/>"));
+    execute(new Add("b.xml", "<x/>"));
+    query("x", "<x/>");
+  }
 }

@@ -262,6 +262,14 @@ public abstract class Data {
     }
   }
 
+  /**
+   * Returns the common default namespace of all documents of the database.
+   * @return namespace, or {@code null} if there is no common namespace
+   */
+  public byte[] defaultNs() {
+    return nspaces.defaultNs(meta.ndocs);
+  }
+
   // RETRIEVING VALUES ============================================================================
 
   /**

@@ -116,23 +116,34 @@ public final class Namespaces {
   }
 
   /**
-   * Returns the default namespace URI for all documents of the database.
-   * @return global default namespace, or {@code null} if there is more than one such namespace
+   * Returns the common default namespace of all documents of the database.
+   * @param ndocs number of documents
+   * @return namespace, or {@code null} if there is no common namespace
    */
-  public byte[] globalUri() {
+  byte[] defaultNs(final int ndocs) {
     // no namespaces defined: default namespace is empty
     final int ch = root.children();
     if(ch == 0) return Token.EMPTY;
-    // give up if more than one namespace is defined
-    if(ch > 1) return null;
-    // give up if child node has more children or more than one namespace
-    final NSNode child = root.child(0);
-    final int[] values = child.values();
-    if(child.children() > 0 || child.pre() != 1 || values.length != 2) return null;
-    // give up if namespace has a non-empty prefix
-    if(prefix(values[0]).length != 0) return null;
-    // return default namespace
-    return uri(values[1]);
+    // give up if number of default namespaces differs from number of documents
+    if(ch != ndocs) return null;
+
+    int id = -1;
+    for(int c = 0; c < ch; c++) {
+      final NSNode child = root.child(0);
+      final int[] values = child.values();
+      // give up if child node has more children or more than one namespace
+      if(child.children() > 0 || child.pre() != 1 || values.length != 2) return null;
+      // give up if namespace has a non-empty prefix
+      if(prefix(values[0]).length != 0) return null;
+      // check if all documents have the same default namespace
+      if(id == -1) {
+        id = values[1];
+      } else if(id != values[1]) {
+        return null;
+      }
+    }
+    // return common default namespace
+    return uri(id);
   }
 
   // Requesting Namespaces Based on Context =======================================================
