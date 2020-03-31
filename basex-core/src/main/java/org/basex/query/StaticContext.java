@@ -35,8 +35,6 @@ public final class StaticContext {
   public byte[] elemNS;
   /** Default function namespace. */
   public byte[] funcNS = FN_URI;
-  /** Expression contains dynamic function call. */
-  public boolean dynFuncCall;
   /** Name of module (not assigned for main module). */
   public QNm module;
 

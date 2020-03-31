@@ -63,7 +63,6 @@ public final class DynFuncCall extends FuncCall {
     this.sc = sc;
     this.updating = updating;
     this.ndt = ndt;
-    sc.dynFuncCall = true;
   }
 
   @Override
@@ -184,7 +183,7 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public boolean has(final Flag... flags) {
-    if(Flag.UPD.in(flags) && updating) return true;
+    if(Flag.UPD.in(flags) && (updating || sc.mixUpdates)) return true;
     if(Flag.NDT.in(flags) && ndt) return true;
     final Flag[] flgs = Flag.NDT.remove(Flag.UPD.remove(flags));
     return flgs.length != 0 && super.has(flgs);

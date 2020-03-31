@@ -217,7 +217,7 @@ public final class QueryContext extends Job implements Closeable {
     final QueryParser qp = new QueryParser(query, uri, this, sc);
     root = qp.parseMain();
     // updating expression: check if an updating expression is left in the expression tree
-    if(updating) updating = (qp.sc.mixUpdates && qp.sc.dynFuncCall) || root.expr.has(Flag.UPD);
+    if(updating && !qp.sc.mixUpdates) updating = root.expr.has(Flag.UPD);
     return root;
   }
 
