@@ -127,7 +127,7 @@ public final class Namespaces {
     // give up if number of default namespaces differs from number of documents
     if(ch != ndocs) return null;
 
-    int id = -1;
+    int id = 0;
     for(int c = 0; c < ch; c++) {
       final NSNode child = root.child(0);
       final int[] values = child.values();
@@ -136,7 +136,7 @@ public final class Namespaces {
       // give up if namespace has a non-empty prefix
       if(prefix(values[0]).length != 0) return null;
       // check if all documents have the same default namespace
-      if(id == -1) {
+      if(c == 0) {
         id = values[1];
       } else if(id != values[1]) {
         return null;
