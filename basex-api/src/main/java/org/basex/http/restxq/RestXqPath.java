@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.query.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -51,7 +52,7 @@ final class RestXqPath extends WebPath implements Comparable<RestXqPath> {
    * @param conn HTTP connection
    * @return map with variable values
    */
-  Map<QNm, String> values(final HTTPConnection conn) {
+  QNmMap<String> values(final HTTPConnection conn) {
     return matcher.values(conn.path());
   }
 

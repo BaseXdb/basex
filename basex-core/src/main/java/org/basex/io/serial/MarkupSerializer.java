@@ -4,12 +4,13 @@ import static org.basex.data.DataText.*;
 import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.Token.normalize;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -141,7 +142,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     if(elems.isEmpty()) checkRoot(null);
     final byte[] val = norm(value);
     if(ftp == null) {
-      final ArrayList<QNm> qnames = cdata();
+      final QNmSet qnames = cdata();
       final int vl = val.length;
       if(qnames.isEmpty() || elems.isEmpty() || !qnames.contains(elems.peek())) {
         for(int k = 0; k < vl; k += cl(val, k)) {
@@ -317,7 +318,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     if(atomic) {
       atomic = false;
     } else if(indent) {
-      final ArrayList<QNm> qnames = suppress();
+      final QNmSet qnames = suppress();
       if(!qnames.isEmpty()) {
         for(final QNm qname : elems) {
           if(qnames.contains(qname)) return;
@@ -376,17 +377,17 @@ abstract class MarkupSerializer extends StandardSerializer {
   }
 
   /** CData elements. */
-  private ArrayList<QNm> cdata;
+  private QNmSet cdata;
 
   /**
    * Initializes the CData elements.
    * @return list
    * @throws QueryIOException query I/O exception
    */
-  private ArrayList<QNm> cdata() throws QueryIOException {
-    ArrayList<QNm> list = cdata;
+  private QNmSet cdata() throws QueryIOException {
+    QNmSet list = cdata;
     if(list == null) {
-      list = new ArrayList<>();
+      list = new QNmSet();
       final boolean html = this instanceof HTMLSerializer;
       final String cdse = sopts.get(CDATA_SECTION_ELEMENTS);
       for(final byte[] name : split(normalize(token(cdse)), ' ')) {
@@ -402,17 +403,17 @@ abstract class MarkupSerializer extends StandardSerializer {
   }
 
   /** Suppress indentation elements. */
-  private ArrayList<QNm> suppress;
+  private QNmSet suppress;
 
   /**
    * Initializes and returns the elements whose contents must not be indented.
    * @return list
    * @throws QueryIOException query I/O exception
    */
-  private ArrayList<QNm> suppress() throws QueryIOException {
-    ArrayList<QNm> list = suppress;
+  private QNmSet suppress() throws QueryIOException {
+    QNmSet list = suppress;
     if(list == null) {
-      list = new ArrayList<>();
+      list = new QNmSet();
       final String supp = sopts.get(SUPPRESS_INDENTATION);
       for(final byte[] name : split(normalize(token(supp)), ' ')) {
         if(name.length != 0) list.add(resolve(name));

@@ -2,12 +2,11 @@ package org.basex.query.expr.constr;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.*;
-
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -67,7 +66,7 @@ public final class Constr {
   public Constr add(final QueryContext qc, final Expr... exprs) throws QueryException {
     final int size = sc.ns.size();
     try {
-      final HashSet<QNm> qnames = new HashSet<>();
+      final QNmSet qnames = new QNmSet();
       for(final Expr expr : exprs) {
         more = false;
         final Iter iter = expr.iter(qc);
@@ -88,7 +87,7 @@ public final class Constr {
    * @return true if item was added
    * @throws QueryException query exception
    */
-  private boolean add(final QueryContext qc, final Item item, final HashSet<QNm> qnames)
+  private boolean add(final QueryContext qc, final Item item, final QNmSet qnames)
       throws QueryException {
 
     if(item instanceof XQArray) {

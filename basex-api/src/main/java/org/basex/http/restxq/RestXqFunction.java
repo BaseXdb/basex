@@ -26,6 +26,7 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -202,8 +203,8 @@ public final class RestXqFunction extends WebFunction {
 
     // bind variables from segments
     if(path != null) {
-      final Map<QNm, String> qnames = path.values(conn);
-      for(final QNm qname : qnames.keySet()) {
+      final QNmMap<String> qnames = path.values(conn);
+      for(final QNm qname : qnames) {
         final QNm qnm = new QNm(qname.string(), function.sc);
         if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
         bind(qnm, args, new Atm(qnames.get(qname)), qc);

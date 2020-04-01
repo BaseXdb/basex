@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -59,8 +60,8 @@ final class RestXqPathMatcher {
    * @param path from which to read the values
    * @return map with variable values
    */
-  Map<QNm, String> values(final String path) {
-    final Map<QNm, String> result = new HashMap<>();
+  QNmMap<String> values(final String path) {
+    final QNmMap<String> result = new QNmMap<>();
     final Matcher m = matcher(path);
     if(m.matches()) {
       final int groupCount = m.groupCount();

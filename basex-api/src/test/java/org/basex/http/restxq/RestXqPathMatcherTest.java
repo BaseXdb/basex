@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import java.math.*;
 import java.util.*;
 
+import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.hamcrest.*;
 import org.junit.*;
@@ -137,10 +138,10 @@ public final class RestXqPathMatcherTest {
   private static void testValues(final String template, final String path, final String var,
       final String val) throws Exception {
 
-    final Map<QNm, String> actual = RestXqPathMatcher.parse(template, null).values(path);
-    assertThat(actual, new CustomTypeSafeMatcher<Map<QNm, String>>("values differ") {
+    final QNmMap<String> actual = RestXqPathMatcher.parse(template, null).values(path);
+    assertThat(actual, new CustomTypeSafeMatcher<QNmMap<String>>("values differ") {
       @Override
-      protected boolean matchesSafely(final Map<QNm, String> item) {
+      protected boolean matchesSafely(final QNmMap<String> item) {
         return Objects.equals(val, item.get(new QNm(var)));
       }
     });

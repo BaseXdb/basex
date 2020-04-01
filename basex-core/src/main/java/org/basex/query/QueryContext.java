@@ -26,6 +26,7 @@ import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.ft.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -53,7 +54,7 @@ public final class QueryContext extends Job implements Closeable {
   /** Functions. */
   public final StaticFuncs funcs = new StaticFuncs();
   /** Externally bound variables. */
-  private final HashMap<QNm, Value> bindings = new HashMap<>();
+  private final QNmMap<Value> bindings = new QNmMap<>();
   /** External query properties. */
   private final HashMap<String, Object> props;
 
@@ -268,7 +269,7 @@ public final class QueryContext extends Job implements Closeable {
             if(ctxItem == null) context(value, root.sc);
           } else {
             final QNm name = qname(key, root.sc);
-            if(!bindings.containsKey(name)) bind(name, value);
+            if(!bindings.contains(name)) bind(name, value);
           }
         }
       }

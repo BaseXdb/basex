@@ -1119,4 +1119,15 @@ public final class RewritingsTest extends QueryPlanTest {
     execute(new Add("b.xml", "<x/>"));
     query("x", "<x/>");
   }
+
+  /** Equality tests on QNames. */
+  @Test public void gh1823() {
+    query("declare namespace p = 'U';\n" +
+      "prefix-from-QName(QName('U', 'a')[. = xs:QName(<_>p:a</_>)]) or\n" +
+      "prefix-from-QName(QName('U', 'p:a')[. = xs:QName(<_>p:a</_>)])",
+      true);
+    query("let $f := function($a) { string($a) }\n" +
+      "return distinct-values(($f(QName('U', 'l')), $f(QName('U', 'p:l'))))",
+      "l\np:l");
+  }
 }

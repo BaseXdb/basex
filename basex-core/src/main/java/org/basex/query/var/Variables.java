@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -19,7 +20,7 @@ import org.basex.util.*;
  */
 public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   /** The variables. */
-  private final HashMap<QNm, VarEntry> vars = new HashMap<>();
+  private final QNmMap<VarEntry> vars = new QNmMap<>();
 
   /**
    * Declares a new static variable.
@@ -95,10 +96,10 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * @param bindings variable bindings
    * @throws QueryException query exception
    */
-  public void bindExternal(final QueryContext qc, final HashMap<QNm, Value> bindings)
+  public void bindExternal(final QueryContext qc, final QNmMap<Value> bindings)
       throws QueryException {
 
-    for(final QNm qnm : bindings.keySet()) {
+    for(final QNm qnm : bindings) {
       final VarEntry ve = vars.get(qnm);
       if(ve != null) ve.var.bind(bindings.get(qnm), qc);
     }
@@ -106,7 +107,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
 
   @Override
   public Iterator<StaticVar> iterator() {
-    final Iterator<QNm> qnames = vars.keySet().iterator();
+    final Iterator<QNm> qnames = vars.iterator();
     return new Iterator<StaticVar>() {
       @Override
       public boolean hasNext() {

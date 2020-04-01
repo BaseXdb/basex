@@ -98,4 +98,9 @@ public final class HashItemSet extends ASet implements ItemSet {
   public Iterator<Item> iterator() {
     return new ArrayIterator<>(keys, 1, size);
   }
+
+  @Override
+  public String toString() {
+    return toString(keys);
+  }
 }

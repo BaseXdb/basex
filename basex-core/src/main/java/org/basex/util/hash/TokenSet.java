@@ -94,8 +94,8 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * @return unique id of stored key (larger than zero)
    */
   public final int put(final byte[] key) {
-    final int i = index(key);
-    return Math.abs(i);
+    final int id = index(key);
+    return Math.abs(id);
   }
 
   /**

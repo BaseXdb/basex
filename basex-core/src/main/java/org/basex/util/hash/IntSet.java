@@ -46,8 +46,8 @@ public class IntSet extends ASet {
    * @return unique id of stored key (larger than zero)
    */
   final int put(final int key) {
-    final int i = index(key);
-    return Math.abs(i);
+    final int id = index(key);
+    return Math.abs(id);
   }
 
   /**
