@@ -101,7 +101,7 @@ function dba:database(
             let $headers := (
               map { 'key': 'backup', 'label': 'Name', 'order': 'desc' },
               map { 'key': 'size', 'label': 'Size', 'type': 'bytes' },
-              map { 'key': 'action', 'label': 'Action', 'type': 'xml' }
+              map { 'key': 'action', 'label': 'Action', 'type': 'dynamic' }
             )
             let $entries :=
               for $backup in db:backups($name)

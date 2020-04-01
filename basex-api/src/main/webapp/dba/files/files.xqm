@@ -71,10 +71,10 @@ function dba:files(
 
         <form action='{ $dba:CAT }' method='post' class='update'>{
           let $headers := (
-            map { 'key': 'name', 'label': 'Name', 'type': 'xml' },
+            map { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
             map { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc' },
             map { 'key': 'bytes', 'label': 'Bytes', 'type': 'bytes', 'order': 'desc' },
-            map { 'key': 'action', 'label': 'Action', 'type': 'xml' }
+            map { 'key': 'action', 'label': 'Action', 'type': 'dynamic' }
           )
           let $entries :=
             let $jobs := jobs:list-details()

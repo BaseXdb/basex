@@ -274,7 +274,7 @@ declare function html:properties(
  :     * 'decimal': sorted as numbers, output with two decimal digits
  :     * 'bytes': sorted as numbers, output in a human-readable format
  :     * 'date', 'dateTime', 'time': sorted and output as dates
- :     * 'xml': function generating XML; sorted as strings, output as XML
+ :     * 'dynamic': function generating dynamic input; sorted as strings
  :     * 'id': suppressed (only used for creating checkboxes)
  :     * otherwise, sorted and output as strings
  :   * The 'order' attribute defines how sorted values will be ordered:
@@ -319,7 +319,6 @@ declare function html:table(
   let $sort-key := head(($sort[.], $headers[1]?key))
   let $sorted-entries := if($sort and not($sort-key = $options?presort)) then (
     let $sort-header := $headers[?key = $sort-key]
-    let $sort-xml := $sort-header?type = 'xml'
     let $sort-value := (
       let $sort-desc := $sort-header?order = 'desc'
       return switch($sort-header?type)
@@ -339,12 +338,13 @@ declare function html:table(
           if($sort-desc)
           then function($v) { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime($v) }
           else function($v) { $v }
+        case 'dynamic' return
+          function($v) { if($v instance of function(*)) then string-join($v()) else $v }
         default return
           function($v) { $v }
     )
     for $entry in $entries
-    order by $sort-value($entry($sort-key) ! (if($sort-xml) then string-join(.()) else .))
-      empty greatest collation '?lang=en'
+    order by $sort-value($entry($sort-key)) empty greatest collation '?lang=en'
     return $entry
   ) else (
     $entries
@@ -430,14 +430,13 @@ declare function html:table(
               format-number(if(exists($v)) then number($v) else 0, '0.00')
             ) else if($type = 'dateTime') then (
               html:date(xs:dateTime($v))
-            ) else if($type = 'xml') then (
+            ) else if($v instance of function(*)) then (
               $v()
             ) else (
               string($v)
             )
           } catch * {
-            (: error: show error message (for functions) or proceed with original value :)
-            if ($v instance of function(*)) then $err:description else $v
+            $err:description
           }
           return element td {
             attribute align { if($type = $html:NUMBER) then 'right' else 'left' },

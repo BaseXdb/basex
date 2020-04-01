@@ -90,7 +90,7 @@ function dba:logs(
           <div id='list'>{
             let $buttons := html:button('log-delete', 'Delete', true())
             let $headers := (
-              map { 'key': 'name', 'label': 'Name', 'type': 'xml' },
+              map { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
               map { 'key': 'size', 'label': 'Size', 'type': 'bytes' }
             )
             let $entries := 
@@ -162,12 +162,12 @@ function dba:log(
   $time   as xs:string?
 ) as element()+ {
   let $headers := (
-    map { 'key': 'time', 'label': 'Time', 'type': 'xml', 'order': 'desc' },
+    map { 'key': 'time', 'label': 'Time', 'type': 'dynamic', 'order': 'desc' },
     map { 'key': 'address', 'label': 'Address' },
-    map { 'key': 'user', 'label': 'User', 'type': 'xml' },
-    map { 'key': 'type', 'label': 'Type', 'type': 'xml' },
+    map { 'key': 'user', 'label': 'User', 'type': 'dynamic' },
+    map { 'key': 'type', 'label': 'Type', 'type': 'dynamic' },
     map { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc' },
-    map { 'key': 'text', 'label': 'Text', 'type': 'xml' }
+    map { 'key': 'text', 'label': 'Text', 'type': 'dynamic' }
   )
   let $entries := (
     let $ignore-logs := options:get($options:IGNORE-LOGS)
