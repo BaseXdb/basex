@@ -327,7 +327,7 @@ public final class QNm extends Item {
 
   @Override
   public int hash(final InputInfo ii) {
-    return Token.hash(local());
+    return Token.hash(id());
   }
 
   @Override
@@ -337,13 +337,16 @@ public final class QNm extends Item {
 
   @Override
   public int hashCode() {
-    return Token.hash(id());
+    return hash(null);
   }
 
   @Override
   public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof QNm)) return false;
+    final QNm qnm = (QNm) obj;
     // prefix is ignored in equality check!
-    return obj instanceof QNm && eq((QNm) obj);
+    return eq(qnm);
   }
 
   @Override

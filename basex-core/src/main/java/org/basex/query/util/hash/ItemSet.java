@@ -14,7 +14,7 @@ public interface ItemSet extends Iterable<Item> {
   /**
    * Stores the specified key if it has not been stored before.
    * @param key key to be added
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return {@code true} if the key did not exist yet and was stored
    * @throws QueryException query exception
    */

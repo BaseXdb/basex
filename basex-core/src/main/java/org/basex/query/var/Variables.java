@@ -3,7 +3,6 @@ package org.basex.query.var;
 import static org.basex.query.QueryError.*;
 
 import java.util.*;
-import java.util.Map.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -36,7 +35,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   public StaticVar declare(final Var var, final AnnList anns, final Expr expr, final boolean ext,
       final String doc, final VarScope vs) throws QueryException {
     final StaticVar sv = new StaticVar(vs, anns, var, expr, ext, doc);
-    vars.computeIfAbsent(var.name, n -> new VarEntry()).setVar(sv);
+    varEntry(var.name).setVar(sv);
     return sv;
   }
 
@@ -72,8 +71,22 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   public StaticVarRef newRef(final QNm name, final StaticContext sc, final InputInfo ii)
       throws QueryException {
     final StaticVarRef ref = new StaticVarRef(ii, name, sc);
-    vars.computeIfAbsent(name, n -> new VarEntry()).addRef(ref);
+    varEntry(name).addRef(ref);
     return ref;
+  }
+
+  /**
+   * Returns a variable entry for the specified QName.
+   * @param name QName
+   * @return variable entry
+   */
+  private VarEntry varEntry(final QNm name) {
+    VarEntry entry = vars.get(name);
+    if(entry == null) {
+      entry = new VarEntry();
+      vars.put(name, entry);
+    }
+    return entry;
   }
 
   /**
@@ -85,24 +98,24 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   public void bindExternal(final QueryContext qc, final HashMap<QNm, Value> bindings)
       throws QueryException {
 
-    for(final Entry<QNm, Value> entry : bindings.entrySet()) {
-      final VarEntry ve = vars.get(entry.getKey());
-      if(ve != null) ve.var.bind(entry.getValue(), qc);
+    for(final QNm qnm : bindings.keySet()) {
+      final VarEntry ve = vars.get(qnm);
+      if(ve != null) ve.var.bind(bindings.get(qnm), qc);
     }
   }
 
   @Override
   public Iterator<StaticVar> iterator() {
-    final Iterator<Entry<QNm, VarEntry>> iter = vars.entrySet().iterator();
+    final Iterator<QNm> qnames = vars.keySet().iterator();
     return new Iterator<StaticVar>() {
       @Override
       public boolean hasNext() {
-        return iter.hasNext();
+        return qnames.hasNext();
       }
 
       @Override
       public StaticVar next() {
-        return iter.next().getValue().var;
+        return vars.get(qnames.next()).var;
       }
 
       @Override
@@ -116,7 +129,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   public void plan(final QueryPlan plan) {
     if(vars.isEmpty()) return;
 
-    final ArrayList<ExprInfo> list = new ArrayList<>();
+    final ArrayList<ExprInfo> list = new ArrayList<>(vars.size());
     for(final VarEntry ve : vars.values()) list.add(ve.var);
     plan.add(plan.create(this), list.toArray());
   }

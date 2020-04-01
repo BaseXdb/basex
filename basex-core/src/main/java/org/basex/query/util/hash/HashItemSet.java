@@ -8,17 +8,16 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * This is an efficient and memory-saving hash map for storing items. Items with identical hash
- * keys are checked for equivalence.
+ * This is an efficient and memory-saving hash map for storing items.
  *
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
-public class HashItemSet extends ASet implements ItemSet {
+public final class HashItemSet extends ASet implements ItemSet {
+  /** Hashed keys. */
+  private Item[] keys = new Item[Array.CAPACITY];
   /** Hash values. */
   private int[] hash = new int[Array.CAPACITY];
-  /** Hashed items. */
-  private Item[] items = new Item[Array.CAPACITY];
   /** Equality check (stricter than equivalence check). */
   private final boolean eq;
 
@@ -32,51 +31,56 @@ public class HashItemSet extends ASet implements ItemSet {
   }
 
   @Override
-  public final boolean add(final Item item, final InputInfo ii) throws QueryException {
-    return !check(item, ii, true);
+  public boolean add(final Item item, final InputInfo ii) throws QueryException {
+    return index(item, ii) >= 0;
   }
 
   /**
    * Checks if the specified item exists.
    * @param item item to look up
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean contains(final Item item, final InputInfo ii) throws QueryException {
-    return check(item, ii, false);
+  public boolean contains(final Item item, final InputInfo ii) throws QueryException {
+    return id(item, ii) > 0;
   }
 
   /**
-   * Checks if an item exists in the index.
+   * Returns the id of the specified QName, or {@code 0} if the QName does not exist.
    * @param item item to look up
-   * @param ii input info
-   * @param add add entry
-   * @return id, or negative id if key has already been stored
+   * @param ii input info (can be {@code null})
+   * @return id, or {@code 0} if QName does not exist
    * @throws QueryException query exception
    */
-  private boolean check(final Item item, final InputInfo ii, final boolean add)
-      throws QueryException {
+  public int id(final Item item, final InputInfo ii) throws QueryException {
+    final int b = item.hash(ii) & buckets.length - 1;
+    for(int id = buckets[b]; id != 0; id = next[id]) {
+      if(eq ? keys[id].eq(item, null, null, ii) : keys[id].equiv(item, null, ii)) return id;
+    }
+    return 0;
+  }
 
+  /**
+   * Stores the specified QName and returns its id, or returns the negative id if the
+   * QName has already been stored.
+   * @param item item to look up
+   * @param ii input info (can be {@code null})
+   * @return id, or negative id if QName has already been stored
+   * @throws QueryException query exception
+   */
+  private int index(final Item item, final InputInfo ii) throws QueryException {
     checkSize();
     final int h = item.hash(ii), b = h & buckets.length - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(eq ? items[id].eq(item, null, null, ii) : items[id].equiv(item, null, ii)) return true;
+      if(eq ? keys[id].eq(item, null, null, ii) : keys[id].equiv(item, null, ii)) return -id;
     }
-    if(add) {
-      final int s = size;
-      next[s] = buckets[b];
-      items[s] = item;
-      hash[s] = h;
-      buckets[b] = s;
-      size = s + 1;
-    }
-    return false;
-  }
-
-  @Override
-  public Iterator<Item> iterator() {
-    return new ArrayIterator<>(items, 1, size);
+    final int s = size++;
+    next[s] = buckets[b];
+    keys[s] = item;
+    hash[s] = h;
+    buckets[b] = s;
+    return s;
   }
 
   @Override
@@ -86,7 +90,12 @@ public class HashItemSet extends ASet implements ItemSet {
 
   @Override
   protected void rehash(final int newSize) {
-    items = Array.copy(items, new Item[newSize]);
+    keys = Array.copy(keys, new Item[newSize]);
     hash = Arrays.copyOf(hash, newSize);
+  }
+
+  @Override
+  public Iterator<Item> iterator() {
+    return new ArrayIterator<>(keys, 1, size);
   }
 }

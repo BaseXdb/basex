@@ -113,9 +113,9 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * @return id, or {@code 0} if key does not exist
    */
   public final int id(final byte[] key) {
-    final int p = Token.hash(key) & buckets.length - 1;
-    for(int i = buckets[p]; i != 0; i = next[i]) {
-      if(eq(key, keys[i])) return i;
+    final int b = Token.hash(key) & buckets.length - 1;
+    for(int id = buckets[b]; id != 0; id = next[id]) {
+      if(eq(key, keys[id])) return id;
     }
     return 0;
   }
@@ -139,12 +139,12 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    */
   public int remove(final byte[] key) {
     final int b = Token.hash(key) & buckets.length - 1;
-    for(int p = 0, i = buckets[b]; i != 0; p = i, i = next[i]) {
-      if(!eq(key, keys[i])) continue;
-      if(p == 0) buckets[b] = next[i];
-      else next[p] = next[next[i]];
-      keys[i] = null;
-      return i;
+    for(int p = 0, id = buckets[b]; id != 0; p = id, id = next[id]) {
+      if(!eq(key, keys[id])) continue;
+      if(p == 0) buckets[b] = next[id];
+      else next[p] = next[next[id]];
+      keys[id] = null;
+      return id;
     }
     return 0;
   }
@@ -158,13 +158,14 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
   private int index(final byte[] key) {
     checkSize();
     final int b = Token.hash(key) & buckets.length - 1;
-    for(int r = buckets[b]; r != 0; r = next[r]) {
-      if(eq(key, keys[r])) return -r;
+    for(int id = buckets[b]; id != 0; id = next[id]) {
+      if(eq(key, keys[id])) return -id;
     }
-    next[size] = buckets[b];
-    keys[size] = key;
-    buckets[b] = size;
-    return size++;
+    final int s = size++;
+    next[s] = buckets[b];
+    keys[s] = key;
+    buckets[b] = s;
+    return s;
   }
 
   @Override

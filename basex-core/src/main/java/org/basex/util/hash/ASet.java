@@ -38,7 +38,7 @@ public abstract class ASet {
   /**
    * Resets the data structure.
    */
-  void clear() {
+  protected void clear() {
     Arrays.fill(buckets, 0);
     size = 1;
   }

@@ -202,10 +202,11 @@ public final class RestXqFunction extends WebFunction {
 
     // bind variables from segments
     if(path != null) {
-      for(final Map.Entry<QNm, String> entry : path.values(conn).entrySet()) {
-        final QNm qnm = new QNm(entry.getKey().string(), function.sc);
+      final Map<QNm, String> qnames = path.values(conn);
+      for(final QNm qname : qnames.keySet()) {
+        final QNm qnm = new QNm(qname.string(), function.sc);
         if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
-        bind(qnm, args, new Atm(entry.getValue()), qc);
+        bind(qnm, args, new Atm(qnames.get(qname)), qc);
       }
     }
 

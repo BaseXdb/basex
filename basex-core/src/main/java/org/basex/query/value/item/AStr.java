@@ -40,8 +40,8 @@ public abstract class AStr extends Item {
   @Override
   public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return coll == null ? Token.eq(string(ii), item.string(ii)) :
-      coll.compare(string(ii), item.string(ii)) == 0;
+    final byte[] str1 = string(ii), str2 = item.string(ii);
+    return coll == null ? Token.eq(str1, str2) : coll.compare(str1, str2) == 0;
   }
 
   @Override
@@ -52,8 +52,8 @@ public abstract class AStr extends Item {
   @Override
   public final int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return coll == null ? Token.diff(string(ii), item.string(ii)) :
-      coll.compare(string(ii), item.string(ii));
+    final byte[] str1 = string(ii), str2 = item.string(ii);
+    return coll == null ? Token.diff(str1, str2) : coll.compare(str1, str2);
   }
 
   @Override

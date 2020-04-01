@@ -1,19 +1,14 @@
 package org.basex.http.restxq;
 
-import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.ZERO;
-import static java.math.BigInteger.TEN;
+import static java.math.BigInteger.*;
 import static org.junit.Assert.*;
 
-import org.basex.query.value.item.QNm;
-import org.hamcrest.CustomTypeSafeMatcher;
-import org.junit.Ignore;
-import org.junit.Test;
+import java.math.*;
+import java.util.*;
 
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
+import org.basex.query.value.item.*;
+import org.hamcrest.*;
+import org.junit.*;
 
 /**
  * Path matcher tests.
