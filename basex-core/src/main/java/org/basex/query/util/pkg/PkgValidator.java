@@ -85,24 +85,21 @@ public final class PkgValidator {
 
   /**
    * Checks if current database version of is among the processor dependencies.
-   * @param procs processor dependencies
+   * @param deps processor dependencies
    * @throws QueryException query exception
    */
-  private void checkProcs(final ArrayList<PkgDep> procs) throws QueryException {
-    boolean supported = false;
+  private void checkProcs(final ArrayList<PkgDep> deps) throws QueryException {
     // extract database version
-    final int i = Prop.VERSION.indexOf(' ');
     final HashSet<String> versions = new HashSet<>();
-    versions.add(i == -1 ? Prop.VERSION : Prop.VERSION.substring(0, i));
-    for(final PkgDep dep : procs) {
-      if(!dep.processor.toLowerCase(Locale.ENGLISH).equals(Prop.PROJECT_NAME)) {
-        supported = false;
-        break;
-      }
-      // check if current version is acceptable for the dependency
-      supported = availVersion(dep, versions) != null;
+    final int version = Prop.VERSION.indexOf(' ');
+    versions.add(version == -1 ? Prop.VERSION : Prop.VERSION.substring(0, version));
+
+    // check if any of the dependencies math
+    for(final PkgDep dep : deps) {
+      if(dep.processor.toLowerCase(Locale.ENGLISH).equals(Prop.PROJECT_NAME) &&
+          availVersion(dep, versions) != null) return;
     }
-    if(!supported) throw REPO_VERSION.get(info);
+    throw REPO_VERSION.get(info);
   }
 
   /**
