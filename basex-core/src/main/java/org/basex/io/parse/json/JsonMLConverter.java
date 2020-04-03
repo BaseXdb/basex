@@ -45,7 +45,7 @@ final class JsonMLConverter extends JsonXmlConverter {
    * @throws QueryIOException query I/O exception
    */
   private static void error(final String msg, final Object... ext) throws QueryIOException {
-    throw JSON_PARSE_X.getIO(Util.inf(msg, ext));
+    throw JSON_PARSE_X.getIO(Util.info(msg, ext) + '.');
   }
 
   /**

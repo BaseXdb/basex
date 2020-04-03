@@ -146,7 +146,7 @@ public abstract class Sandbox {
   /**
    * Checks if a query yields the specified error code.
    * @param query query string
-   * @param error expected error
+   * @param error allowed errors
    */
   protected static void error(final String query, final QueryError... error) {
     try {
@@ -168,7 +168,7 @@ public abstract class Sandbox {
    * Checks if an exception yields one of the specified error codes.
    * @param query query
    * @param ex resulting query exception
-   * @param errors expected errors
+   * @param errors allowed errors
    */
   protected static void error(final String query, final QueryException ex,
       final QueryError... errors) {

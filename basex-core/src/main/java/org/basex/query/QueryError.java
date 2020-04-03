@@ -192,7 +192,7 @@ public enum QueryError {
   // CSV Module
 
   /** Error code. */
-  CSV_PARSE_X(CSV, "parse", "%."),
+  CSV_PARSE_X(CSV, "parse", "%"),
   /** Error code. */
   CSV_SERIALIZE_X(CSV, "serialize", "%."),
 
@@ -345,7 +345,7 @@ public enum QueryError {
   // JSON Module
 
   /** Error code. */
-  JSON_PARSE_X(JSON, "parse", "%."),
+  JSON_PARSE_X(JSON, "parse", "%"),
   /** Error code. */
   JSON_DUPL_X_X_X(JSON, "parse", "(%:%): %."),
   /** Error code. */

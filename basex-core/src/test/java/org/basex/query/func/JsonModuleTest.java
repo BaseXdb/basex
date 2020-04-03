@@ -14,6 +14,14 @@ import org.junit.*;
  */
 public final class JsonModuleTest extends SandboxTest {
   /** Test method. */
+  @Test public void doc() {
+    final Function func = _JSON_DOC;
+    final String path = "src/test/resources/example.json";
+    query(func.args(path) + "//name ! string()", "Smith");
+    query(func.args(path, " map { 'format': 'xquery' }") + "?name", "Smith");
+  }
+
+  /** Test method. */
   @Test public void parseXml() {
     // default output
     parse(" ()", "", "");
@@ -195,6 +203,6 @@ public final class JsonModuleTest extends SandboxTest {
   private static void error(final String input, final String options, final Function function) {
     final String query = options.isEmpty() ? function.args(input) :
       function.args(input, " map {" + options + '}');
-    error(query, INVALIDOPT_X, JSON_PARSE_X_X_X, JSON_SERIALIZE_X);
+    error(query, INVALIDOPT_X, JSON_PARSE_X, JSON_SERIALIZE_X);
   }
 }

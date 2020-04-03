@@ -13,6 +13,14 @@ import org.junit.*;
  */
 public final class HtmlModuleTest extends SandboxTest {
   /** Test method. */
+  @Test public void doc() {
+    final Function func = _HTML_DOC;
+    final String path = "src/test/resources/input.html";
+    query(func.args(path) + "//body ! name()", "body");
+    query(func.args(path, " map { 'nons': false() }") + "//*:body ! name()", "body");
+  }
+
+  /** Test method. */
   @Test public void parse() {
     final Function func = _HTML_PARSE;
     query(func.args(" ()"), "");

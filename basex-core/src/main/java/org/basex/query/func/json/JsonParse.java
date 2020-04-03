@@ -1,6 +1,11 @@
 package org.basex.query.func.json;
 
+import static org.basex.query.QueryError.*;
+
+import java.io.*;
+
 import org.basex.build.json.*;
+import org.basex.io.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -15,22 +20,32 @@ import org.basex.util.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
-public final class JsonParse extends StandardFunc {
+public class JsonParse extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = exprs[0].atomItem(qc, info);
-    final JsonParserOptions opts = toOptions(1, new JsonParserOptions(), qc);
     if(item == Empty.VALUE) return Empty.VALUE;
-
-    try {
-      return JsonConverter.get(opts).convert(toToken(item), null);
-    } catch(final QueryIOException ex) {
-      throw ex.getCause(info);
-    }
+    return parse(new IOContent(toToken(item)), qc);
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected final Expr opt(final CompileContext cc) {
     return optFirst();
+  }
+
+  /**
+   * Parses the input and creates an XML document.
+   * @param io input data
+   * @param qc query context
+   * @return node
+   * @throws QueryException query exception
+   */
+  protected final Item parse(final IO io, final QueryContext qc) throws QueryException {
+    final JsonParserOptions opts = toOptions(1, new JsonParserOptions(), qc);
+    try {
+      return JsonConverter.get(opts).convert(io);
+    } catch(final IOException ex) {
+      throw JSON_PARSE_X.get(info, ex);
+    }
   }
 }

@@ -21,24 +21,32 @@ import org.basex.util.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
-public final class HtmlParse extends StandardFunc {
+public class HtmlParse extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = exprs[0].atomItem(qc, info);
-    final HtmlOptions hopts = toOptions(1, new HtmlOptions(), qc);
     if(item == Empty.VALUE) return Empty.VALUE;
-
-    final MainOptions opts = MainOptions.get();
-    try {
-      final IO io = new IOContent(toBytes(item));
-      return new DBNode(new org.basex.build.html.HtmlParser(io, opts, hopts));
-    } catch(final IOException ex) {
-      throw HTML_PARSE_X.get(info, ex);
-    }
+    return parse(new IOContent(toBytes(item)), qc);
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected final Expr opt(final CompileContext cc) {
     return optFirst();
+  }
+
+  /**
+   * Parses the input and creates an XML document.
+   * @param io input data
+   * @param qc query context
+   * @return node
+   * @throws QueryException query exception
+   */
+  protected final Item parse(final IO io, final QueryContext qc) throws QueryException {
+    final HtmlOptions opts = toOptions(1, new HtmlOptions(), qc);
+    try {
+      return new DBNode(new org.basex.build.html.HtmlParser(io, MainOptions.get(), opts));
+    } catch(final IOException ex) {
+      throw HTML_PARSE_X.get(info, ex);
+    }
   }
 }

@@ -743,6 +743,8 @@ public enum Function implements AFunction {
   // CSV Module
 
   /** XQuery function. */
+  _CSV_DOC(CsvDoc.class, "doc(uri[,options])", arg(STR_O, MAP_ZO), ITEM_ZO, flag(NDT), CSV_URI),
+  /** XQuery function. */
   _CSV_PARSE(CsvParse.class, "parse(string[,options])", arg(STR_ZO, MAP_ZO), ITEM_ZO, CSV_URI),
   /** XQuery function. */
   _CSV_SERIALIZE(CsvSerialize.class, "serialize(item[,options])", arg(ITEM_ZO, ITEM_ZO), STR_O,
@@ -1036,6 +1038,8 @@ public enum Function implements AFunction {
   // HTML Module
 
   /** XQuery function. */
+  _HTML_DOC(HtmlDoc.class, "doc(uri[,options])", arg(STR_O, MAP_ZO), ITEM_ZO, flag(NDT), HTML_URI),
+  /** XQuery function. */
   _HTML_PARSE(HtmlParse.class, "parse(string[,options])", arg(STR_ZO, MAP_ZO), DOC_ZO, HTML_URI),
   /** XQuery function. */
   _HTML_PARSER(HtmlParser.class, "parser()", arg(), STR_O, HTML_URI),
@@ -1117,6 +1121,8 @@ public enum Function implements AFunction {
 
   // JSON Module
 
+  /** XQuery function. */
+  _JSON_DOC(JsonDoc.class, "doc(uri[,options])", arg(STR_O, MAP_ZO), ITEM_ZO, flag(NDT), JSON_URI),
   /** XQuery function. */
   _JSON_PARSE(JsonParse.class, "parse(string[,options])", arg(STR_ZO, MAP_ZO), ITEM_ZO, JSON_URI),
   /** XQuery function. */

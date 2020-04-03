@@ -1,7 +1,6 @@
 package org.basex.query.func.fetch;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 
@@ -25,9 +24,8 @@ import org.basex.util.options.*;
 public class FetchXml extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] in = toToken(exprs[0], qc);
-    if(!Uri.uri(in).isValid()) throw INVDOC_X.get(info, in);
-    return fetch(IO.get(string(in)), qc);
+    final byte[] uri = toToken(exprs[0], qc);
+    return fetch(IO.get(Token.string(uri)), qc);
   }
 
   /**
@@ -48,5 +46,4 @@ public class FetchXml extends StandardFunc {
       throw FETCH_OPEN_X.get(info, ex);
     }
   }
-
 }
