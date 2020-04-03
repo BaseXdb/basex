@@ -22,7 +22,7 @@ public final class BinDecodeString extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final B64 b64 = toB64(exprs[0], qc, true);
-    final String encoding = toEncoding(1, BIN_UE_X, qc);
+    final String encoding = toEncodingOrNull(1, BIN_UE_X, qc);
     final Long off = exprs.length > 2 ? toLong(exprs[2], qc) : null;
     final Long len = exprs.length > 3 ? toLong(exprs[3], qc) : null;
     if(b64 == null) return Empty.VALUE;

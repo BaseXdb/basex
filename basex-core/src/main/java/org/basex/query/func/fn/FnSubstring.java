@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class FnSubstring extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] string = toEmptyToken(exprs[0], qc);
+    final byte[] string = toZeroToken(exprs[0], qc);
     final boolean ascii = Token.ascii(string);
     int length = ascii ? string.length : Token.length(string);
 

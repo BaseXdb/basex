@@ -25,7 +25,7 @@ public final class FnPut extends StandardFunc {
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkCreate(qc);
     final ANode nd = toNode(exprs[0], qc);
-    final byte[] file = toEmptyToken(exprs[1], qc);
+    final byte[] file = toZeroToken(exprs[1], qc);
     final Item so = exprs.length > 2 ? exprs[2].item(qc, info) : Empty.VALUE;
     final SerializerOptions sopts = FuncOptions.serializer(so, info);
 

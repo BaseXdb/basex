@@ -26,8 +26,8 @@ public final class ArraySort extends StandardFunc {
     final XQArray array = toArray(exprs[0], qc);
     Collation coll = sc.collation;
     if(exprs.length > 1) {
-      final byte[] tok = toTokenOrNull(exprs[1], qc);
-      if(tok != null) coll = Collation.get(tok, qc, sc, info, WHICHCOLL_X);
+      final byte[] token = toTokenOrNull(exprs[1], qc);
+      if(token != null) coll = Collation.get(token, qc, sc, info, WHICHCOLL_X);
     }
 
     final long size = array.arraySize();

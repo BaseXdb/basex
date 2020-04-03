@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class FnNormalizeSpace extends ContextFn {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Str.get(Token.normalize(toEmptyToken(ctxArg(0, qc), qc)));
+    return Str.get(Token.normalize(toZeroToken(ctxArg(0, qc), qc)));
   }
 }

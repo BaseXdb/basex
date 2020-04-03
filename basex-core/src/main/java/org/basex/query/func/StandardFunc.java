@@ -296,11 +296,11 @@ public abstract class StandardFunc extends Arr {
    * Converts the specified argument to a file path.
    * @param i index of argument
    * @param qc query context
-   * @return file instance, or {@code null} if the argument does not exist
+   * @return file instance
    * @throws QueryException query exception
    */
   protected final Path toPath(final int i, final QueryContext qc) throws QueryException {
-    return i < exprs.length ? toPath(toToken(exprs[i], qc)) : null;
+    return toPath(toToken(exprs[i], qc));
   }
 
   /**
@@ -395,7 +395,7 @@ public abstract class StandardFunc extends Arr {
    * @return string or {@code null}
    * @throws QueryException query exception
    */
-  protected final String toEncoding(final int i, final QueryError err, final QueryContext qc)
+  protected final String toEncodingOrNull(final int i, final QueryError err, final QueryContext qc)
       throws QueryException {
 
     if(i >= exprs.length) return null;
@@ -413,11 +413,10 @@ public abstract class StandardFunc extends Arr {
    * Returns the item or throws an exception.
    * @param i index of argument
    * @param qc query context
-   * @return node, atomized item, or {@code null} if argument does not exist
+   * @return node or atomized item
    * @throws QueryException query exception
    */
   protected final Item toNodeOrAtomItem(final int i, final QueryContext qc) throws QueryException {
-    if(i >= exprs.length) return null;
     final Item item = toItem(exprs[i], qc);
     return item instanceof ANode ? item : item.atomItem(qc, info);
   }

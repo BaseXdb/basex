@@ -93,7 +93,7 @@ public class QueryParser extends InputParser {
   private final TokenObjMap<StaticFunc> funcs = new TokenObjMap<>();
 
   /** Temporary token cache. */
-  private final TokenBuilder tok = new TokenBuilder();
+  private final TokenBuilder token = new TokenBuilder();
   /** Current XQDoc string. */
   private final StringBuilder currDoc = new StringBuilder();
   /** XQDoc string of module. */
@@ -1812,14 +1812,14 @@ public class QueryParser extends InputParser {
       final QNm name = eQName(QNAME_X, null);
       char ch = curr();
       if(ch != '#' && !ws(ch)) throw error(PRAGMAINV);
-      tok.reset();
+      token.reset();
       while(ch != '#' || next() != ')') {
         if(ch == 0) throw error(PRAGMAINV);
-        tok.add(consume());
+        token.add(consume());
         ch = curr();
       }
 
-      final byte[] value = tok.trim().toArray();
+      final byte[] value = token.trim().toArray();
       if(eq(name.prefix(), DB_PREFIX)) {
         // project-specific declaration
         final String key = string(uc(name.local()));
@@ -2283,7 +2283,7 @@ public class QueryParser extends InputParser {
       final char ch = curr();
       final Expr num = numericLiteral(ch);
       if(Function.ERROR.is(num)) return num;
-      if(!(num instanceof Int)) throw error(ARITY_X, num == null ? ch == 0 ? "" : ch : tok);
+      if(!(num instanceof Int)) throw error(ARITY_X, num == null ? ch == 0 ? "" : ch : token);
       final long a = ((Int) num).itr();
       if(a > Integer.MAX_VALUE) return FnError.get(RANGE_X.get(info(), num), SeqType.ITEM_ZM, sc);
       final int arity = (int) a;
@@ -2332,40 +2332,40 @@ public class QueryParser extends InputParser {
     if(!digit(ch) && ch != '.') return null;
 
     // integer digits
-    tok.reset();
-    while(digit(curr())) tok.add(consume());
+    token.reset();
+    while(digit(curr())) token.add(consume());
 
     // fractional digits?
     final boolean dec = consume('.');
     if(dec) {
-      tok.add('.');
+      token.add('.');
       if(digit(curr())) {
-        do { tok.add(consume()); } while(digit(curr()));
-      } else if(tok.size() == 1) {
-        throw error(NUMBER_X, tok);
+        do { token.add(consume()); } while(digit(curr()));
+      } else if(token.size() == 1) {
+        throw error(NUMBER_X, token);
       }
     }
 
     // double value
     if(XMLToken.isNCStartChar(curr())) {
-      if(!consume('e') && !consume('E')) throw error(NUMBERWS_X, tok);
-      tok.add('e');
-      if(curr('+') || curr('-')) tok.add(consume());
-      if(!digit(curr())) throw error(NUMBER_X, tok);
-      do { tok.add(consume()); } while(digit(curr()));
+      if(!consume('e') && !consume('E')) throw error(NUMBERWS_X, token);
+      token.add('e');
+      if(curr('+') || curr('-')) token.add(consume());
+      if(!digit(curr())) throw error(NUMBER_X, token);
+      do { token.add(consume()); } while(digit(curr()));
 
-      if(XMLToken.isNCStartChar(curr())) throw error(NUMBERWS_X, tok);
-      return Dbl.get(tok.toArray(), info());
+      if(XMLToken.isNCStartChar(curr())) throw error(NUMBERWS_X, token);
+      return Dbl.get(token.toArray(), info());
     }
 
     // decimal value
-    if(dec) return Dec.get(new BigDecimal(string(tok.toArray())));
+    if(dec) return Dec.get(new BigDecimal(string(token.toArray())));
 
     // integer value
-    if(tok.isEmpty()) throw error(NUMBER_X, tok);
-    final long l = toLong(tok.toArray());
+    if(token.isEmpty()) throw error(NUMBER_X, token);
+    final long l = toLong(token.toArray());
     return l != Long.MIN_VALUE ? Int.get(l) :
-      FnError.get(RANGE_X.get(info(), normalize(tok, null)), SeqType.ITR_O, sc);
+      FnError.get(RANGE_X.get(info(), normalize(token, null)), SeqType.ITR_O, sc);
   }
 
   /**
@@ -2378,16 +2378,16 @@ public class QueryParser extends InputParser {
     final char del = curr();
     if(!quote(del)) throw error(NOQUOTE_X, found());
     consume();
-    tok.reset();
+    token.reset();
     while(true) {
       while(!consume(del)) {
         if(!more()) throw error(NOQUOTE_X, found());
-        entity(tok);
+        entity(token);
       }
       if(!consume(del)) break;
-      tok.add(del);
+      token.add(del);
     }
-    return tok.toArray();
+    return token.toArray();
   }
 
   /**
@@ -2397,12 +2397,12 @@ public class QueryParser extends InputParser {
    */
   private byte[] bracedURILiteral() throws QueryException {
     final int p = pos;
-    tok.reset();
+    token.reset();
     while(!consume('}')) {
       if(!more() || curr() == '{') throw error(WRONGCHAR_X_X, CURLY2, found());
-      entity(tok);
+      entity(token);
     }
-    final byte[] ns = normalize(tok.toArray());
+    final byte[] ns = normalize(token.toArray());
     if(eq(ns, XMLNS_URI)) {
       pos = p;
       throw error(ILLEGALEQNAME_X, info(), ns);
@@ -3223,13 +3223,13 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test piTest() throws QueryException {
-    tok.reset();
+    token.reset();
     final byte[] name;
     if(quote(curr())) {
       name = trim(stringLiteral());
       if(!XMLToken.isNCName(name)) throw error(INVNCNAME_X, name);
     } else if(ncName()) {
-      name = tok.toArray();
+      name = token.toArray();
     } else {
       return null;
     }
@@ -3506,10 +3506,10 @@ public class QueryParser extends InputParser {
   private Expr ftAdditive(final boolean i) throws QueryException {
     if(!i) return additive();
     skipWs();
-    tok.reset();
-    while(digit(curr())) tok.add(consume());
-    if(tok.isEmpty()) throw error(INTEXP);
-    return Int.get(toLong(tok.toArray()));
+    token.reset();
+    while(digit(curr())) token.add(consume());
+    if(token.isEmpty()) throw error(INTEXP);
+    return Int.get(toLong(token.toArray()));
   }
 
   /**
@@ -3812,8 +3812,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private byte[] ncName(final QueryError error) throws QueryException {
-    tok.reset();
-    if(ncName()) return tok.toArray();
+    token.reset();
+    if(ncName()) return token.toArray();
     if(error != null) {
       final char ch = consume();
       throw error(error, ch == 0 ? "" : ch);
@@ -3870,7 +3870,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private byte[] qName(final QueryError error) throws QueryException {
-    tok.reset();
+    token.reset();
     if(!ncName()) {
       if(error != null) {
         final char ch = consume();
@@ -3878,15 +3878,15 @@ public class QueryParser extends InputParser {
       }
     } else if(consume(':')) {
       if(XMLToken.isNCStartChar(curr())) {
-        tok.add(':');
+        token.add(':');
         do {
-          tok.add(consume());
+          token.add(consume());
         } while(XMLToken.isNCChar(curr()));
       } else {
         --pos;
       }
     }
-    return tok.toArray();
+    return token.toArray();
   }
 
   /**
@@ -3895,7 +3895,7 @@ public class QueryParser extends InputParser {
    */
   private boolean ncName() {
     if(!XMLToken.isNCStartChar(curr())) return false;
-    do tok.add(consume()); while(XMLToken.isNCChar(curr()));
+    do token.add(consume()); while(XMLToken.isNCChar(curr()));
     return true;
   }
 

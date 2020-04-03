@@ -25,8 +25,7 @@ public class HtmlParse extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = exprs[0].atomItem(qc, info);
-    if(item == Empty.VALUE) return Empty.VALUE;
-    return parse(new IOContent(toBytes(item)), qc);
+    return item != Empty.VALUE ? parse(new IOContent(toBytes(item)), qc) : Empty.VALUE;
   }
 
   @Override

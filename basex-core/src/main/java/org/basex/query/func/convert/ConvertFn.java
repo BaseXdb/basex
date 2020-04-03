@@ -28,7 +28,7 @@ public abstract class ConvertFn extends StandardFunc {
    */
   final byte[] stringToBinary(final QueryContext qc) throws QueryException {
     final byte[] token = toToken(exprs[0], qc);
-    final String encoding = toEncoding(1, CONVERT_ENCODING_X, qc);
+    final String encoding = toEncodingOrNull(1, CONVERT_ENCODING_X, qc);
     if(encoding == null || encoding == Strings.UTF8) return token;
     try {
       return toBinary(token, encoding);

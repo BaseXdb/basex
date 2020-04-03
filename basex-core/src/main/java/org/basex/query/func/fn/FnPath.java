@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 public final class FnPath extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    ANode node = toEmptyNode(ctxArg(0, qc), qc);
+    ANode node = toNodeOrNull(ctxArg(0, qc), qc);
     if(node == null) return Empty.VALUE;
 
     final TokenList tl = new TokenList();

@@ -66,7 +66,7 @@ public class ValidateXsd extends ValidateFn {
           QueryException {
 
         final IO in = read(toNodeOrAtomItem(0, qc), null);
-        final Item schema = toNodeOrAtomItem(1, qc);
+        final Item schema = exprs.length > 1 ? toNodeOrAtomItem(1, qc) : null;
         final HashMap<String, String> options = toOptions(2, new Options(), qc).free();
 
         // create schema factory and set version

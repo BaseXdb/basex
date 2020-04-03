@@ -16,11 +16,11 @@ import org.basex.util.*;
 public final class MathCrc32 extends MathFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = exprs[0].atomItem(qc, info);
-    if(item == Empty.VALUE) return Empty.VALUE;
+    final byte[] token = toTokenOrNull(exprs[0], qc);
+    if(token == null) return Empty.VALUE;
 
     final CRC32 crc = new CRC32();
-    crc.update(toToken(item));
+    crc.update(token);
     final byte[] r = new byte[4];
     for(int i = r.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8) r[i] = (byte) c;
     return new Hex(r);

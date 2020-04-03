@@ -45,7 +45,7 @@ final class FTList {
   /** Current data size. */
   int size;
   /** Next token. */
-  byte[] tok;
+  byte[] token;
   /** Next pre values. */
   int[] prv;
   /** Next pos values. */
@@ -83,8 +83,8 @@ final class FTList {
   void next() {
     if(wasted) return;
 
-    tok = token();
-    if(tok.length == 0) {
+    token = token();
+    if(token.length == 0) {
       wasted = true;
       prv = NOINTS;
       pov = NOINTS;

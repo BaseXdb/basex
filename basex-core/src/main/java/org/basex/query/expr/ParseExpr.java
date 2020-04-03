@@ -240,10 +240,10 @@ public abstract class ParseExpr extends Expr {
    * Returns a value as token or throws an exception.
    * @param expr expression to be evaluated
    * @param qc query context
-   * @return token (empty string if result is an empty sequence)
+   * @return token (zero-length if result is an empty sequence)
    * @throws QueryException query exception
    */
-  protected final byte[] toEmptyToken(final Expr expr, final QueryContext qc)
+  protected final byte[] toZeroToken(final Expr expr, final QueryContext qc)
       throws QueryException {
     final Item item = expr.atomItem(qc, info);
     return item == Empty.VALUE ? EMPTY : toToken(item);
@@ -254,13 +254,13 @@ public abstract class ParseExpr extends Expr {
    * Returns a value as token or throws an exception.
    * @param expr expression to be evaluated
    * @param qc query context
-   * @return token (empty string if result is an empty sequence)
+   * @return token, or {@code null} if result is an empty sequence
    * @throws QueryException query exception
    */
   protected final byte[] toTokenOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item == Empty.VALUE ? null : toToken(item);
+    return item != Empty.VALUE ? toToken(item) : null;
   }
 
   /**
@@ -335,9 +335,10 @@ public abstract class ParseExpr extends Expr {
    * @return double
    * @throws QueryException query exception
    */
-  protected final ANum toNumber(final Expr expr, final QueryContext qc) throws QueryException {
+  protected final ANum toNumberOrNull(final Expr expr, final QueryContext qc)
+      throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item == Empty.VALUE ? null : toNumber(item);
+    return item != Empty.VALUE ? toNumber(item) : null;
   }
 
   /**
@@ -412,7 +413,7 @@ public abstract class ParseExpr extends Expr {
    * @return node or {@code null}
    * @throws QueryException query exception
    */
-  protected final ANode toEmptyNode(final Expr expr, final QueryContext qc) throws QueryException {
+  protected final ANode toNodeOrNull(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.item(qc, info);
     return item == Empty.VALUE ? null : toNode(item);
   }

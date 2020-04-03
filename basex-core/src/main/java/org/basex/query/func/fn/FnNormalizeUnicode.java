@@ -20,7 +20,7 @@ import org.basex.util.*;
 public final class FnNormalizeUnicode extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] str = toEmptyToken(exprs[0], qc);
+    final byte[] str = toZeroToken(exprs[0], qc);
 
     Form form = Form.NFC;
     if(exprs.length == 2) {

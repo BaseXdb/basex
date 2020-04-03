@@ -15,6 +15,10 @@ public final class HtmlModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void doc() {
     final Function func = _HTML_DOC;
+    query(func.args(" ()"), "");
+    query(func.args(" []"), "");
+    query(func.args(" <_/>/text()"), "");
+
     final String path = "src/test/resources/input.html";
     query(func.args(path) + "//body ! name()", "body");
     query(func.args(path, " map { 'nons': false() }") + "//*:body ! name()", "body");

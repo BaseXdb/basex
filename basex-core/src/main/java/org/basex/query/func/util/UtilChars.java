@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 public final class UtilChars extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final int[] cps = cps(toEmptyToken(exprs[0], qc));
+    final int[] cps = cps(toZeroToken(exprs[0], qc));
 
     return new BasicIter<Str>(cps.length) {
       @Override
@@ -36,7 +36,7 @@ public final class UtilChars extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return toValue(cps(toEmptyToken(exprs[0], qc)));
+    return toValue(cps(toZeroToken(exprs[0], qc)));
   }
 
   /**

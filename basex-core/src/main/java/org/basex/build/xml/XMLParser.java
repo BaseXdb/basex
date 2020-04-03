@@ -203,9 +203,9 @@ public class XMLParser extends SingleParser {
    */
   private byte[] consumeToken(final Type type) throws IOException {
     if(scanner.type == type) {
-      final byte[] tok = scanner.token.toArray();
+      final byte[] token = scanner.token.toArray();
       scanner.more();
-      return tok;
+      return token;
     }
     throw new BuildException(PARSEINV, detailedInfo(), type.string, scanner.type.string);
   }

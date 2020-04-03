@@ -32,7 +32,7 @@ public final class CNSpace extends CName {
 
   @Override
   public FNSpace item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] cp = trim(toEmptyToken(name, qc));
+    final byte[] cp = trim(toZeroToken(name, qc));
     if(cp.length != 0 && !XMLToken.isNCName(cp)) throw INVNSNAME_X.get(info, cp);
 
     final byte[] cu = atomValue(qc);

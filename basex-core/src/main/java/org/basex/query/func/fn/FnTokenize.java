@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 public final class FnTokenize extends RegEx {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final byte[] value = toEmptyToken(exprs[0], qc);
+    final byte[] value = toZeroToken(exprs[0], qc);
     if(exprs.length < 2) return StrSeq.get(split(normalize(value), ' '));
 
     final Pattern pattern = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc, true);

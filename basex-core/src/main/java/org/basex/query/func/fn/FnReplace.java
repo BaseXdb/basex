@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class FnReplace extends RegEx {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value1 = toEmptyToken(exprs[0], qc);
+    final byte[] value1 = toZeroToken(exprs[0], qc);
     final Pattern pattern = pattern(exprs[1], exprs.length == 4 ? exprs[3] : null, qc, true);
     final byte[] value2 = toToken(exprs[2], qc);
     String replace = string(value2);

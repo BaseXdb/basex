@@ -68,9 +68,9 @@ final class EnglishStemmer extends InternalStemmer {
   );
 
   /** Token to be stemmed. */
-  private byte[] tok;
+  private byte[] token;
   /** Token length. */
-  private int te;
+  private int tl;
   /** Stemming length. */
   private int tt;
 
@@ -94,9 +94,9 @@ final class EnglishStemmer extends InternalStemmer {
 
   @Override
   protected byte[] stem(final byte[] str) {
-    te = str.length;
-    tok = str;
-    return s() ? Arrays.copyOf(str, te) : str;
+    tl = str.length;
+    token = str;
+    return s() ? Arrays.copyOf(str, tl) : str;
   }
 
   /**
@@ -104,27 +104,27 @@ final class EnglishStemmer extends InternalStemmer {
    * @return true if word was stemmed
    */
   private boolean s() {
-    if(te < 3) return false;
+    if(tl < 3) return false;
 
     // step 1
     if(e(S)) {
-      if(e(SSES) || e(IES)) te -= 2;
-      else if(l(te - 2) != 's') --te;
+      if(e(SSES) || e(IES)) tl -= 2;
+      else if(l(tl - 2) != 's') --tl;
     }
 
     if(e(EED)) {
-      if(m() > 0) --te;
+      if(m() > 0) --tl;
     } else if((e(ED) || e(ING)) && v()) {
-      te = tt;
+      tl = tt;
 
       if(e(AT) || e(BL) || e(IZ)) {
-        tt = te;
+        tt = tl;
         a((byte) 'e');
-      } else if(te > 1) {
-        final int c = l(te - 1);
-        if(c == l(te - 2) && c != 'l' && c != 's' && c != 'z') {
-          --te;
-        } else if(m() == 1 && c(te)) {
+      } else if(tl > 1) {
+        final int c = l(tl - 1);
+        if(c == l(tl - 2) && c != 'l' && c != 's' && c != 'z') {
+          --tl;
+        } else if(m() == 1 && c(tl)) {
           a((byte) 'e');
         }
       }
@@ -149,11 +149,11 @@ final class EnglishStemmer extends InternalStemmer {
 
     // step 4
     if((e(TION) || e(SION)) && e(ION) && m() > 1) {
-      te -= 3;
+      tl -= 3;
     } else {
       for(final byte[] s : ST4) {
         if(e(s)) {
-          if(m() > 1) te = tt;
+          if(m() > 1) tl = tt;
           break;
         }
       }
@@ -162,11 +162,11 @@ final class EnglishStemmer extends InternalStemmer {
     // step 5
     if(e(E)) {
       final int m = m();
-      if(m > 1 || m == 1 && !c(te - 1)) --te;
+      if(m > 1 || m == 1 && !c(tl - 1)) --tl;
     }
-    if(e(LL) && e(L) && m() > 1) --te;
+    if(e(LL) && e(L) && m() > 1) --tl;
 
-    return te != tok.length;
+    return tl != token.length;
   }
 
   /**
@@ -188,7 +188,7 @@ final class EnglishStemmer extends InternalStemmer {
    */
   private boolean e(final byte[] s) {
     final int sl = s.length;
-    final int l = te - sl;
+    final int l = tl - sl;
     if(l < 0) return false;
     for(int i = 0; i < sl; ++i)
       if(l(l + i) != s[i]) return false;
@@ -202,7 +202,7 @@ final class EnglishStemmer extends InternalStemmer {
    * @return result of check
    */
   private boolean e(final byte s) {
-    final int l = te - 1;
+    final int l = tl - 1;
     if(l < 0 || l(l) != s) return false;
     tt = l;
     return true;
@@ -252,7 +252,7 @@ final class EnglishStemmer extends InternalStemmer {
    * @return result of check
    */
   private int l(final int p) {
-    return lc(tok[p]);
+    return lc(token[p]);
   }
 
   /**
@@ -260,8 +260,8 @@ final class EnglishStemmer extends InternalStemmer {
    * @param c character
    */
   private void a(final byte c) {
-    te = tt;
-    tok[te++] = c;
+    tl = tt;
+    token[tl++] = c;
   }
 
   /**
@@ -269,7 +269,7 @@ final class EnglishStemmer extends InternalStemmer {
    * @param t token
    */
   private void a(final byte[] t) {
-    te = tt;
-    for(final byte c : t) tok[te++] = c;
+    tl = tt;
+    for(final byte c : t) token[tl++] = c;
   }
 }

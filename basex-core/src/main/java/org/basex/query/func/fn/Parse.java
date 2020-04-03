@@ -36,15 +36,13 @@ public abstract class Parse extends StandardFunc {
       throws QueryException {
 
     checkCreate(qc);
-    final Item item = exprs[0].atomItem(qc, info);
-    if(item == Empty.VALUE) return check ? Bln.FALSE : Empty.VALUE;
-
-    final byte[] path = toToken(item);
+    final byte[] path = toTokenOrNull(exprs[0], qc);
+    if(path == null) return check ? Bln.FALSE : Empty.VALUE;
 
     String enc;
     IO io;
     try {
-      enc = encoding ? toEncoding(1, ENCODING_X, qc) : null;
+      enc = encoding ? toEncodingOrNull(1, ENCODING_X, qc) : null;
 
       final String p = string(path);
       if(p.indexOf('#') != -1) throw FRAGID_X.get(info, p);
@@ -93,10 +91,10 @@ public abstract class Parse extends StandardFunc {
    * @throws QueryException query exception
    */
   Item parseXml(final QueryContext qc, final boolean frag) throws QueryException {
-    final Item item = exprs[0].atomItem(qc, info);
-    if(item == Empty.VALUE) return Empty.VALUE;
+    final byte[] token = toTokenOrNull(exprs[0], qc);
+    if(token == null) return Empty.VALUE;
 
-    final IO io = new IOContent(toToken(item), string(sc.baseURI().string()));
+    final IO io = new IOContent(token, string(sc.baseURI().string()));
     try {
       return new DBNode(frag ? new XMLParser(io, MainOptions.get(), true) : Parser.xmlParser(io));
     } catch(final IOException ex) {

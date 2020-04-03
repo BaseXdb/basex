@@ -30,7 +30,7 @@ public final class UnitAssertEquals extends UnitFn {
       if(empty1 || empty2 || !comp.equal(item1.iter(), item2.iter())) break;
       c++;
     }
-    final Item item = toNodeOrAtomItem(2, qc);
+    final Item item = exprs.length > 2 ? toNodeOrAtomItem(2, qc) : null;
     throw new UnitException(info, UNIT_FAIL_X_X_X, item1, item2, c).value(item);
   }
 }

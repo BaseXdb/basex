@@ -20,11 +20,9 @@ import org.basex.util.*;
 public final class FnResolveQName extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = exprs[0].atomItem(qc, info);
-    if(item == Empty.VALUE) return Empty.VALUE;
+    final byte[] name = toTokenOrNull(exprs[0], qc);
     final ANode base = toElem(exprs[1], qc);
-
-    final byte[] name = toToken(item);
+    if(name == null) return Empty.VALUE;
     if(!XMLToken.isQName(name)) throw valueError(AtomType.QNM, name, info);
 
     final QNm qname = new QNm(name);

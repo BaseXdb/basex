@@ -131,11 +131,11 @@ public final class WesternTokenizerTest {
    * @param tokens expected tokens
    */
   private void run(final byte[] input, final String... tokens) {
-    final WesternTokenizer tok = new WesternTokenizer(opt);
-    tok.init(input);
+    final WesternTokenizer token = new WesternTokenizer(opt);
+    token.init(input);
     int i = -1;
-    while(tok.hasNext()) {
-      assertTrue(eq(tok.nextToken(), token(tokens[++i])));
+    while(token.hasNext()) {
+      assertTrue(eq(token.nextToken(), token(tokens[++i])));
     }
   }
 

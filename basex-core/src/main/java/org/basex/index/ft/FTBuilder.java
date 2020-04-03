@@ -67,16 +67,16 @@ public final class FTBuilder extends IndexBuilder {
         lexer.init(data.text(pre, true));
         int pos = -1;
         while(lexer.hasNext()) {
-          final byte[] tok = lexer.nextToken();
+          final byte[] token = lexer.nextToken();
           ++pos;
           // skip too long and stopword tokens
-          if(tok.length <= data.meta.maxlen && !sw.contains(tok)) {
+          if(token.length <= data.meta.maxlen && !sw.contains(token)) {
             // check if main memory is exhausted
             if((ntok++ & 0xFFFF) == 0 && splitRequired()) {
               writeIndex(true);
               clean();
             }
-            tree.index(tok, pre, pos, splits);
+            tree.index(token, pre, pos, splits);
             count++;
           }
         }
@@ -122,25 +122,25 @@ public final class FTBuilder extends IndexBuilder {
         il.add(m);
         // find next token to write on disk
         for(int i = 0; i < splits; ++i) {
-          if(m == i || v[i].tok.length == 0) continue;
-          final int l = v[i].tok.length - v[m].tok.length;
-          final int d = diff(v[m].tok, v[i].tok);
-          if(l < 0 || l == 0 && d > 0 || v[m].tok.length == 0) {
+          if(m == i || v[i].token.length == 0) continue;
+          final int l = v[i].token.length - v[m].token.length;
+          final int d = diff(v[m].token, v[i].token);
+          if(l < 0 || l == 0 && d > 0 || v[m].token.length == 0) {
             m = i;
             il.reset();
             il.add(m);
-          } else if(d == 0 && v[i].tok.length > 0) {
+          } else if(d == 0 && v[i].token.length > 0) {
             il.add(i);
           }
         }
 
-        if(ind.isEmpty() || ind.get(ind.size() - 2) < v[m].tok.length) {
-          ind.add(v[m].tok.length);
+        if(ind.isEmpty() || ind.get(ind.size() - 2) < v[m].token.length) {
+          ind.add(v[m].token.length);
           ind.add((int) outY.size());
         }
 
         // write token
-        outY.writeBytes(v[m].tok);
+        outY.writeBytes(v[m].token);
         // pointer on full-text data
         outY.write5(outZ.size());
         // merge and write data size
@@ -277,7 +277,7 @@ public final class FTBuilder extends IndexBuilder {
    */
   private static boolean check(final FTList[] lists) {
     for(final FTList list : lists) {
-      if(list.tok.length > 0) return true;
+      if(list.token.length > 0) return true;
     }
     return false;
   }

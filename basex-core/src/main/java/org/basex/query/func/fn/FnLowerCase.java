@@ -16,6 +16,6 @@ import org.basex.util.*;
 public final class FnLowerCase extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Str.get(lc(toEmptyToken(exprs[0], qc)));
+    return Str.get(lc(toZeroToken(exprs[0], qc)));
   }
 }

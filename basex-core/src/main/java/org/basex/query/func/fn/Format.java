@@ -32,16 +32,16 @@ abstract class Format extends StandardFunc {
     final Item item = exprs[0].atomItem(qc, info);
     if(item == Empty.VALUE) return Empty.VALUE;
 
-    final byte[] picture = toEmptyToken(exprs[1], qc);
+    final byte[] picture = toZeroToken(exprs[1], qc);
 
     final boolean more = el == 5;
-    final byte[] language = more ? toEmptyToken(exprs[2], qc) : EMPTY;
+    final byte[] language = more ? toZeroToken(exprs[2], qc) : EMPTY;
     byte[] calendar = null;
     if(more) {
       calendar = toTokenOrNull(exprs[3], qc);
       if(calendar != null) calendar = trim(calendar);
     }
-    final byte[] place = more ? toEmptyToken(exprs[4], qc) : EMPTY;
+    final byte[] place = more ? toZeroToken(exprs[4], qc) : EMPTY;
 
     final ADate date = (ADate) checkType(item, tp);
     final Formatter form = Formatter.get(language);

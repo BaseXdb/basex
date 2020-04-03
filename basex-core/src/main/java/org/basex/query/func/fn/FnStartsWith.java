@@ -15,7 +15,7 @@ import org.basex.util.*;
 public final class FnStartsWith extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] ss = toEmptyToken(exprs[0], qc), sb = toEmptyToken(exprs[1], qc);
+    final byte[] ss = toZeroToken(exprs[0], qc), sb = toZeroToken(exprs[1], qc);
     final Collation coll = toCollation(2, qc);
     return Bln.get(coll == null ? Token.startsWith(ss, sb) : coll.startsWith(ss, sb, info));
   }

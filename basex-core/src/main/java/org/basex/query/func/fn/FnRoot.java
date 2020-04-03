@@ -16,7 +16,7 @@ import org.basex.util.*;
 public final class FnRoot extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toEmptyNode(ctxArg(0, qc), qc);
+    final ANode node = toNodeOrNull(ctxArg(0, qc), qc);
     return node == null ? Empty.VALUE : node.root();
   }
 

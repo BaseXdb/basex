@@ -27,7 +27,7 @@ public class FnRound extends StandardFunc {
    * @throws QueryException query exception
    */
   final Item round(final QueryContext qc, final boolean even) throws QueryException {
-    final ANum num = toNumber(exprs[0], qc);
+    final ANum num = toNumberOrNull(exprs[0], qc);
     final long p = exprs.length == 1 ? 0 : Math.max(Integer.MIN_VALUE, toLong(exprs[1], qc));
     return num == null ? Empty.VALUE : p > Integer.MAX_VALUE ? num : num.round((int) p, even);
   }

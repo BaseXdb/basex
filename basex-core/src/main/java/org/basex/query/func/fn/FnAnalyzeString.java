@@ -30,7 +30,7 @@ public final class FnAnalyzeString extends RegEx {
 
   @Override
   public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toEmptyToken(exprs[0], qc);
+    final byte[] value = toZeroToken(exprs[0], qc);
     final Pattern pattern = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc, true);
     final String string = string(value);
     final Matcher matcher = pattern.matcher(string);

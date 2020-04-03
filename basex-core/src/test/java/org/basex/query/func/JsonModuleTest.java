@@ -16,6 +16,10 @@ public final class JsonModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void doc() {
     final Function func = _JSON_DOC;
+    query(func.args(" ()"), "");
+    query(func.args(" []"), "");
+    query(func.args(" <_/>/text()"), "");
+
     final String path = "src/test/resources/example.json";
     query(func.args(path) + "//name ! string()", "Smith");
     query(func.args(path, " map { 'format': 'xquery' }") + "?name", "Smith");

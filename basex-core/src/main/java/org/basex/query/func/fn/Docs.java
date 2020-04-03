@@ -52,9 +52,8 @@ public abstract class Docs extends StandardFunc {
   Item doc(final QueryContext qc) throws QueryException {
     QueryInput qi = queryInput;
     if(qi == null) {
-      final Item item = exprs[0].atomItem(qc, info);
-      if(item == Empty.VALUE) return Empty.VALUE;
-      final byte[] uri = toToken(item);
+      final byte[] uri = toTokenOrNull(exprs[0], qc);
+      if(uri == null) return Empty.VALUE;
       qi = queryInput(uri);
       if(qi == null) throw INVDOC_X.get(info, uri);
     }

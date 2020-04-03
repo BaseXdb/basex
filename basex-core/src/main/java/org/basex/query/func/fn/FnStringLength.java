@@ -22,7 +22,7 @@ public final class FnStringLength extends ContextFn {
       if(item instanceof FItem) throw FISTRING_X.get(info, item.type);
       token = item == Empty.VALUE ? Token.EMPTY : item.string(info);
     } else {
-      token = toEmptyToken(exprs[0], qc);
+      token = toZeroToken(exprs[0], qc);
     }
     return Int.get(Token.length(token));
   }

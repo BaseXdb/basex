@@ -20,10 +20,10 @@ public final class HttpSendRequest extends StandardFunc {
     checkCreate(qc);
 
     // get request node
-    final ANode request = toEmptyNode(exprs[0], qc);
+    final ANode request = toNodeOrNull(exprs[0], qc);
 
     // get HTTP URI
-    final byte[] href = exprs.length >= 2 ? toEmptyToken(exprs[1], qc) : null;
+    final byte[] href = exprs.length >= 2 ? toZeroToken(exprs[1], qc) : null;
     // get payload
     final ValueBuilder vb = new ValueBuilder(qc);
     if(exprs.length == 3) {

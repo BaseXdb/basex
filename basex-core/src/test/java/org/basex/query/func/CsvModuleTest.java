@@ -16,6 +16,10 @@ public final class CsvModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void doc() {
     final Function func = _CSV_DOC;
+    query(func.args(" ()"), "");
+    query(func.args(" []"), "");
+    query(func.args(" <_/>/text()"), "");
+
     final String path = "src/test/resources/input.csv";
     query(func.args(path) + "//entry[. = 'Picard'] ! string()", "Picard");
     query(func.args(path, " map { 'header': true() }") + "/descendant::Name[1] ! string()",

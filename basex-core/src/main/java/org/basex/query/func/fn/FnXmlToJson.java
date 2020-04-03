@@ -22,7 +22,7 @@ import org.basex.util.options.Options.*;
 public class FnXmlToJson extends FnParseJson {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toEmptyNode(exprs[0], qc);
+    final ANode node = toNodeOrNull(exprs[0], qc);
     final JsonSerialOptions jopts = toOptions(1, new JsonSerialOptions(), qc);
     if(node == null) return Empty.VALUE;
 
