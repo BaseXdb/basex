@@ -354,14 +354,14 @@ public class Options implements Iterable<Option<?>> {
    * Assigns a value after casting it to the correct type. If the option is unknown,
    * it will be added as free option.
    * @param name name of option
-   * @param val value
+   * @param value value
    * @throws BaseXException database exception
    */
-  public synchronized void assign(final String name, final String val) throws BaseXException {
+  public synchronized void assign(final String name, final String value) throws BaseXException {
     if(options.isEmpty()) {
-      free.put(name, val);
+      free.put(name, value);
     } else {
-      assign(name, val, -1, true);
+      assign(name, value, -1, true);
     }
   }
 
@@ -369,42 +369,73 @@ public class Options implements Iterable<Option<?>> {
    * Assigns a value after casting it to the correct type. If the option is unknown,
    * it will be added as free option.
    * @param name name of option
-   * @param item value to be assigned
+   * @param value value to be assigned
    * @param error error
    * @param ii input info
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  public synchronized void assign(final Item name, final Item item, final boolean error,
+  public synchronized void assign(final Item name, final Value value, final boolean error,
       final InputInfo ii) throws BaseXException, QueryException {
 
-    final String nm = string(name.string(ii));
+    final String nm;
+    if(name instanceof QNm) {
+      nm = string(((QNm) name).id());
+    } else if(name.type.isStringOrUntyped()) {
+      nm = string(name.string(ii));
+    } else {
+      throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.STR, name.type, name);
+    }
+
+    final Item item;
+    if(value.isItem()) {
+      // single item: convert QName to string
+      item = value instanceof QNm ? Str.get(((QNm) value).id()) : (Item) value;
+    } else if(value.size() > 1) {
+      // multiple items: create string representation
+      final TokenBuilder tb = new TokenBuilder();
+      for(final Item it : value) {
+        if(!tb.isEmpty()) tb.add(' ');
+        tb.add(serialize(it, ii));
+      }
+      item = Str.get(tb.finish());
+    } else {
+      throw new BaseXException(Text.OPT_EXPECT_X_X_X, SeqType.ITEM_O, value.seqType(), value);
+    }
+
     if(options.isEmpty()) {
-      free.put(nm, (item instanceof XQMap) ? toString((XQMap) item, ii) : string(item.string(ii)));
+      free.put(nm, serialize(item, ii));
     } else {
       assign(nm, item, error, ii);
     }
   }
 
   /**
-   * Creates a string representation of the specified map.
-   * @param map map
+   * Creates a string representation of the specified item.
+   * @param item item
    * @param ii input info
    * @return string
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  private static String toString(final XQMap map, final InputInfo ii)
+  private static String serialize(final Item item, final InputInfo ii)
       throws BaseXException, QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
-    for(final Item key : map.keys()) {
-      if(!tb.isEmpty()) tb.add(',');
-      tb.add(key.string(ii)).add('=');
-      final Value vl = map.get(key, ii);
-      if(!vl.isItem()) throw new BaseXException(
-          Text.OPT_EXPECT_X_X_X, AtomType.STR, vl.seqType(), vl);
-      tb.add(string(((Item) vl).string(ii)).replace(",", ",,"));
+    if(item instanceof XQMap) {
+      final XQMap map = (XQMap) item;
+      for(final Item key : map.keys()) {
+        if(!tb.isEmpty()) tb.add(',');
+        tb.add(key.string(ii)).add('=');
+        final Value vl = map.get(key, ii);
+        if(!vl.isItem()) throw new BaseXException(
+            Text.OPT_EXPECT_X_X_X, AtomType.STR, vl.seqType(), vl);
+        tb.add(string(((Item) vl).string(ii)).replace(",", ",,"));
+      }
+    } else if(item instanceof QNm) {
+      tb.add(((QNm) item).id());
+    } else {
+      tb.add(item.string(ii));
     }
     return tb.toString();
   }
@@ -548,12 +579,7 @@ public class Options implements Iterable<Option<?>> {
       throws BaseXException, QueryException {
 
     for(final Item name : map.keys()) {
-      if(!name.type.isStringOrUntyped())
-        throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.STR, name.type, name);
-      final Value value = map.get(name, ii);
-      if(!value.isItem())
-        throw new BaseXException(Text.OPT_EXPECT_X_X_X, SeqType.ITEM_O, value.seqType(), value);
-      assign(name, (Item) value, error, ii);
+      assign(name, map.get(name, ii), error, ii);
     }
   }
 
@@ -748,23 +774,24 @@ public class Options implements Iterable<Option<?>> {
     } else if(option instanceof NumberOption) {
       value = (int) item.itr(ii);
     } else if(option instanceof StringOption) {
-      value = item instanceof XQMap ? toString((XQMap) item, ii) : string(item.string(ii));
+      value = serialize(item, ii);
     } else if(option instanceof EnumOption) {
-      String string;
+      byte[] token;
       if(item.type.eq(AtomType.BLN)) {
-        string = item.bool(ii) ? Text.YES : Text.NO;
+        token = item.string(ii);
       } else if(item.type.isNumber()) {
         final long l = item.itr(ii);
-        string = l == 1 ? Text.YES : l == 0 ? Text.NO : null;
+        token = l == 1 ? TRUE : l == 0 ? FALSE : null;
       } else {
-        string = string(item.string(ii));
+        token = item.string(ii);
       }
-      if(string == null) {
+      if(token == null) {
         expected = Text.OPT_BOOLEAN_X_X;
       } else {
         final EnumOption<?> eo = (EnumOption<?>) option;
-        value = eo.get(string);
-        if(value == null) throw new BaseXException(allowed(option, string, (Object[]) eo.values()));
+        value = eo.get(eq(token, TRUE) ? Text.YES : eq(token, FALSE) ? Text.NO : string(token));
+        if(value == null) throw new BaseXException(allowed(option, string(token),
+            (Object[]) eo.values()));
       }
     } else if(option instanceof OptionsOption) {
       if(item instanceof XQMap) {

@@ -119,7 +119,7 @@ public final class DbModuleTest extends SandboxTest {
     query("exists(" + _DB_OPEN.args(NAME, "C3.xml") + ")", true);
 
     error(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser':('csv','html') }"), INVALIDOPT_X);
+        " map { 'parser':('csv','html') }"), BASEX_OPTIONS_X_X);
     error(func.args(NAME, CSV, "csv.xml",
         " map { 'parser':'csv','csvparser': map { 'header': ('true','false') } }"), INVALIDOPT_X);
     error(func.args(NAME, CSV, "csv.xml",

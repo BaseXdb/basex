@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -73,7 +74,7 @@ public class CsvOptions extends Options {
   }
 
   @Override
-  public synchronized void assign(final Item name, final Item value, final boolean error,
+  public synchronized void assign(final Item name, final Value value, final boolean error,
       final InputInfo ii) throws BaseXException, QueryException {
     super.assign(name, value, error, ii);
     check();
