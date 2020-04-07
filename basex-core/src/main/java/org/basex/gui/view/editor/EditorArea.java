@@ -211,7 +211,7 @@ public final class EditorArea extends TextPanel {
    * @param string search string
    */
   public void jump(final String string) {
-    search.activate(string, false);
+    search.activate(string, false, false);
     jump(SearchDir.CURRENT, true);
   }
 

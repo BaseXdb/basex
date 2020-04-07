@@ -122,11 +122,15 @@ public class TextPanel extends BaseXPanel {
 
     new BaseXPopup(this, editable ?
       new GUICommand[] {
-        new FindCmd(), new FindNextCmd(), new FindPrevCmd(), null, new GotoCmd(), null,
+        new FindCmd(), new FindNextCmd(), new FindPrevCmd(),
+        new MatchCaseCmd(), new WholeWordCmd(), new RegExCmd(), new MultiLineCmd(), null,
+        new GotoCmd(), null,
         new UndoCmd(), new RedoCmd(), null,
         new AllCmd(), new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd() } :
       new GUICommand[] {
-        new FindCmd(), new FindNextCmd(), new FindPrevCmd(), null, new GotoCmd(), null,
+        new FindCmd(), new FindNextCmd(), new FindPrevCmd(),
+        new MatchCaseCmd(), new WholeWordCmd(), new RegExCmd(), new MultiLineCmd(), null,
+        new GotoCmd(), null,
         new AllCmd(), new CopyCmd() }
     );
 
@@ -899,7 +903,7 @@ public class TextPanel extends BaseXPanel {
     FindCmd() { super(Text.FIND + Text.DOTS, FIND); }
 
     @Override
-    public void execute() { search.activate(searchString(), true); }
+    public void execute() { search.activate(searchString(), true, false); }
     @Override
     public boolean enabled(final GUI main) { return search != null; }
   }
@@ -910,7 +914,7 @@ public class TextPanel extends BaseXPanel {
     FindNextCmd() { super(Text.FIND_NEXT, FINDNEXT1, FINDNEXT2); }
 
     @Override
-    public void execute() { find(true); }
+    public void execute() { search(true); }
     @Override
     public boolean enabled(final GUI main) { return search != null; }
   }
@@ -921,18 +925,79 @@ public class TextPanel extends BaseXPanel {
     FindPrevCmd() { super(Text.FIND_PREVIOUS, FINDPREV1, FINDPREV2); }
 
     @Override
-    public void execute() { find(false); }
+    public void execute() { search(false); }
     @Override
     public boolean enabled(final GUI main) { return search != null; }
+  }
+
+  /** Match-case search. */
+  private class MatchCaseCmd extends GUIPopupCmd {
+    /** Constructor. */
+    MatchCaseCmd() { super(Text.MATCH_CASE, MATCHCASE); }
+
+    @Override
+    public void execute() { search.toggle(search.mcase, searchString()); }
+    @Override
+    public boolean toggle() { return true; }
+    @Override
+    public boolean enabled(final GUI main) { return search != null; }
+    @Override
+    public boolean selected(final GUI main) { return search.mcase.isSelected(); }
+  }
+
+  /** Whole-word search. */
+  private class WholeWordCmd extends GUIPopupCmd {
+    /** Constructor. */
+    WholeWordCmd() { super(Text.WHOLE_WORD, WHOLEWORD); }
+
+    @Override
+    public void execute() { search.toggle(search.word, searchString()); }
+    @Override
+    public boolean toggle() { return true; }
+    @Override
+    public boolean enabled(final GUI main) { return search != null && search.word.isEnabled(); }
+    @Override
+    public boolean selected(final GUI main) { return search.word.isSelected(); }
+  }
+
+  /** Regular-expression search. */
+  private class RegExCmd extends GUIPopupCmd {
+    /** Constructor. */
+    RegExCmd() { super(Text.REGULAR_EXPR, REGEX); }
+
+    @Override
+    public void execute() {
+      search.toggle(search.regex, searchString()); }
+    @Override
+    public boolean toggle() { return true; }
+    @Override
+    public boolean enabled(final GUI main) { return search != null; }
+    @Override
+    public boolean selected(final GUI main) { return search.regex.isSelected(); }
+  }
+
+  /** Multi-line search. */
+  private class MultiLineCmd extends GUIPopupCmd {
+    /** Constructor. */
+    MultiLineCmd() { super(Text.MULTI_LINE, MULTILINE); }
+
+    @Override
+    public void execute() { search.toggle(search.multi, searchString()); }
+    @Override
+    public boolean toggle() { return true; }
+    @Override
+    public boolean enabled(final GUI main) { return search != null && search.multi.isEnabled(); }
+    @Override
+    public boolean selected(final GUI main) { return search.multi.isSelected(); }
   }
 
   /**
    * Highlights the next/previous hit.
    * @param next next/previous hit
    */
-  private void find(final boolean next) {
+  private void search(final boolean next) {
     final boolean vis = search.isVisible();
-    search.activate(searchString(), false);
+    search.activate(searchString(), false, false);
     jump(vis ? next ? SearchDir.FORWARD : SearchDir.BACKWARD : SearchDir.CURRENT, true);
   }
 

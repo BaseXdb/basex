@@ -90,6 +90,10 @@ public enum BaseXKeys {
   /** Find next hit.         */ FINDNEXT2(META, VK_G),
   /** Find previous hit.     */ FINDPREV1(MAC ? META | SHIFT : SHIFT, VK_F3),
   /** Find previous hit.     */ FINDPREV2(META | SHIFT, VK_G),
+  /** Match case.            */ MATCHCASE(SHIFT, VK_F4),
+  /** Whole word.            */ WHOLEWORD(SHIFT, VK_F5),
+  /** Regular expression.    */ REGEX(SHIFT, VK_F6),
+  /** Multi-line.            */ MULTILINE(SHIFT, VK_F7),
 
   // Font
 

@@ -30,11 +30,6 @@ public final class SearchBar extends BaseXBack {
     BACKWARD,
   }
 
-  /** Escape key listener. */
-  private final KeyListener escape = (KeyPressedListener) e -> {
-    if(ESCAPE.is(e)) deactivate(true);
-  };
-
   /** Mode: regular expression. */
   final AbstractButton regex;
   /** Mode: match case. */
@@ -51,12 +46,15 @@ public final class SearchBar extends BaseXBack {
   /** GUI reference. */
   private final GUI gui;
   /** Search text. */
-  private final BaseXCombo search;
+  private final BaseXCombo find;
   /** Replace text. */
   private final BaseXCombo replace;
 
+  /** Escape key listener. */
+  private final KeyListener keys;
+
   /** Search button. */
-  private AbstractButton button;
+  private AbstractButton search;
   /** Current editor reference. */
   private TextPanel editor;
   /** Old search text. */
@@ -73,35 +71,30 @@ public final class SearchBar extends BaseXBack {
     setOpaque(false);
     setVisible(false);
 
-    search = new BaseXCombo(gui, true).history(GUIOptions.SEARCHED, gui.gopts);
-    search.hint(Text.FIND + Text.DOTS);
+    find = new BaseXCombo(gui, true).history(GUIOptions.SEARCHED, gui.gopts);
+    find.hint(Text.FIND + Text.DOTS);
     replace = new BaseXCombo(gui, true).history(GUIOptions.REPLACED, gui.gopts);
     replace.hint(Text.REPLACE_WITH + Text.DOTS);
 
-    final ActionListener action = e -> {
-      refreshButtons();
-      search();
-    };
-    mcase = button("f_case", Text.MATCH_CASE, action);
-    word = button("f_word", Text.WHOLE_WORD, action);
-    regex = button("f_regex", Text.REGULAR_EXPR, action);
-    multi = button("f_multi", Text.MULTI_LINE, action);
+    final ActionListener al = e -> { search(); };
+    mcase = button("f_case", BaseXLayout.addShortcut(Text.MATCH_CASE, MATCHCASE.toString()), al);
+    word = button("f_word", BaseXLayout.addShortcut(Text.WHOLE_WORD, WHOLEWORD.toString()), al);
+    regex = button("f_regex", BaseXLayout.addShortcut(Text.REGULAR_EXPR, REGEX.toString()), al);
+    multi = button("f_multi", BaseXLayout.addShortcut(Text.MULTI_LINE, MULTILINE.toString()), al);
 
     rplc  = BaseXButton.get("f_replace", Text.REPLACE_ALL, false, gui);
     cls = BaseXButton.get("f_close", BaseXLayout.addShortcut(Text.CLOSE, ESCAPE.toString()),
         false, gui);
 
     // add interaction to search field
-    search.addKeyListener(new KeyAdapter() {
+    find.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
         if(FINDPREV1.is(e) || FINDPREV2.is(e) || FINDNEXT1.is(e) || FINDNEXT2.is(e)) {
           editor.editor.noSelect();
           deactivate(false);
-        } else if(ESCAPE.is(e)) {
-          deactivate(search.getText().isEmpty());
         } else if(ENTER.is(e)) {
-          search.updateHistory();
+          find.updateHistory();
           editor.jump(SearchDir.FORWARD, true);
         } else if(SHIFT_ENTER.is(e)) {
           editor.jump(SearchDir.BACKWARD, true);
@@ -110,9 +103,9 @@ public final class SearchBar extends BaseXBack {
 
       @Override
       public void keyReleased(final KeyEvent e) {
-        final String srch = search.getText();
+        final String srch = find.getText();
         if(!oldSearch.equals(srch)) {
-          if(regex.isEnabled() && search.getText().matches("^.*(?<!\\\\)\\\\n.*")) {
+          if(regex.isEnabled() && find.getText().matches("^.*(?<!\\\\)\\\\n.*")) {
             multi.setSelected(true);
           }
           oldSearch = srch;
@@ -121,23 +114,35 @@ public final class SearchBar extends BaseXBack {
       }
     });
 
-    BaseXLayout.addDrop(search, object -> {
+    BaseXLayout.addDrop(find, object -> {
       setSearch(object.toString());
-      search.updateHistory();
+      find.updateHistory();
       search();
     });
 
-    replace.addKeyListener(escape);
+    // add default shortcuts to all interaction components
+    keys = (KeyPressedListener) e -> {
+      if(ESCAPE.is(e)) deactivate(false);
+      else if(MATCHCASE.is(e)) toggle(mcase);
+      else if(WHOLEWORD.is(e)) toggle(word);
+      else if(REGEX.is(e)) toggle(regex);
+      else if(MULTILINE.is(e)) toggle(multi);
+    };
+    mcase.addKeyListener(keys);
+    word.addKeyListener(keys);
+    regex.addKeyListener(keys);
+    multi.addKeyListener(keys);
+    find.addKeyListener(keys);
+    replace.addKeyListener(keys);
+    rplc.addKeyListener(keys);
+    cls.addKeyListener(keys);
 
-    cls.addKeyListener(escape);
-    cls.addActionListener(e -> deactivate(true));
-
-    rplc.addKeyListener(escape);
     rplc.addActionListener(e -> {
       final String in = replace.getText();
       editor.replace(new ReplaceContext(regex.isSelected() ? decode(in) : in));
       deactivate(true);
     });
+    cls.addActionListener(e -> deactivate(true));
 
     // set initial values
     final String[] searched = gui.gopts.get(GUIOptions.SEARCHED);
@@ -162,7 +167,7 @@ public final class SearchBar extends BaseXBack {
       west.add(multi);
 
       final BaseXBack center = new BaseXBack(false).layout(new GridLayout(1, 2, 2, 0));
-      center.add(search);
+      center.add(find);
       if(ed) center.add(replace);
 
       final BaseXBack east = new BaseXBack(false).layout(new ColumnLayout(1));
@@ -187,12 +192,12 @@ public final class SearchBar extends BaseXBack {
    * @return button
    */
   public AbstractButton button(final String help) {
-    button = BaseXButton.get("c_find", BaseXLayout.addShortcut(help, FIND.toString()), true, gui);
-    button.addActionListener(e -> {
+    search = BaseXButton.get("c_find", BaseXLayout.addShortcut(help, FIND.toString()), true, gui);
+    search.addActionListener(e -> {
       if(isVisible()) deactivate(true);
-      else activate("", true);
+      else activate("", true, false);
     });
-    return button;
+    return search;
   }
 
   /**
@@ -201,7 +206,7 @@ public final class SearchBar extends BaseXBack {
   public void refreshLayout() {
     if(editor == null) return;
     final Font ef = editor.getFont().deriveFont((float) GUIConstants.dmfont.getSize() + 2);
-    search.setFont(ef);
+    find.setFont(ef);
     replace.setFont(ef);
   }
 
@@ -209,25 +214,26 @@ public final class SearchBar extends BaseXBack {
    * Activates the search bar. A new search is triggered if the new search term differs from
    * the last one.
    * @param string search string (ignored if empty)
+   * @param enforce enforce search
    * @param focus indicates if the search field should be focused
    */
-  public void activate(final String string, final boolean focus) {
+  public void activate(final String string, final boolean focus, final boolean enforce) {
     boolean invisible = !isVisible();
     if(invisible) {
       setVisible(true);
-      if(button != null) button.setSelected(true);
+      if(search != null) search.setSelected(true);
     }
-    if(focus) search.requestFocusInWindow();
+    if(focus) find.requestFocusInWindow();
 
     // set new, different search string
-    if(!string.isEmpty() && !new SearchContext(this, search.getText()).matches(string)) {
+    if(!string.isEmpty() && !new SearchContext(this, find.getText()).matches(string)) {
       regex.setSelected(false);
       setSearch(string);
-      search.updateHistory();
+      find.updateHistory();
       invisible = true;
     }
     // search if string has changed, or if panel was hidden
-    if(invisible) search();
+    if(invisible || enforce) search();
   }
 
   /**
@@ -239,9 +245,37 @@ public final class SearchBar extends BaseXBack {
     editor.requestFocusInWindow();
     if(!close || !isVisible()) return false;
     setVisible(false);
-    if(button != null) button.setSelected(false);
+    if(search != null) search.setSelected(false);
     search();
     return true;
+  }
+
+  /**
+   * Toggles a button and starts a new search.
+   * @param button button to toggle
+   */
+  public void toggle(final AbstractButton button) {
+    toggle(button, find.getText());
+  }
+
+  /**
+   * Toggles a button and starts a new search.
+   * @param button button to toggle
+   * @param string search string (ignored if empty)
+   */
+  public void toggle(final AbstractButton button, final String string) {
+    button.setSelected(!button.isSelected());
+    activate(string, false, true);
+  }
+
+  /**
+   * Searches text in the current editor.
+   */
+  public void search() {
+    final boolean sel = regex.isSelected();
+    multi.setEnabled(sel);
+    word.setEnabled(!sel);
+    search(true);
   }
 
   /**
@@ -252,7 +286,7 @@ public final class SearchBar extends BaseXBack {
   void refresh(final SearchContext sc, final boolean jump) {
     final boolean hits = sc.nr != 0, empty = sc.string.isEmpty();
     rplc.setEnabled(hits && !empty);
-    search.highlight(hits || empty);
+    find.highlight(hits || empty);
     if(isVisible()) gui.status.setText(Util.info(Text.STRINGS_FOUND_X, sc.nr()));
     if(jump) editor.jump(SearchDir.CURRENT, false);
   }
@@ -264,24 +298,8 @@ public final class SearchBar extends BaseXBack {
    * @param text text
    */
   private void setSearch(final String text) {
-    oldSearch = search.getText();
-    search.setText(text);
-  }
-
-  /**
-   * Refreshes the button states.
-   */
-  private void refreshButtons() {
-    final boolean sel = regex.isSelected();
-    multi.setEnabled(sel);
-    word.setEnabled(!sel);
-  }
-
-  /**
-   * Searches text in the current editor.
-   */
-  private void search() {
-    search(true);
+    oldSearch = find.getText();
+    find.setText(text);
   }
 
   /**
@@ -289,7 +307,7 @@ public final class SearchBar extends BaseXBack {
    * @param jump jump to next search result
    */
   private void search(final boolean jump) {
-    final String text = isVisible() ? search.getText() : "";
+    final String text = isVisible() ? find.getText() : "";
     if(!text.isEmpty()) gui.status.setText(Text.SEARCHING + Text.DOTS);
     editor.search(new SearchContext(this, text), jump);
   }
@@ -304,7 +322,7 @@ public final class SearchBar extends BaseXBack {
   private AbstractButton button(final String icon, final String tooltip,
       final ActionListener action) {
     final AbstractButton b = BaseXButton.get(icon, tooltip, true, gui);
-    b.addKeyListener(escape);
+    b.addKeyListener(keys);
     b.addActionListener(action);
     return b;
   }
