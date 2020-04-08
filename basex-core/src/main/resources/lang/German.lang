@@ -195,6 +195,7 @@ italics              = Kursiv
 jobs_%               = % Job(s)
 jobs_stopped_%       = % Job(s) beendet.
 jump_to_file         = Zu Datei springen
+jump_to_bracket      = Zu Klammer springen
 kill_self_%          = '%' kann sich nicht selbst beenden.
 language             = Sprache
 lax_name_conversion  = Laxe Namenskonvertierung

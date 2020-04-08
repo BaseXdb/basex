@@ -539,6 +539,54 @@ public final class TextEditor {
   }
 
   /**
+   * Jumps to a matching bracket.
+   * @return new caret position
+   */
+  int bracket() {
+    final IntList parentheses = new IntList();
+    int cp = curr(), opening = OPENING.indexOf(cp), closing = CLOSING.indexOf(cp);
+    if(opening != -1) {
+      parentheses.add(opening);
+      while(pos() < size() && !parentheses.isEmpty()) {
+        next();
+        cp = curr();
+        opening = OPENING.indexOf(cp);
+        closing = CLOSING.indexOf(cp);
+        if(opening != -1) {
+          parentheses.add(opening);
+        } else if(closing == parentheses.peek()) {
+          parentheses.pop();
+        }
+      }
+    } else if(closing != -1) {
+      parentheses.add(closing);
+      while(pos() > 0 && !parentheses.isEmpty()) {
+        cp = prev();
+        opening = OPENING.indexOf(cp);
+        closing = CLOSING.indexOf(cp);
+        if(closing != -1) {
+          parentheses.add(closing);
+        } else if(opening == parentheses.peek()) {
+          parentheses.pop();
+        }
+      }
+    } else {
+      while(pos() > 0) {
+        cp = prev();
+        opening = OPENING.indexOf(cp);
+        closing = CLOSING.indexOf(cp);
+        if(opening != -1) {
+          if(parentheses.isEmpty()) break;
+          if(opening == parentheses.peek()) parentheses.pop();
+        } else if(closing != -1) {
+          parentheses.add(closing);
+        }
+      }
+    }
+    return pos;
+  }
+
+  /**
    * Moves the current line or the selected lines up or down.
    * @param down down/up flag
    */

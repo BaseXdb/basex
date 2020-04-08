@@ -1154,6 +1154,8 @@ public interface Text {
   String UPPER_CASE = lang("upper_case");
   /** Title case. */
   String TITLE_CASE = lang("title_case");
+  /** Jump to bracket. */
+  String JUMP_TO_BRACKET = lang("jump_to_bracket");
   /** Split input lines. */
   String SPLIT_INPUT_LINES = lang("split_input_lines");
   /** Treat first line as header. */

@@ -195,6 +195,7 @@ italics              = Наклонный
 jobs_%               = Задачи: %
 jobs_stopped_%       = Задач остановлено: %
 jump_to_file         = Перейти к файлу
+jump_to_bracket      = Перейти на скобку
 kill_self_%          = '%' не может убить себя
 language             = Язык
 lax_name_conversion  = Нестрогая конвертация имен

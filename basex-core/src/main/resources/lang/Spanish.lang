@@ -195,6 +195,7 @@ italics              = Itálica
 jobs_%               = % Job(s)
 jobs_stopped_%       = % job(s) stopped.
 jump_to_file         = Ir a fichero
+jump_to_bracket      = Ir a paréntesis
 kill_self_%          = '%' no puede matarse él mismo.
 language             = Lenguaje
 lax_name_conversion  = Conversión de nombres laxa

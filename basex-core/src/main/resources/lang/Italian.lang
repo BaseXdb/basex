@@ -195,6 +195,7 @@ italics              = Corsivo
 jobs_%               = % Job(s)
 jobs_stopped_%       = % job(s) stopped.
 jump_to_file         = Salta al file
+jump_to_bracket      = Salta alla parentesi
 kill_self_%          = '%' non può chiudere se stessa.
 language             = Lingua
 lax_name_conversion  = Lax name conversion

@@ -195,6 +195,7 @@ italics              = Italique
 jobs_%               = % Job(s)
 jobs_stopped_%       = % job(s) stopped.
 jump_to_file         = Aller au fichier
+jump_to_bracket      = Aller à la parenthèse
 kill_self_%          = '%' ne peut pas s'auto-interrompre.
 language             = Langue
 lax_name_conversion  = Lax name conversion

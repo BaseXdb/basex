@@ -195,6 +195,7 @@ italics              = 斜体
 jobs_%               = % 作业
 jobs_stopped_%       = % 作业停止
 jump_to_file         = 跳转到文件
+jump_to_bracket      = Jump to bracket
 kill_self_%          = '%' 不能结束自己
 language             = 语言
 lax_name_conversion  = Lax name 转换

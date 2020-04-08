@@ -232,7 +232,7 @@ public class TextPanel extends BaseXPanel {
    */
   public final void setCaret(final int pos) {
     editor.pos(pos);
-    cursorCode.invokeLater(1);
+    updateScrollpos.invokeLater(1);
     caret(true);
   }
 
@@ -265,7 +265,7 @@ public class TextPanel extends BaseXPanel {
     super.setFont(f);
     if(rend != null) {
       rend.setFont(f);
-      scrollCode.invokeLater(true);
+      updateScrollbar.invokeLater(true);
     }
   }
 
@@ -292,7 +292,7 @@ public class TextPanel extends BaseXPanel {
   public final void comment() {
     final int caret = editor.pos();
     if(editor.comment(rend.getSyntax())) hist.store(editor.text(), caret, editor.pos());
-    scrollCode.invokeLater(true);
+    updateScrollbar.invokeLater(true);
   }
 
   /**
@@ -302,7 +302,14 @@ public class TextPanel extends BaseXPanel {
   public final void toCase(final Case cs) {
     final int caret = editor.pos();
     if(editor.toCase(cs)) hist.store(editor.text(), caret, editor.pos());
-    scrollCode.invokeLater(true);
+    updateScrollbar.invokeLater(true);
+  }
+
+  /**
+   * Jumps to a matching bracket.
+   */
+  public final void bracket() {
+    setCaret(editor.bracket());
   }
 
   /**
@@ -314,7 +321,7 @@ public class TextPanel extends BaseXPanel {
     if(!ds.ok() || !editor.sort()) return;
 
     hist.store(editor.text(), caret, editor.pos());
-    scrollCode.invokeLater(true);
+    updateScrollbar.invokeLater(true);
     repaint();
   }
 
@@ -324,7 +331,7 @@ public class TextPanel extends BaseXPanel {
   public final void format() {
     final int caret = editor.pos();
     if(editor.format(rend.getSyntax())) hist.store(editor.text(), caret, editor.pos());
-    scrollCode.invokeLater(true);
+    updateScrollbar.invokeLater(true);
   }
 
   @Override
@@ -405,13 +412,7 @@ public class TextPanel extends BaseXPanel {
    */
   protected final void jump(final SearchDir dir, final boolean select) {
     SwingUtilities.invokeLater(() -> {
-      // updates the visible area
-      final int y = rend.jump(dir, select);
-      final int h = getHeight();
-      final int p = scroll.pos();
-      final int m = y + rend.fontHeight() * 3 - h;
-      if(y != -1 && (p < m || p > y)) scroll.pos(y - h / 2);
-      rend.repaint();
+      scroll(rend.jump(dir, select), 1);
     });
   }
 
@@ -634,37 +635,44 @@ public class TextPanel extends BaseXPanel {
     if(txt != tmp) {
       // text has changed: add old text to history
       hist.store(tmp, pos, editor.pos());
-      scrollCode.invokeLater(down);
+      updateScrollbar.invokeLater(down);
     } else if(pos != editor.pos() || selected != editor.isSelected()) {
       // cursor position or selection state has changed
-      cursorCode.invokeLater(down ? 2 : 0);
+      updateScrollpos.invokeLater(down ? 2 : 0);
     }
   }
 
-  /** Updates the scroll bar. */
-  private final GUICode scrollCode = new GUICode() {
+  /** Updates size and position of the scroll bar. */
+  private final GUICode updateScrollbar = new GUICode() {
     @Override
     public void execute(final Object down) {
       rend.updateScrollbar();
-      cursorCode.execute((Boolean) down ? 2 : 0);
+      updateScrollpos.execute((Boolean) down ? 2 : 0);
     }
   };
 
-  /** Updates the cursor position. */
-  private final GUICode cursorCode = new GUICode() {
+  /** Updates the position of the scroll bar. */
+  private final GUICode updateScrollpos = new GUICode() {
     @Override
-    public void execute(final Object algn) {
-      // updates the visible area
-      final int p = scroll.pos();
-      final int y = rend.cursorY();
-      final int m = y + rend.fontHeight() * 3 - getHeight();
-      if(p < m || p > y) {
-        final int align = (Integer) algn;
-        scroll.pos(align == 0 ? y : align == 1 ? y - getHeight() / 2 : m);
-      }
-      rend.repaint();
+    public void execute(final Object align) {
+      scroll(rend.cursorY(), (Integer) align);
     }
   };
+
+  /**
+   * Scrolls to the specified position.
+   * @param y new vertical position
+   * @param align alignment (0: scroll up, 1: jump, 2: scroll down)
+   */
+  private void scroll(final int y, final int align) {
+    if(y != -1) {
+      final int h = getHeight(), m = y + rend.fontHeight() * 2 - h, p = scroll.pos();
+      if(p < m || p > y) {
+        scroll.pos(align == 0 ? y : align == 1 ? y - h / 2 : m);
+      }
+    }
+    rend.repaint();
+  }
 
   /** Last horizontal position. */
   private int lastCol = -1;
@@ -691,7 +699,7 @@ public class TextPanel extends BaseXPanel {
     if(move != 0) editor.pos(Math.min(editor.size(), caret + move));
 
     // adjust text height
-    scrollCode.invokeLater(true);
+    updateScrollbar.invokeLater(true);
     e.consume();
   }
 
@@ -760,7 +768,7 @@ public class TextPanel extends BaseXPanel {
    */
   private void finish(final int old) {
     if(old != -1) hist.store(editor.text(), old, editor.pos());
-    scrollCode.invokeLater(true);
+    updateScrollbar.invokeLater(true);
     release(Action.CHECK);
   }
 
@@ -1118,7 +1126,7 @@ public class TextPanel extends BaseXPanel {
     final int caret = editor.pos();
     editor.complete(string, start);
     hist.store(editor.text(), caret, editor.pos());
-    scrollCode.invokeLater(true);
+    updateScrollbar.invokeLater(true);
   }
 
   /** Replacement lists. */

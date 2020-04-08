@@ -293,6 +293,19 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
+  /** Jump to matching bracket. */
+  C_BRACKET(JUMP_TO_BRACKET, "% shift B", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().bracket();
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
   /** Exits the application. */
   C_EXIT(EXIT, null, false, false) {
     @Override
@@ -897,12 +910,12 @@ public enum GUIMenuCmd implements GUICommand {
     }
   };
 
-  /** States if the command needs a data reference. */
-  private final boolean data;
   /** Menu label. */
   private final String label;
   /** Key shortcut. */
   private final Object key;
+  /** States if the command needs a data reference. */
+  private final boolean data;
   /** Indicates if this command has two states. */
   private final boolean toggle;
   /** Shortcut. */

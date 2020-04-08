@@ -195,6 +195,7 @@ italics              = 斜体
 jobs_%               = % Job(s)
 jobs_stopped_%       = % job(s) stopped.
 jump_to_file         = ファイルへジャンプ
+jump_to_bracket      = 一致部分に移動
 kill_self_%          = '%' 自身のセッションを切断する事は出来ません。
 language             = 言語
 lax_name_conversion  = あいまいな名前変換

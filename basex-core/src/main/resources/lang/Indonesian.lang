@@ -195,6 +195,7 @@ italics              = Miring
 jobs_%               = % Job(s)
 jobs_stopped_%       = % job(s) stopped.
 jump_to_file         = Melompat ke berkas
+jump_to_bracket      = Jump to bracket
 kill_self_%          = '%' tidak dapat mematikan sendiri.
 language             = Bahasa
 lax_name_conversion  = Konversi nama Lax

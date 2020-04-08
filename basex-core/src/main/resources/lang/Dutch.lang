@@ -195,6 +195,7 @@ italics              = Cursief
 jobs_%               = % Job(s)
 jobs_stopped_%       = % job(s) stopped.
 jump_to_file         = Spring naar bestand
+jump_to_bracket      = Jump to bracket
 kill_self_%          = '%' kan zichzelf niet stoppen.
 language             = Taal
 lax_name_conversion  = Niet-stricte naamconversie
