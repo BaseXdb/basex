@@ -26,4 +26,9 @@ public final class MapEntry extends StandardFunc {
     if(type1 != null) exprType.assign(MapType.get(type1, exprs[1].seqType()));
     return this;
   }
+
+  @Override
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    // do not simplify type of key
+  }
 }

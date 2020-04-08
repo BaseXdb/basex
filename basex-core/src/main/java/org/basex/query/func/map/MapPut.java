@@ -43,4 +43,9 @@ public final class MapPut extends StandardFunc {
     }
     return this;
   }
+
+  @Override
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    // do not simplify type of key
+  }
 }

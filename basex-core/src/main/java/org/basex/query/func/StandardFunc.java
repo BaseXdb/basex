@@ -91,8 +91,8 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Simplifies the types of all arguments. This function is overwritten by functions which
-   * process different types.
+   * Simplifies the types of all arguments. This function is overwritten by functions that
+   * rely on the original argument type.
    * @param cc compilation context
    * @throws QueryException query exception
    */

@@ -1130,4 +1130,15 @@ public final class RewritingsTest extends QueryPlanTest {
       "return distinct-values(($f(QName('U', 'l')), $f(QName('U', 'p:l'))))",
       "l\np:l");
   }
+
+
+  /** Static typing, maps. */
+  @Test public void gh1834() {
+    query("declare function local:f() as map(xs:string, xs:string) {" +
+      "  map:entry(<e/> ! string(), '')" +
+      "}; local:f()?*", "");
+    query("declare function local:f() as map(xs:string, xs:string) {" +
+      "  map:put(map {}, <e/> ! string(), '')" +
+      "}; local:f()?*", "");
+  }
 }
