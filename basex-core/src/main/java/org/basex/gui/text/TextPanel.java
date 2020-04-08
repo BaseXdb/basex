@@ -936,7 +936,7 @@ public class TextPanel extends BaseXPanel {
     MatchCaseCmd() { super(Text.MATCH_CASE, MATCHCASE); }
 
     @Override
-    public void execute() { search.toggle(search.mcase, searchString()); }
+    public void execute() { search.toggle(search.mcase); }
     @Override
     public boolean toggle() { return true; }
     @Override
@@ -951,7 +951,7 @@ public class TextPanel extends BaseXPanel {
     WholeWordCmd() { super(Text.WHOLE_WORD, WHOLEWORD); }
 
     @Override
-    public void execute() { search.toggle(search.word, searchString()); }
+    public void execute() { search.toggle(search.word); }
     @Override
     public boolean toggle() { return true; }
     @Override
@@ -967,7 +967,7 @@ public class TextPanel extends BaseXPanel {
 
     @Override
     public void execute() {
-      search.toggle(search.regex, searchString()); }
+      search.toggle(search.regex); }
     @Override
     public boolean toggle() { return true; }
     @Override
@@ -982,7 +982,7 @@ public class TextPanel extends BaseXPanel {
     MultiLineCmd() { super(Text.MULTI_LINE, MULTILINE); }
 
     @Override
-    public void execute() { search.toggle(search.multi, searchString()); }
+    public void execute() { search.toggle(search.multi); }
     @Override
     public boolean toggle() { return true; }
     @Override

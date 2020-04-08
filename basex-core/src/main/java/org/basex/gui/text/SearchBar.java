@@ -38,9 +38,9 @@ public final class SearchBar extends BaseXBack {
   final AbstractButton word;
   /** Mode: multi-line. */
   final AbstractButton multi;
-  /** Action: replace text. */
+  /** Action: replace. */
   private final AbstractButton rplc;
-  /** Action: close panel. */
+  /** Action: close. */
   private final AbstractButton cls;
 
   /** GUI reference. */
@@ -157,8 +157,8 @@ public final class SearchBar extends BaseXBack {
    * @param srch triggers a search in the specified editor
    */
   public void editor(final TextPanel text, final boolean srch) {
-    final boolean ed = text.isEditable();
-    if(editor == null || ed != editor.isEditable()) {
+    final boolean editable = text.isEditable();
+    if(editor == null || editable != editor.isEditable()) {
       removeAll();
       final BaseXBack west = new BaseXBack(false).layout(new ColumnLayout(1));
       west.add(mcase);
@@ -168,10 +168,10 @@ public final class SearchBar extends BaseXBack {
 
       final BaseXBack center = new BaseXBack(false).layout(new GridLayout(1, 2, 2, 0));
       center.add(find);
-      if(ed) center.add(replace);
+      if(editable) center.add(replace);
 
       final BaseXBack east = new BaseXBack(false).layout(new ColumnLayout(1));
-      if(ed) east.add(rplc);
+      if(editable) east.add(rplc);
       east.add(cls);
 
       add(west, BorderLayout.WEST);
@@ -227,7 +227,6 @@ public final class SearchBar extends BaseXBack {
 
     // set new, different search string
     if(!string.isEmpty() && !new SearchContext(this, find.getText()).matches(string)) {
-      regex.setSelected(false);
       setSearch(string);
       find.updateHistory();
       invisible = true;
@@ -255,17 +254,8 @@ public final class SearchBar extends BaseXBack {
    * @param button button to toggle
    */
   public void toggle(final AbstractButton button) {
-    toggle(button, find.getText());
-  }
-
-  /**
-   * Toggles a button and starts a new search.
-   * @param button button to toggle
-   * @param string search string (ignored if empty)
-   */
-  public void toggle(final AbstractButton button, final String string) {
     button.setSelected(!button.isSelected());
-    activate(string, false, true);
+    activate(find.getText(), false, true);
   }
 
   /**
