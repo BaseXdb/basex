@@ -397,8 +397,27 @@ public final class EditorView extends View {
    * @param files files to be opened
    */
   public void init(final ArrayList<IOFile> files) {
-    for(final String file : gui.gopts.get(GUIOptions.OPEN)) files.add(new IOFile(file));
+    for(final String file : gui.gopts.get(GUIOptions.OPEN)) open(new IOFile(file), true, false);
     for(final IOFile file : files) open(file, true, false);
+
+    // open temporary files
+    final IOFile[] children = new IOFile(Prop.TEMPDIR, Prop.PROJECT_NAME).children();
+    final EditorArea edit = getEditor();
+    for(final IOFile file : children) {
+      try {
+        final byte[] text = read(file);
+        if(text != null) {
+          final EditorArea ea = addTab();
+          ea.setText(text);
+          refreshControls(ea, true);
+          file.delete();
+        }
+      } catch(final IOException ex) {
+        Util.debug(ex);
+      }
+    }
+    if(!edit.opened()) closeEditor(edit);
+
     gui.setTitle();
   }
 
@@ -941,14 +960,14 @@ public final class EditorView extends View {
    */
   void refreshControls(final EditorArea edit, final boolean enforce) {
     // update modification flag
-    final boolean mod = edit.hist != null && edit.hist.modified();
-    if(mod == edit.modified() && !enforce) return;
+    final boolean modified = edit.hist != null && edit.hist.modified();
+    if(modified == edit.modified() && !enforce) return;
 
-    edit.modified(mod);
+    edit.modified(modified);
 
     // update tab title
     String title = edit.file().name();
-    if(mod) title += '*';
+    if(modified) title += '*';
     edit.label.setText(title);
 
     // update components
@@ -1040,16 +1059,32 @@ public final class EditorView extends View {
    */
   public boolean confirm(final EditorArea edit) {
     final boolean all = edit == null;
-    final EditorArea[] eas = all ? editors() : new EditorArea[] { edit };
+     final EditorArea[] eas = all ? editors() : new EditorArea[] { edit };
     final String[] buttons = all && eas.length > 1 ? new String[] { CLOSE_ALL } : new String[0];
 
     for(final EditorArea ea : eas) {
       tabs.setSelectedComponent(ea);
-      if(ea.modified() && (ea.opened() || ea.getText().length != 0)) {
+      if(ea.modified() && (ea.opened() || edit != null && ea.getText().length != 0)) {
         final String msg = Util.info(CLOSE_FILE_X, ea.file().name());
         final String action = BaseXDialog.yesNoCancel(gui, msg, buttons);
         if(action == null || action.equals(B_YES) && !save()) return false;
         else if(action.equals(CLOSE_ALL)) break;
+      }
+    }
+
+    // close application: remember opened files
+    final IOFile tmpDir = new IOFile(Prop.TEMPDIR, Prop.PROJECT_NAME);
+    if(edit == null && eas.length > 0 && tmpDir.md()) {
+      try {
+        int c = 0;
+        for(final EditorArea ea : eas) {
+          final byte[] text = ea.getText();
+          if(!ea.opened() && text.length > 0) {
+            new IOFile(tmpDir, Prop.PROJECT_NAME + c++ + IO.TMPSUFFIX).write(text);
+          }
+        }
+      } catch(final IOException ex) {
+        Util.debug(ex);
       }
     }
     return true;
