@@ -52,7 +52,7 @@ public class FnNodeName extends ContextFn {
    * @param type type
    * @return result of check
    */
-  final boolean empty(final Type type) {
+  static boolean empty(final Type type) {
     return type != ELM && type != ATT && type != PI && type != NSP;
   }
 }

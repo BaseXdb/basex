@@ -21,7 +21,7 @@ import org.xml.sax.*;
  */
 public final class IOFile extends IO {
   /** Ignore files starting with a dot. */
-  public static final FileFilter NO_HIDDEN = file -> !file.getName().startsWith(".");
+  public static final FileFilter NO_HIDDEN = file -> !Strings.startsWith(file.getName(), '.');
   /** Pattern for valid file names. */
   private static final Pattern VALIDNAME =
       Pattern.compile("^[^\\\\/" + (Prop.WIN ? ":*?\"<>|" : "") + "]+$");
@@ -71,13 +71,14 @@ public final class IOFile extends IO {
    * @param last last path segment; if it ends with a slash, it indicates a directory
    */
   private IOFile(final File file, final String last) {
-    super(create(file.getAbsolutePath(), last.endsWith("/") || last.endsWith("\\")));
+    super(create(file.getAbsolutePath(), Strings.endsWith(last, '/') ||
+        Strings.endsWith(last, '\\')));
     boolean abs = file.isAbsolute();
     this.file = abs ? file : new File(pth);
     // Windows: checks if the original file path starts with a slash
     if(!abs && Prop.WIN) {
       final String p = file.getPath();
-      abs = p.startsWith("/") || p.startsWith("\\");
+      abs = Strings.startsWith(p, '/') || Strings.startsWith(p, '\\');
     }
     absolute = abs;
   }
@@ -244,7 +245,7 @@ public final class IOFile extends IO {
   public StringList descendants(final FileFilter filter) {
     final StringList files = new StringList();
     if(isDir()) {
-      final int offset = path().length() + (path().endsWith("/") ? 0 : 1);
+      final int offset = path().length() + (Strings.endsWith(path(), '/') ? 0 : 1);
       addDescendants(this, files, filter, offset);
     }
     return files;
@@ -331,7 +332,7 @@ public final class IOFile extends IO {
 
   @Override
   public String url() {
-    final String path = pth.startsWith("/") ? pth.substring(1) : pth;
+    final String path = Strings.startsWith(pth, '/') ? pth.substring(1) : pth;
     final TokenBuilder tb = new TokenBuilder().add(FILEPREF).add("//");
     final int pl = path.length();
     for(int p = 0; p < pl; p++) {
@@ -476,7 +477,7 @@ public final class IOFile extends IO {
         if(ch == '*') {
           // don't allow other dots if pattern ends with a dot
           suf = true;
-          sb.append(glb.endsWith(".") ? "[^.]" : ".");
+          sb.append(Strings.endsWith(glb, '.') ? "[^.]" : ".");
         } else if(ch == '?') {
           ch = '.';
           suf = true;
@@ -516,7 +517,7 @@ public final class IOFile extends IO {
     if(path.startsWith("\\\\") || path.startsWith("//")) tb.add("//");
     final int size = sl.size();
     for(int s = 0; s < size; ++s) {
-      if(s != 0 || path.startsWith("/")) tb.add('/');
+      if(s != 0 || Strings.startsWith(path, '/')) tb.add('/');
       tb.add(sl.get(s));
     }
 

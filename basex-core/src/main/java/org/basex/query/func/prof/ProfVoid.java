@@ -32,7 +32,7 @@ public final class ProfVoid extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr expr = exprs[0];
     return expr.has(Flag.NDT) && expr.size() == 0 ? expr : this;
   }

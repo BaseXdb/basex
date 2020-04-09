@@ -89,7 +89,7 @@ public final class MediaType {
         final String k = kv[0].trim().toLowerCase(Locale.ENGLISH);
         // value: trim whitespaces, remove quotes and backslashed characters
         String v = kv.length < 2 ? "" : kv[1].trim();
-        if(v.startsWith("\"")) v = v.replaceAll("^\"|\"$", "").replaceAll("\\\\(.)", "$1");
+        if(Strings.startsWith(v, '"')) v = v.replaceAll("^\"|\"$", "").replaceAll("\\\\(.)", "$1");
         params.put(k, v);
       }
     }
@@ -228,7 +228,7 @@ public final class MediaType {
         try(NewlineInput nli = new NewlineInput(is)) {
           for(String line; (line = nli.readLine()) != null;) {
             final int i = line.indexOf('=');
-            if(i == -1 || line.startsWith("#")) continue;
+            if(i == -1 || Strings.startsWith(line, '#')) continue;
             final String suffix = line.substring(0, i), type = line.substring(i + 1);
             final MediaType mt = cache.computeIfAbsent(type, MediaType::new);
             TYPES.put(suffix, mt);

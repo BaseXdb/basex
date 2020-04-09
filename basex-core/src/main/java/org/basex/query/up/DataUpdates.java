@@ -191,7 +191,7 @@ final class DataUpdates {
      * - data is a main-memory instance
      */
     final String original = data.meta.original;
-    if(!(original.isEmpty() || original.startsWith("~")) && data.inMemory()) {
+    if(!(original.isEmpty() || Strings.startsWith(original, '~')) && data.inMemory()) {
       if(writeback) {
         try {
           Export.export(data, original, qc.context.options, null);

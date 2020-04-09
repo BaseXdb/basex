@@ -104,7 +104,7 @@ public abstract class IO {
    */
   IO(final String path) {
     pth = path;
-    final String p = path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
+    final String p = Strings.endsWith(path, '/') ? path.substring(0, path.length() - 1) : path;
     nm = p.substring(p.lastIndexOf('/') + 1);
   }
 
@@ -238,7 +238,7 @@ public abstract class IO {
   public final IO merge(final String path) {
     if(path.isEmpty()) return this;
     final IO io = get(path);
-    return io.isAbsolute() ? io : get((pth.endsWith("/") ? pth : dir()) + path);
+    return io.isAbsolute() ? io : get((Strings.endsWith(pth, '/') ? pth : dir()) + path);
   }
 
   /**

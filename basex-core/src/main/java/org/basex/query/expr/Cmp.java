@@ -322,10 +322,9 @@ public abstract class Cmp extends Arr {
       if(op == OpV.LT) return Bln.FALSE;
       if(op == OpV.GE) return Bln.TRUE;
       // do not rewrite GT, as it may be rewritten to a range expression later on
-      final OpV oop = op;
       if(op != OpV.GT) {
         // EQ and LE can be treated identically
-        final Function func = oop == OpV.NE ? Function.BOOLEAN : Function.NOT;
+        final Function func = op == OpV.NE ? Function.BOOLEAN : Function.NOT;
         return cc.function(func, info, cc.function(Function.DATA, info, exprs[0]));
       }
     }

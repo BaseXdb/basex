@@ -771,7 +771,7 @@ public final class QueryContext extends Job implements Closeable {
     if(!nm.hasURI() && nm.hasPrefix()) throw NOURI_X.get(null, nm.string());
 
     Type tp;
-    if(type.endsWith(")")) {
+    if(Strings.endsWith(type, ')')) {
       tp = nm.eq(AtomType.ITEM.name) ? AtomType.ITEM : NodeType.find(nm);
       if(tp == null) tp = FuncType.find(nm);
     } else {

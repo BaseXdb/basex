@@ -321,9 +321,9 @@ public final class Strings {
     // replace special characters with dashes; remove multiple slashes
     path = path.replaceAll("[^\\w.-/]+", "-").replaceAll("//+", "/");
     // add "index" string
-    if(path.endsWith("/")) path += "index";
+    if(Strings.endsWith(path, '/')) path += "index";
     // remove heading slash
-    if(path.startsWith("/")) path = path.substring(1);
+    if(Strings.startsWith(path, '/')) path = path.substring(1);
     return path;
   }
 
@@ -344,7 +344,8 @@ public final class Strings {
    * @return result of check
    */
   public static boolean endsWith(final String string, final char ch) {
-    return string.lastIndexOf(ch) == string.length() - 1;
+    final int sl = string.length();
+    return sl > 0 && string.charAt(sl - 1) == ch;
   }
 
   /**

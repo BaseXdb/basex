@@ -411,9 +411,7 @@ public class TextPanel extends BaseXPanel {
    * @param select select hit
    */
   protected final void jump(final SearchDir dir, final boolean select) {
-    SwingUtilities.invokeLater(() -> {
-      scroll(rend.jump(dir, select), 1);
-    });
+    SwingUtilities.invokeLater(() -> scroll(rend.jump(dir, select), 1));
   }
 
   // MOUSE INTERACTIONS ===========================================================================
@@ -666,7 +664,7 @@ public class TextPanel extends BaseXPanel {
    */
   private void scroll(final int y, final int align) {
     if(y != -1) {
-      final int h = getHeight(), m = y + rend.fontHeight() * 2 - h, p = scroll.pos();
+      final int h = getHeight(), m = y + (rend.fontHeight() << 1) - h, p = scroll.pos();
       if(p < m || p > y) {
         scroll.pos(align == 0 ? y : align == 1 ? y - h / 2 : m);
       }
@@ -1144,7 +1142,7 @@ public class TextPanel extends BaseXPanel {
       try(NewlineInput nli = new NewlineInput(is)) {
         for(String line; (line = nli.readLine()) != null;) {
           final int i = line.indexOf('=');
-          if(i == -1 || line.startsWith("#")) continue;
+          if(i == -1 || Strings.startsWith(line, '#')) continue;
           LISTS.get(0).add(new Pair<>(line.substring(0, i),
               line.substring(i + 1).replace("\\n", "\n")));
         }

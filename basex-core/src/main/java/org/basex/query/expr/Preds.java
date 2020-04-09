@@ -175,7 +175,7 @@ public abstract class Preds extends Arr {
             cc.info(OPTPRED_X, expr);
             final Expr[] ands = ((Arr) expr).exprs;
             final int al = ands.length;
-            for (int a = 0; a < al; a++) {
+            for(int a = 0; a < al; a++) {
               // wrap test with boolean() if the result is numeric
               expr = ands[a];
               if(expr.seqType().mayBeNumber()) expr = cc.function(Function.BOOLEAN, info, expr);

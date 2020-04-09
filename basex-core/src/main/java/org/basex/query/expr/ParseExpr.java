@@ -130,9 +130,7 @@ public abstract class ParseExpr extends Expr {
    */
   public Data data(final Expr... exprs) {
     Data data1 = null;
-    final int el = exprs.length;
-    for(int e = 0; e < el; e++) {
-      final Expr expr = exprs[e];
+    for(final Expr expr : exprs) {
       if(expr.seqType().zero()) continue;
       final Data data2 = expr.data();
       if(data1 == null) data1 = data2;

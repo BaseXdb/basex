@@ -215,7 +215,7 @@ public final class HTTPConnection implements ClientInfo {
    */
   public String resolve(final String location) {
     String loc = location;
-    if(location.startsWith("/")) {
+    if(Strings.startsWith(location, '/')) {
       final String uri = request.getRequestURI(), info = request.getPathInfo();
       loc = (info == null ? uri : uri.substring(0, uri.length() - info.length())) + location;
     }

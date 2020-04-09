@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.*;
 import org.basex.util.http.*;
 
 /**
@@ -54,7 +55,7 @@ public final class RestXqPerm implements Comparable<RestXqPerm> {
    */
   boolean matches(final HTTPConnection conn) {
     final String p = conn.path();
-    return (p.endsWith("/") ? p : p + '/').startsWith(path);
+    return (Strings.endsWith(p, '/') ? p : p + '/').startsWith(path);
   }
 
   @Override

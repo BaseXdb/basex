@@ -44,7 +44,7 @@ public class FnSum extends StandardFunc {
   }
 
   @Override
-  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+  protected void simplifyArgs(final CompileContext cc) {
     // do not simplify summed-up items and zero argument
   }
 

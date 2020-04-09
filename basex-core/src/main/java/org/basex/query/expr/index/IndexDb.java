@@ -59,7 +59,7 @@ public abstract class IndexDb extends ParseExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof IndexDb;
+    return obj instanceof IndexDb;
   }
 
   @Override

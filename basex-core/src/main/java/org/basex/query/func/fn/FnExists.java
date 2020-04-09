@@ -27,7 +27,7 @@ public final class FnExists extends FnEmpty {
   }
 
   @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) {
     // if(exists(node*)) -> if(node*)
     if(mode == Simplify.EBV) {
       final Expr expr = exprs[0];

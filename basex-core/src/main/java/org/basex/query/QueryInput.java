@@ -2,6 +2,7 @@ package org.basex.query;
 
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * This class references input passed on in a query. It can be a URI or a database path.
@@ -30,7 +31,7 @@ public final class QueryInput {
     io = sc.resolve(original);
 
     // check if the specified input string can be rewritten to a database name and path
-    String name = original.startsWith("/") ? original.substring(1) : original, path = "";
+    String name = Strings.startsWith(original, '/') ? original.substring(1) : original, path = "";
     final int s = name.indexOf('/');
     if(s != -1) {
       path = name.substring(s + 1);

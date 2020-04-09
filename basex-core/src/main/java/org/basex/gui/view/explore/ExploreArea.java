@@ -109,7 +109,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
       if(combo.getSelectedIndex() == 0) continue;
       final String elem = combo.getSelectedItem();
-      if(!elem.startsWith("@")) tl.add(elem);
+      if(!Strings.startsWith(elem, '@')) tl.add(elem);
     }
 
     final String[] entries = entries(data.paths.desc(tl, true, false));
@@ -170,7 +170,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
         final boolean selected = combo.getSelectedIndex() != 0;
         if(selected) {
           final String item = combo.getSelectedItem();
-          final boolean att = item.startsWith("@");
+          final boolean att = Strings.startsWith(item, '@');
           final Names names = att ? data.attrNames : data.elemNames;
           final byte[] key = Token.token(att ? item.substring(1) : item);
           final Stats stats = names.stats(names.id(key));
@@ -213,7 +213,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       final int k = com.getSelectedIndex();
       if(k <= 0) continue;
       String key = com.getSelectedItem().replaceAll("^(@?)(.*):", "$1*:");
-      final boolean attr = key.startsWith("@");
+      final boolean attr = Strings.startsWith(key, '@');
 
       final Component comp = panel.getComponent(c + 1);
       String pattern = "";
@@ -222,8 +222,8 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       if(comp instanceof BaseXTextField) {
         val1 = ((JTextComponent) comp).getText();
         if(!val1.isEmpty()) {
-          if(val1.startsWith("\"")) {
-            val1 = val1.replaceAll("\"", "");
+          if(Strings.startsWith(val1, '"')) {
+            val1 = val1.replace("\"", "");
             pattern = PATEX;
           } else {
             pattern = (attr ? data.meta.attrindex : data.meta.textindex) ? PATSUB : PATEX;

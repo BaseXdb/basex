@@ -106,7 +106,8 @@ public final class StaticContext {
       // adopt original URIs that do not adhere to a known IO schema
       string = IO.get(uri) instanceof IOContent ? uri : resolve(uri).url();
       // #1062: check if specified URI points to a directory. if yes, add trailing slash
-      if(!string.endsWith("/") && (uri.endsWith(".") || uri.endsWith("/"))) string += '/';
+      if(!Strings.endsWith(string, '/') &&
+        (Strings.endsWith(uri, '.') || Strings.endsWith(uri, '/'))) string += '/';
     }
     baseURI = Uri.uri(string);
   }

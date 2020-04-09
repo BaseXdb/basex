@@ -193,7 +193,7 @@ public final class FuncDefinition {
         tb.add(arg + "()");
       } else {
         final String str = arg.toString();
-        if(str.startsWith(" ")) {
+        if(Strings.startsWith(str, ' ')) {
           tb.add(str.substring(1));
         } else {
           tb.add('"' + str.replaceAll("\"", "\"\"") + '"');

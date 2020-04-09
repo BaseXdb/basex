@@ -69,7 +69,7 @@ public abstract class ACreate extends Command {
 
     // assign (intermediate) name to input reference
     if(io instanceof IOContent || io instanceof IOStream) {
-      if(name.endsWith("/")) throw new BaseXException(NAME_INVALID_X, name);
+      if(Strings.endsWith(name, '/')) throw new BaseXException(NAME_INVALID_X, name);
       io.name(name.isEmpty() ? "" : name + '.' + options.get(MainOptions.PARSER));
     }
     return io;

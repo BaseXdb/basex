@@ -10,6 +10,7 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
+import org.basex.util.*;
 import org.xml.sax.*;
 
 /**
@@ -48,7 +49,9 @@ public final class Store extends ACreate {
       if(!io.exists() || io.isDir()) return error(RES_NOT_FOUND_X, create ? io : args[1]);
       in = io.inputSource();
       // set/add name of document
-      if((path.isEmpty() || path.endsWith("/")) && !(io instanceof IOContent)) path += io.name();
+      if((path.isEmpty() || Strings.endsWith(path, '/')) && !(io instanceof IOContent)) {
+        path += io.name();
+      }
     }
 
     // ensure that the name is not empty and contains no trailing dots
@@ -56,7 +59,7 @@ public final class Store extends ACreate {
     if(data.inMemory()) return error(NO_MAINMEM);
 
     final IOFile file = data.meta.binary(path);
-    if(path.isEmpty() || path.endsWith(".") || file == null)
+    if(path.isEmpty() || Strings.endsWith(path, '.') || file == null)
       return error(PATH_INVALID_X, create ? path : args[0]);
 
     return update(data, new Code() {

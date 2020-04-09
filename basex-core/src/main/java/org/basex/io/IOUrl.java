@@ -95,7 +95,7 @@ public final class IOUrl extends IO {
 
   @Override
   public boolean isDir() {
-    return pth.endsWith("/");
+    return Strings.endsWith(pth, '/');
   }
 
   /**
@@ -122,7 +122,8 @@ public final class IOUrl extends IO {
   static String toFile(final String uri) {
     try {
       final String path = Paths.get(new URI(uri)).toString();
-      return uri.endsWith("/") || uri.endsWith("\\") ? path + File.separator : path;
+      return Strings.endsWith(uri, '/') || Strings.endsWith(uri, '\\') ?
+        path + File.separator : path;
     } catch(final Exception ex) {
       Util.errln(ex);
       return uri;

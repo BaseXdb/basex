@@ -117,7 +117,7 @@ public class TypeCheck extends Single {
         final Item item = items.get(c);
         items.set(c++, null);
         if(item == null && i < st.occ.min || i > st.occ.max)
-          typeError(expr, st, null, info, error());
+          throw typeError(expr, st, null, info, error());
         i++;
         return item;
       }

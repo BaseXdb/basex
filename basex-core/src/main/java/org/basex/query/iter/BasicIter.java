@@ -25,7 +25,7 @@ public abstract class BasicIter<I extends Item> extends Iter implements Iterable
    * Constructor.
    * @param size size
    */
-  public BasicIter(final long size) {
+  protected BasicIter(final long size) {
     this.size = size;
   }
 

@@ -12,6 +12,6 @@ import org.basex.query.value.*;
 public final class DbOpenId extends DbOpenPre {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return open(qc, false);
+    return open(qc, true);
   }
 }

@@ -159,8 +159,8 @@ public final class Prop {
    * @return directory string
    */
   private static String dir(final String path) {
-    return path.isEmpty() || path.endsWith("\\") || path.endsWith("/") ? path :
-      path + File.separator;
+    return path.isEmpty() || Strings.endsWith(path, '/') || Strings.endsWith(path, '\\') ?
+      path : path + File.separator;
   }
 
   /**

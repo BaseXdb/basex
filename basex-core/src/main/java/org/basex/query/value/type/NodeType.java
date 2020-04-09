@@ -86,7 +86,7 @@ public enum NodeType implements Type {
           return new FDoc(df, bu != null ? Token.token(bu) : Token.EMPTY);
         }
         final String string = value.toString();
-        if(string.startsWith("<")) return new DBNode(new IOContent(string));
+        if(Strings.startsWith(string, '<')) return new DBNode(new IOContent(string));
         return new FDoc().add(new FTxt(string));
       } catch(final IOException ex) {
         throw NODEERR_X_X.get(ii, this, ex);

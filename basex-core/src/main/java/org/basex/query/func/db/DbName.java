@@ -19,7 +19,7 @@ public final class DbName extends DbAccess {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Data data = exprs[0].data();
     return data != null ? Str.get(data.meta.name) : this;
   }

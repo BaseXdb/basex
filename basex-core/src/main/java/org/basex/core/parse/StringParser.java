@@ -42,7 +42,7 @@ final class StringParser extends CommandParser {
     final Scanner sc = new Scanner(input).useDelimiter(single ? "\0" : "\r\n?|\n");
     while(sc.hasNext()) {
       final String line = sc.next().trim();
-      if(line.isEmpty() || line.startsWith("#")) continue;
+      if(line.isEmpty() || Strings.startsWith(line, '#')) continue;
       parser = new InputParser(line);
       parser.file = uri;
       while(parser.more()) {

@@ -80,7 +80,7 @@ public final class Databases {
       if(backup && name.endsWith(IO.ZIPSUFFIX)) {
         final String n = ZIPPATTERN.split(name)[0];
         if(!n.equals(name)) add = n;
-      } else if(file.isDir() && !name.startsWith(".")) {
+      } else if(file.isDir() && !Strings.startsWith(name, '.')) {
         add = name;
       }
       // add entry if it matches the pattern, and has not already been added

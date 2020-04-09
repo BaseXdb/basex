@@ -13,6 +13,7 @@ import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.gui.layout.*;
 import org.basex.query.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -120,7 +121,7 @@ public final class GUIInput extends BaseXCombo {
    */
   private boolean cmdMode() {
     return gui.gopts.get(GUIOptions.SEARCHMODE) == 2 ||
-      gui.context.data() == null || getText().startsWith("!");
+      gui.context.data() == null || Strings.startsWith(getText(), '!');
   }
 
   /**
@@ -145,7 +146,7 @@ public final class GUIInput extends BaseXCombo {
     final int mode = gui.gopts.get(GUIOptions.SEARCHMODE);
     if(cmdMode()) {
       cmdPopup(query);
-    } else if(mode == 1 || mode == 0 && query.startsWith("/")) {
+    } else if(mode == 1 || mode == 0 && Strings.startsWith(query, '/')) {
       queryPopup(query);
     } else {
       popup.setVisible(false);
@@ -158,7 +159,7 @@ public final class GUIInput extends BaseXCombo {
    */
   private void cmdPopup(final String query) {
     StringList sl = null;
-    final boolean excl = query.startsWith("!");
+    final boolean excl = Strings.startsWith(query, '!');
     try {
       pre = excl ? "!" : "";
       final String suf = getText().substring(pre.length());

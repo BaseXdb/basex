@@ -25,7 +25,7 @@ import org.basex.util.hash.*;
  */
 public class FnForEach extends StandardFunc {
   @Override
-  public final Value value(final QueryContext qc) throws QueryException {
+  public final Value value(final QueryContext qc) {
     throw Util.notExpected();
   }
 

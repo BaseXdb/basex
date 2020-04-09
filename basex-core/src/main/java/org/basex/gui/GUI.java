@@ -298,7 +298,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     final String in = input.getText().trim();
     final boolean cmd = mode.getSelectedIndex() == 2;
     // run as command: command mode or exclamation mark as first character
-    final boolean exc = in.startsWith("!");
+    final boolean exc = Strings.startsWith(in, '!');
     if(cmd || exc) {
       try {
         // parse and execute all commands
@@ -313,7 +313,7 @@ public final class GUI extends JFrame implements BaseXWindow {
         if(!info.visible()) GUIMenuCmd.C_SHOWINFO.execute(this);
         info.setInfo(Util.message(ex), null, false, true);
       }
-    } else if(gopts.get(GUIOptions.SEARCHMODE) == 1 || in.startsWith("/")) {
+    } else if(gopts.get(GUIOptions.SEARCHMODE) == 1 || Strings.startsWith(in, '/')) {
       simpleQuery(in);
     } else {
       execute(new Find(in, gopts.get(GUIOptions.FILTERRT)));

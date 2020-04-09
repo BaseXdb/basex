@@ -76,7 +76,7 @@ public final class SearchBar extends BaseXBack {
     replace = new BaseXCombo(gui, true).history(GUIOptions.REPLACED, gui.gopts);
     replace.hint(Text.REPLACE_WITH + Text.DOTS);
 
-    final ActionListener al = e -> { search(); };
+    final ActionListener al = e -> search();
     mcase = button("f_case", BaseXLayout.addShortcut(Text.MATCH_CASE, MATCHCASE.toString()), al);
     word = button("f_word", BaseXLayout.addShortcut(Text.WHOLE_WORD, WHOLEWORD.toString()), al);
     regex = button("f_regex", BaseXLayout.addShortcut(Text.REGULAR_EXPR, REGEX.toString()), al);

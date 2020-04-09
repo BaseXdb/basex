@@ -92,12 +92,7 @@ public final class FuncLit extends Single implements Scope {
     }
   }
 
-  @Override
-  public boolean has(final Flag... flags) {
-    return expr.has(flags);
-  }
-
-  @Override
+    @Override
   public boolean visit(final ASTVisitor visitor) {
     for(final Var var : params) {
       if(!visitor.declared(var)) return false;

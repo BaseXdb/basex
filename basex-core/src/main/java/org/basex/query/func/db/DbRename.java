@@ -35,7 +35,8 @@ public final class DbRename extends DbAccess {
     for(int i = 0; i < is; i++) {
       final int pre = il.get(i);
       final String trg = Rename.target(data, pre, source, target);
-      if(trg.isEmpty() || trg.endsWith("/") || trg.endsWith(".")) throw DB_PATH_X.get(info, trg);
+      if(trg.isEmpty() || Strings.endsWith(trg, '/') || Strings.endsWith(trg, '.'))
+        throw DB_PATH_X.get(info, trg);
       updates.add(new ReplaceValue(pre, data, info, token(trg)), qc);
     }
 

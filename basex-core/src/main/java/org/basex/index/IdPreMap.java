@@ -223,11 +223,10 @@ public class IdPreMap {
     if(startIndex < endIndex) {
       if(endIndex < rows && pres[endIndex] <= end) {
         shrinkFromStart(endIndex, pre, c);
-        shrinkFromEnd(startIndex, pre, inc + c);
       } else {
         --endIndex;     // endIndex is not processed, so we let the increment do that
-        shrinkFromEnd(startIndex, pre, inc + c);
       }
+      shrinkFromEnd(startIndex, pre, inc + c);
     } else if(min < pre) {
       add(++endIndex, pres[startIndex], fids[startIndex], nids[startIndex],
           incs[startIndex], oids[startIndex]);

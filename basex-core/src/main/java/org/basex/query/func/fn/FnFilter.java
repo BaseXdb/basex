@@ -15,7 +15,7 @@ import org.basex.util.*;
  */
 public final class FnFilter extends StandardFunc {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) {
     throw Util.notExpected();
   }
 

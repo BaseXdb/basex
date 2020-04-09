@@ -114,8 +114,7 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
-      throws QueryException {
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc) {
     return mode == Simplify.EBV && dbl() == 0 ? cc.simplify(this, Bln.FALSE) : this;
   }
 

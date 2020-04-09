@@ -115,7 +115,7 @@ public final class Empty extends Item {
   }
 
   @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) {
     return mode == Simplify.EBV ? cc.simplify(this, Bln.FALSE) : this;
   }
 

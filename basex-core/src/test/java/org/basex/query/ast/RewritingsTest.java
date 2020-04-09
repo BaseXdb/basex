@@ -4,7 +4,6 @@ import static org.basex.query.func.Function.*;
 import static org.basex.query.QueryError.*;
 
 import org.basex.core.cmd.*;
-import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
@@ -380,8 +379,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("('a', 'b')[position()[position() ! .]]", "a\nb", count(POSITION, 2));
     check("('a', 'b')[. ! position()]", "a", exists("*[contains(name(), 'Map')]"));
     check("(1, 0)[.]", 1, exists(ContextValue.class));
-    error("true#0[.]", QueryError.EBV_X_X);
-    error("(true#0, false#0)[.]", QueryError.EBV_X_X);
+    error("true#0[.]", EBV_X_X);
+    error("(true#0, false#0)[.]", EBV_X_X);
 
     // map expression
     check("'s'['s' ! <a/>]", "s", empty(IterMap.class));
@@ -758,8 +757,8 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Rewriting of positional tests that might yield an error. */
   @Test public void gh1783() {
     execute(new Close());
-    error("(position() = 3) = (position() = 3)", QueryError.NOCTX_X);
-    error(". = .", QueryError.NOCTX_X);
+    error("(position() = 3) = (position() = 3)", NOCTX_X);
+    error(". = .", NOCTX_X);
   }
 
   /** Pre-evaluate predicates in filter expressions. */

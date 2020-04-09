@@ -10,6 +10,7 @@ import org.basex.query.up.primitives.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -59,8 +60,8 @@ abstract class DbNew extends DbAccess {
 
     // add slash to the target if the addressed file is an archive or directory
     String name = string(path);
-    if(name.endsWith(".")) throw RESINV_X.get(info, path);
-    if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += "/";
+    if(Strings.endsWith(name, '.')) throw RESINV_X.get(info, path);
+    if(!Strings.endsWith(name, '/') && (io.isDir() || io.isArchive())) name += "/";
     String target = "";
     final int s = name.lastIndexOf('/');
     if(s != -1) {

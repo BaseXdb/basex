@@ -132,7 +132,7 @@ public final class DecFormatter extends FormatUtil {
       tl.add(substring(pic, 0, i));
       pic = substring(pic, i + cl(pic, i));
       // "A picture-string must not contain more than one instance of the pattern-separator"
-      if (contains(pic, pattern)) throw PICNUM_X.get(ii, picture);
+      if(contains(pic, pattern)) throw PICNUM_X.get(ii, picture);
     }
     final byte[][] patterns = tl.add(pic).finish();
 
@@ -423,7 +423,7 @@ public final class DecFormatter extends FormatUtil {
       // convert positive number to string; chop leading 0
       String s = (num instanceof Dbl || num instanceof Flt ?
           Dec.get(BigDecimal.valueOf(num.dbl(ii))) : num).toString();
-      if(s.startsWith("0")) s = s.substring(1);
+      if(Strings.startsWith(s, '0')) s = s.substring(1);
 
       // integer/fractional separator
       final int fracSep = s.indexOf('.');

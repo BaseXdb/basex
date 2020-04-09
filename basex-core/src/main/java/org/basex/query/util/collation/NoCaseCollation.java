@@ -57,6 +57,6 @@ final class NoCaseCollation extends Collation {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof NoCaseCollation;
+    return obj instanceof NoCaseCollation;
   }
 }

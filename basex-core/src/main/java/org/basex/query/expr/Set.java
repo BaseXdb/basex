@@ -34,7 +34,7 @@ abstract class Set extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    iterative = ((Checks<Expr>) ex -> ex.ddo()).all(exprs);
+    iterative = ((Checks<Expr>) Expr::ddo).all(exprs);
 
     Type type = null;
     for(final Expr expr : exprs) {

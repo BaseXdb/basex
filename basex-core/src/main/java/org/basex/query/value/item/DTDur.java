@@ -120,7 +120,8 @@ public final class DTDur extends Dur {
 
     final String val = Token.string(value).trim();
     final Matcher mt = DTD.matcher(val);
-    if(!mt.matches() || val.endsWith("P") || val.endsWith("T")) throw dateError(value, XDTD, ii);
+    if(!mt.matches() || Strings.endsWith(val, 'P') || Strings.endsWith(val, 'T'))
+      throw dateError(value, XDTD, ii);
     dayTime(value, mt, 2, ii);
   }
 

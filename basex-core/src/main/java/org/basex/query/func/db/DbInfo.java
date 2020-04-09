@@ -41,7 +41,7 @@ public final class DbInfo extends DbAccess {
       if(cols[0].isEmpty()) continue;
 
       final FElem n = new FElem(token(toName(cols[0])));
-      if(cols[0].startsWith(" ")) {
+      if(Strings.startsWith(cols[0], ' ')) {
         if(node != null) node.add(n);
         if(!cols[1].isEmpty()) n.add(cols[1]);
       } else {

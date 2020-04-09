@@ -264,16 +264,16 @@ final class XMLParser extends CommandParser {
     String t = null;
     boolean ot = true;
     boolean n = false;
-    for(String c : checks) {
-      final boolean o = c.endsWith("?");
-      c = c.replace("?", "");
-      if(!c.isEmpty() && !Character.isLetter(c.charAt(0))) {
+    for(String check : checks) {
+      final boolean o = Strings.endsWith(check, '?');
+      check = check.replace("?", "");
+      if(!check.isEmpty() && !Character.isLetter(check.charAt(0))) {
         // textual contents
-        t = c.substring(1);
+        t = check.substring(1);
         ot = o;
-        n = c.charAt(0) == '<';
+        n = check.charAt(0) == '<';
       } else {
-        (o ? opt : mand).add(c);
+        (o ? opt : mand).add(check);
       }
     }
 

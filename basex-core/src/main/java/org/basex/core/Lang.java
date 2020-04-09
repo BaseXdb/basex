@@ -46,7 +46,7 @@ public final class Lang {
       try(NewlineInput nli = new NewlineInput(is)) {
         for(String line; (line = nli.readLine()) != null;) {
           final int i = line.indexOf('=');
-          if(i == -1 || line.startsWith("#")) continue;
+          if(i == -1 || Strings.startsWith(line, '#')) continue;
           final String key = line.substring(0, i).trim();
           String val = line.substring(i + 1).trim();
           if("langright".equals(key)) {

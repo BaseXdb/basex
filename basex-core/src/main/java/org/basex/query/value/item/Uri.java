@@ -152,8 +152,4 @@ public final class Uri extends AStr {
     return type == u.type && Token.eq(value, u.value);
   }
 
-  @Override
-  public String toString() {
-    return Token.string(toQuotedToken(value));
-  }
 }

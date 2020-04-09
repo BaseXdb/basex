@@ -28,7 +28,7 @@ public final class MapEntry extends StandardFunc {
   }
 
   @Override
-  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+  protected void simplifyArgs(final CompileContext cc) {
     // do not simplify type of key
   }
 }

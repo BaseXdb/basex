@@ -7,6 +7,7 @@ import javax.swing.tree.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.util.*;
 
 /**
  * JTree node for representing database content (raw files / documents).
@@ -57,7 +58,7 @@ public abstract class ResourceNode extends DefaultMutableTreeNode
    */
   public static byte[] preparePath(final byte[] path) {
     String p = MetaData.normPath(string(path));
-    if(p.endsWith("/")) p = p.substring(0, p.length() - 1);
+    if(Strings.endsWith(p, '/')) p = p.substring(0, p.length() - 1);
     return concat(SLASH, token(p));
   }
 

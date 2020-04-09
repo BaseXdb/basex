@@ -92,7 +92,7 @@ public final class Add extends ACreate {
     if(!source.exists()) return in != null ? error(RES_NOT_FOUND) :
         error(RES_NOT_FOUND_X, context.user().has(Perm.CREATE) ? source : args[1]);
 
-    if(!name.endsWith("/") && (source.isDir() || source.isArchive())) name += '/';
+    if(!Strings.endsWith(name, '/') && (source.isDir() || source.isArchive())) name += '/';
 
     String target = "";
     final int s = name.lastIndexOf('/');
