@@ -709,6 +709,12 @@ public enum Function implements AFunction {
   _CONVERT_DAYTIME_TO_INTEGER(ConvertDayTimeToInteger.class, "dayTime-to-integer(duration)",
       arg(DTD_O), ITR_O, CONVERT_URI),
   /** XQuery function. */
+  _CONVERT_DECODE_KEY(ConvertDecodeKey.class, "decode-key(string[,lax])",
+      arg(STR_O, BLN_O), STR_O, CONVERT_URI),
+  /** XQuery function. */
+  _CONVERT_ENCODE_KEY(ConvertEncodeKey.class, "encode-key(string[,lax])",
+      arg(STR_O, BLN_O), STR_O, CONVERT_URI),
+  /** XQuery function. */
   _CONVERT_INTEGERS_TO_BASE64(ConvertIntegersToBase64.class, "integers-to-base64(numbers)",
       arg(ITR_ZM), B64_O, CONVERT_URI),
   /** XQuery function. */

@@ -141,6 +141,8 @@ public enum QueryError {
   CONVERT_BASE_X(CONVERT, "base", "Unsupported base: %."),
   /** Error code. */
   CONVERT_INTEGER_X_X(CONVERT, "integer", "Invalid digit for base %: %."),
+  /** Error code. */
+  CONVERT_KEY_X(CONVERT, "key", "Key could not be decoded: %."),
 
   // Cryptographic Module
 

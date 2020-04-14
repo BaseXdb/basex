@@ -65,6 +65,32 @@ public final class ConvertModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void decodeKey() {
+    final Function func = _CONVERT_DECODE_KEY;
+    query(func.args("_"), "");
+    query(func.args("__"), "_");
+    query(func.args("_0021"), "!");
+    query(func.args("_0021", true), "_0021");
+
+    error(func.args(""), CONVERT_KEY_X);
+    error(func.args("___"), CONVERT_KEY_X);
+    error(func.args("_0"), CONVERT_KEY_X);
+    error(func.args("_00"), CONVERT_KEY_X);
+    error(func.args("_002"), CONVERT_KEY_X);
+    error(func.args("\n"), CONVERT_KEY_X);
+    error(func.args("1"), CONVERT_KEY_X);
+  }
+
+  /** Test method. */
+  @Test public void encodeKey() {
+    final Function func = _CONVERT_ENCODE_KEY;
+    query(func.args(""), "_");
+    query(func.args("_"), "__");
+    query(func.args("!"), "_0021");
+    query(func.args("!", true), "_");
+  }
+
+  /** Test method. */
   @Test public void integerFromBase() {
     final Function func = _CONVERT_INTEGER_FROM_BASE;
     // successful queries
