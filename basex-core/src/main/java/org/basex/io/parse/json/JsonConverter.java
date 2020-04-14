@@ -41,7 +41,7 @@ public abstract class JsonConverter {
 
   /**
    * Converts the specified input to XML.
-   * @param input input stream
+   * @param input input
    * @throws IOException I/O exception
    * @return result
    */
@@ -55,13 +55,13 @@ public abstract class JsonConverter {
   /**
    * Converts the specified input to an XQuery item.
    * @param input input
-   * @param path input path (can be {@code null)}
+   * @param path input path (can be empty string}
    * @throws QueryIOException query I/O exception
    * @return result
    */
   public final Item convert(final byte[] input, final String path) throws QueryIOException {
     JsonParser.parse(Token.string(input), path, jopts, this);
-    return finish();
+    return finish(path.isEmpty() ? "" : IO.get(path).url());
   }
 
   /**
@@ -157,7 +157,8 @@ public abstract class JsonConverter {
 
   /**
    * Returns the resulting XQuery value.
+   * @param uri base URI
    * @return result
    */
-  abstract Item finish();
+  abstract Item finish(String uri);
 }

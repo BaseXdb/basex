@@ -72,7 +72,7 @@ final class CsvBuilder extends CsvConverter {
   }
 
   @Override
-  public Str finish() throws IOException {
+  public Str finish(final String uri) throws IOException {
     if(record) builder.closeElem();
     builder.closeElem();
     return null;

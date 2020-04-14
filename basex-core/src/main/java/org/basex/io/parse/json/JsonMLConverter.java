@@ -34,8 +34,8 @@ final class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  public FDoc finish() {
-    return new FDoc().add(stack.pop());
+  public FDoc finish(final String uri) {
+    return new FDoc(uri).add(stack.pop());
   }
 
   /**

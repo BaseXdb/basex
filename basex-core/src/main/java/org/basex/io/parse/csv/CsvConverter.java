@@ -62,7 +62,7 @@ public abstract class CsvConverter extends Job {
       nli = in;
       CsvParser.parse(in.encoding(copts.get(CsvParserOptions.ENCODING)), copts, this);
     }
-    return finish();
+    return finish(input.url());
   }
 
   /**
@@ -96,8 +96,9 @@ public abstract class CsvConverter extends Job {
 
   /**
    * Returns the resulting byte array.
+   * @param uri base URI
    * @return result (can be {@code null})
    * @throws IOException I/O exception
    */
-  protected abstract Item finish() throws IOException;
+  protected abstract Item finish(String uri) throws IOException;
 }

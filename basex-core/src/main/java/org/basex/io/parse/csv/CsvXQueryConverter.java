@@ -49,7 +49,7 @@ public final class CsvXQueryConverter extends CsvConverter {
   }
 
   @Override
-  protected XQMap finish() throws QueryIOException {
+  protected XQMap finish(final String uri) throws QueryIOException {
     if(row != null) rows.add(row.freeze());
     try {
       XQMap map = XQMap.EMPTY;

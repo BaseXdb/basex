@@ -148,7 +148,7 @@ final class JsonStringConverter extends JsonConverter {
   }
 
   @Override
-  public Item finish() {
+  public Item finish(final String uri) {
     return Str.get(tb.toArray());
   }
 }

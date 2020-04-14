@@ -756,7 +756,7 @@ public final class QueryContext extends Job implements Closeable {
       try {
         final JsonParserOptions jp = new JsonParserOptions();
         jp.set(JsonOptions.FORMAT, JsonFormat.XQUERY);
-        return JsonConverter.get(jp).convert(token(object.toString()), null);
+        return JsonConverter.get(jp).convert(token(object.toString()), "");
       } catch(final QueryIOException ex) {
         throw ex.getCause();
       }

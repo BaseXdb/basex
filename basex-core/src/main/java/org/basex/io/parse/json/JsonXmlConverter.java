@@ -46,7 +46,7 @@ abstract class JsonXmlConverter extends JsonConverter {
   }
 
   @Override
-  public FDoc finish() {
+  public FDoc finish(final String uri) {
     final FElem elem = element();
     if(merge) {
       final ByteList[] types = new ByteList[ATTRS.length];
@@ -68,7 +68,7 @@ abstract class JsonXmlConverter extends JsonConverter {
         if(types[t] != null) elem.add(ATTRS[t], types[t].finish());
       }
     }
-    return new FDoc().add(elem);
+    return new FDoc(uri).add(elem);
   }
 
   /**
