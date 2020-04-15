@@ -70,7 +70,7 @@ public final class FltSeq extends NativeSeq {
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final int size, final Value... values) throws QueryException {
+  static Value get(final int size, final Value... values) throws QueryException {
     final float[] tmp = new float[size];
     int t = 0;
     for(final Value value : values) {

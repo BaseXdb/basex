@@ -330,7 +330,7 @@ public class IdPreMap {
   private void add(final int i, final int pre, final int fid, final int nid,
       final int inc, final int oid) {
     if(rows == pres.length) {
-      final int s = Array.newSize(rows);
+      final int s = Array.newCapacity(rows);
       pres = Arrays.copyOf(pres, s);
       fids = Arrays.copyOf(fids, s);
       nids = Arrays.copyOf(nids, s);

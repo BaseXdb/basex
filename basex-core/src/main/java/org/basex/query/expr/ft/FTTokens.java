@@ -25,7 +25,7 @@ public final class FTTokens extends ObjectList<TokenList, FTTokens> {
   }
 
   @Override
-  protected TokenList[] newList(final int s) {
+  protected TokenList[] newArray(final int s) {
     return new TokenList[s];
   }
 }

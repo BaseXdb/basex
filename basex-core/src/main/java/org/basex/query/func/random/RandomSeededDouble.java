@@ -7,7 +7,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -38,7 +37,7 @@ public final class RandomSeededDouble extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final long[] args = args(qc);
     final Random r = new Random(args[0]);
-    final int vl = ValueList.capacity(args[1]);
+    final int vl = Seq.initialCapacity(args[1]);
     final DoubleList values = new DoubleList(vl);
     for(long v = 0; v < vl; v++) values.add(r.nextDouble());
     return DblSeq.get(values.finish());

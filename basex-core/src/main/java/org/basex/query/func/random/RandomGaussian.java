@@ -5,7 +5,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -37,7 +36,7 @@ public final class RandomGaussian extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final long num = toLong(exprs[0], qc);
-    final DoubleList values = new DoubleList(ValueList.capacity(num));
+    final DoubleList values = new DoubleList(Seq.initialCapacity(num));
     for(long n = 0; n < num; n++) values.add(RND.nextGaussian());
     return DblSeq.get(values.finish());
   }

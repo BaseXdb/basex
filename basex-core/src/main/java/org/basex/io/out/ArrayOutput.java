@@ -13,6 +13,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ArrayOutput extends PrintOutput {
+  /** Byte buffer. */
+  private byte[] buffer = new byte[Array.INITIAL_CAPACITY];
+
   /**
    * Constructor.
    */
@@ -20,16 +23,13 @@ public final class ArrayOutput extends PrintOutput {
     super((OutputStream) null);
   }
 
-  /** Byte buffer. */
-  private byte[] buffer = new byte[Array.CAPACITY];
-
   @Override
   public void write(final int b) {
     final int s = (int) size;
     if(s == max) return;
 
     byte[] bffr = buffer;
-    if(s == bffr.length) bffr = Arrays.copyOf(bffr, Array.newSize(s));
+    if(s == bffr.length) bffr = Arrays.copyOf(bffr, Array.newCapacity(s));
     bffr[s] = (byte) b;
     buffer = bffr;
     size = s + 1;

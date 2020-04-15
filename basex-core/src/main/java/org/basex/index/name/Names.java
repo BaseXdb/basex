@@ -32,7 +32,7 @@ public final class Names extends TokenSet implements Index {
    */
   public Names(final MetaData meta) {
     this.meta = meta;
-    stats = new Stats[Array.CAPACITY];
+    stats = new Stats[Array.INITIAL_CAPACITY];
   }
 
   /**
@@ -144,9 +144,9 @@ public final class Names extends TokenSet implements Index {
   }
 
   @Override
-  protected void rehash(final int s) {
-    super.rehash(s);
-    stats = Array.copy(stats, new Stats[s]);
+  protected void rehash(final int newSize) {
+    super.rehash(newSize);
+    stats = Array.copy(stats, new Stats[newSize]);
   }
 
   @Override

@@ -105,7 +105,7 @@ public final class AnnList extends ObjectList<Ann, AnnList> {
   }
 
   @Override
-  protected Ann[] newList(final int s) {
+  protected Ann[] newArray(final int s) {
     return new Ann[s];
   }
 

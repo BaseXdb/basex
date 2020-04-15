@@ -59,7 +59,7 @@ public final class Thesaurus {
      */
     private void add(final ThesNode n, final byte[] r) {
       if(size == nodes.length) {
-        final int s = Array.newSize(size);
+        final int s = Array.newCapacity(size);
         nodes = Array.copy(nodes, new ThesNode[s]);
         rs = Array.copyOf(rs, s);
       }

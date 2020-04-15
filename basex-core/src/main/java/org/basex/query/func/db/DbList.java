@@ -87,8 +87,8 @@ public class DbList extends StandardFunc {
         return i < size ? Str.get(tokenAt((int) i)) : null;
       }
       @Override
-      public Value value(final QueryContext q, final Expr expr) {
-        final TokenList tl = new TokenList(size);
+      public Value value(final QueryContext q, final Expr expr) throws QueryException {
+        final TokenList tl = new TokenList(Seq.initialCapacity(size));
         for(int i = 0; i < size; i++) tl.add(tokenAt(i));
         return StrSeq.get(tl);
       }

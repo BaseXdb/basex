@@ -19,16 +19,16 @@ public class IntSet extends ASet {
    * Default constructor.
    */
   public IntSet() {
-    this(Array.CAPACITY);
+    this(Array.INITIAL_CAPACITY);
   }
 
   /**
-   * Default constructor.
-   * @param capacity initial array capacity (will be resized to a power of two)
+   * Constructor with initial capacity.
+   * @param capacity array capacity (will be resized to a power of two)
    */
   public IntSet(final int capacity) {
     super(capacity);
-    keys = new int[buckets.length];
+    keys = new int[capacity()];
   }
 
   /**
@@ -65,7 +65,7 @@ public class IntSet extends ASet {
    * @return id, or {@code 0} if key does not exist
    */
   final int id(final int key) {
-    final int b = key & buckets.length - 1;
+    final int b = key & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
       if(key == keys[id]) return id;
     }
@@ -90,7 +90,7 @@ public class IntSet extends ASet {
    */
   private int index(final int key) {
     checkSize();
-    final int b = key & buckets.length - 1;
+    final int b = key & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
       if(key == keys[id]) return -id;
     }

@@ -67,25 +67,25 @@ public final class QueryStack {
 
   /**
    * Ensures that the query stack has at least the given size.
-   * @param newSize required size of the stack
+   * @param size required stack size
    */
-  private void ensureCapacity(final int newSize) {
+  private void ensureCapacity(final int size) {
     final int sl = stack.length;
     int len = sl;
-    while(newSize > len) len <<= 1;
+    while(size > len) len <<= 1;
     if(len != sl) resize(len);
   }
 
   /**
    * Resizes the stacks.
-   * @param len new size
+   * @param size new size
    */
-  private void resize(final int len) {
+  private void resize(final int size) {
     final int os = end;
-    final Value[] nst = new Value[len];
+    final Value[] nst = new Value[size];
     Array.copy(stack, os, nst);
     stack = nst;
-    final Var[] nvr = new Var[len];
+    final Var[] nvr = new Var[size];
     Array.copy(vars, os, nvr);
     vars = nvr;
   }

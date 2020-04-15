@@ -17,7 +17,7 @@ public final class RegExpList extends ObjectList<RegExp, RegExpList> {
   }
 
   @Override
-  protected RegExp[] newList(final int s) {
+  protected RegExp[] newArray(final int s) {
     return new RegExp[s];
   }
 }

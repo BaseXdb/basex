@@ -155,7 +155,7 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
   }
 
   @Override
-  protected ANode[] newList(final int s) {
+  protected ANode[] newArray(final int s) {
     return new ANode[s];
   }
 

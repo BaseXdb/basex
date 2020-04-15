@@ -1,6 +1,7 @@
 package org.basex.query.expr.path;
 
 import org.basex.data.*;
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -38,8 +39,9 @@ final class InvDocTest extends Test {
    * if the root is no value, or if it only contains database nodes.
    * @param rt compile time root (can be {@code null})
    * @return document test
+   * @throws QueryException query exception
    */
-  static Test get(final Expr rt) {
+  static Test get(final Expr rt) throws QueryException {
     // root unknown: use simple test
     if(!(rt instanceof Value)) return KindTest.DOC;
     final Value root = (Value) rt;
@@ -56,7 +58,7 @@ final class InvDocTest extends Test {
       pres = new IntList(seq.pres());
     } else {
       // loop through all documents and add pre values of documents
-      pres = new IntList((int) root.size());
+      pres = new IntList(Seq.initialCapacity(root.size()));
       for(final Item item : root) pres.add(((DBNode) item).pre());
     }
     return new InvDocTest(pres.sort(), data);

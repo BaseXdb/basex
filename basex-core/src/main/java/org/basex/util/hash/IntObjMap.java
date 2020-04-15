@@ -14,7 +14,14 @@ import org.basex.util.*;
  */
 public final class IntObjMap<E> extends IntSet {
   /** Values. */
-  private Object[] values = new Object[Array.CAPACITY];
+  private Object[] values;
+
+  /**
+   * Default constructor.
+   */
+  public IntObjMap() {
+    values = new Object[capacity()];
+  }
 
   /**
    * Indexes the specified key and stores the associated value.
@@ -51,9 +58,9 @@ public final class IntObjMap<E> extends IntSet {
   }
 
   @Override
-  protected void rehash(final int sz) {
-    super.rehash(sz);
-    values = Array.copy(values, new Object[sz]);
+  protected void rehash(final int newSize) {
+    super.rehash(newSize);
+    values = Array.copy(values, new Object[newSize]);
   }
 
   @Override

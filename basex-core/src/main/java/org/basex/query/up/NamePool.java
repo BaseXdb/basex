@@ -87,7 +87,7 @@ public final class NamePool {
       if(nc.name.eq(name) && nc.attr == at) return i;
     }
     if(size == cache.length)
-      cache = Array.copy(cache, new NameCache[Array.newSize(size)]);
+      cache = Array.copy(cache, new NameCache[Array.newCapacity(size)]);
     final NameCache nc = new NameCache();
     nc.name = name;
     nc.attr = at;

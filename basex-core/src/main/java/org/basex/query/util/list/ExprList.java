@@ -19,7 +19,7 @@ public final class ExprList extends ObjectList<Expr, ExprList> {
   }
 
   /**
-   * Constructor, specifying an initial array capacity.
+   * Constructor with initial capacity.
    * @param capacity array capacity
    */
   public ExprList(final int capacity) {
@@ -50,7 +50,7 @@ public final class ExprList extends ObjectList<Expr, ExprList> {
   }
 
   @Override
-  protected Expr[] newList(final int s) {
+  protected Expr[] newArray(final int s) {
     return new Expr[s];
   }
 }

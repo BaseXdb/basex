@@ -16,13 +16,12 @@ public final class TokenList extends ObjectList<byte[], TokenList> {
    * Default constructor.
    */
   public TokenList() {
-    this(Array.CAPACITY);
+    this(Array.INITIAL_CAPACITY);
   }
 
   /**
-   * Constructor, specifying an initial internal array size
-   * (default is {@link Array#CAPACITY}).
-   * @param capacity initial array capacity
+   * Constructor with initial capacity.
+   * @param capacity array capacity
    */
   public TokenList(final int capacity) {
     super(new byte[capacity][]);
@@ -34,7 +33,6 @@ public final class TokenList extends ObjectList<byte[], TokenList> {
    * @param resize resize factor
    */
   public TokenList(final double resize) {
-    this();
     factor = resize;
   }
 
@@ -109,7 +107,7 @@ public final class TokenList extends ObjectList<byte[], TokenList> {
   }
 
   @Override
-  protected byte[][] newList(final int s) {
+  protected byte[][] newArray(final int s) {
     return new byte[s][];
   }
 }

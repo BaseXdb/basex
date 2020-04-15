@@ -97,7 +97,7 @@ public final class FTMatches extends ObjectList<FTMatch, FTMatches> {
   }
 
   @Override
-  protected FTMatch[] newList(final int s) {
+  protected FTMatch[] newArray(final int s) {
     return new FTMatch[s];
   }
 

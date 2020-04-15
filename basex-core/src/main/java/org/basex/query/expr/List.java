@@ -74,7 +74,7 @@ public final class List extends Arr {
     }
     exprType.assign(type, zero ? Occ.ZERO_MORE : Occ.ONE_MORE, size);
 
-    // pre-evaluate list
+    // pre-evaluate list; skip expressions with large result sizes
     if(allAreValues(true)) {
       Type tp = null;
       final Value[] values = new Value[exprs.length];
@@ -87,6 +87,7 @@ public final class List extends Arr {
         values[vl++] = value;
       }
 
+      // result size will be small enough to be cast to an integer
       Value value = Seq.get((int) size, tp, values);
       if(value == null) {
         final ValueBuilder vb = new ValueBuilder(cc.qc);

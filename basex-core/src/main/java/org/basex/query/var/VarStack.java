@@ -16,7 +16,7 @@ public final class VarStack extends ObjectList<Var, VarStack> {
    * Default constructor.
    */
   public VarStack() {
-    super(new Var[Array.CAPACITY]);
+    super(new Var[Array.INITIAL_CAPACITY]);
   }
 
   /**
@@ -34,7 +34,7 @@ public final class VarStack extends ObjectList<Var, VarStack> {
   }
 
   @Override
-  protected Var[] newList(final int s) {
+  protected Var[] newArray(final int s) {
     return new Var[s];
   }
 }

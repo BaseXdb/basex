@@ -52,7 +52,7 @@ public abstract class Seq extends Value {
       type = tp;
       // shortcut for strings (avoid intermediate token representation)
       if(tp == AtomType.STR) {
-        final StringList tmp = new StringList((int) size);
+        final StringList tmp = new StringList(initialCapacity(size));
         for(final Item item : this) tmp.add(item.string(null));
         return tmp.finish();
       }
@@ -282,7 +282,19 @@ public abstract class Seq extends Value {
     if(type == AtomType.DBL) return DblSeq.get(size, values);
     if(type == AtomType.DEC) return DecSeq.get(size, values);
     if(type == AtomType.BYT) return BytSeq.get(size, values);
-    if(type != null && type.instanceOf(AtomType.ITR)) return IntSeq.get(size, type, values);
+    if(type != null && type.instanceOf(AtomType.ITR)) return IntSeq.get(type, size, values);
     return null;
+  }
+
+  /**
+   * Returns an initial array capacity for the expected result size.
+   * Throws an exception if the requested size will take too much memory.
+   * @param size expected result size
+   * @return capacity
+   * @throws QueryException query exception
+   */
+  public static int initialCapacity(final long size) throws QueryException {
+    if(size > Integer.MAX_VALUE - 2) throw RANGE_X.get(null, size);
+    return Array.initialCapacity(size);
   }
 }

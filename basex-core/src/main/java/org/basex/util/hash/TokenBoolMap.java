@@ -2,8 +2,6 @@ package org.basex.util.hash;
 
 import java.util.*;
 
-import org.basex.util.*;
-
 /**
  * This is an efficient and memory-saving hash map for storing tokens and booleans.
  *
@@ -18,7 +16,7 @@ public final class TokenBoolMap extends TokenSet {
    * Constructor.
    */
   public TokenBoolMap() {
-    values = new boolean[Array.CAPACITY];
+    values = new boolean[capacity()];
   }
 
   /**
@@ -43,9 +41,9 @@ public final class TokenBoolMap extends TokenSet {
   }
 
   @Override
-  protected void rehash(final int sz) {
-    super.rehash(sz);
-    values = Arrays.copyOf(values, sz);
+  protected void rehash(final int newSize) {
+    super.rehash(newSize);
+    values = Arrays.copyOf(values, newSize);
   }
 
   @Override

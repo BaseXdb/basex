@@ -153,7 +153,7 @@ abstract class JsonXmlConverter extends JsonConverter {
      * @param nd element to add
      */
     private void add(final FElem nd) {
-      if(size == vals.length) vals = Array.copy(vals, new FElem[Array.newSize(size)]);
+      if(size == vals.length) vals = Array.copy(vals, new FElem[Array.newCapacity(size)]);
       vals[size++] = nd;
     }
   }

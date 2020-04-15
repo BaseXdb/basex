@@ -6,7 +6,7 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Sequence of items of type {@link Int xs:double}, containing at least two of them.
@@ -70,19 +70,16 @@ public final class DblSeq extends NativeSeq {
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final int size, final Value... values) throws QueryException {
-    final double[] tmp = new double[size];
-    int t = 0;
+  static Value get(final int size, final Value... values) throws QueryException {
+    final DoubleList tmp = new DoubleList(size);
     for(final Value value : values) {
       // speed up construction, depending on input
       if(value instanceof DblSeq) {
-        final int vs = (int) value.size();
-        Array.copyFromStart(((DblSeq) value).values, vs, tmp, t);
-        t += vs;
+        tmp.add(((DblSeq) value).values);
       } else {
-        for(final Item item : value) tmp[t++] = item.dbl(null);
+        for(final Item item : value) tmp.add(item.dbl(null));
       }
     }
-    return get(tmp);
+    return get(tmp.finish());
   }
 }

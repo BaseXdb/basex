@@ -31,7 +31,7 @@ public final class FnCodepointsToString extends StandardFunc {
     if(size == 1) return toStr(toLong(iter.next()), info);
 
     // handle arbitrary input
-    final TokenBuilder tb = new TokenBuilder(Math.max(8, (int) size));
+    final TokenBuilder tb = new TokenBuilder(Array.initialCapacity(size));
     for(Item item; (item = qc.next(iter)) != null;) {
       tb.add(checkCp(toLong(item), info));
     }

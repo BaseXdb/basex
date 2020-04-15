@@ -20,16 +20,16 @@ public final class IntMap extends IntSet {
    * Default constructor.
    */
   public IntMap() {
-    this(Array.CAPACITY);
+    this(Array.INITIAL_CAPACITY);
   }
 
   /**
-   * Default constructor.
-   * @param capacity initial array capacity (will be resized to a power of two)
+   * Constructor with initial capacity.
+   * @param capacity array capacity (will be resized to a power of two)
    */
   public IntMap(final int capacity) {
     super(capacity);
-    values = new int[buckets.length];
+    values = new int[capacity()];
     values[0] = Integer.MIN_VALUE;
   }
 
@@ -59,9 +59,9 @@ public final class IntMap extends IntSet {
   }
 
   @Override
-  protected void rehash(final int sz) {
-    super.rehash(sz);
-    values = Arrays.copyOf(values, sz);
+  protected void rehash(final int newSize) {
+    super.rehash(newSize);
+    values = Arrays.copyOf(values, newSize);
   }
 
   @Override

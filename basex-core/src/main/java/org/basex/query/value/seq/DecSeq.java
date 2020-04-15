@@ -70,7 +70,7 @@ public final class DecSeq extends NativeSeq {
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final int size, final Value... values) throws QueryException {
+  static Value get(final int size, final Value... values) throws QueryException {
     final BigDecimal[] tmp = new BigDecimal[size];
     int t = 0;
     for(final Value value : values) {

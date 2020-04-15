@@ -18,12 +18,12 @@ public class DoubleList extends ElementList {
    * Default constructor.
    */
   public DoubleList() {
-    this(Array.CAPACITY);
+    this(Array.INITIAL_CAPACITY);
   }
 
   /**
-   * Constructor, specifying an initial internal array size.
-   * @param capacity initial array capacity
+   * Constructor with initial capacity.
+   * @param capacity array capacity
    */
   public DoubleList(final int capacity) {
     list = new double[capacity];
@@ -37,7 +37,7 @@ public class DoubleList extends ElementList {
   public final DoubleList add(final double element) {
     double[] lst = list;
     final int s = size;
-    if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
+    if(s == lst.length) lst = Arrays.copyOf(lst, newCapacity());
     lst[s] = element;
     list = lst;
     size = s + 1;
@@ -52,7 +52,7 @@ public class DoubleList extends ElementList {
   public final DoubleList add(final double... elements) {
     double[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
-    if(ns > lst.length) lst = Arrays.copyOf(lst, newSize(ns));
+    if(ns > lst.length) lst = Arrays.copyOf(lst, newCapacity(ns));
     Array.copyFromStart(elements, l, lst, s);
     list = lst;
     size = ns;

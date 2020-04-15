@@ -18,12 +18,12 @@ public final class BoolList extends ElementList {
    * Default constructor.
    */
   public BoolList() {
-    this(Array.CAPACITY);
+    this(Array.INITIAL_CAPACITY);
   }
 
   /**
-   * Constructor, specifying an initial internal array size.
-   * @param capacity initial array capacity
+   * Constructor with initial capacity.
+   * @param capacity array capacity
    */
   public BoolList(final int capacity) {
     list = new boolean[capacity];
@@ -37,7 +37,7 @@ public final class BoolList extends ElementList {
   public BoolList add(final boolean element) {
     boolean[] lst = list;
     final int s = size;
-    if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
+    if(s == lst.length) lst = Arrays.copyOf(lst, newCapacity());
     lst[s] = element;
     list = lst;
     size = s + 1;
@@ -52,7 +52,7 @@ public final class BoolList extends ElementList {
   public BoolList add(final boolean... elements) {
     boolean[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
-    if(ns > lst.length) lst = Arrays.copyOf(lst, newSize(ns));
+    if(ns > lst.length) lst = Arrays.copyOf(lst, newCapacity(ns));
     Array.copyFromStart(elements, l, lst, s);
     list = lst;
     size = ns;
@@ -74,7 +74,7 @@ public final class BoolList extends ElementList {
    * @param element element to be stored
    */
   public void set(final int index, final boolean element) {
-    if(index >= list.length) list = Arrays.copyOf(list, newSize(index + 1));
+    if(index >= list.length) list = Arrays.copyOf(list, newCapacity(index + 1));
     list[index] = element;
     size = Math.max(size, index + 1);
   }

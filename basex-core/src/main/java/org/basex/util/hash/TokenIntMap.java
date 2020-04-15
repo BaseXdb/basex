@@ -5,7 +5,6 @@ import java.util.*;
 
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.*;
 
 /**
  * This is an efficient and memory-saving hash map for storing tokens and integers.
@@ -21,7 +20,7 @@ public final class TokenIntMap extends TokenSet {
    * Constructor.
    */
   public TokenIntMap() {
-    values = new int[Array.CAPACITY];
+    values = new int[capacity()];
   }
 
   /**
@@ -68,9 +67,9 @@ public final class TokenIntMap extends TokenSet {
   }
 
   @Override
-  protected void rehash(final int sz) {
-    super.rehash(sz);
-    values = Arrays.copyOf(values, sz);
+  protected void rehash(final int newSize) {
+    super.rehash(newSize);
+    values = Arrays.copyOf(values, newSize);
   }
 
   @Override

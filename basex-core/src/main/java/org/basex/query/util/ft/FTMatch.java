@@ -19,8 +19,8 @@ public final class FTMatch extends ObjectList<FTStringMatch, FTMatch> {
   }
 
   /**
-   * Constructor, specifying an initial internal array size.
-   * @param capacity initial array capacity
+   * Constructor with initial capacity.
+   * @param capacity array capacity
    */
   public FTMatch(final int capacity) {
     super(new FTStringMatch[capacity]);
@@ -59,7 +59,7 @@ public final class FTMatch extends ObjectList<FTStringMatch, FTMatch> {
   }
 
   @Override
-  protected FTStringMatch[] newList(final int s) {
+  protected FTStringMatch[] newArray(final int s) {
     return new FTStringMatch[s];
   }
 }

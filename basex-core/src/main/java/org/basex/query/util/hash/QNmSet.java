@@ -14,15 +14,17 @@ import org.basex.util.hash.*;
  */
 public class QNmSet extends ASet implements Iterable<QNm> {
   /** Hashed keys. */
-  protected QNm[] keys = new QNm[Array.CAPACITY];
+  protected QNm[] keys;
   /** Hash values. */
-  protected int[] hash = new int[Array.CAPACITY];
+  protected int[] hash;
 
   /**
    * Default constructor.
    */
   public QNmSet() {
-    super(Array.CAPACITY);
+    super(Array.INITIAL_CAPACITY);
+    keys = new QNm[capacity()];
+    hash = new int[capacity()];
   }
 
   /**
@@ -59,7 +61,7 @@ public class QNmSet extends ASet implements Iterable<QNm> {
    * @return id, or {@code 0} if QName does not exist
    */
   public final int id(final QNm qnm) {
-    final int b = qnm.hash(null) & buckets.length - 1;
+    final int b = qnm.hash(null) & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
       if(keys[id].eq(qnm)) return id;
     }
@@ -74,7 +76,7 @@ public class QNmSet extends ASet implements Iterable<QNm> {
    */
   private int index(final QNm qnm) {
     checkSize();
-    final int h = qnm.hash(null), b = h & buckets.length - 1;
+    final int h = qnm.hash(null), b = h & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
       if(keys[id].eq(qnm)) return -id;
     }

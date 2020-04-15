@@ -7,7 +7,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -39,8 +38,7 @@ public final class RandomSeededInteger extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final long[] args = args(qc);
     final Random r = new Random(args[0]);
-    final int vl = ValueList.capacity(args[1]);
-    final int max = (int) args[2];
+    final int vl = Seq.initialCapacity(args[1]), max = (int) args[2];
     final LongList values = new LongList(vl);
     for(long v = 0; v < vl; v++) values.add(max == 0 ? r.nextInt() : r.nextInt(max));
     return IntSeq.get(values.finish());

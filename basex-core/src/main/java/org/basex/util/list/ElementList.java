@@ -9,8 +9,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class ElementList {
-  /** Resize factor for extending the arrays. */
-  protected double factor = Array.RESIZE;
+  /** Resize factor for extending arrays. */
+  protected double factor = Array.RESIZE_CAPACITY;
   /** Number of elements. */
   protected int size;
 
@@ -23,8 +23,8 @@ public abstract class ElementList {
    * Returns a new array size.
    * @return new array size
    */
-  protected final int newSize() {
-    return Array.newSize(size, factor);
+  protected final int newCapacity() {
+    return Array.newCapacity(size, factor);
   }
 
   /**
@@ -32,8 +32,8 @@ public abstract class ElementList {
    * @param min minimum size
    * @return new array size
    */
-  protected final int newSize(final int min) {
-    return Math.max(newSize(), min);
+  protected final int newCapacity(final int min) {
+    return Math.max(newCapacity(), min);
   }
 
   /**

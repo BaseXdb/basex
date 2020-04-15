@@ -20,12 +20,12 @@ public class ByteList extends ElementList {
    * Default constructor.
    */
   public ByteList() {
-    this(Array.CAPACITY);
+    this(Array.INITIAL_CAPACITY);
   }
 
   /**
-   * Constructor, specifying an initial internal array size.
-   * @param capacity initial array capacity
+   * Constructor with initial array capacity.
+   * @param capacity array capacity
    */
   public ByteList(final int capacity) {
     list = new byte[capacity];
@@ -39,7 +39,7 @@ public class ByteList extends ElementList {
   public ByteList add(final int element) {
     byte[] lst = list;
     final int s = size;
-    if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
+    if(s == lst.length) lst = Arrays.copyOf(lst, newCapacity());
     lst[s] = (byte) element;
     list = lst;
     size = s + 1;
@@ -64,7 +64,7 @@ public class ByteList extends ElementList {
    */
   public ByteList add(final byte[] elements, final int start, final int end) {
     final int l = end - start;
-    if(size + l > list.length) list = Arrays.copyOf(list, newSize(size + l));
+    if(size + l > list.length) list = Arrays.copyOf(list, newCapacity(size + l));
     Array.copy(elements, start, l, list, size);
     size += l;
     return this;

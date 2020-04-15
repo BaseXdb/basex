@@ -1,10 +1,9 @@
 package org.basex.query.util.list;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
 
 /**
@@ -22,20 +21,20 @@ public final class ValueList extends ObjectList<Value, ValueList> {
   }
 
   /**
-   * Constructor, specifying an initial array capacity.
+   * Constructor with expected result size.
+   * @param size expected result size (ignored if negative)
+   * @throws QueryException query exception
+   */
+  public ValueList(final long size) throws QueryException {
+    this(Seq.initialCapacity(size));
+  }
+
+  /**
+   * Constructor with initial capacity.
    * @param capacity array capacity
    */
   public ValueList(final int capacity) {
     super(new Value[capacity]);
-  }
-
-  /**
-   * Constructor, specifying an initial array capacity.
-   * @param capacity array capacity (can be negative)
-   * @throws QueryException query exception
-   */
-  public ValueList(final long capacity) throws QueryException {
-    this(capacity(capacity));
   }
 
   /**
@@ -49,18 +48,7 @@ public final class ValueList extends ObjectList<Value, ValueList> {
   }
 
   @Override
-  protected Value[] newList(final int s) {
+  protected Value[] newArray(final int s) {
     return new Value[s];
-  }
-
-  /**
-   * Returns the initial array capacity.
-   * @param capacity specified capacity
-   * @return real capacity
-   * @throws QueryException query exception
-   */
-  public static int capacity(final long capacity) throws QueryException {
-    if(capacity > Integer.MAX_VALUE - 2) throw RANGE_X.get(null, capacity);
-    return Math.min(org.basex.util.Array.MAXINIT, Math.max(1, (int) capacity));
   }
 }

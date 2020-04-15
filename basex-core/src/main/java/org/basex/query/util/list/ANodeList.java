@@ -26,7 +26,7 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
   }
 
   /**
-   * Constructor, specifying an initial array capacity.
+   * Constructor with initial capacity.
    * @param capacity array capacity
    */
   public ANodeList(final int capacity) {
@@ -76,7 +76,7 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
   }
 
   @Override
-  protected ANode[] newList(final int s) {
+  protected ANode[] newArray(final int s) {
     return new ANode[s];
   }
 

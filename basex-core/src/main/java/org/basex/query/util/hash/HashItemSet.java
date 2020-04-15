@@ -14,20 +14,22 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class HashItemSet extends ASet implements ItemSet {
-  /** Hashed keys. */
-  private Item[] keys = new Item[Array.CAPACITY];
-  /** Hash values. */
-  private int[] hash = new int[Array.CAPACITY];
   /** Equality check (stricter than equivalence check). */
   private final boolean eq;
+  /** Hashed keys. */
+  private Item[] keys;
+  /** Hash values. */
+  private int[] hash;
 
   /**
    * Default constructor.
    * @param eq equality check
    */
   public HashItemSet(final boolean eq) {
-    super(Array.CAPACITY);
+    super(Array.INITIAL_CAPACITY);
     this.eq = eq;
+    keys = new Item[capacity()];
+    hash = new int[capacity()];
   }
 
   @Override
@@ -54,7 +56,7 @@ public final class HashItemSet extends ASet implements ItemSet {
    * @throws QueryException query exception
    */
   public int id(final Item item, final InputInfo ii) throws QueryException {
-    final int b = item.hash(ii) & buckets.length - 1;
+    final int b = item.hash(ii) & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
       if(eq ? keys[id].eq(item, null, null, ii) : keys[id].equiv(item, null, ii)) return id;
     }
@@ -71,7 +73,7 @@ public final class HashItemSet extends ASet implements ItemSet {
    */
   private int index(final Item item, final InputInfo ii) throws QueryException {
     checkSize();
-    final int h = item.hash(ii), b = h & buckets.length - 1;
+    final int h = item.hash(ii), b = h & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
       if(eq ? keys[id].eq(item, null, null, ii) : keys[id].equiv(item, null, ii)) return -id;
     }

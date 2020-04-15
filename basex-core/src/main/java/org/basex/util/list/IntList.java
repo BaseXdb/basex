@@ -18,12 +18,12 @@ public class IntList extends ElementList {
    * Default constructor.
    */
   public IntList() {
-    this(Array.CAPACITY);
+    this(Array.INITIAL_CAPACITY);
   }
 
   /**
-   * Constructor, specifying an initial internal array size.
-   * @param capacity initial array capacity
+   * Constructor with initial capacity.
+   * @param capacity array capacity
    */
   public IntList(final int capacity) {
     list = new int[capacity];
@@ -31,7 +31,7 @@ public class IntList extends ElementList {
 
   /**
    * Constructor, specifying a resize factor. Smaller values are more memory-saving,
-   * while larger will provide better performance.
+   * while larger values will provide better performance.
    * @param resize resize factor
    */
   public IntList(final double resize) {
@@ -56,7 +56,7 @@ public class IntList extends ElementList {
   public final IntList add(final int element) {
     int[] lst = list;
     final int s = size;
-    if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
+    if(s == lst.length) lst = Arrays.copyOf(lst, newCapacity());
     lst[s] = element;
     list = lst;
     size = s + 1;
@@ -71,7 +71,7 @@ public class IntList extends ElementList {
   public final IntList add(final int... elements) {
     int[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
-    if(ns > lst.length) lst = Arrays.copyOf(lst, newSize(ns));
+    if(ns > lst.length) lst = Arrays.copyOf(lst, newCapacity(ns));
     Array.copyFromStart(elements, l, lst, s);
     list = lst;
     size = ns;
@@ -93,7 +93,7 @@ public class IntList extends ElementList {
    * @param element element to be stored
    */
   public final void set(final int index, final int element) {
-    if(index >= list.length) list = Arrays.copyOf(list, newSize(index + 1));
+    if(index >= list.length) list = Arrays.copyOf(list, newCapacity(index + 1));
     list[index] = element;
     size = Math.max(size, index + 1);
   }
@@ -120,7 +120,7 @@ public class IntList extends ElementList {
   public final void insert(final int index, final int... elements) {
     final int l = elements.length;
     if(l == 0) return;
-    if(size + l > list.length) list = Arrays.copyOf(list, newSize(size + l));
+    if(size + l > list.length) list = Arrays.copyOf(list, newCapacity(size + l));
     Array.insert(list, index, l, size, elements);
     size += l;
   }

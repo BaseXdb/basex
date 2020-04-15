@@ -173,7 +173,7 @@ public final class MemValues extends ValueIndex {
     if(ids == null) {
       ids = vals;
     } else {
-      if(ids.length < size) ids = Arrays.copyOf(ids, Array.newSize(size));
+      if(ids.length < size) ids = Arrays.copyOf(ids, Array.newCapacity(size));
       Array.copyFromStart(vals, vl, ids, len);
       if(ids[len - 1] > vals[0]) {
         if(reorder == null) reorder = new BoolList(values.size());

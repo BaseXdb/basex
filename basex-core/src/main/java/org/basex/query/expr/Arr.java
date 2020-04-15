@@ -120,7 +120,7 @@ public abstract class Arr extends ParseExpr {
 
   /**
    * Returns true if all arguments are values (possibly of small size).
-   * @param limit check if size of any value exceeds {@link CompileContext#MAX_PREEVAL}
+   * @param limit check if result size of any expression exceeds {@link CompileContext#MAX_PREEVAL}
    * @return result of check
    */
   protected final boolean allAreValues(final boolean limit) {

@@ -148,7 +148,7 @@ public class TextInput extends BufferInput {
    */
   public final TokenBuilder cache() throws IOException {
     try {
-      final TokenBuilder tb = new TokenBuilder(Math.max(Array.CAPACITY, (int) length));
+      final TokenBuilder tb = new TokenBuilder(Array.initialCapacity(length));
       for(int ch; (ch = read()) != -1;) tb.add(ch);
       return tb;
     } finally {

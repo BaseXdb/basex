@@ -31,7 +31,7 @@ final class NSNode {
 
   /**
    * Default constructor.
-   * @param pre pre value
+   * @param pre pre value or {@code -1}
    */
   NSNode(final int pre) {
     this.pre = pre;
@@ -204,7 +204,7 @@ final class NSNode {
    * @param node child node
    */
   void add(final NSNode node) {
-    if(size == nodes.length) nodes = Array.copy(nodes, new NSNode[Array.newSize(size)]);
+    if(size == nodes.length) nodes = Array.copy(nodes, new NSNode[Array.newCapacity(size)]);
 
     // find inserting position
     int i = find(node.pre);

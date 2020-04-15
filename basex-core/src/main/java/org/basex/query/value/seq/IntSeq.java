@@ -109,9 +109,7 @@ public final class IntSeq extends NativeSeq {
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final int size, final Type type, final Value... values)
-      throws QueryException {
-
+  static Value get(final Type type, final int size, final Value... values) throws QueryException {
     final LongList tmp = new LongList(size);
     for(final Value value : values) {
       // speed up construction, depending on input

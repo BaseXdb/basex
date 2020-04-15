@@ -17,9 +17,9 @@ import org.basex.util.*;
  */
 public final class TableMemAccess extends TableAccess {
   /** Table data (first half). */
-  private long[] data1 = new long[Array.CAPACITY];
+  private long[] data1 = new long[Array.INITIAL_CAPACITY];
   /** Table data (second half). */
-  private long[] data2 = new long[Array.CAPACITY];
+  private long[] data2 = new long[Array.INITIAL_CAPACITY];
 
   /**
    * Constructor.
@@ -134,7 +134,7 @@ public final class TableMemAccess extends TableAccess {
     dirty();
     final int l = meta.size - source;
     while(l + target >= data1.length) {
-      final int s = Array.newSize(data1.length);
+      final int s = Array.newCapacity(data1.length);
       data1 = Arrays.copyOf(data1, s);
       data2 = Arrays.copyOf(data2, s);
     }

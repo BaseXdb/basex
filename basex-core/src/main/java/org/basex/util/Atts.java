@@ -42,7 +42,7 @@ public final class Atts extends ElementList {
   public Atts add(final byte[] name, final byte[] value) {
     final int sz = size;
     if(sz == nm.length) {
-      final int s = Array.newSize(sz);
+      final int s = Array.newCapacity(sz);
       nm = Array.copyOf(nm, s);
       vl = Array.copyOf(vl, s);
     }

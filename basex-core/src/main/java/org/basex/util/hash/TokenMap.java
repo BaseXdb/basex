@@ -13,7 +13,14 @@ import org.basex.util.*;
  */
 public class TokenMap extends TokenSet {
   /** Hash values. */
-  private byte[][] values = new byte[Array.CAPACITY][];
+  private byte[][] values;
+
+  /**
+   * Default constructor.
+   */
+  public TokenMap() {
+    values = new byte[capacity()][];
+  }
 
   /**
    * Stores the specified key and value.
@@ -67,9 +74,9 @@ public class TokenMap extends TokenSet {
   }
 
   @Override
-  protected final void rehash(final int sz) {
-    super.rehash(sz);
-    values = Array.copyOf(values, sz);
+  protected final void rehash(final int newSize) {
+    super.rehash(newSize);
+    values = Array.copyOf(values, newSize);
   }
 
   @Override

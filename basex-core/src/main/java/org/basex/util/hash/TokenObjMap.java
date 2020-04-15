@@ -14,7 +14,14 @@ import org.basex.util.*;
  */
 public final class TokenObjMap<E> extends TokenSet {
   /** Values. */
-  private Object[] values = new Object[Array.CAPACITY];
+  private Object[] values;
+
+  /**
+   * Default constructor.
+   */
+  public TokenObjMap() {
+    values = new Object[capacity()];
+  }
 
   /**
    * Indexes the specified key and value.
@@ -60,9 +67,9 @@ public final class TokenObjMap<E> extends TokenSet {
   }
 
   @Override
-  protected void rehash(final int sz) {
-    super.rehash(sz);
-    values = Array.copy(values, new Object[sz]);
+  protected void rehash(final int newSize) {
+    super.rehash(newSize);
+    values = Array.copy(values, new Object[newSize]);
   }
 
   @Override

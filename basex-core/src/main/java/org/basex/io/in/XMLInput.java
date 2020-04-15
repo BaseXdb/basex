@@ -91,7 +91,7 @@ public class XMLInput extends InputStream {
    * @param ti buffer to be added
    */
   private void add(final NewlineInput ti) {
-    if(++ip == inputs.length) inputs = Array.copy(inputs, new NewlineInput[Array.newSize(ip)]);
+    if(++ip == inputs.length) inputs = Array.copy(inputs, new NewlineInput[Array.newCapacity(ip)]);
     inputs[ip] = ti;
   }
 

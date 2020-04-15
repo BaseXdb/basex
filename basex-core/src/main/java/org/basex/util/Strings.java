@@ -106,33 +106,32 @@ public final class Strings {
   /**
    * Splits a string around matches of the given separator.
    * @param string string to be split
-   * @param sep separation character
+   * @param separator separation character
    * @return resulting strings
    */
-  public static String[] split(final String string, final char sep) {
-    return split(string, sep, Integer.MAX_VALUE);
+  public static String[] split(final String string, final char separator) {
+    return split(string, separator, -1);
   }
 
   /**
    * Splits a string around matches of the given separator.
    * @param string string to be split
-   * @param sep separation character
-   * @param limit maximum number of strings (must be 1 or larger)
+   * @param separator separation character
+   * @param limit maximum number of strings (ignored if {@code -1})
    * @return resulting strings
    */
-  public static String[] split(final String string, final char sep, final int limit) {
-    final StringList sl = new StringList(limit == Integer.MAX_VALUE ? Array.CAPACITY : limit);
+  public static String[] split(final String string, final char separator, final int limit) {
+    final StringList sl = new StringList(Array.initialCapacity(limit));
     final int tl = string.length();
-    int s = 0, c = 1;
-    for(int p = 0; p < tl && c < limit; p++) {
-      if(string.charAt(p) == sep) {
+    int s = 0, c = 1, l = limit >= 0 ? limit : Integer.MAX_VALUE;
+    for(int p = 0; p < tl && c < l; p++) {
+      if(string.charAt(p) == separator) {
         sl.add(string.substring(s, p));
         s = p + 1;
         c++;
       }
     }
-    sl.add(string.substring(s, tl));
-    return sl.finish();
+    return sl.add(string.substring(s, tl)).finish();
   }
 
   /**

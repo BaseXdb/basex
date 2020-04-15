@@ -15,12 +15,12 @@ public class StringList extends ObjectList<String, StringList> {
    * Default constructor.
    */
   public StringList() {
-    this(Array.CAPACITY);
+    this(Array.INITIAL_CAPACITY);
   }
 
   /**
-   * Constructor, specifying an initial internal array size.
-   * @param capacity initial array capacity
+   * Constructor with initial capacity.
+   * @param capacity array capacity
    */
   public StringList(final int capacity) {
     super(new String[capacity]);
@@ -85,7 +85,7 @@ public class StringList extends ObjectList<String, StringList> {
   }
 
   @Override
-  protected final String[] newList(final int s) {
+  protected final String[] newArray(final int s) {
     return new String[s];
   }
 }

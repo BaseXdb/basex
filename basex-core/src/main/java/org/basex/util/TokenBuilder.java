@@ -40,12 +40,12 @@ public final class TokenBuilder {
    * Empty constructor.
    */
   public TokenBuilder() {
-    this(Array.CAPACITY);
+    this(Array.INITIAL_CAPACITY);
   }
 
   /**
-   * Constructor with initial internal array size.
-   * @param capacity initial array capacity
+   * Constructor with initial array capacity.
+   * @param capacity array capacity
    */
   public TokenBuilder(final int capacity) {
     chars = new byte[capacity];
@@ -218,7 +218,7 @@ public final class TokenBuilder {
   public TokenBuilder addByte(final byte value) {
     byte[] chrs = chars;
     final int s = size;
-    if(s == chrs.length) chrs = Arrays.copyOf(chrs, Array.newSize(s));
+    if(s == chrs.length) chrs = Arrays.copyOf(chrs, Array.newCapacity(s));
     chrs[s] = value;
     chars = chrs;
     size = s + 1;
@@ -264,7 +264,7 @@ public final class TokenBuilder {
     if(l > 0) {
       byte[] chrs = chars;
       final int cl = chrs.length, s = size, ns = s + l;
-      if(ns > cl) chrs = Arrays.copyOf(chrs, Array.newSize(ns));
+      if(ns > cl) chrs = Arrays.copyOf(chrs, Array.newCapacity(ns));
       Array.copy(token, start, l, chrs, s);
       chars = chrs;
       size = ns;

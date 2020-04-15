@@ -28,11 +28,11 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   }
 
   /**
-   * Creates a resized list.
+   * Creates a resized array.
    * @param s size
-   * @return list
+   * @return array
    */
-  protected abstract E[] newList(int s);
+  protected abstract E[] newArray(int s);
 
   /**
    * Returns the element at the specified index.
@@ -77,7 +77,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   public L add(final E element) {
     E[] lst = list;
     final int s = size;
-    if(s == lst.length) lst = Array.copy(lst, newList(newSize()));
+    if(s == lst.length) lst = Array.copy(lst, newArray(newCapacity()));
     lst[s] = element;
     list = lst;
     size = s + 1;
@@ -93,7 +93,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   public final L add(final E... elements) {
     E[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
-    if(ns > lst.length) lst = Array.copy(lst, newList(newSize(ns)));
+    if(ns > lst.length) lst = Array.copy(lst, newArray(newCapacity(ns)));
     Array.copyFromStart(elements, l, lst, s);
     list = lst;
     size = ns;
@@ -121,7 +121,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   public final L set(final int index, final E element) {
     E[] lst = list;
     final int sz = size;
-    if(index >= lst.length) lst = Array.copy(lst, newList(newSize(index + 1)));
+    if(index >= lst.length) lst = Array.copy(lst, newArray(newCapacity(index + 1)));
     lst[index] = element;
     list = lst;
     size = Math.max(sz, index + 1);
@@ -140,7 +140,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
 
     E[] lst = list;
     final int sz = size;
-    if(sz + l > lst.length) lst = Array.copy(lst, newList(newSize(sz + l)));
+    if(sz + l > lst.length) lst = Array.copy(lst, newArray(newCapacity(sz + l)));
     Array.insert(lst, index, l, sz, elements);
     list = lst;
     size = sz + l;
@@ -220,7 +220,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * @return array
    */
   public final E[] toArray() {
-    return Array.copy(list, newList(size));
+    return Array.copy(list, newArray(size));
   }
 
   /**
@@ -232,7 +232,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
     final E[] lst = list;
     list = null;
     final int s = size;
-    return s == lst.length ? lst : Array.copy(lst, newList(s));
+    return s == lst.length ? lst : Array.copy(lst, newArray(s));
   }
 
   /**

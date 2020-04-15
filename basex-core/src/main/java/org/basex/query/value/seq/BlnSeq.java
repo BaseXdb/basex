@@ -70,7 +70,7 @@ public final class BlnSeq extends NativeSeq {
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final int size, final Value... values) throws QueryException {
+  static Value get(final int size, final Value... values) throws QueryException {
     final BoolList tmp = new BoolList(size);
     for(final Value value : values) {
       // speed up construction, depending on input

@@ -12,7 +12,7 @@ import java.util.*;
  */
 public final class MinHeap<K, V> {
   /** Value array. */
-  private Object[] vals = new Object[Array.CAPACITY << 1];
+  private Object[] vals = new Object[Array.INITIAL_CAPACITY << 1];
   /** Comparator. */
   private final Comparator<K> comp;
   /** Size of the heap. */

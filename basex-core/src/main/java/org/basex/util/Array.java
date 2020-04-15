@@ -11,12 +11,12 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Array {
-  /** Maximum size for initializing arrays. */
-  public static final int MAXINIT = 1 << 20;
   /** Initial default size for new arrays. */
-  public static final int CAPACITY = 1 << 3;
+  public static final int INITIAL_CAPACITY = 1 << 3;
+  /** Maximum capacity new arrays. */
+  public static final int MAX_CAPACITY = 1 << 20;
   /** Default factor for resizing dynamic arrays. */
-  public static final double RESIZE = 1.5;
+  public static final double RESIZE_CAPACITY = 1.5;
   /** Private constructor. */
   private Array() { }
 
@@ -280,23 +280,32 @@ public final class Array {
   }
 
   /**
-   * Returns a value for a new array size, which will always be larger than the specified value.
-   * @param old old size
-   * @return resulting size
+   * Returns an initial array capacity.
+   * @param size size expected result size (ignored if negative)
+   * @return capacity
    */
-  public static int newSize(final int old) {
-    return newSize(old, RESIZE);
+  public static int initialCapacity(final long size) {
+    return size < 0 ? INITIAL_CAPACITY : (int) Math.min(MAX_CAPACITY, size);
   }
 
   /**
    * Returns a value for a new array size, which will always be larger than the specified value.
-   * @param old old size
+   * @param size old size
+   * @return new capacity
+   */
+  public static int newCapacity(final int size) {
+    return newCapacity(size, RESIZE_CAPACITY);
+  }
+
+  /**
+   * Returns a value for a new array size, which will always be larger than the specified value.
+   * @param size old size
    * @param factor resize factor; must be larger than or equal to 1
    * @return resulting size
    */
-  public static int newSize(final int old, final double factor) {
-    final int s = Math.min(Integer.MAX_VALUE - 5, (int) (old * factor) + 1);
-    if(s <= old) throw new ArrayIndexOutOfBoundsException("Maximum array size reached.");
+  public static int newCapacity(final int size, final double factor) {
+    final int s = Math.min(Integer.MAX_VALUE - 5, (int) (size * factor) + 1);
+    if(s <= size) throw new ArrayIndexOutOfBoundsException("Maximum array size reached.");
     return s;
   }
 

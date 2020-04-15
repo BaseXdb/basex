@@ -23,20 +23,20 @@ public final class ItemList extends ObjectList<Item, ItemList> {
   }
 
   /**
-   * Constructor, specifying an initial array capacity.
+   * Constructor with expected result size.
+   * @param size expected result size (ignored if negative)
+   * @throws QueryException query exception
+   */
+  public ItemList(final long size) throws QueryException {
+    this(Seq.initialCapacity(size));
+  }
+
+  /**
+   * Constructor with initial capacity.
    * @param capacity array capacity
    */
   public ItemList(final int capacity) {
     super(new Item[capacity]);
-  }
-
-  /**
-   * Constructor, specifying an initial array capacity.
-   * @param capacity array capacity (can be negative)
-   * @throws QueryException query exception
-   */
-  public ItemList(final long capacity) throws QueryException {
-    this(ValueList.capacity(capacity));
   }
 
   /**
@@ -76,7 +76,7 @@ public final class ItemList extends ObjectList<Item, ItemList> {
   }
 
   @Override
-  protected Item[] newList(final int s) {
+  protected Item[] newArray(final int s) {
     return new Item[s];
   }
 }

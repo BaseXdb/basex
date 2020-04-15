@@ -48,7 +48,7 @@ public final class FTPosData {
     if(c < 0) {
       c = -c - 1;
       final int sz = size;
-      if(sz == pos.length) pos = Arrays.copyOf(pos, Array.newSize(sz));
+      if(sz == pos.length) pos = Arrays.copyOf(pos, Array.newCapacity(sz));
       Array.insert(pos, c, 1, sz, null);
       pos[c] = new FTPos(pre, il);
       size++;

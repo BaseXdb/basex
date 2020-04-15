@@ -18,12 +18,12 @@ public class LongList extends ElementList {
    * Default constructor.
    */
   public LongList() {
-    this(Array.CAPACITY);
+    this(Array.INITIAL_CAPACITY);
   }
 
   /**
-   * Constructor, specifying an initial internal array size.
-   * @param capacity initial array capacity
+   * Constructor with initial capacity.
+   * @param capacity array capacity
    */
   public LongList(final int capacity) {
     list = new long[capacity];
@@ -37,7 +37,7 @@ public class LongList extends ElementList {
   public final LongList add(final long element) {
     long[] lst = list;
     final int s = size;
-    if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
+    if(s == lst.length) lst = Arrays.copyOf(lst, newCapacity());
     lst[s] = element;
     list = lst;
     size = s + 1;
@@ -52,7 +52,7 @@ public class LongList extends ElementList {
   public final LongList add(final long... elements) {
     long[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
-    if(ns > lst.length) lst = Arrays.copyOf(lst, newSize(ns));
+    if(ns > lst.length) lst = Arrays.copyOf(lst, newCapacity(ns));
     Array.copyFromStart(elements, l, lst, s);
     list = lst;
     size = ns;
