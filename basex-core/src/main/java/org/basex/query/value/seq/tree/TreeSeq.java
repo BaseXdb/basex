@@ -53,14 +53,14 @@ public abstract class TreeSeq extends Seq {
       tsb.add(value, qc);
       for(long i = pos; --i >= 0;) tsb.addFront(itemAt(i));
     } else {
-      tsb.add(subSequence(0, pos, qc), qc);
+      tsb.add(subsequence(0, pos, qc), qc);
       tsb.add(value, qc);
     }
 
     if(right < MAX_SMALL) {
       for(long i = size - right; i < size; i++) tsb.add(itemAt(i));
     } else {
-      tsb.add(subSequence(pos, right, qc), qc);
+      tsb.add(subsequence(pos, right, qc), qc);
     }
 
     return tsb.seq(type.union(value.type));

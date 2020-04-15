@@ -105,7 +105,7 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final Value subSequence(final long start, final long length, final QueryContext qc) {
+  public final Value subsequence(final long start, final long length, final QueryContext qc) {
     return length == 0 ? Empty.VALUE :
            length == 1 ? itemAt(start) :
            length == size() ? this :
@@ -294,7 +294,7 @@ public abstract class Seq extends Value {
    * @throws QueryException query exception
    */
   public static int initialCapacity(final long size) throws QueryException {
-    if(size > Integer.MAX_VALUE - 2) throw RANGE_X.get(null, size);
+    if(size > Array.MAX_SIZE) throw RANGE_X.get(null, size);
     return Array.initialCapacity(size);
   }
 }

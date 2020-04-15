@@ -27,7 +27,7 @@ public final class UtilInit extends StandardFunc {
 
     // check if iterator is value-based
     final Value value = iter.iterValue();
-    if(value != null) return value.subSequence(0, size - 1, qc).iter();
+    if(value != null) return value.subsequence(0, size - 1, qc).iter();
 
     // return optimized iterator if result size is known
     if(size != -1) return new Iter() {
@@ -67,7 +67,7 @@ public final class UtilInit extends StandardFunc {
     // return empty sequence if value has 0 or 1 items
     final Value value = exprs[0].value(qc);
     final long size = value.size();
-    return size < 1 ? value : value.subSequence(0, size - 1, qc);
+    return size < 1 ? value : value.subsequence(0, size - 1, qc);
   }
 
   @Override

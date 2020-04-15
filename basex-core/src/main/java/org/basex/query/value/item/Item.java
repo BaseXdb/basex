@@ -232,7 +232,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public Value subSequence(final long start, final long length, final QueryContext qc) {
+  public Value subsequence(final long start, final long length, final QueryContext qc) {
     return length == 1 ? this : Empty.VALUE;
   }
 

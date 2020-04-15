@@ -114,7 +114,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
-   * Returns a sub sequence of this value with the given start and length.
+   * Returns a subsequence of this value with the given start and length.
    * The following properties must hold:
    * <ul>
    *   <li>{@code start >= 0},
@@ -126,7 +126,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @param qc query context
    * @return sub sequence
    */
-  public abstract Value subSequence(long start, long length, QueryContext qc);
+  public abstract Value subsequence(long start, long length, QueryContext qc);
 
   /**
    * Caches lazy values.

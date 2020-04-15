@@ -72,7 +72,7 @@ public final class FnRemove extends StandardFunc {
     // position out of bounds: return original value
     if(pos <= 0 || pos > size) return value;
     // remove first or last item (size > 0)
-    if(pos == 1 || pos == size) return value.subSequence(pos == 1 ? 1 : 0, size - 1, qc);
+    if(pos == 1 || pos == size) return value.subsequence(pos == 1 ? 1 : 0, size - 1, qc);
     // remove item at supplied position
     return ((Seq) value).remove(pos - 1, qc);
   }

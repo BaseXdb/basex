@@ -11,9 +11,11 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Array {
+  /** Maximum array size (see {@code MAX_ARRAY_SIZE} variable in {@link ArrayList}). */
+  public static final int MAX_SIZE = Integer.MAX_VALUE - 8;
   /** Initial default size for new arrays. */
-  public static final int INITIAL_CAPACITY = 1 << 3;
-  /** Maximum capacity new arrays. */
+  public static final int INITIAL_CAPACITY = 8;
+  /** Maximum capacity for new arrays. */
   public static final int MAX_CAPACITY = 1 << 20;
   /** Default factor for resizing dynamic arrays. */
   public static final double RESIZE_CAPACITY = 1.5;
@@ -304,9 +306,9 @@ public final class Array {
    * @return resulting size
    */
   public static int newCapacity(final int size, final double factor) {
-    final int s = Math.min(Integer.MAX_VALUE - 5, (int) (size * factor) + 1);
-    if(s <= size) throw new ArrayIndexOutOfBoundsException("Maximum array size reached.");
-    return s;
+    final int sz = Math.min(MAX_SIZE, (int) (size * factor) + 1);
+    if(sz > size) return sz;
+    throw new ArrayIndexOutOfBoundsException("Maximum array size reached.");
   }
 
   /**

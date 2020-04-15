@@ -90,7 +90,7 @@ public final class Empty extends Item {
   }
 
   @Override
-  public Empty subSequence(final long start, final long length, final QueryContext qc) {
+  public Empty subsequence(final long start, final long length, final QueryContext qc) {
     return this;
   }
 
