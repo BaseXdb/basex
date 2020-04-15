@@ -235,7 +235,7 @@ public enum QueryError {
   /** Error code. */
   DB_PROPERTY_X(DB, "property", "Unknown database property: %."),
   /** Error code. */
-  DB_RANGE_X_X_X(DB, "range", "Database '%' has no node with % value %."),
+  DB_RANGE_X_X(DB, "range", "Database '%' value out of range: %."),
   /** Error code. */
   DB_TARGET_X(DB, "target", "Invalid target path: %."),
 

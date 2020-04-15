@@ -61,18 +61,16 @@ public final class List extends Arr {
 
     // determine result type, compute number of results, set expression type
     Type type = null;
+    Occ occ = Occ.ZERO;
+    long size = 0;
     for(final Expr expr : exprs) {
       final SeqType et = expr.seqType();
       if(!et.zero()) type = type == null ? et.type : type.union(et.type);
-    }
-    long size = 0;
-    boolean zero = true;
-    for(final Expr expr : exprs) {
       final long sz = expr.size();
-      if(sz > 0 || expr.seqType().oneOrMore()) zero = false;
       if(size != -1) size = sz == -1 ? -1 : size + sz;
+      occ = occ.add(expr.seqType().occ);
     }
-    exprType.assign(type, zero ? Occ.ZERO_MORE : Occ.ONE_MORE, size);
+    exprType.assign(type, occ, size);
 
     // pre-evaluate list; skip expressions with large result sizes
     if(allAreValues(true)) {

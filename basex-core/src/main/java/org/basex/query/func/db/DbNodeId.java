@@ -8,7 +8,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -17,36 +17,40 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
-public final class DbNodeId extends StandardFunc {
+public class DbNodeId extends StandardFunc {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public final Iter iter(final QueryContext qc) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
     return new Iter() {
       @Override
       public Int next() throws QueryException {
         final Item item = qc.next(iter);
-        if(item == null) return null;
-        final DBNode node = toDBNode(item);
-        return Int.get(node.data().id(node.pre()));
+        return item != null ? Int.get(id(toDBNode(item))) : null;
       }
     };
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final LongList list = new LongList();
+  public final Value value(final QueryContext qc) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
-    for(Item item; (item = qc.next(iter)) != null;) {
-      final DBNode node = toDBNode(item);
-      list.add(node.data().id(node.pre()));
-    }
+    final LongList list = new LongList(Array.initialCapacity(iter.size()));
+    for(Item item; (item = qc.next(iter)) != null;) list.add(id(toDBNode(item)));
     return IntSeq.get(list.finish());
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    final SeqType st = seqType();
-    exprType.assign(st.type, st.occ, exprs[0].size());
+  protected final Expr opt(final CompileContext cc) {
+    final Expr expr = exprs[0];
+    exprType.assign(seqType().type, expr.seqType().occ, expr.size());
     return this;
+  }
+
+  /**
+   * Returns the node value.
+   * @param node database node
+   * @return node id
+   */
+  protected int id(final DBNode node) {
+    return node.data().id(node.pre());
   }
 }

@@ -89,7 +89,7 @@ public final class UtilInit extends StandardFunc {
           cc.function(Function.SUBSEQUENCE, info, args(expr)[0], Int.ONE, Int.get(size - 1));
     }
 
-    exprType.assign(st.type, Occ.ZERO_MORE, size - 1);
+    exprType.assign(st.type, seqType().occ, size - 1);
     return this;
   }
 }
