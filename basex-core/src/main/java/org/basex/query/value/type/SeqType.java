@@ -470,15 +470,6 @@ public final class SeqType {
   }
 
   /**
-   * Adds two sequence types.
-   * @param st second type
-   * @return resulting type
-   */
-  public SeqType add(final SeqType st) {
-    return zero() ? st : st.zero() ? this : get(type.union(st.type), occ.add(st.occ));
-  }
-
-  /**
    * Computes the intersection of two sequence types, i.e. the most general type that is
    * sub-type of both types. If no such type exists, {@code null} is returned.
    * @param st second type

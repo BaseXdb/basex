@@ -385,6 +385,15 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void insertBefore() {
+    final Function func = INSERT_BEFORE;
+    query(func.args(1, 1, 1), "1\n1");
+    query("count(" + func.args(" ()", 2, " 1 to 100000000") + ')', 100000000);
+    query("count(" + func.args(" 1 to 100000000", 3, " ()") + ')', 100000000);
+    query("count(" + func.args(" 1 to 100000000", 4, " 1 to 100000000") + ')', 200000000);
+  }
+
+  /** Test method. */
   @Test public void jsonDoc() {
     final Function func = JSON_DOC;
     query(func.args("src/test/resources/example.json") + "('address')('state')", "NY");
