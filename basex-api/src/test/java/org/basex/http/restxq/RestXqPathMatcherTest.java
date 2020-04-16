@@ -139,7 +139,7 @@ public final class RestXqPathMatcherTest {
       final String val) throws Exception {
 
     final QNmMap<String> actual = RestXqPathMatcher.parse(template, null).values(path);
-    assertThat(actual, new CustomTypeSafeMatcher<QNmMap<String>>("values differ") {
+    MatcherAssert.assertThat(actual, new CustomTypeSafeMatcher<QNmMap<String>>("values differ") {
       @Override
       protected boolean matchesSafely(final QNmMap<String> item) {
         return Objects.equals(val, item.get(new QNm(var)));

@@ -1,7 +1,9 @@
 package org.basex.query.up;
 
 import static org.basex.util.Token.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.*;
 
@@ -11,8 +13,7 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.up.atomic.*;
 import org.basex.util.*;
-import org.junit.*;
-import org.junit.rules.*;
+import org.junit.Test;
 
 /**
  * Test the {@link AtomicUpdateCache}.
@@ -21,10 +22,6 @@ import org.junit.rules.*;
  * @author Lukas Kircher
  */
 public final class AtomicUpdatesTest extends SandboxTest {
-  /** Expected exception. */
-  @Rule
-  public final ExpectedException thrown = ExpectedException.none();
-
   /**
    * Basic Lazy Replace tests.
    */
@@ -212,128 +209,127 @@ public final class AtomicUpdatesTest extends SandboxTest {
    * Multiple destructive operations on same node.
    */
   @Test public void updateSequence01() {
-    final AtomicUpdateCache auc = atomics("<a><b/></a>");
-    auc.addDelete(2);
-    thrown.expect(RuntimeException.class);
-    thrown.expectMessage("Multiple deletes/replaces on node");
-    auc.addDelete(2);
+    assertThrows(RuntimeException.class, () -> {
+      final AtomicUpdateCache auc = atomics("<a><b/></a>");
+      auc.addDelete(2);
+      auc.addDelete(2);
+    }, "Multiple deletes/replaces on node");
   }
 
   /**
    * Multiple destructive operations on same node.
    */
   @Test public void updateSequence02() {
-    final AtomicUpdateCache auc = atomics("<a><b/></a>");
-    final MemData md = new MemData(context.options);
-    auc.addDelete(2);
-    thrown.expect(RuntimeException.class);
-    thrown.expectMessage("Multiple deletes/replaces on node");
-    auc.addReplace(2, elemClip(md, "<newb/>", false));
+    assertThrows(RuntimeException.class, () -> {
+      final AtomicUpdateCache auc = atomics("<a><b/></a>");
+      final MemData md = new MemData(context.options);
+      auc.addDelete(2);
+      auc.addReplace(2, elemClip(md, "<newb/>", false));
+    }, "Multiple deletes/replaces on node");
   }
 
   /**
    * Multiple destructive operations on same node.
    */
   @Test public void updateSequence03() {
-    final AtomicUpdateCache auc = atomics("<a><b/></a>");
-    final MemData md = new MemData(context.options);
-    auc.addReplace(2, elemClip(md, "<newb/>", false));
-    thrown.expect(RuntimeException.class);
-    thrown.expectMessage("Multiple deletes/replaces on node");
-    auc.addReplace(2, elemClip(md, "<newb/>", false));
+    assertThrows(RuntimeException.class, () -> {
+      final AtomicUpdateCache auc = atomics("<a><b/></a>");
+      final MemData md = new MemData(context.options);
+      auc.addReplace(2, elemClip(md, "<newb/>", false));
+      auc.addReplace(2, elemClip(md, "<newb/>", false));
+    }, "Multiple deletes/replaces on node");
   }
 
   /**
    * Multiple renames/updates on same node.
    */
   @Test public void updateSequence04() {
-    final AtomicUpdateCache auc = atomics("<a><b/></a>");
-    auc.addRename(2, token("foo"), EMPTY);
-    thrown.expect(RuntimeException.class);
-    thrown.expectMessage("Multiple renames on node");
-    auc.addRename(2, token("foo2"), EMPTY);
+    assertThrows(RuntimeException.class, () -> {
+      final AtomicUpdateCache auc = atomics("<a><b/></a>");
+      auc.addRename(2, token("foo"), EMPTY);
+      auc.addRename(2, token("foo2"), EMPTY);
+    }, "Multiple renames on node");
   }
 
   /**
    * Multiple renames/updates on same node.
    */
   @Test public void updateSequence05() {
-    final AtomicUpdateCache auc = atomics("<a><b/></a>");
-    auc.addUpdateValue(2, token("foo"));
-    thrown.expect(RuntimeException.class);
-    thrown.expectMessage("Multiple updates on node");
-    auc.addUpdateValue(2, token("foo"));
+    assertThrows(RuntimeException.class, () -> {
+      final AtomicUpdateCache auc = atomics("<a><b/></a>");
+      auc.addUpdateValue(2, token("foo"));
+      auc.addUpdateValue(2, token("foo"));
+    }, "Multiple updates on node");
   }
 
   /**
    * Order of updates.
    */
   @Test public void updateSequence06() {
-    final AtomicUpdateCache auc = atomics("<a><b/></a>");
-    auc.addDelete(3);
-    thrown.expect(RuntimeException.class);
-    thrown.expectMessage("Invalid order at location");
-    auc.addDelete(2);
+    assertThrows(RuntimeException.class, () -> {
+      final AtomicUpdateCache auc = atomics("<a><b/></a>");
+      auc.addDelete(3);
+      auc.addDelete(2);
+    }, "Invalid order at location");
   }
 
   /**
    * Order of updates.
    */
   @Test public void updateSequence07() {
-    final AtomicUpdateCache auc = atomics("<a><b/></a>");
-    auc.addRename(2, token("bb"), EMPTY);
-    thrown.expect(RuntimeException.class);
-    thrown.expectMessage("Invalid sequence of value update and destructive update at " +
-        "location 2");
-    auc.addDelete(2);
+    assertThrows(RuntimeException.class, () -> {
+      final AtomicUpdateCache auc = atomics("<a><b/></a>");
+      auc.addRename(2, token("bb"), EMPTY);
+      auc.addDelete(2);
+    }, "Invalid sequence of value update and destructive update at location 2");
   }
 
   /**
    * Order of updates.
    */
   @Test public void updateSequence08() {
-    final AtomicUpdateCache auc = atomics("<a><b/></a>");
-    final MemData md = new MemData(context.options);
-    auc.addDelete(2);
-    thrown.expect(RuntimeException.class);
-    thrown.expectMessage("Invalid sequence of delete, insert at location 2");
-    auc.addInsert(2, 1, elemClip(md, "<dummy/>", false));
+    assertThrows(RuntimeException.class, () -> {
+      final AtomicUpdateCache auc = atomics("<a><b/></a>");
+      final MemData md = new MemData(context.options);
+      auc.addDelete(2);
+      auc.addInsert(2, 1, elemClip(md, "<dummy/>", false));
+    }, "Invalid sequence of delete, insert at location 2");
   }
 
   /**
    * Order of updates.
    */
   @Test public void updateSequence09() {
-    final AtomicUpdateCache auc = atomics("<a><b id='0'/></a>");
-    final MemData md = new MemData(context.options);
-    auc.addDelete(3);
-    thrown.expect(RuntimeException.class);
-    thrown.expectMessage("Invalid sequence of delete, insert at location 3");
-    auc.addInsert(3, 2, attrClip(md, "id", "1"));
+    assertThrows(RuntimeException.class, () -> {
+      final AtomicUpdateCache auc = atomics("<a><b id='0'/></a>");
+      final MemData md = new MemData(context.options);
+      auc.addDelete(3);
+      auc.addInsert(3, 2, attrClip(md, "id", "1"));
+    }, "Invalid sequence of delete, insert at location 3");
   }
 
   /**
    * Order of updates.
    */
   @Test public void updateSequence10() {
-    final AtomicUpdateCache auc = atomics("<a><b/></a>");
-    final MemData md = new MemData(context.options);
-    auc.addReplace(2, elemClip(md, "<bb/>", false));
-    thrown.expect(RuntimeException.class);
-    thrown.expectMessage("Invalid sequence of replace, insert at location 2");
-    auc.addInsert(2, 1, elemClip(md, "<dummy/>", false));
+    assertThrows(RuntimeException.class, () -> {
+      final AtomicUpdateCache auc = atomics("<a><b/></a>");
+      final MemData md = new MemData(context.options);
+      auc.addReplace(2, elemClip(md, "<bb/>", false));
+      auc.addInsert(2, 1, elemClip(md, "<dummy/>", false));
+    }, "Invalid sequence of replace, insert at location 2");
   }
 
   /**
    * Order of updates.
    */
   @Test public void updateSequence11() {
-    final AtomicUpdateCache auc = atomics("<a><b id='0'/></a>");
-    final MemData md = new MemData(context.options);
-    auc.addReplace(3, attrClip(md, "id", "11"));
-    thrown.expect(RuntimeException.class);
-    thrown.expectMessage("Invalid sequence of replace, insert at location 3");
-    auc.addInsert(3, 2, attrClip(md, "id", "1"));
+    assertThrows(RuntimeException.class, () -> {
+      final AtomicUpdateCache auc = atomics("<a><b id='0'/></a>");
+      final MemData md = new MemData(context.options);
+      auc.addReplace(3, attrClip(md, "id", "11"));
+      auc.addInsert(3, 2, attrClip(md, "id", "1"));
+    }, "Invalid sequence of replace, insert at location 3");
   }
 
   /**
@@ -341,9 +337,9 @@ public final class AtomicUpdatesTest extends SandboxTest {
    */
   @Test public void calculatePreValues() {
     final String doc =
-        "<n1>" +
-            "<n2/><n3/><n4/><n5/><n6/><n7/><n8/><n9/><n10/><n11/>" +
-        "</n1>";
+      "<n1>" +
+        "<n2/><n3/><n4/><n5/><n6/><n7/><n8/><n9/><n10/><n11/>" +
+      "</n1>";
     AtomicUpdateCache auc = atomics(doc);
     auc.addDelete(3);
     auc.applyUpdates();

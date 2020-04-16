@@ -11,6 +11,10 @@
     <relativePath>..</relativePath>
   </parent>
 
+  <properties>
+    <jettyVersion>9.4.28.v20200408</jettyVersion>
+  </properties>
+
   <name>BaseX API</name>
 
   <dependencies>
@@ -60,9 +64,9 @@
       <artifactId>slf4j-simple</artifactId>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+   </dependency>
     <dependency>
       <groupId>com.vividsolutions</groupId>
       <artifactId>jts</artifactId>
@@ -106,7 +110,7 @@
       <plugin>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-maven-plugin</artifactId>
-        <version>9.4.27.v20200227</version>
+        <version>${jettyVersion}</version>
         <configuration>
           <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXml>
           <stopKey>keyToStopJetty</stopKey>

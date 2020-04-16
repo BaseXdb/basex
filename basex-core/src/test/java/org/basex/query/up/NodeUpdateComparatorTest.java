@@ -1,6 +1,6 @@
 package org.basex.query.up;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 import java.util.List;
@@ -10,9 +10,8 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.node.*;
-import org.junit.*;
 import org.junit.Test;
-import org.junit.rules.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests {@link NodeUpdateComparator} that creates an order on update primitives
@@ -22,9 +21,6 @@ import org.junit.rules.*;
  * @author Lukas Kircher
  */
 public final class NodeUpdateComparatorTest extends SandboxTest {
-  /** Expected exception. */
-  @Rule
-  public final ExpectedException thrown = ExpectedException.none();
   /** Test document. */
   private static final String TESTDOCUMENT =
     "<n1>" +
@@ -176,15 +172,15 @@ public final class NodeUpdateComparatorTest extends SandboxTest {
    * Test if an exception is thrown for duplicate {@link NodeUpdate}.
    */
   @Test public void duplicateScore() {
-    thrown.expect(RuntimeException.class);
-    thrown.expectMessage("Ambiguous order of UpdatePrimitives: ");
-    final String doc = "<a><b/></a>";
-    final Data d = data(doc);
-    compare(
-      new NodeUpdate[] {
-      new DeleteNode(2, d, null),
-      new DeleteNode(2, d, null),
-    });
+    assertThrows(RuntimeException.class, () -> {
+      final String doc = "<a><b/></a>";
+      final Data d = data(doc);
+      compare(
+        new NodeUpdate[] {
+        new DeleteNode(2, d, null),
+        new DeleteNode(2, d, null),
+      });
+    }, "Ambiguous order of UpdatePrimitives: ");
   }
 
   /**
@@ -501,7 +497,7 @@ public final class NodeUpdateComparatorTest extends SandboxTest {
       final NodeUpdate p = l.get(s - i - 1);
       final NodeUpdate p2 = l2.get(s - i - 1);
       if(!p.equals(order[i]) || !p2.equals(order[i]))
-        fail("Unexpected order of updates at position: " + i);
+        Assertions.fail("Unexpected order of updates at position: " + i);
     }
   }
 }
