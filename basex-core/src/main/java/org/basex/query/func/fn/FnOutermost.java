@@ -2,12 +2,14 @@ package org.basex.query.func.fn;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -88,5 +90,11 @@ public class FnOutermost extends StandardFunc {
       }
     }
     return nodes.value(this).iter();
+  }
+
+  @Override
+  protected final Expr opt(final CompileContext cc) throws QueryException {
+    final SeqType st1 = exprs[0].seqType();
+    return st1.zeroOrOne() && st1.type instanceof NodeType ? exprs[0] : this;
   }
 }

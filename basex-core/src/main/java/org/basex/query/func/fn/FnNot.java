@@ -38,7 +38,7 @@ public final class FnNot extends StandardFunc {
       return FnBoolean.get(args(expr)[0], info, cc.sc());
     }
     // not('a' = 'b') -> 'a' != 'b'
-    if(expr instanceof CmpV || expr instanceof CmpG) {
+    if(expr instanceof Cmp) {
       final Expr ex = ((Cmp) expr).invert(cc);
       if(ex != expr) return ex;
     }

@@ -135,7 +135,7 @@ public class FnMin extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return optMinmax(OpV.GT);
+    return opt(OpV.GT);
   }
 
   /**
@@ -143,7 +143,7 @@ public class FnMin extends StandardFunc {
    * @param cmp comparator
    * @return optimized or original item
    */
-  final Expr optMinmax(final OpV cmp) {
+  final Expr opt(final OpV cmp) {
     Expr expr = optFirst();
     if(expr != this) return expr;
 

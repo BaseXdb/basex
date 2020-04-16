@@ -21,9 +21,8 @@ public final class FnExists extends FnEmpty {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    final Bln empty = opt();
-    return empty == null ? this : Bln.get(!empty.bool(info));
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    return opt(false, cc);
   }
 
   @Override

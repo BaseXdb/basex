@@ -23,14 +23,7 @@ public class FnEmpty extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    if(exprs[0] instanceof List) {
-      final List list = (List) exprs[0];
-      if(list.seqType().type instanceof NodeType) {
-        exprs[0] = new Union(info, list.exprs).optimize(cc);
-      }
-    }
-    final Bln empty = opt();
-    return empty == null ? this : empty;
+    return opt(true, cc);
   }
 
   /**
@@ -48,17 +41,26 @@ public class FnEmpty extends StandardFunc {
 
   /**
    * Optimizes an existence check.
-   * @return boolean result, or {@code null} if no optimization is possible
+   * @param empty empty flag
+   * @param cc compilation context
+   * @return boolean result or original expression
+   * @throws QueryException query exception
    */
-  final Bln opt() {
-    // ignore non-deterministic expressions (e.g.: empty(error()))
+  final Expr opt(final boolean empty, final CompileContext cc) throws QueryException {
     final Expr expr = exprs[0];
+    final SeqType st = expr.seqType();
+
+    // ignore non-deterministic expressions (e.g.: empty(error()))
     if(!expr.has(Flag.NDT)) {
-      final long size = expr.size();
-      if(size != -1) return Bln.get(size == 0);
-      if(expr.seqType().oneOrMore()) return Bln.FALSE;
+      if(st.zero()) return Bln.get(empty);
+      if(st.oneOrMore()) return Bln.get(!empty);
     }
-    return null;
+
+    // rewrite list to union expression
+    if(expr instanceof List && expr.seqType().type instanceof NodeType) {
+      exprs[0] = new Union(info, ((List) expr).exprs).optimize(cc);
+    }
+    return this;
   }
 
   @Override

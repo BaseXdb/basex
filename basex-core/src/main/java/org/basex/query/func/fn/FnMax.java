@@ -20,6 +20,6 @@ public final class FnMax extends FnMin {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return optMinmax(OpV.LT);
+    return opt(OpV.LT);
   }
 }

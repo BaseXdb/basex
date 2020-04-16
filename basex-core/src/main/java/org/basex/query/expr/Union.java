@@ -57,20 +57,26 @@ public final class Union extends Set {
     }
     exprs = list.finish();
 
-    switch(exprs.length) {
-      case 0:  return Empty.VALUE;
-      case 1:  return iterative ? exprs[0] : cc.function(Function._UTIL_DDO, info, exprs[0]);
-      default: return merge(cc) ? cc.replaceWith(this, exprs[0]) : this;
-    }
+    final int el = exprs.length;
+    if(el == 0) return Empty.VALUE;
+    if(el == 1) return iterative ? exprs[0] : cc.function(Function._UTIL_DDO, info, exprs[0]);
+
+    // try to merge paths
+    final Expr expr = merge(cc);
+    if(expr != null) return cc.replaceWith(this, expr);
+
+    // check if expression will yield at least one node
+    if(((Checks<Expr>) ex -> ex.seqType().oneOrMore()).any(exprs)) exprType.assign(Occ.ONE_MORE);
+    return this;
   }
 
   /**
    * Tries to merge steps with identical axes and nodes types to a single step.
    * @param cc compilation context
-   * @return success flag
+   * @return merged expression or {@code null}
    * @throws QueryException query exception
    */
-  private boolean merge(final CompileContext cc) throws QueryException {
+  private Expr merge(final CompileContext cc) throws QueryException {
     Expr root = null;
     Axis axis = null;
     Expr[] preds = null;
@@ -78,9 +84,9 @@ public final class Union extends Set {
 
     // check if all expressions are paths that can be merged
     for(final Expr expr : exprs) {
-      if(!(expr instanceof Path)) return false;
+      if(!(expr instanceof Path)) return null;
       final Path path = (Path) expr;
-      if(path.steps.length > 1 || !(path.steps[0] instanceof Step)) return false;
+      if(path.steps.length > 1 || !(path.steps[0] instanceof Step)) return null;
 
       final Step step = (Step) path.steps[0];
       if(axis == null) {
@@ -89,11 +95,11 @@ public final class Union extends Set {
         axis = step.axis;
         preds = step.exprs;
         if(root != null && root.has(Flag.CNS, Flag.NDT, Flag.POS) ||
-          step.has(Flag.CNS, Flag.NDT, Flag.POS)) return false;
+          step.has(Flag.CNS, Flag.NDT, Flag.POS)) return null;
       } else {
         // further passes: compare with first root and step
         if(!(Objects.equals(root, path.root) && axis == step.axis &&
-          Arrays.equals(preds, step.exprs))) return false;
+          Arrays.equals(preds, step.exprs))) return null;
       }
 
       // collect tests
@@ -102,11 +108,10 @@ public final class Union extends Set {
 
     // try to merge tests
     final Test test = Test.get(tests);
-    if(test == null) return false;
+    if(test == null) return null;
 
     final Expr step = new StepBuilder(info).axis(axis).test(test).preds(preds).finish(cc, root);
-    exprs[0] = Path.get(info, root, step).optimize(cc);
-    return true;
+    return Path.get(info, root, step).optimize(cc);
   }
 
   @Override
