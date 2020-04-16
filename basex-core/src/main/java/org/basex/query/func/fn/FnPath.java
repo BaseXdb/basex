@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -20,12 +21,12 @@ import org.basex.util.list.*;
  */
 public final class FnPath extends ContextFn {
   /** Root function string. */
-  private static final byte[] ROOT = Token.token("root()");
-  /** Node position cache. Caches the 1000 last accessed nodes. */
-  private final Map<ANode, Integer> cache = Collections.synchronizedMap(
-    new LinkedHashMap<ANode, Integer>(16, 0.75f, true) {
+  private static final byte[] ROOT = QNm.eqName(QueryText.FN_URI, Token.token("root()"));
+  /** Path cache. Caches the 1000 last accessed elements. */
+  private final Map<ANode, byte[]> paths = Collections.synchronizedMap(
+    new LinkedHashMap<ANode, byte[]>(16, 0.75f, true) {
       @Override
-      protected boolean removeEldestEntry(final Map.Entry<ANode, Integer> eldest) {
+      protected boolean removeEldestEntry(final Map.Entry<ANode, byte[]> eldest) {
         return size() > 1000;
       }
     }
@@ -36,11 +37,23 @@ public final class FnPath extends ContextFn {
     ANode node = toNodeOrNull(ctxArg(0, qc), qc);
     if(node == null) return Empty.VALUE;
 
-    final TokenList tl = new TokenList();
     final TokenBuilder tb = new TokenBuilder();
+    final TokenList steps = new TokenList();
+    final ANodeList nodes = new ANodeList();
+
     while(true) {
-      final ANode parent = node.parent();
-      if(parent == null) break;
+      // skip ancestor traversal if cached path is found
+      final byte[] path = paths.get(node);
+      if(path != null) {
+        tb.add(path);
+        break;
+      }
+      // root node: finalize traversal
+      ANode parent = node.parent();
+      if(parent == null) {
+        if(node.type != NodeType.DOC) tb.add(ROOT);
+        break;
+      }
 
       final QNm qname = node.qname();
       final Type type = node.type;
@@ -54,14 +67,17 @@ public final class FnPath extends ContextFn {
         tb.add(type.string()).add('(').add(qname.local());
         tb.add(")[").addInt(pi(node, qname, qc)).add(']');
       }
-      tl.add(tb.next());
+      steps.add(tb.next());
+      nodes.add(node);
       node = parent;
     }
 
-    // add root function
-    if(node.type != NodeType.DOC) tb.add(QNm.eqName(QueryText.FN_URI, ROOT));
-    // add all steps in reverse order
-    for(int i = tl.size() - 1; i >= 0; --i) tb.add('/').add(tl.get(i));
+    // add all steps in reverse order; cache element paths
+    for(int s = steps.size() - 1; s >= 0; --s) {
+      tb.add('/').add(steps.get(s));
+      node = nodes.get(s);
+      if(node.type == NodeType.ELM) paths.put(node, tb.toArray());
+    }
     return Str.get(tb.isEmpty() ? Token.SLASH : tb.finish());
   }
 
@@ -73,9 +89,6 @@ public final class FnPath extends ContextFn {
    * @return index
    */
   private int element(final ANode node, final QNm qname, final QueryContext qc) {
-    final Integer pos = cache.get(node);
-    if(pos != null) return pos;
-
     int p = 1;
     final BasicNodeIter iter = node.precedingSiblingIter();
     for(ANode fs; (fs = iter.next()) != null;) {
@@ -83,7 +96,6 @@ public final class FnPath extends ContextFn {
       final QNm qnm = fs.qname();
       if(qnm != null && qnm.eq(qname)) p++;
     }
-    cache.put(node, p);
     return p;
   }
 
