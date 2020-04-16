@@ -201,6 +201,11 @@ public abstract class FNode extends ANode {
   }
 
   @Override
+  public final int hashCode() {
+    return id;
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     if(!(obj instanceof FNode)) return false;
     final FNode n = (FNode) obj;

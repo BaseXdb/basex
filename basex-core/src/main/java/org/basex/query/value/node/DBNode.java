@@ -434,6 +434,11 @@ public class DBNode extends ANode {
   }
 
   @Override
+  public final int hashCode() {
+    return data.hashCode() + pre;
+  }
+
+  @Override
   public final boolean equals(final Object obj) {
     return obj instanceof DBNode && is((DBNode) obj);
   }
