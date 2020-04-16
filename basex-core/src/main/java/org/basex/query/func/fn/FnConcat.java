@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -27,15 +28,29 @@ public final class FnConcat extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
+    // merge adjacent values, ignore empty sequences
     final int el = exprs.length;
     final ExprList list = new ExprList(el);
+    final TokenBuilder tb = new TokenBuilder();
     for(final Expr expr : exprs) {
-      if(expr != Empty.VALUE) list.add(expr);
+      if(expr instanceof Value) {
+        final Item item = expr.atomItem(cc.qc, info);
+        if(item != Empty.VALUE) tb.add(item.string(info));
+      } else {
+        if(!tb.isEmpty()) list.add(Str.get(tb.next()));
+        list.add(expr);
+      }
     }
+    if(list.isEmpty()) return Str.get(tb.finish());
+    if(!tb.isEmpty()) list.add(Str.get(tb.finish()));
+
+    // single expression left: replace with string call
     final int ls = list.size();
-    if(ls == el) return this;
-    if(ls == 1) return cc.function(Function.STRING, info, list.get(0));
-    if(ls == 0) return Str.ZERO;
-    return cc.function(Function.CONCAT, info, list.finish());
+    if(ls == 1) return cc.function(Function.STRING, info, list.peek());
+
+    // replace old with new expressions
+    if(ls != el) cc.info(QueryText.OPTMERGE_X, this);
+    exprs = list.finish();
+    return this;
   }
 }

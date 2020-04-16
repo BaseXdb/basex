@@ -912,10 +912,8 @@ public final class Token {
    * @return substring
    */
   public static byte[] substring(final byte[] token, final int start, final int end) {
-    final int s = Math.max(0, start);
-    final int e = Math.min(end, token.length);
-    if(s == 0 && e == token.length) return token;
-    return s >= e ? EMPTY : Arrays.copyOfRange(token, s, e);
+    final int tl = token.length, s = Math.max(0, start), e = Math.min(end, tl);
+    return s == 0 && e == tl ? token : s < e ? Arrays.copyOfRange(token, s, e) : EMPTY;
   }
 
   /**

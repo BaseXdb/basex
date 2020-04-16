@@ -123,7 +123,8 @@ public final class Strings {
   public static String[] split(final String string, final char separator, final int limit) {
     final StringList sl = new StringList(Array.initialCapacity(limit));
     final int tl = string.length();
-    int s = 0, c = 1, l = limit >= 0 ? limit : Integer.MAX_VALUE;
+    int s = 0, c = 1;
+    final int l = limit >= 0 ? limit : Integer.MAX_VALUE;
     for(int p = 0; p < tl && c < l; p++) {
       if(string.charAt(p) == separator) {
         sl.add(string.substring(s, p));

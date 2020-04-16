@@ -19,6 +19,9 @@ public final class FnSubstringAfter extends StandardFunc {
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] string = toZeroToken(exprs[0], qc), sub = toZeroToken(exprs[1], qc);
     final Collation coll = toCollation(2, qc);
+    if(string.length == 0) return Str.ZERO;
+    if(sub.length == 0) return Str.get(string);
+
     if(coll == null) {
       final int pos = indexOf(string, sub);
       return pos == -1 ? Str.ZERO : Str.get(substring(string, pos + sub.length));

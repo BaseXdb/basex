@@ -3,9 +3,11 @@ package org.basex.query.func.fn;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -34,5 +36,12 @@ public final class FnStringJoin extends StandardFunc {
       tb.add(token).add(item.string(info));
     } while((item = qc.next(iter)) != null);
     return Str.get(tb.finish());
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final SeqType st1 = exprs[0].seqType(), st2 = (exprs.length > 1 ? exprs[1] : Str.WC).seqType();
+    return (st1.zero() || st1.one() && st1.type.isStringOrUntyped()) &&
+        st2.type.isStringOrUntyped() ? cc.function(Function.STRING, info, exprs[0]) : this;
   }
 }
