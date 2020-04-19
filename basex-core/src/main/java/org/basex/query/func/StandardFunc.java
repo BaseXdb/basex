@@ -269,6 +269,20 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Checks if the specified item has the specified Date type.
+   * If it is item, the specified Date is returned.
+   * @param item item to be checked
+   * @param type target type
+   * @param qc query context
+   * @return date
+   * @throws QueryException query exception
+   */
+  protected ADate toDate(final Item item, final AtomType type, final QueryContext qc)
+      throws QueryException {
+    return (ADate) (item.type.isUntyped() ? type.cast(item, qc, sc, info) : checkType(item, type));
+  }
+
+  /**
    * Checks if the specified expression is a database node.
    * Returns the node or an exception.
    * @param item item to be checked

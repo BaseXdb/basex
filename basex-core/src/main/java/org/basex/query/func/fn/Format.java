@@ -43,7 +43,7 @@ abstract class Format extends StandardFunc {
     }
     final byte[] place = more ? toZeroToken(exprs[4], qc) : EMPTY;
 
-    final ADate date = (ADate) checkType(item, tp);
+    final ADate date = toDate(item, tp, qc);
     final Formatter form = Formatter.get(language);
     return Str.get(form.formatDate(date, language, picture, calendar, place, sc, info));
   }

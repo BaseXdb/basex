@@ -30,20 +30,6 @@ abstract class DateTime extends StandardFunc {
   }
 
   /**
-   * Checks if the specified item has the specified Date type.
-   * If it is item, the specified Date is returned.
-   * @param item item to be checked
-   * @param type target type
-   * @param qc query context
-   * @return date
-   * @throws QueryException query exception
-   */
-  protected ADate checkDate(final Item item, final AtomType type, final QueryContext qc)
-      throws QueryException {
-    return (ADate) (item.type.isUntyped() ? type.cast(item, qc, sc, info) : checkType(item, type));
-  }
-
-  /**
    * Returns the timezone.
    * @param it input item
    * @return timezone or {@link Empty#VALUE}
@@ -63,13 +49,10 @@ abstract class DateTime extends StandardFunc {
   protected ADate adjust(final Item item, final AtomType type, final QueryContext qc)
       throws QueryException {
 
-    final ADate ad;
-    if(item.type.isUntyped()) {
-      ad = (ADate) type.cast(item, qc, sc, info);
-    } else {
-      // clone item
-      final ADate a = (ADate) checkType(item, type);
-      ad = type == AtomType.TIM ? new Tim(a) : type == AtomType.DAT ? new Dat(a) : new Dtm(a);
+    // clone item
+    ADate ad = toDate(item, type, qc);
+    if(!item.type.isUntyped()) {
+      ad = type == AtomType.TIM ? new Tim(ad) : type == AtomType.DAT ? new Dat(ad) : new Dtm(ad);
     }
     final boolean spec = exprs.length == 2;
     final Item zon = spec ? exprs[1].atomItem(qc, info) : Empty.VALUE;
