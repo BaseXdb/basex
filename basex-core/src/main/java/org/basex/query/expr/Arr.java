@@ -231,11 +231,12 @@ public abstract class Arr extends ParseExpr {
   }
 
   /**
-   * Prints array entries with the specified separator.
-   * @param sep separator
+   * Returns a string representation of this expression.
+   * Separates the array entries with the specified separator.
+   * @param separator separator (operator, delimiter)
    * @return string representation
    */
-  protected String toString(final String sep) {
-    return new TokenBuilder().add(PAREN1).addSep(exprs, sep).add(PAREN2).toString();
+  protected String toString(final String separator) {
+    return new TokenBuilder().add(PAREN1).addSeparated(exprs, separator).add(PAREN2).toString();
   }
 }

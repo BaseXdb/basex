@@ -61,11 +61,6 @@ public final class CComm extends CNode {
   }
 
   @Override
-  public String description() {
-    return info(COMMENT);
-  }
-
-  @Override
   public String toString() {
     return toString(COMMENT);
   }

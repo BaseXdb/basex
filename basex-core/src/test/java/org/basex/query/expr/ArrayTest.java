@@ -179,7 +179,7 @@ public final class ArrayTest extends SandboxTest {
   @Test public void piConstructor() {
     query("processing-instruction { ['a'] } { ['b'] }", "<?a b?>");
 
-    error("processing-instruction { [] } { }", EMPTYFOUND_X);
+    error("processing-instruction { [] } { }", STRNCN_X_X);
     error("processing-instruction { ['a', 'b'] } { }", SEQFOUND_X);
   }
 

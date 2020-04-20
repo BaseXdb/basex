@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -39,17 +40,15 @@ public abstract class CNode extends Arr {
     return Flag.CNS.in(flags) || super.has(flags);
   }
 
-  /**
-   * Returns a string info for the expression.
-   * @param pref info prefix
-   * @return string
-   */
-  static String info(final String pref) {
-    return pref + " constructor";
+  @Override
+  public final String description() {
+    return new TokenBuilder().add(seqType().type.string()).add(" constructor").toString();
   }
 
   @Override
-  protected String toString(final String pref) {
-    return pref + " { " + super.toString(SEP) + " }";
+  protected String toString(final String kind) {
+    final StringBuilder sb = new StringBuilder().append(kind).append(" { ");
+    if(exprs.length > 0 && exprs[0] != Empty.VALUE) sb.append(super.toString(SEP)).append(' ');
+    return sb.append('}').toString();
   }
 }

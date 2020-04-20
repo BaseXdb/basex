@@ -1,6 +1,7 @@
 package org.basex.query.expr.constr;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -8,6 +9,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -19,25 +21,21 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 abstract class CName extends CNode {
-  /** Description. */
-  private final String desc;
   /** QName. */
   Expr name;
 
   /**
    * Constructor.
-   * @param desc description
    * @param sc static context
    * @param info input info
    * @param seqType sequence type
    * @param name name
    * @param cont contents
    */
-  CName(final String desc, final StaticContext sc, final InputInfo info, final SeqType seqType,
-      final Expr name, final Expr... cont) {
+  CName(final StaticContext sc, final InputInfo info, final SeqType seqType, final Expr name,
+      final Expr... cont) {
     super(sc, info, seqType, cont);
     this.name = name;
-    this.desc = desc;
   }
 
   @Override
@@ -80,13 +78,13 @@ abstract class CName extends CNode {
   }
 
   /**
-   * Returns an updated name expression.
-   * @param qc query context
+   * Evaluates the name expression as a QName.
    * @param elem element
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  final QNm qname(final QueryContext qc, final boolean elem) throws QueryException {
+  final QNm qname(final boolean elem, final QueryContext qc) throws QueryException {
     final Item item = checkNoEmpty(name.atomItem(qc, info), AtomType.QNM);
     final Type type = item.type;
     if(type == AtomType.QNM) return (QNm) item;
@@ -98,6 +96,24 @@ abstract class CName extends CNode {
       return elem || Token.contains(str, ':') ? new QNm(str, sc) : new QNm(str);
     }
     throw INVNAME_X.get(info, str);
+  }
+
+  /**
+   * Evaluates the name expression as a NCName.
+   * @param empty allow empty name
+   * @param qc query context
+   * @return name
+   * @throws QueryException query exception
+   */
+  final byte[] ncname(final boolean empty, final QueryContext qc) throws QueryException {
+    final Item item = name.atomItem(qc, info);
+    if(item != Empty.VALUE) {
+      final Type type = item.type;
+      if(!type.isStringOrUntyped() || type == AtomType.URI) throw STRNCN_X_X.get(info, type, item);
+      return trim(item.string(info));
+    }
+    if(empty) return Token.EMPTY;
+    throw STRNCN_X_X.get(info, SeqType.EMP, item);
   }
 
   @Override
@@ -144,17 +160,16 @@ abstract class CName extends CNode {
   }
 
   @Override
-  public final String description() {
-    return info(desc);
-  }
-
-  @Override
   public final void plan(final QueryPlan plan) {
     plan.add(plan.create(this), name, exprs);
   }
 
   @Override
-  public final String toString() {
-    return toString(desc + (name.seqType().eq(SeqType.QNM_O) ? " " + name : " { " + name + " }"));
+  protected final String toString(final String kind) {
+    final TokenBuilder tb = new TokenBuilder().add(kind).add(' ');
+    if(name instanceof Str) tb.add(((Str) name).string());
+    else if(name instanceof QNm) tb.add(((QNm) name).id());
+    else tb.add("{ ").addExt(name).add(" }");
+    return super.toString(tb.toString());
   }
 }

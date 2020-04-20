@@ -37,7 +37,7 @@ public final class CElem extends CName {
    */
   public CElem(final StaticContext sc, final InputInfo info, final Expr name, final Atts nspaces,
       final Expr... cont) {
-    super(ELEMENT, sc, info, SeqType.ELM_O, name, cont);
+    super(sc, info, SeqType.ELM_O, name, cont);
     this.nspaces = nspaces == null ? new Atts() : nspaces;
     comp = nspaces == null;
   }
@@ -68,7 +68,7 @@ public final class CElem extends CName {
       for(int i = 0; i < nl; i++) inscopeNS.add(nspaces.name(i), nspaces.value(i));
 
       // create and check QName
-      final QNm nm = qname(qc, true);
+      final QNm nm = qname(true, qc);
       final byte[] cp = nm.prefix(), cu = nm.uri();
       if(eq(cp, XML) ^ eq(cu, XML_URI)) throw CEXML.get(info, cu, cp);
       if(eq(cu, XMLNS_URI)) throw CEINV_X.get(info, cu);
@@ -196,5 +196,10 @@ public final class CElem extends CName {
     if(!(obj instanceof CElem)) return false;
     final CElem c = (CElem) obj;
     return comp == c.comp && nspaces.equals(c.nspaces) && super.equals(obj);
+  }
+
+  @Override
+  public String toString() {
+    return toString(ELEMENT);
   }
 }

@@ -284,13 +284,13 @@ public final class TokenBuilder {
   /**
    * Adds multiple strings to the token, separated by the specified string.
    * @param objects the object to be added
-   * @param sep separator string
+   * @param separator separator string
    * @return self reference
    */
-  public TokenBuilder addSep(final Object[] objects, final String sep) {
+  public TokenBuilder addSeparated(final Object[] objects, final String separator) {
     final int ol = objects.length;
     for(int o = 0; o < ol; o++) {
-      if(o != 0) add(sep);
+      if(o != 0) add(separator);
       add(objects[o]);
     }
     return this;

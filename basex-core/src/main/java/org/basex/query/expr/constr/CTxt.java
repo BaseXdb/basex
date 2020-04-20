@@ -80,11 +80,6 @@ public final class CTxt extends CNode {
   }
 
   @Override
-  public String description() {
-    return info(TEXT);
-  }
-
-  @Override
   public String toString() {
     return toString(TEXT);
   }

@@ -27,20 +27,20 @@ public final class CNSpace extends CName {
    * @param value value
    */
   public CNSpace(final StaticContext sc, final InputInfo info, final Expr name, final Expr value) {
-    super(NAMESPACE, sc, info, SeqType.NSP_O, name, value);
+    super(sc, info, SeqType.NSP_O, name, value);
   }
 
   @Override
   public FNSpace item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] cp = trim(toZeroToken(name, qc));
-    if(cp.length != 0 && !XMLToken.isNCName(cp)) throw INVNSNAME_X.get(info, cp);
+    final byte[] nm = ncname(true, qc);
+    if(nm.length != 0 && !XMLToken.isNCName(nm)) throw INVNSNAME_X.get(info, nm);
 
-    final byte[] cu = atomValue(qc);
-    if(eq(cp, XML) ^ eq(cu, XML_URI)) throw CNXML.get(info);
-    if(eq(cp, XMLNS)) throw CNINV_X.get(info, cp);
-    if(eq(cu, XMLNS_URI) || cu.length == 0) throw CNINVNS_X.get(info, cu);
+    final byte[] value = atomValue(qc);
+    if(eq(nm, XML) ^ eq(value, XML_URI)) throw CNXML.get(info);
+    if(eq(nm, XMLNS)) throw CNINV_X.get(info, nm);
+    if(eq(value, XMLNS_URI) || value.length == 0) throw CNINVNS_X.get(info, value);
 
-    return new FNSpace(cp, cu);
+    return new FNSpace(nm, value);
   }
 
   @Override
@@ -51,5 +51,10 @@ public final class CNSpace extends CName {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof CNSpace && super.equals(obj);
+  }
+
+  @Override
+  public String toString() {
+    return toString(NAMESPACE);
   }
 }

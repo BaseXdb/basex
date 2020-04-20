@@ -2676,7 +2676,7 @@ public class QueryParser extends InputParser {
         if(atts == null) atts = new ArrayList<>(1);
         atts.add(attn);
         qnames.add(attn, false, info());
-        add(cont, new CAttr(sc, info(), false, attn, attv.finish()));
+        add(cont, new CAttr(sc, info(), attn, false, attv.finish()));
       }
       if(!consumeWS()) break;
     }
@@ -2835,7 +2835,7 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(NAMESPACE)) return consume(compNamespace(), p);
     if(wsConsumeWs(TEXT))      return consume(compText(), p);
     if(wsConsumeWs(COMMENT))   return consume(compComment(), p);
-    if(wsConsumeWs(PI))        return consume(compPI(), p);
+    if(wsConsumeWs(PROCESSING_INSTRUCTION))        return consume(compPI(), p);
     return null;
   }
 
@@ -2905,7 +2905,7 @@ public class QueryParser extends InputParser {
     }
 
     skipWs();
-    return curr('{') ? new CAttr(sc, info(), true, name, enclosedExpr()) : null;
+    return curr('{') ? new CAttr(sc, info(), name, true, enclosedExpr()) : null;
   }
 
   /**

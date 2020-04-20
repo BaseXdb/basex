@@ -22,7 +22,6 @@ import org.basex.util.hash.*;
 public final class CAttr extends CName {
   /** Generated namespace. */
   private static final byte[] NS0 = token("ns0:");
-
   /** Computed constructor. */
   private final boolean comp;
 
@@ -30,19 +29,19 @@ public final class CAttr extends CName {
    * Constructor.
    * @param sc static context
    * @param info input info
-   * @param comp computed construction flag
    * @param name name
-   * @param values attribute values
+   * @param computed computed construction flag
+   * @param value attribute value
    */
-  public CAttr(final StaticContext sc, final InputInfo info, final boolean comp, final Expr name,
-      final Expr... values) {
-    super(ATTRIBUTE, sc, info, SeqType.ATT_O, name, values);
-    this.comp = comp;
+  public CAttr(final StaticContext sc, final InputInfo info, final Expr name,
+      final boolean computed, final Expr... value) {
+    super(sc, info, SeqType.ATT_O, name, value);
+    this.comp = computed;
   }
 
   @Override
   public FAttr item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    QNm nm = qname(qc, false);
+    QNm nm = qname(false, qc);
     final byte[] cp = nm.prefix();
     if(comp) {
       final byte[] cu = nm.uri();
@@ -65,11 +64,16 @@ public final class CAttr extends CName {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new CAttr(sc, info, comp, name.copy(cc, vm), copyAll(cc, vm, exprs));
+    return new CAttr(sc, info, name.copy(cc, vm), comp, copyAll(cc, vm, exprs));
   }
 
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof CAttr && comp == ((CAttr) obj).comp && super.equals(obj);
+  }
+
+  @Override
+  public String toString() {
+    return toString(ATTRIBUTE);
   }
 }

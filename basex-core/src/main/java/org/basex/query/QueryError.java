@@ -1069,7 +1069,7 @@ public enum QueryError {
   /** Error code. */
   STRQNM_X_X(XPTY, 4, "String or QName expected, % found: %."),
   /** Error code. */
-  CPIWRONG_X_X(XPTY, 4, "String or NCName expected, % found: %."),
+  STRNCN_X_X(XPTY, 4, "String or NCName expected, % found: %."),
   /** Error code. */
   INVTYPE_X_X_X(XPTY, 4, "Cannot convert % to %: %."),
   /** Error code. */

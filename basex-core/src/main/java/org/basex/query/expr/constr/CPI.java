@@ -28,25 +28,14 @@ public final class CPI extends CName {
    * @param value value
    */
   public CPI(final StaticContext sc, final InputInfo info, final Expr name, final Expr value) {
-    super(PI, sc, info, SeqType.PI_O, name, value);
+    super(sc, info, SeqType.PI_O, name, value);
   }
 
   @Override
   public FPI item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = checkNoEmpty(name.atomItem(qc, info), AtomType.QNM);
-    final Type type = item.type;
-    final QNm qnm;
-    if(type == AtomType.QNM) {
-      qnm = (QNm) item;
-    } else {
-      if(!type.isStringOrUntyped() || type == AtomType.URI)
-        throw CPIWRONG_X_X.get(info, type, item);
-
-      final byte[] nm = trim(item.string(info));
-      if(eq(lc(nm), XML)) throw CPIXML_X.get(info, nm);
-      if(!XMLToken.isNCName(nm)) throw CPIINVAL_X.get(info, nm);
-      qnm = new QNm(nm);
-    }
+    final byte[] nm = ncname(false, qc);
+    if(eq(lc(nm), XML)) throw CPIXML_X.get(info, nm);
+    if(!XMLToken.isNCName(nm)) throw CPIINVAL_X.get(info, nm);
 
     byte[] value = atomValue(qc);
     int i = -1;
@@ -54,7 +43,7 @@ public final class CPI extends CName {
     while(++i < vl && value[i] >= 0 && value[i] <= ' ');
     value = substring(value, i);
 
-    return new FPI(qnm, FPI.parse(value, info));
+    return new FPI(new QNm(nm), FPI.parse(value, info));
   }
 
   @Override
@@ -65,5 +54,10 @@ public final class CPI extends CName {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof CPI && super.equals(obj);
+  }
+
+  @Override
+  public String toString() {
+    return toString(PROCESSING_INSTRUCTION);
   }
 }

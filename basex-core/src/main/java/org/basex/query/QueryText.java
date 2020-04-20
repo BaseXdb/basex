@@ -118,7 +118,7 @@ public interface QueryText {
   /** Parser token. */ String PARAGRAPH = "paragraph";
   /** Parser token. */ String PARAGRAPHS = "paragraphs";
   /** Parser token. */ String PHRASE = "phrase";
-  /** Parser token. */ String PI = "processing-instruction";
+  /** Parser token. */ String PROCESSING_INSTRUCTION = "processing-instruction";
   /** Parser token. */ String PRESERVE = "preserve";
   /** Parser token. */ String PREVIOUS = "previous";
   /** Parser token. */ String RELATIONSHIP = "relationship";

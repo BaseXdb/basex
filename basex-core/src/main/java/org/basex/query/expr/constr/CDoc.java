@@ -52,11 +52,6 @@ public final class CDoc extends CNode {
   }
 
   @Override
-  public String description() {
-    return info(DOCUMENT);
-  }
-
-  @Override
   public String toString() {
     return toString(DOCUMENT);
   }

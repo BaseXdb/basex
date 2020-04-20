@@ -606,6 +606,7 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final String toString() {
-    return new TokenBuilder().add(definition.id()).add('(').addSep(exprs, SEP).add(')').toString();
+    return new TokenBuilder().add(definition.id()).add('(').
+        addSeparated(exprs, SEP).add(')').toString();
   }
 }

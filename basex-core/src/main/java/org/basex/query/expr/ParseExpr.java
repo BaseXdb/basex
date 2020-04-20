@@ -128,7 +128,7 @@ public abstract class ParseExpr extends Expr {
    * @param exprs expressions
    * @return data reference or {@code null}
    */
-  public Data data(final Expr... exprs) {
+  public final Data data(final Expr... exprs) {
     Data data1 = null;
     for(final Expr expr : exprs) {
       if(expr.seqType().zero()) continue;
@@ -151,7 +151,7 @@ public abstract class ParseExpr extends Expr {
    * @return specified expression
    * @throws QueryException query exception
    */
-  protected <T extends XQFunctionExpr> T checkUp(final T expr, final boolean updating,
+  protected final <T extends XQFunctionExpr> T checkUp(final T expr, final boolean updating,
       final StaticContext sc) throws QueryException {
 
     if(!(sc.mixUpdates || updating == expr.annotations().contains(Annotation.UPDATING))) {
@@ -167,7 +167,7 @@ public abstract class ParseExpr extends Expr {
    * @param expr expression (may be {@code null})
    * @throws QueryException query exception
    */
-  protected void checkNoUp(final Expr expr) throws QueryException {
+  protected final void checkNoUp(final Expr expr) throws QueryException {
     if(expr == null) return;
     expr.checkUp();
     if(expr.has(Flag.UPD)) throw UPNOT_X.get(info, description());
@@ -193,7 +193,7 @@ public abstract class ParseExpr extends Expr {
    * @param exprs expressions to be checked
    * @throws QueryException query exception
    */
-  protected void checkAllUp(final Expr... exprs) throws QueryException {
+  protected final void checkAllUp(final Expr... exprs) throws QueryException {
     // updating state: 0 = initial state, 1 = updating, -1 = non-updating
     int state = 0;
     for(final Expr expr : exprs) {
@@ -346,7 +346,7 @@ public abstract class ParseExpr extends Expr {
    * @return number
    * @throws QueryException query exception
    */
-  protected ANum toNumber(final Item item) throws QueryException {
+  protected final ANum toNumber(final Item item) throws QueryException {
     if(item.type.isUntyped()) return Dbl.get(item.dbl(info));
     if(item instanceof ANum) return (ANum) item;
     throw numberError(this, item);
@@ -497,7 +497,7 @@ public abstract class ParseExpr extends Expr {
    * @return binary item
    * @throws QueryException query exception
    */
-  protected Bin toBin(final Item item) throws QueryException {
+  protected final Bin toBin(final Item item) throws QueryException {
     if(checkNoEmpty(item) instanceof Bin) return (Bin) item;
     throw BINARY_X.get(info, item.type);
   }
@@ -590,7 +590,7 @@ public abstract class ParseExpr extends Expr {
    * @return function item
    * @throws QueryException query exception
    */
-  protected FItem toFunc(final Expr expr, final QueryContext qc) throws QueryException {
+  protected final FItem toFunc(final Expr expr, final QueryContext qc) throws QueryException {
     return (FItem) checkType(toItem(expr, qc, SeqType.ANY_FUNC), SeqType.ANY_FUNC);
   }
 
@@ -602,7 +602,7 @@ public abstract class ParseExpr extends Expr {
    * @return map
    * @throws QueryException query exception
    */
-  protected XQMap toMap(final Expr expr, final QueryContext qc) throws QueryException {
+  protected final XQMap toMap(final Expr expr, final QueryContext qc) throws QueryException {
     return toMap(toItem(expr, qc, SeqType.ANY_MAP));
   }
 
@@ -613,7 +613,7 @@ public abstract class ParseExpr extends Expr {
    * @return the map
    * @throws QueryException if the item is not a map
    */
-  protected XQMap toMap(final Item item) throws QueryException {
+  protected final XQMap toMap(final Item item) throws QueryException {
     if(item instanceof XQMap) return (XQMap) item;
     throw typeError(item, SeqType.ANY_MAP, info);
   }
@@ -625,7 +625,7 @@ public abstract class ParseExpr extends Expr {
    * @return array
    * @throws QueryException query exception
    */
-  protected XQArray toArray(final Expr expr, final QueryContext qc) throws QueryException {
+  protected final XQArray toArray(final Expr expr, final QueryContext qc) throws QueryException {
     return toArray(toItem(expr, qc, SeqType.ANY_ARRAY));
   }
 
@@ -635,7 +635,7 @@ public abstract class ParseExpr extends Expr {
    * @return the array
    * @throws QueryException if the item is not an array
    */
-  protected XQArray toArray(final Item item) throws QueryException {
+  protected final XQArray toArray(final Item item) throws QueryException {
     if(item instanceof XQArray) return (XQArray) item;
     throw typeError(item, SeqType.ANY_ARRAY, info);
   }
@@ -649,7 +649,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  protected Item checkType(final Expr expr, final QueryContext qc, final AtomType type)
+  protected final Item checkType(final Expr expr, final QueryContext qc, final AtomType type)
       throws QueryException {
     return checkType(expr.atomItem(qc, info), type);
   }
@@ -662,7 +662,7 @@ public abstract class ParseExpr extends Expr {
    * @return specified item
    * @throws QueryException query exception
    */
-  protected Item checkType(final Item item, final Type type) throws QueryException {
+  protected final Item checkType(final Item item, final Type type) throws QueryException {
     if(checkNoEmpty(item, type).type.instanceOf(type)) return item;
     throw typeError(item, type, info);
   }
@@ -685,7 +685,7 @@ public abstract class ParseExpr extends Expr {
    * @return specified item
    * @throws QueryException query exception
    */
-  protected Item checkNoEmpty(final Item item, final Type type) throws QueryException {
+  protected final Item checkNoEmpty(final Item item, final Type type) throws QueryException {
     if(item != Empty.VALUE) return item;
     throw EMPTYFOUND_X.get(info, type);
   }
