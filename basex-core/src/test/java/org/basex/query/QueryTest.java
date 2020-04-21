@@ -38,20 +38,17 @@ public abstract class QueryTest extends SandboxTest {
       final String query = qu[correct ? 2 : 1].toString();
       final Value cmp = correct ? (Value) qu[1] : null;
 
-      try(QueryProcessor qp = new QueryProcessor(query, context)) {
-        final Value value = qp.value();
-        if(!correct || !new DeepEqual().equal(value, cmp)) {
+      try {
+        final Value value = run(query);
+        if(!correct || !eq(value, cmp)) {
           sb.append('[').append(qu[0]).append("] ").append(query);
           sb.append("\n[E] ");
           if(correct) {
-            sb.append(cmp.size()).append(" result(s): ");
-            for(final Item item : cmp) sb.append(item.serialize()).append("; ");
+            serialize(cmp, sb);
           } else {
             sb.append("error");
           }
-          sb.append("\n[F] ").append(value.size()).append(" result(s): ");
-          for(final Item item : value) sb.append(item.serialize()).append(", ");
-          sb.append(details()).append('\n');
+          serialize(value, sb.append("\n[F] ")).append(details()).append('\n');
           ++fail;
         }
       } catch(final Exception ex) {
@@ -67,6 +64,26 @@ public abstract class QueryTest extends SandboxTest {
       }
     }
     if(fail != 0) fail(fail + " Errors. [E] = expected, [F] = found:\n" + sb.toString().trim());
+  }
+
+  protected static String ser(final Value v) throws Exception {
+    return serialize(v, new StringBuilder()).toString();
+  }
+
+  protected static StringBuilder serialize(final Value v, final StringBuilder sb) throws Exception {
+    sb.append(v.size()).append(" result(s): ");
+    for(final Item item : v) sb.append(item.serialize()).append("; ");
+    return sb;
+  }
+
+  protected static Value run(final String query) throws Exception {
+    try(QueryProcessor qp = new QueryProcessor(query, context)) {
+      return qp.value();
+    }
+  }
+
+  protected static boolean eq(final Value actual, final Value expected) throws Exception {
+    return new DeepEqual().equal(actual, expected);
   }
 
   /**
