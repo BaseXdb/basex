@@ -1,6 +1,6 @@
 package org.basex.local.single;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class benchmarks delete operations.

@@ -1,7 +1,7 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
@@ -10,7 +10,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.util.list.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Class for testing the {@link Compress} methods.

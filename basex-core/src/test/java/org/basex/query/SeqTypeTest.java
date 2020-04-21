@@ -2,12 +2,12 @@ package org.basex.query;
 
 import static org.basex.query.value.type.Occ.*;
 import static org.basex.query.value.type.SeqType.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.function.*;
 
 import org.basex.query.value.type.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests for the {@link SeqType} class.
@@ -30,7 +30,7 @@ public final class SeqTypeTest {
     final int ol = occs.length;
     for(int o = 0; o < ol; o++) {
       for(int p = 0; p < ol; p++) {
-        assertSame("(" + o + ", " + p + ')', table[o][p], occs[o].intersect(occs[p]));
+        assertSame(table[o][p], occs[o].intersect(occs[p]), "(" + o + ", " + p + ')');
       }
     }
   }
@@ -49,7 +49,7 @@ public final class SeqTypeTest {
     final int ol = occs.length;
     for(int o = 0; o < ol; o++) {
       for(int p = 0; p < ol; p++) {
-        assertSame("(" + o + ", " + p + ')', table[o][p], occs[o].union(occs[p]));
+        assertSame(table[o][p], occs[o].union(occs[p]), "(" + o + ", " + p + ')');
       }
     }
   }
@@ -66,7 +66,7 @@ public final class SeqTypeTest {
     for(int o = 0; o < ol; o++) {
       for(int p = 0; p < ol; p++) {
         final boolean inst = (bits >>> 5 * p + o & 1) != 0;
-        assertEquals("(" + o + ", " + p + ')', inst, occs[o].instanceOf(occs[p]));
+        assertEquals(inst, occs[o].instanceOf(occs[p]), "(" + o + ", " + p + ')');
       }
     }
   }
@@ -367,10 +367,10 @@ public final class SeqTypeTest {
     final Consumer<SeqType> check = result -> {
       final String msg = message + result + '\n';
       if(expected == null) {
-        assertNull(msg, result);
+        assertNull(result, msg);
       } else {
-        assertNotNull(msg, result);
-        assertTrue(msg, result.eq(expected));
+        assertNotNull(result, msg);
+        assertTrue(result.eq(expected), msg);
       }
     };
     check.accept(result1);
@@ -385,7 +385,7 @@ public final class SeqTypeTest {
   private static void combine(final SeqType st, final BiFunction<SeqType, SeqType, SeqType> func) {
     final SeqType result = func.apply(st, st);
     final String msg = "\nType: " + st + "\nReturned: " + result + '\n';
-    assertNotNull(msg, result);
-    assertTrue(msg, st.eq(result));
+    assertNotNull(result, msg);
+    assertTrue(st.eq(result), msg);
   }
 }

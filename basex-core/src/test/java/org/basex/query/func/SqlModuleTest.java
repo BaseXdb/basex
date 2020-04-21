@@ -1,7 +1,7 @@
 package org.basex.query.func;
 
 import org.basex.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the functions of the SQL Module.

@@ -1,12 +1,12 @@
 package org.basex.http.rest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
 import org.basex.http.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class sends parallel GET requests to the REST API.
@@ -28,7 +28,7 @@ public final class RESTParallelGetTest extends HTTPTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass public static void start() throws Exception {
+  @BeforeAll public static void start() throws Exception {
     init(REST_ROOT, true);
   }
 

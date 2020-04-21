@@ -1,7 +1,7 @@
 package org.basex.http.restxq;
 
 import org.basex.util.http.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This test contains RESTXQ filters.

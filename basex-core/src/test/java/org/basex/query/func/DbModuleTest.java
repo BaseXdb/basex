@@ -3,7 +3,7 @@ package org.basex.query.func;
 import static org.basex.core.Text.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
@@ -17,8 +17,8 @@ import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests the functions of the Database Module.
@@ -45,12 +45,12 @@ public final class DbModuleTest extends SandboxTest {
   }
 
   /** Initializes a test. */
-  @Before public void initTest() {
+  @BeforeEach public void initTest() {
     execute(new CreateDB(NAME, XML));
   }
 
   /** Finalizes a test. */
-  @After public void finish() {
+  @AfterEach public void finish() {
     set(MainOptions.TEXTINCLUDE, "");
     set(MainOptions.ATTRINCLUDE, "");
     set(MainOptions.TOKENINCLUDE, "");

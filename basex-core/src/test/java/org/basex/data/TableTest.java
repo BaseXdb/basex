@@ -1,12 +1,12 @@
 package org.basex.data;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests the stability of the data storage.
@@ -31,7 +31,7 @@ public final class TableTest extends SandboxTest {
   /**
    * Set up method.
    */
-  @Before public void setUp() {
+  @BeforeEach public void setUp() {
     execute(new CreateDB(NAME, DBFILE));
     tbl = context.data().meta.dbFile(DataText.DATATBL);
   }
@@ -39,7 +39,7 @@ public final class TableTest extends SandboxTest {
   /**
    * Drops the JUnitTest database.
    */
-  @After public void tearDown() {
+  @AfterEach public void tearDown() {
     execute(new DropDB(NAME));
   }
 
@@ -55,6 +55,6 @@ public final class TableTest extends SandboxTest {
     query(String.format(INSERT, n));
     execute(new Close());
 
-    assertEquals("Database size changed: ", s, tbl.length());
+    assertEquals(s, tbl.length(), "Database size changed: ");
   }
 }

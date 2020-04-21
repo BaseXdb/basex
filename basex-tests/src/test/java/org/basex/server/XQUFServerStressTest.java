@@ -4,7 +4,7 @@ import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
 import org.basex.util.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Testing concurrent XQUF statements on a single database.

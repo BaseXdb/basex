@@ -1,11 +1,11 @@
 package org.basex.core.locks;
 
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class checks the execution order of non-locking queries.

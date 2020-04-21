@@ -2,8 +2,8 @@ package org.basex.query.expr;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for optimizations of the path expression (similar to {@link FilterTest}).
@@ -20,12 +20,12 @@ public final class PathTest extends SandboxTest {
   private static final String LI2 = "<li>Exercise 2</li>";
 
   /** Creates a database. */
-  @Before public void setUp() {
+  @BeforeEach public void setUp() {
     execute(new CreateDB(NAME, FILE));
   }
 
   /** Drops the database. */
-  @After public void tearDown() {
+  @AfterEach public void tearDown() {
     execute(new DropDB(NAME));
   }
 

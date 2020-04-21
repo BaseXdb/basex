@@ -1,12 +1,12 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.charset.*;
 
 import org.basex.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests String <-> Token conversions.

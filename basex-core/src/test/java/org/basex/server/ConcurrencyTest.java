@@ -1,6 +1,6 @@
 package org.basex.server;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.util.*;
@@ -10,8 +10,8 @@ import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.util.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests the execution of parallel commands.
@@ -37,7 +37,7 @@ public final class ConcurrencyTest extends SandboxTest {
    * Starts the server.
    * @throws IOException exception
    */
-  @Before public void start() throws IOException {
+  @BeforeEach public void start() throws IOException {
     server = createServer();
     sess = createClient();
     sess.execute(new CreateDB(NAME, FILE));
@@ -47,7 +47,7 @@ public final class ConcurrencyTest extends SandboxTest {
    * Stops the server.
    * @throws Exception exception
    */
-  @After public void stop() throws Exception {
+  @AfterEach public void stop() throws Exception {
     sess.execute(new DropDB(NAME));
     sess.close();
     stopServer(server);

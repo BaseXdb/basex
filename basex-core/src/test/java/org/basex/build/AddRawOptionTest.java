@@ -1,6 +1,6 @@
 package org.basex.build;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.*;
@@ -9,8 +9,8 @@ import org.basex.io.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the {@link MainOptions#ADDRAW} option.
@@ -26,14 +26,14 @@ public final class AddRawOptionTest extends SandboxTest {
   /**
    * Class set up method.
    */
-  @BeforeClass public static void classSetUp() {
+  @BeforeAll public static void classSetUp() {
     set(MainOptions.ADDRAW, true);
   }
 
   /**
    * Set up method.
    */
-  @Before public void setUp() {
+  @BeforeEach public void setUp() {
     execute(new CreateDB(NAME));
   }
 
@@ -58,10 +58,10 @@ public final class AddRawOptionTest extends SandboxTest {
    */
   private static void assertAllFilesExist() {
     final StringList files = new StringList(query(Function._DB_LIST.args(NAME)).split(Prop.NL));
-    assertFalse("No files were imported", files.isEmpty());
+    assertFalse(files.isEmpty(), "No files were imported");
     for(final String name : FILES) {
-      assertTrue("File " + name + " is not imported", files.contains(name));
+      assertTrue(files.contains(name), "File " + name + " is not imported");
     }
-    assertEquals("Expected number of imported files is different", FILES.size(), files.size());
+    assertEquals(FILES.size(), files.size(), "Expected number of imported files is different");
   }
 }

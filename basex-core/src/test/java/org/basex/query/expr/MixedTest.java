@@ -8,8 +8,8 @@ import java.io.*;
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Mixed XQuery tests.
@@ -24,7 +24,7 @@ public final class MixedTest extends SandboxTest {
   /**
    * Drops the collection.
    */
-  @AfterClass public static void after() {
+  @AfterAll public static void after() {
     execute(new DropDB(NAME));
     execute(new DropDB(NAME + '2'));
   }

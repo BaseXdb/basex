@@ -3,7 +3,7 @@ package org.basex.http;
 import static org.basex.core.users.UserText.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.http.HttpMethod.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.net.*;
@@ -18,7 +18,7 @@ import org.basex.util.*;
 import org.basex.util.Base64;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class contains common methods for the HTTP services.
@@ -69,7 +69,7 @@ public abstract class HTTPTest extends SandboxTest {
    * Finish test.
    * @throws Exception exception
    */
-  @AfterClass public static void stop() throws Exception {
+  @AfterAll public static void stop() throws Exception {
     http.stop();
 
     // cleanup: remove project specific system properties

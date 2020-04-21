@@ -1,12 +1,12 @@
 package org.basex.data;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
 import org.basex.index.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Base class with common functionality for all ID -> PRE mapping tests.
@@ -26,7 +26,7 @@ public abstract class IdPreMapBulkTestBase {
   private ArrayList<int[]> ops;
 
   /** Set-up method. */
-  @Before public void setUp() {
+  @BeforeEach public void setUp() {
     final int ml = baseid + 1;
     final int[] map = new int[ml];
     for(int m = 0; m < ml; m++) map[m] = m;

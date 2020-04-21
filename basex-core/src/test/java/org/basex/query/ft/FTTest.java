@@ -3,7 +3,7 @@ package org.basex.query.ft;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.util.options.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Full-text test queries.

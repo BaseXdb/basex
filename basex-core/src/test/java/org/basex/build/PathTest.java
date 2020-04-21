@@ -1,6 +1,6 @@
 package org.basex.build;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.*;
@@ -8,8 +8,8 @@ import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests queries with path in it on collections.
@@ -32,7 +32,7 @@ public final class PathTest extends SandboxTest {
   /**
    * Creates initial databases.
    */
-  @BeforeClass public static void before() {
+  @BeforeAll public static void before() {
     execute(new CreateDB(INPUT));
     execute(new Add("input", INPUTF));
     execute(new Add("input2", INPUTF));
@@ -44,7 +44,7 @@ public final class PathTest extends SandboxTest {
   /**
    * Drops the initial databases.
    */
-  @AfterClass public static void after() {
+  @AfterAll public static void after() {
     execute(new DropDB(INPUT));
     execute(new DropDB(WEEK1));
     execute(new DropDB(WEEK2));

@@ -2,7 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.nio.file.*;
@@ -15,8 +15,8 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.util.pkg.*;
 import org.basex.util.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests the EXPath package API.
@@ -53,7 +53,7 @@ public final class PackageAPITest extends SandboxTest {
    * Prepares a test.
    * @throws IOException I/O exception
    */
-  @Before public void init() throws IOException {
+  @BeforeEach public void init() throws IOException {
     new IOFile(REPO).delete();
     copy(Paths.get(SOURCE), Paths.get(REPO));
   }
@@ -61,7 +61,7 @@ public final class PackageAPITest extends SandboxTest {
   /**
    * Finalizes a test.
    */
-  @After public void finish() {
+  @AfterEach public void finish() {
     new IOFile(REPO).delete();
   }
 
@@ -285,7 +285,7 @@ public final class PackageAPITest extends SandboxTest {
     }
 
     // delete package
-    assertTrue("Repo directory could not be deleted.", new IOFile(REPO, dir).delete());
+    assertTrue(new IOFile(REPO, dir).delete(), "Repo directory could not be deleted.");
     assertFalse(new IOFile(REPO, dir).exists());
   }
 
@@ -298,8 +298,8 @@ public final class PackageAPITest extends SandboxTest {
 
     final IOFile jar = new IOFile(REPO, "org/basex/modules/Hello.jar");
     final IOFile xqm = new IOFile(REPO, "org/basex/modules/Hello.xqm");
-    assertTrue("File not found: " + jar, jar.exists());
-    assertTrue("File not found: " + xqm, xqm.exists());
+    assertTrue(jar.exists(), "File not found: " + jar);
+    assertTrue(xqm.exists(), "File not found: " + xqm);
 
     // run query
     String query = "import module namespace h='http://basex.org/modules/Hello';h:hello('Universe')";
@@ -315,8 +315,8 @@ public final class PackageAPITest extends SandboxTest {
 
     // ensure that all files were deleted
     execute(new RepoDelete("org.basex.modules.Hello", null));
-    assertFalse("File was not deleted:" + jar, jar.exists());
-    assertFalse("File was not deleted:" + xqm, xqm.exists());
+    assertFalse(jar.exists(), "File was not deleted:" + jar);
+    assertFalse( xqm.exists(), "File was not deleted:" + xqm);
 
     // ensure that package can only be deleted once
     try {
@@ -351,8 +351,8 @@ public final class PackageAPITest extends SandboxTest {
     new RepoManager(context).delete("test." + jar);
     final boolean existAfterDelete = isFile(dir + "/." +
         jar + "/Greeter.jar") || isFile(dir + '/' + jar + IO.JARSUFFIX);
-    assertTrue("Repo directory could not be deleted.", new IOFile(REPO, dir).delete());
-    assertFalse("Package could not be deleted.", existAfterDelete);
+    assertTrue(new IOFile(REPO, dir).delete(), "Repo directory could not be deleted.");
+    assertFalse(existAfterDelete, "Package could not be deleted.");
   }
 
   /**

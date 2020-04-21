@@ -1,11 +1,11 @@
 package org.basex.index;
 
 import static org.basex.util.Token.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests for {@link IndexCache}.
@@ -18,7 +18,7 @@ public final class IndexCacheTest {
   private IndexCache cache;
 
   /** Set up method. */
-  @Before public void setUp() {
+  @BeforeEach public void setUp() {
     cache = new IndexCache();
   }
 
@@ -73,7 +73,7 @@ public final class IndexCacheTest {
    * Test that new records can be continuously added without hitting
    * {@link OutOfMemoryError}.
    */
-  @Test @Ignore("Start this test with a small heap size (e.g. -Xmx64m)")
+  @Test @Disabled("Start this test with a small heap size (e.g. -Xmx64m)")
   public void testPerformance() {
     final Random random = new Random(System.nanoTime());
 

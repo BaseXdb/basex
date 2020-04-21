@@ -8,7 +8,7 @@ import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the simple map operator.

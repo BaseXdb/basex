@@ -1,7 +1,6 @@
 package org.basex.query.index;
 
 import java.util.*;
-import java.util.List;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -9,11 +8,10 @@ import org.basex.query.ast.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.value.node.*;
-import org.junit.*;
-import org.junit.Test;
-import org.junit.runner.*;
-import org.junit.runners.*;
-import org.junit.runners.Parameterized.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * This class tests if value indexes will be used.
@@ -21,38 +19,21 @@ import org.junit.runners.Parameterized.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
-@RunWith(Parameterized.class)
 public final class ValueIndexTest extends QueryPlanTest {
   /** Test file. */
   private static final String FILE = "src/test/resources/selective.xml";
 
-  /** Main memory flag. */
-  @Parameter
-  public Object mainmem;
-
-  /**
-   * Mainmem parameters.
-   * @return parameters
-   */
-  @Parameters
-  public static Collection<Object[]> params() {
-    final List<Object[]> params = new ArrayList<>();
-    params.add(new Object[] { false });
-    params.add(new Object[] { true });
-    return params;
-  }
-
   /**
    * Initializes a test.
    */
-  @Before public void before() {
+  public void before(boolean mainmem) {
     set(MainOptions.MAINMEM, mainmem);
   }
 
   /**
    * Finalizes a test.
    */
-  @After public void after() {
+  @AfterEach public void after() {
     set(MainOptions.MAINMEM, false);
     set(MainOptions.UPDINDEX, false);
     set(MainOptions.FTINDEX, false);
@@ -65,14 +46,17 @@ public final class ValueIndexTest extends QueryPlanTest {
   /**
    * Initializes the tests.
    */
-  @BeforeClass public static void start() {
+  @BeforeAll public static void start() {
     execute(new CreateDB(NAME, FILE));
   }
 
   /**
    * Tests the text index.
    */
-  @Test public void textIndex() {
+  @ParameterizedTest
+  @ValueSource(booleans = {true, false})
+  public void textIndex(boolean mainmem) {
+    before(mainmem);
     map().forEach((key, value) -> {
       set(MainOptions.TEXTINCLUDE, key);
       execute(new CreateDB(NAME, FILE));
@@ -85,7 +69,10 @@ public final class ValueIndexTest extends QueryPlanTest {
   /**
    * Tests the attribute index.
    */
-  @Test public void attrIndex() {
+  @ParameterizedTest
+  @ValueSource(booleans = {true, false})
+  public void attrIndex(boolean mainmem) {
+    before(mainmem);
     map().forEach((key, value) -> {
       set(MainOptions.ATTRINCLUDE, key);
       execute(new CreateDB(NAME, FILE));
@@ -99,9 +86,6 @@ public final class ValueIndexTest extends QueryPlanTest {
    * Tests the full-text index.
    */
   @Test public void fulltextIndex() {
-    // not applicable in main-memory mode
-    if((Boolean) mainmem) return;
-
     set(MainOptions.FTINDEX, true);
     map().forEach((key, value) -> {
       set(MainOptions.FTINCLUDE, key);
@@ -116,7 +100,10 @@ public final class ValueIndexTest extends QueryPlanTest {
   /**
    * Tests the text index and update operations.
    */
-  @Test public void textUpdates() {
+  @ParameterizedTest
+  @ValueSource(booleans = {true, false})
+  public void textUpdates(boolean mainmem) {
+    before(mainmem);
     set(MainOptions.UPDINDEX, true);
 
     set(MainOptions.TEXTINCLUDE, "a");

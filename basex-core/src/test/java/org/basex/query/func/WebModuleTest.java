@@ -5,7 +5,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.util.http.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the functions of the Web Module.

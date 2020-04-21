@@ -1,12 +1,12 @@
 package org.basex;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
 import org.basex.core.*;
 import org.basex.io.serial.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the functions of the EXPath Cryptographic module. The tests in basex-test
@@ -79,7 +79,7 @@ public final class FNCryptoTest extends SandboxTest {
    * Creates the database context.
    * @throws Exception error during keystore generation or database exception
    */
-  @BeforeClass
+  @BeforeAll
   public static void start() throws Exception {
     new File(KEYSTORE).delete();
 
@@ -94,7 +94,7 @@ public final class FNCryptoTest extends SandboxTest {
   /**
    * Removes test databases and closes the database context.
    */
-  @AfterClass
+  @AfterAll
   public static void finish() {
     new File(KEYSTORE).delete();
   }

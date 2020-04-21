@@ -1,8 +1,8 @@
 package org.basex.api.xmldb;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
 
@@ -22,7 +22,7 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
    * Initializes a test.
    * @throws Exception any exception
    */
-  @Before public void setUp() throws Exception {
+  @BeforeEach public void setUp() throws Exception {
     createDB();
     final Class<?> clzz = Class.forName(DRIVER);
     final Database database = (Database) clzz.getDeclaredConstructor().newInstance();
@@ -34,7 +34,7 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
    * Finalizes a test.
    * @throws Exception any exception
    */
-  @After public void tearDown() throws Exception {
+  @AfterEach public void tearDown() throws Exception {
     collection.close();
     dropDB();
   }
@@ -46,11 +46,11 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
   @Test public void testHasMoreResources() throws Exception {
     // test result
     ResourceIterator iter = service.query("/").getIterator();
-    assertTrue("Result expected.", iter.hasMoreResources());
+    assertTrue(iter.hasMoreResources(), "Result expected.");
 
     // test empty result
     iter = service.query("//Unknown").getIterator();
-    assertFalse("Result expected.", iter.hasMoreResources());
+    assertFalse(iter.hasMoreResources(), "Result expected.");
   }
 
   /**
@@ -66,15 +66,14 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
       iter.nextResource();
       --size;
     }
-    assertEquals("Wrong result size.", 0, size);
+    assertEquals(0, size, "Wrong result size.");
 
     // test if iterator delivers more results
     try {
       iter.nextResource();
       fail("No resources left.");
     } catch(final XMLDBException ex) {
-      assertEquals("Wrong error code.", ErrorCodes.NO_SUCH_RESOURCE,
-          ex.errorCode);
+      assertEquals(ErrorCodes.NO_SUCH_RESOURCE, ex.errorCode, "Wrong error code.");
     }
   }
 }

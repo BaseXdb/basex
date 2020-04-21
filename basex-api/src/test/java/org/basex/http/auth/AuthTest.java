@@ -1,7 +1,7 @@
 package org.basex.http.auth;
 
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
@@ -9,7 +9,7 @@ import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * HTTP authentication tests.
@@ -38,7 +38,7 @@ public abstract class AuthTest extends HTTPTest {
   /**
    * Stops the test.
    */
-  @AfterClass public static void close() {
+  @AfterAll public static void close() {
     Prop.clear();
     ctx.close();
   }

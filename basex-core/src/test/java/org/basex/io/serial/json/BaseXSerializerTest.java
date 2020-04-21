@@ -1,13 +1,13 @@
 package org.basex.io.serial.json;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.util.options.Options.YesNo;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests for the {@link BaseXSerializer} classes.
@@ -72,7 +72,7 @@ public final class BaseXSerializerTest extends SandboxTest {
 
       final ArrayOutput ao = qp.value().serialize(sopts);
       final String actual = normNL(ao.toString().replace("\"", "'"));
-      assertEquals("\n[E] " + expected + "\n[F] " + actual + '\n', expected, actual);
+      assertEquals(expected, actual, "\n[E] " + expected + "\n[F] " + actual + '\n');
     } catch(final Exception ex) {
       fail(ex.toString());
     }

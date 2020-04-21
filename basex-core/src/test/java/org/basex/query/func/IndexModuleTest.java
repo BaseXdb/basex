@@ -4,8 +4,8 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests the functions of the Index Module.
@@ -18,12 +18,12 @@ public final class IndexModuleTest extends SandboxTest {
   private static final String FILE = "src/test/resources/input.xml";
 
   /** Initializes a test. */
-  @Before public void initTest() {
+  @BeforeEach public void initTest() {
     execute(new CreateDB(NAME, FILE));
   }
 
   /** Finishes a test. */
-  @AfterClass public static void finish() {
+  @AfterAll public static void finish() {
     execute(new DropDB(NAME));
   }
 

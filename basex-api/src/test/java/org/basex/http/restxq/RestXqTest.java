@@ -1,6 +1,6 @@
 package org.basex.http.restxq;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
@@ -10,7 +10,7 @@ import org.basex.http.web.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class contains RESTXQ tests.
@@ -30,7 +30,7 @@ public abstract class RestXqTest extends HTTPTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass public static void start() throws Exception {
+  @BeforeAll public static void start() throws Exception {
     init(HTTP_ROOT, true);
   }
 

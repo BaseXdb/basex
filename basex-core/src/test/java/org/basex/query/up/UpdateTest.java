@@ -2,7 +2,7 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.*;
@@ -10,8 +10,8 @@ import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.node.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * General test of the XQuery Update Facility implementation.
@@ -34,7 +34,7 @@ public final class UpdateTest extends SandboxTest {
   /**
    * Closes the currently opened database.
    */
-  @After public void finish() {
+  @AfterEach public void finish() {
     execute(new Close());
   }
 

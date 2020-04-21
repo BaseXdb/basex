@@ -8,8 +8,8 @@ import org.basex.query.ast.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.index.*;
 import org.basex.util.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests if string range queries are correctly evaluated with(out) the index.
@@ -21,7 +21,7 @@ public final class StringRangeTest extends QueryPlanTest {
   /**
    * Initializes the tests.
    */
-  @BeforeClass public static void start() {
+  @BeforeAll public static void start() {
     final Random rnd = new Random();
 
     // create initial document
@@ -42,7 +42,7 @@ public final class StringRangeTest extends QueryPlanTest {
   /**
    * Finishes the tests.
    */
-  @AfterClass public static void finish() {
+  @AfterAll public static void finish() {
     execute(new DropDB(NAME));
   }
 

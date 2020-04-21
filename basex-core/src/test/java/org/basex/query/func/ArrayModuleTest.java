@@ -4,7 +4,7 @@ import static org.basex.query.func.Function.*;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.ast.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the functions of the Array Module.

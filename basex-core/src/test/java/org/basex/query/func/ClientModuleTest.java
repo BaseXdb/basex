@@ -11,8 +11,8 @@ import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.serial.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests the functions of the Client Module.
@@ -28,12 +28,12 @@ public final class ClientModuleTest extends SandboxTest {
    * Starts the server.
    * @throws IOException I/O exception
    */
-  @BeforeClass public static void start() throws IOException {
+  @BeforeAll public static void start() throws IOException {
     server = createServer();
   }
 
   /** Stops the server. */
-  @AfterClass public static void stop() {
+  @AfterAll public static void stop() {
     stopServer(server);
   }
 

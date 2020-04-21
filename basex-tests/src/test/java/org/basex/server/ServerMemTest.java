@@ -2,7 +2,7 @@ package org.basex.server;
 
 import org.basex.*;
 import org.basex.api.client.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class performs a client/server memory stress tests with a specified number of threads and

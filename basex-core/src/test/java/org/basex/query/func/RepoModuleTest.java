@@ -1,12 +1,12 @@
 package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.io.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the functions of the Repository Module.
@@ -25,7 +25,7 @@ public final class RepoModuleTest extends SandboxTest {
   private static final String PKG3ID = PKG3 + "-10.0";
 
   /** Prepares a test. */
-  @Before public void setupTest() {
+  @BeforeEach public void setupTest() {
     context.soptions.set(StaticOptions.REPOPATH, REPO);
     new IOFile(REPO, normalize(PKG3ID)).delete();
   }
@@ -37,9 +37,9 @@ public final class RepoModuleTest extends SandboxTest {
     query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
     // delete by package name
     final String dir = normalize(PKG3ID);
-    assertTrue("Directory not found: " + dir, dir(dir));
+    assertTrue(dir(dir), "Directory not found: " + dir);
     query(func.args(PKG3));
-    assertFalse("Directory still exists: " + dir, dir(dir));
+    assertFalse(dir(dir), "Directory still exists: " + dir);
 
     // install again
     query(_REPO_INSTALL.args(REPO + "pkg3.xar"));

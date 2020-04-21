@@ -1,6 +1,6 @@
 package org.basex.api.client;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.util.*;
@@ -12,7 +12,7 @@ import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.server.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the correctness of the item types of the client API.
@@ -30,7 +30,7 @@ public final class XdmInfoTest extends SandboxTest {
    * Starts a session.
    * @throws Exception exception
    */
-  @BeforeClass public static void start() throws Exception {
+  @BeforeAll public static void start() throws Exception {
     server = createServer();
     session = new TestSession(Text.S_LOCALHOST, DB_PORT, UserText.ADMIN, UserText.ADMIN);
   }
@@ -39,7 +39,7 @@ public final class XdmInfoTest extends SandboxTest {
    * Stops a session.
    * @throws Exception exception
    */
-  @AfterClass public static void stop() throws Exception {
+  @AfterAll public static void stop() throws Exception {
     session.close();
     stopServer(server);
   }
@@ -54,7 +54,7 @@ public final class XdmInfoTest extends SandboxTest {
       try(TestQuery tq = session.query(exp[1].toString())) {
         final TestResult tr = tq.iter();
         final Object[] type = TYPES[tr.type];
-        assertSame("Types are different.\nExpected: " + exp[0] + "\nFound: " + type[0], exp, type);
+        assertSame(exp, type, "Types are different.\nExpected: " + exp[0] + "\nFound: " + type[0]);
         assertEquals(Token.string(tr.result), type[2]);
       }
     }
@@ -70,7 +70,7 @@ public final class XdmInfoTest extends SandboxTest {
       try(TestQuery tq = session.query(exp[1].toString())) {
         final TestResult tr = tq.full(exp);
         final Object[] type = TYPES[tr.type];
-        assertSame("Types are different.\nExpected: " + exp[0] + "\nFound: " + type[0], exp, type);
+        assertSame(exp, type, "Types are different.\nExpected: " + exp[0] + "\nFound: " + type[0]);
         assertEquals(Token.string(tr.result), type[2]);
         if(exp.length > 3) assertEquals(Token.string(tr.uri), type[3]);
       }

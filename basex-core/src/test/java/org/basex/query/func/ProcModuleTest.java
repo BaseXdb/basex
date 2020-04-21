@@ -7,7 +7,7 @@ import java.io.*;
 
 import org.basex.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the functions of the Process Module.

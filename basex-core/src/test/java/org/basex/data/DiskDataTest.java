@@ -2,7 +2,7 @@ package org.basex.data;
 
 import org.basex.core.cmd.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Test index updates when using disk storage ({@link DiskData}).
@@ -15,14 +15,14 @@ public final class DiskDataTest extends MemDataTest {
   private final String dbName = Util.className(DiskDataTest.class);
 
   @Override
-  @Before public void setUp() {
+  @BeforeEach public void setUp() {
     execute(new CreateDB(dbName, XMLSTR));
   }
 
   /**
    * Clean up method; executed after each test; drops the database.
    */
-  @After public void cleanUp() {
+  @AfterEach public void cleanUp() {
     execute(new DropDB(dbName));
   }
 }

@@ -8,7 +8,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests for inlining.

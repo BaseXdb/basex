@@ -1,6 +1,6 @@
 package org.basex.api.xmldb;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
@@ -8,7 +8,7 @@ import javax.xml.parsers.*;
 
 import org.basex.io.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
@@ -31,7 +31,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * Initializes a test.
    * @throws Exception any exception
    */
-  @Before public void setUp() throws Exception {
+  @BeforeEach public void setUp() throws Exception {
     createDB();
     final Class<?> c = Class.forName(DRIVER);
     final Database database = (Database) c.getDeclaredConstructor().newInstance();
@@ -43,7 +43,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * Finalizes a test.
    * @throws Exception any exception
    */
-  @After public void tearDown() throws Exception {
+  @AfterEach public void tearDown() throws Exception {
     collection.close();
     dropDB();
   }
@@ -53,7 +53,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @Test public void testParentCollection() throws Exception {
-    assertEquals("Wrong collection name.", resource.getParentCollection(), collection);
+    assertEquals(resource.getParentCollection(), collection, "Wrong collection name.");
   }
 
   /**
@@ -61,7 +61,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @Test public void testGetID() throws Exception {
-    assertEquals("Wrong ID.", resource.getId(), DOC1);
+    assertEquals(resource.getId(), DOC1, "Wrong ID.");
   }
 
   /**
@@ -69,8 +69,8 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @Test public void testGetResourceType() throws Exception {
-    assertEquals("Wrong resource type.", resource.getResourceType(),
-        XMLResource.RESOURCE_TYPE);
+    assertEquals(resource.getResourceType(), XMLResource.RESOURCE_TYPE,
+      "Wrong resource type.");
   }
 
   /**
@@ -87,7 +87,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    */
   @Test public void testGetDocumentID() throws Exception {
     // id and document id should be identical
-    assertEquals("ID and DocumentID differ.", resource.getId(), resource.getDocumentId());
+    assertEquals(resource.getId(), resource.getDocumentId(), "ID and DocumentID differ.");
   }
 
   /**
@@ -97,8 +97,8 @@ public final class XMLResourceTest extends XMLDBBaseTest {
   @Test public void testGetContentAsDOM() throws Exception {
     final Node node = resource.getContentAsDOM();
     final String root = node.getChildNodes().item(0).getNodeName();
-    assertTrue("Document instance expected.", node instanceof Document);
-    assertEquals("Wrong root tag.", root, "first");
+    assertTrue(node instanceof Document, "Document instance expected.");
+    assertEquals(root, "first", "Wrong root tag.");
   }
 
   /**
@@ -111,7 +111,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
         collection.createResource(DOC2, XMLResource.RESOURCE_TYPE);
     xml.setContent("<xml/>");
     collection.storeResource(xml);
-    assertEquals("Wrong number of documents.", 2, collection.getResourceCount());
+    assertEquals(2, collection.getResourceCount(), "Wrong number of documents.");
 
     // overwrite document with DOM contents
     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -119,10 +119,10 @@ public final class XMLResourceTest extends XMLDBBaseTest {
     final Document doc = builder.parse(new File(DOCPATH, DOC2));
     xml.setContentAsDOM(doc);
     collection.storeResource(xml);
-    assertEquals("Wrong number of documents.", 2, collection.getResourceCount());
+    assertEquals(2, collection.getResourceCount(), "Wrong number of documents.");
 
     // compare content type
-    assertTrue("Document expected.", xml.getContent() instanceof Document);
+    assertTrue(xml.getContent() instanceof Document, "Document expected.");
   }
 
   /**
@@ -139,7 +139,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
       }
       @Override
       public void endDocument() {
-        assertEquals("Wrong number of elements.", 2, count);
+        assertEquals(2, count, "Wrong number of elements.");
       }
     };
     ((XMLResource) collection.getResource(DOC1)).getContentAsSAX(ch);
@@ -166,7 +166,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
 
     collection.storeResource(doc2);
     collection.storeResource(doc3);
-    assertEquals("Wrong number of documents.", 3, collection.getResourceCount());
+    assertEquals(3, collection.getResourceCount(), "Wrong number of documents.");
 
     final Resource doc1 = collection.getResource(DOC1);
     compare(DOCPATH + DOC1, doc1);
@@ -174,7 +174,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
     compare(DOCPATH + DOC3, doc3);
     collection.removeResource(doc3);
     collection.removeResource(doc2);
-    assertEquals("Wrong number of documents.", 1, collection.getResourceCount());
+    assertEquals(1, collection.getResourceCount(), "Wrong number of documents.");
   }
 
   /**
@@ -190,6 +190,6 @@ public final class XMLResourceTest extends XMLDBBaseTest {
     // compare serialized node with input file
     final String result = resource.getContent().toString().replaceAll("\\r?\\n *", "");
     final String expected = Token.string(new IOFile(file).read()).trim();
-    assertEquals("File content differs.", expected, result.trim());
+    assertEquals(expected, result.trim(), "File content differs.");
   }
 }

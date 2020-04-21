@@ -8,11 +8,9 @@ import java.util.List;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.junit.*;
-import org.junit.Test;
-import org.junit.runner.*;
-import org.junit.runners.*;
-import org.junit.runners.Parameterized.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * This class tests the {@link MainOptions#UPDINDEX} and {@link MainOptions#AUTOOPTIMIZE} options.
@@ -20,35 +18,12 @@ import org.junit.runners.Parameterized.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
-@RunWith(Parameterized.class)
 public final class IndexTest extends SandboxTest {
-  /** Main memory flag. */
-  @Parameter
-  public Object mainmem;
-
-  /**
-   * Mainmem parameters.
-   * @return parameters
-   */
-  @Parameters
-  public static Collection<Object[]> params() {
-    final List<Object[]> params = new ArrayList<>();
-    params.add(new Object[] { false });
-    params.add(new Object[] { true });
-    return params;
-  }
-
-  /**
-   * Initializes a test.
-   */
-  @Before public void before() {
-    set(MainOptions.MAINMEM, mainmem);
-  }
 
   /**
    * Finalize test.
    */
-  @After public void after() {
+  @AfterEach public void after() {
     execute(new DropDB(NAME));
     set(MainOptions.TOKENINDEX, false);
     set(MainOptions.UPDINDEX, false);
@@ -58,8 +33,12 @@ public final class IndexTest extends SandboxTest {
 
   /**
    * Test.
+   * @param mainmem main memory flag.
    */
-  @Test public void updindexText() {
+  @ParameterizedTest
+  @ValueSource(booleans = {false, true})
+  public void updindexText(boolean mainmem) {
+    set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
@@ -72,8 +51,12 @@ public final class IndexTest extends SandboxTest {
 
   /**
    * Test.
+   * @param mainmem main memory flag.
    */
-  @Test public void updindexText2() {
+  @ParameterizedTest
+  @ValueSource(booleans = {false, true})
+  public void updindexText2(boolean mainmem) {
+    set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
@@ -87,8 +70,12 @@ public final class IndexTest extends SandboxTest {
 
   /**
    * Test.
+   * @param mainmem main memory flag.
    */
-  @Test public void updindexText3() {
+  @ParameterizedTest
+  @ValueSource(booleans = {false, true})
+  public void updindexText3(boolean mainmem) {
+    set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
@@ -101,8 +88,12 @@ public final class IndexTest extends SandboxTest {
 
   /**
    * Test.
+   * @param mainmem main memory flag.
    */
-  @Test public void updindexAttribute() {
+  @ParameterizedTest
+  @ValueSource(booleans = {false, true})
+  public void updindexAttribute(boolean mainmem) {
+    set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
@@ -117,8 +108,12 @@ public final class IndexTest extends SandboxTest {
 
   /**
    * Test.
+   * @param mainmem main memory flag.
    */
-  @Test public void updindexToken() {
+  @ParameterizedTest
+  @ValueSource(booleans = {false, true})
+  public void updindexToken(boolean mainmem) {
+    set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     set(MainOptions.TOKENINDEX, true);
     execute(new CreateDB(NAME));
@@ -140,8 +135,12 @@ public final class IndexTest extends SandboxTest {
 
   /**
    * Test.
+   * @param mainmem main memory flag.
    */
-  @Test public void updindexReplace1() {
+  @ParameterizedTest
+  @ValueSource(booleans = {false, true})
+  public void updindexReplace1(boolean mainmem) {
+    set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME, "<X><A>q</A><B>q</B></X>"));
     query("replace node /X/A with 'x', replace node /X/B with 'y'", "");
@@ -149,8 +148,12 @@ public final class IndexTest extends SandboxTest {
 
   /**
    * Test.
+   * @param mainmem main memory flag.
    */
-  @Test public void updindexReplace2() {
+  @ParameterizedTest
+  @ValueSource(booleans = {false, true})
+  public void updindexReplace2(boolean mainmem) {
+    set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
     execute(new Replace("A", "<X a='?' b='a' c='1'/>"));
@@ -160,8 +163,12 @@ public final class IndexTest extends SandboxTest {
 
   /**
    * Test.
+   * @param mainmem main memory flag.
    */
-  @Test public void updindexOpenClose1() {
+  @ParameterizedTest
+  @ValueSource(booleans = {false, true})
+  public void updindexOpenClose1(boolean mainmem) {
+    set(MainOptions.MAINMEM, mainmem);
     final boolean openClose = !(Boolean) mainmem;
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
@@ -176,8 +183,12 @@ public final class IndexTest extends SandboxTest {
 
   /**
    * Test.
+   * @param mainmem main memory flag.
    */
-  @Test public void updindexOpenClose2() {
+  @ParameterizedTest
+  @ValueSource(booleans = {false, true})
+  public void updindexOpenClose2(boolean mainmem) {
+    set(MainOptions.MAINMEM, mainmem);
     final boolean openClose = !(Boolean) mainmem;
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
@@ -194,8 +205,12 @@ public final class IndexTest extends SandboxTest {
 
   /**
    * Test.
+   * @param mainmem main memory flag.
    */
-  @Test public void autooptimize() {
+  @ParameterizedTest
+  @ValueSource(booleans = {false, true})
+  public void autooptimize(boolean mainmem) {
+    set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.AUTOOPTIMIZE, true);
     execute(new CreateDB(NAME));
     query(_DB_INFO.args(NAME) + "//textindex/text()", true);

@@ -1,8 +1,8 @@
 package org.basex.api.xmldb;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 import org.xmldb.api.*;
 import org.xmldb.api.base.*;
 
@@ -20,7 +20,7 @@ public final class DatabaseTest extends XMLDBBaseTest {
    * Initializes a test.
    * @throws Exception any exception
    */
-  @Before public void setUp() throws Exception {
+  @BeforeEach public void setUp() throws Exception {
     createDB();
     database = (BXDatabase) Class.forName(DRIVER).getDeclaredConstructor().newInstance();
   }
@@ -28,7 +28,7 @@ public final class DatabaseTest extends XMLDBBaseTest {
   /**
    * Finalizes a test.
    */
-  @After public void tearDown() {
+  @AfterEach public void tearDown() {
     dropDB();
   }
 
@@ -122,6 +122,6 @@ public final class DatabaseTest extends XMLDBBaseTest {
    * @param ex exception
    */
   private static void checkCode(final int exp, final XMLDBException ex) {
-    assertEquals("Wrong error code.", exp, ex.errorCode);
+    assertEquals(exp, ex.errorCode, "Wrong error code.");
   }
 }

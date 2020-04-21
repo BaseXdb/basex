@@ -3,7 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.QueryError.*;
 
 import org.basex.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the Java bindings.

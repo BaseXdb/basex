@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.*;
 import org.basex.io.serial.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the serializers.

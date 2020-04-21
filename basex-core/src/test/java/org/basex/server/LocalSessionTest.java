@@ -1,7 +1,7 @@
 package org.basex.server;
 
 import org.basex.api.client.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the local session API.
@@ -11,7 +11,7 @@ import org.junit.*;
  */
 public class LocalSessionTest extends SessionTest {
   /** Starts a session. */
-  @Before public void startSession() {
+  @BeforeEach public void startSession() {
     session = new LocalSession(context, out);
   }
 }

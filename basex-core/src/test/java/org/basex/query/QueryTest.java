@@ -1,6 +1,6 @@
 package org.basex.query;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.*;
 
@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests the database commands.

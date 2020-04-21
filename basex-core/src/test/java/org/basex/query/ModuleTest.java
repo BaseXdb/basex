@@ -1,12 +1,12 @@
 package org.basex.query;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Module tests.

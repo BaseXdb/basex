@@ -4,7 +4,7 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.users.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class performs local stress tests with a specified number of threads and queries.

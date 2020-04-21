@@ -1,8 +1,8 @@
 package org.basex.util;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests for {@link BitArray}.
@@ -14,46 +14,46 @@ public final class BitArrayTest {
   /** Test method for {@link BitArray#toArray()}. */
   @Test public void getTrimmedWords() {
     final BitArray ba = new BitArray(new long[] { -1L, 0L }, 64);
-    assertEquals("Array not trimmed correctly", 1, ba.toArray().length);
+    assertEquals(1, ba.toArray().length, "Array not trimmed correctly");
   }
 
   /** Test method for {@link BitArray#get(int)}. */
   @Test public void get() {
     final BitArray ba = new BitArray(new long[] { -1L, 0L }, 65);
-    assertTrue("Bit 63 is 0", ba.get(63));
-    assertFalse("Bit 64 is 1", ba.get(64));
+    assertTrue(ba.get(63), "Bit 63 is 0");
+    assertFalse(ba.get(64), "Bit 64 is 1");
   }
 
   /** Test method for {@link BitArray#set(int)}. */
   @Test public void set() {
     BitArray ba = new BitArray();
     ba.set(128);
-    assertTrue("Bit 128 is 0", ba.get(128));
+    assertTrue(ba.get(128), "Bit 128 is 0");
     ba = new BitArray();
     ba.set(129);
-    assertTrue("Bit 129 is 0", ba.get(129));
+    assertTrue(ba.get(129), "Bit 129 is 0");
   }
 
   /** Test method for {@link BitArray#clear(int)}. */
   @Test public void clear() {
     final BitArray ba = new BitArray(new long[] { -1L, 0L }, 64);
     ba.clear(63);
-    assertFalse("Bit 63 is 1", ba.get(63));
+    assertFalse(ba.get(63), "Bit 63 is 1");
   }
 
   /** Test method for {@link BitArray#nextFree()}. */
   @Test public void nextFree() {
     final BitArray ba = new BitArray(new long[] { -1L, 0L }, 64);
-    assertEquals("Incorrect next clear bit", 64, ba.nextFree());
+    assertEquals(64, ba.nextFree(), "Incorrect next clear bit");
   }
 
   /** Test method for {@link BitArray#nextSet(int)}. */
   @Test public void nextSet() {
     final BitArray ba = new BitArray(new long[] { 0L, -1L }, 128);
-    assertEquals("Incorrect next clear bit", 64, ba.nextSet(0));
-    assertEquals("Incorrect next clear bit", 64, ba.nextSet(64));
-    assertEquals("Incorrect next clear bit", 67, ba.nextSet(67));
-    assertEquals("Incorrect next clear bit", -1, ba.nextSet(128));
+    assertEquals(64, ba.nextSet(0), "Incorrect next clear bit");
+    assertEquals(64, ba.nextSet(64), "Incorrect next clear bit");
+    assertEquals(67, ba.nextSet(67), "Incorrect next clear bit");
+    assertEquals(-1, ba.nextSet(128), "Incorrect next clear bit");
   }
 
   /** Test method for {@link BitArray#cardinality()}. */
@@ -78,30 +78,30 @@ public final class BitArrayTest {
   @Test public void preFill() {
     // map with zero entries
     BitArray ba = new BitArray(0, true);
-    assertFalse("Incorrect value", ba.get(0));
+    assertFalse(ba.get(0), "Incorrect value");
     // map with one entry
     ba = new BitArray(1, true);
-    assertTrue("Incorrect value", ba.get(0));
-    assertFalse("Incorrect value", ba.get(1));
+    assertTrue(ba.get(0), "Incorrect value");
+    assertFalse(ba.get(1), "Incorrect value");
     // map with 63 entries
     int max = BitArray.WORD_SIZE - 1;
     ba = new BitArray(max, true);
-    for(int i = 0; i < max; i++) assertTrue("Incorrect value", ba.get(i));
-    assertFalse("Incorrect value", ba.get(max));
+    for(int i = 0; i < max; i++) assertTrue(ba.get(i), "Incorrect value");
+    assertFalse(ba.get(max), "Incorrect value");
     // map with 64 entries
     max = BitArray.WORD_SIZE;
     ba = new BitArray(max, true);
-    for(int i = 0; i < max; i++) assertTrue("Incorrect value", ba.get(i));
-    assertFalse("Incorrect value", ba.get(max));
+    for(int i = 0; i < max; i++) assertTrue(ba.get(i), "Incorrect value");
+    assertFalse(ba.get(max), "Incorrect value");
     // map with 65 entries
     max = BitArray.WORD_SIZE + 1;
     ba = new BitArray(max, true);
-    for(int i = 0; i < max; i++) assertTrue("Incorrect value", ba.get(i));
-    assertFalse("Incorrect value", ba.get(max));
+    for(int i = 0; i < max; i++) assertTrue(ba.get(i), "Incorrect value");
+    assertFalse(ba.get(max), "Incorrect value");
     // map with 1025 entries
     max = (BitArray.WORD_SIZE << 4) + 1;
     ba = new BitArray(max, true);
-    for(int i = 0; i < max; i++) assertTrue("Incorrect value", ba.get(i));
-    assertFalse("Incorrect value", ba.get(max));
+    for(int i = 0; i < max; i++) assertTrue(ba.get(i), "Incorrect value");
+    assertFalse(ba.get(max), "Incorrect value");
   }
 }

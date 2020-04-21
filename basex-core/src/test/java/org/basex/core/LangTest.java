@@ -1,12 +1,12 @@
 package org.basex.core;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
 import org.basex.*;
 import org.basex.io.out.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the completeness and correctness of the language files.

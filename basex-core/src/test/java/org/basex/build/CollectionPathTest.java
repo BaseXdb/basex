@@ -1,11 +1,11 @@
 package org.basex.build;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests queries on collections.
@@ -26,7 +26,7 @@ public final class CollectionPathTest extends SandboxTest {
   /**
    * Creates an initial database.
    */
-  @BeforeClass public static void before() {
+  @BeforeAll public static void before() {
     execute(new CreateDB(NAME));
     for(final String file : FILES) execute(new Add(DIR, file));
     execute(new Add("test/zipped", ZIP));
@@ -35,7 +35,7 @@ public final class CollectionPathTest extends SandboxTest {
   /**
    * Drops the initial collection.
    */
-  @AfterClass public static void after() {
+  @AfterAll public static void after() {
     execute(new DropDB(NAME));
   }
 

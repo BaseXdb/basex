@@ -2,7 +2,7 @@ package org.basex.http.auth;
 
 import org.basex.http.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Digest HTTP authentication tests.
@@ -15,7 +15,7 @@ public final class DigestAuthTest extends AuthTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass public static void start() throws Exception {
+  @BeforeAll public static void start() throws Exception {
     init("Digest");
   }
 

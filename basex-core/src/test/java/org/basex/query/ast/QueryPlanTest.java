@@ -1,7 +1,7 @@
 package org.basex.query.ast;
 
 import static org.basex.util.Prop.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.query.*;
@@ -32,7 +32,7 @@ public abstract class QueryPlanTest extends SandboxTest {
       // compare results
       if(expected != null) {
         final String result = normNL(qp.value().serialize().toString());
-        assertEquals("\nQuery: " + query + '\n', expected.toString(), result);
+        assertEquals(expected.toString(), result, "\nQuery: " + query + '\n');
       }
 
       for(final String test : tests) {

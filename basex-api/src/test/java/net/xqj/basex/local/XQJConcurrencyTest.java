@@ -1,7 +1,7 @@
 package net.xqj.basex.local;
 
 import static net.xqj.basex.BaseXXQInsertOptions.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor.*;
 
 import javax.xml.xquery.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 import com.xqj2.*;
 

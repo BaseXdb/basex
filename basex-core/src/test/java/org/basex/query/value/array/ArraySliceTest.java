@@ -1,13 +1,13 @@
 package org.basex.query.value.array;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests the {@link XQArray#subArray(long, long, QueryContext)} method.

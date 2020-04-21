@@ -13,8 +13,8 @@ import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Runs the XMark tests.
@@ -119,7 +119,7 @@ public final class XMarkTest {
    * Initializes the tests.
    * @throws Exception any exception
    */
-  @BeforeClass
+  @BeforeAll
   public static void init() throws Exception {
     // only start server if it is not already running
     if(!BaseXServer.ping(StaticOptions.HOST.value(), StaticOptions.PORT.value()))
@@ -134,7 +134,7 @@ public final class XMarkTest {
   /**
    * Initializes the tests.
    */
-  @BeforeClass
+  @AfterAll
   public static void close() {
     // only stop server if it has not been running before starting the tests
     if(server != null) server.stop();

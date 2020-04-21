@@ -4,7 +4,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests for proper tail-calls.

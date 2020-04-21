@@ -1,8 +1,8 @@
 package org.basex.api.xmldb;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
 
@@ -30,7 +30,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
    * Initializes a test.
    * @throws Exception any exception
    */
-  @Before public void setUp() throws Exception {
+  @BeforeEach public void setUp() throws Exception {
     createDB();
     final Class<?> c = Class.forName(DRIVER);
     db = (Database) c.getDeclaredConstructor().newInstance();
@@ -42,7 +42,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
    * Finalizes a test.
    * @throws Exception any exception
    */
-  @After public void tearDown() throws Exception {
+  @AfterEach public void tearDown() throws Exception {
     collection.close();
     dropDB();
   }
@@ -69,7 +69,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
    */
   @Test public void testRemoveCollection() throws Exception {
     service.removeCollection(TEMP);
-    assertNull("Collection was not removed.", db.getCollection(URL + TEMP, null, null));
+    assertNull(db.getCollection(URL + TEMP, null, null), "Collection was not removed.");
   }
 
   /**

@@ -1,13 +1,13 @@
 package org.basex.build;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.serial.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for parsing XML documents.
@@ -19,14 +19,14 @@ public final class XMLParserTest extends SandboxTest {
   /**
    * Prepares the tests.
    */
-  @Before public void before() {
+  @BeforeEach public void before() {
     set(MainOptions.MAINMEM, true);
   }
 
   /**
    * Finishes the tests.
    */
-  @After public void after() {
+  @AfterEach public void after() {
     set(MainOptions.MAINMEM, false);
     set(MainOptions.CHOP, true);
     set(MainOptions.STRIPNS, false);
@@ -123,7 +123,7 @@ public final class XMLParserTest extends SandboxTest {
     for(final boolean b : new boolean[] { true, false }) {
       set(MainOptions.INTPARSE, b);
       execute(new CreateDB(NAME, in));
-      assertEquals("Internal parser: " + b, out, query("."));
+      assertEquals(out, query("."), "Internal parser: " + b);
     }
   }
 }

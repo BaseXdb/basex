@@ -1,11 +1,11 @@
 package org.basex.query;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
 import org.basex.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Runs parallel queries.

@@ -19,6 +19,14 @@
       <artifactId>junit-jupiter-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+    </dependency>
+    <dependency>
       <groupId>jp.sourceforge.igo</groupId>
       <artifactId>igo</artifactId>
       <optional>true</optional>

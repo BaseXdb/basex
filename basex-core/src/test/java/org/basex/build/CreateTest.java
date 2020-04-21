@@ -1,13 +1,13 @@
 package org.basex.build;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for creating databases and adding documents.
@@ -50,7 +50,7 @@ public final class CreateTest extends SandboxTest {
   /**
    * Drops the initial collection.
    */
-  @After public void tearDown() {
+  @AfterEach public void tearDown() {
     execute(new DropDB(NAME));
   }
 

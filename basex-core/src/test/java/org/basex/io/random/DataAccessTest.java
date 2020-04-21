@@ -1,13 +1,13 @@
 package org.basex.io.random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.util.*;
 
 import org.basex.io.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests for class {@link DataAccess}.
@@ -73,7 +73,7 @@ public class DataAccessTest {
    * Set up method.
    * @throws IOException I/O exception
    */
-  @Before public void setUp() throws IOException {
+  @BeforeEach public void setUp() throws IOException {
     file = new IOFile(Prop.TEMPDIR, "page" + IO.BASEXSUFFIX);
     try(RandomAccessFile f = new RandomAccessFile(file.file(), "rw")) {
       initialContent(f);
@@ -84,7 +84,7 @@ public class DataAccessTest {
   /**
    * Tear down method.
    */
-  @After public void tearDown() {
+  @AfterEach public void tearDown() {
     da.close();
     file.delete();
   }
@@ -313,7 +313,7 @@ public class DataAccessTest {
   }
 
   /** Test method for {@link DataAccess#free(long, int)}. */
-  @Ignore
+  @Disabled
   @Test public final void testFree() {
     fail("Not yet implemented");
   }

@@ -7,7 +7,7 @@ import org.basex.query.ast.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the functions of the Utility Module.

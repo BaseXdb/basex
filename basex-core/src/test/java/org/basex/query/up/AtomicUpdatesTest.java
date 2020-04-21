@@ -1,9 +1,7 @@
 package org.basex.query.up;
 
 import static org.basex.util.Token.*;
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.*;
 
@@ -13,7 +11,7 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.up.atomic.*;
 import org.basex.util.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test the {@link AtomicUpdateCache}.

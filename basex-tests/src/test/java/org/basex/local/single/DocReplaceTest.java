@@ -4,7 +4,7 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class replaces document nodes in a database.

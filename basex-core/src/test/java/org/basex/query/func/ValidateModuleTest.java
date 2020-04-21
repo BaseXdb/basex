@@ -2,10 +2,10 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the functions of the Validation Module.

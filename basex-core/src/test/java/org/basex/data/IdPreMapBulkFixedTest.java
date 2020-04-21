@@ -1,6 +1,6 @@
 package org.basex.data;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Fixed ID -> PRE mapping tests.
@@ -9,7 +9,7 @@ import org.junit.*;
  */
 public final class IdPreMapBulkFixedTest extends IdPreMapBulkTestBase {
   /** Set-up method. */
-  @Before @Override
+  @BeforeEach @Override
   public void setUp() {
     baseid = 4;
     opcount = 10;

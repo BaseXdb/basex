@@ -1,12 +1,12 @@
 package org.basex.core;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.parse.*;
 import org.basex.query.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the XML syntax of the database commands.

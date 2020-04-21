@@ -1,7 +1,7 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
@@ -10,7 +10,7 @@ import org.basex.query.expr.ft.*;
 import org.basex.util.ft.*;
 import org.basex.util.ft.FTBitapSearch.TokenComparator;
 import org.basex.util.list.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Test {@link FTBitapSearch} methods.
@@ -134,7 +134,7 @@ public final class FTBitapSearchTest {
   private FTBitapSearch[] searches;
 
   /** Set up method. */
-  @Before public void setUp() {
+  @BeforeEach public void setUp() {
     final TokenComparator cmp = Token::eq;
     final int tl = TESTS.length;
     searches = new FTBitapSearch[tl];

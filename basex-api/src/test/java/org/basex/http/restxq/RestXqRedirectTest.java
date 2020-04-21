@@ -1,6 +1,6 @@
 package org.basex.http.restxq;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This test contains RESTXQ redirections.

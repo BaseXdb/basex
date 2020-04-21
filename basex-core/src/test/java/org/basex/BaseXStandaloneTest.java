@@ -1,12 +1,12 @@
 package org.basex;
 
 import static org.basex.util.Token.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
 import org.basex.io.out.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests the command-line arguments of the standalone starter class.
