@@ -1171,4 +1171,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_><a/></_>/(a[1] union a[2])", "<a/>", exists(Union.class));
     check("<_/>/(<b/>[*] union <c/>[*])", "", exists(Union.class));
   }
+
+  /** XQuery: distinct integer sequences. */
+  @Test public void gh1841() {
+    check("<_/>[position() = (1, 1)]", "<_/>", root(CElem.class));
+    check("<_/>[position() = (1, 2, 1)]", "<_/>", count(Int.class, 2));
+  }
 }

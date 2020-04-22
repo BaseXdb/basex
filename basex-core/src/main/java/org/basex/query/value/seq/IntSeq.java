@@ -1,8 +1,11 @@
+
 package org.basex.query.value.seq;
 
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -47,6 +50,15 @@ public final class IntSeq extends NativeSeq {
    */
   public long[] values() {
     return values;
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    if(mode == Simplify.DISTINCT) {
+      final long[] tmp = new LongList((int) size).add(values).sort().distinct().finish();
+      if(tmp.length != values.length) return cc.replaceWith(this, get(tmp, type));
+    }
+    return super.simplifyFor(mode, cc);
   }
 
   @Override
