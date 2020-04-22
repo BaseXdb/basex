@@ -21,6 +21,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -552,6 +553,7 @@ public abstract class SessionTest extends SandboxTest {
 
   /** Runs an erroneous query. */
   @Test
+  // FIXME: it seems that an error is thrown on the first next() call even though it should be ok
   public void queryError3() throws IOException {
     final Query query = session.query("(1,'a')[. eq 1]");
     assertEqual("1", query.next());
