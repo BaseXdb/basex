@@ -40,7 +40,7 @@ public final class Union extends Set {
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       if(expr == Empty.VALUE || expr.seqType().type instanceof NodeType &&
-          !expr.has(Flag.CNS, Flag.NDT) && ((Checks<Expr>) ex -> ex.equals(expr)).any(list)) {
+          !expr.has(Flag.CNS, Flag.NDT) && list.contains(expr)) {
         // remove empty operands: * union ()  ->  *
         // remove duplicates: * union *  ->  *
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);

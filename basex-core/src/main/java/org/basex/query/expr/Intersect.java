@@ -43,7 +43,7 @@ public final class Intersect extends Set {
         // remove empty operands: * intersect ()  ->  ()
         return cc.emptySeq(this);
       } else if(expr.seqType().type instanceof NodeType && !expr.has(Flag.CNS, Flag.NDT) &&
-         ((Checks<Expr>) ex -> ex.equals(expr)).any(list)) {
+          list.contains(expr)) {
         // remove duplicates: * intersect *  ->  *
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else {
