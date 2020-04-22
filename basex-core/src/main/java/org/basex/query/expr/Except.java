@@ -35,9 +35,7 @@ public final class Except extends Set {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
-    super.optimize(cc);
-
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       if(expr == Empty.VALUE) {
@@ -58,13 +56,16 @@ public final class Except extends Set {
       }
     }
     exprs = list.finish();
+    return null;
+  }
 
-    // ensure that results are always sorted
-    switch(exprs.length) {
-      case 0:  return Empty.VALUE;
-      case 1:  return iterative ? exprs[0] : cc.function(Function._UTIL_DDO, info, exprs[0]);
-      default: return this;
+  @Override
+  And mergePredicates(final Expr[] preds, final CompileContext cc) throws QueryException {
+    final ExprList list = new ExprList(preds.length);
+    for(final Expr pred : preds) {
+      list.add(list.isEmpty() ? pred : cc.function(Function.NOT, info, pred));
     }
+    return new And(info, list.finish());
   }
 
   @Override

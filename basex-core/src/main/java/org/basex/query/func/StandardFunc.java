@@ -112,7 +112,7 @@ public abstract class StandardFunc extends Arr {
   /**
    * Performs function specific optimizations.
    * @param cc compilation context
-   * @return evaluated item
+   * @return optimized or original expression
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")

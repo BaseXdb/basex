@@ -1098,7 +1098,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[empty(b)][empty(c)]", "<a/>", count(EMPTY, 1), count(SingleIterPath.class, 1));
     check("<a/>[empty((b, c))]", "<a/>", count(SingleIterPath.class, 1));
     check("for $a in (<b/>, <c/>) return <a/>[empty(($a[. = 'a'], $a[. = 'b']))]", "<a/>\n<a/>",
-        count(Union.class, 1));
+        count(IterFilter.class, 2));
 
     // no rewritings
     query("for $a in 1 to 2 return <a/>[empty(($a[. = 1], $a[. = 1]))]", "<a/>");
@@ -1139,5 +1139,36 @@ public final class RewritingsTest extends QueryPlanTest {
     query("declare function local:f() as map(xs:string, xs:string) {" +
       "  map:put(map {}, <e/> ! string(), '')" +
       "}; local:f()?*", "");
+  }
+
+  /** Set Expressions: Merge operands. */
+  @Test public void gh1838() {
+    check("<_><a/></_>/(* union *[b])", "<a/>",
+        empty(Union.class), empty(SingleIterPath.class), count(IterStep.class, 1));
+    check("<_><a/></_>/(* intersect *[b])", "",
+        empty(Intersect.class), count(SingleIterPath.class, 1), count(IterStep.class, 2));
+    check("<_><a/></_>/(* except *[b])", "<a/>",
+        empty(Except.class), exists(EMPTY), count(SingleIterPath.class, 1));
+
+    check("<_><a/></_>/*/(.[self::a] union .[self::b])", "<a/>",
+        empty(Union.class));
+    check("<_><a/></_>/*/(.[self::a] intersect .[self::b])", "",
+        empty(Intersect.class));
+    check("<_><a/></_>/*/(.[self::a] except .[self::b])", "<a/>",
+        empty(Except.class), exists(EMPTY));
+
+    check("<_><a/></_>/(.[b][c] union .[d])", "",
+        empty(Union.class), exists(And.class), exists(Or.class));
+    check("<_><a/></_>/(.[b][c] intersect .[d])", "",
+        empty(Intersect.class), empty(And.class));
+    check("<_><a/></_>/(.[b][c] except .[d])", "",
+        empty(Except.class), exists(EMPTY), empty(And.class));
+
+    // no optimization
+    check("<_><a/></_>/(a union a/*[b])", "<a/>", exists(Union.class));
+    check("<_><a/></_>/(a union a/<b/>)", "<a/>\n<b/>", exists(Union.class));
+    check("<_><a/></_>/(a union self::a)", "<a/>", exists(Union.class));
+    check("<_><a/></_>/(a[1] union a[2])", "<a/>", exists(Union.class));
+    check("<_/>/(<b/>[*] union <c/>[*])", "", exists(Union.class));
   }
 }

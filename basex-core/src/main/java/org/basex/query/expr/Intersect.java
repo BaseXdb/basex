@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import java.util.function.*;
 
 import org.basex.query.*;
-import org.basex.query.func.Function;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -35,9 +34,7 @@ public final class Intersect extends Set {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
-    super.optimize(cc);
-
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       // remove empty operands
@@ -54,13 +51,12 @@ public final class Intersect extends Set {
       }
     }
     exprs = list.finish();
+    return null;
+  }
 
-    // ensure that results are always sorted
-    switch(exprs.length) {
-      case 0:  return Empty.VALUE;
-      case 1:  return iterative ? exprs[0] : cc.function(Function._UTIL_DDO, info, exprs[0]);
-      default: return this;
-    }
+  @Override
+  And mergePredicates(final Expr[] preds, final CompileContext cc) {
+    return new And(info, preds);
   }
 
   @Override

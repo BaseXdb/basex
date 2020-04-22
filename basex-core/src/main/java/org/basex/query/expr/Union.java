@@ -2,12 +2,9 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.path.*;
-import org.basex.query.func.Function;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -37,9 +34,7 @@ public final class Union extends Set {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
-    super.optimize(cc);
-
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       if(expr == Empty.VALUE) {
@@ -56,62 +51,12 @@ public final class Union extends Set {
       }
     }
     exprs = list.finish();
-
-    final int el = exprs.length;
-    if(el == 0) return Empty.VALUE;
-    if(el == 1) return iterative ? exprs[0] : cc.function(Function._UTIL_DDO, info, exprs[0]);
-
-    // try to merge paths
-    final Expr expr = merge(cc);
-    if(expr != null) return cc.replaceWith(this, expr);
-
-    // check if expression will yield at least one node
-    if(((Checks<Expr>) ex -> ex.seqType().oneOrMore()).any(exprs)) exprType.assign(Occ.ONE_MORE);
-    return this;
+    return null;
   }
 
-  /**
-   * Tries to merge steps with identical axes and nodes types to a single step.
-   * @param cc compilation context
-   * @return merged expression or {@code null}
-   * @throws QueryException query exception
-   */
-  private Expr merge(final CompileContext cc) throws QueryException {
-    Expr root = null;
-    Axis axis = null;
-    Expr[] preds = null;
-    final ArrayList<Test> tests = new ArrayList<>(2);
-
-    // check if all expressions are paths that can be merged
-    for(final Expr expr : exprs) {
-      if(!(expr instanceof Path)) return null;
-      final Path path = (Path) expr;
-      if(path.steps.length > 1 || !(path.steps[0] instanceof Step)) return null;
-
-      final Step step = (Step) path.steps[0];
-      if(axis == null) {
-        // first pass: assign root, axis and predicates
-        root = path.root;
-        axis = step.axis;
-        preds = step.exprs;
-        if(root != null && root.has(Flag.CNS, Flag.NDT, Flag.POS) ||
-          step.has(Flag.CNS, Flag.NDT, Flag.POS)) return null;
-      } else {
-        // further passes: compare with first root and step
-        if(!(Objects.equals(root, path.root) && axis == step.axis &&
-          Arrays.equals(preds, step.exprs))) return null;
-      }
-
-      // collect tests
-      tests.add(step.test);
-    }
-
-    // try to merge tests
-    final Test test = Test.get(tests);
-    if(test == null) return null;
-
-    final Expr step = new StepBuilder(info).axis(axis).test(test).preds(preds).finish(cc, root);
-    return Path.get(info, root, step).optimize(cc);
+  @Override
+  Or mergePredicates(final Expr[] preds, final CompileContext cc) {
+    return new Or(info, preds);
   }
 
   @Override
