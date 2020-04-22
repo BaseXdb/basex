@@ -97,9 +97,18 @@ public abstract class SimpleMap extends Arr {
 
       final long es = expr.size();
       Expr rep = null;
-      // check if deterministic expressions with known result size can be removed
-      // expression size is never 0 (empty expressions have no followers, see above)
-      if(es != -1 && !expr.has(Flag.NDT)) {
+      if(next instanceof Filter) {
+        final Filter filter = (Filter) next;
+        if(filter.root instanceof ContextValue) {
+          // merge filter with context value as root
+          // A ! .[B]  ->  A[B]
+          rep = Filter.get(info, expr, ((Filter) next).exprs).optimize(cc);
+        }
+      }
+
+      if(rep == null && es != -1 && !expr.has(Flag.NDT)) {
+        // check if deterministic expressions with known result size can be removed
+        // expression size is never 0 (empty expressions have no followers, see above)
         if(next instanceof Value) {
           // rewrite expression with next value as singleton sequence
           // (1 to 2) ! 3  ->  (3, 3)
@@ -109,7 +118,7 @@ public abstract class SimpleMap extends Arr {
           if(next.has(Flag.CTX)) {
             if(expr instanceof ContextValue) {
               // replace leading context reference
-              // ('1','2')[. ! number() = 2]  ->  ('1','2')[number() = 2]
+              // . ! number() = 2  ->  number() = 2
               rep = next;
             } else if(es == 1 && (expr instanceof Value || expr instanceof VarRef)) {
               // single item: inline values and variable references

@@ -1206,4 +1206,11 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("(<_/>[. != 'a'])[. != 'b']\n", "<_/>", count(IterFilter.class, 1), exists(NOT));
   }
+
+  /** Merge simple map and filter expressions. */
+  @Test public void gh1843() {
+    check("(1, 2) ! .[. = 1]", 1, empty(IterMap.class), root(IterFilter.class));
+    check("('a', 'b') ! .[. = 'b']", "b", empty(IterMap.class), root(IterFilter.class));
+    check("(1, 2)[. = 1] ! .[. = 1]", 1, empty(IterMap.class), count(CmpSimpleG.class, 1));
+  }
 }

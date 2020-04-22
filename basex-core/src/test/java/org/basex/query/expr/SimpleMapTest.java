@@ -66,7 +66,8 @@ public final class SimpleMapTest extends QueryPlanTest {
 
   /** Typing. */
   @Test public void types() {
-    check("(1, 2) ! .[. = 1]", 1, exists(IterMap.class));
+    check("(1, 2) ! .[. = 1]", 1, root(IterFilter.class));
+    check("(1, 2) ! <_>{ . }</_>[. = 1]", "<_>1</_>", exists(IterMap.class));
     check("<_>1</_>[. = 1] ! 2", "2", type(ItemMap.class, "xs:integer?"));
     check("<_>4</_>[. = 4] ! (4, 5)[. = 4]", 4, type(IterMap.class, "xs:integer*"));
   }
