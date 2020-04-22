@@ -1203,5 +1203,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("<a/> ! (. > '0' or (. < '1' or . < '2'))", true, count(Or.class, 1));
     check("<a/> ! (. = '0' and (. < '1' and . != '2'))", false, count(And.class, 1));
+
+    check("(<_/>[. != 'a'])[. != 'b']\n", "<_/>", count(IterFilter.class, 1), exists(NOT));
   }
 }

@@ -46,16 +46,13 @@ public abstract class Filter extends Preds {
    */
   public static Expr get(final InputInfo ii, final Expr root, final Expr... preds) {
     // no predicates: return root
-    if(preds.length == 0) return root;
-    // return axis path
-    if(root instanceof AxisPath && !positional(preds))
-      return ((AxisPath) root).addPredicates(preds);
-
-    // use simple filter for single deterministic predicate
-    final Expr pred = preds[0];
-    if(preds.length == 1 && pred.isSimple()) return new SimpleFilter(ii, root, preds);
-
-    return new CachedFilter(ii, root, preds);
+    return preds.length == 0 ? root :
+      // return axis path
+      root instanceof AxisPath && !positional(preds) ? ((AxisPath) root).addPredicates(preds) :
+      // use simple filter for single deterministic predicate
+      preds.length == 1 && preds[0].isSimple() ? new SimpleFilter(ii, root, preds) :
+      // default filter
+      new CachedFilter(ii, root, preds);
   }
 
   @Override
@@ -72,6 +69,13 @@ public abstract class Filter extends Preds {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
+    // flatten nested filters
+    if(root instanceof Filter) {
+      final Filter filter = (Filter) root;
+      root = filter.root;
+      exprs = new ExprList().add(filter.exprs).add(exprs).finish();
+    }
+
     // return empty root
     final SeqType st = root.seqType();
     if(st.zero()) return cc.replaceWith(this, root);
