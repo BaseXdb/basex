@@ -35,16 +35,16 @@ public final class Intersect extends Set {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
+    flatten(cc, Intersect.class);
+
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
-      // remove empty operands
       if(expr == Empty.VALUE) {
-        // example: * intersect ()  ->  ()
+        // remove empty operands: * intersect ()  ->  ()
         return cc.emptySeq(this);
       } else if(expr.seqType().type instanceof NodeType && !expr.has(Flag.CNS, Flag.NDT) &&
          ((Checks<Expr>) ex -> ex.equals(expr)).any(list)) {
-        // remove duplicate
-        // example: * intersect *  ->  *
+        // remove duplicates: * intersect *  ->  *
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else {
         list.add(expr);

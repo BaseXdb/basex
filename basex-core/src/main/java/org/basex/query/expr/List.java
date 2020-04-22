@@ -47,17 +47,22 @@ public final class List extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    flatten(cc, List.class);
+
     // remove empty sequences
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
-      if(expr != Empty.VALUE) list.add(expr);
+      if(expr == Empty.VALUE) {
+        cc.info(OPTREMOVE_X_X, Empty.VALUE, (Supplier<?>) this::description);
+      } else {
+        list.add(expr);
+      }
     }
-    final int ls = list.size();
-    if(ls != exprs.length) {
-      if(ls < 2) return cc.replaceWith(this, ls == 0 ? Empty.VALUE : list.get(0));
-      cc.info(OPTREMOVE_X_X, Empty.VALUE, (Supplier<?>) this::description);
-      exprs = list.finish();
-    }
+    exprs = list.finish();
+
+    final int el = exprs.length;
+    if(el == 0) return Empty.VALUE;
+    if(el == 1) return exprs[0];
 
     // determine result type, compute number of results, set expression type
     Type type = null;

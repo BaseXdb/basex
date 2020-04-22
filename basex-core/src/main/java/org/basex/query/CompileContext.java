@@ -177,17 +177,17 @@ public final class CompileContext {
 
   /**
    * Adds an optimization info for pre-evaluating the specified expression to an empty sequence.
-   * @param result resulting expression
+   * @param expr original expression
    * @return optimized expression
    */
-  public Expr emptySeq(final Expr result) {
-    return replaceWith(result, Empty.VALUE);
+  public Expr emptySeq(final Expr expr) {
+    return replaceWith(expr, Empty.VALUE);
   }
 
   /**
    * Replaces an expression with a simplified one.
    * As the simplified expression may have a different type, no type refinement is performed.
-   * @param expr expression
+   * @param expr original expression
    * @param result resulting expression
    * @return optimized expression
    */
@@ -197,7 +197,7 @@ public final class CompileContext {
 
   /**
    * Replaces an expression with the specified one.
-   * @param expr expression
+   * @param expr original expression
    * @param result resulting expression
    * @return optimized expression
    */
@@ -207,7 +207,7 @@ public final class CompileContext {
 
   /**
    * Replaces an expression with the specified one.
-   * @param expr expression
+   * @param expr original expression
    * @param result resulting expression
    * @param refine refine type
    * @return optimized expression

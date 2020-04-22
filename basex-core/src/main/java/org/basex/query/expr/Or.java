@@ -29,6 +29,7 @@ public final class Or extends Logical {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    flatten(cc, Or.class);
     return optimize(cc, true);
   }
 

@@ -76,7 +76,8 @@ public abstract class SimpleMap extends Arr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    flatten(cc);
+    flatten(cc, IterMap.class);
+
     final boolean item = size(cc);
 
     // simplify static expressions
@@ -168,25 +169,6 @@ public abstract class SimpleMap extends Arr {
   @Override
   public Data data() {
     return exprs[exprs.length - 1].data();
-  }
-
-  /**
-   * Flattens nested maps.
-   * @param cc compilation context
-   */
-  private void flatten(final CompileContext cc) {
-    final ExprList list = new ExprList(exprs.length);
-    for(final Expr expr : exprs) {
-      if(expr instanceof IterMap) {
-        list.add(((IterMap) expr).exprs);
-      } else {
-        list.add(expr);
-      }
-    }
-    if(exprs.length != list.size()) {
-      exprs = list.finish();
-      cc.info(OPTFLAT_X_X, (Supplier<?>) this::description, this);
-    }
   }
 
   /**

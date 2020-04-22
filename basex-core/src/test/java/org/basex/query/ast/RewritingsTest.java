@@ -1192,4 +1192,16 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_/>[position() = (1, 1)]", "<_/>", root(CElem.class));
     check("<_/>[position() = (1, 2, 1)]", "<_/>", count(Int.class, 2));
   }
+
+  /** Flatten expression lists. */
+  @Test public void gh1842() {
+    check("(<a/>, (<b/>, <c/>))", "<a/>\n<b/>\n<c/>", count(List.class, 1));
+
+    check("count(<a/> union (<b/> union <c/>))", 3, count(Union.class, 1));
+    check("count(<a/> intersect (<b/> intersect <c/>))", 0, count(Intersect.class, 1));
+    check("count(<a/> except (<b/> except <c/>))", 1, count(Except.class, 2));
+
+    check("<a/> ! (. > '0' or (. < '1' or . < '2'))", true, count(Or.class, 1));
+    check("<a/> ! (. = '0' and (. < '1' and . != '2'))", false, count(And.class, 1));
+  }
 }

@@ -154,6 +154,25 @@ public abstract class Arr extends ParseExpr {
   }
 
   /**
+   * Flattens nested expressions.
+   * @param cc compilation context
+   * @param clazz expressions to be flattened
+   */
+  protected void flatten(final CompileContext cc, final Class<? extends Arr> clazz) {
+    // flatten nested expressions
+    final ExprList list = new ExprList(exprs.length);
+    for(final Expr expr : exprs) {
+      if(clazz.isInstance(expr)) {
+        list.add(((Arr) expr).exprs);
+        cc.info(OPTFLAT_X_X, expr, (Supplier<?>) this::description);
+      } else {
+        list.add(expr);
+      }
+    }
+    exprs = list.finish();
+  }
+
+  /**
    * Returns the first expression that yields an empty sequence. If all expressions return non-empty
    * results, the original expression is returned.
    * @return empty or original expression

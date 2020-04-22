@@ -57,11 +57,7 @@ abstract class Logical extends Arr {
     ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       final Expr ex = expr.simplifyFor(Simplify.EBV, cc);
-      if(union ? ex instanceof Or : ex instanceof And) {
-        // flatten nested expressions
-        for(final Expr exp : ((Logical) ex).exprs) list.add(exp);
-        cc.info(OPTFLAT_X_X, (Supplier<?>) this::description, ex);
-      } else if(ex instanceof Value) {
+      if(ex instanceof Value) {
         // pre-evaluate values
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
         if(ex.ebv(cc.qc, info).bool(info) ^ !union) return Bln.get(union);
@@ -69,13 +65,9 @@ abstract class Logical extends Arr {
         list.add(ex);
       }
     }
-    // no operands left: return result
-    if(list.isEmpty()) return Bln.get(!union);
-
-    exprs = list.finish();
+    exprs = list.next();
 
     // remove duplicate entries
-    list = new ExprList(exprs.length);
     // 'a'[. = 'a' or . = 'a']  ->  'a'[. = 'a']
     for(final Expr expr : exprs) {
       if(list.contains(expr) && !expr.has(Flag.NDT)) {
@@ -86,7 +78,11 @@ abstract class Logical extends Arr {
     }
     exprs = list.finish();
     mergeEbv(true, union, cc);
-    return exprs.length == 1 ? cc.replaceWith(this, FnBoolean.get(exprs[0], info, cc.sc())) : this;
+
+    final int el = exprs.length;
+    if(el == 0) return Bln.get(!union);
+    if(el == 1) return FnBoolean.get(exprs[0], info, cc.sc());
+    return this;
   }
 
   @Override
