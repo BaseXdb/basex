@@ -38,7 +38,7 @@ abstract class Set extends Arr {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public final Expr optimize(final CompileContext cc) throws QueryException {
     iterative = ((Checks<Expr>) Expr::ddo).all(exprs);
 
     Type type = null;
@@ -114,7 +114,7 @@ abstract class Set extends Arr {
    * @return merged expression or {@code null}
    * @throws QueryException query exception
    */
-  Expr mergePaths(final CompileContext cc) throws QueryException {
+  private Expr mergePaths(final CompileContext cc) throws QueryException {
     Expr root = null;
     Axis axis = null;
     Test test = null;
@@ -185,7 +185,7 @@ abstract class Set extends Arr {
    * @return merged expression or {@code null}
    * @throws QueryException query exception
    */
-  Expr mergeFilters(final CompileContext cc) throws QueryException {
+  private Expr mergeFilters(final CompileContext cc) throws QueryException {
     Expr root = null;
     final ExprList list = new ExprList();
 
@@ -200,7 +200,8 @@ abstract class Set extends Arr {
       }
       if(root == null) {
         root = rt;
-        if(root != null && root.has(Flag.CNS, Flag.NDT)) return null;
+        if(root.has(Flag.CNS, Flag.NDT) || !(root.seqType().type instanceof NodeType))
+          return null;
       } else if(!root.equals(rt)) {
         return null;
       }
@@ -217,13 +218,12 @@ abstract class Set extends Arr {
    * @return predicate expressions
    * @throws QueryException query exception
    */
-  Expr newPredicate(final Expr[] preds, final CompileContext cc) throws QueryException {
+  private Expr newPredicate(final Expr[] preds, final CompileContext cc) throws QueryException {
     final int el = preds.length;
     if(el == 0) return Bln.TRUE;
     if(el == 1) return preds[0];
     return new And(info, preds).optimize(cc);
   }
-
 
   /**
    * Creates a merged filter predicate.

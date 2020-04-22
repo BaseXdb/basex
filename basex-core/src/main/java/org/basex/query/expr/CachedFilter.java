@@ -19,7 +19,7 @@ public class CachedFilter extends Filter {
    * Constructor.
    * @param info input info
    * @param root root expression
-   * @param preds predicates
+   * @param preds predicate expressions
    */
   public CachedFilter(final InputInfo info, final Expr root, final Expr... preds) {
     super(info, root, preds);

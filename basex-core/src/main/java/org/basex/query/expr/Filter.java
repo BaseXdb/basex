@@ -30,7 +30,7 @@ public abstract class Filter extends Preds {
    * Constructor.
    * @param info input info
    * @param root root expression
-   * @param exprs predicates
+   * @param exprs predicate expressions
    */
   protected Filter(final InputInfo info, final Expr root, final Expr... exprs) {
     super(info, SeqType.ITEM_ZM, exprs);
@@ -41,21 +41,21 @@ public abstract class Filter extends Preds {
    * Creates a filter or path expression for the given root and predicates.
    * @param ii input info
    * @param root root expression
-   * @param exprs predicate expressions
+   * @param preds predicate expressions
    * @return filter root, path or filter expression
    */
-  public static Expr get(final InputInfo ii, final Expr root, final Expr... exprs) {
+  public static Expr get(final InputInfo ii, final Expr root, final Expr... preds) {
     // no predicates: return root
-    if(exprs.length == 0) return root;
+    if(preds.length == 0) return root;
     // return axis path
-    if(root instanceof AxisPath && !positional(exprs))
-      return ((AxisPath) root).addPredicates(exprs);
+    if(root instanceof AxisPath && !positional(preds))
+      return ((AxisPath) root).addPredicates(preds);
 
     // use simple filter for single deterministic predicate
-    final Expr pred = exprs[0];
-    if(exprs.length == 1 && pred.isSimple()) return new SimpleFilter(ii, root, exprs);
+    final Expr pred = preds[0];
+    if(preds.length == 1 && pred.isSimple()) return new SimpleFilter(ii, root, preds);
 
-    return new CachedFilter(ii, root, exprs);
+    return new CachedFilter(ii, root, preds);
   }
 
   @Override
