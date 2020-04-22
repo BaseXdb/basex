@@ -861,11 +861,11 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Promote to expression. */
   @Test public void gh1798() {
     check("<a>1</a> promote to xs:string", 1, root(TypeCheck.class));
-    check("(1,2) promote to xs:double+", "1\n2",
+    check("(1, 2) promote to xs:double+", "1\n2",
         empty(TypeCheck.class), root(ItemSeq.class), count(Dbl.class, 2));
 
     error("<a/> promote to empty-sequence()", INVPROMOTE_X_X_X);
-    error("(1,2) promote to xs:byte+", INVPROMOTE_X_X_X);
+    error("(1, 2) promote to xs:byte+", INVPROMOTE_X_X_X);
   }
 
   /** Treats and promotions, error messages. */
@@ -882,7 +882,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(3, 4)[not(. = 1) and not(. = (2, 3))]", 4, count(NOT, 1), count(CmpHashG.class, 1));
     check("(3, 4)[not(. = (2, 3)) and . != 1]", 4, count(NOT, 1), count(CmpHashG.class, 1));
 
-    check("(3, 4)[not(. = (2, 3)) and not(. = (1,4))]", "",
+    check("(3, 4)[not(. = (2, 3)) and not(. = (1, 4))]", "",
         count(NOT, 1), count(CmpHashG.class, 1));
   }
 
@@ -950,7 +950,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(1, 2)[if(.) then '' else xs:anyURI('')]", "", empty());
 
     // no rewriting of numbers > 0
-    check("(1,2) ! boolean(if(.) then 'a' else 1)", "true\ntrue", exists(If.class));
+    check("(1, 2) ! boolean(if(.) then 'a' else 1)", "true\ntrue", exists(If.class));
 
     // switch expression
     check("for $i in (1 to 3)\n" +
@@ -1081,7 +1081,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Rewriting of positional predicate. */
   @Test public void gh1827() {
-    check("declare function local:f($pos) { (1,2)[position() < $pos] };\n" +
+    check("declare function local:f($pos) { (1, 2)[position() < $pos] };\n" +
         "local:f(1)", "", empty());
   }
 
@@ -1172,7 +1172,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_/>/(<b/>[*] union <c/>[*])", "", exists(Union.class));
   }
 
-  /** XQuery: distinct integer sequences. */
+  /** Distinct integer sequences. */
   @Test public void gh1841() {
     check("<_/>[position() = (1, 1)]", "<_/>", root(CElem.class));
     check("<_/>[position() = (1, 2, 1)]", "<_/>", count(Int.class, 2));
