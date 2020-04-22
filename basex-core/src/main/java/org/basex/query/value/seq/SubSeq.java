@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  */
-final class SubSeq extends Seq {
+public final class SubSeq extends Seq {
   /** Underlying sequence. */
   private final Seq sub;
   /** Starting index in {@link #sub}. */

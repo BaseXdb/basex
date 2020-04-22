@@ -1,7 +1,7 @@
 package org.basex.query.ast;
 
-import static org.basex.query.func.Function.*;
 import static org.basex.query.QueryError.*;
+import static org.basex.query.func.Function.*;
 
 import org.basex.core.cmd.*;
 import org.basex.query.expr.*;
@@ -1170,6 +1170,21 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_><a/></_>/(a union self::a)", "<a/>", exists(Union.class));
     check("<_><a/></_>/(a[1] union a[2])", "<a/>", exists(Union.class));
     check("<_/>/(<b/>[*] union <c/>[*])", "", exists(Union.class));
+  }
+
+  /** Combine position predicates. */
+  @Test public void gh1840() {
+    check("(1,2,3)[position() = 1 or position() = 1]", 1, root(Int.class));
+    check("(1,2,3)[position() = 1 or position() = 2]", "1\n2", root(SubSeq.class));
+    check("(1,2,3)[position() = 1 or position() = 3]", "1\n3", count(ItrPos.class, 2));
+
+    check("(1,2,3)[position() = 1 to 2 or position() = 1]", "1\n2", root(SubSeq.class));
+    check("(1,2,3)[position() = 1 to 2 or position() = 2]", "1\n2", root(SubSeq.class));
+    check("(1,2,3)[position() = 1 to 2 or position() = 3]", "1\n2\n3", root(IntSeq.class));
+
+    check("(1,2,3)[position() = 1 to 2 and position() = 1]", 1, root(Int.class));
+    check("(1,2,3)[position() = 1 to 2 and position() = 2 to 3]", 2, root(Int.class));
+    check("(1,2,3)[position() = 1 to 2 and position() = 3]", "", empty());
   }
 
   /** Distinct integer sequences. */
