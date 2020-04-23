@@ -27,6 +27,8 @@ public final class XMarkTest {
   private static final String USER = "xmark";
   /** Name of database. */
   private static final String DB = "111mb";
+  /** Input data of database. */
+  private static final String DBFILE = "http://files.basex.org/xml/xmark.xml";
 
   /** Test directory. */
   private static final IOFile DIR = new IOFile(Prop.TEMPDIR, "XMark");
@@ -126,6 +128,7 @@ public final class XMarkTest {
       server = new BaseXServer();
 
     try(ClientSession cs = createClient(true)) {
+      cs.execute("create db " + DB + " " + DBFILE);
       cs.execute("create user xmark xmark");
       cs.execute("grant read on " + DB + " to xmark");
     }
