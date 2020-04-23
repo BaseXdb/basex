@@ -39,8 +39,8 @@ public final class RESTConcurrencyTest extends SandboxTest {
    * Create a test database and start BaseXHTTP.
    * @throws Exception if database cannot be created or server cannot be started
    */
-  @BeforeAll
-  public static void setUp() throws Exception {
+  @BeforeEach
+  public void setUp() throws Exception {
     final StringList sl = new StringList();
     sl.add("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT, "-z").add("-U" + ADMIN);
 
@@ -51,14 +51,11 @@ public final class RESTConcurrencyTest extends SandboxTest {
   }
 
   /**
-   * Drop the test database and stop BaseXHTTP.
+   * Stop BaseXHTTP.
    * @throws Exception if database cannot be dropped or server cannot be stopped
    */
-  @AfterAll
-  public static void tearDown() throws Exception {
-    try(ClientSession cs = createClient()) {
-      cs.execute(new DropDB(NAME));
-    }
+  @AfterEach
+  public void tearDown() throws Exception {
     http.stop();
   }
 
