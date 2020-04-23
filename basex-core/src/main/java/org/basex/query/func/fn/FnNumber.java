@@ -35,8 +35,8 @@ public final class FnNumber extends ContextFn {
     final boolean context = contextAccess();
     final Expr expr = context ? cc.qc.focus.value : exprs[0];
     if(expr != null && expr.seqType().eq(SeqType.DBL_O)) {
-      // number(1e1) -> 1e1
-      // $double[number() = 1] -> $double[. = 1]
+      // number(1e1)  ->  1e1
+      // $double[number() = 1]  ->  $double[. = 1]
       return context && cc.nestedFocus() ? new ContextValue(info).optimize(cc) : expr;
     }
     return this;

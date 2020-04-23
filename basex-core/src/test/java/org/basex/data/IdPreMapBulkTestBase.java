@@ -18,9 +18,9 @@ public abstract class IdPreMapBulkTestBase {
   int opcount = 7000;
   /** Initial number of records. */
   int baseid = 400;
-  /** ID -> PRE map to compare to. */
+  /** ID-PRE map to compare to. */
   private DummyIdPreMap basemap;
-  /** ID -> PRE map to test. */
+  /** ID-PRE map to test. */
   private IdPreMap testedmap;
   /** Sequence of performed operations and parameters. */
   private ArrayList<int[]> ops;

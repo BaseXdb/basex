@@ -106,7 +106,7 @@ public final class DecFormatter extends FormatUtil {
     for(int i = 0; i < 10; i++) tb.add(zero + i);
     digits = tb.toArray();
     // decimal-separator, exponent-separator, ... , are classified as active characters.
-    // -> decimal-digit-family: added above. pattern-separator: will never occur at this stage
+    // decimal-digit-family: added above. pattern-separator: will never occur at this stage
     actives = tb.add(decimal).add(exponent).add(grouping).add(optional).finish();
     // "all other characters (...) are classified as passive characters."
   }

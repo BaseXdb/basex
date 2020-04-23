@@ -28,9 +28,9 @@ public class IndexPath extends IndexPred {
   /**
    * Returns the last step pointing to the requested nodes. Examples:
    * <ul>
-   *   <li>{@code /xml/a[b = 'A']}        -> {@code b}</li>
-   *   <li>{@code /xml/a[b/text() = 'A']} -> {@code text()}</li>
-   *   <li>{@code /xml/a[text() = 'A']}   -> {@code text()}</li>
+   *   <li>{@code /xml/a[b = 'A']}         ->  {@code b}</li>
+   *   <li>{@code /xml/a[b/text() = 'A']}  ->  {@code text()}</li>
+   *   <li>{@code /xml/a[text() = 'A']}    ->  {@code text()}</li>
    * </ul>
    * @return step or {@code null}
    */
@@ -49,11 +49,11 @@ public class IndexPath extends IndexPred {
   /**
    * Returns the local name and namespace uri of the last name test. Examples:
    * <ul>
-   *   <li> //*[x = 'TEXT']         -> x </li>
-   *   <li> //*[x /text() = 'TEXT'] -> x </li>
-   *   <li> //x[text() = 'TEXT']    -> x </li>
-   *   <li> //*[* /@x = 'TEXT']     -> x </li>
-   *   <li> //*[@x = 'TEXT']        -> x </li>
+   *   <li> //*[x = 'TEXT']          ->  x </li>
+   *   <li> //*[x /text() = 'TEXT']  ->  x </li>
+   *   <li> //x[text() = 'TEXT']     ->  x </li>
+   *   <li> //*[* /@x = 'TEXT']      ->  x </li>
+   *   <li> //*[@x = 'TEXT']         ->  x </li>
    * </ul>
    * @return step with name
    */

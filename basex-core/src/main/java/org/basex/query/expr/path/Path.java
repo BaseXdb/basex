@@ -157,8 +157,8 @@ public abstract class Path extends ParseExpr {
     if(expr == this) expr = index(cc, rt);
     /* rewrite descendant to child steps. this optimization is called after the index rewritings,
      * as it is cheaper to invert a descendant step. examples:
-     * - //B [. = '...'] -> IA('...', B)
-     * - /A/B[. = '...'] -> IA('...', B)/parent::A *[parent::document-node()] */
+     * - //B [. = '...']  ->  IA('...', B)
+     * - /A/B[. = '...']  ->  IA('...', B)/parent::A *[parent::document-node()] */
     if(expr == this) expr = children(cc, rt);
     // return optimized expression
     if(expr != this) return expr.optimize(cc);
@@ -179,7 +179,7 @@ public abstract class Path extends ParseExpr {
         final Step step = (Step) last;
         if(step.exprs.length == 1 && step.seqType().type instanceof NodeType &&
             !step.exprs[0].seqType().mayBeNumber()) {
-          // merge nested predicates. example: if(a[b]) ->  if(a/b)
+          // merge nested predicates. example: if(a[b])  ->  if(a/b)
           final Expr s = step.simplify(this, cc);
           if(s != step) {
             step.exprs = new Expr[0];
@@ -272,7 +272,7 @@ public abstract class Path extends ParseExpr {
     Step self = null;
     final ExprList list = new ExprList(sl);
     for(int s = 0; s < sl; s++) {
-      // remove redundant steps. example: <xml/>/self::node() -> <xml/>
+      // remove redundant steps. example: <xml/>/self::node()  ->  <xml/>
       final Step st = axisStep(s);
       if(st != null && st.axis == SELF && st.exprs.length == 0 && st.test instanceof KindTest) {
         final Expr prev = list.isEmpty() ? root : list.peek();
@@ -282,7 +282,7 @@ public abstract class Path extends ParseExpr {
         }
       }
 
-      // step is empty sequence. example: $doc/NON-EXISTING-STEP -> $doc/() -> ()
+      // step is empty sequence. example: $doc/NON-EXISTING-STEP  ->  $doc/()  ->  ()
       final Expr expr = steps[s];
       if(expr == Empty.VALUE) return cc.emptySeq(this);
 
@@ -290,7 +290,7 @@ public abstract class Path extends ParseExpr {
       list.add(expr);
 
       // ignore remaining steps if step yields no results
-      // example: A/prof:void(.)/B -> A/prof:void(.)
+      // example: A/prof:void(.)/B  ->  A/prof:void(.)
       if(expr.seqType().zero() && s + 1 < sl) {
         cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
         break;
@@ -907,16 +907,16 @@ public abstract class Path extends ParseExpr {
       return null;
     };
 
-    // example: //child::* -> descendant::*
+    // example: //child::*  ->  descendant::*
     if(simpleChild(nxt)) {
       nxt.axis = DESCENDANT;
       return nxt;
     }
-    // example: //(text()|*) -> (descendant::text() | descendant::*)
+    // example: //(text()|*)  ->  (descendant::text() | descendant::*)
     if(next instanceof Union) {
       return rewrite.apply(next);
     }
-    // example: //(text()|*)[..] -> (/descendant::text() | /descendant::*)[..]
+    // example: //(text()|*)[..]  ->  (/descendant::text() | /descendant::*)[..]
     if(next instanceof Filter) {
       final Filter filter = (Filter) next;
       if(!filter.positional()) {

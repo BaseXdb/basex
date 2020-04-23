@@ -21,9 +21,9 @@ public final class IdPreMapTest {
   private static final int BASEID = 2000;
   /** Random number generator. */
   private static final Random RANDOM = new Random();
-  /** ID -> PRE map to compare to. */
+  /** ID-PRE map to compare to. */
   private DummyIdPreMap basemap;
-  /** ID -> PRE map to test. */
+  /** ID-PRE map to test. */
   private IdPreMap testedmap;
   /** Sequence of inserted PRE values. */
   private IntList insertedpres;

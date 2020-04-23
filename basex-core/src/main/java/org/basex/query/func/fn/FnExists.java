@@ -27,7 +27,7 @@ public final class FnExists extends FnEmpty {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) {
-    // if(exists(node*)) -> if(node*)
+    // if(exists(node*))  ->  if(node*)
     if(mode == Simplify.EBV) {
       final Expr expr = exprs[0];
       if(expr.seqType().type instanceof NodeType) return cc.simplify(this, expr);

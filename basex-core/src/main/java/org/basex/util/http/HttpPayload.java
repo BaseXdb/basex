@@ -139,7 +139,7 @@ public final class HttpPayload {
       throws IOException, QueryException {
 
     try {
-      // RFC 1341: Preamble is to be ignored -> read till 1st boundary
+      // RFC 1341: Preamble is to be ignored: read till 1st boundary
       while(true) {
         final byte[] l = readLine();
         if(l == null) throw HC_REQ_X.get(info, "No body specified for http:part");

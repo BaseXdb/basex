@@ -23,8 +23,8 @@ public class IndexContext extends IndexPred {
   /**
    * Returns the last step pointing to the requested nodes. Examples:
    * <ul>
-   *   <li>{@code /xml/a[. = 'A']}        -> {@code a}</li>
-   *   <li>{@code /xml/a/text()[. = 'A']} -> {@code text()}</li>
+   *   <li>{@code /xml/a[. = 'A']}         ->  {@code a}</li>
+   *   <li>{@code /xml/a/text()[. = 'A']}  ->  {@code text()}</li>
    * </ul>
    * @return parent step
    */

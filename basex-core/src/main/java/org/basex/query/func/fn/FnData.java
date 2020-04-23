@@ -40,8 +40,8 @@ public final class FnData extends ContextFn {
       if(st.zero()) return expr;
       final AtomType type = st.type.atomic();
       if(type == st.type) {
-        // data('x') -> 'x'
-        // $string[data() = 'a'] -> $string[. = 'a']
+        // data('x')  ->  'x'
+        // $string[data() = 'a']  ->  $string[. = 'a']
         return context && cc.nestedFocus() ? new ContextValue(info).optimize(cc) : expr;
       }
       if(type != null) exprType.assign(type, st.occ, expr.size());

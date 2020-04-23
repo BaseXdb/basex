@@ -107,9 +107,9 @@ public abstract class Preds extends Arr {
         max = Math.min(max, 1);
       } else if(expr instanceof ItrPos) {
         final ItrPos pos = (ItrPos) expr;
-        // subtract start position. example: ...[1 to 2][2] -> 2 -> 1
+        // subtract start position. example: ...[1 to 2][2]  ->  2  ->  1
         if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
-        // use minimum of old value and range. example: ...[1 to 5] ->  5
+        // use minimum of old value and range. example: ...[1 to 5]  ->  5
         max = Math.min(max, pos.max - pos.min + 1);
       } else {
         // resulting size will be unknown for any other filter
@@ -224,7 +224,7 @@ public abstract class Preds extends Arr {
     for(final Expr expr : exprs) {
       Expr ex = expr;
       if(ex instanceof ContextValue && st.type instanceof NodeType) {
-        // E [ . ] -> E
+        // E [ . ]  ->  E
         cc.info(OPTREMOVE_X_X, ex, (Supplier<?>) this::description);
         continue;
       }
@@ -236,8 +236,8 @@ public abstract class Preds extends Arr {
 
       // map operator
       if(ex instanceof SimpleMap) {
-        // E [ . ! ... ] -> E [ ... ]
-        // E [ E ! ... ] -> E [ ... ]
+        // E [ . ! ... ]  ->  E [ ... ]
+        // E [ E ! ... ]  ->  E [ ... ]
         final SimpleMap map = (SimpleMap) ex;
         final Expr[] mexprs = map.exprs;
         final Expr first = mexprs[0], second = mexprs[1];
@@ -273,8 +273,8 @@ public abstract class Preds extends Arr {
           }
         }
 
-        // E [ . / ... ] -> E [ ... ]
-        // E [ E / ... ] -> E [ ... ]
+        // E [ . / ... ]  ->  E [ ... ]
+        // E [ E / ... ]  ->  E [ ... ]
         final Path path = (Path) ex;
         final Expr first = path.root;
         if(st.type instanceof NodeType && (first instanceof ContextValue ||
@@ -284,7 +284,7 @@ public abstract class Preds extends Arr {
       }
 
       // inline root item (ignore nodes)
-      // 1[. = 1] -> 1[1 = 1]
+      // 1[. = 1]  ->  1[1 = 1]
       if(root instanceof Item && !(st.type instanceof NodeType)) {
         final Expr inlined = ex.inline(null, root, cc);
         if(inlined != null) ex = inlined;
@@ -311,7 +311,7 @@ public abstract class Preds extends Arr {
     final Expr pred = exprs[0];
     if(pred.seqType().mayBeNumber()) return this;
 
-    // a[b] -> a/b
+    // a[b]  ->  a/b
     if(pred instanceof Path) return Path.get(info, root, pred).optimize(cc);
 
     if(pred instanceof CmpG) {
@@ -321,9 +321,9 @@ public abstract class Preds extends Arr {
       // right operand must not depend on context
       if(!expr2.has(Flag.CTX)) {
         Expr expr1 = null;
-        // a[. = 'x'] -> a = 'x'
+        // a[. = 'x']  ->  a = 'x'
         if(expr instanceof ContextValue) expr1 = root;
-        // a[text() = 'x'] -> a/text() = 'x'
+        // a[text() = 'x']  ->  a/text() = 'x'
         if(expr instanceof Path) expr1 = Path.get(info, root, expr).optimize(cc);
         if(expr1 != null)
           return new CmpG(expr1, expr2, cmp.op, cmp.coll, cmp.sc, cmp.info).optimize(cc);
@@ -337,9 +337,9 @@ public abstract class Preds extends Arr {
       if(!ftexpr.has(Flag.CTX)) {
         final Expr expr = cmp.expr;
         Expr expr1 = null;
-        // a[. contains text 'x'] -> a contains text 'x'
+        // a[. contains text 'x']  ->  a contains text 'x'
         if(expr instanceof ContextValue) expr1 = root;
-        // a[text() contains text 'x'] -> a/text() contains text 'x'
+        // a[text() contains text 'x']  ->  a/text() contains text 'x'
         if(expr instanceof Path) expr1 = Path.get(info, root, expr).optimize(cc);
 
         if(expr1 != null) return new FTContains(expr1, ftexpr, cmp.info).optimize(cc);

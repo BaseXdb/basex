@@ -65,12 +65,12 @@ public final class DbRename extends DbAccess {
       throws QueryException {
 
     if(src.isDir()) {
-      // dir -> file? error
+      // dir  ->  file? error
       if(trg.exists() && !trg.isDir()) throw DB_PATH_X.get(info, src);
       // rename children
       for(final IOFile f : src.children()) rename(data, f, new IOFile(trg, f.name()), qc);
     } else if(src.exists()) {
-      // file -> dir? error
+      // file  ->  dir? error
       if(trg.isDir()) throw DB_PATH_X.get(info, src);
       qc.updates().add(new DBRename(data, src.path(), trg.path(), info), qc);
     }

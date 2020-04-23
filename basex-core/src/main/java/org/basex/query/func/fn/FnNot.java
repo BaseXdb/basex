@@ -22,27 +22,27 @@ public final class FnNot extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // e.g.: not(boolean(A)) -> not(A)
+    // e.g.: not(boolean(A))  ->  not(A)
     final Expr expr = exprs[0].simplifyFor(Simplify.EBV, cc);
 
-    // not(empty(A)) -> exists(A)
+    // not(empty(A))  ->  exists(A)
     if(Function.EMPTY.is(expr)) {
       return cc.function(Function.EXISTS, info, args(expr));
     }
-    // not(exists(A)) -> empty(A)
+    // not(exists(A))  ->  empty(A)
     if(Function.EXISTS.is(expr)) {
       return cc.function(Function.EMPTY, info, args(expr));
     }
-    // not(not(A)) -> boolean(A)
+    // not(not(A))  ->  boolean(A)
     if(Function.NOT.is(expr)) {
       return FnBoolean.get(args(expr)[0], info, cc.sc());
     }
-    // not('a' = 'b') -> 'a' != 'b'
+    // not('a' = 'b')  ->  'a' != 'b'
     if(expr instanceof Cmp) {
       final Expr ex = ((Cmp) expr).invert(cc);
       if(ex != expr) return ex;
     }
-    // not($node/text()) -> empty($node/text())
+    // not($node/text())  ->  empty($node/text())
     final SeqType st = expr.seqType();
     if(st.type instanceof NodeType) return cc.function(Function.EMPTY, info, expr);
 

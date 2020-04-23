@@ -197,8 +197,8 @@ public final class ModuleLoader {
       for(final byte[] u : desc.jars) addURL(new IOFile(modDir, string(u)));
     }
 
-    // package has dependencies -> they have to be loaded first => put package
-    // in list with packages to be loaded
+    // package has dependencies. they have to be loaded first
+    // (put package in list with packages to be loaded)
     if(!pkg.dep.isEmpty()) toLoad.add(id);
     for(final PkgDep dep : pkg.dep) {
       if(dep.name != null) {

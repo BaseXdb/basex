@@ -87,18 +87,18 @@ public abstract class Filter extends Preds {
 
     // no positional access..
     if(!positional()) {
-      // convert to axis path: (//x)[text() = 'a'] -> //x[text() = 'a']
+      // convert to axis path: (//x)[text() = 'a']  ->  //x[text() = 'a']
       if(root instanceof AxisPath) return ((AxisPath) root).addPredicates(exprs).optimize(cc);
 
       // rewrite filter with document nodes to path; enables index rewritings
-      // example: db:open('db')[.//text() = 'x'] -> db:open('db')/.[.//text() = 'x']
+      // example: db:open('db')[.//text() = 'x']  ->  db:open('db')/.[.//text() = 'x']
       if(st.type == NodeType.DOC && root.ddo()) {
         final Expr step = new StepBuilder(info).preds(exprs).finish(cc, root);
         return cc.replaceWith(this, Path.get(info, root, step).optimize(cc));
       }
 
       // rewrite independent deterministic single filter to if expression:
-      // example: (1 to 10)[$boolean] -> if($boolean) then (1 to 10) else ()
+      // example: (1 to 10)[$boolean]  ->  if($boolean) then (1 to 10) else ()
       final Expr expr = exprs[0];
       if(exprs.length == 1 && expr.isSimple() && !expr.seqType().mayBeNumber()) {
         final Expr iff = new If(info, expr, root).optimize(cc);
@@ -129,20 +129,20 @@ public abstract class Filter extends Preds {
           final long size = pos.min - 1, len = Math.min(pos.max, r.size()) - size;
           expr = len <= 0 ? Empty.VALUE : ((Value) r).subsequence(size, len, cc.qc);
         } else if(pos.min == pos.max) {
-          // expr[pos] -> util:item(expr, pos)
+          // expr[pos]  ->  util:item(expr, pos)
           expr = pos.min == 1 ? cc.function(Function.HEAD, info, r) :
             cc.function(Function._UTIL_ITEM, info, r, Int.get(pos.min));
         } else {
-          // expr[min..max] -> util:range(expr, min, max)
+          // expr[min..max]  ->  util:range(expr, min, max)
           expr = cc.function(Function._UTIL_RANGE, info, r, Int.get(pos.min), Int.get(pos.max));
         }
       } else if(pred instanceof Pos) {
         final Pos pos = (Pos) pred;
         if(pos.eq()) {
-          // expr[pos] -> util:item(expr, pos.min)
+          // expr[pos]  ->  util:item(expr, pos.min)
           expr = cc.function(Function._UTIL_ITEM, info, r, pos.exprs[0]);
         } else {
-          // expr[min..max] -> util:range(expr, pos.min, pos.max)
+          // expr[min..max]  ->  util:range(expr, pos.min, pos.max)
           expr = cc.function(Function._UTIL_RANGE, info, r, pos.exprs[0], pos.exprs[1]);
         }
       } else if(numeric(pred)) {
@@ -158,10 +158,10 @@ public abstract class Filter extends Preds {
         if(cmp.positional() && opV != null) {
           final Expr ex = cmp.exprs[1];
           if((opV == OpV.LT || opV == OpV.NE) && Function.LAST.is(ex)) {
-            // expr[position() < last()] -> util:init(expr)
+            // expr[position() < last()]  ->  util:init(expr)
             expr = cc.function(Function._UTIL_INIT, info, r);
           } else if(opV == OpV.NE && ex instanceof Int) {
-            // expr[position() != INT] -> remove(expr, INT)
+            // expr[position() != INT]  ->  remove(expr, INT)
             expr = cc.function(Function.REMOVE, info, r, ex);
           }
         }

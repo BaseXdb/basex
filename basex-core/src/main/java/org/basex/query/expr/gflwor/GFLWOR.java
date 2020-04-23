@@ -265,7 +265,7 @@ public final class GFLWOR extends ParseExpr {
         }
       } else if(clause instanceof For) {
         // replace deterministic expression with cheaper singleton sequence
-        // for $i in 1 to 3 return <a/> -> for $i in util:replicate('', 3) return $i
+        // for $i in 1 to 3 return <a/>  ->  for $i in util:replicate('', 3) return $i
         final For fr = (For) clause;
         final long fs = fr.expr.size();
         if(fs > 1 && fr.var.declType == null && !(fr.expr instanceof SingletonSeq) &&
@@ -275,13 +275,13 @@ public final class GFLWOR extends ParseExpr {
           changed = true;
         }
         // remove scoring variable (include current iteration in count)
-        // for $i score $s in <a/> return $i -> for $i in <a/> return $i
+        // for $i score $s in <a/> return $i  ->  for $i in <a/> return $i
         if(fr.score != null && count(fr.score, pos) == VarUsage.NEVER) {
           fr.remove(cc, fr.score);
           changed = true;
         }
         // remove positional variable (include current iteration in count)
-        // for $i pos $p in () return $p -> for $i in () return $p; later -> ()
+        // for $i pos $p in () return $p  ->  for $i in () return $p; later  ->  ()
         if(fr.pos != null && count(fr.pos, pos) == VarUsage.NEVER) {
           fr.remove(cc, fr.pos);
           changed = true;
@@ -328,7 +328,7 @@ public final class GFLWOR extends ParseExpr {
         }
         if(!inline && expr instanceof ContextValue) {
           // inline context values
-          // allowed: 1[let $x := . return $x] -> 1[.]
+          // allowed: 1[let $x := . return $x]  ->  1[.]
           // illegal: 1[let $x := . return <a/>[$x = 1]]
           inline = inlineable.ok();
         }
@@ -336,7 +336,7 @@ public final class GFLWOR extends ParseExpr {
           // inline expressions that occur once, but do not construct nodes
           // e.g. let $x := <X/> return <X xmlns='xx'>{ $x/self::X }</X>
           // inline top-level context references
-          // e.g. (1 to 5)[let $p := position() return $p = 1] -> (1 to 5)[position() = 1]
+          // e.g. (1 to 5)[let $p := position() return $p = 1]  ->  (1 to 5)[position() = 1]
           inline = !expr.has(Flag.CTX) || inlineable.ok();
         }
         if(!inline && expr instanceof Path) {
@@ -374,7 +374,7 @@ public final class GFLWOR extends ParseExpr {
         final Clause clause = iter.next();
         final boolean isFor = clause instanceof For, isLet = clause instanceof Let;
         if(isFor) {
-          // for $x in (for $y in A (...) return B) -> for $y in A (...) for $x in B
+          // for $x in (for $y in A (...) return B)  ->  for $y in A (...) for $x in B
           final For fr = (For) clause;
           if(!fr.empty && fr.pos == null && fr.expr instanceof GFLWOR) {
             final GFLWOR fl = (GFLWOR) fr.expr;
@@ -390,7 +390,7 @@ public final class GFLWOR extends ParseExpr {
         }
 
         if(!thisRound && (isFor || isLet)) {
-          // let $x := (let $y := E return F) -> let $y := E let $x := F
+          // let $x := (let $y := E return F)  ->  let $y := E let $x := F
           final Expr expr = isFor ? ((For) clause).expr : ((Let) clause).expr;
           if(expr instanceof GFLWOR) {
             final GFLWOR fl = (GFLWOR) expr;
@@ -530,7 +530,7 @@ public final class GFLWOR extends ParseExpr {
             if(before instanceof For) {
               final For fr = (For) before;
               if(fr.toPredicate(cc, where.expr)) {
-                // for $i in ('a', 'b') where $i return $i -> for $i in ('a', 'b')[.] return $i
+                // for $i in ('a', 'b') where $i return $i  -> for $i in ('a', 'b')[.] return $i
                 fors.add((For) before);
                 clauses.remove(newPos);
                 changed = true;
@@ -607,7 +607,7 @@ public final class GFLWOR extends ParseExpr {
   private boolean mergeLastClause() {
     if(!clauses.isEmpty() && clauses.getLast() instanceof ForLet && rtrn instanceof VarRef) {
       final ForLet last = (ForLet) clauses.getLast();
-      // for $x in E return $x -> E
+      // for $x in E return $x  ->  E
       if(last.var.is(((VarRef) rtrn).var) && !last.var.checksType() && !last.scoring) {
         clauses.removeLast();
         rtrn = last.expr;

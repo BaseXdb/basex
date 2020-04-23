@@ -77,14 +77,14 @@ public final class If extends Arr {
     cond = cond.simplifyFor(Simplify.EBV, cc);
     if(cond instanceof Value) return cc.replaceWith(this, exprs[branch(cc.qc)]);
 
-    // if A then B else B -> B (errors in A will be ignored)
+    // if A then B else B  ->  B (errors in A will be ignored)
     if(exprs[0].equals(exprs[1])) {
       if(!cond.has(Flag.NDT)) return cc.replaceWith(this, exprs[0]);
       cond = cc.function(Function._PROF_VOID, info, cond);
       return cc.replaceWith(this, new List(info, cond, exprs[0]).optimize(cc));
     }
 
-    // if not(A) then B else C -> if A then C else B
+    // if not(A) then B else C  ->  if A then C else B
     if(Function.NOT.is(cond)) {
       cc.info(OPTSWAP_X, this);
       cond = ((Arr) cond).exprs[0];
@@ -98,27 +98,27 @@ public final class If extends Arr {
     if(st1.eq(SeqType.BLN_O) && st2.eq(SeqType.BLN_O)) {
       final Expr br1 = exprs[0], br2 = exprs[1];
       if(br1 == Bln.TRUE) {
-        // if(A) then true() else false() -> xs:boolean(A)
+        // if(A) then true() else false()  ->  xs:boolean(A)
         if(br2 == Bln.FALSE) return cc.replaceWith(this, FnBoolean.get(cond, info, cc.sc()));
-        // if(A) then true() else C -> A or C
+        // if(A) then true() else C  ->  A or C
         return cc.replaceWith(this, new Or(info, cond, br2).optimize(cc));
       }
 
       if(br2 == Bln.TRUE) {
-        // if(A) then false() else true() -> not(A)
+        // if(A) then false() else true()  ->  not(A)
         if(br1 == Bln.FALSE) return cc.replaceWith(this, cc.function(Function.NOT, info, cond));
-        // if(A) then B else true() -> not(A) or B
+        // if(A) then B else true()  ->  not(A) or B
         final Expr expr = new Or(info, cc.function(Function.NOT, info, cond), br1).optimize(cc);
         return cc.replaceWith(this, expr);
       }
 
-      // if(A) then false() else C -> not(A) and C
+      // if(A) then false() else C  ->  not(A) and C
       if(br1 == Bln.FALSE) {
         final Expr expr = new And(info, cc.function(Function.NOT, info, cond), br2).optimize(cc);
         return cc.replaceWith(this, expr);
       }
 
-      // if(A) then B else false() -> A and B
+      // if(A) then B else false()  ->  A and B
       if(br2 == Bln.FALSE) return cc.replaceWith(this, new And(info, cond, br1).optimize(cc));
     }
 

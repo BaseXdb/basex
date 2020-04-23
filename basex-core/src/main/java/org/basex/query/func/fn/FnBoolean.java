@@ -22,14 +22,14 @@ public final class FnBoolean extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // e.g.: boolean(exists(<a/>)) -> boolean(<a/>)
+    // e.g.: boolean(exists(<a/>))  ->  boolean(<a/>)
     final Expr expr = exprs[0].simplifyFor(Simplify.EBV, cc);
 
-    // boolean($node/text()) -> exists($node/text())
+    // boolean($node/text())  ->  exists($node/text())
     final SeqType st = expr.seqType();
     if(st.type instanceof NodeType) return cc.function(Function.EXISTS, info, expr);
 
-    // simplify, e.g.: boolean(true())) -> true()
+    // simplify, e.g.: boolean(true()))  ->  true()
     if(st.eq(SeqType.BLN_O)) return expr;
 
     exprs[0] = expr;
@@ -38,7 +38,7 @@ public final class FnBoolean extends StandardFunc {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) {
-    // if A is not numeric: expr[boolean(A)] -> expr[A]
+    // if A is not numeric: expr[boolean(A)]  ->  expr[A]
     if(mode == Simplify.EBV) {
       final Expr expr = exprs[0];
       if(!expr.seqType().mayBeNumber()) return cc.simplify(this, expr);

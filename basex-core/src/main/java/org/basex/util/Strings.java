@@ -307,7 +307,7 @@ public final class Strings {
       } else {
         final String auth = u.getAuthority();
         if(auth != null) {
-          // reverse authority, replace dots by slashes. example: basex.org -> org/basex
+          // reverse authority, replace dots by slashes. example: basex.org  ->  org/basex
           final String[] comp = split(auth, '.');
           for(int c = comp.length - 1; c >= 0; c--) tb.add('/').add(comp[c]);
         }
