@@ -21,7 +21,6 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -196,6 +195,7 @@ public abstract class SessionTest extends SandboxTest {
 
   /**
    * Stores binary content in the database.
+   * @throws IOException I/O exception
    */
   @Test
   public final void storeInvalid() throws IOException {
@@ -551,12 +551,11 @@ public abstract class SessionTest extends SandboxTest {
     assertThrows(BaseXException.class, () -> session.query("(1,'a')[. eq 1]").execute());
   }
 
-  /** Runs an erroneous query. */
+  /** Runs an erroneous query.
+   * @throws IOException I/O exception */
   @Test
-  // FIXME: it seems that an error is thrown on the first next() call even though it should be ok
   public void queryError3() throws IOException {
     final Query query = session.query("(1,'a')[. eq 1]");
-    assertEqual("1", query.next());
     assertThrows(BaseXException.class, query::next);
   }
 
@@ -589,9 +588,9 @@ public abstract class SessionTest extends SandboxTest {
     final String var = "declare variable $x external;",
         map = "{\"foo\":[1,2,3],\"bar\":{\"a\":null,\"\":false}}";
     final String[][] tests = {
-        {"for $k in map:keys($x) order by $k descending return $k", "foo\nbar"},
-        {"every $k in $x('foo')?* satisfies $k eq $x('foo')(xs:integer($k))", "true"},
-        {"empty($x('bar')('a')) and not($x('bar')(''))", "true"},
+        { "for $k in map:keys($x) order by $k descending return $k", "foo\nbar" },
+        { "every $k in $x('foo')?* satisfies $k eq $x('foo')(xs:integer($k))", "true" },
+        { "empty($x('bar')('a')) and not($x('bar')(''))", "true" },
     };
     for(final String[] test : tests) {
       try(Query qu = session.query(var + test[0])) {

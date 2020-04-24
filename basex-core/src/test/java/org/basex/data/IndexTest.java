@@ -2,9 +2,6 @@ package org.basex.data;
 
 import static org.basex.query.func.Function.*;
 
-import java.util.*;
-import java.util.List;
-
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -37,7 +34,7 @@ public final class IndexTest extends SandboxTest {
    */
   @ParameterizedTest
   @ValueSource(booleans = {false, true})
-  public void updindexText(boolean mainmem) {
+  public void updindexText(final boolean mainmem) {
     set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
@@ -55,7 +52,7 @@ public final class IndexTest extends SandboxTest {
    */
   @ParameterizedTest
   @ValueSource(booleans = {false, true})
-  public void updindexText2(boolean mainmem) {
+  public void updindexText2(final boolean mainmem) {
     set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
@@ -74,7 +71,7 @@ public final class IndexTest extends SandboxTest {
    */
   @ParameterizedTest
   @ValueSource(booleans = {false, true})
-  public void updindexText3(boolean mainmem) {
+  public void updindexText3(final boolean mainmem) {
     set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
@@ -92,7 +89,7 @@ public final class IndexTest extends SandboxTest {
    */
   @ParameterizedTest
   @ValueSource(booleans = {false, true})
-  public void updindexAttribute(boolean mainmem) {
+  public void updindexAttribute(final boolean mainmem) {
     set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
@@ -112,7 +109,7 @@ public final class IndexTest extends SandboxTest {
    */
   @ParameterizedTest
   @ValueSource(booleans = {false, true})
-  public void updindexToken(boolean mainmem) {
+  public void updindexToken(final boolean mainmem) {
     set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     set(MainOptions.TOKENINDEX, true);
@@ -139,7 +136,7 @@ public final class IndexTest extends SandboxTest {
    */
   @ParameterizedTest
   @ValueSource(booleans = {false, true})
-  public void updindexReplace1(boolean mainmem) {
+  public void updindexReplace1(final boolean mainmem) {
     set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME, "<X><A>q</A><B>q</B></X>"));
@@ -152,7 +149,7 @@ public final class IndexTest extends SandboxTest {
    */
   @ParameterizedTest
   @ValueSource(booleans = {false, true})
-  public void updindexReplace2(boolean mainmem) {
+  public void updindexReplace2(final boolean mainmem) {
     set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
@@ -167,9 +164,9 @@ public final class IndexTest extends SandboxTest {
    */
   @ParameterizedTest
   @ValueSource(booleans = {false, true})
-  public void updindexOpenClose1(boolean mainmem) {
+  public void updindexOpenClose1(final boolean mainmem) {
     set(MainOptions.MAINMEM, mainmem);
-    final boolean openClose = !(Boolean) mainmem;
+    final boolean openClose = !mainmem;
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
@@ -187,9 +184,9 @@ public final class IndexTest extends SandboxTest {
    */
   @ParameterizedTest
   @ValueSource(booleans = {false, true})
-  public void updindexOpenClose2(boolean mainmem) {
+  public void updindexOpenClose2(final boolean mainmem) {
     set(MainOptions.MAINMEM, mainmem);
-    final boolean openClose = !(Boolean) mainmem;
+    final boolean openClose = !mainmem;
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
     execute(new Replace("A", "<a/>"));
@@ -209,7 +206,7 @@ public final class IndexTest extends SandboxTest {
    */
   @ParameterizedTest
   @ValueSource(booleans = {false, true})
-  public void autooptimize(boolean mainmem) {
+  public void autooptimize(final boolean mainmem) {
     set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.AUTOOPTIMIZE, true);
     execute(new CreateDB(NAME));

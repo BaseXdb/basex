@@ -63,7 +63,8 @@ public abstract class BaseXTest extends MainTest {
    */
   @Test
   public void bindErr() {
-    assertThrows(BaseXException.class, () -> run("-ba=A", "-qdeclare variable $a as xs:integer external; $a"));
+    assertThrows(BaseXException.class, () ->
+      run("-ba=A", "-qdeclare variable $a as xs:integer external; $a"));
   }
 
   /**

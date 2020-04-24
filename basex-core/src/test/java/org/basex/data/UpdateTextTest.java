@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
-import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -17,11 +16,12 @@ import org.junit.jupiter.params.provider.ValueSource;
 public final class UpdateTextTest extends DataUpdateTest {
   /**
    * Tests insert as last child.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void insertTextAsOnly1(boolean mainmem) throws IOException {
+  public void insertTextAsOnly1(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final int nextid = data.meta.lastid;
@@ -47,11 +47,12 @@ public final class UpdateTextTest extends DataUpdateTest {
 
   /**
    * Tests insert as last child.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void insertTextAsOnly2(boolean mainmem) throws IOException {
+  public void insertTextAsOnly2(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final int nextid = data.meta.lastid;
@@ -77,11 +78,12 @@ public final class UpdateTextTest extends DataUpdateTest {
 
   /**
    * Tests insert as last child.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void insertTextAsOnly3(boolean mainmem) throws IOException {
+  public void insertTextAsOnly3(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final int nextid = data.meta.lastid;
@@ -107,11 +109,12 @@ public final class UpdateTextTest extends DataUpdateTest {
 
   /**
    * Tests insert as last child.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void insertTextAfterAttsAsFirst(boolean mainmem) throws IOException {
+  public void insertTextAfterAttsAsFirst(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final int nextid = data.meta.lastid;
@@ -135,11 +138,12 @@ public final class UpdateTextTest extends DataUpdateTest {
 
   /**
    * Tests insert as last child.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void insertTextAfterAttsAsSecond(boolean mainmem) throws IOException {
+  public void insertTextAfterAttsAsSecond(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final int nextid = data.meta.lastid;
@@ -164,11 +168,12 @@ public final class UpdateTextTest extends DataUpdateTest {
 
   /**
    * Tests insert as last child.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void insertTextAfterAttsAsLast(boolean mainmem) throws IOException {
+  public void insertTextAfterAttsAsLast(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final int nextid = data.meta.lastid;
@@ -192,41 +197,45 @@ public final class UpdateTextTest extends DataUpdateTest {
 
   /**
    * Tests insert text before text.
+   * @param mainmem main-memory flag
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void insertTextBeforeText(boolean mainmem) {
+  public void insertTextBeforeText(final boolean mainmem) {
     setUp(mainmem);
     assertThrows(IOException.class, () -> insertText(9, 1, T_FOO, Data.TEXT));
   }
 
   /**
    * Tests insert text before text.
+   * @param mainmem main-memory flag
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void insertTextAfterTextAsSecond(boolean mainmem) {
+  public void insertTextAfterTextAsSecond(final boolean mainmem) {
     setUp(mainmem);
     assertThrows(IOException.class, () -> insertText(9, 2, T_FOO, Data.TEXT));
   }
 
   /**
    * Tests insert text before text.
+   * @param mainmem main-memory flag
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void insertTextAfterTextAsLast(boolean mainmem) {
+  public void insertTextAfterTextAsLast(final boolean mainmem) {
     setUp(mainmem);
     assertThrows(IOException.class, () -> insertText(9, 0, T_FOO, Data.TEXT));
   }
 
   /**
    * Tests updateText.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void updateText(boolean mainmem) throws IOException {
+  public void updateText(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     data.startUpdate(context.options);

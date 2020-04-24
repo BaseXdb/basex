@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 import org.junit.jupiter.api.Test;
 
 /**
- * This class tests the database commands.
+ * This class tests query evaluation.
  *
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
@@ -66,32 +66,59 @@ public abstract class QueryTest extends SandboxTest {
     if(fail != 0) fail(fail + " Errors. [E] = expected, [F] = found:\n" + sb.toString().trim());
   }
 
-  protected static String ser(final Value v) throws Exception {
-    return serialize(v, new StringBuilder()).toString();
-  }
-
-  protected static StringBuilder serialize(final Value v, final StringBuilder sb) throws Exception {
-    sb.append(v.size()).append(" result(s): ");
-    for(final Item item : v) sb.append(item.serialize()).append("; ");
-    return sb;
-  }
-
-  protected static Value run(final String query) throws Exception {
-    try(QueryProcessor qp = new QueryProcessor(query, context)) {
-      return qp.value();
-    }
-  }
-
-  protected static boolean eq(final Value actual, final Value expected) throws Exception {
-    return new DeepEqual().equal(actual, expected);
-  }
-
   /**
    * Returns property details.
    * @return details
    */
   protected String details() {
     return "";
+  }
+
+  /**
+   * Serializes the specified value.
+   * @param value value
+   * @return string representation
+   * @throws QueryIOException query I/O exception
+   */
+  protected static String serialize(final Value value) throws QueryIOException {
+    return serialize(value, new StringBuilder()).toString();
+  }
+
+  /**
+   * Serializes the specified value to the specified string builder.
+   * @param value value
+   * @param sb string builder
+   * @return string representation
+   * @throws QueryIOException query I/O exception
+   */
+  protected static StringBuilder serialize(final Value value, final StringBuilder sb)
+      throws QueryIOException {
+    sb.append(value.size()).append(" result(s): ");
+    for(final Item item : value) sb.append(item.serialize()).append("; ");
+    return sb;
+  }
+
+  /**
+   * Runs the specified query.
+   * @param query query string
+   * @return query result
+   * @throws QueryException query exception
+   */
+  protected static Value run(final String query) throws QueryException {
+    try(QueryProcessor qp = new QueryProcessor(query, context)) {
+      return qp.value();
+    }
+  }
+
+  /**
+   * Compares the actual and the expected value.
+   * @param actual evaluated result
+   * @param expected expected result
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  protected static boolean eq(final Value actual, final Value expected) throws QueryException {
+    return new DeepEqual().equal(actual, expected);
   }
 
   /**

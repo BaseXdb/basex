@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.*;
 
 import org.basex.util.*;
-import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -18,11 +17,12 @@ import org.junit.jupiter.params.provider.ValueSource;
 public final class UpdateAttributesTest extends DataUpdateTest {
   /**
    * Tests the update of an existing attribute.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void updateAttribute(boolean mainmem) throws IOException {
+  public void updateAttribute(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     data.startUpdate(context.options);
@@ -40,11 +40,12 @@ public final class UpdateAttributesTest extends DataUpdateTest {
 
   /**
    * Tests the update of an existing attribute.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void updateAttribute2(boolean mainmem) throws IOException {
+  public void updateAttribute2(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     data.startUpdate(context.options);
@@ -60,11 +61,12 @@ public final class UpdateAttributesTest extends DataUpdateTest {
 
   /**
    * Tests the insertion of a new attribute.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void addAttribute(boolean mainmem) throws IOException {
+  public void addAttribute(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final long nextid = data.meta.lastid;

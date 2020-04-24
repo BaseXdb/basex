@@ -68,7 +68,7 @@ public final class ValueIndexTest extends SandboxTest {
    */
   @ParameterizedTest
   @MethodSource("generateParams")
-  public void textIndexTest(Collection<Set> paramSet) {
+  public void textIndexTest(final Collection<Set> paramSet) {
     final LinkedHashMap<String, Integer> tokens = new LinkedHashMap<>();
     tokens.put("3", 3);
     tokens.put("3.4", 1);
@@ -85,7 +85,7 @@ public final class ValueIndexTest extends SandboxTest {
    */
   @ParameterizedTest
   @MethodSource("generateParams")
-  public void attributeIndexTest(Collection<Set> paramSet) {
+  public void attributeIndexTest(final Collection<Set> paramSet) {
     final LinkedHashMap<String, Integer> tokens = new LinkedHashMap<>();
     tokens.put("context", 1);
     tokens.put("baz bar blu", 1);
@@ -103,7 +103,7 @@ public final class ValueIndexTest extends SandboxTest {
    */
   @ParameterizedTest
   @MethodSource("generateParams")
-  public void tokenIndexTest(Collection<Set> paramSet) {
+  public void tokenIndexTest(final Collection<Set> paramSet) {
     set(MainOptions.TOKENINDEX, true);
 
     final LinkedHashMap<String, Integer> tokens = new LinkedHashMap<>();

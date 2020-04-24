@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.*;
 
 import org.basex.util.*;
-import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -18,11 +17,12 @@ import org.junit.jupiter.params.provider.ValueSource;
 public final class UpdateElementTest extends DataUpdateTest {
   /**
    * Tests insert as last child.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void insertElementAsOnly1(boolean mainmem) throws IOException {
+  public void insertElementAsOnly1(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final long nextid = data.meta.lastid;
@@ -47,11 +47,12 @@ public final class UpdateElementTest extends DataUpdateTest {
 
   /**
    * Tests insert as last child.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void insertElementAsOnly2(boolean mainmem) throws IOException {
+  public void insertElementAsOnly2(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final long nextid = data.meta.lastid;
@@ -76,11 +77,12 @@ public final class UpdateElementTest extends DataUpdateTest {
 
   /**
    * Tests insert as last child.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void insertElementAsOnly3(boolean mainmem) throws IOException {
+  public void insertElementAsOnly3(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final long nextid = data.meta.lastid;
@@ -105,11 +107,12 @@ public final class UpdateElementTest extends DataUpdateTest {
 
   /**
    * Tests insert as last child.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void insertElementAfterAttsAsFirst(boolean mainmem) throws IOException {
+  public void insertElementAfterAttsAsFirst(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final long nextid = data.meta.lastid;
@@ -133,11 +136,12 @@ public final class UpdateElementTest extends DataUpdateTest {
 
   /**
    * Tests insert as last child.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void insertElementAfterAttsAsSecond(boolean mainmem) throws IOException {
+  public void insertElementAfterAttsAsSecond(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final long nextid = data.meta.lastid;
@@ -161,11 +165,12 @@ public final class UpdateElementTest extends DataUpdateTest {
 
   /**
    * Tests insert as last child.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void insertElementAfterAttsAsLast(boolean mainmem) throws IOException {
+  public void insertElementAfterAttsAsLast(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final long nextid = data.meta.lastid;
@@ -189,11 +194,12 @@ public final class UpdateElementTest extends DataUpdateTest {
 
   /**
    * Tests updateTagName.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void updateElementName(boolean mainmem) throws IOException {
+  public void updateElementName(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     data.startUpdate(context.options);

@@ -2,14 +2,12 @@ package org.basex.core.locks;
 
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.*;
 
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.Test;
 
 /**
  * This class tests database locking inside BaseX. For this purpose, two queries are forced to be

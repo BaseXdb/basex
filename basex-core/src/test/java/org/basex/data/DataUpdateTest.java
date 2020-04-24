@@ -10,7 +10,6 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -65,8 +64,9 @@ public abstract class DataUpdateTest extends SandboxTest {
 
   /**
    * Creates the database.
+   * @param mainmem main-memory flag
    */
-  public final void setUp(boolean mainmem) {
+  public final void setUp(final boolean mainmem) {
     set(MainOptions.MAINMEM, mainmem);
     execute(new CreateDB(NAME, TESTFILE));
     size = context.data().meta.size;
@@ -84,7 +84,7 @@ public abstract class DataUpdateTest extends SandboxTest {
    * Reloads the database.
    * @param mainmem main memory flag
    */
-  void reload(boolean mainmem) {
+  void reload(final boolean mainmem) {
     if(mainmem) return;
     execute(new Close());
     execute(new Open(NAME));
@@ -103,10 +103,11 @@ public abstract class DataUpdateTest extends SandboxTest {
 
   /**
    * Tests for correct data size.
+   * @param mainmem main-memory flag
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public final void size(boolean mainmem) {
+  public final void size(final boolean mainmem) {
     setUp(mainmem);
 
     assertEquals(size, context.data().meta.size, "Unexpected size!");

@@ -73,18 +73,18 @@ public final class QueryModuleTest extends QueryModule {
 
   /**
    * Ignore argument.
-   * @param e expression
+   * @param expr expression
    */
-  public void ignore(@SuppressWarnings("unused") final Expr e) { }
+  public void ignore(@SuppressWarnings("unused") final Expr expr) { }
 
   /**
    * Compute faculty.
-   * @param e expression
+   * @param expr expression
    * @return resulting value
    * @throws QueryException query exception
    */
-  public Int faculty(final Expr e) throws QueryException {
-    final Iter iter = e.iter(queryContext);
+  public Int faculty(final Expr expr) throws QueryException {
+    final Iter iter = expr.iter(queryContext);
     long c = 1;
     for(Item item; (item = iter.next()) != null;) {
       c *= item.itr(null);

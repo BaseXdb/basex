@@ -316,7 +316,7 @@ public final class PackageAPITest extends SandboxTest {
     // ensure that all files were deleted
     execute(new RepoDelete("org.basex.modules.Hello", null));
     assertFalse(jar.exists(), "File was not deleted:" + jar);
-    assertFalse( xqm.exists(), "File was not deleted:" + xqm);
+    assertFalse(xqm.exists(), "File was not deleted:" + xqm);
 
     // ensure that package can only be deleted once
     try {

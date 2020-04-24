@@ -25,8 +25,9 @@ public final class ValueIndexTest extends QueryPlanTest {
 
   /**
    * Initializes a test.
+   * @param mainmem main-memory flag
    */
-  public void before(boolean mainmem) {
+  public void before(final boolean mainmem) {
     set(MainOptions.MAINMEM, mainmem);
   }
 
@@ -52,10 +53,11 @@ public final class ValueIndexTest extends QueryPlanTest {
 
   /**
    * Tests the text index.
+   * @param mainmem main-memory flag
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void textIndex(boolean mainmem) {
+  public void textIndex(final boolean mainmem) {
     before(mainmem);
     map().forEach((key, value) -> {
       set(MainOptions.TEXTINCLUDE, key);
@@ -68,10 +70,11 @@ public final class ValueIndexTest extends QueryPlanTest {
 
   /**
    * Tests the attribute index.
+   * @param mainmem main-memory flag
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void attrIndex(boolean mainmem) {
+  public void attrIndex(final boolean mainmem) {
     before(mainmem);
     map().forEach((key, value) -> {
       set(MainOptions.ATTRINCLUDE, key);
@@ -99,10 +102,11 @@ public final class ValueIndexTest extends QueryPlanTest {
 
   /**
    * Tests the text index and update operations.
+   * @param mainmem main-memory flag
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void textUpdates(boolean mainmem) {
+  public void textUpdates(final boolean mainmem) {
     before(mainmem);
     set(MainOptions.UPDINDEX, true);
 

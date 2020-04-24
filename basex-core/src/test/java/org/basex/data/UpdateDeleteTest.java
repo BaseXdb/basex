@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
-import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -17,11 +16,12 @@ import org.junit.jupiter.params.provider.ValueSource;
 public final class UpdateDeleteTest extends DataUpdateTest {
   /**
    * Tests deletion of a simple node.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void simpleNodeDelete(boolean mainmem) throws IOException {
+  public void simpleNodeDelete(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final int oldDocSize = data.size(0, Data.DOC);
@@ -47,11 +47,12 @@ public final class UpdateDeleteTest extends DataUpdateTest {
 
   /**
    * Tests deletion of a node with a child.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void cascadingDelete(boolean mainmem) throws IOException {
+  public void cascadingDelete(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final int oldDocSize = data.size(0, Data.DOC);
@@ -74,11 +75,12 @@ public final class UpdateDeleteTest extends DataUpdateTest {
 
   /**
    * Tests deletion of a node with a child (with text) and attribute.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void cascadingDelete2(boolean mainmem) throws IOException {
+  public void cascadingDelete2(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final int oldDocSize = data.size(0, Data.DOC);
@@ -104,11 +106,12 @@ public final class UpdateDeleteTest extends DataUpdateTest {
 
   /**
    * Tests deletion of an attribute.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void deleteAttribute(boolean mainmem) throws IOException {
+  public void deleteAttribute(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     final int oldRootSize = data.size(1, Data.ELEM);
@@ -136,11 +139,12 @@ public final class UpdateDeleteTest extends DataUpdateTest {
   /**
    * For the sake of completeness.
    * Tests deletion of a text-node.
+   * @param mainmem main-memory flag
    * @throws IOException I/O exception
    */
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  public void deleteText(boolean mainmem) throws IOException {
+  public void deleteText(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
     data.startUpdate(context.options);

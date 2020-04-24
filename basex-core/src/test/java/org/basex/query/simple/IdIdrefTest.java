@@ -22,39 +22,54 @@ import java.util.stream.Stream;
  * @author Jens Erat
  */
 public final class IdIdrefTest extends QueryTest {
-
-  public static Stream<Arguments> testQueries() {
+  /**
+   * Queries to test.
+   * @return argument stream
+   */
+  private static Stream<Arguments> testQueries() {
     return Stream.of(
-      Arguments.of("id1", new int[]{1}, _DB_OPEN.args(NAME, "1.xml") + "/id('foo')"),
-      Arguments.of("id1", new int[]{1}, _DB_OPEN.args(NAME, "1.xml") + "/id('foo')"),
-      Arguments.of("id2", new int[]{5}, _DB_OPEN.args(NAME, "2.xml") + "/id('batz')"),
-      Arguments.of("idref1", new int[]{3}, _DB_OPEN.args(NAME, "1.xml") + "/idref('bar')"),
-      Arguments.of("idref2", new int[]{7}, _DB_OPEN.args(NAME, "2.xml") + "/idref('quix')"),
-      Arguments.of("idref2", new int[]{3, 7}, "collection('" + NAME + "')/idref('quix', .)")
+      Arguments.of(new int[] { 1 }, _DB_OPEN.args(NAME, "1.xml") + "/id('foo')"),
+      Arguments.of(new int[] { 1 }, _DB_OPEN.args(NAME, "1.xml") + "/id('foo')"),
+      Arguments.of(new int[] { 5 }, _DB_OPEN.args(NAME, "2.xml") + "/id('batz')"),
+      Arguments.of(new int[] { 3 }, _DB_OPEN.args(NAME, "1.xml") + "/idref('bar')"),
+      Arguments.of(new int[] { 7 }, _DB_OPEN.args(NAME, "2.xml") + "/idref('quix')"),
+      Arguments.of(new int[] { 3, 7 }, "collection('" + NAME + "')/idref('quix', .)")
     );
   }
 
-  public static Stream<Arguments> generateParams() {
+  /**
+   * Parameters.
+   * @return argument stream
+   */
+  private static Stream<Arguments> generateParams() {
     return testQueries().map(Arguments::get).flatMap(q -> Stream.of(
-      Arguments.of(false, false, false, q[0], q[1], q[2]),
-      Arguments.of(false, false, true, q[0], q[1], q[2]),
-      Arguments.of(false, true, false, q[0], q[1], q[2]),
-      Arguments.of(false, true, true, q[0], q[1], q[2]),
-      Arguments.of(true, false, false, q[0], q[1], q[2]),
-      Arguments.of(true, false, true, q[0], q[1], q[2]),
-      Arguments.of(true, true, false, q[0], q[1], q[2]),
-      Arguments.of(true, true, true, q[0], q[1], q[2])
+      Arguments.of(false, false, false, q[0], q[1]),
+      Arguments.of(false, false, true, q[0], q[1]),
+      Arguments.of(false, true, false, q[0], q[1]),
+      Arguments.of(false, true, true, q[0], q[1]),
+      Arguments.of(true, false, false, q[0], q[1]),
+      Arguments.of(true, false, true, q[0], q[1]),
+      Arguments.of(true, true, false, q[0], q[1]),
+      Arguments.of(true, true, true, q[0], q[1])
     ));
   }
 
   /**
-   * Prepare test, setting up parametrized environment.
+   * Prepare test, setting up parameterized environment.
+   * @param mainmem main-memory flag
+   * @param updindex updatable index flag
+   * @param tokenindex token index flag
+   * @param expectedIds expected results
+   * @param query query string
+   * @throws Exception exception
    */
   @DisplayName("IdIdrefTest")
-  @ParameterizedTest(name = "[{3}] {5}: mainmem={0}, updindex={1}, tokenindex={2}")
+  @ParameterizedTest(name = "[{3}] {4}: mainmem={0}, updindex={1}, tokenindex={2}")
   @MethodSource("generateParams")
   public void test(final boolean mainmem, final boolean updindex, final boolean tokenindex,
-                   final String id, final int[] expectedIds, final String query) throws Exception {
+      final int[] expectedIds, final String query)
+      throws Exception {
+
     // set up environment
     execute(new Set(MainOptions.MAINMEM, mainmem));
     execute(new Set(MainOptions.UPDINDEX, updindex));
@@ -64,13 +79,12 @@ public final class IdIdrefTest extends QueryTest {
     execute(new Add("2.xml", "<root2 id='batz' idref2='quix' />"));
 
     final Value expected = nodes(expectedIds);
-
     final Value actual = run(query);
 
     assertTrue(eq(actual, expected), String.format(
       "[E] %d result(s): %s\n[F] %d result(s): %s",
-      expected.size(), ser(expected),
-      actual.size(), ser(actual)));
+      expected.size(), serialize(expected),
+      actual.size(), serialize(actual)));
   }
 
   @Override
