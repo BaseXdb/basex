@@ -5,7 +5,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.core.users.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the functions of the User Module.
@@ -15,20 +15,20 @@ import org.junit.*;
  */
 public final class UserModuleTest extends SandboxTest {
   /** Initialize tests. */
-  @BeforeClass public static void beforeClass() {
+  @BeforeAll public static void beforeClass() {
     // create database
     query(_DB_CREATE.args(NAME));
   }
 
   /** Initialize test. */
-  @Before public void before() {
+  @BeforeEach public void before() {
     // create user and local permission
     query(_USER_CREATE.args(NAME, NAME));
     query(_USER_GRANT.args(NAME, Perm.WRITE, NAME));
   }
 
   /** Finish test. */
-  @After public void after() {
+  @AfterEach public void after() {
     // drop user
     query("if(" + _USER_EXISTS.args(NAME) + ") then " + _USER_DROP.args(NAME) + " else ()");
   }

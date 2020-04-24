@@ -3,7 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 
 import org.basex.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Arrow operator tests.

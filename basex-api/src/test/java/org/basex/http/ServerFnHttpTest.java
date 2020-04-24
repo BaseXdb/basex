@@ -1,7 +1,7 @@
 package org.basex.http;
 
 import org.basex.core.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the embedded HTTP Client.
@@ -14,7 +14,7 @@ public final class ServerFnHttpTest extends FnHttpTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass public static void start() throws Exception {
+  @BeforeAll public static void start() throws Exception {
     init(RESTURL, false);
     ctx = new Context();
   }

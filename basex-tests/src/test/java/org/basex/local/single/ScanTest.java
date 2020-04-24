@@ -8,8 +8,8 @@ import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.util.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class benchmarks simple table scans.
@@ -27,7 +27,7 @@ public final class ScanTest extends SandboxTest {
    * Initializes the test database.
    * @throws IOException I/O exception
    */
-  @BeforeClass
+  @BeforeAll
   public static void initDB() throws IOException {
     /* generate test file. example:
      * <XML>
@@ -67,7 +67,7 @@ public final class ScanTest extends SandboxTest {
   /**
    * Initializes the benchmark.
    */
-  @AfterClass
+  @AfterAll
   public static void finishDB() {
     execute(new DropDB(NAME));
   }

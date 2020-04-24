@@ -2,8 +2,8 @@ package org.basex.query.expr;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for optimizations of the filter expression.
@@ -13,7 +13,7 @@ import org.junit.Test;
  */
 public final class FilterTest extends SandboxTest {
   /** Drops a test database. */
-  @AfterClass public static void end() {
+  @AfterAll public static void end() {
     execute(new DropDB(NAME));
   }
 

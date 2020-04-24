@@ -1,7 +1,7 @@
 package org.basex.io.serial.json;
 
 import static org.basex.query.QueryError.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.build.json.*;
@@ -12,7 +12,7 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.options.Options.YesNo;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests for the {@link JsonSerializer} classes.
@@ -158,7 +158,7 @@ public final class JsonSerializerTest extends SandboxTest {
       final JsonFormat format) {
     try {
       final String actual = serialize(query, format);
-      assertEquals("\n[E] " + expected + "\n[F] " + actual + '\n', expected, actual);
+      assertEquals(expected, actual, "\n[E] " + expected + "\n[F] " + actual + '\n');
     } catch(final Exception ex) {
       fail(ex.toString());
     }

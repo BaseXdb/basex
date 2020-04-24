@@ -5,7 +5,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.core.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests for the {@link MainOptions#MIXUPDATES} flag.
@@ -17,7 +17,7 @@ public final class MixUpdatesTest extends SandboxTest {
   /**
    * Prepare tests.
    */
-  @BeforeClass public static void beforeClass() {
+  @BeforeAll public static void beforeClass() {
     set(MainOptions.MIXUPDATES, true);
   }
 

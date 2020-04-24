@@ -1,12 +1,12 @@
 package org.basex;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
 import org.basex.core.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests the command-line arguments of the starter class.
@@ -19,8 +19,8 @@ public abstract class BaseXTest extends MainTest {
    * Deletes the test files.
    * @throws IOException I/O exception
    */
-  @After public void clean() throws IOException {
-    assertTrue("Could not delete input file.", !INPUT.exists() || INPUT.delete());
+  @AfterEach public void clean() throws IOException {
+    assertTrue(!INPUT.exists() || INPUT.delete(), "Could not delete input file.");
     run("-cdrop db " + NAME);
   }
 
@@ -60,20 +60,18 @@ public abstract class BaseXTest extends MainTest {
 
   /**
    * Test variable bindings.
-   * @throws IOException I/O exception
    */
-  @Test(expected = BaseXException.class)
-  public void bindErr() throws IOException {
-    run("-ba=A", "-qdeclare variable $a as xs:integer external; $a");
+  @Test
+  public void bindErr() {
+    assertThrows(BaseXException.class, () -> run("-ba=A", "-qdeclare variable $a as xs:integer external; $a"));
   }
 
   /**
    * Test variable bindings with namespaces.
-   * @throws IOException I/O exception
    */
-  @Test(expected = BaseXException.class)
-  public void bindNSErr() throws IOException {
-    run("X'\"", "-b{URI}ln=X'\"", INPUT.toString());
+  @Test
+  public void bindNSErr() {
+    assertThrows(BaseXException.class, () -> run("X'\"", "-b{URI}ln=X'\"", INPUT.toString()));
   }
 
   /**
@@ -98,11 +96,10 @@ public abstract class BaseXTest extends MainTest {
 
   /**
    * Command error.
-   * @throws IOException I/O exception
    */
-  @Test(expected = BaseXException.class)
-  public void commandErr() throws IOException {
-    run("-1");
+  @Test
+  public void commandErr() {
+    assertThrows(BaseXException.class, () -> run("-1"));
   }
 
   /**
@@ -124,11 +121,10 @@ public abstract class BaseXTest extends MainTest {
 
   /**
    * Query error.
-   * @throws IOException I/O exception
    */
-  @Test(expected = BaseXException.class)
-  public void queryErr() throws IOException {
-    run("-q1+");
+  @Test
+  public void queryErr() {
+    assertThrows(BaseXException.class, () -> run("-q1+"));
   }
 
   /**
@@ -141,11 +137,10 @@ public abstract class BaseXTest extends MainTest {
 
   /**
    * Test different number of runs.
-   * @throws IOException I/O exception
    */
-  @Test(expected = BaseXException.class)
-  public void runErr() throws IOException {
-    run("-rx", "-q2");
+  @Test
+  public void runErr() {
+    assertThrows(BaseXException.class, () -> run("-rx", "-q2"));
   }
 
   /**

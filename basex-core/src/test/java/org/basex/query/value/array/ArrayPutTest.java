@@ -1,9 +1,9 @@
 package org.basex.query.value.array;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.query.value.item.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests for {@link XQArray#put(long, org.basex.query.value.Value)}.

@@ -2,7 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
@@ -10,7 +10,7 @@ import org.basex.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the functions of the Job Module.
@@ -25,7 +25,7 @@ public final class JobsModuleTest extends SandboxTest {
   private static final String SLOW_QUERY = "(1 to 10000000)[.=1]";
 
   /** Wait until all queries have been processed. */
-  @After public void clean() {
+  @AfterEach public void clean() {
     // wait for running jobs
     query(_JOBS_LIST.args() + "[. != " + _JOBS_CURRENT.args() + "] ! " + _JOBS_WAIT.args(" ."));
     // consume cached results

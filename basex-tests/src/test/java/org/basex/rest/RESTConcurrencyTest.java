@@ -2,7 +2,7 @@ package org.basex.rest;
 
 import static org.basex.core.users.UserText.*;
 import static org.basex.util.http.HttpMethod.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.net.*;
@@ -15,8 +15,8 @@ import org.basex.core.cmd.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Concurrency tests of BaseX REST API.
@@ -39,8 +39,8 @@ public final class RESTConcurrencyTest extends SandboxTest {
    * Create a test database and start BaseXHTTP.
    * @throws Exception if database cannot be created or server cannot be started
    */
-  @BeforeClass
-  public static void setUp() throws Exception {
+  @BeforeEach
+  public void setUp() throws Exception {
     final StringList sl = new StringList();
     sl.add("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT, "-z").add("-U" + ADMIN);
 
@@ -51,14 +51,11 @@ public final class RESTConcurrencyTest extends SandboxTest {
   }
 
   /**
-   * Drop the test database and stop BaseXHTTP.
+   * Stop BaseXHTTP.
    * @throws Exception if database cannot be dropped or server cannot be stopped
    */
-  @AfterClass
-  public static void tearDown() throws Exception {
-    try(ClientSession cs = createClient()) {
-      cs.execute(new DropDB(NAME));
-    }
+  @AfterEach
+  public void tearDown() throws Exception {
     http.stop();
   }
 
@@ -107,7 +104,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
    * @throws Exception error during request execution
    */
   @Test
-  @Ignore("There is no way to stop a query on the server!")
+  @Disabled("There is no way to stop a query on the server!")
   public void testReaderWriter() throws Exception {
     final String readerQuery = "?query=(1%20to%20100000000000000)%5b.=0%5d";
     final String writerQuery = "/test.xml";

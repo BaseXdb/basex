@@ -1,10 +1,10 @@
 package org.basex.query;
 
 import static org.basex.util.Token.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.query.expr.ft.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Wild-card parsing and matching tests.
@@ -74,12 +74,12 @@ public final class FTWildcardTest {
 
       final String[] good = TEXTS_GOOD[i];
       for(final String g : good) {
-        assertTrue('"' + q + "\" did NOT match \"" + g + '"', wc.match(token(g)));
+        assertTrue(wc.match(token(g)), '"' + q + "\" did NOT match \"" + g + '"');
       }
 
       final String[] bad = TEXTS_BAD[i];
       for(final String b : bad) {
-        assertFalse('"' + q + "\" matched \"" + b + '"', wc.match(token(b)));
+        assertFalse(wc.match(token(b)), '"' + q + "\" matched \"" + b + '"');
       }
     }
   }

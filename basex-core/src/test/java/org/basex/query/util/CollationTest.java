@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.*;
 import org.basex.query.util.collation.BaseXCollationOptions.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * XQuery collation tests.

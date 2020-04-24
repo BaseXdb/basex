@@ -1,13 +1,13 @@
 package org.basex;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.users.*;
 import org.basex.io.out.*;
 import org.basex.util.list.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests the command-line arguments of the client starter class.
@@ -31,20 +31,18 @@ public final class BaseXClientTest extends BaseXTest {
 
   /**
    * Test client with invalid port argument.
-   * @throws IOException I/O exception
    */
-  @Test(expected = BaseXException.class)
-  public void portErr() throws IOException {
-    run("-px");
+  @Test
+  public void portErr() {
+    assertThrows(BaseXException.class, () -> run("-px"));
   }
 
   /**
    * Test client with invalid port number.
-   * @throws IOException I/O exception
    */
-  @Test(expected = BaseXException.class)
-  public void portErr2() throws IOException {
-    run("-px0");
+  @Test
+  public void portErr2() {
+    assertThrows(BaseXException.class, () -> run("-px0"));
   }
 
   /**

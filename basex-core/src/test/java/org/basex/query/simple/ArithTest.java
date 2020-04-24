@@ -5,7 +5,7 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Arithmetic tests.

@@ -1,6 +1,6 @@
 package org.basex.http.rest;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the server-based REST API.
@@ -13,7 +13,7 @@ public final class ServerRESTTest extends RESTTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass public static void start() throws Exception {
+  @BeforeAll public static void start() throws Exception {
     init(REST_ROOT, false);
   }
 }

@@ -3,7 +3,7 @@ package org.basex.query;
 import static org.basex.core.Text.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
@@ -15,8 +15,8 @@ import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests namespaces.
@@ -675,7 +675,7 @@ public final class NamespaceTest extends SandboxTest {
    * Test query.
    * Detects malformed namespace hierarchy.
    */
-  @Test @Ignore
+  @Test @Disabled
   public void xuty0004() {
     final String query = "declare variable $input-context external;" +
         "let $source as node()* := (" +
@@ -702,7 +702,7 @@ public final class NamespaceTest extends SandboxTest {
    * inserted <new/> tag. If the result is non-empty we may have a problem -
    * being not able propagate the no-inherit flag to our table.
    */
-  @Test @Ignore
+  @Test @Disabled
   public void copyPreserveNoInheritPersistent() {
     query("declare copy-namespaces preserve,no-inherit;" +
         "declare namespace my = 'ns';" +
@@ -777,7 +777,7 @@ public final class NamespaceTest extends SandboxTest {
   /**
    * Creates the database context.
    */
-  @BeforeClass public static void start() {
+  @BeforeAll public static void start() {
     // turn off pretty printing
     set(MainOptions.SERIALIZER, SerializerMode.NOINDENT.get());
   }

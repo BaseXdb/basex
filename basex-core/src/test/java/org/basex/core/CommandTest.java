@@ -1,7 +1,7 @@
 package org.basex.core;
 
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
@@ -12,8 +12,8 @@ import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests the database commands.
@@ -38,7 +38,7 @@ public class CommandTest extends SandboxTest {
   /** Starts the server.
    * @throws IOException I/O exception
    */
-  @BeforeClass public static void start() throws IOException {
+  @BeforeAll public static void start() throws IOException {
     session = new LocalSession(context);
     cleanUp();
   }
@@ -61,7 +61,7 @@ public class CommandTest extends SandboxTest {
    * Creates the database.
    * @throws IOException I/O exception
    */
-  @After public final void after() throws IOException {
+  @AfterEach public final void after() throws IOException {
     cleanUp();
   }
 

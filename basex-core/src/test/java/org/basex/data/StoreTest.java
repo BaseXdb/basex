@@ -1,13 +1,13 @@
 package org.basex.data;
 
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests the stability of the database store.
@@ -22,7 +22,7 @@ public final class StoreTest extends SandboxTest {
   /**
    * Initializes the tests.
    */
-  @BeforeClass public static void init() {
+  @BeforeAll public static void init() {
     // speed up updates and create initial database
     set(MainOptions.TEXTINDEX, false);
     set(MainOptions.ATTRINDEX, false);

@@ -3,7 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.util.zip.*;
@@ -11,7 +11,7 @@ import java.util.zip.*;
 import org.basex.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the functions of the ZIP Module.
@@ -35,13 +35,13 @@ public final class ZipModuleTest extends SandboxTest {
    * Initializes the test.
    * @throws IOException I/O exception.
    */
-  @BeforeClass public static void init() throws IOException {
+  @BeforeAll public static void init() throws IOException {
     // create temporary file
     new IOFile(TMPFILE).write("!");
   }
 
   /** Finishes the test. */
-  @AfterClass public static void finish() {
+  @AfterAll public static void finish() {
     new IOFile(TMPZIP).delete();
     new IOFile(TMPFILE).delete();
   }
@@ -188,11 +188,11 @@ public final class ZipModuleTest extends SandboxTest {
   private static void checkEntry(final String file, final byte[] data) throws IOException {
     try(ZipFile zf = new ZipFile(TMPZIP)) {
       final ZipEntry ze = zf.getEntry(file);
-      assertNotNull("File not found: " + file, ze);
+      assertNotNull(ze, "File not found: " + file);
       final byte[] dt = new IOStream(zf.getInputStream(ze)).read();
-      assertTrue("Wrong contents in file \"" + file + "\":" + Prop.NL +
-          "Expected: " + string(data) + Prop.NL + "Found: " + string(dt),
-          eq(data, dt));
+      assertTrue(eq(data, dt),
+        "Wrong contents in file \"" + file + "\":" + Prop.NL +
+          "Expected: " + string(data) + Prop.NL + "Found: " + string(dt));
     }
   }
 }

@@ -1,12 +1,12 @@
 package org.basex.server;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
 import org.basex.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the client/server session API.
@@ -22,19 +22,19 @@ public class ClientSessionTest extends SessionTest {
    * Starts the server.
    * @throws IOException I/O exception
    */
-  @BeforeClass public static void startServer() throws IOException {
+  @BeforeAll public static void startServer() throws IOException {
     server = createServer();
   }
 
   /**
    * Stops the server.
    */
-  @AfterClass public static void stop() {
+  @AfterAll public static void stop() {
     stopServer(server);
   }
 
   /** Starts a session. */
-  @Before public void startSession() {
+  @BeforeEach public void startSession() {
     try {
       session = createClient();
       session.setOutputStream(out);

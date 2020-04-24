@@ -3,8 +3,8 @@ package org.basex.local.single;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class adds and retrieves documents in a collection.
@@ -16,7 +16,7 @@ public final class CollAddTest extends SandboxTest {
   /**
    * Initializes the tests.
    */
-  @BeforeClass
+  @BeforeAll
   public static void init() {
     set(MainOptions.INTPARSE, true);
   }

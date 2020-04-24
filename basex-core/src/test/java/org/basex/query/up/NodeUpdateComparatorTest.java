@@ -10,7 +10,7 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.node.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.*;
 
 /**

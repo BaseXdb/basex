@@ -1,12 +1,12 @@
 package org.basex.io.in;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.util.*;
 
 import org.basex.io.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Test class for the {@link TarInputStream}.

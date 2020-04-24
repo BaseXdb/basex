@@ -1,14 +1,14 @@
 package org.basex.build;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests adding files/folders/zip files/urls to collections.
@@ -48,14 +48,14 @@ public final class AddDeleteTest extends SandboxTest {
   /**
    * Creates a database.
    */
-  @Before public void setUp() {
+  @BeforeEach public void setUp() {
     execute(new CreateDB(NAME));
   }
 
   /**
    * Drops the database.
    */
-  @After public void tearDown() {
+  @AfterEach public void tearDown() {
     execute(new DropDB(NAME));
   }
 
@@ -170,11 +170,11 @@ public final class AddDeleteTest extends SandboxTest {
 
   /**
    * Adds a non-existent file.
-   * @throws BaseXException database exception
    */
-  @Test(expected = BaseXException.class)
-  public void addFileFail() throws BaseXException {
-    new Add("", FILE + "/doesnotexist").execute(context);
+  @Test
+  public void addFileFail() {
+    assertThrows(BaseXException.class,
+      () -> new Add("", FILE + "/doesnotexist").execute(context));
   }
 
   /**
@@ -194,22 +194,20 @@ public final class AddDeleteTest extends SandboxTest {
 
   /**
    * Creates a database from a broken input.
-   * @throws BaseXException database exception
    */
-  @Test(expected = BaseXException.class)
-  public void createCorrupt() throws BaseXException {
-    new CreateDB(NAME, "<x").execute(context);
+  @Test
+  public void createCorrupt() {
+    assertThrows(BaseXException.class, () -> new CreateDB(NAME, "<x").execute(context));
   }
 
   /**
    * Creates a database from a broken input file.
-   * @throws BaseXException database exception
    */
-  @Test(expected = BaseXException.class)
-  public void createCorruptFromFile() throws BaseXException {
+  @Test
+  public void createCorruptFromFile() {
     final IOFile io = new IOFile(TEMP);
     write(io, "<x");
-    new CreateDB(NAME, io.path()).execute(context);
+    assertThrows(BaseXException.class, () -> new CreateDB(NAME, io.path()).execute(context));
   }
 
   /**

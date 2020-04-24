@@ -2,7 +2,7 @@ package org.basex.data;
 
 import java.util.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * ID -> PRE mapping test.
@@ -19,7 +19,7 @@ public final class IdPreMapBulkTest extends IdPreMapBulkTestBase {
   private static final int ITER = 20;
 
   /** Set-up method. */
-  @Before @Override
+  @BeforeEach @Override
   public void setUp() {
     baseid = 200;
     opcount = 100;

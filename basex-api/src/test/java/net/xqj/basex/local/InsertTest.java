@@ -1,11 +1,11 @@
 package net.xqj.basex.local;
 
 import static net.xqj.basex.BaseXXQInsertOptions.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import javax.xml.xquery.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 import com.xqj2.*;
 
@@ -20,7 +20,7 @@ public final class InsertTest extends XQJBaseTest {
   /** Name of test document. */
   private static final String URI = "doc.xml";
 
-  @Before @Override
+  @BeforeEach @Override
   public void setUp() throws XQException {
     super.setUp();
 
@@ -31,7 +31,7 @@ public final class InsertTest extends XQJBaseTest {
     xqpe.close();
   }
 
-  @After @Override
+  @AfterEach @Override
   public void tearDown() throws XQException {
     final XQExpression xqpe = xqc.createExpression();
     xqpe.executeCommand("DROP DB " + DB);

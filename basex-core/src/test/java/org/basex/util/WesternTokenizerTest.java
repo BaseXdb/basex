@@ -1,10 +1,10 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.util.ft.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests for {@link WesternTokenizer}.

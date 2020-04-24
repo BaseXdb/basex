@@ -1,6 +1,6 @@
 package org.basex.core;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
@@ -8,8 +8,8 @@ import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
 import org.basex.util.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests transaction and locking cases.
@@ -32,7 +32,7 @@ public final class PoolTest extends SandboxTest {
    * Starts the server.
    * @throws Exception exception
    */
-  @BeforeClass public static void start() throws Exception {
+  @BeforeAll public static void start() throws Exception {
     server = createServer();
     session1 = createClient();
     session2 = createClient();
@@ -42,7 +42,7 @@ public final class PoolTest extends SandboxTest {
    * Stops the server.
    * @throws IOException I/O exception
    */
-  @AfterClass public static void stop() throws IOException {
+  @AfterAll public static void stop() throws IOException {
     session1.close();
     session2.close();
     stopServer(server);

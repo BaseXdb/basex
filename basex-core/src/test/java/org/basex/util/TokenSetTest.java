@@ -1,10 +1,10 @@
 package org.basex.util;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Token set tests.
@@ -21,37 +21,37 @@ public class TokenSetTest {
   private final TokenSet set = new TokenSet();
 
   /** Initializes the tests. */
-  @BeforeClass public static void init() {
+  @BeforeAll public static void init() {
     for(int i = 0; i < SIZE; i++) LIST.add(new byte[] {
         (byte) (i >>> 24), (byte) (i >> 16), (byte) (i >> 8), (byte) i });
   }
 
   /** Initializes a single test. */
-  @Before public void initTest() {
+  @BeforeEach public void initTest() {
     for(final byte[] token : LIST) set.add(token);
   }
 
   /** Tests added tokens. */
   @Test public void add() {
     assertEquals(SIZE, set.size());
-    for(final byte[] token : LIST) assertTrue("Token is missing.", set.contains(token));
+    for(final byte[] token : LIST) assertTrue(set.contains(token), "Token is missing.");
   }
 
   /** Tests removed tokens. */
   @Test public void delete() {
     for(final byte[] token : LIST) set.remove(token);
-    for(final byte[] token : LIST) assertFalse("Token exists.", set.contains(token));
+    for(final byte[] token : LIST) assertFalse(set.contains(token), "Token exists.");
   }
 
   /** Tests removed tokens. */
   @Test public void addDelete() {
     for(final byte[] token : LIST) set.add(token);
-    for(final byte[] token : LIST) assertTrue("Token is missing.", set.contains(token));
+    for(final byte[] token : LIST) assertTrue(set.contains(token), "Token is missing.");
     for(final byte[] token : LIST) set.remove(token);
-    for(final byte[] token : LIST) assertFalse("Token exists.", set.contains(token));
+    for(final byte[] token : LIST) assertFalse(set.contains(token), "Token exists.");
     for(final byte[] token : LIST) set.add(token);
-    for(final byte[] token : LIST) assertTrue("Token is missing.", set.contains(token));
+    for(final byte[] token : LIST) assertTrue(set.contains(token), "Token is missing.");
     for(final byte[] token : LIST) set.remove(token);
-    for(final byte[] token : LIST) assertFalse("Token exists.", set.contains(token));
+    for(final byte[] token : LIST) assertFalse(set.contains(token), "Token exists.");
   }
 }

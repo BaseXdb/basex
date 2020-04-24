@@ -1,12 +1,12 @@
 package org.basex.data;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
 import org.basex.index.*;
 import org.basex.util.list.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * ID -> PRE mapping test.
@@ -31,7 +31,7 @@ public final class IdPreMapTest {
   private IntList deletedpres;
 
   /** Set-up method. */
-  @Before public void setUp() {
+  @BeforeEach public void setUp() {
     final int ml = BASEID + 1;
     final int[] map = new int[ml];
     for(int m = 0; m < ml; m++) map[m] = m;

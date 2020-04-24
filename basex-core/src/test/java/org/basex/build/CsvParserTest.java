@@ -1,6 +1,6 @@
 package org.basex.build;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.build.csv.*;
@@ -10,8 +10,8 @@ import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * CSV Parser Test.
@@ -31,21 +31,21 @@ public final class CsvParserTest extends SandboxTest {
   /**
    * Creates the initial database.
    */
-  @BeforeClass public static void before() {
+  @BeforeAll public static void before() {
     set(MainOptions.PARSER, MainParser.CSV);
   }
 
   /**
    * Removes the temporary CSV file.
    */
-  @AfterClass public static void after() {
+  @AfterAll public static void after() {
     new IOFile(TEMP).delete();
   }
 
   /**
    * Sets initial options.
    */
-  @Before public void init() {
+  @BeforeEach public void init() {
     copts = new CsvParserOptions();
     context.options.set(MainOptions.CSVPARSER, copts);
   }
@@ -53,7 +53,7 @@ public final class CsvParserTest extends SandboxTest {
   /**
    * Drops the database.
    */
-  @After public void finish() {
+  @AfterEach public void finish() {
     execute(new DropDB(NAME));
   }
 

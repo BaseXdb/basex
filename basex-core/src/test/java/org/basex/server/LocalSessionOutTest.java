@@ -1,7 +1,7 @@
 package org.basex.server;
 
 import org.basex.io.out.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the local session API with an output stream.
@@ -12,7 +12,7 @@ import org.junit.*;
 public final class LocalSessionOutTest extends LocalSessionTest {
   /** Initializes the test. */
   @Override
-  @Before public void startSession() {
+  @BeforeEach public void startSession() {
     out = new ArrayOutput();
     super.startSession();
   }

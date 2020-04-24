@@ -1,13 +1,13 @@
 package org.basex.query.func;
 
 import static org.basex.query.func.ApiFunction.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.*;
 
 import org.basex.http.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the Request Module.
@@ -20,7 +20,7 @@ public final class RequestModuleTest extends HTTPTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass public static void start() throws Exception {
+  @BeforeAll public static void start() throws Exception {
     init(REST_ROOT, true);
   }
 

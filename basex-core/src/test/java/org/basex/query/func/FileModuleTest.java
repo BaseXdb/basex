@@ -2,7 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.nio.file.*;
@@ -10,7 +10,7 @@ import java.nio.file.*;
 import org.basex.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the functions of the File Module.
@@ -31,7 +31,7 @@ public final class FileModuleTest extends SandboxTest {
   private static final String PATH4 = PATH + NAME + "/x/y";
 
   /** Initializes the test. */
-  @After public void init() {
+  @AfterEach public void init() {
     new IOFile(PATH4).delete();
     new IOFile(PATH3).delete();
     new IOFile(PATH2).delete();

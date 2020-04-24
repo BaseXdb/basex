@@ -1,11 +1,11 @@
 package org.basex.query.ft;
 
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test if index and non-index full-text queries behave the same way.
@@ -73,6 +73,6 @@ public final class FTIndexQueryTest extends FTData {
     final String result1 = query(query);
     execute(new Open(NAME + "ix"));
     final String resultIx = query(query);
-    assertEquals("Query \"" + name + "\" failed:\nQuery: " + query + '\n', result1, resultIx);
+    assertEquals(result1, resultIx, "Query \"" + name + "\" failed:\nQuery: " + query + '\n');
   }
 }

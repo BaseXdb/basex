@@ -5,8 +5,8 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests the functions of the Admin Module.
@@ -16,12 +16,12 @@ import org.junit.Test;
  */
 public final class AdminModuleTest extends SandboxTest {
   /** Initialize tests. */
-  @BeforeClass public static void init() {
+  @BeforeAll public static void init() {
     execute(new CreateDB(NAME));
   }
 
   /** Finalize tests. */
-  @AfterClass public static void finish() {
+  @AfterAll public static void finish() {
     execute(new DropDB(NAME));
   }
 

@@ -1,9 +1,9 @@
 package org.basex.api.xmldb;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.io.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
 
@@ -23,7 +23,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
    * Initializes a test.
    * @throws Exception any exception
    */
-  @Before public void setUp() throws Exception {
+  @BeforeEach public void setUp() throws Exception {
     createDB();
     final Class<?> c = Class.forName(DRIVER);
     final Database database = (Database) c.getDeclaredConstructor().newInstance();
@@ -35,7 +35,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
    * Finalizes a test.
    * @throws Exception any exception
    */
-  @After public void tearDown() throws Exception {
+  @AfterEach public void tearDown() throws Exception {
     collection.close();
     dropDB();
   }
@@ -48,7 +48,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     // overwriting namespaces
     service.setNamespace("hell", "a");
     service.setNamespace("hell", "o");
-    assertEquals("Namespace not found.", "o", service.getNamespace("hell"));
+    assertEquals("o", service.getNamespace("hell"), "Namespace not found.");
 
     // testing invalid URIs
     try {
@@ -68,12 +68,12 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
    */
   @Test public void testGetNamespace() throws Exception {
     // testing former namespace
-    assertNull("Namespaces shouldn't be global.", service.getNamespace("hell"));
+    assertNull(service.getNamespace("hell"), "Namespaces shouldn't be global.");
 
     // setting and requesting default namespace
     service.setNamespace(null, "def");
-    assertEquals("No default Namespace.", "def", service.getNamespace(null));
-    assertEquals("No default Namespace.", "def", service.getNamespace(""));
+    assertEquals("def", service.getNamespace(null), "No default Namespace.");
+    assertEquals("def", service.getNamespace(""), "No default Namespace.");
   }
 
   /**
@@ -84,12 +84,12 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     // set and remove namespace
     service.setNamespace("hell", "a");
     service.removeNamespace("hell");
-    assertNull("Namespace was not removed.", service.getNamespace("hell"));
+    assertNull(service.getNamespace("hell"), "Namespace was not removed.");
 
     // set and remove default namespace
     service.setNamespace(null, "def");
     service.removeNamespace("");
-    assertNull("Namespace was not removed.", service.getNamespace(null));
+    assertNull(service.getNamespace(null), "Namespace was not removed.");
   }
 
   /**
@@ -100,7 +100,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     // set and clear namespace
     service.setNamespace("hell", "a");
     service.clearNamespaces();
-    assertNull("Namespace was not removed.", service.getNamespace("hell"));
+    assertNull(service.getNamespace("hell"), "Namespace was not removed.");
   }
 
   /**
@@ -114,13 +114,13 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
       fail("Buggy query was accepted.");
     } catch(final XMLDBException ignored) { }
 
-    assertEquals("Wrong result size.", 1, service.query("/").getSize());
+    assertEquals(1, service.query("/").getSize(), "Wrong result size.");
 
     // add second document
     final Resource resource = collection.createResource(DOC2, XMLResource.RESOURCE_TYPE);
     resource.setContent(new IOFile(DOCPATH, DOC2).read());
     collection.storeResource(resource);
-    assertEquals("Wrong result size", 6, service.query("//node()").getSize());
+    assertEquals(6, service.query("//node()").getSize(), "Wrong result size");
 
     // remove second document
     collection.removeResource(resource);
@@ -131,7 +131,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @Test public void testQueryResource() throws Exception {
-     assertEquals("Wrong result size", 3, service.queryResource(DOC1, "//node()").getSize());
+     assertEquals(3, service.queryResource(DOC1, "//node()").getSize(), "Wrong result size");
 
     // catch query errors
     try {

@@ -1,8 +1,8 @@
 package org.basex.api.xmldb;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
 
@@ -22,7 +22,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
    * Initializes a test.
    * @throws Exception any exception
    */
-  @Before public void setUp() throws Exception {
+  @BeforeEach public void setUp() throws Exception {
     createDB();
     final Class<?> c = Class.forName(DRIVER);
     final Database database = (Database) c.getDeclaredConstructor().newInstance();
@@ -34,7 +34,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
    * Finalizes a test.
    * @throws Exception any exception
    */
-  @After public void tearDown() throws Exception {
+  @AfterEach public void tearDown() throws Exception {
     collection.close();
     dropDB();
   }
@@ -53,8 +53,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
       set.getResource(-1);
       fail("Invalid index access.");
     } catch(final XMLDBException ex) {
-      assertEquals("Wrong error code.", ErrorCodes.NO_SUCH_RESOURCE,
-          ex.errorCode);
+      assertEquals(ErrorCodes.NO_SUCH_RESOURCE, ex.errorCode, "Wrong error code.");
     }
   }
 
@@ -70,7 +69,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
     // add second to first result set
     final long size = set1.getSize();
     set1.addResource(set2.getResource(0));
-    assertEquals("Wrong size of result set.", size + 1, set1.getSize());
+    assertEquals(size + 1, set1.getSize(), "Wrong size of result set.");
   }
 
   /**
@@ -81,7 +80,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
     // perform query and remove result
     final ResourceSet set = service.query("1");
     set.removeResource(0);
-    assertEquals("Wrong size of result set.", 0, set.getSize());
+    assertEquals(0, set.getSize(), "Wrong size of result set.");
   }
 
   /**
@@ -93,7 +92,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
     final ResourceSet set = service.query("1");
     set.removeResource(0);
     final ResourceIterator iter = set.getIterator();
-    assertFalse("No results expected.", iter.hasMoreResources());
+    assertFalse(iter.hasMoreResources(), "No results expected.");
   }
 
   /**
@@ -104,9 +103,9 @@ public final class ResourceSetTest extends XMLDBBaseTest {
     // test created resource
     final ResourceSet set = service.query("1");
     final Resource resource = set.getMembersAsResource();
-    assertNull("No ID expected.", resource.getId());
-    assertEquals("Wrong result.", "<xmldb>1</xmldb>", resource.getContent());
-    assertSame("Wrong collection reference.", resource.getParentCollection(), collection);
+    assertNull(resource.getId(), "No ID expected.");
+    assertEquals("<xmldb>1</xmldb>", resource.getContent(), "Wrong result.");
+    assertSame(resource.getParentCollection(), collection, "Wrong collection reference.");
   }
 
   /**
@@ -116,9 +115,9 @@ public final class ResourceSetTest extends XMLDBBaseTest {
   @Test public void testGetSize() throws Exception {
     // test created resource
     final ResourceSet set = service.query("1");
-    assertEquals("Wrong result size.", 1, set.getSize());
+    assertEquals(1, set.getSize(), "Wrong result size.");
     set.removeResource(0);
-    assertEquals("Wrong result size.", 0, set.getSize());
+    assertEquals(0, set.getSize(), "Wrong result size.");
   }
 
   /**
@@ -129,6 +128,6 @@ public final class ResourceSetTest extends XMLDBBaseTest {
     // test created resource
     final ResourceSet set = service.query("1");
     set.clear();
-    assertEquals("Results were not deleted.", 0, set.getSize());
+    assertEquals(0, set.getSize(), "Results were not deleted.");
   }
 }

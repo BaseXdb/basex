@@ -1,15 +1,14 @@
 package org.basex.http.restxq;
 
 import static java.math.BigInteger.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.*;
 import java.util.*;
 
 import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
-import org.hamcrest.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Path matcher tests.
@@ -62,7 +61,7 @@ public final class RestXqPathMatcherTest {
 
   /** Test.
    * @throws Exception exception */
-  @Ignore
+  @Disabled
   @Test public void testParseExtendedQualifiedVariables() throws Exception {
     testParse(
             "/a1/{ $n:var1 }/a2/{ $Q{m}var2 }/a3",
@@ -139,12 +138,7 @@ public final class RestXqPathMatcherTest {
       final String val) throws Exception {
 
     final QNmMap<String> actual = RestXqPathMatcher.parse(template, null).values(path);
-    MatcherAssert.assertThat(actual, new CustomTypeSafeMatcher<QNmMap<String>>("values differ") {
-      @Override
-      protected boolean matchesSafely(final QNmMap<String> item) {
-        return Objects.equals(val, item.get(new QNm(var)));
-      }
-    });
+    assertEquals(val, actual.get(new QNm(var)), "values differ");
   }
 
   /**

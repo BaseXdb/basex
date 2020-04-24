@@ -1,13 +1,13 @@
 package net.xqj.basex.local;
 
 import static javax.xml.xquery.XQItemType.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.*;
 
 import javax.xml.xquery.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 import org.w3c.dom.*;
 
 /**

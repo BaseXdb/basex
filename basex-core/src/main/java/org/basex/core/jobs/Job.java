@@ -17,15 +17,16 @@ public abstract class Job {
   private final List<Job> children = Collections.synchronizedList(new ArrayList<>(0));
   /** Job context. */
   private JobContext jc = new JobContext(this);
+  // state and control flags must be volatile so that all threads see the actual non-cached values
   /** Timer. */
-  private Timer timer;
+  private volatile Timer timer;
 
   /** This flag indicates that a job is updating. */
-  public boolean updating;
+  public volatile boolean updating;
   /** State of job. */
-  public JobState state = JobState.SCHEDULED;
+  public volatile JobState state = JobState.SCHEDULED;
   /** Stopped flag. */
-  private boolean stopped;
+  private volatile boolean stopped;
 
   /**
    * Returns the job context.

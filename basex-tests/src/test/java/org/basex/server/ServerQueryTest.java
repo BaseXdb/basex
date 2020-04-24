@@ -5,7 +5,7 @@ import java.util.*;
 import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class performs a client/server stress tests with a specified

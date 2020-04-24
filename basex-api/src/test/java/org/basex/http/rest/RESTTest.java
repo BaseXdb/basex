@@ -1,6 +1,6 @@
 package org.basex.http.rest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.net.*;
@@ -9,7 +9,7 @@ import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the embedded REST API.
@@ -29,7 +29,7 @@ public abstract class RESTTest extends HTTPTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass public static void start() throws Exception {
+  @BeforeAll public static void start() throws Exception {
     init(REST_ROOT, true);
   }
 
@@ -39,8 +39,8 @@ public abstract class RESTTest extends HTTPTest {
    * @param prefix prefix
    */
   protected static void assertStartsWith(final String string, final String prefix) {
-    assertTrue('\'' + string + "' does not start with '" + prefix + '\'',
-        string.startsWith(prefix));
+    assertTrue(string.startsWith(prefix),
+      '\'' + string + "' does not start with '" + prefix + '\'');
   }
 
   /**

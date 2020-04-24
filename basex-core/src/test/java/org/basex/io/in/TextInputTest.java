@@ -1,12 +1,12 @@
 package org.basex.io.in;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
 import org.basex.io.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Test class for the {@link TextInput} method.
@@ -55,11 +55,10 @@ public final class TextInputTest {
 
   /**
    * Test unknown encoding.
-   * @throws IOException I/O exception
    */
-  @Test(expected = IOException.class)
-  public void unknownEncoding() throws IOException {
-    encoding("unknown", "");
+  @Test
+  public void unknownEncoding() {
+    assertThrows(IOException.class, () -> encoding("unknown", ""));
   }
 
   /**
@@ -118,14 +117,14 @@ public final class TextInputTest {
       final TokenBuilder tb = new TokenBuilder();
       for(int b; (b = ti.read()) != -1;) tb.add(b);
       ti.reset();
-      assertTrue("Mark should not be supported for data size of " + data.length,
-          data.length < IO.BLOCKSIZE);
+      assertTrue(data.length < IO.BLOCKSIZE,
+        "Mark should not be supported for data size of " + data.length);
       tb.reset();
       for(int b; (b = ti.read()) != -1;) tb.add(b);
       assertSame(data, tb.finish());
     } catch(final IOException ex) {
-      assertTrue("Mark could not be reset for data size of " + data.length,
-          data.length >= IO.BLOCKSIZE);
+      assertTrue(data.length >= IO.BLOCKSIZE,
+        "Mark could not be reset for data size of " + data.length);
     }
   }
 
@@ -135,7 +134,7 @@ public final class TextInputTest {
    * @param data2 first array
    */
   private static void assertSame(final byte[] data1, final byte[] data2) {
-    assertEquals("Different array size: ", data1.length, data2.length);
-    assertTrue("Data arrays differ: ", Token.eq(data1, data2));
+    assertEquals(data1.length, data2.length, "Different array size: ");
+    assertTrue(Token.eq(data1, data2), "Data arrays differ: ");
   }
 }

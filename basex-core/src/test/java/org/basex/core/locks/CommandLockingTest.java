@@ -1,14 +1,14 @@
 package org.basex.core.locks;
 
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.index.*;
 import org.basex.query.func.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests commands and XQueries for correct identification of databases to lock.

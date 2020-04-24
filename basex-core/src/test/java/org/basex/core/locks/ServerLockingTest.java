@@ -1,6 +1,6 @@
 package org.basex.core.locks;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
@@ -8,11 +8,8 @@ import java.util.concurrent.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.junit.*;
-import org.junit.Test;
-import org.junit.runner.*;
-import org.junit.runners.*;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests database locking inside BaseX. For this purpose, two queries are forced to be
@@ -21,7 +18,6 @@ import org.junit.runners.Parameterized.Parameters;
  * @author BaseX Team 2005-20, BSD License
  * @author Jens Erat
  */
-@RunWith(Parameterized.class)
 public final class ServerLockingTest extends SandboxTest {
   /** How often should tests be repeated? */
   private static final int REPEAT = 1;
@@ -54,23 +50,10 @@ public final class ServerLockingTest extends SandboxTest {
   private static BaseXServer server;
 
   /**
-   * Enable repeated running of test to track down synchronization issues.
-   * @return Collection of empty object arrays
-   */
-  @Parameters
-  public static Collection<Object[]> generateParams() {
-    final List<Object[]> params = new ArrayList<>();
-    for(int i = 1; i <= REPEAT; i++) {
-      params.add(new Object[0]);
-    }
-    return params;
-  }
-
-  /**
    * Starts the server.
    * @throws Exception None expected
    */
-  @BeforeClass public static void start() throws Exception {
+  @BeforeAll public static void start() throws Exception {
     server = createServer();
     final CountDownLatch latch = new CountDownLatch(2);
     new Client(new CreateDB(NAME, DOC), null, latch);
@@ -82,7 +65,7 @@ public final class ServerLockingTest extends SandboxTest {
   /**
    * Stops the server.
    */
-  @AfterClass public static void stop() {
+  @AfterAll public static void stop() {
     stopServer(server);
   }
 
@@ -118,8 +101,8 @@ public final class ServerLockingTest extends SandboxTest {
     final boolean await = test.await(2 * SLEEP + SYNC, TimeUnit.MILLISECONDS);
     assertNull(cl1.error, cl1.error);
     assertNull(cl2.error, cl2.error);
-    assertEquals(parallel ? "Parallel execution expected" : "Serial execution expected",
-      parallel, await);
+    assertEquals(parallel, await,
+      parallel ? "Parallel execution expected" : "Serial execution expected");
   }
 
   /**
@@ -136,7 +119,8 @@ public final class ServerLockingTest extends SandboxTest {
    * Test whether parallel execution of queries is successful.
    * @throws Exception None expected
    */
-  @Test public void lockingTests() throws Exception {
+  @RepeatedTest(REPEAT)
+  public void lockingTests() throws Exception {
     // Not querying any databases
     testQueries(
         new XQuery(Q),
@@ -194,7 +178,8 @@ public final class ServerLockingTest extends SandboxTest {
    * Load test.
    * @throws Exception None expected
    */
-  @Test public void loadTests() throws Exception {
+  @RepeatedTest(REPEAT)
+  public void loadTests() throws Exception {
     final int totalQueries = RUN_COUNT * QUERIES.length;
     final ArrayList<Client> clients = new ArrayList<>(totalQueries);
     final CountDownLatch allDone = new CountDownLatch(totalQueries);

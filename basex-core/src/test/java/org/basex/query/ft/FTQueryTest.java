@@ -4,7 +4,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.query.func.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Full-text query tests.

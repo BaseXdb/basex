@@ -1,7 +1,7 @@
 package org.basex;
 
 import org.basex.core.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * If this class is extended, tests will be run in a sandbox.
@@ -13,7 +13,7 @@ public abstract class SandboxTest extends Sandbox {
   /**
    * Creates the sandbox.
    */
-  @BeforeClass
+  @BeforeAll
   public static void initTests() {
     initSandbox();
   }
@@ -21,7 +21,7 @@ public abstract class SandboxTest extends Sandbox {
   /**
    * Removes test databases and closes the database context.
    */
-  @AfterClass
+  @AfterAll
   public static void finishTests() {
     finishSandbox();
   }

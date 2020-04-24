@@ -2,7 +2,7 @@ package org.basex.server;
 
 import org.basex.*;
 import org.basex.api.client.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class performs a client/server stress test with concurrent read and write operations.

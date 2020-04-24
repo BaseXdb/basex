@@ -2,7 +2,7 @@ package org.basex.core;
 
 import static org.basex.core.users.UserText.*;
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
@@ -12,8 +12,8 @@ import org.basex.core.cmd.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests user permissions.
@@ -40,20 +40,20 @@ public final class PermissionTest extends SandboxTest {
    * Starts the server.
    * @throws IOException I/O exception
    */
-  @BeforeClass public static void start() throws IOException {
+  @BeforeAll public static void start() throws IOException {
     server = createServer();
   }
 
   /**
    * Stops the server.
    */
-  @AfterClass public static void stop() {
+  @AfterAll public static void stop() {
     stopServer(server);
     new IOFile(Prop.TEMPDIR, NAME + "-export").delete();
   }
 
   /** Set up method. */
-  @Before public void setUp() {
+  @BeforeEach public void setUp() {
     try {
       adminSession = createClient();
       if(server.context.users.get(NAME) != null) {
@@ -73,7 +73,7 @@ public final class PermissionTest extends SandboxTest {
   }
 
   /** Clean up method. */
-  @After public void cleanUp() {
+  @AfterEach public void cleanUp() {
     try {
       testSession.close();
       adminSession.execute(new DropDB(NAME2));

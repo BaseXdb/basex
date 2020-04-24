@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.*;
 import org.basex.query.value.array.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests for XQuery arrays.

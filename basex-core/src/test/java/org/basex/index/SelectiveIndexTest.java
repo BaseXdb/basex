@@ -1,13 +1,13 @@
 package org.basex.index;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Storage tests for the selective index feature (#59).
@@ -27,7 +27,7 @@ public final class SelectiveIndexTest extends SandboxTest {
       set(MainOptions.TEXTINCLUDE, key);
       execute(new CreateDB(NAME, FILE));
       final int size = context.data().textIndex.size();
-      assertEquals("TextIndex: \"" + key + "\": ", value.intValue(), size);
+      assertEquals(value.intValue(), size, "TextIndex: \"" + key + "\": ");
     });
   }
 
@@ -40,7 +40,7 @@ public final class SelectiveIndexTest extends SandboxTest {
         set(MainOptions.ATTRINCLUDE, key);
         execute(new CreateDB(NAME, FILE));
         final int size = context.data().attrIndex.size();
-        assertEquals("AttrIndex: \"" + key + "\": ", value.intValue(), size);
+        assertEquals(value.intValue(), size, "AttrIndex: \"" + key + "\": ");
       });
     } finally {
       set(MainOptions.ATTRINCLUDE, "");
@@ -57,7 +57,7 @@ public final class SelectiveIndexTest extends SandboxTest {
         set(MainOptions.TOKENINCLUDE, key);
         execute(new CreateDB(NAME, FILE));
         final int size = context.data().tokenIndex.size();
-        assertEquals("TokenIndex: \"" + key + "\": ", value.intValue(), size);
+        assertEquals(value.intValue(), size, "TokenIndex: \"" + key + "\": ");
       });
     } finally {
       set(MainOptions.TOKENINCLUDE, "");
@@ -74,7 +74,7 @@ public final class SelectiveIndexTest extends SandboxTest {
       map().forEach((key, value) -> {
         set(MainOptions.FTINCLUDE, key);
         execute(new CreateDB(NAME, FILE));
-        assertEquals("FTIndex: \"" + key + "\": ", (int) value, context.data().ftIndex.size());
+        assertEquals((int) value, context.data().ftIndex.size(), "FTIndex: \"" + key + "\": ");
       });
     } finally {
       set(MainOptions.FTINCLUDE, "");

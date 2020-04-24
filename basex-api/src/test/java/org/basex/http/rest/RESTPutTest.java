@@ -1,13 +1,13 @@
 package org.basex.http.rest;
 
 import static org.basex.util.Token.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
 import org.basex.core.*;
 import org.basex.io.in.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the embedded REST API and the PUT method.

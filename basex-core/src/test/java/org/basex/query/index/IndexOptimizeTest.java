@@ -8,8 +8,8 @@ import org.basex.query.ast.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.index.*;
 import org.basex.util.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests if queries are rewritten for index access.
@@ -19,7 +19,7 @@ import org.junit.Test;
  */
 public final class IndexOptimizeTest extends QueryPlanTest {
   /** Creates a test database. */
-  @BeforeClass public static void start() {
+  @BeforeAll public static void start() {
     execute(new DropDB(NAME));
     set(MainOptions.FTINDEX, true);
     set(MainOptions.TOKENINDEX, true);

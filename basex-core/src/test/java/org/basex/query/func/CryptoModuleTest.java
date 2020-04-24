@@ -3,7 +3,7 @@ package org.basex.query.func;
 import java.util.logging.*;
 
 import org.basex.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the functions of the Cryptography Module.

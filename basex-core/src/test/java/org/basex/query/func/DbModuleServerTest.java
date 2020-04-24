@@ -1,7 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -10,8 +10,8 @@ import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests the functions of the Database Module in a client/server environment.
@@ -30,7 +30,7 @@ public final class DbModuleServerTest extends SandboxTest {
   /**
    * Initializes a test.
    */
-  @Before public void finishTest() {
+  @BeforeEach public void finishTest() {
     execute(new DropDB(NAME));
   }
 
@@ -38,14 +38,14 @@ public final class DbModuleServerTest extends SandboxTest {
    * Starts the server.
    * @throws IOException I/O exception
    */
-  @BeforeClass public static void start() throws IOException {
+  @BeforeAll public static void start() throws IOException {
     server = createServer();
   }
 
   /**
    * Finishes the test.
    */
-  @AfterClass public static void finish() {
+  @AfterAll public static void finish() {
     stopServer(server);
   }
 

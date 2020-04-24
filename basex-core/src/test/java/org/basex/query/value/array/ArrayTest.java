@@ -2,7 +2,7 @@ package org.basex.query.value.array;
 
 import org.basex.*;
 import org.basex.query.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests for {@link XQArray#reverse(QueryContext)}.
@@ -15,12 +15,12 @@ public class ArrayTest extends SandboxTest {
   static QueryContext qc;
 
   /** Initializes the test. */
-  @BeforeClass public static void init() {
+  @BeforeAll public static void init() {
     qc = new QueryContext(context);
   }
 
   /** Finalizes the test. */
-  @AfterClass public static void close() {
+  @AfterAll public static void close() {
     qc = null;
   }
 }

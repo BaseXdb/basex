@@ -1,6 +1,6 @@
 package net.xqj.basex;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
@@ -8,7 +8,7 @@ import javax.xml.namespace.*;
 import javax.xml.xquery.*;
 
 import org.basex.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Performs simple tests on Charles Forster's XQJ client implementation for BaseX.
@@ -24,14 +24,14 @@ public final class XQJTest extends SandboxTest {
    * Starts the tests.
    * @throws IOException I/O exception
    */
-  @BeforeClass public static void before() throws IOException {
+  @BeforeAll public static void before() throws IOException {
     server = createServer();
   }
 
   /**
    * Finishes the tests.
    */
-  @AfterClass public static void after() {
+  @AfterAll public static void after() {
     stopServer(server);
   }
 

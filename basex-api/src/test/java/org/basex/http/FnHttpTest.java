@@ -4,7 +4,7 @@ import static org.basex.core.Text.*;
 import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.http.HttpText.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.net.*;
@@ -31,8 +31,8 @@ import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.http.HttpRequest.*;
 import org.basex.util.list.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests the server-based HTTP Client.
@@ -60,7 +60,7 @@ public class FnHttpTest extends HTTPTest {
    * Start server.
    * @throws Exception exception
    */
-  @BeforeClass public static void start() throws Exception {
+  @BeforeAll public static void start() throws Exception {
     init(RESTURL, true);
     ctx = new Context();
   }
@@ -796,7 +796,7 @@ public class FnHttpTest extends HTTPTest {
    */
   private static void compare(final Value expected, final Value returned) throws Exception {
     // Compare response with expected result
-    assertEquals("Different number of results", expected.size(), returned.size());
+    assertEquals(expected.size(), returned.size(), "Different number of results");
 
     final long es = expected.size();
     for(int e = 0; e < es; e++) {

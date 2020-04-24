@@ -15,7 +15,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Checks query rewritings.

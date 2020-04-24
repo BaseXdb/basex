@@ -8,8 +8,8 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.index.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests the functions of the Fulltext Module.
@@ -24,7 +24,7 @@ public final class FtModuleTest extends SandboxTest {
   /**
    * Initializes a test.
    */
-  @Before public void initTest() {
+  @BeforeEach public void initTest() {
     execute(new CreateDB(NAME, FILE));
     execute(new CreateIndex(CmdIndex.FULLTEXT));
   }

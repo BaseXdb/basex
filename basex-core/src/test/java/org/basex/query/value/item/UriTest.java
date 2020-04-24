@@ -1,13 +1,11 @@
 package org.basex.query.value.item;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.*;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.ParameterizedTest;
 
 /**
  * URI tests.
@@ -15,13 +13,11 @@ import org.junit.runners.Parameterized.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Dimitar Popov
  */
-@RunWith(Parameterized.class)
 public class UriTest {
   /**
    * Sample URIs.
    * @return object parameters
    */
-  @Parameters(name = "{index}: \"{0}\": valid = {1}, absolute = {2}")
   public static Collection<Object[]> sampleUris() {
     return Arrays.asList(new Object[][] {
       {"x:", true, true},
@@ -73,24 +69,27 @@ public class UriTest {
     });
   }
 
-  /** Current test URI. */
-  @Parameter public String uri;
-  /** Current valid flag. */
-  @Parameter(1) public boolean valid;
-  /** Current absolute flag. */
-  @Parameter(2) public boolean absolute;
-
   /**
    * Tests for {@link Uri#isAbsolute()}.
+   * @param uri current test URI.
+   * @param valid current valid flag.
+   * @param absolute current absolute flag.
    */
-  @Test public void isAbsolute() {
-    assertEquals("Uri absolute check failed", absolute, Uri.uri(uri).isAbsolute());
+  @ParameterizedTest
+  @MethodSource("sampleUris")
+  public void isAbsolute(String uri, boolean valid, boolean absolute) {
+    assertEquals(absolute, Uri.uri(uri).isAbsolute(), "Uri absolute check failed");
   }
 
   /**
    * Tests for {@link Uri#isValid()}.
+   * @param uri current test URI.
+   * @param valid current valid flag.
+   * @param absolute current absolute flag.
    */
-  @Test public void isValid() {
-    assertEquals("Uri validation failed", valid, Uri.uri(uri).isValid());
+  @ParameterizedTest
+  @MethodSource("sampleUris")
+  public void isValid(String uri, boolean valid, boolean absolute) {
+    assertEquals(valid, Uri.uri(uri).isValid(), "Uri validation failed");
   }
 }

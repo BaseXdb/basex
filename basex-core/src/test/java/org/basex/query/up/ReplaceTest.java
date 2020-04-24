@@ -4,7 +4,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests on the various replace operations.

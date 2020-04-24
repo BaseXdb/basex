@@ -3,8 +3,8 @@ package org.basex.query.func.fn;
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.index.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * General test of the XQuery Update Facility implementation.
@@ -17,7 +17,7 @@ public final class FnIdTest extends SandboxTest {
   private static final String DOC = "src/test/resources/xmark.xml";
 
   /** Finalize test. */
-  @After public void finish() {
+  @AfterEach public void finish() {
     execute(new Close());
   }
 

@@ -2,7 +2,7 @@ package org.basex.local.single;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Performs bulk updates with standalone version.

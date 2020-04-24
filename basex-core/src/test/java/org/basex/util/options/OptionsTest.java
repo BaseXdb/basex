@@ -1,6 +1,6 @@
 package org.basex.util.options;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.build.csv.*;
@@ -15,7 +15,7 @@ import org.basex.query.func.xquery.XQueryEval.XQueryOptions;
 import org.basex.query.util.collation.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests on options.
@@ -25,7 +25,7 @@ import org.junit.*;
  */
 public final class OptionsTest extends SandboxTest {
   /** Initializes various options. */
-  @AfterClass public static void init() {
+  @AfterAll public static void init() {
     // instantiate options at least once
     new UCAOptions();
     new CsvOptions();

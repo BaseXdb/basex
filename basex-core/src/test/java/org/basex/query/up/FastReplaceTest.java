@@ -1,11 +1,11 @@
 package org.basex.query.up;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Stress Testing the fast replace feature where blocks on disk are directly
@@ -21,7 +21,7 @@ public final class FastReplaceTest extends SandboxTest {
   /**
    * Creates the db based on xmark.xml.
    */
-  @Before public void setUp() {
+  @BeforeEach public void setUp() {
     execute(new CreateDB(NAME, DOC));
     query("let $items := /site/regions//item " +
       "for $i in 1 to 10 " +

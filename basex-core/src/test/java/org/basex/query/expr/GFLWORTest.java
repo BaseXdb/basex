@@ -2,7 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.query.ast.*;
 import org.basex.query.expr.gflwor.*;
@@ -10,7 +10,7 @@ import org.basex.query.up.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 /**
  * Test cases for FLWOR expressions.

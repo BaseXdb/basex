@@ -1,14 +1,14 @@
 package org.basex.server;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
-import org.junit.*;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Admin stress test.
@@ -26,14 +26,14 @@ public final class AdminStressTest extends SandboxTest {
    * Starts the server.
    * @throws IOException I/O exception
    */
-  @BeforeClass public static void start() throws IOException {
+  @BeforeAll public static void start() throws IOException {
     server = createServer();
   }
 
   /**
    * Stops the server.
    */
-  @AfterClass public static void stop() {
+  @AfterAll public static void stop() {
     stopServer(server);
   }
 
