@@ -37,8 +37,8 @@ public final class JobsResult extends Command {
     final JobPool jobs = context.jobs;
     final Map<String, QueryJobResult> results = jobs.results;
     final QueryJobResult result = results.get(id);
-    if(result == null) return error(JOBS_UNKNOWN_X.desc, id);
-    if(!result.cached()) error(JOBS_RUNNING_X.desc, id);
+    if(result == null) return error(JOBS_UNKNOWN_X.message, id);
+    if(!result.cached()) error(JOBS_RUNNING_X.message, id);
 
     try {
       if(result.value == null) throw result.exception;

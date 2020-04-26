@@ -322,7 +322,7 @@ public final class PackageAPITest extends SandboxTest {
     try {
       new RepoDelete("org.basex.modules.Hello", null).execute(context);
     } catch(final BaseXException ex) {
-      assertTrue(ex.toString().contains(REPO_NOTFOUND_X.code));
+      assertTrue(ex.toString().contains(REPO_NOTFOUND_X.toString()));
     }
   }
 

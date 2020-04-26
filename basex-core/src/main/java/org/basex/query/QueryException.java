@@ -68,7 +68,7 @@ public class QueryException extends Exception {
    * @param ext error extension
    */
   public QueryException(final InputInfo info, final QueryError error, final Object... ext) {
-    this(info, error.qname(), error.desc, ext);
+    this(info, error.qname(), error.message, ext);
     this.error = error;
   }
 

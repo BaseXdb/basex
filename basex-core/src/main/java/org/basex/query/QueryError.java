@@ -1391,23 +1391,23 @@ public enum QueryError {
   private static final QueryError[] VALUES = values();
 
   /** Error code. */
-  public final String code;
+  private final String code;
   /** Error URI. */
   private final byte[] uri;
   /** Error prefix. */
   private final String prefix;
-  /** Error description. */
-  public final String desc;
+  /** Error message. */
+  public final String message;
 
   /**
    * Constructor.
    * @param type error type
    * @param code error code
-   * @param desc description
+   * @param message message
    */
-  QueryError(final ErrType type, final String code, final String desc) {
+  QueryError(final ErrType type, final String code, final String message) {
     this.code = code;
-    this.desc = desc;
+    this.message = message;
     uri = type.uri;
     prefix = type.prefix;
   }
@@ -1416,9 +1416,9 @@ public enum QueryError {
    * Constructor.
    * @param type error type
    * @param number error number
-   * @param desc description
+   * @param message message
    */
-  QueryError(final ErrType type, final int number, final String desc) {
+  QueryError(final ErrType type, final int number, final String message) {
     final StringBuilder sb = new StringBuilder(8).append(type);
     final String n = Integer.toString(number);
     final int s  = 4 - n.length();
@@ -1426,7 +1426,7 @@ public enum QueryError {
     code = sb.append(n).toString();
     uri = type.uri;
     prefix = type.prefix;
-    this.desc = desc;
+    this.message = message;
   }
 
   /**
@@ -1437,8 +1437,7 @@ public enum QueryError {
    * @return query exception
    */
   public QueryException get(final InputInfo ii, final Object... ext) {
-    return ii != null && ii.internal() ? QueryException.ERROR :
-      new QueryException(ii, this, ext);
+    return ii != null && ii.internal() ? QueryException.ERROR : new QueryException(ii, this, ext);
   }
 
   /**
@@ -1550,12 +1549,12 @@ public enum QueryError {
 
     /**
      * Constructor for non-standard errors.
-     * @param pref QName prefix
-     * @param u error URI
+     * @param prefix QName prefix
+     * @param uri error URI
      */
-    ErrType(final byte[] pref, final byte[] u) {
-      prefix = Token.string(pref);
-      uri = u;
+    ErrType(final byte[] prefix, final byte[] uri) {
+      this.prefix = Token.string(prefix);
+      this.uri = uri;
     }
 
     /**
@@ -1573,15 +1572,6 @@ public enum QueryError {
    */
   public final QNm qname() {
     return new QNm(prefix + ':' + code, uri);
-  }
-
-  /**
-   * Checks if the error code is of the specified type.
-   * @param type type
-   * @return result of check
-   */
-  public final boolean is(final ErrType type) {
-    return code.startsWith(type.name());
   }
 
   /**

@@ -166,6 +166,15 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void docAvailable() {
+    final Function func = DOC_AVAILABLE;
+
+    query(func.args(TEXT), true);
+    query(func.args("/"), false);
+    query(func.args("/a/b/c/d/e"), false);
+  }
+
+  /** Test method. */
   @Test public void error() {
     final Function func = ERROR;
 

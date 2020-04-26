@@ -125,7 +125,7 @@ public abstract class AQuery extends Command {
         error = ex.getMessage();
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
-        error = BASEX_OVERFLOW.desc;
+        error = BASEX_OVERFLOW.message;
       } catch(final RuntimeException ex) {
         extError("");
         throw ex;

@@ -161,7 +161,7 @@ public final class ServerQuery extends Job {
       throw new BaseXException(ex);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      throw new BaseXException(BASEX_OVERFLOW.desc);
+      throw new BaseXException(BASEX_OVERFLOW.message);
     } finally {
       // close processor and unregisters the process
       if(qp != null) {

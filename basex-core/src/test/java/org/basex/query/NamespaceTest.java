@@ -687,7 +687,7 @@ public final class NamespaceTest extends SandboxTest {
     try(QueryProcessor qp = new QueryProcessor(query, context)) {
       qp.value();
     } catch(final QueryException ex) {
-      assertEquals("XUTY0004", ex.error().code);
+      assertEquals("XUTY0004", ex.error().toString());
     }
     fail("should throw XUTY0004");
   }

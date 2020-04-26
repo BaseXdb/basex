@@ -19,10 +19,13 @@ public final class FnDocAvailable extends Docs {
       return Bln.get(doc(qc) != Empty.VALUE);
     } catch(final QueryException ex) {
       final QueryError error = ex.error();
-      if(error != null && error.code.matches("^.*\\d+$")) {
-        final int num = Strings.toInt(error.code.replaceAll("^.*(\\d+)$", "$1"));
-        if(error.is(ErrType.FODC) && (num == 2 || num == 4 || num == 5) ||
-           error.is(ErrType.DB) && num == 6) return Bln.FALSE;
+      if(error != null) {
+        final String code = error.toString();
+        if(code.matches("^.*\\d+$")) {
+          final int num = Strings.toInt(error.toString().replaceAll("^.*(\\d+)$", "$1"));
+          if(code.startsWith(ErrType.FODC.name()) && (num == 2 || num == 4 || num == 5) ||
+            code.startsWith(ErrType.DB.name()) && num == 6) return Bln.FALSE;
+        }
       }
       throw ex;
     }

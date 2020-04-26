@@ -78,7 +78,7 @@ public abstract class Parse extends StandardFunc {
       }
 
     } catch(final QueryException ex) {
-      if(check && !ex.error().is(ErrType.XPTY)) return Bln.FALSE;
+      if(check && !ex.error().toString().startsWith(ErrType.XPTY.name())) return Bln.FALSE;
       throw ex;
     }
   }
