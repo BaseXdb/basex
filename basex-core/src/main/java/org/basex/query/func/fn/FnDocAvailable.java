@@ -1,7 +1,9 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.QueryError.*;
+import java.util.*;
+
 import org.basex.query.*;
-import org.basex.query.QueryError.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -13,20 +15,16 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FnDocAvailable extends Docs {
+  /** Possible failures. */
+  private static final EnumSet<QueryError> ERRORS = EnumSet.of(
+      BASEX_DBPATH1_X, BASEX_DBPATH2_X, IOERR_X, WHICHRES_X, RESDIR_X, INVDOC_X);
+
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     try {
       return Bln.get(doc(qc) != Empty.VALUE);
     } catch(final QueryException ex) {
-      final QueryError error = ex.error();
-      if(error != null) {
-        final String code = error.toString();
-        if(code.matches("^.*\\d+$")) {
-          final int num = Strings.toInt(error.toString().replaceAll("^.*(\\d+)$", "$1"));
-          if(code.startsWith(ErrType.FODC.name()) && (num == 2 || num == 4 || num == 5) ||
-            code.startsWith(ErrType.DB.name()) && num == 6) return Bln.FALSE;
-        }
-      }
+      if(ERRORS.contains(ex.error())) return Bln.FALSE;
       throw ex;
     }
   }
