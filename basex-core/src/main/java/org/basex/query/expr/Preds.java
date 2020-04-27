@@ -303,48 +303,53 @@ public abstract class Preds extends Arr {
    * @return expression
    * @throws QueryException query exception
    */
-  public final Expr simplify(final Expr root, final CompileContext cc) throws QueryException {
-    // only single predicate can be rewritten; root expression must yield nodes
-    if(exprs.length != 1 || !(root.seqType().type instanceof NodeType)) return this;
+  public final Expr simplifyEbv(final Expr root, final CompileContext cc) throws QueryException {
+    // only single predicate can be rewritten; root must yield nodes; no positional predicates
+    final SeqType rst = root.seqType();
+    final int el = exprs.length;
+    if(!(rst.type instanceof NodeType) || el == 0 || positional()) return this;
 
-    // skip positional predicates
-    final Expr pred = exprs[0];
-    if(pred.seqType().mayBeNumber()) return this;
+    final Expr pred = exprs[el - 1];
+    final QueryFunction<Expr, Expr> createRoot = r -> {
+      return el == 1 ? r : Filter.get(info, r, Arrays.copyOfRange(exprs, 0, el - 1)).optimize(cc);
+    };
+    final QueryFunction<Expr, Expr> createExpr = e -> {
+      return e instanceof ContextValue ? createRoot.apply(root) :
+        e instanceof Path ? Path.get(info, createRoot.apply(root), e).optimize(cc) : null;
+    };
 
-    // a[b]  ->  a/b
-    if(pred instanceof Path) return Path.get(info, root, pred).optimize(cc);
-
+    // rewrite to general comparison (right operand must not depend on context):
+    // a[. = 'x']  ->  a = 'x'
+    // a[text() = 'x']  ->  a/text() = 'x'
     if(pred instanceof CmpG) {
       // not applicable to value/node comparisons, as cardinality of expression might change
       final CmpG cmp = (CmpG) pred;
-      final Expr expr = cmp.exprs[0], expr2 = cmp.exprs[1];
+      final Expr expr1 = createExpr.apply(cmp.exprs[0]), expr2 = cmp.exprs[1];
       // right operand must not depend on context
-      if(!expr2.has(Flag.CTX)) {
-        Expr expr1 = null;
-        // a[. = 'x']  ->  a = 'x'
-        if(expr instanceof ContextValue) expr1 = root;
-        // a[text() = 'x']  ->  a/text() = 'x'
-        if(expr instanceof Path) expr1 = Path.get(info, root, expr).optimize(cc);
-        if(expr1 != null)
-          return new CmpG(expr1, expr2, cmp.op, cmp.coll, cmp.sc, cmp.info).optimize(cc);
+      if(expr1 != null && !expr2.has(Flag.CTX)) {
+        return new CmpG(expr1, expr2, cmp.op, cmp.coll, cmp.sc, cmp.info).optimize(cc);
       }
     }
 
+    // rewrite to contains text expression (right operand must not depend on context):
+    // a[. contains text 'x']  ->  a contains text 'x'
+    // a[text() contains text 'x']  ->  a/text() contains text 'x'
     if(pred instanceof FTContains) {
       final FTContains cmp = (FTContains) pred;
+      final Expr expr = createExpr.apply(cmp.expr);
       final FTExpr ftexpr = cmp.ftexpr;
-      // right operand must not depend on context
-      if(!ftexpr.has(Flag.CTX)) {
-        final Expr expr = cmp.expr;
-        Expr expr1 = null;
-        // a[. contains text 'x']  ->  a contains text 'x'
-        if(expr instanceof ContextValue) expr1 = root;
-        // a[text() contains text 'x']  ->  a/text() contains text 'x'
-        if(expr instanceof Path) expr1 = Path.get(info, root, expr).optimize(cc);
-
-        if(expr1 != null) return new FTContains(expr1, ftexpr, cmp.info).optimize(cc);
+      if(expr != null && !ftexpr.has(Flag.CTX)) {
+        return new FTContains(expr, ftexpr, cmp.info).optimize(cc);
       }
     }
+
+    // rewrite to path: root[path]  ->  root/path
+    final Expr expr = createExpr.apply(pred);
+    if(expr != null) return expr;
+
+    // rewrite to simple map: $node[string()]  ->  $node ! string()
+    if(rst.zeroOrOne()) return SimpleMap.get(info, createRoot.apply(root), pred).optimize(cc);
+
     return this;
   }
 

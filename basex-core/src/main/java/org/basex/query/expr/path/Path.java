@@ -180,7 +180,7 @@ public abstract class Path extends ParseExpr {
         if(step.exprs.length == 1 && step.seqType().type instanceof NodeType &&
             !step.exprs[0].seqType().mayBeNumber()) {
           // merge nested predicates. example: if(a[b])  ->  if(a/b)
-          final Expr s = step.simplify(this, cc);
+          final Expr s = step.simplifyEbv(this, cc);
           if(s != step) {
             step.exprs = new Expr[0];
             return cc.simplify(this, s);

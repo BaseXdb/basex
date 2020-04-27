@@ -1213,4 +1213,12 @@ public final class RewritingsTest extends QueryPlanTest {
     check("('a', 'b') ! .[. = 'b']", "b", empty(IterMap.class), root(IterFilter.class));
     check("(1, 2)[. = 1] ! .[. = 1]", 1, empty(IterMap.class), count(CmpSimpleG.class, 1));
   }
+
+  /** Rewrite filters to simple maps. */
+  @Test public void gh1845() {
+    check("boolean(<a>A</a>[contains(., 'A')])", true, empty(IterFilter.class));
+    check("for $n in (<a/>, <b/>) return if($n[name() = 'a']) then 1 else 2", "1\n2",
+        empty(IterFilter.class));
+    check("boolean(<a/>[data()][. = 'A'])", false, empty(BOOLEAN));
+  }
 }

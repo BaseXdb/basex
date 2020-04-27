@@ -208,7 +208,7 @@ public abstract class Filter extends Preds {
       throws QueryException {
 
     if(mode == Simplify.EBV) {
-      final Expr expr = simplify(root, cc);
+      final Expr expr = simplifyEbv(root, cc);
       if(expr != this) return cc.simplify(this, expr);
     }
     return super.simplifyFor(mode, cc);
