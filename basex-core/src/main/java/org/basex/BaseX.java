@@ -174,7 +174,7 @@ public class BaseX extends CLI {
         if(in.isEmpty()) continue;
 
         try {
-          if(!execute(CommandParser.get(in, context).pwReader(cr.pwReader()))) {
+          if(!execute(CommandParser.get(in, context).pwReader(cr))) {
             // show goodbye message if method returns false
             Util.outln(BYE[new Random().nextInt(4)]);
             break;

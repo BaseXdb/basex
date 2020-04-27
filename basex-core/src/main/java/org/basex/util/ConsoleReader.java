@@ -15,11 +15,9 @@ import org.basex.io.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Dimitar Popov
  */
-public abstract class ConsoleReader implements AutoCloseable {
+public abstract class ConsoleReader implements AutoCloseable, PasswordReader {
   /** Password prompt. */
   private static final String PW_PROMPT = PASSWORD + COLS;
-  /** Password reader. */
-  private final PasswordReader pwReader = this::readPassword;
 
   /**
    * Reads next line. If no input, then the method blocks the thread.
@@ -28,22 +26,8 @@ public abstract class ConsoleReader implements AutoCloseable {
    */
   public abstract String readLine(String prompt);
 
-  /**
-   * Reads a password.
-   * @return password as plain text
-   */
-  protected abstract String readPassword();
-
   @Override
   public abstract void close();
-
-  /**
-   * Create a new password reader for this console.
-   * @return a new instance of {@link PasswordReader}
-   */
-  public final PasswordReader pwReader() {
-    return pwReader;
-  }
 
   /**
    * Creates a new instance.
@@ -82,7 +66,7 @@ public abstract class ConsoleReader implements AutoCloseable {
     }
 
     @Override
-    public String readPassword() {
+    public String password() {
       Util.out(PW_PROMPT);
       return Util.password();
     }
@@ -119,10 +103,8 @@ public abstract class ConsoleReader implements AutoCloseable {
     /** Implementation. */
     private final Object reader;
 
-    /** File history class. */
-    private final Class<?> fileHistoryC;
     /** File history. */
-    private final Object fileHistory;
+    private final Flushable fileHistory;
 
     /**
      * Checks if JLine implementation is available?
@@ -146,7 +128,7 @@ public abstract class ConsoleReader implements AutoCloseable {
       reader = readerC.getDeclaredConstructor().newInstance();
 
       final Class<?> history = Reflect.find(JLINE_HISTORY);
-      fileHistoryC = Reflect.find(JLINE_FILE_HISTORY);
+      final Class<? extends Flushable> fileHistoryC = (Class<? extends Flushable>) Reflect.find(JLINE_FILE_HISTORY);
       fileHistory = Reflect.get(Reflect.find(fileHistoryC, File.class),
           new File(Prop.HOMEDIR, HISTORY_FILE));
 
@@ -171,13 +153,17 @@ public abstract class ConsoleReader implements AutoCloseable {
     }
 
     @Override
-    public String readPassword() {
+    public String password() {
       return (String) Reflect.invoke(readEcho, reader, PW_PROMPT, PASSWORD_ECHO);
     }
 
     @Override
     public void close() {
-      Reflect.invoke(Reflect.method(fileHistoryC, "flush"), fileHistory);
+      try {
+        fileHistory.flush();
+      } catch (final IOException e) {
+        Util.debug(e);
+      }
     }
   }
 }
