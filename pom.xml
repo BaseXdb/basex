@@ -89,27 +89,15 @@
         <optional>true</optional>
       </dependency>
       <dependency>
-        <groupId>com.thaiopensource</groupId>
+        <groupId>org.relaxng</groupId>
         <artifactId>jing</artifactId>
-        <version>20091111</version>
+        <version>20181222</version>
         <scope>runtime</scope>
         <optional>true</optional>
         <exclusions>
           <exclusion>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>saxon</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>isorelax</groupId>
-            <artifactId>isorelax</artifactId>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
