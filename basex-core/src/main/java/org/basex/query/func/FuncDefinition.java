@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
@@ -20,8 +21,8 @@ import org.basex.util.*;
 public final class FuncDefinition {
   /** Function reference. */
   public final AFunction function;
-  /** Function class. */
-  public final Class<? extends StandardFunc> clazz;
+  /** Function constructor. */
+  public final Supplier<? extends StandardFunc> ctor;
 
   /** Minimum and maximum number of arguments. */
   final int[] minMax;
@@ -40,7 +41,7 @@ public final class FuncDefinition {
   /**
    * Constructs a function signature.
    * @param function function reference
-   * @param clazz reference to the class containing the function implementation
+   * @param ctor function implementation constructor
    * @param desc descriptive function string, containing the function name and its
    *             arguments in parentheses. Optional arguments are represented in nested
    *             square brackets; three dots indicate that the number of arguments of a
@@ -50,12 +51,12 @@ public final class FuncDefinition {
    * @param flags static function properties
    * @param uri uri
    */
-  FuncDefinition(final AFunction function, final Class<? extends StandardFunc> clazz,
+  FuncDefinition(final AFunction function, final Supplier<? extends StandardFunc> ctor,
       final String desc, final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags,
       final byte[] uri) {
 
     this.function = function;
-    this.clazz = clazz;
+    this.ctor = ctor;
     this.desc = desc;
     this.seqType = seqType;
     this.params = params;

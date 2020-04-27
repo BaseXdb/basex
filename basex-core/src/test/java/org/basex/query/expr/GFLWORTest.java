@@ -160,7 +160,7 @@ public final class GFLWORTest extends QueryPlanTest {
 
   /** Tests if where clauses are converted to predicates where applicable. */
   @Test public void whereToPred() {
-    final String uia = Util.className(_UTIL_ITEM.definition().clazz);
+    final String uia = Util.className(_UTIL_ITEM.definition().ctor.get().getClass());
     check("for $i in 1 to 10 where <x/>[$i] and $i < 3 return $i",
         1,
         exists("*[ends-with(name(), 'Filter')]/" + uia)
@@ -180,7 +180,7 @@ public final class GFLWORTest extends QueryPlanTest {
 
   /** Tests if let clauses are moved out of any loop they don't depend on. */
   @Test public void slideLet() {
-    final String uia = Util.className(_UTIL_ITEM.definition().clazz);
+    final String uia = Util.className(_UTIL_ITEM.definition().ctor.get().getClass());
     check("for $i in 0 to 3, $j in 0 to 3 where (<x/>)[$i + $j] " +
         "let $foo := $i * $i return $foo * $foo",
         "0\n1",
