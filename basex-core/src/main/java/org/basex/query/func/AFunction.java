@@ -26,7 +26,7 @@ public interface AFunction {
    */
   default StandardFunc get(final StaticContext sc, final InputInfo ii, final Expr... exprs) {
     final FuncDefinition fd = definition();
-    final StandardFunc sf = Reflect.get(fd.clazz);
+    final StandardFunc sf = fd.ctor.get();
     sf.init(sc, ii, fd, exprs);
     return sf;
   }
