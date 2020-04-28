@@ -246,21 +246,24 @@ public abstract class SimpleMap extends Arr {
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
 
+    Expr expr = this;
     if(mode == Simplify.EBV || mode == Simplify.DISTINCT) {
-      final Expr expr = toPath(cc);
-      if(expr != this) return expr;
+      expr = toPath(cc);
     } else {
-      final int el = exprs.length - 1;
-      cc.pushFocus(exprs[el - 1]);
-      final Expr expr = exprs[el];
+      final int el = exprs.length;
+      cc.pushFocus(exprs[el - 2]);
+      final Expr ex, old = exprs[el - 1];
       try {
-        exprs[el] = expr.simplifyFor(mode, cc);
+        ex = old.simplifyFor(mode, cc);
       } finally {
         cc.removeFocus();
       }
-      if(expr != exprs[el]) return optimize(cc);
+      if(ex != old) {
+        final ExprList list = new ExprList(el).add(exprs).set(el - 1, ex);
+        expr = SimpleMap.get(info, list.finish()).optimize(cc);
+      }
     }
-    return super.simplifyFor(mode, cc);
+    return expr != this ? expr : super.simplifyFor(mode, cc);
   }
 
   @Override

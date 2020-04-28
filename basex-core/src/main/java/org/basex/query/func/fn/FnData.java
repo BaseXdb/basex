@@ -54,7 +54,7 @@ public final class FnData extends ContextFn {
     if(mode == Simplify.ATOM || mode == Simplify.NUMBER) {
       // data(<a/>) = ''  ->  <a/> = ''
       if(!contextAccess()) return cc.simplify(this, exprs[0]);
-      // A[B ! data() = '']  ->  A[B = '']
+      // A[B ! data() = '']  ->  A[B ! . = '']
       if(cc.nestedFocus()) return new ContextValue(info).optimize(cc);
     }
     return super.simplifyFor(mode, cc);
