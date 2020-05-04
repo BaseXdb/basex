@@ -938,6 +938,15 @@ public final class RewritingsTest extends QueryPlanTest {
     check("if(prof:void(1)) then () else ()", "", root(_PROF_VOID), count(_PROF_VOID, 1));
   }
 
+  /** Redundant predicates in paths. */
+  @Test public void gh1812() {
+    check("<a/>/*[*]/*", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check("<a>X</a>/text()[..]/..", "<a>X</a>", empty(SingleIterPath.class));
+
+    // no rewriting
+    check("<a/>/*[*]/text()", "", count(IterPath.class, 1), exists(SingleIterPath.class));
+  }
+
   /** EBV simplifications: if, switch, typeswitch. */
   @Test public void gh1813() {
     // if expression

@@ -140,7 +140,7 @@ public abstract class Path extends ParseExpr {
     expr = flatten(cc);
     // rewrite list to union expressions
     if(expr == this) expr = toUnion(cc);
-    // merge descendant-or-self steps
+    // merge adjacent steps
     if(expr == this) expr = mergeSteps(cc);
     // return optimized expression
     if(expr != this) return expr.optimize(cc);
@@ -843,15 +843,35 @@ public abstract class Path extends ParseExpr {
     final int sl = steps.length;
     final ExprList stps = new ExprList(sl);
 
+    boolean changed = false;
     cc.pushFocus(root);
     try {
       for(int s = 0; s < sl; s++) {
-        Expr curr = steps[s];
-        final Expr next = s < sl - 1 ? mergeStep(curr, steps[s + 1], cc) : null;
+        Expr curr = steps[s], next = s < sl - 1 ? steps[s + 1] : null;
+
+        // remove single predicates that are identical to the next step
+        // example:  //*[text()]/text()  ->  //*/text()
+        if(curr instanceof Step) {
+          final Step step = (Step) curr;
+          if(step.exprs.length == 1 && !step.positional()) {
+            final Expr pred = step.exprs[0];
+            if(pred instanceof SingleIterPath && ((SingleIterPath) pred).steps[0].equals(next)) {
+              final Expr rt = stps.isEmpty() ? root : stps.peek();
+              curr = new StepBuilder(step.info).axis(step.axis).test(step.test).finish(cc, rt);
+              changed = true;
+            }
+          }
+        }
+
+        // merge steps:  //*  ->  /descendant::*
         if(next != null) {
-          cc.info(QueryText.OPTMERGE_X, next);
-          curr = next;
-          s++;
+          next = mergeStep(curr, next, cc);
+          if(next != null) {
+            cc.info(QueryText.OPTMERGE_X, next);
+            curr = next;
+            changed = true;
+            s++;
+          }
         }
         stps.add(curr);
         cc.updateFocus(curr);
@@ -860,7 +880,7 @@ public abstract class Path extends ParseExpr {
       cc.removeFocus();
     }
 
-    return stps.size() != steps.length ? get(info, root, stps.finish()) : this;
+    return changed ? get(info, root, stps.finish()) : this;
   }
 
   /**
