@@ -30,7 +30,7 @@ public class Execute extends Command {
    * @param input user input
    */
   public Execute(final String input) {
-    super(Perm.ADMIN, false, input);
+    super(Perm.NONE, false, input);
     commands = new ArrayList<>();
   }
 
@@ -39,7 +39,7 @@ public class Execute extends Command {
    * @param commands commands to execute
    */
   public Execute(final Command... commands) {
-    super(Perm.ADMIN, false);
+    super(Perm.NONE, false);
     this.commands = Arrays.asList(commands);
   }
 
