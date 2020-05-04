@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -33,5 +34,11 @@ public final class FnFunctionLookup extends StandardFunc {
     // make sure that all functions are compiled
     cc.qc.funcs.compile(cc, true);
     return this;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    // locked resources cannot be detected statically
+    return visitor.lock(null, false) && super.accept(visitor);
   }
 }
