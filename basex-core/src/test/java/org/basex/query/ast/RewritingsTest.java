@@ -1230,4 +1230,12 @@ public final class RewritingsTest extends QueryPlanTest {
         empty(IterFilter.class));
     check("boolean(<a/>[data()][. = 'A'])", false, empty(BOOLEAN));
   }
+
+  /** Merge descendant steps. */
+  @Test public void gh1848() {
+    check("<a/>//descendant::*", "", count(IterPath.class, 1), count(IterStep.class, 1));
+    check("<a/>//descendant::text()", "", count(IterPath.class, 1), count(IterStep.class, 1));
+    check("<a/>//(descendant::a, descendant::b)", "",
+        count(IterPath.class, 1), count(IterStep.class, 1));
+  }
 }

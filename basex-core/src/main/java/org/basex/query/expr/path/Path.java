@@ -897,7 +897,7 @@ public abstract class Path extends ParseExpr {
     if(!(curr instanceof Step)) return null;
     final Step crr = (Step) curr, nxt = next instanceof Step ? (Step) next : null;
 
-    // merge self steps
+    // merge self steps:  child::*/self::a  ->  child::a
     if(nxt != null && nxt.axis == SELF && !nxt.positional()) {
       final Test test = crr.test.intersect(nxt.test);
       if(test == null) return null;
@@ -908,12 +908,20 @@ public abstract class Path extends ParseExpr {
     if(crr.axis != DESCENDANT_OR_SELF || crr.test != KindTest.NOD || crr.exprs.length > 0)
       return null;
 
+    // checks if an expression is a simple child or descendant step
+    final Predicate<Expr> simple = expr -> {
+      if(expr instanceof Step) {
+        final Step step = (Step) expr;
+        return (step.axis == CHILD || step.axis == DESCENDANT) && !step.positional();
+      }
+      return false;
+    };
     // function for merging steps inside union expressions
     final QueryFunction<Expr, Expr> rewrite = expr -> {
       final Checks<Expr> startWithChild = ex -> {
         if(!(ex instanceof Path)) return false;
         final Path path = (Path) ex;
-        return path.root == null && simpleChild(path.steps[0]);
+        return path.root == null && simple.test(path.steps[0]);
       };
       if(expr instanceof Union) {
         final Union union = (Union) expr;
@@ -928,7 +936,7 @@ public abstract class Path extends ParseExpr {
     };
 
     // example: //child::*  ->  descendant::*
-    if(simpleChild(nxt)) {
+    if(simple.test(nxt)) {
       nxt.axis = DESCENDANT;
       return nxt;
     }
@@ -945,19 +953,6 @@ public abstract class Path extends ParseExpr {
       }
     }
     return null;
-  }
-
-  /**
-   * Checks if the expressions is a simple child step.
-   * @param expr expression to be checked
-   * @return result of check
-   */
-  private static boolean simpleChild(final Expr expr) {
-    if(expr instanceof Step) {
-      final Step step = (Step) expr;
-      return step.axis == CHILD && !step.positional();
-    }
-    return false;
   }
 
   @Override
