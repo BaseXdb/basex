@@ -145,7 +145,7 @@ abstract class Set extends Arr {
       int s = -1;
       while(++s < sl) {
         final Step step = steps.get(s);
-        if(step.positional()) break;
+        if(step.mayBePositional()) break;
         if(preds == null) {
           preds = step.exprs;
         } else if(!Arrays.equals(preds, step.exprs)) {
@@ -163,7 +163,7 @@ abstract class Set extends Arr {
       int s = -1;
       while(++s < sl) {
         final Step step = steps.get(s);
-        if(step.positional()) break;
+        if(step.mayBePositional()) break;
         if(test == null) {
           test = step.test;
         } else if(!test.equals(step.test)) {
@@ -194,7 +194,7 @@ abstract class Set extends Arr {
       Expr[] preds = {};
       if(expr instanceof Filter) {
         final Filter filter = (Filter) expr;
-        if(filter.positional()) return null;
+        if(filter.mayBePositional()) return null;
         rt = filter.root;
         preds = filter.exprs;
       }

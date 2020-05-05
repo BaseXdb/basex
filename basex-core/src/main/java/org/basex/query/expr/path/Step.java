@@ -53,8 +53,8 @@ public abstract class Step extends Preds {
       if(pred instanceof ItrPos || numeric(pred)) {
         // predicate is known to be positional check; can be optimized
         pos = true;
-      } else if(pred.seqType().mayBeNumber() || pred.has(Flag.POS)) {
-        // choose cached evaluation if check *may* be positional
+      } else if(mayBePositional(pred)) {
+        // predicate **may** be positional: choose cached evaluation
         return new CachedStep(ii, axis, test, preds);
       }
     }

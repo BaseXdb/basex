@@ -40,7 +40,7 @@ public class IndexPath extends IndexPred {
     // give up if one of the steps contains positional predicates
     final int sl = path.steps.length;
     for(int s = 0; s < sl; s++) {
-      if(path.step(s).positional()) return null;
+      if(path.step(s).mayBePositional()) return null;
     }
     // return last step
     return path.step(sl - 1);

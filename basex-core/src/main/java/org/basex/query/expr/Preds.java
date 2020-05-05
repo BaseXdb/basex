@@ -153,7 +153,7 @@ public abstract class Preds extends Arr {
           cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
         } else {
           list.add(expr);
-          if(!pos) pos = positional(expr);
+          if(!pos) pos = mayBePositional(expr);
         }
       }
       exprs = list.finish();
@@ -238,8 +238,8 @@ public abstract class Preds extends Arr {
     if(expr instanceof Path) {
       if(expr instanceof SingleIterPath) {
         final Step predStep = (Step) ((Path) expr).steps[0];
-        if(predStep.axis == Axis.SELF && !predStep.positional()) {
-          if(root instanceof Step && !positional()) {
+        if(predStep.axis == Axis.SELF && !predStep.mayBePositional()) {
+          if(root instanceof Step && !mayBePositional()) {
             final Step rootStep = (Step) root;
             final Test test = rootStep.test.intersect(predStep.test);
             if(test != null) {
@@ -305,7 +305,7 @@ public abstract class Preds extends Arr {
     // only single predicate can be rewritten; root must yield nodes; no positional predicates
     final SeqType rst = root.seqType();
     final int el = exprs.length;
-    if(!(rst.type instanceof NodeType) || el == 0 || positional()) return this;
+    if(!(rst.type instanceof NodeType) || el == 0 || mayBePositional()) return this;
 
     final Expr pred = exprs[el - 1];
     final QueryFunction<Expr, Expr> createRoot = r -> {
@@ -362,11 +362,11 @@ public abstract class Preds extends Arr {
   }
 
   /**
-   * Checks if at least one of the predicates contains a positional access.
+   * Checks if at least one of the predicates may be positional.
    * @return result of check
    */
-  public boolean positional() {
-    return positional(exprs);
+  public boolean mayBePositional() {
+    return mayBePositional(exprs);
   }
 
   /**
@@ -374,9 +374,9 @@ public abstract class Preds extends Arr {
    * @param exprs expressions
    * @return result of check
    */
-  static boolean positional(final Expr[] exprs) {
+  protected static boolean mayBePositional(final Expr[] exprs) {
     for(final Expr expr : exprs) {
-      if(positional(expr)) return true;
+      if(mayBePositional(expr)) return true;
     }
     return false;
   }
@@ -386,7 +386,7 @@ public abstract class Preds extends Arr {
    * @param expr expression
    * @return result of check
    */
-  static boolean positional(final Expr expr) {
+  protected static boolean mayBePositional(final Expr expr) {
     return expr.seqType().mayBeNumber() || expr.has(Flag.POS);
   }
 

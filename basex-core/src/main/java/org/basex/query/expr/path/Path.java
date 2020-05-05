@@ -548,7 +548,7 @@ public abstract class Path extends ParseExpr {
 
       // ignore axes other than descendant, or numeric predicates
       final Step curr = axisStep(s);
-      if(curr == null || curr.axis != DESCENDANT || curr.positional()) continue;
+      if(curr == null || curr.axis != DESCENDANT || curr.mayBePositional()) continue;
 
       // check if child steps can be retrieved for current step
       ArrayList<PathNode> nodes = pathNodes(s);
@@ -656,7 +656,7 @@ public abstract class Path extends ParseExpr {
       // only accept descendant steps without positional predicates
       // Example for position predicate: child:x[1] != parent::x[1]
       final Step step = axisStep(s);
-      if(step == null || !step.axis.down || step.positional()) break;
+      if(step == null || !step.axis.down || step.mayBePositional()) break;
 
       final int el = step.exprs.length;
       if(el > 0) {
@@ -798,7 +798,7 @@ public abstract class Path extends ParseExpr {
       }
       if(step instanceof Filter) {
         final Filter filter = (Filter) step;
-        if(!filter.positional() && filter.root instanceof List) {
+        if(!filter.mayBePositional() && filter.root instanceof List) {
           final Expr st = ((List) filter.root).toUnion(cc);
           if(st != filter.root) return Filter.get(filter.info, st, filter.exprs).optimize(cc);
         }
@@ -853,7 +853,7 @@ public abstract class Path extends ParseExpr {
         // example:  //*[text()]/text()  ->  //*/text()
         if(curr instanceof Step) {
           final Step step = (Step) curr;
-          if(step.exprs.length == 1 && !step.positional()) {
+          if(step.exprs.length == 1 && !step.mayBePositional()) {
             final Expr pred = step.exprs[0];
             if(pred instanceof SingleIterPath && ((SingleIterPath) pred).steps[0].equals(next)) {
               final Expr rt = stps.isEmpty() ? root : stps.peek();
@@ -898,7 +898,7 @@ public abstract class Path extends ParseExpr {
     final Step crr = (Step) curr, nxt = next instanceof Step ? (Step) next : null;
 
     // merge self steps:  child::*/self::a  ->  child::a
-    if(nxt != null && nxt.axis == SELF && !nxt.positional()) {
+    if(nxt != null && nxt.axis == SELF && !nxt.mayBePositional()) {
       final Test test = crr.test.intersect(nxt.test);
       if(test == null) return null;
       crr.test = test;
@@ -912,7 +912,7 @@ public abstract class Path extends ParseExpr {
     final Predicate<Expr> simple = expr -> {
       if(expr instanceof Step) {
         final Step step = (Step) expr;
-        return (step.axis == CHILD || step.axis == DESCENDANT) && !step.positional();
+        return (step.axis == CHILD || step.axis == DESCENDANT) && !step.mayBePositional();
       }
       return false;
     };
@@ -947,7 +947,7 @@ public abstract class Path extends ParseExpr {
     // example: //(text()|*)[..]  ->  (/descendant::text() | /descendant::*)[..]
     if(next instanceof Filter) {
       final Filter filter = (Filter) next;
-      if(!filter.positional()) {
+      if(!filter.mayBePositional()) {
         final Expr expr = rewrite.apply(filter.root);
         if(expr != null) return Filter.get(filter.info, expr, filter.exprs).optimize(cc);
       }

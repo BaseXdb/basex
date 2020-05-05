@@ -48,7 +48,7 @@ public abstract class Filter extends Preds {
     // no predicates: return root
     return preds.length == 0 ? root :
       // return axis path
-      root instanceof AxisPath && !positional(preds) ? ((AxisPath) root).addPredicates(preds) :
+      root instanceof AxisPath && !mayBePositional(preds) ? ((AxisPath) root).addPredicates(preds) :
       // use simple filter for single deterministic predicate
       preds.length == 1 && preds[0].isSimple() ? new SimpleFilter(ii, root, preds) :
       // default filter
@@ -86,7 +86,7 @@ public abstract class Filter extends Preds {
     if(exprs.length == 0) return root;
 
     // no positional access..
-    if(!positional()) {
+    if(!mayBePositional()) {
       // convert to axis path: (//x)[text() = 'a']  ->  //x[text() = 'a']
       if(root instanceof AxisPath) return ((AxisPath) root).addPredicates(exprs).optimize(cc);
 
