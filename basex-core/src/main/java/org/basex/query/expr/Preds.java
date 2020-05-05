@@ -70,27 +70,6 @@ public abstract class Preds extends Arr {
   protected abstract void type(Expr expr, CompileContext cc);
 
   /**
-   * Adds an expression to the new expression list.
-   * @param expr expression
-   * @param list expression list
-   * @param pos positional access flag
-   * @param cc compilation context
-   * @return this, or a previous expression, uses positional access
-   */
-  private boolean addUnique(final Expr expr, final ExprList list, final boolean pos,
-      final CompileContext cc) {
-
-    final boolean ps = pos || expr.seqType().mayBeNumber() || expr.has(Flag.POS);
-    if(expr == Bln.TRUE) {
-      // skip predicate that yields true
-      cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-    } else if(ps || !list.contains(expr) || expr.has(Flag.NDT)) {
-      list.add(expr);
-    }
-    return ps;
-  }
-
-  /**
    * Assigns the sequence type and result size.
    * @param root root expression
    * @return whether expression may yield results
@@ -158,50 +137,27 @@ public abstract class Preds extends Arr {
    * @throws QueryException query exception
    */
   protected final boolean optimize(final CompileContext cc, final Expr root) throws QueryException {
-    // remember current context value (will be temporarily overwritten)
     cc.pushFocus(root);
     try {
-      simplify(cc, root);
+      // optimize predicates
+      final ExprList list = new ExprList(exprs.length);
+      for(final Expr expr : exprs) {
+        if(!optimize(expr, list, root, cc)) return false;
+      }
+      exprs = list.next();
 
-      final int el = exprs.length;
-      final ExprList list = new ExprList(el);
+      // remove duplicates, preserve entries after positional predicates
       boolean pos = false;
-      for(final Expr ex : exprs) {
-        final Expr ebv = ex.simplifyFor(Simplify.EBV, cc);
-        Expr expr = ebv;
-        if(expr instanceof And) {
-          if(!expr.has(Flag.POS)) {
-            // replace AND expression with predicates (don't rewrite position tests)
-            cc.info(OPTPRED_X, expr);
-            final Expr[] ands = ((Arr) expr).exprs;
-            final int al = ands.length;
-            for(int a = 0; a < al; a++) {
-              // wrap test with boolean() if the result is numeric
-              expr = ands[a];
-              if(expr.seqType().mayBeNumber()) expr = cc.function(Function.BOOLEAN, info, expr);
-              if(a + 1 < al) pos = addUnique(expr, list, pos, cc);
-            }
-          }
-        } else if(expr instanceof ANum) {
-          expr = ItrPos.get(((ANum) expr).dbl(), info);
-        } else if(expr instanceof Value) {
-          expr = Bln.get(expr.ebv(cc.qc, info).bool(info));
+      for(final Expr expr : exprs) {
+        if(!pos && list.contains(expr) && !expr.has(Flag.NDT)) {
+          cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+        } else {
+          list.add(expr);
+          if(!pos) pos = positional(expr);
         }
-
-        // example: <a/>/.[1]  ->  <a/>/.[true()]
-        // example: $child/..[2]  ->  $child/..[false()]
-        if(root instanceof Step && expr instanceof ItrPos) {
-          final Axis axis = ((Step) root).axis;
-          if(axis == Axis.SELF || axis == Axis.PARENT) expr = Bln.get(((ItrPos) expr).min == 1);
-        }
-
-        // predicate will not yield any results
-        if(expr == Bln.FALSE) return false;
-        if(expr != ebv) cc.replaceWith(ex, expr);
-
-        pos = addUnique(expr, list, pos, cc);
       }
       exprs = list.finish();
+
       mergeEbv(false, false, cc);
 
     } finally {
@@ -213,86 +169,128 @@ public abstract class Preds extends Arr {
   }
 
   /**
-   * Simplifies the predicates.
-   * @param cc compilation context
+   * Optimizes a predicate.
+   * @param pred predicate
+   * @param list expression list
    * @param root root expression
+   * @param cc compilation context
+   * @return {@code true} if expression may yield results
    * @throws QueryException query exception
    */
-  private void simplify(final CompileContext cc, final Expr root) throws QueryException {
-    final ExprList list = new ExprList(exprs.length);
-    final SeqType st = root.seqType();
-    for(final Expr expr : exprs) {
-      Expr ex = expr;
-      if(ex instanceof ContextValue && st.type instanceof NodeType) {
-        // E [ . ]  ->  E
-        cc.info(OPTREMOVE_X_X, ex, (Supplier<?>) this::description);
-        continue;
-      }
+  private boolean optimize(final Expr pred, final ExprList list, final Expr root,
+      final CompileContext cc) throws QueryException {
 
-      // comparisons
-      if(ex instanceof CmpG || ex instanceof CmpV) {
-        ex = ((Cmp) ex).optPred(root, cc);
+    // AND expression
+    if(pred instanceof And && !pred.has(Flag.POS)) {
+      // E[A and B]  ->  E[A][B]
+      cc.info(OPTPRED_X, pred);
+      for(final Expr expr : ((Arr) pred).exprs) {
+        optimize(expr.seqType().mayBeNumber() ? cc.function(Function.BOOLEAN, info, expr) : expr,
+          list, root, cc);
       }
+      return true;
+    }
 
-      // map operator
-      if(ex instanceof SimpleMap) {
-        // E [ . ! ... ]  ->  E [ ... ]
-        // E [ E ! ... ]  ->  E [ ... ]
-        final SimpleMap map = (SimpleMap) ex;
-        final Expr[] mexprs = map.exprs;
-        final Expr first = mexprs[0], second = mexprs[1];
-        if((first instanceof ContextValue || root.equals(first) && root.isSimple() && st.one()) &&
-            !second.has(Flag.POS)) {
-          final int ml = mexprs.length;
-          ex = ml == 2 ? second : SimpleMap.get(map.info, Arrays.copyOfRange(mexprs, 1, ml));
-        }
+    // comparisons
+    Expr expr = pred;
+    if(expr instanceof CmpG || expr instanceof CmpV) {
+      // E[position() = 1]  ->  E[1]
+      expr = ((Cmp) expr).optPred(root, cc);
+    }
+
+    // map operator
+    final SeqType rst = root.seqType();
+    if(expr instanceof SimpleMap) {
+      // E[. ! ...]  ->  E[...]
+      // E[E ! ...]  ->  E[...]
+      final SimpleMap map = (SimpleMap) expr;
+      final Expr[] mexprs = map.exprs;
+      final Expr first = mexprs[0], second = mexprs[1];
+      if((first instanceof ContextValue || root.equals(first) && root.isSimple() && rst.one()) &&
+          !second.has(Flag.POS)) {
+        final int ml = mexprs.length;
+        expr = ml == 2 ? second : SimpleMap.get(map.info, Arrays.copyOfRange(mexprs, 1, ml));
       }
+    }
 
-      // paths
-      if(ex instanceof Path) {
-        if(ex instanceof SingleIterPath) {
-          final Step predStep = (Step) ((Path) ex).steps[0];
-          if(predStep.axis == Axis.SELF && !predStep.positional()) {
-            if(root instanceof Step && !positional()) {
-              final Step rootStep = (Step) root;
-              final Test test = rootStep.test.intersect(predStep.test);
-              if(test != null) {
-                // child::node() [ self:* ]  ->  child::*
-                cc.info(OPTMERGE_X, predStep);
-                rootStep.test = test;
-                list.add(predStep.exprs);
-                continue;
-              }
-            }
-            if(predStep.test instanceof KindTest && predStep.exprs.length == 0 &&
-                st.type.instanceOf(predStep.test.type)) {
-              // <a/> [ self:* ]  ->  <a/>
-              cc.info(OPTREMOVE_X_X, ex, (Supplier<?>) this::description);
-              continue;
+    // paths
+    if(expr instanceof Path) {
+      // E[./...]  ->  E[...]
+      // E[E/...]  ->  E[...]
+      final Path path = (Path) expr;
+      final Expr first = path.root;
+      if(rst.type instanceof NodeType && (first instanceof ContextValue ||
+          root.equals(first) && root.isSimple() && rst.one())) {
+        expr = Path.get(path.info, null, path.steps);
+      }
+    }
+
+    // E[exists(nodes)]  ->  E[nodes]
+    expr = expr.simplifyFor(Simplify.EBV, cc);
+
+    // inline root item (ignore nodes)
+    // 1[. = 1]  ->  1[1 = 1]
+    if(root instanceof Item && !(rst.type instanceof NodeType)) {
+      final Expr inlined = expr.inline(null, root, cc);
+      if(inlined != null) expr = inlined;
+    }
+
+    if(expr instanceof Path) {
+      if(expr instanceof SingleIterPath) {
+        final Step predStep = (Step) ((Path) expr).steps[0];
+        if(predStep.axis == Axis.SELF && !predStep.positional()) {
+          if(root instanceof Step && !positional()) {
+            final Step rootStep = (Step) root;
+            final Test test = rootStep.test.intersect(predStep.test);
+            if(test != null) {
+              // child::node()[self:*]  ->  child::*
+              cc.info(OPTMERGE_X, predStep);
+              rootStep.test = test;
+              list.add(predStep.exprs);
+              return true;
             }
           }
-        }
-
-        // E [ . / ... ]  ->  E [ ... ]
-        // E [ E / ... ]  ->  E [ ... ]
-        final Path path = (Path) ex;
-        final Expr first = path.root;
-        if(st.type instanceof NodeType && (first instanceof ContextValue ||
-            root.equals(first) && root.isSimple() && st.one())) {
-          ex = Path.get(path.info, null, path.steps);
+          if(predStep.test instanceof KindTest && predStep.exprs.length == 0 &&
+              rst.type.instanceOf(predStep.test.type)) {
+            // <a/>[self:*]  ->  <a/>
+            cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+            return true;
+          }
         }
       }
-
-      // inline root item (ignore nodes)
-      // 1[. = 1]  ->  1[1 = 1]
-      if(root instanceof Item && !(st.type instanceof NodeType)) {
-        final Expr inlined = ex.inline(null, root, cc);
-        if(inlined != null) ex = inlined;
-      }
-
-      list.add(cc.replaceWith(expr, ex));
     }
-    exprs = list.finish();
+
+    // context value
+    if(expr instanceof ContextValue && rst.type instanceof NodeType) {
+      // E[.]  ->  E
+      cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+      return true;
+    }
+
+    // evaluate values
+    if(expr instanceof ANum) {
+      expr = ItrPos.get(((ANum) expr).dbl(), info);
+    } else if(expr instanceof Value) {
+      expr = Bln.get(expr.ebv(cc.qc, info).bool(info));
+    }
+
+    // positional tests
+    if(root instanceof Step && expr instanceof ItrPos) {
+      // <a/>/.[1]  ->  <a/>/.[true()]
+      // $child/..[2]  ->  $child/..[false()]
+      final Axis axis = ((Step) root).axis;
+      if(axis == Axis.SELF || axis == Axis.PARENT) expr = Bln.get(((ItrPos) expr).min == 1);
+    }
+
+    // cancel optimization, or skip or add predicate
+    if(expr == Bln.FALSE) {
+      return false;
+    } else if(expr == Bln.TRUE) {
+      cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+    } else {
+      list.add(cc.replaceWith(pred, expr));
+    }
+    return true;
   }
 
   /**
@@ -372,15 +370,24 @@ public abstract class Preds extends Arr {
   }
 
   /**
-   * Checks if some of the specified expressions are positional.
+   * Checks if some of the specified expressions may be positional.
    * @param exprs expressions
    * @return result of check
    */
   static boolean positional(final Expr[] exprs) {
     for(final Expr expr : exprs) {
-      if(expr.seqType().mayBeNumber() || expr.has(Flag.POS)) return true;
+      if(positional(expr)) return true;
     }
     return false;
+  }
+
+  /**
+   * Checks if the specified expression may be positional.
+   * @param expr expression
+   * @return result of check
+   */
+  static boolean positional(final Expr expr) {
+    return expr.seqType().mayBeNumber() || expr.has(Flag.POS);
   }
 
   @Override

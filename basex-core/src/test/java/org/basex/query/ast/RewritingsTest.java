@@ -1238,4 +1238,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>//(descendant::a, descendant::b)", "",
         count(IterPath.class, 1), count(IterStep.class, 1));
   }
+
+  /** Merge steps and predicates with self steps. */
+  @Test public void gh1850() {
+    check("<a/>/*[self::b]", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check("<a/>/*[self::b and true()]", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check("<a/>/*[self::b][true()]", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+  }
 }
