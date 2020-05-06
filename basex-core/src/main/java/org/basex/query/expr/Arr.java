@@ -216,6 +216,32 @@ public abstract class Arr extends ParseExpr {
     }
     exprs = list.next();
 
+    if(exprs.length > 1 && !(positional && has(Flag.POS))) {
+      final Class<? extends Logical> clazz = or ? And.class : Or.class;
+      final Checks<Expr> logical = expr -> clazz.isInstance(expr);
+      if(logical.all(exprs)) {
+        // (A and B) or (A and C)  ->  A and (B or C)
+        // (A or B) and (A or C) and (A or D)  ->  A or (B and C and D)
+      } else if(logical.any(exprs)) {
+        // A or (A and B)  ->  A
+        // A and (A or B) and (A or C or D) ->  A
+        Expr root = null;
+        for(final Expr expr : exprs) {
+          if(clazz.isInstance(expr)) continue;
+          root = root == null ? expr : null;
+          if(root == null) break;
+        }
+        if(root != null) {
+          final Expr rt = root;
+          if(((Checks<Expr>) expr ->
+            expr == rt || ((Checks<Expr>) ex -> ex.equals(rt)).any(((Logical) expr).exprs)
+          ).all(exprs)) {
+            exprs = new Expr[] { FnBoolean.get(root, info, cc.sc()) };
+          }
+        }
+      }
+    }
+
     // 'a'[. = 'a' or . = 'b']  ->  'a'[. = ('a', 'b')]
     // $v[. != 'a'][. != 'b']  ->  $v[not(. = ('a', 'b')]
     list.add(exprs);

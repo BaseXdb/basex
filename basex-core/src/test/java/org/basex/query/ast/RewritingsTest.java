@@ -1245,4 +1245,23 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>/*[self::b and true()]", "", count(IterPath.class, 1), empty(SingleIterPath.class));
     check("<a/>/*[self::b][true()]", "", count(IterPath.class, 1), empty(SingleIterPath.class));
   }
+
+  /** Logical and set expressions, DNFs/CNFs. */
+  @Test public void gh1851() {
+    check("let $a := data(<a/>), $b := data(<b/>),$c := data(<c/>)\n" +
+        "return $a and ($a or $c) and ($a or $b)",
+        false, empty(And.class), empty(Or.class));
+    check("let $a := data(<a/>), $b := data(<b/>),$c := data(<c/>)\n" +
+        "return $a or ($a and $c) or ($a and $b)",
+        false, empty(And.class), empty(Or.class));
+
+    check("for $a in (false(), true())\n" +
+        "for $b in (false(), true())\n" +
+        "return $a and ($a or $b)",
+        "false\nfalse\ntrue\ntrue", empty(And.class), empty(Or.class));
+    check("for $a in (false(), true())\n" +
+        "for $b in (false(), true())\n" +
+        "return $a or ($a and $b)",
+        "false\nfalse\ntrue\ntrue", empty(And.class), empty(Or.class));
+  }
 }
