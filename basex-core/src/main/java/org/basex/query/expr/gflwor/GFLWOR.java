@@ -587,7 +587,6 @@ public final class GFLWOR extends ParseExpr {
           /* OLD: for $v at $pos in E where $pos = P ...
            * NEW: for $v in E[position() = P] ... */
           pos.addPredicate(ItrPos.get(cmp.min, cmp.max, cmp.info), cc);
-          pos.expr = pos.expr.optimize(cc);
           cc.info(QueryText.OPTPRED_X, expr);
           changed = true;
         } else {

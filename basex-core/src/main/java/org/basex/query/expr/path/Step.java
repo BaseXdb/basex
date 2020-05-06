@@ -107,7 +107,7 @@ public abstract class Step extends Preds {
       return cc.emptySeq(this);
     }
     // optimize predicate, choose best implementation
-    return optimize(cc, this) ? copyType(get(info, axis, test, exprs)) : cc.emptySeq(this);
+    return optimize(cc, this) ? cc.emptySeq(this) : copyType(get(info, axis, test, exprs));
   }
 
   @Override

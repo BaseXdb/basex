@@ -81,7 +81,7 @@ public abstract class Filter extends Preds {
     if(st.zero()) return cc.replaceWith(this, root);
 
     // simplify predicates
-    if(!optimize(cc, root)) return cc.emptySeq(this);
+    if(optimize(cc, root)) return cc.emptySeq(this);
     // no predicates: return root
     if(exprs.length == 0) return root;
 

@@ -181,7 +181,7 @@ public final class For extends ForLet {
       // add to last step of path, provided that predicate is not positional; merge predicates
       final AxisPath path = (AxisPath) expr;
       expr = path.addPredicates(ex);
-      path.step(path.steps.length - 1).mergeEbv(false, false, cc);
+      path.step(path.steps.length - 1).optimize(cc);
     } else if(expr instanceof Filter) {
       // add to existing filter expression
       expr = ((Filter) expr).addPredicate(ex);
@@ -189,6 +189,7 @@ public final class For extends ForLet {
       // create new filter expression
       expr = Filter.get(info, expr, ex);
     }
+    expr = expr.optimize(cc);
   }
 
   /**
@@ -217,7 +218,6 @@ public final class For extends ForLet {
     if(pred.seqType().mayBeNumber()) pred = cc.function(Function.BOOLEAN, info, pred);
 
     addPredicate(pred, cc);
-    expr = expr.optimize(cc);
     return true;
   }
 

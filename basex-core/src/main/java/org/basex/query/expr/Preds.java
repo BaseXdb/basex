@@ -72,7 +72,7 @@ public abstract class Preds extends Arr {
   /**
    * Assigns the sequence type and result size.
    * @param root root expression
-   * @return whether expression may yield results
+   * @return whether evaluation can be skipped
    */
   private boolean exprType(final Expr root) {
     long max = root.size();
@@ -100,7 +100,7 @@ public abstract class Preds extends Arr {
     final long size = exact || max == 0 ? max : -1;
     final Occ occ = max > 1 ? root.seqType().occ.union(Occ.ZERO) : Occ.ZERO_ONE;
     exprType.assign(root.seqType().type, occ, size);
-    return max > 0;
+    return max == 0;
   }
 
   /**
@@ -133,38 +133,19 @@ public abstract class Preds extends Arr {
    * Optimizes all predicates.
    * @param cc compilation context
    * @param root root expression
-   * @return {@code true} if expression may yield results
+   * @return {@code true} if evaluation can be skipped
    * @throws QueryException query exception
    */
   protected final boolean optimize(final CompileContext cc, final Expr root) throws QueryException {
     cc.pushFocus(root);
     try {
-      // optimize predicates
       final ExprList list = new ExprList(exprs.length);
-      for(final Expr expr : exprs) {
-        if(!optimize(expr, list, root, cc)) return false;
-      }
-      exprs = list.next();
-
-      // remove duplicates, preserve entries after positional predicates
-      boolean pos = false;
-      for(final Expr expr : exprs) {
-        if(!pos && list.contains(expr) && !expr.has(Flag.NDT)) {
-          cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-        } else {
-          list.add(expr);
-          if(!pos) pos = mayBePositional(expr);
-        }
-      }
+      for(final Expr expr : exprs) optimize(expr, list, root, cc);
       exprs = list.finish();
-
-      mergeEbv(false, false, cc);
-
+      if(mergeEbv(false, true, cc)) return true;
     } finally {
       cc.removeFocus();
     }
-
-    // check result size
     return exprType(root);
   }
 
@@ -174,10 +155,9 @@ public abstract class Preds extends Arr {
    * @param list expression list
    * @param root root expression
    * @param cc compilation context
-   * @return {@code true} if expression may yield results
    * @throws QueryException query exception
    */
-  private boolean optimize(final Expr pred, final ExprList list, final Expr root,
+  private void optimize(final Expr pred, final ExprList list, final Expr root,
       final CompileContext cc) throws QueryException {
 
     // AND expression
@@ -188,7 +168,7 @@ public abstract class Preds extends Arr {
         optimize(expr.seqType().mayBeNumber() ? cc.function(Function.BOOLEAN, info, expr) : expr,
           list, root, cc);
       }
-      return true;
+      return;
     }
 
     // comparisons
@@ -247,14 +227,14 @@ public abstract class Preds extends Arr {
               cc.info(OPTMERGE_X, predStep);
               rootStep.test = test;
               list.add(predStep.exprs);
-              return true;
+              return;
             }
           }
           if(predStep.test instanceof KindTest && predStep.exprs.length == 0 &&
               rst.type.instanceOf(predStep.test.type)) {
             // <a/>[self:*]  ->  <a/>
             cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-            return true;
+            return;
           }
         }
       }
@@ -264,15 +244,11 @@ public abstract class Preds extends Arr {
     if(expr instanceof ContextValue && rst.type instanceof NodeType) {
       // E[.]  ->  E
       cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-      return true;
+      return;
     }
 
-    // evaluate values
-    if(expr instanceof ANum) {
-      expr = ItrPos.get(((ANum) expr).dbl(), info);
-    } else if(expr instanceof Value) {
-      expr = Bln.get(expr.ebv(cc.qc, info).bool(info));
-    }
+    // rewrite number to positional test
+    if(expr instanceof ANum) expr = ItrPos.get(((ANum) expr).dbl(), info);
 
     // positional tests
     if(root instanceof Step && expr instanceof ItrPos) {
@@ -282,15 +258,7 @@ public abstract class Preds extends Arr {
       if(axis == Axis.SELF || axis == Axis.PARENT) expr = Bln.get(((ItrPos) expr).min == 1);
     }
 
-    // cancel optimization, or skip or add predicate
-    if(expr == Bln.FALSE) {
-      return false;
-    } else if(expr == Bln.TRUE) {
-      cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-    } else {
-      list.add(cc.replaceWith(pred, expr));
-    }
-    return true;
+    list.add(cc.replaceWith(pred, expr));
   }
 
   /**
@@ -379,15 +347,6 @@ public abstract class Preds extends Arr {
       if(mayBePositional(expr)) return true;
     }
     return false;
-  }
-
-  /**
-   * Checks if the specified expression may be positional.
-   * @param expr expression
-   * @return result of check
-   */
-  protected static boolean mayBePositional(final Expr expr) {
-    return expr.seqType().mayBeNumber() || expr.has(Flag.POS);
   }
 
   @Override

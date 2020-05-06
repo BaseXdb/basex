@@ -1,15 +1,8 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
-
-import java.util.function.*;
-
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.util.*;
-import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -53,31 +46,9 @@ abstract class Logical extends Arr {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public final Expr optimize(final CompileContext cc, final boolean union) throws QueryException {
-    ExprList list = new ExprList(exprs.length);
-    for(final Expr expr : exprs) {
-      final Expr ex = expr.simplifyFor(Simplify.EBV, cc);
-      if(ex instanceof Value) {
-        // pre-evaluate values
-        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-        if(ex.ebv(cc.qc, info).bool(info) ^ !union) return Bln.get(union);
-      } else {
-        list.add(ex);
-      }
-    }
-    exprs = list.next();
-
-    // remove duplicate entries
-    // 'a'[. = 'a' or . = 'a']  ->  'a'[. = 'a']
-    for(final Expr expr : exprs) {
-      if(list.contains(expr) && !expr.has(Flag.NDT)) {
-        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-      } else {
-        list.add(expr);
-      }
-    }
-    exprs = list.finish();
-    mergeEbv(true, union, cc);
+  final Expr optimize(final CompileContext cc, final boolean union) throws QueryException {
+    simplifyAll(Simplify.EBV, cc);
+    if(mergeEbv(union, false, cc)) return cc.replaceWith(this, Bln.get(union));
 
     final int el = exprs.length;
     if(el == 0) return Bln.get(!union);
