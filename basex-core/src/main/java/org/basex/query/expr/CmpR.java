@@ -163,7 +163,7 @@ public final class CmpR extends Single {
   }
 
   @Override
-  public Expr mergeEbv(final Expr ex, final boolean union, final CompileContext cc) {
+  public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc) {
     if(!(ex instanceof CmpR)) return null;
 
     // do not merge if expressions to be compared are different
@@ -171,11 +171,11 @@ public final class CmpR extends Single {
     if(!expr.equals(cmp.expr)) return null;
 
     // do not merge if ranges are exclusive
-    if(union && (max < cmp.min || cmp.max < min)) return null;
+    if(or && (max < cmp.min || cmp.max < min)) return null;
 
     // merge min and max values
-    final double mn = union ? Math.min(min, cmp.min) : Math.max(min, cmp.min);
-    final double mx = union ? Math.max(max, cmp.max) : Math.min(max, cmp.max);
+    final double mn = or ? Math.min(min, cmp.min) : Math.max(min, cmp.min);
+    final double mx = or ? Math.max(max, cmp.max) : Math.min(max, cmp.max);
     return get(expr, mn, mx, info);
   }
 

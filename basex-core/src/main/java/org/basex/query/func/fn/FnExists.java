@@ -36,10 +36,10 @@ public final class FnExists extends FnEmpty {
   }
 
   @Override
-  public Expr mergeEbv(final Expr expr, final boolean union, final CompileContext cc)
+  public Expr mergeEbv(final Expr expr, final boolean or, final CompileContext cc)
       throws QueryException {
 
-    if(union && Function.EXISTS.is(expr)) {
+    if(or && Function.EXISTS.is(expr)) {
       exprs[0] = new List(info, exprs[0], ((FnExists) expr).exprs[0]).optimize(cc);
       return optimize(cc);
     }

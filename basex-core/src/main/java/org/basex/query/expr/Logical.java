@@ -42,16 +42,16 @@ abstract class Logical extends Arr {
   /**
    * Optimizes the expression.
    * @param cc compilation context
-   * @param union union or intersection
+   * @param or union or intersection
    * @return resulting expression
    * @throws QueryException query exception
    */
-  final Expr optimize(final CompileContext cc, final boolean union) throws QueryException {
+  final Expr optimize(final CompileContext cc, final boolean or) throws QueryException {
     simplifyAll(Simplify.EBV, cc);
-    if(mergeEbv(union, false, cc)) return cc.replaceWith(this, Bln.get(union));
+    if(optimizeEbv(or, false, cc)) return cc.replaceWith(this, Bln.get(or));
 
     final int el = exprs.length;
-    if(el == 0) return Bln.get(!union);
+    if(el == 0) return Bln.get(!or);
     if(el == 1) return FnBoolean.get(exprs[0], info, cc.sc());
     return this;
   }

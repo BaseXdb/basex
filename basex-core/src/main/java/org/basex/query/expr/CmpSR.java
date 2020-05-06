@@ -138,8 +138,8 @@ public final class CmpSR extends Single {
 
 
   @Override
-  public Expr mergeEbv(final Expr ex, final boolean union, final CompileContext cc) {
-    if(union || !(ex instanceof CmpSR)) return null;
+  public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc) {
+    if(or || !(ex instanceof CmpSR)) return null;
 
     // skip intersection if expressions to be compared are different
     final CmpSR cmp = (CmpSR) ex;

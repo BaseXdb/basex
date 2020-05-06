@@ -121,10 +121,10 @@ public abstract class AxisPath extends Path {
   }
 
   @Override
-  public Expr mergeEbv(final Expr expr, final boolean union, final CompileContext cc)
+  public Expr mergeEbv(final Expr expr, final boolean or, final CompileContext cc)
       throws QueryException {
 
-    if(union && expr instanceof AxisPath) {
+    if(or && expr instanceof AxisPath) {
       return new Union(info, this, expr).optimize(cc);
     }
     return null;

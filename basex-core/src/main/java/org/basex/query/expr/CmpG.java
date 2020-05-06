@@ -298,7 +298,7 @@ public class CmpG extends Cmp {
   }
 
   @Override
-  public Expr mergeEbv(final Expr expr, final boolean union, final CompileContext cc)
+  public Expr mergeEbv(final Expr expr, final boolean or, final CompileContext cc)
       throws QueryException {
 
     /* OR: merge comparisons
@@ -328,7 +328,7 @@ public class CmpG extends Cmp {
     // check if comparisons can be merged
     final boolean seqL = !exprL.seqType().one();
     final boolean seqR1 = !exprR1.seqType().one(), seqR2 = !exprR2.seqType().one();
-    if(union) {
+    if(or) {
       /* do not merge if second comparison was inverted and left operand or
        * second right operand contain are not a single item. examples:
        * $number  = 2  or  not($number  = 4)

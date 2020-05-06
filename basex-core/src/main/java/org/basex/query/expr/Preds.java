@@ -142,7 +142,7 @@ public abstract class Preds extends Arr {
       final ExprList list = new ExprList(exprs.length);
       for(final Expr expr : exprs) optimize(expr, list, root, cc);
       exprs = list.finish();
-      if(mergeEbv(false, true, cc)) return true;
+      if(optimizeEbv(false, true, cc)) return true;
     } finally {
       cc.removeFocus();
     }

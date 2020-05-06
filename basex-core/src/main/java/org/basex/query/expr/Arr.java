@@ -187,13 +187,13 @@ public abstract class Arr extends ParseExpr {
 
   /**
    * Tries to merge consecutive EBV tests.
-   * @param union union or intersection
+   * @param or union or intersection
    * @param positional consider positional tests
    * @param cc compilation context
    * @return {@code true} if evaluation can be skipped
    * @throws QueryException query exception
    */
-  public boolean mergeEbv(final boolean union, final boolean positional, final CompileContext cc)
+  public boolean optimizeEbv(final boolean or, final boolean positional, final CompileContext cc)
       throws QueryException {
 
     final ExprList list = new ExprList(exprs.length);
@@ -202,7 +202,7 @@ public abstract class Arr extends ParseExpr {
       // pre-evaluate values
       if(expr instanceof Value) {
         // skip evaluation: true() or $bool  ->  true()
-        if(expr.ebv(cc.qc, info).bool(info) ^ !union) return true;
+        if(expr.ebv(cc.qc, info).bool(info) ^ !or) return true;
         // ignore result: true() and $bool  ->  $bool
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else if(!pos && list.contains(expr) && !expr.has(Flag.NDT)) {
@@ -223,7 +223,7 @@ public abstract class Arr extends ParseExpr {
       for(int m = l + 1; m < list.size(); m++) {
         final Expr expr = list.get(l);
         if(!(positional && expr.has(Flag.POS))) {
-          final Expr merged = expr.mergeEbv(list.get(m), union, cc);
+          final Expr merged = expr.mergeEbv(list.get(m), or, cc);
           if(merged != null) {
             cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
             list.set(l, merged);
@@ -239,7 +239,7 @@ public abstract class Arr extends ParseExpr {
     if(exprs.length > 1 && fnNot.all(exprs)) {
       final ExprList tmp = new ExprList(exprs.length);
       for(final Expr expr : exprs) tmp.add(((FnNot) expr).exprs[0]);
-      final Expr expr = union ? new And(info, tmp.finish()) : new Or(info, tmp.finish());
+      final Expr expr = or ? new And(info, tmp.finish()) : new Or(info, tmp.finish());
       exprs = new Expr[] { cc.function(Function.NOT, info, expr.optimize(cc)) };
     }
     return false;

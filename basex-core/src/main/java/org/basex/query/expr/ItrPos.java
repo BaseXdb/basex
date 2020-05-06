@@ -128,7 +128,7 @@ public final class ItrPos extends Simple {
   }
 
   @Override
-  public Expr mergeEbv(final Expr ex, final boolean union, final CompileContext cc) {
+  public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc) {
     if(!(ex instanceof ItrPos)) return null;
 
     // find range with smaller minimum
@@ -138,7 +138,7 @@ public final class ItrPos extends Simple {
       pos2 = this;
     }
     // create intersection: position() = 1 to 2 and position() = 2 to 3  ->  position() = 2
-    return !union ? get(pos2.min, Math.min(pos1.max, pos2.max), info) :
+    return !or ? get(pos2.min, Math.min(pos1.max, pos2.max), info) :
       // create union: position() = 1 to 2 or position() = 2 to 3  ->  position() = 1 to 3
       pos1.max + 1 >= pos2.min ? get(pos1.min, Math.max(pos1.max, pos2.max), info) :
       // disjoint ranges: position() = 1 or position() = 3   ->  no rewrite

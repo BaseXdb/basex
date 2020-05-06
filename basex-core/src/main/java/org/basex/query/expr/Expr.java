@@ -400,17 +400,18 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Tries to merge two expressions. Called by {@link And}, {@link Or}), {@link Step} and
-   * {@link Filter}. Overwritten by {@link CmpG}, {@link CmpIR}, {@link CmpR},
-   * {@link CmpSR}, {@link ItrPos}, {@link Pos} and others.
+   * Tries to merge two expressions that are part of an EBV test.
+   * Called by {@link And}, {@link Or}), {@link Step} and {@link Filter}.
+   * Overwritten by {@link CmpG}, {@link CmpIR}, {@link CmpR}, {@link CmpSR},
+   * {@link ItrPos}, {@link Pos} and others.
    * @param expr second expression
-   * @param union union or intersection
+   * @param or union or intersection
    * @param cc compilation context
    * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr mergeEbv(final Expr expr, final boolean union, final CompileContext cc)
+  public Expr mergeEbv(final Expr expr, final boolean or, final CompileContext cc)
       throws QueryException {
     return null;
   }

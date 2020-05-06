@@ -64,10 +64,10 @@ public class FnEmpty extends StandardFunc {
   }
 
   @Override
-  public Expr mergeEbv(final Expr expr, final boolean union, final CompileContext cc)
+  public Expr mergeEbv(final Expr expr, final boolean or, final CompileContext cc)
       throws QueryException {
 
-    if(!union && Function.EMPTY.is(expr)) {
+    if(!or && Function.EMPTY.is(expr)) {
       exprs[0] = new List(info, exprs[0], ((FnEmpty) expr).exprs[0]).optimize(cc);
       return optimize(cc);
     }
