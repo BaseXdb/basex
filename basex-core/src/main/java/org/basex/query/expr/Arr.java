@@ -6,7 +6,6 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -217,28 +216,10 @@ public abstract class Arr extends ParseExpr {
     exprs = list.next();
 
     if(exprs.length > 1 && !(positional && has(Flag.POS))) {
-      final Class<? extends Logical> clazz = or ? And.class : Or.class;
-      final Checks<Expr> logical = expr -> clazz.isInstance(expr);
-      if(logical.all(exprs)) {
-        // (A and B) or (A and C)  ->  A and (B or C)
-        // (A or B) and (A or C) and (A or D)  ->  A or (B and C and D)
-      } else if(logical.any(exprs)) {
-        // A or (A and B)  ->  A
-        // A and (A or B) and (A or C or D) ->  A
-        Expr root = null;
-        for(final Expr expr : exprs) {
-          if(clazz.isInstance(expr)) continue;
-          root = root == null ? expr : null;
-          if(root == null) break;
-        }
-        if(root != null) {
-          final Expr rt = root;
-          if(((Checks<Expr>) expr ->
-            expr == rt || ((Checks<Expr>) ex -> ex.equals(rt)).any(((Logical) expr).exprs)
-          ).all(exprs)) {
-            exprs = new Expr[] { FnBoolean.get(root, info, cc.sc()) };
-          }
-        }
+      final Expr[] tmp = rewriteEbv(or, cc);
+      if(tmp != null) {
+        exprs = tmp;
+        cc.info(OPTREWRITE_X_X, (Supplier<?>) this::description, this);
       }
     }
 
@@ -258,17 +239,69 @@ public abstract class Arr extends ParseExpr {
         }
       }
     }
-    exprs = list.finish();
+    exprs = list.next();
 
     // not($a) and not($b)  ->  not($a or $b)
-    final Checks<Expr> fnNot = ex -> Function.NOT.is(ex) && !(positional && ex.has(Flag.POS));
+    final org.basex.query.func.Function not = org.basex.query.func.Function.NOT;
+    final Checks<Expr> fnNot = ex -> not.is(ex) && !(positional && ex.has(Flag.POS));
     if(exprs.length > 1 && fnNot.all(exprs)) {
       final ExprList tmp = new ExprList(exprs.length);
       for(final Expr expr : exprs) tmp.add(((FnNot) expr).exprs[0]);
       final Expr expr = or ? new And(info, tmp.finish()) : new Or(info, tmp.finish());
-      exprs = new Expr[] { cc.function(Function.NOT, info, expr.optimize(cc)) };
+      list.add(cc.function(not, info, expr.optimize(cc)));
+    } else {
+      list.add(exprs);
     }
+
+    exprs = list.finish();
     return false;
+  }
+
+  /**
+   * Rewrites EBV expressions.
+   * @param or union or intersection
+   * @param cc compilation context
+   * @return new expressions or null
+   * @throws QueryException query exception
+   */
+  private Expr[] rewriteEbv(final boolean or, final CompileContext cc) throws QueryException {
+    final Class<? extends Logical> clazz = or ? And.class : Or.class;
+    if(!((Checks<Expr>) expr -> clazz.isInstance(expr)).any(exprs)) return null;
+
+    // check if common tests exists
+    final Function<Expr, ExprList> entries = ex ->
+      new ExprList().add(clazz.isInstance(ex) ? ((Logical) ex).exprs : new Expr[] { ex });
+    final int el = exprs.length;
+    final ExprList lefts = new ExprList().add(entries.apply(exprs[0]));
+    for(int e = 1; e < el && !lefts.isEmpty(); ++e) {
+      final ExprList curr = entries.apply(exprs[e]);
+      for(int c = lefts.size() - 1; c >= 0; c--) {
+        if(!curr.contains(lefts.get(c))) lefts.remove(c);
+      }
+    }
+    if(lefts.isEmpty()) return null;
+
+    final Expr left = Logical.get(!or, info, lefts.toArray()).optimize(cc);
+    final ExprList rights = new ExprList(exprs.length);
+    for(final Expr expr : exprs) {
+      final ExprList curr = entries.apply(expr).removeAll(lefts);
+      if(curr.isEmpty()) {
+        // no additional tests: return common tests
+        // A and (A or B)  ->  A
+        // (A and B) or (A and B and C)  ->  A
+        return new Expr[] { left };
+      } else if(curr.size() == 1) {
+        // single additional test: add this test
+        // (A and B) or (A and C)  ->  A and (B or C)
+        rights.add(curr.get(0));
+      } else {
+        // multiple additional tests: simplify logical expression
+        // (A and B) or (A and C and D)  ->  A and (B or (C and D))
+        rights.add(Logical.get(!or, info, curr.finish()).optimize(cc));
+      }
+    }
+    final Expr right = Logical.get(or, info, rights.finish()).optimize(cc);
+    return new Expr[] { Logical.get(!or, info, left, right).optimize(cc) };
   }
 
   /**

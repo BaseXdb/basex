@@ -24,6 +24,20 @@ abstract class Logical extends Arr {
     super(info, SeqType.BLN_O, exprs);
   }
 
+  /**
+   * Creates a logical expression. If a single expression is supplied, returns this expression.
+   * @param or union or intersection
+   * @param info input info
+   * @param exprs expressions
+   * @return logical expression
+   */
+  public static Expr get(final boolean or, final InputInfo info, final Expr... exprs) {
+    final int el = exprs.length;
+    if(el == 0) return Bln.get(!or);
+    if(el == 1) return exprs[0];
+    return or ? new Or(info, exprs) : new And(info, exprs);
+  }
+
   @Override
   public final Expr compile(final CompileContext cc) throws QueryException {
     final int el = exprs.length;

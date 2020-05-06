@@ -15,6 +15,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
+import org.basex.util.list.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -1247,21 +1248,55 @@ public final class RewritingsTest extends QueryPlanTest {
   }
 
   /** Logical and set expressions, DNFs/CNFs. */
-  @Test public void gh1851() {
-    check("let $a := data(<a/>), $b := data(<b/>),$c := data(<c/>)\n" +
-        "return $a and ($a or $c) and ($a or $b)",
-        false, empty(And.class), empty(Or.class));
-    check("let $a := data(<a/>), $b := data(<b/>),$c := data(<c/>)\n" +
-        "return $a or ($a and $c) or ($a and $b)",
-        false, empty(And.class), empty(Or.class));
+  @Test public void gh1839() {
+    check(joinBooleans("$a or $b"), "fttt",
+        count(And.class, 0), count(Or.class, 1));
+    check(joinBooleans("$a and $b"), "ffft",
+        count(And.class, 1), count(Or.class, 0));
 
-    check("for $a in (false(), true())\n" +
-        "for $b in (false(), true())\n" +
-        "return $a and ($a or $b)",
-        "false\nfalse\ntrue\ntrue", empty(And.class), empty(Or.class));
-    check("for $a in (false(), true())\n" +
-        "for $b in (false(), true())\n" +
-        "return $a or ($a and $b)",
-        "false\nfalse\ntrue\ntrue", empty(And.class), empty(Or.class));
+    check(joinBooleans("$a or ($a and $b)"), "fftt",
+        count(And.class, 0), count(Or.class, 0));
+    check(joinBooleans("$a and ($a or $b)"), "fftt",
+        count(And.class, 0), count(Or.class, 0));
+
+    check(joinBooleans("($a and $b) or ($a and $c)"), "fffffttt",
+        count(And.class, 1), count(Or.class, 1));
+    check(joinBooleans("($a or $b) and ($a or $c)"), "fffttttt",
+        count(And.class, 1), count(Or.class, 1));
+
+    check(joinBooleans("($a or $b) and ($a or $c or $d)"), "fffffttttttttttt",
+        count(And.class, 1), count(Or.class, 2));
+    check(joinBooleans("($a and $b) or ($a and $c and $d)"), "fffffffffffttttt",
+        count(And.class, 2), count(Or.class, 1));
+
+    check(joinBooleans("($a and $b) or ($a and $b and $c)"), "fffffftt",
+        count(And.class, 1), count(Or.class, 0));
+    check(joinBooleans("($a or $b) and ($a or $b or $c)"), "fftttttt",
+        count(And.class, 0), count(Or.class, 1));
   }
+
+  /**
+   * Creates a query that concatenates booleans in a string.
+   * @param query query string
+   * @return query
+   */
+  private static String joinBooleans(final String query) {
+    // extract variable names from query
+    final StringList vars = new StringList();
+    for(final String var : query.split("\\$")) {
+      if(var.isEmpty()) continue;
+      final char ch = var.charAt(0);
+      if(Character.isLetter(ch)) vars.addUnique(String.valueOf(ch));
+    }
+
+    // generate query string with FLWOR expression
+    final StringBuilder sb = new StringBuilder();
+    sb.append("string-join((\n");
+    for(final String var : vars) {
+      sb.append("  for $").append(var).append(" in (false(), true())\n");
+    }
+    sb.append("  return ").append(query).append("\n");
+    sb.append(") ! (if(.) then 't' else 'f'))");
+    return sb.toString();
+  };
 }

@@ -179,12 +179,12 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   /**
    * Removes all elements from the specified list.
    * @param elements elements
-   * @return flag, indicating if any element was removed
+   * @return self reference
    */
-  public boolean removeAll(final L elements) {
-    boolean rem = false;
-    for(final E e : elements) rem |= removeAll(e);
-    return rem;
+  @SuppressWarnings("unchecked")
+  public L removeAll(final L elements) {
+    for(final E e : elements) removeAll(e);
+    return (L) this;
   }
 
   /**
