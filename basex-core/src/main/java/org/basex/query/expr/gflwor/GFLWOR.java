@@ -107,7 +107,7 @@ public final class GFLWOR extends ParseExpr {
     // apply all optimizations in a row until nothing changes anymore
     while(flattenReturn(cc) | flattenFor(cc) | unnestFLWR(cc) | forToLet(cc) | inlineLets(cc) |
         slideLetsOut(cc) | unusedVars(cc) | cleanDeadVars() | optimizeWhere(cc) | optimizePos(cc) |
-        unnestLets(cc) | mergeLastClause() | ifToWhere(cc));
+        unnestLets(cc) | mergeReturn(cc) | ifToWhere(cc));
 
     mergeWheres();
 
@@ -601,16 +601,32 @@ public final class GFLWOR extends ParseExpr {
 
   /**
    * Merge last 'for' or 'let' clause with 'return' clause.
+   * @param cc compilation context
    * @return change flag
+   * @throws QueryException query exception
    */
-  private boolean mergeLastClause() {
-    if(!clauses.isEmpty() && clauses.getLast() instanceof ForLet && rtrn instanceof VarRef) {
-      final ForLet last = (ForLet) clauses.getLast();
+  private boolean mergeReturn(final CompileContext cc) throws QueryException {
+    if(clauses.peekLast() instanceof ForLet) {
+      final ForLet last = (ForLet) clauses.peekLast();
+      final Predicate<Expr> varref = expr -> expr instanceof VarRef &&
+          ((VarRef) expr).var.is(last.var) && !last.var.checksType() && !last.scoring;
+
       // for $x in E return $x  ->  E
-      if(last.var.is(((VarRef) rtrn).var) && !last.var.checksType() && !last.scoring) {
-        clauses.removeLast();
+      if(varref.test(rtrn)) {
         rtrn = last.expr;
+        clauses.removeLast();
         return true;
+      }
+
+      // for $x in E return $x[. = 1]  ->  E[. = 1]
+      if(clauses.size() == 1 && rtrn instanceof Filter) {
+        final Filter filter = (Filter) rtrn;
+        final Checks<Expr> noVarRef = pred -> pred.count(last.var) == VarUsage.NEVER;
+        if(varref.test(filter.root) && !filter.mayBePositional() && noVarRef.all(filter.exprs)) {
+          rtrn = Filter.get(filter.info, last.expr, filter.exprs).optimize(cc);
+          clauses.removeLast();
+          return true;
+        }
       }
     }
     return false;

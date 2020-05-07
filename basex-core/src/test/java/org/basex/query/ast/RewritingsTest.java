@@ -391,7 +391,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("'s'['x' ! <a>{ . }</a>[. = 'x']]", "s", empty(IterMap.class), root(If.class));
 
     // path expression
-    check("let $a := <a/> return $a[$a/self::a]", "<a/>", count(VarRef.class, 1));
+    check("let $a := <a/> return $a[$a/self::a]", "<a/>", empty(VarRef.class));
     check("let $a := <a/> return $a[$a]", "<a/>", empty(VarRef.class));
   }
 
@@ -1299,6 +1299,16 @@ public final class RewritingsTest extends QueryPlanTest {
     sb.append(") ! (if(.) then 't' else 'f'))");
     return sb.toString();
   };
+
+  /** Name tests in where clauses, index rewritings. */
+  @Test public void gh1851() {
+    check("for $c in 1 to 10 return $c[. = 1]", 1, root(IterFilter.class));
+
+    // do not rewrite positional tests and variable references in predicates
+    check("for $c in 1 to 10 return $c[.]", 1, root(GFLWOR.class));
+    check("for $c in 1 to 10 return $c[position() = <_>2</_>]", "", root(GFLWOR.class));
+    check("for $c in 1 to 10 return $c[$c]", 1, root(GFLWOR.class));
+  }
 
   /** Name tests in where clauses, index rewritings. */
   @Test public void gh1853() {
