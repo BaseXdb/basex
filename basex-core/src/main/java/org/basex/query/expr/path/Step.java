@@ -93,7 +93,7 @@ public abstract class Step extends Preds {
   /**
    * Optimizes the step for the given root expression.
    * @param cc compilation context
-   * @param expr input expression (can be {@code null})
+   * @param expr context expression (can be {@code null})
    * @return optimized step
    * @throws QueryException query exception
    */
@@ -106,7 +106,7 @@ public abstract class Step extends Preds {
       cc.info(OPTSTEP_X, this);
       return cc.emptySeq(this);
     }
-    // optimize predicate, choose best implementation
+    // optimize predicates, choose best implementation
     return optimize(cc, this) ? cc.emptySeq(this) : copyType(get(info, axis, test, exprs));
   }
 
@@ -282,11 +282,11 @@ public abstract class Step extends Preds {
   /**
    * Adds predicates to the step.
    * After the call, a new instance of the resulting path must be created.
-   * @param add predicates to be added
+   * @param preds predicates to be added
    * @return resulting step instance
    */
-  final Step addPreds(final Expr... add) {
-    return copyType(get(info, axis, test, ExprList.concat(exprs, add)));
+  final Step addPreds(final Expr... preds) {
+    return copyType(get(info, axis, test, ExprList.concat(exprs, preds)));
   }
 
   /**

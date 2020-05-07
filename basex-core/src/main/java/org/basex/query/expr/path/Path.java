@@ -164,9 +164,7 @@ public abstract class Path extends ParseExpr {
     if(expr != this) return expr.optimize(cc);
 
     // choose best path implementation (dummy will be used for type checking)
-    final Path path = get(info, root == null && rt instanceof Dummy ? rt : root, steps);
-    path.data = data;
-    return copyType(path);
+    return copyType(get(info, root == null && rt instanceof Dummy ? rt : root, steps));
   }
 
   @Override
@@ -1030,6 +1028,11 @@ public abstract class Path extends ParseExpr {
   @Override
   public final Data data() {
     return data;
+  }
+
+  @Override
+  public void data(final Data dt) {
+    data = dt;
   }
 
   @Override

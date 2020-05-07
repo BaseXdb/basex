@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.path.PathCache.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -110,9 +111,33 @@ public abstract class AxisPath extends Path {
    * @return resulting path instance
    */
   public final Path addPredicates(final Expr... preds) {
-    final int sl = steps.length - 1;
-    steps[sl] = step(sl).addPreds(preds);
-    return copyType(get(info, root, steps));
+    final ExprList list = new ExprList(steps.length).add(steps);
+    final Expr step = ((Step) list.pop()).addPreds(preds);
+    return copyType(get(info, root, list.add(step).finish()));
+  }
+
+  /**
+   * Adds predicates to the last step and optimizes the result.
+   * @param cc compilation context (can be {@code null})
+   * @param preds predicates to be added
+   * @return resulting path instance
+   * @throws QueryException query exception
+   */
+  public final Path addPredicates(final CompileContext cc, final Expr... preds)
+      throws QueryException {
+
+    final ExprList list = new ExprList(steps.length).add(steps);
+    Expr step = ((Step) list.pop()).addPreds(preds);
+    if(cc != null) {
+      cc.pushFocus(this);
+      cc.updateFocus(step);
+      try {
+        step = step.optimize(cc);
+      } finally {
+        cc.removeFocus();
+      }
+    }
+    return copyType(get(info, root, list.add(step).finish()));
   }
 
   @Override

@@ -178,10 +178,8 @@ public final class For extends ForLet {
    */
   void addPredicate(final Expr ex, final CompileContext cc) throws QueryException {
     if(expr instanceof AxisPath && !ex.has(Flag.POS)) {
-      // add to last step of path, provided that predicate is not positional; merge predicates
-      final AxisPath path = (AxisPath) expr;
-      expr = path.addPredicates(ex);
-      path.step(path.steps.length - 1).optimize(cc);
+      // add to last step of path, provided that predicate is not positional
+      expr = ((AxisPath) expr).addPredicates(cc, ex);
     } else if(expr instanceof Filter) {
       // add to existing filter expression
       expr = ((Filter) expr).addPredicate(ex);

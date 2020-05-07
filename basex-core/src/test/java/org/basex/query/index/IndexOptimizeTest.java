@@ -238,7 +238,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     execute(new CreateDB(NAME, "<xml><a y='Y'>A</a><b z='Z'>B</b></xml>"));
 
     // texts
-    indexCheck("//(a,b)[text() = 'A']/name()", "a");
+
     indexCheck("//(a|b)[text() = 'A']/name()", "a");
     indexCheck("//*[(a|b)/text() = 'A']/name()", "xml");
     indexCheck("//(a|b)/text()[. = 'A']", "A");

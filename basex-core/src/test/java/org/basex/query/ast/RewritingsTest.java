@@ -1299,4 +1299,11 @@ public final class RewritingsTest extends QueryPlanTest {
     sb.append(") ! (if(.) then 't' else 'f'))");
     return sb.toString();
   };
+
+  /** Name tests in where clauses, index rewritings. */
+  @Test public void gh1853() {
+    execute(new CreateDB(NAME, "<a><b/></a>"));
+    check("for $e in //* where name($e) = 'b' return $e", "<b/>", empty(Function.NAME));
+    check("for $e in //* where local-name($e) = 'e' return $e", "", empty());
+  }
 }

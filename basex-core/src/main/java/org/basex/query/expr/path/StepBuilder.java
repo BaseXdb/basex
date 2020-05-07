@@ -63,12 +63,12 @@ public final class StepBuilder {
   /**
    * Returns a new and optimized expression for this step.
    * @param cc compilation context
-   * @param expr context expression
+   * @param root root expression
    * @return expression
    * @throws QueryException query exception
    */
-  public Expr finish(final CompileContext cc, final Expr expr) throws QueryException {
-    final Expr ex = expr != null ? expr : cc.qc.focus.value;
+  public Expr finish(final CompileContext cc, final Expr root) throws QueryException {
+    final Expr ex = root != null ? root : cc.qc.focus.value;
     return Step.get(info, a, t, e != null ? e : new Expr[0]).optimize(ex, cc);
   }
 }

@@ -169,6 +169,13 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Assigns a data reference, if supported.
+   * @param dt data reference
+   */
+  public void data(@SuppressWarnings("unused") final Data dt) {
+  }
+
+  /**
    * Returns the result size, or {@code -1} if the size is unknown.
    * @return result of check
    */

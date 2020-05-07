@@ -110,6 +110,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final <T extends ParseExpr> T copyType(final T expr) {
     expr.exprType.assign(this);
+    expr.data(data());
     return expr;
   }
 

@@ -47,8 +47,6 @@ public abstract class Filter extends Preds {
   public static Expr get(final InputInfo ii, final Expr root, final Expr... preds) {
     // no predicates: return root
     return preds.length == 0 ? root :
-      // return axis path
-      root instanceof AxisPath && !mayBePositional(preds) ? ((AxisPath) root).addPredicates(preds) :
       // use simple filter for single deterministic predicate
       preds.length == 1 && preds[0].isSimple() ? new SimpleFilter(ii, root, preds) :
       // default filter
@@ -88,7 +86,7 @@ public abstract class Filter extends Preds {
     // no positional access..
     if(!mayBePositional()) {
       // convert to axis path: (//x)[text() = 'a']  ->  //x[text() = 'a']
-      if(root instanceof AxisPath) return ((AxisPath) root).addPredicates(exprs).optimize(cc);
+      if(root instanceof AxisPath) return ((AxisPath) root).addPredicates(cc, exprs).optimize(cc);
 
       // rewrite filter with document nodes to path; enables index rewritings
       // example: db:open('db')[.//text() = 'x']  ->  db:open('db')/.[.//text() = 'x']
