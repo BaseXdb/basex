@@ -128,7 +128,9 @@ public abstract class ConsoleReader implements AutoCloseable, PasswordReader {
       reader = readerC.getDeclaredConstructor().newInstance();
 
       final Class<?> history = Reflect.find(JLINE_HISTORY);
-      final Class<? extends Flushable> fileHistoryC = (Class<? extends Flushable>) Reflect.find(JLINE_FILE_HISTORY);
+      @SuppressWarnings("unchecked")
+      final Class<? extends Flushable> fileHistoryC = (Class<? extends Flushable>)
+          Reflect.find(JLINE_FILE_HISTORY);
       fileHistory = Reflect.get(Reflect.find(fileHistoryC, File.class),
           new File(Prop.HOMEDIR, HISTORY_FILE));
 
@@ -161,8 +163,8 @@ public abstract class ConsoleReader implements AutoCloseable, PasswordReader {
     public void close() {
       try {
         fileHistory.flush();
-      } catch (final IOException e) {
-        Util.debug(e);
+      } catch(final IOException ex) {
+        Util.debug(ex);
       }
     }
   }

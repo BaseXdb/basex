@@ -63,7 +63,7 @@ public final class If extends Arr {
     for(final int b : branches) {
       try {
         exprs[b] = exprs[b].compile(cc);
-      } catch (final QueryException ex) {
+      } catch(final QueryException ex) {
         // replace original expression with error
         exprs[b] = cc.error(ex, this);
       }

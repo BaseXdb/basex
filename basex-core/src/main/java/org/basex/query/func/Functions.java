@@ -189,7 +189,7 @@ public final class Functions {
   private static StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     final FuncDefinition fd = getBuiltIn(name, args.length, ii);
-    return fd == null ? null : fd.function.get(sc, ii, args);
+    return fd == null ? null : fd.get(sc, ii, args);
   }
 
   /**
@@ -254,7 +254,7 @@ public final class Functions {
         args[i] = new VarRef(ii, params[i]);
       }
 
-      final StandardFunc sf = fd.function.get(sc, ii, args);
+      final StandardFunc sf = fd.get(sc, ii, args);
       final boolean upd = sf.has(Flag.UPD);
       if(upd) {
         anns.add(new Ann(ii, Annotation.UPDATING));
