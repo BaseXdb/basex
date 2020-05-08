@@ -66,8 +66,7 @@ abstract class ForLet extends Clause {
     final Expr sub = expr.inline(v, ex, cc);
     if(sub == null) return null;
     expr = sub;
-    // call compile instead of optimize, because many new optimizations may be triggered by inlining
-    return compile(cc);
+    return optimize(cc);
   }
 
   @Override

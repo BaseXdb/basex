@@ -1316,4 +1316,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $e in //* where name($e) = 'b' return $e", "<b/>", empty(Function.NAME));
     check("for $e in //* where local-name($e) = 'e' return $e", "", empty());
   }
+
+  /** Nested predicates in FLWOR expression. */
+  @Test public void gh1855() {
+    execute(new CreateDB(NAME, "<a><b c='d'>e</b></a>"));
+    check("count(let $e := 'e' let $f := a[b[@c = 'd'] = $e] return $f)", 1,
+        exists(ValueAccess.class));
+  }
 }
