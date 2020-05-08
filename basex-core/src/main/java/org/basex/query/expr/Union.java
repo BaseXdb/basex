@@ -35,12 +35,19 @@ public final class Union extends Set {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
+    Type type = null;
+    for(final Expr expr : exprs) {
+      final Type type2 = expr.seqType().type;
+      type = type == null ? type2 : type.union(type2);
+    }
+    if(type instanceof NodeType) exprType.assign(type);
+
     flatten(cc, Union.class);
 
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       if(expr == Empty.VALUE || expr.seqType().type instanceof NodeType &&
-          !expr.has(Flag.CNS, Flag.NDT) && list.contains(expr)) {
+          list.contains(expr) && !expr.has(Flag.CNS, Flag.NDT)) {
         // remove empty operands: * union ()  ->  *
         // remove duplicates: * union *  ->  *
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);

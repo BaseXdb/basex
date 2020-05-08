@@ -36,6 +36,9 @@ public final class Except extends Set {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
+    final Type type = exprs[0].seqType().type;
+    if(type instanceof NodeType) exprType.assign(type);
+
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       if(expr == Empty.VALUE) {

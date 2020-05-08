@@ -35,6 +35,13 @@ public final class Intersect extends Set {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
+    Type type = null;
+    for(final Expr expr : exprs) {
+      final Type type2 = expr.seqType().type;
+      type = type == null ? type2 : type.intersect(type2);
+    }
+    if(type instanceof NodeType) exprType.assign(type);
+
     flatten(cc, Intersect.class);
 
     final ExprList list = new ExprList(exprs.length);

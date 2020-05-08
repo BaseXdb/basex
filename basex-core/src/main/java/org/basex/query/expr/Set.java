@@ -41,13 +41,6 @@ abstract class Set extends Arr {
   public final Expr optimize(final CompileContext cc) throws QueryException {
     iterative = ((Checks<Expr>) Expr::ddo).all(exprs);
 
-    Type type = null;
-    for(final Expr expr : exprs) {
-      final Type type2 = expr.seqType().type;
-      type = type == null ? type2 : type.union(type2);
-    }
-    if(type instanceof NodeType) exprType.assign(type);
-
     Expr expr = opt(cc);
     if(expr == null) {
       final int el = exprs.length;
@@ -200,8 +193,7 @@ abstract class Set extends Arr {
       }
       if(root == null) {
         root = rt;
-        if(root.has(Flag.CNS, Flag.NDT) || !(root.seqType().type instanceof NodeType))
-          return null;
+        if(root.has(Flag.CNS, Flag.NDT) || !(root.seqType().type instanceof NodeType)) return null;
       } else if(!root.equals(rt)) {
         return null;
       }
