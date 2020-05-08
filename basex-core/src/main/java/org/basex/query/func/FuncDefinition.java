@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 import java.util.function.Supplier;
 
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -19,11 +20,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FuncDefinition {
-  /** Function reference. */
-  public final AFunction function;
   /** Function constructor. */
-  public final Supplier<? extends StandardFunc> ctor;
-
+  final Supplier<? extends StandardFunc> supplier;
   /** Minimum and maximum number of arguments. */
   final int[] minMax;
   /** Parameter types. */
@@ -40,8 +38,7 @@ public final class FuncDefinition {
 
   /**
    * Constructs a function signature.
-   * @param function function reference
-   * @param ctor function implementation constructor
+   * @param supplier function implementation constructor
    * @param desc descriptive function string, containing the function name and its
    *             arguments in parentheses. Optional arguments are represented in nested
    *             square brackets; three dots indicate that the number of arguments of a
@@ -51,12 +48,10 @@ public final class FuncDefinition {
    * @param flags static function properties
    * @param uri uri
    */
-  FuncDefinition(final AFunction function, final Supplier<? extends StandardFunc> ctor,
-      final String desc, final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags,
-      final byte[] uri) {
+  FuncDefinition(final Supplier<? extends StandardFunc> supplier, final String desc,
+      final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri) {
 
-    this.function = function;
-    this.ctor = ctor;
+    this.supplier = supplier;
     this.desc = desc;
     this.seqType = seqType;
     this.params = params;
@@ -202,6 +197,19 @@ public final class FuncDefinition {
       }
     }
     return ' ' + toString().replaceAll("\\(.*", "(") + tb + ')';
+  }
+
+  /**
+   * Creates a new function instance.
+   * @param sc static context
+   * @param ii input info
+   * @param args function arguments
+   * @return function
+   */
+  public StandardFunc get(final StaticContext sc, final InputInfo ii, final Expr... args) {
+    final StandardFunc sf = supplier.get();
+    sf.init(sc, ii, this, args);
+    return sf;
   }
 
   @Override

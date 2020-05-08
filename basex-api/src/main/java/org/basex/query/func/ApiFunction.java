@@ -47,8 +47,7 @@ public enum ApiFunction implements AFunction {
   /** XQuery function. */
   _GEO_CROSSES(GeoCrosses::new, "crosses(node1,node2)", arg(ELM_O, ELM_O), BLN_O, GEO_URI),
   /** XQuery function. */
-  _GEO_DIFFERENCE(GeoDifference::new, "difference(node1,node2)",
-      arg(ELM_O, ELM_O), ELM_O, GEO_URI),
+  _GEO_DIFFERENCE(GeoDifference::new, "difference(node1,node2)", arg(ELM_O, ELM_O), ELM_O, GEO_URI),
   /** XQuery function. */
   _GEO_DIMENSION(GeoDimension::new, "dimension(node)", arg(ELM_O), ITR_O, GEO_URI),
   /** XQuery function. */
@@ -74,8 +73,7 @@ public enum ApiFunction implements AFunction {
   _GEO_INTERSECTION(GeoIntersection::new, "intersection(node1,node2)",
       arg(ELM_O, ELM_O), ELM_O, GEO_URI),
   /** XQuery function. */
-  _GEO_INTERSECTS(GeoIntersects::new, "intersects(node1,node2)",
-      arg(ELM_O, ELM_O), BLN_O, GEO_URI),
+  _GEO_INTERSECTS(GeoIntersects::new, "intersects(node1,node2)", arg(ELM_O, ELM_O), BLN_O, GEO_URI),
   /** XQuery function. */
   _GEO_IS_CLOSED(GeoIsClosed::new, "is-closed(node)", arg(ELM_O), BLN_O, GEO_URI),
   /** XQuery function. */
@@ -160,8 +158,7 @@ public enum ApiFunction implements AFunction {
   /** XQuery function. */
   _REQUEST_QUERY(RequestQuery::new, "query()", arg(), STR_ZO, REQUEST_URI),
   /** XQuery function. */
-  _REQUEST_REMOTE_ADDRESS(RequestRemoteAddress::new,
-      "remote-address()", arg(), STR_O, REQUEST_URI),
+  _REQUEST_REMOTE_ADDRESS(RequestRemoteAddress::new, "remote-address()", arg(), STR_O, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_REMOTE_HOSTNAME(RequestRemoteHostname::new, "remote-hostname()",
       arg(), STR_O, REQUEST_URI),
@@ -204,8 +201,7 @@ public enum ApiFunction implements AFunction {
   /** XQuery function. */
   _SESSION_NAMES(SessionNames::new, "names()", arg(), STR_ZM, flag(NDT), SESSION_URI),
   /** XQuery function. */
-  _SESSION_SET(SessionSet::new, "set(key,value)",
-      arg(STR_O, ITEM_ZM), EMP, flag(NDT), SESSION_URI),
+  _SESSION_SET(SessionSet::new, "set(key,value)", arg(STR_O, ITEM_ZM), EMP, flag(NDT), SESSION_URI),
 
   // Sessions Module
 
@@ -264,59 +260,58 @@ public enum ApiFunction implements AFunction {
   /**
    * Constructs a function signature; calls
    * {@link #ApiFunction(Supplier, String, SeqType[], SeqType, EnumSet)}.
-   * @param ctor function implementation constructor
+   * @param supplier function implementation constructor
    * @param desc descriptive function string
    * @param args types of the function arguments
    * @param seqType return type
    */
-  ApiFunction(final Supplier<? extends StandardFunc> ctor, final String desc, final SeqType[] args,
-      final SeqType seqType) {
-    this(ctor, desc, args, seqType, EnumSet.noneOf(Flag.class));
+  ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
+      final SeqType[] args, final SeqType seqType) {
+    this(supplier, desc, args, seqType, EnumSet.noneOf(Flag.class));
   }
 
   /**
    * Constructs a function signature; calls
    * {@link #ApiFunction(Supplier, String, SeqType[], SeqType, EnumSet)}.
-   * @param ctor function implementation constructor
+   * @param supplier function implementation constructor
    * @param desc descriptive function string
    * @param args types of the function arguments
    * @param type return type
    * @param uri uri
    */
-  ApiFunction(final Supplier<? extends StandardFunc> ctor, final String desc, final SeqType[] args,
-      final SeqType type, final byte[] uri) {
-    this(ctor, desc, args, type, EnumSet.noneOf(Flag.class), uri);
+  ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
+      final SeqType[] args, final SeqType type, final byte[] uri) {
+    this(supplier, desc, args, type, EnumSet.noneOf(Flag.class), uri);
   }
 
   /**
    * Constructs a function signature; calls
    * {@link #ApiFunction(Supplier, String, SeqType[], SeqType, EnumSet, byte[])}.
-   * @param ctor function implementation constructor
+   * @param supplier function implementation constructor
    * @param desc descriptive function string
    * @param args types of the function arguments
    * @param seqType return type
    * @param flag static function properties
    */
-  ApiFunction(final Supplier<? extends StandardFunc> ctor, final String desc, final SeqType[] args,
-      final SeqType seqType, final EnumSet<Flag> flag) {
-    this(ctor, desc, args, seqType, flag, FN_URI);
+  ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
+      final SeqType[] args, final SeqType seqType, final EnumSet<Flag> flag) {
+    this(supplier, desc, args, seqType, flag, FN_URI);
   }
 
   /**
    * Constructs a function signature.
-   * @param ctor function implementation constructor
-   * @param desc descriptive function string, containing the function name and its
-   *             arguments in parentheses. Optional arguments are represented in nested
-   *             square brackets; three dots indicate that the number of arguments of a
-   *             function is not limited
+   * @param supplier function implementation constructor
+   * @param desc descriptive function string, containing the function name and its arguments in
+   *   parentheses. Optional arguments are represented in nested square brackets; three dots
+   *   indicate that the number of arguments of a function is not limited.
    * @param params parameter types
    * @param seqType return type
    * @param flags static function properties
    * @param uri uri
    */
-  ApiFunction(final Supplier<? extends StandardFunc> ctor, final String desc, final SeqType[] params,
-      final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri) {
-    definition = new FuncDefinition(this, ctor, desc, params, seqType, flags, uri);
+  ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
+      final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri) {
+    definition = new FuncDefinition(supplier, desc, params, seqType, flags, uri);
   }
 
   @Override

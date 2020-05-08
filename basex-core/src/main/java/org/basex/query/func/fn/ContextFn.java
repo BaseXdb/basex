@@ -58,7 +58,9 @@ public abstract class ContextFn extends StandardFunc {
   @Override
   public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    return inline(var, ex, cc, v -> contextAccess() ? cc.function(definition.function, info,
-        new ExprList(exprs.length + 1).add(exprs).add(ex).finish()) : null);
+    return inline(var, ex, cc, v -> {
+      final Expr[] args = new ExprList(exprs.length + 1).add(exprs).add(ex).finish();
+      return contextAccess() ? definition.get(cc.sc(), info, args).optimize(cc) : null;
+    });
   }
 }

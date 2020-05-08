@@ -94,8 +94,7 @@ public enum Function implements AFunction {
   CODEPOINT_EQUAL(FnCodepointEqual::new, "codepoint-equal(string1,string2)",
       arg(STR_ZO, STR_ZO), BLN_ZO),
   /** XQuery function. */
-  CODEPOINTS_TO_STRING(FnCodepointsToString::new, "codepoints-to-string(nums)",
-      arg(ITR_ZM), STR_O),
+  CODEPOINTS_TO_STRING(FnCodepointsToString::new, "codepoints-to-string(nums)", arg(ITR_ZM), STR_O),
   /** XQuery function. */
   COLLECTION(FnCollection::new, "collection([uri])", arg(STR_ZO), DOC_ZM),
   /** XQuery function. */
@@ -309,8 +308,8 @@ public enum Function implements AFunction {
   /** XQuery function. */
   PARSE_XML(FnParseXml::new, "parse-xml(string)", arg(STR_ZO), DOC_ZO, flag(CNS)),
   /** XQuery function. */
-  PARSE_XML_FRAGMENT(FnParseXmlFragment::new, "parse-xml-fragment(string)", arg(STR_ZO), DOC_ZO,
-      flag(CNS)),
+  PARSE_XML_FRAGMENT(FnParseXmlFragment::new, "parse-xml-fragment(string)",
+      arg(STR_ZO), DOC_ZO, flag(CNS)),
   /** XQuery function. */
   PATH(FnPath::new, "path([node])", arg(NOD_ZO), STR_ZO),
   /** XQuery function. */
@@ -373,8 +372,7 @@ public enum Function implements AFunction {
   SUBSEQUENCE(FnSubsequence::new, "subsequence(items,first[,length])",
       arg(ITEM_ZM, DBL_O, DBL_O), ITEM_ZM),
   /** XQuery function. */
-  SUBSTRING(FnSubstring::new, "substring(string,start[,length])",
-      arg(STR_ZO, DBL_O, DBL_O), STR_O),
+  SUBSTRING(FnSubstring::new, "substring(string,start[,length])", arg(STR_ZO, DBL_O, DBL_O), STR_O),
   /** XQuery function. */
   SUBSTRING_AFTER(FnSubstringAfter::new, "substring-after(string,separator[,collation])",
       arg(STR_ZO, STR_ZO, STR_O), STR_O),
@@ -454,8 +452,7 @@ public enum Function implements AFunction {
   // Array Module
 
   /** XQuery function. */
-  _ARRAY_APPEND(ArrayAppend::new, "append(array,value)",
-      arg(ARRAY_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
+  _ARRAY_APPEND(ArrayAppend::new, "append(array,value)", arg(ARRAY_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_FILTER(ArrayFilter::new, "filter(array,function)",
       arg(ARRAY_O, FuncType.get(BLN_O, ITEM_ZM).seqType()), ARRAY_O, flag(HOF), ARRAY_URI),
@@ -499,9 +496,8 @@ public enum Function implements AFunction {
   _ARRAY_SORT(ArraySort::new, "sort(array[,collation[,function]])",
       arg(ARRAY_O, STR_ZO, FuncType.get(AAT_ZM, ITEM_O).seqType()), ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_SUBARRAY(ArraySubarray::new,
-      "subarray(array,position[,length])", arg(ARRAY_O, ITR_O, ITR_O),
-      ARRAY_O, ARRAY_URI),
+  _ARRAY_SUBARRAY(ArraySubarray::new, "subarray(array,position[,length])",
+      arg(ARRAY_O, ITR_O, ITR_O), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_TAIL(ArrayTail::new, "tail(array)", arg(ARRAY_O), ARRAY_O, ARRAY_URI),
 
@@ -641,8 +637,7 @@ public enum Function implements AFunction {
   _BIN_PAD_RIGHT(BinPadRight::new, "pad-right(binary,size[,octet])",
       arg(B64_ZO, ITR_O, ITR_O), B64_ZO, BIN_URI),
   /** XQuery function. */
-  _BIN_PART(BinPart::new, "part(binary,offset[,size])",
-      arg(B64_ZO, ITR_O, ITR_O), B64_ZO, BIN_URI),
+  _BIN_PART(BinPart::new, "part(binary,offset[,size])", arg(B64_ZO, ITR_O, ITR_O), B64_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_SHIFT(BinShift::new, "shift(binary,by)", arg(B64_ZO, ITR_O), B64_ZO, BIN_URI),
   /** XQuery function. */
@@ -671,8 +666,8 @@ public enum Function implements AFunction {
   _CLIENT_CONNECT(ClientConnect::new, "connect(url,port,user,password)",
       arg(STR_O, ITR_O, STR_O, STR_O), URI_O, flag(NDT), CLIENT_URI),
   /** XQuery function. */
-  _CLIENT_EXECUTE(ClientExecute::new, "execute(id,command)", arg(URI_O, STR_O), STR_O, flag(NDT),
-      CLIENT_URI),
+  _CLIENT_EXECUTE(ClientExecute::new, "execute(id,command)",
+      arg(URI_O, STR_O), STR_O, flag(NDT), CLIENT_URI),
   /** XQuery function. */
   _CLIENT_INFO(ClientInfo::new, "info(id)", arg(URI_O), STR_O, flag(NDT), CLIENT_URI),
   /** XQuery function. */
@@ -754,8 +749,8 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _CSV_PARSE(CsvParse::new, "parse(string[,options])", arg(STR_ZO, MAP_ZO), ITEM_ZO, CSV_URI),
   /** XQuery function. */
-  _CSV_SERIALIZE(CsvSerialize::new, "serialize(item[,options])", arg(ITEM_ZO, ITEM_ZO), STR_O,
-      CSV_URI),
+  _CSV_SERIALIZE(CsvSerialize::new, "serialize(item[,options])",
+      arg(ITEM_ZO, ITEM_ZO), STR_O, CSV_URI),
 
   // Database Module
 
@@ -795,8 +790,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _DB_DROP_BACKUP(DbDropBackup::new, "drop-backup(name)", arg(STR_O), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_EXISTS(DbExists::new, "exists(database[,path])",
-      arg(STR_O, STR_O), BLN_O, flag(NDT), DB_URI),
+  _DB_EXISTS(DbExists::new, "exists(database[,path])", arg(STR_O, STR_O), BLN_O, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_EXPORT(DbExport::new, "export(database,path[,param]])",
       arg(STR_O, STR_O, ITEM_O), EMP, flag(NDT), DB_URI),
@@ -864,8 +858,8 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _FETCH_BINARY(FetchBinary::new, "binary(uri)", arg(STR_O), B64_O, flag(NDT), FETCH_URI),
   /** XQuery function. */
-  _FETCH_CONTENT_TYPE(FetchContentType::new, "content-type(uri)", arg(STR_O), STR_O, flag(NDT),
-      FETCH_URI),
+  _FETCH_CONTENT_TYPE(FetchContentType::new, "content-type(uri)",
+      arg(STR_O), STR_O, flag(NDT), FETCH_URI),
   /** XQuery function. */
   _FETCH_TEXT(FetchText::new, "text(uri[,encoding[,fallback]])",
       arg(STR_O, STR_O, BLN_O), STR_O, flag(NDT), FETCH_URI),
@@ -1013,8 +1007,7 @@ public enum Function implements AFunction {
   // HOF Module
 
   /** XQuery function. */
-  _HOF_CONST(HofConst::new, "const(return,ignore)",
-      arg(ITEM_ZM, ITEM_ZM), ITEM_ZM, HOF_URI),
+  _HOF_CONST(HofConst::new, "const(return,ignore)", arg(ITEM_ZM, ITEM_ZM), ITEM_ZM, HOF_URI),
   /** XQuery function. */
   _HOF_FOLD_LEFT1(HofFoldLeft1::new, "fold-left1(non-empty-items,function)",
       arg(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O).seqType()), ITEM_ZM, flag(HOF), HOF_URI),
@@ -1292,8 +1285,8 @@ public enum Function implements AFunction {
       arg(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O).seqType()), EMP, flag(UPD, HOF), UPDATE_URI),
   /** XQuery function. */
   _UPDATE_FOR_EACH_PAIR(UpdateForEachPair::new, "for-each-pair(items1,items2,function)",
-      arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_O).seqType()),
-      EMP, flag(UPD, HOF), UPDATE_URI),
+      arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_O).seqType()), EMP, flag(UPD, HOF),
+      UPDATE_URI),
   /** XQuery function. */
   _UPDATE_MAP_FOR_EACH(UpdateMapForEach::new, "map-for-each(map,function)",
       arg(MAP_O, FuncType.get(ITEM_ZM, AAT_O, ITEM_ZM).seqType()), EMP, flag(UPD, HOF), UPDATE_URI),
@@ -1386,8 +1379,7 @@ public enum Function implements AFunction {
   _VALIDATE_XSD_INFO(ValidateXsdInfo::new, "xsd-info(input[,schema[,options]])",
       arg(ITEM_O, ITEM_O, MAP_O), STR_ZM, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
-  _VALIDATE_XSD_PROCESSOR(ValidateXsdProcessor::new, "xsd-processor()",
-      arg(), STR_O, VALIDATE_URI),
+  _VALIDATE_XSD_PROCESSOR(ValidateXsdProcessor::new, "xsd-processor()", arg(), STR_O, VALIDATE_URI),
   /** XQuery function. */
   _VALIDATE_XSD_REPORT(ValidateXsdReport::new, "xsd-report(input[,schema[,options]])",
       arg(ITEM_O, ITEM_O, MAP_O), ELM_O, flag(NDT), VALIDATE_URI),
@@ -1485,59 +1477,58 @@ public enum Function implements AFunction {
   /**
    * Constructs a function signature; calls
    * {@link #Function(Supplier, String, SeqType[], SeqType, EnumSet)}.
-   * @param ctor function implementation constructor
+   * @param supplier function implementation constructor
    * @param desc descriptive function string
    * @param args types of the function arguments
    * @param seqType return type
    */
-  Function(final Supplier<? extends StandardFunc> ctor, final String desc, final SeqType[] args,
-           final SeqType seqType) {
-    this(ctor, desc, args, seqType, EnumSet.noneOf(Flag.class));
+  Function(final Supplier<? extends StandardFunc> supplier, final String desc, final SeqType[] args,
+      final SeqType seqType) {
+    this(supplier, desc, args, seqType, EnumSet.noneOf(Flag.class));
   }
 
   /**
    * Constructs a function signature; calls
    * {@link #Function(Supplier, String, SeqType[], SeqType, EnumSet)}.
-   * @param ctor function implementation constructor
+   * @param supplier function implementation constructor
    * @param desc descriptive function string
    * @param args types of the function arguments
    * @param type return type
    * @param uri uri
    */
-  Function(final Supplier<? extends StandardFunc> ctor, final String desc, final SeqType[] args,
+  Function(final Supplier<? extends StandardFunc> supplier, final String desc, final SeqType[] args,
       final SeqType type, final byte[] uri) {
-    this(ctor, desc, args, type, EnumSet.noneOf(Flag.class), uri);
+    this(supplier, desc, args, type, EnumSet.noneOf(Flag.class), uri);
   }
 
   /**
    * Constructs a function signature; calls
    * {@link #Function(Supplier, String, SeqType[], SeqType, EnumSet, byte[])}.
-   * @param ctor function implementation constructor
+   * @param supplier function implementation constructor
    * @param desc descriptive function string
    * @param args types of the function arguments
    * @param seqType return type
    * @param flag static function properties
    */
-  Function(final Supplier<? extends StandardFunc> ctor, final String desc, final SeqType[] args,
+  Function(final Supplier<? extends StandardFunc> supplier, final String desc, final SeqType[] args,
       final SeqType seqType, final EnumSet<Flag> flag) {
-    this(ctor, desc, args, seqType, flag, FN_URI);
+    this(supplier, desc, args, seqType, flag, FN_URI);
   }
 
   /**
    * Constructs a function signature.
-   * @param ctor function implementation constructor
-   * @param desc descriptive function string, containing the function name and its
-   *             arguments in parentheses. Optional arguments are represented in nested
-   *             square brackets; three dots indicate that the number of arguments of a
-   *             function is not limited
+   * @param supplier function implementation constructor
+   * @param desc descriptive function string, containing the function name and its arguments in
+   *   parentheses. Optional arguments are represented in nested square brackets; three dots
+   *   indicate that the number of arguments of a function is not limited.
    * @param params parameter types
    * @param seqType return type
    * @param flags static function properties
    * @param uri uri
    */
-  Function(final Supplier<? extends StandardFunc> ctor, final String desc, final SeqType[] params,
-      final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri) {
-    definition = new FuncDefinition(this, ctor, desc, params, seqType, flags, uri);
+  Function(final Supplier<? extends StandardFunc> supplier, final String desc,
+      final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri) {
+    definition = new FuncDefinition(supplier, desc, params, seqType, flags, uri);
   }
 
   @Override

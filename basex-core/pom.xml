@@ -52,7 +52,7 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.relaxng</groupId>
+      <groupId>com.thaiopensource</groupId>
       <artifactId>jing</artifactId>
       <optional>true</optional>
     </dependency>

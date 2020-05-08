@@ -73,7 +73,7 @@ public abstract class QueryPlanTest extends SandboxTest {
    * @return test string
    */
   protected static String empty(final Function func) {
-    return empty(func.definition().ctor.get().getClass());
+    return empty(func.className());
   }
 
   /**
@@ -100,7 +100,7 @@ public abstract class QueryPlanTest extends SandboxTest {
    * @return test string
    */
   protected static String exists(final Function func) {
-    return exists(func.definition().ctor.get().getClass());
+    return exists(func.className());
   }
 
   /**
@@ -126,7 +126,7 @@ public abstract class QueryPlanTest extends SandboxTest {
    * @return test string
    */
   protected static String root(final Function func) {
-    return root(func.definition().ctor.get().getClass());
+    return root(func.className());
   }
 
   /**
@@ -155,7 +155,7 @@ public abstract class QueryPlanTest extends SandboxTest {
    * @return test string
    */
   protected static String count(final Function func, final int count) {
-    return count(func.definition().ctor.get().getClass(), count);
+    return count(func.className(), count);
   }
 
   /**
@@ -195,6 +195,6 @@ public abstract class QueryPlanTest extends SandboxTest {
    * @return test string
    */
   protected static String type(final Function func, final String type) {
-    return type(func.definition().ctor.get().getClass(), type);
+    return type(func.className(), type);
   }
 }

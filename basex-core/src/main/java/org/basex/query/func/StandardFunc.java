@@ -125,7 +125,7 @@ public abstract class StandardFunc extends Arr {
     final int el = exprs.length;
     final Expr[] arg = new Expr[el];
     for(int e = 0; e < el; e++) arg[e] = exprs[e].copy(cc, vm);
-    return copyType(definition.function.get(sc, info, arg));
+    return copyType(definition.get(sc, info, arg));
   }
 
   /**

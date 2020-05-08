@@ -49,7 +49,7 @@ public final class FnPath extends ContextFn {
         break;
       }
       // root node: finalize traversal
-      ANode parent = node.parent();
+      final ANode parent = node.parent();
       if(parent == null) {
         if(node.type != NodeType.DOC) tb.add(ROOT);
         break;

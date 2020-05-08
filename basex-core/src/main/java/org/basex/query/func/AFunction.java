@@ -21,14 +21,11 @@ public interface AFunction {
    * Creates a new instance of the function.
    * @param sc static context
    * @param ii input info
-   * @param exprs arguments
+   * @param args function arguments
    * @return function
    */
-  default StandardFunc get(final StaticContext sc, final InputInfo ii, final Expr... exprs) {
-    final FuncDefinition fd = definition();
-    final StandardFunc sf = fd.ctor.get();
-    sf.init(sc, ii, fd, exprs);
-    return sf;
+  default StandardFunc get(final StaticContext sc, final InputInfo ii, final Expr... args) {
+    return definition().get(sc, ii, args);
   }
 
   /**
@@ -48,5 +45,13 @@ public interface AFunction {
    */
   default String args(final Object... args) {
     return definition().args(args);
+  }
+
+  /**
+   * Returns the class name of a function implementation. Only called by tests.
+   * @return class name
+   */
+  default String className() {
+    return Util.className(definition().supplier.get().getClass());
   }
 }
