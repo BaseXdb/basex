@@ -250,4 +250,50 @@ public final class ValidateModuleTest extends SandboxTest {
     final Function func = _VALIDATE_XSD_VERSION;
     assertFalse(query(func.args()).isEmpty());
   }
+
+  /** Test RelaxNG schema validation with compact syntax */
+  @Test public void rngCompact() {
+    query(
+      // language=xquery
+      "let $doc := <book><page>This is page one.</page><page>This is page two.</page></book>\n" +
+      "let $schema := 'element book { element page { text }+ }'\n" +
+      "return validate:rng($doc, $schema, true())", "");
+  }
+
+  /** Test RelaxNG schema validation with compact syntax */
+  @Test public void rngXml() {
+    query(
+      // language=xquery
+      "let $doc := <book><page>This is page one.</page><page>This is page two.</page></book>\n" +
+      "let $schema := <element name=\"book\" xmlns=\"http://relaxng.org/ns/structure/1.0\">" +
+      "   <oneOrMore>" +
+      "      <element name=\"page\">" +
+      "         <text/>" +
+      "      </element>" +
+      "   </oneOrMore>" +
+      "</element>\n" +
+      "return validate:rng($doc, $schema)", "");
+  }
+
+  /** Test RelaxNG schema validation report */
+  @Test public void rngReport() {
+    query(
+      // language=xquery
+      "let $doc := <book><page>This is page one.</page><page2/></book>\n" +
+      "let $schema := 'element book { element page { text }+ }'\n" +
+      "let $report := validate:rng-report($doc, $schema, true())" +
+      "return $report/status/text()", "invalid");
+  }
+
+  /** Test RelaxNG schema validation info */
+  @Test public void rngInfo() {
+    query(
+      // language=xquery
+      "let $doc := <book><page>This is page one.</page><page2/></book>\n" +
+      "let $schema := 'element book { element page { text }+ }'\n" +
+      "return validate:rng-info($doc, $schema, true())",
+      "3:11: element \"page2\" not allowed anywhere; expected the element end-tag or element \"page\"");
+  }
+
+
 }
