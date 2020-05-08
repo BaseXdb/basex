@@ -6,7 +6,6 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -98,25 +97,24 @@ public final class If extends Arr {
     if(st1.eq(SeqType.BLN_O) && st2.eq(SeqType.BLN_O)) {
       final Expr br1 = exprs[0], br2 = exprs[1];
       if(br1 == Bln.TRUE) {
-        // if(A) then true() else false()  ->  xs:boolean(A)
-        if(br2 == Bln.FALSE) return cc.replaceWith(this, FnBoolean.get(cond, info, cc.sc()));
-        // if(A) then true() else C  ->  A or C
-        return cc.replaceWith(this, new Or(info, cond, br2).optimize(cc));
+        return cc.replaceWith(this, br2 == Bln.FALSE ?
+          // if(A) then true() else false()  ->  xs:boolean(A)
+          cc.function(Function.BOOLEAN, info, cond) :
+          // if(A) then true() else C  ->  A or C
+          new Or(info, cond, br2).optimize(cc));
       }
 
       if(br2 == Bln.TRUE) {
+        return cc.replaceWith(this, br1 == Bln.FALSE ?
         // if(A) then false() else true()  ->  not(A)
-        if(br1 == Bln.FALSE) return cc.replaceWith(this, cc.function(Function.NOT, info, cond));
+        cc.function(Function.NOT, info, cond) :
         // if(A) then B else true()  ->  not(A) or B
-        final Expr expr = new Or(info, cc.function(Function.NOT, info, cond), br1).optimize(cc);
-        return cc.replaceWith(this, expr);
+        new Or(info, cc.function(Function.NOT, info, cond), br1).optimize(cc));
       }
 
       // if(A) then false() else C  ->  not(A) and C
-      if(br1 == Bln.FALSE) {
-        final Expr expr = new And(info, cc.function(Function.NOT, info, cond), br2).optimize(cc);
-        return cc.replaceWith(this, expr);
-      }
+      if(br1 == Bln.FALSE) return cc.replaceWith(this,
+          new And(info, cc.function(Function.NOT, info, cond), br2).optimize(cc));
 
       // if(A) then B else false()  ->  A and B
       if(br2 == Bln.FALSE) return cc.replaceWith(this, new And(info, cond, br1).optimize(cc));

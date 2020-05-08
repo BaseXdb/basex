@@ -1098,11 +1098,11 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Merge fn:empty and fn:exist functions. */
   @Test public void gh1829() {
     check("exists(<a/>/a) or exists(<b/>/b)", false,
-        root(BOOLEAN), empty(Or.class), empty(EXISTS), exists(Union.class));
+        root(EXISTS), empty(Or.class), empty(BOOLEAN), exists(Union.class));
     check("for $i in 1 to 2 return exists($i[. = 1]) or exists($i[. = 2])", "true\ntrue",
         empty(Or.class), count(EXISTS, 1));
 
-    check("<a/>/a or <b/>/b", false, root(BOOLEAN), empty(Or.class), exists(Union.class));
+    check("<a/>/a or <b/>/b", false, root(EXISTS), empty(Or.class), exists(Union.class));
     check("<a/>[a or b]", "", empty(Or.class), count(SingleIterPath.class, 1));
 
     check("<a/>[empty(b)][empty(c)]", "<a/>", count(EMPTY, 1), count(SingleIterPath.class, 1));
@@ -1322,5 +1322,10 @@ public final class RewritingsTest extends QueryPlanTest {
     execute(new CreateDB(NAME, "<a><b c='d'>e</b></a>"));
     check("count(let $e := 'e' let $f := a[b[@c = 'd'] = $e] return $f)", 1,
         exists(ValueAccess.class));
+  }
+
+  /** . */
+  @Test public void gh1856() {
+    check("if(<a/>/text()) then true() else false()", false, root(EXISTS));
   }
 }

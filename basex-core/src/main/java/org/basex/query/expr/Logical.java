@@ -2,7 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.func.fn.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -66,7 +66,7 @@ abstract class Logical extends Arr {
 
     final int el = exprs.length;
     if(el == 0) return Bln.get(!or);
-    if(el == 1) return FnBoolean.get(exprs[0], info, cc.sc());
+    if(el == 1) return cc.function(Function.BOOLEAN, info, exprs);
     return this;
   }
 

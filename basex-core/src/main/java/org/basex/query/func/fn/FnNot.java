@@ -26,17 +26,12 @@ public final class FnNot extends StandardFunc {
     final Expr expr = exprs[0].simplifyFor(Simplify.EBV, cc);
 
     // not(empty(A))  ->  exists(A)
-    if(Function.EMPTY.is(expr)) {
-      return cc.function(Function.EXISTS, info, args(expr));
-    }
+    if(Function.EMPTY.is(expr)) return cc.function(Function.EXISTS, info, args(expr));
     // not(exists(A))  ->  empty(A)
-    if(Function.EXISTS.is(expr)) {
-      return cc.function(Function.EMPTY, info, args(expr));
-    }
+    if(Function.EXISTS.is(expr)) return cc.function(Function.EMPTY, info, args(expr));
     // not(not(A))  ->  boolean(A)
-    if(Function.NOT.is(expr)) {
-      return FnBoolean.get(args(expr)[0], info, cc.sc());
-    }
+    if(Function.NOT.is(expr)) return cc.function(Function.BOOLEAN, info, args(expr));
+
     // not('a' = 'b')  ->  'a' != 'b'
     if(expr instanceof Cmp) {
       final Expr ex = ((Cmp) expr).invert(cc);

@@ -6,7 +6,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.gflwor.*;
-import org.basex.query.func.fn.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -36,7 +36,7 @@ public final class Quantifier extends Single {
   public Quantifier(final InputInfo info, final For[] inputs, final Expr satisfier,
       final boolean every, final StaticContext sc) {
     this(info, new GFLWOR(info, new LinkedList<>(Arrays.asList(inputs)),
-        FnBoolean.get(satisfier, info, sc)), every);
+        Function.BOOLEAN.get(sc, info, satisfier)), every);
   }
 
   /**

@@ -22,15 +22,15 @@ public final class FnBoolean extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // e.g.: boolean(exists(<a/>))  ->  boolean(<a/>)
+    // boolean(exists(<a/>))  ->  boolean(<a/>)
     final Expr expr = exprs[0].simplifyFor(Simplify.EBV, cc);
 
-    // boolean($node/text())  ->  exists($node/text())
+    // boolean(true()))  ->  true()
     final SeqType st = expr.seqType();
-    if(st.type instanceof NodeType) return cc.function(Function.EXISTS, info, expr);
-
-    // simplify, e.g.: boolean(true()))  ->  true()
     if(st.eq(SeqType.BLN_O)) return expr;
+
+    // boolean($node/text())  ->  exists($node/text())
+    if(st.type instanceof NodeType) return cc.function(Function.EXISTS, info, expr);
 
     exprs[0] = expr;
     return this;
@@ -44,18 +44,5 @@ public final class FnBoolean extends StandardFunc {
       if(!expr.seqType().mayBeNumber()) return cc.simplify(this, expr);
     }
     return this;
-  }
-
-  /**
-   * Returns a boolean equivalent for the specified expression.
-   * If the specified expression yields a boolean value anyway, it will be
-   * returned as is. Otherwise, it will be wrapped into a boolean function.
-   * @param expr expression to be rewritten
-   * @param ii input info
-   * @param sc static context
-   * @return expression
-   */
-  public static Expr get(final Expr expr, final InputInfo ii, final StaticContext sc) {
-    return expr.seqType().eq(SeqType.BLN_O) ? expr : Function.BOOLEAN.get(sc, ii, expr);
   }
 }
