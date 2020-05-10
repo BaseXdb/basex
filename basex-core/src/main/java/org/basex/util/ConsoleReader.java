@@ -79,20 +79,9 @@ public abstract class ConsoleReader implements AutoCloseable, PasswordReader {
   /** Implementation which provides advanced features, such as history. */
   private static class JLineConsoleReader extends ConsoleReader {
     /** JLine console reader class name. */
-    private static final String JLINE_CONSOLE_READER = "jline.console.ConsoleReader";
-    /** JLine file history class name. */
-    private static final String JLINE_FILE_HISTORY = "jline.console.history.FileHistory";
-    /** JLine history class name. */
-    private static final String JLINE_HISTORY = "jline.console.history.History";
-    /** JLine history class name. */
-    private static final String JLINE_COMPLETER = "jline.console.completer.Completer";
-    /** JLine history class name. */
-    private static final String JLINE_ENUM_COMPLETER = "jline.console.completer.EnumCompleter";
-    /** JLine history class name. */
-    private static final String JLINE_FILE_NAME_COMPLETER =
-        "jline.console.completer.FileNameCompleter";
+    private static final String JLINE_CONSOLE_READER = "org.jline.reader.LineReader";
     /** Command history file. */
-    private static final String HISTORY_FILE = IO.BASEXSUFFIX + "history";
+    private static final File HISTORY_FILE = new File(Prop.HOMEDIR, IO.BASEXSUFFIX + "history");
     /** Password echo character. */
     private static final Character PASSWORD_ECHO = (char) 0;
 
@@ -102,9 +91,6 @@ public abstract class ConsoleReader implements AutoCloseable, PasswordReader {
     private final Method readEcho;
     /** Implementation. */
     private final Object reader;
-
-    /** File history. */
-    private final Flushable fileHistory;
 
     /**
      * Checks if JLine implementation is available?
@@ -120,37 +106,40 @@ public abstract class ConsoleReader implements AutoCloseable, PasswordReader {
      */
     JLineConsoleReader() throws Exception {
       // reflection
-      final Class<?> readerC = Reflect.find(JLINE_CONSOLE_READER);
-      readLine = Reflect.method(readerC, "readLine", String.class);
-      readEcho = Reflect.method(readerC, "readLine", String.class, Character.class);
+      // not usig org.basex.util.Reflect, since there is no need to cache the Class objects
+      // normally, there is only one instance of JLineConsoleReader.
+      final Class<?> readerC = Class.forName(JLINE_CONSOLE_READER);
+      readLine = readerC.getMethod("readLine", String.class);
+      readEcho = readerC.getMethod("readLine", String.class, Character.class);
 
-      // initialization
-      reader = readerC.getDeclaredConstructor().newInstance();
+      final Class<?> completerC = Class.forName("org.jline.reader.Completer");
+      final Object enumCompleter = Class.forName("org.jline.reader.impl.completer.EnumCompleter")
+        .getDeclaredConstructor(Class.class)
+        .newInstance(Cmd.class);
+      final Object fileCompleter = Class.forName("org.jline.reader.impl.completer.FileNameCompleter")
+        .getDeclaredConstructor()
+        .newInstance();
+      final Object completers = java.lang.reflect.Array.newInstance(completerC, 2);
+      java.lang.reflect.Array.set(completers, 0, enumCompleter);
+      java.lang.reflect.Array.set(completers, 1, fileCompleter);
+      final Object completer = Class.forName("org.jline.reader.impl.completer.AggregateCompleter")
+        .getDeclaredConstructor(Class.forName("[Lorg.jline.reader.Completer;"))
+        .newInstance(completers);
 
-      final Class<?> history = Reflect.find(JLINE_HISTORY);
-      @SuppressWarnings("unchecked")
-      final Class<? extends Flushable> fileHistoryC = (Class<? extends Flushable>)
-          Reflect.find(JLINE_FILE_HISTORY);
-      fileHistory = Reflect.get(Reflect.find(fileHistoryC, File.class),
-          new File(Prop.HOMEDIR, HISTORY_FILE));
+      final Class<?> builderC = Class.forName("org.jline.reader.LineReaderBuilder");
+      final Method builderVariable = builderC.getMethod("variable", String.class, Object.class);
+      final Method builderCompleter = builderC.getMethod("completer", completerC);
 
-      final Class<?> completer = Reflect.find(JLINE_COMPLETER);
-      final Class<?> enumCompleter = Reflect.find(JLINE_ENUM_COMPLETER);
-      final Class<?> fileNameCompleter = Reflect.find(JLINE_FILE_NAME_COMPLETER);
+      final Object readerBuilder = builderC.getMethod("builder").invoke(null);
+      builderCompleter.invoke(readerBuilder, completer);
+      builderVariable.invoke(readerBuilder, "bell-style", "off");
+      builderVariable.invoke(readerBuilder, "history-file", HISTORY_FILE);
 
-      Reflect.invoke(Reflect.method(readerC, "setBellEnabled", boolean.class), reader, false);
-      Reflect.invoke(Reflect.method(readerC, "setHistory", history), reader, fileHistory);
-      Reflect.invoke(Reflect.method(readerC, "setHistoryEnabled", boolean.class), reader, true);
-
-      // command completions
-      Reflect.invoke(Reflect.method(readerC, "addCompleter", completer), reader,
-          Reflect.get(Reflect.find(enumCompleter, Class.class), Cmd.class));
-      Reflect.invoke(Reflect.method(readerC, "addCompleter", completer), reader,
-          Reflect.get(Reflect.find(fileNameCompleter)));
+      reader = builderC.getMethod("build").invoke(readerBuilder);
     }
 
     @Override
-    public String readLine(final String prompt) {
+    public String readLine(String prompt) {
       return (String) Reflect.invoke(readLine, reader, prompt);
     }
 
@@ -162,8 +151,9 @@ public abstract class ConsoleReader implements AutoCloseable, PasswordReader {
     @Override
     public void close() {
       try {
-        fileHistory.flush();
-      } catch(final IOException ex) {
+        final Object history = reader.getClass().getMethod("getHistory").invoke(reader);
+        history.getClass().getMethod("save").invoke(history);
+      } catch (final Exception ex) {
         Util.debug(ex);
       }
     }

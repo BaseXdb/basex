@@ -47,8 +47,8 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>jline</groupId>
-      <artifactId>jline</artifactId>
+      <groupId>org.jline</groupId>
+      <artifactId>jline-reader</artifactId>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -113,4 +113,21 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>win</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.jline</groupId>
+          <artifactId>jline-terminal-jansi</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 </project>
