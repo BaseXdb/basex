@@ -407,7 +407,8 @@ public final class FTWords extends FTExpr {
 
     // estimate costs if text is not known at compile time
     if(inputs == null) {
-      ii.costs = data == null ? null : IndexCosts.get(Math.max(2, data.meta.size / 30));
+      ii.costs = ii.enforce() ? IndexCosts.ENFORCE_DYNAMIC :
+        IndexCosts.get(Math.max(2, data.meta.size / 30));
     } else {
       // summarize number of hits; break loop if no hits are expected
       ii.costs = IndexCosts.ZERO;

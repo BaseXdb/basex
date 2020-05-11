@@ -16,6 +16,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.list.*;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,6 +28,13 @@ import org.junit.jupiter.api.Test;
 public final class RewritingsTest extends QueryPlanTest {
   /** Input file. */
   private static final String FILE = "src/test/resources/input.xml";
+
+  /**
+   * Drops the database.
+   */
+  @AfterEach public void tearDown() {
+    execute(new DropDB(NAME));
+  }
 
   /** Checks if the count function is pre-compiled. */
   @Test public void preEval() {
@@ -1324,8 +1332,19 @@ public final class RewritingsTest extends QueryPlanTest {
         exists(ValueAccess.class));
   }
 
-  /** . */
+  /** Reoptimize newly created fn:boolean instances. */
   @Test public void gh1856() {
     check("if(<a/>/text()) then true() else false()", false, root(EXISTS));
+  }
+
+  /** Enforce index pragma, full-text. */
+  @Test public void gh1860() {
+    query(_DB_CREATE.args(NAME, " <_>a</_>", "_.xml", " map { 'ftindex': true() }"));
+    query("(# db:enforceindex #) {\n" +
+      "  let $t := 'a'\n" +
+      "  for $db in '" + NAME + "'\n" +
+      "  return db:open($db)/_[text() contains text { $t }]\n" +
+      "}",
+      "<_>a</_>");
   }
 }
