@@ -110,4 +110,14 @@ public final class FTPosData {
     }
     return true;
   }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    for(int p = 0; p < size; ++p) {
+      if(sb.length() > 0) sb.append('\n');
+      sb.append(pos[p]);
+    }
+    return sb.toString();
+  }
 }
