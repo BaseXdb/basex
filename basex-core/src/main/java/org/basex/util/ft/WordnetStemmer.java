@@ -30,12 +30,12 @@ final class WordnetStemmer extends Stemmer {
 
   static {
     // don't try to find the other classes if Dictionary is not found:
-    if(Reflect.available(PATTERN, "Dictionary")) {
+    final Class<?> dict = Reflect.find(PATTERN, "Dictionary");
+    if(dict == null) {
       CTR = null;
       FIND_STEMS = null;
       DICT = null;
     } else {
-      final Class<?> dict = Reflect.find(PATTERN, "Dictionary");
       final Class<?> wn = Reflect.find(PATTERN, "morph.WordnetStemmer");
       CTR = Reflect.find(wn, Reflect.find(PATTERN, "IDictionary"));
       FIND_STEMS = Reflect.method(wn, "findStems", String.class);
