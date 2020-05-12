@@ -47,7 +47,7 @@ public final class List extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    flatten(cc, List.class);
+    flatten(cc);
 
     // remove empty sequences
     final ExprList list = new ExprList(exprs.length);

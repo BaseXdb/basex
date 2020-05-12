@@ -75,10 +75,49 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
-  public final Expr optimize(final CompileContext cc) throws QueryException {
-    flatten(cc, IterMap.class);
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    // flatten nested expressions (unless result needs to be cached)
+    final ExprList list = new ExprList(exprs.length);
+    for(final Expr expr : exprs) {
+      if(expr instanceof SimpleMap && !(expr instanceof CachedMap)) {
+        list.add(((SimpleMap) expr).exprs);
+        cc.info(OPTFLAT_X_X, expr, (Supplier<?>) this::description);
+      } else {
+        list.add(expr);
+      }
+    }
+    if(list.size() != exprs.length) return SimpleMap.get(info, list.finish()).optimize(cc);
+    exprs = list.next();
 
-    final boolean item = size(cc);
+    // determine type, result size, find expressions that will never be evaluated
+    long min = 1, max = 1;
+    boolean item = true;
+    for(final Expr expr : exprs) {
+      // no results: skip evaluation of remaining expressions
+      if(max == 0) break;
+      list.add(expr);
+      final long es = expr.size();
+      if(es == 0) {
+        min = 0;
+        max = 0;
+      } else if(es > 0) {
+        min *= es;
+        if(max != -1) max *= es;
+        if(es > 1) item = false;
+      } else {
+        final Occ o = expr.seqType().occ;
+        if(o.min == 0) min = 0;
+        if(o.max > 1) {
+          max = -1;
+          item = false;
+        }
+      }
+    }
+    if(exprs.length != list.size()) {
+      exprs = list.finish();
+      cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
+    }
+    exprType.assign(exprs[exprs.length - 1].seqType().type, new long[] { min, max });
 
     // simplify static expressions
     int e = 0;
@@ -178,44 +217,6 @@ public abstract class SimpleMap extends Arr {
   @Override
   public Data data() {
     return exprs[exprs.length - 1].data();
-  }
-
-  /**
-   * Computes the result size.
-   * @param cc compilation context
-   * @return item-based evaluation
-   */
-  private boolean size(final CompileContext cc) {
-    final ExprList list = new ExprList(exprs.length);
-    long min = 1, max = 1;
-    boolean item = true;
-    for(final Expr expr : exprs) {
-      // no results: skip evaluation of remaining expressions
-      if(max == 0) break;
-      list.add(expr);
-      final long es = expr.size();
-      if(es == 0) {
-        min = 0;
-        max = 0;
-      } else if(es > 0) {
-        min *= es;
-        if(max != -1) max *= es;
-        if(es > 1) item = false;
-      } else {
-        final Occ o = expr.seqType().occ;
-        if(o.min == 0) min = 0;
-        if(o.max > 1) {
-          max = -1;
-          item = false;
-        }
-      }
-    }
-    if(exprs.length != list.size()) {
-      exprs = list.finish();
-      cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
-    }
-    exprType.assign(exprs[exprs.length - 1].seqType().type, new long[] { min, max });
-    return item;
   }
 
   /**

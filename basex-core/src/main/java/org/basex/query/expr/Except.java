@@ -35,30 +35,37 @@ public final class Except extends Set {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    final Type type = exprs[0].seqType().type;
-    if(type instanceof NodeType) exprType.assign(type);
+  Expr opt(final CompileContext cc) throws QueryException {
+    // first operand is empty: return empty sequence
+    if(exprs[0] == Empty.VALUE) return cc.emptySeq(this);
 
-    final ExprList list = new ExprList(exprs.length);
-    for(final Expr expr : exprs) {
-      if(expr == Empty.VALUE) {
-        // remove empty operands (return empty sequence if first value is empty)
-        if(list.isEmpty()) return cc.emptySeq(this);
-        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-      } else if(expr.seqType().type instanceof NodeType && !expr.has(Flag.CNS, Flag.NDT)) {
-        final int same = ((Checks<Expr>) ex -> ex.equals(expr)).index(list);
-        // identical to first operand: return empty sequence
-        // example: text() except text()  ->  ()
-        if(same == 0) return cc.emptySeq(this);
-        // identical to subsequent operand: remove duplicate
-        // example: node() except * except *  ->  node() except *
-        if(same > 0) cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-        else list.add(expr);
-      } else {
-        list.add(expr);
+    // determine type
+    final Type type = exprs[0].seqType().type;
+
+    // skip optimizations if operands do not have the correct type
+    if(type instanceof NodeType) {
+      exprType.assign(type);
+
+      final ExprList list = new ExprList(exprs.length);
+      for(final Expr expr : exprs) {
+        if(expr == Empty.VALUE) {
+          // ignore empty operands
+          cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+        } else if(!expr.has(Flag.CNS, Flag.NDT)) {
+          final int same = ((Checks<Expr>) ex -> ex.equals(expr)).index(list);
+          // identical to first operand: return empty sequence
+          // example: text() except text()  ->  ()
+          if(same == 0) return cc.emptySeq(this);
+          // identical to subsequent operand: remove duplicate
+          // example: node() except * except *  ->  node() except *
+          if(same > 0) cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+          else list.add(expr);
+        } else {
+          list.add(expr);
+        }
       }
+      exprs = list.finish();
     }
-    exprs = list.finish();
     return null;
   }
 
@@ -72,7 +79,7 @@ public final class Except extends Set {
   }
 
   @Override
-  protected Value nodes(final QueryContext qc) throws QueryException {
+  Value nodes(final QueryContext qc) throws QueryException {
     final ANodeBuilder nodes = new ANodeBuilder();
     Iter iter = exprs[0].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) nodes.add(toNode(item));
@@ -87,7 +94,7 @@ public final class Except extends Set {
   }
 
   @Override
-  protected NodeIter iterate(final QueryContext qc) throws QueryException {
+  NodeIter iterate(final QueryContext qc) throws QueryException {
     return new SetIter(qc, iters(qc)) {
       @Override
       public ANode next() throws QueryException {

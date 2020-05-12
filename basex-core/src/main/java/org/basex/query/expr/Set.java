@@ -60,7 +60,7 @@ abstract class Set extends Arr {
    * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
-  protected abstract Expr opt(CompileContext cc) throws QueryException;
+  abstract Expr opt(CompileContext cc) throws QueryException;
 
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
@@ -78,7 +78,7 @@ abstract class Set extends Arr {
    * @return iterators
    * @throws QueryException query exception
    */
-  Iter[] iters(final QueryContext qc) throws QueryException {
+  final Iter[] iters(final QueryContext qc) throws QueryException {
     final int el = exprs.length;
     final Iter[] iters = new Iter[el];
     for(int e = 0; e < el; e++) iters[e] = exprs[e].iter(qc);
@@ -91,7 +91,7 @@ abstract class Set extends Arr {
    * @return resulting node list
    * @throws QueryException query exception
    */
-  protected abstract Value nodes(QueryContext qc) throws QueryException;
+  abstract Value nodes(QueryContext qc) throws QueryException;
 
   /**
    * Evaluates the specified iterators in an iterative manner.
@@ -99,7 +99,7 @@ abstract class Set extends Arr {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  protected abstract Iter iterate(QueryContext qc) throws QueryException;
+  abstract Iter iterate(QueryContext qc) throws QueryException;
 
   /**
    * Tries to merge paths.

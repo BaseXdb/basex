@@ -155,11 +155,11 @@ public abstract class Arr extends ParseExpr {
   /**
    * Flattens nested expressions.
    * @param cc compilation context
-   * @param clazz expressions to be flattened
    */
-  protected void flatten(final CompileContext cc, final Class<? extends Arr> clazz) {
+  protected void flatten(final CompileContext cc) {
     // flatten nested expressions
     final ExprList list = new ExprList(exprs.length);
+    final Class<? extends Arr> clazz = getClass();
     for(final Expr expr : exprs) {
       if(clazz.isInstance(expr)) {
         list.add(((Arr) expr).exprs);
@@ -192,7 +192,7 @@ public abstract class Arr extends ParseExpr {
    * @return {@code true} if evaluation can be skipped
    * @throws QueryException query exception
    */
-  public boolean optimizeEbv(final boolean or, final boolean positional, final CompileContext cc)
+  boolean optimizeEbv(final boolean or, final boolean positional, final CompileContext cc)
       throws QueryException {
 
     final ExprList list = new ExprList(exprs.length);
@@ -215,10 +215,13 @@ public abstract class Arr extends ParseExpr {
     }
     exprs = list.next();
 
-    if(exprs.length > 1 && !(positional && has(Flag.POS))) {
-      final Expr[] tmp = rewriteEbv(or, cc);
+    if(!(positional && has(Flag.POS))) {
+      final Class<? extends Arr> clazz = or ? And.class : Or.class;
+      final QueryBiFunction<Boolean, Expr[], Expr> func = (invert, args) ->
+        ((invert ? !or : or) ? new Or(info, args) : new And(info, args)).optimize(cc);
+      final Expr tmp = rewrite(clazz, func);
       if(tmp != null) {
-        exprs = tmp;
+        exprs = new Expr[] { tmp };
         cc.info(OPTREWRITE_X_X, (Supplier<?>) this::description, this);
       }
     }
@@ -258,19 +261,22 @@ public abstract class Arr extends ParseExpr {
   }
 
   /**
-   * Rewrites EBV expressions.
-   * @param or union or intersection
-   * @param cc compilation context
-   * @return new expressions or null
+   * Rewrites logical and set expressions.
+   * @param inverse inverse operator
+   * @param newExpr function for creating a new expression
+   * @return optimized expression or null
    * @throws QueryException query exception
    */
-  private Expr[] rewriteEbv(final boolean or, final CompileContext cc) throws QueryException {
-    final Class<? extends Logical> clazz = or ? And.class : Or.class;
-    if(!((Checks<Expr>) expr -> clazz.isInstance(expr)).any(exprs)) return null;
+  Expr rewrite(final Class<? extends Arr> inverse,
+      final QueryBiFunction<Boolean, Expr[], Expr> newExpr) throws QueryException {
 
-    // check if common tests exists
+    // skip if only one operand is left, or if children have no operands that can be optimized
+    if(exprs.length < 2 || !((Checks<Expr>) expr -> inverse.isInstance(expr)).any(exprs))
+      return null;
+
+    // check if expressions have common operands
     final Function<Expr, ExprList> entries = ex ->
-      new ExprList().add(clazz.isInstance(ex) ? ((Logical) ex).exprs : new Expr[] { ex });
+      new ExprList().add(inverse.isInstance(ex) ? ((Arr) ex).exprs : new Expr[] { ex });
     final int el = exprs.length;
     final ExprList lefts = new ExprList().add(entries.apply(exprs[0]));
     for(int e = 1; e < el && !lefts.isEmpty(); ++e) {
@@ -281,27 +287,30 @@ public abstract class Arr extends ParseExpr {
     }
     if(lefts.isEmpty()) return null;
 
-    final Expr left = Logical.get(!or, info, lefts.toArray()).optimize(cc);
+    // common operands found: recombine expressions
+    final QueryBiFunction<Boolean, Expr[], Expr> f = (invert, args) ->
+      args.length == 1 ? args[0] : newExpr.apply(invert, args);
+
+    final Expr left = f.apply(true, lefts.toArray());
     final ExprList rights = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       final ExprList curr = entries.apply(expr).removeAll(lefts);
       if(curr.isEmpty()) {
         // no additional tests: return common tests
-        // A and (A or B)  ->  A
+        // A intersect (A union B)  ->  A
         // (A and B) or (A and B and C)  ->  A
-        return new Expr[] { left };
+        return left;
       } else if(curr.size() == 1) {
         // single additional test: add this test
         // (A and B) or (A and C)  ->  A and (B or C)
         rights.add(curr.get(0));
       } else {
-        // multiple additional tests: simplify logical expression
+        // multiple additional tests: simplify expression
         // (A and B) or (A and C and D)  ->  A and (B or (C and D))
-        rights.add(Logical.get(!or, info, curr.finish()).optimize(cc));
+        rights.add(f.apply(true, curr.finish()));
       }
     }
-    final Expr right = Logical.get(or, info, rights.finish()).optimize(cc);
-    return new Expr[] { Logical.get(!or, info, left, right).optimize(cc) };
+    return f.apply(true, new Expr[] { left, f.apply(false, rights.finish()) });
   }
 
   /**

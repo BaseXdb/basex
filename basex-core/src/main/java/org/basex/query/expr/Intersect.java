@@ -34,30 +34,42 @@ public final class Intersect extends Set {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  Expr opt(final CompileContext cc) throws QueryException {
+    flatten(cc);
+
+    // determine type
     Type type = null;
     for(final Expr expr : exprs) {
-      final Type type2 = expr.seqType().type;
+      final SeqType st = expr.seqType();
+      final Type type2 = st.zero() ? NodeType.NOD : st.type;
       type = type == null ? type2 : type.intersect(type2);
     }
-    if(type instanceof NodeType) exprType.assign(type);
 
-    flatten(cc, Intersect.class);
+    // skip optimizations if operands do not have the correct type
+    if(type instanceof NodeType) {
+      exprType.assign(type);
 
-    final ExprList list = new ExprList(exprs.length);
-    for(final Expr expr : exprs) {
-      if(expr == Empty.VALUE) {
-        // remove empty operands: * intersect ()  ->  ()
-        return cc.emptySeq(this);
-      } else if(expr.seqType().type instanceof NodeType && !expr.has(Flag.CNS, Flag.NDT) &&
-          list.contains(expr)) {
-        // remove duplicates: * intersect *  ->  *
-        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-      } else {
-        list.add(expr);
+      final ExprList list = new ExprList(exprs.length);
+      for(final Expr expr : exprs) {
+        if(expr == Empty.VALUE) {
+          // remove empty operands: * intersect ()  ->  ()
+          return cc.emptySeq(this);
+        } else if(!expr.has(Flag.CNS, Flag.NDT) && list.contains(expr)) {
+          // remove duplicates: * intersect *  ->  *
+          cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+        } else {
+          list.add(expr);
+        }
+      }
+      exprs = list.finish();
+
+      final Expr ex = rewrite(Union.class, (invert, ops) ->
+        (invert ? new Union(info, ops) : new Intersect(info, ops)).optimize(cc));
+      if(ex != null) {
+        cc.info(OPTREWRITE_X_X, (Supplier<?>) this::description, ex);
+        return ex;
       }
     }
-    exprs = list.finish();
     return null;
   }
 
@@ -67,7 +79,7 @@ public final class Intersect extends Set {
   }
 
   @Override
-  protected Value nodes(final QueryContext qc) throws QueryException {
+  Value nodes(final QueryContext qc) throws QueryException {
     ANodeBuilder nodes = new ANodeBuilder();
     Iter iter = exprs[0].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) nodes.add(toNode(item));
@@ -87,7 +99,7 @@ public final class Intersect extends Set {
   }
 
   @Override
-  protected NodeIter iterate(final QueryContext qc) throws QueryException {
+  NodeIter iterate(final QueryContext qc) throws QueryException {
     return new SetIter(qc, iters(qc)) {
       @Override
       public ANode next() throws QueryException {

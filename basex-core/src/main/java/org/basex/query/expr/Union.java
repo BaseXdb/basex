@@ -34,28 +34,43 @@ public final class Union extends Set {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  Expr opt(final CompileContext cc) throws QueryException {
+    flatten(cc);
+
+    // determine type
     Type type = null;
     for(final Expr expr : exprs) {
-      final Type type2 = expr.seqType().type;
-      type = type == null ? type2 : type.union(type2);
-    }
-    if(type instanceof NodeType) exprType.assign(type);
-
-    flatten(cc, Union.class);
-
-    final ExprList list = new ExprList(exprs.length);
-    for(final Expr expr : exprs) {
-      if(expr == Empty.VALUE || expr.seqType().type instanceof NodeType &&
-          list.contains(expr) && !expr.has(Flag.CNS, Flag.NDT)) {
-        // remove empty operands: * union ()  ->  *
-        // remove duplicates: * union *  ->  *
-        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-      } else {
-        list.add(expr);
+      final SeqType st = expr.seqType();
+      if(!st.zero()) {
+        final Type type2 = expr.seqType().type;
+        type = type == null ? type2 : type.union(type2);
       }
     }
-    exprs = list.finish();
+    if(type == null) type = NodeType.NOD;
+
+    // skip optimizations if operands do not have the correct type
+    if(type instanceof NodeType) {
+      exprType.assign(type);
+
+      final ExprList list = new ExprList(exprs.length);
+      for(final Expr expr : exprs) {
+        if(expr == Empty.VALUE || list.contains(expr) && !expr.has(Flag.CNS, Flag.NDT)) {
+          // remove empty operands: * union ()  ->  *
+          // remove duplicates: * union *  ->  *
+          cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+        } else {
+          list.add(expr);
+        }
+      }
+      exprs = list.finish();
+
+      final Expr ex = rewrite(Intersect.class, (invert, ops) ->
+        (invert ? new Intersect(info, ops) : new Union(info, ops)).optimize(cc));
+      if(ex != null) {
+        cc.info(OPTREWRITE_X_X, (Supplier<?>) this::description, ex);
+        return ex;
+      }
+    }
     return null;
   }
 
@@ -65,7 +80,7 @@ public final class Union extends Set {
   }
 
   @Override
-  protected Value nodes(final QueryContext qc) throws QueryException {
+  Value nodes(final QueryContext qc) throws QueryException {
     final ANodeBuilder nodes = new ANodeBuilder();
     for(final Expr expr : exprs) {
       final Iter iter = expr.iter(qc);
@@ -75,7 +90,7 @@ public final class Union extends Set {
   }
 
   @Override
-  protected NodeIter iterate(final QueryContext qc) throws QueryException {
+  NodeIter iterate(final QueryContext qc) throws QueryException {
     return new SetIter(qc, iters(qc)) {
       @Override
       public ANode next() throws QueryException {

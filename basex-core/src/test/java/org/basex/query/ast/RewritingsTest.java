@@ -1190,6 +1190,68 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_/>/(<b/>[*] union <c/>[*])", "", exists(Union.class));
   }
 
+  /** Logical expressions, DNFs/CNFs. */
+  @Test public void gh1839() {
+    // no rewriting
+    check(gh1839("$a or $b"), "fttt",
+        count(And.class, 0), count(Or.class, 1));
+    // no rewriting
+    check(gh1839("$a and $b"), "ffft",
+        count(And.class, 1), count(Or.class, 0));
+
+    // optimized: $a
+    check(gh1839("$a or ($a and $b)"), "fftt",
+        count(And.class, 0), count(Or.class, 0));
+    // optimized: $a
+    check(gh1839("$a and ($a or $b)"), "fftt",
+        count(And.class, 0), count(Or.class, 0));
+
+    // optimized: $a and ($b or $c)
+    check(gh1839("($a and $b) or ($a and $c)"), "fffffttt",
+        count(And.class, 1), count(Or.class, 1));
+    // optimized: $a or ($b and $c)
+    check(gh1839("($a or $b) and ($a or $c)"), "fffttttt",
+        count(And.class, 1), count(Or.class, 1));
+
+    // optimized: $a or ($b and ($c or $d))
+    check(gh1839("($a or $b) and ($a or $c or $d)"), "fffffttttttttttt",
+        count(And.class, 1), count(Or.class, 2));
+    // optimized: $a and ($b or ($c and $d))
+    check(gh1839("($a and $b) or ($a and $c and $d)"), "fffffffffffttttt",
+        count(And.class, 2), count(Or.class, 1));
+
+    // optimized: $a and $b
+    check(gh1839("($a and $b) or ($a and $b and $c)"), "fffffftt",
+        count(And.class, 1), count(Or.class, 0));
+    // optimized: $a or $b
+    check(gh1839("($a or $b) and ($a or $b or $c)"), "fftttttt",
+        count(And.class, 0), count(Or.class, 1));
+  }
+
+  /**
+   * Creates a query that concatenates booleans in a string.
+   * @param query query string
+   * @return query
+   */
+  private static String gh1839(final String query) {
+    // extract variable names from query
+    final StringList vars = new StringList();
+    for(final String var : query.split("\\$")) {
+      if(var.isEmpty()) continue;
+      final char ch = var.charAt(0);
+      if(Character.isLetter(ch)) vars.addUnique(String.valueOf(ch));
+    }
+
+    // generate query string with FLWOR expression
+    final StringBuilder sb = new StringBuilder();
+    sb.append("string-join(\n");
+    for(final String var : vars) {
+      sb.append("  for $").append(var).append(" in (false(), true())\n");
+    }
+    sb.append("  return if(").append(query).append(") then 't' else 'f'\n");
+    return sb.append(")").toString();
+  };
+
   /** Combine position predicates. */
   @Test public void gh1840() {
     check("(1,2,3)[position() = 1 or position() = 1]", 1, root(Int.class));
@@ -1255,32 +1317,52 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>/*[self::b][true()]", "", count(IterPath.class, 1), empty(SingleIterPath.class));
   }
 
-  /** Logical and set expressions, DNFs/CNFs. */
-  @Test public void gh1839() {
-    check(joinBooleans("$a or $b"), "fttt",
-        count(And.class, 0), count(Or.class, 1));
-    check(joinBooleans("$a and $b"), "ffft",
-        count(And.class, 1), count(Or.class, 0));
+  /** Name tests in where clauses, index rewritings. */
+  @Test public void gh1851() {
+    check("for $c in 1 to 10 return $c[. = 1]", 1, root(IterFilter.class));
 
-    check(joinBooleans("$a or ($a and $b)"), "fftt",
-        count(And.class, 0), count(Or.class, 0));
-    check(joinBooleans("$a and ($a or $b)"), "fftt",
-        count(And.class, 0), count(Or.class, 0));
+    // do not rewrite positional tests and variable references in predicates
+    check("for $c in 1 to 10 return $c[.]", 1, root(GFLWOR.class));
+    check("for $c in 1 to 10 return $c[position() = <_>2</_>]", "", root(GFLWOR.class));
+    check("for $c in 1 to 10 return $c[$c]", 1, root(GFLWOR.class));
+  }
 
-    check(joinBooleans("($a and $b) or ($a and $c)"), "fffffttt",
-        count(And.class, 1), count(Or.class, 1));
-    check(joinBooleans("($a or $b) and ($a or $c)"), "fffttttt",
-        count(And.class, 1), count(Or.class, 1));
+  /** Set expressions, DNFs/CNFs. */
+  @Test public void gh1852() {
+    // no rewriting
+    check(gh1852("$a() union $b()"),
+        "fttt", count(Intersect.class, 0), count(Union.class, 1));
+    // no rewriting
+    check(gh1852("$a() intersect $b()"),
+        "ffft", count(Intersect.class, 1), count(Union.class, 0));
 
-    check(joinBooleans("($a or $b) and ($a or $c or $d)"), "fffffttttttttttt",
-        count(And.class, 1), count(Or.class, 2));
-    check(joinBooleans("($a and $b) or ($a and $c and $d)"), "fffffffffffttttt",
-        count(And.class, 2), count(Or.class, 1));
+    // optimized: $a()
+    check(gh1852("$a() union ($a() intersect $b())"),
+        "fftt", count(Intersect.class, 0), count(Union.class, 0));
+    // optimized: $a()
+    check(gh1852("$a() intersect ($a() union $b())"),
+        "fftt", count(Intersect.class, 0), count(Union.class, 0));
 
-    check(joinBooleans("($a and $b) or ($a and $b and $c)"), "fffffftt",
-        count(And.class, 1), count(Or.class, 0));
-    check(joinBooleans("($a or $b) and ($a or $b or $c)"), "fftttttt",
-        count(And.class, 0), count(Or.class, 1));
+    // optimized: $a() intersect ($b() union $c)
+    check(gh1852("($a() intersect $b()) union ($a() intersect $c())"),
+        "fffffttt", count(Intersect.class, 1), count(Union.class, 1));
+    // optimized: $a() union ($b() intersect $c())
+    check(gh1852("($a() union $b()) intersect ($a() union $c())"),
+        "fffttttt", count(Intersect.class, 1), count(Union.class, 1));
+
+    // optimized: $a() union ($b() intersect ($c() union $d))
+    check(gh1852("($a() union $b()) intersect ($a() union $c() union $d())"),
+        "fffffttttttttttt", count(Intersect.class, 1), count(Union.class, 2));
+    // optimized: $a() intersect ($b() union ($c() intersect $d()))
+    check(gh1852("($a() intersect $b()) union ($a() intersect $c() intersect $d())"),
+        "fffffffffffttttt", count(Intersect.class, 2), count(Union.class, 1));
+
+    // optimized: $a() intersect $b()
+    check(gh1852("($a() intersect $b()) union ($a() intersect $b() intersect $c())"),
+        "fffffftt", count(Intersect.class, 1), count(Union.class, 0));
+    // optimized: $a() union $b()
+    check(gh1852("($a() union $b()) intersect ($a() union $b() union $c())"),
+        "fftttttt", count(Intersect.class, 0), count(Union.class, 1));
   }
 
   /**
@@ -1288,7 +1370,7 @@ public final class RewritingsTest extends QueryPlanTest {
    * @param query query string
    * @return query
    */
-  private static String joinBooleans(final String query) {
+  private static String gh1852(final String query) {
     // extract variable names from query
     final StringList vars = new StringList();
     for(final String var : query.split("\\$")) {
@@ -1299,24 +1381,14 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // generate query string with FLWOR expression
     final StringBuilder sb = new StringBuilder();
-    sb.append("string-join((\n");
+    sb.append("let $n := <n/>\n");
+    sb.append("return string-join(\n");
     for(final String var : vars) {
-      sb.append("  for $").append(var).append(" in (false(), true())\n");
+      sb.append("  for $").append(var).append(" in (function() { }, function() { $n })\n");
     }
-    sb.append("  return ").append(query).append("\n");
-    sb.append(") ! (if(.) then 't' else 'f'))");
-    return sb.toString();
+    sb.append("  return if(").append(query).append(") then 't' else 'f' \n");
+    return sb.append(")").toString();
   };
-
-  /** Name tests in where clauses, index rewritings. */
-  @Test public void gh1851() {
-    check("for $c in 1 to 10 return $c[. = 1]", 1, root(IterFilter.class));
-
-    // do not rewrite positional tests and variable references in predicates
-    check("for $c in 1 to 10 return $c[.]", 1, root(GFLWOR.class));
-    check("for $c in 1 to 10 return $c[position() = <_>2</_>]", "", root(GFLWOR.class));
-    check("for $c in 1 to 10 return $c[$c]", 1, root(GFLWOR.class));
-  }
 
   /** Name tests in where clauses, index rewritings. */
   @Test public void gh1853() {
