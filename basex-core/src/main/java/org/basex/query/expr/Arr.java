@@ -6,6 +6,7 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -226,14 +227,20 @@ public abstract class Arr extends ParseExpr {
       }
     }
 
-    // 'a'[. = 'a' or . = 'b']  ->  'a'[. = ('a', 'b')]
-    // $v[. != 'a'][. != 'b']  ->  $v[not(. = ('a', 'b')]
     list.add(exprs);
     for(int l = 0; l < list.size(); l++) {
       for(int m = l + 1; m < list.size(); m++) {
-        final Expr expr = list.get(l);
-        if(!(positional && expr.has(Flag.POS))) {
-          final Expr merged = expr.mergeEbv(list.get(m), or, cc);
+        final Expr expr1 = list.get(l), expr2 = list.get(m);
+        if(!(positional && expr1.has(Flag.POS))) {
+          // A or not(A)  ->  true()
+          // A[B][not(B)]  ->  ()
+          if(Function.NOT.is(expr2) && ((Arr) expr2).exprs[0].equals(expr1) ||
+             Function.NOT.is(expr1) && ((Arr) expr1).exprs[0].equals(expr2)) {
+            return true;
+          }
+          // 'a'[. = 'a' or . = 'b']  ->  'a'[. = ('a', 'b')]
+          // $v[. != 'a'][. != 'b']  ->  $v[not(. = ('a', 'b')]
+          final Expr merged = expr1.mergeEbv(expr2, or, cc);
           if(merged != null) {
             cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
             list.set(l, merged);
@@ -275,7 +282,7 @@ public abstract class Arr extends ParseExpr {
       return null;
 
     // check if expressions have common operands
-    final Function<Expr, ExprList> entries = ex ->
+    final java.util.function.Function<Expr, ExprList> entries = ex ->
       new ExprList().add(inverse.isInstance(ex) ? ((Arr) ex).exprs : new Expr[] { ex });
     final int el = exprs.length;
     final ExprList lefts = new ExprList().add(entries.apply(exprs[0]));

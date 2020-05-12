@@ -1419,4 +1419,18 @@ public final class RewritingsTest extends QueryPlanTest {
       "}",
       "<_>a</_>");
   }
+
+  /** Logical expressions, tertium non datur. */
+  @Test public void gh1863() {
+    check("(true(), false()) ! (. and not(.))", "false\nfalse", root(SingletonSeq.class));
+    check("(true(), false()) ! (. or  not(.))", "true\ntrue",   root(SingletonSeq.class));
+    check("(true(), false()) ! (not(.) and .)", "false\nfalse", root(SingletonSeq.class));
+    check("(true(), false()) ! (not(.) or  .)", "true\ntrue",   root(SingletonSeq.class));
+
+    check("for $i in 1 to 2 return $i and $i = 1 and not($i)", "false\nfalse",
+        root(SingletonSeq.class));
+
+    check("<a/>[text() = 'a']['ignored'][not(text() = 'a')]", "", empty());
+    check("<a/>[not(text() = 'a')]['ignored'][text() = 'a']", "", empty());
+  }
 }
