@@ -127,6 +127,6 @@ public final class FTIndexAccess extends Simple {
       final FTWords ftw = (FTWords) ftexpr;
       if(ftw.mode == FTMode.ANY && ftw.occ == null && ftw.simple) expr = ftw.query;
     }
-    return Function._FT_SEARCH.args(db.source(), expr).substring(1);
+    return Function._FT_SEARCH.args(db, expr).substring(1);
   }
 }

@@ -4,7 +4,6 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
-import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -84,11 +83,6 @@ public final class IndexStaticDb extends IndexDb {
   }
 
   @Override
-  public Expr source() {
-    return Str.get(data.meta.name);
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     return obj instanceof IndexStaticDb && data == ((IndexStaticDb) obj).data && super.equals(obj);
   }
@@ -96,5 +90,10 @@ public final class IndexStaticDb extends IndexDb {
   @Override
   public void plan(final QueryPlan plan) {
     plan.add(plan.create(this));
+  }
+
+  @Override
+  public String toString() {
+    return data.meta.name;
   }
 }

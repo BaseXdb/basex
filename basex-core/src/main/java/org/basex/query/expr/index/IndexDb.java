@@ -45,12 +45,6 @@ public abstract class IndexDb extends ParseExpr {
    */
   abstract Data data(QueryContext qc) throws QueryException;
 
-  /**
-   * Returns the expression containing the data source.
-   * @return source
-   */
-  public abstract Expr source();
-
   @Override
   public abstract IndexDb inline(Var var, Expr ex, CompileContext cc) throws QueryException;
 
@@ -60,10 +54,5 @@ public abstract class IndexDb extends ParseExpr {
   @Override
   public boolean equals(final Object obj) {
     return obj instanceof IndexDb;
-  }
-
-  @Override
-  public final String toString() {
-    return source().toString();
   }
 }

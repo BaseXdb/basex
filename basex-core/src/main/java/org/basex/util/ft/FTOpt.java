@@ -118,7 +118,7 @@ public final class FTOpt extends ExprInfo {
     else if(cs == FTCase.SENSITIVE) list.add(CASE + ' ' + SENSITIVE);
     if(is(DC)) list.add(DIACRITICS + ' ' + SENSITIVE);
     if(is(ST) || sd != null) list.add(STEMMING);
-    if(ln != null) list.add(LANGUAGE + " '" + ln + "'");
+    if(ln != null) list.add(LANGUAGE + " \"" + ln + '"');
     if(th != null) list.add(THESAURUS);
 
     final StringBuilder sb = new StringBuilder();

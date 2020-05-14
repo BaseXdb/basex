@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
@@ -91,11 +92,6 @@ public final class IndexDynDb extends IndexDb {
   }
 
   @Override
-  public Expr source() {
-    return expr;
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     return obj instanceof IndexDynDb && expr.equals(((IndexDynDb) obj).expr) && super.equals(obj);
   }
@@ -103,5 +99,10 @@ public final class IndexDynDb extends IndexDb {
   @Override
   public void plan(final QueryPlan plan) {
     plan.add(plan.create(this), expr);
+  }
+
+  @Override
+  public String toString() {
+    return Function._DB_NAME.args(expr);
   }
 }
