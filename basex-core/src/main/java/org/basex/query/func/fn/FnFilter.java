@@ -26,15 +26,12 @@ public final class FnFilter extends StandardFunc {
     if(st.zero()) return items;
 
     // create filter expression
-    Expr pred = coerceFunc(exprs[1], cc, SeqType.BLN_O, st.with(Occ.ONE));
-    cc.pushFocus(items);
-    try {
-      pred = new ContextValue(info).optimize(cc);
-      pred = new DynFuncCall(info, sc, exprs[1], pred).optimize(cc);
-      pred = new TypeCheck(sc, info, pred, SeqType.BLN_O, true).optimize(cc);
-    } finally {
-      cc.removeFocus();
-    }
+    final Expr pred = cc.get(items, () -> {
+      Expr p = new ContextValue(info).optimize(cc);
+      p = new DynFuncCall(info, sc, exprs[1], p).optimize(cc);
+      p = new TypeCheck(sc, info, p, SeqType.BLN_O, true).optimize(cc);
+      return p;
+    });
     return Filter.get(info, items, cc.function(Function.BOOLEAN, info, pred)).optimize(cc);
   }
 }

@@ -109,20 +109,21 @@ public abstract class Path extends ParseExpr {
       rt = cc.qc.focus.value;
     }
 
-    cc.pushFocus(rt);
-    final int sl = steps.length;
-    for(int s = 0; s < sl; s++) {
-      Expr step = steps[s];
-      try {
-        step = step.compile(cc);
-      } catch(final QueryException ex) {
-        // replace original expression with error
-        step = cc.error(ex, this);
+    cc.get(rt, () -> {
+      final int sl = steps.length;
+      for(int s = 0; s < sl; s++) {
+        Expr step = steps[s];
+        try {
+          step = step.compile(cc);
+        } catch(final QueryException ex) {
+          // replace original expression with error
+          step = cc.error(ex, this);
+        }
+        steps[s] = step;
+        cc.updateFocus(step);
       }
-      steps[s] = step;
-      cc.updateFocus(step);
-    }
-    cc.removeFocus();
+      return null;
+    });
 
     return optimize(cc);
   }
@@ -816,20 +817,20 @@ public abstract class Path extends ParseExpr {
       }
     }
 
-    cc.pushFocus(root);
-    try {
+    changed |= cc.ok(root, () -> {
+      boolean chngd = false;
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
         final Expr step = rewrite.apply(steps[s]);
         if(step != steps[s]) {
           steps[s] = step;
-          changed = true;
+          chngd = true;
         }
         cc.updateFocus(step);
       }
-    } finally {
-      cc.removeFocus();
-    }
+      return chngd;
+    });
+
     return changed ? get(info, root, steps) : this;
   }
 
@@ -842,10 +843,8 @@ public abstract class Path extends ParseExpr {
   private Expr mergeSteps(final CompileContext cc) throws QueryException {
     final int sl = steps.length;
     final ExprList stps = new ExprList(sl);
-
-    boolean changed = false;
-    cc.pushFocus(root);
-    try {
+    return cc.ok(root, () -> {
+      boolean chngd = false;
       for(int s = 0; s < sl; s++) {
         Expr curr = steps[s], next = s < sl - 1 ? steps[s + 1] : null;
         // merge steps: //*  ->  /descendant::*
@@ -854,18 +853,15 @@ public abstract class Path extends ParseExpr {
           if(next != null) {
             cc.info(QueryText.OPTMERGE_X, next);
             curr = next;
-            changed = true;
+            chngd = true;
             s++;
           }
         }
         stps.add(curr);
         cc.updateFocus(curr);
       }
-    } finally {
-      cc.removeFocus();
-    }
-
-    return changed ? get(info, root, stps.finish()) : this;
+      return chngd;
+    }) ? get(info, root, stps.finish()) : this;
   }
 
   /**
@@ -876,8 +872,7 @@ public abstract class Path extends ParseExpr {
    */
   private Expr movePreds(final CompileContext cc) throws QueryException {
     // example: //*[text()]/text()  ->  //*/text()
-    cc.pushFocus(root);
-    try {
+    return cc.get(root, () -> {
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
         final Expr curr = steps[s];
@@ -887,10 +882,8 @@ public abstract class Path extends ParseExpr {
         }
         cc.updateFocus(curr);
       }
-    } finally {
-      cc.removeFocus();
-    }
-    return this;
+      return this;
+    });
   }
 
   /**
@@ -1043,23 +1036,20 @@ public abstract class Path extends ParseExpr {
       }
     }
 
-    // #1202: during inlining, expressions will be optimized, which are based on the context value
-    if(var != null) {
-      cc.pushFocus(root != null ? root : cc.qc.focus.value);
-      try {
-        final int sl = steps.length;
-        for(int s = 0; s < sl; s++) {
-          final Expr step = steps[s].inline(var, ex, cc);
-          if(step != null) {
-            steps[s] = step;
-            changed = true;
-          }
-          cc.updateFocus(steps[s]);
+    changed |= var != null && cc.ok(root != null ? root : cc.qc.focus.value, () -> {
+      boolean chngd = false;
+      final int sl = steps.length;
+      for(int s = 0; s < sl; s++) {
+        final Expr step = steps[s].inline(var, ex, cc);
+        if(step != null) {
+          steps[s] = step;
+          chngd = true;
         }
-      } finally {
-        cc.removeFocus();
+        cc.updateFocus(steps[s]);
       }
-    }
+      return chngd;
+    });
+
     return changed ? optimize(cc) : null;
   }
 

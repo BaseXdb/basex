@@ -127,17 +127,12 @@ public abstract class AxisPath extends Path {
       throws QueryException {
 
     final ExprList list = new ExprList(steps.length).add(steps);
-    Expr step = ((Step) list.pop()).addPreds(preds);
-    if(cc != null) {
-      cc.pushFocus(this);
+    final Expr step = ((Step) list.pop()).addPreds(preds);
+    list.add(cc == null ? step : cc.get(this, () -> {
       cc.updateFocus(step);
-      try {
-        step = step.optimize(cc);
-      } finally {
-        cc.removeFocus();
-      }
-    }
-    return copyType(get(info, root, list.add(step).finish()));
+      return step.optimize(cc);
+    }));
+    return copyType(get(info, root, list.finish()));
   }
 
   @Override

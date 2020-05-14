@@ -106,6 +106,38 @@ public final class CompileContext {
   }
 
   /**
+   * Evaluates a function in the given focus.
+   * @param expr focus
+   * @param func function to evaluate
+   * @return resulting expression
+   * @throws QueryException query exception
+   */
+  public Expr get(final Expr expr, final QuerySupplier<Expr> func) throws QueryException {
+    pushFocus(expr);
+    try {
+      return func.get();
+    } finally {
+      removeFocus();
+    }
+  }
+
+  /**
+   * Evaluates a function in the given focus.
+   * @param expr focus
+   * @param func function to evaluate
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public boolean ok(final Expr expr, final QuerySupplier<Boolean> func) throws QueryException {
+    pushFocus(expr);
+    try {
+      return func.get();
+    } finally {
+      removeFocus();
+    }
+  }
+
+  /**
    * Returns a dummy item, based on the type of the specified expression and the current context.
    * @param expr expression
    * @return dummy item

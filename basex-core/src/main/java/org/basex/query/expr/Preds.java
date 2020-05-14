@@ -41,24 +41,20 @@ public abstract class Preds extends Arr {
     type(cc.qc.focus.value, cc);
 
     final int pl = exprs.length;
-    if(pl != 0) {
-      cc.pushFocus(this);
-      try {
-        final QueryFocus focus = cc.qc.focus;
-        final Value init = focus.value;
-        for(int p = 0; p < pl; ++p) {
-          try {
-            exprs[p] = exprs[p].compile(cc);
-          } catch(final QueryException ex) {
-            // replace original expression with error
-            exprs[p] = cc.error(ex, this);
-          }
+    if(pl != 0) cc.get(this, () -> {
+      final QueryFocus focus = cc.qc.focus;
+      final Value init = focus.value;
+      for(int p = 0; p < pl; ++p) {
+        try {
+          exprs[p] = exprs[p].compile(cc);
+        } catch(final QueryException ex) {
+          // replace original expression with error
+          exprs[p] = cc.error(ex, this);
         }
-        focus.value = init;
-      } finally {
-        cc.removeFocus();
       }
-    }
+      focus.value = init;
+      return null;
+    });
     return optimize(cc);
   }
 
@@ -137,16 +133,12 @@ public abstract class Preds extends Arr {
    * @throws QueryException query exception
    */
   protected final boolean optimize(final CompileContext cc, final Expr root) throws QueryException {
-    cc.pushFocus(root);
-    try {
+    return cc.ok(root, () -> {
       final ExprList list = new ExprList(exprs.length);
       for(final Expr expr : exprs) optimize(expr, list, root, cc);
       exprs = list.finish();
-      if(optimizeEbv(false, true, cc)) return true;
-    } finally {
-      cc.removeFocus();
-    }
-    return exprType(root);
+      return optimizeEbv(false, true, cc);
+    }) || exprType(root);
   }
 
   /**

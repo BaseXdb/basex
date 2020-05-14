@@ -34,12 +34,7 @@ public final class TransformWith extends Arr {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    cc.pushFocus(new Dummy(exprs[0].seqType().type, null));
-    try {
-      return super.compile(cc);
-    } finally {
-      cc.removeFocus();
-    }
+    return cc.get(new Dummy(exprs[0].seqType().type, null), () -> super.compile(cc));
   }
 
   @Override

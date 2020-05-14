@@ -241,14 +241,8 @@ public abstract class Filter extends Preds {
       root = rt;
       changed = true;
     }
-    if(var != null) {
-      cc.pushFocus(root);
-      try {
-        if(inlineAll(var, ex, exprs, cc)) changed = true;
-      } finally {
-        cc.removeFocus();
-      }
-    }
+    changed |= var != null && cc.ok(root, () -> inlineAll(var, ex, exprs, cc));
+
     return changed ? optimize(cc) : null;
   }
 

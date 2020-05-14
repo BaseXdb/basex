@@ -252,13 +252,8 @@ public abstract class SimpleMap extends Arr {
       expr = toPath(cc);
     } else {
       final int el = exprs.length;
-      cc.pushFocus(exprs[el - 2]);
-      final Expr ex, old = exprs[el - 1];
-      try {
-        ex = old.simplifyFor(mode, cc);
-      } finally {
-        cc.removeFocus();
-      }
+      final Expr old = exprs[el - 1];
+      final Expr ex = cc.get(exprs[el - 2], () -> old.simplifyFor(mode, cc));
       if(ex != old) {
         final ExprList list = new ExprList(el).add(exprs).set(el - 1, ex);
         expr = SimpleMap.get(info, list.finish()).optimize(cc);

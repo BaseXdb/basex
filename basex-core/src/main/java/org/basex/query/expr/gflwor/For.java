@@ -202,18 +202,16 @@ public final class For extends ForLet {
     if(empty || !(vars().length == 1 && ex.uses(var) && ex.inlineable(var))) return false;
 
     // reset context value (will not be accessible in predicate)
-    Expr pred = ex;
-    cc.pushFocus(expr);
-    try {
+    Expr pred = cc.get(expr, () -> {
       // assign type of iterated items to context expression
       final Expr r = ex.inline(var, new ContextValue(info).optimize(cc), cc);
-      if(r != null) pred = r;
-    } finally {
-      cc.removeFocus();
-    }
+      return r != null ? r : ex;
+    });
 
     // attach predicates to axis path or filter, or create a new filter
-    if(pred.seqType().mayBeNumber()) pred = cc.function(Function.BOOLEAN, info, pred);
+    if(pred.seqType().mayBeNumber()) {
+      pred = cc.function(Function.BOOLEAN, info, pred);
+    }
 
     addPredicate(pred, cc);
     return true;
