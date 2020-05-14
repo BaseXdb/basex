@@ -1433,4 +1433,24 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[text() = 'a']['ignored'][not(text() = 'a')]", "", empty());
     check("<a/>[not(text() = 'a')]['ignored'][text() = 'a']", "", empty());
   }
+
+  /** Remove redundant paths. */
+  @Test public void gh1864() {
+    check("<a/>/*[a]/a", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check("<a/>/*[a]/a/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check("<a/>/*[a/b]/a/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check("<a/>/*[a/b]/a", "", count(IterPath.class, 1), count(SingleIterPath.class, 1));
+    check("<a/>/*[a/b]/a/c", "", count(IterPath.class, 1), count(SingleIterPath.class, 1));
+    check("<a/>/*[a]/a[b]/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+  }
+
+  /* Remove redundant paths with comparisons.
+  @Test public void gh1866() {
+    check("<a/>/*[a = 'x]/a", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check("<a/>/*[a ne 'x']/a/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check("<a/>/*[a/b > 1]/a/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+    check("<a/>/*[a/b > 'x']/a", "", count(IterPath.class, 1), count(SingleIterPath.class, 1));
+    check("<a/>/*[a/b contains text 'x']/a/c", "",
+        count(IterPath.class, 1), count(SingleIterPath.class, 1));
+  }*/
 }

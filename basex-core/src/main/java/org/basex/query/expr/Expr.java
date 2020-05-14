@@ -271,7 +271,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Inlines the given expression into all elements of the given array.
-   * @param var variable to replace
+   * @param var variable to replace ({@code null} for context replacement)
    * @param expr expression to inline
    * @param exprs expressions to process
    * @param cc compilation context

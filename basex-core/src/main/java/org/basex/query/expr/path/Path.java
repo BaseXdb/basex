@@ -142,6 +142,8 @@ public abstract class Path extends ParseExpr {
     if(expr == this) expr = toUnion(cc);
     // merge adjacent steps
     if(expr == this) expr = mergeSteps(cc);
+    // move predicates downward
+    if(expr == this) expr = movePreds(cc);
     // return optimized expression
     if(expr != this) return expr.optimize(cc);
 
@@ -846,22 +848,7 @@ public abstract class Path extends ParseExpr {
     try {
       for(int s = 0; s < sl; s++) {
         Expr curr = steps[s], next = s < sl - 1 ? steps[s + 1] : null;
-
-        // remove single predicates that are identical to the next step
-        // example:  //*[text()]/text()  ->  //*/text()
-        if(curr instanceof Step) {
-          final Step step = (Step) curr;
-          if(step.exprs.length == 1 && !step.mayBePositional()) {
-            final Expr pred = step.exprs[0];
-            if(pred instanceof SingleIterPath && ((SingleIterPath) pred).steps[0].equals(next)) {
-              final Expr rt = stps.isEmpty() ? root : stps.peek();
-              curr = new StepBuilder(step.info).axis(step.axis).test(step.test).finish(cc, rt);
-              changed = true;
-            }
-          }
-        }
-
-        // merge steps:  //*  ->  /descendant::*
+        // merge steps: //*  ->  /descendant::*
         if(next != null) {
           next = mergeStep(curr, next, cc);
           if(next != null) {
@@ -879,6 +866,77 @@ public abstract class Path extends ParseExpr {
     }
 
     return changed ? get(info, root, stps.finish()) : this;
+  }
+
+  /**
+   * Moves predicates downward.
+   * @param cc compilation context
+   * @return original or new expression
+   * @throws QueryException query exception
+   */
+  private Expr movePreds(final CompileContext cc) throws QueryException {
+    // example: //*[text()]/text()  ->  //*/text()
+    cc.pushFocus(root);
+    try {
+      final int sl = steps.length;
+      for(int s = 0; s < sl; s++) {
+        final Expr curr = steps[s];
+        if(curr instanceof Step) {
+          final Expr ex = movePreds(cc, s);
+          if(ex != null) return ex;
+        }
+        cc.updateFocus(curr);
+      }
+    } finally {
+      cc.removeFocus();
+    }
+    return this;
+  }
+
+  /**
+   * Moves a predicate downwards.
+   * @param cc compilation context
+   * @param s current step
+   * @return new expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr movePreds(final CompileContext cc, final int s) throws QueryException {
+    final Step step = (Step) steps[s];
+    if(step.exprs.length != 1 || step.mayBePositional()) return null;
+
+    final Expr pred = step.exprs[0];
+    if(!(pred instanceof Path)) return null;
+    final Path path = (Path) pred;
+    if(path.root != null) return null;
+
+    final Expr[] predSteps = path.steps;
+    final int sl = steps.length, pl = predSteps.length;
+    int t = s + 1, p = 0;
+    for(; t < sl && p < pl; p++, t++) {
+      if(!steps[t].equals(predSteps[p])) break;
+    }
+    if(t == s + 1) return null;
+
+    // compose new path
+    final ExprList list = new ExprList();
+    // add previous steps
+    for(int r = 0; r < s; r++) list.add(steps[r]);
+    // add analyzed step without predicates
+    list.add(Step.get(step.info, step.axis, step.test));
+    // add steps in between
+    for(int r = s + 1; r < t - 1; r++) list.add(steps[r]);
+    // attach remaining predicates of analyzed step
+    if(p < pl) {
+      cc.updateFocus(list.peek());
+      final Expr expr = get(info, null, Arrays.copyOfRange(predSteps, p, pl)).optimize(cc);
+      list.add(((Step) steps[t - 1]).addPreds(expr).optimize(cc));
+    } else {
+      list.add(steps[t - 1]);
+    }
+    // add remaining steps
+    for(int r = t; r < sl; r++) list.add(steps[r]);
+
+    return get(info, root, list.finish());
   }
 
   /**
