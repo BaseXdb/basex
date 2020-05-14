@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -45,7 +46,11 @@ public final class FnSubstring extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final int start = exprs[1] instanceof Value ? start(cc.qc) : Integer.MAX_VALUE;
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    // empty argument: return empty string
+    if(expr1 == Empty.VALUE || expr1 == Str.ZERO) return Str.ZERO;
+
+    final int start = expr2 instanceof Value ? start(cc.qc) : Integer.MAX_VALUE;
     final int length = exprs.length < 3 ? Integer.MAX_VALUE :
       exprs[2] instanceof Value ? length(cc.qc) : Integer.MIN_VALUE;
 
@@ -54,8 +59,8 @@ public final class FnSubstring extends StandardFunc {
 
     // return full string or original expression
     return start <= 0 && length == Integer.MAX_VALUE &&
-      exprs[0].seqType().type.isStringOrUntyped() ?
-      cc.function(Function.STRING, info, exprs[0]) : this;
+      expr1.seqType().type.isStringOrUntyped() ?
+      cc.function(Function.STRING, info, expr1) : this;
   }
 
   /**

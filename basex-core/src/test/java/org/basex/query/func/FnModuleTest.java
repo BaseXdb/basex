@@ -143,6 +143,19 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void contains() {
+    final Function func = CONTAINS;
+
+    // pre-evaluate equal arguments and empty substring
+    check(func.args(" <_/>", " <_/>"), true, root(Bln.class));
+    check(func.args(" <_>abc</_>", ""), true, root(Bln.class));
+    check(func.args(" <_>abc</_>", " ()"), true, root(Bln.class));
+
+    // do not optimize if argument may be of wrong type
+    check(func.args(" (1,'a')[. instance of xs:string]", "a"), true, root(CONTAINS));
+  }
+
+  /** Test method. */
   @Test public void count() {
     final Function func = COUNT;
 
@@ -914,6 +927,9 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" <a>A</a>", 0), "A", empty(SUBSTRING), exists(STRING));
     check(func.args(" <a>A</a>", " xs:double('NaN')"), "", root(Str.class));
     check(func.args(" <a>A</a>", 1, 0), "", root(Str.class));
+
+    check(func.args(" ()", " <_>1</_>", " <_>1</_>"), "", root(Str.class));
+    check(func.args("", " <_>1</_>", " <_>1</_>"), "", root(Str.class));
   }
 
   /** Test method. */
