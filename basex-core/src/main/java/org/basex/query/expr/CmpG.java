@@ -141,7 +141,7 @@ public class CmpG extends Cmp {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public final Expr optimize(final CompileContext cc) throws QueryException {
     // pre-evaluate if one value is empty:
     // () eq local:expensive()  ->  ()
     // prof:void(123) = 1  ->  boolean(prof:void('123'))
@@ -186,18 +186,26 @@ public class CmpG extends Cmp {
           type1.instanceOf(AtomType.NUM) && type2.instanceOf(AtomType.NUM) ||
           type1.instanceOf(AtomType.DUR) && type2.instanceOf(AtomType.DUR));
 
+      CmpHashG hash = null;
       if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
         // simple comparisons
-        expr = new CmpSimpleG(expr1, expr2, op, coll, sc, info);
+        if(!(this instanceof CmpSimpleG)) expr = new CmpSimpleG(expr1, expr2, op, coll, sc, info);
       } else if(op == OpG.EQ && coll == null && (type1.isNumber() && type2.isNumber() ||
           (type1.isStringOrUntyped() && type2.isStringOrUntyped())) && !st2.zeroOrOne()) {
         // hash-based comparisons
-        expr = new CmpHashG(expr1, expr2, op, null, sc, info);
+        hash = this instanceof CmpHashG ? (CmpHashG) this :
+          new CmpHashG(expr1, expr2, op, null, sc, info);
+        expr = hash;
+      }
+      // pre-evaluate expression; discard hashed results
+      if(allAreValues(false)) {
+        expr = cc.preEval(expr);
+        if(hash != null) cc.qc.threads.get(hash).remove();
       }
     }
 
-    // pre-evaluate values or return expression
-    return allAreValues(false) ? cc.preEval(expr) : cc.replaceWith(this, expr);
+    // return optimized, pre-evaluated or original expression
+    return cc.replaceWith(this, expr);
   }
 
   @Override

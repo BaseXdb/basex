@@ -95,7 +95,7 @@ public abstract class Cmp extends Arr {
   /**
    * Performs various optimizations.
    * @param cc compilation context
-   * @return resulting expression
+   * @return optimized or original expression
    * @throws QueryException query exception
    */
   final Expr opt(final CompileContext cc) throws QueryException {

@@ -1,5 +1,6 @@
 package org.basex.query.expr.path;
 
+import java.util.*;
 import java.util.List;
 
 import org.basex.query.*;
@@ -46,18 +47,29 @@ public abstract class Test extends ExprInfo {
   /**
    * Returns a single test for the specified tests.
    * @param tests tests
-   * @return test, or {@code null} if no test was supplied.
+   * @return test, or {@code null} if test cannot be created.
    */
   public static Test get(final List<Test> tests) {
     final int tl = tests.size();
     if(tl == 0) return null;
     if(tl == 1) return tests.get(0);
 
-    final NodeType type = tests.get(0).type;
-    for(int t = 1; t < tl; t++) {
-      if(tests.get(t).type != type) return null;
+    NodeType type = null;
+    final List<Test> list = new ArrayList<>(tl);
+    for(final Test test : tests) {
+      if(type == null) {
+        type = test.type;
+      } else if(test.type != type) {
+        return null;
+      }
+      // flatten tests
+      if(test instanceof UnionTest) {
+        for(final Test t : ((UnionTest) test).tests) list.add(t);
+      } else {
+        list.add(test);
+      }
     }
-    return new UnionTest(type, tests);
+    return new UnionTest(type, list.toArray(new Test[0]));
   }
 
   /**

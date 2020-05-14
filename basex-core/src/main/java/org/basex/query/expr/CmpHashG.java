@@ -31,14 +31,6 @@ public final class CmpHashG extends CmpG {
     super(expr1, expr2, op, coll, sc, info);
   }
 
-  @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
-    final Expr expr = super.optimize(cc);
-    // invalidate cache if value was pre-evaluated
-    if(expr instanceof Value) cc.qc.threads.get(this).remove();
-    return expr;
-  }
-
   /**
    * {@inheritDoc}
    * Overwrites the original comparator.

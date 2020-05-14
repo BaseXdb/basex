@@ -14,14 +14,14 @@ import org.basex.util.*;
  */
 public final class UnionTest extends Test {
   /** Tests. */
-  final List<Test> tests;
+  final Test[] tests;
 
   /**
    * Constructor.
    * @param type node type
    * @param tests tests
    */
-  UnionTest(final NodeType type, final List<Test> tests) {
+  UnionTest(final NodeType type, final Test[] tests) {
     super(type);
     this.tests = tests;
   }
@@ -41,7 +41,7 @@ public final class UnionTest extends Test {
 
   @Override
   public Test intersect(final Test test) {
-    final ArrayList<Test> list = new ArrayList<>(tests.size());
+    final ArrayList<Test> list = new ArrayList<>(tests.length);
     for(final Test t : tests) {
       final Test t2 = t.intersect(test);
       if(t2 != null) list.add(t2);
@@ -51,6 +51,6 @@ public final class UnionTest extends Test {
 
   @Override
   public String toString() {
-    return new TokenBuilder().addSeparated(tests.toArray(), "|").toString();
+    return new TokenBuilder().addSeparated(tests, "|").toString();
   }
 }
