@@ -1321,8 +1321,11 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1851() {
     check("for $c in 1 to 10 return $c[. = 1]", 1, root(IterFilter.class));
 
-    // do not rewrite positional tests and variable references in predicates
-    check("for $c in 1 to 10 return $c[.]", 1, root(GFLWOR.class));
+    // move filters with positional tests and variable references into simple map
+    check("for $c in 1 to 10 return $c[.]", 1, root(IterMap.class));
+    check("for $c in (1, 2) return $c[position() = (0, 2)]", "", root(IterMap.class));
+
+    // no rewriting: position checks are replaced by util:item
     check("for $c in 1 to 10 return $c[position() = <_>2</_>]", "", root(GFLWOR.class));
     check("for $c in 1 to 10 return $c[$c]", 1, root(GFLWOR.class));
   }
@@ -1442,6 +1445,22 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>/*[a/b]/a", "", count(IterPath.class, 1), count(SingleIterPath.class, 1));
     check("<a/>/*[a/b]/a/c", "", count(IterPath.class, 1), count(SingleIterPath.class, 1));
     check("<a/>/*[a]/a[b]/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+  }
+
+  /** Inline paths in FLWOR expressions. */
+  @Test public void gh1865() {
+    execute(new CreateDB(NAME, "<a><b c='d'><c/></b><c/></a>"));
+
+    // child, attribute, self axis: merge steps
+    check("for $a in /* return $a/c", "<c/>", empty(GFLWOR.class));
+    check("for $n in //* return $n/c", "<c/>\n<c/>", empty(GFLWOR.class));
+    check("for $n in //(a,b,c) return $n/@*", "c=\"d\"", empty(GFLWOR.class));
+    check("for $n in //(a,b,c) return $n/self::d", "", empty(GFLWOR.class));
+
+    // other axes: rewrite to simple map operator
+    check("count(for $c in //c return $c/..)", 2, exists(IterMap.class));
+    check("count(for $c in //* return $c//c)", 3, exists(IterMap.class));
+    check("count(for $c in //* return $c/following::*)", 2, exists(IterMap.class));
   }
 
   /* Remove redundant paths with comparisons.

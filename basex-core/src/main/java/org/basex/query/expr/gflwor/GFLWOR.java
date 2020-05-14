@@ -608,22 +608,56 @@ public final class GFLWOR extends ParseExpr {
   private boolean mergeReturn(final CompileContext cc) throws QueryException {
     if(clauses.peekLast() instanceof ForLet) {
       final ForLet last = (ForLet) clauses.peekLast();
-      final Predicate<Expr> varref = expr -> expr instanceof VarRef &&
-          ((VarRef) expr).var.is(last.var) && !last.var.checksType() && !last.scoring;
+      if(rtrn.count(last.var) != VarUsage.ONCE) return false;
 
       // for $x in E return $x  ->  E
+      final Predicate<Expr> varref = expr -> expr instanceof VarRef &&
+          ((VarRef) expr).var.is(last.var) && !last.var.checksType() && !last.scoring;
       if(varref.test(rtrn)) {
         rtrn = last.expr;
         clauses.removeLast();
         return true;
       }
 
-      // for $x in E return $x[. = 1]  ->  E[. = 1]
-      if(clauses.size() == 1 && rtrn instanceof Filter) {
+      if(clauses.size() != 1) return false;
+
+      if(rtrn instanceof Filter) {
         final Filter filter = (Filter) rtrn;
-        final Checks<Expr> noVarRef = pred -> pred.count(last.var) == VarUsage.NEVER;
-        if(varref.test(filter.root) && !filter.mayBePositional() && noVarRef.all(filter.exprs)) {
-          rtrn = Filter.get(filter.info, last.expr, filter.exprs).optimize(cc);
+        final QueryFunction<Expr, Expr> func = expr ->
+          Filter.get(filter.info, expr, filter.exprs).optimize(cc);
+        if(varref.test(filter.root)) {
+          if(filter.mayBePositional()) {
+            // for $x in E return $x[1]  ->  E ! .[1]
+            final Expr expr = cc.get(last.expr, () -> func.apply(
+                new ContextValue(filter.info).optimize(cc)));
+            rtrn = SimpleMap.get(filter.info, last.expr, expr);
+          } else {
+            // for $x in E return $x[. = 1]  ->  E[. = 1]
+            rtrn = func.apply(last.expr);
+          }
+          clauses.removeLast();
+          return true;
+        }
+      }
+
+      if(rtrn instanceof Path) {
+        final Path path = (Path) rtrn;
+        if(varref.test(path.root)) {
+          final QueryFunction<Expr, Expr> func = expr ->
+            Path.get(path.info, expr, path.steps).optimize(cc);
+          final Checks<Expr> simple = expr -> {
+            if(!(expr instanceof Step)) return false;
+            final Axis axis = ((Step) expr).axis;
+            return axis == Axis.SELF || axis == Axis.CHILD || axis == Axis.ATTRIBUTE;
+          };
+          if(last.expr instanceof Path && simple.all(path.steps)) {
+            // for $a in //a return $a/b  ->  //a/b
+            rtrn = func.apply(last.expr);
+          } else {
+            // for $a in (a,b) return $a/descendant::b  ->  (a,b) ! descendant::b
+            final Expr expr = cc.get(last.expr, () -> func.apply(null));
+            rtrn = SimpleMap.get(path.info, last.expr, expr).optimize(cc);
+          }
           clauses.removeLast();
           return true;
         }
