@@ -95,12 +95,12 @@ public final class FTWords extends FTExpr {
       for(int o = 0; o < ol; o++) occ[o] = occ[o].compile(cc);
     }
     query = query.compile(cc);
-
-    return init(cc.qc, cc.qc.ftOpt()).optimize(cc);
+    return optimize(cc);
   }
 
   @Override
   public FTWords optimize(final CompileContext cc) throws QueryException {
+    init(cc.qc, cc.qc.ftOpt().copy());
     if(occ != null) {
       final int ol = occ.length;
       for(int o = 0; o < ol; o++) occ[o] = occ[o].simplifyFor(Simplify.NUMBER, cc);
