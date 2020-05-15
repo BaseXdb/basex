@@ -1,3 +1,7 @@
+VERSION 9.3.3 (May 15, 2020) -------------------------------------------
+
+ - Minor bug fixes, performance tweaks, new query optimizations
+
 VERSION 9.3.2 (March 10, 2020) -----------------------------------------
 
  - Minor bug fixes, numerous performance tweaks
