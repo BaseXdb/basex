@@ -17,11 +17,6 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.opentest4j:opentest4j:1.2.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-commons:1.6.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-params:5.6.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-api:5.6.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.apiguardian:apiguardian-api:1.1.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.opentest4j:opentest4j:1.2.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-commons:1.6.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-params:5.6.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.6.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-engine:1.6.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: jp.sourceforge.igo:igo:0.4.3" level="project" />
@@ -29,6 +24,6 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.ccil.cowan.tagsoup:tagsoup:1.2.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: xml-resolver:xml-resolver:1.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: jline:jline:2.14.6" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.thaiopensource:jing:20091111" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.relaxng:jing:20181222" level="project" />
   </component>
 </module>
