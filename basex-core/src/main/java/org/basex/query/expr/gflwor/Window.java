@@ -278,14 +278,15 @@ public final class Window extends Clause {
   }
 
   @Override
-  public Clause inline(final Var v, final Expr ex, final CompileContext cc) throws QueryException {
-    final Expr exp = expr.inline(v, ex, cc);
-    final Condition st = start.inline(v, ex, cc);
-    final Condition en = end == null ? null : end.inline(v, ex, cc);
-    if(exp != null) expr = exp;
+  public Clause inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+      throws QueryException {
+    final Expr inlined = expr.inline(ei, ex, cc);
+    final Condition st = start.inline(ei, ex, cc);
+    final Condition en = end == null ? null : end.inline(ei, ex, cc);
+    if(inlined != null) expr = inlined;
     if(st != null) start = st;
     if(en != null) end = en;
-    return exp != null || st != null || en != null ? optimize(cc) : null;
+    return inlined != null || st != null || en != null ? optimize(cc) : null;
   }
 
   @Override

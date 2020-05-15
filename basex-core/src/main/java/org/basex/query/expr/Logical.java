@@ -5,7 +5,6 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -64,14 +63,15 @@ abstract class Logical extends Arr {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+      throws QueryException {
     boolean changed = false;
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
       try {
-        final Expr exp = exprs[e].inline(var, ex, cc);
-        if(exp != null) {
-          exprs[e] = exp;
+        final Expr inlined = exprs[e].inline(ei, ex, cc);
+        if(inlined != null) {
+          exprs[e] = inlined;
           changed = true;
         }
       } catch(final QueryException qe) {

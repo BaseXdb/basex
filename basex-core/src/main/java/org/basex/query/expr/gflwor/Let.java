@@ -156,12 +156,12 @@ public final class Let extends ForLet {
     /**
      * Constructor for the first let binding in the block.
      * @param let first let binding
-     * @param subEval sub-evaluator
+     * @param sub sub-evaluator
      */
-    LetEval(final Let let, final Eval subEval) {
+    LetEval(final Let let, final Eval sub) {
       lets = new ArrayList<>();
       lets.add(let);
-      sub = subEval;
+      this.sub = sub;
     }
 
     @Override

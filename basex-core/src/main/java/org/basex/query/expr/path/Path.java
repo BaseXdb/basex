@@ -1019,28 +1019,28 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
+  public final Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
       throws QueryException {
 
     boolean changed = false;
     if(root == null) {
-      if(var == null) {
+      if(ei == null) {
         root = ex;
         changed = true;
       }
     } else {
-      final Expr rt = root.inline(var, ex, cc);
-      if(rt != null) {
-        root = rt;
+      final Expr inlined = root.inline(ei, ex, cc);
+      if(inlined != null) {
+        root = inlined;
         changed = true;
       }
     }
 
-    changed |= var != null && cc.ok(root != null ? root : cc.qc.focus.value, () -> {
+    changed |= ei != null && cc.ok(root != null ? root : cc.qc.focus.value, () -> {
       boolean chngd = false;
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
-        final Expr step = steps[s].inline(var, ex, cc);
+        final Expr step = steps[s].inline(ei, ex, cc);
         if(step != null) {
           steps[s] = step;
           chngd = true;

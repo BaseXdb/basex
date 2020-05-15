@@ -196,12 +196,13 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    boolean changed = inlineAll(var, ex, groups, cc);
-    final Expr cn = cond.inline(var, ex, cc);
-    if(cn != null) {
+  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+      throws QueryException {
+    boolean changed = inlineAll(ei, ex, groups, cc);
+    final Expr inlined = cond.inline(ei, ex, cc);
+    if(inlined != null) {
       changed = true;
-      cond = cn;
+      cond = inlined;
     }
     return changed ? optimize(cc) : null;
   }

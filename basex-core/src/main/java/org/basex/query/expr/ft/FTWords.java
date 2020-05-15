@@ -464,13 +464,13 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTExpr inline(final Var var, final Expr ex, final CompileContext cc)
+  public FTExpr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
       throws QueryException {
 
-    boolean changed = occ != null && inlineAll(var, ex, occ, cc);
-    final Expr q = query.inline(var, ex, cc);
-    if(q != null) {
-      query = q;
+    boolean changed = occ != null && inlineAll(ei, ex, occ, cc);
+    final Expr inlined = query.inline(ei, ex, cc);
+    if(inlined != null) {
+      query = inlined;
       changed = true;
     }
     return changed ? optimize(cc) : null;

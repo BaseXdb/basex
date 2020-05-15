@@ -232,16 +232,16 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
+  public final Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
       throws QueryException {
 
     boolean changed = false;
-    final Expr rt = root.inline(var, ex, cc);
-    if(rt != null) {
-      root = rt;
+    final Expr inlined = root.inline(ei, ex, cc);
+    if(inlined != null) {
+      root = inlined;
       changed = true;
     }
-    changed |= var != null && cc.ok(root, () -> inlineAll(var, ex, exprs, cc));
+    changed |= ei != null && cc.ok(root, () -> inlineAll(ei, ex, exprs, cc));
 
     return changed ? optimize(cc) : null;
   }

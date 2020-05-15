@@ -78,7 +78,7 @@ public final class Count extends Clause {
   }
 
   @Override
-  public Clause inline(final Var v, final Expr ex, final CompileContext cc) {
+  public Clause inline(final ExprInfo ei, final Expr ex, final CompileContext cc) {
     return null;
   }
 

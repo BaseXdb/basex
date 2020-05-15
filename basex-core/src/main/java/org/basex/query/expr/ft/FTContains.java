@@ -102,12 +102,13 @@ public final class FTContains extends Single {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    final Expr sub = expr.inline(var, ex, cc);
-    if(sub != null) expr = sub;
-    final FTExpr fte = ftexpr.inline(var, ex, cc);
-    if(fte != null) ftexpr = fte;
-    return sub != null || fte != null ? optimize(cc) : null;
+  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+      throws QueryException {
+    final Expr inlined = expr.inline(ei, ex, cc);
+    if(inlined != null) expr = inlined;
+    final FTExpr ftinlined = ftexpr.inline(ei, ex, cc);
+    if(ftinlined != null) ftexpr = ftinlined;
+    return inlined != null || ftinlined != null ? optimize(cc) : null;
   }
 
   @Override

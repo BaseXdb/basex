@@ -304,28 +304,28 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
-  public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
+  public final Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
       throws QueryException {
 
     boolean changed = false;
     // context inlining: only consider first expression
-    final int el = var == null ? 1 : exprs.length;
+    final int el = ei == null ? 1 : exprs.length;
     for(int e = 0; e < el; e++) {
-      Expr expr;
+      Expr inlined;
       try {
-        expr = exprs[e].inline(var, ex, cc);
+        inlined = exprs[e].inline(ei, ex, cc);
       } catch(final QueryException qe) {
         // replace original expression with error
-        expr = cc.error(qe, this);
+        inlined = cc.error(qe, this);
       }
-      if(expr != null) {
-        exprs[e] = expr;
+      if(inlined != null) {
+        exprs[e] = inlined;
         changed = true;
       } else {
-        expr = exprs[e];
+        inlined = exprs[e];
       }
-      if(e == 0) cc.pushFocus(expr);
-      else cc.updateFocus(expr);
+      if(e == 0) cc.pushFocus(inlined);
+      else cc.updateFocus(inlined);
     }
     cc.removeFocus();
     return changed ? optimize(cc) : null;

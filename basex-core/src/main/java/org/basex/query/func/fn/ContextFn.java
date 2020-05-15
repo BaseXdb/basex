@@ -7,7 +7,6 @@ import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 
 /**
  * Context-based function.
@@ -56,9 +55,9 @@ public abstract class ContextFn extends StandardFunc {
   }
 
   @Override
-  public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
+  public final Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
       throws QueryException {
-    return inline(var, ex, cc, v -> {
+    return inline(ei, ex, cc, () -> {
       final Expr[] args = new ExprList(exprs.length + 1).add(exprs).add(ex).finish();
       return contextAccess() ? definition.get(cc.sc(), info, args).optimize(cc) : null;
     });

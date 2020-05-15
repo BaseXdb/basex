@@ -47,7 +47,8 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
+  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+      throws QueryException {
     return null;
   }
 

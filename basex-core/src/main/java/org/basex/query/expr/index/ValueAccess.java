@@ -241,11 +241,12 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    final Expr sub = expr.inline(var, ex, cc);
-    if(sub != null) expr = sub;
-    final Expr ia = super.inline(var, ex, cc);
-    return sub != null || ia != null ? optimize(cc) : null;
+  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+      throws QueryException {
+    final Expr inlined = expr.inline(ei, ex, cc);
+    if(inlined != null) expr = inlined;
+    final Expr inlined2 = super.inline(ei, ex, cc);
+    return inlined != null || inlined2 != null ? optimize(cc) : null;
   }
 
   @Override

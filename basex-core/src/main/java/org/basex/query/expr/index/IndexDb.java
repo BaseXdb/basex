@@ -46,7 +46,7 @@ public abstract class IndexDb extends ParseExpr {
   abstract Data data(QueryContext qc) throws QueryException;
 
   @Override
-  public abstract IndexDb inline(Var var, Expr ex, CompileContext cc) throws QueryException;
+  public abstract IndexDb inline(ExprInfo ei, Expr ex, CompileContext cc) throws QueryException;
 
   @Override
   public abstract IndexDb copy(CompileContext cc, IntObjMap<Var> vm);

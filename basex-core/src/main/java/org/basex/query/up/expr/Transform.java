@@ -117,8 +117,9 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    final boolean a = inlineAll(var, ex, copies, cc), b = inlineAll(var, ex, exprs, cc);
+  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+      throws QueryException {
+    final boolean a = inlineAll(ei, ex, copies, cc), b = inlineAll(ei, ex, exprs, cc);
     return a || b ? optimize(cc) : null;
   }
 

@@ -137,11 +137,12 @@ abstract class CName extends CNode {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    boolean changed = inlineAll(var, ex, exprs, cc);
-    final Expr sub = name.inline(var, ex, cc);
-    if(sub != null) {
-      name = sub;
+  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+      throws QueryException {
+    boolean changed = inlineAll(ei, ex, exprs, cc);
+    final Expr inlined = name.inline(ei, ex, cc);
+    if(inlined != null) {
+      name = inlined;
       changed = true;
     }
     return changed ? optimize(cc) : null;

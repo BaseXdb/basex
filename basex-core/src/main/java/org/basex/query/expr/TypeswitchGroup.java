@@ -76,8 +76,8 @@ public final class TypeswitchGroup extends Single {
    */
   void inline(final CompileContext cc, final Value value) throws QueryException {
     if(var == null) return;
-    final Expr ex = expr.inline(var, var.checkType(value, cc.qc, true), cc);
-    if(ex != null) expr = ex;
+    final Expr inlined = expr.inline(var, var.checkType(value, cc.qc, true), cc);
+    if(inlined != null) expr = inlined;
   }
 
   /**
@@ -138,9 +138,9 @@ public final class TypeswitchGroup extends Single {
   }
 
   @Override
-  public Expr inline(final Var v, final Expr ex, final CompileContext cc) {
+  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc) {
     try {
-      return super.inline(v, ex, cc);
+      return super.inline(ei, ex, cc);
     } catch(final QueryException qe) {
       expr = cc.error(qe, expr);
       return this;

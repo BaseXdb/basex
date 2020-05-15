@@ -6,6 +6,7 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
@@ -71,32 +72,34 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    return inlineAll(var, ex, exprs, cc) ? optimize(cc) : null;
+  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+      throws QueryException {
+    return inlineAll(ei, ex, exprs, cc) ? optimize(cc) : null;
   }
 
   /**
    * Inlines an expression into this one, replacing all variable or context references.
-   * @param var variable to replace
+   * @param ei {@link Var}, {@link Path} or context ({@code null}) to inline
    * @param ex expression to inline
    * @param cc compilation context
    * @param context function for context inlining
    * @return resulting expression if something changed, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc,
-      final QueryFunction<Void, Expr> context) throws QueryException {
+  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc,
+      final QuerySupplier<Expr> context) throws QueryException {
 
     // no arguments are inlined: return null or apply context inlining function
-    if(!inlineAll(var, ex, exprs, cc))
-      return var != null ? null : context.apply(null);
+    if(!inlineAll(ei, ex, exprs, cc)) {
+      return ei != null ? null : context.get();
+    }
 
     // optimize new expression. skip further optimizations if variable was inlined
     final Expr opt = optimize(cc);
-    if(var != null) return opt;
+    if(ei != null) return opt;
 
     // inline again if context was inlined
-    final Expr inlined = opt.inline(null, ex, cc);
+    final Expr inlined = opt.inline(ei, ex, cc);
     return inlined != null ? inlined : opt;
   }
 

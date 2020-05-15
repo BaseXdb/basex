@@ -204,8 +204,8 @@ public final class For extends ForLet {
     // reset context value (will not be accessible in predicate)
     Expr pred = cc.get(expr, () -> {
       // assign type of iterated items to context expression
-      final Expr r = ex.inline(var, new ContextValue(info).optimize(cc), cc);
-      return r != null ? r : ex;
+      final Expr inlined = ex.inline(var, new ContextValue(info).optimize(cc), cc);
+      return inlined != null ? inlined : ex;
     });
 
     // attach predicates to axis path or filter, or create a new filter

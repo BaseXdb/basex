@@ -47,10 +47,11 @@ public abstract class IndexAccess extends Simple {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc) throws QueryException {
-    final IndexDb sub = db.inline(var, ex, cc);
-    if(sub != null) {
-      db = sub;
+  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+      throws QueryException {
+    final IndexDb inlined = db.inline(ei, ex, cc);
+    if(inlined != null) {
+      db = inlined;
       return this;
     }
     return null;

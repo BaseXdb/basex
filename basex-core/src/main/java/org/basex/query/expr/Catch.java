@@ -94,11 +94,11 @@ public final class Catch extends Single {
   }
 
   @Override
-  public Catch inline(final Var var, final Expr ex, final CompileContext cc) {
+  public Catch inline(final ExprInfo ei, final Expr ex, final CompileContext cc) {
     try {
-      final Expr sub = expr.inline(var, ex, cc);
-      if(sub == null) return null;
-      expr = sub;
+      final Expr inlined = expr.inline(ei, ex, cc);
+      if(inlined == null) return null;
+      expr = inlined;
     } catch(final QueryException qe) {
       expr = cc.error(qe, expr);
     }
@@ -117,8 +117,8 @@ public final class Catch extends Single {
     if(!(ex instanceof Value)) {
       int v = 0;
       for(final Value value : values(qe)) {
-        final Expr ex2 = ex.inline(vars[v++], value, cc);
-        if(ex2 != null) ex = ex2;
+        final Expr inlined = ex.inline(vars[v++], value, cc);
+        if(inlined != null) ex = inlined;
       }
     }
     return ex;
