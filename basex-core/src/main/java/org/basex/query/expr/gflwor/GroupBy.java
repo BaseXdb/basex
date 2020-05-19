@@ -250,7 +250,8 @@ public final class GroupBy extends Clause {
   @Override
   public Clause inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
       throws QueryException {
-    return inlineAll(ei, ex, specs, cc) || inlineAll(ei, ex, preExpr, cc) ? optimize(cc) : null;
+    // single or: inline both grouping specs and non-grouping variable expressions
+    return inlineAll(ei, ex, specs, cc) | inlineAll(ei, ex, preExpr, cc) ? optimize(cc) : null;
   }
 
   @Override
