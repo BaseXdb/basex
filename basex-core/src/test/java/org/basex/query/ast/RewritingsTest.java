@@ -1472,4 +1472,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>/*[a/b contains text 'x']/a/c", "",
         count(IterPath.class, 1), count(SingleIterPath.class, 1));
   }*/
+
+  /** FLWOR: Return clause, filter expression. */
+  @Test public void gh1867() {
+    check("for $a at $p in (1, 2) return $a[. = $p]", "1\n2", root(GFLWOR.class));
+  }
 }
