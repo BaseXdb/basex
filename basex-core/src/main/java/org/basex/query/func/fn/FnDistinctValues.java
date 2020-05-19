@@ -64,6 +64,11 @@ public final class FnDistinctValues extends StandardFunc {
   }
 
   @Override
+  protected void simplifyArgs(final CompileContext cc) {
+    // do not simplify type of key
+  }
+
+  @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     exprs[0] = exprs[0].simplifyFor(Simplify.DISTINCT, cc);
 

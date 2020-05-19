@@ -1477,4 +1477,10 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1867() {
     check("for $a at $p in (1, 2) return $a[. = $p]", "1\n2", root(GFLWOR.class));
   }
+
+  /** Distinct-values, optimization of arguments. */
+  @Test public void gh1868() {
+    check("let $s as xs:string* := distinct-values(<_>x</_> ! string()) return $s", "x",
+        root(DISTINCT_VALUES));
+  }
 }
