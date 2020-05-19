@@ -72,10 +72,6 @@ public final class If extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // static condition: return branch in question
-    cond = cond.simplifyFor(Simplify.EBV, cc);
-    if(cond instanceof Value) return cc.replaceWith(this, exprs[branch(cc.qc)]);
-
     // if A then B else B  ->  B (errors in A will be ignored)
     if(exprs[0].equals(exprs[1])) {
       if(!cond.has(Flag.NDT)) return cc.replaceWith(this, exprs[0]);
@@ -83,19 +79,26 @@ public final class If extends Arr {
       return cc.replaceWith(this, new List(info, cond, exprs[0]).optimize(cc));
     }
 
-    // if not(A) then B else C  ->  if A then C else B
-    if(Function.NOT.is(cond)) {
+    if(Function.EMPTY.is(cond)) {
+      // if empty(A) then B else C  ->  if exists(A) then C else B
+      cond = cc.function(Function.EXISTS, info, ((Arr) cond).exprs[0]);
       cc.info(OPTSWAP_X, this);
+      swap();
+    } else if(Function.NOT.is(cond)) {
+      // if not(A) then B else C  ->  if A then C else B
       cond = ((Arr) cond).exprs[0];
-      final Expr tmp = exprs[0];
-      exprs[0] = exprs[1];
-      exprs[1] = tmp;
+      cc.info(OPTSWAP_X, this);
+      swap();
     }
 
+    // static condition: return branch in question
+    cond = cond.simplifyFor(Simplify.EBV, cc);
+    if(cond instanceof Value) return cc.replaceWith(this, exprs[branch(cc.qc)]);
+
     // rewritings for constant booleans
-    final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
+    final Expr br1 = exprs[0], br2 = exprs[1];
+    final SeqType st1 = br1.seqType(), st2 = br2.seqType();
     if(st1.eq(SeqType.BLN_O) && st2.eq(SeqType.BLN_O)) {
-      final Expr br1 = exprs[0], br2 = exprs[1];
       if(br1 == Bln.TRUE) {
         return cc.replaceWith(this, br2 == Bln.FALSE ?
           // if(A) then true() else false()  ->  xs:boolean(A)
@@ -122,6 +125,27 @@ public final class If extends Arr {
 
     exprType.assign(st1.union(st2));
     return this;
+  }
+
+  /**
+   * Inverts the expression if the first branch is empty.
+   * @param cc compilation context
+   * @throws QueryException query exception
+   */
+  public void invert(final CompileContext cc) throws QueryException {
+    if(exprs[0] == Empty.VALUE) {
+      cond = cc.function(Function.NOT, info, cond);
+      swap();
+    }
+  }
+
+  /**
+   * Swaps the arguments.
+   */
+  private void swap() {
+    final Expr tmp = exprs[0];
+    exprs[0] = exprs[1];
+    exprs[1] = tmp;
   }
 
   @Override

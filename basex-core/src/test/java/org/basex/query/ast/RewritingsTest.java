@@ -939,6 +939,10 @@ public final class RewritingsTest extends QueryPlanTest {
         root(IterFilter.class), exists(ContextValue.class));
     check("for $t in ('a', 'b') return $t[$t]", "a\nb",
         root(IterFilter.class), exists(ContextValue.class));
+
+    check("for $i in 1 to 2\n" +
+        "for $f in if ($i = 1) then 1 else ()\n" +
+        "return $f + $i\n", 2, count(For.class, 1));
   }
 
   /** If expression with empty branches. */
@@ -1116,7 +1120,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[empty(b)][empty(c)]", "<a/>", count(EMPTY, 1), count(SingleIterPath.class, 1));
     check("<a/>[empty((b, c))]", "<a/>", count(SingleIterPath.class, 1));
     check("for $a in (<b/>, <c/>) return <a/>[empty(($a[. = 'a'], $a[. = 'b']))]", "<a/>\n<a/>",
-        count(IterFilter.class, 2));
+        count(IterFilter.class, 1));
 
     // no rewritings
     query("for $a in 1 to 2 return <a/>[empty(($a[. = 1], $a[. = 1]))]", "<a/>");

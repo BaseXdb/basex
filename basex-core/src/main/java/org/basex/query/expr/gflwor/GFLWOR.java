@@ -667,28 +667,42 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Rewrites an if expression in the return clause to a where clause.
+   * Rewrites if expressions to where clauses.
    * @param cc compilation context
    * @return change flag
    * @throws QueryException query exception
    */
   private boolean ifToWhere(final CompileContext cc) throws QueryException {
-    if(!(rtrn instanceof If)) return false;
+    final QueryFunction<Expr, If> rewritableIf = expr -> {
+      if(expr instanceof If) {
+        final If iff = (If) expr;
+        iff.invert(cc);
+        if(iff.exprs[1] == Empty.VALUE) return iff;
+      }
+      return null;
+    };
 
-    // invert condition if first branch is empty
-    final If iff = (If) rtrn;
-    Expr cond = iff.cond, thn = iff.exprs[0];
-    final Expr els = iff.exprs[1];
-    if(thn == Empty.VALUE) {
-      thn = els;
-      cond = cc.function(Function.NOT, info, iff.cond);
-    } else if(els != Empty.VALUE) {
-      return false;
+    boolean changed = false;
+    for(int c = clauses.size(); --c >= 0;) {
+      final Clause clause = clauses.get(c);
+      if(clause instanceof For) {
+        final For fr = (For) clause;
+        final If iff = rewritableIf.apply(fr.expr);
+        if(iff != null && !fr.empty) {
+          fr.expr = iff.exprs[0];
+          clauses.add(c, new Where(iff.cond, iff.info));
+          changed = true;
+        }
+      }
     }
 
-    clauses.add(new Where(cond, iff.info));
-    rtrn = thn;
-    return true;
+    final If iff = rewritableIf.apply(rtrn);
+    if(iff != null) {
+      clauses.add(new Where(iff.cond, iff.info));
+      rtrn = iff.exprs[0];
+      changed = true;
+    }
+    return changed;
   }
 
   /**
