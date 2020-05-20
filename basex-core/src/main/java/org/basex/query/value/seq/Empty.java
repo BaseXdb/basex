@@ -49,7 +49,7 @@ public final class Empty extends Item {
   }
 
   @Override
-  public boolean isVacuous() {
+  public boolean vacuous() {
     return true;
   }
 

@@ -94,8 +94,8 @@ public final class MixedPath extends Path {
   }
 
   @Override
-  public boolean isVacuous() {
-    return steps[steps.length - 1].isVacuous();
+  public boolean vacuous() {
+    return steps[steps.length - 1].vacuous();
   }
 
   @Override

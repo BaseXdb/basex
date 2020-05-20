@@ -54,8 +54,8 @@ public interface XQFunctionExpr {
   Expr inline(Expr[] exprs, CompileContext cc) throws QueryException;
 
   /**
-   * Checks if this function returns vacuous results (see {@link Expr#isVacuous()}).
+   * Checks if this function returns vacuous results (see {@link Expr#vacuous()}).
    * @return result of check
    */
-  boolean isVacuousBody();
+  boolean vacuousBody();
 }

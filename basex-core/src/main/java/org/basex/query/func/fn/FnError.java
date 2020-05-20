@@ -43,7 +43,7 @@ public final class FnError extends StandardFunc {
   }
 
   @Override
-  public boolean isVacuous() {
+  public boolean vacuous() {
     return true;
   }
 

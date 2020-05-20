@@ -361,13 +361,13 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public boolean isVacuous() {
+  public boolean vacuous() {
     return declType != null && declType.zero() && !has(Flag.UPD);
   }
 
   @Override
-  public boolean isVacuousBody() {
-    return isVacuous();
+  public boolean vacuousBody() {
+    return vacuous();
   }
 
   @Override
@@ -421,7 +421,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final boolean updAnn = anns.contains(Annotation.UPDATING);
     if(updating != updAnn) {
       if(!updAnn) anns.add(new Ann(info, Annotation.UPDATING));
-      else if(!expr.isVacuous()) throw UPEXPECTF.get(info);
+      else if(!expr.vacuous()) throw UPEXPECTF.get(info);
     }
   }
 

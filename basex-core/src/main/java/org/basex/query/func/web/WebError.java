@@ -40,7 +40,7 @@ public final class WebError extends StandardFunc {
   }
 
   @Override
-  public boolean isVacuous() {
+  public boolean vacuous() {
     return true;
   }
 

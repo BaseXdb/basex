@@ -45,7 +45,7 @@ public final class Transform extends Arr {
     for(final Let copy : copies) copy.checkUp();
     final Expr modify = exprs[0];
     modify.checkUp();
-    if(!modify.isVacuous() && !modify.has(Flag.UPD)) throw UPMODIFY.get(info);
+    if(!modify.vacuous() && !modify.has(Flag.UPD)) throw UPMODIFY.get(info);
     exprs[1].checkUp();
   }
 

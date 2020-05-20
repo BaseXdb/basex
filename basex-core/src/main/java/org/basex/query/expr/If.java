@@ -218,8 +218,8 @@ public final class If extends Arr {
   }
 
   @Override
-  public boolean isVacuous() {
-    return exprs[0].isVacuous() && exprs[1].isVacuous();
+  public boolean vacuous() {
+    return exprs[0].vacuous() && exprs[1].vacuous();
   }
 
   @Override

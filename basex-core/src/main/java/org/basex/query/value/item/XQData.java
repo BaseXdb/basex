@@ -47,7 +47,7 @@ public abstract class XQData extends FItem {
   }
 
   @Override
-  public final boolean isVacuousBody() {
+  public final boolean vacuousBody() {
     return false;
   }
 

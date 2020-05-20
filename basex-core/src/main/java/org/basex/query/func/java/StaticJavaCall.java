@@ -54,7 +54,7 @@ public final class StaticJavaCall extends JavaCall {
   }
 
   @Override
-  public boolean isVacuous() {
+  public boolean vacuous() {
     return method.getReturnType() == Void.TYPE;
   }
 

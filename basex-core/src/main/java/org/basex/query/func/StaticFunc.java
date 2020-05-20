@@ -198,7 +198,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     if(updating) {
       // updating function
       if(declType != null && !declType.zero()) throw UUPFUNCTYPE.get(info);
-      if(!upd && !expr.isVacuous()) throw UPEXPECTF.get(ii);
+      if(!upd && !expr.vacuous()) throw UPEXPECTF.get(ii);
     } else if(upd) {
       // uses updates, but is not declared as such
       throw UPNOT_X.get(ii, description());
@@ -206,7 +206,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public boolean isVacuousBody() {
+  public boolean vacuousBody() {
     return declType != null && declType.zero() && !has(Flag.UPD);
   }
 

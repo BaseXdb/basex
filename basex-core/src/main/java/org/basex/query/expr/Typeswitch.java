@@ -157,11 +157,8 @@ public final class Typeswitch extends ParseExpr {
   }
 
   @Override
-  public boolean isVacuous() {
-    for(final TypeswitchGroup group : groups) {
-      if(!group.expr.isVacuous()) return false;
-    }
-    return true;
+  public boolean vacuous() {
+    return ((Checks<TypeswitchGroup>) group -> group.expr.vacuous()).all(groups);
   }
 
   @Override

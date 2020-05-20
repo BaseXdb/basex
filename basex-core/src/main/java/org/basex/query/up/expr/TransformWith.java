@@ -47,7 +47,7 @@ public final class TransformWith extends Arr {
     checkNoUp(exprs[0]);
     final Expr modify = exprs[1];
     modify.checkUp();
-    if(!modify.isVacuous() && !modify.has(Flag.UPD)) throw UPMODIFY.get(info);
+    if(!modify.vacuous() && !modify.has(Flag.UPD)) throw UPMODIFY.get(info);
   }
 
   @Override

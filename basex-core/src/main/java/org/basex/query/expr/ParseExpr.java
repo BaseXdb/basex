@@ -157,7 +157,7 @@ public abstract class ParseExpr extends Expr {
 
     if(!(sc.mixUpdates || updating == expr.annotations().contains(Annotation.UPDATING))) {
       if(!updating) throw FUNCUP_X.get(info, expr);
-      if(!expr.isVacuousBody()) throw FUNCNOTUP_X.get(info, expr);
+      if(!expr.vacuousBody()) throw FUNCNOTUP_X.get(info, expr);
     }
     return expr;
   }
@@ -199,7 +199,7 @@ public abstract class ParseExpr extends Expr {
     int state = 0;
     for(final Expr expr : exprs) {
       expr.checkUp();
-      if(expr.isVacuous()) continue;
+      if(expr.vacuous()) continue;
       final boolean updating = expr.has(Flag.UPD);
       if(updating ? state == -1 : state == 1) throw UPALL.get(info);
       state = updating ? 1 : -1;

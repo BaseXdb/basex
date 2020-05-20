@@ -155,7 +155,7 @@ public abstract class Expr extends ExprInfo {
    * This check is needed for updating queries.
    * @return result of check
    */
-  public boolean isVacuous() {
+  public boolean vacuous() {
     return false;
   }
 

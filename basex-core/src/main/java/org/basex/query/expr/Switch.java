@@ -162,11 +162,8 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public boolean isVacuous() {
-    for(final SwitchGroup group : groups) {
-      if(!group.exprs[0].isVacuous()) return false;
-    }
-    return true;
+  public boolean vacuous() {
+    return ((Checks<SwitchGroup>) group -> group.exprs[0].vacuous()).all(groups);
   }
 
   @Override

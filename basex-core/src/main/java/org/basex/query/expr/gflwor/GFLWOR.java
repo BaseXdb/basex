@@ -842,8 +842,8 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public boolean isVacuous() {
-    return rtrn.isVacuous();
+  public boolean vacuous() {
+    return rtrn.vacuous();
   }
 
   @Override

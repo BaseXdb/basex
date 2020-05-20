@@ -140,11 +140,8 @@ public final class Try extends Single {
   }
 
   @Override
-  public boolean isVacuous() {
-    for(final Catch ctch : catches) {
-      if(!ctch.expr.isVacuous()) return false;
-    }
-    return expr.isVacuous();
+  public boolean vacuous() {
+    return expr.vacuous() && ((Checks<Catch>) ctch -> ctch.expr.vacuous()).all(catches);
   }
 
   @Override
