@@ -24,4 +24,9 @@ public final class LazyCache extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     return adoptType(exprs[0]);
   }
+
+  @Override
+  public boolean ddo() {
+    return exprs[0].ddo();
+  }
 }

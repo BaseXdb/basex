@@ -145,6 +145,11 @@ public final class Try extends Single {
   }
 
   @Override
+  public boolean ddo() {
+    return expr.ddo() && ((Checks<Catch>) ctch -> ctch.expr.ddo()).all(catches);
+  }
+
+  @Override
   public boolean has(final Flag... flags) {
     for(final Catch ctch : catches) {
       if(ctch.has(flags)) return true;

@@ -136,11 +136,6 @@ public abstract class AxisPath extends Path {
   }
 
   @Override
-  public final boolean ddo() {
-    return true;
-  }
-
-  @Override
   public Expr mergeEbv(final Expr expr, final boolean or, final CompileContext cc)
       throws QueryException {
 

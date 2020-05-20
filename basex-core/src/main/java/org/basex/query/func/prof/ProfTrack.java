@@ -3,7 +3,6 @@ package org.basex.query.func.prof;
 import java.math.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -74,10 +73,5 @@ public final class ProfTrack extends StandardFunc {
     // evaluated value
     if(value != null) mb.put(TrackOptions.VALUE.name(), value);
     return mb.finish();
-  }
-
-  @Override
-  protected Expr opt(final CompileContext cc) {
-    return adoptType(exprs[0]);
   }
 }

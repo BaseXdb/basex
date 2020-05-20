@@ -35,7 +35,7 @@ abstract class Ids extends ContextFn {
    * @return referenced nodes
    * @throws QueryException query exception
    */
-  protected Value ids(final QueryContext qc, final boolean idref) throws QueryException {
+  protected final Value ids(final QueryContext qc, final boolean idref) throws QueryException {
     final TokenSet idSet = ids(exprs[0].atomIter(qc, info), qc);
     final ANode root = checkRoot(toNode(ctxArg(1, qc), qc));
 
@@ -131,12 +131,12 @@ abstract class Ids extends ContextFn {
   }
 
   @Override
-  int contextArg() {
+  final int contextArg() {
     return 1;
   }
 
   @Override
-  public boolean ddo() {
+  public final boolean ddo() {
     return true;
   }
 }

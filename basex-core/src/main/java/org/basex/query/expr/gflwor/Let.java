@@ -97,13 +97,16 @@ public final class Let extends ForLet {
       }
     }
     // promote at compile time
-    if(expr instanceof Value && var.checksType())
+    if(expr instanceof Value && var.checksType()) {
       expr = var.checkType((Value) expr, cc.qc, true);
+    }
 
     // assign type to clause and variable
-    if(!scoring) {
+    if(scoring) {
+      var.expr(Dbl.ZERO);
+    } else {
       adoptType(expr);
-      var.data = expr.data();
+      var.expr(expr);
     }
     var.refineType(seqType(), size(), cc);
     return this;

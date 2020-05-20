@@ -34,7 +34,7 @@ public final class UtilDdo extends StandardFunc {
     final SeqType st = expr.seqType();
     final Type type = st.type;
     if(type instanceof NodeType) {
-      if(st.zeroOrOne()) return expr;
+      if(expr.ddo() || st.zeroOrOne()) return expr;
       exprType.assign(type);
     }
     return this;

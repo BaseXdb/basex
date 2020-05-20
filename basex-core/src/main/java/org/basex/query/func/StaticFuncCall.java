@@ -118,6 +118,11 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   @Override
+  public boolean ddo() {
+    return func.expr.ddo();
+  }
+
+  @Override
   public boolean has(final Flag... flags) {
     // check arguments, which will be evaluated previous to the function body
     if(super.has(flags)) return true;

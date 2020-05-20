@@ -97,4 +97,9 @@ public class FnOutermost extends StandardFunc {
     final SeqType st1 = exprs[0].seqType();
     return st1.zeroOrOne() && st1.type instanceof NodeType ? exprs[0] : this;
   }
+
+  @Override
+  public final boolean ddo() {
+    return true;
+  }
 }

@@ -50,6 +50,11 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
+  public boolean ddo() {
+    return var.ddo();
+  }
+
+  @Override
   public Data data() {
     return var.data();
   }

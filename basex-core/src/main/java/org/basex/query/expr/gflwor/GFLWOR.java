@@ -651,7 +651,7 @@ public final class GFLWOR extends ParseExpr {
           final Axis axis = ((Step) expr).axis;
           return axis == Axis.SELF || axis == Axis.CHILD || axis == Axis.ATTRIBUTE;
         };
-        if(last.expr instanceof Path && simple.all(path.steps)) {
+        if(last.expr.ddo() && simple.all(path.steps)) {
           // for $a in //a return $a/b  ->  //a/b
           rtrn = func.apply(last.expr);
         } else {

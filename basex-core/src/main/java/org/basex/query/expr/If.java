@@ -223,6 +223,11 @@ public final class If extends Arr {
   }
 
   @Override
+  public boolean ddo() {
+    return exprs[0].ddo() && exprs[1].ddo();
+  }
+
+  @Override
   public void markTailCalls(final CompileContext cc) {
     for(final Expr expr : exprs) expr.markTailCalls(cc);
   }

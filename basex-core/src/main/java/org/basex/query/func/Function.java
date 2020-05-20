@@ -1190,7 +1190,7 @@ public enum Function implements AFunction {
       arg(ITEM_ZM, STR_O), ITEM_ZM, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_TRACK(ProfTrack::new, "track(value[,options])",
-      arg(ITEM_ZM, MAP_ZO), ITEM_ZM, flag(NDT), PROF_URI),
+      arg(ITEM_ZM, MAP_ZO), MAP_O, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_TYPE(ProfType::new, "type(value)", arg(ITEM_ZM), ITEM_ZM, PROF_URI),
   /** XQuery function. */

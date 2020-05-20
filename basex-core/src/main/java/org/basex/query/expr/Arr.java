@@ -222,8 +222,8 @@ public abstract class Arr extends ParseExpr {
     if(!(positional && has(Flag.POS))) {
       final Class<? extends Arr> clazz = or ? And.class : Or.class;
       final QueryBiFunction<Boolean, Expr[], Expr> func = (invert, args) ->
-        ((invert ? !or : or) ? new Or(info, args) : new And(info, args)).optimize(cc);
-      final Expr tmp = rewrite(clazz, func);
+        (invert ? !or : or) ? new Or(info, args) : new And(info, args);
+      final Expr tmp = rewrite(clazz, func, cc);
       if(tmp != null) {
         exprs = new Expr[] { tmp };
         cc.info(OPTREWRITE_X_X, (Supplier<?>) this::description, this);
@@ -274,11 +274,13 @@ public abstract class Arr extends ParseExpr {
    * Rewrites logical and set expressions.
    * @param inverse inverse operator
    * @param newExpr function for creating a new expression
+   * @param cc compilation context
    * @return optimized expression or null
    * @throws QueryException query exception
    */
   Expr rewrite(final Class<? extends Arr> inverse,
-      final QueryBiFunction<Boolean, Expr[], Expr> newExpr) throws QueryException {
+      final QueryBiFunction<Boolean, Expr[], Expr> newExpr, final CompileContext cc)
+      throws QueryException {
 
     // skip if only one operand is left, or if children have no operands that can be optimized
     if(exprs.length < 2 || !((Checks<Expr>) expr -> inverse.isInstance(expr)).any(exprs))
@@ -299,7 +301,7 @@ public abstract class Arr extends ParseExpr {
 
     // common operands found: recombine expressions
     final QueryBiFunction<Boolean, Expr[], Expr> f = (invert, args) ->
-      args.length == 1 ? args[0] : newExpr.apply(invert, args);
+      args.length == 1 ? args[0] : newExpr.apply(invert, args).optimize(cc);
 
     final Expr left = f.apply(true, lefts.toArray());
     final ExprList rights = new ExprList(exprs.length);
@@ -309,7 +311,7 @@ public abstract class Arr extends ParseExpr {
         // no additional tests: return common tests
         // A intersect (A union B)  ->  A
         // (A and B) or (A and B and C)  ->  A
-        return left;
+        return left.ddo() ? left : cc.function(Function._UTIL_DDO, info, left);
       } else if(curr.size() == 1) {
         // single additional test: add this test
         // (A and B) or (A and C)  ->  A and (B or C)

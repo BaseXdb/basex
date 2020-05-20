@@ -29,9 +29,6 @@ public final class Var extends ExprInfo {
   public SeqType declType;
   /** Flag for function conversion. */
   public boolean promote;
-  /** Data reference (can be {@code null}). */
-  public Data data;
-
   /** Stack slot number. */
   int slot;
 
@@ -41,6 +38,8 @@ public final class Var extends ExprInfo {
   private final StaticContext sc;
   /** Flag for function parameters. */
   private final boolean param;
+  /** Input expression, from which the data reference and DDO flag will be requested. */
+  private Expr ex;
 
   /**
    * Constructor for a variable with an already known stack slot.
@@ -101,18 +100,35 @@ public final class Var extends ExprInfo {
   }
 
   /**
+   * Attaches an input expression.
+   * @param expr input expression
+   */
+  public void expr(final Expr expr) {
+    ex = expr;
+  }
+
+  /**
    * Returns the result size.
    * @return result size
    */
   public long size() {
     return exprType.size();
   }
+
   /**
-   * Returns the data reference bound to this variable.
+   * Returns the distinct document order flag. See {@link Expr#ddo} for details.
+   * @return result of check
+   */
+  public boolean ddo() {
+    return seqType().zeroOrOne() || ex != null && ex.ddo();
+  }
+
+  /**
+   * Returns the data reference bound to this variable. See {@link Expr#data} for details.
    * @return data reference (can be {@code null})
    */
   public Data data() {
-    return data;
+    return ex != null ? ex.data() : null;
   }
 
   /**

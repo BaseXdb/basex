@@ -30,6 +30,11 @@ public class ProfTime extends StandardFunc {
     return adoptType(exprs[0]);
   }
 
+  @Override
+  public boolean ddo() {
+    return exprs[0].ddo();
+  }
+
   /**
    * Profiles the argument.
    * @param qc query context

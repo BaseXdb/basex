@@ -125,9 +125,15 @@ public final class For extends ForLet {
     final SeqType type = expr.seqType();
     exprType.assign(type.type, empty && !type.oneOrMore() ? Occ.ZERO_ONE : Occ.ONE);
     var.refineType(seqType(), size(), cc);
-    var.data = expr.data();
-    if(pos != null) pos.refineType(SeqType.ITR_O, 1, cc);
-    if(score != null) score.refineType(SeqType.DBL_O, 1, cc);
+    var.expr(expr);
+    if(pos != null) {
+      pos.refineType(SeqType.ITR_O, 1, cc);
+      pos.expr(Int.ZERO);
+    }
+    if(score != null) {
+      score.refineType(SeqType.DBL_O, 1, cc);
+      score.expr(Dbl.ZERO);
+    }
     return this;
   }
 

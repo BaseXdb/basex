@@ -44,6 +44,11 @@ public class FnTrace extends StandardFunc {
     return adoptType(exprs[0]);
   }
 
+  @Override
+  public boolean ddo() {
+    return exprs[0].ddo();
+  }
+
   /**
    * Dumps the specified info to standard error or the info view of the GUI.
    * @param value traced value

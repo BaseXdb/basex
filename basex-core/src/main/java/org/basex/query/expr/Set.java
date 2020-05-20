@@ -39,19 +39,19 @@ abstract class Set extends Arr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    iterative = ((Checks<Expr>) Expr::ddo).all(exprs);
-
     Expr expr = opt(cc);
     if(expr == null) {
       final int el = exprs.length;
       if(el == 0) return Empty.VALUE;
-      if(el == 1) return iterative ? exprs[0] : cc.function(Function._UTIL_DDO, info, exprs[0]);
-
+      if(el == 1) return cc.function(Function._UTIL_DDO, info, exprs[0]);
       // try to merge operands
       expr = mergePaths(cc);
       if(expr == null) expr = mergeFilters(cc);
     }
-    return expr != null ? cc.replaceWith(this, expr) : this;
+    if(expr != null) return cc.replaceWith(this, expr);
+
+    iterative = ((Checks<Expr>) Expr::ddo).all(exprs);
+    return this;
   }
 
   /**

@@ -162,6 +162,11 @@ public final class Typeswitch extends ParseExpr {
   }
 
   @Override
+  public boolean ddo() {
+    return ((Checks<TypeswitchGroup>) group -> group.expr.ddo()).all(groups);
+  }
+
+  @Override
   public boolean has(final Flag... flags) {
     for(final TypeswitchGroup group : groups) {
       if(group.has(flags)) return true;

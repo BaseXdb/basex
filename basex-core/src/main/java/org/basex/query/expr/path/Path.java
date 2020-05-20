@@ -301,9 +301,7 @@ public abstract class Path extends ParseExpr {
     // self step was removed: ensure that result will be in distinct document order
     if(self != null && (list.isEmpty() || !list.get(0).seqType().type.instanceOf(NodeType.NOD))) {
       if(root == null) root = new ContextValue(info).optimize(cc);
-      if(!root.seqType().zeroOrOne() || root instanceof DBNodeSeq) {
-        root = cc.replaceWith(root, cc.function(Function._UTIL_DDO, info, root));
-      }
+      if(!root.ddo()) root = cc.replaceWith(root, cc.function(Function._UTIL_DDO, info, root));
     }
 
     // no steps left: return root
@@ -1079,8 +1077,13 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public void data(final Data dt) {
+  public final void data(final Data dt) {
     data = dt;
+  }
+
+  @Override
+  public final boolean ddo() {
+    return true;
   }
 
   @Override

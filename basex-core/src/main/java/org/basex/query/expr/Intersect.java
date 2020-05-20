@@ -64,7 +64,7 @@ public final class Intersect extends Set {
       exprs = list.finish();
 
       final Expr ex = rewrite(Union.class, (invert, ops) ->
-        (invert ? new Union(info, ops) : new Intersect(info, ops)).optimize(cc));
+        invert ? new Union(info, ops) : new Intersect(info, ops), cc);
       if(ex != null) {
         cc.info(OPTREWRITE_X_X, (Supplier<?>) this::description, ex);
         return ex;

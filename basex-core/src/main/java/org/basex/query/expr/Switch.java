@@ -167,6 +167,11 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
+  public boolean ddo() {
+    return ((Checks<SwitchGroup>) group -> group.exprs[0].ddo()).all(groups);
+  }
+
+  @Override
   public boolean has(final Flag... flags) {
     for(final SwitchGroup group : groups) {
       if(group.has(flags)) return true;
