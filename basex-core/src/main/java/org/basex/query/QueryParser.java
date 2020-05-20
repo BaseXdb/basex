@@ -1388,9 +1388,9 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(TERNARY1)) return iff;
 
     final InputInfo ii = info();
-    final Expr thn = check(elvis(), NOTERNARY);
+    final Expr thn = check(single(), NOTERNARY);
     if(!wsConsumeWs(TERNARY2)) throw error(NOTERNARY);
-    final Expr els = check(elvis(), NOTERNARY);
+    final Expr els = check(single(), NOTERNARY);
     return new If(ii, iff, thn, els);
   }
 
@@ -1402,7 +1402,7 @@ public class QueryParser extends InputParser {
   private Expr elvis() throws QueryException {
     final Expr ex = or();
     if(!wsConsumeWs(ELVIS)) return ex;
-    return Function._UTIL_OR.get(sc, info(), ex, check(or(), NOELVIS));
+    return Function._UTIL_OR.get(sc, info(), ex, check(single(), NOELVIS));
   }
 
   /**
