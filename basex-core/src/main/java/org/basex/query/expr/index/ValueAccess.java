@@ -152,8 +152,7 @@ public final class ValueAccess extends IndexAccess {
         public DBNode next() {
           while(ii.more()) {
             tmp.pre(data.parent(ii.pre(), kind));
-            if(!test.matches(tmp)) continue;
-            return tmp.finish();
+            if(test.matches(tmp)) return tmp.finish();
           }
           return null;
         }
