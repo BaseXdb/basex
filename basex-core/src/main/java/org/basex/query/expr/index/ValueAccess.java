@@ -144,24 +144,59 @@ public final class ValueAccess extends IndexAccess {
     final IndexIterator ii = index ? data.iter(new StringToken(type, term)) : scan(term, data);
     final int kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
     final DBNode tmp = new DBNode(data, 0, test == null ? kind : Data.ELEM);
+
+    // test names of parents (index access or sequential scan)
+    if(test != null) {
+      return new DBNodeIter(data) {
+        @Override
+        public DBNode next() {
+          while(ii.more()) {
+            tmp.pre(data.parent(ii.pre(), kind));
+            if(!test.matches(tmp)) continue;
+            return tmp.finish();
+          }
+          return null;
+        }
+      };
+    }
+
+    // sequential scan
+    if(!index) {
+      return new DBNodeIter(data) {
+        @Override
+        public DBNode next() {
+          while(ii.more()) {
+            tmp.pre(ii.pre());
+            return tmp.finish();
+          }
+          return null;
+        }
+      };
+    }
+
+    // cache retrieved values for direct access
     return new DBNodeIter(data) {
+      final IntList list = new IntList();
+
       @Override
       public DBNode next() {
         while(ii.more()) {
-          if(test == null) {
-            tmp.pre(ii.pre());
-          } else {
-            tmp.pre(data.parent(ii.pre(), kind));
-            if(!test.matches(tmp)) continue;
-          }
+          final int pre = ii.pre();
+          tmp.pre(pre);
+          list.add(pre);
           return tmp.finish();
         }
         return null;
       }
       @Override
+      public DBNode get(final long i) {
+        while(i >= list.size() && next() != null);
+        tmp.pre(list.get((int) i));
+        return tmp.finish();
+      }
+      @Override
       public long size() {
-        // index access: number of results is known in advance
-        return index ? ii.size() : -1;
+        return ii.size();
       }
     };
   }
