@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.jar.*;
+import java.util.jar.Attributes.Name;
 
 /**
  * Utility class to retrieve the manifest attributes of a JAR in the classpath.
@@ -46,11 +47,21 @@ final class JarManifest {
    * @param key key
    * @return value or {@code null}
    */
-  public static Object get(final String key) {
+  public static String get(final String key) {
     if(MAP != null) {
-      for(final Map.Entry<Object, Object> entry : MAP.entrySet()) {
-        if(key.equals(entry.getKey().toString())) return entry.getValue();
-      }
+      return MAP.getValue(key);
+    }
+    return null;
+  }
+
+  /**
+   * Returns the manifest value for the specified key.
+   * @param key key
+   * @return value or {@code null}
+   */
+  public static String get(final Name key) {
+    if(MAP != null) {
+      return MAP.getValue(key);
     }
     return null;
   }
