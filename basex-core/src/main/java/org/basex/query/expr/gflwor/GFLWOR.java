@@ -676,7 +676,10 @@ public final class GFLWOR extends ParseExpr {
     final QueryFunction<Expr, If> rewritableIf = expr -> {
       if(expr instanceof If) {
         final If iff = (If) expr;
-        iff.invert(cc);
+        if(iff.exprs[0] == Empty.VALUE) {
+          iff.cond = cc.function(Function.NOT, info, iff.cond);
+          iff.swap();
+        }
         if(iff.exprs[1] == Empty.VALUE) return iff;
       }
       return null;

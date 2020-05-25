@@ -128,21 +128,9 @@ public final class If extends Arr {
   }
 
   /**
-   * Inverts the expression if the first branch is empty.
-   * @param cc compilation context
-   * @throws QueryException query exception
-   */
-  public void invert(final CompileContext cc) throws QueryException {
-    if(exprs[0] == Empty.VALUE) {
-      cond = cc.function(Function.NOT, info, cond);
-      swap();
-    }
-  }
-
-  /**
    * Swaps the arguments.
    */
-  private void swap() {
+  public void swap() {
     final Expr tmp = exprs[0];
     exprs[0] = exprs[1];
     exprs[1] = tmp;
