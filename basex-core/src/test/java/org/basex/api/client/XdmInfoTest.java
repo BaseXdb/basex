@@ -111,7 +111,6 @@ public final class XdmInfoTest extends SandboxTest {
       sout.write(cmd.code);
       send(arg);
       sout.flush();
-      @SuppressWarnings("resource")
       final BufferInput bi = BufferInput.get(sin);
       ClientSession.receive(bi, ao);
       if(!ClientSession.ok(bi)) throw new BaseXException(bi.readString());

@@ -93,7 +93,7 @@ public class FnOutermost extends StandardFunc {
   }
 
   @Override
-  protected final Expr opt(final CompileContext cc) throws QueryException {
+  protected final Expr opt(final CompileContext cc) {
     final SeqType st1 = exprs[0].seqType();
     return st1.zeroOrOne() && st1.type instanceof NodeType ? exprs[0] : this;
   }

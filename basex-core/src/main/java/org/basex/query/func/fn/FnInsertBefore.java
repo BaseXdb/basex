@@ -54,7 +54,7 @@ public final class FnInsertBefore extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr expr1 = exprs[0], expr3 = exprs[2];
     if(expr1 == Empty.VALUE) return expr3;
     if(expr3 == Empty.VALUE) return expr1;

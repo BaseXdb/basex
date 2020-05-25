@@ -24,7 +24,7 @@ public final class FnContains extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     // contains($a, ''), contains($a, $a)
     if(exprs.length < 3 && expr1.seqType().type.isStringOrUntyped() && !expr1.has(Flag.NDT)) {

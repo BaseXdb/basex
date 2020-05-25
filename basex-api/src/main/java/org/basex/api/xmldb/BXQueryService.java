@@ -57,12 +57,14 @@ public final class BXQueryService implements XPathQueryService {
 
   @Override
   public String getNamespace(final String prefix) {
-    return ns.get(prefix == null ? "" : prefix);
+    final String key = prefix == null ? "" : prefix;
+    return ns.get(key);
   }
 
   @Override
   public void removeNamespace(final String prefix) {
-    ns.remove(prefix == null ? "" : prefix);
+    final String key = prefix == null ? "" : prefix;
+    ns.remove(key);
   }
 
   @Override

@@ -35,7 +35,7 @@ public final class Except extends Set {
   }
 
   @Override
-  Expr opt(final CompileContext cc) throws QueryException {
+  Expr opt(final CompileContext cc) {
     // first operand is empty: return empty sequence
     if(exprs[0] == Empty.VALUE) return cc.emptySeq(this);
 

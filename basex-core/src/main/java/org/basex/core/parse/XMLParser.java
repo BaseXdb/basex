@@ -44,12 +44,14 @@ final class XMLParser extends CommandParser {
         query = COMMANDS + query;
         // ensure that the root contains no text nodes as children
         final String ws = COMMANDS + "/text()[normalize-space()]";
-        try(QueryProcessor qp = new QueryProcessor(ws, ctx).context(node)) {
+        try(QueryProcessor qp = new QueryProcessor(ws, ctx)) {
+          qp.context(node);
           if(!qp.value().isEmpty())
             throw error(Text.SYNTAX_X, '<' + COMMANDS + "><...></" + COMMANDS + '>');
         }
       }
-      try(QueryProcessor qp = new QueryProcessor(query, ctx).context(node)) {
+      try(QueryProcessor qp = new QueryProcessor(query, ctx)) {
+        qp.context(node);
         for(final Item ia : qp.value()) cmds.add(command(ia).baseURI(uri));
       }
     } catch(final IOException ex) {
@@ -232,7 +234,8 @@ final class XMLParser extends CommandParser {
    * @throws QueryException query exception
    */
   private String execute(final String query, final Item context) throws QueryException {
-    try(QueryProcessor qp = new QueryProcessor(query, ctx).context(context)) {
+    try(QueryProcessor qp = new QueryProcessor(query, ctx)) {
+      qp.context(context);
       final Iter iter = qp.iter();
       final Item item = iter.next();
       return item == null ? "" : item.toJava().toString().trim();
@@ -298,7 +301,8 @@ final class XMLParser extends CommandParser {
     }
 
     // run query
-    try(QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root)) {
+    try(QueryProcessor qp = new QueryProcessor(tb.toString(), ctx)) {
+      qp.context(root);
       qp.bind("A", StrSeq.get(mand.toArray())).bind("O", StrSeq.get(opt.toArray()));
       if(!qp.value().isEmpty()) return true;
     }
