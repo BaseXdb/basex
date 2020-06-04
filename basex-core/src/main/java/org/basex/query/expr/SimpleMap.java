@@ -138,7 +138,7 @@ public abstract class SimpleMap extends Arr {
       Expr rep = null;
       if(next instanceof Filter) {
         final Filter filter = (Filter) next;
-        if(filter.root instanceof ContextValue) {
+        if(filter.root instanceof ContextValue && !filter.mayBePositional()) {
           // merge filter with context value as root
           // A ! .[B]  ->  A[B]
           rep = Filter.get(cc, info, expr, ((Filter) next).exprs);

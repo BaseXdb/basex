@@ -1467,16 +1467,6 @@ public final class RewritingsTest extends QueryPlanTest {
     check("count(for $c in //* return $c/following::*)", 2, exists(IterMap.class));
   }
 
-  /* Remove redundant paths with comparisons.
-  @Test public void gh1866() {
-    check("<a/>/*[a = 'x]/a", "", count(IterPath.class, 1), empty(SingleIterPath.class));
-    check("<a/>/*[a ne 'x']/a/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
-    check("<a/>/*[a/b > 1]/a/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
-    check("<a/>/*[a/b > 'x']/a", "", count(IterPath.class, 1), count(SingleIterPath.class, 1));
-    check("<a/>/*[a/b contains text 'x']/a/c", "",
-        count(IterPath.class, 1), count(SingleIterPath.class, 1));
-  }*/
-
   /** FLWOR: Return clause, filter expression. */
   @Test public void gh1867() {
     check("for $a at $p in (1, 2) return $a[. = $p]", "1\n2", root(GFLWOR.class));
@@ -1486,5 +1476,10 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1868() {
     check("let $s as xs:string* := distinct-values(<_>x</_> ! string()) return $s", "x",
         root(DISTINCT_VALUES));
+  }
+
+  /** Simple map, positional predicates. */
+  @Test public void gh1874() {
+    check("(1, 2) ! .[.]", 1);
   }
 }
