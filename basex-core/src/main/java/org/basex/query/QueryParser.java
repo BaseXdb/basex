@@ -1847,7 +1847,7 @@ public class QueryParser extends InputParser {
       if(next != '=' && next != '!' && wsConsumeWs(EXCL)) {
         final ExprList el = new ExprList(ex);
         do add(el, path()); while(next() != '=' && wsConsumeWs(EXCL));
-        return SimpleMap.get(info(), el.finish());
+        return new CachedMap(info(), el.finish());
       }
     }
     return ex;

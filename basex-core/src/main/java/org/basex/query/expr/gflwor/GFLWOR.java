@@ -631,7 +631,7 @@ public final class GFLWOR extends ParseExpr {
           // for $x in E return $x[1]  ->  E ! .[1]
           final Expr expr = cc.get(last.expr, () -> func.apply(
               new ContextValue(filter.info).optimize(cc)));
-          rtrn = SimpleMap.get(filter.info, last.expr, expr);
+          rtrn = SimpleMap.get(cc, filter.info, last.expr, expr);
         } else {
           // for $x in E return $x[. = 1]  ->  E[. = 1]
           rtrn = func.apply(last.expr);
@@ -657,7 +657,7 @@ public final class GFLWOR extends ParseExpr {
         } else {
           // for $a in (a,b) return $a/descendant::b  ->  (a,b) ! descendant::b
           final Expr expr = cc.get(last.expr, () -> func.apply(null));
-          rtrn = SimpleMap.get(path.info, last.expr, expr).optimize(cc);
+          rtrn = SimpleMap.get(cc, path.info, last.expr, expr);
         }
         clauses.removeLast();
         return true;

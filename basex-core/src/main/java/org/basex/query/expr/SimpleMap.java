@@ -36,16 +36,16 @@ public abstract class SimpleMap extends Arr {
   }
 
   /**
-   * Returns a map instance.
+   * Creates a new, optimized map expression, or the first expression if only one was specified.
+   * @param cc compilation context
    * @param ii input info
-   * @param exprs two or more expressions
-   * @return instance
+   * @param exprs one or more expressions
+   * @return filter root, path or filter expression
+   * @throws QueryException query exception
    */
-  public static SimpleMap get(final InputInfo ii, final Expr... exprs) {
-    for(final Expr expr : exprs) {
-      if(expr.has(Flag.POS)) return new CachedMap(ii, exprs);
-    }
-    return new IterMap(ii, exprs);
+  public static Expr get(final CompileContext cc, final InputInfo ii, final Expr... exprs)
+      throws QueryException {
+    return exprs.length == 1 ? exprs[0] : new CachedMap(ii, exprs).optimize(cc);
   }
 
   @Override
@@ -75,7 +75,7 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public final Expr optimize(final CompileContext cc) throws QueryException {
     // flatten nested expressions (unless result needs to be cached)
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
@@ -86,10 +86,10 @@ public abstract class SimpleMap extends Arr {
         list.add(expr);
       }
     }
-    if(list.size() != exprs.length) return SimpleMap.get(info, list.finish()).optimize(cc);
+    if(list.size() != exprs.length) return SimpleMap.get(cc, info, list.finish());
     exprs = list.next();
 
-    // determine type, result size, find expressions that will never be evaluated
+    // determine type and result size, drop expressions that will never be evaluated
     long min = 1, max = 1;
     boolean item = true;
     for(final Expr expr : exprs) {
@@ -119,6 +119,9 @@ public abstract class SimpleMap extends Arr {
     }
     exprType.assign(exprs[exprs.length - 1].seqType().type, new long[] { min, max });
 
+    // no results, deterministic expressions: return empty sequence
+    if(size() == 0 && !has(Flag.NDT)) return cc.emptySeq(this);
+
     // simplify static expressions
     int e = 0;
     final int el = exprs.length;
@@ -135,30 +138,30 @@ public abstract class SimpleMap extends Arr {
       }
 
       final long es = expr.size();
-      Expr rep = null;
+      Expr ex = null;
       if(next instanceof Filter) {
         final Filter filter = (Filter) next;
         if(filter.root instanceof ContextValue && !filter.mayBePositional()) {
           // merge filter with context value as root
           // A ! .[B]  ->  A[B]
-          rep = Filter.get(cc, info, expr, ((Filter) next).exprs);
+          ex = Filter.get(cc, info, expr, ((Filter) next).exprs);
         }
       }
 
-      if(rep == null && es != -1 && !expr.has(Flag.NDT)) {
+      if(ex == null && es != -1 && !expr.has(Flag.NDT)) {
         // check if deterministic expressions with known result size can be removed
         // expression size is never 0 (empty expressions have no followers, see above)
         if(next instanceof Value) {
           // rewrite expression with next value as singleton sequence
           // (1 to 2) ! 3  ->  (3, 3)
-          rep = SingletonSeq.get((Value) next, es);
+          ex = SingletonSeq.get((Value) next, es);
         } else if(!next.has(Flag.POS)) {
           // check if next expression relies on the context
           if(next.has(Flag.CTX)) {
             if(expr instanceof ContextValue) {
               // replace leading context reference
               // . ! number() = 2  ->  number() = 2
-              rep = next;
+              ex = next;
             } else if(es == 1 && (expr instanceof Value || expr instanceof VarRef)) {
               // single item: inline values and variable references
               // 'a' ! (. = 'a')  ->  'a  = 'a'
@@ -166,25 +169,25 @@ public abstract class SimpleMap extends Arr {
               // 123 ! number()   ->  number(123)
               // $doc ! /         ->  $doc
               try {
-                rep = next.inline(null, expr, cc);
+                ex = next.inline(null, expr, cc);
                 // ignore rewritten expression that is identical to original one
-                if(rep instanceof SimpleMap) {
-                  final Expr[] ex = ((SimpleMap) rep).exprs;
-                  if(ex[0] == expr && ex[1] == next) rep = null;
+                if(ex instanceof SimpleMap) {
+                  final Expr[] tmp = ((SimpleMap) ex).exprs;
+                  if(tmp[0] == expr && tmp[1] == next) ex = null;
                 }
               } catch(final QueryException qe) {
                 // replace original expression with error
-                rep = cc.error(qe, this);
+                ex = cc.error(qe, this);
               }
             }
           } else if(es == 1) {
             // replace expression with next expression
             // <x/> ! 'ok'  ->  'ok'
-            rep = next;
+            ex = next;
           } else if(!next.has(Flag.NDT, Flag.CNS)) {
             // replace expression with replicated expression
             // (1 to 2) ! 'ok'  ->  util:replicate('ok', 2)
-            rep = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es));
+            ex = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es));
           } else {
             // (1 to 2) ! <x/>  ->  util:replicate('', 2) ! <x/>
             exprs[e] = cc.replaceWith(exprs[e], SingletonSeq.get(Str.ZERO, es));
@@ -192,9 +195,9 @@ public abstract class SimpleMap extends Arr {
         }
       }
 
-      if(rep != null) {
-        cc.info(OPTMERGE_X, rep);
-        exprs[e] = rep;
+      if(ex != null) {
+        cc.info(OPTMERGE_X, ex);
+        exprs[e] = ex;
       } else if(!(next instanceof ContextValue)) {
         // context item expression can be ignored
         exprs[++e] = next;
@@ -202,16 +205,27 @@ public abstract class SimpleMap extends Arr {
     }
     if(pushed) cc.removeFocus();
 
+    // single expression: return this expression
+    if(e == 0) return exprs[0];
     if(++e != el) exprs = Arrays.copyOf(exprs, e);
 
-    // single expression: return this expression
-    return e == 1 ? exprs[0] :
-      // no results, deterministic expressions: return empty sequence
-      size() == 0 && !has(Flag.NDT) ? cc.emptySeq(this) :
-      // item-based iteration
-      item ? copyType(new ItemMap(info, exprs)) :
-      // default evaluation
-      this;
+    // choose best map implementation
+    return copyType(
+      item ? new ItemMap(info, exprs) :
+      iterative(exprs) ? new IterMap(info, exprs) :
+      new CachedMap(info, exprs));
+  }
+
+  /**
+   * Checks if the specified expressions can be evaluated iteratively.
+   * @param exprs expressions
+   * @return result of check
+   */
+  private static boolean iterative(final Expr... exprs) {
+    for(final Expr expr : exprs) {
+      if(expr.has(Flag.POS)) return false;
+    }
+    return true;
   }
 
   @Override
@@ -256,7 +270,7 @@ public abstract class SimpleMap extends Arr {
       final Expr ex = cc.get(exprs[el - 2], () -> old.simplifyFor(mode, cc));
       if(ex != old) {
         final ExprList list = new ExprList(el).add(exprs).set(el - 1, ex);
-        expr = SimpleMap.get(info, list.finish()).optimize(cc);
+        expr = SimpleMap.get(cc, info, list.finish());
       }
     }
     return expr != this ? expr : super.simplifyFor(mode, cc);

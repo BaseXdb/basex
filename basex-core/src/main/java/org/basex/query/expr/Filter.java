@@ -170,7 +170,7 @@ public abstract class Filter extends Preds {
     // return optimized expression
     if(opt) return cc.replaceWith(this, prepare.apply(expr));
 
-    // otherwise, return best filter implementation
+    // choose best filter implementation
     return copyType(
       exprs.length == 1 && exprs[0].isSimple() ? new SimpleFilter(info, root, exprs) :
       new CachedFilter(info, root, exprs));

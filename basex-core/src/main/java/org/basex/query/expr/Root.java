@@ -66,9 +66,10 @@ public final class Root extends Simple {
   }
 
   @Override
-  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc) {
+  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+      throws QueryException {
     return ei != null ? null : ex.seqType().instanceOf(SeqType.DOC_ZO) ? ex :
-      copyType(SimpleMap.get(info, ex, this));
+      SimpleMap.get(cc, info, ex, this);
   }
 
   @Override

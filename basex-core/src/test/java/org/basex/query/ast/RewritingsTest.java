@@ -646,7 +646,10 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Path tests. */
   @Test public void gh1729() {
-    check("let $x := 'g' return <g/> ! self::g[name() = $x]", "<g/>", empty(CachedPath.class));
+    check("let $x := 'g' return <g/> ! self::g[name() = $x]", "<g/>",
+        empty(CachedPath.class), root(ItemMap.class));
+    check("let $x := 'g' return <g/> ! self::*[local-name() = $x]", "<g/>",
+        empty(CachedPath.class), root(ItemMap.class));
   }
 
   /** Path tests. */

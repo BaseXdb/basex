@@ -97,7 +97,7 @@ public final class StaticJavaCall extends JavaCall {
   public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
       throws QueryException {
     return inline(ei, ex, cc, () -> method.getAnnotation(FocusDependent.class) != null ?
-      copyType(SimpleMap.get(info, ex, this)) : null);
+      SimpleMap.get(cc, info, ex, this) : null);
   }
 
   @Override

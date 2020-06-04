@@ -164,7 +164,7 @@ public abstract class Path extends ParseExpr {
      * - /A/B[. = '...']  ->  IA('...', B)/parent::A *[parent::document-node()] */
     if(expr == this) expr = children(cc, rt);
     // return optimized expression
-    if(expr != this) return expr.optimize(cc);
+    if(expr != this) return expr;
 
     // choose best path implementation (dummy will be used for type checking)
     return copyType(get(info, root == null && rt instanceof Dummy ? rt : root, steps));
@@ -582,7 +582,7 @@ public abstract class Path extends ParseExpr {
       }
       while(++s < sl) stps[ts++] = steps[s];
 
-      return get(info, root, stps);
+      return get(info, root, stps).optimize(cc);
     }
     return this;
   }
@@ -612,7 +612,7 @@ public abstract class Path extends ParseExpr {
      * - <a/>/<b/>  ->  <a/> ! <b/>
      * - $a/b/string  ->  $a/b ! string() */
     if(sl > 1) s1 = get(info, root, Arrays.copyOfRange(steps, 0, sl - 1)).optimize(cc);
-    if(s1 != null) s2 = SimpleMap.get(info, s1, s2);
+    if(s1 != null) s2 = SimpleMap.get(cc, info, s1, s2);
     return cc.replaceWith(this, s2);
   }
 
@@ -757,7 +757,8 @@ public abstract class Path extends ParseExpr {
       resultSteps.add(steps[s]);
     }
 
-    return resultSteps.isEmpty() ? resultRoot : get(info, resultRoot, resultSteps.finish());
+    return resultSteps.isEmpty() ? resultRoot :
+      get(info, resultRoot, resultSteps.finish()).optimize(cc);
   }
 
   /**

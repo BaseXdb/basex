@@ -180,8 +180,7 @@ public abstract class Preds extends Arr {
       final Expr first = mexprs[0], second = mexprs[1];
       if((first instanceof ContextValue || root.equals(first) && root.isSimple() && rst.one()) &&
           !second.has(Flag.POS)) {
-        final int ml = mexprs.length;
-        expr = ml == 2 ? second : SimpleMap.get(map.info, Arrays.copyOfRange(mexprs, 1, ml));
+        expr = SimpleMap.get(cc, map.info, Arrays.copyOfRange(mexprs, 1, mexprs.length));
       }
     }
 
@@ -306,7 +305,7 @@ public abstract class Preds extends Arr {
     if(expr != null) return expr;
 
     // rewrite to simple map: $node[string()]  ->  $node ! string()
-    if(rst.zeroOrOne()) return SimpleMap.get(info, createRoot.apply(root), pred).optimize(cc);
+    if(rst.zeroOrOne()) return SimpleMap.get(cc, info, createRoot.apply(root), pred);
 
     return this;
   }
