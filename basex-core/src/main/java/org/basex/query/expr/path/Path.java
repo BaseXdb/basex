@@ -799,7 +799,7 @@ public abstract class Path extends ParseExpr {
         final Filter filter = (Filter) step;
         if(!filter.mayBePositional() && filter.root instanceof List) {
           final Expr st = ((List) filter.root).toUnion(cc);
-          if(st != filter.root) return Filter.get(filter.info, st, filter.exprs).optimize(cc);
+          if(st != filter.root) return Filter.get(cc, filter.info, st, filter.exprs);
         }
       }
       return step;
@@ -996,7 +996,7 @@ public abstract class Path extends ParseExpr {
       final Filter filter = (Filter) next;
       if(!filter.mayBePositional()) {
         final Expr expr = rewrite.apply(filter.root);
-        if(expr != null) return Filter.get(filter.info, expr, filter.exprs).optimize(cc);
+        if(expr != null) return Filter.get(cc, filter.info, expr, filter.exprs);
       }
     }
     return null;

@@ -285,6 +285,12 @@ public final class FilterTest extends SandboxTest {
 
     query("count((1 to 100000000)[position() != 1])", 99999999);
     query("count((1 to 100000000)[position() != 0])", 100000000);
+
+    query("for $i in 1 to 2 return (1, 2)[.][$i]", "1\n2");
+    query("for $i in 1 to 2 return (2, 1)[.][$i]", "");
+
+    query("for $i in 1 to 2 return (1, 2)[$i][.]", 1);
+    query("for $i in 1 to 2 return (2, 1)[$i][.]", 1);
   }
 
   /** Start position. */

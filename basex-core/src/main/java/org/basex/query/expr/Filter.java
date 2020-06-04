@@ -9,9 +9,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -38,19 +36,17 @@ public abstract class Filter extends Preds {
   }
 
   /**
-   * Creates a filter or path expression for the given root and predicates.
+   * Creates a new, optimized filter expression, or the root expression if no predicates exist.
+   * @param cc compilation context
    * @param ii input info
    * @param root root expression
    * @param preds predicate expressions
    * @return filter root, path or filter expression
+   * @throws QueryException query exception
    */
-  public static Expr get(final InputInfo ii, final Expr root, final Expr... preds) {
-    // no predicates: return root
-    return preds.length == 0 ? root :
-      // use simple filter for single deterministic predicate
-      preds.length == 1 && preds[0].isSimple() ? new SimpleFilter(ii, root, preds) :
-      // default filter
-      new CachedFilter(ii, root, preds);
+  public static Expr get(final CompileContext cc, final InputInfo ii, final Expr root,
+      final Expr... preds) throws QueryException {
+    return preds.length == 0 ? root : new CachedFilter(ii, root, preds).optimize(cc);
   }
 
   @Override
@@ -86,7 +82,7 @@ public abstract class Filter extends Preds {
     // no positional access..
     if(!mayBePositional()) {
       // convert to axis path: (//x)[text() = 'a']  ->  //x[text() = 'a']
-      if(root instanceof AxisPath) return ((AxisPath) root).addPredicates(cc, exprs).optimize(cc);
+      if(root instanceof AxisPath) return ((AxisPath) root).addPredicates(cc, exprs);
 
       // rewrite filter with document nodes to path; enables index rewritings
       // example: db:open('db')[.//text() = 'x']  ->  db:open('db')/.[.//text() = 'x']
@@ -107,82 +103,77 @@ public abstract class Filter extends Preds {
       return copyType(new IterFilter(info, root, exprs));
     }
 
-    // evaluate positional predicates: build new root expression
-    Expr r = root;
+    // rewrite positional predicates
+    Expr expr = root;
     boolean opt = false;
+    final ExprList preds = new ExprList(exprs.length);
+    final QueryFunction<Expr, Expr> prepare = ex -> {
+      return preds.isEmpty() ? ex : get(cc, info, ex, preds.next());
+    };
     for(final Expr pred : exprs) {
-      Expr expr = null;
+      Expr ex = null;
       if(Function.LAST.is(pred)) {
-        if(r instanceof Value) {
-          // value: replace with last item
-          expr = ((Value) r).itemAt(r.size() - 1);
-        } else {
-          // rewrite positional predicate to util:last
-          expr = cc.function(Function._UTIL_LAST, info, r);
-        }
+        // rewrite positional predicate to util:last
+        ex = cc.function(Function._UTIL_LAST, info, prepare.apply(expr));
       } else if(pred instanceof ItrPos) {
         final ItrPos pos = (ItrPos) pred;
-        if(r instanceof Value) {
-          // value: replace with subsequence
-          final long size = pos.min - 1, len = Math.min(pos.max, r.size()) - size;
-          expr = len <= 0 ? Empty.VALUE : ((Value) r).subsequence(size, len, cc.qc);
-        } else if(pos.min == pos.max) {
-          // expr[pos]  ->  util:item(expr, pos)
-          expr = pos.min == 1 ? cc.function(Function.HEAD, info, r) :
-            cc.function(Function._UTIL_ITEM, info, r, Int.get(pos.min));
-        } else {
+        if(pos.min != pos.max) {
           // expr[min..max]  ->  util:range(expr, min, max)
-          expr = cc.function(Function._UTIL_RANGE, info, r, Int.get(pos.min), Int.get(pos.max));
+          ex = cc.function(Function._UTIL_RANGE, info, prepare.apply(expr),
+              Int.get(pos.min), Int.get(pos.max));
+        } else if(pos.min == 1) {
+          // expr[1]  ->  head(expr)
+          ex = cc.function(Function.HEAD, info, prepare.apply(expr));
+        } else {
+          // expr[pos]  ->  util:item(expr, pos)
+          ex = cc.function(Function._UTIL_ITEM, info, prepare.apply(expr), Int.get(pos.min));
         }
       } else if(pred instanceof Pos) {
         final Pos pos = (Pos) pred;
         if(pos.eq()) {
           // expr[pos]  ->  util:item(expr, pos.min)
-          expr = cc.function(Function._UTIL_ITEM, info, r, pos.exprs[0]);
+          ex = cc.function(Function._UTIL_ITEM, info, prepare.apply(expr), pos.exprs[0]);
         } else {
           // expr[min..max]  ->  util:range(expr, pos.min, pos.max)
-          expr = cc.function(Function._UTIL_RANGE, info, r, pos.exprs[0], pos.exprs[1]);
+          ex = cc.function(Function._UTIL_RANGE, info, prepare.apply(expr),
+              pos.exprs[0], pos.exprs[1]);
         }
       } else if(numeric(pred)) {
         /* - rewrite positional predicate to util:item
-         *   expr[pos] -> util:item(expr, pos)
+         *   expr[pos]  ->  util:item(expr, pos)
          * - only choose deterministic and context-independent offsets
          *   illegal examples: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
-        expr = cc.function(Function._UTIL_ITEM, info, r, pred);
+        ex = cc.function(Function._UTIL_ITEM, info, prepare.apply(expr), pred);
       } else if(pred instanceof Cmp) {
         // rewrite positional predicate to fn:remove
         final Cmp cmp = (Cmp) pred;
         final OpV opV = cmp.opV();
         if(cmp.positional() && opV != null) {
-          final Expr ex = cmp.exprs[1];
-          if((opV == OpV.LT || opV == OpV.NE) && Function.LAST.is(ex)) {
+          final Expr e = cmp.exprs[1];
+          if((opV == OpV.LT || opV == OpV.NE) && Function.LAST.is(e)) {
             // expr[position() < last()]  ->  util:init(expr)
-            expr = cc.function(Function._UTIL_INIT, info, r);
-          } else if(opV == OpV.NE && ex instanceof Int) {
+            ex = cc.function(Function._UTIL_INIT, info, prepare.apply(expr));
+          } else if(opV == OpV.NE && e instanceof Int) {
             // expr[position() != INT]  ->  remove(expr, INT)
-            expr = cc.function(Function.REMOVE, info, r, ex);
+            ex = cc.function(Function.REMOVE, info, prepare.apply(expr), e);
           }
         }
       }
-
-      if(expr != null) {
-        // predicate was optimized: replace old with new expression
-        r = expr;
+      // replace temporary result expression or add predicate to temporary list
+      if(ex != null) {
+        expr = ex;
         opt = true;
-      } else if(r != root && r instanceof Filter) {
-        // otherwise, if root has changed: add predicate to temporary filter
-        r = ((Filter) r).addPredicate(pred);
       } else {
-        // otherwise, create new filter expression
-        r = get(info, r, pred);
+        preds.add(pred);
       }
     }
+    // return optimized expression
+    if(opt) return cc.replaceWith(this, prepare.apply(expr));
 
-    // return optimized expression or standard iterator
-    if(opt) return cc.replaceWith(this, r);
-
-    final Expr expr = get(info, root, exprs);
-    return expr instanceof ParseExpr ? copyType((ParseExpr) expr) : expr;
+    // otherwise, return best filter implementation
+    return copyType(
+      exprs.length == 1 && exprs[0].isSimple() ? new SimpleFilter(info, root, exprs) :
+      new CachedFilter(info, root, exprs));
   }
 
   @Override
@@ -191,14 +182,16 @@ public abstract class Filter extends Preds {
   }
 
   /**
-   * Adds a predicate to the filter.
+   * Adds a predicate and returns the optimized expression.
    * This function is e.g. called by {@link For#addPredicate}.
+   * @param cc compilation context
    * @param pred predicate to be added
    * @return new filter
+   * @throws QueryException query exception
    */
-  public final CachedFilter addPredicate(final Expr pred) {
+  public final Expr addPredicate(final CompileContext cc, final Expr pred) throws QueryException {
     exprs = new ExprList(exprs.length + 1).add(exprs).add(pred).finish();
-    return copyType(new CachedFilter(info, root, exprs));
+    return copyType(new CachedFilter(info, root, exprs)).optimize(cc);
   }
 
   @Override

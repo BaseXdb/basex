@@ -269,7 +269,7 @@ public abstract class Preds extends Arr {
 
     final Expr pred = exprs[el - 1];
     final QueryFunction<Expr, Expr> createRoot = r -> {
-      return el == 1 ? r : Filter.get(info, r, Arrays.copyOfRange(exprs, 0, el - 1)).optimize(cc);
+      return el == 1 ? r : Filter.get(cc, info, r, Arrays.copyOfRange(exprs, 0, el - 1));
     };
     final QueryFunction<Expr, Expr> createExpr = e -> {
       return e instanceof ContextValue ? createRoot.apply(root) :

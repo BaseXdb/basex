@@ -625,7 +625,7 @@ public final class GFLWOR extends ParseExpr {
     if(rtrn instanceof Filter) {
       final Filter filter = (Filter) rtrn;
       final QueryFunction<Expr, Expr> func = expr ->
-        Filter.get(filter.info, expr, filter.exprs).optimize(cc);
+        Filter.get(cc, filter.info, expr, filter.exprs);
       if(var.test(filter.root)) {
         if(filter.mayBePositional()) {
           // for $x in E return $x[1]  ->  E ! .[1]

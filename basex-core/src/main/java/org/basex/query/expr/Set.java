@@ -200,7 +200,7 @@ abstract class Set extends Arr {
       list.add(newPredicate(preds, cc));
     }
     final Expr pred = mergePredicates(list.finish(), cc).optimize(cc);
-    return Filter.get(info, root, pred).optimize(cc);
+    return Filter.get(cc, info, root, pred);
   }
 
   /**

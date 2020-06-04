@@ -32,6 +32,6 @@ public final class FnFilter extends StandardFunc {
       p = new TypeCheck(sc, info, p, SeqType.BLN_O, true).optimize(cc);
       return p;
     });
-    return Filter.get(info, items, cc.function(Function.BOOLEAN, info, pred)).optimize(cc);
+    return Filter.get(cc, info, items, cc.function(Function.BOOLEAN, info, pred));
   }
 }

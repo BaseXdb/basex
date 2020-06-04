@@ -188,12 +188,11 @@ public final class For extends ForLet {
       expr = ((AxisPath) expr).addPredicates(cc, ex);
     } else if(expr instanceof Filter) {
       // add to existing filter expression
-      expr = ((Filter) expr).addPredicate(ex);
+      expr = ((Filter) expr).addPredicate(cc, ex);
     } else {
       // create new filter expression
-      expr = Filter.get(info, expr, ex);
+      expr = Filter.get(cc, info, expr, ex);
     }
-    expr = expr.optimize(cc);
   }
 
   /**
