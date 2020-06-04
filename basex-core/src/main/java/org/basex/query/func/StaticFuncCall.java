@@ -119,7 +119,7 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public boolean ddo() {
-    return func.expr.ddo();
+    return func != null && func.expr.ddo();
   }
 
   @Override
