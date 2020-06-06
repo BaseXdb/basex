@@ -103,6 +103,7 @@ public abstract class ParseExpr extends Expr {
   @Override
   public final void refineType(final Expr expr) {
     exprType.refine(expr);
+    if(data() == null) data(expr.data());
   }
 
   // OPTIMIZATIONS ================================================================================
@@ -115,7 +116,6 @@ public abstract class ParseExpr extends Expr {
    */
   protected final <T extends Expr> T copyType(final T expr) {
     expr.refineType(this);
-    expr.data(data());
     return expr;
   }
 

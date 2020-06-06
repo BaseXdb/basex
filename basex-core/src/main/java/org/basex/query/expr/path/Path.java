@@ -35,7 +35,7 @@ public abstract class Path extends ParseExpr {
   /** Path steps. */
   public Expr[] steps;
   /** Data reference (can be {@code null}). */
-  private Data data;
+  protected Data data;
 
   /**
    * Constructor.
@@ -1070,16 +1070,6 @@ public abstract class Path extends ParseExpr {
     int size = 1;
     for(final Expr step : steps) size += step.exprSize();
     return root == null ? size : size + root.exprSize();
-  }
-
-  @Override
-  public final Data data() {
-    return data;
-  }
-
-  @Override
-  public final void data(final Data dt) {
-    data = dt;
   }
 
   @Override

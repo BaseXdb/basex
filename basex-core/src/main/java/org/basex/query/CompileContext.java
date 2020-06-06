@@ -212,7 +212,7 @@ public final class CompileContext {
    * @return optimized expression
    */
   public Expr emptySeq(final Expr expr) {
-    return replaceWith(expr, Empty.VALUE);
+    return replaceWith(expr, Empty.VALUE, false);
   }
 
   /**
