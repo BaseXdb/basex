@@ -460,6 +460,13 @@ public abstract class Expr extends ExprInfo {
   public abstract int exprSize();
 
   /**
+   * Refines the expression type.
+   * @param expr original expression
+   */
+  public void refineType(@SuppressWarnings("unused") final Expr expr) {
+  }
+
+  /**
    * Tries to push the given type check inside this expression.
    * @param tc type check to push into the expression
    * @param cc compilation context

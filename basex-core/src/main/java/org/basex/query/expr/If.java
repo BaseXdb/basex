@@ -98,6 +98,8 @@ public final class If extends Arr {
     // rewritings for constant booleans
     final Expr br1 = exprs[0], br2 = exprs[1];
     final SeqType st1 = br1.seqType(), st2 = br2.seqType();
+    exprType.assign(st1.union(st2));
+
     if(st1.eq(SeqType.BLN_O) && st2.eq(SeqType.BLN_O)) {
       if(br1 == Bln.TRUE) {
         return cc.replaceWith(this, br2 == Bln.FALSE ?
@@ -123,7 +125,6 @@ public final class If extends Arr {
       if(br2 == Bln.FALSE) return cc.replaceWith(this, new And(info, cond, br1).optimize(cc));
     }
 
-    exprType.assign(st1.union(st2));
     return this;
   }
 

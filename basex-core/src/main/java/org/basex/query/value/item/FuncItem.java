@@ -155,7 +155,7 @@ public final class FuncItem extends FItem implements Scope {
     if(pl != ft.argTypes.length) throw FUNARITY_X_X.get(info, arguments(pl), al);
 
     // optimize: continue with coercion if current type is only an instance of new type
-    final FuncType tp = funcType();
+    FuncType tp = funcType();
     if(optimize ? tp.eq(ft) : tp.instanceOf(ft)) return this;
 
     // create new compilation context and variable scope
@@ -175,18 +175,17 @@ public final class FuncItem extends FItem implements Scope {
     if(optimize) body = body.optimize(cc);
 
     // add type check if return types differ
-    if(!tp.declType.instanceOf(ft.declType)) {
-      body = new TypeCheck(sc, ii, body, ft.declType, true);
+    final SeqType dt = ft.declType;
+    if(!tp.declType.instanceOf(dt)) {
+      body = new TypeCheck(sc, ii, body, dt, true);
       if(optimize) body = body.optimize(cc);
     }
 
     // adopt type of optimized body if it is more specific than passed on type
-    final SeqType st = body.seqType();
-    final FuncType newType = optimize && st.refinable(ft.declType) ?
-      FuncType.get(st, ft.argTypes) : ft;
-
+    final SeqType bt = body.seqType();
+    tp = optimize && !bt.eq(dt) && bt.instanceOf(dt) ? FuncType.get(bt, ft.argTypes) : ft;
     body.markTailCalls(null);
-    return new FuncItem(sc, anns, name, vars, newType, body, vs.stackSize(), ii);
+    return new FuncItem(sc, anns, name, vars, tp, body, vs.stackSize(), ii);
   }
 
   @Override

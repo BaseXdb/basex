@@ -95,7 +95,7 @@ public abstract class Single extends ParseExpr {
              dt.oneOf(AtomType.STR, AtomType.ATM) ||
            mode == Simplify.NUMBER && (at.isUntyped() && dt == AtomType.DBL ||
              at.instanceOf(AtomType.INT) && at.instanceOf(dt))) {
-          return cc.replaceWith(this, expr);
+          return cc.simplify(this, expr);
         }
       }
     }

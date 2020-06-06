@@ -237,7 +237,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   IRI_TO_URI(FnIriToUri::new, "iri-to-uri(string)", arg(STR_ZO), STR_O),
   /** XQuery function. */
-  JSON_DOC(FnJsonDoc::new, "json-doc(uri[,options])", arg(STR_ZO, MAP_O), DOC_ZO),
+  JSON_DOC(FnJsonDoc::new, "json-doc(uri[,options])", arg(STR_ZO, MAP_O), ITEM_ZO),
   /** XQuery function. */
   JSON_TO_XML(FnJsonToXml::new, "json-to-xml(string[,options])",
       arg(STR_ZO, MAP_O), NOD_ZO, flag(CNS)),

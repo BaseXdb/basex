@@ -115,6 +115,15 @@ public final class ExprType {
   }
 
   /**
+   * Refines the type with type information from the specified expression.
+   * @param expr expression with original type
+   */
+  public void refine(final Expr expr) {
+    final SeqType st = seqType.intersect(expr.seqType());
+    if(st != null) assign(st.type, st.occ, size != -1 ? size : expr.size());
+  }
+
+  /**
    * Assigns the specified sequence type and result size.
    * @param st sequence type
    * @param sz result size

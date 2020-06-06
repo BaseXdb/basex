@@ -14,7 +14,6 @@ import org.basex.query.scope.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -246,7 +245,7 @@ public final class CompileContext {
    */
   private Expr replaceWith(final Expr expr, final Expr result, final boolean refine) {
     if(result != expr) {
-      final Supplier<String> f  = () -> {
+      info("%", (Supplier<String>) () -> {
         final TokenBuilder tb = new TokenBuilder();
         final String exprDesc = expr.description(), resDesc = result.description();
         tb.add(OPTREWRITE).add(' ').add(exprDesc);
@@ -257,22 +256,8 @@ public final class CompileContext {
         tb.add(": ").add(exprString);
         if(!Token.eq(exprString, resString)) tb.add(" -> ").add(resString);
         return tb.toString();
-      };
-      info("%", f);
-
-      if(refine) {
-        if(result instanceof Value) {
-          ((Value) result).refineType(expr);
-        } else {
-          // refine type. required mostly for {@link Filter} rewritings
-          final ParseExpr re = (ParseExpr) result;
-          final SeqType et = expr.seqType(), rt = re.seqType();
-          if(et.refinable(rt)) {
-            final SeqType st = et.intersect(rt);
-            if(st != null) re.exprType.assign(st);
-          }
-        }
-      }
+      });
+      if(refine) result.refineType(expr);
     }
     return result;
   }

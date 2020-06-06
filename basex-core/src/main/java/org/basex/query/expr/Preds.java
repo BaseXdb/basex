@@ -135,7 +135,7 @@ public abstract class Preds extends Arr {
   protected final boolean optimize(final CompileContext cc, final Expr root) throws QueryException {
     return cc.ok(root, () -> {
       final ExprList list = new ExprList(exprs.length);
-      for(final Expr expr : exprs) optimize(expr, list, root, cc);
+      for(final Expr expr : exprs) simplify(expr, list, root, cc);
       exprs = list.finish();
       return optimizeEbv(false, true, cc);
     }) || exprType(root);
@@ -144,12 +144,12 @@ public abstract class Preds extends Arr {
   /**
    * Optimizes a predicate.
    * @param pred predicate
-   * @param list expression list
+   * @param list resulting predicates
    * @param root root expression
    * @param cc compilation context
    * @throws QueryException query exception
    */
-  private void optimize(final Expr pred, final ExprList list, final Expr root,
+  private void simplify(final Expr pred, final ExprList list, final Expr root,
       final CompileContext cc) throws QueryException {
 
     // AND expression
@@ -157,7 +157,7 @@ public abstract class Preds extends Arr {
       // E[A and B]  ->  E[A][B]
       cc.info(OPTPRED_X, pred);
       for(final Expr expr : ((Arr) pred).exprs) {
-        optimize(expr.seqType().mayBeNumber() ? cc.function(Function.BOOLEAN, info, expr) : expr,
+        simplify(expr.seqType().mayBeNumber() ? cc.function(Function.BOOLEAN, info, expr) : expr,
           list, root, cc);
       }
       return;
@@ -249,7 +249,7 @@ public abstract class Preds extends Arr {
       if(axis == Axis.SELF || axis == Axis.PARENT) expr = Bln.get(((ItrPos) expr).min == 1);
     }
 
-    list.add(cc.replaceWith(pred, expr));
+    list.add(cc.simplify(pred, expr));
   }
 
   /**

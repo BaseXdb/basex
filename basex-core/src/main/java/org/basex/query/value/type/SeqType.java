@@ -536,15 +536,6 @@ public final class SeqType {
   }
 
   /**
-   * Checks if this sequence type an instance of (but different to) the specified sequence type.
-   * @param st sequence type to check
-   * @return result of check
-   */
-  public boolean refinable(final SeqType st) {
-    return !eq(st) && instanceOf(st);
-  }
-
-  /**
    * Checks if this sequence type is an instance of the specified sequence type.
    * @param st sequence type to check
    * @return result of check

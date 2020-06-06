@@ -78,9 +78,8 @@ public final class FnFoldLeft extends StandardFunc {
     final Expr func = exprs[2];
     if(func instanceof FuncItem) {
       // function argument is a single function item
-      final SeqType seq = exprs[0].seqType(), zero = exprs[1].seqType();
-      final SeqType curr = array && seq.type instanceof ArrayType ?
-        ((ArrayType) seq.type).declType : seq.with(Occ.ONE);
+      final SeqType seq = exprs[0].seqType(), zero = exprs[1].seqType(), curr = array &&
+          seq.type instanceof ArrayType ? ((ArrayType) seq.type).declType : seq.with(Occ.ONE);
 
       // assign item type of iterated value, optimize function
       final SeqType[] args = { left ? SeqType.ITEM_ZM : curr, left ? curr : SeqType.ITEM_ZM };
@@ -91,7 +90,8 @@ public final class FnFoldLeft extends StandardFunc {
       SeqType input = zero, output = ft.declType;
 
       // if initial item has more specific type, assign it and check optimized result type
-      if(input.refinable(ft.argTypes[i])) {
+      final SeqType at = ft.argTypes[i];
+      if(!input.eq(at) && input.instanceOf(at)) {
         do {
           args[i] = input;
           optFunc = sf.coerceFunc(func, cc, ft.declType, args);

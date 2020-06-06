@@ -100,16 +100,21 @@ public abstract class ParseExpr extends Expr {
     return exprType.size();
   }
 
+  @Override
+  public final void refineType(final Expr expr) {
+    exprType.refine(expr);
+  }
+
   // OPTIMIZATIONS ================================================================================
 
   /**
    * Copies this expression's type to the specified expression.
    * @param <T> expression type
-   * @param expr expression
+   * @param expr expression to be modified
    * @return specified expression
    */
-  protected final <T extends ParseExpr> T copyType(final T expr) {
-    expr.exprType.assign(this);
+  protected final <T extends Expr> T copyType(final T expr) {
+    expr.refineType(this);
     expr.data(data());
     return expr;
   }

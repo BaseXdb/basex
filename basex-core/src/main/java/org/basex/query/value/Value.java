@@ -107,13 +107,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
-   * Refines the value type.
-   * @param expr original expression
-   */
-  public void refineType(@SuppressWarnings("unused") final Expr expr) {
-  }
-
-  /**
    * Returns a subsequence of this value with the given start and length.
    * The following properties must hold:
    * <ul>

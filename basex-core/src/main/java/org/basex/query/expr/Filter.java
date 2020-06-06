@@ -191,7 +191,7 @@ public abstract class Filter extends Preds {
    */
   public final Expr addPredicate(final CompileContext cc, final Expr pred) throws QueryException {
     exprs = new ExprList(exprs.length + 1).add(exprs).add(pred).finish();
-    return copyType(new CachedFilter(info, root, exprs)).optimize(cc);
+    return copyType(get(cc, info, root, exprs));
   }
 
   @Override
