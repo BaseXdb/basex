@@ -51,7 +51,9 @@ public final class FnOneOrMore extends StandardFunc {
     final SeqType st = expr.seqType();
     if(st.oneOrMore()) return expr;
     if(st.zero()) throw ONEORMORE.get(info);
+
     exprType.assign(st.type);
+    data(expr.data());
     return this;
   }
 }

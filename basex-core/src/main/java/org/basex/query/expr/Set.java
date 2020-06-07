@@ -232,7 +232,7 @@ abstract class Set extends Arr {
   }
 
   @Override
-  public final Data data() {
+  public Data data() {
     return data(exprs);
   }
 

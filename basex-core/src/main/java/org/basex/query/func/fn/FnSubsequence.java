@@ -221,6 +221,7 @@ public class FnSubsequence extends StandardFunc {
     }
 
     exprType.assign(st.type, st.occ.union(Occ.ZERO), sz);
+    data(expr.data());
     return this;
   }
 

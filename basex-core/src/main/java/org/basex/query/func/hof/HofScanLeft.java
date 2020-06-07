@@ -49,6 +49,7 @@ public final class HofScanLeft extends StandardFunc {
 
     final SeqType st = expr1.seqType();
     exprType.assign(st.type, st.occ.union(Occ.ZERO));
+    data(expr1.data());
     return this;
   }
 }

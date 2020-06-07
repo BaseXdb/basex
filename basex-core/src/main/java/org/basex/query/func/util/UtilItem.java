@@ -78,6 +78,7 @@ public final class UtilItem extends StandardFunc {
       return cc.function(Function._UTIL_ITEM, info, args(expr)[0], pos);
 
     exprType.assign(st.type);
+    data(expr.data());
     return this;
   }
 

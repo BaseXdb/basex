@@ -50,6 +50,7 @@ public final class FnHead extends StandardFunc {
       return FileReadTextLines.opt(this, 0, 1, cc);
 
     exprType.assign(st.type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
+    data(expr.data());
     return this;
   }
 }

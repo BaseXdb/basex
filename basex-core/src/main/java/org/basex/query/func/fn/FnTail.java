@@ -93,6 +93,7 @@ public final class FnTail extends StandardFunc {
       return FileReadTextLines.opt(this, 1, Long.MAX_VALUE, cc);
 
     exprType.assign(st.type, seqType().occ, size - 1);
+    data(expr.data());
     return this;
   }
 

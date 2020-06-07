@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.func.Function;
 import org.basex.query.iter.*;
@@ -122,6 +123,11 @@ public final class Except extends Set {
         return temp;
       }
     };
+  }
+
+  @Override
+  public Data data() {
+    return exprs[0].data();
   }
 
   @Override

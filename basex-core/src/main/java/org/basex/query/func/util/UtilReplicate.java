@@ -43,6 +43,7 @@ public final class UtilReplicate extends StandardFunc {
 
     // adopt sequence type
     exprType.assign(st.type, st.occ.union(m > 0 ? Occ.ONE_MORE : Occ.ZERO_MORE), sz);
+    data(expr.data());
     return this;
   }
 

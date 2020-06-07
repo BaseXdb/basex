@@ -256,7 +256,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public void data(final Data dt) {
+  public final void data(final Data dt) {
     data = dt;
   }
 

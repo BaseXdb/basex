@@ -90,6 +90,7 @@ public final class UtilInit extends StandardFunc {
     }
 
     exprType.assign(st.type, seqType().occ, size - 1);
+    data(expr.data());
     return this;
   }
 }

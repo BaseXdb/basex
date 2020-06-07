@@ -49,6 +49,7 @@ public final class UtilLast extends StandardFunc {
       return cc.function(Function.HEAD, info, args(expr));
 
     exprType.assign(st.type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
+    data(expr.data());
     return this;
   }
 }
