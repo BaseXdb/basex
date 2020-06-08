@@ -1064,7 +1064,7 @@ public final class EditorView extends View {
 
     for(final EditorArea ea : eas) {
       tabs.setSelectedComponent(ea);
-      if(ea.modified() && (ea.opened() || edit != null && ea.getText().length != 0)) {
+      if(ea.modified() && (ea.opened() || edit != null && trim(ea.getText()).length != 0)) {
         final String msg = Util.info(CLOSE_FILE_X, ea.file().name());
         final String action = BaseXDialog.yesNoCancel(gui, msg, buttons);
         if(action == null || action.equals(B_YES) && !save()) return false;
