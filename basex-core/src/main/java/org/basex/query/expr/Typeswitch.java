@@ -11,6 +11,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -62,7 +63,7 @@ public final class Typeswitch extends ParseExpr {
     if(cond instanceof Value) {
       final Value value = (Value) cond;
       for(final TypeswitchGroup group : groups) {
-        if(group.instance(value)) {
+        if(group.match(value, null)) {
           group.inline(cc, value);
           return cc.replaceWith(this, group.expr);
         }
@@ -138,23 +139,33 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Value seq = cond.value(qc);
-    for(final TypeswitchGroup group : groups) {
-      final Iter iter = group.iter(qc, seq);
-      if(iter != null) return iter;
-    }
-    throw Util.notExpected();
+    return group(qc).iter(qc);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value seq = cond.value(qc);
+    return group(qc).value(qc);
+  }
+
+  @Override
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return group(qc).item(qc, info);
+  }
+
+  /**
+   * Returns the typeswitch group with a matching expression.
+   * @param qc query context
+   * @return group
+   * @throws QueryException query exception
+   */
+  private TypeswitchGroup group(final QueryContext qc) throws QueryException {
+    final Value value = cond.value(qc);
     for(final TypeswitchGroup group : groups) {
-      final Value value = group.value(qc, seq);
-      if(value != null) return value;
+      if(group.match(value, qc)) return group;
     }
     throw Util.notExpected();
   }
+
 
   @Override
   public boolean vacuous() {

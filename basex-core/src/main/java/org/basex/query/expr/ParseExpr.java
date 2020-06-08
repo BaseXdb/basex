@@ -53,7 +53,7 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return value(qc).item(qc, ii);
+    return value(qc).item(qc, info);
   }
 
   @Override

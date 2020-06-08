@@ -4,6 +4,8 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -103,13 +105,30 @@ public final class SwitchGroup extends Arr {
   }
 
   /**
+   * Checks if the switch group matches the supplied item.
+   * @param item item to match
+   * @param qc query context
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  boolean match(final Item item, final QueryContext qc) throws QueryException {
+    final int el = exprs.length;
+    for(int e = 1; e < el; e++) {
+      final Item cs = exprs[e].atomItem(qc, info);
+      if(item == cs || item != Empty.VALUE && cs != Empty.VALUE && item.equiv(cs, null, info))
+        return true;
+    }
+    return el == 1;
+  }
+
+  /**
    * Simplifies all expressions for requests of the specified type.
    * @param mode mode of simplification
    * @param cc compilation context
    * @return {@code true} if expression has changed
    * @throws QueryException query exception
    */
-  public boolean simplify(final Simplify mode, final CompileContext cc) throws QueryException {
+  boolean simplify(final Simplify mode, final CompileContext cc) throws QueryException {
     final Expr expr = exprs[0].simplifyFor(mode, cc);
     if(expr == exprs[0]) return false;
     exprs[0] = expr;

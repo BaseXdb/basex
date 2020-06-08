@@ -148,17 +148,31 @@ public final class Switch extends ParseExpr {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return getCase(qc).iter(qc);
+    return group(qc).iter(qc);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return getCase(qc).value(qc);
+    return group(qc).value(qc);
   }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return getCase(qc).item(qc, info);
+    return group(qc).item(qc, info);
+  }
+
+  /**
+   * Chooses the selected {@code case} expression.
+   * @param qc query context
+   * @return case expression
+   * @throws QueryException query exception
+   */
+  private Expr group(final QueryContext qc) throws QueryException {
+    final Item item = cond.atomItem(qc, info);
+    for(final SwitchGroup group : groups) {
+      if(group.match(item, qc)) return group.exprs[0];
+    }
+    throw Util.notExpected();
   }
 
   @Override
@@ -207,28 +221,6 @@ public final class Switch extends ParseExpr {
       cond = inlined;
     }
     return changed ? optimize(cc) : null;
-  }
-
-  /**
-   * Chooses the selected {@code case} expression.
-   * @param qc query context
-   * @return case expression
-   * @throws QueryException query exception
-   */
-  private Expr getCase(final QueryContext qc) throws QueryException {
-    final Item item = cond.atomItem(qc, info);
-    for(final SwitchGroup group : groups) {
-      final int gl = group.exprs.length;
-      for(int e = 1; e < gl; e++) {
-        // includes check for empty sequence (null reference)
-        final Item cs = group.exprs[e].atomItem(qc, info);
-        if(item == cs || item != Empty.VALUE && cs != Empty.VALUE && item.equiv(cs, null, info))
-          return group.exprs[0];
-      }
-      if(gl == 1) return group.exprs[0];
-    }
-    // will never be evaluated
-    throw Util.notExpected();
   }
 
   @Override

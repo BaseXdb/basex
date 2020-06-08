@@ -12,6 +12,7 @@ import org.basex.query.expr.gflwor.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -180,44 +181,33 @@ public final class TypeswitchGroup extends Single {
   /**
    * Checks if the given value matches this group.
    * @param value value to be matched
+   * @param qc query context (if {@code null}, value will not be assigned to the variable)
    * @return result of check ({@code true} is returned for the default case
+   * @throws QueryException query exception
    */
-  boolean instance(final Value value) {
-    if(seqTypes.length == 0) return true;
+  boolean match(final Value value, final QueryContext qc) throws QueryException {
     for(final SeqType st : seqTypes) {
-      if(st.instance(value)) return true;
+      if(st.instance(value)) {
+        if(var != null && qc != null) qc.set(var, value);
+        return true;
+      }
     }
-    return false;
+    return seqTypes.length == 0;
   }
 
-  /**
-   * Evaluates the expression.
-   * @param qc query context
-   * @param value sequence to be checked
-   * @return resulting iterator or {@code null}
-   * @throws QueryException query exception
-   */
-  Iter iter(final QueryContext qc, final Value value) throws QueryException {
-    if(!instance(value)) return null;
-    if(var == null) return expr.iter(qc);
-
-    // evaluate full expression if variable needs to be bound
-    qc.set(var, value);
-    return expr.value(qc).iter();
+  @Override
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return (var != null ? expr.value(qc) : expr).iter(qc);
   }
 
-  /**
-   * Evaluates the expression.
-   * @param qc query context
-   * @param value sequence to be checked
-   * @return resulting value or {@code null}
-   * @throws QueryException query exception
-   */
-  Value value(final QueryContext qc, final Value value) throws QueryException {
-    if(!instance(value)) return null;
-
-    if(var != null) qc.set(var, value);
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
     return expr.value(qc);
+  }
+
+  @Override
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return expr.item(qc, info);
   }
 
   /**
