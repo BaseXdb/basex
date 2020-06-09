@@ -169,7 +169,7 @@ public abstract class Item extends Value {
    * Compares the items for equality.
    * @param item item to be compared
    * @param coll collation (can be {@code null})
-   * @param sc static context; required for comparing items of type xs:QName
+   * @param sc static context; required for comparing items of type xs:QName (can be {@code null})
    * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
