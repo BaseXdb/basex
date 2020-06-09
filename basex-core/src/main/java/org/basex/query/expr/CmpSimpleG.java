@@ -34,7 +34,7 @@ public final class CmpSimpleG extends CmpG {
     final Item item1 = exprs[0].item(qc, info);
     if(item1 == Empty.VALUE) return Bln.FALSE;
     final Item item2 = exprs[1].item(qc, info);
-    return Bln.get(item2 != Empty.VALUE && eval(item1, item2));
+    return item2 == Empty.VALUE ? Bln.FALSE : Bln.get(eval(item1, item2));
   }
 
   @Override
