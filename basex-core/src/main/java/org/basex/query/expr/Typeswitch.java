@@ -33,7 +33,7 @@ public final class Typeswitch extends ParseExpr {
    * Constructor.
    * @param info input info
    * @param cond condition
-   * @param groups case expressions
+   * @param groups case groups (last one is default)
    */
   public Typeswitch(final InputInfo info, final Expr cond, final TypeswitchGroup[] groups) {
     super(info, SeqType.ITEM_ZM);

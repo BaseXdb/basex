@@ -1485,4 +1485,10 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1874() {
     check("(1, 2) ! .[.]", 1);
   }
+
+  /** Switch Expression: Rewrite to if expression. */
+  @Test public void gh1877() {
+    check("switch(<_/>) case '' return 1 default return 2", 1, root(If.class));
+    check("switch(<_/>) case '' case 'x' return 1 default return 2", 1, root(If.class));
+  }
 }

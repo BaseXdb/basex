@@ -8,6 +8,7 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.expr.CmpG.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -86,13 +87,6 @@ public final class Switch extends ParseExpr {
     return changed ? optimize(cc) : super.simplifyFor(mode, cc);
   }
 
-  @Override
-  public Data data() {
-    final ExprList list = new ExprList(groups.length);
-    for(final SwitchGroup group : groups) list.add(group.exprs[0]);
-    return data(list.finish());
-  }
-
   /**
    * Optimizes the expression.
    * @param cc compilation context
@@ -137,52 +131,77 @@ public final class Switch extends ParseExpr {
       cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
     }
 
-    // return first expression if all return expressions are equal, or if only one branch is left
+    Expr expr = simplify();
+    if(expr == this) expr = toIf(cc);
+    return expr;
+  }
+
+  /**
+   * Simplifies a switch expression with identical branches.
+   * @return new or original expression
+   */
+  private Expr simplify() {
     final Expr expr = groups[0].exprs[0];
-    final int gl = groups.length;
-    for(int g = 1; g < gl; g++) {
+    for(int g = groups.length - 1; g >= 1; g--) {
       if(!expr.equals(groups[g].exprs[0])) return this;
     }
     return expr;
   }
 
+  /**
+   * Rewrites the switch to an if expression.
+   * @param cc compilation context
+   * @return new or original expression
+   * @throws QueryException query exception
+   */
+  private Expr toIf(final CompileContext cc) throws QueryException {
+    if(groups.length != 2) return this;
+
+    final SeqType st = cond.seqType();
+    final boolean string = st.type.isStringOrUntyped(), dec = st.type.instanceOf(AtomType.DEC);
+    if(!st.one() || !(string || dec)) return this;
+
+    final Expr[] exprs = groups[0].exprs;
+    for(int e = exprs.length - 1; e >= 1; e--) {
+      final SeqType mt = exprs[e].seqType();
+      if(!mt.one() || !(
+        string && mt.type.isStringOrUntyped() ||
+        dec && mt.type.instanceOf(AtomType.DEC)
+      )) return this;
+    }
+
+    final List list = new List(groups[0].info, Arrays.copyOfRange(exprs, 1, exprs.length));
+    final CmpG cmp = new CmpG(cond, list.optimize(cc), OpG.EQ, null, null, groups[0].info);
+    return new If(info, cmp.optimize(cc), groups[0].exprs[0], groups[1].exprs[0]).optimize(cc);
+  }
+
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return group(qc).iter(qc);
+    return expr(qc).iter(qc);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return group(qc).value(qc);
+    return expr(qc).value(qc);
   }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return group(qc).item(qc, info);
+    return expr(qc).item(qc, info);
   }
 
   /**
-   * Chooses the selected {@code case} expression.
+   * Tests the conditions and returns the expression to evaluate.
    * @param qc query context
    * @return case expression
    * @throws QueryException query exception
    */
-  private Expr group(final QueryContext qc) throws QueryException {
+  private Expr expr(final QueryContext qc) throws QueryException {
     final Item item = cond.atomItem(qc, info);
     for(final SwitchGroup group : groups) {
       if(group.match(item, qc)) return group.exprs[0];
     }
     throw Util.notExpected();
-  }
-
-  @Override
-  public boolean vacuous() {
-    return ((Checks<SwitchGroup>) group -> group.exprs[0].vacuous()).all(groups);
-  }
-
-  @Override
-  public boolean ddo() {
-    return ((Checks<SwitchGroup>) group -> group.exprs[0].ddo()).all(groups);
   }
 
   @Override
@@ -229,8 +248,25 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
+  public boolean vacuous() {
+    return ((Checks<SwitchGroup>) group -> group.exprs[0].vacuous()).all(groups);
+  }
+
+  @Override
+  public boolean ddo() {
+    return ((Checks<SwitchGroup>) group -> group.exprs[0].ddo()).all(groups);
+  }
+
+  @Override
   public void markTailCalls(final CompileContext cc) {
     for(final SwitchGroup group : groups) group.markTailCalls(cc);
+  }
+
+  @Override
+  public Data data() {
+    final ExprList list = new ExprList(groups.length);
+    for(final SwitchGroup group : groups) list.add(group.exprs[0]);
+    return data(list.finish());
   }
 
   @Override

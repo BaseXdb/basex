@@ -182,14 +182,14 @@ public abstract class ParseExpr extends Expr {
   /**
    * Ensures that none of the specified expressions performs an update.
    * Otherwise, throws an exception.
-   * @param exprs expressions (may be {@code null}, and may contain {@code null} references)
+   * @param exprs expressions (may be {@code null})
    * @throws QueryException query exception
    */
   protected final void checkNoneUp(final Expr... exprs) throws QueryException {
     if(exprs == null) return;
     checkAllUp(exprs);
     for(final Expr expr : exprs) {
-      if(expr != null && expr.has(Flag.UPD)) throw UPNOT_X.get(info, description());
+      if(expr.has(Flag.UPD)) throw UPNOT_X.get(info, description());
     }
   }
 
