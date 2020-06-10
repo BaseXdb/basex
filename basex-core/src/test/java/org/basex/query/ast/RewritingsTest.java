@@ -431,7 +431,6 @@ public final class RewritingsTest extends QueryPlanTest {
     check("declare function local:f() { document {}/.. }; local:f()", "", empty(CDoc.class));
   }
 
-
   /**
    * Remove redundant self steps.
    */
@@ -1154,7 +1153,6 @@ public final class RewritingsTest extends QueryPlanTest {
       "return distinct-values(($f(QName('U', 'l')), $f(QName('U', 'p:l'))))",
       "l\np:l");
   }
-
 
   /** Static typing, maps. */
   @Test public void gh1834() {

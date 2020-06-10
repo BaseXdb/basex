@@ -79,7 +79,6 @@ public final class DeepEqual {
     return equal(value1.iter(), value2.iter());
   }
 
-
   /**
    * Checks values for deep equality.
    * @param iter1 first iterator

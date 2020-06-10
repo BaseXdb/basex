@@ -166,7 +166,6 @@ public final class Typeswitch extends ParseExpr {
     throw Util.notExpected();
   }
 
-
   @Override
   public boolean vacuous() {
     return ((Checks<TypeswitchGroup>) group -> group.expr.vacuous()).all(groups);

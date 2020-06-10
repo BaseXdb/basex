@@ -6,7 +6,6 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
-
 /**
  * An XQuery module.
  *

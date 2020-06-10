@@ -83,7 +83,6 @@ public final class DialogMem extends BaseXDialog {
         + Performance.format(used) + NL + NL + H_USED_MEM;
   }
 
-
   /**
    * Add timer for updating display of memory consumption.
    */

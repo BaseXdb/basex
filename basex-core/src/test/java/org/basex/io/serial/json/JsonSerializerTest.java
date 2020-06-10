@@ -147,7 +147,6 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("1", "1", format);
   }
 
-
   /**
    * Serializes the specified input as JSON.
    * @param query query string

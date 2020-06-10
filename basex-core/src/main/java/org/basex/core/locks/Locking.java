@@ -221,7 +221,6 @@ public final class Locking {
     return list.finish();
   }
 
-
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(NL).append("Locking").append(NL);

@@ -95,7 +95,6 @@ public final class RestXqMethodTest extends RestXqTest {
     headR("declare %R:GET %R:path('') function m:f() { 1 to 5 };");
   }
 
-
   /**
    * {@code %OPTIONS} method.
    * @throws Exception exception

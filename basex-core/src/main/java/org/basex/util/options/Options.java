@@ -448,7 +448,6 @@ public class Options implements Iterable<Option<?>> {
     return free;
   }
 
-
   /**
    * Returns a map representation of the entries of the requested string (separated by commas).
    * @param option option to be found

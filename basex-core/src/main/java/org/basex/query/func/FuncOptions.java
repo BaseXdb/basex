@@ -185,7 +185,6 @@ public final class FuncOptions {
     return tb.toString();
   }
 
-
   /**
    * Checks if the specified node has elements as children.
    * @param node node

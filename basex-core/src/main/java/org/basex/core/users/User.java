@@ -220,7 +220,6 @@ public final class User {
     return this;
   }
 
-
   /**
    * Tests if the user has the specified permission.
    * @param prm permission to be checked

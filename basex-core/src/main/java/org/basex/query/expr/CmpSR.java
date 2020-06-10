@@ -136,7 +136,6 @@ public final class CmpSR extends Single {
     return (mni ? mn >= 0 : mn > 0) && (mxi ? mx <= 0 : mx < 0);
   }
 
-
   @Override
   public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc) {
     if(or || !(ex instanceof CmpSR)) return null;

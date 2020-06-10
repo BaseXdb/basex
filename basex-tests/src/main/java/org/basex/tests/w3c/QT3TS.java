@@ -109,7 +109,6 @@ public final class QT3TS extends Main {
     super(args);
   }
 
-
   /**
    * Runs all tests.
    * @throws Exception exception

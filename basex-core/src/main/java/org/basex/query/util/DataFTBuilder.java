@@ -38,7 +38,6 @@ final class DataFTBuilder {
     this.name = name;
   }
 
-
   /**
    * Returns the id of the marker element name.
    * @return id

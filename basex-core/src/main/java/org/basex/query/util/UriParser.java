@@ -49,7 +49,6 @@ public final class UriParser {
   private static final String PATH_ROOTLESS = "(?<pathRootless>" + SEGMENT_NZ +
       "(/" + SEGMENT + ")*)";
 
-
   /** <pre>reg-name = *( unreserved / pct-encoded / sub-delims )</pre>. */
   private static final String REG_NAME = "(" + UNRESERVED + "|" + PCT_ENCODED + "|" +
       SUB_DELIMS + ")*";

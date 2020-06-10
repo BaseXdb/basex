@@ -58,7 +58,6 @@ public final class Array {
     return tmp;
   }
 
-
   /**
    * Adds an entry to the end of an array and returns the new array.
    * @param array array to be resized

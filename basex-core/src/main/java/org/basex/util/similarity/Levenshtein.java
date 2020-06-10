@@ -160,7 +160,6 @@ public final class Levenshtein {
     return (double) (lMax - m[lMax][lMax]) / lMax;
   }
 
-
   /**
    * Gets the minimum of three values.
    * @param a 1st value

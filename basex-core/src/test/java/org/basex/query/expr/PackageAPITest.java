@@ -82,7 +82,6 @@ public final class PackageAPITest extends SandboxTest {
     }
   }
 
-
   /** Tests repository initialization. */
   @Test public void repoInit() {
     // check namespace dictionary

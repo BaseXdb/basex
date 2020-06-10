@@ -102,7 +102,6 @@ public final class FileReadTextLines extends FileRead {
     return new long[] { start, end };
   }
 
-
   /**
    * Creates an optimized version of a {@link FileReadTextLines} call.
    * @param func original function (argument is an instance of the function of this class)

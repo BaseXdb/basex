@@ -406,8 +406,6 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
     return pos + 1;
   }
 
-
-
   /**
    * Recursive helper method for {@link #toString()}.
    * @param sb string builder

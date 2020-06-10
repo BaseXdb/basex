@@ -146,8 +146,6 @@ public abstract class BaseXDialog extends JDialog implements BaseXWindow {
     return getModalityType() != ModalityType.MODELESS;
   }
 
-
-
   /**
    * States if the dialog window was confirmed or canceled.
    * @return true when dialog was confirmed

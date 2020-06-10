@@ -133,26 +133,6 @@ public final class If extends Arr {
   }
 
   /**
-   * Rewrites nested if expressions to a select expression.
-   * @param conds conditions
-   * @param branches branches
-   */
-  void toSelect(final ExprList conds, final ExprList branches) {
-    final Expr br1 = exprs[0], br2 = exprs[1];
-    conds.add(cond);
-    branches.add(br1);
-    if(br2 instanceof If) {
-      ((If) br2).toSelect(conds, branches);
-    } else if(br2 instanceof Select) {
-      final Select select = (Select) br2;
-      conds.add(select.conds);
-      branches.add(select.exprs);
-    } else {
-      branches.add(br2);
-    }
-  }
-
-  /**
    * Swaps the arguments.
    */
   public void swap() {

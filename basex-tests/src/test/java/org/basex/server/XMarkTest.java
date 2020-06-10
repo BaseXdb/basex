@@ -143,7 +143,6 @@ public final class XMarkTest {
     if(server != null) server.stop();
   }
 
-
   /**
    * Runs all tests and generates some test output.
    * @throws Exception any exception

@@ -136,7 +136,6 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
           break;
         }
 
-
         if(mid instanceof SingletonTree) {
           // single middle node
           node = mid.head();
