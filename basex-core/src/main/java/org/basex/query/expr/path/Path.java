@@ -50,15 +50,30 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
+   * Creates a new, optimized path expression.
+   * @param cc compilation context
+   * @param ii input info
+   * @param root root expression (can be temporary {@link Dummy} node or {@code null})
+   * @param steps steps
+   * @return path instance
+   * @throws QueryException query exception
+   */
+  public static Expr get(final CompileContext cc, final InputInfo ii, final Expr root,
+      final Expr... steps) throws QueryException {
+    return get(ii, root, steps).optimize(cc);
+  }
+
+  /**
    * Returns a new path instance.
    * A path implementation is chosen that works fastest for the given steps.
    * @param ii input info
-   * @param root root expression (can be temporary {@link Dummy} item or {@code null})
+   * @param root root expression (can be temporary {@link Dummy} node or {@code null})
    * @param steps steps
    * @return path instance
    */
   public static Expr get(final InputInfo ii, final Expr root, final Expr... steps) {
     // add steps of input array
+    boolean axes = true;
     final ExprList tmp = new ExprList(steps.length);
     for(final Expr step : steps) {
       Expr expr = step;
@@ -71,17 +86,13 @@ public abstract class Path extends ParseExpr {
         if(f.root instanceof ContextValue) expr = Step.get(f.info, SELF, KindTest.NOD, f.exprs);
       }
       tmp.add(expr);
+      axes = axes && expr instanceof Step;
     }
-    final Expr[] stps = tmp.finish();
-
-    // normalize root context
     final Expr rt = root instanceof ContextValue || root instanceof Dummy ? null : root;
+    final Expr[] stps = tmp.finish();
     final boolean single = rt == null && stps.length == 1;
 
     // choose best implementation
-    boolean axes = true;
-    for(final Expr expr : stps) axes = axes && expr instanceof Step;
-
     if(axes) {
       if(iterative(root, stps)) {
         // example: a
@@ -278,7 +289,7 @@ public abstract class Path extends ParseExpr {
 
     // find empty results, remove redundant steps
     final int sl = steps.length;
-    Step self = null;
+    boolean self = false;
     final ExprList list = new ExprList(sl);
     for(int s = 0; s < sl; s++) {
       // remove redundant steps. example: <xml/>/self::node()  ->  <xml/>
@@ -286,7 +297,7 @@ public abstract class Path extends ParseExpr {
       if(st != null && st.axis == SELF && st.exprs.length == 0 && st.test instanceof KindTest) {
         final Expr prev = list.isEmpty() ? root : list.peek();
         if(prev != null && prev.seqType().type.instanceOf(st.test.type)) {
-          self = st;
+          self = true;
           continue;
         }
       }
@@ -307,7 +318,7 @@ public abstract class Path extends ParseExpr {
     }
 
     // self step was removed: ensure that result will be in distinct document order
-    if(self != null && (list.isEmpty() || !list.get(0).seqType().type.instanceOf(NodeType.NOD))) {
+    if(self && (list.isEmpty() || !list.get(0).seqType().type.instanceOf(NodeType.NOD))) {
       if(root == null) root = new ContextValue(info).optimize(cc);
       if(!root.ddo()) root = cc.simplify(root, cc.function(Function._UTIL_DDO, info, root));
     }
@@ -590,7 +601,7 @@ public abstract class Path extends ParseExpr {
       }
       while(++s < sl) stps[ts++] = steps[s];
 
-      return get(info, root, stps).optimize(cc);
+      return get(cc, info, root, stps);
     }
     return this;
   }
@@ -619,7 +630,7 @@ public abstract class Path extends ParseExpr {
      * - (<a/>, <b/>)/map { name(): . }  ->  (<a/>, <b/>) ! map { name(): . }
      * - <a/>/<b/>  ->  <a/> ! <b/>
      * - $a/b/string  ->  $a/b ! string() */
-    if(sl > 1) s1 = get(info, root, Arrays.copyOfRange(steps, 0, sl - 1)).optimize(cc);
+    if(sl > 1) s1 = get(cc, info, root, Arrays.copyOfRange(steps, 0, sl - 1));
     if(s1 != null) s2 = SimpleMap.get(cc, info, s1, s2);
     return cc.replaceWith(this, s2);
   }
@@ -765,8 +776,7 @@ public abstract class Path extends ParseExpr {
       resultSteps.add(steps[s]);
     }
 
-    return resultSteps.isEmpty() ? resultRoot :
-      get(info, resultRoot, resultSteps.finish()).optimize(cc);
+    return resultSteps.isEmpty() ? resultRoot : get(cc, info, resultRoot, resultSteps.finish());
   }
 
   /**
@@ -928,7 +938,7 @@ public abstract class Path extends ParseExpr {
     // attach remaining predicates of analyzed step
     if(p < pl) {
       cc.updateFocus(list.peek());
-      final Expr expr = get(info, null, Arrays.copyOfRange(predSteps, p, pl)).optimize(cc);
+      final Expr expr = get(cc, info, null, Arrays.copyOfRange(predSteps, p, pl));
       list.add(((Step) steps[t - 1]).addPreds(expr).optimize(cc));
     } else {
       list.add(steps[t - 1]);

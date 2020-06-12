@@ -49,15 +49,15 @@ public final class NameTest extends Test {
   }
 
   @Override
-  public boolean optimize(final Expr expr) {
+  public boolean noMatches(final Expr expr) {
     // skip optimizations if context value has no data reference
-    if(expr == null) return true;
+    if(expr == null) return false;
     final Data data = expr.data();
-    if(data == null) return true;
+    if(data == null) return false;
 
     // skip optimizations if more than one namespace is defined in the database
     final byte[] dataNs = data.defaultNs();
-    if(dataNs == null) return true;
+    if(dataNs == null) return false;
 
     // check if test may yield results
     if(part == NamePart.FULL && !qname.hasURI()) {
@@ -66,13 +66,13 @@ public final class NameTest extends Test {
         part = NamePart.LOCAL;
       } else {
         // element and db default namespaces are different: no results
-        return false;
+        return true;
       }
     }
 
     // check existence of local element/attribute names
-    return type == NodeType.PI || part != NamePart.LOCAL ||
-      (type == NodeType.ELM ? data.elemNames : data.attrNames).contains(local);
+    return type != NodeType.PI && part == NamePart.LOCAL &&
+      !(type == NodeType.ELM ? data.elemNames : data.attrNames).contains(local);
   }
 
   @Override

@@ -88,7 +88,7 @@ public abstract class Filter extends Preds {
       // example: db:open('db')[.//text() = 'x']  ->  db:open('db')/.[.//text() = 'x']
       if(st.type == NodeType.DOC && root.ddo()) {
         final Expr step = new StepBuilder(info).preds(exprs).finish(cc, root);
-        return cc.replaceWith(this, Path.get(info, root, step).optimize(cc));
+        return cc.replaceWith(this, Path.get(cc, info, root, step));
       }
 
       // rewrite independent deterministic single filter to if expression:

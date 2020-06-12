@@ -73,13 +73,13 @@ public abstract class Test extends ExprInfo {
   }
 
   /**
-   * Optimizes the expression.
+   * Checks if evaluation can be dropped.
    * @param expr root expression (can be {@code null})
-   * @return false if test always returns false
+   * @return result of check
    */
   @SuppressWarnings("unused")
-  public boolean optimize(final Expr expr) {
-    return true;
+  public boolean noMatches(final Expr expr) {
+    return false;
   }
 
   /**

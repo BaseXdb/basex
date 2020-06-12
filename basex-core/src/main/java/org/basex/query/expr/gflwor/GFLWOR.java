@@ -644,8 +644,7 @@ public final class GFLWOR extends ParseExpr {
     if(rtrn instanceof Path) {
       final Path path = (Path) rtrn;
       if(var.test(path.root)) {
-        final QueryFunction<Expr, Expr> func = expr ->
-          Path.get(path.info, expr, path.steps).optimize(cc);
+        final QueryFunction<Expr, Expr> func = expr -> Path.get(cc, path.info, expr, path.steps);
         final Checks<Expr> simple = expr -> {
           if(!(expr instanceof Step)) return false;
           final Axis axis = ((Step) expr).axis;

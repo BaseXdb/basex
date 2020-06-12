@@ -119,7 +119,7 @@ public abstract class AxisPath extends Path {
 
   /**
    * Adds predicates to the last step and returns the optimized expression.
-   * @param cc compilation context (can be {@code null})
+   * @param cc compilation context
    * @param preds predicates to be added
    * @return resulting path instance
    * @throws QueryException query exception
@@ -133,7 +133,7 @@ public abstract class AxisPath extends Path {
       cc.updateFocus(step);
       return step.optimize(cc);
     }));
-    return copyType(get(info, root, list.finish())).optimize(cc);
+    return copyType(get(cc, info, root, list.finish()));
   }
 
   @Override

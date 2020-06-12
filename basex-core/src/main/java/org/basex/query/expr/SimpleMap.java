@@ -254,7 +254,7 @@ public abstract class SimpleMap extends Arr {
       if(path.root != null) return this;
       steps.add(path.steps);
     }
-    return cc.replaceWith(this, Path.get(info, root, steps.finish()).optimize(cc));
+    return cc.replaceWith(this, Path.get(cc, info, root, steps.finish()));
   }
 
   @Override

@@ -184,7 +184,7 @@ public abstract class Cmp extends Arr {
         for(final QNm qname : qnames) {
           final Test test = new NameTest((NodeType) type, qname, part, cc.sc().elemNS);
           final Expr step = new StepBuilder(info).test(test).finish(cc, null);
-          if(step != Empty.VALUE) paths.add(Path.get(info, null, step).optimize(cc));
+          if(step != Empty.VALUE) paths.add(Path.get(cc, info, null, step));
         }
         return paths.isEmpty() ? Bln.FALSE : paths.size() == 1 ? paths.get(0) :
           new Union(info, paths.finish()).optimize(cc);

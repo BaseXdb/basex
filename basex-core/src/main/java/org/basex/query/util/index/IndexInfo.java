@@ -206,7 +206,7 @@ public final class IndexInfo {
       rt = root;
     } else {
       final Expr st = new StepBuilder(ii).axis(Axis.PARENT).test(test).finish(cc, root);
-      rt = Path.get(ii, root, st).optimize(cc);
+      rt = Path.get(cc, ii, root, st);
     }
     expr = pred.invert(rt);
     optInfo = opt;

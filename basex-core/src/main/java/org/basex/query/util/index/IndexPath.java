@@ -89,7 +89,7 @@ public class IndexPath extends IndexPred {
     steps.add(new StepBuilder(st.info).axis(step(s + 1).axis.invert()).test(st.test).
         finish(cc, rt));
 
-    return Path.get(path.info, rt, steps.finish()).optimize(cc);
+    return Path.get(cc, path.info, rt, steps.finish());
   }
 
   /**

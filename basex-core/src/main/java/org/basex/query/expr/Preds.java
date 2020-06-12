@@ -192,7 +192,7 @@ public abstract class Preds extends Arr {
       final Expr first = path.root;
       if((first instanceof ContextValue || root.equals(first) && root.isSimple() && rst.one()) &&
           !path.steps[0].has(Flag.POS)) {
-        expr = Path.get(path.info, null, path.steps).optimize(cc);
+        expr = Path.get(cc, path.info, null, path.steps);
       }
     }
 
@@ -272,7 +272,7 @@ public abstract class Preds extends Arr {
     };
     final QueryFunction<Expr, Expr> createExpr = e -> {
       return e instanceof ContextValue ? createRoot.apply(root) :
-        e instanceof Path ? Path.get(info, createRoot.apply(root), e).optimize(cc) : null;
+        e instanceof Path ? Path.get(cc, info, createRoot.apply(root), e) : null;
     };
 
     // rewrite to general comparison (right operand must not depend on context):

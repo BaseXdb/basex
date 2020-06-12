@@ -101,8 +101,9 @@ public abstract class Step extends Preds {
     // updates the static type
     final Expr ex = expr != null ? expr : cc.qc.focus.value;
     type(ex, cc);
+
     // check if step or test will never yield results
-    if(emptyStep() || !test.optimize(ex)) {
+    if(noMatches() || test.noMatches(ex)) {
       cc.info(OPTSTEP_X, this);
       return cc.emptySeq(this);
     }
@@ -200,7 +201,7 @@ public abstract class Step extends Preds {
    * Checks if the step will never yield results.
    * @return {@code true} if steps will never yield results
    */
-  private boolean emptyStep() {
+  private boolean noMatches() {
     final NodeType type = test.type;
     if(type.oneOf(NodeType.NOD, NodeType.SCA, NodeType.SCE)) return false;
 

@@ -78,7 +78,7 @@ public class DbText extends DbAccess {
 
     final NameTest nt = new NameTest(NodeType.ATT, qName, NamePart.FULL, sc.elemNS);
     // return empty sequence if test will yield no results
-    if(!nt.optimize(qc.focus.value)) return Empty.ITER;
+    if(nt.noMatches(qc.focus.value)) return Empty.ITER;
 
     // wrap iterator with name test
     final Iter iter = ia.iter(qc);
