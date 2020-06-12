@@ -33,7 +33,7 @@ public final class ItemSeq extends Seq {
 
   @Override
   public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item head = itemAt(0);
+    final Item head = items[0];
     if(head instanceof ANode) return head;
     throw EBV_X.get(ii, this);
   }

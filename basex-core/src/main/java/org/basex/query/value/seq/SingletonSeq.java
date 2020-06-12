@@ -1,5 +1,6 @@
 package org.basex.query.value.seq;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
@@ -7,6 +8,7 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -31,7 +33,9 @@ public final class SingletonSeq extends Seq {
 
   @Override
   public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return value.ebv(qc, ii);
+    final Item head = value.itemAt(0);
+    if(head instanceof ANode) return head;
+    throw EBV_X.get(ii, this);
   }
 
   @Override

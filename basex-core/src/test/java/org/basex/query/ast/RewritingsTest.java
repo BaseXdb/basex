@@ -1495,4 +1495,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("switch(<_/>) case '' return 1 default return 2", 1, root(If.class));
     check("switch(<_/>) case '' case 'x' return 1 default return 2", 1, root(If.class));
   }
+
+  /** Singleton sequences in predicates. */
+  @Test public void gh1878() {
+    error("<a/>[util:replicate(1, 2)]", EBV_X);
+  }
 }
