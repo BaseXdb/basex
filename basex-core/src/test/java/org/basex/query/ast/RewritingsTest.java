@@ -1500,4 +1500,14 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1878() {
     error("<a/>[util:replicate(1, 2)]", EBV_X);
   }
+
+  /** Lacking filter rewriting. */
+  @Test public void gh1879() {
+    check("let $a := <a/> return $a[$a/self::a]", "<a/>",
+        empty(CachedFilter.class), count(IterFilter.class, 1));
+    check("let $a := <a/> return $a[./self::a]", "<a/>",
+        empty(CachedFilter.class), count(IterFilter.class, 1));
+    check("let $a := <a/> return $a[self::a]", "<a/>",
+        empty(CachedFilter.class), count(IterFilter.class, 1));
+  }
 }

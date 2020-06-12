@@ -192,7 +192,7 @@ public abstract class Preds extends Arr {
       final Expr first = path.root;
       if((first instanceof ContextValue || root.equals(first) && root.isSimple() && rst.one()) &&
           !path.steps[0].has(Flag.POS)) {
-        expr = Path.get(path.info, null, path.steps);
+        expr = Path.get(path.info, null, path.steps).optimize(cc);
       }
     }
 
