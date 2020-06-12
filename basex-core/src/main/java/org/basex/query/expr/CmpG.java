@@ -163,7 +163,9 @@ public class CmpG extends Cmp {
     }
 
     // simplify operands
-    for(int e = 0; e < 2; e++) exprs[e] = exprs[e].simplifyFor(Simplify.DISTINCT, cc);
+    for(int e = 0; e < 2; e++) {
+      exprs[e] = exprs[e].simplifyFor(Simplify.DISTINCT, cc);
+    }
 
     // optimize expression
     expr = opt(cc);

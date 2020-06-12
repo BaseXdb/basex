@@ -262,7 +262,8 @@ public abstract class SimpleMap extends Arr {
       throws QueryException {
 
     Expr expr = this;
-    if(mode == Simplify.EBV || mode == Simplify.DISTINCT) {
+    if(mode == Simplify.EBV || mode == Simplify.PREDICATE || mode == Simplify.DISTINCT) {
+      // nodes ! text() = string  ->  nodes/text() = string
       expr = toPath(cc);
     } else {
       final int el = exprs.length;

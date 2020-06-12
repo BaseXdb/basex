@@ -111,7 +111,7 @@ public abstract class AxisPath extends Path {
    * @param preds predicates to be added
    * @return resulting path instance
    */
-  public final Path addPredicates(final Expr... preds) {
+  public final Expr addPredicates(final Expr... preds) {
     final ExprList list = new ExprList(steps.length).add(steps);
     final Expr step = ((Step) list.pop()).addPreds(preds);
     return copyType(get(info, root, list.add(step).finish()));

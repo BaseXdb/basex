@@ -38,11 +38,10 @@ public final class FnBoolean extends StandardFunc {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) {
-    // if A is not numeric: expr[boolean(A)]  ->  expr[A]
-    if(mode == Simplify.EBV) {
-      final Expr expr = exprs[0];
-      if(!expr.seqType().mayBeNumber()) return cc.simplify(this, expr);
-    }
-    return this;
+    // if(boolean(number))  ->  if(number)
+    // E[boolean(nodes)]  ->  E[nodes]
+    final Expr expr = exprs[0];
+    return mode == Simplify.EBV || mode == Simplify.PREDICATE && !expr.seqType().mayBeNumber() ?
+      cc.simplify(this, expr) : this;
   }
 }

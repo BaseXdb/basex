@@ -123,7 +123,8 @@ public final class Uri extends AStr {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) {
-    return mode == Simplify.EBV ? cc.simplify(this, Bln.get(value.length != 0)) : this;
+    return (mode == Simplify.EBV || mode == Simplify.PREDICATE) ?
+      cc.simplify(this, Bln.get(value.length != 0)) : this;
   }
 
   /**

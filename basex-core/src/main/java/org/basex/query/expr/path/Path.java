@@ -57,7 +57,7 @@ public abstract class Path extends ParseExpr {
    * @param steps steps
    * @return path instance
    */
-  public static Path get(final InputInfo ii, final Expr root, final Expr... steps) {
+  public static Expr get(final InputInfo ii, final Expr root, final Expr... steps) {
     // add steps of input array
     final ExprList tmp = new ExprList(steps.length);
     for(final Expr step : steps) {
@@ -74,21 +74,29 @@ public abstract class Path extends ParseExpr {
     }
     final Expr[] stps = tmp.finish();
 
-    // check if path can be evaluated iteratively
-    Expr rt = root;
-    boolean axes = true;
-    for(final Expr expr : stps) axes &= expr instanceof Step;
-    final boolean iterative = axes && iterative(rt, stps);
-
     // normalize root context
-    if(rt instanceof ContextValue || rt instanceof Dummy) rt = null;
+    final Expr rt = root instanceof ContextValue || root instanceof Dummy ? null : root;
+    final boolean single = rt == null && stps.length == 1;
 
-    final boolean single = iterative && rt == null && stps.length == 1 && !stps[0].has(Flag.POS);
+    // choose best implementation
+    boolean axes = true;
+    for(final Expr expr : stps) axes = axes && expr instanceof Step;
 
-    return single ? new SingleIterPath(ii, stps[0]) :
-      iterative ? new IterPath(ii, rt, stps) :
-      axes ? new CachedPath(ii, rt, stps) :
-      new MixedPath(ii, rt, stps);
+    if(axes) {
+      if(iterative(root, stps)) {
+        // example: a
+        if(single && !stps[0].has(Flag.POS)) return new SingleIterPath(ii, stps[0]);
+        // example: a/b
+        return new IterPath(ii, rt, stps);
+      }
+      // example: a/b/..
+      return new CachedPath(ii, rt, stps);
+    }
+
+    // example: 'text'
+    if(single && stps[0].seqType().instanceOf(SeqType.AAT_ZM)) return stps[0];
+    // example: (1 to 10)/<xml/>
+    return new MixedPath(ii, rt, stps);
   }
 
   @Override
@@ -174,7 +182,7 @@ public abstract class Path extends ParseExpr {
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
 
-    if(mode == Simplify.EBV) {
+    if(mode == Simplify.EBV || mode == Simplify.PREDICATE) {
       final Expr last = steps[steps.length - 1];
       if(last instanceof Step) {
         final Step step = (Step) last;

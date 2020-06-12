@@ -30,6 +30,7 @@ public final class CompileContext {
     /** Effective boolean value. */ EBV,
     /** Untyped atomic.          */ ATOM,
     /** Numbers.                 */ NUMBER,
+    /** Predicate checks.        */ PREDICATE,
     /** Distinct values.         */ DISTINCT
   }
 

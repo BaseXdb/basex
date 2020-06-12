@@ -1,12 +1,14 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -52,6 +54,16 @@ public final class FnCount extends StandardFunc {
     }
 
     exprs[0] = expr;
+    return this;
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) {
+    // if(count(nodes))  ->  if(nodes)
+    if(mode == Simplify.EBV) {
+      final Expr expr = exprs[0];
+      if(expr.seqType().type instanceof NodeType) return cc.simplify(this, expr);
+    }
     return this;
   }
 }

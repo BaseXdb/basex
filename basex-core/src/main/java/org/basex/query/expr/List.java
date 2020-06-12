@@ -170,7 +170,7 @@ public final class List extends Arr {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode == Simplify.EBV) {
+    if(mode == Simplify.EBV || mode == Simplify.PREDICATE) {
       // otherwise, rewrite list to union
       expr = toUnion(cc);
     } else if(mode == Simplify.DISTINCT) {

@@ -115,7 +115,11 @@ public abstract class ANum extends Item {
 
   @Override
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc) {
-    return mode == Simplify.EBV && dbl() == 0 ? cc.simplify(this, Bln.FALSE) : this;
+    // predicate: E[0]  ->  E[false()]
+    // EBV: if(0)  ->  if(false())
+    final double d = dbl();
+    return cc.simplify(this, mode == Simplify.PREDICATE && (d != itr() || d < 1) ||
+        mode == Simplify.EBV && d == 0 ? Bln.FALSE : this);
   }
 
   @Override

@@ -8,7 +8,6 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -84,7 +83,7 @@ public final class If extends Arr {
       swap();
       cc.info(OPTSWAP_X, this);
     }
-    // if(exists(A))  ->  if(A)
+    // if(exists(nodes))  ->  if(nodes)
     cond = cond.simplifyFor(Simplify.EBV, cc);
 
     return cc.replaceWith(this, opt(cc));

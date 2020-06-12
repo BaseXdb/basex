@@ -335,8 +335,8 @@ public abstract class Expr extends ExprInfo {
   @SuppressWarnings("unused")
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // return true if a deterministic expression returns at least one node
-    return mode == Simplify.EBV && seqType().instanceOf(SeqType.NOD_OM) && !has(Flag.NDT) ?
-      cc.simplify(this, Bln.TRUE) : this;
+    return (mode == Simplify.EBV || mode == Simplify.PREDICATE) &&
+      seqType().instanceOf(SeqType.NOD_OM) && !has(Flag.NDT) ? cc.simplify(this, Bln.TRUE) : this;
   }
 
   /**

@@ -185,19 +185,16 @@ public abstract class Preds extends Arr {
     }
 
     // paths
-    if(expr instanceof Path) {
+    if(expr instanceof Path && rst.type instanceof NodeType) {
       // E[./...]  ->  E[...]
       // E[E/...]  ->  E[...]
       final Path path = (Path) expr;
       final Expr first = path.root;
-      if(rst.type instanceof NodeType && (first instanceof ContextValue ||
-          root.equals(first) && root.isSimple() && rst.one())) {
+      if((first instanceof ContextValue || root.equals(first) && root.isSimple() && rst.one()) &&
+          !path.steps[0].has(Flag.POS)) {
         expr = Path.get(path.info, null, path.steps);
       }
     }
-
-    // E[exists(nodes)]  ->  E[nodes]
-    expr = expr.simplifyFor(Simplify.EBV, cc);
 
     // inline root item (ignore nodes)
     // 1[. = 1]  ->  1[1 = 1]
@@ -206,27 +203,33 @@ public abstract class Preds extends Arr {
       if(inlined != null) expr = inlined;
     }
 
-    if(expr instanceof Path) {
-      if(expr instanceof SingleIterPath) {
-        final Step predStep = (Step) ((Path) expr).steps[0];
-        if(predStep.axis == Axis.SELF && !predStep.mayBePositional()) {
-          if(root instanceof Step && !mayBePositional()) {
-            final Step rootStep = (Step) root;
-            final Test test = rootStep.test.intersect(predStep.test);
-            if(test != null) {
-              // child::node()[self:*]  ->  child::*
-              cc.info(OPTMERGE_X, predStep);
-              rootStep.test = test;
-              list.add(predStep.exprs);
-              return;
-            }
-          }
-          if(predStep.test instanceof KindTest && predStep.exprs.length == 0 &&
-              rst.type.instanceOf(predStep.test.type)) {
-            // <a/>[self:*]  ->  <a/>
-            cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+    // E[exists(nodes)]  ->  E[nodes]
+    // E[count(nodes)]  will not be rewritten
+    expr = expr.simplifyFor(Simplify.PREDICATE, cc);
+
+    // rewrite number to positional test
+    if(expr instanceof ANum) expr = ItrPos.get(((ANum) expr).dbl(), info);
+
+    // merge node tests with steps; remove redundant node tests
+    if(expr instanceof SingleIterPath) {
+      final Step predStep = (Step) ((Path) expr).steps[0];
+      if(predStep.axis == Axis.SELF && !predStep.mayBePositional()) {
+        if(root instanceof Step && !mayBePositional()) {
+          final Step rootStep = (Step) root;
+          final Test test = rootStep.test.intersect(predStep.test);
+          if(test != null) {
+            // child::node()[self:*]  ->  child::*
+            cc.info(OPTMERGE_X, predStep);
+            rootStep.test = test;
+            list.add(predStep.exprs);
             return;
           }
+        }
+        if(predStep.test instanceof KindTest && predStep.exprs.length == 0 &&
+            rst.type.instanceOf(predStep.test.type)) {
+          // <a/>[self:*]  ->  <a/>
+          cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+          return;
         }
       }
     }
@@ -237,9 +240,6 @@ public abstract class Preds extends Arr {
       cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       return;
     }
-
-    // rewrite number to positional test
-    if(expr instanceof ANum) expr = ItrPos.get(((ANum) expr).dbl(), info);
 
     // positional tests
     if(root instanceof Step && expr instanceof ItrPos) {

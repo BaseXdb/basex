@@ -1484,6 +1484,12 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(1, 2) ! .[.]", 1);
   }
 
+  /** EBV Rewritings: count(expr), numeric checks. */
+  @Test public void gh1875() {
+    check("boolean(count(<_>A</_>[. = 'A']))", true, empty(COUNT));
+    check("boolean(count(<_>A</_>[. = 'A']) != 0)", true, empty(COUNT));
+  }
+
   /** Switch Expression: Rewrite to if expression. */
   @Test public void gh1877() {
     check("switch(<_/>) case '' return 1 default return 2", 1, root(If.class));
