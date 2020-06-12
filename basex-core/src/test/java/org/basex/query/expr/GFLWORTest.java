@@ -153,8 +153,7 @@ public final class GFLWORTest extends QueryPlanTest {
     check("let $rnd := random:double() where $rnd div 2 >= 0.2 where $rnd < 0.5 " +
         "where round(2 * $rnd) eq 1 return $rnd",
         null,
-        count("Where", 1),
-        exists("Where/And")
+        root(IterFilter.class)
     );
   }
 

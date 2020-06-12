@@ -7,8 +7,6 @@ import java.util.List;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.path.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -176,50 +174,9 @@ public final class For extends ForLet {
     return true;
   }
 
-  /**
-   * Adds a predicate to the looped expression.
-   * @param ex expression to add as predicate
-   * @param cc compilation context
-   * @throws QueryException query exception
-   */
-  void addPredicate(final Expr ex, final CompileContext cc) throws QueryException {
-    if(expr instanceof AxisPath && !ex.has(Flag.POS)) {
-      // add to last step of path, provided that predicate is not positional
-      expr = ((AxisPath) expr).addPredicates(cc, ex);
-    } else if(expr instanceof Filter) {
-      // add to existing filter expression
-      expr = ((Filter) expr).addPredicate(cc, ex);
-    } else {
-      // create new filter expression
-      expr = Filter.get(cc, info, expr, ex);
-    }
-  }
-
-  /**
-   * Tries to add the given expression as a predicate.
-   * Replaces variable references with a context expression
-   * @param cc compilation context
-   * @param ex expression to add as predicate
-   * @return success flag
-   * @throws QueryException query exception
-   */
+  @Override
   boolean toPredicate(final CompileContext cc, final Expr ex) throws QueryException {
-    if(empty || !(vars().length == 1 && ex.uses(var) && ex.inlineable(var))) return false;
-
-    // reset context value (will not be accessible in predicate)
-    Expr pred = cc.get(expr, () -> {
-      // assign type of iterated items to context expression
-      final Expr inlined = ex.inline(var, new ContextValue(info).optimize(cc), cc);
-      return inlined != null ? inlined : ex;
-    });
-
-    // attach predicates to axis path or filter, or create a new filter
-    if(pred.seqType().mayBeNumber()) {
-      pred = cc.function(Function.BOOLEAN, info, pred);
-    }
-
-    addPredicate(pred, cc);
-    return true;
+    return !empty && pos == null && super.toPredicate(cc, ex);
   }
 
   /**

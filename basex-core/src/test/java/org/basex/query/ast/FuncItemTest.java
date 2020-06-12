@@ -2,7 +2,7 @@ package org.basex.query.ast;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
@@ -269,6 +269,6 @@ public final class FuncItemTest extends QueryPlanTest {
   @Test public void gh1649() {
     check("function($v) { if($v = 0) then () else $v }(<x>0</x>)",
         "",
-        type(GFLWOR.class, "element()?"));
+        root(IterFilter.class));
   }
 }

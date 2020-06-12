@@ -490,9 +490,9 @@ public final class GFLWOR extends ParseExpr {
    */
   private boolean optimizeWhere(final CompileContext cc) throws QueryException {
     boolean changed = false;
-    final HashSet<For> fors = new HashSet<>();
-    for(int i = 0; i < clauses.size(); i++) {
-      final Clause clause = clauses.get(i);
+    final HashSet<ForLet> forLets = new HashSet<>();
+    for(int c = 0; c < clauses.size(); c++) {
+      final Clause clause = clauses.get(c);
       if(!(clause instanceof Where)) continue;
 
       final Where where = (Where) clause;
@@ -503,12 +503,12 @@ public final class GFLWOR extends ParseExpr {
           break;
         }
         // test is always true: remove it
-        clauses.remove(i--);
+        clauses.remove(c--);
         changed = true;
       } else if(!clause.has(Flag.NDT)) {
         // find insertion position
         int insert = -1;
-        for(int j = i; --j >= 0;) {
+        for(int j = c; --j >= 0;) {
           final Clause curr = clauses.get(j);
           if(curr.has(Flag.NDT) || !curr.skippable(where)) break;
           // where clauses are always moved to avoid unnecessary computations,
@@ -517,35 +517,36 @@ public final class GFLWOR extends ParseExpr {
         }
 
         if(insert >= 0) {
-          clauses.add(insert, clauses.remove(i));
+          clauses.add(insert, clauses.remove(c));
           changed = true;
           // it's safe to go on because clauses below the current one are never touched
         }
 
-        // try to rewrite where clause to predicate
+        // rewrite where clause to predicate:
+        // for $b in /a/b where $b/c  ->  for $b in /a/b[c]
+        // let $a := 1 to 3 where $a > 1 return $a  ->  let $a := (1 to 3)[. > 1] return $i
         if(!clause.has(Flag.CTX)) {
-          final int newPos = insert < 0 ? i : insert;
+          final int newPos = insert < 0 ? c : insert;
           for(int b4 = newPos; --b4 >= 0;) {
             final Clause before = clauses.get(b4);
-            if(before instanceof For) {
-              final For fr = (For) before;
-              if(fr.toPredicate(cc, where.expr)) {
-                // for $i in ('a', 'b') where $i return $i  -> for $i in ('a', 'b')[.] return $i
-                fors.add((For) before);
+            if(before instanceof Where) continue;
+            if(before instanceof ForLet) {
+              final ForLet fl = (ForLet) before;
+              if((before instanceof For || c + 1 == clauses.size() && rtrn instanceof VarRef &&
+                  ((VarRef) rtrn).var.is(fl.var)) && fl.toPredicate(cc, where.expr)) {
+                forLets.add(fl);
                 clauses.remove(newPos);
                 changed = true;
-                i--;
+                c--;
               }
-            } else if(before instanceof Where) {
-              continue;
             }
             break;
           }
         }
       }
     }
-    // trigger optimizations on rewritten expressions
-    for(final For fr : fors) fr.expr = fr.expr.optimize(cc);
+    // optimize on rewritten expressions (only once per clause)
+    for(final ForLet fl : forLets) fl.expr = fl.expr.optimize(cc);
     if(changed) cc.info(QueryText.OPTWHERE);
     return changed;
   }
@@ -566,8 +567,8 @@ public final class GFLWOR extends ParseExpr {
       if(pos.pos == null) continue;
 
       // find where clause ($c = 1)
-      for(int i = c + 1; i < clauses.size(); i++) {
-        final Clause cl = clauses.get(i);
+      for(int d = c + 1; d < clauses.size(); d++) {
+        final Clause cl = clauses.get(d);
         if(!(cl instanceof Where)) {
           // stop if clause is no 'for' or 'let' expression or non-deterministic
           if(!(cl instanceof For || cl instanceof Let) || cl.has(Flag.NDT)) break;
@@ -582,7 +583,7 @@ public final class GFLWOR extends ParseExpr {
         if(!(cmp.expr instanceof VarRef)) continue;
 
         // remove clause and ensure that the positional variable is only used once
-        clauses.remove(i);
+        clauses.remove(d);
         if(count(pos.pos, c) == VarUsage.NEVER) {
           /* OLD: for $v at $pos in E where $pos = P ...
            * NEW: for $v in E[position() = P] ... */
@@ -591,7 +592,7 @@ public final class GFLWOR extends ParseExpr {
           changed = true;
         } else {
           // re-add variable, give up
-          clauses.add(i, cl);
+          clauses.add(d, cl);
         }
         break;
       }
