@@ -35,7 +35,7 @@ public final class WebModules {
 
   /** Module cache. */
   private HashMap<String, WebModule> modules = new HashMap<>();
-  /** Current parsing state. */
+  /** Indicates if modules have been cached. */
   private boolean parsed;
   /** Last access time. */
   private long access;
@@ -60,7 +60,7 @@ public final class WebModules {
         @Override
         public void run() {
           synchronized(WebModules.this) {
-            if(System.currentTimeMillis() - access >= ms) init();
+            if(System.currentTimeMillis() - access >= ms) init(false);
           }
         }
       }, 0, 100);
@@ -79,8 +79,10 @@ public final class WebModules {
 
   /**
    * Initializes the module cache.
+   * @param full discard old cache
    */
-  public synchronized void init() {
+  public synchronized void init(final boolean full) {
+    if(full) modules = new HashMap<>();
     parsed = false;
   }
 
@@ -339,20 +341,13 @@ public final class WebModules {
       } else {
         final String path = file.path();
         if(file.hasSuffix(IO.XQSUFFIXES)) {
-          WebModule module = old != null ? old.get(path) : null;
-          boolean parsed = false;
-          if(module != null) {
-            // check if module has been modified
-            parsed = module.uptodate();
-          } else {
-            // create new module
-            module = new WebModule(file);
-          }
-          // add module if it has been parsed, and if it contains relevant annotations
-          if(parsed || module.parse(ctx)) {
-            module.touch();
-            cache.put(path, module);
-          }
+          // retrieve existing module or create new instance
+          WebModule module = old.get(path);
+          if(module == null) module = new WebModule(file);
+
+          // parse updated module, add to cache
+          module.parse(ctx);
+          cache.put(path, module);
         }
       }
     }

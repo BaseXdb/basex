@@ -29,7 +29,7 @@ public final class WebModule {
   /** File reference. */
   private final IOFile file;
   /** Parsing timestamp. */
-  private long time;
+  private long time = -1;
 
   /**
    * Constructor.
@@ -37,17 +37,19 @@ public final class WebModule {
    */
   public WebModule(final IOFile file) {
     this.file = file;
-    time = file.timeStamp();
   }
 
   /**
    * Checks the module for relevant annotations.
    * @param ctx database context
-   * @return {@code true} if module contains relevant annotations
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public boolean parse(final Context ctx) throws QueryException, IOException {
+  public void parse(final Context ctx) throws QueryException, IOException {
+    final long ts = file.timeStamp();
+    if(time == ts) return;
+    time = ts;
+
     functions.clear();
     wsFunctions.clear();
 
@@ -68,22 +70,6 @@ public final class WebModule {
       // ignore modules that cannot be parsed
       Util.debug(ex);
     }
-    return !(functions.isEmpty() && wsFunctions.isEmpty());
-  }
-
-  /**
-   * Checks if the timestamp is still up-to-date.
-   * @return result of check
-   */
-  public boolean uptodate() {
-    return time == file.timeStamp();
-  }
-
-  /**
-   * Updates the timestamp.
-   */
-  public void touch() {
-    time = file.timeStamp();
   }
 
   /**

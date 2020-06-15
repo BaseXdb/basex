@@ -89,7 +89,7 @@ public abstract class RestXqTest extends HTTPTest {
     // create new module
     module().write(HEADER + function);
     // invalidate module cache
-    WebModules.get(context).init();
+    WebModules.get(context).init(true);
   }
 
   /**

@@ -177,7 +177,7 @@ public enum ApiFunction implements AFunction {
   /** XQuery function. */
   _RESTXQ_BASE_URI(RestBaseUri::new, "base-uri()", arg(), URI_O, REST_URI),
   /** XQuery function. */
-  _RESTXQ_INIT(RestInit::new, "init()", arg(), EMP, REST_URI),
+  _RESTXQ_INIT(RestInit::new, "init([full])", arg(BLN_O), EMP, REST_URI),
   /** XQuery function. */
   _RESTXQ_URI(RestUri::new, "uri()", arg(), URI_O, REST_URI),
   /** XQuery function. */
