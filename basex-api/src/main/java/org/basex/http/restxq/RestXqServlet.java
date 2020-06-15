@@ -36,7 +36,7 @@ public final class RestXqServlet extends BaseXServlet {
 
     // initialize RESTXQ
     if(conn.path().equals('/' + WebText.INIT)) {
-      modules.init(true);
+      modules.init(false);
       return;
     }
 

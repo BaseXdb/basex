@@ -60,7 +60,7 @@ public final class WebModules {
         @Override
         public void run() {
           synchronized(WebModules.this) {
-            if(System.currentTimeMillis() - access >= ms) init(false);
+            if(System.currentTimeMillis() - access >= ms) init(true);
           }
         }
       }, 0, 100);
@@ -79,10 +79,10 @@ public final class WebModules {
 
   /**
    * Initializes the module cache.
-   * @param full discard old cache
+   * @param update only update new modules
    */
-  public synchronized void init(final boolean full) {
-    if(full) modules = new HashMap<>();
+  public synchronized void init(final boolean update) {
+    if(!update) modules = new HashMap<>();
     parsed = false;
   }
 
