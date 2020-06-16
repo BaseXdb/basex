@@ -10,6 +10,7 @@ import module namespace html = 'dba/html' at 'lib/html.xqm';
 
 (:~
  : Permissions: checks the user credentials.
+ : Redirects to the login page if a user is not logged in, or if the page is not public.
  : @param  $perm  permission data
  : @return redirection to login page or empty sequence
  :)
@@ -18,14 +19,20 @@ declare
 function dba:check(
   $perm  as map(*)
 ) as element(rest:response)? {
-  (: redirect to login page if user is not logged in, or if page is not public :)
   let $path := $perm?path
-  where not(session:get($config:SESSION-KEY) or $perm?allow = 'public')
-  (: normalize login path :)
-  let $target := if(ends-with($path, '/dba')) then 'dba/login' else 'login'
-  (: last visited page to redirect to (if there was one) :)
-  let $page := replace($path, '^.*dba/?', '')[.]
-  return web:redirect($target, html:parameters(map { 'page': $page }))
+  let $allow := $perm?allow
+  return if ($allow = 'public') then (
+    (: public function, register id for better log entries :)
+    request:set-attribute('id', $allow)
+  ) else if (session:get($config:SESSION-KEY)) then (
+    (: everything fine, user is logged in :)
+  ) else (
+    (: normalize login path :)
+    let $target := if(ends-with($path, '/dba')) then 'dba/login' else 'login'
+    (: last visited page to redirect to (if there was one) :)
+    let $page := replace($path, '^.*dba/?', '')[.]
+    return web:redirect($target, html:parameters(map { 'page': $page }))
+  )
 };
 
 (:~
