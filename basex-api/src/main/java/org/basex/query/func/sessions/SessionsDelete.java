@@ -1,6 +1,7 @@
 package org.basex.query.func.sessions;
 
 import org.basex.query.*;
+import org.basex.query.func.session.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -14,7 +15,10 @@ import org.basex.util.*;
 public final class SessionsDelete extends SessionsFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    session(qc).delete(toToken(exprs[1], qc));
+    final ASession session = session(qc);
+    final byte[] name = toToken(exprs[1], qc);
+
+    session.delete(name);
     return Empty.VALUE;
   }
 }

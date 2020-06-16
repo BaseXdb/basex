@@ -15,6 +15,7 @@ public final class SessionsIds extends SessionsFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     check(qc);
+
     return StrSeq.get(SessionListener.ids());
   }
 }

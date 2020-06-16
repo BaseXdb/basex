@@ -14,7 +14,9 @@ import org.basex.util.*;
 public final class SessionClose extends SessionFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    session(qc).close();
+    final ASession session = session(qc, false);
+
+    if(session != null) session.close();
     return Empty.VALUE;
   }
 }

@@ -411,15 +411,15 @@ public enum QueryError {
 
   /** Error code. */
   SESSION_SET_X(SESSION, "set", "Item cannot be stored: %."),
+  /** Error code. */
+  SESSION_NOTFOUND(SESSIONS, "not-found", "Session not available."),
 
-  // Session Module
+  // Sessions Module
 
   /** Error code. */
-  SESSIONS_SET_X(SESSIONS, "set", "Function items cannot be stored: %."),
+  SESSIONS_SET_X(SESSIONS, "set", "Item cannot be stored: %."),
   /** Error code. */
-  SESSIONS_NOTFOUND_X(SESSIONS, "not-found", "Unknown session: %."),
-  /** Error code. */
-  SESSIONS_NOTFOUND(SESSIONS, "not-found", "Session not available."),
+  SESSIONS_NOTFOUND_X(SESSIONS, "not-found", "Session not available: %."),
 
   // SQL Module
 

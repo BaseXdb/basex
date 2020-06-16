@@ -13,6 +13,8 @@ import org.basex.util.*;
 public final class SessionCreated extends SessionFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return session(qc).created();
+    final ASession session = session(qc, true);
+
+    return session.created();
   }
 }

@@ -2,6 +2,7 @@ package org.basex.query.func.session;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -12,6 +13,8 @@ import org.basex.query.value.*;
 public final class SessionNames extends SessionFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return session(qc).names();
+    final ASession session = session(qc, false);
+
+    return session != null ? session.names() : Empty.VALUE;
   }
 }

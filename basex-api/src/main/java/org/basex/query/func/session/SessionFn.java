@@ -19,10 +19,11 @@ abstract class SessionFn extends ApiFunc {
   /**
    * Returns a session instance.
    * @param qc query context
-   * @return session instance
+   * @param create create session if none exists
+   * @return session instance or {@code null}
    * @throws QueryException query exception
    */
-  final ASession session(final QueryContext qc) throws QueryException {
+  final ASession session(final QueryContext qc, final boolean create) throws QueryException {
     // check if HTTP connection is available
     final HttpServletRequest requestCtx = request(qc);
 
@@ -31,10 +32,12 @@ abstract class SessionFn extends ApiFunc {
     final Object ws = qc.getProperty(HTTPText.WEBSOCKET);
     if(ws != null) session = ((WebSocket) ws).session;
     // HTTP context: get/create session
-    if(session == null) session = requestCtx.getSession();
-    // raise error if no session could be created (may happen in the WebSocket context)
-    if(session == null) throw SESSIONS_NOTFOUND.get(info);
-
+    if(session == null) session = requestCtx.getSession(create);
+    // no session created (may happen with WebSockets): raise error or return null reference
+    if(session == null) {
+      if(create) throw SESSION_NOTFOUND.get(info);
+      return null;
+    }
     return new ASession(session);
   }
 }

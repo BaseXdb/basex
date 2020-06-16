@@ -14,10 +14,14 @@ import org.basex.query.value.seq.*;
 public final class SessionGet extends SessionFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    final ASession session = session(qc, false);
     final byte[] name = toToken(exprs[0], qc);
     final Value dflt = exprs.length == 1 ? Empty.VALUE : exprs[1].value(qc);
 
-    final Object object = session(qc).get(name);
-    return object != null ? JavaCall.toValue(object, qc, sc) : dflt;
+    if(session != null) {
+      final Object object = session.get(name);
+      if(object != null) return JavaCall.toValue(object, qc, sc);
+    }
+    return dflt;
   }
 }
