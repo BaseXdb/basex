@@ -20,7 +20,7 @@ function dba:check(
 ) as element(rest:response)? {
   (: redirect to login page if user is not logged in, or if page is not public :)
   let $path := $perm?path
-  where not(session:get($config:SESSION-KEY) or $perm?allow = 'all')
+  where not(session:get($config:SESSION-KEY) or $perm?allow = 'public')
   (: normalize login path :)
   let $target := if(ends-with($path, '/dba')) then 'dba/login' else 'login'
   (: last visited page to redirect to (if there was one) :)
@@ -41,7 +41,7 @@ declare
   %rest:query-param('_error', '{$error}')
   %rest:query-param('_page',  '{$page}')
   %output:method('html')
-  %perm:allow('all')
+  %perm:allow('public')
 function dba:login(
   $name   as xs:string?,
   $error  as xs:string?,
@@ -97,7 +97,7 @@ declare
   %rest:query-param('_name', '{$name}')
   %rest:query-param('_pass', '{$pass}')
   %rest:query-param('_page', '{$page}')
-  %perm:allow('all')
+  %perm:allow('public')
 function dba:login-check(
   $name  as xs:string,
   $pass  as xs:string,
