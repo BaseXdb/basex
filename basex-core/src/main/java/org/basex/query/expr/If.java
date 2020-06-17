@@ -279,6 +279,9 @@ public final class If extends Arr {
 
   @Override
   public String toString() {
-    return IF + '(' + cond + ") " + THEN + ' ' + exprs[0] + ' ' + ELSE + ' ' + exprs[1];
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(IF).addBraced("(", cond, ")").addSpaced(THEN).add(exprs[0]);
+    if(exprs[1] != Empty.VALUE) tb.addSpaced(ELSE).add(exprs[1]);
+    return tb.toString();
   }
 }

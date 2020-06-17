@@ -85,6 +85,6 @@ public final class And extends Logical {
 
   @Override
   public String toString() {
-    return toString(' ' + AND + ' ');
+    return toString(AND);
   }
 }

@@ -1,7 +1,5 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
@@ -109,6 +107,6 @@ public final class Extension extends Single {
 
   @Override
   public String toString() {
-    return String.valueOf(pragma) + ' ' + CURLY1 + ' ' + expr + ' ' + CURLY2;
+    return new TokenBuilder().add(pragma).addBraced("{ ", expr, " }").toString();
   }
 }

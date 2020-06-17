@@ -285,17 +285,12 @@ public final class TypeswitchGroup extends Single {
   @Override
   public String toString() {
     final int sl = seqTypes.length;
-    final TokenBuilder tb = new TokenBuilder().add(sl == 0 ? DEFAULT : CASE);
+    final TokenBuilder tb = new TokenBuilder().add(' ').add(sl == 0 ? DEFAULT : CASE);
     if(var != null) {
       tb.add(' ').add(var);
-      if(sl != 0) tb.add(' ').add(AS);
+      if(sl > 0) tb.add(' ').add(AS);
     }
-    if(sl != 0) {
-      for(int s = 0; s < sl; s++) {
-        if(s > 0) tb.add(" |");
-        tb.add(' ').add(seqTypes[s]);
-      }
-    }
-    return tb.add(' ' + RETURN + ' ' + expr).toString();
+    if(sl > 0) tb.add(' ').addSeparated(seqTypes, "|", false);
+    return tb.addSpaced(RETURN).add(expr).toString();
   }
 }

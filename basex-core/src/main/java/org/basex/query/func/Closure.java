@@ -471,23 +471,16 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     if(!global.isEmpty()) {
-      sb.append("((: inline-closure :) ");
-      global.forEach((k, v) -> sb.append(LET + ' ').append(k).append(' ').append(ASSIGN).
-          append(' ').append(v).append(' '));
-      sb.append(RETURN).append(' ');
+      tb.add("((: inline-closure :) ");
+      global.forEach((k, v) -> tb.add(LET).addSpaced(k).add(ASSIGN).addSpaced(v));
+      tb.add(RETURN).add(' ');
     }
-    sb.append(FUNCTION).append(PAREN1);
-    final int pl = params.length;
-    for(int p = 0; p < pl; p++) {
-      if(p > 0) sb.append(", ");
-      sb.append(params[p]);
-    }
-    sb.append(PAREN2).append(' ');
-    sb.append(AS).append(' ').append(declType != null ? declType : SeqType.ITEM_ZM).append(' ');
-    sb.append(CURLY1).append(' ').append(expr).append(' ').append(CURLY2);
-    if(!global.isEmpty()) sb.append(PAREN2);
-    return sb.toString();
+    tb.add(FUNCTION).addSeparated(params, ", ", true);
+    tb.addSpaced(AS).add(declType != null ? declType : SeqType.ITEM_ZM).add(' ');
+    tb.addBraced("{ ", expr, " }");
+    if(!global.isEmpty()) tb.add(PAREN2);
+    return tb.toString();
   }
 }

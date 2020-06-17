@@ -235,13 +235,13 @@ public final class StaticFuncs extends ExprInfo {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     for(final FuncCache fc : funcs.values()) {
       if(fc.func != null && fc.func.compiled()) {
-        sb.append(fc.func).append(Text.NL);
+        tb.add(fc.func).add(Text.NL);
       }
     }
-    return sb.toString();
+    return tb.toString();
   }
 
   /** Function cache. */

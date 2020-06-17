@@ -400,6 +400,6 @@ public class CmpG extends Cmp {
 
   @Override
   public final String toString() {
-    return toString(" " + op + ' ');
+    return toString(op.toString());
   }
 }

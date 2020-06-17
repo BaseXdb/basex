@@ -74,8 +74,8 @@ public final class Dummy extends Item {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(Util.className(this)).append('(').append(type);
-    if(data != null) sb.append(", db: ").append(data.meta.name);
-    return sb.append(')').toString();
+    final TokenBuilder tb = new TokenBuilder().add(Util.className(this)).add('(').add(type);
+    if(data != null) tb.add(", db: ").add(data.meta.name);
+    return tb.add(')').toString();
   }
 }

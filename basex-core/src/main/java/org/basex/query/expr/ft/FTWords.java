@@ -518,29 +518,29 @@ public final class FTWords extends FTExpr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    final boolean str = query instanceof AStr;
-    if(!str) sb.append("{ ");
-    sb.append(query);
-    if(!str) sb.append(" }");
+    final TokenBuilder tb = new TokenBuilder();
+    if(query instanceof AStr) {
+      tb.add(query);
+    } else {
+      tb.addBraced("{ ", query, " }");
+    }
     switch(mode) {
       case ALL:
-        sb.append(' ' + ALL);
+        tb.add(' ').add(ALL);
         break;
       case ALL_WORDS:
-        sb.append(' ' + ALL + ' ' + WORDS);
+        tb.add(' ').add(ALL).add(' ').add(WORDS);
         break;
       case ANY_WORD:
-        sb.append(' ' + ANY + ' ' + WORD);
+        tb.add(' ').add(ANY).add(' ').add(WORD);
         break;
       case PHRASE:
-        sb.append(' ' + PHRASE);
+        tb.add(' ').add(PHRASE);
         break;
       default:
     }
-    if(occ != null) sb.append(OCCURS + ' ').append(occ[0]).append(' ').append(TO).append(' ').
-      append(occ[1]).append(' ').append(TIMES);
-    if(ftOpt != null) sb.append(ftOpt);
-    return sb.toString();
+    if(occ != null) tb.add(OCCURS).addSpaced(occ[0]).add(TO).addSpaced(occ[1]).add(TIMES);
+    if(ftOpt != null) tb.add(ftOpt);
+    return tb.toString();
   }
 }

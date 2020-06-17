@@ -170,13 +170,13 @@ public final class ItrPos extends Simple {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder().append(Function.POSITION).append(' ');
+    final TokenBuilder tb = new TokenBuilder().add(Function.POSITION);
     if(max == MAX_VALUE) {
-      sb.append(">= ").append(min);
+      tb.addSpaced(">=").add(min);
     } else {
-      sb.append("= ").append(min);
-      if(min != max) sb.append(' ').append(TO).append(' ').append(max);
+      tb.addSpaced("=").add(min);
+      if(min != max) tb.addSpaced(TO).add(max);
     }
-    return sb.toString();
+    return tb.toString();
   }
 }

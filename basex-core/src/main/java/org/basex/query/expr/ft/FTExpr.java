@@ -1,5 +1,7 @@
 package org.basex.query.expr.ft;
 
+import static org.basex.query.QueryText.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -136,14 +138,13 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   /**
-   * Prints the array with the specified separator.
-   * @param sep separator
+   * Returns a string representation of this expression.
+   * Separates the array entries with the specified separator.
+   * @param separator separator (operator, delimiter); if {@code null}, separated with comma
    * @return string representation
    */
-  final String toString(final Object sep) {
-    final StringBuilder sb = new StringBuilder();
-    final int el = exprs.length;
-    for(int e = 0; e < el; e++) sb.append(e == 0 ? "" : sep.toString()).append(exprs[e]);
-    return sb.toString();
+  final String toString(final String separator) {
+    final String sep = separator == null ? SEP : (' ' + separator + ' ');
+    return new TokenBuilder().addSeparated(exprs, sep, true).toString();
   }
 }

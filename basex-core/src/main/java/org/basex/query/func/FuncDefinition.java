@@ -170,7 +170,7 @@ public final class FuncDefinition {
    * <ul>
    * <li>numbers (integer, long, float, double)</li>
    * <li>booleans (which will be suffixed with parentheses)</li>
-   * <li>strings starting with a space</li>
+   * <li>strings starting with a space (which will be chopped)</li>
    * </ul>
    * @param args arguments
    * @return string representation (prefixed with a space to simplify nesting of returned string)

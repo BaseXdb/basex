@@ -255,11 +255,11 @@ public class FuncType implements Type {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(anns).add(FUNCTION).add('(');
+    final TokenBuilder tb = new TokenBuilder().add(anns).add(FUNCTION);
     if(this == SeqType.ANY_FUNC) {
-      tb.add('*').add(')');
+      tb.add("(*)");
     } else {
-      tb.addSeparated(argTypes, ", ").add(") as ").add(declType);
+      tb.addSeparated(argTypes, ", ", true).addSpaced(AS).add(declType);
     }
     return tb.toString();
   }

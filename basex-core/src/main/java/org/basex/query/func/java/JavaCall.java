@@ -298,12 +298,12 @@ public abstract class JavaCall extends Arr {
     if(similar != null) {
       // if name is equal, no function was chosen via exact type matching
       if(eq(nm, similar)) {
-        final StringBuilder sb = new StringBuilder();
+        final TokenBuilder tb = new TokenBuilder();
         for(final String type : types) {
-          if(sb.length() != 0) sb.append(", ");
-          sb.append(type.replaceAll("^.*\\.", ""));
+          if(!tb.isEmpty()) tb.add(", ");
+          tb.add(type.replaceAll("^.*\\.", ""));
         }
-        return JAVAARGS_X_X.get(ii, full, sb);
+        return JAVAARGS_X_X.get(ii, full, tb);
       }
       // show similar field/method name
       return FUNCSIMILAR_X_X.get(ii, full, similar);
@@ -393,6 +393,6 @@ public abstract class JavaCall extends Arr {
 
   @Override
   public final String toString() {
-    return desc() + toString(SEP);
+    return desc() + toString(null);
   }
 }

@@ -149,10 +149,10 @@ public final class SwitchGroup extends Arr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     final int el = exprs.length;
-    for(int e = 1; e < el; ++e) sb.append(' ').append(CASE).append(' ').append(exprs[e]);
-    if(el == 1) sb.append(' ').append(DEFAULT);
-    return sb.append(' ').append(RETURN).append(' ').append(exprs[0]).toString();
+    for(int e = 1; e < el; ++e) tb.addSpaced(CASE).add(exprs[e]);
+    if(el == 1) tb.add(' ').add(DEFAULT);
+    return tb.addSpaced(RETURN).add(exprs[0]).toString();
   }
 }

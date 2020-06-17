@@ -14,6 +14,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -222,10 +223,10 @@ public final class For extends ForLet {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(FOR).append(' ').append(var);
-    if(empty) sb.append(' ').append(ALLOWING).append(' ').append(EMPTYY);
-    if(pos != null) sb.append(' ').append(AT).append(' ').append(pos);
-    if(score != null) sb.append(' ').append(SCORE).append(' ').append(score);
-    return sb.append(' ').append(IN).append(' ').append(expr).toString();
+    final TokenBuilder tb = new TokenBuilder().add(FOR).add(' ').add(var);
+    if(empty) tb.addSpaced(ALLOWING).add(EMPTYY);
+    if(pos != null) tb.addSpaced(AT).add(pos);
+    if(score != null) tb.addSpaced(SCORE).add(score);
+    return tb.addSpaced(IN).add(expr).toString();
   }
 }

@@ -363,10 +363,11 @@ public abstract class Arr extends ParseExpr {
   /**
    * Returns a string representation of this expression.
    * Separates the array entries with the specified separator.
-   * @param separator separator (operator, delimiter)
+   * @param separator separator (operator, delimiter); if {@code null}, separated with comma
    * @return string representation
    */
   protected String toString(final String separator) {
-    return new TokenBuilder().add(PAREN1).addSeparated(exprs, separator).add(PAREN2).toString();
+    final String sep = separator == null ? SEP : (' ' + separator + ' ');
+    return new TokenBuilder().addSeparated(exprs, sep, true).toString();
   }
 }

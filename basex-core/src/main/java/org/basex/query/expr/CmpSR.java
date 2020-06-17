@@ -214,10 +214,10 @@ public final class CmpSR extends Single {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(PAREN1);
-    if(min != null) tb.add(expr).add(mni ? " >= " : " > ").add(Item.toQuotedToken(min));
-    if(min == null && max == null) tb.add(' ').add(AND).add(' ');
-    if(max != null) tb.add(expr).add(mxi ? " <= " : " < ").add(Item.toQuotedToken(max));
-    return tb.add(PAREN2).toString();
+    final TokenBuilder tb = new TokenBuilder();
+    if(min != null) tb.add(expr).addSpaced(mni ? ">=" : ">").add(Item.toQuotedToken(min));
+    if(min == null && max == null) tb.addSpaced(AND);
+    if(max != null) tb.add(expr).addSpaced(mxi ? "<=" : "<").add(Item.toQuotedToken(max));
+    return parens(tb);
   }
 }

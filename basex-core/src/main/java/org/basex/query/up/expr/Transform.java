@@ -155,10 +155,10 @@ public final class Transform extends Arr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(COPY + ' ');
-    for(final Let copy : copies)
-      sb.append(copy.var).append(' ').append(ASSIGN).append(' ').append(copy.expr).append(' ');
-    return sb.append(MODIFY + ' ').append(exprs[0]).append(' ').append(RETURN).append(' ').
-      append(exprs[1]).toString();
+    final TokenBuilder tb = new TokenBuilder().add(COPY).add(' ');
+    for(final Let copy : copies) {
+      tb.add(copy.var).addSpaced(ASSIGN).add(copy.expr).add(' ');
+    }
+    return tb.add(MODIFY).addSpaced(exprs[0]).add(RETURN).add(' ').add(exprs[1]).toString();
   }
 }

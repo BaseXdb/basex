@@ -130,20 +130,19 @@ public final class QueryStack {
    * @return string dump
    */
   public String dump() {
-    final StringBuilder sb = new StringBuilder(QueryText.DEBUGLOCAL + ':');
+    final TokenBuilder tb = new TokenBuilder().add(QueryText.DEBUGLOCAL).add(':');
     for(int i = end; --i >= 0;) {
       if(vars[i] != null) {
-        sb.append(Prop.NL).append("  $").append(vars[i].name).append(" := ").append(stack[i]);
-        if(i == start && i > 0) sb.append(Prop.NL).append(QueryText.DEBUGGLOBAL + ':');
+        tb.add(Prop.NL).add("  $").add(vars[i].name).addSpaced(":=").add(stack[i]);
+        if(i == start && i > 0) tb.add(Prop.NL).add(QueryText.DEBUGGLOBAL).add(':');
       }
     }
-    return sb.toString();
+    return tb.toString();
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
-    for(int i = 0; i < end; i++) sb.append(i == 0 ? "" : ", ").append(stack[i]);
-    return sb.append(']').toString();
+    final TokenBuilder tb = new TokenBuilder().add(getClass()).add('[');
+    return tb.addSeparated(stack, ", ", false).add(']').toString();
   }
 }

@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.ann.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -111,8 +112,8 @@ public final class AnnList extends ObjectList<Ann, AnnList> {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(final Ann ann : this) sb.append(ann);
-    return sb.toString();
+    final TokenBuilder tb = new TokenBuilder();
+    for(final Ann ann : this) tb.add(ann);
+    return tb.toString();
   }
 }

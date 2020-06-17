@@ -76,7 +76,7 @@ public final class Ann {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder().add('%');
     tb.add(sig != null ? sig.id() : name.prefixId(XQ_URI));
-    if(args.length != 0) tb.add('(').addSeparated(args, SEP).add(')');
+    if(args.length != 0) tb.addSeparated(args, SEP, true);
     return tb.add(' ').toString();
   }
 }

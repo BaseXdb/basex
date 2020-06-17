@@ -205,9 +205,9 @@ public class TypeCheck extends Single {
 
   @Override
   public final String toString() {
-    final StringBuilder sb = new StringBuilder().append('(').append(expr).append(' ');
-    if(promote) sb.append(PROMOTE).append(' ').append(TO);
-    else sb.append(TREAT).append(' ').append(AS);
-    return sb.append(' ').append(seqType()).append(')').toString();
+    final TokenBuilder tb = new TokenBuilder().add('(').add(expr);
+    if(promote) tb.addSpaced(PROMOTE).add(TO);
+    else tb.addSpaced(TREAT).add(AS);
+    return tb.add(' ').add(seqType()).add(')').toString();
   }
 }

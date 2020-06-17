@@ -227,6 +227,6 @@ public final class List extends Arr {
 
   @Override
   public String toString() {
-    return toString(SEP);
+    return toString(null);
   }
 }

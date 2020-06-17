@@ -113,11 +113,11 @@ public final class FTPosData {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(int p = 0; p < size; ++p) {
-      if(sb.length() > 0) sb.append('\n');
-      sb.append(pos[p]);
+    final TokenBuilder tb = new TokenBuilder();
+    for(int p = 0; p < size; p++) {
+      if(!tb.isEmpty()) tb.add('\n');
+      tb.add(pos[p]);
     }
-    return sb.toString();
+    return tb.toString();
   }
 }

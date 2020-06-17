@@ -199,14 +199,14 @@ public final class CmpIR extends Single {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(PAREN1);
+    final TokenBuilder tb = new TokenBuilder();
     if(min == max) {
-      tb.add(expr).add(" = ").add(min);
+      tb.add(expr).addSpaced("=").add(min);
     } else {
-      if(min != MIN_VALUE) tb.add(expr).add(" >= ").add(min);
-      if(min != MIN_VALUE && max != MAX_VALUE) tb.add(' ').add(AND).add(' ');
-      if(max != MAX_VALUE) tb.add(expr).add(" <= ").add(max);
+      if(min != MIN_VALUE) tb.add(expr).addSpaced(">=").add(min);
+      if(min != MIN_VALUE && max != MAX_VALUE) tb.addSpaced(AND);
+      if(max != MAX_VALUE) tb.add(expr).addSpaced("<=").add(max);
     }
-    return tb.add(PAREN2).toString();
+    return parens(tb);
   }
 }

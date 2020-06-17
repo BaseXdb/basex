@@ -54,9 +54,9 @@ final class ErrorInfo {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    if(url != null) sb.append(url).append(", ");
-    if(line != Integer.MIN_VALUE) sb.append(line).append(':').append(column).append(": ");
-    return sb.append(message).toString();
+    final TokenBuilder tb = new TokenBuilder();
+    if(url != null) tb.add(url).add(", ");
+    if(line != Integer.MIN_VALUE) tb.add(line).add(':').add(column).add(": ");
+    return tb.add(message).toString();
   }
 }

@@ -197,12 +197,12 @@ public final class Condition extends Single {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(start ? START : END);
-    if(item != null) sb.append(' ').append(item);
-    if(pos  != null) sb.append(' ').append(AT).append(' ').append(pos);
-    if(prev != null) sb.append(' ').append(PREVIOUS).append(' ').append(prev);
-    if(next != null) sb.append(' ').append(NEXT).append(' ').append(next);
-    return sb.append(' ').append(WHEN).append(' ').append(expr).toString();
+    final TokenBuilder tb = new TokenBuilder().add(start ? START : END);
+    if(item != null) tb.add(' ').add(item);
+    if(pos  != null) tb.addSpaced(AT).add(pos);
+    if(prev != null) tb.addSpaced(PREVIOUS).add(prev);
+    if(next != null) tb.addSpaced(NEXT).add(next);
+    return tb.addSpaced(WHEN).add(expr).toString();
   }
 }
 

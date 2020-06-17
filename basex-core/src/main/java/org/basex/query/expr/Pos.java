@@ -160,9 +160,8 @@ public final class Pos extends Arr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(Function.POSITION).append(" = ").append(exprs[0]);
-    if(!eq()) sb.append(' ' + TO + ' ').append(exprs[1]);
-    return sb.toString();
+    final TokenBuilder tb = new TokenBuilder().add(Function.POSITION).addSpaced("=").add(exprs[0]);
+    if(!eq()) tb.addSpaced(TO).add(exprs[1]);
+    return tb.toString();
   }
 }

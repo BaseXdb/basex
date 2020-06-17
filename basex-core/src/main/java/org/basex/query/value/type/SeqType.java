@@ -571,13 +571,13 @@ public final class SeqType {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     if(!one() && type instanceof FuncType) {
-      sb.append('(').append(typeString()).append(')');
+      tb.addBraced("(", typeString(), ")");
     } else {
-      sb.append(typeString());
+      tb.add(typeString());
     }
-    if(!(type instanceof ListType)) sb.append(occ);
-    return sb.toString();
+    if(!(type instanceof ListType)) tb.add(occ);
+    return tb.toString();
   }
 }

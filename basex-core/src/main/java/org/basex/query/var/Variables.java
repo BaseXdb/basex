@@ -137,9 +137,9 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(final VarEntry ve : vars.values()) sb.append(ve.var);
-    return sb.toString();
+    final TokenBuilder tb = new TokenBuilder();
+    for(final VarEntry ve : vars.values()) tb.add(ve.var);
+    return tb.toString();
   }
 
   /** Entry for static variables and their references. */

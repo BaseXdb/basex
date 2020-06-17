@@ -130,6 +130,6 @@ public final class FTAnd extends FTExpr {
 
   @Override
   public String toString() {
-    return PAREN1 + toString(' ' + FTAND + ' ') + PAREN2;
+    return toString(FTAND);
   }
 }

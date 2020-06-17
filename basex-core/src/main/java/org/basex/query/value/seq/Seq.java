@@ -249,7 +249,7 @@ public abstract class Seq extends Value {
    * @return string
    */
   private String toString(final boolean error) {
-    final TokenBuilder tb = new TokenBuilder().add(PAREN1);
+    final TokenBuilder tb = new TokenBuilder().add('(');
     for(int i = 0; i < size; ++i) {
       if(i > 0) tb.add(SEP);
       final Item item = itemAt(i);
@@ -260,7 +260,7 @@ public abstract class Seq extends Value {
         break;
       }
     }
-    return tb.add(PAREN2).toString();
+    return tb.add(')').toString();
   }
 
   // STATIC METHODS ===============================================================================

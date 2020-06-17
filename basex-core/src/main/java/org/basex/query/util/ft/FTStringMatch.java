@@ -1,5 +1,7 @@
 package org.basex.query.util.ft;
 
+import org.basex.util.*;
+
 /**
  * Single full-text string match.
  *
@@ -61,8 +63,10 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder().append(pos);
-    sb.append(':').append(start).append('-').append(end);
-    return exclude ? "not(" + sb + ')' : sb.toString();
+    final TokenBuilder tb = new TokenBuilder();
+    if(exclude) tb.add("not(");
+    tb.add(pos).add(':').add(start).add('-').add(end);
+    if(exclude) tb.add(')');
+    return tb.toString();
   }
 }

@@ -115,10 +115,10 @@ public final class MapType extends FuncType {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder().append("map(");
+    final TokenBuilder tb = new TokenBuilder().add("map(");
     final AtomType type = keyType();
-    sb.append(type == AtomType.AAT && declType.eq(SeqType.ITEM_ZM) ? "*" :
-      type + ", " + declType);
-    return sb.append(')').toString();
+    if(type == AtomType.AAT && declType.eq(SeqType.ITEM_ZM)) tb.add('*');
+    else tb.add(type).add(SEP).add(declType);
+    return tb.add(')').toString();
   }
 }

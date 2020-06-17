@@ -333,15 +333,12 @@ public final class GroupBy extends Clause {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     final int pl = post.length;
     for(int p = 0; p < pl; p++) {
-      sb.append(LET).append(" (: post-group :) ").append(post[p]);
-      sb.append(' ').append(ASSIGN).append(' ').append(preExpr[p]).append(' ');
+      tb.add(LET).addSpaced("(: post-group :)").add(post[p]);
+      tb.addSpaced(ASSIGN).add(preExpr[p]).add(' ');
     }
-    sb.append(GROUP).append(' ').append(BY);
-    final int sl = specs.length;
-    for(int s = 0; s < sl; s++) sb.append(s == 0 ? " " : SEP).append(specs[s]);
-    return sb.toString();
+    return tb.add(GROUP).addSpaced(' ').addSeparated(specs, SEP, false).toString();
   }
 }

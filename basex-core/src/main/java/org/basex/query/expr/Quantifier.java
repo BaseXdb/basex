@@ -100,14 +100,14 @@ public final class Quantifier extends Single {
   @Override
   public String toString() {
     if(expr instanceof GFLWOR) {
-      final StringBuilder sb = new StringBuilder(every ? EVERY : SOME).append(' ');
+      final TokenBuilder tb = new TokenBuilder().add(every ? EVERY : SOME).add(' ');
       final GFLWOR gflwor = (GFLWOR) expr;
       int c = 0;
       for(final Clause clause : gflwor.clauses) {
-        if(c++ != 0) sb.append(", ");
-        sb.append(clause.toString().replaceAll('^' + FOR + ' ', ""));
+        if(c++ != 0) tb.add(", ");
+        tb.add(clause.toString().replaceAll('^' + FOR + ' ', ""));
       }
-      return sb.append(' ').append(SATISFIES).append(' ').append(gflwor.rtrn).toString();
+      return tb.addSpaced(SATISFIES).add(gflwor.rtrn).toString();
     }
     return expr.toString();
   }

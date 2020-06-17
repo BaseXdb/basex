@@ -182,12 +182,12 @@ final class JavaEval {
    * @return types string
    */
   private static String types(final Object[] args) {
-    final StringBuilder sb = new StringBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     for(final Object arg : args) {
-      if(sb.length() != 0) sb.append(", ");
-      sb.append(type(arg));
+      if(!tb.isEmpty()) tb.add(", ");
+      tb.add(type(arg));
     }
-    return sb.toString();
+    return tb.toString();
   }
 
   /**

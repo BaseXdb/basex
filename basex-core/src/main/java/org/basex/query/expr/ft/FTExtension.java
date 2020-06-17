@@ -1,7 +1,5 @@
 package org.basex.query.expr.ft;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -59,6 +57,6 @@ public final class FTExtension extends FTExpr {
 
   @Override
   public String toString() {
-    return String.valueOf(pragma) + ' ' + CURLY1 + ' ' +  exprs[0] + ' ' + CURLY2;
+    return new TokenBuilder().add(pragma).addBraced("{ ", exprs[0], " }").toString();
   }
 }

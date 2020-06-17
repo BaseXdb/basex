@@ -173,6 +173,6 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public String toString() {
-    return Strings.concat(name.prefixId(), toString(SEP));
+    return Strings.concat(name.prefixId(), toString(null));
   }
 }

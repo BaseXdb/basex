@@ -250,6 +250,6 @@ public final class CmpV extends Cmp {
 
   @Override
   public String toString() {
-    return toString(" " + opV + ' ');
+    return toString(opV.toString());
   }
 }

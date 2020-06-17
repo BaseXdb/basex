@@ -228,9 +228,6 @@ public final class OrderBy extends Clause {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(ORDER).append(' ').append(BY);
-    final int kl = keys.length;
-    for(int k = 0; k < kl; k++) sb.append(k == 0 ? " " : SEP).append(keys[k]);
-    return sb.toString();
+    return new TokenBuilder().add(ORDER).addSpaced(BY).addSeparated(keys, SEP, false).toString();
   }
 }

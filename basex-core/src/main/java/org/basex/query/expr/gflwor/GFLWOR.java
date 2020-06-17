@@ -1043,9 +1043,8 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(final Clause clause : clauses) sb.append(clause).append(' ');
-    return sb.append(QueryText.RETURN).append(' ').append(rtrn).toString();
+    return new TokenBuilder().addSeparated(clauses.toArray(), " ", false).
+        addSpaced(QueryText.RETURN).add(rtrn).toString();
   }
 
   /** Start evaluator, doing nothing, once. */

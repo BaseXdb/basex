@@ -207,11 +207,7 @@ public interface QueryText {
 
   /** Parser token. */ String CONCAT = "||";
   /** Parser token. */ String ASSIGN = ":=";
-  /** Parser token. */ String SQUARE1 = "[";
-  /** Parser token. */ String SQUARE2 = "]";
   /** Parser token. */ String EQNAME = "Q{";
-  /** Parser token. */ String CURLY1 = "{";
-  /** Parser token. */ String CURLY2 = "}";
   /** Parser token. */ String CDATA = "<![CDATA[";
   /** Parser token. */ String COL = ":";
   /** Parser token. */ String COLS = "::";
@@ -229,6 +225,10 @@ public interface QueryText {
   /** Parser token. */ String XQ31 = "3.1";
   /** Parser token. */ String PAREN1 = "(";
   /** Parser token. */ String PAREN2 = ")";
+  /** Parser token. */ String SQUARE1 = "[";
+  /** Parser token. */ String SQUARE2 = "]";
+  /** Parser token. */ String CURLY1 = "{";
+  /** Parser token. */ String CURLY2 = "}";
   /** Parser token. */ String PIPE = "|";
   /** Parser token. */ String PRAGMA = "(#";
   /** Parser token. */ String PRAGMA2 = "#)";
@@ -464,4 +464,22 @@ public interface QueryText {
   /** Example for a MonthDay format.          */ String XMDA = "--12-31";
   /** Example for a Day format.               */ String XDAY = "---31";
   /** Example for a Month format.             */ String XMON = "--12";
+
+  /**
+   * Returns a string surrounded by spaces.
+   * @param object the object to be added
+   * @return string
+   */
+  static String spaced(final Object object) {
+    return new TokenBuilder().addSpaced(object).toString();
+  }
+
+  /**
+   * Returns a string surrounded by parentheses.
+   * @param object the object to be added
+   * @return string
+   */
+  static String parens(final Object object) {
+    return new TokenBuilder().addBraced("(", object, ")").toString();
+  }
 }

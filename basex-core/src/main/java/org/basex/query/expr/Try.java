@@ -1,5 +1,7 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
+
 import java.util.*;
 
 import org.basex.data.*;
@@ -195,8 +197,7 @@ public final class Try extends Single {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("try { " + expr + " }");
-    for(final Catch ctch : catches) sb.append(' ').append(ctch);
-    return sb.toString();
+    return new TokenBuilder().add(TRY).addBraced(" { ", expr, " }").add(' ').
+        addSeparated(catches, " ", false).toString();
   }
 }

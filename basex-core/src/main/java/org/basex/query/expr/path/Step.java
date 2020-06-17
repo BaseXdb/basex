@@ -325,26 +325,26 @@ public abstract class Step extends Preds {
 
   @Override
   public final String toString() {
-    final StringBuilder sb = new StringBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     if(test == KindTest.NOD) {
-      if(axis == Axis.PARENT) sb.append("..");
-      if(axis == Axis.SELF) sb.append('.');
+      if(axis == Axis.PARENT) tb.add("..");
+      if(axis == Axis.SELF) tb.add('.');
     }
-    if(sb.length() == 0) {
-      final java.util.function.Function<Test, StringBuilder> add = t -> {
-        if(axis == Axis.ATTRIBUTE && t instanceof NameTest) sb.append('@');
-        else if(axis != Axis.CHILD) sb.append(axis).append("::");
-        return sb.append(t);
+    if(tb.isEmpty()) {
+      final java.util.function.Function<Test, TokenBuilder> add = t -> {
+        if(axis == Axis.ATTRIBUTE && t instanceof NameTest) tb.add('@');
+        else if(axis != Axis.CHILD) tb.add(axis).add("::");
+        return tb.add(t);
       };
 
       if(test instanceof UnionTest) {
-        sb.append('(');
-        for(final Test t : ((UnionTest) test).tests) add.apply(t).append(" | ");
-        sb.delete(sb.length() - 3, sb.length()).append(')');
+        tb.add('(');
+        for(final Test t : ((UnionTest) test).tests) add.apply(t).add(" | ");
+        tb.delete(tb.size() - 3, 3).add(')');
       } else {
         add.apply(test);
       }
     }
-    return sb.append(super.toString()).toString();
+    return tb.add(super.toString()).toString();
   }
 }

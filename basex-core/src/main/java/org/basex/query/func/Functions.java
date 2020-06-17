@@ -165,13 +165,13 @@ public final class Functions {
       if(m > max) max = m;
     }
 
-    final StringBuilder ext = new StringBuilder();
+    final TokenBuilder ext = new TokenBuilder();
     if(as > 2 && max - min + 1 == as) {
-      ext.append(min).append('-').append(max);
+      ext.add(min).add('-').add(max);
     } else {
       for(int a = 0; a < as; a++) {
-        if(a != 0) ext.append(a + 1 < as ? ", " : " or ");
-        ext.append(arities.get(a));
+        if(a != 0) ext.add(a + 1 < as ? ", " : " or ");
+        ext.add(arities.get(a));
       }
     }
     return FUNCARITY_X_X_X.get(ii, function, arguments(arity), ext);

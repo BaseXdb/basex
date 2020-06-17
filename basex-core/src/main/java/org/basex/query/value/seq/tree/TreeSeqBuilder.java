@@ -223,21 +223,21 @@ public final class TreeSeqBuilder implements Iterable<Item> {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
+    final TokenBuilder tb = new TokenBuilder().add(getClass()).add('[');
     if(tree.isEmpty()) {
       final int n = inLeft + inRight, first = (mid - inLeft + CAP) % CAP;
       if(n > 0) {
-        sb.append(vals[first]);
-        for(int i = 1; i < n; i++) sb.append(", ").append(vals[(first + i) % CAP]);
+        tb.add(vals[first]);
+        for(int i = 1; i < n; i++) tb.add(", ").add(vals[(first + i) % CAP]);
       }
     } else {
       final int first = (mid - inLeft + CAP) % CAP;
-      sb.append(vals[first]);
-      for(int i = 1; i < inLeft; i++) sb.append(", ").append(vals[(first + i) % CAP]);
-      for(final Item item : tree) sb.append(", ").append(item);
-      for(int i = 0; i < inRight; i++) sb.append(", ").append(vals[(mid + i) % CAP]);
+      tb.add(vals[first]);
+      for(int i = 1; i < inLeft; i++) tb.add(", ").add(vals[(first + i) % CAP]);
+      for(final Item item : tree) tb.add(", ").add(item);
+      for(int i = 0; i < inRight; i++) tb.add(", ").add(vals[(mid + i) % CAP]);
     }
-    return sb.append(']').toString();
+    return tb.add(']').toString();
   }
 
   @Override

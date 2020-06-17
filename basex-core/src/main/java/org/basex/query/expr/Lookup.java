@@ -161,19 +161,23 @@ public final class Lookup extends Arr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    if(exprs.length > 1) sb.append(exprs[1]);
+    final TokenBuilder tb = new TokenBuilder();
+    if(exprs.length > 1) tb.add(exprs[1]);
+    tb.add('?');
 
     final Expr keys = exprs[0];
-    if(keys == Str.WC) return sb.append("?*").toString();
-
-    if(keys instanceof Str) {
+    Object key = null;
+    if(keys == Str.WC) {
+      key = "*";
+    } else if(keys instanceof Str) {
       final Str str = (Str) keys;
-      if(XMLToken.isNCName(str.string())) return sb.append('?').append(str.toJava()).toString();
+      if(XMLToken.isNCName(str.string())) key = str.toJava();
     } else if(keys instanceof Int) {
-      final long val = ((Int) keys).itr();
-      if(val >= 0) return sb.append('?').append(val).toString();
+      final long l = ((Int) keys).itr();
+      if(l >= 0) key = l;
     }
-    return sb.append("?(").append(keys).append(')').toString();
+    if(key != null) tb.add(key);
+    else tb.addBraced("(", keys, ")");
+    return tb.toString();
   }
 }

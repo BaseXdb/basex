@@ -210,6 +210,11 @@ public final class Typeswitch extends ParseExpr {
   }
 
   @Override
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return copyType(new Typeswitch(info, cond.copy(cc, vm), Arr.copyAll(cc, vm, groups)));
+  }
+
+  @Override
   public void markTailCalls(final CompileContext cc) {
     for(final TypeswitchGroup group : groups) group.markTailCalls(cc);
   }
@@ -227,11 +232,6 @@ public final class Typeswitch extends ParseExpr {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Typeswitch(info, cond.copy(cc, vm), Arr.copyAll(cc, vm, groups)));
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof Typeswitch)) return false;
@@ -241,12 +241,12 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public void plan(final QueryPlan plan) {
-    plan.add(plan.create(this), groups, cond);
+    plan.add(plan.create(this), cond, groups);
   }
 
   @Override
   public String toString() {
-    return new TokenBuilder().add(TYPESWITCH).add(PAREN1).add(cond).add(PAREN2).add(' ').
-        addSeparated(groups, " ").toString();
+    return new TokenBuilder().add(TYPESWITCH).addBraced("(", cond, ")").
+        addSeparated(groups, "", false).toString();
   }
 }

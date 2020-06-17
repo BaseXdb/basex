@@ -1,7 +1,5 @@
 package org.basex.query.expr.constr;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
@@ -47,8 +45,8 @@ public abstract class CNode extends Arr {
 
   @Override
   protected String toString(final String kind) {
-    final StringBuilder sb = new StringBuilder().append(kind).append(" { ");
-    if(exprs.length > 0 && exprs[0] != Empty.VALUE) sb.append(super.toString(SEP)).append(' ');
-    return sb.append('}').toString();
+    final TokenBuilder tb = new TokenBuilder().add(kind).add(" { ");
+    if(exprs.length > 0 && exprs[0] != Empty.VALUE) tb.add(super.toString(null)).add(' ');
+    return tb.add('}').toString();
   }
 }

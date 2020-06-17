@@ -14,7 +14,7 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
- * Query plan.
+ * Query plan builder.
  *
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen

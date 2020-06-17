@@ -143,8 +143,7 @@ public final class MinHeap<K, V> {
   public String toString() {
     final StringBuilder sb = new StringBuilder("Heap[");
     for(int i = 0; i < size; i++) {
-      sb.append('(').append(vals[2 * i]).append(", ").append(
-          vals[2 * i + 1]).append(')');
+      sb.append('(').append(vals[2 * i]).append(", ").append(vals[2 * i + 1]).append(')');
       if(i < size - 1) sb.append(", ");
     }
     return sb.append(']').toString();

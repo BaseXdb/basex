@@ -279,14 +279,14 @@ public final class CmpR extends Single {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(PAREN1);
+    final TokenBuilder tb = new TokenBuilder();
     if(min == max) {
-      tb.add(expr).add(" = ").add(min);
+      tb.add(expr).addSpaced("=").add(min);
     } else {
-      if(min != NEGATIVE_INFINITY) tb.add(expr).add(" >= ").add(min);
-      if(min != NEGATIVE_INFINITY && max != POSITIVE_INFINITY) tb.add(' ').add(AND).add(' ');
-      if(max != POSITIVE_INFINITY) tb.add(expr).add(" <= ").add(max);
+      if(min != NEGATIVE_INFINITY) tb.add(expr).addSpaced(">=").add(min);
+      if(min != NEGATIVE_INFINITY && max != POSITIVE_INFINITY) tb.addSpaced(AND);
+      if(max != POSITIVE_INFINITY) tb.add(expr).addSpaced("<=").add(max);
     }
-    return tb.add(PAREN2).toString();
+    return parens(tb);
   }
 }

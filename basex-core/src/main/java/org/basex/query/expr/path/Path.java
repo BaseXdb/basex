@@ -1109,12 +1109,8 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final String toString() {
-    final StringBuilder sb = new StringBuilder();
-    if(root != null) sb.append(root);
-    for(final Expr step : steps) {
-      if(sb.length() != 0) sb.append('/');
-      sb.append(step);
-    }
-    return sb.toString();
+    final TokenBuilder tb = new TokenBuilder();
+    if(root != null) tb.add(root).add('/');
+    return tb.addSeparated(steps, "/", false).toString();
   }
 }

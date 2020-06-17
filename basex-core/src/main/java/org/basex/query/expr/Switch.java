@@ -205,6 +205,16 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
+  public boolean vacuous() {
+    return ((Checks<SwitchGroup>) group -> group.exprs[0].vacuous()).all(groups);
+  }
+
+  @Override
+  public boolean ddo() {
+    return ((Checks<SwitchGroup>) group -> group.exprs[0].ddo()).all(groups);
+  }
+
+  @Override
   public boolean has(final Flag... flags) {
     for(final SwitchGroup group : groups) {
       if(group.has(flags)) return true;
@@ -248,16 +258,6 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public boolean vacuous() {
-    return ((Checks<SwitchGroup>) group -> group.exprs[0].vacuous()).all(groups);
-  }
-
-  @Override
-  public boolean ddo() {
-    return ((Checks<SwitchGroup>) group -> group.exprs[0].ddo()).all(groups);
-  }
-
-  @Override
   public void markTailCalls(final CompileContext cc) {
     for(final SwitchGroup group : groups) group.markTailCalls(cc);
   }
@@ -296,8 +296,7 @@ public final class Switch extends ParseExpr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(SWITCH + PAREN1 + cond + PAREN2);
-    for(final SwitchGroup group : groups) sb.append(group);
-    return sb.toString();
+    return new TokenBuilder().add(SWITCH).addBraced("(", cond, ")").
+        addSeparated(groups, "", false).toString();
   }
 }
