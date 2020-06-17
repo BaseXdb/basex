@@ -7,6 +7,7 @@ import java.security.*;
 import java.util.*;
 import java.util.Map.*;
 import java.util.concurrent.*;
+import java.util.jar.Attributes;
 
 import org.basex.io.*;
 import org.basex.util.options.*;
@@ -18,6 +19,8 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class Prop {
+  /** Application URL. */
+  public static final URL LOCATION = location();
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Code version (may contain major, minor and optional patch number). */
@@ -76,29 +79,17 @@ public final class Prop {
   public static final String TEMPDIR = dir(System.getProperty("java.io.tmpdir"));
   /** Project home directory. */
   public static final String HOMEDIR;
-  /** Application URL. */
-  public static final URL LOCATION;
-
   /** Global options, assigned by the starter classes and the web.xml context parameters. */
   private static final Map<String, String> OPTIONS = new ConcurrentHashMap<>();
 
   // determine project home directory for storing property files and directories...
   static {
-    // retrieve application URL
-    URL location = null;
-    final ProtectionDomain pd = Prop.class.getProtectionDomain();
-    if(pd != null) {
-      final CodeSource cs = pd.getCodeSource();
-      if(cs != null) location = cs.getLocation();
-    }
-    LOCATION = location;
-
     // check system property 'org.basex.path'
     String homedir = System.getProperty(PATH);
     // check if current working directory contains configuration file
     if(homedir == null) homedir = configDir(System.getProperty("user.dir"));
     // check if application directory contains configuration file
-    if(homedir == null) homedir = configDir(applicationDir(location));
+    if(homedir == null) homedir = configDir(applicationDir(LOCATION));
     // fallback: choose home directory (linux: check HOME variable, GH-773)
     if(homedir == null) {
       final String home = WIN ? null : System.getenv("HOME");
@@ -164,13 +155,27 @@ public final class Prop {
   }
 
   /**
+   * Retrieve application URL.
+   * @return application URL.
+   */
+  private static URL location() {
+    // retrieve application URL
+    final ProtectionDomain pd = Prop.class.getProtectionDomain();
+    if(pd != null) {
+      final CodeSource cs = pd.getCodeSource();
+      if(cs != null) return cs.getLocation();
+    }
+    return null;
+  }
+
+  /**
    * Build version string using data from the JAR manifest.
    * @param devVersion version used during development;
    *        returned if there is no implementation version or no manifest.
    * @return version string
    */
   private static String version(final String devVersion) {
-    final String version = Prop.class.getPackage().getImplementationVersion();
+    final String version = JarManifest.get(Attributes.Name.IMPLEMENTATION_VERSION);
     if(version == null) return devVersion;
     if(!version.contains("-SNAPSHOT")) return version;
 
