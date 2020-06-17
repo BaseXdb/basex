@@ -39,7 +39,7 @@ final class JarManifest {
         Util.stack(ex);
       }
     }
-    MAP = map;
+    MAP = map != null ? map : new Attributes(0);
   }
 
   /**
@@ -48,10 +48,7 @@ final class JarManifest {
    * @return value or {@code null}
    */
   public static String get(final String key) {
-    if(MAP != null) {
-      return MAP.getValue(key);
-    }
-    return null;
+    return MAP.getValue(key);
   }
 
   /**
@@ -60,9 +57,6 @@ final class JarManifest {
    * @return value or {@code null}
    */
   public static String get(final Name key) {
-    if(MAP != null) {
-      return MAP.getValue(key);
-    }
-    return null;
+    return MAP.getValue(key);
   }
 }

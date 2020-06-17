@@ -155,11 +155,10 @@ public final class Prop {
   }
 
   /**
-   * Retrieve application URL.
-   * @return application URL.
+   * Retrieves the location of the application.
+   * @return application URL, or {@code null} if not available
    */
   private static URL location() {
-    // retrieve application URL
     final ProtectionDomain pd = Prop.class.getProtectionDomain();
     if(pd != null) {
       final CodeSource cs = pd.getCodeSource();
@@ -169,9 +168,9 @@ public final class Prop {
   }
 
   /**
-   * Build version string using data from the JAR manifest.
+   * Returns a build version string using data from the JAR manifest.
    * @param devVersion version used during development;
-   *        returned if there is no implementation version or no manifest.
+   *        returned if there is no implementation version or no manifest
    * @return version string
    */
   private static String version(final String devVersion) {
