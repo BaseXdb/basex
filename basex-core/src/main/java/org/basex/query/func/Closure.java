@@ -472,15 +472,16 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
-    if(!global.isEmpty()) {
+    final boolean inlined = !global.isEmpty();
+    if(inlined) {
       tb.add("((: inline-closure :) ");
       global.forEach((k, v) -> tb.add(LET).addSpaced(k).add(ASSIGN).addSpaced(v));
       tb.add(RETURN).add(' ');
     }
-    tb.add(FUNCTION).addSeparated(params, ", ", true);
+    tb.add(FUNCTION).addAll(params, ", ", true);
     tb.addSpaced(AS).add(declType != null ? declType : SeqType.ITEM_ZM).add(' ');
     tb.addBraced("{ ", expr, " }");
-    if(!global.isEmpty()) tb.add(PAREN2);
+    if(inlined) tb.add(PAREN2);
     return tb.toString();
   }
 }

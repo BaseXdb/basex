@@ -63,11 +63,10 @@ public class QueryParser extends InputParser {
 
   static {
     final byte[][] keys = {
-      token(FUNCTION), token(ARRAY), NodeType.ATT.string(), NodeType.COM.string(),
-      NodeType.DOC.string(), NodeType.ELM.string(), token(EMPTY_SEQUENCE), token(IF),
-      AtomType.ITEM.string(), token(MAP), NodeType.NSP.string(), NodeType.NOD.string(),
-      NodeType.PI.string(), token(SCHEMA_ATTRIBUTE), token(SCHEMA_ELEMENT), token(SWITCH),
-      NodeType.TXT.string(), token(TYPESWITCH)
+      token(FUNCTION), token(ARRAY), NodeType.ATT.name, NodeType.COM.name, NodeType.DOC.name,
+      NodeType.ELM.name, token(EMPTY_SEQUENCE), token(IF), AtomType.ITEM.name.string(), token(MAP),
+      NodeType.NSP.name, NodeType.NOD.name, NodeType.PI.name, token(SCHEMA_ATTRIBUTE),
+      token(SCHEMA_ELEMENT), token(SWITCH), NodeType.TXT.name, token(TYPESWITCH)
     };
     for(final byte[] key : keys) KEYWORDS.add(key);
   }

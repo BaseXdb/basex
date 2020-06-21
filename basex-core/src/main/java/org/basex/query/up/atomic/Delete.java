@@ -62,6 +62,6 @@ final class Delete extends StructuralUpdate {
 
   @Override
   public String toString() {
-    return "\n Delete: " + super.toString();
+    return "\nDelete: " + super.toString();
   }
 }

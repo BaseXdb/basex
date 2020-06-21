@@ -139,7 +139,7 @@ public final class NameTest extends Test {
    */
   public String toString(final boolean full) {
     final TokenBuilder tb = new TokenBuilder();
-    if(full) tb.add(type.string()).add('(');
+    if(full) tb.add(type.name).add('(');
     if(part == NamePart.LOCAL) {
       tb.add('*').add(':');
     } else if(qname.hasPrefix()) {

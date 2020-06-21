@@ -1421,7 +1421,7 @@ public enum QueryError {
   QueryError(final ErrType type, final int number, final String message) {
     final StringBuilder sb = new StringBuilder(8).append(type);
     final String n = Integer.toString(number);
-    final int s  = 4 - n.length();
+    final int s = 4 - n.length();
     for(int i = 0; i < s; i++) sb.append('0');
     code = sb.append(n).toString();
     uri = type.uri;

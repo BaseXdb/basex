@@ -145,6 +145,6 @@ public abstract class FTExpr extends ParseExpr {
    */
   final String toString(final String separator) {
     final String sep = separator == null ? SEP : (' ' + separator + ' ');
-    return new TokenBuilder().addSeparated(exprs, sep, true).toString();
+    return new TokenBuilder().addAll(exprs, sep, true).toString();
   }
 }

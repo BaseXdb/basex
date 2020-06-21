@@ -83,7 +83,7 @@ public final class Functions {
       if(tp.parent == null) continue;
       final byte[] u = tp.name.uri();
       if(eq(u, XS_URI) && tp != AtomType.NOT && tp != AtomType.AAT &&
-          ls.similar(lc(ln), lc(tp.string()))) {
+          ls.similar(lc(ln), lc(tp.name.local()))) {
         throw FUNCSIMILAR_X_X.get(ii, name.prefixId(), tp.toString());
       }
     }
@@ -167,11 +167,11 @@ public final class Functions {
 
     final TokenBuilder ext = new TokenBuilder();
     if(as > 2 && max - min + 1 == as) {
-      ext.add(min).add('-').add(max);
+      ext.addInt(min).add('-').addInt(max);
     } else {
       for(int a = 0; a < as; a++) {
         if(a != 0) ext.add(a + 1 < as ? ", " : " or ");
-        ext.add(arities.get(a));
+        ext.addInt(arities.get(a));
       }
     }
     return FUNCARITY_X_X_X.get(ii, function, arguments(arity), ext);

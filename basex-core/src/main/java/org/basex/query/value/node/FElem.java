@@ -420,7 +420,8 @@ public final class FElem extends FNode {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add('<').add(name.string());
+    final byte[] nm = name.string();
+    final TokenBuilder tb = new TokenBuilder().add('<').add(nm);
     if(ns != null) {
       final int nl = ns.size();
       for(int n = 0; n < nl; n++) {
@@ -438,7 +439,7 @@ public final class FElem extends FNode {
       } else {
         tb.add(DOTS);
       }
-      tb.add("</").add(name.string()).add('>');
+      tb.add("</").add(nm).add('>');
     } else {
       tb.add("/>");
     }

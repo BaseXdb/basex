@@ -66,6 +66,6 @@ public final class DocTest extends Test {
 
   @Override
   public String toString() {
-    return Strings.concat(type.string(), '(', child, ')');
+    return Strings.concat(type.name, "(", child, ")");
   }
 }

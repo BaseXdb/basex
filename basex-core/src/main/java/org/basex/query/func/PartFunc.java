@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryError.*;
 
 import java.util.*;
@@ -56,7 +57,7 @@ public final class PartFunc extends Arr {
 
     final Expr body = body();
     final FuncType ft = body.funcType();
-    if(ft != null && ft != SeqType.ANY_FUNC) {
+    if(ft != null && ft != FuncType.FUNCTION) {
       final int nargs = exprs.length + holes.length - 1;
       if(ft.argTypes.length != nargs)
         throw INVARITY_X_X_X.get(info, arguments(nargs), ft.argTypes.length, body);
@@ -118,18 +119,20 @@ public final class PartFunc extends Arr {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(body()).add('(');
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(body()).add('(');
     int p = -1;
     final int el = exprs.length, hs = holes.length;
     for(int i = 0; i < hs; i++) {
       while(++p < holes[i]) {
-        if(p > 0) tb.add(QueryText.SEP);
+        if(p > 0) tb.add(SEP);
         tb.add(exprs[p - i]);
       }
-      if(p > 0) tb.add(QueryText.SEP);
+      if(p > 0) tb.add(SEP);
       tb.add('?');
     }
-    while(++p < el + hs - 1) tb.add(QueryText.SEP).add(exprs[p - hs]);
-    return tb.add(')').toString();
+    while(++p < el + hs - 1) tb.add(SEP).add(exprs[p - hs]);
+    tb.add(')');
+    return tb.toString();
   }
 }

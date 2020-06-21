@@ -13,7 +13,6 @@ import java.util.regex.*;
 import javax.xml.namespace.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -759,13 +758,14 @@ public enum AtomType implements Type {
 
   /** Cached enums (faster). */
   public static final AtomType[] VALUES = values();
+
   /** Name. */
   public final QNm name;
   /** Parent type. */
   public final AtomType parent;
+
   /** Type id . */
   private final Type.ID id;
-
   /** Number flag. */
   private final boolean numeric;
   /** Untyped flag. */
@@ -881,11 +881,6 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public final byte[] string() {
-    return name.string();
-  }
-
-  @Override
   public final AtomType atomic() {
     return instanceOf(AAT) ? this : null;
   }
@@ -893,16 +888,6 @@ public enum AtomType implements Type {
   @Override
   public final Type.ID id() {
     return id;
-  }
-
-  @Override
-  public final String toString() {
-    final boolean xs = Token.eq(XS_URI, name.uri());
-    final TokenBuilder tb = new TokenBuilder();
-    if(xs) tb.add(NSGlobal.prefix(name.uri())).add(':');
-    tb.add(name.string());
-    if(!xs) tb.add("()");
-    return tb.toString();
   }
 
   /**
@@ -1010,6 +995,17 @@ public enum AtomType implements Type {
   @Override
   public final boolean nsSensitive() {
     return instanceOf(QNM) || instanceOf(NOT);
+  }
+
+  @Override
+  public final String toString() {
+    final TokenBuilder tb = new TokenBuilder();
+    if(Token.eq(XS_URI, name.uri())) {
+      tb.add(XS_PREFIX).add(':').add(name.string());
+    } else {
+      tb.add(name.string()).add("()");
+    }
+    return tb.toString();
   }
 
   /**

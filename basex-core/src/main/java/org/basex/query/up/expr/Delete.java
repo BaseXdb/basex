@@ -37,11 +37,11 @@ public final class Delete extends Update {
     final Iter iter = exprs[0].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
       if(!(item instanceof ANode)) throw UPTRGDELEMPT_X.get(info, item);
-      final ANode n = (ANode) item;
+      final ANode node = (ANode) item;
       // nodes without parents are ignored
-      if(n.parent() == null) continue;
+      if(node.parent() == null) continue;
       final Updates updates = qc.updates();
-      final DBNode dbn = updates.determineDataRef(n, qc);
+      final DBNode dbn = updates.determineDataRef(node, qc);
       updates.add(new DeleteNode(dbn.pre(), dbn.data(), info), qc);
     }
     return Empty.VALUE;

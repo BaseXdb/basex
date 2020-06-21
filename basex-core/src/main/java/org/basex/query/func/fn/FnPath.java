@@ -56,7 +56,7 @@ public final class FnPath extends ContextFn {
       }
 
       final QNm qname = node.qname();
-      final Type type = node.type;
+      final NodeType type = (NodeType) node.type;
       if(type == NodeType.ATT) {
         tb.add('@').add(qname.id());
       } else if(type == NodeType.ELM) {
@@ -64,8 +64,8 @@ public final class FnPath extends ContextFn {
       } else if(type == NodeType.COM || type == NodeType.TXT) {
         tb.add(node.seqType().toString()).add('[').addInt(textComment(node, qc)).add(']');
       } else if(type == NodeType.PI) {
-        tb.add(type.string()).add('(').add(qname.local());
-        tb.add(")[").addInt(pi(node, qname, qc)).add(']');
+        tb.add(type.name).add('(').add(qname.local()).add(')').add('[').
+          addInt(pi(node, qname, qc)).add(']');
       }
       steps.add(tb.next());
       nodes.add(node);

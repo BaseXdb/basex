@@ -51,6 +51,6 @@ public final class UnionTest extends Test {
 
   @Override
   public String toString() {
-    return new TokenBuilder().addSeparated(tests, "|", false).toString();
+    return new TokenBuilder().addAll(tests, "|").toString();
   }
 }

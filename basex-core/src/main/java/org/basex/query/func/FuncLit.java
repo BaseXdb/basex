@@ -118,6 +118,6 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public String toString() {
-    return Strings.concat(name.prefixId(), '#', params.length);
+    return Strings.concat(name.prefixId(), "#", params.length);
   }
 }

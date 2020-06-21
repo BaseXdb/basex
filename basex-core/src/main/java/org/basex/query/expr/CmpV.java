@@ -144,7 +144,9 @@ public final class CmpV extends Cmp {
     public abstract OpV invert();
 
     @Override
-    public String toString() { return name; }
+    public String toString() {
+      return name;
+    }
   }
 
   /** Operator. */

@@ -1,5 +1,6 @@
 package org.basex.query.var;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryError.*;
 
 import org.basex.data.*;
@@ -163,7 +164,7 @@ public final class Var extends ExprInfo {
       if(declType.occ.intersect(st.occ) == null)
         throw INVTREAT_X_X_X.get(info, st, declType, Token.concat('$', name.string()));
       if(st.instanceOf(declType)) {
-        if(cc != null) cc.info(QueryText.OPTTYPE_X, this);
+        if(cc != null) cc.info(OPTTYPE_X, this);
         declType = null;
       } else if(!st.promotable(declType)) {
         return;
@@ -289,7 +290,7 @@ public final class Var extends ExprInfo {
 
   @Override
   public String toErrorString() {
-    return Strings.concat(QueryText.DOLLAR, name.string());
+    return Strings.concat(DOLLAR, name.string());
   }
 
   @Override

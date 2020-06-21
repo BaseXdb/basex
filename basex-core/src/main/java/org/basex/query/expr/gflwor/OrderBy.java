@@ -228,6 +228,6 @@ public final class OrderBy extends Clause {
 
   @Override
   public String toString() {
-    return new TokenBuilder().add(ORDER).addSpaced(BY).addSeparated(keys, SEP, false).toString();
+    return new TokenBuilder().add(ORDER).addSpaced(BY).addAll(keys, SEP).toString();
   }
 }

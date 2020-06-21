@@ -195,7 +195,7 @@ final class DynJavaFunc extends DynJavaCall {
 
   @Override
   String desc() {
-    return EQNAME + JAVAPREF + clazz.getName() + CURLY2 + name;
+    return QNm.eqName(JAVAPREF + clazz.getName(), name);
   }
 
   @Override

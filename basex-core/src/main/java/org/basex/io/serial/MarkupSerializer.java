@@ -343,7 +343,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     startOpen(new QNm(META));
     attribute(HTTP_EQUIV, CONTENT_TYPE, false);
     attribute(CONTENT, concat(media.isEmpty() ? MediaType.TEXT_HTML : media, "; ",
-      CHARSET, '=', encoding), false);
+      CHARSET, "=", encoding), false);
     if(html) {
       out.print(ELEM_C);
     } else {

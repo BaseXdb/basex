@@ -344,7 +344,7 @@ public enum ApiFunction implements AFunction {
    * @param list list of function signatures
    */
   public static void init(final ArrayList<FuncDefinition> list) {
-    for(final ApiFunction func : values()) list.add(func.definition);
+    for(final ApiFunction function : values()) list.add(function.definition);
   }
 
   @Override

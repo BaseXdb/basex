@@ -246,7 +246,7 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public String toString() {
-    return new TokenBuilder().add(TYPESWITCH).addBraced("(", cond, ")").
-        addSeparated(groups, "", false).toString();
+    return new TokenBuilder().add(TYPESWITCH).addBraced("(", cond, ")").addAll(groups, "").
+        toString();
   }
 }

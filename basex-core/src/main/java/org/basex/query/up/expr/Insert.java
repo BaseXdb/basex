@@ -69,8 +69,7 @@ public final class Insert extends Update {
     if(i2 != null) throw (loc ? UPTRGSNGL2_X : UPTRGSNGL_X).get(info,
         ValueBuilder.concat(item, i2, qc));
 
-    final ANode node = (ANode) item;
-    final ANode par = node.parent();
+    final ANode node = (ANode) item, par = node.parent();
     if(loc) {
       if(node.type == NodeType.ATT || node.type == NodeType.DOC) throw UPTRGTYP2_X.get(info, node);
       if(par == null) throw UPPAREMPTY_X.get(info, node);
@@ -118,7 +117,7 @@ public final class Insert extends Update {
 
   @Override
   public String toString() {
-    return QueryText.INSERT + ' ' + QueryText.NODE + ' ' + exprs[1] + ' ' +
+    return QueryText.INSERT + ' ' + QueryText.NODES + ' ' + exprs[1] + ' ' +
         QueryText.INTO + ' ' + exprs[0];
   }
 }

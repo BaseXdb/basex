@@ -140,8 +140,9 @@ public enum NodeType implements Type {
 
   /** Cached enums (faster). */
   private static final NodeType[] VALUES = values();
+
   /** Name. */
-  private final byte[] name;
+  public final byte[] name;
   /** Parent type. */
   private final Type parent;
   /** Type id . */
@@ -233,11 +234,6 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public final byte[] string() {
-    return name;
-  }
-
-  @Override
   public final AtomType atomic() {
     return this == PI || this == COM ? AtomType.STR : AtomType.ATM;
   }
@@ -245,11 +241,6 @@ public enum NodeType implements Type {
   @Override
   public final ID id() {
     return id;
-  }
-
-  @Override
-  public final String toString() {
-    return Strings.concat(name, "()");
   }
 
   /**
@@ -266,6 +257,11 @@ public enum NodeType implements Type {
   @Override
   public boolean nsSensitive() {
     return false;
+  }
+
+  @Override
+  public final String toString() {
+    return Token.string(name) + "()";
   }
 
   /**

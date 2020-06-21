@@ -1,5 +1,7 @@
 package org.basex.query.value.node;
 
+import static org.basex.query.QueryText.*;
+
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -135,11 +137,11 @@ public final class FDoc extends FNode {
 
   @Override
   public void plan(final QueryPlan plan) {
-    plan.add(plan.create(this, QueryText.BASE, uri));
+    plan.add(plan.create(this, BASE, uri));
   }
 
   @Override
   public String toString() {
-    return Strings.concat(QueryText.DOCUMENT, " { ", uri.length == 0 ? "..." : uri, " }");
+    return Strings.concat(DOCUMENT, " { ", uri.length == 0 ? "..." : uri, " }");
   }
 }

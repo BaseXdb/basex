@@ -44,8 +44,8 @@ public final class Rename extends Update {
 
     // check target constraints
     if(item == null) throw UPSEQEMP_X.get(info, Util.className(this));
-    final Item i2 = iter.next();
-    if(i2 != null) throw UPWRTRGSINGLE_X.get(info, ValueBuilder.concat(item, i2, qc));
+    final Item item2 = iter.next();
+    if(item2 != null) throw UPWRTRGSINGLE_X.get(info, ValueBuilder.concat(item, item2, qc));
 
     final CNode ex;
     if(item.type == NodeType.ELM) {
@@ -63,8 +63,7 @@ public final class Rename extends Update {
 
     // check namespace conflicts...
     if(target.type == NodeType.ELM || target.type == NodeType.ATT) {
-      final byte[] rp = rename.prefix();
-      final byte[] ru = rename.uri();
+      final byte[] rp = rename.prefix(), ru = rename.uri();
       final Atts at = target.nsScope(sc);
       final int as = at.size();
       for(int a = 0; a < as; a++) {

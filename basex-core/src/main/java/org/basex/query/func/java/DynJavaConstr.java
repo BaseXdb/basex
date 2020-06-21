@@ -8,6 +8,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -91,7 +92,7 @@ final class DynJavaConstr extends DynJavaCall {
 
   @Override
   String desc() {
-    return EQNAME + JAVAPREF + clazz.getName() + CURLY2 + NEW;
+    return QNm.eqName(JAVAPREF + clazz.getName(), NEW);
   }
 
   @Override

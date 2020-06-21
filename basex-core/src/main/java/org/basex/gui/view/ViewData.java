@@ -56,7 +56,7 @@ public final class ViewData {
     }
 
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(Function._DB_OPEN.args(data.meta.name, Token.string(data.text(p, true))).substring(1));
+    tb.add(Function._DB_OPEN.args(data.meta.name, Token.string(data.text(p, true))).trim());
     for(int i = pres.size() - 1; i >= 0; i--) {
       p = pres.get(i);
       k = data.kind(p);

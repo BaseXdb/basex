@@ -340,7 +340,7 @@ public abstract class Step extends Preds {
       if(test instanceof UnionTest) {
         tb.add('(');
         for(final Test t : ((UnionTest) test).tests) add.apply(t).add(" | ");
-        tb.delete(tb.size() - 3, 3).add(')');
+        tb.delete(tb.size() - 3, tb.size()).add(')');
       } else {
         add.apply(test);
       }

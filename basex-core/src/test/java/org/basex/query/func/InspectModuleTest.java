@@ -169,8 +169,12 @@ public final class InspectModuleTest extends SandboxTest {
     query(func.args(" ()"), "empty-sequence()");
     query(func.args(1), "xs:integer");
     query(func.args(" 1 to 2"), "xs:integer+");
-    query(func.args(" map { 'a': (1, 2)[. = 1] }"), "map(*)");
     query(func.args(" <_/>"), "element()");
+    query(func.args(" map { 'a': (1, 2)[. = 1] }"), "map(*)");
+    query(func.args(" map { 'a': 'b' }"), "map(xs:string, xs:string?)");
+    query(func.args(" array { 1, <a/> }"), "array(*)");
+    query(func.args(" array { 1, 2 }"), "array(xs:integer)");
+    query(func.args(" function() { 1 }"), "function() as xs:integer");
   }
 
   /** Test method. */

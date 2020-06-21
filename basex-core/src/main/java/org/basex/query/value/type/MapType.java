@@ -1,7 +1,6 @@
 package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -15,18 +14,16 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class MapType extends FuncType {
+  /** General map type. */
+  public static final MapType MAP = new MapType(AtomType.AAT, SeqType.ITEM_ZM);
+
   /**
    * Constructor.
    * @param keyType key type
    * @param declType declared return type
    */
-  MapType(final AtomType keyType, final SeqType declType) {
+  private MapType(final AtomType keyType, final SeqType declType) {
     super(declType, keyType.seqType());
-  }
-
-  @Override
-  public byte[] string() {
-    return Token.token(MAP);
   }
 
   @Override
@@ -50,7 +47,7 @@ public final class MapType extends FuncType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(type == AtomType.ITEM || type == SeqType.ANY_FUNC || type == SeqType.ANY_MAP) return true;
+    if(type == AtomType.ITEM || type == FUNCTION || type == MAP) return true;
     if(!(type instanceof FuncType) || type instanceof ArrayType) return false;
 
     final FuncType ft = (FuncType) type;
@@ -69,7 +66,7 @@ public final class MapType extends FuncType {
       final MapType mt = (MapType) type;
       return get((AtomType) keyType().union(mt.keyType()), declType.union(mt.declType));
     }
-    return type instanceof ArrayType ? SeqType.ANY_FUNC :
+    return type instanceof ArrayType ? FUNCTION :
            type instanceof FuncType  ? type.union(this) : AtomType.ITEM;
   }
 
@@ -109,16 +106,14 @@ public final class MapType extends FuncType {
    * @return map type
    */
   public static MapType get(final AtomType keyType, final SeqType declType) {
-    return keyType == AtomType.AAT && declType.eq(SeqType.ITEM_ZM) ? SeqType.ANY_MAP :
+    return keyType == AtomType.AAT && declType.eq(SeqType.ITEM_ZM) ? MAP :
       new MapType(keyType, declType);
   }
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add("map(");
-    final AtomType type = keyType();
-    if(type == AtomType.AAT && declType.eq(SeqType.ITEM_ZM)) tb.add('*');
-    else tb.add(type).add(SEP).add(declType);
-    return tb.add(')').toString();
+    final Object[] param = this == MAP ? WILDCARD : new Object[] { keyType(), declType };
+    return new TokenBuilder().add(QueryText.MAP).add('(').addAll(param, QueryText.SEP).
+        add(')').toString();
   }
 }

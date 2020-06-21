@@ -296,7 +296,6 @@ public final class Switch extends ParseExpr {
 
   @Override
   public String toString() {
-    return new TokenBuilder().add(SWITCH).addBraced("(", cond, ")").
-        addSeparated(groups, "", false).toString();
+    return new TokenBuilder().add(SWITCH).addBraced("(", cond, ")").addAll(groups, "").toString();
   }
 }

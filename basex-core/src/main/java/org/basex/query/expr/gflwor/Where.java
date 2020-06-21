@@ -1,5 +1,7 @@
 package org.basex.query.expr.gflwor;
 
+import static org.basex.query.QueryText.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -128,6 +130,6 @@ public final class Where extends Clause {
 
   @Override
   public String toString() {
-    return QueryText.WHERE + ' ' + expr;
+    return WHERE + ' ' + expr;
   }
 }

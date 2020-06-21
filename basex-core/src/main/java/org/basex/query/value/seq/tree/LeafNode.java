@@ -224,11 +224,6 @@ final class LeafNode implements Node<Item, Item> {
   }
 
   @Override
-  public String toString() {
-    return Util.className(this) + '(' + size() + ')' + Arrays.toString(values);
-  }
-
-  @Override
   public long checkInvariants() {
     if(values.length < TreeSeq.MIN_LEAF || values.length > TreeSeq.MAX_LEAF)
       throw new AssertionError("Wrong " + Util.className(this) + " size: " + values.length);
@@ -243,5 +238,10 @@ final class LeafNode implements Node<Item, Item> {
   @Override
   public Item getSub(final int index) {
     return values[index];
+  }
+
+  @Override
+  public String toString() {
+    return Util.className(this) + '(' + size() + ')' + Arrays.toString(values);
   }
 }

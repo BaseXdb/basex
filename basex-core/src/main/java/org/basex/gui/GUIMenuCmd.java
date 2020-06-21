@@ -14,7 +14,6 @@ import org.basex.gui.view.*;
 import org.basex.gui.view.editor.*;
 import org.basex.io.*;
 import org.basex.query.func.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -406,8 +405,7 @@ public enum GUIMenuCmd implements GUICommand {
 
       final StringList sl = insert.result;
       final NodeType type = ANode.type(insert.kind);
-      String item = Token.string(type.string()) +
-          " { " + quote(sl.get(0)) + " }";
+      String item = Strings.concat(type.name, " { ", quote(sl.get(0)), " }");
 
       if(type == NodeType.ATT || type == NodeType.PI) {
         item += " { " + quote(sl.get(1)) + " }";
@@ -991,6 +989,6 @@ public enum GUIMenuCmd implements GUICommand {
    * @return function string
    */
   private static String openPre(final DBNodes nodes, final int index) {
-    return Function._DB_OPEN_PRE.args(Str.get(nodes.data().meta.name), Int.get(nodes.pre(index)));
+    return Function._DB_OPEN_PRE.args(nodes.data().meta.name, nodes.pre(index)).trim();
   }
 }

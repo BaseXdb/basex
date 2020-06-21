@@ -1,6 +1,5 @@
 package org.basex.query.value.item;
 
-import static org.basex.data.DataText.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
@@ -8,6 +7,7 @@ import java.math.*;
 
 import org.basex.data.*;
 import org.basex.io.in.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -345,40 +345,6 @@ public abstract class Item extends Value {
     return type.id();
   }
 
-  /**
-   * Returns a chopped and quoted token representation of the specified value.
-   * @param value value
-   * @return token
-   */
-  public static byte[] toQuotedToken(final byte[] value) {
-    return toToken(value, true, true);
-  }
-
-  /**
-   * Returns a chopped token representation of the specified value.
-   * @param value value
-   * @param quotes wrap with quotes
-   * @param limit limit output
-   * @return token
-   */
-  public static byte[] toToken(final byte[] value, final boolean quotes, final boolean limit) {
-    final TokenBuilder tb = new TokenBuilder();
-    if(quotes) tb.add('"');
-    for(final byte v : value) {
-      if(limit && tb.size() > 127) {
-        tb.add(DOTS);
-        break;
-      }
-      if(v == '&') tb.add(E_AMP);
-      else if(v == '\r') tb.add(E_CR);
-      else if(v == '\n') tb.add(E_NL);
-      else if(v == '"' && quotes) tb.add('"').add('"');
-      else tb.addByte(v);
-    }
-    if(quotes) tb.add('"');
-    return tb.finish();
-  }
-
   @Override
   public String description() {
     return type + " " + ITEM;
@@ -387,11 +353,33 @@ public abstract class Item extends Value {
   @Override
   public void plan(final QueryPlan plan) {
     try {
-      plan.add(plan.create(this), toToken(string(null), false, true));
+      plan.add(plan.create(this), toToken(string(null)));
     } catch(final QueryException ex) {
       // only function items throw exceptions in atomization, and they should
       // override plan(Serializer) sensibly
       throw Util.notExpected(ex);
     }
+  }
+
+  /**
+   * Returns a chopped token representation of the specified value.
+   * @param value value
+   * @return string
+   */
+  public static byte[] toToken(final byte[] value) {
+    final TokenBuilder tb = new TokenBuilder();
+    Serializer.value(value, false, true, tb);
+    return tb.finish();
+  }
+
+  /**
+   * Returns a chopped and quoted token representation of the specified value.
+   * @param value value
+   * @return token
+   */
+  public static byte[] toQuotedToken(final byte[] value) {
+    final TokenBuilder tb = new TokenBuilder();
+    Serializer.value(value, true, true, tb);
+    return tb.finish();
   }
 }

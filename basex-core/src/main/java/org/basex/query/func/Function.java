@@ -1561,7 +1561,7 @@ public enum Function implements AFunction {
    * @param list list of function signatures
    */
   public static void init(final ArrayList<FuncDefinition> list) {
-    for(final Function func : values()) list.add(func.definition);
+    for(final Function function : values()) list.add(function.definition);
   }
 
   @Override

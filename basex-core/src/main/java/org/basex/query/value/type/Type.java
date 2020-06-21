@@ -150,7 +150,7 @@ public interface Type {
     public static Type getType(final int id) {
       final ID i = get(id);
       if(i == null) return null;
-      if(i == FUN) return SeqType.ANY_FUNC;
+      if(i == FUN) return FuncType.FUNCTION;
       final Type type = AtomType.getType(i);
       return type != null ? type : NodeType.getType(i);
     }
@@ -279,12 +279,6 @@ public interface Type {
    * @return result of check
    */
   boolean isSortable();
-
-  /**
-   * Returns the string representation of this type.
-   * @return name
-   */
-  byte[] string();
 
   /**
    * Returns the atomic type.

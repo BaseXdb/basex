@@ -74,6 +74,6 @@ public final class Instance extends Single {
 
   @Override
   public String toString() {
-    return Util.info("% instance of %", expr, seqType);
+    return expr + " instance of " + seqType;
   }
 }

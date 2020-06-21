@@ -260,6 +260,7 @@ public enum Annotation {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder().add('%');
     if(!eq(uri, XQ_URI)) tb.add(NSGlobal.prefix(uri)).add(':');
+    // chop parentheses if annotation has no parameters
     return tb.add(desc.replace("()", "")).toString();
   }
 }

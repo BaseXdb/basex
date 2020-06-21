@@ -358,6 +358,6 @@ public abstract class SimpleMap extends Arr {
 
   @Override
   public final String toString() {
-    return new TokenBuilder().addSeparated(exprs, " ! ", true).toString();
+    return new TokenBuilder().addAll(exprs, " ! ", true).toString();
   }
 }

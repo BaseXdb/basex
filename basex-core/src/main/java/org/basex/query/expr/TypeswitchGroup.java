@@ -290,7 +290,7 @@ public final class TypeswitchGroup extends Single {
       tb.add(' ').add(var);
       if(sl > 0) tb.add(' ').add(AS);
     }
-    if(sl > 0) tb.add(' ').addSeparated(seqTypes, "|", false);
+    if(sl > 0) tb.add(' ').addAll(seqTypes, "|");
     return tb.addSpaced(RETURN).add(expr).toString();
   }
 }

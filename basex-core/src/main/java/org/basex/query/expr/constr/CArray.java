@@ -1,5 +1,6 @@
 package org.basex.query.expr.constr;
 
+import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -72,7 +73,7 @@ public final class CArray extends Arr {
 
   @Override
   public String description() {
-    return QueryText.ARRAY;
+    return ARRAY;
   }
 
   @Override
@@ -80,7 +81,7 @@ public final class CArray extends Arr {
     final int el = exprs.length;
     if(seq && el == 0) return "[]";
 
-    final TokenBuilder tb = new TokenBuilder().add(seq ? "[" : QueryText.ARRAY + " {");
+    final TokenBuilder tb = new TokenBuilder().add(seq ? "[" : ARRAY + " {");
     for(int e = 0; e < el; e++) {
       if(e != 0) tb.add(',');
       tb.add(' ').add(exprs[e]);

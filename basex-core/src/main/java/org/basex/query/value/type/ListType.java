@@ -72,11 +72,6 @@ public enum ListType implements Type {
   }
 
   @Override
-  public final byte[] string() {
-    return name.string();
-  }
-
-  @Override
   public final Value cast(final Item item, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
 

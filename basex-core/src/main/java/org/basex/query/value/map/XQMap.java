@@ -37,7 +37,7 @@ public final class XQMap extends XQData {
    * @param root map
    */
   private XQMap(final TrieNode root) {
-    super(SeqType.ANY_MAP);
+    super(MapType.MAP);
     this.root = root;
   }
 

@@ -235,32 +235,30 @@ public abstract class Seq extends Value {
 
   @Override
   public final String toErrorString() {
-    return toString(true);
+    return build(true).toString();
   }
 
   @Override
   public String toString() {
-    return toString(false);
+    return build(false).toString();
   }
 
   /**
    * Returns a string representation of the sequence.
    * @param error error flag
-   * @return string
+   * @return token builder
    */
-  private String toString(final boolean error) {
+  private TokenBuilder build(final boolean error) {
     final TokenBuilder tb = new TokenBuilder().add('(');
     for(int i = 0; i < size; ++i) {
       if(i > 0) tb.add(SEP);
-      final Item item = itemAt(i);
-      tb.add(error ? item.toErrorString() : item.toString());
-      if(i + 1 < size && tb.size() > 40) {
-        // chop too long strings
-        tb.add(SEP).add(DOTS);
-        break;
-      }
+      tb.add(error ? itemAt(i).toErrorString() : itemAt(i).toString());
+      if(tb.size() <= 40 || i + 1 == size) continue;
+      // chop output to prevent too long error strings
+      tb.add(SEP).add(DOTS);
+      break;
     }
-    return tb.add(')').toString();
+    return tb.add(')');
   }
 
   // STATIC METHODS ===============================================================================

@@ -114,10 +114,11 @@ public class DBNodeSeq extends NativeSeq {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder().add('(');
-    for(int i = 0; i < size; ++i) {
-      tb.add(i == 0 ? "" : SEP).add(_DB_OPEN_PRE.args(data.meta.name, pres[i]).substring(1));
-      if(tb.size() <= 16 || i + 1 == size) continue;
-      // output is chopped to prevent too long error strings
+    for(int p = 0; p < size; ++p) {
+      if(p > 0) tb.add(SEP);
+      tb.add(_DB_OPEN_PRE.args(data.meta.name, pres[p]).trim());
+      if(tb.size() <= 16 || p + 1 == size) continue;
+      // chop output to prevent too long error strings
       tb.add(SEP).add(DOTS);
       break;
     }

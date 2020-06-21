@@ -128,7 +128,7 @@ public final class RangeSeq extends Seq {
   @Override
   public String toString() {
     final long[] range = range(false);
-    final String str = range[0] + spaced(TO) + range[1];
-    return asc ? parens(str) : Function.REVERSE.args(' ' + str).substring(1);
+    final String arg = range[0] + " " + TO + ' ' + range[1];
+    return asc ? "(" + arg + ")" : Function.REVERSE.args(' ' + arg).trim();
   }
 }

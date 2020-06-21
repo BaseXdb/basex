@@ -287,6 +287,6 @@ public final class CmpR extends Single {
       if(min != NEGATIVE_INFINITY && max != POSITIVE_INFINITY) tb.addSpaced(AND);
       if(max != POSITIVE_INFINITY) tb.add(expr).addSpaced("<=").add(max);
     }
-    return parens(tb);
+    return "(" + tb + ")";
   }
 }

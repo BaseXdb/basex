@@ -214,6 +214,6 @@ public final class FuncDefinition {
 
   @Override
   public String toString() {
-    return Strings.concat(NSGlobal.prefix(uri), ':', desc);
+    return Strings.concat(NSGlobal.prefix(uri), ":", desc);
   }
 }

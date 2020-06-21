@@ -1,5 +1,7 @@
 package org.basex.query.expr.ft;
 
+import static org.basex.query.QueryText.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -126,11 +128,11 @@ public final class FTWindow extends FTFilter {
 
   @Override
   public void plan(final QueryPlan plan) {
-    plan.add(plan.create(this, QueryText.WINDOW, unit), win, exprs);
+    plan.add(plan.create(this, WINDOW, unit), win, exprs);
   }
 
   @Override
   public String toString() {
-    return super.toString() + QueryText.WINDOW + ' ' + win + ' ' + unit;
+    return super.toString() + WINDOW + ' ' + win + ' ' + unit;
   }
 }

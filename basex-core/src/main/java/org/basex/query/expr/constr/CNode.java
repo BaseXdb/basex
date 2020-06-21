@@ -40,7 +40,7 @@ public abstract class CNode extends Arr {
 
   @Override
   public final String description() {
-    return new TokenBuilder().add(seqType().type.string()).add(" constructor").toString();
+    return Token.string(((NodeType) seqType().type).name) + " constructor";
   }
 
   @Override

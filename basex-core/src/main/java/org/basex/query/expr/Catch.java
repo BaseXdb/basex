@@ -229,7 +229,7 @@ public final class Catch extends Single {
     final TokenBuilder tb = new TokenBuilder().add(CATCH).add(' ');
     int c = 0;
     for(final NameTest test : tests) {
-      if(c++ > 0) tb.add(" | ");
+      if(c++ > 0) tb.add('|');
       tb.add(test != null ? test.toString(false) : "*");
     }
     return tb.addBraced(" { ", expr, " }").toString();

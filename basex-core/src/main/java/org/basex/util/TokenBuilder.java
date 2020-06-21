@@ -202,12 +202,13 @@ public final class TokenBuilder {
 
   /**
    * Deletes bytes from the token.
-   * @param pos position
-   * @param length number of bytes to be removed
+   * @param start start position
+   * @param end end position
    * @return self reference
    */
-  public TokenBuilder delete(final int pos, final int length) {
-    Array.remove(chars, pos, length, size);
+  public TokenBuilder delete(final int start, final int end) {
+    final int length = end - start;
+    Array.remove(chars, start, length, size);
     size -= length;
     return this;
   }
@@ -255,7 +256,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds the part of a token to the token.
+   * Adds a subtoken.
    * @param token the token
    * @param start start position
    * @param end end position
@@ -287,10 +288,20 @@ public final class TokenBuilder {
    * Adds multiple strings to the token, separated by the specified string.
    * @param objects the object to be added
    * @param separator separator string
+   * @return self reference
+   */
+  public TokenBuilder addAll(final Object[] objects, final String separator) {
+    return addAll(objects, separator, false);
+  }
+
+  /**
+   * Adds multiple strings to the token, separated by the specified string.
+   * @param objects the object to be added
+   * @param separator separator string
    * @param parentheses wrap with parentheses
    * @return self reference
    */
-  public TokenBuilder addSeparated(final Object[] objects, final String separator,
+  public TokenBuilder addAll(final Object[] objects, final String separator,
       final boolean parentheses) {
 
     if(parentheses) add('(');

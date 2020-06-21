@@ -105,7 +105,9 @@ public class CmpG extends Cmp {
     public abstract OpG invert();
 
     @Override
-    public String toString() { return name; }
+    public String toString() {
+      return name;
+    }
 
     /**
      * Returns the comparator for the specified value comparison operator.

@@ -361,6 +361,16 @@ public final class QNm extends Item {
   }
 
   /**
+   * Returns an EQName representation.
+   * @param uri URI
+   * @param local local name
+   * @return QName as token
+   */
+  public static String eqName(final String uri, final String local) {
+    return Strings.concat(QueryText.EQNAME, uri, CURLY2, local);
+  }
+
+  /**
    * Constructs an internal string representation for the components of a QName.
    * @param prefix prefix
    * @param local name (can be {@code null})

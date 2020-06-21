@@ -218,6 +218,6 @@ public final class CmpSR extends Single {
     if(min != null) tb.add(expr).addSpaced(mni ? ">=" : ">").add(Item.toQuotedToken(min));
     if(min == null && max == null) tb.addSpaced(AND);
     if(max != null) tb.add(expr).addSpaced(mxi ? "<=" : "<").add(Item.toQuotedToken(max));
-    return parens(tb);
+    return "(" + tb + ")";
   }
 }

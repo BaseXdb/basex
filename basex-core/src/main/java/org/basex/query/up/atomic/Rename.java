@@ -63,6 +63,6 @@ final class Rename extends BasicUpdate {
 
   @Override
   public String toString() {
-    return "\n Rename: " + super.toString();
+    return "\nRename: " + super.toString();
   }
 }

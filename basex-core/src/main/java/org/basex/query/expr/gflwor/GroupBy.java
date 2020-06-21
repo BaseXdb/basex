@@ -339,6 +339,6 @@ public final class GroupBy extends Clause {
       tb.add(LET).addSpaced("(: post-group :)").add(post[p]);
       tb.addSpaced(ASSIGN).add(preExpr[p]).add(' ');
     }
-    return tb.add(GROUP).addSpaced(' ').addSeparated(specs, SEP, false).toString();
+    return tb.add(GROUP).addSpaced(' ').addAll(specs, SEP).toString();
   }
 }

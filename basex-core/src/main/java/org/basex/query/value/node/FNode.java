@@ -211,15 +211,4 @@ public abstract class FNode extends ANode {
     final FNode n = (FNode) obj;
     return type.eq(n.type) && Token.eq(value, n.value) && parent == n.parent;
   }
-
-  // STATIC METHODS ===============================================================================
-
-  /**
-   * Returns a chopped token representation of the specified value.
-   * @param value value
-   * @return string
-   */
-  public static byte[] toToken(final byte[] value) {
-    return toToken(value, false, true);
-  }
 }

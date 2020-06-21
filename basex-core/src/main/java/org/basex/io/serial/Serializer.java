@@ -523,4 +523,30 @@ public abstract class Serializer implements Closeable {
     elems.push(elem);
     level++;
   }
+
+  // STATIC METHODS ===============================================================================
+
+  /**
+   * Serializes the specified value.
+   * @param value value
+   * @param quotes wrap with quotes
+   * @param chop chop large tokens
+   * @param tb token builder
+   */
+  public static void value(final byte[] value, final boolean quotes, final boolean chop,
+      final TokenBuilder tb) {
+    if(quotes) tb.add('"');
+    for(final byte v : value) {
+      if(chop && tb.size() > 127) {
+        tb.add(QueryText.DOTS);
+        break;
+      }
+      if(v == '&') tb.add(E_AMP);
+      else if(v == '\r') tb.add(E_CR);
+      else if(v == '\n') tb.add(E_NL);
+      else if(v == '"' && quotes) tb.add('"').add('"');
+      else tb.addByte(v);
+    }
+    if(quotes) tb.add('"');
+  }
 }

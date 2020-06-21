@@ -92,6 +92,6 @@ final class InvDocTest extends Test {
 
   @Override
   public String toString() {
-    return Strings.concat(NodeType.DOC.string(), "(...)");
+    return Strings.concat(NodeType.DOC.name, "(...)");
   }
 }

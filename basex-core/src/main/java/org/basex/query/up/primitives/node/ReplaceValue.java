@@ -64,7 +64,7 @@ public final class ReplaceValue extends NodeUpdate {
 
   @Override
   public String toString() {
-    return Util.info("%[%, %]", Util.className(this), node(), value);
+    return Util.className(this) + '[' + node() + ", " + value + ']';
   }
 
   /**

@@ -139,6 +139,6 @@ public final class FTDistance extends FTFilter {
 
   @Override
   public String toString() {
-    return super.toString() + DISTANCE + parens(min + "-" + max + ' ' + unit);
+    return super.toString() + DISTANCE + '(' + min + "-" + max + ' ' + unit + ')';
   }
 }

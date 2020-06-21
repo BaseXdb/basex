@@ -15,17 +15,15 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ArrayType extends FuncType {
+  /** General array type. */
+  public static final ArrayType ARRAY = new ArrayType(SeqType.ITEM_ZM);
+
   /**
    * Constructor.
    * @param declType declared return type
    */
-  ArrayType(final SeqType declType) {
+  private ArrayType(final SeqType declType) {
     super(declType, SeqType.ITR_O);
-  }
-
-  @Override
-  public byte[] string() {
-    return Token.token(ARRAY);
   }
 
   @Override
@@ -46,7 +44,7 @@ public final class ArrayType extends FuncType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(type == AtomType.ITEM || type == SeqType.ANY_FUNC || type == SeqType.ANY_ARRAY) return true;
+    if(type == AtomType.ITEM || type == FUNCTION || type == ARRAY) return true;
     if(!(type instanceof FuncType) || type instanceof MapType) return false;
 
     final FuncType ft = (FuncType) type;
@@ -65,7 +63,7 @@ public final class ArrayType extends FuncType {
       final ArrayType at = (ArrayType) type;
       return get(declType.union(at.declType));
     }
-    return type instanceof MapType  ? SeqType.ANY_FUNC :
+    return type instanceof MapType  ? FUNCTION :
            type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
 
@@ -92,11 +90,12 @@ public final class ArrayType extends FuncType {
    * @return array type
    */
   public static ArrayType get(final SeqType declType) {
-    return declType.eq(SeqType.ITEM_ZM) ? SeqType.ANY_ARRAY : new ArrayType(declType);
+    return declType.eq(SeqType.ITEM_ZM) ? ARRAY : new ArrayType(declType);
   }
 
   @Override
   public String toString() {
-    return declType.eq(SeqType.ITEM_ZM) ? "array(*)" : "array(" + declType + ')';
+    final Object[] param = this == ARRAY ? WILDCARD : new Object[] { declType };
+    return new TokenBuilder().add(QueryText.ARRAY).add('(').addAll(param, SEP).add(')').toString();
   }
 }

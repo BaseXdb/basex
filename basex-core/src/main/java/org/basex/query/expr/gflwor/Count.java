@@ -1,5 +1,7 @@
 package org.basex.query.expr.gflwor;
 
+import static org.basex.query.QueryText.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
@@ -114,6 +116,6 @@ public final class Count extends Clause {
 
   @Override
   public String toString() {
-    return "count " + var;
+    return COUNT + ' ' + var;
   }
 }

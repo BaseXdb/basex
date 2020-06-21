@@ -95,8 +95,8 @@ public final class JavaMapping {
     new Pair(FPI.class, NodeType.PI),
     new Pair(FTxt.class, NodeType.TXT),
     // function types
-    new Pair(Array.class, SeqType.ANY_ARRAY),
-    new Pair(XQMap.class, SeqType.ANY_MAP),
+    new Pair(Array.class, ArrayType.ARRAY),
+    new Pair(XQMap.class, MapType.MAP),
   };
 
   static {

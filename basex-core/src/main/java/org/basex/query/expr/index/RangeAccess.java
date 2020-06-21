@@ -86,6 +86,6 @@ public final class RangeAccess extends IndexAccess {
   public String toString() {
     final Function func = index.type() == IndexType.TEXT ? Function._DB_TEXT_RANGE :
       Function._DB_ATTRIBUTE_RANGE;
-    return func.args(db, Dbl.get(index.min), Dbl.get(index.max)).substring(1);
+    return func.args(db, Dbl.get(index.min), Dbl.get(index.max)).trim();
   }
 }

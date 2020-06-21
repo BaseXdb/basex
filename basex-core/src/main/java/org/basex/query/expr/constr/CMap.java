@@ -1,5 +1,6 @@
 package org.basex.query.expr.constr;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
@@ -85,12 +86,12 @@ public final class CMap extends Arr {
 
   @Override
   public String description() {
-    return QueryText.MAP;
+    return MAP;
   }
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(QueryText.MAP).add(" {");
+    final TokenBuilder tb = new TokenBuilder().add(MAP).add(" {");
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
       if(e != 0) tb.add(',');

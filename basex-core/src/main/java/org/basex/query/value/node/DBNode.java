@@ -464,10 +464,11 @@ public class DBNode extends ANode {
    * @return string
    */
   private String toString(final boolean func) {
-    if(func) return Function._DB_OPEN_PRE.args(data.meta.name, pre).substring(1);
+    if(func) return Function._DB_OPEN_PRE.args(data.meta.name, pre).trim();
 
-    final TokenBuilder tb = new TokenBuilder().add(type.string()).add(' ');
-    switch((NodeType) type) {
+    final NodeType nd = (NodeType) type;
+    final TokenBuilder tb = new TokenBuilder().add(nd.name).add(' ');
+    switch(nd) {
       case ATT:
       case PI:
         tb.add(name()).add(" {").add(toQuotedToken(string())).add('}');

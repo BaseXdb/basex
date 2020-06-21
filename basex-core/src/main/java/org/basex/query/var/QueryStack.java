@@ -133,7 +133,7 @@ public final class QueryStack {
     final TokenBuilder tb = new TokenBuilder().add(QueryText.DEBUGLOCAL).add(':');
     for(int i = end; --i >= 0;) {
       if(vars[i] != null) {
-        tb.add(Prop.NL).add("  $").add(vars[i].name).addSpaced(":=").add(stack[i]);
+        tb.add(Prop.NL).add("  $").add(vars[i].name).add(" := ").add(stack[i]);
         if(i == start && i > 0) tb.add(Prop.NL).add(QueryText.DEBUGGLOBAL).add(':');
       }
     }
@@ -142,7 +142,6 @@ public final class QueryStack {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(getClass()).add('[');
-    return tb.addSeparated(stack, ", ", false).add(']').toString();
+    return new TokenBuilder().add(getClass()).add('[').addAll(stack, ", ").add(']').toString();
   }
 }

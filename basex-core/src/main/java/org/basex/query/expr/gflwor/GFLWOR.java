@@ -1043,8 +1043,8 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public String toString() {
-    return new TokenBuilder().addSeparated(clauses.toArray(), " ", false).
-        addSpaced(QueryText.RETURN).add(rtrn).toString();
+    return new TokenBuilder().addAll(clauses.toArray(), " ").addSpaced(QueryText.RETURN).
+        add(rtrn).toString();
   }
 
   /** Start evaluator, doing nothing, once. */

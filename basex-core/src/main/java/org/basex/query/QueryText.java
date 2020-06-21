@@ -464,22 +464,4 @@ public interface QueryText {
   /** Example for a MonthDay format.          */ String XMDA = "--12-31";
   /** Example for a Day format.               */ String XDAY = "---31";
   /** Example for a Month format.             */ String XMON = "--12";
-
-  /**
-   * Returns a string surrounded by spaces.
-   * @param object the object to be added
-   * @return string
-   */
-  static String spaced(final Object object) {
-    return new TokenBuilder().addSpaced(object).toString();
-  }
-
-  /**
-   * Returns a string surrounded by parentheses.
-   * @param object the object to be added
-   * @return string
-   */
-  static String parens(final Object object) {
-    return new TokenBuilder().addBraced("(", object, ")").toString();
-  }
 }

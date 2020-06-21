@@ -26,21 +26,21 @@ public final class SqlExecutePrepared extends SqlExecute {
   private static final QNm Q_PARAMETER = new QNm(SQL_PREFIX, "parameter", SQL_URI);
 
   /** Type int. */
-  private static final byte[] INT = AtomType.INT.string();
+  private static final byte[] INT = AtomType.INT.name.local();
   /** Type string. */
-  private static final byte[] STRING = AtomType.STR.string();
+  private static final byte[] STRING = AtomType.STR.name.local();
   /** Type boolean. */
-  private static final byte[] BOOL = AtomType.BLN.string();
+  private static final byte[] BOOL = AtomType.BLN.name.local();
   /** Type date. */
-  private static final byte[] DATE = AtomType.DAT.string();
+  private static final byte[] DATE = AtomType.DAT.name.local();
   /** Type double. */
-  private static final byte[] DOUBLE = AtomType.DBL.string();
+  private static final byte[] DOUBLE = AtomType.DBL.name.local();
   /** Type float. */
-  private static final byte[] FLOAT = AtomType.FLT.string();
+  private static final byte[] FLOAT = AtomType.FLT.name.local();
   /** Type short. */
-  private static final byte[] SHORT = AtomType.SHR.string();
+  private static final byte[] SHORT = AtomType.SHR.name.local();
   /** Type time. */
-  private static final byte[] TIME = AtomType.TIM.string();
+  private static final byte[] TIME = AtomType.TIM.name.local();
   /** Type timestamp. */
   private static final byte[] TIMESTAMP = token("timestamp");
   /** Type xml. */

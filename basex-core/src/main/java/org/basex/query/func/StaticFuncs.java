@@ -230,16 +230,18 @@ public final class StaticFuncs extends ExprInfo {
 
   @Override
   public void plan(final QueryPlan plan) {
-    if(!funcs.isEmpty()) plan.add(plan.create(this), funcs);
+    if(funcs.isEmpty()) return;
+
+    final ArrayList<ExprInfo> list = new ArrayList<>(funcs.size());
+    for(final FuncCache fc : funcs.values()) list.add(fc.func);
+    plan.add(plan.create(this), list.toArray());
   }
 
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
     for(final FuncCache fc : funcs.values()) {
-      if(fc.func != null && fc.func.compiled()) {
-        tb.add(fc.func).add(Text.NL);
-      }
+      if(fc.func != null && fc.func.compiled()) tb.add(fc.func).add(Text.NL);
     }
     return tb.toString();
   }

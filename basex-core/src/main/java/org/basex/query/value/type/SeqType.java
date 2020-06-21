@@ -156,29 +156,22 @@ public final class SeqType {
   /** Zero or more text nodes. */
   public static final SeqType TXT_ZM = NodeType.TXT.seqType(Occ.ZERO_MORE);
 
-  /** Any function type. */
-  public static final FuncType ANY_FUNC = new FuncType(null, (SeqType[]) null);
-  /** The general map type. */
-  public static final MapType ANY_MAP = new MapType(AtomType.AAT, ITEM_ZM);
-  /** The general array type. */
-  public static final ArrayType ANY_ARRAY = new ArrayType(ITEM_ZM);
-
   /** Single function. */
-  public static final SeqType FUNC_O = ANY_FUNC.seqType();
+  public static final SeqType FUNC_O = FuncType.FUNCTION.seqType();
   /** Zero of single function. */
-  public static final SeqType FUNC_ZO = ANY_FUNC.seqType(Occ.ZERO_ONE);
+  public static final SeqType FUNC_ZO = FuncType.FUNCTION.seqType(Occ.ZERO_ONE);
   /** Zero of more functions. */
-  public static final SeqType FUNC_ZM = ANY_FUNC.seqType(Occ.ZERO_MORE);
+  public static final SeqType FUNC_ZM = FuncType.FUNCTION.seqType(Occ.ZERO_MORE);
   /** Single map. */
-  public static final SeqType MAP_O = ANY_MAP.seqType();
+  public static final SeqType MAP_O = MapType.MAP.seqType();
   /** Zero or one map. */
-  public static final SeqType MAP_ZO = ANY_MAP.seqType(Occ.ZERO_ONE);
+  public static final SeqType MAP_ZO = MapType.MAP.seqType(Occ.ZERO_ONE);
   /** Zero or more maps. */
-  public static final SeqType MAP_ZM = ANY_MAP.seqType(Occ.ZERO_MORE);
+  public static final SeqType MAP_ZM = MapType.MAP.seqType(Occ.ZERO_MORE);
   /** Single array. */
-  public static final SeqType ARRAY_O = ANY_ARRAY.seqType();
+  public static final SeqType ARRAY_O = ArrayType.ARRAY.seqType();
   /** Zero or more arrays. */
-  public static final SeqType ARRAY_ZM = ANY_ARRAY.seqType(Occ.ZERO_MORE);
+  public static final SeqType ARRAY_ZM = ArrayType.ARRAY.seqType(Occ.ZERO_MORE);
 
   /** Item type. */
   public final Type type;
@@ -573,7 +566,7 @@ public final class SeqType {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
     if(!one() && type instanceof FuncType) {
-      tb.addBraced("(", typeString(), ")");
+      tb.add('(').add(typeString()).add(')');
     } else {
       tb.add(typeString());
     }

@@ -37,7 +37,7 @@ public abstract class XQArray extends XQData {
    * Default constructor.
    */
   XQArray() {
-    super(SeqType.ANY_ARRAY);
+    super(ArrayType.ARRAY);
   }
 
   /**
@@ -398,8 +398,6 @@ public abstract class XQArray extends XQData {
 
   @Override
   public final String toString() {
-    if(arraySize() == 0) return "[]";
-
     final TokenBuilder tb = new TokenBuilder().add('[');
     final Iterator<Value> iter = iterator(0);
     for(boolean fst = true; iter.hasNext(); fst = false) {

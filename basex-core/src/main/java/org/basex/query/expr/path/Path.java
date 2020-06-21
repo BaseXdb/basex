@@ -624,7 +624,7 @@ public abstract class Path extends ParseExpr {
      * - previous expression yields nodes (otherwise, an error must be raised at runtime)
      * - last expression is no step, and yields a single result or no node */
     if(!type1.instanceOf(NodeType.NOD) || s2 instanceof Step || size() != 1 &&
-       !type2.instanceOf(AtomType.AAT) && !type2.instanceOf(SeqType.ANY_FUNC)) return this;
+       !type2.instanceOf(AtomType.AAT) && !type2.instanceOf(FuncType.FUNCTION)) return this;
 
     /* remove last step from new root expression. examples:
      * - (<a/>, <b/>)/map { name(): . }  ->  (<a/>, <b/>) ! map { name(): . }
@@ -1111,6 +1111,6 @@ public abstract class Path extends ParseExpr {
   public final String toString() {
     final TokenBuilder tb = new TokenBuilder();
     if(root != null) tb.add(root).add('/');
-    return tb.addSeparated(steps, "/", false).toString();
+    return tb.addAll(steps, "/").toString();
   }
 }

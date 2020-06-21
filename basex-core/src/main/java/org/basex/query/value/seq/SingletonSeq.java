@@ -98,7 +98,7 @@ public final class SingletonSeq extends Seq {
 
   @Override
   public String toString() {
-    return _UTIL_REPLICATE.args(value, size / value.size()).substring(1);
+    return _UTIL_REPLICATE.args(value, size / value.size()).trim();
   }
 
   // STATIC METHODS ===============================================================================

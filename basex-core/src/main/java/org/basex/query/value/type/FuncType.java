@@ -20,6 +20,11 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public class FuncType implements Type {
+  /** General function type. */
+  public static final FuncType FUNCTION = new FuncType(null, (SeqType[]) null);
+  /** Any function placeholder string. */
+  static final String[] WILDCARD = { "*" };
+
   /** Annotations. */
   public final AnnList anns;
   /** Return type of the function. */
@@ -83,17 +88,12 @@ public class FuncType implements Type {
   }
 
   @Override
-  public byte[] string() {
-    return token(FUNCTION);
-  }
-
-  @Override
   public FItem cast(final Item item, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
 
     if(!(item instanceof FItem)) throw typeError(item, this, ii);
     final FItem func = (FItem) item;
-    return this == SeqType.ANY_FUNC ? func : func.coerceTo(this, qc, ii, false);
+    return this == FUNCTION ? func : func.coerceTo(this, qc, ii, false);
   }
 
   @Override
@@ -114,8 +114,7 @@ public class FuncType implements Type {
     if(type.getClass() != FuncType.class) return false;
     final FuncType ft = (FuncType) type;
 
-    if(this == SeqType.ANY_FUNC || ft == SeqType.ANY_FUNC ||
-        argTypes.length != ft.argTypes.length) return false;
+    if(this == FUNCTION || ft == FUNCTION || argTypes.length != ft.argTypes.length) return false;
 
     final int al = argTypes.length;
     for(int a = 0; a < al; a++) {
@@ -126,8 +125,8 @@ public class FuncType implements Type {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(this == type || type == AtomType.ITEM || type == SeqType.ANY_FUNC) return true;
-    if(this == SeqType.ANY_FUNC || !(type instanceof FuncType) || type instanceof MapType ||
+    if(this == type || type == AtomType.ITEM || type == FUNCTION) return true;
+    if(this == FUNCTION || !(type instanceof FuncType) || type instanceof MapType ||
         type instanceof ArrayType) return false;
 
     final FuncType ft = (FuncType) type;
@@ -151,12 +150,12 @@ public class FuncType implements Type {
 
     final FuncType ft = (FuncType) type;
     final int al = argTypes.length;
-    if(al != ft.argTypes.length) return SeqType.ANY_FUNC;
+    if(al != ft.argTypes.length) return FUNCTION;
 
     final SeqType[] arg = new SeqType[al];
     for(int a = 0; a < al; a++) {
       arg[a] = argTypes[a].intersect(ft.argTypes[a]);
-      if(arg[a] == null) return SeqType.ANY_FUNC;
+      if(arg[a] == null) return FUNCTION;
     }
 
     final AnnList an = anns.union(ft.anns);
@@ -215,9 +214,9 @@ public class FuncType implements Type {
   public static Type find(final QNm name) {
     if(name.uri().length == 0) {
       final byte[] ln = name.local();
-      if(Token.eq(ln, token(FUNCTION))) return SeqType.ANY_FUNC;
-      if(Token.eq(ln, token(MAP))) return SeqType.ANY_MAP;
-      if(Token.eq(ln, token(ARRAY))) return SeqType.ANY_ARRAY;
+      if(Token.eq(ln, token(QueryText.FUNCTION))) return FUNCTION;
+      if(Token.eq(ln, token(QueryText.MAP))) return MapType.MAP;
+      if(Token.eq(ln, token(QueryText.ARRAY))) return ArrayType.ARRAY;
     }
     return null;
   }
@@ -255,11 +254,11 @@ public class FuncType implements Type {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(anns).add(FUNCTION);
-    if(this == SeqType.ANY_FUNC) {
+    final TokenBuilder tb = new TokenBuilder().add(anns).add(QueryText.FUNCTION);
+    if(this == FUNCTION) {
       tb.add("(*)");
     } else {
-      tb.addSeparated(argTypes, ", ", true).addSpaced(AS).add(declType);
+      tb.addAll(argTypes, ", ", true).addSpaced(AS).add(declType);
     }
     return tb.toString();
   }

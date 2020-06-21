@@ -5,7 +5,7 @@ import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
- * Container for inputs that are to be added to a database.
+ * Container for inputs that are to be appended to a database.
  *
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
@@ -20,10 +20,8 @@ public final class NewInput {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(Util.className(getClass())).add('[').add("path: \"").add(path).add("\", ");
-    if(node != null) tb.add("node");
-    else tb.add("io: ").add(io);
-    return tb.add(']').toString();
+    return new StringBuilder().append(Util.className(this)).append('[').append("path: \"").
+      append(path).append("\", ").append(node != null ? "node" : "io: " + io).
+      append(']').toString();
   }
 }

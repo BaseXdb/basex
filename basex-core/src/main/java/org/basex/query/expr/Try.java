@@ -197,7 +197,7 @@ public final class Try extends Single {
 
   @Override
   public String toString() {
-    return new TokenBuilder().add(TRY).addBraced(" { ", expr, " }").add(' ').
-        addSeparated(catches, " ", false).toString();
+    return new TokenBuilder().add(TRY).addBraced(" { ", expr, " }").add(' ').addAll(catches, " ").
+        toString();
   }
 }

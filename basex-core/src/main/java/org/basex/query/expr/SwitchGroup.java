@@ -151,7 +151,7 @@ public final class SwitchGroup extends Arr {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
     final int el = exprs.length;
-    for(int e = 1; e < el; ++e) tb.addSpaced(CASE).add(exprs[e]);
+    for(int e = 1; e < el; e++) tb.addSpaced(CASE).add(exprs[e]);
     if(el == 1) tb.add(' ').add(DEFAULT);
     return tb.addSpaced(RETURN).add(exprs[0]).toString();
   }

@@ -67,6 +67,6 @@ final class Insert extends StructuralUpdate {
 
   @Override
   public String toString() {
-    return "\n Insert: " + super.toString();
+    return "\nInsert: " + super.toString();
   }
 }

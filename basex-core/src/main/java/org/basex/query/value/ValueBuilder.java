@@ -11,7 +11,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * A builder for efficiently creating a {@link Value} by prepending and adding
+ * A builder for efficiently creating a {@link Value} by prepending and appending
  * {@link Item}s and {@link Value}s.
  *
  * @author BaseX Team 2005-20, BSD License
@@ -37,8 +37,8 @@ public final class ValueBuilder {
   /**
    * Constructor with initial items.
    * @param qc query context (required for interrupting running queries)
-   * @param item1 first item to add
-   * @param item2 second item to add
+   * @param item1 first item to append
+   * @param item2 second item to append
    */
   public ValueBuilder(final QueryContext qc, final Item item1, final Item item2) {
     this(qc);
@@ -85,8 +85,8 @@ public final class ValueBuilder {
   }
 
   /**
-   * adds an item to the built value.
-   * @param item item to add
+   * Appends an item to the built value.
+   * @param item item to append
    * @return reference to this builder for convenience
    */
   public ValueBuilder add(final Item item) {
@@ -107,8 +107,8 @@ public final class ValueBuilder {
   }
 
   /**
-   * adds a value to the built value.
-   * @param value value to add
+   * Appends a value to the built value.
+   * @param value value to append
    * @return reference to this builder for convenience
    */
   public ValueBuilder add(final Value value) {
@@ -165,13 +165,13 @@ public final class ValueBuilder {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(getClass()).add('[');
+    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
     final Iterator<Item> iter = firstValue != null ? firstValue.iterator() :
       builder != null ? builder.iterator() : Collections.emptyIterator();
     if(iter.hasNext()) {
-      tb.add(iter.next());
-      while(iter.hasNext()) tb.add(", ").add(iter.next());
+      sb.append(iter.next());
+      while(iter.hasNext()) sb.append(", ").append(iter.next());
     }
-    return tb.add(']').toString();
+    return sb.append(']').toString();
   }
 }

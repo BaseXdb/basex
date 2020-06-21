@@ -633,7 +633,7 @@ public final class TextEditor {
     if(ind != 0) {
       final StringBuilder spaces = new StringBuilder();
       for(int i = 0; i < ind; i++) spaces.append(' ');
-      v = new TokenBuilder().addSeparated(v.split("\n"), "\n" + spaces, false).toString();
+      v = new TokenBuilder().addAll(v.split("\n"), "\n" + spaces).toString();
     }
     // delete old string, add new one
     replace(p, pos, v);

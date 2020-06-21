@@ -17,8 +17,10 @@ import org.w3c.dom.*;
  * @author Christian Gruen
  */
 public final class FPI extends FNode {
-  /** Closing processing instruction. */
-  private static final byte[] CLOSE = { '?', '>' };
+  /** Opening characters. */
+  public static final byte[] OPEN = { '<', '?' };
+  /** Closing characters. */
+  public static final byte[] CLOSE = { '?', '>' };
 
   /** PI name. */
   private final QNm name;
@@ -79,7 +81,7 @@ public final class FPI extends FNode {
 
   @Override
   public String toString() {
-    return Util.info("<?% %?>", name.string(), toToken(value));
+    return Strings.concat(OPEN, name.string(), " ", toToken(value), CLOSE);
   }
 
   /**

@@ -253,7 +253,7 @@ public final class HttpClient {
     } else {
       // otherwise @media-type of <http:body/> is considered
       ct = request.payloadAtts.get(SerializerOptions.MEDIA_TYPE.name());
-      if(request.isMultipart) ct = Strings.concat(ct, "; ", BOUNDARY, '=', request.boundary());
+      if(request.isMultipart) ct = Strings.concat(ct, "; ", BOUNDARY, "=", request.boundary());
     }
     conn.setRequestProperty(CONTENT_TYPE, ct);
   }

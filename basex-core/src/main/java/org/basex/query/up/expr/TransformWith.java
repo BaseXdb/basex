@@ -1,6 +1,7 @@
 package org.basex.query.up.expr;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -92,6 +93,13 @@ public final class TransformWith extends Arr {
   }
 
   @Override
+  public int exprSize() {
+    int size = 1;
+    for(final Expr expr : exprs) size += expr.exprSize();
+    return size;
+  }
+
+  @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return copyType(new TransformWith(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
   }
@@ -103,13 +111,6 @@ public final class TransformWith extends Arr {
 
   @Override
   public String toString() {
-    return exprs[0] + " " + QueryText.UPDATE + " { " + exprs[1] + " }";
-  }
-
-  @Override
-  public int exprSize() {
-    int size = 1;
-    for(final Expr expr : exprs) size += expr.exprSize();
-    return size;
+    return exprs[0] + " " + UPDATE + " { " + exprs[1] + " }";
   }
 }
