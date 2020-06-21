@@ -186,13 +186,11 @@ public final class TypeswitchGroup extends Single {
    * @throws QueryException query exception
    */
   boolean match(final Value value, final QueryContext qc) throws QueryException {
-    for(final SeqType st : seqTypes) {
-      if(st.instance(value)) {
-        if(var != null && qc != null) qc.set(var, value);
-        return true;
-      }
-    }
-    return seqTypes.length == 0;
+    final int sl = seqTypes.length;
+    boolean found = sl == 0;
+    for(int s = 0; !found && s < sl; s++) found = seqTypes[s].instance(value);
+    if(found && var != null && qc != null) qc.set(var, value);
+    return found;
   }
 
   @Override

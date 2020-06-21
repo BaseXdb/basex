@@ -1525,4 +1525,12 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $a score $s in (<a/>, <b/>) where $a/self::a return $s", 0, root(GFLWOR.class));
     check("for $a score $s in <a/> where $a/self::a return $s", 0, root(GFLWOR.class));
   }
+
+  /** Typeswitch: default branch with variable. */
+  @Test public void gh1883() {
+    query(
+      "typeswitch(<x/> update delete node x) " +
+      " case $i as xs:int return '-' " +
+      " default $i return $i", "<x/>");
+  }
 }
