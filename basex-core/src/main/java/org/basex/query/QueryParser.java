@@ -2675,7 +2675,7 @@ public class QueryParser extends InputParser {
         if(atts == null) atts = new ArrayList<>(1);
         atts.add(attn);
         qnames.add(attn, false, info());
-        add(cont, new CAttr(sc, info(), attn, false, attv.finish()));
+        add(cont, new CAttr(sc, info(), false, attn, attv.finish()));
       }
       if(!consumeWS()) break;
     }
@@ -2710,7 +2710,7 @@ public class QueryParser extends InputParser {
 
     sc.ns.size(size);
     sc.elemNS = nse;
-    return new CElem(sc, info(), name, ns, cont.finish());
+    return new CElem(sc, info(), false, name, ns, cont.finish());
   }
 
   /**
@@ -2776,7 +2776,7 @@ public class QueryParser extends InputParser {
       final char ch = consumeContent();
       if(ch == '-' && consume('-')) {
         check('>');
-        return new CComm(sc, info(), Str.get(tb.finish()));
+        return new CComm(sc, info(), false, Str.get(tb.finish()));
       }
       tb.add(ch);
     } while(true);
@@ -2797,7 +2797,7 @@ public class QueryParser extends InputParser {
     do {
       final char ch = consumeContent();
       if(ch == '?' && consume('>')) {
-        return new CPI(sc, info(), Str.get(str), Str.get(tb.finish()));
+        return new CPI(sc, info(), false, Str.get(str), Str.get(tb.finish()));
       }
       if(!space) throw error(PIWRONG);
       tb.add(ch);
@@ -2855,7 +2855,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compDoc() throws QueryException {
-    return curr('{') ? new CDoc(sc, info(), enclosedExpr()) : null;
+    return curr('{') ? new CDoc(sc, info(), false, enclosedExpr()) : null;
   }
 
   /**
@@ -2880,7 +2880,7 @@ public class QueryParser extends InputParser {
     }
 
     skipWs();
-    return curr('{') ? new CElem(sc, info(), name, null, enclosedExpr()) : null;
+    return curr('{') ? new CElem(sc, info(), true, name, new Atts(), enclosedExpr()) : null;
   }
 
   /**
@@ -2904,7 +2904,7 @@ public class QueryParser extends InputParser {
     }
 
     skipWs();
-    return curr('{') ? new CAttr(sc, info(), name, true, enclosedExpr()) : null;
+    return curr('{') ? new CAttr(sc, info(), true, name, enclosedExpr()) : null;
   }
 
   /**
@@ -2924,7 +2924,7 @@ public class QueryParser extends InputParser {
       name = Str.get(str);
     }
     skipWs();
-    return curr('{') ? new CNSpace(sc, info(), name, enclosedExpr()) : null;
+    return curr('{') ? new CNSpace(sc, info(), true, name, enclosedExpr()) : null;
   }
 
   /**
@@ -2933,7 +2933,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compText() throws QueryException {
-    return curr('{') ? new CTxt(sc, info(), enclosedExpr()) : null;
+    return curr('{') ? new CTxt(sc, info(), true, enclosedExpr()) : null;
   }
 
   /**
@@ -2942,7 +2942,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compComment() throws QueryException {
-    return curr('{') ? new CComm(sc, info(), enclosedExpr()) : null;
+    return curr('{') ? new CComm(sc, info(), true, enclosedExpr()) : null;
   }
 
   /**
@@ -2964,7 +2964,7 @@ public class QueryParser extends InputParser {
     }
 
     skipWs();
-    return curr('{') ? new CPI(sc, info(), name, enclosedExpr()) : null;
+    return curr('{') ? new CPI(sc, info(), true, name, enclosedExpr()) : null;
   }
 
   /**

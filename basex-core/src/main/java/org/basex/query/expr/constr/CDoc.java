@@ -22,10 +22,12 @@ public final class CDoc extends CNode {
    * Constructor.
    * @param sc static context
    * @param info input info
+   * @param computed computed constructor
    * @param expr expression
    */
-  public CDoc(final StaticContext sc, final InputInfo info, final Expr expr) {
-    super(sc, info, SeqType.DOC_O, expr);
+  public CDoc(final StaticContext sc, final InputInfo info, final boolean computed,
+      final Expr expr) {
+    super(sc, info, SeqType.DOC_O, computed, expr);
   }
 
   @Override
@@ -43,7 +45,7 @@ public final class CDoc extends CNode {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new CDoc(sc, info, exprs[0].copy(cc, vm));
+    return new CDoc(sc, info, computed, exprs[0].copy(cc, vm));
   }
 
   @Override

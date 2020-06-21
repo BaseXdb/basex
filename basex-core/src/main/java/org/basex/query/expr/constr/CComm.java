@@ -24,10 +24,12 @@ public final class CComm extends CNode {
    * Constructor.
    * @param sc static context
    * @param info input info
+   * @param computed computed constructor
    * @param comment comment
    */
-  public CComm(final StaticContext sc, final InputInfo info, final Expr comment) {
-    super(sc, info, SeqType.COM_O, comment);
+  public CComm(final StaticContext sc, final InputInfo info, final boolean computed,
+      final Expr comment) {
+    super(sc, info, SeqType.COM_O, computed, comment);
   }
 
   @Override
@@ -52,7 +54,7 @@ public final class CComm extends CNode {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new CComm(sc, info, exprs[0].copy(cc, vm));
+    return new CComm(sc, info, computed, exprs[0].copy(cc, vm));
   }
 
   @Override

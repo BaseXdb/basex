@@ -17,17 +17,22 @@ import org.basex.util.*;
 public abstract class CNode extends Arr {
   /** Static context. */
   final StaticContext sc;
+  /** Computed constructor. */
+  final boolean computed;
 
   /**
    * Constructor.
    * @param sc static context
    * @param info input info
+   * @param computed computed constructor
    * @param seqType sequence type
    * @param exprs expressions
    */
-  CNode(final StaticContext sc, final InputInfo info, final SeqType seqType, final Expr... exprs) {
+  CNode(final StaticContext sc, final InputInfo info, final SeqType seqType, final boolean computed,
+      final Expr... exprs) {
     super(info, seqType, exprs);
     this.sc = sc;
+    this.computed = computed;
   }
 
   @Override
@@ -36,6 +41,11 @@ public abstract class CNode extends Arr {
   @Override
   public boolean has(final Flag... flags) {
     return Flag.CNS.in(flags) || super.has(flags);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return obj instanceof CNode && computed == ((CNode) obj).computed && super.equals(obj);
   }
 
   @Override

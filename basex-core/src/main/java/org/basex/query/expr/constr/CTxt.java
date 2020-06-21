@@ -28,10 +28,12 @@ public final class CTxt extends CNode {
    * Constructor.
    * @param sc static context
    * @param info input info
+   * @param computed computed constructor
    * @param text text
    */
-  public CTxt(final StaticContext sc, final InputInfo info, final Expr text) {
-    super(sc, info, SeqType.TXT_ZO, text);
+  public CTxt(final StaticContext sc, final InputInfo info, final boolean computed,
+      final Expr text) {
+    super(sc, info, SeqType.TXT_ZO, computed, text);
   }
 
   @Override
@@ -69,7 +71,7 @@ public final class CTxt extends CNode {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final CTxt ctxt = copyType(new CTxt(sc, info, exprs[0].copy(cc, vm)));
+    final CTxt ctxt = copyType(new CTxt(sc, info, computed, exprs[0].copy(cc, vm)));
     ctxt.simple = simple;
     return ctxt;
   }
