@@ -9,6 +9,7 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.func.Function;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -89,7 +90,9 @@ public final class TypeswitchGroup extends Single {
    * @throws QueryException query exception
    */
   Expr rewrite(final Expr cond, final CompileContext cc) throws QueryException {
-    if(var == null) return expr;
+    if(var == null) return cond.has(Flag.NDT) ?
+      new List(info, cc.function(Function._PROF_VOID, info, cond), expr).optimize(cc) : expr;
+
     final IntObjMap<Var> vm = new IntObjMap<>();
     final LinkedList<Clause> clauses = new LinkedList<>();
     clauses.add(new Let(cc.copy(var, vm), cond).optimize(cc));

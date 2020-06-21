@@ -78,47 +78,43 @@ public final class Typeswitch extends ParseExpr {
       if(group.removeTypes(ct, types, cc)) newGroups.add(group);
     }
     groups = newGroups.toArray(new TypeswitchGroup[0]);
-
-    Expr expr = this;
     final int gl = groups.length;
-    if(!cond.has(Flag.NDT)) {
-      // check if always the same branch will be chosen (most specific branches occur first)
-      TypeswitchGroup tg = null;
-      for(final TypeswitchGroup group : groups) {
-        if(tg == null && group.instance(ct)) tg = group;
-      }
-
-      // check if it's always the default branch that will be evaluated
-      if(tg == null) {
-        boolean opt = true;
-        for(int g = 0; opt && g < gl - 1; g++) opt = groups[g].isNever(ct);
-        if(opt) tg = groups[gl - 1];
-      }
-
-      // return first expression if all return expressions are equal
-      if(tg == null) {
-        boolean opt = true;
-        for(int g = 1; opt && g < gl; g++) opt = groups[0].expr.equals(groups[g].expr);
-        if(opt) tg = groups[0];
-      }
-
-      if(tg != null) {
-        expr = tg.rewrite(cond, cc);
-      } else if(gl < 3 && groups[0].seqTypes.length == 1) {
-        // one or two branches: rewrite to if expression
-        final Expr iff = new Instance(info, cond, groups[0].seqTypes[0]).optimize(cc);
-        final Expr thn = groups[0].rewrite(cond, cc), els = groups[1].rewrite(cond, cc);
-        expr = new If(info, iff, thn, els).optimize(cc);
-      }
-    }
-    if(expr != this) return cc.replaceWith(this, expr);
 
     // combine types of return expressions
     SeqType st = groups[0].seqType();
     for(int g = 1; g < gl; g++) st = st.union(groups[g].seqType());
     exprType.assign(st);
 
-    return this;
+    // check if always the same branch will be evaluated
+    Expr expr = this;
+    // choose branch that can be statically determined
+    TypeswitchGroup tg = null;
+    for(final TypeswitchGroup group : groups) {
+      if(tg == null && group.instance(ct)) tg = group;
+    }
+    // choose default branch if none of the branches will be chosen
+    if(tg == null) {
+      boolean opt = true;
+      for(int g = 0; opt && g < gl - 1; g++) opt = groups[g].isNever(ct);
+      if(opt) tg = groups[gl - 1];
+    }
+    // choose first branch if all return expressions are equal
+    if(tg == null) {
+      boolean opt = true;
+      for(int g = 1; opt && g < gl; g++) opt = groups[0].expr.equals(groups[g].expr);
+      if(opt) tg = groups[0];
+    }
+
+    if(tg != null) {
+      // rewrite chosen branch
+      expr = tg.rewrite(cond, cc);
+    } else if(gl < 3 && groups[0].seqTypes.length == 1 && !cond.has(Flag.NDT)) {
+      // otherwise, rewrite to if expression if one or two branches are left
+      final Expr iff = new Instance(info, cond, groups[0].seqTypes[0]).optimize(cc);
+      final Expr thn = groups[0].rewrite(cond, cc), els = groups[1].rewrite(cond, cc);
+      expr = new If(info, iff, thn, els).optimize(cc);
+    }
+    return cc.replaceWith(this, expr);
   }
 
   @Override
