@@ -124,7 +124,7 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
-  public String toString() {
-    return toString(' ' + FTOR + ' ');
+  public void plan(final QueryString qs) {
+    qs.tokens(exprs, ' ' + FTOR + ' ', true);
   }
 }

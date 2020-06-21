@@ -159,9 +159,8 @@ public final class Pos extends Arr {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(Function.POSITION).addSpaced("=").add(exprs[0]);
-    if(!eq()) tb.addSpaced(TO).add(exprs[1]);
-    return tb.toString();
+  public void plan(final QueryString qs) {
+    qs.token(Function.POSITION).token("=").token(exprs[0]);
+    if(!eq()) qs.token(TO).token(exprs[1]);
   }
 }

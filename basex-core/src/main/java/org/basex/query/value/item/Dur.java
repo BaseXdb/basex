@@ -246,7 +246,7 @@ public class Dur extends ADateDur {
   }
 
   @Override
-  public final String toString() {
-    return Token.string(toQuotedToken(string(null)));
+  public final void plan(final QueryString qs) {
+    qs.quoted(string(null));
   }
 }

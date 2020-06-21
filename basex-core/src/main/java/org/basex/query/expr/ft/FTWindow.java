@@ -132,7 +132,7 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public String toString() {
-    return super.toString() + WINDOW + ' ' + win + ' ' + unit;
+  public void plan(final QueryString qs) {
+    qs.token(exprs[0]).token(WINDOW).token(win).token(unit);
   }
 }

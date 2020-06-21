@@ -91,7 +91,7 @@ final class InvDocTest extends Test {
   }
 
   @Override
-  public String toString() {
-    return Strings.concat(NodeType.DOC.name, "(...)");
+  public void plan(final QueryString qs) {
+    qs.token(NodeType.DOC.name).paren("...");
   }
 }

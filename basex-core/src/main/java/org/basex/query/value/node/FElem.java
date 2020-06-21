@@ -419,7 +419,7 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public String toString() {
+  public void plan(final QueryString qs) {
     final byte[] nm = name.string();
     final TokenBuilder tb = new TokenBuilder().add('<').add(nm);
     if(ns != null) {
@@ -435,7 +435,7 @@ public final class FElem extends FNode {
       tb.add('>');
       final ANode child = children.get(0);
       if(child.type == NodeType.TXT && children.size() == 1) {
-        tb.add(toToken(child.value));
+        tb.add(QueryString.toValue(child.value));
       } else {
         tb.add(DOTS);
       }
@@ -443,6 +443,6 @@ public final class FElem extends FNode {
     } else {
       tb.add("/>");
     }
-    return tb.toString();
+    qs.token(tb.finish());
   }
 }

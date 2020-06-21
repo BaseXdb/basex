@@ -324,7 +324,7 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public final String toString() {
+  public void plan(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder();
     if(test == KindTest.NOD) {
       if(axis == Axis.PARENT) tb.add("..");
@@ -345,6 +345,7 @@ public abstract class Step extends Preds {
         add.apply(test);
       }
     }
-    return tb.add(super.toString()).toString();
+    qs.token(tb.finish());
+    super.plan(qs);
   }
 }

@@ -118,9 +118,9 @@ public final class StringRangeAccess extends IndexAccess {
   }
 
   @Override
-  public String toString() {
-    final Function func = index.type() == IndexType.TEXT ? Function._DB_TEXT_RANGE :
+  public void plan(final QueryString qs) {
+    final Function function = index.type() == IndexType.TEXT ? Function._DB_TEXT_RANGE :
       Function._DB_ATTRIBUTE_RANGE;
-    return func.args(db, Str.get(index.min), Str.get(index.max)).trim();
+    qs.function(function, db, Str.get(index.min), Str.get(index.max));
   }
 }

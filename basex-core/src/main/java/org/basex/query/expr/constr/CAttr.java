@@ -70,7 +70,16 @@ public final class CAttr extends CName {
   }
 
   @Override
-  public String toString() {
-    return toString(ATTRIBUTE);
+  public void plan(final QueryString qs) {
+    if(computed) {
+      plan(qs, ATTRIBUTE);
+    } else {
+      qs.token(((QNm) name).string()).token('=');
+      if(exprs.length == 1 && exprs[0] instanceof Str) {
+        qs.quoted(((Str) exprs[0]).string());
+      } else {
+        qs.token("\"{").tokens(exprs, SEP).token("}\"");
+      }
+    }
   }
 }

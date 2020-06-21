@@ -349,9 +349,7 @@ public abstract class Preds extends Arr {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    for(final Expr expr : exprs) tb.addBraced("[", expr, "]");
-    return tb.toString();
+  public void plan(final QueryString qs) {
+    for(final Expr expr : exprs) qs.bracket(expr);
   }
 }

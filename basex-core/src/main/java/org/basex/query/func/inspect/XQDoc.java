@@ -95,17 +95,17 @@ final class XQDoc extends Inspect {
       if(name.hasPrefix()) nsCache.put(name.prefix(), name.uri());
       annotations(sf.anns, function);
 
-      final TokenBuilder tb = new TokenBuilder();
-      tb.add(DECLARE).add(' ').add(sf.anns).add(FUNCTION).add(' ').add(name.string()).add('(');
+      final QueryString qs = new QueryString();
+      qs.token(DECLARE).token(sf.anns).token(FUNCTION).token(name.string()).token('(');
       for(int i = 0; i < al; i++) {
         final Var var = sf.params[i];
-        if(i > 0) tb.add(SEP);
-        tb.add(DOLLAR).add(var.name.string()).addSpaced(AS).add(tp.argTypes[i]);
+        if(i > 0) qs.token(SEP);
+        qs.concat(DOLLAR, var.name.string()).token(AS).token(tp.argTypes[i]);
       }
-      tb.add(')').addSpaced(AS).add(tp.declType);
-      if(sf.expr == null) tb.add(" external");
+      qs.token(')').token(AS).token(tp.declType);
+      if(sf.expr == null) qs.token("external");
 
-      elem("signature", function).add(tb.finish());
+      elem("signature", function).add(qs.toString());
       if(al != 0) {
         final FElem fparameters = elem("parameters", function);
         for(int a = 0; a < al; a++) {

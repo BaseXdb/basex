@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.core.locks.*;
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -88,7 +89,7 @@ public final class Root extends Simple {
   }
 
   @Override
-  public String toString() {
-    return "root()";
+  public void plan(final QueryString qs) {
+    qs.function(Function.ROOT);
   }
 }

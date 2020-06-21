@@ -150,8 +150,10 @@ public final class Let extends ForLet {
   }
 
   @Override
-  public String toString() {
-    return LET + ' ' + (scoring ? SCORE + ' ' : "") + var + ' ' + ASSIGN + ' ' + expr;
+  public void plan(final QueryString qs) {
+    qs.token(LET);
+    if(scoring) qs.token(SCORE);
+    qs.token(var).token(ASSIGN).token(expr);
   }
 
   /** Evaluator for a block of {@code let} expressions. */

@@ -1,7 +1,6 @@
 package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.value.array.XQArray;
@@ -96,6 +95,6 @@ public final class ArrayType extends FuncType {
   @Override
   public String toString() {
     final Object[] param = this == ARRAY ? WILDCARD : new Object[] { declType };
-    return new TokenBuilder().add(QueryText.ARRAY).add('(').addAll(param, SEP).add(')').toString();
+    return new QueryString().token(QueryText.ARRAY).params(param).toString();
   }
 }

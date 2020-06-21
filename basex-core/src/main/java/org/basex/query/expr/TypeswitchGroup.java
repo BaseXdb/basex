@@ -281,14 +281,14 @@ public final class TypeswitchGroup extends Single {
   }
 
   @Override
-  public String toString() {
-    final int sl = seqTypes.length;
-    final TokenBuilder tb = new TokenBuilder().add(' ').add(sl == 0 ? DEFAULT : CASE);
+  public void plan(final QueryString qs) {
+    final boolean cases = seqTypes.length > 0;
+    qs.token(cases ? CASE : DEFAULT);
     if(var != null) {
-      tb.add(' ').add(var);
-      if(sl > 0) tb.add(' ').add(AS);
+      qs.token(var);
+      if(cases) qs.token(AS);
     }
-    if(sl > 0) tb.add(' ').addAll(seqTypes, "|");
-    return tb.addSpaced(RETURN).add(expr).toString();
+    if(cases) qs.tokens(seqTypes, "|");
+    qs.token(RETURN).token(expr);
   }
 }

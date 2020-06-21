@@ -1,5 +1,6 @@
 package org.basex.query.expr.path;
 
+import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -91,7 +92,7 @@ public class KindTest extends Test {
   }
 
   @Override
-  public String toString() {
-    return type.toString();
+  public void plan(final QueryString qs) {
+    qs.token(type);
   }
 }

@@ -161,8 +161,8 @@ public final class MainModule extends AModule {
   }
 
   @Override
-  public String toString() {
-    return expr.toString();
+  public void plan(final QueryString qs) {
+    qs.token(expr);
   }
 
   /**

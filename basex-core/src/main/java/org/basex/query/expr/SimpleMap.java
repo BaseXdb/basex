@@ -357,7 +357,7 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
-  public final String toString() {
-    return new TokenBuilder().addAll(exprs, " ! ", true).toString();
+  public void plan(final QueryString qs) {
+    qs.tokens(exprs, " ! ");
   }
 }

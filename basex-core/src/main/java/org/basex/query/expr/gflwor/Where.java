@@ -129,7 +129,7 @@ public final class Where extends Clause {
   }
 
   @Override
-  public String toString() {
-    return WHERE + ' ' + expr;
+  public void plan(final QueryString qs) {
+    qs.token(WHERE).token(expr);
   }
 }

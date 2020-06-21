@@ -19,6 +19,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Function item.
@@ -279,30 +280,26 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public String toErrorString() {
-    return toString(true);
+    final QueryString qs = new QueryString();
+    final StringList list = new StringList(params.length);
+    for(final Var param : params) list.add(param.toErrorString());
+    toString(qs, list.finish());
+    return qs.toString();
   }
 
   @Override
-  public String toString() {
-    return toString(false);
+  public void plan(final QueryString qs) {
+    toString(qs, params);
   }
 
   /**
-   * Returns a string representation.
-   * @param error error flag
-   * @return string
+   * Creates a string representation.
+   * @param qs query string builder
+   * @param list list of parameters
    */
-  private String toString(final boolean error) {
-    final TokenBuilder tb = new TokenBuilder();
-    if(name != null) tb.add("(: ").add(name.prefixId()).add("#").addInt(arity()).add(" :) ");
-    tb.add(anns).add(FUNCTION).add('(');
-    final int pl = params.length;
-    for(int p = 0; p < pl; p++) {
-      if(p != 0) tb.add(", ");
-      tb.add(error ? params[p].toErrorString() : params[p]);
-    }
-    tb.add(')').addSpaced(AS).add(funcType().declType).addBraced(" { ", expr, " }");
-    return tb.toString();
+  private void toString(final QueryString qs, final Object[] list) {
+    if(name != null) qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
+    qs.token(anns).token(FUNCTION).params(list).token(AS).token(funcType().declType).brace(expr);
   }
 
   /**

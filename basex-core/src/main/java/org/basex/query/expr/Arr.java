@@ -359,15 +359,4 @@ public abstract class Arr extends ParseExpr {
   public void plan(final QueryPlan plan) {
     plan.add(plan.create(this), exprs);
   }
-
-  /**
-   * Returns a string representation of this expression.
-   * Separates the array entries with the specified separator.
-   * @param separator separator (operator, delimiter); if {@code null}, separated with comma
-   * @return string representation
-   */
-  protected String toString(final String separator) {
-    final String sep = separator == null ? SEP : (' ' + separator + ' ');
-    return new TokenBuilder().addAll(exprs, sep, true).toString();
-  }
 }

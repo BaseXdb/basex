@@ -126,7 +126,7 @@ final class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public String toString() {
-    return Strings.concat('$', name.string());
+  public void plan(final QueryString qs) {
+    qs.concat("$", name.string());
   }
 }

@@ -82,7 +82,7 @@ public final class CTxt extends CNode {
   }
 
   @Override
-  public String toString() {
-    return toString(TEXT);
+  public void plan(final QueryString qs) {
+    plan(qs, TEXT);
   }
 }

@@ -312,13 +312,11 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    final Function func = type == IndexType.TEXT ? Function._DB_TEXT : type == IndexType.ATTRIBUTE
-        ? Function._DB_ATTRIBUTE : Function._DB_TOKEN;
-    tb.add(func.args(db, toExpr()).trim());
-    if(test != null) tb.add("/parent::").add(test);
-    return tb.toString();
+  public void plan(final QueryString qs) {
+    final Function function = type == IndexType.TEXT ? Function._DB_TEXT :
+      type == IndexType.ATTRIBUTE ? Function._DB_ATTRIBUTE : Function._DB_TOKEN;
+    qs.function(function, db, toExpr());
+    if(test != null) qs.token('/').token("parent::").token(test);
   }
 
   /**

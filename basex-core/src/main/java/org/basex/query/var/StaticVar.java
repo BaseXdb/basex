@@ -181,12 +181,11 @@ public final class StaticVar extends StaticDecl {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(DECLARE).add(' ').add(anns);
-    tb.add(VARIABLE).add(' ').add(name());
-    if(declType != null) tb.add(' ').add(AS).add(' ').add(declType);
-    if(external) tb.add(' ').add(EXTERNAL);
-    if(expr != null) tb.add(' ').add(ASSIGN).add(' ').add(expr);
-    return tb.add(';').toString();
+  public void plan(final QueryString qs) {
+    qs.token(DECLARE).token(anns).token(VARIABLE).token(name());
+    if(declType != null) qs.token(AS).token(declType);
+    if(external) qs.token(EXTERNAL);
+    if(expr != null) qs.token(ASSIGN).token(expr);
+    qs.token(';');
   }
 }

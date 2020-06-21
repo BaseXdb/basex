@@ -1,7 +1,6 @@
 package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
@@ -254,12 +253,9 @@ public class FuncType implements Type {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(anns).add(QueryText.FUNCTION);
-    if(this == FUNCTION) {
-      tb.add("(*)");
-    } else {
-      tb.addAll(argTypes, ", ", true).addSpaced(AS).add(declType);
-    }
-    return tb.toString();
+    final QueryString qs = new QueryString().token(anns).token(QueryText.FUNCTION);
+    if(this == FUNCTION) qs.params(WILDCARD);
+    else qs.params(argTypes).token(QueryText.AS).token(declType);
+    return qs.toString();
   }
 }

@@ -37,6 +37,12 @@ public abstract class ExprInfo {
   public abstract void plan(QueryPlan plan);
 
   /**
+   * Creates a query string.
+   * @param qs query string builder
+   */
+  public abstract void plan(QueryString qs);
+
+  /**
    * Returns a string representation of the expression that can be embedded in error messages.
    * Defaults to {@link #toString()}.
    * @return class name
@@ -46,5 +52,7 @@ public abstract class ExprInfo {
   }
 
   @Override
-  public abstract String toString();
+  public final String toString() {
+    return new QueryString().token(this).toString();
+  }
 }

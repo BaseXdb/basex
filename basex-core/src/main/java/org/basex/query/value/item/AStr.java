@@ -65,7 +65,7 @@ public abstract class AStr extends Item {
   }
 
   @Override
-  public String toString() {
-    return Token.string(toQuotedToken(value));
+  public void plan(final QueryString qs) {
+    qs.quoted(value);
   }
 }

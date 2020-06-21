@@ -167,11 +167,11 @@ abstract class CName extends CNode {
   }
 
   @Override
-  protected final String toString(final String kind) {
-    final TokenBuilder tb = new TokenBuilder().add(kind).add(' ');
-    if(name instanceof Str) tb.add(((Str) name).string());
-    else if(name instanceof QNm) tb.add(((QNm) name).id());
-    else tb.add("{ ").addExt(name).add(" }");
-    return super.toString(tb.toString());
+  public final void plan(final QueryString qs, final String kind) {
+    qs.token(kind);
+    if(name instanceof Str) qs.token(((Str) name).string());
+    else if(name instanceof QNm) qs.token(((QNm) name).id());
+    else qs.brace(name);
+    super.plan(qs, null);
   }
 }

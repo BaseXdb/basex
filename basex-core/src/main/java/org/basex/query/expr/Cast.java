@@ -99,7 +99,7 @@ public final class Cast extends Single {
   }
 
   @Override
-  public String toString() {
-    return expr + " " + CAST + ' ' + AS + ' ' + seqType;
+  public void plan(final QueryString qs) {
+    qs.token(expr).token(CAST).token(AS).token(seqType);
   }
 }

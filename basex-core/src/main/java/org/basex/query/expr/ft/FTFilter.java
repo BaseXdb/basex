@@ -119,9 +119,4 @@ public abstract class FTFilter extends FTExpr {
   public boolean equals(final Object obj) {
     return obj instanceof FTFilter && unit == ((FTFilter) obj).unit && super.equals(obj);
   }
-
-  @Override
-  public String toString() {
-    return exprs[0] + " ";
-  }
 }

@@ -1,10 +1,11 @@
 package org.basex.query.expr.constr;
 
+import static org.basex.query.QueryText.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -53,10 +54,15 @@ public abstract class CNode extends Arr {
     return Token.string(((NodeType) seqType().type).name) + " constructor";
   }
 
-  @Override
-  protected String toString(final String kind) {
-    final TokenBuilder tb = new TokenBuilder().add(kind).add(" { ");
-    if(exprs.length > 0 && exprs[0] != Empty.VALUE) tb.add(super.toString(null)).add(' ');
-    return tb.add('}').toString();
+  /**
+   * Adds the expression with the specified separator to the query string.
+   * @param qs query string builder
+   * @param kind node kind
+   */
+  protected void plan(final QueryString qs, final String kind) {
+    if(kind != null) qs.token(kind);
+    qs.token("{");
+    if(exprs.length > 0) qs.tokens(exprs, SEP, false);
+    qs.token(" }");
   }
 }

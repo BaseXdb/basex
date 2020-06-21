@@ -112,8 +112,8 @@ public final class Bln extends Item {
   }
 
   @Override
-  public String toString() {
-    return Strings.concat(value ? Token.TRUE : Token.FALSE, "()");
+  public void plan(final QueryString qs) {
+    qs.token(value ? Token.TRUE : Token.FALSE).paren("");
   }
 
   // STATIC METHODS ===============================================================================

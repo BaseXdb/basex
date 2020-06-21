@@ -90,13 +90,13 @@ public final class CMap extends Arr {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(MAP).add(" {");
+  public void plan(final QueryString qs) {
+    qs.token(MAP).token(" {");
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
-      if(e != 0) tb.add(',');
-      tb.add(' ').add(exprs[e]).add(": ").add(exprs[e + 1]);
+      if(e != 0) qs.token(SEP);
+      qs.token(exprs[e]).token(": ").token(exprs[e + 1]);
     }
-    return tb.add(" }").toString();
+    qs.token(" }");
   }
 }

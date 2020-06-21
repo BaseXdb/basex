@@ -160,10 +160,9 @@ public final class Lookup extends Arr {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    if(exprs.length > 1) tb.add(exprs[1]);
-    tb.add('?');
+  public void plan(final QueryString qs) {
+    if(exprs.length > 1) qs.token(exprs[1]);
+    qs.token('?');
 
     final Expr keys = exprs[0];
     Object key = null;
@@ -176,8 +175,7 @@ public final class Lookup extends Arr {
       final long l = ((Int) keys).itr();
       if(l >= 0) key = l;
     }
-    if(key != null) tb.add(key);
-    else tb.addBraced("(", keys, ")");
-    return tb.toString();
+    if(key != null) qs.token(key);
+    else qs.paren(keys);
   }
 }

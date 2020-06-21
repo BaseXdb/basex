@@ -251,7 +251,7 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public String toString() {
-    return toString(opV.toString());
+  public void plan(final QueryString qs) {
+    qs.tokens(exprs, " " + opV + ' ', false);
   }
 }

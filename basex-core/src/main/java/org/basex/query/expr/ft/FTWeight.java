@@ -1,6 +1,7 @@
 package org.basex.query.expr.ft;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -146,7 +147,7 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public String toString() {
-    return exprs[0] + " " + QueryText.WEIGHT + " {" + weight + "} ";
+  public void plan(final QueryString qs) {
+    qs.token(exprs[0]).token(WEIGHT).brace(weight);
   }
 }

@@ -291,51 +291,12 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder addAll(final Object[] objects, final String separator) {
-    return addAll(objects, separator, false);
-  }
-
-  /**
-   * Adds multiple strings to the token, separated by the specified string.
-   * @param objects the object to be added
-   * @param separator separator string
-   * @param parentheses wrap with parentheses
-   * @return self reference
-   */
-  public TokenBuilder addAll(final Object[] objects, final String separator,
-      final boolean parentheses) {
-
-    if(parentheses) add('(');
     final int ol = objects.length;
     for(int o = 0; o < ol; o++) {
       if(o > 0) add(separator);
       add(objects[o]);
     }
-    if(parentheses) add(')');
     return this;
-  }
-
-  /**
-   * Adds a braced string to the token. Parentheses from the specified bject are chopped.
-   * @param open opening brace
-   * @param object the object to be added
-   * @param close closing brace
-   * @return self reference
-   */
-  public TokenBuilder addBraced(final String open, final Object object, final String close) {
-    String string = object.toString();
-    if(Strings.startsWith(string, '(') && Strings.endsWith(string, ')')) {
-      string = string.substring(1, string.length() - 1);
-    }
-    return add(open).add(string).add(close);
-  }
-
-  /**
-   * Adds a string surrounded by spaces.
-   * @param object the object to be added
-   * @return self reference
-   */
-  public TokenBuilder addSpaced(final Object object) {
-    return add(' ').add(object).add(' ');
   }
 
   /**

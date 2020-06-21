@@ -56,7 +56,7 @@ public final class FTExtension extends FTExpr {
   }
 
   @Override
-  public String toString() {
-    return new TokenBuilder().add(pragma).addBraced("{ ", exprs[0], " }").toString();
+  public void plan(final QueryString qs) {
+    qs.token(pragma).brace(exprs[0]);
   }
 }

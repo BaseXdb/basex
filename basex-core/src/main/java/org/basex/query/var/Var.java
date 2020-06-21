@@ -289,14 +289,13 @@ public final class Var extends ExprInfo {
   }
 
   @Override
-  public String toErrorString() {
-    return Strings.concat(DOLLAR, name.string());
+  public void plan(final QueryString qs) {
+    qs.concat(DOLLAR, name.string(), '_', id);
+    if(declType != null) qs.token(AS).token(declType);
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(toErrorString()).add('_').addInt(id);
-    if(declType != null) tb.add(' ').add(QueryText.AS).add(' ').add(declType);
-    return tb.toString();
+  public String toErrorString() {
+    return Strings.concat(DOLLAR, name.string());
   }
 }

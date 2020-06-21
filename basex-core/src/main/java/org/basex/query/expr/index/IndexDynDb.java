@@ -102,7 +102,7 @@ public final class IndexDynDb extends IndexDb {
   }
 
   @Override
-  public String toString() {
-    return Function._DB_NAME.args(expr);
+  public void plan(final QueryString qs) {
+    qs.function(Function._DB_NAME, expr);
   }
 }

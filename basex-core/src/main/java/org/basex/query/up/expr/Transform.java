@@ -154,11 +154,11 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(COPY).add(' ');
+  public void plan(final QueryString qs) {
+    qs.token(COPY);
     for(final Let copy : copies) {
-      tb.add(copy.var).addSpaced(ASSIGN).add(copy.expr).add(' ');
+      qs.token(copy.var).token(ASSIGN).token(copy.expr);
     }
-    return tb.add(MODIFY).addSpaced(exprs[0]).add(RETURN).add(' ').add(exprs[1]).toString();
+    qs.token(MODIFY).token(exprs[0]).token(RETURN).token(exprs[1]);
   }
 }

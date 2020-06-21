@@ -1,6 +1,7 @@
 package org.basex.query.value.node;
 
 import org.basex.data.*;
+import org.basex.query.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.value.type.*;
 import org.basex.util.ft.*;
@@ -72,7 +73,8 @@ public final class FTNode extends DBNode {
   }
 
   @Override
-  public String toString() {
-    return super.toString() + (matches != null ? " (" + matches.size() + ')' : "");
+  public void plan(final QueryString qs) {
+    super.plan(qs);
+    if(matches != null) qs.paren(matches.size());
   }
 }

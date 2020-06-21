@@ -81,11 +81,10 @@ public final class OrderKey extends Single {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(expr);
-    if(desc) tb.add(' ').add(DESCENDING);
-    tb.add(' ').add(EMPTYY).add(' ').add(least ? LEAST : GREATEST);
-    if(coll != null) tb.add(' ').add(COLLATION).add(" \"").add(coll.uri()).add('"');
-    return tb.toString();
+  public void plan(final QueryString qs) {
+    qs.token(expr);
+    if(desc) qs.token(DESCENDING);
+    qs.token(EMPTYY).token(least ? LEAST : GREATEST);
+    if(coll != null) qs.token(COLLATION).token("\"").token(coll.uri()).token('"');
   }
 }

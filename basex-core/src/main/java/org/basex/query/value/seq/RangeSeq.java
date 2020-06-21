@@ -126,9 +126,13 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public String toString() {
+  public void plan(final QueryString qs) {
     final long[] range = range(false);
-    final String arg = range[0] + " " + TO + ' ' + range[1];
-    return asc ? "(" + arg + ")" : Function.REVERSE.args(' ' + arg).trim();
+    final String arg = new QueryString().token(range[0]).token(TO).token(range[1]).toString();
+    if(asc) {
+      qs.paren(arg);
+    } else {
+      qs.function(Function.REVERSE, ' ' + arg);
+    }
   }
 }

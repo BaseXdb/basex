@@ -88,7 +88,7 @@ public final class Arith extends Arr {
   }
 
   @Override
-  public String toString() {
-    return toString(calc.name);
+  public void plan(final QueryString qs) {
+    qs.tokens(exprs, ' ' + calc.name + ' ', true);
   }
 }

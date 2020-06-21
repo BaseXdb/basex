@@ -450,41 +450,45 @@ public class DBNode extends ANode {
 
   @Override
   public String toErrorString() {
-    return toString(false);
+    final QueryString qs = new QueryString();
+    plan(qs, true);
+    return qs.toString();
   }
 
   @Override
-  public String toString() {
-    return toString(!data.inMemory());
+  public void plan(final QueryString qs) {
+    plan(qs, false);
   }
 
   /**
    * Returns a string representation of the sequence.
-   * @param func display function representation
-   * @return string
+   * @param qs query string builder
+   * @param error error representation
    */
-  private String toString(final boolean func) {
-    if(func) return Function._DB_OPEN_PRE.args(data.meta.name, pre).trim();
-
-    final NodeType nd = (NodeType) type;
-    final TokenBuilder tb = new TokenBuilder().add(nd.name).add(' ');
-    switch(nd) {
-      case ATT:
-      case PI:
-        tb.add(name()).add(" {").add(toQuotedToken(string())).add('}');
-        break;
-      case ELM:
-        tb.add(name()).add(" {");
-        if(hasChildren() || attributeIter().size() != 0) tb.add(Text.DOTS);
-        tb.add('}');
-        break;
-      case DOC:
-        tb.add('{').add(toQuotedToken(data.text(pre, true))).add('}');
-        break;
-      default:
-        tb.add('{').add(toQuotedToken(string())).add('}');
-        break;
+  private void plan(final QueryString qs, final boolean error) {
+    if(error || data.inMemory()) {
+      switch((NodeType) type) {
+        case ATT:
+          qs.concat(name(), "=", QueryString.toQuoted(string()));
+          break;
+        case PI:
+          qs.concat(FPI.OPEN, name(), " ", QueryString.toValue(string()), FPI.CLOSE);
+          break;
+        case ELM:
+          qs.concat("<", name(), hasChildren() || attributeIter().size() > 0 ? DOTS : "", "/>");
+          break;
+        case DOC:
+          qs.token(DOCUMENT).brace(QueryString.toQuoted(baseURI()));
+          break;
+        case COM:
+          qs.concat("<!--", QueryString.toValue(string()), "-->");
+          break;
+        default:
+          qs.quoted(string());
+          break;
+      }
+    } else {
+      qs.function(Function._DB_OPEN_PRE, data.meta.name, pre);
     }
-    return tb.toString();
   }
 }

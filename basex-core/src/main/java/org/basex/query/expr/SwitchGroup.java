@@ -148,11 +148,10 @@ public final class SwitchGroup extends Arr {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
+  public void plan(final QueryString qs) {
     final int el = exprs.length;
-    for(int e = 1; e < el; e++) tb.addSpaced(CASE).add(exprs[e]);
-    if(el == 1) tb.add(' ').add(DEFAULT);
-    return tb.addSpaced(RETURN).add(exprs[0]).toString();
+    for(int e = 1; e < el; e++) qs.token(CASE).token(exprs[e]);
+    if(el == 1) qs.token(DEFAULT);
+    qs.token(RETURN).token(exprs[0]);
   }
 }

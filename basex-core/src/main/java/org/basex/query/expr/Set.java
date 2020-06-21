@@ -242,8 +242,8 @@ abstract class Set extends Arr {
   }
 
   @Override
-  public final String toString() {
-    return "(" + toString(Util.className(this).toLowerCase(Locale.ENGLISH)) + ")";
+  public final void plan(final QueryString qs) {
+    qs.tokens(exprs, ' ' + Util.className(this).toLowerCase(Locale.ENGLISH) + ' ', true);
   }
 
   /**

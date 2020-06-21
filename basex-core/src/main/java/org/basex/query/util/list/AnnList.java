@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.ann.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -110,10 +109,11 @@ public final class AnnList extends ObjectList<Ann, AnnList> {
     return new Ann[s];
   }
 
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    for(final Ann ann : this) tb.add(ann);
-    return tb.toString();
+  /**
+   * Adds the annotations to a query string.
+   * @param qs query string builder
+   */
+  public void plan(final QueryString qs) {
+    for(final Ann ann : this) ann.plan(qs);
   }
 }

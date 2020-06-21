@@ -392,7 +392,7 @@ public abstract class JavaCall extends Arr {
   }
 
   @Override
-  public final String toString() {
-    return desc() + toString(null);
+  public void plan(final QueryString qs) {
+    qs.token(desc()).params(exprs);
   }
 }

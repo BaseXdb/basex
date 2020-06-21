@@ -136,7 +136,7 @@ public final class Empty extends Item {
   }
 
   @Override
-  public String toString() {
-    return "()";
+  public void plan(final QueryString qs) {
+    qs.paren("");
   }
 }

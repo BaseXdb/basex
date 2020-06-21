@@ -213,11 +213,9 @@ public final class CmpSR extends Single {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    if(min != null) tb.add(expr).addSpaced(mni ? ">=" : ">").add(Item.toQuotedToken(min));
-    if(min == null && max == null) tb.addSpaced(AND);
-    if(max != null) tb.add(expr).addSpaced(mxi ? "<=" : "<").add(Item.toQuotedToken(max));
-    return "(" + tb + ")";
+  public void plan(final QueryString qs) {
+    if(min != null) qs.token(expr).token(mni ? ">=" : ">").quoted(min);
+    if(min == null && max == null) qs.token(AND);
+    if(max != null) qs.token(expr).token(mxi ? "<=" : "<").quoted(max);
   }
 }

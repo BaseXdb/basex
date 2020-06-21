@@ -517,30 +517,28 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
+  public void plan(final QueryString qs) {
     if(query instanceof AStr) {
-      tb.add(query);
+      qs.token(query);
     } else {
-      tb.addBraced("{ ", query, " }");
+      qs.brace(query);
     }
     switch(mode) {
       case ALL:
-        tb.add(' ').add(ALL);
+        qs.token(ALL);
         break;
       case ALL_WORDS:
-        tb.add(' ').add(ALL).add(' ').add(WORDS);
+        qs.token(ALL).token(WORDS);
         break;
       case ANY_WORD:
-        tb.add(' ').add(ANY).add(' ').add(WORD);
+        qs.token(ANY).token(WORD);
         break;
       case PHRASE:
-        tb.add(' ').add(PHRASE);
+        qs.token(PHRASE);
         break;
       default:
     }
-    if(occ != null) tb.add(OCCURS).addSpaced(occ[0]).add(TO).addSpaced(occ[1]).add(TIMES);
-    if(ftOpt != null) tb.add(ftOpt);
-    return tb.toString();
+    if(occ != null) qs.token(OCCURS).token(occ[0]).token(TO).token(occ[1]).token(TIMES);
+    if(ftOpt != null) qs.token(ftOpt);
   }
 }

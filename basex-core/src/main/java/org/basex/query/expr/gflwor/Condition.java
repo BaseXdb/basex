@@ -194,15 +194,14 @@ public final class Condition extends Single {
     if(next != null) plan.addElement(elem, plan.create(NEXT, next));
     plan.add(elem, expr);
   }
-
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(start ? START : END);
-    if(item != null) tb.add(' ').add(item);
-    if(pos  != null) tb.addSpaced(AT).add(pos);
-    if(prev != null) tb.addSpaced(PREVIOUS).add(prev);
-    if(next != null) tb.addSpaced(NEXT).add(next);
-    return tb.addSpaced(WHEN).add(expr).toString();
+  public void plan(final QueryString qs) {
+    qs.token(start ? START : END);
+    if(item != null) qs.token(item);
+    if(pos  != null) qs.token(AT).token(pos);
+    if(prev != null) qs.token(PREVIOUS).token(prev);
+    if(next != null) qs.token(NEXT).token(next);
+    qs.token(WHEN).token(expr);
   }
 }
 

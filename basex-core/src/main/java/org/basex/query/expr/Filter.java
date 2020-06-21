@@ -278,7 +278,8 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final String toString() {
-    return root + super.toString();
+  public final void plan(final QueryString qs) {
+    qs.token(root);
+    super.plan(qs);
   }
 }

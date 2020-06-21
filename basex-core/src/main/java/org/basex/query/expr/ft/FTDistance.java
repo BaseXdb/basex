@@ -138,7 +138,7 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public String toString() {
-    return super.toString() + DISTANCE + '(' + min + "-" + max + ' ' + unit + ')';
+  public void plan(final QueryString qs) {
+    qs.token(exprs[0]).token(DISTANCE).paren(min + "-" + max + ' ' + unit);
   }
 }

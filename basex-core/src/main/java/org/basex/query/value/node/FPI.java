@@ -80,8 +80,8 @@ public final class FPI extends FNode {
   }
 
   @Override
-  public String toString() {
-    return Strings.concat(OPEN, name.string(), " ", toToken(value), CLOSE);
+  public void plan(final QueryString qs) {
+    qs.concat(OPEN, name.string(), " ", QueryString.toValue(value), CLOSE);
   }
 
   /**

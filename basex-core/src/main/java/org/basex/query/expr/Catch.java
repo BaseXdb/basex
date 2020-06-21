@@ -225,13 +225,13 @@ public final class Catch extends Single {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(CATCH).add(' ');
+  public void plan(final QueryString qs) {
+    qs.token(CATCH);
     int c = 0;
     for(final NameTest test : tests) {
-      if(c++ > 0) tb.add('|');
-      tb.add(test != null ? test.toString(false) : "*");
+      if(c++ > 0) qs.token('|');
+      qs.token(test != null ? test.toString(false) : "*");
     }
-    return tb.addBraced(" { ", expr, " }").toString();
+    qs.brace(expr);
   }
 }

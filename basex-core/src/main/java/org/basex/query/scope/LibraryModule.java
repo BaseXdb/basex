@@ -40,7 +40,6 @@ public final class LibraryModule extends AModule {
   }
 
   @Override
-  public String toString() {
-    return "";
+  public void plan(final QueryString qs) {
   }
 }

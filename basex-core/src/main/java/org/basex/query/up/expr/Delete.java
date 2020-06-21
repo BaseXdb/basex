@@ -58,7 +58,7 @@ public final class Delete extends Update {
   }
 
   @Override
-  public String toString() {
-    return DELETE + ' ' + NODES + ' ' + exprs[0];
+  public void plan(final QueryString qs) {
+    qs.token(DELETE).token(NODES).token(exprs[0]);
   }
 }

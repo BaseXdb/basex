@@ -1,5 +1,6 @@
 package org.basex.query.expr.ft;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
@@ -48,7 +49,7 @@ public final class FTOrder extends FTFilter {
   }
 
   @Override
-  public String toString() {
-    return super.toString() + QueryText.ORDERED;
+  public void plan(final QueryString qs) {
+    qs.token(exprs[0]).token(ORDERED);
   }
 }

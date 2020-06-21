@@ -401,7 +401,7 @@ public class CmpG extends Cmp {
   }
 
   @Override
-  public final String toString() {
-    return toString(op.toString());
+  public final void plan(final QueryString qs) {
+    qs.tokens(exprs, " " + op + ' ', false);
   }
 }

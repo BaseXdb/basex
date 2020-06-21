@@ -397,8 +397,8 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public final String toString() {
-    final TokenBuilder tb = new TokenBuilder().add('[');
+  public void plan(final QueryString qs) {
+    final TokenBuilder tb = new TokenBuilder();
     final Iterator<Value> iter = iterator(0);
     for(boolean fst = true; iter.hasNext(); fst = false) {
       tb.add(fst ? " " : ", ");
@@ -411,6 +411,6 @@ public abstract class XQArray extends XQData {
       }
       if(vs != 1) tb.add(')');
     }
-    return tb.add(" ]").toString();
+    qs.bracket(tb.add(' ').finish());
   }
 }

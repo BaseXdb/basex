@@ -110,7 +110,7 @@ public final class TransformWith extends Arr {
   }
 
   @Override
-  public String toString() {
-    return exprs[0] + " " + UPDATE + " { " + exprs[1] + " }";
+  public void plan(final QueryString qs) {
+    qs.token(exprs[0]).token(UPDATE).brace(exprs[1]);
   }
 }

@@ -169,14 +169,13 @@ public final class ItrPos extends Simple {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(Function.POSITION);
+  public void plan(final QueryString qs) {
+    qs.token(Function.POSITION);
     if(max == MAX_VALUE) {
-      tb.addSpaced(">=").add(min);
+      qs.token(">=").token(min);
     } else {
-      tb.addSpaced("=").add(min);
-      if(min != max) tb.addSpaced(TO).add(max);
+      qs.token("=").token(min);
+      if(min != max) qs.token(TO).token(max);
     }
-    return tb.toString();
   }
 }

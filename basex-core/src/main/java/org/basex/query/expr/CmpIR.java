@@ -198,15 +198,13 @@ public final class CmpIR extends Single {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
+  public void plan(final QueryString qs) {
     if(min == max) {
-      tb.add(expr).add(" = ").add(min);
+      qs.token(expr).token("=").token(min);
     } else {
-      if(min != MIN_VALUE) tb.add(expr).add(" >= ").add(min);
-      if(min != MIN_VALUE && max != MAX_VALUE) tb.addSpaced(AND);
-      if(max != MAX_VALUE) tb.add(expr).add(" <= ").add(max);
+      if(min != MIN_VALUE) qs.token(expr).token(">=").token(min);
+      if(min != MIN_VALUE && max != MAX_VALUE) qs.token(AND);
+      if(max != MAX_VALUE) qs.token(expr).token("<=").token(max);
     }
-    return "(" + tb + ")";
   }
 }

@@ -113,7 +113,6 @@ public final class MapType extends FuncType {
   @Override
   public String toString() {
     final Object[] param = this == MAP ? WILDCARD : new Object[] { keyType(), declType };
-    return new TokenBuilder().add(QueryText.MAP).add('(').addAll(param, QueryText.SEP).
-        add(')').toString();
+    return new QueryString().token(QueryText.MAP).params(param).toString();
   }
 }

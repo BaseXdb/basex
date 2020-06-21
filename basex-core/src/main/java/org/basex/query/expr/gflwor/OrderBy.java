@@ -227,7 +227,7 @@ public final class OrderBy extends Clause {
   }
 
   @Override
-  public String toString() {
-    return new TokenBuilder().add(ORDER).addSpaced(BY).addAll(keys, SEP).toString();
+  public void plan(final QueryString qs) {
+    qs.token(ORDER).token(BY).tokens(keys, SEP);
   }
 }

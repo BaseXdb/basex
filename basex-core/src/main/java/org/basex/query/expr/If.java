@@ -277,10 +277,8 @@ public final class If extends Arr {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(IF).addBraced("(", cond, ")").addSpaced(THEN).add(exprs[0]);
-    if(exprs[1] != Empty.VALUE) tb.addSpaced(ELSE).add(exprs[1]);
-    return tb.toString();
+  public void plan(final QueryString qs) {
+    qs.token(IF).paren(cond).token(THEN).token(exprs[0]);
+    if(exprs[1] != Empty.VALUE) qs.token(ELSE).token(exprs[1]);
   }
 }

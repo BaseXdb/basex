@@ -73,7 +73,7 @@ public final class FTOptions extends FTExpr {
   }
 
   @Override
-  public String toString() {
-    return exprs[0].toString() + opt;
+  public void plan(final QueryString qs) {
+    qs.token(exprs[0]).token(opt);
   }
 }

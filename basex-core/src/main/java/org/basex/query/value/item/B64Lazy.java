@@ -70,7 +70,11 @@ public final class B64Lazy extends B64 implements Lazy {
   }
 
   @Override
-  public String toString() {
-    return isCached() ? super.toString() : Function._FILE_READ_BINARY.args(input).trim();
+  public void plan(final QueryString qs) {
+    if(isCached()) {
+      super.plan(qs);
+    } else {
+      qs.function(Function._FILE_READ_BINARY, input);
+    }
   }
 }

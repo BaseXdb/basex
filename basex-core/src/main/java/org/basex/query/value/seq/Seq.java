@@ -239,8 +239,8 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public String toString() {
-    return build(false).toString();
+  public void plan(final QueryString qs) {
+    qs.token(build(false).finish());
   }
 
   /**

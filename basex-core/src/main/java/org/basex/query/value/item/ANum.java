@@ -140,7 +140,7 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public final String toString() {
-    return Token.string(string(null));
+  public final void plan(final QueryString qs) {
+    qs.token(string(null));
   }
 }

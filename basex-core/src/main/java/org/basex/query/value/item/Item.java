@@ -7,7 +7,6 @@ import java.math.*;
 
 import org.basex.data.*;
 import org.basex.io.in.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -353,33 +352,11 @@ public abstract class Item extends Value {
   @Override
   public void plan(final QueryPlan plan) {
     try {
-      plan.add(plan.create(this), toToken(string(null)));
+      plan.add(plan.create(this), QueryString.toValue(string(null)));
     } catch(final QueryException ex) {
       // only function items throw exceptions in atomization, and they should
       // override plan(Serializer) sensibly
       throw Util.notExpected(ex);
     }
-  }
-
-  /**
-   * Returns a chopped token representation of the specified value.
-   * @param value value
-   * @return string
-   */
-  public static byte[] toToken(final byte[] value) {
-    final TokenBuilder tb = new TokenBuilder();
-    Serializer.value(value, false, true, tb);
-    return tb.finish();
-  }
-
-  /**
-   * Returns a chopped and quoted token representation of the specified value.
-   * @param value value
-   * @return token
-   */
-  public static byte[] toQuotedToken(final byte[] value) {
-    final TokenBuilder tb = new TokenBuilder();
-    Serializer.value(value, true, true, tb);
-    return tb.finish();
   }
 }

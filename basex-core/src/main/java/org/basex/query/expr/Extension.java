@@ -106,7 +106,7 @@ public final class Extension extends Single {
   }
 
   @Override
-  public String toString() {
-    return new TokenBuilder().add(pragma).addBraced("{ ", expr, " }").toString();
+  public void plan(final QueryString qs) {
+    qs.token(pragma).brace(expr);
   }
 }

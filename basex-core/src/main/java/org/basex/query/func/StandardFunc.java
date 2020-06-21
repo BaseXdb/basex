@@ -608,7 +608,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final String toString() {
-    return new TokenBuilder().add(definition.id()).addAll(exprs, SEP, true).toString();
+  public void plan(final QueryString qs) {
+    qs.token(definition.id()).params(exprs);
   }
 }

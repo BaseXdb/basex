@@ -340,14 +340,13 @@ public final class Window extends Clause {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(FOR).addSpaced(sliding ? SLIDING : TUMBLING).
-      add(WINDOW).addSpaced(var).add(IN).addSpaced(expr).add(start);
+  public void plan(final QueryString qs) {
+    qs.token(FOR).token(sliding ? SLIDING : TUMBLING).token(WINDOW).token(var).token(IN).
+      token(expr).token(start);
     if(end != null) {
-      if(only) tb.add(' ').add(ONLY);
-      tb.add(' ').add(end);
+      if(only) qs.token(ONLY);
+      qs.token(end);
     }
-    return tb.toString();
   }
 
   /**

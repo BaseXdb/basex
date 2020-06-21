@@ -115,7 +115,7 @@ public final class Count extends Clause {
   }
 
   @Override
-  public String toString() {
-    return COUNT + ' ' + var;
+  public void plan(final QueryString qs) {
+    qs.token(COUNT).token(var);
   }
 }

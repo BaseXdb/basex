@@ -71,7 +71,7 @@ public final class Castable extends Single {
   }
 
   @Override
-  public String toString() {
-    return expr + " " + CASTABLE + ' ' + AS + ' ' + seqType;
+  public void plan(final QueryString qs) {
+    qs.token(expr).token(CASTABLE).token(AS).token(seqType);
   }
 }

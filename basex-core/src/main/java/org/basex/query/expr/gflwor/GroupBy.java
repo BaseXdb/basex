@@ -332,13 +332,11 @@ public final class GroupBy extends Clause {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
+  public void plan(final QueryString qs) {
     final int pl = post.length;
     for(int p = 0; p < pl; p++) {
-      tb.add(LET).addSpaced("(: post-group :)").add(post[p]);
-      tb.addSpaced(ASSIGN).add(preExpr[p]).add(' ');
+      qs.token(LET).token("(: post-group :)").token(post[p]).token(ASSIGN).token(preExpr[p]);
     }
-    return tb.add(GROUP).addSpaced(' ').addAll(specs, SEP).toString();
+    qs.token(GROUP).tokens(specs, SEP);
   }
 }

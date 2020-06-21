@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 import org.w3c.dom.*;
 
@@ -82,8 +81,7 @@ public final class FAttr extends FNode {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FAttr && name.eq(((FAttr) obj).name) &&
-        super.equals(obj);
+    return this == obj || obj instanceof FAttr && name.eq(((FAttr) obj).name) && super.equals(obj);
   }
 
   @Override
@@ -92,7 +90,7 @@ public final class FAttr extends FNode {
   }
 
   @Override
-  public String toString() {
-    return Strings.concat(name.string(), '=', toQuotedToken(value));
+  public void plan(final QueryString qs) {
+    qs.concat(name.string(), "=", QueryString.toQuoted(value));
   }
 }

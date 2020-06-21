@@ -206,14 +206,13 @@ public final class DynFuncCall extends FuncCall {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
+  public void plan(final QueryString qs) {
     final int el = exprs.length - 1;
-    tb.add(exprs[el]).add('(');
+    qs.token(exprs[el]).token('(');
     for(int e = 0; e < el; e++) {
-      if(e > 0) tb.add(SEP);
-      tb.add(exprs[e]);
+      if(e > 0) qs.token(SEP);
+      qs.token(exprs[e]);
     }
-    return tb.add(')').toString();
+    qs.token(')');
   }
 }

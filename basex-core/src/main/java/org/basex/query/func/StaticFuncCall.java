@@ -172,7 +172,7 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   @Override
-  public String toString() {
-    return Strings.concat(name.prefixId(), toString(null));
+  public void plan(final QueryString qs) {
+    qs.token(name.prefixId()).params(exprs);
   }
 }

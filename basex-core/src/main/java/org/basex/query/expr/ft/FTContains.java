@@ -149,7 +149,7 @@ public final class FTContains extends Single {
   }
 
   @Override
-  public String toString() {
-    return expr + " " + CONTAINS + ' ' + TEXT + ' ' + ftexpr;
+  public void plan(final QueryString qs) {
+    qs.token(expr).token(CONTAINS).token(TEXT).token(ftexpr);
   }
 }

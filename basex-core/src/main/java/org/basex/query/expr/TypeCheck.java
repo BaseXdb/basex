@@ -204,10 +204,10 @@ public class TypeCheck extends Single {
   }
 
   @Override
-  public final String toString() {
-    final TokenBuilder tb = new TokenBuilder().add('(').add(expr);
-    if(promote) tb.addSpaced(PROMOTE).add(TO);
-    else tb.addSpaced(TREAT).add(AS);
-    return tb.add(' ').add(seqType()).add(')').toString();
+  public final void plan(final QueryString qs) {
+    qs.token(expr);
+    if(promote) qs.token(PROMOTE).token(TO);
+    else qs.token(TREAT).token(AS);
+    qs.token(seqType());
   }
 }

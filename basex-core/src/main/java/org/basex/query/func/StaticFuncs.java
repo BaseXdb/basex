@@ -238,12 +238,10 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
+  public void plan(final QueryString qs) {
     for(final FuncCache fc : funcs.values()) {
-      if(fc.func != null && fc.func.compiled()) tb.add(fc.func).add(Text.NL);
+      if(fc.func != null && fc.func.compiled()) qs.token(fc.func).token(Text.NL);
     }
-    return tb.toString();
   }
 
   /** Function cache. */

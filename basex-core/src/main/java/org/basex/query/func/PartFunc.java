@@ -118,21 +118,19 @@ public final class PartFunc extends Arr {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(body()).add('(');
+  public void plan(final QueryString qs) {
+    qs.token(body()).token('(');
     int p = -1;
     final int el = exprs.length, hs = holes.length;
     for(int i = 0; i < hs; i++) {
       while(++p < holes[i]) {
-        if(p > 0) tb.add(SEP);
-        tb.add(exprs[p - i]);
+        if(p > 0) qs.token(SEP);
+        qs.token(exprs[p - i]);
       }
-      if(p > 0) tb.add(SEP);
-      tb.add('?');
+      if(p > 0) qs.token(SEP);
+      qs.token('?');
     }
-    while(++p < el + hs - 1) tb.add(SEP).add(exprs[p - hs]);
-    tb.add(')');
-    return tb.toString();
+    while(++p < el + hs - 1) qs.token(SEP).token(exprs[p - hs]);
+    qs.token(')');
   }
 }

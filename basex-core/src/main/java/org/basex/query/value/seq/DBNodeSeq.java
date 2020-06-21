@@ -112,7 +112,7 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public String toString() {
+  public void plan(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder().add('(');
     for(int p = 0; p < size; ++p) {
       if(p > 0) tb.add(SEP);
@@ -122,7 +122,7 @@ public class DBNodeSeq extends NativeSeq {
       tb.add(SEP).add(DOTS);
       break;
     }
-    return tb.add(')').toString();
+    qs.token(tb.add(')').finish());
   }
 
   // STATIC METHODS ===============================================================================

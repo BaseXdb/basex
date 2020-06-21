@@ -73,7 +73,7 @@ public final class Instance extends Single {
   }
 
   @Override
-  public String toString() {
-    return expr + " instance of " + seqType;
+  public void plan(final QueryString qs) {
+    qs.token(expr).token(INSTANCE).token(OF).token(seqType);
   }
 }

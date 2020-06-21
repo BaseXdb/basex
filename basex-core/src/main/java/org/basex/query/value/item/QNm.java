@@ -344,8 +344,8 @@ public final class QNm extends Item {
   }
 
   @Override
-  public String toString() {
-    return Token.string(id());
+  public void plan(final QueryString qs) {
+    qs.token(id());
   }
 
   // STATIC METHODS ===============================================================================

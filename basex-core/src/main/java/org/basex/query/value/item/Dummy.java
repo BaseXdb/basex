@@ -5,6 +5,7 @@ import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Dummy item (only used at compile time).
@@ -73,9 +74,9 @@ public final class Dummy extends Item {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(getClass()).add('(').add(type);
-    if(data != null) tb.add(", db: ").add(data.meta.name);
-    return tb.add(')').toString();
+  public void plan(final QueryString qs) {
+    final TokenList list = new TokenList().add(type.toString());
+    if(data != null) list.add(data.meta.name);
+    qs.token(getClass()).params(list.finish());
   }
 }

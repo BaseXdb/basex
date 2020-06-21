@@ -98,17 +98,18 @@ public final class Quantifier extends Single {
   }
 
   @Override
-  public String toString() {
+  public void plan(final QueryString qs) {
     if(expr instanceof GFLWOR) {
-      final TokenBuilder tb = new TokenBuilder().add(every ? EVERY : SOME).add(' ');
+      qs.token(every ? EVERY : SOME);
       final GFLWOR gflwor = (GFLWOR) expr;
       int c = 0;
       for(final Clause clause : gflwor.clauses) {
-        if(c++ != 0) tb.add(", ");
-        tb.add(clause.toString().replaceAll('^' + FOR + ' ', ""));
+        if(c++ != 0) qs.token(SEP);
+        qs.token(clause.toString().replaceAll('^' + FOR + ' ', ""));
       }
-      return tb.addSpaced(SATISFIES).add(gflwor.rtrn).toString();
+      qs.token(SATISFIES).token(gflwor.rtrn);
+    } else {
+      qs.token(expr);
     }
-    return expr.toString();
   }
 }

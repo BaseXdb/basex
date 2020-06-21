@@ -4,6 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -194,7 +196,40 @@ public final class CElem extends CName {
   }
 
   @Override
-  public String toString() {
-    return toString(ELEMENT);
+  public void plan(final QueryString qs) {
+    if(computed) {
+      plan(qs, ELEMENT);
+    } else {
+      final byte[] nm = ((QNm) name).string();
+      qs.token('<').token(nm);
+      final int el = exprs.length;
+      for(int e = 0; e < el; e++) {
+        final Expr expr = exprs[e];
+        if(expr instanceof CAttr && !((CAttr) expr).computed) {
+          qs.token(expr);
+        } else {
+          qs.token('>');
+          boolean constr = false;
+          for(int f = e; f < el && !constr; f++) {
+            constr = exprs[f] instanceof CNode ? ((CNode) exprs[f]).computed :
+              !(expr instanceof Str);
+          }
+          if(constr) {
+            qs.token("{").tokens(Arrays.copyOfRange(exprs, e, el), SEP).token("}");
+          } else {
+            for(int f = e; f < el; f++) {
+              if(exprs[f] instanceof Str) {
+                qs.value(((Str) exprs[f]).string());
+              } else {
+                qs.token(exprs[f]);
+              }
+            }
+          }
+          qs.token('<').token('/').token(nm).token('>');
+          return;
+        }
+      }
+      qs.token('/').token('>');
+    }
   }
 }

@@ -1,6 +1,7 @@
 package org.basex.query.expr.path;
 
 import org.basex.data.*;
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -157,7 +158,7 @@ public final class NameTest extends Test {
   }
 
   @Override
-  public String toString() {
-    return toString(true);
+  public void plan(final QueryString qs) {
+    qs.token(toString(true));
   }
 }

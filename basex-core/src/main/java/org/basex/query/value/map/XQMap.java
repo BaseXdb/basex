@@ -274,11 +274,7 @@ public final class XQMap extends XQData {
   }
 
   @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(MAP).add(" { ");
-    if(mapSize() > 0) {
-      tb.add(root.append(new StringBuilder()).toString().replaceAll(", $", "")).add(" ");
-    }
-    return tb.add("}").toString();
+  public void plan(final QueryString qs) {
+    qs.token(MAP).brace(root.append(new StringBuilder()).toString().replaceAll(", $", ""));
   }
 }

@@ -226,7 +226,7 @@ public final class List extends Arr {
   }
 
   @Override
-  public String toString() {
-    return toString(null);
+  public void plan(final QueryString qs) {
+    qs.params(exprs);
   }
 }
