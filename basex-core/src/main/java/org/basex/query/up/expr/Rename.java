@@ -89,7 +89,7 @@ public final class Rename extends Update {
   }
 
   @Override
-  public String toString() {
-    return RENAME + ' ' + NODE + ' ' + exprs[0] + ' ' + AS + ' ' + exprs[1];
+  public void plan(final QueryString qs) {
+    qs.token(RENAME).token(NODE).token(exprs[0]).token(AS).token(exprs[1]);
   }
 }
