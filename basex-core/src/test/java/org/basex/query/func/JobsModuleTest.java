@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.*;
 import org.basex.core.users.*;
@@ -156,6 +157,20 @@ public final class JobsModuleTest extends SandboxTest {
     query("starts-with(" + func.args(uri) + ", 'job')", true);
     error(func.args(" xs:anyURI('src/test/resources/xxx.xq')"), WHICHRES_X);
   }
+
+  /** Test method. */
+  @Test public void evalLog() {
+    final Function func = _JOBS_EVAL;
+
+    // write UUID into logs
+    final String uuid = UUID.randomUUID().toString();
+    final String id = query(func.args("1", null, " map { 'log': '" + uuid + "' }"));
+    query(_JOBS_WAIT.args(id));
+    // find log entry
+    final String date = DateTime.format(new Date(), DateTime.DATE);
+    query(_ADMIN_LOGS.args(date) + " = '" + uuid + "'", true);
+  }
+
 
   /** Test method. */
   @Test public void finished() {

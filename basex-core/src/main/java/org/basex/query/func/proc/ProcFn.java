@@ -102,7 +102,7 @@ abstract class ProcFn extends StandardFunc {
     try {
       while(thread.isAlive()) {
         qc.checkStop();
-        if(seconds > 0 && (System.nanoTime() - perf.start()) / 1000000000 >= seconds) {
+        if(seconds > 0 && perf.ns(false) / 1000000000 >= seconds) {
           thread.interrupt();
           throw PROC_TIMEOUT.get(info);
         }

@@ -92,7 +92,8 @@ public final class AdminLogs extends AdminFn {
                   entry.type = t;
                   entry.user = next.user;
                   entry.ms = entry.ms.add(next.ms);
-                  if(!next.message.isEmpty()) entry.message += "; " + next.message;
+                  final String msg1 = entry.message, msg2 = next.message;
+                  if(!msg2.isEmpty()) entry.message = msg1.isEmpty() ? msg2 : msg1 + "; " + msg2;
                   iter.remove();
                   break;
                 }

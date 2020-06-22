@@ -11,21 +11,22 @@ public final class Performance {
   private long time = System.nanoTime();
 
   /**
-   * Returns the start time.
-   * @return start time
-   */
-  public long start() {
-    return time;
-  }
-
-  /**
    * Returns the measured execution time in nanoseconds and resets the timer.
    * @return execution time
    */
   public long ns() {
+    return ns(true);
+  }
+
+  /**
+   * Returns the measured execution time in nanoseconds.
+   * @param reset reset timer
+   * @return execution time
+   */
+  public long ns(final boolean reset) {
     final long time2 = System.nanoTime();
     final long diff = time2 - time;
-    time = time2;
+    if(reset) time = time2;
     return diff;
   }
 

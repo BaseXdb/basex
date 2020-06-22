@@ -203,6 +203,6 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
       context.log.write(LogType.ERROR, "", perf, context);
       throw ex;
     }
-    context.log.write((status != null ? status : LogType.OK).toString(), "", perf, context);
+    context.log.write(status != null ? status : LogType.OK, null, perf, context);
   }
 }

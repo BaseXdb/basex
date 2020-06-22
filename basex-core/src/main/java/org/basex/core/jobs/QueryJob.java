@@ -11,6 +11,7 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.server.Log.*;
 import org.basex.util.*;
 
 /**
@@ -147,6 +148,8 @@ public final class QueryJob extends Job implements Runnable {
     final JobContext jc = jc();
     final Context ctx = jc.context;
     final JobsOptions opts = job.options;
+    log(LogType.REQUEST, opts.get(JobsOptions.LOG));
+
     qp = new QueryProcessor(job.query, opts.get(JobsOptions.BASE_URI), ctx);
     try {
       // parse, push and register query. order is important!
@@ -178,8 +181,7 @@ public final class QueryJob extends Job implements Runnable {
       result.exception = XQUERY_UNEXPECTED_X.get(null, ex);
     } finally {
       // close and invalidate query after result has been assigned. order is important!
-      final Boolean cache = opts.get(JobsOptions.CACHE);
-      if(cache != null && cache) {
+      if(Boolean.TRUE.equals(opts.get(JobsOptions.CACHE))) {
         ctx.jobs.scheduleResult(this);
         state(JobState.CACHED);
       } else {
@@ -191,7 +193,14 @@ public final class QueryJob extends Job implements Runnable {
         unregister(ctx);
         popJob();
         qp = null;
-        result.time += jc.performance.ns();
+        result.time += jc.performance.ns(false);
+
+        if(result.exception != null) {
+          log(LogType.ERROR, result.exception.getLocalizedMessage());
+        } else {
+          log(LogType.OK, null);
+        }
+
         // invalidates the performance measurements
         jc.performance = null;
       }
@@ -200,6 +209,21 @@ public final class QueryJob extends Job implements Runnable {
       if(notify != null) notify.accept(result);
     }
   }
+
+  /**
+   * Creates a log entry.
+   * @param type log type
+   * @param info info string (can be {@code null})
+   */
+  private void log(final LogType type, final String info) {
+    final String log = job.options.get(JobsOptions.LOG);
+    if(log == null || log.isEmpty()) return;
+
+    final JobContext jc = jc();
+    final Context ctx = jc.context;
+    ctx.log.write(type, info, jc.performance, "JOB:" + jc.id(), ctx);
+  }
+
 
   @Override
   public void addLocks() {

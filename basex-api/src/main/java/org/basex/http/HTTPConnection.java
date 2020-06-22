@@ -205,7 +205,7 @@ public final class HTTPConnection implements ClientInfo {
    * @param info info string (can be {@code null})
    */
   public void log(final int status, final String info) {
-    context.log.write(Integer.toString(status), info, perf, context);
+    context.log.write(status, info, perf, context);
   }
 
   /**

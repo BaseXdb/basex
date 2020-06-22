@@ -74,9 +74,9 @@ public final class Log implements QueryTracer {
 
   /**
    * Writes an entry to the log file.
-   * @param type type (ERROR, OK, REQUEST, INFO)
+   * @param type type
    * @param info info string (can be {@code null})
-   * @param perf performance string (can be {@code null})
+   * @param perf performance object (can be {@code null})
    * @param ctx database context
    */
   public void write(final LogType type, final String info, final Performance perf,
@@ -86,21 +86,34 @@ public final class Log implements QueryTracer {
 
   /**
    * Writes an entry to the log file.
-   * @param type type (ERROR, OK, REQUEST, INFO, HTTP status code, custom string)
+   * @param type type
    * @param info info string (can be {@code null})
-   * @param perf performance string (can be {@code null})
+   * @param perf performance object (can be {@code null})
+   * @param address address (can be {@code null})
    * @param ctx database context
    */
-  public void write(final String type, final String info, final Performance perf,
-      final Context ctx) {
-    write(type, info, perf, ctx.clientAddress(), ctx.clientName());
+  public void write(final LogType type, final String info, final Performance perf,
+      final String address, final Context ctx) {
+    write(type.toString(), info, perf, address, ctx.clientName());
   }
 
   /**
    * Writes an entry to the log file.
-   * @param type type (ERROR, OK, REQUEST, INFO, HTTP status code)
+   * @param type type ({@link LogType}, HTTP status code or custom string)
    * @param info info string (can be {@code null})
-   * @param perf performance string (can be {@code null})
+   * @param perf performance object (can be {@code null})
+   * @param ctx database context
+   */
+  public void write(final Object type, final String info, final Performance perf,
+      final Context ctx) {
+    write(type.toString(), info, perf, ctx.clientAddress(), ctx.clientName());
+  }
+
+  /**
+   * Writes an entry to the log file.
+   * @param type type ({@link LogType}, HTTP status code or custom string)
+   * @param info info string (can be {@code null})
+   * @param perf performance object (can be {@code null})
    * @param address address string ({@code SERVER} is written if value is {@code null})
    * @param user user ({@code admin} is written if value is {@code null})
    */

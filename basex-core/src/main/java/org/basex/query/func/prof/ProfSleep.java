@@ -18,7 +18,7 @@ public final class ProfSleep extends StandardFunc {
     final long ms = toLong(exprs[0], qc);
     final Performance perf = new Performance();
     for(int m = 0; m < ms; m++) {
-      if((System.nanoTime() - perf.start()) / 1000000 >= ms) break;
+      if(perf.ns(false) / 1000000 >= ms) break;
       Performance.sleep(1);
       qc.checkStop();
     }

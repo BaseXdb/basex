@@ -91,7 +91,7 @@ public final class JobsList extends Command {
 
     final JobContext jc = job.jc();
     final long ms = jc.performance != null
-        ? (System.nanoTime() - jc.performance.start()) / 1000000 : jr != null
+        ? jc.performance.ns(false) / 1000000 : jr != null
         ? jr.time / 1000000 : -1;
 
     final TokenList tl = new TokenList(10);
