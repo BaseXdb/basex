@@ -1968,7 +1968,7 @@ public class QueryParser extends InputParser {
   private Step axisStep(final boolean error) throws QueryException {
     Axis axis = null;
     Test test = null;
-    if(wsConsume(DOT2)) {
+    if(wsConsume(DOTS2)) {
       axis = Axis.PARENT;
       test = KindTest.NOD;
       checkTest(test, true);
@@ -2034,8 +2034,9 @@ public class QueryParser extends InputParser {
       p = pos;
       if(consume(':')) {
         // name test: *:name
-        if(!consume('*')) return new NameTest(type, new QNm(ncName(QNAME_X)), NamePart.LOCAL,
-            sc.elemNS);
+        if(!consume('*')) {
+          return new NameTest(type, new QNm(ncName(QNAME_X)), NamePart.LOCAL, sc.elemNS);
+        }
       }
       // name test: *
       pos = p;

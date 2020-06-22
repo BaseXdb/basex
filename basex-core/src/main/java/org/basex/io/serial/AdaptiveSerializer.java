@@ -100,9 +100,7 @@ public class AdaptiveSerializer extends OutputSerializer {
       tb.add(dur.type).add("(\"").add(dur.string(null)).add("\")");
     } else {
       try {
-        tb.add(item.type).add('(');
-        value(item.string(null), true, false, tb);
-        tb.add(')');
+        tb.add(item.type).add('(').add(value(item.string(null), true, false)).add(')');
       } catch(final QueryException ex) {
         throw new QueryIOException(ex);
       }

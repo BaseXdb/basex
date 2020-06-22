@@ -1,6 +1,5 @@
 package org.basex.query.expr.path;
 
-import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -92,7 +91,7 @@ public class KindTest extends Test {
   }
 
   @Override
-  public void plan(final QueryString qs) {
-    qs.token(type);
+  public String toString(final boolean full) {
+    return full || type != NodeType.ELM ? type.toString() : "*";
   }
 }

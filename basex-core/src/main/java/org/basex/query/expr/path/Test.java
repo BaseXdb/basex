@@ -111,8 +111,20 @@ public abstract class Test extends ExprInfo {
    */
   public abstract Test intersect(Test test);
 
+  /**
+   * Returns a string representation of this test.
+   * @param full include node type
+   * @return string
+   */
+  public abstract String toString(boolean full);
+
   @Override
   public void plan(final QueryPlan plan) {
     throw Util.notExpected();
+  }
+
+  @Override
+  public final void plan(final QueryString qs) {
+    qs.token(toString(true));
   }
 }

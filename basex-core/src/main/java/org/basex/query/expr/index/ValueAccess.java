@@ -316,7 +316,7 @@ public final class ValueAccess extends IndexAccess {
     final Function function = type == IndexType.TEXT ? Function._DB_TEXT :
       type == IndexType.ATTRIBUTE ? Function._DB_ATTRIBUTE : Function._DB_TOKEN;
     qs.function(function, db, toExpr());
-    if(test != null) qs.token('/').token("parent::").token(test);
+    if(test != null) qs.token('/').token(Step.get(info, Axis.PARENT, test));
   }
 
   /**

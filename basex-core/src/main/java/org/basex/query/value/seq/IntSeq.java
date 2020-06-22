@@ -98,6 +98,17 @@ public final class IntSeq extends NativeSeq {
    * @param values values
    * @return value
    */
+  public static Value get(final int[] values) {
+    final LongList list = new LongList(values.length);
+    for(final int value : values) list.add(value);
+    return get(list.finish(), AtomType.ITR);
+  }
+
+  /**
+   * Creates an xs:integer sequence with the specified items.
+   * @param values values
+   * @return value
+   */
   public static Value get(final long[] values) {
     return get(values, AtomType.ITR);
   }

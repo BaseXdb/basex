@@ -2,9 +2,9 @@ package org.basex.query.expr.path;
 
 import java.util.*;
 
-import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Union node test.
@@ -50,7 +50,12 @@ public final class UnionTest extends Test {
   }
 
   @Override
-  public void plan(final QueryString qs) {
-    qs.tokens(tests, "|");
+  public String toString(final boolean full) {
+    final TokenBuilder tb = new TokenBuilder();
+    for(final Test test : tests) {
+      if(!tb.isEmpty()) tb.add('|');
+      tb.add(test.toString(full));
+    }
+    return tb.toString();
   }
 }

@@ -1,7 +1,6 @@
 package org.basex.query.expr.path;
 
 import org.basex.data.*;
-import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -133,32 +132,29 @@ public final class NameTest extends Test {
     return type == nt.type && qname.eq(nt.qname);
   }
 
-  /**
-   * Returns a string representation of the name test.
-   * @param full include node type
-   * @return string
-   */
+  @Override
   public String toString(final boolean full) {
     final TokenBuilder tb = new TokenBuilder();
-    if(full) tb.add(type.name).add('(');
-    if(part == NamePart.LOCAL) {
-      tb.add('*').add(':');
-    } else if(qname.hasPrefix()) {
-      tb.add(qname.prefix()).add(':');
-    } else if(qname.uri().length != 0) {
-      tb.add('{').add(qname.uri()).add('}');
+    final boolean pi = type == NodeType.PI;
+    if(full || pi) tb.add(type.name).add('(');
+
+    // add URI part
+    final byte[] prefix = qname.prefix(), uri = qname.uri();
+    if(part == NamePart.LOCAL && !pi) {
+      tb.add("*:");
+    } else if(prefix.length > 0) {
+      tb.add(prefix).add(':');
+    } else if(uri.length != 0) {
+      tb.add("Q{").add(uri).add('}');
     }
+    // add local part
     if(part == NamePart.URI) {
       tb.add('*');
     } else {
       tb.add(qname.local());
     }
-    if(full) tb.add(')');
-    return tb.toString();
-  }
 
-  @Override
-  public void plan(final QueryString qs) {
-    qs.token(toString(true));
+    if(full || pi) tb.add(')');
+    return tb.toString();
   }
 }

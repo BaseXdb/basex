@@ -149,7 +149,7 @@ public final class QueryString {
    * @return string
    */
   public QueryString value(final byte[] value) {
-    Serializer.value(value, false, true, tb);
+    tb.add(toValue(value));
     return this;
   }
 
@@ -159,7 +159,7 @@ public final class QueryString {
    * @return token
    */
   public QueryString quoted(final byte[] value) {
-    Serializer.value(value, true, true, tb);
+    tb.add(toQuoted(value));
     return this;
   }
 
@@ -208,9 +208,7 @@ public final class QueryString {
    * @return string
    */
   public static byte[] toValue(final byte[] value) {
-    final TokenBuilder tb = new TokenBuilder();
-    Serializer.value(value, false, true, tb);
-    return tb.finish();
+    return Serializer.value(value, false, true);
   }
 
   /**
@@ -219,8 +217,6 @@ public final class QueryString {
    * @return token
    */
   public static byte[] toQuoted(final byte[] value) {
-    final TokenBuilder tb = new TokenBuilder();
-    Serializer.value(value, true, true, tb);
-    return tb.finish();
+    return Serializer.value(value, true, true);
   }
 }

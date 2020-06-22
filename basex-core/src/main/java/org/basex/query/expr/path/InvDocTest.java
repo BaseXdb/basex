@@ -91,7 +91,7 @@ final class InvDocTest extends Test {
   }
 
   @Override
-  public void plan(final QueryString qs) {
-    qs.token(NodeType.DOC.name).paren("...");
+  public String toString(final boolean full) {
+    return new TokenBuilder().add(NodeType.DOC.name).add("((: ids :))").toString();
   }
 }

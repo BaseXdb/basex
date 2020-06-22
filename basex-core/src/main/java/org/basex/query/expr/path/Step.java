@@ -320,7 +320,7 @@ public abstract class Step extends Preds {
 
   @Override
   public final void plan(final QueryPlan plan) {
-    plan.add(plan.create(this, AXIS, axis.name, TEST, test), exprs);
+    plan.add(plan.create(this, AXIS, axis.name, TEST, test.toString(false)), exprs);
   }
 
   @Override
@@ -333,10 +333,9 @@ public abstract class Step extends Preds {
     if(tb.isEmpty()) {
       final java.util.function.Function<Test, TokenBuilder> add = t -> {
         if(axis == Axis.ATTRIBUTE && t instanceof NameTest) tb.add('@');
-        else if(axis != Axis.CHILD) tb.add(axis).add("::");
-        return tb.add(t);
+        else if(axis != Axis.CHILD) tb.add(axis).add(COLS);
+        return tb.add(t.toString(false));
       };
-
       if(test instanceof UnionTest) {
         tb.add('(');
         for(final Test t : ((UnionTest) test).tests) add.apply(t).add(" | ");

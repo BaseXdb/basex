@@ -142,6 +142,6 @@ public final class FDoc extends FNode {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.token(DOCUMENT).brace(uri.length == 0 ? "..." : QueryString.toQuoted(uri));
+    qs.token(DOCUMENT).brace(uri.length == 0 ? DOTS : QueryString.toQuoted(uri));
   }
 }

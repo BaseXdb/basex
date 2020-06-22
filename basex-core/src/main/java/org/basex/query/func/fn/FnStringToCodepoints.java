@@ -9,7 +9,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -28,24 +27,13 @@ public final class FnStringToCodepoints extends StandardFunc {
       }
       @Override
       public Value value(final QueryContext q, final Expr expr) {
-        return toValue(cps);
+        return IntSeq.get(cps);
       }
     };
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return toValue(cps(toZeroToken(exprs[0], qc)));
-  }
-
-  /**
-   * Returns the specified codepoints as value.
-   * @param cps codepoints
-   * @return value
-   */
-  private static Value toValue(final int[] cps) {
-    final LongList list = new LongList(cps.length);
-    for(final int cp : cps) list.add(cp);
-    return IntSeq.get(list.finish());
+    return IntSeq.get(cps(toZeroToken(exprs[0], qc)));
   }
 }

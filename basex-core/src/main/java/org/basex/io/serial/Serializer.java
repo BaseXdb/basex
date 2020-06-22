@@ -531,10 +531,10 @@ public abstract class Serializer implements Closeable {
    * @param value value
    * @param quotes wrap with quotes
    * @param chop chop large tokens
-   * @param tb token builder
+   * @return value
    */
-  public static void value(final byte[] value, final boolean quotes, final boolean chop,
-      final TokenBuilder tb) {
+  public static byte[] value(final byte[] value, final boolean quotes, final boolean chop) {
+    final TokenBuilder tb = new TokenBuilder();
     if(quotes) tb.add('"');
     for(final byte v : value) {
       if(chop && tb.size() > 127) {
@@ -548,5 +548,6 @@ public abstract class Serializer implements Closeable {
       else tb.addByte(v);
     }
     if(quotes) tb.add('"');
+    return tb.finish();
   }
 }

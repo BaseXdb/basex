@@ -1,9 +1,9 @@
 package org.basex.query.expr.path;
 
-import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Document kind test.
@@ -65,7 +65,7 @@ public final class DocTest extends Test {
   }
 
   @Override
-  public void plan(final QueryString qs) {
-    qs.token(type.name).paren(child);
+  public String toString(final boolean full) {
+    return Strings.concat(type.name, "(", child, ")");
   }
 }

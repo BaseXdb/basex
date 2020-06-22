@@ -216,7 +216,7 @@ public interface QueryText {
   /** Parser token. */ String SEMICOL = ";";
   /** Parser token. */ String COMMA = ",";
   /** Parser token. */ String DOLLAR = "$";
-  /** Parser token. */ String DOT2 = "..";
+  /** Parser token. */ String DOTS2 = "..";
   /** Parser token. */ String IS = "=";
   /** Parser token. */ String EXCL = "!";
   /** Parser token. */ String XQ10 = "1.0";

@@ -94,6 +94,6 @@ public final class IndexStaticDb extends IndexDb {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.token(data.meta.name);
+    qs.quoted(Token.token(data.meta.name));
   }
 }
