@@ -30,7 +30,7 @@ public class FileList extends FileFn {
       final Path dir = toPath(0, qc).toRealPath();
       final boolean recursive = optionalBool(1, qc);
       final Pattern pattern = exprs.length == 3 ? Pattern.compile(IOFile.regex(
-          string(toToken(exprs[2], qc))), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE) : null;
+          string(toToken(exprs[2], qc)), false), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE) : null;
 
       final TokenList tl = new TokenList();
       list(dir, recursive, pattern, tl, dir.getNameCount(), qc);

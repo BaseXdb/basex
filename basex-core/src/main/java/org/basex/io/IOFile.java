@@ -461,28 +461,28 @@ public final class IOFile extends IO {
    * contain asterisks (*) and question marks (?); commas (,) are used to
    * separate multiple filters.
    * @param glob filter
-   * @param sub accept substring in the result
+   * @param substring accept substring in the result
    * @return regular expression
    */
-  public static String regex(final String glob, final boolean sub) {
+  public static String regex(final String glob, final boolean substring) {
     final StringBuilder sb = new StringBuilder();
     for(final String globs : Strings.split(glob, ',')) {
       final String glb = globs.trim();
       if(sb.length() != 0) sb.append('|');
       // loop through single pattern
-      boolean suf = false;
+      boolean suffix = false;
       final int gl = glb.length();
       for(int g = 0; g < gl; g++) {
         char ch = glb.charAt(g);
         if(ch == '*') {
           // don't allow other dots if pattern ends with a dot
-          suf = true;
+          suffix = true;
           sb.append(Strings.endsWith(glb, '.') ? "[^.]" : ".");
         } else if(ch == '?') {
           ch = '.';
-          suf = true;
+          suffix = true;
         } else if(ch == '.') {
-          suf = true;
+          suffix = true;
           // last character is dot: disallow file suffix
           if(g + 1 == glb.length()) break;
           sb.append('\\');
@@ -491,7 +491,7 @@ public final class IOFile extends IO {
         }
         sb.append(ch);
       }
-      if(!suf && sub) sb.append(".*");
+      if(!suffix && substring) sb.append(".*");
     }
     return Prop.CASE ? sb.toString() : sb.toString().toLowerCase(Locale.ENGLISH);
   }
