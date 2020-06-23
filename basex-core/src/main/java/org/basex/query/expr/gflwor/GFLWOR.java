@@ -524,7 +524,8 @@ public final class GFLWOR extends ParseExpr {
 
         // rewrite where clause to predicate:
         // for $b in /a/b where $b/c  ->  for $b in /a/b[c]
-        // let $a := 1 to 3 where $a > 1 return $a  ->  let $a := (1 to 3)[. > 1] return $i
+        // let $a := 1 to 3 where $a > 1 return $a  ->  let $a := (1 to 3)[. > 1] ...
+        // let $a := <a/> where $a[. = ''] return $a/self::a  ->  let $a := <a/>[. == ''] ...
         if(!clause.has(Flag.CTX)) {
           final int newPos = insert < 0 ? c : insert;
           for(int b4 = newPos; --b4 >= 0;) {
@@ -532,12 +533,19 @@ public final class GFLWOR extends ParseExpr {
             if(before instanceof Where) continue;
             if(before instanceof ForLet) {
               final ForLet fl = (ForLet) before;
-              if((before instanceof For || c + 1 == clauses.size() && rtrn instanceof VarRef &&
-                  ((VarRef) rtrn).var.is(fl.var)) && fl.toPredicate(cc, where.expr)) {
-                forLets.add(fl);
-                clauses.remove(newPos);
-                changed = true;
-                c--;
+              final Predicate<Expr> var = expr ->
+                expr instanceof VarRef && ((VarRef) expr).var.is(fl.var);
+              if(before instanceof For || c + 1 == clauses.size() && (
+                var.test(rtrn) ||
+                rtrn instanceof Filter && var.test(((Filter) rtrn).root) ||
+                rtrn instanceof Path && var.test(((Path) rtrn).root)
+              )) {
+                if(fl.toPredicate(cc, where.expr)) {
+                  forLets.add(fl);
+                  clauses.remove(newPos);
+                  changed = true;
+                  c--;
+                }
               }
             }
             break;
@@ -625,9 +633,9 @@ public final class GFLWOR extends ParseExpr {
 
     if(rtrn instanceof Filter) {
       final Filter filter = (Filter) rtrn;
-      final QueryFunction<Expr, Expr> func = expr ->
-        Filter.get(cc, filter.info, expr, filter.exprs);
       if(var.test(filter.root)) {
+        final QueryFunction<Expr, Expr> func = expr ->
+          Filter.get(cc, filter.info, expr, filter.exprs);
         if(filter.mayBePositional()) {
           // for $x in E return $x[1]  ->  E ! .[1]
           final Expr expr = cc.get(last.expr, () -> func.apply(

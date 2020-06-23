@@ -1513,8 +1513,14 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Single let, inline where clause. */
   @Test public void gh1880() {
-    check("let $a := <a/> where $a return $a", "<a/>", root(CElem.class));
-    check("let $a := <a/> where $a/self::a return $a", "<a/>", root(IterFilter.class));
+    check("let $a := <a/> where $a return $a", "<a/>",
+        empty(GFLWOR.class), root(CElem.class));
+    check("let $a := <a/> where $a/self::a return $a", "<a/>",
+        empty(GFLWOR.class), root(IterFilter.class));
+    check("let $a := <a/> where $a/self::a return $a[. = '']", "<a/>",
+        empty(GFLWOR.class), count(IterFilter.class, 1));
+    check("let $a := <a/> where $a[. = ''] return $a/self::a", "<a/>",
+        empty(GFLWOR.class), root(IterPath.class));
 
     // skip rewritings: let
     check("let $e := (<a/>, <b/>) where $e/self::a return $e", "<a/>\n<b/>", root(GFLWOR.class));

@@ -29,7 +29,6 @@ public final class ContextValue extends Simple {
     final Value value = cc.qc.focus.value;
     if(value != null) {
       if(!cc.nestedFocus()) return cc.replaceWith(this, value);
-      exprType.assign(Occ.ONE);
       adoptType(value);
     }
     return this;
