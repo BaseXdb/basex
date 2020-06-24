@@ -288,9 +288,17 @@ public final class Var extends ExprInfo {
     plan.add(plan.attachVariable(plan.create(this), this, true));
   }
 
+  /**
+   * Returns a unique representation of the variable.
+   * @return variable id
+   */
+  public byte[] id() {
+    return Token.concat(DOLLAR, name.string(), "_", id);
+  }
+
   @Override
   public void plan(final QueryString qs) {
-    qs.concat(DOLLAR, name.string(), '_', id);
+    qs.token(id());
     if(declType != null) qs.token(AS).token(declType);
   }
 

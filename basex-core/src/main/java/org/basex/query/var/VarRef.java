@@ -1,7 +1,5 @@
 package org.basex.query.var;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -120,7 +118,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.concat(DOLLAR, var.name.string(), "_", var.id);
+    qs.token(var.id());
   }
 
   @Override

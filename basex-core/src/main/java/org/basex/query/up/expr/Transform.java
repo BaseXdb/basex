@@ -155,8 +155,11 @@ public final class Transform extends Arr {
   @Override
   public void plan(final QueryString qs) {
     qs.token(COPY);
+    boolean more = false;
     for(final Let copy : copies) {
-      qs.token(copy.var).token(ASSIGN).token(copy.expr);
+      if(more) qs.token(SEP);
+      else more = true;
+      qs.token(copy.var.id()).token(ASSIGN).token(copy.expr);
     }
     qs.token(MODIFY).token(exprs[0]).token(RETURN).token(exprs[1]);
   }

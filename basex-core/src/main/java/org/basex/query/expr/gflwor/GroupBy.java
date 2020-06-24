@@ -338,6 +338,6 @@ public final class GroupBy extends Clause {
     for(int p = 0; p < pl; p++) {
       qs.token(LET).token("(: post-group :)").token(post[p]).token(ASSIGN).token(preExpr[p]);
     }
-    qs.token(GROUP).tokens(specs, SEP);
+    qs.token(GROUP).token(BY).tokens(specs, SEP);
   }
 }
