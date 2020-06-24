@@ -64,7 +64,7 @@ public final class Typeswitch extends ParseExpr {
       final Value value = (Value) cond;
       for(final TypeswitchGroup group : groups) {
         if(group.match(value, null)) {
-          group.inline(cc, value);
+          group.inline(value, cc);
           return cc.replaceWith(this, group.expr);
         }
       }

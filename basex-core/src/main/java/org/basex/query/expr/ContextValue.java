@@ -46,7 +46,8 @@ public final class ContextValue extends Simple {
 
   @Override
   public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc) {
-    return ei != null ? null : ex;
+    // inline context or return null
+    return ei == null ? ex : null;
   }
 
   @Override

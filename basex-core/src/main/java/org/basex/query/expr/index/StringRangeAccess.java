@@ -13,6 +13,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -35,7 +36,7 @@ public final class StringRangeAccess extends IndexAccess {
    * @param db index database
    */
   public StringRangeAccess(final InputInfo info, final StringRange index, final IndexDb db) {
-    super(db, info, index.type());
+    super(db, info, index.type() == IndexType.TEXT ? NodeType.TXT : NodeType.ATT);
     this.index = index;
   }
 
@@ -102,8 +103,14 @@ public final class StringRangeAccess extends IndexAccess {
   }
 
   @Override
+  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+      throws QueryException {
+    return super.inlineDb(ei, ex, cc) ? optimize(cc) : null;
+  }
+
+  @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new StringRangeAccess(info, index, db.copy(cc, vm));
+    return copyType(new StringRangeAccess(info, index, db.copy(cc, vm)));
   }
 
   @Override

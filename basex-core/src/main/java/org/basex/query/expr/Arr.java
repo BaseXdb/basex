@@ -95,12 +95,12 @@ public abstract class Arr extends ParseExpr {
     }
 
     // optimize new expression. skip further optimizations if variable was inlined
-    final Expr opt = optimize(cc);
-    if(ei != null) return opt;
+    final Expr optimized = optimize(cc);
+    if(ei != null) return optimized;
 
     // inline again if context was inlined
-    final Expr inlined = opt.inline(ei, ex, cc);
-    return inlined != null ? inlined : opt;
+    final Expr inlined = optimized.inline(ei, ex, cc);
+    return inlined != null ? inlined : optimized;
   }
 
   /**

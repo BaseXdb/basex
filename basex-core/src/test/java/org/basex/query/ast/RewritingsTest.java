@@ -1408,6 +1408,8 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Nested predicates in FLWOR expression. */
   @Test public void gh1855() {
     execute(new CreateDB(NAME, "<a><b c='d'>e</b></a>"));
+    check("count(let $e := 'e' return a[b[@c = 'd'] = $e])", 1,
+        exists(ValueAccess.class));
     check("count(let $e := 'e' let $f := a[b[@c = 'd'] = $e] return $f)", 1,
         exists(ValueAccess.class));
   }

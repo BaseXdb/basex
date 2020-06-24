@@ -19,6 +19,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -69,7 +70,8 @@ public final class ValueAccess extends IndexAccess {
   /**
    * Constructor.
    * @param info input info
-   * @param type index type
+   * @param type index type ({@link IndexType#TEXT}, {@link IndexType#TOKEN},
+   *   {@link IndexType#ATTRIBUTE})
    * @param test test test (can be {@code null})
    * @param db index database
    * @param expr search expression
@@ -77,11 +79,12 @@ public final class ValueAccess extends IndexAccess {
    */
   private ValueAccess(final InputInfo info, final IndexType type, final NameTest test,
       final IndexDb db, final Expr expr, final TokenSet tokens) {
-    super(db, info, type);
+    super(db, info, test != null ? NodeType.ELM : type == IndexType.TEXT ? NodeType.TXT :
+      NodeType.ATT);
     this.type = type;
     this.test = test;
-    this.tokens = tokens;
     this.expr = expr;
+    this.tokens = tokens;
   }
 
   @Override
@@ -279,8 +282,8 @@ public final class ValueAccess extends IndexAccess {
       throws QueryException {
     final Expr inlined = expr.inline(ei, ex, cc);
     if(inlined != null) expr = inlined;
-    final Expr inlined2 = super.inline(ei, ex, cc);
-    return inlined != null || inlined2 != null ? optimize(cc) : null;
+    final boolean inlinedDb = super.inlineDb(ei, ex, cc);
+    return inlined != null || inlinedDb ? optimize(cc) : null;
   }
 
   @Override

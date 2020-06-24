@@ -47,12 +47,6 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    return null;
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     return true;
   }

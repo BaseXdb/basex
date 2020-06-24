@@ -1,7 +1,6 @@
 package org.basex.query.expr.index;
 
 import org.basex.data.*;
-import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
@@ -23,11 +22,10 @@ public abstract class IndexAccess extends Simple {
    * Constructor.
    * @param db index database
    * @param info input info
-   * @param type type index type
+   * @param type type
    */
-  IndexAccess(final IndexDb db, final InputInfo info, final IndexType type) {
-    super(info, type == IndexType.TEXT || type == IndexType.FULLTEXT ? SeqType.TXT_ZM :
-      SeqType.ATT_ZM);
+  IndexAccess(final IndexDb db, final InputInfo info, final Type type) {
+    super(info, type.seqType(Occ.ZERO_MORE));
     this.db = db;
   }
 
@@ -46,15 +44,20 @@ public abstract class IndexAccess extends Simple {
     return db.count(var);
   }
 
-  @Override
-  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+  /**
+   * Inlines the database reference.
+   * @param ei variable ({@link Var} reference) or context ({@code null}) to inline
+   * @param ex expression to replace with
+   * @param cc compilation context
+   * @return result of inlining
+   * @throws QueryException query exception
+   */
+  final boolean inlineDb(final ExprInfo ei, final Expr ex, final CompileContext cc)
       throws QueryException {
     final IndexDb inlined = db.inline(ei, ex, cc);
-    if(inlined != null) {
-      db = inlined;
-      return this;
-    }
-    return null;
+    if(inlined == null) return false;
+    db = inlined;
+    return true;
   }
 
   @Override

@@ -72,11 +72,11 @@ public final class TypeswitchGroup extends Single {
 
   /**
    * Inlines the expression.
-   * @param cc compilation context
    * @param value value to be bound
+   * @param cc compilation context
    * @throws QueryException query exception
    */
-  void inline(final CompileContext cc, final Value value) throws QueryException {
+  void inline(final Value value, final CompileContext cc) throws QueryException {
     if(var == null) return;
     final Expr inlined = expr.inline(var, var.checkType(value, cc.qc, true), cc);
     if(inlined != null) expr = inlined;

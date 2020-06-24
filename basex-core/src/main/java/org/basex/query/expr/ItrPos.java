@@ -105,6 +105,11 @@ public final class ItrPos extends Simple {
   }
 
   @Override
+  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc) {
+    return null;
+  };
+
+  @Override
   public ItrPos copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return new ItrPos(min, max, info);
   }
