@@ -30,9 +30,7 @@ public enum Annotation {
   /** XQuery annotation. */
   _BASEX_INLINE("inline([limit])", arg(ITR_O), BASEX_URI),
   /** XQuery annotation. */
-  _BASEX_READ_LOCK("read-lock(key)", arg(STR_O), BASEX_URI),
-  /** XQuery annotation. */
-  _BASEX_WRITE_LOCK("write-lock(key)", arg(STR_O), BASEX_URI),
+  _BASEX_LOCK("lock(key)", arg(STR_O), BASEX_URI),
 
   /** XQuery annotation. */
   _INPUT_CSV("csv(option[,...])", arg(STR_O), INPUT_URI),

@@ -8,6 +8,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.index.*;
 import org.basex.query.func.*;
+import org.basex.util.list.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -47,13 +48,13 @@ public final class CommandLockingTest extends SandboxTest {
   private static final LockList BACKUP_NAME =
       new LockList().add(Locking.BACKUP).add(NAME);
   /** StringList containing java module test lock strings. */
-  private static final LockList MODULE_LIST = new LockList().add(Locking.JAVA_PREFIX
-      + QueryModuleTest.LOCK1).add(Locking.JAVA_PREFIX + QueryModuleTest.LOCK2);
+  private static final LockList MODULE_LIST = new LockList().
+      add(Locking.BASEX_PREFIX + QueryModuleTest.LOCK);
 
   /**
    * Test commands affecting databases.
    */
-  @Test public void databaseCommands() {
+  @Test public void commands() {
     ckDBs(new Add(FILE, FILE), true, CTX_LIST);
     ckDBs(new AlterDB(NAME, NAME2), true, new LockList().add(NAME).add(NAME2));
     ckDBs(new AlterPassword(NAME, NAME), true, USER_LIST);
@@ -113,13 +114,18 @@ public final class CommandLockingTest extends SandboxTest {
 
   /** Tests locked databases in XQuery queries. */
   @Test public void xquery() {
-    // Basic document access
-    ckDBs(new XQuery(COLLECTION.args(NAME)), false, NAME_LIST);
+    // context access
+    ckDBs(new XQuery("."), false, CTX_LIST);
+
+    // functions
     ckDBs(new XQuery(COLLECTION.args()), false, CTX_LIST);
-    // fn:collection() always accesses the global context, no matter what local context is
+    ckDBs(new XQuery(COLLECTION.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery("<a/>/" + COUNT.args(COLLECTION.args())), false, CTX_LIST);
+
     ckDBs(new XQuery(DOC.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(DOC.args("http://abc.de/")), false, NONE);
+    ckDBs(new XQuery(DOC_AVAILABLE.args(NAME + "/foo.xml")), false, NAME_LIST, null);
+
     ckDBs(new XQuery(ID.args(NAME)), false, CTX_LIST);
     ckDBs(new XQuery(IDREF.args(NAME)), false, CTX_LIST);
     ckDBs(new XQuery(ELEMENT_WITH_ID.args(NAME)), false, CTX_LIST);
@@ -128,43 +134,47 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(IDREF.args(NAME, DOC.args(NAME))), false, NAME_LIST);
     ckDBs(new XQuery(ELEMENT_WITH_ID.args(NAME, DOC.args(NAME))), false, NAME_LIST);
     ckDBs(new XQuery(LANG.args(NAME, DOC.args(NAME))), false, NAME_LIST);
-    ckDBs(new XQuery(DOC_AVAILABLE.args(NAME + "/foo.xml")), false, NAME_LIST, null);
+
     ckDBs(new XQuery(PARSE_XML.args(" <foo/>")), true, NONE);
     ckDBs(new XQuery(PARSE_XML_FRAGMENT.args(" <foo/>")), true, NONE);
+
     ckDBs(new XQuery(PUT.args(" <foo/>", NAME)), true, NONE);
     ckDBs(new XQuery(PUT.args(" .", NAME)), true, CTX_LIST);
+
     ckDBs(new XQuery(ROOT.args()), false, CTX_LIST);
     ckDBs(new XQuery(ROOT.args(" .")), false, CTX_LIST);
     ckDBs(new XQuery(ROOT.args(" ./test")), false, CTX_LIST);
     ckDBs(new XQuery(ROOT.args(" <foo/>")), true, NONE);
+
     ckDBs(new XQuery(UNPARSED_TEXT.args(FILE)), false, NONE);
     ckDBs(new XQuery(UNPARSED_TEXT_AVAILABLE.args(FILE)), false, NONE);
     ckDBs(new XQuery(UNPARSED_TEXT_LINES.args(FILE)), false, NONE);
+
     ckDBs(new XQuery(URI_COLLECTION.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(URI_COLLECTION.args()), false, CTX_LIST);
 
-    // Accessor and node functions
-    for(final Function fn : new Function[] { DATA, STRING, NUMBER, STRING_LENGTH, NORMALIZE_SPACE,
+    // accessor and node functions
+    final Function[] functions = { DATA, STRING, NUMBER, STRING_LENGTH, NORMALIZE_SPACE,
         DOCUMENT_URI, NILLED, NODE_NAME, LOCAL_NAME, Function.NAME, NAMESPACE_URI, ROOT, BASE_URI,
-        GENERATE_ID, HAS_CHILDREN, PATH }) {
-      ckDBs(new XQuery(fn.args()), false, CTX_LIST);
-      ckDBs(new XQuery(DOC.args(NAME) + '/' + fn.args()), false, NAME_LIST, NAME_CTX);
+        GENERATE_ID, HAS_CHILDREN, PATH };
+    for(final Function function : functions) {
+      ckDBs(new XQuery(function.args()), false, CTX_LIST);
+      ckDBs(new XQuery(DOC.args(NAME) + '/' + function.args()), false, NAME_LIST, NAME_CTX);
     }
-    for(final Function fn : new Function[] { DATA, STRING, NUMBER, STRING_LENGTH, NORMALIZE_SPACE,
-        DOCUMENT_URI, NILLED, NODE_NAME, LOCAL_NAME, Function.NAME, NAMESPACE_URI, ROOT, BASE_URI,
-        GENERATE_ID, HAS_CHILDREN, PATH }) {
-      ckDBs(new XQuery(fn.args(DOC.args(NAME))), false, NAME_LIST);
+    for(final Function function : functions) {
+      ckDBs(new XQuery(function.args(DOC.args(NAME))), false, NAME_LIST);
     }
 
-    // Others
-    ckDBs(new XQuery("."), false, CTX_LIST);
+    // errors
     ckDBs(new XQuery(ERROR.args()), false, NONE);
     ckDBs(new XQuery(ERROR.args(" xs:QName('foo')")), false, NONE);
     ckDBs(new XQuery(ERROR.args(" xs:QName('foo')", "bar")), false, NONE);
     ckDBs(new XQuery(ERROR.args(" xs:QName('foo')", "bar", " <batz/>")), false, NONE);
     ckDBs(new XQuery(_RANDOM_INTEGER.args()), false, NONE);
+  }
 
-    // User defined functions
+  /** Tests user-defined functions. */
+  @Test public void userDefined() {
     ckDBs(new XQuery("declare function local:a($a) {" +
         "if($a = 0) then $a else local:a($a idiv 2) };" +
         "local:a(5)"), false, NONE);
@@ -174,17 +184,20 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery("declare function local:a($a) {" +
         "if($a = 0) then " + DOC.args(NAME) + " else local:a($a idiv 2) };" +
         "local:a(5)"), false, NAME_LIST);
+  }
 
-    // Java module function test. Locks are added at compilation, so execute each query
-    // to get it compiled.
-    XQuery query = new XQuery(
-        "import module namespace qm='java:org.basex.query.func.QueryModuleTest';" +
-        "qm:readLock()");
+  /** Tests locked databases in XQuery java function calls. */
+  @Test public void javaRead() {
+    final String prolog = "import module namespace qm='java:org.basex.query.func.QueryModuleTest';";
+    final XQuery query = new XQuery(prolog + "qm:read-lock()");
     execute(query);
     ckDBs(query, false, MODULE_LIST);
-    query = new XQuery(
-        "import module namespace qm='java:org.basex.query.func.QueryModuleTest';" +
-        "qm:writeLock()");
+  }
+
+  /** Tests locked databases in XQuery java function calls. */
+  @Test public void javaWrite() {
+    final String prolog = "import module namespace qm='java:org.basex.query.func.QueryModuleTest';";
+    final XQuery query = new XQuery(prolog + "qm:write-lock()");
     execute(query);
     ckDBs(query, true, MODULE_LIST);
   }
@@ -348,20 +361,32 @@ public final class CommandLockingTest extends SandboxTest {
       if(list != null) list.finish(null);
     }
 
-    // Test if read locking too much or less databases
-    if(reqRd == null && !locks.reads.global()) fail("Should read lock all databases, didn't.");
+    // read locks
+    final StringList list = new StringList();
+    if(reqRd == null && !locks.reads.global())
+      list.add("Should apply global READ lock.");
     if(reqRd != null && allowRd != null && !containsAll(locks.reads, reqRd))
-      fail("Didn't read lock all necessary databases.");
-    if(allowRd != null && locks.reads.global()) fail("Read locked all databases, may not.");
+      list.add("Applied too few READ locks: " + locks.reads + " vs. " + reqRd);
+    if(allowRd != null && locks.reads.global())
+      list.add("Applied global WRITE locks; expected: " + allowRd);
     if(allowRd != null && !containsAll(allowRd, locks.reads))
-      fail("Read locked more databases than I should.");
-    // Test if write locking too much or less databases
-    if(reqWt == null && !locks.writes.global()) fail("Should write lock all databases, didn't.");
+      list.add("Applied too many READ locks: " + locks.reads + " vs. " + allowRd);
+
+    // write locks
+    if(reqWt == null && !locks.writes.global())
+      list.add("Should apply global WRITE lock.");
     if(reqWt != null && allowWt != null && !containsAll(locks.writes, reqWt))
-      fail("Didn't write lock all necessary databases.");
-    if(allowWt != null && locks.writes.global()) fail("Write locked all databases, may not.");
+      list.add("Applied too few WRITE locks: " + locks.writes + " vs. " + reqWt);
+    if(allowWt != null && locks.writes.global())
+      list.add("Applied global WRITE locks; expected: " + allowWt);
     if(allowWt != null && !containsAll(allowWt, locks.writes))
-      fail("Write locked more databases than I should.");
+      list.add("Applied too many WRITE locks: " + locks.writes + " vs. " + allowWt);
+
+    if(!list.isEmpty()) {
+      final StringBuilder sb = new StringBuilder("Errors:");
+      for(final String string : list) sb.append("\n- ").append(string);
+      fail(sb.toString());
+    }
   }
 
   /**

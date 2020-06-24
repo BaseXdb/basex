@@ -16,9 +16,7 @@ public final class QueryModuleTest extends QueryModule {
   /** Fruits array. */
   private static final String[] FRUITS = { "Apple", "Banana", "Cherry" };
   /** Lock string. */
-  public static final String LOCK1 = "foo";
-  /** Lock string. */
-  public static final String LOCK2 = "bar";
+  public static final String LOCK = "Fruits";
 
   /**
    * Returns the specified fruit modulo number of fruits.
@@ -62,13 +60,14 @@ public final class QueryModuleTest extends QueryModule {
   /**
    * Read lock.
    */
-  @Lock(read = { LOCK1, LOCK2 })
+  @Lock(LOCK)
   public void readLock() { }
 
   /**
-   * Write locks.
+   * Write lock.
    */
-  @Lock(write = { LOCK1, LOCK2 })
+  @Updating
+  @Lock(LOCK)
   public void writeLock() { }
 
   /**

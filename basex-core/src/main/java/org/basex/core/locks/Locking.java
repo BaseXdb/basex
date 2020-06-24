@@ -32,22 +32,20 @@ import org.basex.util.list.*;
  */
 public final class Locking {
   /** Prefix for internal special locks. */
-  public static final String PREFIX = "I/";
+  public static final String INTERNAL_PREFIX = "internal:";
   /** Prefix for query locks. */
-  public static final String QUERY_PREFIX = "Q/";
-  /** Prefix for locks in Java modules. */
-  public static final String JAVA_PREFIX = "J/";
+  public static final String BASEX_PREFIX = "basex:";
 
   /** Special lock identifier for database opened in current context; will be substituted. */
-  public static final String CONTEXT = PREFIX + "CONTEXT";
+  public static final String CONTEXT = INTERNAL_PREFIX + "context";
   /** Special lock identifier for collection available via current context; will be substituted. */
-  public static final String COLLECTION = PREFIX + "COLLECTION";
+  public static final String COLLECTION = INTERNAL_PREFIX + "collection";
   /** Special lock identifier for user commands. */
-  public static final String USER = PREFIX + "USER";
+  public static final String USER = INTERNAL_PREFIX + "user";
   /** Special lock identifier for backup commands. */
-  public static final String BACKUP = PREFIX + "BACKUP";
+  public static final String BACKUP = INTERNAL_PREFIX + "backup";
   /** Special lock identifier for repository commands. */
-  public static final String REPO = PREFIX + "REPO";
+  public static final String REPO = INTERNAL_PREFIX + "repo";
 
   /** Fair ordering policy; prevents starvation, but reduces parallelism. */
   private final boolean fair;
@@ -215,9 +213,9 @@ public final class Locking {
   public static String[] queryLocks(final byte[] string) {
     final StringList list = new StringList();
     for(final byte[] lock : split(string, ',')) {
-      list.add(QUERY_PREFIX + string(lock).trim());
+      list.add(BASEX_PREFIX + string(lock).trim());
     }
-    if(list.isEmpty()) list.add(QUERY_PREFIX);
+    if(list.isEmpty()) list.add(BASEX_PREFIX);
     return list.finish();
   }
 

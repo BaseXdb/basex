@@ -5,9 +5,9 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests database locking inside BaseX. For this purpose, two queries are forced to be
@@ -17,13 +17,10 @@ import org.junit.jupiter.api.*;
  * @author Jens Erat
  */
 public final class ServerLockingTest extends SandboxTest {
-  /** How often should tests be repeated? */
-  private static final int REPEAT = 1;
-
   /** Maximum sleep time in ms. */
-  private static final long SLEEP = 500L;
+  private static final long SLEEP = 500;
   /** Additional allowed holding time for client creation overhead, ... in ms. */
-  private static final long SYNC = 200L;
+  private static final long SYNC = 200;
 
   /** Test document. */
   private static final String DOC = "src/test/resources/test.xml";
@@ -38,11 +35,7 @@ public final class ServerLockingTest extends SandboxTest {
     "for $i in ('%1$s') return (db:open($i), %2$s)"
   };
   /** XQuery code for handling latches. */
-  private static final String Q;
-
-  static {
-    Q = "Q{" + ServerLockingTest.class.getName() + "}countDownAndWait()";
-  }
+  private static final String Q = "Q{" + ServerLockingTest.class.getName() + "}countDownAndWait()";
 
   /** Server reference. */
   private static BaseXServer server;
@@ -84,23 +77,22 @@ public final class ServerLockingTest extends SandboxTest {
 
   /**
    * Test parallel execution of given queries.
-   * @param c1 First command
-   * @param c2 Second command
+   * @param query1 first query
+   * @param query2 second query
    * @param parallel Should queries be executed in parallel?
    * @throws Exception None expected
    */
-  private static void testQueries(final Command c1, final Command c2, final boolean parallel)
+  private static void testQueries(final String query1, final String query2, final boolean parallel)
       throws Exception {
 
     sync = new CountDownLatch(2);
     test = new CountDownLatch(2);
-    final Client cl1 = new Client(c1, null, null);
-    final Client cl2 = new Client(c2, null, null);
+    final Client cl1 = new Client(new XQuery(query1), null, null);
+    final Client cl2 = new Client(new XQuery(query2), null, null);
     final boolean await = test.await(2 * SLEEP + SYNC, TimeUnit.MILLISECONDS);
     assertNull(cl1.error, cl1.error);
     assertNull(cl2.error, cl2.error);
-    assertEquals(parallel, await,
-      parallel ? "Parallel execution expected" : "Serial execution expected");
+    assertEquals(parallel, await, (parallel ? "Parallel" : "Serial") + " execution expected");
   }
 
   /**
@@ -114,70 +106,130 @@ public final class ServerLockingTest extends SandboxTest {
   }
 
   /**
-   * Test whether parallel execution of queries is successful.
+   * Query no databases.
    * @throws Exception None expected
    */
-  @RepeatedTest(REPEAT)
-  public void lockingTests() throws Exception {
-    // Not querying any databases
+  @Test public void noDatabase() throws Exception {
+    testQueries(Q, Q, true);
+  };
+
+  /**
+   * Read same database.
+   * @throws Exception None expected
+   */
+  @Test public void readDatabase() throws Exception {
     testQueries(
-        new XQuery(Q),
-        new XQuery(Q),
+        f("(db:open('%s'), %s)", NAME, Q),
+        f("(db:open('%s'), %s)", NAME, Q),
         true);
-    // Reading the same database twice
+  };
+
+  /**
+   * Read two different databases.
+   * @throws Exception None expected
+   */
+  @Test public void readDatabases() throws Exception {
     testQueries(
-        new XQuery(f("(db:open('%s'), %s)", NAME, Q)),
-        new XQuery(f("(db:open('%s'), %s)", NAME, Q)),
+        f("(db:open('%s'), %s)", NAME, Q),
+        f("(db:open('%s1'), %s)", NAME, Q),
         true);
-    // Reading two different databases
+  };
+
+  /**
+   * Write to the same database twice.
+   * @throws Exception None expected
+   */
+  @Test public void writeDatabase() throws Exception {
     testQueries(
-        new XQuery(f("(db:open('%s'), %s)", NAME, Q)),
-        new XQuery(f("(db:open('%s1'), %s)", NAME, Q)),
-        true);
-    // Writing to the same database twice
-    testQueries(
-        new XQuery(f("insert node %s into db:open('%s')", Q, NAME)),
-        new XQuery(f("insert node %s into db:open('%s')", Q, NAME)),
+        f("insert node %s into db:open('%s')", Q, NAME),
+        f("insert node %s into db:open('%s')", Q, NAME),
         false);
-    // Writing to different databases
+  };
+
+  /**
+   * Write to different databases.
+   * @throws Exception None expected
+   */
+  @Test public void writeDatabases() throws Exception {
     testQueries(
-        new XQuery(f("insert node %s into db:open('%s')", Q, NAME)),
-        new XQuery(f("insert node %s into db:open('%s1')", Q, NAME)),
+        f("insert node %s into db:open('%s')", Q, NAME),
+        f("insert node %s into db:open('%s1')", Q, NAME),
         true);
-    // Read from and write to the same database
+  };
+
+  /**
+   * Read from and write to the same database.
+   * @throws Exception None expected
+   */
+  @Test public void readWriteDatabase() throws Exception {
     testQueries(
-        new XQuery(f("(db:open('%s'), %s)", NAME, Q)),
-        new XQuery(f("insert node %s into db:open('%s')", Q, NAME)),
+        f("(db:open('%s'), %s)", NAME, Q),
+        f("insert node %s into db:open('%s')", Q, NAME),
         false);
-    // Read from and write to different databases
+  };
+
+  /**
+   * Read from and write to different databases.
+   * @throws Exception None expected
+   */
+  @Test public void readWriteDatabases() throws Exception {
     testQueries(
-        new XQuery(f("(db:open('%s'), %s)", NAME, Q)),
-        new XQuery(f("insert node %s into db:open('%s1')", Q, NAME)),
+        f("(db:open('%s'), %s)", NAME, Q),
+        f("insert node %s into db:open('%s1')", Q, NAME),
         true);
-    // Read from a database, perform global write lock
+  };
+
+  /**
+   * Read from a database, perform global write lock.
+   * @throws Exception None expected
+   */
+  @Test public void readDatabasesGlobalWrite() throws Exception {
     testQueries(
-        new XQuery(f("(db:open('%s'), %s)", NAME, Q)),
-        new XQuery(f("for $i in ('%s') return insert node %s into db:open($i)", NAME, Q)),
+        f("(db:open('%s'), %s)", NAME, Q),
+        f("for $i in ('%s') return insert node %s into db:open($i)", NAME, Q),
         false);
-    // Global write lock twice
+  };
+
+  /**
+   * Global write lock twice.
+   * @throws Exception None expected
+   */
+  @Test public void globalWrites() throws Exception {
     testQueries(
-        new XQuery(f("for $i in ('%s') return insert node %s into db:open($i)", NAME, Q)),
-        new XQuery(f("for $i in ('%s') return insert node %s into db:open($i)", NAME, Q)),
+        f("for $i in ('%s') return insert node %s into db:open($i)", NAME, Q),
+        f("for $i in ('%s') return insert node %s into db:open($i)", NAME, Q),
         false);
-    // Custom Java module locking
-    testQueries(new XQuery(f(
-        "import module namespace qm='java:org.basex.query.func.QueryModuleTest';"
-            + "qm:writeLock(), %s", Q)), new XQuery(f(
-        "import module namespace qm='java:org.basex.query.func.QueryModuleTest';"
-            + "qm:writeLock(), %s", Q)), false);
+  };
+
+  /**
+   * Test XQuery locks.
+   * @throws Exception none expected
+   */
+  @Test public void xqueryRead() throws Exception {
+    final String prolog = "import module namespace qm='java:org.basex.query.func.QueryModuleTest';";
+    testQueries(
+      f(prolog + "qm:read-lock(), %s", Q),
+      f(prolog + "qm:read-lock(), %s", Q),
+      true);
+  }
+
+  /**
+   * Test XQuery locks.
+   * @throws Exception none expected
+   */
+  @Test public void xqueryWrite() throws Exception {
+    final String prolog = "import module namespace qm='java:org.basex.query.func.QueryModuleTest';";
+    testQueries(
+      f(prolog + "qm:write-lock(), %s", Q),
+      f(prolog + "qm:write-lock(), %s", Q),
+      false);
   }
 
   /**
    * Load test.
    * @throws Exception None expected
    */
-  @RepeatedTest(REPEAT)
-  public void loadTests() throws Exception {
+  @Test public void loadTests() throws Exception {
     final int totalQueries = RUN_COUNT * QUERIES.length;
     final ArrayList<Client> clients = new ArrayList<>(totalQueries);
     final CountDownLatch allDone = new CountDownLatch(totalQueries);

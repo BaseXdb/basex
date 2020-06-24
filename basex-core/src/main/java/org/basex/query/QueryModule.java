@@ -79,6 +79,13 @@ public abstract class QueryModule {
   }
 
   /**
+   * If a function is annotated as {@link Updating}, its function body will be treated as updating.
+   */
+  @Retention(RetentionPolicy.RUNTIME)
+  @Target(ElementType.METHOD)
+  public @interface Updating { }
+
+  /**
    * Java code is treated as "non-deterministic", as its behavior cannot be predicted from
    * the XQuery processor. You may annotate a function as {@link Deterministic} if you
    * know that it will have no side-effects and will always yield the same result.
@@ -112,16 +119,10 @@ public abstract class QueryModule {
   @Target(ElementType.METHOD)
   public @interface Lock {
     /**
-     * Read locks.
-     * @return read locks
+     * Lock.
+     * @return read lock
      */
-    String[] read() default { };
-
-    /**
-     * Write locks.
-     * @return write locks
-     */
-    String[] write() default { };
+    String value();
   }
 
   /** Global query context. */

@@ -63,8 +63,7 @@ public final class Transform extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Updates upd = qc.updates();
-    final Updates updates = new Updates(true);
+    final Updates tmp = qc.updates(), updates = new Updates(true);
     qc.updates = updates;
 
     try {
@@ -88,7 +87,7 @@ public final class Transform extends Arr {
       updates.prepare(qc);
       updates.apply(qc);
     } finally {
-      qc.updates = upd;
+      qc.updates = tmp;
     }
     return exprs[1].value(qc);
   }

@@ -43,16 +43,21 @@ public abstract class JavaCall extends Arr {
   final StaticContext sc;
   /** Permission. */
   final Perm perm;
+  /** Updating flag. */
+  final boolean updating;
 
   /**
    * Constructor.
    * @param args arguments
    * @param perm required permission to run the function
+   * @param updating updating flag
    * @param sc static context
    * @param info input info
    */
-  JavaCall(final Expr[] args, final Perm perm, final StaticContext sc, final InputInfo info) {
+  JavaCall(final Expr[] args, final Perm perm, final boolean updating, final StaticContext sc,
+      final InputInfo info) {
     super(info, SeqType.ITEM_ZM, args);
+    this.updating = updating;
     this.sc = sc;
     this.perm = perm;
   }
@@ -61,7 +66,13 @@ public abstract class JavaCall extends Arr {
   public final Value value(final QueryContext qc) throws QueryException {
     // check permission
     if(!qc.context.user().has(perm)) throw BASEX_PERMISSION_X_X.get(info, perm, this);
-    return toValue(eval(qc), qc, sc);
+
+    final Value value = toValue(eval(qc), qc, sc);
+    if(!updating) return value;
+
+    // updating function: cache output
+    qc.updates().addOutput(value, qc);
+    return Empty.VALUE;
   }
 
   /**
@@ -71,11 +82,6 @@ public abstract class JavaCall extends Arr {
    * @throws QueryException query exception
    */
   protected abstract Object eval(QueryContext qc) throws QueryException;
-
-  @Override
-  public boolean has(final Flag... flags) {
-    return Flag.NDT.in(flags) || super.has(flags);
-  }
 
   // STATIC METHODS ===============================================================================
 
@@ -181,7 +187,9 @@ public abstract class JavaCall extends Arr {
       final Requires req = meth.getAnnotation(Requires.class);
       final Perm perm = req == null ? Perm.ADMIN :
         Perm.get(req.value().name().toLowerCase(Locale.ENGLISH));
-      return new StaticJavaCall(module, meth, args, perm, sc, ii);
+      final boolean updating = meth.getAnnotation(Updating.class) != null;
+      if(updating) qc.updating();
+      return new StaticJavaCall(module, meth, args, perm, updating, sc, ii);
     }
 
     /* skip Java class lookup if...
@@ -262,10 +270,7 @@ public abstract class JavaCall extends Arr {
     // method found: add module locks to QueryContext
     if(method != null) {
       final Lock lock = method.getAnnotation(Lock.class);
-      if(lock != null) {
-        for(final String read : lock.read()) qc.readLocks.add(Locking.JAVA_PREFIX + read);
-        for(final String write : lock.write()) qc.writeLocks.add(Locking.JAVA_PREFIX + write);
-      }
+      if(lock != null) qc.locks.add(Locking.BASEX_PREFIX + lock.value());
       return method;
     }
 

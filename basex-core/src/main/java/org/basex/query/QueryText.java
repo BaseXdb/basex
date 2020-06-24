@@ -196,8 +196,7 @@ public interface QueryText {
   /** Parser token. */ String DEFAULT_ORDER_EMPTY = "default-order-empty";
   /** Parser token. */ String DECIMAL_FORMATS = "decimal-formats";
 
-  /** Parser token. */ String READ_LOCK = "read-lock";
-  /** Parser token. */ String WRITE_LOCK = "write-lock";
+  /** Parser token. */ String LOCK = "lock";
   /** Parser token. */ String NON_DETERMNISTIC = "non-deterministic";
 
   // PARSER KEYWORDS (IGNORED BY THE SYNTAX HIGHLIGHTER) ==========================================

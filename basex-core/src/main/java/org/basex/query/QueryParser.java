@@ -535,16 +535,8 @@ public class QueryParser extends InputParser {
 
     } else if(eq(qname.uri(), BASEX_URI)) {
       // query-specific options
-      switch(name) {
-        case READ_LOCK:
-          for(final String lock : Locking.queryLocks(value)) qc.readLocks.add(lock);
-          break;
-        case WRITE_LOCK:
-          for(final String lock : Locking.queryLocks(value)) qc.writeLocks.add(lock);
-          break;
-        default:
-          throw error(BASEX_OPTIONS1_X, name);
-      }
+      if(!name.equals(LOCK)) throw error(BASEX_OPTIONS1_X, name);
+      for(final String lock : Locking.queryLocks(value)) qc.locks.add(lock);
     }
     // ignore unknown options
   }

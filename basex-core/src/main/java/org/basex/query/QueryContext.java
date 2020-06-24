@@ -94,10 +94,8 @@ public final class QueryContext extends Job implements Closeable {
   /** Available collations. */
   public TokenObjMap<Collation> collations;
 
-  /** Strings to lock defined by read-lock option. */
-  public final LockList readLocks = new LockList();
-  /** Strings to lock defined by write-lock option. */
-  public final LockList writeLocks = new LockList();
+  /** User-defined locks. */
+  public final LockList locks = new LockList();
 
   /** Number of successive tail calls. */
   public int tailCalls;
@@ -365,14 +363,16 @@ public final class QueryContext extends Job implements Closeable {
 
   @Override
   public void addLocks() {
-    final Locks locks = jc().locks;
-    final LockList read = locks.reads, write = locks.writes;
-    read.add(readLocks);
-    write.add(writeLocks);
-    // use global locking if referenced databases cannot be statically determined
-    if(root == null || !root.databases(locks, this) ||
-       ctxItem != null && !ctxItem.databases(locks, this)) {
-      (updating ? write : read).addGlobal();
+    // choose read or write locks
+    final Locks l = jc().locks;
+    final LockList list = updating ? l.writes : l.reads;
+
+    if(root == null || !root.databases(l, this) || ctxItem != null && !ctxItem.databases(l, this)) {
+      // use global locking if referenced databases cannot statically be determined
+      list.addGlobal();
+    } else {
+      // add custom locks
+      list.add(locks);
     }
   }
 

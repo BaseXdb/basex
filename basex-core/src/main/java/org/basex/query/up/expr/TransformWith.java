@@ -53,7 +53,7 @@ public final class TransformWith extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Updates upd = qc.updates();
+    final Updates tmp = qc.updates();
     final QueryFocus qf = qc.focus;
     final Value cv = qf.value;
 
@@ -79,7 +79,7 @@ public final class TransformWith extends Arr {
         vb.add(item);
       }
     } finally {
-      qc.updates = upd;
+      qc.updates = tmp;
       qf.value = cv;
     }
     return vb.value(this);
