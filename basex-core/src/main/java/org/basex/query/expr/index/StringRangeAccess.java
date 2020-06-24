@@ -105,7 +105,7 @@ public final class StringRangeAccess extends IndexAccess {
   @Override
   public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
       throws QueryException {
-    return super.inlineDb(ei, ex, cc) ? optimize(cc) : null;
+    return inlineDb(ei, ex, cc) ? optimize(cc) : null;
   }
 
   @Override

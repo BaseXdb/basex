@@ -282,7 +282,7 @@ public final class ValueAccess extends IndexAccess {
       throws QueryException {
     final Expr inlined = expr.inline(ei, ex, cc);
     if(inlined != null) expr = inlined;
-    final boolean inlinedDb = super.inlineDb(ei, ex, cc);
+    final boolean inlinedDb = inlineDb(ei, ex, cc);
     return inlined != null || inlinedDb ? optimize(cc) : null;
   }
 

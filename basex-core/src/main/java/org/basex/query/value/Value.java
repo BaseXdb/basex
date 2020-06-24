@@ -159,7 +159,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   @Override
   public final Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc) {
-    // values do not contain variable references
     return null;
   }
 
