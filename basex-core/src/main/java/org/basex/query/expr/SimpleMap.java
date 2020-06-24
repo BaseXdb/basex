@@ -343,6 +343,7 @@ public abstract class SimpleMap extends Arr {
       else cc.updateFocus(inlined);
     }
     cc.removeFocus();
+
     return changed ? optimize(cc) : null;
   }
 

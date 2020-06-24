@@ -64,7 +64,8 @@ public final class IndexInfo {
    * the applicable index type.
    * @param input input (if {@code null}, no optimization will be possible)
    * @param type index type, predefined by the called expression (can be {@code null})
-   * @return resulting index type, or {@code null} if index access is not possible
+   * @return supplied type, {@link IndexType#TEXT}, {@link IndexType#ATTRIBUTE}, or
+   *   {@code null} if index access is not possible
    */
   public IndexType type(final Expr input, final IndexType type) {
     pred = IndexPred.get(input, this);

@@ -112,6 +112,7 @@ public final class Try extends Single {
   @Override
   public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
       throws QueryException {
+
     boolean changed = false;
     try {
       final Expr inlined = expr.inline(ei, ex, cc);
@@ -132,7 +133,9 @@ public final class Try extends Single {
       throw qe;
     }
 
-    for(final Catch ctch : catches) changed |= ctch.inline(ei, ex, cc) != null;
+    for(final Catch ctch : catches) {
+      changed |= ctch.inline(ei, ex, cc) != null;
+    }
     return changed ? this : null;
   }
 

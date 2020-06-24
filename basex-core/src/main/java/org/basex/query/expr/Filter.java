@@ -234,6 +234,7 @@ public abstract class Filter extends Preds {
       root = inlined;
       changed = true;
     }
+    // do not inline context reference in predicates
     changed |= ei != null && cc.ok(root, () -> inlineAll(ei, ex, exprs, cc));
 
     return changed ? optimize(cc) : null;

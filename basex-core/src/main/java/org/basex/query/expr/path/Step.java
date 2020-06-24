@@ -122,6 +122,7 @@ public abstract class Step extends Preds {
   @Override
   public final Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
       throws QueryException {
+    // do not inline context value
     return ei != null && cc.ok(this, () -> inlineAll(ei, ex, exprs, cc)) ? optimize(cc) : null;
   }
 
