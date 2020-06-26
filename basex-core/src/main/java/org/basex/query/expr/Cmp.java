@@ -183,7 +183,7 @@ public abstract class Cmp extends Arr {
         final ExprList paths = new ExprList(2);
         for(final QNm qname : qnames) {
           final Test test = new NameTest((NodeType) type, qname, part, cc.sc().elemNS);
-          final Expr step = new StepBuilder(info).test(test).finish(cc, null);
+          final Expr step = Step.get(cc, null, info, test);
           if(step != Empty.VALUE) paths.add(Path.get(cc, info, null, step));
         }
         return paths.isEmpty() ? Bln.FALSE : paths.size() == 1 ? paths.get(0) :

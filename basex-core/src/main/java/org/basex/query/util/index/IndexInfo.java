@@ -206,7 +206,7 @@ public final class IndexInfo {
     if(test == null || !parent) {
       rt = root;
     } else {
-      final Expr st = new StepBuilder(ii).axis(Axis.PARENT).test(test).finish(cc, root);
+      final Expr st = Step.get(cc, root, ii, Axis.PARENT, test);
       rt = Path.get(cc, ii, root, st);
     }
     expr = pred.invert(rt);

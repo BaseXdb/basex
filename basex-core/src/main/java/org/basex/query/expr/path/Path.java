@@ -598,7 +598,7 @@ public abstract class Path extends ParseExpr {
         final QNm qName = qNames.get(ts - t - 1);
         final Test test = qName == null ? KindTest.ELM :
           new NameTest(NodeType.ELM, qName, NamePart.LOCAL, null);
-        stps[t] = new StepBuilder(curr.info).axis(CHILD).test(test).preds(preds).finish(cc, root);
+        stps[t] = Step.get(cc, root, curr.info, CHILD, test, preds);
       }
       while(++s < sl) stps[ts++] = steps[s];
 
@@ -737,13 +737,13 @@ public abstract class Path extends ParseExpr {
         if(s == 0) {
           // add document test for collections and axes other than ancestors
           if(rootTest != KindTest.DOC || invAxis != ANCESTOR && invAxis != ANCESTOR_OR_SELF) {
-            invSteps.add(new StepBuilder(info).axis(invAxis).test(rootTest).finish(cc, resultRoot));
+            invSteps.add(Step.get(cc, resultRoot, info, invAxis, rootTest));
           }
         } else {
           final Step prevStep = axisStep(s - 1);
           final Axis newAxis = prevStep.axis == ATTRIBUTE ? ATTRIBUTE : invAxis;
-          final Expr newStep = new StepBuilder(prevStep.info).axis(newAxis).test(prevStep.test).
-              preds(prevStep.exprs).finish(cc, resultRoot);
+          final Expr newStep = Step.get(cc, resultRoot, prevStep.info, newAxis, prevStep.test,
+              prevStep.exprs);
           invSteps.add(newStep);
         }
       }
@@ -765,7 +765,7 @@ public abstract class Path extends ParseExpr {
       final Expr step;
       if(ls < 0 || !(resultSteps.get(ls) instanceof Step)) {
         // add at least one self axis step
-        step = new StepBuilder(info).preds(newPreds.finish()).finish(cc, resultRoot);
+        step = Step.get(cc, resultRoot, info, newPreds.finish());
         ls++;
       } else {
         step = ((Step) resultSteps.get(ls)).addPredicates(newPreds.finish());

@@ -76,18 +76,16 @@ public class IndexPath extends IndexPred {
 
     // attribute index request: start inverted path with attribute step
     if(!ii.text && (last.test instanceof NameTest || last.test instanceof UnionTest)) {
-      steps.add(new StepBuilder(last.info).test(last.test).finish(cc, rt));
+      steps.add(Step.get(cc, rt, last.info, last.test));
     }
     // add inverted steps in reverse order
     while(--s >= 0) {
       final Step st = step(s);
-      steps.add(new StepBuilder(st.info).axis(step(s + 1).axis.invert()).test(st.test).
-          preds(st.exprs).finish(cc, rt));
+      steps.add(Step.get(cc, rt, st.info, step(s + 1).axis.invert(), st.test, st.exprs));
     }
     // add root step without predicates
     final Step st = step(s);
-    steps.add(new StepBuilder(st.info).axis(step(s + 1).axis.invert()).test(st.test).
-        finish(cc, rt));
+    steps.add(Step.get(cc, rt, st.info, step(s + 1).axis.invert(), st.test));
 
     return Path.get(cc, path.info, rt, steps.finish());
   }

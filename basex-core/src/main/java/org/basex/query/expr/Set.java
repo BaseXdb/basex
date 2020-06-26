@@ -168,7 +168,7 @@ abstract class Set extends Arr {
     }
     if(test == null || preds == null) return null;
 
-    final Expr step = new StepBuilder(info).axis(axis).test(test).preds(preds).finish(cc, root);
+    final Expr step = Step.get(cc, root, info, axis, test, preds);
     return Path.get(cc, info, root, step);
   }
 

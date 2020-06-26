@@ -33,6 +33,51 @@ public abstract class Step extends Preds {
   public Axis axis;
 
   /**
+   * Returns a new optimized self::node() step.
+   * @param cc compilation context
+   * @param root root expression
+   * @param ii input info
+   * @param preds predicates
+   * @return step
+   * @throws QueryException query exception
+   */
+  public static Expr get(final CompileContext cc, final Expr root, final InputInfo ii,
+      final Expr... preds) throws QueryException {
+    return get(cc, root, ii, KindTest.NOD, preds);
+  }
+
+  /**
+   * Returns a new optimized self step.
+   * @param cc compilation context
+   * @param root root expression
+   * @param ii input info
+   * @param test test
+   * @param preds predicates
+   * @return step
+   * @throws QueryException query exception
+   */
+  public static Expr get(final CompileContext cc, final Expr root, final InputInfo ii,
+      final Test test, final Expr... preds) throws QueryException {
+    return get(cc, root, ii, Axis.SELF, test, preds);
+  }
+
+  /**
+   * Returns a new optimized step.
+   * @param cc compilation context
+   * @param root root expression
+   * @param ii input info
+   * @param axis axis
+   * @param test node test
+   * @param preds predicates
+   * @return step
+   * @throws QueryException query exception
+   */
+  public static Expr get(final CompileContext cc, final Expr root, final InputInfo ii,
+      final Axis axis, final Test test, final Expr... preds) throws QueryException {
+    return new CachedStep(ii, axis, test, preds).optimize(root, cc);
+  }
+
+  /**
    * Returns a new step.
    * @param ii input info
    * @param axis axis
