@@ -1054,9 +1054,18 @@ public abstract class Path extends ParseExpr {
       changed = true;
     }
 
-    changed |= ei != null && cc.ok(root != null ? root : cc.qc.focus.value, () -> {
+    // optimize steps with new root context
+    final int sl = steps.length;
+    final Expr rt = root != null ? root : cc.qc.focus.value;
+    if(changed) {
+      for(int s = 0; s < sl; s++) {
+        final Expr step = steps[s];
+        steps[s] = step instanceof Step ? ((Step) step).optimize(rt, cc) : step.optimize(cc);
+      }
+    }
+
+    changed |= ei != null && cc.ok(rt, () -> {
       boolean chngd = false;
-      final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
         final Expr step = steps[s].inline(ei, ex, cc);
         if(step != null) {
