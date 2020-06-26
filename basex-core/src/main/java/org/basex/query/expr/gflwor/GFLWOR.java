@@ -662,6 +662,9 @@ public final class GFLWOR extends ParseExpr {
         if(last.expr.ddo() && simple.all(path.steps)) {
           // for $a in //a return $a/b  ->  //a/b
           rtrn = func.apply(last.expr);
+        } else if(path.root.size() != 1) {
+          // let $a := reverse((<a>A</a>, <b>B</b>)) return $n/text()
+          return false;
         } else {
           // for $a in (a,b) return $a/descendant::b  ->  (a,b) ! descendant::b
           final Expr expr = cc.get(last.expr, () -> func.apply(null));

@@ -1468,6 +1468,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("count(for $c in //c return $c/..)", 2, exists(IterMap.class));
     check("count(for $c in //* return $c//c)", 3, exists(IterMap.class));
     check("count(for $c in //* return $c/following::*)", 2, exists(IterMap.class));
+
+    // do not rewrite expressions that would change node order
+    check("let $n := reverse((<a>A</a>, <b>B</b>)) return $n/text()", "A\nB", root(GFLWOR.class));
   }
 
   /** FLWOR: Return clause, filter expression. */
