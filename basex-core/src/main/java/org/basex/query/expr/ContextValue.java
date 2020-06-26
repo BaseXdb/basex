@@ -1,4 +1,3 @@
-
 package org.basex.query.expr;
 
 import org.basex.core.locks.*;

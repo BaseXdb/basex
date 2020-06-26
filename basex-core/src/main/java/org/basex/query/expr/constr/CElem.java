@@ -212,7 +212,7 @@ public final class CElem extends CName {
           boolean constr = false;
           for(int f = e; f < el && !constr; f++) {
             constr = exprs[f] instanceof CNode ? ((CNode) exprs[f]).computed :
-              !(expr instanceof Str);
+              !(exprs[f] instanceof Str);
           }
           if(constr) {
             qs.token("{").tokens(Arrays.copyOfRange(exprs, e, el), SEP).token("}");
@@ -225,7 +225,7 @@ public final class CElem extends CName {
               }
             }
           }
-          qs.token('<').token('/').token(nm).token('>');
+          qs.token("</").token(nm).token('>');
           return;
         }
       }

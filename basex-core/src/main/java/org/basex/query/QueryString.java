@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public final class QueryString {
   /** Characters after which no spaces should be added. */
-  private static final String NO_SPACE = "|/<>([ \n\t";
+  private static final String NO_SPACE = "|/<([ \n\t";
   /** Query string. */
   private final TokenBuilder tb = new TokenBuilder();
 
