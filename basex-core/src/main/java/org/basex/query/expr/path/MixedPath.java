@@ -10,6 +10,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -28,7 +29,7 @@ public final class MixedPath extends Path {
    * @param steps axis steps
    */
   MixedPath(final InputInfo info, final Expr root, final Expr... steps) {
-    super(info, root, steps);
+    super(info, AtomType.ITEM, root, steps);
   }
 
   @Override

@@ -1,7 +1,7 @@
 package org.basex.query.expr.path;
 
 import org.basex.data.*;
-import org.basex.query.expr.*;
+
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -49,10 +49,8 @@ public final class NameTest extends Test {
   }
 
   @Override
-  public boolean noMatches(final Expr expr) {
-    // skip optimizations if context value has no data reference
-    if(expr == null) return false;
-    final Data data = expr.data();
+  public boolean noMatches(final Data data) {
+    // skip optimizations if data reference is not known at compile time
     if(data == null) return false;
 
     // skip optimizations if more than one namespace is defined in the database

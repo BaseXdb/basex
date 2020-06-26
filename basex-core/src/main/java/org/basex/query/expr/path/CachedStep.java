@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
-final class CachedStep extends Step {
+public final class CachedStep extends Step {
   /**
    * Constructor.
    * @param info input info
@@ -24,7 +24,7 @@ final class CachedStep extends Step {
    * @param test node test
    * @param preds predicates
    */
-  CachedStep(final InputInfo info, final Axis axis, final Test test, final Expr... preds) {
+  public CachedStep(final InputInfo info, final Axis axis, final Test test, final Expr... preds) {
     super(info, axis, test, preds);
   }
 

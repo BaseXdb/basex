@@ -75,7 +75,7 @@ public abstract class Filter extends Preds {
     if(st.zero()) return cc.replaceWith(this, root);
 
     // simplify predicates
-    if(optimize(cc, root)) return cc.emptySeq(this);
+    if(simplify(cc, root)) return cc.emptySeq(this);
     // no predicates: return root
     if(exprs.length == 0) return root;
 
@@ -84,7 +84,7 @@ public abstract class Filter extends Preds {
       // convert to axis path: (//x)[text() = 'a']  ->  //x[text() = 'a']
       if(root instanceof AxisPath) return ((AxisPath) root).addPredicates(cc, exprs);
 
-      // rewrite filter with document nodes to path; enables index rewritings
+      // rewrite filter with document nodes to path to possibly enable index rewritings
       // example: db:open('db')[.//text() = 'x']  ->  db:open('db')/.[.//text() = 'x']
       if(st.type == NodeType.DOC && root.ddo()) {
         final Expr step = new StepBuilder(info).preds(exprs).finish(cc, root);
@@ -177,7 +177,7 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  protected final void type(final Expr expr, final CompileContext cc) {
+  protected final void type(final Expr expr) {
     exprType.assign(root.seqType().type);
   }
 

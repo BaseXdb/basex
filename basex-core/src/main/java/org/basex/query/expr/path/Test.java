@@ -3,6 +3,7 @@ package org.basex.query.expr.path;
 import java.util.*;
 import java.util.List;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
@@ -74,11 +75,11 @@ public abstract class Test extends ExprInfo {
 
   /**
    * Checks if evaluation can be dropped.
-   * @param expr root expression (can be {@code null})
+   * @param data data reference (can be {@code null})
    * @return result of check
    */
   @SuppressWarnings("unused")
-  public boolean noMatches(final Expr expr) {
+  public boolean noMatches(final Data data) {
     return false;
   }
 

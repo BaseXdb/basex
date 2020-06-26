@@ -88,7 +88,7 @@ public final class CompileContext {
 
   /**
    * Pushes the current query focus onto the stack and, if possible, assigns a new dummy item.
-   * @param expr context expression (can be {@code null})
+   * @param expr focus expression (can be {@code null})
    */
   public void pushFocus(final Expr expr) {
     focuses.add(qc.focus);
@@ -99,7 +99,7 @@ public final class CompileContext {
 
   /**
    * Assigns a new dummy item to the query focus.
-   * @param expr context expression
+   * @param expr focus expression
    */
   public void updateFocus(final Expr expr) {
     qc.focus.value = dummyItem(expr);
@@ -107,7 +107,7 @@ public final class CompileContext {
 
   /**
    * Evaluates a function in the given focus.
-   * @param expr focus
+   * @param expr focus expression (can be {@code null})
    * @param func function to evaluate
    * @return resulting expression
    * @throws QueryException query exception
@@ -123,7 +123,7 @@ public final class CompileContext {
 
   /**
    * Evaluates a function in the given focus.
-   * @param expr focus
+   * @param expr focus expression (can be {@code null})
    * @param func function to evaluate
    * @return result of check
    * @throws QueryException query exception
@@ -142,7 +142,7 @@ public final class CompileContext {
    * @param expr expression
    * @return dummy item
    */
-  public Item dummyItem(final Expr expr) {
+  private Item dummyItem(final Expr expr) {
     Data data = expr.data();
     // no data reference: if expression is a step, use data from current focus
     if(data == null && expr instanceof Step) {

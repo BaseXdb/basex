@@ -40,11 +40,12 @@ public abstract class Path extends ParseExpr {
   /**
    * Constructor.
    * @param info input info
+   * @param type type
    * @param root root expression (can be {@code null})
    * @param steps steps
    */
-  protected Path(final InputInfo info, final Expr root, final Expr... steps) {
-    super(info, SeqType.ITEM_ZM);
+  protected Path(final InputInfo info, final Type type, final Expr root, final Expr... steps) {
+    super(info, type.seqType(Occ.ZERO_MORE));
     this.root = root;
     this.steps = steps;
   }
@@ -163,7 +164,7 @@ public abstract class Path extends ParseExpr {
     // merge adjacent steps
     if(expr == this) expr = mergeSteps(cc);
     // move predicates downward
-    if(expr == this) expr = movePreds(cc);
+    if(expr == this) expr = movePredicates(cc);
     // return optimized expression
     if(expr != this) return expr.optimize(cc);
 
@@ -728,9 +729,8 @@ public abstract class Path extends ParseExpr {
     }
 
     // invert steps that occur before index step and add them as predicate
-    final ExprList newPreds = new ExprList();
+    final ExprList invSteps = new ExprList(), newPreds = new ExprList();
     final Test rootTest = InvDocTest.get(rt);
-    final ExprList invSteps = new ExprList();
     if(rootTest != KindTest.DOC || data == null || !data.meta.uptodate || invertSteps(indexStep)) {
       for(int s = indexStep; s >= 0; s--) {
         final Axis invAxis = axisStep(s).axis.invert();
@@ -748,7 +748,9 @@ public abstract class Path extends ParseExpr {
         }
       }
     }
-    if(!invSteps.isEmpty()) newPreds.add(get(info, null, invSteps.finish()));
+    if(!invSteps.isEmpty()) {
+      newPreds.add(get(info, null, invSteps.finish()));
+    }
 
     // add remaining predicates
     final Expr[] preds = index.step.exprs;
@@ -766,7 +768,7 @@ public abstract class Path extends ParseExpr {
         step = new StepBuilder(info).preds(newPreds.finish()).finish(cc, resultRoot);
         ls++;
       } else {
-        step = ((Step) resultSteps.get(ls)).addPreds(newPreds.finish());
+        step = ((Step) resultSteps.get(ls)).addPredicates(newPreds.finish());
       }
       resultSteps.set(ls, step);
     }
@@ -887,14 +889,14 @@ public abstract class Path extends ParseExpr {
    * @return original or new expression
    * @throws QueryException query exception
    */
-  private Expr movePreds(final CompileContext cc) throws QueryException {
+  private Expr movePredicates(final CompileContext cc) throws QueryException {
     // example: //*[text()]/text()  ->  //*/text()
     return cc.get(root, () -> {
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
         final Expr curr = steps[s];
         if(curr instanceof Step) {
-          final Expr ex = movePreds(cc, s);
+          final Expr ex = movePredicates(cc, s);
           if(ex != null) return ex;
         }
         cc.updateFocus(curr);
@@ -910,7 +912,7 @@ public abstract class Path extends ParseExpr {
    * @return new expression or {@code null}
    * @throws QueryException query exception
    */
-  private Expr movePreds(final CompileContext cc, final int s) throws QueryException {
+  private Expr movePredicates(final CompileContext cc, final int s) throws QueryException {
     final Step step = (Step) steps[s];
     if(step.exprs.length != 1 || step.mayBePositional()) return null;
 
@@ -939,7 +941,7 @@ public abstract class Path extends ParseExpr {
     if(p < pl) {
       cc.updateFocus(list.peek());
       final Expr expr = get(cc, info, null, Arrays.copyOfRange(predSteps, p, pl));
-      list.add(((Step) steps[t - 1]).addPreds(expr).optimize(cc));
+      list.add(((Step) steps[t - 1]).addPredicates(expr).optimize(cc));
     } else {
       list.add(steps[t - 1]);
     }
@@ -968,7 +970,7 @@ public abstract class Path extends ParseExpr {
       final Test test = crr.test.intersect(nxt.test);
       if(test == null) return null;
       crr.test = test;
-      return crr.addPreds(nxt.exprs);
+      return crr.addPredicates(nxt.exprs);
     }
 
     if(crr.axis != DESCENDANT_OR_SELF || crr.test != KindTest.NOD || crr.exprs.length > 0)
@@ -1040,17 +1042,16 @@ public abstract class Path extends ParseExpr {
       throws QueryException {
 
     boolean changed = false;
-    if(root == null) {
-      if(ei == null) {
-        root = ex;
-        changed = true;
-      }
-    } else {
+    if(root != null) {
       final Expr inlined = root.inline(ei, ex, cc);
       if(inlined != null) {
         root = inlined;
         changed = true;
       }
+    } else if(ei == null) {
+      // relative path: assign new root
+      root = ex;
+      changed = true;
     }
 
     changed |= ei != null && cc.ok(root != null ? root : cc.qc.focus.value, () -> {

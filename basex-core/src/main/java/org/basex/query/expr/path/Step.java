@@ -33,7 +33,7 @@ public abstract class Step extends Preds {
   public Axis axis;
 
   /**
-   * This method returns the most efficient step implementation.
+   * Returns a new step.
    * @param ii input info
    * @param axis axis
    * @param test node test
@@ -93,26 +93,26 @@ public abstract class Step extends Preds {
   /**
    * Optimizes the step for the given root expression.
    * @param cc compilation context
-   * @param expr context expression (can be {@code null})
+   * @param expr context expression; if {@code null}, the current context will be used
    * @return optimized step
    * @throws QueryException query exception
    */
   final Expr optimize(final Expr expr, final CompileContext cc) throws QueryException {
     // updates the static type
     final Expr ex = expr != null ? expr : cc.qc.focus.value;
-    type(ex, cc);
+    type(ex);
 
     // check if step or test will never yield results
-    if(noMatches() || test.noMatches(ex)) {
+    if(noMatches() || ex != null && test.noMatches(ex.data())) {
       cc.info(OPTSTEP_X, this);
       return cc.emptySeq(this);
     }
-    // optimize predicates, choose best implementation
-    return optimize(cc, this) ? cc.emptySeq(this) : copyType(get(info, axis, test, exprs));
+    // simplify predicates, choose best implementation
+    return simplify(cc, this) ? cc.emptySeq(this) : copyType(get(info, axis, test, exprs));
   }
 
   @Override
-  protected final void type(final Expr expr, final CompileContext cc) {
+  protected final void type(final Expr expr) {
     // assign input type if step will return identical nodes
     if(expr != null && axis == Axis.SELF && test == KindTest.NOD) {
       exprType.assign(expr.seqType().type);
@@ -277,7 +277,7 @@ public abstract class Step extends Preds {
    * @param preds predicates to be added
    * @return resulting step instance
    */
-  final Step addPreds(final Expr... preds) {
+  final Step addPredicates(final Expr... preds) {
     return copyType(get(info, axis, test, ExprList.concat(exprs, preds)));
   }
 

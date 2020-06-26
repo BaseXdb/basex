@@ -9,6 +9,7 @@ import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -25,7 +26,7 @@ public abstract class AxisPath extends Path {
    * @param steps axis steps
    */
   AxisPath(final InputInfo info, final Expr root, final Expr... steps) {
-    super(info, root, steps);
+    super(info, NodeType.NOD, root, steps);
   }
 
   @Override
@@ -107,28 +108,17 @@ public abstract class AxisPath extends Path {
   }
 
   /**
-   * Adds predicates to the last step.
-   * @param preds predicates to be added
-   * @return resulting path instance
-   */
-  public final Expr addPredicates(final Expr... preds) {
-    final ExprList list = new ExprList(steps.length).add(steps);
-    final Expr step = ((Step) list.pop()).addPreds(preds);
-    return copyType(get(info, root, list.add(step).finish()));
-  }
-
-  /**
    * Adds predicates to the last step and returns the optimized expression.
    * @param cc compilation context
    * @param preds predicates to be added
-   * @return resulting path instance
+   * @return new path
    * @throws QueryException query exception
    */
   public final Expr addPredicates(final CompileContext cc, final Expr... preds)
       throws QueryException {
 
     final ExprList list = new ExprList(steps.length).add(steps);
-    final Expr step = ((Step) list.pop()).addPreds(preds);
+    final Expr step = ((Step) list.pop()).addPredicates(preds);
     list.add(cc == null ? step : cc.get(this, () -> {
       cc.updateFocus(step);
       return step.optimize(cc);

@@ -38,7 +38,8 @@ public abstract class Preds extends Arr {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    type(cc.qc.focus.value, cc);
+    // called at an early stage as it influences the optimization of predicates
+    type(cc.qc.focus.value);
 
     final int pl = exprs.length;
     if(pl != 0) cc.get(this, () -> {
@@ -59,11 +60,10 @@ public abstract class Preds extends Arr {
   }
 
   /**
-   * Assigns the expression type. Needs to be called before the predicates are compiled.
+   * Assigns the expression type.
    * @param expr root expression
-   * @param cc compilation context
    */
-  protected abstract void type(Expr expr, CompileContext cc);
+  protected abstract void type(Expr expr);
 
   /**
    * Assigns the sequence type and result size.
@@ -126,13 +126,13 @@ public abstract class Preds extends Arr {
   }
 
   /**
-   * Optimizes all predicates.
+   * Simplifies all predicates.
    * @param cc compilation context
    * @param root root expression
    * @return {@code true} if evaluation can be skipped
    * @throws QueryException query exception
    */
-  protected final boolean optimize(final CompileContext cc, final Expr root) throws QueryException {
+  protected final boolean simplify(final CompileContext cc, final Expr root) throws QueryException {
     return cc.ok(root, () -> {
       final ExprList list = new ExprList(exprs.length);
       for(final Expr expr : exprs) simplify(expr, list, root, cc);
@@ -142,7 +142,7 @@ public abstract class Preds extends Arr {
   }
 
   /**
-   * Optimizes a predicate.
+   * Simplifies a predicate.
    * @param pred predicate
    * @param list resulting predicates
    * @param root root expression

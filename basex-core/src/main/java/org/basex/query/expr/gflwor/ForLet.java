@@ -94,17 +94,17 @@ abstract class ForLet extends Clause {
       pred = cc.function(Function.BOOLEAN, info, pred);
     }
 
-    addPredicate(pred, cc);
+    addPredicate(cc, pred);
     return true;
   }
 
   /**
    * Adds a predicate to the looped expression.
-   * @param ex expression to add as predicate
    * @param cc compilation context
+   * @param ex expression to add as predicate
    * @throws QueryException query exception
    */
-  void addPredicate(final Expr ex, final CompileContext cc) throws QueryException {
+  final void addPredicate(final CompileContext cc, final Expr ex) throws QueryException {
     if(expr instanceof AxisPath && !ex.has(Flag.POS)) {
       // add to last step of path, provided that predicate is not positional
       expr = ((AxisPath) expr).addPredicates(cc, ex);
