@@ -64,7 +64,7 @@ public final class GroupSpec extends Single {
   public GroupSpec optimize(final CompileContext cc) throws QueryException {
     expr = expr.simplifyFor(Simplify.ATOM, cc);
 
-    adoptType(expr);
+    exprType.assign(expr);
     final AtomType type = expr.seqType().type.atomic();
     if(type != null) var.refineType(seqType().with(type), cc);
     return this;

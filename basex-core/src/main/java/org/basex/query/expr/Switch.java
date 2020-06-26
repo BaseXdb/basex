@@ -71,10 +71,11 @@ public final class Switch extends ParseExpr {
     if(expr != this) return cc.replaceWith(this, expr);
 
     // combine types of return expressions
-    SeqType st = groups[0].exprs[0].seqType();
     final int gl = groups.length;
-    for(int g = 1; g < gl; g++) st = st.union(groups[g].exprs[0].seqType());
+    SeqType st = groups[0].seqType();
+    for(int g = 1; g < gl; g++) st = st.union(groups[g].seqType());
     exprType.assign(st);
+
     return this;
   }
 

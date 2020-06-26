@@ -40,7 +40,8 @@ public final class TransformWith extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    return adoptType(exprs[0]);
+    exprType.assign(exprs[0]);
+    return this;
   }
 
   @Override

@@ -126,6 +126,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final ParseExpr adoptType(final Expr expr) {
     exprType.assign(expr);
+    if(data() == null) data(expr.data());
     return this;
   }
 
@@ -134,7 +135,7 @@ public abstract class ParseExpr extends Expr {
    * @param exprs expressions
    * @return data reference or {@code null}
    */
-  public final Data data(final Expr... exprs) {
+  static final Data data(final Expr... exprs) {
     Data data1 = null;
     for(final Expr expr : exprs) {
       if(expr.seqType().zero()) continue;

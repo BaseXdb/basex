@@ -57,8 +57,9 @@ public final class Transform extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    for(final Let copy : copies) copy.adoptType(copy.expr);
-    return adoptType(exprs[1]);
+    for(final Let copy : copies) copy.exprType.assign(copy.expr);
+    exprType.assign(exprs[1]);
+    return this;
   }
 
   @Override

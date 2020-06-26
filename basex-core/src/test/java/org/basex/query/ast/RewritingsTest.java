@@ -1548,7 +1548,9 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Optimize inlined path steps. */
   @Test public void gh1886() {
     execute(new CreateDB(NAME, "<_>X</_>"));
+
     check("function($db) { $db/UNKNOWN }(.)", "", empty());
+    check("let $f := function($a) { $a/UNKNOWN } return ./$f(.)", "", empty());
     check("function($db) { $db/_[. = 'X'] }(.)", "<_>X</_>", root(ValueAccess.class));
   }
 }

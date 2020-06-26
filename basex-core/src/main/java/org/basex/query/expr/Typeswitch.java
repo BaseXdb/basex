@@ -78,9 +78,9 @@ public final class Typeswitch extends ParseExpr {
       if(group.removeTypes(ct, types, cc)) newGroups.add(group);
     }
     groups = newGroups.toArray(new TypeswitchGroup[0]);
-    final int gl = groups.length;
 
     // combine types of return expressions
+    final int gl = groups.length;
     SeqType st = groups[0].seqType();
     for(int g = 1; g < gl; g++) st = st.union(groups[g].seqType());
     exprType.assign(st);

@@ -84,7 +84,7 @@ public final class Try extends Single {
 
   @Override
   public Data data() {
-    final ExprList list = new ExprList(catches.length).add(expr);
+    final ExprList list = new ExprList(catches.length + 1).add(expr);
     for(final Catch ctch : catches) list.add(ctch);
     return data(list.finish());
   }
