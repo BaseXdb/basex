@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -125,6 +126,11 @@ public final class Intersect extends Set {
         return nodes[0];
       }
     };
+  }
+
+  @Override
+  public Data data() {
+    return data(exprs);
   }
 
   @Override
