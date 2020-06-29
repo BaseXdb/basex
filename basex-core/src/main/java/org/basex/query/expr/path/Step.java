@@ -158,9 +158,16 @@ public abstract class Step extends Preds {
 
   @Override
   protected final void type(final Expr expr) {
-    // assign input type if step will return identical nodes
-    if(expr != null && axis == Axis.SELF && test == KindTest.NOD) {
-      exprType.assign(expr.seqType().type);
+    // self axis, kind tests: refine type
+    if(expr != null && axis == Axis.SELF && test instanceof KindTest) {
+      final Type type = expr.seqType().type;
+      if(test == KindTest.NOD) {
+        // node test: adopt type of context expression
+        exprType.assign(type);
+      } else if(type == test.type) {
+        // other kind tests: step will yield one result
+        exprType.assign(Occ.ONE);
+      }
     }
   }
 

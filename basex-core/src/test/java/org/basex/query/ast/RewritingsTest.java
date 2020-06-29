@@ -1569,4 +1569,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("let $f := function($a) { $a/UNKNOWN } return ./$f(.)", "", empty());
     check("function($db) { $db/_[. = 'X'] }(.)", "<_>X</_>", root(ValueAccess.class));
   }
+
+  /** Cardinality of self steps. */
+  @Test public void gh1887() {
+    check("<a/>[count(self::*) = 1]", "<a/>", root(CElem.class));
+    check("<a/>[self::* = self::*]", "<a/>", root(CElem.class));
+  }
 }
