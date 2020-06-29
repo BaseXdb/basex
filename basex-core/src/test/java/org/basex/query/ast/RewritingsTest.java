@@ -1575,4 +1575,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[count(self::*) = 1]", "<a/>", root(CElem.class));
     check("<a/>[self::* = self::*]", "<a/>", root(CElem.class));
   }
+
+  /** Distinct document order. */
+  @Test public void gh1888() {
+    check("let $a := <a/> return util:ddo(($a, $a))", "<a/>", root(CElem.class));
+    check("let $a := <a/> return ($a, $a)/.", "<a/>", root(CElem.class));
+  }
 }
