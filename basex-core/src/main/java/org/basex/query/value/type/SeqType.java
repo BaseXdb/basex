@@ -156,22 +156,31 @@ public final class SeqType {
   /** Zero or more text nodes. */
   public static final SeqType TXT_ZM = NodeType.TXT.seqType(Occ.ZERO_MORE);
 
+  // function types must be placed here due to circular dependencies
+
+  /** Any function type. */
+  public static final FuncType FUNC = new FuncType(null, (SeqType[]) null);
+  /** The general map type. */
+  public static final MapType MAP = new MapType(AtomType.AAT, ITEM_ZM);
+  /** The general array type. */
+  public static final ArrayType ARRAY = new ArrayType(ITEM_ZM);
+
   /** Single function. */
-  public static final SeqType FUNC_O = FuncType.FUNCTION.seqType();
+  public static final SeqType FUNC_O = FUNC.seqType();
   /** Zero of single function. */
-  public static final SeqType FUNC_ZO = FuncType.FUNCTION.seqType(Occ.ZERO_ONE);
+  public static final SeqType FUNC_ZO = FUNC.seqType(Occ.ZERO_ONE);
   /** Zero of more functions. */
-  public static final SeqType FUNC_ZM = FuncType.FUNCTION.seqType(Occ.ZERO_MORE);
+  public static final SeqType FUNC_ZM = FUNC.seqType(Occ.ZERO_MORE);
   /** Single map. */
-  public static final SeqType MAP_O = MapType.MAP.seqType();
+  public static final SeqType MAP_O = MAP.seqType();
   /** Zero or one map. */
-  public static final SeqType MAP_ZO = MapType.MAP.seqType(Occ.ZERO_ONE);
+  public static final SeqType MAP_ZO = MAP.seqType(Occ.ZERO_ONE);
   /** Zero or more maps. */
-  public static final SeqType MAP_ZM = MapType.MAP.seqType(Occ.ZERO_MORE);
+  public static final SeqType MAP_ZM = MAP.seqType(Occ.ZERO_MORE);
   /** Single array. */
-  public static final SeqType ARRAY_O = ArrayType.ARRAY.seqType();
+  public static final SeqType ARRAY_O = ARRAY.seqType();
   /** Zero or more arrays. */
-  public static final SeqType ARRAY_ZM = ArrayType.ARRAY.seqType(Occ.ZERO_MORE);
+  public static final SeqType ARRAY_ZM = ARRAY.seqType(Occ.ZERO_MORE);
 
   /** Item type. */
   public final Type type;

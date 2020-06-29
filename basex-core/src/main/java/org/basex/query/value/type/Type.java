@@ -150,7 +150,7 @@ public interface Type {
     public static Type getType(final int id) {
       final ID i = get(id);
       if(i == null) return null;
-      if(i == FUN) return FuncType.FUNCTION;
+      if(i == FUN) return SeqType.FUNC;
       final Type type = AtomType.getType(i);
       return type != null ? type : NodeType.getType(i);
     }

@@ -57,7 +57,7 @@ public final class PartFunc extends Arr {
 
     final Expr body = body();
     final FuncType ft = body.funcType();
-    if(ft != null && ft != FuncType.FUNCTION) {
+    if(ft != null && ft != SeqType.FUNC) {
       final int nargs = exprs.length + holes.length - 1;
       if(ft.argTypes.length != nargs)
         throw INVARITY_X_X_X.get(info, arguments(nargs), ft.argTypes.length, body);

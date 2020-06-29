@@ -95,25 +95,25 @@ public final class SeqTypeTest {
     final MapType m = MapType.get(AtomType.STR, ITR_O);
     assertTrue(m.instanceOf(m));
     assertTrue(m.instanceOf(AtomType.ITEM));
-    assertTrue(m.instanceOf(FuncType.FUNCTION));
-    assertTrue(m.instanceOf(MapType.MAP));
+    assertTrue(m.instanceOf(SeqType.FUNC));
+    assertTrue(m.instanceOf(SeqType.MAP));
     assertTrue(m.instanceOf(MapType.get(AtomType.AAT, ITR_O)));
     assertTrue(m.instanceOf(MapType.get(AtomType.STR, ITR_O)));
     assertTrue(m.instanceOf(MapType.get(AtomType.STR, ITR_ZO)));
     assertFalse(m.instanceOf(MapType.get(AtomType.ITR, ITEM_ZM)));
-    assertFalse(m.instanceOf(ArrayType.ARRAY));
+    assertFalse(m.instanceOf(SeqType.ARRAY));
     assertFalse(m.instanceOf(MapType.get(AtomType.STR, BLN_O)));
 
     // arrays
     final ArrayType a = ArrayType.get(ITR_O);
     assertTrue(a.instanceOf(a));
     assertTrue(a.instanceOf(AtomType.ITEM));
-    assertTrue(a.instanceOf(FuncType.FUNCTION));
-    assertTrue(a.instanceOf(ArrayType.ARRAY));
+    assertTrue(a.instanceOf(SeqType.FUNC));
+    assertTrue(a.instanceOf(SeqType.ARRAY));
     assertTrue(a.instanceOf(ArrayType.get(ITR_O)));
     assertTrue(a.instanceOf(ArrayType.get(ITR_O)));
     assertTrue(a.instanceOf(ArrayType.get(ITR_ZO)));
-    assertFalse(a.instanceOf(MapType.MAP));
+    assertFalse(a.instanceOf(SeqType.MAP));
     assertFalse(a.instanceOf(ArrayType.get(BLN_O)));
 
     // nodes

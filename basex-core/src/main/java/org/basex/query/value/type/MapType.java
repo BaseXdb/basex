@@ -14,15 +14,12 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class MapType extends FuncType {
-  /** General map type. */
-  public static final MapType MAP = new MapType(AtomType.AAT, SeqType.ITEM_ZM);
-
   /**
    * Constructor.
    * @param keyType key type
    * @param declType declared return type
    */
-  private MapType(final AtomType keyType, final SeqType declType) {
+  MapType(final AtomType keyType, final SeqType declType) {
     super(declType, keyType.seqType());
   }
 
@@ -47,7 +44,7 @@ public final class MapType extends FuncType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(type == AtomType.ITEM || type == FUNCTION || type == MAP) return true;
+    if(type == AtomType.ITEM || type == SeqType.FUNC || type == SeqType.MAP) return true;
     if(!(type instanceof FuncType) || type instanceof ArrayType) return false;
 
     final FuncType ft = (FuncType) type;
@@ -66,7 +63,7 @@ public final class MapType extends FuncType {
       final MapType mt = (MapType) type;
       return get((AtomType) keyType().union(mt.keyType()), declType.union(mt.declType));
     }
-    return type instanceof ArrayType ? FUNCTION :
+    return type instanceof ArrayType ? SeqType.FUNC :
            type instanceof FuncType  ? type.union(this) : AtomType.ITEM;
   }
 
@@ -106,13 +103,14 @@ public final class MapType extends FuncType {
    * @return map type
    */
   public static MapType get(final AtomType keyType, final SeqType declType) {
-    return keyType == AtomType.AAT && declType.eq(SeqType.ITEM_ZM) ? MAP :
+    return keyType == AtomType.AAT && declType.eq(SeqType.ITEM_ZM) ? SeqType.MAP :
       new MapType(keyType, declType);
   }
 
   @Override
   public String toString() {
-    final Object[] param = this == MAP ? WILDCARD : new Object[] { keyType(), declType };
+    final Object[] param = this == SeqType.MAP ? WILDCARD :
+      new Object[] { keyType(), declType };
     return new QueryString().token(QueryText.MAP).params(param).toString();
   }
 }

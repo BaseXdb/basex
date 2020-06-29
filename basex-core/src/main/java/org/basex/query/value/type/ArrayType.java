@@ -14,14 +14,11 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ArrayType extends FuncType {
-  /** General array type. */
-  public static final ArrayType ARRAY = new ArrayType(SeqType.ITEM_ZM);
-
   /**
    * Constructor.
    * @param declType declared return type
    */
-  private ArrayType(final SeqType declType) {
+  ArrayType(final SeqType declType) {
     super(declType, SeqType.ITR_O);
   }
 
@@ -43,7 +40,7 @@ public final class ArrayType extends FuncType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(type == AtomType.ITEM || type == FUNCTION || type == ARRAY) return true;
+    if(type == AtomType.ITEM || type == SeqType.FUNC || type == SeqType.ARRAY) return true;
     if(!(type instanceof FuncType) || type instanceof MapType) return false;
 
     final FuncType ft = (FuncType) type;
@@ -62,7 +59,7 @@ public final class ArrayType extends FuncType {
       final ArrayType at = (ArrayType) type;
       return get(declType.union(at.declType));
     }
-    return type instanceof MapType  ? FUNCTION :
+    return type instanceof MapType  ? SeqType.FUNC :
            type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
 
@@ -89,12 +86,12 @@ public final class ArrayType extends FuncType {
    * @return array type
    */
   public static ArrayType get(final SeqType declType) {
-    return declType.eq(SeqType.ITEM_ZM) ? ARRAY : new ArrayType(declType);
+    return declType.eq(SeqType.ITEM_ZM) ? SeqType.ARRAY : new ArrayType(declType);
   }
 
   @Override
   public String toString() {
-    final Object[] param = this == ARRAY ? WILDCARD : new Object[] { declType };
+    final Object[] param = this == SeqType.ARRAY ? WILDCARD : new Object[] { declType };
     return new QueryString().token(QueryText.ARRAY).params(param).toString();
   }
 }

@@ -37,7 +37,7 @@ public abstract class XQArray extends XQData {
    * Default constructor.
    */
   XQArray() {
-    super(ArrayType.ARRAY);
+    super(SeqType.ARRAY);
   }
 
   /**
