@@ -56,7 +56,7 @@ public final class ClientModuleTest extends SandboxTest {
     query("exists(" + connection() + ")", true);
     // BXCL0001: connection errors
     error(func.args(Text.S_LOCALHOST, DB_PORT, ADMIN, ""), CLIENT_CONNECT_X);
-    error(func.args("xxx", DB_PORT, ADMIN, ADMIN), CLIENT_CONNECT_X);
+    error(func.args("x\\o//x", DB_PORT, ADMIN, ADMIN), CLIENT_CONNECT_X);
   }
 
   /** Test method. */
@@ -106,10 +106,10 @@ public final class ClientModuleTest extends SandboxTest {
       SerializerOptions.ENCODING.arg("US-ASCII") + "'\u00e4'"), "\u00e4");
     query(func.args(connection(), "xs:base64Binary('QQ==')"), "A");
     // query errors: returning function items
-    error(func.args(connection(), "function(){}"), CLIENT_FITEM_X);
+    error(func.args(connection(), "function() { }"), CLIENT_FITEM_X);
     error(func.args(connection(), "true#0"), CLIENT_FITEM_X);
-    error(func.args(connection(), "array{}"), CLIENT_FITEM_X);
-    error(func.args(connection(), "map{}"), CLIENT_FITEM_X);
+    error(func.args(connection(), "array { }"), CLIENT_FITEM_X);
+    error(func.args(connection(), "map { }"), CLIENT_FITEM_X);
     // query errors: server-side errors
     error(func.args(connection(), "x"), NOCTX_X);
   }

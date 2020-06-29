@@ -10,7 +10,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  */
-public class ArrayTest extends SandboxTest {
+public abstract class ArrayTest extends SandboxTest {
   /** Query context. */
   static QueryContext qc;
 

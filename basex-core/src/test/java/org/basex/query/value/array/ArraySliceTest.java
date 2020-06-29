@@ -19,7 +19,7 @@ public final class ArraySliceTest extends ArrayTest {
   /** Exhaustively tests creating sub-arrays of arrays of a range of lengths. */
   @Test public void testSlice() {
     XQArray arr = XQArray.empty();
-    for(int len = 0; len < 180; len++) {
+    for(int len = 0; len < 100; len++) {
       assertEquals(len, arr.arraySize());
       for(int pos = 0; pos < len; pos++) {
         for(int k = 0; k <= len - pos; k++) {

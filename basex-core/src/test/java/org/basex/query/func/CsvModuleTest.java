@@ -106,10 +106,14 @@ public final class CsvModuleTest extends SandboxTest {
 
   /** Test method. */
   @Test public void serializeXQuery() {
-    serial(" map{'records':['A','B']}",             "'format':'xquery'", "A,B\n");
-    serial(" map{'records':['A','B']}",             "'header':false(),'format':'xquery'", "A,B\n");
-    serial(" map{'names':['A','B'],'records':()}",  "'header':true(),'format':'xquery'", "A,B\n");
-    serial(" map{'names':['A'],'records':(['1'])}", "'header':true(),'format':'xquery'", "A\n1\n");
+    serial(" map {'records': ['A','B'] }",
+        "'format': 'xquery'", "A,B\n");
+    serial(" map {'records': ['A','B'] }",
+        "'header': false(), 'format': 'xquery'", "A,B\n");
+    serial(" map {'names': ['A','B'], 'records': () }",
+        "'header': true(), 'format': 'xquery'", "A,B\n");
+    serial(" map {'names': ['A'], 'records': ['1'] }",
+        "'header': true(), 'format': 'xquery'", "A\n1\n");
   }
 
   /**

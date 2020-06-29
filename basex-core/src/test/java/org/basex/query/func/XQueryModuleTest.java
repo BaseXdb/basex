@@ -32,24 +32,45 @@ public final class XQueryModuleTest extends SandboxTest {
     error(func.args("declare %updating function local:x() {()}; local:x()"), XQUERY_UPDATE1);
     query(func.args("declare %updating function local:x() {()}; 1"));
     query(func.args(DOC.args(PATH).trim()));
+  }
 
-    // check additional options
-    query(_DB_CREATE.args(NAME));
-    query("try { " + func.args("(1 to 10000000000000)[. = 0]", " map { }",
-      " map { 'timeout': 1 }") + " } catch * { () }", "");
+  /** Test method. */
+  @Test public void evalBaseUri() {
+    final Function func = _XQUERY_EVAL;
+    // queries
     query(func.args("static-base-uri()", " map { }",
       " map { 'base-uri': 'http://x.x/' }"), "http://x.x/");
+  }
 
+  /** Test method. */
+  @Test public void evalPermission() {
+    final Function func = _XQUERY_EVAL;
+    // queries
+    query(_DB_CREATE.args(NAME));
     error(func.args(DOC.args(NAME).trim(), " map { }",
       " map { 'permission': 'none' }"), XQUERY_PERMISSION1_X);
     error(func.args(_DB_OPEN.args(NAME).trim(), " map { }",
       " map { 'permission': 'none' }"), XQUERY_PERMISSION1_X);
     error(func.args(_FILE_EXISTS.args("x").trim(), " map { }",
       " map { 'permission': 'none' }"), XQUERY_PERMISSION1_X);
-    error(func.args("(1 to 10000000000000)[. = 0]", " map { }",
-      " map { 'timeout': 1 }"), XQUERY_TIMEOUT);
+  }
+
+  /** Test method. */
+  @Test public void evalMemory() {
+    final Function func = _XQUERY_EVAL;
+    // queries
     error(func.args("(1 to 10000000000000) ! <a/>", " map { }",
-      " map { 'memory': 10 }"), XQUERY_MEMORY);
+        " map { 'memory': 10 }"), XQUERY_MEMORY);
+  }
+
+  /** Test method. */
+  @Test public void evalTimeout() {
+    final Function func = _XQUERY_EVAL;
+    // queries
+    query("try { " + func.args("(1 to 10000000000000)[. = 0]", " map { }",
+        " map { 'timeout': 1 }") + " } catch * { () }", "");
+    error(func.args("(1 to 10000000000000)[. = 0]", " map { }",
+        " map { 'timeout': 1 }"), XQUERY_TIMEOUT);
   }
 
   /** Test method. */
@@ -127,8 +148,8 @@ public final class XQueryModuleTest extends SandboxTest {
     query(func.args("1") + "/@updating/string()", false);
     query(func.args("1") + "/QueryPlan/@compiled/string()", false);
 
-    query(func.args("1", " map{'compile':true()}") + "/QueryPlan/@compiled/string()", true);
-    query(func.args("1", " map{'plan':false()}") + "/QueryPlan", "");
+    query(func.args("1", " map {'compile': true() }") + "/QueryPlan/@compiled/string()", true);
+    query(func.args("1", " map {'plan': false() }") + "/QueryPlan", "");
 
     query(func.args("module namespace x='x'; "
         + "declare function x:x() { 1 };") + "/name()", "LibraryModule");
@@ -138,7 +159,7 @@ public final class XQueryModuleTest extends SandboxTest {
 
     error(func.args("1+"), CALCEXPR);
     query("\n\ntry {" + func.args("1 +",
-        " map{'pass':true()}") + "} catch * { $err:line-number }", 1);
+        " map { 'pass': true() }") + "} catch * { $err:line-number }", 1);
 
     query("contains(try {" + func.args("1 +",
         " map { 'base-uri': 'XXXX', 'pass': 'true' }") + "} catch * { $err:module }, 'XXXX')",

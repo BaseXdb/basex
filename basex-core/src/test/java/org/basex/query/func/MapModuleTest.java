@@ -20,7 +20,7 @@ public final class MapModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test public void contains() {
     final Function func = _MAP_CONTAINS;
-    query(func.args(" map{}", 1), false);
+    query(func.args(" map { }", 1), false);
     query(func.args(_MAP_ENTRY.args(1, 2), 1), true);
   }
 
@@ -41,7 +41,7 @@ public final class MapModuleTest extends QueryPlanTest {
     query("(1,map { 1: 2 })[. instance of map(*)] ! " +
         func.args(" .", " function($k, $v) { $v }"), 2);
     query("(1,matches#2)[. instance of function(*)] ! " +
-        func.args(" map{ 'aa': 'a' }", " ."), true);
+        func.args(" map { 'aa': 'a' }", " ."), true);
 
     query(func.args(" map { }", " function($k, $v) { 1 }"), "");
     query(func.args(" map { 1: 2 }", " function($k, $v) { $k+$v }"), 3);
@@ -53,7 +53,7 @@ public final class MapModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test public void get() {
     final Function func = _MAP_GET;
-    query(func.args(" map{}", 1), "");
+    query(func.args(" map { }", 1), "");
     query(func.args(_MAP_ENTRY.args(1, 2), 1), 2);
   }
 
@@ -77,20 +77,24 @@ public final class MapModuleTest extends QueryPlanTest {
     checkSize(_MAP_ENTRY.args(1, 2), 1);
     checkSize(func.args(" ()"), 0);
     // single entry
-    query("exists(" + func.args(" map{ 'a':'b' }") + ')', true);
-    checkSize(func.args(" map{ 'a':'b' }"), 1);
+    query("exists(" + func.args(" map { 'a': 'b' }") + ')', true);
+    checkSize(func.args(" map { 'a': 'b' }"), 1);
     // single entry
-    query("exists(" + func.args(" map{ 'a':'b','b':'c' }") + ')', true);
-    checkSize(func.args(" map{ 'a':'b','b':'c' }"), 2);
+    query("exists(" + func.args(" map { 'a': 'b', 'b': 'c' }") + ')', true);
+    checkSize(func.args(" map { 'a': 'b', 'b': 'c' }"), 2);
 
-    query(func.args(" (map{ xs:time('01:01:01'):''}, map{ xs:time('01:01:01+01:00'):''})"));
+    query(func.args(" (map { xs:time('01:01:01'): '' }, map { xs:time('01:01:01+01:00'): '' })"));
 
     // duplicates option
-    query(func.args(" (map{1:2},map {1:3})") + "(1)", 2);
-    query(func.args(" (map{1:2},map {1:3})", " map{ 'duplicates': 'use-first' }") + "(1)", 2);
-    query(func.args(" (map{1:2},map {1:3})", " map{ 'duplicates': 'use-last' }") + "(1)", 3);
-    query(func.args(" (map{1:2},map {1:3})", " map{ 'duplicates': 'combine' }") + "(1)", "2\n3");
-    error(func.args(" (map{1:2},map {1:3})", " map{ 'duplicates': 'reject' }") + "(1)",
+    query(func.args(" (map { 1: 2 }, map { 1: 3 })") + "(1)", 2);
+    query(func.args(" (map { 1: 2 }, map { 1: 3 })",
+        " map { 'duplicates': 'use-first' }") + "(1)", 2);
+    query(func.args(" (map { 1: 2 }, map { 1: 3 })",
+        " map { 'duplicates': 'use-last' }") + "(1)", 3);
+    query(func.args(" (map { 1: 2 }, map { 1: 3 })",
+        " map { 'duplicates': 'combine' }") + "(1)", "2\n3");
+    error(func.args(" (map { 1: 2 }, map { 1: 3 })",
+        " map { 'duplicates': 'reject' }") + "(1)",
         MERGE_DUPLICATE_X);
 
     // GH1543
@@ -110,9 +114,9 @@ public final class MapModuleTest extends QueryPlanTest {
     // GH1561
     final String arg1 = " (map { 'A': 'a' }, map { 'A': 'a', 'B': 'b' })";
     query("map:size(" + func.args(arg1) + ")", 2);
-    query("map:size(" + func.args(arg1, " map{ 'duplicates': 'use-first' }") + ")", 2);
-    query("map:size(" + func.args(arg1, " map{ 'duplicates': 'use-last' }") + ")", 2);
-    query("map:size(" + func.args(arg1, " map{ 'duplicates': 'combine' }") + ")", 2);
+    query("map:size(" + func.args(arg1, " map { 'duplicates': 'use-first' }") + ")", 2);
+    query("map:size(" + func.args(arg1, " map { 'duplicates': 'use-last' }") + ")", 2);
+    query("map:size(" + func.args(arg1, " map { 'duplicates': 'combine' }") + ")", 2);
 
     // GH1602
     query("let $_ := 'combine' return " + func.args(" map { 0:1 }",
@@ -131,50 +135,53 @@ public final class MapModuleTest extends QueryPlanTest {
     assertEquals(keys[0].hash(null), keys[1].hash(null));
     assertEquals(keys[1].hash(null), keys[2].hash(null));
 
-    final String mapAB = Util.info("map{'%':%,'%':%}", keys[0], 1, keys[1], 1);
-    final String mapABC = Util.info("map{'%':%,'%':%,'%':%}", keys[0], 2, keys[2], 2, keys[1], 2);
+    final String mapAB = Util.info("map {'%': %, '%': % }", keys[0], 1, keys[1], 1);
+    final String mapABC = Util.info("map {'%': %, '%': %, '%': % }",
+        keys[0], 2, keys[2], 2, keys[1], 2);
     // use-first
     query(
         DEEP_EQUAL.args(
-            func.args(" (" + mapAB + "," + mapABC + ")", " map{'duplicates':'use-first'}"),
-            Util.info(" map{'%':%,'%':%,'%':%}", keys[0], 1, keys[1], 1, keys[2], 2)
+            func.args(" (" + mapAB + "," + mapABC + ")", " map { 'duplicates': 'use-first' }"),
+            Util.info(" map { '%': %, '%': %, '%': % }", keys[0], 1, keys[1], 1, keys[2], 2)
         ),
         true
     );
     query(
         DEEP_EQUAL.args(
-            func.args(" (" + mapABC + "," + mapAB + ")", " map{'duplicates':'use-first'}"),
-            Util.info(" map{'%':%,'%':%,'%':%}", keys[0], 2, keys[1], 2, keys[2], 2)
+            func.args(" (" + mapABC + "," + mapAB + ")", " map {'duplicates':'use-first' }"),
+            Util.info(" map { '%': %, '%': %, '%': % }", keys[0], 2, keys[1], 2, keys[2], 2)
         ),
         true
     );
     // use-last
     query(
         DEEP_EQUAL.args(
-            func.args(" (" + mapAB + "," + mapABC + ")", " map{'duplicates':'use-last'}"),
-            Util.info(" map{'%':%,'%':%,'%':%}", keys[0], 2, keys[1], 2, keys[2], 2)
+            func.args(" (" + mapAB + "," + mapABC + ")", " map { 'duplicates': 'use-last' }"),
+            Util.info(" map { '%': %, '%': %, '%': % }", keys[0], 2, keys[1], 2, keys[2], 2)
         ),
         true
     );
     query(
         DEEP_EQUAL.args(
-            func.args(" (" + mapABC + "," + mapAB + ")", " map{'duplicates':'use-last'}"),
-            Util.info(" map{'%':%,'%':%,'%':%}", keys[0], 1, keys[1], 1, keys[2], 2)
+            func.args(" (" + mapABC + "," + mapAB + ")", " map { 'duplicates': 'use-last' }"),
+            Util.info(" map { '%': %, '%': %, '%': % }", keys[0], 1, keys[1], 1, keys[2], 2)
         ),
         true
     );
     // merge
     query(
         DEEP_EQUAL.args(
-            func.args(" (" + mapAB + "," + mapABC + ")", " map{'duplicates':'combine'}"),
-            Util.info(" map{'%':(%,%),'%':(%,%),'%':%}", keys[0], 1, 2, keys[1], 1, 2, keys[2], 2)
+            func.args(" (" + mapAB + "," + mapABC + ")", " map { 'duplicates': 'combine' }"),
+            Util.info(" map {'%': (%, %), '%': (%, %), '%': % }",
+                keys[0], 1, 2, keys[1], 1, 2, keys[2], 2)
         ),
         true
     );
     query(
         DEEP_EQUAL.args(
-            func.args(" (" + mapABC + "," + mapAB + ")", " map{'duplicates':'combine'}"),
-            Util.info(" map{'%':(%,%),'%':(%,%),'%':%}", keys[0], 2, 1, keys[1], 2, 1, keys[2], 2)
+            func.args(" (" + mapABC + "," + mapAB + ")", " map { 'duplicates': 'combine' }"),
+            Util.info(" map {'%': (%, %), '%': (%, %), '%': % }",
+                keys[0], 2, 1, keys[1], 2, 1, keys[2], 2)
         ),
         true
     );
@@ -184,14 +191,14 @@ public final class MapModuleTest extends QueryPlanTest {
   @Test public void put() {
     // no entry
     final Function func = _MAP_PUT;
-    checkSize(func.args(" map{}", 1, 2), 1);
-    checkSize(func.args(" map{}", "a", "b"), 1);
-    checkSize(func.args(" map{ 'a': 'b' }", "c", "d"), 2);
-    checkSize(func.args(" map{ 'a': 'b' }", "c", "d"), 2);
+    checkSize(func.args(" map { }", 1, 2), 1);
+    checkSize(func.args(" map { }", "a", "b"), 1);
+    checkSize(func.args(" map { 'a': 'b' }", "c", "d"), 2);
+    checkSize(func.args(" map { 'a': 'b' }", "c", "d"), 2);
 
-    query(func.args(" map{ xs:time('01:01:01'):'b' }", "xs:time('01:01:02+01:00')", 1));
+    query(func.args(" map { xs:time('01:01:01'): 'b' }", "xs:time('01:01:02+01:00')", 1));
 
-    query("deep-equal(" + func.args(" map{ 0: 1 }", -1, 2) + ", map { 0: 1, -1: 2 })", true);
+    query("deep-equal(" + func.args(" map { 0: 1 }", -1, 2) + ", map { 0: 1, -1: 2 })", true);
   }
 
   /** Test method. */
@@ -203,7 +210,7 @@ public final class MapModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test public void size() {
     final Function func = _MAP_SIZE;
-    query(func.args(" map{}"), 0);
+    query(func.args(" map { }"), 0);
   }
 
   /**
