@@ -194,31 +194,58 @@ public abstract class Cmp extends Arr {
   }
 
   /**
-   * Tries to simplify an expression with equal operands. Rewriting is possible if:
-   * <ul>
-   *   <li> the equality operator is specified</li>
-   *   <li> operands are equal</li>
-   *   <li> operands are deterministic, non-updating</li>
-   *   <li> operands do not depend on context, or if context value exists</li>
-   * </ul>
+   * Tries to simplify an expression with equal operands.
+   * @param op operator
+   * @param cc compilation context
+   * @return resulting expression
+   * @throws QueryException query exception
+   */
+  private Expr optEqual(final OpV op, final CompileContext cc) throws QueryException {
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    Expr expr = optEqual(expr1, expr2, op, cc);
+    if(expr != this) return expr;
+
+    // (if(A) then 'B' else 'C') = C  ->  boolean(A)
+    if(expr1 instanceof If && !expr1.has(Flag.NDT)) {
+      final If iff = (If) expr1;
+      boolean invert = false;
+      for(Expr ex : iff.exprs) {
+        expr = optEqual(ex, expr2, op, cc);
+        if(expr != this) {
+          invert ^= expr == Bln.FALSE;
+          return cc.function(invert ? Function.NOT : Function.BOOLEAN, info, iff.cond);
+        }
+        invert = true;
+      }
+    }
+    return this;
+  }
+
+  /**
+   * Tries to simplify an expression with equal operands.
+   * @param expr1 first operand
+   * @param expr2 second operand
    * @param op operator
    * @param cc compilation context
    * @return resulting expression
    */
-  private Expr optEqual(final OpV op, final CompileContext cc) {
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
-    final boolean single = this instanceof CmpV;
-    if((op == OpV.EQ || single && op == OpV.NE) && expr1.equals(expr2) && !expr1.has(Flag.NDT) &&
-        (!expr1.has(Flag.CTX) || cc.qc.focus.value != null)) {
-      /* consider query flags
-       * illegal: random:integer() eq random:integer() */
-      final SeqType st1 = expr1.seqType();
-      final Type type1 = st1.type;
-      final boolean one = single ? st1.one() : st1.oneOrMore();
-      /* limited to strings, integers and booleans.
-       * illegal rewriting: xs:double('NaN') eq xs:double('NaN') */
-      if(one && (type1.isStringOrUntyped() || type1.instanceOf(AtomType.ITR) ||
-          type1 == AtomType.BLN)) return Bln.get(op == OpV.EQ);
+  private Expr optEqual(final Expr expr1, final Expr expr2, final OpV op, final CompileContext cc) {
+    final SeqType st1 = expr1.seqType();
+    final Type type1 = st1.type;
+    if(expr1.equals(expr2) &&
+      // keep: () = (), (1,2) != (1,2), (1,2) eq (1,2)
+      (op != OpV.EQ || this instanceof CmpV ? st1.one() : st1.oneOrMore()) &&
+      // keep: xs:double('NaN') = xs:double('NaN')
+      (type1.isStringOrUntyped() || type1.instanceOf(AtomType.DEC) || type1 == AtomType.BLN) &&
+      // keep: random:integer() = random:integer()
+      // keep if no context is available: last() = last()
+      !expr1.has(Flag.NDT) && (!expr1.has(Flag.CTX) || cc.qc.focus.value != null)
+    ) {
+      // 1 = 1  ->  true()
+      // <x/> ne <x/>  ->  false()
+      // (1, 2) >= (1, 2)  ->  true()
+      // (1, 2, 3)[last() = last()]  ->  (1, 2, 3)
+      return Bln.get(op == OpV.EQ || op == OpV.GE || op == OpV.LE);
     }
     return this;
   }

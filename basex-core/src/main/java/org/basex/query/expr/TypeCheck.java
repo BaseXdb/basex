@@ -205,9 +205,9 @@ public class TypeCheck extends Single {
 
   @Override
   public final void plan(final QueryString qs) {
-    qs.token(expr);
+    qs.token("(").token(expr);
     if(promote) qs.token(PROMOTE).token(TO);
     else qs.token(TREAT).token(AS);
-    qs.token(seqType());
+    qs.token(seqType()).token(')');
   }
 }

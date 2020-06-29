@@ -1545,6 +1545,22 @@ public final class RewritingsTest extends QueryPlanTest {
       " default $i return $i", "<x/>");
   }
 
+  /** Simplify if expressions and comparisons. */
+  @Test public void gh1885() {
+    check("(0, 1) ! ((if(.) then 'S' else 'P') = 'S')", "false\ntrue", empty(If.class));
+    check("(0, 1) ! ((if(.) then 'S' else 'P') != 'S')", "true\nfalse", empty(If.class));
+    check("(0, 1) ! ((if(.) then 'S' else 'P') = 'P')", "true\nfalse", empty(If.class));
+    check("(0, 1) ! ((if(.) then 'S' else 'P') != 'P')", "false\ntrue", empty(If.class));
+
+    check("(0, 1) ! ((if(.) then <_/> else ()) = <_/>)", "false\ntrue", empty(If.class));
+    check("(0, 1) ! ((if(.) then (1, 2) else ()) = (1, 2))", "false\ntrue", empty(If.class));
+    check("(if((1, 2)[. = 0]) then () else (1, 2)) = (1, 2)", true, empty(If.class), root(NOT));
+
+    // do not rewrite...
+    check("(0, 1) ! ((if(.) then 'S' else 'P') = 'X')", "false\nfalse", exists(If.class));
+    check("(0, 1) ! ((if(.) then 'S' else 'P') = 'X')", "false\nfalse", exists(If.class));
+  }
+
   /** Optimize inlined path steps. */
   @Test public void gh1886() {
     execute(new CreateDB(NAME, "<_>X</_>"));
