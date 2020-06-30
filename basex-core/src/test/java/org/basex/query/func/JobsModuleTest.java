@@ -88,7 +88,7 @@ public final class JobsModuleTest extends SandboxTest {
   @Test public void evalStart() {
     // delayed execution
     final Function func = _JOBS_EVAL;
-    final String id = query(func.args(" 'prof:sleep(200)'", " ()", " map {'start': 'PT0.2S' }"));
+    final String id = query(func.args(" 'prof:sleep(200)'", " ()", " map { 'start': 'PT0.2S' }"));
     // ensure that query is not run again
     Performance.sleep(100);
     query(_JOBS_FINISHED.args(id), true);
@@ -237,7 +237,7 @@ public final class JobsModuleTest extends SandboxTest {
   @Test public void result() throws IOException {
     // receive result of asynchronous execution
     final Function func = _JOBS_RESULT;
-    query("let $q := " + _JOBS_EVAL.args(SLOW_QUERY, " ()", " map {'cache': true() }") +
+    query("let $q := " + _JOBS_EVAL.args(SLOW_QUERY, " ()", " map { 'cache': true() }") +
         " return ("
         + _HOF_UNTIL.args(" function($r) { " + _JOBS_FINISHED.args(" $q") + " },"
             + "function($c) { prof:sleep(1) }, ()") + ','
@@ -259,7 +259,7 @@ public final class JobsModuleTest extends SandboxTest {
     }
 
     // receive cached result
-    id = query(_JOBS_EVAL.args(SLOW_QUERY, " ()", " map {'cache': true() }"));
+    id = query(_JOBS_EVAL.args(SLOW_QUERY, " ()", " map { 'cache': true() }"));
     while(true) {
       try {
         assertEquals("1", eval(func.args(id)));
@@ -272,7 +272,7 @@ public final class JobsModuleTest extends SandboxTest {
     }
 
     // receive cached error
-    id = query(_JOBS_EVAL.args("db:open('db')", " ()", " map {'cache': true() }"));
+    id = query(_JOBS_EVAL.args("db:open('db')", " ()", " map { 'cache': true() }"));
     query(_JOBS_WAIT.args(id));
     error(func.args(id), DB_OPEN2_X);
   }
@@ -280,7 +280,7 @@ public final class JobsModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void waitFor() {
     final Function func = _JOBS_WAIT;
-    query(func.args(_JOBS_EVAL.args("1",  " ()", " map { 'start':'PT0.1S' }")));
+    query(func.args(_JOBS_EVAL.args("1",  " ()", " map { 'start': 'PT0.1S' }")));
     error(func.args(_JOBS_CURRENT.args()), JOBS_SELF_X);
   }
 

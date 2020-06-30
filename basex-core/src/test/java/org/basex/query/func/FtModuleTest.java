@@ -57,16 +57,16 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args("Exercise 1", "1 Exercise", " map { 'mode':'any word' }"), true);
     query(func.args("Exercise 1", "1 Exercise", " map { 'mode':'all words' }"), true);
 
-    query(func.args("databases and xml", "databases xml", " map { 'mode':'all words'," +
-        "'distance':map {'min':0,'max':1} }"), true);
-    query(func.args("databases and xml", "databases xml", " map { 'mode':'all words'," +
-        "'distance':map {'max':0} }"), false);
-    query(func.args("databases and xml", "databases xml", " map { 'mode':'all words'," +
-        "'window':map {'size':3} }"), true);
+    query(func.args("databases and xml", "databases xml",
+        " map { 'mode': 'all words', 'distance':map { 'min': 0, 'max': 1 } }"), true);
+    query(func.args("databases and xml", "databases xml",
+        " map { 'mode': 'all words', 'distance':map { 'max': 0 } }"), false);
+    query(func.args("databases and xml", "databases xml",
+        " map { 'mode': 'all words', 'window':map { 'size': 3 } }"), true);
 
     // check buggy options
-    error(func.args("x", "x", " map { 'x':'y' }"), INVALIDOPT_X);
-    error(func.args("x", "x", " map { 'mode':'' }"), INVALIDOPT_X);
+    error(func.args("x", "x", " map { 'x': 'y' }"), INVALIDOPT_X);
+    error(func.args("x", "x", " map { 'mode': '' }"), INVALIDOPT_X);
     error(func.args("x", "x", " 1"), MAP_X_X);
   }
 
@@ -175,16 +175,19 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(NAME, "1 Exercise", " map { 'mode':'any word' }"), "Exercise 1\nExercise 2");
     query(func.args(NAME, "1 Exercise", " map { 'mode':'all words' }"), "Exercise 1");
 
-    query(func.args(NAME, "databases xml", " map { 'mode':'all words'," +
-        "'distance':map {'min':0,'max':1} }"), "Databases and XML");
-    query(func.args(NAME, "databases xml", " map { 'mode':'all words'," +
-        "'distance':map {'max':0} }"), "");
-    query(func.args(NAME, "databases xml", " map { 'mode':'all words'," +
-        "'window':map {'size':3} }"), "Databases and XML");
+    query(func.args(NAME, "databases xml",
+        " map { 'mode': 'all words', 'distance':map { 'min': 0, 'max': 1 } }"),
+        "Databases and XML");
+    query(func.args(NAME, "databases xml",
+        " map { 'mode': 'all words', 'distance':map { 'max': 0 } }"),
+        "");
+    query(func.args(NAME, "databases xml",
+        " map { 'mode': 'all words', 'window':map { 'size': 3 } }"),
+        "Databases and XML");
 
     // check buggy options
-    error(func.args(NAME, "x", " map { 'x':'y' }"), INVALIDOPT_X);
-    error(func.args(NAME, "x", " map { 'mode':'' }"), INVALIDOPT_X);
+    error(func.args(NAME, "x", " map { 'x': 'y' }"), INVALIDOPT_X);
+    error(func.args(NAME, "x", " map { 'mode': '' }"), INVALIDOPT_X);
     error(func.args(NAME, "x", " 1"), MAP_X_X);
   }
 

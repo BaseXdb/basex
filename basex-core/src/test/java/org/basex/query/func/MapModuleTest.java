@@ -135,8 +135,8 @@ public final class MapModuleTest extends QueryPlanTest {
     assertEquals(keys[0].hash(null), keys[1].hash(null));
     assertEquals(keys[1].hash(null), keys[2].hash(null));
 
-    final String mapAB = Util.info("map {'%': %, '%': % }", keys[0], 1, keys[1], 1);
-    final String mapABC = Util.info("map {'%': %, '%': %, '%': % }",
+    final String mapAB = Util.info("map { '%': %, '%': % }", keys[0], 1, keys[1], 1);
+    final String mapABC = Util.info("map { '%': %, '%': %, '%': % }",
         keys[0], 2, keys[2], 2, keys[1], 2);
     // use-first
     query(
@@ -148,7 +148,7 @@ public final class MapModuleTest extends QueryPlanTest {
     );
     query(
         DEEP_EQUAL.args(
-            func.args(" (" + mapABC + "," + mapAB + ")", " map {'duplicates':'use-first' }"),
+            func.args(" (" + mapABC + "," + mapAB + ")", " map { 'duplicates': 'use-first' }"),
             Util.info(" map { '%': %, '%': %, '%': % }", keys[0], 2, keys[1], 2, keys[2], 2)
         ),
         true
@@ -172,7 +172,7 @@ public final class MapModuleTest extends QueryPlanTest {
     query(
         DEEP_EQUAL.args(
             func.args(" (" + mapAB + "," + mapABC + ")", " map { 'duplicates': 'combine' }"),
-            Util.info(" map {'%': (%, %), '%': (%, %), '%': % }",
+            Util.info(" map { '%': (%, %), '%': (%, %), '%': % }",
                 keys[0], 1, 2, keys[1], 1, 2, keys[2], 2)
         ),
         true
@@ -180,7 +180,7 @@ public final class MapModuleTest extends QueryPlanTest {
     query(
         DEEP_EQUAL.args(
             func.args(" (" + mapABC + "," + mapAB + ")", " map { 'duplicates': 'combine' }"),
-            Util.info(" map {'%': (%, %), '%': (%, %), '%': % }",
+            Util.info(" map { '%': (%, %), '%': (%, %), '%': % }",
                 keys[0], 2, 1, keys[1], 2, 1, keys[2], 2)
         ),
         true

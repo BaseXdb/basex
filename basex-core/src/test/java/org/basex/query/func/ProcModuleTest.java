@@ -24,7 +24,7 @@ public final class ProcModuleTest extends SandboxTest {
     query("exists(" + func.args("a b c") + "/error)", true);
     query("empty(" + func.args("a b c") + "/(output, code))", true);
 
-    error(func.args("java", "-version", " map {'encoding': 'xx'}"), PROC_ENCODING_X);
+    error(func.args("java", "-version", " map { 'encoding': 'xx' }"), PROC_ENCODING_X);
   }
 
   /** Test method. */
@@ -73,7 +73,7 @@ public final class ProcModuleTest extends SandboxTest {
     query(func.args("java", "-version"), "");
     query("try { " + func.args("java", "x") + "} catch proc:* { 'error' }", "error");
 
-    error(func.args("java", "-version", " map {'encoding': 'xx'}"), PROC_ENCODING_X);
+    error(func.args("java", "-version", " map { 'encoding': 'xx' }"), PROC_ENCODING_X);
     error(func.args("a b c"), PROC_ERROR_X);
   }
 }

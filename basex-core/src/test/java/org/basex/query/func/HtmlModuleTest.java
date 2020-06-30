@@ -33,7 +33,7 @@ public final class HtmlModuleTest extends SandboxTest {
     // check if the function returns a HTML root node
     query("exists(" + func.args("&lt;html/&gt;") + "/*:html)", true);
     // check if the function returns <html/>
-    query(func.args("&lt;html/&gt;", " map {'nons': true()}"), "<html/>");
+    query(func.args("&lt;html/&gt;", " map { 'nons': true() }"), "<html/>");
   }
 
   /** Test method. */

@@ -324,7 +324,7 @@ public final class DbModuleTest extends SandboxTest {
     // specify index options
     for(final boolean b : new boolean[] { false, true }) {
       query(func.args(NAME, " ()", " ()",
-          " map { '" + lc(MainOptions.UPDINDEX) + "':" + b + "() }"));
+          " map { '" + lc(MainOptions.UPDINDEX) + "': " + b + "() }"));
       query(_DB_INFO.args(NAME) + "//" + lc(MainOptions.UPDINDEX) + "/text()", b);
     }
     assertEquals(context.options.get(MainOptions.UPDINDEX), false);
@@ -337,32 +337,33 @@ public final class DbModuleTest extends SandboxTest {
     final String[] stringOptions = lc(MainOptions.LANGUAGE, MainOptions.STOPWORDS);
 
     for(final String option : numberOptions) {
-      query(func.args(NAME, " ()", " ()", " map { '" + option + "':1 }"));
+      query(func.args(NAME, " ()", " ()", " map { '" + option + "': 1 }"));
     }
     for(final String option : boolOptions) {
       for(final boolean v : new boolean[] { true, false }) {
-        query(func.args(NAME, " ()", " ()", " map { '" + option + "':" + v + "() }"));
+        query(func.args(NAME, " ()", " ()", " map { '" + option + "': " + v + "() }"));
       }
     }
     for(final String option : stringOptions) {
-      query(func.args(NAME, " ()", " ()", " map { '" + option + "':'' }"));
+      query(func.args(NAME, " ()", " ()", " map { '" + option + "': '' }"));
     }
 
     // specify parsing options
     query(func.args(NAME, " '<a> </a>'", "a.xml",
-        " map { '" + lc(MainOptions.CHOP) + "':true() }"));
+        " map { '" + lc(MainOptions.CHOP) + "': true() }"));
     query(_DB_OPEN.args(NAME), "<a/>");
     query(func.args(NAME, " '<a> </a>'", "a.xml",
-        " map { '" + lc(MainOptions.CHOP) + "':false() }"));
+        " map { '" + lc(MainOptions.CHOP) + "': false() }"));
     query(_DB_OPEN.args(NAME), "<a> </a>");
 
     // specify unknown or invalid options
-    error(func.args(NAME, " ()", " ()", " map {'xyz':'abc'}"), BASEX_OPTIONS1_X);
-    error(func.args(NAME, " ()", " ()", " map {'" + lc(MainOptions.MAXLEN) + "':-1}"),
+    error(func.args(NAME, " ()", " ()", " map { 'xyz': 'abc' }"),
+        BASEX_OPTIONS1_X);
+    error(func.args(NAME, " ()", " ()", " map { '" + lc(MainOptions.MAXLEN) + "': -1 }"),
         BASEX_OPTIONS_X_X);
-    error(func.args(NAME, " ()", " ()", " map {'" + lc(MainOptions.MAXLEN) + "':'a'}"),
+    error(func.args(NAME, " ()", " ()", " map { '" + lc(MainOptions.MAXLEN) + "': 'a' }"),
         BASEX_OPTIONS_X_X);
-    error(func.args(NAME, " ()", " ()", " map {'" + lc(MainOptions.TEXTINDEX) + "':'nope'}"),
+    error(func.args(NAME, " ()", " ()", " map { '" + lc(MainOptions.TEXTINDEX) + "': 'nope' }"),
         BASEX_OPTIONS_X_X);
   }
 
@@ -487,7 +488,7 @@ public final class DbModuleTest extends SandboxTest {
     final IOFile path = new IOFile(new IOFile(Prop.TEMPDIR, NAME), XML.replaceAll(".*/", ""));
     query(_FILE_EXISTS.args(path));
     // serializes as text; ensures that the output contains no angle bracket
-    query(func.args(NAME, new IOFile(Prop.TEMPDIR, NAME), " map {'method':'text'}"));
+    query(func.args(NAME, new IOFile(Prop.TEMPDIR, NAME), " map { 'method': 'text' }"));
     query("0[contains(" + _FILE_READ_TEXT.args(path) + ", '&lt;')]", "");
     // deletes the exported file
     query(_FILE_DELETE.args(path));

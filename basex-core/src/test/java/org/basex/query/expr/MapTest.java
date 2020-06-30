@@ -70,7 +70,7 @@ public final class MapTest extends SandboxTest {
 
   /** GitHub bug (#1012). */
   @Test public void gh1012() {
-    error("map {}(())", EMPTYFOUND);
+    error("map { }(())", EMPTYFOUND);
   }
 
   /** GitHub bug (#1297). */
@@ -93,6 +93,6 @@ public final class MapTest extends SandboxTest {
 
   /** Atomize key. */
   @Test public void atomKey() {
-    query("map {'x':42}(['x'])", 42);
+    query("map { 'x': 42 }([ 'x' ])", 42);
   }
 }

@@ -148,8 +148,8 @@ public final class XQueryModuleTest extends SandboxTest {
     query(func.args("1") + "/@updating/string()", false);
     query(func.args("1") + "/QueryPlan/@compiled/string()", false);
 
-    query(func.args("1", " map {'compile': true() }") + "/QueryPlan/@compiled/string()", true);
-    query(func.args("1", " map {'plan': false() }") + "/QueryPlan", "");
+    query(func.args("1", " map { 'compile': true() }") + "/QueryPlan/@compiled/string()", true);
+    query(func.args("1", " map { 'plan': false() }") + "/QueryPlan", "");
 
     query(func.args("module namespace x='x'; "
         + "declare function x:x() { 1 };") + "/name()", "LibraryModule");

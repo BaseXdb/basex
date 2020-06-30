@@ -18,9 +18,9 @@ import org.junit.jupiter.api.Test;
  */
 public final class ServerLockingTest extends SandboxTest {
   /** Maximum sleep time in ms. */
-  private static final long SLEEP = 500;
+  private static final long SLEEP = 250;
   /** Additional allowed holding time for client creation overhead, ... in ms. */
-  private static final long SYNC = 200;
+  private static final long SYNC = 50;
 
   /** Test document. */
   private static final String DOC = "src/test/resources/test.xml";

@@ -22,7 +22,7 @@ public final class LookupTest extends SandboxTest {
     query("map:merge(for $i in 1 to 5 return map { $i: $i+1 })? 2", 3);
 
     query("map { 'first' : 'Jenna', 'last' : 'Scott' } ? first", "Jenna");
-    query("(map {'first': 'Tom'}, map {'first': 'Dick'}, map {'first': 'Harry'}) ? first",
+    query("(map { 'first': 'Tom' }, map { 'first': 'Dick' }, map { 'first': 'Harry' }) ? first",
         "Tom\nDick\nHarry");
 
     query("<_>X</_>[map { 'Y': <_/> }?(text())]", "");

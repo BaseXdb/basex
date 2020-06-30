@@ -109,8 +109,7 @@ public final class MapType extends FuncType {
 
   @Override
   public String toString() {
-    final Object[] param = this == SeqType.MAP ? WILDCARD :
-      new Object[] { keyType(), declType };
+    final Object[] param = this == SeqType.MAP ? WILDCARD : new Object[] { keyType(), declType };
     return new QueryString().token(QueryText.MAP).params(param).toString();
   }
 }

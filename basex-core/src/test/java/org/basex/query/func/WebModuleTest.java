@@ -105,7 +105,7 @@ public final class WebModuleTest extends SandboxTest {
         "/http:response/*)", 0);
 
     // status/message arguments
-    query(func.args(" map {}", " map {}", " map {'status':200,'message':'OK'}") +
+    query(func.args(" map {}", " map {}", " map { 'status': 200, 'message': 'OK' }") +
         "/http:response ! (@status, @message) ! string()", "200\nOK");
 
     // GH1585

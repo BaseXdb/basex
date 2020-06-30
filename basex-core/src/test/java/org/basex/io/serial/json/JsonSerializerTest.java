@@ -134,9 +134,9 @@ public final class JsonSerializerTest extends SandboxTest {
     error("[ (1,2) ]", format, SERJSONSEQ);
 
     // mixed
-    serialize("map { 'A':map {} }", "{'A':{}}", format);
-    serialize("map { 'A':map {'B':'C'} }", "{'A':{'B':'C'}}", format);
-    serialize("map { 'A':array {'B'} }", "{'A':['B']}", format);
+    serialize("map { 'A': map {} }", "{'A':{}}", format);
+    serialize("map { 'A': map { 'B': 'C' } }", "{'A':{'B':'C'}}", format);
+    serialize("map { 'A': array { 'B' } }", "{'A':['B']}", format);
     serialize("map { '0': () }", "{'0':null}", format);
     serialize("map { '-1': () }", "{'-1':null}", format);
 

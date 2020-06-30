@@ -106,14 +106,22 @@ public final class JsonModuleTest extends SandboxTest {
 
   /** Tests the configuration argument of {@code json:parse(...)}. */
   @Test public void parseConfig() {
-    query("json:parse('[\"foo\",{\"test\":\"asdf\"}]', map {'format':'jsonml'})",
-        "<foo test=\"asdf\"/>");
-    query("array:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', map {'format':'xquery'}))", 2);
-    query("json:parse('\"\\t\\u000A\"', map {'format':'xquery','escape':true(),'liberal':true()})",
+    final Function func = _JSON_PARSE;
+    // queries
+    query(func.args("[\"A\",{\"B\":\"C\"}]",
+        " map { 'format': 'jsonml' }"),
+        "<A B=\"C\"/>");
+    query("array:size(" + func.args("[\"A\",{\"B\":\"C\"}]",
+        " map { 'format': 'xquery' }") + ')',
+        2);
+    query(func.args("\"\\t\\u000A\"",
+        " map { 'format': 'xquery', 'escape': true(), 'liberal': true() }"),
         "\\t\\n");
-    query("string-to-codepoints(json:parse('\"\\t\\u000A\"'," +
-        "  map {'format':'xquery','escape':false(),'liberal':true()}))", "9\n10");
-    error("json:parse('42', map {'spec':'garbage'})", INVALIDOPT_X);
+    query("string-to-codepoints(" + func.args("\"\\t\\u000A\"",
+        " map { 'format': 'xquery', 'escape': false(), 'liberal': true() }") + ')',
+        "9\n10");
+
+    error(func.args("42", " map { 'spec': 'garbage' }"), INVALIDOPT_X);
   }
 
   /** Test method. */
@@ -171,7 +179,7 @@ public final class JsonModuleTest extends SandboxTest {
       final Function function) {
 
     final String query = options.isEmpty() ? function.args(input) :
-      function.args(input, " map {" + options + '}');
+      function.args(input, " map { " + options + " }");
     final String exp = expected.toString();
     if(exp.startsWith("...")) {
       contains(query, exp.substring(3));
@@ -206,7 +214,7 @@ public final class JsonModuleTest extends SandboxTest {
    */
   private static void error(final String input, final String options, final Function function) {
     final String query = options.isEmpty() ? function.args(input) :
-      function.args(input, " map {" + options + '}');
+      function.args(input, " map { " + options + " }");
     error(query, INVALIDOPT_X, JSON_PARSE_X, JSON_SERIALIZE_X);
   }
 }
