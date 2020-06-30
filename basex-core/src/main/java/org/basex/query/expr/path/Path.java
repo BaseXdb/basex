@@ -934,7 +934,7 @@ public abstract class Path extends ParseExpr {
     // add previous steps
     for(int r = 0; r < s; r++) list.add(steps[r]);
     // add analyzed step without predicates
-    list.add(Step.get(step.info, step.axis, step.test));
+    list.add(step.copyType(Step.get(step.info, step.axis, step.test)));
     // add steps in between
     for(int r = s + 1; r < t - 1; r++) list.add(steps[r]);
     // attach remaining predicates of analyzed step

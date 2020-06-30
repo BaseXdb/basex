@@ -118,22 +118,15 @@ public abstract class AxisPath extends Path {
       throws QueryException {
 
     final ExprList list = new ExprList(steps.length).add(steps);
-    final Expr step = ((Step) list.pop()).addPredicates(preds);
-    list.add(cc == null ? step : cc.get(this, () -> {
-      cc.updateFocus(step);
-      return step.optimize(cc);
-    }));
+    final Step step = ((Step) list.pop()).addPredicates(preds);
+    list.add(cc.get(step, () -> step.optimize(root, cc)));
     return copyType(get(cc, info, root, list.finish()));
   }
 
   @Override
-  public Expr mergeEbv(final Expr expr, final boolean or, final CompileContext cc)
+  public final Expr mergeEbv(final Expr expr, final boolean or, final CompileContext cc)
       throws QueryException {
-
-    if(or && expr instanceof AxisPath) {
-      return new Union(info, this, expr).optimize(cc);
-    }
-    return null;
+    return or && expr instanceof AxisPath ? new Union(info, this, expr).optimize(cc) : null;
   }
 
   @Override

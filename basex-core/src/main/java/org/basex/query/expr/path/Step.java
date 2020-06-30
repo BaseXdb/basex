@@ -113,18 +113,18 @@ public abstract class Step extends Preds {
    * @param info input info
    * @param axis axis
    * @param test node test
-   * @param exprs predicates
+   * @param preds predicates
    */
-  Step(final InputInfo info, final Axis axis, final Test test, final Expr... exprs) {
+  Step(final InputInfo info, final Axis axis, final Test test, final Expr... preds) {
     super(info, SeqType.get(
       // type
       axis == Axis.ATTRIBUTE ? NodeType.ATT : test.type,
       // occurrence
-      axis == Axis.SELF && test == KindTest.NOD && exprs.length == 0 ? Occ.ONE :
+      axis == Axis.SELF && test == KindTest.NOD && preds.length == 0 ? Occ.ONE :
       axis == Axis.SELF || axis == Axis.PARENT || axis == Axis.ATTRIBUTE &&
         test instanceof NameTest && ((NameTest) test).part == NamePart.FULL ?
         Occ.ZERO_ONE : Occ.ZERO_MORE
-    ), exprs);
+    ), preds);
 
     this.axis = axis;
     this.test = test;

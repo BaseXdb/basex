@@ -114,7 +114,7 @@ public abstract class ParseExpr extends Expr {
    * @param expr expression to be modified
    * @return specified expression
    */
-  protected final <T extends Expr> T copyType(final T expr) {
+  public final <T extends Expr> T copyType(final T expr) {
     expr.refineType(this);
     return expr;
   }
