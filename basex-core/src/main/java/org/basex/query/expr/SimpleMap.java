@@ -212,20 +212,22 @@ public abstract class SimpleMap extends Arr {
     // choose best map implementation
     return copyType(
       item ? new ItemMap(info, exprs) :
-      iterative(exprs) ? new IterMap(info, exprs) :
-      new CachedMap(info, exprs));
+      cached(exprs) ? new CachedMap(info, exprs) :
+      exprs.length == 2 && exprs[1].seqType().zeroOrOne() ? new DualMap(info, exprs) :
+      new IterMap(info, exprs)
+    );
   }
 
   /**
-   * Checks if the specified expressions can be evaluated iteratively.
+   * Checks if the specified expressions contains positional access.
    * @param exprs expressions
    * @return result of check
    */
-  private static boolean iterative(final Expr... exprs) {
+  private static boolean cached(final Expr... exprs) {
     for(final Expr expr : exprs) {
-      if(expr.has(Flag.POS)) return false;
+      if(expr.has(Flag.POS)) return true;
     }
-    return true;
+    return false;
   }
 
   @Override

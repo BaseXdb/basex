@@ -1327,8 +1327,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $c in 1 to 10 return $c[. = 1]", 1, root(IterFilter.class));
 
     // move filters with positional tests and variable references into simple map
-    check("for $c in 1 to 10 return $c[.]", 1, root(IterMap.class));
-    check("for $c in (1, 2) return $c[position() = (0, 2)]", "", root(IterMap.class));
+    check("for $c in 1 to 10 return $c[.]", 1, root(DualMap.class));
+    check("for $c in (1, 2) return $c[position() = (0, 2)]", "", root(DualMap.class));
 
     // no rewriting: position checks are replaced by util:item
     check("for $c in 1 to 10 return $c[position() = <_>2</_>]", "", root(GFLWOR.class));
@@ -1465,7 +1465,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $n in //(a,b,c) return $n/self::d", "", empty(GFLWOR.class));
 
     // other axes: rewrite to simple map operator
-    check("count(for $c in //c return $c/..)", 2, exists(IterMap.class));
+    check("count(for $c in //c return $c/..)", 2, exists(DualMap.class));
     check("count(for $c in //* return $c//c)", 3, exists(IterMap.class));
     check("count(for $c in //* return $c/following::*)", 2, exists(IterMap.class));
 

@@ -67,7 +67,7 @@ public final class SimpleMapTest extends QueryPlanTest {
   /** Typing. */
   @Test public void types() {
     check("(1, 2) ! .[. = 1]", 1, root(IterFilter.class));
-    check("(1, 2) ! <_>{ . }</_>[. = 1]", "<_>1</_>", exists(IterMap.class));
+    check("(1, 2) ! <_>{ . }</_>[. = 1]", "<_>1</_>", exists(DualMap.class));
     check("<_>1</_>[. = 1] ! 2", "2", type(ItemMap.class, "xs:integer?"));
     check("<_>4</_>[. = 4] ! (4, 5)[. = 4]", 4, type(IterMap.class, "xs:integer*"));
   }
@@ -104,7 +104,7 @@ public final class SimpleMapTest extends QueryPlanTest {
     // replace first or both expressions with singleton sequence
     check("(1 to 2) ! 3", "3\n3", exists(SingletonSeq.class), empty(IterMap.class));
     check("(1 to 2) ! 'a'[.]", "a\na", exists(SingletonSeq.class), empty(IterMap.class));
-    check("(1 to 2) ! <x/>", "<x/>\n<x/>", exists(SingletonSeq.class), exists(IterMap.class));
+    check("(1 to 2) ! <x/>", "<x/>\n<x/>", exists(SingletonSeq.class), exists(DualMap.class));
 
     // combine identical values in singleton sequence
     check("(1 to 2) ! ('a', 'a')", "a\na\na\na", exists(SingletonSeq.class) + " and .//@size = 4");
