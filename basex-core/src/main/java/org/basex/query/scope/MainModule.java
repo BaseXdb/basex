@@ -101,7 +101,7 @@ public final class MainModule extends AModule {
       @Override
       public Item next() throws QueryException {
         if(more) {
-          final Item item = qc.next(iter);
+          final Item item = iter.next();
           if(item != null) return item;
           more = false;
           VarScope.exit(fp, qc);
