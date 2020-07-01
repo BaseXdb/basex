@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
-abstract class ForLet extends Clause {
+public abstract class ForLet extends Clause {
   /** Item variable. */
   public final Var var;
   /** Bound expression. */

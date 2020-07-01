@@ -210,7 +210,7 @@ public abstract class Expr extends ExprInfo {
    * Checks if the specified variable is inlineable.
    * This function is called by:
    * <ul>
-   *   <li> {@link For#toPredicate}</li>
+   *   <li> {@link ForLet#toPredicate}</li>
    *   <li> {@link GFLWOR#inlineLets}</li>
    * </ul>
    * The following tests might return false:
@@ -243,7 +243,7 @@ public abstract class Expr extends ExprInfo {
    * <ul>
    *   <li> {@link Catch#inline(QueryException, CompileContext)}</li>
    *   <li> {@link Closure#optimize}</li>
-   *   <li> {@link For#toPredicate}</li>
+   *   <li> {@link ForLet#toPredicate}</li>
    *   <li> {@link GFLWOR#inlineLets}</li>
    *   <li> {@link TypeswitchGroup#inline}</li>
    *   <li> {@link SimpleMap#optimize}</li> (for the context)
