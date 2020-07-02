@@ -189,19 +189,19 @@
   <!-- Project Information -->
   <name>BaseX</name>
   <description>BaseX XML database and XPath/XQuery processor</description>
-  <url>http://basex.org</url>
+  <url>https://basex.org</url>
   <inceptionYear>2005</inceptionYear>
 
   <licenses>
     <license>
       <name>BSD License</name>
-      <url>http://www.opensource.org/licenses/bsd-license.php</url>
+      <url>https://www.opensource.org/licenses/bsd-license.php</url>
     </license>
   </licenses>
 
   <organization>
     <name>BaseX Team</name>
-    <url>http://basex.org</url>
+    <url>https://basex.org</url>
   </organization>
 
   <!-- Environment Settings -->
@@ -223,7 +223,7 @@
       <name>Christian Grün</name>
       <email>cg@basex.org</email>
       <organization>BaseX Team</organization>
-      <organizationUrl>http://basex.org</organizationUrl>
+      <organizationUrl>https://basex.org</organizationUrl>
     </developer>
   </developers>
 
@@ -238,7 +238,7 @@
     <repository>
       <id>basex</id>
       <name>BaseX Maven Repository</name>
-      <url>http://files.basex.org/maven</url>
+      <url>https://files.basex.org/maven</url>
     </repository>
     <repository>
       <id>central</id>

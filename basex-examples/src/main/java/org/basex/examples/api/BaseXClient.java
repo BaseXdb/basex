@@ -10,7 +10,7 @@ import java.util.*;
  * Java client for BaseX.
  * Works with BaseX 7.0 and later
  *
- * Documentation: http://docs.basex.org/wiki/Clients
+ * Documentation: https://docs.basex.org/wiki/Clients
  *
  * (C) BaseX Team 2005-20, BSD License
  */

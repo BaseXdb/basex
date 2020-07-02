@@ -12,7 +12,7 @@ LIMITATIONS:
 * also, will fail to extract stored binary content, maybe.
   (both my code, and original don't care escaped 0xff.)
 
-Documentation: http://docs.basex.org/wiki/Clients
+Documentation: https://docs.basex.org/wiki/Clients
 
 (C) 2012, Hiroaki Itoh. BSD License
     updated 2014 by Marc van Grootel
@@ -97,7 +97,7 @@ directly."""
 class Session(object):
     """class Session.
 
-    see http://docs.basex.org/wiki/Server_Protocol
+    see https://docs.basex.org/wiki/Server_Protocol
     """
 
     def __init__(self, host, port, user, password,
@@ -237,7 +237,7 @@ yourself explicitly."""
         """iter_receive() -> (typecode, item)
 
 iterate while the query returns items.
-typecode list is in http://docs.basex.org/wiki/Server_Protocol:_Types
+typecode list is in https://docs.basex.org/wiki/Server_Protocol:_Types
 """
         self.__swrapper.clear_buffer()
         typecode = self.__swrapper.recv_single_byte()
@@ -255,7 +255,7 @@ typecode list is in http://docs.basex.org/wiki/Server_Protocol:_Types
 class Query():
     """class Query.
 
-    see http://docs.basex.org/wiki/Server_Protocol
+    see https://docs.basex.org/wiki/Server_Protocol
     """
 
     def __init__(self, session, querytxt):

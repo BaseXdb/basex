@@ -12,6 +12,6 @@
  `mvn test`
 
  For questions or feedback, feel free to use the Tracker or our
- [Mailinglist](http://basex.org/open-source/ "BaseX | Open Source").
+ [Mailinglist](https://basex.org/open-source/ "BaseX | Open Source").
 
 ========================================================================

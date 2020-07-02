@@ -22,7 +22,7 @@ int basex_authenticate(int sfd, const char *user, const char *passwd);
  *   0  | result | info  | database command has been processed successfully
  *  >0  |  NULL  | error | database command processing failed
  *
- * BaseX commands: http://docs.basex.org/wiki/Commands
+ * BaseX commands: https://docs.basex.org/wiki/Commands
  */
 int basex_execute(int sfd, const char *command, char **result, char **info);
 

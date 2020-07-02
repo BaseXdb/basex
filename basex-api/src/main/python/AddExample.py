@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # This example shows how new documents can be added.
 #
-# Documentation: http://docs.basex.org/wiki/Clients
+# Documentation: https://docs.basex.org/wiki/Clients
 #
 # (C) BaseX Team 2005-12, BSD License
 

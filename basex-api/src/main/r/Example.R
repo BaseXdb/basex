@@ -1,7 +1,7 @@
 # Basic example. Show info and execute simple commands.
 # Works with BaseX 8.0 and later
 #
-# Documentation: http://docs.basex.org/wiki/Clients
+# Documentation: https://docs.basex.org/wiki/Clients
 #
 # (C) Ben Engbers
 

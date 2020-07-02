@@ -1,12 +1,12 @@
 # Basic example. Add and replace resources in BaseX.
 # Works with BaseX 8.0 and later
 #
-# Documentation: http://docs.basex.org/wiki/Clients
+# Documentation: https://docs.basex.org/wiki/Clients
 #
 # (C) Ben Engbers
 
 # This example requires a running database server instance.
-# Documentation: http://docs.basex.org/wiki/Clients
+# Documentation: https://docs.basex.org/wiki/Clients
 
 # @author BaseX Team 2005-20, BSD License
 

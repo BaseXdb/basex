@@ -3,7 +3,7 @@ import java.io._
 /**
  * This example shows how external variables can be bound to XQuery expressions.
  *
- * Documentation: http://docs.basex.org/wiki/Clients
+ * Documentation: https://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-12, BSD License
  */

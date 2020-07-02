@@ -6,7 +6,7 @@ Rebol [
  Version: "0.1" 
  Copyright: "Sabu Francis, Navi Mumbai, India"
  License: "Perl Artistic License 2.0"
- LicenseTextUrl: http://www.perlfoundation.org/artistic_license_2_0
+ LicenseTextUrl: https://www.perlfoundation.org/artistic-license-20.html
  
  Purpose: {"BaseX Rebol client; works with BaseX 6.x (but not with BaseX 7.0 and later)"} 
 

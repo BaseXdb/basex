@@ -1,4 +1,3 @@
-
 module namespace tree = "http://basex.org/red-black-tree";
 
 declare variable $tree:color := 1;

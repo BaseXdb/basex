@@ -293,7 +293,7 @@ public final class Strings {
 
   /**
    * Converts a URI to a directory path.
-   * See http://docs.basex.org/wiki/Repository#URI_Rewriting for details.
+   * See https://docs.basex.org/wiki/Repository#URI_Rewriting for details.
    * @param uri namespace uri
    * @return converted path
    */

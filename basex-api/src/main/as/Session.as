@@ -2,7 +2,7 @@
  * Language Binding for BaseX.
  * Works with BaseX 7.x (but not with BaseX 8.0 and later)
  *
- * Documentation: http://docs.basex.org/wiki/Clients
+ * Documentation: https://docs.basex.org/wiki/Clients
  *
  * (C) Manfred Knobloch, BSD License
  * Institut für Wissensmedien IWM - Knowledge Media Research Center (KMRC)

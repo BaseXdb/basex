@@ -9,7 +9,7 @@ import java.io.*;
  * Iterative evaluation will be slower, as more server requests are performed.
  *
  * This example requires a running database server instance.
- * Documentation: http://docs.basex.org/wiki/Clients
+ * Documentation: https://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-20, BSD License
  */

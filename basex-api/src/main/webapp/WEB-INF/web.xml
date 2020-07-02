@@ -10,7 +10,7 @@
     
   <!-- A BaseX option can be overwritten by prefixing the key with "org.basex."
      and specifying it in <context-param/> elements, as shown below.
-     Check out http://docs.basex.org/wiki/Options for a list of all options.
+     Check out https://docs.basex.org/wiki/Options for a list of all options.
 
   <context-param>
     <param-name>org.basex.restxqpath</param-name>

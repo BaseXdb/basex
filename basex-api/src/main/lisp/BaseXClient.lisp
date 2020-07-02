@@ -1,7 +1,7 @@
 ; Lisp client for BaseX.
 ; Works with BaseX 6.x (but not with BaseX 7 and later)
 ;
-; Documentation: http://docs.basex.org/wiki/Clients
+; Documentation: https://docs.basex.org/wiki/Clients
 ; 
 ; (C) Andy Chambers, Formedix Ltd 2010, BSD License
 

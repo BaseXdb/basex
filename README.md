@@ -4,10 +4,10 @@ Introduction
 Welcome to the BaseX open source project. We are interested in your feedback:
 
 * Please send new suggestions and bug reports to our
-  [basex-talk](http://basex.org/open-source/) mailing list.
+  [basex-talk](https://basex.org/open-source/) mailing list.
 * Confirmed bugs and feature requests are discussed in our issue tracker.
 * We invite you to contribute to our
-  [Documentation](http://docs.basex.org/wiki/Main_Page).
+  [Documentation](https://docs.basex.org/).
 
 Compiling BaseX
 ---------------
@@ -165,8 +165,8 @@ For further information on using the Docker image, refer to the
 [BaseX Docker documentation].
 
 [`basex/basexhttp`]: https://hub.docker.com/r/basex/basexhttp/
-[BaseX Docker documentation]: http://docs.basex.org/wiki/Docker
-[BaseX Web Application documentation]: http://docs.basex.org/wiki/Web_Application
+[BaseX Docker documentation]: https://docs.basex.org/wiki/Docker
+[BaseX Web Application documentation]: https://docs.basex.org/wiki/Web_Application
 
 Best regards
 Your BaseX Team

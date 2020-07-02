@@ -8,7 +8,7 @@ import java.util._
  * Works with BaseX 7.x (but not with BaseX 8.0 and later)
  * Does not support all bindings yet; your extensions are welcome.
  *
- * Documentation: http://docs.basex.org/wiki/Clients
+ * Documentation: https://docs.basex.org/wiki/Clients
  *
  * (C) BaseX Team 2005-12, BSD License
  */

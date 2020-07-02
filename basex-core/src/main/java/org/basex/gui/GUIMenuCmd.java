@@ -796,7 +796,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_HELP(HELP, "F1", false, false) {
     @Override
     public void execute(final GUI gui) {
-      BaseXDialog.browse(gui, Prop.DOC_URL);
+      BaseXDialog.browse(gui, Prop.DOCS_URL);
     }
   },
 

@@ -137,7 +137,7 @@ function dba:user(
             A global permission can be overwritten by a local permission.<br/>
             Local permissions are applied to those databases that match<br/>
             a specified pattern. The pattern is based on the <a target='_blank'
-              href='http://docs.basex.org/wiki/Commands#Glob_Syntax'>glob syntax</a>.<br/>
+              href='https://docs.basex.org/wiki/Commands#Glob_Syntax'>glob syntax</a>.<br/>
           </div>
         </_>/node()
       }</td>

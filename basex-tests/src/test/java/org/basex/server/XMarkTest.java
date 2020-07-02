@@ -28,7 +28,7 @@ public final class XMarkTest {
   /** Name of database. */
   private static final String DB = "111mb";
   /** Input data of database. */
-  private static final String DBFILE = "http://files.basex.org/xml/xmark.xml";
+  private static final String DBFILE = "https://files.basex.org/xml/xmark.xml";
 
   /** Test directory. */
   private static final IOFile DIR = new IOFile(Prop.TEMPDIR, "XMark");

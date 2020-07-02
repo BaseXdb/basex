@@ -36,17 +36,19 @@ public final class Prop {
   /** Project namespace. */
   public static final String PROJECT_NAME = NAME.toLowerCase(Locale.ENGLISH);
   /** URL. */
-  public static final String URL = "http://" + PROJECT_NAME + ".org";
+  public static final String URL = "https://" + PROJECT_NAME + ".org";
   /** URL of the community page. */
-  public static final String COMMUNITY_URL = URL + "/open-source";
-  /** URL of the documentation. */
-  public static final String DOC_URL = "http://docs." + PROJECT_NAME + ".org";
+  public static final String COMMUNITY_URL = URL + "/open-source/";
   /** URL of the update page. */
-  public static final String UPDATE_URL = URL + "/products/download/all-downloads/";
+  public static final String UPDATE_URL = URL + "/download/";
+  /** URL of the documentation. */
+  public static final String DOCS_URL = "https://docs." + PROJECT_NAME + ".org";
+  /** URL of the documentation. */
+  public static final String FILES_URL = "https://files." + PROJECT_NAME + ".org";
   /** Version URL. */
-  public static final String VERSION_URL = "http://files." + PROJECT_NAME + ".org/version.txt";
+  public static final String VERSION_URL = FILES_URL + "/version.txt";
   /** Repository URL. */
-  public static final String REPO_URL = "http://files." + PROJECT_NAME + ".org/modules";
+  public static final String REPO_URL = FILES_URL + "/modules";
   /** Mail. */
   public static final String MAILING_LIST = PROJECT_NAME + "-talk@mailman.uni-konstanz.de";
   /** Title and version. */

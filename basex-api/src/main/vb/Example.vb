@@ -1,6 +1,6 @@
 ' This example shows how database commands can be executed.
 '
-' Documentation: http://docs.basex.org/wiki/Clients
+' Documentation: https://docs.basex.org/wiki/Clients
 '
 ' (C) BaseX Team 2005-12, BSD License
 

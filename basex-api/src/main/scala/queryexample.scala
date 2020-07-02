@@ -4,7 +4,7 @@ import java.io._
  * This example shows how queries can be executed in an iterative manner.
  * Iterative evaluation will be slower, as more server requests are performed.
  *
- * Documentation: http://docs.basex.org/wiki/Clients
+ * Documentation: https://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-12, BSD License
  */

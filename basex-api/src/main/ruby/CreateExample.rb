@@ -1,5 +1,5 @@
 # This example shows how new databases can be created.
-# Documentation: http://docs.basex.org/wiki/Clients
+# Documentation: https://docs.basex.org/wiki/Clients
 #
 # (C) BaseX Team 2005-12, BSD License
 
