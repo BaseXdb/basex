@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.build.*;
+import org.basex.build.Parser;
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
@@ -15,6 +15,7 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.xml.sax.*;
 
 /**
  * Parse functions.
@@ -98,7 +99,10 @@ public abstract class Parse extends StandardFunc {
     try {
       return new DBNode(frag ? new XMLParser(io, MainOptions.get(), true) : Parser.xmlParser(io));
     } catch(final IOException ex) {
-      throw SAXERR_X.get(info, ex);
+      final QueryException qe = SAXERR_X.get(info, ex);
+      final Throwable th = ex.getCause();
+      if(th instanceof SAXException) qe.value(Str.get(th.toString()));
+      throw qe;
     }
   }
 }
