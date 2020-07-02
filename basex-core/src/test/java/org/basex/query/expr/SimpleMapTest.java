@@ -7,8 +7,9 @@ import org.basex.query.ast.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.var.*;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 /**
  * Tests for the simple map operator.
@@ -53,12 +54,12 @@ public final class SimpleMapTest extends QueryPlanTest {
     query("(1, 2) ! last()", "2\n2");
     query("map {} ! head(?_) ! string()", "");
 
-    check("1 ! .", 1, empty(IterMap.class));
-    check("(1, 2)[. = 1] ! .", 1, empty(IterMap.class));
-    check("(1, (2, 3)[. = 2]) ! .", "1\n2", empty(IterMap.class));
-    check("(1, 2) !.!.!.!.!.!.!.!.!.!.!.", "1\n2", empty(IterMap.class));
-    check("<a/> ! . ! .", "<a/>", empty(IterMap.class));
-    check("(1, 2)[. ! number() = 2]", 2, empty("*[name() = 'IterMap']"));
+    check("1 ! .", 1, root(Int.class));
+    check("(1, 2)[. = 1] ! .", 1, root(IterFilter.class));
+    check("(1, (2, 3)[. = 2]) ! .", "1\n2", root(List.class));
+    check("(1, 2) !.!.!.!.!.!.!.!.!.!.!.", "1\n2", root(IntSeq.class));
+    check("<a/> ! . ! .", "<a/>", root(CElem.class));
+    check("(1, 2)[. ! number() = 2]", 2, empty(ItemMap.class));
 
     check("trace(1) ! (. + 1)", 2, exists(ItemMap.class));
     check("<_>1</_>[. = 1] ! trace(.)", "<_>1</_>", exists(TRACE));
@@ -81,7 +82,7 @@ public final class SimpleMapTest extends QueryPlanTest {
 
   /** Inline simple expressions into next operand. */
   @Test public void inline() {
-    check("'1' ! (., number())", "1\n1", empty(IterMap.class));
+    check("'1' ! (., number())", "1\n1", root(SmallSeq.class));
     check("let $a := document { <a/> } return $a ! (., /)", "<a/>\n<a/>", count(VarRef.class, 2));
     check("let $d := document{} return $d ! /", "", root(CDoc.class));
     check("map { 1: 2 } ! ?*", 2, root(Int.class));
@@ -102,8 +103,8 @@ public final class SimpleMapTest extends QueryPlanTest {
     check("(1 to 2) ! prof:void(.)", "", empty(_UTIL_REPLICATE));
 
     // replace first or both expressions with singleton sequence
-    check("(1 to 2) ! 3", "3\n3", exists(SingletonSeq.class), empty(IterMap.class));
-    check("(1 to 2) ! 'a'[.]", "a\na", exists(SingletonSeq.class), empty(IterMap.class));
+    check("(1 to 2) ! 3", "3\n3", exists(SingletonSeq.class), root(SingletonSeq.class));
+    check("(1 to 2) ! 'a'[.]", "a\na", exists(SingletonSeq.class), root(SingletonSeq.class));
     check("(1 to 2) ! <x/>", "<x/>\n<x/>", exists(SingletonSeq.class), exists(DualMap.class));
 
     // combine identical values in singleton sequence

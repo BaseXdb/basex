@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  */
-final class BigSeq extends TreeSeq {
+public final class BigSeq extends TreeSeq {
   /** Left digit. */
   final Item[] left;
   /** Middle tree. */

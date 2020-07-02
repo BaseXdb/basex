@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  */
-final class SmallSeq extends TreeSeq {
+public final class SmallSeq extends TreeSeq {
   /** The elements. */
   final Item[] items;
 

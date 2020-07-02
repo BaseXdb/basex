@@ -392,11 +392,11 @@ public final class RewritingsTest extends QueryPlanTest {
     error("(true#0, false#0)[.]", EBV_X_X);
 
     // map expression
-    check("'s'['s' ! <a/>]", "s", empty(IterMap.class));
+    check("'s'['s' ! <a/>]", "s", root(Str.class));
     check("'s'['s' ! <a/>]", "s", root(Str.class));
     check("'s'['x' ! <a/> ! <b/>]", "s", root(Str.class));
     check("'s'['x' ! (<a/>, <b/>) ! <b/>]", "s", root(Str.class));
-    check("'s'['x' ! <a>{ . }</a>[. = 'x']]", "s", empty(IterMap.class), root(If.class));
+    check("'s'['x' ! <a>{ . }</a>[. = 'x']]", "s", root(If.class));
 
     // path expression
     check("let $a := <a/> return $a[$a/self::a]", "<a/>", empty(VarRef.class));
@@ -653,7 +653,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Path tests. */
   @Test public void gh1752() {
-    check("'1' ! json:parse(.)/descendant::*[text()] = 1", true, empty(IterMap.class));
+    check("'1' ! json:parse(.)/descendant::*[text()] = 1", true, root(IterPath.class));
   }
 
   /** Static typing of computed maps. */
@@ -918,13 +918,12 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Comparisons with simple map operands. */
   @Test public void gh1804() {
     // rewritings in comparisons
-    check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class), empty(IterMap.class));
-    check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class), empty(IterMap.class));
-    check("let $a := <_>A</_> return $a ! text() = $a ! text()", true,
-        count(IterPath.class, 2), empty(IterMap.class));
+    check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class));
+    check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class));
+    check("let $a := <_>A</_> return $a ! text() = $a ! text()", true, count(IterPath.class, 2));
 
     // EBV rewritings
-    check("<a><b/></a>[b ! ..]", "<a>\n<b/>\n</a>", exists(CachedPath.class), empty(IterMap.class));
+    check("<a><b/></a>[b ! ..]", "<a>\n<b/>\n</a>", exists(CachedPath.class));
 
     // do not rewrite absolute paths
     check("<a>a</a>/string() ! <x>{ . }</x>/text() = 'a'", true, exists(IterMap.class));
@@ -1294,9 +1293,9 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Merge simple map and filter expressions. */
   @Test public void gh1843() {
-    check("(1, 2) ! .[. = 1]", 1, empty(IterMap.class), root(IterFilter.class));
-    check("('a', 'b') ! .[. = 'b']", "b", empty(IterMap.class), root(IterFilter.class));
-    check("(1, 2)[. = 1] ! .[. = 1]", 1, empty(IterMap.class), count(CmpSimpleG.class, 1));
+    check("(1, 2) ! .[. = 1]", 1, root(IterFilter.class));
+    check("('a', 'b') ! .[. = 'b']", "b", root(IterFilter.class));
+    check("(1, 2)[. = 1] ! .[. = 1]", 1, root(IterFilter.class), count(CmpSimpleG.class, 1));
   }
 
   /** Rewrite filters to simple maps. */
