@@ -1581,4 +1581,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("let $a := <a/> return util:ddo(($a, $a))", "<a/>", root(CElem.class));
     check("let $a := <a/> return ($a, $a)/.", "<a/>", root(CElem.class));
   }
+
+  /** Inlining in update expression. */
+  @Test public void gh1891() {
+    query("for $n in (<a/>, <b/>) return $n ! (. update rename node . as name())", "<a/>\n<b/>");
+    query("'s' ! (<a/> update delete node .)", "<a/>");
+  }
 }

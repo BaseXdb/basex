@@ -12,6 +12,7 @@ import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.func.java.*;
 import org.basex.query.iter.*;
+import org.basex.query.up.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.index.*;
 import org.basex.query.value.*;
@@ -218,6 +219,7 @@ public abstract class Expr extends ExprInfo {
    *   <li>{@link Preds#inlineable} if the variable is used in a predicate</li>
    *   <li>{@link Path#inlineable} if the variable occurs within the path</li>
    *   <li>{@link SimpleMap#inlineable} if the variable occurs in a right-hand expression</li>
+   *   <li>{@link TransformWith#inlineable} if the variable occurs in an updating expression</li>
    * </ul>
    * @param var variable to be inlined
    * @return result of check
