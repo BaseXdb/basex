@@ -1601,9 +1601,15 @@ public final class RewritingsTest extends QueryPlanTest {
     query("'s' ! (<a/> update delete node .)", "<a/>");
   }
 
-  /** Inlining into simple maps. */
+  /** Static properties of closures. */
   @Test public void gh1892() {
     check("1 ! (let $a := . return function() { $a }) ! .()", 1, root(Int.class));
     query("function() { for $a in (1, 2) return function() { $a } }() ! .()", "1\n2");
+  }
+
+  /** Inline variables into simple map. */
+  @Test public void gh1895() {
+    check("let $a := (<a/>, <b/>) return $a ! name()", "a\nb", root(DualMap.class));
+    check("let $doc := <e a=''/> return $doc/@a ! node-name()", "a");
   }
 }

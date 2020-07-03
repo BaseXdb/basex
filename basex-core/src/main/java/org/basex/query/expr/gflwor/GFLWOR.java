@@ -644,6 +644,7 @@ public final class GFLWOR extends ParseExpr {
     final Predicate<Expr> var = expr -> expr instanceof VarRef && ((VarRef) expr).var.is(last.var);
     if(var.test(rtrn)) return last.expr;
 
+    // inline into filter
     if(rtrn instanceof Filter) {
       final Filter filter = (Filter) rtrn;
       if(var.test(filter.root)) {
@@ -664,34 +665,53 @@ public final class GFLWOR extends ParseExpr {
       }
     }
 
-    if(rtrn instanceof Path) {
-      final Path path = (Path) rtrn;
-      if(var.test(path.root)) {
-        final QueryFunction<Expr, Expr> func = root -> Path.get(cc, path.info, root, path.steps);
-        // rewrite
-        //   let $a := //a return $a//sub  ->  //a//sub
-        //   for $a in //a return $a/sub  ->  //a/sub
-        //   for $a in head(//a) return $a/..  ->  head(//a)/..
-        // do not rewrite
-        //   for $a in reverse(//a) return $a/sub
-        //   for $a in //a return $a//sub
-        if(last instanceof Let || last.expr.seqType().zeroOrOne() ||
-            last.expr.ddo() && path.simple()) return func.apply(last.expr);
+    // inline into path
+    final QueryFunction<Expr, Expr> inlineIntoPath = expr -> {
+      if(!(expr instanceof Path)) return null;
+      final Path path = (Path) expr;
+      if(!var.test(path.root)) return null;
 
-        // for $a in (a,b) return $a/descendant::b  ->  (a,b) ! descendant::b
-        final Expr expr = cc.get(last.expr, () -> func.apply(null));
-        return SimpleMap.get(cc, path.info, last.expr, expr);
+      final QueryFunction<Expr, Expr> func = root -> Path.get(cc, path.info, root, path.steps);
+      // rewrite
+      //   let $a := //a return $a//sub  ->  //a//sub
+      //   for $a in //a return $a/sub  ->  //a/sub
+      //   for $a in head(//a) return $a/..  ->  head(//a)/..
+      // do not rewrite
+      //   for $a in reverse(//a) return $a/sub
+      //   for $a in //a return $a//sub
+      if(last instanceof Let || last.expr.seqType().zeroOrOne() ||
+          last.expr.ddo() && path.simple()) return func.apply(last.expr);
+
+      // for $a in (a,b) return $a/descendant::b  ->  (a,b) ! descendant::b
+      final Expr ex = cc.get(last.expr, () -> func.apply(null));
+      return SimpleMap.get(cc, path.info, last.expr, ex);
+    };
+    final Expr path = inlineIntoPath.apply(rtrn);
+    if(path != null) return path;
+
+    // inline into simple map
+    if(rtrn instanceof SimpleMap) {
+      final SimpleMap map = (SimpleMap) rtrn;
+      Expr expr = map.exprs[0];
+      if(var.test(expr)) {
+        expr = last.expr;
+      } else if(!var.test(expr)) {
+        expr = inlineIntoPath.apply(expr);
+      }
+      if(expr != null) {
+        map.exprs[0] = expr;
+        return map.optimize(cc);
       }
     }
 
-    // rewrite
-    //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
-    // do not rewrite
-    //   for $c allowing empty in () return count($c)
-    //   <_/>[for $c in (1, 2) return (., $c)]
+    // for clause: rewrite to simple map
     if(last instanceof For && last.size() == 1 && !rtrn.has(Flag.CTX)) {
       final Expr expr = cc.get(last.expr, () -> {
-        // assign type of iterated items to context expression
+        // rewrite
+        //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
+        // do not rewrite
+        //   for $c allowing empty in () return count($c)
+        //   <_/>[for $c in (1, 2) return (., $c)]
         final Expr inlined = rtrn.inline(last.var, new ContextValue(info).optimize(cc), cc);
         return inlined != null ? inlined : rtrn;
       });
