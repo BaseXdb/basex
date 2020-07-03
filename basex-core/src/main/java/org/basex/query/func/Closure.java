@@ -125,10 +125,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     checkUpdating();
 
     // compile closure
-    for(final Entry<Var, Expr> e : global.entrySet()) {
-      final Expr bound = e.getValue().compile(cc);
-      e.setValue(bound);
-      e.getKey().refineType(bound.seqType(), cc);
+    for(final Entry<Var, Expr> entry : global.entrySet()) {
+      final Expr bound = entry.getValue().compile(cc);
+      entry.setValue(bound);
+      entry.getKey().refineType(bound.seqType(), cc);
     }
 
     cc.pushScope(vs);
@@ -201,8 +201,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public VarUsage count(final Var var) {
     VarUsage all = VarUsage.NEVER;
-    for(final Entry<Var, Expr> e : global.entrySet()) {
-      if((all = all.plus(e.getValue().count(var))) == VarUsage.MORE_THAN_ONCE) break;
+    for(final Expr ex : global.values()) {
+      if((all = all.plus(ex.count(var))) == VarUsage.MORE_THAN_ONCE) break;
     }
     return all;
   }
@@ -262,8 +262,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     for(int p = 0; p < pl; p++) {
       clauses.add(new Let(cc.copy(params[p], vm), exprs[p]).optimize(cc));
     }
-    for(final Entry<Var, Expr> e : global.entrySet()) {
-      clauses.add(new Let(cc.copy(e.getKey(), vm), e.getValue()).optimize(cc));
+    for(final Entry<Var, Expr> entry : global.entrySet()) {
+      clauses.add(new Let(cc.copy(entry.getKey(), vm), entry.getValue()).optimize(cc));
     }
 
     // create the return clause
@@ -315,17 +315,26 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public boolean has(final Flag... flags) {
-    // handle recursive calls: check which flags have already been assigned
+    // closure does not perform any updates
+    if(Flag.UPD.in(flags)) return false;
+
+    // handle recursive calls: check which flags are already or currently assigned
     final ArrayList<Flag> flgs = new ArrayList<>();
     for(final Flag flag : flags) {
       if(!map.containsKey(flag)) {
-        map.put(flag, false);
-        // skip updating flag (function itself does not perform any updates)
-        if(flag != Flag.UPD) flgs.add(flag);
+        map.put(flag, Boolean.FALSE);
+        flgs.add(flag);
       }
     }
-    // cache flags for remaining, new properties
-    for(final Flag flag : flgs) map.put(flag, expr.has(flag));
+    // request missing properties
+    for(final Flag flag : flgs) {
+      boolean f = false;
+      for(final Expr ex : global.values()) {
+        f = f || ex.has(flag);
+      }
+      map.put(flag, f || expr.has(flag));
+    }
+
     // evaluate result
     for(final Flag flag : flags) {
       if(map.get(flag)) return true;
@@ -335,16 +344,16 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public boolean inlineable(final Var var) {
-    for(final Entry<Var, Expr> e : global.entrySet()) {
-      if(!e.getValue().inlineable(var)) return false;
+    for(final Expr ex : global.values()) {
+      if(!ex.inlineable(var)) return false;
     }
     return true;
   }
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    for(final Entry<Var, Expr> v : global.entrySet()) {
-      if(!(v.getValue().accept(visitor) && visitor.declared(v.getKey()))) return false;
+    for(final Entry<Var, Expr> entry : global.entrySet()) {
+      if(!(entry.getValue().accept(visitor) && visitor.declared(entry.getKey()))) return false;
     }
     for(final Var var : params) {
       if(!visitor.declared(var)) return false;

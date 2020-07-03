@@ -1586,4 +1586,9 @@ public final class RewritingsTest extends QueryPlanTest {
     query("for $n in (<a/>, <b/>) return $n ! (. update rename node . as name())", "<a/>\n<b/>");
     query("'s' ! (<a/> update delete node .)", "<a/>");
   }
+
+  /** Inlining into simple maps. */
+  @Test public void gh1892() {
+    query("1 ! (let $a := . return function() { $a }) ! .()", 1);
+  }
 }
