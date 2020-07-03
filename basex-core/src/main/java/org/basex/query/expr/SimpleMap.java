@@ -122,9 +122,18 @@ public abstract class SimpleMap extends Arr {
     // no results, deterministic expressions: return empty sequence
     if(size() == 0 && !has(Flag.NDT)) return cc.emptySeq(this);
 
+    // merge paths:  /a/b ! c  ->  /a/b/c
+    final int el = exprs.length;
+    if(el == 2 && exprs[0] instanceof Path && exprs[1] instanceof Path) {
+      final Path path1 = (Path) exprs[0], path2 = (Path) exprs[1];
+      if(path1.ddo() && path2.root == null && path2.simple()) {
+        final Expr[] steps = new ExprList().add(path1.steps).add(path2.steps).finish();
+        return Path.get(cc, info, path1.root, steps);
+      }
+    }
+
     // simplify static expressions
     int e = 0;
-    final int el = exprs.length;
     boolean pushed = false;
     for(int n = 1; n < el; n++) {
       final Expr expr = exprs[e], next = exprs[n];

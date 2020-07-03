@@ -1607,6 +1607,12 @@ public final class RewritingsTest extends QueryPlanTest {
     query("function() { for $a in (1, 2) return function() { $a } }() ! .()", "1\n2");
   }
 
+  /** Rewrite simple map to path. */
+  @Test public void gh1894() {
+    execute(new CreateDB(NAME, "<xml><a/></xml>"));
+    check("/xml ! a", "<a/>", root(IterPath.class));
+  }
+
   /** Inline variables into simple map. */
   @Test public void gh1895() {
     check("let $a := (<a/>, <b/>) return $a ! name()", "a\nb", root(DualMap.class));
