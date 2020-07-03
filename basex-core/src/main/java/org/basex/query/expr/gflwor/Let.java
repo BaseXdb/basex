@@ -124,7 +124,9 @@ public final class Let extends ForLet {
 
   @Override
   boolean toPredicate(final CompileContext cc, final Expr ex) throws QueryException {
-    return size() == 1 && !var.checksType() && super.toPredicate(cc, ex);
+    // do not rewrite:
+    // let $e := (<a/>, <b/>) where $e/self::a return $e
+    return size() == 1 && super.toPredicate(cc, ex);
   }
 
   /**

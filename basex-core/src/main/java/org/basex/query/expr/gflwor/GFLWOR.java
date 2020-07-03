@@ -264,8 +264,8 @@ public final class GFLWOR extends ParseExpr {
           changed = true;
         }
       } else if(clause instanceof For) {
-        // replace deterministic expression with cheaper singleton sequence
-        // for $i in 1 to 3 return <a/>  ->  for $i in util:replicate('', 3) return $i
+        // replace deterministic expression with cheaper singleton sequence:
+        //   for $i in 1 to 3 return <a/>  ->  for $i in util:replicate('', 3) return $i
         final For fr = (For) clause;
         final long fs = fr.expr.size();
         if(fs > 1 && fr.var.declType == null && !(fr.expr instanceof SingletonSeq) &&
@@ -274,14 +274,14 @@ public final class GFLWOR extends ParseExpr {
           fr.exprType.assign(AtomType.STR);
           changed = true;
         }
-        // remove scoring variable (include current iteration in count)
-        // for $i score $s in <a/> return $i  ->  for $i in <a/> return $i
+        // remove scoring variable (include current iteration in count):
+        //   for $i score $s in <a/> return $i  ->  for $i in <a/> return $i
         if(fr.score != null && count(fr.score, pos) == VarUsage.NEVER) {
           fr.remove(cc, fr.score);
           changed = true;
         }
-        // remove positional variable (include current iteration in count)
-        // for $i pos $p in () return $p  ->  for $i in () return $p; later  ->  ()
+        // remove positional variable (include current iteration in count):
+        //   for $i pos $p in () return $p  ->  for $i in () return $p; later  ->  ()
         if(fr.pos != null && count(fr.pos, pos) == VarUsage.NEVER) {
           fr.remove(cc, fr.pos);
           changed = true;
@@ -327,23 +327,24 @@ public final class GFLWOR extends ParseExpr {
           inline = !var.checksType();
         }
         if(!inline && expr instanceof ContextValue) {
-          // inline context values
-          // allowed: 1[let $x := . return $x]  ->  1[.]
-          // illegal: 1[let $x := . return <a/>[$x = 1]]
+          // inline context values:
+          //   1[let $x := . return $x]  ->  1[.]
+          // not allowed if context is nested:
+          //   1[let $x := . return <a/>[$x = 1]]
           inline = inlineable.ok();
         }
         if(!inline && count(var, next) == VarUsage.ONCE && !expr.has(Flag.CNS)) {
-          // inline expressions that occur once, but do not construct nodes
-          // e.g. let $x := <X/> return <X xmlns='xx'>{ $x/self::X }</X>
-          // inline top-level context references
-          // e.g. (1 to 5)[let $p := position() return $p = 1]  ->  (1 to 5)[position() = 1]
-          inline = !expr.has(Flag.CTX) || inlineable.ok();
+          // inline expressions that occur once:
+          //   let $a := (1, 2)[. = 1] return $a  ->  (1, 2)[. = 1]
+          //   $seq[let $p := position() return $p = 1]  ->  $seq[position() = 1]
+          // do not inline node constructors:
+          //   let $x := <X/> return <X xmlns='xx'>{ $x/self::X }</X>
+          inline = inlineable.ok();
         }
         if(!inline && expr instanceof Path) {
-          // inline cheap path expressions with single result
-          // e.g. doc('x.xml')/root
-          inline = expr.size() == 1 && !expr.has(Flag.NDT, Flag.CNS) &&
-              (!expr.has(Flag.CTX) || inlineable.ok());
+          // inline cheap path expressions with single result:
+          //   doc('x.xml')/root
+          inline = expr.size() == 1 && !expr.has(Flag.NDT, Flag.CNS) && inlineable.ok();
         }
 
         if(inline) {
@@ -523,14 +524,16 @@ public final class GFLWOR extends ParseExpr {
         }
 
         // rewrite where clause to predicate:
-        // for $b in /a/b where $b/c  ->  for $b in /a/b[c]
-        // let $a := 1 to 3 where $a > 1 return $a  ->  let $a := (1 to 3)[. > 1] ...
-        // let $a := <a/> where $a[. = ''] return $a/self::a  ->  let $a := <a/>[. == ''] ...
+        //   for $b in /a/b where $b/c  ->  for $b in /a/b[c]
+        //   let $a := 1 to 3 where $a > 1 return $a  ->  let $a := (1 to 3)[. > 1] ...
+        //   let $a := <a/> where $a[. = ''] return $a/self::a  ->  let $a := <a/>[. == ''] ...
         if(!clause.has(Flag.CTX)) {
           final int newPos = insert < 0 ? c : insert;
           for(int b4 = newPos; --b4 >= 0;) {
             final Clause before = clauses.get(b4);
+            // skip where clauses
             if(before instanceof Where) continue;
+            // analyze for/let clauses, abort otherwise
             if(before instanceof ForLet) {
               final ForLet fl = (ForLet) before;
               final Predicate<Expr> var = expr ->

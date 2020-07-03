@@ -211,10 +211,10 @@ public abstract class Expr extends ExprInfo {
    * Checks if the specified variable is inlineable.
    * This function is called by:
    * <ul>
-   *   <li> {@link ForLet#toPredicate}</li>
+   *   <li> {@link GFLWOR#optimizeWhere} -> {@link ForLet#toPredicate}</li>
    *   <li> {@link GFLWOR#inlineLets}</li>
    * </ul>
-   * The following tests might return false:
+   * The following tests might return false if the variable occurs in a nested context:
    * <ul>
    *   <li>{@link Preds#inlineable} if the variable is used in a predicate</li>
    *   <li>{@link Path#inlineable} if the variable occurs within the path</li>

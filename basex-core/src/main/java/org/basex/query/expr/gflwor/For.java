@@ -176,6 +176,9 @@ public final class For extends ForLet {
 
   @Override
   boolean toPredicate(final CompileContext cc, final Expr ex) throws QueryException {
+    // do not rewrite:
+    // for $a allowing empty in 0 where $a return count($a)
+    // for $a at $p in (1,2) where $a = 2 return $p
     return !empty && pos == null && super.toPredicate(cc, ex);
   }
 

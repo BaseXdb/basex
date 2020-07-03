@@ -80,7 +80,10 @@ public abstract class ForLet extends Clause {
    * @throws QueryException query exception
    */
   boolean toPredicate(final CompileContext cc, final Expr ex) throws QueryException {
-    if(scoring || !ex.uses(var) || !ex.inlineable(var)) return false;
+    // do not rewrite:
+    // let $a as element(a) := <a/> where $a instance of element(b) return $a
+    // let score $s := <a/> where not($s) return $s
+    if(var.checksType() || scoring || !ex.uses(var) || !ex.inlineable(var)) return false;
 
     // reset context value (will not be accessible in predicate)
     Expr pred = cc.get(expr, () -> {
@@ -90,6 +93,7 @@ public abstract class ForLet extends Clause {
     });
 
     // attach predicates to axis path or filter, or create a new filter
+    // for $i in 1 where $i  ->  for $i in 1[boolean(.)]
     if(pred.seqType().mayBeNumber()) {
       pred = cc.function(Function.BOOLEAN, info, pred);
     }
