@@ -23,6 +23,37 @@ public interface Text {
 
   // FIXED STRINGS ================================================================================
 
+  /** Title and version. */
+  String TITLE = Prop.NAME + ' ' + Prop.VERSION;
+  /** Public URL (used in the GUI). */
+  String PUBLIC_URL = "https://" + Prop.PROJECT + ".org";
+  /** URL of the community page. */
+  String COMMUNITY_URL = PUBLIC_URL + "/open-source/";
+  /** URL of the update page. */
+  String UPDATE_URL = PUBLIC_URL + "/download/";
+  /** URL of the documentation. */
+  String DOCS_URL = "https://docs." + Prop.PROJECT + ".org";
+  /** URL of the documentation. */
+  String FILES_URL = "https://files." + Prop.PROJECT + ".org";
+  /** Version URL. */
+  String VERSION_URL = FILES_URL + "/version.txt";
+  /** Repository URL. */
+  String REPO_URL = FILES_URL + "/modules";
+  /** Mail. */
+  String MAILING_LIST = Prop.PROJECT + "-talk@mailman.uni-konstanz.de";
+
+  /** Main author. */
+  String AUTHOR = "Christian Grün";
+  /** Co-authors (1). */
+  String AUTHORS1 = "Michael Seiferle, Alexander Holupirek";
+  /** Co-authors (2). */
+  String AUTHORS2 = "Marc H. Scholl, Sabine Teubner, Dominik Abend";
+
+  /** Entity. */
+  String ORGANIZATION = Prop.NAME + " Team";
+  /** Copyright info. */
+  String COPYRIGHT = "\u00A9 2005-20 " + ORGANIZATION;
+
   /** New line. */
   String NL = Prop.NL;
   /** Colon. */
@@ -143,7 +174,7 @@ public interface Text {
   /** Bug info. */
   String S_BUGINFO = "Improper use? Potential bug? Your feedback is welcome:";
   /** Console text. */
-  String S_CONSOLE_X = Prop.TITLE + " [%]";
+  String S_CONSOLE_X = TITLE + " [%]";
 
   /** Localhost. */
   String S_LOCALHOST = "localhost";
@@ -235,8 +266,6 @@ public interface Text {
 
   /** "Stack Trace". */
   String STACK_TRACE = "Stack Trace";
-  /** Copyright info. */
-  String COPYRIGHT = "\u00A9 2005-20 " + Prop.ENTITY;
 
   // SERVER =======================================================================================
 
@@ -1363,11 +1392,9 @@ public interface Text {
   /** License info. */
   String LICENSE = lang("license");
   /** Developer info. */
-  String CHIEF_ARCHITECT = lang("chief_architect") + COLS + Prop.AUTHOR;
+  String CHIEF_ARCHITECT = lang("chief_architect");
   /** Contributors info. */
-  String TEAM1 = lang("team") + COLS + Prop.TEAM1 + ',';
-  /** Developer names. */
-  String TEAM2 = Prop.TEAM2;
+  String TEAM = lang("team");
   /** Developer names. */
   String AND_OTHERS = lang("and_others");
   /** Translation. */

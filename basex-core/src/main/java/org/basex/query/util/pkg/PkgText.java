@@ -18,7 +18,7 @@ public interface PkgText {
   /** Package descriptor. */
   String DESCRIPTOR = "expath-pkg" + IO.XMLSUFFIX;
   /** Jar descriptor. */
-  String JARDESC = Prop.PROJECT_NAME + IO.XMLSUFFIX;
+  String JARDESC = Prop.PROJECT + IO.XMLSUFFIX;
 
   /** EXPath content directory. */
   String CONTENT = "content";

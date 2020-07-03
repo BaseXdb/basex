@@ -19,46 +19,20 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class Prop {
-  /** Application URL. */
-  public static final URL LOCATION = location();
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Code version (may contain major, minor and optional patch number). */
   public static final String VERSION = version("9.4 RC2");
-  /** Main author. */
-  public static final String AUTHOR = "Christian Gr\u00FCn";
-  /** Co-authors (1). */
-  public static final String TEAM1 = "Michael Seiferle, Alexander Holupirek";
-  /** Co-authors (2). */
-  public static final String TEAM2 = "Marc H. Scholl, Sabine Teubner, Dominik Abend";
-  /** Entity. */
-  public static final String ENTITY = NAME + " Team";
+
   /** Project namespace. */
-  public static final String PROJECT_NAME = NAME.toLowerCase(Locale.ENGLISH);
-  /** URL. */
-  public static final String URL = "https://" + PROJECT_NAME + ".org";
-  /** URL of the community page. */
-  public static final String COMMUNITY_URL = URL + "/open-source/";
-  /** URL of the update page. */
-  public static final String UPDATE_URL = URL + "/download/";
-  /** URL of the documentation. */
-  public static final String DOCS_URL = "https://docs." + PROJECT_NAME + ".org";
-  /** URL of the documentation. */
-  public static final String FILES_URL = "https://files." + PROJECT_NAME + ".org";
-  /** Version URL. */
-  public static final String VERSION_URL = FILES_URL + "/version.txt";
-  /** Repository URL. */
-  public static final String REPO_URL = FILES_URL + "/modules";
-  /** Mail. */
-  public static final String MAILING_LIST = PROJECT_NAME + "-talk@mailman.uni-konstanz.de";
-  /** Title and version. */
-  public static final String TITLE = NAME + ' ' + VERSION;
+  public static final String PROJECT = NAME.toLowerCase(Locale.ENGLISH);
+  /** Project URL (used inside namespaces). */
+  public static final String URL = "http://" + PROJECT + ".org";
 
   /** System-specific newline string. */
   public static final String NL = System.getProperty("line.separator");
   /** Returns the system's default encoding. */
   public static final String ENCODING = System.getProperty("file.encoding");
-
   /** OS flag (source: {@code http://lopica.sourceforge.net/os.html}). */
   private static final String OS = System.getProperty("os.name");
   /** Flag denoting if OS belongs to Mac family. */
@@ -77,10 +51,13 @@ public final class Prop {
   /** System property for specifying database home directory. */
   public static final String PATH = DBPREFIX + "path";
 
+  /** Application URL. */
+  public static final URL LOCATION = location();
   /** System's temporary directory. */
   public static final String TEMPDIR = dir(System.getProperty("java.io.tmpdir"));
   /** Project home directory. */
   public static final String HOMEDIR;
+
   /** Global options, assigned by the starter classes and the web.xml context parameters. */
   private static final Map<String, String> OPTIONS = new ConcurrentHashMap<>();
 
@@ -95,7 +72,7 @@ public final class Prop {
     // fallback: choose home directory (linux: check HOME variable, GH-773)
     if(homedir == null) {
       final String home = WIN ? null : System.getenv("HOME");
-      homedir = dir(home != null ? home : System.getProperty("user.home")) + PROJECT_NAME;
+      homedir = dir(home != null ? home : System.getProperty("user.home")) + PROJECT;
     }
     HOMEDIR = dir(homedir);
   }

@@ -106,9 +106,9 @@ public final class QT3TSReport {
     submission.add("anonymous", "false");
 
     final FElem created = element("created", submission);
-    created.add("by", Prop.AUTHOR);
+    created.add("by", Text.AUTHOR);
     created.add("email", "cg@basex.org");
-    created.add("organization", Prop.ENTITY);
+    created.add("organization", Text.ORGANIZATION);
     created.add("on", date);
 
     final FElem testRun = element("test-run", submission);
@@ -119,7 +119,7 @@ public final class QT3TSReport {
 
     // product element
     final FElem product = element("product", root);
-    product.add("vendor", Prop.ENTITY);
+    product.add("vendor", Text.ORGANIZATION);
     product.add("name", Prop.NAME);
     product.add("version", Prop.VERSION);
     product.add("released", "true");

@@ -796,7 +796,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_HELP(HELP, "F1", false, false) {
     @Override
     public void execute(final GUI gui) {
-      BaseXDialog.browse(gui, Prop.DOCS_URL);
+      BaseXDialog.browse(gui, DOCS_URL);
     }
   },
 
@@ -804,7 +804,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_COMMUNITY(COMMUNITY, null, false, false) {
     @Override
     public void execute(final GUI gui) {
-      BaseXDialog.browse(gui, Prop.COMMUNITY_URL);
+      BaseXDialog.browse(gui, COMMUNITY_URL);
     }
   },
 
@@ -812,7 +812,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_UPDATES(CHECK_FOR_UPDATES, null, false, false) {
     @Override
     public void execute(final GUI gui) {
-      BaseXDialog.browse(gui, Prop.UPDATE_URL);
+      BaseXDialog.browse(gui, UPDATE_URL);
     }
   },
 

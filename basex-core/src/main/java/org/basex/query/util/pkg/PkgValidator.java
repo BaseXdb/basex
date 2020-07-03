@@ -96,7 +96,7 @@ public final class PkgValidator {
 
     // check if any of the dependencies math
     for(final PkgDep dep : deps) {
-      if(dep.processor.toLowerCase(Locale.ENGLISH).equals(Prop.PROJECT_NAME) &&
+      if(dep.processor.toLowerCase(Locale.ENGLISH).equals(Prop.PROJECT) &&
           availVersion(dep, versions) != null) return;
     }
     throw REPO_VERSION.get(info);

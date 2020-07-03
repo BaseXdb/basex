@@ -34,10 +34,10 @@ final class DialogInstallURL extends BaseXDialog {
     url = new BaseXTextField(this);
     info = new BaseXLabel(" ");
 
-    final BaseXLabel link = new BaseXLabel("<html><u>" + Prop.REPO_URL + "</u></html>");
+    final BaseXLabel link = new BaseXLabel("<html><u>" + REPO_URL + "</u></html>");
     link.setForeground(GUIConstants.BLUE);
     link.setCursor(GUIConstants.CURSORHAND);
-    link.addMouseListener((MouseClickedListener) e -> BaseXDialog.browse(gui, Prop.REPO_URL));
+    link.addMouseListener((MouseClickedListener) e -> BaseXDialog.browse(gui, REPO_URL));
 
     BaseXBack p = new BaseXBack(new BorderLayout(0, 8));
     p.add(url, BorderLayout.NORTH);

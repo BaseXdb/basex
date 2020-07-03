@@ -269,7 +269,7 @@ public final class GUI extends JFrame implements BaseXWindow {
       tb.add("[").add(data.meta.name).add("]");
     }
     if(!tb.isEmpty()) tb.add(" - ");
-    tb.add(Prop.TITLE);
+    tb.add(TITLE);
     setTitle(tb.toString());
   }
 
@@ -689,7 +689,7 @@ public final class GUI extends JFrame implements BaseXWindow {
           // update version option to latest used version
           writeVersion(used);
         } else {
-          final String page = Token.string(new IOUrl(Prop.VERSION_URL).read());
+          final String page = Token.string(new IOUrl(VERSION_URL).read());
           final Matcher m = Pattern.compile("^(Version )?([\\w\\d.]*?)( .*|$)",
               Pattern.DOTALL).matcher(page);
           if(m.matches()) {
@@ -704,7 +704,7 @@ public final class GUI extends JFrame implements BaseXWindow {
       protected void done(final Version latest) {
         if(BaseXDialog.confirm(GUI.this, Util.info(H_NEW_VERSION, Prop.NAME, latest))) {
           // jump to browser
-          BaseXDialog.browse(GUI.this, Prop.UPDATE_URL);
+          BaseXDialog.browse(GUI.this, UPDATE_URL);
         } else {
           // don't show update dialog anymore if it has been rejected once
           writeVersion(latest);

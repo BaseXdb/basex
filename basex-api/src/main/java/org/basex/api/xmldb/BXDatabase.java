@@ -44,7 +44,7 @@ public final class BXDatabase implements Database {
 
   @Override
   public String getName() {
-    return Prop.PROJECT_NAME;
+    return Prop.PROJECT;
   }
 
   @Override
