@@ -653,7 +653,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Path tests. */
   @Test public void gh1752() {
-    check("'1' ! json:parse(.)/descendant::*[text()] = 1", true, root(IterPath.class));
+    check("'1' ! json:parse(.)/descendant::*[text()] = 1", true, empty(IterMap.class));
   }
 
   /** Static typing of computed maps. */
