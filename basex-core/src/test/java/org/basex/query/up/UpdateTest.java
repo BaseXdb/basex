@@ -1024,8 +1024,8 @@ public final class UpdateTest extends SandboxTest {
       "xquery:eval('declare variable $c external; $c()', map { 'c': local:c#0 })", "<a/>");
   }
 
-  /** Tests adding an attribute and thus crossing the {@link IO#MAXATTS} line (GH-752). */
-  @Test public void insertAttrMaxAtt() {
+  /** Tests adding an attribute and thus crossing the {@link IO#MAXATTS} line. */
+  @Test public void gh752() {
     query(
         transform(
             "<x a01='' a02='' a03='' a04='' a05='' a06='' a07='' a08='' a09='' a10=''" +
@@ -1119,8 +1119,8 @@ public final class UpdateTest extends SandboxTest {
         + "declare function local:b() { count('1') }; updating local:a()()", FUNCNOTUP_X);
   }
 
-  /** Coercion of updating functions. GH-1430. */
-  @Test public void coerceUpdating() {
+  /** Coercion of updating functions. */
+  @Test public void gh1430() {
     query("let $f := "
         + "function($arg as %updating function(item()*) as empty-sequence()) { $arg } "
         + "return prof:void($f(function($e) { $e ! (delete node .) }))", "");

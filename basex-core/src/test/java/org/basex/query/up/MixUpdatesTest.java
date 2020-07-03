@@ -85,8 +85,8 @@ public final class MixUpdatesTest extends SandboxTest {
     query(_XQUERY_EVAL.args("function($x) { function() { $x }  }(4)") + "()", 4);
   }
 
-  /** Test method (GH-1281). */
-  @Test public void inlineFunction() {
+  /** Test method. */
+  @Test public void gh1281() {
     query("declare function local:f() { update:output('1') }; local:f()", 1);
   }
 

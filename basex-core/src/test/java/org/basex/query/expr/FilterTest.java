@@ -303,8 +303,8 @@ public final class FilterTest extends SandboxTest {
     query("db:open('" + NAME + "')[2]", "<two/>");
   }
 
-  /** Start position (GH-1641). */
-  @Test public void nested() {
+  /** Start position. */
+  @Test public void gh1641() {
     query("((1 to 2)[. != 0])[position() != .]", "");
   }
 }

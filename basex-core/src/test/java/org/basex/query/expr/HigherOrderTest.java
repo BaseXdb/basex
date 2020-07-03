@@ -103,19 +103,19 @@ public final class HigherOrderTest extends SandboxTest {
     error("count(concat#2('1','2','3'))", INVARITY_X_X_X);
   }
 
-  /** Tests using a partial function application as the context value (see GH-579). */
-  @Test public void ctxValueTest() {
+  /** Tests using a partial function application as the context value. */
+  @Test public void gh579() {
     query("declare context item := contains(?, 'a'); .('abc')", true);
   }
 
-  /** Tests using a function literal that is used before the function (see GH-698). */
-  @Test public void funcLitForward() {
+  /** Tests using a function literal that is used before the function. */
+  @Test public void gh698() {
     query("declare function local:a($a) { local:b#1($a) };" +
           "declare function local:b($b) { $b }; local:a(1)", 1);
   }
 
-  /** Do not pre-evaluate function items with non-deterministic expressions (see GH-1191). */
-  @Test public void nonDeterministic() {
+  /** Do not pre-evaluate function items with non-deterministic expressions. */
+  @Test public void gh1191() {
     final IOFile sandbox = sandbox();
     query(
       "let $files := ('a','b') ! (\"" + sandbox + "/\" || . || '.txt')" +
@@ -129,8 +129,8 @@ public final class HigherOrderTest extends SandboxTest {
     );
   }
 
-  /** Tests the %non-deterministic annotation (see GH-1212). */
-  @Test public void ndtAnnotation() {
+  /** Tests the %non-deterministic annotation. */
+  @Test public void gh1212() {
     // FLWOR will be optimized away (empty result)
     query("for $f in (prof:void#1(?), error#0) let $ignore := $f() return ()", "");
     // FLWOR expression will be evaluated (due to non-deterministic keyword)
@@ -152,7 +152,7 @@ public final class HigherOrderTest extends SandboxTest {
         + "} catch * { 'ERR' }", "ERR");
   }
 
-  /** Ensures that updating flag is not assigned before function body is known (see GH-1222). */
+  /** Ensures that updating flag is not assigned before function body is known. */
   @Test public void gh1222() {
     query("declare function local:f($i) {"
         + "  for-each($i, function($k) { if($k) then local:f('') else () })"

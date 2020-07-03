@@ -461,10 +461,10 @@ public final class NamespaceTest extends SandboxTest {
   }
 
   /**
-   * GH-249: Inserts an element with a prefixed attribute and checks
+   * Inserts an element with a prefixed attribute and checks
    * if there are superfluous namespace declarations for the element.
    */
-  @Test public void superfluousPrefixDeclaration() {
+  @Test public void gh249() {
     create(18);
     query(
       "declare namespace ns='ns'; " +
@@ -535,16 +535,6 @@ public final class NamespaceTest extends SandboxTest {
       "<e xmlns='URI' a=''/> update { insert node attribute a { } into . }",
       UPATTDUPL_X);
   }
-
-  /*
-   * Currently buggy (discovered via GH-1395).
-   * A new namespace declaration should be added.
-   *
-  @Test public void renameDuplNSCheck() {
-    query("<a a='v'/> update rename node @a as QName('U', 'a')",
-      "<a xmlns:ns0=\"U\" ns0:a=''/><a xmlns=\"uri\" a=\"v\"/>");
-  }
-   */
 
   /**
    * Checks namespace declarations.

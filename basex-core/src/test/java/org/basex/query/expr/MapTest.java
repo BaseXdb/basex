@@ -20,8 +20,8 @@ public final class MapTest extends SandboxTest {
           "$q", FIATOM_X);
   }
 
-  /** Tests the the new syntax for map literals (see GH-755). */
-  @Test public void jsonSyntax() {
+  /** Tests the the new syntax for map literals. */
+  @Test public void gh755() {
     query("(<x><y/></x> / map { 'test':y, 42:'asdf' })('test')", "<y/>");
   }
 

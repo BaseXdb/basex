@@ -167,7 +167,6 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   @Test public void gh1553() {
     createColl();
 
-    // optimization in functions. GH-1553
     indexCheck("declare function db:a() { " + _DB_OPEN.args(NAME) + "//a[text() = '1'] }; "
         + "db:a()", "<a>1</a>");
     indexCheck("declare function db:b() { collection('" + NAME + "')//text()[. = '1'] }; "

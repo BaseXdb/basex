@@ -36,7 +36,7 @@ public final class InlineTest extends QueryPlanTest {
         " default return 1337", "<x/>", empty(GFLWOR.class));
   }
 
-  /** Regression test for Issue GH-738, "switch with contains". */
+  /** Switch with contains. */
   @Test public void gh738() {
     check("let $item := <item>blah blah</item> " +
         "let $type := switch (fn:true())" +
@@ -47,7 +47,7 @@ public final class InlineTest extends QueryPlanTest {
         count(Let.class, 1));
   }
 
-  /** Regression test for Issue GH-849, "Typing and Function items: XPTY0004". */
+  /** Typing and Function items: XPTY0004. */
   @Test public void gh849() {
     check("let $f := function($s as xs:string) { $s }" +
         "return $f(let $x := <x>1</x> return if($x = 1.1) then () else 'x')",

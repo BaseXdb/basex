@@ -80,9 +80,8 @@ public final class FuncItemTest extends QueryPlanTest {
 
   /**
    * Checks if statically used functions are compiled at compile time.
-   * Added because of issue GH-382.
    */
-  @Test public void compStatUsedTest() {
+  @Test public void gh382() {
     check("declare function local:a() { local:b() };" +
         "declare function local:b() { 42 };" +
         "local:a#0()",
@@ -175,9 +174,8 @@ public final class FuncItemTest extends QueryPlanTest {
 
   /**
    * Checks if function items that have a non-empty closure but no arguments are correctly inlined.
-   * @see <a href="https://github.com/BaseXdb/basex/issues/796">GH-796</a>
    */
-  @Test public void closureOnlyInlining() {
+  @Test public void gh796() {
     check("declare function local:f($x as item()) { function() { $x } };" +
         "declare function local:g($f, $x) {if(fn:empty($f())) then local:f($x) else local:f(())};" +
         "declare variable $x := local:g(function() { () }, function() { () });" +
