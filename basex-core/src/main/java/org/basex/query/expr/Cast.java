@@ -100,6 +100,6 @@ public final class Cast extends Single {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.token(expr).token(CAST).token(AS).token(seqType);
+    qs.token("(").token(expr).token(CAST).token(AS).token(seqType).token(')');
   }
 }
