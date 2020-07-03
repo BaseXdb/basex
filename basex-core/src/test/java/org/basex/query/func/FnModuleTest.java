@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
-import org.basex.query.expr.gflwor.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
@@ -312,13 +311,12 @@ public final class FnModuleTest extends QueryPlanTest {
         empty(func),
         exists(_RANDOM_DOUBLE));
 
-    // should be rewritten to FLWOR expression
+    // should be rewritten to maps
     check(func.args(" 0 to 10", " function($x) { $x + 1 }"),
         "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11",
-        exists(GFLWOR.class));
-
+        root(DualMap.class));
     check(func.args(" (1 to 2)[. = 2]", " function($a) { $a * $a }"), 4,
-        type(GFLWOR.class, "xs:integer*"));
+        type(DualMap.class, "xs:integer*"));
   }
 
   /** Test method. */

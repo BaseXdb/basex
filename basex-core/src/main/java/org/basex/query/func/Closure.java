@@ -219,7 +219,11 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         entry.setValue(inlined);
       }
     }
-    return changed ? optimize(cc) : null;
+    if(!changed) return null;
+
+    // invalidate cached flags, optimize closure
+    map.clear();
+    return optimize(cc);
   }
 
   @Override
@@ -329,9 +333,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     // request missing properties
     for(final Flag flag : flgs) {
       boolean f = false;
-      for(final Expr ex : global.values()) {
-        f = f || ex.has(flag);
-      }
+      for(final Expr ex : global.values()) f = f || ex.has(flag);
       map.put(flag, f || expr.has(flag));
     }
 

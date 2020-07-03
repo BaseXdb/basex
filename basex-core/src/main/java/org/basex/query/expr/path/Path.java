@@ -241,6 +241,19 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
+   * Checks if this path exclusively contains self, child and attribute steps.
+   * @return result of check
+   */
+  public boolean simple() {
+    for(final Expr step : steps) {
+      if(!(step instanceof Step)) return false;
+      final Axis axis = ((Step) step).axis;
+      return axis == Axis.SELF || axis == Axis.CHILD || axis == Axis.ATTRIBUTE;
+    }
+    return true;
+  }
+
+  /**
    * Flattens nested path expressions.
    * @param cc compilation context
    * @return original or optimized expression

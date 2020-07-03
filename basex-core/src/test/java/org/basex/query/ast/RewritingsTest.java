@@ -658,8 +658,10 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Static typing of computed maps. */
   @Test public void gh1766() {
+    check("let $map := map { 'c': 'x' } return $map?(('a', 'b'))", "",
+        type(DualMap.class, "xs:string*"));
     check("let $map := map { 'c': 'x' } return count($map?(('a', 'b')))", 0,
-        type(For.class, "xs:string"));
+        type(DualMap.class, "xs:string*"));
   }
 
   /** Rewrite boolean comparisons. */
@@ -1046,9 +1048,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $_ in 1 to 2 return 3", "3\n3", root(SingletonSeq.class));
     check("for $_ in 1 to 2 return ()", "", empty());
 
-    // skip rewriting
-    check("for $_ in 1 to 2 return <a/>", "<a/>\n<a/>", root(GFLWOR.class));
-    check("for $_ in 1 to 2 return prof:void(1)", "", root(GFLWOR.class));
+    // rewrite to simple map
+    check("for $_ in 1 to 2 return <a/>", "<a/>\n<a/>", root(DualMap.class));
+    check("for $_ in 1 to 2 return prof:void(1)", "", root(DualMap.class));
   }
 
   /** Merge and/or expressions. */
@@ -1121,7 +1123,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[empty(b)][empty(c)]", "<a/>", count(EMPTY, 1), count(SingleIterPath.class, 1));
     check("<a/>[empty((b, c))]", "<a/>", count(SingleIterPath.class, 1));
     check("for $a in (<b/>, <c/>) return <a/>[empty(($a[. = 'a'], $a[. = 'b']))]", "<a/>\n<a/>",
-        count(IterFilter.class, 1));
+        root(DualMap.class), empty(IterFilter.class));
 
     // no rewritings
     query("for $a in 1 to 2 return <a/>[empty(($a[. = 1], $a[. = 1]))]", "<a/>");
@@ -1330,8 +1332,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $c in (1, 2) return $c[position() = (0, 2)]", "", root(DualMap.class));
 
     // no rewriting: position checks are replaced by util:item
-    check("for $c in 1 to 10 return $c[position() = <_>2</_>]", "", root(GFLWOR.class));
-    check("for $c in 1 to 10 return $c[$c]", 1, root(GFLWOR.class));
+    check("for $c in 1 to 10 return $c[position() = <_>2</_>]", "", root(DualMap.class));
+    check("for $c in 1 to 10 return $c[$c]", 1, root(DualMap.class));
   }
 
   /** Set expressions, DNFs/CNFs. */
@@ -1467,9 +1469,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("count(for $c in //c return $c/..)", 2, exists(DualMap.class));
     check("count(for $c in //* return $c//c)", 3, exists(IterMap.class));
     check("count(for $c in //* return $c/following::*)", 2, exists(IterMap.class));
-
-    // do not rewrite expressions that would change node order
-    check("let $n := reverse((<a>A</a>, <b>B</b>)) return $n/text()", "A\nB", root(GFLWOR.class));
+    check("let $n := reverse((<a>A</a>, <b>B</b>)) return $n/text()", "A\nB",
+        root(CachedPath.class));
   }
 
   /** FLWOR: Return clause, filter expression. */
@@ -1581,6 +1582,19 @@ public final class RewritingsTest extends QueryPlanTest {
     check("let $a := <a/> return ($a, $a)/.", "<a/>", root(CElem.class));
   }
 
+  /** Simple map implementation for two operands. */
+  @Test public void gh1889() {
+    check("(1 to 2) ! <a/>", "<a/>\n<a/>", root(DualMap.class));
+    check("(3 to 4) ! prof:void(.)", "", root(DualMap.class));
+  }
+
+  /** Rewrite FLWOR to simple map. */
+  @Test public void gh1890() {
+    check("for $i in 1 to 2 return ($i + $i)", "2\n4", root(DualMap.class));
+    check("for $a in 1 to 2 for $b in 1 to 2 return ($a * 2)", "2\n2\n4\n4",
+        root(IterMap.class), exists(_UTIL_REPLICATE));
+  }
+
   /** Inlining in update expression. */
   @Test public void gh1891() {
     query("for $n in (<a/>, <b/>) return $n ! (. update rename node . as name())", "<a/>\n<b/>");
@@ -1589,6 +1603,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Inlining into simple maps. */
   @Test public void gh1892() {
-    query("1 ! (let $a := . return function() { $a }) ! .()", 1);
+    check("1 ! (let $a := . return function() { $a }) ! .()", 1, root(Int.class));
+    query("function() { for $a in (1, 2) return function() { $a } }() ! .()", "1\n2");
   }
 }

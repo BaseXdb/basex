@@ -122,13 +122,6 @@ public final class Let extends ForLet {
     return expr.accept(visitor) && visitor.declared(var);
   }
 
-  @Override
-  boolean toPredicate(final CompileContext cc, final Expr ex) throws QueryException {
-    // do not rewrite:
-    // let $e := (<a/>, <b/>) where $e/self::a return $e
-    return size() == 1 && super.toPredicate(cc, ex);
-  }
-
   /**
    * Returns an expression that is appropriate for inlining.
    * @param cc compilation context
