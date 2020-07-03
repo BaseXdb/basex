@@ -303,19 +303,19 @@ public interface QueryText {
 
   // URIS =========================================================================================
 
-  /** W3 URI. */ String W3_URI = "http://www.w3.org";
-  /** W3 URI. */ byte[] XML_URI = token(W3_URI + "/XML/1998/namespace");
-  /** W3 URI. */ byte[] FN_URI = token(W3_URI + "/2005/xpath-functions");
-  /** W3 URI. */ byte[] MATH_URI = token(W3_URI + "/2005/xpath-functions/math");
-  /** W3 URI. */ byte[] XMLNS_URI = token(W3_URI + "/2000/xmlns/");
-  /** W3 URI. */ byte[] LOCAL_URI = token(W3_URI + "/2005/xquery-local-functions");
-  /** W3 URI. */ byte[] XS_URI = token(W3_URI + "/2001/XMLSchema");
-  /** W3 URI. */ byte[] XSI_URI = token(W3_URI + "/2001/XMLSchema-instance");
-  /** W3 URI. */ byte[] OUTPUT_URI = token(W3_URI + "/2010/xslt-xquery-serialization");
-  /** W3 URI. */ byte[] ERROR_URI = token(W3_URI + "/2005/xqt-errors");
-  /** W3 URI. */ byte[] MAP_URI = token(W3_URI + "/2005/xpath-functions/map");
-  /** W3 URI. */ byte[] ARRAY_URI = token(W3_URI + "/2005/xpath-functions/array");
-  /** W3 URI. */ byte[] XQ_URI = token(W3_URI + "/2012/xquery");
+  /** W3 URI. */ String W3_URL = "http://www.w3.org";
+  /** W3 URI. */ byte[] XML_URI = token(W3_URL + "/XML/1998/namespace");
+  /** W3 URI. */ byte[] FN_URI = token(W3_URL + "/2005/xpath-functions");
+  /** W3 URI. */ byte[] MATH_URI = token(W3_URL + "/2005/xpath-functions/math");
+  /** W3 URI. */ byte[] XMLNS_URI = token(W3_URL + "/2000/xmlns/");
+  /** W3 URI. */ byte[] LOCAL_URI = token(W3_URL + "/2005/xquery-local-functions");
+  /** W3 URI. */ byte[] XS_URI = token(W3_URL + "/2001/XMLSchema");
+  /** W3 URI. */ byte[] XSI_URI = token(W3_URL + "/2001/XMLSchema-instance");
+  /** W3 URI. */ byte[] OUTPUT_URI = token(W3_URL + "/2010/xslt-xquery-serialization");
+  /** W3 URI. */ byte[] ERROR_URI = token(W3_URL + "/2005/xqt-errors");
+  /** W3 URI. */ byte[] MAP_URI = token(W3_URL + "/2005/xpath-functions/map");
+  /** W3 URI. */ byte[] ARRAY_URI = token(W3_URL + "/2005/xpath-functions/array");
+  /** W3 URI. */ byte[] XQ_URI = token(W3_URL + "/2012/xquery");
   /** W3 URI. */ byte[] COLLATION_URI = concat(FN_URI, token("/collation/codepoint"));
 
   /** EXPath URI. */ String EXPATH_URI = "http://expath.org/ns/";
@@ -328,49 +328,50 @@ public interface QueryText {
   /** EXPath URI. */ byte[] ZIP_URI = token(EXPATH_URI + "zip");
   /** EXPath URI. */ byte[] EXPERROR_URI = token(EXPATH_URI + "error");
 
-  /** EXQuery URI. */ String EXQUERY_URI = "http://exquery.org/ns/";
-  /** EXQuery URI. */ byte[] REQUEST_URI = token(EXQUERY_URI + "request");
-  /** EXQuery URI. */ byte[] REST_URI = token(EXQUERY_URI + "restxq");
+  /** EXQuery URI. */ String EXQUERY_URL = "http://exquery.org/ns/";
+  /** EXQuery URI. */ byte[] REQUEST_URI = token(EXQUERY_URL + "request");
+  /** EXQuery URI. */ byte[] REST_URI = token(EXQUERY_URL + "restxq");
 
-  /** BaseX URI. */ byte[] BASEX_URI = token(Prop.URL);
+  /** BaseX URI. */ String BASEX_URL = "http://" + Prop.PROJECT + ".org";
+  /** BaseX URI. */ byte[] BASEX_URI = token(BASEX_URL);
 
-  /** BaseX URI. */ String BXMODULES_URI = Prop.URL + "/modules/";
-  /** BaseX URI. */ byte[] ADMIN_URI = token(BXMODULES_URI + "admin");
-  /** BaseX URI. */ byte[] ARCHIVE_URI = token(BXMODULES_URI + "archive");
-  /** BaseX URI. */ byte[] CLIENT_URI = token(BXMODULES_URI + "client");
-  /** BaseX URI. */ byte[] CONVERT_URI = token(BXMODULES_URI + "convert");
-  /** BaseX URI. */ byte[] CSV_URI = token(BXMODULES_URI + "csv");
-  /** BaseX URI. */ byte[] DB_URI = token(BXMODULES_URI + "db");
-  /** BaseX URI. */ byte[] FETCH_URI = token(BXMODULES_URI + "fetch");
-  /** BaseX URI. */ byte[] FT_URI = token(BXMODULES_URI + "ft");
-  /** BaseX URI. */ byte[] HASH_URI = token(BXMODULES_URI + "hash");
-  /** BaseX URI. */ byte[] HOF_URI = token(BXMODULES_URI + "hof");
-  /** BaseX URI. */ byte[] HTML_URI = token(BXMODULES_URI + "html");
-  /** BaseX URI. */ byte[] INDEX_URI = token(BXMODULES_URI + "index");
-  /** BaseX URI. */ byte[] INPUT_URI = token(BXMODULES_URI + "input");
-  /** BaseX URI. */ byte[] INSPECT_URI = token(BXMODULES_URI + "inspect");
-  /** BaseX URI. */ byte[] JOBS_URI = token(BXMODULES_URI + "jobs");
-  /** BaseX URI. */ byte[] JSON_URI = token(BXMODULES_URI + "json");
-  /** BaseX URI. */ byte[] LAZY_URI = token(BXMODULES_URI + "lazy");
-  /** BaseX URI. */ byte[] OUT_URI = token(BXMODULES_URI + "out");
-  /** BaseX URI. */ byte[] PERM_URI = token(BXMODULES_URI + "perm");
-  /** BaseX URI. */ byte[] PROC_URI = token(BXMODULES_URI + "proc");
-  /** BaseX URI. */ byte[] PROF_URI = token(BXMODULES_URI + "prof");
-  /** BaseX URI. */ byte[] RANDOM_URI = token(BXMODULES_URI + "random");
-  /** BaseX URI. */ byte[] REPO_URI = token(BXMODULES_URI + "repo");
-  /** BaseX URI. */ byte[] SQL_URI = token(BXMODULES_URI + "sql");
-  /** BaseX URI. */ byte[] SESSION_URI = token(BXMODULES_URI + "session");
-  /** BaseX URI. */ byte[] SESSIONS_URI = token(BXMODULES_URI + "sessions");
-  /** BaseX URI. */ byte[] STRINGS_URI = token(BXMODULES_URI + "strings");
-  /** BaseX URI. */ byte[] UNIT_URI = token(BXMODULES_URI + "unit");
-  /** BaseX URI. */ byte[] UPDATE_URI = token(BXMODULES_URI + "update");
-  /** BaseX URI. */ byte[] USER_URI = token(BXMODULES_URI + "user");
-  /** BaseX URI. */ byte[] UTIL_URI = token(BXMODULES_URI + "util");
-  /** BaseX URI. */ byte[] VALIDATE_URI = token(BXMODULES_URI + "validate");
-  /** BaseX URI. */ byte[] WEB_URI = token(BXMODULES_URI + "web");
-  /** BaseX URI. */ byte[] WS_URI = token(BXMODULES_URI + "ws");
-  /** BaseX URI. */ byte[] XQUERY_URI = token(BXMODULES_URI + "xquery");
-  /** BaseX URI. */ byte[] XSLT_URI = token(BXMODULES_URI + "xslt");
+  /** BaseX URI. */ String BXMODULES_URL = BASEX_URL + "/modules/";
+  /** BaseX URI. */ byte[] ADMIN_URI = token(BXMODULES_URL + "admin");
+  /** BaseX URI. */ byte[] ARCHIVE_URI = token(BXMODULES_URL + "archive");
+  /** BaseX URI. */ byte[] CLIENT_URI = token(BXMODULES_URL + "client");
+  /** BaseX URI. */ byte[] CONVERT_URI = token(BXMODULES_URL + "convert");
+  /** BaseX URI. */ byte[] CSV_URI = token(BXMODULES_URL + "csv");
+  /** BaseX URI. */ byte[] DB_URI = token(BXMODULES_URL + "db");
+  /** BaseX URI. */ byte[] FETCH_URI = token(BXMODULES_URL + "fetch");
+  /** BaseX URI. */ byte[] FT_URI = token(BXMODULES_URL + "ft");
+  /** BaseX URI. */ byte[] HASH_URI = token(BXMODULES_URL + "hash");
+  /** BaseX URI. */ byte[] HOF_URI = token(BXMODULES_URL + "hof");
+  /** BaseX URI. */ byte[] HTML_URI = token(BXMODULES_URL + "html");
+  /** BaseX URI. */ byte[] INDEX_URI = token(BXMODULES_URL + "index");
+  /** BaseX URI. */ byte[] INPUT_URI = token(BXMODULES_URL + "input");
+  /** BaseX URI. */ byte[] INSPECT_URI = token(BXMODULES_URL + "inspect");
+  /** BaseX URI. */ byte[] JOBS_URI = token(BXMODULES_URL + "jobs");
+  /** BaseX URI. */ byte[] JSON_URI = token(BXMODULES_URL + "json");
+  /** BaseX URI. */ byte[] LAZY_URI = token(BXMODULES_URL + "lazy");
+  /** BaseX URI. */ byte[] OUT_URI = token(BXMODULES_URL + "out");
+  /** BaseX URI. */ byte[] PERM_URI = token(BXMODULES_URL + "perm");
+  /** BaseX URI. */ byte[] PROC_URI = token(BXMODULES_URL + "proc");
+  /** BaseX URI. */ byte[] PROF_URI = token(BXMODULES_URL + "prof");
+  /** BaseX URI. */ byte[] RANDOM_URI = token(BXMODULES_URL + "random");
+  /** BaseX URI. */ byte[] REPO_URI = token(BXMODULES_URL + "repo");
+  /** BaseX URI. */ byte[] SQL_URI = token(BXMODULES_URL + "sql");
+  /** BaseX URI. */ byte[] SESSION_URI = token(BXMODULES_URL + "session");
+  /** BaseX URI. */ byte[] SESSIONS_URI = token(BXMODULES_URL + "sessions");
+  /** BaseX URI. */ byte[] STRINGS_URI = token(BXMODULES_URL + "strings");
+  /** BaseX URI. */ byte[] UNIT_URI = token(BXMODULES_URL + "unit");
+  /** BaseX URI. */ byte[] UPDATE_URI = token(BXMODULES_URL + "update");
+  /** BaseX URI. */ byte[] USER_URI = token(BXMODULES_URL + "user");
+  /** BaseX URI. */ byte[] UTIL_URI = token(BXMODULES_URL + "util");
+  /** BaseX URI. */ byte[] VALIDATE_URI = token(BXMODULES_URL + "validate");
+  /** BaseX URI. */ byte[] WEB_URI = token(BXMODULES_URL + "web");
+  /** BaseX URI. */ byte[] WS_URI = token(BXMODULES_URL + "ws");
+  /** BaseX URI. */ byte[] XQUERY_URI = token(BXMODULES_URL + "xquery");
+  /** BaseX URI. */ byte[] XSLT_URI = token(BXMODULES_URL + "xslt");
 
   // QUERY PLAN ===================================================================================
 

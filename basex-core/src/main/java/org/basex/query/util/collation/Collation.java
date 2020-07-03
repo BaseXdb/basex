@@ -27,7 +27,7 @@ public abstract class Collation {
   /** UCA collations. */
   private static final byte[] UCA = token("http://www.w3.org/2013/collation/UCA");
   /** Implementation-defined collation URI. */
-  private static final byte[] URL = token(Prop.URL + "/collation");
+  private static final byte[] URL = token(BASEX_URL + "/collation");
   /** Collation URI. */
   private byte[] uri = EMPTY;
 

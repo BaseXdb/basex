@@ -95,7 +95,7 @@ public class FnHttpTest extends HTTPTest {
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request method='post'>"
         + "<http:body media-type='application/xml'>"
-        + "<query xmlns='" + Prop.URL + "/rest'>"
+        + "<query xmlns='" + QueryText.BASEX_URL + "/rest'>"
         + "<text><![CDATA[<x>1</x>]]></text>"
         + "</query>"
         + "</http:body>"
@@ -109,7 +109,7 @@ public class FnHttpTest extends HTTPTest {
         + "<http:body media-type='application/xml'/>"
         + "</http:request>",
         RESTURL,
-        " <query xmlns='" + Prop.URL + "/rest'>"
+        " <query xmlns='" + QueryText.BASEX_URL + "/rest'>"
         + "<text><![CDATA[<x>1</x>]]></text>"
         + "</query>"), ctx)) {
       checkResponse(qp.value(), 2, HttpURLConnection.HTTP_OK);

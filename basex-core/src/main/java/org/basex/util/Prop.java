@@ -24,10 +24,8 @@ public final class Prop {
   /** Code version (may contain major, minor and optional patch number). */
   public static final String VERSION = version("9.4 RC2");
 
-  /** Project namespace. */
+  /** Project name. */
   public static final String PROJECT = NAME.toLowerCase(Locale.ENGLISH);
-  /** Project URL (used inside namespaces). */
-  public static final String URL = "http://" + PROJECT + ".org";
 
   /** System-specific newline string. */
   public static final String NL = System.getProperty("line.separator");

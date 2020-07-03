@@ -19,8 +19,7 @@ public abstract class XMLDBBaseTest extends SandboxTest {
   /** XMLDB driver. */
   static final String DRIVER = BXDatabase.class.getName();
   /** Database/document path. */
-  static final String URL =
-      "xmldb:" + Prop.PROJECT + "://" + S_LOCALHOST + ':' + DB_PORT + '/';
+  static final String URL = "xmldb:" + Prop.PROJECT + "://" + S_LOCALHOST + ':' + DB_PORT + '/';
   /** Name of the collection. */
   static final String COLL = "XMLDB";
   /** Database/document path. */
