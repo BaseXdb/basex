@@ -114,7 +114,7 @@ public abstract class SimpleMap extends Arr {
       }
     }
     if(exprs.length != list.size()) {
-      exprs = list.finish();
+      exprs = list.next();
       cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
     }
     exprType.assign(exprs[exprs.length - 1].seqType().type, new long[] { min, max });
@@ -122,17 +122,12 @@ public abstract class SimpleMap extends Arr {
     // no results, deterministic expressions: return empty sequence
     if(size() == 0 && !has(Flag.NDT)) return cc.emptySeq(this);
 
-    // merge paths:  /a/b ! c  ->  /a/b/c
-    final int el = exprs.length;
-    if(el == 2 && exprs[0] instanceof Path && exprs[1] instanceof Path) {
-      final Path path1 = (Path) exprs[0], path2 = (Path) exprs[1];
-      if(path1.ddo() && path2.root == null && path2.simple()) {
-        final Expr[] steps = new ExprList().add(path1.steps).add(path2.steps).finish();
-        return Path.get(cc, info, path1.root, steps);
-      }
-    }
+    // merge paths
+    Expr ex = mergePaths(cc);
+    if(ex != null) return ex;
 
     // simplify static expressions
+    final int el = exprs.length;
     int e = 0;
     boolean pushed = false;
     for(int n = 1; n < el; n++) {
@@ -147,7 +142,7 @@ public abstract class SimpleMap extends Arr {
       }
 
       final long es = expr.size();
-      Expr ex = null;
+      ex = null;
       if(next instanceof Filter) {
         final Filter filter = (Filter) next;
         if(filter.root instanceof ContextValue && !filter.mayBePositional()) {
@@ -225,6 +220,49 @@ public abstract class SimpleMap extends Arr {
       exprs.length == 2 && exprs[1].seqType().zeroOrOne() ? new DualMap(info, exprs) :
       new IterMap(info, exprs)
     );
+  }
+
+  /**
+   * Rewrites adjacent paths to single path expressions.
+   * @param cc compilation context
+   * @return resulting expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr mergePaths(final CompileContext cc) throws QueryException {
+    // skip optimization if first operand does not yield nodes in DDO
+    if(!(exprs[0].seqType().type instanceof NodeType && exprs[0].ddo())) return null;
+
+    // first operand: determine root and optional steps
+    Expr root = exprs[0];
+    final ExprList steps = new ExprList().add();
+    if(root instanceof AxisPath) {
+      final AxisPath ap = (AxisPath) root;
+      root = ap.root;
+      steps.add(ap.steps);
+    }
+
+    // remaining operands: check for simple axis paths
+    final int el = exprs.length;
+    int e = 0;
+    while(++e < el) {
+      if(!(exprs[e] instanceof AxisPath)) break;
+      final AxisPath path2 = (AxisPath) exprs[e];
+      if(path2.root != null || !path2.simple()) break;
+      steps.add(path2.steps);
+    }
+    if(e == 1) return null;
+
+    // all operands are steps
+    //   db:open('animals') ! xml  ->  db:open('animals')/xml
+    //   a ! b ! c  ->  /a/b/c
+    final Expr path = Path.get(cc, info, root, steps.finish());
+    if(e == el) return path;
+
+    // create expression with path and remaining operands
+    //   a ! b ! string()  ->  a/b ! string()
+    final ExprList list = new ExprList(el - e + 1).add(path);
+    for(; e < el; e++) list.add(exprs[e]);
+    return get(cc, info, list.finish());
   }
 
   /**

@@ -646,9 +646,9 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Path tests. */
   @Test public void gh1729() {
     check("let $x := 'g' return <g/> ! self::g[name() = $x]", "<g/>",
-        empty(CachedPath.class), root(ItemMap.class));
+        root(IterPath.class));
     check("let $x := 'g' return <g/> ! self::*[local-name() = $x]", "<g/>",
-        empty(CachedPath.class), root(ItemMap.class));
+        root(IterPath.class));
   }
 
   /** Path tests. */
@@ -1611,6 +1611,8 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1894() {
     execute(new CreateDB(NAME, "<xml><a/></xml>"));
     check("/xml ! a", "<a/>", root(IterPath.class));
+    check("<a/> ! a ! b ! c ! d ! e", "", root(IterPath.class), empty(IterMap.class));
+    check("<a/> ! a ! descendant::x", "", root(IterMap.class), exists(IterPath.class));
   }
 
   /** Inline variables into simple map. */
