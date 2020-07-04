@@ -17,7 +17,7 @@ import org.basex.util.*;
  */
 public abstract class ForLet extends Clause {
   /** Item variable. */
-  public final Var var;
+  public Var var;
   /** Bound expression. */
   public Expr expr;
   /** Scoring flag. */

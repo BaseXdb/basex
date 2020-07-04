@@ -1607,6 +1607,12 @@ public final class RewritingsTest extends QueryPlanTest {
     query("function() { for $a in (1, 2) return function() { $a } }() ! .()", "1\n2");
   }
 
+  /** XQuery: FLWOR, positional variable. */
+  @Test public void gh1893() {
+    check("for $a at $p in 6 to 8 return $p", "1\n2\n3", root(RangeSeq.class));
+    check("for $a at $p in ('a', 'b') return $p", "1\n2", root(RangeSeq.class));
+  }
+
   /** Rewrite simple map to path. */
   @Test public void gh1894() {
     execute(new CreateDB(NAME, "<xml><a/></xml>"));

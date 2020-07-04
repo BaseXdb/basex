@@ -374,9 +374,16 @@ public final class GFLWORTest extends QueryPlanTest {
     check("for $a at $p in " +
         "  for $x in (1 to 2) " +
         "  return $x + 1 " +
+        "return $a",
+        "2\n3",
+        root(DualMap.class)
+    );
+    check("for $a at $p in " +
+        "  for $x in (1 to 2) " +
+        "  return $x + 1 " +
         "return $p",
         "1\n2",
-        count("VarRef", 1)
+        root(RangeSeq.class)
     );
   }
 

@@ -264,24 +264,37 @@ public final class GFLWOR extends ParseExpr {
           changed = true;
         }
       } else if(clause instanceof For) {
-        // replace deterministic expression with cheaper singleton sequence:
-        //   for $i in 1 to 3 return <a/>  ->  for $i in util:replicate('', 3) return $i
         final For fr = (For) clause;
         final long fs = fr.expr.size();
         if(fs > 1 && fr.var.declType == null && !(fr.expr instanceof SingletonSeq) &&
             !fr.has(Flag.NDT) && count(fr.var, pos + 1) == VarUsage.NEVER) {
-          fr.expr = cc.replaceWith(fr.expr, SingletonSeq.get(Str.ZERO, fs));
-          fr.exprType.assign(AtomType.STR);
+          if(fr.pos != null && count(fr.pos, pos) != VarUsage.NEVER) {
+            // replace with positional variable
+            //   for $i at $p in ('a', 'b') return $p  ->  for $p in 1 to 2 return $p
+            fr.expr = cc.replaceWith(fr.expr, RangeSeq.get(1, fs, true));
+            fr.exprType.assign(AtomType.ITR);
+            fr.var = fr.pos;
+            fr.remove(cc, fr.pos);
+          } else {
+            // replace with singleton sequence (will never be accessed)
+            //   for $i in 1 to 3 return <a/>  ->  for $i in util:replicate('', 3) return $i
+            fr.expr = cc.replaceWith(fr.expr, SingletonSeq.get(Str.ZERO, fs));
+            fr.exprType.assign(AtomType.STR);
+          }
           changed = true;
         }
         // remove scoring variable (include current iteration in count):
-        //   for $i score $s in <a/> return $i  ->  for $i in <a/> return $i
+        //   for $i score $s in $nodes return $i  ->  for $i in $nodes return $i
+        // number of iterations is considered
+        //   for $i score $s in () return $s  ->  for $i in () return $s  ->  ()
         if(fr.score != null && count(fr.score, pos) == VarUsage.NEVER) {
           fr.remove(cc, fr.score);
           changed = true;
         }
-        // remove positional variable (include current iteration in count):
-        //   for $i pos $p in () return $p  ->  for $i in () return $p; later  ->  ()
+        // remove positional variable
+        //   for $i at $p in (1,2,3) return $i  ->  for $i in (1,2,3) return $i
+        // number of iterations is considered
+        //   for $i at $p in () return $p  ->  for $i in () return $p  ->  ()
         if(fr.pos != null && count(fr.pos, pos) == VarUsage.NEVER) {
           fr.remove(cc, fr.pos);
           changed = true;
