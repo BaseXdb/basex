@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -26,36 +27,61 @@ public final class IterMap extends SimpleMap {
 
   @Override
   public Iter iter(final QueryContext qc) {
+    final QueryFocus qf = qc.focus, focus = new QueryFocus();
+
+    final int el = exprs.length;
+    final Iter[] iter = new Iter[el];
+    // choose item-based or iterative processing
+    final boolean[] items = new boolean[exprs.length];
+    for(int e = 0; e < el; e++) items[e] = exprs[e].seqType().zeroOrOne();
+    // initial context values
+    final Value[] values = new Value[el];
+    values[0] = qc.focus.value;
+
     return new Iter() {
-      final int sz = exprs.length;
-      final QueryFocus focus = new QueryFocus();
-      final Value[] values = new Value[sz];
-      final Iter[] iter = new Iter[sz];
-      int pos;
+      private int pos;
 
       @Override
       public Item next() throws QueryException {
-        final QueryFocus qf = qc.focus;
-        if(iter[0] == null) {
-          iter[0] = exprs[0].iter(qc);
-          values[0] = qf.value;
-        }
-
         qc.focus = focus;
         try {
           do {
             focus.value = values[pos];
-            final Item item = qc.next(iter[pos]);
-            if(item == null) {
-              if(--pos == -1) return null;
-            } else if(pos < sz - 1) {
-              focus.value = item;
-              values[++pos] = item;
-              iter[pos] = exprs[pos].iter(qc);
+            Iter ir = iter[pos];
+            if(items[pos]) {
+              // item-based processing
+              if(ir == Empty.ITER) {
+                iter[pos--] = null;
+              } else {
+                final Item item = exprs[pos].item(qc, info);
+                if(item == Empty.VALUE) {
+                  pos--;
+                } else {
+                  iter[pos] = Empty.ITER;
+                  if(pos < el - 1) {
+                    values[++pos] = item;
+                  } else {
+                    return item;
+                  }
+                }
+              }
             } else {
-              return item;
+              // iterative processing
+              if(ir == null) {
+                ir = exprs[pos].iter(qc);
+                iter[pos] = ir;
+              }
+              final Item item = qc.next(ir);
+              if(item == null) {
+                iter[pos--] = null;
+              } else if(pos < el - 1) {
+                values[++pos] = item;
+              } else {
+                return item;
+              }
             }
-          } while(true);
+          } while(pos != -1);
+          return null;
         } finally {
           qc.focus = qf;
         }
