@@ -94,9 +94,9 @@ public final class Catch extends Single {
   }
 
   @Override
-  public Catch inline(final ExprInfo ei, final Expr ex, final CompileContext cc) {
+  public Catch inline(final Var var, final Expr ex, final CompileContext cc) {
     try {
-      final Expr inlined = expr.inline(ei, ex, cc);
+      final Expr inlined = expr.inline(var, ex, cc);
       if(inlined == null) return null;
       expr = inlined;
     } catch(final QueryException qe) {

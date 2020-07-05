@@ -63,14 +63,14 @@ public final class SwitchGroup extends Arr {
   }
 
   @Override
-  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
     boolean changed = false;
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
       Expr inlined;
       try {
-        inlined = exprs[e].inline(ei, ex, cc);
+        inlined = exprs[e].inline(var, ex, cc);
       } catch(final QueryException qe) {
         inlined = cc.error(qe, exprs[e]);
       }

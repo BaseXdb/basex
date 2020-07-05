@@ -62,10 +62,10 @@ public abstract class ForLet extends Clause {
   }
 
   @Override
-  public final Clause inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+  public final Clause inline(final Var v, final Expr ex, final CompileContext cc)
       throws QueryException {
 
-    final Expr inlined = expr.inline(ei, ex, cc);
+    final Expr inlined = expr.inline(v, ex, cc);
     if(inlined == null) return null;
     expr = inlined;
     return optimize(cc);

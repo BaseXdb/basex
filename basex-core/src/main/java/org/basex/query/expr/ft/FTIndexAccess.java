@@ -79,11 +79,11 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    final FTExpr ftinlined = ftexpr.inline(ei, ex, cc);
+    final FTExpr ftinlined = ftexpr.inline(var, ex, cc);
     if(ftinlined != null) ftexpr = ftinlined;
-    final IndexDb inlined = db.inline(ei, ex, cc);
+    final IndexDb inlined = db.inline(var, ex, cc);
     if(inlined != null) db = inlined;
     return ftinlined != null || inlined != null ? optimize(cc) : this;
   }

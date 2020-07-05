@@ -68,9 +68,9 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc) {
+  public Expr inline(final Var v, final Expr ex, final CompileContext cc) {
     // replace variable reference with expression
-    if(ei instanceof Var && var.is((Var) ei)) {
+    if(v != null && var.is(v)) {
       return ex instanceof Value ? ex : ex.copy(cc, new IntObjMap<>());
     }
     return null;

@@ -59,9 +59,9 @@ public final class IndexDynDb extends IndexDb {
   }
 
   @Override
-  public IndexDb inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+  public IndexDb inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    final Expr inlined = expr.inline(ei, ex, cc);
+    final Expr inlined = expr.inline(var, ex, cc);
     if(inlined == null) return null;
     expr = inlined;
     return this;

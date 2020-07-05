@@ -368,16 +368,16 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
-  public final Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+  public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
 
     boolean changed = false;
     // context inlining: only consider first expression
-    final int el = ei == null ? 1 : exprs.length;
+    final int el = var == null ? 1 : exprs.length;
     for(int e = 0; e < el; e++) {
       Expr inlined;
       try {
-        inlined = exprs[e].inline(ei, ex, cc);
+        inlined = exprs[e].inline(var, ex, cc);
       } catch(final QueryException qe) {
         // replace original expression with error
         inlined = cc.error(qe, this);

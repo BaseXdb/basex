@@ -962,28 +962,28 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    return inline(cc, ei, ex, clauses.listIterator()) ? optimize(cc) : null;
+    return inline(cc, var, ex, clauses.listIterator()) ? optimize(cc) : null;
   }
 
   /**
    * Inlines an expression bound to a given variable, starting at a specified clause.
    * @param cc compilation context
-   * @param ei {@link Var}, {@link Path} or context ({@code null}) to inline
+   * @param var {@link Var}, {@link Path} or context ({@code null}) to inline
    * @param ex expression to inline
    * @param iter iterator at the position of the first clause to inline into
    * @return if changes occurred
    * @throws QueryException query exception
    */
-  private boolean inline(final CompileContext cc, final ExprInfo ei, final Expr ex,
+  private boolean inline(final CompileContext cc, final Var var, final Expr ex,
       final ListIterator<Clause> iter) throws QueryException {
 
     boolean changed = false;
     while(iter.hasNext()) {
       final Clause clause = iter.next();
       try {
-        final Clause cl = clause.inline(ei, ex, cc);
+        final Clause cl = clause.inline(var, ex, cc);
         if(cl != null) {
           changed = true;
           iter.set(cl);
@@ -995,7 +995,7 @@ public final class GFLWOR extends ParseExpr {
     }
 
     try {
-      final Expr inlined = rtrn.inline(ei, ex, cc);
+      final Expr inlined = rtrn.inline(var, ex, cc);
       if(inlined != null) {
         changed = true;
         rtrn = inlined;

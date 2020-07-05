@@ -67,11 +67,11 @@ public final class Root extends Simple {
   }
 
   @Override
-  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
 
     // rewrite context reference
-    if(ei == null) {
+    if(var == null) {
       return ex.seqType().instanceOf(SeqType.DOC_ZO) ? ex : SimpleMap.get(cc, info, ex, this);
     }
     return null;

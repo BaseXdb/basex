@@ -225,15 +225,15 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+  public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
 
-    final Expr inlined = root.inline(ei, ex, cc);
+    final Expr inlined = root.inline(var, ex, cc);
     boolean changed = inlined != null;
     if(changed) root = inlined;
 
     // do not inline context reference in predicates
-    changed |= ei != null && cc.ok(root, () -> inlineAll(ei, ex, exprs, cc));
+    changed |= var != null && cc.ok(root, () -> inlineAll(var, ex, exprs, cc));
 
     return changed ? optimize(cc) : null;
   }

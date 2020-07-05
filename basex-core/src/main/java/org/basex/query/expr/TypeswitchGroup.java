@@ -142,9 +142,9 @@ public final class TypeswitchGroup extends Single {
   }
 
   @Override
-  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc) {
+  public Expr inline(final Var v, final Expr ex, final CompileContext cc) {
     try {
-      return super.inline(ei, ex, cc);
+      return super.inline(v, ex, cc);
     } catch(final QueryException qe) {
       expr = cc.error(qe, expr);
       return this;

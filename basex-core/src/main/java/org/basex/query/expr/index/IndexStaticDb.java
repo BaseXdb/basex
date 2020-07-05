@@ -53,7 +53,7 @@ public final class IndexStaticDb extends IndexDb {
   }
 
   @Override
-  public IndexDb inline(final ExprInfo ei, final Expr ex, final CompileContext cc) {
+  public IndexDb inline(final Var var, final Expr ex, final CompileContext cc) {
     return null;
   }
 

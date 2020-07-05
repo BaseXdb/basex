@@ -105,7 +105,7 @@ public final class ItrPos extends Simple {
   }
 
   @Override
-  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc) {
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc) {
     return null;
   };
 

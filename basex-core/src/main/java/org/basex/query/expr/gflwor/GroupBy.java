@@ -248,10 +248,10 @@ public final class GroupBy extends Clause {
   }
 
   @Override
-  public Clause inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+  public Clause inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
     // inline both grouping specs and non-grouping variable expressions
-    final boolean a = inlineAll(ei, ex, specs, cc), b = inlineAll(ei, ex, preExpr, cc);
+    final boolean a = inlineAll(var, ex, specs, cc), b = inlineAll(var, ex, preExpr, cc);
     return a || b ? optimize(cc) : null;
   }
 

@@ -61,9 +61,9 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    final Expr inlined = expr.inline(ei, ex, cc);
+    final Expr inlined = expr.inline(var, ex, cc);
     if(inlined == null) return null;
     expr = inlined;
     return optimize(cc);

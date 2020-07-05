@@ -45,16 +45,16 @@ public abstract class IndexAccess extends Simple {
   }
 
   /**
-   * Inlines the database reference.
-   * @param ei variable ({@link Var} reference) or context ({@code null}) to inline
+   * Inlines an expression (see {@link Expr#inline(Var, Expr, CompileContext)}).
+   * @param var variable ({@link Var} reference) or context ({@code null}) to inline
    * @param ex expression to replace with
    * @param cc compilation context
    * @return result of inlining
    * @throws QueryException query exception
    */
-  final boolean inlineDb(final ExprInfo ei, final Expr ex, final CompileContext cc)
+  final boolean inlineDb(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    final IndexDb inlined = db.inline(ei, ex, cc);
+    final IndexDb inlined = db.inline(var, ex, cc);
     if(inlined == null) return false;
     db = inlined;
     return true;

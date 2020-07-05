@@ -107,10 +107,10 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTExpr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+  public FTExpr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    boolean changed = inlineAll(ei, ex, exprs, cc);
-    final Expr inlined = weight.inline(ei, ex, cc);
+    boolean changed = inlineAll(var, ex, exprs, cc);
+    final Expr inlined = weight.inline(var, ex, cc);
     if(inlined != null) {
       weight = inlined;
       changed = true;

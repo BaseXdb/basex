@@ -97,7 +97,7 @@ final class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final ExprInfo ei, final Expr ex, final CompileContext cc) {
+  public Expr inline(final Var v, final Expr ex, final CompileContext cc) {
     return null;
   }
 

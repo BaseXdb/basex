@@ -94,9 +94,9 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public FTExpr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+  public FTExpr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    return inlineAll(ei, ex, exprs, cc) ? optimize(cc) : null;
+    return inlineAll(var, ex, exprs, cc) ? optimize(cc) : null;
   }
 
   @Override

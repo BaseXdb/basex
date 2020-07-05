@@ -106,12 +106,12 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public FTExpr inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+  public FTExpr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    final Expr mn = min.inline(ei, ex, cc), mx = max.inline(ei, ex, cc);
+    final Expr mn = min.inline(var, ex, cc), mx = max.inline(var, ex, cc);
     if(mn != null) min = mn;
     if(mx != null) max = mx;
-    return inlineAll(ei, ex, exprs, cc) || mn != null || mx != null ? optimize(cc) : null;
+    return inlineAll(var, ex, exprs, cc) || mn != null || mx != null ? optimize(cc) : null;
   }
 
   @Override

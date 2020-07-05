@@ -155,15 +155,14 @@ public final class OrderBy extends Clause {
   }
 
   @Override
-  public Clause inline(final ExprInfo ei, final Expr ex, final CompileContext cc)
+  public Clause inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    if(ei instanceof Var) {
-      final Var var = (Var) ei;
+    if(var != null) {
       for(int r = refs.length; --r >= 0;) {
         if(var.is(refs[r].var)) refs = Array.remove(refs, r);
       }
     }
-    return inlineAll(ei, ex, keys, cc) ? optimize(cc) : null;
+    return inlineAll(var, ex, keys, cc) ? optimize(cc) : null;
   }
 
   @Override
