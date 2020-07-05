@@ -16,6 +16,9 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class IterMap extends SimpleMap {
+  /** Item-based or iterative processing. */
+  private final boolean[] items;
+
   /**
    * Constructor.
    * @param info input info
@@ -23,18 +26,17 @@ public final class IterMap extends SimpleMap {
    */
   IterMap(final InputInfo info, final Expr... exprs) {
     super(info, exprs);
+
+    final int el = exprs.length;
+    items = new boolean[el];
+    for(int e = 0; e < el; e++) items[e] = exprs[e].seqType().zeroOrOne();
   }
 
   @Override
   public Iter iter(final QueryContext qc) {
     final QueryFocus qf = qc.focus, focus = new QueryFocus();
-
     final int el = exprs.length;
     final Iter[] iter = new Iter[el];
-    // choose item-based or iterative processing
-    final boolean[] items = new boolean[exprs.length];
-    for(int e = 0; e < el; e++) items[e] = exprs[e].seqType().zeroOrOne();
-    // initial context values
     final Value[] values = new Value[el];
     values[0] = qc.focus.value;
 

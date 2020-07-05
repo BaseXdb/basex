@@ -98,10 +98,10 @@ public abstract class XQArray extends XQData {
    * Returns a copy of this array where the entry at the given position is
    * replaced by the given value.
    * @param pos position of the entry to replace
-   * @param val value to put into this array
+   * @param value value to put into this array
    * @return resulting array
    */
-  public abstract XQArray put(long pos, Value val);
+  public abstract XQArray put(long pos, Value value);
 
   /**
    * Returns the number of elements in this array.

@@ -123,16 +123,16 @@ public final class TreeSeqBuilder implements Iterable<Item> {
 
   /**
    * Appends the items of the given value to this builder.
-   * @param val value to append
+   * @param value value to append
    * @param qc query context
    * @return this builder for convenience
    */
-  public TreeSeqBuilder add(final Value val, final QueryContext qc) {
+  public TreeSeqBuilder add(final Value value, final QueryContext qc) {
     // shortcut for adding single items
-    if(val.isItem()) return add((Item) val);
+    if(value.isItem()) return add((Item) value);
 
-    if(!(val instanceof BigSeq)) {
-      final BasicIter<?> iter = val.iter();
+    if(!(value instanceof BigSeq)) {
+      final BasicIter<?> iter = value.iter();
       for(Item item; (item = iter.next()) != null;) {
         qc.checkStop();
         add(item);
@@ -140,7 +140,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
       return this;
     }
 
-    final BigSeq big = (BigSeq) val;
+    final BigSeq big = (BigSeq) value;
     final Item[] ls = big.left, rs = big.right;
     final FingerTree<Item, Item> midTree = big.middle;
     if(midTree.isEmpty()) {

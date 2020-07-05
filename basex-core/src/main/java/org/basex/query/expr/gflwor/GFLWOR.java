@@ -57,7 +57,7 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public Iter iter(final QueryContext qc) {
     return new Iter() {
-      private final Eval ev = newEval();
+      private final Eval eval = newEval();
       private Iter iter = Empty.ITER;
 
       @Override
@@ -65,7 +65,7 @@ public final class GFLWOR extends ParseExpr {
         while(true) {
           final Item item = qc.next(iter);
           if(item != null) return item;
-          if(!ev.next(qc)) {
+          if(!eval.next(qc)) {
             iter = null;
             return null;
           }

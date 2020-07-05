@@ -41,7 +41,7 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public XQArray put(final long pos, final Value val) {
+  public XQArray put(final long pos, final Value value) {
     throw Util.notExpected();
   }
 

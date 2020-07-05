@@ -216,23 +216,23 @@ final class BigArray extends XQArray {
   }
 
   @Override
-  public XQArray put(final long pos, final Value val) {
+  public XQArray put(final long pos, final Value value) {
     long p = pos;
     if(p < left.length) {
       final Value[] newLeft = left.clone();
-      newLeft[(int) p] = val;
+      newLeft[(int) p] = value;
       return new BigArray(newLeft, middle, right);
     }
     p -= left.length;
 
     final long m = middle.size();
     if(p < m) {
-      return new BigArray(left, middle.set(p, val), right);
+      return new BigArray(left, middle.set(p, value), right);
     }
     p -= m;
 
     final Value[] newRight = right.clone();
-    newRight[(int) p] = val;
+    newRight[(int) p] = value;
     return new BigArray(left, middle, newRight);
   }
 

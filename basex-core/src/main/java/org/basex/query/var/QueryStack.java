@@ -115,13 +115,13 @@ public final class QueryStack {
   /**
    * Sets the value of the given variable in the current stack frame.
    * @param var variable to bind the value to
-   * @param val value to bind
+   * @param value value to bind
    * @param qc query context
    * @throws QueryException if the value does not have the right type
    */
-  public void set(final Var var, final Value val, final QueryContext qc) throws QueryException {
+  public void set(final Var var, final Value value, final QueryContext qc) throws QueryException {
     final int pos = pos(var);
-    stack[pos] = var.checkType(val, qc, false);
+    stack[pos] = var.checkType(value, qc, false);
     vars[pos] = var;
   }
 

@@ -39,18 +39,18 @@ final class LeafNode implements Node<Value, Value> {
   }
 
   @Override
-  public LeafNode set(final long pos, final Value val) {
+  public LeafNode set(final long pos, final Value value) {
     final Value[] vals = values.clone();
-    vals[(int) pos] = val;
+    vals[(int) pos] = value;
     return new LeafNode(vals);
   }
 
   @Override
-  public boolean insert(final Node<Value, Value>[] siblings, final long pos, final Value val) {
+  public boolean insert(final Node<Value, Value>[] siblings, final long pos, final Value value) {
     final int p = (int) pos, n = values.length;
     final Value[] vals = new Value[n + 1];
     Array.copy(values, p, vals);
-    vals[p] = val;
+    vals[p] = value;
     Array.copy(values, p, n - p, vals, p + 1);
 
     if(n < XQArray.MAX_LEAF) {

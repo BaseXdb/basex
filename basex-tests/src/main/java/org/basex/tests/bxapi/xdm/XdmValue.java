@@ -19,13 +19,13 @@ import org.basex.tests.bxapi.*;
 public abstract class XdmValue implements Iterable<XdmItem> {
   /**
    * Returns a new XQuery value.
-   * @param val value
+   * @param value value
    * @return result
    */
-  public static XdmValue get(final Value val) {
-    final long size = val.size();
-    return size == 0 ? XdmEmpty.EMPTY : size == 1 ? XdmItem.get((Item) val) :
-      new XdmSequence((Seq) val);
+  public static XdmValue get(final Value value) {
+    final long size = value.size();
+    return size == 0 ? XdmEmpty.EMPTY : size == 1 ? XdmItem.get((Item) value) :
+      new XdmSequence((Seq) value);
   }
 
   /**

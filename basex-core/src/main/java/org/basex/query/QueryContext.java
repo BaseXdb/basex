@@ -562,11 +562,11 @@ public final class QueryContext extends Job implements Closeable {
   /**
    * Binds an expression to a local variable.
    * @param var variable
-   * @param val expression to be bound
+   * @param value expression to be bound
    * @throws QueryException exception
    */
-  public void set(final Var var, final Value val) throws QueryException {
-    stack.set(var, val, this);
+  public void set(final Var var, final Value value) throws QueryException {
+    stack.set(var, value, this);
   }
 
   /**
