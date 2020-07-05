@@ -28,7 +28,7 @@ public final class For extends ForLet {
   /** Score variable (can be {@code null}). */
   Var score;
   /** {@code allowing empty} flag. */
-  final boolean empty;
+  boolean empty;
 
   /**
    * Constructor.
@@ -119,9 +119,16 @@ public final class For extends ForLet {
 
   @Override
   public For optimize(final CompileContext cc) throws QueryException {
-    // assign type to clause and variable
-    final SeqType type = expr.seqType();
-    exprType.assign(type.type, empty && !type.oneOrMore() ? Occ.ZERO_ONE : Occ.ONE);
+    // assign type to clause and variable; remove empty flag if expression always yields items
+    final SeqType st = expr.seqType();
+    Occ occ = Occ.ONE;
+    if(st.oneOrMore()) {
+      empty = false;
+    } else if(empty) {
+      occ = Occ.ZERO_ONE;
+    }
+    exprType.assign(st.type, occ);
+
     var.refineType(seqType(), size(), cc);
     var.expr(expr);
     if(pos != null) {
