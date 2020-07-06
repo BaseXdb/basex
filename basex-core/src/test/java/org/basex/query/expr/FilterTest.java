@@ -269,11 +269,11 @@ public final class FilterTest extends SandboxTest {
   /** Variable predicates. */
   @Test public void variablePreds() {
     // empty sequence
-    query("for $i in (1,'a',2) return <a b='{$i}'/>[$i]", "<a b=\"1\"/>\n<a b=\"a\"/>");
-    query("for $i in (1,'a',2) return <a b='{$i}'/>[<b c='{random:integer()}'/>][$i]",
+    query("for $i in (1,'a',2) return <a b='{ $i }'/>[$i]", "<a b=\"1\"/>\n<a b=\"a\"/>");
+    query("for $i in (1,'a',2) return <a b='{ $i }'/>[<b c='{random:integer()}'/>][$i]",
         "<a b=\"1\"/>\n<a b=\"a\"/>");
     query("for $i in (1,'a',2) "
-        + "return <a b='{$i}'/>[<a b='{random:integer()}'/>][<b c='{random:integer()}'/>][$i]",
+        + "return <a b='{ $i }'/>[<a b='{random:integer()}'/>][<b c='{random:integer()}'/>][$i]",
         "<a b=\"1\"/>\n<a b=\"a\"/>");
   }
 

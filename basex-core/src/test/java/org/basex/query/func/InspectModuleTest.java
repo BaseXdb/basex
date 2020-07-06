@@ -48,7 +48,7 @@ public final class InspectModuleTest extends SandboxTest {
     query(query + "/return/@type/data()", "xs:integer");
     query(query + "/return/@occurrence/data()", "");
 
-    query = query("declare %private function Q{U}f($v as xs:int) as xs:integer {$v};" +
+    query = query("declare %private function Q{U}f($v as xs:int) as xs:integer { $v };" +
         func.args(" Q{U}f#1"));
     query(query + "/@name/data()", "f");
     query(query + "/@uri/data()", "U");

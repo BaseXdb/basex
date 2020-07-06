@@ -32,18 +32,18 @@ public final class HofModuleTest extends QueryPlanTest {
 
     // should be unrolled and evaluated at compile time
     final int limit = StandardFunc.UNROLL_LIMIT;
-    check(func.args(" 1 to " + limit, " function($a, $b) {$a + $b}"),
+    check(func.args(" 1 to " + limit, " function($a, $b) { $a + $b }"),
         55,
         empty(func),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 1 to " + limit, " function($a, $b) {0 * random:double() + $b}"),
+    check(func.args(" 1 to " + limit, " function($a, $b) { 0 * random:double() + $b }"),
         10,
         exists(Int.class),
         empty(func),
         count(Util.className(Arith.class) + "[@op = '+']", 9));
     // should not be unrolled
-    check(func.args(" 1 to " + (limit + 1), " function($a, $b) {$a + $b}"),
+    check(func.args(" 1 to " + (limit + 1), " function($a, $b) { $a + $b }"),
         66,
         exists(func));
   }
@@ -84,6 +84,6 @@ public final class HofModuleTest extends QueryPlanTest {
   @Test public void untilTest() {
     final Function func = _HOF_UNTIL;
     query(func.args(" function($x) { $x >= 1000 }, function($x) { $x * 2 }, 1"), 1024);
-    query(func.args(" function($xs) { count($xs) > 3 }, function($x) {$x, $x}, 1"), "1\n1\n1\n1");
+    query(func.args(" function($xs) { count($xs) > 3 }, function($x) { $x, $x }, 1"), "1\n1\n1\n1");
   }
 }

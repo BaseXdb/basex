@@ -18,7 +18,7 @@ public final class HigherOrderTest extends SandboxTest {
    */
   @Test public void shadowingTest() {
     query("let $x := 1 to 9 " +
-      "return fold-left($x, 0, function($x, $y){$x * 10 + $y})",
+      "return fold-left($x, 0, function($x, $y) { $x * 10 + $y })",
       123456789);
   }
 
@@ -67,7 +67,7 @@ public final class HigherOrderTest extends SandboxTest {
   @Test public void typeTest() {
     query("declare function local:f($x as xs:long, $y as xs:NCName)" +
       "    as element(e) {" +
-      "  <e x='{$x}' y='{$y}'/>" +
+      "  <e x='{ $x }' y='{ $y }'/>" +
       "};" +
       "local:f#2 instance of function(xs:long, xs:NCName) as element(e)",
       true);
