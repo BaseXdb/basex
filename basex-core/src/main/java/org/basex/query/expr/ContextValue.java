@@ -49,6 +49,11 @@ public final class ContextValue extends Simple {
   }
 
   @Override
+  public VarUsage count(final Var var) {
+    return var == null ? VarUsage.ONCE : VarUsage.NEVER;
+  }
+
+  @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc) {
     // inline context or return null
     return var == null ? ex : null;

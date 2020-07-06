@@ -175,9 +175,9 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   Value[] evalArgs(final QueryContext qc) throws QueryException {
-    final int last = exprs.length - 1;
-    final Value[] args = new Value[last];
-    for(int a = 0; a < last; a++) args[a] = exprs[a].value(qc);
+    final int el = exprs.length - 1;
+    final Value[] args = new Value[el];
+    for(int e = 0; e < el; e++) args[e] = exprs[e].value(qc);
     return args;
   }
 

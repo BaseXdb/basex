@@ -166,12 +166,23 @@ public abstract class SimpleMap extends Arr {
               // replace leading context reference
               // . ! number() = 2  ->  number() = 2
               ex = next;
-            } else if(es == 1 && (expr instanceof Value || expr instanceof VarRef)) {
-              // single item: inline values and variable references
-              // 'a' ! (. = 'a')  ->  'a  = 'a'
-              // map {} ! ?*      ->  map {}?*
-              // 123 ! number()   ->  number(123)
-              // $doc ! /         ->  $doc
+            } else if(es == 1 && (
+              // single item: inline values
+              //   'a' ! (. = 'a')  ->  'a'  = 'a'
+              //   map {} ! ?*      ->  map {}?*
+              //   123 ! number()   ->  number(123)
+              expr instanceof Value ||
+              // inline variable references:
+              //   $a ! (. + .)  ->  $a + $a
+              expr instanceof VarRef ||
+              // inline any other expression
+              //   ($a + $b) ! (. * 2)  ->  ($a + $b) * 2
+              // skip nested node constructors
+              //   <X/> ! <X xmlns='x'>{ . }</X>
+              next.count(null) == VarUsage.ONCE && !(expr.has(Flag.CNS) && next.has(Flag.CNS))
+            )) {
+              // inline single uses
+              //   ($n + 2) ! abs(.) ->  map {}?*
               try {
                 ex = next.inline(null, expr, cc);
                 // ignore rewritten expression that is identical to original one
@@ -342,11 +353,15 @@ public abstract class SimpleMap extends Arr {
   @Override
   public final VarUsage count(final Var var) {
     VarUsage uses = VarUsage.NEVER;
-    final int el = exprs.length;
-    for(int e = 1; e < el; e++) {
-      uses = uses.plus(exprs[e].count(var));
-      if(uses == VarUsage.MORE_THAN_ONCE) break;
+    // context reference check: only consider first operand
+    if(var != null) {
+      final int el = exprs.length;
+      for(int e = 1; e < el; e++) {
+        uses = uses.plus(exprs[e].count(var));
+        if(uses == VarUsage.MORE_THAN_ONCE) break;
+      }
     }
+    // assume that remaining operands will be evaluated multiple times
     return uses == VarUsage.NEVER ? exprs[0].count(var) : VarUsage.MORE_THAN_ONCE;
   }
 

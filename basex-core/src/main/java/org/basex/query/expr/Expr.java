@@ -227,15 +227,19 @@ public abstract class Expr extends ExprInfo {
   public abstract boolean inlineable(Var var);
 
   /**
-   * Checks how often a variable is used in this expression.
+   * Checks how often a variable or context reference is used in this expression.
    * This function is called by:
    * <ul>
-   *   <li> {@link GFLWOR#simplify}, {@link GFLWOR#inlineLets}, {@link GFLWOR#optimizePos}
-   *     and {@link GFLWOR#unusedVars}</li>
-   *   <li> {@link SwitchGroup#countCases}</li>
+   *   <li> {@link GFLWOR#simplify}</li>
+   *   <li> {@link GFLWOR#inlineLets}</li>
+   *   <li> {@link GFLWOR#optimizePos}</li>
+   *   <li> {@link GFLWOR#unusedVars}</li>
+   *   <li> {@link Closure#optimize}</li>
+   *   <li> {@link TypeswitchGroup#optimize}</li>
+   *   <li> {@link SimpleMap#optimize}</li>
    * </ul>
-   * @param var variable to look for
-   * @return how often the variable is used, see {@link VarUsage}
+   * @param var variable ({@link Var} reference) or context ({@code null}) to inline
+   * @return number of usages, see {@link VarUsage}
    */
   public abstract VarUsage count(Var var);
 

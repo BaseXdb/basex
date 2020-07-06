@@ -99,6 +99,12 @@ public final class TransformWith extends Arr {
   }
 
   @Override
+  public VarUsage count(final Var var) {
+    // context reference check: only consider source expression
+    return var == null ? exprs[0].count(var) : super.count(var);
+  }
+
+  @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
 

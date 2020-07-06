@@ -67,6 +67,11 @@ public final class Root extends Simple {
   }
 
   @Override
+  public VarUsage count(final Var var) {
+    return var == null ? VarUsage.ONCE : VarUsage.NEVER;
+  }
+
+  @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
 

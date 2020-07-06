@@ -56,6 +56,12 @@ public abstract class ContextFn extends StandardFunc {
   }
 
   @Override
+  public VarUsage count(final Var var) {
+    // context reference check: check if function accesses context
+    return (var == null && contextAccess() ? VarUsage.ONCE : VarUsage.NEVER).plus(super.count(var));
+  }
+
+  @Override
   public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
     return inline(var, ex, cc, () -> {

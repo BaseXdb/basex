@@ -41,7 +41,7 @@ public final class Lookup extends Arr {
 
     final Expr keys = exprs[0];
     final long ks = keys.seqType().mayBeArray() ? -1 : keys.size();
-    if(exprs.length == 1) {
+    if(unary()) {
       return ks == 0 && exprType(cc.qc.focus.value, keys) ? cc.replaceWith(this, keys) : this;
     }
 
@@ -114,7 +114,7 @@ public final class Lookup extends Arr {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Expr keys = exprs[0];
-    final Iter iter = (exprs.length == 1 ? ctxValue(qc) : exprs[1]).iter(qc);
+    final Iter iter = (unary() ? ctxValue(qc) : exprs[1]).iter(qc);
 
     // iterate through all map/array inputs
     final ValueBuilder vb = new ValueBuilder(qc);
@@ -139,19 +139,32 @@ public final class Lookup extends Arr {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.CTX.in(flags) && exprs.length == 1 || super.has(flags);
+    return Flag.CTX.in(flags) && unary() || super.has(flags);
+  }
+
+  @Override
+  public VarUsage count(final Var var) {
+    // context reference check: check if this is a unary lookup
+    return (var == null && unary() ? VarUsage.ONCE : VarUsage.NEVER).plus(super.count(var));
   }
 
   @Override
   public Expr inline(final Var var, final Expr ex, final CompileContext cc)
       throws QueryException {
-    return inline(var, ex, cc, () -> exprs.length == 1 ?
-      new Lookup(info, exprs[0], ex).optimize(cc) : null);
+    return inline(var, ex, cc, () -> unary() ? new Lookup(info, exprs[0], ex).optimize(cc) : null);
   }
 
   @Override
   public Lookup copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return copyType(new Lookup(info, copyAll(cc, vm, exprs)));
+  }
+
+  /**
+   * Checks if this is a unary lookup.
+   * @return result of check
+   */
+  private boolean unary() {
+    return exprs.length == 1;
   }
 
   @Override

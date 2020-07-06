@@ -64,7 +64,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public VarUsage count(final Var v) {
-    return var.is(v) ? VarUsage.ONCE : VarUsage.NEVER;
+    return v != null && var.is(v) ? VarUsage.ONCE : VarUsage.NEVER;
   }
 
   @Override

@@ -22,8 +22,7 @@ public final class InlineTest extends QueryPlanTest {
     check("let $x := 21 return $x + 21", 42, empty(GFLWOR.class));
     check("let $x := 21 return 21 + $x", 42, empty(GFLWOR.class));
     check("let $x := 21 return $x + $x", 42, empty(GFLWOR.class));
-
-    check("let $x := <x>21</x> return $x + 21", 42, exists(GFLWOR.class));
+    check("let $x := <x>21</x> return $x + 21", 42, empty(GFLWOR.class));
   }
 
   /** Tests if variable uses in {@link Switch} are counted correctly. */
@@ -161,6 +160,7 @@ public final class InlineTest extends QueryPlanTest {
         "ok",
         exists(DynFuncCall.class),
         empty(StaticFunc.class),
-        exists("DynFuncCall/GFLWOR/Closure"));
+        empty(Closure.class),
+        root(GFLWOR.class));
   }
 }

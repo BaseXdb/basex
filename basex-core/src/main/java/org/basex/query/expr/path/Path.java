@@ -1047,6 +1047,9 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final VarUsage count(final Var var) {
+    // context reference check: only consider root
+    if(var == null) return root == null ? VarUsage.ONCE : root.count(var);
+
     final VarUsage inRoot = root == null ? VarUsage.NEVER : root.count(var);
     return VarUsage.sum(var, steps) == VarUsage.NEVER ? inRoot : VarUsage.MORE_THAN_ONCE;
   }

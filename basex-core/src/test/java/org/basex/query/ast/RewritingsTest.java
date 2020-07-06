@@ -738,7 +738,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<x>A</x>[string(.) = 'A']", "<x>A</x>", empty(STRING));
     check("<A>A</A> ! string() = data(<A>B</A>)", false, empty(STRING));
 
-    check("max(<_>1</_> ! string(@a))", "", root(ItemMap.class));
+    check("max(<_>1</_> ! string(@a))", "", root(STRING));
     check("max((<_>1</_>, <_>2</_>) ! string(@a))", "", root(MAX));
     check("min(<_ _='A'/>/@_ ! string())", "A", root(MIN));
 
@@ -928,6 +928,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a><b/></a>[b ! ..]", "<a>\n<b/>\n</a>", exists(CachedPath.class));
 
     // do not rewrite absolute paths
+    check("text { 'a' } ! <x>{ . }</x>/text() = 'a'", true, exists(IterMap.class));
     check("<a>a</a>/string() ! <x>{ . }</x>/text() = 'a'", true, exists(IterMap.class));
   }
 
@@ -1526,10 +1527,11 @@ public final class RewritingsTest extends QueryPlanTest {
         empty(GFLWOR.class), count(IterFilter.class, 1));
     check("let $a := <a/> where $a[. = ''] return $a/self::a", "<a/>",
         empty(GFLWOR.class), root(IterPath.class));
+    check("let $a as element(a) := <a/> where $a return $a", "<a/>",
+        root(TypeCheck.class));
 
     // skip rewritings: let
     check("let $e := (<a/>, <b/>) where $e/self::a return $e", "<a/>\n<b/>", root(GFLWOR.class));
-    check("let $a as element(a) := <a/> where $a return $a", "<a/>", root(GFLWOR.class));
     check("let score $s := <a/> where $s return $s", "", root(GFLWOR.class));
     check("let $a := <a/> where $a = '' return data($a)", "", root(GFLWOR.class));
     // skip rewritings: for
@@ -1625,5 +1627,15 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1895() {
     check("let $a := (<a/>, <b/>) return $a ! name()", "a\nb", root(DualMap.class));
     check("let $doc := <e a=''/> return $doc/@a ! node-name()", "a");
+  }
+
+  /** Simple maps, inline operands. */
+  @Test public void gh1897() {
+    check("<a/> ! name()", "a", root(Function.NAME));
+    check("'s' ! <_>{ . }</_>", "<_>s</_>", root(CElem.class));
+    check("count#1 ! .('a')", 1, root(Int.class));
+
+    // do not generate nested node constructors
+    check("namespace-uri(<a><b/></a>) ! <x xmlns='x'>{ . }</x> ! name()", "x", root(ItemMap.class));
   }
 }

@@ -219,7 +219,11 @@ public abstract class Filter extends Preds {
 
   @Override
   public final VarUsage count(final Var var) {
-    final VarUsage inPreds = super.count(var), inRoot = root.count(var);
+    // context reference check: only consider root
+    final VarUsage inRoot = root.count(var);
+    if(var == null) return inRoot;
+
+    final VarUsage inPreds = super.count(var);
     return inPreds == VarUsage.NEVER ? inRoot :
       root.seqType().zeroOrOne() ? inRoot.plus(inPreds) : VarUsage.MORE_THAN_ONCE;
   }

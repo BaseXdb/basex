@@ -346,18 +346,27 @@ public final class GFLWOR extends ParseExpr {
           //   1[let $x := . return <a/>[$x = 1]]
           inline = inlineable.ok();
         }
-        if(!inline && count(var, next) == VarUsage.ONCE && !expr.has(Flag.CNS)) {
+        if(!inline && expr instanceof Path) {
+          // inline cheap path expressions with single result (might trigger index rewritings)
+          //   for $r in /root return $nodes[@id = $r/@id]  ->  $nodes[@id = /root/@id]
+          inline = expr.size() == 1 && !expr.has(Flag.NDT, Flag.CNS) && inlineable.ok();
+        }
+        if(!inline && count(var, next) == VarUsage.ONCE) {
           // inline expressions that occur once:
           //   let $a := (1, 2)[. = 1] return $a  ->  (1, 2)[. = 1]
           //   $seq[let $p := position() return $p = 1]  ->  $seq[position() = 1]
-          // do not inline node constructors:
-          //   let $x := <X/> return <X xmlns='xx'>{ $x/self::X }</X>
           inline = inlineable.ok();
-        }
-        if(!inline && expr instanceof Path) {
-          // inline cheap path expressions with single result:
-          //   doc('x.xml')/root
-          inline = expr.size() == 1 && !expr.has(Flag.NDT, Flag.CNS) && inlineable.ok();
+          if(inline && expr.has(Flag.CNS)) {
+            // do not generate nested node constructors:
+            //   let $x := <X/> return <X xmlns='xx'>{ $x/self::X }</X>
+            Expr e = rtrn.count(var) == VarUsage.ONCE ? rtrn : null;
+            for(final ListIterator<Clause> ir = clauses.listIterator(next);
+                e == null && ir.hasNext();) {
+              final Clause c = ir.next();
+              if(c.count(var) == VarUsage.ONCE) e = c;
+            };
+            inline = !e.has(Flag.CNS);
+          }
         }
 
         if(inline) {
@@ -952,8 +961,7 @@ public final class GFLWOR extends ParseExpr {
   private VarUsage count(final Var var, final int index) {
     final long[] minMax = { 1, 1 };
     VarUsage uses = VarUsage.NEVER;
-    final ListIterator<Clause> iter = clauses.listIterator(index);
-    while(iter.hasNext()) {
+    for(final ListIterator<Clause> iter = clauses.listIterator(index); iter.hasNext();) {
       final Clause clause = iter.next();
       uses = uses.plus(clause.count(var).times(minMax[1]));
       clause.calcSize(minMax);

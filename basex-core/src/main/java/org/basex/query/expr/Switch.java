@@ -233,10 +233,10 @@ public final class Switch extends ParseExpr {
 
   @Override
   public VarUsage count(final Var var) {
-    VarUsage max = VarUsage.NEVER, curr = VarUsage.NEVER;
+    VarUsage max = VarUsage.NEVER, uses = VarUsage.NEVER;
     for(final SwitchGroup cs : groups) {
-      curr = curr.plus(cs.countCases(var));
-      max = max.max(curr.plus(cs.count(var)));
+      uses = uses.plus(cs.countCases(var));
+      max = max.max(uses.plus(cs.count(var)));
     }
     return max.plus(cond.count(var));
   }

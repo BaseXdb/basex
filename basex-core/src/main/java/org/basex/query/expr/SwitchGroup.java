@@ -98,12 +98,13 @@ public final class SwitchGroup extends Arr {
    * @return number of occurrences
    */
   VarUsage countCases(final Var var) {
-    VarUsage all = VarUsage.NEVER;
+    VarUsage uses = VarUsage.NEVER;
     final int el = exprs.length;
     for(int e = 1; e < el; e++) {
-      if((all = all.plus(exprs[e].count(var))) == VarUsage.MORE_THAN_ONCE) break;
+      uses = uses.plus(exprs[e].count(var));
+      if(uses == VarUsage.MORE_THAN_ONCE) break;
     }
-    return all;
+    return uses;
   }
 
   /**

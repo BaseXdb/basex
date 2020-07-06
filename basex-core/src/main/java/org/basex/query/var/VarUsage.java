@@ -3,7 +3,7 @@ package org.basex.query.var;
 import org.basex.query.expr.*;
 
 /**
- * A tri-state encoding the number of usages of a variable.
+ * A tri-state encoding the number of usages of a variable or context reference.
  *
  * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
@@ -35,7 +35,7 @@ public enum VarUsage {
   }
 
   /**
-   * Number of usages of the variable if the code is executed {@code count} times.
+   * Number of usages if the code is executed {@code count} times.
    * @param count number of executions, may be {@code -1} if not known
    * @return number of usages
    */
@@ -44,23 +44,23 @@ public enum VarUsage {
   }
 
   /**
-   * Checks how often the given variable is accessed in all of the given expressions.
-   * @param var variable
+   * Checks how often a variable or context reference is accessed in all of the given expressions.
+   * @param var variable ({@link Var} reference) or context ({@code null}) to inline
    * @param exprs expressions
    * @return number of accesses to the variable in all expressions combined
    */
   public static VarUsage sum(final Var var, final Expr... exprs) {
-    VarUsage all = NEVER;
+    VarUsage uses = NEVER;
     for(final Expr expr : exprs) {
-      all = all.plus(expr.count(var));
-      if(all == MORE_THAN_ONCE) break;
+      uses = uses.plus(expr.count(var));
+      if(uses == MORE_THAN_ONCE) break;
     }
-    return all;
+    return uses;
   }
 
   /**
-   * Checks how often the given variable is used in any of the given expressions.
-   * @param var variable
+   * Checks how often a variable or context reference is used in any of the given expressions.
+   * @param var variable ({@link Var} reference) or context ({@code null}) to inline
    * @param exprs expressions
    * @return maximum number of accesses in any given expression
    */
