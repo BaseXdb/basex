@@ -130,6 +130,11 @@ public abstract class AxisPath extends Path {
   }
 
   @Override
+  public final boolean ddo() {
+    return true;
+  }
+
+  @Override
   public final Data data() {
     return data;
   }

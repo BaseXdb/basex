@@ -121,7 +121,9 @@ public final class Var extends ExprInfo {
    * @return result of check
    */
   public boolean ddo() {
-    return seqType().zeroOrOne() || ex != null && ex.ddo();
+    if(ex != null) return ex.ddo();
+    final SeqType st = seqType();
+    return st.zeroOrOne() && st.type instanceof NodeType;
   }
 
   /**

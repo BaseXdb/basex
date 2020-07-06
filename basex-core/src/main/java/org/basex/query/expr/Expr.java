@@ -358,12 +358,12 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Indicates if returned nodes are in document order and contain no duplicates.
-   * The function is only called if nodes are processed: {@link Path}, {@link Set}, {@link Filter}.
+   * Indicates if this expression returns nodes in document order without duplicates.
    * @return result of check
    */
   public boolean ddo() {
-    return seqType().zeroOrOne();
+    final SeqType st = seqType();
+    return st.zeroOrOne() && st.type instanceof NodeType;
   }
 
   /**

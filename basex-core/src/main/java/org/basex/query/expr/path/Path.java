@@ -364,7 +364,8 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Checks if the specified axis steps can be evaluated iteratively.
+   * Checks if a path can be evaluated iteratively (i.e., if all results will be in distinct
+   * document order without final sorting).
    * @param root root expression (can be {@code null})
    * @param steps path steps
    * @return result of check
@@ -1111,11 +1112,6 @@ public abstract class Path extends ParseExpr {
     int size = 1;
     for(final Expr step : steps) size += step.exprSize();
     return root == null ? size : size + root.exprSize();
-  }
-
-  @Override
-  public final boolean ddo() {
-    return true;
   }
 
   @Override

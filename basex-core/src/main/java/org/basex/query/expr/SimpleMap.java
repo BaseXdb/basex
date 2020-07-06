@@ -230,7 +230,7 @@ public abstract class SimpleMap extends Arr {
    */
   private Expr mergePaths(final CompileContext cc) throws QueryException {
     // skip optimization if first operand does not yield nodes in DDO
-    if(!(exprs[0].seqType().type instanceof NodeType && exprs[0].ddo())) return null;
+    if(!exprs[0].ddo()) return null;
 
     // first operand: determine root and optional steps
     Expr root = exprs[0];

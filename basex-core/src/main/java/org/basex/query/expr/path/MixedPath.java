@@ -91,6 +91,11 @@ public final class MixedPath extends Path {
   }
 
   @Override
+  public boolean ddo() {
+    return seqType().type instanceof NodeType;
+  }
+
+  @Override
   public Data data() {
     return steps[steps.length - 1].data();
   }

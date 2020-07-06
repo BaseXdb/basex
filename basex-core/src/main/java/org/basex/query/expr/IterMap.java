@@ -34,33 +34,32 @@ public final class IterMap extends SimpleMap {
 
   @Override
   public Iter iter(final QueryContext qc) {
-    final QueryFocus qf = qc.focus, focus = new QueryFocus();
-    final int el = exprs.length;
-    final Iter[] iter = new Iter[el];
-    final Value[] values = new Value[el];
+    final int el = exprs.length - 1;
+    final Iter[] iters = new Iter[el + 1];
+    final Value[] values = new Value[el + 1];
     values[0] = qc.focus.value;
 
     return new Iter() {
-      private int pos;
+      int pos;
 
       @Override
       public Item next() throws QueryException {
-        qc.focus = focus;
+        final QueryFocus qf = qc.focus;
         try {
           do {
-            focus.value = values[pos];
-            Iter ir = iter[pos];
+            qf.value = values[pos];
+            Iter iter = iters[pos];
             if(items[pos]) {
               // item-based processing
-              if(ir == Empty.ITER) {
-                iter[pos--] = null;
+              if(iter == Empty.ITER) {
+                iters[pos--] = null;
               } else {
                 final Item item = exprs[pos].item(qc, info);
                 if(item == Empty.VALUE) {
                   pos--;
                 } else {
-                  iter[pos] = Empty.ITER;
-                  if(pos < el - 1) {
+                  iters[pos] = Empty.ITER;
+                  if(pos < el) {
                     values[++pos] = item;
                   } else {
                     return item;
@@ -69,14 +68,14 @@ public final class IterMap extends SimpleMap {
               }
             } else {
               // iterative processing
-              if(ir == null) {
-                ir = exprs[pos].iter(qc);
-                iter[pos] = ir;
+              if(iter == null) {
+                iter = exprs[pos].iter(qc);
+                iters[pos] = iter;
               }
-              final Item item = qc.next(ir);
+              final Item item = qc.next(iter);
               if(item == null) {
-                iter[pos--] = null;
-              } else if(pos < el - 1) {
+                iters[pos--] = null;
+              } else if(pos < el) {
                 values[++pos] = item;
               } else {
                 return item;
@@ -85,7 +84,7 @@ public final class IterMap extends SimpleMap {
           } while(pos != -1);
           return null;
         } finally {
-          qc.focus = qf;
+          qf.value = values[0];
         }
       }
     };
