@@ -213,11 +213,15 @@ public abstract class SimpleMap extends Arr {
     if(e == 0) return exprs[0];
     if(++e != el) exprs = Arrays.copyOf(exprs, e);
 
+    boolean cached = false;
+    for(final Expr expr : exprs) cached = cached || expr.has(Flag.POS);
+    boolean dual = exprs.length == 2 && exprs[1].seqType().zeroOrOne();
+
     // choose best map implementation
     return copyType(
+      cached ? new CachedMap(info, exprs) :
       item ? new ItemMap(info, exprs) :
-      cached(exprs) ? new CachedMap(info, exprs) :
-      exprs.length == 2 && exprs[1].seqType().zeroOrOne() ? new DualMap(info, exprs) :
+      dual ? new DualMap(info, exprs) :
       new IterMap(info, exprs)
     );
   }
@@ -263,18 +267,6 @@ public abstract class SimpleMap extends Arr {
     final ExprList list = new ExprList(el - e + 1).add(path);
     for(; e < el; e++) list.add(exprs[e]);
     return get(cc, info, list.finish());
-  }
-
-  /**
-   * Checks if the specified expressions contains positional access.
-   * @param exprs expressions
-   * @return result of check
-   */
-  private static boolean cached(final Expr... exprs) {
-    for(final Expr expr : exprs) {
-      if(expr.has(Flag.POS)) return true;
-    }
-    return false;
   }
 
   @Override

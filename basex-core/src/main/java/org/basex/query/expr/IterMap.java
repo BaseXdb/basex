@@ -10,7 +10,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Simple map expression: iterative evaluation (no positional access).
+ * Simple map expression: iterative evaluation, no positional access.
  *
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen

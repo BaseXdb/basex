@@ -11,7 +11,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Iterative path expression for location paths that return sorted and duplicate-free results.
+ * Iterative expression for paths that return nodes in distinct document order.
  *
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
@@ -39,10 +39,11 @@ public final class IterPath extends AxisPath {
 
       @Override
       public Item next() throws QueryException {
+        if(iter[0] == null) iter[0] = exprs[0].iter(qc);
+
         final QueryFocus qf = qc.focus;
         final Value value = qf.value;
         try {
-          if(iter[0] == null) iter[0] = exprs[0].iter(qc);
           do {
             final Item item = qc.next(iter[pos]);
             if(item == null) {

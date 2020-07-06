@@ -28,27 +28,27 @@ public final class DualMap extends SimpleMap {
   @Override
   public Iter iter(final QueryContext qc) {
     return new Iter() {
-      final QueryFocus focus = new QueryFocus();
       Iter iter;
 
       @Override
       public Item next() throws QueryException {
-        final QueryFocus qf = qc.focus;
         if(iter == null) iter = exprs[0].iter(qc);
-        qc.focus = focus;
+
+        final QueryFocus qf = qc.focus;
+        final Value value = qf.value;
         try {
           do {
             // evaluate left operand
-            focus.value = qf.value;
+            qf.value = qf.value;
             Item item = qc.next(iter);
             if(item == null) return null;
             // evaluate right operand (yielding an item)
-            focus.value = item;
+            qf.value = item;
             item = exprs[1].item(qc, info);
             if(item != Empty.VALUE) return item;
           } while(true);
         } finally {
-          qc.focus = qf;
+          qf.value = value;
         }
       }
     };

@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
@@ -8,7 +9,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Simple map expression: item-based evaluation.
+ * Simple map expression: item-based evaluation, no positional access.
  *
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
@@ -25,18 +26,19 @@ public final class ItemMap extends SimpleMap {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    Item result = exprs[0].item(qc, info);
-    final QueryFocus qf = qc.focus, focus = new QueryFocus();
-    qc.focus = focus;
+    Item item = exprs[0].item(qc, info);
+
+    final QueryFocus qf = qc.focus;
+    final Value value = qf.value;
     try {
       final int el = exprs.length;
-      for(int e = 1; e < el && result != Empty.VALUE; e++) {
-        focus.value = result;
-        result = exprs[e].item(qc, info);
+      for(int e = 1; e < el && item != Empty.VALUE; e++) {
+        qf.value = item;
+        item = exprs[e].item(qc, info);
       }
-      return result;
+      return item;
     } finally {
-      qc.focus = qf;
+      qf.value = value;
     }
   }
 
