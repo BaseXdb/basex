@@ -27,7 +27,7 @@ public final class Catch extends Single {
   /** Error QNames. */
   public static final QNm[] NAMES = {
     create(E_CODE), create(E_DESCRIPTION), create(E_VALUE), create(E_MODULE),
-    create(E_LINE_NUMBER), create(E_COLUM_NUMBER), create(E_ADDITIONAL)
+    create(E_LINE_NUMBER), create(E_COLUMN_NUMBER), create(E_ADDITIONAL)
   };
   /** Error types. */
   public static final SeqType[] TYPES = {

@@ -447,7 +447,7 @@ public interface QueryText {
   /** Error token. */ byte[] E_VALUE = token("value");
   /** Error token. */ byte[] E_MODULE = token("module");
   /** Error token. */ byte[] E_LINE_NUMBER = token("line-number");
-  /** Error token. */ byte[] E_COLUM_NUMBER = token("column-number");
+  /** Error token. */ byte[] E_COLUMN_NUMBER = token("column-number");
   /** Error token. */ byte[] E_ADDITIONAL = token("additional");
 
   /** Debugging info. */ String DEBUGLOCAL = "Local Variables";
