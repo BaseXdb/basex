@@ -264,7 +264,6 @@ public abstract class Expr extends ExprInfo {
    *   <li> {@link ContextFn#inline}</li>
    *   <li> {@link ContextValue#inline}</li>
    *   <li> {@link Lookup#inline}</li>
-   *   <li> {@link Root#inline}</li>
    *   <li> {@link StaticJavaCall#inline}</li>
    * </ul>
    * @param var variable ({@link Var} reference) or context ({@code null}) to inline

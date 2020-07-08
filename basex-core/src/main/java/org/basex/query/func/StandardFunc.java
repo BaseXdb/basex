@@ -261,17 +261,6 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Returns the specified argument, or the context value if it does not exist.
-   * @param i index of argument
-   * @param qc query context
-   * @return expression
-   * @throws QueryException query exception
-   */
-  protected final Expr ctxArg(final int i, final QueryContext qc) throws QueryException {
-    return exprs.length == i ? ctxValue(qc) : exprs[i];
-  }
-
-  /**
    * Checks if the specified item has the specified Date type.
    * If it is item, the specified Date is returned.
    * @param item item to be checked

@@ -1,6 +1,7 @@
 package org.basex.query.expr.path;
 
 import org.basex.query.expr.*;
+import org.basex.query.func.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 
@@ -35,7 +36,10 @@ public final class PathCache {
    */
   boolean sameContext(final Value value, final Expr root) {
     // check if context value has changed, or if roots of cached and new context value are equal
-    return value == initial || root instanceof Root && value instanceof ANode &&
-        initial instanceof ANode && ((ANode) initial).root().equals(((ANode) value).root());
+    return value == initial || (
+      root instanceof UtilRoot && ((UtilRoot) root).exprs[0] instanceof ContextValue &&
+      value instanceof ANode && initial instanceof ANode &&
+      ((ANode) initial).root().equals(((ANode) value).root())
+    );
   }
 }

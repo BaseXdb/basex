@@ -834,7 +834,7 @@ public enum QueryError {
   /** Error code. */
   VAREMPTY_X(XPDY, 2, "No value assigned to %."),
   /** Error code. */
-  CTXNODE(XPDY, 50, "Root of the context value is no document node."),
+  NODOC_X(XPDY, 50, "Value has no document node: %."),
   /** Error code. */
   NOTREAT_X_X_X(XPDY, 50, "Cannot treat % as %: %."),
 

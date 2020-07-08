@@ -32,6 +32,17 @@ public abstract class ContextFn extends StandardFunc {
     return exprs.length == contextArg();
   }
 
+  /**
+   * Returns the specified argument, or the context value if it does not exist.
+   * @param i index of argument
+   * @param qc query context
+   * @return expression
+   * @throws QueryException query exception
+   */
+  protected final Expr ctxArg(final int i, final QueryContext qc) throws QueryException {
+    return exprs.length == i ? ctxValue(qc) : exprs[i];
+  }
+
   @Override
   public final boolean has(final Flag... flags) {
     return Flag.CTX.in(flags) && contextAccess() || super.has(flags);

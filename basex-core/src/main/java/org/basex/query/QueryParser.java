@@ -1855,7 +1855,8 @@ public class QueryParser extends InputParser {
     final ExprList el;
     Expr root = null;
     if(consume('/')) {
-      root = new Root(info());
+      final InputInfo ii = info();
+      root = Function._UTIL_ROOT.get(sc, ii, new ContextValue(ii));
       el = new ExprList();
       final Expr ex;
       if(consume('/')) {
