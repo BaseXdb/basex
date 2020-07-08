@@ -179,11 +179,17 @@ public final class Util {
     if(throwable instanceof ConnectException) return CONNECTION_ERROR;
     if(throwable instanceof SocketTimeoutException) return TIMEOUT_EXCEEDED;
     if(throwable instanceof SocketException) return CONNECTION_ERROR;
+
     String msg = throwable.getMessage();
     if(msg == null || msg.isEmpty() || throwable instanceof RuntimeException)
       msg = throwable.toString();
     if(throwable instanceof FileNotFoundException) return info(RES_NOT_FOUND_X, msg);
     if(throwable instanceof UnknownHostException) return info(UNKNOWN_HOST_X, msg);
+
+    // chop long error messages. // example: doc("http://google.com/sdffds")
+    if(throwable.getClass() == IOException.class && msg.length() > 200) {
+      msg = msg.substring(0, 200) + DOTS;
+    }
     return msg;
   }
 
