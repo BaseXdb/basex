@@ -1626,7 +1626,7 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Inline variables into simple map. */
   @Test public void gh1895() {
     check("let $a := (<a/>, <b/>) return $a ! name()", "a\nb", root(DualMap.class));
-    check("let $doc := <e a=''/> return $doc/@a ! node-name()", "a");
+    check("let $doc := <e a=''/> return $doc/@a ! node-name()", "a", root(NODE_NAME));
   }
 
   /** Simple maps, inline operands. */
@@ -1637,5 +1637,13 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // do not generate nested node constructors
     check("namespace-uri(<a><b/></a>) ! <x xmlns='x'>{ . }</x> ! name()", "x", root(ItemMap.class));
+  }
+
+  /** Inline cast expressions. */
+  @Test public void gh1901() {
+    check("<a id='x'/>/@id ! xs:string(.)", "x", root(Cast.class));
+    check("<_/>/@id ! data()", "", root(DATA));
+    check("<_/>[data()] ! base-uri()", "", root(BASE_URI));
+    check("<_/>[not(data())] ! base-uri()", "", root(BASE_URI));
   }
 }

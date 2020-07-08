@@ -25,7 +25,7 @@ public abstract class ContextFn extends StandardFunc {
   }
 
   /**
-   * Indicates if the function access the current context.
+   * Indicates if the function accesses the current context.
    * @return result of check
    */
   final boolean contextAccess() {
@@ -64,6 +64,15 @@ public abstract class ContextFn extends StandardFunc {
       final SeqType st = expr.seqType();
       if(st.oneOrMore() && !st.mayBeArray()) exprType.assign(Occ.ONE);
     }
+  }
+
+  /**
+   * Indicates if the function will evaluate the current context.
+   * @return result of check
+   */
+  public boolean inlineable() {
+    return (contextAccess() || exprs[contextArg()] instanceof ContextValue) &&
+        definition.seqType.occ == Occ.ZERO_ONE;
   }
 
   @Override

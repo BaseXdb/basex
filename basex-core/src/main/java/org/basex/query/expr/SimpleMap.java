@@ -10,6 +10,7 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -152,60 +153,78 @@ public abstract class SimpleMap extends Arr {
         }
       }
 
-      if(ex == null && es != -1 && !expr.has(Flag.NDT)) {
+      if(ex == null && es != -1 && !expr.has(Flag.NDT) && !next.has(Flag.POS)) {
         // check if deterministic expressions with known result size can be removed
         // expression size is never 0 (empty expressions have no followers, see above)
         if(next instanceof Value) {
           // rewrite expression with next value as singleton sequence
           // (1 to 2) ! 3  ->  (3, 3)
           ex = SingletonSeq.get((Value) next, es);
-        } else if(!next.has(Flag.POS)) {
+        } else if(next.has(Flag.CTX)) {
           // check if next expression relies on the context
-          if(next.has(Flag.CTX)) {
-            if(expr instanceof ContextValue) {
-              // replace leading context reference
-              // . ! number() = 2  ->  number() = 2
-              ex = next;
-            } else if(es == 1 && (
-              // single item: inline values
-              //   'a' ! (. = 'a')  ->  'a'  = 'a'
-              //   map {} ! ?*      ->  map {}?*
-              //   123 ! number()   ->  number(123)
-              expr instanceof Value ||
-              // inline variable references:
-              //   $a ! (. + .)  ->  $a + $a
-              expr instanceof VarRef ||
-              // inline any other expression
-              //   ($a + $b) ! (. * 2)  ->  ($a + $b) * 2
-              // skip nested node constructors
-              //   <X/> ! <X xmlns='x'>{ . }</X>
-              next.count(null) == VarUsage.ONCE && !(expr.has(Flag.CNS) && next.has(Flag.CNS))
-            )) {
-              // inline single uses
-              //   ($n + 2) ! abs(.) ->  map {}?*
-              try {
-                ex = next.inline(null, expr, cc);
-                // ignore rewritten expression that is identical to original one
-                if(ex instanceof SimpleMap) {
-                  final Expr[] tmp = ((SimpleMap) ex).exprs;
-                  if(tmp[0] == expr && tmp[1] == next) ex = null;
-                }
-              } catch(final QueryException qe) {
-                // replace original expression with error
-                ex = cc.error(qe, this);
-              }
-            }
-          } else if(es == 1) {
-            // replace expression with next expression
-            // <x/> ! 'ok'  ->  'ok'
+          if(expr instanceof ContextValue) {
+            // replace leading context reference
+            // . ! number() = 2  ->  number() = 2
             ex = next;
-          } else if(!next.has(Flag.NDT, Flag.CNS)) {
-            // replace expression with replicated expression
-            // (1 to 2) ! 'ok'  ->  util:replicate('ok', 2)
-            ex = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es));
-          } else {
-            // (1 to 2) ! <x/>  ->  util:replicate('', 2) ! <x/>
-            exprs[e] = cc.replaceWith(exprs[e], SingletonSeq.get(Str.ZERO, es));
+          } else if(es == 1 && (
+            // single item: inline values
+            //   'a' ! (. = 'a')  ->  'a'  = 'a'
+            //   map {} ! ?*      ->  map {}?*
+            //   123 ! number()   ->  number(123)
+            expr instanceof Value ||
+            // inline variable references:
+            //   $a ! (. + .)  ->  $a + $a
+            expr instanceof VarRef ||
+            // inline any other expression
+            //   ($a + $b) ! (. * 2)  ->  ($a + $b) * 2
+            // skip nested node constructors
+            //   <X/> ! <X xmlns='x'>{ . }</X>
+            next.count(null) == VarUsage.ONCE && !(expr.has(Flag.CNS) && next.has(Flag.CNS))
+          )) {
+            // inline single uses
+            //   ($n + 2) ! abs(.) ->  map {}?*
+            try {
+              ex = next.inline(null, expr, cc);
+              // ignore rewritten expression that is identical to original one
+              if(ex instanceof SimpleMap) {
+                final Expr[] tmp = ((SimpleMap) ex).exprs;
+                if(tmp[0] == expr && tmp[1] == next) ex = null;
+              }
+            } catch(final QueryException qe) {
+              // replace original expression with error
+              ex = cc.error(qe, this);
+            }
+          }
+        } else if(es == 1) {
+          // replace expression with next expression
+          // <x/> ! 'ok'  ->  'ok'
+          ex = next;
+        } else if(!next.has(Flag.NDT, Flag.CNS)) {
+          // replace expression with replicated expression
+          // (1 to 2) ! 'ok'  ->  util:replicate('ok', 2)
+          ex = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es));
+        } else {
+          // (1 to 2) ! <x/>  ->  util:replicate('', 2) ! <x/>
+          exprs[e] = cc.replaceWith(exprs[e], SingletonSeq.get(Str.ZERO, es));
+        }
+      }
+
+      if(ex == null && expr.seqType().zeroOrOne()) {
+        boolean inline = false;
+        if(next instanceof Cast) {
+          // $node/@id ! xs:integer(.)  ->  xs:integer($node/@id)
+          final Cast cast = (Cast) next;
+          inline = cast.expr instanceof ContextValue && cast.seqType.occ == Occ.ZERO_ONE;
+        } else if(next instanceof ContextFn) {
+          // $node/.. ! base-uri(.)  ->  base-uri($node/..)
+          inline = ((ContextFn) next).inlineable();
+        }
+        if(inline) {
+          try {
+            ex = next.inline(null, expr, cc);
+          } catch(final QueryException qe) {
+            // replace original expression with error
+            ex = cc.error(qe, this);
           }
         }
       }

@@ -59,4 +59,9 @@ public final class FnData extends ContextFn {
     }
     return super.simplifyFor(mode, cc);
   }
+
+  @Override
+  public boolean inlineable() {
+    return contextAccess() || exprs[contextArg()] instanceof ContextValue;
+  }
 }

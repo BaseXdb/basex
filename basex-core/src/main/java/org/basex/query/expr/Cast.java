@@ -22,7 +22,7 @@ public final class Cast extends Single {
   /** Static context. */
   private final StaticContext sc;
   /** Sequence type to cast to. */
-  private final SeqType seqType;
+  final SeqType seqType;
 
   /**
    * Function constructor.
@@ -100,6 +100,10 @@ public final class Cast extends Single {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.token("(").token(expr).token(CAST).token(AS).token(seqType).token(')');
+    if(seqType.one()) {
+      qs.token("(").token(expr).token(CAST).token(AS).token(seqType).token(')');
+    } else {
+      qs.token(seqType.type).paren(expr);
+    }
   }
 }

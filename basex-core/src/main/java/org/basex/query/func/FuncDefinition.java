@@ -27,7 +27,7 @@ public final class FuncDefinition {
   /** Parameter types. */
   final SeqType[] params;
   /** Sequence type. */
-  final SeqType seqType;
+  public final SeqType seqType;
   /** URI. */
   final byte[] uri;
 
