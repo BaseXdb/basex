@@ -421,8 +421,8 @@ public interface QueryText {
   /** Optimization info. */ String OPTSIMPLE_X_X = "simplify %: %";
   /** Optimization info. */ String OPTINLINE_X = "inline %";
   /** Optimization info. */ String OPTREMOVE_X_X = "remove % from %";
-  /** Optimization info. */ String OPTWHERE = "rewrite where clause(s)";
-  /** Optimization info. */ String OPTPRED_X = "rewrite % to predicate(s)";
+  /** Optimization info. */ String OPTMOVE_X = "move where clause: %";
+  /** Optimization info. */ String OPTPRED_X = "rewrite to predicate: %";
   /** Optimization info. */ String OPTVAR_X = "remove unused variable: %";
   /** Optimization info. */ String OPTSTEP_X = "remove step without results: %";
   /** Optimization info. */ String OPTPATH_X = "remove path without results: %";

@@ -209,7 +209,7 @@ public class CmpG extends Cmp {
     }
 
     // return optimized, pre-evaluated or original expression
-    return cc.replaceWith(this, expr);
+    return expr instanceof CmpG ? expr : cc.replaceWith(this, expr);
   }
 
   @Override

@@ -526,6 +526,7 @@ public final class GFLWOR extends ParseExpr {
           break;
         }
         // test is always true: remove it
+        cc.info(QueryText.OPTREMOVE_X_X, where.expr, (Supplier<?>) this::description);
         clauses.remove(c--);
         changed = true;
       } else if(!clause.has(Flag.NDT)) {
@@ -541,6 +542,7 @@ public final class GFLWOR extends ParseExpr {
 
         if(insert >= 0) {
           clauses.add(insert, clauses.remove(c));
+          cc.info(QueryText.OPTMOVE_X, where.expr);
           changed = true;
           // it's safe to go on because clauses below the current one are never touched
         }
@@ -568,6 +570,7 @@ public final class GFLWOR extends ParseExpr {
                 if(fl.toPredicate(cc, where.expr)) {
                   forLets.add(fl);
                   clauses.remove(newPos);
+                  cc.info(QueryText.OPTPRED_X, where.expr);
                   changed = true;
                   c--;
                 }
@@ -580,7 +583,6 @@ public final class GFLWOR extends ParseExpr {
     }
     // optimize on rewritten expressions (only once per clause)
     for(final ForLet fl : forLets) fl.expr = fl.expr.optimize(cc);
-    if(changed) cc.info(QueryText.OPTWHERE);
     return changed;
   }
 
