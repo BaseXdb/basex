@@ -1639,17 +1639,22 @@ public final class RewritingsTest extends QueryPlanTest {
     check("namespace-uri(<a><b/></a>) ! <x xmlns='x'>{ . }</x> ! name()", "x", root(ItemMap.class));
   }
 
-  /** Inline cast expressions. */
-  @Test public void gh1901() {
-    check("<a id='x'/>/@id ! xs:string(.)", "x", root(Cast.class));
-    check("<_/>/@id ! data()", "", root(DATA));
-    check("<_/>[data()] ! base-uri()", "", root(BASE_URI));
-    check("<_/>[not(data())] ! base-uri()", "", root(BASE_URI));
+  /** Rewritings of positional tests. */
+  @Test public void gh1898() {
+    check("for $a in (1, 2) return $a[$a[.]]", 1, root(GFLWOR.class));
   }
 
   /** Inline filter expressions. */
   @Test public void gh1899() {
     check("for $a in (1, 'a') let $b := $a[.] return $a[$b]", "1\na", empty(Let.class));
     query("function($a, $b) { $a ! element s { .[$b] } }(<a/>, ())", "<s/>");
+  }
+
+  /** Inline cast expressions. */
+  @Test public void gh1901() {
+    check("<a id='x'/>/@id ! xs:string(.)", "x", root(Cast.class));
+    check("<_/>/@id ! data()", "", root(DATA));
+    check("<_/>[data()] ! base-uri()", "", root(BASE_URI));
+    check("<_/>[not(data())] ! base-uri()", "", root(BASE_URI));
   }
 }

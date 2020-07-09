@@ -141,9 +141,11 @@ public abstract class Filter extends Preds {
       } else if(numeric(pred)) {
         /* - rewrite positional predicate to util:item
          *   expr[pos]  ->  util:item(expr, pos)
-         * - only choose deterministic and context-independent offsets
-         *   illegal examples: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
-        ex = cc.function(Function._UTIL_ITEM, info, prepare.apply(expr), pred);
+         * - only choose deterministic and context-independent offsets. illegal:
+         *   (1 to 10)[random:integer(10)]  or  (1 to 10)[.]  or  $a[$a[.]] */
+        if(pred.seqType().one()) {
+          ex = cc.function(Function._UTIL_ITEM, info, prepare.apply(expr), pred);
+        }
       } else if(pred instanceof Cmp) {
         // rewrite positional predicate to fn:remove
         final Cmp cmp = (Cmp) pred;
