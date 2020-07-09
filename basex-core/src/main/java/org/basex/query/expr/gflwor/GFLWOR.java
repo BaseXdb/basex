@@ -680,10 +680,10 @@ public final class GFLWOR extends ParseExpr {
         // for $x in E return $x[. = '']  ->  E ! .[. = '']
         // for $x in head(E) return $x[1]  ->  E ! .[1]
         // for $x in E return $x[1]  ->  E ! .[1]
-        final Expr expr = cc.get(last.expr, () ->
+        final Expr ex = cc.get(last.expr, () ->
           Filter.get(cc, filter.info, new ContextValue(filter.info).optimize(cc), filter.exprs)
         );
-        return SimpleMap.get(cc, filter.info, last.expr, expr);
+        return SimpleMap.get(cc, filter.info, last.expr, ex);
       }
     }
 
@@ -706,13 +706,10 @@ public final class GFLWOR extends ParseExpr {
     // inline into simple map
     if(rtrn instanceof SimpleMap) {
       final SimpleMap map = (SimpleMap) rtrn;
-      Expr expr = map.exprs[0];
-      if(var.test(expr)) {
-        expr = last.expr;
-      } else if(!var.test(expr)) {
-        expr = inlineIntoPath.apply(expr);
-      }
+      final Expr expr = var.test(map.exprs[0]) ? last.expr : inlineIntoPath.apply(map.exprs[0]);
       if(expr != null) {
+        // for $x in E return $x ! 123  ->  E ! 123
+        // for $x in E return $x/a ! 123  ->  E/a ! 123
         map.exprs[0] = expr;
         return map.optimize(cc);
       }
