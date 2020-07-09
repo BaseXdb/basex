@@ -137,7 +137,7 @@ public abstract class Path extends ParseExpr {
           step = step.compile(cc);
         } catch(final QueryException ex) {
           // replace original expression with error
-          step = cc.error(ex, this);
+          step = cc.error(ex, step);
         }
         steps[s] = step;
         cc.updateFocus(step);
@@ -1039,8 +1039,10 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final boolean inlineable(final InlineContext ic) {
-    for(final Expr step : steps) {
-      if(step.uses(ic.var)) return false;
+    if(ic.expr instanceof ContextValue) {
+      for(final Expr step : steps) {
+        if(step.uses(ic.var)) return false;
+      }
     }
     return root == null || root.inlineable(ic);
   }

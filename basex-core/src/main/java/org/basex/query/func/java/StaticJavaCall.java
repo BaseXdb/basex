@@ -97,7 +97,8 @@ public final class StaticJavaCall extends JavaCall {
 
   @Override
   public boolean inlineable(final InlineContext ic) {
-    return method.getAnnotation(FocusDependent.class) == null && super.inlineable(ic);
+    return (ic.var != null || method.getAnnotation(FocusDependent.class) == null) &&
+        super.inlineable(ic);
   }
 
   @Override

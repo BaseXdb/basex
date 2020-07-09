@@ -40,16 +40,16 @@ public abstract class Preds extends Arr {
     // called at an early stage as it influences the optimization of predicates
     type(cc.qc.focus.value);
 
-    final int pl = exprs.length;
-    if(pl != 0) cc.get(this, () -> {
+    final int el = exprs.length;
+    if(el != 0) cc.get(this, () -> {
       final QueryFocus focus = cc.qc.focus;
       final Value init = focus.value;
-      for(int p = 0; p < pl; ++p) {
+      for(int e = 0; e < el; ++e) {
         try {
-          exprs[p] = exprs[p].compile(cc);
+          exprs[e] = exprs[e].compile(cc);
         } catch(final QueryException ex) {
           // replace original expression with error
-          exprs[p] = cc.error(ex, this);
+          exprs[e] = cc.error(ex, exprs[e]);
         }
       }
       focus.value = init;
@@ -198,8 +198,7 @@ public abstract class Preds extends Arr {
     // inline root item (ignore nodes)
     // 1[. = 1]  ->  1[1 = 1]
     if(root instanceof Item && !(rst.type instanceof NodeType)) {
-      final InlineContext ic = new InlineContext(null, root, cc);
-      final Expr inlined = expr.inline(ic);
+      final Expr inlined = new InlineContext(null, root, cc).inline(expr);
       if(inlined != null) expr = inlined;
     }
 
@@ -342,8 +341,10 @@ public abstract class Preds extends Arr {
 
   @Override
   public boolean inlineable(final InlineContext ic) {
-    for(final Expr expr : exprs) {
-      if(expr.uses(ic.var)) return false;
+    if(ic.expr instanceof ContextValue) {
+      for(final Expr expr : exprs) {
+        if(expr.uses(ic.var)) return false;
+      }
     }
     return true;
   }

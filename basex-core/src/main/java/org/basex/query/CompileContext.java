@@ -266,7 +266,7 @@ public final class CompileContext {
   /**
    * Creates an error function instance.
    * @param qe exception to be raised
-   * @param expr expression
+   * @param expr expression that caused the error message
    * @return function
    */
   public StandardFunc error(final QueryException qe, final Expr expr) {

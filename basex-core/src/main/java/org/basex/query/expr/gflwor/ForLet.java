@@ -96,20 +96,14 @@ public abstract class ForLet extends Clause {
     if(!(inlineable() && size() == 1 && ex.uses(var))) return false;
 
     final InlineContext ic = new InlineContext(var, new ContextValue(info), cc);
-    if(!ex.inlineable(ic)) return false;
+    if(!ic.inlineable(ex, null)) return false;
 
     // reset context value (will not be accessible in predicate)
-    Expr pred = cc.get(expr, () -> {
-      // assign type of iterated items to context expression
-      final Expr inlined = ex.inline(ic);
-      return inlined != null ? inlined : ex;
-    });
+    Expr pred = cc.get(expr, () -> ic.inline(ex));
 
     // attach predicates to axis path or filter, or create a new filter
     // for $i in 1 where $i  ->  for $i in 1[boolean(.)]
-    if(pred.seqType().mayBeNumber()) {
-      pred = cc.function(Function.BOOLEAN, info, pred);
-    }
+    if(pred.seqType().mayBeNumber()) pred = cc.function(Function.BOOLEAN, info, pred);
 
     addPredicate(cc, pred);
     return true;

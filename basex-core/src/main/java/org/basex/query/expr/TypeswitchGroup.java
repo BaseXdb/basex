@@ -78,8 +78,8 @@ public final class TypeswitchGroup extends Single {
    */
   void inline(final Value value, final CompileContext cc) throws QueryException {
     if(var == null) return;
-    final InlineContext ic = new InlineContext(var, var.checkType(value, cc.qc, true), cc);
-    final Expr inlined = expr.inline(ic);
+    final Value val = var.checkType(value, cc.qc, true);
+    final Expr inlined = new InlineContext(var, val, cc).inline(expr);
     if(inlined != null) expr = inlined;
   }
 

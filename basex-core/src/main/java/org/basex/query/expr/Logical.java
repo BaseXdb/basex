@@ -80,7 +80,7 @@ abstract class Logical extends Arr {
         // everything behind the error is dead anyway
         final Expr[] nw = new Expr[e + 1];
         Array.copy(exprs, e, nw);
-        nw[e] = ic.cc.error(qe, this);
+        nw[e] = ic.cc.error(qe, exprs[e]);
         exprs = nw;
         changed = true;
         break;

@@ -95,7 +95,7 @@ public final class TransformWith extends Arr {
 
   @Override
   public boolean inlineable(final InlineContext ic) {
-    return exprs[0].inlineable(ic) && !exprs[1].uses(ic.var);
+    return exprs[0].inlineable(ic) && !(ic.expr instanceof ContextValue && exprs[1].uses(ic.var));
   }
 
   @Override

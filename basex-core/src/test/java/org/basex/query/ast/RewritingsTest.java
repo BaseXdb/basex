@@ -1646,4 +1646,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_/>[data()] ! base-uri()", "", root(BASE_URI));
     check("<_/>[not(data())] ! base-uri()", "", root(BASE_URI));
   }
+
+  /** Inline filter expressions. */
+  @Test public void gh1899() {
+    check("for $a in (1, 'a') let $b := $a[.] return $a[$b]", "1\na", empty(Let.class));
+    query("function($a, $b) { $a ! element s { .[$b] } }(<a/>, ())", "<s/>");
+  }
 }

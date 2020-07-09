@@ -161,8 +161,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         if(ex instanceof Value) {
           // values are always inlined into the closure
           ex = var.checkType((Value) ex, cc.qc, true);
-          final InlineContext ic = new InlineContext(var, ex, cc);
-          final Expr inlined = expr.inline(ic);
+          final Expr inlined = new InlineContext(var, ex, cc).inline(expr);
           if(inlined != null) expr = inlined;
           iter.remove();
         } else if(ex instanceof Closure) {
@@ -177,9 +176,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
               add.put(var2, expr2.getValue());
               expr2.setValue(new VarRef(cl.info, var2));
             }
-
-            final InlineContext ic = new InlineContext(var, cl, cc);
-            final Expr inlined = expr.inline(ic);
+            final Expr inlined = new InlineContext(var, cl, cc).inline(expr);
             if(inlined != null) expr = inlined;
             iter.remove();
           }

@@ -64,7 +64,7 @@ public final class If extends Arr {
         exprs[e] = exprs[e].compile(cc);
       } catch(final QueryException ex) {
         // replace original expression with error
-        exprs[e] = cc.error(ex, this);
+        exprs[e] = cc.error(ex, exprs[e]);
       }
     }
     return optimize(cc);
@@ -193,7 +193,7 @@ public final class If extends Arr {
       try {
         inlined = exprs[e].inline(ic);
       } catch(final QueryException qe) {
-        inlined = ic.cc.error(qe, this);
+        inlined = ic.cc.error(qe, exprs[e]);
       }
       if(inlined != null) {
         exprs[e] = inlined;

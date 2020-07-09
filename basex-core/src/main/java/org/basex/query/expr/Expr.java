@@ -208,11 +208,10 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Checks if the specified variable is inlineable.
-   * This function is called by:
+   * Checks if inlining is possible.
+   * This function is called by {@link InlineContext#inlineable} and:
    * <ul>
    *   <li> {@link GFLWOR#inlineLets}</li>
-   *   <li> {@link GFLWOR#optimizeWhere} -> {@link ForLet#toPredicate}</li>
    * </ul>
    * The following tests might return false if the variable occurs in a nested context:
    * <ul>
@@ -245,17 +244,8 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Inlines an expression into this one, replacing all variable or context references.
-   * This function is called by:
-   * <ul>
-   *   <li> {@link Catch#inline(QueryException, CompileContext)}</li>
-   *   <li> {@link Closure#optimize}</li>
-   *   <li> {@link GFLWOR#inlineLets}</li>
-   *   <li> {@link GFLWOR#mergeReturn}</li>
-   *   <li> {@link GFLWOR#optimizeWhere} -> {@link ForLet#toPredicate}</li>
-   *   <li> {@link SimpleMap#optimize}</li>
-   *   <li> {@link Preds#simplify}</li>
-   *   <li> {@link Typeswitch#optimize} -> {@link TypeswitchGroup#inline}</li>
-   * </ul>
+   * This function is called by {@link InlineContext#inline(Expr)}.
+   *
    * The variable reference is replaced in:
    * <ul>
    *   <li> {@link OrderBy#inline}</li>
@@ -268,6 +258,7 @@ public abstract class Expr extends ExprInfo {
    *   <li> {@link Lookup#inline}</li>
    *   <li> {@link StaticJavaCall#inline}</li>
    * </ul>
+   *
    * @param ic inlining context
    * @return resulting expression if something changed, {@code null} otherwise
    * @throws QueryException query exception

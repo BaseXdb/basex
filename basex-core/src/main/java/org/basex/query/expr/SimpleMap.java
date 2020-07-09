@@ -65,7 +65,7 @@ public abstract class SimpleMap extends Arr {
         expr = expr.compile(cc);
       } catch(final QueryException qe) {
         // replace original expression with error
-        expr = cc.error(qe, this);
+        expr = cc.error(qe, expr);
       }
       if(e == 0) cc.pushFocus(expr);
       else cc.updateFocus(expr);
@@ -156,52 +156,41 @@ public abstract class SimpleMap extends Arr {
       if(ex == null && es != -1 && !expr.has(Flag.NDT) && !next.has(Flag.POS)) {
         // check if deterministic expressions with known result size can be removed
         // expression size is never 0 (empty expressions have no followers, see above)
-        if(next instanceof Value) {
-          // rewrite expression with next value as singleton sequence
-          // (1 to 2) ! 3  ->  (3, 3)
-          ex = SingletonSeq.get((Value) next, es);
-        } else if(next.has(Flag.CTX)) {
-          // check if next expression relies on the context
-          if(expr instanceof ContextValue) {
-            // replace leading context reference
-            // . ! number() = 2  ->  number() = 2
-            ex = next;
-          } else if(es == 1 && (
-            // single item: inline values
+        if(es == 1) {
+          final InlineContext ic = new InlineContext(null, expr, cc);
+          if(ic.inlineable(next, v -> next.count(v))) {
+            // inline values
             //   'a' ! (. = 'a')  ->  'a'  = 'a'
             //   map {} ! ?*      ->  map {}?*
             //   123 ! number()   ->  number(123)
-            expr instanceof Value ||
-            // inline variable references:
+            // inline context reference
+            // . ! number() = 2  ->  number() = 2
+            // inline variable references
             //   $a ! (. + .)  ->  $a + $a
-            expr instanceof VarRef ||
             // inline any other expression
             //   ($a + $b) ! (. * 2)  ->  ($a + $b) * 2
+            //   ($n + 2) ! abs(.) ->  abs(. + 2)
             // skip nested node constructors
             //   <X/> ! <X xmlns='x'>{ . }</X>
-            next.count(null) == VarUsage.ONCE && !(expr.has(Flag.CNS) && next.has(Flag.CNS))
-          )) {
-            // inline single uses
-            //   ($n + 2) ! abs(.) ->  map {}?*
             try {
-              final InlineContext ic = new InlineContext(null, expr, cc);
-              ex = next.inline(ic);
+              ex = ic.inline(next);
             } catch(final QueryException qe) {
               // replace original expression with error
-              ex = cc.error(qe, this);
+              ex = cc.error(qe, next);
             }
           }
-        } else if(es == 1) {
-          // replace expression with next expression
-          // <x/> ! 'ok'  ->  'ok'
-          ex = next;
-        } else if(!next.has(Flag.NDT, Flag.CNS)) {
-          // replace expression with replicated expression
-          // (1 to 2) ! 'ok'  ->  util:replicate('ok', 2)
-          ex = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es));
-        } else {
-          // (1 to 2) ! <x/>  ->  util:replicate('', 2) ! <x/>
-          exprs[e] = cc.replaceWith(exprs[e], SingletonSeq.get(Str.ZERO, es));
+        } else if(!next.has(Flag.CTX)) {
+          // merge expressions if next expression does not rely on the context
+          if(next instanceof Value) {
+            // (1 to 2) ! 3  ->  (3, 3)
+            ex = SingletonSeq.get((Value) next, es);
+          } else if(next.has(Flag.NDT, Flag.CNS)) {
+            // (1 to 2) ! <x/>  ->  util:replicate('', 2) ! <x/>
+            exprs[e] = cc.replaceWith(exprs[e], SingletonSeq.get(Str.ZERO, es));
+          } else {
+            // (1 to 2) ! 'ok'  ->  util:replicate('ok', 2)
+            ex = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es));
+          }
         }
       }
 
@@ -221,7 +210,7 @@ public abstract class SimpleMap extends Arr {
             ex = next.inline(ic);
           } catch(final QueryException qe) {
             // replace original expression with error
-            ex = cc.error(qe, this);
+            ex = cc.error(qe, next);
           }
         }
       }
@@ -383,9 +372,11 @@ public abstract class SimpleMap extends Arr {
 
   @Override
   public final boolean inlineable(final InlineContext ic) {
-    final int el = exprs.length;
-    for(int e = 1; e < el; e++) {
-      if(exprs[e].uses(ic.var)) return false;
+    if(ic.expr instanceof ContextValue) {
+      final int el = exprs.length;
+      for(int e = 1; e < el; e++) {
+        if(exprs[e].uses(ic.var)) return false;
+      }
     }
     return exprs[0].inlineable(ic);
   }
@@ -402,7 +393,7 @@ public abstract class SimpleMap extends Arr {
         inlined = exprs[e].inline(ic);
       } catch(final QueryException qe) {
         // replace original expression with error
-        inlined = cc.error(qe, this);
+        inlined = cc.error(qe, exprs[e]);
       }
       if(inlined != null) {
         exprs[e] = inlined;

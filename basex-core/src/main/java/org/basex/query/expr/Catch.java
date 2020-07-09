@@ -117,8 +117,7 @@ public final class Catch extends Single {
     if(!(ex instanceof Value)) {
       int v = 0;
       for(final Value value : values(qe)) {
-        final InlineContext ic = new InlineContext(vars[v++], value, cc);
-        final Expr inlined = ex.inline(ic);
+        final Expr inlined = new InlineContext(vars[v++], value, cc).inline(ex);
         if(inlined != null) ex = inlined;
       }
     }

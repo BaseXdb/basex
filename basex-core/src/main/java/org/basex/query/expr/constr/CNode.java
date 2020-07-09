@@ -45,6 +45,11 @@ public abstract class CNode extends Arr {
   }
 
   @Override
+  public boolean inlineable(final InlineContext ic) {
+    return !ic.expr.has(Flag.CNS) && super.inlineable(ic);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     return obj instanceof CNode && computed == ((CNode) obj).computed && super.equals(obj);
   }

@@ -88,7 +88,7 @@ public abstract class Arr extends ParseExpr {
     // inline arguments
     final boolean changed = ic.inline(exprs);
     // context reference: create new expression with inlined context
-    Expr expr = ic.var == null ? context.get() : null;
+    Expr expr = ic.var == null && !(ic.expr instanceof ContextValue) ? context.get() : null;
     // new expression exists and/or arguments were inlined: optimize expression
     return expr != null ? expr.optimize(ic.cc) : changed ? optimize(ic.cc) : null;
   }

@@ -671,25 +671,18 @@ public final class GFLWOR extends ParseExpr {
 
     // dummy context value... should be changed for filter, simple map, path
     final InlineContext ic = new InlineContext(last.var, new ContextValue(info), cc);
-    if(!rtrn.inlineable(ic)) return null;
+    if(!ic.inlineable(rtrn, v -> rtrn.count(v))) return null;
 
     // inline into filter
     if(rtrn instanceof Filter) {
       final Filter filter = (Filter) rtrn;
       if(var.test(filter.root)) {
-        final QueryFunction<Expr, Expr> func = root ->
-          Filter.get(cc, filter.info, root, filter.exprs);
-        // rewrite
-        //   for $x in E return $x[. = '']  ->  E[. = '']
-        //   for $x in head(E) return $x[1]  ->  E[1]
-        // do not rewrite
-        //   for $x in (1, 2, 3) return $x[1]
-        if(last instanceof Let || last.expr.seqType().zeroOrOne() || !filter.mayBePositional())
-          return func.apply(last.expr);
-
+        // for $x in E return $x[. = '']  ->  E ! .[. = '']
+        // for $x in head(E) return $x[1]  ->  E ! .[1]
         // for $x in E return $x[1]  ->  E ! .[1]
-        final Expr expr = cc.get(last.expr, () -> func.apply(
-            new ContextValue(filter.info).optimize(cc)));
+        final Expr expr = cc.get(last.expr, () ->
+          Filter.get(cc, filter.info, new ContextValue(filter.info).optimize(cc), filter.exprs)
+        );
         return SimpleMap.get(cc, filter.info, last.expr, expr);
       }
     }
@@ -700,19 +693,11 @@ public final class GFLWOR extends ParseExpr {
       final Path path = (Path) expr;
       if(!var.test(path.root)) return null;
 
-      final QueryFunction<Expr, Expr> func = root -> Path.get(cc, path.info, root, path.steps);
-      // rewrite
-      //   let $a := //a return $a//sub  ->  //a//sub
-      //   for $a in //a return $a/sub  ->  //a/sub
-      //   for $a in head(//a) return $a/..  ->  head(//a)/..
-      // do not rewrite
-      //   for $a in reverse(//a) return $a/sub
-      //   for $a in //a return $a//sub
-      if(last instanceof Let || last.expr.seqType().zeroOrOne() || last.expr.ddo() && path.simple())
-        return func.apply(last.expr);
-
-      // for $a in (a,b) return $a/descendant::b  ->  (a,b) ! descendant::b
-      final Expr ex = cc.get(last.expr, () -> func.apply(null));
+      // let $a := //a return $a/descendant::sub  ->  //a ! descendant::sub
+      // for $a in //a return $a/sub  ->  //a ! sub
+      // for $a in head(//a) return $a/..  ->  head(//a) ! ..
+      // for $a in reverse(//a) return $a/sub  ->  reverse(//a) ! sub
+      final Expr ex = cc.get(last.expr, () -> Path.get(cc, path.info, null, path.steps));
       return SimpleMap.get(cc, path.info, last.expr, ex);
     };
     final Expr path = inlineIntoPath.apply(rtrn);
@@ -735,18 +720,13 @@ public final class GFLWOR extends ParseExpr {
 
     // for clause: rewrite to simple map
     if(last instanceof For && last.size() == 1 && !rtrn.has(Flag.CTX)) {
-      if(rtrn.inlineable(ic)) {
-        final Expr expr = cc.get(last.expr, () -> {
-          // rewrite
-          //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
-          // do not rewrite
-          //   for $c allowing empty in () return count($c)
-          //   <_/>[for $c in (1, 2) return (., $c)]
-          final Expr inlined = rtrn.inline(ic);
-          return inlined != null ? inlined : rtrn;
-        });
-        return SimpleMap.get(cc, info, last.expr, expr);
-      }
+      // rewrite
+      //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
+      // do not rewrite
+      //   for $c allowing empty in () return count($c)
+      //   <_/>[for $c in (1, 2) return (., $c)]
+      final Expr ex = cc.get(last.expr, () -> ic.inline(rtrn));
+      return SimpleMap.get(cc, info, last.expr, ex);
     }
 
     return null;
@@ -997,7 +977,7 @@ public final class GFLWOR extends ParseExpr {
     while(iter.hasNext()) {
       final Clause clause = iter.next();
       try {
-        final Clause cl = clause.inline(ic);
+        final Clause cl = (Clause) ic.inline(clause);
         if(cl != null) {
           changed = true;
           iter.set(cl);
@@ -1009,7 +989,7 @@ public final class GFLWOR extends ParseExpr {
     }
 
     try {
-      final Expr inlined = rtrn.inline(ic);
+      final Expr inlined = ic.inline(rtrn);
       if(inlined != null) {
         changed = true;
         rtrn = inlined;
