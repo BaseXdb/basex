@@ -104,11 +104,11 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
+  public boolean inlineable(final InlineContext ic) {
     for(final Let copy : copies) {
-      if(!copy.inlineable(var)) return false;
+      if(!copy.inlineable(ic)) return false;
     }
-    return super.inlineable(var);
+    return super.inlineable(ic);
   }
 
   @Override
@@ -117,10 +117,9 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    final boolean a = inlineAll(var, ex, copies, cc), b = inlineAll(var, ex, exprs, cc);
-    return a || b ? optimize(cc) : null;
+  public Expr inline(final InlineContext ic) throws QueryException {
+    final boolean a = ic.inline(copies), b = ic.inline(exprs);
+    return a || b ? optimize(ic.cc) : null;
   }
 
   @Override

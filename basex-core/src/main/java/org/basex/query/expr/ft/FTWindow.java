@@ -91,8 +91,8 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
-    return win.inlineable(var) && super.inlineable(var);
+  public boolean inlineable(final InlineContext ic) {
+    return win.inlineable(ic) && super.inlineable(ic);
   }
 
   @Override
@@ -101,12 +101,11 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public FTExpr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    final boolean anyInlined = inlineAll(var, ex, exprs, cc);
-    final Expr inlined = win.inline(var, ex, cc);
+  public FTExpr inline(final InlineContext ic) throws QueryException {
+    final boolean anyInlined = ic.inline(exprs);
+    final Expr inlined = win.inline(ic);
     if(inlined != null) win = inlined;
-    return anyInlined || inlined != null ? optimize(cc) : null;
+    return anyInlined || inlined != null ? optimize(ic.cc) : null;
   }
 
   @Override

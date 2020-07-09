@@ -54,9 +54,8 @@ public final class ContextValue extends Simple {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc) {
-    // inline context or return null
-    return var == null ? ex : null;
+  public Expr inline(final InlineContext ic) throws QueryException {
+    return ic.var == null ? ic.copy() : null;
   }
 
   @Override

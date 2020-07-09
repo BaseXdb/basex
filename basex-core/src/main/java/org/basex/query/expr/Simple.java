@@ -37,7 +37,7 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
+  public boolean inlineable(final InlineContext ic) {
     return true;
   }
 

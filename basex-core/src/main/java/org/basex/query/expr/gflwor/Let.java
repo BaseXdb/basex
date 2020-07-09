@@ -97,7 +97,7 @@ public final class Let extends ForLet {
       }
     }
     // promote at compile time
-    if(expr instanceof Value && var.checksType()) {
+    if(expr instanceof Value) {
       expr = var.checkType((Value) expr, cc.qc, true);
     }
 

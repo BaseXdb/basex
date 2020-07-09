@@ -267,7 +267,7 @@ public final class Window extends Clause {
   }
 
   @Override
-  public boolean inlineable(final Var v) {
+  public boolean inlineable(final InlineContext v) {
     return expr.inlineable(v) && start.inlineable(v) && (end == null || end.inlineable(v));
   }
 
@@ -278,15 +278,14 @@ public final class Window extends Clause {
   }
 
   @Override
-  public Clause inline(final Var v, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    final Expr inlined = expr.inline(v, ex, cc);
-    final Condition st = start.inline(v, ex, cc);
-    final Condition en = end == null ? null : end.inline(v, ex, cc);
+  public Clause inline(final InlineContext ic) throws QueryException {
+    final Expr inlined = expr.inline(ic);
+    final Condition st = start.inline(ic);
+    final Condition en = end == null ? null : end.inline(ic);
     if(inlined != null) expr = inlined;
     if(st != null) start = st;
     if(en != null) end = en;
-    return inlined != null || st != null || en != null ? optimize(cc) : null;
+    return inlined != null || st != null || en != null ? optimize(ic.cc) : null;
   }
 
   @Override

@@ -15,7 +15,6 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 
@@ -199,7 +198,8 @@ public abstract class Preds extends Arr {
     // inline root item (ignore nodes)
     // 1[. = 1]  ->  1[1 = 1]
     if(root instanceof Item && !(rst.type instanceof NodeType)) {
-      final Expr inlined = expr.inline(null, root, cc);
+      final InlineContext ic = new InlineContext(null, root, cc);
+      final Expr inlined = expr.inline(ic);
       if(inlined != null) expr = inlined;
     }
 
@@ -341,9 +341,9 @@ public abstract class Preds extends Arr {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
+  public boolean inlineable(final InlineContext ic) {
     for(final Expr expr : exprs) {
-      if(expr.uses(var)) return false;
+      if(expr.uses(ic.var)) return false;
     }
     return true;
   }

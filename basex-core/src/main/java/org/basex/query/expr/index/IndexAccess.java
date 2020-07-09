@@ -35,8 +35,8 @@ public abstract class IndexAccess extends Simple {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
-    return db.inlineable(var);
+  public boolean inlineable(final InlineContext ic) {
+    return db.inlineable(ic);
   }
 
   @Override
@@ -45,16 +45,13 @@ public abstract class IndexAccess extends Simple {
   }
 
   /**
-   * Inlines an expression (see {@link Expr#inline(Var, Expr, CompileContext)}).
-   * @param var variable ({@link Var} reference) or context ({@code null}) to inline
-   * @param ex expression to replace with
-   * @param cc compilation context
+   * Inlines an expression (see {@link Expr#inline(InlineContext)}).
+   * @param ic inlining context
    * @return result of inlining
    * @throws QueryException query exception
    */
-  final boolean inlineDb(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    final IndexDb inlined = db.inline(var, ex, cc);
+  final boolean inlineDb(final InlineContext ic) throws QueryException {
+    final IndexDb inlined = db.inline(ic);
     if(inlined == null) return false;
     db = inlined;
     return true;

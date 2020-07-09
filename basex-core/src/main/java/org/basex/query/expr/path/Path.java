@@ -1038,11 +1038,11 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final boolean inlineable(final Var var) {
+  public final boolean inlineable(final InlineContext ic) {
     for(final Expr step : steps) {
-      if(step.uses(var)) return false;
+      if(step.uses(ic.var)) return false;
     }
-    return root == null || root.inlineable(var);
+    return root == null || root.inlineable(ic);
   }
 
   @Override
@@ -1055,23 +1055,22 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-
+  public final Expr inline(final InlineContext ic) throws QueryException {
     boolean changed = false;
     if(root != null) {
-      final Expr inlined = root.inline(var, ex, cc);
+      final Expr inlined = root.inline(ic);
       if(inlined != null) {
         root = inlined;
         changed = true;
       }
-    } else if(var == null) {
+    } else if(ic.var == null) {
       // relative path: assign new root
-      root = ex;
+      root = ic.copy();
       changed = true;
     }
 
     // optimize steps with new root context
+    final CompileContext cc = ic.cc;
     final int sl = steps.length;
     final Expr rt = root != null ? root : cc.qc.focus.value;
     if(changed) {
@@ -1081,10 +1080,10 @@ public abstract class Path extends ParseExpr {
       }
     }
 
-    changed |= var != null && cc.ok(rt, () -> {
+    changed |= ic.var != null && cc.ok(rt, () -> {
       boolean chngd = false;
       for(int s = 0; s < sl; s++) {
-        final Expr step = steps[s].inline(var, ex, cc);
+        final Expr step = steps[s].inline(ic);
         if(step != null) {
           steps[s] = step;
           chngd = true;

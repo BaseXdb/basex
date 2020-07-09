@@ -118,8 +118,8 @@ abstract class CName extends CNode {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
-    return name.inlineable(var) && super.inlineable(var);
+  public boolean inlineable(final InlineContext ic) {
+    return name.inlineable(ic) && super.inlineable(ic);
   }
 
   @Override
@@ -138,15 +138,14 @@ abstract class CName extends CNode {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    boolean changed = inlineAll(var, ex, exprs, cc);
-    final Expr inlined = name.inline(var, ex, cc);
+  public Expr inline(final InlineContext ic) throws QueryException {
+    boolean changed = ic.inline(exprs);
+    final Expr inlined = name.inline(ic);
     if(inlined != null) {
       name = inlined;
       changed = true;
     }
-    return changed ? optimize(cc) : null;
+    return changed ? optimize(ic.cc) : null;
   }
 
   @Override

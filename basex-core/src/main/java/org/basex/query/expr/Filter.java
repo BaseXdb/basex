@@ -213,8 +213,8 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final boolean inlineable(final Var var) {
-    return root.inlineable(var) && super.inlineable(var);
+  public final boolean inlineable(final InlineContext ic) {
+    return root.inlineable(ic) && super.inlineable(ic);
   }
 
   @Override
@@ -229,17 +229,15 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-
-    final Expr inlined = root.inline(var, ex, cc);
+  public final Expr inline(final InlineContext ic) throws QueryException {
+    final Expr inlined = root.inline(ic);
     boolean changed = inlined != null;
     if(changed) root = inlined;
 
     // do not inline context reference in predicates
-    changed |= var != null && cc.ok(root, () -> inlineAll(var, ex, exprs, cc));
+    changed |= ic.var != null && ic.cc.ok(root, () -> ic.inline(exprs));
 
-    return changed ? optimize(cc) : null;
+    return changed ? optimize(ic.cc) : null;
   }
 
   @Override

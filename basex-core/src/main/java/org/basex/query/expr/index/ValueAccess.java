@@ -268,8 +268,8 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
-    return expr.inlineable(var) && super.inlineable(var);
+  public boolean inlineable(final InlineContext ic) {
+    return expr.inlineable(ic) && super.inlineable(ic);
   }
 
   @Override
@@ -278,12 +278,11 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    final Expr inlined = expr.inline(var, ex, cc);
+  public Expr inline(final InlineContext ic) throws QueryException {
+    final Expr inlined = expr.inline(ic);
     if(inlined != null) expr = inlined;
-    final boolean inlinedDb = inlineDb(var, ex, cc);
-    return inlined != null || inlinedDb ? optimize(cc) : null;
+    final boolean inlinedDb = inlineDb(ic);
+    return inlined != null || inlinedDb ? optimize(ic.cc) : null;
   }
 
   @Override

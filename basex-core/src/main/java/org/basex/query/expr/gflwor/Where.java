@@ -68,8 +68,8 @@ public final class Where extends Clause {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
-    return expr.inlineable(var);
+  public boolean inlineable(final InlineContext ic) {
+    return expr.inlineable(ic);
   }
 
   @Override
@@ -78,12 +78,11 @@ public final class Where extends Clause {
   }
 
   @Override
-  public Clause inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    final Expr inlined = expr.inline(var, ex, cc);
+  public Clause inline(final InlineContext ic) throws QueryException {
+    final Expr inlined = expr.inline(ic);
     if(inlined == null) return null;
     expr = inlined;
-    return optimize(cc);
+    return optimize(ic.cc);
   }
 
   @Override

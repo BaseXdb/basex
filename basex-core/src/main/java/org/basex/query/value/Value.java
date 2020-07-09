@@ -148,7 +148,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public final boolean inlineable(final Var var) {
+  public final boolean inlineable(final InlineContext ic) {
     return true;
   }
 
@@ -158,7 +158,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public final Expr inline(final Var var, final Expr ex, final CompileContext cc) {
+  public final Expr inline(final InlineContext ic) {
     return null;
   }
 

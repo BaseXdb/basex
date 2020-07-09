@@ -211,8 +211,8 @@ public abstract class Expr extends ExprInfo {
    * Checks if the specified variable is inlineable.
    * This function is called by:
    * <ul>
-   *   <li> {@link GFLWOR#optimizeWhere} -> {@link ForLet#toPredicate}</li>
    *   <li> {@link GFLWOR#inlineLets}</li>
+   *   <li> {@link GFLWOR#optimizeWhere} -> {@link ForLet#toPredicate}</li>
    * </ul>
    * The following tests might return false if the variable occurs in a nested context:
    * <ul>
@@ -221,22 +221,22 @@ public abstract class Expr extends ExprInfo {
    *   <li>{@link SimpleMap#inlineable} if the variable occurs in a right-hand expression</li>
    *   <li>{@link TransformWith#inlineable} if the variable occurs in an updating expression</li>
    * </ul>
-   * @param var variable to be inlined
+   * @param ic inlining context
    * @return result of check
    */
-  public abstract boolean inlineable(Var var);
+  public abstract boolean inlineable(InlineContext ic);
 
   /**
    * Checks how often a variable or context reference is used in this expression.
    * This function is called by:
    * <ul>
-   *   <li> {@link GFLWOR#simplify}</li>
+   *   <li> {@link Closure#optimize}</li>
    *   <li> {@link GFLWOR#inlineLets}</li>
    *   <li> {@link GFLWOR#optimizePos}</li>
+   *   <li> {@link GFLWOR#simplify}</li>
    *   <li> {@link GFLWOR#unusedVars}</li>
-   *   <li> {@link Closure#optimize}</li>
-   *   <li> {@link TypeswitchGroup#optimize}</li>
    *   <li> {@link SimpleMap#optimize}</li>
+   *   <li> {@link TypeswitchGroup#optimize}</li>
    * </ul>
    * @param var variable ({@link Var} reference) or context ({@code null}) to inline
    * @return number of usages, see {@link VarUsage}
@@ -249,15 +249,17 @@ public abstract class Expr extends ExprInfo {
    * <ul>
    *   <li> {@link Catch#inline(QueryException, CompileContext)}</li>
    *   <li> {@link Closure#optimize}</li>
-   *   <li> {@link ForLet#toPredicate}</li>
    *   <li> {@link GFLWOR#inlineLets}</li>
-   *   <li> {@link TypeswitchGroup#inline}</li>
-   *   <li> {@link SimpleMap#optimize}</li> (for the context)
+   *   <li> {@link GFLWOR#mergeReturn}</li>
+   *   <li> {@link GFLWOR#optimizeWhere} -> {@link ForLet#toPredicate}</li>
+   *   <li> {@link SimpleMap#optimize}</li>
+   *   <li> {@link Preds#simplify}</li>
+   *   <li> {@link Typeswitch#optimize} -> {@link TypeswitchGroup#inline}</li>
    * </ul>
    * The variable reference is replaced in:
    * <ul>
-   *   <li> {@link VarRef#inline}</li>
    *   <li> {@link OrderBy#inline}</li>
+   *   <li> {@link VarRef#inline}</li>
    * </ul>
    * The context is replaced in:
    * <ul>
@@ -266,38 +268,11 @@ public abstract class Expr extends ExprInfo {
    *   <li> {@link Lookup#inline}</li>
    *   <li> {@link StaticJavaCall#inline}</li>
    * </ul>
-   * @param var variable ({@link Var} reference) or context ({@code null}) to inline
-   * @param ex expression to replace with
-   * @param cc compilation context
+   * @param ic inlining context
    * @return resulting expression if something changed, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public abstract Expr inline(Var var, Expr ex, CompileContext cc) throws QueryException;
-
-  /**
-   * Inlines the given expression into the specified expressions
-   * (see {@link Expr#inline(Var, Expr, CompileContext)}).
-   * @param var variable ({@link Var} reference) or context ({@code null}) to inline
-   * @param expr expression to inline
-   * @param exprs expressions to process
-   * @param cc compilation context
-   * @return {@code true} if the array has changed, {@code false} otherwise
-   * @throws QueryException query exception
-   */
-  protected static boolean inlineAll(final Var var, final Expr expr, final Expr[] exprs,
-      final CompileContext cc) throws QueryException {
-
-    boolean changed = false;
-    final int el = exprs.length;
-    for(int e = 0; e < el; e++) {
-      final Expr inlined = exprs[e].inline(var, expr, cc);
-      if(inlined != null) {
-        exprs[e] = inlined;
-        changed = true;
-      }
-    }
-    return changed;
-  }
+  public abstract Expr inline(InlineContext ic) throws QueryException;
 
   /**
    * Copies an expression. Used for inlining functions, or for copying static queries.

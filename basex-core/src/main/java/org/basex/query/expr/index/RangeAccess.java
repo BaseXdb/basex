@@ -68,9 +68,8 @@ public final class RangeAccess extends IndexAccess {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    return inlineDb(var, ex, cc) ? optimize(cc) : null;
+  public Expr inline(final InlineContext ic) throws QueryException {
+    return inlineDb(ic) ? optimize(ic.cc) : null;
   }
 
   @Override

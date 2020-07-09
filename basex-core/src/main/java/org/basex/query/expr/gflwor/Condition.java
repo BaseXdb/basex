@@ -82,9 +82,8 @@ public final class Condition extends Single {
   }
 
   @Override
-  public Condition inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    return (Condition) super.inline(var, ex, cc);
+  public Condition inline(final InlineContext ic) throws QueryException {
+    return (Condition) super.inline(ic);
   }
 
   @Override

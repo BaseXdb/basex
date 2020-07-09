@@ -235,9 +235,9 @@ public final class GroupBy extends Clause {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
+  public boolean inlineable(final InlineContext ic) {
     for(final GroupSpec spec : specs) {
-      if(!spec.inlineable(var)) return false;
+      if(!spec.inlineable(ic)) return false;
     }
     return true;
   }
@@ -248,11 +248,10 @@ public final class GroupBy extends Clause {
   }
 
   @Override
-  public Clause inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
+  public Clause inline(final InlineContext ic) throws QueryException {
     // inline both grouping specs and non-grouping variable expressions
-    final boolean a = inlineAll(var, ex, specs, cc), b = inlineAll(var, ex, preExpr, cc);
-    return a || b ? optimize(cc) : null;
+    final boolean a = ic.inline(specs), b = ic.inline(preExpr);
+    return a || b ? optimize(ic.cc) : null;
   }
 
   @Override

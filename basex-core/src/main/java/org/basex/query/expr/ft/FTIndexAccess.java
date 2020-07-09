@@ -69,8 +69,8 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
-    return ftexpr.inlineable(var) && db.inlineable(var);
+  public boolean inlineable(final InlineContext ic) {
+    return ftexpr.inlineable(ic) && db.inlineable(ic);
   }
 
   @Override
@@ -79,13 +79,12 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    final FTExpr ftinlined = ftexpr.inline(var, ex, cc);
+  public Expr inline(final InlineContext ic) throws QueryException {
+    final FTExpr ftinlined = ftexpr.inline(ic);
     if(ftinlined != null) ftexpr = ftinlined;
-    final IndexDb inlined = db.inline(var, ex, cc);
+    final IndexDb inlined = db.inline(ic);
     if(inlined != null) db = inlined;
-    return ftinlined != null || inlined != null ? optimize(cc) : this;
+    return ftinlined != null || inlined != null ? optimize(ic.cc) : this;
   }
 
   @Override

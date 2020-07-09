@@ -449,13 +449,13 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
+  public boolean inlineable(final InlineContext ic) {
     if(occ != null) {
       for(final Expr o : occ) {
-        if(!o.inlineable(var)) return false;
+        if(!o.inlineable(ic)) return false;
       }
     }
-    return query.inlineable(var);
+    return query.inlineable(ic);
   }
 
   @Override
@@ -464,16 +464,14 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTExpr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-
-    boolean changed = occ != null && inlineAll(var, ex, occ, cc);
-    final Expr inlined = query.inline(var, ex, cc);
+  public FTExpr inline(final InlineContext ic) throws QueryException {
+    boolean changed = occ != null && ic.inline(occ);
+    final Expr inlined = query.inline(ic);
     if(inlined != null) {
       query = inlined;
       changed = true;
     }
-    return changed ? optimize(cc) : null;
+    return changed ? optimize(ic.cc) : null;
   }
 
   @Override

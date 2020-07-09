@@ -3,7 +3,6 @@ package org.basex.query.expr.gflwor;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -70,7 +69,7 @@ public final class Count extends Clause {
   }
 
   @Override
-  public boolean inlineable(final Var v) {
+  public boolean inlineable(final InlineContext v) {
     return true;
   }
 
@@ -80,7 +79,7 @@ public final class Count extends Clause {
   }
 
   @Override
-  public Clause inline(final Var v, final Expr ex, final CompileContext cc) {
+  public Clause inline(final InlineContext ic) {
     return null;
   }
 

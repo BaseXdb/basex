@@ -157,10 +157,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       while(iter.hasNext()) {
         final Entry<Var, Expr> entry = iter.next();
         final Var var = entry.getKey();
-        final Expr ex = entry.getValue();
+        Expr ex = entry.getValue();
         if(ex instanceof Value) {
           // values are always inlined into the closure
-          final Expr inlined = expr.inline(var, var.checkType((Value) ex, cc.qc, true), cc);
+          ex = var.checkType((Value) ex, cc.qc, true);
+          final InlineContext ic = new InlineContext(var, ex, cc);
+          final Expr inlined = expr.inline(ic);
           if(inlined != null) expr = inlined;
           iter.remove();
         } else if(ex instanceof Closure) {
@@ -176,7 +178,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
               expr2.setValue(new VarRef(cl.info, var2));
             }
 
-            final Expr inlined = expr.inline(var, cl, cc);
+            final InlineContext ic = new InlineContext(var, cl, cc);
+            final Expr inlined = expr.inline(ic);
             if(inlined != null) expr = inlined;
             iter.remove();
           }
@@ -208,12 +211,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-
+  public Expr inline(final InlineContext ic) throws QueryException {
     boolean changed = false;
     for(final Entry<Var, Expr> entry : global.entrySet()) {
-      final Expr inlined = entry.getValue().inline(var, ex, cc);
+      final Expr inlined = entry.getValue().inline(ic);
       if(inlined != null) {
         changed = true;
         entry.setValue(inlined);
@@ -223,7 +224,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     // invalidate cached flags, optimize closure
     map.clear();
-    return optimize(cc);
+    return optimize(ic.cc);
   }
 
   @Override
@@ -345,9 +346,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
+  public boolean inlineable(final InlineContext ic) {
     for(final Expr ex : global.values()) {
-      if(!ex.inlineable(var)) return false;
+      if(!ex.inlineable(ic)) return false;
     }
     return true;
   }

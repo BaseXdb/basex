@@ -181,11 +181,11 @@ public final class Typeswitch extends ParseExpr {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
+  public boolean inlineable(final InlineContext ic) {
     for(final TypeswitchGroup group : groups) {
-      if(!group.inlineable(var)) return false;
+      if(!group.inlineable(ic)) return false;
     }
-    return cond.inlineable(var);
+    return cond.inlineable(ic);
   }
 
   @Override
@@ -194,15 +194,14 @@ public final class Typeswitch extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    boolean changed = inlineAll(var, ex, groups, cc);
-    final Expr inlined = cond.inline(var, ex, cc);
+  public Expr inline(final InlineContext ic) throws QueryException {
+    boolean changed = ic.inline(groups);
+    final Expr inlined = cond.inline(ic);
     if(inlined != null) {
       changed = true;
       cond = inlined;
     }
-    return changed ? optimize(cc) : null;
+    return changed ? optimize(ic.cc) : null;
   }
 
   @Override

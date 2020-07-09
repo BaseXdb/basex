@@ -58,7 +58,7 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public boolean inlineable(final Var v) {
+  public boolean inlineable(final InlineContext v) {
     return true;
   }
 
@@ -68,12 +68,9 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final Var v, final Expr ex, final CompileContext cc) {
+  public Expr inline(final InlineContext ic) throws QueryException {
     // replace variable reference with expression
-    if(v != null && var.is(v)) {
-      return ex instanceof Value ? ex : ex.copy(cc, new IntObjMap<>());
-    }
-    return null;
+    return ic.var != null && var.is(ic.var) ? ic.copy() : null;
   }
 
   @Override

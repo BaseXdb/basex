@@ -81,9 +81,9 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
+  public boolean inlineable(final InlineContext ic) {
     for(final Expr expr : exprs) {
-      if(!expr.inlineable(var)) return false;
+      if(!expr.inlineable(ic)) return false;
     }
     return true;
   }
@@ -94,9 +94,8 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public FTExpr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    return inlineAll(var, ex, exprs, cc) ? optimize(cc) : null;
+  public FTExpr inline(final InlineContext ic) throws QueryException {
+    return ic.inline(exprs) ? optimize(ic.cc) : null;
   }
 
   @Override

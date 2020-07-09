@@ -96,8 +96,8 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
-    return min.inlineable(var) || max.inlineable(var) && super.inlineable(var);
+  public boolean inlineable(final InlineContext ic) {
+    return min.inlineable(ic) || max.inlineable(ic) && super.inlineable(ic);
   }
 
   @Override
@@ -106,12 +106,11 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public FTExpr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    final Expr mn = min.inline(var, ex, cc), mx = max.inline(var, ex, cc);
+  public FTExpr inline(final InlineContext ic) throws QueryException {
+    final Expr mn = min.inline(ic), mx = max.inline(ic);
     if(mn != null) min = mn;
     if(mx != null) max = mx;
-    return inlineAll(var, ex, exprs, cc) || mn != null || mx != null ? optimize(cc) : null;
+    return ic.inline(exprs) || mn != null || mx != null ? optimize(ic.cc) : null;
   }
 
   @Override

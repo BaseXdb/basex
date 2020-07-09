@@ -54,7 +54,7 @@ public abstract class Clause extends ParseExpr {
   public abstract Clause optimize(CompileContext cc) throws QueryException;
 
   @Override
-  public abstract Clause inline(Var var, Expr ex, CompileContext cc) throws QueryException;
+  public abstract Clause inline(InlineContext ic) throws QueryException;
 
   @Override
   public abstract Clause copy(CompileContext cc, IntObjMap<Var> vm);

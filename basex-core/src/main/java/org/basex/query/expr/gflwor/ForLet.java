@@ -52,7 +52,7 @@ public abstract class ForLet extends Clause {
   }
 
   @Override
-  public final boolean inlineable(final Var v) {
+  public final boolean inlineable(final InlineContext v) {
     return expr.inlineable(v);
   }
 
@@ -62,13 +62,11 @@ public abstract class ForLet extends Clause {
   }
 
   @Override
-  public final Clause inline(final Var v, final Expr ex, final CompileContext cc)
-      throws QueryException {
-
-    final Expr inlined = expr.inline(v, ex, cc);
+  public final Clause inline(final InlineContext ic) throws QueryException {
+    final Expr inlined = expr.inline(ic);
     if(inlined == null) return null;
     expr = inlined;
-    return optimize(cc);
+    return optimize(ic.cc);
   }
 
   /**
@@ -95,12 +93,15 @@ public abstract class ForLet extends Clause {
     //   let $a as element(a) := <a/> where $a instance of element(b) return $a
     //   let score $s := <a/> where not($s) return $s
     //   let $e := (<a/>, <b/>) where $e/self::a return $e
-    if(!(inlineable() && size() == 1 && ex.uses(var) && ex.inlineable(var))) return false;
+    if(!(inlineable() && size() == 1 && ex.uses(var))) return false;
+
+    final InlineContext ic = new InlineContext(var, new ContextValue(info), cc);
+    if(!ex.inlineable(ic)) return false;
 
     // reset context value (will not be accessible in predicate)
     Expr pred = cc.get(expr, () -> {
       // assign type of iterated items to context expression
-      final Expr inlined = ex.inline(var, new ContextValue(info).optimize(cc), cc);
+      final Expr inlined = ex.inline(ic);
       return inlined != null ? inlined : ex;
     });
 

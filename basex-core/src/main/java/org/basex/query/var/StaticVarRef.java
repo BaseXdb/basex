@@ -87,7 +87,7 @@ final class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public boolean inlineable(final Var v) {
+  public boolean inlineable(final InlineContext v) {
     return true;
   }
 
@@ -97,7 +97,7 @@ final class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final Var v, final Expr ex, final CompileContext cc) {
+  public Expr inline(final InlineContext ic) {
     return null;
   }
 

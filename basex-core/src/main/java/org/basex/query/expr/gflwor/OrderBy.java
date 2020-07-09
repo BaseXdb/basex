@@ -142,9 +142,9 @@ public final class OrderBy extends Clause {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
+  public boolean inlineable(final InlineContext ic) {
     for(final OrderKey key : keys) {
-      if(!key.inlineable(var)) return false;
+      if(!key.inlineable(ic)) return false;
     }
     return true;
   }
@@ -155,14 +155,13 @@ public final class OrderBy extends Clause {
   }
 
   @Override
-  public Clause inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    if(var != null) {
+  public Clause inline(final InlineContext ic) throws QueryException {
+    if(ic.var != null) {
       for(int r = refs.length; --r >= 0;) {
-        if(var.is(refs[r].var)) refs = Array.remove(refs, r);
+        if(refs[r].var.is(ic.var)) refs = Array.remove(refs, r);
       }
     }
-    return inlineAll(var, ex, keys, cc) ? optimize(cc) : null;
+    return ic.inline(keys) ? optimize(ic.cc) : null;
   }
 
   @Override

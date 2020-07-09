@@ -184,7 +184,8 @@ public abstract class SimpleMap extends Arr {
             // inline single uses
             //   ($n + 2) ! abs(.) ->  map {}?*
             try {
-              ex = next.inline(null, expr, cc);
+              final InlineContext ic = new InlineContext(null, expr, cc);
+              ex = next.inline(ic);
             } catch(final QueryException qe) {
               // replace original expression with error
               ex = cc.error(qe, this);
@@ -216,7 +217,8 @@ public abstract class SimpleMap extends Arr {
         }
         if(inline) {
           try {
-            ex = next.inline(null, expr, cc);
+            final InlineContext ic = new InlineContext(null, expr, cc);
+            ex = next.inline(ic);
           } catch(final QueryException qe) {
             // replace original expression with error
             ex = cc.error(qe, this);
@@ -380,25 +382,24 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
-  public final boolean inlineable(final Var var) {
+  public final boolean inlineable(final InlineContext ic) {
     final int el = exprs.length;
     for(int e = 1; e < el; e++) {
-      if(exprs[e].uses(var)) return false;
+      if(exprs[e].uses(ic.var)) return false;
     }
-    return exprs[0].inlineable(var);
+    return exprs[0].inlineable(ic);
   }
 
   @Override
-  public final Expr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-
+  public final Expr inline(final InlineContext ic) throws QueryException {
     boolean changed = false;
     // context inlining: only consider first expression
-    final int el = var == null ? 1 : exprs.length;
+    final CompileContext cc = ic.cc;
+    final int el = ic.var == null ? 1 : exprs.length;
     for(int e = 0; e < el; e++) {
       Expr inlined;
       try {
-        inlined = exprs[e].inline(var, ex, cc);
+        inlined = exprs[e].inline(ic);
       } catch(final QueryException qe) {
         // replace original expression with error
         inlined = cc.error(qe, this);

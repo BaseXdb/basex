@@ -43,7 +43,7 @@ public final class IndexStaticDb extends IndexDb {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
+  public boolean inlineable(final InlineContext ic) {
     return true;
   }
 
@@ -53,7 +53,7 @@ public final class IndexStaticDb extends IndexDb {
   }
 
   @Override
-  public IndexDb inline(final Var var, final Expr ex, final CompileContext cc) {
+  public IndexDb inline(final InlineContext ic) {
     return null;
   }
 

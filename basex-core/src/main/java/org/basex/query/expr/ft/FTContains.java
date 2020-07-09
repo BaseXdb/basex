@@ -92,8 +92,8 @@ public final class FTContains extends Single {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
-    return super.inlineable(var) && ftexpr.inlineable(var);
+  public boolean inlineable(final InlineContext ic) {
+    return super.inlineable(ic) && ftexpr.inlineable(ic);
   }
 
   @Override
@@ -102,13 +102,12 @@ public final class FTContains extends Single {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    final Expr inlined = expr.inline(var, ex, cc);
+  public Expr inline(final InlineContext ic) throws QueryException {
+    final Expr inlined = expr.inline(ic);
     if(inlined != null) expr = inlined;
-    final FTExpr ftinlined = ftexpr.inline(var, ex, cc);
+    final FTExpr ftinlined = ftexpr.inline(ic);
     if(ftinlined != null) ftexpr = ftinlined;
-    return inlined != null || ftinlined != null ? optimize(cc) : null;
+    return inlined != null || ftinlined != null ? optimize(ic.cc) : null;
   }
 
   @Override

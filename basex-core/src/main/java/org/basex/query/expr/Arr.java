@@ -58,9 +58,9 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
+  public boolean inlineable(final InlineContext ic) {
     for(final Expr expr : exprs) {
-      if(!expr.inlineable(var)) return false;
+      if(!expr.inlineable(ic)) return false;
     }
     return true;
   }
@@ -71,35 +71,26 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    return inlineAll(var, ex, exprs, cc) ? optimize(cc) : null;
+  public Expr inline(final InlineContext ic) throws QueryException {
+    return ic.inline(exprs) ? optimize(ic.cc) : null;
   }
 
   /**
-   * Inlines an expression (see {@link Expr#inline(Var, Expr, CompileContext)}).
-   * @param var variable ({@link Var} reference) or context ({@code null}) to inline
-   * @param ex expression to inline
-   * @param cc compilation context
-   * @param context function for context inlining
+   * Inlines an expression (see {@link Expr#inline(InlineContext)}).
+   * @param ic inlining context
+   * @param context function for context inlining; yields {@code null} if no inlining is required
    * @return resulting expression if something changed, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc,
-      final QuerySupplier<Expr> context) throws QueryException {
+  public Expr inline(final InlineContext ic, final QuerySupplier<Expr> context)
+      throws QueryException {
 
-    // no arguments are inlined: return null or apply context inlining function
-    if(!inlineAll(var, ex, exprs, cc)) {
-      return var != null ? null : context.get();
-    }
-
-    // optimize new expression. skip further optimizations if variable was inlined
-    final Expr optimized = optimize(cc);
-    if(var != null) return optimized;
-
-    // inline again if context was inlined
-    final Expr inlined = optimized.inline(var, ex, cc);
-    return inlined != null ? inlined : optimized;
+    // inline arguments
+    final boolean changed = ic.inline(exprs);
+    // context reference: create new expression with inlined context
+    Expr expr = ic.var == null ? context.get() : null;
+    // new expression exists and/or arguments were inlined: optimize expression
+    return expr != null ? expr.optimize(ic.cc) : changed ? optimize(ic.cc) : null;
   }
 
   /**

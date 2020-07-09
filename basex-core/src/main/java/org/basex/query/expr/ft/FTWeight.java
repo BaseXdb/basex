@@ -97,8 +97,8 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
-    return weight.inlineable(var) && super.inlineable(var);
+  public boolean inlineable(final InlineContext ic) {
+    return weight.inlineable(ic) && super.inlineable(ic);
   }
 
   @Override
@@ -107,15 +107,14 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTExpr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    boolean changed = inlineAll(var, ex, exprs, cc);
-    final Expr inlined = weight.inline(var, ex, cc);
+  public FTExpr inline(final InlineContext ic) throws QueryException {
+    boolean changed = ic.inline(exprs);
+    final Expr inlined = weight.inline(ic);
     if(inlined != null) {
       weight = inlined;
       changed = true;
     }
-    return changed ? optimize(cc) : null;
+    return changed ? optimize(ic.cc) : null;
   }
 
   @Override

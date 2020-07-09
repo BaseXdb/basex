@@ -110,12 +110,11 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-
+  public Expr inline(final InlineContext ic) throws QueryException {
     boolean changed = false;
+    final CompileContext cc = ic.cc;
     try {
-      final Expr inlined = expr.inline(var, ex, cc);
+      final Expr inlined = expr.inline(ic);
       if(inlined != null) {
         if(inlined instanceof Value) return cc.replaceWith(this, inlined);
         expr = inlined;
@@ -126,7 +125,7 @@ public final class Try extends Single {
       for(final Catch ctch : catches) {
         if(ctch.matches(qe)) {
           // found a matching clause, inline variable and error message
-          final Catch ct = ctch.inline(var, ex, cc);
+          final Catch ct = ctch.inline(ic);
           return cc.replaceWith(this, (ct == null ? ctch : ct).inline(qe, cc));
         }
       }
@@ -134,7 +133,7 @@ public final class Try extends Single {
     }
 
     for(final Catch ctch : catches) {
-      changed |= ctch.inline(var, ex, cc) != null;
+      changed |= ctch.inline(ic) != null;
     }
     return changed ? this : null;
   }
@@ -163,11 +162,11 @@ public final class Try extends Single {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
+  public boolean inlineable(final InlineContext ic) {
     for(final Catch ctch : catches) {
-      if(!ctch.inlineable(var)) return false;
+      if(!ctch.inlineable(ic)) return false;
     }
-    return super.inlineable(var);
+    return super.inlineable(ic);
   }
 
   @Override

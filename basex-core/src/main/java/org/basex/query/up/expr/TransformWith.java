@@ -94,8 +94,8 @@ public final class TransformWith extends Arr {
   }
 
   @Override
-  public boolean inlineable(final Var var) {
-    return exprs[0].inlineable(var) && !exprs[1].uses(var);
+  public boolean inlineable(final InlineContext ic) {
+    return exprs[0].inlineable(ic) && !exprs[1].uses(ic.var);
   }
 
   @Override
@@ -105,21 +105,19 @@ public final class TransformWith extends Arr {
   }
 
   @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-
-    final Expr inlined = exprs[0].inline(var, ex, cc);
+  public Expr inline(final InlineContext ic) throws QueryException {
+    final Expr inlined = exprs[0].inline(ic);
     boolean changed = inlined != null;
     if(changed) exprs[0] = inlined;
 
     // do not inline context reference in updating expressions
-    changed |= var != null && cc.ok(exprs[0], () -> {
-      final Expr expr = exprs[1].inline(var, ex, cc);
+    changed |= ic.var != null && ic.cc.ok(exprs[0], () -> {
+      final Expr expr = exprs[1].inline(ic);
       if(expr == null) return false;
       exprs[1] = expr;
       return true;
     });
-    return changed ? optimize(cc) : null;
+    return changed ? optimize(ic.cc) : null;
   }
 
   @Override
