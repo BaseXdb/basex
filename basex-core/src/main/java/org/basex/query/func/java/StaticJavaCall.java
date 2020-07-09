@@ -96,20 +96,6 @@ public final class StaticJavaCall extends JavaCall {
   }
 
   @Override
-  public VarUsage count(final Var var) {
-    // do not trigger optimizations if the function depends on the context reference
-    return var == null && method.getAnnotation(FocusDependent.class) != null ?
-      VarUsage.MORE_THAN_ONCE : super.count(var);
-  }
-
-  @Override
-  public Expr inline(final Var var, final Expr ex, final CompileContext cc)
-      throws QueryException {
-    return inline(var, ex, cc, () -> method.getAnnotation(FocusDependent.class) != null ?
-      SimpleMap.get(cc, info, ex, this) : null);
-  }
-
-  @Override
   String desc() {
     return name();
   }

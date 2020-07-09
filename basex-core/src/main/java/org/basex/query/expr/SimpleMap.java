@@ -185,11 +185,6 @@ public abstract class SimpleMap extends Arr {
             //   ($n + 2) ! abs(.) ->  map {}?*
             try {
               ex = next.inline(null, expr, cc);
-              // ignore rewritten expression that is identical to original one
-              if(ex instanceof SimpleMap) {
-                final Expr[] tmp = ((SimpleMap) ex).exprs;
-                if(tmp[0] == expr && tmp[1] == next) ex = null;
-              }
             } catch(final QueryException qe) {
               // replace original expression with error
               ex = cc.error(qe, this);
