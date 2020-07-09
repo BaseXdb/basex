@@ -198,8 +198,7 @@ public abstract class Preds extends Arr {
     // inline root item (ignore nodes)
     // 1[. = 1]  ->  1[1 = 1]
     if(root instanceof Item && !(rst.type instanceof NodeType)) {
-      final Expr inlined = new InlineContext(null, root, cc).inline(expr);
-      if(inlined != null) expr = inlined;
+      expr = new InlineContext(null, root, cc).inline(expr);
     }
 
     // E[exists(nodes)]  ->  E[nodes]

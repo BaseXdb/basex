@@ -305,7 +305,7 @@ public final class GroupBy extends Clause {
   }
 
   @Override
-  void calcSize(final long[] minMax) {
+  public void calcSize(final long[] minMax) {
     minMax[0] = Math.min(minMax[0], 1);
   }
 

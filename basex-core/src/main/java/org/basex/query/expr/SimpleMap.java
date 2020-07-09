@@ -158,13 +158,13 @@ public abstract class SimpleMap extends Arr {
         // expression size is never 0 (empty expressions have no followers, see above)
         if(es == 1) {
           final InlineContext ic = new InlineContext(null, expr, cc);
-          if(ic.inlineable(next, v -> next.count(v))) {
+          if(ic.inlineable(next)) {
             // inline values
             //   'a' ! (. = 'a')  ->  'a'  = 'a'
             //   map {} ! ?*      ->  map {}?*
             //   123 ! number()   ->  number(123)
             // inline context reference
-            // . ! number() = 2  ->  number() = 2
+            //   . ! number() = 2  ->  number() = 2
             // inline variable references
             //   $a ! (. + .)  ->  $a + $a
             // inline any other expression

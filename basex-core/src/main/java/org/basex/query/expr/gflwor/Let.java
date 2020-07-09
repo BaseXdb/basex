@@ -122,12 +122,7 @@ public final class Let extends ForLet {
     return expr.accept(visitor) && visitor.declared(var);
   }
 
-  /**
-   * Returns an expression that is appropriate for inlining.
-   * @param cc compilation context
-   * @return inlineable expression
-   * @throws QueryException query exception
-   */
+  @Override
   Expr inlineExpr(final CompileContext cc) throws QueryException {
     return scoring ? cc.function(Function._FT_SCORE, info, expr) : var.checked(expr, cc);
   }

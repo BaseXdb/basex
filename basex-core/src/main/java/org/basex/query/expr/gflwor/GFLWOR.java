@@ -317,61 +317,16 @@ public final class GFLWOR extends ParseExpr {
       final ListIterator<Clause> iter = clauses.listIterator();
       while(iter.hasNext()) {
         final Clause clause = iter.next();
-        if(!(clause instanceof Let)) continue;
+        if(!(clause instanceof Let) || clause.has(Flag.NDT)) continue;
 
-        final int next = iter.nextIndex();
         final Let lt = (Let) clause;
-        if(lt.expr.has(Flag.NDT)) continue;
-
-        final Var var = lt.var;
-        final Expr expr = lt.inlineExpr(cc);
-        final InlineContext ic = new InlineContext(var, expr, cc);
-        final Check inlineable = () -> {
-          for(final ListIterator<Clause> ir = clauses.listIterator(next); ir.hasNext();) {
-            if(!ir.next().inlineable(ic)) return false;
-          }
-          return rtrn.inlineable(ic);
-        };
-
-        // inline simple values
-        boolean inline = expr instanceof Value;
-
-        if(!inline && expr instanceof VarRef) {
-          // inline variable references without type checks
-          inline = !var.checksType();
+        final InlineContext ic = new InlineContext(lt.var, lt.inlineExpr(cc), cc);
+        final ExprList exprs = new ExprList();
+        for(final ListIterator<Clause> ir = clauses.listIterator(iter.nextIndex()); ir.hasNext();) {
+          exprs.add(ir.next());
         }
-        if(!inline && expr instanceof ContextValue) {
-          // inline context values:
-          //   1[let $x := . return $x]  ->  1[.]
-          // not allowed if context is nested:
-          //   1[let $x := . return <a/>[$x = 1]]
-          inline = inlineable.ok();
-        }
-        if(!inline && expr instanceof Path) {
-          // inline cheap path expressions with single result (might trigger index rewritings)
-          //   for $r in /root return $nodes[@id = $r/@id]  ->  $nodes[@id = /root/@id]
-          inline = expr.size() == 1 && !expr.has(Flag.CNS) && inlineable.ok();
-        }
-        if(!inline && count(var, next) == VarUsage.ONCE) {
-          // inline expressions that occur once:
-          //   let $a := (1, 2)[. = 1] return $a  ->  (1, 2)[. = 1]
-          //   $seq[let $p := position() return $p = 1]  ->  $seq[position() = 1]
-          inline = inlineable.ok();
-          if(inline && expr.has(Flag.CNS)) {
-            // do not generate nested node constructors:
-            //   let $x := <X/> return <X xmlns='xx'>{ $x/self::X }</X>
-            Expr ex = rtrn.count(var) == VarUsage.ONCE ? rtrn : null;
-            for(final ListIterator<Clause> ir = clauses.listIterator(next);
-                ex == null && ir.hasNext();) {
-              final Clause c = ir.next();
-              if(c.count(var) == VarUsage.ONCE) ex = c;
-            };
-            inline = !ex.has(Flag.CNS);
-          }
-        }
-
-        if(inline) {
-          cc.info(QueryText.OPTINLINE_X, var);
+        if(ic.inlineable(exprs.add(rtrn).finish())) {
+          cc.info(QueryText.OPTINLINE_X, lt.var);
           inline(ic, iter);
           clauses.remove(lt);
           changing = changed = true;
@@ -663,15 +618,16 @@ public final class GFLWOR extends ParseExpr {
    */
   private Expr mergeReturn(final CompileContext cc, final ForLet last) throws QueryException {
     // do not inline variables with scoring, type checks, etc.
-    if(!last.inlineable()) return null;
+    final Expr root = last.inlineExpr(cc);
+    if(root == null) return null;
 
     // for $x in E return $x  ->  E
     final Predicate<Expr> var = expr -> expr instanceof VarRef && ((VarRef) expr).var.is(last.var);
-    if(var.test(rtrn)) return last.expr;
+    if(var.test(rtrn)) return root;
 
     // dummy context value... should be changed for filter, simple map, path
     final InlineContext ic = new InlineContext(last.var, new ContextValue(info), cc);
-    if(!ic.inlineable(rtrn, v -> rtrn.count(v))) return null;
+    if(!ic.inlineable(rtrn)) return null;
 
     // inline into filter
     if(rtrn instanceof Filter) {
@@ -680,10 +636,10 @@ public final class GFLWOR extends ParseExpr {
         // for $x in E return $x[. = '']  ->  E ! .[. = '']
         // for $x in head(E) return $x[1]  ->  E ! .[1]
         // for $x in E return $x[1]  ->  E ! .[1]
-        final Expr ex = cc.get(last.expr, () ->
+        final Expr ex = cc.get(root, () ->
           Filter.get(cc, filter.info, new ContextValue(filter.info).optimize(cc), filter.exprs)
         );
-        return SimpleMap.get(cc, filter.info, last.expr, ex);
+        return SimpleMap.get(cc, filter.info, root, ex);
       }
     }
 
@@ -697,8 +653,8 @@ public final class GFLWOR extends ParseExpr {
       // for $a in //a return $a/sub  ->  //a ! sub
       // for $a in head(//a) return $a/..  ->  head(//a) ! ..
       // for $a in reverse(//a) return $a/sub  ->  reverse(//a) ! sub
-      final Expr ex = cc.get(last.expr, () -> Path.get(cc, path.info, null, path.steps));
-      return SimpleMap.get(cc, path.info, last.expr, ex);
+      final Expr ex = cc.get(root, () -> Path.get(cc, path.info, null, path.steps));
+      return SimpleMap.get(cc, path.info, root, ex);
     };
     final Expr path = inlineIntoPath.apply(rtrn);
     if(path != null) return path;
@@ -706,7 +662,7 @@ public final class GFLWOR extends ParseExpr {
     // inline into simple map
     if(rtrn instanceof SimpleMap) {
       final SimpleMap map = (SimpleMap) rtrn;
-      final Expr expr = var.test(map.exprs[0]) ? last.expr : inlineIntoPath.apply(map.exprs[0]);
+      final Expr expr = var.test(map.exprs[0]) ? root : inlineIntoPath.apply(map.exprs[0]);
       if(expr != null) {
         // for $x in E return $x ! 123  ->  E ! 123
         // for $x in E return $x/a ! 123  ->  E/a ! 123
@@ -722,8 +678,8 @@ public final class GFLWOR extends ParseExpr {
       // do not rewrite
       //   for $c allowing empty in () return count($c)
       //   <_/>[for $c in (1, 2) return (., $c)]
-      final Expr ex = cc.get(last.expr, () -> ic.inline(rtrn));
-      return SimpleMap.get(cc, info, last.expr, ex);
+      final Expr ex = cc.get(root, () -> ic.inline(rtrn));
+      return SimpleMap.get(cc, info, root, ex);
     }
 
     return null;
@@ -975,9 +931,9 @@ public final class GFLWOR extends ParseExpr {
       final Clause clause = iter.next();
       try {
         final Clause cl = (Clause) ic.inline(clause);
-        if(cl != null) {
-          changed = true;
+        if(cl != clause) {
           iter.set(cl);
+          changed = true;
         }
       } catch(final QueryException qe) {
         iter.remove();
@@ -987,9 +943,9 @@ public final class GFLWOR extends ParseExpr {
 
     try {
       final Expr inlined = ic.inline(rtrn);
-      if(inlined != null) {
-        changed = true;
+      if(rtrn != inlined) {
         rtrn = inlined;
+        changed = true;
       }
     } catch(final QueryException qe) {
       return clauseError(qe, iter, ic.cc);

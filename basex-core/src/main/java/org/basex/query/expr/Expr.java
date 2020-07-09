@@ -210,9 +210,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Checks if inlining is possible.
    * This function is called by {@link InlineContext#inlineable} and:
-   * <ul>
-   *   <li> {@link GFLWOR#inlineLets}</li>
-   * </ul>
+   *
    * The following tests might return false if the variable occurs in a nested context:
    * <ul>
    *   <li>{@link Preds#inlineable} if the variable is used in a predicate</li>

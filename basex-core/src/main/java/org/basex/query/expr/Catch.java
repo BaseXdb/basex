@@ -113,14 +113,11 @@ public final class Catch extends Single {
    * @throws QueryException query exception
    */
   Expr inline(final QueryException qe, final CompileContext cc) throws QueryException {
+    if(expr instanceof Value) return expr;
+
     Expr ex = expr;
-    if(!(ex instanceof Value)) {
-      int v = 0;
-      for(final Value value : values(qe)) {
-        final Expr inlined = new InlineContext(vars[v++], value, cc).inline(ex);
-        if(inlined != null) ex = inlined;
-      }
-    }
+    int v = 0;
+    for(final Value value : values(qe)) ex = new InlineContext(vars[v++], value, cc).inline(ex);
     return ex;
   }
 

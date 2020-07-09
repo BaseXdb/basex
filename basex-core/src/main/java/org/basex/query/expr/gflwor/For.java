@@ -198,11 +198,16 @@ public final class For extends ForLet {
   }
 
   @Override
-  void calcSize(final long[] minMax) {
+  public void calcSize(final long[] minMax) {
     final long size = expr.size(), factor = size > 0 ? size : empty ? 1 : 0;
     minMax[0] *= factor;
     final long max = minMax[1];
     if(max > 0) minMax[1] = size >= 0 ? max * factor : -1;
+  }
+
+  @Override
+  Expr inlineExpr(final CompileContext cc) throws QueryException {
+    return vars.length > 1 || var.checksType() ? null : expr;
   }
 
   @Override

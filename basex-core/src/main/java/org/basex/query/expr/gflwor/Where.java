@@ -107,7 +107,7 @@ public final class Where extends Clause {
   }
 
   @Override
-  void calcSize(final long[] minMax) {
+  public void calcSize(final long[] minMax) {
     minMax[0] = 0;
     if(expr == Bln.FALSE) minMax[1] = 0;
   }

@@ -1,6 +1,7 @@
 package org.basex.query;
 
 import org.basex.query.expr.*;
+import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -38,16 +39,18 @@ public final class InlineContext {
 
   /**
    * Checks if the expression can be inlined.
-   * @param target expression in which the expression will be inlined
-   * @param count function for counting the variable usages (ignored if {@code null})
+   * @param targets target expressions in which the expression will be inlined
    * @return result of check
-   * @throws QueryException query exception
    */
-  public boolean inlineable(final Expr target, final QueryFunction<Var, VarUsage> count)
-      throws QueryException {
-
+  public boolean inlineable(final Expr... targets) {
     // count number of uses
-    if(count != null) uses = count.apply(var);
+    final long[] minMax = { 1, 1 };
+    uses = VarUsage.NEVER;
+    for(final Expr target : targets) {
+      uses = uses.plus(target.count(var).times(minMax[1]));
+      if(target instanceof Clause) ((Clause) target).calcSize(minMax);
+    }
+
     // no uses: no inlining required
     if(uses == VarUsage.NEVER) return true;
 
@@ -56,12 +59,16 @@ public final class InlineContext {
       expr instanceof Value ||
       expr instanceof VarRef ||
       expr instanceof ContextValue ||
-      expr instanceof Path && expr.size() == 1 && !expr.has(Flag.CNS))) {
+      expr instanceof Path && expr.size() == 1 && !expr.has(Flag.CNS)
+    )) {
       return false;
     };
 
     // check if inlining is possible
-    return target.inlineable(this);
+    for(final Expr target : targets) {
+      if(!target.inlineable(this)) return false;
+    }
+    return true;
   }
 
   /**

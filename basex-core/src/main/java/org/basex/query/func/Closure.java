@@ -157,13 +157,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       while(iter.hasNext()) {
         final Entry<Var, Expr> entry = iter.next();
         final Var var = entry.getKey();
-        Expr ex = entry.getValue();
+        final Expr ex = entry.getValue();
+
+        Expr inline = null;
         if(ex instanceof Value) {
           // values are always inlined into the closure
-          ex = var.checkType((Value) ex, cc.qc, true);
-          final Expr inlined = new InlineContext(var, ex, cc).inline(expr);
-          if(inlined != null) expr = inlined;
-          iter.remove();
+          inline = var.checkType((Value) ex, cc.qc, true);
         } else if(ex instanceof Closure) {
           // nested closures are inlined if their size and number of closed-over variables is small
           final Closure cl = (Closure) ex;
@@ -176,10 +175,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
               add.put(var2, expr2.getValue());
               expr2.setValue(new VarRef(cl.info, var2));
             }
-            final Expr inlined = new InlineContext(var, cl, cc).inline(expr);
-            if(inlined != null) expr = inlined;
-            iter.remove();
+            inline = cl;
           }
+        }
+        if(inline != null) {
+          expr = new InlineContext(var, inline, cc).inline(expr);
+          iter.remove();
         }
       }
       // add all newly added bindings

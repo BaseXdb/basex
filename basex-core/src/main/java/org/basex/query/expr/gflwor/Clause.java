@@ -100,5 +100,5 @@ public abstract class Clause extends ParseExpr {
    * Calculates the minimum and maximum number of results.
    * @param minMax minimum and maximum number of incoming tuples
    */
-  void calcSize(@SuppressWarnings("unused") final long[] minMax) { }
+  public void calcSize(@SuppressWarnings("unused") final long[] minMax) { }
 }

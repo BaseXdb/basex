@@ -70,15 +70,12 @@ public abstract class ForLet extends Clause {
   }
 
   /**
-   * Checks if an expression can be inlined.
-   * @return result of check
+   * Returns an expression that is appropriate for inlining.
+   * @param cc compilation context
+   * @return inlineable expression or {@code null}
+   * @throws QueryException query exception
    */
-  final boolean inlineable() {
-    // do not rewrite
-    //   for $a allowing empty in 0 where $a return count($a)
-    //   for $a at $p in (1,2) where $a = 2 return $p
-    return vars.length == 1 && !scoring && !var.checksType();
-  }
+  abstract Expr inlineExpr(CompileContext cc) throws QueryException;
 
   /**
    * Tries to add the given expression as a predicate.
@@ -90,13 +87,16 @@ public abstract class ForLet extends Clause {
    */
   final boolean toPredicate(final CompileContext cc, final Expr ex) throws QueryException {
     // do not rewrite:
-    //   let $a as element(a) := <a/> where $a instance of element(b) return $a
+    //   for $a at $p in (1,2) where $a = 2 return $p
     //   let score $s := <a/> where not($s) return $s
-    //   let $e := (<a/>, <b/>) where $e/self::a return $e
-    if(!(inlineable() && size() == 1 && ex.uses(var))) return false;
+    //   let $a as element(a) := <a/> where $a instance of element(b) return $a
+    //   let $a := (<a/>, <b/>) where $a/self::a return $a
+    //   for $a allowing empty in 0 where $a return count($a)
+    if(vars.length != 1 || scoring || var.checksType() || size() != 1 || !ex.uses(var))
+      return false;
 
     final InlineContext ic = new InlineContext(var, new ContextValue(info), cc);
-    if(!ic.inlineable(ex, null)) return false;
+    if(!ic.inlineable(ex)) return false;
 
     // reset context value (will not be accessible in predicate)
     Expr pred = cc.get(expr, () -> ic.inline(ex));

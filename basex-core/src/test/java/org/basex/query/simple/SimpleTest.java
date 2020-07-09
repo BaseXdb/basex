@@ -70,8 +70,6 @@ public final class SimpleTest extends QueryTest {
         "for $a score $s in 1 let $s := 3 return $s" },
       { "ForLet 5", integers(1),
         "for $a at $p in 1 let $s := $p return $s" },
-      { "ForLet 6",
-        "let $a as xs:string := <a/> return 1" },
 
       { "ExtVar 1", integers(1), "declare variable $a external; 1" },
       { "ExtVar 2", "declare variable $a external; $a" },
@@ -176,9 +174,6 @@ public final class SimpleTest extends QueryTest {
 
       { "DeclFun 1", integers(0, 1), "declare function local:x($x as xs:integer) { $x }; " +
         "let $a := 0, $b := 1 return try { local:x( (1 to 20) ) } catch * { ($a,$b) }" },
-      { "DeclFun 2",
-        "declare function local:b($p as element()) { element a {} };" +
-        "declare function local:a($s as xs:string) { local:b($s) }; local:a('x')" },
 
       { "Catch 1", "try { 1+'' } catch XPTY0004 { 1 }" },
       { "Catch 2", integers(1), "try { 1+'' } catch err:XPTY0004 { 1 }" },
