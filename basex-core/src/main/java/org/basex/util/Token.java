@@ -126,7 +126,7 @@ public final class Token {
     // input is assumed to be correct UTF8. if input contains codepoints
     // larger than Character.MAX_CODE_POINT, results might be unexpected.
 
-    final StringBuilder sb = new StringBuilder(length << 1);
+    final StringBuilder sb = new StringBuilder(Array.newCapacity(length));
     final int il = Math.min(start + length, token.length);
     for(int i = start; i < il; i += cl(token, i)) {
       final int cp = cp(token, i);
@@ -192,7 +192,7 @@ public final class Token {
   private static byte[] utf8(final String string) {
     final char[] arr = string.toCharArray();
     final int al = arr.length;
-    final TokenBuilder tb = new TokenBuilder(al << 1);
+    final TokenBuilder tb = new TokenBuilder(Array.newCapacity(al));
     for(int c = 0; c < al; ++c) {
       final char ch = arr[c];
       tb.add(Character.isHighSurrogate(ch) && c < al - 1
