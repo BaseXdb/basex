@@ -9,6 +9,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -29,8 +30,8 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
    * Constructor with initial capacity.
    * @param capacity array capacity
    */
-  public ANodeList(final int capacity) {
-    super(new ANode[capacity]);
+  public ANodeList(final long capacity) {
+    super(new ANode[Array.checkCapacity(capacity)]);
   }
 
   /**

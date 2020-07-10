@@ -25,8 +25,8 @@ public class IntList extends ElementList {
    * Constructor with initial capacity.
    * @param capacity array capacity
    */
-  public IntList(final int capacity) {
-    list = new int[capacity];
+  public IntList(final long capacity) {
+    list = new int[Array.checkCapacity(capacity)];
   }
 
   /**

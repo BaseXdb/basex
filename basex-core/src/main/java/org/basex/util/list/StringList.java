@@ -22,8 +22,8 @@ public class StringList extends ObjectList<String, StringList> {
    * Constructor with initial capacity.
    * @param capacity array capacity
    */
-  public StringList(final int capacity) {
-    super(new String[capacity]);
+  public StringList(final long capacity) {
+    super(new String[Array.checkCapacity(capacity)]);
   }
 
   /**

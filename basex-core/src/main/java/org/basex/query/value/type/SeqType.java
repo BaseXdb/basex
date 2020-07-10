@@ -390,7 +390,7 @@ public final class SeqType {
         if(items != null) items.add(item);
       } else {
         if(items == null) {
-          items = new ItemList(size);
+          items = new ItemList(Seq.initialCapacity(size));
           for(int j = 0; j < i; j++) items.add(value.itemAt(j));
         }
         promote(item, name, items, qc, sc, ii, opt);

@@ -621,7 +621,7 @@ public final class GFLWOR extends ParseExpr {
     final Expr root = last.inlineExpr(cc);
     if(root == null) return null;
 
-    // for $x in E return $x  ->  E
+    // let $r := random:uuid() return $e  ->  random:uuid()
     final Predicate<Expr> var = expr -> expr instanceof VarRef && ((VarRef) expr).var.is(last.var);
     if(var.test(rtrn)) return root;
 

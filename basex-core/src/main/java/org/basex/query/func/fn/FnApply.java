@@ -10,6 +10,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -44,7 +45,7 @@ public class FnApply extends StandardFunc {
     final long ar = checkUp(func, this instanceof UpdateApply, sc).arity(), as = array.arraySize();
     if(ar != as) throw APPLY_X_X.get(info, ar, as);
 
-    final ValueList values = new ValueList(as);
+    final ValueList values = new ValueList(Seq.initialCapacity(as));
     for(final Value value : array.members()) values.add(value);
     return values.finish();
   }

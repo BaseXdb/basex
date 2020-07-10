@@ -47,8 +47,8 @@ public final class TokenBuilder {
    * Constructor with initial array capacity.
    * @param capacity array capacity
    */
-  public TokenBuilder(final int capacity) {
-    chars = new byte[capacity];
+  public TokenBuilder(final long capacity) {
+    chars = new byte[Array.checkCapacity(capacity)];
   }
 
   /**

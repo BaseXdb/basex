@@ -23,8 +23,8 @@ public final class TokenList extends ObjectList<byte[], TokenList> {
    * Constructor with initial capacity.
    * @param capacity array capacity
    */
-  public TokenList(final int capacity) {
-    super(new byte[capacity][]);
+  public TokenList(final long capacity) {
+    super(new byte[Array.checkCapacity(capacity)][]);
   }
 
   /**

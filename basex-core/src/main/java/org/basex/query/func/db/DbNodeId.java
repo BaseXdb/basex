@@ -8,7 +8,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -33,7 +32,7 @@ public class DbNodeId extends StandardFunc {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
-    final LongList list = new LongList(Array.initialCapacity(iter.size()));
+    final LongList list = new LongList(Seq.initialCapacity(iter.size()));
     for(Item item; (item = qc.next(iter)) != null;) list.add(id(toDBNode(item)));
     return IntSeq.get(list.finish());
   }

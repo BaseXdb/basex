@@ -2,6 +2,7 @@ package org.basex.query.util.ft;
 
 import java.util.*;
 
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -22,8 +23,8 @@ public final class FTMatch extends ObjectList<FTStringMatch, FTMatch> {
    * Constructor with initial capacity.
    * @param capacity array capacity
    */
-  public FTMatch(final int capacity) {
-    super(new FTStringMatch[capacity]);
+  public FTMatch(final long capacity) {
+    super(new FTStringMatch[Array.checkCapacity(capacity)]);
   }
 
   /**

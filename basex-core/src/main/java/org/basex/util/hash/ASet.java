@@ -28,11 +28,12 @@ public abstract class ASet {
    * Constructor with initial capacity.
    * @param capacity array capacity (will be resized to a power of two)
    */
-  protected ASet(final int capacity) {
-    int c = 1;
+  protected ASet(final long capacity) {
+    long c = 1;
     while(c < capacity) c <<= 1;
-    buckets = new int[c];
-    next = new int[c];
+    final int s = Array.checkCapacity(c);
+    buckets = new int[s];
+    next = new int[s];
   }
 
   /**

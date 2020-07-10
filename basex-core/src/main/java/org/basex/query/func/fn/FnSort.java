@@ -50,7 +50,7 @@ public final class FnSort extends StandardFunc {
     final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
 
     final long size = value.size();
-    final ValueList values = new ValueList(size);
+    final ValueList values = new ValueList(Seq.initialCapacity(size));
     final Iter iter = value.iter();
     for(Item item; (item = qc.next(iter)) != null;) {
       values.add((key == null ? item : key.invokeValue(qc, info, item)).atomValue(qc, info));

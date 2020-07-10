@@ -1,11 +1,11 @@
 package org.basex.query.util.list;
 
-import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -23,20 +23,11 @@ public final class ItemList extends ObjectList<Item, ItemList> {
   }
 
   /**
-   * Constructor with expected result size.
-   * @param size expected result size (ignored if negative)
-   * @throws QueryException query exception
-   */
-  public ItemList(final long size) throws QueryException {
-    this(Seq.initialCapacity(size));
-  }
-
-  /**
    * Constructor with initial capacity.
    * @param capacity array capacity
    */
-  public ItemList(final int capacity) {
-    super(new Item[capacity]);
+  public ItemList(final long capacity) {
+    super(new Item[Array.checkCapacity(capacity)]);
   }
 
   /**

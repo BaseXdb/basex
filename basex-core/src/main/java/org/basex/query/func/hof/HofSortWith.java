@@ -8,6 +8,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -22,7 +23,7 @@ public final class HofSortWith extends HofFn {
     final Comparator<Item> comp = getComp(1, qc);
     if(value.size() < 2) return value;
 
-    final ItemList items = new ItemList(value.size());
+    final ItemList items = new ItemList(Seq.initialCapacity(value.size()));
     final Iter iter = value.iter();
     for(Item item; (item = qc.next(iter)) != null;) items.add(item);
 

@@ -11,6 +11,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -31,7 +32,7 @@ public final class ArraySort extends StandardFunc {
     }
 
     final long size = array.arraySize();
-    final ValueList values = new ValueList(size);
+    final ValueList values = new ValueList(Seq.initialCapacity(size));
     final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
     for(final Value value : array.members()) {
       values.add((key == null ? value : key.invokeValue(qc, info, value)).atomValue(qc, info));

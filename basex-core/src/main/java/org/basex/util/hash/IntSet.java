@@ -26,7 +26,7 @@ public class IntSet extends ASet {
    * Constructor with initial capacity.
    * @param capacity array capacity (will be resized to a power of two)
    */
-  public IntSet(final int capacity) {
+  public IntSet(final long capacity) {
     super(capacity);
     keys = new int[capacity()];
   }

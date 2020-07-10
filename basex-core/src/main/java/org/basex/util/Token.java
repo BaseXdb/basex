@@ -161,13 +161,13 @@ public final class Token {
    * @return byte array
    */
   public static byte[] token(final String string) {
-    final int l = string.length();
-    if(l == 0) return EMPTY;
-    final byte[] b = new byte[l];
-    for(int i = 0; i < l; ++i) {
-      final char c = string.charAt(i);
+    final int sl = string.length();
+    if(sl == 0) return EMPTY;
+    final byte[] b = new byte[sl];
+    for(int s = 0; s < sl; ++s) {
+      final char c = string.charAt(s);
       if(c > 0x7F) return utf8(string);
-      b[i] = (byte) c;
+      b[s] = (byte) c;
     }
     return b;
   }
@@ -305,10 +305,10 @@ public final class Token {
    */
   public static int[] cps(final byte[] token) {
     int pos = 0;
-    final int len = token.length;
-    final int[] cp = new int[len];
-    for(int i = 0; i < len; i += cl(token, i)) cp[pos++] = cp(token, i);
-    return pos < len ? Arrays.copyOf(cp, pos) : cp;
+    final int tl = token.length;
+    final int[] cp = new int[tl];
+    for(int i = 0; i < tl; i += cl(token, i)) cp[pos++] = cp(token, i);
+    return pos < tl ? Arrays.copyOf(cp, pos) : cp;
   }
 
   /**
@@ -375,22 +375,22 @@ public final class Token {
     int n = integer;
     final boolean m = n < 0;
     if(m) n = -n;
-    int j = numDigits(n);
-    if(m) ++j;
-    final byte[] num = new byte[j];
+    int nl = numDigits(n);
+    if(m) ++nl;
+    final byte[] num = new byte[nl];
 
     // faster division by 10 for values < 81920 (see Integer.getChars)
     while(n > 81919) {
       final int q = n / 10;
-      num[--j] = (byte) (n - (q << 3) - (q << 1) + '0');
+      num[--nl] = (byte) (n - (q << 3) - (q << 1) + '0');
       n = q;
     }
     while(n != 0) {
       final int q = n * 52429 >>> 19;
-      num[--j] = (byte) (n - (q << 3) - (q << 1) + '0');
+      num[--nl] = (byte) (n - (q << 3) - (q << 1) + '0');
       n = q;
     }
-    if(m) num[--j] = '-';
+    if(m) num[--nl] = '-';
     return num;
   }
 
@@ -1058,9 +1058,9 @@ public final class Token {
    * @return resulting token
    */
   public static byte[] concat(final byte[]... tokens) {
-    int s = 0;
-    for(final byte[] token : tokens) s += token.length;
-    final byte[] tmp = new byte[s];
+    int sl = 0;
+    for(final byte[] token : tokens) sl += token.length;
+    final byte[] tmp = new byte[sl];
     int i = 0;
     for(final byte[] token : tokens) {
       final int tl = token.length;
@@ -1117,9 +1117,9 @@ public final class Token {
    * @return normalized token
    */
   public static byte[] normalize(final byte[] token) {
-    final int l = token.length;
-    if(l == 0) return token;
-    final byte[] tmp = new byte[l];
+    final int tl = token.length;
+    if(tl == 0) return token;
+    final byte[] tmp = new byte[tl];
     int c = 0;
     boolean ws1 = true;
     for(final byte b : token) {
@@ -1129,7 +1129,7 @@ public final class Token {
       ws1 = ws2;
     }
     if(c > 0 && ws(tmp[c - 1])) --c;
-    return c == l ? tmp : Arrays.copyOf(tmp, c);
+    return c == tl ? tmp : Arrays.copyOf(tmp, c);
   }
 
   /**
@@ -1301,12 +1301,11 @@ public final class Token {
    */
   public static byte[] hex(final byte[] value, final boolean uc) {
     final int vl = value.length, u = uc ? 0x37 : 0x57;
-    final byte[] data = new byte[vl << 1];
-    for(int v = 0, c = 0; v < vl; v++) {
-      int b = value[v] >> 4 & 0x0F;
-      data[c++] = (byte) (b + (b > 9 ? u : '0'));
-      b = value[v] & 0x0F;
-      data[c++] = (byte) (b + (b > 9 ? u : '0'));
+    final byte[] data = new byte[Array.checkCapacity((long) vl << 1)];
+    for(int v = 0, d = 0; v < vl; v++) {
+      final int a = value[v], b = a >> 4 & 0x0F, c = a & 0x0F;
+      data[d++] = (byte) (b + (b > 9 ? u : '0'));
+      data[d++] = (byte) (c + (c > 9 ? u : '0'));
     }
     return data;
   }

@@ -1,9 +1,8 @@
 package org.basex.query.util.list;
 
-import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
-import org.basex.query.value.seq.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -21,20 +20,11 @@ public final class ValueList extends ObjectList<Value, ValueList> {
   }
 
   /**
-   * Constructor with expected result size.
-   * @param size expected result size (ignored if negative)
-   * @throws QueryException query exception
-   */
-  public ValueList(final long size) throws QueryException {
-    this(Seq.initialCapacity(size));
-  }
-
-  /**
    * Constructor with initial capacity.
    * @param capacity array capacity
    */
-  public ValueList(final int capacity) {
-    super(new Value[capacity]);
+  public ValueList(final long capacity) {
+    super(new Value[Array.checkCapacity(capacity)]);
   }
 
   /**

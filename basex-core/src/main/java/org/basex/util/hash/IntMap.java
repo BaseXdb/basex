@@ -27,7 +27,7 @@ public final class IntMap extends IntSet {
    * Constructor with initial capacity.
    * @param capacity array capacity (will be resized to a power of two)
    */
-  public IntMap(final int capacity) {
+  public IntMap(final long capacity) {
     super(capacity);
     values = new int[capacity()];
     values[0] = Integer.MIN_VALUE;

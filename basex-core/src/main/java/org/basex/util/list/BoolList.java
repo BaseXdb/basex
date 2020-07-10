@@ -25,8 +25,8 @@ public final class BoolList extends ElementList {
    * Constructor with initial capacity.
    * @param capacity array capacity
    */
-  public BoolList(final int capacity) {
-    list = new boolean[capacity];
+  public BoolList(final long capacity) {
+    list = new boolean[Array.checkCapacity(capacity)];
   }
 
   /**

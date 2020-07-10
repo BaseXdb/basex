@@ -25,8 +25,8 @@ public class LongList extends ElementList {
    * Constructor with initial capacity.
    * @param capacity array capacity
    */
-  public LongList(final int capacity) {
-    list = new long[capacity];
+  public LongList(final long capacity) {
+    list = new long[Array.checkCapacity(capacity)];
   }
 
   /**

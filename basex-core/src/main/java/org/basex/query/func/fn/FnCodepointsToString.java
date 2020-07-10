@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -31,7 +32,7 @@ public final class FnCodepointsToString extends StandardFunc {
     if(size == 1) return toStr(toLong(iter.next()), info);
 
     // handle arbitrary input
-    final TokenBuilder tb = new TokenBuilder(Array.initialCapacity(size));
+    final TokenBuilder tb = new TokenBuilder(Seq.initialCapacity(size));
     for(Item item; (item = qc.next(iter)) != null;) {
       tb.add(checkCp(toLong(item), info));
     }

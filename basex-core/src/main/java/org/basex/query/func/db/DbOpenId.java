@@ -9,7 +9,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -24,7 +23,7 @@ public class DbOpenId extends DbAccess {
     final Data data = checkData(qc);
     final Iter iter = exprs[1].atomIter(qc, info);
 
-    final IntList list = new IntList(Array.initialCapacity(iter.size()));
+    final IntList list = new IntList(Seq.initialCapacity(iter.size()));
     for(Item item; (item = qc.next(iter)) != null;) {
       final int id = (int) toLong(item), pre = pre(id, data);
       if(pre < 0 || pre >= data.meta.size) throw DB_RANGE_X_X.get(info, data.meta.name, id);
