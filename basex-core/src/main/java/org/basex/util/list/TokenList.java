@@ -30,10 +30,10 @@ public final class TokenList extends ObjectList<byte[], TokenList> {
   /**
    * Constructor, specifying a resize factor. Smaller values are more memory-saving,
    * while larger will provide better performance.
-   * @param resize resize factor
+   * @param factor resize factor
    */
-  public TokenList(final double resize) {
-    factor = resize;
+  public TokenList(final double factor) {
+    this.factor = factor;
   }
 
   /**

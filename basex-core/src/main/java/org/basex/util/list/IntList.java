@@ -32,11 +32,11 @@ public class IntList extends ElementList {
   /**
    * Constructor, specifying a resize factor. Smaller values are more memory-saving,
    * while larger values will provide better performance.
-   * @param resize resize factor
+   * @param factor resize factor
    */
-  public IntList(final double resize) {
+  public IntList(final double factor) {
     this();
-    factor = resize;
+    this.factor = factor;
   }
 
   /**
