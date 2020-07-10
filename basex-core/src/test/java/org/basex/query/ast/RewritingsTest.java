@@ -1657,4 +1657,12 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_/>[data()] ! base-uri()", "", root(BASE_URI));
     check("<_/>[not(data())] ! base-uri()", "", root(BASE_URI));
   }
+
+  /** Size of type check results. */
+  @Test public void gh1902() {
+    check("function() as xs:string+ { util:replicate(<x/>, 10000000000) }() => count()",
+      "10000000000", root(Int.class));
+    check("function() as xs:double+ { 1 to 100000000000000 }() => count()",
+      "100000000000000", root(Int.class));
+  }
 }

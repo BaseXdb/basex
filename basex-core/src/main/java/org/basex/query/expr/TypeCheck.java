@@ -74,9 +74,8 @@ public class TypeCheck extends Single {
     }
 
     // we can type check immediately
-    if(expr instanceof Value && expr.size() <= CompileContext.MAX_PREEVAL) {
-      return cc.preEval(this);
-    }
+    final long es = expr.size();
+    if(expr instanceof Value && es <= CompileContext.MAX_PREEVAL) return cc.preEval(this);
 
     // check at each call
     if(at.type.instanceOf(st.type) && at.occ.intersect(st.occ) == null)
@@ -86,6 +85,10 @@ public class TypeCheck extends Single {
     if(opt != null) {
       cc.info(OPTTYPE_X_X, st, opt);
       return opt;
+    }
+
+    if(size() == -1 && es != -1 && st.occ == expr.seqType().occ) {
+      exprType.assign(st.type, st.occ, expr.size());
     }
 
     return this;

@@ -195,8 +195,11 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final SeqType dt = declType == null || st.instanceOf(declType) ? st : declType;
     exprType.assign(FuncType.get(anns, dt, params));
 
-    // only evaluate if the closure is empty, so we don't lose variables
-    return global.isEmpty() ? cc.preEval(this) : this;
+    // only evaluate if:
+    // - the closure is empty, so we don't lose variables
+    // - the result size does not exceed a specific limit
+    return global.isEmpty() && expr.size() <= CompileContext.MAX_PREEVAL ?
+      cc.preEval(this) : this;
   }
 
   @Override
