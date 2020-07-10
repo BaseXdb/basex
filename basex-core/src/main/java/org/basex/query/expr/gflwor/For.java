@@ -207,7 +207,7 @@ public final class For extends ForLet {
 
   @Override
   Expr inlineExpr(final CompileContext cc) throws QueryException {
-    return vars.length > 1 || var.checksType() ? null : expr;
+    return empty || vars.length > 1 || var.checksType() ? null : expr;
   }
 
   @Override

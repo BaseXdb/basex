@@ -326,7 +326,7 @@ public final class GFLWOR extends ParseExpr {
           exprs.add(ir.next());
         }
         if(ic.inlineable(exprs.add(rtrn).finish())) {
-          cc.info(QueryText.OPTINLINE_X, lt.var);
+          cc.info(QueryText.OPTINLINE_X, lt);
           inline(ic, iter);
           clauses.remove(lt);
           changing = changed = true;
@@ -592,7 +592,7 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Merge last 'for' or 'let' clause with 'return' clause.
+   * Merge expression of last clause into 'return' clause.
    * @param cc compilation context
    * @return change flag
    * @throws QueryException query exception
@@ -600,89 +600,32 @@ public final class GFLWOR extends ParseExpr {
   private boolean mergeReturn(final CompileContext cc) throws QueryException {
     if(!(clauses.peekLast() instanceof ForLet)) return false;
 
-    final Expr expr = mergeReturn(cc, (ForLet) clauses.peekLast());
-    if(expr == null) return false;
-
     // do not inline variables with scoring, type checks, etc.
-    rtrn = expr;
+    final ForLet last = (ForLet) clauses.peekLast();
+    final Expr root = last.inlineExpr(cc);
+    if(root == null) return false;
+    final Expr old = rtrn;
+
+    if(rtrn instanceof VarRef && ((VarRef) rtrn).var.is(last.var)) {
+      // replace return clause with expression
+      //   for $i in (1, 2) return $i  ->  (1, 2)
+      //   let $c := <a/> return $c
+      rtrn = root;
+    } else if(last instanceof For) {
+      // rewrite for clause to simple map
+      //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
+      // skip expressions with context reference
+      //   <_/>[for $c in (1, 2) return (., $c)]
+      final InlineContext ic = new InlineContext(last.var, new ContextValue(info), cc);
+      if(ic.inlineable(rtrn) && !rtrn.has(Flag.CTX)) {
+        rtrn = SimpleMap.get(cc, info, root, cc.get(root, () -> ic.inline(rtrn)));
+      }
+    }
+    if(old == rtrn) return false;
+
+    cc.info(QueryText.OPTINLINE_X, last);
     clauses.removeLast();
     return true;
-  }
-
-  /**
-   * Merge last 'for' or 'let' clause with 'return' clause.
-   * @param cc compilation context
-   * @param last last clause
-   * @return new return expression or {@code null}
-   * @throws QueryException query exception
-   */
-  private Expr mergeReturn(final CompileContext cc, final ForLet last) throws QueryException {
-    // do not inline variables with scoring, type checks, etc.
-    final Expr root = last.inlineExpr(cc);
-    if(root == null) return null;
-
-    // let $r := random:uuid() return $r  ->  random:uuid()
-    final Predicate<Expr> var = expr -> expr instanceof VarRef && ((VarRef) expr).var.is(last.var);
-    if(var.test(rtrn)) return root;
-
-    // dummy context value... should be changed for filter, simple map, path
-    final InlineContext ic = new InlineContext(last.var, new ContextValue(info), cc);
-    if(!ic.inlineable(rtrn)) return null;
-
-    // inline into filter
-    if(rtrn instanceof Filter) {
-      final Filter filter = (Filter) rtrn;
-      if(var.test(filter.root)) {
-        // for $x in E return $x[. = '']  ->  E ! .[. = '']
-        // for $x in head(E) return $x[1]  ->  E ! .[1]
-        // for $x in E return $x[1]  ->  E ! .[1]
-        final Expr ex = cc.get(root, () ->
-          Filter.get(cc, filter.info, new ContextValue(filter.info).optimize(cc), filter.exprs)
-        );
-        return SimpleMap.get(cc, filter.info, root, ex);
-      }
-    }
-
-    // inline into path
-    final QueryFunction<Expr, Expr> inlineIntoPath = expr -> {
-      if(!(expr instanceof Path)) return null;
-      final Path path = (Path) expr;
-      if(!var.test(path.root)) return null;
-
-      // let $a := //a return $a/descendant::sub  ->  //a ! descendant::sub
-      // for $a in //a return $a/sub  ->  //a ! sub
-      // for $a in head(//a) return $a/..  ->  head(//a) ! ..
-      // for $a in reverse(//a) return $a/sub  ->  reverse(//a) ! sub
-      final Expr ex = cc.get(root, () -> Path.get(cc, path.info, null, path.steps));
-      return SimpleMap.get(cc, path.info, root, ex);
-    };
-    final Expr path = inlineIntoPath.apply(rtrn);
-    if(path != null) return path;
-
-    // inline into simple map
-    if(rtrn instanceof SimpleMap) {
-      final SimpleMap map = (SimpleMap) rtrn;
-      final Expr expr = var.test(map.exprs[0]) ? root : inlineIntoPath.apply(map.exprs[0]);
-      if(expr != null) {
-        // for $x in E return $x ! 123  ->  E ! 123
-        // for $x in E return $x/a ! 123  ->  E/a ! 123
-        map.exprs[0] = expr;
-        return map.optimize(cc);
-      }
-    }
-
-    // for clause: rewrite to simple map
-    if(last instanceof For && last.size() == 1 && !rtrn.has(Flag.CTX)) {
-      // rewrite
-      //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
-      // do not rewrite
-      //   for $c allowing empty in () return count($c)
-      //   <_/>[for $c in (1, 2) return (., $c)]
-      final Expr ex = cc.get(root, () -> ic.inline(rtrn));
-      return SimpleMap.get(cc, info, root, ex);
-    }
-
-    return null;
   }
 
   /**

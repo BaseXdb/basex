@@ -38,23 +38,21 @@ public final class InlineContext {
   }
 
   /**
-   * Checks if the expression can be inlined.
-   * @param targets target expressions in which the expression will be inlined
+   * Checks if inlining into the specified expressions is possible.
+   * @param targets target expressions
    * @return result of check
    */
   public boolean inlineable(final Expr... targets) {
-    // count number of uses
+    // skip early if no inlining is required
     final long[] minMax = { 1, 1 };
     uses = VarUsage.NEVER;
     for(final Expr target : targets) {
       uses = uses.plus(target.count(var).times(minMax[1]));
       if(target instanceof Clause) ((Clause) target).calcSize(minMax);
     }
-
-    // no uses: no inlining required
     if(uses == VarUsage.NEVER) return true;
 
-    // expensive expressions should be evaluated at most once
+    // do not inline expensive expressions that are referenced more than once
     if(uses == VarUsage.MORE_THAN_ONCE && !(
       expr instanceof Value ||
       expr instanceof VarRef ||
@@ -64,7 +62,7 @@ public final class InlineContext {
       return false;
     };
 
-    // check if inlining is possible
+    // check if expression can be inlined into the specified target expressions
     for(final Expr target : targets) {
       if(!target.inlineable(this)) return false;
     }
