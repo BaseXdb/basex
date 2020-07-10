@@ -169,7 +169,7 @@ public final class IndexInfo {
 
       // create expression for index access
       final ValueAccess va = new ValueAccess(ii, tokens, type, test, db);
-      if(counts == 1) va.exprType.assign(Occ.ZERO_ONE);
+      va.size(counts);
       root = va;
 
     } else {
