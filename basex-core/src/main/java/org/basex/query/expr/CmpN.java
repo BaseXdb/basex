@@ -105,9 +105,8 @@ public final class CmpN extends Cmp {
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     if(st1.oneOrMore() && st2.oneOrMore()) exprType.assign(Occ.ONE);
 
-    Expr expr = emptyExpr();
-    if(expr == this && allAreValues(false)) expr = value(cc.qc);
-    return cc.replaceWith(this, expr);
+    final Expr expr = emptyExpr();
+    return expr == this && allAreValues(false) ? cc.preEval(this) : cc.replaceWith(this, expr);
   }
 
   @Override

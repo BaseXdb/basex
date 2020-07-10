@@ -179,7 +179,7 @@ public class FnSubsequence extends StandardFunc {
       if(sr == EMPTY) return Empty.VALUE;
       // all values?
       if(sr == ALL) return expr;
-      // pre-evaluate value
+      // ignore standard limitation for large values to speed up evaluation of result
       if(expr instanceof Value) return value(cc.qc);
 
       // check if result size is statically known

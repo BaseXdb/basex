@@ -57,9 +57,6 @@ public final class UtilItem extends StandardFunc {
       // pre-evaluate values
       final long size = expr.size();
       if(size != -1) {
-        if(expr instanceof Value) {
-          return p < size ? ((Value) expr).itemAt(p) : Empty.VALUE;
-        }
         if(p + 1 == size) return cc.function(Function._UTIL_LAST, info, expr);
         if(p + 1 > size) return Empty.VALUE;
         if(Function.REVERSE.is(expr))

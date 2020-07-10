@@ -79,7 +79,7 @@ public final class FnRemove extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // ignore standard limitation for large values
+    // ignore standard limitation for large values to speed up evaluation of result
     if(allAreValues(false)) return value(cc.qc);
 
     final Expr expr = exprs[0], pos = exprs[1];

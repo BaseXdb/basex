@@ -179,27 +179,25 @@ public final class CmpV extends Cmp {
 
     Expr expr = emptyExpr();
     if(expr == this) {
-      if(allAreValues(false)) {
-        expr = value(cc.qc);
-      } else {
-        // check if operands will always yield a single item
-        final Expr expr1 = exprs[0], expr2 = exprs[1];
-        final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-        if(st1.oneOrMore() && !st1.mayBeArray() && st2.oneOrMore() && !st2.mayBeArray()) {
-          exprType.assign(Occ.ONE);
+      if(allAreValues(false)) return cc.preEval(this);
 
-          // no type check: rewrite to general expression (faster evaluation)
-          final Type type1 = st1.type, type2 = st2.type;
-          if(st1.one() && st2.one() && (
-            type1 == type2 && !AtomType.AAT.instanceOf(type1) &&
-              (type1.isSortable() || opV != OpV.EQ && opV != OpV.NE) ||
-            type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
-            type1 == AtomType.QNM && type2 == AtomType.QNM ||
-            type1.instanceOf(AtomType.NUM) && type2.instanceOf(AtomType.NUM) ||
-            type1.instanceOf(AtomType.DUR) && type2.instanceOf(AtomType.DUR))
-          ) {
-            expr = new CmpG(expr1, expr2, OpG.get(opV), coll, sc, info).optimize(cc);
-          }
+      // check if operands will always yield a single item
+      final Expr expr1 = exprs[0], expr2 = exprs[1];
+      final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
+      if(st1.oneOrMore() && !st1.mayBeArray() && st2.oneOrMore() && !st2.mayBeArray()) {
+        exprType.assign(Occ.ONE);
+
+        // no type check: rewrite to general expression (faster evaluation)
+        final Type type1 = st1.type, type2 = st2.type;
+        if(st1.one() && st2.one() && (
+          type1 == type2 && !AtomType.AAT.instanceOf(type1) &&
+            (type1.isSortable() || opV != OpV.EQ && opV != OpV.NE) ||
+          type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
+          type1 == AtomType.QNM && type2 == AtomType.QNM ||
+          type1.instanceOf(AtomType.NUM) && type2.instanceOf(AtomType.NUM) ||
+          type1.instanceOf(AtomType.DUR) && type2.instanceOf(AtomType.DUR))
+        ) {
+          expr = new CmpG(expr1, expr2, OpG.get(opV), coll, sc, info).optimize(cc);
         }
       }
     }

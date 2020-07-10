@@ -205,6 +205,7 @@ public class CmpG extends Cmp {
       if(allAreValues(false)) {
         expr = cc.preEval(expr);
         if(hash != null) cc.qc.threads.get(hash).remove();
+        return expr;
       }
     }
 

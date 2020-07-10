@@ -72,7 +72,7 @@ public final class UtilInit extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // ignore limitation for large values
+    // ignore standard limitation for large values to speed up evaluation of result
     final Expr expr = exprs[0];
     if(expr instanceof Value) return value(cc.qc);
 

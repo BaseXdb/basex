@@ -208,7 +208,7 @@ public final class CompileContext {
   }
 
   /**
-   * Adds an optimization info for pre-evaluating the specified expression to an empty sequence.
+   * Replaces the specified expression with an empty sequence.
    * @param expr original expression
    * @return optimized expression
    */

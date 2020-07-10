@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -36,11 +35,8 @@ public final class UtilLast extends StandardFunc {
     final SeqType st = expr.seqType();
     if(st.zeroOrOne()) return expr;
 
-    // ignore standard limitation for large values
-    final long size = expr.size();
-    if(expr instanceof Value) return ((Value) expr).itemAt(size - 1);
-
     // rewrite nested function calls
+    final long size = expr.size();
     if(Function.TAIL.is(expr) && size > 1)
       return cc.function(Function._UTIL_LAST, info, args(expr));
     if(Function._UTIL_INIT.is(expr) && size > 0)

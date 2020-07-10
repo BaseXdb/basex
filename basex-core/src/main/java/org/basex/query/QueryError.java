@@ -837,6 +837,8 @@ public enum QueryError {
   NODOC_X(XPDY, 50, "Value has no document node: %."),
   /** Error code. */
   NOTREAT_X_X_X(XPDY, 50, "Cannot treat % as %: %."),
+  /** Error code. */
+  ARRAY_X_X(XPDY, 130, "Maximum size exceeded (%): %."),
 
   /** Error code. */
   QUERYEMPTY(XPST, 3, "Empty query."),

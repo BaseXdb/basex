@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.file.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -28,9 +27,6 @@ public final class FnHead extends StandardFunc {
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
     if(st.zeroOrOne()) return expr;
-
-    // check for large values and fn:reverse function
-    if(expr instanceof Value) return ((Value) expr).itemAt(0);
 
     // rewrite nested function calls
     final long size = expr.size();

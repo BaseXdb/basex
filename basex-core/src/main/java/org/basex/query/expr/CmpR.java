@@ -117,10 +117,10 @@ public final class CmpR extends Single {
     final SeqType st = expr.seqType();
     single = st.zeroOrOne() && !st.mayBeArray();
 
+    if(expr instanceof Value) return cc.preEval(this);
+
     Expr ex = this;
-    if(expr instanceof Value) {
-      ex = item(cc.qc, info);
-    } else if(Function.POSITION.is(expr)) {
+    if(Function.POSITION.is(expr)) {
       final long mn = Math.max((long) Math.ceil(min), 1), mx = (long) Math.floor(max);
       ex = ItrPos.get(RangeSeq.get(mn, mx - mn + 1, true), OpV.EQ, info);
     }

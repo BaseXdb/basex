@@ -81,13 +81,13 @@ public abstract class StandardFunc extends Arr {
     simplifyArgs(cc);
 
     final Expr expr = opt(cc);
-    return cc.replaceWith(this,
+    return
       // return optimized expression
-      expr != this ? expr :
+      expr != this ? cc.replaceWith(this, expr) :
       // pre-evaluate function
-      allAreValues(definition.seqType.occ.max > 1) && isSimple() ? value(cc.qc) :
+      allAreValues(definition.seqType.occ.max > 1) && isSimple() ? cc.preEval(this) :
       // return original function
-      this);
+      this;
   }
 
   /**

@@ -48,9 +48,9 @@ public final class Arith extends Arr {
 
     Expr expr = emptyExpr();
     if(expr == this) {
-      if(allAreValues(false)) {
-        expr = value(cc.qc);
-      } else if(nums && noarray && st1.one() && st2.one()) {
+      if(allAreValues(false)) return cc.preEval(this);
+
+      if(nums && noarray && st1.one() && st2.one()) {
         // example: number($a) + 0  ->  number($a)
         final Expr ex = calc.optimize(expr1, expr2);
         if(ex != null && ex.seqType().type.eq(type)) expr = ex;

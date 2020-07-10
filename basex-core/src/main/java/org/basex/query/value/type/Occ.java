@@ -10,13 +10,13 @@ public enum Occ {
   /** Zero.         */ ZERO(0, 0, ""),
   /** Zero or one.  */ ZERO_ONE(0, 1, "?"),
   /** Exactly one.  */ ONE(1, 1, ""),
-  /** One or more.  */ ONE_MORE(1, Integer.MAX_VALUE, "+"),
-  /** Zero or more. */ ZERO_MORE(0, Integer.MAX_VALUE, "*");
+  /** One or more.  */ ONE_MORE(1, Long.MAX_VALUE, "+"),
+  /** Zero or more. */ ZERO_MORE(0, Long.MAX_VALUE, "*");
 
   /** Minimal result size ({@code 0} or more). */
-  public final int min;
+  public final long min;
   /** Maximal result size (equal to {@link #min} or more). */
-  public final int max;
+  public final long max;
   /** String representation. */
   private final String string;
 
@@ -26,7 +26,7 @@ public enum Occ {
    * @param max maximal result size
    * @param string string representation
    */
-  Occ(final int min, final int max, final String string) {
+  Occ(final long min, final long max, final String string) {
     this.min = min;
     this.max = max;
     this.string = string;
@@ -49,7 +49,7 @@ public enum Occ {
    * @return intersection or {@code null}
    */
   public Occ intersect(final Occ other) {
-    final int mn = Math.max(min, other.min), mx = Math.min(max, other.max);
+    final long mn = Math.max(min, other.min), mx = Math.min(max, other.max);
     return mx < mn ? null : mx == 0 ? ZERO : mn == mx ? ONE : mx == 1 ? ZERO_ONE :
       mn == 0 ? ZERO_MORE : ONE_MORE;
   }
@@ -60,7 +60,7 @@ public enum Occ {
    * @return union
    */
   public Occ union(final Occ other) {
-    final int mn = Math.min(min, other.min), mx = Math.max(max, other.max);
+    final long mn = Math.min(min, other.min), mx = Math.max(max, other.max);
     return mx == 0 ? ZERO : mn == mx ? ONE : mx == 1 ? ZERO_ONE : mn == 0 ? ZERO_MORE : ONE_MORE;
   }
 
@@ -70,7 +70,7 @@ public enum Occ {
    * @return union
    */
   public Occ add(final Occ other) {
-    final long mn = (long) min + other.min, mx = (long) max + other.max;
+    final long mn = min + other.min, mx = max + other.max;
     return mx == 0 ? ZERO : mx == 1 ? mn == 0 ? ZERO_ONE : ONE : mn == 0 ? ZERO_MORE : ONE_MORE;
   }
 

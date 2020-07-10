@@ -36,16 +36,14 @@ public final class Range extends Arr {
 
     Expr expr = emptyExpr();
     if(expr == this) {
-      if(allAreValues(false)) {
-        expr = value(cc.qc);
-      } else {
-        final Expr expr1 = exprs[0], expr2 = exprs[1];
-        if(expr1.equals(expr2)) {
-          if(expr1.seqType().instanceOf(SeqType.ITR_O)) {
-            expr = expr1;
-          } else {
-            exprType.assign(Occ.ONE);
-          }
+      if(allAreValues(false)) return cc.preEval(this);
+
+      final Expr expr1 = exprs[0], expr2 = exprs[1];
+      if(expr1.equals(expr2)) {
+        if(expr1.seqType().instanceOf(SeqType.ITR_O)) {
+          expr = expr1;
+        } else {
+          exprType.assign(Occ.ONE);
         }
       }
     }

@@ -115,6 +115,7 @@ public final class FnSort extends StandardFunc {
     final SeqType st1 = expr1.seqType();
     if(st1.zero()) return expr1;
 
+    // enforce pre-evaluation as remaining arguments may not be values
     if(expr1 instanceof Value) {
       final Value value = quickValue((Value) expr1);
       if(value != null) return value;
