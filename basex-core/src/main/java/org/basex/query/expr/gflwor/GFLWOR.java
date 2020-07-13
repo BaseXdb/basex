@@ -107,7 +107,7 @@ public final class GFLWOR extends ParseExpr {
     // apply all optimizations in a row until nothing changes anymore
     while(flattenReturn(cc) | flattenFor(cc) | unnestFLWR(cc) | forToLet(cc) | inlineLets(cc) |
         slideLetsOut(cc) | unusedVars(cc) | cleanDeadVars() | optimizeWhere(cc) | optimizePos(cc) |
-        unnestLets(cc) | mergeReturn(cc) | ifToWhere(cc));
+        unnestLets(cc) | ifToWhere(cc) | mergeReturn(cc));
 
     mergeWheres();
 
