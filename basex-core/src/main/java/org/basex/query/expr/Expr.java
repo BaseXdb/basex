@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
@@ -210,14 +211,17 @@ public abstract class Expr extends ExprInfo {
   /**
    * Checks if inlining is possible.
    * This function is called by {@link InlineContext#inlineable} and:
+   * {@link CNode#inlineable} returns false if the new expression construct new nodes.
    *
-   * The following tests might return false if the variable occurs in a nested context:
+   * The following tests might reject inlining if the expression is a context reference:
    * <ul>
-   *   <li>{@link Preds#inlineable} if the variable is used in a predicate</li>
-   *   <li>{@link Path#inlineable} if the variable occurs within the path</li>
-   *   <li>{@link SimpleMap#inlineable} if the variable occurs in a right-hand expression</li>
-   *   <li>{@link TransformWith#inlineable} if the variable occurs in an updating expression</li>
+   *   <li>{@link Preds#inlineable}</li>
+   *   <li>{@link Path#inlineable}</li>
+   *   <li>{@link SimpleMap#inlineable}</li>
+   *   <li>{@link StaticJavaCall#inlineable}</li>
+   *   <li>{@link TransformWith#inlineable}</li>
    * </ul>
+   *
    * @param ic inlining context
    * @return result of check
    */
@@ -225,6 +229,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks how often a variable or context reference is used in this expression.
+   *
    * This function is called by:
    * <ul>
    *   <li> {@link Closure#optimize}</li>
@@ -235,6 +240,7 @@ public abstract class Expr extends ExprInfo {
    *   <li> {@link SimpleMap#optimize}</li>
    *   <li> {@link TypeswitchGroup#optimize}</li>
    * </ul>
+   *
    * @param var variable ({@link Var} reference) or context ({@code null}) to inline
    * @return number of usages, see {@link VarUsage}
    */
@@ -242,7 +248,8 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Inlines an expression into this one, replacing all variable or context references.
-   * This function is called by {@link InlineContext#inline(Expr)}.
+   * This function is called by {@link InlineContext#inline(Expr)} (see invocations of this
+   * functions for further inlinings).
    *
    * The variable reference is replaced in:
    * <ul>
@@ -254,7 +261,6 @@ public abstract class Expr extends ExprInfo {
    *   <li> {@link ContextFn#inline}</li>
    *   <li> {@link ContextValue#inline}</li>
    *   <li> {@link Lookup#inline}</li>
-   *   <li> {@link StaticJavaCall#inline}</li>
    * </ul>
    *
    * @param ic inlining context

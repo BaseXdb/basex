@@ -39,6 +39,7 @@ public final class InlineContext {
 
   /**
    * Checks if inlining into the specified expressions is possible.
+   * See {@link Expr#inlineable} for further details.
    * @param targets target expressions
    * @return result of check
    */
@@ -71,6 +72,7 @@ public final class InlineContext {
 
   /**
    * Inlines an expression into the specified target expression.
+   * See {@link Expr#inline} for further details.
    * @param target expression in which the expression will be inlined
    * @return optimized or original expression
    * @throws QueryException query exception

@@ -117,7 +117,9 @@ public final class Catch extends Single {
 
     Expr ex = expr;
     int v = 0;
-    for(final Value value : values(qe)) ex = new InlineContext(vars[v++], value, cc).inline(ex);
+    for(final Value value : values(qe)) {
+      ex = new InlineContext(vars[v++], value, cc).inline(ex);
+    }
     return ex;
   }
 
