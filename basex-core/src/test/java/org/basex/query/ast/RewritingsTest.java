@@ -1124,7 +1124,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[empty(b)][empty(c)]", "<a/>", count(EMPTY, 1), count(SingleIterPath.class, 1));
     check("<a/>[empty((b, c))]", "<a/>", count(SingleIterPath.class, 1));
     check("for $a in (<b/>, <c/>) return <a/>[empty(($a[. = 'a'], $a[. = 'b']))]", "<a/>\n<a/>",
-        root(DualMap.class), empty(IterFilter.class));
+        root(DualMap.class), exists(NOT), empty(If.class));
 
     // no rewritings
     query("for $a in 1 to 2 return <a/>[empty(($a[. = 1], $a[. = 1]))]", "<a/>");

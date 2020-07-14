@@ -208,7 +208,7 @@ public final class QueryString {
    * @return string
    */
   public static byte[] toValue(final byte[] value) {
-    return Serializer.value(value, false, true);
+    return Serializer.value(value, 0, true);
   }
 
   /**
@@ -217,6 +217,6 @@ public final class QueryString {
    * @return token
    */
   public static byte[] toQuoted(final byte[] value) {
-    return Serializer.value(value, true, true);
+    return Serializer.value(value, '"', true);
   }
 }

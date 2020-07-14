@@ -139,7 +139,7 @@ public final class NameTest extends Test {
     // add URI part
     final byte[] prefix = qname.prefix(), uri = qname.uri();
     if(part == NamePart.LOCAL && !pi) {
-      tb.add("*:");
+      if(!(full && type == NodeType.ATT)) tb.add("*:");
     } else if(prefix.length > 0) {
       tb.add(prefix).add(':');
     } else if(uri.length != 0) {

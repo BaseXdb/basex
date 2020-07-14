@@ -384,9 +384,10 @@ public abstract class Step extends Preds {
     }
     if(tb.isEmpty()) {
       final java.util.function.Function<Test, TokenBuilder> add = t -> {
-        if(axis == Axis.ATTRIBUTE && t instanceof NameTest) tb.add('@');
-        else if(axis != Axis.CHILD) tb.add(axis).add(COLS);
-        return tb.add(t.toString(false));
+        if(axis == Axis.ATTRIBUTE && t instanceof NameTest)
+          return tb.add('@').add(t.toString(false));
+        if(axis != Axis.CHILD) tb.add(axis).add(COLS);
+        return tb.add(t.toString(test.type == NodeType.ATT));
       };
       if(test instanceof UnionTest) {
         tb.add('(');
