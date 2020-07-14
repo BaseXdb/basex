@@ -604,13 +604,13 @@ public final class GFLWOR extends ParseExpr {
     final ForLet last = (ForLet) clauses.peekLast();
     final Expr root = last.inlineExpr(cc);
     if(root == null) return false;
-    final Expr old = rtrn;
+    Expr expr = null;
 
     if(rtrn instanceof VarRef && ((VarRef) rtrn).var.is(last.var)) {
       // replace return clause with expression
       //   for $i in (1, 2) return $i  ->  (1, 2)
       //   let $c := <a/> return $c
-      rtrn = root;
+      expr = root;
     } else if(last instanceof For) {
       // rewrite for clause to simple map
       //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
@@ -618,13 +618,14 @@ public final class GFLWOR extends ParseExpr {
       //   <_/>[for $c in (1, 2) return (., $c)]
       final InlineContext ic = new InlineContext(last.var, new ContextValue(info), cc);
       if(ic.inlineable(rtrn) && !rtrn.has(Flag.CTX)) {
-        rtrn = SimpleMap.get(cc, info, root, cc.get(root, () -> ic.inline(rtrn)));
+        expr = SimpleMap.get(cc, info, root, cc.get(root, () -> ic.inline(rtrn)));
       }
     }
-    if(old == rtrn) return false;
+    if(expr == null) return false;
 
     cc.info(QueryText.OPTINLINE_X, last);
     clauses.removeLast();
+    rtrn = expr;
     return true;
   }
 
