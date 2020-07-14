@@ -1,3 +1,54 @@
+VERSION 9.4 (July 14, 2020) --------------------------------------------
+
+ WEB APPLICATIONS
+ - DBA: support for millions of log entries
+ - LOGTRACE option: write trace output to logs or STDERR
+ - rest:init: Full or partial initialization of RESTXQ cache
+ - basexhttp: register job services
+ 
+ GUI
+ - result view: show number of results and result size
+ - Shift F4-F7: toggle search options (case, regeex, ..)
+ - Ctrl-Shift-B: jump to matching bracket
+ 
+ XQUERY LOCKING
+ - single lock option for reading and updating queries
+ - Java bindings: annotation added for updating functions
+ 
+ XQUERY FUNCTIONS
+ - convenience functions: json:doc, csv:doc, html:doc
+ - element names: convert:encode-key, convert:decode-key
+ - jobs:eval: option added for writing log entries
+ - session module: only create new sessions if required
+ 
+ XQUERY PERFORMANCE
+ - boolean comparisons: flatten nested expressions
+ - boolean expressions: merge conjunctions
+ - comparisons: simplify operands with if expression
+ - database functions: always open at compile time
+ - databases: propagate to more expressions at compile time
+ - filters: inline context for single items
+ - filters: rewrite to simple maps
+ - FLWOR: inline where clauses into let clauses
+ - FLWOR: merge last with return clause, rewrite to simple map
+ - FLWOR: rewrite "return if ..." to "where ... return"
+ - fn:for-each, fn:filter: rewrite to FLWORs and filters
+ - if expression, EBV tests: simplify boolean tests
+ - lists, sets, logical expressions: flatten expressions
+ - lists: rewrite to union expressions
+ - logical expressions: apply more boolean algebra rules
+ - paths: remove redundant predicates
+ - predicates with name functions: rewrite to name tests
+ - predicates: merge expressions, discard redundant tests
+ - predicates: remove of superfluous and redundant tests
+ - set expressions: merge operands
+ - simple map: inline cast expressions
+ - simple maps: faster evaluation
+ - simple maps: merge operands
+ - simple maps: rewrite to paths, optimize for index access
+ - switch: rewrite to if expression
+ - types: skip redundant checks, promotions  and conversions
+
 VERSION 9.3.3 (May 15, 2020) -------------------------------------------
 
  - Minor bug fixes, performance tweaks, new query optimizations
