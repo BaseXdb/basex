@@ -1665,4 +1665,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("function() as xs:double+ { 1 to 100000000000000 }() => count()",
       "100000000000000", root(Int.class));
   }
+
+  /** Inlining of simple map operands. */
+  @Test public void gh1905() {
+    check("<a>b</a>/self::a ! string() ! element xml { . }", "<xml>b</xml>");
+    check("<a>b</a>/self::a ! string() ! string() ! element xml { . }", "<xml>b</xml>");
+    check("<a>b</a>/self::a ! string() ! string() ! string() ! element xml { . }", "<xml>b</xml>");
+  }
 }

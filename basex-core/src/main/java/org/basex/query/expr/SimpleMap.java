@@ -133,17 +133,8 @@ public abstract class SimpleMap extends Arr {
     boolean pushed = false;
     for(int n = 1; n < el; n++) {
       final Expr expr = exprs[e], next = exprs[n];
-      if(e > 0) {
-        if(pushed) {
-          cc.updateFocus(expr);
-        } else {
-          cc.pushFocus(expr);
-          pushed = true;
-        }
-      }
-
-      final long es = expr.size();
       ex = null;
+
       if(next instanceof Filter) {
         final Filter filter = (Filter) next;
         if(filter.root instanceof ContextValue && !filter.mayBePositional()) {
@@ -153,9 +144,10 @@ public abstract class SimpleMap extends Arr {
         }
       }
 
-      if(ex == null && es != -1 && !expr.has(Flag.NDT) && !next.has(Flag.POS)) {
+      if(ex == null && !expr.has(Flag.NDT) && !next.has(Flag.POS)) {
         // check if deterministic expressions with known result size can be removed
         // expression size is never 0 (empty expressions have no followers, see above)
+        final long es = expr.size();
         if(es == 1) {
           final InlineContext ic = new InlineContext(null, expr, cc);
           if(ic.inlineable(next)) {
@@ -179,7 +171,7 @@ public abstract class SimpleMap extends Arr {
               ex = cc.error(qe, next);
             }
           }
-        } else if(!next.has(Flag.CTX)) {
+        } else if(es != -1 && !next.has(Flag.CTX)) {
           // merge expressions if next expression does not rely on the context
           if(next instanceof Value) {
             // (1 to 2) ! 3  ->  (3, 3)
@@ -221,6 +213,15 @@ public abstract class SimpleMap extends Arr {
       } else if(!(next instanceof ContextValue)) {
         // context item expression can be ignored
         exprs[++e] = next;
+      }
+
+      if(e > 0) {
+        if(pushed) {
+          cc.updateFocus(exprs[e - 1]);
+        } else {
+          cc.pushFocus(exprs[e - 1]);
+          pushed = true;
+        }
       }
     }
     if(pushed) cc.removeFocus();
