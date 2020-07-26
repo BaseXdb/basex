@@ -1672,4 +1672,27 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a>b</a>/self::a ! string() ! string() ! element xml { . }", "<xml>b</xml>");
     check("<a>b</a>/self::a ! string() ! string() ! string() ! element xml { . }", "<xml>b</xml>");
   }
+
+  /** Type check, refine occurrence indicator. */
+  @Test public void gh1906() {
+    check("function() as xs:string* { <_/> }() instance of xs:string*", true, root(Bln.class));
+    check("function() as xs:string* { <_/> }() instance of xs:string+", true, root(Bln.class));
+    check("function() as xs:string* { <_/> }() instance of xs:string?", true, root(Bln.class));
+    check("function() as xs:string* { <_/> }() instance of xs:string ", true, root(Bln.class));
+
+    check("function() as xs:string+ { <_/> }() instance of xs:string*", true, root(Bln.class));
+    check("function() as xs:string+ { <_/> }() instance of xs:string+", true, root(Bln.class));
+    check("function() as xs:string+ { <_/> }() instance of xs:string?", true, root(Bln.class));
+    check("function() as xs:string+ { <_/> }() instance of xs:string ", true, root(Bln.class));
+
+    check("function() as xs:string? { <_/> }() instance of xs:string*", true, root(Bln.class));
+    check("function() as xs:string? { <_/> }() instance of xs:string+", true, root(Bln.class));
+    check("function() as xs:string? { <_/> }() instance of xs:string?", true, root(Bln.class));
+    check("function() as xs:string? { <_/> }() instance of xs:string ", true, root(Bln.class));
+
+    check("function() as xs:string  { <_/> }() instance of xs:string*", true, root(Bln.class));
+    check("function() as xs:string  { <_/> }() instance of xs:string+", true, root(Bln.class));
+    check("function() as xs:string  { <_/> }() instance of xs:string?", true, root(Bln.class));
+    check("function() as xs:string  { <_/> }() instance of xs:string ", true, root(Bln.class));
+  }
 }

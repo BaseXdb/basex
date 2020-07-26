@@ -187,7 +187,7 @@ public final class SeqType {
   /** Occurrence indicator. */
   public final Occ occ;
   /** Kind test (can be {@code null}). */
-  private final Test test;
+  public final Test test;
 
   /**
    * Private constructor.

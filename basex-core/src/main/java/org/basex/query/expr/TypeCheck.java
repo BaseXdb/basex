@@ -73,22 +73,25 @@ public class TypeCheck extends Single {
       return cc.replaceWith(this, ((FuncItem) expr).coerceTo(ft, cc.qc, info, true));
     }
 
-    // we can type check immediately
+    // pre-evaluate type check
     final long es = expr.size();
     if(expr instanceof Value && es <= CompileContext.MAX_PREEVAL) return cc.preEval(this);
 
-    // check at each call
-    if(at.type.instanceOf(st.type) && at.occ.intersect(st.occ) == null)
-      throw typeError(expr, st, null, info, error());
-
+    // push type check inside expression
     final Expr opt = expr.typeCheck(this, cc);
     if(opt != null) {
       cc.info(OPTTYPE_X_X, st, opt);
       return opt;
     }
 
-    if(size() == -1 && es != -1 && st.occ == expr.seqType().occ) {
-      exprType.assign(st.type, st.occ, expr.size());
+    // refine occurrence indicator and result size
+    final Occ occ = at.occ.intersect(st.occ);
+    if(occ != null) {
+      // preserve kind test
+      if(st.test == null) exprType.assign(st.type, occ, expr.size());
+    } else if(st.type instanceof AtomType && !at.mayBeArray()) {
+      // report odd occurrence indicator
+      throw typeError(expr, st, null, info, error());
     }
 
     return this;
