@@ -26,6 +26,8 @@ public final class Language implements Comparable<Language> {
   static final HashMap<String, Language> ALL = new HashMap<>();
   /** Available languages, indexed by their display. */
   private static final HashMap<String, Language> DISP = new HashMap<>();
+  /** Locale. */
+  private final Locale locale;
 
   static {
     for(final Locale l : Locale.getAvailableLocales()) {
@@ -33,8 +35,6 @@ public final class Language implements Comparable<Language> {
       DISP.put(l.getDisplayLanguage(Locale.ENGLISH), new Language(l));
     }
   }
-  /** Locale. */
-  private final Locale locale;
 
   /**
    * Private Constructor.

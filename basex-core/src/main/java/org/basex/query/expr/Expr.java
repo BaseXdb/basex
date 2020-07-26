@@ -452,6 +452,7 @@ public abstract class Expr extends ExprInfo {
   protected Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
     return null;
   }
+
   /**
    * {@inheritDoc}
    * <div>
