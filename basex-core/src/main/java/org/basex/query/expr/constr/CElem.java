@@ -216,7 +216,7 @@ public final class CElem extends CName {
               !(exprs[f] instanceof Str);
           }
           if(constr) {
-            qs.token("{").tokens(Arrays.copyOfRange(exprs, e, el), SEP).token("}");
+            qs.token('{').tokens(Arrays.copyOfRange(exprs, e, el), SEP).token("}");
           } else {
             for(int f = e; f < el; f++) {
               if(exprs[f] instanceof Str) {
@@ -226,7 +226,7 @@ public final class CElem extends CName {
               }
             }
           }
-          qs.token("</").token(nm).token('>');
+          qs.token('<').token('/').token(nm).token('>');
           return;
         }
       }
