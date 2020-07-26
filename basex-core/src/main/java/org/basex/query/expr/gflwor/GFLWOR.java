@@ -874,9 +874,9 @@ public final class GFLWOR extends ParseExpr {
     while(iter.hasNext()) {
       final Clause clause = iter.next();
       try {
-        final Clause cl = (Clause) ic.inline(clause);
-        if(cl != clause) {
-          iter.set(cl);
+        final Expr inlined = ic.inlineOrNull(clause);
+        if(inlined != null) {
+          iter.set((Clause) inlined);
           changed = true;
         }
       } catch(final QueryException qe) {
@@ -886,8 +886,8 @@ public final class GFLWOR extends ParseExpr {
     }
 
     try {
-      final Expr inlined = ic.inline(rtrn);
-      if(rtrn != inlined) {
+      final Expr inlined = ic.inlineOrNull(rtrn);
+      if(inlined != null) {
         rtrn = inlined;
         changed = true;
       }

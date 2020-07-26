@@ -78,8 +78,20 @@ public final class InlineContext {
    * @throws QueryException query exception
    */
   public Expr inline(final Expr target) throws QueryException {
-    final Expr inlined = uses == VarUsage.NEVER ? target : target.inline(this);
+    final Expr inlined = inlineOrNull(target);
     return inlined != null ? inlined : target;
+  }
+
+  /**
+   * Inlines an expression into the specified target expression,
+   * or returns {@code null} if no inlining is required.
+   * See {@link Expr#inline} for further details.
+   * @param target expression in which the expression will be inlined
+   * @return optimized expression or {@code null}
+   * @throws QueryException query exception
+   */
+  public Expr inlineOrNull(final Expr target) throws QueryException {
+    return uses == VarUsage.NEVER ? null : target.inline(this);
   }
 
   /**
