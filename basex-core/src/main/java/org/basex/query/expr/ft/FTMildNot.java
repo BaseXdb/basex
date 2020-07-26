@@ -99,7 +99,7 @@ public final class FTMildNot extends FTExpr {
 
   @Override
   public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new FTMildNot(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm));
+    return copyType(new FTMildNot(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
   }
 
   @Override

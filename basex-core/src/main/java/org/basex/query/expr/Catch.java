@@ -90,7 +90,7 @@ public final class Catch extends Single {
     final int val = vars.length;
     for(int v = 0; v < val; v++) vm.put(vars[v].id, ctch.vars[v]);
     ctch.expr = expr.copy(cc, vm);
-    return ctch;
+    return copyType(ctch);
   }
 
   @Override

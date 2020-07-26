@@ -58,7 +58,7 @@ public final class Instance extends Single {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Instance(info, expr.copy(cc, vm), seqType);
+    return copyType(new Instance(info, expr.copy(cc, vm), seqType));
   }
 
   @Override

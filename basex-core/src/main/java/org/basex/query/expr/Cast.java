@@ -83,8 +83,8 @@ public final class Cast extends Single {
   }
 
   @Override
-  public Cast copy(final CompileContext cc, final IntObjMap<Var> vs) {
-    return copyType(new Cast(sc, info, expr.copy(cc, vs), seqType));
+  public Cast copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return copyType(new Cast(sc, info, expr.copy(cc, vm), seqType));
   }
 
   @Override

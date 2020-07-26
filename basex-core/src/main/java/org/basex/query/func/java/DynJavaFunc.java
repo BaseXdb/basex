@@ -190,7 +190,7 @@ final class DynJavaFunc extends DynJavaCall {
     final DynJavaFunc f = new DynJavaFunc(clazz, name, types, copyAll(cc, vm, exprs), sc, info);
     f.field = field;
     f.methods = methods;
-    return f;
+    return copyType(f);
   }
 
   @Override

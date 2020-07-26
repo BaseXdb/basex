@@ -120,7 +120,7 @@ public final class FTAnd extends FTExpr {
 
   @Override
   public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new FTAnd(info, Arr.copyAll(cc, vm, exprs));
+    return copyType(new FTAnd(info, Arr.copyAll(cc, vm, exprs)));
   }
 
   @Override

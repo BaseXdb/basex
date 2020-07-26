@@ -205,8 +205,7 @@ public final class If extends Arr {
 
   @Override
   public If copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new If(info, cond.copy(cc, vm), exprs[0].copy(cc, vm),
-        exprs[1].copy(cc, vm)));
+    return copyType(new If(info, cond.copy(cc, vm), exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
   }
 
   @Override

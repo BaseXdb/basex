@@ -120,7 +120,10 @@ public final class ExprType {
    */
   public void refine(final Expr expr) {
     final SeqType st = seqType.intersect(expr.seqType());
-    if(st != null) assign(st.type, st.occ, size != -1 ? size : expr.size());
+    if(st != null) {
+      final long es = expr.size();
+      assign(st, es == size || size == -1 ? es : es == -1 ? size : -1);
+    }
   }
 
   /**

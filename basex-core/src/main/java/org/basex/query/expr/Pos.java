@@ -113,7 +113,7 @@ public final class Pos extends Arr {
 
   @Override
   public Pos copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Pos(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm));
+    return copyType(new Pos(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
   }
 
   @Override

@@ -110,7 +110,7 @@ public final class FTWindow extends FTFilter {
 
   @Override
   public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new FTWindow(info, exprs[0].copy(cc, vm), win.copy(cc, vm), unit);
+    return copyType(new FTWindow(info, exprs[0].copy(cc, vm), win.copy(cc, vm), unit));
   }
 
   @Override

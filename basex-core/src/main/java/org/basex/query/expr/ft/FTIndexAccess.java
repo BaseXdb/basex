@@ -89,7 +89,7 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new FTIndexAccess(info, ftexpr.copy(cc, vm), db.copy(cc, vm));
+    return copyType(new FTIndexAccess(info, ftexpr.copy(cc, vm), db.copy(cc, vm)));
   }
 
   @Override

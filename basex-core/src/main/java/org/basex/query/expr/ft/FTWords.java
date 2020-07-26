@@ -483,7 +483,7 @@ public final class FTWords extends FTExpr {
     ftw.inputs = inputs;
     ftw.ftOpt = ftOpt;
     if(db != null) ftw.db = db.copy(cc, vm);
-    return ftw;
+    return copyType(ftw);
   }
 
   @Override

@@ -47,7 +47,7 @@ public final class CNSpace extends CName {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new CNSpace(sc, info, computed, name.copy(cc, vm), exprs[0].copy(cc, vm));
+    return copyType(new CNSpace(sc, info, computed, name.copy(cc, vm), exprs[0].copy(cc, vm)));
   }
 
   @Override

@@ -56,7 +56,7 @@ public final class Or extends Logical {
 
   @Override
   public Or copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Or(info, copyAll(cc, vm, exprs));
+    return copyType(new Or(info, copyAll(cc, vm, exprs)));
   }
 
   @Override

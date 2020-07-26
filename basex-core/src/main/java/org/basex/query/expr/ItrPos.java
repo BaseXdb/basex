@@ -111,7 +111,7 @@ public final class ItrPos extends Simple {
 
   @Override
   public ItrPos copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new ItrPos(min, max, info);
+    return copyType(new ItrPos(min, max, info));
   }
 
   /**

@@ -54,8 +54,8 @@ public final class And extends Logical {
   }
 
   @Override
-  public And copy(final CompileContext cc, final IntObjMap<Var> vars) {
-    return new And(info, copyAll(cc, vars, exprs));
+  public And copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return copyType(new And(info, copyAll(cc, vm, exprs)));
   }
 
   @Override

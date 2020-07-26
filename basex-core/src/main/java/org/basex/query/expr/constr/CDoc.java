@@ -45,7 +45,7 @@ public final class CDoc extends CNode {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new CDoc(sc, info, computed, exprs[0].copy(cc, vm));
+    return copyType(new CDoc(sc, info, computed, exprs[0].copy(cc, vm)));
   }
 
   @Override

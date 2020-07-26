@@ -189,7 +189,7 @@ public final class CmpSR extends Single {
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final CmpSR cmp = new CmpSR(expr.copy(cc, vm), min, mni, max, mxi, coll, info);
     cmp.single = single;
-    return cmp;
+    return copyType(cmp);
   }
 
   @Override

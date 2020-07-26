@@ -166,7 +166,7 @@ public class TypeCheck extends Single {
   }
 
   /**
-   * Return the used error code.
+   * Returns the used error code.
    * @return error code
    */
   public QueryError error() {
@@ -174,18 +174,18 @@ public class TypeCheck extends Single {
   }
 
   /**
-   * Return a new instance of this class.
+   * Returns a new instance of this class ({@link TypeCheck} or ({@link Treat}).
    * @param ex expression
    * @param st sequence type
    * @return error code
    */
-  public TypeCheck get(final Expr ex, final SeqType st) {
+  TypeCheck get(final Expr ex, final SeqType st) {
     return new TypeCheck(sc, info, ex, st, promote);
   }
 
   @Override
   public final Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return get(expr.copy(cc, vm), seqType());
+    return copyType(get(expr.copy(cc, vm), seqType()));
   }
 
   @Override

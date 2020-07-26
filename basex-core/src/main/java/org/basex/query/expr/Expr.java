@@ -439,8 +439,7 @@ public abstract class Expr extends ExprInfo {
    * Refines the expression type.
    * @param expr original expression
    */
-  public void refineType(@SuppressWarnings("unused") final Expr expr) {
-  }
+  public abstract void refineType(Expr expr);
 
   /**
    * Tries to push the given type check inside this expression.

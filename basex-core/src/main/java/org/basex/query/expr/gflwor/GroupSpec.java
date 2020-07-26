@@ -50,9 +50,9 @@ public final class GroupSpec extends Single {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final GroupSpec spec = copyType(new GroupSpec(info, cc.copy(var, vm), expr.copy(cc, vm), coll));
+    final GroupSpec spec = new GroupSpec(info, cc.copy(var, vm), expr.copy(cc, vm), coll);
     spec.occluded = occluded;
-    return spec;
+    return copyType(spec);
   }
 
   @Override

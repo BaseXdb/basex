@@ -69,7 +69,7 @@ public final class IndexStaticDb extends IndexDb {
 
   @Override
   public IndexDb copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new IndexStaticDb(data, info);
+    return copyType(new IndexStaticDb(data, info));
   }
 
   @Override

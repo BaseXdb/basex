@@ -133,7 +133,7 @@ public final class FTContains extends Single {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new FTContains(expr.copy(cc, vm), ftexpr.copy(cc, vm), info);
+    return copyType(new FTContains(expr.copy(cc, vm), ftexpr.copy(cc, vm), info));
   }
 
   @Override

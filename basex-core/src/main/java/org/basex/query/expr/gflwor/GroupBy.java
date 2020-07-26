@@ -265,7 +265,7 @@ public final class GroupBy extends Clause {
     for(int p = 0; p < pl; p++) ps[p] = cc.copy(post[p], vm);
 
     // done
-    return new GroupBy(Arr.copyAll(cc, vm, specs), pEx, ps, nonOcc, info);
+    return copyType(new GroupBy(Arr.copyAll(cc, vm, specs), pEx, ps, nonOcc, info));
   }
 
   @Override

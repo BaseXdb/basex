@@ -176,7 +176,7 @@ public final class CmpIR extends Single {
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final CmpIR cmp = new CmpIR(expr.copy(cc, vm), min, max, info);
     cmp.single = single;
-    return cmp;
+    return copyType(cmp);
   }
 
   @Override

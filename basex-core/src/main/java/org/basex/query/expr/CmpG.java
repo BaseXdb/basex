@@ -383,7 +383,7 @@ public class CmpG extends Cmp {
   public CmpG copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final CmpG cmp = new CmpG(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc, info);
     cmp.check = check;
-    return cmp;
+    return copyType(cmp);
   }
 
   @Override

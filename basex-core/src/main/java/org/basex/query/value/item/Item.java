@@ -291,6 +291,10 @@ public abstract class Item extends Value {
   }
 
   @Override
+  public void refineType(final Expr expr) {
+  }
+
+  @Override
   public final boolean ddo() {
     return type instanceof NodeType;
   }

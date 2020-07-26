@@ -158,14 +158,15 @@ public abstract class Step extends Preds {
 
   @Override
   protected final void type(final Expr expr) {
-    // self axis, kind tests: refine type
     if(expr != null && axis == Axis.SELF && test instanceof KindTest) {
       final Type type = expr.seqType().type;
       if(test == KindTest.NOD) {
         // node test: adopt type of context expression
+        // <a/>/self::node()
         exprType.assign(type);
-      } else if(type == test.type) {
-        // other kind tests: step will yield one result
+      } else if(type == test.type && exprs.length == 0) {
+        // other kind tests, no predicates: step will yield one result
+        // $elements/self::element()
         exprType.assign(Occ.ONE);
       }
     }
@@ -329,6 +330,7 @@ public abstract class Step extends Preds {
    * @return resulting step instance
    */
   final Step addPredicates(final Expr... preds) {
+    exprType.assign(seqType().with(Occ.ZERO_MORE));
     return copyType(get(info, axis, test, ExprList.concat(exprs, preds)));
   }
 

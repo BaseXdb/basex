@@ -56,7 +56,7 @@ public final class Castable extends Single {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new Castable(sc, info, expr.copy(cc, vm), seqType);
+    return copyType(new Castable(sc, info, expr.copy(cc, vm), seqType));
   }
 
   @Override

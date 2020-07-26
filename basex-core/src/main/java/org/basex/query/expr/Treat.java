@@ -31,7 +31,7 @@ public final class Treat extends TypeCheck {
   }
 
   @Override
-  public TypeCheck get(final Expr ex, final SeqType st) {
+  TypeCheck get(final Expr ex, final SeqType st) {
     return new Treat(sc, info, ex, st);
   }
 }

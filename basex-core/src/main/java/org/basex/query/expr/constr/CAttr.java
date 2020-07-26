@@ -61,7 +61,7 @@ public final class CAttr extends CName {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return new CAttr(sc, info, computed, name.copy(cc, vm), copyAll(cc, vm, exprs));
+    return copyType(new CAttr(sc, info, computed, name.copy(cc, vm), copyAll(cc, vm, exprs)));
   }
 
   @Override

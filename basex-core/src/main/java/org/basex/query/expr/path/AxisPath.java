@@ -120,6 +120,8 @@ public abstract class AxisPath extends Path {
     final ExprList list = new ExprList(steps.length).add(steps);
     final Step step = ((Step) list.pop()).addPredicates(preds);
     list.add(cc.get(step, () -> step.optimize(root, cc)));
+
+    exprType.assign(seqType().with(Occ.ZERO_MORE));
     return copyType(get(cc, info, root, list.finish()));
   }
 
