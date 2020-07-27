@@ -31,7 +31,6 @@ public final class GroupSpec extends Single {
 
   /**
    * Constructor.
-   *
    * @param info input info
    * @param var grouping variable
    * @param expr grouping expression
@@ -44,8 +43,8 @@ public final class GroupSpec extends Single {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return expr.item(qc, info);
+  public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return expr.atomItem(qc, ii);
   }
 
   @Override

@@ -1695,4 +1695,13 @@ public final class RewritingsTest extends QueryPlanTest {
     check("function() as xs:string  { <_/> }() instance of xs:string?", true, root(Bln.class));
     check("function() as xs:string  { <_/> }() instance of xs:string ", true, root(Bln.class));
   }
+
+  /** Atomization of group by expressions. */
+  @Test public void gh1907() {
+    query("let $i := 1 group by $n := ([], [$i]) return $n", 1);
+    query("let $i := 1 group by $n := ([], [$i]) return $i", 1);
+    query("let $i := 1 group by $n := ([], [1]) return $i", 1);
+    query("let $i := 1 group by $n := ([], []) return $i", 1);
+    query("let $i := 1 group by $n := () return $i", 1);
+  }
 }
