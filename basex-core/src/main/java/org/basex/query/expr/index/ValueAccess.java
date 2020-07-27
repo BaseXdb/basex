@@ -95,10 +95,9 @@ public final class ValueAccess extends IndexAccess {
     // result size can be determined statically if:
     // - index access is not followed by a name test,
     // - all search tokens are known, and
-    // - at most token is looked up, or it is not looked up in a token index
-    if(test == null && tokens != null && (tokens.size() <= 1 || type != IndexType.TOKEN)) {
-      final SeqType st = seqType();
-      exprType.assign(st.type, st.occ, size);
+    // - at most one token is looked up
+    if(test == null && tokens != null && tokens.size() <= 1) {
+      exprType.assign(seqType(), size);
     }
   }
 
