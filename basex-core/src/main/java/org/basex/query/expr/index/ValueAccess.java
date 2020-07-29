@@ -97,7 +97,8 @@ public final class ValueAccess extends IndexAccess {
     // - all search tokens are known, and
     // - at most one token is looked up
     if(test == null && tokens != null && tokens.size() <= 1) {
-      exprType.assign(seqType(), size);
+      final SeqType st = seqType();
+      exprType.assign(st.type, st.occ, size);
     }
   }
 
