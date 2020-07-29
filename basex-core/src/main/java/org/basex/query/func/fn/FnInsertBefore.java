@@ -63,7 +63,7 @@ public final class FnInsertBefore extends StandardFunc {
     final SeqType st1 = expr1.seqType(), st3 = expr3.seqType();
     final long size1 = expr1.size(), size3 = expr3.size();
     final long sz = size1 != -1 && size3 != -1 ? size1 + size3 : -1;
-    exprType.assign(st1.type.union(st3.type), st1.occ.add(st3.occ), sz);
+    exprType.assign(SeqType.get(st1.type.union(st3.type), st1.occ.add(st3.occ)), sz);
     final Data data = expr1.data();
     if(data != null && expr3.data() == data) data(data);
     return this;

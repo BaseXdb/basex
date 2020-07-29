@@ -87,8 +87,7 @@ public class TypeCheck extends Single {
     // refine occurrence indicator and result size
     final Occ occ = at.occ.intersect(st.occ);
     if(occ != null) {
-      // preserve kind test
-      if(st.test == null) exprType.assign(st.type, occ, expr.size());
+      exprType.assign(st, occ, expr.size());
     } else if(st.type instanceof AtomType && !at.mayBeArray()) {
       // report odd occurrence indicator
       throw typeError(expr, st, null, info, error());

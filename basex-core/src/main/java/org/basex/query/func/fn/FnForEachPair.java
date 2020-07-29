@@ -67,7 +67,7 @@ public class FnForEachPair extends StandardFunc {
       final boolean oneOrMore = st1.oneOrMore() && st2.oneOrMore() && declType.oneOrMore();
       final long size = declType.zero() ? 0 : declType.one() ?
         Math.min(expr1.size(), expr2.size()) : -1;
-      exprType.assign(declType.type, oneOrMore ? Occ.ONE_MORE : Occ.ZERO_MORE, size);
+      exprType.assign(declType, oneOrMore ? Occ.ONE_MORE : Occ.ZERO_MORE, size);
     }
 
     return this;

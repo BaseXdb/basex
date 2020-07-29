@@ -92,7 +92,7 @@ public final class FnTail extends StandardFunc {
     if(Function._FILE_READ_TEXT_LINES.is(expr))
       return FileReadTextLines.opt(this, 1, Long.MAX_VALUE, cc);
 
-    exprType.assign(st.type, seqType().occ, size - 1);
+    exprType.assign(st.union(Occ.ZERO), size - 1);
     data(expr.data());
     return this;
   }

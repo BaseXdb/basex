@@ -90,7 +90,7 @@ public final class ExprType {
 
   /**
    * Assigns the specified type and result size.
-   * The occurrence indicator is ignored if the exact result size is known.
+   * The occurrence indicator is ignored if the result size is known.
    * @param type type
    * @param occ occurrence indicator
    * @param sz result size (unknown if negative)
@@ -99,19 +99,44 @@ public final class ExprType {
     if(sz >= 0) {
       asg(SeqType.get(type, sz == 0 ? Occ.ZERO : sz == 1 ? Occ.ONE : Occ.ONE_MORE), sz);
     } else {
-      assign(type, occ);
+      assign(SeqType.get(type, occ));
     }
   }
 
   /**
+   * Assigns the specified sequence type and result size.
+   * The occurrence indicator of the sequence type is ignored if the result size is known.
+   * @param st sequence type
+   * @param sz result size (unknown if negative)
+   */
+  public void assign(final SeqType st, final long sz) {
+    if(sz >= 0) {
+      asg(st.with(sz == 0 ? Occ.ZERO : sz == 1 ? Occ.ONE : Occ.ONE_MORE), sz);
+    } else {
+      assign(st);
+    }
+  }
+
+  /**
+   * Assigns the specified type and result size.
+   * The specified occurrence indicator is ignored if the result size is known.
+   * @param st sequence type (the occurrence indicator is ignored)
+   * @param occ occurrence indicator
+   * @param sz result size (unknown if negative)
+   */
+  public void assign(final SeqType st, final Occ occ, final long sz) {
+    assign(sz >= 0 ? st : st.with(occ), sz);
+  }
+
+  /**
    * Assigns the type and result size, based on the specified min/max occurrences.
-   * @param type type
+   * @param st sequence type (the occurrence indicator is ignored)
    * @param minMax min/max values (min: 0 or more, max: -1 or more)
    */
-  public void assign(final Type type, final long[] minMax) {
+  public void assign(final SeqType st, final long[] minMax) {
     final long min = minMax[0], max = minMax[1], sz = min == max ? min : -1;
-    final Occ occ = min == 0 ? max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE : Occ.ONE_MORE;
-    assign(type, occ, sz);
+    final Occ occ = min > 0 ? Occ.ONE_MORE : max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE;
+    assign(st, occ, sz);
   }
 
   /**

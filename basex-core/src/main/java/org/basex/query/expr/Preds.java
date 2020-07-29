@@ -74,7 +74,7 @@ public abstract class Preds extends Arr {
     boolean exact = max != -1;
     if(!exact) max = Long.MAX_VALUE;
 
-    // check positional predicates
+    // check for positional predicates
     for(final Expr expr : exprs) {
       if(Function.LAST.is(expr)) {
         // use minimum of old value and 1
@@ -90,11 +90,7 @@ public abstract class Preds extends Arr {
         exact = false;
       }
     }
-
-    // choose exact result size; if not available, work with occurrence indicator
-    final long size = exact || max == 0 ? max : -1;
-    final Occ occ = max > 1 ? root.seqType().occ.union(Occ.ZERO) : Occ.ZERO_ONE;
-    exprType.assign(root.seqType().type, occ, size);
+    exprType.assign(root.seqType().union(Occ.ZERO), exact || max == 0 ? max : -1);
     return max == 0;
   }
 

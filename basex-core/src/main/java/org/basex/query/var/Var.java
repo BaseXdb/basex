@@ -177,7 +177,7 @@ public final class Var extends ExprInfo {
     if(!dt.instanceOf(st)) {
       // the new type provides new information
       final SeqType it = dt.intersect(st);
-      if(it != null) exprType.assign(it.type, it.occ, size);
+      if(it != null) exprType.assign(it, size);
     }
   }
 

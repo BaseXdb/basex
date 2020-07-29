@@ -40,7 +40,7 @@ public class DbNodeId extends StandardFunc {
   @Override
   protected final Expr opt(final CompileContext cc) {
     final Expr expr = exprs[0];
-    exprType.assign(seqType().type, expr.seqType().occ, expr.size());
+    exprType.assign(seqType(), expr.seqType().occ, expr.size());
     return this;
   }
 

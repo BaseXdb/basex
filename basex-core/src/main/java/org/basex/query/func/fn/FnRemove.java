@@ -101,7 +101,7 @@ public final class FnRemove extends StandardFunc {
       sz--;
     }
 
-    exprType.assign(st.type, st.occ.union(Occ.ZERO), sz);
+    exprType.assign(st.union(Occ.ZERO), sz);
     data(expr.data());
     return this;
   }

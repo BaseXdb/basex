@@ -199,9 +199,10 @@ public interface Type {
   }
 
   /**
-   * Returns a sequence type with the specified occurrence indicator.
+   * Internal function for creating a sequence type with the specified occurrence indicator.
    * @param occ occurrence indicator
    * @return sequence type
+   * @see SeqType#get(Type, Occ)
    */
   SeqType seqType(Occ occ);
 

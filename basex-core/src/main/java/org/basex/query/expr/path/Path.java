@@ -435,7 +435,7 @@ public abstract class Path extends ParseExpr {
   private void seqType(final Expr rt) {
     if(rt != null) data = rt.data();
 
-    final Type type = steps[steps.length - 1].seqType().type;
+    final SeqType st = steps[steps.length - 1].seqType();
     Occ occ = Occ.ZERO_MORE;
     long size = size(rt);
 
@@ -451,7 +451,7 @@ public abstract class Path extends ParseExpr {
       // more than one result: final size is unknown due to DDO
       if(size > 1) size = -1;
     }
-    exprType.assign(type, occ, size);
+    exprType.assign(st, occ, size);
   }
 
   /**

@@ -65,7 +65,7 @@ public final class GroupSpec extends Single {
 
     exprType.assign(expr);
     final AtomType type = expr.seqType().type.atomic();
-    if(type != null) var.refineType(seqType().with(type), cc);
+    if(type != null) var.refineType(SeqType.get(type, seqType().occ), cc);
     return this;
   }
 

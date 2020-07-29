@@ -52,7 +52,8 @@ public final class Unary extends Single {
     // --123  ->  123
     // --$byte  ->  xs:byte($byte)
     if(!minus && st.instanceOf(SeqType.NUM_ZO)) {
-      return cc.replaceWith(this, new Cast(cc.sc(), info, expr, type.seqType(st.occ)).optimize(cc));
+      final Expr cast = new Cast(cc.sc(), info, expr, SeqType.get(type, st.occ)).optimize(cc);
+      return cc.replaceWith(this, cast);
     }
 
     return super.optimize(cc);

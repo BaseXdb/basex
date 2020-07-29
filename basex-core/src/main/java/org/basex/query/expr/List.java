@@ -75,7 +75,7 @@ public final class List extends Arr {
       if(size != -1) size = sz == -1 ? -1 : size + sz;
       occ = occ.add(expr.seqType().occ);
     }
-    exprType.assign(type, occ, size);
+    exprType.assign(SeqType.get(type, occ), size);
 
     // pre-evaluate list; skip expressions with large result sizes
     if(allAreValues(true)) {

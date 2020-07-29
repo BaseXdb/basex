@@ -128,7 +128,7 @@ public final class GFLWOR extends ParseExpr {
       return expr;
     }
 
-    exprType.assign(rtrn.seqType().type, calcSize(true));
+    exprType.assign(rtrn.seqType(), calcSize(true));
     return expr;
   }
 

@@ -233,16 +233,6 @@ public final class SeqType {
   }
 
   /**
-   * Returns a sequence type with the specified type and occurrence indicator.
-   * @param tp type
-   * @param oc occurrence indicator
-   * @return sequence type
-   */
-  public SeqType with(final Type tp, final Occ oc) {
-    return type.eq(tp) && occ == oc && test == null ? this : get(tp, oc);
-  }
-
-  /**
    * Returns a sequence type with the specified occurrence indicator.
    * @param oc occurrence indicator
    * @return sequence type
@@ -258,15 +248,6 @@ public final class SeqType {
    */
   public SeqType union(final Occ oc) {
     return oc == occ ? this : get(type, occ.union(oc), test);
-  }
-
-  /**
-   * Returns a version of this sequence type that is adapted to the given type.
-   * @param tp type
-   * @return sequence type
-   */
-  public SeqType with(final Type tp) {
-    return type.eq(tp) ? this : get(tp, occ, test);
   }
 
   /**
@@ -478,7 +459,8 @@ public final class SeqType {
     // ignore general type of empty sequence
     final Type tp = type.eq(st.type) || st.zero() ? type : zero() ? st.type : type.union(st.type);
     final Occ oc = occ.union(st.occ);
-    return get(tp, oc);
+    final Test ts = Objects.equals(test, st.test) ? test : null;
+    return get(tp, oc, ts);
   }
 
   /**

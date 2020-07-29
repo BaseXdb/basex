@@ -118,7 +118,7 @@ public abstract class SimpleMap extends Arr {
       exprs = list.next();
       cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
     }
-    exprType.assign(exprs[exprs.length - 1].seqType().type, new long[] { min, max });
+    exprType.assign(exprs[exprs.length - 1].seqType(), new long[] { min, max });
 
     // no results, deterministic expressions: return empty sequence
     if(size() == 0 && !has(Flag.NDT)) return cc.emptySeq(this);

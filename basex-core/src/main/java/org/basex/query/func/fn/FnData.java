@@ -44,7 +44,7 @@ public final class FnData extends ContextFn {
         // $string[data() = 'a']  ->  $string[. = 'a']
         return context && cc.nestedFocus() ? new ContextValue(info).optimize(cc) : expr;
       }
-      if(type != null) exprType.assign(type, st.occ, expr.size());
+      if(type != null) exprType.assign(SeqType.get(type, st.occ), expr.size());
     }
     return this;
   }
