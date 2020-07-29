@@ -190,7 +190,7 @@ public final class SeqType {
   public final Test test;
 
   /**
-   * Private constructor.
+   * Constructor.
    * @param type type
    * @param occ occurrence
    */
@@ -224,11 +224,12 @@ public final class SeqType {
    * Returns a sequence type.
    * @param type type
    * @param occ occurrence indicator
-   * @param test kind test (can be {@code null})
+   * @param test kind test (can be {@code null}; ignored if this is no node type)
    * @return sequence type
    */
   public static SeqType get(final Type type, final Occ occ, final Test test) {
-    return occ == Occ.ZERO || test == null ? get(type, occ) : new SeqType(type, occ, test);
+    return occ == Occ.ZERO || test == null || !(type instanceof NodeType) ?
+      get(type, occ) : new SeqType(type, occ, test);
   }
 
   /**
@@ -242,12 +243,21 @@ public final class SeqType {
   }
 
   /**
-   * Returns a version of this sequence type that is adapted to the given {@link Occ}.
+   * Returns a sequence type with the specified occurrence indicator.
    * @param oc occurrence indicator
    * @return sequence type
    */
   public SeqType with(final Occ oc) {
     return oc == occ ? this : get(type, oc, test);
+  }
+
+  /**
+   * Returns a sequence type with a new occurrence indicator.
+   * @param oc occurrence indicator
+   * @return sequence type
+   */
+  public SeqType union(final Occ oc) {
+    return oc == occ ? this : get(type, occ.union(oc), test);
   }
 
   /**

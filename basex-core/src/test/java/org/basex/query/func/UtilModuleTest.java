@@ -223,8 +223,8 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" (3, <_>4</_>)[. = 3]", null), 3, root(IterFilter.class));
     check(func.args(" (4, <_>5</_>)[. = 4]", "<z/>"), 4, root(_UTIL_OR));
 
-    check(func.args(" prof:void(1)", 2), 2, root(_UTIL_OR));
-    check(func.args(" prof:void(2)", " prof:void(3)"), "", root(_UTIL_OR));
+    check(func.args(" prof:void(1)", 2), 2, root(List.class));
+    check(func.args(" prof:void(2)", " prof:void(3)"), "", root(List.class));
 
     check(func.args(" <_>6</_>[. = 6]", 7), "<_>6</_>", root(_UTIL_OR));
   }

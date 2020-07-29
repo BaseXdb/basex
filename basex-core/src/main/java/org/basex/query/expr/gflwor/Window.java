@@ -257,7 +257,7 @@ public final class Window extends Clause {
 
   @Override
   public Clause optimize(final CompileContext cc) throws QueryException {
-    var.refineType(expr.seqType().with(Occ.ZERO_MORE), cc);
+    var.refineType(expr.seqType().union(Occ.ZERO), cc);
     return this;
   }
 

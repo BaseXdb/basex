@@ -74,7 +74,7 @@ public final class UtilItem extends StandardFunc {
     if(Function._UTIL_INIT.is(expr))
       return cc.function(Function._UTIL_ITEM, info, args(expr)[0], pos);
 
-    exprType.assign(st.type);
+    exprType.assign(st.with(Occ.ZERO_ONE));
     data(expr.data());
     return this;
   }

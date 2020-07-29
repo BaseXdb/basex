@@ -121,13 +121,8 @@ public final class For extends ForLet {
   public For optimize(final CompileContext cc) throws QueryException {
     // assign type to clause and variable; remove empty flag if expression always yields items
     final SeqType st = expr.seqType();
-    Occ occ = Occ.ONE;
-    if(st.oneOrMore()) {
-      empty = false;
-    } else if(empty) {
-      occ = Occ.ZERO_ONE;
-    }
-    exprType.assign(st.type, occ);
+    if(st.oneOrMore()) empty = false;
+    exprType.assign(st.with(empty ? st.zero() ? Occ.ZERO : Occ.ZERO_ONE : Occ.ONE));
 
     var.refineType(seqType(), size(), cc);
     var.expr(expr);

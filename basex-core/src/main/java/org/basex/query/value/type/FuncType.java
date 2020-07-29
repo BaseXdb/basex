@@ -80,6 +80,7 @@ public class FuncType implements Type {
 
   @Override
   public SeqType seqType(final Occ occ) {
+    // cannot statically be instantiated due to circular dependencies
     if(seqTypes == null) seqTypes = new EnumMap<>(Occ.class);
     return seqTypes.computeIfAbsent(occ, o -> new SeqType(this, o));
   }

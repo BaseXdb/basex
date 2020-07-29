@@ -45,7 +45,7 @@ public final class FnHead extends StandardFunc {
     if(Function._FILE_READ_TEXT_LINES.is(expr))
       return FileReadTextLines.opt(this, 0, 1, cc);
 
-    exprType.assign(st.type, st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
+    exprType.assign(st.with(st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE));
     data(expr.data());
     return this;
   }

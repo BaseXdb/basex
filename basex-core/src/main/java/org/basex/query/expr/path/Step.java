@@ -330,7 +330,7 @@ public abstract class Step extends Preds {
    * @return resulting step instance
    */
   final Step addPredicates(final Expr... preds) {
-    exprType.assign(seqType().with(Occ.ZERO_MORE));
+    exprType.assign(seqType().union(Occ.ZERO));
     return copyType(get(info, axis, test, ExprList.concat(exprs, preds)));
   }
 

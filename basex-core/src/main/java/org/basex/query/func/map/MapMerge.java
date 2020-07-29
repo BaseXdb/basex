@@ -44,7 +44,7 @@ public final class MapMerge extends StandardFunc {
       if(exprs.length < 2 || !(exprs[1] instanceof Value) ||
         options(cc.qc).get(MergeOptions.DUPLICATES) == MergeDuplicates.COMBINE) {
         final SeqType st = mt.declType;
-        mt = MapType.get(mt.keyType(), st.with(st.oneOrMore() ? Occ.ONE_MORE : Occ.ZERO_MORE));
+        mt = MapType.get(mt.keyType(), st.zero() ? st : st.union(Occ.ONE_MORE));
       }
       exprType.assign(mt);
     }

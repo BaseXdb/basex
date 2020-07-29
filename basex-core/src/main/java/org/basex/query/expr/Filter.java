@@ -180,7 +180,7 @@ public abstract class Filter extends Preds {
 
   @Override
   protected final void type(final Expr expr) {
-    exprType.assign(root.seqType().type);
+    exprType.assign(root.seqType().union(Occ.ZERO));
   }
 
   /**
@@ -193,8 +193,6 @@ public abstract class Filter extends Preds {
    */
   public final Expr addPredicate(final CompileContext cc, final Expr pred) throws QueryException {
     exprs = new ExprList(exprs.length + 1).add(exprs).add(pred).finish();
-
-    exprType.assign(seqType().with(Occ.ZERO_MORE));
     return copyType(get(cc, info, root, exprs));
   }
 

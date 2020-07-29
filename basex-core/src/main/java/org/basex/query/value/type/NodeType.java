@@ -208,6 +208,7 @@ public enum NodeType implements Type {
 
   @Override
   public final SeqType seqType(final Occ occ) {
+    // cannot statically be instantiated due to circular dependencies
     if(seqTypes == null) seqTypes = new EnumMap<>(Occ.class);
     return seqTypes.computeIfAbsent(occ, o -> new SeqType(this, o));
   }

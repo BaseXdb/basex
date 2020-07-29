@@ -186,18 +186,18 @@ public final class GroupBy extends Clause {
 
   /**
    * Checks two keys for equality.
-   * @param its1 first keys
-   * @param its2 second keys
+   * @param items1 first keys
+   * @param items2 second keys
    * @param coll collations
    * @return {@code true} if the compare as equal, {@code false} otherwise
    * @throws QueryException query exception
    */
-  private boolean eq(final Item[] its1, final Item[] its2, final Collation[] coll)
+  private boolean eq(final Item[] items1, final Item[] items2, final Collation[] coll)
       throws QueryException {
 
-    final int il = its1.length;
+    final int il = items1.length;
     for(int i = 0; i < il; i++) {
-      final Item item1 = its1[i], item2 = its2[i];
+      final Item item1 = items1[i], item2 = items2[i];
       if(item1 == Empty.VALUE ^ item2 == Empty.VALUE ||
          item1 != Empty.VALUE && !item1.equiv(item2, coll[i], info)) return false;
     }
@@ -223,8 +223,7 @@ public final class GroupBy extends Clause {
   public GroupBy optimize(final CompileContext cc) throws QueryException {
     final int pl = preExpr.length;
     for(int p = 0; p < pl; p++) {
-      final SeqType st = preExpr[p].seqType();
-      post[p].refineType(st.with(st.occ.union(Occ.ONE_MORE)), cc);
+      post[p].refineType(preExpr[p].seqType().union(Occ.ONE_MORE), cc);
     }
     SeqType st = null;
     for(final GroupSpec spec : specs) {

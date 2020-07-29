@@ -40,11 +40,11 @@ public final class ExprType {
   }
 
   /**
-   * Assigns the specified type, updates the result size.
+   * Assigns the specified sequence type, updates the result size.
    * @param st sequence type
    */
   public void assign(final SeqType st) {
-    assign(st, st.zero() ? 0 : st.one() ? 1 : -1);
+    asg(st, st.zero() ? 0 : st.one() ? 1 : -1);
   }
 
   /**
@@ -52,7 +52,7 @@ public final class ExprType {
    * @param expr expression
    */
   public void assign(final Expr expr) {
-    assign(expr.seqType(), expr.size());
+    asg(expr.seqType(), expr.size());
   }
 
   /**
@@ -60,7 +60,7 @@ public final class ExprType {
    * @param et expression type
    */
   public void assign(final ExprType et) {
-    assign(et.seqType, et.size);
+    asg(et.seqType, et.size);
   }
 
   /**
@@ -68,7 +68,7 @@ public final class ExprType {
    * @param type type
    */
   public void assign(final Type type) {
-    seqType = seqType.with(type);
+    seqType = SeqType.get(type, seqType.occ);
   }
 
   /**
@@ -77,7 +77,7 @@ public final class ExprType {
    * @param occ occurrence indicator
    */
   public void assign(final Type type, final Occ occ) {
-    assign(seqType.with(type, occ));
+    assign(SeqType.get(type, occ));
   }
 
   /**
@@ -89,15 +89,15 @@ public final class ExprType {
   }
 
   /**
-   * Assigns the specified type and result size. The occurrence indicator is ignored if the exact
-   * result size is known.
+   * Assigns the specified type and result size.
+   * The occurrence indicator is ignored if the exact result size is known.
    * @param type type
    * @param occ occurrence indicator
-   * @param sz exact result size (unknown if negative)
+   * @param sz result size (unknown if negative)
    */
   public void assign(final Type type, final Occ occ, final long sz) {
     if(sz >= 0) {
-      assign(seqType.with(type, sz == 0 ? Occ.ZERO : sz == 1 ? Occ.ONE : Occ.ONE_MORE), sz);
+      asg(SeqType.get(type, sz == 0 ? Occ.ZERO : sz == 1 ? Occ.ONE : Occ.ONE_MORE), sz);
     } else {
       assign(type, occ);
     }
@@ -122,7 +122,7 @@ public final class ExprType {
     final SeqType st = seqType.intersect(expr.seqType());
     if(st != null) {
       final long es = expr.size();
-      assign(st, es == size || size == -1 ? es : es == -1 ? size : -1);
+      asg(st, es == size || size == -1 ? es : es == -1 ? size : -1);
     }
   }
 
@@ -131,7 +131,7 @@ public final class ExprType {
    * @param st sequence type
    * @param sz result size
    */
-  private void assign(final SeqType st, final long sz) {
+  private void asg(final SeqType st, final long sz) {
     seqType = st;
     size = sz;
   }

@@ -47,7 +47,7 @@ public final class HofTakeWhile extends StandardFunc {
     final SeqType st = expr.seqType();
     if(st.zero()) return expr;
 
-    exprType.assign(st.type, st.occ.union(Occ.ZERO));
+    exprType.assign(st.union(Occ.ZERO));
     data(expr.data());
     return this;
   }
