@@ -97,8 +97,7 @@ public final class YMDur extends Dur {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
     if(item.type != type) throw diffError(item, this, ii);
     final long m = mon - ((Dur) item).mon;
     return m < 0 ? -1 : m > 0 ? 1 : 0;

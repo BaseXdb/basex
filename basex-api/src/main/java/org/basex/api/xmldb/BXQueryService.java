@@ -79,9 +79,7 @@ public final class BXQueryService implements XPathQueryService {
   }
 
   @Override
-  public BXResourceSet queryResource(final String id, final String query)
-      throws XMLDBException {
-
+  public BXResourceSet queryResource(final String id, final String query) throws XMLDBException {
     final BXXMLResource xml = coll.getResource(id);
     if(xml != null) return query(query, new DBNode(xml.data, xml.pre));
     // throw exception if id was not found...

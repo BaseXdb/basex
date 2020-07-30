@@ -103,8 +103,7 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
     final double d = item.dbl(ii);
     return d == Double.NEGATIVE_INFINITY ? -1 : d == Double.POSITIVE_INFINITY ? 1 :
       Double.isNaN(d) ? UNDEF : value.compareTo(item.dec(ii));

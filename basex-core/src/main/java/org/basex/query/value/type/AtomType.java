@@ -941,9 +941,9 @@ public enum AtomType implements Type {
   final Item checkNum(final Object value, final InputInfo ii) throws QueryException {
     final Item item;
     if(value instanceof Value) {
-      final Value v = (Value) value;
-      if(v.size() != 1) throw typeError(v, this, ii);
-      item = (Item) v;
+      final Value val = (Value) value;
+      if(val.size() != 1) throw typeError(val, this, ii);
+      item = (Item) val;
     } else {
       item = Str.get(value.toString());
     }

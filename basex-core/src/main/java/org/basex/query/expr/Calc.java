@@ -21,8 +21,7 @@ public enum Calc {
   /** Addition. */
   PLUS("+") {
     @Override
-    public Item eval(final Item item1, final Item item2, final InputInfo ii)
-        throws QueryException {
+    public Item eval(final Item item1, final Item item2, final InputInfo ii) throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
       if(num1 ^ num2) throw numberError(num1 ? item2 : item1, ii);
@@ -80,8 +79,7 @@ public enum Calc {
   /** Subtraction. */
   MINUS("-") {
     @Override
-    public Item eval(final Item item1, final Item item2, final InputInfo ii)
-        throws QueryException {
+    public Item eval(final Item item1, final Item item2, final InputInfo ii) throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
       if(num1 ^ num2) throw numberError(num1 ? item2 : item1, ii);
@@ -136,8 +134,7 @@ public enum Calc {
   /** Multiplication. */
   MULT("*") {
     @Override
-    public Item eval(final Item item1, final Item item2, final InputInfo ii)
-        throws QueryException {
+    public Item eval(final Item item1, final Item item2, final InputInfo ii) throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
 
       if(type1 == YMD) {
@@ -199,8 +196,7 @@ public enum Calc {
   /** Division. */
   DIV("div") {
     @Override
-    public Item eval(final Item item1, final Item item2, final InputInfo ii)
-        throws QueryException {
+    public Item eval(final Item item1, final Item item2, final InputInfo ii) throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
       if(type1 == type2) {
         if(type1 == YMD) {
@@ -301,8 +297,7 @@ public enum Calc {
   /** Modulo. */
   MOD("mod") {
     @Override
-    public Item eval(final Item item1, final Item item2, final InputInfo ii)
-        throws QueryException {
+    public Item eval(final Item item1, final Item item2, final InputInfo ii) throws QueryException {
       checkNum(ii, item1, item2);
       final Type type = numType(item1.type, item2.type);
       if(type == DBL) return Dbl.get(item1.dbl(ii) % item2.dbl(ii));

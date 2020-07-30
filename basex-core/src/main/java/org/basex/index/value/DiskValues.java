@@ -46,8 +46,7 @@ public class DiskValues extends ValueIndex {
    * @param type index type
    * @throws IOException I/O Exception
    */
-  public DiskValues(final Data data, final IndexType type)
-      throws IOException {
+  public DiskValues(final Data data, final IndexType type) throws IOException {
     this(data, type, fileSuffix(type));
   }
 

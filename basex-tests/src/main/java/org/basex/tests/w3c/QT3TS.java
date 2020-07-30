@@ -222,9 +222,7 @@ public final class QT3TS extends Main {
    * @param envs environments
    * @throws Exception exception
    */
-  private void testCase(final XdmItem test, final ArrayList<QT3Env> envs)
-      throws Exception {
-
+  private void testCase(final XdmItem test, final ArrayList<QT3Env> envs) throws Exception {
     if(total++ % 500 == 0) Util.out(".");
 
     if(!supported(test)) {

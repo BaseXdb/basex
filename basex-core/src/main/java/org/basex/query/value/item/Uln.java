@@ -101,8 +101,7 @@ public final class Uln extends ANum {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
     if(item.type == AtomType.ULN) return value.compareTo(((Uln) item).value);
     if(item.type == AtomType.DBL || item.type == AtomType.FLT) return -item.diff(this, coll, ii);
     return value.compareTo(BigInteger.valueOf(item.itr(ii)));

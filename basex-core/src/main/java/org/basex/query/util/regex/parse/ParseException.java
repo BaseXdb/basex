@@ -88,8 +88,7 @@ public class ParseException extends Exception {
    * @param img token images
    * @return error description
    */
-  private static String initialise(final Token curr, final int[][] exps,
-      final String[] img) {
+  private static String initialise(final Token curr, final int[][] exps, final String[] img) {
     final String eol = System.getProperty("line.separator", "\n");
     final StringBuilder expected = new StringBuilder();
     int maxSize = 0;

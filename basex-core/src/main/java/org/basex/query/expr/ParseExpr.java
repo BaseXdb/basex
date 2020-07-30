@@ -248,8 +248,7 @@ public abstract class ParseExpr extends Expr {
    * @return token (zero-length if result is an empty sequence)
    * @throws QueryException query exception
    */
-  protected final byte[] toZeroToken(final Expr expr, final QueryContext qc)
-      throws QueryException {
+  protected final byte[] toZeroToken(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
     return item == Empty.VALUE ? EMPTY : toToken(item);
   }

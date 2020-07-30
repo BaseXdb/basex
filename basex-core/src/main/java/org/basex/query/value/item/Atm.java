@@ -55,8 +55,7 @@ public final class Atm extends Item {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
     return item.type.isUntyped() ? coll == null ? Token.diff(value, item.string(ii)) :
       coll.compare(value, item.string(ii)) : -item.diff(this, coll, ii);
   }

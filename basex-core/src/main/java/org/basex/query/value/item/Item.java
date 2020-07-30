@@ -215,8 +215,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public int diff(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
     throw diffError(this, item, ii);
   }
 

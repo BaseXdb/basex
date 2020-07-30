@@ -56,8 +56,7 @@ public final class Hex extends Bin {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
     final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
     return Token.diff(binary(ii), bin);
   }

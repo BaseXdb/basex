@@ -369,9 +369,7 @@ public abstract class StandardFunc extends Arr {
    * @return query contents and URL
    * @throws QueryException query exception
    */
-  protected final IOContent toQuery(final byte[] uri, final QueryContext qc)
-      throws QueryException {
-
+  protected final IOContent toQuery(final byte[] uri, final QueryContext qc) throws QueryException {
     checkAdmin(qc);
     final IO io = checkPath(uri);
     try {

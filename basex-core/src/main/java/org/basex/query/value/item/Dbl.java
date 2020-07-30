@@ -147,8 +147,7 @@ public final class Dbl extends ANum {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
     // cannot be replaced by Double.compare (different semantics)
     final double n = item.dbl(ii);
     return Double.isNaN(n) || Double.isNaN(value) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;

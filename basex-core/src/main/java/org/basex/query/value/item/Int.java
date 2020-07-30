@@ -159,8 +159,7 @@ public final class Int extends ANum {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
     if(item instanceof Int) return Long.compare(value, ((Int) item).value);
     final double n = item.dbl(ii);
     return Double.isNaN(n) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;

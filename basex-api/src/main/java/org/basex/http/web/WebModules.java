@@ -159,8 +159,7 @@ public final class WebModules {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public List<RestXqFunction> checks(final HTTPConnection conn)
-      throws QueryException, IOException {
+  public List<RestXqFunction> checks(final HTTPConnection conn) throws QueryException, IOException {
     return find(conn, null, true);
   }
 

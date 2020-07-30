@@ -39,7 +39,7 @@ final class RestXqPathMatcher {
    * @param varsPos variable position
    */
   private RestXqPathMatcher(final String regex, final List<QNm> varNames, final int segments,
-    final BigInteger varsPos) {
+      final BigInteger varsPos) {
     this.varNames = varNames;
     this.segments = segments;
     this.varsPos = varsPos;
