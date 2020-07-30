@@ -371,7 +371,22 @@ public abstract class ADate extends ADateDur {
   @Override
   public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return diff(item, coll, ii) == 0;
+    return df(item, ii) == 0;
+  }
+
+  /**
+   * Returns the difference between the current and the specified item.
+   * See {@link Item#diff(Item, Collation, InputInfo)}.
+   * @param item item to be compared
+   * @param ii input info (can be {@code null})
+   * @return difference
+   * @throws QueryException query exception
+   */
+  private int df(final Item item, final InputInfo ii) throws QueryException {
+    final ADate d = (ADate) (item instanceof ADate ? item : type.cast(item, null, null, ii));
+    final BigDecimal d1 = seconds().add(days().multiply(DAYSECONDS));
+    final BigDecimal d2 = d.seconds().add(d.days().multiply(DAYSECONDS));
+    return d1.compareTo(d2);
   }
 
   @Override
@@ -386,10 +401,7 @@ public abstract class ADate extends ADateDur {
 
   @Override
   public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    final ADate d = (ADate) (item instanceof ADate ? item : type.cast(item, null, null, ii));
-    final BigDecimal d1 = seconds().add(days().multiply(DAYSECONDS));
-    final BigDecimal d2 = d.seconds().add(d.days().multiply(DAYSECONDS));
-    return d1.compareTo(d2);
+    return df(item, ii);
   }
 
   @Override
