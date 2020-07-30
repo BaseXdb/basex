@@ -880,14 +880,22 @@ public abstract class Path extends ParseExpr {
       boolean chngd = false;
       for(int s = 0; s < sl; s++) {
         Expr curr = steps[s], next = s < sl - 1 ? steps[s + 1] : null;
-        // merge steps: //*  ->  /descendant::*
-        if(next != null) {
-          next = mergeStep(curr, next, cc);
-          if(next != null) {
-            cc.info(QueryText.OPTMERGE_X, next);
-            curr = next;
+        if(steps[s] instanceof Step) {
+          final Step crr = (Step) steps[s];
+          if(crr.test == KindTest.NOD && next instanceof Step && ((Step) next).axis == ATTRIBUTE) {
+            // rewrite node test before attribute step: node()/@*  ->  */@*
+            next = Step.get(cc, root, crr.info, crr.axis, KindTest.ELM, crr.exprs);
+            curr = cc.replaceWith(curr, next);
             chngd = true;
-            s++;
+          } else if(next != null) {
+            // merge steps: //*  ->  /descendant::*
+            next = mergeStep(crr, next, cc);
+            if(next != null) {
+              cc.info(QueryText.OPTMERGE_X, next);
+              curr = next;
+              chngd = true;
+              s++;
+            }
           }
         }
         stps.add(curr);
@@ -973,21 +981,19 @@ public abstract class Path extends ParseExpr {
    * @return merged expression or {@code null}
    * @throws QueryException query exception
    */
-  private static Expr mergeStep(final Expr curr, final Expr next, final CompileContext cc)
+  private static Expr mergeStep(final Step curr, final Expr next, final CompileContext cc)
       throws QueryException {
 
-    if(!(curr instanceof Step)) return null;
-    final Step crr = (Step) curr, nxt = next instanceof Step ? (Step) next : null;
-
     // merge self steps:  child::*/self::a  ->  child::a
+    final Step nxt = next instanceof Step ? (Step) next : null;
     if(nxt != null && nxt.axis == SELF && !nxt.mayBePositional()) {
-      final Test test = crr.test.intersect(nxt.test);
+      final Test test = curr.test.intersect(nxt.test);
       if(test == null) return null;
-      crr.test = test;
-      return crr.addPredicates(nxt.exprs);
+      curr.test = test;
+      return curr.addPredicates(nxt.exprs);
     }
 
-    if(crr.axis != DESCENDANT_OR_SELF || crr.test != KindTest.NOD || crr.exprs.length > 0)
+    if(curr.axis != DESCENDANT_OR_SELF || curr.test != KindTest.NOD || curr.exprs.length > 0)
       return null;
 
     // checks if an expression is a simple child or descendant step

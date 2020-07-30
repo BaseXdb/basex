@@ -1704,4 +1704,10 @@ public final class RewritingsTest extends QueryPlanTest {
     query("let $i := 1 group by $n := ([], []) return $i", 1);
     query("let $i := 1 group by $n := () return $i", 1);
   }
+
+  /** Axis followed by attribute step. */
+  @Test public void gh1910() {
+    check("<x/>//@*", null, type("IterStep[@axis = 'descendant-or-self']", "element()*"));
+    check("<x/>/../@*", null, type("IterStep[@axis = 'parent']", "element()?"));
+  }
 }
