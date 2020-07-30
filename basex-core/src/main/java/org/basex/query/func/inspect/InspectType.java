@@ -19,10 +19,18 @@ public final class InspectType extends StandardFunc {
     final Value value = exprs[0].value(qc);
 
     // combine types of all items to get more specific type
-    Type type = null;
+    SeqType st = null;
     for(final Item item : value) {
-      type = type == null ? item.type : type.union(item.type);
+      final SeqType st2 = item.seqType();
+      st = st == null ? st2 : st.union(st2);
     }
-    return Str.get(SeqType.get(type, value.seqType().occ).toString());
+    if(st == null) st = SeqType.EMP;
+    st = st.with(value.seqType().occ);
+
+    // compare with original type, which may be more specific (in particular for node types)
+    final SeqType et = exprs[0].seqType();
+    if(et.instanceOf(st)) st = et;
+
+    return Str.get(st.toString());
   }
 }

@@ -38,17 +38,20 @@ public final class Intersect extends Set {
   Expr opt(final CompileContext cc) throws QueryException {
     flatten(cc);
 
-    // determine type
-    Type type = null;
+    // determine type; skip optimizations if operands do not have the correct type
+    SeqType st = null;
     for(final Expr expr : exprs) {
-      final SeqType st = expr.seqType();
-      final Type type2 = st.zero() ? NodeType.NOD : st.type;
-      type = type == null ? type2 : type.intersect(type2);
+      final SeqType st2 = expr.seqType();
+      if(!st2.zero()) {
+        st = st == null ? st2 : st.intersect(st2);
+        if(st == null) return null;
+      }
     }
+    // check if all operands yield an empty sequence
+    if(st == null) st = SeqType.NOD_ZM;
 
-    // skip optimizations if operands do not have the correct type
-    if(type instanceof NodeType) {
-      exprType.assign(type);
+    if(st.type instanceof NodeType) {
+      exprType.assign(st.union(Occ.ZERO));
 
       final ExprList list = new ExprList(exprs.length);
       for(final Expr expr : exprs) {

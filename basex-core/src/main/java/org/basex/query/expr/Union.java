@@ -39,19 +39,17 @@ public final class Union extends Set {
     flatten(cc);
 
     // determine type
-    Type type = null;
+    SeqType st = null;
     for(final Expr expr : exprs) {
-      final SeqType st = expr.seqType();
-      if(!st.zero()) {
-        final Type type2 = expr.seqType().type;
-        type = type == null ? type2 : type.union(type2);
-      }
+      final SeqType st2 = expr.seqType();
+      if(!st2.zero()) st = st == null ? st2 : st.union(st2);
     }
-    if(type == null) type = NodeType.NOD;
+    // check if all operands yield an empty sequence
+    if(st == null) st = SeqType.NOD_ZM;
 
     // skip optimizations if operands do not have the correct type
-    if(type instanceof NodeType) {
-      exprType.assign(type);
+    if(st.type instanceof NodeType) {
+      exprType.assign(st.union(Occ.ONE_MORE));
 
       final ExprList list = new ExprList(exprs.length);
       for(final Expr expr : exprs) {

@@ -65,17 +65,17 @@ public final class List extends Arr {
     if(el == 1) return exprs[0];
 
     // determine result type, compute number of results, set expression type
-    Type type = null;
+    SeqType st = null;
     Occ occ = Occ.ZERO;
     long size = 0;
     for(final Expr expr : exprs) {
-      final SeqType et = expr.seqType();
-      if(!et.zero()) type = type == null ? et.type : type.union(et.type);
+      final SeqType st2 = expr.seqType();
+      if(!st2.zero()) st = st == null ? st2 : st.union(st2);
       final long sz = expr.size();
       if(size != -1) size = sz == -1 ? -1 : size + sz;
-      occ = occ.add(expr.seqType().occ);
+      occ = occ.add(st2.occ);
     }
-    exprType.assign(SeqType.get(type, occ), size);
+    exprType.assign(st != null ? st : SeqType.EMP, occ, size);
 
     // pre-evaluate list; skip expressions with large result sizes
     if(allAreValues(true)) {

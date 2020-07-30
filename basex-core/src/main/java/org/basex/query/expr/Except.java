@@ -41,11 +41,12 @@ public final class Except extends Set {
     if(exprs[0] == Empty.VALUE) return cc.emptySeq(this);
 
     // determine type
-    final Type type = exprs[0].seqType().type;
+    SeqType st = exprs[0].seqType();
+    if(st.zero()) st = SeqType.NOD_ZM;
 
     // skip optimizations if operands do not have the correct type
-    if(type instanceof NodeType) {
-      exprType.assign(type);
+    if(st.type instanceof NodeType) {
+      exprType.assign(st.union(Occ.ZERO));
 
       final ExprList list = new ExprList(exprs.length);
       for(final Expr expr : exprs) {
