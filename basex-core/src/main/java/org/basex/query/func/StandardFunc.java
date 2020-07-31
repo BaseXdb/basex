@@ -571,11 +571,11 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Returns the arguments of a standard function.
-   * @param func functions argument
+   * @param expr expression
    * @return arguments
    */
-  protected static Expr[] args(final Expr func) {
-    return ((StandardFunc) func).exprs;
+  protected static Expr[] args(final Expr expr) {
+    return ((StandardFunc) expr).exprs;
   }
 
   @Override

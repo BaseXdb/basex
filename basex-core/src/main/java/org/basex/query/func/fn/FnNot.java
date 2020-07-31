@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -26,11 +28,11 @@ public final class FnNot extends StandardFunc {
     final Expr expr = exprs[0].simplifyFor(Simplify.EBV, cc);
 
     // not(empty(A))  ->  exists(A)
-    if(Function.EMPTY.is(expr)) return cc.function(Function.EXISTS, info, args(expr));
+    if(EMPTY.is(expr)) return cc.function(EXISTS, info, args(expr));
     // not(exists(A))  ->  empty(A)
-    if(Function.EXISTS.is(expr)) return cc.function(Function.EMPTY, info, args(expr));
+    if(EXISTS.is(expr)) return cc.function(EMPTY, info, args(expr));
     // not(not(A))  ->  boolean(A)
-    if(Function.NOT.is(expr)) return cc.function(Function.BOOLEAN, info, args(expr));
+    if(NOT.is(expr)) return cc.function(BOOLEAN, info, args(expr));
 
     // not('a' = 'b')  ->  'a' != 'b'
     if(expr instanceof Cmp) {
@@ -39,7 +41,7 @@ public final class FnNot extends StandardFunc {
     }
     // not($node/text())  ->  empty($node/text())
     final SeqType st = expr.seqType();
-    if(st.type instanceof NodeType) return cc.function(Function.EMPTY, info, expr);
+    if(st.type instanceof NodeType) return cc.function(EMPTY, info, expr);
 
     exprs[0] = expr;
     return this;
@@ -49,6 +51,6 @@ public final class FnNot extends StandardFunc {
   public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc)
       throws QueryException {
     // negation: operator may be inverted in general comparison merge
-    return Function.NOT.is(ex) ? null : ex.mergeEbv(this, or, cc);
+    return NOT.is(ex) ? null : ex.mergeEbv(this, or, cc);
   }
 }

@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -185,15 +187,11 @@ public class FnSubsequence extends StandardFunc {
       // check if result size is statically known
       final long size = sr.adjust(expr.size());
       if(size != -1) {
-        if(sr.length == size)
-          return expr;
+        if(sr.length == size) return expr;
         // rewrite nested function calls
-        if(sr.start == size - 1)
-          return cc.function(Function._UTIL_LAST, info, expr);
-        if(sr.start == 1 && sr.end == size)
-          return cc.function(Function.TAIL, info, expr);
-        if(sr.start == 0 && sr.end == size - 1)
-          return cc.function(Function._UTIL_INIT, info, expr);
+        if(sr.start == size - 1) return cc.function(_UTIL_LAST, info, expr);
+        if(sr.start == 1 && sr.end == size) return cc.function(TAIL, info, expr);
+        if(sr.start == 0 && sr.end == size - 1) return cc.function(_UTIL_INIT, info, expr);
         sz = sr.length;
       } else if(st.zeroOrOne()) {
         // sr.length is always larger than 0 at this point
@@ -202,20 +200,20 @@ public class FnSubsequence extends StandardFunc {
 
       // rewrite nested function calls
       if(sr.length == 1) {
-        return sr.start == 0 ? cc.function(Function.HEAD, info, expr) :
-          cc.function(Function._UTIL_ITEM, info, expr, Int.get(sr.start + 1));
+        return sr.start == 0 ? cc.function(HEAD, info, expr) :
+          cc.function(_UTIL_ITEM, info, expr, Int.get(sr.start + 1));
       }
       if(sr.length == Long.MAX_VALUE && sr.start == 1)
-        return cc.function(Function.TAIL, info, expr);
-      if(Function._FILE_READ_TEXT_LINES.is(expr))
+        return cc.function(TAIL, info, expr);
+      if(_FILE_READ_TEXT_LINES.is(expr))
         return FileReadTextLines.opt(this, sr.start, sr.length, cc);
     } else {
       // subsequence(expr, 1, count(expr) - 1)  ->  util:init(expr)
       if(exprs[1] == Int.get(1) && exprs[2] instanceof Arith && !exprs[0].has(Flag.NDT)) {
         final Arith ar = (Arith) exprs[2];
-        if(Function.COUNT.is(ar.exprs[0]) && ar.calc == Calc.MINUS && ar.exprs[1] == Int.get(1) &&
+        if(COUNT.is(ar.exprs[0]) && ar.calc == Calc.MINUS && ar.exprs[1] == Int.get(1) &&
             exprs[0].equals(args(ar.exprs[0])[0])) {
-          return cc.function(Function._UTIL_INIT, info, expr);
+          return cc.function(_UTIL_INIT, info, expr);
         }
       }
     }
