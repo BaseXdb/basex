@@ -11,6 +11,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -257,7 +258,8 @@ public final class Window extends Clause {
 
   @Override
   public Clause optimize(final CompileContext cc) throws QueryException {
-    var.refineType(expr.seqType().union(Occ.ZERO), cc);
+    exprType.assign(expr.seqType().union(Occ.ZERO));
+    var.refineType(seqType(), cc);
     return this;
   }
 
@@ -335,7 +337,8 @@ public final class Window extends Clause {
 
   @Override
   public void plan(final QueryPlan plan) {
-    plan.add(plan.attachVariable(plan.create(this, SLIDING, sliding), var, true), start, end, expr);
+    final FElem elem = plan.attachVariable(plan.create(this, SLIDING, sliding), var, false);
+    plan.add(elem, start, end, expr);
   }
 
   @Override
@@ -406,7 +409,7 @@ public final class Window extends Clause {
     Item next;
 
     /**
-     * Reads a new current item and populates the {@code nxt} variable if it's used.
+     * Reads a new current item and populates the {@code next} variable if it's used.
      * @return next item
      * @throws QueryException evaluation exception
      */
