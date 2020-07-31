@@ -90,8 +90,17 @@ public final class GFLWORTest extends QueryPlanTest {
   @Test public void moveFor() {
     check("let $x := <x/> " +
         "for $a in 1 to 2 " +
+        "for $b in $x " +
+        "return (<_>{ $b }</_>, $b)[1]/x",
+        "<x/>\n<x/>",
+        count(Let.class, 1),
+        empty(For.class)
+    );
+
+    check("let $x := <x/> " +
+        "for $a in 1 to 2 " +
         "for $b as element(x) in $x " +
-        "return ($b, $b)[1]",
+        "return (<_>{ $b }</_>, $b)[1]/x",
         "<x/>\n<x/>",
         count(Let.class, 1),
         empty(For.class)

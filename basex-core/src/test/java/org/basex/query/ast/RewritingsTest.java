@@ -1710,4 +1710,21 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<x/>//@*", null, type("IterStep[@axis = 'descendant-or-self']", "element()*"));
     check("<x/>/../@*", null, type("IterStep[@axis = 'parent']", "element()?"));
   }
+
+  /** Elvis Operator rewritings. */
+  @Test public void gh1911() {
+    check("head((<a/>[data()], 1))", 1, root(_UTIL_OR));
+    check("head((<a/>[data()], <b/>[data()], <c/>[data()]))", null, count(_UTIL_OR, 2));
+
+    check("head((1, <_/>))", 1, root(Int.class));
+    check("head((<item/>, <default/>))", "<item/>", root(CElem.class));
+
+    check("let $a := <a/>[data()] return if($a) then $a else ()", "", root(IterFilter.class));
+    check("let $a := <a/>[data()] return if($a) then $a else 0", 0, root(_UTIL_OR));
+    check("if(trace(<a/>)) then trace(<a/>) else 0", "<a/>", root(If.class));
+
+    check("let $x := <x/> for $a in 1 to 2 for $b in $x return ($b, $b)[1]", "<x/>\n<x/>",
+        root(_UTIL_REPLICATE)
+    );
+  }
 }

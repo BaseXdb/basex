@@ -1,9 +1,11 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.func.Function.*;
+import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.func.*;
 import org.basex.query.func.file.*;
 import org.basex.query.value.item.*;
@@ -46,6 +48,20 @@ public final class FnHead extends StandardFunc {
       return cc.function(_UTIL_LAST, info, args(expr));
     if(_FILE_READ_TEXT_LINES.is(expr))
       return FileReadTextLines.opt(this, 0, 1, cc);
+
+    // rewrite list to its arguments or to elvis operator
+    if(expr instanceof List) {
+      final Expr[] args = ((List) expr).exprs;
+      final SeqType st1 = args[0].seqType();
+      if(st1.one())
+        return args[0];
+      if(st1.oneOrMore())
+        return cc.function(HEAD, info, args[0]);
+      if(st1.zeroOrOne()) {
+        final Expr dflt = new List(info, Arrays.copyOfRange(args, 1, args.length)).optimize(cc);
+        return cc.function(_UTIL_OR, info, args[0], cc.function(HEAD, info, dflt));
+      }
+    }
 
     exprType.assign(st.with(st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE));
     data(expr.data());

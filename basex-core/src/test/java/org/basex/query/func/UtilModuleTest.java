@@ -95,7 +95,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" tokenize(<_>X Y Z</_>)"), "X\nY");
 
     // iterator with known result size
-    check(func.args(" (<a/>, <b/>)"), "<a/>", exists(HEAD));
+    check(func.args(" (<a/>, <b/>)"), "<a/>", root(CElem.class));
     check(func.args(" sort((1 to 3) ! <_>{ . }</_>)"), "<_>1</_>\n<_>2</_>", exists(func));
     check("reverse(" + func.args(" (<a/>, <b/>, <c/>))"), "<b/>\n<a/>", exists(func));
 
@@ -103,7 +103,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(func.args(" ()")), "", empty());
     check(func.args(func.args(" (<a/>)")), "", empty());
     check(func.args(func.args(" (<a/>, <b/>)")), "", empty());
-    check(func.args(func.args(" (<a/>, <b/>, <c/>)")), "<a/>", exists(HEAD));
+    check(func.args(func.args(" (<a/>, <b/>, <c/>)")), "<a/>", root(CElem.class));
     check(func.args(func.args(" (<a/>, <b/>, <c/>, <d/>)")), "<a/>\n<b/>", exists(SUBSEQUENCE));
   }
 
