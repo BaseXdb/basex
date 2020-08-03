@@ -1,6 +1,7 @@
 package org.basex.query.expr.constr;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
@@ -91,12 +92,21 @@ abstract class CName extends CNode {
     if(type == AtomType.QNM) return (QNm) item;
     if(!type.isStringOrUntyped() || type == AtomType.URI) throw STRQNM_X_X.get(info, type, item);
 
-    // create and update namespace
-    final byte[] str = item.string(info);
-    if(XMLToken.isQName(str)) {
-      return elem || Token.contains(str, ':') ? new QNm(str, sc) : new QNm(str);
+    // check for QName
+    final byte[] token = normalize(item.string(info));
+    if(XMLToken.isQName(token)) {
+      return elem || contains(token, ':') ? new QNm(token, sc) : new QNm(token);
     }
-    throw INVNAME_X.get(info, str);
+
+    // check for EQName
+    final String string = string(token);
+    if(string.matches("^Q\\{.*\\}.+")) {
+      final byte[] local = token(string.replaceAll("^.*\\}", ""));
+      final byte[] uri = normalize(token(string.replaceAll("^Q\\{|\\}.*", "")));
+      if(XMLToken.isNCName(local) && !eq(uri, XMLNS_URI)) return new QNm(local, uri);
+    }
+
+    throw INVNAME_X.get(info, token);
   }
 
   /**
@@ -113,7 +123,7 @@ abstract class CName extends CNode {
       if(!type.isStringOrUntyped() || type == AtomType.URI) throw STRNCN_X_X.get(info, type, item);
       return trim(item.string(info));
     }
-    if(empty) return Token.EMPTY;
+    if(empty) return EMPTY;
     throw STRNCN_X_X.get(info, SeqType.EMP, item);
   }
 

@@ -165,4 +165,28 @@ public final class MixedTest extends SandboxTest {
     query("db:open('" + NAME + "')/*/* union db:open('" + NAME + "2')/*/*",
         "<n1a/>\n<n1b/>\n<n2a/>\n<n2b/>");
   }
+
+  /** Node construction, dynamic EQNames with URIs. */
+  @Test public void gh1912() {
+    query("element { 'a' } {}", "<a/>");
+    query("element { ' a ' } {}", "<a/>");
+    query("element { ' Q{}a ' } {}", "<a/>");
+    query("element { ' Q{ }a ' } {}", "<a/>");
+    query("element { ' Q{b}a ' } {}", "<a xmlns=\"b\"/>");
+    query("element { ' Q{ b }a ' } {}", "<a xmlns=\"b\"/>");
+    query("element { ' xml:a ' } {}", "<xml:a/>");
+    query("declare namespace p = 'u'; element { 'p:l' } {}", "<p:l xmlns:p=\"u\"/>");
+
+    query("attribute { ' a ' } {}", "a=\"\"");
+
+    error("element { '' } {}", INVNAME_X);
+    error("element { ' ' } {}", INVNAME_X);
+    error("element { 'a b' } {}", INVNAME_X);
+    error("element { 'a:b' } {}", INVPREF_X);
+    error("element { 'a: b' } {}", INVNAME_X);
+    error("element { 'Q{}' } {}", INVNAME_X);
+    error("element { 'Q{ }' } {}", INVNAME_X);
+
+    error("element { 'Q{ http://www.w3.org/2000/xmlns/ }a' } {}", INVNAME_X);
+  }
 }
