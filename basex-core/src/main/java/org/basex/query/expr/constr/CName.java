@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -52,13 +51,6 @@ abstract class CName extends CNode {
     return super.compile(cc);
   }
 
-  @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
-    name = name.simplifyFor(Simplify.ATOM, cc);
-    simplifyAll(Simplify.ATOM, cc);
-    return this;
-  }
-
   /**
    * Returns the atomized value of the constructor.
    * @param qc query context
@@ -101,9 +93,11 @@ abstract class CName extends CNode {
     // check for EQName
     final String string = string(token);
     if(string.matches("^Q\\{.*\\}.+")) {
-      final byte[] local = token(string.replaceAll("^.*\\}", ""));
+      final byte[] local = token(string.replaceAll("^.*?\\}", ""));
       final byte[] uri = normalize(token(string.replaceAll("^Q\\{|\\}.*", "")));
-      if(XMLToken.isNCName(local) && !eq(uri, XMLNS_URI)) return new QNm(local, uri);
+      if(XMLToken.isNCName(local) && !eq(uri, XMLNS_URI) && !contains(uri, '{')) {
+        return new QNm(local, uri);
+      }
     }
 
     throw INVNAME_X.get(info, token);

@@ -187,7 +187,7 @@ public final class SeqType {
   /** Occurrence indicator. */
   public final Occ occ;
   /** Kind test (can be {@code null}). */
-  public final Test test;
+  private final Test test;
 
   /**
    * Constructor.
@@ -550,17 +550,17 @@ public final class SeqType {
     return this == st || type.eq(st.type) && occ == st.occ && Objects.equals(test, st.test);
   }
 
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof SeqType && eq((SeqType) obj);
+  }
+
   /**
    * Returns a string representation of the type.
    * @return string
    */
   public String typeString() {
     return zero() ? EMPTY_SEQUENCE + "()" : test != null ? test.toString() : type.toString();
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof SeqType && eq((SeqType) obj);
   }
 
   @Override

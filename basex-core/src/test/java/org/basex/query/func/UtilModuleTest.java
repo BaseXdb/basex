@@ -278,8 +278,8 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" <a/>", 0), "", empty());
     check(func.args(" ()", " <_>2</_>"), "", empty());
     check(func.args(" <a/>", 1), "<a/>", empty(func));
-    check(func.args(" <a/>", 2), "<a/>\n<a/>", type(func, "element()+"));
-    check(func.args(" <a/>", " <_>2</_>"), "<a/>\n<a/>", type(func, "element()*"));
+    check(func.args(" <a/>", 2), "<a/>\n<a/>", type(func, "element(a)+"));
+    check(func.args(" <a/>", " <_>2</_>"), "<a/>\n<a/>", type(func, "element(a)*"));
 
     error(func.args(1, -1), UTIL_NEGATIVE_X);
   }

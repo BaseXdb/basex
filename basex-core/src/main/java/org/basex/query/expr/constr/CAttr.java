@@ -5,7 +5,9 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -34,6 +36,18 @@ public final class CAttr extends CName {
   public CAttr(final StaticContext sc, final InputInfo info, final boolean computed,
       final Expr name, final Expr... value) {
     super(sc, info, SeqType.ATT_O, computed, name, value);
+  }
+
+  @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    name = name.simplifyFor(Simplify.ATOM, cc);
+    if(name instanceof QNm) {
+      // ignore strings (namespaces depend on context)
+      exprType.assign(SeqType.get(NodeType.ATT, Occ.ONE, Test.get(NodeType.ATT, (QNm) name)));
+    }
+
+    simplifyAll(Simplify.ATOM, cc);
+    return this;
   }
 
   @Override

@@ -3226,7 +3226,7 @@ public class QueryParser extends InputParser {
     } else {
       return null;
     }
-    return Test.get(NodeType.PI, new QNm(name), null, null);
+    return Test.get(NodeType.PI, new QNm(name));
   }
 
   /**

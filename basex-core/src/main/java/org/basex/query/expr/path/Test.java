@@ -33,7 +33,17 @@ public abstract class Test extends ExprInfo {
    * Returns a node test, a name test or {@code null}.
    * @param type node type (element, attribute, processing instruction)
    * @param name node name
-   * @param ann type annotation
+   * @return test or {@code null}
+   */
+  public static Test get(final NodeType type, final QNm name) {
+    return get(type, name, null, null);
+  }
+
+  /**
+   * Returns a node test, a name test or {@code null}.
+   * @param type node type (element, attribute, processing instruction)
+   * @param name node name
+   * @param ann type annotation (can be {@code null})
    * @param ns default element namespace (may be {@code null})
    * @return test or {@code null}
    */

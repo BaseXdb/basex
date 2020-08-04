@@ -1528,7 +1528,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("let $a := <a/> where $a[. = ''] return $a/self::a", "<a/>",
         empty(GFLWOR.class), root(IterPath.class));
     check("let $a as element(a) := <a/> where $a return $a", "<a/>",
-        root(TypeCheck.class));
+        root(CElem.class));
 
     // skip rewritings: let
     check("let $e := (<a/>, <b/>) where $e/self::a return $e", "<a/>\n<b/>", root(GFLWOR.class));
@@ -1703,6 +1703,32 @@ public final class RewritingsTest extends QueryPlanTest {
     query("let $i := 1 group by $n := ([], [1]) return $i", 1);
     query("let $i := 1 group by $n := ([], []) return $i", 1);
     query("let $i := 1 group by $n := () return $i", 1);
+  }
+
+  /** Node constructors, better typing. */
+  @Test public void gh1908() {
+    check("<a/> treat as element(a)", "<a/>", root(CElem.class));
+    check("attribute a {} treat as attribute(a)", "a=\"\"", root(CAttr.class));
+    check("<?a ?> treat as processing-instruction(a)", "<?a ?>", root(CPI.class));
+    check("<xml:a/> treat as element(xml:a)", "<xml:a/>", root(CElem.class));
+    check("element Q{_}a {} treat as element(Q{_}a)", "<a xmlns=\"_\"/>", root(CElem.class));
+
+    check("function() as element(a) { <a/> }() " +
+        "instance of element(a)",
+        true, root(Bln.class));
+    check("function() as attribute(a) { attribute a {} }() " +
+        "instance of attribute(a)",
+        true, root(Bln.class));
+    check("function() as processing-instruction(a) { <?a ?> }() " +
+        "instance of processing-instruction(a)",
+        true, root(Bln.class));
+
+    check("function() as element(xml:a) { <xml:a/> }() " +
+        "instance of element(xml:a)",
+        true, root(Bln.class));
+    check("function() as element(Q{_}a) { element Q{_}a {} }() " +
+        "instance of element(Q{_}a)",
+        true, root(Bln.class));
   }
 
   /** Axis followed by attribute step. */

@@ -9,6 +9,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -55,6 +56,10 @@ public final class CElem extends CName {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     name = name.simplifyFor(Simplify.ATOM, cc);
+    if(name instanceof QNm) {
+      // ignore strings (namespaces depend on context)
+      exprType.assign(SeqType.get(NodeType.ELM, Occ.ONE, Test.get(NodeType.ELM, (QNm) name)));
+    }
     return this;
   }
 
