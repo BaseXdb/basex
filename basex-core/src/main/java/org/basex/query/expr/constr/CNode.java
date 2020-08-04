@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -38,6 +39,33 @@ public abstract class CNode extends Arr {
 
   @Override
   public abstract Item item(QueryContext qc, InputInfo ii) throws QueryException;
+
+  /**
+   * Returns the atomized node value.
+   * @param qc query context
+   * @return resulting value or {@code null}
+   * @throws QueryException query exception
+   */
+  byte[] atomValue(final QueryContext qc) throws QueryException {
+    final int el = exprs.length;
+    // empty sequence: empty string
+    if(el == 0) return null;
+    // single string argument
+    if(el == 1 && exprs[0] instanceof Str) return ((Str) exprs[0]).string();
+
+    boolean more = false;
+    final TokenBuilder tb = new TokenBuilder();
+    for(final Expr expr : exprs) {
+      more = false;
+      final Iter iter = expr.atomIter(qc, info);
+      for(Item item; (item = qc.next(iter)) != null;) {
+        if(more) tb.add(' ');
+        tb.add(item.string(info));
+        more = true;
+      }
+    }
+    return more ? tb.finish() : null;
+  }
 
   @Override
   public boolean has(final Flag... flags) {

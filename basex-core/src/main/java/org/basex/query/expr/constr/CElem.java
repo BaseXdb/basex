@@ -11,6 +11,7 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -56,9 +57,12 @@ public final class CElem extends CName {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     name = name.simplifyFor(Simplify.ATOM, cc);
-    if(name instanceof QNm) {
-      // ignore strings (namespaces depend on context)
-      exprType.assign(SeqType.get(NodeType.ELM, Occ.ONE, Test.get(NodeType.ELM, (QNm) name)));
+    if(name instanceof Value) {
+      final QNm nm = qname(true, cc.qc, null);
+      if(nm != null) {
+        name = nm;
+        exprType.assign(SeqType.get(NodeType.ELM, Occ.ONE, Test.get(NodeType.ELM, nm)));
+      }
     }
     return this;
   }
@@ -73,7 +77,7 @@ public final class CElem extends CName {
       for(int i = 0; i < nl; i++) inscopeNS.add(nspaces.name(i), nspaces.value(i));
 
       // create and check QName
-      final QNm nm = qname(true, qc);
+      final QNm nm = qname(true, qc, sc);
       final byte[] cp = nm.prefix(), cu = nm.uri();
       if(eq(cp, XML) ^ eq(cu, XML_URI)) throw CEXML.get(info, cu, cp);
       if(eq(cu, XMLNS_URI)) throw CEINV_X.get(info, cu);

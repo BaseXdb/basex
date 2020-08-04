@@ -8,6 +8,7 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -38,11 +39,14 @@ public final class CPI extends CName {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     name = name.simplifyFor(Simplify.ATOM, cc);
-    if(name instanceof Str) {
+    if(name instanceof Value) {
       final byte[] nm = ncname(false, cc.qc);
-      exprType.assign(SeqType.get(NodeType.PI, Occ.ONE, Test.get(NodeType.PI, new QNm(nm))));
+      if(nm != null) {
+        name = Str.get(nm);
+        exprType.assign(SeqType.get(NodeType.PI, Occ.ONE, Test.get(NodeType.PI, new QNm(nm))));
+      }
     }
-    simplifyAll(Simplify.ATOM, cc);
+    optValue(cc);
     return this;
   }
 

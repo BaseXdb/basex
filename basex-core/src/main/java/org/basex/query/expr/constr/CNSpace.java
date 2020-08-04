@@ -5,7 +5,10 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -30,6 +33,17 @@ public final class CNSpace extends CName {
   public CNSpace(final StaticContext sc, final InputInfo info, final boolean computed,
       final Expr name, final Expr value) {
     super(sc, info, SeqType.NSP_O, computed, name, value);
+  }
+
+  @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    name = name.simplifyFor(Simplify.ATOM, cc);
+    if(name instanceof Value) {
+      final byte[] nm = ncname(true, cc.qc);
+      if(nm != null) name = Str.get(nm);
+    }
+    optValue(cc);
+    return this;
   }
 
   @Override

@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -21,9 +20,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class CTxt extends CNode {
-  /** Item evaluation flag. */
-  private boolean simple;
-
   /**
    * Constructor.
    * @param sc static context
@@ -40,40 +36,29 @@ public final class CTxt extends CNode {
   public Expr optimize(final CompileContext cc) throws QueryException {
     simplifyAll(Simplify.ATOM, cc);
 
+    if(allAreValues(true) && !(exprs[0] instanceof Str)) {
+      final byte[] value = atomValue(cc.qc);
+      exprs[0] = value != null ? Str.get(value) : Empty.VALUE;
+    }
+
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
     if(st.zero()) return cc.replaceWith(this, expr);
+
     final boolean atom = !st.mayBeArray();
     if(st.oneOrMore() && atom) exprType.assign(Occ.ONE);
-    simple = st.zeroOrOne() && atom;
     return this;
   }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // if possible, retrieve single item
-    final Expr expr = exprs[0];
-    if(simple) {
-      final Item item = expr.item(qc, info);
-      return new FTxt(item == Empty.VALUE ? Token.EMPTY : item.string(info));
-    }
-
-    final TokenBuilder tb = new TokenBuilder();
-    boolean more = false;
-    final Iter iter = expr.atomIter(qc, info);
-    for(Item item; (item = qc.next(iter)) != null;) {
-      if(more) tb.add(' ');
-      tb.add(item.string(info));
-      more = true;
-    }
-    return more ? new FTxt(tb.finish()) : Empty.VALUE;
+    final byte[] value = atomValue(qc);
+    return value != null ? new FTxt(value) : Empty.VALUE;
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final CTxt ctxt = new CTxt(sc, info, computed, exprs[0].copy(cc, vm));
-    ctxt.simple = simple;
-    return copyType(ctxt);
+    return copyType(new CTxt(sc, info, computed, exprs[0].copy(cc, vm)));
   }
 
   @Override

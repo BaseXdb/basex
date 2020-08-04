@@ -8,6 +8,7 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -41,18 +42,20 @@ public final class CAttr extends CName {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     name = name.simplifyFor(Simplify.ATOM, cc);
-    if(name instanceof QNm) {
-      // ignore strings (namespaces depend on context)
-      exprType.assign(SeqType.get(NodeType.ATT, Occ.ONE, Test.get(NodeType.ATT, (QNm) name)));
+    if(name instanceof Value) {
+      final QNm nm = qname(true, cc.qc, null);
+      if(nm != null) {
+        name = nm;
+        exprType.assign(SeqType.get(NodeType.ATT, Occ.ONE, Test.get(NodeType.ATT, nm)));
+      }
     }
-
-    simplifyAll(Simplify.ATOM, cc);
+    optValue(cc);
     return this;
   }
 
   @Override
   public FAttr item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    QNm nm = qname(false, qc);
+    QNm nm = qname(false, qc, sc);
     final byte[] cp = nm.prefix();
     if(computed) {
       final byte[] cu = nm.uri();
@@ -67,10 +70,10 @@ public final class CAttr extends CName {
     }
     if(!nm.hasURI() && nm.hasPrefix()) throw INVPREF_X.get(info, nm);
 
-    byte[] val = atomValue(qc);
-    if(eq(cp, XML) && eq(nm.local(), ID)) val = normalize(val);
+    byte[] value = atomValue(qc);
+    if(eq(cp, XML) && eq(nm.local(), ID)) value = normalize(value);
 
-    return new FAttr(nm, val);
+    return new FAttr(nm, value);
   }
 
   @Override

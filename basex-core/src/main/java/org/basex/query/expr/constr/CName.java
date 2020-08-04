@@ -3,10 +3,11 @@ package org.basex.query.expr.constr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.Token.normalize;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -52,33 +53,34 @@ abstract class CName extends CNode {
   }
 
   /**
-   * Returns the atomized value of the constructor.
-   * @param qc query context
-   * @return resulting value
+   * Optimizes the node value.
+   * @param cc compilation context
    * @throws QueryException query exception
    */
-  final byte[] atomValue(final QueryContext qc) throws QueryException {
-    final TokenBuilder tb = new TokenBuilder();
-    for(final Expr expr : exprs) {
-      boolean more = false;
-      final Iter iter = expr.atomIter(qc, info);
-      for(Item item; (item = qc.next(iter)) != null;) {
-        if(more) tb.add(' ');
-        tb.add(item.string(info));
-        more = true;
-      }
+  final void optValue(final CompileContext cc) throws QueryException {
+    simplifyAll(Simplify.ATOM, cc);
+    if(allAreValues(true) && (exprs.length != 1 || !(exprs[0] instanceof Str))) {
+      exprs = new Expr[] { Str.get(atomValue(cc.qc)) };
     }
-    return tb.finish();
+  }
+
+  @Override
+  final byte[] atomValue(final QueryContext qc) throws QueryException {
+    final byte[] value = super.atomValue(qc);
+    return value != null ? value : Token.EMPTY;
   }
 
   /**
    * Evaluates the name expression as a QName.
    * @param elem element
    * @param qc query context
-   * @return result
+   * @param sctx static context for resolving namespaces (can be {@code null})
+   * @return result, or {@code null} if namespace cannot be resolved (at compile time)
    * @throws QueryException query exception
    */
-  final QNm qname(final boolean elem, final QueryContext qc) throws QueryException {
+  final QNm qname(final boolean elem, final QueryContext qc, final StaticContext sctx)
+      throws QueryException {
+
     final Item item = checkNoEmpty(name.atomItem(qc, info), AtomType.QNM);
     final Type type = item.type;
     if(type == AtomType.QNM) return (QNm) item;
@@ -86,9 +88,8 @@ abstract class CName extends CNode {
 
     // check for QName
     final byte[] token = normalize(item.string(info));
-    if(XMLToken.isQName(token)) {
-      return elem || contains(token, ':') ? new QNm(token, sc) : new QNm(token);
-    }
+    if(XMLToken.isQName(token)) return !(elem || contains(token, ':')) ?
+      new QNm(token) : sctx != null ? new QNm(token, sctx) : null;
 
     // check for EQName
     final String string = string(token);
@@ -172,8 +173,7 @@ abstract class CName extends CNode {
   @Override
   public final void plan(final QueryString qs, final String kind) {
     qs.token(kind);
-    if(name instanceof Str) qs.token(((Str) name).string());
-    else if(name instanceof QNm) qs.token(((QNm) name).id());
+    if(name instanceof QNm) qs.token(((QNm) name).id());
     else qs.brace(name);
     super.plan(qs, null);
   }
