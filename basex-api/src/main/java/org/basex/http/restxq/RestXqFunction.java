@@ -484,12 +484,12 @@ public final class RestXqFunction extends WebFunction {
       // message
       if(name != null && name.hasPrefix() && !name.hasURI()) throw error(INV_NONS_X, name);
       final NameTest test = part != null ?
-        new NameTest(NodeType.ELM, name, part, null) : null;
+        new NameTest(name, part, NodeType.ELM, null) : null;
 
       final Function<NameTest, String> toString = t -> t != null ? t.toString() : "*";
       if(!error.isEmpty()) {
         final NameTest first = error.get(0);
-        if(first != null ? first.part != part : part != null) {
+        if(first != null ? first.part() != part : part != null) {
           throw error(INV_PRECEDENCE_X_X, toString.apply(first), toString.apply(test));
         }
       }

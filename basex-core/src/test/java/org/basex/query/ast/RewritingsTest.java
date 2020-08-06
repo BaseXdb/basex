@@ -1731,6 +1731,37 @@ public final class RewritingsTest extends QueryPlanTest {
         true, root(Bln.class));
   }
 
+  /** Axis steps, better typing. */
+  @Test public void gh1909() {
+    // fragments
+    check("function() as element(a)? { <a/>/self::a }()",
+        "<a/>", root(IterPath.class));
+    check("function() as element(a)? { <a/>/self::Q{}a }()",
+        "<a/>", root(IterPath.class));
+    check("function() as element(Q{}a)? { <a/>/self::Q{}a }()",
+        "<a/>", root(IterPath.class));
+
+    // database nodes
+    execute(new CreateDB(NAME, "<x>A</x>"));
+    check("function() as element(x)* { x }()[text() = 'A']",
+        "<x>A</x>", exists(ValueAccess.class));
+    check("function() as element(x)* { /x }()[text() = 'A']",
+        "<x>A</x>", exists(ValueAccess.class));
+    check("function() as element(x)* { db:open('" + NAME + "')/x }()[text() = 'A']",
+        "<x>A</x>", exists(ValueAccess.class));
+    check("function() as element(x) { db:open('" + NAME + "')/x }()[text() = 'A']",
+        "<x>A</x>", exists(ValueAccess.class));
+    check("function() as document-node() { db:open('" + NAME + "') }()/x[text() = 'A']",
+        "<x>A</x>", exists(ValueAccess.class));
+
+    // no rewriting allowed
+    check("function() as element(a)? { <a/>/self::*:a }()",
+        "<a/>", root(TypeCheck.class));
+    check("function() as element(xml:a)? { <xml:a/>/self::xml:* }()",
+        "<xml:a/>", root(TypeCheck.class));
+    error("function() as element(a)? { <xml:a/>/self::xml:a }()", INVPROMOTE_X_X_X);
+  }
+
   /** Axis followed by attribute step. */
   @Test public void gh1910() {
     check("<x/>//@*", null, type("IterStep[@axis = 'descendant-or-self']", "element()*"));

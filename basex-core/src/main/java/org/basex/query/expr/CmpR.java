@@ -244,7 +244,7 @@ public final class CmpR extends Single {
       }
       if(!(step.test instanceof NameTest)) return null;
       test = (NameTest) step.test;
-      if(test.part != NamePart.LOCAL) return null;
+      if(test.part() != NamePart.LOCAL) return null;
     }
 
     final Names names = type == IndexType.TEXT ? data.elemNames : data.attrNames;

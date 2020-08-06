@@ -29,12 +29,12 @@ public final class QNm extends Item {
   /** URL pattern (matching Clark and EQName notation). */
   public static final Pattern EQNAME = Pattern.compile("^Q?\\{(.*?)}(.+)$");
 
-  /** Namespace URI (can be {@code null}). */
-  private byte[] uri;
   /** Name with optional prefix. */
   private final byte[] name;
   /** Prefix index. */
   private final int pref;
+  /** Namespace URI (can be {@code null}). */
+  private byte[] uri;
 
   /**
    * Constructor.

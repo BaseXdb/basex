@@ -2028,7 +2028,7 @@ public class QueryParser extends InputParser {
       if(consume(':')) {
         // name test: *:name
         if(!consume('*')) {
-          return new NameTest(type, new QNm(ncName(QNAME_X)), NamePart.LOCAL, sc.elemNS);
+          return new NameTest(new QNm(ncName(QNAME_X)), NamePart.LOCAL, type, sc.elemNS);
         }
       }
       // name test: *
@@ -2041,7 +2041,7 @@ public class QueryParser extends InputParser {
       if(consume('*')) {
         // name test: Q{uri}*
         final QNm name = new QNm(COLON, uri);
-        return new NameTest(type, name, NamePart.URI, sc.elemNS);
+        return new NameTest(name, NamePart.URI, type, sc.elemNS);
       }
     }
     pos = p;
@@ -2062,11 +2062,11 @@ public class QueryParser extends InputParser {
           // name test: prefix:*
           name = new QNm(concat(name.string(), COLON));
           qnames.add(name, type == NodeType.ELM, ii);
-          return new NameTest(type, name, NamePart.URI, sc.elemNS);
+          return new NameTest(name, NamePart.URI, type, sc.elemNS);
         }
         // name test: prefix:name, name, Q{uri}name
         qnames.add(name, type == NodeType.ELM, ii);
-        return new NameTest(type, name, NamePart.FULL, sc.elemNS);
+        return new NameTest(name, NamePart.FULL, type, sc.elemNS);
       }
     }
     pos = p;

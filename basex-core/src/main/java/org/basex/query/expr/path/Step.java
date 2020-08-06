@@ -124,7 +124,7 @@ public abstract class Step extends Preds {
       axis == Axis.SELF || axis == Axis.PARENT || axis == Axis.ATTRIBUTE &&
         test instanceof NameTest && ((NameTest) test).part == NamePart.FULL ?
         Occ.ZERO_ONE : Occ.ZERO_MORE
-    ), preds);
+    , test instanceof KindTest ? null : test), preds);
 
     this.axis = axis;
     this.test = test;
@@ -205,7 +205,7 @@ public abstract class Step extends Preds {
     // check node type
     int name = 0;
     if(test instanceof NameTest) {
-      final NamePart part = ((NameTest) test).part;
+      final NamePart part = ((NameTest) test).part();
       if(part == NamePart.LOCAL) {
         // element/attribute test (*:ln)
         final Names names = test.type == NodeType.ATT ? data.attrNames : data.elemNames;

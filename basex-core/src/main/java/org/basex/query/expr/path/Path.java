@@ -380,6 +380,25 @@ public abstract class Path extends ParseExpr {
     for(final Expr expr : steps) {
       final Step step = (Step) expr;
       switch(step.axis) {
+        case ATTRIBUTE:
+        case SELF:
+          // nothing changes
+          break;
+        case PARENT:
+        case FOLLOWING_SIBLING:
+          // can overlap, preserves level
+          if(!atMostOne) return false;
+          break;
+        case CHILD:
+          // order is only ensured if all nodes are on the same level
+          if(!sameDepth) return false;
+          break;
+        case DESCENDANT:
+        case DESCENDANT_OR_SELF:
+          // non-overlapping if all nodes are on the same level
+          if(!sameDepth) return false;
+          sameDepth = false;
+          break;
         case ANCESTOR:
         case ANCESTOR_OR_SELF:
         case PRECEDING:
@@ -389,41 +408,12 @@ public abstract class Path extends ParseExpr {
         case FOLLOWING:
           // can overlap
           if(!atMostOne) return false;
-          atMostOne = false;
           sameDepth = false;
-          break;
-        case FOLLOWING_SIBLING:
-          // can overlap, preserves level
-          if(!atMostOne) return false;
-          atMostOne = false;
-          break;
-        case ATTRIBUTE:
-          // only unique for exact QName matching
-          atMostOne &= step.test instanceof NameTest &&
-            ((NameTest) step.test).part == NamePart.FULL;
-          break;
-        case CHILD:
-          // order is only ensured if all nodes are on the same level
-          if(!sameDepth) return false;
-          atMostOne = false;
-          break;
-        case DESCENDANT:
-        case DESCENDANT_OR_SELF:
-          // non-overlapping if all nodes are on the same level
-          if(!sameDepth) return false;
-          atMostOne = false;
-          sameDepth = false;
-          break;
-        case PARENT:
-          // overlaps
-          if(!atMostOne) return false;
-          break;
-        case SELF:
-          // nothing changes
           break;
         default:
           throw Util.notExpected();
       }
+      atMostOne &= step.seqType().zeroOrOne();
     }
     return true;
   }
@@ -514,7 +504,7 @@ public abstract class Path extends ParseExpr {
       if(!desc && curr.axis != CHILD || !(curr.test instanceof NameTest)) return null;
 
       final NameTest test = (NameTest) curr.test;
-      if(test.part != NamePart.LOCAL) return null;
+      if(test.part() != NamePart.LOCAL) return null;
 
       final int name = data.elemNames.id(test.qname.local());
       final ArrayList<PathNode> tmp = new ArrayList<>();
@@ -611,7 +601,7 @@ public abstract class Path extends ParseExpr {
         final Expr[] preds = t == ts - 1 ? ((Preds) steps[s]).exprs : new Expr[0];
         final QNm qName = qNames.get(ts - t - 1);
         final Test test = qName == null ? KindTest.ELM :
-          new NameTest(NodeType.ELM, qName, NamePart.LOCAL, null);
+          new NameTest(qName, NamePart.LOCAL, NodeType.ELM, null);
         stps[t] = Step.get(cc, root, curr.info, CHILD, test, preds);
       }
       while(++s < sl) stps[ts++] = steps[s];
@@ -810,7 +800,7 @@ public abstract class Path extends ParseExpr {
           !(step.test instanceof NameTest)) return true;
       // only consider local name tests
       final NameTest test = (NameTest) step.test;
-      if(test.part != NamePart.LOCAL) return true;
+      if(test.part() != NamePart.LOCAL) return true;
       // only support unique paths with nodes on the correct level
       final ArrayList<PathNode> pn = data.paths.desc(test.qname.local());
       if(pn.size() != 1 || pn.get(0).level() != s + 1) return true;

@@ -6,7 +6,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Document kind test.
+ * Document with child test.
  *
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
@@ -17,11 +17,11 @@ public final class DocTest extends Test {
 
   /**
    * Constructor.
-   * @param test child test (node test or element kind test)
+   * @param child child element test
    */
-  public DocTest(final Test test) {
+  public DocTest(final Test child) {
     super(NodeType.DOC);
-    child = test;
+    this.child = child;
   }
 
   @Override
@@ -44,9 +44,6 @@ public final class DocTest extends Test {
 
   @Override
   public Test intersect(final Test test) {
-    if(test instanceof UnionTest) {
-      return test.intersect(this);
-    }
     if(test instanceof DocTest) {
       final DocTest dt = (DocTest) test;
       if(child == null || dt.child == null || child.equals(dt.child))
@@ -54,8 +51,10 @@ public final class DocTest extends Test {
       final Test tp = child.intersect(dt.child);
       return tp == null ? null : new DocTest(tp);
     }
-    if(test instanceof KindTest) return NodeType.DOC.instanceOf(test.type) ? this : null;
+    if(test instanceof KindTest) return type.instanceOf(test.type) ? this : null;
+    if(test instanceof UnionTest) return test.intersect(this);
     if(test instanceof InvDocTest) return this;
+    // NameTest
     return null;
   }
 

@@ -52,7 +52,7 @@ public abstract class Test extends ExprInfo {
       (ann == AtomType.AST || ann == AtomType.AAT || ann == AtomType.ATM))) return null;
 
     return name == null ? KindTest.get(type) :
-      new NameTest(type, name, type == NodeType.PI ? NamePart.LOCAL : NamePart.FULL, ns);
+      new NameTest(name, type == NodeType.PI ? NamePart.LOCAL : NamePart.FULL, type, ns);
   }
 
   /**
@@ -114,6 +114,16 @@ public abstract class Test extends ExprInfo {
    * @return deep copy
    */
   public abstract Test copy();
+
+  /**
+   * Checks if the current test is an instance of the specified test.
+   * @param test test to be checked
+   * @return result of check
+   */
+  public boolean instanceOf(final Test test) {
+    return test instanceof UnionTest ? ((UnionTest) test).instance(this) :
+      type.instanceOf(test.type);
+  }
 
   /**
    * Computes the intersection between two tests.

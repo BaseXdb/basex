@@ -65,17 +65,17 @@ final class InvDocTest extends Test {
   }
 
   @Override
+  public Test copy() {
+    return new InvDocTest(pres, data);
+  }
+
+  @Override
   public boolean matches(final ANode node) {
     // no database node
     if(!(node instanceof DBNode)) return false;
     // ensure that the pre value is contained in the target documents
     final DBNode db = (DBNode) node;
     return data == db.data() && pres.sortedIndexOf(db.pre()) >= 0;
-  }
-
-  @Override
-  public Test copy() {
-    return new InvDocTest(pres, data);
   }
 
   @Override

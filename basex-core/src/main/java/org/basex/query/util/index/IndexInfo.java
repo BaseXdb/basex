@@ -85,7 +85,7 @@ public final class IndexInfo {
           !(last.test instanceof NameTest)) return null;
 
       test = (NameTest) last.test;
-      if(test.part != NamePart.LOCAL) return null;
+      if(test.part() != NamePart.LOCAL) return null;
 
       final Stats stats = data.elemNames.stats(data.elemNames.id(test.qname.local()));
       if(stats == null || !stats.isLeaf()) return null;

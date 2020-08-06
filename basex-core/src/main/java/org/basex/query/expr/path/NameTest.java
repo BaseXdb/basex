@@ -14,37 +14,40 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class NameTest extends Test {
-  /** Default element namespace. */
-  private final byte[] defaultNs;
-  /** Local name. */
-  public final byte[] local;
   /** QName test. */
   public final QNm qname;
   /** Part of name to be tested. */
-  public NamePart part;
+  public final NamePart part;
+  /** Local name. */
+  public final byte[] local;
+  /** Default element namespace. */
+  private final byte[] defaultNs;
+
+  /** Perform only local check at runtime. */
+  private boolean simple;
 
   /**
    * Convenience constructor for element tests.
    * @param name node name
    */
   public NameTest(final QNm name) {
-    this(NodeType.ELM, name, NamePart.FULL, null);
+    this(name, NamePart.FULL, NodeType.ELM, null);
   }
 
   /**
    * Constructor.
-   * @param type node type
    * @param qname name
    * @param part part of name to be tested
+   * @param type node type
    * @param defaultNs default element namespace (used for optimizations, can be {@code null})
    */
-  public NameTest(final NodeType type, final QNm qname, final NamePart part,
+  public NameTest(final QNm qname, final NamePart part, final NodeType type,
       final byte[] defaultNs) {
 
     super(type);
-    this.defaultNs = defaultNs != null ? defaultNs : Token.EMPTY;
-    this.part = part;
     this.qname = qname;
+    this.part = part;
+    this.defaultNs = defaultNs != null ? defaultNs : Token.EMPTY;
     local = qname.local();
   }
 
@@ -59,18 +62,15 @@ public final class NameTest extends Test {
 
     // check if test may yield results
     if(part == NamePart.FULL && !qname.hasURI()) {
-      if(type == NodeType.ATT || Token.eq(dataNs, defaultNs)) {
-        // namespace is irrelevant/identical: only check local name
-        part = NamePart.LOCAL;
-      } else {
-        // element and db default namespaces are different: no results
-        return true;
-      }
+      // element and db default namespaces are different: no results
+      if(type != NodeType.ATT && !Token.eq(dataNs, defaultNs)) return true;
+      // namespace is irrelevant/identical: only check local name
+      simple = true;
     }
 
     // check existence of local element/attribute names
-    return type != NodeType.PI && part == NamePart.LOCAL &&
-      !(type == NodeType.ELM ? data.elemNames : data.attrNames).contains(local);
+    return !(type == NodeType.PI || part() != NamePart.LOCAL ||
+      (type == NodeType.ELM ? data.elemNames : data.attrNames).contains(local));
   }
 
   @Override
@@ -81,8 +81,7 @@ public final class NameTest extends Test {
   @Override
   public boolean matches(final ANode node) {
     if(node.type != type) return false;
-
-    switch(part) {
+    switch(part()) {
       // namespaces wildcard: only check local name
       case LOCAL: return Token.eq(local, Token.local(node.name()));
       // name wildcard: only check namespace
@@ -98,7 +97,7 @@ public final class NameTest extends Test {
    * @return result of check
    */
   public boolean matches(final QNm qName) {
-    switch(part) {
+    switch(part()) {
       // namespaces wildcard: only check local name
       case LOCAL: return Token.eq(local, qName.local());
       // name wildcard: only check namespace
@@ -108,18 +107,33 @@ public final class NameTest extends Test {
     }
   }
 
+  /**
+   * Returns the name part relevant at runtime.
+   * @return name part
+   */
+  public NamePart part() {
+    return simple ? NamePart.LOCAL : part;
+  }
+
+
+  @Override
+  public boolean instanceOf(final Test test) {
+    if(test instanceof NameTest) {
+      final NameTest nt = (NameTest) test;
+      return type == nt.type && part == nt.part && qname.eq(nt.qname);
+    }
+    return super.instanceOf(test);
+  }
+
   @Override
   public Test intersect(final Test test) {
-    if(test instanceof UnionTest) {
-      return test.intersect(this);
-    }
     if(test instanceof NameTest) {
       final NameTest nt = (NameTest) test;
       return type == nt.type && qname.eq(nt.qname) ? this : null;
     }
-    if(test instanceof KindTest) {
-      return type.instanceOf(test.type) ? this : null;
-    }
+    if(test instanceof KindTest) return type.instanceOf(test.type) ? this : null;
+    if(test instanceof UnionTest) return test.intersect(this);
+    // DocTest, InvDocTest
     return null;
   }
 
@@ -127,7 +141,7 @@ public final class NameTest extends Test {
   public boolean equals(final Object obj) {
     if(!(obj instanceof NameTest)) return false;
     final NameTest nt = (NameTest) obj;
-    return type == nt.type && qname.eq(nt.qname);
+    return type == nt.type && part == nt.part && qname.eq(nt.qname);
   }
 
   @Override

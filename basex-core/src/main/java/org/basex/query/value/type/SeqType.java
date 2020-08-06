@@ -538,7 +538,7 @@ public final class SeqType {
     // empty sequence: only check cardinality
     return zero() ? !st.oneOrMore() :
       (st.type == AtomType.ITEM || type.instanceOf(st.type)) && occ.instanceOf(st.occ) &&
-      (st.test == null || test != null && test.intersect(st.test) != null);
+      (st.test == null || test != null && test.instanceOf(st.test));
   }
 
   /**

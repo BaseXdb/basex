@@ -14,7 +14,10 @@ public class KindTest extends Test {
   /** Generic document node test. */
   public static final KindTest DOC = new KindTest(NodeType.DOC);
   /** Generic element node test. */
-  public static final KindTest ELM = new KindTest(NodeType.ELM);
+  public static final KindTest ELM = new KindTest(NodeType.ELM) {
+    @Override
+    public String toString(final boolean full) { return full ? type.toString() : "*"; }
+  };
   /** Generic attribute node test. */
   public static final KindTest ATT = new KindTest(NodeType.ATT);
   /** Generic PI node test. */
@@ -29,6 +32,10 @@ public class KindTest extends Test {
   public static final KindTest NOD = new KindTest(NodeType.NOD) {
     @Override
     public boolean matches(final ANode node) { return true; }
+    @Override
+    public boolean instanceOf(final Test test) { return false; }
+    @Override
+    public Test intersect(final Test test) { return test; }
   };
 
   /**
@@ -59,7 +66,7 @@ public class KindTest extends Test {
   }
 
   @Override
-  public KindTest copy() {
+  public final KindTest copy() {
     return this;
   }
 
@@ -69,29 +76,29 @@ public class KindTest extends Test {
   }
 
   @Override
+  public boolean instanceOf(final Test test) {
+    return (test instanceof KindTest || test instanceof UnionTest) && super.instanceOf(test);
+  }
+
+  @Override
   public Test intersect(final Test test) {
-    if(test instanceof UnionTest) {
+    if(test instanceof KindTest)
+      return instanceOf(test) ? this : test.instanceOf(this) ? test : null;
+    if(test instanceof NameTest || test instanceof DocTest)
+      return test.instanceOf(this) ? test : null;
+    if(test instanceof UnionTest)
       return test.intersect(this);
-    }
-    if(test instanceof NameTest || test instanceof DocTest) {
-      return test.type.instanceOf(type) ? test : null;
-    }
-    if(test instanceof KindTest) {
-      return type.instanceOf(test.type) ? this : test.type.instanceOf(type) ? test : null;
-    }
-    if(test instanceof InvDocTest) {
-      throw Util.notExpected(test);
-    }
+    // InvDocTest
     return null;
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return obj instanceof KindTest && type == ((KindTest) obj).type;
+  public final boolean equals(final Object obj) {
+    return obj == this;
   }
 
   @Override
   public String toString(final boolean full) {
-    return full || type != NodeType.ELM ? type.toString() : "*";
+    return type.toString();
   }
 }
