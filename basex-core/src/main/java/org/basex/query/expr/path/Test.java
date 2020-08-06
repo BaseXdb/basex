@@ -82,7 +82,7 @@ public abstract class Test extends ExprInfo {
         if(!list.contains(test)) list.add(test);
       }
     }
-    return new UnionTest(type, list.toArray(new Test[0]));
+    return list.size() == 1 ? list.get(0) : new UnionTest(type, list.toArray(new Test[0]));
   }
 
   /**
