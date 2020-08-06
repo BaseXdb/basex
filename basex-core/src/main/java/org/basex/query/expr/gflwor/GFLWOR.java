@@ -576,8 +576,7 @@ public final class GFLWOR extends ParseExpr {
         // remove clause and ensure that the positional variable is only used once
         clauses.remove(d);
         if(count(pos.pos, c) == VarUsage.NEVER) {
-          /* OLD: for $v at $pos in E where $pos = P ...
-           * NEW: for $v in E[position() = P] ... */
+          // for $e at $p in E where $p = P ...  ->  for $e in E[position() = P] ...
           pos.addPredicate(cc, ItrPos.get(cmp.min, cmp.max, cmp.info));
           cc.info(QueryText.OPTPRED_X, expr);
           changed = true;
@@ -683,8 +682,7 @@ public final class GFLWOR extends ParseExpr {
       if(!fst.empty) {
         // flat nested FLWOR expressions
         if(fst.expr instanceof GFLWOR) {
-          // OLD: for $a at $p in for $x in (1 to 2) return $x + 1 return $p
-          // NEW: for $a in (1 to 2) count $p return $p
+          // for $a in (for $b in ... return $b + 1) ...  ->  for $b in ... for $a in $b + 1 ...
           cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, fst.var);
           final GFLWOR sub = (GFLWOR) fst.expr;
           clauses.set(0, new For(fst.var, null, fst.score, sub.rtrn, false));
@@ -695,9 +693,11 @@ public final class GFLWOR extends ParseExpr {
         if(clauses.size() > 1 && clauses.get(1) instanceof Count) {
           final Count cnt = (Count) clauses.get(1);
           if(fst.pos != null) {
+            // for $a at $b in ... count $c ...  ->  for $a at $b in ... let $c := $b ...
             final VarRef vr = new VarRef(cnt.info, fst.pos);
             clauses.set(1, new Let(cnt.var, vr.optimize(cc)).optimize(cc));
           } else {
+            // for $a in 1 to 3 count $c ...  -> for $a at $c in 1 to 3 ...
             clauses.set(0, new For(fst.var, cnt.var, fst.score, fst.expr, false).optimize(cc));
             clauses.remove(1);
           }
@@ -718,8 +718,7 @@ public final class GFLWOR extends ParseExpr {
       final GFLWOR sub = (GFLWOR) rtrn;
       if(sub.isFLW()) {
         // flatten nested FLWOR expressions
-        // OLD: for $a in (1 to 2) return let $f := <a>1</a> return $f + 1
-        // NEW: for $a in (1 to 2) let $f := <a>1</a> return $f + 1
+        // for $a in (1 to 2) return let $f := ...  ->  for $a in (1 to 2) let $f := ...
         final Clause clause = sub.clauses.getFirst();
         final ExprInfo ei = clause instanceof ForLet ? ((ForLet) clause).var : clause;
         cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, ei);
