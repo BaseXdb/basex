@@ -2,6 +2,7 @@ package org.basex.query.expr.path;
 
 import java.util.*;
 import java.util.List;
+import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
@@ -56,8 +57,8 @@ public abstract class Test extends ExprInfo {
   }
 
   /**
-   * Returns a single test for the specified tests.
-   * @param tests tests
+   * Creates a single test with the same node type.
+   * @param tests tests to be merged
    * @return single test, union test, or {@code null} if test cannot be created.
    */
   public static Test get(final Test... tests) {
@@ -65,21 +66,28 @@ public abstract class Test extends ExprInfo {
     if(tl == 0) return null;
     if(tl == 1) return tests[0];
 
-    NodeType type = null;
+    // check if tests can be merged or discarded
     final List<Test> list = new ArrayList<>(tl);
+    final Consumer<Test> add = tst -> {
+      if(tst instanceof KindTest) {
+        list.removeIf((Predicate<Test>) t -> t instanceof NameTest);
+      } else if(tst instanceof NameTest) {
+        if(((Checks<Test>) t -> t instanceof KindTest).any(list)) return;
+      }
+      if(!list.contains(tst)) list.add(tst);
+    };
+
+    NodeType type = null;
     for(final Test test : tests) {
       if(type == null) {
         type = test.type;
       } else if(test.type != type) {
         return null;
       }
-      // flatten tests
       if(test instanceof UnionTest) {
-        for(final Test t : ((UnionTest) test).tests) {
-          if(!list.contains(t)) list.add(t);
-        }
+        for(final Test t : ((UnionTest) test).tests) add.accept(t);
       } else {
-        if(!list.contains(test)) list.add(test);
+        add.accept(test);
       }
     }
     return list.size() == 1 ? list.get(0) : new UnionTest(type, list.toArray(new Test[0]));

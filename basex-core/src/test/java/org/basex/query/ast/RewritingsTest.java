@@ -1784,4 +1784,17 @@ public final class RewritingsTest extends QueryPlanTest {
         root(_UTIL_REPLICATE)
     );
   }
+
+  /** Discard redundant union tests. */
+  @Test public void gh1914() {
+    check("<a/>/(self::*|self::a)", "<a/>", root(CElem.class));
+
+    check("<a/>/(* | a)", "", type(IterStep.class, "element()*"));
+    check("<a/>/(a | *)", "", type(IterStep.class, "element()*"));
+    check("<a/>/(a | * | b)", "", type(IterStep.class, "element()*"));
+
+    check("(<a/> | <b/> | <a/>)/self::b", "<b/>", type(Union.class, "element(a)|element(b)+"));
+    check("(<a/>, <b/>, <a/>)/self::b", "<b/>", type(Union.class, "element(a)|element(b)+"));
+    check("count((<a/>, <b/> | <a/>))", 3, type(List.class, "element(a)|element(b)+"));
+  }
 }
