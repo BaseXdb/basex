@@ -133,7 +133,7 @@ abstract class Set extends Arr {
 
     // try to merge node tests
     if(this instanceof Union) {
-      final ArrayList<Test> list = new ArrayList<>(sl);
+      final ArrayList<Test> tests = new ArrayList<>(sl);
       int s = -1;
       while(++s < sl) {
         final Step step = steps.get(s);
@@ -143,10 +143,10 @@ abstract class Set extends Arr {
         } else if(!Arrays.equals(preds, step.exprs)) {
           break;
         }
-        list.add(step.test);
+        tests.add(step.test);
       }
       // all steps were parsed. try to merge tests
-      if(s == sl) test = Test.get(list);
+      if(s == sl) test = Test.get(tests.toArray(new Test[0]));
     }
 
     // try to merge first predicates of all steps

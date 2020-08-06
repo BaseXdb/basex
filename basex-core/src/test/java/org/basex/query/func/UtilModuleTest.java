@@ -171,7 +171,7 @@ public final class UtilModuleTest extends QueryPlanTest {
 
     check(func.args(" prof:void(())"), "", empty(func));
     check(func.args(" <a/>"), "<a/>", empty(func));
-    check(func.args(" (<a/>, <b/>)[name()]"), "<b/>", type(func, "element()?"));
+    check(func.args(" (<a/>, <b/>)[name()]"), "<b/>", type(func, "element(a)|element(b)?"));
     check(func.args(" reverse((1, 2, 3)[. > 1])"), 2, exists(HEAD));
 
     check(func.args(" tokenize(<_/>)"), "", exists(_UTIL_LAST));

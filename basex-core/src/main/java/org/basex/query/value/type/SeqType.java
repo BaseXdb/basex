@@ -459,7 +459,7 @@ public final class SeqType {
     // ignore general type of empty sequence
     final Type tp = type.eq(st.type) || st.zero() ? type : zero() ? st.type : type.union(st.type);
     final Occ oc = occ.union(st.occ);
-    final Test ts = Objects.equals(test, st.test) ? test : null;
+    final Test ts = test != null && st.test != null ? Test.get(test, st.test) : null;
     return get(tp, oc, ts);
   }
 

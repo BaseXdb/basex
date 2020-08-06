@@ -58,12 +58,12 @@ public abstract class Test extends ExprInfo {
   /**
    * Returns a single test for the specified tests.
    * @param tests tests
-   * @return test, or {@code null} if test cannot be created.
+   * @return single test, union test, or {@code null} if test cannot be created.
    */
-  public static Test get(final List<Test> tests) {
-    final int tl = tests.size();
+  public static Test get(final Test... tests) {
+    final int tl = tests.length;
     if(tl == 0) return null;
-    if(tl == 1) return tests.get(0);
+    if(tl == 1) return tests[0];
 
     NodeType type = null;
     final List<Test> list = new ArrayList<>(tl);
@@ -75,9 +75,11 @@ public abstract class Test extends ExprInfo {
       }
       // flatten tests
       if(test instanceof UnionTest) {
-        for(final Test t : ((UnionTest) test).tests) list.add(t);
+        for(final Test t : ((UnionTest) test).tests) {
+          if(!list.contains(t)) list.add(t);
+        }
       } else {
-        list.add(test);
+        if(!list.contains(test)) list.add(test);
       }
     }
     return new UnionTest(type, list.toArray(new Test[0]));
