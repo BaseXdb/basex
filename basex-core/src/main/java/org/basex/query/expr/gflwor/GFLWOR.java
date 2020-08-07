@@ -977,7 +977,9 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
     if(tc.seqType().occ != Occ.ZERO_MORE) return null;
-    rtrn = tc.check(rtrn, cc);
+    final Expr r = tc.check(rtrn, cc);
+    if(r == null) return this;
+    rtrn = r;
     return optimize(cc);
   }
 

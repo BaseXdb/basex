@@ -192,23 +192,11 @@ public final class If extends Arr {
 
   @Override
   public Expr inline(final InlineContext ic) throws QueryException {
-    boolean changed = false;
-    Expr inlined = cond.inline(ic);
+    boolean changed = ic.inline(exprs, true);
+    final Expr inlined = cond.inline(ic);
     if(inlined != null) {
-      cond = inlined;
       changed = true;
-    }
-    final int el = exprs.length;
-    for(int e = 0; e < el; e++) {
-      try {
-        inlined = exprs[e].inline(ic);
-      } catch(final QueryException qe) {
-        inlined = ic.cc.error(qe, exprs[e]);
-      }
-      if(inlined != null) {
-        exprs[e] = inlined;
-        changed = true;
-      }
+      cond = inlined;
     }
     return changed ? optimize(ic.cc) : null;
   }
@@ -266,7 +254,7 @@ public final class If extends Arr {
       } catch(final QueryException qe) {
         expr = cc.error(qe, expr);
       }
-      if(expr != exprs[e]) {
+      if(expr != null) {
         changed = true;
         exprs[e] = expr;
       }

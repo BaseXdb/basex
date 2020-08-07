@@ -243,13 +243,22 @@ public final class Switch extends ParseExpr {
 
   @Override
   public Expr inline(final InlineContext ic) throws QueryException {
-    boolean changed = ic.inline(groups);
+    boolean changed = ic.inline(groups, true);
     final Expr inlined = cond.inline(ic);
     if(inlined != null) {
       changed = true;
       cond = inlined;
     }
     return changed ? optimize(ic.cc) : null;
+  }
+
+  @Override
+  public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
+    boolean changed = false;
+    for(final SwitchGroup group : groups) {
+      changed = group.typeCheck(tc, cc) != null;
+    }
+    return changed ? optimize(cc) : this;
   }
 
   @Override

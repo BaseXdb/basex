@@ -1797,4 +1797,21 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(<a/>, <b/>, <a/>)/self::b", "<b/>", type(Union.class, "element(a)|element(b)+"));
     check("count((<a/>, <b/> | <a/>))", 3, type(List.class, "element(a)|element(b)+"));
   }
+
+  /** Push type checks into expressions. */
+  @Test public void gh1915() {
+    check("(switch(<_>a</_>) "
+        + "  case 'a' return <a/> "
+        + "  case 'b' return <b/> "
+        + "  default  return error()"
+        + ") treat as element(a)",
+        "<a/>", exists("SwitchGroup/Treat"));
+    check("for $e in (<a/>, <b/>) "
+        + "return (typeswitch($e) "
+        + "  case element(a) return <a/> "
+        + "  case element(b) return <b/> "
+        + "  default return error() "
+        + ") treat as element()",
+        "<a/>\n<b/>", empty(Treat.class));
+  }
 }

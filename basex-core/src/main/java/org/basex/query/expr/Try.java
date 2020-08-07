@@ -135,7 +135,7 @@ public final class Try extends Single {
     for(final Catch ctch : catches) {
       changed |= ctch.inline(ic) != null;
     }
-    return changed ? this : null;
+    return changed ? optimize(ic.cc) : null;
   }
 
   @Override

@@ -101,10 +101,27 @@ public final class InlineContext {
    * @throws QueryException query exception
    */
   public boolean inline(final Expr[] exprs) throws QueryException {
+    return inline(exprs, false);
+  }
+
+  /**
+   * Inlines an expression into the specified expressions.
+   * @param exprs expressions to update
+   * @param error catch errors
+   * @return {@code true} if the array has changed, {@code false} otherwise
+   * @throws QueryException query exception
+   */
+  public boolean inline(final Expr[] exprs, final boolean error) throws QueryException {
     boolean changed = false;
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
-      final Expr inlined = exprs[e].inline(this);
+      Expr inlined;
+      try {
+        inlined = exprs[e].inline(this);
+      } catch(final QueryException qe) {
+        if(!error) throw qe;
+        inlined = cc.error(qe, exprs[e]);
+      }
       if(inlined != null) {
         exprs[e] = inlined;
         changed = true;

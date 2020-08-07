@@ -159,12 +159,12 @@ public class TypeCheck extends Single {
    * Creates an expression that checks the given expression's return type.
    * @param ex expression to check
    * @param cc compilation context
-   * @return the resulting expression
+   * @return the resulting expression, or {@code null} if no type check is necessary
    * @throws QueryException query exception
    */
   public final Expr check(final Expr ex, final CompileContext cc) throws QueryException {
-    final SeqType at = ex.seqType(), st = seqType();
-    return at.instanceOf(st) ? ex : get(ex, st).optimize(cc);
+    final SeqType st = seqType();
+    return ex.seqType().instanceOf(st) ? null : get(ex, st).optimize(cc);
   }
 
   /**

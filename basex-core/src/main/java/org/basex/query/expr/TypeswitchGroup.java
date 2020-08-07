@@ -142,13 +142,17 @@ public final class TypeswitchGroup extends Single {
   }
 
   @Override
-  public Expr inline(final InlineContext ic) {
+  public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
+    Expr ex = null;
     try {
-      return super.inline(ic);
+      ex = tc.check(expr, cc);
     } catch(final QueryException qe) {
-      expr = ic.cc.error(qe, expr);
-      return this;
+      ex = cc.error(qe, expr);
     }
+    // returned expression will be handled Typeswitch#typeCheck
+    if(ex == null) return null;
+    expr = ex;
+    return optimize(cc);
   }
 
   @Override

@@ -64,21 +64,21 @@ public final class SwitchGroup extends Arr {
 
   @Override
   public Expr inline(final InlineContext ic) throws QueryException {
-    boolean changed = false;
-    final int el = exprs.length;
-    for(int e = 0; e < el; e++) {
-      Expr inlined;
-      try {
-        inlined = exprs[e].inline(ic);
-      } catch(final QueryException qe) {
-        inlined = ic.cc.error(qe, exprs[e]);
-      }
-      if(inlined != null) {
-        exprs[e] = inlined;
-        changed = true;
-      }
+    return ic.inline(exprs, true) ? optimize(ic.cc) : null;
+  }
+
+  @Override
+  public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
+    Expr ex = exprs[0];
+    try {
+      ex = tc.check(ex, cc);
+    } catch(final QueryException qe) {
+      ex = cc.error(qe, ex);
     }
-    return changed ? optimize(ic.cc) : null;
+    // returned expression will be handled Switch#typeCheck
+    if(ex == null) return null;
+    exprs[0] = ex;
+    return optimize(cc);
   }
 
   /**
