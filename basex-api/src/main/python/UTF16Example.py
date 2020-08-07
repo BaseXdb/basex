@@ -34,8 +34,7 @@ try:
     # run query on database
     query = session.query("""doc('py3clientexample')""")
 
-    for typecode, item in query.iter():
-        print("typecode=%d" % typecode)
+    for item in query.iter():
         print("item=%s" % item)
 
     # drop database
