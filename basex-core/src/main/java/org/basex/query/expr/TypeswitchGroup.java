@@ -178,7 +178,7 @@ public final class TypeswitchGroup extends Single {
    * @param seqType sequence type to be matched
    * @return result of check
    */
-  boolean isNever(final SeqType seqType) {
+  boolean noMatches(final SeqType seqType) {
     for(final SeqType st : seqTypes) {
       if(st.intersect(seqType) != null) return false;
     }

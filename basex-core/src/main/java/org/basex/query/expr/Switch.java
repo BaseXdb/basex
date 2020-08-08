@@ -97,7 +97,7 @@ public final class Switch extends ParseExpr {
   private Expr opt(final CompileContext cc) throws QueryException {
     // cached switch cases
     final ExprList cases = new ExprList();
-    final Item item = cond instanceof Value ? cond.atomItem(cc.qc, info) : Empty.VALUE;
+    final Item cnd = cond instanceof Value ? cond.atomItem(cc.qc, info) : null;
     final ArrayList<SwitchGroup> tmpGroups = new ArrayList<>();
     for(final SwitchGroup group : groups) {
       final int el = group.exprs.length;
@@ -105,10 +105,10 @@ public final class Switch extends ParseExpr {
       final ExprList list = new ExprList(el).add(rtrn);
       for(int e = 1; e < el; e++) {
         final Expr expr = group.exprs[e];
-        if(cond instanceof Value && expr instanceof Value) {
+        if(cnd != null && expr instanceof Value) {
           // includes check for empty sequence (null reference)
           final Item cs = expr.atomItem(cc.qc, info);
-          if(item == cs || cs != Empty.VALUE && item != Empty.VALUE && item.equiv(cs, null, info))
+          if(cnd == cs || cs != Empty.VALUE && cnd != Empty.VALUE && cnd.equiv(cs, null, info))
             return rtrn;
           cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
         } else if(cases.contains(expr)) {
