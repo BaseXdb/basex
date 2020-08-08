@@ -32,7 +32,10 @@ public final class FnData extends ContextFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    // data(string(E))  ->  data(E)
+    simplifyAll(Simplify.ATOM, cc);
+
     final boolean context = contextAccess();
     final Expr expr = context ? cc.qc.focus.value : exprs[0];
     if(expr != null) {

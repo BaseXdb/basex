@@ -29,6 +29,7 @@ public final class FnString extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
+    // string(data(E))  ->  string(E)
     simplifyAll(Simplify.ATOM, cc);
 
     final boolean context = contextAccess();

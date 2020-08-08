@@ -720,6 +720,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("data(<_>1</_>) + 2", 3, empty(DATA));
     check("string-join(data(<_>X</_>))", "X", empty(DATA));
     check("data(data(<_>X</_>))", "X", count(DATA, 1));
+    check("string(data(<_>X</_>))", "X", empty(DATA));
+    check("data(string(<_>X</_>))", "X", empty(STRING));
 
     check("<x>A</x>[data() = 'A']", "<x>A</x>", empty(DATA), count(ContextValue.class, 1));
     check("<x>A</x>[data() ! data() ! data() = 'A']", "<x>A</x>",
