@@ -177,6 +177,9 @@ public final class MixedTest extends SandboxTest {
     query("element { ' xml:a ' } {}", "<xml:a/>");
     query("declare namespace p = 'u'; element { 'p:l' } {}", "<p:l xmlns:p=\"u\"/>");
 
+    query("element Q{ }x {}[namespace-uri() = (' ')]", "");
+    query("element { 'Q{ }x' } {}[namespace-uri() = (' ')]", "");
+
     query("attribute { ' a ' } {}", "a=\"\"");
 
     error("element { '' } {}", INVNAME_X);

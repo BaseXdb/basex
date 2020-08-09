@@ -141,6 +141,7 @@ public abstract class Cmp extends Arr {
 
       // skip functions that do not refer to the current context item
       final ContextFn func = (ContextFn) expr1;
+      final Value value = (Value) expr2;
       if(func.exprs.length > 0 && !(func.exprs[0] instanceof ContextValue)) return this;
 
       final ArrayList<QNm> qnames = new ArrayList<>();
@@ -149,23 +150,25 @@ public abstract class Cmp extends Arr {
         // local-name() eq 'a'  ->  self::*:a
         if(Function.LOCAL_NAME.is(func)) {
           part = NamePart.LOCAL;
-          for(final Item item : (Value) expr2) {
+          for(final Item item : value) {
             final byte[] name = item.string(info);
             if(XMLToken.isNCName(name)) qnames.add(new QNm(name));
           }
         } else if(Function.NAMESPACE_URI.is(func)) {
-          // namespace-uri() = ('URI1', 'URI2')  ->  self::Q{URI1} | self::Q{URI2}*
-          part = NamePart.URI;
-          for(final Item item : (Value) expr2) {
-            qnames.add(new QNm(COLON, item.string(info)));
+          // namespace-uri() = ('URI1', 'URI2')  ->  self::Q{URI1}* | self::Q{URI2}*
+          for(final Item item : value) {
+            final byte[] uri = item.string(info);
+            if(!eq(normalize(uri), uri)) break;
+            qnames.add(new QNm(COLON, uri));
           }
+          if(qnames.size() == value.size()) part = NamePart.URI;
         } else if(Function.NAME.is(func)) {
           // (db-without-ns)[name() = 'city']  ->  (db-without-ns)[self::city]
           final Data data = cc.qc.focus.value.data();
           final byte[] dataNs = data != null ? data.defaultNs() : null;
           if(dataNs != null && dataNs.length == 0) {
             part = NamePart.LOCAL;
-            for(final Item item : (Value) expr2) {
+            for(final Item item : value) {
               final byte[] name = item.string(info);
               if(XMLToken.isNCName(name)) qnames.add(new QNm(name));
             }
@@ -174,7 +177,7 @@ public abstract class Cmp extends Arr {
       } else if(Function.NODE_NAME.is(func) && expr2.seqType().type == AtomType.QNM) {
         // node-name() = xs:QName('pref:local')  ->  self::pref:local
         part = NamePart.FULL;
-        for(final Item item : (Value) expr2) {
+        for(final Item item : value) {
           qnames.add((QNm) item);
         }
       }
