@@ -158,8 +158,7 @@ public abstract class Cmp extends Arr {
           // namespace-uri() = ('URI1', 'URI2')  ->  self::Q{URI1}* | self::Q{URI2}*
           for(final Item item : value) {
             final byte[] uri = item.string(info);
-            if(!eq(normalize(uri), uri)) break;
-            qnames.add(new QNm(COLON, uri));
+            if(eq(normalize(uri), uri)) qnames.add(new QNm(COLON, uri));
           }
           if(qnames.size() == value.size()) part = NamePart.URI;
         } else if(Function.NAME.is(func)) {
