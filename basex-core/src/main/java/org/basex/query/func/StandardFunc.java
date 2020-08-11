@@ -133,7 +133,7 @@ public abstract class StandardFunc extends Arr {
    * and adjusts the occurrence indicator if the argument will always yield one item.
    * @return original expression or function argument
    */
-  protected Expr optFirst() {
+  protected final Expr optFirst() {
     return optFirst(true, true, null);
   }
 
@@ -150,7 +150,7 @@ public abstract class StandardFunc extends Arr {
    * @param value context value (ignored if {@code null})
    * @return original expression or function argument
    */
-  protected Expr optFirst(final boolean occ, final boolean atom, final Value value) {
+  protected final Expr optFirst(final boolean occ, final boolean atom, final Value value) {
     final Expr expr = exprs.length > 0 ? exprs[0] : value;
     if(expr != null) {
       final SeqType st = expr.seqType();
@@ -212,7 +212,7 @@ public abstract class StandardFunc extends Arr {
    * @return old or new expression
    * @throws QueryException query context
    */
-  public Expr coerceFunc(final Expr expr, final CompileContext cc, final SeqType declType,
+  public final Expr coerceFunc(final Expr expr, final CompileContext cc, final SeqType declType,
       final SeqType... argTypes) throws QueryException {
 
     // check if argument is function item
@@ -269,7 +269,7 @@ public abstract class StandardFunc extends Arr {
    * @return date
    * @throws QueryException query exception
    */
-  protected ADate toDate(final Item item, final AtomType type, final QueryContext qc)
+  protected final ADate toDate(final Item item, final AtomType type, final QueryContext qc)
       throws QueryException {
     return (ADate) (item.type.isUntyped() ? type.cast(item, qc, sc, info) : checkType(item, type));
   }
@@ -579,7 +579,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public boolean equals(final Object obj) {
+  public final boolean equals(final Object obj) {
     return this == obj || obj instanceof StandardFunc &&
         definition == ((StandardFunc) obj).definition && super.equals(obj);
   }
@@ -595,7 +595,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public final void plan(final QueryString qs) {
     qs.token(definition.id()).params(exprs);
   }
 }

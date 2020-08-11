@@ -57,7 +57,7 @@ public abstract class ContextFn extends StandardFunc {
    * Optimizes a context-based function call.
    * @param cc compilation context
    */
-  protected void optContext(final CompileContext cc) {
+  protected final void optContext(final CompileContext cc) {
     final boolean context = contextAccess();
     final Expr expr = context ? cc.qc.focus.value : exprs[contextArg()];
     if(expr != null) {
@@ -76,7 +76,7 @@ public abstract class ContextFn extends StandardFunc {
   }
 
   @Override
-  public VarUsage count(final Var var) {
+  public final VarUsage count(final Var var) {
     // context reference check: check if function accesses context
     return (var == null && contextAccess() ? VarUsage.ONCE : VarUsage.NEVER).plus(super.count(var));
   }

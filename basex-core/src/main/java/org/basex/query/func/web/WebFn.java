@@ -35,7 +35,7 @@ abstract class WebFn extends StandardFunc {
    * @return generated url
    * @throws QueryException query exception
    */
-  String createUrl(final QueryContext qc) throws QueryException {
+  final String createUrl(final QueryContext qc) throws QueryException {
     final byte[] path = toToken(exprs[0], qc);
     final XQMap map = exprs.length < 2 ? XQMap.EMPTY : toMap(exprs[1], qc);
     final byte[] anchor = exprs.length < 3 ? Token.EMPTY : toToken(exprs[2], qc);
@@ -61,7 +61,7 @@ abstract class WebFn extends StandardFunc {
    * @return response
    * @throws QueryException query exception
    */
-  FElem createResponse(final ResponseOptions response, final HashMap<String, String> headers,
+  final FElem createResponse(final ResponseOptions response, final HashMap<String, String> headers,
       final HashMap<String, String> output) throws QueryException {
 
     // root element

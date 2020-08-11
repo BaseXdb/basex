@@ -22,7 +22,7 @@ abstract class HofFn extends StandardFunc {
    * @return comparator
    * @throws QueryException exception
    */
-  Comparator<Item> getComp(final int pos, final QueryContext qc) throws QueryException {
+  final Comparator<Item> getComp(final int pos, final QueryContext qc) throws QueryException {
     final FItem lt = checkArity(exprs[pos], 2, qc);
     return (a, b) -> {
       try {

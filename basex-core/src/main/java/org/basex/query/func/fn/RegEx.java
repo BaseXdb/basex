@@ -28,7 +28,7 @@ abstract class RegEx extends StandardFunc {
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  protected Pattern pattern(final Expr regex, final Expr modifier, final QueryContext qc,
+  protected final Pattern pattern(final Expr regex, final Expr modifier, final QueryContext qc,
       final boolean check) throws QueryException {
 
     final byte[] pat = toToken(regex, qc);

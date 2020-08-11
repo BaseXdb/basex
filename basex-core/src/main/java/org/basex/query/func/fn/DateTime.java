@@ -23,7 +23,7 @@ abstract class DateTime extends StandardFunc {
    * @return duration
    * @throws QueryException query exception
    */
-  protected Dur checkDur(final Item item) throws QueryException {
+  protected final Dur checkDur(final Item item) throws QueryException {
     if(item instanceof Dur) return (Dur) item;
     if(item.type.isUntyped()) return new Dur(item.string(info), info);
     throw typeError(item, AtomType.DUR, info);
@@ -46,7 +46,7 @@ abstract class DateTime extends StandardFunc {
    * @return duration
    * @throws QueryException query exception
    */
-  protected ADate adjust(final Item item, final AtomType type, final QueryContext qc)
+  final ADate adjust(final Item item, final AtomType type, final QueryContext qc)
       throws QueryException {
 
     // clone item

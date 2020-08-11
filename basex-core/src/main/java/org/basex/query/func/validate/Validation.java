@@ -38,7 +38,7 @@ abstract class Validation {
    * @return resulting file
    * @throws IOException I/O exception
    */
-  protected IO prepare(final IO in, final ValidationHandler handler) throws IOException {
+  final IO prepare(final IO in, final ValidationHandler handler) throws IOException {
     if(in instanceof IOContent || in instanceof IOStream) {
       // cache main-memory content or stream to file
       schema = new IOFile(File.createTempFile(Prop.NAME + '-', IO.TMPSUFFIX));
@@ -52,7 +52,7 @@ abstract class Validation {
   /**
    * Closes a temporary schema instance.
    */
-  void finish() {
+  final void finish() {
     if(schema != null) schema.delete();
   }
 }
