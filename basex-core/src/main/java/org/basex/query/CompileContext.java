@@ -11,6 +11,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -245,22 +246,24 @@ public final class CompileContext {
    * @return optimized expression
    */
   private Expr replaceWith(final Expr expr, final Expr result, final boolean refine) {
-    if(result != expr) {
+    // result yields no items and is deterministic: replace with empty sequence
+    final Expr res = result.seqType().zero() && !result.has(Flag.NDT) ? Empty.VALUE : result;
+    if(res != expr) {
       info("%", (Supplier<String>) () -> {
         final TokenBuilder tb = new TokenBuilder();
-        final String exprDesc = expr.description(), resDesc = result.description();
+        final String exprDesc = expr.description(), resDesc = res.description();
         tb.add(OPTREWRITE).add(' ').add(exprDesc);
         if(!exprDesc.equals(resDesc)) tb.add(" to ").add(resDesc);
 
         final byte[] exprString = QueryError.normalize(Token.token(expr.toString()), null);
-        final byte[] resString = QueryError.normalize(Token.token(result.toString()), null);
+        final byte[] resString = QueryError.normalize(Token.token(res.toString()), null);
         tb.add(": ").add(exprString);
         if(!Token.eq(exprString, resString)) tb.add(" -> ").add(resString);
         return tb.toString();
       });
-      if(refine) result.refineType(expr);
+      if(refine) res.refineType(expr);
     }
-    return result;
+    return res;
   }
 
   /**

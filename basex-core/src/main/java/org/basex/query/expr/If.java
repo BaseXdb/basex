@@ -99,14 +99,17 @@ public final class If extends Arr {
     // choose static branch at compile time
     if(cond instanceof Value) return expr(cc.qc);
 
-    final boolean ndt = cond.has(Flag.NDT);
+    // if(...empty sequence...) then A else B  ->  B
     final Expr br1 = exprs[0], br2 = exprs[1];
+    final SeqType ct = cond.seqType();
+    final boolean ndt = cond.has(Flag.NDT);
+    if(ct.zero() && !ndt) return br2;
 
     // rewrite to elvis operator:
     //   if(exists(VALUE)) then VALUE else DEFAULT  ->  VALUE ?: DEFAULT
     //   if(NODES) then NODES else DEFAULT  ->  NODES ?: DEFAULT
     final Expr cmp = Function.EXISTS.is(cond) ? ((Arr) cond).exprs[0] :
-      cond.seqType().type instanceof NodeType ? cond : null;
+      ct.type instanceof NodeType ? cond : null;
     if(!ndt && cmp != null && cmp.equals(br1)) return
         cc.function(Function._UTIL_OR, info, br1, br2);
 
