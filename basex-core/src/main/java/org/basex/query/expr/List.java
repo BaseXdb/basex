@@ -7,7 +7,9 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.func.Function;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -63,6 +65,13 @@ public final class List extends Arr {
     final int el = exprs.length;
     if(el == 0) return Empty.VALUE;
     if(el == 1) return exprs[0];
+
+    // rewrite identical expressions to util:replicate
+    if(!exprs[0].has(Flag.NDT, Flag.CNS)) {
+      int e = 0;
+      while(++e < el && exprs[e].equals(exprs[0]));
+      if(e == el) return cc.function(Function._UTIL_REPLICATE, info, exprs[0], Int.get(el));
+    }
 
     // determine result type, compute number of results, set expression type
     SeqType st = null;
@@ -183,8 +192,8 @@ public final class List extends Arr {
         // otherwise, rewrite list to union
         expr = toUnion(cc);
       }
-    } else {
-      if(simplifyAll(mode, cc)) expr = optimize(cc);
+    } else if(simplifyAll(mode, cc)) {
+      expr = optimize(cc);
     }
     return expr == this ? super.simplifyFor(mode, cc) : expr.simplifyFor(mode, cc);
   }

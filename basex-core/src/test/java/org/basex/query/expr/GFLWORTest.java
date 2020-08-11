@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.query.ast.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.up.expr.*;
 import org.basex.query.value.item.*;
@@ -186,8 +187,7 @@ public final class GFLWORTest extends QueryPlanTest {
     );
     check("<x/>/(for $i in 1 to 3 let $x := . where $x return $x)",
         "<x/>",
-        empty(GFLWOR.class),
-        exists(_UTIL_REPLICATE)
+        root(CElem.class)
     );
     check("for $len in 1 to 3 " +
         "for sliding window $w in 1 to 3 start at $p when true() only " +

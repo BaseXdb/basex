@@ -408,20 +408,21 @@ public final class RewritingsTest extends QueryPlanTest {
     check("count(let $s := (0, 1 to 99999) return $s[. = $s])", 100000, exists(CmpHashG.class));
   }
 
-  /** Checks OR optimizations. */
+  /** Count, big sequences. */
   @Test public void gh1519() {
-    query("declare function local:replicate($seq, $n, $out) {"
+    query("declare function local:replicate($seq, $n, $out) { "
         + "  if($n eq 0) then $out "
         + "  else ( "
         + "    let $out2 := if($n mod 2 eq 0) then $out else ($out, $seq) "
         + "    return local:replicate(($seq, $seq), $n idiv 2, $out2) "
-        + "  )"
+        + "  ) "
         + "};"
-        + "let $n := 1000000000 "
+        + "let $n := 1000000 "
         + "return ( "
         + "  count(local:replicate((1, 2, 3), $n, ())) eq 3 * $n, "
         + "  count(local:replicate((1, 2, 3), $n, ())) = 3 * $n "
-        + ")", "true\ntrue");
+        + ")",
+        "true\ntrue");
   }
 
   /** Checks simplification of empty path expressions. */
@@ -803,8 +804,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[local-name() = 'a' or local-name() = 'b']", "<a/>", exists(SingleIterPath.class));
     check("<a/>[node-name() = (xs:QName('a'), xs:QName('b'))]", "<a/>",
         exists(SingleIterPath.class));
+    check("<a/>[local-name() = ('a', 'a', 'a')]", "<a/>", exists(SingleIterPath.class));
 
-    check("<a/>[local-name() = ('', '', '')]", "", empty());
     check("(<a/>, <b/>)[. = '!'][local-name() = 'a']", "", empty(LOCAL_NAME));
 
     check("comment {}[local-name() = '']", "<!---->", root(CComm.class));
@@ -1822,5 +1823,13 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1917() {
     check("let $a := (# basex:non-deterministic #) { <a/> } return $a ! name()",
         "a", root(ItemMap.class));
+  }
+
+  /** Rewrite list to util:replicate. */
+  @Test public void gh1918() {
+    check("(1, 1)", "1\n1", root(SingletonSeq.class));
+
+    // do not rewrite node constructors and non-deterministic expressions
+    check("(<a/>, <a/>)", "<a/>\n<a/>", root(List.class));
   }
 }

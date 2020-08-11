@@ -14,6 +14,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.index.*;
 import org.basex.query.func.Function;
+import org.basex.query.func.util.*;
 import org.basex.query.util.*;
 import org.basex.query.util.index.*;
 import org.basex.query.util.list.*;
@@ -809,7 +810,7 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Tries to rewrite lists to union expressions.
+   * Tries to rewrite steps to union expressions.
    * @param cc compilation context
    * @return original or new expression
    * @throws QueryException query exception
@@ -826,6 +827,9 @@ public abstract class Path extends ParseExpr {
           final Expr st = ((List) filter.root).toUnion(cc);
           if(st != filter.root) return Filter.get(cc, filter.info, st, filter.exprs);
         }
+      }
+      if(step instanceof UtilReplicate && step.seqType().type instanceof NodeType) {
+        return ((Arr) step).exprs[0];
       }
       return step;
     };
