@@ -83,7 +83,7 @@ public final class SimpleMapTest extends QueryPlanTest {
   /** Inline simple expressions into next operand. */
   @Test public void inline() {
     check("'1' ! (., number())", "1\n1", root(SmallSeq.class));
-    check("let $a := document { <a/> } return $a ! (., /)", "<a/>\n<a/>", count(VarRef.class, 2));
+    check("let $a := document { <a/> } return $a ! (., /)", "<a/>\n<a/>", empty(VarRef.class));
     check("let $d := document{} return $d ! /", "", root(CDoc.class));
     check("map { 1: 2 } ! ?*", 2, root(Int.class));
     check("let $n := map { 1: 2 } return $n ! ?*", 2, root(Int.class));

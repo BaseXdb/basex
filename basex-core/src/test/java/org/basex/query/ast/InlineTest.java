@@ -38,12 +38,13 @@ public final class InlineTest extends QueryPlanTest {
   /** Switch with contains. */
   @Test public void gh738() {
     check("let $item := <item>blah blah</item> " +
-        "let $type := switch (fn:true())" +
-        "  case $item contains text \"blah\" return <type>a</type>" +
-        "  default return ()" +
+        "let $type := switch (fn:true()) " +
+        "  case ($item contains text 'blah') return <type>a</type> " +
+        "  default return () " +
         "return $type",
         "<type>a</type>",
-        count(Let.class, 1));
+        empty(Let.class),
+        root(ItemMap.class));
   }
 
   /** Typing and Function items: XPTY0004. */
@@ -161,6 +162,6 @@ public final class InlineTest extends QueryPlanTest {
         exists(DynFuncCall.class),
         empty(StaticFunc.class),
         empty(Closure.class),
-        root(GFLWOR.class));
+        root(ItemMap.class));
   }
 }

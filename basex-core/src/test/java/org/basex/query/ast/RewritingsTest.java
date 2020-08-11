@@ -924,7 +924,8 @@ public final class RewritingsTest extends QueryPlanTest {
     // rewritings in comparisons
     check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class));
     check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class));
-    check("let $a := <_>A</_> return $a ! text() = $a ! text()", true, count(IterPath.class, 2));
+    check("let $a := <_>A</_> return $a ! text() = $a ! text()", true,
+        root(ItemMap.class), empty(IterPath.class), empty(IterMap.class));
 
     // EBV rewritings
     check("<a><b/></a>[b ! ..]", "<a>\n<b/>\n</a>", exists(CachedPath.class));
@@ -1815,5 +1816,11 @@ public final class RewritingsTest extends QueryPlanTest {
         + "  default return error() "
         + ") treat as element()",
         "<a/>\n<b/>", empty(Treat.class));
+  }
+
+  /** Rewrite side-effecting let expressions. */
+  @Test public void gh1917() {
+    check("let $a := (# basex:non-deterministic #) { <a/> } return $a ! name()",
+        "a", root(ItemMap.class));
   }
 }

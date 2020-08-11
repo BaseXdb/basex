@@ -610,7 +610,7 @@ public final class GFLWOR extends ParseExpr {
       //   for $i in (1, 2) return $i  ->  (1, 2)
       //   let $c := <a/> return $c
       expr = root;
-    } else if(last instanceof For) {
+    } else if(last instanceof For || last instanceof Let && last.size() == 1) {
       // rewrite for clause to simple map
       //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
       // skip expressions with context reference

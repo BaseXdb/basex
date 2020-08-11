@@ -224,14 +224,15 @@ public final class GFLWORTest extends QueryPlanTest {
 
   /** Tests if multiple let clauses are all moved to their optimal position. */
   @Test public void slideMultipleLets() {
-    check("for $i in 1 to 2 for $j in 1 to 2 " +
-        "let $a as xs:integer := 3 * $i, " +
-        "    $b as xs:integer := 2 * $i " +
+    check("for $i in 1 to 2 " +
+        "for $j in 1 to 2 " +
+        "let $a as xs:integer := 3 * $i " +
+        "let $b as xs:integer := 2 * $i " +
         "return $a * $a + $b * $b",
         "13\n13\n52\n52",
         exists("For[every $let in //Let satisfies . << $let]"),
         count(For.class, 1),
-        "//Let[@name = '$a'] << //Let[@name = '$b']"
+        count(Let.class, 1)
     );
   }
 
@@ -247,7 +248,8 @@ public final class GFLWORTest extends QueryPlanTest {
   @Test public void dontSlideLetNDT() {
     check("for $i in 1 to 10 let $rnd := random:double() return $i * $rnd",
         null,
-        "exactly-one(//For) << exactly-one(//Let)"
+        empty(Let.class),
+        exists(ItemMap.class)
     );
   }
 
@@ -255,7 +257,8 @@ public final class GFLWORTest extends QueryPlanTest {
   @Test public void dontSlideLetCNS() {
     check("for $i in 1 to 10 let $x := <x/> return ($i, $x, $x)",
         null,
-        "//For << //Let"
+        empty(Let.class),
+        exists(IterMap.class)
     );
   }
 
@@ -348,11 +351,13 @@ public final class GFLWORTest extends QueryPlanTest {
     );
   }
 
-  /** Ensures that non-deterministic expressions are not inlined. */
-  @Test public void dontInlineNDTTest() {
+  /** Ensures that non-deterministic expressions are rewritten to a simple map. */
+  @Test public void inlineNDTTest() {
     check("let $rnd := random:double() return (1 to 10) ! $rnd",
         null,
-        exists(Let.class)
+        empty(Let.class),
+        root(IterMap.class),
+        exists(_UTIL_REPLICATE)
     );
   }
 
