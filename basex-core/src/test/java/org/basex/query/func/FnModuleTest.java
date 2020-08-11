@@ -167,6 +167,8 @@ public final class FnModuleTest extends QueryPlanTest {
     final Function func = DEEP_EQUAL;
 
     query("let $a := reverse((<a/>, <b/>)) return " + func.args(" $a/.", " $a/."), true);
+    query("deep-equal(1 to 1000000000, 1 to 1000000000)", true);
+    query("deep-equal(1 to 1000000000, 1 to 1000000001)", false);
   }
 
   /** Test method. */
