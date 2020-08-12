@@ -1835,6 +1835,30 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Switch expression: static and dynamic cases. */
   @Test public void gh1919() {
-    check("switch('x') case <_>x</_>return 1 case 'x' return 2 default return 3", 1);
+    query("switch('x') case <_>x</_>return 1 case 'x' return 2 default return 3", 1);
+  }
+
+  /** Switch expression, merge branches. */
+  @Test public void gh1920() {
+    check("switch(<_/>) case 'a' return 1 case 'b' return 1 case 'c' return 2 default return 3", 3,
+        root(Switch.class), count(SwitchGroup.class, 3));
+    check("switch(<_/>) case 'a' return 1 case 'b' return 2 case 'c' return 2 default return 3", 3,
+        root(Switch.class), count(SwitchGroup.class, 3));
+    check("switch(<_/>) case 'a' return 1 case 'b' return 2 case 'c' return 3 default return 3", 3,
+        root(Switch.class), count(SwitchGroup.class, 3));
+
+    check("switch(<_>a</_>) case 'a' return 1 case 'b' return 1 default return 2", 1,
+        root(If.class));
+    check("switch(<_>a</_>) case 'a' return 1 case 'b' return 2 default return 2", 1,
+        root(If.class));
+    check("switch(<_/>) case 'a' return 1 case 'b' return 1 case 'c' return 1 default return 2", 2,
+        root(If.class));
+
+    check("switch(<_>a</_>) case 'a' return 1 default return 1", 1,
+        root(Int.class));
+    check("switch(<_>a</_>) case 'a' return 1 case 'b' return 1 default return 1", 1,
+        root(Int.class));
+    check("switch(<_/>) case 'a' return 1 case 'b' return 1 case 'c' return 1 default return 1", 1,
+        root(Int.class));
   }
 }

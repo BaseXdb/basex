@@ -49,12 +49,12 @@ public final class SwitchGroup extends Arr {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public SwitchGroup optimize(final CompileContext cc) throws QueryException {
     final int el = exprs.length;
     for(int e = 1; e < el; e++) {
       exprs[e] = exprs[e].simplifyFor(Simplify.ATOM, cc);
     }
-    return adoptType(exprs[0]);
+    return (SwitchGroup) adoptType(rtrn());
   }
 
   @Override
@@ -87,7 +87,7 @@ public final class SwitchGroup extends Arr {
    */
   @Override
   public VarUsage count(final Var var) {
-    return exprs[0].count(var);
+    return rtrn().count(var);
   }
 
   /**
@@ -124,6 +124,14 @@ public final class SwitchGroup extends Arr {
   }
 
   /**
+   * Returns the return expression.
+   * @return return expression
+   */
+  Expr rtrn() {
+    return exprs[0];
+  }
+
+  /**
    * Simplifies all expressions for requests of the specified type.
    * @param mode mode of simplification
    * @param cc compilation context
@@ -154,6 +162,6 @@ public final class SwitchGroup extends Arr {
     final int el = exprs.length;
     for(int e = 1; e < el; e++) qs.token(CASE).token(exprs[e]);
     if(el == 1) qs.token(DEFAULT);
-    qs.token(RETURN).token(exprs[0]);
+    qs.token(RETURN).token(rtrn());
   }
 }
