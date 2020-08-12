@@ -1832,4 +1832,9 @@ public final class RewritingsTest extends QueryPlanTest {
     // do not rewrite node constructors and non-deterministic expressions
     check("(<a/>, <a/>)", "<a/>\n<a/>", root(List.class));
   }
+
+  /** Switch expression: static and dynamic cases. */
+  @Test public void gh1919() {
+    check("switch('x') case <_>x</_>return 1 case 'x' return 2 default return 3", 1);
+  }
 }

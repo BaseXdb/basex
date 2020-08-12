@@ -97,7 +97,7 @@ public final class Switch extends ParseExpr {
   private Expr opt(final CompileContext cc) throws QueryException {
     // cached switch cases
     final ExprList cases = new ExprList();
-    final Item cnd = cond instanceof Value ? cond.atomItem(cc.qc, info) : null;
+    Item cnd = cond instanceof Value ? cond.atomItem(cc.qc, info) : null;
     final ArrayList<SwitchGroup> tmpGroups = new ArrayList<>();
     for(final SwitchGroup group : groups) {
       final int el = group.exprs.length;
@@ -105,19 +105,26 @@ public final class Switch extends ParseExpr {
       final ExprList list = new ExprList(el).add(rtrn);
       for(int e = 1; e < el; e++) {
         final Expr expr = group.exprs[e];
-        if(cnd != null && expr instanceof Value) {
-          // includes check for empty sequence (null reference)
-          final Item cs = expr.atomItem(cc.qc, info);
-          if(cnd == cs || cs != Empty.VALUE && cnd != Empty.VALUE && cnd.equiv(cs, null, info))
-            return rtrn;
-          cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-        } else if(cases.contains(expr)) {
+        if(cases.contains(expr)) {
           // case has already been checked before
           cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-        } else {
-          cases.add(expr);
-          list.add(expr);
+          continue;
         }
+        if(cnd != null) {
+          // compare condition and value; return result or remove case
+          if(expr instanceof Value) {
+            final Item cs = expr.atomItem(cc.qc, info);
+            if(cnd == cs || cs != Empty.VALUE && cnd != Empty.VALUE && cnd.equiv(cs, null, info)) {
+              return rtrn;
+            }
+            cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+            continue;
+          }
+          // value unknown at compile: perform no further compile-time checks
+          cnd = null;
+        }
+        cases.add(expr);
+        list.add(expr);
       }
       // build list of branches (add those with case left, or the default branch)
       if(list.size() > 1 || el == 1) {
