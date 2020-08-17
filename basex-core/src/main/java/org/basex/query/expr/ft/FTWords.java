@@ -95,12 +95,14 @@ public final class FTWords extends FTExpr {
       for(int o = 0; o < ol; o++) occ[o] = occ[o].compile(cc);
     }
     query = query.compile(cc);
+    ftOpt = cc.qc.ftOpt().copy();
 
-    return init(cc.qc, cc.qc.ftOpt()).optimize(cc);
+    return optimize(cc);
   }
 
   @Override
   public FTWords optimize(final CompileContext cc) throws QueryException {
+    optimize(cc.qc);
     if(occ != null) {
       final int ol = occ.length;
       for(int o = 0; o < ol; o++) occ[o] = occ[o].simplifyFor(Simplify.NUMBER, cc);
@@ -111,17 +113,24 @@ public final class FTWords extends FTExpr {
   /**
    * Prepares query evaluation.
    * @param qc query context
-   * @param opt full-text options
    * @return self reference
    * @throws QueryException query exception
    */
-  public FTWords init(final QueryContext qc, final FTOpt opt) throws QueryException {
+  public FTWords optimize(final QueryContext qc) throws QueryException {
     // pre-evaluate tokens, choose fast evaluation for default search options
     if(query instanceof Value) {
       inputs = inputs(qc);
       simple = mode == FTMode.ANY && occ == null;
     }
+    return this;
+  }
 
+  /**
+   * Assigns full-text options.
+   * @param opt full-text options
+   * @return self reference
+   */
+  public FTWords ftOpt(final FTOpt opt) {
     ftOpt = opt;
     return this;
   }

@@ -90,6 +90,14 @@ public final class FTOpt extends ExprInfo {
     return b != null && b;
   }
 
+  /**
+   * Creates a copy of the full-text options.
+   * @return copy
+   */
+  public FTOpt copy() {
+    return new FTOpt().assign(this);
+  }
+
   @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
