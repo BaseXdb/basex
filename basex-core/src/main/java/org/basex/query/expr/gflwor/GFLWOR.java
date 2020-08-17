@@ -140,7 +140,7 @@ public final class GFLWOR extends ParseExpr {
    */
   private Expr simplify(final CompileContext cc) throws QueryException {
     // checks if clauses have side-effects
-    final Checks<Clause> ndt = clause -> clause.has(Flag.NDT, Flag.UPD);
+    final Checks<Clause> ndt = clause -> clause.has(Flag.NDT);
     // checks if the return expression references the variable of a clause
     final Checks<Clause> varrefs = clause -> {
       for(final Var var : clause.vars()) {
@@ -156,7 +156,7 @@ public final class GFLWOR extends ParseExpr {
       // zero iterations:
       if(min == 0) {
         // for $_ in () return <x/>  ->  ()
-        if(!has(Flag.NDT, Flag.UPD)) return Empty.VALUE;
+        if(!has(Flag.NDT)) return Empty.VALUE;
         // for $_ in file:write(...) return 1  ->  file:write(...)
         if(clauses.size() == 1 && clauses.get(0) instanceof ForLet) {
           return ((ForLet) clauses.get(0)).expr;
@@ -173,7 +173,7 @@ public final class GFLWOR extends ParseExpr {
             expr = new List(info, expr, rtrn).optimize(cc);
             return cc.replaceWith(this, expr);
           }
-        } else if(!ndt.any(clauses) && !rtrn.has(Flag.CNS, Flag.NDT, Flag.UPD)) {
+        } else if(!ndt.any(clauses) && !rtrn.has(Flag.CNS, Flag.NDT)) {
           // for $_ in 1 to 2 return 3  ->  util:replicate(3, 2)
           return cc.function(Function._UTIL_REPLICATE, info, rtrn, Int.get(min));
         }
