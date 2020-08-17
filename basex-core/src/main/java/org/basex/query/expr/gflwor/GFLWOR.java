@@ -173,9 +173,10 @@ public final class GFLWOR extends ParseExpr {
             expr = new List(info, expr, rtrn).optimize(cc);
             return cc.replaceWith(this, expr);
           }
-        } else if(!ndt.any(clauses) && !rtrn.has(Flag.CNS, Flag.NDT)) {
+        } else if(!ndt.any(clauses)) {
           // for $_ in 1 to 2 return 3  ->  util:replicate(3, 2)
-          return cc.function(Function._UTIL_REPLICATE, info, rtrn, Int.get(min));
+          final boolean multi = rtrn.has(Flag.NDT, Flag.CNS);
+          return cc.function(Function._UTIL_REPLICATE, info, rtrn, Int.get(min), Bln.get(multi));
         }
       }
     }

@@ -1054,8 +1054,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $_ in 1 to 2 return ()", "", empty());
 
     // rewrite to simple map
-    check("for $_ in 1 to 2 return <a/>", "<a/>\n<a/>", root(DualMap.class));
-    check("for $_ in 1 to 2 return prof:void(1)", "", root(DualMap.class));
+    check("for $_ in 1 to 2 return <a/>", "<a/>\n<a/>", root(_UTIL_REPLICATE));
+    check("for $_ in 1 to 2 return prof:void(1)", "", root(_UTIL_REPLICATE));
   }
 
   /** Merge and/or expressions. */
@@ -1078,7 +1078,6 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_>a</_>[. = 'a' or .. != 'b']", "<_>a</_>", exists(Or.class));
 
     // AND: merge
-    check("(<_/>, <_/>) = 'a' and (<_/>, <_/>) = 'b'", false, empty(And.class));
     check("<_>1</_>[not(. = 1) and not(. = (2, 3))]", "",
         exists(CmpG.class), empty(CmpSimpleG.class));
     check("not((<_/>, <_/>) != 'a') and not((<_/>, <_/>) != 'b')", false,
@@ -1590,7 +1589,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Simple map implementation for two operands. */
   @Test public void gh1889() {
-    check("(1 to 2) ! <a/>", "<a/>\n<a/>", root(DualMap.class));
+    check("(1 to 2) ! <a/>", "<a/>\n<a/>", root(_UTIL_REPLICATE));
     check("(3 to 4) ! prof:void(.)", "", root(DualMap.class));
   }
 
@@ -1828,9 +1827,7 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Rewrite list to util:replicate. */
   @Test public void gh1918() {
     check("(1, 1)", "1\n1", root(SingletonSeq.class));
-
-    // do not rewrite node constructors and non-deterministic expressions
-    check("(<a/>, <a/>)", "<a/>\n<a/>", root(List.class));
+    check("let $a := (<a/>, <a/>) return $a[1] is $a[2]", false, exists(_UTIL_REPLICATE));
   }
 
   /** Switch expression: static and dynamic cases. */

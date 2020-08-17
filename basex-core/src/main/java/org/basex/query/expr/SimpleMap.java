@@ -13,9 +13,7 @@ import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -173,16 +171,10 @@ public abstract class SimpleMap extends Arr {
           }
         } else if(es != -1 && !next.has(Flag.CTX)) {
           // merge expressions if next expression does not rely on the context
-          if(next instanceof Value) {
-            // (1 to 2) ! 3  ->  (3, 3)
-            ex = SingletonSeq.get((Value) next, es);
-          } else if(next.has(Flag.NDT, Flag.CNS)) {
-            // (1 to 2) ! <x/>  ->  util:replicate('', 2) ! <x/>
-            exprs[e] = cc.replaceWith(exprs[e], SingletonSeq.get(Str.ZERO, es));
-          } else {
-            // (1 to 2) ! 'ok'  ->  util:replicate('ok', 2)
-            ex = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es));
-          }
+          // (1 to 2) ! 'ok'  ->  util:replicate('ok', 2, false())
+          // (1 to 2) ! <x/>  ->  util:replicate(<x/>, 2, true())
+          final boolean multi = next.has(Flag.NDT, Flag.CNS);
+          ex = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es), Bln.get(multi));
         }
       }
 

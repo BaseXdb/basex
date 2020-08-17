@@ -828,7 +828,8 @@ public abstract class Path extends ParseExpr {
           if(st != filter.root) return Filter.get(cc, filter.info, st, filter.exprs);
         }
       }
-      if(step instanceof UtilReplicate && step.seqType().type instanceof NodeType) {
+      if(step instanceof UtilReplicate && ((UtilReplicate) step).once() &&
+          step.seqType().type instanceof NodeType) {
         return ((Arr) step).exprs[0];
       }
       return step;

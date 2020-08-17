@@ -44,8 +44,10 @@ public final class GFLWORTest extends QueryPlanTest {
         "let $m := $b " +
         "return <_>{ $m }</_>//text()",
         "a\na",
-        count(Let.class, 1),
-        empty(For.class)
+        empty(Let.class),
+        empty(For.class),
+        root(IterMap.class),
+        exists(_UTIL_REPLICATE)
     );
   }
 
@@ -94,8 +96,10 @@ public final class GFLWORTest extends QueryPlanTest {
         "for $b in $x " +
         "return (<_>{ $b }</_>, $b)[1]/x",
         "<x/>\n<x/>",
-        count(Let.class, 1),
-        empty(For.class)
+        empty(Let.class),
+        empty(For.class),
+        root(IterMap.class),
+        exists(_UTIL_REPLICATE)
     );
 
     check("let $x := <x/> " +
@@ -103,8 +107,10 @@ public final class GFLWORTest extends QueryPlanTest {
         "for $b as element(x) in $x " +
         "return (<_>{ $b }</_>, $b)[1]/x",
         "<x/>\n<x/>",
-        count(Let.class, 1),
-        empty(For.class)
+        empty(Let.class),
+        empty(For.class),
+        root(IterMap.class),
+        exists(_UTIL_REPLICATE)
     );
   }
 
@@ -211,10 +217,10 @@ public final class GFLWORTest extends QueryPlanTest {
         empty(For.class),
         exists(_UTIL_REPLICATE)
     );
-    check("for $r in 1 to 2 return <_>3</_>",
-        "<_>3</_>\n<_>3</_>",
-        exists(DualMap.class),
-        exists(SingletonSeq.class)
+    check("let $n := for $r in 1 to 2 return <_>3</_> return $n[1] is $n[2]",
+        false,
+        empty(For.class),
+        exists(_UTIL_REPLICATE)
     );
     check("for $r in 1 to 2 return 3[. = 4]",
         "",
@@ -318,8 +324,7 @@ public final class GFLWORTest extends QueryPlanTest {
     );
     check("for $i in 1 to 3 let $x := $i * $i return error()",
         null,
-        empty(GFLWOR.class),
-        root(IterMap.class)
+        root(_UTIL_REPLICATE)
     );
   }
 

@@ -6,7 +6,10 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
@@ -19,44 +22,104 @@ import org.basex.query.value.type.*;
 public final class UtilReplicate extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = exprs[0].value(qc);
-    final long mult = toLong(exprs[1], qc);
-    if(mult < 0) throw UTIL_NEGATIVE_X.get(info, mult);
-    return SingletonSeq.get(value, mult);
+    final Expr expr = exprs[0];
+    final long count = toLong(exprs[1], qc);
+    final boolean single = exprs.length < 3 || !toBoolean(exprs[2], qc);
+
+    if(count < 0) throw UTIL_NEGATIVE_X.get(info, count);
+    if(count == 0) return Empty.VALUE;
+    if(count == 1) return expr.value(qc);
+
+    // single evaluation
+    if(single) return SingletonSeq.get(expr.value(qc), count);
+
+    // multiple evaluations
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(long c = 0; c < count; c++) vb.add(expr.value(qc));
+    return vb.value(this);
+  }
+
+  @Override
+  public Iter iter(final QueryContext qc) throws QueryException {
+    final Expr expr = exprs[0];
+    final long count = toLong(exprs[1], qc);
+    final boolean single = exprs.length < 3 || !toBoolean(exprs[2], qc);
+
+    if(count < 0) throw UTIL_NEGATIVE_X.get(info, count);
+    if(count == 0) return Empty.ITER;
+    if(count == 1) return expr.iter(qc);
+
+    // single evaluation
+    if(single) return SingletonSeq.get(expr.value(qc), count).iter();
+
+    return new Iter() {
+      long c = count;
+      Iter iter;
+
+      @Override
+      public Item next() throws QueryException {
+        while(true) {
+          if(iter == null) {
+            if(c-- == 0) return null;
+            iter = expr.iter(qc);
+          }
+          final Item item = iter.next();
+          if(item != null) return item;
+          iter = null;
+        }
+      }
+    };
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0], mult = exprs[1];
-    final SeqType st = expr.seqType();
-    if(st.zero()) return expr;
+    final Expr expr = exprs[0], count = exprs[1];
+    final boolean single = exprs.length < 3 || exprs[2] == Bln.FALSE;
 
     // pre-evaluate static multipliers
-    long sz = -1, m = -1;
-    if(mult instanceof Value) {
-      m = toLong(mult, cc.qc);
-      if(m == 0) return Empty.VALUE;
-      if(m == 1) return expr;
+    long sz = -1, c = -1;
+    if(count instanceof Value) {
+      c = toLong(count, cc.qc);
+      // util:replicate(<a/>, 0)  ->  ()
+      if(c == 0) return Empty.VALUE;
+      // util:replicate(<a/>, 1)  ->  <a/>
+      if(c == 1) return expr;
       sz = expr.size();
-      if(sz != -1) sz *= m;
+      if(sz != -1) sz *= c;
     }
+    // util:replicate(prof:void(<a/>), 2)  ->  prof:void(<a/>)
+    if(expr == Empty.VALUE || sz == 0 && single) return expr;
 
     // adopt sequence type
-    exprType.assign(st.union(m > 0 ? Occ.ONE_MORE : Occ.ZERO_MORE), sz);
+    exprType.assign(expr.seqType().union(c > 0 ? Occ.ONE_MORE : Occ.ZERO_MORE), sz);
     data(expr.data());
     return this;
   }
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0], mult = exprs[1];
+    final Expr expr = exprs[0];
+
     if(mode == Simplify.DISTINCT) {
-      if(mult instanceof Value && toLong(mult, cc.qc) > 0) {
+      // ensure that input argument will be evaluated exactly once
+      // util:replicate($node, 2)  ->  $node
+      final long count = exprs[1] instanceof Int ? ((Int) exprs[1]).itr() : -1;
+      final boolean single = exprs.length < 3 || exprs[2] == Bln.FALSE;
+      if(count > 0 && (single || !expr.has(Flag.NDT))) {
         return cc.replaceWith(this, expr);
       }
     } else if(mode == Simplify.ATOM || mode == Simplify.NUMBER) {
       exprs[0] = expr.simplifyFor(mode, cc);
     }
     return super.simplifyFor(mode, cc);
+  }
+
+  /**
+   * Indicates if the input argument will be evaluated exactly once.
+   * @return result of check, {@code false} if unknown at compile time
+   */
+  public boolean once() {
+    return (exprs.length < 3 || exprs[2] == Bln.FALSE) &&
+        exprs[1] instanceof Int && ((Int) exprs[1]).itr() > 0;
   }
 }

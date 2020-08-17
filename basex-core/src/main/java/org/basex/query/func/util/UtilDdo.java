@@ -34,7 +34,8 @@ public final class UtilDdo extends StandardFunc {
     final Type type = expr.seqType().type;
 
     // util:ddo(util:replicate(*, 2))  ->  util:ddo(*)
-    if(expr instanceof UtilReplicate && type instanceof NodeType) return args(expr)[0];
+    if(expr instanceof UtilReplicate && ((UtilReplicate) expr).once() &&
+        type instanceof NodeType) return args(expr)[0];
 
     // replace list with union:
     // util:ddo((<a/>, <b/>))  ->  <a/> | <b/>

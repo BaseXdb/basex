@@ -1349,8 +1349,8 @@ public enum Function implements AFunction {
   _UTIL_RANGE(UtilRange::new, "range(items,first,last)",
       arg(ITEM_ZM, DBL_O, DBL_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
-  _UTIL_REPLICATE(UtilReplicate::new, "replicate(items,count)",
-      arg(ITEM_ZM, ITR_O), ITEM_ZM, UTIL_URI),
+  _UTIL_REPLICATE(UtilReplicate::new, "replicate(items,count[,multiple])",
+      arg(ITEM_ZM, ITR_O, BLN_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_ROOT(UtilRoot::new, "root(nodes)", arg(NOD_ZM), DOC_ZM, UTIL_URI),
 

@@ -67,10 +67,11 @@ public final class List extends Arr {
     if(el == 1) return exprs[0];
 
     // rewrite identical expressions to util:replicate
-    if(!exprs[0].has(Flag.NDT, Flag.CNS)) {
-      int e = 0;
-      while(++e < el && exprs[e].equals(exprs[0]));
-      if(e == el) return cc.function(Function._UTIL_REPLICATE, info, exprs[0], Int.get(el));
+    int e = 0;
+    while(++e < el && exprs[e].equals(exprs[0]));
+    if(e == el) {
+      final boolean multi = exprs[0].has(Flag.NDT, Flag.CNS);
+      return cc.function(Function._UTIL_REPLICATE, info, exprs[0], Int.get(el), Bln.get(multi));
     }
 
     // determine result type, compute number of results, set expression type

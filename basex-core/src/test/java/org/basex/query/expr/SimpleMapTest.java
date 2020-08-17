@@ -100,12 +100,13 @@ public final class SimpleMapTest extends QueryPlanTest {
     check("(1 to 2) ! ('a', 'a')[.]", "a\na\na\na", exists(_UTIL_REPLICATE));
     check("(1 to 2) ! (4, 5)[. = 4]", "4\n4", exists(_UTIL_REPLICATE));
     check("(1 to 2) ! ('a', '')[.]", "a\na", exists(_UTIL_REPLICATE));
+    check("(1 to 2) ! <x/>", "<x/>\n<x/>", exists(_UTIL_REPLICATE));
+
     check("(1 to 2) ! prof:void(.)", "", empty(_UTIL_REPLICATE));
 
     // replace first or both expressions with singleton sequence
     check("(1 to 2) ! 3", "3\n3", exists(SingletonSeq.class), root(SingletonSeq.class));
     check("(1 to 2) ! 'a'[.]", "a\na", exists(SingletonSeq.class), root(SingletonSeq.class));
-    check("(1 to 2) ! <x/>", "<x/>\n<x/>", exists(SingletonSeq.class), exists(DualMap.class));
 
     // combine identical values in singleton sequence
     check("(1 to 2) ! ('a', 'a')", "a\na\na\na", exists(SingletonSeq.class) + " and .//@size = 4");
