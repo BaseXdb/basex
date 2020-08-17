@@ -91,11 +91,11 @@ public final class CMap extends Arr {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.token(MAP).token(" {");
+    qs.token(MAP).token(" { ");
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
-      if(e != 0) qs.token(SEP);
-      qs.token(exprs[e]).token(": ").token(exprs[e + 1]);
+      if(e != 0) qs.token(',');
+      qs.token(exprs[e]).token(':').token(exprs[e + 1]);
     }
     qs.token(" }");
   }

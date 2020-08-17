@@ -78,6 +78,6 @@ public final class CArray extends Arr {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.token(seq ? "[" : ARRAY + " { ").tokens(exprs, SEP).token(seq ? " ]" : " }");
+    qs.token(seq ? "[ " : ARRAY + " { ").tokens(exprs, SEP).token(seq ? " ]" : " }");
   }
 }
