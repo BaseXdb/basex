@@ -99,17 +99,12 @@ public final class Quantifier extends Single {
 
   @Override
   public void plan(final QueryString qs) {
-    if(expr instanceof GFLWOR) {
-      qs.token(every ? EVERY : SOME);
-      final GFLWOR gflwor = (GFLWOR) expr;
-      int c = 0;
-      for(final Clause clause : gflwor.clauses) {
-        if(c++ != 0) qs.token(SEP);
-        qs.token(clause.toString().replaceAll('^' + FOR + ' ', ""));
-      }
-      qs.token(SATISFIES).token(gflwor.rtrn);
+    final String arg = new QueryString().token('(').token(expr).token(')').token("=").
+        function(every ? Function.FALSE : Function.TRUE).toString();
+    if(every) {
+      qs.function(Function.NOT, ' ' + arg);
     } else {
-      qs.token(expr);
+      qs.token(arg);
     }
   }
 }
