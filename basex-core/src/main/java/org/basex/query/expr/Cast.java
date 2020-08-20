@@ -47,7 +47,7 @@ public final class Cast extends Single {
   public Expr optimize(final CompileContext cc) throws QueryException {
     expr = expr.simplifyFor(Simplify.ATOM, cc);
 
-    // pre-evaluate value argument
+    // pre-evaluate (check value)
     if(expr instanceof Value) return cc.preEval(this);
 
     // assign target type
@@ -66,7 +66,9 @@ public final class Cast extends Single {
     // ('a' cast as xs:string)  ->  'a'
     // xs:string(''[. = <_/>])  ->  ''[. = <_/>]
     final SeqType dst = exprType.seqType();
-    return ast.occ.instanceOf(dst.occ) && ast.type.eq(dt) ? cc.replaceWith(this, expr) : this;
+    if(ast.occ.instanceOf(dst.occ) && ast.type.eq(dt)) return cc.replaceWith(this, expr);
+
+    return this;
   }
 
   @Override
@@ -74,7 +76,7 @@ public final class Cast extends Single {
     final Value value = expr.atomValue(qc, info);
     final long size = value.size();
     if(!seqType.occ.check(size)) throw INVTYPE_X_X_X.get(info, value.seqType(), seqType, value);
-    return size == 1 ? seqType.cast((Item) value, true, qc, sc, info) : value;
+    return size == 0 ? value : seqType.cast((Item) value, true, qc, sc, info);
   }
 
   @Override

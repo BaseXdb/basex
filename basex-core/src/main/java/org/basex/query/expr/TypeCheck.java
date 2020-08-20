@@ -73,7 +73,7 @@ public class TypeCheck extends Single {
       return cc.replaceWith(this, ((FuncItem) expr).coerceTo(ft, cc.qc, info, true));
     }
 
-    // pre-evaluate type check
+    // pre-evaluate (check value and result size)
     final long es = expr.size();
     if(expr instanceof Value && es <= CompileContext.MAX_PREEVAL) return cc.preEval(this);
 

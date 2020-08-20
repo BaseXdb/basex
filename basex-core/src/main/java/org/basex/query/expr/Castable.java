@@ -3,6 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -42,8 +44,12 @@ public final class Castable extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) {
-    return expr.seqType().instanceOf(seqType) ? cc.replaceWith(this, Bln.TRUE) : this;
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    expr = expr.simplifyFor(Simplify.ATOM, cc);
+
+    // pre-evaluate (check value or static type)
+    return expr instanceof Value ? cc.preEval(this) : cc.replaceWith(this,
+      expr.seqType().instanceOf(seqType) && !expr.has(Flag.NDT) ? Bln.TRUE : this);
   }
 
   @Override

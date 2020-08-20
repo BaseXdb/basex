@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -37,16 +38,18 @@ public final class Instance extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) {
-    final SeqType st = expr.seqType();
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    // pre-evaluate (check value)
+    if(expr instanceof Value) return cc.preEval(this);
+
+    // pre-evaluate (check static type)
     Expr ex = this;
-    if(!ex.has(Flag.NDT)) {
-      if(st.instanceOf(seqType)) {
-        ex = Bln.TRUE;
-      } else if(st.intersect(seqType) == null) {
-        // if no intersection is possible at compile time, final type cannot be an instance either
-        ex = Bln.FALSE;
-      }
+    if(!expr.has(Flag.NDT)) {
+      final SeqType st = expr.seqType();
+      // (1, 2)[. = 1] instance of xs:numeric*
+      if(st.instanceOf(seqType)) ex = Bln.TRUE;
+      // (1, 2)[. = 1] instance of xs:string
+      else if(st.intersect(seqType) == null) ex = Bln.FALSE;
     }
     return cc.replaceWith(this, ex);
   }
