@@ -1009,6 +1009,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _HOF_CONST(HofConst::new, "const(return,ignore)", arg(ITEM_ZM, ITEM_ZM), ITEM_ZM, HOF_URI),
   /** XQuery function. */
+  _HOF_DROP_WHILE(HofDropWhile::new, "drop-while(items,predicate)",
+      arg(ITEM_ZM, FuncType.get(BLN_O, ITEM_O).seqType()), ITEM_ZM, flag(HOF), HOF_URI),
+  /** XQuery function. */
   _HOF_FOLD_LEFT1(HofFoldLeft1::new, "fold-left1(non-empty-items,function)",
       arg(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O).seqType()), ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */

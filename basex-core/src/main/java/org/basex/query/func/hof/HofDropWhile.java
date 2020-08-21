@@ -1,12 +1,9 @@
 package org.basex.query.func.hof;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -14,7 +11,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  */
-public class HofTakeWhile extends StandardFunc {
+public final class HofDropWhile extends HofTakeWhile {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
@@ -25,11 +22,16 @@ public class HofTakeWhile extends StandardFunc {
     if(value != null) return value.iter();
 
     return new Iter() {
+      boolean found;
+
       @Override
       public Item next() throws QueryException {
-        final Item item = qc.next(iter);
-        if(item != null && test(pred, item, qc)) return item;
-        return null;
+        Item item = qc.next(iter);
+        if(!found) {
+          while(item != null && test(pred, item, qc)) item = qc.next(iter);
+          found = true;
+        }
+        return item;
       }
     };
   }
@@ -44,7 +46,9 @@ public class HofTakeWhile extends StandardFunc {
     if(value != null) return value;
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item item; (item = qc.next(iter)) != null && test(pred, item, qc);) vb.add(item);
+    Item item;
+    while((item = qc.next(iter)) != null && test(pred, item, qc));
+    do vb.add(item); while((item = qc.next(iter)) != null);
     return vb.value(this);
   }
 
@@ -65,30 +69,6 @@ public class HofTakeWhile extends StandardFunc {
     final long size = value.size();
     long c = -1;
     while(++c < size && test(pred, value.itemAt(c), qc));
-    return value.subsequence(0, c, qc);
-  }
-
-  /**
-   * Tests if the specified predicate is successful.
-   * @param pred predicate
-   * @param item item
-   * @param qc query context
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  final boolean test(final FItem pred, final Item item, final QueryContext qc)
-      throws QueryException {
-    return toBoolean(pred.invokeValue(qc, info, item), qc);
-  }
-
-  @Override
-  protected final Expr opt(final CompileContext cc) {
-    final Expr expr = exprs[0];
-    final SeqType st = expr.seqType();
-    if(st.zero()) return expr;
-
-    exprType.assign(st.union(Occ.ZERO));
-    data(expr.data());
-    return this;
+    return value.subsequence(c, size - c, qc);
   }
 }
