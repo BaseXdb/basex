@@ -89,6 +89,13 @@ public final class List extends Arr {
 
     // pre-evaluate list; skip expressions with large result sizes
     if(allAreValues(true)) {
+      // rewrite to range sequence: 1, 2, 3  ->  1 to 3
+      if(st.eq(SeqType.ITR_O)) {
+        final long s = ((Int) exprs[0]).itr();
+        for(e = 1; e < el && e + s == ((Int) exprs[e]).itr(); e++);
+        if(e == el) return cc.replaceWith(this, RangeSeq.get(s, el, true));
+      }
+
       Type tp = null;
       final Value[] values = new Value[exprs.length];
       int vl = 0;

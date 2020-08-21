@@ -307,7 +307,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" 0 to 8", " function($x) { $x + 1 }"),
         "1\n2\n3\n4\n5\n6\n7\n8\n9",
         empty(func),
-        exists(IntSeq.class));
+        exists(RangeSeq.class));
     // should be unrolled but not evaluated at compile time
     check(func.args(" 1 to 9", " function($x) { $x[random:double()] }"), "",
         empty(func),

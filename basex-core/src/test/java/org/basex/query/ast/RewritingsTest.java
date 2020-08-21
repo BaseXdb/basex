@@ -691,7 +691,7 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Merge conjunctions. */
   @Test public void gh1776() {
     check("for $n in (1, 2, 3) where $n != 2 and $n != 3 return $n", 1,
-        exists(NOT), exists(IntSeq.class));
+        exists(NOT), exists(RangeSeq.class));
 
     check("<_>A</_>[. = <a>A</a> and . = 'A']", "<_>A</_>", exists(NOT), exists(List.class));
     check("(<a/>, <b/>, <c/>)[name() = 'a' and name() = 'b']", "",
@@ -895,8 +895,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_/>[not(. = ('A', 'B'))][not(. = ('C', 'D'))]", "<_/>", count(CmpHashG.class, 1));
     check("<_/>[. != 'A'][. != 'B'][. != 'C'][. != 'D']", "<_/>",   count(CmpHashG.class, 1));
 
-    check("(3, 4)[not(. = 1) and not(. = (2, 3))]", 4, count(NOT, 1), count(CmpHashG.class, 1));
-    check("(3, 4)[not(. = (2, 3)) and . != 1]", 4, count(NOT, 1), count(CmpHashG.class, 1));
+    check("(3, 4)[not(. = 1) and not(. = (2, 4))]", 3, count(NOT, 1), count(CmpHashG.class, 1));
+    check("(3, 4)[not(. = (2, 4)) and . != 1]", 3, count(NOT, 1), count(CmpHashG.class, 1));
 
     check("(3, 4)[not(. = (2, 3)) and not(. = (1, 4))]", "",
         count(NOT, 1), count(CmpHashG.class, 1));
@@ -1265,12 +1265,12 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Combine position predicates. */
   @Test public void gh1840() {
     check("(1,2,3)[position() = 1 or position() = 1]", 1, root(Int.class));
-    check("(1,2,3)[position() = 1 or position() = 2]", "1\n2", root(SubSeq.class));
+    check("(1,2,3)[position() = 1 or position() = 2]", "1\n2", root(RangeSeq.class));
     check("(1,2,3)[position() = 1 or position() = 3]", "1\n3", count(ItrPos.class, 2));
 
-    check("(1,2,3)[position() = 1 to 2 or position() = 1]", "1\n2", root(SubSeq.class));
-    check("(1,2,3)[position() = 1 to 2 or position() = 2]", "1\n2", root(SubSeq.class));
-    check("(1,2,3)[position() = 1 to 2 or position() = 3]", "1\n2\n3", root(IntSeq.class));
+    check("(1,2,3)[position() = 1 to 2 or position() = 1]", "1\n2", root(RangeSeq.class));
+    check("(1,2,3)[position() = 1 to 2 or position() = 2]", "1\n2", root(RangeSeq.class));
+    check("(1,2,3)[position() = 1 to 2 or position() = 3]", "1\n2\n3", root(RangeSeq.class));
 
     check("(1,2,3)[position() = 1 to 2 and position() = 1]", 1, root(Int.class));
     check("(1,2,3)[position() = 1 to 2 and position() = 2 to 3]", 2, root(Int.class));
@@ -1857,5 +1857,11 @@ public final class RewritingsTest extends QueryPlanTest {
         root(Int.class));
     check("switch(<_/>) case 'a' return 1 case 'b' return 1 case 'c' return 1 default return 1", 1,
         root(Int.class));
+  }
+
+  /** Rewrite integer lists to range sequences. */
+  @Test public void gh1924() {
+    check("1, 2", "1\n2", root(RangeSeq.class));
+    check("-1, 0, 1", "-1\n0\n1", root(RangeSeq.class));
   }
 }

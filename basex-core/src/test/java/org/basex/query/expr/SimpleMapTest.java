@@ -57,7 +57,7 @@ public final class SimpleMapTest extends QueryPlanTest {
     check("1 ! .", 1, root(Int.class));
     check("(1, 2)[. = 1] ! .", 1, root(IterFilter.class));
     check("(1, (2, 3)[. = 2]) ! .", "1\n2", root(List.class));
-    check("(1, 2) !.!.!.!.!.!.!.!.!.!.!.", "1\n2", root(IntSeq.class));
+    check("(1, 2) !.!.!.!.!.!.!.!.!.!.!.", "1\n2", root(RangeSeq.class));
     check("<a/> ! . ! .", "<a/>", root(CElem.class));
     check("(1, 2)[. ! number() = 2]", 2, empty(ItemMap.class));
 
