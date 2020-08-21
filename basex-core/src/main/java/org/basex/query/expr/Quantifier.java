@@ -100,7 +100,7 @@ public final class Quantifier extends Single {
   @Override
   public void plan(final QueryString qs) {
     final String arg = new QueryString().token('(').token(expr).token(')').token("=").
-        function(every ? Function.FALSE : Function.TRUE).toString();
+        token(every ? Bln.FALSE : Bln.TRUE).toString();
     if(every) {
       qs.function(Function.NOT, ' ' + arg);
     } else {
