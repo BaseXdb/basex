@@ -6,7 +6,6 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -124,7 +123,7 @@ public final class Let extends ForLet {
 
   @Override
   Expr inlineExpr(final CompileContext cc) throws QueryException {
-    return scoring ? cc.function(Function._FT_SCORE, info, expr) : var.checked(expr, cc);
+    return scoring ? null : var.checked(expr, cc);
   }
 
   @Override

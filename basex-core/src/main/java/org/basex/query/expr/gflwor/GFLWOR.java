@@ -321,7 +321,9 @@ public final class GFLWOR extends ParseExpr {
         if(!(clause instanceof Let) || clause.has(Flag.NDT)) continue;
 
         final Let lt = (Let) clause;
-        final InlineContext ic = new InlineContext(lt.var, lt.inlineExpr(cc), cc);
+        final Expr inlined = lt.inlineExpr(cc);
+        if(inlined == null) continue;
+        final InlineContext ic = new InlineContext(lt.var, inlined, cc);
         final ExprList exprs = new ExprList();
         for(final ListIterator<Clause> ir = clauses.listIterator(iter.nextIndex()); ir.hasNext();) {
           exprs.add(ir.next());
