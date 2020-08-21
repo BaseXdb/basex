@@ -199,12 +199,15 @@ public final class CmpIR extends Single {
 
   @Override
   public void plan(final QueryString qs) {
+    qs.token(expr);
     if(min == max) {
-      qs.token(expr).token("=").token(min);
+      qs.token("=").token(min);
+    } else if(min != MIN_VALUE && max != MAX_VALUE) {
+      qs.token("=").token(min).token(TO).token(max);
+    } else if(min != MIN_VALUE) {
+      qs.token(">=").token(min);
     } else {
-      if(min != MIN_VALUE) qs.token(expr).token(">=").token(min);
-      if(min != MIN_VALUE && max != MAX_VALUE) qs.token(AND);
-      if(max != MAX_VALUE) qs.token(expr).token("<=").token(max);
+      qs.token("<=").token(max);
     }
   }
 }

@@ -215,7 +215,7 @@ public final class CmpSR extends Single {
   @Override
   public void plan(final QueryString qs) {
     if(min != null) qs.token(expr).token(mni ? ">=" : ">").quoted(min);
-    if(min == null && max == null) qs.token(AND);
+    if(min != null && max != null) qs.token(AND);
     if(max != null) qs.token(expr).token(mxi ? "<=" : "<").quoted(max);
   }
 }
