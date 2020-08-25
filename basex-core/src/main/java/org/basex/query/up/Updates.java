@@ -134,26 +134,20 @@ public final class Updates {
     if(target instanceof DBNode) return (DBNode) target;
 
     // determine highest ancestor node
-    ANode anc = target;
+    ANode tmp = target;
     final BasicNodeIter iter = target.ancestorIter();
-    for(ANode n; (n = iter.next()) != null;) anc = n;
+    for(ANode n; (n = iter.next()) != null;) tmp = n;
+    final ANode root = tmp;
 
-    /* See if this ancestor has already been added to the pending update list.
-     * In this case a database has already been created. */
-    final int ancID = anc.id;
+    // see if this ancestor has already been added to the pending update list
+    // if data instance does not exist, create mapping between fragment id and data reference
     MemData data;
     synchronized(fragmentIDs) {
-      data = fragmentIDs.get(ancID);
-      // if data instance does not exist, create new one
-      if(data == null) {
-        data = (MemData) anc.copy(qc).data();
-        // create a mapping between the fragment id and the data reference
-        fragmentIDs.put(ancID, data);
-      }
+      data = fragmentIDs.computeIfAbsent(root.id, () -> (MemData) root.copy(qc).data());
     }
 
     // determine the pre value of the target node within its database
-    final int pre = preSteps(anc, target.id);
+    final int pre = preSteps(root, target.id);
     return new DBNode(data, pre);
   }
 

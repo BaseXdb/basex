@@ -225,12 +225,7 @@ public final class FTIndex extends ValueIndex {
 
     // try to find cached text (requested length may vary in full-text requests)
     final int key = (ti << 24) + pos;
-    byte[] text = ctext.get(key);
-    if(text == null) {
-      text = dataY.readBytes(pos, ti);
-      ctext.put(key, text);
-    }
-    return text;
+    return ctext.computeIfAbsent(key, () -> dataY.readBytes(pos, ti));
   }
 
   @Override

@@ -102,12 +102,7 @@ public final class StaticFuncs extends ExprInfo {
       if(qe != null) throw qe;
     }
     final byte[] sig = signature(name, args.length);
-    FuncCache fc = funcs.get(sig);
-    if(fc == null) {
-      fc = new FuncCache(null);
-      funcs.put(sig, fc);
-    }
-    return fc.newCall(name, args, sc, ii);
+    return funcs.computeIfAbsent(sig, () -> new FuncCache(null)).newCall(name, args, sc, ii);
   }
 
   /**
@@ -116,12 +111,7 @@ public final class StaticFuncs extends ExprInfo {
    */
   public void registerFuncLiteral(final Closure literal) {
     final byte[] sig = signature(literal.funcName(), literal.arity());
-    FuncCache cache = funcs.get(sig);
-    if(cache == null) {
-      cache = new FuncCache(null);
-      funcs.put(sig, cache);
-    }
-    cache.literals.add(literal);
+    funcs.computeIfAbsent(sig, () -> new FuncCache(null)).literals.add(literal);
   }
 
   /**

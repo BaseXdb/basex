@@ -41,33 +41,6 @@ public final class Thesaurus {
     RSHIPS.put("RT", "RT");
   }
 
-  /** Thesaurus node. */
-  private static class ThesNode {
-    /** Related nodes. */
-    private ThesNode[] nodes = new ThesNode[1];
-    /** Relationships. */
-    private byte[][] rs = new byte[1][];
-    /** Term. */
-    private byte[] term;
-    /** Entries. */
-    private int size;
-
-    /**
-     * Adds a relationship to the node.
-     * @param n target node
-     * @param r relationship
-     */
-    private void add(final ThesNode n, final byte[] r) {
-      if(size == nodes.length) {
-        final int s = Array.newCapacity(size);
-        nodes = Array.copy(nodes, new ThesNode[s]);
-        rs = Array.copyOf(rs, s);
-      }
-      nodes[size] = n;
-      rs[size++] = r;
-    }
-  }
-
   /** Input file. */
   private final IO file;
   /** Relationship. */
@@ -145,13 +118,7 @@ public final class Thesaurus {
    * @return node
    */
   private ThesNode node(final byte[] term) {
-    ThesNode node = nodes.get(term);
-    if(node == null) {
-      node = new ThesNode();
-      node.term = term;
-      nodes.put(term, node);
-    }
-    return node;
+    return nodes.computeIfAbsent(term, () -> new ThesNode(term));
   }
 
   /**
@@ -218,5 +185,40 @@ public final class Thesaurus {
     if(!(obj instanceof Thesaurus)) return false;
     final Thesaurus th = (Thesaurus) obj;
     return file.eq(th.file) && min == th.min && max == th.max && eq(rel, th.rel);
+  }
+
+  /** Thesaurus node. */
+  private static final class ThesNode {
+    /** Related nodes. */
+    private ThesNode[] nodes = new ThesNode[1];
+    /** Relationships. */
+    private byte[][] rs = new byte[1][];
+    /** Term. */
+    private byte[] term;
+    /** Entries. */
+    private int size;
+
+    /**
+     * Constructor.
+     * @param term term
+     */
+    private ThesNode(final byte[] term) {
+      this.term = term;
+    }
+
+    /**
+     * Adds a relationship to the node.
+     * @param n target node
+     * @param r relationship
+     */
+    private void add(final ThesNode n, final byte[] r) {
+      if(size == nodes.length) {
+        final int s = Array.newCapacity(size);
+        nodes = Array.copy(nodes, new ThesNode[s]);
+        rs = Array.copyOf(rs, s);
+      }
+      nodes[size] = n;
+      rs[size++] = r;
+    }
   }
 }

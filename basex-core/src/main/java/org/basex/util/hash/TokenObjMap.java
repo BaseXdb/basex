@@ -1,6 +1,7 @@
 package org.basex.util.hash;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.util.*;
 
@@ -33,6 +34,22 @@ public final class TokenObjMap<E> extends TokenSet {
     // array bounds are checked before array is resized..
     final int i = put(key);
     values[i] = val;
+  }
+
+  /**
+   * Returns the value for the specified key.
+   * Creates a new value if none exists.
+   * @param key key
+   * @param func function that create a new value
+   * @return value
+   */
+  public E computeIfAbsent(final byte[] key, final Supplier<? extends E> func) {
+    E value = get(key);
+    if(value == null) {
+      value = func.get();
+      put(key, value);
+    }
+    return value;
   }
 
   /**

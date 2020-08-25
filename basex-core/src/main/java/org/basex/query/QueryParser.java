@@ -874,8 +874,8 @@ public class QueryParser extends InputParser {
     final SeqType type = optAsType();
     final Expr ex = wsConsumeWs(EXTERNAL) ? null : enclosedExpr();
     final VarScope vs = localVars.popContext();
-    final StaticFunc func = qc.funcs.declare(
-        anns, name, args, type, ex, currDoc.toString(), vs, ii);
+    final String cd = currDoc.toString();
+    final StaticFunc func = qc.funcs.declare(anns, name, args, type, ex, cd, vs, ii);
     funcs.put(func.id(), func);
   }
 

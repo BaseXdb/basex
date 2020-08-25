@@ -1,6 +1,7 @@
 package org.basex.util.hash;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.util.*;
 
@@ -37,6 +38,22 @@ public final class IntObjMap<E> extends IntSet {
     final Object v = values[i];
     values[i] = value;
     return (E) v;
+  }
+
+  /**
+   * Returns the value for the specified key.
+   * Creates a new value if none exists.
+   * @param key key
+   * @param func function that create a new value
+   * @return value
+   */
+  public E computeIfAbsent(final int key, final Supplier<? extends E> func) {
+    E value = get(key);
+    if(value == null) {
+      value = func.get();
+      put(key, value);
+    }
+    return value;
   }
 
   /**
