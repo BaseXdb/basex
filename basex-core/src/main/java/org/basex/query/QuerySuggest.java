@@ -79,7 +79,7 @@ public final class QuerySuggest extends QueryParser {
   protected void checkTest(final Test test, final boolean element) {
     final TokenBuilder tb = new TokenBuilder();
     if(!element) tb.add('@');
-    if(test != null) tb.add(test.toString().replaceAll("\\*:", ""));
+    if(test != null) tb.add(test.toString(false).replaceAll("\\*:", ""));
     name = tb.finish();
     // use inexact matching only if the element is at the end:
     checkTest(pos < length);
