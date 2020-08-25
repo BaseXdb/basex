@@ -619,6 +619,9 @@ public final class GFLWOR extends ParseExpr {
         expr = SimpleMap.get(cc, info, last, cc.get(last, () -> ic.inline(rtrn)));
       }
     } else if(rtrn.count(fl.var) == VarUsage.NEVER) {
+      // rewrite let clause with unused variable
+      //   let $_ := file:write(...) return ()  ->  file:write(...)
+      //   let $_ := prof:void(1) return 2  ->  prof:void(1), 2
       expr = cc.merge(last, rtrn, info);
     }
     if(expr == null) return false;
