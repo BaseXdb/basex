@@ -1871,4 +1871,18 @@ public final class RewritingsTest extends QueryPlanTest {
     check("5 to 6, 8", "5\n6\n8", root(IntSeq.class));
     check("1, 3 to 4", "1\n3\n4", root(IntSeq.class));
   }
+
+  /** ... */
+  @Test public void gh1925() {
+    query("declare function local:a($a) as xs:boolean {"
+        + "if ($a) then local:a(text { '' }) "
+        + "else if ($a) then local:a($a) "
+        + "else false() }; "
+        + "local:a(()) ! text { . }", false);
+    query("declare function local:a($a) as xs:boolean {"
+        + "if ($a) then local:a(text { '' }) "
+        + "else if ($a) then local:a($a) "
+        + "else false() }; "
+        + "let $c := local:a(()) return text { $c }", false);
+  }
 }
