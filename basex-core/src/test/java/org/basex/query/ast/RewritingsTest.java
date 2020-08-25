@@ -1053,6 +1053,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $_ in 1 to 2 return 3", "3\n3", root(SingletonSeq.class));
     check("for $_ in 1 to 2 return ()", "", empty());
 
+    check("let $_ := prof:void(1) return 1", 1, root(List.class), exists(_PROF_VOID));
+
     // rewrite to simple map
     check("for $_ in 1 to 2 return <a/>", "<a/>\n<a/>", root(_UTIL_REPLICATE));
     check("for $_ in 1 to 2 return prof:void(1)", "", root(_UTIL_REPLICATE));

@@ -7,8 +7,10 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
+import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
@@ -287,5 +289,18 @@ public final class CompileContext {
   public Expr function(final AFunction function, final InputInfo ii, final Expr... exprs)
       throws QueryException {
     return function.get(sc(), ii, exprs).optimize(this);
+  }
+
+  /**
+   * Creates a single expression from a condition and a return expression.
+   * @param cond condition
+   * @param rtrn return expression
+   * @param ii input info
+   * @return function
+   * @throws QueryException query exception
+   */
+  public Expr merge(final Expr cond, final Expr rtrn, final InputInfo ii) throws QueryException {
+    return cond.has(Flag.NDT) ?
+      new List(ii, function(Function._PROF_VOID, ii, cond), rtrn).optimize(this) : rtrn;
   }
 }

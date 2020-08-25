@@ -6,7 +6,6 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.List;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
 import org.basex.query.iter.*;
@@ -168,10 +167,7 @@ public final class GFLWOR extends ParseExpr {
           if(!ndt.any(clauses)) return rtrn;
           // let $_ := file:write(...) return 1  ->  (file:write(...), 1)
           if(clauses.size() == 1 && clauses.get(0) instanceof ForLet) {
-            Expr expr = ((ForLet) clauses.get(0)).expr;
-            expr = cc.function(Function._PROF_VOID, info, expr);
-            expr = new List(info, expr, rtrn).optimize(cc);
-            return cc.replaceWith(this, expr);
+            return cc.replaceWith(this, cc.merge(((ForLet) clauses.get(0)).expr, rtrn, info));
           }
         } else if(!ndt.any(clauses)) {
           // for $_ in 1 to 2 return 3  ->  util:replicate(3, 2)
@@ -603,29 +599,31 @@ public final class GFLWOR extends ParseExpr {
     if(!(clauses.peekLast() instanceof ForLet)) return false;
 
     // do not inline variables with scoring, type checks, etc.
-    final ForLet last = (ForLet) clauses.peekLast();
-    final Expr root = last.inlineExpr(cc);
-    if(root == null) return false;
+    final ForLet fl = (ForLet) clauses.peekLast();
+    final Expr last = fl.inlineExpr(cc);
+    if(last == null) return false;
     Expr expr = null;
 
-    if(rtrn instanceof VarRef && ((VarRef) rtrn).var.is(last.var)) {
+    if(rtrn instanceof VarRef && ((VarRef) rtrn).var.is(fl.var)) {
       // replace return clause with expression
       //   for $i in (1, 2) return $i  ->  (1, 2)
       //   let $c := <a/> return $c
-      expr = root;
-    } else if(last instanceof For || last instanceof Let && last.size() == 1) {
+      expr = last;
+    } else if(fl instanceof For || fl instanceof Let && fl.size() == 1) {
       // rewrite for clause to simple map
       //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
       // skip expressions with context reference
       //   <_/>[for $c in (1, 2) return (., $c)]
-      final InlineContext ic = new InlineContext(last.var, new ContextValue(info), cc);
+      final InlineContext ic = new InlineContext(fl.var, new ContextValue(info), cc);
       if(ic.inlineable(rtrn) && !rtrn.has(Flag.CTX)) {
-        expr = SimpleMap.get(cc, info, root, cc.get(root, () -> ic.inline(rtrn)));
+        expr = SimpleMap.get(cc, info, last, cc.get(last, () -> ic.inline(rtrn)));
       }
+    } else if(rtrn.count(fl.var) == VarUsage.NEVER) {
+      expr = cc.merge(last, rtrn, info);
     }
     if(expr == null) return false;
 
-    cc.info(QueryText.OPTINLINE_X, last);
+    cc.info(QueryText.OPTINLINE_X, fl);
     clauses.removeLast();
     rtrn = expr;
     return true;

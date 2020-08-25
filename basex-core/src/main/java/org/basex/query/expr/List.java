@@ -125,7 +125,7 @@ public final class List extends Arr {
     Long s = null, e = null;
     for(final Expr expr : exprs) {
       long l1 = 0, l2 = 0;
-      if(expr instanceof Int) {
+      if(expr instanceof Int && expr.seqType().type == AtomType.ITR) {
         l1 = ((Int) expr).itr();
         l2 = l1 + 1;
       } else if(expr instanceof RangeSeq) {

@@ -114,8 +114,7 @@ public final class If extends Arr {
         cc.function(Function._UTIL_OR, info, br1, br2);
 
     // if(A) then B else B  ->  B (errors in A will be ignored)
-    if(br1.equals(br2)) return ndt ?
-      new List(info, cc.function(Function._PROF_VOID, info, cond), br1).optimize(cc) : br1;
+    if(br1.equals(br2)) return cc.merge(cond, br1, info);
 
     // determine type
     final SeqType st1 = br1.seqType(), st2 = br2.seqType();
