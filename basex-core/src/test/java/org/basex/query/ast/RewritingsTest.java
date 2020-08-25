@@ -405,7 +405,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Comparison expressions. */
   @Test public void cmpG() {
-    check("count(let $s := (0, 1 to 99999) return $s[. = $s])", 100000, exists(CmpHashG.class));
+    check("count(let $s := (-1, 1 to 99999) return $s[. = $s])", 100000, exists(CmpHashG.class));
   }
 
   /** Count, big sequences. */
@@ -1863,5 +1863,10 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1924() {
     check("1, 2", "1\n2", root(RangeSeq.class));
     check("-1, 0, 1", "-1\n0\n1", root(RangeSeq.class));
+    check("1, 2 to 3", "1\n2\n3", root(RangeSeq.class));
+    check("5, 6 to 7, 8", "5\n6\n7\n8", root(RangeSeq.class));
+    check("5 to 6, 7 to 8", "5\n6\n7\n8", root(RangeSeq.class));
+    check("5 to 6, 8", "5\n6\n8", root(IntSeq.class));
+    check("1, 3 to 4", "1\n3\n4", root(IntSeq.class));
   }
 }

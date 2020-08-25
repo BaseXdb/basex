@@ -90,11 +90,8 @@ public final class List extends Arr {
     // pre-evaluate list; skip expressions with large result sizes
     if(allAreValues(true)) {
       // rewrite to range sequence: 1, 2, 3  ->  1 to 3
-      if(st.eq(SeqType.ITR_O)) {
-        final long s = ((Int) exprs[0]).itr();
-        for(e = 1; e < el && e + s == ((Int) exprs[e]).itr(); e++);
-        if(e == el) return cc.replaceWith(this, RangeSeq.get(s, el, true));
-      }
+      final Expr range = toRange();
+      if(range != null) return cc.replaceWith(this, range);
 
       Type tp = null;
       final Value[] values = new Value[exprs.length];
@@ -118,6 +115,32 @@ public final class List extends Arr {
     }
 
     return this;
+  }
+
+  /**
+   * Tries to rewrite the list to a range sequence.
+   * @return rewritten expression or {@code null}
+   */
+  private Expr toRange() {
+    Long s = null, e = null;
+    for(final Expr expr : exprs) {
+      long l1 = 0, l2 = 0;
+      if(expr instanceof Int) {
+        l1 = ((Int) expr).itr();
+        l2 = l1 + 1;
+      } else if(expr instanceof RangeSeq) {
+        final RangeSeq seq = (RangeSeq) expr;
+        if(!seq.asc) return null;
+        l1 = ((Int) seq.itemAt(0)).itr();
+        l2 = l1 + seq.size();
+      } else {
+        return null;
+      }
+      if(s == null) s = l1;
+      else if(e != l1) return null;
+      e = l2;
+    }
+    return RangeSeq.get(s, e - s, true);
   }
 
   @Override
