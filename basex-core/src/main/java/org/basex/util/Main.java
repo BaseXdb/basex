@@ -39,7 +39,7 @@ public abstract class Main {
    */
   protected static IOFile stopFile(final Class<?> clazz, final int port) {
     final String file = Util.className(clazz).toLowerCase(Locale.ENGLISH) + "stop-" + port + ".tmp";
-    return new IOFile(Prop.TEMPDIR, file);
+    return new IOFile(new IOFile(Prop.TEMPDIR, Prop.PROJECT), file);
   }
 
   /**

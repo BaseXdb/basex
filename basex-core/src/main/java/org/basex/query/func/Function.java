@@ -672,7 +672,7 @@ public enum Function implements AFunction {
   _CLIENT_INFO(ClientInfo::new, "info(id)", arg(URI_O), STR_O, flag(NDT), CLIENT_URI),
   /** XQuery function. */
   _CLIENT_QUERY(ClientQuery::new, "query(id,query[,bindings])",
-      arg(URI_O, STR_O, MAP_ZO), ITEM_ZO, flag(NDT), CLIENT_URI),
+      arg(URI_O, STR_O, MAP_ZO), ITEM_ZM, flag(NDT), CLIENT_URI),
 
   // Conversion Module
 
