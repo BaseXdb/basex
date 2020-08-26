@@ -14,6 +14,7 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.var.*;
 import org.basex.util.list.*;
 import org.junit.jupiter.api.*;
@@ -1872,8 +1873,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("1, 3 to 4", "1\n3\n4", root(IntSeq.class));
   }
 
-  /** ... */
-  @Test public void gh1925() {
+  /** DDO property of recursive function. */
+  @Test public void gh1927() {
     query("declare function local:a($a) as xs:boolean {"
         + "if ($a) then local:a(text { '' }) "
         + "else if ($a) then local:a($a) "
@@ -1884,5 +1885,13 @@ public final class RewritingsTest extends QueryPlanTest {
         + "else if ($a) then local:a($a) "
         + "else false() }; "
         + "let $c := local:a(()) return text { $c }", false);
+  }
+
+  /** Pre-evaluate lookup expressions. */
+  @Test public void gh1928() {
+    check("()?1", "", empty());
+    check("([ 1 ], map { 2: 3 })?*", "1\n3", root(SmallSeq.class));
+    check("((map { 1: 'A', 'x': 'B' }) treat as function(xs:anyAtomicType) as xs:string)?1",
+        "A", root(Str.class));
   }
 }

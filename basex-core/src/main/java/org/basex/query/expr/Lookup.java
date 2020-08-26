@@ -80,7 +80,9 @@ public final class Lookup extends Arr {
         return cc.replaceWith(this, expr);
       }
     }
-    return this;
+
+    // return result or expression
+    return allAreValues(true) ? cc.preEval(this) : this;
   }
 
   /**
