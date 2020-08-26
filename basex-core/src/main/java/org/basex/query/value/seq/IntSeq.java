@@ -56,7 +56,15 @@ public final class IntSeq extends NativeSeq {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     if(mode == Simplify.DISTINCT) {
       final long[] tmp = new LongList((int) size).add(values).sort().distinct().finish();
-      if(tmp.length != values.length) return cc.replaceWith(this, get(tmp, type));
+      final int tl = tmp.length;
+      if(seqType().type == AtomType.ITR) {
+        // try to rewrite to range sequence
+        int t = 0;
+        while(++t < tl && tmp[0] + t == tmp[t]);
+        if(t == tl) return cc.replaceWith(this, RangeSeq.get(tmp[0], tl, true));
+      }
+      // replace with new, sorted (possibly smaller) sequence
+      return cc.replaceWith(this, get(tmp, type));
     }
     return super.simplifyFor(mode, cc);
   }

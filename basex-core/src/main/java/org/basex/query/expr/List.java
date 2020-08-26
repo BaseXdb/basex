@@ -122,25 +122,25 @@ public final class List extends Arr {
    * @return rewritten expression or {@code null}
    */
   private Expr toRange() {
-    Long s = null, e = null;
+    Long start = null, end = null;
     for(final Expr expr : exprs) {
-      long l1 = 0, l2 = 0;
+      long s = 0, e = 0;
       if(expr instanceof Int && expr.seqType().type == AtomType.ITR) {
-        l1 = ((Int) expr).itr();
-        l2 = l1 + 1;
+        s = ((Int) expr).itr();
+        e = s + 1;
       } else if(expr instanceof RangeSeq) {
         final RangeSeq seq = (RangeSeq) expr;
         if(!seq.asc) return null;
-        l1 = ((Int) seq.itemAt(0)).itr();
-        l2 = l1 + seq.size();
+        s = ((Int) seq.itemAt(0)).itr();
+        e = s + seq.size();
       } else {
         return null;
       }
-      if(s == null) s = l1;
-      else if(e != l1) return null;
-      e = l2;
+      if(start == null) start = s;
+      else if(end != s) return null;
+      end = e;
     }
-    return RangeSeq.get(s, e - s, true);
+    return RangeSeq.get(start, end - start, true);
   }
 
   @Override

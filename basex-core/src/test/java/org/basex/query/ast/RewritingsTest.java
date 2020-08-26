@@ -1283,7 +1283,8 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Distinct integer sequences. */
   @Test public void gh1841() {
     check("<_/>[position() = (1, 1)]", "<_/>", root(CElem.class));
-    check("<_/>[position() = (1, 2, 1)]", "<_/>", count(Int.class, 2));
+    check("<_/>[position() = (1, 2, 1)]", "<_/>", root(CElem.class));
+    check("<_/>[position() = (1, 2, 2.1)]", "<_/>", count(Int.class, 2));
   }
 
   /** Flatten expression lists. */
@@ -1893,5 +1894,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("([ 1 ], map { 2: 3 })?*", "1\n3", root(SmallSeq.class));
     check("((map { 1: 'A', 'x': 'B' }) treat as function(xs:anyAtomicType) as xs:string)?1",
         "A", root(Str.class));
+  }
+
+  /** Rewrite distinct sequence checks. */
+  @Test public void gh1930() {
+    check("(1 to 2)[. = (5, 4, 3, 1, 2, 5)]", "1\n2", exists(RangeSeq.class));
+    check("distinct-values((5, 3, 4, 2, 1, 6, 1))", "1\n2\n3\n4\n5\n6", root(RangeSeq.class));
   }
 }
