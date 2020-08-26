@@ -247,7 +247,19 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final DBNodeIter ancestorIter() {
+  public final BasicNodeIter ancestorIter() {
+    if(parent != null) {
+      return new BasicNodeIter() {
+        private ANode node = parent;
+
+        @Override
+        public ANode next() {
+          final ANode p = node;
+          if(p != null) node = p.parent;
+          return p;
+        }
+      };
+    }
     return new DBNodeIter(data) {
       private final DBNode node = finish();
       int curr = pre, kind = data.kind(curr);
@@ -264,7 +276,19 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final DBNodeIter ancestorOrSelfIter() {
+  public final BasicNodeIter ancestorOrSelfIter() {
+    if(parent != null) {
+      return new BasicNodeIter() {
+        private ANode node = DBNode.this;
+
+        @Override
+        public ANode next() {
+          final ANode p = node;
+          if(p != null) node = p.parent;
+          return p;
+        }
+      };
+    }
     return new DBNodeIter(data) {
       private final DBNode node = finish();
       int curr = pre, kind = data.kind(curr);

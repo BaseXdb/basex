@@ -1901,4 +1901,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(1 to 2)[. = (5, 4, 3, 1, 2, 5)]", "1\n2", exists(RangeSeq.class));
     check("distinct-values((5, 3, 4, 2, 1, 6, 1))", "1\n2\n3\n4\n5\n6", root(RangeSeq.class));
   }
+
+  /** Ancestor steps on database and fragment nodes. */
+  @Test public void gh1931() {
+    query("<a>{ (<b><c/></b> update {})/c }</a>/c/ancestor::*", "<a>\n<c/>\n</a>");
+  }
 }
