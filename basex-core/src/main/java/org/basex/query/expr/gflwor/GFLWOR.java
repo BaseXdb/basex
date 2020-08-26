@@ -606,9 +606,14 @@ public final class GFLWOR extends ParseExpr {
 
     if(rtrn instanceof VarRef && ((VarRef) rtrn).var.is(fl.var)) {
       // replace return clause with expression
-      //   for $i in (1, 2) return $i  ->  (1, 2)
-      //   let $c := <a/> return $c
+      //   for $c in (1, 2) return $c  ->  (1, 2)
+      //   let $c := <a/> return $c  ->  <a/>
       expr = last;
+    } else if(fl instanceof Let && rtrn.count(fl.var) == VarUsage.NEVER) {
+      // rewrite let clause with unused variable
+      //   let $_ := file:write(...) return ()  ->  file:write(...)
+      //   let $_ := prof:void(1) return 2  ->  prof:void(1), 2
+      expr = cc.merge(last, rtrn, info);
     } else if(fl instanceof For || fl instanceof Let && fl.size() == 1) {
       // rewrite for clause to simple map
       //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
@@ -618,11 +623,6 @@ public final class GFLWOR extends ParseExpr {
       if(ic.inlineable(rtrn) && !rtrn.has(Flag.CTX)) {
         expr = SimpleMap.get(cc, info, last, cc.get(last, () -> ic.inline(rtrn)));
       }
-    } else if(rtrn.count(fl.var) == VarUsage.NEVER) {
-      // rewrite let clause with unused variable
-      //   let $_ := file:write(...) return ()  ->  file:write(...)
-      //   let $_ := prof:void(1) return 2  ->  prof:void(1), 2
-      expr = cc.merge(last, rtrn, info);
     }
     if(expr == null) return false;
 
