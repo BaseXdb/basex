@@ -238,17 +238,17 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" ()", " ()", " function($a, $b) { $b }"), "", empty());
 
     // should be unrolled and evaluated at compile time
-    check(func.args(" 2 to 10", 1, " function($a, $b) { $a + $b }"),
-        55,
+    final int limit = StandardFunc.UNROLL_LIMIT;
+    check(func.args(" 2 to " + limit, 1, " function($a, $b) { $a + $b }"), 15,
         empty(func),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 2 to 10", 1, " function($a, $b) { $b[random:double()] }"),
-        "",
+    check(func.args(" 2 to " + limit, 1, " function($a, $b) { $b[random:double()] }"), "",
         empty(func),
         exists(_RANDOM_DOUBLE));
     // should not be unrolled
-    check(func.args(" 1 to 11", 0, " function($a, $b) { $a + $b }"), 66, exists(func));
+    check(func.args(" 1 to " + (limit + 1), 0, " function($a, $b) { $a + $b }"), 21,
+        exists(func));
 
     // type inference
     check(func.args(" (1, 2)[. = 1]", " ()", " function($r, $a) { $r, $a }"), 1,
@@ -278,17 +278,17 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" ()", " ()", " function($a, $b) { $a }"), "", empty());
 
     // should be unrolled and evaluated at compile time
-    check(func.args(" 1 to 9", 10, " function($a, $b) { $a + $b }"),
-        55,
+    final int limit = StandardFunc.UNROLL_LIMIT;
+    check(func.args(" 1 to " + (limit - 1), 10, " function($a, $b) { $a + $b }"), 20,
         empty(func),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 1 to 9", 10, " function($a, $b) { $b[random:double()] }"),
-        "",
+    check(func.args(" 1 to " + (limit - 1), 10, " function($a, $b) { $b[random:double()] }"), "",
         empty(func),
         exists(_RANDOM_DOUBLE));
     // should not be unrolled
-    check(func.args(" 0 to 10", 10, " function($a, $b) { $a + $b }"), 65, exists(func));
+    check(func.args(" 0 to " + limit, 10, " function($a, $b) { $a + $b }"), 25,
+        exists(func));
   }
 
   /** Test method. */

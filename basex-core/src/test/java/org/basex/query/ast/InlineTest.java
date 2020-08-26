@@ -136,7 +136,9 @@ public final class InlineTest extends QueryPlanTest {
   /** Ensures that non-deterministic clauses are not reordered. */
   @Test public void ndtFuncTest() {
     check("let $a := function($d) { trace($d) }"
-        + "let $b := $a(1) let $c := $a(1) return $b", 1, exists(VarRef.class));
+        + "let $b := $a('1st') let $c := $a('2nd') return $b", "1st",
+        root(ItemMap.class),
+        "//FnTrace[. = '1st'] << //FnTrace[. = '2nd']");
   }
 
   /** Checks that window clauses are recognized as loops. */
