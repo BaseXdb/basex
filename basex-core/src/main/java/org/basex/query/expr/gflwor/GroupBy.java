@@ -297,6 +297,20 @@ public final class GroupBy extends Clause {
     return false;
   }
 
+  /**
+   * Checks if this is a simple group by clause that can be rewritten to a distinct-values call.
+   * @param from input variable
+   * @param to output variable
+   * @return result of check
+   */
+  boolean simple(final Var from, final VarRef to) {
+    if(specs.length != 1) return false;
+    final GroupSpec spec = specs[0];
+    return spec.coll == null && spec.var.declType == null && from.declType == null &&
+        spec.expr instanceof VarRef && from.equals(((VarRef) spec.expr).var) &&
+        spec.var.equals(to.var);
+  }
+
   @Override
   public void checkUp() throws QueryException {
     checkNoneUp(preExpr);

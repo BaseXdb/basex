@@ -1906,4 +1906,21 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1931() {
     query("<a>{ (<b><c/></b> update {})/c }</a>/c/ancestor::*", "<a>\n<c/>\n</a>");
   }
+
+  /** XQuery: Rewrite group by to distinct-values(). */
+  @Test public void gh1932() {
+    check("for $a in 1 to 2 group by $a return $a", "1\n2", root(RangeSeq.class));
+    check("for $a in 1 to 2 group by $b := $a return $b", "1\n2", root(RangeSeq.class));
+    check("for $a in 1 to 2 group by $b := data($a) return $b", "1\n2", root(RangeSeq.class));
+
+    check("for $a in (1, 2) group by $a return $a", "1\n2", root(RangeSeq.class));
+    check("for $a in (1, 3) group by $a return $a", "1\n3", root(SmallSeq.class));
+    check("for $a in (1, 'a', 1) group by $a return $a", "1\na", root(SmallSeq.class));
+
+    check("for $a allowing empty in () group by $a return $a", "", exists(GroupBy.class));
+
+    error("for $a as xs:byte in (1, 2) group by $a return $a", INVTREAT_X_X_X);
+    error("for $a in (1, 2) group by $a as xs:byte := $a return $a", INVTREAT_X_X_X);
+    error("for $a in (1, 2) group by $a return $a treat as xs:byte", NOTREAT_X_X_X);
+  }
 }

@@ -1013,8 +1013,9 @@ public class QueryParser extends InputParser {
         }
 
         // add new copies for all non-grouping variables
-        final Var[] ngrp = new Var[ng.size()];
-        for(int i = ng.size(); --i >= 0;) {
+        final int ns = ng.size();
+        final Var[] ngrp = new Var[ns];
+        for(int i = ns; --i >= 0;) {
           final VarRef ref = ng.get(i);
           // if one groups variables such as $x as xs:integer, then the resulting
           // sequence isn't compatible with the type and can't be assigned
@@ -1022,9 +1023,7 @@ public class QueryParser extends InputParser {
           ngrp[i] = nv;
           curr.put(nv.name.id(), nv);
         }
-
-        final VarRef[] pre = new VarRef[ng.size()];
-        clauses.add(new GroupBy(specs, ng.toArray(pre), ngrp, specs[0].info));
+        clauses.add(new GroupBy(specs, ng.toArray(new VarRef[0]), ngrp, specs[0].info));
       }
 
       final boolean stable = wsConsumeWs(STABLE);

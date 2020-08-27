@@ -177,6 +177,18 @@ public final class GFLWOR extends ParseExpr {
       }
     }
 
+    // rewrite group by to distinct-values
+    //  for $a in (1 to 2) group by $a return $a  ->  (1 to 2)
+    //  for $a in ('a', 'b') group by $b := $a return $b  ->  ('a', 'b')
+    if(clauses.size() == 2 && clauses.get(0) instanceof For &&
+        clauses.get(1) instanceof GroupBy && rtrn instanceof VarRef) {
+      final For fr = (For) clauses.get(0);
+      final GroupBy grp = (GroupBy) clauses.get(1);
+      if(fr.vars.length == 1 && !fr.empty && grp.simple(fr.var, (VarRef) rtrn)) {
+        return cc.function(Function.DISTINCT_VALUES, info, fr.expr);
+      }
+    }
+
     // for $_ in 1 to 2 return ()  ->  ()
     return rtrn == Empty.VALUE && !ndt.any(clauses) ? rtrn : this;
   }
