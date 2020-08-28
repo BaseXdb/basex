@@ -110,35 +110,49 @@ public final class GFLWOR extends ParseExpr {
 
     mergeWheres();
 
-    // replace with expression of 'return' clause if all clauses were removed
-    Expr expr;
-    if(clauses.isEmpty()) {
-      expr = rtrn;
-    } else if(clauses.getFirst() instanceof Where) {
-      // replace with 'if' expression if FLWOR starts with 'where'
-      final Where where = (Where) clauses.removeFirst();
-      final Expr branch = clauses.isEmpty() ? rtrn : this;
-      expr = new If(info, where.expr, branch).optimize(cc);
-    } else {
-      expr = simplify(cc);
-    }
-    if(expr != this) {
+    final Expr expr = simplify(cc);
+    if(expr != null) {
       cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, expr);
       return expr;
     }
 
     exprType.assign(rtrn.seqType(), calcSize(true));
-    return expr;
+    return this;
   }
 
   /**
    * Simplifies a FLWOR expression.
    * @param cc compilation context
-   * @return original or optimized expression
+   * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr simplify(final CompileContext cc) throws QueryException {
-    // checks if clauses have side-effects
+    // replace with expression of 'return' clause if all clauses were removed
+    if(clauses.isEmpty()) return rtrn;
+
+    // replace with 'if' expression if FLWOR starts with 'where'
+    if(clauses.getFirst() instanceof Where) {
+      final Where where = (Where) clauses.removeFirst();
+      final Expr branch = clauses.isEmpty() ? rtrn : this;
+      return new If(info, where.expr, branch).optimize(cc);
+    }
+
+    // rewrite group by to distinct-values
+    //   for $e in E group by $g := G return R
+    //   ->  for $g in distinct-values(for $e in E return G)) return R
+    if(clauses.size() == 2 && clauses.get(0) instanceof For && clauses.get(1) instanceof GroupBy) {
+      final GroupSpec grp = ((GroupBy) clauses.get(1)).group();
+      if(grp != null) {
+        final LinkedList<Clause> cls = new LinkedList<>();
+        cls.add(clauses.pollFirst());
+        final Expr flwor = new GFLWOR(info, cls, grp.expr).optimize(cc);
+        final Expr expr = cc.function(Function.DISTINCT_VALUES, info, flwor);
+        clauses.set(0, new For(grp.var, expr).optimize(cc));
+        return optimize(cc);
+      }
+    }
+
+    // checks if clauses have side effects
     final Checks<Clause> ndt = clause -> clause.has(Flag.NDT);
     // checks if the return expression references the variable of a clause
     final Checks<Clause> varrefs = clause -> {
@@ -152,45 +166,24 @@ public final class GFLWOR extends ParseExpr {
     final long[] minMax = calcSize(false);
     final long min = minMax[0], max = minMax[1];
     if(min == max) {
-      // zero iterations:
       if(min == 0) {
-        // for $_ in () return <x/>  ->  ()
+        // zero iterations, no side effects
+        //   for $_ in () return <x/>  ->  ()
         if(!has(Flag.NDT)) return Empty.VALUE;
-        // for $_ in file:write(...) return 1  ->  file:write(...)
-        if(clauses.size() == 1 && clauses.get(0) instanceof ForLet) {
-          return ((ForLet) clauses.get(0)).expr;
-        }
-      } else if(!varrefs.any(clauses)) {
-        // single iteration, no referenced variables in return clause:
-        if(min == 1) {
-          // let $_ := 1 return <x/>  ->  <x/>
-          if(!ndt.any(clauses)) return rtrn;
-          // let $_ := file:write(...) return 1  ->  (file:write(...), 1)
-          if(clauses.size() == 1 && clauses.get(0) instanceof ForLet) {
-            return cc.replaceWith(this, cc.merge(((ForLet) clauses.get(0)).expr, rtrn, info));
-          }
-        } else if(!ndt.any(clauses)) {
-          // for $_ in 1 to 2 return 3  ->  util:replicate(3, 2)
-          final boolean multi = rtrn.has(Flag.NDT, Flag.CNS);
-          return cc.function(Function._UTIL_REPLICATE, info, rtrn, Int.get(min), Bln.get(multi));
-        }
-      }
-    }
-
-    // rewrite group by to distinct-values
-    //  for $a in (1 to 2) group by $a return $a  ->  (1 to 2)
-    //  for $a in ('a', 'b') group by $b := $a return $b  ->  ('a', 'b')
-    if(clauses.size() == 2 && clauses.get(0) instanceof For &&
-        clauses.get(1) instanceof GroupBy && rtrn instanceof VarRef) {
-      final For fr = (For) clauses.get(0);
-      final GroupBy grp = (GroupBy) clauses.get(1);
-      if(fr.vars.length == 1 && !fr.empty && grp.simple(fr.var, (VarRef) rtrn)) {
-        return cc.function(Function.DISTINCT_VALUES, info, fr.expr);
+      } else if(!varrefs.any(clauses) && !ndt.any(clauses)) {
+        // no referenced variables in return clause
+        // single iteration
+        //   let $_ := 1 return <x/>  ->  <x/>
+        if(min == 1) return rtrn;
+        // multiple iterations
+        //   for $_ in 1 to 2 return 3  ->  util:replicate(3, 2)
+        final boolean multi = rtrn.has(Flag.NDT, Flag.CNS);
+        return cc.function(Function._UTIL_REPLICATE, info, rtrn, Int.get(min), Bln.get(multi));
       }
     }
 
     // for $_ in 1 to 2 return ()  ->  ()
-    return rtrn == Empty.VALUE && !ndt.any(clauses) ? rtrn : this;
+    return rtrn == Empty.VALUE && !ndt.any(clauses) ? rtrn : null;
   }
 
   /**

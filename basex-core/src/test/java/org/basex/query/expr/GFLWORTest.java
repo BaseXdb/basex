@@ -176,7 +176,7 @@ public final class GFLWORTest extends QueryPlanTest {
         exists("*[ends-with(name(), 'Filter')]/UtilItem")
     );
     check("for $i in 1 to 3 " +
-        "where count(for $j in 1 to $i group by $k := $j mod 2 return $i) > 1 " +
+        "where count(for $j in 1 to $i group by $k := $j mod 2 return $k) > 1 " +
         "return $i",
         "2\n3",
         empty(Where.class),

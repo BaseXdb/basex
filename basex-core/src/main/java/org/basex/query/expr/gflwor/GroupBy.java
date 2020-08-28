@@ -298,17 +298,15 @@ public final class GroupBy extends Clause {
   }
 
   /**
-   * Checks if this is a simple group by clause that can be rewritten to a distinct-values call.
-   * @param from input variable
-   * @param to output variable
-   * @return result of check
+   * Returns a group specification that can be rewritten to a distinct-values argument.
+   * @return group specification
    */
-  boolean simple(final Var from, final VarRef to) {
-    if(specs.length != 1) return false;
-    final GroupSpec spec = specs[0];
-    return spec.coll == null && spec.var.declType == null && from.declType == null &&
-        spec.expr instanceof VarRef && from.equals(((VarRef) spec.expr).var) &&
-        spec.var.equals(to.var);
+  GroupSpec group() {
+    if(specs.length == 1 && post.length == 0) {
+      final GroupSpec spec = specs[0];
+      if(spec.coll == null && spec.var.declType == null) return spec;
+    }
+    return null;
   }
 
   @Override
