@@ -177,6 +177,8 @@ public final class FnModuleTest extends QueryPlanTest {
 
     query(func.args(" (1 to 100000000) ! 'a'"), "a");
     query("count(" + func.args(" 1 to 100000000") + ')', 100000000);
+    check(func.args(" prof:void(1)"), "", root(_PROF_VOID));
+    check("(1, 3) ! " + func.args(" ."), "1\n3", root(IntSeq.class));
   }
 
   /** Test method. */

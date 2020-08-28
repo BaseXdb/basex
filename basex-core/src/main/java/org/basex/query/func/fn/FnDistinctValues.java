@@ -72,19 +72,21 @@ public final class FnDistinctValues extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     exprs[0] = exprs[0].simplifyFor(Simplify.DISTINCT, cc);
 
-    Expr expr = exprs[0];
+    final Expr expr = exprs[0];
     if(expr instanceof RangeSeq) return expr;
-    if(expr instanceof SingletonSeq) {
-      expr = ((SingletonSeq) expr).value;
-      exprs[0] = expr;
-    }
 
     final SeqType st = expr.seqType();
+    if(st.zero()) return expr;
+
     final AtomType type = st.type.atomic();
     if(type != null) {
+      // single value, same type: return argument
+      if(type == st.type && st.one() && exprs.length == 1) return expr;
+      // assign atomic type of argument
       exprType.assign(type);
       simple = st.zeroOrOne();
     }
+
     return optStats(expr, cc);
   }
 

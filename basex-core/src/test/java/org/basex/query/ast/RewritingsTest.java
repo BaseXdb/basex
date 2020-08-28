@@ -1488,8 +1488,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Distinct-values, optimization of arguments. */
   @Test public void gh1868() {
-    check("let $s as xs:string* := distinct-values(<_>x</_> ! string()) return $s", "x",
-        root(DISTINCT_VALUES));
+    check("let $s as xs:string* := distinct-values(<_>x</_> ! string()) return $s",
+        "x", root(STRING));
   }
 
   /** Simple map, positional predicates. */
@@ -1916,7 +1916,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $a in (1, 2) group by $a return $a", "1\n2", root(RangeSeq.class));
     check("for $a in (1, 3) group by $a return $a", "1\n3", root(SmallSeq.class));
     check("for $a in (1, 'a', 1) group by $a return $a", "1\na", root(SmallSeq.class));
-    check("for $a allowing empty in () group by $a return $a", "", root(DISTINCT_VALUES));
+    check("for $a allowing empty in () group by $a return $a", "", empty());
 
     check("for $p in 1 to 2 group by $q := string($p) return $q",
         "1\n2", root(DISTINCT_VALUES), exists(DualMap.class));
