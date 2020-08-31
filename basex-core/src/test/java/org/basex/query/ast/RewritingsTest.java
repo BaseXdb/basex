@@ -1616,7 +1616,7 @@ public final class RewritingsTest extends QueryPlanTest {
     query("function() { for $a in (1, 2) return function() { $a } }() ! .()", "1\n2");
   }
 
-  /** XQuery: FLWOR, positional variable. */
+  /** FLWOR, positional variable. */
   @Test public void gh1893() {
     check("for $a at $p in 6 to 8 return $p", "1\n2\n3", root(RangeSeq.class));
     check("for $a at $p in ('a', 'b') return $p", "1\n2", root(RangeSeq.class));
@@ -1907,7 +1907,7 @@ public final class RewritingsTest extends QueryPlanTest {
     query("<a>{ (<b><c/></b> update {})/c }</a>/c/ancestor::*", "<a>\n<c/>\n</a>");
   }
 
-  /** XQuery: Rewrite group by to distinct-values(). */
+  /** Rewrite group by to distinct-values(). */
   @Test public void gh1932() {
     check("for $a in 1 to 2 group by $a return $a", "1\n2", root(RangeSeq.class));
     check("for $a in 1 to 2 group by $b := $a return $b", "1\n2", root(RangeSeq.class));
@@ -1928,5 +1928,13 @@ public final class RewritingsTest extends QueryPlanTest {
 
     error("for $a as xs:byte in (1, 2) group by $a return $a", INVTREAT_X_X_X);
     error("for $a in (1, 2) group by $a as xs:byte := $a return $a", INVTREAT_X_X_X);
+  }
+
+  /** Rewrite expression range to util:replicate. */
+  @Test public void gh1934() {
+    check("for $i in 1 to 2 return (1 to $i) ! $i", "1\n2\n2",
+        root(IterMap.class), exists(_UTIL_REPLICATE));
+    check("for $i in 1 to 2 for $j in 1 to $i return $i", "1\n2\n2",
+        root(IterMap.class), exists(_UTIL_REPLICATE));
   }
 }

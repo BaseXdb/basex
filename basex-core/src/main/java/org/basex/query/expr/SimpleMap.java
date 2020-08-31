@@ -169,12 +169,23 @@ public abstract class SimpleMap extends Arr {
               ex = cc.error(qe, next);
             }
           }
-        } else if(es != -1 && !next.has(Flag.CTX)) {
+        } else if(!next.has(Flag.CTX)) {
           // merge expressions if next expression does not rely on the context
-          // (1 to 2) ! 'ok'  ->  util:replicate('ok', 2, false())
-          // (1 to 2) ! <x/>  ->  util:replicate(<x/>, 2, true())
-          final boolean multi = next.has(Flag.NDT, Flag.CNS);
-          ex = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es), Bln.get(multi));
+          Expr count = null;
+          if(es != -1) {
+            count = Int.get(es);
+          } else if(expr instanceof Range) {
+            final Range rng = (Range) expr;
+            if(rng.exprs[0] == Int.ONE && rng.exprs[1].seqType().eq(SeqType.ITR_O)) {
+              count = rng.exprs[1];
+            }
+          }
+          if(count != null) {
+            // (1 to 2) ! <x/>  ->  util:replicate(<x/>, 2, true())
+            // (1 to $c) ! 'A'  ->  util:replicate('A', $c, false())
+            final boolean multi = next.has(Flag.NDT, Flag.CNS);
+            ex = cc.function(Function._UTIL_REPLICATE, info, next, count, Bln.get(multi));
+          }
         }
       }
 

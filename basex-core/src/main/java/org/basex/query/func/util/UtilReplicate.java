@@ -1,7 +1,5 @@
 package org.basex.query.func.util;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -26,14 +24,11 @@ public final class UtilReplicate extends StandardFunc {
     final long count = toLong(exprs[1], qc);
     final boolean single = exprs.length < 3 || !toBoolean(exprs[2], qc);
 
-    if(count < 0) throw UTIL_NEGATIVE_X.get(info, count);
-    if(count == 0) return Empty.VALUE;
+    if(count <= 0) return Empty.VALUE;
     if(count == 1) return expr.value(qc);
-
-    // single evaluation
     if(single) return SingletonSeq.get(expr.value(qc), count);
 
-    // multiple evaluations
+    // repeated evaluations
     final ValueBuilder vb = new ValueBuilder(qc);
     for(long c = 0; c < count; c++) vb.add(expr.value(qc));
     return vb.value(this);
@@ -45,13 +40,11 @@ public final class UtilReplicate extends StandardFunc {
     final long count = toLong(exprs[1], qc);
     final boolean single = exprs.length < 3 || !toBoolean(exprs[2], qc);
 
-    if(count < 0) throw UTIL_NEGATIVE_X.get(info, count);
-    if(count == 0) return Empty.ITER;
+    if(count <= 0) return Empty.ITER;
     if(count == 1) return expr.iter(qc);
-
-    // single evaluation
     if(single) return SingletonSeq.get(expr.value(qc), count).iter();
 
+    // repeated evaluations
     return new Iter() {
       long c = count;
       Iter iter;
@@ -81,7 +74,7 @@ public final class UtilReplicate extends StandardFunc {
     if(count instanceof Value) {
       c = toLong(count, cc.qc);
       // util:replicate(<a/>, 0)  ->  ()
-      if(c == 0) return Empty.VALUE;
+      if(c <= 0) return Empty.VALUE;
       // util:replicate(<a/>, 1)  ->  <a/>
       if(c == 1) return expr;
       sz = expr.size();

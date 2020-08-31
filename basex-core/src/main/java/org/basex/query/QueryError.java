@@ -484,11 +484,6 @@ public enum QueryError {
   /** Error code. */
   USER_UPDATE3_X_X(USER, "update", "User '%' can only be % once."),
 
-  // Utility Module
-
-  /** Error code. */
-  UTIL_NEGATIVE_X(UTIL, "negative", "Index '%' is negative."),
-
   // Validation Module
 
   /** Error code. */
