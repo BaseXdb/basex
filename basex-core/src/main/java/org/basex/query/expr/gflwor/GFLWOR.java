@@ -131,24 +131,33 @@ public final class GFLWOR extends ParseExpr {
     if(clauses.isEmpty()) return rtrn;
 
     // replace with 'if' expression if FLWOR starts with 'where'
-    if(clauses.getFirst() instanceof Where) {
+    final Expr first = clauses.getFirst();
+    if(first instanceof Where) {
       final Where where = (Where) clauses.removeFirst();
       final Expr branch = clauses.isEmpty() ? rtrn : this;
       return new If(info, where.expr, branch).optimize(cc);
     }
 
-    // rewrite group by to distinct-values
-    //   for $e in E group by $g := G return R
-    //   ->  for $g in distinct-values(for $e in E return G)) return R
-    if(clauses.size() == 2 && clauses.get(0) instanceof For && clauses.get(1) instanceof GroupBy) {
-      final GroupSpec grp = ((GroupBy) clauses.get(1)).group();
-      if(grp != null) {
-        final LinkedList<Clause> cls = new LinkedList<>();
-        cls.add(clauses.pollFirst());
-        final Expr flwor = new GFLWOR(info, cls, grp.expr).optimize(cc);
-        final Expr expr = cc.function(Function.DISTINCT_VALUES, info, flwor);
-        clauses.set(0, new For(grp.var, expr).optimize(cc));
-        return optimize(cc);
+    if(first instanceof For) {
+      // replace allowing empty with empty sequence
+      //   for $_ allowing empty in () return $_  ->  ()
+      final For fr = (For) first;
+      if(clauses.size() == 1 && fr.size() == 0 && !fr.has(Flag.NDT) && rtrn instanceof VarRef &&
+          ((VarRef) rtrn).var.is(fr.var)) return Empty.VALUE;
+
+      // rewrite group by to distinct-values
+      //   for $e in E group by $g := G return R
+      //   ->  for $g in distinct-values(for $e in E return G)) return R
+      if(clauses.size() == 2 && clauses.get(1) instanceof GroupBy) {
+        final GroupSpec grp = ((GroupBy) clauses.get(1)).group();
+        if(grp != null) {
+          final LinkedList<Clause> cls = new LinkedList<>();
+          cls.add(clauses.removeFirst());
+          final Expr flwor = new GFLWOR(info, cls, grp.expr).optimize(cc);
+          final Expr expr = cc.function(Function.DISTINCT_VALUES, info, flwor);
+          clauses.set(0, new For(grp.var, expr).optimize(cc));
+          return optimize(cc);
+        }
       }
     }
 

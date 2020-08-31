@@ -427,4 +427,10 @@ public final class GFLWORTest extends QueryPlanTest {
   @Test public void posVar() {
     check("for $v at $p in (1, 2) where $p = 2 return $v", 2, root(Int.class));
   }
+
+  /** Allowing empty. */
+  @Test public void allowingEmpty() {
+    check("for $x allowing empty in () return $x", "", empty());
+    check("for $x allowing empty in prof:void(1) return $x", "", exists(GFLWOR.class));
+  }
 }
