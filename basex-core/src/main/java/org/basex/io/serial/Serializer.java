@@ -447,7 +447,7 @@ public abstract class Serializer implements Closeable {
       namespace(node.name(), node.string(), true);
     } else if(type == NodeType.DOC) {
       openDoc(node.baseURI());
-      for(final ANode n : node.childIter()) node(n);
+      for(final ANode nd : node.childIter()) node(nd);
       closeDoc();
     } else {
       // serialize elements (code will never be called for attributes)

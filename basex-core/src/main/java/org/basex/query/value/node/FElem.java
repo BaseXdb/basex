@@ -116,7 +116,7 @@ public final class FElem extends FNode {
    * @param parent parent reference (can be {@code null})
    * @param nss namespaces in scope
    */
-  public FElem(final Element elem, final ANode parent, final TokenMap nss) {
+  public FElem(final Element elem, final FNode parent, final TokenMap nss) {
     super(NodeType.ELM);
 
     this.parent = parent;
@@ -218,11 +218,11 @@ public final class FElem extends FNode {
   public FElem optimize() {
     // update parent references and invalidate empty arrays
     if(children != null) {
-      for(final ANode n : children) n.parent(this);
+      for(final ANode node : children) node.parent(this);
       if(children.isEmpty()) children = null;
     }
     if(atts != null) {
-      for(final ANode n : atts) n.parent(this);
+      for(final ANode node : atts) node.parent(this);
       if(atts.isEmpty()) atts = null;
     }
     if(ns != null && ns.isEmpty()) ns = null;
@@ -396,10 +396,10 @@ public final class FElem extends FNode {
       for(int n = 0; n < nl; ++n) as.add(ns.name(n), ns.value(n));
     }
     if(at != null) {
-      for(final ANode n : atts) at.add(n.materialize(qc, true));
+      for(final ANode nd : atts) at.add(nd.materialize(qc, true));
     }
     if(ch != null) {
-      for(final ANode n : children) ch.add(n.materialize(qc, true));
+      for(final ANode nd : children) ch.add(nd.materialize(qc, true));
     }
     return node.optimize();
   }

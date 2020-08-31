@@ -50,8 +50,8 @@ public final class QuerySuggest extends QueryParser {
   public StringList complete() {
     final StringList sl = new StringList();
     if(show) {
-      for(final PathNode n : curr) {
-        final String nm = string(n.token(data));
+      for(final PathNode pn : curr) {
+        final String nm = string(pn.token(data));
         if(!nm.isEmpty() && !sl.contains(nm)) sl.add(nm);
       }
       sl.sort();

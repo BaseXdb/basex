@@ -156,14 +156,14 @@ public final class PathIndex implements Index {
    * @return descendant nodes
    */
   public static ArrayList<PathNode> desc(final ArrayList<PathNode> nodes, final boolean desc) {
-    final ArrayList<PathNode> out = new ArrayList<>();
+    final ArrayList<PathNode> list = new ArrayList<>();
     for(final PathNode node : nodes) {
       for(final PathNode child : node.children) {
-        if(desc) child.addDesc(out);
-        else if(!out.contains(child)) out.add(child);
+        if(desc) child.addDesc(list);
+        else if(!list.contains(child)) list.add(child);
       }
     }
-    return out;
+    return list;
   }
 
   /**
@@ -174,9 +174,9 @@ public final class PathIndex implements Index {
    */
   public ArrayList<PathNode> desc(final byte[] name) {
     final int id = data.elemNames.id(name);
-    final ArrayList<PathNode> nodes = new ArrayList<>();
-    for(final PathNode child : root.children) child.addDesc(nodes, id);
-    return nodes;
+    final ArrayList<PathNode> list = new ArrayList<>();
+    for(final PathNode child : root.children) child.addDesc(list, id);
+    return list;
   }
 
   /**
@@ -210,15 +210,15 @@ public final class PathIndex implements Index {
       final byte kind = attr ? Data.ATTR : Data.ELEM;
       final int id = attr ? data.attrNames.id(substring(name, 1)) : data.elemNames.id(name);
 
-      final ArrayList<PathNode> tmp = new ArrayList<>();
+      final ArrayList<PathNode> list = new ArrayList<>();
       for(final PathNode node : nodes) {
         if(node.name != id || node.kind != kind) continue;
         for(final PathNode child : node.children) {
-          if(desc) child.addDesc(tmp);
-          else tmp.add(child);
+          if(desc) child.addDesc(list);
+          else list.add(child);
         }
       }
-      nodes = tmp;
+      nodes = list;
     }
 
     // sort by number of occurrences

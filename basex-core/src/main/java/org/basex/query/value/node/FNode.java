@@ -50,34 +50,6 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final BasicNodeIter ancestorIter() {
-    return new BasicNodeIter() {
-      private ANode node = FNode.this;
-
-      @Override
-      public ANode next() {
-        node = node.parent();
-        return node;
-      }
-    };
-  }
-
-  @Override
-  public final BasicNodeIter ancestorOrSelfIter() {
-    return new BasicNodeIter() {
-      private ANode node = FNode.this;
-
-      @Override
-      public ANode next() {
-        if(node == null) return null;
-        final ANode n = node;
-        node = n.parent();
-        return n;
-      }
-    };
-  }
-
-  @Override
   public BasicNodeIter attributeIter() {
     return BasicNodeIter.EMPTY;
   }

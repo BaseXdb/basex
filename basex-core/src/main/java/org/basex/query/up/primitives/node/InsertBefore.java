@@ -30,7 +30,7 @@ public final class InsertBefore extends NodeCopy {
   public void merge(final Update update) {
     final InsertBefore newOne = (InsertBefore) update;
     final ANodeList newInsert = newOne.nodes;
-    for(final ANode n : newInsert) nodes.add(n);
+    for(final ANode node : newInsert) nodes.add(node);
   }
 
   @Override

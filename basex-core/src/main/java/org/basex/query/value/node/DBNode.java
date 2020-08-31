@@ -67,7 +67,7 @@ public class DBNode extends ANode {
    * @param par parent reference
    * @param type node type
    */
-  DBNode(final Data data, final int pre, final ANode par, final NodeType type) {
+  DBNode(final Data data, final int pre, final FNode par, final NodeType type) {
     super(type);
     this.data = data;
     this.pre = pre;
@@ -248,18 +248,8 @@ public class DBNode extends ANode {
 
   @Override
   public final BasicNodeIter ancestorIter() {
-    if(parent != null) {
-      return new BasicNodeIter() {
-        private ANode node = parent;
+    if(parent != null) return super.ancestorIter();
 
-        @Override
-        public ANode next() {
-          final ANode p = node;
-          if(p != null) node = p.parent;
-          return p;
-        }
-      };
-    }
     return new DBNodeIter(data) {
       private final DBNode node = finish();
       int curr = pre, kind = data.kind(curr);
@@ -277,18 +267,8 @@ public class DBNode extends ANode {
 
   @Override
   public final BasicNodeIter ancestorOrSelfIter() {
-    if(parent != null) {
-      return new BasicNodeIter() {
-        private ANode node = DBNode.this;
+    if(parent != null) return super.ancestorOrSelfIter();
 
-        @Override
-        public ANode next() {
-          final ANode p = node;
-          if(p != null) node = p.parent;
-          return p;
-        }
-      };
-    }
     return new DBNodeIter(data) {
       private final DBNode node = finish();
       int curr = pre, kind = data.kind(curr);
@@ -325,7 +305,9 @@ public class DBNode extends ANode {
         return n;
       }
       @Override
-      public long size() { return size - 1; }
+      public long size() {
+        return size - 1;
+      }
     };
   }
 
@@ -396,7 +378,7 @@ public class DBNode extends ANode {
         if(size == -1) {
           if(data.meta.ndocs > 1) {
             int p = pre;
-            for(final ANode n : ancestorIter()) p = ((DBNode) n).pre;
+            for(final ANode nd : ancestorIter()) p = ((DBNode) nd).pre;
             size = p + data.size(p, data.kind(p));
           } else {
             size = data.meta.size;

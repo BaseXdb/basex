@@ -6,7 +6,6 @@ import org.basex.api.dom.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -34,7 +33,7 @@ public abstract class ANode extends Item {
   /** Cached string value. */
   byte[] value;
   /** Parent node (can be {@code null}). */
-  ANode parent;
+  FNode parent;
 
   /**
    * Constructor.
@@ -279,12 +278,12 @@ public abstract class ANode extends Item {
    * Sets the parent node.
    * @param par parent node
    */
-  public final void parent(final ANode par) {
+  public final void parent(final FNode par) {
     parent = par;
   }
 
   /**
-   * Returns true if the node has children.
+   * Indicates if the node has children.
    * @return result of test
    */
   public abstract boolean hasChildren();
@@ -315,16 +314,40 @@ public abstract class ANode extends Item {
   /**
    * Returns a light-weight, low-level ancestor axis iterator.
    * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
+   * Overwritten by {@link DBNode#ancestorIter}.
    * @return iterator
    */
-  public abstract BasicNodeIter ancestorIter();
+  public BasicNodeIter ancestorIter() {
+    return new BasicNodeIter() {
+      private ANode node = ANode.this;
+
+      @Override
+      public ANode next() {
+        node = node.parent();
+        return node;
+      }
+    };
+  }
 
   /**
    * Returns a light-weight ancestor-or-self axis iterator.
    * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
+   * Overwritten by {@link DBNode#ancestorOrSelfIter}.
    * @return iterator
    */
-  public abstract BasicNodeIter ancestorOrSelfIter();
+  public BasicNodeIter ancestorOrSelfIter() {
+    return new BasicNodeIter() {
+      private ANode node = ANode.this;
+
+      @Override
+      public ANode next() {
+        if(node == null) return null;
+        final ANode n = node;
+        node = n.parent();
+        return n;
+      }
+    };
+  }
 
   /**
    * Returns a light-weight, low-level attribute axis iterator with {@link Iter#size()} and
@@ -384,18 +407,6 @@ public abstract class ANode extends Item {
         called = true;
         return parent();
       }
-      @Override
-      public ANode get(final long i) {
-        return parent();
-      }
-      @Override
-      public ANode value(final QueryContext qc, final Expr expr) {
-        return parent();
-      }
-      @Override
-      public long size() {
-        return 1;
-      }
     };
   }
 
@@ -454,9 +465,9 @@ public abstract class ANode extends Item {
           if(r == null) return null;
 
           final ANodeList list = new ANodeList();
-          for(final ANode n : r.childIter()) {
-            if(n.is(ANode.this)) break;
-            list.add(n.finish());
+          for(final ANode node : r.childIter()) {
+            if(node.is(ANode.this)) break;
+            list.add(node.finish());
           }
           i = list.size();
           iter = list.iter();
@@ -485,13 +496,13 @@ public abstract class ANode extends Item {
 
   /**
    * Adds children of a sub node.
-   * @param ch child nodes
-   * @param nb node cache
+   * @param children child nodes
+   * @param nodes node cache
    */
-  static void addDesc(final BasicNodeIter ch, final ANodeList nb) {
-    for(final ANode n : ch) {
-      nb.add(n.finish());
-      addDesc(n.childIter(), nb);
+  static void addDesc(final BasicNodeIter children, final ANodeList nodes) {
+    for(final ANode node : children) {
+      nodes.add(node.finish());
+      addDesc(node.childIter(), nodes);
     }
   }
 

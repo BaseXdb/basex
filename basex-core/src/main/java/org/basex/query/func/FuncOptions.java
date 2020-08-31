@@ -191,8 +191,8 @@ public final class FuncOptions {
    * @return result of check
    */
   private static boolean hasElements(final ANode node) {
-    for(final ANode n : node.childIter()) {
-      if(n.type == NodeType.ELM) return true;
+    for(final ANode nd : node.childIter()) {
+      if(nd.type == NodeType.ELM) return true;
     }
     return false;
   }

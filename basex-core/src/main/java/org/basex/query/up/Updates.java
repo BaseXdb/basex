@@ -201,15 +201,15 @@ public final class Updates {
     if(node.id == trgID) return 0;
 
     int s = 1;
-    for(final ANode n : node.attributeIter()) {
-      final int st = preSteps(n, trgID);
+    for(final ANode nd : node.attributeIter()) {
+      final int st = preSteps(nd, trgID);
       if(st == 0) return s;
       s += st;
     }
-    for(final ANode n : node.childIter()) {
+    for(final ANode nd : node.childIter()) {
       // n.id <= trgID: rewritten to catch ID overflow
-      if(trgID - n.id < 0) break;
-      s += preSteps(n, trgID);
+      if(trgID - nd.id < 0) break;
+      s += preSteps(nd, trgID);
     }
     return s;
   }
