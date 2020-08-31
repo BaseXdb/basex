@@ -37,7 +37,7 @@ final class XHTMLSerializer extends MarkupSerializer {
   @Override
   protected void startOpen(final QNm value) throws IOException {
     super.startOpen(value);
-    if(content && eq(lc(elem.local()), HEAD)) ct++;
+    if(content && eq(lc(elem.local()), HEAD)) skip++;
   }
 
   @Override

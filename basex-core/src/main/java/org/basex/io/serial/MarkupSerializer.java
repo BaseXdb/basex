@@ -30,8 +30,6 @@ abstract class MarkupSerializer extends StandardSerializer {
   String docsys;
   /** Public document type. */
   String docpub;
-  /** Flag for printing content type. */
-  int ct;
 
   /** Indicates if root element has been serialized. */
   boolean root;
@@ -282,8 +280,8 @@ abstract class MarkupSerializer extends StandardSerializer {
   protected abstract void doctype(byte[] type) throws IOException;
 
   @Override
-  protected boolean ignore(final ANode node) {
-    if(ct > 0 && node.type == NodeType.ELM && eq(node.name(), META)) {
+  protected boolean skipElement(final ANode node) {
+    if(node.type == NodeType.ELM && eq(node.name(), META)) {
       final byte[] value = node.attribute(HTTP_EQUIV);
       return value != null && eq(trim(value), CONTENT_TYPE);
     }
@@ -336,8 +334,8 @@ abstract class MarkupSerializer extends StandardSerializer {
    * @throws IOException I/O exception
    */
   protected final boolean printCT(final boolean empty, final boolean html) throws IOException {
-    if(ct != 1) return false;
-    ct++;
+    if(skip != 1) return false;
+    skip++;
     if(empty) finishOpen();
     level++;
     startOpen(new QNm(META));
