@@ -32,8 +32,6 @@ public abstract class ANode extends Item {
 
   /** Cached string value. */
   byte[] value;
-  /** Parent node (can be {@code null}). */
-  FNode parent;
 
   /**
    * Constructor.
@@ -278,9 +276,7 @@ public abstract class ANode extends Item {
    * Sets the parent node.
    * @param par parent node
    */
-  public final void parent(final FNode par) {
-    parent = par;
-  }
+  public abstract void parent(FNode par);
 
   /**
    * Indicates if the node has children.
@@ -383,14 +379,57 @@ public abstract class ANode extends Item {
    * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
    * @return iterator
    */
-  public abstract BasicNodeIter followingIter();
+  public BasicNodeIter followingIter() {
+    return new BasicNodeIter() {
+      private BasicNodeIter iter;
+
+      @Override
+      public ANode next() {
+        if(iter == null) {
+          final ANodeList list = new ANodeList();
+          ANode node = ANode.this, root = node.parent();
+          while(root != null) {
+            final BasicNodeIter ir = root.childIter();
+            if(node.type != NodeType.ATT) {
+              for(final ANode nd : ir) {
+                if(nd.is(node)) break;
+              }
+            }
+            for(final ANode nd : ir) {
+              list.add(nd.finish());
+              addDesc(nd.childIter(), list);
+            }
+            node = root;
+            root = root.parent();
+          }
+          iter = list.iter();
+        }
+        return iter.next();
+      }
+    };
+  }
 
   /**
    * Returns a light-weight, low-level following-sibling axis iterator.
    * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
    * @return iterator
    */
-  public abstract BasicNodeIter followingSiblingIter();
+  public BasicNodeIter followingSiblingIter() {
+    return new BasicNodeIter() {
+      private BasicNodeIter iter;
+
+      @Override
+      public ANode next() {
+        if(iter == null) {
+          final ANode root = parent();
+          if(root == null) return null;
+          iter = root.childIter();
+          for(ANode n; (n = iter.next()) != null && !n.is(ANode.this););
+        }
+        return iter.next();
+      }
+    };
+  }
 
   /**
    * Returns a light-weight, low-level parent axis iterator.
@@ -417,26 +456,25 @@ public abstract class ANode extends Item {
    */
   public final BasicNodeIter precedingIter() {
     return new BasicNodeIter() {
-      /** Iterator. */
       private BasicNodeIter iter;
 
       @Override
       public ANode next() {
         if(iter == null) {
           final ANodeList list = new ANodeList();
-          ANode n = ANode.this, p = n.parent();
-          while(p != null) {
-            if(n.type != NodeType.ATT) {
+          ANode node = ANode.this, root = node.parent();
+          while(root != null) {
+            if(node.type != NodeType.ATT) {
               final ANodeList tmp = new ANodeList();
-              for(final ANode c : p.childIter()) {
-                if(c.is(n)) break;
+              for(final ANode c : root.childIter()) {
+                if(c.is(node)) break;
                 tmp.add(c.finish());
                 addDesc(c.childIter(), tmp);
               }
               for(int t = tmp.size() - 1; t >= 0; t--) list.add(tmp.get(t));
             }
-            n = p;
-            p = p.parent();
+            node = root;
+            root = root.parent();
           }
           iter = list.iter();
         }
@@ -452,20 +490,18 @@ public abstract class ANode extends Item {
    */
   public final BasicNodeIter precedingSiblingIter() {
     return new BasicNodeIter() {
-      /** Child nodes. */
       private BasicNodeIter iter;
-      /** Counter. */
       private int i;
 
       @Override
       public ANode next() {
         if(iter == null) {
           if(type == NodeType.ATT) return null;
-          final ANode r = parent();
-          if(r == null) return null;
+          final ANode root = parent();
+          if(root == null) return null;
 
           final ANodeList list = new ANodeList();
-          for(final ANode node : r.childIter()) {
+          for(final ANode node : root.childIter()) {
             if(node.is(ANode.this)) break;
             list.add(node.finish());
           }

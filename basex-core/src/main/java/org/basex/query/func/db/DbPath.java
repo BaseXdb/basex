@@ -15,12 +15,13 @@ import org.basex.util.*;
 public final class DbPath extends DbAccess {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    ANode node, par = toNode(exprs[0], qc);
+    ANode node, parent = toNode(exprs[0], qc);
     do {
-      node = par;
-      par = node.parent();
-    } while(par != null);
-    final DBNode dbn = toDBNode(node);
-    return dbn.kind() == Data.DOC ? Str.get(dbn.data().text(dbn.pre(), true)) : Str.ZERO;
+      node = parent;
+      parent = node.parent();
+    } while(parent != null);
+
+    final DBNode dbnode = toDBNode(node);
+    return dbnode.kind() == Data.DOC ? Str.get(dbnode.data().text(dbnode.pre(), true)) : Str.ZERO;
   }
 }

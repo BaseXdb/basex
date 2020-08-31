@@ -98,6 +98,42 @@ public final class MixedTest extends SandboxTest {
     query("declare function local:a($a) { contains($a, 'a') }; //x[local:a(.)]", "");
   }
 
+  /** Ancestor axis of DBNodes wrapped in FNodes. */
+  @Test public void gh919() {
+    query("<a><b/></a>/b ! name(..)", "a");
+
+    query("<a>{ <b/> }</a>/b ! name(..)", "a");
+    query("<a>{ <b/> update {} }</a>/b ! name(..)", "a");
+    query("(<a><b/></a> update {})/b ! name(..)", "a");
+
+    query("<a>{ <b><c/></b> }</a>/b ! name(..)", "a");
+    query("<a>{ <b><c/></b> update {} }</a>/b ! name(..)", "a");
+    query("(<a><b><c/></b></a> update {})/b ! name(..)", "a");
+
+    query("<a>{ <b><c/></b>/c }</a>/c ! name(..)", "a");
+    query("<a>{ (<b><c/></b> update {})/c }</a>/c ! name(..)", "a");
+    query("(<a><b><c/></b></a> update {})/b/c ! name(..)", "b");
+    query("(<a><b><c/></b></a> update {})/b/c/.. ! name(..)", "a");
+
+    query("<a><b/></a>  ! <x>{ . }</x>/a/b/ancestor::node() ! name()", "x\na");
+    query("(<a><b/></a> update {}) ! <x>{ . }</x>/a/b/ancestor::node() ! name()", "x\na");
+
+    query("<A>{ <a><b/><c/></a>/* }</A>/b/following-sibling::c", "<c/>");
+    query("<A>{ (<a><b/><c/></a> update {})/* }</A>/b/following-sibling::c", "<c/>");
+
+    query("<A>{ document { <a><b/><c/></a> }/a/* }</A>/b/following-sibling::c", "<c/>");
+    query("<A>{ (document { <a><b/><c/></a> } update {})/a/* }</A>/b/following-sibling::c", "<c/>");
+
+    query("<A>{ <a><b/><c/></a>/* }</A>/c/preceding-sibling::b", "<b/>");
+    query("<A>{ (<a><b/><c/></a> update {})/* }</A>/c/preceding-sibling::b", "<b/>");
+
+    query("<A>{ document { <a><b/><c/></a> }/a/* }</A>/c/preceding-sibling::b", "<b/>");
+    query("<A>{ (document { <a><b/><c/></a> } update {})/a/* }</A>/c/preceding-sibling::b", "<b/>");
+
+    error("let $doc := document { <a><b/></a> } update ()"
+        + "return id('id', element c { $doc/*/node() }/*)", IDDOC);
+  }
+
   /** Type intersections. */
   @Test public void gh1427() {
     query("let $a := function($f) as element(*) { $f() }"

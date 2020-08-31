@@ -69,10 +69,10 @@ public final class Insert extends Update {
     if(i2 != null) throw (loc ? UPTRGSNGL2_X : UPTRGSNGL_X).get(info,
         ValueBuilder.concat(item, i2, qc));
 
-    final ANode node = (ANode) item, par = node.parent();
+    final ANode node = (ANode) item, parent = node.parent();
     if(loc) {
       if(node.type == NodeType.ATT || node.type == NodeType.DOC) throw UPTRGTYP2_X.get(info, node);
-      if(par == null) throw UPPAREMPTY_X.get(info, node);
+      if(parent == null) throw UPPAREMPTY_X.get(info, node);
     } else {
       if(node.type != NodeType.ELM && node.type != NodeType.DOC) throw UPTRGTYP_X.get(info, node);
     }
@@ -82,7 +82,7 @@ public final class Insert extends Update {
     // no update primitive is created if node list is empty
     final Updates updates = qc.updates();
     if(!aList.isEmpty()) {
-      final ANode targ = loc ? par : node;
+      final ANode targ = loc ? parent : node;
       if(targ.type != NodeType.ELM) throw (loc ? UPATTELM_X : UPATTELM2_X).get(info, targ);
 
       dbn = updates.determineDataRef(targ, qc);
