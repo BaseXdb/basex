@@ -7,9 +7,7 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.func.Function;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -33,6 +31,19 @@ public final class List extends Arr {
    */
   public List(final InputInfo info, final Expr... exprs) {
     super(info, SeqType.ITEM_ZM, exprs);
+  }
+
+  /**
+   * Creates a new, optimized list expression, or the first expression if only one was specified.
+   * @param cc compilation context
+   * @param ii input info
+   * @param exprs one or more expressions
+   * @return filter root, path or filter expression
+   * @throws QueryException query exception
+   */
+  public static Expr get(final CompileContext cc, final InputInfo ii, final Expr... exprs)
+      throws QueryException {
+    return exprs.length == 1 ? exprs[0] : new List(ii, exprs).optimize(cc);
   }
 
   @Override
@@ -64,15 +75,11 @@ public final class List extends Arr {
 
     final int el = exprs.length;
     if(el == 0) return Empty.VALUE;
-    if(el == 1) return exprs[0];
 
     // rewrite identical expressions to util:replicate
     int e = 0;
     while(++e < el && exprs[e].equals(exprs[0]));
-    if(e == el) {
-      final boolean multi = exprs[0].has(Flag.NDT, Flag.CNS);
-      return cc.function(Function._UTIL_REPLICATE, info, exprs[0], Int.get(el), Bln.get(multi));
-    }
+    if(e == el) return el == 1 ? exprs[0] : cc.replicate(exprs[0], Int.get(el), info);
 
     // determine result type, compute number of results, set expression type
     SeqType st = null;
@@ -94,7 +101,7 @@ public final class List extends Arr {
       if(range != null) return cc.replaceWith(this, range);
 
       Type tp = null;
-      final Value[] values = new Value[exprs.length];
+      final Value[] values = new Value[el];
       int vl = 0;
       for(final Expr expr : exprs) {
         cc.qc.checkStop();
@@ -218,7 +225,7 @@ public final class List extends Arr {
       for(final Expr ex : exprs) list.addUnique(ex);
       if(list.size() != exprs.length) {
         // remove duplicate list expressions
-        expr = cc.replaceWith(this, new List(info, list.finish()).optimize(cc));
+        expr = cc.replaceWith(this, List.get(cc, info, list.finish()));
       } else {
         // otherwise, rewrite list to union
         expr = toUnion(cc);

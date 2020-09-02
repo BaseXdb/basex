@@ -830,7 +830,7 @@ public abstract class Path extends ParseExpr {
       }
       if(step instanceof UtilReplicate && ((UtilReplicate) step).once() &&
           step.seqType().type instanceof NodeType) {
-        return ((Arr) step).exprs[0];
+        return step.arg(0);
       }
       return step;
     };

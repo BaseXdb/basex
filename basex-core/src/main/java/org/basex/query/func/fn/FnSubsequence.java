@@ -2,8 +2,11 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.func.Function.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.func.*;
 import org.basex.query.func.file.*;
 import org.basex.query.iter.*;
@@ -12,6 +15,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -207,12 +211,25 @@ public class FnSubsequence extends StandardFunc {
         return cc.function(TAIL, info, expr);
       if(_FILE_READ_TEXT_LINES.is(expr))
         return FileReadTextLines.opt(this, sr.start, sr.length, cc);
+      if(_UTIL_REPLICATE.is(expr)) {
+        final Expr[] args = expr.args();
+        if(args[0].size() == 1 && args[1] instanceof Int) {
+          args[1] = Int.get(sr.length);
+          return cc.function(_UTIL_REPLICATE, info, args);
+        }
+      }
+      if(expr instanceof List) {
+        final Expr[] args = expr.args();
+        if(((Checks<Expr>) ex -> ex.seqType().one()).all(args)) {
+          return List.get(cc, info, Arrays.copyOfRange(args, (int) sr.start, (int) (sr.end)));
+        }
+      }
     } else {
       // subsequence(expr, 1, count(expr) - 1)  ->  util:init(expr)
-      if(exprs[1] == Int.get(1) && exprs[2] instanceof Arith && !exprs[0].has(Flag.NDT)) {
+      if(exprs[1] == Int.ONE && exprs[2] instanceof Arith && !exprs[0].has(Flag.NDT)) {
         final Arith ar = (Arith) exprs[2];
-        if(COUNT.is(ar.exprs[0]) && ar.calc == Calc.MINUS && ar.exprs[1] == Int.get(1) &&
-            exprs[0].equals(args(ar.exprs[0])[0])) {
+        if(COUNT.is(ar.exprs[0]) && ar.calc == Calc.MINUS && ar.exprs[1] == Int.ONE &&
+            exprs[0].equals(ar.exprs[0].arg(0))) {
           return cc.function(_UTIL_INIT, info, expr);
         }
       }

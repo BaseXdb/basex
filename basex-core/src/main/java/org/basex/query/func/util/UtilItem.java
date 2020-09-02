@@ -1,7 +1,12 @@
 package org.basex.query.func.util;
 
+import static org.basex.query.func.Function.*;
+
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.func.*;
 import org.basex.query.func.file.*;
 import org.basex.query.iter.*;
@@ -43,36 +48,57 @@ public final class UtilItem extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0], pos = exprs[1];
+    final Expr expr = exprs[0], position = exprs[1];
     final SeqType st = expr.seqType();
     if(st.zero()) return expr;
 
-    if(pos instanceof Value) {
+    if(position instanceof Value) {
       // retrieve (possibly invalid) position
-      final long p = pos(cc.qc);
-      if(p < 0) return Empty.VALUE;
+      final long pos = pos(cc.qc);
+      if(pos < 0) return Empty.VALUE;
 
       // pre-evaluate single expression with static position
-      if(st.zeroOrOne()) return p == 0 ? expr : Empty.VALUE;
+      if(st.zeroOrOne()) return pos == 0 ? expr : Empty.VALUE;
       // pre-evaluate values
       final long size = expr.size();
       if(size != -1) {
-        if(p + 1 == size) return cc.function(Function._UTIL_LAST, info, expr);
-        if(p + 1 > size) return Empty.VALUE;
-        if(Function.REVERSE.is(expr))
-          return cc.function(Function._UTIL_ITEM, info, args(expr)[0], Int.get(size - p));
+        if(pos + 1 == size) return cc.function(_UTIL_LAST, info, expr);
+        if(pos + 1 > size) return Empty.VALUE;
+        if(REVERSE.is(expr))
+          return cc.function(_UTIL_ITEM, info, expr.arg(0), Int.get(size - pos));
       }
-      if(p == 0) return cc.function(Function.HEAD, info, expr);
+      if(pos == 0) return cc.function(HEAD, info, expr);
 
       // rewrite nested function calls
-      if(Function.TAIL.is(expr))
-        return cc.function(Function._UTIL_ITEM, info, args(expr)[0], Int.get(p + 2));
-      if(Function._FILE_READ_TEXT_LINES.is(expr))
-        return FileReadTextLines.opt(this, p, 1, cc);
+      if(TAIL.is(expr))
+        return cc.function(_UTIL_ITEM, info, expr.arg(0), Int.get(pos + 2));
+      if(_UTIL_REPLICATE.is(expr)) {
+        // static integer will always be greater than 1
+        final Expr[] args = expr.args();
+        if(args[0].size() == 1 && args[1] instanceof Int) {
+          final long count = ((Int) args[1]).itr();
+          return pos > count ? Empty.VALUE : args[0];
+        }
+      }
+      if(_FILE_READ_TEXT_LINES.is(expr))
+        return FileReadTextLines.opt(this, pos, 1, cc);
+
+      // rewrite to head function
+      if(expr instanceof List) {
+        final Expr[] args = expr.args();
+        final int al = args.length;
+        for(int a = 0; a < al; a++) {
+          if(a == pos) {
+            final Expr list = List.get(cc, info, Arrays.copyOfRange(args, a, al));
+            return cc.function(HEAD, info, list);
+          }
+          if(!args[a].seqType().one()) break;
+        }
+      }
     }
 
-    if(Function._UTIL_INIT.is(expr))
-      return cc.function(Function._UTIL_ITEM, info, args(expr)[0], pos);
+    if(_UTIL_INIT.is(expr))
+      return cc.function(_UTIL_ITEM, info, expr.arg(0), position);
 
     exprType.assign(st.with(Occ.ZERO_ONE));
     data(expr.data());

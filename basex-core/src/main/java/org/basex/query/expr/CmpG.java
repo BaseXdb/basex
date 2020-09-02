@@ -323,7 +323,7 @@ public class CmpG extends Cmp {
 
     // if required, invert second operator (first operator need never be inverted)
     final boolean not2 = Function.NOT.is(expr);
-    Expr expr2 = not2 ? ((FnNot) expr).exprs[0] : expr;
+    Expr expr2 = not2 ? expr.arg(0) : expr;
     if(!(expr2 instanceof CmpG)) return null;
 
     // compare first and second comparison
@@ -334,7 +334,7 @@ public class CmpG extends Cmp {
     // function for creating new comparison
     final Expr exprL = exprs[0], exprR1 = exprs[1], exprR2 = cmp2.exprs[1];
     final QueryFunction<OpG, Expr> newList = newOp -> {
-      final Expr exprR = new List(info, exprR1, exprR2).optimize(cc);
+      final Expr exprR = List.get(cc, info, exprR1, exprR2);
       return new CmpG(exprL, exprR, newOp, coll, sc, info).optimize(cc);
     };
 

@@ -43,7 +43,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     final Function func = _UTIL_DDO;
     query(func.args(" <a/>"), "<a/>");
     query(func.args(" (<a/>, <b/>)"), "<a/>\n<b/>");
-    query(func.args(" reverse((<a/>, <b/>))"), "<a/>\n<b/>");
+    query(func.args(" reverse((<a/>, <b/>))"), "<b/>\n<a/>");
     error(func.args(1), INVTYPE_X_X_X);
   }
 
@@ -97,14 +97,37 @@ public final class UtilModuleTest extends QueryPlanTest {
     // iterator with known result size
     check(func.args(" (<a/>, <b/>)"), "<a/>", root(CElem.class));
     check(func.args(" sort((1 to 3) ! <_>{ . }</_>)"), "<_>1</_>\n<_>2</_>", exists(func));
-    check("reverse(" + func.args(" (<a/>, <b/>, <c/>))"), "<b/>\n<a/>", exists(func));
+    check("reverse(" + func.args(" (<a/>, <b/>, <c/>))"), "<b/>\n<a/>", root(List.class));
 
     // nested function calls
     check(func.args(func.args(" ()")), "", empty());
     check(func.args(func.args(" (<a/>)")), "", empty());
     check(func.args(func.args(" (<a/>, <b/>)")), "", empty());
     check(func.args(func.args(" (<a/>, <b/>, <c/>)")), "<a/>", root(CElem.class));
-    check(func.args(func.args(" (<a/>, <b/>, <c/>, <d/>)")), "<a/>\n<b/>", exists(SUBSEQUENCE));
+    check(func.args(func.args(" (<a/>, <b/>, <c/>, <d/>)")), "<a/>\n<b/>", root(List.class));
+    check(func.args(func.args(" (1 to 3) ! <a>{. }</a>")), "<a>1</a>", root(HEAD));
+    check(func.args(func.args(" (1 to 4) ! <a>{. }</a>")), "<a>1</a>\n<a>2</a>", root(SUBSEQUENCE));
+
+    check(func.args(" util:replicate(<a/>, 2)"), "<a/>", root(CElem.class));
+    check(func.args(" util:replicate(<a/>, 3)"), "<a/>\n<a/>", root(_UTIL_REPLICATE));
+    check(func.args(" util:replicate(<a/>[. = ''], 2)"), "<a/>", root(IterFilter.class));
+
+    check(func.args(" (<a/>, <b/>)"), "<a/>", root(CElem.class), empty(_UTIL_INIT));
+    check(func.args(" (<a/>, <b/>, <c/>)"), "<a/>\n<b/>", root(List.class), empty(_UTIL_INIT));
+    check(func.args(" (<a/>, 1 to 2)"), "<a/>\n1", root(List.class), empty(_UTIL_INIT));
+
+    check(func.args(" subsequence((1 to 5) ! <_>{ . }</_>, 1, 1)"),
+        "", empty());
+    check(func.args(" subsequence((1 to 5) ! <_>{ . }</_>, 1, 2)"),
+        "<_>1</_>", root(HEAD));
+    check(func.args(" subsequence((1 to 5) ! <_>{ . }</_>, 1, 3)"),
+        "<_>1</_>\n<_>2</_>", root(SUBSEQUENCE));
+    check(func.args(" subsequence((1 to 5) ! <_>{ . }</_>, 2, 3)"),
+        "<_>2</_>\n<_>3</_>", root(SUBSEQUENCE));
+    check(func.args(" subsequence((1 to 5) ! <_>{ . }</_>, 4, 2)"),
+        "<_>4</_>", root(_UTIL_ITEM));
+    check(func.args(" subsequence((1 to 5) ! <_>{ . }</_>, 5, 1)"),
+        "", empty());
   }
 
   /** Test method. */
@@ -145,13 +168,25 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" 1[. = 1]", 1), 1, empty(func));
     check(func.args(" 1[. = 1]", 2), "", empty());
 
-    check(func.args(" (1, 2, <_/>)", 3), "<_/>", exists(_UTIL_LAST));
+    check(func.args(" (1, 2, <_/>)", 3), "<_/>", root(CElem.class));
     check(func.args(" reverse((1, 2, <_/>))", 2), 2, empty(REVERSE));
 
     check(func.args(" tail((1, 2, 3, <_/>))", 2), 3, empty(TAIL));
+    check(func.args(" tail((<_/>[data()], <_/>, <_/>))", 2), "", empty(TAIL), root(_UTIL_ITEM));
+
     check(func.args(" util:init((1, 2, 3, <_/>))", 2), 2, empty(_UTIL_INIT));
 
     check(func.args(" (7 to 9)[. = 8]", 1), 8, exists(HEAD), type(HEAD, "xs:integer?"));
+
+    check(func.args(" (<a/>, <b/>, <c/>)", 2), "<b/>", root(CElem.class));
+    check(func.args(" (<a/>, <b/>, <c/>, <d/>)", 2), "<b/>", root(CElem.class));
+    check(func.args(" (<a/>, <b/>[data()], <c/>)", 2), "<c/>", root(_UTIL_OR));
+    check(func.args(" (<a/>, <b/>[data()], <c/>, <d/>)", 2), "<c/>", root(_UTIL_OR));
+    check(func.args(" (<a/>[data()], <b/>, <c/>)", 2), "<c/>", root(_UTIL_ITEM));
+
+    check(func.args(" util:replicate(<a/>, 2)", 1), "<a/>", root(CElem.class));
+    check(func.args(" util:replicate(<a/>, 2)", 2), "<a/>", root(CElem.class));
+    check(func.args(" util:replicate(<a/>, 2)", 3), "", empty());
   }
 
   /** Test method. */
@@ -185,6 +220,16 @@ public final class UtilModuleTest extends QueryPlanTest {
 
     check(func.args(" util:init((1 to 3) ! <_>{.}</_>)"), "<_>2</_>", empty(_UTIL_INIT));
     check(func.args(" util:init(tokenize(<a/>))"), "", exists(_UTIL_INIT));
+
+    check(func.args(" util:replicate(<a/>, 2)"), "<a/>", root(CElem.class));
+    check(func.args(" util:replicate(<a/>[. = ''], 2)"), "<a/>",
+        root(IterFilter.class), empty(_UTIL_REPLICATE));
+    check(func.args(" util:replicate((<a/>, <b/>)[. = ''], 2)"), "<b/>",
+        root(_UTIL_LAST), empty(_UTIL_REPLICATE));
+    check(func.args(" util:replicate(<a/>, <_>2</_>)"), "<a/>", exists(_UTIL_REPLICATE));
+
+    check(func.args(" (<a/>, <b/>)"), "<b/>", root(CElem.class));
+    check(func.args(" (<a/>, 1 to 2)"), 2, root(Int.class));
   }
 
   /** Test method. */

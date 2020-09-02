@@ -61,7 +61,7 @@ public final class Quantifier extends Single {
     if(expr instanceof Value) return cc.preEval(this);
     // non-deterministic expression: rewrite to list (ensure evaluation)
     if(expr.size() == 0) {
-      return cc.replaceWith(this, new List(info, expr, Bln.get(every)).optimize(cc));
+      return cc.replaceWith(this, List.get(cc, info, expr, Bln.get(every)));
     }
     return this;
   }

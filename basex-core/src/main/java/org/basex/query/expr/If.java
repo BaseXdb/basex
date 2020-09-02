@@ -74,12 +74,12 @@ public final class If extends Arr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     if(Function.EMPTY.is(cond)) {
       // if(empty(A)) then B else C  ->  if(exists(A)) then C else B
-      cond = cc.function(Function.EXISTS, info, ((Arr) cond).exprs[0]);
+      cond = cc.function(Function.EXISTS, info, cond.arg(0));
       swap();
       cc.info(OPTSWAP_X, this);
     } else if(Function.NOT.is(cond)) {
       // if(not(A)) then B else C  ->  if(A) then C else B
-      cond = ((Arr) cond).exprs[0];
+      cond = cond.arg(0);
       swap();
       cc.info(OPTSWAP_X, this);
     }
@@ -108,7 +108,7 @@ public final class If extends Arr {
     // rewrite to elvis operator:
     //   if(exists(VALUE)) then VALUE else DEFAULT  ->  VALUE ?: DEFAULT
     //   if(NODES) then NODES else DEFAULT  ->  NODES ?: DEFAULT
-    final Expr cmp = Function.EXISTS.is(cond) ? ((Arr) cond).exprs[0] :
+    final Expr cmp = Function.EXISTS.is(cond) ? cond.arg(0) :
       ct.type instanceof NodeType ? cond : null;
     if(!ndt && cmp != null && cmp.equals(br1)) return
         cc.function(Function._UTIL_OR, info, br1, br2);

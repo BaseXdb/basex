@@ -7,7 +7,6 @@ import java.util.function.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.func.Function;
-import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -156,7 +155,7 @@ public abstract class Arr extends ParseExpr {
     final Class<? extends Arr> clazz = getClass();
     for(final Expr expr : exprs) {
       if(clazz.isInstance(expr)) {
-        list.add(((Arr) expr).exprs);
+        list.add(expr.args());
         cc.info(OPTFLAT_X_X, expr, (Supplier<?>) this::description);
       } else {
         list.add(expr);
@@ -227,8 +226,8 @@ public abstract class Arr extends ParseExpr {
         if(!(positional && expr1.has(Flag.POS))) {
           // A or not(A)  ->  true()
           // A[B][not(B)]  ->  ()
-          if(Function.NOT.is(expr2) && ((Arr) expr2).exprs[0].equals(expr1) ||
-             Function.NOT.is(expr1) && ((Arr) expr1).exprs[0].equals(expr2)) {
+          if(Function.NOT.is(expr2) && expr2.arg(0).equals(expr1) ||
+             Function.NOT.is(expr1) && expr1.arg(0).equals(expr2)) {
             return true;
           }
           // 'a'[. = 'a' or . = 'b']  ->  'a'[. = ('a', 'b')]
@@ -245,11 +244,11 @@ public abstract class Arr extends ParseExpr {
     exprs = list.next();
 
     // not($a) and not($b)  ->  not($a or $b)
-    final org.basex.query.func.Function not = org.basex.query.func.Function.NOT;
+    final Function not = Function.NOT;
     final Checks<Expr> fnNot = ex -> not.is(ex) && !(positional && ex.has(Flag.POS));
     if(exprs.length > 1 && fnNot.all(exprs)) {
       final ExprList tmp = new ExprList(exprs.length);
-      for(final Expr expr : exprs) tmp.add(((FnNot) expr).exprs[0]);
+      for(final Expr expr : exprs) tmp.add(expr.arg(0));
       final Expr expr = or ? new And(info, tmp.finish()) : new Or(info, tmp.finish());
       list.add(cc.function(not, info, expr.optimize(cc)));
     } else {
@@ -328,6 +327,11 @@ public abstract class Arr extends ParseExpr {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     return visitAll(visitor, exprs);
+  }
+
+  @Override
+  public Expr[] args() {
+    return exprs;
   }
 
   @Override

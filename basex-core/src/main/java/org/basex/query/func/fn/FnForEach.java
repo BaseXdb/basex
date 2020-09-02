@@ -48,7 +48,7 @@ public class FnForEach extends StandardFunc {
         results.add(new DynFuncCall(info, sc, updating, ndt, func, item).optimize(cc));
       }
       cc.info(QueryText.OPTUNROLL_X, this);
-      return new List(info, results.finish()).optimize(cc);
+      return List.get(cc, info, results.finish());
     }
 
     // otherwise, create FLWOR expression

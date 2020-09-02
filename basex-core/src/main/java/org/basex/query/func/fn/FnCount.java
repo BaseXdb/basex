@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -38,14 +40,14 @@ public final class FnCount extends StandardFunc {
     Expr expr = exprs[0];
 
     // rewrite count(map:keys(...)) to map:size(...)
-    if(Function._MAP_KEYS.is(expr))
-      return cc.function(Function._MAP_SIZE, info, args(expr));
+    if(_MAP_KEYS.is(expr))
+      return cc.function(_MAP_SIZE, info, expr.args());
     // rewrite count(string-to-codepoints(...)) to string-length(...)
-    if(Function.STRING_TO_CODEPOINTS.is(expr) || Function._UTIL_CHARS.is(expr))
-      return cc.function(Function.STRING_LENGTH, info, args(expr));
+    if(STRING_TO_CODEPOINTS.is(expr) || _UTIL_CHARS.is(expr))
+      return cc.function(STRING_LENGTH, info, expr.args());
     // rewrite count(reverse(...)) to count(...)
-    if(Function.REVERSE.is(expr))
-      expr = args(expr)[0];
+    if(REVERSE.is(expr))
+      expr = expr.arg(0);
 
     // return statically known size (ignore non-deterministic expressions, e.g. count(error()))
     if(!expr.has(Flag.NDT)) {

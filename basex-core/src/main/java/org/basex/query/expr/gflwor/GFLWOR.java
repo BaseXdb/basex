@@ -181,13 +181,9 @@ public final class GFLWOR extends ParseExpr {
         if(!has(Flag.NDT)) return Empty.VALUE;
       } else if(!varrefs.any(clauses) && !ndt.any(clauses)) {
         // no referenced variables in return clause
-        // single iteration
         //   let $_ := 1 return <x/>  ->  <x/>
-        if(min == 1) return rtrn;
-        // multiple iterations
         //   for $_ in 1 to 2 return 3  ->  util:replicate(3, 2)
-        final boolean multi = rtrn.has(Flag.NDT, Flag.CNS);
-        return cc.function(Function._UTIL_REPLICATE, info, rtrn, Int.get(min), Bln.get(multi));
+        return min == 1 ? rtrn : cc.replicate(rtrn, Int.get(min), info);
       }
     }
 

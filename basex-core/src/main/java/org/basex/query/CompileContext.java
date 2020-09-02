@@ -14,6 +14,7 @@ import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -301,6 +302,21 @@ public final class CompileContext {
    */
   public Expr merge(final Expr cond, final Expr rtrn, final InputInfo ii) throws QueryException {
     return cond.has(Flag.NDT) ?
-      new List(ii, function(Function._PROF_VOID, ii, cond), rtrn).optimize(this) : rtrn;
+      List.get(this, ii, function(Function._PROF_VOID, ii, cond), rtrn) : rtrn;
+  }
+
+  /**
+   * Replicates an expression.
+   * @param expr expression
+   * @param count count expression
+   * @param ii input info
+   * @return function
+   * @throws QueryException query exception
+   */
+  public Expr replicate(final Expr expr, final Expr count, final InputInfo ii)
+      throws QueryException {
+    final ExprList args = new ExprList().add(expr).add(count);
+    if(expr.has(Flag.NDT, Flag.CNS)) args.add(Bln.TRUE);
+    return function(Function._UTIL_REPLICATE, ii, args.finish());
   }
 }

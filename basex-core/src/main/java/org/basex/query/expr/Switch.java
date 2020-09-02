@@ -192,8 +192,8 @@ public final class Switch extends ParseExpr {
       )) return this;
     }
 
-    final List list = new List(groups[0].info, Arrays.copyOfRange(exprs, 1, exprs.length));
-    final CmpG cmp = new CmpG(cond, list.optimize(cc), OpG.EQ, null, null, groups[0].info);
+    final Expr list = List.get(cc, groups[0].info, Arrays.copyOfRange(exprs, 1, exprs.length));
+    final CmpG cmp = new CmpG(cond, list, OpG.EQ, null, null, groups[0].info);
     return new If(info, cmp.optimize(cc), groups[0].rtrn(), groups[1].rtrn()).optimize(cc);
   }
 

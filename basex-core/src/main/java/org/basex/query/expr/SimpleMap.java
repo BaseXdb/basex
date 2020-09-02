@@ -9,7 +9,6 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -79,7 +78,7 @@ public abstract class SimpleMap extends Arr {
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       if(expr instanceof SimpleMap && !(expr instanceof CachedMap)) {
-        list.add(((SimpleMap) expr).exprs);
+        list.add(expr.args());
         cc.info(OPTFLAT_X_X, expr, (Supplier<?>) this::description);
       } else {
         list.add(expr);
@@ -183,8 +182,7 @@ public abstract class SimpleMap extends Arr {
           if(count != null) {
             // (1 to 2) ! <x/>  ->  util:replicate(<x/>, 2, true())
             // (1 to $c) ! 'A'  ->  util:replicate('A', $c, false())
-            final boolean multi = next.has(Flag.NDT, Flag.CNS);
-            ex = cc.function(Function._UTIL_REPLICATE, info, next, count, Bln.get(multi));
+            ex = cc.replicate(next, count, info);
           }
         }
       }

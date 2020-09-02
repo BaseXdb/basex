@@ -294,7 +294,7 @@ public abstract class Cmp extends Arr {
       return Bln.get(check == 0);
     }
 
-    final SeqType st1 = ((Arr) expr1).exprs[0].seqType();
+    final SeqType st1 = expr1.arg(0).seqType();
     if(st1.zeroOrOne()) {
       // count($zeroOrOne) < 2  ->  true()
       if(op == OpV.LT && count > 1 || op == OpV.LE && count >= 1 ||

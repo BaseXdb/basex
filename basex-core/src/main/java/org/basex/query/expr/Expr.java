@@ -340,6 +340,23 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Returns the arguments/operands of an expression (function, list, etc).
+   * @return arguments or {@code null}
+   */
+  public Expr[] args() {
+    return null;
+  }
+
+  /**
+   * Returns the specified argument/operand of an expression (function, list, etc).
+   * @param i index of argument
+   * @return arguments or {@code null}
+   */
+  public final Expr arg(final int i) {
+    return args()[i];
+  }
+
+  /**
    * Checks if an expression can be rewritten to an index access.
    * If so, the index expression will be bound to {@link IndexInfo#expr}.
    * This method will be called by the {@link Path} expression.

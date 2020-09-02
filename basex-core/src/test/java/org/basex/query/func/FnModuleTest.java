@@ -388,12 +388,23 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" util:init((<a/>))"), "", empty());
     check(func.args(" util:init((1, 2)[. = 0])"), "", exists(_UTIL_INIT));
 
-    check(func.args(" tail((<a/>, <b/>, <c/>))"), "<b/>", exists(_UTIL_ITEM));
+    check(func.args(" tail((<a/>, <b/>, <c/>[. = '']))"), "<b/>", root(CElem.class));
+    check(func.args(" tail((<a/>, <b/>, <c/>))"), "<b/>", root(CElem.class));
 
     check(func.args(" subsequence((<a/>, <b/>), <_>1</_>)"), "<a/>", exists(SUBSEQUENCE));
-    check(func.args(" subsequence((<a/>, <b/>, <c/>, <d/>), 2, 2)"), "<b/>", exists(_UTIL_ITEM));
+    check(func.args(" subsequence((<a/>, <b/>, <c/>, <d/>), 2, 2)"), "<b/>", root(CElem.class));
+    check(func.args(" util:range((<a/>, <b/>, <c/>, <d/>), 2, 3)"), "<b/>", root(CElem.class));
 
-    check(func.args(" util:range((<a/>, <b/>, <c/>, <d/>), 2, 3)"), "<b/>", exists(_UTIL_ITEM));
+    check(func.args(" util:replicate(<a/>, 2)"), "<a/>", root(CElem.class));
+    check(func.args(" util:replicate(<a/>[. = ''], 2)"), "<a/>",
+        root(IterFilter.class), empty(_UTIL_REPLICATE));
+    check(func.args(" util:replicate((<a/>, <b/>)[. = ''], 2)"), "<a/>",
+        root(HEAD), empty(_UTIL_REPLICATE));
+    check(func.args(" util:replicate(<a/>, <_>2</_>)"), "<a/>", exists(_UTIL_REPLICATE));
+
+    check(func.args(" (1, <a/>)"), 1, root(Int.class));
+    check(func.args(" (1 to 2, <a/>)"), 1, root(Int.class));
+    check(func.args(" (<a/>[. = ''], 1)"), "<a/>", root(_UTIL_OR));
   }
 
   /** Test method. */
@@ -713,13 +724,20 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" (1 to 2) ! 1"), "1\n1");
     query(func.args(" (1 to 2) ! (1, 2)"), "2\n1\n2\n1");
 
-    check(func.args(" tail((<a/>, <b/>, <c/>))"), "<c/>\n<b/>", empty(_UTIL_INIT));
-    check(func.args(" (<a/>, <b/>, <c/>)[position() < last()]"), "<b/>\n<a/>", empty(TAIL));
-
-    check(func.args(" tail(" + func.args(" (<a/>, <b/>, <c/>)") + ")"), "<a/>\n<b/>",
-        exists(_UTIL_INIT));
-    check(func.args(" (" + func.args(" (<a/>, <b/>, <c/>)") + ")[position() < last()]"),
-        "<b/>\n<c/>", exists(TAIL));
+    check(func.args(" tail((<a/>, <b/>, <c/>))"),
+        "<c/>\n<b/>", empty(_UTIL_INIT));
+    check(func.args(" (<a/>, <b/>, <c/>)[position() < last()]"),
+        "<b/>\n<a/>", empty(TAIL));
+    check(func.args(" tail(" + func.args(" (1 to 2)[. > 0]") + ")"),
+        1, exists(_UTIL_INIT));
+    check(func.args(" (" + func.args(" (1 to 2)[. > 0]") + ")[position() < last()]"),
+        2, exists(TAIL));
+    check(func.args(" util:replicate(<a/>, 2)"),
+        "<a/>\n<a/>", empty(REVERSE));
+    check(func.args(" util:replicate((<a/>, <b/>), 2)"),
+        null, exists(REVERSE));
+    check(func.args(" (1, <a/>[. = ''])"),
+        "<a/>\n1", root(List.class));
   }
 
   /** Test method. */
@@ -918,6 +936,10 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" (<_/>, <_/>, <_/>)", 4, 0), "");
     query(func.args(" (<_/>, <_/>, <_/>)", 4, 1), "");
 
+    check(func.args(" (<a/>, <b/>, <c/>, <d/>)", 2, 2), "<b/>\n<c/>", root(List.class));
+    check(func.args(" util:replicate(<a/>, 5)", 2, 2), "<a/>\n<a/>", root(_UTIL_REPLICATE));
+    check(func.args(" util:replicate(<a/>, 5)", 2, 3), "<a/>\n<a/>\n<a/>", root(_UTIL_REPLICATE));
+
     query("sort(" + func.args(" tokenize(<_/>)", 3) + ')', "");
   }
 
@@ -1021,6 +1043,14 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" subsequence(tokenize(<_/>), <_>1</_>)"), "");
     query(func.args(" util:range(tokenize(<_>W X Y Z</_>), 3, 4)"), "Z");
     query(func.args(" util:range(tokenize(<_/>), <_>1</_>, 1)"), "");
+
+    check(func.args(" util:replicate(<a/>, 2)"), "<a/>", root(CElem.class));
+    check(func.args(" util:replicate(<a/>, 3)"), "<a/>\n<a/>", root(_UTIL_REPLICATE));
+    check(func.args(" util:replicate(<a/>[. = ''], 2)"), "<a/>", root(IterFilter.class));
+
+    check(func.args(" (<a/>, <b/>)"), "<b/>", root(CElem.class), empty(TAIL));
+    check(func.args(" (<a/>, <b/>, <c/>)"), "<b/>\n<c/>", root(List.class), empty(TAIL));
+    check(func.args(" (1 to 2, <a/>)"), "2\n<a/>", root(List.class), empty(TAIL));
   }
 
   /** Test method. */

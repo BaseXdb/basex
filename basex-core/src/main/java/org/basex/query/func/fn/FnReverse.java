@@ -1,12 +1,19 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.func.Function.*;
+
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -69,10 +76,24 @@ public final class FnReverse extends StandardFunc {
     // reverse sequence
     if(expr instanceof RangeSeq) return ((RangeSeq) expr).reverse(cc.qc);
 
-    if(Function.TAIL.is(expr) && Function.REVERSE.is(args(expr)[0]))
-      return cc.function(Function._UTIL_INIT, info, args(args(expr)[0]));
-    if(Function._UTIL_INIT.is(expr) && Function.REVERSE.is(args(expr)[0]))
-      return cc.function(Function.TAIL, info, args(args(expr)[0]));
+    // reverse(tail(reverse(E))  ->  util:init(E)
+    if(TAIL.is(expr) && REVERSE.is(expr.arg(0)))
+      return cc.function(_UTIL_INIT, info, expr.arg(0).args());
+    // reverse(util:init(reverse(E))  ->  tail(E)
+    if(_UTIL_INIT.is(expr) && REVERSE.is(expr.arg(0)))
+      return cc.function(TAIL, info, expr.arg(0).args());
+    // reverse(util:replicate(ITEM, COUNT))  ->  util:replicate(ITEM, COUNT)
+    if(_UTIL_REPLICATE.is(expr) && !expr.has(Flag.NDT))
+      if(expr.arg(0).seqType().zeroOrOne()) return expr;
+
+    // rewrite list
+    if(expr instanceof List) {
+      final Expr[] args = expr.args();
+      if(((Checks<Expr>) ex -> ex.seqType().zeroOrOne()).all(args)) {
+        Collections.reverse(Arrays.asList(args));
+        return expr;
+      }
+    }
 
     return adoptType(expr);
   }

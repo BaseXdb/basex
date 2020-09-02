@@ -372,10 +372,26 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $i in" + seq + "return ('a', 'b')[position() < $i and position() < $i+1]", "a\na\na",
         exists(CachedFilter.class));
 
-    check("(<a/>, <b/>)[last()]", "<b/>", count(_UTIL_LAST, 1));
-    check("(<a/>, <b/>)[position() > 1 and position() < 3]", "<b/>", count(_UTIL_LAST, 1));
-    check("(<a/>, <b/>)[position() > 1 and position() < 3 and <b/>]", "<b/>", count(_UTIL_LAST, 1));
-    check("(<a/>, <b/>)[position() > 1 and position() < 4]", "<b/>", count(_UTIL_LAST, 1));
+    check("(<a/>, <b/>)[last()]",
+        "<b/>", root(CElem.class));
+    check("(<a/>, <b/>[. = ''])[last()]",
+        "<b/>", count(_UTIL_LAST, 1));
+    check("(<a/>, <b/>)[position() > 1 and position() < 3]",
+        "<b/>", root(CElem.class));
+    check("(<a/>, <b/>[. = ''])[position() > 1 and position() < 3]",
+        "<b/>", root(IterFilter.class));
+    check("(<a/>[. = ''], <b/>)[position() > 1 and position() < 3]",
+        "<b/>", count(_UTIL_ITEM, 1));
+    check("(<a/>, <b/>)[position() > 1 and position() < 3 and <b/>]",
+        "<b/>", root(CElem.class));
+    check("(<a/>, <b/>[. = ''])[position() > 1 and position() < 3 and <b/>]",
+        "<b/>", root(IterFilter.class));
+    check("(<a/>[. = ''], <b/>)[position() > 1 and position() < 3 and <b/>]",
+        "<b/>", count(_UTIL_ITEM, 1));
+    check("(<a/>, <b/>)[position() > 1 and position() < 4]",
+        "<b/>", root(CElem.class));
+    check("(<a/>, <b/>[. = ''])[position() > 1 and position() < 4]",
+        "<b/>", count(_UTIL_RANGE, 1));
   }
 
   /** Predicates. */
@@ -1477,7 +1493,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("count(for $c in //c return $c/..)", 2, exists(DualMap.class));
     check("count(for $c in //* return $c//c)", 3, exists(IterMap.class));
     check("count(for $c in //* return $c/following::*)", 2, exists(IterMap.class));
-    check("let $n := reverse((<a>A</a>, <b>B</b>)) return $n/text()", "A\nB",
+    check("let $n := reverse((<a>A</a>, <b>B</b>)) return $n/text()", "B\nA",
         root(CachedPath.class));
   }
 

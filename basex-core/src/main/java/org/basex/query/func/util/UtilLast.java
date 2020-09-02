@@ -1,7 +1,10 @@
 package org.basex.query.func.util;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
@@ -37,12 +40,25 @@ public final class UtilLast extends StandardFunc {
 
     // rewrite nested function calls
     final long size = expr.size();
-    if(Function.TAIL.is(expr) && size > 1)
-      return cc.function(Function._UTIL_LAST, info, args(expr));
-    if(Function._UTIL_INIT.is(expr) && size > 0)
-      return cc.function(Function._UTIL_ITEM, info, args(expr)[0], Int.get(size));
-    if(Function.REVERSE.is(expr))
-      return cc.function(Function.HEAD, info, args(expr));
+    if(TAIL.is(expr) && size > 1)
+      return cc.function(_UTIL_LAST, info, expr.args());
+    if(_UTIL_INIT.is(expr) && size > 0)
+      return cc.function(_UTIL_ITEM, info, expr.arg(0), Int.get(size));
+    if(REVERSE.is(expr))
+      return cc.function(HEAD, info, expr.args());
+    if(_UTIL_REPLICATE.is(expr)) {
+      // static integer will always be greater than 1
+      if(expr.arg(1) instanceof Int) return cc.function(_UTIL_LAST, info, expr.arg(0));
+    }
+
+    // rewrite list
+    if(expr instanceof List) {
+      final Expr[] args = expr.args();
+      final Expr last = args[args.length - 1];
+      final SeqType stl = last.seqType();
+      if(stl.one()) return last;
+      if(stl.oneOrMore()) return cc.function(_UTIL_LAST, info, last);
+    }
 
     exprType.assign(st.with(st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE));
     data(expr.data());

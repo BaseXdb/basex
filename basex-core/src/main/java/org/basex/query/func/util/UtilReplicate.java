@@ -112,7 +112,7 @@ public final class UtilReplicate extends StandardFunc {
    * @return result of check, {@code false} if unknown at compile time
    */
   public boolean once() {
-    return (exprs.length < 3 || exprs[2] == Bln.FALSE) &&
-        exprs[1] instanceof Int && ((Int) exprs[1]).itr() > 0;
+    // static integer will always be greater than 1
+    return (exprs.length < 3 || exprs[2] == Bln.FALSE) && exprs[1] instanceof Int;
   }
 }

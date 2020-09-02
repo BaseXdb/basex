@@ -1,8 +1,11 @@
 package org.basex.query.func.util;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -81,12 +84,34 @@ public final class UtilInit extends StandardFunc {
 
     final long size = expr.size();
     if(size != -1) {
-      // two results: return last item
-      if(size == 2) return cc.function(Function.HEAD, info, expr);
-
+      // two results: return first item
+      if(size == 2) return cc.function(HEAD, info, expr);
       // rewrite nested function calls
-      if(Function._UTIL_INIT.is(expr)) return
-          cc.function(Function.SUBSEQUENCE, info, args(expr)[0], Int.ONE, Int.get(size - 1));
+      if(_UTIL_INIT.is(expr))
+        return cc.function(SUBSEQUENCE, info, expr.arg(0), Int.ONE, Int.get(size - 1));
+    }
+
+    if(SUBSEQUENCE.is(expr) || _UTIL_RANGE.is(expr)) {
+      final SeqRange r = SeqRange.get(expr, cc);
+      if(r != null) return cc.function(SUBSEQUENCE, info, expr.arg(0),
+          Int.get(r.start + 1), Int.get(r.length - 1));
+    }
+    if(_UTIL_REPLICATE.is(expr)) {
+      final Expr[] args = expr.args();
+      if(args[1] instanceof Int && args[0].seqType().zeroOrOne()) {
+        args[1] = Int.get(((Int) args[1]).itr() - 1);
+        return cc.function(_UTIL_REPLICATE, info, args);
+      }
+    }
+
+    // rewrite list
+    if(expr instanceof List) {
+      final Expr[] args = expr.args();
+      final Expr last = args[args.length - 1];
+      if(last.seqType().oneOrMore()) {
+        args[args.length - 1] = cc.function(_UTIL_INIT, info, last);
+        return List.get(cc, info, args);
+      }
     }
 
     exprType.assign(st.union(Occ.ZERO), size - 1);
