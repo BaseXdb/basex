@@ -179,7 +179,7 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public final Value value(final QueryContext qc) throws QueryException {
     return iter(qc).value(qc, this);
   }
 

@@ -1953,4 +1953,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $i in 1 to 2 for $j in 1 to $i return $i", "1\n2\n2",
         root(IterMap.class), exists(_UTIL_REPLICATE));
   }
+
+  /** Iterative path traversal, positional access. */
+  @Test public void gh1935() {
+    query("declare variable $x := <x><a><_/></a></x>; $x/a ! (_[$x/_ ! 1], .)", "<a>\n<_/>\n</a>");
+  }
 }
