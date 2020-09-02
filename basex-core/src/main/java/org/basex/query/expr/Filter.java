@@ -1,12 +1,13 @@
 package org.basex.query.expr;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -112,31 +113,30 @@ public abstract class Filter extends Preds {
     };
     for(final Expr pred : exprs) {
       Expr ex = null;
-      if(Function.LAST.is(pred)) {
+      if(LAST.is(pred)) {
         // rewrite positional predicate to util:last
-        ex = cc.function(Function._UTIL_LAST, info, prepare.apply(expr));
+        ex = cc.function(_UTIL_LAST, info, prepare.apply(expr));
       } else if(pred instanceof ItrPos) {
         final ItrPos pos = (ItrPos) pred;
         if(pos.min != pos.max) {
           // expr[min..max]  ->  util:range(expr, min, max)
-          ex = cc.function(Function._UTIL_RANGE, info, prepare.apply(expr),
+          ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr),
               Int.get(pos.min), Int.get(pos.max));
         } else if(pos.min == 1) {
           // expr[1]  ->  head(expr)
-          ex = cc.function(Function.HEAD, info, prepare.apply(expr));
+          ex = cc.function(HEAD, info, prepare.apply(expr));
         } else {
           // expr[pos]  ->  util:item(expr, pos)
-          ex = cc.function(Function._UTIL_ITEM, info, prepare.apply(expr), Int.get(pos.min));
+          ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr), Int.get(pos.min));
         }
       } else if(pred instanceof Pos) {
         final Pos pos = (Pos) pred;
         if(pos.eq()) {
           // expr[pos]  ->  util:item(expr, pos.min)
-          ex = cc.function(Function._UTIL_ITEM, info, prepare.apply(expr), pos.exprs[0]);
+          ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr), pos.exprs[0]);
         } else {
           // expr[min..max]  ->  util:range(expr, pos.min, pos.max)
-          ex = cc.function(Function._UTIL_RANGE, info, prepare.apply(expr),
-              pos.exprs[0], pos.exprs[1]);
+          ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), pos.exprs[0], pos.exprs[1]);
         }
       } else if(numeric(pred)) {
         /* - rewrite positional predicate to util:item
@@ -144,7 +144,7 @@ public abstract class Filter extends Preds {
          * - only choose deterministic and context-independent offsets. illegal:
          *   (1 to 10)[random:integer(10)]  or  (1 to 10)[.]  or  $a[$a[.]] */
         if(pred.seqType().one()) {
-          ex = cc.function(Function._UTIL_ITEM, info, prepare.apply(expr), pred);
+          ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr), pred);
         }
       } else if(pred instanceof Cmp) {
         // rewrite positional predicate to fn:remove
@@ -152,12 +152,24 @@ public abstract class Filter extends Preds {
         final OpV opV = cmp.opV();
         if(cmp.positional() && opV != null) {
           final Expr e = cmp.exprs[1];
-          if((opV == OpV.LT || opV == OpV.NE) && Function.LAST.is(e)) {
+          if((opV == OpV.LT || opV == OpV.NE) && LAST.is(e)) {
             // expr[position() < last()]  ->  util:init(expr)
-            ex = cc.function(Function._UTIL_INIT, info, prepare.apply(expr));
+            ex = cc.function(_UTIL_INIT, info, prepare.apply(expr));
           } else if(opV == OpV.NE && e instanceof Int) {
             // expr[position() != INT]  ->  remove(expr, INT)
-            ex = cc.function(Function.REMOVE, info, prepare.apply(expr), e);
+            ex = cc.function(REMOVE, info, prepare.apply(expr), e);
+          } else if(opV == OpV.EQ && e instanceof Range) {
+            final Expr[] args = e.args();
+            if(args[0] instanceof Int && LAST.is(args[1])) {
+              // expr[position() = INT to last()]
+              ex = cc.function(SUBSEQUENCE, info, prepare.apply(expr), args[0]);
+            } else if(args[0] == Int.ONE && args[1] instanceof Arith) {
+              // expr[position() = 1 to last() - 1]
+              final Expr[] arth = args[1].args();
+              if(LAST.is(arth[0]) && ((Arith) args[1]).calc == Calc.MINUS && arth[1] == Int.ONE) {
+                ex = cc.function(_UTIL_INIT, info, prepare.apply(expr));
+              }
+            }
           }
         }
       }
