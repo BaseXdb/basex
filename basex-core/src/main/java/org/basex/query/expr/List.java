@@ -221,11 +221,12 @@ public final class List extends Arr {
       // otherwise, rewrite list to union
       expr = toUnion(cc);
     } else if(mode == Simplify.DISTINCT) {
-      final ExprList list = new ExprList(exprs.length);
+      final int el = exprs.length;
+      final ExprList list = new ExprList(el);
       for(final Expr ex : exprs) list.addUnique(ex);
-      if(list.size() != exprs.length) {
+      if(list.size() != el) {
         // remove duplicate list expressions
-        expr = cc.replaceWith(this, List.get(cc, info, list.finish()));
+        expr = cc.simplify(this, List.get(cc, info, list.finish()));
       } else {
         // otherwise, rewrite list to union
         expr = toUnion(cc);

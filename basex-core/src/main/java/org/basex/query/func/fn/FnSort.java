@@ -1,10 +1,12 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.func.Function.*;
 
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -120,11 +122,23 @@ public final class FnSort extends StandardFunc {
       final Value value = quickValue((Value) expr1);
       if(value != null) return value;
     }
+    if(_UTIL_REPLICATE.is(expr1)) {
+      final SeqType st = expr1.arg(0).seqType();
+      if(st.zeroOrOne() && st.type.isSortable()) return expr1;
+    }
     if(exprs.length == 3) {
       exprs[2] = coerceFunc(exprs[2], cc, SeqType.AAT_ZM, st1.with(Occ.ONE));
     }
-
     return adoptType(expr1);
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    Expr expr = this;
+    if(mode == Simplify.DISTINCT && seqType().type.isSortable()) {
+      expr = cc.simplify(this, exprs[0]);
+    }
+    return expr == this ? super.simplifyFor(mode, cc) : expr.simplifyFor(mode, cc);
   }
 
   /**
@@ -141,7 +155,8 @@ public final class FnSort extends StandardFunc {
       }
       // sortable single or singleton values
       final SeqType st = value.seqType();
-      if(st.type.isSortable() && (st.one() || value instanceof SingletonSeq)) return value;
+      if(st.type.isSortable() && (st.one() || (value instanceof SingletonSeq &&
+          ((SingletonSeq) value).value instanceof Item))) return value;
     }
     // no quick evaluation possible
     return null;

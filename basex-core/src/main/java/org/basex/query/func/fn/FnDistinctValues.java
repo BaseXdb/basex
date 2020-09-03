@@ -86,7 +86,6 @@ public final class FnDistinctValues extends StandardFunc {
       exprType.assign(type);
       simple = st.zeroOrOne();
     }
-
     return optStats(expr, cc);
   }
 

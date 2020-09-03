@@ -179,6 +179,19 @@ public final class FnModuleTest extends QueryPlanTest {
     query("count(" + func.args(" 1 to 100000000") + ')', 100000000);
     check(func.args(" prof:void(1)"), "", root(_PROF_VOID));
     check("(1, 3) ! " + func.args(" ."), "1\n3", root(IntSeq.class));
+
+    // remove duplicate expressions
+    check(func.args(" (1, <_/>, 1)"), "1\n", count(Int.class, 1));
+    check(func.args(" (1, 1)[. = 1]"), 1, root(Int.class));
+    check(func.args(" (<_>1</_>, <_>1</_>)[. = 1]"), 1, empty(List.class), empty(_UTIL_REPLICATE));
+    // remove reverse function call
+    check(func.args(" reverse((<a>A</a>, <b>A</b>))"), "A", empty(REVERSE));
+    check(func.args(" reverse((<a>A</a>, <b>A</b>)[data()])"), "A", empty(REVERSE));
+    check(func.args(" reverse((<a>A</a>, <b>A</b>))[data()]"), "A", empty(REVERSE));
+    // remove sort function call
+    check(func.args(" sort((<a>A</a>, <b>A</b>))"), "A", empty(SORT));
+    check(func.args(" sort((<a>A</a>, <b>A</b>)[data()])"), "A", empty(SORT));
+    check(func.args(" sort((<a>A</a>, <b>A</b>))[data()]"), "A", empty(SORT));
   }
 
   /** Test method. */

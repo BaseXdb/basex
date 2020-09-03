@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.func.*;
@@ -94,7 +95,15 @@ public final class FnReverse extends StandardFunc {
         return expr;
       }
     }
-
     return adoptType(expr);
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    Expr expr = this;
+    if(mode == Simplify.DISTINCT) {
+      expr = cc.simplify(this, exprs[0]);
+    }
+    return expr == this ? super.simplifyFor(mode, cc) : expr.simplifyFor(mode, cc);
   }
 }

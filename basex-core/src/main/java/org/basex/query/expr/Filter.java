@@ -215,6 +215,9 @@ public abstract class Filter extends Preds {
     if(mode == Simplify.EBV || mode == Simplify.PREDICATE) {
       final Expr expr = simplifyEbv(root, cc);
       if(expr != this) return cc.simplify(this, expr);
+    } else if(mode == Simplify.DISTINCT && !mayBePositional()) {
+      final Expr expr = root.simplifyFor(mode, cc);
+      if(expr != root) return Filter.get(cc, info, expr, exprs);
     }
     return super.simplifyFor(mode, cc);
   }

@@ -319,15 +319,6 @@ public abstract class Preds extends Arr {
    * @return result of check
    */
   public boolean mayBePositional() {
-    return mayBePositional(exprs);
-  }
-
-  /**
-   * Checks if some of the specified expressions may be positional.
-   * @param exprs expressions
-   * @return result of check
-   */
-  protected static boolean mayBePositional(final Expr[] exprs) {
     for(final Expr expr : exprs) {
       if(mayBePositional(expr)) return true;
     }
