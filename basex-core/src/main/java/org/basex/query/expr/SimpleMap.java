@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
 
 import java.util.*;
 import java.util.function.*;
@@ -10,9 +11,11 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.fn.*;
+import org.basex.query.func.util.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -183,6 +186,16 @@ public abstract class SimpleMap extends Arr {
             // (1 to 2) ! <x/>  ->  util:replicate(<x/>, 2, true())
             // (1 to $c) ! 'A'  ->  util:replicate('A', $c, false())
             ex = cc.replicate(next, count, info);
+          }
+        } else if(_UTIL_REPLICATE.is(next) && ((UtilReplicate) next).single() &&
+            next.arg(0) instanceof ContextValue) {
+          if(_UTIL_REPLICATE.is(expr) && ((UtilReplicate) expr).single()) {
+            // util:replicate(E, C) ! util:replicate(., D)  ->  util:replicate(E, C * D)
+            final Expr cnt = new Arith(info, expr.arg(1), next.arg(1), Calc.MULT).optimize(cc);
+            ex = cc.function(_UTIL_REPLICATE, info, expr.arg(0), cnt);
+          } else if(expr instanceof SingletonSeq && ((SingletonSeq) expr).value instanceof Item) {
+            // SINGLETONSEQ ! util:replicate(., C)  ->  util:replicate(SINGLETONSEQ, C)
+            ex = cc.function(_UTIL_REPLICATE, info, expr, next.arg(1));
           }
         }
       }

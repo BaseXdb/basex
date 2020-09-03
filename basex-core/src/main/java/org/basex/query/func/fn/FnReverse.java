@@ -73,7 +73,7 @@ public final class FnReverse extends StandardFunc {
     final Expr expr = exprs[0];
     // zero/single items or singleton sequence: return argument
     if(expr.seqType().zeroOrOne() || expr instanceof SingletonSeq &&
-        ((SingletonSeq) expr).value.size() == 1) return expr;
+        ((SingletonSeq) expr).value instanceof Item) return expr;
     // reverse sequence
     if(expr instanceof RangeSeq) return ((RangeSeq) expr).reverse(cc.qc);
 
