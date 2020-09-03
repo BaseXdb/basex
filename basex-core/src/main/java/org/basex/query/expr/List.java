@@ -270,7 +270,7 @@ public final class List extends Arr {
 
   @Override
   public String description() {
-    return "expression list";
+    return "list";
   }
 
   @Override

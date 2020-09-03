@@ -458,7 +458,7 @@ public enum Calc {
    * @return string
    */
   final String info() {
-    return '\'' + name + "' operator";
+    return '\'' + name + "' expression";
   }
 
   @Override

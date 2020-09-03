@@ -431,7 +431,7 @@ public abstract class SimpleMap extends Arr {
 
   @Override
   public String description() {
-    return "map operator";
+    return "simple map";
   }
 
   @Override

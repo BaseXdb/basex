@@ -79,7 +79,7 @@ public final class Arith extends Arr {
 
   @Override
   public String description() {
-    return '\'' + calc.name + "' operator";
+    return '\'' + calc.name + "' expression";
   }
 
   @Override
