@@ -233,7 +233,7 @@ public abstract class SimpleMap extends Arr {
 
     boolean cached = false;
     for(final Expr expr : exprs) cached = cached || expr.has(Flag.POS);
-    boolean dual = exprs.length == 2 && exprs[1].seqType().zeroOrOne();
+    final boolean dual = exprs.length == 2 && exprs[1].seqType().zeroOrOne();
 
     // choose best map implementation
     return copyType(

@@ -194,7 +194,7 @@ public final class Thesaurus {
     /** Relationships. */
     private byte[][] rs = new byte[1][];
     /** Term. */
-    private byte[] term;
+    private final byte[] term;
     /** Entries. */
     private int size;
 

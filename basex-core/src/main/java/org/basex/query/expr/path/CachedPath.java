@@ -39,27 +39,24 @@ public final class CachedPath extends AxisPath {
   protected Value nodes(final QueryContext qc) throws QueryException {
     final ANodeBuilder list = new ANodeBuilder();
 
-    final QueryFocus qf = qc.focus, focus = new QueryFocus();
-    final Value rt = root != null ? root.value(qc) : qf.value;
-    qc.focus = focus;
+    final QueryFocus focus = qc.focus, qf = new QueryFocus();
+    final Value rt = root != null ? root.value(qc) : focus.value;
+    qc.focus = qf;
     try {
       if(rt != null) {
         final Iter iter = rt.iter(qc);
         for(Item item; (item = iter.next()) != null;) {
-          // check if root returns nodes
           if(root != null && !(item instanceof ANode))
             throw PATHNODE_X_X_X.get(info, steps[0], item.type, item);
-          focus.value = item;
+          qf.value = item;
           iterate(0, list, qc);
         }
       } else {
-        focus.value = null;
         iterate(0, list, qc);
       }
     } finally {
-      qc.focus = qf;
+      qc.focus = focus;
     }
-
     return list.value(this);
   }
 
@@ -75,14 +72,12 @@ public final class CachedPath extends AxisPath {
 
     // cast is safe (steps will always return a {@link NodeIter} instance)
     final NodeIter ni = (NodeIter) steps[step].iter(qc);
-    final boolean more = step + 1 != steps.length;
-    for(ANode node; (node = ni.next()) != null;) {
-      if(more) {
+    if(step + 1 == steps.length) {
+      for(ANode node; (node = ni.next()) != null;) list.add(node);
+    } else {
+      for(ANode node; (node = ni.next()) != null;) {
         qc.focus.value = node;
         iterate(step + 1, list, qc);
-      } else {
-        qc.checkStop();
-        list.add(node);
       }
     }
   }

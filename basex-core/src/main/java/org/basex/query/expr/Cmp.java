@@ -211,7 +211,7 @@ public abstract class Cmp extends Arr {
     if(expr1 instanceof If && !expr1.has(Flag.NDT)) {
       final If iff = (If) expr1;
       boolean invert = false;
-      for(Expr ex : iff.exprs) {
+      for(final Expr ex : iff.exprs) {
         expr = optEqual(ex, expr2, op, cc);
         if(expr != this) {
           invert ^= expr == Bln.FALSE;

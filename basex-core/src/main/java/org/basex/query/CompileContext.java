@@ -96,9 +96,9 @@ public final class CompileContext {
    */
   public void pushFocus(final Expr expr) {
     focuses.add(qc.focus);
-    final QueryFocus focus = new QueryFocus();
-    if(expr != null) focus.value = dummyItem(expr);
-    qc.focus = focus;
+    final QueryFocus qf = new QueryFocus();
+    if(expr != null) qf.value = dummyItem(expr);
+    qc.focus = qf;
   }
 
   /**

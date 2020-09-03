@@ -28,25 +28,25 @@ public final class CachedMap extends SimpleMap {
   public Value value(final QueryContext qc) throws QueryException {
     Value value = exprs[0].value(qc);
 
-    final QueryFocus qf = qc.focus, focus = new QueryFocus();
-    qc.focus = focus;
+    final QueryFocus focus = qc.focus, qf = new QueryFocus();
+    qc.focus = qf;
     try {
       final int el = exprs.length;
       for(int e = 1; e < el; e++) {
         final Expr expr = exprs[e];
-        focus.pos = 0;
-        focus.size = value.size();
+        qf.size = value.size();
+        qf.pos = 0;
         final ValueBuilder vb = new ValueBuilder(qc);
         final Iter iter = value.iter();
         for(Item item; (item = qc.next(iter)) != null;) {
-          focus.pos++;
-          focus.value = item;
+          qf.value = item;
+          qf.pos++;
           vb.add(expr.value(qc));
         }
         value = vb.value(expr);
       }
     } finally {
-      qc.focus = qf;
+      qc.focus = focus;
     }
 
     return value;
