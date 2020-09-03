@@ -175,15 +175,15 @@ public final class ItrPos extends Simple {
 
   @Override
   public void plan(final QueryString qs) {
+    qs.function(Function.POSITION);
     if(min == max) {
-      qs.token(min);
+      qs.token("=").token(min);
+    } else if(max == MAX_VALUE) {
+      qs.token(">=").token(min);
+    } else if(min == 1) {
+      qs.token("<=").token(max);
     } else {
-      qs.token(Function.POSITION);
-      if(max == MAX_VALUE) {
-        qs.token(">=").token(min);
-      } else {
-        qs.token("=").token(min).token(TO).token(max);
-      }
+      qs.token("=").token(min).token(TO).token(max);
     }
   }
 }

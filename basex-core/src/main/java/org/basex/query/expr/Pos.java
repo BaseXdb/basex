@@ -103,7 +103,7 @@ public final class Pos extends Arr {
     if(item1 == Empty.VALUE) return Bln.FALSE;
     final long pos = qc.focus.pos;
     final double start = toDouble(item1);
-    if(eq()) return Bln.get(pos == start);
+    if(exact()) return Bln.get(pos == start);
 
     final Item item2 = exprs[1].atomItem(qc, info);
     if(item2 == Empty.VALUE) return Bln.FALSE;
@@ -121,7 +121,7 @@ public final class Pos extends Arr {
     if(or || !(ex instanceof Pos)) return null;
     final Pos pos = (Pos) ex;
     final Expr[] posExpr = pos.exprs;
-    if(!eq() && !pos.eq()) {
+    if(!exact() && !pos.exact()) {
       final Expr min = exprs[0] == Int.ONE ? posExpr[0] : posExpr[0] == Int.ONE ? exprs[0] : null;
       final Expr max = exprs[1] == Int.MAX ? posExpr[1] : posExpr[1] == Int.MAX ? exprs[1] : null;
       if(min != null && max != null) return new Pos(info, min, max);
@@ -133,9 +133,8 @@ public final class Pos extends Arr {
    * Checks if minimum and maximum expressions are identical.
    * @return result of check
    */
-  boolean eq() {
-    final Expr[] ex = exprs;
-    return ex[0] == ex[1];
+  boolean exact() {
+    return exprs[0] == exprs[1];
   }
 
   @Override
@@ -160,7 +159,7 @@ public final class Pos extends Arr {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.token(Function.POSITION).token("=").token(exprs[0]);
-    if(!eq()) qs.token(TO).token(exprs[1]);
+    qs.function(Function.POSITION).token("=").token(exprs[0]);
+    if(!exact()) qs.token(TO).token(exprs[1]);
   }
 }

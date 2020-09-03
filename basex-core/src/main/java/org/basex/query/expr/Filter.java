@@ -131,7 +131,7 @@ public abstract class Filter extends Preds {
         }
       } else if(pred instanceof Pos) {
         final Pos pos = (Pos) pred;
-        if(pos.eq()) {
+        if(pos.exact()) {
           // expr[pos]  ->  util:item(expr, pos.min)
           ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr), pos.exprs[0]);
         } else {
