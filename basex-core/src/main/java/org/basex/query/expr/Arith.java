@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -36,8 +37,19 @@ public final class Arith extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     simplifyAll(Simplify.NUMBER, cc);
+    if(allAreValues(false)) return cc.preEval(this);
 
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    // move values to second position
+    Expr expr1 = exprs[0], expr2 = exprs[1];
+    if((calc == Calc.PLUS || calc == Calc.MULT) && (
+        expr1 instanceof Value && !(expr2 instanceof Value))) {
+      cc.info(OPTSWAP_X, this);
+      exprs[0] = expr2;
+      exprs[1] = expr1;
+      expr1 = exprs[0];
+      expr2 = exprs[1];
+    }
+
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     final Type type1 = st1.type, type2 = st2.type;
     final boolean nums = type1.isNumberOrUntyped() && type2.isNumberOrUntyped();
@@ -47,13 +59,29 @@ public final class Arith extends Arr {
     exprType.assign(type, noarray && st1.oneOrMore() && st2.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
 
     Expr expr = emptyExpr();
-    if(expr == this) {
-      if(allAreValues(false)) return cc.preEval(this);
-
-      if(nums && noarray && st1.one() && st2.one()) {
-        // example: number($a) + 0  ->  number($a)
-        final Expr ex = calc.optimize(expr1, expr2);
-        if(ex != null && ex.seqType().type.eq(type)) expr = ex;
+    if(expr == this && nums && noarray && st1.one() && st2.one()) {
+      // example: number($a) + 0  ->  number($a)
+      Expr ex = calc.optimize(expr1, expr2);
+      if(ex != null && ex.seqType().type.eq(type)) {
+        expr = ex;
+      } else if(expr1 instanceof Arith) {
+        final Calc acalc = ((Arith) expr1).calc;
+        final Expr arg1 = expr1.arg(0), arg2 = expr1.arg(1);
+        if(arg2 instanceof Value && expr2 instanceof Value &&
+            (acalc == calc || acalc == calc.invert())) {
+          // (E - 3) + 2  ->  E - (3 - 2)
+          // (E * 3 div 2  ->  E * (3 div 2)
+          final Calc ncalc = acalc == Calc.PLUS || acalc == Calc.MULT ? calc :
+            acalc == Calc.MINUS || acalc == Calc.DIV ? calc.invert() : null;
+          if(ncalc != null) {
+            expr = new Arith(info, arg1, new Arith(info, arg2, expr2, ncalc).optimize(cc),
+                acalc).optimize(cc);
+          }
+        } else if(acalc == calc.invert() && arg2.equals(expr2)) {
+          // E + INT - INT  ->  E
+          expr = arg1.seqType().instanceOf(SeqType.NUM_O) ? arg1 :
+            new Cast(cc.sc(), info, arg1, SeqType.NUM_O).optimize(cc);
+        }
       }
     }
     return cc.replaceWith(this, expr);

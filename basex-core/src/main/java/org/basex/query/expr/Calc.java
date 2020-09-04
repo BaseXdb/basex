@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.AtomType.*;
 
 import java.math.*;
-import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -58,10 +57,7 @@ public enum Calc {
     @Override
     public Expr optimize(final Expr ex1, final Expr ex2) {
       // check for neutral numbers
-      final BiFunction<Expr, Expr, Expr> func = (expr1, expr2) ->
-        expr1 instanceof ANum && ((ANum) expr1).dbl() == 0 ? expr2 : null;
-      final Expr expr = func.apply(ex1, ex2);
-      return expr != null ? expr : func.apply(ex2, ex1);
+      return ex2 instanceof ANum && ((ANum) ex2).dbl() == 0 ? ex1 : null;
     }
 
     @Override
@@ -74,6 +70,9 @@ public enum Calc {
       if(type1 == DTD && type2 == TIM) return TIM;
       return numType(type1, type2);
     }
+
+    @Override
+    public Calc invert() { return MINUS; }
   },
 
   /** Subtraction. */
@@ -129,6 +128,9 @@ public enum Calc {
       if(type1 == TIM && type2 == DTD) return TIM;
       return numType(type1, type2);
     }
+
+    @Override
+    public Calc invert() { return PLUS; }
   },
 
   /** Multiplication. */
@@ -177,12 +179,8 @@ public enum Calc {
     @Override
     public Expr optimize(final Expr ex1, final Expr ex2) {
       // check for absorbing and neutral numbers
-      final BiFunction<Expr, Expr, Expr> func = (expr1, expr2) -> {
-        final double dbl1 = expr1 instanceof ANum ? ((ANum) expr1).dbl() : Double.NaN;
-        return dbl1 == 1 ? expr2 : dbl1 == 0 ? zero(expr1) : null;
-      };
-      final Expr expr = func.apply(ex1, ex2);
-      return expr != null ? expr : func.apply(ex2, ex1);
+      final double dbl2 = ex2 instanceof ANum ? ((ANum) ex2).dbl() : Double.NaN;
+      return dbl2 == 1 ? ex1 : dbl2 == 0 ? zero(ex1) : null;
     }
 
     @Override
@@ -191,6 +189,9 @@ public enum Calc {
       if(type1 == DTD || type2 == DTD) return DTD;
       return numType(type1, type2);
     }
+
+    @Override
+    public Calc invert() { return DIV; }
   },
 
   /** Division. */
@@ -246,6 +247,9 @@ public enum Calc {
       final Type t = numType(type1, type2);
       return t == ITR ? DEC : t;
     }
+
+    @Override
+    public Calc invert() { return MULT; }
   },
 
   /** Integer division. */
@@ -292,6 +296,9 @@ public enum Calc {
     public Type type(final Type type1, final Type type2) {
       return ITR;
     }
+
+    @Override
+    public Calc invert() { return null; }
   },
 
   /** Modulo. */
@@ -324,6 +331,9 @@ public enum Calc {
       final Type t = numType(type1, type2);
       return t == AAT ? NUM : t;
     }
+
+    @Override
+    public Calc invert() { return null; }
   };
 
   /** {@link Long#MIN_VALUE} as a {@link BigDecimal}. */
@@ -367,6 +377,12 @@ public enum Calc {
    * @return result expression, or {@code null} if expression cannot be optimized
    */
   public abstract Type type(Type type1, Type type2);
+
+  /**
+   * Inverts the operator.
+   * @return inverted operator or {@code null}
+   */
+  public abstract Calc invert();
 
   /**
    * Returns the numeric type with the highest precedence.
