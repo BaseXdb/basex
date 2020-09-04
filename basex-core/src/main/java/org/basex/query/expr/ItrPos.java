@@ -4,6 +4,7 @@ import static java.lang.Long.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
@@ -66,7 +67,7 @@ public final class ItrPos extends Simple {
   /**
    * Tries to rewrite {@code fn:position() CMP number(s)} to this expression.
    * Returns an instance of this class, an optimized expression, or {@code null}
-   * @param expr expression to be checked
+   * @param expr positions to be matched
    * @param op comparator
    * @param ii input info
    * @return optimized expression or {@code null}
@@ -121,6 +122,21 @@ public final class ItrPos extends Simple {
    */
   public boolean skip(final long pos) {
     return pos >= max;
+  }
+
+  /**
+   * If possible, returns an optimized expression with inverted operands.
+   * @param cc compilation context
+   * @return original or modified expression
+   * @throws QueryException query exception
+   */
+  public Expr invert(final CompileContext cc) throws QueryException {
+    if(min == max) {
+      final Expr pos = cc.function(Function.POSITION, info);
+      return new CmpG(pos, Int.get(min), OpG.NE, null, cc.sc(), info).optimize(cc);
+    }
+    return min == 1 ? get(max + 1, MAX_VALUE, info) :
+      max == MAX_VALUE ? get(1, min - 1, info) : this;
   }
 
   /**

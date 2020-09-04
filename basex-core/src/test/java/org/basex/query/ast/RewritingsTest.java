@@ -402,7 +402,6 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[.][.]", "<a/>", exists(CElem.class), empty(ContextValue.class));
     check("<a/>/self::*[.][.]", "<a/>", empty(ContextValue.class));
     check("<a/>/self::*[.][.]", "<a/>", empty(ContextValue.class));
-    check("('a', 'b')[position()[position() ! .]]", "a\nb", count(POSITION, 2));
     check("('a', 'b')[. ! position()]", "a", exists("*[contains(name(), 'Map')]"));
     check("(1, 0)[.]", 1, exists(ContextValue.class));
     error("true#0[.]", EBV_X_X);
@@ -1957,5 +1956,26 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Iterative path traversal, positional access. */
   @Test public void gh1935() {
     query("declare variable $x := <x><a><_/></a></x>; $x/a ! (_[$x/_ ! 1], .)", "<a>\n<_/>\n</a>");
+  }
+
+  /** Positional checks. */
+  @Test public void gh1937() {
+    check("1[position()]", 1, root(Int.class));
+    check("(1, 3)[position()]", "1\n3", root(IntSeq.class));
+    check("('a', 'b')[position()[position() ! .]]", "a\nb", root(StrSeq.class));
+
+    check("(1, 3, 5)[last() - 2]", 1, root(Int.class));
+    check("(1, 3, 5)[position() = last() - 1]", 3, root(Int.class));
+    check("(1, 3, 5, 7)[position() = last() idiv 2]", 3, root(Int.class));
+    check("(1, 3, 5, 7)[position() = last() div 2]", 3, root(Int.class));
+
+    check("(1, 3, 5)[not(position() = 2)]", "1\n5", root(SmallSeq.class));
+    check("(1, 3, 5)[not(position() > 2)]", "1\n3", root(SubSeq.class));
+    check("(1, 3, 5)[not(position() < 2)]", "3\n5", root(SubSeq.class));
+    check("(1, <_/>[data()])[not(position() = 2)]", 1, root(REMOVE));
+
+    check("for $i in 1 to 2 return (3 to 4)[not(position() = $i)]", "4\n3", exists(REMOVE));
+    check("for $i in 1 to 2 return (3 to 4)[not(position() > $i)]", "3\n3\n4", exists(_UTIL_RANGE));
+    check("for $i in 1 to 2 return (3 to 4)[not(position() < $i)]", "3\n4\n4", exists(_UTIL_RANGE));
   }
 }

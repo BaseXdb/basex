@@ -155,23 +155,28 @@ public abstract class Filter extends Preds {
           if((opV == OpV.LT || opV == OpV.NE) && LAST.is(e)) {
             // expr[position() < last()]  ->  util:init(expr)
             ex = cc.function(_UTIL_INIT, info, prepare.apply(expr));
-          } else if(opV == OpV.NE && e instanceof Int) {
+          } else if(opV == OpV.NE && e.seqType().instanceOf(SeqType.ITR_O) && e.isSimple()) {
             // expr[position() != INT]  ->  remove(expr, INT)
             ex = cc.function(REMOVE, info, prepare.apply(expr), e);
           } else if(opV == OpV.EQ && e instanceof Range) {
-            final Expr[] args = e.args();
-            if(args[0] instanceof Int && LAST.is(args[1])) {
+            final Expr arg1 = e.arg(0), arg2 = e.arg(1);
+            if(LAST.is(arg2) && arg1.seqType().instanceOf(SeqType.ITR_O) && arg1.isSimple()) {
               // expr[position() = INT to last()]
-              ex = cc.function(SUBSEQUENCE, info, prepare.apply(expr), args[0]);
-            } else if(args[0] == Int.ONE && args[1] instanceof Arith) {
+              ex = cc.function(SUBSEQUENCE, info, prepare.apply(expr), arg1);
+            } else if(arg1 == Int.ONE && arg2 instanceof Arith) {
               // expr[position() = 1 to last() - 1]
-              final Expr[] arth = args[1].args();
-              if(LAST.is(arth[0]) && ((Arith) args[1]).calc == Calc.MINUS && arth[1] == Int.ONE) {
+              final Expr arth1 = arg2.arg(0), arth2 = arg2.arg(1);
+              if(LAST.is(arth1) && ((Arith) arg2).calc == Calc.MINUS && arth2 == Int.ONE) {
                 ex = cc.function(_UTIL_INIT, info, prepare.apply(expr));
               }
             }
           }
         }
+      } else if(pred instanceof Arith && LAST.is(pred.arg(0)) && preds.isEmpty()) {
+        // expr[last() - 1]  ->  util:item(expr, count(expr) - 1)
+        final long es = expr.size();
+        if(es != -1) ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr),
+            new Arith(info, Int.get(es), pred.arg(1), ((Arith) pred).calc).optimize(cc));
       }
       // replace temporary result expression or add predicate to temporary list
       if(ex != null) {

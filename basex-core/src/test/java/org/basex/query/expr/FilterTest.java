@@ -307,6 +307,8 @@ public final class FilterTest extends QueryPlanTest {
 
   /** Start position. */
   @Test public void gh1641() {
+    query("(1 to 2)[position() = .]", "1\n2");
+    query("(1 to 2)[position() != .]", "");
     query("((1 to 2)[. != 0])[position() != .]", "");
   }
 

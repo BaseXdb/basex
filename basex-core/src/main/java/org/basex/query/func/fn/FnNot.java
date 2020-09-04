@@ -39,6 +39,16 @@ public final class FnNot extends StandardFunc {
       final Expr ex = ((Cmp) expr).invert(cc);
       if(ex != expr) return ex;
     }
+    // not(position() = 3)  ->  position() != 3
+    if(expr instanceof ItrPos) {
+      final Expr ex = ((ItrPos) expr).invert(cc);
+      if(ex != expr) return ex;
+    }
+    // not(position() = <_>3</_>)  ->  position() != 3
+    if(expr instanceof Pos) {
+      final Expr ex = ((Pos) expr).invert(cc);
+      if(ex != expr) return ex;
+    }
     // not($node/text())  ->  empty($node/text())
     final SeqType st = expr.seqType();
     if(st.type instanceof NodeType) return cc.function(EMPTY, info, expr);
