@@ -53,7 +53,7 @@ public final class QueryString {
    * @return self reference
    */
   public QueryString function(final Function function, final Object... args) {
-    token(function.args(args));
+    token(function.args(args).trim());
     return this;
   }
 

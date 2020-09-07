@@ -173,7 +173,7 @@ public final class FuncDefinition {
    * <li>strings starting with a space (which will be chopped)</li>
    * </ul>
    * @param args arguments
-   * @return string representation (prefixed with a space to simplify nesting of returned string)
+   * @return string representation with leading space (simplifies nesting of returned string)
    */
   String args(final Object... args) {
     final TokenBuilder tb = new TokenBuilder();
