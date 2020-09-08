@@ -316,11 +316,11 @@ public final class Array {
   /**
    * Raises an exception if the specified size exceeds the maximum array size.
    * @param size array capacity
-   * @return argument as integer
+   * @return argument as integer, or {@code 0} if the argument is negative
    */
   public static int checkCapacity(final long size) {
     if(size > MAX_SIZE) throw new ArrayIndexOutOfBoundsException("Maximum array size reached.");
-    return (int) size;
+    return Math.max(0, (int) size);
   }
 
   /**

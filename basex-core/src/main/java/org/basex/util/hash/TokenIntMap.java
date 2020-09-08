@@ -67,6 +67,13 @@ public final class TokenIntMap extends TokenSet {
   }
 
   @Override
+  public int remove(final byte[] key) {
+    final int i = super.remove(key);
+    values[i] = -1;
+    return i;
+  }
+
+  @Override
   protected void rehash(final int newSize) {
     super.rehash(newSize);
     values = Arrays.copyOf(values, newSize);

@@ -56,11 +56,10 @@ public class ArchiveCreateFrom extends ArchiveCreate {
         while(true) {
           final Item en = qc.next(entries);
           if(en == null) break;
-          checkElemToken(en);
-          final IOFile file = new IOFile(root, string(en.string(info)));
+          final IOFile file = new IOFile(root, string(checkElemToken(en).string(info)));
           if(!file.exists()) throw FILE_NOT_FOUND_X.get(info, file);
           if(file.isDir()) throw FILE_IS_DIR_X.get(info, file);
-          add(en, B64.get(file.read()), out, level, dir, qc);
+          add(new Item[] { en, B64.get(file.read()) }, out, level, dir, qc);
         }
       } catch(final IOException ex) {
         throw ARCHIVE_ERROR_X.get(info, ex);

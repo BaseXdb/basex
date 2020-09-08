@@ -24,31 +24,19 @@ import org.basex.util.*;
 public class ArchiveCreate extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter entries = exprs[0].iter(qc), contents = exprs[1].iter(qc);
+    final Map<String, Item[]> map = toMap(0, qc);
     final CreateOptions opts = toOptions(2, new CreateOptions(), qc);
 
     // check options
     final String format = opts.get(CreateOptions.FORMAT);
-    final int level = level(opts);
+    if(format.equals(GZIP) && map.size() > 1) throw ARCHIVE_SINGLE_X.get(info, format);
 
+    final int level = level(opts);
     try(ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info)) {
       out.level(level);
       try {
-        int e = 0, c = 0;
-        while(true) {
-          final Item en = qc.next(entries), cn = contents.next();
-          if(en == null || cn == null) {
-            // count remaining entries
-            if(cn != null) do c++; while(contents.next() != null);
-            if(en != null) do e++; while(entries.next() != null);
-            if(e != c) throw ARCHIVE_NUMBER_X_X.get(info, e, c);
-            break;
-          }
-          if(out instanceof GZIPOut && c > 0)
-            throw ARCHIVE_SINGLE_X.get(info, format.toUpperCase(Locale.ENGLISH));
-          add(checkElemToken(en), cn, out, level, "", qc);
-          e++;
-          c++;
+        for(final Item[] entry : map.values()) {
+          add(entry, out, level, "", qc);
         }
       } catch(final IOException ex) {
         throw ARCHIVE_ERROR_X.get(info, ex);
@@ -79,8 +67,7 @@ public class ArchiveCreate extends ArchiveFn {
 
   /**
    * Adds the specified entry to the output stream.
-   * @param entry entry descriptor
-   * @param content contents
+   * @param entry archive entry
    * @param out output archive
    * @param level default compression level
    * @param root root path (empty, or ending with slash)
@@ -88,12 +75,12 @@ public class ArchiveCreate extends ArchiveFn {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  protected final void add(final Item entry, final Item content, final ArchiveOut out,
-      final int level, final String root, final QueryContext qc)
-      throws QueryException, IOException {
+  protected final void add(final Item[] entry, final ArchiveOut out, final int level,
+      final String root, final QueryContext qc) throws QueryException, IOException {
 
     // create new zip entry
-    String name = string(entry.string(info));
+    final Item header = entry[0], content = entry[1];
+    String name = string(header.string(info));
     if(name.isEmpty()) throw ARCHIVE_DESCRIPTOR1.get(info);
     if(Prop.WIN) name = name.replace('\\', '/');
 
@@ -102,8 +89,8 @@ public class ArchiveCreate extends ArchiveFn {
 
     // compression level
     byte[] lvl = null;
-    if(entry instanceof ANode) {
-      final ANode el = (ANode) entry;
+    if(header instanceof ANode) {
+      final ANode el = (ANode) header;
       lvl = el.attribute(LEVEL);
 
       // last modified
@@ -126,8 +113,8 @@ public class ArchiveCreate extends ArchiveFn {
     }
 
     // data to be compressed
-    byte[] val = toBytes(content);
-    if(!(content instanceof Bin) && encoding != Strings.UTF8) val = encode(val, encoding, qc);
+    byte[] value = toBytes(content);
+    if(!(content instanceof Bin) && encoding != Strings.UTF8) value = encode(value, encoding, qc);
 
     try {
       out.level(lvl == null ? level : toInt(lvl));
@@ -135,6 +122,33 @@ public class ArchiveCreate extends ArchiveFn {
       Util.debug(ex);
       throw ARCHIVE_DESCRIPTOR2_X.get(info, lvl);
     }
-    out.write(ze, val);
+    out.write(ze, value);
+  }
+
+  /**
+   * Returns archive entries and contents.
+   * @param i index for supplied entries
+   * @param qc query context
+   * @return map with file names and entries and contents
+   * @throws QueryException query exception
+   */
+  final Map<String, Item[]> toMap(final int i, final QueryContext qc) throws QueryException {
+    final Iter entries = exprs[i].iter(qc), contents = exprs[i + 1].iter(qc);
+    final Map<String, Item[]> map = new LinkedHashMap<>();
+    int e = 0, c = 0;
+    while(true) {
+      final Item en = qc.next(entries), cn = contents.next();
+      if(en == null || cn == null) {
+        // count remaining entries
+        if(cn != null) do c++; while(contents.next() != null);
+        if(en != null) do e++; while(entries.next() != null);
+        if(e != c) throw ARCHIVE_NUMBER_X_X.get(info, e, c);
+        break;
+      }
+      map.put(string(checkElemToken(en).string(info)), new Item[] { en, cn });
+      e++;
+      c++;
+    }
+    return map;
   }
 }
