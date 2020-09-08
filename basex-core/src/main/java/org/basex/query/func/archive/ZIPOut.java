@@ -14,6 +14,8 @@ import org.basex.util.*;
 final class ZIPOut extends ArchiveOut {
   /** ZIP output stream. */
   private final ZipOutputStream zos;
+  /** Method. */
+  private int method;
 
   /**
    * Writing constructor.
@@ -24,6 +26,8 @@ final class ZIPOut extends ArchiveOut {
 
   @Override
   public void level(final int l) {
+    method = l == 0 ? ZipEntry.STORED : ZipEntry.DEFLATED;
+    zos.setMethod(method);
     zos.setLevel(l);
   }
 
@@ -40,6 +44,12 @@ final class ZIPOut extends ArchiveOut {
 
   @Override
   public void write(final ZipEntry entry, final byte[] value) throws IOException {
+    if(method == ZipEntry.STORED) {
+      entry.setSize(value.length);
+      final CRC32 crc = new CRC32();
+      crc.update(value);
+      entry.setCrc(crc.getValue());
+    }
     zos.putNextEntry(entry);
     zos.write(value);
     zos.closeEntry();
