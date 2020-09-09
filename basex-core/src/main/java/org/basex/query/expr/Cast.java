@@ -63,11 +63,15 @@ public final class Cast extends Single {
     }
 
     // skip cast if input and target types are equal
-    // ('a' cast as xs:string)  ->  'a'
-    // xs:string(''[. = <_/>])  ->  ''[. = <_/>]
-    final SeqType dst = exprType.seqType();
-    if(ast.occ.instanceOf(dst.occ) && ast.type.eq(dt)) return cc.replaceWith(this, expr);
-
+    // (123 cast as xs:integer)  ->  123
+    // xs:string('x'[. != 'y'])  ->  'x'[. != 'y']
+    // (1, 2.0) ! xs:numeric(.)  ->  (1, 2.0)
+    if(ast.occ.instanceOf(exprType.seqType().occ)) {
+      final Type at = ast.type;
+      if(at.eq(dt) || dt == AtomType.NUM && at.instanceOf(dt)) {
+        return cc.replaceWith(this, expr);
+      }
+    }
     return this;
   }
 
