@@ -3,8 +3,10 @@ package org.basex.query.func.math;
 import static java.lang.StrictMath.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -16,9 +18,23 @@ import org.basex.util.*;
 public final class MathPow extends MathFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = exprs[0].atomItem(qc, info);
-    return item == Empty.VALUE ? Empty.VALUE :
-      Dbl.get(power(toDouble(item), toDouble(exprs[1], qc)));
+    final Item base = exprs[0].atomItem(qc, info);
+    final double exp = toDouble(exprs[1], qc);
+    return base == Empty.VALUE ? Empty.VALUE : Dbl.get(power(toDouble(base), exp));
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr base = exprs[0];
+    if(base instanceof ANum && ((ANum) base).dbl() == 1) return Dbl.ONE;
+
+    final Expr exp = exprs[1];
+    if(exp instanceof ANum) {
+      final double e = ((ANum) exp).dbl();
+      if(e == 0) return Dbl.ONE;
+      if(e == 1) return new Cast(sc, info, base, SeqType.DBL_O).optimize(cc);
+    }
+    return super.opt(cc);
   }
 
   /**

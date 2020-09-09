@@ -1978,12 +1978,4 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $i in 1 to 2 return (3 to 4)[not(position() > $i)]", "3\n3\n4", exists(_UTIL_RANGE));
     check("for $i in 1 to 2 return (3 to 4)[not(position() < $i)]", "3\n4\n4", exists(_UTIL_RANGE));
   }
-
-  /** Merge arithmetic expressions. */
-  @Test public void gh1938() {
-    check("<_>1</_> + 1 - 1", 1, count(Arith.class, 1));
-    check("<_>6</_> div 3 * 2", 4, count(Arith.class, 1));
-    check("(1 to 2) ! (<_>1</_> + . - .)", "1\n1", empty(Arith.class), exists(Cast.class));
-    check("(1 to 2) ! (<_>{ . }</_> + . - .)", "1\n2", empty(Arith.class), exists(Cast.class));
-  }
 }

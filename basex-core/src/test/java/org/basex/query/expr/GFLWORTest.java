@@ -201,7 +201,7 @@ public final class GFLWORTest extends QueryPlanTest {
         "let $x := $len div 2 " +
         "return count($w) div ($x + $x)",
         "1\n1\n1\n1\n1\n1",
-        "//For << //Let and //Let << //Window"
+        empty(Let.class)
     );
   }
 
