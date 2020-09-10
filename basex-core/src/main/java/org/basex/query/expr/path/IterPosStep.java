@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
-final class IterPosStep extends Step {
+public final class IterPosStep extends Step {
   /**
    * Constructor.
    * @param info input info
@@ -33,7 +33,7 @@ final class IterPosStep extends Step {
   @Override
   public NodeIter iter(final QueryContext qc) {
     return new NodeIter() {
-      final ItrPos[] posExpr = new ItrPos[exprs.length];
+      final CmpPos[] posExpr = new CmpPos[exprs.length];
       final long[] cPos = new long[exprs.length];
       BasicNodeIter iter;
       boolean skip;
@@ -46,15 +46,15 @@ final class IterPosStep extends Step {
           final int el = exprs.length;
           for(int e = 0; e < el; e++) {
             final Expr expr = exprs[e];
-            if(expr instanceof ItrPos) {
-              posExpr[e] = (ItrPos) expr;
+            if(expr instanceof CmpPos) {
+              posExpr[e] = (CmpPos) expr;
             } else if(numeric(expr)) {
               // pre-evaluate numeric position
               final Item item = expr.item(qc, info);
               if(item == Empty.VALUE) return null;
               final Expr ex = ItrPos.get(toDouble(item), info);
-              if(!(ex instanceof ItrPos)) return null;
-              posExpr[e] = (ItrPos) ex;
+              if(!(ex instanceof CmpPos)) return null;
+              posExpr[e] = (CmpPos) ex;
             }
           }
         }
@@ -75,15 +75,16 @@ final class IterPosStep extends Step {
           final int pl = exprs.length;
           for(int p = 0; p < pl; p++) {
             final Expr pred = exprs[p];
-            final ItrPos pos = posExpr[p];
+            final CmpPos pos = posExpr[p];
             if(pos == null) {
               final Item tst = pred.test(qc, info);
               if(tst == null) return false;
               if(s != -1) s += tst.score();
             } else {
               final long ps = ++cPos[p];
-              if(!pos.matches(ps)) return false;
-              if(pos.skip(ps)) skip = true;
+              final int t = pos.test(ps, qc);
+              if(t == 0) return false;
+              if(t == 2) skip = true;
             }
           }
           if(s > 0) node.score(Scoring.avg(s, exprs.length));

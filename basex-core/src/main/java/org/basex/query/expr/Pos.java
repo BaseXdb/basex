@@ -16,12 +16,12 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Position check expression.
+ * Position range check.
  *
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
-public final class Pos extends Arr {
+public final class Pos extends Arr implements CmpPos {
   /**
    * Constructor.
    * @param info input info
@@ -93,28 +93,24 @@ public final class Pos extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     simplifyAll(Simplify.NUMBER, cc);
+
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if(expr1 instanceof Int && expr2 instanceof Int) {
+      return cc.replaceWith(this, ItrPos.get(((Int) expr1).itr(), ((Int) expr2).itr(), info));
+    }
     return this;
   }
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     ctxValue(qc);
-
-    final Item item1 = exprs[0].atomItem(qc, info);
-    if(item1 == Empty.VALUE) return Bln.FALSE;
-    final long pos = qc.focus.pos;
-    final double start = toDouble(item1);
-    if(exact()) return Bln.get(pos == start);
-
-    final Item item2 = exprs[1].atomItem(qc, info);
-    if(item2 == Empty.VALUE) return Bln.FALSE;
-    final double end = toDouble(item2);
-    return Bln.get(pos >= start && pos <= end);
+    return Bln.get(test(qc.focus.pos, qc) != 0);
   }
 
   @Override
   public Pos copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Pos(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
+    final Expr min = exprs[0].copy(cc, vm), max = exact() ? min : exprs[1].copy(cc, vm);
+    return copyType(new Pos(info, min, max));
   }
 
   @Override
@@ -123,39 +119,53 @@ public final class Pos extends Arr {
     final Pos pos = (Pos) ex;
     final Expr[] posExpr = pos.exprs;
     if(!exact() && !pos.exact()) {
-      final Expr min = exprs[0] == Int.ONE ? posExpr[0] : posExpr[0] == Int.ONE ? exprs[0] : null;
-      final Expr max = exprs[1] == Int.MAX ? posExpr[1] : posExpr[1] == Int.MAX ? exprs[1] : null;
+      final Expr expr1 = exprs[0], expr2 = exprs[1];
+      final Expr min = expr1 == Int.ONE ? posExpr[0] : posExpr[0] == Int.ONE ? expr1 : null;
+      final Expr max = expr2 == Int.MAX ? posExpr[1] : posExpr[1] == Int.MAX ? expr2 : null;
       if(min != null && max != null) return new Pos(info, min, max);
     }
     return null;
   }
 
-  /**
-   * If possible, returns an optimized expression with inverted operands.
-   * @param cc compilation context
-   * @return original or modified expression
-   * @throws QueryException query exception
-   */
+  @Override
   public Expr invert(final CompileContext cc) throws QueryException {
     if(exprs[0].seqType().one()) {
       final Expr pos = cc.function(Function.POSITION, info);
+      final Expr expr1 = exprs[0], expr2 = exprs[1];
       if(exact()) {
-        return new CmpG(pos, exprs[0], OpG.NE, null, cc.sc(), info).optimize(cc);
-      } else if(exprs[0] == Int.ONE) {
-        return new CmpG(pos, exprs[1], OpG.GT, null, cc.sc(), info).optimize(cc);
-      } else if(exprs[1] == Int.MAX) {
-        return new CmpG(pos, exprs[0], OpG.LT, null, cc.sc(), info).optimize(cc);
+        return new CmpG(pos, expr1, OpG.NE, null, cc.sc(), info).optimize(cc);
+      } else if(expr1 == Int.ONE) {
+        return new CmpG(pos, expr2, OpG.GT, null, cc.sc(), info).optimize(cc);
+      } else if(expr2 == Int.MAX) {
+        return new CmpG(pos, expr1, OpG.LT, null, cc.sc(), info).optimize(cc);
       }
     }
     return this;
   }
 
-  /**
-   * Checks if minimum and maximum expressions are identical.
-   * @return result of check
-   */
-  boolean exact() {
+  @Override
+  public boolean exact() {
     return exprs[0] == exprs[1];
+  }
+
+  @Override
+  public boolean simple() {
+    return exprs[0].isSimple() && (exact() || exprs[1].isSimple());
+  }
+
+  @Override
+  public int test(final long pos, final QueryContext qc) throws QueryException {
+    final Item item1 = exprs[0].atomItem(qc, info);
+    if(item1 == Empty.VALUE) return 0;
+    final double min = toDouble(item1), max;
+    if(exact()) {
+      max = min;
+    } else {
+      final Item item2 = exprs[1].atomItem(qc, info);
+      if(item2 == Empty.VALUE) return 0;
+      max = toDouble(item2);
+    }
+    return pos == max ? 2 : pos >= min && pos <= max ? 1 : 0;
   }
 
   @Override
