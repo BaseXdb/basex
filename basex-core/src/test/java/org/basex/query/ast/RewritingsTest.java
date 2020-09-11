@@ -317,10 +317,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("'a'[position() <= 1]", "a", "exists(QueryPlan/Str)");
 
     // check if positional predicates are rewritten to utility functions
-    check("for $i in (1, 2) return 'a'[$i]", "a", exists(_UTIL_ITEM));
-    check("for $i in (1, 2) return 'a'[position() = $i]", "a", exists(_UTIL_ITEM));
-    check("for $i in (1, 2) return 'a'[position() = $i to $i]", "a", exists(_UTIL_ITEM));
-    check("for $i in (1, 2) return 'a'[position() = $i to $i+1]", "a", exists(_UTIL_RANGE));
+    check("for $i in (1, 2) return 'a'[$i]", "a", root(Str.class));
+    check("for $i in (1, 2) return 'a'[position() = $i]", "a", root(Str.class));
+    check("for $i in (1, 2) return 'a'[position() = $i to $i]", "a", root(Str.class));
+    check("for $i in (1, 2) return 'a'[position() = $i to $i + 1]", "a", exists(_UTIL_RANGE));
     check("for $i in (1, 2) return 'a'[position() = $i to 1]", "a", exists(_UTIL_RANGE));
     check("for $i in (1, 2) return 'a'[position() >= $i]", "a", exists(_UTIL_RANGE));
     check("for $i in (1, 2) return 'a'[position() > $i]", "", exists(_UTIL_RANGE));
@@ -329,48 +329,48 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // check if positional predicates are rewritten to utility functions
     final String seq = " (1, 1.1, 1.9, 2) ";
-    check("for $i in" + seq + "return ('a', 'b')[$i]", "a\nb",
-        exists(_UTIL_ITEM));
-    check("for $i in" + seq + "return ('a', 'b')[position() = $i]", "a\nb",
-        exists(_UTIL_ITEM));
-    check("for $i in" + seq + "return ('a', 'b')[position() >= $i]", "a\nb\nb\nb\nb",
-        exists(_UTIL_RANGE));
-    check("for $i in" + seq + "return ('a', 'b')[position() > $i]", "b\nb\nb",
-        exists(_UTIL_RANGE));
-    check("for $i in" + seq + "return ('a', 'b')[position() <= $i]", "a\na\na\na\nb",
-        exists(_UTIL_RANGE));
-    check("for $i in" + seq + "return ('a', 'b')[position() < $i]", "a\na\na",
-        exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a', 'b')[$i]",
+        "a\nb", exists(_UTIL_ITEM));
+    check("for $i in" + seq + "return ('a', 'b')[position() = $i]",
+        "a\nb", exists(_UTIL_ITEM));
+    check("for $i in" + seq + "return ('a', 'b')[position() >= $i]",
+        "a\nb\nb\nb\nb", exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a', 'b')[position() > $i]",
+        "b\nb\nb", exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a', 'b')[position() <= $i]",
+        "a\na\na\na\nb", exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a', 'b')[position() < $i]",
+        "a\na\na", exists(_UTIL_RANGE));
 
     // check if multiple positional predicates are rewritten to utility functions
-    check("for $i in" + seq + "return ('a', 'b')[$i][$i]", "a",
-        count(_UTIL_ITEM, 2));
-    check("for $i in" + seq + "return ('a', 'b')[position() = $i][position() = $i]", "a",
-        count(_UTIL_ITEM, 2));
-    check("for $i in" + seq + "return ('a', 'b')[position() < $i][position() < $i]", "a\na\na",
-        count(_UTIL_RANGE, 2));
+    check("for $i in" + seq + "return ('a', 'b')[$i][$i]",
+        "a", count(_UTIL_ITEM, 2));
+    check("for $i in" + seq + "return ('a', 'b')[position() = $i][position() = $i]",
+        "a", count(_UTIL_ITEM, 2));
+    check("for $i in" + seq + "return ('a', 'b')[position() < $i][position() < $i]",
+        "a\na\na", count(_UTIL_RANGE, 2));
 
     // check if positional predicates are merged and rewritten to utility functions
     check("for $i in" + seq + "return ('a', 'b')[position() = $i and position() = $i]", "a\nb",
         exists(_UTIL_ITEM));
     check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() <= $i]", "a\nb",
         exists(_UTIL_RANGE));
-    check("for $i in" + seq + "return ('a', 'b')[position() <= $i and position() >= $i]", "a\nb",
-        exists(_UTIL_RANGE));
-    check("for $i in" + seq + "return ('a', 'b')[position() > $i and position() < $i]", "",
-        exists(_UTIL_RANGE));
-    check("for $i in" + seq + "return ('a', 'b')[position() < $i and position() > $i]", "",
-        exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a', 'b')[position() <= $i and position() >= $i]",
+        "a\nb", exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a', 'b')[position() > $i and position() < $i]",
+        "", exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a', 'b')[position() < $i and position() > $i]",
+        "", exists(_UTIL_RANGE));
 
     // no rewriting possible (conflicting positional predicates)
-    check("for $i in" + seq + "return ('a', 'b')[position() = $i and position() = $i+1]", "",
-        exists(CachedFilter.class));
-    check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() > $i]", "b\nb\nb",
-        exists(CachedFilter.class));
-    check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() >= $i+1]", "b",
-        exists(CachedFilter.class));
-    check("for $i in" + seq + "return ('a', 'b')[position() < $i and position() < $i+1]", "a\na\na",
-        exists(CachedFilter.class));
+    check("for $i in" + seq + "return ('a', 'b')[position() = $i and position() = $i + 1]",
+        "", exists(CachedFilter.class));
+    check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() > $i]",
+        "b\nb\nb", exists(CachedFilter.class));
+    check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() >= $i + 1]",
+        "b", exists(CachedFilter.class));
+    check("for $i in" + seq + "return ('a', 'b')[position() < $i and position() < $i + 1]",
+        "a\na\na", exists(CachedFilter.class));
 
     check("(<a/>, <b/>)[last()]",
         "<b/>", root(CElem.class));

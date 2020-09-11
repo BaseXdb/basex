@@ -10,6 +10,7 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.func.util.*;
 import org.basex.query.util.*;
@@ -187,15 +188,35 @@ public abstract class SimpleMap extends Arr {
             // (1 to $c) ! 'A'  ->  util:replicate('A', $c, false())
             ex = cc.replicate(next, count, info);
           }
-        } else if(_UTIL_REPLICATE.is(next) && ((UtilReplicate) next).single() &&
-            next.arg(0) instanceof ContextValue) {
-          if(_UTIL_REPLICATE.is(expr) && ((UtilReplicate) expr).single()) {
-            // util:replicate(E, C) ! util:replicate(., D)  ->  util:replicate(E, C * D)
-            final Expr cnt = new Arith(info, expr.arg(1), next.arg(1), Calc.MULT).optimize(cc);
-            ex = cc.function(_UTIL_REPLICATE, info, expr.arg(0), cnt);
-          } else if(expr instanceof SingletonSeq && ((SingletonSeq) expr).value instanceof Item) {
-            // SINGLETONSEQ ! util:replicate(., C)  ->  util:replicate(SINGLETONSEQ, C)
-            ex = cc.function(_UTIL_REPLICATE, info, expr, next.arg(1));
+        } else if(next instanceof StandardFunc && !next.has(Flag.NDT)) {
+          final Expr[] args = next.args();
+          if(_UTIL_REPLICATE.is(next) && ((UtilReplicate) next).single() &&
+              args[0] instanceof ContextValue && !args[1].has(Flag.CTX)) {
+            if(_UTIL_REPLICATE.is(expr) && ((UtilReplicate) expr).single()) {
+              // util:replicate(E, C) ! util:replicate(., D)  ->  util:replicate(E, C * D)
+              final Expr cnt = new Arith(info, expr.arg(1), args[1], Calc.MULT).optimize(cc);
+              ex = cc.function(_UTIL_REPLICATE, info, expr.arg(0), cnt);
+            } else if(expr instanceof SingletonSeq && ((SingletonSeq) expr).value instanceof Item) {
+              // SINGLETONSEQ ! util:replicate(., C)  ->  util:replicate(SINGLETONSEQ, C)
+              ex = cc.function(_UTIL_REPLICATE, info, expr, args[1]);
+            }
+          } else if(_UTIL_ITEM.is(next) && !args[0].has(Flag.CTX) &&
+              args[1] instanceof ContextValue) {
+            if(expr instanceof RangeSeq) {
+              final RangeSeq range = (RangeSeq) expr;
+              final Item start = range.itemAt(0), end = range.itemAt(range.size() - 1);
+              if(range.asc) {
+                // (3 to 4) ! util:item(X, .)  ->  util:range(X, 3, 4)
+                ex = cc.function(_UTIL_RANGE, info, args[0], start, end);
+              } else {
+                // reverse(3 to 4) ! util:item(X, .)  ->  reverse(util:range(X, 3, 4))
+                ex = cc.function(_UTIL_RANGE, info, args[0], end, start);
+                ex = cc.function(REVERSE, info, ex);
+              }
+            } else if(expr instanceof Range) {
+              // (1 to $i) ! util:item(X, .)  ->  util:range(X, 1, $i)
+              ex = cc.function(_UTIL_RANGE, info, args[0], expr.arg(0), expr.arg(1));
+            }
           }
         }
       }

@@ -113,4 +113,10 @@ public final class SimpleMapTest extends QueryPlanTest {
     check("(1 to 2) ! util:replicate('a', 2) ! util:replicate('a', 2)", "a\na\na\na\na\na\na\na",
         exists(SingletonSeq.class) + " and .//@size = 8");
   }
+
+  /** Positional access. */
+  @Test public void positional() {
+    check("for $i in 2 to 3 return (1 to 4)[$i]", "2\n3", root(RangeSeq.class));
+    check("(2 to 3) ! util:item((1 to 4), .)", "2\n3", root(RangeSeq.class));
+  }
 }
