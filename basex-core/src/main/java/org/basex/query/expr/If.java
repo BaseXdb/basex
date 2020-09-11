@@ -276,6 +276,7 @@ public final class If extends Arr {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.token(IF).paren(cond).token(THEN).token(exprs[0]).token(ELSE).token(exprs[1]);
+    qs.token("(").token(IF).paren(cond).token(THEN).token(exprs[0]);
+    qs.token(ELSE).token(exprs[1]).token(')');
   }
 }

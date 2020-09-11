@@ -153,6 +153,6 @@ public final class CmpN extends Cmp {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.tokens(exprs, " " + op + ' ', false);
+    qs.tokens(exprs, " " + op + ' ', true);
   }
 }

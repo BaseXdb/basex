@@ -403,6 +403,6 @@ public class CmpG extends Cmp {
 
   @Override
   public final void plan(final QueryString qs) {
-    qs.tokens(exprs, " " + op + ' ', false);
+    qs.tokens(exprs, " " + op + ' ', true);
   }
 }

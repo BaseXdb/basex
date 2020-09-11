@@ -250,6 +250,6 @@ public final class CmpV extends Cmp {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.tokens(exprs, " " + opV + ' ', false);
+    qs.tokens(exprs, " " + opV + ' ', true);
   }
 }

@@ -1017,7 +1017,7 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.tokens(clauses.toArray()).token(QueryText.RETURN).token(rtrn);
+    qs.token("(").tokens(clauses.toArray()).token(QueryText.RETURN).token(rtrn).token(')');
   }
 
   /** Start evaluator, doing nothing, once. */
