@@ -131,7 +131,7 @@ abstract class Ids extends ContextFn {
   }
 
   @Override
-  final int contextArg() {
+  public final int contextArg() {
     return 1;
   }
 

@@ -192,6 +192,11 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" sort((<a>A</a>, <b>A</b>))"), "A", empty(SORT));
     check(func.args(" sort((<a>A</a>, <b>A</b>)[data()])"), "A", empty(SORT));
     check(func.args(" sort((<a>A</a>, <b>A</b>))[data()]"), "A", empty(SORT));
+
+    // single value: replace with data
+    check(func.args(" <_>A</_>"), "A", root(DATA));
+    check("(<a/>, <b/>) ! " + func.args(" ."), "\n", root(DATA));
+    check("(1 to 2) ! " + func.args(" ."), "1\n2", root(RangeSeq.class));
   }
 
   /** Test method. */

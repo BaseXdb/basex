@@ -20,7 +20,7 @@ public final class FnInsertBefore extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
-    final long pos = Math.max(1, toLong(exprs[1], qc));
+    final long pos = pos(qc);
     final Iter insert = exprs[2].iter(qc);
 
     return new Iter() {
@@ -30,13 +30,13 @@ public final class FnInsertBefore extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         while(!last) {
-          final boolean sub = p == 0 || --p == 0;
+          final boolean sub = p == -1 || --p == -1;
           final Item item = qc.next(sub ? insert : iter);
           if(item != null) return item;
           if(sub) --p;
           else last = true;
         }
-        return p > 0 ? insert.next() : null;
+        return p >= 0 ? insert.next() : null;
       }
     };
   }
@@ -44,28 +44,46 @@ public final class FnInsertBefore extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value value = exprs[0].value(qc);
-    final long pos = toLong(exprs[1], qc);
     final Value insert = exprs[2].value(qc);
 
     // prepend, append or insert new value
-    final long size = value.size(), ps = Math.min(Math.max(0, pos - 1), size);
-    return ps == 0 ? ValueBuilder.concat(insert, value, qc) :
-           ps == size ? ValueBuilder.concat(value, insert, qc) :
-           ((Seq) value).insertBefore(ps, insert, qc);
+    final long size = value.size(), pos = Math.min(pos(qc), size);
+    return pos == 0 ? ValueBuilder.concat(insert, value, qc) :
+           pos == size ? ValueBuilder.concat(value, insert, qc) :
+           ((Seq) value).insertBefore(pos, insert, qc);
+  }
+
+
+  /**
+   * Returns the insertion position.
+   * @param qc query context
+   * @return position
+   * @throws QueryException query exception
+   */
+  private long pos(final QueryContext qc) throws QueryException {
+    return Math.max(0, toLong(exprs[1], qc) - 1);
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    final Expr expr1 = exprs[0], expr3 = exprs[2];
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr expr1 = exprs[0], expr2 = exprs[1], expr3 = exprs[2];
     if(expr1 == Empty.VALUE) return expr3;
     if(expr3 == Empty.VALUE) return expr1;
 
     final SeqType st1 = expr1.seqType(), st3 = expr3.seqType();
     final long size1 = expr1.size(), size3 = expr3.size();
+
+    if(expr2 instanceof Value) {
+      final long pos = pos(cc.qc);
+      if(pos == 0) return List.get(cc, info, expr3, expr1);
+      if(size1 != -1 && pos >= size1) return List.get(cc, info, expr1, expr3);
+    }
+
     final long sz = size1 != -1 && size3 != -1 ? size1 + size3 : -1;
     exprType.assign(st1.union(st3), st1.occ.add(st3.occ), sz);
     final Data data = expr1.data();
     if(data != null && expr3.data() == data) data(data);
+
     return this;
   }
 }

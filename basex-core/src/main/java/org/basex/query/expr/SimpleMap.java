@@ -177,11 +177,9 @@ public abstract class SimpleMap extends Arr {
           Expr count = null;
           if(es != -1) {
             count = Int.get(es);
-          } else if(expr instanceof Range) {
-            final Range rng = (Range) expr;
-            if(rng.exprs[0] == Int.ONE && rng.exprs[1].seqType().eq(SeqType.ITR_O)) {
-              count = rng.exprs[1];
-            }
+          } else if(expr instanceof Range && expr.arg(0) == Int.ONE &&
+              expr.arg(1).seqType().eq(SeqType.ITR_O)) {
+            count = expr.arg(1);
           }
           if(count != null) {
             // (1 to 2) ! <x/>  ->  util:replicate(<x/>, 2, true())
@@ -189,6 +187,7 @@ public abstract class SimpleMap extends Arr {
             ex = cc.replicate(next, count, info);
           }
         } else if(next instanceof StandardFunc && !next.has(Flag.NDT)) {
+          // next operand relies on context and is a deterministic function call
           final Expr[] args = next.args();
           if(_UTIL_REPLICATE.is(next) && ((UtilReplicate) next).single() &&
               args[0] instanceof ContextValue && !args[1].has(Flag.CTX)) {
@@ -217,6 +216,10 @@ public abstract class SimpleMap extends Arr {
               // (1 to $i) ! util:item(X, .)  ->  util:range(X, 1, $i)
               ex = cc.function(_UTIL_RANGE, info, args[0], expr.arg(0), expr.arg(1));
             }
+          } else if(DATA.is(next) && (((FnData) next).contextAccess() ||
+              args[0] instanceof ContextValue)) {
+            // ITEMS ! data(.)  ->  data(ITEMS)
+            ex = cc.function(DATA, info, expr);
           }
         }
       }

@@ -142,8 +142,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   DOCUMENT_URI(FnDocumentUri::new, "document-uri([node])", arg(NOD_ZO), URI_ZO),
   /** XQuery function. */
-  ELEMENT_WITH_ID(FnElementWithId::new, "element-with-id(string[,node])",
-      arg(STR_ZM, NOD_O), ELM_ZM),
+  ELEMENT_WITH_ID(FnElementWithId::new, "element-with-id(ids[,node])", arg(STR_ZM, NOD_O), ELM_ZM),
   /** XQuery function. */
   EMPTY(FnEmpty::new, "empty(items)", arg(ITEM_ZM), BLN_O),
   /** XQuery function. */

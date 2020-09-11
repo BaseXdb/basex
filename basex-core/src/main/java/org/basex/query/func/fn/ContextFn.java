@@ -20,7 +20,7 @@ public abstract class ContextFn extends StandardFunc {
    * Argument that provides the context.
    * @return context argument.
    */
-  int contextArg() {
+  public int contextArg() {
     return 0;
   }
 
@@ -28,7 +28,7 @@ public abstract class ContextFn extends StandardFunc {
    * Indicates if the function accesses the current context.
    * @return result of check
    */
-  final boolean contextAccess() {
+  public final boolean contextAccess() {
     return exprs.length == contextArg();
   }
 

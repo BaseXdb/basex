@@ -80,11 +80,14 @@ public final class FnDistinctValues extends StandardFunc {
 
     final AtomType type = st.type.atomic();
     if(type != null) {
-      // single value, same type: return argument
-      if(type == st.type && st.one() && exprs.length == 1) return expr;
       // assign atomic type of argument
       exprType.assign(type);
       simple = st.zeroOrOne();
+
+      // distinct-values($string)  ->  $string
+      // distinct-values($node)  ->  data($node)
+      if(simple && exprs.length == 1) return type == st.type ? expr :
+        cc.function(Function.DATA, info, exprs);
     }
     return optStats(expr, cc);
   }

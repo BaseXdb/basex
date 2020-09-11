@@ -119,4 +119,10 @@ public final class SimpleMapTest extends QueryPlanTest {
     check("for $i in 2 to 3 return (1 to 4)[$i]", "2\n3", root(RangeSeq.class));
     check("(2 to 3) ! util:item((1 to 4), .)", "2\n3", root(RangeSeq.class));
   }
+
+  /** Inline sequences. */
+  @Test public void inlineSequences() {
+    check("(<a/>, <b/>) ! data()", "\n", root(DATA));
+    check("(<a/>, <b/>) ! data(.)", "\n", root(DATA));
+  }
 }
