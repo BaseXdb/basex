@@ -40,7 +40,9 @@ public final class TransformWith extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    exprType.assign(exprs[0]);
+    // name of node may change
+    final SeqType st = exprs[0].seqType();
+    exprType.assign(st.type, st.occ);
     return this;
   }
 
