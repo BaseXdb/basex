@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -39,10 +40,10 @@ public final class Instance extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // pre-evaluate (check value)
+    // check value
     if(expr instanceof Value) return cc.preEval(this);
 
-    // pre-evaluate (check static type)
+    // check static type
     Expr ex = this;
     if(!expr.has(Flag.NDT)) {
       final SeqType st = expr.seqType();
@@ -56,7 +57,33 @@ public final class Instance extends Single {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(seqType.instance(expr.value(qc)));
+    // check instance of value
+    final Iter iter = expr.iter(qc);
+    final Value value = iter.iterValue();
+    if(value != null) return Bln.get(seqType.instance(value));
+
+    // if occurrence indicator matches, only check type
+    final SeqType st = expr.seqType();
+    if(st.occ.instanceOf(seqType.occ)) {
+      for(Item item; (item = iter.next()) != null;) {
+        if(!seqType.instance(item)) return Bln.FALSE;
+      }
+      return Bln.TRUE;
+    }
+
+    // if type matches, only check occurrence indicator
+    final long max = seqType.occ.max;
+    if(st.type.instanceOf(seqType.type)) {
+      return Bln.get(iter.next() == null ? !seqType.oneOrMore() :
+        max > 1 || max > 0 && iter.next() == null);
+    }
+
+    // check both occurrence indicator and type
+    long c = 0;
+    for(Item item; (item = iter.next()) != null;) {
+      if(++c > max || !seqType.instance(item)) return Bln.FALSE;
+    }
+    return Bln.get(c != 0 || !seqType.oneOrMore());
   }
 
   @Override
@@ -66,8 +93,8 @@ public final class Instance extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Instance && seqType.eq(((Instance) obj).seqType) &&
-        super.equals(obj);
+    return this == obj
+        || obj instanceof Instance && seqType.eq(((Instance) obj).seqType) && super.equals(obj);
   }
 
   @Override

@@ -228,4 +228,38 @@ public final class MixedTest extends SandboxTest {
 
     error("element { 'Q{ http://www.w3.org/2000/xmlns/ }a' } {}", INVNAME_X);
   }
+
+  /** Faster instance of checks. */
+  @Test public void gh1939() {
+    query("128 instance of xs:integer", true);
+
+    query("<a/>[.  = ''] instance of element(a) ", true);
+    query("<a/>[.  = ''] instance of element(a)?", true);
+    query("<a/>[.  = ''] instance of element(a)+", true);
+    query("<a/>[.  = ''] instance of element(a)*", true);
+    query("<a/>[. != ''] instance of element(a) ", false);
+    query("<a/>[. != ''] instance of element(a)?", true);
+    query("<a/>[. != ''] instance of element(a)+", false);
+    query("<a/>[. != ''] instance of element(a)*", true);
+
+    query("('' , <a/>)[.  = ''] instance of empty-sequence()", false);
+    query("('a', <a/>)[.  = ''] instance of empty-sequence()", false);
+    query("('' , <a/>)[. != ''] instance of empty-sequence()", true);
+    query("('a', <a/>)[. != ''] instance of empty-sequence()", false);
+
+    error("error() instance of xs:string*", FUNERR1);
+
+    query("(xs:anyURI('b'), 'a', 'a')[. = 'a'] instance of xs:string ", false);
+    query("(xs:anyURI('b'), 'a', 'a')[. = 'a'] instance of xs:string?", false);
+    query("(xs:anyURI('b'), 'a', 'a')[. = 'a'] instance of xs:string+", true);
+    query("(xs:anyURI('b'), 'a', 'a')[. = 'a'] instance of xs:string*", true);
+    query("(xs:anyURI('b'), 'a', 'a')[. = 'b'] instance of xs:string ", false);
+    query("(xs:anyURI('b'), 'a', 'a')[. = 'b'] instance of xs:string?", false);
+    query("(xs:anyURI('b'), 'a', 'a')[. = 'b'] instance of xs:string+", false);
+    query("(xs:anyURI('b'), 'a', 'a')[. = 'b'] instance of xs:string*", false);
+    query("(xs:anyURI('b'), 'a', 'a')[. = 'c'] instance of xs:string ", false);
+    query("(xs:anyURI('b'), 'a', 'a')[. = 'c'] instance of xs:string?", true);
+    query("(xs:anyURI('b'), 'a', 'a')[. = 'c'] instance of xs:string+", false);
+    query("(xs:anyURI('b'), 'a', 'a')[. = 'c'] instance of xs:string*", true);
+  }
 }
