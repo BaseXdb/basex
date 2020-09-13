@@ -449,6 +449,15 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
+  public void markTailCalls(final CompileContext cc) {
+    final int el = exprs.length - 1;
+    for(int e = 0; e < el; e++) {
+      if(!exprs[e].seqType().zeroOrOne()) return;
+    }
+    exprs[el].markTailCalls(cc);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof SimpleMap && super.equals(obj);
   }
