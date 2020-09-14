@@ -1616,18 +1616,18 @@ public enum QueryError {
    * Throws a type exception.
    * @param ii input info
    * @param expr expression
-   * @param type target type
-   * @param name name (can be {@code null})
+   * @param st target type
+   * @param name variable name (can be {@code null})
    * @param error error code
    * @return query exception
    */
-  public static QueryException typeError(final Expr expr, final SeqType type, final QNm name,
+  public static QueryException typeError(final Expr expr, final SeqType st, final QNm name,
       final InputInfo ii, final QueryError error) {
 
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) tb.add('$').add(name.string()).add(" := ");
     final byte[] value = tb.add(normalize(expr, ii)).finish();
-    return error.get(ii, expr.seqType(), type, value);
+    return error.get(ii, expr.seqType(), st, value);
   }
 
   /**

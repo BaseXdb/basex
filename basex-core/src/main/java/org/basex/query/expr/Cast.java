@@ -66,7 +66,7 @@ public final class Cast extends Single {
     // (123 cast as xs:integer)  ->  123
     // xs:string('x'[. != 'y'])  ->  'x'[. != 'y']
     // (1, 2.0) ! xs:numeric(.)  ->  (1, 2.0)
-    if(ast.occ.instanceOf(exprType.seqType().occ)) {
+    if(ast.occ.instanceOf(seqType().occ)) {
       final Type at = ast.type;
       if(at.eq(dt) || dt == AtomType.NUM && at.instanceOf(dt)) {
         return cc.replaceWith(this, expr);
