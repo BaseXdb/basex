@@ -61,7 +61,7 @@ public final class GroupSpec extends Single {
 
   @Override
   public GroupSpec optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(Simplify.STRING, cc);
+    expr = expr.simplifyFor(Simplify.DATA, cc);
 
     exprType.assign(expr);
     final AtomType type = expr.seqType().type.atomic();

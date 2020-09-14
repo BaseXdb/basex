@@ -738,7 +738,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("string-join(data(<_>X</_>))", "X", empty(DATA));
     check("data(data(<_>X</_>))", "X", count(DATA, 1));
     check("string(data(<_>X</_>))", "X", empty(DATA));
-    check("data(string(<_>X</_>))", "X", empty(STRING));
+    check("data(string(<_>X</_>))", "X", empty(DATA));
 
     check("<x>A</x>[data() = 'A']", "<x>A</x>", empty(DATA), count(ContextValue.class, 1));
     check("<x>A</x>[data() ! data() ! data() = 'A']", "<x>A</x>",
@@ -746,6 +746,12 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<x>A</x>[data() = 'A']", "<x>A</x>", empty(DATA));
 
     check("<A>A</A> ! data() = data(<A>B</A>)", false, empty(DATA));
+
+    check("data(string(<_/>)) instance of xs:string", true, root(Bln.class));
+    check("data(xs:NMTOKENS(<_/>) ! xs:untypedAtomic(.)) instance of xs:untypedAtomic*",
+        true, root(Bln.class));
+    error("data(data(<_>a</_>) promote to element(e))", INVPROMOTE_X_X_X);
+    error("data(<_>a</_> promote to element(e))", INVPROMOTE_X_X_X);
   }
 
   /** Remove redundant atomizations. */

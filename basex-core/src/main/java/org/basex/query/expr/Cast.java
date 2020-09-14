@@ -85,7 +85,7 @@ public final class Cast extends Single {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    return simplifyCast(mode, cc);
+    return simplifyForCast(mode, cc);
   }
 
   @Override

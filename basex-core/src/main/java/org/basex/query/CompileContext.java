@@ -8,6 +8,8 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
+import org.basex.query.expr.ft.*;
+import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.Function;
@@ -30,13 +32,53 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class CompileContext {
-  /** Compile-time optimizations. */
+  /**
+   * Compile-time simplifications.
+   * @see Expr#simplifyFor(Simplify, CompileContext)
+   */
   public enum Simplify {
-    /** Effective boolean value. */ EBV,
-    /** Untyped atomic.          */ STRING,
-    /** Numbers.                 */ NUMBER,
-    /** Predicate checks.        */ PREDICATE,
-    /** Distinct values.         */ DISTINCT
+    /**
+     * Simplify EBV checks.
+     * Requested by {@link If}, {@link Logical}, {@link Preds}, {@link Condition}, {@link Where},
+     * {@link FnBoolean}, {@link FnNot}.
+     * Evaluated by {@link Expr} {@link Filter}, {@link List}, {@link SimpleMap}, {@link Path}
+     * and others.
+     */
+    EBV,
+    /**
+     * Skip redundant atomizations.
+     * Requested by {@link FnData}, {@link FnDistinctValues}, {@link Data}, {@link GroupSpec},
+     * {@link OrderKey}.
+     * Evaluated by {@link FnData}, {@link Cast}, {@link TypeCheck}.
+     */
+    DATA,
+    /**
+     * String arguments.
+     * Requested by {@link Cast}, {@link CmpG}, {@link StandardFunc} and others.
+     * Evaluated by {@link FnData}, {@link Cast}, {@link TypeCheck}.
+     */
+    STRING,
+    /**
+     * Numeric arguments.
+     * Requested by {@link Arith}, {@link CmpIR}, {@link FTWeight} and others.
+     * Evaluated by {@link FnData}, {@link Cast}, {@link TypeCheck},
+     * {@link SimpleMap} or {@link FnNumber}.
+     */
+    NUMBER,
+    /**
+     * Predicate checks.
+     * Requested by {@link Preds}.
+     * Evaluated by {@link Expr} , {@link FnData}, {@link Cast}, {@link TypeCheck},
+     * {@link SimpleMap} or {@link FnNumber}.
+     */
+    PREDICATE,
+    /**
+     * Distinct values.
+     * Requested by {@link CmpG} and {@link FnDistinctValues}.
+     * Evaluated by {@link Filter}, {@link List}, {@link SimpleMap} and others.
+     * and others.
+     */
+    DISTINCT
   }
 
   /** Limit for the size of sequences that are pre-evaluated. */

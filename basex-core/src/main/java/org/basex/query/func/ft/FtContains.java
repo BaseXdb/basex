@@ -5,7 +5,6 @@ import static org.basex.util.ft.FTFlag.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -44,9 +43,8 @@ public final class FtContains extends FtAccess {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
     exprs[0] = exprs[0].simplifyFor(Simplify.STRING, cc);
     exprs[1] = exprs[1].simplifyFor(Simplify.STRING, cc);
-    return this;
   }
 }

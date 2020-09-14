@@ -64,14 +64,12 @@ public final class FnDistinctValues extends StandardFunc {
   }
 
   @Override
-  protected void simplifyArgs(final CompileContext cc) {
-    // do not simplify type of key
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    exprs[0] = exprs[0].simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    exprs[0] = exprs[0].simplifyFor(Simplify.DISTINCT, cc);
-
     final Expr expr = exprs[0];
     if(expr instanceof RangeSeq) return expr;
 

@@ -24,8 +24,7 @@ public final class FnNot extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // e.g.: not(boolean(A))  ->  not(A)
-    final Expr expr = exprs[0].simplifyFor(Simplify.EBV, cc);
+    final Expr expr = exprs[0];
 
     // not(empty(A))  ->  exists(A)
     if(EMPTY.is(expr)) return cc.function(EXISTS, info, expr.args());
@@ -49,8 +48,13 @@ public final class FnNot extends StandardFunc {
     final SeqType st = expr.seqType();
     if(st.type instanceof NodeType) return cc.function(EMPTY, info, expr);
 
-    exprs[0] = expr;
     return this;
+  }
+
+  @Override
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    // not(boolean(A))  ->  not(A)
+    exprs[0] = exprs[0].simplifyFor(Simplify.EBV, cc);
   }
 
   @Override

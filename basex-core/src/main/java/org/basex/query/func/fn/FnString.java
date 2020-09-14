@@ -52,7 +52,7 @@ public final class FnString extends ContextFn {
         // string(<a>1</a>) = '1'  ->  <a>1</a> = '1'
         if(!context) return cc.simplify(this, exprs[0]);
         // $node[string() = 'x']  ->  $node[. = 'x']
-        if(cc.nestedFocus()) return new ContextValue(info).optimize(cc);
+        if(cc.nestedFocus()) return cc.simplify(this, new ContextValue(info).optimize(cc));
       }
     }
     return super.simplifyFor(mode, cc);
