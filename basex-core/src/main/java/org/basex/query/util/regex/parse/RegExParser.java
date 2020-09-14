@@ -31,59 +31,6 @@ public class RegExParser implements RegExParserConstants {
   private boolean multiLine;
 
   /**
-   * Compiles this regular expression to a {@link Pattern}.
-   * @param regex regular expression to parse
-   * @param modifiers modifiers
-   * @param ii input info
-   * @param check check result for empty strings
-   * @return the pattern
-   * @throws QueryException query exception
-   */
-  public static Pattern parse(final byte[] regex, final byte[] modifiers, final InputInfo ii,
-      final boolean check) throws QueryException {
-
-    // process modifiers
-    int flags = 0;
-    boolean strip = false, java = false;
-    for(final byte mod : modifiers) {
-      if(mod == 'i') flags |= CASE_INSENSITIVE | UNICODE_CASE;
-      else if(mod == 'm') flags |= MULTILINE;
-      else if(mod == 's') flags |= DOTALL;
-      else if(mod == 'q') flags |= LITERAL;
-      else if(mod == 'x') strip = true;
-      else if(mod == 'j' || mod == '!') java = true;
-      else if(mod != ';') throw REGMOD_X.get(ii, (char) mod);
-    }
-
-    try {
-      // Java syntax, literal query: no need to change anything
-      if(java || (flags & LITERAL) != 0) return Pattern.compile(string(regex), flags);
-
-      final RegExParser parser = new RegExParser(regex, strip, (flags & DOTALL) != 0,
-          (flags & MULTILINE) != 0);
-      final String string = parser.parse().toString();
-      final Pattern pattern = Pattern.compile(string, flags);
-      if(check) {
-        // Circumvent Java RegEx behavior ("If MULTILINE mode is activated"...):
-        // http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#lt
-        final Pattern p = (pattern.flags() & Pattern.MULTILINE) == 0 ? pattern :
-          Pattern.compile(pattern.pattern());
-        if(p.matcher("").matches()) throw REGROUP.get(ii);
-      }
-      return pattern;
-    } catch(final PatternSyntaxException ex) {
-      Util.debug(ex);
-      throw REGPAT_X.get(ii, regex);
-    } catch(final ParseException ex) {
-      Util.debug(ex);
-      throw REGPAT_X.get(ii, regex);
-    } catch(final TokenMgrError ex) {
-      Util.debug(ex);
-      throw REGPAT_X.get(ii, regex);
-    }
-  }
-
-  /**
    * Constructor.
    * @param regex regular expression to parse
    * @param strip strip whitespace while lexing
@@ -95,6 +42,14 @@ public class RegExParser implements RegExParserConstants {
     this(new RegExLexer(regex, strip));
     dotAll = all;
     multiLine = multi;
+  }
+
+  /**
+   * Returns the number of parsed groups.
+   * @return number of groups
+   */
+  final public int groups() {
+    return groups;
   }
 
   /**

@@ -719,6 +719,12 @@ public final class FnModuleTest extends QueryPlanTest {
 
     query(func.args("a", "", "x", "j"), "xax");
     error(func.args("a", "", "x"), REGROUP);
+
+    // GH1940
+    query("replace('hello', 'hel(?:lo)', '$1')", "");
+    query("replace('abc', 'b', '$0')", "abc");
+    query("replace('abc', 'b', '$1')", "ac");
+    query("replace('abc', 'b', '$10')", "a0c");
   }
 
   /** Test method. */
