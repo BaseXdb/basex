@@ -103,7 +103,7 @@ public abstract class StandardFunc extends Arr {
       final int p = Math.min(e, definition.params.length - 1);
       final Type type = definition.params[p].type;
       if(type.instanceOf(AtomType.AAT)) {
-        final Simplify mode = type.instanceOf(AtomType.NUM) ? Simplify.NUMBER : Simplify.ATOM;
+        final Simplify mode = type.instanceOf(AtomType.NUM) ? Simplify.NUMBER : Simplify.STRING;
         exprs[e] = exprs[e].simplifyFor(mode, cc);
       }
     }

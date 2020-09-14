@@ -33,7 +33,7 @@ public final class CompileContext {
   /** Compile-time optimizations. */
   public enum Simplify {
     /** Effective boolean value. */ EBV,
-    /** Untyped atomic.          */ ATOM,
+    /** Untyped atomic.          */ STRING,
     /** Numbers.                 */ NUMBER,
     /** Predicate checks.        */ PREDICATE,
     /** Distinct values.         */ DISTINCT

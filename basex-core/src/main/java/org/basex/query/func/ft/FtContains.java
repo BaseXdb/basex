@@ -45,8 +45,8 @@ public final class FtContains extends FtAccess {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    exprs[0] = exprs[0].simplifyFor(Simplify.ATOM, cc);
-    exprs[1] = exprs[1].simplifyFor(Simplify.ATOM, cc);
+    exprs[0] = exprs[0].simplifyFor(Simplify.STRING, cc);
+    exprs[1] = exprs[1].simplifyFor(Simplify.STRING, cc);
     return this;
   }
 }

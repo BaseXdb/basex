@@ -38,7 +38,7 @@ public final class CPI extends CName {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    name = name.simplifyFor(Simplify.ATOM, cc);
+    name = name.simplifyFor(Simplify.STRING, cc);
     if(name instanceof Value) {
       final byte[] nm = ncname(false, cc.qc);
       if(nm != null) {

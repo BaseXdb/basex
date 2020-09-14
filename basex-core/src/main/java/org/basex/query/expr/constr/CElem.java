@@ -56,7 +56,7 @@ public final class CElem extends CName {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    name = name.simplifyFor(Simplify.ATOM, cc);
+    name = name.simplifyFor(Simplify.STRING, cc);
     if(name instanceof Value) {
       final QNm nm = qname(true, cc.qc, null);
       if(nm != null) {

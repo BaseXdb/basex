@@ -30,7 +30,7 @@ public final class FnString extends ContextFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // string(data(E))  ->  string(E)
-    simplifyAll(Simplify.ATOM, cc);
+    simplifyAll(Simplify.STRING, cc);
 
     final boolean context = contextAccess();
     final Expr expr = context ? cc.qc.focus.value : exprs[0];
@@ -46,7 +46,7 @@ public final class FnString extends ContextFn {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     final boolean context = contextAccess();
     final Expr expr = context ? cc.qc.focus.value : exprs[0];
-    if(mode == Simplify.ATOM && expr != null) {
+    if(mode == Simplify.STRING && expr != null) {
       final SeqType st = expr.seqType();
       if(st.one() && st.type.isStringOrUntyped()) {
         // string(<a>1</a>) = '1'  ->  <a>1</a> = '1'

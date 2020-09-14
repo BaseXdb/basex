@@ -58,7 +58,7 @@ abstract class CName extends CNode {
    * @throws QueryException query exception
    */
   final void optValue(final CompileContext cc) throws QueryException {
-    simplifyAll(Simplify.ATOM, cc);
+    simplifyAll(Simplify.STRING, cc);
     if(allAreValues(true) && (exprs.length != 1 || !(exprs[0] instanceof Str))) {
       exprs = new Expr[] { Str.get(atomValue(cc.qc)) };
     }

@@ -45,7 +45,7 @@ public final class Castable extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(Simplify.ATOM, cc);
+    expr = expr.simplifyFor(Simplify.STRING, cc);
 
     // pre-evaluate (check value or static type)
     return expr instanceof Value ? cc.preEval(this) : cc.replaceWith(this,

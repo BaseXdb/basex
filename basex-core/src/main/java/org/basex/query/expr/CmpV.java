@@ -169,7 +169,7 @@ public final class CmpV extends Cmp {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    simplifyAll(Simplify.ATOM, cc);
+    simplifyAll(Simplify.STRING, cc);
 
     // swap operands
     if(swap()) {

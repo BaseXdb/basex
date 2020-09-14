@@ -54,7 +54,7 @@ public class TypeCheck extends Single {
   public final Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st = seqType();
     final boolean atomic = st.type instanceof AtomType && !expr.seqType().mayBeArray();
-    if(atomic) expr = expr.simplifyFor(Simplify.ATOM, cc);
+    if(atomic) expr = expr.simplifyFor(Simplify.STRING, cc);
 
     final SeqType et = expr.seqType();
     occ = et.type.instanceOf(st.type) && et.kindInstanceOf(st);

@@ -50,7 +50,7 @@ public final class FtSearch extends FtAccess {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    exprs[1] = exprs[1].simplifyFor(Simplify.ATOM, cc);
+    exprs[1] = exprs[1].simplifyFor(Simplify.STRING, cc);
     return compileData(cc);
   }
 }

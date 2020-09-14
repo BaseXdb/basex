@@ -52,7 +52,7 @@ public final class SwitchGroup extends Arr {
   public SwitchGroup optimize(final CompileContext cc) throws QueryException {
     final int el = exprs.length;
     for(int e = 1; e < el; e++) {
-      exprs[e] = exprs[e].simplifyFor(Simplify.ATOM, cc);
+      exprs[e] = exprs[e].simplifyFor(Simplify.STRING, cc);
     }
     return (SwitchGroup) adoptType(rtrn());
   }

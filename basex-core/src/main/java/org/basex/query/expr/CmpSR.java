@@ -73,7 +73,7 @@ public final class CmpSR extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(Simplify.ATOM, cc);
+    expr = expr.simplifyFor(Simplify.STRING, cc);
 
     final SeqType st = expr.seqType();
     single = st.zeroOrOne() && !st.mayBeArray();

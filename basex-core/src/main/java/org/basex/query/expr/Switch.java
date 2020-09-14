@@ -63,7 +63,7 @@ public final class Switch extends ParseExpr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    cond = cond.simplifyFor(Simplify.ATOM, cc);
+    cond = cond.simplifyFor(Simplify.STRING, cc);
 
     // check if expression can be pre-evaluated
     final Expr expr = opt(cc);

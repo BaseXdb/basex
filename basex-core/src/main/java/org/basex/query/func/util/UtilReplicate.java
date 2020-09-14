@@ -112,7 +112,7 @@ public final class UtilReplicate extends StandardFunc {
       if(count > 0 && (single || !expr.has(Flag.NDT))) {
         return cc.replaceWith(this, expr);
       }
-    } else if(mode == Simplify.ATOM || mode == Simplify.NUMBER) {
+    } else if(mode == Simplify.STRING || mode == Simplify.NUMBER) {
       exprs[0] = expr.simplifyFor(mode, cc);
     }
     return super.simplifyFor(mode, cc);

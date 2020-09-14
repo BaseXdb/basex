@@ -34,7 +34,7 @@ public final class FnData extends ContextFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // data(string(E))  ->  data(E)
-    simplifyAll(Simplify.ATOM, cc);
+    simplifyAll(Simplify.STRING, cc);
 
     final boolean context = contextAccess();
     final Expr expr = context ? cc.qc.focus.value : exprs[0];
@@ -54,7 +54,7 @@ public final class FnData extends ContextFn {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    if(mode == Simplify.ATOM || mode == Simplify.NUMBER) {
+    if(mode == Simplify.STRING || mode == Simplify.NUMBER) {
       // data(<a/>) = ''  ->  <a/> = ''
       if(!contextAccess()) return cc.simplify(this, exprs[0]);
       // A[B ! data() = '']  ->  A[B ! . = '']

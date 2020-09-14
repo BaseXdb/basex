@@ -86,11 +86,11 @@ public abstract class Single extends ParseExpr {
    * @throws QueryException query exception
    */
   final Expr simplifyCast(final Simplify mode, final CompileContext cc) throws QueryException {
-    if(mode == Simplify.ATOM || mode == Simplify.NUMBER) {
+    if(mode == Simplify.STRING || mode == Simplify.NUMBER) {
       final SeqType ast = expr.seqType(), dst = seqType();
       if(ast.occ.instanceOf(dst.occ)) {
         final Type at = ast.type, dt = dst.type;
-        if(mode == Simplify.ATOM && at.isStringOrUntyped() &&
+        if(mode == Simplify.STRING && at.isStringOrUntyped() &&
              dt.oneOf(AtomType.STR, AtomType.ATM) ||
            mode == Simplify.NUMBER && (at.isUntyped() && dt == AtomType.DBL ||
              at.instanceOf(AtomType.INT) && at.instanceOf(dt))) {

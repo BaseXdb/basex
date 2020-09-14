@@ -153,7 +153,7 @@ public class CmpG extends Cmp {
     // remove redundant type conversions
     final Type t1 = exprs[0].seqType().type, t2 = exprs[1].seqType().type;
     if(t1.isStringOrUntyped() && t2.isStringOrUntyped()) {
-      simplifyAll(Simplify.ATOM, cc);
+      simplifyAll(Simplify.STRING, cc);
     } else if(t1.isNumber() && t2.isNumber()) {
       simplifyAll(Simplify.NUMBER, cc);
     }
