@@ -2976,7 +2976,7 @@ public class QueryParser extends InputParser {
         if(!AtomType.AST.name.eq(name)) throw error(TYPE30_X, name.prefixId(XML));
         type = AtomType.AST;
       }
-      if(type == AtomType.AST || type == AtomType.AAT || type == AtomType.NOT)
+      if(type.oneOf(AtomType.AST, AtomType.AAT, AtomType.NOT))
         throw error(CASTUNKNOWN_X, name.prefixId(XML));
     }
     skipWs();

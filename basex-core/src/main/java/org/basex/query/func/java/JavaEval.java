@@ -101,7 +101,8 @@ final class JavaEval {
       } else {
         final Value arg = expr.value(qc);
         exprs[s + p] = arg;
-        if(arg.type.instanceOf(JavaMapping.type(param, true))) {
+        final Type type = JavaMapping.type(param, true);
+        if(type != null && arg.type.instanceOf(type)) {
           // convert to Java object if an XQuery type exists for the function parameter
           vals[p] = arg.toJava();
         } else {
