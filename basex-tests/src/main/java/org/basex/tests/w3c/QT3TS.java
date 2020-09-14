@@ -442,7 +442,7 @@ public final class QT3TS extends Main {
    */
   private boolean supported(final XdmValue test) {
     // the following query generates a result if the specified test is not supported
-    return new XQuery(
+    return all || new XQuery(
       "*:environment/*:collation |" + // skip collation tests
       "*:dependency[" +
       // skip schema imports, schema validation, namespace axis, static typing
