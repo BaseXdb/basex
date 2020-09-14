@@ -21,6 +21,8 @@ import org.basex.util.hash.*;
 public final class Instance extends Single {
   /** Sequence type to check for. */
   private final SeqType seqType;
+  /** Check: 1: only check item type, 2: only check occurrence indicator. */
+  private int check;
 
   /**
    * Constructor.
@@ -44,15 +46,18 @@ public final class Instance extends Single {
     if(expr instanceof Value) return cc.preEval(this);
 
     // check static type
-    Expr ex = this;
+    final SeqType et = expr.seqType();
     if(!expr.has(Flag.NDT)) {
-      final SeqType st = expr.seqType();
       // (1, 2)[. = 1] instance of xs:numeric*
-      if(st.instanceOf(seqType)) ex = Bln.TRUE;
+      if(et.instanceOf(seqType)) return cc.replaceWith(this, Bln.TRUE);
       // (1, 2)[. = 1] instance of xs:string
-      else if(st.intersect(seqType) == null) ex = Bln.FALSE;
+      if(et.intersect(seqType) == null) return cc.replaceWith(this, Bln.FALSE);
     }
-    return cc.replaceWith(this, ex);
+
+    // 1: only check item type, 2: only check occurrence indicator
+    check = et.occ.instanceOf(seqType.occ) ? 1 :
+      et.type.instanceOf(seqType.type) && et.kindInstanceOf(seqType) ? 2 : 0;
+    return this;
   }
 
   @Override
@@ -62,21 +67,18 @@ public final class Instance extends Single {
     final Value value = iter.iterValue();
     if(value != null) return Bln.get(seqType.instance(value));
 
-    // if occurrence indicator matches, only check type
-    final SeqType st = expr.seqType();
-    if(st.occ.instanceOf(seqType.occ)) {
+    // only check item type
+    if(check == 1) {
       for(Item item; (item = iter.next()) != null;) {
         if(!seqType.instance(item)) return Bln.FALSE;
       }
       return Bln.TRUE;
     }
 
-    // if type matches, only check occurrence indicator
+    // only check occurrence indicator
     final long max = seqType.occ.max;
-    if(st.type.instanceOf(seqType.type)) {
-      return Bln.get(iter.next() == null ? !seqType.oneOrMore() :
-        max > 1 || max > 0 && iter.next() == null);
-    }
+    if(check == 2) return Bln.get(iter.next() == null ? !seqType.oneOrMore() :
+      max > 1 || max > 0 && iter.next() == null);
 
     // check both occurrence indicator and type
     long c = 0;
@@ -87,14 +89,16 @@ public final class Instance extends Single {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Instance(info, expr.copy(cc, vm), seqType));
+  public Instance copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    final Instance ex = copyType(new Instance(info, expr.copy(cc, vm), seqType));
+    ex.check = check;
+    return ex;
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj
-        || obj instanceof Instance && seqType.eq(((Instance) obj).seqType) && super.equals(obj);
+    return this == obj || obj instanceof Instance && seqType.eq(((Instance) obj).seqType) &&
+        super.equals(obj);
   }
 
   @Override
