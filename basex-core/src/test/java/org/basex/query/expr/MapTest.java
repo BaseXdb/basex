@@ -22,7 +22,7 @@ public final class MapTest extends SandboxTest {
 
   /** Tests the the new syntax for map literals. */
   @Test public void gh755() {
-    query("(<x><y/></x> / map { 'test':y, 42:'asdf' })('test')", "<y/>");
+    query("(<x><y/></x> / map { 'test': y, 42: 'asdf' })('test')", "<y/>");
   }
 
   /** Tests keys. */
@@ -34,7 +34,7 @@ public final class MapTest extends SandboxTest {
     query(_MAP_SIZE.args(" map { xs:time('01:01:01'): 1, xs:time('02:02:02'): 2 }"), 2);
     query("let $k1 := xs:time('01:01:01')"
         + "let $k2 := xs:time('01:01:02+01:00')"
-        + "let $m := map { $k1:1 }"
+        + "let $m := map { $k1: 1 }"
         + "return map:put(map:remove($m, $k1), $k2, 2)($k2)", 2);
 
     query(" map {  xs:time('01:01:01'): 1, xs:time('01:01:02+01:00'): 2 }");
@@ -42,18 +42,18 @@ public final class MapTest extends SandboxTest {
 
     query("let $k1 := xs:time('01:01:01')"
         + "let $k2 := xs:dateTime('2001-01-01T01:01:01+01:00')"
-        + "let $m := map { $k1:1 }"
+        + "let $m := map { $k1: 1 }"
         + "return map:put($m, $k2, 2)");
     query("let $k1 := xs:time('01:01:01')"
         + "let $k2 := xs:time('01:01:02')"
         + "let $k3 := xs:time('01:01:03+01:00')"
-        + "let $m := map { $k1:1, $k2:2 }"
+        + "let $m := map { $k1: 1, $k2: 2 }"
         + "return map:put(map:remove($m,$k2), $k3, 3)");
     query("let $k1 := xs:time('01:01:01')"
         + "let $k2 := xs:time('01:01:02')"
         + "let $k3 := xs:time('01:01:02+01:00')"
-        + "let $m := map { $k1:1, $k2:2 }"
-        + "return map:merge((map:remove($m, $k2), map { $k3:3 }))");
+        + "let $m := map { $k1: 1, $k2: 2 }"
+        + "return map:merge((map:remove($m, $k2), map { $k3: 3 }))");
   }
 
   /** Stack overflow bug. */
@@ -75,7 +75,7 @@ public final class MapTest extends SandboxTest {
 
   /** GitHub bug (#1297). */
   @Test public void gh1297() {
-    query("let $m := map { 'A_':1, 'B@':2, 'C!':3 }"
+    query("let $m := map { 'A_': 1, 'B@': 2, 'C!': 3 }"
         + "return (map:remove($m, 'A_')('A_'), map:remove($m, 'C!')('C!'))", "");
   }
 
