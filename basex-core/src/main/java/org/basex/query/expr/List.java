@@ -131,7 +131,7 @@ public final class List extends Arr {
   private Expr toRange() {
     Long start = null, end = null;
     for(final Expr expr : exprs) {
-      long s = 0, e = 0;
+      long s, e;
       if(expr instanceof Int && expr.seqType().type == AtomType.ITR) {
         s = ((Int) expr).itr();
         e = s + 1;

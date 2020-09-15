@@ -71,7 +71,7 @@ public abstract class Test extends ExprInfo {
     final List<Test> list = new ArrayList<>(tl);
     final Consumer<Test> add = tst -> {
       if(tst instanceof KindTest) {
-        list.removeIf((Predicate<Test>) t -> t instanceof NameTest);
+        list.removeIf(t -> t instanceof NameTest);
       } else if(tst instanceof NameTest) {
         if(((Checks<Test>) t -> t instanceof KindTest).any(list)) return;
       }

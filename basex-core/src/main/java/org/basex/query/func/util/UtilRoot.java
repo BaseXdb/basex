@@ -35,7 +35,7 @@ public class UtilRoot extends StandardFunc {
   }
 
   @Override
-  public Expr opt(final CompileContext cc) throws QueryException {
+  public Expr opt(final CompileContext cc) {
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
     if(st.type.eq(NodeType.DOC)) return expr;

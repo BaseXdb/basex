@@ -24,7 +24,7 @@ public final class FnDeepEqual extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if(expr1.equals(expr2) && !expr1.has(Flag.NDT)) return Bln.TRUE;
 

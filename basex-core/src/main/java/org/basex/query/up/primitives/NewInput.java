@@ -20,8 +20,7 @@ public final class NewInput {
 
   @Override
   public String toString() {
-    return new StringBuilder().append(Util.className(this)).append('[').append("path: \"").
-      append(path).append("\", ").append(node != null ? "node" : "io: " + io).
-      append(']').toString();
+    return Util.className(this) + '[' + "path: \"" + path + "\", " +
+        (node != null ? "node" : "io: " + io) + ']';
   }
 }

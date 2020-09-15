@@ -4,7 +4,6 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.List;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;

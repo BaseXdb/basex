@@ -141,7 +141,7 @@ public final class TypeswitchGroup extends Single {
 
   @Override
   public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    Expr ex = null;
+    Expr ex;
     try {
       ex = tc.check(expr, cc);
     } catch(final QueryException qe) {

@@ -211,7 +211,7 @@ public abstract class Arr extends ParseExpr {
     if(!(positional && has(Flag.POS))) {
       final Class<? extends Arr> clazz = or ? And.class : Or.class;
       final QueryBiFunction<Boolean, Expr[], Expr> func = (invert, args) ->
-        (invert ? !or : or) ? new Or(info, args) : new And(info, args);
+        (invert != or) ? new Or(info, args) : new And(info, args);
       final Expr tmp = rewrite(clazz, func, cc);
       if(tmp != null) {
         exprs = new Expr[] { tmp };

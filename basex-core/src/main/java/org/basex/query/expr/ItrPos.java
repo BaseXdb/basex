@@ -116,7 +116,7 @@ public final class ItrPos extends Simple implements CmpPos {
   }
 
   @Override
-  public int test(final long pos, final QueryContext qc) throws QueryException {
+  public int test(final long pos, final QueryContext qc) {
     return pos == max ? 2 : pos >= min && pos <= max ? 1 : 0;
   }
 

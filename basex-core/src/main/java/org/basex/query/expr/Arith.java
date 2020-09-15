@@ -61,7 +61,7 @@ public final class Arith extends Arr {
     Expr expr = emptyExpr();
     if(expr == this && nums && noarray && st1.one() && st2.one()) {
       // example: number($a) + 0  ->  number($a)
-      Expr ex = calc.optimize(expr1, expr2, info, cc);
+      final Expr ex = calc.optimize(expr1, expr2, info, cc);
       if(ex != null) {
         expr = ex;
       } else if(expr1 instanceof Arith) {

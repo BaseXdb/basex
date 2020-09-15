@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.Set;
 import org.basex.query.*;
 import org.basex.query.value.Value;
 import org.junit.jupiter.api.*;

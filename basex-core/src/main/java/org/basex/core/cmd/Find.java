@@ -69,7 +69,7 @@ public final class Find extends AQuery {
    */
   public static String find(final String query, final Context ctx, final boolean root) {
     // treat input as XQuery
-    if(query.startsWith("/")) return query;
+    if(Strings.startsWith(query, '/')) return query;
 
     final boolean r = root || ctx.root();
     if(query.isEmpty()) return r ? "/" : ".";
@@ -82,12 +82,12 @@ public final class Find extends AQuery {
     for(String term : terms) {
       if(term.startsWith("@=")) {
         preds.append("[@* = \"").append(term.substring(2)).append("\"]");
-      } else if(term.startsWith("=")) {
+      } else if(Strings.startsWith(term, '=')) {
         preds.append("[text() = \"").append(term.substring(1)).append("\"]");
-      } else if(term.startsWith("~")) {
+      } else if(Strings.startsWith(term, '~')) {
         preds.append("[text() contains text \"").append(term.substring(1));
         preds.append("\" using fuzzy]");
-      } else if(term.startsWith("@")) {
+      } else if(Strings.startsWith(term, '@')) {
         if(term.length() == 1) continue;
         preds.append("[@* contains text \"").append(term.substring(1)).append("\"]");
         term = term.substring(1);

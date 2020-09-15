@@ -88,7 +88,7 @@ public final class FnPath extends ContextFn {
    * @param qc query context
    * @return index
    */
-  private int element(final ANode node, final QNm qname, final QueryContext qc) {
+  private static int element(final ANode node, final QNm qname, final QueryContext qc) {
     int p = 1;
     final BasicNodeIter iter = node.precedingSiblingIter();
     for(ANode fs; (fs = iter.next()) != null;) {
@@ -105,7 +105,7 @@ public final class FnPath extends ContextFn {
    * @param qc query context
    * @return index
    */
-  private int textComment(final ANode node, final QueryContext qc) {
+  private static int textComment(final ANode node, final QueryContext qc) {
     int p = 1;
     final BasicNodeIter iter = node.precedingSiblingIter();
     for(ANode fs; (fs = iter.next()) != null;) {
@@ -122,7 +122,7 @@ public final class FnPath extends ContextFn {
    * @param qc query context
    * @return index
    */
-  private int pi(final ANode node, final QNm qname, final QueryContext qc) {
+  private static int pi(final ANode node, final QNm qname, final QueryContext qc) {
     final BasicNodeIter iter = node.precedingSiblingIter();
     int p = 1;
     for(ANode fs; (fs = iter.next()) != null;) {

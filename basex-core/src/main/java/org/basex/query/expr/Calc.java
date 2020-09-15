@@ -381,12 +381,11 @@ public enum Calc {
 
     @Override
     public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
-        final CompileContext cc) throws QueryException {
+        final CompileContext cc) {
 
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
       if(type == ITR && expr2 == Int.ONE) return Int.ZERO;
-
       return null;
     }
 
