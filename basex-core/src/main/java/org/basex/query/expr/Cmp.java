@@ -84,7 +84,16 @@ public abstract class Cmp extends Arr {
    * @return original or modified expression
    * @throws QueryException query exception
    */
-  public abstract Expr invert(CompileContext cc) throws QueryException;
+  public final Expr invert(final CompileContext cc) throws QueryException {
+    final Expr expr = invert();
+    return expr != null ? expr.optimize(cc) : this;
+  }
+
+  /**
+   * If possible, returns an expression with inverted operands.
+   * @return original or {@code null}
+   */
+  public abstract Expr invert();
 
   /**
    * Returns the value operator of the expression.

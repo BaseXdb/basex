@@ -139,44 +139,12 @@ public final class If extends Arr {
       if(br2 == Bln.FALSE) return
         new And(info, cond, br1).optimize(cc);
 
-      Expr expr = notToCmp(br1, br2, OpG.EQ, cc);
-      if(expr == this) expr = notToCmp(br2, br1, OpG.NE, cc);
-      if(expr == this) expr = emptyToCmp(br1, br2, OpG.EQ, cc);
-      if(expr == this) expr = emptyToCmp(br2, br1, OpG.NE, cc);
-      if(expr != this) return expr;
+      if(contradict(br1, br2, false)) return new CmpG(
+          cc.function(BOOLEAN, info, cond), br1, OpG.EQ, null, cc.sc(), info).optimize(cc);
+      if(contradict(br2, br1, false)) return new CmpG(
+          cc.function(BOOLEAN, info, cond), br2, OpG.NE, null, cc.sc(), info).optimize(cc);
     }
     return this;
-  }
-
-  /**
-   * Rewrites an if expression to a comparison.
-   * @param ex1 first expression
-   * @param ex2 second expression
-   * @param op operator
-   * @param cc compilation context
-   * @return new expression or self reference
-   * @throws QueryException query exception
-   */
-  private Expr notToCmp(final Expr ex1, final Expr ex2, final OpG op, final CompileContext cc)
-      throws QueryException {
-    final Expr arg1 = BOOLEAN.is(ex1) ? ex1.arg(0) : ex1;
-    return NOT.is(ex2) && arg1.equals(ex2.arg(0)) ? new CmpG(
-        cc.function(BOOLEAN, info, cond), ex1, op, null, cc.sc(), info).optimize(cc) : this;
-  }
-
-  /**
-   * Rewrites an if expression to a comparison.
-   * @param ex1 first expression
-   * @param ex2 second expression
-   * @param op operator
-   * @param cc compilation context
-   * @return new expression or self reference
-   * @throws QueryException query exception
-   */
-  private Expr emptyToCmp(final Expr ex1, final Expr ex2, final OpG op, final CompileContext cc)
-      throws QueryException {
-    return EMPTY.is(ex1) && EXISTS.is(ex2) && ex1.arg(0).equals(ex2.arg(0)) ? new CmpG(
-        cc.function(BOOLEAN, info, cond), ex1, op, null, cc.sc(), info).optimize(cc) : this;
   }
 
   /**

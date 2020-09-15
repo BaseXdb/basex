@@ -1470,6 +1470,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(true(), false()) ! (not(.) and .)", "false\nfalse", root(SingletonSeq.class));
     check("(true(), false()) ! (not(.) or  .)", "true\ntrue",   root(SingletonSeq.class));
 
+    check("(true(), false()) ! (. = false() and . = true())", "false\nfalse",
+        root(SingletonSeq.class));
+    check("(true(), false()) ! (. = true() or . = false())", "true\ntrue",
+        root(SingletonSeq.class));
+
     check("for $i in 1 to 2 return $i and $i = 1 and not($i)", "false\nfalse",
         root(SingletonSeq.class));
 
@@ -2014,5 +2019,10 @@ public final class RewritingsTest extends QueryPlanTest {
         + "if($b) then exists($a) else empty($a)", "false\ntrue", empty(If.class));
     check("let $a := <a/>[. = ''] for $b in (false(), true()) return "
         + "if($b) then empty($a) else exists($a)", "true\nfalse", empty(If.class));
+
+    check("let $a := <a/> for $b in (false(), true()) return "
+        + "if($b) then $a = '' else $a != ''", "false\ntrue", empty(If.class));
+    check("let $a := <a/> for $b in (false(), true()) return "
+        + "if($b) then $a != '' else $a = ''", "true\nfalse", empty(If.class));
   }
 }
