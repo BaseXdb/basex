@@ -1987,4 +1987,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $i in 1 to 2 return (3 to 4)[not(position() > $i)]", "3\n3\n4", exists(_UTIL_RANGE));
     check("for $i in 1 to 2 return (3 to 4)[not(position() < $i)]", "3\n4\n4", exists(_UTIL_RANGE));
   }
+
+  /** Simple map, context value. */
+  @Test public void gh1941() {
+    query("<a/> ! <b>{ (<c>{ . }</c>, .) ! name()[. = 'a'] }</b>", "<b>a</b>");
+  }
 }

@@ -39,7 +39,7 @@ public final class DualMap extends SimpleMap {
         try {
           do {
             // evaluate left operand
-            qf.value = qf.value;
+            qf.value = value;
             Item item = qc.next(iter);
             if(item == null) return null;
             // evaluate right operand (yielding an item)
