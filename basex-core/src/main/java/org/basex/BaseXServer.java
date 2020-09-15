@@ -82,6 +82,7 @@ public final class BaseXServer extends CLI implements Runnable {
     final String host = sopts.get(StaticOptions.SERVERHOST);
     final InetAddress addr = host.isEmpty() ? null : InetAddress.getByName(host);
 
+    // stop server
     if(stop) {
       stop();
       if(!quiet) Util.outln(SRV_STOPPED_PORT_X, port);
@@ -90,6 +91,7 @@ public final class BaseXServer extends CLI implements Runnable {
       return;
     }
 
+    // start server in a new Java process
     if(service) {
       start(port, args);
       if(!quiet) Util.outln(SRV_STARTED_PORT_X, port);
@@ -175,8 +177,9 @@ public final class BaseXServer extends CLI implements Runnable {
 
   /**
    * Stops the server.
+   * @throws IOException I/O exception
    */
-  public void stop() {
+  public void stop() throws IOException {
     final StaticOptions sopts = context.soptions;
     final int port = sopts.get(StaticOptions.SERVERPORT);
     final String host = sopts.get(StaticOptions.SERVERHOST);
@@ -318,22 +321,23 @@ public final class BaseXServer extends CLI implements Runnable {
    * Stops the server.
    * @param host server host
    * @param port server port
+   * @throws IOException I/O exception
    */
-  public static void stop(final String host, final int port) {
+  public static void stop(final String host, final int port) throws IOException {
     // create stop file
     final IOFile stopFile = stopFile(BaseXServer.class, port);
+    stopFile.parent().md();
     stopFile.touch();
 
     // try to connect the server
     try(Socket s = new Socket(host, port)) {
-      // no action
+      // wait until server was stopped
+      do Performance.sleep(10); while(stopFile.exists());
     } catch(final IOException ex) {
       Util.debug(ex);
       stopFile.delete();
-      //throw new IOException(Util.info(CONNECTION_ERROR_X, port));
+      throw new BaseXException(CONNECTION_ERROR_X, port);
     }
-    // wait until server was stopped
-    do Performance.sleep(10); while(stopFile.exists());
   }
 
   /**

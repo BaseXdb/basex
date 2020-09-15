@@ -34,8 +34,9 @@ public final class ServerCommandTest extends CommandTest {
 
   /**
    * Stops the server.
+   * @throws IOException I/O exception
    */
-  @AfterAll public static void stop() {
+  @AfterAll public static void stop() throws IOException {
     try {
       if(session != null) session.close();
     } catch(final Exception ex) {

@@ -1,6 +1,8 @@
 package org.basex.core.locks;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -55,8 +57,9 @@ public final class ServerLockingTest extends SandboxTest {
 
   /**
    * Stops the server.
+   * @throws IOException I/O exception
    */
-  @AfterAll public static void stop() {
+  @AfterAll public static void stop() throws IOException {
     stopServer(server);
   }
 

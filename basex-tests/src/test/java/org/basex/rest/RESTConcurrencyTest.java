@@ -36,7 +36,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
   private static final String BASE_URL = REST_ROOT + NAME;
 
   /**
-   * Create a test database and start BaseXHTTP.
+   * Creates a test database and starts BaseXHTTP.
    * @throws Exception if database cannot be created or server cannot be started
    */
   @BeforeEach public void setUp() throws Exception {
@@ -50,10 +50,10 @@ public final class RESTConcurrencyTest extends SandboxTest {
   }
 
   /**
-   * Stop BaseXHTTP.
-   * @throws Exception if database cannot be dropped or server cannot be stopped
+   * Stops the server.
+   * @throws IOException I/O exception
    */
-  @AfterEach public void tearDown() throws Exception {
+  @AfterEach public void tearDown() throws IOException {
     http.stop();
   }
 

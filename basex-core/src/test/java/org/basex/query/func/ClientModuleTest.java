@@ -32,8 +32,11 @@ public final class ClientModuleTest extends SandboxTest {
     server = createServer();
   }
 
-  /** Stops the server. */
-  @AfterAll public static void stop() {
+  /**
+   * Starts the server.
+   * @throws IOException I/O exception
+   */
+  @AfterAll public static void stop() throws IOException {
     stopServer(server);
   }
 

@@ -135,8 +135,9 @@ public final class XMarkTest {
 
   /**
    * Initializes the tests.
+   * @throws IOException I/O exception
    */
-  @AfterAll public static void close() {
+  @AfterAll public static void close() throws IOException {
     // only stop server if it has not been running before starting the tests
     if(server != null) server.stop();
   }

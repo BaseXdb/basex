@@ -106,7 +106,7 @@ public final class BaseXHTTP extends CLI {
         final int serverPort = soptions.get(StaticOptions.SERVERPORT);
         Util.outln(msg1.apply(start), serverPort);
       }
-      Performance.sleep(2000);
+      Performance.sleep(1000);
     };
 
     // stop web server
@@ -165,9 +165,9 @@ public final class BaseXHTTP extends CLI {
 
   /**
    * Stops the server.
-   * @throws Exception exception
+   * @throws IOException I/O exception
    */
-  public void stop() throws Exception {
+  public void stop() throws IOException {
     final String host = soptions.get(StaticOptions.SERVERHOST);
     final int stopPort = soptions.get(StaticOptions.STOPPORT);
     if(stopPort > 0) stop(host.isEmpty() ? S_LOCALHOST : host, stopPort);
@@ -307,18 +307,18 @@ public final class BaseXHTTP extends CLI {
   public static void stop(final String host, final int port) throws IOException {
     // create stop file
     final IOFile stopFile = stopFile(BaseXHTTP.class, port);
+    stopFile.parent().md();
     stopFile.touch();
 
     // try to connect the server
     try(Socket s = new Socket(host, port)) {
-      // no action
-    } catch(final ConnectException ex) {
+      // wait until server was stopped
+      do Performance.sleep(10); while(stopFile.exists());
+    } catch(final IOException ex) {
       Util.debug(ex);
       stopFile.delete();
       throw new IOException(Util.info(CONNECTION_ERROR_X, port));
     }
-    // wait until server was stopped
-    do Performance.sleep(10); while(stopFile.exists());
   }
 
   @Override

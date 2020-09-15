@@ -43,9 +43,10 @@ public final class DbModuleServerTest extends SandboxTest {
   }
 
   /**
-   * Finishes the test.
+   * Stops the server.
+   * @throws IOException I/O exception
    */
-  @AfterAll public static void finish() {
+  @AfterAll public static void stop() throws IOException {
     stopServer(server);
   }
 
