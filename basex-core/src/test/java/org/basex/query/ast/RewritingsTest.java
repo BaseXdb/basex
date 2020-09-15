@@ -962,11 +962,11 @@ public final class RewritingsTest extends QueryPlanTest {
   }
 
   /** Rewrite if to where. */
-  public void gh1806() {
+  @Test public void gh1806() {
     check("let $a := <_/> return if ($a = '') then $a else ()", "<_/>",
-        empty(If.class), exists(Where.class));
+        empty(If.class), empty(Where.class), exists(IterFilter.class));
     check("for $a in (1, 2) return if ($a = 3) then $a else ()", "",
-        empty(If.class), exists(Where.class), root(IterFilter.class));
+        empty(If.class), empty(Where.class), root(IterFilter.class));
 
     check("for $t in ('a', 'b') return if($t) then $t else ()", "a\nb",
         root(IterFilter.class), exists(ContextValue.class));
@@ -975,7 +975,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("for $i in 1 to 2\n" +
         "for $f in if ($i = 1) then 1 else ()\n" +
-        "return $f + $i\n", 2, count(For.class, 1));
+        "return $f + $i\n", 2, empty(GFLWOR.class));
   }
 
   /** If expression with empty branches. */
@@ -1991,5 +1991,28 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Simple map, context value. */
   @Test public void gh1941() {
     query("<a/> ! <b>{ (<c>{ . }</c>, .) ! name()[. = 'a'] }</b>", "<b>a</b>");
+  }
+
+  /** If expression, boolean/not. */
+  @Test public void gh1942() {
+    check("for $a in (false(), true()) for $b in (false(), true()) return "
+        + "if($a) then $b else not($b)", "true\nfalse\nfalse\ntrue", empty(If.class));
+    check("for $a in (false(), true()) for $b in (false(), true()) return "
+        + "if($a) then not($b) else $b", "false\ntrue\ntrue\nfalse", empty(If.class));
+
+    check("for $a in (false(), true()) for $b in (0, 1) return "
+        + "if($a) then not($b) else boolean($b)", "false\ntrue\ntrue\nfalse", empty(If.class));
+    check("for $a in (false(), true()) for $b in (0, 1) return "
+        + "if($a) then boolean($b) else not($b)", "true\nfalse\nfalse\ntrue", empty(If.class));
+
+    check("for $a in (1, 2) for $b in (false(), true()) return "
+        + "if($a) then $b else not($b)", "false\ntrue\nfalse\ntrue", empty(If.class));
+    check("for $a in (1, 2) for $b in (false(), true()) return "
+        + "if($a) then not($b) else $b", "true\nfalse\ntrue\nfalse", empty(If.class));
+
+    check("let $a := <a/>[. = ''] for $b in (false(), true()) return "
+        + "if($b) then exists($a) else empty($a)", "false\ntrue", empty(If.class));
+    check("let $a := <a/>[. = ''] for $b in (false(), true()) return "
+        + "if($b) then empty($a) else exists($a)", "true\nfalse", empty(If.class));
   }
 }

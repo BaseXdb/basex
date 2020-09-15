@@ -1,11 +1,11 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.func.*;
+import org.basex.query.expr.CmpG.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -72,16 +72,16 @@ public final class If extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    if(Function.EMPTY.is(cond)) {
+    if(EMPTY.is(cond)) {
       // if(empty(A)) then B else C  ->  if(exists(A)) then C else B
-      cond = cc.function(Function.EXISTS, info, cond.arg(0));
+      cond = cc.function(EXISTS, info, cond.arg(0));
       swap();
-      cc.info(OPTSWAP_X, this);
-    } else if(Function.NOT.is(cond)) {
+      cc.info(QueryText.OPTSWAP_X, this);
+    } else if(NOT.is(cond)) {
       // if(not(A)) then B else C  ->  if(A) then C else B
       cond = cond.arg(0);
       swap();
-      cc.info(OPTSWAP_X, this);
+      cc.info(QueryText.OPTSWAP_X, this);
     }
     // if(exists(nodes))  ->  if(nodes)
     cond = cond.simplifyFor(Simplify.EBV, cc);
@@ -108,10 +108,10 @@ public final class If extends Arr {
     // rewrite to elvis operator:
     //   if(exists(VALUE)) then VALUE else DEFAULT  ->  VALUE ?: DEFAULT
     //   if(NODES) then NODES else DEFAULT  ->  NODES ?: DEFAULT
-    final Expr cmp = Function.EXISTS.is(cond) ? cond.arg(0) :
+    final Expr cmp = EXISTS.is(cond) ? cond.arg(0) :
       ct.type instanceof NodeType ? cond : null;
     if(!ndt && cmp != null && cmp.equals(br1)) return
-        cc.function(Function._UTIL_OR, info, br1, br2);
+        cc.function(_UTIL_OR, info, br1, br2);
 
     // if(A) then B else B  ->  B (errors in A will be ignored)
     if(br1.equals(br2)) return cc.merge(cond, br1, info);
@@ -124,23 +124,59 @@ public final class If extends Arr {
     if(st1.eq(SeqType.BLN_O) && st2.eq(SeqType.BLN_O)) {
       if(br1 == Bln.TRUE) return br2 == Bln.FALSE ?
         // if(A) then true() else false()  ->  boolean(A)
-        cc.function(Function.BOOLEAN, info, cond) :
+        cc.function(BOOLEAN, info, cond) :
         // if(A) then true() else C  ->  A or C
         new Or(info, cond, br2).optimize(cc);
       if(br2 == Bln.TRUE) return br1 == Bln.FALSE ?
         // if(A) then false() else true()  ->  not(A)
-        cc.function(Function.NOT, info, cond) :
+        cc.function(NOT, info, cond) :
         // if(A) then B else true()  ->  not(A) or B
-        new Or(info, cc.function(Function.NOT, info, cond), br1).optimize(cc);
+        new Or(info, cc.function(NOT, info, cond), br1).optimize(cc);
       // if(A) then false() else C  ->  not(A) and C
       if(br1 == Bln.FALSE) return
-        new And(info, cc.function(Function.NOT, info, cond), br2).optimize(cc);
+        new And(info, cc.function(NOT, info, cond), br2).optimize(cc);
       // if(A) then B else false()  ->  A and B
       if(br2 == Bln.FALSE) return
         new And(info, cond, br1).optimize(cc);
-    }
 
+      Expr expr = notToCmp(br1, br2, OpG.EQ, cc);
+      if(expr == this) expr = notToCmp(br2, br1, OpG.NE, cc);
+      if(expr == this) expr = emptyToCmp(br1, br2, OpG.EQ, cc);
+      if(expr == this) expr = emptyToCmp(br2, br1, OpG.NE, cc);
+      if(expr != this) return expr;
+    }
     return this;
+  }
+
+  /**
+   * Rewrites an if expression to a comparison.
+   * @param ex1 first expression
+   * @param ex2 second expression
+   * @param op operator
+   * @param cc compilation context
+   * @return new expression or self reference
+   * @throws QueryException query exception
+   */
+  private Expr notToCmp(final Expr ex1, final Expr ex2, final OpG op, final CompileContext cc)
+      throws QueryException {
+    final Expr arg1 = BOOLEAN.is(ex1) ? ex1.arg(0) : ex1;
+    return NOT.is(ex2) && arg1.equals(ex2.arg(0)) ? new CmpG(
+        cc.function(BOOLEAN, info, cond), ex1, op, null, cc.sc(), info).optimize(cc) : this;
+  }
+
+  /**
+   * Rewrites an if expression to a comparison.
+   * @param ex1 first expression
+   * @param ex2 second expression
+   * @param op operator
+   * @param cc compilation context
+   * @return new expression or self reference
+   * @throws QueryException query exception
+   */
+  private Expr emptyToCmp(final Expr ex1, final Expr ex2, final OpG op, final CompileContext cc)
+      throws QueryException {
+    return EMPTY.is(ex1) && EXISTS.is(ex2) && ex1.arg(0).equals(ex2.arg(0)) ? new CmpG(
+        cc.function(BOOLEAN, info, cond), ex1, op, null, cc.sc(), info).optimize(cc) : this;
   }
 
   /**
@@ -276,7 +312,7 @@ public final class If extends Arr {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.token("(").token(IF).paren(cond).token(THEN).token(exprs[0]);
-    qs.token(ELSE).token(exprs[1]).token(')');
+    qs.token("(").token(QueryText.IF).paren(cond).token(QueryText.THEN).token(exprs[0]);
+    qs.token(QueryText.ELSE).token(exprs[1]).token(')');
   }
 }
