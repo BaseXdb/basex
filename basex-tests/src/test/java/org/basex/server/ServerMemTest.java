@@ -18,20 +18,18 @@ public final class ServerMemTest extends SandboxTest {
   BaseXServer server;
 
   /**
-   * Runs the test.
+   * Runs the test with 10 clients.
    * @throws Exception exception
    */
-  @Test
-  public void clients10() throws Exception {
+  @Test public void clients10() throws Exception {
     run(10);
   }
 
   /**
-   * Runs the test.
+   * Runs the test with 100 clients.
    * @throws Exception exception
    */
-  @Test
-  public void clients100() throws Exception {
+  @Test public void clients100() throws Exception {
     run(100);
   }
 

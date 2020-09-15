@@ -54,16 +54,14 @@ public abstract class SessionTest extends SandboxTest {
   }
 
   /** Runs an erroneous query command. */
-  @Test
-  public final void commandError() {
+  @Test public final void commandError() {
     assertThrows(BaseXException.class, () -> session.execute("xquery ("));
   }
 
   /**
    * Runs a query command and retrieves the result as string.
    */
-  @Test
-  public final void commandErr() {
+  @Test public final void commandErr() {
     assertThrows(BaseXException.class, () -> session.execute("1,<a/>+''"));
   }
 
@@ -81,16 +79,14 @@ public abstract class SessionTest extends SandboxTest {
   /**
    * Stops because of invalid input.
    */
-  @Test
-  public final void createErr() {
+  @Test public final void createErr() {
     assertThrows(BaseXException.class, () -> session.create(NAME, new ArrayInput("<")));
   }
 
   /**
    * Stops because of an invalid database name.
    */
-  @Test
-  public final void createNameErr() {
+  @Test public final void createNameErr() {
     assertThrows(BaseXException.class, () -> session.create("", new ArrayInput("")));
   }
 
@@ -110,8 +106,7 @@ public abstract class SessionTest extends SandboxTest {
    * Adds a file with an invalid file name.
    * @throws IOException I/O exception
    */
-  @Test
-  public final void addNameErr() throws IOException {
+  @Test public final void addNameErr() throws IOException {
     session.execute("create db " + NAME);
     assertThrows(BaseXException.class, () -> session.add("", new ArrayInput("<X/>")));
   }
@@ -120,8 +115,7 @@ public abstract class SessionTest extends SandboxTest {
    * Adds a file with missing input.
    * @throws IOException I/O exception
    */
-  @Test
-  public final void addNoInput() throws IOException {
+  @Test public final void addNoInput() throws IOException {
     session.execute("create db " + NAME);
     assertThrows(BaseXException.class, () -> session.add("", new ArrayInput("")));
   }
@@ -145,8 +139,7 @@ public abstract class SessionTest extends SandboxTest {
    * Replaces a file with an invalid file name.
    * @throws IOException I/O exception
    */
-  @Test
-  public final void replaceNameErr() throws IOException {
+  @Test public final void replaceNameErr() throws IOException {
     session.execute("create db " + NAME);
     assertThrows(BaseXException.class, () -> session.replace("", new ArrayInput("<X/>")));
   }
@@ -155,8 +148,7 @@ public abstract class SessionTest extends SandboxTest {
    * Adds a file with missing input.
    * @throws IOException I/O exception
    */
-  @Test
-  public final void replaceNoInput() throws IOException {
+  @Test public final void replaceNoInput() throws IOException {
     session.execute("create db " + NAME);
     assertThrows(BaseXException.class, () -> session.replace("", new ArrayInput("")));
   }
@@ -188,8 +180,7 @@ public abstract class SessionTest extends SandboxTest {
   /**
    * Stores binary content in the database.
    */
-  @Test
-  public final void storeNoDB() {
+  @Test public final void storeNoDB() {
     assertThrows(BaseXException.class, () -> session.store("X", new ArrayInput("!")));
   }
 
@@ -197,8 +188,7 @@ public abstract class SessionTest extends SandboxTest {
    * Stores binary content in the database.
    * @throws IOException I/O exception
    */
-  @Test
-  public final void storeInvalid() throws IOException {
+  @Test public final void storeInvalid() throws IOException {
     session.execute("create db " + NAME);
     assertThrows(BaseXException.class, () -> session.store("..", new ArrayInput("!")));
   }
@@ -350,8 +340,7 @@ public abstract class SessionTest extends SandboxTest {
   }
 
   /** Runs a query with an external variable declaration. */
-  @Test
-  public void queryBind2() {
+  @Test public void queryBind2() {
     assertThrows(BaseXException.class,
       () -> session.query("declare variable $a external; $a").next());
   }
@@ -540,21 +529,18 @@ public abstract class SessionTest extends SandboxTest {
   }
 
   /** Runs an erroneous query. */
-  @Test
-  public void queryError() {
+  @Test public void queryError() {
     assertThrows(BaseXException.class, () -> session.query("(").next());
   }
 
   /** Runs an erroneous query. */
-  @Test
-  public void queryError2() {
+  @Test public void queryError2() {
     assertThrows(BaseXException.class, () -> session.query("(1,'a')[. eq 1]").execute());
   }
 
   /** Runs an erroneous query.
    * @throws IOException I/O exception */
-  @Test
-  public void queryError3() throws IOException {
+  @Test public void queryError3() throws IOException {
     final Query query = session.query("(1,'a')[. eq 1]");
     assertThrows(BaseXException.class, query::next);
   }

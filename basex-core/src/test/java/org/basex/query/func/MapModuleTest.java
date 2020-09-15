@@ -97,7 +97,7 @@ public final class MapModuleTest extends QueryPlanTest {
         " map { 'duplicates': 'reject' }") + "(1)",
         MERGE_DUPLICATE_X);
 
-    // GH1543
+    // GH-1543
     query("map:for-each(" + func.args(" (map { 'a': () }, map { 'a': () })") +
         ", function($k, $v) { () })", "");
     query("map:for-each(" + func.args(" (map { 'a': () }, map { 'a': () })",
@@ -111,14 +111,14 @@ public final class MapModuleTest extends QueryPlanTest {
     query("map:for-each(" + func.args(" (map { 'a': () }, map { 'b': () })",
         " map { 'duplicates': 'use-first' }") + ", function($k, $v) { $v })", "");
 
-    // GH1561
+    // GH-1561
     final String arg1 = " (map { 'A': 'a' }, map { 'A': 'a', 'B': 'b' })";
     query("map:size(" + func.args(arg1) + ")", 2);
     query("map:size(" + func.args(arg1, " map { 'duplicates': 'use-first' }") + ")", 2);
     query("map:size(" + func.args(arg1, " map { 'duplicates': 'use-last' }") + ")", 2);
     query("map:size(" + func.args(arg1, " map { 'duplicates': 'combine' }") + ")", 2);
 
-    // GH1602
+    // GH-1602
     query("let $_ := 'combine' return " + func.args(" map { 0:1 }",
         " map { 'duplicates': $_ }") + "?0", 1);
   }

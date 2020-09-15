@@ -711,16 +711,17 @@ public final class FnModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void replace() {
-    // tests for issue GH-573:
     final Function func = REPLACE;
-    query(func.args("aaaaa bbbbbbbb ddd ", "(.{6,15}) ", "$1@"), "aaaaa bbbbbbbb@ddd ");
-    query(func.args("aaaa AAA 123", "(\\s+\\P{Ll}{3,280}?)", "$1@"), "aaaa AAA@ 123@");
-    error(func.args("asdf", "a{12, 3}", ""), REGPAT_X);
 
     query(func.args("a", "", "x", "j"), "xax");
     error(func.args("a", "", "x"), REGROUP);
 
-    // GH1940
+    // GH-573
+    query(func.args("aaaaa bbbbbbbb ddd ", "(.{6,15}) ", "$1@"), "aaaaa bbbbbbbb@ddd ");
+    query(func.args("aaaa AAA 123", "(\\s+\\P{Ll}{3,280}?)", "$1@"), "aaaa AAA@ 123@");
+    error(func.args("asdf", "a{12, 3}", ""), REGPAT_X);
+
+    // GH-1940
     query("replace('hello', 'hel(?:lo)', '$1')", "");
     query("replace('abc', 'b', '$0')", "abc");
     query("replace('abc', 'b', '$1')", "ac");

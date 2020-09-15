@@ -39,8 +39,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
    * Create a test database and start BaseXHTTP.
    * @throws Exception if database cannot be created or server cannot be started
    */
-  @BeforeEach
-  public void setUp() throws Exception {
+  @BeforeEach public void setUp() throws Exception {
     final StringList sl = new StringList();
     sl.add("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT, "-z").add("-U" + ADMIN);
 
@@ -54,8 +53,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
    * Stop BaseXHTTP.
    * @throws Exception if database cannot be dropped or server cannot be stopped
    */
-  @AfterEach
-  public void tearDown() throws Exception {
+  @AfterEach public void tearDown() throws Exception {
     http.stop();
   }
 
@@ -68,8 +66,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
    * </ol>
    * @throws Exception error during request execution
    */
-  @Test
-  public void testMultipleReaders() throws Exception {
+  @Test public void testMultipleReaders() throws Exception {
     final String number = "63177";
     final String slowQuery = "?query=(1%20to%20100000000000)%5b.=0%5d";
     final String fastQuery = "?query=" + number;
@@ -103,9 +100,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
    * </ol>
    * @throws Exception error during request execution
    */
-  @Test
-  @Disabled("There is no way to stop a query on the server!")
-  public void testReaderWriter() throws Exception {
+  @Test @Disabled("Query cannot be stopped") public void testReaderWriter() throws Exception {
     final String readerQuery = "?query=(1%20to%20100000000000000)%5b.=0%5d";
     final String writerQuery = "/test.xml";
     final byte[] content = Token.token("<a/>");
@@ -147,8 +142,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
    * </ol>
    * @throws Exception error during request execution
    */
-  @Test
-  public void testMultipleWriters() throws Exception {
+  @Test public void testMultipleWriters() throws Exception {
     final int count = 10;
     final String template =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +

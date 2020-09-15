@@ -988,25 +988,19 @@ public final class UpdateTest extends SandboxTest {
     error("copy $c := <a/> modify put(<a/>, 'x.txt') return $c", BASEX_UPDATE);
   }
 
-  /**
-   * Reject updating functions in built-in higher-order function.
-   */
+  /** Reject updating functions in built-in higher-order function. */
   @Test public void updatingHof() {
     error("apply(update:output#1, [<b/>])", FUNCUP_X);
     error("for-each(<a/>, update:output#1)", FUNCUP_X);
     error("for-each-pair(<a/>, <b/>, put#2)", FUNCUP_X);
   }
 
-  /**
-   * Replaces a node with two others.
-   */
+  /** Replaces a node with two others. */
   @Test public void duplAttribute() {
     query("replace node document { <A><B/></A> }//B with (<X/>, <X/>)");
   }
 
-  /**
-   * Inserts attributes.
-   */
+  /** Inserts attributes. */
   @Test public void attributeInserts() {
     // Issue #736
     query("declare namespace x='x';" +
@@ -1016,9 +1010,7 @@ public final class UpdateTest extends SandboxTest {
         "return insert node attribute {concat('x:', 'att', $i)} {} into  $n");
   }
 
-  /**
-   * Tests the combination of transform expressions and xquery:eval().
-   */
+  /** Tests the combination of transform expressions and xquery:eval(). */
   @Test public void evalFItem() {
     query("declare function local:c() { copy $a := <a/> modify () return $a };" +
       "xquery:eval('declare variable $c external; $c()', map { 'c': local:c#0 })", "<a/>");
@@ -1059,18 +1051,14 @@ public final class UpdateTest extends SandboxTest {
     error("<x/> transform with { 1 }", UPMODIFY);
   }
 
-  /**
-   * Tests the relaxed rule that the last step of a path may be simple, vacuous, or updating.
-   */
+  /** Tests the relaxed rule that the last step of a path may be simple, vacuous, or updating. */
   @Test public void updateLastStep() {
     query("<X/>!(delete node .)");
     query("<X/>/(delete node .)");
     query("(<X/>,<Y/>)/(insert node <Z/> into .)");
   }
 
-  /**
-   * Tests the expressions in modify clauses for updates.
-   */
+  /** Tests the expressions in modify clauses for updates. */
   @Test public void modifyCheck() {
     error("copy $c:= <a>X</a> modify 'a' return $c", UPMODIFY);
     error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", UPALL);
@@ -1080,9 +1068,7 @@ public final class UpdateTest extends SandboxTest {
     error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", UPALL);
   }
 
-  /**
-   * Reject updating function items.
-   */
+  /** Reject updating function items. */
   @Test public void updatingFuncItems() {
     query("update:output(?)", "(anonymous-function)#1");
     query("update:output#1", "update:output#1");
@@ -1138,17 +1124,13 @@ public final class UpdateTest extends SandboxTest {
     query(_FILE_EXISTS.args(sandbox() + "test.xml"), true);
   }
 
-  /**
-   * Allows empty-sequence() as return type for updating functions.
-   */
+  /** Allows empty-sequence() as return type for updating functions. */
   @Test public void returnType() {
     query("declare %updating function local:f() as empty-sequence() {delete node <a/>};local:f()");
     query("updating function() as empty-sequence() {delete node <a/>}()");
   }
 
-  /**
-   * Window clauses.
-   */
+  /** Window clauses. */
   @Test public void window() {
     query("for tumbling window $w in 1 start when true() return update:output($w)", 1);
     query("for sliding window $w in 1 start when true() end when true() "
@@ -1158,18 +1140,14 @@ public final class UpdateTest extends SandboxTest {
     error("for tumbling window $w in update:output(1) start when () return ()", UPNOT_X);
   }
 
-  /**
-   * Checks if updating expressions are treated like non-deterministic code.
-   */
+  /** Checks if updating expressions are treated like non-deterministic code. */
   @Test public void noOptimization() {
     query("<a/> update { . ! (insert node text { '1' } into .) }", "<a>1</a>");
     query("<a/> update { for $a in (1,2) return insert node text { '1' } into . }", "<a>11</a>");
     query("(update:output('1'), update:output('2'))", "1\n2");
   }
 
-  /**
-   * GH1576.
-   */
+  /** Test. */
   @Test public void gh1576() {
     query("update:output([])", "[]");
     query("update:output([1,(2,[3,4])])", "[1, (2, [3, 4])]");
@@ -1182,9 +1160,7 @@ public final class UpdateTest extends SandboxTest {
     error("update:output(map { 1: map { 2: true#0 }})", BASEX_FUNCTION_X);
   }
 
-  /**
-   * GH1693.
-   */
+  /** Test. */
   @Test public void gh1693() {
     query("try { () } catch * { () }, delete node <a/>");
   }

@@ -121,8 +121,7 @@ public final class XMarkTest {
    * Initializes the tests.
    * @throws Exception any exception
    */
-  @BeforeAll
-  public static void init() throws Exception {
+  @BeforeAll public static void init() throws Exception {
     // only start server if it is not already running
     if(!BaseXServer.ping(StaticOptions.HOST.value(), StaticOptions.PORT.value()))
       server = new BaseXServer();
@@ -137,8 +136,7 @@ public final class XMarkTest {
   /**
    * Initializes the tests.
    */
-  @AfterAll
-  public static void close() {
+  @AfterAll public static void close() {
     // only stop server if it has not been running before starting the tests
     if(server != null) server.stop();
   }
@@ -147,8 +145,7 @@ public final class XMarkTest {
    * Runs all tests and generates some test output.
    * @throws Exception any exception
    */
-  @Test
-  public void test() throws Exception {
+  @Test public void test() throws Exception {
     final IntList exclude = new IntList(new int[] { 11, 12 });
     final TokenBuilder tb = new TokenBuilder().add(DB).add(Prop.NL);
 

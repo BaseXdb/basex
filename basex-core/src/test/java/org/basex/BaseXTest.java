@@ -61,8 +61,7 @@ public abstract class BaseXTest extends MainTest {
   /**
    * Test variable bindings.
    */
-  @Test
-  public void bindErr() {
+  @Test public void bindErr() {
     assertThrows(BaseXException.class, () ->
       run("-ba=A", "-qdeclare variable $a as xs:integer external; $a"));
   }
@@ -70,8 +69,7 @@ public abstract class BaseXTest extends MainTest {
   /**
    * Test variable bindings with namespaces.
    */
-  @Test
-  public void bindNSErr() {
+  @Test public void bindNSErr() {
     assertThrows(BaseXException.class, () -> run("X'\"", "-b{URI}ln=X'\"", INPUT.toString()));
   }
 
@@ -98,8 +96,7 @@ public abstract class BaseXTest extends MainTest {
   /**
    * Command error.
    */
-  @Test
-  public void commandErr() {
+  @Test public void commandErr() {
     assertThrows(BaseXException.class, () -> run("-1"));
   }
 
@@ -123,8 +120,7 @@ public abstract class BaseXTest extends MainTest {
   /**
    * Query error.
    */
-  @Test
-  public void queryErr() {
+  @Test public void queryErr() {
     assertThrows(BaseXException.class, () -> run("-q1+"));
   }
 
@@ -139,8 +135,7 @@ public abstract class BaseXTest extends MainTest {
   /**
    * Test different number of runs.
    */
-  @Test
-  public void runErr() {
+  @Test public void runErr() {
     assertThrows(BaseXException.class, () -> run("-rx", "-q2"));
   }
 

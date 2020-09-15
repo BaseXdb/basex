@@ -30,8 +30,7 @@ public abstract class Benchmark extends SandboxTest {
    * Initializes the benchmark.
    * @throws IOException I/O exception
    */
-  @BeforeAll
-  public static void init() throws IOException {
+  @BeforeAll public static void init() throws IOException {
     // check if server is (not) running
     final int sp = context.soptions.get(StaticOptions.SERVERPORT);
     server = local || BaseXServer.ping(S_LOCALHOST, sp) ? null : createServer();
@@ -44,8 +43,7 @@ public abstract class Benchmark extends SandboxTest {
   /**
    * Stops the server.
    */
-  @AfterAll
-  public static void stop() {
+  @AfterAll public static void stop() {
     stopServer(server);
   }
 

@@ -48,8 +48,7 @@ public final class FNCryptoTest extends SandboxTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureWithCertificate() {
+  @Test public void validateSignatureWithCertificate() {
     query("crypto:validate-signature(" +
         "crypto:generate-signature(<a/>,'','','','',''," + CT + "))", "true");
   }
@@ -58,8 +57,7 @@ public final class FNCryptoTest extends SandboxTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureWithXPathAndCertificate() {
+  @Test public void validateSignatureWithXPathAndCertificate() {
     query("crypto:validate-signature(crypto:generate-signature(<a><n/><n/></a>," +
         "'','','','','','/a/n'," + CT + "))", "true");
   }
@@ -68,8 +66,7 @@ public final class FNCryptoTest extends SandboxTest {
    * Tests whether validate-signature returns true for a certificate created
    * with generate-signature.
    */
-  @Test
-  public void validateSignatureFullySpecified() {
+  @Test public void validateSignatureFullySpecified() {
     query("crypto:validate-signature(crypto:generate-signature(<a><n/></a>," +
         "'exclusive','SHA512','RSA_SHA1','myPrefix','enveloped','/a/n'," + CT +
         "))", "true");
@@ -79,8 +76,7 @@ public final class FNCryptoTest extends SandboxTest {
    * Creates the database context.
    * @throws Exception error during keystore generation or database exception
    */
-  @BeforeAll
-  public static void start() throws Exception {
+  @BeforeAll public static void start() throws Exception {
     new File(KEYSTORE).delete();
 
     final Process proc = Runtime.getRuntime().exec(GENKEY_CMD);
@@ -94,8 +90,7 @@ public final class FNCryptoTest extends SandboxTest {
   /**
    * Removes test databases and closes the database context.
    */
-  @AfterAll
-  public static void finish() {
+  @AfterAll public static void finish() {
     new File(KEYSTORE).delete();
   }
 

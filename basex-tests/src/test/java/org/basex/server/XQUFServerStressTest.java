@@ -17,8 +17,7 @@ public final class XQUFServerStressTest extends SandboxTest {
    * Runs the test.
    * @throws Exception exception
    */
-  @Test
-  public void clients10runs10() throws Exception {
+  @Test public void clients10runs10() throws Exception {
     run(10, 10);
   }
 
@@ -26,8 +25,7 @@ public final class XQUFServerStressTest extends SandboxTest {
    * Runs the test.
    * @throws Exception exception
    */
-  @Test
-  public void clients10runs50() throws Exception {
+  @Test public void clients10runs50() throws Exception {
     run(10, 50);
   }
 
@@ -35,8 +33,7 @@ public final class XQUFServerStressTest extends SandboxTest {
    * Runs the test.
    * @throws Exception exception
    */
-  @Test
-  public void clients50runs10() throws Exception {
+  @Test public void clients50runs10() throws Exception {
     run(50, 10);
   }
 
@@ -44,8 +41,7 @@ public final class XQUFServerStressTest extends SandboxTest {
    * Runs the test.
    * @throws Exception exception
    */
-  @Test
-  public void clients50runs50() throws Exception {
+  @Test public void clients50runs50() throws Exception {
     run(50, 50);
   }
 

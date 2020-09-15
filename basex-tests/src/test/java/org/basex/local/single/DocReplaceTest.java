@@ -16,11 +16,8 @@ public final class DocReplaceTest extends SandboxTest {
   /** Number of queries to be run. */
   private static final int NQUERIES = 25000;
 
-  /**
-   * Runs the test.
-   */
-  @Test
-  public void run() {
+  /** Runs the test. */
+  @Test public void run() {
     set(MainOptions.TEXTINDEX, false);
     set(MainOptions.ATTRINDEX, false);
     set(MainOptions.AUTOFLUSH, false);

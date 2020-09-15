@@ -546,7 +546,7 @@ public final class RewritingsTest extends QueryPlanTest {
         count(TypeCheck.class, 1));
   }
 
-  /** GH1694. */
+  /** Test. */
   @Test public void gh1694() {
     check("count(1)", 1, exists(Int.class));
     execute(new CreateDB(NAME, "<_/>"));
@@ -561,7 +561,7 @@ public final class RewritingsTest extends QueryPlanTest {
     query(query, "<_/>");
   }
 
-  /** GH1726. */
+  /** Test. */
   @Test public void gh1726() {
     final String query =
       "let $xml := if((1, 0)[.]) then ( " +
@@ -575,14 +575,14 @@ public final class RewritingsTest extends QueryPlanTest {
     query(query, "<b/>\n<a>\n<b/>\n</a>");
   }
 
-  /** GH1723. */
+  /** Test. */
   @Test public void gh1723() {
     check("count(<a/>)", 1, root(Int.class));
     check("count(<a/>/<b/>)", 1, root(Int.class));
     check("count(<a/>/<b/>/<c/>/<d/>)", 1, root(Int.class));
   }
 
-  /** GH1733. */
+  /** Test. */
   @Test public void gh1733() {
     check("(<a/>, <b/>)/1", "1\n1", root(SingletonSeq.class));
     check("<a/>/1", 1, root(Int.class));
@@ -594,7 +594,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(<a/>, <b/>)/<c/>", "<c/>\n<c/>", root(MixedPath.class));
   }
 
-  /** GH1741. */
+  /** Test. */
   @Test public void gh1741() {
     check("<a/>/<b/>[1]", "<b/>", root(CElem.class));
     check("<a/>/.[1]", "<a/>", root(CElem.class));
@@ -605,7 +605,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<doc><x/><y/></doc>/*/..[2] ! name()", "", empty());
   }
 
-  /** GH1737: combined kind tests. */
+  /** Combined kind tests. */
   @Test public void gh1737() {
     // merge identical steps, rewrite to iterative path
     check("<a/>/(* | *)", "", root(IterPath.class), empty(Union.class));
@@ -629,7 +629,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>/(*, @*)", "", root(MixedPath.class), exists(Union.class));
   }
 
-  /** GH1761: merge adjacent steps in path expressions. */
+  /** Merge adjacent steps in path expressions. */
   @Test public void gh1761() {
     // merge self steps
     check("<a/>/self::*/self::a", "<a/>", count(IterStep.class, 1));
@@ -648,7 +648,7 @@ public final class RewritingsTest extends QueryPlanTest {
         count(IterStep.class, 1));
   }
 
-  /** GH1762: merge steps and predicates with self steps. */
+  /** Merge steps and predicates with self steps. */
   @Test public void gh1762() {
     // merge self steps
     check("<a/>/self::*[self::a]", "<a/>", count(IterStep.class, 1));

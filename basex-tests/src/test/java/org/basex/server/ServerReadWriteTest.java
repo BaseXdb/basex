@@ -20,8 +20,7 @@ public final class ServerReadWriteTest extends SandboxTest {
    * Runs the test.
    * @throws Exception exception
    */
-  @Test
-  public void clients20runs20() throws Exception {
+  @Test public void clients20runs20() throws Exception {
     run(20, 20);
   }
 
@@ -29,8 +28,7 @@ public final class ServerReadWriteTest extends SandboxTest {
    * Runs the test.
    * @throws Exception exception
    */
-  @Test
-  public void clients20runs200() throws Exception {
+  @Test public void clients20runs200() throws Exception {
     run(20, 200);
   }
 
@@ -38,8 +36,7 @@ public final class ServerReadWriteTest extends SandboxTest {
    * Runs the test.
    * @throws Exception exception
    */
-  @Test
-  public void clients200runs20() throws Exception {
+  @Test public void clients200runs20() throws Exception {
     run(200, 20);
   }
 
@@ -47,8 +44,7 @@ public final class ServerReadWriteTest extends SandboxTest {
    * Runs the test.
    * @throws Exception exception
    */
-  @Test
-  public void clients200runs200() throws Exception {
+  @Test public void clients200runs200() throws Exception {
     run(200, 200);
   }
 

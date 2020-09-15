@@ -32,16 +32,14 @@ public final class BaseXClientTest extends BaseXTest {
   /**
    * Test client with invalid port argument.
    */
-  @Test
-  public void portErr() {
+  @Test public void portErr() {
     assertThrows(BaseXException.class, () -> run("-px"));
   }
 
   /**
    * Test client with invalid port number.
    */
-  @Test
-  public void portErr2() {
+  @Test public void portErr2() {
     assertThrows(BaseXException.class, () -> run("-px0"));
   }
 

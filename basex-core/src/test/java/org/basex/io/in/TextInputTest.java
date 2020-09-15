@@ -56,8 +56,7 @@ public final class TextInputTest {
   /**
    * Test unknown encoding.
    */
-  @Test
-  public void unknownEncoding() {
+  @Test public void unknownEncoding() {
     assertThrows(IOException.class, () -> encoding("unknown", ""));
   }
 
