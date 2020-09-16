@@ -1164,4 +1164,16 @@ public final class UpdateTest extends SandboxTest {
   @Test public void gh1693() {
     query("try { () } catch * { () }, delete node <a/>");
   }
+
+  /** Do not merge non-updating expressions. */
+  @Test public void gh1943() {
+    query("let $c := <a/> ! (. update {}, . update {}) return $c[1] is $c[2]", false);
+    query("let $a := <a/> let $c := ($a update {}, $a update {}) return $c[1] is $c[2]", false);
+
+    query("<a/> ! (copy $_ := . modify () return $_)", "<a/>");
+    query("let $a := <a/> let $c := ("
+        + "  copy $_ := $a modify () return $_,"
+        + "  copy $_ := $a modify () return $_"
+        + ") return $c[1] is $c[2]", false);
+  }
 }
