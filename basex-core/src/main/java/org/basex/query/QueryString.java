@@ -98,7 +98,8 @@ public final class QueryString {
 
     boolean more = false;
     for(final Object token : tokens) {
-      if(more) tb.add(separator);
+      if(more) tb.add(last() == ' ' && Strings.startsWith(separator, ' ') ?
+        separator.substring(1) : separator);
       else more = true;
       token(token);
     }

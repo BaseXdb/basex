@@ -90,7 +90,7 @@ public final class TransformWith extends Arr {
 
   @Override
   public boolean has(final Flag... flags) {
-    if(Flag.CNS.in(flags) || Flag.UPD.in(flags) && exprs[0].has(Flag.UPD)) return true;
+    if(Flag.CNS.in(flags)) return true;
     final Flag[] flgs = Flag.UPD.remove(flags);
     return flgs.length != 0 && super.has(flgs);
   }
