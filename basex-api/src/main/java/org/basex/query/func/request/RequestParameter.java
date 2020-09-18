@@ -26,11 +26,14 @@ public final class RequestParameter extends ApiFunc {
     try {
       final Value query = requestCtx.queryValues().get(name);
       final Value form = requestCtx.formValues(qc.context.options).get(name);
-      if(query == null && form == null)
+      if(query == null && form == null) {
         return exprs.length == 1 ? Empty.VALUE : exprs[1].value(qc);
-      if(query == null) return form;
-      if(form == null) return query;
-      return ValueBuilder.concat(query, form, qc);
+      }
+
+      final ValueBuilder vb = new ValueBuilder(qc);
+      if(query != null) vb.add(query);
+      if(form != null) vb.add(form);
+      return vb.value(this);
     } catch(final IOException ex) {
       throw REQUEST_PARAMETER.get(info, requestCtx.queryString());
     }
