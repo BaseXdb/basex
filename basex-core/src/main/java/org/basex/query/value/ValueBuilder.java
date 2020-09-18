@@ -59,7 +59,7 @@ public final class ValueBuilder {
     if(size2 == 0) return value1;
     if(size1 > 1) return ((Seq) value1).insertBefore(size1, value2, qc);
     if(size2 > 1) return ((Seq) value2).insert(0, (Item) value1, qc);
-    return TreeSeqBuilder.value(new Item[] { (Item) value1, (Item) value2 }, 2, null);
+    return TreeSeqBuilder.concat((Item) value1, (Item) value2, null);
   }
 
   /**
@@ -156,7 +156,7 @@ public final class ValueBuilder {
   /**
    * Returns a {@link Value} representation of the items currently stored in this builder
    * annotated with the type of the given expression.
-   * @param expr expression (can be {@code null})
+   * @param expr expression (can be {@code null}, only considered if new sequence is created)
    * @return value
    */
   public Value value(final Expr expr) {
