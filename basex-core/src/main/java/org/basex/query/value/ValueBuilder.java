@@ -53,13 +53,16 @@ public final class ValueBuilder {
    * @return concatenated values
    */
   public static Value concat(final Value value1, final Value value2, final QueryContext qc) {
+    // return existing values
     final long size1 = value1.size();
     if(size1 == 0) return value2;
     final long size2 = value2.size();
     if(size2 == 0) return value1;
+    // prepend or append values
     if(size1 > 1) return ((Seq) value1).insertBefore(size1, value2, qc);
     if(size2 > 1) return ((Seq) value2).insert(0, (Item) value1, qc);
-    return TreeSeqBuilder.concat((Item) value1, (Item) value2, null);
+    // concatenate single items
+    return TreeSeqBuilder.concat((Item) value1, (Item) value2);
   }
 
   /**
@@ -156,7 +159,7 @@ public final class ValueBuilder {
   /**
    * Returns a {@link Value} representation of the items currently stored in this builder
    * annotated with the type of the given expression.
-   * @param expr expression (can be {@code null}, only considered if new sequence is created)
+   * @param expr expression that created the value (can be {@code null})
    * @return value
    */
   public Value value(final Expr expr) {

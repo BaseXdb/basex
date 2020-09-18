@@ -40,11 +40,10 @@ public final class TreeSeqBuilder implements Iterable<Item> {
    * Concatenates two items.
    * @param item1 first item
    * @param item2 second item
-   * @param type type of all items in this sequence, can be {@code null}
    * @return the value
    */
-  public static Seq concat(final Item item1, final Item item2, final Type type) {
-    return new SmallSeq(new Item[] { item1, item2 }, type);
+  public static Seq concat(final Item item1, final Item item2) {
+    return new SmallSeq(new Item[] { item1, item2 }, item1.type.union(item2.type));
   }
 
   /**

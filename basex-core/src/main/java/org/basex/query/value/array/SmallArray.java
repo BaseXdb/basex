@@ -72,7 +72,7 @@ final class SmallArray extends XQArray {
 
   @Override
   public XQArray concat(final XQArray seq) {
-    return seq.isEmptyArray() ? this : seq.consSmall(elems);
+    return seq.isEmptyArray() ? this : seq.prepend(this);
   }
 
   @Override
@@ -204,16 +204,16 @@ final class SmallArray extends XQArray {
   }
 
   @Override
-  XQArray consSmall(final Value[] left) {
-    final int l = left.length, r = elems.length, n = l + r;
-    if(Math.min(l, r) >= MIN_DIGIT) {
-      // both arrays can be used as digits
-      return new BigArray(left, elems);
-    }
+  XQArray prepend(final SmallArray array) {
+    final Value[] values = array.elems;
+    final int a = values.length, b = elems.length, n = a + b;
+
+    // both arrays can be used as digits
+    if(Math.min(a, b) >= MIN_DIGIT) return new BigArray(values, elems);
 
     final Value[] out = new Value[n];
-    Array.copy(left, l, out);
-    Array.copyFromStart(elems, r, out, l);
+    Array.copy(values, a, out);
+    Array.copyFromStart(elems, b, out, a);
     if(n <= MAX_SMALL) return new SmallArray(out);
 
     final int mid = n / 2;

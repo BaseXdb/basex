@@ -649,17 +649,15 @@ final class BigArray extends XQArray {
   }
 
   @Override
-  XQArray consSmall(final Value[] values) {
+  XQArray prepend(final SmallArray array) {
+    final Value[] values = array.elems;
     final int a = values.length, b = left.length, n = a + b;
-    if(n <= MAX_DIGIT) {
-      // no need to change the middle tree
-      return new BigArray(concat(values, left), middle, right);
-    }
 
-    if(a >= MIN_DIGIT && MIN_LEAF <= b && b <= MAX_LEAF) {
-      // reuse the arrays
+    // no need to change the middle tree
+    if(n <= MAX_DIGIT) return new BigArray(concat(values, left), middle, right);
+    // reuse the arrays
+    if(a >= MIN_DIGIT && MIN_LEAF <= b && b <= MAX_LEAF)
       return new BigArray(values, middle.cons(new LeafNode(left)), right);
-    }
 
     // left digit is too big
     final int mid = n / 2, move = mid - a;
