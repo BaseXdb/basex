@@ -102,7 +102,9 @@ final class QueryCompiler {
    * @throws QueryException compilation errors
    */
   public static void compile(final CompileContext cc, final MainModule root) throws QueryException {
-    if(!root.compiled()) new QueryCompiler(cc, root).compile();
+    if(!root.compiled()) {
+      new QueryCompiler(cc, root).compile();
+    }
   }
 
   /**
@@ -110,18 +112,28 @@ final class QueryCompiler {
    * @throws QueryException compilation errors
    */
   private void compile() throws QueryException {
-    // compile the used scopes only
-    for(final Scope[] scope : scopes(0)) circCheck(scope).comp(cc);
+    // compile the used scopes only, collect static functions
+    final ArrayList<StaticFunc> funcs = new ArrayList<>();
+    for(final Scope[] scps : scopes(0)) {
+      final Scope scope = circCheck(scps);
+      scope.comp(cc);
+      if(scope instanceof StaticFunc) funcs.add((StaticFunc) scope);
+    }
 
     // check for circular variable declarations without compiling the unused scopes
     for(final StaticVar var : cc.qc.vars) {
-      if(id(var) == -1) for(final Scope[] scope : scopes(add(var))) circCheck(scope);
+      if(id(var) == -1) {
+        for(final Scope[] scope : scopes(add(var))) circCheck(scope);
+      }
     }
+
+    // optimize static functions
+    for(final StaticFunc func : funcs) func.optimize(cc);
   }
 
   /**
    * Checks if the given component contains a static variable that depends on itself.
-   * @param scopes scope to check
+   * @param scopes scopes to check
    * @return scope to be compiled, the others are compiled recursively
    * @throws QueryException query exception
    */

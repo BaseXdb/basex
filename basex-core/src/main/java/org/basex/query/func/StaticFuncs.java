@@ -27,6 +27,8 @@ import org.basex.util.similarity.*;
 public final class StaticFuncs extends ExprInfo {
   /** User-defined functions. */
   private final TokenObjMap<FuncCache> funcs = new TokenObjMap<>();
+  /** User-defined functions. */
+  private Map<StaticFunc, ArrayList<StaticFuncCall>> calls;
 
   /**
    * Returns the signature of the function with the given name and arity.
@@ -157,21 +159,23 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   /**
-   * Compiles the used functions.
+   * Compiles all functions.
    * @param cc compilation context
    */
-  public void compile(final CompileContext cc) {
-    compile(cc, false);
+  public void compileAll(final CompileContext cc) {
+    for(final FuncCache fc : funcs.values()) fc.func.comp(cc);
   }
 
   /**
-   * Compiles all functions.
+   * Compiles all referenced functions.
    * @param cc compilation context
-   * @param all compile all functions (not only used ones)
    */
-  public void compile(final CompileContext cc, final boolean all) {
+  public void compile(final CompileContext cc) {
     for(final FuncCache fc : funcs.values()) {
-      if(all || !fc.calls.isEmpty()) fc.func.comp(cc);
+      if(!fc.calls.isEmpty()) {
+        fc.func.comp(cc);
+        fc.func.optimize(cc);
+      }
     }
   }
 
@@ -184,6 +188,34 @@ public final class StaticFuncs extends ExprInfo {
   public StaticFunc get(final QNm name, final long arity) {
     final FuncCache fc = funcs.get(signature(name, arity));
     return fc != null ? fc.func : null;
+  }
+
+  /**
+   * Returns the unions of the sequences types for function calls of the specified function.
+   * @param func function
+   * @return sequence types or {@code null}
+   */
+  public SeqType[] seqTypes(final StaticFunc func) {
+    // initialize cache for direct lookups of function calls
+    if(calls == null) {
+      calls = new IdentityHashMap<>(funcs.size());
+      for(final FuncCache fc : funcs.values()) {
+        if(func.params.length > 0 && !fc.calls.isEmpty()) calls.put(fc.func, fc.calls);
+      }
+    }
+
+    final ArrayList<StaticFuncCall> sfcs = calls.get(func);
+    if(sfcs == null) return null;
+
+    final int sl = func.params.length;
+    final SeqType[] seqTypes = new SeqType[sl];
+    for(final StaticFuncCall sfc : sfcs) {
+      for(int s = 0; s < sl; s++) {
+        final SeqType st = sfc.arg(s).seqType(), stOld = seqTypes[s];
+        seqTypes[s] = stOld == null ? st : stOld.union(st);
+      }
+    }
+    return seqTypes;
   }
 
   /**

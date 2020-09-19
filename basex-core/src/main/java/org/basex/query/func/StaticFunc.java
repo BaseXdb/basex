@@ -63,25 +63,13 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     if(compiled || expr == null) return;
     compiling = compiled = true;
 
+    // compile function body, handle return type
     cc.pushFocus(null);
     cc.pushScope(vs);
     try {
       expr = expr.compile(cc);
-
-      if(declType != null) {
-        // remove redundant casts
-        final Type type = declType.type;
-        if(declType.eq(expr.seqType()) && type.oneOf(
-          AtomType.BLN, AtomType.FLT, AtomType.DBL, AtomType.QNM, AtomType.URI
-        )) {
-          cc.info(OPTTYPE_X, this);
-        } else {
-          expr = new TypeCheck(sc, info, expr, declType, true).optimize(cc);
-        }
-      }
+      if(declType != null) expr = new TypeCheck(sc, info, expr, declType, true).optimize(cc);
     } catch(final QueryException qe) {
-      // error: set most general sequence type
-      declType = SeqType.ITEM_ZM;
       expr = cc.error(qe, expr);
     } finally {
       cc.removeScope(this);
@@ -90,8 +78,26 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
     // convert all function calls in tail position to proper tail calls
     expr.markTailCalls(cc);
-
     compiling = false;
+  }
+
+  /**
+   * Optimize the static function.
+   * @param cc compilation context
+   */
+  public void optimize(final CompileContext cc) {
+    // check function calls, drop superfluous type checks
+    final SeqType[] seqTypes = cc.qc.funcs.seqTypes(this);
+    if(seqTypes != null) {
+      final int pl = arity();
+      for(int p = 0; p < pl; p++) {
+        if(seqTypes[p].instanceOf(params[p].seqType())) {
+          cc.info(OPTTYPE_X, params[p]);
+          params[p].declType = null;
+        }
+      }
+    }
+    declType = null;
   }
 
   /**

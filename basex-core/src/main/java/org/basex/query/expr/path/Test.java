@@ -59,7 +59,7 @@ public abstract class Test extends ExprInfo {
 
   /**
    * Creates a single test with the same node type.
-   * @param tests tests to be merged
+   * @param tests tests to be merged (can contain {@code null} references)
    * @return single test, union test, or {@code null} if test cannot be created.
    */
   public static Test get(final Test... tests) {
@@ -80,11 +80,8 @@ public abstract class Test extends ExprInfo {
 
     NodeType type = null;
     for(final Test test : tests) {
-      if(type == null) {
-        type = test.type;
-      } else if(test.type != type) {
-        return null;
-      }
+      if(test == null || type != null && type != test.type) return null;
+      type = test.type;
       if(test instanceof UnionTest) {
         for(final Test t : ((UnionTest) test).tests) add.accept(t);
       } else {

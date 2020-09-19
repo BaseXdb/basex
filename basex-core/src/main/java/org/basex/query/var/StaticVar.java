@@ -10,7 +10,6 @@ import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -57,8 +56,7 @@ public final class StaticVar extends StaticDecl {
     try {
       expr = expr.compile(cc);
     } catch(final QueryException qe) {
-      // error: set most general sequence type
-      declType = SeqType.ITEM_ZM;
+      declType = null;
       if(lazy) {
         expr = cc.error(qe, expr);
         return;
