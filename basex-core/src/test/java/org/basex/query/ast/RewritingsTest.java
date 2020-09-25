@@ -533,7 +533,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("map { string(<_/>): '' } instance of map(xs:string, xs:string)", true);
   }
 
-  /** Casts. */
+  /** Type checks. */
   @Test public void typeCheck() {
     check("declare function local:a($e) as xs:string? { local:b($e) }; " +
         "declare function local:b($e) as xs:string? { $e }; local:a(<_>X</_>)", "X",
@@ -544,6 +544,16 @@ public final class RewritingsTest extends QueryPlanTest {
     check("declare function local:a($e) as xs:string* { local:b($e) }; " +
         "declare function local:b($e) as xs:string? { $e }; local:a(<_>X</_>)", "X",
         count(TypeCheck.class, 1));
+
+    query("declare function local:f() as item()  { data([ <_/> ]) }; local:f()", "");
+    query("declare function local:f() as item()? { data([ <_/> ]) }; local:f()", "");
+    query("declare function local:f() as item()+ { data([ <_/> ]) }; local:f()", "");
+    query("declare function local:f() as item()* { data([ <_/> ]) }; local:f()", "");
+
+    query("declare function local:f($a) as item()  { data($a) }; local:f(<_/>)", "");
+    query("declare function local:f($a) as item()? { data($a) }; local:f(<_/>)", "");
+    query("declare function local:f($a) as item()+ { data($a) }; local:f(<_/>)", "");
+    query("declare function local:f($a) as item()* { data($a) }; local:f(<_/>)", "");
   }
 
   /** Test. */

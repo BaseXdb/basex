@@ -53,9 +53,9 @@ public class TypeCheck extends Single {
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st = seqType();
-    final boolean atomic = st.type instanceof AtomType && !expr.seqType().mayBeArray();
-    if(atomic) expr = expr.simplifyFor(Simplify.DATA, cc);
-
+    if(st.type.instanceOf(AtomType.AAT)) {
+      expr = expr.simplifyFor(Simplify.DATA, cc);
+    }
     final SeqType et = expr.seqType();
     occ = et.type.instanceOf(st.type) && et.kindInstanceOf(st);
 
@@ -94,7 +94,7 @@ public class TypeCheck extends Single {
     }
 
     // refine occurrence indicator and result size
-    if(atomic) {
+    if(!expr.seqType().mayBeArray()) {
       final Occ o = et.occ.intersect(st.occ);
       if(o == null) throw error(expr, st);
       exprType.assign(st, o, et.occ == st.occ ? es : -1);
