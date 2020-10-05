@@ -263,7 +263,7 @@ public abstract class Expr extends ExprInfo {
    * </ul>
    *
    * @param ic inlining context
-   * @return resulting expression if something changed, {@code null} otherwise
+   * @return resulting expression if something has changed, {@code null} otherwise
    * @throws QueryException query exception
    */
   public abstract Expr inline(InlineContext ic) throws QueryException;
