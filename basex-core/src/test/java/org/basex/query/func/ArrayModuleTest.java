@@ -165,6 +165,10 @@ public final class ArrayModuleTest extends QueryPlanTest {
     query(func.args(" ([1], [2])"), "[1, 2]");
     query(func.args(" ([1], [2], [3])"), "[1, 2, 3]");
     query(func.args(" ([1], [()], [2 to 3])"), "[1, (), (2, 3)]");
+
+    check(func.args(" [ <a/> ]") + "?1", "<a/>", empty(func));
+    check(func.args(" ([ <a/> ], [])") + "?1", "<a/>", empty(func));
+    check(func.args(" ([ <a/> ], [])") + "?*", "<a/>", empty(func));
   }
 
   /** Test method. */

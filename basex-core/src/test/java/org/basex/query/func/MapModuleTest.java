@@ -121,6 +121,10 @@ public final class MapModuleTest extends QueryPlanTest {
     // GH-1602
     query("let $_ := 'combine' return " + func.args(" map { 0:1 }",
         " map { 'duplicates': $_ }") + "?0", 1);
+
+    check(func.args(" map { 1: <a/> }") + "?1", "<a/>", empty(func));
+    check(func.args(" (map { 1: <a/> }, map { })") + "?1", "<a/>", empty(func));
+    check(func.args(" (map { 1: <a/> }, map { })") + "?*", "<a/>", empty(func));
   }
 
   /**
