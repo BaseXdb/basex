@@ -18,6 +18,7 @@ import org.basex.query.func.util.*;
 import org.basex.query.util.*;
 import org.basex.query.util.index.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -709,10 +710,10 @@ public abstract class Path extends ParseExpr {
       }
     }
 
-    // skip rewriting if no index access is possible, or if it is too expensive
+    // skip rewriting if no index access is possible, if it is too expensive or if root is no value
     if(index == null || data != null && index.costs.tooExpensive(data)) return this;
     // skip optimization if it is not enforced
-    if(rt instanceof Dummy && !index.enforce()) return this;
+    if((!(rt instanceof Value) || rt instanceof Dummy) && !index.enforce()) return this;
 
     // rewrite for index access
     cc.info(index.optInfo);
