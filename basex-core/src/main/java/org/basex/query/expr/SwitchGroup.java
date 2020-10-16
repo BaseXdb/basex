@@ -69,7 +69,7 @@ public final class SwitchGroup extends Arr {
 
   @Override
   public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    Expr ex = exprs[0];
+    Expr ex = rtrn();
     try {
       ex = tc.check(ex, cc);
     } catch(final QueryException qe) {
@@ -139,10 +139,15 @@ public final class SwitchGroup extends Arr {
    * @throws QueryException query exception
    */
   boolean simplify(final Simplify mode, final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0].simplifyFor(mode, cc);
-    if(expr == exprs[0]) return false;
+    final Expr expr = rtrn().simplifyFor(mode, cc);
+    if(expr == rtrn()) return false;
     exprs[0] = expr;
     return true;
+  }
+
+  @Override
+  public void markTailCalls(final CompileContext cc) {
+    rtrn().markTailCalls(cc);
   }
 
   @Override
