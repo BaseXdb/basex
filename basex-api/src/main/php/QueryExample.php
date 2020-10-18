@@ -22,8 +22,8 @@ try {
         $query = $session->query($input);
 
         // loop through all results
-        while ($query->more()) {
-            print $query->next()."\n";
+        foreach ($query as $resultItem) {
+            print $resultItem."\n";
         }
 
         // close query instance

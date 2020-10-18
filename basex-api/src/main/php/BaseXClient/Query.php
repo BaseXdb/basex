@@ -10,7 +10,7 @@
 
 namespace BaseXClient;
 
-class Query
+class Query implements \Iterator
 {
     protected $session;
     protected $id;
@@ -93,5 +93,24 @@ class Query
             throw new BaseXException($this->session->readString());
         }
         return $s;
+    }
+
+    public function current()
+    {
+        return $this->cache[$this->pos];
+    }
+
+    public function key()
+    {
+        return $this->pos;
+    }
+
+    public function valid()
+    {
+        return $this->more();
+    }
+
+    public function rewind()
+    {
     }
 }
