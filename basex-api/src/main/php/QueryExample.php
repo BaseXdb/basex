@@ -10,32 +10,29 @@
 include("BaseXClient.php");
 
 try {
-  // create session
-  $session = new Session("localhost", 1984, "admin", "admin");
-  
-  try {
-    // create query instance
-    $input = 'for $i in 1 to 10 return <xml>Text { $i }</xml>';
-    $query = $session->query($input);
+    // create session
+    $session = new Session("localhost", 1984, "admin", "admin");
 
-    // loop through all results
-    while($query->more()) {
-      print $query->next()."\n";
+    try {
+        // create query instance
+        $input = 'for $i in 1 to 10 return <xml>Text { $i }</xml>';
+        $query = $session->query($input);
+
+        // loop through all results
+        while ($query->more()) {
+            print $query->next()."\n";
+        }
+
+        // close query instance
+        $query->close();
+    } catch (Exception $e) {
+        // print exception
+        print $e->getMessage();
     }
 
-    // close query instance
-    $query->close();
-
-  } catch (Exception $e) {
+    // close session
+    $session->close();
+} catch (Exception $e) {
     // print exception
     print $e->getMessage();
-  }
-
-  // close session
-  $session->close();
-
-} catch (Exception $e) {
-  // print exception
-  print $e->getMessage();
 }
-?>

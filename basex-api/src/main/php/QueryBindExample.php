@@ -9,33 +9,30 @@
 include("BaseXClient.php");
 
 try {
-  // create session
-  $session = new Session("localhost", 1984, "admin", "admin");
-  
-  try {
-    // create query instance
-    $input = 'declare variable $name external; for $i in 1 to 10 return element { $name } { $i }';
-    $query = $session->query($input);
+    // create session
+    $session = new Session("localhost", 1984, "admin", "admin");
 
-    // bind variable
-    $query->bind("name", "number");
+    try {
+        // create query instance
+        $input = 'declare variable $name external; for $i in 1 to 10 return element { $name } { $i }';
+        $query = $session->query($input);
 
-    // print results
-    print $query->execute()."\n";
+        // bind variable
+        $query->bind("name", "number");
 
-    // close query instance
-    $query->close();
+        // print results
+        print $query->execute()."\n";
 
-  } catch (Exception $e) {
+        // close query instance
+        $query->close();
+    } catch (Exception $e) {
+        // print exception
+        print $e->getMessage();
+    }
+
+    // close session
+    $session->close();
+} catch (Exception $e) {
     // print exception
     print $e->getMessage();
-  }
-
-  // close session
-  $session->close();
-
-} catch (Exception $e) {
-  // print exception
-  print $e->getMessage();
 }
-?>
