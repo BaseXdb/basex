@@ -12,15 +12,21 @@ namespace BaseXClient;
 
 class Query
 {
-    public $session;
-    public $id;
-    public $open;
-    public $cache;
+    protected $session;
+    protected $id;
+    protected $cache;
+    protected $pos;
 
-    public function __construct($s, $q)
+    /**
+     * Query constructor.
+     *
+     * @param Session $session
+     * @param string $query
+     */
+    public function __construct($session, $query)
     {
-        $this->session = $s;
-        $this->id = $this->exec(chr(0), $q);
+        $this->session = $session;
+        $this->id = $this->exec(chr(0), $query);
     }
 
     public function bind($name, $value, $type = "")
@@ -40,7 +46,7 @@ class Query
 
     public function more()
     {
-        if ($this->cache == null) {
+        if ($this->cache === null) {
             $this->pos = 0;
             $this->session->send(chr(4).$this->id.chr(0));
             while (!$this->session->ok()) {
@@ -83,7 +89,7 @@ class Query
     {
         $this->session->send($cmd.$arg);
         $s = $this->session->receive();
-        if ($this->session->ok() != true) {
+        if ($this->session->ok() !== true) {
             throw new Exception($this->session->readString());
         }
         return $s;
