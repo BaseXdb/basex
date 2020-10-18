@@ -10,5 +10,5 @@
 
 namespace BaseXClient;
 
-class Exception extends \RuntimeException
+class BaseXException extends \RuntimeException
 {}

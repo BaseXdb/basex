@@ -10,4 +10,4 @@
 
 include_once 'BaseXClient/Session.php';
 include_once 'BaseXClient/Query.php';
-include_once 'BaseXClient/Exception.php';
+include_once 'BaseXClient/BaseXException.php';

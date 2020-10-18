@@ -24,7 +24,7 @@ class Session
         // create server connection
         $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if (!socket_connect($this->socket, $hostname, $port)) {
-            throw new Exception("Can't communicate with server.");
+            throw new BaseXException("Can't communicate with server.");
         }
 
         // receive timestamp
@@ -44,7 +44,7 @@ class Session
 
         // receives success flag
         if (socket_read($this->socket, 1) != chr(0)) {
-            throw new Exception("Access denied.");
+            throw new BaseXException("Access denied.");
         }
     }
 
@@ -63,7 +63,7 @@ class Session
         $result = $this->receive();
         $this->info = $this->readString();
         if ($this->ok() != true) {
-            throw new Exception($this->info);
+            throw new BaseXException($this->info);
         }
         return $result;
     }
@@ -169,7 +169,7 @@ class Session
         socket_write($this->socket, chr($code).$arg.chr(0).$input.chr(0));
         $this->info = $this->receive();
         if ($this->ok() != true) {
-            throw new Exception($this->info);
+            throw new BaseXException($this->info);
         }
     }
 

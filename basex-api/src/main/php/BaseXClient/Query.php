@@ -53,7 +53,7 @@ class Query
                 $this->cache[] = $this->session->readString();
             }
             if (!$this->session->ok()) {
-                throw new Exception($this->session->readString());
+                throw new BaseXException($this->session->readString());
             }
         }
         if ($this->pos < count($this->cache)) {
@@ -90,7 +90,7 @@ class Query
         $this->session->send($cmd.$arg);
         $s = $this->session->receive();
         if ($this->session->ok() !== true) {
-            throw new Exception($this->session->readString());
+            throw new BaseXException($this->session->readString());
         }
         return $s;
     }
