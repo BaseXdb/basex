@@ -7,7 +7,9 @@
  *
  * (C) BaseX Team 2005-12, BSD License
  */
-include("BaseXClient.php");
+include_once 'load.php';
+
+use BaseXClient\Session;
 
 try {
     // create session
