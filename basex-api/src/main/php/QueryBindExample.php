@@ -8,6 +8,7 @@
  */
 include_once 'load.php';
 
+use BaseXClient\BaseXException;
 use BaseXClient\Session;
 
 try {
@@ -27,14 +28,14 @@ try {
 
         // close query instance
         $query->close();
-    } catch (Exception $e) {
+    } catch (BaseXException $e) {
         // print exception
         print $e->getMessage();
     }
 
     // close session
     $session->close();
-} catch (Exception $e) {
+} catch (BaseXException $e) {
     // print exception
     print $e->getMessage();
 }
