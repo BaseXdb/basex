@@ -8,6 +8,7 @@
  */
 include_once 'load.php';
 
+use BaseXClient\BaseXException;
 use BaseXClient\Session;
 
 try {
@@ -26,7 +27,7 @@ try {
     // print time needed
     $time = (microtime(true) - $start) * 1000;
     print "\n$time ms\n";
-} catch (Exception $e) {
+} catch (BaseXException $e) {
     // print exception
     print $e->getMessage();
 }
