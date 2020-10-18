@@ -12,18 +12,18 @@ namespace BaseXClient;
 
 class Session
 {
-    // class variables.
-    public $socket;
-    public $info;
-    public $buffer;
-    public $bpos;
-    public $bsize;
+    // instance variables.
+    protected $socket;
+    protected $info;
+    protected $buffer;
+    protected $bpos;
+    protected $bsize;
 
-    public function __construct($h, $p, $user, $pw)
+    public function __construct($hostname, $port, $user, $password)
     {
         // create server connection
         $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if (!socket_connect($this->socket, $h, $p)) {
+        if (!socket_connect($this->socket, $hostname, $port)) {
             throw new Exception("Can't communicate with server.");
         }
 
@@ -33,10 +33,10 @@ class Session
         if (false !== strpos($ts, ':')) {
             // digest-auth
             $challenge = explode(':', $ts, 2);
-            $md5 = hash("md5", hash("md5", $user . ':' . $challenge[0] . ':' . $pw) . $challenge[1]);
+            $md5 = hash("md5", hash("md5", $user . ':' . $challenge[0] . ':' . $password) . $challenge[1]);
         } else {
             // Legacy: cram-md5
-            $md5 = hash("md5", hash("md5", $pw) . $ts);
+            $md5 = hash("md5", hash("md5", $password) . $ts);
         }
 
         // send username and hashed password/timestamp
@@ -48,10 +48,16 @@ class Session
         }
     }
 
-    public function execute($com)
+    /**
+     * Execute BaseX command.
+     *
+     * @param string $command
+     * @return string
+     */
+    public function execute($command)
     {
         // send command to server
-        socket_write($this->socket, $com.chr(0));
+        socket_write($this->socket, $command.chr(0));
 
         // receive result
         $result = $this->receive();
@@ -62,21 +68,45 @@ class Session
         return $result;
     }
 
-    public function query($q)
+    /**
+     * Execute XQuery query.
+     *
+     * @param string $xquery
+     * @return Query
+     */
+    public function query($xquery)
     {
-        return new Query($this, $q);
+        return new Query($this, $xquery);
     }
 
+    /**
+     * Creates a new database, inserts initial content.
+     *
+     * @param string $name name of the new database
+     * @param string $input XML to insert
+     */
     public function create($name, $input)
     {
         $this->sendCmd(8, $name, $input);
     }
 
+    /**
+     * Inserts a document in the database at the specified path.
+     *
+     * @param string $path filesystem-like path
+     * @param string $input XML to insert
+     */
     public function add($path, $input)
     {
         $this->sendCmd(9, $path, $input);
     }
 
+    /**
+     * Replaces content at the specified path by the given document.
+     *
+     * @param string $path filesystem-like path
+     * @param string $input XML to insert
+     */
     public function replace($path, $input)
     {
         $this->sendCmd(12, $path, $input);
@@ -87,11 +117,19 @@ class Session
         $this->sendCmd(13, $path, $input);
     }
 
+    /**
+     * Status information of the last command/query.
+     *
+     * @return string|null
+     */
     public function info()
     {
         return $this->info;
     }
 
+    /**
+     * Close the connection.
+     */
     public function close()
     {
         socket_write($this->socket, "exit".chr(0));
@@ -104,6 +142,10 @@ class Session
         $this->bsize = 0;
     }
 
+    /**
+     * @internal
+     * @return string
+     */
     public function readString()
     {
         $com = "";
@@ -136,11 +178,21 @@ class Session
         socket_write($this->socket, $str.chr(0));
     }
 
+    /**
+     * Was the last command/query successful?
+     *
+     * @internal not idempotent, not intended for use by client code
+     * @return bool
+     */
     public function ok()
     {
         return $this->read() == chr(0);
     }
 
+    /**
+     * @internal
+     * @return string
+     */
     public function receive()
     {
         $this->init();
