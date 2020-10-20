@@ -1489,7 +1489,6 @@ public enum QueryError {
     /** Error type. */ WS(WS_PREFIX,             WS_URI),
     /** Error type. */ SQL(SQL_PREFIX,           SQL_URI),
     /** Error type. */ UNIT(UNIT_PREFIX,         UNIT_URI),
-    /** Error type. */ UTIL(UTIL_PREFIX,         UTIL_URI),
     /** Error type. */ USER(USER_PREFIX,         USER_URI),
     /** Error type. */ VALIDATE(VALIDATE_PREFIX, VALIDATE_URI),
     /** Error type. */ WEB(WEB_PREFIX,           WEB_URI),

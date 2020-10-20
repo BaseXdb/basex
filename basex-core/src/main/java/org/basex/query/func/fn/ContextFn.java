@@ -54,19 +54,6 @@ public abstract class ContextFn extends StandardFunc {
   }
 
   /**
-   * Optimizes a context-based function call.
-   * @param cc compilation context
-   */
-  protected final void optContext(final CompileContext cc) {
-    final boolean context = contextAccess();
-    final Expr expr = context ? cc.qc.focus.value : exprs[contextArg()];
-    if(expr != null) {
-      final SeqType st = expr.seqType();
-      if(st.oneOrMore() && !st.mayBeArray()) exprType.assign(Occ.ONE);
-    }
-  }
-
-  /**
    * Indicates if the function will evaluate the current context.
    * @return result of check
    */
