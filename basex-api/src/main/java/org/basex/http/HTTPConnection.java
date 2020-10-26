@@ -342,7 +342,7 @@ public final class HTTPConnection implements ClientInfo {
           final String details = am.length > 1 ? am[1] : "";
           final String[] creds = Strings.split(Base64.decode(details), ':', 2);
           user = user(creds[0]);
-          if(creds.length < 2 || !user.matches(creds[1])) throw new LoginException();
+          if(creds.length < 2 || !user.matches(creds[1])) throw new LoginException(user.name());
 
         } else {
           final EnumMap<Request, String> map = HttpClient.authHeaders(header);
@@ -366,7 +366,7 @@ public final class HTTPConnection implements ClientInfo {
           sb.append(':').append(ha2);
 
           if(!Strings.md5(sb.toString()).equals(map.get(Request.RESPONSE)))
-            throw new LoginException();
+            throw new LoginException(user.name());
         }
       }
 
@@ -383,14 +383,14 @@ public final class HTTPConnection implements ClientInfo {
 
   /**
    * Returns a user for the specified string, or an error.
-   * @param user user name (can be {@code null})
+   * @param name user name (can be {@code null})
    * @return user reference
    * @throws LoginException login exception
    */
-  private User user(final String user) throws LoginException {
-    final User u = context.users.get(user);
-    if(u == null) throw new LoginException();
-    return u;
+  private User user(final String name) throws LoginException {
+    final User user = context.users.get(name);
+    if(user == null) throw new LoginException(name);
+    return user;
   }
 
   /**

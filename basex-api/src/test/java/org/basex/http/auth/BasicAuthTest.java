@@ -38,6 +38,6 @@ public final class BasicAuthTest extends AuthTest {
    * Access denied.
    */
   @Test public void accessDenied() {
-    test(REST_ROOT.replace("://", "://user:unknown@"), Text.ACCESS_DENIED);
+    test(REST_ROOT.replace("://", "://user:unknown@"), Util.info(Text.ACCESS_DENIED_X, "user"));
   }
 }

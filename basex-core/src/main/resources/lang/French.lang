@@ -2,7 +2,7 @@
 # Maud Ingarao and Nathalie Arlin
 
 about_%              = A propos de %
-access_denied        = Accès refusé.
+access_denied_%      = Accès refusé: %.
 add                  = Ajouter
 add_archive_name     = Inclure le nom de l'archive dans le chemin du document
 add_raw_files        = Ajouter les fichiers restants comme fichiers bruts

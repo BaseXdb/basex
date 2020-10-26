@@ -2,7 +2,7 @@
 # Oleksandr Shpak, Max Shamaev
 
 about_%              = О %
-access_denied        = Доступ запрещен
+access_denied_%      = Доступ запрещен: %
 add                  = Добавить
 add_archive_name     = Добавить имя архива в путь документа
 add_raw_files        = Добавить другие файлы в исходном виде

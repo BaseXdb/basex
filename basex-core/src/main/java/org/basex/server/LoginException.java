@@ -15,9 +15,10 @@ import org.basex.util.*;
 public final class LoginException extends IOException {
   /**
    * Constructor.
+   * @param name user name (can be {@code null})
    */
-  public LoginException() {
-    super(ACCESS_DENIED);
+  public LoginException(final String name) {
+    this(ACCESS_DENIED_X, name == null ? "-" : name);
   }
 
   /**

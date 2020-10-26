@@ -2,7 +2,7 @@
 # Kiss-Kálmán Dániel
 
 about_%              = % névjegye
-access_denied        = Hozzáférés megtagadva.
+access_denied_%      = Hozzáférés megtagadva: %.
 add                  = Hozzáadás
 add_archive_name     = Archívumnév hozzáadása a dokumentum-útvonalhoz
 add_raw_files        = A többi fájl raw fájlként történő hozzáadása

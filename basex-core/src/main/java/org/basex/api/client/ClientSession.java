@@ -120,7 +120,7 @@ public class ClientSession extends Session {
     sout.flush();
 
     // receive success flag
-    if(!ok(bi)) throw new LoginException();
+    if(!ok(bi)) throw new LoginException(username);
   }
 
   @Override

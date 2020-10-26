@@ -2,7 +2,7 @@
 # Tuguldur Jamiyansharav, CSMS
 
 about_%              = % тухай
-access_denied        = Хандалт амжилтгүй.
+access_denied_%      = Хандалт амжилтгүй: %.
 add                  = Нэмэх
 add_archive_name     = Include name of archive in document path
 add_raw_files        = Үлдсэн боловсруулагдаагүй файлуудыг нэмэх

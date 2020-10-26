@@ -2,7 +2,7 @@
 # Carlos Marcos (carlos.marcos@atos.net)
 
 about_%              = Acerca de %
-access_denied        = Acceso denegado.
+access_denied_%      = Acceso denegado: %.
 add                  = Añadir
 add_archive_name     = Incluir el nombre de archivo en la ruta del documento
 add_raw_files        = Añadir otros ficheros como ficheros en bruto

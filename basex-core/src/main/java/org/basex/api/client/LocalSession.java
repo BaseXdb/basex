@@ -61,7 +61,7 @@ public class LocalSession extends Session {
 
     this(context, output, context.users.get(username));
     final User user = ctx.user();
-    if(user == null || !user.matches(password)) throw new LoginException();
+    if(!user.matches(password)) throw new LoginException(user.name());
   }
 
   /**
