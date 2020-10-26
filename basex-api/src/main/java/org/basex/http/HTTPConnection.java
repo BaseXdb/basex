@@ -28,6 +28,10 @@ import org.basex.util.http.*;
  * @author Christian Gruen
  */
 public final class HTTPConnection implements ClientInfo {
+  /** Forwarding headers. */
+  private static final String[] FORWARDING_HEADERS = { "X-Forwarded-For", "Proxy-Client-IP",
+      "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR" };
+
   /** HTTP servlet request. */
   public final HttpServletRequest request;
   /** HTTP servlet response. */
@@ -243,7 +247,7 @@ public final class HTTPConnection implements ClientInfo {
 
   @Override
   public String clientAddress() {
-    return request.getRemoteAddr() + ':' + request.getRemotePort();
+    return getRemoteAddr() + ':' + request.getRemotePort();
   }
 
   @Override
@@ -325,7 +329,6 @@ public final class HTTPConnection implements ClientInfo {
    * @throws IOException I/O exception
    */
   private User login() throws IOException {
-    final byte[] address = token(request.getRemoteAddr());
     try {
       final User user;
       if(auth == AuthMethod.CUSTOM) {
@@ -371,12 +374,12 @@ public final class HTTPConnection implements ClientInfo {
       }
 
       // accept and return user
-      context.blocker.remove(address);
+      context.blocker.remove(token(getRemoteAddr()));
       return user;
 
     } catch(final LoginException ex) {
       // delay users with wrong passwords
-      context.blocker.delay(address);
+      context.blocker.delay(token(getRemoteAddr()));
       throw ex;
     }
   }
@@ -391,6 +394,36 @@ public final class HTTPConnection implements ClientInfo {
     final User user = context.users.get(name);
     if(user == null) throw new LoginException(name);
     return user;
+  }
+
+  /**
+   * Returns the remote address. Resolves proxy forwardings.
+   * @return client address
+   */
+  private String getRemoteAddr() {
+    for(final String header : FORWARDING_HEADERS) {
+      final String addr = request.getHeader(header);
+      if (addr != null && !addr.isEmpty() && !"unknown".equalsIgnoreCase(addr)) return addr;
+    }
+    return request.getRemoteAddr();
+  }
+
+  /**
+   * Sets a status and sends an info message.
+   * @param code status code
+   * @param message status message (can be {@code null})
+   * @param info detailed information (can be {@code null})
+   * @param ex exception
+   */
+  private void logError(final int code, final String message, final String info,
+      final Exception ex) {
+
+    final StringBuilder sb = new StringBuilder();
+    sb.append("Code: ").append(code);
+    if(info != null) sb.append(", Info: ").append(info);
+    if(message != null) sb.append(", Message: ").append(message);
+    sb.append(", Error: ").append(Util.message(ex));
+    log(SC_INTERNAL_SERVER_ERROR, sb.toString());
   }
 
   /**
@@ -455,23 +488,5 @@ public final class HTTPConnection implements ClientInfo {
     } catch(final IllegalStateException | IllegalArgumentException ex) {
       logError(code, message, body, ex);
     }
-  }
-
-  /**
-   * Sets a status and sends an info message.
-   * @param code status code
-   * @param message status message (can be {@code null})
-   * @param info detailed information (can be {@code null})
-   * @param ex exception
-   */
-  private void logError(final int code, final String message, final String info,
-      final Exception ex) {
-
-    final StringBuilder sb = new StringBuilder();
-    sb.append("Code: ").append(code);
-    if(info != null) sb.append(", Info: ").append(info);
-    if(message != null) sb.append(", Message: ").append(message);
-    sb.append(", Error: ").append(Util.message(ex));
-    log(SC_INTERNAL_SERVER_ERROR, sb.toString());
   }
 }
