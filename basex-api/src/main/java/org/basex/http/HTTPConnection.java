@@ -267,6 +267,70 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
+   * Sets 460 a proprietary status code and sends the exception message as info.
+   * @param ex job exception
+   * @throws IOException I/O exception
+   */
+  public void stop(final JobException ex) throws IOException {
+    final int code = 460;
+    final String info = ex.getMessage();
+    log(code, info);
+    try {
+      response.resetBuffer();
+      response.setStatus(code);
+      response.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
+      // client directive: do not cache result (HTTP 1.1, old clients)
+      response.setHeader(CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+      response.setHeader(PRAGMA, "no-cache");
+      response.setHeader(EXPIRES, "0");
+      response.getOutputStream().write(token(info));
+    } catch(final IllegalStateException e) {
+      // too late (response has already been committed)
+      logError(code, null, info, e);
+    }
+  }
+
+  /**
+   * Sets a status and sends an info message.
+   * @param code status code
+   * @param message status message (can be {@code null})
+   * @param body message for response body (can be {@code null})
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("deprecation")
+  public void status(final int code, final String message, final String body) throws IOException {
+    try {
+      response.resetBuffer();
+      if(code == SC_UNAUTHORIZED && !response.containsHeader(WWW_AUTHENTICATE)) {
+        final TokenBuilder header = new TokenBuilder();
+        header.add(auth).add(' ').add(Request.REALM).add("=\"").add(Prop.NAME).add('"');
+        if(auth == AuthMethod.DIGEST) {
+          final String nonce = Strings.md5(Long.toString(System.nanoTime()));
+          header.add(",").add(Request.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT);
+          header.add('"').add(',').add(Request.NONCE).add("=\"").add(nonce).add('"');
+        }
+        response.setHeader(WWW_AUTHENTICATE, header.toString());
+      }
+
+      final int c = code < 0 || code > 999 ? 500 : code;
+      if(message == null) {
+        response.setStatus(c);
+      } else {
+        // do not allow Jetty to create a custom error html page
+        // control characters and non-ASCII codes will be removed (GH-1632)
+        response.setStatus(c, message.replaceAll("[^\\x20-\\x7F]", "?"));
+      }
+
+      if(body != null) {
+        response.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
+        response.getOutputStream().write(new TokenBuilder(token(body)).normalize().finish());
+      }
+    } catch(final IllegalStateException | IllegalArgumentException ex) {
+      logError(code, message, body, ex);
+    }
+  }
+
+  /**
    * Returns the media type defined in the specified serialization parameters.
    * @param sopts serialization parameters
    * @return media type
@@ -424,69 +488,5 @@ public final class HTTPConnection implements ClientInfo {
     if(message != null) sb.append(", Message: ").append(message);
     sb.append(", Error: ").append(Util.message(ex));
     log(SC_INTERNAL_SERVER_ERROR, sb.toString());
-  }
-
-  /**
-   * Sets 460 a proprietary status code and sends the exception message as info.
-   * @param ex job exception
-   * @throws IOException I/O exception
-   */
-  public void stop(final JobException ex) throws IOException {
-    final int code = 460;
-    final String info = ex.getMessage();
-    log(code, info);
-    try {
-      response.resetBuffer();
-      response.setStatus(code);
-      response.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
-      // client directive: do not cache result (HTTP 1.1, old clients)
-      response.setHeader(CACHE_CONTROL, "no-cache, no-store, must-revalidate");
-      response.setHeader(PRAGMA, "no-cache");
-      response.setHeader(EXPIRES, "0");
-      response.getOutputStream().write(token(info));
-    } catch(final IllegalStateException e) {
-      // too late (response has already been committed)
-      logError(code, null, info, e);
-    }
-  }
-
-  /**
-   * Sets a status and sends an info message.
-   * @param code status code
-   * @param message status message (can be {@code null})
-   * @param body message for response body (can be {@code null})
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("deprecation")
-  public void status(final int code, final String message, final String body) throws IOException {
-    try {
-      response.resetBuffer();
-      if(code == SC_UNAUTHORIZED && !response.containsHeader(WWW_AUTHENTICATE)) {
-        final TokenBuilder header = new TokenBuilder();
-        header.add(auth).add(' ').add(Request.REALM).add("=\"").add(Prop.NAME).add('"');
-        if(auth == AuthMethod.DIGEST) {
-          final String nonce = Strings.md5(Long.toString(System.nanoTime()));
-          header.add(",").add(Request.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT);
-          header.add('"').add(',').add(Request.NONCE).add("=\"").add(nonce).add('"');
-        }
-        response.setHeader(WWW_AUTHENTICATE, header.toString());
-      }
-
-      final int c = code < 0 || code > 999 ? 500 : code;
-      if(message == null) {
-        response.setStatus(c);
-      } else {
-        // do not allow Jetty to create a custom error html page
-        // control characters and non-ASCII codes will be removed (GH-1632)
-        response.setStatus(c, message.replaceAll("[^\\x20-\\x7F]", "?"));
-      }
-
-      if(body != null) {
-        response.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
-        response.getOutputStream().write(new TokenBuilder(token(body)).normalize().finish());
-      }
-    } catch(final IllegalStateException | IllegalArgumentException ex) {
-      logError(code, message, body, ex);
-    }
   }
 }
