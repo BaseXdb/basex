@@ -484,11 +484,6 @@ public enum QueryError {
   /** Error code. */
   USER_UPDATE3_X_X(USER, "update", "User '%' can only be % once."),
 
-  // Utility Module
-
-  /** Error code. */
-  UTIL_NEGATIVE_X(UTIL, "negative", "Index '%' is negative."),
-
   // Validation Module
 
   /** Error code. */
@@ -1494,7 +1489,6 @@ public enum QueryError {
     /** Error type. */ WS(WS_PREFIX,             WS_URI),
     /** Error type. */ SQL(SQL_PREFIX,           SQL_URI),
     /** Error type. */ UNIT(UNIT_PREFIX,         UNIT_URI),
-    /** Error type. */ UTIL(UTIL_PREFIX,         UTIL_URI),
     /** Error type. */ USER(USER_PREFIX,         USER_URI),
     /** Error type. */ VALIDATE(VALIDATE_PREFIX, VALIDATE_URI),
     /** Error type. */ WEB(WEB_PREFIX,           WEB_URI),
@@ -1621,18 +1615,18 @@ public enum QueryError {
    * Throws a type exception.
    * @param ii input info
    * @param expr expression
-   * @param type target type
-   * @param name name (can be {@code null})
+   * @param st target type
+   * @param name variable name (can be {@code null})
    * @param error error code
    * @return query exception
    */
-  public static QueryException typeError(final Expr expr, final SeqType type, final QNm name,
+  public static QueryException typeError(final Expr expr, final SeqType st, final QNm name,
       final InputInfo ii, final QueryError error) {
 
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) tb.add('$').add(name.string()).add(" := ");
     final byte[] value = tb.add(normalize(expr, ii)).finish();
-    return error.get(ii, expr.seqType(), type, value);
+    return error.get(ii, expr.seqType(), st, value);
   }
 
   /**

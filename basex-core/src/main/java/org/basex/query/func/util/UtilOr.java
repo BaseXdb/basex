@@ -57,7 +57,7 @@ public final class UtilOr extends StandardFunc {
     // return items or rewrite to list
     final SeqType st = items.seqType();
     if(st.oneOrMore()) return items;
-    if(st.zero()) return new List(info, items, dflt).optimize(cc);
+    if(st.zero()) return List.get(cc, info, items, dflt);
 
     // number of items unknown: combine sequence types
     exprType.assign(st.with(st.zeroOrOne() ? Occ.ONE : Occ.ONE_MORE).union(dflt.seqType()));

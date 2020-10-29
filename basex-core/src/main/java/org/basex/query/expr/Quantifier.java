@@ -61,7 +61,7 @@ public final class Quantifier extends Single {
     if(expr instanceof Value) return cc.preEval(this);
     // non-deterministic expression: rewrite to list (ensure evaluation)
     if(expr.size() == 0) {
-      return cc.replaceWith(this, new List(info, expr, Bln.get(every)).optimize(cc));
+      return cc.replaceWith(this, List.get(cc, info, expr, Bln.get(every)));
     }
     return this;
   }
@@ -99,17 +99,12 @@ public final class Quantifier extends Single {
 
   @Override
   public void plan(final QueryString qs) {
-    if(expr instanceof GFLWOR) {
-      qs.token(every ? EVERY : SOME);
-      final GFLWOR gflwor = (GFLWOR) expr;
-      int c = 0;
-      for(final Clause clause : gflwor.clauses) {
-        if(c++ != 0) qs.token(SEP);
-        qs.token(clause.toString().replaceAll('^' + FOR + ' ', ""));
-      }
-      qs.token(SATISFIES).token(gflwor.rtrn);
+    final String arg = new QueryString().token('(').token(expr).token(')').token("=").
+        token(every ? Bln.FALSE : Bln.TRUE).toString();
+    if(every) {
+      qs.function(Function.NOT, ' ' + arg);
     } else {
-      qs.token(expr);
+      qs.token(arg);
     }
   }
 }

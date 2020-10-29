@@ -24,13 +24,13 @@ final class GZIPOut extends ArchiveOut {
   }
 
   @Override
-  public void level(final int l) {
+  public void level(final int level) {
     // ignore compression level
   }
 
   @Override
   public void write(final ArchiveIn in) throws IOException {
-    for(int c; (c = in.read(data)) != -1;) zos.write(data, 0, c);
+    write(in, zos);
   }
 
   @Override

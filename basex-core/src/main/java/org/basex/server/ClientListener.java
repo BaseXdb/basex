@@ -198,7 +198,7 @@ public final class ClientListener extends Thread implements ClientInfo {
         context.blocker.remove(address);
         context.sessions.add(this);
       } else {
-        if(!name.isEmpty()) log(LogType.ERROR, ACCESS_DENIED);
+        if(!name.isEmpty()) log(LogType.ERROR, Util.info(ACCESS_DENIED_X, name));
         // delay users with wrong passwords
         context.blocker.delay(address);
         send(false);

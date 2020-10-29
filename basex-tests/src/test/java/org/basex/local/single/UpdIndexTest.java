@@ -52,8 +52,7 @@ public final class UpdIndexTest extends SandboxTest {
   /**
    * Finishes the test.
    */
-  @AfterEach
-  public void finish() {
+  @AfterEach public void finish() {
     set(MainOptions.TOKENINDEX, false);
     execute(new DropDB(NAME));
   }

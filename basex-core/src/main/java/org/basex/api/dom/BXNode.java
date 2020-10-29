@@ -49,9 +49,10 @@ public abstract class BXNode implements Node {
       case DOC: return new BXDoc(node);
       case ELM: return new BXElem(node);
       case TXT: return new BXText(node);
-      case ATT: return new BXAttr(node);
       case COM: return new BXComm(node);
       case PI : return new BXPI(node);
+      // drop parent reference (see Xerces’ NodeImpl#getParentNode)
+      case ATT: return new BXAttr(new FAttr(node.qname(), node.string()));
       default : return null;
     }
   }

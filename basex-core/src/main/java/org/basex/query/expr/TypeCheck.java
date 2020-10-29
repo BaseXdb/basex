@@ -27,6 +27,8 @@ public class TypeCheck extends Single {
   final StaticContext sc;
   /** Flag for function conversion. */
   public final boolean promote;
+  /** Only check occurrence indicator. */
+  private boolean occ;
 
   /**
    * Constructor.
@@ -50,18 +52,23 @@ public class TypeCheck extends Single {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    final SeqType at = expr.seqType(), st = seqType();
+    final SeqType st = seqType();
+    if(st.type.instanceOf(AtomType.AAT)) {
+      expr = expr.simplifyFor(Simplify.DATA, cc);
+    }
+    final SeqType et = expr.seqType();
+    occ = et.type.instanceOf(st.type) && et.kindInstanceOf(st);
 
     // remove redundant type check
     if(expr instanceof TypeCheck) {
       final TypeCheck tc = (TypeCheck) expr;
-      if(promote == tc.promote && st.instanceOf(at)) {
+      if(promote == tc.promote && st.instanceOf(et)) {
         return cc.replaceWith(this, get(tc.expr, st).optimize(cc));
       }
     }
 
     // skip check if return type is already correct
-    if(at.instanceOf(st)) {
+    if(et.instanceOf(st)) {
       cc.info(OPTTYPE_X_X, st, expr);
       return expr;
     }
@@ -69,28 +76,28 @@ public class TypeCheck extends Single {
     // function item coercion
     final FuncType ft = expr.funcType();
     if(ft != null && expr instanceof FuncItem) {
-      if(!st.occ.check(1)) throw typeError(expr, st, null, info, error());
+      if(!st.occ.check(1)) throw error(expr, st);
       return cc.replaceWith(this, ((FuncItem) expr).coerceTo(ft, cc.qc, info, true));
     }
 
-    // pre-evaluate type check
+    // pre-evaluate (check value and result size)
     final long es = expr.size();
-    if(expr instanceof Value && es <= CompileContext.MAX_PREEVAL) return cc.preEval(this);
+    if(expr instanceof Value && es <= CompileContext.MAX_PREEVAL) {
+      return cc.preEval(this);
+    }
 
     // push type check inside expression
-    final Expr opt = expr.typeCheck(this, cc);
-    if(opt != null) {
-      cc.info(OPTTYPE_X_X, st, opt);
-      return opt;
+    final Expr checked = expr.typeCheck(this, cc);
+    if(checked != null) {
+      cc.info(OPTTYPE_X_X, st, checked);
+      return checked;
     }
 
     // refine occurrence indicator and result size
-    final Occ occ = at.occ.intersect(st.occ);
-    if(occ != null) {
-      exprType.assign(st, occ, expr.size());
-    } else if(st.type instanceof AtomType && !at.mayBeArray()) {
-      // report odd occurrence indicator
-      throw typeError(expr, st, null, info, error());
+    if(!expr.seqType().mayBeArray()) {
+      final Occ o = et.occ.intersect(st.occ);
+      if(o == null) throw error(expr, st);
+      exprType.assign(st, o, et.occ == st.occ ? es : -1);
     }
 
     return this;
@@ -100,32 +107,49 @@ public class TypeCheck extends Single {
   public final Iter iter(final QueryContext qc) throws QueryException {
     final SeqType st = seqType();
     final Iter iter = expr.iter(qc);
+    final Value value = iter.iterValue();
+    if(value != null) {
+      if(st.instance(value)) return iter;
+      if(!promote) throw error(value, st);
+    }
 
+    // only check occurrence indicator
+    if(occ) {
+      return new Iter() {
+        int c;
+
+        @Override
+        public Item next() throws QueryException {
+          final Item item = qc.next(iter);
+          if(item != null ? ++c > st.occ.max : c < st.occ.min) throw error(expr, st);
+          return item;
+        }
+      };
+    }
+
+    // check item type and (optionally) occurrence indicator
     return new Iter() {
       final ItemList items = new ItemList();
-      int c, i;
+      int i, c;
 
       @Override
       public Item next() throws QueryException {
-        while(c == items.size()) {
+        while(i == items.size()) {
           items.reset();
-          c = 0;
+          i = 0;
 
           final Item item = qc.next(iter);
           if(item == null || st.instance(item)) {
             items.add(item);
-          } else if(promote) {
-            st.promote(item, null, items, qc, sc, info, false);
           } else {
-            throw typeError(expr, st, null, info, error());
+            if(!promote) throw error(expr, st);
+            st.promote(item, null, items, qc, sc, info, false);
           }
         }
 
-        final Item item = items.get(c);
-        items.set(c++, null);
-        if(item == null && i < st.occ.min || i > st.occ.max)
-          throw typeError(expr, st, null, info, error());
-        i++;
+        final Item item = items.get(i);
+        items.set(i++, null);
+        if(item != null ? ++c > st.occ.max : c < st.occ.min) throw error(expr, st);
         return item;
       }
     };
@@ -135,15 +159,23 @@ public class TypeCheck extends Single {
   public final Value value(final QueryContext qc) throws QueryException {
     final Value value = expr.value(qc);
     final SeqType st = seqType();
+
+    // only check occurrence indicator
+    if(occ) {
+      if(!st.occ.check(value.size())) throw error(value, st);
+      return value;
+    }
+    // check occurrence indicator and item type
     if(st.instance(value)) return value;
-    if(promote) return st.promote(value, null, qc, sc, info, false);
-    throw typeError(value, st, null, info, error());
+
+    if(!promote) throw error(value, st);
+    return st.promote(value, null, qc, sc, info, false);
   }
 
   @Override
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
-    return promote ? simplifyCast(mode, cc) : super.simplifyFor(mode, cc);
+    return promote ? simplifyForCast(mode, cc) : super.simplifyFor(mode, cc);
   }
 
   /**
@@ -176,6 +208,16 @@ public class TypeCheck extends Single {
   }
 
   /**
+   * Throws a type error.
+   * @param ex expression that triggers the error
+   * @param st target type
+   * @return query exception
+   */
+  private QueryException error(final Expr ex, final SeqType st) {
+    return typeError(ex, st, null, info, error());
+  }
+
+  /**
    * Returns a new instance of this class ({@link TypeCheck} or ({@link Treat}).
    * @param ex expression
    * @param st sequence type
@@ -187,7 +229,9 @@ public class TypeCheck extends Single {
 
   @Override
   public final Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(get(expr.copy(cc, vm), seqType()));
+    final TypeCheck ex = copyType(get(expr.copy(cc, vm), seqType()));
+    ex.occ = occ;
+    return ex;
   }
 
   @Override

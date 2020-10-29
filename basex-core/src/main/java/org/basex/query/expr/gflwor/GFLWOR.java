@@ -6,7 +6,6 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.List;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
 import org.basex.query.iter.*;
@@ -111,36 +110,59 @@ public final class GFLWOR extends ParseExpr {
 
     mergeWheres();
 
-    // replace with expression of 'return' clause if all clauses were removed
-    Expr expr;
-    if(clauses.isEmpty()) {
-      expr = rtrn;
-    } else if(clauses.getFirst() instanceof Where) {
-      // replace with 'if' expression if FLWOR starts with 'where'
-      final Where where = (Where) clauses.removeFirst();
-      final Expr branch = clauses.isEmpty() ? rtrn : this;
-      expr = new If(info, where.expr, branch).optimize(cc);
-    } else {
-      expr = simplify(cc);
-    }
-    if(expr != this) {
+    final Expr expr = simplify(cc);
+    if(expr != null) {
       cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, expr);
       return expr;
     }
 
     exprType.assign(rtrn.seqType(), calcSize(true));
-    return expr;
+    return this;
   }
 
   /**
    * Simplifies a FLWOR expression.
    * @param cc compilation context
-   * @return original or optimized expression
+   * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr simplify(final CompileContext cc) throws QueryException {
-    // checks if clauses have side-effects
-    final Checks<Clause> ndt = clause -> clause.has(Flag.NDT, Flag.UPD);
+    // replace with expression of 'return' clause if all clauses were removed
+    if(clauses.isEmpty()) return rtrn;
+
+    // replace with 'if' expression if FLWOR starts with 'where'
+    final Expr first = clauses.getFirst();
+    if(first instanceof Where) {
+      final Where where = (Where) clauses.removeFirst();
+      final Expr branch = clauses.isEmpty() ? rtrn : this;
+      return new If(info, where.expr, branch).optimize(cc);
+    }
+
+    if(first instanceof For) {
+      // replace allowing empty with empty sequence
+      //   for $_ allowing empty in () return $_  ->  ()
+      final For fr = (For) first;
+      if(clauses.size() == 1 && fr.size() == 0 && !fr.has(Flag.NDT) && rtrn instanceof VarRef &&
+          ((VarRef) rtrn).var.is(fr.var)) return Empty.VALUE;
+
+      // rewrite group by to distinct-values
+      //   for $e in E group by $g := G return R
+      //   ->  for $g in distinct-values(for $e in E return G)) return R
+      if(clauses.size() == 2 && clauses.get(1) instanceof GroupBy) {
+        final GroupSpec grp = ((GroupBy) clauses.get(1)).group();
+        if(grp != null) {
+          final LinkedList<Clause> cls = new LinkedList<>();
+          cls.add(clauses.removeFirst());
+          final Expr flwor = new GFLWOR(info, cls, grp.expr).optimize(cc);
+          final Expr expr = cc.function(Function.DISTINCT_VALUES, info, flwor);
+          clauses.set(0, new For(grp.var, expr).optimize(cc));
+          return optimize(cc);
+        }
+      }
+    }
+
+    // checks if clauses have side effects
+    final Checks<Clause> ndt = clause -> clause.has(Flag.NDT);
     // checks if the return expression references the variable of a clause
     final Checks<Clause> varrefs = clause -> {
       for(final Var var : clause.vars()) {
@@ -153,35 +175,20 @@ public final class GFLWOR extends ParseExpr {
     final long[] minMax = calcSize(false);
     final long min = minMax[0], max = minMax[1];
     if(min == max) {
-      // zero iterations:
       if(min == 0) {
-        // for $_ in () return <x/>  ->  ()
-        if(!has(Flag.NDT, Flag.UPD)) return Empty.VALUE;
-        // for $_ in file:write(...) return 1  ->  file:write(...)
-        if(clauses.size() == 1 && clauses.get(0) instanceof ForLet) {
-          return ((ForLet) clauses.get(0)).expr;
-        }
-      } else if(!varrefs.any(clauses)) {
-        // single iteration, no referenced variables in return clause:
-        if(min == 1) {
-          // let $_ := 1 return <x/>  ->  <x/>
-          if(!ndt.any(clauses)) return rtrn;
-          // let $_ := file:write(...) return 1  ->  (file:write(...), 1)
-          if(clauses.size() == 1 && clauses.get(0) instanceof ForLet) {
-            Expr expr = ((ForLet) clauses.get(0)).expr;
-            expr = cc.function(Function._PROF_VOID, info, expr);
-            expr = new List(info, expr, rtrn).optimize(cc);
-            return cc.replaceWith(this, expr);
-          }
-        } else if(!ndt.any(clauses) && !rtrn.has(Flag.CNS, Flag.NDT, Flag.UPD)) {
-          // for $_ in 1 to 2 return 3  ->  util:replicate(3, 2)
-          return cc.function(Function._UTIL_REPLICATE, info, rtrn, Int.get(min));
-        }
+        // zero iterations, no side effects
+        //   for $_ in () return <x/>  ->  ()
+        if(!has(Flag.NDT)) return Empty.VALUE;
+      } else if(!varrefs.any(clauses) && !ndt.any(clauses)) {
+        // no referenced variables in return clause
+        //   let $_ := 1 return <x/>  ->  <x/>
+        //   for $_ in 1 to 2 return 3  ->  util:replicate(3, 2)
+        return min == 1 ? rtrn : cc.replicate(rtrn, Int.get(min), info);
       }
     }
 
     // for $_ in 1 to 2 return ()  ->  ()
-    return rtrn == Empty.VALUE && !ndt.any(clauses) ? rtrn : this;
+    return rtrn == Empty.VALUE && !ndt.any(clauses) ? rtrn : null;
   }
 
   /**
@@ -320,7 +327,9 @@ public final class GFLWOR extends ParseExpr {
         if(!(clause instanceof Let) || clause.has(Flag.NDT)) continue;
 
         final Let lt = (Let) clause;
-        final InlineContext ic = new InlineContext(lt.var, lt.inlineExpr(cc), cc);
+        final Expr inlined = lt.inlineExpr(cc);
+        if(inlined == null) continue;
+        final InlineContext ic = new InlineContext(lt.var, inlined, cc);
         final ExprList exprs = new ExprList();
         for(final ListIterator<Clause> ir = clauses.listIterator(iter.nextIndex()); ir.hasNext();) {
           exprs.add(ir.next());
@@ -600,29 +609,34 @@ public final class GFLWOR extends ParseExpr {
     if(!(clauses.peekLast() instanceof ForLet)) return false;
 
     // do not inline variables with scoring, type checks, etc.
-    final ForLet last = (ForLet) clauses.peekLast();
-    final Expr root = last.inlineExpr(cc);
-    if(root == null) return false;
+    final ForLet fl = (ForLet) clauses.peekLast();
+    final Expr last = fl.inlineExpr(cc);
+    if(last == null) return false;
     Expr expr = null;
 
-    if(rtrn instanceof VarRef && ((VarRef) rtrn).var.is(last.var)) {
+    if(rtrn instanceof VarRef && ((VarRef) rtrn).var.is(fl.var)) {
       // replace return clause with expression
-      //   for $i in (1, 2) return $i  ->  (1, 2)
-      //   let $c := <a/> return $c
-      expr = root;
-    } else if(last instanceof For) {
+      //   for $c in (1, 2) return $c  ->  (1, 2)
+      //   let $c := <a/> return $c  ->  <a/>
+      expr = last;
+    } else if(fl instanceof Let && rtrn.count(fl.var) == VarUsage.NEVER) {
+      // rewrite let clause with unused variable
+      //   let $_ := file:write(...) return ()  ->  file:write(...)
+      //   let $_ := prof:void(1) return 2  ->  prof:void(1), 2
+      expr = cc.merge(last, rtrn, info);
+    } else if(fl instanceof For || fl instanceof Let && fl.size() == 1) {
       // rewrite for clause to simple map
       //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
       // skip expressions with context reference
       //   <_/>[for $c in (1, 2) return (., $c)]
-      final InlineContext ic = new InlineContext(last.var, new ContextValue(info), cc);
+      final InlineContext ic = new InlineContext(fl.var, new ContextValue(info), cc);
       if(ic.inlineable(rtrn) && !rtrn.has(Flag.CTX)) {
-        expr = SimpleMap.get(cc, info, root, cc.get(root, () -> ic.inline(rtrn)));
+        expr = SimpleMap.get(cc, info, last, cc.get(last, () -> ic.inline(rtrn)));
       }
     }
     if(expr == null) return false;
 
-    cc.info(QueryText.OPTINLINE_X, last);
+    cc.info(QueryText.OPTINLINE_X, fl);
     clauses.removeLast();
     rtrn = expr;
     return true;
@@ -1003,7 +1017,7 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.tokens(clauses.toArray()).token(QueryText.RETURN).token(rtrn);
+    qs.token("(").tokens(clauses.toArray()).token(QueryText.RETURN).token(rtrn).token(')');
   }
 
   /** Start evaluator, doing nothing, once. */

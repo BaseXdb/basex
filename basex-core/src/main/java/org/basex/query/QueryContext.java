@@ -309,7 +309,7 @@ public final class QueryContext extends Job implements Closeable {
       try {
         // compile the expression
         if(root != null) QueryCompiler.compile(cc, root);
-        // compile global functions.
+        // compile static functions
         else funcs.compile(cc);
       } catch(final StackOverflowError ex) {
         Util.debug(ex);

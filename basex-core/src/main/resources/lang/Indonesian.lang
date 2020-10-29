@@ -2,7 +2,7 @@
 # Andria Arisal
 
 about_%              = Perihal %
-access_denied        = Akses ditolak.
+access_denied_%      = Akses ditolak: %.
 add                  = Tambah
 add_archive_name     = Tamhah nama arsip dalam rintis dokumen
 add_raw_files        = Tambah berkas lainnya sebagai berkas mentah

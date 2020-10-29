@@ -33,7 +33,7 @@ public abstract class Parse extends StandardFunc {
    *   if availability is checked
    * @throws QueryException query exception
    */
-  Item unparsedText(final QueryContext qc, final boolean check, final boolean encoding)
+  final Item unparsedText(final QueryContext qc, final boolean check, final boolean encoding)
       throws QueryException {
 
     checkCreate(qc);
@@ -91,7 +91,7 @@ public abstract class Parse extends StandardFunc {
    * @return result or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
-  Item parseXml(final QueryContext qc, final boolean frag) throws QueryException {
+  final Item parseXml(final QueryContext qc, final boolean frag) throws QueryException {
     final byte[] token = toTokenOrNull(exprs[0], qc);
     if(token == null) return Empty.VALUE;
 

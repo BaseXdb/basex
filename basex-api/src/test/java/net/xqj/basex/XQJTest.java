@@ -30,8 +30,9 @@ public final class XQJTest extends SandboxTest {
 
   /**
    * Finishes the tests.
+   * @throws IOException I/O exception
    */
-  @AfterAll public static void after() {
+  @AfterAll public static void after() throws IOException {
     stopServer(server);
   }
 

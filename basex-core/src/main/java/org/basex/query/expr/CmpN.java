@@ -27,8 +27,6 @@ public final class CmpN extends Cmp {
       public boolean eval(final ANode node1, final ANode node2) {
         return node1.is(node2);
       }
-      @Override
-      public OpN invert() { return null; }
     },
 
     /** Node comparison: before. */
@@ -37,8 +35,6 @@ public final class CmpN extends Cmp {
       public boolean eval(final ANode node1, final ANode node2) {
         return node1.diff(node2) < 0;
       }
-      @Override
-      public OpN invert() { return GT; }
     },
 
     /** Node comparison: after. */
@@ -47,8 +43,6 @@ public final class CmpN extends Cmp {
       public boolean eval(final ANode node1, final ANode node2) {
         return node1.diff(node2) > 0;
       }
-      @Override
-      public OpN invert() { return ET; }
     };
 
     /** Cached enums (faster). */
@@ -71,12 +65,6 @@ public final class CmpN extends Cmp {
      * @return result
      */
     public abstract boolean eval(ANode node1, ANode node2);
-
-    /**
-     * Inverts the comparator.
-     * @return inverted comparator or {@code null}
-     */
-    public abstract OpN invert();
 
     @Override
     public String toString() {
@@ -119,11 +107,8 @@ public final class CmpN extends Cmp {
   }
 
   @Override
-  public Expr invert(final CompileContext cc) throws QueryException {
-    final OpN opN = op.invert();
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
-    return opN != null && expr1.seqType().oneOrMore() && expr2.seqType().oneOrMore() ?
-      new CmpN(expr1, expr2, opN, info).optimize(cc) : this;
+  public Expr invert() {
+    return null;
   }
 
   @Override
@@ -153,6 +138,6 @@ public final class CmpN extends Cmp {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.tokens(exprs, " " + op + ' ', false);
+    qs.tokens(exprs, " " + op + ' ', true);
   }
 }

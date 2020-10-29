@@ -16,15 +16,23 @@ import org.basex.util.list.*;
 public final class Dummy extends Item {
   /** Data reference (can be {@code null}). */
   private final Data data;
+  /** Sequence type. */
+  private final SeqType seqType;
 
   /**
    * Constructor.
-   * @param type type
+   * @param seqType sequence type
    * @param data data reference (can be {@code null})
    */
-  public Dummy(final Type type, final Data data) {
-    super(type);
+  public Dummy(final SeqType seqType, final Data data) {
+    super(seqType.type);
+    this.seqType = seqType;
     this.data = data;
+  }
+
+  @Override
+  public SeqType seqType() {
+    return seqType;
   }
 
   @Override

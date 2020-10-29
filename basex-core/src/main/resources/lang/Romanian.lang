@@ -2,7 +2,7 @@
 # Adrian Berila
 
 about_%              = Despre %
-access_denied        = Acces refuzat.
+access_denied_%      = Acces refuzat: %.
 add                  = Adăugare
 add_archive_name     = Adaugă numele arhivei in calea documentului
 add_raw_files        = Adăugaţi fişiere rămase ca fişiere RAW

@@ -62,40 +62,27 @@ public abstract class StaticScope extends ExprInfo implements Scope {
     if(doc == null) return null;
 
     final TokenObjMap<TokenList> map = new TokenObjMap<>();
-    byte[] key = null;
-    final TokenBuilder val = new TokenBuilder(), line = new TokenBuilder();
+    final TokenBuilder key = new TokenBuilder(), value = new TokenBuilder();
+    final Runnable add = () -> {
+      final byte[] k = key.isEmpty() ? Inspect.DOC_TAGS[0] : key.next();
+      map.computeIfAbsent(k, () -> new TokenList()).add(value.trim().next());
+    };
+
+    final TokenBuilder input = new TokenBuilder();
     try(NewlineInput nli = new NewlineInput(doc)) {
-      while(nli.readLine(line)) {
-        String l = line.toString().replaceAll("^\\s*: ?", "");
-        if(Strings.startsWith(l, '@')) {
-          add(key, val, map);
-          key = Token.token(l.replaceAll("^@(\\w*).*", "$1"));
-          l = l.replaceAll("^@\\w+ *", "");
+      while(nli.readLine(input)) {
+        String line = input.toString().replaceAll("^\\s*:? *", "");
+        if(line.matches("^@\\w+\\s+.*")) {
+          add.run();
+          key.add(line.replaceAll("^@|\\s+.*", ""));
+          line = line.replaceAll("^@\\w+\\s+", "");
         }
-        val.add(l).add('\n');
+        value.add(line).add('\n');
       }
     } catch(final IOException ex) {
       throw Util.notExpected(ex);
     }
-    add(key, val, map);
+    add.run();
     return map;
-  }
-
-  /**
-   * Adds a key and a value to the specified map.
-   * @param key key
-   * @param val value
-   * @param map map
-   */
-  private static void add(final byte[] key, final TokenBuilder val,
-      final TokenObjMap<TokenList> map) {
-
-    final byte[] k = key == null ? Inspect.DOC_TAGS[0] : key;
-    TokenList tl = map.get(k);
-    if(tl == null) {
-      tl = new TokenList();
-      map.put(k, tl);
-    }
-    tl.add(val.trim().next());
   }
 }

@@ -43,22 +43,23 @@ public abstract class Test extends ExprInfo {
   /**
    * Returns a node test, a name test or {@code null}.
    * @param type node type (element, attribute, processing instruction)
-   * @param name node name
+   * @param name node name (can be {@code null})
    * @param ann type annotation (can be {@code null})
-   * @param ns default element namespace (may be {@code null})
+   * @param ns default element namespace (can be {@code null})
    * @return test or {@code null}
    */
   public static Test get(final NodeType type, final QNm name, final Type ann, final byte[] ns) {
-    if(!(ann == null || ann == AtomType.ATY || ann == AtomType.UTY || type == NodeType.ATT &&
-      (ann == AtomType.AST || ann == AtomType.AAT || ann == AtomType.ATM))) return null;
-
-    return name == null ? KindTest.get(type) :
-      new NameTest(name, type == NodeType.PI ? NamePart.LOCAL : NamePart.FULL, type, ns);
+    if(ann == null || ann.oneOf(AtomType.ATY, AtomType.UTY) ||
+        type == NodeType.ATT && ann.oneOf(AtomType.AST, AtomType.AAT, AtomType.ATM)) {
+      return name == null ? KindTest.get(type) :
+        new NameTest(name, type == NodeType.PI ? NamePart.LOCAL : NamePart.FULL, type, ns);
+    }
+    return null;
   }
 
   /**
    * Creates a single test with the same node type.
-   * @param tests tests to be merged
+   * @param tests tests to be merged (can contain {@code null} references)
    * @return single test, union test, or {@code null} if test cannot be created.
    */
   public static Test get(final Test... tests) {
@@ -70,7 +71,7 @@ public abstract class Test extends ExprInfo {
     final List<Test> list = new ArrayList<>(tl);
     final Consumer<Test> add = tst -> {
       if(tst instanceof KindTest) {
-        list.removeIf((Predicate<Test>) t -> t instanceof NameTest);
+        list.removeIf(t -> t instanceof NameTest);
       } else if(tst instanceof NameTest) {
         if(((Checks<Test>) t -> t instanceof KindTest).any(list)) return;
       }
@@ -79,11 +80,8 @@ public abstract class Test extends ExprInfo {
 
     NodeType type = null;
     for(final Test test : tests) {
-      if(type == null) {
-        type = test.type;
-      } else if(test.type != type) {
-        return null;
-      }
+      if(test == null || type != null && type != test.type) return null;
+      type = test.type;
       if(test instanceof UnionTest) {
         for(final Test t : ((UnionTest) test).tests) add.accept(t);
       } else {

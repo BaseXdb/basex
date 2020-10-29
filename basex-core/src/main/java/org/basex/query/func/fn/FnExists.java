@@ -40,8 +40,8 @@ public final class FnExists extends FnEmpty {
       throws QueryException {
 
     if(or && Function.EXISTS.is(expr)) {
-      exprs[0] = new List(info, exprs[0], ((FnExists) expr).exprs[0]).optimize(cc);
-      return optimize(cc);
+      final Expr args = List.get(cc, info, exprs[0], expr.arg(0));
+      return cc.function(Function.EXISTS, info, args);
     }
     return null;
   }

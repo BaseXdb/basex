@@ -5,7 +5,6 @@ import static org.basex.core.Text.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.function.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
@@ -78,15 +77,6 @@ public final class Util {
    */
   public static String className(final Class<?> clazz) {
     return clazz.getSimpleName();
-  }
-
-  /**
-   * Returns the name of the class that is created by the supplier, excluding its path.
-   * @param supplier instance supplier
-   * @return class name
-   */
-  public static String className(final Supplier<?> supplier) {
-    return supplier.get().getClass().getSimpleName();
   }
 
   /**

@@ -66,10 +66,10 @@ public abstract class HTTPTest extends SandboxTest {
   }
 
   /**
-   * Finish test.
-   * @throws Exception exception
+   * Finishes the test.
+   * @throws IOException I/O exception
    */
-  @AfterAll public static void stop() throws Exception {
+  @AfterAll public static void stop() throws IOException {
     http.stop();
 
     // cleanup: remove project specific system properties

@@ -874,8 +874,8 @@ public class QueryParser extends InputParser {
     final SeqType type = optAsType();
     final Expr ex = wsConsumeWs(EXTERNAL) ? null : enclosedExpr();
     final VarScope vs = localVars.popContext();
-    final StaticFunc func = qc.funcs.declare(
-        anns, name, args, type, ex, currDoc.toString(), vs, ii);
+    final String cd = currDoc.toString();
+    final StaticFunc func = qc.funcs.declare(anns, name, args, type, ex, cd, vs, ii);
     funcs.put(func.id(), func);
   }
 
@@ -1013,8 +1013,9 @@ public class QueryParser extends InputParser {
         }
 
         // add new copies for all non-grouping variables
-        final Var[] ngrp = new Var[ng.size()];
-        for(int i = ng.size(); --i >= 0;) {
+        final int ns = ng.size();
+        final Var[] ngrp = new Var[ns];
+        for(int i = ns; --i >= 0;) {
           final VarRef ref = ng.get(i);
           // if one groups variables such as $x as xs:integer, then the resulting
           // sequence isn't compatible with the type and can't be assigned
@@ -1022,9 +1023,7 @@ public class QueryParser extends InputParser {
           ngrp[i] = nv;
           curr.put(nv.name.id(), nv);
         }
-
-        final VarRef[] pre = new VarRef[ng.size()];
-        clauses.add(new GroupBy(specs, ng.toArray(pre), ngrp, specs[0].info));
+        clauses.add(new GroupBy(specs, ng.toArray(new VarRef[0]), ngrp, specs[0].info));
       }
 
       final boolean stable = wsConsumeWs(STABLE);
@@ -2977,7 +2976,7 @@ public class QueryParser extends InputParser {
         if(!AtomType.AST.name.eq(name)) throw error(TYPE30_X, name.prefixId(XML));
         type = AtomType.AST;
       }
-      if(type == AtomType.AST || type == AtomType.AAT || type == AtomType.NOT)
+      if(type.oneOf(AtomType.AST, AtomType.AAT, AtomType.NOT))
         throw error(CASTUNKNOWN_X, name.prefixId(XML));
     }
     skipWs();

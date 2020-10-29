@@ -89,21 +89,6 @@ public final class ExprType {
   }
 
   /**
-   * Assigns the specified type and result size.
-   * The occurrence indicator is ignored if the result size is known.
-   * @param type type
-   * @param occ occurrence indicator
-   * @param sz result size (unknown if negative)
-   */
-  public void assign(final Type type, final Occ occ, final long sz) {
-    if(sz >= 0) {
-      asg(SeqType.get(type, sz == 0 ? Occ.ZERO : sz == 1 ? Occ.ONE : Occ.ONE_MORE), sz);
-    } else {
-      assign(SeqType.get(type, occ));
-    }
-  }
-
-  /**
    * Assigns the specified sequence type and result size.
    * The occurrence indicator of the sequence type is ignored if the result size is known.
    * @param st sequence type

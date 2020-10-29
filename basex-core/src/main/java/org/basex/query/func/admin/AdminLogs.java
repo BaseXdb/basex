@@ -41,13 +41,13 @@ public final class AdminLogs extends AdminFn {
    * @param qc query context
    * @return list
    */
-  private static Value list(final QueryContext qc) {
+  private Value list(final QueryContext qc) {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final IOFile file : qc.context.log.files()) {
       final String date = file.name().replace(IO.LOGSUFFIX, "");
       vb.add(new FElem(FILE).add(date).add(SIZE, Token.token(file.length())));
     }
-    return vb.value();
+    return vb.value(this);
   }
 
   /**

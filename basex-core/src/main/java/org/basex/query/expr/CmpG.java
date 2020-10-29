@@ -153,7 +153,7 @@ public class CmpG extends Cmp {
     // remove redundant type conversions
     final Type t1 = exprs[0].seqType().type, t2 = exprs[1].seqType().type;
     if(t1.isStringOrUntyped() && t2.isStringOrUntyped()) {
-      simplifyAll(Simplify.ATOM, cc);
+      simplifyAll(Simplify.STRING, cc);
     } else if(t1.isNumber() && t2.isNumber()) {
       simplifyAll(Simplify.NUMBER, cc);
     }
@@ -298,11 +298,11 @@ public class CmpG extends Cmp {
   }
 
   @Override
-  public final Expr invert(final CompileContext cc) throws QueryException {
+  public final CmpG invert() {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     return st1.one() && !st1.mayBeArray() && st2.one() && !st2.mayBeArray() ?
-      new CmpG(expr1, expr2, op.invert(), coll, sc, info).optimize(cc) : this;
+      new CmpG(expr1, expr2, op.invert(), coll, sc, info) : null;
   }
 
   @Override
@@ -323,7 +323,7 @@ public class CmpG extends Cmp {
 
     // if required, invert second operator (first operator need never be inverted)
     final boolean not2 = Function.NOT.is(expr);
-    Expr expr2 = not2 ? ((FnNot) expr).exprs[0] : expr;
+    Expr expr2 = not2 ? expr.arg(0) : expr;
     if(!(expr2 instanceof CmpG)) return null;
 
     // compare first and second comparison
@@ -334,7 +334,7 @@ public class CmpG extends Cmp {
     // function for creating new comparison
     final Expr exprL = exprs[0], exprR1 = exprs[1], exprR2 = cmp2.exprs[1];
     final QueryFunction<OpG, Expr> newList = newOp -> {
-      final Expr exprR = new List(info, exprR1, exprR2).optimize(cc);
+      final Expr exprR = List.get(cc, info, exprR1, exprR2);
       return new CmpG(exprL, exprR, newOp, coll, sc, info).optimize(cc);
     };
 
@@ -403,6 +403,6 @@ public class CmpG extends Cmp {
 
   @Override
   public final void plan(final QueryString qs) {
-    qs.tokens(exprs, " " + op + ' ', false);
+    qs.tokens(exprs, " " + op + ' ', true);
   }
 }

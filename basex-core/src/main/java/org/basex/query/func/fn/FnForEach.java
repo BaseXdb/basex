@@ -8,13 +8,13 @@ import org.basex.query.expr.List;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.func.update.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
-import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -25,8 +25,14 @@ import org.basex.util.hash.*;
  */
 public class FnForEach extends StandardFunc {
   @Override
-  public final Value value(final QueryContext qc) {
-    throw Util.notExpected();
+  public final Value value(final QueryContext qc) throws QueryException {
+    // implementation for dynamic function lookup
+    final Iter iter = exprs[0].iter(qc);
+    final FItem func = checkArity(exprs[1], 1, this instanceof UpdateForEach, qc);
+
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(Item item; (item = qc.next(iter)) != null;) vb.add(func.invokeValue(qc, info, item));
+    return vb.value(this);
   }
 
   @Override
@@ -48,7 +54,7 @@ public class FnForEach extends StandardFunc {
         results.add(new DynFuncCall(info, sc, updating, ndt, func, item).optimize(cc));
       }
       cc.info(QueryText.OPTUNROLL_X, this);
-      return new List(info, results.finish()).optimize(cc);
+      return List.get(cc, info, results.finish());
     }
 
     // otherwise, create FLWOR expression

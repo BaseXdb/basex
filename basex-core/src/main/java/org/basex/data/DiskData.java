@@ -373,6 +373,6 @@ public final class DiskData extends Data {
     final DataAccess store = text ? texts : values;
     final long offset = store.length();
     store.writeToken(offset, packed);
-    return packed != value ? Compress.COMPRESS | offset : offset;
+    return packed == value ? offset : Compress.COMPRESS | offset;
   }
 }

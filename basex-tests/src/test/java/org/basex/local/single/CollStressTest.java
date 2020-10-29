@@ -32,8 +32,7 @@ public final class CollStressTest extends SandboxTest {
   /**
    * Requests specific documents.
    */
-  @Test
-  public void specificOpened() {
+  @Test public void specificOpened() {
     execute(new Open(NAME));
     for(int i = 0; i < SIZE; i++) query("collection('" + NAME + '/' + i + "')");
   }
@@ -41,8 +40,7 @@ public final class CollStressTest extends SandboxTest {
   /**
    * Requests specific documents from closed database.
    */
-  @Test
-  public void specificClosed() {
+  @Test public void specificClosed() {
     execute(new Close());
     for(int i = 0; i < SIZE; i++) query("collection('" + NAME + '/' + i + "')");
   }
@@ -50,8 +48,7 @@ public final class CollStressTest extends SandboxTest {
   /**
    * Requests all documents.
    */
-  @Test
-  public void allOpened() {
+  @Test public void allOpened() {
     execute(new Open(NAME));
     query("for $i in 0 to " + (SIZE - 1) + " return collection(concat('" + NAME + "/', $i))");
   }
@@ -59,8 +56,7 @@ public final class CollStressTest extends SandboxTest {
   /**
    * Requests all documents from closed database.
    */
-  @Test
-  public void allClosed() {
+  @Test public void allClosed() {
     execute(new Close());
     query("for $i in 0 to " + (SIZE - 1) + " return collection(concat('" + NAME + "/', $i))");
   }

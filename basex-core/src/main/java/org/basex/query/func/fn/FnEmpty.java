@@ -58,7 +58,7 @@ public class FnEmpty extends StandardFunc {
 
     // rewrite list to union expression
     if(expr instanceof List && expr.seqType().type instanceof NodeType) {
-      exprs[0] = new Union(info, ((List) expr).exprs).optimize(cc);
+      exprs[0] = new Union(info, expr.args()).optimize(cc);
     }
     return this;
   }
@@ -68,8 +68,8 @@ public class FnEmpty extends StandardFunc {
       throws QueryException {
 
     if(!or && Function.EMPTY.is(expr)) {
-      exprs[0] = new List(info, exprs[0], ((FnEmpty) expr).exprs[0]).optimize(cc);
-      return optimize(cc);
+      final Expr args = List.get(cc, info, exprs[0], expr.arg(0));
+      return cc.function(Function.EMPTY, info, args);
     }
     return null;
   }

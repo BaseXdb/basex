@@ -56,8 +56,7 @@ public final class FDoc extends FNode {
     super(NodeType.DOC);
     this.children = children;
     this.uri = uri;
-    // update parent references
-    for(final ANode n : children) n.parent(this);
+    optimize();
   }
 
   /**

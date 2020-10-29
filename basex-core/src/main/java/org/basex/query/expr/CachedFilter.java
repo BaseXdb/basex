@@ -30,55 +30,52 @@ public class CachedFilter extends Filter {
     final ItemList items = new ItemList();
     Value value = root.value(qc);
 
-    final QueryFocus qf = qc.focus, focus = new QueryFocus();
-    qc.focus = focus;
+    final QueryFocus focus = qc.focus, qf = new QueryFocus();
+    qc.focus = qf;
     try {
       // evaluate first predicate, based on incoming value
-      Expr pred = exprs[0];
+      Expr expr = exprs[0];
       long vs = value.size();
-      focus.size = vs;
-      focus.pos = 1;
+      qf.size = vs;
 
       final boolean scoring = qc.scoring;
-      for(int s = 0; s < vs; s++) {
+      for(int v = 0; v < vs; v++) {
         qc.checkStop();
-        final Item item = value.itemAt(s);
-        focus.value = item;
-        final Item test = pred.test(qc, info);
+        final Item item = value.itemAt(v);
+        qf.value = item;
+        qf.pos = v + 1;
+        final Item test = expr.test(qc, info);
         if(test != null) {
           if(scoring) item.score(test.score());
           items.add(item);
         }
-        focus.pos++;
       }
       // save memory
       value = null;
 
       // evaluate remaining predicates, based on value builder
-      final int pl = exprs.length;
-      for(int i = 1; i < pl; i++) {
+      final int el = exprs.length;
+      for(int e = 1; e < el; e++) {
         vs = items.size();
-        pred = exprs[i];
-        focus.size = vs;
-        focus.pos = 1;
+        qf.size = vs;
+        expr = exprs[e];
         int c = 0;
-        for(int s = 0; s < vs; ++s) {
+        for(int i = 0; i < vs; ++i) {
           qc.checkStop();
-          final Item item = items.get(s);
-          focus.value = item;
-          final Item test = pred.test(qc, info);
+          final Item item = items.get(i);
+          qf.value = item;
+          qf.pos = i + 1;
+          final Item test = expr.test(qc, info);
           if(test != null) {
             if(scoring) item.score(test.score());
             items.set(c++, item);
           }
-          focus.pos++;
         }
         items.size(c);
       }
     } finally {
-      qc.focus = qf;
+      qc.focus = focus;
     }
-
     return items.value(this);
   }
 

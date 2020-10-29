@@ -22,18 +22,21 @@ public final class FnBoolean extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // boolean(exists(<a/>))  ->  boolean(<a/>)
-    final Expr expr = exprs[0].simplifyFor(Simplify.EBV, cc);
-
     // boolean(true()))  ->  true()
+    final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
     if(st.eq(SeqType.BLN_O)) return expr;
 
     // boolean($node/text())  ->  exists($node/text())
     if(st.type instanceof NodeType) return cc.function(Function.EXISTS, info, expr);
 
-    exprs[0] = expr;
     return this;
+  }
+
+  @Override
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    // boolean(exists(<a/>))  ->  boolean(<a/>)
+    exprs[0] = exprs[0].simplifyFor(Simplify.EBV, cc);
   }
 
   @Override

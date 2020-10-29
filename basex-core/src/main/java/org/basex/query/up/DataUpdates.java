@@ -70,13 +70,7 @@ final class DataUpdates {
   void add(final DataUpdate up, final MemData tmp) throws QueryException {
     if(up instanceof NodeUpdate) {
       for(final NodeUpdate nodeUp : ((NodeUpdate) up).substitute(tmp)) {
-        final int pre = nodeUp.pre;
-        NodeUpdates pc = nodeUpdates.get(pre);
-        if(pc == null) {
-          pc = new NodeUpdates();
-          nodeUpdates.put(pre, pc);
-        }
-        pc.add(nodeUp);
+        nodeUpdates.computeIfAbsent(nodeUp.pre, () -> new NodeUpdates()).add(nodeUp);
       }
 
     } else if(up instanceof Put) {

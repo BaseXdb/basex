@@ -256,7 +256,9 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     indexCheck(pragma + db + "//a[text() = '1']/text() }", 1);
     indexCheck(pragma + db + "//a/text()[. = '1'] }", 1);
     indexCheck(pragma + db + "/*/@*[. = <_/> ] }", "");
-    indexCheck(db + "/*/@*[" + pragma + ". = <_/> }]", "");
+
+    // no index access (root may not yield all documents of a database)
+    check(db + "/*/@*[" + pragma + ". = <_/> }]", "", empty(ValueAccess.class));
   }
 
   /** Optimizations of predicates that are changed by optimizations. */
@@ -271,6 +273,17 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     execute(new CreateDB(NAME, "<x a='A'/>"));
     check("(# db:enforceindex #) { <_>" + NAME + "</_> ! db:open(.)//*[comment() = 'A'] }", "",
         empty(ValueAccess.class));
+  }
+
+  /** Index access, unfiltered document test. */
+  @Test public void gh1948() {
+    final String doc = "<a b=\"c\"/>";
+    execute(new CreateDB(NAME));
+    execute(new Add("a/doc.xml", doc));
+    execute(new Add("b/doc.xml", doc));
+    execute(new Optimize());
+    execute(new Close());
+    indexCheck("let $db := db:open('" + NAME + "', 'a') return $db/a[@b = 'c']", doc);
   }
 
   /**

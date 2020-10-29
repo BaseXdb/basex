@@ -188,7 +188,7 @@ public final class JavaFunctionTest extends SandboxTest {
 
   /** Retrieve function items as Java objects. */
   @Test public void toJava() {
-    query("import module namespace set = \"java:java.util.HashSet\"; set:add(true#0)", "true");
+    query("import module namespace set = 'java:java.util.HashSet'; set:add(true#0)", "true");
   }
 
   /** Empty sequences. */

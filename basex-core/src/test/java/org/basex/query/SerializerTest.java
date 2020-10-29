@@ -30,6 +30,17 @@ public final class SerializerTest extends SandboxTest {
     }
   }
 
+  /** method=xhtml, meta element. */
+  @Test public void gh1933() {
+    final String query1 = "let $string := serialize("
+        + "<head><meta http-equiv='Content-Type'/></head>";
+    final String query2 = ", map { 'method': 'xhtml' })"
+        + "return count(analyze-string($string, '<meta ')//fn:match)";
+
+    query(query1 + query2, 1);
+    query(query1 + "update {}" + query2, 1);
+  }
+
   /** Test: method=html. */
   @Test public void html() {
     final String option = SerializerOptions.METHOD.arg("html");

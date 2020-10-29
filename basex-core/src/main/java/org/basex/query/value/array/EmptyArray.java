@@ -111,7 +111,7 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  XQArray consSmall(final Value[] values) {
-    return new SmallArray(values);
+  XQArray prepend(final SmallArray array) {
+    return array;
   }
 }

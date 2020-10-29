@@ -84,7 +84,7 @@ public abstract class DataUpdateTest extends SandboxTest {
    * Reloads the database.
    * @param mainmem main memory flag
    */
-  void reload(final boolean mainmem) {
+  static void reload(final boolean mainmem) {
     if(mainmem) return;
     execute(new Close());
     execute(new Open(NAME));

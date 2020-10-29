@@ -14,6 +14,7 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.var.*;
 import org.basex.util.list.*;
 import org.junit.jupiter.api.*;
@@ -316,10 +317,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("'a'[position() <= 1]", "a", "exists(QueryPlan/Str)");
 
     // check if positional predicates are rewritten to utility functions
-    check("for $i in (1, 2) return 'a'[$i]", "a", exists(_UTIL_ITEM));
-    check("for $i in (1, 2) return 'a'[position() = $i]", "a", exists(_UTIL_ITEM));
-    check("for $i in (1, 2) return 'a'[position() = $i to $i]", "a", exists(_UTIL_ITEM));
-    check("for $i in (1, 2) return 'a'[position() = $i to $i+1]", "a", exists(_UTIL_RANGE));
+    check("for $i in (1, 2) return 'a'[$i]", "a", root(Str.class));
+    check("for $i in (1, 2) return 'a'[position() = $i]", "a", root(Str.class));
+    check("for $i in (1, 2) return 'a'[position() = $i to $i]", "a", root(Str.class));
+    check("for $i in (1, 2) return 'a'[position() = $i to $i + 1]", "a", exists(_UTIL_RANGE));
     check("for $i in (1, 2) return 'a'[position() = $i to 1]", "a", exists(_UTIL_RANGE));
     check("for $i in (1, 2) return 'a'[position() >= $i]", "a", exists(_UTIL_RANGE));
     check("for $i in (1, 2) return 'a'[position() > $i]", "", exists(_UTIL_RANGE));
@@ -328,53 +329,69 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // check if positional predicates are rewritten to utility functions
     final String seq = " (1, 1.1, 1.9, 2) ";
-    check("for $i in" + seq + "return ('a', 'b')[$i]", "a\nb",
-        exists(_UTIL_ITEM));
-    check("for $i in" + seq + "return ('a', 'b')[position() = $i]", "a\nb",
-        exists(_UTIL_ITEM));
-    check("for $i in" + seq + "return ('a', 'b')[position() >= $i]", "a\nb\nb\nb\nb",
-        exists(_UTIL_RANGE));
-    check("for $i in" + seq + "return ('a', 'b')[position() > $i]", "b\nb\nb",
-        exists(_UTIL_RANGE));
-    check("for $i in" + seq + "return ('a', 'b')[position() <= $i]", "a\na\na\na\nb",
-        exists(_UTIL_RANGE));
-    check("for $i in" + seq + "return ('a', 'b')[position() < $i]", "a\na\na",
-        exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a', 'b')[$i]",
+        "a\nb", exists(_UTIL_ITEM));
+    check("for $i in" + seq + "return ('a', 'b')[position() = $i]",
+        "a\nb", exists(_UTIL_ITEM));
+    check("for $i in" + seq + "return ('a', 'b')[position() >= $i]",
+        "a\nb\nb\nb\nb", exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a', 'b')[position() > $i]",
+        "b\nb\nb", exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a', 'b')[position() <= $i]",
+        "a\na\na\na\nb", exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a', 'b')[position() < $i]",
+        "a\na\na", exists(_UTIL_RANGE));
 
     // check if multiple positional predicates are rewritten to utility functions
-    check("for $i in" + seq + "return ('a', 'b')[$i][$i]", "a",
-        count(_UTIL_ITEM, 2));
-    check("for $i in" + seq + "return ('a', 'b')[position() = $i][position() = $i]", "a",
-        count(_UTIL_ITEM, 2));
-    check("for $i in" + seq + "return ('a', 'b')[position() < $i][position() < $i]", "a\na\na",
-        count(_UTIL_RANGE, 2));
+    check("for $i in" + seq + "return ('a', 'b')[$i][$i]",
+        "a", count(_UTIL_ITEM, 2));
+    check("for $i in" + seq + "return ('a', 'b')[position() = $i][position() = $i]",
+        "a", count(_UTIL_ITEM, 2));
+    check("for $i in" + seq + "return ('a', 'b')[position() < $i][position() < $i]",
+        "a\na\na", count(_UTIL_RANGE, 2));
 
     // check if positional predicates are merged and rewritten to utility functions
     check("for $i in" + seq + "return ('a', 'b')[position() = $i and position() = $i]", "a\nb",
         exists(_UTIL_ITEM));
     check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() <= $i]", "a\nb",
         exists(_UTIL_RANGE));
-    check("for $i in" + seq + "return ('a', 'b')[position() <= $i and position() >= $i]", "a\nb",
-        exists(_UTIL_RANGE));
-    check("for $i in" + seq + "return ('a', 'b')[position() > $i and position() < $i]", "",
-        exists(_UTIL_RANGE));
-    check("for $i in" + seq + "return ('a', 'b')[position() < $i and position() > $i]", "",
-        exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a', 'b')[position() <= $i and position() >= $i]",
+        "a\nb", exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a', 'b')[position() > $i and position() < $i]",
+        "", exists(_UTIL_RANGE));
+    check("for $i in" + seq + "return ('a', 'b')[position() < $i and position() > $i]",
+        "", exists(_UTIL_RANGE));
 
     // no rewriting possible (conflicting positional predicates)
-    check("for $i in" + seq + "return ('a', 'b')[position() = $i and position() = $i+1]", "",
-        exists(CachedFilter.class));
-    check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() > $i]", "b\nb\nb",
-        exists(CachedFilter.class));
-    check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() >= $i+1]", "b",
-        exists(CachedFilter.class));
-    check("for $i in" + seq + "return ('a', 'b')[position() < $i and position() < $i+1]", "a\na\na",
-        exists(CachedFilter.class));
+    check("for $i in" + seq + "return ('a', 'b')[position() = $i and position() = $i + 1]",
+        "", exists(CachedFilter.class));
+    check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() > $i]",
+        "b\nb\nb", exists(CachedFilter.class));
+    check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() >= $i + 1]",
+        "b", exists(CachedFilter.class));
+    check("for $i in" + seq + "return ('a', 'b')[position() < $i and position() < $i + 1]",
+        "a\na\na", exists(CachedFilter.class));
 
-    check("(<a/>, <b/>)[last()]", "<b/>", count(_UTIL_LAST, 1));
-    check("(<a/>, <b/>)[position() > 1 and position() < 3]", "<b/>", count(_UTIL_LAST, 1));
-    check("(<a/>, <b/>)[position() > 1 and position() < 3 and <b/>]", "<b/>", count(_UTIL_LAST, 1));
-    check("(<a/>, <b/>)[position() > 1 and position() < 4]", "<b/>", count(_UTIL_LAST, 1));
+    check("(<a/>, <b/>)[last()]",
+        "<b/>", root(CElem.class));
+    check("(<a/>, <b/>[. = ''])[last()]",
+        "<b/>", count(_UTIL_LAST, 1));
+    check("(<a/>, <b/>)[position() > 1 and position() < 3]",
+        "<b/>", root(CElem.class));
+    check("(<a/>, <b/>[. = ''])[position() > 1 and position() < 3]",
+        "<b/>", root(IterFilter.class));
+    check("(<a/>[. = ''], <b/>)[position() > 1 and position() < 3]",
+        "<b/>", count(_UTIL_ITEM, 1));
+    check("(<a/>, <b/>)[position() > 1 and position() < 3 and <b/>]",
+        "<b/>", root(CElem.class));
+    check("(<a/>, <b/>[. = ''])[position() > 1 and position() < 3 and <b/>]",
+        "<b/>", root(IterFilter.class));
+    check("(<a/>[. = ''], <b/>)[position() > 1 and position() < 3 and <b/>]",
+        "<b/>", count(_UTIL_ITEM, 1));
+    check("(<a/>, <b/>)[position() > 1 and position() < 4]",
+        "<b/>", root(CElem.class));
+    check("(<a/>, <b/>[. = ''])[position() > 1 and position() < 4]",
+        "<b/>", count(_UTIL_RANGE, 1));
   }
 
   /** Predicates. */
@@ -385,7 +402,6 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[.][.]", "<a/>", exists(CElem.class), empty(ContextValue.class));
     check("<a/>/self::*[.][.]", "<a/>", empty(ContextValue.class));
     check("<a/>/self::*[.][.]", "<a/>", empty(ContextValue.class));
-    check("('a', 'b')[position()[position() ! .]]", "a\nb", count(POSITION, 2));
     check("('a', 'b')[. ! position()]", "a", exists("*[contains(name(), 'Map')]"));
     check("(1, 0)[.]", 1, exists(ContextValue.class));
     error("true#0[.]", EBV_X_X);
@@ -405,23 +421,24 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Comparison expressions. */
   @Test public void cmpG() {
-    check("count(let $s := (0, 1 to 99999) return $s[. = $s])", 100000, exists(CmpHashG.class));
+    check("count(let $s := (-1, 1 to 99999) return $s[. = $s])", 100000, exists(CmpHashG.class));
   }
 
-  /** Checks OR optimizations. */
+  /** Count, big sequences. */
   @Test public void gh1519() {
-    query("declare function local:replicate($seq, $n, $out) {"
+    query("declare function local:replicate($seq, $n, $out) { "
         + "  if($n eq 0) then $out "
         + "  else ( "
         + "    let $out2 := if($n mod 2 eq 0) then $out else ($out, $seq) "
         + "    return local:replicate(($seq, $seq), $n idiv 2, $out2) "
-        + "  )"
+        + "  ) "
         + "};"
-        + "let $n := 1000000000 "
+        + "let $n := 1000000 "
         + "return ( "
         + "  count(local:replicate((1, 2, 3), $n, ())) eq 3 * $n, "
         + "  count(local:replicate((1, 2, 3), $n, ())) = 3 * $n "
-        + ")", "true\ntrue");
+        + ")",
+        "true\ntrue");
   }
 
   /** Checks simplification of empty path expressions. */
@@ -505,6 +522,9 @@ public final class RewritingsTest extends QueryPlanTest {
         count(Cast.class, 1), type(Arith.class, "xs:integer"));
 
     error("(if(<_>!</_> = 'a') then 'b') cast as xs:string", INVTYPE_X_X_X);
+    error("((1 to 1000000000) ! (. || 'x')) cast as xs:string", INVTYPE_X_X_X);
+    error("() cast as xs:string", INVTYPE_X_X_X);
+    error("(1 to 100000)[. < 3] cast as xs:integer", SEQFOUND_X);
   }
 
   /** Type promotions. */
@@ -513,7 +533,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("map { string(<_/>): '' } instance of map(xs:string, xs:string)", true);
   }
 
-  /** Casts. */
+  /** Type checks. */
   @Test public void typeCheck() {
     check("declare function local:a($e) as xs:string? { local:b($e) }; " +
         "declare function local:b($e) as xs:string? { $e }; local:a(<_>X</_>)", "X",
@@ -524,9 +544,19 @@ public final class RewritingsTest extends QueryPlanTest {
     check("declare function local:a($e) as xs:string* { local:b($e) }; " +
         "declare function local:b($e) as xs:string? { $e }; local:a(<_>X</_>)", "X",
         count(TypeCheck.class, 1));
+
+    query("declare function local:f() as item()  { data([ <_/> ]) }; local:f()", "");
+    query("declare function local:f() as item()? { data([ <_/> ]) }; local:f()", "");
+    query("declare function local:f() as item()+ { data([ <_/> ]) }; local:f()", "");
+    query("declare function local:f() as item()* { data([ <_/> ]) }; local:f()", "");
+
+    query("declare function local:f($a) as item()  { data($a) }; local:f(<_/>)", "");
+    query("declare function local:f($a) as item()? { data($a) }; local:f(<_/>)", "");
+    query("declare function local:f($a) as item()+ { data($a) }; local:f(<_/>)", "");
+    query("declare function local:f($a) as item()* { data($a) }; local:f(<_/>)", "");
   }
 
-  /** GH1694. */
+  /** Test. */
   @Test public void gh1694() {
     check("count(1)", 1, exists(Int.class));
     execute(new CreateDB(NAME, "<_/>"));
@@ -541,7 +571,7 @@ public final class RewritingsTest extends QueryPlanTest {
     query(query, "<_/>");
   }
 
-  /** GH1726. */
+  /** Test. */
   @Test public void gh1726() {
     final String query =
       "let $xml := if((1, 0)[.]) then ( " +
@@ -555,14 +585,14 @@ public final class RewritingsTest extends QueryPlanTest {
     query(query, "<b/>\n<a>\n<b/>\n</a>");
   }
 
-  /** GH1723. */
+  /** Test. */
   @Test public void gh1723() {
     check("count(<a/>)", 1, root(Int.class));
     check("count(<a/>/<b/>)", 1, root(Int.class));
     check("count(<a/>/<b/>/<c/>/<d/>)", 1, root(Int.class));
   }
 
-  /** GH1733. */
+  /** Test. */
   @Test public void gh1733() {
     check("(<a/>, <b/>)/1", "1\n1", root(SingletonSeq.class));
     check("<a/>/1", 1, root(Int.class));
@@ -574,7 +604,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(<a/>, <b/>)/<c/>", "<c/>\n<c/>", root(MixedPath.class));
   }
 
-  /** GH1741. */
+  /** Test. */
   @Test public void gh1741() {
     check("<a/>/<b/>[1]", "<b/>", root(CElem.class));
     check("<a/>/.[1]", "<a/>", root(CElem.class));
@@ -585,7 +615,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<doc><x/><y/></doc>/*/..[2] ! name()", "", empty());
   }
 
-  /** GH1737: combined kind tests. */
+  /** Combined kind tests. */
   @Test public void gh1737() {
     // merge identical steps, rewrite to iterative path
     check("<a/>/(* | *)", "", root(IterPath.class), empty(Union.class));
@@ -609,7 +639,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>/(*, @*)", "", root(MixedPath.class), exists(Union.class));
   }
 
-  /** GH1761: merge adjacent steps in path expressions. */
+  /** Merge adjacent steps in path expressions. */
   @Test public void gh1761() {
     // merge self steps
     check("<a/>/self::*/self::a", "<a/>", count(IterStep.class, 1));
@@ -628,7 +658,7 @@ public final class RewritingsTest extends QueryPlanTest {
         count(IterStep.class, 1));
   }
 
-  /** GH1762: merge steps and predicates with self steps. */
+  /** Merge steps and predicates with self steps. */
   @Test public void gh1762() {
     // merge self steps
     check("<a/>/self::*[self::a]", "<a/>", count(IterStep.class, 1));
@@ -690,7 +720,7 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Merge conjunctions. */
   @Test public void gh1776() {
     check("for $n in (1, 2, 3) where $n != 2 and $n != 3 return $n", 1,
-        exists(NOT), exists(IntSeq.class));
+        exists(NOT), exists(RangeSeq.class));
 
     check("<_>A</_>[. = <a>A</a> and . = 'A']", "<_>A</_>", exists(NOT), exists(List.class));
     check("(<a/>, <b/>, <c/>)[name() = 'a' and name() = 'b']", "",
@@ -720,6 +750,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("data(<_>1</_>) + 2", 3, empty(DATA));
     check("string-join(data(<_>X</_>))", "X", empty(DATA));
     check("data(data(<_>X</_>))", "X", count(DATA, 1));
+    check("string(data(<_>X</_>))", "X", empty(DATA));
+    check("data(string(<_>X</_>))", "X", empty(DATA));
 
     check("<x>A</x>[data() = 'A']", "<x>A</x>", empty(DATA), count(ContextValue.class, 1));
     check("<x>A</x>[data() ! data() ! data() = 'A']", "<x>A</x>",
@@ -727,6 +759,12 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<x>A</x>[data() = 'A']", "<x>A</x>", empty(DATA));
 
     check("<A>A</A> ! data() = data(<A>B</A>)", false, empty(DATA));
+
+    check("data(string(<_/>)) instance of xs:string", true, root(Bln.class));
+    check("data(xs:NMTOKENS(<_/>) ! xs:untypedAtomic(.)) instance of xs:untypedAtomic*",
+        true, root(Bln.class));
+    error("data(data(<_>a</_>) promote to element(e))", INVPROMOTE_X_X_X);
+    error("data(<_>a</_> promote to element(e))", INVPROMOTE_X_X_X);
   }
 
   /** Remove redundant atomizations. */
@@ -801,8 +839,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[local-name() = 'a' or local-name() = 'b']", "<a/>", exists(SingleIterPath.class));
     check("<a/>[node-name() = (xs:QName('a'), xs:QName('b'))]", "<a/>",
         exists(SingleIterPath.class));
+    check("<a/>[local-name() = ('a', 'a', 'a')]", "<a/>", exists(SingleIterPath.class));
 
-    check("<a/>[local-name() = ('', '', '')]", "", empty());
     check("(<a/>, <b/>)[. = '!'][local-name() = 'a']", "", empty(LOCAL_NAME));
 
     check("comment {}[local-name() = '']", "<!---->", root(CComm.class));
@@ -892,8 +930,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_/>[not(. = ('A', 'B'))][not(. = ('C', 'D'))]", "<_/>", count(CmpHashG.class, 1));
     check("<_/>[. != 'A'][. != 'B'][. != 'C'][. != 'D']", "<_/>",   count(CmpHashG.class, 1));
 
-    check("(3, 4)[not(. = 1) and not(. = (2, 3))]", 4, count(NOT, 1), count(CmpHashG.class, 1));
-    check("(3, 4)[not(. = (2, 3)) and . != 1]", 4, count(NOT, 1), count(CmpHashG.class, 1));
+    check("(3, 4)[not(. = 1) and not(. = (2, 4))]", 3, count(NOT, 1), count(CmpHashG.class, 1));
+    check("(3, 4)[not(. = (2, 4)) and . != 1]", 3, count(NOT, 1), count(CmpHashG.class, 1));
 
     check("(3, 4)[not(. = (2, 3)) and not(. = (1, 4))]", "",
         count(NOT, 1), count(CmpHashG.class, 1));
@@ -922,7 +960,8 @@ public final class RewritingsTest extends QueryPlanTest {
     // rewritings in comparisons
     check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class));
     check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class));
-    check("let $a := <_>A</_> return $a ! text() = $a ! text()", true, count(IterPath.class, 2));
+    check("let $a := <_>A</_> return $a ! text() = $a ! text()", true,
+        root(ItemMap.class), empty(IterPath.class), empty(IterMap.class));
 
     // EBV rewritings
     check("<a><b/></a>[b ! ..]", "<a>\n<b/>\n</a>", exists(CachedPath.class));
@@ -933,11 +972,11 @@ public final class RewritingsTest extends QueryPlanTest {
   }
 
   /** Rewrite if to where. */
-  public void gh1806() {
+  @Test public void gh1806() {
     check("let $a := <_/> return if ($a = '') then $a else ()", "<_/>",
-        empty(If.class), exists(Where.class));
+        empty(If.class), empty(Where.class), exists(IterFilter.class));
     check("for $a in (1, 2) return if ($a = 3) then $a else ()", "",
-        empty(If.class), exists(Where.class), root(IterFilter.class));
+        empty(If.class), empty(Where.class), root(IterFilter.class));
 
     check("for $t in ('a', 'b') return if($t) then $t else ()", "a\nb",
         root(IterFilter.class), exists(ContextValue.class));
@@ -946,7 +985,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("for $i in 1 to 2\n" +
         "for $f in if ($i = 1) then 1 else ()\n" +
-        "return $f + $i\n", 2, count(For.class, 1));
+        "return $f + $i\n", 2, empty(GFLWOR.class));
   }
 
   /** If expression with empty branches. */
@@ -1049,9 +1088,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $_ in 1 to 2 return 3", "3\n3", root(SingletonSeq.class));
     check("for $_ in 1 to 2 return ()", "", empty());
 
+    check("let $_ := prof:void(1) return 1", 1, root(List.class), exists(_PROF_VOID));
+
     // rewrite to simple map
-    check("for $_ in 1 to 2 return <a/>", "<a/>\n<a/>", root(DualMap.class));
-    check("for $_ in 1 to 2 return prof:void(1)", "", root(DualMap.class));
+    check("for $_ in 1 to 2 return <a/>", "<a/>\n<a/>", root(_UTIL_REPLICATE));
+    check("for $_ in 1 to 2 return prof:void(1)", "", root(_UTIL_REPLICATE));
   }
 
   /** Merge and/or expressions. */
@@ -1074,7 +1115,6 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_>a</_>[. = 'a' or .. != 'b']", "<_>a</_>", exists(Or.class));
 
     // AND: merge
-    check("(<_/>, <_/>) = 'a' and (<_/>, <_/>) = 'b'", false, empty(And.class));
     check("<_>1</_>[not(. = 1) and not(. = (2, 3))]", "",
         exists(CmpG.class), empty(CmpSimpleG.class));
     check("not((<_/>, <_/>) != 'a') and not((<_/>, <_/>) != 'b')", false,
@@ -1262,12 +1302,12 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Combine position predicates. */
   @Test public void gh1840() {
     check("(1,2,3)[position() = 1 or position() = 1]", 1, root(Int.class));
-    check("(1,2,3)[position() = 1 or position() = 2]", "1\n2", root(SubSeq.class));
+    check("(1,2,3)[position() = 1 or position() = 2]", "1\n2", root(RangeSeq.class));
     check("(1,2,3)[position() = 1 or position() = 3]", "1\n3", count(ItrPos.class, 2));
 
-    check("(1,2,3)[position() = 1 to 2 or position() = 1]", "1\n2", root(SubSeq.class));
-    check("(1,2,3)[position() = 1 to 2 or position() = 2]", "1\n2", root(SubSeq.class));
-    check("(1,2,3)[position() = 1 to 2 or position() = 3]", "1\n2\n3", root(IntSeq.class));
+    check("(1,2,3)[position() = 1 to 2 or position() = 1]", "1\n2", root(RangeSeq.class));
+    check("(1,2,3)[position() = 1 to 2 or position() = 2]", "1\n2", root(RangeSeq.class));
+    check("(1,2,3)[position() = 1 to 2 or position() = 3]", "1\n2\n3", root(RangeSeq.class));
 
     check("(1,2,3)[position() = 1 to 2 and position() = 1]", 1, root(Int.class));
     check("(1,2,3)[position() = 1 to 2 and position() = 2 to 3]", 2, root(Int.class));
@@ -1277,7 +1317,8 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Distinct integer sequences. */
   @Test public void gh1841() {
     check("<_/>[position() = (1, 1)]", "<_/>", root(CElem.class));
-    check("<_/>[position() = (1, 2, 1)]", "<_/>", count(Int.class, 2));
+    check("<_/>[position() = (1, 2, 1)]", "<_/>", root(CElem.class));
+    check("<_/>[position() = (1, 2, 2.1)]", "<_/>", count(Int.class, 2));
   }
 
   /** Flatten expression lists. */
@@ -1439,6 +1480,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(true(), false()) ! (not(.) and .)", "false\nfalse", root(SingletonSeq.class));
     check("(true(), false()) ! (not(.) or  .)", "true\ntrue",   root(SingletonSeq.class));
 
+    check("(true(), false()) ! (. = false() and . = true())", "false\nfalse",
+        root(SingletonSeq.class));
+    check("(true(), false()) ! (. = true() or . = false())", "true\ntrue",
+        root(SingletonSeq.class));
+
     check("for $i in 1 to 2 return $i and $i = 1 and not($i)", "false\nfalse",
         root(SingletonSeq.class));
 
@@ -1470,7 +1516,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("count(for $c in //c return $c/..)", 2, exists(DualMap.class));
     check("count(for $c in //* return $c//c)", 3, exists(IterMap.class));
     check("count(for $c in //* return $c/following::*)", 2, exists(IterMap.class));
-    check("let $n := reverse((<a>A</a>, <b>B</b>)) return $n/text()", "A\nB",
+    check("let $n := reverse((<a>A</a>, <b>B</b>)) return $n/text()", "B\nA",
         root(CachedPath.class));
   }
 
@@ -1481,8 +1527,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Distinct-values, optimization of arguments. */
   @Test public void gh1868() {
-    check("let $s as xs:string* := distinct-values(<_>x</_> ! string()) return $s", "x",
-        root(DISTINCT_VALUES));
+    check("let $s as xs:string* := distinct-values(<_>x</_> ! string()) return $s",
+        "x", root(STRING));
   }
 
   /** Simple map, positional predicates. */
@@ -1586,7 +1632,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Simple map implementation for two operands. */
   @Test public void gh1889() {
-    check("(1 to 2) ! <a/>", "<a/>\n<a/>", root(DualMap.class));
+    check("(1 to 2) ! <a/>", "<a/>\n<a/>", root(_UTIL_REPLICATE));
     check("(3 to 4) ! prof:void(.)", "", root(DualMap.class));
   }
 
@@ -1609,7 +1655,7 @@ public final class RewritingsTest extends QueryPlanTest {
     query("function() { for $a in (1, 2) return function() { $a } }() ! .()", "1\n2");
   }
 
-  /** XQuery: FLWOR, positional variable. */
+  /** FLWOR, positional variable. */
   @Test public void gh1893() {
     check("for $a at $p in 6 to 8 return $p", "1\n2\n3", root(RangeSeq.class));
     check("for $a at $p in ('a', 'b') return $p", "1\n2", root(RangeSeq.class));
@@ -1813,5 +1859,180 @@ public final class RewritingsTest extends QueryPlanTest {
         + "  default return error() "
         + ") treat as element()",
         "<a/>\n<b/>", empty(Treat.class));
+  }
+
+  /** Rewrite side-effecting let expressions. */
+  @Test public void gh1917() {
+    check("let $a := (# basex:non-deterministic #) { <a/> } return $a ! name()",
+        "a", root(ItemMap.class));
+  }
+
+  /** Rewrite list to util:replicate. */
+  @Test public void gh1918() {
+    check("(1, 1)", "1\n1", root(SingletonSeq.class));
+    check("let $a := (<a/>, <a/>) return $a[1] is $a[2]", false, exists(_UTIL_REPLICATE));
+  }
+
+  /** Switch expression: static and dynamic cases. */
+  @Test public void gh1919() {
+    query("switch('x') case <_>x</_>return 1 case 'x' return 2 default return 3", 1);
+  }
+
+  /** Switch expression, merge branches. */
+  @Test public void gh1920() {
+    check("switch(<_/>) case 'a' return 1 case 'b' return 1 case 'c' return 2 default return 3", 3,
+        root(Switch.class), count(SwitchGroup.class, 3));
+    check("switch(<_/>) case 'a' return 1 case 'b' return 2 case 'c' return 2 default return 3", 3,
+        root(Switch.class), count(SwitchGroup.class, 3));
+    check("switch(<_/>) case 'a' return 1 case 'b' return 2 case 'c' return 3 default return 3", 3,
+        root(Switch.class), count(SwitchGroup.class, 3));
+
+    check("switch(<_>a</_>) case 'a' return 1 case 'b' return 1 default return 2", 1,
+        root(If.class));
+    check("switch(<_>a</_>) case 'a' return 1 case 'b' return 2 default return 2", 1,
+        root(If.class));
+    check("switch(<_/>) case 'a' return 1 case 'b' return 1 case 'c' return 1 default return 2", 2,
+        root(If.class));
+
+    check("switch(<_>a</_>) case 'a' return 1 default return 1", 1,
+        root(Int.class));
+    check("switch(<_>a</_>) case 'a' return 1 case 'b' return 1 default return 1", 1,
+        root(Int.class));
+    check("switch(<_/>) case 'a' return 1 case 'b' return 1 case 'c' return 1 default return 1", 1,
+        root(Int.class));
+  }
+
+  /** Rewrite integer lists to range sequences. */
+  @Test public void gh1924() {
+    check("1, 2", "1\n2", root(RangeSeq.class));
+    check("-1, 0, 1", "-1\n0\n1", root(RangeSeq.class));
+    check("1, 2 to 3", "1\n2\n3", root(RangeSeq.class));
+    check("5, 6 to 7, 8", "5\n6\n7\n8", root(RangeSeq.class));
+    check("5 to 6, 7 to 8", "5\n6\n7\n8", root(RangeSeq.class));
+    check("5 to 6, 8", "5\n6\n8", root(IntSeq.class));
+    check("1, 3 to 4", "1\n3\n4", root(IntSeq.class));
+  }
+
+  /** DDO property of recursive function. */
+  @Test public void gh1927() {
+    query("declare function local:a($a) as xs:boolean {"
+        + "if ($a) then local:a(text { '' }) "
+        + "else if ($a) then local:a($a) "
+        + "else false() }; "
+        + "local:a(()) ! text { . }", false);
+    query("declare function local:a($a) as xs:boolean {"
+        + "if ($a) then local:a(text { '' }) "
+        + "else if ($a) then local:a($a) "
+        + "else false() }; "
+        + "let $c := local:a(()) return text { $c }", false);
+  }
+
+  /** Pre-evaluate lookup expressions. */
+  @Test public void gh1928() {
+    check("()?1", "", empty());
+    check("([ 1 ], map { 2: 3 })?*", "1\n3", root(SmallSeq.class));
+    check("((map { 1: 'A', 'x': 'B' }) treat as function(xs:anyAtomicType) as xs:string)?1",
+        "A", root(Str.class));
+  }
+
+  /** Rewrite distinct sequence checks. */
+  @Test public void gh1930() {
+    check("(1 to 2)[. = (5, 4, 3, 1, 2, 5)]", "1\n2", exists(RangeSeq.class));
+    check("distinct-values((5, 3, 4, 2, 1, 6, 1))", "1\n2\n3\n4\n5\n6", root(RangeSeq.class));
+  }
+
+  /** Ancestor steps on database and fragment nodes. */
+  @Test public void gh1931() {
+    query("<a>{ (<b><c/></b> update {})/c }</a>/c/ancestor::*", "<a>\n<c/>\n</a>");
+  }
+
+  /** Rewrite group by to distinct-values(). */
+  @Test public void gh1932() {
+    check("for $a in 1 to 2 group by $a return $a", "1\n2", root(RangeSeq.class));
+    check("for $a in 1 to 2 group by $b := $a return $b", "1\n2", root(RangeSeq.class));
+    check("for $a in 1 to 2 group by $b := data($a) return $b", "1\n2", root(RangeSeq.class));
+
+    check("for $a in (1, 2) group by $a return $a", "1\n2", root(RangeSeq.class));
+    check("for $a in (1, 3) group by $a return $a", "1\n3", root(SmallSeq.class));
+    check("for $a in (1, 'a', 1) group by $a return $a", "1\na", root(SmallSeq.class));
+    check("for $a allowing empty in () group by $a return $a", "", empty());
+
+    check("for $p in 1 to 2 group by $q := string($p) return $q",
+        "1\n2", root(DISTINCT_VALUES), exists(DualMap.class));
+    check("for $a in (1, 2) group by $a return $a promote to xs:double",
+        "1\n2", root(DualMap.class));
+
+    check("for $a in (1, 2) group by $b := string($a) return $b || 'x'",
+        "1x\n2x", count(DualMap.class, 2));
+
+    error("for $a as xs:byte in (1, 2) group by $a return $a", INVTREAT_X_X_X);
+    error("for $a in (1, 2) group by $a as xs:byte := $a return $a", INVTREAT_X_X_X);
+  }
+
+  /** Rewrite expression range to util:replicate. */
+  @Test public void gh1934() {
+    check("for $i in 1 to 2 return (1 to $i) ! $i", "1\n2\n2",
+        root(IterMap.class), exists(_UTIL_REPLICATE));
+    check("for $i in 1 to 2 for $j in 1 to $i return $i", "1\n2\n2",
+        root(IterMap.class), exists(_UTIL_REPLICATE));
+  }
+
+  /** Iterative path traversal, positional access. */
+  @Test public void gh1935() {
+    query("declare variable $x := <x><a><_/></a></x>; $x/a ! (_[$x/_ ! 1], .)", "<a>\n<_/>\n</a>");
+  }
+
+  /** Positional checks. */
+  @Test public void gh1937() {
+    check("1[position()]", 1, root(Int.class));
+    check("(1, 3)[position()]", "1\n3", root(IntSeq.class));
+    check("('a', 'b')[position()[position() ! .]]", "a\nb", root(StrSeq.class));
+
+    check("(1, 3, 5)[last() - 2]", 1, root(Int.class));
+    check("(1, 3, 5)[position() = last() - 1]", 3, root(Int.class));
+    check("(1, 3, 5, 7)[position() = last() idiv 2]", 3, root(Int.class));
+    check("(1, 3, 5, 7)[position() = last() div 2]", 3, root(Int.class));
+
+    check("(1, 3, 5)[not(position() = 2)]", "1\n5", root(SmallSeq.class));
+    check("(1, 3, 5)[not(position() > 2)]", "1\n3", root(SubSeq.class));
+    check("(1, 3, 5)[not(position() < 2)]", "3\n5", root(SubSeq.class));
+    check("(1, <_/>[data()])[not(position() = 2)]", 1, root(REMOVE));
+
+    check("for $i in 1 to 2 return (3 to 4)[not(position() = $i)]", "4\n3", exists(REMOVE));
+    check("for $i in 1 to 2 return (3 to 4)[not(position() > $i)]", "3\n3\n4", exists(_UTIL_RANGE));
+    check("for $i in 1 to 2 return (3 to 4)[not(position() < $i)]", "3\n4\n4", exists(_UTIL_RANGE));
+  }
+
+  /** Simple map, context value. */
+  @Test public void gh1941() {
+    query("<a/> ! <b>{ (<c>{ . }</c>, .) ! name()[. = 'a'] }</b>", "<b>a</b>");
+  }
+
+  /** If expression, boolean/not. */
+  @Test public void gh1942() {
+    check("for $a in (false(), true()) for $b in (false(), true()) return "
+        + "if($a) then $b else not($b)", "true\nfalse\nfalse\ntrue", empty(If.class));
+    check("for $a in (false(), true()) for $b in (false(), true()) return "
+        + "if($a) then not($b) else $b", "false\ntrue\ntrue\nfalse", empty(If.class));
+
+    check("for $a in (false(), true()) for $b in (0, 1) return "
+        + "if($a) then not($b) else boolean($b)", "false\ntrue\ntrue\nfalse", empty(If.class));
+    check("for $a in (false(), true()) for $b in (0, 1) return "
+        + "if($a) then boolean($b) else not($b)", "true\nfalse\nfalse\ntrue", empty(If.class));
+
+    check("for $a in (1, 2) for $b in (false(), true()) return "
+        + "if($a) then $b else not($b)", "false\ntrue\nfalse\ntrue", empty(If.class));
+    check("for $a in (1, 2) for $b in (false(), true()) return "
+        + "if($a) then not($b) else $b", "true\nfalse\ntrue\nfalse", empty(If.class));
+
+    check("let $a := <a/>[. = ''] for $b in (false(), true()) return "
+        + "if($b) then exists($a) else empty($a)", "false\ntrue", empty(If.class));
+    check("let $a := <a/>[. = ''] for $b in (false(), true()) return "
+        + "if($b) then empty($a) else exists($a)", "true\nfalse", empty(If.class));
+
+    check("let $a := <a/> for $b in (false(), true()) return "
+        + "if($b) then $a = '' else $a != ''", "false\ntrue", empty(If.class));
+    check("let $a := <a/> for $b in (false(), true()) return "
+        + "if($b) then $a != '' else $a = ''", "true\nfalse", empty(If.class));
   }
 }

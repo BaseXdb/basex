@@ -1,5 +1,6 @@
 package org.basex.query.value.type;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
@@ -76,6 +77,8 @@ public enum ListType implements Type {
       final InputInfo ii) throws QueryException {
 
     final byte[][] values = split(normalize(item.string(ii)), ' ');
+    if(values.length == 0) throw FUNCCAST_X_X_X.get(ii, item.type, this, item);
+
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final byte[] value : values) vb.add(type.cast(Str.get(value), qc, sc, ii));
     return vb.value(type);

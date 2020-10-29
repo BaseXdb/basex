@@ -37,21 +37,13 @@ public final class TreeSeqBuilder implements Iterable<Item> {
   private final FingerTreeBuilder<Item> tree = new FingerTreeBuilder<>();
 
   /**
-   * Returns a {@link Value} representation of the given items.
-   * @param items array containing the items
-   * @param size number of items (must be {@code 2} or more)
-   * @param type type (can be {@code null})
+   * Concatenates two items.
+   * @param item1 first item
+   * @param item2 second item
    * @return the value
    */
-  public static Seq value(final Item[] items, final int size, final Type type) {
-    if(size <= TreeSeq.MAX_SMALL) {
-      final Item[] small = new Item[size];
-      Array.copy(items, size, small);
-      return new SmallSeq(small, type);
-    }
-    final TreeSeqBuilder tsb = new TreeSeqBuilder();
-    for(int i = 0; i < size; i++) tsb.add(items[i]);
-    return tsb.seq(type);
+  public static Seq concat(final Item item1, final Item item2) {
+    return new SmallSeq(new Item[] { item1, item2 }, item1.type.union(item2.type));
   }
 
   /**

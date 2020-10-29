@@ -16,7 +16,7 @@ public final class BXAttr extends BXNode implements Attr {
    * Constructor.
    * @param node node reference
    */
-  BXAttr(final ANode node) {
+  BXAttr(final FNode node) {
     super(node);
   }
 
@@ -101,8 +101,8 @@ public final class BXAttr extends BXNode implements Attr {
    * @return text node
    */
   private FNode text() {
-    final FNode node = new FTxt(nd.string());
-    node.parent(nd);
-    return node;
+    final FNode txt = new FTxt(nd.string());
+    txt.parent((FNode) nd);
+    return txt;
   }
 }

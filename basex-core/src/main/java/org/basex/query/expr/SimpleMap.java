@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
 
 import java.util.*;
 import java.util.function.*;
@@ -9,11 +10,11 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.Function;
+import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
+import org.basex.query.func.util.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -81,7 +82,7 @@ public abstract class SimpleMap extends Arr {
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       if(expr instanceof SimpleMap && !(expr instanceof CachedMap)) {
-        list.add(((SimpleMap) expr).exprs);
+        list.add(expr.args());
         cc.info(OPTFLAT_X_X, expr, (Supplier<?>) this::description);
       } else {
         list.add(expr);
@@ -171,17 +172,54 @@ public abstract class SimpleMap extends Arr {
               ex = cc.error(qe, next);
             }
           }
-        } else if(es != -1 && !next.has(Flag.CTX)) {
+        } else if(!next.has(Flag.CTX)) {
           // merge expressions if next expression does not rely on the context
-          if(next instanceof Value) {
-            // (1 to 2) ! 3  ->  (3, 3)
-            ex = SingletonSeq.get((Value) next, es);
-          } else if(next.has(Flag.NDT, Flag.CNS)) {
-            // (1 to 2) ! <x/>  ->  util:replicate('', 2) ! <x/>
-            exprs[e] = cc.replaceWith(exprs[e], SingletonSeq.get(Str.ZERO, es));
-          } else {
-            // (1 to 2) ! 'ok'  ->  util:replicate('ok', 2)
-            ex = cc.function(Function._UTIL_REPLICATE, info, next, Int.get(es));
+          Expr count = null;
+          if(es != -1) {
+            count = Int.get(es);
+          } else if(expr instanceof Range && expr.arg(0) == Int.ONE &&
+              expr.arg(1).seqType().eq(SeqType.ITR_O)) {
+            count = expr.arg(1);
+          }
+          if(count != null) {
+            // (1 to 2) ! <x/>  ->  util:replicate(<x/>, 2, true())
+            // (1 to $c) ! 'A'  ->  util:replicate('A', $c, false())
+            ex = cc.replicate(next, count, info);
+          }
+        } else if(next instanceof StandardFunc && !next.has(Flag.NDT)) {
+          // next operand relies on context and is a deterministic function call
+          final Expr[] args = next.args();
+          if(_UTIL_REPLICATE.is(next) && ((UtilReplicate) next).single() &&
+              args[0] instanceof ContextValue && !args[1].has(Flag.CTX)) {
+            if(_UTIL_REPLICATE.is(expr) && ((UtilReplicate) expr).single()) {
+              // util:replicate(E, C) ! util:replicate(., D)  ->  util:replicate(E, C * D)
+              final Expr cnt = new Arith(info, expr.arg(1), args[1], Calc.MULT).optimize(cc);
+              ex = cc.function(_UTIL_REPLICATE, info, expr.arg(0), cnt);
+            } else if(expr instanceof SingletonSeq && ((SingletonSeq) expr).value instanceof Item) {
+              // SINGLETONSEQ ! util:replicate(., C)  ->  util:replicate(SINGLETONSEQ, C)
+              ex = cc.function(_UTIL_REPLICATE, info, expr, args[1]);
+            }
+          } else if(_UTIL_ITEM.is(next) && !args[0].has(Flag.CTX) &&
+              args[1] instanceof ContextValue) {
+            if(expr instanceof RangeSeq) {
+              final RangeSeq range = (RangeSeq) expr;
+              final Item start = range.itemAt(0), end = range.itemAt(range.size() - 1);
+              if(range.asc) {
+                // (3 to 4) ! util:item(X, .)  ->  util:range(X, 3, 4)
+                ex = cc.function(_UTIL_RANGE, info, args[0], start, end);
+              } else {
+                // reverse(3 to 4) ! util:item(X, .)  ->  reverse(util:range(X, 3, 4))
+                ex = cc.function(_UTIL_RANGE, info, args[0], end, start);
+                ex = cc.function(REVERSE, info, ex);
+              }
+            } else if(expr instanceof Range) {
+              // (1 to $i) ! util:item(X, .)  ->  util:range(X, 1, $i)
+              ex = cc.function(_UTIL_RANGE, info, args[0], expr.arg(0), expr.arg(1));
+            }
+          } else if(DATA.is(next) && (((FnData) next).contextAccess() ||
+              args[0] instanceof ContextValue)) {
+            // ITEMS ! data(.)  ->  data(ITEMS)
+            ex = cc.function(DATA, info, expr);
           }
         }
       }
@@ -232,7 +270,7 @@ public abstract class SimpleMap extends Arr {
 
     boolean cached = false;
     for(final Expr expr : exprs) cached = cached || expr.has(Flag.POS);
-    boolean dual = exprs.length == 2 && exprs[1].seqType().zeroOrOne();
+    final boolean dual = exprs.length == 2 && exprs[1].seqType().zeroOrOne();
 
     // choose best map implementation
     return copyType(
@@ -411,13 +449,22 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
+  public void markTailCalls(final CompileContext cc) {
+    final int el = exprs.length - 1;
+    for(int e = 0; e < el; e++) {
+      if(!exprs[e].seqType().zeroOrOne()) return;
+    }
+    exprs[el].markTailCalls(cc);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof SimpleMap && super.equals(obj);
   }
 
   @Override
   public String description() {
-    return "map operator";
+    return "simple map";
   }
 
   @Override

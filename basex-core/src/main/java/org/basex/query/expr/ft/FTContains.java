@@ -82,7 +82,7 @@ public final class FTContains extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(Simplify.ATOM, cc);
+    expr = expr.simplifyFor(Simplify.STRING, cc);
     return expr.seqType().zero() ? cc.function(Function.BOOLEAN, info, expr) : this;
   }
 

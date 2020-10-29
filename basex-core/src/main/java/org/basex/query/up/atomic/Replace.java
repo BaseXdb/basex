@@ -39,12 +39,9 @@ final class Replace extends StructuralUpdate {
    * @return instance
    */
   static Replace getInstance(final Data data, final int pre, final DataClip clip) {
-    final int kind = data.kind(pre);
-    final int par = data.parent(pre, kind);
-    final int oldsize = data.size(pre, kind);
-    final int newsize = clip.size();
-    final int sh = newsize - oldsize;
-    return new Replace(pre, sh, sh, pre + oldsize, clip, par);
+    final int kind = data.kind(pre), parent = data.parent(pre, kind);
+    final int oldsize = data.size(pre, kind), sh = clip.size() - oldsize;
+    return new Replace(pre, sh, sh, pre + oldsize, clip, parent);
   }
 
   @Override
@@ -56,8 +53,7 @@ final class Replace extends StructuralUpdate {
       data.replace(location, clip);
     } else {
       // fallback: delete old entries, add new ones
-      final int kind = data.kind(location);
-      final int par = data.parent(location, kind);
+      final int kind = data.kind(location), par = data.parent(location, kind);
       // delete first - otherwise insert must be at location+1
       data.delete(location);
       if(kind == Data.ATTR) {

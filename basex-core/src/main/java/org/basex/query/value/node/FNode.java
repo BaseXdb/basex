@@ -14,6 +14,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class FNode extends ANode {
+  /** Parent node (can be {@code null}). */
+  FNode parent;
+
   /**
    * Constructor.
    * @param type item type
@@ -50,31 +53,8 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final BasicNodeIter ancestorIter() {
-    return new BasicNodeIter() {
-      private ANode node = FNode.this;
-
-      @Override
-      public ANode next() {
-        node = node.parent();
-        return node;
-      }
-    };
-  }
-
-  @Override
-  public final BasicNodeIter ancestorOrSelfIter() {
-    return new BasicNodeIter() {
-      private ANode node = FNode.this;
-
-      @Override
-      public ANode next() {
-        if(node == null) return null;
-        final ANode n = node;
-        node = n.parent();
-        return n;
-      }
-    };
+  public final void parent(final FNode par) {
+    parent = par;
   }
 
   @Override
@@ -142,55 +122,6 @@ public abstract class FNode extends ANode {
           iters.add(ir);
         }
         return last;
-      }
-    };
-  }
-
-  @Override
-  public final BasicNodeIter followingSiblingIter() {
-    return new BasicNodeIter() {
-      private BasicNodeIter iter;
-
-      @Override
-      public ANode next() {
-        if(iter == null) {
-          final ANode r = parent();
-          if(r == null) return null;
-          iter = r.childIter();
-          for(ANode n; (n = iter.next()) != null && !n.is(FNode.this););
-        }
-        return iter.next();
-      }
-    };
-  }
-
-  @Override
-  public final BasicNodeIter followingIter() {
-    return new BasicNodeIter() {
-      private BasicNodeIter iter;
-
-      @Override
-      public ANode next() {
-        if(iter == null) {
-          final ANodeList list = new ANodeList();
-          ANode node = FNode.this, par = node.parent();
-          while(par != null) {
-            final BasicNodeIter ir = par.childIter();
-            if(node.type != NodeType.ATT) {
-              for(final ANode nd : ir) {
-                if(nd.is(node)) break;
-              }
-            }
-            for(final ANode nd : ir) {
-              list.add(nd.finish());
-              addDesc(nd.childIter(), list);
-            }
-            node = par;
-            par = par.parent();
-          }
-          iter = list.iter();
-        }
-        return iter.next();
       }
     };
   }

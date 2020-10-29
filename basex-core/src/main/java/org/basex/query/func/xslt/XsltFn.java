@@ -29,11 +29,9 @@ abstract class XsltFn extends StandardFunc {
   static final String PROCESSOR;
   /** Version. */
   static final String VERSION;
-  /** Implementation. */
-  static final String FACTORY;
 
   static {
-    String factory = null, processor = "Java", version = "1.0";
+    String processor = "Java", version = "1.0";
 
     // check if system property has been assigned by the user
     final String fac = TransformerFactory.class.getName();
@@ -41,12 +39,10 @@ abstract class XsltFn extends StandardFunc {
     if(impl != null) {
       processor = "unknown";
       version = "unknown";
-      factory = impl;
     } else {
       // search classpath for Saxon processors, retrieve edition and XSL version
       for(final String saxon : SAXON) {
         if(find(saxon) != null) {
-          factory = saxon;
           processor = "Saxon";
           System.setProperty(fac, saxon);
           final Class<?> vrsn = find("net.sf.saxon.Version");
@@ -60,6 +56,5 @@ abstract class XsltFn extends StandardFunc {
     }
     PROCESSOR = processor;
     VERSION = version;
-    FACTORY = factory;
   }
 }

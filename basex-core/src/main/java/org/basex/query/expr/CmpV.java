@@ -169,7 +169,7 @@ public final class CmpV extends Cmp {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    simplifyAll(Simplify.ATOM, cc);
+    simplifyAll(Simplify.STRING, cc);
 
     // swap operands
     if(swap()) {
@@ -216,11 +216,11 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Expr invert(final CompileContext cc) throws QueryException {
+  public Expr invert() {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     return st1.one() && !st1.mayBeArray() && st2.one() && !st2.mayBeArray() ?
-      new CmpV(expr1, expr2, opV.invert(), coll, sc, info).optimize(cc) : this;
+      new CmpV(expr1, expr2, opV.invert(), coll, sc, info) : null;
   }
 
   @Override
@@ -250,6 +250,6 @@ public final class CmpV extends Cmp {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.tokens(exprs, " " + opV + ' ', false);
+    qs.tokens(exprs, " " + opV + ' ', true);
   }
 }

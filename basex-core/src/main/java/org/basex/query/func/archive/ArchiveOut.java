@@ -42,9 +42,9 @@ abstract class ArchiveOut implements Closeable {
 
   /**
    * Sets the compression level.
-   * @param l level
+   * @param level level
    */
-  public abstract void level(int l);
+  public abstract void level(int level);
 
   /**
    * Writes data from the specified archive.
@@ -72,5 +72,15 @@ abstract class ArchiveOut implements Closeable {
   final byte[] finish() {
     close();
     return ao.finish();
+  }
+
+  /**
+   * Writes data from the specified archive to the specified output stream.
+   * @param in input archive
+   * @param out output stream
+   * @throws IOException I/O exception
+   */
+  public final void write(final ArchiveIn in, final OutputStream out) throws IOException {
+    for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
   }
 }

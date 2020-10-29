@@ -35,12 +35,14 @@ public final class TransformWith extends Arr {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    return cc.get(new Dummy(exprs[0].seqType().type, null), () -> super.compile(cc));
+    return cc.get(new Dummy(exprs[0].seqType().with(Occ.ONE), null), () -> super.compile(cc));
   }
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    exprType.assign(exprs[0]);
+    // name of node may change
+    final SeqType st = exprs[0].seqType();
+    exprType.assign(st.type, st.occ);
     return this;
   }
 
@@ -88,7 +90,7 @@ public final class TransformWith extends Arr {
 
   @Override
   public boolean has(final Flag... flags) {
-    if(Flag.UPD.in(flags) && exprs[0].has(Flag.UPD)) return true;
+    if(Flag.CNS.in(flags)) return true;
     final Flag[] flgs = Flag.UPD.remove(flags);
     return flgs.length != 0 && super.has(flgs);
   }

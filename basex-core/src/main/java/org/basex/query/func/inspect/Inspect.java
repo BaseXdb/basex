@@ -5,13 +5,12 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.build.*;
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
-import org.basex.query.scope.AModule;
+import org.basex.query.scope.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -136,8 +135,17 @@ public abstract class Inspect {
    */
   public static void add(final byte[] value, final FElem elem) {
     try {
-      final Parser parser = new XMLParser(new IOContent(value), MainOptions.get(), true);
-      for(final ANode node : new DBNode(parser).childIter()) elem.add(node.finish());
+      final MainOptions mopts = MainOptions.get();
+      if(contains(value, '<')) {
+        // contains angle brackets: add as XML structure
+        final ANode node = new DBNode(new XMLParser(new IOContent(value), mopts, true));
+        for(final ANode child : node.childIter()) {
+          elem.add(child.copy(mopts, null));
+        }
+      } else {
+        // add as single text node
+        elem.add(new FTxt(value));
+      }
     } catch(final IOException ex) {
       // fallback: add string representation
       Util.debug(ex);

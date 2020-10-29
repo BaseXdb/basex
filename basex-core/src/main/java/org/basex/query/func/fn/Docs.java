@@ -29,7 +29,7 @@ public abstract class Docs extends StandardFunc {
    * @return collection
    * @throws QueryException query exception
    */
-  Value collection(final QueryContext qc) throws QueryException {
+  final Value collection(final QueryContext qc) throws QueryException {
     // return default collection or parse specified collection
     QueryInput qi = queryInput;
     if(qi == null) {
@@ -49,7 +49,7 @@ public abstract class Docs extends StandardFunc {
    * @return document or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
-  Item doc(final QueryContext qc) throws QueryException {
+  final Item doc(final QueryContext qc) throws QueryException {
     QueryInput qi = queryInput;
     if(qi == null) {
       final byte[] uri = toTokenOrNull(exprs[0], qc);
@@ -83,7 +83,7 @@ public abstract class Docs extends StandardFunc {
   }
 
   @Override
-  public boolean has(final Flag... flags) {
+  public final boolean has(final Flag... flags) {
     // remote URLs: return non-deterministic flag to suppress pre-evaluation
     if(Flag.NDT.in(flags) && exprs.length > 0) {
       final Expr expr = exprs[0];

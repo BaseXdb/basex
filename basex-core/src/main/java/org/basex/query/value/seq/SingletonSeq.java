@@ -80,10 +80,7 @@ public final class SingletonSeq extends Seq {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    if(mode == Simplify.DISTINCT) {
-      return cc.replaceWith(this, value);
-    }
-    return super.simplifyFor(mode, cc);
+    return mode == Simplify.DISTINCT ? cc.replaceWith(this, value) : super.simplifyFor(mode, cc);
   }
 
   @Override

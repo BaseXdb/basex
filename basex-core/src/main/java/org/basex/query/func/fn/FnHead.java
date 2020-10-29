@@ -35,31 +35,34 @@ public final class FnHead extends StandardFunc {
     // rewrite nested function calls
     final long size = expr.size();
     if(_UTIL_INIT.is(expr) && size > 1)
-      return cc.function(HEAD, info, args(expr));
+      return cc.function(HEAD, info, expr.args());
     if(TAIL.is(expr))
-      return cc.function(_UTIL_ITEM, info, args(expr)[0], Int.get(2));
+      return cc.function(_UTIL_ITEM, info, expr.arg(0), Int.get(2));
     if(SUBSEQUENCE.is(expr) || _UTIL_RANGE.is(expr)) {
       final SeqRange r = SeqRange.get(expr, cc);
-      // safety check (due to previous optimizations, r.length will never be 0)
+      // safety check (at this stage, r.length will never be 0)
       if(r != null && r.length != 0)
-        return cc.function(_UTIL_ITEM, info, args(expr)[0], Int.get(r.start + 1));
+        return cc.function(_UTIL_ITEM, info, expr.arg(0), Int.get(r.start + 1));
     }
     if(REVERSE.is(expr))
-      return cc.function(_UTIL_LAST, info, args(expr));
+      return cc.function(_UTIL_LAST, info, expr.args());
+    if(_UTIL_REPLICATE.is(expr)) {
+      // static integer will always be greater than 1
+      if(expr.arg(1) instanceof Int) return cc.function(HEAD, info, expr.arg(0));
+    }
     if(_FILE_READ_TEXT_LINES.is(expr))
       return FileReadTextLines.opt(this, 0, 1, cc);
 
     // rewrite list to its arguments or to elvis operator
     if(expr instanceof List) {
-      final Expr[] args = ((List) expr).exprs;
-      final SeqType st1 = args[0].seqType();
-      if(st1.one())
-        return args[0];
-      if(st1.oneOrMore())
-        return cc.function(HEAD, info, args[0]);
+      final Expr[] args = expr.args();
+      final Expr first = args[0];
+      final SeqType st1 = first.seqType();
+      if(st1.one()) return first;
+      if(st1.oneOrMore()) return cc.function(HEAD, info, first);
       if(st1.zeroOrOne()) {
-        final Expr dflt = new List(info, Arrays.copyOfRange(args, 1, args.length)).optimize(cc);
-        return cc.function(_UTIL_OR, info, args[0], cc.function(HEAD, info, dflt));
+        final Expr dflt = List.get(cc, info, Arrays.copyOfRange(args, 1, args.length));
+        return cc.function(_UTIL_OR, info, first, cc.function(HEAD, info, dflt));
       }
     }
 

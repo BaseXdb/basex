@@ -2,7 +2,9 @@ package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
 
-import org.basex.*;
+import org.basex.query.ast.*;
+import org.basex.query.expr.*;
+import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -11,7 +13,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Christian Gruen
  */
-public final class MathModuleTest extends SandboxTest {
+public final class MathModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test public void crc32() {
     final Function func = _MATH_CRC32;
@@ -37,6 +39,18 @@ public final class MathModuleTest extends SandboxTest {
   @Test public void pi() {
     final Function func = _MATH_PI;
     query(func.args(), StrictMath.PI);
+  }
+
+  /** Test method. */
+  @Test public void pow() {
+    final Function func = _MATH_POW;
+    check(func.args(2, 2), 4, root(Dbl.class));
+
+    check(func.args(" ()", " <_>1</_>"), "", empty());
+    check(func.args(1, " <_>1</_>"), 1, root(Dbl.class));
+
+    check(func.args(" <_>5</_>", 0), 1, root(Dbl.class));
+    check(func.args(" <_>5</_>", 1), 5, root(Cast.class));
   }
 
   /** Test method. */

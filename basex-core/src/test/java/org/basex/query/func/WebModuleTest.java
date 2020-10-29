@@ -80,7 +80,7 @@ public final class WebModuleTest extends SandboxTest {
     query(func.args("a/b", " map { 'a':'b' }") +
         "/*:response/*:header[@name = 'Location']/@value/string()", "a/b?a=b");
 
-    // GH1585
+    // GH-1585
     query("count((" + func.args("a") + " update {})/http:response)", 1);
   }
 
@@ -108,7 +108,7 @@ public final class WebModuleTest extends SandboxTest {
     query(func.args(" map {}", " map {}", " map { 'status': 200, 'message': 'OK' }") +
         "/http:response ! (@status, @message) ! string()", "200\nOK");
 
-    // GH1585
+    // GH-1585
     query("count((" + func.args() + " update {})/http:response)", 1);
     query("count((" + func.args() + " update {})/output:*)", 1);
   }

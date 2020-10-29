@@ -14,9 +14,11 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.index.*;
 import org.basex.query.func.Function;
+import org.basex.query.func.util.*;
 import org.basex.query.util.*;
 import org.basex.query.util.index.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -708,10 +710,10 @@ public abstract class Path extends ParseExpr {
       }
     }
 
-    // skip rewriting if no index access is possible, or if it is too expensive
+    // skip rewriting if no index access is possible, if it is too expensive or if root is no value
     if(index == null || data != null && index.costs.tooExpensive(data)) return this;
     // skip optimization if it is not enforced
-    if(rt instanceof Dummy && !index.enforce()) return this;
+    if((!(rt instanceof Value) || rt instanceof Dummy) && !index.enforce()) return this;
 
     // rewrite for index access
     cc.info(index.optInfo);
@@ -809,7 +811,7 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Tries to rewrite lists to union expressions.
+   * Tries to rewrite steps to union expressions.
    * @param cc compilation context
    * @return original or new expression
    * @throws QueryException query exception
@@ -826,6 +828,10 @@ public abstract class Path extends ParseExpr {
           final Expr st = ((List) filter.root).toUnion(cc);
           if(st != filter.root) return Filter.get(cc, filter.info, st, filter.exprs);
         }
+      }
+      if(step instanceof UtilReplicate && ((UtilReplicate) step).once() &&
+          step.seqType().type instanceof NodeType) {
+        return step.arg(0);
       }
       return step;
     };

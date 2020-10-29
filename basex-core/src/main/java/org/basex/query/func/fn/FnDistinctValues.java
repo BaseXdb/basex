@@ -64,26 +64,28 @@ public final class FnDistinctValues extends StandardFunc {
   }
 
   @Override
-  protected void simplifyArgs(final CompileContext cc) {
-    // do not simplify type of key
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    exprs[0] = exprs[0].simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    exprs[0] = exprs[0].simplifyFor(Simplify.DISTINCT, cc);
-
-    Expr expr = exprs[0];
+    final Expr expr = exprs[0];
     if(expr instanceof RangeSeq) return expr;
-    if(expr instanceof SingletonSeq) {
-      expr = ((SingletonSeq) expr).value;
-      exprs[0] = expr;
-    }
 
     final SeqType st = expr.seqType();
+    if(st.zero()) return expr;
+
     final AtomType type = st.type.atomic();
     if(type != null) {
+      // assign atomic type of argument
       exprType.assign(type);
       simple = st.zeroOrOne();
+
+      // distinct-values($string)  ->  $string
+      // distinct-values($node)  ->  data($node)
+      if(simple && exprs.length == 1) return type == st.type ? expr :
+        cc.function(Function.DATA, info, exprs);
     }
     return optStats(expr, cc);
   }

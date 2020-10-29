@@ -20,9 +20,11 @@ public final class HofScanLeft extends StandardFunc {
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter outer = exprs[0].iter(qc);
     final FItem func = checkArity(exprs[2], 2, qc);
+
     return new Iter() {
       private Value acc = exprs[1].value(qc);
       private Iter inner = acc.iter();
+
       @Override
       public Item next() throws QueryException {
         while(true) {
@@ -30,6 +32,7 @@ public final class HofScanLeft extends StandardFunc {
           if(in != null) return in;
           final Item out = outer.next();
           if(out == null) return null;
+
           acc = func.invokeValue(qc, info, acc, out);
           inner = acc.iter();
         }

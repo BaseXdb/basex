@@ -22,11 +22,8 @@ public final class ReplaceInPlaceTest extends SandboxTest {
   /** Result counter. */
   static int counter;
 
-  /**
-   * Runs the test.
-   */
-  @Test
-  public void run() {
+  /** Runs the test. */
+  @Test public void run() {
     set(MainOptions.TEXTINDEX, false);
     set(MainOptions.ATTRINDEX, false);
     set(MainOptions.AUTOFLUSH, false);

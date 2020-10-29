@@ -6,7 +6,6 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.constr.*;
-import org.basex.query.expr.ft.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -264,7 +263,7 @@ public abstract class Expr extends ExprInfo {
    * </ul>
    *
    * @param ic inlining context
-   * @return resulting expression if something changed, {@code null} otherwise
+   * @return resulting expression if something has changed, {@code null} otherwise
    * @throws QueryException query exception
    */
   public abstract Expr inline(InlineContext ic) throws QueryException;
@@ -282,30 +281,10 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * This function is called at compile time for expressions whose operands might be simplified.
-   * Different types of simplifications are supported:
-   * <ul>
-   *   <li> {@link Simplify#EBV}: Simplify effective boolean tests.
-   *     Called by {@link If}, {@link Logical}, {@link Preds}, {@link Condition}, {@link Where},
-   *     {@link FnBoolean}, {@link FnNot}.
-   *     Overwritten by {@link CmpG}, {@link CmpV}, {@link FnBoolean}, {@link FnExists},
-   *     {@link Path} or {@link Filter}
-   *   </li>
-   *   <li> {@link Simplify#ATOM}: Simplify atomizations.
-   *     Called by {@link Cast}, {@link CmpG}, {@link StandardFunc} and many other expressions.
-   *     Overwritten by {@link FnData}, {@link SimpleMap}.
-   *   </li>
-   *   <li> {@link Simplify#NUMBER}: Simplify atomizations for numeric operation.
-   *     Called by {@link Arith}, {@link CmpIR}, {@link FTWeight} and others.
-   *     Overwritten by {@link FnData}, {@link SimpleMap}, {@link FnNumber}.
-   *   </li>
-   *   <li> {@link Simplify#DISTINCT}: Simplify retrieval of distinct values.
-   *     Called by {@link CmpG}, {@link FnDistinctValues} and others.
-   *     Overwritten by {@link SingletonSeq}, {@link SimpleMap}, {@link List} and others.
-   *   </li>
-   * </ul>
    * @param mode mode of simplification
    * @param cc compilation context
    * @return simplified or original expression
+   * @see Simplify
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
@@ -337,6 +316,23 @@ public abstract class Expr extends ExprInfo {
   public boolean ddo() {
     final SeqType st = seqType();
     return st.zeroOrOne() && st.type instanceof NodeType;
+  }
+
+  /**
+   * Returns the arguments/operands of an expression (function, list, etc).
+   * @return arguments or {@code null}
+   */
+  public Expr[] args() {
+    return null;
+  }
+
+  /**
+   * Returns the specified argument/operand of an expression (function, list, etc).
+   * @param i index of argument
+   * @return arguments or {@code null}
+   */
+  public final Expr arg(final int i) {
+    return args()[i];
   }
 
   /**

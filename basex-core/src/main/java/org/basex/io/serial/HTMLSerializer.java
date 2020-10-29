@@ -107,7 +107,7 @@ final class HTMLSerializer extends MarkupSerializer {
     out.print(name.string());
     sep = indent;
     script = SCRIPTS.contains(lc(name.local()));
-    if(content && eq(lc(elem.local()), HEAD)) ct++;
+    if(content && eq(lc(elem.local()), HEAD)) skip++;
   }
 
   @Override

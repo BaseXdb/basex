@@ -53,7 +53,7 @@ public final class QueryString {
    * @return self reference
    */
   public QueryString function(final Function function, final Object... args) {
-    token(function.args(args));
+    token(function.args(args).trim());
     return this;
   }
 
@@ -98,7 +98,8 @@ public final class QueryString {
 
     boolean more = false;
     for(final Object token : tokens) {
-      if(more) tb.add(separator);
+      if(more) tb.add(last() == ' ' && Strings.startsWith(separator, ' ') ?
+        separator.substring(1) : separator);
       else more = true;
       token(token);
     }

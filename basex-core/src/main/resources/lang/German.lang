@@ -2,7 +2,7 @@
 # BaseX Team
 
 about_%              = Über %
-access_denied        = Der Zugriff wurde verweigert.
+access_denied_%      = Zugriff verweigert: %.
 add                  = Hinzufügen
 add_archive_name     = Archivname dem Dokumentpfad hinzufügen
 add_raw_files        = Speichere andere Dateien im Binärformat

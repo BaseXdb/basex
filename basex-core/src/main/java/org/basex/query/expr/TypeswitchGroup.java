@@ -9,7 +9,6 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
-import org.basex.query.func.Function;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -90,8 +89,7 @@ public final class TypeswitchGroup extends Single {
    * @throws QueryException query exception
    */
   Expr rewrite(final Expr cond, final CompileContext cc) throws QueryException {
-    if(var == null) return cond.has(Flag.NDT) ?
-      new List(info, cc.function(Function._PROF_VOID, info, cond), expr).optimize(cc) : expr;
+    if(var == null) return cc.merge(cond, expr, info);
 
     final IntObjMap<Var> vm = new IntObjMap<>();
     final LinkedList<Clause> clauses = new LinkedList<>();
@@ -142,8 +140,18 @@ public final class TypeswitchGroup extends Single {
   }
 
   @Override
+  public Expr inline(final InlineContext ic) throws QueryException {
+    try {
+      return super.inline(ic);
+    } catch(final QueryException qe) {
+      expr = ic.cc.error(qe, this);
+      return this;
+    }
+  }
+
+  @Override
   public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    Expr ex = null;
+    Expr ex;
     try {
       ex = tc.check(expr, cc);
     } catch(final QueryException qe) {
@@ -178,7 +186,7 @@ public final class TypeswitchGroup extends Single {
    * @param seqType sequence type to be matched
    * @return result of check
    */
-  boolean isNever(final SeqType seqType) {
+  boolean noMatches(final SeqType seqType) {
     for(final SeqType st : seqTypes) {
       if(st.intersect(seqType) != null) return false;
     }

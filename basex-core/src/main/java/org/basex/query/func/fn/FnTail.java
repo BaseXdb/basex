@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -74,23 +76,35 @@ public final class FnTail extends StandardFunc {
     // zero or one result: return empty sequence
     if(size == 0 || size == 1 || st.zeroOrOne()) return Empty.VALUE;
     // two results: return last item
-    if(size == 2) return cc.function(Function._UTIL_LAST, info, expr);
+    if(size == 2) return cc.function(_UTIL_LAST, info, expr);
 
     // rewrite nested function calls
-    if(Function.TAIL.is(expr))
-      return cc.function(Function.SUBSEQUENCE, info, args(expr)[0], Int.get(3));
-    if(Function.SUBSEQUENCE.is(expr)) {
+    if(TAIL.is(expr))
+      return cc.function(SUBSEQUENCE, info, expr.arg(0), Int.get(3));
+    if(SUBSEQUENCE.is(expr) || _UTIL_RANGE.is(expr)) {
       final SeqRange r = SeqRange.get(expr, cc);
-      if(r != null) return cc.function(Function.SUBSEQUENCE, info, args(expr)[0],
+      if(r != null) return cc.function(SUBSEQUENCE, info, expr.arg(0),
           Int.get(r.start + 2), Int.get(r.length - 1));
     }
-    if(Function._UTIL_RANGE.is(expr)) {
-      final SeqRange r = SeqRange.get(expr, cc);
-      if(r != null) return cc.function(Function.SUBSEQUENCE, info, args(expr)[0],
-          Int.get(r.start + 2), Int.get(r.length - 1));
+    if(_UTIL_REPLICATE.is(expr)) {
+      final Expr[] args = expr.args();
+      if(args[1] instanceof Int && args[0].seqType().zeroOrOne()) {
+        args[1] = Int.get(((Int) args[1]).itr() - 1);
+        return cc.function(_UTIL_REPLICATE, info, args);
+      }
     }
-    if(Function._FILE_READ_TEXT_LINES.is(expr))
+    if(_FILE_READ_TEXT_LINES.is(expr))
       return FileReadTextLines.opt(this, 1, Long.MAX_VALUE, cc);
+
+    // rewrite list
+    if(expr instanceof List) {
+      final Expr[] args = expr.args();
+      final Expr first = args[0];
+      if(first.seqType().oneOrMore()) {
+        args[0] = cc.function(TAIL, info, first);
+        return List.get(cc, info, args);
+      }
+    }
 
     exprType.assign(st.union(Occ.ZERO), size - 1);
     data(expr.data());

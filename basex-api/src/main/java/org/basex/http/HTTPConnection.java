@@ -28,6 +28,10 @@ import org.basex.util.http.*;
  * @author Christian Gruen
  */
 public final class HTTPConnection implements ClientInfo {
+  /** Forwarding headers. */
+  private static final String[] FORWARDING_HEADERS = { "X-Forwarded-For", "Proxy-Client-IP",
+      "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR" };
+
   /** HTTP servlet request. */
   public final HttpServletRequest request;
   /** HTTP servlet response. */
@@ -243,7 +247,7 @@ public final class HTTPConnection implements ClientInfo {
 
   @Override
   public String clientAddress() {
-    return request.getRemoteAddr() + ':' + request.getRemotePort();
+    return getRemoteAddr() + ':' + request.getRemotePort();
   }
 
   @Override
@@ -260,6 +264,70 @@ public final class HTTPConnection implements ClientInfo {
       }
     }
     return clientName(value, context);
+  }
+
+  /**
+   * Sets 460 a proprietary status code and sends the exception message as info.
+   * @param ex job exception
+   * @throws IOException I/O exception
+   */
+  public void stop(final JobException ex) throws IOException {
+    final int code = 460;
+    final String info = ex.getMessage();
+    log(code, info);
+    try {
+      response.resetBuffer();
+      response.setStatus(code);
+      response.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
+      // client directive: do not cache result (HTTP 1.1, old clients)
+      response.setHeader(CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+      response.setHeader(PRAGMA, "no-cache");
+      response.setHeader(EXPIRES, "0");
+      response.getOutputStream().write(token(info));
+    } catch(final IllegalStateException e) {
+      // too late (response has already been committed)
+      logError(code, null, info, e);
+    }
+  }
+
+  /**
+   * Sets a status and sends an info message.
+   * @param code status code
+   * @param message status message (can be {@code null})
+   * @param body message for response body (can be {@code null})
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("deprecation")
+  public void status(final int code, final String message, final String body) throws IOException {
+    try {
+      response.resetBuffer();
+      if(code == SC_UNAUTHORIZED && !response.containsHeader(WWW_AUTHENTICATE)) {
+        final TokenBuilder header = new TokenBuilder();
+        header.add(auth).add(' ').add(Request.REALM).add("=\"").add(Prop.NAME).add('"');
+        if(auth == AuthMethod.DIGEST) {
+          final String nonce = Strings.md5(Long.toString(System.nanoTime()));
+          header.add(",").add(Request.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT);
+          header.add('"').add(',').add(Request.NONCE).add("=\"").add(nonce).add('"');
+        }
+        response.setHeader(WWW_AUTHENTICATE, header.toString());
+      }
+
+      final int c = code < 0 || code > 999 ? 500 : code;
+      if(message == null) {
+        response.setStatus(c);
+      } else {
+        // do not allow Jetty to create a custom error html page
+        // control characters and non-ASCII codes will be removed (GH-1632)
+        response.setStatus(c, message.replaceAll("[^\\x20-\\x7F]", "?"));
+      }
+
+      if(body != null) {
+        response.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
+        response.getOutputStream().write(new TokenBuilder(token(body)).normalize().finish());
+      }
+    } catch(final IllegalStateException | IllegalArgumentException ex) {
+      logError(code, message, body, ex);
+    }
   }
 
   /**
@@ -325,7 +393,6 @@ public final class HTTPConnection implements ClientInfo {
    * @throws IOException I/O exception
    */
   private User login() throws IOException {
-    final byte[] address = token(request.getRemoteAddr());
     try {
       final User user;
       if(auth == AuthMethod.CUSTOM) {
@@ -342,7 +409,7 @@ public final class HTTPConnection implements ClientInfo {
           final String details = am.length > 1 ? am[1] : "";
           final String[] creds = Strings.split(Base64.decode(details), ':', 2);
           user = user(creds[0]);
-          if(creds.length < 2 || !user.matches(creds[1])) throw new LoginException();
+          if(creds.length < 2 || !user.matches(creds[1])) throw new LoginException(user.name());
 
         } else {
           final EnumMap<Request, String> map = HttpClient.authHeaders(header);
@@ -366,95 +433,43 @@ public final class HTTPConnection implements ClientInfo {
           sb.append(':').append(ha2);
 
           if(!Strings.md5(sb.toString()).equals(map.get(Request.RESPONSE)))
-            throw new LoginException();
+            throw new LoginException(user.name());
         }
       }
 
       // accept and return user
-      context.blocker.remove(address);
+      context.blocker.remove(token(getRemoteAddr()));
       return user;
 
     } catch(final LoginException ex) {
       // delay users with wrong passwords
-      context.blocker.delay(address);
+      context.blocker.delay(token(getRemoteAddr()));
       throw ex;
     }
   }
 
   /**
    * Returns a user for the specified string, or an error.
-   * @param user user name (can be {@code null})
+   * @param name user name (can be {@code null})
    * @return user reference
    * @throws LoginException login exception
    */
-  private User user(final String user) throws LoginException {
-    final User u = context.users.get(user);
-    if(u == null) throw new LoginException();
-    return u;
+  private User user(final String name) throws LoginException {
+    final User user = context.users.get(name);
+    if(user == null) throw new LoginException(name);
+    return user;
   }
 
   /**
-   * Sets 460 a proprietary status code and sends the exception message as info.
-   * @param ex job exception
-   * @throws IOException I/O exception
+   * Returns the remote address. Resolves proxy forwardings.
+   * @return client address
    */
-  public void stop(final JobException ex) throws IOException {
-    final int code = 460;
-    final String info = ex.getMessage();
-    log(code, info);
-    try {
-      response.resetBuffer();
-      response.setStatus(code);
-      response.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
-      // client directive: do not cache result (HTTP 1.1, old clients)
-      response.setHeader(CACHE_CONTROL, "no-cache, no-store, must-revalidate");
-      response.setHeader(PRAGMA, "no-cache");
-      response.setHeader(EXPIRES, "0");
-      response.getOutputStream().write(token(info));
-    } catch(final IllegalStateException e) {
-      // too late (response has already been committed)
-      logError(code, null, info, e);
+  private String getRemoteAddr() {
+    for(final String header : FORWARDING_HEADERS) {
+      final String addr = request.getHeader(header);
+      if (addr != null && !addr.isEmpty() && !"unknown".equalsIgnoreCase(addr)) return addr;
     }
-  }
-
-  /**
-   * Sets a status and sends an info message.
-   * @param code status code
-   * @param message status message (can be {@code null})
-   * @param body message for response body (can be {@code null})
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("deprecation")
-  public void status(final int code, final String message, final String body) throws IOException {
-    try {
-      response.resetBuffer();
-      if(code == SC_UNAUTHORIZED && !response.containsHeader(WWW_AUTHENTICATE)) {
-        final TokenBuilder header = new TokenBuilder();
-        header.add(auth).add(' ').add(Request.REALM).add("=\"").add(Prop.NAME).add('"');
-        if(auth == AuthMethod.DIGEST) {
-          final String nonce = Strings.md5(Long.toString(System.nanoTime()));
-          header.add(",").add(Request.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT);
-          header.add('"').add(',').add(Request.NONCE).add("=\"").add(nonce).add('"');
-        }
-        response.setHeader(WWW_AUTHENTICATE, header.toString());
-      }
-
-      final int c = code < 0 || code > 999 ? 500 : code;
-      if(message == null) {
-        response.setStatus(c);
-      } else {
-        // do not allow Jetty to create a custom error html page
-        // control characters and non-ASCII codes will be removed (GH-1632)
-        response.setStatus(c, message.replaceAll("[^\\x20-\\x7F]", "?"));
-      }
-
-      if(body != null) {
-        response.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
-        response.getOutputStream().write(new TokenBuilder(token(body)).normalize().finish());
-      }
-    } catch(final IllegalStateException | IllegalArgumentException ex) {
-      logError(code, message, body, ex);
-    }
+    return request.getRemoteAddr();
   }
 
   /**

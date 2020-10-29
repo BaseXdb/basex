@@ -39,7 +39,7 @@ public final class DualMap extends SimpleMap {
         try {
           do {
             // evaluate left operand
-            qf.value = qf.value;
+            qf.value = value;
             Item item = qc.next(iter);
             if(item == null) return null;
             // evaluate right operand (yielding an item)
@@ -56,7 +56,20 @@ public final class DualMap extends SimpleMap {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc, this);
+    final QueryFocus qf = qc.focus;
+    final Value qv = qf.value;
+    try {
+      final ValueBuilder vb = new ValueBuilder(qc);
+      final Iter iter = exprs[0].iter(qc);
+      for(Item item; (item = qc.next(iter)) != null;) {
+        qf.value = item;
+        item = exprs[1].item(qc, info);
+        if(item != Empty.VALUE) vb.add(item);
+      }
+      return vb.value(this);
+    } finally {
+      qf.value = qv;
+    }
   }
 
   @Override

@@ -43,15 +43,15 @@ public final class MixedPath extends Path {
       size = iter.size();
     }
 
-    final QueryFocus qf = qc.focus, focus = new QueryFocus();
-    qc.focus = focus;
+    final QueryFocus focus = qc.focus, qf = new QueryFocus();
+    qc.focus = qf;
     try {
       // loop through all expressions
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
         // set context position and size
-        focus.size = size;
-        focus.pos = 1;
+        qf.size = size;
+        qf.pos = 0;
 
         // loop through all input items; cache nodes and items
         final ANodeBuilder nodes = new ANodeBuilder();
@@ -59,15 +59,14 @@ public final class MixedPath extends Path {
         final Expr step = steps[s];
         for(Item item; (item = iter.next()) != null;) {
           if(!(item instanceof ANode)) throw PATHNODE_X_X_X.get(info, step, item.type, item);
-          focus.value = item;
-
+          qf.value = item;
+          qf.pos++;
           // loop through all resulting items
           final Iter ir = step.iter(qc);
           for(Item it; (it = qc.next(ir)) != null;) {
             if(it instanceof ANode) nodes.add((ANode) it);
             else items.add(it);
           }
-          focus.pos++;
         }
 
         final Value value = items.value(step);
@@ -85,7 +84,7 @@ public final class MixedPath extends Path {
         size = iter.size();
       }
     } finally {
-      qc.focus = qf;
+      qc.focus = focus;
     }
     return iter;
   }

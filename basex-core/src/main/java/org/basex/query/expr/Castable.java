@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -42,16 +43,39 @@ public final class Castable extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) {
-    return expr.seqType().instanceOf(seqType) ? cc.replaceWith(this, Bln.TRUE) : this;
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    expr = expr.simplifyFor(Simplify.STRING, cc);
+
+    // target type
+    final SeqType est = expr.seqType();
+    Type dt = seqType.type;
+    Occ o = seqType.occ;
+    if(dt instanceof ListType) {
+      dt = dt.atomic();
+      o = Occ.ZERO_MORE;
+    } else if(o == Occ.ZERO_ONE && est.oneOrMore() && !est.mayBeArray()) {
+      o = Occ.ONE;
+    }
+
+    if(!est.mayBeArray()) {
+      final long es = expr.size();
+      if(es != -1 && (es < o.min || es > o.max)) return cc.replaceWith(this, Bln.FALSE);
+
+      final Type et = est.type;
+      if(et.instanceOf(dt)) {
+        if(est.occ.instanceOf(o) && (et.eq(dt) || dt == AtomType.NUM))
+          return cc.replaceWith(this, Bln.TRUE);
+      }
+    }
+    return expr instanceof Value ? cc.preEval(this) : this;
   }
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Value value = expr.value(qc);
-    final long size = value.size();
+    final Item item = expr.atomItem(qc, info);
+    final long size = item.size();
     return Bln.get(seqType.occ.check(size) &&
-        (size == 0 || seqType.cast((Item) value, false, qc, sc, info) != null));
+        (size == 0 || seqType.cast(item, false, qc, sc, info) != null));
   }
 
   @Override

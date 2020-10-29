@@ -7,6 +7,7 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
@@ -243,6 +244,20 @@ public abstract class Preds extends Arr {
       if(axis == Axis.SELF || axis == Axis.PARENT) expr = Bln.get(((ItrPos) expr).min == 1);
     }
 
+    // positional tests with position()
+    if(expr instanceof Cmp) {
+      final Cmp cmp = (Cmp) expr;
+      final Expr ex = cmp.exprs[1];
+      final SeqType st = ex.seqType();
+      if(cmp.positional() && cmp.opV() == OpV.EQ && st.one()) {
+        // E[position() = last() - 1]  ->  E[last() - 1]
+        expr = new Cast(cc.sc(), info, ex, SeqType.NUM_O).optimize(cc);
+      }
+    }
+
+    // E[position()]  ->  E
+    if(Function.POSITION.is(expr)) expr = Bln.TRUE;
+
     list.add(cc.simplify(pred, expr));
   }
 
@@ -319,15 +334,6 @@ public abstract class Preds extends Arr {
    * @return result of check
    */
   public boolean mayBePositional() {
-    return mayBePositional(exprs);
-  }
-
-  /**
-   * Checks if some of the specified expressions may be positional.
-   * @param exprs expressions
-   * @return result of check
-   */
-  protected static boolean mayBePositional(final Expr[] exprs) {
     for(final Expr expr : exprs) {
       if(mayBePositional(expr)) return true;
     }

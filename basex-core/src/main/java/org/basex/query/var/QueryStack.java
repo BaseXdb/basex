@@ -91,25 +91,12 @@ public final class QueryStack {
   }
 
   /**
-   * Calculates the position of the given variable on the stack.
-   * @param var variable
-   * @return position
-   */
-  private int pos(final Var var) {
-    final int pos = start + var.slot;
-    if(pos < start || end <= pos) {
-      throw Util.notExpected(var + " index: " + pos + ", slot: " + var.slot);
-    }
-    return pos;
-  }
-
-  /**
    * Gets the value bound to the given variable in the current stack frame.
    * @param var variable
    * @return bound value
    */
   public Value get(final Var var) {
-    return stack[pos(var)];
+    return stack[start + var.slot];
   }
 
   /**
@@ -120,7 +107,7 @@ public final class QueryStack {
    * @throws QueryException if the value does not have the right type
    */
   public void set(final Var var, final Value value, final QueryContext qc) throws QueryException {
-    final int pos = pos(var);
+    final int pos = start + var.slot;
     stack[pos] = var.checkType(value, qc, false);
     vars[pos] = var;
   }

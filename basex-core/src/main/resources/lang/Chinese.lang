@@ -2,7 +2,7 @@
 # ZhaoChanggang（donaldjohn@qq.com）
 
 about_%              = 关于 %
-access_denied        = 拒绝访问
+access_denied_%      = 拒绝访问：%
 add                  = 添加
 add_archive_name     = 在文档路径中添加压缩包文件名
 add_raw_files        = 将其他文件添加为raw文件

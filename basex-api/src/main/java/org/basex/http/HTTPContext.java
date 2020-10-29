@@ -125,7 +125,11 @@ public final class HTTPContext {
    */
   public synchronized void close() {
     if(server != null) {
-      server.stop();
+      try {
+        server.stop();
+      } catch(final IOException ex) {
+        Util.stack(ex);
+      }
       server = null;
     }
     if(context != null) {

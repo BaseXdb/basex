@@ -1,14 +1,13 @@
 package org.basex.query.expr.constr;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -35,27 +34,27 @@ public final class CMap extends Arr {
     // determine static key type (all keys must be single items)
     final int el = exprs.length;
 
-    Type key = null;
+    Type kt = null;
     for(int e = 0; e < el; e += 2) {
       final SeqType st = exprs[e].seqType();
       final Type type = st.type.atomic();
       if(type == null || !st.one()) {
-        key = null;
+        kt = null;
         break;
       }
-      key = key == null ? type : key.union(type);
+      kt = kt == null ? type : kt.union(type);
     }
-    if(key == null) key = AtomType.AAT;
+    if(kt == null) kt = AtomType.AAT;
 
     // determine static value type
-    SeqType vt = null;
+    SeqType dt = null;
     for(int e = 1; e < el; e += 2) {
       final SeqType dst = exprs[e].seqType();
-      vt = vt == null ? dst : vt.union(dst);
+      dt = dt == null ? dst : dt.union(dst);
     }
-    vt = vt != null ? vt.union(SeqType.EMP) : SeqType.ITEM_ZM;
+    dt = dt != null ? dt.union(SeqType.EMP) : SeqType.ITEM_ZM;
 
-    exprType.assign(MapType.get((AtomType) key, vt));
+    exprType.assign(MapType.get((AtomType) kt, dt));
 
     return allAreValues(true) ? cc.preEval(this) : this;
   }
@@ -65,8 +64,7 @@ public final class CMap extends Arr {
     XQMap map = XQMap.EMPTY;
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
-      final Item key = exprs[e].atomItem(qc, info);
-      if(key == Empty.VALUE) throw EMPTYFOUND.get(info);
+      final Item key = toAtomItem(exprs[e], qc);
       final Value value = exprs[e + 1].value(qc);
       if(map.contains(key, info)) throw MAPDUPLKEY_X_X_X.get(info, key, map.get(key, info), value);
       map = map.put(key, value, info);
@@ -91,11 +89,11 @@ public final class CMap extends Arr {
 
   @Override
   public void plan(final QueryString qs) {
-    qs.token(MAP).token(" {");
+    qs.token(MAP).token(" { ");
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
-      if(e != 0) qs.token(SEP);
-      qs.token(exprs[e]).token(": ").token(exprs[e + 1]);
+      if(e != 0) qs.token(',');
+      qs.token(exprs[e]).token(':').token(exprs[e + 1]);
     }
     qs.token(" }");
   }

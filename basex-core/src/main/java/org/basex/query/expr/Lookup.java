@@ -37,7 +37,7 @@ public final class Lookup extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    exprs[0] = exprs[0].simplifyFor(Simplify.ATOM, cc);
+    exprs[0] = exprs[0].simplifyFor(Simplify.STRING, cc);
 
     final Expr keys = exprs[0];
     final long ks = keys.seqType().mayBeArray() ? -1 : keys.size();
@@ -80,7 +80,9 @@ public final class Lookup extends Arr {
         return cc.replaceWith(this, expr);
       }
     }
-    return this;
+
+    // return result or expression
+    return allAreValues(true) ? cc.preEval(this) : this;
   }
 
   /**

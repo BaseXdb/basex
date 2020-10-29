@@ -14,27 +14,18 @@ public final class XQUFStressTest extends SandboxTest {
   /** Number of node updates. */
   private static final int NRNODES = 100;
 
-  /**
-   * Tests the insert statement.
-   */
-  @Test
-  public void insert10() {
+  /** Tests the insert statement. */
+  @Test public void insert10() {
     insert(10);
   }
 
-  /**
-   * Tests the insert statement.
-   */
-  @Test
-  public void insert100() {
+  /** Tests the insert statement. */
+  @Test public void insert100() {
     insert(100);
   }
 
-  /**
-   * Tests the insert statement.
-   */
-  @Test
-  public void insert1000() {
+  /** Tests the insert statement. */
+  @Test public void insert1000() {
     insert(1000);
   }
 
@@ -58,27 +49,18 @@ public final class XQUFStressTest extends SandboxTest {
     }
   }
 
-  /**
-   * Tests the delete statement.
-   */
-  @Test
-  public void delete10() {
+  /** Tests the delete statement. */
+  @Test public void delete10() {
     delete(10);
   }
 
-  /**
-   * Tests the delete statement.
-   */
-  @Test
-  public void delete100() {
+  /** Tests the delete statement. */
+  @Test public void delete100() {
     delete(100);
   }
 
-  /**
-   * Tests the delete statement.
-   */
-  @Test
-  public void delete1000() {
+  /** Tests the delete statement. */
+  @Test public void delete1000() {
     delete(1000);
   }
 

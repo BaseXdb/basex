@@ -118,10 +118,10 @@ public abstract class TreeSeq extends Seq {
 
   /**
    * Prepends the given elements to this sequence.
-   * @param vals values, with length at most {@link TreeSeq#MAX_SMALL}
+   * @param seq small sequence
    * @return resulting sequence
    */
-  abstract TreeSeq consSmall(Item[] vals);
+  abstract TreeSeq prepend(SmallSeq seq);
 
   /**
    * Returns items containing the values at the indices {@code from} to {@code to - 1} in

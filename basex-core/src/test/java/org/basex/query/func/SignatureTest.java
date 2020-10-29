@@ -56,9 +56,9 @@ public final class SignatureTest extends SandboxTest {
         if(in) {
           // test arguments
           if(fd.params[p].type == AtomType.STR) {
-            qu.append('1');
+            qu.append((char) (48 + p));
           } else { // any type (skip test)
-            qu.append("'X'");
+            qu.append("'").append((char) (65 + p)).append("'");
             if(SeqType.STR_O.instanceOf(fd.params[p])) any++;
           }
         } else {

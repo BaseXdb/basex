@@ -20,7 +20,7 @@ public abstract class ContextFn extends StandardFunc {
    * Argument that provides the context.
    * @return context argument.
    */
-  int contextArg() {
+  public int contextArg() {
     return 0;
   }
 
@@ -28,7 +28,7 @@ public abstract class ContextFn extends StandardFunc {
    * Indicates if the function accesses the current context.
    * @return result of check
    */
-  final boolean contextAccess() {
+  public final boolean contextAccess() {
     return exprs.length == contextArg();
   }
 
@@ -54,19 +54,6 @@ public abstract class ContextFn extends StandardFunc {
   }
 
   /**
-   * Optimizes a context-based function call.
-   * @param cc compilation context
-   */
-  protected void optContext(final CompileContext cc) {
-    final boolean context = contextAccess();
-    final Expr expr = context ? cc.qc.focus.value : exprs[contextArg()];
-    if(expr != null) {
-      final SeqType st = expr.seqType();
-      if(st.oneOrMore() && !st.mayBeArray()) exprType.assign(Occ.ONE);
-    }
-  }
-
-  /**
    * Indicates if the function will evaluate the current context.
    * @return result of check
    */
@@ -76,7 +63,7 @@ public abstract class ContextFn extends StandardFunc {
   }
 
   @Override
-  public VarUsage count(final Var var) {
+  public final VarUsage count(final Var var) {
     // context reference check: check if function accesses context
     return (var == null && contextAccess() ? VarUsage.ONCE : VarUsage.NEVER).plus(super.count(var));
   }

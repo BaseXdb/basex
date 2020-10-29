@@ -46,8 +46,9 @@ public final class PermissionTest extends SandboxTest {
 
   /**
    * Stops the server.
+   * @throws IOException I/O exception
    */
-  @AfterAll public static void stop() {
+  @AfterAll public static void stop() throws IOException {
     stopServer(server);
     new IOFile(Prop.TEMPDIR, NAME + "-export").delete();
   }

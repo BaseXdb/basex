@@ -92,7 +92,25 @@ public final class IterMap extends SimpleMap {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc, this);
+    final QueryFocus qf = qc.focus;
+    final Value qv = qf.value;
+    try {
+      Value value = exprs[0].value(qc);
+      final int el = exprs.length;
+      for(int e = 1; e < el; e++) {
+        final Expr expr = exprs[e];
+        final ValueBuilder vb = new ValueBuilder(qc);
+        final Iter iter = value.iter();
+        for(Item item; (item = qc.next(iter)) != null;) {
+          qf.value = item;
+          vb.add(expr.value(qc));
+        }
+        value = vb.value(expr);
+      }
+      return value;
+    } finally {
+      qf.value = qv;
+    }
   }
 
   @Override

@@ -64,7 +64,8 @@ public final class ReplaceValue extends NodeUpdate {
 
   @Override
   public String toString() {
-    return Util.className(this) + '[' + node() + ", " + value + ']';
+    return new TokenBuilder().add(this).add('[').add(node()).add(", ").add(value).add(']').
+        toString();
   }
 
   /**

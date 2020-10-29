@@ -288,8 +288,9 @@ public abstract class Sandbox {
   /**
    * Stops a server instance.
    * @param server server
+   * @throws IOException I/O exception
    */
-  public static void stopServer(final BaseXServer server) {
+  public static void stopServer(final BaseXServer server) throws IOException {
     if(server != null) server.stop();
   }
 

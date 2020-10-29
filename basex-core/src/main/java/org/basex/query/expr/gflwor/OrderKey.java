@@ -55,7 +55,7 @@ public final class OrderKey extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(Simplify.ATOM, cc);
+    expr = expr.simplifyFor(Simplify.DATA, cc);
     // override pre-evaluation
     return this;
   }

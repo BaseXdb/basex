@@ -86,7 +86,7 @@ public class AdaptiveSerializer extends OutputSerializer {
     final TokenBuilder tb = new TokenBuilder();
     final Type type = item.type;
     if(type.instanceOf(AtomType.STR) || type.instanceOf(AtomType.DEC) ||
-       type == AtomType.BLN || type == AtomType.ATM || type == AtomType.URI) {
+       type.oneOf(AtomType.BLN, AtomType.ATM, AtomType.URI)) {
       tb.add(item);
     } else if(type == AtomType.QNM) {
       tb.add(((QNm) item).eqName());

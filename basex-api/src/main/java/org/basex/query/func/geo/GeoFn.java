@@ -98,7 +98,7 @@ abstract class GeoFn extends StandardFunc {
    * @return DBNode database node
    * @throws QueryException exception
    */
-  final DBNode toElement(final Geometry geometry, final QueryContext qc) throws QueryException {
+  final ANode toElement(final Geometry geometry, final QueryContext qc) throws QueryException {
     final String geo;
     try {
       // write geometry and add namespace declaration

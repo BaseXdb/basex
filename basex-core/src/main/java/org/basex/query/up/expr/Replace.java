@@ -75,12 +75,12 @@ public final class Replace extends Update {
 
       updates.add(new ReplaceValue(dbn.pre(), dbn.data(), info, txt), qc);
     } else {
-      final ANode par = targ.parent();
-      if(par == null) throw UPNOPAR_X.get(info, targ);
+      final ANode parent = targ.parent();
+      if(parent == null) throw UPNOPAR_X.get(info, targ);
       if(type == NodeType.ATT) {
         // replace attribute node
         if(!list.isEmpty()) throw UPWRATTR_X.get(info, list.get(0));
-        list = checkNS(aList, par);
+        list = checkNS(aList, parent);
       } else {
         // replace non-attribute node
         if(!aList.isEmpty()) throw UPWRELM_X.get(info, targ);

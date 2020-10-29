@@ -288,7 +288,7 @@ public interface Text {
   /** Timeout exceeded. */
   String TIMEOUT_EXCEEDED = lang("timeout_exceeded");
   /** Access denied. */
-  String ACCESS_DENIED = lang("access_denied");
+  String ACCESS_DENIED_X = lang("access_denied_%");
   /** User name. */
   String USERNAME = lang("username");
   /** Password. */

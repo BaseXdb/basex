@@ -3,9 +3,10 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -15,8 +16,16 @@ import org.basex.util.*;
  */
 public final class FnFilter extends StandardFunc {
   @Override
-  public Value value(final QueryContext qc) {
-    throw Util.notExpected();
+  public Value value(final QueryContext qc) throws QueryException {
+    // implementation for dynamic function lookup
+    final Iter iter = exprs[0].iter(qc);
+    final FItem func = checkArity(exprs[1], 1, qc);
+
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(Item item; (item = iter.next()) != null;) {
+      if(toBoolean(func.invokeItem(qc, info, item))) vb.add(item);
+    }
+    return vb.value(this);
   }
 
   @Override

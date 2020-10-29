@@ -34,7 +34,7 @@ public final class FtSearch extends FtAccess {
     opt.set(WC, opts.get(FtIndexOptions.WILDCARDS));
     if(opt.is(FZ) && opt.is(WC)) throw FT_OPTIONS.get(info, this);
 
-    final FTWords ftw = new FTWords(info, db, terms, mode).init(qc, opt);
+    final FTWords ftw = new FTWords(info, db, terms, mode).ftOpt(opt).optimize(qc);
     return new FTIndexAccess(info, options(ftw, opts), db).iter(qc);
   }
 
@@ -50,7 +50,12 @@ public final class FtSearch extends FtAccess {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    exprs[1] = exprs[1].simplifyFor(Simplify.ATOM, cc);
     return compileData(cc);
+  }
+
+  @Override
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    exprs[1] = exprs[1].simplifyFor(Simplify.STRING, cc);
+    super.simplifyArgs(cc);
   }
 }

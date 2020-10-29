@@ -142,8 +142,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   DOCUMENT_URI(FnDocumentUri::new, "document-uri([node])", arg(NOD_ZO), URI_ZO),
   /** XQuery function. */
-  ELEMENT_WITH_ID(FnElementWithId::new, "element-with-id(string[,node])",
-      arg(STR_ZM, NOD_O), ELM_ZM),
+  ELEMENT_WITH_ID(FnElementWithId::new, "element-with-id(ids[,node])", arg(STR_ZM, NOD_O), ELM_ZM),
   /** XQuery function. */
   EMPTY(FnEmpty::new, "empty(items)", arg(ITEM_ZM), BLN_O),
   /** XQuery function. */
@@ -672,7 +671,7 @@ public enum Function implements AFunction {
   _CLIENT_INFO(ClientInfo::new, "info(id)", arg(URI_O), STR_O, flag(NDT), CLIENT_URI),
   /** XQuery function. */
   _CLIENT_QUERY(ClientQuery::new, "query(id,query[,bindings])",
-      arg(URI_O, STR_O, MAP_ZO), ITEM_ZO, flag(NDT), CLIENT_URI),
+      arg(URI_O, STR_O, MAP_ZO), ITEM_ZM, flag(NDT), CLIENT_URI),
 
   // Conversion Module
 
@@ -1009,6 +1008,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _HOF_CONST(HofConst::new, "const(return,ignore)", arg(ITEM_ZM, ITEM_ZM), ITEM_ZM, HOF_URI),
   /** XQuery function. */
+  _HOF_DROP_WHILE(HofDropWhile::new, "drop-while(items,predicate)",
+      arg(ITEM_ZM, FuncType.get(BLN_O, ITEM_O).seqType()), ITEM_ZM, flag(HOF), HOF_URI),
+  /** XQuery function. */
   _HOF_FOLD_LEFT1(HofFoldLeft1::new, "fold-left1(non-empty-items,function)",
       arg(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O).seqType()), ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
@@ -1277,7 +1279,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _UPDATE_APPLY(UpdateApply::new, "apply(function,args)", arg(FUNC_O, ARRAY_O), EMP,
-      flag(POS, CTX, UPD, NDT, HOF), UPDATE_URI),
+      flag(POS, CTX, UPD, HOF), UPDATE_URI),
   /** XQuery function. */
   _UPDATE_CACHE(UpdateCache::new, "cache([reset])", arg(BLN_O), ITEM_ZM, flag(NDT), UPDATE_URI),
   /** XQuery function. */
@@ -1349,8 +1351,8 @@ public enum Function implements AFunction {
   _UTIL_RANGE(UtilRange::new, "range(items,first,last)",
       arg(ITEM_ZM, DBL_O, DBL_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
-  _UTIL_REPLICATE(UtilReplicate::new, "replicate(items,count)",
-      arg(ITEM_ZM, ITR_O), ITEM_ZM, UTIL_URI),
+  _UTIL_REPLICATE(UtilReplicate::new, "replicate(items,count[,multiple])",
+      arg(ITEM_ZM, ITR_O, BLN_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_ROOT(UtilRoot::new, "root(nodes)", arg(NOD_ZM), DOC_ZM, UTIL_URI),
 

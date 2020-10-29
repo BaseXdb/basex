@@ -18,10 +18,10 @@ public final class ClientBlocker {
    * @param client client address
    */
   public synchronized void delay(final byte[] client) {
-    int delay = blocked.get(client);
-    delay = delay == -1 ? 1 : Math.min(delay, 1024) << 1;
+    // do not delay more than 10 seconds
+    int delay = Math.min(blocked.get(client) + 1, 20);
     blocked.put(client, delay);
-    while(--delay > 0) Performance.sleep(100);
+    while(--delay > 0) Performance.sleep(500);
   }
 
   /**

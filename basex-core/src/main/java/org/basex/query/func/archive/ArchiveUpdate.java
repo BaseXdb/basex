@@ -1,17 +1,14 @@
 package org.basex.query.func.archive;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -24,41 +21,29 @@ public final class ArchiveUpdate extends ArchiveCreate {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkCreate(qc);
 
-    final B64 archive = toB64(exprs[0], qc, false);
     // entries to be updated
-    final TokenObjMap<Item[]> hm = new TokenObjMap<>();
+    final B64 archive = toB64(exprs[0], qc, false);
+    final Map<String, Item[]> map = toMap(1, qc);
 
-    final Iter entries = exprs[1].iter(qc), contents = exprs[2].iter(qc);
-    int e = 0, c = 0;
-    Item en, cn;
-    while(true) {
-      en = qc.next(entries);
-      cn = contents.next();
-      if(en == null || cn == null) break;
-      hm.put(checkElemToken(en).string(info), new Item[] { en, cn });
-      e++;
-      c++;
-    }
-    // count remaining entries
-    if(cn != null) do c++; while(contents.next() != null);
-    if(en != null) do e++; while(entries.next() != null);
-    if(e != c) throw ARCHIVE_NUMBER_X_X.get(info, e, c);
-
-    try(ArchiveIn in = ArchiveIn.get(archive.input(info), info);
-        ArchiveOut out = ArchiveOut.get(in.format(), info)) {
-      if(in instanceof GZIPIn)
-        throw ARCHIVE_MODIFY_X.get(info, in.format().toUpperCase(Locale.ENGLISH));
-      // delete entries to be updated
-      while(in.more()) {
-        if(!hm.contains(token(in.entry().getName()))) out.write(in);
+    try(ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
+      final String format = in.format();
+      if(in instanceof GZIPIn) throw ARCHIVE_MODIFY_X.get(info, format);
+      try(ArchiveOut out = ArchiveOut.get(format, info)) {
+        // write existing or updated entries
+        while(in.more()) {
+          final Item[] entry = map.remove(in.entry().getName());
+          if(entry != null) {
+            add(entry, out, ZipEntry.DEFLATED, "", qc);
+          } else {
+            out.write(in);
+          }
+        }
+        // add remaining entries
+        for(final Item[] entry : map.values()) {
+          add(entry, out, ZipEntry.DEFLATED, "", qc);
+        }
+        return B64.get(out.finish());
       }
-      // add new and updated entries
-      for(final byte[] h : hm) {
-        if(h == null) continue;
-        final Item[] items = hm.get(h);
-        add(items[0], items[1], out, ZipEntry.DEFLATED, "", qc);
-      }
-      return B64.get(out.finish());
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);
     }

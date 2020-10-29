@@ -34,7 +34,7 @@ public final class CTxt extends CNode {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    simplifyAll(Simplify.ATOM, cc);
+    simplifyAll(Simplify.STRING, cc);
 
     if(allAreValues(true) && !(exprs[0] instanceof Str)) {
       final byte[] value = atomValue(cc.qc);

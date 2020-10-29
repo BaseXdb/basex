@@ -45,45 +45,57 @@ public final class Cast extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(Simplify.ATOM, cc);
+    expr = expr.simplifyFor(Simplify.STRING, cc);
 
-    // pre-evaluate value argument
-    if(expr instanceof Value) return cc.preEval(this);
-
-    // assign target type
-    final SeqType ast = expr.seqType();
+    // target type
+    final SeqType est = expr.seqType();
     Type dt = seqType.type;
+    Occ o = seqType.occ;
     if(dt instanceof ListType) {
       dt = dt.atomic();
-      exprType.assign(dt);
-    } else {
-      Occ occ = seqType.occ;
-      if(occ == Occ.ZERO_ONE && ast.oneOrMore() && !ast.mayBeArray()) occ = Occ.ONE;
-      exprType.assign(dt, occ);
+      o = Occ.ZERO_MORE;
+    } else if(o == Occ.ZERO_ONE && est.oneOrMore() && !est.mayBeArray()) {
+      o = Occ.ONE;
     }
+    exprType.assign(dt, o);
 
-    // skip cast if input and target types are equal
-    // ('a' cast as xs:string)  ->  'a'
-    // xs:string(''[. = <_/>])  ->  ''[. = <_/>]
-    final SeqType dst = exprType.seqType();
-    return ast.occ.instanceOf(dst.occ) && ast.type.eq(dt) ? cc.replaceWith(this, expr) : this;
+    if(!est.mayBeArray()) {
+      final long es = expr.size();
+      if(es != -1 && (es < o.min || es > o.max)) throw error(expr);
+
+      final Type et = est.type;
+      if(et.instanceOf(dt)) {
+        if(est.occ.instanceOf(o) && (et.eq(dt) || dt == AtomType.NUM))
+          return cc.replaceWith(this, expr);
+      }
+    }
+    return expr instanceof Value ? cc.preEval(this) : this;
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = expr.atomValue(qc, info);
-    final long size = value.size();
-    if(!seqType.occ.check(size)) throw INVTYPE_X_X_X.get(info, value.seqType(), seqType, value);
-    return size == 1 ? seqType.cast((Item) value, true, qc, sc, info) : value;
+    final Item item = expr.atomItem(qc, info);
+    final long size = item.size();
+    if(!seqType.occ.check(size)) throw error(item);
+    return size == 0 ? item : seqType.cast(item, true, qc, sc, info);
+  }
+
+  /**
+   * Throws a type error.
+   * @param ex expression that triggers the error
+   * @return query exception
+   */
+  private QueryException error(final Expr ex) {
+    return INVTYPE_X_X_X.get(info, ex.seqType(), seqType, ex);
   }
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    return simplifyCast(mode, cc);
+    return simplifyForCast(mode, cc);
   }
 
   @Override
-  public Cast copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return copyType(new Cast(sc, info, expr.copy(cc, vm), seqType));
   }
 

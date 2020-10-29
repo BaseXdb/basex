@@ -50,8 +50,8 @@ public final class QuerySuggest extends QueryParser {
   public StringList complete() {
     final StringList sl = new StringList();
     if(show) {
-      for(final PathNode n : curr) {
-        final String nm = string(n.token(data));
+      for(final PathNode pn : curr) {
+        final String nm = string(pn.token(data));
         if(!nm.isEmpty() && !sl.contains(nm)) sl.add(nm);
       }
       sl.sort();
@@ -79,7 +79,7 @@ public final class QuerySuggest extends QueryParser {
   protected void checkTest(final Test test, final boolean element) {
     final TokenBuilder tb = new TokenBuilder();
     if(!element) tb.add('@');
-    if(test != null) tb.add(test.toString().replaceAll("\\*:", ""));
+    if(test != null) tb.add(test.toString(false).replaceAll("\\*:", ""));
     name = tb.finish();
     // use inexact matching only if the element is at the end:
     checkTest(pos < length);

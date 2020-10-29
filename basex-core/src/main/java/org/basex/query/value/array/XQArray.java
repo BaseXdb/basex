@@ -217,11 +217,11 @@ public abstract class XQArray extends XQData {
   }
 
   /**
-   * Prepends the given elements to this array.
-   * @param values values, with length at most {@link XQArray#MAX_SMALL}
+   * Prepends the given sequence to this array.
+   * @param array small array
    * @return resulting array
    */
-  abstract XQArray consSmall(Value[] values);
+  abstract XQArray prepend(SmallArray array);
 
   /**
    * Returns an array containing the values at the indices {@code from} to {@code to - 1} in

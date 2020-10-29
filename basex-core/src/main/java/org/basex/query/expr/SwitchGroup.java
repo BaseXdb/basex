@@ -49,12 +49,12 @@ public final class SwitchGroup extends Arr {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public SwitchGroup optimize(final CompileContext cc) throws QueryException {
     final int el = exprs.length;
     for(int e = 1; e < el; e++) {
-      exprs[e] = exprs[e].simplifyFor(Simplify.ATOM, cc);
+      exprs[e] = exprs[e].simplifyFor(Simplify.STRING, cc);
     }
-    return adoptType(exprs[0]);
+    return (SwitchGroup) adoptType(rtrn());
   }
 
   @Override
@@ -69,7 +69,7 @@ public final class SwitchGroup extends Arr {
 
   @Override
   public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    Expr ex = exprs[0];
+    Expr ex = rtrn();
     try {
       ex = tc.check(ex, cc);
     } catch(final QueryException qe) {
@@ -87,7 +87,7 @@ public final class SwitchGroup extends Arr {
    */
   @Override
   public VarUsage count(final Var var) {
-    return exprs[0].count(var);
+    return rtrn().count(var);
   }
 
   /**
@@ -124,6 +124,14 @@ public final class SwitchGroup extends Arr {
   }
 
   /**
+   * Returns the return expression.
+   * @return return expression
+   */
+  Expr rtrn() {
+    return exprs[0];
+  }
+
+  /**
    * Simplifies all expressions for requests of the specified type.
    * @param mode mode of simplification
    * @param cc compilation context
@@ -131,10 +139,15 @@ public final class SwitchGroup extends Arr {
    * @throws QueryException query exception
    */
   boolean simplify(final Simplify mode, final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0].simplifyFor(mode, cc);
-    if(expr == exprs[0]) return false;
+    final Expr expr = rtrn().simplifyFor(mode, cc);
+    if(expr == rtrn()) return false;
     exprs[0] = expr;
     return true;
+  }
+
+  @Override
+  public void markTailCalls(final CompileContext cc) {
+    rtrn().markTailCalls(cc);
   }
 
   @Override
@@ -154,6 +167,6 @@ public final class SwitchGroup extends Arr {
     final int el = exprs.length;
     for(int e = 1; e < el; e++) qs.token(CASE).token(exprs[e]);
     if(el == 1) qs.token(DEFAULT);
-    qs.token(RETURN).token(exprs[0]);
+    qs.token(RETURN).token(rtrn());
   }
 }

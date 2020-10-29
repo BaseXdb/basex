@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.query.ast.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.up.expr.*;
 import org.basex.query.value.item.*;
@@ -43,8 +44,10 @@ public final class GFLWORTest extends QueryPlanTest {
         "let $m := $b " +
         "return <_>{ $m }</_>//text()",
         "a\na",
-        count(Let.class, 1),
-        empty(For.class)
+        empty(Let.class),
+        empty(For.class),
+        root(IterMap.class),
+        exists(_UTIL_REPLICATE)
     );
   }
 
@@ -93,8 +96,10 @@ public final class GFLWORTest extends QueryPlanTest {
         "for $b in $x " +
         "return (<_>{ $b }</_>, $b)[1]/x",
         "<x/>\n<x/>",
-        count(Let.class, 1),
-        empty(For.class)
+        empty(Let.class),
+        empty(For.class),
+        root(IterMap.class),
+        exists(_UTIL_REPLICATE)
     );
 
     check("let $x := <x/> " +
@@ -102,8 +107,10 @@ public final class GFLWORTest extends QueryPlanTest {
         "for $b as element(x) in $x " +
         "return (<_>{ $b }</_>, $b)[1]/x",
         "<x/>\n<x/>",
-        count(Let.class, 1),
-        empty(For.class)
+        empty(Let.class),
+        empty(For.class),
+        root(IterMap.class),
+        exists(_UTIL_REPLICATE)
     );
   }
 
@@ -169,7 +176,7 @@ public final class GFLWORTest extends QueryPlanTest {
         exists("*[ends-with(name(), 'Filter')]/UtilItem")
     );
     check("for $i in 1 to 3 " +
-        "where count(for $j in 1 to $i group by $k := $j mod 2 return $i) > 1 " +
+        "where count(for $j in 1 to $i group by $k := $j mod 2 return $k) > 1 " +
         "return $i",
         "2\n3",
         empty(Where.class),
@@ -186,8 +193,7 @@ public final class GFLWORTest extends QueryPlanTest {
     );
     check("<x/>/(for $i in 1 to 3 let $x := . where $x return $x)",
         "<x/>",
-        empty(GFLWOR.class),
-        exists(_UTIL_REPLICATE)
+        root(CElem.class)
     );
     check("for $len in 1 to 3 " +
         "for sliding window $w in 1 to 3 start at $p when true() only " +
@@ -195,7 +201,7 @@ public final class GFLWORTest extends QueryPlanTest {
         "let $x := $len div 2 " +
         "return count($w) div ($x + $x)",
         "1\n1\n1\n1\n1\n1",
-        "//For << //Let and //Let << //Window"
+        empty(Let.class)
     );
   }
 
@@ -211,10 +217,10 @@ public final class GFLWORTest extends QueryPlanTest {
         empty(For.class),
         exists(_UTIL_REPLICATE)
     );
-    check("for $r in 1 to 2 return <_>3</_>",
-        "<_>3</_>\n<_>3</_>",
-        exists(DualMap.class),
-        exists(SingletonSeq.class)
+    check("let $n := for $r in 1 to 2 return <_>3</_> return $n[1] is $n[2]",
+        false,
+        empty(For.class),
+        exists(_UTIL_REPLICATE)
     );
     check("for $r in 1 to 2 return 3[. = 4]",
         "",
@@ -224,14 +230,15 @@ public final class GFLWORTest extends QueryPlanTest {
 
   /** Tests if multiple let clauses are all moved to their optimal position. */
   @Test public void slideMultipleLets() {
-    check("for $i in 1 to 2 for $j in 1 to 2 " +
-        "let $a as xs:integer := 3 * $i, " +
-        "    $b as xs:integer := 2 * $i " +
+    check("for $i in 1 to 2 " +
+        "for $j in 1 to 2 " +
+        "let $a as xs:integer := 3 * $i " +
+        "let $b as xs:integer := 2 * $i " +
         "return $a * $a + $b * $b",
         "13\n13\n52\n52",
         exists("For[every $let in //Let satisfies . << $let]"),
         count(For.class, 1),
-        "//Let[@name = '$a'] << //Let[@name = '$b']"
+        count(Let.class, 1)
     );
   }
 
@@ -247,7 +254,8 @@ public final class GFLWORTest extends QueryPlanTest {
   @Test public void dontSlideLetNDT() {
     check("for $i in 1 to 10 let $rnd := random:double() return $i * $rnd",
         null,
-        "exactly-one(//For) << exactly-one(//Let)"
+        empty(Let.class),
+        exists(ItemMap.class)
     );
   }
 
@@ -255,7 +263,8 @@ public final class GFLWORTest extends QueryPlanTest {
   @Test public void dontSlideLetCNS() {
     check("for $i in 1 to 10 let $x := <x/> return ($i, $x, $x)",
         null,
-        "//For << //Let"
+        empty(Let.class),
+        exists(IterMap.class)
     );
   }
 
@@ -315,8 +324,7 @@ public final class GFLWORTest extends QueryPlanTest {
     );
     check("for $i in 1 to 3 let $x := $i * $i return error()",
         null,
-        empty(GFLWOR.class),
-        root(IterMap.class)
+        root(_UTIL_REPLICATE)
     );
   }
 
@@ -348,11 +356,13 @@ public final class GFLWORTest extends QueryPlanTest {
     );
   }
 
-  /** Ensures that non-deterministic expressions are not inlined. */
-  @Test public void dontInlineNDTTest() {
+  /** Ensures that non-deterministic expressions are rewritten to a simple map. */
+  @Test public void inlineNDTTest() {
     check("let $rnd := random:double() return (1 to 10) ! $rnd",
         null,
-        exists(Let.class)
+        empty(Let.class),
+        root(IterMap.class),
+        exists(_UTIL_REPLICATE)
     );
   }
 
@@ -416,5 +426,11 @@ public final class GFLWORTest extends QueryPlanTest {
   /** Inlining of positional variable. */
   @Test public void posVar() {
     check("for $v at $p in (1, 2) where $p = 2 return $v", 2, root(Int.class));
+  }
+
+  /** Allowing empty. */
+  @Test public void allowingEmpty() {
+    check("for $x allowing empty in () return $x", "", empty());
+    check("for $x allowing empty in prof:void(1) return $x", "", exists(GFLWOR.class));
   }
 }

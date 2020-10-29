@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class HashItemSet extends ASet implements ItemSet {
-  /** Equality check (stricter than equivalence check). */
+  /** Equality vs. equivalence check. */
   private final boolean eq;
   /** Hashed keys. */
   private Item[] keys;

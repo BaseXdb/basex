@@ -50,8 +50,14 @@ public final class FnData extends ContextFn {
   }
 
   @Override
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    // data(xs:untypedAtomic(E))  ->  data(E)
+    simplifyAll(Simplify.DATA, cc);
+  }
+
+  @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    if(mode == Simplify.ATOM || mode == Simplify.NUMBER) {
+    if(mode == Simplify.DATA || mode == Simplify.STRING || mode == Simplify.NUMBER) {
       // data(<a/>) = ''  ->  <a/> = ''
       if(!contextAccess()) return cc.simplify(this, exprs[0]);
       // A[B ! data() = '']  ->  A[B ! . = '']

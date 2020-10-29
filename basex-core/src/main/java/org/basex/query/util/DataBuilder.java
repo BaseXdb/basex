@@ -67,7 +67,7 @@ public final class DataBuilder {
   public void build(final ANodeList nodes) {
     data.meta.update();
     int next = data.meta.size;
-    for(final ANode n : nodes) next = addNode(n, next, -1);
+    for(final ANode node : nodes) next = addNode(node, next, -1);
   }
 
   /**

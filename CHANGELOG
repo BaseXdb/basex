@@ -1,3 +1,11 @@
+VERSION 9.4.3 (September 11, 2020) -------------------------------------
+
+ - New compile-time optimizations and performance tweaks
+
+VERSION 9.4.2 (August 21, 2020) ----------------------------------------
+
+ - Performance tweaks, bug fixes
+
 VERSION 9.4.1 (July 26, 2020) ------------------------------------------
 
  - Minor bug fixes and performance tweaks

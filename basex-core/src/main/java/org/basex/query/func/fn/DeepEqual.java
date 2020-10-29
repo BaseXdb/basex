@@ -101,6 +101,9 @@ public final class DeepEqual {
   public boolean equal(final Iter iter1, final Iter iter2, final QueryContext qc)
       throws QueryException {
 
+    final long size1 = iter1.size(), size2 = iter2.size();
+    if(size1 != -1 && size2 != -1 && size1 != size2) return false;
+
     while(true) {
       if(qc != null) qc.checkStop();
 

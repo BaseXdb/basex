@@ -2,7 +2,7 @@
 # Toshio HIRAI, Kazuo KASHIMA
 
 about_%              = %について
-access_denied        = アクセスが拒否されました。
+access_denied_%      = アクセスが拒否されました: %。
 add                  = 追加
 add_archive_name     = ドキュメントパスにアーカイブ名を含める
 add_raw_files        = 残りのファイルをRAWファイルとして追加します

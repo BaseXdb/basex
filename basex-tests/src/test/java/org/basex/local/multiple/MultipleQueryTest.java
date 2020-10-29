@@ -30,8 +30,7 @@ public final class MultipleQueryTest extends SandboxTest {
    * Runs the test.
    * @throws Exception exception
    */
-  @Test
-  public void clients10runs10() throws Exception {
+  @Test public void clients10runs10() throws Exception {
     run(10, 10);
   }
 
@@ -39,8 +38,7 @@ public final class MultipleQueryTest extends SandboxTest {
    * Runs the test.
    * @throws Exception exception
    */
-  @Test
-  public void clients10runs100() throws Exception {
+  @Test public void clients10runs100() throws Exception {
     run(10, 100);
   }
 
@@ -48,8 +46,7 @@ public final class MultipleQueryTest extends SandboxTest {
    * Runs the test.
    * @throws Exception exception
    */
-  @Test
-  public void clients100runs10() throws Exception {
+  @Test public void clients100runs10() throws Exception {
     run(100, 10);
   }
 
@@ -57,8 +54,7 @@ public final class MultipleQueryTest extends SandboxTest {
    * Runs the test.
    * @throws Exception exception
    */
-  @Test
-  public void clients100runs100() throws Exception {
+  @Test public void clients100runs100() throws Exception {
     run(100, 100);
   }
 

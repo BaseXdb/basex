@@ -170,6 +170,6 @@ public final class DiskBuilder extends Builder {
     final DataOutput store = text ? xout : vout;
     final long offset = store.size();
     store.writeToken(packed);
-    return packed != value ? Compress.COMPRESS | offset : offset;
+    return packed == value ? offset : Compress.COMPRESS | offset;
   }
 }

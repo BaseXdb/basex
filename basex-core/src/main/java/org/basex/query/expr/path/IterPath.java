@@ -50,7 +50,7 @@ public final class IterPath extends AxisPath {
               if(--pos == -1) return null;
             } else if(pos < sz) {
               qf.value = item;
-              ++pos;
+              pos++;
               iter[pos] = exprs[pos].iter(qc);
             } else {
               return item;

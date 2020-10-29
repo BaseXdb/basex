@@ -5,7 +5,6 @@ import static org.basex.util.ft.FTFlag.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -39,14 +38,13 @@ public final class FtContains extends FtAccess {
     final FTCase cs = opts.get(FtContainsOptions.CASE);
     if(cs != null) opt.cs = cs;
 
-    final FTWords ftw = new FTWords(info, query, mode, null).init(qc, opt);
+    final FTWords ftw = new FTWords(info, query, mode, null).ftOpt(opt).optimize(qc);
     return new FTContains(input, options(ftw, opts), info).item(qc, info);
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    exprs[0] = exprs[0].simplifyFor(Simplify.ATOM, cc);
-    exprs[1] = exprs[1].simplifyFor(Simplify.ATOM, cc);
-    return this;
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    exprs[0] = exprs[0].simplifyFor(Simplify.STRING, cc);
+    exprs[1] = exprs[1].simplifyFor(Simplify.STRING, cc);
   }
 }

@@ -21,7 +21,7 @@ import org.basex.query.iter.*;
  *       also make it accessible to users with less privileges.</li>
  *   <li>Java code is treated as "non-deterministic", as its behavior cannot
  *       be predicted by the XQuery processor. You may annotate a function as
- *       {@link Deterministic} if you know that it will have no side-effects and will
+ *       {@link Deterministic} if you know that it will have no side effects and will
  *       always yield the same result.</li>
  *   <li>Java code is treated as "context-independent". If a function accesses
  *       the specified {@link #queryContext}, it should be annotated as
@@ -88,7 +88,7 @@ public abstract class QueryModule {
   /**
    * Java code is treated as "non-deterministic", as its behavior cannot be predicted from
    * the XQuery processor. You may annotate a function as {@link Deterministic} if you
-   * know that it will have no side-effects and will always yield the same result.
+   * know that it will have no side effects and will always yield the same result.
    */
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.METHOD)

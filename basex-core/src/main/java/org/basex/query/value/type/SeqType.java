@@ -333,8 +333,8 @@ public final class SeqType {
   }
 
   /**
-   * Checks the specified value for this sequence type.
-   * @param value value to be checked
+   * Treats the specified value as this sequence type.
+   * @param value value to check
    * @param name name of variable (can be {@code null})
    * @param qc query context
    * @param ii input info
@@ -356,8 +356,8 @@ public final class SeqType {
   }
 
   /**
-   * Promotes a value to the type of this sequence type.
-   * @param value value to convert
+   * Promotes the specified value to this sequence type.
+   * @param value value to promote
    * @param name variable name (can be {@code null})
    * @param qc query context
    * @param sc static context
@@ -370,9 +370,6 @@ public final class SeqType {
       final StaticContext sc, final InputInfo ii, final boolean opt) throws QueryException {
 
     final long size = value.size();
-    if(!occ.check(size)) throw typeError(value, this, name, ii, true);
-    if(size == 0) return Empty.VALUE;
-
     ItemList items = null;
     for(long i = 0; i < size; i++) {
       qc.checkStop();
@@ -387,11 +384,13 @@ public final class SeqType {
         promote(item, name, items, qc, sc, ii, opt);
       }
     }
+    final long is = items != null ? items.size() : value.size();
+    if(!occ.check(is)) throw typeError(value, this, name, ii, true);
     return items != null ? items.value(type) : value;
   }
 
   /**
-   * Promotes an item to the type of this sequence type.
+   * Promotes the specified item to this item type.
    * @param item item to promote
    * @param name variable name (can be {@code null})
    * @param items item cache
@@ -457,9 +456,9 @@ public final class SeqType {
    */
   public SeqType union(final SeqType st) {
     // ignore general type of empty sequence
-    final Type tp = type.eq(st.type) || st.zero() ? type : zero() ? st.type : type.union(st.type);
+    final Type tp = st.zero() ? type : zero() ? st.type : type.union(st.type);
     final Occ oc = occ.union(st.occ);
-    final Test ts = test != null && st.test != null ? Test.get(test, st.test) : null;
+    final Test ts = st.zero() ? test : zero() ? st.test : Test.get(test, st.test);
     return get(tp, oc, ts);
   }
 
@@ -537,8 +536,18 @@ public final class SeqType {
   public boolean instanceOf(final SeqType st) {
     // empty sequence: only check cardinality
     return zero() ? !st.oneOrMore() :
-      (st.type == AtomType.ITEM || type.instanceOf(st.type)) && occ.instanceOf(st.occ) &&
-      (st.test == null || test != null && test.instanceOf(st.test));
+      (st.type == AtomType.ITEM || type.instanceOf(st.type)) &&
+      occ.instanceOf(st.occ) && kindInstanceOf(st);
+  }
+
+  /**
+   * Checks if the kind of this sequence type is an instance of the kind of the specified
+   * sequence type.
+   * @param st sequence type to check
+   * @return result of check
+   */
+  public boolean kindInstanceOf(final SeqType st) {
+    return st.test == null || test != null && test.instanceOf(st.test);
   }
 
   /**

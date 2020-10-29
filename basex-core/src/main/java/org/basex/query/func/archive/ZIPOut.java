@@ -3,6 +3,7 @@ package org.basex.query.func.archive;
 import java.io.*;
 import java.util.zip.*;
 
+import org.basex.io.out.*;
 import org.basex.util.*;
 
 /**
@@ -14,6 +15,8 @@ import org.basex.util.*;
 final class ZIPOut extends ArchiveOut {
   /** ZIP output stream. */
   private final ZipOutputStream zos;
+  /** Stored flag. */
+  private boolean stored;
 
   /**
    * Writing constructor.
@@ -23,23 +26,39 @@ final class ZIPOut extends ArchiveOut {
   }
 
   @Override
-  public void level(final int l) {
-    zos.setLevel(l);
+  public void level(final int level) {
+    stored = level == 0;
+    zos.setMethod(stored ? ZipEntry.STORED : ZipEntry.DEFLATED);
+    zos.setLevel(level);
   }
 
   @Override
   public void write(final ArchiveIn in) throws IOException {
-    final ZipEntry zi = in.entry();
-    final ZipEntry zo = new ZipEntry(zi.getName());
+    final ZipEntry zi = in.entry(), zo = new ZipEntry(zi.getName());
     zo.setTime(zi.getTime());
     zo.setComment(zi.getComment());
-    zos.putNextEntry(zo);
-    for(int c; (c = in.read(data)) != -1;) zos.write(data, 0, c);
-    zos.closeEntry();
+
+    if(zi.getMethod() == ZipEntry.STORED) {
+      stored = true;
+      final ArrayOutput out = new ArrayOutput();
+      write(in, out);
+      write(zo, out.finish());
+    } else {
+      level(-1);
+      zos.putNextEntry(zo);
+      write(in, zos);
+      zos.closeEntry();
+    }
   }
 
   @Override
   public void write(final ZipEntry entry, final byte[] value) throws IOException {
+    if(stored) {
+      final CRC32 crc = new CRC32();
+      crc.update(value);
+      entry.setCrc(crc.getValue());
+      entry.setSize(value.length);
+    }
     zos.putNextEntry(entry);
     zos.write(value);
     zos.closeEntry();

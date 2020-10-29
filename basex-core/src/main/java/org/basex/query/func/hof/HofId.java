@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -14,8 +13,9 @@ import org.basex.util.*;
  */
 public class HofId extends StandardFunc {
   @Override
-  public Value value(final QueryContext qc) {
-    throw Util.notExpected();
+  public Value value(final QueryContext qc) throws QueryException {
+    // implementation for dynamic function lookup calls
+    return exprs[0].value(qc);
   }
 
   @Override

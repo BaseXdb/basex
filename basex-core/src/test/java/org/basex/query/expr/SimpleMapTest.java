@@ -57,7 +57,7 @@ public final class SimpleMapTest extends QueryPlanTest {
     check("1 ! .", 1, root(Int.class));
     check("(1, 2)[. = 1] ! .", 1, root(IterFilter.class));
     check("(1, (2, 3)[. = 2]) ! .", "1\n2", root(List.class));
-    check("(1, 2) !.!.!.!.!.!.!.!.!.!.!.", "1\n2", root(IntSeq.class));
+    check("(1, 2) !.!.!.!.!.!.!.!.!.!.!.", "1\n2", root(RangeSeq.class));
     check("<a/> ! . ! .", "<a/>", root(CElem.class));
     check("(1, 2)[. ! number() = 2]", 2, empty(ItemMap.class));
 
@@ -83,7 +83,7 @@ public final class SimpleMapTest extends QueryPlanTest {
   /** Inline simple expressions into next operand. */
   @Test public void inline() {
     check("'1' ! (., number())", "1\n1", root(SmallSeq.class));
-    check("let $a := document { <a/> } return $a ! (., /)", "<a/>\n<a/>", count(VarRef.class, 2));
+    check("let $a := document { <a/> } return $a ! (., /)", "<a/>\n<a/>", empty(VarRef.class));
     check("let $d := document{} return $d ! /", "", root(CDoc.class));
     check("map { 1: 2 } ! ?*", 2, root(Int.class));
     check("let $n := map { 1: 2 } return $n ! ?*", 2, root(Int.class));
@@ -100,16 +100,29 @@ public final class SimpleMapTest extends QueryPlanTest {
     check("(1 to 2) ! ('a', 'a')[.]", "a\na\na\na", exists(_UTIL_REPLICATE));
     check("(1 to 2) ! (4, 5)[. = 4]", "4\n4", exists(_UTIL_REPLICATE));
     check("(1 to 2) ! ('a', '')[.]", "a\na", exists(_UTIL_REPLICATE));
+    check("(1 to 2) ! <x/>", "<x/>\n<x/>", exists(_UTIL_REPLICATE));
+
     check("(1 to 2) ! prof:void(.)", "", empty(_UTIL_REPLICATE));
 
     // replace first or both expressions with singleton sequence
     check("(1 to 2) ! 3", "3\n3", exists(SingletonSeq.class), root(SingletonSeq.class));
     check("(1 to 2) ! 'a'[.]", "a\na", exists(SingletonSeq.class), root(SingletonSeq.class));
-    check("(1 to 2) ! <x/>", "<x/>\n<x/>", exists(SingletonSeq.class), exists(DualMap.class));
 
     // combine identical values in singleton sequence
     check("(1 to 2) ! ('a', 'a')", "a\na\na\na", exists(SingletonSeq.class) + " and .//@size = 4");
     check("(1 to 2) ! util:replicate('a', 2) ! util:replicate('a', 2)", "a\na\na\na\na\na\na\na",
         exists(SingletonSeq.class) + " and .//@size = 8");
+  }
+
+  /** Positional access. */
+  @Test public void positional() {
+    check("for $i in 2 to 3 return (1 to 4)[$i]", "2\n3", root(RangeSeq.class));
+    check("(2 to 3) ! util:item((1 to 4), .)", "2\n3", root(RangeSeq.class));
+  }
+
+  /** Inline sequences. */
+  @Test public void inlineSequences() {
+    check("(<a/>, <b/>) ! data()", "\n", root(DATA));
+    check("(<a/>, <b/>) ! data(.)", "\n", root(DATA));
   }
 }

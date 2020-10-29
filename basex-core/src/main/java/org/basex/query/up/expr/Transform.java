@@ -57,8 +57,12 @@ public final class Transform extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    for(final Let copy : copies) copy.exprType.assign(copy.expr);
-    exprType.assign(exprs[1]);
+    for(final Let copy : copies) {
+      copy.exprType.assign(copy.expr);
+    }
+    // name of node may change
+    final SeqType st = exprs[1].seqType();
+    exprType.assign(st.type, st.occ);
     return this;
   }
 
@@ -98,7 +102,7 @@ public final class Transform extends Arr {
     for(final Let copy : copies) {
       if(copy.has(flags)) return true;
     }
-    if(Flag.UPD.in(flags) && exprs[1].has(Flag.UPD)) return true;
+    if(Flag.CNS.in(flags) || Flag.UPD.in(flags) && exprs[1].has(Flag.UPD)) return true;
     final Flag[] flgs = Flag.UPD.remove(flags);
     return flgs.length != 0 && super.has(flgs);
   }

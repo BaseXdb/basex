@@ -4,9 +4,9 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.AtomType.*;
 
 import java.math.*;
-import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -56,12 +56,18 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr ex1, final Expr ex2) {
-      // check for neutral numbers
-      final BiFunction<Expr, Expr, Expr> func = (expr1, expr2) ->
-        expr1 instanceof ANum && ((ANum) expr1).dbl() == 0 ? expr2 : null;
-      final Expr expr = func.apply(ex1, ex2);
-      return expr != null ? expr : func.apply(ex2, ex1);
+    public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
+        final CompileContext cc) throws QueryException {
+      // check for neutral number
+      final Type type = numType(expr1.seqType().type, expr2.seqType().type);
+      if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 0) {
+        return new Cast(cc.sc(), info, expr1, type.seqType()).optimize(cc);
+      }
+      // check for identical operands
+      if(expr1.equals(expr2)) {
+        return new Arith(info, expr1, Int.get(2), Calc.MULT).optimize(cc);
+      }
+      return null;
     }
 
     @Override
@@ -73,6 +79,11 @@ public enum Calc {
       if(type1 == TIM && type2 == DTD) return TIM;
       if(type1 == DTD && type2 == TIM) return TIM;
       return numType(type1, type2);
+    }
+
+    @Override
+    public Calc invert() {
+      return MINUS;
     }
   },
 
@@ -113,10 +124,19 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr ex1, final Expr ex2) {
-      // check for neutral number and identical arguments
-      return ex2 instanceof ANum && ((ANum) ex2).dbl() == 0 ? ex1 :
-        ex1.equals(ex2) ? zero(ex1) : null;
+    public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
+        final CompileContext cc) throws QueryException {
+
+      // check for neutral number
+      final Type type = numType(expr1.seqType().type, expr2.seqType().type);
+      if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 0) {
+        return new Cast(cc.sc(), info, expr1, type.seqType()).optimize(cc);
+      }
+      // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
+      if(expr1.equals(expr2)) {
+        return type == DEC ? Dec.ZERO : type == ITR ? Int.ZERO : null;
+      }
+      return null;
     }
 
     @Override
@@ -128,6 +148,11 @@ public enum Calc {
       if(type1 == DAT) return DAT;
       if(type1 == TIM && type2 == DTD) return TIM;
       return numType(type1, type2);
+    }
+
+    @Override
+    public Calc invert() {
+      return PLUS;
     }
   },
 
@@ -159,8 +184,7 @@ public enum Calc {
       if(num1) {
         final Type type = numType(type1, type2);
         if(type == ITR) {
-          final long l1 = item1.itr(ii);
-          final long l2 = item2.itr(ii);
+          final long l1 = item1.itr(ii), l2 = item2.itr(ii);
           if(l2 > 0 ? l1 > Long.MAX_VALUE / l2 || l1 < Long.MIN_VALUE / l2
                     : l2 < -1 ? l1 > Long.MIN_VALUE / l2 || l1 < Long.MAX_VALUE / l2
                               : l2 == -1 && l1 == Long.MIN_VALUE)
@@ -175,14 +199,22 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr ex1, final Expr ex2) {
-      // check for absorbing and neutral numbers
-      final BiFunction<Expr, Expr, Expr> func = (expr1, expr2) -> {
-        final double dbl1 = expr1 instanceof ANum ? ((ANum) expr1).dbl() : Double.NaN;
-        return dbl1 == 1 ? expr2 : dbl1 == 0 ? zero(expr1) : null;
-      };
-      final Expr expr = func.apply(ex1, ex2);
-      return expr != null ? expr : func.apply(ex2, ex1);
+    public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
+        final CompileContext cc) throws QueryException {
+
+      final Type type = numType(expr1.seqType().type, expr2.seqType().type);
+      if(expr2 instanceof ANum) {
+        final double dbl2 = ((ANum) expr2).dbl();
+        // check for neutral number
+        if(dbl2 == 1) return new Cast(cc.sc(), info, expr1, type.seqType()).optimize(cc);
+        // check for absorbing number
+        if(dbl2 == 0) return type == DEC ? Dec.ZERO : type == ITR ? Int.ZERO : null;
+      }
+      // check for identical operands
+      if(expr1.equals(expr2) && type == DBL) {
+        return cc.function(Function._MATH_POW, info, expr1, Dbl.get(2));
+      }
+      return null;
     }
 
     @Override
@@ -190,6 +222,11 @@ public enum Calc {
       if(type1 == YMD || type2 == YMD) return YMD;
       if(type1 == DTD || type2 == DTD) return DTD;
       return numType(type1, type2);
+    }
+
+    @Override
+    public Calc invert() {
+      return DIV;
     }
   },
 
@@ -232,10 +269,19 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr ex1, final Expr ex2) {
-      // check for neutral number and identical arguments
-      return ex2 instanceof ANum && ((ANum) ex2).dbl() == 1 ? ex1 :
-        ex1.equals(ex2) ? one(ex1) : null;
+    public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
+        final CompileContext cc) throws QueryException {
+
+      // check for neutral number
+      final Type type = numType(expr1.seqType().type, expr2.seqType().type);
+      if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 1) {
+        return new Cast(cc.sc(), info, expr1, type.seqType()).optimize(cc);
+      }
+      // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
+      if(expr1.equals(expr2)) {
+        return type == DEC ? Dec.ONE : type == ITR ? Int.ONE : null;
+      }
+      return null;
     }
 
     @Override
@@ -243,8 +289,13 @@ public enum Calc {
       if(type1 == YMD && type2 == YMD || type1 == DTD && type2 == DTD) return DEC;
       if(type1 == YMD) return YMD;
       if(type1 == DTD) return DTD;
-      final Type t = numType(type1, type2);
-      return t == ITR ? DEC : t;
+      final Type type = numType(type1, type2);
+      return type == ITR ? DEC : type;
+    }
+
+    @Override
+    public Calc invert() {
+      return MULT;
     }
   },
 
@@ -282,15 +333,29 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr ex1, final Expr ex2) {
-      // check for neutral number and identical arguments
-      return ex2 instanceof ANum && ((ANum) ex2).dbl() == 1 ? ex1 :
-        ex1.equals(ex2) ? one(ex1) : null;
+    public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
+        final CompileContext cc) throws QueryException {
+
+      // check for neutral number
+      final Type type = numType(expr1.seqType().type, expr2.seqType().type);
+      if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 1) {
+        return new Cast(cc.sc(), info, expr1, SeqType.ITR_O).optimize(cc);
+      }
+      // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
+      if(expr1.equals(expr2)) {
+        return type == DEC ? Dec.ONE : type == ITR ? Int.ONE : null;
+      }
+      return null;
     }
 
     @Override
     public Type type(final Type type1, final Type type2) {
       return ITR;
+    }
+
+    @Override
+    public Calc invert() {
+      return null;
     }
   },
 
@@ -315,14 +380,24 @@ public enum Calc {
     }
 
     @Override
-    public Expr optimize(final Expr ex1, final Expr ex2) {
+    public Expr optimize(final Expr expr1, final Expr expr2, final InputInfo info,
+        final CompileContext cc) {
+
+      // check for neutral number
+      final Type type = numType(expr1.seqType().type, expr2.seqType().type);
+      if(type == ITR && expr2 == Int.ONE) return Int.ZERO;
       return null;
     }
 
     @Override
     public Type type(final Type type1, final Type type2) {
-      final Type t = numType(type1, type2);
-      return t == AAT ? NUM : t;
+      final Type type = numType(type1, type2);
+      return type == AAT ? NUM : type;
+    }
+
+    @Override
+    public Calc invert() {
+      return null;
     }
   };
 
@@ -354,11 +429,15 @@ public enum Calc {
 
   /**
    * Optimizes the expressions.
-   * @param ex1 first expression
-   * @param ex2 second expression
+   * @param expr1 first expression
+   * @param expr2 second expression
+   * @param info input info
+   * @param cc compilation context
    * @return result expression, or {@code null} if expression cannot be optimized
+   * @throws QueryException query exception
    */
-  public abstract Expr optimize(Expr ex1, Expr ex2);
+  public abstract Expr optimize(Expr expr1, Expr expr2, InputInfo info, CompileContext cc)
+      throws QueryException;
 
   /**
    * Returns the result type of this calculation.
@@ -367,6 +446,12 @@ public enum Calc {
    * @return result expression, or {@code null} if expression cannot be optimized
    */
   public abstract Type type(Type type1, Type type2);
+
+  /**
+   * Inverts the operator.
+   * @return inverted operator or {@code null}
+   */
+  public abstract Calc invert();
 
   /**
    * Returns the numeric type with the highest precedence.
@@ -379,29 +464,8 @@ public enum Calc {
     if(type1 == DBL || type2 == DBL || type1.isUntyped() || type2.isUntyped()) return DBL;
     if(type1 == FLT || type2 == FLT) return FLT;
     if(type1 == DEC || type2 == DEC) return DEC;
+    if(type1 == NUM || type2 == NUM) return NUM;
     return ITR;
-  }
-
-  /**
-   * Tries to rewrite the expression to {@code 0}.
-   * @param expr expression
-   * @return zero value or {@code null}
-   */
-  private static Expr zero(final Expr expr) {
-    // floating points
-    final Type type = expr.seqType().type;
-    return type == DEC ? Dec.ZERO : type.instanceOf(ITR) ? Int.ZERO : null;
-  }
-
-  /**
-   * Tries to rewrite the expression to {@code 1}.
-   * @param expr expression
-   * @return zero value or {@code null}
-   */
-  private static Expr one(final Expr expr) {
-    // floating points
-    final Type type = expr.seqType().type;
-    return type == DEC ? Dec.ONE : type.instanceOf(ITR) ? Int.ONE : null;
   }
 
   /**
@@ -458,7 +522,7 @@ public enum Calc {
    * @return string
    */
   final String info() {
-    return '\'' + name + "' operator";
+    return '\'' + name + "' expression";
   }
 
   @Override

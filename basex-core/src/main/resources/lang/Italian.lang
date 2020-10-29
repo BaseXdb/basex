@@ -2,7 +2,7 @@
 # Massimo Franceschet
 
 about_%              = Su %
-access_denied        = Accesso negato.
+access_denied_%      = Accesso negato: %.
 add                  = Aggiungi
 add_archive_name     = Includi il nome dell'archivio nel percorso del documento
 add_raw_files        = Aggiungi i risorse rimanenti come 'binaries'
