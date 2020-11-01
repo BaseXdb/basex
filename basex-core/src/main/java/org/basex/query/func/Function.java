@@ -568,25 +568,25 @@ public enum Function implements AFunction {
       arg(STR_O, MAP_ZO, ITEM_ZM), EMP, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_DELETE(ArchiveDelete::new, "delete(archive,entries)",
-      arg(B64_O, ITEM_ZM), B64_O, flag(NDT), ARCHIVE_URI),
+      arg(B64_O, ITEM_ZM), B64_O, ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_ENTRIES(ArchiveEntries::new, "entries(archive)",
-      arg(B64_O), ELM_ZM, flag(NDT), ARCHIVE_URI),
+      arg(B64_O), ELM_ZM, ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_BINARY(ArchiveExtractBinary::new, "extract-binary(archive[,entries])",
-      arg(B64_O, ITEM_ZM), B64_ZM, flag(NDT), ARCHIVE_URI),
+      arg(B64_O, ITEM_ZM), B64_ZM, ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_TEXT(ArchiveExtractText::new, "extract-text(archive[,entries[,encoding]])",
-      arg(B64_O, ITEM_ZM, STR_O), STR_ZM, flag(NDT), ARCHIVE_URI),
+      arg(B64_O, ITEM_ZM, STR_O), STR_ZM, ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_TO(ArchiveExtractTo::new, "extract-to(path,archive[,entries])",
       arg(STR_O, B64_O, ITEM_ZM), EMP, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_OPTIONS(ArchiveOptions::new, "options(archive)",
-      arg(B64_O), MAP_O, flag(NDT), ARCHIVE_URI),
+      arg(B64_O), MAP_O, ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_UPDATE(ArchiveUpdate::new, "update(archive,entries,contents)",
-      arg(B64_O, ITEM_ZM, ITEM_ZM), B64_O, flag(NDT), ARCHIVE_URI),
+      arg(B64_O, ITEM_ZM, ITEM_ZM), B64_O, ARCHIVE_URI),
 
   // Binary Module
 
