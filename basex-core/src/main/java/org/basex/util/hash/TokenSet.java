@@ -142,7 +142,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
     for(int p = 0, id = buckets[b]; id != 0; p = id, id = next[id]) {
       if(!eq(key, keys[id])) continue;
       if(p == 0) buckets[b] = next[id];
-      else next[p] = next[next[id]];
+      else next[p] = next[next[p]];
       keys[id] = null;
       return id;
     }
