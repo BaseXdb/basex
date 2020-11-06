@@ -125,6 +125,9 @@ public final class MapModuleTest extends QueryPlanTest {
     check(func.args(" map { 1: <a/> }") + "?1", "<a/>", empty(func));
     check(func.args(" (map { 1: <a/> }, map { })") + "?1", "<a/>", empty(func));
     check(func.args(" (map { 1: <a/> }, map { })") + "?*", "<a/>", empty(func));
+
+    // GH-1954
+    query(func.args(" if (<a/>/text()) then map { } else ()") + " ! map:keys(.)", "");
   }
 
   /**

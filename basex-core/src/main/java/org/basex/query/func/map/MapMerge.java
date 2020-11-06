@@ -47,7 +47,7 @@ public final class MapMerge extends StandardFunc {
       }
       // return simple arguments
       final SeqType st = exprs[0].seqType();
-      if(st.zeroOrOne()) return exprs[0];
+      if(st.one()) return exprs[0];
 
       // check if duplicates will be combined (if yes, adjust occurrence of return type)
       MapType mt = (MapType) st.type;
