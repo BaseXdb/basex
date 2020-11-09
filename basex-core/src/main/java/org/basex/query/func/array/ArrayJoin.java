@@ -55,7 +55,7 @@ public final class ArrayJoin extends ArrayFn {
       }
       // return simple arguments
       final SeqType st = exprs[0].seqType();
-      if(st.zeroOrOne()) return exprs[0];
+      if(st.one()) return exprs[0];
 
       exprType.assign(st.type);
     }
