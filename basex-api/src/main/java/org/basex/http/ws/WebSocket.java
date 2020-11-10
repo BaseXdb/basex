@@ -134,8 +134,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
 
   @Override
   public String clientAddress() {
-    final Session ws = getSession();
-    return ws != null ? ws.getRemoteAddress().toString() : null;
+    return HTTPConnection.remoteAddress(request);
   }
 
   @Override

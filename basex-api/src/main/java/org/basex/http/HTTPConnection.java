@@ -359,6 +359,19 @@ public final class HTTPConnection implements ClientInfo {
     return new MediaType(ct == null ? "" : ct);
   }
 
+  /**
+   * Returns the content type of a request, or an empty string.
+   * @param request servlet request
+   * @return content type
+   */
+  public static String remoteAddress(final HttpServletRequest request) {
+    for(final String header : FORWARDING_HEADERS) {
+      final String addr = request.getHeader(header);
+      if (addr != null && !addr.isEmpty() && !"unknown".equalsIgnoreCase(addr)) return addr;
+    }
+    return request.getRemoteAddr();
+  }
+
   // PRIVATE METHODS ==============================================================================
 
   /**
@@ -465,11 +478,7 @@ public final class HTTPConnection implements ClientInfo {
    * @return client address
    */
   private String getRemoteAddr() {
-    for(final String header : FORWARDING_HEADERS) {
-      final String addr = request.getHeader(header);
-      if (addr != null && !addr.isEmpty() && !"unknown".equalsIgnoreCase(addr)) return addr;
-    }
-    return request.getRemoteAddr();
+    return remoteAddress(request);
   }
 
   /**
