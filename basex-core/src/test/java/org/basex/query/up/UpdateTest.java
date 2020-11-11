@@ -1176,4 +1176,9 @@ public final class UpdateTest extends SandboxTest {
         + "  copy $_ := $a modify () return $_"
         + ") return $c[1] is $c[2]", false);
   }
+
+  /** XQuery: Simple map, update checks. */
+  @Test public void gh1957() {
+    query("declare %updating function local:f() { (1, 2) ! prof:void(.) }; local:f()", "");
+  }
 }

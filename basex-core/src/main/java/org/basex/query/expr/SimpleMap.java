@@ -58,6 +58,11 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
+  public boolean vacuous() {
+    return exprs[exprs.length - 1].vacuous();
+  }
+
+  @Override
   public final Expr compile(final CompileContext cc) throws QueryException {
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
