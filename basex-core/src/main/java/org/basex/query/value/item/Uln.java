@@ -17,8 +17,8 @@ import org.basex.util.*;
  */
 public final class Uln extends ANum {
   /** Maximum unsigned long values. */
-  public static final BigDecimal MAXULN = BigDecimal.valueOf(Long.MAX_VALUE).multiply(
-      BigDecimal.valueOf(2)).add(BigDecimal.ONE);
+  public static final BigDecimal MAXULN = BigDecimal.valueOf(Long.MAX_VALUE).
+      multiply(Dec.BD_2).add(BigDecimal.ONE);
   /** Decimal value. */
   private final BigInteger value;
 

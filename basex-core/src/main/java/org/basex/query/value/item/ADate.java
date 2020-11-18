@@ -1,6 +1,7 @@
 package org.basex.query.value.item;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.value.item.Dec.*;
 
 import java.math.*;
 import java.util.*;
@@ -130,12 +131,12 @@ public abstract class ADate extends ADateDur {
     hou = (byte) Strings.toInt(mt.group(1));
     min = (byte) Strings.toInt(mt.group(2));
     sec = toDecimal(mt.group(3), false, ii);
-    if(min >= 60 || sec.compareTo(BD60) >= 0 || hou > 24 ||
+    if(min >= 60 || sec.compareTo(BD_60) >= 0 || hou > 24 ||
        hou == 24 && (min > 0 || sec.compareTo(BigDecimal.ZERO) > 0)) throw dateError(time, exp, ii);
     zone(mt, 5, time, ii);
     if(hou == 24) {
       hou = 0;
-      add(DAYSECONDS);
+      add(BD_864000);
     }
   }
 
@@ -196,8 +197,8 @@ public abstract class ADate extends ADateDur {
   private void add(final BigDecimal add) {
     // normalized modulo: sc % 60  vs.  (-sc + sc % 60 + 60 + sc) % 60
     final BigDecimal sc = sec().add(add);
-    sec = sc.signum() >= 0 ? sc.remainder(BD60) :
-      sc.negate().add(sc.remainder(BD60)).add(BD60).add(sc).remainder(BD60);
+    sec = sc.signum() >= 0 ? sc.remainder(BD_60) :
+      sc.negate().add(sc.remainder(BD_60)).add(BD_60).add(sc).remainder(BD_60);
 
     final long mn = Math.max(minute(), 0) + div(
         sc.setScale(0, RoundingMode.FLOOR).longValue(), 60);
@@ -384,8 +385,8 @@ public abstract class ADate extends ADateDur {
    */
   private int df(final Item item, final InputInfo ii) throws QueryException {
     final ADate d = (ADate) (item instanceof ADate ? item : type.cast(item, null, null, ii));
-    final BigDecimal d1 = seconds().add(days().multiply(DAYSECONDS));
-    final BigDecimal d2 = d.seconds().add(d.days().multiply(DAYSECONDS));
+    final BigDecimal d1 = seconds().add(days().multiply(BD_864000));
+    final BigDecimal d2 = d.seconds().add(d.days().multiply(BD_864000));
     return d1.compareTo(d2);
   }
 
@@ -396,7 +397,7 @@ public abstract class ADate extends ADateDur {
 
   @Override
   public final int hash(final InputInfo ii) {
-    return seconds().add(days().multiply(DAYSECONDS)).intValue();
+    return seconds().add(days().multiply(BD_864000)).intValue();
   }
 
   @Override
@@ -421,7 +422,7 @@ public abstract class ADate extends ADateDur {
    * Returns the date in seconds.
    * @return seconds
    */
-  final BigDecimal seconds() {
+  public final BigDecimal seconds() {
     int z = tz;
     if(z == Short.MAX_VALUE) {
       // [CG] could be eliminated (XQuery, DateTime)
@@ -453,7 +454,7 @@ public abstract class ADate extends ADateDur {
    */
   private static BigDecimal days(final long year, final int month, final int day) {
     final long y = year - (month < 2 ? 1 : 0), m = month + (month < 2 ? 13 : 1), d = day + 1;
-    return BD365.multiply(BigDecimal.valueOf(y)).add(
+    return BD_365.multiply(BigDecimal.valueOf(y)).add(
         BigDecimal.valueOf(y / 4 - y / 100 + y / 400 - 92 + d + (153 * m - 2) / 5));
   }
 
@@ -465,15 +466,15 @@ public abstract class ADate extends ADateDur {
    */
   private static long[] ymd(final BigDecimal days) {
     BigDecimal d = days;
-    BigDecimal t = d.add(BD36525).multiply(BD4).
-        divideToIntegralValue(BD146097).subtract(BigDecimal.ONE);
-    BigDecimal y = BD100.multiply(t);
-    d = d.subtract(BD36524.multiply(t).add(t.divideToIntegralValue(BD4)));
-    t = d.add(BD366).multiply(BD4).divideToIntegralValue(BD1461).subtract(BigDecimal.ONE);
+    BigDecimal t = d.add(BD_36525).multiply(BD_4).
+        divideToIntegralValue(BD_146097).subtract(BigDecimal.ONE);
+    BigDecimal y = BD_100.multiply(t);
+    d = d.subtract(BD_36524.multiply(t).add(t.divideToIntegralValue(BD_4)));
+    t = d.add(BD_366).multiply(BD_4).divideToIntegralValue(BD_1461).subtract(BigDecimal.ONE);
     y = y.add(t);
-    d = d.subtract(BD365.multiply(t).add(t.divideToIntegralValue(BD4)));
-    final BigDecimal m = BD5.multiply(d).add(BD2).divideToIntegralValue(BD153);
-    d = d.subtract(BD153.multiply(m).add(BD2).divideToIntegralValue(BD5));
+    d = d.subtract(BD_365.multiply(t).add(t.divideToIntegralValue(BD_4)));
+    final BigDecimal m = BD_5.multiply(d).add(BD_2).divideToIntegralValue(BD_153);
+    d = d.subtract(BD_153.multiply(m).add(BD_2).divideToIntegralValue(BD_5));
     long mm = m.longValue();
     if(mm > 9) { mm -= 12; y = y.add(BigDecimal.ONE); }
     return new long[] { y.subtract(BigDecimal.valueOf(ADD_NEG)).longValue(),

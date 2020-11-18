@@ -2,6 +2,7 @@ package org.basex.query.value.item;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.value.item.Dec.*;
 
 import java.math.*;
 import java.util.regex.*;
@@ -28,17 +29,18 @@ public final class DTDur extends Dur {
   }
 
   /**
-   * Timezone constructor.
+   * Constructor.
    * @param hours hours
    * @param minutes minutes
    */
   public DTDur(final long hours, final long minutes) {
     super(AtomType.DTD);
-    sec = BigDecimal.valueOf(hours).multiply(BD60).add(BigDecimal.valueOf(minutes)).multiply(BD60);
+    sec = BigDecimal.valueOf(hours).multiply(BD_60).add(BigDecimal.valueOf(minutes)).
+        multiply(BD_60);
   }
 
   /**
-   * Timezone constructor.
+   * Constructor.
    * @param sec seconds
    */
   public DTDur(final BigDecimal sec) {
@@ -48,6 +50,22 @@ public final class DTDur extends Dur {
 
   /**
    * Constructor.
+   * @param value value
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  public DTDur(final byte[] value, final InputInfo ii) throws QueryException {
+    super(AtomType.DTD);
+
+    final String val = Token.string(value).trim();
+    final Matcher mt = DTD.matcher(val);
+    if(!mt.matches() || Strings.endsWith(val, 'P') || Strings.endsWith(val, 'T'))
+      throw dateError(value, XDTD, ii);
+    dayTime(value, mt, 2, ii);
+  }
+
+  /**
+   * Constructor for adding two durations.
    * @param dur duration item
    * @param add duration to be added/subtracted
    * @param plus plus/minus flag
@@ -64,8 +82,8 @@ public final class DTDur extends Dur {
   }
 
   /**
-   * Constructor.
-   * @param dur duration item
+   * Constructor for multiplying a duration with a number.
+   * @param dur  duration item
    * @param factor factor
    * @param mult multiplication flag
    * @param ii input info
@@ -95,7 +113,7 @@ public final class DTDur extends Dur {
   }
 
   /**
-   * Constructor.
+   * Constructor for subtracting two date/time items.
    * @param date date item
    * @param sub date/time to be subtracted
    * @param ii input info
@@ -103,26 +121,10 @@ public final class DTDur extends Dur {
    */
   public DTDur(final ADate date, final ADate sub, final InputInfo ii) throws QueryException {
     super(AtomType.DTD);
-    sec = date.days().subtract(sub.days()).multiply(DAYSECONDS).add(
+    sec = date.days().subtract(sub.days()).multiply(BD_864000).add(
         date.seconds().subtract(sub.seconds()));
     final double d = sec.doubleValue();
     if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECRANGE_X.get(ii, d);
-  }
-
-  /**
-   * Constructor.
-   * @param value value
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  public DTDur(final byte[] value, final InputInfo ii) throws QueryException {
-    super(AtomType.DTD);
-
-    final String val = Token.string(value).trim();
-    final Matcher mt = DTD.matcher(val);
-    if(!mt.matches() || Strings.endsWith(val, 'P') || Strings.endsWith(val, 'T'))
-      throw dateError(value, XDTD, ii);
-    dayTime(value, mt, 2, ii);
   }
 
   /**
@@ -157,6 +159,6 @@ public final class DTDur extends Dur {
    * @return dateTime instance
    */
   public static DTDur get(final long ms) {
-    return new DTDur(BigDecimal.valueOf(ms).divide(BD1000, MathContext.DECIMAL64));
+    return new DTDur(BigDecimal.valueOf(ms).divide(BD_1000, MathContext.DECIMAL64));
   }
 }

@@ -16,6 +16,41 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class Dec extends ANum {
+  /** Maximum long value. */
+  public static final BigDecimal BD_MAXLONG = BigDecimal.valueOf(Long.MAX_VALUE);
+  /** Decimal representing a million. */
+  public static final BigDecimal BD_1000000 = BigDecimal.valueOf(1000000);
+  /** Seconds per day. */
+  public static final BigDecimal BD_864000 = BigDecimal.valueOf(86400);
+  /** BigDecimal: 146097. */
+  public static final BigDecimal BD_146097 = BigDecimal.valueOf(146097);
+  /** BigDecimal: 36525. */
+  public static final BigDecimal BD_36525 = BigDecimal.valueOf(36525);
+  /** BigDecimal: 36524. */
+  public static final BigDecimal BD_36524 = BigDecimal.valueOf(36524);
+  /** BigDecimal: 60. */
+  public static final BigDecimal BD_3600 = BigDecimal.valueOf(3600);
+  /** BigDecimal: 1461. */
+  public static final BigDecimal BD_1461 = BigDecimal.valueOf(1461);
+  /** BigDecimal: 1000. */
+  public static final BigDecimal BD_1000 = BigDecimal.valueOf(1000);
+  /** BigDecimal: 366. */
+  public static final BigDecimal BD_366 = BigDecimal.valueOf(366);
+  /** BigDecimal: 365. */
+  public static final BigDecimal BD_365 = BigDecimal.valueOf(365);
+  /** BigDecimal: 153. */
+  public static final BigDecimal BD_153 = BigDecimal.valueOf(153);
+  /** BigDecimal: 100. */
+  public static final BigDecimal BD_100 = BigDecimal.valueOf(100);
+  /** BigDecimal: 60. */
+  public static final BigDecimal BD_60 = BigDecimal.valueOf(60);
+  /** BigDecimal: 5. */
+  public static final BigDecimal BD_5 = BigDecimal.valueOf(5);
+  /** BigDecimal: 4. */
+  public static final BigDecimal BD_4 = BigDecimal.valueOf(4);
+  /** BigDecimal: 2. */
+  public static final BigDecimal BD_2 = BigDecimal.valueOf(2);
+
   /** Value 0. */
   public static final Dec ZERO = new Dec(BigDecimal.ZERO);
   /** Value 1. */

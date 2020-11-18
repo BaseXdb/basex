@@ -2,6 +2,7 @@ package org.basex.query.value.item;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.value.item.Dec.*;
 
 import java.math.*;
 import java.util.regex.*;
@@ -124,9 +125,9 @@ public class Dur extends ADateDur {
     final long m = match.group(pos + 5) != null ? toLong(match.group(pos + 6), true, ii) : 0;
     final BigDecimal s = match.group(pos + 7) != null ?
       toDecimal(match.group(pos + 8), true, ii) : BigDecimal.ZERO;
-    sec = s.add(BigDecimal.valueOf(d).multiply(DAYSECONDS)).
-        add(BigDecimal.valueOf(h).multiply(BD3600)).
-        add(BigDecimal.valueOf(m).multiply(BD60));
+    sec = s.add(BigDecimal.valueOf(d).multiply(BD_864000)).
+        add(BigDecimal.valueOf(h).multiply(BD_3600)).
+        add(BigDecimal.valueOf(m).multiply(BD_60));
     if(!match.group(1).isEmpty()) sec = sec.negate();
     final double v = sec.doubleValue();
     if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(ii, type, value);
@@ -144,7 +145,7 @@ public class Dur extends ADateDur {
 
   @Override
   public final long day() {
-    return sec.divideToIntegralValue(DAYSECONDS).longValue();
+    return sec.divideToIntegralValue(BD_864000).longValue();
   }
 
   @Override
@@ -159,7 +160,7 @@ public class Dur extends ADateDur {
 
   @Override
   public final BigDecimal sec() {
-    return sec.remainder(BD60);
+    return sec.remainder(BD_60);
   }
 
   /**
@@ -167,7 +168,7 @@ public class Dur extends ADateDur {
    * @return time
    */
   private long tim() {
-    return sec.remainder(DAYSECONDS).longValue();
+    return sec.remainder(BD_864000).longValue();
   }
 
   @Override
@@ -200,7 +201,7 @@ public class Dur extends ADateDur {
    * @param tb token builder
    */
   final void time(final TokenBuilder tb) {
-    if(sec.remainder(DAYSECONDS).signum() == 0) return;
+    if(sec.remainder(BD_864000).signum() == 0) return;
     tb.add('T');
     final long h = hour();
     if(h != 0) { tb.addLong(Math.abs(h)); tb.add('H'); }

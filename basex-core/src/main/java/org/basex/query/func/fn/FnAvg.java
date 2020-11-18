@@ -72,6 +72,6 @@ public class FnAvg extends FnSum {
     if(value.isEmpty()) return Empty.VALUE;
     final long min = value.itemAt(0).itr(info), max = value.itemAt(value.size() - 1).itr(info);
     final BigDecimal sum = BigDecimal.valueOf(min).add(BigDecimal.valueOf(max));
-    return Dec.get(sum.divide(BigDecimal.valueOf(2), MathContext.DECIMAL64));
+    return Dec.get(sum.divide(Dec.BD_2, MathContext.DECIMAL64));
   }
 }

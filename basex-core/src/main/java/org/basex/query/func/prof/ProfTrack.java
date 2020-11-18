@@ -28,9 +28,6 @@ public final class ProfTrack extends StandardFunc {
     public static final BooleanOption MEMORY = new BooleanOption("memory", false);
   }
 
-  /** Decimal representing a million. */
-  private static final BigDecimal MILLION = BigDecimal.valueOf(1000000);
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final TrackOptions opts = toOptions(1, new TrackOptions(), qc);
@@ -62,7 +59,8 @@ public final class ProfTrack extends StandardFunc {
     final MapBuilder mb = new MapBuilder();
     // execution time (called before garbage collection)
     if(perf != null) {
-      final BigDecimal ms = BigDecimal.valueOf(perf.ns()).divide(MILLION, MathContext.DECIMAL64);
+      final BigDecimal ms = BigDecimal.valueOf(perf.ns()).divide(Dec.BD_1000000,
+          MathContext.DECIMAL64);
       mb.put(TrackOptions.TIME.name(), Dec.get(ms));
     }
     // memory consumption

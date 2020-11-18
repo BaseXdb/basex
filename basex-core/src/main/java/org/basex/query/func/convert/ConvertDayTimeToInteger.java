@@ -20,8 +20,8 @@ public final class ConvertDayTimeToInteger extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final DTDur dur = (DTDur) checkType(exprs[0], qc, AtomType.DTD);
-    final BigDecimal ms = dur.sec.multiply(BigDecimal.valueOf(1000));
-    if(ms.compareTo(ADateDur.BDMAXLONG) > 0) throw INTRANGE_X.get(info, ms);
+    final BigDecimal ms = dur.sec.multiply(Dec.BD_1000);
+    if(ms.compareTo(Dec.BD_MAXLONG) > 0) throw INTRANGE_X.get(info, ms);
     return Int.get(ms.longValue());
   }
 }
