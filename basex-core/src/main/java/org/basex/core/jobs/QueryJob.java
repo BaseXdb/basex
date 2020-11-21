@@ -218,16 +218,15 @@ public final class QueryJob extends Job implements Runnable {
         popJob();
         qp = null;
         result.time += jc.performance.ns(false);
-
-        if(result.exception != null) {
-          log(LogType.ERROR, result.exception.getLocalizedMessage());
-        } else {
-          log(LogType.OK, null);
-        }
-
-        // invalidates the performance measurements
-        jc.performance = null;
       }
+
+      // write concluding log entry, invalidate performance measurements
+      if(result.exception != null) {
+        log(LogType.ERROR, result.exception.getLocalizedMessage());
+      } else {
+        log(LogType.OK, null);
+      }
+      jc.performance = null;
 
       if(remove) ctx.jobs.tasks.remove(jc.id());
       if(notify != null) notify.accept(result);
