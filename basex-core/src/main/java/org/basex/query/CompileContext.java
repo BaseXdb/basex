@@ -105,7 +105,7 @@ public final class CompileContext {
    * @param ext text text extensions
    */
   public void info(final String string, final Object... ext) {
-    qc.info.compInfo(string, ext);
+    if(qc.parent == null) qc.info.compInfo(string, ext);
   }
 
   /**
