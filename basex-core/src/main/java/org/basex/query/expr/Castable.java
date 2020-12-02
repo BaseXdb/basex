@@ -72,10 +72,7 @@ public final class Castable extends Single {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = expr.atomItem(qc, info);
-    final long size = item.size();
-    return Bln.get(seqType.occ.check(size) &&
-        (size == 0 || seqType.cast(item, false, qc, sc, info) != null));
+    return Bln.get(seqType.cast(expr.atomValue(qc, info), false, qc, sc, info) != null);
   }
 
   @Override

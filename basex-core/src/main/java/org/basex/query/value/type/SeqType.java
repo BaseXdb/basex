@@ -279,57 +279,51 @@ public final class SeqType {
   }
 
   /**
-   * Casts the given item to this sequence type.
-   * @param item item to cast
-   * @param error raise error (return {@code null} otherwise)
-   * @param qc query context
-   * @param sc static context
-   * @param ii input info
-   * @return cast value or {@code null}
-   * @throws QueryException query exception
-   */
-  public Value cast(final Item item, final boolean error, final QueryContext qc,
-      final StaticContext sc, final InputInfo ii) throws QueryException {
-
-    // kind test is ignored (simple casts have no kind test)
-    if(item.type.eq(type)) return item;
-    try {
-      if(!error && ii != null) ii.internal(true);
-      return type.cast(item, qc, sc, ii);
-    } catch(final QueryException ex) {
-      if(error) throw ex;
-      return null;
-    } finally {
-      if(!error && ii != null) ii.internal(false);
-    }
-  }
-
-  /**
    * Casts a sequence to this type.
    * @param value value to cast
+   * @param error raise error (return {@code null} otherwise)
    * @param qc query context
    * @param sc static context
    * @param ii input info
    * @return cast value
    * @throws QueryException query exception
    */
-  public Value cast(final Value value, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+  public Value cast(final Value value, final boolean error, final QueryContext qc,
+      final StaticContext sc, final InputInfo ii) throws QueryException {
 
     // check cardinality
     final long size = value.size();
-    if(!occ.check(size)) throw INVTYPE_X_X_X.get(ii, value.seqType(), this, value);
-
-    // handle simple types
-    if(size == 0) return Empty.VALUE;
-    if(size == 1) return cast((Item) value, true, qc, sc, ii);
-
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Item item : value) {
-      qc.checkStop();
-      vb.add(cast(item, true, qc, sc, ii));
+    if(!occ.check(size)) {
+      if(error) throw INVTYPE_X_X_X.get(ii, value.seqType(), this, value);
+      return null;
     }
-    return vb.value(type);
+    if(size == 0) return Empty.VALUE;
+
+    try {
+      // enable light-weight error handling
+      if(!error && ii != null) ii.internal(true);
+      // cast single items
+      if(size == 1) {
+        final Item item = (Item) value;
+        return item.type.eq(type) ? item : type.cast(item, qc, sc, ii);
+      }
+      // cast sequences
+      final ValueBuilder vb = new ValueBuilder(qc);
+      for(final Item item : value) {
+        if(item.type.eq(type)) {
+          vb.add(item);
+        } else {
+          qc.checkStop();
+          vb.add(type.cast(item, qc, sc, ii));
+        }
+      }
+      return vb.value(type);
+    } catch(final QueryException ex) {
+      if(error) throw ex;
+      return null;
+    } finally {
+      if(!error && ii != null) ii.internal(false);
+    }
   }
 
   /**

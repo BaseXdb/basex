@@ -524,7 +524,7 @@ public final class RewritingsTest extends QueryPlanTest {
     error("(if(<_>!</_> = 'a') then 'b') cast as xs:string", INVTYPE_X_X_X);
     error("((1 to 1000000000) ! (. || 'x')) cast as xs:string", INVTYPE_X_X_X);
     error("() cast as xs:string", INVTYPE_X_X_X);
-    error("(1 to 100000)[. < 3] cast as xs:integer", SEQFOUND_X);
+    error("(1 to 100000)[. < 3] cast as xs:integer", INVTYPE_X_X_X);
   }
 
   /** Type promotions. */

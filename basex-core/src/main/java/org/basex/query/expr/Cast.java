@@ -6,7 +6,6 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -74,10 +73,7 @@ public final class Cast extends Single {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item item = expr.atomItem(qc, info);
-    final long size = item.size();
-    if(!seqType.occ.check(size)) throw error(item);
-    return size == 0 ? item : seqType.cast(item, true, qc, sc, info);
+    return seqType.cast(expr.atomValue(qc, info), true, qc, sc, info);
   }
 
   /**

@@ -215,7 +215,7 @@ public final class ArrayTest extends SandboxTest {
     query("xs:integer([ 1 ])", 1);
 
     error("[] cast as xs:integer", INVTYPE_X_X_X);
-    error("[ 1, 2 ] cast as xs:integer", SEQFOUND_X);
+    error("[ 1, 2 ] cast as xs:integer", INVTYPE_X_X_X);
   }
 
   /** Functions. */
