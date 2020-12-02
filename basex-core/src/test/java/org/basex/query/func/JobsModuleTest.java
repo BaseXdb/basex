@@ -73,7 +73,7 @@ public final class JobsModuleTest extends SandboxTest {
   @Test public void evalError() {
     // errors
     final Function func = _JOBS_EVAL;
-    error(func.args("1", " ()", " map { 'start':'12345' }"), DATEFORMAT_X_X_X);
+    error(func.args("1", " ()", " map { 'start':'abc' }"), DATEFORMAT_X_X_X);
     error(func.args("1", " ()",
         " map { 'start':'2030-01-01T01:01:01','end':'2029-01-01T01:01:01' }"), JOBS_RANGE_X);
     error(func.args("1", " ()", " map { 'interval':'12345' }"), DATEFORMAT_X_X_X);
