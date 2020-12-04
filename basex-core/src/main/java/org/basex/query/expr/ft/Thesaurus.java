@@ -72,7 +72,7 @@ public final class Thesaurus {
     this.file = file;
     rel = res;
     this.min = min;
-    this.max = max;
+    this.max = Math.min(max, min + 100);
     this.ctx = ctx;
   }
 
@@ -156,7 +156,9 @@ public final class Thesaurus {
    */
   void find(final InputInfo ii, final TokenList list, final byte[] token) throws QueryException {
     if(nodes.isEmpty()) init(ii);
-    find(list, nodes.get(token), 1);
+
+    final ThesNode tn = nodes.get(token);
+    if(tn != null) find(list, tn, 1);
   }
 
   /**
@@ -166,14 +168,13 @@ public final class Thesaurus {
    * @param level current level
    */
   private void find(final TokenList list, final ThesNode node, final long level) {
-    if(level > max || node == null) return;
-
     for(int n = 0; n < node.size; ++n) {
       if(rel.length == 0 || eq(node.rs[n], rel)) {
-        final byte[] term = node.nodes[n].term;
+        final ThesNode tn = node.nodes[n];
+        final byte[] term = tn.term;
         if(!list.contains(term)) {
           list.add(term);
-          find(list, node.nodes[n], level + 1);
+          if(level < max) find(list, tn, level + 1);
         }
       }
     }
