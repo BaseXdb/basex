@@ -333,5 +333,8 @@ public final class UtilModuleTest extends QueryPlanTest {
         "<_/>\n<_/>\n<_/>\n<_/>", count(_UTIL_REPLICATE, 1));
     check("(1,1) ! " + func.args(" .", 2),
         "1\n1\n1\n1", empty(_UTIL_REPLICATE));
+
+    check("(1,1) ! " + func.args(" .", 2),
+        "1\n1\n1\n1", empty(_UTIL_REPLICATE));
   }
 }

@@ -133,126 +133,15 @@ public abstract class SimpleMap extends Arr {
     Expr ex = mergePaths(cc);
     if(ex != null) return ex;
 
-    // simplify static expressions
+    // merge operands
     final int el = exprs.length;
     int e = 0;
     boolean pushed = false;
     for(int n = 1; n < el; n++) {
-      final Expr expr = exprs[e], next = exprs[n];
-      ex = null;
-
-      if(next instanceof Filter) {
-        final Filter filter = (Filter) next;
-        if(filter.root instanceof ContextValue && !filter.mayBePositional()) {
-          // merge filter with context value as root
-          // A ! .[B]  ->  A[B]
-          ex = Filter.get(cc, info, expr, ((Filter) next).exprs);
-        }
-      }
-
-      if(ex == null && !expr.has(Flag.NDT) && !next.has(Flag.POS)) {
-        // check if deterministic expressions with known result size can be removed
-        // expression size is never 0 (empty expressions have no followers, see above)
-        final long es = expr.size();
-        if(es == 1) {
-          final InlineContext ic = new InlineContext(null, expr, cc);
-          if(ic.inlineable(next)) {
-            // inline values
-            //   'a' ! (. = 'a')  ->  'a'  = 'a'
-            //   map {} ! ?*      ->  map {}?*
-            //   123 ! number()   ->  number(123)
-            // inline context reference
-            //   . ! number() = 2  ->  number() = 2
-            // inline variable references
-            //   $a ! (. + .)  ->  $a + $a
-            // inline any other expression
-            //   ($a + $b) ! (. * 2)  ->  ($a + $b) * 2
-            //   ($n + 2) ! abs(.) ->  abs(. + 2)
-            // skip nested node constructors
-            //   <X/> ! <X xmlns='x'>{ . }</X>
-            try {
-              ex = ic.inline(next);
-            } catch(final QueryException qe) {
-              // replace original expression with error
-              ex = cc.error(qe, next);
-            }
-          }
-        } else if(!next.has(Flag.CTX)) {
-          // merge expressions if next expression does not rely on the context
-          Expr count = null;
-          if(es != -1) {
-            count = Int.get(es);
-          } else if(expr instanceof Range && expr.arg(0) == Int.ONE &&
-              expr.arg(1).seqType().eq(SeqType.ITR_O)) {
-            count = expr.arg(1);
-          }
-          if(count != null) {
-            // (1 to 2) ! <x/>  ->  util:replicate(<x/>, 2, true())
-            // (1 to $c) ! 'A'  ->  util:replicate('A', $c, false())
-            ex = cc.replicate(next, count, info);
-          }
-        } else if(next instanceof StandardFunc && !next.has(Flag.NDT)) {
-          // next operand relies on context and is a deterministic function call
-          final Expr[] args = next.args();
-          if(_UTIL_REPLICATE.is(next) && ((UtilReplicate) next).single() &&
-              args[0] instanceof ContextValue && !args[1].has(Flag.CTX)) {
-            if(_UTIL_REPLICATE.is(expr) && ((UtilReplicate) expr).single()) {
-              // util:replicate(E, C) ! util:replicate(., D)  ->  util:replicate(E, C * D)
-              final Expr cnt = new Arith(info, expr.arg(1), args[1], Calc.MULT).optimize(cc);
-              ex = cc.function(_UTIL_REPLICATE, info, expr.arg(0), cnt);
-            } else if(expr instanceof SingletonSeq && ((SingletonSeq) expr).value instanceof Item) {
-              // SINGLETONSEQ ! util:replicate(., C)  ->  util:replicate(SINGLETONSEQ, C)
-              ex = cc.function(_UTIL_REPLICATE, info, expr, args[1]);
-            }
-          } else if(_UTIL_ITEM.is(next) && !args[0].has(Flag.CTX) &&
-              args[1] instanceof ContextValue) {
-            if(expr instanceof RangeSeq) {
-              final RangeSeq range = (RangeSeq) expr;
-              final Item start = range.itemAt(0), end = range.itemAt(range.size() - 1);
-              if(range.asc) {
-                // (3 to 4) ! util:item(X, .)  ->  util:range(X, 3, 4)
-                ex = cc.function(_UTIL_RANGE, info, args[0], start, end);
-              } else {
-                // reverse(3 to 4) ! util:item(X, .)  ->  reverse(util:range(X, 3, 4))
-                ex = cc.function(_UTIL_RANGE, info, args[0], end, start);
-                ex = cc.function(REVERSE, info, ex);
-              }
-            } else if(expr instanceof Range) {
-              // (1 to $i) ! util:item(X, .)  ->  util:range(X, 1, $i)
-              ex = cc.function(_UTIL_RANGE, info, args[0], expr.arg(0), expr.arg(1));
-            }
-          } else if(DATA.is(next) && (((FnData) next).contextAccess() ||
-              args[0] instanceof ContextValue)) {
-            // ITEMS ! data(.)  ->  data(ITEMS)
-            ex = cc.function(DATA, info, expr);
-          }
-        }
-      }
-
-      if(ex == null && expr.seqType().zeroOrOne()) {
-        boolean inline = false;
-        if(next instanceof Cast) {
-          // $node/@id ! xs:integer(.)  ->  xs:integer($node/@id)
-          final Cast cast = (Cast) next;
-          inline = cast.expr instanceof ContextValue && cast.seqType.occ == Occ.ZERO_ONE;
-        } else if(next instanceof ContextFn) {
-          // $node/.. ! base-uri(.)  ->  base-uri($node/..)
-          inline = ((ContextFn) next).inlineable();
-        }
-        if(inline) {
-          try {
-            final InlineContext ic = new InlineContext(null, expr, cc);
-            ex = next.inline(ic);
-          } catch(final QueryException qe) {
-            // replace original expression with error
-            ex = cc.error(qe, next);
-          }
-        }
-      }
-
-      if(ex != null) {
-        cc.info(OPTMERGE_X, ex);
-        exprs[e] = ex;
+      final Expr next = exprs[n], merged = merge(exprs[e], next, cc);
+      if(merged != null) {
+        cc.info(OPTMERGE_X, merged);
+        exprs[e] = merged;
       } else if(!(next instanceof ContextValue)) {
         // context item expression can be ignored
         exprs[++e] = next;
@@ -284,6 +173,137 @@ public abstract class SimpleMap extends Arr {
       dual ? new DualMap(info, exprs) :
       new IterMap(info, exprs)
     );
+  }
+
+  /**
+   * Tries to merge two adjacent map operands.
+   * @param expr first operand
+   * @param next second operand
+   * @param cc compilation context
+   * @return new expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr merge(final Expr expr, final Expr next, final CompileContext cc)
+      throws QueryException {
+
+    // merge filter with context value as root
+    // A ! .[B]  ->  A[B]
+    if(next instanceof Filter) {
+      final Filter filter = (Filter) next;
+      if(filter.root instanceof ContextValue && !filter.mayBePositional())
+        return Filter.get(cc, info, expr, ((Filter) next).exprs);
+    }
+
+    if(!expr.has(Flag.NDT) && !next.has(Flag.POS)) {
+      // merge expressions if next expression does not rely on the context
+      if(!next.has(Flag.CTX)) {
+        Expr count = null;
+        if(expr.size() != -1) {
+          count = Int.get(expr.size());
+        } else if(expr instanceof Range && expr.arg(0) == Int.ONE &&
+            expr.arg(1).seqType().eq(SeqType.ITR_O)) {
+          count = expr.arg(1);
+        }
+        // (1 to 2) ! <x/>  ->  util:replicate(<x/>, 2, true())
+        // (1 to $c) ! 'A'  ->  util:replicate('A', $c, false())
+        if(count != null) return cc.replicate(next, count, info);
+      }
+
+      if(next instanceof StandardFunc && !next.has(Flag.NDT)) {
+        // next operand relies on context and is a deterministic function call
+        final Expr[] args = next.args();
+        if(_UTIL_REPLICATE.is(next) && ((UtilReplicate) next).single() &&
+            args[0] instanceof ContextValue && !args[1].has(Flag.CTX)) {
+          if(_UTIL_REPLICATE.is(expr) && ((UtilReplicate) expr).single()) {
+            // util:replicate(E, C) ! util:replicate(., D)  ->  util:replicate(E, C * D)
+            final Expr cnt = new Arith(info, expr.arg(1), args[1], Calc.MULT).optimize(cc);
+            return cc.function(_UTIL_REPLICATE, info, expr.arg(0), cnt);
+          }
+          if(expr instanceof SingletonSeq && ((SingletonSeq) expr).value instanceof Item) {
+            // SINGLETONSEQ ! util:replicate(., C)  ->  util:replicate(SINGLETONSEQ, C)
+            return cc.function(_UTIL_REPLICATE, info, expr, args[1]);
+          }
+        } else if(_UTIL_ITEM.is(next) && !args[0].has(Flag.CTX) &&
+            args[1] instanceof ContextValue) {
+          if(expr instanceof RangeSeq) {
+            final RangeSeq range = (RangeSeq) expr;
+            final Item start = range.itemAt(0), end = range.itemAt(range.size() - 1);
+            if(range.asc) {
+              // (3 to 4) ! util:item(X, .)  ->  util:range(X, 3, 4)
+              return cc.function(_UTIL_RANGE, info, args[0], start, end);
+            }
+            // reverse(3 to 4) ! util:item(X, .)  ->  reverse(util:range(X, 3, 4))
+            final Expr ex = cc.function(_UTIL_RANGE, info, args[0], end, start);
+            return cc.function(REVERSE, info, ex);
+          }
+          if(expr instanceof Range) {
+            // (1 to $i) ! util:item(X, .)  ->  util:range(X, 1, $i)
+            return cc.function(_UTIL_RANGE, info, args[0], expr.arg(0), expr.arg(1));
+          }
+        } else if(DATA.is(next) && (((FnData) next).contextAccess() ||
+            args[0] instanceof ContextValue)) {
+          // ITEMS ! data(.)  ->  data(ITEMS)
+          return cc.function(DATA, info, expr);
+        }
+      }
+
+      // try to merge deterministic expressions
+      Expr input = expr;
+      if(_UTIL_REPLICATE.is(expr) && ((UtilReplicate) expr).single()) {
+        input = expr.arg(0);
+      } else if(expr instanceof SingletonSeq) {
+        input = ((SingletonSeq) expr).value;
+      }
+      if(input.size() == 1) {
+        final InlineContext ic = new InlineContext(null, input, cc);
+        if(ic.inlineable(next)) {
+          // inline values
+          //   'a' ! (. = 'a')  ->  'a'  = 'a'
+          //   map {} ! ?*      ->  map {}?*
+          //   123 ! number()   ->  number(123)
+          // inline context reference
+          //   . ! number() = 2  ->  number() = 2
+          // inline variable references
+          //   $a ! (. + .)  ->  $a + $a
+          // inline any other expression
+          //   ($a + $b) ! (. * 2)  ->  ($a + $b) * 2
+          //   ($n + 2) ! abs(.) ->  abs(. + 2)
+          // skip nested node constructors
+          //   <X/> ! <X xmlns='x'>{ . }</X>
+          Expr ex;
+          try {
+            ex = ic.inline(next);
+          } catch(final QueryException qe) {
+            // replace original expression with error
+            ex = cc.error(qe, next);
+          }
+          // util:replicate(1, 2) ! (. = 1)  ->  util:replicate(1 = 1, 2)
+          return expr == input ? ex : cc.replicate(ex, Int.get(expr.size()), info);
+        }
+      }
+    }
+
+    if(expr.seqType().zeroOrOne()) {
+      boolean inline = false;
+      if(next instanceof Cast) {
+        // $node/@id ! xs:integer(.)  ->  xs:integer($node/@id)
+        final Cast cast = (Cast) next;
+        inline = cast.expr instanceof ContextValue && cast.seqType.occ == Occ.ZERO_ONE;
+      } else if(next instanceof ContextFn) {
+        // $node/.. ! base-uri(.)  ->  base-uri($node/..)
+        inline = ((ContextFn) next).inlineable();
+      }
+      if(inline) {
+        try {
+          final InlineContext ic = new InlineContext(null, expr, cc);
+          return ic.inline(next);
+        } catch(final QueryException qe) {
+          // replace original expression with error
+          return cc.error(qe, next);
+        }
+      }
+    }
+    return null;
   }
 
   /**

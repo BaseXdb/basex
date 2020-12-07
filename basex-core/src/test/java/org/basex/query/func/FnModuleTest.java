@@ -30,7 +30,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check("for $i in (1, 2.0) return " + func.args(" $i"), "1\n2", type(func, "xs:decimal"));
     check(func.args(" <a>1</a>"), 1, type(func, "xs:double"));
 
-    check("for $i in ([], []) return " + func.args(" $i"), "", type(func, "xs:numeric?"));
+    check("for $i in ([], [1]) return " + func.args(" $i"), 1, type(func, "xs:numeric?"));
     check("for $i in (1, <a>2</a>) return " + func.args(" $i"), "1\n2", type(func, "xs:numeric?"));
 
     // pre-evaluate empty sequence

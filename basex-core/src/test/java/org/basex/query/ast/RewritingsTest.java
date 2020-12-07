@@ -2035,4 +2035,13 @@ public final class RewritingsTest extends QueryPlanTest {
     check("let $a := <a/> for $b in (false(), true()) return "
         + "if($b) then $a != '' else $a = ''", "true\nfalse", empty(If.class));
   }
+
+  /** Inline arguments of replicated items and singleton sequences. */
+  @Test public void gh1963() {
+    check("util:replicate('x', 2) ! (. = 'x')", "true\ntrue", root(SingletonSeq.class));
+    check("util:replicate(<a/>, 2) ! (. = 'x')", "false\nfalse", root(_UTIL_REPLICATE));
+
+    check("(10, 10) ! .[. = 5]", "", root(IterFilter.class));
+    check("util:replicate(<a/>, 2) ! .[data()]", "", root(IterFilter.class));
+  }
 }
