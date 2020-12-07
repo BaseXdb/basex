@@ -1054,7 +1054,8 @@ public class QueryParser extends InputParser {
 
     final Expr rtrn = check(single(), NORETURN);
     localVars.closeScope(s);
-    return new GFLWOR(clauses.get(0).info, clauses, rtrn);
+
+    return new GFLWOR(clauses.peek().info, clauses, rtrn);
   }
 
   /**
@@ -1263,18 +1264,22 @@ public class QueryParser extends InputParser {
     if(!some && !wsConsumeWs(EVERY, DOLLAR, NOSOME)) return null;
 
     final int s = localVars.openScope();
-    For[] fl = { };
+    final LinkedList<Clause> clauses = new LinkedList<>();
     do {
       final Var var = newVar();
       wsCheck(IN);
       final Expr ex = check(single(), NOSOME);
-      fl = Array.add(fl, new For(localVars.add(var), ex));
+      clauses.add(new For(localVars.add(var), ex));
     } while(wsConsumeWs(COMMA));
 
     wsCheck(SATISFIES);
-    final Expr ex = check(single(), NOSOME);
+    final Expr rtrn = Function.BOOLEAN.get(sc, info(), check(single(), NOSOME));
     localVars.closeScope(s);
-    return new Quantifier(info(), fl, ex, !some, sc);
+
+    final InputInfo info = clauses.peek().info;
+    final GFLWOR flwor = new GFLWOR(info, clauses, rtrn);
+    final CmpG cmp = new CmpG(flwor, Bln.get(some), OpG.EQ, null, sc, info);
+    return some ? cmp : Function.NOT.get(sc, info, cmp);
   }
 
   /**
