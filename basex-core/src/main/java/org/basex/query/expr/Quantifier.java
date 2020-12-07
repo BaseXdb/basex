@@ -58,9 +58,10 @@ public final class Quantifier extends Single {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // return pre-evaluated result
-    if(expr instanceof Value) return cc.preEval(this);
+    final long es = expr.size();
+    if(expr instanceof Value && es <= CompileContext.MAX_PREEVAL) return cc.preEval(this);
     // non-deterministic expression: rewrite to list (ensure evaluation)
-    if(expr.size() == 0) {
+    if(es == 0) {
       return cc.replaceWith(this, List.get(cc, info, expr, Bln.get(every)));
     }
     return this;
