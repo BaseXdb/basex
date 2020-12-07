@@ -70,10 +70,10 @@ public final class UtilReplicate extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr = exprs[0], count = exprs[1];
-    final boolean single = single();
+    final boolean single = singleEval();
 
     // merge replicate functions
-    if(_UTIL_REPLICATE.is(expr) && single == ((UtilReplicate) expr).single()) {
+    if(_UTIL_REPLICATE.is(expr) && single == ((UtilReplicate) expr).singleEval()) {
       final ExprList args = new ExprList(2).add(expr.arg(0));
       args.add(new Arith(info, count, expr.arg(1), Calc.MULT).optimize(cc));
       if(!single) args.add(Bln.TRUE);
@@ -108,7 +108,7 @@ public final class UtilReplicate extends StandardFunc {
       // ensure that input argument will be evaluated exactly once
       // util:replicate($node, 2)  ->  $node
       final long count = exprs[1] instanceof Int ? ((Int) exprs[1]).itr() : -1;
-      final boolean single = single();
+      final boolean single = singleEval();
       if(count > 0 && (single || !expr.has(Flag.NDT))) {
         return cc.replaceWith(this, expr);
       }
@@ -122,7 +122,7 @@ public final class UtilReplicate extends StandardFunc {
    * Indicates if the input argument will be evaluated at most once.
    * @return result of check
    */
-  public boolean single() {
+  public boolean singleEval() {
     return exprs.length < 3 || exprs[2] == Bln.FALSE;
   }
 
@@ -132,6 +132,6 @@ public final class UtilReplicate extends StandardFunc {
    */
   public boolean once() {
     // static integer will always be greater than 1
-    return single() && exprs[1] instanceof Int;
+    return singleEval() && exprs[1] instanceof Int;
   }
 }

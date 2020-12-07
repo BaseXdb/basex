@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 public final class SingletonSeq extends Seq {
   /** Singleton value. */
-  public final Value value;
+  private final Value value;
 
   /**
    * Constructor.
@@ -96,6 +96,14 @@ public final class SingletonSeq extends Seq {
   @Override
   public void plan(final QueryString qs) {
     qs.function(_UTIL_REPLICATE, value, size / value.size());
+  }
+
+  /**
+   * Indicates if the sequence is based on a single item.
+   * @return result of check
+   */
+  public boolean singleItem() {
+    return value instanceof Item;
   }
 
   // STATIC METHODS ===============================================================================
