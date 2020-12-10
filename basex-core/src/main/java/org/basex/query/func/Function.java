@@ -1342,6 +1342,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UTIL_INIT(UtilInit::new, "init(items)", arg(ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
+  _UTIL_INTERSPERSE(UtilIntersperse::new, "intersperse(items[,separator])",
+      arg(ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
+  /** XQuery function. */
   _UTIL_ITEM(UtilItem::new, "item(items,position)", arg(ITEM_ZM, DBL_O), ITEM_ZO, UTIL_URI),
   /** XQuery function. */
   _UTIL_LAST(UtilLast::new, "last(items)", arg(ITEM_ZM), ITEM_ZO, UTIL_URI),

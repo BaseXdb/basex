@@ -131,6 +131,26 @@ public final class UtilModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void intersperse() {
+    final Function func = _UTIL_INTERSPERSE;
+
+    query(func.args(" ()", " ()"), "");
+    query(func.args(" ()", 1), "");
+    query(func.args(1, " ()"), 1);
+    query(func.args(" (1, 2)", " ()"), "1\n2");
+
+    query(func.args(1, "a"), 1);
+    query(func.args(1, " ('a', 'b')"), 1);
+    query(func.args(" (1, 2)", "a"), "1\na\n2");
+    query(func.args(" (1, 2)", " ('a', 'b')"), "1\na\nb\n2");
+
+    check(func.args(1, "a") + " => count()", 1, root(Int.class));
+    check(func.args(" 1[. = <_>1</_>]", "a"), 1, root(If.class));
+    check(func.args(" (1, 2)[. = <_>3</_>]", " 'a'"), "", root(func));
+    check(func.args(" (1, 2)", " 'a'[. = <_/>]"), "1\n2", root(func));
+  }
+
+  /** Test method. */
   @Test public void item() {
     final Function func = _UTIL_ITEM;
 
