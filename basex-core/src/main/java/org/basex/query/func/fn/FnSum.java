@@ -38,21 +38,20 @@ public class FnSum extends StandardFunc {
       final Item item = iter.next();
       if(item != null) return sum(iter, item, false, qc);
     }
-
     // return default item
     return exprs.length == 2 ? exprs[1].atomItem(qc, info) : Int.ZERO;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0], expr2 = exprs.length == 2 ? exprs[1] : null;
+    final Expr expr1 = exprs[0];
     if(expr1 instanceof RangeSeq) return range((Value) expr1, false);
     if(expr1 instanceof SingletonSeq) {
       final Item item = singleton((SingletonSeq) expr1, false);
       if(item != null) return item;
     }
 
-    // empty sequence: replace with default item
+    final Expr expr2 = exprs.length == 2 ? exprs[1] : null;
     final SeqType st1 = expr1.seqType(), st2 = expr2 != null ? expr2.seqType() : null;
     if(st1.zero()) {
       // sequence is empty: check if it also deterministic

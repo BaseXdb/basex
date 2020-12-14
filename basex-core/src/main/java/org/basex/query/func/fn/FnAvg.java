@@ -19,8 +19,10 @@ public class FnAvg extends FnSum {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Expr expr = exprs[0];
-    if(expr instanceof RangeSeq || expr instanceof Range) return range(expr.value(qc), true);
-
+    if(expr instanceof RangeSeq || expr instanceof Range) {
+      final Item item = range(expr.value(qc), true);
+      return item != null ? item : Empty.VALUE;
+    }
     if(expr instanceof SingletonSeq) {
       final Item item = singleton((SingletonSeq) expr, true);
       if(item != null) return item;
