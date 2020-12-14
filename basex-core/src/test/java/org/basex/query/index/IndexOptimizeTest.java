@@ -109,6 +109,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     createDoc();
     execute(new Open(NAME));
     indexCheck("data(//*[tokenize(@idref) = 'id1'])", 1);
+    indexCheck("data(//*[tokenize(@idref, '\\s+') = 'id1'])", 1);
     indexCheck("data(//@*[tokenize(.) = 'id1'])", "id1 id2");
     indexCheck("for $s in ('id2', 'id3') return data(//*[tokenize(@idref) = $s])", 1);
     indexCheck("for $s in ('id2', 'id3') return data(//@*[tokenize(.) = $s])", "id1 id2");

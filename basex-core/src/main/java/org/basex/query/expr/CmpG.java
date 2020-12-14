@@ -374,9 +374,13 @@ public class CmpG extends Cmp {
     if(op != OpG.EQ || coll != null) return false;
 
     Expr expr1 = exprs[0];
-    final boolean tokenize = Function.TOKENIZE.is(expr1);
-    if(tokenize) expr1 = ((FnTokenize) expr1).input();
-    return ii.create(exprs[1], ii.type(expr1, tokenize ? IndexType.TOKEN : null), false, info);
+    IndexType type = null;
+    if(Function.TOKENIZE.is(expr1)) {
+      if(!(expr1.arg(0).seqType().zeroOrOne() && ((FnTokenize) expr1).whitespaces())) return false;
+      expr1 = expr1.arg(0);
+      type = IndexType.TOKEN;
+    }
+    return ii.create(exprs[1], ii.type(expr1, type), false, info);
   }
 
   @Override

@@ -5,9 +5,10 @@ import static org.basex.util.Token.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -17,10 +18,13 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class FnTokenize extends RegEx {
+  /** Placeholder for default search. */
+  private static final byte[] DEFAULT = Token.token("\\s+");
+
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final byte[] value = toZeroToken(exprs[0], qc);
-    if(exprs.length < 2) return StrSeq.get(split(normalize(value), ' '));
+    if(whitespaces()) return StrSeq.get(split(normalize(value), ' '));
 
     final Pattern pattern = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc, true);
 
@@ -39,11 +43,12 @@ public final class FnTokenize extends RegEx {
   }
 
   /**
-   * Returns the input argument if no others are specified, and if it returns at most one item.
-   * @return first argument
+   * Indicates if a default whitespace tokenization is to be performed.
+   * @return result of check
    */
-  public Expr input() {
-    // X must yield single result (otherwise, it may result in an error)
-    return exprs.length == 1 && exprs[0].seqType().zeroOrOne() ? exprs[0] : null;
+  public boolean whitespaces() {
+    final int el = exprs.length;
+    return el == 1 || el == 2 && exprs[1] instanceof Str &&
+        Token.eq(((Str) exprs[1]).string(), DEFAULT);
   }
 }
