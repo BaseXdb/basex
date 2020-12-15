@@ -52,7 +52,7 @@ public final class FuncOptions {
    * @param root name of root node (can be {@code null})
    * @param info input info
    */
-  private FuncOptions(final QNm root, final InputInfo info) {
+  public FuncOptions(final QNm root, final InputInfo info) {
     test = root == null ? null : new NameTest(root);
     this.root = root;
     this.info = info;
