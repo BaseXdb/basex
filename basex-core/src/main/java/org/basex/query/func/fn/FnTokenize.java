@@ -1,10 +1,12 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 
 import java.util.regex.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -20,11 +22,13 @@ import org.basex.util.list.*;
 public final class FnTokenize extends RegEx {
   /** Placeholder for default search. */
   private static final byte[] DEFAULT = Token.token("\\s+");
+  /** Single space. */
+  private static final byte[] SPACE = Token.token(" ");
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final byte[] value = toZeroToken(exprs[0], qc);
-    if(whitespaces()) return StrSeq.get(split(normalize(value), ' '));
+    if(exprs.length < 2) return StrSeq.get(split(normalize(value), ' '));
 
     final Pattern pattern = pattern(exprs[1], exprs.length == 3 ? exprs[2] : null, qc, true);
 
@@ -40,6 +44,19 @@ public final class FnTokenize extends RegEx {
       tl.add(string.substring(start));
     }
     return StrSeq.get(tl);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr expr = exprs[0], ptrn = exprs.length == 2 ? exprs[1] : null;
+
+    // tokenize(normalize-space(A), ' ')  ->  tokenize(A)
+    if(NORMALIZE_SPACE.is(expr) && ptrn instanceof Str && eq(((Str) ptrn).string(), SPACE)) {
+      final Expr arg = expr.args().length == 1 ? expr.arg(0) : new ContextValue(info).optimize(cc);
+      return cc.function(TOKENIZE, info, arg);
+    }
+
+    return this;
   }
 
   /**
