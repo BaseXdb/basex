@@ -342,7 +342,7 @@ public abstract class Preds extends Arr {
 
   @Override
   public boolean inlineable(final InlineContext ic) {
-    if(ic.expr instanceof ContextValue) {
+    if(ic.expr instanceof ContextValue && ic.var != null) {
       for(final Expr expr : exprs) {
         if(expr.uses(ic.var)) return false;
       }

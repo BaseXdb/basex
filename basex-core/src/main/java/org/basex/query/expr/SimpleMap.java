@@ -436,7 +436,7 @@ public abstract class SimpleMap extends Arr {
 
   @Override
   public final boolean inlineable(final InlineContext ic) {
-    if(ic.expr instanceof ContextValue) {
+    if(ic.expr instanceof ContextValue && ic.var != null) {
       final int el = exprs.length;
       for(int e = 1; e < el; e++) {
         if(exprs[e].uses(ic.var)) return false;

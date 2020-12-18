@@ -2044,4 +2044,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(10, 10) ! .[. = 5]", "", root(IterFilter.class));
     check("util:replicate(<a/>, 2) ! .[data()]", "", root(IterFilter.class));
   }
+
+  /** Inlining context item expression. */
+  @Test public void gh1964() {
+    query("let $a := <a/> return <b/>[. ! ./$a]", "<b/>");
+    query("let $a := <a/> return <b/>[. ! data()[. = $a]]", "");
+  }
 }
