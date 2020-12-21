@@ -2050,4 +2050,11 @@ public final class RewritingsTest extends QueryPlanTest {
     query("let $a := <a/> return <b/>[. ! ./$a]", "<b/>");
     query("let $a := <a/> return <b/>[. ! data()[. = $a]]", "");
   }
+
+  /** Faster fn:count operations. */
+  @Test public void gh1965() {
+    check("(1 to 2)[. = 1] => sort() => count()", 1, empty(SORT));
+    check("(1 to 2)[. = 1] => reverse() => count()", 1, empty(REVERSE));
+    check("(for $i in (1 to 2)[. = 1] order by $i return $i ) => count()", 1, empty(OrderBy.class));
+  }
 }

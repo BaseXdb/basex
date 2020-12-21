@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -37,7 +38,7 @@ public final class FnCount extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    Expr expr = exprs[0];
+    final Expr expr = exprs[0];
 
     // rewrite count(map:keys(...)) to map:size(...)
     if(_MAP_KEYS.is(expr))
@@ -46,8 +47,13 @@ public final class FnCount extends StandardFunc {
     if(STRING_TO_CODEPOINTS.is(expr) || _UTIL_CHARS.is(expr))
       return cc.function(STRING_LENGTH, info, expr.args());
     // rewrite count(reverse(...)) to count(...)
-    if(REVERSE.is(expr))
-      expr = expr.arg(0);
+    if(REVERSE.is(expr) || SORT.is(expr))
+      return cc.function(COUNT, info, expr.arg(0));
+    // remove order by clauses from FLWOR expression
+    if(expr instanceof GFLWOR) {
+      final Expr flwor = ((GFLWOR) expr).removeOrderBy(cc);
+      if(flwor != null) return cc.function(COUNT, info, flwor);
+    }
 
     // return statically known size (ignore non-deterministic expressions, e.g. count(error()))
     if(!expr.has(Flag.NDT)) {

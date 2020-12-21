@@ -940,6 +940,21 @@ public final class GFLWOR extends ParseExpr {
     throw qe;
   }
 
+  /**
+   * Removes order by clauses.
+   * @param cc compilation context
+   * @return rewritten expression or {@code null}
+   * @throws QueryException query exception
+   */
+  public Expr removeOrderBy(final CompileContext cc) throws QueryException {
+    final int cs = clauses.size();
+    final ListIterator<Clause> iter = clauses.listIterator();
+    while(iter.hasNext()) {
+      if(iter.next() instanceof OrderBy) iter.remove();
+    }
+    return cs != clauses.size() ? optimize(cc) : null;
+  }
+
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final LinkedList<Clause> cls = new LinkedList<>();
