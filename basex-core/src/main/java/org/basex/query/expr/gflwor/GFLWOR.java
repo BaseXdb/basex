@@ -106,7 +106,7 @@ public final class GFLWOR extends ParseExpr {
     // apply all optimizations in a row until nothing changes anymore
     while(flattenReturn(cc) | flattenFor(cc) | unnestFLWR(cc) | forToLet(cc) | inlineLets(cc) |
         slideLetsOut(cc) | unusedVars(cc) | cleanDeadVars() | optimizeWhere(cc) | optimizePos(cc) |
-        unnestLets(cc) | ifToWhere(cc) | mergeReturn(cc));
+        unnestLets(cc) | ifToWhere(cc) | mergeReturn(cc) | optimizeOrderBy(cc));
 
     mergeWheres();
 
@@ -640,6 +640,29 @@ public final class GFLWOR extends ParseExpr {
     clauses.removeLast();
     rtrn = expr;
     return true;
+  }
+
+  /**
+   * Simplify order by clauses.
+   * @param cc compilation context
+   * @return change flag
+   * @throws QueryException query exception
+   */
+  private boolean optimizeOrderBy(final CompileContext cc) throws QueryException {
+    final ListIterator<Clause> iter = clauses.listIterator();
+    For fr = null;
+    while(fr == null && iter.hasNext()) {
+      final Clause clause = iter.next();
+      if(clause instanceof For) fr = (For) clause;
+    }
+    if(fr != null && fr.vars.length == 1 && iter.hasNext()) {
+      final Clause clause = iter.next();
+      if(clause instanceof OrderBy && ((OrderBy) clause).merge(fr, cc)) {
+        iter.remove();
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

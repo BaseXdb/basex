@@ -2,6 +2,7 @@ package org.basex.query.expr.gflwor;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
 
 import java.util.*;
 import java.util.List;
@@ -25,9 +26,9 @@ import org.basex.util.hash.*;
  */
 public final class OrderBy extends Clause {
   /** References to the variables to be sorted. */
-  private VarRef[] refs;
+  VarRef[] refs;
   /** Sort keys. */
-  private final OrderKey[] keys;
+  final OrderKey[] keys;
 
   /**
    * Constructor.
@@ -120,6 +121,30 @@ public final class OrderBy extends Clause {
         }
       }
     };
+  }
+
+  /**
+   * Merges the order by clause with the supplied for clause.
+   * @param fr for clause
+   * @param cc compilation context
+   * @return success flag
+   * @throws QueryException query exception
+   */
+  boolean merge(final For fr, final CompileContext cc) throws QueryException {
+    if(keys.length == 1 && keys[0].coll == null && keys[0].least) {
+      final Expr expr = keys[0].expr;
+      // do not rewrite array keys (as they may contain sequences)
+      if(expr.seqType().mayBeArray()) return false;
+      // for $i in 1 to 2 order by 1 return $i  ->  for $i in 1 to 2 return $i
+      if(expr instanceof Item) return true;
+      // for $i in 1 to 2 order by $i return $i  ->  for $i in sort(1 to 2) return $i
+      if(fr != null && expr instanceof VarRef && ((VarRef) expr).var.is(fr.var)) {
+        fr.expr = cc.function(SORT, info, fr.expr);
+        if(keys[0].desc) fr.expr = cc.function(REVERSE, info, fr.expr);
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

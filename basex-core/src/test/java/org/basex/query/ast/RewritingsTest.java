@@ -2057,4 +2057,34 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(1 to 2)[. = 1] => reverse() => count()", 1, empty(REVERSE));
     check("(for $i in (1 to 2)[. = 1] order by $i return $i ) => count()", 1, empty(OrderBy.class));
   }
+
+  /** Rewrite order by to fn:sort. */
+  @Test public void gh1966() {
+    check("for $i in 1 to 2 order by 1 return $i", "1\n2",
+        empty(OrderBy.class), root(RangeSeq.class));
+    check("for $i in 1 to 2 order by 1 descending return $i", "1\n2",
+        empty(OrderBy.class), root(RangeSeq.class));
+
+    check("for $i in 1 to 2 order by $i return $i", "1\n2",
+        empty(OrderBy.class), root(RangeSeq.class));
+    check("for $i in 1 to 2 order by $i descending return $i", "2\n1",
+        empty(OrderBy.class), root(RangeSeq.class));
+    check("for $i in 1 to 2 order by $i return $i + 1", "2\n3",
+        empty(OrderBy.class), root(DualMap.class));
+    check("let $_ := <_>1</_> for $i in 1 to 2 order by $i return $i + $_", "2\n3",
+        empty(OrderBy.class), root(GFLWOR.class));
+
+    check("for $i in 1 to 2 order by $i empty greatest return $i", "1\n2",
+        exists(OrderBy.class));
+    check("for $i in 1 to 2 order by $i collation '?lang=de' return $i", "1\n2",
+        exists(OrderBy.class));
+    check("for $i in ([ 1 ], [ 2 ]) order by $i return $i?*", "1\n2",
+        exists(OrderBy.class));
+    check("for $a in 1 to 2 for $b in 3 to 4 order by $a return $a", "1\n1\n2\n2",
+        exists(OrderBy.class));
+    check("for $i in 1 to 2 order by $i, 1 return $i", "1\n2",
+        exists(OrderBy.class));
+    check("for $i in 1 to 2 order by -$i return $i", "2\n1",
+        exists(OrderBy.class));
+  }
 }
