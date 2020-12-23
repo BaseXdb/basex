@@ -2087,4 +2087,12 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $i in 1 to 2 order by -$i return $i", "2\n1",
         exists(OrderBy.class));
   }
+
+  /** distinct-values: simplify arguments. */
+  @Test public void gh1967() {
+    check("count(distinct-values((1 to 100000000, 1 to 100000000)))", 100000000, root(Int.class));
+    check("count(distinct-values((1 to 100000000, 1)))", 100000000, root(Int.class));
+    check("count(distinct-values((1 to 100000000, 1, 0, 100000000, 100, 10 to 10000, 100000001)))",
+        100000002, root(Int.class));
+  }
 }

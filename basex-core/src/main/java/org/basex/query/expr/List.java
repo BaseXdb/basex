@@ -16,6 +16,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * List of expressions that have been separated by commas.
@@ -138,7 +139,7 @@ public final class List extends Arr {
       } else if(expr instanceof RangeSeq) {
         final RangeSeq seq = (RangeSeq) expr;
         if(!seq.asc) return null;
-        s = ((Int) seq.itemAt(0)).itr();
+        s = seq.itemAt(0).itr();
         e = s + seq.size();
       } else {
         return null;
@@ -223,10 +224,14 @@ public final class List extends Arr {
     } else if(mode == Simplify.DISTINCT) {
       final int el = exprs.length;
       final ExprList list = new ExprList(el);
-      for(final Expr ex : exprs) list.addUnique(ex);
-      if(list.size() != el) {
+      for(final Expr ex : exprs) list.addUnique(ex.simplifyFor(mode, cc));
+      exprs = list.finish();
+      if(exprs.length != el) {
         // remove duplicate list expressions
-        expr = cc.simplify(this, List.get(cc, info, list.finish()));
+        expr = cc.simplify(this, List.get(cc, info, exprs));
+      } else if(seqType().type == AtomType.ITR) {
+        // merge numbers and ranges
+        expr = toDistinctRange();
       } else {
         // otherwise, rewrite list to union
         expr = toUnion(cc);
@@ -246,6 +251,36 @@ public final class List extends Arr {
   public Expr toUnion(final CompileContext cc) throws QueryException {
     return seqType().type instanceof NodeType ?
       cc.replaceWith(this, new Union(info, exprs)).optimize(cc) : this;
+  }
+
+  /**
+   * If possible, rewrites the list to a distinct range expression.
+   * @return range or original expression
+   */
+  public Expr toDistinctRange() {
+    long start = 0, end = 0;
+    final LongList list = new LongList(2);
+    for(final Expr ex : exprs) {
+      if(ex instanceof Int) {
+        list.add(((Int) ex).itr());
+      } else if(ex instanceof RangeSeq) {
+        final RangeSeq seq = (RangeSeq) ex;
+        list.add(seq.itemAt(0).itr()).add(seq.itemAt(ex.size() - 1).itr()).sort();
+      } else {
+        return this;
+      }
+      final long mn = list.get(0), mx = list.peek() + 1;
+      if(start == end) {
+        start = mn;
+        end = mx;
+      } else {
+        if(mn < start - 1 || mx > end + 1) return this;
+        if(mn == start - 1) start = mn;
+        if(mx == end + 1) end = mx;
+      }
+      list.reset();
+    }
+    return RangeSeq.get(start, end - start, true);
   }
 
   @Override

@@ -1,4 +1,3 @@
-
 package org.basex.query.value.seq;
 
 import java.util.*;

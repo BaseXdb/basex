@@ -68,7 +68,7 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public Item itemAt(final long pos) {
+  public Int itemAt(final long pos) {
     return Int.get(start + (asc ? pos : -pos));
   }
 
