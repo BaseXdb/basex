@@ -2,6 +2,7 @@ package org.basex.query.expr.constr;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -33,6 +34,7 @@ public final class CMap extends Arr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     // determine static key type (all keys must be single items)
     final int el = exprs.length;
+    if(el == 2) return cc.function(_MAP_ENTRY, info, exprs);
 
     Type kt = null;
     for(int e = 0; e < el; e += 2) {

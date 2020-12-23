@@ -1,5 +1,7 @@
 package org.basex.query.func.map;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -48,6 +50,14 @@ public final class MapMerge extends StandardFunc {
       // return simple arguments
       final SeqType st = exprs[0].seqType();
       if(st.one()) return exprs[0];
+
+      // rewrite (map:entry, map) to map:put
+      if(exprs.length == 1 && exprs[0] instanceof List && exprs[0].args().length == 2) {
+        final Expr[] args = exprs[0].args();
+        if(_MAP_ENTRY.is(args[0]) && args[1].seqType().instanceOf(SeqType.MAP_O)) {
+          return cc.function(_MAP_PUT, info, args[1], args[0].arg(0), args[0].arg(1));
+        }
+      }
 
       // check if duplicates will be combined (if yes, adjust occurrence of return type)
       MapType mt = (MapType) st.type;
