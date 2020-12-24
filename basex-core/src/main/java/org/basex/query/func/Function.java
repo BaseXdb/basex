@@ -1358,6 +1358,9 @@ public enum Function implements AFunction {
       arg(ITEM_ZM, ITR_O, BLN_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_ROOT(UtilRoot::new, "root(nodes)", arg(NOD_ZM), DOC_ZM, UTIL_URI),
+  /** XQuery function. */
+  _UTIL_WITHIN(UtilWithin::new, "within(items,min[,max])",
+      arg(ITEM_ZM, ITR_O, ITR_O), BLN_O, UTIL_URI),
 
   // Validate Module
 

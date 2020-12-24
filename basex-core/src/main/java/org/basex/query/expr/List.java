@@ -137,10 +137,10 @@ public final class List extends Arr {
         s = ((Int) expr).itr();
         e = s + 1;
       } else if(expr instanceof RangeSeq) {
-        final RangeSeq seq = (RangeSeq) expr;
-        if(!seq.asc) return null;
-        s = seq.itemAt(0).itr();
-        e = s + seq.size();
+        final long[] range = ((RangeSeq) expr).range(true);
+        s = range[0];
+        e = range[1] + 1;
+        if(e <= s) return null;
       } else {
         return null;
       }
@@ -264,8 +264,7 @@ public final class List extends Arr {
       if(ex instanceof Int) {
         list.add(((Int) ex).itr());
       } else if(ex instanceof RangeSeq) {
-        final RangeSeq seq = (RangeSeq) ex;
-        list.add(seq.itemAt(0).itr()).add(seq.itemAt(ex.size() - 1).itr()).sort();
+        list.add(((RangeSeq) ex).range(false));
       } else {
         return this;
       }

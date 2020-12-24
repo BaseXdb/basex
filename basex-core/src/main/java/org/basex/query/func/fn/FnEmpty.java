@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -60,7 +62,10 @@ public class FnEmpty extends StandardFunc {
     if(expr instanceof List && expr.seqType().type instanceof NodeType) {
       exprs[0] = new Union(info, expr.args()).optimize(cc);
     }
-    return this;
+
+    // simplify argument
+    final Expr arg = FnCount.simplify(expr, cc);
+    return arg != null ? cc.function(empty ? EMPTY : EXISTS, info, arg) : this;
   }
 
   @Override

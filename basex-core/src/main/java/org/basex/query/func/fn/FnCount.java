@@ -40,29 +40,22 @@ public final class FnCount extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr = exprs[0];
 
-    // rewrite count(map:keys(...)) to map:size(...)
-    if(_MAP_KEYS.is(expr))
-      return cc.function(_MAP_SIZE, info, expr.args());
-    // rewrite count(string-to-codepoints(...)) to string-length(...)
-    if(STRING_TO_CODEPOINTS.is(expr) || _UTIL_CHARS.is(expr))
-      return cc.function(STRING_LENGTH, info, expr.args());
-    // rewrite count(reverse(...)) to count(...)
-    if(REVERSE.is(expr) || SORT.is(expr))
-      return cc.function(COUNT, info, expr.arg(0));
-    // remove order by clauses from FLWOR expression
-    if(expr instanceof GFLWOR) {
-      final Expr flwor = ((GFLWOR) expr).removeOrderBy(cc);
-      if(flwor != null) return cc.function(COUNT, info, flwor);
-    }
-
     // return statically known size (ignore non-deterministic expressions, e.g. count(error()))
     if(!expr.has(Flag.NDT)) {
       final long size = expr.size();
       if(size >= 0) return Int.get(size);
     }
 
-    exprs[0] = expr;
-    return this;
+    // rewrite count(map:keys(...)) to map:size(...)
+    if(_MAP_KEYS.is(expr))
+      return cc.function(_MAP_SIZE, info, expr.args());
+    // rewrite count(string-to-codepoints(...)) to string-length(...)
+    if(STRING_TO_CODEPOINTS.is(expr) || _UTIL_CHARS.is(expr))
+      return cc.function(STRING_LENGTH, info, expr.args());
+
+    // simplify argument
+    final Expr arg = simplify(expr, cc);
+    return arg != null ? cc.function(COUNT, info, arg) : this;
   }
 
   @Override
@@ -73,5 +66,24 @@ public final class FnCount extends StandardFunc {
       if(expr.seqType().type instanceof NodeType) return cc.simplify(this, expr);
     }
     return this;
+  }
+
+  /**
+   * Simplify count arguments.
+   * @param expr expression to simplify
+   * @param cc compilation context
+   * @return simplified expression or {@code null}
+   * @throws QueryException query exception
+   */
+  public static Expr simplify(final Expr expr, final CompileContext cc) throws QueryException {
+    // rewrite count(reverse(...)) to count(...)
+    if(REVERSE.is(expr) || SORT.is(expr))
+      return expr.arg(0);
+    // remove order by clauses from FLWOR expression
+    if(expr instanceof GFLWOR) {
+      final Expr flwor = ((GFLWOR) expr).removeOrderBy(cc);
+      if(flwor != null) return flwor;
+    }
+    return null;
   }
 }

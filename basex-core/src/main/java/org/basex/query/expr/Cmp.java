@@ -32,6 +32,15 @@ public abstract class Cmp extends Arr {
   /** Static context. */
   final StaticContext sc;
 
+  /** Check: true. */
+  private static final long[] TRUE = { };
+  /** Check: false. */
+  private static final long[] FALSE = { };
+  /** Check: empty. */
+  private static final long[] EMPTY = { };
+  /** Check: exists. */
+  private static final long[] EXISTS = { };
+
   /**
    * Constructor.
    * @param info input info
@@ -289,28 +298,35 @@ public abstract class Cmp extends Arr {
    */
   private Expr optCount(final OpV op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(!(Function.COUNT.is(expr1) && expr2 instanceof ANum)) return this;
+    if(!(Function.COUNT.is(expr1))) return this;
 
-    final double count = ((ANum) expr2).dbl();
-    final int check = check(op, count);
-    if(check >= 2) {
-      // count(A) > 0  ->  exists(A)
-      final Function func = check == 2 ? Function.EXISTS : Function.EMPTY;
-      return cc.function(func, info, ((Arr) expr1).exprs);
-    }
-    if(check >= 0) {
-      // count(A) >= 0  ->  true()
-      return Bln.get(check == 0);
-    }
+    final Expr arg = expr1.arg(0);
+    if(expr2 instanceof ANum) {
+      final double count = ((ANum) expr2).dbl();
+      final long[] counts = counts(op, count);
+      if(counts == TRUE || counts == FALSE) {
+        // count(A) >= 0  ->  true()
+        return Bln.get(counts == TRUE);
+      }
+      if(counts == EMPTY || counts == EXISTS) {
+        // count(A) > 0  ->  exists(A)
+        final Function func = counts == EMPTY ? Function.EMPTY : Function.EXISTS;
+        return cc.function(func, info, arg);
+      }
+      if(counts != null) {
+        // count(A) > 1  ->  util:within(A, 2)
+        final int al = counts.length == 2 ? 3 : 2;
+        final ExprList args = new ExprList(3).add(arg).add(Int.get(counts[0]));
+        if(al == 3) args.add(Int.get(counts[1]));
+        return cc.function(Function._UTIL_WITHIN, info, args.finish());
+      }
 
-    final SeqType st1 = expr1.arg(0).seqType();
-    if(st1.zeroOrOne()) {
-      // count($zeroOrOne) < 2  ->  true()
-      if(op == OpV.LT && count > 1 || op == OpV.LE && count >= 1 ||
-        op == OpV.NE && count != 0 && count != 1) return Bln.TRUE;
-      // count($zeroOrOne) = 2  ->  false()
-      if(op == OpV.GT && count >= 1 || op == OpV.GE && count > 1 ||
-        op == OpV.EQ && count != 0 && count != 1) return Bln.FALSE;
+      // count($zeroOrOne) != 0  ->  true()
+      if(arg.seqType().zeroOrOne() && op == OpV.NE && count != 0 && count != 1) return Bln.TRUE;
+
+    } else if(expr2 instanceof RangeSeq && op == OpV.EQ) {
+      final long[] range = ((RangeSeq) expr2).range(false);
+      return cc.function(Function._UTIL_WITHIN, info, arg, Int.get(range[0]), Int.get(range[1]));
     }
 
     return this;
@@ -328,20 +344,19 @@ public abstract class Cmp extends Arr {
     if(!(Function.STRING_LENGTH.is(expr1) && expr2 instanceof ANum)) return this;
 
     final Expr[] args = ((Arr) expr1).exprs;
-    final double count = ((ANum) expr2).dbl();
-    final int check = check(op, count);
-    if(check >= 2) {
-      // string-length(A) > 0  ->  boolean(string(A))
-      final Function func = check == 2 ? Function.BOOLEAN : Function.NOT;
-      return cc.function(func, info, cc.function(Function.STRING, info, args));
-    }
-    if(check >= 0) {
+    final long[] counts = counts(op, ((ANum) expr2).dbl());
+    if(counts == TRUE || counts == FALSE) {
       // string-length(A) >= 0  ->  true()
       final Expr arg1 = args.length > 0 ? args[0] : cc.qc.focus.value;
       if(arg1 != null) {
         final SeqType st1 = arg1.seqType();
-        if(st1.zero() || st1.one() && st1.type.isStringOrUntyped()) return Bln.get(check == 0);
+        if(st1.zero() || st1.one() && st1.type.isStringOrUntyped()) return Bln.get(counts == TRUE);
       }
+    }
+    if(counts == EMPTY || counts == EXISTS) {
+      // string-length(A) > 0  ->  boolean(string(A))
+      final Function func = counts == EMPTY ? Function.NOT : Function.BOOLEAN;
+      return cc.function(func, info, cc.function(Function.STRING, info, args));
     }
     return this;
   }
@@ -393,32 +408,38 @@ public abstract class Cmp extends Arr {
   }
 
   /**
-   * Analyzes the comparison and returns its optimization type. Possible types are:
-   * <ul>
-   *   <li>0: always true</li>
-   *   <li>1: always false</li>
-   *   <li>2: positive, non-zero check</li>
-   *   <li>3: zero check</li>
-   *   <li>-1: none of them</li>
-   * </ul>
+   * Analyzes the comparison and returns its optimization type.
    * @param op operator
    * @param count count to compare against
-   * @return comparison type ({@code -1}: no optimization possible)
+   * @return comparison type, min/max range or {@code null}
    */
-  private static int check(final OpV op, final double count) {
-    // > (v<0), != (v<0), >= (v<=0), != integer(v)
-    if((op == OpV.GT || op == OpV.NE) && count < 0 || op == OpV.GE && count <= 0 ||
-      op == OpV.NE && count != (long) count) return 0;
-    // < (v<=0), <= (v<0), = (v<0), != integer(v)
-    if(op == OpV.LT && count <= 0 || (op == OpV.LE || op == OpV.EQ) && count < 0 ||
-      op == OpV.EQ && count != (long) count) return 1;
-    // > (v<1), >= (v<=1), != (v=0)
-    if(op == OpV.GT && count < 1 || op == OpV.GE && count <= 1 || op == OpV.NE && count == 0)
-      return 2;
-    // < (v<=1), <= (v<1), = (v=0)
-    if(op == OpV.LT && count <= 1 || op == OpV.LE && count < 1 || op == OpV.EQ && count == 0)
-      return 3;
+  private static long[] counts(final OpV op, final double count) {
+    // skip special cases
+    if(!Double.isFinite(count)) return null;
 
-    return -1;
+    // > (v<0), != (v<0), >= (v<=0), != integer(v)
+    final long cnt = (long) count;
+    if((op == OpV.GT || op == OpV.NE) && count < 0 ||
+        op == OpV.GE && count <= 0 ||
+        op == OpV.NE && count != cnt) return TRUE;
+    // < (v<=0), <= (v<0), = (v<0), != integer(v)
+    if(op == OpV.LT && count <= 0 ||
+      (op == OpV.LE || op == OpV.EQ) && count < 0 ||
+       op == OpV.EQ && count != cnt) return FALSE;
+    // < (v<=1), <= (v<1), = (v=0)
+    if(op == OpV.LT && count <= 1 ||
+       op == OpV.LE && count < 1 ||
+       op == OpV.EQ && count == 0) return EMPTY;
+    // > (v<1), >= (v<=1), != (v=0)
+    if(op == OpV.GT && count < 1 ||
+       op == OpV.GE && count <= 1 ||
+       op == OpV.NE && count == 0) return EXISTS;
+    // range queries
+    if(op == OpV.GT) return new long[] { (long) Math.floor(count) + 1 };
+    if(op == OpV.GE) return new long[] { (long) Math.ceil(count) };
+    if(op == OpV.LT) return new long[] { 0, (long) Math.ceil(count) - 1 };
+    if(op == OpV.LE) return new long[] { 0, (long) Math.floor(count) };
+    if(op == OpV.EQ) return new long[] { cnt, cnt };
+    return null;
   }
 }
