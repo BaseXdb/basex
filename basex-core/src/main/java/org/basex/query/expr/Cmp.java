@@ -297,39 +297,57 @@ public abstract class Cmp extends Arr {
    * @throws QueryException query exception
    */
   private Expr optCount(final OpV op, final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final Expr expr1 = exprs[0];
     if(!(Function.COUNT.is(expr1))) return this;
 
-    final Expr arg = expr1.arg(0);
-    if(expr2 instanceof ANum) {
-      final double count = ((ANum) expr2).dbl();
-      final long[] counts = counts(op, count);
+    final Expr arg = expr1.arg(0), count = exprs[1];
+    final ExprList args = new ExprList(3);
+    if(count instanceof ANum) {
+      final double cnt = ((ANum) count).dbl();
+      if(arg.seqType().zeroOrOne()) {
+        // count(ZeroOrOne)
+        if(cnt > 1) {
+          return Bln.get(op == OpV.LT || op == OpV.LE || op == OpV.NE);
+        }
+        if(cnt == 1) {
+          return op == OpV.NE || op == OpV.LT ? cc.function(Function.EMPTY, info, arg) :
+                 op == OpV.EQ || op == OpV.GE ? cc.function(Function.EXISTS, info, arg) :
+                 Bln.get(op == OpV.LE);
+        }
+      }
+      final long[] counts = counts(op, cnt);
+      // count(A) >= 0  ->  true()
       if(counts == TRUE || counts == FALSE) {
-        // count(A) >= 0  ->  true()
         return Bln.get(counts == TRUE);
       }
+      // count(A) > 0  ->  exists(A)
       if(counts == EMPTY || counts == EXISTS) {
-        // count(A) > 0  ->  exists(A)
-        final Function func = counts == EMPTY ? Function.EMPTY : Function.EXISTS;
-        return cc.function(func, info, arg);
+        return cc.function(counts == EMPTY ? Function.EMPTY : Function.EXISTS, info, arg);
       }
+      // count(A) > 1  ->  util:within(A, 2)
       if(counts != null) {
-        // count(A) > 1  ->  util:within(A, 2)
-        final int al = counts.length == 2 ? 3 : 2;
-        final ExprList args = new ExprList(3).add(arg).add(Int.get(counts[0]));
-        if(al == 3) args.add(Int.get(counts[1]));
-        return cc.function(Function._UTIL_WITHIN, info, args.finish());
+        for(long c : counts) args.add(Int.get(c));
       }
-
-      // count($zeroOrOne) != 0  ->  true()
-      if(arg.seqType().zeroOrOne() && op == OpV.NE && count != 0 && count != 1) return Bln.TRUE;
-
-    } else if(expr2 instanceof RangeSeq && op == OpV.EQ) {
-      final long[] range = ((RangeSeq) expr2).range(false);
-      return cc.function(Function._UTIL_WITHIN, info, arg, Int.get(range[0]), Int.get(range[1]));
+    } else if(op == OpV.EQ || op == OpV.GE || op == OpV.LE) {
+      final SeqType st2 = count.seqType();
+      if(st2.type.instanceOf(AtomType.ITR)) {
+        if(count instanceof RangeSeq) {
+          final long[] range = ((RangeSeq) count).range(false);
+          args.add(Int.get(range[0])).add(Int.get(range[1]));
+        } else if(st2.one() && (count instanceof VarRef || count instanceof ContextValue)) {
+          args.add(count).add(count);
+        }
+        if(!args.isEmpty()) {
+          if(op == OpV.GE) args.remove(args.size() - 1);
+          else if(op == OpV.LE) args.set(0, Int.ONE);
+        }
+      }
     }
+    if(args.isEmpty() || arg instanceof VarRef || arg instanceof ContextValue) return this;
 
-    return this;
+    // count(A) = 1  ->  util:within(A, 1, 1)
+    args.insert(0,  arg);
+    return cc.function(Function._UTIL_WITHIN, info, args.finish());
   }
 
   /**

@@ -21,8 +21,8 @@ import org.basex.util.*;
 public final class UtilWithin extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final long min = toLong(exprs[1], qc);
-    final long max = exprs.length > 2 ? toLong(exprs[2], qc) : Long.MAX_VALUE;
+    final long min = toLong(exprs[1], qc), max = exprs.length == 2 ? Long.MAX_VALUE :
+      exprs[1] == exprs[2] ? min : toLong(exprs[2], qc);
 
     // iterative access: if the iterator size is unknown, iterate through results
     final Iter iter = exprs[0].iter(qc);

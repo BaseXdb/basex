@@ -263,6 +263,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // zero-or-one result: no need to evaluate count
     check(count + " <  2", true, root(Bln.class));
+    check(count + " <= 2", true, root(Bln.class));
     check(count + " <= 1", true, root(Bln.class));
     check(count + " != 2", true, root(Bln.class));
     check(count + " >  1", false, root(Bln.class));
@@ -270,8 +271,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check(count + " =  2", false, root(Bln.class));
 
     // no pre-evaluation possible
-    check(count + " != 1", false, exists(COUNT));
-    check(count + " =  1", true, exists(_UTIL_WITHIN));
+    check(count + " != 1", false, exists(EMPTY));
+    check(count + " =  1", true, exists(EXISTS));
 
     // one-or-more results: no need to evaluate count
     count = "count((1, <_>1</_>[. = 1]))";
@@ -281,8 +282,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check(count + " <  1", false, root(Bln.class));
     check(count + " <= 0", false, root(Bln.class));
     check(count + " =  0", false, root(Bln.class));
+    check(count + " =  1.1", false, root(Bln.class));
 
     // no pre-evaluation possible
+    check(count + " != 1", true, exists(COUNT));
     check(count + " =  1", false, exists(_UTIL_WITHIN));
     check(count + " =  2", true, exists(_UTIL_WITHIN));
   }

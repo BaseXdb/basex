@@ -478,6 +478,6 @@ public final class UtilModuleTest extends QueryPlanTest {
     check("count((1 to 10)[. < 5]) = 3 to 5", true, root(func));
     check("count((1 to 10)[. < 5]) = 5 to 7", false, root(func));
 
-    check("count((8, 9, 9)[. = 9]) = 1.1", false, root(Bln.class));
+    check("(1 to 2) ! (count((1 to 10)[. < 5]) = .)", "false\nfalse", exists(func));
   }
 }
