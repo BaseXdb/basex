@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -55,5 +56,10 @@ public final class ArraySort extends StandardFunc {
       exprType.assign(type1);
     }
     return this;
+  }
+
+  @Override
+  public boolean has(final Flag... flags) {
+    return Flag.HOF.in(flags) && exprs.length > 2 || super.has(flags);
   }
 }

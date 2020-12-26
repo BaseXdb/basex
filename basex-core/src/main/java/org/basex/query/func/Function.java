@@ -352,7 +352,7 @@ public enum Function implements AFunction {
   SERIALIZE(FnSerialize::new, "serialize(items[,params])", arg(ITEM_ZM, ITEM_ZO), STR_O),
   /** XQuery function. */
   SORT(FnSort::new, "sort(items[,collation[,function]])",
-      arg(ITEM_ZM, STR_ZO, FuncType.get(AAT_ZM, ITEM_O).seqType()), ITEM_ZM, flag(HOF)),
+      arg(ITEM_ZM, STR_ZO, FuncType.get(AAT_ZM, ITEM_O).seqType()), ITEM_ZM),
   /** XQuery function. */
   STARTS_WITH(FnStartsWith::new, "starts-with(string,substring[,collation])",
       arg(STR_ZO, STR_ZO, STR_O), BLN_O),
@@ -493,7 +493,7 @@ public enum Function implements AFunction {
   _ARRAY_SIZE(ArraySize::new, "size(array)", arg(ARRAY_O), ITR_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_SORT(ArraySort::new, "sort(array[,collation[,function]])",
-      arg(ARRAY_O, STR_ZO, FuncType.get(AAT_ZM, ITEM_O).seqType()), ARRAY_O, flag(HOF), ARRAY_URI),
+      arg(ARRAY_O, STR_ZO, FuncType.get(AAT_ZM, ITEM_O).seqType()), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_SUBARRAY(ArraySubarray::new, "subarray(array,position[,length])",
       arg(ARRAY_O, ITR_O, ITR_O), ARRAY_O, ARRAY_URI),

@@ -10,6 +10,7 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -139,6 +140,11 @@ public final class FnSort extends StandardFunc {
       expr = cc.simplify(this, exprs[0]);
     }
     return expr == this ? super.simplifyFor(mode, cc) : expr.simplifyFor(mode, cc);
+  }
+
+  @Override
+  public boolean has(final Flag... flags) {
+    return Flag.HOF.in(flags) && exprs.length > 2 || super.has(flags);
   }
 
   /**
