@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -59,6 +60,14 @@ public final class Arith extends Arr {
     exprType.assign(type, noarray && st1.oneOrMore() && st2.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
 
     Expr expr = emptyExpr();
+    // 0 - $x  ->  -$x
+    if(expr == this && expr1 == Int.ZERO && calc == Calc.MINUS) {
+      expr = new Unary(info, expr2, true).optimize(cc);
+    }
+    // count($n/@*) + count($n/*)  ->  count(($n/@*, $n/*))
+    if(expr == this && Function.COUNT.is(expr1) && calc == Calc.PLUS && Function.COUNT.is(expr2)) {
+      expr = cc.function(Function.COUNT, info, List.get(cc, info, expr1.arg(0), expr2.arg(0)));
+    }
     if(expr == this && nums && noarray && st1.one() && st2.one()) {
       // example: number($a) + 0  ->  number($a)
       final Expr ex = calc.optimize(expr1, expr2, info, cc);

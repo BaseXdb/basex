@@ -342,7 +342,7 @@ public abstract class Cmp extends Arr {
       }
       // count(A) > 1  ->  util:within(A, 2)
       if(counts != null) {
-        for(long c : counts) args.add(Int.get(c));
+        for(final long c : counts) args.add(Int.get(c));
       }
     } else if(op == OpV.EQ || op == OpV.GE || op == OpV.LE) {
       final SeqType st2 = count.seqType();

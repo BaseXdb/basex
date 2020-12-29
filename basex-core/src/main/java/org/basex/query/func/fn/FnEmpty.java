@@ -49,7 +49,7 @@ public class FnEmpty extends StandardFunc {
    * @throws QueryException query exception
    */
   final Expr opt(final boolean empty, final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0];
+    Expr expr = exprs[0];
     final SeqType st = expr.seqType();
 
     // ignore non-deterministic expressions (e.g.: empty(error()))
@@ -59,13 +59,14 @@ public class FnEmpty extends StandardFunc {
     }
 
     // rewrite list to union expression
-    if(expr instanceof List && expr.seqType().type instanceof NodeType) {
-      exprs[0] = new Union(info, expr.args()).optimize(cc);
-    }
-
+    if(expr instanceof List && expr.seqType().type instanceof NodeType)
+      expr = new Union(info, expr.args()).optimize(cc);
+    // simplify replicate
+    if(_UTIL_REPLICATE.is(expr)) expr = expr.arg(0);
     // simplify argument
-    final Expr arg = FnCount.simplify(expr, cc);
-    return arg != null ? cc.function(empty ? EMPTY : EXISTS, info, arg) : this;
+    expr = FnCount.simplify(expr, cc);
+
+    return expr != exprs[0] ? cc.function(empty ? EMPTY : EXISTS, info, expr) : this;
   }
 
   @Override

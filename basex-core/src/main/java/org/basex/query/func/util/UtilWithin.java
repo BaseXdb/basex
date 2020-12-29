@@ -59,7 +59,7 @@ public final class UtilWithin extends StandardFunc {
 
     // simplify argument
     final Expr arg = FnCount.simplify(expr1, cc);
-    if(arg != null) {
+    if(arg != expr1) {
       final Expr[] args = exprs.clone();
       args[0] = arg;
       return cc.function(_UTIL_WITHIN, info, args);

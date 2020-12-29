@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.func.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -23,6 +24,12 @@ public final class ArithTest extends QueryPlanTest {
     check("for $i in 1 to 2 return 0 + $i", "1\n2", empty(Arith.class), empty(GFLWOR.class));
     check("for $i in 1 to 2 return 0e0 + $i", "1\n2", exists(Cast.class));
     check("for $i in 1 to 2 return $i + 0e0", "1\n2", exists(Cast.class));
+
+    // counts
+    check("let $n := <_>1</_>[. = 1] return count($n) + count($n)",
+        2, count(Function.COUNT, 1), exists(Function._UTIL_REPLICATE));
+    check("let $n := <_>1</_>[. = 1] return count($n) + count($n) > 0",
+        true, exists(Function.EXISTS), empty(Function._UTIL_REPLICATE));
   }
 
   /** Test method. */
@@ -32,7 +39,7 @@ public final class ArithTest extends QueryPlanTest {
     // neutral number
     check("for $i in 1 to 2 return $i - 0", "1\n2", empty(Arith.class), empty(GFLWOR.class));
     check("for $i in 1 to 2 return $i - 0e0", "1\n2", exists(Cast.class));
-    check("for $i in 1 to 2 return 0 - $i", "-1\n-2", exists(Arith.class));
+    check("for $i in 1 to 2 return 0 - $i", "-1\n-2", exists(Unary.class));
 
     // identical arguments
     check("for $i in (1, xs:double('NaN')) return $i - $i", "0\nNaN", exists(Arith.class));

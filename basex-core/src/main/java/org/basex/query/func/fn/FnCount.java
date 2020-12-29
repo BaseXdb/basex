@@ -55,7 +55,7 @@ public final class FnCount extends StandardFunc {
 
     // simplify argument
     final Expr arg = simplify(expr, cc);
-    return arg != null ? cc.function(COUNT, info, arg) : this;
+    return arg != expr ? cc.function(COUNT, info, arg) : this;
   }
 
   @Override
@@ -72,7 +72,7 @@ public final class FnCount extends StandardFunc {
    * Simplify count arguments.
    * @param expr expression to simplify
    * @param cc compilation context
-   * @return simplified expression or {@code null}
+   * @return simplified or supplied expression
    * @throws QueryException query exception
    */
   public static Expr simplify(final Expr expr, final CompileContext cc) throws QueryException {
@@ -84,6 +84,6 @@ public final class FnCount extends StandardFunc {
       final Expr flwor = ((GFLWOR) expr).removeOrderBy(cc);
       if(flwor != null) return flwor;
     }
-    return null;
+    return expr;
   }
 }

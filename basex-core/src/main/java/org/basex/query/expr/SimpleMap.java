@@ -130,7 +130,7 @@ public abstract class SimpleMap extends Arr {
     if(size() == 0 && !has(Flag.NDT)) return cc.emptySeq(this);
 
     // merge paths
-    Expr ex = mergePaths(cc);
+    final Expr ex = mergePaths(cc);
     if(ex != null) return ex;
 
     // merge operands
