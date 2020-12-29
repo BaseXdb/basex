@@ -173,6 +173,7 @@ public class CmpG extends Cmp {
     expr = opt(cc);
 
     // range comparisons
+    if(expr == this) expr = optArith(cc);
     if(expr == this) expr = CmpIR.get(this, false, cc);
     if(expr == this) expr = CmpR.get(this, cc);
     if(expr == this) expr = CmpSR.get(this, cc);
@@ -211,6 +212,25 @@ public class CmpG extends Cmp {
 
     // return optimized, pre-evaluated or original expression
     return expr instanceof CmpG ? expr : cc.replaceWith(this, expr);
+  }
+
+  /**
+   * Tries to rewrite arithmetic operations.
+   * @param cc compilation context
+   * @return optimized or original expression
+   * @throws QueryException query exception
+   */
+  private Expr optArith(final CompileContext cc) throws QueryException {
+    final Expr expr1 = exprs[0], count = exprs[1];
+    if(expr1 instanceof Arith && count instanceof ANum) {
+      final Arith arith = (Arith) expr1;
+      if(arith.calc != Calc.MOD && arith.calc != Calc.IDIV && arith.arg(1) instanceof ANum) {
+        // count(E) - 1 = 0  ->  count(E) = 1
+        final Expr arg2 = new Arith(info, count, arith.arg(1), arith.calc.invert()).optimize(cc);
+        return new CmpG(arith.arg(0), arg2, op, coll, sc, info).optimize(cc);
+      }
+    }
+    return this;
   }
 
   @Override

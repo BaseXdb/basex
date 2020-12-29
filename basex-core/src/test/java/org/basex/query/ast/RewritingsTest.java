@@ -271,8 +271,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check(count + " =  2", false, root(Bln.class));
 
     // no pre-evaluation possible
-    check(count + " != 1", false, exists(EMPTY));
-    check(count + " =  1", true, exists(EXISTS));
+    check(count + " != 1", false, root(EMPTY));
+    check(count + " =  1", true, root(EXISTS));
+    check(count + " - 1 = 0", true, root(EXISTS));
 
     // one-or-more results: no need to evaluate count
     count = "count((1, <_>1</_>[. = 1]))";
@@ -286,8 +287,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // no pre-evaluation possible
     check(count + " != 1", true, exists(COUNT));
-    check(count + " =  1", false, exists(_UTIL_WITHIN));
-    check(count + " =  2", true, exists(_UTIL_WITHIN));
+    check(count + " =  1", false, root(_UTIL_WITHIN));
+    check(count + " =  2", true, root(_UTIL_WITHIN));
   }
 
   /** Checks that empty sequences are eliminated and that singleton lists are flattened. */
