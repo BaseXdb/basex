@@ -79,6 +79,37 @@ public final class UtilModuleTest extends QueryPlanTest {
 
     error(func.args(" (1, true#0)"), FIATOM_X);
     error(func.args(" (1 to 5) ! true#0"), FIATOM_X);
+
+    // optimizations
+    String seq = "let $seq := (<_>1</_>, 2, <_>1</_>) return ";
+    check(seq + "count($seq)  = count(distinct-values($seq))", false, root(EMPTY), exists(func));
+    check(seq + "count($seq) <= count(distinct-values($seq))", false, root(EMPTY), exists(func));
+    check(seq + "count($seq) <  count(distinct-values($seq))", false, root(Bln.class));
+    check(seq + "count($seq) >= count(distinct-values($seq))", true, root(Bln.class));
+    check(seq + "count($seq) >  count(distinct-values($seq))", true, root(EXISTS), exists(func));
+    check(seq + "count($seq) != count(distinct-values($seq))", true, root(EXISTS), exists(func));
+
+    check(seq + "count(distinct-values($seq))  = count($seq)", false, root(EMPTY), exists(func));
+    check(seq + "count(distinct-values($seq)) <= count($seq)", true, root(Bln.class));
+    check(seq + "count(distinct-values($seq)) <  count($seq)", true, root(EXISTS), exists(func));
+    check(seq + "count(distinct-values($seq)) >= count($seq)", false, root(EMPTY), exists(func));
+    check(seq + "count(distinct-values($seq)) >  count($seq)", false, root(Bln.class));
+    check(seq + "count(distinct-values($seq)) != count($seq)", true, root(EXISTS), exists(func));
+
+    seq = "let $seq := (<_>1</_>, 2, <_>1</_>)[. = 1] return ";
+    check(seq + "count($seq)  = count(distinct-values($seq))", false, root(EMPTY), exists(func));
+    check(seq + "count($seq) <= count(distinct-values($seq))", false, root(EMPTY), exists(func));
+    check(seq + "count($seq) <  count(distinct-values($seq))", false, root(Bln.class));
+    check(seq + "count($seq) >= count(distinct-values($seq))", true, root(Bln.class));
+    check(seq + "count($seq) >  count(distinct-values($seq))", true, root(EXISTS), exists(func));
+    check(seq + "count($seq) != count(distinct-values($seq))", true, root(EXISTS), exists(func));
+
+    check(seq + "count(distinct-values($seq))  = count($seq)", false, root(EMPTY), exists(func));
+    check(seq + "count(distinct-values($seq)) <= count($seq)", true, root(Bln.class));
+    check(seq + "count(distinct-values($seq)) <  count($seq)", true, root(EXISTS), exists(func));
+    check(seq + "count(distinct-values($seq)) >= count($seq)", false, root(EMPTY), exists(func));
+    check(seq + "count(distinct-values($seq)) >  count($seq)", false, root(Bln.class));
+    check(seq + "count(distinct-values($seq)) != count($seq)", true, root(EXISTS), exists(func));
   }
 
   /** Test method. */

@@ -8,6 +8,7 @@ import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -113,5 +114,20 @@ public final class FnDistinctValues extends StandardFunc {
       }
     }
     return vb.value(this);
+  }
+
+  /**
+   * Rewrites the function call to a duplicate check.
+   * @param op comparison operator
+   * @param cc compilation context
+   * @return new function or {@code null}
+   * @throws QueryException query context
+   */
+  public Expr duplicates(final OpV op, final CompileContext cc) throws QueryException {
+    if(op == OpV.LT) return Bln.FALSE;
+    if(op == OpV.GE) return Bln.TRUE;
+
+    final Expr dupl = cc.function(Function._UTIL_DUPLICATES, info, exprs);
+    return cc.function(op == OpV.LE || op == OpV.EQ ? Function.EMPTY : Function.EXISTS, info, dupl);
   }
 }
