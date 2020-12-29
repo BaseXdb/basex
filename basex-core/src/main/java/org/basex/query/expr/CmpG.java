@@ -224,10 +224,14 @@ public class CmpG extends Cmp {
     final Expr expr1 = exprs[0], count = exprs[1];
     if(expr1 instanceof Arith && count instanceof ANum) {
       final Arith arith = (Arith) expr1;
-      if(arith.calc != Calc.MOD && arith.calc != Calc.IDIV && arith.arg(1) instanceof ANum) {
-        // count(E) - 1 = 0  ->  count(E) = 1
-        final Expr arg2 = new Arith(info, count, arith.arg(1), arith.calc.invert()).optimize(cc);
-        return new CmpG(arith.arg(0), arg2, op, coll, sc, info).optimize(cc);
+      final Expr op1 = arith.arg(0), op2 = arith.arg(1);
+      if(arith.calc == Calc.MINUS && op2.seqType().instanceOf(SeqType.NUM_O) && count == Int.ZERO) {
+        // sum(A) - sum(B) = 0  ->  sum(A) = sum(B)
+        return new CmpG(op1, op2, op, coll, sc, info).optimize(cc);
+      } else if(arith.calc != Calc.MOD && arith.calc != Calc.IDIV && op2 instanceof ANum) {
+        // count(E) div 2 = 1  ->  count(E) = 1 * 2
+        final Expr arg2 = new Arith(info, count, op2, arith.calc.invert()).optimize(cc);
+        return new CmpG(op1, arg2, op, coll, sc, info).optimize(cc);
       }
     }
     return this;

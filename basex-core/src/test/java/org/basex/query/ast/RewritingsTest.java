@@ -289,6 +289,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check(count + " != 1", true, exists(COUNT));
     check(count + " =  1", false, root(_UTIL_WITHIN));
     check(count + " =  2", true, root(_UTIL_WITHIN));
+    check(count + " div 2 = 1", true, root(_UTIL_WITHIN));
   }
 
   /** Checks that empty sequences are eliminated and that singleton lists are flattened. */
