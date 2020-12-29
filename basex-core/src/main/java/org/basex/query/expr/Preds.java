@@ -152,7 +152,7 @@ public abstract class Preds extends Arr {
     if(pred instanceof And && !pred.has(Flag.POS)) {
       // E[A and B]  ->  E[A][B]
       cc.info(OPTPRED_X, pred);
-      for(final Expr expr : ((Arr) pred).exprs) {
+      for(final Expr expr : pred.args()) {
         simplify(expr.seqType().mayBeNumber() ? cc.function(Function.BOOLEAN, info, expr) : expr,
           list, root, cc);
       }

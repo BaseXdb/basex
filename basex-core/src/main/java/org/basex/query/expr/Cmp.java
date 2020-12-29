@@ -377,7 +377,7 @@ public abstract class Cmp extends Arr {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if(!(STRING_LENGTH.is(expr1) && expr2 instanceof ANum)) return this;
 
-    final Expr[] args = ((Arr) expr1).exprs;
+    final Expr[] args = expr1.args();
     final long[] counts = countRange(op, ((ANum) expr2).dbl());
     if(counts == COUNT_TRUE || counts == COUNT_FALSE) {
       // string-length(A) >= 0  ->  true()

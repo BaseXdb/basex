@@ -222,7 +222,7 @@ public final class GFLWOR extends ParseExpr {
         final Where where = (Where) clause;
         if(where.expr instanceof And) {
           iter.remove();
-          for(final Expr expr : ((Arr) where.expr).exprs) iter.add(new Where(expr, where.info));
+          for(final Expr expr : ((Arr) where.expr).args()) iter.add(new Where(expr, where.info));
         }
       }
     }
