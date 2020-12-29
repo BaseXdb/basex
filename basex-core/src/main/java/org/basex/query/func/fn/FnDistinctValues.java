@@ -25,15 +25,11 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 public final class FnDistinctValues extends StandardFunc {
-  /** Item evaluation flag. */
-  private boolean simple;
-
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Collation coll = toCollation(1, qc);
     final Expr expr = exprs[0];
     final Iter iter = expr.atomIter(qc, info);
-    if(simple || expr instanceof RangeSeq || expr instanceof Range) return iter;
 
     final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
     return new Iter() {
@@ -49,18 +45,7 @@ public final class FnDistinctValues extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Collation coll = toCollation(1, qc);
-    final Expr expr = exprs[0];
-    if(simple || expr instanceof RangeSeq || expr instanceof Range)
-      return expr.atomValue(qc, info);
-
-    final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
-    final Iter iter = expr.atomIter(qc, info);
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item item; (item = qc.next(iter)) != null;) {
-      if(set.add(item, info)) vb.add(item);
-    }
-    return vb.value(this);
+    return iter(qc).value(qc, this);
   }
 
   @Override
@@ -71,8 +56,6 @@ public final class FnDistinctValues extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr = exprs[0];
-    if(expr instanceof RangeSeq) return expr;
-
     final SeqType st = expr.seqType();
     if(st.zero()) return expr;
 
@@ -80,12 +63,14 @@ public final class FnDistinctValues extends StandardFunc {
     if(type != null) {
       // assign atomic type of argument
       exprType.assign(type);
-      simple = st.zeroOrOne();
 
-      // distinct-values($string)  ->  $string
-      // distinct-values($node)  ->  data($node)
-      if(simple && exprs.length == 1) return type == st.type ? expr :
-        cc.function(Function.DATA, info, exprs);
+      if(exprs.length == 1) {
+        // distinct-values(1 to 10)  ->  1 to 10
+        if(expr instanceof Range || expr instanceof RangeSeq) return expr;
+        // distinct-values($string)  ->  $string
+        // distinct-values($node)  ->  data($node)
+        if(st.zeroOrOne()) return type == st.type ? expr : cc.function(Function.DATA, info, exprs);
+      }
     }
     return optStats(expr, cc);
   }

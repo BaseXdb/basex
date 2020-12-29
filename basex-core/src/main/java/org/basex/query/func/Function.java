@@ -1337,6 +1337,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UTIL_DDO(UtilDdo::new, "ddo(nodes)", arg(NOD_ZM), NOD_ZM, UTIL_URI),
   /** XQuery function. */
+  _UTIL_DUPLICATES(UtilDuplicates::new, "duplicates(items[,collation])",
+      arg(AAT_ZM, STR_O), AAT_ZM, UTIL_URI),
+  /** XQuery function. */
   _UTIL_IF(UtilIf::new, "if(condition,then[,else])",
       arg(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
