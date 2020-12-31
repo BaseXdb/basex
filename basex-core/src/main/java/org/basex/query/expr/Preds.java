@@ -262,18 +262,21 @@ public abstract class Preds extends Arr {
   }
 
   /**
-   * Optimizes the predicates for boolean evaluation.
+   * Flattens predicates for boolean evaluation.
    * Drops solitary context values, flattens nested predicates.
    * @param root root expression
+   * @param ebv EBV check
    * @param cc compilation context
-   * @return expression
+   * @return optimized or original expression
    * @throws QueryException query exception
    */
-  public final Expr simplifyEbv(final Expr root, final CompileContext cc) throws QueryException {
+  public final Expr flatten(final Expr root, final boolean ebv, final CompileContext cc)
+      throws QueryException {
+
     // only single predicate can be rewritten; root must yield nodes; no positional predicates
     final SeqType rst = root.seqType();
     final int el = exprs.length;
-    if(!(rst.type instanceof NodeType) || el == 0 || mayBePositional()) return this;
+    if(el == 0 || mayBePositional() || ebv && !(rst.type instanceof NodeType)) return this;
 
     final Expr pred = exprs[el - 1];
     final QueryFunction<Expr, Expr> createRoot = r -> {
@@ -310,8 +313,10 @@ public abstract class Preds extends Arr {
     }
 
     // rewrite to path: root[path]  ->  root/path
-    final Expr expr = createExpr.apply(pred);
-    if(expr != null) return expr;
+    if(rst.type instanceof NodeType) {
+      final Expr expr = createExpr.apply(pred);
+      if(expr != null) return expr;
+    }
 
     // rewrite to simple map: $node[string()]  ->  $node ! string()
     if(rst.zeroOrOne()) return SimpleMap.get(cc, info, createRoot.apply(root), pred);

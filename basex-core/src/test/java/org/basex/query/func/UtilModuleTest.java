@@ -441,7 +441,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" (8, 9)", 3), false);
 
     check(func.args(" (8, 9, 9)[. = 9]", 0), true, root(Bln.class));
-    check(func.args(" (8, 9, 9)[. = 9]", 1), true, root(EXISTS));
+    check(func.args(" (8, 9, 9)[. = 9]", 1), true, root(Bln.class));
     query(func.args(" (8, 9, 9)[. = 9]", 2), true);
     query(func.args(" (8, 9, 9)[. = 9]", 3), false);
     query(func.args(" (8, 9, 9)[. = 9]", " <_>1</_>"), true);
@@ -473,7 +473,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" (8, 9)", 2, 3), true);
     query(func.args(" (8, 9)", 3, 2), false);
 
-    check(func.args(" (8, 9, 9)[. = 9]", 0, 0), false, root(EMPTY));
+    check(func.args(" (8, 9, 9)[. = 9]", 0, 0), false, root(Bln.class));
     query(func.args(" (8, 9, 9)[. = 9]", 1, 1), false);
     query(func.args(" (8, 9, 9)[. = 9]", 1, 2), true);
     query(func.args(" (8, 9, 9)[. = 9]", 2, 2), true);

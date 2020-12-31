@@ -254,12 +254,12 @@ public final class RewritingsTest extends QueryPlanTest {
     check(count + " !=  -1", true, root(Bln.class));
 
     // rewrite to empty/exists (faster)
-    check(count + " >  0", true, root(EXISTS));
-    check(count + " >= 1", true, root(EXISTS));
-    check(count + " != 0", true, root(EXISTS));
-    check(count + " <  1", false, root(EMPTY));
-    check(count + " <= 0", false, root(EMPTY));
-    check(count + " =  0", false, root(EMPTY));
+    check(count + " >  0", true, root(CmpSimpleG.class));
+    check(count + " >= 1", true, root(CmpSimpleG.class));
+    check(count + " != 0", true, root(CmpSimpleG.class));
+    check(count + " <  1", false, root(CmpSimpleG.class));
+    check(count + " <= 0", false, root(CmpSimpleG.class));
+    check(count + " =  0", false, root(CmpSimpleG.class));
 
     // zero-or-one result: no need to evaluate count
     check(count + " <  2", true, root(Bln.class));
@@ -271,9 +271,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check(count + " =  2", false, root(Bln.class));
 
     // no pre-evaluation possible
-    check(count + " != 1", false, root(EMPTY));
-    check(count + " =  1", true, root(EXISTS));
-    check(count + " - 1 = 0", true, root(EXISTS));
+    check(count + " != 1", false, root(CmpSimpleG.class));
+    check(count + " =  1", true, root(CmpSimpleG.class));
+    check(count + " - 1 = 0", true, root(CmpSimpleG.class));
 
     // one-or-more results: no need to evaluate count
     count = "count((1, <_>1</_>[. = 1]))";
@@ -1161,21 +1161,21 @@ public final class RewritingsTest extends QueryPlanTest {
     check("exists(<a/>/a) or exists(<b/>/b)", false,
         root(EXISTS), empty(Or.class), empty(BOOLEAN), exists(Union.class));
     check("for $i in 1 to 2 return exists($i[. = 1]) or exists($i[. = 2])", "true\ntrue",
-        empty(Or.class), count(EXISTS, 1));
+        empty(Or.class), empty(EXISTS), root(DualMap.class));
 
     check("<a/>/a or <b/>/b", false, root(EXISTS), empty(Or.class), exists(Union.class));
     check("<a/>[a or b]", "", empty(Or.class), count(SingleIterPath.class, 1));
 
     check("<a/>[empty(b)][empty(c)]", "<a/>", count(EMPTY, 1), count(SingleIterPath.class, 1));
     check("<a/>[empty((b, c))]", "<a/>", count(SingleIterPath.class, 1));
-    check("for $a in (<b/>, <c/>) return <a/>[empty(($a[. = 'a'], $a[. = 'b']))]", "<a/>\n<a/>",
+    check("for $a in (<b/>, <c/>) return <a/>[empty(($a[. = 'i'], $a[. = 'j']))]", "<a/>\n<a/>",
         root(DualMap.class), exists(NOT), empty(If.class));
 
     // no rewritings
     query("for $a in 1 to 2 return <a/>[empty(($a[. = 1], $a[. = 1]))]", "<a/>");
     check("exists(<a/>/a) and exists(<b/>/b)", false, exists(And.class));
     check("for $i in 1 to 2 return exists($i[. = 1]) and exists($i[. = 2])", "false\nfalse",
-        exists(And.class));
+        empty(And.class), empty(EXISTS), root(DualMap.class));
     check("<a/>/a and <b/>/b", false, exists(And.class));
     check("<a/>[a and b]", "", count(SingleIterPath.class, 2));
 
@@ -2099,5 +2099,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("count(distinct-values((1 to 100000000, 1)))", 100000000, root(Int.class));
     check("count(distinct-values((1 to 100000000, 1, 0, 100000000, 100, 10 to 10000, 100000001)))",
         100000002, root(Int.class));
+  }
+
+  /** Existence checks, filter expressions. */
+  @Test public void gh1971() {
+    check("for $i in 1 to 2 return exists($i[. = 1])", "true\nfalse",
+        root(DualMap.class), exists(CmpSimpleG.class));
   }
 }

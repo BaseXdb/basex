@@ -29,7 +29,7 @@ public final class ArithTest extends QueryPlanTest {
     check("let $n := <_>1</_>[. = 1] return count($n) + count($n)",
         2, count(Function.COUNT, 1), exists(Function._UTIL_REPLICATE));
     check("let $n := <_>1</_>[. = 1] return count($n) + count($n) > 0",
-        true, exists(Function.EXISTS), empty(Function._UTIL_REPLICATE));
+        true, root(CmpSimpleG.class));
   }
 
   /** Test method. */

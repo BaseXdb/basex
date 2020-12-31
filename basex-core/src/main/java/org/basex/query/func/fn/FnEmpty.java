@@ -66,6 +66,13 @@ public class FnEmpty extends StandardFunc {
     // simplify argument
     expr = FnCount.simplify(expr, cc);
 
+    // rewrite filter
+    if(expr instanceof Filter) {
+      final Filter filter = (Filter) expr;
+      expr = filter.flatten(filter.root, false, cc);
+      if(expr != filter) return cc.function(empty ? NOT : BOOLEAN, info, expr);
+    }
+
     return expr != exprs[0] ? cc.function(empty ? EMPTY : EXISTS, info, expr) : this;
   }
 
