@@ -76,9 +76,14 @@ public final class FnCount extends StandardFunc {
    * @throws QueryException query exception
    */
   public static Expr simplify(final Expr expr, final CompileContext cc) throws QueryException {
+    // simplify filter expression
+    if(expr instanceof Filter) {
+      return ((Filter) expr).simplifyCount(cc);
+    }
     // rewrite count(reverse(...)) to count(...)
-    if(REVERSE.is(expr) || SORT.is(expr))
+    if(REVERSE.is(expr) || SORT.is(expr)) {
       return expr.arg(0);
+    }
     // remove order by clauses from FLWOR expression
     if(expr instanceof GFLWOR) {
       final Expr flwor = ((GFLWOR) expr).removeOrderBy(cc);

@@ -1543,8 +1543,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** EBV Rewritings: count(expr), numeric checks. */
   @Test public void gh1875() {
-    check("boolean(count(<_>A</_>[. = 'A']))", true, empty(COUNT));
-    check("boolean(count(<_>A</_>[. = 'A']) != 0)", true, empty(COUNT));
+    check("boolean(count(<_>A</_>[. >= 'A']))", true, empty(COUNT));
+    check("boolean(count(<_>A</_>[. >= 'A']) != 0)", true, empty(COUNT));
   }
 
   /** Switch Expression: Rewrite to if expression. */
@@ -2118,5 +2118,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(1 to 2) ! (. + 1)", "2\n3", root(RangeSeq.class));
     check("reverse(1 to 2) ! (. - 1)", "1\n0", root(RangeSeq.class));
     check("reverse((1 to 2) ! (. - 1))", "1\n0", root(RangeSeq.class));
+  }
+
+  /** Count optimizations. */
+  @Test public void gh1973() {
+    check("count((<a/>, <b/>)[self::a])", 1, exists(DualMap.class));
+    check("for $i in 1 to 2 return count((1 to 3)[. = $i])", "1\n1", exists(INDEX_OF));
   }
 }

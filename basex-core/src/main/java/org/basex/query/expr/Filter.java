@@ -2,6 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.func.Function.*;
 
+import java.util.function.*;
+
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -211,6 +213,34 @@ public abstract class Filter extends Preds {
   public final Expr addPredicate(final CompileContext cc, final Expr pred) throws QueryException {
     exprs = new ExprList(exprs.length + 1).add(exprs).add(pred).finish();
     return copyType(get(cc, info, root, exprs));
+  }
+
+  /**
+   * Rewrites a filter expression for count operations.
+   * @param cc compilation context
+   * @return optimized or original expression.
+   * @throws QueryException query exception
+   */
+  public final Expr simplifyCount(final CompileContext cc) throws QueryException {
+    if(exprs.length != 1) return this;
+
+    // exists($nodes[@attr])  ->  exists($nodes ! @attr)
+    final Expr pred = exprs[0];
+    if(pred.seqType().instanceOf(SeqType.NOD_ZO)) return SimpleMap.get(cc, info, root, pred);
+
+    // count($seq[. = 'x'])  ->  count(index-of($seq, 'x'))
+    final Function<Expr, Integer> type = expr -> {
+      final Type t = expr.seqType().type;
+      return t.isStringOrUntyped() ? 1 : t.isNumber() ? 2 : 0;
+    };
+    final int rtype = type.apply(root);
+    if(rtype != 0 && pred instanceof CmpG && ((CmpG) pred).opV() == OpV.EQ) {
+      final Expr op2 = pred.arg(1);
+      if(pred.arg(0) instanceof ContextValue && op2.seqType().one() && type.apply(op2) == rtype) {
+        return cc.function(INDEX_OF, info, root, op2);
+      }
+    }
+    return this;
   }
 
   @Override

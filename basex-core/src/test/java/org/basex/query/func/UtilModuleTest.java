@@ -508,27 +508,27 @@ public final class UtilModuleTest extends QueryPlanTest {
         true, empty(GFLWOR.class));
 
     // rewritings
-    check("count((8, 9, 9)[. = 9]) < 3", true, root(func));
-    check("count((8, 9, 9)[. = 9]) < 2.1", true, root(func));
-    check("count((8, 9, 9)[. = 9]) < 2", false, root(func));
+    check("count((8, 9, 9)[. >= 9]) < 3", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) < 2.1", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) < 2", false, root(func));
 
-    check("count((8, 9, 9)[. = 9]) <= 2.1", true, root(func));
-    check("count((8, 9, 9)[. = 9]) <= 2", true, root(func));
-    check("count((8, 9, 9)[. = 9]) <= 1.9", false, root(func));
+    check("count((8, 9, 9)[. >= 9]) <= 2.1", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) <= 2", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) <= 1.9", false, root(func));
 
-    check("count((8, 9, 9)[. = 9]) > 1", true, root(func));
-    check("count((8, 9, 9)[. = 9]) > 1.1", true, root(func));
-    check("count((8, 9, 9)[. = 9]) > 1.9", true, root(func));
-    check("count((8, 9, 9)[. = 9]) > 2", false, root(func));
-    check("count((8, 9, 9)[. = 9]) > 2.1", false, root(func));
+    check("count((8, 9, 9)[. >= 9]) > 1", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) > 1.1", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) > 1.9", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) > 2", false, root(func));
+    check("count((8, 9, 9)[. >= 9]) > 2.1", false, root(func));
 
-    check("count((8, 9, 9)[. = 9]) >= 1.9", true, root(func));
-    check("count((8, 9, 9)[. = 9]) >= 2", true, root(func));
-    check("count((8, 9, 9)[. = 9]) >= 2.1", false, root(func));
+    check("count((8, 9, 9)[. >= 9]) >= 1.9", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) >= 2", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) >= 2.1", false, root(func));
 
-    check("count((8, 9, 9)[. = 9]) = 1", false, root(func));
-    check("count((8, 9, 9)[. = 9]) = 2", true, root(func));
-    check("count((8, 9, 9)[. = 9]) = 3", false, root(func));
+    check("count((8, 9, 9)[. >= 9]) = 1", false, root(func));
+    check("count((8, 9, 9)[. >= 9]) = 2", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) = 3", false, root(func));
 
     check("count((1 to 10)[. < 5]) = 1 to 3", false, root(func));
     check("count((1 to 10)[. < 5]) = 3 to 5", true, root(func));

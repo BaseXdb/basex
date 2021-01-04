@@ -57,21 +57,20 @@ public class FnEmpty extends StandardFunc {
       if(st.zero()) return Bln.get(empty);
       if(st.oneOrMore()) return Bln.get(!empty);
     }
-
     // rewrite list to union expression
-    if(expr instanceof List && expr.seqType().type instanceof NodeType)
+    if(expr instanceof List && expr.seqType().type instanceof NodeType) {
       expr = new Union(info, expr.args()).optimize(cc);
-    // simplify replicate
-    if(_UTIL_REPLICATE.is(expr)) expr = expr.arg(0);
-    // simplify argument
-    expr = FnCount.simplify(expr, cc);
-
+    }
     // rewrite filter
     if(expr instanceof Filter) {
       final Filter filter = (Filter) expr;
       expr = filter.flatten(filter.root, false, cc);
       if(expr != filter) return cc.function(empty ? NOT : BOOLEAN, info, expr);
     }
+    // simplify replicate
+    if(_UTIL_REPLICATE.is(expr)) expr = expr.arg(0);
+    // simplify argument
+    expr = FnCount.simplify(expr, cc);
 
     return expr != exprs[0] ? cc.function(empty ? EMPTY : EXISTS, info, expr) : this;
   }
