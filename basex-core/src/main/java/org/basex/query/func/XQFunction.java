@@ -13,48 +13,48 @@ import org.basex.util.*;
  */
 public interface XQFunction extends XQFunctionExpr {
   /**
-   * Internally invokes this function with the given arguments.
-   * This method does not deal with tail calls, so it is unsafe to call.
-   * Use {@link #invokeValue(QueryContext, InputInfo, Value...)} instead.
+   * Calls the function with the given arguments and takes care of tail calls.
+   * @param args arguments for the call
    * @param qc query context
+   * @param item flag for requesting a single item
    * @param ii input info
-   * @param args arguments
-   * @return resulting iterator
+   * @return result of the function call
    * @throws QueryException query exception
    */
-  Value invValue(QueryContext qc, InputInfo ii, Value... args) throws QueryException;
+  default Value invoke(final Value[] args, final boolean item, final QueryContext qc,
+      final InputInfo ii) throws QueryException {
+
+    XQFunction fn = this;
+    Value[] values = args;
+    final int fp = qc.stack.enterFrame(fn.stackFrameSize());
+    try {
+      while(true) {
+        qc.checkStop();
+        final Value value = fn.invoke(qc, ii, item, values);
+        fn = qc.pollTailCall();
+        if(fn == null) return value;
+        qc.stack.reuseFrame(fn.stackFrameSize());
+        values = qc.pollTailArgs();
+      }
+    } catch(final QueryException ex) {
+      throw ex.add(ii);
+   } finally {
+      qc.stack.exitFrame(fp);
+    }
+  }
 
   /**
    * Internally invokes this function with the given arguments.
    * This method does not deal with tail calls, so it is unsafe to call.
-   * Use {@link #invokeItem(QueryContext, InputInfo, Value...)} instead.
+   * Use {@link FItem#invokeValue(QueryContext, InputInfo, Value...)} instead.
    * @param qc query context
    * @param ii input info
+   * @param item flag for requesting a single item
    * @param args arguments
-   * @return resulting item
+   * @return resulting value
    * @throws QueryException query exception
    */
-  Item invItem(QueryContext qc, InputInfo ii, Value... args) throws QueryException;
-
-  /**
-   * Invokes this function with the given arguments.
-   * @param qc query context
-   * @param ii input info
-   * @param args arguments
-   * @return resulting iterator
-   * @throws QueryException query exception
-   */
-  Value invokeValue(QueryContext qc, InputInfo ii, Value... args) throws QueryException;
-
-  /**
-   * Invokes this function with the given arguments.
-   * @param qc query context
-   * @param ii input info
-   * @param args arguments
-   * @return resulting item
-   * @throws QueryException query exception
-   */
-  Item invokeItem(QueryContext qc, InputInfo ii, Value... args) throws QueryException;
+  Value invoke(QueryContext qc, InputInfo ii, boolean item, Value... args) throws QueryException;
 
   /**
    * Size of this function's stack frame.

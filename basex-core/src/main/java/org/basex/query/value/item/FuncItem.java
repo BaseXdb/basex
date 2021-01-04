@@ -101,51 +101,36 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public int stackFrameSize() {
-    return stackSize;
-  }
-
-  @Override
-  public Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
-      throws QueryException {
-
-    // bind variables and cache context
-    final QueryFocus qf = qc.focus;
-    qc.focus = focus != null ? focus : new QueryFocus();
-    try {
-      final int pl = params.length;
-      for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
-      return expr.value(qc);
-    } finally {
-      qc.focus = qf;
-    }
-  }
-
-  @Override
-  public Item invItem(final QueryContext qc, final InputInfo ii, final Value... args)
-      throws QueryException {
-    // bind variables and cache context
-    final QueryFocus qf = qc.focus;
-    qc.focus = focus != null ? focus : new QueryFocus();
-    try {
-      final int pl = params.length;
-      for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
-      return expr.item(qc, ii);
-    } finally {
-      qc.focus = qf;
-    }
-  }
-
-  @Override
   public Value invokeValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return FuncCall.invoke(this, args, false, qc, info);
+    return invoke(args, false, qc, info);
   }
 
   @Override
   public Item invokeItem(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return (Item) FuncCall.invoke(this, args, true, qc, info);
+    return (Item) invoke(args, true, qc, info);
+  }
+
+  @Override
+  public Value invoke(final QueryContext qc, final InputInfo ii, final boolean item,
+      final Value... args) throws QueryException {
+
+    // bind variables and cache context
+    final QueryFocus qf = qc.focus;
+    qc.focus = focus != null ? focus : new QueryFocus();
+    try {
+      final int pl = params.length;
+      for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
+      return item ? expr.item(qc, ii) : expr.value(qc);
+    } finally {
+      qc.focus = qf;
+    }
+  }
+
+  @Override
+  public int stackFrameSize() {
+    return stackSize;
   }
 
   @Override

@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
@@ -37,11 +36,6 @@ public abstract class XQData extends FItem {
   }
 
   @Override
-  public final int stackFrameSize() {
-    return 0;
-  }
-
-  @Override
   public final Expr inline(final Expr[] exprs, final CompileContext cc) {
     return null;
   }
@@ -52,29 +46,29 @@ public abstract class XQData extends FItem {
   }
 
   @Override
-  public final Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
-      throws QueryException {
-    final Item key = args[0].atomItem(qc, ii);
-    if(key == Empty.VALUE) throw EMPTYFOUND.get(ii);
-    return get(key, ii);
-  }
-
-  @Override
-  public final Item invItem(final QueryContext qc, final InputInfo ii, final Value... args)
-      throws QueryException {
-    return invValue(qc, ii, args).item(qc, ii);
-  }
-
-  @Override
   public final Value invokeValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return FuncCall.invoke(this, args, false, qc, ii);
+    return invoke(args, false, qc, ii);
   }
 
   @Override
   public final Item invokeItem(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return (Item) FuncCall.invoke(this, args, true, qc, ii);
+    return (Item) invoke(args, true, qc, ii);
+  }
+
+  @Override
+  public final Value invoke(final QueryContext qc, final InputInfo ii, final boolean item,
+      final Value... args) throws QueryException {
+    final Item key = args[0].atomItem(qc, ii);
+    if(key == Empty.VALUE) throw EMPTYFOUND.get(ii);
+    final Value value = get(key, ii);
+    return item ? value.item(qc, ii) : value;
+  }
+
+  @Override
+  public final int stackFrameSize() {
+    return 0;
   }
 
   @Override

@@ -149,8 +149,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public Item invItem(final QueryContext qc, final InputInfo ii, final Value... arg)
-      throws QueryException {
+  public Value invoke(final QueryContext qc, final InputInfo ii, final boolean item,
+      final Value... arg) throws QueryException {
 
     // reset context and evaluate function
     final QueryFocus qf = qc.focus;
@@ -159,39 +159,10 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     try {
       final int pl = params.length;
       for(int p = 0; p < pl; p++) qc.set(params[p], arg[p]);
-      return expr.item(qc, info);
+      return item ? expr.item(qc, info) : expr.value(qc);
     } finally {
       qf.value = cv;
     }
-  }
-
-  @Override
-  public Value invValue(final QueryContext qc, final InputInfo ii, final Value... arg)
-      throws QueryException {
-
-    // reset context and evaluate function
-    final QueryFocus qf = qc.focus;
-    final Value cv = qf.value;
-    qf.value = null;
-    try {
-      final int pl = params.length;
-      for(int p = 0; p < pl; p++) qc.set(params[p], arg[p]);
-      return expr.value(qc);
-    } finally {
-      qf.value = cv;
-    }
-  }
-
-  @Override
-  public Value invokeValue(final QueryContext qc, final InputInfo ii, final Value... args)
-      throws QueryException {
-    return FuncCall.invoke(this, args, false, qc, info);
-  }
-
-  @Override
-  public Item invokeItem(final QueryContext qc, final InputInfo ii, final Value... args)
-      throws QueryException {
-    return (Item) FuncCall.invoke(this, args, true, qc, info);
   }
 
   /**
