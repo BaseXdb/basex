@@ -383,14 +383,14 @@ public final class GFLWORTest extends QueryPlanTest {
   @Test public void flattening1() {
     check("for $a at $p in " +
         "  for $x in (1 to 2) " +
-        "  return $x + 1 " +
+        "  return $x * 2 " +
         "return $a",
-        "2\n3",
+        "2\n4",
         root(DualMap.class)
     );
     check("for $a at $p in " +
         "  for $x in (1 to 2) " +
-        "  return $x + 1 " +
+        "  return $x * 2 " +
         "return $p",
         "1\n2",
         root(RangeSeq.class)

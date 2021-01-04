@@ -201,7 +201,7 @@ public abstract class SimpleMap extends Arr {
         if(expr.size() != -1) {
           count = Int.get(expr.size());
         } else if(expr instanceof Range && expr.arg(0) == Int.ONE &&
-            expr.arg(1).seqType().eq(SeqType.ITR_O)) {
+            expr.arg(1).seqType().instanceOf(SeqType.ITR_O)) {
           count = expr.arg(1);
         }
         // (1 to 2) ! <x/>  ->  util:replicate(<x/>, 2, true())
@@ -226,15 +226,13 @@ public abstract class SimpleMap extends Arr {
         } else if(_UTIL_ITEM.is(next) && !args[0].has(Flag.CTX) &&
             args[1] instanceof ContextValue) {
           if(expr instanceof RangeSeq) {
-            final RangeSeq range = (RangeSeq) expr;
-            final Item start = range.itemAt(0), end = range.itemAt(range.size() - 1);
-            if(range.asc) {
-              // (3 to 4) ! util:item(X, .)  ->  util:range(X, 3, 4)
-              return cc.function(_UTIL_RANGE, info, args[0], start, end);
-            }
+            // (3 to 4) ! util:item(X, .)  ->  util:range(X, 3, 4)
             // reverse(3 to 4) ! util:item(X, .)  ->  reverse(util:range(X, 3, 4))
-            final Expr ex = cc.function(_UTIL_RANGE, info, args[0], end, start);
-            return cc.function(REVERSE, info, ex);
+            final RangeSeq seq = (RangeSeq) expr;
+            final long[] range = seq.range(false);
+            final Expr func = cc.function(_UTIL_RANGE, info,
+                args[0], Int.get(range[0]), Int.get(range[1]));
+            return seq.asc ? func : cc.function(REVERSE, info, func);
           }
           if(expr instanceof Range) {
             // (1 to $i) ! util:item(X, .)  ->  util:range(X, 1, $i)
@@ -244,6 +242,17 @@ public abstract class SimpleMap extends Arr {
             args[0] instanceof ContextValue)) {
           // ITEMS ! data(.)  ->  data(ITEMS)
           return cc.function(DATA, info, expr);
+        }
+      }
+
+      // (1 to 5) ! (. + 1)  ->  2 to 6
+      if(expr instanceof RangeSeq && next instanceof Arith) {
+        final Arith arith = (Arith) next;
+        final boolean plus = arith.calc == Calc.PLUS, minus = arith.calc == Calc.MINUS;
+        if((plus || minus) && next.arg(0) instanceof ContextValue && next.arg(1) instanceof Int) {
+          final RangeSeq seq = (RangeSeq) expr;
+          final long diff = ((Int) next.arg(1)).itr();
+          return RangeSeq.get(seq.range(true)[0] + (plus ? diff : -diff), seq.size(), seq.asc);
         }
       }
 

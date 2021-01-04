@@ -2074,7 +2074,7 @@ public final class RewritingsTest extends QueryPlanTest {
         empty(OrderBy.class), root(RangeSeq.class));
     check("for $i in 1 to 2 order by $i descending return $i", "2\n1",
         empty(OrderBy.class), root(RangeSeq.class));
-    check("for $i in 1 to 2 order by $i return $i + 1", "2\n3",
+    check("for $i in 1 to 2 order by $i return $i * 2", "2\n4",
         empty(OrderBy.class), root(DualMap.class));
     check("let $_ := <_>1</_> for $i in 1 to 2 order by $i return $i + $_", "2\n3",
         empty(OrderBy.class), root(GFLWOR.class));
@@ -2111,5 +2111,12 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1329() {
     query("xquery:fork-join(util:replicate(function() { <x/>[@a] }, 100000))", "");
     query("1!fn:last#0()", 1);
+  }
+
+  /** Range and arithmetic expression. */
+  @Test public void gh1972() {
+    check("(1 to 2) ! (. + 1)", "2\n3", root(RangeSeq.class));
+    check("reverse(1 to 2) ! (. - 1)", "1\n0", root(RangeSeq.class));
+    check("reverse((1 to 2) ! (. - 1))", "1\n0", root(RangeSeq.class));
   }
 }

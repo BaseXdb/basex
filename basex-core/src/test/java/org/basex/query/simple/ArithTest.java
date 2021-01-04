@@ -17,7 +17,7 @@ import org.junit.jupiter.api.*;
 public final class ArithTest extends QueryPlanTest {
   /** Test method. */
   @Test public void plus() {
-    check("for $i in 1 to 2 return $i + 1", "2\n3", exists(Arith.class));
+    check("for $i in 1 to 2 return ($i * $i) + 1", "2\n5", exists(Arith.class));
 
     // neutral number
     check("for $i in 1 to 2 return $i + 0", "1\n2", empty(Arith.class), empty(GFLWOR.class));
@@ -34,7 +34,7 @@ public final class ArithTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void minus() {
-    check("for $i in 1 to 2 return $i - 1", "0\n1", exists(Arith.class));
+    check("for $i in 1 to 2 return ($i * $i) - 1", "0\n3", exists(Arith.class));
 
     // neutral number
     check("for $i in 1 to 2 return $i - 0", "1\n2", empty(Arith.class), empty(GFLWOR.class));

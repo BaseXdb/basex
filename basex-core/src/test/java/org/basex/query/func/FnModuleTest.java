@@ -334,8 +334,8 @@ public final class FnModuleTest extends QueryPlanTest {
         exists(_RANDOM_DOUBLE));
 
     // should be rewritten to maps
-    check(func.args(" 0 to 10", " function($x) { $x + 1 }"),
-        "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11",
+    check(func.args(" 0 to 10", " function($x) { $x idiv 2 }"),
+        "0\n0\n1\n1\n2\n2\n3\n3\n4\n4\n5",
         root(DualMap.class));
     check(func.args(" (1 to 2)[. = 2]", " function($a) { $a * $a }"), 4,
         type(DualMap.class, "xs:integer*"));

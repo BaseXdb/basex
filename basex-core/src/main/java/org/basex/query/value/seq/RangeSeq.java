@@ -36,13 +36,13 @@ public final class RangeSeq extends Seq {
 
   /**
    * Returns a value representation of the specified items.
-   * @param min minimum value
+   * @param start start value
    * @param size size
    * @param asc ascending
    * @return resulting item or sequence
    */
-  public static Value get(final long min, final long size, final boolean asc) {
-    return size < 1 ? Empty.VALUE : size == 1 ? Int.get(min) : new RangeSeq(min, size, asc);
+  public static Value get(final long start, final long size, final boolean asc) {
+    return size < 1 ? Empty.VALUE : size == 1 ? Int.get(start) : new RangeSeq(start, size, asc);
   }
 
   /**
