@@ -201,7 +201,7 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public void plan(final QueryPlan plan) {
-    plan.add(plan.create(this, TCL, tco), exprs);
+    plan.add(plan.create(this, TAILCALL, tco), exprs);
   }
 
   @Override

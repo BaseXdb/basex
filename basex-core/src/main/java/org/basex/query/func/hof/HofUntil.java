@@ -19,9 +19,8 @@ public final class HofUntil extends StandardFunc {
     final FItem pred = checkArity(exprs[0], 1, qc), func = checkArity(exprs[1], 1, qc);
     Value value = exprs[2].value(qc);
 
-    while(!toBoolean(pred.invokeItem(qc, info, value))) {
-      qc.checkStop();
-      value = func.invokeValue(qc, info, value);
+    while(!toBoolean(pred.invoke(qc, info, value).item(qc, info))) {
+      value = func.invoke(qc, info, value);
     }
     return value;
   }

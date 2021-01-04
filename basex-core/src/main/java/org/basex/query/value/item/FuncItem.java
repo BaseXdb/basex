@@ -101,20 +101,8 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Value invokeValue(final QueryContext qc, final InputInfo ii, final Value... args)
+  public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
-    return invoke(args, false, qc, info);
-  }
-
-  @Override
-  public Item invokeItem(final QueryContext qc, final InputInfo ii, final Value... args)
-      throws QueryException {
-    return (Item) invoke(args, true, qc, info);
-  }
-
-  @Override
-  public Value invoke(final QueryContext qc, final InputInfo ii, final boolean item,
-      final Value... args) throws QueryException {
 
     // bind variables and cache context
     final QueryFocus qf = qc.focus;
@@ -122,7 +110,7 @@ public final class FuncItem extends FItem implements Scope {
     try {
       final int pl = params.length;
       for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
-      return item ? expr.item(qc, ii) : expr.value(qc);
+      return expr.value(qc);
     } finally {
       qc.focus = qf;
     }

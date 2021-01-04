@@ -163,7 +163,7 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public void plan(final QueryPlan plan) {
-    plan.add(plan.create(this, NAME, name.string(), TCL, tco), exprs);
+    plan.add(plan.create(this, NAME, name.string(), TAILCALL, tco), exprs);
   }
 
   @Override

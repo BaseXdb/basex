@@ -23,7 +23,7 @@ public final class FnFilter extends StandardFunc {
 
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = iter.next()) != null;) {
-      if(toBoolean(func.invokeItem(qc, info, item))) vb.add(item);
+      if(toBoolean(func.invoke(qc, info, item).item(qc, info))) vb.add(item);
     }
     return vb.value(this);
   }

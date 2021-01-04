@@ -19,7 +19,7 @@ public final class ArrayFoldLeft extends ArrayFn {
     final XQArray array = toArray(exprs[0], qc);
     Value result = exprs[1].value(qc);
     final FItem func = checkArity(exprs[2], 2, qc);
-    for(final Value value : array.members()) result = func.invokeValue(qc, info, result, value);
+    for(final Value value : array.members()) result = func.invoke(qc, info, result, value);
     return result;
   }
 

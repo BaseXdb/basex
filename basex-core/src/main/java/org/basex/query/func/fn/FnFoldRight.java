@@ -28,12 +28,12 @@ public final class FnFoldRight extends StandardFunc {
       final ListIterator<Item> iter = ((TreeSeq) seq).iterator(seq.size());
       while(iter.hasPrevious()) {
         qc.checkStop();
-        value = func.invokeValue(qc, info, iter.previous(), value);
+        value = func.invoke(qc, info, iter.previous(), value);
       }
     } else {
       for(long i = seq.size(); --i >= 0;) {
         qc.checkStop();
-        value = func.invokeValue(qc, info, seq.itemAt(i), value);
+        value = func.invoke(qc, info, seq.itemAt(i), value);
       }
     }
     return value;
@@ -52,12 +52,12 @@ public final class FnFoldRight extends StandardFunc {
       final ListIterator<Item> iter = ((TreeSeq) seq).iterator(seq.size());
       while(iter.hasPrevious()) {
         qc.checkStop();
-        value = func.invokeValue(qc, info, iter.previous(), value);
+        value = func.invoke(qc, info, iter.previous(), value);
       }
     } else {
       for(long i = seq.size(); --i >= 0;) {
         qc.checkStop();
-        value = func.invokeValue(qc, info, seq.itemAt(i), value);
+        value = func.invoke(qc, info, seq.itemAt(i), value);
       }
     }
     return value.iter();

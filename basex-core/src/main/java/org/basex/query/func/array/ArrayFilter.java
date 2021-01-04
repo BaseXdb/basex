@@ -21,7 +21,7 @@ public final class ArrayFilter extends ArrayFn {
     final FItem func = checkArity(exprs[1], 1, qc);
     final ArrayBuilder builder = new ArrayBuilder();
     for(final Value value : array.members()) {
-      if(toBoolean(func.invokeItem(qc, info, value))) builder.append(value);
+      if(toBoolean(func.invoke(qc, info, value).item(qc, info))) builder.append(value);
     }
     return builder.freeze();
   }

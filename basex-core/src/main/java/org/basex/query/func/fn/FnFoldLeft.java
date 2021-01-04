@@ -23,7 +23,7 @@ public final class FnFoldLeft extends StandardFunc {
 
     Value value = exprs[1].value(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
-      value = func.invokeValue(qc, info, value, item);
+      value = func.invoke(qc, info, value, item);
     }
     return value;
   }
@@ -39,7 +39,7 @@ public final class FnFoldLeft extends StandardFunc {
 
     Value value = exprs[1].value(qc);
     do {
-      value = func.invokeValue(qc, info, value, item);
+      value = func.invoke(qc, info, value, item);
     } while((item = qc.next(iter)) != null);
     return value.iter();
   }

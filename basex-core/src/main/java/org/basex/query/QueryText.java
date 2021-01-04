@@ -391,7 +391,7 @@ public interface QueryText {
   /** Query Info. */ String INCLUDE_MIN = "include-min";
   /** Query Info. */ String INCLUDE_MAX = "include-max";
   /** Query Info. */ String INF = "inf";
-  /** Query Info. */ String TCL = "tailCall";
+  /** Query Info. */ String TAILCALL = "tailCall";
   /** Query Info. */ String ENTRIES = "entries";
   /** Query Info. */ String PROMOTE = "promote";
   /** Query Info. */ String DATABASE = "database";

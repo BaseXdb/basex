@@ -24,7 +24,7 @@ public final class HofFoldLeft1 extends StandardFunc {
 
     Value sum = checkNoEmpty(iter.next());
     for(Item item; (item = qc.next(iter)) != null;) {
-      sum = func.invokeValue(qc, info, sum, item);
+      sum = func.invoke(qc, info, sum, item);
     }
     return sum;
   }

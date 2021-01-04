@@ -218,7 +218,7 @@ final class TrieLeaf extends TrieNode {
   @Override
   void forEach(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
       throws QueryException {
-    vb.add(func.invokeValue(qc, ii, key, value));
+    vb.add(func.invoke(qc, ii, key, value));
   }
 
   @Override

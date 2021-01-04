@@ -8,11 +8,9 @@ import org.basex.query.func.*;
 import org.basex.query.func.update.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.XQArray;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -24,30 +22,14 @@ public class FnApply extends StandardFunc {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     final FItem func = toFunc(exprs[0], qc);
-    return func.invokeValue(qc, info, values(func, qc));
-  }
-
-  @Override
-  public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FItem func = toFunc(exprs[0], qc);
-    return func.invokeItem(qc, info, values(func, qc));
-  }
-
-  /**
-   * Returns the values to apply to the function.
-   * @param func function
-   * @param qc query context
-   * @return values
-   * @throws QueryException query exception
-   */
-  private Value[] values(final FItem func, final QueryContext qc) throws QueryException {
     final XQArray array = toArray(exprs[1], qc);
+
     final long ar = checkUp(func, this instanceof UpdateApply, sc).arity(), as = array.arraySize();
     if(ar != as) throw APPLY_X_X.get(info, ar, as);
 
-    final ValueList values = new ValueList(Seq.initialCapacity(as));
+    final ValueList values = new ValueList(as);
     for(final Value value : array.members()) values.add(value);
-    return values.finish();
+    return func.invoke(qc, info, values.finish());
   }
 
   @Override

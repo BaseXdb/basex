@@ -149,8 +149,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public Value invoke(final QueryContext qc, final InputInfo ii, final boolean item,
-      final Value... arg) throws QueryException {
+  public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
+      throws QueryException {
 
     // reset context and evaluate function
     final QueryFocus qf = qc.focus;
@@ -158,8 +158,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     qf.value = null;
     try {
       final int pl = params.length;
-      for(int p = 0; p < pl; p++) qc.set(params[p], arg[p]);
-      return item ? expr.item(qc, info) : expr.value(qc);
+      for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
+      return expr.value(qc);
     } finally {
       qf.value = cv;
     }

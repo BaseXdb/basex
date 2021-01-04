@@ -22,7 +22,7 @@ public final class ArrayFoldRight extends ArrayFn {
     Value result = exprs[1].value(qc);
     final FItem func = checkArity(exprs[2], 2, qc);
     final ListIterator<Value> iter = array.iterator(array.arraySize());
-    while(iter.hasPrevious()) result = func.invokeValue(qc, info, iter.previous(), result);
+    while(iter.hasPrevious()) result = func.invoke(qc, info, iter.previous(), result);
     return result;
   }
 

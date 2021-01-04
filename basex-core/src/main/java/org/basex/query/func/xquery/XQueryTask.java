@@ -58,7 +58,7 @@ final class XQueryTask extends RecursiveTask<Value> {
     if(l == 1) {
       // perform the work
       try {
-        vb.add(((FItem) funcs.itemAt(s)).invokeValue(qc, ii));
+        vb.add(((FItem) funcs.itemAt(s)).invoke(qc, ii));
       } catch(final QueryException ex) {
         completeExceptionally(ex);
         cancel(true);

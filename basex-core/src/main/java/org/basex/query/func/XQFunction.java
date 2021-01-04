@@ -2,7 +2,7 @@ package org.basex.query.func;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -14,15 +14,15 @@ import org.basex.util.*;
 public interface XQFunction extends XQFunctionExpr {
   /**
    * Calls the function with the given arguments and takes care of tail calls.
-   * @param args arguments for the call
+   * Must not be overwritten.
    * @param qc query context
-   * @param item flag for requesting a single item
    * @param ii input info
+   * @param args arguments for the call
    * @return result of the function call
    * @throws QueryException query exception
    */
-  default Value invoke(final Value[] args, final boolean item, final QueryContext qc,
-      final InputInfo ii) throws QueryException {
+  default Value invoke(final QueryContext qc, final InputInfo ii, final Value... args)
+      throws QueryException {
 
     XQFunction fn = this;
     Value[] values = args;
@@ -30,7 +30,7 @@ public interface XQFunction extends XQFunctionExpr {
     try {
       while(true) {
         qc.checkStop();
-        final Value value = fn.invoke(qc, ii, item, values);
+        final Value value = fn.invokeInternal(qc, ii, values);
         fn = qc.pollTailCall();
         if(fn == null) return value;
         qc.stack.reuseFrame(fn.stackFrameSize());
@@ -38,23 +38,52 @@ public interface XQFunction extends XQFunctionExpr {
       }
     } catch(final QueryException ex) {
       throw ex.add(ii);
-   } finally {
+    } finally {
+      qc.stack.exitFrame(fp);
+    }
+  }
+
+  /**
+   * Tail-calls the given function with the given arguments.
+   * Must not be overwritten.
+   * @param qc query context
+   * @param ii input info
+   * @param args arguments for the call
+   * @return result of the function call
+   * @throws QueryException query exception
+   */
+  default Value invokeTail(final QueryContext qc, final InputInfo ii, final Value... args)
+      throws QueryException {
+
+    qc.checkStop();
+    final int calls = qc.tailCalls, max = qc.maxCalls;
+    if(max >= 0 && calls >= max) {
+      // too many tail calls on the stack, eliminate them
+      qc.registerTailCall(this, args);
+      return Empty.VALUE;
+    }
+
+    qc.tailCalls++;
+    final int fp = qc.stack.enterFrame(stackFrameSize());
+    try {
+      return invokeInternal(qc, ii, args);
+    } catch(final QueryException ex) {
+      throw ex.add(ii);
+    } finally {
+      qc.tailCalls = calls;
       qc.stack.exitFrame(fp);
     }
   }
 
   /**
    * Internally invokes this function with the given arguments.
-   * This method does not deal with tail calls, so it is unsafe to call.
-   * Use {@link FItem#invokeValue(QueryContext, InputInfo, Value...)} instead.
    * @param qc query context
    * @param ii input info
-   * @param item flag for requesting a single item
    * @param args arguments
    * @return resulting value
    * @throws QueryException query exception
    */
-  Value invoke(QueryContext qc, InputInfo ii, boolean item, Value... args) throws QueryException;
+  Value invokeInternal(QueryContext qc, InputInfo ii, Value[] args) throws QueryException;
 
   /**
    * Size of this function's stack frame.

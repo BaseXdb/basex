@@ -7,7 +7,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -64,28 +63,6 @@ public abstract class FItem extends Item implements XQFunction {
   public final FuncType funcType() {
     return (FuncType) type;
   }
-
-  /**
-   * Invokes this function with the given arguments.
-   * @param qc query context
-   * @param ii input info
-   * @param args arguments
-   * @return resulting iterator
-   * @throws QueryException query exception
-   */
-  public abstract Value invokeValue(QueryContext qc, InputInfo ii, Value... args)
-      throws QueryException;
-
-  /**
-   * Invokes this function with the given arguments.
-   * @param qc query context
-   * @param ii input info
-   * @param args arguments
-   * @return resulting item
-   * @throws QueryException query exception
-   */
-  public abstract Item invokeItem(QueryContext qc, InputInfo ii, Value... args)
-      throws QueryException;
 
   /**
    * Coerces this function item to the given function type.

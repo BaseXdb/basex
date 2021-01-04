@@ -46,24 +46,11 @@ public abstract class XQData extends FItem {
   }
 
   @Override
-  public final Value invokeValue(final QueryContext qc, final InputInfo ii, final Value... args)
+  public final Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
-    return invoke(args, false, qc, ii);
-  }
-
-  @Override
-  public final Item invokeItem(final QueryContext qc, final InputInfo ii, final Value... args)
-      throws QueryException {
-    return (Item) invoke(args, true, qc, ii);
-  }
-
-  @Override
-  public final Value invoke(final QueryContext qc, final InputInfo ii, final boolean item,
-      final Value... args) throws QueryException {
     final Item key = args[0].atomItem(qc, ii);
-    if(key == Empty.VALUE) throw EMPTYFOUND.get(ii);
-    final Value value = get(key, ii);
-    return item ? value.item(qc, ii) : value;
+    if(key != Empty.VALUE) return get(key, ii);
+    throw EMPTYFOUND.get(ii);
   }
 
   @Override

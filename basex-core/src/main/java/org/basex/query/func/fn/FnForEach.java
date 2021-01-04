@@ -31,7 +31,7 @@ public class FnForEach extends StandardFunc {
     final FItem func = checkArity(exprs[1], 1, this instanceof UpdateForEach, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item item; (item = qc.next(iter)) != null;) vb.add(func.invokeValue(qc, info, item));
+    for(Item item; (item = qc.next(iter)) != null;) vb.add(func.invoke(qc, info, item));
     return vb.value(this);
   }
 

@@ -32,7 +32,7 @@ public class FnForEachPair extends StandardFunc {
           if(item != null) return item;
           final Item item1 = iter1.next(), item2 = iter2.next();
           if(item1 == null || item2 == null) return null;
-          iter = func.invokeValue(qc, info, item1, item2).iter();
+          iter = func.invoke(qc, info, item1, item2).iter();
         } while(true);
       }
     };
@@ -45,7 +45,7 @@ public class FnForEachPair extends StandardFunc {
 
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item1, item2; (item1 = iter1.next()) != null && (item2 = iter2.next()) != null;) {
-      vb.add(func.invokeValue(qc, info, item1, item2));
+      vb.add(func.invoke(qc, info, item1, item2));
     }
     return vb.value(this);
   }

@@ -20,7 +20,7 @@ public final class ArrayForEach extends ArrayFn {
     final XQArray array = toArray(exprs[0], qc);
     final FItem func = checkArity(exprs[1], 1, qc);
     final ArrayBuilder builder = new ArrayBuilder();
-    for(final Value value : array.members()) builder.append(func.invokeValue(qc, info, value));
+    for(final Value value : array.members()) builder.append(func.invoke(qc, info, value));
     return builder.freeze();
   }
 
