@@ -56,7 +56,7 @@ public final class FuncItem extends FItem implements Scope {
    */
   public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
       final FuncType type, final Expr expr, final int stackSize, final InputInfo info) {
-    this(sc, anns, name, params, type, expr, new QueryFocus(), stackSize, info);
+    this(sc, anns, name, params, type, expr, null, stackSize, info);
   }
 
   /**
@@ -67,7 +67,7 @@ public final class FuncItem extends FItem implements Scope {
    * @param params formal parameters
    * @param type function type
    * @param expr function body
-   * @param focus query focus
+   * @param focus query focus (may be {@code null})
    * @param stackSize stack-frame size
    * @param info input info
    */
@@ -111,7 +111,7 @@ public final class FuncItem extends FItem implements Scope {
 
     // bind variables and cache context
     final QueryFocus qf = qc.focus;
-    qc.focus = focus;
+    qc.focus = focus != null ? focus : new QueryFocus();
     try {
       final int pl = params.length;
       for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
@@ -126,7 +126,7 @@ public final class FuncItem extends FItem implements Scope {
       throws QueryException {
     // bind variables and cache context
     final QueryFocus qf = qc.focus;
-    qc.focus = focus;
+    qc.focus = focus != null ? focus : new QueryFocus();
     try {
       final int pl = params.length;
       for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);

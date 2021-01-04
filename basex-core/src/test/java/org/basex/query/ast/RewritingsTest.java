@@ -2106,4 +2106,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $i in 1 to 2 return exists($i[. = 1])", "true\nfalse",
         root(DualMap.class), exists(CmpSimpleG.class));
   }
+
+  /** Parallel execution. */
+  @Test public void gh1329() {
+    query("xquery:fork-join(util:replicate(function() { <x/>[@a] }, 100000))", "");
+    query("1!fn:last#0()", 1);
+  }
 }

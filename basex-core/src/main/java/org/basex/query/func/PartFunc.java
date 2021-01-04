@@ -80,24 +80,24 @@ public final class PartFunc extends Arr {
     final FuncType ft = func.funcType();
     final Expr[] args = new Expr[nargs];
     final VarScope vs = new VarScope(sc);
-    final Var[] vars = new Var[hl];
+    final Var[] params = new Var[hl];
     int a = -1;
     for(int h = 0; h < hl; h++) {
       while(++a < holes[h]) args[a] = exprs[a - h].value(qc);
-      vars[h] = vs.addNew(func.paramName(holes[h]), null, false, qc, info);
-      args[a] = new VarRef(info, vars[h]);
+      params[h] = vs.addNew(func.paramName(holes[h]), null, false, qc, info);
+      args[a] = new VarRef(info, params[h]);
       final SeqType at = ft.argTypes[a];
-      if(at != null) vars[h].refineType(at, null);
+      if(at != null) params[h].refineType(at, null);
     }
     final int al = args.length;
     while(++a < al) args[a] = exprs[a - hl].value(qc);
 
     final AnnList anns = func.annotations();
     final boolean updating = anns.contains(Annotation.UPDATING);
-    final DynFuncCall ex = new DynFuncCall(info, sc, updating, false, func, args);
+    final DynFuncCall expr = new DynFuncCall(info, sc, updating, false, func, args);
 
-    final FuncType type = FuncType.get(anns, ft.declType, vars);
-    return new FuncItem(sc, anns, null, vars, type, ex, qc.focus, vs.stackSize(), info);
+    final FuncType type = FuncType.get(anns, ft.declType, params);
+    return new FuncItem(sc, anns, null, params, type, expr, qc.focus.copy(), vs.stackSize(), info);
   }
 
   @Override
