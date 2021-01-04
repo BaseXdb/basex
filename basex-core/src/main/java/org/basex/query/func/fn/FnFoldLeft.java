@@ -19,14 +19,14 @@ public final class FnFoldLeft extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
-    Item item = iter.next();
+    final Item item = iter.next();
     return item != null ? value(iter, item, qc) : exprs[1].value(qc);
   }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
-    Item item = iter.next();
+    final Item item = iter.next();
     return item != null ? value(iter, item, qc).iter() : exprs[1].iter(qc);
   }
 
