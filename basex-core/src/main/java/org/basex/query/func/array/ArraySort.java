@@ -30,9 +30,9 @@ public final class ArraySort extends StandardFunc {
       final byte[] token = toTokenOrNull(exprs[1], qc);
       if(token != null) coll = Collation.get(token, qc, sc, info, WHICHCOLL_X);
     }
+    final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
 
     final ValueList values = new ValueList(array.arraySize());
-    final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
     for(final Value value : array.members()) {
       values.add((key == null ? value : key.invoke(qc, info, value)).atomValue(qc, info));
     }

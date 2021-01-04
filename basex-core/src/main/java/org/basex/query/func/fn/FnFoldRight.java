@@ -21,46 +21,37 @@ public final class FnFoldRight extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value seq = exprs[0].value(qc);
-    Value value = exprs[1].value(qc);
-    final FItem func = checkArity(exprs[2], 2, qc);
-
-    if(seq instanceof TreeSeq) {
-      final ListIterator<Item> iter = ((TreeSeq) seq).iterator(seq.size());
-      while(iter.hasPrevious()) {
-        qc.checkStop();
-        value = func.invoke(qc, info, iter.previous(), value);
-      }
-    } else {
-      for(long i = seq.size(); --i >= 0;) {
-        qc.checkStop();
-        value = func.invoke(qc, info, seq.itemAt(i), value);
-      }
-    }
-    return value;
+    return value(seq, qc);
   }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Value seq = exprs[0].value(qc);
+    return seq.isEmpty() ? exprs[1].iter(qc) : value(seq, qc).iter();
+  }
+
+  /**
+   * Evaluates the expression.
+   * @param items items to process
+   * @param qc query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Value value(final Value items, final QueryContext qc) throws QueryException {
+    Value value = exprs[1].value(qc);
     final FItem func = checkArity(exprs[2], 2, qc);
 
-    // evaluate start value lazily if it's passed straight through
-    if(seq.isEmpty()) return exprs[1].iter(qc);
-
-    Value value = exprs[1].value(qc);
-    if(seq instanceof TreeSeq) {
-      final ListIterator<Item> iter = ((TreeSeq) seq).iterator(seq.size());
+    if(items instanceof TreeSeq) {
+      final ListIterator<Item> iter = ((TreeSeq) items).iterator(items.size());
       while(iter.hasPrevious()) {
-        qc.checkStop();
         value = func.invoke(qc, info, iter.previous(), value);
       }
     } else {
-      for(long i = seq.size(); --i >= 0;) {
-        qc.checkStop();
-        value = func.invoke(qc, info, seq.itemAt(i), value);
+      for(long i = items.size(); --i >= 0;) {
+        value = func.invoke(qc, info, items.itemAt(i), value);
       }
     }
-    return value.iter();
+    return value;
   }
 
   @Override

@@ -21,6 +21,7 @@ public final class ArrayFoldRight extends ArrayFn {
     final XQArray array = toArray(exprs[0], qc);
     Value result = exprs[1].value(qc);
     final FItem func = checkArity(exprs[2], 2, qc);
+
     final ListIterator<Value> iter = array.iterator(array.arraySize());
     while(iter.hasPrevious()) result = func.invoke(qc, info, iter.previous(), result);
     return result;

@@ -21,6 +21,7 @@ public final class ArrayForEachPair extends ArrayFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array1 = toArray(exprs[0], qc), array2 = toArray(exprs[1], qc);
     final FItem func = checkArity(exprs[2], 2, qc);
+
     final ArrayBuilder builder = new ArrayBuilder();
     final Iterator<Value> as = array1.iterator(0), bs = array2.iterator(0);
     while(as.hasNext() && bs.hasNext()) builder.append(func.invoke(qc, info, as.next(), bs.next()));
