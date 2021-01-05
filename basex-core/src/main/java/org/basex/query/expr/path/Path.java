@@ -334,7 +334,7 @@ public abstract class Path extends ParseExpr {
     }
 
     // self step was removed: ensure that result will be in distinct document order
-    if(self && (list.isEmpty() || !list.get(0).seqType().type.instanceOf(NodeType.NOD))) {
+    if(self && (list.isEmpty() || !(list.get(0).seqType().type instanceof NodeType))) {
       if(root == null) root = new ContextValue(info).optimize(cc);
       if(!root.ddo()) root = cc.simplify(root, cc.function(Function._UTIL_DDO, info, root));
     }
@@ -630,7 +630,7 @@ public abstract class Path extends ParseExpr {
     /* rewrite if:
      * - previous expression yields nodes (otherwise, an error must be raised at runtime)
      * - last expression is no step, and yields a single result or no node */
-    if(!type1.instanceOf(NodeType.NOD) || s2 instanceof Step || size() != 1 &&
+    if(!(type1 instanceof NodeType) || s2 instanceof Step || size() != 1 &&
        !type2.instanceOf(AtomType.AAT) && !type2.instanceOf(SeqType.FUNC)) return this;
 
     /* remove last step from new root expression. examples:

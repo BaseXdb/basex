@@ -63,7 +63,7 @@ public class XQueryParse extends StandardFunc {
       final AModule mod = qctx.parse(string(query), toBaseUri(path, opts));
       final FElem root;
       if(mod instanceof LibraryModule) {
-        final QNm module = ((LibraryModule) mod).sc.module;
+        final QNm module = mod.sc.module;
         root = new FElem(LIBRARY_MODULE);
         root.add(PREFIX, module.string());
         root.add(URI, module.uri());
