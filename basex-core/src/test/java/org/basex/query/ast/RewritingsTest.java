@@ -2120,9 +2120,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("reverse((1 to 2) ! (. - 1))", "1\n0", root(RangeSeq.class));
   }
 
-  /** Count optimizations. */
-  @Test public void gh1973() {
-    check("count((<a/>, <b/>)[self::a])", 1, exists(DualMap.class));
-    check("for $i in 1 to 2 return count((1 to 3)[. = $i])", "1\n1", exists(INDEX_OF));
+  /** count -> exists. */
+  @Test public void gh1974() {
+    check("boolean(count((1, 2)[. <= 2]))", true, root(EXISTS));
   }
 }
