@@ -106,7 +106,7 @@ public final class StaticOptions extends Options {
     @Override
     public String toString() {
       final String name = name();
-      return name.substring(0, 1) + name.substring(1).toLowerCase(Locale.ENGLISH);
+      return name.charAt(0) + name.substring(1).toLowerCase(Locale.ENGLISH);
     }
   }
 

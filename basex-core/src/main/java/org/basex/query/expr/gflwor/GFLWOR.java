@@ -222,7 +222,7 @@ public final class GFLWOR extends ParseExpr {
         final Where where = (Where) clause;
         if(where.expr instanceof And) {
           iter.remove();
-          for(final Expr expr : ((Arr) where.expr).args()) iter.add(new Where(expr, where.info));
+          for(final Expr expr : where.expr.args()) iter.add(new Where(expr, where.info));
         }
       }
     }
@@ -970,12 +970,7 @@ public final class GFLWOR extends ParseExpr {
    * @throws QueryException query exception
    */
   public Expr removeOrderBy(final CompileContext cc) throws QueryException {
-    final int cs = clauses.size();
-    final ListIterator<Clause> iter = clauses.listIterator();
-    while(iter.hasNext()) {
-      if(iter.next() instanceof OrderBy) iter.remove();
-    }
-    return cs != clauses.size() ? optimize(cc) : null;
+    return clauses.removeIf(clause -> clause instanceof OrderBy) ? optimize(cc) : null;
   }
 
   @Override

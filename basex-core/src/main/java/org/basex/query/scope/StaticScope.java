@@ -65,7 +65,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
     final TokenBuilder key = new TokenBuilder(), value = new TokenBuilder();
     final Runnable add = () -> {
       final byte[] k = key.isEmpty() ? Inspect.DOC_TAGS[0] : key.next();
-      map.computeIfAbsent(k, () -> new TokenList()).add(value.trim().next());
+      map.computeIfAbsent(k, TokenList::new).add(value.trim().next());
     };
 
     final TokenBuilder input = new TokenBuilder();

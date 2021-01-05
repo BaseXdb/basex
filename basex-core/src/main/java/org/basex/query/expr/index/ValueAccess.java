@@ -182,7 +182,7 @@ public final class ValueAccess extends IndexAccess {
       return new DBNodeIter(data) {
         @Override
         public DBNode next() {
-          while(ii.more()) {
+          if(ii.more()) {
             tmp.pre(ii.pre());
             return tmp.finish();
           }
@@ -197,7 +197,7 @@ public final class ValueAccess extends IndexAccess {
 
       @Override
       public DBNode next() {
-        while(ii.more()) {
+        if(ii.more()) {
           final int pre = ii.pre();
           tmp.pre(pre);
           list.add(pre);

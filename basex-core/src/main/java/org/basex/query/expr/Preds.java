@@ -279,13 +279,11 @@ public abstract class Preds extends Arr {
     if(el == 0 || mayBePositional() || ebv && !(rst.type instanceof NodeType)) return this;
 
     final Expr pred = exprs[el - 1];
-    final QueryFunction<Expr, Expr> createRoot = r -> {
-      return el == 1 ? r : Filter.get(cc, info, r, Arrays.copyOfRange(exprs, 0, el - 1));
-    };
-    final QueryFunction<Expr, Expr> createExpr = e -> {
-      return e instanceof ContextValue ? createRoot.apply(root) :
-        e instanceof Path ? Path.get(cc, info, createRoot.apply(root), e) : null;
-    };
+    final QueryFunction<Expr, Expr> createRoot = r ->
+      el == 1 ? r : Filter.get(cc, info, r, Arrays.copyOfRange(exprs, 0, el - 1));
+    final QueryFunction<Expr, Expr> createExpr = e ->
+      e instanceof ContextValue ? createRoot.apply(root) :
+      e instanceof Path ? Path.get(cc, info, createRoot.apply(root), e) : null;
 
     // rewrite to general comparison (right operand must not depend on context):
     // a[. = 'x']  ->  a = 'x'

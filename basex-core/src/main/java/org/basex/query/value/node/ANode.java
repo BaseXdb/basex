@@ -310,7 +310,7 @@ public abstract class ANode extends Item {
   /**
    * Returns a light-weight, low-level ancestor axis iterator.
    * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
-   * Overwritten by {@link DBNode#ancestorIter}.
+   * Overwritten by {@link DBNode#ancestorIter()}.
    * @return iterator
    */
   public BasicNodeIter ancestorIter() {
@@ -328,7 +328,7 @@ public abstract class ANode extends Item {
   /**
    * Returns a light-weight ancestor-or-self axis iterator.
    * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
-   * Overwritten by {@link DBNode#ancestorOrSelfIter}.
+   * Overwritten by {@link DBNode#ancestorOrSelfIter()}.
    * @return iterator
    */
   public BasicNodeIter ancestorOrSelfIter() {

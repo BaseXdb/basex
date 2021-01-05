@@ -294,7 +294,7 @@ public final class List extends Arr {
 
   @Override
   public boolean vacuous() {
-    return ((Checks<Expr>) expr -> expr.vacuous()).all(exprs);
+    return ((Checks<Expr>) Expr::vacuous).all(exprs);
   }
 
   @Override

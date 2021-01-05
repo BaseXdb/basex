@@ -110,9 +110,8 @@ public abstract class Filter extends Preds {
     Expr expr = root;
     boolean opt = false;
     final ExprList preds = new ExprList(exprs.length);
-    final QueryFunction<Expr, Expr> prepare = ex -> {
-      return preds.isEmpty() ? ex : get(cc, info, ex, preds.next());
-    };
+    final QueryFunction<Expr, Expr> prepare = ex ->
+      preds.isEmpty() ? ex : get(cc, info, ex, preds.next());
     for(final Expr pred : exprs) {
       Expr ex = null;
       if(LAST.is(pred)) {

@@ -292,7 +292,7 @@ public abstract class Arr extends ParseExpr {
       throws QueryException {
 
     // skip if only one operand is left, or if children have no operands that can be optimized
-    if(exprs.length < 2 || !((Checks<Expr>) expr -> inverse.isInstance(expr)).any(exprs))
+    if(exprs.length < 2 || !((Checks<Expr>) inverse::isInstance).any(exprs))
       return null;
 
     // check if expressions have common operands

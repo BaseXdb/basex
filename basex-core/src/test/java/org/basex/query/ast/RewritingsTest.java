@@ -1302,9 +1302,9 @@ public final class RewritingsTest extends QueryPlanTest {
     }
     sb.append("  return if(").append(query).append(") then 't' else 'f'\n");
     return sb.append(")").toString();
-  };
+  }
 
-  /** Combine position predicates. */
+    /** Combine position predicates. */
   @Test public void gh1840() {
     check("(1,2,3)[position() = 1 or position() = 1]", 1, root(Int.class));
     check("(1,2,3)[position() = 1 or position() = 2]", "1\n2", root(RangeSeq.class));
@@ -1444,7 +1444,7 @@ public final class RewritingsTest extends QueryPlanTest {
     }
     sb.append("  return if(").append(query).append(") then 't' else 'f' \n");
     return sb.append(")").toString();
-  };
+  }
 
   /** Name tests in where clauses, index rewritings. */
   @Test public void gh1853() {

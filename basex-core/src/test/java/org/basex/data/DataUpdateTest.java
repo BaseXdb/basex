@@ -41,15 +41,10 @@ public abstract class DataUpdateTest extends SandboxTest {
   /** Test file size in nodes. */
   int size;
 
-  /** Main memory flag. */
-  //@Parameter
-  //public Object mainmem;
-
   /**
    * Test parameters.
    * @return parameters
    */
-  //@Parameters
   public static List<Object[]> params() {
     return Arrays.asList(new Object[][] { { false }, { true } });
   }

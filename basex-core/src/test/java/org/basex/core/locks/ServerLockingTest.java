@@ -114,9 +114,9 @@ public final class ServerLockingTest extends SandboxTest {
    */
   @Test public void noDatabase() throws Exception {
     testQueries(Q, Q, true);
-  };
+  }
 
-  /**
+    /**
    * Read same database.
    * @throws Exception None expected
    */
@@ -125,7 +125,7 @@ public final class ServerLockingTest extends SandboxTest {
         f("(db:open('%s'), %s)", NAME, Q),
         f("(db:open('%s'), %s)", NAME, Q),
         true);
-  };
+  }
 
   /**
    * Read two different databases.
@@ -136,7 +136,7 @@ public final class ServerLockingTest extends SandboxTest {
         f("(db:open('%s'), %s)", NAME, Q),
         f("(db:open('%s1'), %s)", NAME, Q),
         true);
-  };
+  }
 
   /**
    * Write to the same database twice.
@@ -147,7 +147,7 @@ public final class ServerLockingTest extends SandboxTest {
         f("insert node %s into db:open('%s')", Q, NAME),
         f("insert node %s into db:open('%s')", Q, NAME),
         false);
-  };
+  }
 
   /**
    * Write to different databases.
@@ -158,7 +158,7 @@ public final class ServerLockingTest extends SandboxTest {
         f("insert node %s into db:open('%s')", Q, NAME),
         f("insert node %s into db:open('%s1')", Q, NAME),
         true);
-  };
+  }
 
   /**
    * Read from and write to the same database.
@@ -169,7 +169,7 @@ public final class ServerLockingTest extends SandboxTest {
         f("(db:open('%s'), %s)", NAME, Q),
         f("insert node %s into db:open('%s')", Q, NAME),
         false);
-  };
+  }
 
   /**
    * Read from and write to different databases.
@@ -180,7 +180,7 @@ public final class ServerLockingTest extends SandboxTest {
         f("(db:open('%s'), %s)", NAME, Q),
         f("insert node %s into db:open('%s1')", Q, NAME),
         true);
-  };
+  }
 
   /**
    * Read from a database, perform global write lock.
@@ -191,7 +191,7 @@ public final class ServerLockingTest extends SandboxTest {
         f("(db:open('%s'), %s)", NAME, Q),
         f("for $i in ('%s') return insert node %s into db:open($i)", NAME, Q),
         false);
-  };
+  }
 
   /**
    * Global write lock twice.
@@ -202,7 +202,7 @@ public final class ServerLockingTest extends SandboxTest {
         f("for $i in ('%s') return insert node %s into db:open($i)", NAME, Q),
         f("for $i in ('%s') return insert node %s into db:open($i)", NAME, Q),
         false);
-  };
+  }
 
   /**
    * Test XQuery locks.

@@ -140,7 +140,7 @@ public final class TypeswitchGroup extends Single {
   }
 
   @Override
-  public Expr inline(final InlineContext ic) throws QueryException {
+  public Expr inline(final InlineContext ic) {
     try {
       return super.inline(ic);
     } catch(final QueryException qe) {

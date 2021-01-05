@@ -123,7 +123,7 @@ public final class ItrPos extends Simple implements CmpPos {
   @Override
   public Expr inline(final InlineContext ic) {
     return null;
-  };
+  }
 
   @Override
   public ItrPos copy(final CompileContext cc, final IntObjMap<Var> vm) {

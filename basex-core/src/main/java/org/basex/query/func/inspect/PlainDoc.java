@@ -48,7 +48,7 @@ final class PlainDoc extends Inspect {
     parseQuery(io);
     final FElem root = elem("module", null);
     if(module instanceof LibraryModule) {
-      final QNm name = ((LibraryModule) module).sc.module;
+      final QNm name = module.sc.module;
       root.add("prefix", name.string());
       root.add("uri", name.uri());
     }

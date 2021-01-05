@@ -61,7 +61,7 @@ public final class InlineContext {
       expr instanceof Path && expr.size() == 1 && !expr.has(Flag.CNS)
     )) {
       return false;
-    };
+    }
 
     // check if expression can be inlined into the specified target expressions
     for(final Expr target : targets) {
