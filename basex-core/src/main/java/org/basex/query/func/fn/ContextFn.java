@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import org.basex.core.locks.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -75,5 +76,18 @@ public abstract class ContextFn extends StandardFunc {
       final Expr[] args = new ExprList(exprs.length + 1).add(exprs).add(ic.copy()).finish();
       return definition.get(ic.cc.sc(), info, args);
     });
+  }
+
+  /**
+   * Optimizes EBV checks.
+   * @param cc compilation context
+   * @param expr context expression (can be {@code null})
+   * @return optimized expression or {@code null}
+   * @throws QueryException query exception
+   */
+  public final Expr simplifyEbv(final Expr expr, final CompileContext cc) throws QueryException {
+    final SeqType st = expr.seqType();
+    return st.instanceOf(SeqType.ELM_O) || st.instanceOf(SeqType.DOC_O) ?
+      Path.get(cc, info, expr, Step.get(cc, expr, info, Axis.DESCENDANT, KindTest.TXT)) : null;
   }
 }

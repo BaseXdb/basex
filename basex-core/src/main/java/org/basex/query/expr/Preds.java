@@ -11,6 +11,7 @@ import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -270,7 +271,7 @@ public abstract class Preds extends Arr {
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  public final Expr flatten(final Expr root, final boolean ebv, final CompileContext cc)
+  public final Expr flattenEbv(final Expr root, final boolean ebv, final CompileContext cc)
       throws QueryException {
 
     // only single predicate can be rewritten; root must yield nodes; no positional predicates
@@ -311,8 +312,13 @@ public abstract class Preds extends Arr {
     }
 
     // rewrite to path: root[path]  ->  root/path
+    // rewrite to path: root[data()]  ->  root/descendant::text()
     if(rst.type instanceof NodeType) {
-      final Expr expr = createExpr.apply(pred);
+      Expr expr = createExpr.apply(pred);
+      if(expr == null && (Function.DATA.is(pred) || Function.STRING.is(pred))) {
+        final ContextFn func = (ContextFn) pred;
+        if(func.contextAccess()) expr = func.simplifyEbv(root, cc);
+      }
       if(expr != null) return expr;
     }
 

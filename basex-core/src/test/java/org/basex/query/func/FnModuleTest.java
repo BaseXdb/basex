@@ -7,9 +7,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * XQuery functions: AST tests.
@@ -834,7 +835,8 @@ public final class FnModuleTest extends QueryPlanTest {
     check("for $s in (<a/>, <b/>) return " + func.args(" $s"), "\n", exists(func));
     check("for $s in ('a', 'b') return $s[" + func.args() + ']', "a\nb", empty(func));
     check("for $s in ('a', 'b') return $s[" + func.args() + " = 'a']", "a", empty(func));
-    check("for $s in (<a/>, <b/>) return $s[" + func.args() + ']', "", exists(func));
+    check("for $s in (<a/>, <b/>) return $s[" + func.args() + ']', "",
+        empty(func), exists(SingleIterPath.class));
 
     error(func.args(), NOCTX_X);
     error(func.args(" true#0"), FISTRING_X);

@@ -247,7 +247,7 @@ public abstract class Filter extends Preds {
       throws QueryException {
 
     if(mode == Simplify.EBV || mode == Simplify.PREDICATE) {
-      final Expr expr = flatten(root, true, cc);
+      final Expr expr = flattenEbv(root, true, cc);
       if(expr != this) return cc.simplify(this, expr);
     } else if(mode == Simplify.DISTINCT && !mayBePositional()) {
       final Expr expr = root.simplifyFor(mode, cc);

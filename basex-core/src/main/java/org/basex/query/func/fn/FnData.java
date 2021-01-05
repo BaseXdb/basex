@@ -57,13 +57,17 @@ public final class FnData extends ContextFn {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    Expr expr = null;
+    final Expr expr1 = contextAccess() ? new ContextValue(info).optimize(cc) : exprs[0];
     if(mode == Simplify.DATA || mode == Simplify.STRING || mode == Simplify.NUMBER) {
       // data(<a/>) = ''  ->  <a/> = ''
-      if(!contextAccess()) return cc.simplify(this, exprs[0]);
       // A[B ! data() = '']  ->  A[B ! . = '']
-      if(cc.nestedFocus()) return new ContextValue(info).optimize(cc);
+      expr = expr1;
+    } else if(mode == Simplify.EBV || mode == Simplify.PREDICATE) {
+      // if(data($node))  ->  if($node/descendant::text())
+      expr = simplifyEbv(expr1, cc);
     }
-    return super.simplifyFor(mode, cc);
+    return expr != null ? cc.simplify(this, expr) : super.simplifyFor(mode, cc);
   }
 
   @Override

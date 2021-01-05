@@ -64,7 +64,7 @@ public class FnEmpty extends StandardFunc {
     // rewrite filter
     if(expr instanceof Filter) {
       final Filter filter = (Filter) expr;
-      expr = filter.flatten(filter.root, false, cc);
+      expr = filter.flattenEbv(filter.root, false, cc);
       if(expr != filter) return cc.function(empty ? NOT : BOOLEAN, info, expr);
     }
     // simplify replicate

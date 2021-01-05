@@ -226,13 +226,13 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[string-length() eq -1]", "", empty(IterFilter.class));
     check("<a/>[string-length() eq 1.1]", "", empty(IterFilter.class));
 
-    check("<a/>[string-length() >  0]", "", exists(STRING));
-    check("<a/>[string-length() >= 0.5]", "", exists(STRING));
-    check("<a/>[string-length() ne 0]", "", exists(STRING));
+    check("<a/>[string-length() >  0]", "", exists(SingleIterPath.class));
+    check("<a/>[string-length() >= 0.5]", "", exists(SingleIterPath.class));
+    check("<a/>[string-length() ne 0]", "", exists(SingleIterPath.class));
 
-    check("<a/>[string-length() <  0.5]", "<a/>", exists(STRING));
-    check("<a/>[string-length() <= 0.5]", "<a/>", exists(STRING));
-    check("<a/>[string-length() eq 0]", "<a/>", exists(STRING));
+    check("<a/>[string-length() <  0.5]", "<a/>", exists(SingleIterPath.class));
+    check("<a/>[string-length() <= 0.5]", "<a/>", exists(SingleIterPath.class));
+    check("<a/>[string-length() eq 0]", "<a/>", exists(SingleIterPath.class));
 
     check("<a/>[string-length() gt 1]", "", exists(STRING_LENGTH));
     check("<a/>[string-length() = <a>1</a>]", "", exists(STRING_LENGTH));
@@ -747,7 +747,7 @@ public final class RewritingsTest extends QueryPlanTest {
   /** EBV checks. */
   @Test public void gh1769ebv() {
     check("if((<a/>, <b/>)) then 1 else 2", 1, root(Int.class));
-    check("if(data(<a/>)) then 1 else 2", 2, exists(DATA));
+    check("if(data(<a/>)) then 1 else 2", 2, exists(IterPath.class));
   }
 
   /** Remove redundant atomizations. */
@@ -948,11 +948,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[local-name() eq '']", "", exists(NOT), empty(STRING));
     check("attribute { 'a' } { '' }[local-name() = '']", "", exists(NOT), empty(STRING));
     check("let $x := (<a/>, <a/>) where $x[. eq ''] return $x", "<a/>\n<a/>",
-        exists(NOT), exists(DATA));
+        exists(EMPTY), exists(SingleIterPath.class));
 
-    check("string(<_/>) != ''", false, root(BOOLEAN));
-    check("string(<_/>) = ''", true, root(NOT), exists(DATA));
-    check("string(<_/>) <= ''", true, root(NOT), exists(DATA));
+    check("string(<_/>) != ''", false, exists(EXISTS), exists(IterPath.class));
+    check("string(<_/>) = ''", true, exists(EMPTY), exists(IterPath.class));
+    check("string(<_/>) <= ''", true, exists(EMPTY), exists(IterPath.class));
     check("string(<_/>) >= ''", true, root(Bln.class));
     check("string(<_/>) < ''", false, root(Bln.class));
 
