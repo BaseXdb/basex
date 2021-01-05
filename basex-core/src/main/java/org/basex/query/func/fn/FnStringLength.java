@@ -1,8 +1,11 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -25,5 +28,14 @@ public final class FnStringLength extends ContextFn {
       token = toZeroToken(exprs[0], qc);
     }
     return Int.get(Token.length(token));
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    if(mode == Simplify.EBV) {
+      // if(string-length(nodes))  ->  if(string(nodes))
+      return cc.simplify(this, cc.function(STRING, info, exprs));
+    }
+    return this;
   }
 }

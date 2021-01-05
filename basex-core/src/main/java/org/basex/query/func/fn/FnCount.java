@@ -65,7 +65,7 @@ public final class FnCount extends StandardFunc {
       // if(count(items))  ->  if(exists(items))
       final Expr expr = exprs[0];
       return cc.simplify(this, expr.seqType().type instanceof NodeType ? expr :
-        cc.function(EXISTS, info, expr));
+        cc.function(EXISTS, info, exprs));
     }
     return this;
   }

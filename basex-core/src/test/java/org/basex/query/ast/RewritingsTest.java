@@ -2123,5 +2123,9 @@ public final class RewritingsTest extends QueryPlanTest {
   /** count -> exists. */
   @Test public void gh1974() {
     check("boolean(count((1, 2)[. <= 2]))", true, root(EXISTS));
+    check("boolean(count((1, 2)[. >= 3]))", false, root(EXISTS));
+
+    check("boolean(string-length(<_>A</_>))", true, exists(STRING));
+    check("boolean(string-length(<_/>))", false, exists(STRING));
   }
 }
