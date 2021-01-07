@@ -5,7 +5,7 @@
   <!-- Artifact information -->
   <groupId>org.basex</groupId>
   <artifactId>basex-parent</artifactId>
-  <version>9.4.6-SNAPSHOT</version>
+  <version>9.4.6</version>
   <packaging>pom</packaging>
 
   <distributionManagement>
@@ -29,7 +29,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
-    <jettyVersion>9.4.34.v20201102</jettyVersion>
+    <jettyVersion>9.4.35.v20201120</jettyVersion>
     <junit.version>5.7.0</junit.version>
   </properties>
 
