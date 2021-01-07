@@ -16,6 +16,6 @@ import org.basex.util.*;
 public final class FnDefaultLanguage extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) {
-    return new Str(Formatter.EN, AtomType.LAN);
+    return new Str(Formatter.EN, AtomType.LANGUAGE);
   }
 }

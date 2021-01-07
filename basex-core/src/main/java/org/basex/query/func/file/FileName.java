@@ -15,6 +15,6 @@ public final class FileName extends FileFn {
   @Override
   public Item item(final QueryContext qc) throws QueryException {
     final Path path = toPath(0, qc).getFileName();
-    return path == null ? Str.ZERO : Str.get(path.toString());
+    return path == null ? Str.EMPTY : Str.get(path.toString());
   }
 }

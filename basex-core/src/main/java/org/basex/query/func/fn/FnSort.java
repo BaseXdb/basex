@@ -128,7 +128,7 @@ public final class FnSort extends StandardFunc {
       if(st.zeroOrOne() && st.type.isSortable()) return expr1;
     }
     if(exprs.length == 3) {
-      exprs[2] = coerceFunc(exprs[2], cc, SeqType.AAT_ZM, st1.with(Occ.ONE));
+      exprs[2] = coerceFunc(exprs[2], cc, SeqType.ANY_ATOMIC_TYPE_ZM, st1.with(Occ.EXACTLY_ONE));
     }
     return adoptType(expr1);
   }

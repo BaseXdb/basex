@@ -30,7 +30,7 @@ public final class Dbl extends ANum {
    * @param value value
    */
   private Dbl(final double value) {
-    super(AtomType.DBL);
+    super(AtomType.DOUBLE);
     this.value = value;
   }
 
@@ -83,7 +83,7 @@ public final class Dbl extends ANum {
   @Override
   public BigDecimal dec(final InputInfo ii) throws QueryException {
     if(Double.isNaN(value) || Double.isInfinite(value))
-     throw valueError(AtomType.DEC, string(), ii);
+     throw valueError(AtomType.DECIMAL, string(), ii);
     return new BigDecimal(value);
   }
 
@@ -179,8 +179,8 @@ public final class Dbl extends ANum {
     final byte[] v = Token.trim(value);
     if(Token.eq(v, Token.NAN)) return Double.NaN;
     if(Token.eq(v, Token.INF)) return Double.POSITIVE_INFINITY;
-    if(Token.eq(v, Token.NINF)) return Double.NEGATIVE_INFINITY;
+    if(Token.eq(v, Token.NEGATVE_INF)) return Double.NEGATIVE_INFINITY;
 
-    throw AtomType.DBL.castError(value, ii);
+    throw AtomType.DOUBLE.castError(value, ii);
   }
 }

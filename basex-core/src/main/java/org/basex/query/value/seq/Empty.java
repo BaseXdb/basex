@@ -96,7 +96,7 @@ public final class Empty extends Item {
 
   @Override
   public SeqType seqType() {
-    return SeqType.EMP;
+    return SeqType.EMPTY_SEQUENCE_Z;
   }
 
   @Override

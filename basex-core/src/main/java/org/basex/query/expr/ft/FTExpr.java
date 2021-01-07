@@ -27,7 +27,7 @@ public abstract class FTExpr extends ParseExpr {
    * @param exprs expressions
    */
   FTExpr(final InputInfo info, final FTExpr... exprs) {
-    super(info, SeqType.BLN_O);
+    super(info, SeqType.BOOLEAN_O);
     this.exprs = exprs;
   }
 

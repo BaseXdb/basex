@@ -41,7 +41,7 @@ public final class CmpIR extends Single {
    * @param info input info
    */
   private CmpIR(final Expr expr, final long min, final long max, final InputInfo info) {
-    super(info, expr, SeqType.BLN_O);
+    super(info, expr, SeqType.BOOLEAN_O);
     this.min = min;
     this.max = max;
   }
@@ -73,7 +73,7 @@ public final class CmpIR extends Single {
     final Expr expr1 = cmp.exprs[0], expr2 = cmp.exprs[1];
 
     // only rewrite deterministic integer comparisons
-    if(cmp.has(Flag.NDT) || !expr1.seqType().type.instanceOf(AtomType.ITR)) return cmp;
+    if(cmp.has(Flag.NDT) || !expr1.seqType().type.instanceOf(AtomType.INTEGER)) return cmp;
 
     long mn, mx;
     if(expr2 instanceof RangeSeq) {

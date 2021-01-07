@@ -252,7 +252,7 @@ public abstract class Preds extends Arr {
       final SeqType st = ex.seqType();
       if(cmp.positional() && cmp.opV() == OpV.EQ && st.one()) {
         // E[position() = last() - 1]  ->  E[last() - 1]
-        expr = new Cast(cc.sc(), info, ex, SeqType.NUM_O).optimize(cc);
+        expr = new Cast(cc.sc(), info, ex, SeqType.NUMERIC_O).optimize(cc);
       }
     }
 

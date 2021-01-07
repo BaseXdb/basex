@@ -53,7 +53,7 @@ public class TypeCheck extends Single {
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st = seqType();
-    if(st.type.instanceOf(AtomType.AAT)) {
+    if(st.type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
       expr = expr.simplifyFor(Simplify.DATA, cc);
     }
     final SeqType et = expr.seqType();

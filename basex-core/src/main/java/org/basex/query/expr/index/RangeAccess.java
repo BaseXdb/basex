@@ -36,7 +36,7 @@ public final class RangeAccess extends IndexAccess {
    * @param db index database
    */
   public RangeAccess(final InputInfo info, final NumericRange index, final IndexDb db) {
-    super(db, info, index.type() == IndexType.TEXT ? NodeType.TXT : NodeType.ATT);
+    super(db, info, index.type() == IndexType.TEXT ? NodeType.TEXT : NodeType.ATTRIBUTE);
     this.index = index;
   }
 

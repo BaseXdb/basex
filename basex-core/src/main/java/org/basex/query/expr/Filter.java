@@ -89,7 +89,7 @@ public abstract class Filter extends Preds {
 
       // rewrite filter with document nodes to path to possibly enable index rewritings
       // example: db:open('db')[.//text() = 'x']  ->  db:open('db')/.[.//text() = 'x']
-      if(st.type == NodeType.DOC && root.ddo()) {
+      if(st.type == NodeType.DOCUMENT_NODE && root.ddo()) {
         final Expr step = Step.get(cc, root, info, exprs);
         return cc.replaceWith(this, Path.get(cc, info, root, step));
       }
@@ -156,12 +156,12 @@ public abstract class Filter extends Preds {
           if((opV == OpV.LT || opV == OpV.NE) && LAST.is(e)) {
             // expr[position() < last()]  ->  util:init(expr)
             ex = cc.function(_UTIL_INIT, info, prepare.apply(expr));
-          } else if(opV == OpV.NE && e.seqType().instanceOf(SeqType.ITR_O) && e.isSimple()) {
+          } else if(opV == OpV.NE && e.seqType().instanceOf(SeqType.INTEGER_O) && e.isSimple()) {
             // expr[position() != INT]  ->  remove(expr, INT)
             ex = cc.function(REMOVE, info, prepare.apply(expr), e);
           } else if(opV == OpV.EQ && e instanceof Range) {
             final Expr arg1 = e.arg(0), arg2 = e.arg(1);
-            if(LAST.is(arg2) && arg1.seqType().instanceOf(SeqType.ITR_O) && arg1.isSimple()) {
+            if(LAST.is(arg2) && arg1.seqType().instanceOf(SeqType.INTEGER_O) && arg1.isSimple()) {
               // expr[position() = INT to last()]
               ex = cc.function(SUBSEQUENCE, info, prepare.apply(expr), arg1);
             } else if(arg1 == Int.ONE && arg2 instanceof Arith) {
@@ -225,7 +225,7 @@ public abstract class Filter extends Preds {
 
     // exists($nodes[@attr])  ->  exists($nodes ! @attr)
     final Expr pred = exprs[0];
-    if(pred.seqType().instanceOf(SeqType.NOD_ZO)) return SimpleMap.get(cc, info, root, pred);
+    if(pred.seqType().instanceOf(SeqType.NODE_ZO)) return SimpleMap.get(cc, info, root, pred);
 
     // count($seq[. = 'x'])  ->  count(index-of($seq, 'x'))
     final Function<Expr, Integer> type = expr -> {

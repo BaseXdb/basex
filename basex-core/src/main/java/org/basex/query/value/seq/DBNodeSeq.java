@@ -67,7 +67,7 @@ public class DBNodeSeq extends NativeSeq {
   public Value atomValue(final QueryContext qc, final InputInfo ii) {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(int i = 0; i < size; i++) vb.add(itemAt(i).atomValue(qc, ii));
-    return vb.value(AtomType.AAT);
+    return vb.value(AtomType.ANY_ATOMIC_TYPE);
   }
 
   /**
@@ -137,7 +137,7 @@ public class DBNodeSeq extends NativeSeq {
    */
   public static Value get(final int[] pres, final Data data, final Type type, final boolean all) {
     return pres.length == 0 ? Empty.VALUE : pres.length == 1 ? new DBNode(data, pres[0]) :
-      new DBNodeSeq(pres, data, type == null ? NodeType.NOD : type, all);
+      new DBNodeSeq(pres, data, type == null ? NodeType.NODE : type, all);
   }
 
   /**
@@ -148,7 +148,7 @@ public class DBNodeSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final int[] pres, final Data data, final Expr expr) {
-    return get(pres, data, NodeType.NOD.refine(expr), false);
+    return get(pres, data, NodeType.NODE.refine(expr), false);
   }
 
   /**
@@ -161,6 +161,6 @@ public class DBNodeSeq extends NativeSeq {
    */
   public static Value get(final IntList pres, final Data data, final boolean docs,
       final boolean all) {
-    return get(pres.toArray(), data, docs ? NodeType.DOC : null, all);
+    return get(pres.toArray(), data, docs ? NodeType.DOCUMENT_NODE : null, all);
   }
 }

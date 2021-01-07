@@ -21,7 +21,7 @@ import org.basex.util.*;
  */
 public class FnParseJson extends Parse {
   /** Function taking and returning a string. */
-  private static final FuncType STRFUNC = FuncType.get(SeqType.STR_O, SeqType.STR_O);
+  private static final FuncType STRFUNC = FuncType.get(SeqType.STRING_O, SeqType.STRING_O);
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {

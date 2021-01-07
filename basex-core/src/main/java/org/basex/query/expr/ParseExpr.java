@@ -1,8 +1,8 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
+import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.NodeType.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
@@ -77,7 +77,7 @@ public abstract class ParseExpr extends Expr {
       final Item next = iter.next();
       if(next != null) {
         final ValueBuilder vb = new ValueBuilder(qc, item, next);
-        if(iter.next() != null) vb.add(Str.get(DOTS));
+        if(iter.next() != null) vb.add(Str.get(QueryText.DOTS));
         throw EBV_X.get(info, vb.value());
       }
     }
@@ -235,7 +235,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final byte[] toToken(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    if(item == Empty.VALUE) throw EMPTYFOUND_X.get(info, AtomType.STR);
+    if(item == Empty.VALUE) throw EMPTYFOUND_X.get(info, STRING);
     return toToken(item);
   }
 
@@ -248,7 +248,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final byte[] toZeroToken(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item == Empty.VALUE ? EMPTY : toToken(item);
+    return item == Empty.VALUE ? Token.EMPTY : toToken(item);
   }
 
   /**
@@ -273,8 +273,7 @@ public abstract class ParseExpr extends Expr {
   protected final byte[] toToken(final Item item) throws QueryException {
     final Type type = item.type;
     if(type.isStringOrUntyped()) return item.string(info);
-    throw item instanceof FItem ? FIATOM_X.get(info, item.type) :
-      typeError(item, AtomType.STR, info);
+    throw item instanceof FItem ? FIATOM_X.get(info, item.type) : typeError(item, STRING, info);
   }
 
   /**
@@ -295,10 +294,10 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final boolean toBoolean(final Item item) throws QueryException {
-    final Type type = checkNoEmpty(item, AtomType.BLN).type;
-    if(type == AtomType.BLN) return item.bool(info);
+    final Type type = checkNoEmpty(item, BOOLEAN).type;
+    if(type == BOOLEAN) return item.bool(info);
     if(type.isUntyped()) return Bln.parse(item, info);
-    throw typeError(item, AtomType.BLN, info);
+    throw typeError(item, BOOLEAN, info);
   }
 
   /**
@@ -319,7 +318,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final double toDouble(final Item item) throws QueryException {
-    if(checkNoEmpty(item, AtomType.DBL).type.isNumberOrUntyped()) return item.dbl(info);
+    if(checkNoEmpty(item, DOUBLE).type.isNumberOrUntyped()) return item.dbl(info);
     throw numberError(this, item);
   }
 
@@ -357,7 +356,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final float toFloat(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    if(checkNoEmpty(item, AtomType.FLT).type.isNumberOrUntyped()) return item.flt(info);
+    if(checkNoEmpty(item, FLOAT).type.isNumberOrUntyped()) return item.flt(info);
     throw numberError(this, item);
   }
 
@@ -379,9 +378,9 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final long toLong(final Item item) throws QueryException {
-    final Type type = checkNoEmpty(item, AtomType.ITR).type;
-    if(type.instanceOf(AtomType.ITR) || type.isUntyped()) return item.itr(info);
-    throw typeError(item, AtomType.ITR, info);
+    final Type type = checkNoEmpty(item, INTEGER).type;
+    if(type.instanceOf(INTEGER) || type.isUntyped()) return item.itr(info);
+    throw typeError(item, INTEGER, info);
   }
 
   /**
@@ -392,7 +391,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final ANode toNode(final Expr expr, final QueryContext qc) throws QueryException {
-    return toNode(checkNoEmpty(expr.item(qc, info), NodeType.NOD));
+    return toNode(checkNoEmpty(expr.item(qc, info), NODE));
   }
 
   /**
@@ -415,7 +414,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final ANode toNode(final Item item) throws QueryException {
     if(item instanceof ANode) return (ANode) item;
-    throw typeError(item, NodeType.NOD, info);
+    throw typeError(item, NODE, info);
   }
 
   /**
@@ -461,7 +460,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final ANode toElem(final Expr expr, final QueryContext qc) throws QueryException {
-    return (ANode) checkType(expr.item(qc, info), NodeType.ELM);
+    return (ANode) checkType(expr.item(qc, info), ELEMENT);
   }
 
   /**
@@ -520,7 +519,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final B64 toB64(final Item item, final boolean empty) throws QueryException {
     if(empty && item == Empty.VALUE) return null;
-    return (B64) checkType(item, AtomType.B64);
+    return (B64) checkType(item, BASE64_BINARY);
   }
 
   /**
@@ -557,10 +556,10 @@ public abstract class ParseExpr extends Expr {
    */
   protected final QNm toQNm(final Item item, final boolean empty) throws QueryException {
     if(empty && item == Empty.VALUE) return null;
-    final Type type = checkNoEmpty(item, AtomType.QNM).type;
-    if(type == AtomType.QNM) return (QNm) item;
-    if(type.isUntyped()) throw NSSENS_X_X.get(info, type, AtomType.QNM);
-    throw typeError(item, AtomType.QNM, info);
+    final Type type = checkNoEmpty(item, QNAME).type;
+    if(type == QNAME) return (QNm) item;
+    if(type.isUntyped()) throw NSSENS_X_X.get(info, type, QNAME);
+    throw typeError(item, QNAME, info);
   }
 
   /**
@@ -571,7 +570,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final FItem toFunc(final Expr expr, final QueryContext qc) throws QueryException {
-    return (FItem) checkType(toItem(expr, qc, SeqType.FUNC), SeqType.FUNC);
+    return (FItem) checkType(toItem(expr, qc, SeqType.FUNCTION), SeqType.FUNCTION);
   }
 
   /**

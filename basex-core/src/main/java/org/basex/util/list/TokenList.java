@@ -103,7 +103,7 @@ public final class TokenList extends ObjectList<byte[], TokenList> {
    * @return self reference
    */
   public TokenList sort(final boolean cs, final boolean ascending) {
-    return sort(cs ? COMP : LC_COMP, ascending);
+    return sort(cs ? COMPARATOR : LC_COMPARATOR, ascending);
   }
 
   @Override

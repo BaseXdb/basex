@@ -33,7 +33,7 @@ public class DbAttribute extends DbText {
     if(!qName.hasPrefix()) qName.uri(sc.ns.uri(EMPTY));
 
     // return empty sequence if test will yield no results
-    final NameTest nt = new NameTest(qName, NamePart.FULL, NodeType.ATT, sc.elemNS);
+    final NameTest nt = new NameTest(qName, NamePart.FULL, NodeType.ATTRIBUTE, sc.elemNS);
     if(nt.noMatches(data)) return Empty.ITER;
 
     // wrap iterator with name test

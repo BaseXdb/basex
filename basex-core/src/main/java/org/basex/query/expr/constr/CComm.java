@@ -29,7 +29,7 @@ public final class CComm extends CNode {
    */
   public CComm(final StaticContext sc, final InputInfo info, final boolean computed,
       final Expr comment) {
-    super(sc, info, SeqType.COM_O, computed, comment);
+    super(sc, info, SeqType.COMMENT_O, computed, comment);
   }
 
   @Override

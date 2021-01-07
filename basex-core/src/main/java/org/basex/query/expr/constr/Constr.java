@@ -106,11 +106,11 @@ public final class Constr {
       final ANode node = (ANode) item;
 
       final Type type = item.type;
-      if(type == NodeType.TXT) {
+      if(type == NodeType.TEXT) {
         // type: text node
         text.add(node.string());
 
-      } else if(type == NodeType.ATT) {
+      } else if(type == NodeType.ATTRIBUTE) {
         // type: attribute node
 
         // check if attribute is specified after texts or child nodes
@@ -129,7 +129,7 @@ public final class Constr {
         // add new namespace
         if(name.hasURI()) sc.ns.add(name.prefix(), name.uri());
 
-      } else if(type == NodeType.NSP) {
+      } else if(type == NodeType.NAMESPACE_NODE) {
         // type: namespace node
 
         // no attribute allowed after texts or child nodes
@@ -148,7 +148,7 @@ public final class Constr {
           return false;
         }
 
-      } else if(type == NodeType.DOC) {
+      } else if(type == NodeType.DOCUMENT_NODE) {
         // type: document node
 
         final BasicNodeIter iter = node.childIter();

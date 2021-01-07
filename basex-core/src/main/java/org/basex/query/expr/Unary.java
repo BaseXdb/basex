@@ -29,7 +29,7 @@ public final class Unary extends Single {
    * @param minus minus flag
    */
   public Unary(final InputInfo info, final Expr expr, final boolean minus) {
-    super(info, expr, SeqType.NUM_ZO);
+    super(info, expr, SeqType.NUMERIC_ZO);
     this.minus = minus;
   }
 
@@ -44,14 +44,14 @@ public final class Unary extends Single {
 
     // no negation, numeric value: return operand
     final SeqType st = expr.seqType();
-    final Type type = st.type.isUntyped() ? AtomType.DBL :
-      st.type.instanceOf(AtomType.ITR) ? AtomType.ITR : st.type;
-    final Occ occ = st.oneOrMore() && !st.mayBeArray() ? Occ.ONE : Occ.ZERO_ONE;
+    final Type type = st.type.isUntyped() ? AtomType.DOUBLE :
+      st.type.instanceOf(AtomType.INTEGER) ? AtomType.INTEGER : st.type;
+    final Occ occ = st.oneOrMore() && !st.mayBeArray() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
     exprType.assign(type, occ);
 
     // --123  ->  123
     // --$byte  ->  xs:byte($byte)
-    if(!minus && st.instanceOf(SeqType.NUM_ZO)) {
+    if(!minus && st.instanceOf(SeqType.NUMERIC_ZO)) {
       final Expr cast = new Cast(cc.sc(), info, expr, SeqType.get(type, st.occ)).optimize(cc);
       return cc.replaceWith(this, cast);
     }
@@ -72,9 +72,9 @@ public final class Unary extends Single {
     if(!type.isNumber()) throw numberError(this, item);
 
     if(!minus) return item;
-    if(type == AtomType.DBL) return Dbl.get(-item.dbl(info));
-    if(type == AtomType.FLT) return Flt.get(-item.flt(info));
-    if(type == AtomType.DEC) return Dec.get(item.dec(info).negate());
+    if(type == AtomType.DOUBLE) return Dbl.get(-item.dbl(info));
+    if(type == AtomType.FLOAT) return Flt.get(-item.flt(info));
+    if(type == AtomType.DECIMAL) return Dec.get(item.dec(info).negate());
     // default: integer
     final long l = item.itr(info);
     if(l == Long.MIN_VALUE) throw RANGE_X.get(info, item);

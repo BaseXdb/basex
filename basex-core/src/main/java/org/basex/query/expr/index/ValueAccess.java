@@ -79,8 +79,8 @@ public final class ValueAccess extends IndexAccess {
    */
   private ValueAccess(final InputInfo info, final IndexType type, final NameTest test,
       final IndexDb db, final Expr expr, final TokenSet tokens) {
-    super(db, info, test != null ? NodeType.ELM : type == IndexType.TEXT ? NodeType.TXT :
-      NodeType.ATT);
+    super(db, info, test != null ? NodeType.ELEMENT : type == IndexType.TEXT ? NodeType.TEXT :
+      NodeType.ATTRIBUTE);
     this.type = type;
     this.test = test;
     this.expr = expr;

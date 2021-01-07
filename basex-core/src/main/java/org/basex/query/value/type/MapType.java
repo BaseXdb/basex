@@ -44,13 +44,13 @@ public final class MapType extends FuncType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(type.oneOf(SeqType.MAP, SeqType.FUNC, AtomType.ITEM)) return true;
+    if(type.oneOf(SeqType.MAP, SeqType.FUNCTION, AtomType.ITEM)) return true;
     if(!(type instanceof FuncType) || type instanceof ArrayType) return false;
 
     final FuncType ft = (FuncType) type;
     return declType.instanceOf(ft.declType) && (
       type instanceof MapType ? keyType().instanceOf(((MapType) type).keyType()) :
-      ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.AAT_O)
+      ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O)
     );
   }
 
@@ -63,7 +63,7 @@ public final class MapType extends FuncType {
       final MapType mt = (MapType) type;
       return get((AtomType) keyType().union(mt.keyType()), declType.union(mt.declType));
     }
-    return type instanceof ArrayType ? SeqType.FUNC :
+    return type instanceof ArrayType ? SeqType.FUNCTION :
            type instanceof FuncType  ? type.union(this) : AtomType.ITEM;
   }
 
@@ -84,8 +84,8 @@ public final class MapType extends FuncType {
       return kt != null ? get(kt, dt) : null;
     }
 
-    return ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.AAT_O) ?
-      new FuncType(dt, ft.argTypes[0].union(SeqType.AAT_O)) : null;
+    return ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O) ?
+      new FuncType(dt, ft.argTypes[0].union(SeqType.ANY_ATOMIC_TYPE_O)) : null;
   }
 
   /**
@@ -103,7 +103,7 @@ public final class MapType extends FuncType {
    * @return map type
    */
   public static MapType get(final AtomType keyType, final SeqType declType) {
-    return keyType == AtomType.AAT && declType.eq(SeqType.ITEM_ZM) ? SeqType.MAP :
+    return keyType == AtomType.ANY_ATOMIC_TYPE && declType.eq(SeqType.ITEM_ZM) ? SeqType.MAP :
       new MapType(keyType, declType);
   }
 

@@ -1,5 +1,8 @@
 package org.basex.query.expr.path;
 
+import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.NodeType.*;
+
 import java.util.*;
 import java.util.List;
 import java.util.function.*;
@@ -49,10 +52,10 @@ public abstract class Test extends ExprInfo {
    * @return test or {@code null}
    */
   public static Test get(final NodeType type, final QNm name, final Type ann, final byte[] ns) {
-    if(ann == null || ann.oneOf(AtomType.ATY, AtomType.UTY) ||
-        type == NodeType.ATT && ann.oneOf(AtomType.AST, AtomType.AAT, AtomType.ATM)) {
-      return name == null ? KindTest.get(type) :
-        new NameTest(name, type == NodeType.PI ? NamePart.LOCAL : NamePart.FULL, type, ns);
+    if(ann == null || ann.oneOf(ANY_TYPE, UNTYPED) ||
+        type == ATTRIBUTE && ann.oneOf(ANY_SIMPLE_TYPE, ANY_ATOMIC_TYPE, UNTYPED_ATOMIC)) {
+      return name == null ? KindTest.get(type) : new NameTest(name,
+        type == PROCESSING_INSTRUCTION ? NamePart.LOCAL : NamePart.FULL, type, ns);
     }
     return null;
   }

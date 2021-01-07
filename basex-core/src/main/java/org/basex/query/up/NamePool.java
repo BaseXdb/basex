@@ -25,8 +25,8 @@ public final class NamePool {
    * @param type node type
    */
   public void add(final QNm name, final NodeType type) {
-    if(type != NodeType.ATT && type != NodeType.ELM) return;
-    final int i = index(name, type == NodeType.ATT);
+    if(type != NodeType.ATTRIBUTE && type != NodeType.ELEMENT) return;
+    final int i = index(name, type == NodeType.ATTRIBUTE);
     cache[i].add++;
   }
 
@@ -35,8 +35,8 @@ public final class NamePool {
    * @param node node
    */
   public void remove(final ANode node) {
-    if(node.type != NodeType.ATT && node.type != NodeType.ELM) return;
-    final int i = index(node.qname(), node.type == NodeType.ATT);
+    if(node.type != NodeType.ATTRIBUTE && node.type != NodeType.ELEMENT) return;
+    final int i = index(node.qname(), node.type == NodeType.ATTRIBUTE);
     cache[i].del = true;
   }
 

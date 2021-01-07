@@ -63,7 +63,7 @@ public final class Dec extends ANum {
    * @param value decimal value
    */
   private Dec(final BigDecimal value) {
-    super(AtomType.DEC);
+    super(AtomType.DECIMAL);
     this.value = value;
   }
 
@@ -133,7 +133,7 @@ public final class Dec extends ANum {
       final InputInfo ii) throws QueryException {
     final Type t = item.type;
     return t.isUntyped() ? dbl() == item.dbl(ii) :
-      t == AtomType.DBL || t == AtomType.FLT ? item.eq(this, coll, sc, ii) :
+      t == AtomType.DOUBLE || t == AtomType.FLOAT ? item.eq(this, coll, sc, ii) :
       value.compareTo(item.dec(ii)) == 0;
   }
 
@@ -169,6 +169,6 @@ public final class Dec extends ANum {
       if(!contains(value, 'e') && !contains(value, 'E'))
         return new BigDecimal(Token.string(value).trim());
     } catch(final NumberFormatException ex) { Util.debug(ex); }
-    throw AtomType.DEC.castError(item, ii);
+    throw AtomType.DECIMAL.castError(item, ii);
   }
 }

@@ -95,7 +95,7 @@ public final class UtilReplicate extends StandardFunc {
     if(expr == Empty.VALUE || sz == 0 && single) return expr;
 
     // adopt sequence type
-    exprType.assign(expr.seqType().union(c > 0 ? Occ.ONE_MORE : Occ.ZERO_MORE), sz);
+    exprType.assign(expr.seqType().union(c > 0 ? Occ.ONE_OR_MORE : Occ.ZERO_OR_MORE), sz);
     data(expr.data());
     return this;
   }

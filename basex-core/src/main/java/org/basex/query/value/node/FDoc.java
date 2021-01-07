@@ -53,7 +53,7 @@ public final class FDoc extends FNode {
    * @param uri base uri
    */
   public FDoc(final ANodeList children, final byte[] uri) {
-    super(NodeType.DOC);
+    super(NodeType.DOCUMENT_NODE);
     this.children = children;
     this.uri = uri;
     optimize();
@@ -122,8 +122,8 @@ public final class FDoc extends FNode {
   @Override
   public ID typeId() {
     // check if a document has a single element as child
-    return (children.size() == 1 && children.get(0).type == NodeType.ELM ?
-      NodeType.DEL : type).id();
+    return (children.size() == 1 && children.get(0).type == NodeType.ELEMENT ?
+      NodeType.DOCUMENT_NODE_ELEMENT : type).id();
   }
 
   @Override

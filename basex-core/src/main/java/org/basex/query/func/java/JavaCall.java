@@ -136,7 +136,7 @@ public abstract class JavaCall extends Arr {
       final short[] r = (short[]) object;
       final long[] b = new long[r.length];
       for(int v = 0; v < s; v++) b[v] = r[v];
-      return IntSeq.get(b, AtomType.SHR);
+      return IntSeq.get(b, AtomType.SHORT);
     }
     // integer array
     if(object instanceof int[]) {
@@ -344,32 +344,32 @@ public abstract class JavaCall extends Arr {
     final Type type = JavaMapping.type(object.getClass(), true);
     if(type != null) return type;
 
-    if(object instanceof Element) return NodeType.ELM;
-    if(object instanceof Document) return NodeType.DOC;
-    if(object instanceof DocumentFragment) return NodeType.DOC;
-    if(object instanceof Attr) return NodeType.ATT;
-    if(object instanceof Comment) return NodeType.COM;
-    if(object instanceof ProcessingInstruction) return NodeType.PI;
-    if(object instanceof Text) return NodeType.TXT;
+    if(object instanceof Element) return NodeType.ELEMENT;
+    if(object instanceof Document) return NodeType.DOCUMENT_NODE;
+    if(object instanceof DocumentFragment) return NodeType.DOCUMENT_NODE;
+    if(object instanceof Attr) return NodeType.ATTRIBUTE;
+    if(object instanceof Comment) return NodeType.COMMENT;
+    if(object instanceof ProcessingInstruction) return NodeType.PROCESSING_INSTRUCTION;
+    if(object instanceof Text) return NodeType.TEXT;
 
     if(object instanceof Duration) {
       final Duration d = (Duration) object;
       return !d.isSet(DatatypeConstants.YEARS) && !d.isSet(DatatypeConstants.MONTHS)
-          ? AtomType.DTD : !d.isSet(DatatypeConstants.HOURS) &&
+          ? AtomType.DAY_TIME_DURATION : !d.isSet(DatatypeConstants.HOURS) &&
           !d.isSet(DatatypeConstants.MINUTES) && !d.isSet(DatatypeConstants.SECONDS)
-          ? AtomType.YMD : AtomType.DUR;
+          ? AtomType.YEAR_MONTH_DURATION : AtomType.DURATION;
     }
 
     if(object instanceof XMLGregorianCalendar) {
       final QName qnm = ((XMLGregorianCalendar) object).getXMLSchemaType();
-      if(qnm == DatatypeConstants.DATE) return AtomType.DAT;
-      if(qnm == DatatypeConstants.DATETIME) return AtomType.DTM;
-      if(qnm == DatatypeConstants.TIME) return AtomType.TIM;
-      if(qnm == DatatypeConstants.GYEARMONTH) return AtomType.YMO;
-      if(qnm == DatatypeConstants.GMONTHDAY) return AtomType.MDA;
-      if(qnm == DatatypeConstants.GYEAR) return AtomType.YEA;
-      if(qnm == DatatypeConstants.GMONTH) return AtomType.MON;
-      if(qnm == DatatypeConstants.GDAY) return AtomType.DAY;
+      if(qnm == DatatypeConstants.DATE) return AtomType.DATE;
+      if(qnm == DatatypeConstants.DATETIME) return AtomType.DATE_TIME;
+      if(qnm == DatatypeConstants.TIME) return AtomType.TIME;
+      if(qnm == DatatypeConstants.GYEARMONTH) return AtomType.G_YEAR_MONTH;
+      if(qnm == DatatypeConstants.GMONTHDAY) return AtomType.G_MONTH_DAY;
+      if(qnm == DatatypeConstants.GYEAR) return AtomType.G_YEAR;
+      if(qnm == DatatypeConstants.GMONTH) return AtomType.G_MONTH;
+      if(qnm == DatatypeConstants.GDAY) return AtomType.G_DAY;
     }
     return null;
   }

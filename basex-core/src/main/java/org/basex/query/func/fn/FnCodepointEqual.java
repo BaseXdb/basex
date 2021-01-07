@@ -31,7 +31,7 @@ public final class FnCodepointEqual extends StandardFunc {
     if(st1.zero()) return expr1;
     if(st2.zero()) return expr2;
     if(st1.oneOrMore() && !st1.mayBeArray() && st2.oneOrMore() && !st2.mayBeArray())
-      exprType.assign(Occ.ONE);
+      exprType.assign(Occ.EXACTLY_ONE);
     return this;
   }
 }

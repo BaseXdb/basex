@@ -384,7 +384,7 @@ public class Options implements Iterable<Option<?>> {
     } else if(name.type.isStringOrUntyped()) {
       nm = string(name.string(ii));
     } else {
-      throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.STR, name.type, name);
+      throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.STRING, name.type, name);
     }
 
     final Item item;
@@ -429,7 +429,7 @@ public class Options implements Iterable<Option<?>> {
         tb.add(key.string(ii)).add('=');
         final Value vl = map.get(key, ii);
         if(!vl.isItem()) throw new BaseXException(
-            Text.OPT_EXPECT_X_X_X, AtomType.STR, vl.seqType(), vl);
+            Text.OPT_EXPECT_X_X_X, AtomType.STRING, vl.seqType(), vl);
         tb.add(string(((Item) vl).string(ii)).replace(",", ",,"));
       }
     } else if(item instanceof QNm) {
@@ -763,7 +763,7 @@ public class Options implements Iterable<Option<?>> {
     Object value = null;
     String expected = null;
     if(option instanceof BooleanOption) {
-      if(item.type.eq(AtomType.BLN)) {
+      if(item.type.eq(AtomType.BOOLEAN)) {
         value = item.bool(ii);
       } else {
         final String s = string(item.string(ii));
@@ -776,7 +776,7 @@ public class Options implements Iterable<Option<?>> {
       value = serialize(item, ii);
     } else if(option instanceof EnumOption) {
       byte[] token;
-      if(item.type.eq(AtomType.BLN)) {
+      if(item.type.eq(AtomType.BOOLEAN)) {
         token = item.string(ii);
       } else if(item.type.isNumber()) {
         final long l = item.itr(ii);

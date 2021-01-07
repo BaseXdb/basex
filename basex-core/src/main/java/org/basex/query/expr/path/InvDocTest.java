@@ -29,7 +29,7 @@ final class InvDocTest extends Test {
    * @param data data reference
    */
   private InvDocTest(final IntList pres, final Data data) {
-    super(NodeType.DOC);
+    super(NodeType.DOCUMENT_NODE);
     this.pres = pres;
     this.data = data;
   }
@@ -92,6 +92,6 @@ final class InvDocTest extends Test {
 
   @Override
   public String toString(final boolean full) {
-    return new TokenBuilder().add(NodeType.DOC.name).add("((: ids :))").toString();
+    return new TokenBuilder().add(NodeType.DOCUMENT_NODE.name).add("((: ids :))").toString();
   }
 }

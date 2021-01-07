@@ -68,7 +68,7 @@ abstract class SqlFn extends StandardFunc {
       throws QueryException {
 
     final JDBCConnections conns = jdbc(qc);
-    final Uri id = (Uri) checkType(exprs[0], qc, AtomType.URI);
+    final Uri id = (Uri) checkType(exprs[0], qc, AtomType.ANY_URI);
     final AutoCloseable ac = conns.get(id);
     switch(mode) {
       case 1:

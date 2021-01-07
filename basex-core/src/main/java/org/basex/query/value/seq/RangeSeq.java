@@ -29,7 +29,7 @@ public final class RangeSeq extends Seq {
    * @param asc ascending
    */
   private RangeSeq(final long start, final long size, final boolean asc) {
-    super(size, AtomType.ITR);
+    super(size, AtomType.INTEGER);
     this.start = start;
     this.asc = asc;
   }

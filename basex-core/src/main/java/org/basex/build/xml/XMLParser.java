@@ -144,7 +144,7 @@ public class XMLParser extends SingleParser {
       }
       consume(Type.QUOTE);
 
-      if(startsWith(an, XMLNSC)) {
+      if(startsWith(an, XMLNS_COLON)) {
         // open namespace...
         if(!stripNS) nsp.add(local(an), av);
       } else if(eq(an, XMLNS)) {

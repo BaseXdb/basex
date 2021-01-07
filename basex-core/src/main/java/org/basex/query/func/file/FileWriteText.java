@@ -39,7 +39,7 @@ public class FileWriteText extends FileFn {
       throws QueryException, IOException {
 
     final Path path = checkParentDir(toPath(0, qc));
-    final AStr text = (AStr) checkType(exprs[1], qc, AtomType.STR);
+    final AStr text = (AStr) checkType(exprs[1], qc, AtomType.STRING);
     final String encoding = toEncodingOrNull(2, FILE_UNKNOWN_ENCODING_X, qc);
     final Charset cs = encoding == null || encoding == Strings.UTF8 ? null :
       Charset.forName(encoding);

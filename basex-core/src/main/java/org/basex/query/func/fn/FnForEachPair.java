@@ -57,7 +57,8 @@ public class FnForEachPair extends StandardFunc {
     if(st1.zero()) return expr1;
     if(st2.zero()) return expr2;
 
-    exprs[2] = coerceFunc(exprs[2], cc, SeqType.ITEM_ZM, st1.with(Occ.ONE), st2.with(Occ.ONE));
+    exprs[2] = coerceFunc(exprs[2], cc, SeqType.ITEM_ZM, st1.with(Occ.EXACTLY_ONE),
+        st2.with(Occ.EXACTLY_ONE));
 
     // assign type after coercion (expression might have changed)
     final boolean updating = this instanceof UpdateForEachPair;
@@ -67,7 +68,7 @@ public class FnForEachPair extends StandardFunc {
       final boolean oneOrMore = st1.oneOrMore() && st2.oneOrMore() && declType.oneOrMore();
       final long size = declType.zero() ? 0 : declType.one() ?
         Math.min(expr1.size(), expr2.size()) : -1;
-      exprType.assign(declType, oneOrMore ? Occ.ONE_MORE : Occ.ZERO_MORE, size);
+      exprType.assign(declType, oneOrMore ? Occ.ONE_OR_MORE : Occ.ZERO_OR_MORE, size);
     }
 
     return this;

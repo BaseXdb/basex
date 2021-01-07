@@ -56,7 +56,7 @@ public final class IntSeq extends NativeSeq {
     if(mode == Simplify.DISTINCT) {
       final long[] tmp = new LongList((int) size).add(values).sort().distinct().finish();
       final int tl = tmp.length;
-      if(seqType().type == AtomType.ITR) {
+      if(seqType().type == AtomType.INTEGER) {
         // try to rewrite to range sequence
         int t = 0;
         while(++t < tl && tmp[0] + t == tmp[t]);
@@ -71,17 +71,17 @@ public final class IntSeq extends NativeSeq {
   @Override
   public Object toJava() {
     switch((AtomType) type) {
-      case BYT:
+      case BYTE:
         final byte[] t1 = new byte[(int) size];
         for(int s = 0; s < size; s++) t1[s] = (byte) values[s];
         return t1;
-      case SHR:
-      case UBY:
+      case SHORT:
+      case UNSIGNED_BYTE:
         final short[] t2 = new short[(int) size];
         for(int s = 0; s < size; s++) t2[s] = (short) values[s];
         return t2;
       case INT:
-      case USH:
+      case UNSIGNED_SHORT:
         final int[] t3 = new int[(int) size];
         for(int s = 0; s < size; s++) t3[s] = (int) values[s];
         return t3;
@@ -108,7 +108,7 @@ public final class IntSeq extends NativeSeq {
   public static Value get(final int[] values) {
     final LongList list = new LongList(values.length);
     for(final int value : values) list.add(value);
-    return get(list.finish(), AtomType.ITR);
+    return get(list.finish(), AtomType.INTEGER);
   }
 
   /**
@@ -117,7 +117,7 @@ public final class IntSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final long[] values) {
-    return get(values, AtomType.ITR);
+    return get(values, AtomType.INTEGER);
   }
 
   /**

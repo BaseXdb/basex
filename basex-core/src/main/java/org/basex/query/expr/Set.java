@@ -33,7 +33,7 @@ abstract class Set extends Arr {
    * @param exprs expressions
    */
   Set(final InputInfo info, final Expr[] exprs) {
-    super(info, SeqType.NOD_ZM, exprs);
+    super(info, SeqType.NODE_ZM, exprs);
   }
 
   @Override

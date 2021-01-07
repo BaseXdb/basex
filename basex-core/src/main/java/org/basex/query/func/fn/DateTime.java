@@ -26,7 +26,7 @@ abstract class DateTime extends StandardFunc {
   protected final Dur checkDur(final Item item) throws QueryException {
     if(item instanceof Dur) return (Dur) item;
     if(item.type.isUntyped()) return new Dur(item.string(info), info);
-    throw typeError(item, AtomType.DUR, info);
+    throw typeError(item, AtomType.DURATION, info);
   }
 
   /**
@@ -52,11 +52,13 @@ abstract class DateTime extends StandardFunc {
     // clone item
     ADate ad = toDate(item, type, qc);
     if(!item.type.isUntyped()) {
-      ad = type == AtomType.TIM ? new Tim(ad) : type == AtomType.DAT ? new Dat(ad) : new Dtm(ad);
+      ad = type == AtomType.TIME ? new Tim(ad) : type == AtomType.DATE ? new Dat(ad) : new Dtm(ad);
     }
     final boolean spec = exprs.length == 2;
     final Item zon = spec ? exprs[1].atomItem(qc, info) : Empty.VALUE;
-    ad.timeZone(zon == Empty.VALUE ? null : (DTDur) checkType(zon, AtomType.DTD), spec, info);
+    final DTDur dur = zon == Empty.VALUE ? null :
+      (DTDur) checkType(zon, AtomType.DAY_TIME_DURATION);
+    ad.timeZone(dur, spec, info);
     return ad;
   }
 

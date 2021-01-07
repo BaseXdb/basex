@@ -46,9 +46,9 @@ public final class JsonBasicSerializer extends JsonSerializer {
     if(level > 0) indent();
 
     final BasicNodeIter iter = node.childIter();
-    if(node.type == NodeType.DOC || node.type == NodeType.DEL) {
+    if(node.type == NodeType.DOCUMENT_NODE || node.type == NodeType.DOCUMENT_NODE_ELEMENT) {
       for(ANode child; (child = iter.next()) != null;) node(child);
-    } else if(node.type == NodeType.ELM) {
+    } else if(node.type == NodeType.ELEMENT) {
       final QNm name = node.qname();
       final byte[] type = name.local();
       if(!eq(name.uri(), QueryText.FN_URI))
@@ -89,7 +89,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
       if(eq(type, NULL)) {
         out.print(NULL);
         for(ANode n; (n = iter.next()) != null;) {
-          if(n.type != NodeType.COM && n.type != NodeType.PI)
+          if(n.type != NodeType.COMMENT && n.type != NodeType.PROCESSING_INSTRUCTION)
             throw error("Element '%' must have no children.", type);
         }
       } else if(eq(type, BOOLEAN)) {
@@ -175,11 +175,11 @@ public final class JsonBasicSerializer extends JsonSerializer {
     level++;
     boolean comma = false;
     for(ANode child; (child = iter.next()) != null;) {
-      if(child.type == NodeType.ELM) {
+      if(child.type == NodeType.ELEMENT) {
         if(comma) out.print(',');
         node(child);
         comma = true;
-      } else if(child.type == NodeType.TXT && !ws(child.string())) {
+      } else if(child.type == NodeType.TEXT && !ws(child.string())) {
         throw error("Element '%' must have no text nodes.", child.name());
       }
     }
@@ -199,10 +199,10 @@ public final class JsonBasicSerializer extends JsonSerializer {
   private static byte[] value(final BasicNodeIter iter, final byte[] type) throws QueryIOException {
     TokenBuilder tb = null;
     for(ANode child; (child = iter.next()) != null;) {
-      if(child.type == NodeType.TXT) {
+      if(child.type == NodeType.TEXT) {
         if(tb == null) tb = new TokenBuilder();
         tb.add(child.string());
-      } else if(child.type == NodeType.ELM) {
+      } else if(child.type == NodeType.ELEMENT) {
         throw error("Element '%' must have no child elements.", type);
       }
     }
@@ -233,12 +233,18 @@ public final class JsonBasicSerializer extends JsonSerializer {
       if(cp >= 0 && cp < 32 || cp >= 127 && cp < 160) {
         tb.add('\\');
         switch(cp) {
-          case '\b': tb.add('b'); break;
-          case '\f': tb.add('f'); break;
-          case '\n': tb.add('n'); break;
-          case '\r': tb.add('r'); break;
-          case '\t': tb.add('t'); break;
-          default: tb.add('u').add('0').add('0').add(HEX[cp >> 4]).add(HEX[cp & 0xF]); break;
+          case '\b':
+            tb.add('b'); break;
+          case '\f':
+            tb.add('f'); break;
+          case '\n':
+            tb.add('n'); break;
+          case '\r':
+            tb.add('r'); break;
+          case '\t':
+            tb.add('t'); break;
+          default:
+            tb.add('u').add('0').add('0').add(HEX_TABLE[cp >> 4]).add(HEX_TABLE[cp & 0xF]); break;
         }
       } else {
         if((cp == '\\' || cp == '"' || cp == '/') && (!escape || !bs && cp != '\\')) tb.add('\\');

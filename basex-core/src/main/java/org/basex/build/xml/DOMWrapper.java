@@ -65,7 +65,7 @@ public final class DOMWrapper extends Parser {
             final byte[] av = token(att.getValue());
             if(eq(an, XMLNS)) {
               if(!stripNS) nsp.add(EMPTY, av);
-            } else if(startsWith(an, XMLNSC)) {
+            } else if(startsWith(an, XMLNS_COLON)) {
               if(!stripNS) nsp.add(local(an), av);
             } else {
               atts.add(stripNS ? local(an) : an, av);

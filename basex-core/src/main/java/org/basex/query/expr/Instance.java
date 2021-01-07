@@ -31,7 +31,7 @@ public final class Instance extends Single {
    * @param seqType sequence type to check for
    */
   public Instance(final InputInfo info, final Expr expr, final SeqType seqType) {
-    super(info, expr, SeqType.BLN_O);
+    super(info, expr, SeqType.BOOLEAN_O);
     this.seqType = seqType;
   }
 

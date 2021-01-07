@@ -83,7 +83,7 @@ public final class CmpN extends Cmp {
    * @param info input info
    */
   public CmpN(final Expr expr1, final Expr expr2, final OpN op, final InputInfo info) {
-    super(info, expr1, expr2, null, SeqType.BLN_ZO, null);
+    super(info, expr1, expr2, null, SeqType.BOOLEAN_ZO, null);
     this.op = op;
   }
 
@@ -91,7 +91,7 @@ public final class CmpN extends Cmp {
   public Expr optimize(final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    if(st1.oneOrMore() && st2.oneOrMore()) exprType.assign(Occ.ONE);
+    if(st1.oneOrMore() && st2.oneOrMore()) exprType.assign(Occ.EXACTLY_ONE);
 
     final Expr expr = emptyExpr();
     return expr == this && allAreValues(false) ? cc.preEval(this) : cc.replaceWith(this, expr);

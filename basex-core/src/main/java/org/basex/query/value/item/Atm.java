@@ -20,7 +20,7 @@ public final class Atm extends Item {
    * @param value value
    */
   public Atm(final byte[] value) {
-    super(AtomType.ATM);
+    super(AtomType.UNTYPED_ATOMIC);
     this.value = value;
   }
 

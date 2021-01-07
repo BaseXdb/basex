@@ -49,7 +49,8 @@ public final class ArraySort extends StandardFunc {
 
     if(type1 instanceof ArrayType) {
       if(exprs.length == 3) {
-        exprs[2] = coerceFunc(exprs[2], cc, SeqType.AAT_ZM, ((ArrayType) type1).declType);
+        exprs[2] = coerceFunc(exprs[2], cc, SeqType.ANY_ATOMIC_TYPE_ZM,
+            ((ArrayType) type1).declType);
       }
       exprType.assign(type1);
     }

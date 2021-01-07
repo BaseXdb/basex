@@ -42,7 +42,7 @@ public final class Except extends Set {
 
     // determine type
     SeqType st = exprs[0].seqType();
-    if(st.zero()) st = SeqType.NOD_ZM;
+    if(st.zero()) st = SeqType.NODE_ZM;
 
     // skip optimizations if operands do not have the correct type
     if(st.type instanceof NodeType) {

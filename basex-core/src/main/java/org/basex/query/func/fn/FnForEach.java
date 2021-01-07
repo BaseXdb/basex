@@ -44,7 +44,7 @@ public class FnForEach extends StandardFunc {
     // assign type after coercion (expression might have changed)
     final boolean updating = this instanceof UpdateForEach;
     final long size = items.size();
-    final Expr func = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, st.with(Occ.ONE));
+    final Expr func = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE));
 
     final boolean ndt = func.has(Flag.NDT);
     if(allAreValues(false) && size <= UNROLL_LIMIT) {

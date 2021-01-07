@@ -26,7 +26,7 @@ public final class Bln extends Item {
    * @param value boolean value
    */
   private Bln(final boolean value) {
-    super(AtomType.BLN);
+    super(AtomType.BOOLEAN);
     this.value = value;
   }
 
@@ -127,7 +127,7 @@ public final class Bln extends Item {
   public static boolean parse(final Item item, final InputInfo ii) throws QueryException {
     final Boolean b = parse(item.string(ii));
     if(b != null) return b;
-    throw AtomType.BLN.castError(item, ii);
+    throw AtomType.BOOLEAN.castError(item, ii);
   }
 
   /**

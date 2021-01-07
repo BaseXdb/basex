@@ -21,7 +21,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
   private static final FuncType PERMUTE_TYPE = FuncType.get(SeqType.ITEM_ZM, SeqType.ITEM_ZM);
   /** Type for next function. */
   private static final FuncType NEXT_TYPE =
-      FuncType.get(MapType.get(AtomType.STR, SeqType.ITEM_O).seqType());
+      FuncType.get(MapType.get(AtomType.STRING, SeqType.ITEM_O).seqType());
 
   /** Multiplier for the RNG (derived from Java's random class). */
   private static final long MULT = 0x5DEECE66DL;

@@ -296,7 +296,7 @@ final class DataUpdates {
       final int uriId = data.nspaces.uriIdForPrefix(Token.prefix(nm), pre, data);
       if(uriId != 0) name.uri(data.nspaces.uri(uriId));
     }
-    names.add(name, NodeType.ATT);
+    names.add(name, NodeType.ATTRIBUTE);
   }
 
 }

@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static java.lang.Double.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
@@ -52,7 +51,7 @@ public final class CmpR extends Single {
    * @param info input info
    */
   private CmpR(final Expr expr, final double min, final double max, final InputInfo info) {
-    super(info, expr, SeqType.BLN_O);
+    super(info, expr, SeqType.BOOLEAN_O);
     this.min = min;
     this.max = max;
   }
@@ -83,11 +82,11 @@ public final class CmpR extends Single {
     final Type type1 = expr1.seqType().type, type2 = expr2.seqType().type;
 
     // only rewrite deterministic comparisons if input is not decimal
-    if(cmp.has(Flag.NDT) || !type1.isNumberOrUntyped() || type1 == AtomType.DEC) return cmp;
+    if(cmp.has(Flag.NDT) || !type1.isNumberOrUntyped() || type1 == AtomType.DECIMAL) return cmp;
 
     // if value to be compared is a decimal, input must be untyped or integer
-    if(!(expr2 instanceof ANum) || type2 == AtomType.DEC && !type1.isUntyped() &&
-        !type1.instanceOf(AtomType.ITR)) return cmp;
+    if(!(expr2 instanceof ANum) || type2 == AtomType.DECIMAL && !type1.isUntyped() &&
+        !type1.instanceOf(AtomType.INTEGER)) return cmp;
 
     // reject numbers that are too large or small to be safely compared as doubles
     final double d = ((ANum) expr2).dbl();
@@ -205,13 +204,13 @@ public final class CmpR extends Single {
     if(ii.costs == null) return false;
 
     // skip if numbers are negative, doubles, or of different string length
-    final int mnl = min >= 0 && (long) min == min ? token(min).length : -1;
-    final int mxl = max >= 0 && (long) max == max ? token(max).length : -1;
+    final int mnl = min >= 0 && (long) min == min ? Token.token(min).length : -1;
+    final int mxl = max >= 0 && (long) max == max ? Token.token(max).length : -1;
     if(mnl != mxl || mnl == -1) return false;
 
     // don't use index if min/max values are infinite
     if(min == NEGATIVE_INFINITY && max == POSITIVE_INFINITY ||
-        token((int) nr.min).length != token((int) nr.max).length) return false;
+        Token.token((int) nr.min).length != Token.token((int) nr.max).length) return false;
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add('[').add(min).add(',').add(max).add(']');

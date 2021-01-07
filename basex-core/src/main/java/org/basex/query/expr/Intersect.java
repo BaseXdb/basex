@@ -48,7 +48,7 @@ public final class Intersect extends Set {
       }
     }
     // check if all operands yield an empty sequence
-    if(st == null) st = SeqType.NOD_ZM;
+    if(st == null) st = SeqType.NODE_ZM;
 
     if(st.type instanceof NodeType) {
       exprType.assign(st.union(Occ.ZERO));

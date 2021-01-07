@@ -25,7 +25,7 @@ public final class FTxt extends FNode {
    * @param value text value
    */
   public FTxt(final byte[] value) {
-    super(NodeType.TXT);
+    super(NodeType.TEXT);
     this.value = value;
   }
 

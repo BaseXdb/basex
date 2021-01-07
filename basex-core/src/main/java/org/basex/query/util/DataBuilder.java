@@ -80,11 +80,11 @@ public final class DataBuilder {
   private int addNode(final ANode node, final int pre, final int par) {
     if(qc != null) qc.checkStop();
     switch(node.nodeType()) {
-      case DOC: return addDoc(node, pre);
-      case ELM: return addElem(node, pre, par);
-      case TXT: return addText(node, pre, par);
-      case ATT: return addAttr(node, pre, par);
-      case COM: return addComm(node, pre, par);
+      case DOCUMENT_NODE: return addDoc(node, pre);
+      case ELEMENT: return addElem(node, pre, par);
+      case TEXT: return addText(node, pre, par);
+      case ATTRIBUTE: return addAttr(node, pre, par);
+      case COMMENT: return addComm(node, pre, par);
       // will always be processing instruction
       default:  return addPI(node, pre, par);
     }
@@ -266,7 +266,7 @@ public final class DataBuilder {
    * @return new node
    */
   public static ANode stripNS(final ANode node, final byte[] ns, final Context ctx) {
-    if(node.type != NodeType.ELM && node.type != NodeType.DOC) return node;
+    if(node.type != NodeType.ELEMENT && node.type != NodeType.DOCUMENT_NODE) return node;
 
     final MemData data = new MemData(ctx.options);
     final DataBuilder db = new DataBuilder(data, null);

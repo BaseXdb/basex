@@ -133,7 +133,7 @@ public final class PkgParser {
       public ANode next() {
         while(true) {
           final ANode n = ch.next();
-          if(n == null || n.type == NodeType.ELM) return n;
+          if(n == null || n.type == NodeType.ELEMENT) return n;
         }
       }
     };

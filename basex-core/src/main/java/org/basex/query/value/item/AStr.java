@@ -19,7 +19,7 @@ public abstract class AStr extends Item {
    * Constructor.
    */
   AStr() {
-    super(AtomType.STR);
+    super(AtomType.STRING);
   }
 
   /**

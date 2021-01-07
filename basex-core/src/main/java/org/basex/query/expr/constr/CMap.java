@@ -46,7 +46,7 @@ public final class CMap extends Arr {
       }
       kt = kt == null ? type : kt.union(type);
     }
-    if(kt == null) kt = AtomType.AAT;
+    if(kt == null) kt = AtomType.ANY_ATOMIC_TYPE;
 
     // determine static value type
     SeqType dt = null;
@@ -54,7 +54,7 @@ public final class CMap extends Arr {
       final SeqType dst = exprs[e].seqType();
       dt = dt == null ? dst : dt.union(dst);
     }
-    dt = dt != null ? dt.union(SeqType.EMP) : SeqType.ITEM_ZM;
+    dt = dt != null ? dt.union(SeqType.EMPTY_SEQUENCE_Z) : SeqType.ITEM_ZM;
 
     exprType.assign(MapType.get((AtomType) kt, dt));
 

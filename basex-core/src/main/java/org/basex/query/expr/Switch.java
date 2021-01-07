@@ -180,7 +180,7 @@ public final class Switch extends ParseExpr {
     if(groups.length != 2) return this;
 
     final SeqType st = cond.seqType();
-    final boolean string = st.type.isStringOrUntyped(), dec = st.type.instanceOf(AtomType.DEC);
+    final boolean string = st.type.isStringOrUntyped(), dec = st.type.instanceOf(AtomType.DECIMAL);
     if(!st.one() || !(string || dec)) return this;
 
     final Expr[] exprs = groups[0].exprs;
@@ -188,7 +188,7 @@ public final class Switch extends ParseExpr {
       final SeqType mt = exprs[e].seqType();
       if(!mt.one() || !(
         string && mt.type.isStringOrUntyped() ||
-        dec && mt.type.instanceOf(AtomType.DEC)
+        dec && mt.type.instanceOf(AtomType.DECIMAL)
       )) return this;
     }
 

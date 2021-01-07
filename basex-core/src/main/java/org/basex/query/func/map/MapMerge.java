@@ -65,7 +65,7 @@ public final class MapMerge extends StandardFunc {
       if(exprs.length < 2 || !(exprs[1] instanceof Value) ||
         options(cc.qc).get(MergeOptions.DUPLICATES) == MergeDuplicates.COMBINE) {
         final SeqType dt = mt.declType;
-        mt = MapType.get(mt.keyType(), dt.zero() ? dt : dt.union(Occ.ONE_MORE));
+        mt = MapType.get(mt.keyType(), dt.zero() ? dt : dt.union(Occ.ONE_OR_MORE));
       }
       exprType.assign(mt);
     }

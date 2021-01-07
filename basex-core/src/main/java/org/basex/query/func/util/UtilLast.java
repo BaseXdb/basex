@@ -59,7 +59,7 @@ public final class UtilLast extends StandardFunc {
       if(stl.oneOrMore()) return cc.function(_UTIL_LAST, info, last);
     }
 
-    exprType.assign(st.with(st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE));
+    exprType.assign(st.with(st.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE));
     data(expr.data());
     return this;
   }

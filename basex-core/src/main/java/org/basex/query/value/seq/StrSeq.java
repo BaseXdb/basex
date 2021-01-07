@@ -22,7 +22,7 @@ public final class StrSeq extends NativeSeq {
    * @param values values
    */
   private StrSeq(final byte[][] values) {
-    super(values.length, AtomType.STR);
+    super(values.length, AtomType.STRING);
     this.values = values;
   }
 

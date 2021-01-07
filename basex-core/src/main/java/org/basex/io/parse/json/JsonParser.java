@@ -373,8 +373,8 @@ final class JsonParser extends InputParser {
       } else if(XMLToken.valid(ch)) {
         tb.add(ch);
       } else {
-        tb.add('\\').add('u').add(HEX[ch >> 12 & 0xF]).add(HEX[ch >> 8 & 0xF]);
-        tb.add(HEX[ch >> 4 & 0xF]).add(HEX[ch & 0xF]);
+        tb.add('\\').add('u').add(HEX_TABLE[ch >> 12 & 0xF]).add(HEX_TABLE[ch >> 8 & 0xF]);
+        tb.add(HEX_TABLE[ch >> 4 & 0xF]).add(HEX_TABLE[ch & 0xF]);
       }
     } else if(XMLToken.valid(ch)) {
       tb.add(ch);

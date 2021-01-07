@@ -25,7 +25,7 @@ public final class FnBoolean extends StandardFunc {
     // boolean(true()))  ->  true()
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
-    if(st.eq(SeqType.BLN_O)) return expr;
+    if(st.eq(SeqType.BOOLEAN_O)) return expr;
 
     // boolean($node/text())  ->  exists($node/text())
     if(st.type instanceof NodeType) return cc.function(Function.EXISTS, info, expr);

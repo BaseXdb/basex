@@ -137,14 +137,14 @@ public class DBNode extends ANode {
 
   @Override
   public final long itr(final InputInfo ii) throws QueryException {
-    if(type == NodeType.ELM) {
+    if(type == NodeType.ELEMENT) {
       final int as = data.attSize(pre, Data.ELEM);
       if(data.size(pre, Data.ELEM) - as == 1 && data.kind(pre + as) == Data.TEXT) {
         final long l = data.textItr(pre + as, true);
         if(l != Long.MIN_VALUE) return l;
       }
-    } else if(type == NodeType.TXT || type == NodeType.ATT) {
-      final long l = data.textItr(pre, type == NodeType.TXT);
+    } else if(type == NodeType.TEXT || type == NodeType.ATTRIBUTE) {
+      final long l = data.textItr(pre, type == NodeType.TEXT);
       if(l != Long.MIN_VALUE) return l;
     }
     return Int.parse(this, ii);
@@ -154,13 +154,13 @@ public class DBNode extends ANode {
   public final double dbl(final InputInfo ii) throws QueryException {
     // try to directly retrieve inlined numeric value from XML storage
     double d = Double.NaN;
-    if(type == NodeType.ELM) {
+    if(type == NodeType.ELEMENT) {
       final int as = data.attSize(pre, Data.ELEM);
       if(data.size(pre, Data.ELEM) - as == 1 && data.kind(pre + as) == Data.TEXT) {
         d = data.textDbl(pre + as, true);
       }
-    } else if(type == NodeType.TXT || type == NodeType.ATT) {
-      d = data.textDbl(pre, type == NodeType.TXT);
+    } else if(type == NodeType.TEXT || type == NodeType.ATTRIBUTE) {
+      d = data.textDbl(pre, type == NodeType.TEXT);
     }
     // GH-1206: parse invalid values again
     return Double.isNaN(d) ? Dbl.parse(string(), ii) : d;
@@ -168,13 +168,14 @@ public class DBNode extends ANode {
 
   @Override
   public final byte[] name() {
-    return type == NodeType.ELM || type == NodeType.ATT || type == NodeType.PI ?
-      data.name(pre, kind(nodeType())) : null;
+    return type == NodeType.ELEMENT || type == NodeType.ATTRIBUTE ||
+        type == NodeType.PROCESSING_INSTRUCTION ? data.name(pre, kind(nodeType())) : null;
   }
 
   @Override
   public final QNm qname() {
-    if(type == NodeType.ELM || type == NodeType.ATT || type == NodeType.PI) {
+    if(type == NodeType.ELEMENT || type == NodeType.ATTRIBUTE ||
+        type == NodeType.PROCESSING_INSTRUCTION) {
       final byte[][] qname = data.qname(pre, kind());
       return new QNm(qname[0], qname[1]);
     }
@@ -188,7 +189,7 @@ public class DBNode extends ANode {
 
   @Override
   public final byte[] baseURI() {
-    if(type == NodeType.DOC) {
+    if(type == NodeType.DOCUMENT_NODE) {
       final String base = Token.string(data.text(pre, true));
       if(data.inMemory()) {
         final String path = data.meta.original;
@@ -410,8 +411,8 @@ public class DBNode extends ANode {
   @Override
   public final byte[] xdmInfo() {
     final ByteList bl = new ByteList().add(typeId().asByte());
-    if(type == NodeType.DOC) bl.add(baseURI()).add(0);
-    else if(type == NodeType.ATT) bl.add(qname().uri()).add(0);
+    if(type == NodeType.DOCUMENT_NODE) bl.add(baseURI()).add(0);
+    else if(type == NodeType.ATTRIBUTE) bl.add(qname().uri()).add(0);
     return bl.finish();
   }
 
@@ -419,10 +420,12 @@ public class DBNode extends ANode {
   public final ID typeId() {
     // check if a document has a single element as child
     ID i = type.id();
-    if(type == NodeType.DOC) {
+    if(type == NodeType.DOCUMENT_NODE) {
       final BasicNodeIter iter = childIter();
       final ANode n = iter.next();
-      if(n != null && n.type == NodeType.ELM && iter.next() == null) i = NodeType.DEL.id();
+      if(n != null && n.type == NodeType.ELEMENT && iter.next() == null) {
+        i = NodeType.DOCUMENT_NODE_ELEMENT.id();
+      }
     }
     return i;
   }
@@ -467,19 +470,19 @@ public class DBNode extends ANode {
   private void plan(final QueryString qs, final boolean error) {
     if(error || data.inMemory()) {
       switch((NodeType) type) {
-        case ATT:
+        case ATTRIBUTE:
           qs.concat(name(), "=", QueryString.toQuoted(string()));
           break;
-        case PI:
+        case PROCESSING_INSTRUCTION:
           qs.concat(FPI.OPEN, name(), " ", QueryString.toValue(string()), FPI.CLOSE);
           break;
-        case ELM:
+        case ELEMENT:
           qs.concat("<", name(), hasChildren() || attributeIter().size() > 0 ? DOTS : "", "/>");
           break;
-        case DOC:
+        case DOCUMENT_NODE:
           qs.token(DOCUMENT).brace(QueryString.toQuoted(baseURI()));
           break;
-        case COM:
+        case COMMENT:
           qs.concat("<!--", QueryString.toValue(string()), "-->");
           break;
         default:

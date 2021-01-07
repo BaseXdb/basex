@@ -22,6 +22,6 @@ public final class DbPath extends DbAccess {
     } while(parent != null);
 
     final DBNode dbnode = toDBNode(node);
-    return dbnode.kind() == Data.DOC ? Str.get(dbnode.data().text(dbnode.pre(), true)) : Str.ZERO;
+    return dbnode.kind() == Data.DOC ? Str.get(dbnode.data().text(dbnode.pre(), true)) : Str.EMPTY;
   }
 }

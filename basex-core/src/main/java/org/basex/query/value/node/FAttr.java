@@ -45,7 +45,7 @@ public final class FAttr extends FNode {
    * @param value value
    */
   public FAttr(final QNm name, final byte[] value) {
-    super(NodeType.ATT);
+    super(NodeType.ATTRIBUTE);
     this.name = name;
     this.value = value;
   }

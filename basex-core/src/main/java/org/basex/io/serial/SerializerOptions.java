@@ -214,7 +214,7 @@ public final class SerializerOptions extends Options {
       if(!free.isEmpty()) throw SEROPTION_X.get(ii, free.keySet().iterator().next());
 
       for(final ANode child : root.childIter()) {
-        if(child.type != NodeType.ELM) continue;
+        if(child.type != NodeType.ELEMENT) continue;
         if(string(child.qname().local()).equals(USE_CHARACTER_MAPS.name())) {
           final String map = characterMap(child);
           if(map == null) throw SEROPTION_X.get(ii, USE_CHARACTER_MAPS.name());
@@ -235,7 +235,7 @@ public final class SerializerOptions extends Options {
     // parse characters
     final TokenMap map = new TokenMap();
     for(final ANode child : elem.childIter()) {
-      if(child.type != NodeType.ELM) continue;
+      if(child.type != NodeType.ELEMENT) continue;
       final byte[] name = child.qname().local();
       if(eq(name, CHARACTER_MAP)) {
         byte[] key = null, val = null;

@@ -81,12 +81,12 @@ public final class RestXqResponse extends WebResponse {
       boolean head = true;
 
       // handle special cases
-      if(item != null && item.type == NodeType.ELM) {
+      if(item != null && item.type == NodeType.ELEMENT) {
         final ANode node = (ANode) item;
         if(REST_FORWARD.matches(node)) {
           // server-side forwarding
           final ANode ch = node.childIter().next();
-          if(ch == null || ch.type != NodeType.TXT) throw func.error(NO_VALUE_X, node.name());
+          if(ch == null || ch.type != NodeType.TEXT) throw func.error(NO_VALUE_X, node.name());
           forward = string(ch.string()).trim();
           item = iter.next();
         } else if(REST_RESPONSE.matches(node)) {

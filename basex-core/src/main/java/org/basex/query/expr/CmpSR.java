@@ -58,7 +58,7 @@ public final class CmpSR extends Single {
   private CmpSR(final Expr expr, final byte[] min, final boolean mni, final byte[] max,
       final boolean mxi, final Collation coll, final InputInfo info) {
 
-    super(info, expr, SeqType.BLN_O);
+    super(info, expr, SeqType.BOOLEAN_O);
     this.coll = coll;
     this.min = min;
     this.mni = mni;
@@ -127,7 +127,7 @@ public final class CmpSR extends Single {
    * @throws QueryException query exception
    */
   private boolean eval(final Item item) throws QueryException {
-    if(!item.type.isStringOrUntyped()) throw diffError(item, Str.ZERO, info);
+    if(!item.type.isStringOrUntyped()) throw diffError(item, Str.EMPTY, info);
     final byte[] s = item.string(info);
     final int mn = min == null ?  1 :
       coll == null ? Token.diff(s, min) : coll.compare(s, min);

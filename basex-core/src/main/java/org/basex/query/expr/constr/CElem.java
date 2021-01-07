@@ -40,7 +40,7 @@ public final class CElem extends CName {
    */
   public CElem(final StaticContext sc, final InputInfo info, final boolean computed,
       final Expr name, final Atts nspaces, final Expr... cont) {
-    super(sc, info, SeqType.ELM_O, computed, name, cont);
+    super(sc, info, SeqType.ELEMENT_O, computed, name, cont);
     this.nspaces = nspaces;
   }
 
@@ -61,7 +61,8 @@ public final class CElem extends CName {
       final QNm nm = qname(true, cc.qc, null);
       if(nm != null) {
         name = nm;
-        exprType.assign(SeqType.get(NodeType.ELM, Occ.ONE, Test.get(NodeType.ELM, nm)));
+        exprType.assign(SeqType.get(NodeType.ELEMENT, Occ.EXACTLY_ONE,
+            Test.get(NodeType.ELEMENT, nm)));
       }
     }
     return this;

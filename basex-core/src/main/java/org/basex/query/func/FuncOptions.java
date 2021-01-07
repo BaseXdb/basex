@@ -121,7 +121,7 @@ public final class FuncOptions {
     final TokenBuilder tb = new TokenBuilder();
     // interpret options
     for(final ANode child : node.childIter()) {
-      if(child.type != NodeType.ELM) continue;
+      if(child.type != NodeType.ELEMENT) continue;
 
       // ignore elements in other namespace
       final QNm qname = child.qname();
@@ -192,7 +192,7 @@ public final class FuncOptions {
    */
   private static boolean hasElements(final ANode node) {
     for(final ANode nd : node.childIter()) {
-      if(nd.type == NodeType.ELM) return true;
+      if(nd.type == NodeType.ELEMENT) return true;
     }
     return false;
   }

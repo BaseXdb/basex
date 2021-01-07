@@ -38,7 +38,7 @@ public final class PartFunc extends Arr {
   public PartFunc(final StaticContext sc, final InputInfo info, final Expr expr, final Expr[] args,
       final int[] holes) {
 
-    super(info, SeqType.FUNC_O, ExprList.concat(args, expr));
+    super(info, SeqType.FUNCTION_O, ExprList.concat(args, expr));
     this.sc = sc;
     this.holes = holes;
   }
@@ -57,7 +57,7 @@ public final class PartFunc extends Arr {
 
     final Expr body = body();
     final FuncType ft = body.funcType();
-    if(ft != null && ft != SeqType.FUNC) {
+    if(ft != null && ft != SeqType.FUNCTION) {
       final int nargs = exprs.length + holes.length - 1;
       if(ft.argTypes.length != nargs)
         throw INVARITY_X_X_X.get(info, arguments(nargs), ft.argTypes.length, body);

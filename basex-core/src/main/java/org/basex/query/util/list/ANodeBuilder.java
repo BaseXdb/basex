@@ -75,7 +75,7 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
     }
 
     // otherwise, create default sequence
-    return ItemSeq.get(finish(), sz, NodeType.NOD.refine(expr));
+    return ItemSeq.get(finish(), sz, NodeType.NODE.refine(expr));
   }
 
   /**

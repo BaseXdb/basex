@@ -60,12 +60,12 @@ public class FnMin extends StandardFunc {
         if(!(item2 instanceof AStr)) throw CMP_X_X_X.get(info, type1, item2.type, item2);
         final Type type2 = item2.type;
         if(cmp.eval(item1, item2, coll, sc, info)) item1 = item2;
-        if(type1 != type2 && item1.type == URI) item1 = STR.cast(item1, qc, sc, info);
+        if(type1 != type2 && item1.type == ANY_URI) item1 = STRING.cast(item1, qc, sc, info);
       }
       return item1;
     }
     // booleans, dates, durations, binaries
-    if(type1 == BLN || item1 instanceof ADate || item1 instanceof Dur || item1 instanceof Bin) {
+    if(type1 == BOOLEAN || item1 instanceof ADate || item1 instanceof Dur || item1 instanceof Bin) {
       for(Item item; (item = qc.next(iter)) != null;) {
         if(type1 != item.type) throw CMP_X_X_X.get(info, type1, item.type, item);
         if(cmp.eval(item1, item, coll, sc, info)) item1 = item;
@@ -73,7 +73,7 @@ public class FnMin extends StandardFunc {
       return item1;
     }
     // numbers
-    if(type1.isUntyped()) item1 = DBL.cast(item1, qc, sc, info);
+    if(type1.isUntyped()) item1 = DOUBLE.cast(item1, qc, sc, info);
     for(Item item2; (item2 = qc.next(iter)) != null;) {
       final AtomType type = numType(item1, item2);
       if(cmp.eval(item1, item2, coll, sc, info) || Double.isNaN(item2.dbl(info))) item1 = item2;
@@ -91,12 +91,12 @@ public class FnMin extends StandardFunc {
    */
   private AtomType numType(final Item item1, final Item item2) throws QueryException {
     final Type type2 = item2.type;
-    if(type2.isUntyped()) return DBL;
+    if(type2.isUntyped()) return DOUBLE;
     final Type type1 = item1.type;
     if(!(item2 instanceof ANum)) throw CMP_X_X_X.get(info, type1, type2, item2);
     return type1 == type2 ? null :
-           type1 == DBL || type2 == DBL ? DBL :
-           type1 == FLT || type2 == FLT ? FLT :
+           type1 == DOUBLE || type2 == DOUBLE ? DOUBLE :
+           type1 == FLOAT || type2 == FLOAT ? FLOAT :
            null;
   }
 
@@ -121,7 +121,7 @@ public class FnMin extends StandardFunc {
       }
       if(item != null) {
         final Type type = item.seqType().type;
-        if(type.isNumber() || type.instanceOf(STR)) return item;
+        if(type.isNumber() || type.instanceOf(STRING)) return item;
       }
     }
     return null;
@@ -152,7 +152,7 @@ public class FnMin extends StandardFunc {
     Type type = st.type;
     if(type.isSortable()) {
       if(type.isUntyped()) {
-        type = DBL;
+        type = DOUBLE;
       } else if(st.one() && exprs.length < 2) {
         return expr;
       }

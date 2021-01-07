@@ -20,7 +20,7 @@ public final class FnBaseUri extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toNodeOrNull(ctxArg(0, qc), qc);
-    if(node == null || node.type != NodeType.ELM && node.type != NodeType.DOC &&
+    if(node == null || node.type != NodeType.ELEMENT && node.type != NodeType.DOCUMENT_NODE &&
         node.parent() == null) return Empty.VALUE;
 
     Uri base = Uri.EMPTY;
@@ -30,7 +30,7 @@ public final class FnBaseUri extends ContextFn {
       final Uri bu = Uri.uri(nd.baseURI(), false);
       if(!bu.isValid()) throw INVURI_X.get(info, nd.baseURI());
       base = bu.resolve(base, info);
-      if(nd.type == NodeType.DOC && nd instanceof DBNode) break;
+      if(nd.type == NodeType.DOCUMENT_NODE && nd instanceof DBNode) break;
       nd = nd.parent();
     } while(!base.isAbsolute());
     return base;

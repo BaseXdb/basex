@@ -55,7 +55,8 @@ public final class Replace extends Update {
     // check target constraints
     if(item == null) throw UPSEQEMP_X.get(info, Util.className(this));
     final Type type = item.type;
-    if(!(item instanceof ANode) || type == NodeType.DOC) throw UPTRGNODE_X.get(info, item);
+    if(!(item instanceof ANode) || type == NodeType.DOCUMENT_NODE)
+      throw UPTRGNODE_X.get(info, item);
     final Item item2 = iter.next();
     if(item2 != null) throw UPTRGSINGLE_X.get(info, ValueBuilder.concat(item, item2, qc));
     final ANode targ = (ANode) item;
@@ -70,14 +71,14 @@ public final class Replace extends Update {
       final byte[] txt = list.size() < 1 ? aList.size() < 1 ? EMPTY :
         aList.get(0).string() : list.get(0).string();
       // check validity of future comments or PIs
-      if(type == NodeType.COM) FComm.parse(txt, info);
-      if(type == NodeType.PI) FPI.parse(txt, info);
+      if(type == NodeType.COMMENT) FComm.parse(txt, info);
+      if(type == NodeType.PROCESSING_INSTRUCTION) FPI.parse(txt, info);
 
       updates.add(new ReplaceValue(dbn.pre(), dbn.data(), info, txt), qc);
     } else {
       final ANode parent = targ.parent();
       if(parent == null) throw UPNOPAR_X.get(info, targ);
-      if(type == NodeType.ATT) {
+      if(type == NodeType.ATTRIBUTE) {
         // replace attribute node
         if(!list.isEmpty()) throw UPWRATTR_X.get(info, list.get(0));
         list = checkNS(aList, parent);

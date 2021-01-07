@@ -51,19 +51,19 @@ public final class FnPath extends ContextFn {
       // root node: finalize traversal
       final ANode parent = node.parent();
       if(parent == null) {
-        if(node.type != NodeType.DOC) tb.add(ROOT);
+        if(node.type != NodeType.DOCUMENT_NODE) tb.add(ROOT);
         break;
       }
 
       final QNm qname = node.qname();
       final NodeType type = (NodeType) node.type;
-      if(type == NodeType.ATT) {
+      if(type == NodeType.ATTRIBUTE) {
         tb.add('@').add(qname.id());
-      } else if(type == NodeType.ELM) {
+      } else if(type == NodeType.ELEMENT) {
         tb.add(qname.eqName()).add('[').addInt(element(node, qname, qc)).add(']');
-      } else if(type == NodeType.COM || type == NodeType.TXT) {
+      } else if(type == NodeType.COMMENT || type == NodeType.TEXT) {
         tb.add(node.seqType().toString()).add('[').addInt(textComment(node, qc)).add(']');
-      } else if(type == NodeType.PI) {
+      } else if(type == NodeType.PROCESSING_INSTRUCTION) {
         tb.add(type.name).add('(').add(qname.local()).add(')').add('[').
           addInt(pi(node, qname, qc)).add(']');
       }
@@ -76,7 +76,7 @@ public final class FnPath extends ContextFn {
     for(int s = steps.size() - 1; s >= 0; --s) {
       tb.add('/').add(steps.get(s));
       node = nodes.get(s);
-      if(node.type == NodeType.ELM) paths.put(node, tb.toArray());
+      if(node.type == NodeType.ELEMENT) paths.put(node, tb.toArray());
     }
     return Str.get(tb.isEmpty() ? Token.SLASH : tb.finish());
   }

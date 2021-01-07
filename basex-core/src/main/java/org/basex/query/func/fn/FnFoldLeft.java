@@ -84,7 +84,8 @@ public final class FnFoldLeft extends StandardFunc {
     if(func instanceof FuncItem) {
       // function argument is a single function item
       final SeqType seq = exprs[0].seqType(), zero = exprs[1].seqType(), curr = array &&
-          seq.type instanceof ArrayType ? ((ArrayType) seq.type).declType : seq.with(Occ.ONE);
+          seq.type instanceof ArrayType ? ((ArrayType) seq.type).declType :
+            seq.with(Occ.EXACTLY_ONE);
 
       // assign item type of iterated value, optimize function
       final SeqType[] args = { left ? SeqType.ITEM_ZM : curr, left ? curr : SeqType.ITEM_ZM };

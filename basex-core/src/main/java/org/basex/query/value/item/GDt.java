@@ -2,6 +2,7 @@ package org.basex.query.value.item;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.value.type.AtomType.*;
 
 import java.util.regex.*;
 
@@ -19,9 +20,7 @@ import org.basex.util.*;
  */
 public final class GDt extends ADate {
   /** Date pattern. */
-  private static final Type[] TYPES = {
-    AtomType.YEA, AtomType.YMO, AtomType.MON, AtomType.MDA, AtomType.DAY,
-  };
+  private static final Type[] TYPES = { G_YEAR, G_YEAR_MONTH, G_MONTH, G_MONTH_DAY, G_DAY };
   /** Date patterns. */
   private static final Pattern[] PATTERNS = {
     Pattern.compile(YEAR + ZONE),
@@ -42,9 +41,9 @@ public final class GDt extends ADate {
    */
   public GDt(final ADate date, final Type type) {
     super(type, date);
-    if(type != AtomType.YEA && type != AtomType.YMO) yea = Long.MAX_VALUE;
-    if(type != AtomType.MON && type != AtomType.YMO && type != AtomType.MDA) mon = -1;
-    if(type != AtomType.DAY && type != AtomType.MDA) day = -1;
+    if(type != G_YEAR && type != G_YEAR_MONTH) yea = Long.MAX_VALUE;
+    if(type != G_MONTH && type != G_YEAR_MONTH && type != G_MONTH_DAY) mon = -1;
+    if(type != G_DAY && type != G_MONTH_DAY) day = -1;
     hou = -1;
     min = -1;
     sec = null;

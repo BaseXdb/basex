@@ -66,7 +66,7 @@ public final class FnHead extends StandardFunc {
       }
     }
 
-    exprType.assign(st.with(st.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE));
+    exprType.assign(st.with(st.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE));
     data(expr.data());
     return this;
   }

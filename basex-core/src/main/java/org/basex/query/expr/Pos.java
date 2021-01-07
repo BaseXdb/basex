@@ -29,7 +29,7 @@ public final class Pos extends Arr implements CmpPos {
    * @param max max expression
    */
   private Pos(final InputInfo info, final Expr min, final Expr max) {
-    super(info, SeqType.BLN_O, min, max);
+    super(info, SeqType.BOOLEAN_O, min, max);
   }
 
   /**
@@ -53,7 +53,7 @@ public final class Pos extends Arr implements CmpPos {
       if(expr instanceof Range && op == OpV.EQ) {
         final Range range = (Range) expr;
         final Expr start = range.exprs[0], end = range.exprs[1];
-        if(st2.type.instanceOf(AtomType.ITR)) {
+        if(st2.type.instanceOf(AtomType.INTEGER)) {
           min = start;
           max = start.equals(end) ? start : end;
         }
@@ -68,7 +68,7 @@ public final class Pos extends Arr implements CmpPos {
             max = Int.MAX;
             break;
           case GT:
-            min = new Arith(ii, st2.type.instanceOf(AtomType.ITR) ? expr :
+            min = new Arith(ii, st2.type.instanceOf(AtomType.INTEGER) ? expr :
               cc.function(Function.FLOOR, ii, expr), Int.ONE, Calc.PLUS).optimize(cc);
             max = Int.MAX;
             break;
@@ -78,7 +78,7 @@ public final class Pos extends Arr implements CmpPos {
             break;
           case LT:
             min = Int.ONE;
-            max = new Arith(ii, st2.type.instanceOf(AtomType.ITR) ? expr :
+            max = new Arith(ii, st2.type.instanceOf(AtomType.INTEGER) ? expr :
               cc.function(Function.CEILING, ii, expr), Int.ONE, Calc.MINUS).optimize(cc);
             break;
           default:

@@ -30,12 +30,13 @@ public final class TransformWith extends Arr {
    * @param modify modify expression
    */
   public TransformWith(final InputInfo info, final Expr source, final Expr modify) {
-    super(info, SeqType.NOD_ZM, source, modify);
+    super(info, SeqType.NODE_ZM, source, modify);
   }
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    return cc.get(new Dummy(exprs[0].seqType().with(Occ.ONE), null), () -> super.compile(cc));
+    return cc.get(new Dummy(exprs[0].seqType().with(Occ.EXACTLY_ONE), null),
+        () -> super.compile(cc));
   }
 
   @Override

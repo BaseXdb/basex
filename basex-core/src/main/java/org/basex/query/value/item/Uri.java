@@ -30,7 +30,7 @@ public final class Uri extends AStr {
    * @param value value
    */
   private Uri(final byte[] value) {
-    super(AtomType.URI, value);
+    super(AtomType.ANY_URI, value);
   }
 
   /**

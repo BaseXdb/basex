@@ -22,13 +22,13 @@ public class UtilRoot extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value value = exprs[0].value(qc);
-    if(value.seqType().type == NodeType.DOC) return value;
+    if(value.seqType().type == NodeType.DOCUMENT_NODE) return value;
 
     final Iter iter = value.iter();
     final ANodeBuilder list = new ANodeBuilder();
     for(Item item; (item = qc.next(iter)) != null;) {
       final ANode node = item instanceof ANode ? ((ANode) item).root() : null;
-      if(node == null || node.type != NodeType.DOC) throw NODOC_X.get(info, value);
+      if(node == null || node.type != NodeType.DOCUMENT_NODE) throw NODOC_X.get(info, value);
       list.add(node);
     }
     return list.value(this);
@@ -38,7 +38,7 @@ public class UtilRoot extends StandardFunc {
   public Expr opt(final CompileContext cc) {
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
-    if(st.type.eq(NodeType.DOC)) return expr;
+    if(st.type.eq(NodeType.DOCUMENT_NODE)) return expr;
     if(st.zeroOrOne()) exprType.assign(st.occ);
     return this;
   }

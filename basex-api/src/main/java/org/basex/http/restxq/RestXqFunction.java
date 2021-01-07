@@ -109,7 +109,9 @@ public final class RestXqFunction extends WebFunction {
         } catch(final IllegalArgumentException ex) {
           throw error(ann.info, ex.getMessage());
         }
-        for(final QNm name : path.varNames()) checkVariable(name, AtomType.AAT, declared);
+        for(final QNm name : path.varNames()) {
+          checkVariable(name, AtomType.ANY_ATOMIC_TYPE, declared);
+        }
       } else if(sig == _REST_ERROR) {
         error(ann);
       } else if(sig == _REST_CONSUMES) {
@@ -484,7 +486,7 @@ public final class RestXqFunction extends WebFunction {
       // message
       if(name != null && name.hasPrefix() && !name.hasURI()) throw error(INV_NONS_X, name);
       final NameTest test = part != null ?
-        new NameTest(name, part, NodeType.ELM, null) : null;
+        new NameTest(name, part, NodeType.ELEMENT, null) : null;
 
       final Function<NameTest, String> toString = t -> t != null ? t.toString() : "*";
       if(!error.isEmpty()) {

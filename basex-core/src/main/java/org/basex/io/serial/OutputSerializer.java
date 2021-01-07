@@ -144,10 +144,10 @@ public abstract class OutputSerializer extends Serializer {
     for(int i = 3; i >= 0; i--) {
       final int b = (cp >> (i << 3)) & 0xFF;
       if(o || b > 0x0F) {
-        out.print(HEX[b >> 4]);
+        out.print(HEX_TABLE[b >> 4]);
       }
       if(o || b != 0) {
-        out.print(HEX[b & 0xF]);
+        out.print(HEX_TABLE[b & 0xF]);
         o = true;
       }
     }

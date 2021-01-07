@@ -40,7 +40,7 @@ public final class FPI extends FNode {
    * @param value value
    */
   public FPI(final QNm name, final byte[] value) {
-    super(NodeType.PI);
+    super(NodeType.PROCESSING_INSTRUCTION);
     this.name = name;
     this.value = value;
   }

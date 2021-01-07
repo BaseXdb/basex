@@ -47,7 +47,7 @@ public final class ItemSeq extends Seq {
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Item item : this) vb.add(item.atomValue(qc, ii));
-    return vb.value(AtomType.AAT);
+    return vb.value(AtomType.ANY_ATOMIC_TYPE);
   }
 
   @Override

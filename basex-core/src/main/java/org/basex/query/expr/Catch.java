@@ -31,8 +31,8 @@ public final class Catch extends Single {
   };
   /** Error types. */
   public static final SeqType[] TYPES = {
-    SeqType.QNM_O, SeqType.STR_ZO, SeqType.ITEM_ZM, SeqType.STR_ZO,
-    SeqType.ITR_ZO, SeqType.ITR_ZO, SeqType.ITEM_ZM
+    SeqType.QNAME_O, SeqType.STRING_ZO, SeqType.ITEM_ZM, SeqType.STRING_ZO,
+    SeqType.INTEGER_ZO, SeqType.INTEGER_ZO, SeqType.ITEM_ZM
   };
 
   /** Error tests. */

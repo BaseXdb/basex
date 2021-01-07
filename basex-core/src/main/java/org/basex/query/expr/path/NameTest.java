@@ -31,7 +31,7 @@ public final class NameTest extends Test {
    * @param name node name
    */
   public NameTest(final QNm name) {
-    this(name, NamePart.FULL, NodeType.ELM, null);
+    this(name, NamePart.FULL, NodeType.ELEMENT, null);
   }
 
   /**
@@ -63,14 +63,14 @@ public final class NameTest extends Test {
     // check if test may yield results
     if(part == NamePart.FULL && !qname.hasURI()) {
       // element and db default namespaces are different: no results
-      if(type != NodeType.ATT && !Token.eq(dataNs, defaultNs)) return true;
+      if(type != NodeType.ATTRIBUTE && !Token.eq(dataNs, defaultNs)) return true;
       // namespace is irrelevant/identical: only check local name
       simple = true;
     }
 
     // check existence of local element/attribute names
-    return !(type == NodeType.PI || part() != NamePart.LOCAL ||
-      (type == NodeType.ELM ? data.elemNames : data.attrNames).contains(local));
+    return !(type == NodeType.PROCESSING_INSTRUCTION || part() != NamePart.LOCAL ||
+      (type == NodeType.ELEMENT ? data.elemNames : data.attrNames).contains(local));
   }
 
   @Override
@@ -147,13 +147,13 @@ public final class NameTest extends Test {
   @Override
   public String toString(final boolean full) {
     final TokenBuilder tb = new TokenBuilder();
-    final boolean pi = type == NodeType.PI;
+    final boolean pi = type == NodeType.PROCESSING_INSTRUCTION;
     if(full || pi) tb.add(type.name).add('(');
 
     // add URI part
     final byte[] prefix = qname.prefix(), uri = qname.uri();
     if(part == NamePart.LOCAL && !pi) {
-      if(!(full && type == NodeType.ATT)) tb.add("*:");
+      if(!(full && type == NodeType.ATTRIBUTE)) tb.add("*:");
     } else if(prefix.length > 0) {
       tb.add(prefix).add(':');
     } else if(uri.length != 0) {

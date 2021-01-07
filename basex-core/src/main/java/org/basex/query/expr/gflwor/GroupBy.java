@@ -223,7 +223,7 @@ public final class GroupBy extends Clause {
   public GroupBy optimize(final CompileContext cc) throws QueryException {
     final int pl = preExpr.length;
     for(int p = 0; p < pl; p++) {
-      post[p].refineType(preExpr[p].seqType().union(Occ.ONE_MORE), cc);
+      post[p].refineType(preExpr[p].seqType().union(Occ.ONE_OR_MORE), cc);
     }
     SeqType st = null;
     for(final GroupSpec spec : specs) {

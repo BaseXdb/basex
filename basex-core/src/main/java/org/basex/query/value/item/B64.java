@@ -32,7 +32,7 @@ public class B64 extends Bin {
    * Empty constructor.
    */
   B64() {
-    super(null, AtomType.B64);
+    super(null, AtomType.BASE64_BINARY);
   }
 
   /**
@@ -80,7 +80,7 @@ public class B64 extends Bin {
    * @param data binary data
    */
   private B64(final byte[] data) {
-    super(data, AtomType.B64);
+    super(data, AtomType.BASE64_BINARY);
   }
 
   @Override
@@ -113,7 +113,7 @@ public class B64 extends Bin {
     try {
       return Base64.decode(item.string(ii));
     } catch(final IllegalArgumentException ex) {
-      throw AtomType.B64.castError(item, ii);
+      throw AtomType.BASE64_BINARY.castError(item, ii);
     }
   }
 
@@ -128,7 +128,7 @@ public class B64 extends Bin {
     try {
       return Base64.decode(value);
     } catch(final IllegalArgumentException ex) {
-      throw AtomType.B64.castError(value, ii);
+      throw AtomType.BASE64_BINARY.castError(value, ii);
     }
   }
 

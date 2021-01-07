@@ -91,7 +91,7 @@ public class FuncType implements Type {
 
     if(!(item instanceof FItem)) throw typeError(item, this, ii);
     final FItem func = (FItem) item;
-    return this == SeqType.FUNC ? func : func.coerceTo(this, qc, ii, false);
+    return this == SeqType.FUNCTION ? func : func.coerceTo(this, qc, ii, false);
   }
 
   @Override
@@ -112,7 +112,7 @@ public class FuncType implements Type {
     if(type.getClass() != FuncType.class) return false;
     final FuncType ft = (FuncType) type;
 
-    if(this == SeqType.FUNC || ft == SeqType.FUNC || argTypes.length != ft.argTypes.length)
+    if(this == SeqType.FUNCTION || ft == SeqType.FUNCTION || argTypes.length != ft.argTypes.length)
       return false;
 
     final int al = argTypes.length;
@@ -124,8 +124,8 @@ public class FuncType implements Type {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(type.oneOf(this, SeqType.FUNC, AtomType.ITEM)) return true;
-    if(this == SeqType.FUNC || !(type instanceof FuncType) || type instanceof MapType ||
+    if(type.oneOf(this, SeqType.FUNCTION, AtomType.ITEM)) return true;
+    if(this == SeqType.FUNCTION || !(type instanceof FuncType) || type instanceof MapType ||
         type instanceof ArrayType) return false;
 
     final FuncType ft = (FuncType) type;
@@ -149,12 +149,12 @@ public class FuncType implements Type {
 
     final FuncType ft = (FuncType) type;
     final int al = argTypes.length;
-    if(al != ft.argTypes.length) return SeqType.FUNC;
+    if(al != ft.argTypes.length) return SeqType.FUNCTION;
 
     final SeqType[] arg = new SeqType[al];
     for(int a = 0; a < al; a++) {
       arg[a] = argTypes[a].intersect(ft.argTypes[a]);
-      if(arg[a] == null) return SeqType.FUNC;
+      if(arg[a] == null) return SeqType.FUNCTION;
     }
 
     final AnnList an = anns.union(ft.anns);
@@ -213,7 +213,7 @@ public class FuncType implements Type {
   public static Type find(final QNm name) {
     if(name.uri().length == 0) {
       final byte[] ln = name.local();
-      if(Token.eq(ln, token(QueryText.FUNCTION))) return SeqType.FUNC;
+      if(Token.eq(ln, token(QueryText.FUNCTION))) return SeqType.FUNCTION;
       if(Token.eq(ln, token(QueryText.MAP))) return SeqType.MAP;
       if(Token.eq(ln, token(QueryText.ARRAY))) return SeqType.ARRAY;
     }
@@ -254,7 +254,7 @@ public class FuncType implements Type {
   @Override
   public String toString() {
     final QueryString qs = new QueryString().token(anns).token(QueryText.FUNCTION);
-    if(this == SeqType.FUNC) qs.params(WILDCARD);
+    if(this == SeqType.FUNCTION) qs.params(WILDCARD);
     else qs.params(argTypes).token(QueryText.AS).token(declType);
     return qs.toString();
   }

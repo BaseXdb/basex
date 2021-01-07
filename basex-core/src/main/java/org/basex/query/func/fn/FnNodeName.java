@@ -20,7 +20,7 @@ public class FnNodeName extends ContextFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toNodeOrNull(ctxArg(0, qc), qc);
     return node == null || empty(node.type) ||
-      node.type == NSP && node.name().length == 0 ? Empty.VALUE : node.qname();
+      node.type == NAMESPACE_NODE && node.name().length == 0 ? Empty.VALUE : node.qname();
   }
 
   @Override
@@ -41,10 +41,10 @@ public class FnNodeName extends ContextFn {
 
     final SeqType st = expr.seqType();
     final Type type = st.type;
-    if(occ && st.oneOrMore() && (type == ELM || type == ATT || type == PI)) {
-      exprType.assign(Occ.ONE);
+    if(occ && st.oneOrMore() && (type.oneOf(ELEMENT, ATTRIBUTE, PROCESSING_INSTRUCTION))) {
+      exprType.assign(Occ.EXACTLY_ONE);
     }
-    return type instanceof NodeType && type != NOD && empty(type);
+    return type instanceof NodeType && type != NODE && empty(type);
   }
 
   /**
@@ -53,6 +53,6 @@ public class FnNodeName extends ContextFn {
    * @return result of check
    */
   static boolean empty(final Type type) {
-    return type != ELM && type != ATT && type != PI && type != NSP;
+    return !type.oneOf(ELEMENT, ATTRIBUTE, PROCESSING_INSTRUCTION, NAMESPACE_NODE);
   }
 }

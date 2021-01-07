@@ -33,7 +33,7 @@ public final class CPI extends CName {
    */
   public CPI(final StaticContext sc, final InputInfo info, final boolean computed, final Expr name,
       final Expr value) {
-    super(sc, info, SeqType.PI_O, computed, name, value);
+    super(sc, info, SeqType.PROCESSING_INSTRUCTION_O, computed, name, value);
   }
 
   @Override
@@ -43,7 +43,8 @@ public final class CPI extends CName {
       final byte[] nm = ncname(false, cc.qc);
       if(nm != null) {
         name = Str.get(nm);
-        exprType.assign(SeqType.get(NodeType.PI, Occ.ONE, Test.get(NodeType.PI, new QNm(nm))));
+        exprType.assign(SeqType.get(NodeType.PROCESSING_INSTRUCTION, Occ.EXACTLY_ONE,
+            Test.get(NodeType.PROCESSING_INSTRUCTION, new QNm(nm))));
       }
     }
     optValue(cc);

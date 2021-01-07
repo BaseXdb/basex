@@ -71,10 +71,12 @@ public final class Insert extends Update {
 
     final ANode node = (ANode) item, parent = node.parent();
     if(loc) {
-      if(node.type == NodeType.ATT || node.type == NodeType.DOC) throw UPTRGTYP2_X.get(info, node);
+      if(node.type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE))
+        throw UPTRGTYP2_X.get(info, node);
       if(parent == null) throw UPPAREMPTY_X.get(info, node);
     } else {
-      if(node.type != NodeType.ELM && node.type != NodeType.DOC) throw UPTRGTYP_X.get(info, node);
+      if(!node.type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE))
+        throw UPTRGTYP_X.get(info, node);
     }
 
     NodeUpdate up;
@@ -83,7 +85,7 @@ public final class Insert extends Update {
     final Updates updates = qc.updates();
     if(!aList.isEmpty()) {
       final ANode targ = loc ? parent : node;
-      if(targ.type != NodeType.ELM) throw (loc ? UPATTELM_X : UPATTELM2_X).get(info, targ);
+      if(targ.type != NodeType.ELEMENT) throw (loc ? UPATTELM_X : UPATTELM2_X).get(info, targ);
 
       dbn = updates.determineDataRef(targ, qc);
       up = new InsertAttribute(dbn.pre(), dbn.data(), info, checkNS(aList, targ));

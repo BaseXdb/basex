@@ -196,7 +196,7 @@ public final class CompileContext {
       final Value value = qc.focus.value;
       if(value != null) data = value.data();
     }
-    return new Dummy(expr.seqType().with(Occ.ONE), data);
+    return new Dummy(expr.seqType().with(Occ.EXACTLY_ONE), data);
   }
 
   /**

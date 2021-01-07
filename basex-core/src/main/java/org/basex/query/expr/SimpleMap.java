@@ -201,7 +201,7 @@ public abstract class SimpleMap extends Arr {
         if(expr.size() != -1) {
           count = Int.get(expr.size());
         } else if(expr instanceof Range && expr.arg(0) == Int.ONE &&
-            expr.arg(1).seqType().instanceOf(SeqType.ITR_O)) {
+            expr.arg(1).seqType().instanceOf(SeqType.INTEGER_O)) {
           count = expr.arg(1);
         }
         // (1 to 2) ! <x/>  ->  util:replicate(<x/>, 2, true())
@@ -297,7 +297,7 @@ public abstract class SimpleMap extends Arr {
       if(next instanceof Cast) {
         // $node/@id ! xs:integer(.)  ->  xs:integer($node/@id)
         final Cast cast = (Cast) next;
-        inline = cast.expr instanceof ContextValue && cast.seqType.occ == Occ.ZERO_ONE;
+        inline = cast.expr instanceof ContextValue && cast.seqType.occ == Occ.ZERO_OR_ONE;
       } else if(next instanceof ContextFn) {
         // $node/.. ! base-uri(.)  ->  base-uri($node/..)
         inline = ((ContextFn) next).inlineable();

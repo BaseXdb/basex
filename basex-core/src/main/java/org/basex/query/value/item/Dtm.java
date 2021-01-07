@@ -22,7 +22,7 @@ public final class Dtm extends ADate {
    * @param date date
    */
   public Dtm(final ADate date) {
-    super(AtomType.DTM, date);
+    super(AtomType.DATE_TIME, date);
     if(hou == -1) {
       hou = 0;
       min = 0;
@@ -38,7 +38,7 @@ public final class Dtm extends ADate {
    * @throws QueryException query exception
    */
   public Dtm(final Dat date, final Tim time, final InputInfo ii) throws QueryException {
-    super(AtomType.DTM, date);
+    super(AtomType.DATE_TIME, date);
 
     hou = time.hou;
     min = time.min;
@@ -57,7 +57,7 @@ public final class Dtm extends ADate {
    * @throws QueryException query exception
    */
   public Dtm(final byte[] date, final InputInfo ii) throws QueryException {
-    super(AtomType.DTM);
+    super(AtomType.DATE_TIME);
     final int i = Token.indexOf(date, 'T');
     if(i == -1) throw dateError(date, XDTM, ii);
     date(Token.substring(date, 0, i), XDTM, ii);

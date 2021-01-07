@@ -100,7 +100,7 @@ public final class UtilItem extends StandardFunc {
     if(_UTIL_INIT.is(expr))
       return cc.function(_UTIL_ITEM, info, expr.arg(0), position);
 
-    exprType.assign(st.with(Occ.ZERO_ONE));
+    exprType.assign(st.with(Occ.ZERO_OR_ONE));
     data(expr.data());
     return this;
   }

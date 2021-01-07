@@ -81,10 +81,11 @@ abstract class CName extends CNode {
   final QNm qname(final boolean elem, final QueryContext qc, final StaticContext sctx)
       throws QueryException {
 
-    final Item item = checkNoEmpty(name.atomItem(qc, info), AtomType.QNM);
+    final Item item = checkNoEmpty(name.atomItem(qc, info), AtomType.QNAME);
     final Type type = item.type;
-    if(type == AtomType.QNM) return (QNm) item;
-    if(!type.isStringOrUntyped() || type == AtomType.URI) throw STRQNM_X_X.get(info, type, item);
+    if(type == AtomType.QNAME) return (QNm) item;
+    if(!type.isStringOrUntyped() || type == AtomType.ANY_URI)
+      throw STRQNM_X_X.get(info, type, item);
 
     // check for QName
     final byte[] token = normalize(item.string(info));
@@ -115,11 +116,11 @@ abstract class CName extends CNode {
     final Item item = name.atomItem(qc, info);
     if(item != Empty.VALUE) {
       final Type type = item.type;
-      if(!type.isStringOrUntyped() || type == AtomType.URI) throw STRNCN_X_X.get(info, type, item);
-      return trim(item.string(info));
+      if(type.isStringOrUntyped() && type != AtomType.ANY_URI) return trim(item.string(info));
+      throw STRNCN_X_X.get(info, type, item);
     }
     if(empty) return EMPTY;
-    throw STRNCN_X_X.get(info, SeqType.EMP, item);
+    throw STRNCN_X_X.get(info, SeqType.EMPTY_SEQUENCE_Z, item);
   }
 
   @Override

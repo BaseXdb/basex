@@ -138,7 +138,7 @@ public class CmpG extends Cmp {
    */
   public CmpG(final Expr expr1, final Expr expr2, final OpG op, final Collation coll,
       final StaticContext sc, final InputInfo info) {
-    super(info, expr1, expr2, coll, SeqType.BLN_O, sc);
+    super(info, expr1, expr2, coll, SeqType.BOOLEAN_O, sc);
     this.op = op;
   }
 
@@ -184,12 +184,12 @@ public class CmpG extends Cmp {
       final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
       final Type type1 = st1.type, type2 = st2.type;
       // skip type check if types are identical (and a child instance of of any atomic type)
-      check = !(type1 == type2 && !AtomType.AAT.instanceOf(type1) &&
+      check = !(type1 == type2 && !AtomType.ANY_ATOMIC_TYPE.instanceOf(type1) &&
           (type1.isSortable() || op != OpG.EQ && op != OpG.NE) ||
           type1.isUntyped() || type2.isUntyped() ||
-          type1.instanceOf(AtomType.STR) && type2.instanceOf(AtomType.STR) ||
-          type1.instanceOf(AtomType.NUM) && type2.instanceOf(AtomType.NUM) ||
-          type1.instanceOf(AtomType.DUR) && type2.instanceOf(AtomType.DUR));
+          type1.instanceOf(AtomType.STRING) && type2.instanceOf(AtomType.STRING) ||
+          type1.instanceOf(AtomType.NUMERIC) && type2.instanceOf(AtomType.NUMERIC) ||
+          type1.instanceOf(AtomType.DURATION) && type2.instanceOf(AtomType.DURATION));
 
       CmpHashG hash = null;
       if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
@@ -225,7 +225,8 @@ public class CmpG extends Cmp {
     if(expr1 instanceof Arith && count instanceof ANum) {
       final Arith arith = (Arith) expr1;
       final Expr op1 = arith.arg(0), op2 = arith.arg(1);
-      if(arith.calc == Calc.MINUS && op2.seqType().instanceOf(SeqType.NUM_O) && count == Int.ZERO) {
+      if(arith.calc == Calc.MINUS && op2.seqType().instanceOf(SeqType.NUMERIC_O) &&
+          count == Int.ZERO) {
         // sum(A) - sum(B) = 0  ->  sum(A) = sum(B)
         return new CmpG(op1, op2, op, coll, sc, info).optimize(cc);
       } else if(arith.calc != Calc.MOD && arith.calc != Calc.IDIV && op2 instanceof ANum) {

@@ -24,13 +24,13 @@ public final class FnSubstring extends StandardFunc {
     int length = ascii ? string.length : Token.length(string);
     int start = start(qc), end = exprs.length == 3 ? length(qc) : length;
 
-    if(length == 0 || start == Integer.MIN_VALUE) return Str.ZERO;
+    if(length == 0 || start == Integer.MIN_VALUE) return Str.EMPTY;
     if(start < 0) {
       end += start;
       start = 0;
     }
     end = Math.min(length, exprs.length == 3 ? start + end : Integer.MAX_VALUE);
-    if(start >= end) return Str.ZERO;
+    if(start >= end) return Str.EMPTY;
     if(ascii) return Str.get(Token.substring(string, start, end));
 
     // process strings with non-ascii characters
@@ -48,14 +48,14 @@ public final class FnSubstring extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     // empty argument: return empty string
-    if(expr1 == Empty.VALUE || expr1 == Str.ZERO) return Str.ZERO;
+    if(expr1 == Empty.VALUE || expr1 == Str.EMPTY) return Str.EMPTY;
 
     final int start = expr2 instanceof Value ? start(cc.qc) : Integer.MAX_VALUE;
     final int length = exprs.length < 3 ? Integer.MAX_VALUE :
       exprs[2] instanceof Value ? length(cc.qc) : Integer.MIN_VALUE;
 
     // invalid start offset or zero length: return empty string
-    if(start == Integer.MIN_VALUE || length == 0) return Str.ZERO;
+    if(start == Integer.MIN_VALUE || length == 0) return Str.EMPTY;
 
     // return full string or original expression
     return start <= 0 && length == Integer.MAX_VALUE &&

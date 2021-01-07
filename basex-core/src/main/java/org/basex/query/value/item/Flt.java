@@ -30,7 +30,7 @@ public final class Flt extends ANum {
    * @param value value
    */
   private Flt(final float value) {
-    super(AtomType.FLT);
+    super(AtomType.FLOAT);
     this.value = value;
   }
 
@@ -72,7 +72,7 @@ public final class Flt extends ANum {
   @Override
   public BigDecimal dec(final InputInfo ii) throws QueryException {
     if(Float.isNaN(value) || Float.isInfinite(value))
-      throw valueError(AtomType.DEC, string(), ii);
+      throw valueError(AtomType.DECIMAL, string(), ii);
     return new BigDecimal(value);
   }
 
@@ -102,7 +102,7 @@ public final class Flt extends ANum {
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return item.type == AtomType.DBL ? item.eq(this, coll, sc, ii) : value == item.flt(ii);
+    return item.type == AtomType.DOUBLE ? item.eq(this, coll, sc, ii) : value == item.flt(ii);
   }
 
   @Override
@@ -133,14 +133,14 @@ public final class Flt extends ANum {
    */
   public static float parse(final byte[] value, final InputInfo ii) throws QueryException {
     final byte[] v = Token.trim(value);
-    if(!Token.eq(v, Token.INFINITY, Token.NINFINITY)) {
+    if(!Token.eq(v, Token.INFINITY, Token.NEGATIVE_INFINITY)) {
       try {
         return Float.parseFloat(Token.string(v));
       } catch(final NumberFormatException ignore) { }
     }
 
     if(Token.eq(v, Token.INF)) return Float.POSITIVE_INFINITY;
-    if(Token.eq(v, Token.NINF)) return Float.NEGATIVE_INFINITY;
-    throw AtomType.FLT.castError(value, ii);
+    if(Token.eq(v, Token.NEGATVE_INF)) return Float.NEGATIVE_INFINITY;
+    throw AtomType.FLOAT.castError(value, ii);
   }
 }

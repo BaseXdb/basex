@@ -155,7 +155,7 @@ public abstract class Formatter extends FormatUtil {
         BigDecimal frac = null;
         long num = 0;
 
-        final boolean dat = date.type == AtomType.DAT, tim = date.type == AtomType.TIM;
+        final boolean dat = date.type == AtomType.DATE, tim = date.type == AtomType.TIME;
         boolean err = false;
         switch(compSpec) {
           case 'Y':

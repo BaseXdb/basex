@@ -23,7 +23,7 @@ public final class BlnSeq extends NativeSeq {
    * @param values bytes
    */
   private BlnSeq(final boolean[] values) {
-    super(values.length, AtomType.BLN);
+    super(values.length, AtomType.BOOLEAN);
     this.values = values;
   }
 

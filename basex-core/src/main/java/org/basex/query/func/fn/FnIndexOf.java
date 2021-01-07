@@ -58,7 +58,7 @@ public final class FnIndexOf extends StandardFunc {
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
     if(st.zero()) return expr;
-    if(st.zeroOrOne() && !st.mayBeArray()) exprType.assign(Occ.ZERO_ONE);
+    if(st.zeroOrOne() && !st.mayBeArray()) exprType.assign(Occ.ZERO_OR_ONE);
     return this;
   }
 }

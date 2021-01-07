@@ -24,7 +24,7 @@ public final class DTDur extends Dur {
    * @param dur duration item
    */
   public DTDur(final Dur dur) {
-    super(AtomType.DTD);
+    super(AtomType.DAY_TIME_DURATION);
     sec = dur.sec == null ? BigDecimal.ZERO : dur.sec;
   }
 
@@ -34,7 +34,7 @@ public final class DTDur extends Dur {
    * @param minutes minutes
    */
   public DTDur(final long hours, final long minutes) {
-    super(AtomType.DTD);
+    super(AtomType.DAY_TIME_DURATION);
     sec = BigDecimal.valueOf(hours).multiply(BD_60).add(BigDecimal.valueOf(minutes)).
         multiply(BD_60);
   }
@@ -44,7 +44,7 @@ public final class DTDur extends Dur {
    * @param sec seconds
    */
   public DTDur(final BigDecimal sec) {
-    super(AtomType.DTD);
+    super(AtomType.DAY_TIME_DURATION);
     this.sec = sec;
   }
 
@@ -55,7 +55,7 @@ public final class DTDur extends Dur {
    * @throws QueryException query exception
    */
   public DTDur(final byte[] value, final InputInfo ii) throws QueryException {
-    super(AtomType.DTD);
+    super(AtomType.DAY_TIME_DURATION);
 
     final String val = Token.string(value).trim();
     final Matcher mt = DTD.matcher(val);
@@ -120,7 +120,7 @@ public final class DTDur extends Dur {
    * @throws QueryException query exception
    */
   public DTDur(final ADate date, final ADate sub, final InputInfo ii) throws QueryException {
-    super(AtomType.DTD);
+    super(AtomType.DAY_TIME_DURATION);
     sec = date.days().subtract(sub.days()).multiply(BD_864000).add(
         date.seconds().subtract(sub.seconds()));
     final double d = sec.doubleValue();

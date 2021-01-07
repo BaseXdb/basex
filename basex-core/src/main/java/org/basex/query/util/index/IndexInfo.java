@@ -76,9 +76,9 @@ public final class IndexInfo {
     if(last == null) return null;
 
     final Data data = db.data();
-    if(last.test.type == NodeType.TXT) {
+    if(last.test.type == NodeType.TEXT) {
       text = true;
-    } else if(last.test.type == NodeType.ELM) {
+    } else if(last.test.type == NodeType.ELEMENT) {
       // ensure that addressed elements only have text nodes as children
       // stop if database is unknown/out-dated, if namespaces occur, or if name test is not simple
       if(data == null || !(data.meta.uptodate && data.nspaces.isEmpty()) ||
@@ -90,7 +90,7 @@ public final class IndexInfo {
       final Stats stats = data.elemNames.stats(data.elemNames.id(test.qname.local()));
       if(stats == null || !stats.isLeaf()) return null;
       text = true;
-    } else if(last.test.type != NodeType.ATT) {
+    } else if(last.test.type != NodeType.ATTRIBUTE) {
       // other tests cannot be rewritten for index access
       return null;
     }

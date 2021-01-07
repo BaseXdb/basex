@@ -1,6 +1,7 @@
 package org.basex.io.serial;
 
 import static org.basex.io.serial.SerializerOptions.*;
+import static org.basex.query.value.type.AtomType.*;
 
 import java.io.*;
 import java.text.*;
@@ -74,8 +75,8 @@ public class AdaptiveSerializer extends OutputSerializer {
   protected final void node(final ANode node) throws IOException {
     final Type type = node.type;
     final XMLSerializer ser = xml();
-    if(type == NodeType.ATT) ser.attribute(node.name(), node.string(), true);
-    else if(type == NodeType.NSP) ser.namespace(node.name(), node.string(), true);
+    if(type == NodeType.ATTRIBUTE) ser.attribute(node.name(), node.string(), true);
+    else if(type == NodeType.NAMESPACE_NODE) ser.namespace(node.name(), node.string(), true);
     else ser.node(node);
     ser.out.flush();
     ser.reset();
@@ -85,17 +86,17 @@ public class AdaptiveSerializer extends OutputSerializer {
   protected void atomic(final Item item) throws IOException {
     final TokenBuilder tb = new TokenBuilder();
     final Type type = item.type;
-    if(type.instanceOf(AtomType.STR) || type.instanceOf(AtomType.DEC) ||
-       type.oneOf(AtomType.BLN, AtomType.ATM, AtomType.URI)) {
+    if(type.instanceOf(STRING) || type.instanceOf(DECIMAL) ||
+       type.oneOf(BOOLEAN, UNTYPED_ATOMIC, ANY_URI)) {
       tb.add(item);
-    } else if(type == AtomType.QNM) {
+    } else if(type == QNAME) {
       tb.add(((QNm) item).eqName());
-    } else if(type == AtomType.DBL) {
+    } else if(type == DOUBLE) {
       final Dbl dbl = (Dbl) item;
       final double d = dbl.dbl();
       if(Double.isInfinite(d) || Double.isNaN(d)) tb.add(dbl.string());
       else tb.add(new DecimalFormat(DOUBLES, Token.LOC).format(d).toLowerCase(Locale.ENGLISH));
-    } else if(type.instanceOf(AtomType.DUR)) {
+    } else if(type.instanceOf(DURATION)) {
       final Dur dur = new Dur((Dur) item);
       tb.add(dur.type).add("(\"").add(dur.string(null)).add("\")");
     } else {

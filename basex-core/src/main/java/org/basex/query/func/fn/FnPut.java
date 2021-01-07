@@ -29,7 +29,8 @@ public final class FnPut extends StandardFunc {
     final Item so = exprs.length > 2 ? exprs[2].item(qc, info) : Empty.VALUE;
     final SerializerOptions sopts = FuncOptions.serializer(so, info);
 
-    if(nd.type != NodeType.DOC && nd.type != NodeType.ELM) throw UPFOTYPE_X.get(info, exprs[0]);
+    if(!nd.type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ELEMENT))
+      throw UPFOTYPE_X.get(info, exprs[0]);
 
     final Uri uri = Uri.uri(file);
     if(uri == Uri.EMPTY || !uri.isValid()) throw UPFOURI_X.get(info, file);

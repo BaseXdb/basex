@@ -23,7 +23,7 @@ public final class FltSeq extends NativeSeq {
    * @param values bytes
    */
   private FltSeq(final float[] values) {
-    super(values.length, AtomType.FLT);
+    super(values.length, AtomType.FLOAT);
     this.values = values;
   }
 

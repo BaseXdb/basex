@@ -31,7 +31,7 @@ public final class FComm extends FNode {
    * @param value text value
    */
   public FComm(final byte[] value) {
-    super(NodeType.COM);
+    super(NodeType.COMMENT);
     this.value = value;
   }
 

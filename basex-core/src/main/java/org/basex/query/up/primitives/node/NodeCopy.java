@@ -79,9 +79,9 @@ abstract class NodeCopy extends NodeUpdate {
     final ANodeList s = new ANodeList(ns);
     ANode n = nl.get(0);
     for(int c = 0; c < ns;) {
-      if(n.type == NodeType.TXT) {
+      if(n.type == NodeType.TEXT) {
         final TokenBuilder tb = new TokenBuilder();
-        while(n.type == NodeType.TXT) {
+        while(n.type == NodeType.TEXT) {
           tb.add(n.string());
           if(++c == ns) break;
           n = nl.get(c);

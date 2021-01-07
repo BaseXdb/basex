@@ -46,7 +46,7 @@ abstract class DbNew extends DbAccess {
       }
 
       // adding a document node
-      if(node.type == NodeType.ATT) throw UPDOCTYPE_X.get(info, node);
+      if(node.type == NodeType.ATTRIBUTE) throw UPDOCTYPE_X.get(info, node);
       ni.node = node;
       ni.path = string(name);
       return ni;

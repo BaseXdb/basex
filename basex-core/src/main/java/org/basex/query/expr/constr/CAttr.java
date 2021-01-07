@@ -36,7 +36,7 @@ public final class CAttr extends CName {
    */
   public CAttr(final StaticContext sc, final InputInfo info, final boolean computed,
       final Expr name, final Expr... value) {
-    super(sc, info, SeqType.ATT_O, computed, name, value);
+    super(sc, info, SeqType.ATTRIBUTE_O, computed, name, value);
   }
 
   @Override
@@ -46,7 +46,8 @@ public final class CAttr extends CName {
       final QNm nm = qname(true, cc.qc, null);
       if(nm != null) {
         name = nm;
-        exprType.assign(SeqType.get(NodeType.ATT, Occ.ONE, Test.get(NodeType.ATT, nm)));
+        exprType.assign(SeqType.get(NodeType.ATTRIBUTE, Occ.EXACTLY_ONE,
+            Test.get(NodeType.ATTRIBUTE, nm)));
       }
     }
     optValue(cc);

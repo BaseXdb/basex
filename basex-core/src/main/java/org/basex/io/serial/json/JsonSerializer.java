@@ -128,9 +128,9 @@ public abstract class JsonSerializer extends StandardSerializer {
     try {
       if(item.type.isNumber()) {
         final byte[] str = item.string(null);
-        if(eq(str, NAN, INF, NINF)) throw SERNUMBER_X.getIO(str);
+        if(eq(str, NAN, INF, NEGATVE_INF)) throw SERNUMBER_X.getIO(str);
         out.print(str);
-      } else if(item.type == AtomType.BLN) {
+      } else if(item.type == AtomType.BOOLEAN) {
         out.print(item.string(null));
       } else {
         string(item.string(null));

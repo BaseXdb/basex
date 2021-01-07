@@ -111,7 +111,7 @@ abstract class Ids extends ContextFn {
    */
   private ANode checkRoot(final ANode node) throws QueryException {
     final ANode root = node.root();
-    if(root.type != NodeType.DOC) throw IDDOC.get(info);
+    if(root.type != NodeType.DOCUMENT_NODE) throw IDDOC.get(info);
     return root;
   }
 

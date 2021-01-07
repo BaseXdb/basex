@@ -51,7 +51,7 @@ public abstract class Seq extends Value {
     if(tp != null) {
       type = tp;
       // shortcut for strings (avoid intermediate token representation)
-      if(tp == AtomType.STR) {
+      if(tp == AtomType.STRING) {
         final StringList tmp = new StringList(initialCapacity(size));
         for(final Item item : this) tmp.add(item.string(null));
         return tmp.finish();
@@ -204,7 +204,7 @@ public abstract class Seq extends Value {
 
   @Override
   public final SeqType seqType() {
-    return SeqType.get(type, Occ.ONE_MORE);
+    return SeqType.get(type, Occ.ONE_OR_MORE);
   }
 
   @Override
@@ -274,13 +274,13 @@ public abstract class Seq extends Value {
   public static Value get(final int size, final Type type, final Value... values)
       throws QueryException {
 
-    if(type == AtomType.STR) return StrSeq.get(size, values);
-    if(type == AtomType.BLN) return BlnSeq.get(size, values);
-    if(type == AtomType.FLT) return FltSeq.get(size, values);
-    if(type == AtomType.DBL) return DblSeq.get(size, values);
-    if(type == AtomType.DEC) return DecSeq.get(size, values);
-    if(type == AtomType.BYT) return BytSeq.get(size, values);
-    if(type != null && type.instanceOf(AtomType.ITR)) return IntSeq.get(type, size, values);
+    if(type == AtomType.STRING) return StrSeq.get(size, values);
+    if(type == AtomType.BOOLEAN) return BlnSeq.get(size, values);
+    if(type == AtomType.FLOAT) return FltSeq.get(size, values);
+    if(type == AtomType.DOUBLE) return DblSeq.get(size, values);
+    if(type == AtomType.DECIMAL) return DecSeq.get(size, values);
+    if(type == AtomType.BYTE) return BytSeq.get(size, values);
+    if(type != null && type.instanceOf(AtomType.INTEGER)) return IntSeq.get(type, size, values);
     return null;
   }
 

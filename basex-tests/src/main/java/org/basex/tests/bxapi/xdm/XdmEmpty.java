@@ -24,7 +24,7 @@ public final class XdmEmpty extends XdmValue {
 
   @Override
   public SeqType getType() {
-    return SeqType.EMP;
+    return SeqType.EMPTY_SEQUENCE_Z;
   }
 
   @Override

@@ -25,7 +25,7 @@ public abstract class IndexAccess extends Simple {
    * @param type type
    */
   IndexAccess(final IndexDb db, final InputInfo info, final Type type) {
-    super(info, SeqType.get(type, Occ.ZERO_MORE));
+    super(info, SeqType.get(type, Occ.ZERO_OR_MORE));
     this.db = db;
   }
 

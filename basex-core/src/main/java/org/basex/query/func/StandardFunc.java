@@ -102,8 +102,8 @@ public abstract class StandardFunc extends Arr {
       // consider variable-size parameters
       final int p = Math.min(e, definition.params.length - 1);
       final Type type = definition.params[p].type;
-      if(type.instanceOf(AtomType.AAT)) {
-        final Simplify mode = type.instanceOf(AtomType.NUM) ? Simplify.NUMBER : Simplify.STRING;
+      if(type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
+        final Simplify mode = type.instanceOf(AtomType.NUMERIC) ? Simplify.NUMBER : Simplify.STRING;
         exprs[e] = exprs[e].simplifyFor(mode, cc);
       }
     }
@@ -155,7 +155,7 @@ public abstract class StandardFunc extends Arr {
     if(expr != null) {
       final SeqType st = expr.seqType();
       if(st.zero()) return expr;
-      if(occ && st.oneOrMore() && !(atom && st.mayBeArray())) exprType.assign(Occ.ONE);
+      if(occ && st.oneOrMore() && !(atom && st.mayBeArray())) exprType.assign(Occ.EXACTLY_ONE);
     }
     return this;
   }
@@ -282,7 +282,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final DBNode toDBNode(final Item item) throws QueryException {
-    if(checkNoEmpty(item, NodeType.NOD) instanceof DBNode) return (DBNode) item;
+    if(checkNoEmpty(item, NodeType.NODE) instanceof DBNode) return (DBNode) item;
     throw DB_NODE_X.get(info, item);
   }
 
@@ -553,7 +553,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final long dateTimeToMs(final Expr expr, final QueryContext qc) throws QueryException {
-    final Dtm dtm = (Dtm) checkType(expr, qc, AtomType.DTM);
+    final Dtm dtm = (Dtm) checkType(expr, qc, AtomType.DATE_TIME);
     if(dtm.yea() > 292278993) throw INTRANGE_X.get(info, dtm.yea());
     return dtm.toJava().toGregorianCalendar().getTimeInMillis();
   }

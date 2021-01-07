@@ -29,7 +29,7 @@ abstract class Update extends Arr {
    * @param expr expressions
    */
   Update(final StaticContext sc, final InputInfo info, final Expr... expr) {
-    super(info, SeqType.EMP, expr);
+    super(info, SeqType.EMPTY_SEQUENCE_Z, expr);
     this.sc = sc;
   }
 

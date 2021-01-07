@@ -123,12 +123,13 @@ public final class XQMap extends XQData {
     if(!(tp instanceof FuncType) || tp instanceof ArrayType) return false;
 
     final FuncType ft = (FuncType) tp;
-    if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(SeqType.AAT_O)) return false;
+    if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O))
+      return false;
 
     AtomType kt = null;
     if(ft instanceof MapType) {
       kt = ((MapType) ft).keyType();
-      if(kt == AtomType.AAT) kt = null;
+      if(kt == AtomType.ANY_ATOMIC_TYPE) kt = null;
     }
 
     SeqType dt = ft.declType;

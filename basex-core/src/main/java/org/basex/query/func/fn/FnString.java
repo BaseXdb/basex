@@ -20,8 +20,8 @@ public final class FnString extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = ctxArg(0, qc).item(qc, info);
-    if(item == Empty.VALUE) return Str.ZERO;
-    if(item.type == AtomType.STR) return item;
+    if(item == Empty.VALUE) return Str.EMPTY;
+    if(item.type == AtomType.STRING) return item;
 
     if(item instanceof FItem) throw FISTRING_X.get(info, item.type);
     return Str.get(item.string(info));
@@ -34,7 +34,7 @@ public final class FnString extends ContextFn {
 
     final boolean context = contextAccess();
     final Expr expr = context ? cc.qc.focus.value : exprs[0];
-    if(expr != null && expr.seqType().eq(SeqType.STR_O)) {
+    if(expr != null && expr.seqType().eq(SeqType.STRING_O)) {
       // string('x')  ->  'x'
       // $string[string() = 'a']  ->  $string[. = 'a']
       return context && cc.nestedFocus() ? new ContextValue(info).optimize(cc) : expr;

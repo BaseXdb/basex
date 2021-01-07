@@ -37,7 +37,7 @@ public final class CArray extends Arr {
     SeqType dt = null;
     for(final Expr expr : exprs) {
       SeqType st = expr.seqType();
-      if(!seq) st = st.with(Occ.ONE);
+      if(!seq) st = st.with(Occ.EXACTLY_ONE);
       dt = dt == null ? st : dt.union(st);
     }
     if(dt != null) exprType.assign(ArrayType.get(dt));

@@ -8,10 +8,10 @@ package org.basex.query.value.type;
  */
 public enum Occ {
   /** Zero.         */ ZERO(0, 0, ""),
-  /** Zero or one.  */ ZERO_ONE(0, 1, "?"),
-  /** Exactly one.  */ ONE(1, 1, ""),
-  /** One or more.  */ ONE_MORE(1, Long.MAX_VALUE, "+"),
-  /** Zero or more. */ ZERO_MORE(0, Long.MAX_VALUE, "*");
+  /** Zero or one.  */ ZERO_OR_ONE(0, 1, "?"),
+  /** Exactly one.  */ EXACTLY_ONE(1, 1, ""),
+  /** One or more.  */ ONE_OR_MORE(1, Long.MAX_VALUE, "+"),
+  /** Zero or more. */ ZERO_OR_MORE(0, Long.MAX_VALUE, "*");
 
   /** Minimal result size ({@code 0} or more). */
   public final long min;
@@ -44,14 +44,14 @@ public enum Occ {
 
   /**
    * Computes the intersection between this occurrence indicator and the given one.
-   * If none exists (e.g. between {@link #ZERO} and {@link #ONE}), {@code null} is returned.
+   * If none exists (e.g. between {@link #ZERO} and {@link #EXACTLY_ONE}), {@code null} is returned.
    * @param other other occurrence indicator
    * @return intersection or {@code null}
    */
   public Occ intersect(final Occ other) {
     final long mn = Math.max(min, other.min), mx = Math.min(max, other.max);
-    return mx < mn ? null : mx == 0 ? ZERO : mn == mx ? ONE : mx == 1 ? ZERO_ONE :
-      mn == 0 ? ZERO_MORE : ONE_MORE;
+    return mx < mn ? null : mx == 0 ? ZERO : mn == mx ? EXACTLY_ONE : mx == 1 ? ZERO_OR_ONE :
+      mn == 0 ? ZERO_OR_MORE : ONE_OR_MORE;
   }
 
   /**
@@ -61,7 +61,8 @@ public enum Occ {
    */
   public Occ union(final Occ other) {
     final long mn = Math.min(min, other.min), mx = Math.max(max, other.max);
-    return mx == 0 ? ZERO : mn == mx ? ONE : mx == 1 ? ZERO_ONE : mn == 0 ? ZERO_MORE : ONE_MORE;
+    return mx == 0 ? ZERO : mn == mx ? EXACTLY_ONE : mx == 1 ? ZERO_OR_ONE :
+      mn == 0 ? ZERO_OR_MORE : ONE_OR_MORE;
   }
 
   /**
@@ -71,7 +72,8 @@ public enum Occ {
    */
   public Occ add(final Occ other) {
     final long mn = min + other.min, mx = max + other.max;
-    return mx == 0 ? ZERO : mx == 1 ? mn == 0 ? ZERO_ONE : ONE : mn == 0 ? ZERO_MORE : ONE_MORE;
+    return mx == 0 ? ZERO : mx == 1 ? mn == 0 ? ZERO_OR_ONE : EXACTLY_ONE :
+      mn == 0 ? ZERO_OR_MORE : ONE_OR_MORE;
   }
 
   /**

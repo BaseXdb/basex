@@ -20,7 +20,7 @@ public final class Hex extends Bin {
    * @param value bytes
    */
   public Hex(final byte[] value) {
-    super(value, AtomType.HEX);
+    super(value, AtomType.HEX_BINARY);
   }
 
   /**
@@ -30,7 +30,7 @@ public final class Hex extends Bin {
    * @throws QueryException query exception
    */
   public Hex(final byte[] value, final InputInfo ii) throws QueryException {
-    super(parse(Token.trim(value), ii), AtomType.HEX);
+    super(parse(Token.trim(value), ii), AtomType.HEX_BINARY);
   }
 
   /**
@@ -71,7 +71,7 @@ public final class Hex extends Bin {
   public static byte[] parse(final Item item, final InputInfo ii) throws QueryException {
     final byte[] bytes = parse(item.string(ii));
     if(bytes != null) return bytes;
-    throw AtomType.HEX.castError(item, ii);
+    throw AtomType.HEX_BINARY.castError(item, ii);
   }
 
   /**
@@ -84,7 +84,7 @@ public final class Hex extends Bin {
   public static byte[] parse(final byte[] value, final InputInfo ii) throws QueryException {
     final byte[] bytes = parse(value);
     if(bytes != null) return bytes;
-    throw AtomType.HEX.castError(value, ii);
+    throw AtomType.HEX_BINARY.castError(value, ii);
   }
 
   /**

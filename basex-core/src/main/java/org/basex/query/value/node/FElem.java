@@ -102,7 +102,7 @@ public final class FElem extends FNode {
    * @param atts attributes, may be {@code null}
    */
   public FElem(final QNm name, final Atts ns, final ANodeList children, final ANodeList atts) {
-    super(NodeType.ELM);
+    super(NodeType.ELEMENT);
     this.name = name;
     this.children = children;
     this.atts = atts;
@@ -117,7 +117,7 @@ public final class FElem extends FNode {
    * @param nss namespaces in scope
    */
   public FElem(final Element elem, final FNode parent, final TokenMap nss) {
-    super(NodeType.ELM);
+    super(NodeType.ELEMENT);
 
     this.parent = parent;
     final String nu = elem.getNamespaceURI();
@@ -133,7 +133,7 @@ public final class FElem extends FNode {
       final byte[] nm = token(att.getName()), uri = token(att.getValue());
       if(Token.eq(nm, XMLNS)) {
         ns.add(EMPTY, uri);
-      } else if(startsWith(nm, XMLNSC)) {
+      } else if(startsWith(nm, XMLNS_COLON)) {
         ns.add(local(nm), uri);
       } else {
         add(new FAttr(att));
@@ -244,7 +244,7 @@ public final class FElem extends FNode {
    * @return self reference
    */
   public FElem add(final ANode node) {
-    if(node.type == NodeType.ATT) {
+    if(node.type == NodeType.ATTRIBUTE) {
       if(atts == null) atts = new ANodeList();
       atts.add(node);
     } else {
@@ -434,7 +434,7 @@ public final class FElem extends FNode {
     if(hasChildren()) {
       tb.add('>');
       final ANode child = children.get(0);
-      if(child.type == NodeType.TXT && children.size() == 1) {
+      if(child.type == NodeType.TEXT && children.size() == 1) {
         tb.add(QueryString.toValue(child.value));
       } else {
         tb.add(DOTS);

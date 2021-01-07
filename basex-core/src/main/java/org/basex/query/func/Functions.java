@@ -72,7 +72,7 @@ public final class Functions {
     if(type == null) type = AtomType.find(name, false);
 
     // no constructor function found, or abstract type specified
-    if(type != null && type != AtomType.NOT && type != AtomType.AAT) {
+    if(type != null && type != AtomType.NOTATION && type != AtomType.ANY_ATOMIC_TYPE) {
       if(arity == 1) return type;
       throw FUNCARITY_X_X_X.get(ii, name.string(), arguments(arity), 1);
     }
@@ -82,7 +82,7 @@ public final class Functions {
     for(final AtomType tp : AtomType.VALUES) {
       if(tp.parent == null) continue;
       final byte[] u = tp.name.uri();
-      if(eq(u, XS_URI) && tp != AtomType.NOT && tp != AtomType.AAT &&
+      if(eq(u, XS_URI) && tp != AtomType.NOTATION && tp != AtomType.ANY_ATOMIC_TYPE &&
           ls.similar(lc(ln), lc(tp.name.local()))) {
         throw FUNCSIMILAR_X_X.get(ii, name.prefixId(), tp.toString());
       }
@@ -211,7 +211,8 @@ public final class Functions {
       final FuncType ft, final Expr expr, final VarScope vs, final InputInfo ii,
       final boolean runtime, final boolean updating) {
     return runtime ? new FuncItem(vs.sc, anns, name, params, ft, expr, vs.stackSize(), ii) :
-      new Closure(ii, name, updating ? SeqType.EMP : ft.declType, params, expr, anns, null, vs);
+      new Closure(ii, name, updating ? SeqType.EMPTY_SEQUENCE_Z : ft.declType,
+        params, expr, anns, null, vs);
   }
 
   /**
@@ -232,8 +233,10 @@ public final class Functions {
     if(eq(name.uri(), XS_URI)) {
       final Type type = getCast(name, arity, ii);
       final VarScope vs = new VarScope(sc);
-      final Var[] params = { vs.addNew(new QNm(ITEM, ""), SeqType.AAT_ZO, true, qc, ii) };
-      final SeqType st = SeqType.get(type, Occ.ZERO_ONE);
+      final Var[] params = {
+        vs.addNew(new QNm(ITEM, ""), SeqType.ANY_ATOMIC_TYPE_ZO, true, qc, ii)
+      };
+      final SeqType st = SeqType.get(type, Occ.ZERO_OR_ONE);
       final Expr expr = new Cast(sc, ii, new VarRef(ii, params[0]), st);
       final AnnList anns = new AnnList();
       final FuncType ft = FuncType.get(anns, expr.seqType(), params);
@@ -345,7 +348,7 @@ public final class Functions {
     // type constructors
     if(eq(name.uri(), XS_URI)) {
       final Type type = getCast(name, args.length, ii);
-      final SeqType st = SeqType.get(type, Occ.ZERO_ONE);
+      final SeqType st = SeqType.get(type, Occ.ZERO_OR_ONE);
       return new Cast(sc, ii, args[0], st);
     }
 

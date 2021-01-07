@@ -149,11 +149,11 @@ public final class DeepEqual {
 
         // skip comparison of descendant comments and processing instructions
         if(skip) {
-          if(type1 == NodeType.COM || type1 == NodeType.PI) {
+          if(type1 == NodeType.COMMENT || type1 == NodeType.PROCESSING_INSTRUCTION) {
             node1 = ch1.next();
             continue;
           }
-          if(type2 == NodeType.COM || type2 == NodeType.PI) {
+          if(type2 == NodeType.COMMENT || type2 == NodeType.PROCESSING_INSTRUCTION) {
             node2 = ch2.next();
             continue;
           }
@@ -173,11 +173,11 @@ public final class DeepEqual {
               flags.contains(Mode.NAMESPACES) && !eq(n1.prefix(), n2.prefix())))
             return false;
 
-          if(type1 == NodeType.TXT || type1 == NodeType.ATT || type1 == NodeType.COM ||
-             type1 == NodeType.PI || type1 == NodeType.NSP) {
+          if(type1 == NodeType.TEXT || type1 == NodeType.ATTRIBUTE || type1 == NodeType.COMMENT ||
+             type1 == NodeType.PROCESSING_INSTRUCTION || type1 == NodeType.NAMESPACE_NODE) {
             // compare string values
             if(!eq(node1.string(), node2.string())) return false;
-          } else if(type1 == NodeType.ELM) {
+          } else if(type1 == NodeType.ELEMENT) {
             // compare attributes
             final BasicNodeIter ir1 = node1.attributeIter();
             BasicNodeIter ir2 = node2.attributeIter();

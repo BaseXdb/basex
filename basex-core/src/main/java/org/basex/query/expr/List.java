@@ -93,7 +93,7 @@ public final class List extends Arr {
       if(size != -1) size = sz == -1 ? -1 : size + sz;
       occ = occ.add(st2.occ);
     }
-    exprType.assign(st != null ? st : SeqType.EMP, occ, size);
+    exprType.assign(st != null ? st : SeqType.EMPTY_SEQUENCE_Z, occ, size);
 
     // pre-evaluate list; skip expressions with large result sizes
     if(allAreValues(true)) {
@@ -133,7 +133,7 @@ public final class List extends Arr {
     Long start = null, end = null;
     for(final Expr expr : exprs) {
       long s, e;
-      if(expr instanceof Int && expr.seqType().type == AtomType.ITR) {
+      if(expr instanceof Int && expr.seqType().type == AtomType.INTEGER) {
         s = ((Int) expr).itr();
         e = s + 1;
       } else if(expr instanceof RangeSeq) {
@@ -229,7 +229,7 @@ public final class List extends Arr {
       if(exprs.length != el) {
         // remove duplicate list expressions
         expr = cc.simplify(this, List.get(cc, info, exprs));
-      } else if(seqType().type == AtomType.ITR) {
+      } else if(seqType().type == AtomType.INTEGER) {
         // merge numbers and ranges
         expr = toDistinctRange();
       } else {

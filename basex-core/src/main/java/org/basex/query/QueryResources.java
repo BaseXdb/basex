@@ -353,7 +353,7 @@ public final class QueryResources {
       final QueryInput qi = new QueryInput(path, sc);
       items.add(new DBNode(create(true, qi, null), 0, Data.DOC));
     }
-    addCollection(items.value(NodeType.DOC), name);
+    addCollection(items.value(NodeType.DOCUMENT_NODE), name);
   }
 
   /**

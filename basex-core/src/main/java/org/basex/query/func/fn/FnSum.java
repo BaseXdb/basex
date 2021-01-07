@@ -58,16 +58,17 @@ public class FnSum extends StandardFunc {
       if(!expr1.has(Flag.NDT)) {
         if(expr2 == null) return Int.ZERO;
         if(expr2 == Empty.VALUE) return expr1;
-        if(st2.instanceOf(SeqType.ITR_O)) return expr2;
+        if(st2.instanceOf(SeqType.INTEGER_O)) return expr2;
       }
     } else if(st1.oneOrMore() && !st1.mayBeArray()) {
       // sequence is not empty: assign result type
       final Type type1 = st1.type;
       if(type1.isNumber()) exprType.assign(type1.seqType());
-      else if(type1.isUntyped()) exprType.assign(SeqType.DBL_O);
+      else if(type1.isUntyped()) exprType.assign(SeqType.DOUBLE_O);
     } else if(st2 != null && !st2.zero() && !st2.mayBeArray()) {
       // if input may be empty: consider default argument in static type
-      exprType.assign(Calc.PLUS.type(st1.type, st2.type), st2.oneOrMore() ? Occ.ONE : Occ.ZERO_ONE);
+      final Occ occ = st2.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
+      exprType.assign(Calc.PLUS.type(st1.type, st2.type), occ);
     }
     return this;
   }
@@ -144,7 +145,8 @@ public class FnSum extends StandardFunc {
       throws QueryException {
 
     Item result = item.type.isUntyped() ? Dbl.get(item.dbl(info)) : item;
-    final boolean num = result instanceof ANum, dtd = result.type == DTD, ymd = result.type == YMD;
+    final boolean num = result instanceof ANum;
+    final boolean dtd = result.type == DAY_TIME_DURATION, ymd = result.type == YEAR_MONTH_DURATION;
     if(!num && !dtd && !ymd) throw SUM_X_X.get(info, result.type, result);
 
     int c = 1;
@@ -152,10 +154,15 @@ public class FnSum extends StandardFunc {
       final Type type = it.type;
       Type tp = null;
       if(type.isNumberOrUntyped()) {
-        if(!num) tp = DUR;
+        if(!num) {
+          tp = DURATION;
+        }
       } else {
-        if(num) tp = NUM;
-        else if(dtd && type != DTD || ymd && type != YMD) tp = DUR;
+        if(num) {
+          tp = NUMERIC;
+        } else if(dtd && type != DAY_TIME_DURATION || ymd && type != YEAR_MONTH_DURATION) {
+          tp = DURATION;
+        }
       }
       if(tp != null) throw CMP_X_X_X.get(info, tp, type, it);
       result = Calc.PLUS.eval(result, it, info);

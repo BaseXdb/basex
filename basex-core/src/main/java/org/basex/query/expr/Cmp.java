@@ -71,7 +71,7 @@ public abstract class Cmp extends Arr {
       expr1 instanceof Value ||
       // hashed comparisons: move larger sequences to the right: $small = $large
       expr1.size() > 1 && expr1.size() > expr2.size() &&
-      expr1.seqType().type.instanceOf(AtomType.AAT) ||
+      expr1.seqType().type.instanceOf(AtomType.ANY_ATOMIC_TYPE) ||
       // hashed comparisons: . = $words
       expr1 instanceof VarRef && expr1.seqType().occ.max > 1 &&
         !(expr2 instanceof VarRef && expr2.seqType().occ.max > 1) ||
@@ -154,7 +154,7 @@ public abstract class Cmp extends Arr {
           default:
         }
       }
-    } else if(type instanceof NodeType && type != NodeType.NOD && expr1 instanceof ContextFn &&
+    } else if(type instanceof NodeType && type != NodeType.NODE && expr1 instanceof ContextFn &&
         (this instanceof CmpG ? expr2 instanceof Value : expr2 instanceof Item) && opV == OpV.EQ) {
 
       // skip functions that do not refer to the current context item
@@ -191,7 +191,7 @@ public abstract class Cmp extends Arr {
             }
           }
         }
-      } else if(NODE_NAME.is(func) && expr2.seqType().type == AtomType.QNM) {
+      } else if(NODE_NAME.is(func) && expr2.seqType().type == AtomType.QNAME) {
         // node-name() = xs:QName('pref:local')  ->  self::pref:local
         part = NamePart.FULL;
         for(final Item item : value) {
@@ -256,7 +256,8 @@ public abstract class Cmp extends Arr {
       // keep: () = (), (1,2) != (1,2), (1,2) eq (1,2)
       (op != OpV.EQ || this instanceof CmpV ? st1.one() : st1.oneOrMore()) &&
       // keep: xs:double('NaN') = xs:double('NaN')
-      (type1.isStringOrUntyped() || type1.instanceOf(AtomType.DEC) || type1 == AtomType.BLN) &&
+      (type1.isStringOrUntyped() || type1.instanceOf(AtomType.DECIMAL) ||
+          type1 == AtomType.BOOLEAN) &&
       // keep: random:integer() = random:integer()
       // keep if no context is available: last() = last()
       !expr1.has(Flag.NDT) && (!expr1.has(Flag.CTX) || cc.qc.focus.value != null)
@@ -279,7 +280,7 @@ public abstract class Cmp extends Arr {
    */
   private Expr optBoolean(final OpV op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(expr1.seqType().eq(SeqType.BLN_O)) {
+    if(expr1.seqType().eq(SeqType.BOOLEAN_O)) {
       // boolean(A) = true()   ->  boolean(A)
       if(op == OpV.EQ && expr2 == Bln.TRUE || op == OpV.NE && expr2 == Bln.FALSE) return expr1;
       // boolean(A) = false()  ->  not(boolean(A))
@@ -346,7 +347,7 @@ public abstract class Cmp extends Arr {
       }
     } else if(op == OpV.EQ || op == OpV.GE || op == OpV.LE) {
       final SeqType st2 = count.seqType();
-      if(st2.type.instanceOf(AtomType.ITR)) {
+      if(st2.type.instanceOf(AtomType.INTEGER)) {
         if(count instanceof RangeSeq) {
           final long[] range = ((RangeSeq) count).range(false);
           args.add(Int.get(range[0])).add(Int.get(range[1]));
@@ -406,7 +407,7 @@ public abstract class Cmp extends Arr {
   private Expr optEmptyString(final OpV op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType();
-    if(st1.one() && st1.type.isStringOrUntyped() && expr2 == Str.ZERO) {
+    if(st1.one() && st1.type.isStringOrUntyped() && expr2 == Str.EMPTY) {
       if(op == OpV.LT) return Bln.FALSE;
       if(op == OpV.GE) return Bln.TRUE;
       // do not rewrite GT, as it may be rewritten to a range expression later on

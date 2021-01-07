@@ -279,14 +279,14 @@ public final class GFLWOR extends ParseExpr {
             // replace with positional variable
             //   for $i at $p in ('a', 'b') return $p  ->  for $p in 1 to 2 return $p
             fr.expr = cc.replaceWith(fr.expr, RangeSeq.get(1, fs, true));
-            fr.exprType.assign(AtomType.ITR);
+            fr.exprType.assign(AtomType.INTEGER);
             fr.var = fr.pos;
             fr.remove(cc, fr.pos);
           } else {
             // replace with singleton sequence (will never be accessed)
             //   for $i in 1 to 3 return <a/>  ->  for $i in util:replicate('', 3) return $i
-            fr.expr = cc.replaceWith(fr.expr, SingletonSeq.get(Str.ZERO, fs));
-            fr.exprType.assign(AtomType.STR);
+            fr.expr = cc.replaceWith(fr.expr, SingletonSeq.get(Str.EMPTY, fs));
+            fr.exprType.assign(AtomType.STRING);
           }
           changed = true;
         }
@@ -1023,7 +1023,7 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    if(tc.seqType().occ != Occ.ZERO_MORE) return null;
+    if(tc.seqType().occ != Occ.ZERO_OR_MORE) return null;
     final Expr r = tc.check(rtrn, cc);
     if(r == null) return this;
     rtrn = r;

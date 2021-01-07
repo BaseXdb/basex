@@ -98,7 +98,7 @@ public abstract class Expr extends ExprInfo {
   public Iter atomIter(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = iter(qc);
     final SeqType st = seqType();
-    if(st.type.instanceOf(AtomType.AAT)) return iter;
+    if(st.type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) return iter;
     long size = iter.size();
     if(size != -1 && st.mayBeArray()) size = -1;
     return new AtomIter(iter, qc, ii, size);
@@ -291,7 +291,7 @@ public abstract class Expr extends ExprInfo {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // return true if a deterministic expression returns at least one node
     return (mode == Simplify.EBV || mode == Simplify.PREDICATE) &&
-      seqType().instanceOf(SeqType.NOD_OM) && !has(Flag.NDT) ? cc.simplify(this, Bln.TRUE) : this;
+      seqType().instanceOf(SeqType.NODE_OM) && !has(Flag.NDT) ? cc.simplify(this, Bln.TRUE) : this;
   }
 
   /**

@@ -46,13 +46,13 @@ public abstract class BXNode implements Node {
   public static BXNode get(final ANode node) {
     if(node == null) return null;
     switch(node.nodeType()) {
-      case DOC: return new BXDoc(node);
-      case ELM: return new BXElem(node);
-      case TXT: return new BXText(node);
-      case COM: return new BXComm(node);
-      case PI : return new BXPI(node);
+      case DOCUMENT_NODE: return new BXDoc(node);
+      case ELEMENT: return new BXElem(node);
+      case TEXT: return new BXText(node);
+      case COMMENT: return new BXComm(node);
+      case PROCESSING_INSTRUCTION : return new BXPI(node);
       // drop parent reference (see Xerces’ NodeImpl#getParentNode)
-      case ATT: return new BXAttr(new FAttr(node.qname(), node.string()));
+      case ATTRIBUTE: return new BXAttr(new FAttr(node.qname(), node.string()));
       default : return null;
     }
   }
@@ -156,7 +156,7 @@ public abstract class BXNode implements Node {
   public BXDoc getOwnerDocument() {
     ANode n = nd;
     for(ANode p; (p = n.parent()) != null;) n = p;
-    return n.type == NodeType.DOC ? (BXDoc) get(n) : null;
+    return n.type == NodeType.DOCUMENT_NODE ? (BXDoc) get(n) : null;
   }
 
   @Override
@@ -269,7 +269,7 @@ public abstract class BXNode implements Node {
     final ANodeList nb = new ANodeList();
     final byte[] nm = "*".equals(name) ? null : token(name);
     for(final ANode n : nd.descendantIter()) {
-      if(n.type == NodeType.ELM && (nm == null || eq(nm, n.name()))) nb.add(n.finish());
+      if(n.type == NodeType.ELEMENT && (nm == null || eq(nm, n.name()))) nb.add(n.finish());
     }
     return new BXNList(nb);
   }

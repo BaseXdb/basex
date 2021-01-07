@@ -137,7 +137,7 @@ abstract class GeoFn extends StandardFunc {
    * @throws QueryException query exception
    */
   private Geometry geo(final ANode node, final QNm... names) throws QueryException {
-    if(node.type != NodeType.ELM) throw typeError(node, NodeType.ELM, null);
+    if(node.type != NodeType.ELEMENT) throw typeError(node, NodeType.ELEMENT, null);
 
     final QNm qname = node.qname();
     for(final QNm geo : names) {

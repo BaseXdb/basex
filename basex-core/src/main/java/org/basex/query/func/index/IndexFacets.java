@@ -29,9 +29,9 @@ public final class IndexFacets extends IndexFn {
   /** Name: max. */
   private static final String MAX = "max";
   /** Name: elements. */
-  private static final byte[] ELM = NodeType.ELM.name;
+  private static final byte[] ELM = NodeType.ELEMENT.name;
   /** Name: attributes. */
-  private static final byte[] ATT = NodeType.ATT.name;
+  private static final byte[] ATT = NodeType.ATTRIBUTE.name;
   /** Flag: flat output. */
   private static final byte[] FLAT = token("flat");
 
@@ -48,7 +48,7 @@ public final class IndexFacets extends IndexFn {
    * @return element
    */
   private static FElem flat(final Data data) {
-    final FElem elem = new FElem(new QNm(NodeType.DOC.name));
+    final FElem elem = new FElem(new QNm(NodeType.DOCUMENT_NODE.name));
     index(data.elemNames, ELM, elem);
     index(data.attrNames, ATT, elem);
     return elem;

@@ -219,7 +219,7 @@ public abstract class Serializer implements Closeable {
 
     final byte[] ancUri = nsUri(prefix);
     if(ancUri == null || !eq(ancUri, uri)) {
-      attribute(prefix.length == 0 ? XMLNS : concat(XMLNSC, prefix), uri, standalone);
+      attribute(prefix.length == 0 ? XMLNS : concat(XMLNS_COLON, prefix), uri, standalone);
       nspaces.add(prefix, uri);
     }
   }
@@ -440,17 +440,17 @@ public abstract class Serializer implements Closeable {
    */
   private void node(final FNode node) throws IOException {
     final Type type = node.type;
-    if(type == NodeType.COM) {
+    if(type == NodeType.COMMENT) {
       prepareComment(node.string());
-    } else if(type == NodeType.TXT) {
+    } else if(type == NodeType.TEXT) {
       prepareText(node.string(), null);
-    } else if(type == NodeType.PI) {
+    } else if(type == NodeType.PROCESSING_INSTRUCTION) {
       preparePi(node.name(), node.string());
-    } else if(type == NodeType.ATT) {
+    } else if(type == NodeType.ATTRIBUTE) {
       attribute(node.name(), node.string(), true);
-    } else if(type == NodeType.NSP) {
+    } else if(type == NodeType.NAMESPACE_NODE) {
       namespace(node.name(), node.string(), true);
-    } else if(type == NodeType.DOC) {
+    } else if(type == NodeType.DOCUMENT_NODE) {
       openDoc(node.baseURI());
       for(final ANode nd : node.childIter()) node(nd);
       closeDoc();

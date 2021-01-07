@@ -21,10 +21,10 @@ public final class FnQName extends StandardFunc {
   public QNm item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] uri = toZeroToken(exprs[0], qc);
     final byte[] name = toToken(exprs[1], qc);
-    final byte[] str = !contains(name, ':') && eq(uri, XML_URI) ? concat(XMLC, name) : name;
-    if(!XMLToken.isQName(str)) throw valueError(AtomType.QNM, name, info);
+    final byte[] str = !contains(name, ':') && eq(uri, XML_URI) ? concat(XML_COLON, name) : name;
+    if(!XMLToken.isQName(str)) throw valueError(AtomType.QNAME, name, info);
     final QNm qname = new QNm(str, uri);
-    if(qname.hasPrefix() && uri.length == 0) throw valueError(AtomType.URI, qname.uri(), info);
+    if(qname.hasPrefix() && uri.length == 0) throw valueError(AtomType.ANY_URI, qname.uri(), info);
     return qname;
   }
 }

@@ -52,9 +52,9 @@ public final class Cast extends Single {
     Occ o = seqType.occ;
     if(dt instanceof ListType) {
       dt = dt.atomic();
-      o = Occ.ZERO_MORE;
-    } else if(o == Occ.ZERO_ONE && est.oneOrMore() && !est.mayBeArray()) {
-      o = Occ.ONE;
+      o = Occ.ZERO_OR_MORE;
+    } else if(o == Occ.ZERO_OR_ONE && est.oneOrMore() && !est.mayBeArray()) {
+      o = Occ.EXACTLY_ONE;
     }
     exprType.assign(dt, o);
 
@@ -64,7 +64,7 @@ public final class Cast extends Single {
 
       final Type et = est.type;
       if(et.instanceOf(dt)) {
-        if(est.occ.instanceOf(o) && (et.eq(dt) || dt == AtomType.NUM))
+        if(est.occ.instanceOf(o) && (et.eq(dt) || dt == AtomType.NUMERIC))
           return cc.replaceWith(this, expr);
       }
     }

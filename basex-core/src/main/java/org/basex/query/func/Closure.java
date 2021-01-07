@@ -78,7 +78,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    */
   Closure(final InputInfo info, final QNm name, final SeqType declType, final Var[] params,
       final Expr expr, final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
-    super(info, expr, SeqType.FUNC_O);
+    super(info, expr, SeqType.FUNCTION_O);
     this.name = name;
     this.params = params;
     this.declType = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;

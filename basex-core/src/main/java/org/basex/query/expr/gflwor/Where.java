@@ -29,7 +29,7 @@ public final class Where extends Clause {
    * @param info input info
    */
   public Where(final Expr expr, final InputInfo info) {
-    super(info, SeqType.BLN_O);
+    super(info, SeqType.BOOLEAN_O);
     this.expr = expr;
   }
 

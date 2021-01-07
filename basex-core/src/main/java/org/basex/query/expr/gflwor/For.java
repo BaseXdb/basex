@@ -122,16 +122,16 @@ public final class For extends ForLet {
     // assign type to clause and variable; remove empty flag if expression always yields items
     final SeqType st = expr.seqType();
     if(st.oneOrMore()) empty = false;
-    exprType.assign(st.with(empty ? st.zero() ? Occ.ZERO : Occ.ZERO_ONE : Occ.ONE));
+    exprType.assign(st.with(empty ? st.zero() ? Occ.ZERO : Occ.ZERO_OR_ONE : Occ.EXACTLY_ONE));
 
     var.refineType(seqType(), size(), cc);
     var.expr(expr);
     if(pos != null) {
-      pos.refineType(SeqType.ITR_O, 1, cc);
+      pos.refineType(SeqType.INTEGER_O, 1, cc);
       pos.expr(Int.ZERO);
     }
     if(score != null) {
-      score.refineType(SeqType.DBL_O, 1, cc);
+      score.refineType(SeqType.DOUBLE_O, 1, cc);
       score.expr(Dbl.ZERO);
     }
     return this;

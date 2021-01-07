@@ -41,7 +41,7 @@ public final class FTNode extends DBNode {
   public FTNode(final FTMatches matches, final Data data, final int pre, final int tl,
       final int is) {
 
-    super(data, pre, null, NodeType.TXT);
+    super(data, pre, null, NodeType.TEXT);
     this.matches = matches;
     this.tl = tl;
     this.is = is;

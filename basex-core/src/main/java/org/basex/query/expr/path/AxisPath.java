@@ -26,7 +26,7 @@ public abstract class AxisPath extends Path {
    * @param steps axis steps
    */
   AxisPath(final InputInfo info, final Expr root, final Expr... steps) {
-    super(info, NodeType.NOD, root, steps);
+    super(info, NodeType.NODE, root, steps);
   }
 
   @Override

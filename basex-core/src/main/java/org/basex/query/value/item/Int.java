@@ -41,7 +41,7 @@ public final class Int extends ANum {
    * @param value value
    */
   private Int(final long value) {
-    this(value, AtomType.ITR);
+    this(value, AtomType.INTEGER);
   }
 
   /**
@@ -70,7 +70,7 @@ public final class Int extends ANum {
    * @return instance
    */
   public static Int get(final long value, final Type type) {
-    return type == AtomType.ITR ? get(value) : new Int(value, type);
+    return type == AtomType.INTEGER ? get(value) : new Int(value, type);
   }
 
   @Override
@@ -154,7 +154,7 @@ public final class Int extends ANum {
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return item instanceof Int ? value == ((Int) item).value :
-           item.type != AtomType.DEC ? value == item.dbl(ii) :
+           item.type != AtomType.DECIMAL ? value == item.dbl(ii) :
            item.eq(this, coll, sc, ii);
   }
 
@@ -168,13 +168,13 @@ public final class Int extends ANum {
   @Override
   public Object toJava() {
     switch((AtomType) type) {
-      case BYT: return (byte) value;
-      case SHR:
-      case UBY: return (short) value;
+      case BYTE: return (byte) value;
+      case SHORT:
+      case UNSIGNED_BYTE: return (short) value;
       case INT:
-      case USH: return (int) value;
-      case LNG:
-      case UIN: return value;
+      case UNSIGNED_SHORT: return (int) value;
+      case LONG:
+      case UNSIGNED_INT: return value;
       default:  return new BigInteger(toString());
     }
   }
@@ -199,7 +199,7 @@ public final class Int extends ANum {
   public static long parse(final Item item, final InputInfo ii) throws QueryException {
     final byte[] value = item.string(ii);
     final long l = Token.toLong(value);
-    if(l != Long.MIN_VALUE || Token.eq(Token.trim(value), Token.MINLONG)) return l;
-    throw AtomType.ITR.castError(item, ii);
+    if(l != Long.MIN_VALUE || Token.eq(Token.trim(value), Token.MIN_LONG)) return l;
+    throw AtomType.INTEGER.castError(item, ii);
   }
 }

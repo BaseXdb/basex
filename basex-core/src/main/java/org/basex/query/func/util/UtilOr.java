@@ -60,7 +60,8 @@ public final class UtilOr extends StandardFunc {
     if(st.zero()) return List.get(cc, info, items, dflt);
 
     // number of items unknown: combine sequence types
-    exprType.assign(st.with(st.zeroOrOne() ? Occ.ONE : Occ.ONE_MORE).union(dflt.seqType()));
+    final Occ occ = st.zeroOrOne() ? Occ.EXACTLY_ONE : Occ.ONE_OR_MORE;
+    exprType.assign(st.with(occ).union(dflt.seqType()));
     return this;
   }
 }

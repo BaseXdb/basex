@@ -27,7 +27,7 @@ public final class Range extends Arr {
    * @param expr2 second expression
    */
   public Range(final InputInfo info, final Expr expr1, final Expr expr2) {
-    super(info, SeqType.ITR_ZM, expr1, expr2);
+    super(info, SeqType.INTEGER_ZM, expr1, expr2);
   }
 
   @Override
@@ -40,10 +40,10 @@ public final class Range extends Arr {
 
       final Expr expr1 = exprs[0], expr2 = exprs[1];
       if(expr1.equals(expr2)) {
-        if(expr1.seqType().instanceOf(SeqType.ITR_O)) {
+        if(expr1.seqType().instanceOf(SeqType.INTEGER_O)) {
           expr = expr1;
         } else {
-          exprType.assign(Occ.ONE);
+          exprType.assign(Occ.EXACTLY_ONE);
         }
       }
     }

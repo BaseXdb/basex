@@ -90,10 +90,10 @@ public abstract class Single extends ParseExpr {
     if(est.occ.instanceOf(dst.occ)) {
       final Type et = est.type, dt = dst.type;
       if(mode == Simplify.STRING && et.isStringOrUntyped() &&
-           dt.oneOf(AtomType.STR, AtomType.ATM) ||
-         mode == Simplify.NUMBER && (et.isUntyped() && dt == AtomType.DBL ||
+           dt.oneOf(AtomType.STRING, AtomType.UNTYPED_ATOMIC) ||
+         mode == Simplify.NUMBER && (et.isUntyped() && dt == AtomType.DOUBLE ||
            et.instanceOf(AtomType.INT) && et.instanceOf(dt)) ||
-         mode == Simplify.DATA && et instanceof NodeType && dt == AtomType.ATM) {
+         mode == Simplify.DATA && et instanceof NodeType && dt == AtomType.UNTYPED_ATOMIC) {
         return cc.simplify(this, expr);
       }
     }

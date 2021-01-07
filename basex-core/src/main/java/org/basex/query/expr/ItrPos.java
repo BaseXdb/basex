@@ -35,7 +35,7 @@ public final class ItrPos extends Simple implements CmpPos {
    * @param info input info
    */
   private ItrPos(final long min, final long max, final InputInfo info) {
-    super(info, SeqType.BLN_O);
+    super(info, SeqType.BOOLEAN_O);
     this.min = min;
     this.max = max;
   }

@@ -34,7 +34,7 @@ public final class FnZeroOrOne extends StandardFunc {
     if(st.zeroOrOne()) return expr;
     if(expr.size() > 1) throw ZEROORONE.get(info);
 
-    exprType.assign(st.with(Occ.ZERO_ONE));
+    exprType.assign(st.with(Occ.ZERO_OR_ONE));
     data(expr.data());
     return this;
   }

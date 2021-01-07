@@ -264,8 +264,8 @@ public abstract class XQArray extends XQData {
 
   @Override
   public final Value get(final Item key, final InputInfo ii) throws QueryException {
-    if(!key.type.instanceOf(AtomType.ITR) && !key.type.isUntyped())
-      throw typeError(key, AtomType.ITR, ii);
+    if(!key.type.instanceOf(AtomType.INTEGER) && !key.type.isUntyped())
+      throw typeError(key, AtomType.INTEGER, ii);
 
     final long pos = key.itr(ii), size = arraySize();
     if(pos > 0 && pos <= size) return get(pos - 1);
@@ -282,7 +282,7 @@ public abstract class XQArray extends XQData {
     if(arraySize() == 1) return get(0).atomValue(qc, ii);
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Value value : members()) vb.add(value.atomValue(qc, ii));
-    return vb.value(AtomType.AAT);
+    return vb.value(AtomType.ANY_ATOMIC_TYPE);
   }
 
   @Override
@@ -344,7 +344,7 @@ public abstract class XQArray extends XQData {
     if(!(tp instanceof FuncType) || tp instanceof MapType) return false;
 
     final FuncType ft = (FuncType) tp;
-    if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(SeqType.ITR_O)) return false;
+    if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(SeqType.INTEGER_O)) return false;
 
     final SeqType dt = ft.declType;
     if(dt.eq(SeqType.ITEM_ZM)) return true;

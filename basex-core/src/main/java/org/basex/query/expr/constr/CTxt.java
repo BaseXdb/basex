@@ -29,7 +29,7 @@ public final class CTxt extends CNode {
    */
   public CTxt(final StaticContext sc, final InputInfo info, final boolean computed,
       final Expr text) {
-    super(sc, info, SeqType.TXT_ZO, computed, text);
+    super(sc, info, SeqType.TEXT_ZO, computed, text);
   }
 
   @Override
@@ -46,7 +46,7 @@ public final class CTxt extends CNode {
     if(st.zero()) return cc.replaceWith(this, expr);
 
     final boolean atom = !st.mayBeArray();
-    if(st.oneOrMore() && atom) exprType.assign(Occ.ONE);
+    if(st.oneOrMore() && atom) exprType.assign(Occ.EXACTLY_ONE);
     return this;
   }
 

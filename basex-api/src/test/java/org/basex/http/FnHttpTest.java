@@ -127,7 +127,7 @@ public class FnHttpTest extends HTTPTest {
       final Value value = qp.value();
       checkResponse(value, 2, HttpURLConnection.HTTP_OK);
 
-      assertEquals(NodeType.DOC, value.itemAt(1).type);
+      assertEquals(NodeType.DOCUMENT_NODE, value.itemAt(1).type);
     }
 
     // GET2 - with override-media-type='text/plain'
@@ -136,7 +136,7 @@ public class FnHttpTest extends HTTPTest {
       final Value value = qp.value();
       checkResponse(value, 2, HttpURLConnection.HTTP_OK);
 
-      assertEquals(AtomType.STR, value.itemAt(1).type);
+      assertEquals(AtomType.STRING, value.itemAt(1).type);
     }
 
     // Get3 - with status-only='true'
@@ -802,8 +802,8 @@ public class FnHttpTest extends HTTPTest {
     for(int e = 0; e < es; e++) {
       Item exp = expected.itemAt(e), ret = returned.itemAt(e);
       // reorder response headers
-      if(exp.type == NodeType.ELM) exp = reorderHeaders(exp);
-      if(ret.type == NodeType.ELM) ret = reorderHeaders(ret);
+      if(exp.type == NodeType.ELEMENT) exp = reorderHeaders(exp);
+      if(ret.type == NodeType.ELEMENT) ret = reorderHeaders(ret);
       // compare items
       if(!new DeepEqual().equal(exp, ret)) {
         fail(Strings.concat("Result ", e, " differs:\nReturned: ",

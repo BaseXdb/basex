@@ -52,7 +52,7 @@ class RESTQuery extends RESTCmd {
       if(cmd instanceof XQuery) {
         final XQuery xq = (XQuery) cmd;
         // create query instance
-        if(value != null) xq.bind(null, value, NodeType.DOC.toString());
+        if(value != null) xq.bind(null, value, NodeType.DOCUMENT_NODE.toString());
 
         // bind HTTP context and external variables
         xq.putExternal(HTTPText.REQUEST, conn.requestCtx);

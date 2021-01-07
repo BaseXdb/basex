@@ -153,7 +153,7 @@ public final class XMLToken {
    */
   public static boolean isId(final byte[] name, final boolean idref) {
     final byte[] n = lc(local(name));
-    return idref ? contains(n, IDREF) : contains(n, ID) && !contains(n, IDREF);
+    return idref ? contains(n, REF) : contains(n, ID) && !contains(n, REF);
   }
 
   /**

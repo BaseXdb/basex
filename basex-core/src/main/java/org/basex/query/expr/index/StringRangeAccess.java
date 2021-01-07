@@ -36,7 +36,7 @@ public final class StringRangeAccess extends IndexAccess {
    * @param db index database
    */
   public StringRangeAccess(final InputInfo info, final StringRange index, final IndexDb db) {
-    super(db, info, index.type() == IndexType.TEXT ? NodeType.TXT : NodeType.ATT);
+    super(db, info, index.type() == IndexType.TEXT ? NodeType.TEXT : NodeType.ATTRIBUTE);
     this.index = index;
   }
 

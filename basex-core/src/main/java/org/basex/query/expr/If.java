@@ -121,7 +121,7 @@ public final class If extends Arr {
     exprType.assign(st1.union(st2));
 
     // logical rewritings
-    if(st1.eq(SeqType.BLN_O) && st2.eq(SeqType.BLN_O)) {
+    if(st1.eq(SeqType.BOOLEAN_O) && st2.eq(SeqType.BOOLEAN_O)) {
       if(br1 == Bln.TRUE) return br2 == Bln.FALSE ?
         // if(A) then true() else false()  ->  boolean(A)
         cc.function(BOOLEAN, info, cond) :

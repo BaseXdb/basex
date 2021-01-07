@@ -55,7 +55,7 @@ public final class Lookup extends Arr {
       if(es == 0) return cc.replaceWith(this, ctx);
       if(ks == 0) return cc.replaceWith(this, keys);
 
-      if(keys != Str.WC) {
+      if(keys != Str.WILDCARD) {
         Expr expr = this;
         if(es == 1) {
           // context expression yields one item
@@ -101,9 +101,10 @@ public final class Lookup extends Arr {
     // derive type from input expression
     final SeqType st = ft.declType;
     Occ occ = st.occ;
-    if(keys == Str.WC || ctx.size() != 1 || !keys.seqType().one() || keys.seqType().mayBeArray()) {
+    if(keys == Str.WILDCARD || ctx.size() != 1 || !keys.seqType().one() ||
+        keys.seqType().mayBeArray()) {
       // key is wildcard, or expression yields no single item
-      occ = occ.union(Occ.ZERO_MORE);
+      occ = occ.union(Occ.ZERO_OR_MORE);
     } else if(map) {
       // map lookup may result in empty sequence
       occ = occ.union(Occ.ZERO);
@@ -124,7 +125,7 @@ public final class Lookup extends Arr {
       if(!(item instanceof XQMap || item instanceof XQArray)) throw LOOKUP_X.get(info, item);
       final FItem fit = (FItem) item;
 
-      if(keys == Str.WC) {
+      if(keys == Str.WILDCARD) {
         // wildcard: add all values
         if(fit instanceof XQMap) {
           ((XQMap) fit).values(vb);
@@ -180,7 +181,7 @@ public final class Lookup extends Arr {
 
     final Expr keys = exprs[0];
     Object key = null;
-    if(keys == Str.WC) {
+    if(keys == Str.WILDCARD) {
       key = "*";
     } else if(keys instanceof Str) {
       final Str str = (Str) keys;

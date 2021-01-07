@@ -47,7 +47,7 @@ public abstract class Path extends ParseExpr {
    * @param steps steps
    */
   protected Path(final InputInfo info, final Type type, final Expr root, final Expr... steps) {
-    super(info, SeqType.get(type, Occ.ZERO_MORE));
+    super(info, SeqType.get(type, Occ.ZERO_OR_MORE));
     this.root = root;
     this.steps = steps;
   }
@@ -108,7 +108,7 @@ public abstract class Path extends ParseExpr {
     }
 
     // example: 'text'
-    if(single && stps[0].seqType().instanceOf(SeqType.AAT_ZM)) return stps[0];
+    if(single && stps[0].seqType().instanceOf(SeqType.ANY_ATOMIC_TYPE_ZM)) return stps[0];
     // example: (1 to 10)/<xml/>
     return new MixedPath(ii, rt, stps);
   }
@@ -319,7 +319,7 @@ public abstract class Path extends ParseExpr {
           if(type.instanceOf(st.test.type) && (
             st.axis == SELF ||
             st.axis == DESCENDANT_OR_SELF && type.oneOf(NodeType.LEAVE_TYPES) ||
-            st.axis == ANCESTOR_OR_SELF && type.instanceOf(NodeType.DOC)
+            st.axis == ANCESTOR_OR_SELF && type.instanceOf(NodeType.DOCUMENT_NODE)
           )) {
             removed = true;
             continue;
@@ -360,7 +360,7 @@ public abstract class Path extends ParseExpr {
    */
   public final ArrayList<PathNode> pathNodes(final Expr rt) {
     // ensure that path starts with document nodes
-    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOC) || data == null ||
+    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT_NODE) || data == null ||
         !data.meta.uptodate) return null;
 
     ArrayList<PathNode> nodes = data.paths.root();
@@ -386,7 +386,7 @@ public abstract class Path extends ParseExpr {
 
     final SeqType st = root.seqType();
     boolean atMostOne = st.zeroOrOne();
-    boolean sameDepth = atMostOne || st.type.instanceOf(NodeType.DOC);
+    boolean sameDepth = atMostOne || st.type.instanceOf(NodeType.DOCUMENT_NODE);
 
     for(final Expr expr : steps) {
       final Step step = (Step) expr;
@@ -437,7 +437,7 @@ public abstract class Path extends ParseExpr {
     if(rt != null) data = rt.data();
 
     final SeqType st = steps[steps.length - 1].seqType();
-    Occ occ = Occ.ZERO_MORE;
+    Occ occ = Occ.ZERO_OR_MORE;
     long size = size(rt);
 
     if(size == -1 && rt != null) {
@@ -471,7 +471,7 @@ public abstract class Path extends ParseExpr {
     // - path does not start with document nodes,
     // - no database instance is available, outdated, or
     // - if context does not contain all database nodes
-    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOC) ||
+    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT_NODE) ||
         data == null || !data.meta.uptodate || data.meta.ndocs != rt.size()) return -1;
 
     ArrayList<PathNode> nodes = data.paths.root();
@@ -571,7 +571,7 @@ public abstract class Path extends ParseExpr {
     // - if path does not start with document nodes
     // - if index does not exist or is out-dated
     // - if several namespaces occur in the input
-    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOC) ||
+    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT_NODE) ||
         data == null || !data.meta.uptodate || data.defaultNs() == null) return this;
 
     final int sl = steps.length;
@@ -612,7 +612,7 @@ public abstract class Path extends ParseExpr {
         final Expr[] preds = t == ts - 1 ? ((Preds) steps[s]).exprs : new Expr[0];
         final QNm qName = qNames.get(ts - t - 1);
         final Test test = qName == null ? KindTest.ELM :
-          new NameTest(qName, NamePart.LOCAL, NodeType.ELM, null);
+          new NameTest(qName, NamePart.LOCAL, NodeType.ELEMENT, null);
         stps[t] = Step.get(cc, root, curr.info, CHILD, test, preds);
       }
       while(++s < sl) stps[ts++] = steps[s];
@@ -640,7 +640,8 @@ public abstract class Path extends ParseExpr {
      * - previous expression yields nodes (otherwise, an error must be raised at runtime)
      * - last expression is no step, and yields a single result or no node */
     if(!(type1 instanceof NodeType) || s2 instanceof Step || size() != 1 &&
-       !type2.instanceOf(AtomType.AAT) && !type2.instanceOf(SeqType.FUNC)) return this;
+       !type2.instanceOf(AtomType.ANY_ATOMIC_TYPE) && !type2.instanceOf(SeqType.FUNCTION))
+      return this;
 
     /* remove last step from new root expression. examples:
      * - (<a/>, <b/>)/map { name(): . }  ->  (<a/>, <b/>) ! map { name(): . }
@@ -677,7 +678,7 @@ public abstract class Path extends ParseExpr {
    */
   private Expr index(final CompileContext cc, final Expr rt) throws QueryException {
     // skip optimization if path does not start with document nodes
-    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOC)) return this;
+    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT_NODE)) return this;
 
     // cache index access costs
     IndexInfo index = null;
@@ -739,7 +740,7 @@ public abstract class Path extends ParseExpr {
     }
     // only one hit: update sequence type
     if(index.costs.results() == 1 && resultRoot instanceof ParseExpr) {
-      final Occ occ = resultRoot instanceof IndexAccess ? Occ.ONE : Occ.ZERO_ONE;
+      final Occ occ = resultRoot instanceof IndexAccess ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
       ((ParseExpr) resultRoot).exprType.assign(occ);
     }
 

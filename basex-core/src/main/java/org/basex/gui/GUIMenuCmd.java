@@ -407,9 +407,9 @@ public enum GUIMenuCmd implements GUICommand {
       final NodeType type = ANode.type(insert.kind);
       String item = Strings.concat(type.name, " { ", quote(sl.get(0)), " }");
 
-      if(type == NodeType.ATT || type == NodeType.PI) {
+      if(type == NodeType.ATTRIBUTE || type == NodeType.PROCESSING_INSTRUCTION) {
         item += " { " + quote(sl.get(1)) + " }";
-      } else if(type == NodeType.ELM) {
+      } else if(type == NodeType.ELEMENT) {
         item += " { () }";
       }
 
