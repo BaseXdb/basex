@@ -2120,12 +2120,31 @@ public final class RewritingsTest extends QueryPlanTest {
     check("reverse((1 to 2) ! (. - 1))", "1\n0", root(RangeSeq.class));
   }
 
-  /** count -> exists. */
+  /** EBV tests, count -> exists. */
   @Test public void gh1974() {
     check("boolean(count((1, 2)[. <= 2]))", true, root(EXISTS));
     check("boolean(count((1, 2)[. >= 3]))", false, root(EXISTS));
 
     check("boolean(string-length(<_>A</_>))", true, exists(STRING));
     check("boolean(string-length(<_/>))", false, exists(STRING));
+  }
+
+  /** Axis steps: Rewrites. */
+  @Test public void gh1976() {
+    check("document { }/parent::node()", "", root(Empty.class));
+
+    check("attribute a {}/child::document-node()", "", root(Empty.class));
+    check("attribute a {}/self::document-node()", "", root(Empty.class));
+    check("attribute a {}/descendant-or-self::document-node()", "", root(Empty.class));
+    check("attribute a {}/descendant-or-self::*", "", root(Empty.class));
+
+    check("text { '' }/child::document-node()", "", root(Empty.class));
+    check("text { '' }/self::document-node()", "", root(Empty.class));
+    check("text { '' }/descendant-or-self::document-node()", "", root(Empty.class));
+    check("text { '' }/descendant-or-self::*", "", root(Empty.class));
+
+    check("document { }/ancestor-or-self::node()", "", root(CDoc.class));
+    check("attribute a {}/descendant-or-self::attribute()", "a=\"\"", root(CAttr.class));
+    check("text { '' }/descendant-or-self::text()", "", root(CTxt.class));
   }
 }

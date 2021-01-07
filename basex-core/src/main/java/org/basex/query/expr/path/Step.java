@@ -2,6 +2,7 @@ package org.basex.query.expr.path;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.value.type.NodeType.*;
 
 import java.util.*;
 
@@ -118,7 +119,7 @@ public abstract class Step extends Preds {
   Step(final InputInfo info, final Axis axis, final Test test, final Expr... preds) {
     super(info, SeqType.get(
       // type
-      axis == Axis.ATTRIBUTE ? NodeType.ATT : test.type,
+      axis == Axis.ATTRIBUTE ? ATT : test.type,
       // occurrence
       axis == Axis.SELF && test == KindTest.NOD && preds.length == 0 ? Occ.ONE :
       axis == Axis.SELF || axis == Axis.PARENT || axis == Axis.ATTRIBUTE &&
@@ -200,7 +201,7 @@ public abstract class Step extends Preds {
     if(axis != Axis.ATTRIBUTE && axis != Axis.CHILD && axis != Axis.DESCENDANT &&
        axis != Axis.DESCENDANT_OR_SELF && axis != Axis.SELF) return null;
     // skip tests other than processing instructions, skip union tests
-    if(test.type == NodeType.PI || test instanceof UnionTest) return null;
+    if(test.type == PI || test instanceof UnionTest) return null;
 
     // check node type
     int name = 0;
@@ -208,7 +209,7 @@ public abstract class Step extends Preds {
       final NamePart part = ((NameTest) test).part();
       if(part == NamePart.LOCAL) {
         // element/attribute test (*:ln)
-        final Names names = test.type == NodeType.ATT ? data.attrNames : data.elemNames;
+        final Names names = test.type == ATT ? data.attrNames : data.elemNames;
         name = names.id(((NameTest) test).local);
       } else if(part != null) {
         // skip namespace and standard tests
@@ -256,16 +257,16 @@ public abstract class Step extends Preds {
    */
   private boolean noMatches() {
     final NodeType type = test.type;
-    if(type.oneOf(NodeType.NOD, NodeType.SCA, NodeType.SCE)) return false;
+    if(type.oneOf(NOD, SCA, SCE)) return false;
 
     switch(axis) {
       // attribute::element()
       case ATTRIBUTE:
-        return type != NodeType.ATT;
+        return type != ATT;
       case ANCESTOR:
       // parent::comment()
       case PARENT:
-        return type.oneOf(NodeType.ATT, NodeType.COM, NodeType.NSP, NodeType.PI, NodeType.TXT);
+        return type.oneOf(LEAVE_TYPES);
       // child::attribute()
       case CHILD:
       case DESCENDANT:
@@ -273,7 +274,7 @@ public abstract class Step extends Preds {
       case FOLLOWING_SIBLING:
       case PRECEDING:
       case PRECEDING_SIBLING:
-        return type.oneOf(NodeType.ATT, NodeType.DEL, NodeType.DOC, NodeType.NSP);
+        return type.oneOf(ATT, DEL, DOC, NSP);
       default:
         return false;
     }
@@ -281,23 +282,22 @@ public abstract class Step extends Preds {
 
   /**
    * Checks if the step will never yield results.
-   * @param prevType type of incoming nodes
+   * @param inputType type of incoming nodes
    * @return {@code true} if steps will never yield results
    */
-  final boolean emptyStep(final NodeType prevType) {
+  final boolean emptyStep(final NodeType inputType) {
     // checks steps on document nodes
     final NodeType type = test.type;
-    if(prevType.instanceOf(NodeType.DOC) && ((Check) () -> {
+    if(inputType.instanceOf(DOC) && ((Check) () -> {
       switch(axis) {
         case SELF:
         case ANCESTOR_OR_SELF:
-          return !type.oneOf(NodeType.NOD, NodeType.DOC);
+          return !type.oneOf(NOD, DOC);
         case CHILD:
         case DESCENDANT:
-          return type.oneOf(NodeType.DOC, NodeType.ATT);
+          return type.oneOf(DOC, ATT);
         case DESCENDANT_OR_SELF:
-          return type == NodeType.ATT;
-        // document {}/parent::, ...
+          return type == ATT;
         default:
           return true;
       }
@@ -305,19 +305,24 @@ public abstract class Step extends Preds {
 
     // check step after any other expression
     switch(axis) {
-      // type of current step will not accept any nodes of previous step
-      // example: <a/>/self::text()
+      // $element/self::text(), ...
       case SELF:
-        return type != NodeType.NOD && !type.instanceOf(prevType);
-      // .../descendant::, .../child::, .../attribute::
+        return type != NOD && !type.instanceOf(inputType);
+      // $attribute/descendant::, $text/child::, $comment/attribute::, ...
       case DESCENDANT:
       case CHILD:
       case ATTRIBUTE:
-        return prevType.oneOf(NodeType.ATT, NodeType.TXT, NodeType.COM, NodeType.PI, NodeType.NSP);
-      // .../following-sibling::, .../preceding-sibling::
+        return inputType.oneOf(LEAVE_TYPES);
+      // $text/descendant-or-self::text(), ...
+      case DESCENDANT_OR_SELF:
+        return inputType.oneOf(LEAVE_TYPES) && type != NOD && !type.instanceOf(inputType);
+      // $attribute/following-sibling::, $attribute/preceding-sibling::
       case FOLLOWING_SIBLING:
       case PRECEDING_SIBLING:
-        return prevType == NodeType.ATT;
+        return inputType == ATT;
+      // $attribute/parent::document-node()
+      case PARENT:
+        return inputType == ATT && type == DOC;
       default:
         return false;
     }
@@ -389,7 +394,7 @@ public abstract class Step extends Preds {
         if(axis == Axis.ATTRIBUTE && t instanceof NameTest)
           return tb.add('@').add(t.toString(false));
         if(axis != Axis.CHILD) tb.add(axis).add(COLS);
-        return tb.add(t.toString(test.type == NodeType.ATT));
+        return tb.add(t.toString(test.type == ATT));
       };
       if(test instanceof UnionTest) {
         tb.add('(');

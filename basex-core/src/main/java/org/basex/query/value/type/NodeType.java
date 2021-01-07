@@ -140,6 +140,8 @@ public enum NodeType implements Type {
 
   /** Cached enums (faster). */
   private static final NodeType[] VALUES = values();
+  /** Leaf node types. */
+  public static final NodeType[] LEAVE_TYPES = { ATT, COM, NSP, PI, TXT };
 
   /** Name. */
   public final byte[] name;

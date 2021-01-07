@@ -305,16 +305,25 @@ public abstract class Path extends ParseExpr {
 
     // find empty results, remove redundant steps
     final int sl = steps.length;
-    boolean self = false;
+    boolean removed = false;
     final ExprList list = new ExprList(sl);
     for(int s = 0; s < sl; s++) {
-      // remove redundant steps. example: <xml/>/self::node()  ->  <xml/>
+      // remove redundant steps:
+      // <xml/>/self::node()  ->  <xml/>
+      // $text/descendant-or-self::text()  ->  $text
       final Step st = axisStep(s);
-      if(st != null && st.axis == SELF && st.exprs.length == 0 && st.test instanceof KindTest) {
+      if(st != null && st.exprs.length == 0 && st.test instanceof KindTest) {
         final Expr prev = list.isEmpty() ? root : list.peek();
-        if(prev != null && prev.seqType().type.instanceOf(st.test.type)) {
-          self = true;
-          continue;
+        if(prev != null) {
+          final Type type = prev.seqType().type;
+          if(type.instanceOf(st.test.type) && (
+            st.axis == SELF ||
+            st.axis == DESCENDANT_OR_SELF && type.oneOf(NodeType.LEAVE_TYPES) ||
+            st.axis == ANCESTOR_OR_SELF && type.instanceOf(NodeType.DOC)
+          )) {
+            removed = true;
+            continue;
+          }
         }
       }
 
@@ -334,7 +343,7 @@ public abstract class Path extends ParseExpr {
     }
 
     // self step was removed: ensure that result will be in distinct document order
-    if(self && (list.isEmpty() || !(list.get(0).seqType().type instanceof NodeType))) {
+    if(removed && (list.isEmpty() || !(list.get(0).seqType().type instanceof NodeType))) {
       if(root == null) root = new ContextValue(info).optimize(cc);
       if(!root.ddo()) root = cc.simplify(root, cc.function(Function._UTIL_DDO, info, root));
     }
