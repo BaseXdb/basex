@@ -360,10 +360,10 @@ public abstract class Cmp extends Arr {
         }
       }
     }
-    if(args.isEmpty() || arg instanceof VarRef || arg instanceof ContextValue) return this;
+    if(args.isEmpty()) return this;
 
     // count(A) = 1  ->  util:within(A, 1, 1)
-    args.insert(0,  arg);
+    args.insert(0, arg);
     return cc.function(_UTIL_WITHIN, info, args.finish());
   }
 

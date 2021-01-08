@@ -10,7 +10,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -23,12 +22,8 @@ import org.basex.util.*;
 public final class FnCount extends StandardFunc {
   @Override
   public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // if possible, retrieve single item
-    final Expr expr = exprs[0];
-    if(expr.seqType().zeroOrOne()) return expr.item(qc, info) == Empty.VALUE ? Int.ZERO : Int.ONE;
-
     // iterative access: if the iterator size is unknown, iterate through all results
-    final Iter iter = expr.iter(qc);
+    final Iter iter = exprs[0].iter(qc);
     long size = iter.size();
     if(size == -1) {
       do ++size; while(qc.next(iter) != null);
@@ -40,11 +35,9 @@ public final class FnCount extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr = exprs[0];
 
-    // return statically known size (ignore non-deterministic expressions, e.g. count(error()))
-    if(!expr.has(Flag.NDT)) {
-      final long size = expr.size();
-      if(size >= 0) return Int.get(size);
-    }
+    // return static result size
+    final long size = expr.size();
+    if(size >= 0 && !expr.has(Flag.NDT)) return Int.get(size);
 
     // rewrite count(map:keys(...)) to map:size(...)
     if(_MAP_KEYS.is(expr))

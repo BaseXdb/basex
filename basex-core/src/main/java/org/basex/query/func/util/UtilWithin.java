@@ -28,8 +28,13 @@ public final class UtilWithin extends StandardFunc {
     final Iter iter = exprs[0].iter(qc);
     long size = iter.size();
     if(size == -1) {
-      // no check for maximum value: skip if minimum size is reached
-      do ++size; while((max < Long.MAX_VALUE ? size <= max : size < min) && qc.next(iter) != null);
+      if(max == Long.MAX_VALUE) {
+        // >= min: skip if minimum is reached
+        do ++size; while(size < min && qc.next(iter) != null);
+      } else {
+        // min - max: skip if maximum is reached
+        do ++size; while(size <= max && qc.next(iter) != null);
+      }
     }
     return Bln.get(size >= min && size <= max);
   }
@@ -45,6 +50,7 @@ public final class UtilWithin extends StandardFunc {
       if(min > max) return Bln.FALSE;
       if(min <= 0 && max == Long.MAX_VALUE) return Bln.TRUE;
 
+      // evaluate static result size
       final long size = expr1.size();
       if(size >= 0 && !expr1.has(Flag.NDT)) return Bln.get(size >= min && size <= max);
 
