@@ -3,4 +3,4 @@ version: '3'
 services:
   basex:
     build: .
-    image: hgdata1/basex:9.2.4-hg-2019.09.18T12.00.00
+    image: hgdata1/basex:9.2.4-hg-2021.01.12T12.00.00
