@@ -264,7 +264,7 @@ public abstract class Step extends Preds {
       case ANCESTOR:
       // parent::comment()
       case PARENT:
-        return type.oneOf(LEAVE_TYPES);
+        return type.oneOf(LEAF_TYPES);
       // child::attribute()
       case CHILD:
       case DESCENDANT:
@@ -310,10 +310,10 @@ public abstract class Step extends Preds {
       case DESCENDANT:
       case CHILD:
       case ATTRIBUTE:
-        return inputType.oneOf(LEAVE_TYPES);
+        return inputType.oneOf(LEAF_TYPES);
       // $text/descendant-or-self::text(), ...
       case DESCENDANT_OR_SELF:
-        return inputType.oneOf(LEAVE_TYPES) && type != NODE && !type.instanceOf(inputType);
+        return inputType.oneOf(LEAF_TYPES) && type != NODE && !type.instanceOf(inputType);
       // $attribute/following-sibling::, $attribute/preceding-sibling::
       case FOLLOWING_SIBLING:
       case PRECEDING_SIBLING:

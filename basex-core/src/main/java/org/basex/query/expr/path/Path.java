@@ -318,7 +318,7 @@ public abstract class Path extends ParseExpr {
           final Type type = prev.seqType().type;
           if(type.instanceOf(st.test.type) && (
             st.axis == SELF ||
-            st.axis == DESCENDANT_OR_SELF && type.oneOf(NodeType.LEAVE_TYPES) ||
+            st.axis == DESCENDANT_OR_SELF && type.oneOf(NodeType.LEAF_TYPES) ||
             st.axis == ANCESTOR_OR_SELF && type.instanceOf(NodeType.DOCUMENT_NODE)
           )) {
             removed = true;

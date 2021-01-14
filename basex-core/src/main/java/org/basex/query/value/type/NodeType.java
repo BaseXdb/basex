@@ -141,7 +141,7 @@ public enum NodeType implements Type {
   /** Cached enums (faster). */
   private static final NodeType[] VALUES = values();
   /** Leaf node types. */
-  public static final NodeType[] LEAVE_TYPES = {
+  public static final NodeType[] LEAF_TYPES = {
     ATTRIBUTE, COMMENT, NAMESPACE_NODE, PROCESSING_INSTRUCTION, TEXT
   };
 
