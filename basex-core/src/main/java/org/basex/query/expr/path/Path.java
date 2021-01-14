@@ -885,12 +885,13 @@ public abstract class Path extends ParseExpr {
     return cc.ok(root, () -> {
       boolean chngd = false;
       for(int s = 0; s < sl; s++) {
-        Expr curr = steps[s], next = s < sl - 1 ? steps[s + 1] : null;
-        if(steps[s] instanceof Step) {
-          final Step crr = (Step) steps[s];
+        Expr curr = steps[s];
+        if(curr instanceof Step) {
+          Expr next = s < sl - 1 ? steps[s + 1] : null;
+          final Step crr = (Step) curr;
           if(crr.test == KindTest.NOD && next instanceof Step && ((Step) next).axis == ATTRIBUTE) {
             // rewrite node test before attribute step: node()/@*  ->  */@*
-            next = Step.get(cc, root, crr.info, crr.axis, KindTest.ELM, crr.exprs);
+            next = Step.get(cc, null, crr.info, crr.axis, KindTest.ELM, crr.exprs);
             curr = cc.replaceWith(curr, next);
             chngd = true;
           } else if(next != null) {

@@ -2147,4 +2147,15 @@ public final class RewritingsTest extends QueryPlanTest {
     check("attribute a {}/descendant-or-self::attribute()", "a=\"\"", root(CAttr.class));
     check("text { '' }/descendant-or-self::text()", "", root(CTxt.class));
   }
+
+  /** descendant-or-self -> descendant. */
+  @Test public void gh1979() {
+    check("document { <a/> }/descendant-or-self::a", "<a/>",
+        exists("IterStep[@axis = 'descendant']"));
+    check("<a/>/ancestor-or-self::document-node()", "",
+        exists("IterStep[@axis = 'ancestor']"));
+    check("document { <a b='c'/> }/descendant::a//@*", "b=\"c\"",
+        exists("IterStep[@axis = 'descendant']"));
+    check("<a b='c'/>/descendant-or-self::attribute()", "", root(Empty.class));
+  }
 }

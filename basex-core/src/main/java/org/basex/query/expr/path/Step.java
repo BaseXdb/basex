@@ -34,7 +34,7 @@ public abstract class Step extends Preds {
   /**
    * Returns a new optimized self::node() step.
    * @param cc compilation context
-   * @param root root expression
+   * @param root root expression; if {@code null}, the current context will be used
    * @param ii input info
    * @param preds predicates
    * @return step
@@ -48,7 +48,7 @@ public abstract class Step extends Preds {
   /**
    * Returns a new optimized self step.
    * @param cc compilation context
-   * @param root root expression
+   * @param root root expression; if {@code null}, the current context will be used
    * @param ii input info
    * @param test test
    * @param preds predicates
@@ -63,7 +63,7 @@ public abstract class Step extends Preds {
   /**
    * Returns a new optimized step.
    * @param cc compilation context
-   * @param root root expression
+   * @param root root expression; if {@code null}, the current context will be used
    * @param ii input info
    * @param axis axis
    * @param test node test
@@ -145,6 +145,18 @@ public abstract class Step extends Preds {
     // updates the static type
     final Expr ex = expr != null ? expr : cc.qc.focus.value;
     type(ex);
+
+    // choose stricter axis
+    if(ex != null) {
+      final Type rtype = ex.seqType().type, type = seqType().type;
+      if(type.intersect(rtype) == null) {
+        // db:open('x')/descendant-or-self::x  ->  db:open('x')/descendant::x
+        final Axis old = axis;
+        if(axis == Axis.DESCENDANT_OR_SELF) axis = Axis.DESCENDANT;
+        else if(axis == Axis.ANCESTOR_OR_SELF) axis = Axis.ANCESTOR;
+        if(axis != old) cc.info(QueryText.OPTREWRITE_X_X, old, this);
+      }
+    }
 
     // check if step or test will never yield results
     if(noMatches() || ex != null && test.noMatches(ex.data())) {
