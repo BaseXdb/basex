@@ -8,7 +8,6 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 
 /**
@@ -35,18 +34,6 @@ public final class And extends Logical {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // compute scoring
-    if(qc.scoring) {
-      double score = 0;
-      for(final Expr expr : exprs) {
-        final Item item = expr.ebv(qc, info);
-        if(!item.bool(info)) return Bln.FALSE;
-        score += item.score();
-      }
-      return Bln.get(true, Scoring.avg(score, exprs.length));
-    }
-
-    // standard evaluation
     for(final Expr expr : exprs) {
       if(!expr.ebv(qc, info).bool(info)) return Bln.FALSE;
     }

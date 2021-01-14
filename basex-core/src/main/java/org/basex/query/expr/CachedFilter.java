@@ -38,7 +38,6 @@ public class CachedFilter extends Filter {
       long vs = value.size();
       qf.size = vs;
 
-      final boolean scoring = qc.scoring;
       for(int v = 0; v < vs; v++) {
         qc.checkStop();
         final Item item = value.itemAt(v);
@@ -46,7 +45,6 @@ public class CachedFilter extends Filter {
         qf.pos = v + 1;
         final Item test = expr.test(qc, info);
         if(test != null) {
-          if(scoring) item.score(test.score());
           items.add(item);
         }
       }
@@ -65,11 +63,7 @@ public class CachedFilter extends Filter {
           final Item item = items.get(i);
           qf.value = item;
           qf.pos = i + 1;
-          final Item test = expr.test(qc, info);
-          if(test != null) {
-            if(scoring) item.score(test.score());
-            items.set(c++, item);
-          }
+          if(expr.test(qc, info) != null) items.set(c++, item);
         }
         items.size(c);
       }

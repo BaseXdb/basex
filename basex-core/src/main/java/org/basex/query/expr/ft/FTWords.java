@@ -52,7 +52,7 @@ public final class FTWords extends FTExpr {
   private FTOpt ftOpt;
 
   /**
-   * Constructor for scan-based evaluation.
+   * Constructor for sequential evaluation.
    * @param info input info
    * @param query query expression
    * @param mode search mode

@@ -20,6 +20,8 @@ public final class Bln extends Item {
   public static final Bln FALSE = new Bln(false);
   /** Data. */
   private final boolean value;
+  /** Score value. */
+  private double score;
 
   /**
    * Constructor, adding a full-text score.
@@ -41,12 +43,11 @@ public final class Bln extends Item {
 
   /**
    * Constructor, adding a full-text score.
-   * @param value boolean value
    * @param score score value
    * @return item
    */
-  public static Bln get(final boolean value, final double score) {
-    return value && score != 0 ? new Bln(score) : get(value);
+  public static Bln get(final double score) {
+    return score != 0 ? new Bln(score) : Bln.FALSE;
   }
 
   /**
@@ -98,6 +99,11 @@ public final class Bln extends Item {
   public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
     final boolean n = item.type == type ? item.bool(ii) : parse(item, ii);
     return value ? n ? 0 : 1 : n ? -1 : 0;
+  }
+
+  @Override
+  public double score() {
+    return score;
   }
 
   @Override

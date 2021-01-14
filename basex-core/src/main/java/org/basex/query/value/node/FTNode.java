@@ -19,6 +19,8 @@ public final class FTNode extends DBNode {
   private final int is;
   /** Full-text matches. */
   private FTMatches matches;
+  /** Score value. */
+  private Double score;
 
   /**
    * Constructor, called by the sequential variant.
@@ -33,7 +35,7 @@ public final class FTNode extends DBNode {
   /**
    * Constructor, called by the index variant.
    * @param matches full-text matches
-   * @param data data reference
+   * @param data data reference (can be {@code null})
    * @param pre pre value
    * @param tl token length
    * @param is number of indexed results
@@ -70,6 +72,14 @@ public final class FTNode extends DBNode {
       score = Scoring.textNode(matches.size(), is, tl, data().textLen(pre(), true));
     }
     return score;
+  }
+
+  /**
+   * Sets a new score value.
+   * @param s score value
+   */
+  public void score(final double s) {
+    score = s;
   }
 
   @Override

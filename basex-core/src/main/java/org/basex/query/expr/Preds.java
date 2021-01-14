@@ -18,7 +18,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.ft.*;
 
 /**
  * Abstract predicate expression, implemented by {@link Filter} and {@link Step}.
@@ -109,13 +108,9 @@ public abstract class Preds extends Arr {
     final Value cv = qf.value;
     qf.value = item;
     try {
-      double s = qc.scoring ? 0 : -1;
       for(final Expr expr : exprs) {
-        final Item test = expr.test(qc, info);
-        if(test == null) return false;
-        if(s != -1) s += test.score();
+        if(expr.test(qc, info) == null) return false;
       }
-      if(s > 0) item.score(Scoring.avg(s, exprs.length));
       return true;
     } finally {
       qf.value = cv;

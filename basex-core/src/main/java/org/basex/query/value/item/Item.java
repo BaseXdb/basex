@@ -29,8 +29,6 @@ import org.basex.util.*;
 public abstract class Item extends Value {
   /** Undefined item. */
   public static final int UNDEF = Integer.MIN_VALUE;
-  /** Score value. {@code null} reference takes less memory on 32bit than a double. */
-  protected Double score;
 
   /**
    * Constructor.
@@ -312,16 +310,7 @@ public abstract class Item extends Value {
    * @return score value
    */
   public double score() {
-    final Double s = score;
-    return s == null ? 0 : s;
-  }
-
-  /**
-   * Sets a new score value (do not assign if value is 0).
-   * @param s score value
-   */
-  public final void score(final double s) {
-    if(s != 0) score = s;
+    return 0;
   }
 
   @Override

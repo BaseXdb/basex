@@ -65,7 +65,7 @@ public class DBNode extends ANode {
 
   /**
    * Constructor, specifying full node information.
-   * @param data data reference
+   * @param data data reference (can be {@code null} if invoked by {@link FTNode})
    * @param pre pre value
    * @param rt root reference (can be {@code null})
    * @param type node type
@@ -229,9 +229,7 @@ public class DBNode extends ANode {
 
   @Override
   public final DBNode finish() {
-    final DBNode node = new DBNode(data, pre, root, nodeType());
-    node.score = score;
-    return node;
+    return new DBNode(data, pre, root, nodeType());
   }
 
   @Override

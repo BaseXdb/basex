@@ -49,15 +49,15 @@ public final class FTContains extends Single {
     qc.ftLexer = lexer;
     try {
       double score = 0;
-      int c = 0;
-      boolean f = false;
+      int count = 0;
+      boolean found = false;
       final FTPosData ftPosData = qc.ftPosData;
       for(Item item; (item = qc.next(iter)) != null;) {
         lexer.init(item.string(info));
         final FTNode it = ftexpr.item(qc, info);
         final FTMatches all = it.matches();
         if(all.matches()) {
-          f = true;
+          found = true;
           if(scoring) score += it.score();
           // cache entry for visualizations or ft:mark/ft:extract
           if(ftPosData != null && item instanceof DBNode) {
@@ -65,9 +65,9 @@ public final class FTContains extends Single {
             ftPosData.add(node.data(), node.pre(), all);
           }
         }
-        c++;
+        count++;
       }
-      return scoring ? Bln.get(f, Scoring.avg(score, c)) : Bln.get(f);
+      return found && scoring ? Bln.get(Scoring.avg(score, count)) : Bln.get(found);
     } finally {
       qc.ftLexer = tmp;
     }
