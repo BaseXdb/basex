@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-20, BSD License
  * @author Leo Woerteler
  */
-final class JsonParser extends InputParser {
+public final class JsonParser extends InputParser {
   /** Names of control characters not allowed in string literals. */
   private static final String[] CTRL = {
     // U+0000 -- U+001F
@@ -39,12 +39,12 @@ final class JsonParser extends InputParser {
 
   /**
    * Constructor taking the input string and the spec according to which it is parsed.
-   * @param in input string
+   * @param input input string
    * @param opts options
    * @param conv converter
    */
-  private JsonParser(final String in, final JsonParserOptions opts, final JsonConverter conv) {
-    super(in);
+  public JsonParser(final String input, final JsonParserOptions opts, final JsonConverter conv) {
+    super(input);
     liberal = opts.get(JsonParserOptions.LIBERAL);
     escape = opts.get(JsonParserOptions.ESCAPE);
     final JsonDuplicates dupl = opts.get(JsonParserOptions.DUPLICATES);
@@ -54,26 +54,10 @@ final class JsonParser extends InputParser {
   }
 
   /**
-   * Parses the input string, directs the parse events to the given handler and returns
-   * the resulting value.
-   * @param input input string
-   * @param path input path (can be {@code null)}
-   * @param opts options
-   * @param conv converter
-   * @throws QueryIOException parse exception
-   */
-  static void parse(final String input, final String path, final JsonParserOptions opts,
-      final JsonConverter conv) throws QueryIOException {
-    final JsonParser parser = new JsonParser(input, opts, conv);
-    parser.file = path;
-    parser.parse();
-  }
-
-  /**
    * Parses a JSON expression.
    * @throws QueryIOException query I/O exception
    */
-  private void parse() throws QueryIOException {
+  public void parse() throws QueryIOException {
     consume('\uFEFF');
     skipWs();
     try {

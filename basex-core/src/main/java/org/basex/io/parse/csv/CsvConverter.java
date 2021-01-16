@@ -52,17 +52,18 @@ public abstract class CsvConverter extends Job {
   }
 
   /**
-   * Converts the specified input to XML.
+   * Converts the specified input to an XQuery value.
    * @param input input
    * @return result
    * @throws IOException I/O exception
    */
   public final Item convert(final IO input) throws IOException {
+    init(input.url());
     try(NewlineInput in = new NewlineInput(input)) {
-      nli = in;
-      CsvParser.parse(in.encoding(copts.get(CsvParserOptions.ENCODING)), copts, this);
+      nli = in.encoding(copts.get(CsvParserOptions.ENCODING));
+      new CsvParser(in, copts, this).parse();
     }
-    return finish(input.url());
+    return finish();
   }
 
   /**
@@ -95,10 +96,15 @@ public abstract class CsvConverter extends Job {
   protected abstract void entry(byte[] value) throws IOException;
 
   /**
-   * Returns the resulting byte array.
+   * Initializes the conversion.
    * @param uri base URI
-   * @return result (can be {@code null})
+   */
+  protected abstract void init(String uri);
+
+  /**
+   * Returns the resulting XQuery value.
+   * @return result
    * @throws IOException I/O exception
    */
-  protected abstract Item finish(String uri) throws IOException;
+  protected abstract Item finish() throws IOException;
 }

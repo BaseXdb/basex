@@ -54,7 +54,11 @@ public final class JsonXQueryConverter extends JsonConverter {
   }
 
   @Override
-  public Item finish(final String uri) {
+  void init(final String uri) {
+  }
+
+  @Override
+  public Item finish() {
     final Value value = stack.pop();
     return value.isEmpty() ? Empty.VALUE : (Item) value;
   }

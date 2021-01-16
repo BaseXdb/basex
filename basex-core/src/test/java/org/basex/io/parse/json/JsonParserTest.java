@@ -2,7 +2,6 @@ package org.basex.io.parse.json;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.basex.query.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -20,9 +19,9 @@ public final class JsonParserTest {
 
   /**
    * Tests for parsing numbers.
-   * @throws QueryIOException query I/O exception
+   * @throws Exception exception
    */
-  @Test public void numberTest() throws QueryIOException {
+  @Test public void numberTest() throws Exception {
     parse("0", false);
     parse("1", false);
     parse("-1", false);
@@ -59,9 +58,9 @@ public final class JsonParserTest {
 
   /**
    * Tests for paring strings.
-   * @throws QueryIOException query I/O exception
+   * @throws Exception exception
    */
-  @Test public void stringTest() throws QueryIOException {
+  @Test public void stringTest() throws Exception {
     parse("\"\"", false);
     parse("\"test\"", false);
     parse("\"\u00e4\"", false);
@@ -103,9 +102,9 @@ public final class JsonParserTest {
 
   /**
    * Tests for parsing arrays.
-   * @throws QueryIOException query I/O exception
+   * @throws Exception exception
    */
-  @Test public void arrayTest() throws QueryIOException {
+  @Test public void arrayTest() throws Exception {
     parse("[ ]", false);
     parse("[]", "[ ]", false);
     parse("[[[[[[42], {}]]]]]", "[ [ [ [ [ [ 42 ], { } ] ] ] ] ]", false);
@@ -119,9 +118,9 @@ public final class JsonParserTest {
 
   /**
    * Tests for parsing objects.
-   * @throws QueryIOException query I/O exception
+   * @throws Exception exception
    */
-  @Test public void objectTest() throws QueryIOException {
+  @Test public void objectTest() throws Exception {
     parse("{ }", false);
     parse("{ \"\": 42 }", false);
     parse("{ a : 42, b: 23 }", "{ \"a\": 42, \"b\": 23 }", true);
@@ -133,9 +132,9 @@ public final class JsonParserTest {
 
   /**
    * Tests for parsing literals.
-   * @throws QueryIOException query I/O exception
+   * @throws Exception exception
    */
-  @Test public void literals() throws QueryIOException {
+  @Test public void literals() throws Exception {
     parse("true", false);
     parse("false", false);
     parse("null", false);
@@ -156,7 +155,7 @@ public final class JsonParserTest {
     try {
       parse(json, liberal);
       fail("Should have failed: '" + json + '\'');
-    } catch(final QueryIOException qe) {
+    } catch(final Exception qe) {
       // expected error
     }
   }
@@ -165,9 +164,9 @@ public final class JsonParserTest {
    * Checks if the given JSON string is correct and is reproduced by the parser.
    * @param json JSON string
    * @param liberal liberal parsing
-   * @throws QueryIOException parse error
+   * @throws Exception exception
    */
-  private static void parse(final String json, final boolean liberal) throws QueryIOException {
+  private static void parse(final String json, final boolean liberal) throws Exception {
     parse(json, json, liberal);
   }
 
@@ -176,10 +175,10 @@ public final class JsonParserTest {
    * @param json JSON string
    * @param exp expected output
    * @param liberal liberal parsing
-   * @throws QueryIOException parse error
+   * @throws Exception exception
    */
   private static void parse(final String json, final String exp, final boolean liberal)
-      throws QueryIOException {
+      throws Exception {
     assertEquals(exp, JsonStringConverter.toString(json, liberal, false));
   }
 
@@ -188,9 +187,9 @@ public final class JsonParserTest {
    * activated.
    * @param json JSON string
    * @param exp expected output
-   * @throws QueryIOException parse error
+   * @throws Exception exception
    */
-  private static void escape(final String json, final String exp) throws QueryIOException {
+  private static void escape(final String json, final String exp) throws Exception {
     assertEquals(exp, JsonStringConverter.toString(json, false, true));
   }
 }

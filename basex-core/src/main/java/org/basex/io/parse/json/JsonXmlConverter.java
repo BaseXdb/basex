@@ -23,6 +23,8 @@ abstract class JsonXmlConverter extends JsonConverter {
   /** Include string type. */
   private final boolean strings;
 
+  /** Document root. */
+  FDoc doc;
   /** Current element. */
   FElem curr;
 
@@ -36,6 +38,11 @@ abstract class JsonXmlConverter extends JsonConverter {
     strings = jopts.get(JsonOptions.STRINGS);
   }
 
+  @Override
+  final void init(final String uri) {
+    doc = new FDoc(uri);
+  }
+
   /**
    * Returns the current element.
    * @return element
@@ -46,7 +53,7 @@ abstract class JsonXmlConverter extends JsonConverter {
   }
 
   @Override
-  public FDoc finish(final String uri) {
+  FDoc finish() {
     final FElem elem = element();
     if(merge) {
       final ByteList[] types = new ByteList[ATTRS.length];
@@ -68,7 +75,7 @@ abstract class JsonXmlConverter extends JsonConverter {
         if(types[t] != null) elem.add(ATTRS[t], types[t].finish());
       }
     }
-    return new FDoc(uri).add(elem);
+    return doc.add(elem);
   }
 
   /**

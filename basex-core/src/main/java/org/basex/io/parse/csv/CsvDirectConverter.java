@@ -11,8 +11,10 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class CsvDirectConverter extends CsvConverter {
+  /** Document root. */
+  private FDoc doc;
   /** Root node. */
-  private final FElem root = new FElem(CSV);
+  private FElem root;
   /** Record. */
   private FElem record;
 
@@ -50,7 +52,13 @@ final class CsvDirectConverter extends CsvConverter {
   }
 
   @Override
-  protected FDoc finish(final String uri) {
-    return new FDoc(uri).add(root);
+  protected void init(final String uri) {
+    doc = new FDoc(uri);
+    root = new FElem(CSV);
+  }
+
+  @Override
+  protected FDoc finish() {
+    return doc.add(root);
   }
 }

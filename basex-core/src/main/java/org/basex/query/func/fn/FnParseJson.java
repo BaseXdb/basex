@@ -65,7 +65,7 @@ public class FnParseJson extends Parse {
           throw new QueryRTException(ex);
         }
       });
-      return conv.convert(json, "");
+      return conv.convert(Token.string(json), "");
     } catch(final QueryRTException ex) {
       throw ex.getCause();
     } catch(final QueryIOException ex) {

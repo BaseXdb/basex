@@ -7,7 +7,6 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Interface for converters from JSON to XQuery values.
@@ -40,7 +39,7 @@ public abstract class JsonConverter {
   }
 
   /**
-   * Converts the specified input to XML.
+   * Converts the specified input to an XQuery value.
    * @param input input
    * @throws IOException I/O exception
    * @return result
@@ -48,20 +47,23 @@ public abstract class JsonConverter {
   public final Item convert(final IO input) throws IOException {
     final String encoding = jopts.get(JsonParserOptions.ENCODING);
     try(NewlineInput ni = new NewlineInput(input)) {
-      return convert(ni.encoding(encoding).content(), input.path());
+      return convert(ni.encoding(encoding).cache().toString(), input.url());
     }
   }
 
   /**
-   * Converts the specified input to an XQuery item.
+   * Converts the specified input to an XQuery value.
    * @param input input
    * @param path input path (can be empty string}
    * @throws QueryIOException query I/O exception
    * @return result
    */
-  public final Item convert(final byte[] input, final String path) throws QueryIOException {
-    JsonParser.parse(Token.string(input), path, jopts, this);
-    return finish(path.isEmpty() ? "" : IO.get(path).url());
+  public final Item convert(final String input, final String path) throws QueryIOException {
+    init(path.isEmpty() ? "" : IO.get(path).url());
+
+    final JsonParser parser = new JsonParser(input, jopts, this);
+    parser.parse();
+    return finish();
   }
 
   /**
@@ -156,9 +158,14 @@ public abstract class JsonConverter {
   abstract void booleanLit(byte[] b) throws QueryIOException;
 
   /**
-   * Returns the resulting XQuery value.
+   * Initializes the conversion.
    * @param uri base URI
+   */
+  abstract void init(String uri);
+
+  /**
+   * Returns the resulting XQuery value.
    * @return result
    */
-  abstract Item finish(String uri);
+  abstract Item finish();
 }

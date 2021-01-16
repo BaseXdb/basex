@@ -35,16 +35,16 @@ final class JsonStringConverter extends JsonConverter {
    * @param escape escape flag
    * @return resulting string
    * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    */
   public static String toString(final String json, final boolean liberal, final boolean escape)
-      throws QueryIOException {
+      throws QueryIOException, QueryException {
 
     final JsonParserOptions jopts = new JsonParserOptions();
     jopts.set(JsonParserOptions.LIBERAL, liberal);
     jopts.set(JsonParserOptions.ESCAPE, escape);
-    final TokenBuilder tb = new TokenBuilder();
-    JsonParser.parse(json, null, jopts, new JsonStringConverter(jopts, tb));
-    return tb.toString();
+    final JsonStringConverter jsc = new JsonStringConverter(jopts, new TokenBuilder());
+    return (String) jsc.convert(json, "").toJava();
   }
 
   @Override
@@ -148,7 +148,11 @@ final class JsonStringConverter extends JsonConverter {
   }
 
   @Override
-  public Item finish(final String uri) {
+  void init(final String uri) {
+  }
+
+  @Override
+  Item finish() {
     return Str.get(tb.toArray());
   }
 }

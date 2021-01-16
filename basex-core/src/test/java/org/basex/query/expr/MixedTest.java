@@ -262,4 +262,10 @@ public final class MixedTest extends SandboxTest {
     query("(xs:anyURI('b'), 'a', 'a')[. = 'c'] instance of xs:string+", false);
     query("(xs:anyURI('b'), 'a', 'a')[. = 'c'] instance of xs:string*", true);
   }
+
+  /** JSON documents, node ids. */
+  public void gh1983() {
+    query("tail(json:parse('{}')/*/ancestor-or-self::node()) instance of element()", true);
+    query("tail(csv:parse('')/*/ancestor-or-self::node()) instance of element()", true);
+  }
 }
