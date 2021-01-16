@@ -109,6 +109,11 @@ public abstract class ANum extends Item {
   public abstract ANum round(int scale, boolean even);
 
   @Override
+  public final boolean comparable(final Item item) {
+    return item instanceof ANum;
+  }
+
+  @Override
   public Item test(final QueryContext qc, final InputInfo ii) {
     return dbl() == qc.focus.pos ? this : null;
   }

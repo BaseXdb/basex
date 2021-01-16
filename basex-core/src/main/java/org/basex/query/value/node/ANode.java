@@ -59,6 +59,11 @@ public abstract class ANode extends Item {
   public abstract byte[] string();
 
   @Override
+  public final boolean comparable(final Item item) {
+    return item.type.isStringOrUntyped();
+  }
+
+  @Override
   public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return item.type.isUntyped() ? coll == null ? Token.eq(string(), item.string(ii)) :

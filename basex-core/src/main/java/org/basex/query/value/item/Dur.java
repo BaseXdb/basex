@@ -182,6 +182,11 @@ public class Dur extends ADateDur {
     return tb.finish();
   }
 
+  @Override
+  public final boolean comparable(final Item item) {
+    return item instanceof Dur;
+  }
+
   /**
    * Adds the date to the specified token builder.
    * @param tb token builder

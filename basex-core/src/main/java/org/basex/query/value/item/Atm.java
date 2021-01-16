@@ -43,6 +43,11 @@ public final class Atm extends Item {
   }
 
   @Override
+  public boolean comparable(final Item item) {
+    return item.type.isStringOrUntyped();
+  }
+
+  @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return item.type.isUntyped() ? coll == null ? Token.eq(value, item.string(ii)) :

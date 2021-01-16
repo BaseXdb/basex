@@ -154,12 +154,8 @@ public abstract class Item extends Value {
    * @param item item to be compared
    * @return result of check
    */
-  public final boolean comparable(final Item item) {
-    final Type type1 = type, type2 = item.type;
-    return type1 == type2
-        || type1.isStringOrUntyped() && type2.isStringOrUntyped()
-        || this instanceof ANum && item instanceof ANum
-        || this instanceof Dur && item instanceof Dur;
+  public boolean comparable(final Item item) {
+    return type == item.type;
   }
 
   /**
