@@ -41,6 +41,11 @@ public final class Dummy extends Item {
   }
 
   @Override
+  public boolean ddo() {
+    return type instanceof NodeType;
+  }
+
+  @Override
   public byte[] string(final InputInfo ii) {
     throw Util.notExpected();
   }
@@ -63,6 +68,11 @@ public final class Dummy extends Item {
 
   @Override
   public int diff(final Item item, final Collation coll, final InputInfo ii) {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public boolean comparable(final Item item) {
     throw Util.notExpected();
   }
 

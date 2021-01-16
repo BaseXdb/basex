@@ -102,6 +102,11 @@ public abstract class ANode extends Item {
   }
 
   @Override
+  public boolean ddo() {
+    return true;
+  }
+
+  @Override
   public abstract ANode materialize(QueryContext qc, boolean copy);
 
   /**
