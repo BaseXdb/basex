@@ -2168,7 +2168,10 @@ public class QueryParser extends InputParser {
     // unary lookup
     p = pos;
     if(consume(QUESTION)) {
-      if(!wsConsume(COMMA) && !consume(PAREN2)) return new Lookup(info(), keySpecifier());
+      if(!wsConsume(COMMA) && !consume(PAREN2)) {
+        final InputInfo info = info();
+        return new Lookup(info, new ContextValue(info), keySpecifier());
+      }
       pos = p;
     }
     // context value

@@ -37,73 +37,83 @@ public final class Lookup extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    exprs[0] = exprs[0].simplifyFor(Simplify.STRING, cc);
+    exprs[1] = exprs[1].simplifyFor(Simplify.STRING, cc);
 
-    final Expr keys = exprs[0];
-    final long ks = keys.seqType().mayBeArray() ? -1 : keys.size();
-    if(unary()) {
-      return ks == 0 && exprType(cc.qc.focus.value, keys) ? cc.replaceWith(this, keys) : this;
-    }
+    final Expr inputs = exprs[0];
+    final Expr keys = exprs[1];
+    //
+    final long ks = keys.seqType().mayBeArray() || keys.has(Flag.NDT) ? -1 : keys.size();
 
-    // postfix expression
-    final Expr ctx = exprs[1];
-    if(exprType(ctx, keys)) {
-      if((ctx instanceof XQMap || ctx instanceof XQArray) && keys instanceof Value)
-        return cc.preEval(this);
-
-      final long es = ctx.size();
-      if(es == 0) return cc.replaceWith(this, ctx);
-      if(ks == 0) return cc.replaceWith(this, keys);
-
-      if(keys != Str.WILDCARD) {
-        Expr expr = this;
-        if(es == 1) {
-          // context expression yields one item
-          if(ks == 1) {
-            // one key: rewrite to function call
-            expr = new DynFuncCall(info, cc.sc(), ctx, keys).optimize(cc);
-          } else if(ks != -1) {
-            // otherwise, rewrite to for each loop
-            expr = cc.function(Function.FOR_EACH, info, exprs);
+    Expr expr = this;
+    final long is = inputs.size();
+    if(is == 0) {
+      expr = inputs;
+    } else if(exprType()) {
+      // only rewrite if input yields maps or arrays
+      if(ks == 0) {
+        expr = keys;
+      } else if(keys != Str.WILDCARD) {
+        if(ks == 1) {
+          // single keys
+          if(is == 1) {
+            // single inputs: INPUT?(KEY)  ->  INPUT(KEY)
+            expr = new DynFuncCall(info, cc.sc(), inputs, keys).optimize(cc);
+          } else {
+            // multiple inputs: INPUTS?(KEY)  ->  INPUTS ! .(KEY)
+            final Expr dfc = cc.get(inputs, () -> {
+              final Expr ctx = new ContextValue(info).optimize(cc);
+              return new DynFuncCall(info, cc.sc(), ctx, keys).optimize(cc);
+            });
+            expr = SimpleMap.get(cc, info, inputs, dfc);
           }
-        } else if(keys instanceof Value) {
-          // keys are constant, so we do not duplicate work in the inner loop
-          final LinkedList<Clause> clauses = new LinkedList<>();
-          final Var c = cc.vs().addNew(new QNm("c"), null, false, cc.qc, info);
-          clauses.add(new For(c, ctx));
-          final Var k = cc.vs().addNew(new QNm("k"), null, false, cc.qc, info);
-          clauses.add(new For(k, keys));
-          final VarRef rc = new VarRef(info, c), rk = new VarRef(info, k);
-          final DynFuncCall rtrn = new DynFuncCall(info, cc.sc(), rc, rk);
-          expr = new GFLWOR(info, clauses, rtrn).optimize(cc);
+        } else if(ks != -1 && (inputs instanceof Value || inputs instanceof VarRef)) {
+          // multiple deterministic keys, inputs are values or variable references
+          if(is == 1) {
+            // single input:
+            //  INPUT?(KEYS)  ->  KEYS ! INPUT(.)
+            final Expr dfc = cc.get(keys, () -> {
+              final Expr ctx = new ContextValue(info).optimize(cc);
+              return new DynFuncCall(info, cc.sc(), inputs, ctx).optimize(cc);
+            });
+            expr = SimpleMap.get(cc, info, keys, dfc);
+          } else {
+            // multiple inputs:
+            //  INPUTS?(KEYS)  ->  for $_ in INPUTS return KEYS ! $_(.)
+            final LinkedList<Clause> clauses = new LinkedList<>();
+            final Var var = cc.vs().addNew(new QNm("_"), null, false, cc.qc, info);
+            clauses.add(new For(var, inputs).optimize(cc));
+            final VarRef ref = new VarRef(info, var).optimize(cc);
+            final Expr dfc = cc.get(keys, () -> {
+              final Expr ctx = new ContextValue(info).optimize(cc);
+              return new DynFuncCall(info, cc.sc(), ref, ctx).optimize(cc);
+            });
+            expr = new GFLWOR(info, clauses, SimpleMap.get(cc, info, keys, dfc)).optimize(cc);
+          }
         }
-        return cc.replaceWith(this, expr);
       }
     }
 
     // return result or expression
-    return allAreValues(true) ? cc.preEval(this) : this;
+    return expr != this ? cc.replaceWith(this, expr) : allAreValues(true) ? cc.preEval(this) : this;
   }
 
   /**
    * Assigns a sequence type.
-   * @param ctx context expression
-   * @param keys keys
    * @return {@code true} if expression type was assigned
    */
-  private boolean exprType(final Expr ctx, final Expr keys) {
-    if(ctx == null) return false;
-
-    final FuncType ft = ctx.funcType();
+  private boolean exprType() {
+    final Expr inputs = exprs[0];
+    final FuncType ft = inputs.funcType();
     final boolean map = ft instanceof MapType, array = ft instanceof ArrayType;
     if(!map && !array) return false;
 
     // derive type from input expression
+    final Expr keys = exprs[1];
     final SeqType st = ft.declType;
     Occ occ = st.occ;
-    if(keys == Str.WILDCARD || ctx.size() != 1 || !keys.seqType().one() ||
+    if(inputs.size() != 1 || keys == Str.WILDCARD || !keys.seqType().one() ||
         keys.seqType().mayBeArray()) {
-      // key is wildcard, or expression yields no single item
+      // key is wildcard, or expressions yield no single item
       occ = occ.union(Occ.ZERO_OR_MORE);
     } else if(map) {
       // map lookup may result in empty sequence
@@ -116,57 +126,37 @@ public final class Lookup extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Expr keys = exprs[0];
-    final Iter iter = (unary() ? ctxValue(qc) : exprs[1]).iter(qc);
+    final Iter iter = exprs[0].iter(qc);
+    final Expr keys = exprs[1];
 
     // iterate through all map/array inputs
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
       if(!(item instanceof XQMap || item instanceof XQArray)) throw LOOKUP_X.get(info, item);
-      final FItem fit = (FItem) item;
 
       if(keys == Str.WILDCARD) {
         // wildcard: add all values
-        if(fit instanceof XQMap) {
-          ((XQMap) fit).values(vb);
+        if(item instanceof XQMap) {
+          ((XQMap) item).values(vb);
         } else {
-          for(final Value value : ((XQArray) item).members()) vb.add(value);
+          for(final Value value : ((XQArray) item).members()) {
+            vb.add(value);
+          }
         }
       } else {
+        final FItem fitem = (FItem) item;
         final Iter ir = keys.atomIter(qc, info);
-        for(Item key; (key = qc.next(ir)) != null;) vb.add(fit.invoke(qc, info, key));
+        for(Item key; (key = qc.next(ir)) != null;) {
+          vb.add(fitem.invoke(qc, info, key));
+        }
       }
     }
     return vb.value(this);
   }
 
   @Override
-  public boolean has(final Flag... flags) {
-    return Flag.CTX.in(flags) && unary() || super.has(flags);
-  }
-
-  @Override
-  public VarUsage count(final Var var) {
-    // context reference check: check if this is a unary lookup
-    return (var == null && unary() ? VarUsage.ONCE : VarUsage.NEVER).plus(super.count(var));
-  }
-
-  @Override
-  public Expr inline(final InlineContext ic) throws QueryException {
-    return inline(ic, () -> unary() ? new Lookup(info, exprs[0], ic.copy()) : null);
-  }
-
-  @Override
   public Lookup copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return copyType(new Lookup(info, copyAll(cc, vm, exprs)));
-  }
-
-  /**
-   * Checks if this is a unary lookup.
-   * @return result of check
-   */
-  private boolean unary() {
-    return exprs.length == 1;
   }
 
   @Override
@@ -176,10 +166,9 @@ public final class Lookup extends Arr {
 
   @Override
   public void plan(final QueryString qs) {
-    if(exprs.length > 1) qs.token(exprs[1]);
-    qs.token('?');
+    qs.token(exprs[0]).token('?');
 
-    final Expr keys = exprs[0];
+    final Expr keys = exprs[1];
     Object key = null;
     if(keys == Str.WILDCARD) {
       key = "*";
