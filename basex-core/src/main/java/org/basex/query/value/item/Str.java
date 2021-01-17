@@ -16,8 +16,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class Str extends AStr {
-  /** Wildcard string. */
-  public static final Str WILDCARD = new Str(new byte[] { '*' });
   /** Zero-length string. */
   public static final Str EMPTY = new Str(Token.EMPTY);
 

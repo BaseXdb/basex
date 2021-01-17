@@ -1934,10 +1934,16 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Pre-evaluate lookup expressions. */
   @Test public void gh1928() {
+    // pre-evaluate lookup with zero or single input items
     check("()?1", "", empty());
-    check("([ 1 ], map { 2: 3 })?*", "1\n3", root(SmallSeq.class));
+    check("()?*", "", empty());
+    check("map { 1: 2 }?*", 2, root(Int.class));
+    check("[ 1 ]?*", 1, root(Int.class));
+
+    // do not pre-evaluate lookups with multiple input items
+    check("([ 1 ], map { 2: 3 })?*", "1\n3", root(Lookup.class));
     check("((map { 1: 'A', 'x': 'B' }) treat as function(xs:anyAtomicType) as xs:string)?1",
-        "A", root(Str.class));
+        "A", root(Lookup.class));
   }
 
   /** Rewrite distinct sequence checks. */
@@ -2157,5 +2163,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("document { <a b='c'/> }/descendant::a//@*", "b=\"c\"",
         exists("IterStep[@axis = 'descendant']"));
     check("<a b='c'/>/descendant-or-self::attribute()", "", root(Empty.class));
+  }
+
+  /** Lookup operator, iterative evaluation. */
+  @Test public void gh1984() {
+    query("head(([ 2 ], 3) ?1)", 2);
+    query("[ map { }, map { } ] ?* [ ?* ]", "");
   }
 }

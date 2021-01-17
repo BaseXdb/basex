@@ -39,7 +39,7 @@ public final class FnStringJoin extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final SeqType st1 = exprs[0].seqType();
-    final SeqType st2 = (exprs.length > 1 ? exprs[1] : Str.WILDCARD).seqType();
+    final SeqType st2 = (exprs.length > 1 ? exprs[1] : Str.EMPTY).seqType();
     return (st1.zero() || st1.one() && st1.type.isStringOrUntyped()) &&
         st2.type.isStringOrUntyped() ? cc.function(Function.STRING, info, exprs[0]) : this;
   }

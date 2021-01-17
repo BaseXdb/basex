@@ -2196,7 +2196,7 @@ public class QueryParser extends InputParser {
     final char ch = curr();
     if(ch == '*') {
       consume();
-      return Str.WILDCARD;
+      return Lookup.WILDCARD;
     }
     if(ch == '(') return parenthesized();
     // numeric literal

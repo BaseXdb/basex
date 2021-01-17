@@ -26,6 +26,9 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class Lookup extends Arr {
+  /** Wildcard string. */
+  public static final Str WILDCARD = Str.get(new byte[] { '*' });
+
   /**
    * Constructor.
    * @param info input info
@@ -52,11 +55,11 @@ public final class Lookup extends Arr {
       // only rewrite if input yields maps or arrays
       if(ks == 0) {
         expr = keys;
-      } else if(keys != Str.WILDCARD) {
+      } else if(keys != WILDCARD) {
         if(ks == 1) {
           // single keys
           if(is == 1) {
-            // single inputs: INPUT?(KEY)  ->  INPUT(KEY)
+            // single input: INPUT?(KEY)  ->  INPUT(KEY)
             expr = new DynFuncCall(info, cc.sc(), inputs, keys).optimize(cc);
           } else {
             // multiple inputs: INPUTS?(KEY)  ->  INPUTS ! .(KEY)
@@ -90,11 +93,14 @@ public final class Lookup extends Arr {
             expr = new GFLWOR(info, clauses, SimpleMap.get(cc, info, keys, dfc)).optimize(cc);
           }
         }
+      } else {
+        // wildcard, single input: pre-evaluate
+        if(inputs instanceof Item) {
+          return cc.preEval(expr);
+        }
       }
     }
-
-    // return result or expression
-    return expr != this ? cc.replaceWith(this, expr) : allAreValues(true) ? cc.preEval(this) : this;
+    return expr != this ? cc.replaceWith(this, expr) : this;
   }
 
   /**
@@ -111,7 +117,7 @@ public final class Lookup extends Arr {
     final Expr keys = exprs[1];
     final SeqType st = ft.declType;
     Occ occ = st.occ;
-    if(inputs.size() != 1 || keys == Str.WILDCARD || !keys.seqType().one() ||
+    if(inputs.size() != 1 || keys == WILDCARD || !keys.seqType().one() ||
         keys.seqType().mayBeArray()) {
       // key is wildcard, or expressions yield no single item
       occ = occ.union(Occ.ZERO_OR_MORE);
@@ -125,33 +131,61 @@ public final class Lookup extends Arr {
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
-    final Expr keys = exprs[1];
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return new Iter() {
+      final Iter iter = exprs[0].iter(qc);
+      Iter ir;
 
-    // iterate through all map/array inputs
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item item; (item = qc.next(iter)) != null;) {
-      if(!(item instanceof XQMap || item instanceof XQArray)) throw LOOKUP_X.get(info, item);
-
-      if(keys == Str.WILDCARD) {
-        // wildcard: add all values
-        if(item instanceof XQMap) {
-          ((XQMap) item).values(vb);
-        } else {
-          for(final Value value : ((XQArray) item).members()) {
-            vb.add(value);
+      @Override
+      public Item next() throws QueryException {
+        while(true) {
+          if(ir != null) {
+            final Item item = qc.next(ir);
+            if(item != null) return item;
           }
-        }
-      } else {
-        final FItem fitem = (FItem) item;
-        final Iter ir = keys.atomIter(qc, info);
-        for(Item key; (key = qc.next(ir)) != null;) {
-          vb.add(fitem.invoke(qc, info, key));
+          final Item item = qc.next(iter);
+          if(item == null) return null;
+          ir = add(item, new ValueBuilder(qc), qc).value(Lookup.this).iter();
         }
       }
-    }
+    };
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(qc);
+    final Iter iter = exprs[0].iter(qc);
+    for(Item item; (item = qc.next(iter)) != null;) add(item, vb, qc);
     return vb.value(this);
+  }
+
+  /**
+   * Adds values to the specified value builder.
+   * @param item input item
+   * @param vb value builder
+   * @param qc query context
+   * @return supplied value builder
+   * @throws QueryException query exception
+   */
+  private ValueBuilder add(final Item item, final ValueBuilder vb, final QueryContext qc)
+      throws QueryException {
+
+    if(!(item instanceof XQMap || item instanceof XQArray)) throw LOOKUP_X.get(info, item);
+
+    final Expr keys = exprs[1];
+    if(keys == WILDCARD) {
+      // wildcard: add all values
+      if(item instanceof XQMap) {
+        ((XQMap) item).values(vb);
+      } else {
+        for(final Value value : ((XQArray) item).members()) vb.add(value);
+      }
+    } else {
+      final FItem fitem = (FItem) item;
+      final Iter ir = keys.atomIter(qc, info);
+      for(Item key; (key = qc.next(ir)) != null;) vb.add(fitem.invoke(qc, info, key));
+    }
+    return vb;
   }
 
   @Override
@@ -170,8 +204,8 @@ public final class Lookup extends Arr {
 
     final Expr keys = exprs[1];
     Object key = null;
-    if(keys == Str.WILDCARD) {
-      key = "*";
+    if(keys == WILDCARD) {
+      key = WILDCARD.string();
     } else if(keys instanceof Str) {
       final Str str = (Str) keys;
       if(XMLToken.isNCName(str.string())) key = str.toJava();
