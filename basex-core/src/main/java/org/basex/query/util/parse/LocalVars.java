@@ -84,8 +84,8 @@ public final class LocalVars {
    */
   public ParseExpr resolve(final QNm name, final InputInfo ii) throws QueryException {
     // local variable
-    final VarRef local = resolveLocal(name, ii);
-    if(local != null) return local;
+    final VarRef ref = resolveLocal(name, ii);
+    if(ref != null) return ref;
 
     // static variable
     final byte[] uri = name.uri();

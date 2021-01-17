@@ -173,7 +173,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
               final Var var2 = cc.copy(expr2.getKey(), null);
               if(add == null) add = new HashMap<>();
               add.put(var2, expr2.getValue());
-              expr2.setValue(new VarRef(cl.info, var2));
+              expr2.setValue(new VarRef(cl.info, var2).optimize(cc));
             }
             inline = cl;
           }

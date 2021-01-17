@@ -33,7 +33,6 @@ import org.basex.query.util.collation.*;
 import org.basex.query.util.format.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -1211,13 +1210,13 @@ public class QueryParser extends InputParser {
         if(var.declType != null) wsCheck(ASSIGN);
         by = check(single(), NOVARDECL);
       } else {
-        final VarRef vr = localVars.resolveLocal(var.name, var.info);
+        final VarRef ref = localVars.resolveLocal(var.name, var.info);
         // the grouping variable has to be declared by the same FLWOR expression
         boolean dec = false;
-        if(vr != null) {
+        if(ref != null) {
           // check preceding clauses
           for(final Clause f : cl) {
-            if(f.declares(vr.var)) {
+            if(f.declares(ref.var)) {
               dec = true;
               break;
             }
@@ -1226,7 +1225,7 @@ public class QueryParser extends InputParser {
           // check other grouping variables
           if(!dec && specs != null) {
             for(final GroupSpec spec : specs) {
-              if(spec.var.is(vr.var)) {
+              if(spec.var.is(ref.var)) {
                 dec = true;
                 break;
               }
@@ -1234,7 +1233,7 @@ public class QueryParser extends InputParser {
           }
         }
         if(!dec) throw error(GVARNOTDEFINED_X, var);
-        by = vr;
+        by = ref;
       }
 
       final Collation coll = wsConsumeWs(COLLATION) ? Collation.get(stringLiteral(),
@@ -2097,7 +2096,6 @@ public class QueryParser extends InputParser {
           } while(wsConsume(SQUARE1));
           ex = new CachedFilter(info(), ex, el.finish());
         } else if(consume(PAREN1)) {
-          if(ex instanceof Value && !(ex instanceof FItem)) throw error(NOPAREN_X_X, ex);
           // parses the "ArgumentList" rule
           final InputInfo ii = info();
           final ExprList argList = new ExprList();
@@ -2109,7 +2107,7 @@ public class QueryParser extends InputParser {
           final int p = pos;
           if(consume(QUESTION) && !consume(QUESTION) && !consume(':')) {
             // parses the "Lookup" rule
-            ex = new Lookup(info(), keySpecifier(), ex);
+            ex = new Lookup(info(), ex, keySpecifier());
           } else {
             pos = p;
           }
@@ -3794,7 +3792,6 @@ public class QueryParser extends InputParser {
           if(!wsConsume(PAREN2)) throw error(FUNCARG_X, found());
         }
         // skip if primary expression cannot be a function
-        if(func instanceof Value && !(func instanceof FItem)) throw error(NOPAREN_X_X, func);
         if(upd) qc.updating();
         return new DynFuncCall(ii, sc, upd, ndt, func, argList.finish());
       }

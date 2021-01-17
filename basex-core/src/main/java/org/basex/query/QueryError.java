@@ -1078,8 +1078,6 @@ public enum QueryError {
   /** Error code. */
   INVFUNCITEM_X_X(XPTY, 4, "Function expected, % found: %."),
   /** Error code. */
-  NOPAREN_X_X(XPTY, 4, "No parenthesis expected after %."),
-  /** Error code. */
   CMPTYPE_X(XPTY, 4, "Type % is not comparable."),
   /** Error code. */
   CMPTYPES_X_X(XPTY, 4, "Types % and % are not comparable."),
@@ -1096,7 +1094,7 @@ public enum QueryError {
   /** Error code. */
   CITYPES_X_X(XPTY, 4, "Incompatible types in context value declarations: % vs. %."),
   /** Error code. */
-  LOOKUP_X(XPTY, 4, "Input of lookup operator is not a map or array: %."),
+  LOOKUP_X(XPTY, 4, "Input of lookup operator must be map or array: %."),
   /** Error code. */
   INVALIDOPT_X(XPTY, 4, "%"),
   /** Error code. */
