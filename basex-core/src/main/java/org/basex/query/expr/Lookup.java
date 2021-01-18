@@ -43,88 +43,87 @@ public final class Lookup extends Arr {
     exprs[1] = exprs[1].simplifyFor(Simplify.STRING, cc);
 
     final Expr inputs = exprs[0];
-    final Expr keys = exprs[1];
-    final FuncType ft = inputs.funcType();
-    final long ks = keys.seqType().mayBeArray() || keys.has(Flag.NDT) ? -1 : keys.size();
-
-    Expr expr = this;
     final long is = inputs.size();
-    if(is == 0) {
-      expr = inputs;
-    } else if(exprType()) {
-      // only rewrite if input yields maps or arrays
-      if(ks == 0) {
-        expr = keys;
-      } else {
-        final QueryBiFunction<Expr, Expr, Expr> rewrite = (input, arg) -> {
-          return keys == WILDCARD ? cc.function(ft instanceof MapType ?
-            Function._UTIL_MAP_VALUES : Function._UTIL_ARRAY_VALUES, info, input) :
-            new DynFuncCall(info, cc.sc(), input, arg).optimize(cc);
-        };
-        // single keys
-        if(ks == 1) {
-          if(is == 1) {
-            // single input: INPUT?(KEY)  ->  INPUT(KEY)
-            expr = rewrite.apply(inputs, keys);
-          } else {
-            // multiple inputs: INPUTS?(KEY)  ->  INPUTS ! .(KEY)
-            final Expr ex = cc.get(inputs, () -> rewrite.apply(ContextValue.get(cc, info), keys));
-            expr = SimpleMap.get(cc, info, inputs, ex);
-          }
-        } else if(ks != -1 && (inputs instanceof Value || inputs instanceof VarRef)) {
-          // multiple deterministic keys, inputs are values or variable references
-          if(is == 1) {
-            // single input:
-            //  INPUT?(KEYS)  ->  KEYS ! INPUT(.)
-            final Expr ex = cc.get(keys, () -> rewrite.apply(inputs, ContextValue.get(cc, info)));
-            expr = SimpleMap.get(cc, info, keys, ex);
-          } else {
-            // multiple inputs:
-            //  INPUTS?(KEYS)  ->  for $_ in INPUTS return KEYS ! $_(.)
-            final LinkedList<Clause> clauses = new LinkedList<>();
-            final Var var = cc.vs().addNew(new QNm("_"), null, false, cc.qc, info);
-            clauses.add(new For(var, inputs).optimize(cc));
-            final Expr ex = cc.get(keys, () -> {
-              return rewrite.apply(new VarRef(info, var).optimize(cc), ContextValue.get(cc, info));
-            });
-            expr = new GFLWOR(info, clauses, SimpleMap.get(cc, info, keys, ex)).optimize(cc);
-          }
-        }
-      }
-    }
-    return expr != this ? cc.replaceWith(this, expr) : this;
-  }
+    if(is == 0) return cc.replaceWith(this, inputs);
 
-  /**
-   * Assigns a sequence type.
-   * @return {@code true} if expression type was assigned
-   */
-  private boolean exprType() {
-    final Expr inputs = exprs[0];
+    // skip optimizations if input may yield other items than maps or arrays
     final FuncType ft = inputs.funcType();
     final boolean map = ft instanceof MapType, array = ft instanceof ArrayType;
-    if(!map && !array) return false;
+    if(!(map || array)) return this;
+
+    final Expr expr = opt(cc);
+    if(expr != this) return cc.replaceWith(this, expr);
 
     // derive type from input expression
     final Expr keys = exprs[1];
-    final SeqType st = ft.declType;
+    final SeqType st = ft.declType, kt = keys.seqType();
     Occ occ = st.occ;
-    if(inputs.size() != 1 || keys == WILDCARD || !keys.seqType().one() ||
-        keys.seqType().mayBeArray()) {
+    if(inputs.size() != 1 || keys == WILDCARD || !kt.one() || kt.mayBeArray()) {
       // key is wildcard, or expressions yield no single item
       occ = occ.union(Occ.ZERO_OR_MORE);
     } else if(map) {
       // map lookup may result in empty sequence
       occ = occ.union(Occ.ZERO);
     }
-
     exprType.assign(st.type, occ);
-    return true;
+
+    return this;
+  }
+
+  /**
+   * Rewrites the lookup to another expression.
+   * @param cc compilation context
+   * @return optimized or original expression
+   * @throws QueryException query exception
+   */
+  public Expr opt(final CompileContext cc) throws QueryException {
+    final Expr inputs = exprs[0], keys = exprs[1];
+    final long ks = keys.seqType().mayBeArray() || keys.has(Flag.NDT) ? -1 : keys.size();
+    if(ks == 0) return keys;
+
+    final long is = inputs.size();
+    final QueryBiFunction<Expr, Expr, Expr> rewrite = (input, arg) -> {
+      return keys == WILDCARD ? cc.function(inputs.funcType() instanceof MapType ?
+        Function._UTIL_MAP_VALUES : Function._UTIL_ARRAY_VALUES, info, input) :
+        new DynFuncCall(info, cc.sc(), input, arg).optimize(cc);
+    };
+
+    // single keys
+    if(ks == 1) {
+      // single input:
+      //   INPUT?(KEY)  ->  INPUT(KEY)
+      //   ARRAY?*      ->  util:array-values(MAP)
+      //   MAP?*        ->  util:map-values(MAP)
+      if(is == 1) return rewrite.apply(inputs, keys);
+      // multiple inputs:
+      //   INPUTS?(KEY)  ->  INPUTS ! .(KEY)
+      final Expr ex = cc.get(inputs, () -> rewrite.apply(ContextValue.get(cc, info), keys));
+      return SimpleMap.get(cc, info, inputs, ex);
+    }
+
+    // multiple deterministic keys, inputs are values or variable references
+    if(ks != -1 && (inputs instanceof Value || inputs instanceof VarRef)) {
+      if(is == 1) {
+        // single input:
+        //  INPUT?(KEYS)  ->  KEYS ! INPUT(.)
+        final Expr ex = cc.get(keys, () -> rewrite.apply(inputs, ContextValue.get(cc, info)));
+        return SimpleMap.get(cc, info, keys, ex);
+      }
+      // multiple inputs:
+      //  INPUTS?(KEYS)  ->  for $_ in INPUTS return KEYS ! $_(.)
+      final LinkedList<Clause> clauses = new LinkedList<>();
+      final Var var = cc.vs().addNew(new QNm("_"), null, false, cc.qc, info);
+      clauses.add(new For(var, inputs).optimize(cc));
+      final Expr ex = cc.get(keys, () -> {
+        return rewrite.apply(new VarRef(info, var).optimize(cc), ContextValue.get(cc, info));
+      });
+      return new GFLWOR(info, clauses, SimpleMap.get(cc, info, keys, ex)).optimize(cc);
+    }
+    return this;
   }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    System.err.println("[1] " + this);
     return new Iter() {
       final Iter iter = exprs[0].iter(qc);
       Iter ir;
@@ -146,7 +145,6 @@ public final class Lookup extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    System.err.println("[2] " + this);
     final ValueBuilder vb = new ValueBuilder(qc);
     final Iter iter = exprs[0].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) add(item, vb, qc);
