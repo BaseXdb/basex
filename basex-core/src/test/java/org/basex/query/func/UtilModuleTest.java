@@ -18,6 +18,30 @@ import org.junit.jupiter.api.*;
  */
 public final class UtilModuleTest extends QueryPlanTest {
   /** Test method. */
+  @Test public void arrayMembers() {
+    final Function func = _UTIL_ARRAY_MEMBERS;
+
+    query(func.args(" []"), "");
+    query(func.args(" [ () ]"), "[()]");
+    query(func.args(" [ 1 ]"), "[1]");
+    query(func.args(" [ 1, 2 ]"), "[1]\n[2]");
+    query(func.args(" [ (1, 2) ]"), "[(1, 2)]");
+    query(func.args(" [ (1, 2), 3 ]"), "[(1, 2)]\n[3]");
+  }
+
+  /** Test method. */
+  @Test public void arrayValues() {
+    final Function func = _UTIL_ARRAY_VALUES;
+
+    query(func.args(" []"), "");
+    query(func.args(" [ () ]"), "");
+    query(func.args(" [ 1 ]"), "1");
+    query(func.args(" [ 1, 2 ]"), "1\n2");
+    query(func.args(" [ (1, 2) ]"), "1\n2");
+    query(func.args(" [ (1, 2), 3 ]"), "1\n2\n3");
+  }
+
+  /** Test method. */
   @Test public void chars() {
     final Function func = _UTIL_CHARS;
 
@@ -307,6 +331,29 @@ public final class UtilModuleTest extends QueryPlanTest {
 
     check(func.args(" (<a/>, <b/>)"), "<b/>", root(CElem.class));
     check(func.args(" (<a/>, 1 to 2)"), 2, root(Int.class));
+  }
+
+  /** Test method. */
+  @Test public void mapEntries() {
+    final Function func = _UTIL_MAP_ENTRIES;
+
+    query(func.args(" map {}"), "");
+    query(func.args(" map { 1: 2 }") + "?key", 1);
+    query(func.args(" map { 1: 2 }") + "?value", 2);
+    query(func.args(" map { 1: (2, 3) }") + "?key", 1);
+    query(func.args(" map { 1: (2, 3) }") + "?value", "2\n3");
+    query(func.args(" map { 1: 2, 3: 4 }") + "?key", "1\n3");
+    query(func.args(" map { 1: 2, 3: 4 }") + "?value", "2\n4");
+  }
+
+  /** Test method. */
+  @Test public void mapValues() {
+    final Function func = _UTIL_MAP_VALUES;
+
+    query(func.args(" map {}"), "");
+    query(func.args(" map { 1: 2 }"), 2);
+    query(func.args(" map { 1: (2, 3) }"), "2\n3");
+    query(func.args(" map { 1: 2, 3: 4 }"), "2\n4");
   }
 
   /** Test method. */

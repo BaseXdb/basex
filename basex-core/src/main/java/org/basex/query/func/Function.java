@@ -1603,6 +1603,12 @@ public enum Function implements AFunction {
   // Utility Module
 
   /** XQuery function. */
+  _UTIL_ARRAY_MEMBERS(UtilArrayMembers::new, "array-members(array)",
+      arg(ARRAY_O), ARRAY_ZM, UTIL_URI),
+  /** XQuery function. */
+  _UTIL_ARRAY_VALUES(UtilArrayValues::new, "array-values(array)",
+      arg(ARRAY_O), ITEM_ZM, UTIL_URI),
+  /** XQuery function. */
   _UTIL_CHARS(UtilChars::new, "chars(string)",
       arg(STRING_O), STRING_ZM, UTIL_URI),
   /** XQuery function. */
@@ -1629,6 +1635,12 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UTIL_LAST(UtilLast::new, "last(items)",
       arg(ITEM_ZM), ITEM_ZO, UTIL_URI),
+  /** XQuery function. */
+  _UTIL_MAP_ENTRIES(UtilMapEntries::new, "map-entries(map)",
+      arg(MAP_O), MAP_ZM, UTIL_URI),
+  /** XQuery function. */
+  _UTIL_MAP_VALUES(UtilMapValues::new, "map-values(map)",
+      arg(MAP_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_OR(UtilOr::new, "or(items,default)",
       arg(ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),

@@ -44,7 +44,7 @@ public final class Lookup extends Arr {
 
     final Expr inputs = exprs[0];
     final Expr keys = exprs[1];
-    //
+    final FuncType ft = inputs.funcType();
     final long ks = keys.seqType().mayBeArray() || keys.has(Flag.NDT) ? -1 : keys.size();
 
     Expr expr = this;
@@ -55,48 +55,40 @@ public final class Lookup extends Arr {
       // only rewrite if input yields maps or arrays
       if(ks == 0) {
         expr = keys;
-      } else if(keys != WILDCARD) {
+      } else {
+        final QueryBiFunction<Expr, Expr, Expr> rewrite = (input, arg) -> {
+          return keys == WILDCARD ? cc.function(ft instanceof MapType ?
+            Function._UTIL_MAP_VALUES : Function._UTIL_ARRAY_VALUES, info, input) :
+            new DynFuncCall(info, cc.sc(), input, arg).optimize(cc);
+        };
+        // single keys
         if(ks == 1) {
-          // single keys
           if(is == 1) {
             // single input: INPUT?(KEY)  ->  INPUT(KEY)
-            expr = new DynFuncCall(info, cc.sc(), inputs, keys).optimize(cc);
+            expr = rewrite.apply(inputs, keys);
           } else {
             // multiple inputs: INPUTS?(KEY)  ->  INPUTS ! .(KEY)
-            final Expr dfc = cc.get(inputs, () -> {
-              final Expr ctx = new ContextValue(info).optimize(cc);
-              return new DynFuncCall(info, cc.sc(), ctx, keys).optimize(cc);
-            });
-            expr = SimpleMap.get(cc, info, inputs, dfc);
+            final Expr ex = cc.get(inputs, () -> rewrite.apply(ContextValue.get(cc, info), keys));
+            expr = SimpleMap.get(cc, info, inputs, ex);
           }
         } else if(ks != -1 && (inputs instanceof Value || inputs instanceof VarRef)) {
           // multiple deterministic keys, inputs are values or variable references
           if(is == 1) {
             // single input:
             //  INPUT?(KEYS)  ->  KEYS ! INPUT(.)
-            final Expr dfc = cc.get(keys, () -> {
-              final Expr ctx = new ContextValue(info).optimize(cc);
-              return new DynFuncCall(info, cc.sc(), inputs, ctx).optimize(cc);
-            });
-            expr = SimpleMap.get(cc, info, keys, dfc);
+            final Expr ex = cc.get(keys, () -> rewrite.apply(inputs, ContextValue.get(cc, info)));
+            expr = SimpleMap.get(cc, info, keys, ex);
           } else {
             // multiple inputs:
             //  INPUTS?(KEYS)  ->  for $_ in INPUTS return KEYS ! $_(.)
             final LinkedList<Clause> clauses = new LinkedList<>();
             final Var var = cc.vs().addNew(new QNm("_"), null, false, cc.qc, info);
             clauses.add(new For(var, inputs).optimize(cc));
-            final VarRef ref = new VarRef(info, var).optimize(cc);
-            final Expr dfc = cc.get(keys, () -> {
-              final Expr ctx = new ContextValue(info).optimize(cc);
-              return new DynFuncCall(info, cc.sc(), ref, ctx).optimize(cc);
+            final Expr ex = cc.get(keys, () -> {
+              return rewrite.apply(new VarRef(info, var).optimize(cc), ContextValue.get(cc, info));
             });
-            expr = new GFLWOR(info, clauses, SimpleMap.get(cc, info, keys, dfc)).optimize(cc);
+            expr = new GFLWOR(info, clauses, SimpleMap.get(cc, info, keys, ex)).optimize(cc);
           }
-        }
-      } else {
-        // wildcard, single input: pre-evaluate
-        if(inputs instanceof Item) {
-          return cc.preEval(expr);
         }
       }
     }
@@ -132,6 +124,7 @@ public final class Lookup extends Arr {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    System.err.println("[1] " + this);
     return new Iter() {
       final Iter iter = exprs[0].iter(qc);
       Iter ir;
@@ -153,6 +146,7 @@ public final class Lookup extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    System.err.println("[2] " + this);
     final ValueBuilder vb = new ValueBuilder(qc);
     final Iter iter = exprs[0].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) add(item, vb, qc);
@@ -178,7 +172,7 @@ public final class Lookup extends Arr {
       if(item instanceof XQMap) {
         ((XQMap) item).values(vb);
       } else {
-        for(final Value value : ((XQArray) item).members()) vb.add(value);
+        for(final Value member : ((XQArray) item).members()) vb.add(member);
       }
     } else {
       final FItem fitem = (FItem) item;
