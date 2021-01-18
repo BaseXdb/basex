@@ -28,6 +28,16 @@ public final class ContextValue extends Simple {
     super(info, SeqType.ITEM_ZM);
   }
 
+  /**
+   * Creates a new, optimized context value expression.
+   * @param cc compilation context
+   * @param ii input info
+   * @return optimized expression
+   */
+  public static Expr get(final CompileContext cc, final InputInfo ii) {
+    return new ContextValue(ii).optimize(cc);
+  }
+
   @Override
   public Expr optimize(final CompileContext cc) {
     final Value value = cc.qc.focus.value;

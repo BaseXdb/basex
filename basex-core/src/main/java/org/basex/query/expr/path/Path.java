@@ -344,7 +344,7 @@ public abstract class Path extends ParseExpr {
 
     // self step was removed: ensure that result will be in distinct document order
     if(removed && (list.isEmpty() || !(list.get(0).seqType().type instanceof NodeType))) {
-      if(root == null) root = new ContextValue(info).optimize(cc);
+      if(root == null) root = ContextValue.get(cc, info);
       if(!root.ddo()) root = cc.simplify(root, cc.function(Function._UTIL_DDO, info, root));
     }
 

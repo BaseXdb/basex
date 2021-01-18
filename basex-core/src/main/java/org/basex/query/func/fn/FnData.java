@@ -42,7 +42,7 @@ public final class FnData extends ContextFn {
       if(type == st.type) {
         // data('x')  ->  'x'
         // $string[data() = 'a']  ->  $string[. = 'a']
-        return context && cc.nestedFocus() ? new ContextValue(info).optimize(cc) : expr;
+        return context && cc.nestedFocus() ? ContextValue.get(cc, info) : expr;
       }
       if(type != null) exprType.assign(SeqType.get(type, st.occ), expr.size());
     }
@@ -58,7 +58,7 @@ public final class FnData extends ContextFn {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = null;
-    final Expr expr1 = contextAccess() ? new ContextValue(info).optimize(cc) : exprs[0];
+    final Expr expr1 = contextAccess() ? ContextValue.get(cc, info) : exprs[0];
     if(mode == Simplify.DATA || mode == Simplify.STRING || mode == Simplify.NUMBER) {
       // data(<a/>) = ''  ->  <a/> = ''
       // A[B ! data() = '']  ->  A[B ! . = '']

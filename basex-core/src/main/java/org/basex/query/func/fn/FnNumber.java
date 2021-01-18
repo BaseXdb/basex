@@ -37,7 +37,7 @@ public final class FnNumber extends ContextFn {
     if(expr != null && expr.seqType().eq(SeqType.DOUBLE_O)) {
       // number(1e1)  ->  1e1
       // $double[number() = 1]  ->  $double[. = 1]
-      return context && cc.nestedFocus() ? new ContextValue(info).optimize(cc) : expr;
+      return context && cc.nestedFocus() ? ContextValue.get(cc, info) : expr;
     }
     return this;
   }
@@ -52,7 +52,7 @@ public final class FnNumber extends ContextFn {
         // number(<a>1</a>) + 2  ->  <a>1</a> + 2
         if(!context) return cc.simplify(this, exprs[0]);
         // A[number() = 1]  ->  A[. = 0]
-        if(cc.nestedFocus()) return new ContextValue(info).optimize(cc);
+        if(cc.nestedFocus()) return ContextValue.get(cc, info);
       }
     }
     return super.simplifyFor(mode, cc);

@@ -36,7 +36,7 @@ public final class FnFilter extends StandardFunc {
 
     // create filter expression
     final Expr pred = cc.get(items, () -> {
-      Expr p = new ContextValue(info).optimize(cc);
+      Expr p = ContextValue.get(cc, info);
       p = new DynFuncCall(info, sc, exprs[1], p).optimize(cc);
       p = new TypeCheck(sc, info, p, SeqType.BOOLEAN_O, true).optimize(cc);
       return p;

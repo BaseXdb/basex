@@ -37,7 +37,7 @@ public final class FnString extends ContextFn {
     if(expr != null && expr.seqType().eq(SeqType.STRING_O)) {
       // string('x')  ->  'x'
       // $string[string() = 'a']  ->  $string[. = 'a']
-      return context && cc.nestedFocus() ? new ContextValue(info).optimize(cc) : expr;
+      return context && cc.nestedFocus() ? ContextValue.get(cc, info) : expr;
     }
     return this;
   }
@@ -45,7 +45,7 @@ public final class FnString extends ContextFn {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = null;
-    final Expr expr1 = contextAccess() ? new ContextValue(info).optimize(cc) : exprs[0];
+    final Expr expr1 = contextAccess() ? ContextValue.get(cc, info) : exprs[0];
     final SeqType st1 = expr1.seqType();
     if(mode == Simplify.STRING && st1.type.isStringOrUntyped() && st1.one()) {
       // $node[string() = 'x']  ->  $node[. = 'x']

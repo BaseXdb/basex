@@ -52,7 +52,7 @@ public final class FnTokenize extends RegEx {
 
     // tokenize(normalize-space(A), ' ')  ->  tokenize(A)
     if(NORMALIZE_SPACE.is(expr) && ptrn instanceof Str && eq(((Str) ptrn).string(), SPACE)) {
-      final Expr arg = expr.args().length == 1 ? expr.arg(0) : new ContextValue(info).optimize(cc);
+      final Expr arg = expr.args().length == 1 ? expr.arg(0) : ContextValue.get(cc, info);
       return cc.function(TOKENIZE, info, arg);
     }
 
