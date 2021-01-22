@@ -12,6 +12,7 @@ import org.basex.http.restxq.*;
 import org.basex.http.ws.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
 
@@ -107,16 +108,20 @@ public final class WebModule {
 
   /**
    * Returns the specified function from the given query context.
-   * @param qc query context
    * @param func function to be found
+   * @param qc query context
    * @return function or {@code null}
    * @throws HTTPException HTTP exception
    */
-  public static StaticFunc find(final QueryContext qc, final StaticFunc func) throws HTTPException {
+  public static StaticFunc get(final StaticFunc func, final QueryContext qc) throws HTTPException {
     for(final StaticFunc sf : qc.funcs.funcs()) {
-      if(func.info.equals(sf.info)) return sf;
+      if(func.info.equals(sf.info)) {
+        // inline arguments of called function
+        sf.anns.addUnique(new Ann(sf.info, Annotation._BASEX_INLINE));
+        return sf;
+      }
     }
-    // will only happen if file has been swapped between caching and parsing
+    // not to be expected; can only happen if file has been swapped between caching and parsing
     throw HTTPCode.NO_XQUERY.get();
   }
 }

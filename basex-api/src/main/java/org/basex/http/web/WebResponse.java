@@ -56,7 +56,7 @@ public abstract class WebResponse {
     try {
       qc = module.qc(ctx);
       init(function);
-      final StaticFunc sf = WebModule.find(qc, func);
+      final StaticFunc sf = WebModule.get(func, qc);
       final Expr[] args = new Expr[sf.params.length];
       bind(args, data);
       qc.jc().description(toString(func, args));
