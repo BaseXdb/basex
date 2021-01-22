@@ -3,6 +3,7 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+import java.util.function.*;
 
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
@@ -61,18 +62,25 @@ public final class Replace extends ACreate {
   }
 
   /**
-   * Replaces files in the specified database.
+   * Replaces resources in the specified database.
    * @param data database
    * @param bin binary file (can be {@code null})
    * @param path target path
    * @return success flag
    */
   private boolean replace(final Data data, final IOFile bin, final String path) {
+    context.invalidate();
+
     // retrieve old list of resources
     final AtomicUpdateCache auc = new AtomicUpdateCache(data);
-
     final IntList docs = data.resources.docs(path);
-    int d = 0, bs = 0;
+    final int ds = docs.size();
+    final IntConsumer exec = start -> {
+      for(int d = start; d < ds; d++) auc.addDelete(docs.get(d));
+      auc.execute(false);
+    };
+
+    int bs = 0;
     if(bin != null && bin.exists()) {
       // replace binary file if it already exists
       final Store store = new Store(path);
@@ -80,6 +88,7 @@ public final class Replace extends ACreate {
       store.lock = false;
       if(!store.run(context)) return error(store.info());
       bs = 1;
+      exec.accept(0);
     } else {
       // otherwise, add new document as xml
       final Add add = new Add(path);
@@ -89,21 +98,17 @@ public final class Replace extends ACreate {
         if(!add.build()) return error(add.info());
 
         final DataClip clip = new DataClip(add.tmpData);
+        int d = 0;
         if(docs.isEmpty()) {
           auc.addInsert(data.meta.size, -1, clip);
         } else {
           auc.addReplace(docs.get(d++), clip);
         }
-        context.invalidate();
+        exec.accept(d);
       } finally {
         add.finish();
       }
     }
-
-    // delete old documents
-    final int ds = docs.size();
-    for(; d < ds; d++) auc.addDelete(docs.get(d));
-    auc.execute(false);
 
     return info(RES_REPLACED_X_X, ds + bs, jc().performance);
   }
