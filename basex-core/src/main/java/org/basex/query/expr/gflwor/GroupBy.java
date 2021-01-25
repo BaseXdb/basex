@@ -206,6 +206,9 @@ public final class GroupBy extends Clause {
 
   @Override
   public boolean has(final Flag... flags) {
+    for(final Expr expr : preExpr) {
+      if(expr.has(flags)) return true;
+    }
     for(final GroupSpec spec : specs) {
       if(spec.has(flags)) return true;
     }

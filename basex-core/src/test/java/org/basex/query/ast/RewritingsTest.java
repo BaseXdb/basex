@@ -2170,4 +2170,11 @@ public final class RewritingsTest extends QueryPlanTest {
     query("head(([ 2 ], 3) ?1)", 2);
     query("[ map { }, map { } ] ?* [ ?* ]", "");
   }
+
+  /** Simple maps, group by: Context check. */
+  @Test public void gh1987() {
+    query("function($m) { function() { $m?* } ! (" +
+        "for $b in $m?0 let $c := .() group by $d := () return $c" +
+        ")}(map { 0: 1 })", 1);
+  }
 }
