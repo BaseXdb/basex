@@ -4,6 +4,7 @@ import java.awt.*;
 
 import javax.swing.*;
 
+import org.basex.core.*;
 import org.basex.gui.GUIConstants.Msg;
 
 /**
@@ -84,6 +85,24 @@ public class BaseXLabel extends JLabel {
   public final BaseXLabel setText(final String text, final Msg icon) {
     setIcon(text == null ? null : icon.small);
     setText(text == null ? " " : text);
+    return this;
+  }
+
+  /**
+   * Shows an text. If required, chops the last characters.
+   * @param text warning text
+   * @param width maximum width
+   * @return self reference
+   */
+  public final BaseXLabel setChoppedText(final String text, final int width) {
+    final FontMetrics fm = getFontMetrics(getFont());
+    String txt = text;
+    if(width < fm.stringWidth(txt)) {
+      int tl = txt.length();
+      while(tl > 0 && width < fm.stringWidth(txt + Text.DOTS)) txt = txt.substring(0, --tl);
+      txt += Text.DOTS;
+    }
+    super.setText(txt);
     return this;
   }
 

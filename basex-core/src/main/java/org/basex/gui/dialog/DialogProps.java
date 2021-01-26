@@ -89,6 +89,7 @@ public final class DialogProps extends BaseXDialog {
 
     // resource tree
     resources = new DialogResources(this);
+    resources.setPreferredSize(new Dimension(300, 1));
     set(resources, BorderLayout.WEST);
 
     // tabs
@@ -136,11 +137,12 @@ public final class DialogProps extends BaseXDialog {
     final BaseXBack infoPanel = new BaseXBack(new GridLayout(2, 1)).border(8);
 
     final BaseXBack dbPanel = new BaseXBack(new BorderLayout());
-    dbPanel.add(new BaseXLabel(DATABASE + COLS + data.meta.name).border(0, 0, 6, 0).large(),
-        BorderLayout.NORTH);
+    final BaseXLabel db = new BaseXLabel().border(0, 0, 6, 0).large();
+    dbPanel.add(db.setChoppedText(DATABASE + COLS + data.meta.name, 600), BorderLayout.NORTH);
 
     dbInfo = new TextPanel(this, "", false);
     dbInfo.setFont(infoPanel.getFont());
+    dbInfo.setPreferredSize(new Dimension(600, 1));
     dbPanel.add(new SearchEditor(gui, dbInfo), BorderLayout.CENTER);
 
     final BaseXBack nsPanel = new BaseXBack(new BorderLayout());

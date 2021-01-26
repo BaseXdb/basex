@@ -74,6 +74,7 @@ public final class DialogManage extends BaseXDialog {
 
     detail = new TextPanel(this, false);
     detail.setFont(panel.getFont());
+    detail.setPreferredSize(new Dimension(600, 1));
 
     // database buttons
     rename = new BaseXButton(this, RENAME + DOTS);
@@ -185,8 +186,8 @@ public final class DialogManage extends BaseXDialog {
 
     } else {
       final String title = dbs.size() == 1 ? db : dbs.size() + " " + DATABASES;
-      doc1.setText(title);
-      doc2.setText(BACKUPS + COLS + title);
+      doc1.setChoppedText(title, 600);
+      doc2.setChoppedText(BACKUPS + COLS + title, 600);
 
       boolean active = ctx.soptions.dbExists(db);
       String info = "";

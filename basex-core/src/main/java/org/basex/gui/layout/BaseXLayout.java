@@ -411,7 +411,7 @@ public final class BaseXLayout {
   }
 
   /**
-   * Draws the specified string. Chops the last character if space is not enough space.
+   * Draws the specified string and chops the last characters if there is not enough space.
    * @param g graphics reference
    * @param string string
    * @param x x coordinate
