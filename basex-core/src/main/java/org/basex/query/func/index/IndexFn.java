@@ -51,12 +51,27 @@ public abstract class IndexFn extends StandardFunc {
    * @return entry iterator
    */
   static Iter entries(final Index index, final IndexEntries entries) {
-    return new Iter() {
-      final EntryIterator ei = index.entries(entries);
+    final EntryIterator ei = index.entries(entries);
+
+    return new BasicIter<FElem>(ei.size()) {
       @Override
       public FElem next() {
         final byte[] token = ei.next();
-        return token == null ? null : new FElem(ENTRY).add(COUNT, token(ei.count())).add(token);
+        return token == null ? null : get(token);
+      }
+
+      @Override
+      public FElem get(final long i) {
+        return get(ei.get((int) i));
+      }
+
+      /**
+       * Returns an entry element with the specified token.
+       * @param token token
+       * @return element
+       */
+      private FElem get(final byte[] token) {
+        return new FElem(ENTRY).add(COUNT, token(ei.count())).add(token);
       }
     };
   }

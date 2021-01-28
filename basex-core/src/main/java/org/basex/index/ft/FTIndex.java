@@ -150,6 +150,7 @@ public final class FTIndex extends ValueIndex {
   @Override
   public EntryIterator entries(final IndexEntries entries) {
     final byte[] token = entries.token();
+
     return new EntryIterator() {
       int p = token.length - 1, start, end, nr;
       boolean inner;
@@ -186,6 +187,7 @@ public final class FTIndex extends ValueIndex {
           return null;
         }
       }
+
       @Override
       public int count() {
         return nr;

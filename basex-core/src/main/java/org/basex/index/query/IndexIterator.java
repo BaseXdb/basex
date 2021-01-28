@@ -19,19 +19,19 @@ public interface IndexIterator {
 
   /**
    * Returns true if more results can be returned.
-   * @return size
+   * @return result of check
    */
   boolean more();
 
   /**
    * Returns the next pre value.
-   * @return result
+   * @return pre value
    */
   int pre();
 
   /**
    * Returns an approximate number of index results.
-   * @return result approximate number of results
+   * @return approximate number of results
    */
   int size();
 }

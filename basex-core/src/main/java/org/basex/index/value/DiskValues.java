@@ -111,14 +111,23 @@ public class DiskValues extends ValueIndex {
     }
 
     return new IndexIterator() {
-      final int s = pres.size();
-      int p;
+      final int sz = pres.size();
+      int c;
+
       @Override
-      public boolean more() { return p < s; }
+      public boolean more() {
+        return c < sz;
+      }
+
       @Override
-      public int pre() { return pres.get(p++); }
+      public int pre() {
+        return pres.get(c++);
+      }
+
       @Override
-      public int size() { return s; }
+      public int size() {
+        return sz;
+      }
     };
   }
 
@@ -148,9 +157,12 @@ public class DiskValues extends ValueIndex {
   @Override
   public final EntryIterator entries(final IndexEntries entries) {
     final byte[] token = entries.token();
-    if(token.length == 0) return allKeys(entries.descending);
-    if(entries.prefix) return keysWithPrefix(token);
-    return keysFrom(token, entries.descending);
+    if(token.length == 0) return keys(0, size(), entries.descending);
+    if(entries.prefix) return keys(token);
+
+    int i = get(token);
+    if(i < 0) i = -i - 1;
+    return entries.descending ? keys(0, i, true) : keys(i, size(), false);
   }
 
   @Override
@@ -230,58 +242,31 @@ public class DiskValues extends ValueIndex {
   }
 
   /**
-   * Returns all index entries.
-   * @param reverse return in a reverse order
-   * @return entries
-   */
-  private EntryIterator allKeys(final boolean reverse) {
-    final int s = size() - 1;
-    return reverse ? keysWithinReverse(0, s) : keysWithin(0, s);
-  }
-
-  /**
-   * Returns all index entries, starting from the specified key.
-   * @param key key
-   * @param reverse return in a reverse order
-   * @return entries
-   */
-  private EntryIterator keysFrom(final byte[] key, final boolean reverse) {
-    final int s = size() - 1;
-    int i = get(key);
-    if(i < 0) i = -i - 1;
-    return reverse ? keysWithinReverse(0, i - 1) : keysWithin(i, s);
-  }
-
-  /**
    * Returns all index entries with the given prefix.
    * @param prefix prefix
    * @return entries
    */
-  private EntryIterator keysWithPrefix(final byte[] prefix) {
-    final int i = get(prefix);
+  private EntryIterator keys(final byte[] prefix) {
+    final int first = get(prefix), sz = size();
+
     return new EntryIterator() {
-      final int s = size();
-      // -1 in order to use the faster ++ix operator
-      int ix = (i < 0 ? -i - 1 : i) - 1, count = -1;
+      int c = first < 0 ? -first - 1 : first;
+      IndexEntry entry;
 
       @Override
       public byte[] next() {
-        if(++ix < s) {
+        if(c < sz) {
           synchronized(monitor) {
-            final IndexEntry entry = indexEntry(ix);
-            if(startsWith(entry.key, prefix)) {
-              count = entry.size;
-              return entry.key;
-            }
+            entry = indexEntry(c++);
+            if(startsWith(entry.key, prefix)) return entry.key;
           }
         }
-        count = -1;
         return null;
       }
 
       @Override
       public int count() {
-        return count;
+        return entry.size;
       }
     };
   }
@@ -289,61 +274,37 @@ public class DiskValues extends ValueIndex {
   /**
    * Returns all index entries within the given range.
    * @param first first entry to be returned
-   * @param last last entry to be returned
+   * @param last last entry to be returned (exclusive)
+   * @param reverse return in reverse order
    * @return entries
    */
-  private EntryIterator keysWithin(final int first, final int last) {
+  private EntryIterator keys(final int first, final int last, final boolean reverse) {
+    final int sz = last - first;
     return new EntryIterator() {
-      int ix = first - 1;
-      int count = -1;
+      int c;
+      IndexEntry entry;
 
       @Override
       public byte[] next() {
-        if(++ix <= last) {
-          synchronized(monitor) {
-            final IndexEntry entry = indexEntry(ix);
-            count = entry.size;
-            return entry.key;
-          }
-        }
-        count = -1;
-        return null;
+        return c < sz ? get(c++) : null;
       }
 
       @Override
       public int count() {
-        return count;
+        return entry.size;
       }
-    };
-  }
-
-  /**
-   * Returns all index entries within the given range in a reverse order.
-   * @param first first entry to be returned
-   * @param last last entry to be returned
-   * @return entries
-   */
-  private EntryIterator keysWithinReverse(final int first, final int last) {
-    return new EntryIterator() {
-      int ix = last + 1;
-      int count = -1;
 
       @Override
-      public byte[] next() {
-        if(--ix >= first) {
-          synchronized(monitor) {
-            final IndexEntry entry = indexEntry(ix);
-            count = entry.size;
-            return entry.key;
-          }
+      public byte[] get(final int i) {
+        synchronized(monitor) {
+          entry = indexEntry(reverse ? last - i - 1 : first + i);
+          return entry.key;
         }
-        count = -1;
-        return null;
       }
 
       @Override
-      public int count() {
-        return count;
+      public int size() {
+        return sz;
       }
     };
   }

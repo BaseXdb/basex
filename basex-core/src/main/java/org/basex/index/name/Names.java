@@ -136,10 +136,31 @@ public final class Names extends TokenSet implements Index {
 
   @Override
   public EntryIterator entries(final IndexEntries entries) {
+    final int sz = size();
+
     return new EntryIterator() {
       int c;
-      @Override public byte[] next() { return ++c < size ? keys[c] : null; }
-      @Override public int count() { return stats[c].count; }
+
+      @Override
+      public byte[] next() {
+        return c < sz ? get(c) : null;
+      }
+
+      @Override
+      public byte[] get(final int i) {
+        c = i + 1;
+        return keys[c];
+      }
+
+      @Override
+      public int count() {
+        return stats[c].count;
+      }
+
+      @Override
+      public int size() {
+        return sz;
+      }
     };
   }
 

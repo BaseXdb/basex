@@ -1272,13 +1272,13 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _INDEX_ATTRIBUTE_NAMES(IndexAttributeNames::new, "attribute-names(database)",
-      arg(STRING_O), ELEMENT_ZM, INDEX_URI),
+      arg(STRING_O), ELEMENT_ZM, flag(NDT), INDEX_URI),
   /** XQuery function. */
   _INDEX_ATTRIBUTES(IndexAttributes::new, "attributes(database[,prefix[,ascending]])",
       arg(STRING_O, STRING_O, BOOLEAN_O), ELEMENT_ZM, flag(NDT), INDEX_URI),
   /** XQuery function. */
   _INDEX_ELEMENT_NAMES(IndexElementNames::new, "element-names(database)",
-      arg(STRING_O), ELEMENT_ZM, INDEX_URI),
+      arg(STRING_O), ELEMENT_ZM, flag(NDT), INDEX_URI),
   /** XQuery function. */
   _INDEX_FACETS(IndexFacets::new, "facets(database[,type])",
       arg(STRING_O, STRING_O), DOCUMENT_NODE_O, flag(NDT), INDEX_URI),
