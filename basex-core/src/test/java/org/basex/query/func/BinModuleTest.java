@@ -315,6 +315,15 @@ public final class BinModuleTest extends SandboxTest {
     hexQuery(func.args(base64("6600"), -8),      "0066");
     hexQuery(func.args(base64("12345678"), 16),  "56780000");
     hexQuery(func.args(base64("12345678"), -16), "00001234");
+    hexQuery(func.args(base64("00C641"), 7),     "632080");
+    hexQuery(func.args(base64("00000001"), 1),   "00000002");
+    hexQuery(func.args(base64("00000001"), 31),  "80000000");
+    hexQuery(func.args(base64("00000001"), 32),  "00000000");
+    hexQuery(func.args(base64("FFFFFFFF"), -31), "00000001");
+    hexQuery(func.args(base64("FFFFFFFF"), -32), "00000000");
+
+    hexQuery(func.args(base64("00000000"), 111111111), "00000000");
+    hexQuery(func.args(base64("00000000"), -111111111), "00000000");
   }
 
   /** Test method. */

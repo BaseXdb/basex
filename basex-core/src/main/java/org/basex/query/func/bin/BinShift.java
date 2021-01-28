@@ -19,53 +19,53 @@ public final class BinShift extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final B64 b64 = toB64(exprs[0], qc, true);
-    long by = toLong(exprs[1], qc);
+    final long by = toLong(exprs[1], qc);
+
+    // special cases
     if(b64 == null) return Empty.VALUE;
     if(by == 0) return b64;
 
     final byte[] bytes = b64.binary(info);
     final int bl = bytes.length;
-    if(bl == 1 && by < 8) {
-      if(by > 0)  return B64.get((byte) (bytes[0] << by));
-      if(by > -8) return B64.get((byte) (bytes[0] >>> -by));
+
+    // single byte
+    if(bl == 1) {
+      final int b = bytes[0];
+      return B64.get((byte) (by > 0 ? (b << by) : ((b & 0xFF) >> -by)));
     }
 
-    byte[] tmp = new byte[bl];
-    int r = 0;
-    if(by > 7) {
-      tmp = new BigInteger(bytes).shiftLeft((int) by).toByteArray();
-      if(tmp.length != bl) tmp = Arrays.copyOfRange(tmp, tmp.length - bl, tmp.length);
-    } else if(by > 0) {
-      for(int i = bl - 1; i >= 0; i--) {
-        final byte b = bytes[i];
-        tmp[i] = (byte) (b << by | r);
-        r = b >>> 32 - by;
-      }
-    } else if(by > -8) {
-      by = -by;
-      for(int i = 0; i < bl; i++) {
-        final int b = bytes[i] & 0xFF;
-        tmp[i] = (byte) (b >>> by | r);
-        r = b << 32 - by;
-      }
+    byte[] shifted;
+    if(by / 8 >= bl || by / 8 <= -bl) {
+      // too many shifts: zeroes
+      shifted = new byte[bl];
     } else {
-      by = -by;
+      final int shifts = (int) (by < 0 ? -by : by);
       BigInteger bi = new BigInteger(bytes);
-      if(bi.signum() >= 0) {
-        bi = bi.shiftRight((int) by);
+      if(by > 0) {
+        // left shift
+        bi = bi.shiftLeft(shifts);
       } else {
-        final BigInteger o = BigInteger.ONE.shiftLeft((bl << 3) + 1);
-        final BigInteger m = o.subtract(BigInteger.ONE).shiftRight((int) by + 1);
-        bi = bi.subtract(o).shiftRight((int) by).and(m);
+        // right shift
+        if(bi.signum() >= 0) {
+          bi = bi.shiftRight(shifts);
+        } else {
+          final BigInteger o = BigInteger.ONE.shiftLeft((bl << 3) + 1);
+          final BigInteger m = o.subtract(BigInteger.ONE).shiftRight(shifts + 1);
+          bi = bi.subtract(o).shiftRight(shifts).and(m);
+        }
       }
-      tmp = bi.toByteArray();
-      final int tl = tmp.length;
-      if(tl != bl) {
-        final byte[] tmp2 = new byte[bl];
-        Array.copyFromStart(tmp, tl, tmp2, bl - tl);
-        tmp = tmp2;
-      }
+      shifted = bi.toByteArray();
     }
-    return B64.get(tmp);
+
+    // return array with identical size
+    final int tl = shifted.length;
+    if(tl < bl) {
+      final byte[] tmp = new byte[bl];
+      Array.copyFromStart(shifted, tl, tmp, bl - tl);
+      shifted = tmp;
+    } else if(tl > bl) {
+      shifted = Arrays.copyOfRange(shifted, tl - bl, tl);
+    }
+    return B64.get(shifted);
   }
 }
