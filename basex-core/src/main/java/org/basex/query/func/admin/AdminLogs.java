@@ -142,7 +142,12 @@ public final class AdminLogs extends AdminFn {
           entry.user = cols[2];
           entry.type = cols.length > 3 ? cols[3] : "";
           entry.message = cols.length > 4 ? cols[4] : "";
-          entry.ms = cols.length > 5 ? new BigDecimal(cols[5].replace(" ms", "")) : BigDecimal.ZERO;
+          entry.ms = BigDecimal.ZERO;
+          if(cols.length > 5) {
+            // skip errors caused by erroneous input
+            final int i = cols[5].indexOf(" ms");
+            if(i > -1) entry.ms = new BigDecimal(cols[5].substring(0, i));
+          }
         } else {
           // legacy format
           entry.message = line;
