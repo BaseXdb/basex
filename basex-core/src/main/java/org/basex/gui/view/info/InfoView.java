@@ -299,7 +299,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     if(!times.isEmpty()) {
       total = Performance.getTime(times.get(times.size() - 1) * 10000L * runs, runs);
     }
-    if(total != null) label.setText(TOTAL_TIME_CC + total);
+    if(total != null) setTime(TOTAL_TIME_CC + total);
     all = tb.finish();
     newText = all;
 
@@ -345,8 +345,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
       }
     }
 
-    final int f = focus == -1 ? l - 1 : focus;
-    label.setText(strings.get(f).replace(LI, ""));
+    setTime(strings.get(focus == -1 ? l - 1 : focus).replace(LI, ""));
     repaint();
   }
 
@@ -399,5 +398,22 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
   public boolean print(final String info) {
     if(clear || all.length < 50000) setInfo(info, null, true, false);
     return true;
+  }
+
+  /**
+   * Displays the specified runtime.
+   * @param info info string with measured time;
+   */
+  private void setTime(final String info) {
+    final long ms = Long.parseLong(info.replaceAll("^.+: |\\..+", ""));
+    if(ms >= 60000) {
+      // choose hh:mm:ss.mm format if time exceeds 1 minute
+      final long seconds = ms / 1000, minutes = (seconds % 3600) / 60, hours = seconds / 3600;
+      final String frac = info.replaceAll("^.+\\.| ms.*", "");
+      final String time = String.format("%02d:%02d:%02d.%s", hours, minutes, seconds % 60, frac);
+      label.setText(info.replaceAll("\\d+\\.\\d+ ms", time.replaceAll("^00:", "")));
+    } else {
+      label.setText(info);
+    }
   }
 }
