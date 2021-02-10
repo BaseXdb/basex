@@ -52,12 +52,8 @@ public final class DBOptimize extends DBUpdate {
   }
 
   @Override
-  public void merge(final Update update) {
-    all |= ((DBOptimize) update).all;
+  public void prepare() {
   }
-
-  @Override
-  public void prepare() { }
 
   @Override
   public void apply() throws QueryException {
@@ -129,6 +125,11 @@ public final class DBOptimize extends DBUpdate {
 
     // remove old database reference
     if(all) qc.resources.remove(meta.name);
+  }
+
+  @Override
+  public void merge(final Update update) {
+    all |= ((DBOptimize) update).all;
   }
 
   @Override

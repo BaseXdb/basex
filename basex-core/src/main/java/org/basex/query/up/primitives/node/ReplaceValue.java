@@ -140,5 +140,6 @@ public final class ReplaceValue extends NodeUpdate {
   }
 
   @Override
-  public void update(final NamePool pool) { }
+  public void update(final NamePool pool) {
+  }
 }

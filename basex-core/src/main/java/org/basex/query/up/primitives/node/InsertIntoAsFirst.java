@@ -39,5 +39,6 @@ public final class InsertIntoAsFirst extends NodeCopy {
   }
 
   @Override
-  public void update(final NamePool pool) { }
+  public void update(final NamePool pool) {
+  }
 }

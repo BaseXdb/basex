@@ -35,6 +35,10 @@ public final class DBRestore extends NameUpdate {
   }
 
   @Override
+  public void prepare() {
+  }
+
+  @Override
   public void apply() throws QueryException {
     close();
     // restore backup
@@ -46,8 +50,7 @@ public final class DBRestore extends NameUpdate {
   }
 
   @Override
-  public void prepare() { }
-
-  @Override
-  public String operation() { return "restored"; }
+  public String operation() {
+    return "restored";
+  }
 }

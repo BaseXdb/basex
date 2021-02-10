@@ -82,10 +82,12 @@ public final class DBCreate extends NameUpdate {
   }
 
   @Override
-  public String toString() {
-    return Util.className(this) + '[' + newDocs.inputs + ']';
+  public String operation() {
+    return "created";
   }
 
   @Override
-  public String operation() { return "created"; }
+  public String toString() {
+    return Util.className(this) + '[' + newDocs.inputs + ']';
+  }
 }

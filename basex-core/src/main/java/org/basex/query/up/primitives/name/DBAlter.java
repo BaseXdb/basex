@@ -34,6 +34,10 @@ public final class DBAlter extends NameUpdate {
   }
 
   @Override
+  public void prepare() {
+  }
+
+  @Override
   public void apply() throws QueryException {
     close();
     close(newName, qc, info);
@@ -42,10 +46,9 @@ public final class DBAlter extends NameUpdate {
   }
 
   @Override
-  public void prepare() { }
-
-  @Override
-  protected String operation() { return "renamed"; }
+  protected String operation() {
+    return "renamed";
+  }
 
   @Override
   public void databases(final StringList db) {

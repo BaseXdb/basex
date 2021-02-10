@@ -54,6 +54,8 @@ public final class UserAlter extends UserFn {
     }
 
     @Override
-    public String operation() { return "altered"; }
+    public String operation() {
+      return "altered";
+    }
   }
 }

@@ -43,6 +43,17 @@ public final class DBAdd extends DBUpdate {
   }
 
   @Override
+  public void prepare() throws QueryException {
+    size = newDocs.inputs.size();
+    newDocs.prepare(data.meta.name, false);
+  }
+
+  @Override
+  public void apply() throws QueryException {
+    newDocs.add(data);
+  }
+
+  @Override
   public void merge(final Update update) throws QueryException {
     final DBAdd add = (DBAdd) update;
     if(replace || add.replace) {
@@ -53,17 +64,6 @@ public final class DBAdd extends DBUpdate {
       if(path.equals(addPath)) throw UPMULTDOC_X_X.get(info, data.meta.name, addPath);
     }
     newDocs.merge(add.newDocs);
-  }
-
-  @Override
-  public void prepare() throws QueryException {
-    size = newDocs.inputs.size();
-    newDocs.prepare(data.meta.name, false);
-  }
-
-  @Override
-  public void apply() throws QueryException {
-    newDocs.add(data);
   }
 
   @Override

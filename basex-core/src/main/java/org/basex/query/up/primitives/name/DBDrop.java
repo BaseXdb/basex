@@ -26,7 +26,8 @@ public final class DBDrop extends NameUpdate {
   }
 
   @Override
-  public void prepare() { }
+  public void prepare() {
+  }
 
   @Override
   public void apply() throws QueryException {
@@ -36,5 +37,7 @@ public final class DBDrop extends NameUpdate {
   }
 
   @Override
-  protected String operation() { return "dropped"; }
+  protected String operation() {
+    return "dropped";
+  }
 }

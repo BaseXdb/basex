@@ -28,6 +28,10 @@ public final class BackupCreate extends NameUpdate {
   }
 
   @Override
+  public void prepare() {
+  }
+
+  @Override
   public void apply() throws QueryException {
     try {
       CreateBackup.backup(name, qc.context.soptions, null);
@@ -37,8 +41,7 @@ public final class BackupCreate extends NameUpdate {
   }
 
   @Override
-  public void prepare() { }
-
-  @Override
-  public String operation() { return "backed up"; }
+  public String operation() {
+    return "backed up";
+  }
 }

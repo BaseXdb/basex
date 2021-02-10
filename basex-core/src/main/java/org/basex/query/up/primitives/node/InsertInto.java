@@ -39,5 +39,6 @@ public class InsertInto extends NodeCopy {
   }
 
   @Override
-  public final void update(final NamePool pool) { }
+  public final void update(final NamePool pool) {
+  }
 }

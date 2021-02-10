@@ -66,6 +66,8 @@ public final class UserCreate extends UserFn {
     }
 
     @Override
-    public String operation() { return "created"; }
+    public String operation() {
+      return "created";
+    }
   }
 }

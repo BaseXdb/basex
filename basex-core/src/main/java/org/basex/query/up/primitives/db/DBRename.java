@@ -35,12 +35,7 @@ public final class DBRename extends DBUpdate {
   }
 
   @Override
-  public void merge(final Update update) throws QueryException {
-    for(final Entry<String, String> e : ((DBRename) update).map.entrySet()) {
-      final String src = e.getKey();
-      if(map.containsKey(src)) throw UPPATHREN_X.get(info, src);
-      map.put(src, e.getValue());
-    }
+  public void prepare() {
   }
 
   @Override
@@ -59,10 +54,16 @@ public final class DBRename extends DBUpdate {
   }
 
   @Override
-  public int size() {
-    return map.size();
+  public void merge(final Update update) throws QueryException {
+    for(final Entry<String, String> e : ((DBRename) update).map.entrySet()) {
+      final String src = e.getKey();
+      if(map.containsKey(src)) throw UPPATHREN_X.get(info, src);
+      map.put(src, e.getValue());
+    }
   }
 
   @Override
-  public void prepare() { }
+  public int size() {
+    return map.size();
+  }
 }

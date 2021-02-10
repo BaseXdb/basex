@@ -29,7 +29,8 @@ public final class DBFlush extends DBUpdate {
   }
 
   @Override
-  public void merge(final Update update) { }
+  public void prepare() {
+  }
 
   @Override
   public void apply() {
@@ -37,10 +38,11 @@ public final class DBFlush extends DBUpdate {
   }
 
   @Override
-  public int size() {
-    return 1;
+  public void merge(final Update update) {
   }
 
   @Override
-  public void prepare() { }
+  public int size() {
+    return 1;
+  }
 }

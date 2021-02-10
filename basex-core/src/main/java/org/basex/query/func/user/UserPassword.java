@@ -44,6 +44,8 @@ public final class UserPassword extends UserFn {
     }
 
     @Override
-    public String operation() { return "altered"; }
+    public String operation() {
+      return "altered";
+    }
   }
 }

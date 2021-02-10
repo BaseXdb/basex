@@ -49,6 +49,10 @@ public final class Put extends DBUpdate {
   }
 
   @Override
+  public void prepare() {
+  }
+
+  @Override
   public void apply() throws QueryException {
     final int pre = data.pre(id);
     if(pre == -1) return;
@@ -82,7 +86,4 @@ public final class Put extends DBUpdate {
   public String toString() {
     return Util.className(this) + '[' + id + ", " + paths.get(0) + ']';
   }
-
-  @Override
-  public void prepare() { }
 }
