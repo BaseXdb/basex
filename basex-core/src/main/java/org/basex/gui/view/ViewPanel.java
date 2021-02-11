@@ -9,7 +9,7 @@ import org.basex.util.options.*;
 /**
  * This class contains a view and a {@link ViewMover} on top.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 final class ViewPanel extends BaseXBack implements ViewComponent {

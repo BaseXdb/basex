@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
  * This class assembles methods and variables that are used by more than one
  * formatter class.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 abstract class FormatUtil {

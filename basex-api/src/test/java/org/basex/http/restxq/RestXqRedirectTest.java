@@ -5,7 +5,7 @@ import org.junit.jupiter.api.*;
 /**
  * This test contains RESTXQ redirections.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class RestXqRedirectTest extends RestXqTest {

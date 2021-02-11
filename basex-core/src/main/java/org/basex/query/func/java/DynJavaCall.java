@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Dynamic invocation of a Java constructor, field or method.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 abstract class DynJavaCall extends JavaCall {

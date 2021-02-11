@@ -3,7 +3,7 @@ package org.basex.gui.view.map;
 /**
  * SplitLayout algorithm.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Joerg Hauser
  */
 final class SplitAlgo extends MapAlgo {

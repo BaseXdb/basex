@@ -13,7 +13,7 @@ import org.basex.util.*;
  * Evaluates the 'check' command: opens an existing database or
  * creates a new one.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class Check extends Command {

@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Checks query rewritings.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class RewritingsTest extends QueryPlanTest {

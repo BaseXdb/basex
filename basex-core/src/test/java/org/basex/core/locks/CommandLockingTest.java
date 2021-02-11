@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests commands and XQueries for correct identification of databases to lock.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Jens Erat
  */
 public final class CommandLockingTest extends SandboxTest {

@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
 /**
  * Element constructor.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class CElem extends CName {

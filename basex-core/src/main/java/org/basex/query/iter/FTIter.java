@@ -6,7 +6,7 @@ import org.basex.query.value.node.*;
 /**
  * Node iterator interface.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Sebastian Gath
  */
 public abstract class FTIter extends Iter {

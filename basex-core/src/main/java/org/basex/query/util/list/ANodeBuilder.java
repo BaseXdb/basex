@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * Resizable-array implementation for nodes. The stored nodes will be sorted and duplicates will
  * before removed before they are returned as value or via an iterator.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {

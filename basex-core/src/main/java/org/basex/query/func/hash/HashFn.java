@@ -15,7 +15,7 @@ import org.basex.util.Util;
 /**
  * Hashing function.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 abstract class HashFn extends StandardFunc {

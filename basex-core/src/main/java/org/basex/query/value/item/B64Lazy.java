@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Lazy base64 item ({@code xs:base64Binary}).
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class B64Lazy extends B64 implements Lazy {

@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * An array containing more elements than fit into a {@link SmallArray}.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Leo Woerteler
  */
 final class BigArray extends XQArray {

@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Job class. This abstract class is implemented by all command and query instances.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public abstract class Job {

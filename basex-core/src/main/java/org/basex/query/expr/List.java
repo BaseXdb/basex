@@ -21,7 +21,7 @@ import org.basex.util.list.*;
 /**
  * List of expressions that have been separated by commas.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class List extends Arr {

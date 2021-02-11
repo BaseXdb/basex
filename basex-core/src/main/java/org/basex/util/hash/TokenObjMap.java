@@ -9,7 +9,7 @@ import org.basex.util.*;
  * This is an efficient and memory-saving hash map for storing tokens and objects.
  * {@link TokenSet hash set}.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  * @param <E> generic value type
  */

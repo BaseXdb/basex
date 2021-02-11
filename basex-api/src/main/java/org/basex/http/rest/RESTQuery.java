@@ -11,7 +11,7 @@ import org.basex.query.value.type.*;
 /**
  * Evaluate queries via REST.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 class RESTQuery extends RESTCmd {

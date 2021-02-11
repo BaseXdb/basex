@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * A small sequence that is represented as a single Java array.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Leo Woerteler
  */
 public final class SmallSeq extends TreeSeq {

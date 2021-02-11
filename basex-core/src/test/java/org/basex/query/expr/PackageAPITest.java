@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests the EXPath package API.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Rositsa Shadura
  */
 public final class PackageAPITest extends SandboxTest {

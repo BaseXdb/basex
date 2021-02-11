@@ -8,7 +8,7 @@ import org.junit.jupiter.api.*;
  * This class performs a client/server memory stress tests with a specified number of threads and
  * queries.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class ServerMemTest extends SandboxTest {

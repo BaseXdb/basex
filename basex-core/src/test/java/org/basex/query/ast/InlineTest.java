@@ -13,7 +13,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests for inlining.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Leo Woerteler
  */
 public final class InlineTest extends QueryPlanTest {

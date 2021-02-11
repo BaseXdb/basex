@@ -12,7 +12,7 @@ import org.basex.util.hash.*;
 /**
  * Simple map expression: iterative evaluation with two operands (the last one yielding items).
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class DualMap extends SimpleMap {

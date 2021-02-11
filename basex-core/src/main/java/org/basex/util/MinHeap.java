@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * A min-heap.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Leo Woerteler
  * @param <K> key type
  * @param <V> value type

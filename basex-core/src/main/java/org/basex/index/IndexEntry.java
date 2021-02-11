@@ -3,7 +3,7 @@ package org.basex.index;
 /**
  * This class represents a single index entry.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Dimitar Popov
  */
 public final class IndexEntry {

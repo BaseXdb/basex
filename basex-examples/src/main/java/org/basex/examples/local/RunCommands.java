@@ -8,7 +8,7 @@ import org.basex.core.cmd.*;
  * It then shows how to add indexes to the database and retrieve
  * some information on the database structures.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  */
 public final class RunCommands {
   /**

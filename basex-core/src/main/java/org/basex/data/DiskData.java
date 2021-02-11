@@ -47,7 +47,7 @@ import org.basex.util.*;
  *   - NOT COMPRESSED: return external text unchanged
  * </pre>
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */

@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 /**
  * Simple map expression: item-based evaluation, no positional access.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class ItemMap extends SimpleMap {

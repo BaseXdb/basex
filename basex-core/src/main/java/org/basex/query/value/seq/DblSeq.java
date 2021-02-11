@@ -11,7 +11,7 @@ import org.basex.util.list.*;
 /**
  * Sequence of items of type {@link Int xs:double}, containing at least two of them.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class DblSeq extends NativeSeq {

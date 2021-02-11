@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 /**
  * This class tests the {@link MainOptions#UPDINDEX} and {@link MainOptions#AUTOOPTIMIZE} options.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class IndexTest extends SandboxTest {

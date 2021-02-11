@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * A parser for XSD regular expressions.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")

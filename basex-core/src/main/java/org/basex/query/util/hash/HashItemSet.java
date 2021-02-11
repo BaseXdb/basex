@@ -10,7 +10,7 @@ import org.basex.util.hash.*;
 /**
  * This is an efficient and memory-saving hash map for storing items.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class HashItemSet extends ASet implements ItemSet {

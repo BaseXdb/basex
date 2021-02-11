@@ -5,7 +5,7 @@ import org.basex.query.func.fn.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class UpdateForEachPair extends FnForEachPair {

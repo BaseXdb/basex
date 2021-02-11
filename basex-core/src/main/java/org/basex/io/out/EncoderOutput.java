@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * This class is a wrapper for outputting texts with specific encodings.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class EncoderOutput extends PrintOutput {

@@ -10,7 +10,7 @@ import org.basex.query.value.item.*;
 /**
  * This class assembles texts which are used in the Web classes.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public interface WebText {

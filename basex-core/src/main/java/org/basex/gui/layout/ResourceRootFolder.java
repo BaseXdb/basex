@@ -7,7 +7,7 @@ import org.basex.core.*;
  * the name of the database and has basically an artificial path ('/')
  * which leads to problems if treated like an ordinary folder node.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Lukas Kircher
  */
 public final class ResourceRootFolder extends ResourceFolder {

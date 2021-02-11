@@ -28,7 +28,7 @@ import org.basex.util.similarity.*;
  * If an instance of this class contains no pre-defined options, assigned options will
  * be added as free options.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public class Options implements Iterable<Option<?>> {

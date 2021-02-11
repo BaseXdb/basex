@@ -19,7 +19,7 @@ import org.basex.util.*;
 /**
  * This class defines syntax highlighting for XQuery files.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 final class SyntaxXQuery extends Syntax {

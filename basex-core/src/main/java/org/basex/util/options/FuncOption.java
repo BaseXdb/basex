@@ -5,7 +5,7 @@ import org.basex.query.value.item.*;
 /**
  * Option containing a boolean value.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class FuncOption extends Option<FItem> {

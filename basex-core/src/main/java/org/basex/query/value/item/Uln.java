@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Unsigned long ({@code xs:unsignedLong}).
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class Uln extends ANum {

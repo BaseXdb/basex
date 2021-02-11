@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Implementation of common stemmer methods.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Dimitar Popov
  */
 public abstract class Stemmer extends LanguageImpl {

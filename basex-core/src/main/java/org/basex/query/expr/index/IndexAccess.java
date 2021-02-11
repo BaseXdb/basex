@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * This abstract class retrieves values from an index.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public abstract class IndexAccess extends Simple {

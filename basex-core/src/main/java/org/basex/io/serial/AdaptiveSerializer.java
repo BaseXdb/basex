@@ -19,7 +19,7 @@ import org.basex.util.*;
 /**
  * This class serializes items in adaptive mode.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public class AdaptiveSerializer extends OutputSerializer {

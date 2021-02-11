@@ -32,7 +32,7 @@ import org.basex.util.options.Options.*;
 /**
  * HTTP Client.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Rositsa Shadura
  * @author Michael Seiferle
  */

@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * Dynamic invocation of a Java field or method.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 final class DynJavaFunc extends DynJavaCall {

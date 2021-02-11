@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests the functions of the Admin Module.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class AdminModuleTest extends SandboxTest {

@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Static invocation of a function in an imported Java class instance.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class StaticJavaCall extends JavaCall {

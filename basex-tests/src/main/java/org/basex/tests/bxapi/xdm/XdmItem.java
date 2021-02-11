@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Wrapper for representing XQuery items.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public abstract class XdmItem extends XdmValue {

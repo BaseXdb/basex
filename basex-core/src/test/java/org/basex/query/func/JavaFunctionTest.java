@@ -8,7 +8,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the Java bindings.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Leo Woerteler
  */
 public final class JavaFunctionTest extends SandboxTest {

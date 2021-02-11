@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This is an abstract class for storing objects of any kind in an array-based list.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  * @param <E> generic object type
  * @param <L> generic object type

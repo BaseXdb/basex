@@ -6,7 +6,7 @@ import org.basex.api.client.*;
 /**
  * This class demonstrates query execution via the client/server architecture.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  */
 public final class ServerQueries {
   /**

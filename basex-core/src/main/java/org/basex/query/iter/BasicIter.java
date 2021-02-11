@@ -11,7 +11,7 @@ import org.basex.util.*;
  * This class also implements the {@link Iterable} interface. Hence, all values can also be
  * retrieved via an enhanced for-loop. Using {@link #next()} is faster.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  * @param <I> generic item type
  */

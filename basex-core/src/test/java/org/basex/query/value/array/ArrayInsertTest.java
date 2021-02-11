@@ -12,7 +12,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests for {@link XQArray#insertBefore(long, Value, QueryContext)}.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Leo Woerteler
  */
 public final class ArrayInsertTest extends ArrayTest {

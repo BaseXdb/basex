@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests transaction and locking cases.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Andreas Weiler
  */
 public final class PoolTest extends SandboxTest {

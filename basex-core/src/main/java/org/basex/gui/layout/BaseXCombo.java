@@ -17,7 +17,7 @@ import org.basex.util.options.*;
 /**
  * Project specific ComboBox implementation.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public class BaseXCombo extends JComboBox<Object> {
@@ -326,7 +326,7 @@ public class BaseXCombo extends JComboBox<Object> {
   /**
    * Combo box editor.
    *
-   * @author BaseX Team 2005-20, BSD License
+   * @author BaseX Team 2005-21, BSD License
    * @author Christian Gruen
    */
   private static final class BaseXEditor implements ComboBoxEditor {

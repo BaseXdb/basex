@@ -3,7 +3,7 @@ package org.basex.gui.listener;
 /**
  * Listener interface for handling link events.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public interface LinkListener {

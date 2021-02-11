@@ -12,7 +12,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests the command-line arguments of the client starter class.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class BaseXClientTest extends BaseXTest {

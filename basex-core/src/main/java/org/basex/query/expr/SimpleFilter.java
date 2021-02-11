@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 /**
  * Simple filter expression with one deterministic predicate.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 final class SimpleFilter extends CachedFilter {

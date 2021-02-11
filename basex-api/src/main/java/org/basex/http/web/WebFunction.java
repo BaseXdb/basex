@@ -20,7 +20,7 @@ import org.basex.util.*;
 /**
  * This abstract class defines common methods of Web functions.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Johannes Finckh
  */
 public abstract class WebFunction implements Comparable<WebFunction> {

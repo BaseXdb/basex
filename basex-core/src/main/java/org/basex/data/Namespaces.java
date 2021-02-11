@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * This class organizes the namespaces of a database.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class Namespaces {

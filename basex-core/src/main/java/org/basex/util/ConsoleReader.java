@@ -12,7 +12,7 @@ import org.basex.io.*;
 /**
  * Console reader.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Dimitar Popov
  */
 public abstract class ConsoleReader implements AutoCloseable, PasswordReader {

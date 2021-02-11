@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * Iterative expression for paths that return nodes in distinct document order.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class IterPath extends AxisPath {

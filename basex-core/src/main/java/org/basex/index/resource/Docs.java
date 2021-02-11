@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * in some cases (e.g. when bulk insertions of new documents are performed). A tree structure could
  * be introduced to offer better general performance.</p>
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  * @author Lukas Kircher
  */

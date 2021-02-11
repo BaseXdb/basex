@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests queries on collections.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Michael Seiferle
  */
 public final class CollectionPathTest extends SandboxTest {

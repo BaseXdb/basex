@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * <p>This class builds a main-memory index for attribute values and text contents.</p>
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public class MemValuesBuilder extends ValuesBuilder {

@@ -11,7 +11,7 @@ import org.basex.query.value.seq.*;
 /**
  * Adds default paint operations to the tree map.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 final class MapPainter {

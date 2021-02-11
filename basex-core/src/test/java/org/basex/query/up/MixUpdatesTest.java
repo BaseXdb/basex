@@ -10,7 +10,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests for the {@link MainOptions#MIXUPDATES} flag.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class MixUpdatesTest extends SandboxTest {

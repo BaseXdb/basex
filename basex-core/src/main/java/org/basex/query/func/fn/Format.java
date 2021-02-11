@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * Formatting functions.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 abstract class Format extends StandardFunc {

@@ -22,7 +22,7 @@ import org.basex.util.list.*;
  * This class provides access to attribute values and text contents stored on disk.
  * The data structure is described in the {@link DiskValuesBuilder} class.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public class DiskValues extends ValueIndex {

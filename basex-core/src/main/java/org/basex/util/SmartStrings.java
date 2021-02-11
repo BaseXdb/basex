@@ -4,7 +4,7 @@ package org.basex.util;
  * This class provides convenience operations for smart string comparisons.
  * If query strings and character are lower case, search will be case insensitive.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class SmartStrings {

@@ -23,7 +23,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class contains common methods for the HTTP services.
  *
- * @author BaseX Team 2005-20, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public abstract class HTTPTest extends SandboxTest {
