@@ -155,11 +155,11 @@ public final class StaticOptions extends Options {
   }
 
   /**
-   * Creates a random database directory and returns its name.
+   * Creates a temporary database directory and returns its name.
    * @param name name of the original database
    * @return name of random database
    */
-  public String createRandomDb(final String name) {
+  public String createTempDb(final String name) {
     String db;
     int c = 0;
     do {

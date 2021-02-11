@@ -90,7 +90,7 @@ public final class DBNew {
           final Context ctx = qc.context;
           final MainOptions mopts = ctx.options;
           final StaticOptions sopts = ctx.soptions;
-          final String dbname = cache ? sopts.createRandomDb(name) : name;
+          final String dbname = cache ? sopts.createTempDb(name) : name;
           data = cache ? CreateDB.create(dbname, Parser.emptyParser(mopts), ctx, mopts) :
             new MemData(mopts);
           data.startUpdate(mopts);
@@ -178,7 +178,7 @@ public final class DBNew {
 
     // create temporary database on disk if requested, or if binary data needs to be written
     final Builder builder;
-    final String dbname = cache ? sopts.createRandomDb(name) : name;
+    final String dbname = cache ? sopts.createTempDb(name) : name;
     if(cache) {
       builder = new DiskBuilder(dbname, parser, sopts, mopts);
     } else {
