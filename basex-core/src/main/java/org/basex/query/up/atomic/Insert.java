@@ -55,10 +55,10 @@ final class Insert extends StructuralUpdate {
   }
 
   @Override
-  public BasicUpdate merge(final Data data, final BasicUpdate bu) {
-    if(bu instanceof Delete && parent == bu.parent && location == bu.location &&
-        data.kind(bu.location) != Data.ATTR) {
-      final Delete del = (Delete) bu;
+  public BasicUpdate merge(final Data data, final BasicUpdate update) {
+    if(update instanceof Delete && parent == update.parent && location == update.location &&
+        data.kind(update.location) != Data.ATTR) {
+      final Delete del = (Delete) update;
       return new Replace(location, shifts + del.shifts,
           del.accumulatedShifts, del.preOfAffectedNode, clip, parent);
     }

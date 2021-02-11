@@ -120,7 +120,7 @@ final class Replace extends StructuralUpdate {
         }
       }
     }
-    for(final BasicUpdate bu : valueUpdates) bu.apply(data);
+    for(final BasicUpdate update : valueUpdates) update.apply(data);
     return true;
   }
 

@@ -50,10 +50,10 @@ final class Delete extends StructuralUpdate {
   }
 
   @Override
-  public BasicUpdate merge(final Data data, final BasicUpdate bu) {
-    if(bu instanceof Insert && parent == bu.parent && location - shifts == bu.location &&
-        data.kind(location) != Data.ATTR) {
-      final Insert ins = (Insert) bu;
+  public BasicUpdate merge(final Data data, final BasicUpdate update) {
+    if(update instanceof Insert && parent == update.parent &&
+        location - shifts == update.location && data.kind(location) != Data.ATTR) {
+      final Insert ins = (Insert) update;
       return new Replace(location, shifts + ins.shifts,
           ins.accumulatedShifts, preOfAffectedNode, ins.clip, parent);
     }

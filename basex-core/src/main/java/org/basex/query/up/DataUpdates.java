@@ -94,11 +94,11 @@ final class DataUpdates {
 
   /**
    * Checks updates for violations. If a violation is found, the complete update process is aborted.
-   * @param tmp temporary mem data
+   * @param memData temporary data instance
    * @param qc query context
    * @throws QueryException query exception
    */
-  void prepare(final MemData tmp, final QueryContext qc) throws QueryException {
+  void prepare(final MemData memData, final QueryContext qc) throws QueryException {
     // Prepare/check database operations
     for(final DBUpdate update : dbUpdates) update.prepare();
 
@@ -110,7 +110,7 @@ final class DataUpdates {
 
     for(int i = 0; i < sz; ++i) {
       final NodeUpdates updates = nodeUpdates.get(nodes.get(i));
-      for(final NodeUpdate update : updates.updates) update.prepare(tmp, qc);
+      for(final NodeUpdate update : updates.updates) update.prepare(memData, qc);
     }
 
     // check attribute duplicates

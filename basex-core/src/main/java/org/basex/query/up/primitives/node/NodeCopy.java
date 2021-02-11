@@ -38,15 +38,15 @@ abstract class NodeCopy extends NodeUpdate {
   }
 
   @Override
-  public final void prepare(final MemData tmp, final QueryContext qc) {
+  public final void prepare(final MemData memData, final QueryContext qc) {
     // merge texts. after that, text nodes still need to be merged,
     // as two adjacent iterators may lead to two adjacent text nodes
     final ANodeList list = mergeNodeCacheText(nodes);
     nodes = null;
     // build main memory representation of nodes to be copied
-    final int start = tmp.meta.size;
-    new DataBuilder(tmp, qc).build(list);
-    insseq = new DataClip(tmp, start, tmp.meta.size, list.size());
+    final int start = memData.meta.size;
+    new DataBuilder(memData, qc).build(list);
+    insseq = new DataClip(memData, start, memData.meta.size, list.size());
   }
 
   /**

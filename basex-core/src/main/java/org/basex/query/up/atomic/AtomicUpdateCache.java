@@ -47,9 +47,9 @@ import org.basex.util.hash.*;
  */
 public final class AtomicUpdateCache {
   /** List of structural updates (nodes are inserted to / deleted from the table. */
-  private final List<StructuralUpdate> struct = new ArrayList<>(1);
+  private final List<StructuralUpdate> structUpdates = new ArrayList<>(1);
   /** Value / non-structural updates like rename. */
-  private final List<BasicUpdate> val = new ArrayList<>(1);
+  private final List<BasicUpdate> valueUpdates = new ArrayList<>(1);
   /** Most recently added update buffer. Used to merge/discard updates and to detect
    * inconsistencies on-the-fly eliminating the need to traverse all updates. */
   private BasicUpdate recent;
@@ -118,8 +118,8 @@ public final class AtomicUpdateCache {
    * Resets the list.
    */
   public void clear() {
-    struct.clear();
-    val.clear();
+    structUpdates.clear();
+    valueUpdates.clear();
     recent = null;
     recentStruct = null;
   }
@@ -133,8 +133,7 @@ public final class AtomicUpdateCache {
     // fill the one-atomic-update buffer
     if(recent == null) {
       recent = candidate;
-      if(recent instanceof StructuralUpdate)
-        recentStruct = candidate;
+      if(recent instanceof StructuralUpdate) recentStruct = candidate;
       return;
     }
 
@@ -160,20 +159,18 @@ public final class AtomicUpdateCache {
    * Adds the given update to the updates/buffer depending on the type and whether it's
    * been merged or not.
    *
-   * @param bu update
+   * @param update update
    * @param merged if true, the given update has been merged w/ the recent one
    */
-  private void add(final BasicUpdate bu, final boolean merged) {
-    if(bu == null) return;
+  private void add(final BasicUpdate update, final boolean merged) {
+    if(update == null) return;
 
     if(!merged) {
-      if(recent instanceof StructuralUpdate)
-        struct.add((StructuralUpdate) recent);
-      else val.add(recent);
+      if(recent instanceof StructuralUpdate) structUpdates.add((StructuralUpdate) recent);
+      else valueUpdates.add(recent);
     }
-    recent = bu;
-    if(bu instanceof StructuralUpdate)
-      recentStruct = bu;
+    recent = update;
+    if(update instanceof StructuralUpdate) recentStruct = update;
   }
 
   /**
@@ -193,7 +190,7 @@ public final class AtomicUpdateCache {
    */
   public int updatesSize() {
     flush();
-    return struct.size() + val.size();
+    return structUpdates.size() + valueUpdates.size();
   }
 
   /**
@@ -289,9 +286,9 @@ public final class AtomicUpdateCache {
     // check if previous update still in buffer
     flush();
     // value updates applied front-to-back, doens't matter as there are no row shifts
-    for(final BasicUpdate u : val) u.apply(data);
+    for(final BasicUpdate update : valueUpdates) update.apply(data);
     // structural updates are applied back-to-front
-    for(int i = struct.size() - 1; i >= 0; i--) struct.get(i).apply(data);
+    for(int i = structUpdates.size() - 1; i >= 0; i--) structUpdates.get(i).apply(data);
   }
 
   /**
@@ -306,7 +303,7 @@ public final class AtomicUpdateCache {
   private void adjustDistances() {
     // check if any distance has changed at all
     boolean shifts = false;
-    for(final StructuralUpdate update : struct) {
+    for(final StructuralUpdate update : structUpdates) {
       if(update.accumulatedShifts != 0) {
         shifts = true;
         break;
@@ -315,7 +312,7 @@ public final class AtomicUpdateCache {
     if(!shifts) return;
 
     final IntSet updatedNodes = new IntSet();
-    for(final StructuralUpdate update : struct) {
+    for(final StructuralUpdate update : structUpdates) {
       /* Update distance for the affected node and all following siblings of nodes
        * on the ancestor-or-self axis. */
       int pre = update.preOfAffectedNode + update.accumulatedShifts;
@@ -368,8 +365,8 @@ public final class AtomicUpdateCache {
     // given PRE not changed by updates
     if(i == -1) return pre;
     // refine the search to determine accumulated shifts for the given PRE
-    i = refine(struct, i, beforeUpdates);
-    final int acm = struct.get(i).accumulatedShifts;
+    i = refine(structUpdates, i, beforeUpdates);
+    final int acm = structUpdates.get(i).accumulatedShifts;
     return beforeUpdates ? pre - acm : pre + acm;
   }
 
@@ -387,20 +384,20 @@ public final class AtomicUpdateCache {
    */
   private int find(final int pre, final boolean beforeUpdates) {
     int left = 0;
-    int right = struct.size() - 1;
+    int right = structUpdates.size() - 1;
 
     while(left <= right) {
       if(left == right) {
-        if(c(struct, left, beforeUpdates) <= pre) return left;
+        if(recalculate(structUpdates, left, beforeUpdates) <= pre) return left;
         return -1;
       }
       if(right - left == 1) {
-        if(c(struct, right, beforeUpdates) <= pre) return right;
-        if(c(struct, left, beforeUpdates) <= pre) return left;
+        if(recalculate(structUpdates, right, beforeUpdates) <= pre) return right;
+        if(recalculate(structUpdates, left, beforeUpdates) <= pre) return left;
         return -1;
       }
       final int middle = left + right >>> 1;
-      final int value = c(struct, middle, beforeUpdates);
+      final int value = recalculate(structUpdates, middle, beforeUpdates);
       if(value == pre) return middle;
       else if(value > pre) right = middle - 1;
       else left = middle;
@@ -422,9 +419,9 @@ public final class AtomicUpdateCache {
   private static int refine(final List<StructuralUpdate> updates, final int index,
       final boolean beforeUpdates) {
     int u = index;
-    final int value = c(updates, u++, beforeUpdates);
+    final int value = recalculate(updates, u++, beforeUpdates);
     final int us = updates.size();
-    while(u < us && c(updates, u, beforeUpdates) == value) u++;
+    while(u < us && recalculate(updates, u, beforeUpdates) == value) u++;
     return u - 1;
   }
 
@@ -436,7 +433,7 @@ public final class AtomicUpdateCache {
    * @param beforeUpdates calculate PRE value before or after updates
    * @return PRE value
    */
-  private static int c(final List<StructuralUpdate> updates, final int index,
+  private static int recalculate(final List<StructuralUpdate> updates, final int index,
       final boolean beforeUpdates) {
     final StructuralUpdate u = updates.get(index);
     return u.preOfAffectedNode + (beforeUpdates ? u.accumulatedShifts : 0);
@@ -454,8 +451,8 @@ public final class AtomicUpdateCache {
     // keep track of the visited locations to avoid superfluous checks
     int smallestVisited = Integer.MAX_VALUE;
     // Text nodes have to be merged from the highest to the lowest pre value
-    for(int i = struct.size() - 1; i >= 0; i--) {
-      final StructuralUpdate u = struct.get(i);
+    for(int i = structUpdates.size() - 1; i >= 0; i--) {
+      final StructuralUpdate u = structUpdates.get(i);
       final DataClip insseq = u.getInsertionData();
       // calculate the new location of the update, here we have to check for adjacency
       final int newLocation = u.location + u.accumulatedShifts - u.shifts;
