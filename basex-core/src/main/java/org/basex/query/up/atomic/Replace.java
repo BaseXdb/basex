@@ -3,6 +3,7 @@ package org.basex.query.up.atomic;
 import static org.basex.util.Token.*;
 
 import java.util.*;
+import java.util.List;
 
 import org.basex.data.*;
 
@@ -46,21 +47,25 @@ final class Replace extends StructuralUpdate {
 
   @Override
   void apply(final Data data) {
-    if(data.nspaces.isEmpty() && clip.data.nspaces.isEmpty()) {
-      // Lazy Replace: rewrite to value updates if structure has not changed
-      if(lazyReplace(data)) return;
-      // Rapid Replace: in-place update, overwrite existing table entries
-      data.replace(location, clip);
-    } else {
-      // fallback: delete old entries, add new ones
-      final int kind = data.kind(location), par = data.parent(location, kind);
-      // delete first - otherwise insert must be at location+1
-      data.delete(location);
-      if(kind == Data.ATTR) {
-        data.insertAttr(location, par, clip);
+    try {
+      if(data.nspaces.isEmpty() && clip.data.nspaces.isEmpty()) {
+        // Lazy Replace: rewrite to value updates if structure has not changed
+        if(lazyReplace(data)) return;
+        // Rapid Replace: in-place update, overwrite existing table entries
+        data.replace(location, clip);
       } else {
-        data.insert(location, par, clip);
+        // fallback: delete old entries, add new ones
+        final int kind = data.kind(location), par = data.parent(location, kind);
+        // delete first - otherwise insert must be at location+1
+        data.delete(location);
+        if(kind == Data.ATTR) {
+          data.insertAttr(location, par, clip);
+        } else {
+          data.insert(location, par, clip);
+        }
       }
+    } finally {
+      clip.finish();
     }
   }
 

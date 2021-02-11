@@ -17,8 +17,10 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class ReplaceDoc extends NodeUpdate {
-  /** Container for new database documents. */
+  /** Container for new documents. */
   private final DBNew newDocs;
+  /** Data clip with generated input. */
+  private DataClip clip;
 
   /**
    * Constructor.
@@ -40,7 +42,7 @@ public final class ReplaceDoc extends NodeUpdate {
 
   @Override
   public void prepare(final MemData memData, final QueryContext qc) throws QueryException {
-    newDocs.prepare(data.meta.name, false);
+    clip = newDocs.prepare(data.meta.name, false);
   }
 
   @Override
@@ -55,7 +57,7 @@ public final class ReplaceDoc extends NodeUpdate {
 
   @Override
   public void addAtomics(final AtomicUpdateCache auc) {
-    auc.addReplace(pre, new DataClip(newDocs.data));
+    auc.addReplace(pre, clip);
   }
 
   @Override

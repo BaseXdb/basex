@@ -15,10 +15,12 @@ import org.basex.util.options.*;
  * @author Dimitar Popov
  */
 public final class DBAdd extends DBUpdate {
-  /** Container for new database documents. */
+  /** Container for new documents. */
   private final DBNew newDocs;
   /** Replace flag. */
   private final boolean replace;
+  /** Data clip with generated input. */
+  private DataClip clip;
   /** Size. */
   private int size;
 
@@ -45,12 +47,16 @@ public final class DBAdd extends DBUpdate {
   @Override
   public void prepare() throws QueryException {
     size = newDocs.inputs.size();
-    newDocs.prepare(data.meta.name, false);
+    clip = newDocs.prepare(data.meta.name, false);
   }
 
   @Override
   public void apply() throws QueryException {
-    newDocs.add(data);
+    try {
+      newDocs.addTo(data);
+    } finally {
+      clip.finish();
+    }
   }
 
   @Override

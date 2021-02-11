@@ -1177,12 +1177,12 @@ public final class UpdateTest extends SandboxTest {
         + ") return $c[1] is $c[2]", false);
   }
 
-  /** XQuery: Simple map, update checks. */
+  /** Simple map, update checks. */
   @Test public void gh1957() {
     query("declare %updating function local:f() { (1, 2) ! prof:void(.) }; local:f()", "");
   }
 
-  /** XQuery: Simple map, update checks. */
+  /** Simple map, update checks. */
   @Test public void gh1978() {
     createDB(null);
     set(MainOptions.ADDCACHE, true);
@@ -1261,5 +1261,12 @@ public final class UpdateTest extends SandboxTest {
     } finally {
       set(MainOptions.ADDCACHE, false);
     }
+  }
+
+  /** db:replace, ADDCACHE option. */
+  @Test public void gh1989() {
+    createDB("<a/>");
+    query("db:replace('" + NAME + "', 'Sandbox.xml', '" + DOC + "', map { 'addcache': true() })");
+    query("db:exists('" + NAME + ".0')", false);
   }
 }
