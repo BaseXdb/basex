@@ -111,13 +111,14 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Initializes the output. Sets the expected encoding and content type.
+   * Initializes the output and assigns the character encoding and content type.
    */
   public void initResponse() {
-    final SerializerOptions opts = sopts();
-    final String encoding = opts.get(SerializerOptions.ENCODING);
-    final MediaType mt = new MediaType(mediaType(opts) + "; " + CHARSET + '=' + encoding);
-    response.setCharacterEncoding(encoding);
+    final SerializerOptions sopts = sopts();
+    final MediaType mt = mediaType(sopts);
+    final HashMap<String, String> params = mt.parameters();
+    params.putIfAbsent(CHARSET, sopts.get(SerializerOptions.ENCODING));
+    response.setCharacterEncoding(params.get(CHARSET));
     response.setContentType(mt.toString());
   }
 
