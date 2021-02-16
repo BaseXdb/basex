@@ -90,10 +90,10 @@ final class RESTPost {
 
       // handle input
       String val = null;
-      try(QueryProcessor qp = new QueryProcessor("*/*:context/(*, text()[normalize-space()])",
-          ctx).context(doc)) {
+      try(QueryProcessor qp = new QueryProcessor("*/*:context/(*|text()[normalize-space()])", ctx).
+          context(doc)) {
         for(final Item item : qp.value()) {
-          if(val != null) throw HTTPCode.MULTIPLE_CONTEXT_X.get();
+          if(val != null) throw HTTPCode.MULTIPLE_CONTEXTS.get();
           // create main memory instance of the specified node
           val = DataBuilder.stripNS((ANode) item, REST_URI, ctx).serialize().toString();
         }

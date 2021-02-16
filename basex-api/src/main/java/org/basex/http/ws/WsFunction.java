@@ -1,6 +1,5 @@
 package org.basex.http.ws;
 
-import static org.basex.http.web.WebText.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
@@ -44,7 +43,7 @@ public final class WsFunction extends WebFunction {
     final boolean[] declared = new boolean[function.params.length];
     // counter for annotations that should occur only once
     boolean found = false;
-    int count = 0;
+    final AnnList starts = new AnnList();
 
     for(final Ann ann : function.anns) {
       final Annotation sig = ann.sig;
@@ -64,30 +63,20 @@ public final class WsFunction extends WebFunction {
         case _WS_CLOSE:
         case _WS_CONNECT:
           path = new WsPath(toString(args[0]));
-          count++;
+          starts.add(ann);
           break;
         case _WS_ERROR:
         case _WS_MESSAGE:
           final QNm msg = checkVariable(toString(args[1]), declared);
           message = new WebParam(msg, "message", null);
           path = new WsPath(toString(args[0]));
-          count++;
+          starts.add(ann);
           break;
         default:
           break;
       }
     }
-
-    if(found) {
-      if(count == 0) throw error(function.info, ANN_MISSING);
-      if(count > 1) throw error(function.info, ANN_CONFLICT);
-      final int dl = declared.length;
-      for(int d = 0; d < dl; d++) {
-        if(!declared[d]) throw error(function.info, VAR_UNDEFINED_X,
-            function.params[d].name.string());
-      }
-    }
-    return found;
+    return checkParsed(found, starts, declared);
   }
 
   /**
@@ -104,11 +93,11 @@ public final class WsFunction extends WebFunction {
     if(msg != null) values.put("message", msg instanceof byte[] ?
       B64.get((byte[]) msg) : Str.get((String) msg));
 
-    for(final WebParam rxp : headerParams) {
-      bind(rxp.var, args, values.get(rxp.name), qc);
+    for(final WebParam param : headerParams) {
+      bind(param.var, args, values.get(param.name), qc, "Value of \"" + param.name + '"');
     }
     if(message != null) {
-      bind(message.var, args, values.get(message.name), qc);
+      bind(message.var, args, values.get(message.name), qc, "Message");
     }
   }
 
@@ -138,7 +127,7 @@ public final class WsFunction extends WebFunction {
    */
   @Override
   public QueryException error(final String msg, final Object... ext) {
-    return error(function.info, Util.info(msg, ext));
+    return error(function.info, msg, ext);
   }
 
   // PRIVATE METHODS ==============================================================================

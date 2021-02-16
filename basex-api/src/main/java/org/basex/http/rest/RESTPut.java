@@ -32,13 +32,13 @@ final class RESTPut {
     // create new database or update resource
     final HTTPConnection conn = session.conn;
     final String db = conn.db();
-    if(db.isEmpty()) throw HTTPCode.NO_PATH.get();
+    if(db.isEmpty()) throw HTTPCode.NO_DATABASE_SPECIFIED.get();
 
     RESTCmd.parseOptions(session);
 
     final MainOptions options = conn.context.options;
     final InputStream is = conn.request.getInputStream();
-    final MediaType mt = conn.contentType();
+    final MediaType mt = conn.mediaType();
 
     // choose correct importer
     boolean xml = true;

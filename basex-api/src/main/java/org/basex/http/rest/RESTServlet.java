@@ -52,6 +52,6 @@ public final class RESTServlet extends BaseXServlet {
     if(mth.equals(HttpMethod.POST.name()))   return RESTPost.get(session);
     if(mth.equals(HttpMethod.PUT.name()))    return RESTPut.get(session);
     if(mth.equals(HttpMethod.DELETE.name())) return RESTDelete.get(session);
-    throw HTTPCode.NOT_IMPLEMENTED_X.get(session.conn.request.getMethod());
+    throw HTTPCode.METHOD_NOT_SUPPORTED_X.get(session.conn.request.getMethod());
   }
 }

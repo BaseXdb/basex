@@ -58,7 +58,7 @@ public final class RestXqServlet extends BaseXServlet {
         func = modules.restxq(conn, null);
         body = false;
       }
-      if(func == null) throw HTTPCode.NO_XQUERY.get();
+      if(func == null) throw HTTPCode.SERVICE_NOT_FOUND.get();
     }
 
     // create response

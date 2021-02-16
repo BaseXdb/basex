@@ -97,6 +97,7 @@ public final class RestXqFunction extends WebFunction {
     boolean found = false;
     final MainOptions options = ctx.options;
 
+    final AnnList starts = new AnnList();
     for(final Ann ann : function.anns) {
       final Annotation sig = ann.sig;
       if(sig == null) continue;
@@ -106,14 +107,17 @@ public final class RestXqFunction extends WebFunction {
       if(sig == _REST_PATH) {
         try {
           path = new RestXqPath(toString(args[0]), ann.info);
+          starts.add(ann);
         } catch(final IllegalArgumentException ex) {
           throw error(ann.info, ex.getMessage());
         }
         for(final QNm name : path.varNames()) {
-          checkVariable(name, AtomType.ANY_ATOMIC_TYPE, declared);
+          checkVariable(name, declared);
         }
       } else if(sig == _REST_ERROR) {
         error(ann);
+        // function can have multiple error annotations
+        if(!starts.contains(sig)) starts.add(ann);
       } else if(sig == _REST_CONSUMES) {
         strings(ann, consumes);
       } else if(sig == _REST_PRODUCES) {
@@ -164,6 +168,7 @@ public final class RestXqFunction extends WebFunction {
         final String p = args.length > 0 ? toString(args[0]) : "";
         final QNm v = args.length > 1 ? checkVariable(toString(args[1]), declared) : null;
         permission = new RestXqPerm(p, v);
+        starts.add(ann);
       }
     }
 
@@ -173,22 +178,10 @@ public final class RestXqFunction extends WebFunction {
       if(qf != null) {
         final double d = toDouble(token(qf));
         // NaN will be included if negated condition is used...
-        if(!(d >= 0 && d <= 1)) throw error(function.info, ERROR_QS_X, qf);
+        if(!(d >= 0 && d <= 1)) throw error(ERROR_QS_X, qf);
       }
     }
-
-    if(found) {
-      final int paths = (path != null ? 1 : 0) + (error != null ? 1 : 0) +
-          (permission != null ? 1 : 0);
-      if(paths != 1) throw error(function.info, paths == 0 ? ANN_MISSING : ANN_CONFLICT);
-
-      final int dl = declared.length;
-      for(int d = 0; d < dl; d++) {
-        if(declared[d]) continue;
-        throw error(function.info, VAR_UNDEFINED_X, function.params[d].name.string());
-      }
-    }
-    return found;
+    return checkParsed(found, starts, declared);
   }
 
   /**
@@ -209,19 +202,22 @@ public final class RestXqFunction extends WebFunction {
       for(final QNm qname : qnames) {
         final QNm qnm = new QNm(qname.string(), function.sc);
         if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
-        bind(qnm, args, new Atm(qnames.get(qname)), qc);
+        bind(qnm, args, new Atm(qnames.get(qname)), qc, "Path segment");
       }
     }
 
     // bind request body in the correct format
     final MainOptions mopts = conn.context.options;
     if(requestBody != null) {
+      final MediaType mt = conn.mediaType();
+      final IOContent payload = conn.requestCtx.payload();
+      final Value value;
       try {
-        final IOContent payload = conn.requestCtx.payload();
-        bind(requestBody, args, HttpPayload.value(payload, mopts, conn.contentType()), qc);
+        value = HttpPayload.value(payload, mopts, mt);
       } catch(final IOException ex) {
-        throw error(INPUT_CONV_X, ex);
+        throw error(BODY_TYPE_X_X, mt, ex);
       }
+      bind(requestBody, args, value, qc, "Request body");
     }
 
     // bind query and form parameters
@@ -266,7 +262,7 @@ public final class RestXqFunction extends WebFunction {
 
     // bind permission information
     if(ext instanceof RestXqFunction && permission.var != null) {
-      bind(permission.var, args, RestXqPerm.map((RestXqFunction) ext, conn), qc);
+      bind(permission.var, args, RestXqPerm.map((RestXqFunction) ext, conn), qc, "Error info");
     }
   }
 
@@ -367,12 +363,12 @@ public final class RestXqFunction extends WebFunction {
     // return true if no type is given
     if(consumes.isEmpty()) return true;
     // return true if no content type is specified by the user
-    final MediaType type = conn.contentType();
-    if(type.type().isEmpty()) return true;
+    final MediaType mt = conn.mediaType();
+    if(mt.type().isEmpty()) return true;
 
     // check if any combination matches
     for(final MediaType consume : consumes) {
-      if(consume.matches(type)) return true;
+      if(consume.matches(mt)) return true;
     }
     return false;
   }
@@ -396,16 +392,17 @@ public final class RestXqFunction extends WebFunction {
 
   /**
    * Binds the specified parameter to a variable.
-   * @param rxp parameter
+   * @param param parameter
    * @param args argument array
    * @param value values to be bound; the parameter's default value is assigned
    *        if the argument is {@code null} or empty
    * @param qc query context
    * @throws QueryException query exception
    */
-  private void bind(final WebParam rxp, final Expr[] args, final Value value,
+  private void bind(final WebParam param, final Expr[] args, final Value value,
       final QueryContext qc) throws QueryException {
-    bind(rxp.var, args, value == null || value.isEmpty() ? rxp.value : value, qc);
+    bind(param.var, args, value == null || value.isEmpty() ? param.value : value, qc,
+      "Value of \"" + param.name + '"');
   }
 
   /**

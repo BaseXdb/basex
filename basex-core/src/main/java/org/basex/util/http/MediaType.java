@@ -113,7 +113,7 @@ public final class MediaType {
 
   /**
    * Returns the media type, composed from the main and sub type.
-   * @return type
+   * @return type without parameters
    */
   public String type() {
     return sub.isEmpty() ? main : (main + '/' + sub);

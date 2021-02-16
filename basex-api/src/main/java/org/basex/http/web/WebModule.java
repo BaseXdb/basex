@@ -122,6 +122,6 @@ public final class WebModule {
       }
     }
     // not to be expected; can only happen if file has been swapped between caching and parsing
-    throw HTTPCode.NO_XQUERY.get();
+    throw HTTPCode.SERVICE_NOT_FOUND.get();
   }
 }

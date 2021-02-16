@@ -277,12 +277,12 @@ public final class WebModules {
 
   /**
    * Returns the quality factor of the specified media type.
-   * @param mt media type
+   * @param type media type
    * @param f quality factor string
    * @return quality factor
    */
-  private static double qf(final MediaType mt, final String f) {
-    final String qf = mt.parameters().get(f);
+  private static double qf(final MediaType type, final String f) {
+    final String qf = type.parameters().get(f);
     return qf != null ? toDouble(token(qf)) : 1;
   }
 
@@ -302,7 +302,7 @@ public final class WebModules {
       cache = modules;
     } else {
       // module cache needs to be updated
-      if(!path.exists()) throw HTTPCode.NO_RESTXQ.get();
+      if(!path.exists()) throw HTTPCode.NO_RESTXQ_DIRECTORY.get();
 
       cache = new HashMap<>();
       parse(ctx, path, cache, modules);

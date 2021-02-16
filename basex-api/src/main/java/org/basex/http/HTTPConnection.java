@@ -103,10 +103,10 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Returns the content type of a request, or an empty string.
+   * Returns the content type of a request as media type.
    * @return content type
    */
-  public MediaType contentType() {
+  public MediaType mediaType() {
     return mediaType(request);
   }
 
@@ -351,7 +351,7 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Returns the content type of a request, or an empty string.
+   * Returns the content type of a request as media type.
    * @param request servlet request
    * @return content type
    */

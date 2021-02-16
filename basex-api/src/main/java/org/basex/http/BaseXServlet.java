@@ -68,19 +68,23 @@ public abstract class BaseXServlet extends HttpServlet {
     } catch(final LoginException ex) {
       conn.error(SC_UNAUTHORIZED, Util.message(ex));
     } catch(final QueryException ex) {
-      final Value value = ex.value();
-      final int code = value instanceof ANum ? (int) ((ANum) value).itr() : SC_BAD_REQUEST;
-      final boolean rest = Token.eq(ex.qname().uri(), QueryText.REST_URI);
-      final String info = rest ? ex.getLocalizedMessage() : Util.message(ex);
-      conn.error(code, info);
+      int code = SC_INTERNAL_SERVER_ERROR;
+      boolean full = conn.context.soptions.get(StaticOptions.RESTXQERRORS);
+      if(ex.qname().eq(QNm.REST_ERROR)) {
+        final Value value = ex.value();
+        if(value instanceof ANum) code = (int) ((ANum) value).itr();
+        full = false;
+      }
+      conn.error(code, full ? Util.message(ex) : ex.getLocalizedMessage());
     } catch(final IOException ex) {
-      conn.error(SC_BAD_REQUEST, Util.message(ex));
+      final boolean full = conn.context.soptions.get(StaticOptions.RESTXQERRORS);
+      conn.error(SC_INTERNAL_SERVER_ERROR, full ? Util.message(ex) : ex.getLocalizedMessage());
     } catch(final JobException ex) {
       conn.stop(ex);
     } catch(final Exception ex) {
-      final String msg = Util.bug(ex);
-      Util.errln(msg);
-      conn.error(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED_X, msg));
+      final String message = Util.bug(ex);
+      Util.errln(message);
+      conn.error(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED_X, message));
     } finally {
       if(Prop.debug) {
         Util.errln("Request: " + request.getMethod() + ' ' + request.getRequestURL());

@@ -25,7 +25,7 @@ public enum QueryError {
   /** Error code. */
   BASEX_ANNOTATION2_X_X(BASEX, "annotation", "%: % supplied."),
   /** Error code. */
-  BASEX_ANNOTATION3_X_X(BASEX, "annotation", "Annotation %% was declared twice."),
+  BASEX_ANNOTATION3_X_X(BASEX, "annotation", "Annotation %% is declared twice."),
   /** Error code. */
   BASEX_ANNOTATION_X_X_X(BASEX, "annotation", "%: % expected, % found."),
   /** Error code. */
@@ -777,7 +777,7 @@ public enum QueryError {
   /** Error code. */
   NOTHES_X(FTST, 18, "Thesaurus not found: '%'."),
   /** Error code. */
-  FTDUP_X(FTST, 19, "Match option '%' was declared twice."),
+  FTDUP_X(FTST, 19, "Match option '%' is declared twice."),
 
   /** Error code. */
   SERATTR_X(SENR, 1, "Attributes cannot be serialized:%."),

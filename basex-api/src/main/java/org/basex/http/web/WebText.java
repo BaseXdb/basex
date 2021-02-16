@@ -56,7 +56,7 @@ public interface WebText {
   /** Error message. */
   String ANN_MISSING = "Path annotation missing.";
   /** Error message. */
-  String ANN_CONFLICT = "Conflicting path annotations found.";
+  String ANN_CONFLICT_X = "Conflicting annotations: %.";
   /** Error message. */
   String ANN_BODYVAR = "More than one body request variable specified.";
   /** Error message. */
@@ -76,13 +76,15 @@ public interface WebText {
   /** Error message. */
   String INV_NONS_X = "No namespace declared for '%'.";
   /** Error message. */
-  String INV_VARTYPE_X_X = "Variable $% must inherit from %.";
+  String ARG_TYPE_X_X_X = "% must be %, supplied: %.";
   /** Error message. */
-  String UNKNOWN_VAR_X = "Variable $% is not specified as argument.";
+  String PARAM_MISSING_X = "Parameter $% missing in function declaration.";
   /** Error message. */
-  String VAR_ASSIGNED_X = "Variable $% is specified more than once.";
+  String PARAM_DUPL_X = "$% is specified more than once.";
   /** Error message. */
-  String VAR_UNDEFINED_X = "Variable $% is not assigned by the annotations.";
+  String PARAM_TYPE_X_X = "Parameter $% must be of type %.";
+  /** Error message. */
+  String VAR_UNDEFINED_X = "No binding defined for $%.";
   /** Error message. */
   String UNKNOWN_SER_X = "Unknown serialization parameter: %.";
   /** Error message. */
@@ -92,11 +94,11 @@ public interface WebText {
   /** Error message. */
   String METHOD_VALUE_X = "Method % does not allow values.";
   /** Error message. */
-  String INPUT_CONV_X = "Input could not be converted: %";
+  String BODY_TYPE_X_X = "Request body must be of type \"%\", supplied: %";
   /** Error message. */
-  String PATH_CONFLICT_X_X = "Several functions found for path \"%\":%";
+  String PATH_CONFLICT_X_X = "Multiple services defined for path \"%\":%";
   /** Error message. */
-  String ERROR_CONFLICT_X_X = "Several functions found for error \"%\":%";
+  String ERROR_CONFLICT_X_X = "Multiple services defined for error \"%\":%";
   /** Error message. */
   String ERROR_QS_X = "Invalid quality factor: qs=%";
   /** Error message. */
