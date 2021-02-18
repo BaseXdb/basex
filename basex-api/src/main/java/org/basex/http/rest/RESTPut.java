@@ -42,7 +42,6 @@ final class RESTPut {
 
     // choose correct importer
     boolean xml = true;
-    final String ct = mt.type();
     if(mt.isJSON()) {
       final JsonParserOptions opts = new JsonParserOptions();
       opts.assign(mt);
@@ -63,7 +62,7 @@ final class RESTPut {
       opts.assign(mt);
       options.set(MainOptions.TEXTPARSER, opts);
       options.set(MainOptions.PARSER, MainParser.TEXT);
-    } else if(!ct.isEmpty() && !mt.isXML()) {
+    } else if(!mt.is(MediaType.ALL_ALL) && !mt.isXML()) {
       xml = false;
     }
 

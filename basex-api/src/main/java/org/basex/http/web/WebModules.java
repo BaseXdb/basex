@@ -110,17 +110,15 @@ public final class WebModules {
     List<RestXqFunction> funcs = find(conn, error, false);
     if(funcs.isEmpty()) return null;
 
-    // remove functions with different specifity
-    final RestXqFunction first = funcs.get(0);
-    for(int l = funcs.size() - 1; l > 0; l--) {
-      if(first.compareTo(funcs.get(l)) != 0) funcs.remove(l);
-    }
-    // return single function
-    if(funcs.size() == 1) return first;
-
+    // multiple functions: check specifity
+    if(funcs.size() > 1) bestSpec(funcs);
     // multiple functions: check quality factors
-    funcs = bestQf(funcs, conn);
-    if(funcs.size() == 1) return funcs.get(0);
+    if(funcs.size() > 1) bestQf(funcs, conn);
+    // multiple functions: check consume filter
+    if(funcs.size() > 1) bestConsume(funcs, conn);
+
+    final RestXqFunction first = funcs.get(0);
+    if(funcs.size() == 1) return first;
 
     // show error if we are left with multiple function candidates
     throw first.path == null ?
@@ -217,14 +215,42 @@ public final class WebModules {
   }
 
   /**
-   * Returns the functions with media type whose quality factors match best.
+   * Filters functions by their consume filters.
    * @param funcs list of functions
    * @param conn HTTP connection
-   * @return list of matching functions
    */
-  private static List<RestXqFunction> bestQf(final List<RestXqFunction> funcs,
-      final HTTPConnection conn) {
+  private static void bestConsume(final List<RestXqFunction> funcs, final HTTPConnection conn) {
+    // retrieve most specific consume types from all functions
+    final MediaType mt = conn.mediaType();
+    final ArrayList<MediaType> types = new ArrayList<>(funcs.size());
+    for(final RestXqFunction func : funcs) types.add(func.consumedType(mt));
+    // find most specific type
+    MediaType spec = null;
+    for(final MediaType type : types) {
+      if(spec == null || spec.compareTo(type) > 0) spec = type;
+    }
+    // drop functions with more generic types
+    for(int f = funcs.size() - 1; f >= 0; f--) {
+      if(!types.get(f).is(spec)) funcs.remove(f);
+    }
+  }
 
+  /**
+   * Filters functions by their specifity.
+   * @param funcs list of functions
+   */
+  private static void bestSpec(final List<RestXqFunction> funcs) {
+    for(int l = funcs.size() - 1; l > 0; l--) {
+      if(funcs.get(0).compareTo(funcs.get(l)) != 0) funcs.remove(l);
+    }
+  }
+
+  /**
+   * Filters functions by their quality factors.
+   * @param funcs list of functions
+   * @param conn HTTP connection
+   */
+  private static void bestQf(final List<RestXqFunction> funcs, final HTTPConnection conn) {
     // find highest matching quality factors
     final ArrayList<MediaType> accepts = conn.accepts();
     double cQf = 0, sQf = 0;
@@ -243,25 +269,22 @@ public final class WebModules {
         }
       }
     }
-
-    // find matching functions
-    final List<RestXqFunction> list = bestQf(funcs, accepts, cQf, -1);
-    return list.size() > 1 ? bestQf(funcs, accepts, cQf, sQf) : list;
+    bestQf(funcs, accepts, cQf, -1);
+    if(funcs.size() > 1) bestQf(funcs, accepts, cQf, sQf);
   }
 
   /**
-   * Returns the functions with media type whose quality factors match best.
+   * Filters functions by their quality factors.
    * @param funcs list of functions
    * @param accepts accept media types
    * @param clientQf client quality factor
    * @param serverQf server quality factor (ignore if {@code -1})
-   * @return list of matching functions
    */
-  private static List<RestXqFunction> bestQf(final List<RestXqFunction> funcs,
-      final ArrayList<MediaType> accepts, final double clientQf, final double serverQf) {
+  private static void bestQf(final List<RestXqFunction> funcs, final ArrayList<MediaType> accepts,
+      final double clientQf, final double serverQf) {
 
-    final ArrayList<RestXqFunction> list = new ArrayList<>();
-    for(final RestXqFunction func : funcs) {
+    for(int fl = funcs.size() - 1; fl >= 0; fl--) {
+      final RestXqFunction func = funcs.get(fl);
       final Checks<MediaType> check = accept -> {
         if(func.produces.isEmpty()) return qf(accept, "q") == clientQf;
 
@@ -270,9 +293,8 @@ public final class WebModules {
           (serverQf == -1 || qf(produce, "qs") == serverQf);
         return checkProduce.any(func.produces);
       };
-      if(check.any(accepts)) list.add(func);
+      if(!check.any(accepts)) funcs.remove(fl);
     }
-    return list;
   }
 
   /**

@@ -283,6 +283,19 @@ public final class RestXqFunction extends WebFunction {
     return path != null && path.matches(conn);
   }
 
+  /**
+   * Returns the most specific consume type for the specified type.
+   * @param type media type
+   * @return most specific type
+   */
+  public MediaType consumedType(final MediaType type) {
+    MediaType mt = null;
+    for(final MediaType consume : consumes) {
+      if(type.matches(consume) && (mt == null || mt.compareTo(consume) > 0)) mt = consume;
+    }
+    return mt == null ? MediaType.ALL_ALL : mt;
+  }
+
   @Override
   public QueryException error(final String msg, final Object... ext) {
     return error(function.info, msg, ext);
@@ -360,17 +373,13 @@ public final class RestXqFunction extends WebFunction {
    * @return result of check
    */
   private boolean consumes(final HTTPConnection conn) {
-    // return true if no type is given
-    if(consumes.isEmpty()) return true;
-    // return true if no content type is specified by the user
-    final MediaType mt = conn.mediaType();
-    if(mt.type().isEmpty()) return true;
-
     // check if any combination matches
+    final MediaType mt = conn.mediaType();
     for(final MediaType consume : consumes) {
-      if(consume.matches(mt)) return true;
+      if(mt.matches(consume)) return true;
     }
-    return false;
+    // return true if no type is given
+    return consumes.isEmpty();
   }
 
   /**

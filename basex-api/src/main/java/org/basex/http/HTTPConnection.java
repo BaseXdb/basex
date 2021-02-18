@@ -357,7 +357,7 @@ public final class HTTPConnection implements ClientInfo {
    */
   public static MediaType mediaType(final HttpServletRequest request) {
     final String ct = request.getContentType();
-    return new MediaType(ct == null ? "" : ct);
+    return ct == null ? MediaType.ALL_ALL : new MediaType(ct);
   }
 
   /**

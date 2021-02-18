@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class MediaType {
+public final class MediaType implements Comparable<MediaType> {
   /** Multipart type. */
   private static final String MULTIPART = "multipart";
   /** Text type. */
@@ -177,7 +177,7 @@ public final class MediaType {
   }
 
   /**
-   * Checks if the pattern is matching.
+   * Checks if the specified media type is contained in this media type.
    * @param pattern pattern
    * @return result of check
    */
@@ -192,6 +192,25 @@ public final class MediaType {
    */
   public boolean is(final MediaType type) {
     return main.equals(type.main) && sub.equals(type.sub);
+  }
+
+  @Override
+  public int compareTo(final MediaType type) {
+    final int cmp = compareTo(main, type.main);
+    return cmp == 0 ? compareTo(sub, type.sub) : cmp;
+  }
+
+  /**
+   * Compares the specified main or sub types.
+   * @param type1 first type
+   * @param type2 second type
+   * @return result of check
+   */
+  private static int compareTo(final String type1, final String type2) {
+    return type1.equals(type2) ? 0 :
+           type1.equals("*") ? 1 :
+           type2.equals("*") ? -1 :
+           type1.compareTo(type2);
   }
 
   @Override
