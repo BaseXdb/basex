@@ -6,6 +6,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import javax.net.ssl.*;
+
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.list.*;
@@ -175,6 +177,7 @@ public final class Util {
       msg = throwable.toString();
     if(throwable instanceof FileNotFoundException) return info(RES_NOT_FOUND_X, msg);
     if(throwable instanceof UnknownHostException) return info(UNKNOWN_HOST_X, msg);
+    if(throwable instanceof SSLException) return "SSL: " + msg;
 
     // chop long error messages. // example: doc("http://google.com/sdffds")
     if(throwable.getClass() == IOException.class && msg.length() > 200) {
