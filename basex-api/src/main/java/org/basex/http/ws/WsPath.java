@@ -13,7 +13,7 @@ public final class WsPath extends WebPath implements Comparable<WsPath> {
    * Constructor.
    * @param path WebSocket path
    */
-  public WsPath(final String path) {
+  WsPath(final String path) {
     super(path);
   }
 

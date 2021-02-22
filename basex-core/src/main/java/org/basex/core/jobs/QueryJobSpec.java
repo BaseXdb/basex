@@ -14,13 +14,13 @@ import org.basex.util.*;
  */
 public final class QueryJobSpec {
   /** Variable bindings. */
-  public final HashMap<String, Value> bindings;
+  final HashMap<String, Value> bindings;
   /** Options. */
-  public final JobsOptions options;
+  final JobsOptions options;
   /** Query. */
-  public final String query;
+  final String query;
   /** Simple query without URI. */
-  public final boolean simple;
+  final boolean simple;
 
   /**
    * Constructor.

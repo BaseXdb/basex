@@ -82,8 +82,6 @@ public interface WebText {
   /** Error message. */
   String PARAM_DUPL_X = "$% is specified more than once.";
   /** Error message. */
-  String PARAM_TYPE_X_X = "Parameter $% must be of type %.";
-  /** Error message. */
   String VAR_UNDEFINED_X = "No binding defined for $%.";
   /** Error message. */
   String UNKNOWN_SER_X = "Unknown serialization parameter: %.";

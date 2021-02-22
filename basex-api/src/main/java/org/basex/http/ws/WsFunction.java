@@ -26,7 +26,7 @@ public final class WsFunction extends WebFunction {
   /** Path of the function. */
   public WsPath path;
   /** Message parameter. */
-  public WebParam message;
+  private WebParam message;
 
   /**
    * Constructor.
@@ -87,7 +87,7 @@ public final class WsFunction extends WebFunction {
    * @param qc query context
    * @throws QueryException query exception
    */
-  public void bind(final Expr[] args, final Object msg, final Map<String, Value> values,
+  void bind(final Expr[] args, final Object msg, final Map<String, Value> values,
       final QueryContext qc) throws QueryException {
 
     if(msg != null) values.put("message", msg instanceof byte[] ?

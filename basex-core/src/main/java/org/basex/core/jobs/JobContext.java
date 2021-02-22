@@ -16,7 +16,7 @@ public final class JobContext {
   private static final QueryTracer ERRLN = info -> { Util.errln(info); return false; };
 
   /** Job prefix. */
-  public static final String PREFIX = "job";
+  static final String PREFIX = "job";
   /** Query id. */
   private static long jobId = -1;
 

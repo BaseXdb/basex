@@ -27,7 +27,7 @@ import org.basex.util.http.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class RestXqResponse extends WebResponse {
+final class RestXqResponse extends WebResponse {
   /** HTTP connection. */
   private final HTTPConnection conn;
 
@@ -42,7 +42,7 @@ public final class RestXqResponse extends WebResponse {
    * Constructor.
    * @param conn HTTP connection
    */
-  public RestXqResponse(final HTTPConnection conn) {
+  RestXqResponse(final HTTPConnection conn) {
     super(conn.context);
     this.conn = conn;
   }

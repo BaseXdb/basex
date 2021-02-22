@@ -34,7 +34,7 @@ public final class WsResponse extends WebResponse {
    * Constructor.
    * @param ws WebSocket instance
    */
-  public WsResponse(final WebSocket ws) {
+  WsResponse(final WebSocket ws) {
     super(ws.context);
     this.ws = ws;
   }

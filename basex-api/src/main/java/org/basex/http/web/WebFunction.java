@@ -28,7 +28,7 @@ import org.basex.util.list.*;
  */
 public abstract class WebFunction implements Comparable<WebFunction> {
   /** Single template pattern. */
-  protected static final Pattern TEMPLATE = Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*}\\s*");
+  private static final Pattern TEMPLATE = Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*}\\s*");
 
   /** Associated function. */
   public final StaticFunc function;

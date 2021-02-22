@@ -263,7 +263,7 @@ public final class SearchBar extends BaseXBack {
   /**
    * Searches text in the current editor.
    */
-  public void search() {
+  private void search() {
     final boolean sel = regex.isSelected();
     multi.setEnabled(sel);
     word.setEnabled(!sel);

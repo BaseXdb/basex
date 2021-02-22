@@ -50,7 +50,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * @param dialog dialog window
    * @param cmd progress reference
    */
-  public DialogProgress(final BaseXDialog dialog, final Command cmd) {
+  private DialogProgress(final BaseXDialog dialog, final Command cmd) {
     super(dialog, "");
     init(dialog, cmd);
   }

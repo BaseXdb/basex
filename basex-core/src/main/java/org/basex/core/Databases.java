@@ -14,9 +14,6 @@ import org.basex.util.list.*;
  * @author Jens Erat
  */
 public final class Databases {
-  /** Date pattern. */
-  public static final String DATE = "\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}";
-
   /** Allowed characters for database names (additional to letters and digits).
    * The following characters are invalid:
    * <ul>
@@ -27,6 +24,8 @@ public final class Databases {
    */
   public static final String DBCHARS = "-+=~!#$%^&()[]{}@'`";
 
+  /** Date pattern. */
+  private static final String DATE = "\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}";
   /** Regex representation of allowed database characters. */
   private static final String REGEXCHARS = DBCHARS.replaceAll("(.)", "\\\\$1");
   /** Pattern to extract the database name from a backup file name. */
@@ -58,7 +57,7 @@ public final class Databases {
    * @param pattern database pattern (may be {@code null})
    * @return database list
    */
-  public StringList listDBs(final String pattern) {
+  StringList listDBs(final String pattern) {
     return list(false, pattern);
   }
 
@@ -106,7 +105,7 @@ public final class Databases {
    * @param suffix regular expression suffix
    * @return regular expression or {@code null}
    */
-  public static Pattern regex(final String pattern, final String suffix) {
+  private static Pattern regex(final String pattern, final String suffix) {
     if(pattern == null) return null;
     final String nm = REGEX.matcher(pattern).matches() ? IOFile.regex(pattern) :
       pattern.replaceAll("([" + REGEXCHARS + "])", "\\\\$1") + suffix;

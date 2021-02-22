@@ -28,9 +28,9 @@ public final class BXCollection implements Collection {
   /** Database context. */
   final BXDatabase db;
   /** Database context. */
-  public final Context ctx;
+  final Context ctx;
   /** Database. */
-  public Data data;
+  Data data;
 
   /**
    * Constructor to create/open a collection.

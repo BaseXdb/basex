@@ -73,7 +73,7 @@ final class TextRenderer extends BaseXBack {
   /** Indicates if the cursor is located in the current line. */
   private boolean lineC;
   /** String rendering cache. */
-  final TokenBuilder stringCache = new TokenBuilder(4);
+  private final TokenBuilder stringCache = new TokenBuilder(4);
 
   /** Cursor position. */
   private final int[] cursor = new int[2];

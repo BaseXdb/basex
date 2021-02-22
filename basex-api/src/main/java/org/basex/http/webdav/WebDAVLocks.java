@@ -24,7 +24,7 @@ public final class WebDAVLocks {
    * Returns singleton instance.
    * @return locks
    */
-  public static WebDAVLocks get() {
+  static WebDAVLocks get() {
     synchronized(INSTANCE) {
       // remove expired entries before returning the object
       INSTANCE.locks.entrySet().removeIf(entry -> entry.getValue().token.isExpired());

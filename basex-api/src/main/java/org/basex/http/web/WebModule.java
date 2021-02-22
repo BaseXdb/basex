@@ -36,7 +36,7 @@ public final class WebModule {
    * Constructor.
    * @param file xquery file
    */
-  public WebModule(final IOFile file) {
+  WebModule(final IOFile file) {
     this.file = file;
   }
 
@@ -46,7 +46,7 @@ public final class WebModule {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public void parse(final Context ctx) throws QueryException, IOException {
+  void parse(final Context ctx) throws QueryException, IOException {
     final long ts = file.timeStamp();
     if(time == ts) return;
     time = ts;
@@ -85,7 +85,7 @@ public final class WebModule {
    * Returns all WebSocket functions.
    * @return functions
    */
-  public ArrayList<WsFunction> wsFunctions() {
+  ArrayList<WsFunction> wsFunctions() {
     return wsFunctions;
   }
 
@@ -95,7 +95,7 @@ public final class WebModule {
    * @return query context
    * @throws QueryException query exception
    */
-  public QueryContext qc(final Context ctx) throws QueryException {
+  QueryContext qc(final Context ctx) throws QueryException {
     final QueryContext qc = new QueryContext(ctx);
     try {
       qc.parse(string(file.read()), file.path());
@@ -113,7 +113,7 @@ public final class WebModule {
    * @return function or {@code null}
    * @throws HTTPException HTTP exception
    */
-  public static StaticFunc get(final StaticFunc func, final QueryContext qc) throws HTTPException {
+  static StaticFunc get(final StaticFunc func, final QueryContext qc) throws HTTPException {
     for(final StaticFunc sf : qc.funcs.funcs()) {
       if(func.info.equals(sf.info)) {
         // inline arguments of called function

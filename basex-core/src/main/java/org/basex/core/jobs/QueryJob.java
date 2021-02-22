@@ -163,7 +163,7 @@ public final class QueryJob extends Job implements Runnable {
   /**
    * Removes the job from the task list as soon as it has been activated.
    */
-  public void remove() {
+  void remove() {
     remove = true;
   }
 

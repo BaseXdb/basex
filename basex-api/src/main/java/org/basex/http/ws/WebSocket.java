@@ -50,7 +50,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
    * Constructor.
    * @param request request
    */
-  WebSocket(final HttpServletRequest request) {
+  private WebSocket(final HttpServletRequest request) {
     this.request = request;
 
     final String pi = request.getPathInfo();
