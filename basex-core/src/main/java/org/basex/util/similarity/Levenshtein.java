@@ -5,8 +5,6 @@ import static org.basex.util.Token.*;
 
 import java.util.function.*;
 
-import org.basex.util.list.*;
-
 /**
  * <p>Damerau-Levenshtein algorithm. Based on the publications from Levenshtein (1965):
  * "Binary codes capable of correcting spurious insertions and deletions of ones", and
@@ -40,65 +38,85 @@ public final class Levenshtein {
   }
 
   /**
-   * Returns the first similar entry.
+   * Returns the most similar entry.
    * @param token token to be compared
-   * @param tokens tokens to be compared
-   * @return similar token or {@code null}
+   * @param objects objects to be compared
+   * @return most similar token or {@code null}
    */
-  public static byte[] similar(final byte[] token, final Consumer<TokenList> tokens) {
-    final TokenList list = new TokenList();
-    tokens.accept(list);
-
-    final Levenshtein ls = new Levenshtein();
-    final byte[] t = lc(token);
-    for(final byte[] sub : list) {
-      if(ls.similar(t, lc(sub))) return sub;
-    }
-    return null;
+  public static Object similar(final byte[] token, final Object[] objects) {
+    return similar(token, objects, Function.identity());
   }
 
   /**
-   * Compares two character arrays for similarity.
+   * Returns the most similar entry.
    * @param token token to be compared
-   * @param sub second token to be compared
+   * @param objects objects to be compared
+   * @param prepare function for preparing the object to be compared for the comparison
+   * @return most similar token or {@code null}
+   */
+  public static Object similar(final byte[] token, final Object[] objects,
+      final Function<Object, Object> prepare) {
+
+    Object similar = null;
+    int err = Integer.MAX_VALUE;
+    final Levenshtein ls = new Levenshtein();
+    for(final Object obj : objects) {
+      final byte[] compare = token(prepare.apply(obj));
+      if(compare != null) {
+        final int d = ls.distance(token, compare, 0);
+        if(d < err) {
+          similar = obj;
+          err = d;
+        }
+      }
+    }
+    return err != Integer.MAX_VALUE ? similar : null;
+  }
+
+  /**
+   * Compares two tokens for similarity.
+   * @param token token to be compared
+   * @param compare second token to be compared
    * @return true if the arrays are similar
    */
-  public boolean similar(final byte[] token, final byte[] sub) {
-    return similar(token, sub, error);
+  public boolean similar(final byte[] token, final byte[] compare) {
+    return similar(token, compare, error);
   }
 
   /**
-   * Compares two character arrays for similarity.
+   * Compares two tokens for similarity.
    * @param token token to be compared
-   * @param sub second token to be compared
+   * @param compare second token to be compared
    * @param err number of allowed errors; dynamic calculation if value is 0
    * @return true if the arrays are similar
    */
-  public boolean similar(final byte[] token, final byte[] sub, final int err) {
-    final int sl = sub.length, tl = token.length;
-    int slen = 0, tlen = 0;
-    for(int s = 0; s < sl; s += cl(sub, s)) ++slen;
-    for(int t = 0; t < tl; t += cl(token, t)) ++tlen;
-    if(tlen == 0) return false;
-
-    // use exact search for too short and too long values
-    if(err == 0 && slen < 4 || tlen > MAX || slen > MAX) return slen == tlen && same(token, sub);
-
-    // skip different tokens with too different lengths
-    final int k = err == 0 ? Math.max(1, slen >> 2) : err;
-    return Math.abs(slen - tlen) <= k && ls(token, tlen, sub, slen, k);
+  public boolean similar(final byte[] token, final byte[] compare, final int err) {
+    return distance(token, compare, err) != Integer.MAX_VALUE;
   }
 
   /**
-   * Calculates a Levenshtein distance.
-   * @param tk token to be compared
-   * @param tl token length
-   * @param sb sub token to be compared
-   * @param sl string length
-   * @param k maximum number of accepted errors
-   * @return true if the arrays are similar
+   * Computes the Levenshtein distance.
+   * @param token original token
+   * @param compare token to be compared
+   * @param err number of allowed errors; dynamic calculation if value is 0
+   * @return distance
    */
-  private boolean ls(final byte[] tk, final int tl, final byte[] sb, final int sl, final int k) {
+  private int distance(final byte[] token, final byte[] compare, final int err) {
+    final int sl = compare.length, tl = token.length;
+    int clen = 0, tlen = 0;
+    for(int c = 0; c < sl; c += cl(compare, c)) ++clen;
+    for(int t = 0; t < tl; t += cl(token, t)) ++tlen;
+
+    // use exact search for too short and too long values
+    final int dlen = Math.abs(clen - tlen);
+    if(err == 0 && (tlen < 4 || clen < 4) || tlen > MAX || clen > MAX)
+      return dlen == 0 && same(token, compare) ? 0 : Integer.MAX_VALUE;
+
+    // skip different tokens with too different lengths
+    final int k = err == 0 ? Math.max(1, clen >> 2) : err;
+    if(dlen > k) return Integer.MAX_VALUE;
+
+    // compute distance
     int[][] mx = matrix;
     if(mx == null) {
       mx = new int[MAX + 2][MAX + 2];
@@ -110,22 +128,23 @@ public final class Levenshtein {
       matrix = mx;
     }
 
-    int e2 = -1, f2 = -1;
-    for(int t = 0; t < tl; t += cl(tk, t)) {
-      final int e = noDiacritics(lc(cp(tk, t)));
+    int f = -1, g = -1;
+    for(int t = 0; t < tlen; t += cl(token, t)) {
+      final int tn = noDiacritics(lc(cp(token, t)));
       int d = Integer.MAX_VALUE;
-      for(int s = 0; s < sl; s += cl(sb, s)) {
-        final int f = noDiacritics(lc(cp(sb, s)));
-        int c = m(mx[t][s + 1] + 1, mx[t + 1][s] + 1, mx[t][s] + (e == f ? 0 : 1));
-        if(e == f2 && f == e2) c = mx[t][s];
-        mx[t + 1][s + 1] = c;
-        d = Math.min(d, c);
-        f2 = f;
+      for(int c = 0; c < clen; c += cl(compare, c)) {
+        final int cn = noDiacritics(lc(cp(compare, c)));
+        int e = m(mx[t][c + 1] + 1, mx[t + 1][c] + 1, mx[t][c] + (tn == cn ? 0 : 1));
+        if(tn == g && cn == f) e = mx[t][c];
+        mx[t + 1][c + 1] = e;
+        d = Math.min(d, e);
+        g = cn;
       }
-      if(d > k) return false;
-      e2 = e;
+      if(d > k) return Integer.MAX_VALUE;
+      f = tn;
     }
-    return mx[tl][sl] <= k;
+    final int d = mx[tlen][clen];
+    return d <= k ? d : Integer.MAX_VALUE;
   }
 
   /**

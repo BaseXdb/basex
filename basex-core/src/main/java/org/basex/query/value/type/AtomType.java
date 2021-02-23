@@ -16,6 +16,7 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.similarity.*;
 
 /**
  * XQuery atomic types.
@@ -477,7 +478,7 @@ public enum AtomType implements Type {
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(item instanceof Dur) return new Dur((Dur) item);
-      if(str(item)) return new Dur(item.string(ii), ii);
+      if(isString(item)) return new Dur(item.string(ii), ii);
       throw typeError(item, this, ii);
     }
     @Override
@@ -494,7 +495,7 @@ public enum AtomType implements Type {
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(item instanceof Dur) return new YMDur((Dur) item);
-      if(str(item)) return new YMDur(item.string(ii), ii);
+      if(isString(item)) return new YMDur(item.string(ii), ii);
       throw typeError(item, this, ii);
     }
     @Override
@@ -510,7 +511,7 @@ public enum AtomType implements Type {
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(item instanceof Dur) return new DTDur((Dur) item);
-      if(str(item)) return new DTDur(item.string(ii), ii);
+      if(isString(item)) return new DTDur(item.string(ii), ii);
       throw typeError(item, this, ii);
     }
     @Override
@@ -526,7 +527,7 @@ public enum AtomType implements Type {
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(item.type == DATE) return new Dtm((ADate) item);
-      if(str(item)) return new Dtm(item.string(ii), ii);
+      if(isString(item)) return new Dtm(item.string(ii), ii);
       throw typeError(item, this, ii);
     }
     @Override
@@ -545,7 +546,7 @@ public enum AtomType implements Type {
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(item.type == DATE_TIME) return new Dat((ADate) item);
-      if(str(item)) return new Dat(item.string(ii), ii);
+      if(isString(item)) return new Dat(item.string(ii), ii);
       throw typeError(item, this, ii);
     }
     @Override
@@ -561,7 +562,7 @@ public enum AtomType implements Type {
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(item.type == DATE_TIME) return new Tim((ADate) item);
-      if(str(item)) return new Tim(item.string(ii), ii);
+      if(isString(item)) return new Tim(item.string(ii), ii);
       throw typeError(item, this, ii);
     }
     @Override
@@ -577,7 +578,7 @@ public enum AtomType implements Type {
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(item.type == DATE_TIME || item.type == DATE) return new GDt((ADate) item, this);
-      if(str(item)) return new GDt(item.string(ii), this, ii);
+      if(isString(item)) return new GDt(item.string(ii), this, ii);
       throw typeError(item, this, ii);
     }
     @Override
@@ -593,7 +594,7 @@ public enum AtomType implements Type {
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(item.type == DATE_TIME || item.type == DATE) return new GDt((ADate) item, this);
-      if(str(item)) return new GDt(item.string(ii), this, ii);
+      if(isString(item)) return new GDt(item.string(ii), this, ii);
       throw typeError(item, this, ii);
     }
     @Override
@@ -609,7 +610,7 @@ public enum AtomType implements Type {
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(item.type == DATE_TIME || item.type == DATE) return new GDt((ADate) item, this);
-      if(str(item)) return new GDt(item.string(ii), this, ii);
+      if(isString(item)) return new GDt(item.string(ii), this, ii);
       throw typeError(item, this, ii);
     }
     @Override
@@ -625,7 +626,7 @@ public enum AtomType implements Type {
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(item.type == DATE_TIME || item.type == DATE) return new GDt((ADate) item, this);
-      if(str(item)) return new GDt(item.string(ii), this, ii);
+      if(isString(item)) return new GDt(item.string(ii), this, ii);
       throw typeError(item, this, ii);
     }
     @Override
@@ -641,7 +642,7 @@ public enum AtomType implements Type {
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(item.type == DATE_TIME || item.type == DATE) return new GDt((ADate) item, this);
-      if(str(item)) return new GDt(item.string(ii), this, ii);
+      if(isString(item)) return new GDt(item.string(ii), this, ii);
       throw typeError(item, this, ii);
     }
     @Override
@@ -657,7 +658,7 @@ public enum AtomType implements Type {
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(item instanceof ANum) return Bln.get(item.bool(ii));
-      if(str(item)) return Bln.get(Bln.parse(item, ii));
+      if(isString(item)) return Bln.get(Bln.parse(item, ii));
       throw typeError(item, this, ii);
     }
     @Override
@@ -677,7 +678,7 @@ public enum AtomType implements Type {
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(item instanceof Bin) return org.basex.query.value.item.B64.get((Bin) item, ii);
-      if(str(item)) return org.basex.query.value.item.B64.get(item.string(ii), ii);
+      if(isString(item)) return org.basex.query.value.item.B64.get(item.string(ii), ii);
       throw typeError(item, this, ii);
     }
     @Override
@@ -694,7 +695,7 @@ public enum AtomType implements Type {
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
       if(item instanceof Bin) return new Hex((Bin) item, ii);
-      if(str(item)) return new Hex(item.string(ii), ii);
+      if(isString(item)) return new Hex(item.string(ii), ii);
       throw typeError(item, this, ii);
     }
     @Override
@@ -972,16 +973,6 @@ public enum AtomType implements Type {
   }
 
   /**
-   * Checks if the specified item is a string.
-   * @param item item
-   * @return item argument
-   */
-  static boolean str(final Item item) {
-    final Type type = item.type;
-    return type.isStringOrUntyped() && type != ANY_URI;
-  }
-
-  /**
    * Checks the validity of the specified name.
    * @param item value to be checked
    * @param ii input info
@@ -1032,17 +1023,33 @@ public enum AtomType implements Type {
 
   /**
    * Finds and returns the specified type.
-   * @param type type
+   * @param qname name of type
    * @param all accept all types (including those without parent type)
    * @return type or {@code null}
    */
-  public static AtomType find(final QNm type, final boolean all) {
-    if(!Token.eq(type.uri(), BASEX_URI)) {
+  public static AtomType find(final QNm qname, final boolean all) {
+    if(!Token.eq(qname.uri(), BASEX_URI)) {
       for(final AtomType tp : VALUES) {
-        if(type.eq(tp.qname()) && (all || tp.parent != null)) return tp;
+        if(qname.eq(tp.qname()) && (all || tp.parent != null)) return tp;
       }
     }
     return null;
+  }
+
+  /**
+   * Returns an info message for a similar function.
+   * @param qname name of type
+   * @return info string
+   */
+  public static byte[] similar(final QNm qname) {
+    final byte[] ln = lc(qname.local());
+
+    final Object similar = Levenshtein.similar(ln, VALUES, o -> {
+      final AtomType tp = (AtomType) o;
+      final QNm qnm = tp.qname();
+      return Token.eq(qnm.uri(), XS_URI) && tp.parent != null ? qnm.local() : null;
+    });
+    return QueryError.similar(qname.prefixId(XML), similar);
   }
 
   /**
@@ -1055,5 +1062,15 @@ public enum AtomType implements Type {
       if(type.id == id) return type;
     }
     return null;
+  }
+
+  /**
+   * Checks if the specified item is a string.
+   * @param item item
+   * @return item argument
+   */
+  private static boolean isString(final Item item) {
+    final Type type = item.type;
+    return type.isStringOrUntyped() && type != ANY_URI;
   }
 }

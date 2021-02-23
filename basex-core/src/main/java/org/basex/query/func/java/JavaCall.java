@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import java.lang.reflect.*;
 import java.lang.reflect.Array;
 import java.util.*;
-import java.util.function.*;
 
 import javax.xml.datatype.*;
 import javax.xml.namespace.*;
@@ -275,9 +274,9 @@ public abstract class JavaCall extends Arr {
     }
 
     // no suitable method found: check if method with correct name was found
-    throw noFunction(name, arity, string(qname.string()), arities, types, ii, list -> {
-      for(final Method m : methods) list.add(m.getName());
-    });
+    final TokenList names = new TokenList();
+    for(final Method m : methods) names.add(m.getName());
+    throw noFunction(name, arity, string(qname.string()), arities, types, ii, names.finish());
   }
 
   /**
@@ -288,21 +287,20 @@ public abstract class JavaCall extends Arr {
    * @param arities arities of found methods
    * @param types types (can be {@code null})
    * @param ii input info
-   * @param consumer list of available names
+   * @param names list of available names
    * @return exception
    */
   static QueryException noFunction(final String name, final int arity, final String full,
-      final IntList arities, final String[] types, final InputInfo ii,
-      final Consumer<TokenList> consumer) {
-
+      final IntList arities, final String[] types, final InputInfo ii, final byte[][] names) {
     // functions with different arities
     if(!arities.isEmpty()) return Functions.wrongArity(full, arity, arities, ii);
 
     // find similar field/method names
-    final byte[] nm = token(name), similar = Levenshtein.similar(nm, consumer);
+    final byte[] nm = token(name);
+    final Object similar = Levenshtein.similar(nm, names);
     if(similar != null) {
       // if name is equal, no function was chosen via exact type matching
-      if(eq(nm, similar)) {
+      if(eq(nm, (byte[]) similar)) {
         final TokenBuilder tb = new TokenBuilder();
         for(final String type : types) {
           if(!tb.isEmpty()) tb.add(", ");
@@ -310,11 +308,8 @@ public abstract class JavaCall extends Arr {
         }
         return JAVAARGS_X_X.get(ii, full, tb);
       }
-      // show similar field/method name
-      return FUNCSIMILAR_X_X.get(ii, full, similar);
     }
-    // no similar field/method found, show default error
-    return WHICHFUNC_X.get(ii, full);
+    return WHICHFUNC_X.get(ii, similar(full, similar));
   }
 
   /**

@@ -926,7 +926,7 @@ public enum QueryError {
   /** Error code. */
   GRPBY(XPST, 3, "Expecting valid expression after 'group by'."),
   /** Error code. */
-  FLWORRETURN(XPST, 3, "Incomplete FLWOR expression: expecting 'return'."),
+  FLWORRETURN(XPST, 3, "Incomplete FLWOR expression, expecting 'return'."),
   /** Error code. */
   NOSOME(XPST, 3, "Incomplete quantifier expression."),
   /** Error code. */
@@ -982,7 +982,7 @@ public enum QueryError {
   /** Error code. */
   UPDATINGVAR(XPST, 3, "Variable cannot be updating."),
   /** Error code. */
-  SIMPLETYPE_X(XPST, 3, "Simple type expected, '%(' found."),
+  SIMPLETYPE_X(XPST, 3, "Simple type expected, function found: %(."),
   /** Error code. */
   KEYSPEC(XPST, 3, "No specifier after lookup operator: '%'."),
   /** Error code. */
@@ -1005,13 +1005,13 @@ public enum QueryError {
   /** Error code. */
   FUNCPRIVATE_X(XPST, 17, "Function not visible: %."),
   /** Error code. */
-  FUNCSIMILAR_X_X(XPST, 17, "Unknown function: % (similar: %)."),
-  /** Error code. */
   FUNCARITY_X_X(XPST, 17, "%: % supplied."),
   /** Error code. */
   FUNCARITY_X_X_X(XPST, 17, "%: % supplied, % expected."),
   /** Error code. */
   WHICHFUNC_X(XPST, 17, "Unknown function: %."),
+  /** Error code. */
+  INVALIDFUNC_X(XPST, 17, "Invalid function: %."),
   /** Error code. */
   FUNCNOIMPL_X(XPST, 17, "External function not implemented: %."),
   /** Error code. */
@@ -1028,7 +1028,7 @@ public enum QueryError {
   /** Error code. */
   TYPEUNKNOWN_X(XPST, 51, "Unknown type: %."),
   /** Error code. */
-  CASTUNKNOWN_X(XPST, 80, "Invalid cast type: %."),
+  INVALIDCAST_X(XPST, 80, "Invalid cast type: %."),
   /** Error code. */
   NOURI_X(XPST, 81, "No namespace declared for '%'."),
   /** Error code. */
@@ -1199,7 +1199,7 @@ public enum QueryError {
   /** Error code. */
   VARDUPL_X(XQST, 49, "Duplicate declaration of static variable $%."),
   /** Error code. */
-  TYPE30_X(XQST, 52, "Unknown cast type: %."),
+  WHICHCAST_X(XQST, 52, "Unknown type: %."),
   /** Error code. */
   DUPLCOPYNS(XQST, 55, "Duplicate 'copy-namespace' declaration."),
   /** Error code. */
@@ -1674,10 +1674,20 @@ public enum QueryError {
    * @param number long number
    * @return suffix
    */
-  public static String arguments(final long number) {
-    final StringBuilder sb = new StringBuilder().append(number).append(" argument");
-    if(number != 1) sb.append('s');
-    return sb.toString();
+  public static byte[] arguments(final long number) {
+    final TokenBuilder tb = new TokenBuilder().addLong(number).add(" argument");
+    if(number != 1) tb.add('s');
+    return tb.finish();
+  }
+
+  /**
+   * Returns an info message for similar strings.
+   * @param string original string
+   * @param similar similar string (can be {@code null})
+   * @return info message
+   */
+  public static byte[] similar(final Object string, final Object similar) {
+    return similar == null ? Token.token(string) : Util.inf("% (similar: %)", string, similar);
   }
 
   /**

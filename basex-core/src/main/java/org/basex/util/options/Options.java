@@ -501,9 +501,8 @@ public class Options implements Iterable<Option<?>> {
    * @return error string
    */
   public final synchronized String error(final String name) {
-    final byte[] similar = Levenshtein.similar(token(name), list -> {
-      for(final String opts : options.keySet()) list.add(opts);
-    });
+    final Object similar = Levenshtein.similar(token(name),
+        options.keySet().toArray(new String[0]));
     return similar != null ? Util.info(Text.UNKNOWN_OPT_SIMILAR_X_X, name, similar) :
       Util.info(Text.UNKNOWN_OPTION_X, name);
   }

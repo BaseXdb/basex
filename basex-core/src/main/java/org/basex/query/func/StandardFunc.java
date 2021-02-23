@@ -34,6 +34,7 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.options.*;
+import org.basex.util.similarity.*;
 
 /**
  * Built-in functions.
@@ -403,13 +404,15 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
 
     if(i >= exprs.length) return null;
-    final String encoding = string(toToken(exprs[i], qc));
+    final byte[] encoding = toToken(exprs[i], qc);
     try {
-      if(Charset.isSupported(encoding)) return Strings.normEncoding(encoding);
+      final String enc = string(toToken(exprs[i], qc));
+      if(Charset.isSupported(enc)) return Strings.normEncoding(enc);
     } catch(final IllegalArgumentException ignored) {
       /* character set is invalid or unknown (e.g. empty string) */
     }
-    throw err.get(info, encoding);
+    throw err.get(info, QueryError.similar(encoding,
+        Levenshtein.similar(encoding, Strings.encodings())));
   }
 
   /**

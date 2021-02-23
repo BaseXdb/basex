@@ -92,7 +92,7 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
 
     final Component comp;
     if(option == SerializerOptions.ENCODING) {
-      final BaseXCombo combo = new BaseXCombo(dialog, GUIConstants.ENCODINGS);
+      final BaseXCombo combo = new BaseXCombo(dialog, Strings.encodings());
       combo.setSelectedItem(options.get(option));
       combo.addActionListener(e -> {
         options.set((StringOption) option, combo.getSelectedItem());

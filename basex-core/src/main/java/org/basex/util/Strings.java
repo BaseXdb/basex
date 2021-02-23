@@ -35,6 +35,9 @@ public final class Strings {
   /** UTF32 encoding strings. */
   private static final String[] ALL_UTF32 = { UTF32, "UTF32" };
 
+  /** Available encodings. */
+  private static String[] encodings;
+
   /** Hidden constructor. */
   private Strings() { }
 
@@ -355,5 +358,14 @@ public final class Strings {
    */
   public static String concat(final Object... objects) {
     return Token.string(Token.concat(objects));
+  }
+
+  /**
+   * Returns a string array with all supported encodings.
+   * @return encodings
+   */
+  public static String[] encodings() {
+    if(encodings == null) encodings = Charset.availableCharsets().keySet().toArray(new String[0]);
+    return encodings;
   }
 }

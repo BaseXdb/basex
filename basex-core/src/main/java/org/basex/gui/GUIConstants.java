@@ -4,7 +4,6 @@ import static org.basex.gui.GUIMenuCmd.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.nio.charset.*;
 
 import javax.swing.*;
 
@@ -255,16 +254,6 @@ public final class GUIConstants {
   public static Color colormark1A;
   /** Second mark color, custom alpha value. */
   public static Color colormark2A;
-
-  // ENCODING =====================================================================================
-
-  /** Available encodings. */
-  public static final String[] ENCODINGS;
-
-  // initialize encodings
-  static {
-    ENCODINGS = Charset.availableCharsets().keySet().toArray(new String[0]);
-  }
 
   // FONTS ========================================================================================
 

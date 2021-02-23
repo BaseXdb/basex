@@ -2980,13 +2980,12 @@ public class QueryParser extends InputParser {
     Type type = ListType.find(name);
     if(type == null) {
       type = AtomType.find(name, false);
-      if(type == null) {
-        if(wsConsume(PAREN1)) throw error(SIMPLETYPE_X, name);
-        if(!AtomType.ANY_SIMPLE_TYPE.qname().eq(name)) throw error(TYPE30_X, name.prefixId(XML));
-        type = AtomType.ANY_SIMPLE_TYPE;
-      }
-      if(type.oneOf(AtomType.ANY_SIMPLE_TYPE, AtomType.ANY_ATOMIC_TYPE, AtomType.NOTATION))
-        throw error(CASTUNKNOWN_X, name.prefixId(XML));
+      if(consume(PAREN1)) throw error(SIMPLETYPE_X, name.prefixId(XML));
+      if(type == null ? name.eq(AtomType.ANY_SIMPLE_TYPE.qname()) :
+        type.oneOf(AtomType.ANY_ATOMIC_TYPE, AtomType.NOTATION))
+        throw error(INVALIDCAST_X, name.prefixId(XML));
+      if(type == null)
+        throw error(WHICHCAST_X, AtomType.similar(name));
     }
     skipWs();
     return SeqType.get(type, consume('?') ? Occ.ZERO_OR_ONE : Occ.EXACTLY_ONE);

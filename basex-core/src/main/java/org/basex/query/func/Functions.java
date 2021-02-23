@@ -33,7 +33,7 @@ public final class Functions {
   public static final ArrayList<FuncDefinition> DEFINITIONS = new ArrayList<>();
 
   /** Cached functions. */
-  private static final TokenSet CACHE = new TokenSet();
+  private static final TokenObjMap<QNm> CACHE = new TokenObjMap<>();
   /** URIs of built-in functions. */
   private static final TokenSet URIS = new TokenSet();
 
@@ -51,8 +51,8 @@ public final class Functions {
 
     for(final FuncDefinition fd : DEFINITIONS) {
       URIS.add(fd.uri);
-      if(!CACHE.add(new QNm(fd.local(), fd.uri()).id())) {
-        throw Util.notExpected("Duplicate function definition: " + fd);      }
+      final QNm qnm = new QNm(fd.local(), fd.uri());
+      CACHE.put(qnm.id(), qnm);
     }
   }
 
@@ -67,29 +67,13 @@ public final class Functions {
   private static Type getCast(final QNm name, final long arity, final InputInfo ii)
       throws QueryException {
 
-    final byte[] ln = name.local();
     Type type = ListType.find(name);
     if(type == null) type = AtomType.find(name, false);
-
-    // no constructor function found, or abstract type specified
-    if(type != null && type != AtomType.NOTATION && type != AtomType.ANY_ATOMIC_TYPE) {
-      if(arity == 1) return type;
-      throw FUNCARITY_X_X_X.get(ii, name.string(), arguments(arity), 1);
-    }
-
-    // include similar function name in error message
-    final Levenshtein ls = new Levenshtein();
-    for(final AtomType tp : AtomType.VALUES) {
-      final QNm qnm = tp.qname();
-      final byte[] uri = qnm.uri();
-      if(eq(uri, XS_URI) && tp != AtomType.NOTATION && tp != AtomType.ANY_ATOMIC_TYPE &&
-          ls.similar(lc(ln), lc(qnm.local())) && AtomType.find(qnm, false) != null) {
-        throw FUNCSIMILAR_X_X.get(ii, name.prefixId(), tp.toString());
-      }
-    }
-
-    // no similar name: constructor function found, or abstract type specified
-    throw WHICHFUNC_X.get(ii, name.prefixId());
+    if(type == null) throw WHICHFUNC_X.get(ii, AtomType.similar(name));
+    if(type == AtomType.NOTATION || type == AtomType.ANY_ATOMIC_TYPE)
+      throw INVALIDFUNC_X.get(ii, name.prefixId());
+    if(arity != 1) throw FUNCARITY_X_X_X.get(ii, name.string(), arguments(arity), 1);
+    return type;
   }
 
   /**
@@ -375,47 +359,28 @@ public final class Functions {
   }
 
   /**
-   * Returns an exception if the name of a built-in function is similar to the specified name.
-   * @param name name of input function
-   * @param ii input info
-   * @return query exception or {@code null}
+   * Returns an info message for a similar function.
+   * @param qname name of type
+   * @return info string
    */
-  static QueryException similarError(final QNm name, final InputInfo ii) {
+  static byte[] similar(final QNm qname) {
     // find similar function in three runs
-    final byte[] local = name.local(), uri = name.uri();
-    final Levenshtein ls = new Levenshtein();
-    for(int mode = 0; mode < 3; mode++) {
-      for(final byte[] key : CACHE) {
-        final int i = indexOf(key, '}');
-        final byte[] slocal = substring(key, i + 1), suri = substring(key, 2, i);
-        if(mode == 0 ?
-          // find functions with identical URIs and similar local names
-          eq(uri, suri) && ls.similar(local, slocal) : mode == 1 ?
-          // find functions with identical local names
-          eq(local, substring(key, i + 1)) :
-          // find functions with identical URIs and local names that start with the specified name
-          eq(uri, substring(key, 2, i)) && startsWith(substring(key, i + 1), local)) {
-          final QNm sim = new QNm(slocal, suri);
-          return FUNCSIMILAR_X_X.get(ii, name.prefixId(), sim.prefixId());
-        }
-      }
-    }
-    return null;
-  }
+    final ArrayList<QNm> qnames = new ArrayList<>(CACHE.size());
+    for(final QNm qnm : CACHE.values()) qnames.add(qnm);
+    final byte[] local = lc(qname.local()), uri = qname.uri();
 
-  /*
-   * Returns the names of all functions. Used to update MediaWiki syntax highlighter.
-   * All function names are listed in reverse order to give precedence to longer names.
-   * @param args ignored
-  public static void main(final String... args) {
-    final org.basex.util.list.StringList sl = new org.basex.util.list.StringList();
-    for(FuncSignature sig : SIGNATURES) {
-      sl.add(sig.toString().replaceAll("^fn:|\\(.*", ""));
+    // find functions with identical URIs and similar local names
+    Object similar = Levenshtein.similar(qname.local(), qnames.toArray(),
+        o -> eq(uri, ((QNm) o).uri()) ? ((QNm) o).local() : null);
+    // find functions with identical local names
+    for(final QNm qnm : qnames) {
+      if(similar == null && eq(lc(qnm.local()), local)) similar = qnm;
     }
-    for(final String s : sl.sort(false, false)) {
-      Util.out(s + ' ');
+    // find functions with identical URIs and local names that start with the specified name
+    for(final QNm qnm : qnames) {
+      if(similar == null && eq(uri, qnm.uri()) && startsWith(lc(qnm.local()), local)) similar = qnm;
     }
-    Util.outln("fn:");
+    return QueryError.similar(qname.prefixString(),
+        similar != null ? ((QNm) similar).prefixString() : null);
   }
-   */
 }

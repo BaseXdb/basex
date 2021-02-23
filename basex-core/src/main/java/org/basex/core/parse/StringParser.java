@@ -405,9 +405,9 @@ final class StringParser extends CommandParser {
     }
 
     // output error for similar commands
-    final byte[] name = uc(token(token)), similar = Levenshtein.similar(name, list -> {
-      for(final Enum<?> s : startWith(complete, null)) list.add(s.name());
-    });
+    final byte[] name = uc(token(token));
+    final Object similar = Levenshtein.similar(name, startWith(complete, null),
+        o -> ((Enum<?>) o).name());
     if(similar != null) throw error(alt, UNKNOWN_SIMILAR_X_X, name, similar);
 
     // show unknown command error or available command extensions
