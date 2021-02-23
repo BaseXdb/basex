@@ -146,7 +146,7 @@ public enum NodeType implements Type {
   };
 
   /** Name. */
-  public final byte[] name;
+  private final byte[] name;
   /** Parent type. */
   private final Type parent;
   /** Type id . */
@@ -154,6 +154,8 @@ public enum NodeType implements Type {
 
   /** Sequence types (lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
+  /** QName (lazy instantiation). */
+  private QNm qnm;
 
   /**
    * Constructor.
@@ -217,6 +219,15 @@ public enum NodeType implements Type {
     return seqTypes.computeIfAbsent(occ, o -> new SeqType(this, o));
   }
 
+  /**
+   * Returns the name of a node type.
+   * @return name
+   */
+  public final QNm qname() {
+    if(qnm == null) qnm = new QNm(name);
+    return qnm;
+  }
+
   @Override
   public final boolean eq(final Type type) {
     return this == type;
@@ -267,7 +278,16 @@ public enum NodeType implements Type {
 
   @Override
   public final String toString() {
-    return Token.string(name) + "()";
+    return toString("");
+  }
+
+  /**
+   * Returns a string representation with the specified argument.
+   * @param arg argument
+   * @return string representation
+   */
+  public final String toString(final String arg) {
+    return new TokenBuilder().add(name).add('(').add(arg).add(')').toString();
   }
 
   /**

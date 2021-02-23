@@ -146,9 +146,8 @@ public final class NameTest extends Test {
 
   @Override
   public String toString(final boolean full) {
-    final TokenBuilder tb = new TokenBuilder();
     final boolean pi = type == NodeType.PROCESSING_INSTRUCTION;
-    if(full || pi) tb.add(type.name).add('(');
+    final TokenBuilder tb = new TokenBuilder();
 
     // add URI part
     final byte[] prefix = qname.prefix(), uri = qname.uri();
@@ -165,8 +164,7 @@ public final class NameTest extends Test {
     } else {
       tb.add(qname.local());
     }
-
-    if(full || pi) tb.add(')');
-    return tb.toString();
+    final String test = tb.toString();
+    return full || pi ? type.toString(test) : test;
   }
 }

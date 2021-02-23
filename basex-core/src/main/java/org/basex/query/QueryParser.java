@@ -62,11 +62,13 @@ public class QueryParser extends InputParser {
 
   static {
     final byte[][] keys = {
-      token(FUNCTION), token(ARRAY), NodeType.ATTRIBUTE.name, NodeType.COMMENT.name,
-      NodeType.DOCUMENT_NODE.name, NodeType.ELEMENT.name, token(EMPTY_SEQUENCE), token(IF),
-      AtomType.ITEM.name.string(), token(MAP), NodeType.NAMESPACE_NODE.name, NodeType.NODE.name,
-      NodeType.PROCESSING_INSTRUCTION.name, token(SCHEMA_ATTRIBUTE), token(SCHEMA_ELEMENT),
-      token(SWITCH), NodeType.TEXT.name, token(TYPESWITCH)
+      token(FUNCTION), token(ARRAY), NodeType.ATTRIBUTE.qname().string(),
+      NodeType.COMMENT.qname().string(), NodeType.DOCUMENT_NODE.qname().string(),
+      NodeType.ELEMENT.qname().string(), token(EMPTY_SEQUENCE), token(IF),
+      AtomType.ITEM.qname().string(), token(MAP), NodeType.NAMESPACE_NODE.qname().string(),
+      NodeType.NODE.qname().string(), NodeType.PROCESSING_INSTRUCTION.qname().string(),
+      token(SCHEMA_ATTRIBUTE), token(SCHEMA_ELEMENT), token(SWITCH),
+      NodeType.TEXT.qname().string(), token(TYPESWITCH)
     };
     for(final byte[] key : keys) KEYWORDS.add(key);
   }
@@ -2980,7 +2982,7 @@ public class QueryParser extends InputParser {
       type = AtomType.find(name, false);
       if(type == null) {
         if(wsConsume(PAREN1)) throw error(SIMPLETYPE_X, name);
-        if(!AtomType.ANY_SIMPLE_TYPE.name.eq(name)) throw error(TYPE30_X, name.prefixId(XML));
+        if(!AtomType.ANY_SIMPLE_TYPE.qname().eq(name)) throw error(TYPE30_X, name.prefixId(XML));
         type = AtomType.ANY_SIMPLE_TYPE;
       }
       if(type.oneOf(AtomType.ANY_SIMPLE_TYPE, AtomType.ANY_ATOMIC_TYPE, AtomType.NOTATION))
@@ -3042,7 +3044,7 @@ public class QueryParser extends InputParser {
     if(func) {
       consume(PAREN1);
       // item type
-      if(name.eq(AtomType.ITEM.name)) type = AtomType.ITEM;
+      if(name.eq(AtomType.ITEM.qname())) type = AtomType.ITEM;
       // node types
       if(type == null) type = NodeType.find(name);
       // function types

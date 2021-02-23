@@ -92,6 +92,6 @@ final class InvDocTest extends Test {
 
   @Override
   public String toString(final boolean full) {
-    return new TokenBuilder().add(NodeType.DOCUMENT_NODE.name).add("((: ids :))").toString();
+    return NodeType.DOCUMENT_NODE.toString("(: ids :)");
   }
 }

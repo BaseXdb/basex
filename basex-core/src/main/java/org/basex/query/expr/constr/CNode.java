@@ -84,7 +84,7 @@ public abstract class CNode extends Arr {
 
   @Override
   public final String description() {
-    return Token.string(((NodeType) seqType().type).name) + " constructor";
+    return Strings.concat(((NodeType) seqType().type).qname().local(), " constructor");
   }
 
   /**

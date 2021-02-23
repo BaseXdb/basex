@@ -62,10 +62,10 @@ public final class FnPath extends ContextFn {
       } else if(type == NodeType.ELEMENT) {
         tb.add(qname.eqName()).add('[').addInt(element(node, qname, qc)).add(']');
       } else if(type == NodeType.COMMENT || type == NodeType.TEXT) {
-        tb.add(node.seqType().toString()).add('[').addInt(textComment(node, qc)).add(']');
+        tb.add(type.toString()).add('[').addInt(textComment(node, qc)).add(']');
       } else if(type == NodeType.PROCESSING_INSTRUCTION) {
-        tb.add(type.name).add('(').add(qname.local()).add(')').add('[').
-          addInt(pi(node, qname, qc)).add(']');
+        final String name = type.toString(Token.string(qname.local()));
+        tb.add(name).add('[').addInt(pi(node, qname, qc)).add(']');
       }
       steps.add(tb.next());
       nodes.add(node);

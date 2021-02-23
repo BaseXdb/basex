@@ -80,10 +80,10 @@ public final class Functions {
     // include similar function name in error message
     final Levenshtein ls = new Levenshtein();
     for(final AtomType tp : AtomType.VALUES) {
-      if(tp.parent == null) continue;
-      final byte[] u = tp.name.uri();
-      if(eq(u, XS_URI) && tp != AtomType.NOTATION && tp != AtomType.ANY_ATOMIC_TYPE &&
-          ls.similar(lc(ln), lc(tp.name.local()))) {
+      final QNm qnm = tp.qname();
+      final byte[] uri = qnm.uri();
+      if(eq(uri, XS_URI) && tp != AtomType.NOTATION && tp != AtomType.ANY_ATOMIC_TYPE &&
+          ls.similar(lc(ln), lc(qnm.local())) && AtomType.find(qnm, false) != null) {
         throw FUNCSIMILAR_X_X.get(ii, name.prefixId(), tp.toString());
       }
     }

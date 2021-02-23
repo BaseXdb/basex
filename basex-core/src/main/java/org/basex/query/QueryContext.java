@@ -772,7 +772,7 @@ public final class QueryContext extends Job implements Closeable {
 
     Type tp;
     if(Strings.endsWith(type, ')')) {
-      tp = nm.eq(AtomType.ITEM.name) ? AtomType.ITEM : NodeType.find(nm);
+      tp = nm.eq(AtomType.ITEM.qname()) ? AtomType.ITEM : NodeType.find(nm);
       if(tp == null) tp = FuncType.find(nm);
     } else {
       tp = ListType.find(nm);

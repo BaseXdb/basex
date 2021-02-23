@@ -766,9 +766,11 @@ public enum AtomType implements Type {
   public static final AtomType[] VALUES = values();
 
   /** Name. */
-  public final QNm name;
+  private final byte[] name;
   /** Parent type. */
-  public final AtomType parent;
+  private final AtomType parent;
+  /** URI. */
+  private final byte[] uri;
 
   /** Type id . */
   private final Type.ID id;
@@ -783,6 +785,8 @@ public enum AtomType implements Type {
 
   /** Sequence types (lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
+  /** QName (lazy instantiation). */
+  private QNm qnm;
 
   /**
    * Constructor.
@@ -797,8 +801,9 @@ public enum AtomType implements Type {
    */
   AtomType(final String name, final AtomType parent, final byte[] uri, final boolean numeric,
       final boolean untyped, final boolean string, final boolean sortable, final Type.ID id) {
-    this.name = new QNm(name, uri);
+    this.name = token(name);
     this.parent = parent;
+    this.uri = uri;
     this.numeric = numeric;
     this.untyped = untyped;
     this.string = string;
@@ -830,6 +835,15 @@ public enum AtomType implements Type {
     // cannot statically be instantiated due to circular dependencies
     if(seqTypes == null) seqTypes = new EnumMap<>(Occ.class);
     return seqTypes.computeIfAbsent(occ, o -> new SeqType(this, o));
+  }
+
+  /**
+   * Returns the name of a node type.
+   * @return name
+   */
+  public final QNm qname() {
+    if(qnm == null) qnm = new QNm(name, uri);
+    return qnm;
   }
 
   @Override
@@ -1008,10 +1022,10 @@ public enum AtomType implements Type {
   @Override
   public final String toString() {
     final TokenBuilder tb = new TokenBuilder();
-    if(Token.eq(XS_URI, name.uri())) {
-      tb.add(XS_PREFIX).add(':').add(name.string());
+    if(Token.eq(XS_URI, uri)) {
+      tb.add(XS_PREFIX).add(':').add(name);
     } else {
-      tb.add(name.string()).add("()");
+      tb.add(name).add("()");
     }
     return tb.toString();
   }
@@ -1025,7 +1039,7 @@ public enum AtomType implements Type {
   public static AtomType find(final QNm type, final boolean all) {
     if(!Token.eq(type.uri(), BASEX_URI)) {
       for(final AtomType tp : VALUES) {
-        if(tp.name.eq(type) && (all || tp.parent != null)) return tp;
+        if(type.eq(tp.qname()) && (all || tp.parent != null)) return tp;
       }
     }
     return null;

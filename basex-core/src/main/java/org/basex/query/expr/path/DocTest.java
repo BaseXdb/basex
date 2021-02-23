@@ -3,7 +3,6 @@ package org.basex.query.expr.path;
 import org.basex.query.iter.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Document with child test.
@@ -65,6 +64,6 @@ public final class DocTest extends Test {
 
   @Override
   public String toString(final boolean full) {
-    return Strings.concat(type.name, "(", child, ")");
+    return type.toString(child.toString());
   }
 }
