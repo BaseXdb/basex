@@ -1,3 +1,38 @@
+VERSION 9.5 (February 25, 2021) ----------------------------------------
+
+ RESTXQ
+ - the client IP address behind a proxy is added to the logs
+ - stack traces in the error message can now be suppressed
+ - the default error code has been changed from 400 to 500
+ - error messages are more user-friendly now (#1708)
+ - content negotiation was improved (#1991)
+ - inline arguments of called function (#1982)
+
+ XQUERY FUNCTIONS
+ - Utility: new functions for sequences, arrays and maps
+ - Higher-Order Functions: hof:drop-while
+ - Jobs: More options for job intervals
+
+ XQUERY PERFORMANCE
+ - revised scoring propagation (all items will take less memory)
+ - default function inlining limit reduced from 100 to 50
+ - axis path rewritings, better typing (#1910, #1976, #1979)
+ - better typing (#1906, #1908, #1909, #1944, #1945)
+ - faster data()/string() checks (#1975)
+ - rewrite map:merge to map:put (#1969)
+ - rewrite order by to fn:sort (#1966)
+ - rewrite group by to fn:distinct-values (#1932)
+ - rewrite quantifiers to FLWOR expressions (#1961)
+ - optimizations of arithmetic expressions (#1938, #1972)
+ - optimizations of lookup operator (#1929, #1984)
+ - optimizations of counts (#1965, #1973, #1974)
+ - optimizations of regular lists (#1919, #1924)
+ - optimizations of switch expression (#1920)
+ - optimizations of instance of (#1939)
+ - distinct values (#1930, #1967)
+ - positional checks (#1937)
+ - existence checks (#1971)
+
 VERSION 9.4.6 (January 7, 2021) ----------------------------------------
 
  - Performance tweaks, minor bug fixes
