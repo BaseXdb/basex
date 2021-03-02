@@ -14,6 +14,9 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class MapType extends FuncType {
+  /** Name. */
+  public static final byte[] MAP = Token.token(QueryText.MAP);
+
   /**
    * Constructor.
    * @param keyType key type
@@ -110,6 +113,6 @@ public final class MapType extends FuncType {
   @Override
   public String toString() {
     final Object[] param = this == SeqType.MAP ? WILDCARD : new Object[] { keyType(), declType };
-    return new QueryString().token(QueryText.MAP).params(param).toString();
+    return new QueryString().token(MAP).params(param).toString();
   }
 }

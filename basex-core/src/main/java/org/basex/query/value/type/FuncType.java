@@ -11,6 +11,8 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
+import org.basex.util.similarity.*;
 
 /**
  * XQuery 3.0 function types.
@@ -19,6 +21,8 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public class FuncType implements Type {
+  /** Name. */
+  public static final byte[] FUNCTION = Token.token(QueryText.FUNCTION);
   /** Any function placeholder string. */
   static final String[] WILDCARD = { "*" };
 
@@ -213,11 +217,37 @@ public class FuncType implements Type {
   public static Type find(final QNm name) {
     if(name.uri().length == 0) {
       final byte[] ln = name.local();
-      if(Token.eq(ln, token(QueryText.FUNCTION))) return SeqType.FUNCTION;
-      if(Token.eq(ln, token(QueryText.MAP))) return SeqType.MAP;
-      if(Token.eq(ln, token(QueryText.ARRAY))) return SeqType.ARRAY;
+      if(Token.eq(ln, FuncType.FUNCTION)) return SeqType.FUNCTION;
+      if(Token.eq(ln, MapType.MAP)) return SeqType.MAP;
+      if(Token.eq(ln, ArrayType.ARRAY)) return SeqType.ARRAY;
     }
     return null;
+  }
+
+  /**
+   * Returns an info message for a similar function.
+   * @param qname name of type
+   * @return info string
+   */
+  public static byte[] similar(final QNm qname) {
+    final byte[] ln = lc(qname.local());
+
+    final TokenList list = new TokenList();
+    list.add(AtomType.ITEM.qname().local()).add(FuncType.FUNCTION);
+    list.add(MapType.MAP).add(ArrayType.ARRAY);
+    for(final NodeType type : NodeType.values()) list.add(type.qname().local());
+    final byte[][] values = list.finish();
+
+    Object similar = Levenshtein.similar(ln, values);
+    if(similar == null) {
+      for(final byte[] value : values) {
+        if(startsWith(value, ln)) {
+          similar = value;
+          break;
+        }
+      }
+    }
+    return QueryError.similar(qname.prefixId(XML), similar);
   }
 
   /**
@@ -253,7 +283,7 @@ public class FuncType implements Type {
 
   @Override
   public String toString() {
-    final QueryString qs = new QueryString().token(anns).token(QueryText.FUNCTION);
+    final QueryString qs = new QueryString().token(anns).token(FUNCTION);
     if(this == SeqType.FUNCTION) qs.params(WILDCARD);
     else qs.params(argTypes).token(QueryText.AS).token(declType);
     return qs.toString();

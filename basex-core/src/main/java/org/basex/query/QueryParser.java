@@ -62,13 +62,16 @@ public class QueryParser extends InputParser {
 
   static {
     final byte[][] keys = {
-      token(FUNCTION), token(ARRAY), NodeType.ATTRIBUTE.qname().string(),
-      NodeType.COMMENT.qname().string(), NodeType.DOCUMENT_NODE.qname().string(),
-      NodeType.ELEMENT.qname().string(), token(EMPTY_SEQUENCE), token(IF),
-      AtomType.ITEM.qname().string(), token(MAP), NodeType.NAMESPACE_NODE.qname().string(),
-      NodeType.NODE.qname().string(), NodeType.PROCESSING_INSTRUCTION.qname().string(),
-      token(SCHEMA_ATTRIBUTE), token(SCHEMA_ELEMENT), token(SWITCH),
-      NodeType.TEXT.qname().string(), token(TYPESWITCH)
+      NodeType.ATTRIBUTE.qname().string(), NodeType.COMMENT.qname().string(),
+      NodeType.DOCUMENT_NODE.qname().string(), NodeType.ELEMENT.qname().string(),
+      NodeType.NAMESPACE_NODE.qname().string(), NodeType.NODE.qname().string(),
+      NodeType.PROCESSING_INSTRUCTION.qname().string(), NodeType.TEXT.qname().string(),
+      NodeType.SCHEMA_ATTRIBUTE.qname().string(), NodeType.SCHEMA_ELEMENT.qname().string(),
+
+      ArrayType.ARRAY, FuncType.FUNCTION, MapType.MAP,
+      AtomType.ITEM.qname().string(),
+
+      token(EMPTY_SEQUENCE), token(IF), token(SWITCH), token(TYPESWITCH)
     };
     for(final byte[] key : keys) KEYWORDS.add(key);
   }
@@ -3052,14 +3055,14 @@ public class QueryParser extends InputParser {
         if(type != null) return functionTest(anns, type).seqType();
       }
       // no type found
-      if(type == null) throw error(WHICHTYPE_X, name.prefixId(XML));
+      if(type == null) throw error(WHICHTYPE_X, FuncType.similar(name));
     } else {
       // attach default element namespace
       if(!name.hasURI()) name.uri(sc.elemNS);
       // atomic types
       type = AtomType.find(name, false);
       // no type found
-      if(type == null) throw error(TYPEUNKNOWN_X, name.prefixId(XML));
+      if(type == null) throw error(TYPEUNKNOWN_X, AtomType.similar(name));
     }
 
     // annotations are not allowed for remaining types
@@ -3168,7 +3171,7 @@ public class QueryParser extends InputParser {
         final QNm tn = eQName(QNAME_X, sc.elemNS);
         ann = ListType.find(tn);
         if(ann == null) ann = AtomType.find(tn, true);
-        if(ann == null) throw error(TYPEUNDEF_X, tn);
+        if(ann == null) throw error(TYPEUNDEF_X, AtomType.similar(tn));
         // parse (and ignore) optional question mark
         wsConsume(QUESTION);
       }
@@ -3206,7 +3209,7 @@ public class QueryParser extends InputParser {
         final QNm tn = eQName(QNAME_X, sc.elemNS);
         ann = ListType.find(tn);
         if(ann == null) ann = AtomType.find(tn, true);
-        if(ann == null) throw error(TYPEUNDEF_X, tn);
+        if(ann == null) throw error(TYPEUNDEF_X, AtomType.similar(tn));
       }
       if(ann != null || !wc) {
         final Test test = Test.get(NodeType.ATTRIBUTE, name, ann, sc.elemNS);

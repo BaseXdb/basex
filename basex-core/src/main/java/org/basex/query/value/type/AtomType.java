@@ -8,6 +8,7 @@ import static org.basex.util.Token.normalize;
 
 import java.math.*;
 import java.util.*;
+import java.util.function.*;
 import java.util.regex.*;
 
 import javax.xml.namespace.*;
@@ -1044,11 +1045,20 @@ public enum AtomType implements Type {
   public static byte[] similar(final QNm qname) {
     final byte[] ln = lc(qname.local());
 
-    final Object similar = Levenshtein.similar(ln, VALUES, o -> {
-      final AtomType tp = (AtomType) o;
+    final Function<AtomType, byte[]> local = tp -> {
       final QNm qnm = tp.qname();
       return Token.eq(qnm.uri(), XS_URI) && tp.parent != null ? qnm.local() : null;
-    });
+    };
+    Object similar = Levenshtein.similar(ln, VALUES, o -> local.apply((AtomType) o));
+    if(similar == null) {
+      for(final AtomType tp : VALUES) {
+        final byte[] lc = local.apply(tp);
+        if(lc != null && startsWith(lc, ln)) {
+          similar = tp;
+          break;
+        }
+      }
+    }
     return QueryError.similar(qname.prefixId(XML), similar);
   }
 

@@ -14,6 +14,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ArrayType extends FuncType {
+  /** Name. */
+  public static final byte[] ARRAY = Token.token(QueryText.ARRAY);
+
   /**
    * Constructor.
    * @param declType declared return type
@@ -92,6 +95,6 @@ public final class ArrayType extends FuncType {
   @Override
   public String toString() {
     final Object[] param = this == SeqType.ARRAY ? WILDCARD : new Object[] { declType };
-    return new QueryString().token(QueryText.ARRAY).params(param).toString();
+    return new QueryString().token(ARRAY).params(param).toString();
   }
 }
