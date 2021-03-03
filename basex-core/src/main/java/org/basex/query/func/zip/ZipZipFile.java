@@ -29,6 +29,8 @@ import org.basex.util.list.*;
 public class ZipZipFile extends ZipFn {
   /** Attribute: src. */
   private static final byte[] SRC = token("src");
+  /** Attribute: compressed. */
+  private static final byte[] COMPRESSED = token("compressed");
   /** Attribute: method. */
   private static final byte[] METHOD = token("method");
   /** Method "base64". */
@@ -84,16 +86,21 @@ public class ZipZipFile extends ZipFn {
       // source: if null, the node's children are serialized
       String src = attribute(node, SRC, false);
       if(src != null) src = src.replaceAll("\\\\", "/");
+      // compressed: if null, the node's children are serialized
+      String store = attribute(node, COMPRESSED, false);
+      if(store != null && store.equals("yes")) store = null;
 
+      // normalize name (path)
       if(name == null) {
         // throw exception if both attributes are null
         if(src == null) throw ZIP_INVALID_X_X.get(info, node.qname(), SRC);
         name = src;
       }
       name = name.replaceAll(".*/", "");
-
-      // add slash to directories
       if(dir) name += '/';
+
+      // prepare next entry
+      zos.setLevel(store != null ? Deflater.NO_COMPRESSION : Deflater.DEFAULT_COMPRESSION);
       zos.putNextEntry(new ZipEntry(root + name));
 
       if(dir) {
