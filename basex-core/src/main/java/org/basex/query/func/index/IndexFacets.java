@@ -12,6 +12,8 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -100,8 +102,16 @@ public final class IndexFacets extends IndexFn {
       elem.add(MAX, mx == stats.max ? token(mx) : token(stats.max));
     }
     if(isCategory(type)) {
-      for(final byte[] value : stats.values) {
-        elem.add(new FElem(ENTRY).add(COUNT, token(stats.values.get(value))).add(value));
+      final TokenIntMap map = stats.values;
+      final IntList list = new IntList(map.size());
+      final TokenList values = new TokenList(map.size());
+      for(final byte[] value : map) {
+        list.add(map.get(value));
+        values.add(value);
+      }
+      for(final int o : list.createOrder(false)) {
+        final byte[] value = values.get(o);
+        elem.add(new FElem(ENTRY).add(COUNT, token(map.get(value))).add(value));
       }
     }
   }
