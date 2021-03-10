@@ -225,7 +225,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
     int[] order = null;
     if(tokenize) {
       // tokenization: create array with offsets to ordered values
-      order = id.createOrder();
+      order = id.createOrder(true);
     } else {
       // no token index: simple sort
       id.sort();

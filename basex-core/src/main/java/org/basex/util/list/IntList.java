@@ -235,13 +235,28 @@ public class IntList extends ElementList {
   }
 
   /**
+   * Reverses the order of the elements.
+   * @return self reference
+   */
+  public IntList reverse() {
+    int[] lst = list;
+    for(int l = 0, r = size - 1; l < r; l++, r--) {
+      final int tmp = lst[l];
+      lst[l] = lst[r];
+      lst[r] = tmp;
+    }
+    return this;
+  }
+
+  /**
    * Sorts the data and returns an array with offsets to the sorted array.
-   * See {@link Array#createOrder(int[], boolean)} for more details.
+   * See {@link Array#createOrder(int[], boolean)}
+   * @param asc ascending order
    * @return array with new order
    */
-  public final int[] createOrder() {
+  public final int[] createOrder(final boolean asc) {
     final IntList il = Array.number(size);
-    il.sort(list, true);
+    il.sort(list, asc);
     return il.finish();
   }
 
@@ -259,415 +274,417 @@ public class IntList extends ElementList {
    * Sorts the data in the order of the specified token array.
    * Note that the input array will be resorted as well.
    * The algorithm is derived from {@link Arrays#sort(int[])}.
-   * @param tok token array to sort by
+   * @param values values to sort by
+   * @param asc ascending order
    * @param num numeric sort
-   * @param asc ascending
    */
-  public final void sort(final byte[][] tok, final boolean num, final boolean asc) {
-    sort(0, size, num, asc, tok);
+  public final void sort(final byte[][] values, final boolean asc, final boolean num) {
+    sort(values, asc, 0, size, num);
   }
 
   /**
    * Sorts the data in the order of the specified numeric array.
    * Note that the input array will be resorted as well.
    * The algorithm is derived from {@link Arrays#sort(int[])}.
-   * @param num token array to sort by
-   * @param asc ascending
+   * @param values values to sort by
+   * @param asc ascending order
    */
-  public final void sort(final double[] num, final boolean asc) {
-    sort(0, size, asc, num);
+  public final void sort(final double[] values, final boolean asc) {
+    sort(values, asc, 0, size);
   }
 
   /**
    * Sorts the data in the order of the specified numeric array.
    * Note that the input array will be resorted as well.
    * The algorithm is derived from {@link Arrays#sort(int[])}.
-   * @param num token array to sort by
-   * @param asc ascending
+   * @param values values to sort by
+   * @param asc ascending order
    */
-  public final void sort(final int[] num, final boolean asc) {
-    sort(0, size, asc, num);
+  public final void sort(final int[] values, final boolean asc) {
+    sort(values, asc, 0, size);
   }
 
   /**
    * Sorts the data in the order of the specified numeric array.
    * Note that the input array will be resorted as well.
    * The algorithm is derived from {@link Arrays#sort(int[])}.
-   * @param num token array to sort by
-   * @param asc ascending
+   * @param values values to sort by
+   * @param asc ascending order
    */
-  public final void sort(final long[] num, final boolean asc) {
-    sort(0, size, asc, num);
+  public final void sort(final long[] values, final boolean asc) {
+    sort(values, asc, 0, size);
   }
 
   /**
    * Sorts the array.
-   * @param s offset
-   * @param e length
-   * @param g numeric sort
-   * @param f ascending/descending sort
-   * @param t sort array
+   * @param values values to sort by
+   * @param asc ascending/descending order
+   * @param start start position
+   * @param length length
+   * @param num numeric sort
    */
-  private void sort(final int s, final int e, final boolean g, final boolean f, final byte[][] t) {
-    if(e < 7) {
-      for(int i = s; i < e + s; ++i) {
-        for(int j = i; j > s; j--) {
-          final int h = g ? s(t[j - 1], t[j]) : d(t[j - 1], t[j]);
-          if(f ? h < 0 : h > 0) break;
-          s(j, j - 1, t);
+  private void sort(final byte[][] values, final boolean asc, final int start, final int length,
+      final boolean num) {
+    if(length < 7) {
+      for(int i = start; i < length + start; ++i) {
+        for(int j = i; j > start; j--) {
+          final int h = num ? cmpNum(values[j - 1], values[j]) : cmp(values[j - 1], values[j]);
+          if(asc ? h < 0 : h > 0) break;
+          swap(j, j - 1, values);
         }
       }
       return;
     }
 
-    int m = s + (e >> 1);
-    if(e > 7) {
-      int l = s;
-      int n = s + e - 1;
-      if(e > 40) {
-        final int k = e >>> 3;
-        l = m(l, l + k, l + (k << 1));
-        m = m(m - k, m, m + k);
-        n = m(n - (k << 1), n - k, n);
+    int m = start + (length >> 1);
+    if(length > 7) {
+      int l = start;
+      int n = start + length - 1;
+      if(length > 40) {
+        final int k = length >>> 3;
+        l = median(l, l + k, l + (k << 1));
+        m = median(m - k, m, m + k);
+        n = median(n - (k << 1), n - k, n);
       }
-      m = m(l, m, n);
+      m = median(l, m, n);
     }
-    final byte[] v = t[m];
+    final byte[] v = values[m];
 
-    int a = s, b = a, c = s + e - 1, d = c;
+    int a = start, b = a, c = start + length - 1, d = c;
     while(true) {
       while(b <= c) {
-        final int h = g ? s(t[b], v) : d(t[b], v);
-        if(f ? h > 0 : h < 0) break;
-        if(h == 0) s(a++, b, t);
+        final int h = num ? cmpNum(values[b], v) : cmp(values[b], v);
+        if(asc ? h > 0 : h < 0) break;
+        if(h == 0) swap(a++, b, values);
         ++b;
       }
       while(c >= b) {
-        final int h = g ? s(t[c], v) : d(t[c], v);
-        if(f ? h < 0 : h > 0) break;
-        if(h == 0) s(c, d--, t);
+        final int h = num ? cmpNum(values[c], v) : cmp(values[c], v);
+        if(asc ? h < 0 : h > 0) break;
+        if(h == 0) swap(c, d--, values);
         --c;
       }
       if(b > c) break;
-      s(b++, c--, t);
+      swap(b++, c--, values);
     }
 
-    final int n = s + e;
-    int k = Math.min(a - s, b - a);
-    s(s, b - k, k, t);
+    final int n = start + length;
+    int k = Math.min(a - start, b - a);
+    swap(values, start, b - k, k);
     k = Math.min(d - c, n - d - 1);
-    s(b, n - k, k, t);
+    swap(values, b, n - k, k);
 
-    if((k = b - a) > 1) sort(s, k, g, f, t);
-    if((k = d - c) > 1) sort(n - k, k, g, f, t);
+    if((k = b - a) > 1) sort(values, asc, start, k, num);
+    if((k = d - c) > 1) sort(values, asc, n - k, k, num);
   }
 
   /**
    * Sorts the array.
-   * @param s offset
-   * @param e length
-   * @param f ascending/descending sort
-   * @param t sort array
+   * @param values values to sort by
+   * @param asc ascending/descending sort
+   * @param start start position
+   * @param length length
    */
-  private void sort(final int s, final int e, final boolean f, final double[] t) {
-    if(e < 7) {
-      for(int i = s; i < e + s; ++i) {
-        for(int j = i; j > s; j--) {
-          final double h = t[j - 1] - t[j];
-          if(f ? h < 0 : h > 0) break;
-          s(j, j - 1, t);
+  private void sort(final double[] values, final boolean asc, final int start, final int length) {
+    if(length < 7) {
+      for(int i = start; i < length + start; ++i) {
+        for(int j = i; j > start; j--) {
+          final double h = values[j - 1] - values[j];
+          if(asc ? h < 0 : h > 0) break;
+          swap(j, j - 1, values);
         }
       }
       return;
     }
 
-    int m = s + (e >> 1);
-    if(e > 7) {
-      int l = s;
-      int n = s + e - 1;
-      if(e > 40) {
-        final int k = e >>> 3;
-        l = m(l, l + k, l + (k << 1));
-        m = m(m - k, m, m + k);
-        n = m(n - (k << 1), n - k, n);
+    int m = start + (length >> 1);
+    if(length > 7) {
+      int l = start;
+      int n = start + length - 1;
+      if(length > 40) {
+        final int k = length >>> 3;
+        l = median(l, l + k, l + (k << 1));
+        m = median(m - k, m, m + k);
+        n = median(n - (k << 1), n - k, n);
       }
-      m = m(l, m, n);
+      m = median(l, m, n);
     }
-    final double v = t[m];
+    final double v = values[m];
 
-    int a = s, b = a, c = s + e - 1, d = c;
+    int a = start, b = a, c = start + length - 1, d = c;
     while(true) {
       while(b <= c) {
-        final double h = t[b] - v;
-        if(f ? h > 0 : h < 0) break;
-        if(h == 0) s(a++, b, t);
+        final double h = values[b] - v;
+        if(asc ? h > 0 : h < 0) break;
+        if(h == 0) swap(a++, b, values);
         ++b;
       }
       while(c >= b) {
-        final double h = t[c] - v;
-        if(f ? h < 0 : h > 0) break;
-        if(h == 0) s(c, d--, t);
+        final double h = values[c] - v;
+        if(asc ? h < 0 : h > 0) break;
+        if(h == 0) swap(c, d--, values);
         --c;
       }
       if(b > c) break;
-      s(b++, c--, t);
+      swap(b++, c--, values);
     }
 
-    final int n = s + e;
-    int k = Math.min(a - s, b - a);
-    s(s, b - k, k, t);
+    final int n = start + length;
+    int k = Math.min(a - start, b - a);
+    swap(values, start, b - k, k);
     k = Math.min(d - c, n - d - 1);
-    s(b, n - k, k, t);
+    swap(values, b, n - k, k);
 
-    if((k = b - a) > 1) sort(s, k, f, t);
-    if((k = d - c) > 1) sort(n - k, k, f, t);
+    if((k = b - a) > 1) sort(values, asc, start, k);
+    if((k = d - c) > 1) sort(values, asc, n - k, k);
   }
 
   /**
    * Sorts the array.
-   * @param s offset
-   * @param e length
-   * @param f ascending/descending sort
-   * @param t sort array
+   * @param values values to sort by
+   * @param asc ascending/descending sort
+   * @param start start position
+   * @param length length
    */
-  private void sort(final int s, final int e, final boolean f, final int[] t) {
-    if(e < 7) {
-      for(int i = s; i < e + s; ++i) {
-        for(int j = i; j > s; j--) {
-          final int h = t[j - 1] - t[j];
-          if(f ? h < 0 : h > 0) break;
-          s(j, j - 1, t);
+  private void sort(final int[] values, final boolean asc, final int start, final int length) {
+    if(length < 7) {
+      for(int i = start; i < start + length; ++i) {
+        for(int j = i; j > start; j--) {
+          final int h = values[j - 1] - values[j];
+          if(asc ? h < 0 : h > 0) break;
+          swap(j, j - 1, values);
         }
       }
       return;
     }
 
-    int m = s + (e >> 1);
-    if(e > 7) {
-      int l = s;
-      int n = s + e - 1;
-      if(e > 40) {
-        final int k = e >>> 3;
-        l = m(l, l + k, l + (k << 1));
-        m = m(m - k, m, m + k);
-        n = m(n - (k << 1), n - k, n);
+    int m = start + (length >> 1);
+    if(length > 7) {
+      int l = start;
+      int n = start + length - 1;
+      if(length > 40) {
+        final int k = length >>> 3;
+        l = median(l, l + k, l + (k << 1));
+        m = median(m - k, m, m + k);
+        n = median(n - (k << 1), n - k, n);
       }
-      m = m(l, m, n);
+      m = median(l, m, n);
     }
-    final int v = t[m];
+    final int v = values[m];
 
-    int a = s, b = a, c = s + e - 1, d = c;
+    int a = start, b = a, c = start + length - 1, d = c;
     while(true) {
       while(b <= c) {
-        final int h = t[b] - v;
-        if(f ? h > 0 : h < 0) break;
-        if(h == 0) s(a++, b, t);
+        final int h = values[b] - v;
+        if(asc ? h > 0 : h < 0) break;
+        if(h == 0) swap(a++, b, values);
         ++b;
       }
       while(c >= b) {
-        final int h = t[c] - v;
-        if(f ? h < 0 : h > 0) break;
-        if(h == 0) s(c, d--, t);
+        final int h = values[c] - v;
+        if(asc ? h < 0 : h > 0) break;
+        if(h == 0) swap(c, d--, values);
         --c;
       }
       if(b > c) break;
-      s(b++, c--, t);
+      swap(b++, c--, values);
     }
 
-    final int n = s + e;
-    int k = Math.min(a - s, b - a);
-    s(s, b - k, k, t);
+    final int n = start + length;
+    int k = Math.min(a - start, b - a);
+    swap(values, start, b - k, k);
     k = Math.min(d - c, n - d - 1);
-    s(b, n - k, k, t);
+    swap(values, b, n - k, k);
 
-    if((k = b - a) > 1) sort(s, k, f, t);
-    if((k = d - c) > 1) sort(n - k, k, f, t);
+    if((k = b - a) > 1) sort(values, asc, start, k);
+    if((k = d - c) > 1) sort(values, asc, n - k, k);
   }
 
   /**
    * Sorts the array.
-   * @param s offset
-   * @param e length
-   * @param f ascending/descending sort
-   * @param t sort array
+   * @param values values to sort by
+   * @param asc ascending/descending sort
+   * @param start start position
+   * @param length length
    */
-  private void sort(final int s, final int e, final boolean f, final long[] t) {
-    if(e < 7) {
-      for(int i = s; i < e + s; ++i) {
-        for(int j = i; j > s; j--) {
-          final long h = t[j - 1] - t[j];
-          if(f ? h < 0 : h > 0) break;
-          s(j, j - 1, t);
+  private void sort(final long[] values, final boolean asc, final int start, final int length) {
+    if(length < 7) {
+      for(int i = start; i < length + start; ++i) {
+        for(int j = i; j > start; j--) {
+          final long h = values[j - 1] - values[j];
+          if(asc ? h < 0 : h > 0) break;
+          swap(values, j, j - 1);
         }
       }
       return;
     }
 
-    int m = s + (e >> 1);
-    if(e > 7) {
-      int l = s;
-      int n = s + e - 1;
-      if(e > 40) {
-        final int k = e >>> 3;
-        l = m(l, l + k, l + (k << 1));
-        m = m(m - k, m, m + k);
-        n = m(n - (k << 1), n - k, n);
+    int m = start + (length >> 1);
+    if(length > 7) {
+      int l = start;
+      int n = start + length - 1;
+      if(length > 40) {
+        final int k = length >>> 3;
+        l = median(l, l + k, l + (k << 1));
+        m = median(m - k, m, m + k);
+        n = median(n - (k << 1), n - k, n);
       }
-      m = m(l, m, n);
+      m = median(l, m, n);
     }
-    final long v = t[m];
+    final long v = values[m];
 
-    int a = s, b = a, c = s + e - 1, d = c;
+    int a = start, b = a, c = start + length - 1, d = c;
     while(true) {
       while(b <= c) {
-        final long h = t[b] - v;
-        if(f ? h > 0 : h < 0) break;
-        if(h == 0) s(a++, b, t);
+        final long h = values[b] - v;
+        if(asc ? h > 0 : h < 0) break;
+        if(h == 0) swap(values, a++, b);
         ++b;
       }
       while(c >= b) {
-        final long h = t[c] - v;
-        if(f ? h < 0 : h > 0) break;
-        if(h == 0) s(c, d--, t);
+        final long h = values[c] - v;
+        if(asc ? h < 0 : h > 0) break;
+        if(h == 0) swap(values, c, d--);
         --c;
       }
       if(b > c) break;
-      s(b++, c--, t);
+      swap(values, b++, c--);
     }
 
-    final int n = s + e;
-    int k = Math.min(a - s, b - a);
-    s(s, b - k, k, t);
+    final int n = start + length;
+    int k = Math.min(a - start, b - a);
+    swap(values, start, b - k, k);
     k = Math.min(d - c, n - d - 1);
-    s(b, n - k, k, t);
+    swap(values, b, n - k, k);
 
-    if((k = b - a) > 1) sort(s, k, f, t);
-    if((k = d - c) > 1) sort(n - k, k, f, t);
+    if((k = b - a) > 1) sort(values, asc, start, k);
+    if((k = d - c) > 1) sort(values, asc, n - k, k);
   }
 
   /**
    * Compares two numeric tokens and returns an integer.
-   * @param a first token
-   * @param b second token
+   * @param value1 first value
+   * @param value2 second value
    * @return result
    */
-  private static int s(final byte[] a, final byte[] b) {
-    final double n = Token.toDouble(a) - Token.toDouble(b);
+  private static int cmpNum(final byte[] value1, final byte[] value2) {
+    final double n = Token.toDouble(value1) - Token.toDouble(value2);
     return n > 0 ? 1 : n < 0 ? -1 : 0;
   }
 
   /**
    * Compares two tokens and returns an integer.
-   * @param a first token
-   * @param b second token
+   * @param value1 first value
+   * @param value2 second value
    * @return result
    */
-  private static int d(final byte[] a, final byte[] b) {
-    return a == null ? b == null ? 0 : -1 : b == null ? 1 : Token.diff(a, b);
+  private static int cmp(final byte[] value1, final byte[] value2) {
+    return value1 == null ? value2 == null ? 0 : -1 : value2 == null ? 1 :
+      Token.diff(value1, value2);
   }
 
   /**
    * Swaps two array elements.
    * @param a first offset
    * @param b second offset
-   * @param t sort array
+   * @param values values to sort by
    */
-  private void s(final int a, final int b, final byte[][] t) {
+  private void swap(final int a, final int b, final byte[][] values) {
     final int l = list[a];
     list[a] = list[b];
     list[b] = l;
-    final byte[] c = t[a];
-    t[a] = t[b];
-    t[b] = c;
+    final byte[] c = values[a];
+    values[a] = values[b];
+    values[b] = c;
   }
 
   /**
    * Swaps two array elements.
    * @param a first offset
    * @param b second offset
-   * @param t sort array
+   * @param values values to sort by
    */
-  private void s(final int a, final int b, final double[] t) {
+  private void swap(final int a, final int b, final double[] values) {
     final int l = list[a];
     list[a] = list[b];
     list[b] = l;
-    final double c = t[a];
-    t[a] = t[b];
-    t[b] = c;
+    final double c = values[a];
+    values[a] = values[b];
+    values[b] = c;
   }
 
   /**
    * Swaps two array elements.
    * @param a first offset
    * @param b second offset
-   * @param t sort array
+   * @param values values to sort by
    */
-  private void s(final int a, final int b, final int[] t) {
+  private void swap(final int a, final int b, final int[] values) {
     final int l = list[a];
     list[a] = list[b];
     list[b] = l;
-    final int c = t[a];
-    t[a] = t[b];
-    t[b] = c;
+    final int c = values[a];
+    values[a] = values[b];
+    values[b] = c;
   }
 
   /**
    * Swaps two array elements.
+   * @param values values to sort by
    * @param a first offset
    * @param b second offset
-   * @param t sort array
    */
-  private void s(final int a, final int b, final long[] t) {
+  private void swap(final long[] values, final int a, final int b) {
     final int l = list[a];
     list[a] = list[b];
     list[b] = l;
-    final long c = t[a];
-    t[a] = t[b];
-    t[b] = c;
+    final long c = values[a];
+    values[a] = values[b];
+    values[b] = c;
   }
 
   /**
    * Swaps x[a .. (a+n-1)] with x[b .. (b+n-1)].
+   * @param values values to sort by
    * @param a first offset
    * @param b second offset
-   * @param n number of elements
-   * @param t sort array
+   * @param length number of elements
    */
-  private void s(final int a, final int b, final int n, final byte[][] t) {
-    for(int i = 0; i < n; ++i) s(a + i, b + i, t);
+  private void swap(final byte[][] values, final int a, final int b, final int length) {
+    for(int i = 0; i < length; ++i) swap(a + i, b + i, values);
   }
 
   /**
    * Swaps x[a .. (a+n-1)] with x[b .. (b+n-1)].
+   * @param values values to sort by
    * @param a first offset
    * @param b second offset
-   * @param n number of elements
-   * @param t sort array
+   * @param length number of elements
    */
-  private void s(final int a, final int b, final int n, final double[] t) {
-    for(int i = 0; i < n; ++i) s(a + i, b + i, t);
+  private void swap(final double[] values, final int a, final int b, final int length) {
+    for(int i = 0; i < length; ++i) swap(a + i, b + i, values);
   }
 
   /**
    * Swaps x[a .. (a+n-1)] with x[b .. (b+n-1)].
+   * @param values values to sort by
    * @param a first offset
    * @param b second offset
-   * @param n number of elements
-   * @param t sort array
+   * @param length number of elements
    */
-  private void s(final int a, final int b, final int n, final int[] t) {
-    for(int i = 0; i < n; ++i) s(a + i, b + i, t);
+  private void swap(final int[] values, final int a, final int b, final int length) {
+    for(int i = 0; i < length; ++i) swap(a + i, b + i, values);
   }
 
   /**
    * Swaps x[a .. (a+n-1)] with x[b .. (b+n-1)].
+   * @param values values to sort by
    * @param a first offset
    * @param b second offset
-   * @param n number of elements
-   * @param t sort array
+   * @param length number of elements
    */
-  private void s(final int a, final int b, final int n, final long[] t) {
-    for(int i = 0; i < n; ++i) s(a + i, b + i, t);
+  private void swap(final long[] values, final int a, final int b, final int length) {
+    for(int i = 0; i < length; ++i) swap(values, a + i, b + i);
   }
 
   /**
@@ -677,7 +694,7 @@ public class IntList extends ElementList {
    * @param c thirst offset
    * @return median
    */
-  private int m(final int a, final int b, final int c) {
+  private int median(final int a, final int b, final int c) {
     return list[a] < list[b] ?
       list[b] < list[c] ? b : list[a] < list[c] ? c : a :
       list[b] > list[c] ? b : list[a] > list[c] ? c : a;

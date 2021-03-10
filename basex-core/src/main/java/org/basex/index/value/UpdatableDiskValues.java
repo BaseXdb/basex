@@ -246,7 +246,7 @@ public final class UpdatableDiskValues extends DiskValues {
       ids.sort();
     } else {
       // tokenization: create array with offsets to ordered values
-      order = ids.createOrder();
+      order = ids.createOrder(true);
     }
 
     int lastId = 0;

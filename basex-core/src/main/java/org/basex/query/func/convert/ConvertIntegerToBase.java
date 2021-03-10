@@ -36,26 +36,23 @@ public final class ConvertIntegerToBase extends StandardFunc {
     for(int i = 1, p = 2; i < 6; i++, p <<= 1)
       if(base == p) return toBaseFast(num, i);
 
-    final ByteList tb = new ByteList();
+    final ByteList bl = new ByteList();
     long n = num;
     if(n < 0) {
       // unsigned value doesn't fit in any native type...
       final BigInteger[] dr = BigInteger.valueOf(n).add(MAX_ULONG).divideAndRemainder(
           BigInteger.valueOf(base));
       n = dr[0].longValue();
-      tb.add(DIGITS[dr[1].intValue()]);
+      bl.add(DIGITS[dr[1].intValue()]);
     } else {
-      tb.add(DIGITS[(int) (n % base)]);
+      bl.add(DIGITS[(int) (n % base)]);
       n /= base;
     }
     while(n != 0) {
-      tb.add(DIGITS[(int) (n % base)]);
+      bl.add(DIGITS[(int) (n % base)]);
       n /= base;
     }
-
-    final byte[] bytes = tb.finish();
-    Array.reverse(bytes);
-    return Str.get(bytes);
+    return Str.get(bl.reverse().finish());
   }
 
   /**

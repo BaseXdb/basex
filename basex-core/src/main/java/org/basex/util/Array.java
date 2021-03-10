@@ -194,7 +194,7 @@ public final class Array {
   public static int[] createOrder(final byte[][] values, final boolean numeric,
       final boolean ascending) {
     final IntList il = number(values.length);
-    il.sort(values, numeric, ascending);
+    il.sort(values, ascending, numeric);
     return il.finish();
   }
 
@@ -243,42 +243,6 @@ public final class Array {
     final int[] tmp = new int[size];
     for(int i = 0; i < size; ++i) tmp[i] = i;
     return new IntList(tmp);
-  }
-
-  /**
-   * Reverses the order of the entries in the given array.
-   * @param array array
-   */
-  public static void reverse(final byte[] array) {
-    reverse(array, 0, array.length);
-  }
-
-  /**
-   * Reverses the order of all entries in the given interval.
-   * @param array array
-   * @param index index of first entry of the interval
-   * @param length length of the interval
-   */
-  private static void reverse(final byte[] array, final int index, final int length) {
-    for(int l = index, r = index + length - 1; l < r; l++, r--) {
-      final byte tmp = array[l];
-      array[l] = array[r];
-      array[r] = tmp;
-    }
-  }
-
-  /**
-   * Reverses the order of all entries in the given interval.
-   * @param array array
-   * @param index index of first entry of the interval
-   * @param length length of the interval
-   */
-  public static void reverse(final Object[] array, final int index, final int length) {
-    for(int l = index, r = index + length - 1; l < r; l++, r--) {
-      final Object tmp = array[l];
-      array[l] = array[r];
-      array[r] = tmp;
-    }
   }
 
   /**

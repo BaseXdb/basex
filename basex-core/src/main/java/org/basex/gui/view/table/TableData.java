@@ -262,7 +262,7 @@ final class TableData {
         tokens[r] = num ? MAXNUM : MAXTOK;
       }
     }
-    rows.sort(tokens, num, asc);
+    rows.sort(tokens, asc, num);
   }
 
   /**

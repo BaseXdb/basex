@@ -111,6 +111,20 @@ public class ByteList extends ElementList {
     return s == 0 ? EMPTY : s == lst.length ? lst : Arrays.copyOf(lst, s);
   }
 
+  /**
+   * Reverses the order of the elements.
+   * @return self reference
+   */
+  public ByteList reverse() {
+    byte[] lst = list;
+    for(int l = 0, r = size - 1; l < r; l++, r--) {
+      final byte tmp = lst[l];
+      lst[l] = lst[r];
+      lst[r] = tmp;
+    }
+    return this;
+  }
+
   @Override
   public boolean equals(final Object obj) {
     if(obj == this) return true;
