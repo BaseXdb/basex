@@ -4,13 +4,11 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.List;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.func.update.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -41,30 +39,17 @@ public class FnForEach extends StandardFunc {
     final SeqType st = items.seqType();
     if(st.zero()) return items;
 
-    // assign type after coercion (expression might have changed)
-    final boolean updating = this instanceof UpdateForEach;
-    final long size = items.size();
-    final Expr func = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE));
-
-    final boolean ndt = func.has(Flag.NDT);
-    if(allAreValues(false) && size <= UNROLL_LIMIT) {
-      // unroll the loop
-      final ExprList results = new ExprList((int) size);
-      for(final Item item : (Value) items) {
-        results.add(new DynFuncCall(info, sc, updating, ndt, func, item).optimize(cc));
-      }
-      cc.info(QueryText.OPTUNROLL_X, this);
-      return List.get(cc, info, results.finish());
-    }
-
-    // otherwise, create FLWOR expression
+    // create FLWOR expression
     final LinkedList<Clause> clauses = new LinkedList<>();
     final IntObjMap<Var> vm = new IntObjMap<>();
     final Var var = cc.copy(new Var(new QNm("each"), null, false, cc.qc, sc, info), vm);
     clauses.add(new For(var, items).optimize(cc));
 
+    final Expr func = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE));
+    final boolean updating = this instanceof UpdateForEach, ndt = func.has(Flag.NDT);
     final ParseExpr ref = new VarRef(info, var).optimize(cc);
     final Expr rtrn = new DynFuncCall(info, sc, updating, ndt, func, ref).optimize(cc);
+
     return new GFLWOR(info, clauses, rtrn).optimize(cc);
   }
 }

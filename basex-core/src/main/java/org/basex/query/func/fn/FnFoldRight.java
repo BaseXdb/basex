@@ -56,16 +56,16 @@ public final class FnFoldRight extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final Expr expr1 = exprs[0], expr2 = exprs[1], expr3 = exprs[2];
     if(expr1 == Empty.VALUE) return expr2;
 
     FnFoldLeft.opt(this, cc, false, false);
 
-    if(allAreValues(false) && expr1.size() <= UNROLL_LIMIT) {
+    if(expr1 instanceof Value && expr3 instanceof Value && expr1.size() <= UNROLL_LIMIT) {
       // unroll the loop
       Expr expr = expr2;
       for(final Item item : ((Value) expr1).reverse(cc.qc)) {
-        expr = new DynFuncCall(info, sc, exprs[2], item, expr).optimize(cc);
+        expr = new DynFuncCall(info, sc, expr3, item, expr).optimize(cc);
       }
       cc.info(QueryText.OPTUNROLL_X, this);
       return expr;

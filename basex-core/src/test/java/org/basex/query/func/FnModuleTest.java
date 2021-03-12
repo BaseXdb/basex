@@ -324,17 +324,14 @@ public final class FnModuleTest extends QueryPlanTest {
     query("count(" + func.args(" 1 to 10000000000", " string#1") + ')', 10000000000L);
     check("count(" + func.args(" 1 to 20", " function($a) { $a, $a }") + ')', 40, root(Int.class));
 
-    // should be unrolled and evaluated at compile time
+    // rewritten to FLWOR expression
     check(func.args(" 0 to 8", " function($x) { $x + 1 }"),
         "1\n2\n3\n4\n5\n6\n7\n8\n9",
         empty(func),
-        exists(RangeSeq.class));
-    // should be unrolled but not evaluated at compile time
+        root(RangeSeq.class), exists(RangeSeq.class));
     check(func.args(" 1 to 9", " function($x) { $x[random:double()] }"), "",
         empty(func),
-        exists(_RANDOM_DOUBLE));
-
-    // should be rewritten to maps
+        exists(DualMap.class), exists(_RANDOM_DOUBLE));
     check(func.args(" 0 to 10", " function($x) { $x idiv 2 }"),
         "0\n0\n1\n1\n2\n2\n3\n3\n4\n4\n5",
         root(DualMap.class));
