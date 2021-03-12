@@ -16,7 +16,7 @@ import org.basex.util.*;
  */
 public final class ArrayForEach extends ArrayFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(exprs[0], qc);
     final FItem func = checkArity(exprs[1], 1, qc);
 
@@ -27,7 +27,10 @@ public final class ArrayForEach extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Type type1 = exprs[0].seqType().type;
+    final Expr expr1 = exprs[0];
+    if(expr1 == XQArray.empty()) return expr1;
+
+    final Type type1 = expr1.seqType().type;
     if(type1 instanceof ArrayType) {
       exprs[1] = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, ((ArrayType) type1).declType);
     }

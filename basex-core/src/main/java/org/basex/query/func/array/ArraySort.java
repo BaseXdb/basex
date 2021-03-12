@@ -44,6 +44,9 @@ public final class ArraySort extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr expr1 = exprs[0];
+    if(expr1 == XQArray.empty()) return expr1;
+
     final SeqType st1 = exprs[0].seqType();
     final Type type1 = st1.type;
 

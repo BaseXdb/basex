@@ -7,6 +7,7 @@ import org.basex.query.func.update.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -25,11 +26,14 @@ public class MapForEach extends StandardFunc {
 
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
-    final Type type1 = exprs[0].seqType().type;
+    final Expr expr1 = exprs[0];
+    if(expr1 == XQMap.EMPTY) return Empty.VALUE;
+
+    final Type type1 = expr1.seqType().type;
     if(type1 instanceof MapType) {
       final MapType mtype1 = (MapType) type1;
-      exprs[1] = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM,
-          mtype1.argTypes[0].with(Occ.EXACTLY_ONE), mtype1.declType);
+      final SeqType declType1 = mtype1.argTypes[0].with(Occ.EXACTLY_ONE);
+      exprs[1] = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, declType1, mtype1.declType);
     }
 
     final boolean updating = this instanceof UpdateMapForEach;

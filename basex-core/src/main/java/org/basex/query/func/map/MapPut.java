@@ -1,5 +1,7 @@
 package org.basex.query.func.map;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -25,8 +27,10 @@ public final class MapPut extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1], expr3 = exprs[2];
+    if(expr1 == XQMap.EMPTY) return cc.function(_MAP_ENTRY, info, expr2, expr3);
+
     final Type type1 = expr1.seqType().type;
     if(type1 instanceof MapType) {
       Type type2 = expr2.seqType().type.atomic();

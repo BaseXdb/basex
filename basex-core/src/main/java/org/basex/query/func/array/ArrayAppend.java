@@ -2,6 +2,8 @@ package org.basex.query.func.array;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.constr.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -19,10 +21,13 @@ public final class ArrayAppend extends ArrayFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    final Type type1 = exprs[0].seqType().type;
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if(expr1 == XQArray.empty()) return new CArray(info, true, expr2).optimize(cc);
+
+    final Type type1 = expr1.seqType().type;
     if(type1 instanceof ArrayType) {
-      final SeqType dt = ((ArrayType) type1).declType.union(exprs[1].seqType());
+      final SeqType dt = ((ArrayType) type1).declType.union(expr2.seqType());
       exprType.assign(ArrayType.get(dt));
     }
     return this;
