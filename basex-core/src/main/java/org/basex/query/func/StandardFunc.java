@@ -43,9 +43,6 @@ import org.basex.util.similarity.*;
  * @author Christian Gruen
  */
 public abstract class StandardFunc extends Arr {
-  /** Minimum size of a loop that should not be unrolled. */
-  public static final int UNROLL_LIMIT = 5;
-
   /** Function definition. */
   public FuncDefinition definition;
   /** Static context. */

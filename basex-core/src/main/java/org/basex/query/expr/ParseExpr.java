@@ -26,6 +26,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class ParseExpr extends Expr {
+  /** Limit for unrolling iterations in the code. */
+  public static final int UNROLL_LIMIT = 5;
+
   /** Expression type. */
   public final ExprType exprType;
   /** Input information. */

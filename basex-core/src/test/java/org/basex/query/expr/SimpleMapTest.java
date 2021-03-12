@@ -67,17 +67,17 @@ public final class SimpleMapTest extends QueryPlanTest {
 
   /** Typing. */
   @Test public void types() {
-    check("(1, 2) ! .[. = 1]", 1, root(IterFilter.class));
-    check("(1, 2) ! <_>{ . }</_>[. = 1]", "<_>1</_>", exists(DualMap.class));
+    check("(1, 2)[. != 0] ! .[. = 1]", 1, root(IterFilter.class));
+    check("(1, 2)[. != 0] ! <_>{ . }</_>[. = 1]", "<_>1</_>", exists(DualMap.class));
     check("<_>1</_>[. = 1] ! 2", "2", type(ItemMap.class, "xs:integer?"));
     check("<_>4</_>[. = 4] ! (4, 5)[. = 4]", 4, type(IterMap.class, "xs:integer*"));
   }
 
   /** Flatten nested operators. */
   @Test public void flatten() {
-    check("(1, 2) ! ((. + .) ! (. * .))", "4\n16", count(IterMap.class, 1));
+    check("(1, 2)[. != 0] ! ((. + .) ! (. * .))", "4\n16", count(IterMap.class, 1));
     // do not rewrite positional access
-    check("(1, 2) ! ((1 to .) ! position())", "1\n1\n2", count(CachedMap.class, 1));
+    check("(1, 2)[. != 0] ! ((1 to .) ! position())", "1\n1\n2", count(CachedMap.class, 1));
   }
 
   /** Inline simple expressions into next operand. */

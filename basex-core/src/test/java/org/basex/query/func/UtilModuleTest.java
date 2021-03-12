@@ -186,8 +186,9 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(func.args(" (<a/>, <b/>)")), "", empty());
     check(func.args(func.args(" (<a/>, <b/>, <c/>)")), "<a/>", root(CElem.class));
     check(func.args(func.args(" (<a/>, <b/>, <c/>, <d/>)")), "<a/>\n<b/>", root(List.class));
-    check(func.args(func.args(" (1 to 3) ! <a>{. }</a>")), "<a>1</a>", root(HEAD));
-    check(func.args(func.args(" (1 to 4) ! <a>{. }</a>")), "<a>1</a>\n<a>2</a>", root(SUBSEQUENCE));
+    check(func.args(func.args(" (1 to 10) ! <a>{. }</a>")),
+        "<a>1</a>\n<a>2</a>\n<a>3</a>\n<a>4</a>\n<a>5</a>\n<a>6</a>\n<a>7</a>\n<a>8</a>",
+        root(SUBSEQUENCE));
 
     check(func.args(" util:replicate(<a/>, 2)"), "<a/>", root(CElem.class));
     check(func.args(" util:replicate(<a/>, 3)"), "<a/>\n<a/>", root(_UTIL_REPLICATE));
@@ -197,17 +198,17 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" (<a/>, <b/>, <c/>)"), "<a/>\n<b/>", root(List.class), empty(_UTIL_INIT));
     check(func.args(" (<a/>, 1 to 2)"), "<a/>\n1", root(List.class), empty(_UTIL_INIT));
 
-    check(func.args(" subsequence((1 to 5) ! <_>{ . }</_>, 1, 1)"),
+    check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 1, 1)"),
         "", empty());
-    check(func.args(" subsequence((1 to 5) ! <_>{ . }</_>, 1, 2)"),
+    check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 1, 2)"),
         "<_>1</_>", root(HEAD));
-    check(func.args(" subsequence((1 to 5) ! <_>{ . }</_>, 1, 3)"),
+    check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 1, 3)"),
         "<_>1</_>\n<_>2</_>", root(SUBSEQUENCE));
-    check(func.args(" subsequence((1 to 5) ! <_>{ . }</_>, 2, 3)"),
+    check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 2, 3)"),
         "<_>2</_>\n<_>3</_>", root(SUBSEQUENCE));
-    check(func.args(" subsequence((1 to 5) ! <_>{ . }</_>, 4, 2)"),
+    check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 4, 2)"),
         "<_>4</_>", root(_UTIL_ITEM));
-    check(func.args(" subsequence((1 to 5) ! <_>{ . }</_>, 5, 1)"),
+    check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 5, 1)"),
         "", empty());
   }
 

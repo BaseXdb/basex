@@ -325,15 +325,16 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $i in (1, 2) return 'a'[$i]", "a", root(Str.class));
     check("for $i in (1, 2) return 'a'[position() = $i]", "a", root(Str.class));
     check("for $i in (1, 2) return 'a'[position() = $i to $i]", "a", root(Str.class));
-    check("for $i in (1, 2) return 'a'[position() = $i to $i + 1]", "a", exists(_UTIL_RANGE));
-    check("for $i in (1, 2) return 'a'[position() = $i to 1]", "a", exists(_UTIL_RANGE));
-    check("for $i in (1, 2) return 'a'[position() >= $i]", "a", exists(_UTIL_RANGE));
-    check("for $i in (1, 2) return 'a'[position() > $i]", "", exists(_UTIL_RANGE));
-    check("for $i in (1, 2) return 'a'[position() <= $i]", "a\na", exists(_UTIL_RANGE));
-    check("for $i in (1, 2) return 'a'[position() < $i]", "a", exists(_UTIL_RANGE));
+
+    check("for $i in (1, 2)[. > 0] return 9[position() = $i to $i + 1]", 9, exists(_UTIL_RANGE));
+    check("for $i in (1, 2)[. > 0] return 9[position() = $i to 1]", 9, exists(_UTIL_RANGE));
+    check("for $i in (1, 2)[. > 0] return 9[position() >= $i]", 9, exists(_UTIL_RANGE));
+    check("for $i in (1, 2)[. > 0] return 9[position() > $i]", "", exists(_UTIL_RANGE));
+    check("for $i in (1, 2)[. > 0] return 9[position() <= $i]", "9\n9", exists(_UTIL_RANGE));
+    check("for $i in (1, 2)[. > 0] return 9[position() < $i]", 9, exists(_UTIL_RANGE));
 
     // check if positional predicates are rewritten to utility functions
-    final String seq = " (1, 1.1, 1.9, 2) ";
+    final String seq = " (1, 1.1, 1.9, 2, 2.1, 2.2, 2.1, 2.2) ";
     check("for $i in" + seq + "return ('a', 'b')[$i]",
         "a\nb", exists(_UTIL_ITEM));
     check("for $i in" + seq + "return ('a', 'b')[position() = $i]",
@@ -343,9 +344,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $i in" + seq + "return ('a', 'b')[position() > $i]",
         "b\nb\nb", exists(_UTIL_RANGE));
     check("for $i in" + seq + "return ('a', 'b')[position() <= $i]",
-        "a\na\na\na\nb", exists(_UTIL_RANGE));
+        "a\na\na\na\nb\na\nb\na\nb\na\nb\na\nb", exists(_UTIL_RANGE));
     check("for $i in" + seq + "return ('a', 'b')[position() < $i]",
-        "a\na\na", exists(_UTIL_RANGE));
+        "a\na\na\na\nb\na\nb\na\nb\na\nb", exists(_UTIL_RANGE));
 
     // check if multiple positional predicates are rewritten to utility functions
     check("for $i in" + seq + "return ('a', 'b')[$i][$i]",
@@ -353,7 +354,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $i in" + seq + "return ('a', 'b')[position() = $i][position() = $i]",
         "a", count(_UTIL_ITEM, 2));
     check("for $i in" + seq + "return ('a', 'b')[position() < $i][position() < $i]",
-        "a\na\na", count(_UTIL_RANGE, 2));
+        "a\na\na\na\nb\na\nb\na\nb\na\nb", count(_UTIL_RANGE, 2));
 
     // check if positional predicates are merged and rewritten to utility functions
     check("for $i in" + seq + "return ('a', 'b')[position() = $i and position() = $i]", "a\nb",
@@ -375,7 +376,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() >= $i + 1]",
         "b", exists(CachedFilter.class));
     check("for $i in" + seq + "return ('a', 'b')[position() < $i and position() < $i + 1]",
-        "a\na\na", exists(CachedFilter.class));
+        "a\na\na\na\nb\na\nb\na\nb\na\nb", exists(CachedFilter.class));
 
     check("(<a/>, <b/>)[last()]",
         "<b/>", root(CElem.class));
@@ -523,7 +524,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("xs:string(<_/>[. = '']) = ''", true, empty(Cast.class), root(CmpSimpleG.class));
     check("xs:double(<_>1</_>) + 2", 3, empty(Cast.class), type(Arith.class, "xs:double"));
-    check("(1, 2) ! (xs:byte(.)) ! (xs:integer(.) + 2)", "3\n4",
+    check("(1, 2)[. != 0] ! (xs:byte(.)) ! (xs:integer(.) + 2)", "3\n4",
         count(Cast.class, 1), type(Arith.class, "xs:integer"));
 
     error("(if(<_>!</_> = 'a') then 'b') cast as xs:string", INVTYPE_X_X_X);
@@ -693,9 +694,9 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Static typing of computed maps. */
   @Test public void gh1766() {
-    check("let $map := map { 'c': 'x' } return $map?(('a', 'b'))", "",
+    check("let $map := map { 'c': 'x' } return $map?(1 to 6)", "",
         type(DualMap.class, "xs:string*"));
-    check("let $map := map { 'c': 'x' } return count($map?(('a', 'b')))", 0,
+    check("let $map := map { 'c': 'x' } return count($map?(1 to 6))", 0,
         type(DualMap.class, "xs:string*"));
   }
 
@@ -704,8 +705,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(false(), true()) ! (.  = true())", "false\ntrue", root(BlnSeq.class));
     check("(false(), true()) ! (. != false())", "false\ntrue", root(BlnSeq.class));
 
-    check("(false(), true()) ! (.  = false())", "true\nfalse", exists(NOT));
-    check("(false(), true()) ! (. != true())", "true\nfalse", exists(NOT));
+    check("(false(), true())[random:double() < 2] ! (.  = false())", "true\nfalse", exists(NOT));
+    check("(false(), true())[random:double() < 2] ! (. != true())", "true\nfalse", exists(NOT));
   }
 
   /** Merge predicates. */
@@ -800,14 +801,14 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(1e0, 2e0) ! (number() + 1)", "2\n3", empty(NUMBER));
     check("for $v in (1e0, 2e0) return number($v) + 1", "2\n3", empty(NUMBER));
 
-    check("for $n in (10000000000000000, 1) return number($n) = 10000000000000001",
+    check("for $n in (10000000000000000, 1)[. != 0] return number($n) = 10000000000000001",
         "true\nfalse", exists(NUMBER));
   }
 
   /** Inlining of where clauses. */
   @Test public void gh1782() {
     check("1 ! (for $a in (1, 2) where $a = last() return $a)", 1, exists(GFLWOR.class));
-    check("(3, 4) ! (for $a in (1, 2) where . = $a return $a)", "", exists(GFLWOR.class));
+    check("(3, 4)[. != 0] ! (for $a in (1, 2) where . = $a return $a)", "", exists(GFLWOR.class));
   }
 
   /** Rewriting of positional tests that might yield an error. */
@@ -1020,7 +1021,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(1, 2)[if(.) then '' else xs:anyURI('')]", "", empty());
 
     // no rewriting of numbers > 0
-    check("(1, 2) ! boolean(if(.) then 'a' else 1)", "true\ntrue", exists(If.class));
+    check("(1, 2)[. != 0] ! boolean(if(.) then 'a' else 1)", "true\ntrue", exists(If.class));
 
     // switch expression
     check("for $i in (1 to 3)\n" +
@@ -1158,10 +1159,10 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Merge fn:empty and fn:exist functions. */
   @Test public void gh1829() {
-    check("exists(<a/>/a) or exists(<b/>/b)", false,
-        root(EXISTS), empty(Or.class), empty(BOOLEAN), exists(Union.class));
-    check("for $i in 1 to 2 return exists($i[. = 1]) or exists($i[. = 2])", "true\ntrue",
-        empty(Or.class), empty(EXISTS), root(DualMap.class));
+    check("exists(<a/>/a) or exists(<b/>/b)",
+        false, root(EXISTS), empty(Or.class), empty(BOOLEAN), exists(Union.class));
+    check("for $i in (1 to 2)[. != 0] return exists($i[. = 1]) or exists($i[. = 2])",
+        "true\ntrue", empty(Or.class), empty(EXISTS), root(DualMap.class));
 
     check("<a/>/a or <b/>/b", false, root(EXISTS), empty(Or.class), exists(Union.class));
     check("<a/>[a or b]", "", empty(Or.class), count(SingleIterPath.class, 1));
@@ -1172,10 +1173,10 @@ public final class RewritingsTest extends QueryPlanTest {
         root(DualMap.class), exists(NOT), empty(If.class));
 
     // no rewritings
-    query("for $a in 1 to 2 return <a/>[empty(($a[. = 1], $a[. = 1]))]", "<a/>");
+    query("for $a in (1 to 2)[. != 0] return <a/>[empty(($a[. = 1], $a[. = 1]))]", "<a/>");
     check("exists(<a/>/a) and exists(<b/>/b)", false, exists(And.class));
-    check("for $i in 1 to 2 return exists($i[. = 1]) and exists($i[. = 2])", "false\nfalse",
-        empty(And.class), empty(EXISTS), root(DualMap.class));
+    check("for $i in (1 to 2)[. != 0] return exists($i[. = 1]) and exists($i[. = 2])",
+        "false\nfalse", empty(And.class), empty(EXISTS), root(DualMap.class));
     check("<a/>/a and <b/>/b", false, exists(And.class));
     check("<a/>[a and b]", "", count(SingleIterPath.class, 2));
 
@@ -1298,7 +1299,7 @@ public final class RewritingsTest extends QueryPlanTest {
     final StringBuilder sb = new StringBuilder();
     sb.append("string-join(\n");
     for(final String var : vars) {
-      sb.append("  for $").append(var).append(" in (false(), true())\n");
+      sb.append("  for $").append(var).append(" in (0, 1) ! <_>{ . }</_> ! xs:boolean(.)\n");
     }
     sb.append("  return if(").append(query).append(") then 't' else 'f'\n");
     return sb.append(")").toString();
@@ -1376,7 +1377,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // move filters with positional tests and variable references into simple map
     check("for $c in 1 to 10 return $c[.]", 1, root(DualMap.class));
-    check("for $c in (1, 2) return $c[position() = (0, 2)]", "", root(DualMap.class));
+    check("for $c in 1 to 10 return $c[position() = (0, 2)]", "", root(DualMap.class));
 
     // no rewriting: position checks are replaced by util:item
     check("for $c in 1 to 10 return $c[position() = <_>2</_>]", "", root(DualMap.class));
@@ -1538,7 +1539,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Simple map, positional predicates. */
   @Test public void gh1874() {
-    check("(1, 2) ! .[.]", 1);
+    check("(1 to 10) ! .[.]", 1);
   }
 
   /** EBV Rewritings: count(expr), numeric checks. */
@@ -1600,18 +1601,18 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Simplify if expressions and comparisons. */
   @Test public void gh1885() {
-    check("(0, 1) ! ((if(.) then 'S' else 'P') = 'S')", "false\ntrue", empty(If.class));
-    check("(0, 1) ! ((if(.) then 'S' else 'P') != 'S')", "true\nfalse", empty(If.class));
-    check("(0, 1) ! ((if(.) then 'S' else 'P') = 'P')", "true\nfalse", empty(If.class));
-    check("(0, 1) ! ((if(.) then 'S' else 'P') != 'P')", "false\ntrue", empty(If.class));
+    check("(0, 1)[. >= 0] ! ((if(.) then 'S' else 'P') = 'S')", "false\ntrue", empty(If.class));
+    check("(0, 1)[. >= 0] ! ((if(.) then 'S' else 'P') != 'S')", "true\nfalse", empty(If.class));
+    check("(0, 1)[. >= 0] ! ((if(.) then 'S' else 'P') = 'P')", "true\nfalse", empty(If.class));
+    check("(0, 1)[. >= 0] ! ((if(.) then 'S' else 'P') != 'P')", "false\ntrue", empty(If.class));
 
     check("(0, 1) ! ((if(.) then <_/> else ()) = <_/>)", "false\ntrue", empty(If.class));
     check("(0, 1) ! ((if(.) then (1, 2) else ()) = (1, 2))", "false\ntrue", empty(If.class));
     check("(if((1, 2)[. = 0]) then () else (1, 2)) = (1, 2)", true, empty(If.class), root(NOT));
 
     // do not rewrite...
-    check("(0, 1) ! ((if(.) then 'S' else 'P') = 'X')", "false\nfalse", exists(If.class));
-    check("(0, 1) ! ((if(.) then 'S' else 'P') = 'X')", "false\nfalse", exists(If.class));
+    check("(0, 1)[. >= 0] ! ((if(.) then 'S' else 'P') = 'X')", "false\nfalse", exists(If.class));
+    check("(0, 1)[. >= 0] ! ((if(.) then 'S' else 'P') = 'X')", "false\nfalse", exists(If.class));
   }
 
   /** Optimize inlined path steps. */
@@ -1638,13 +1639,13 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Simple map implementation for two operands. */
   @Test public void gh1889() {
     check("(1 to 2) ! <a/>", "<a/>\n<a/>", root(_UTIL_REPLICATE));
-    check("(3 to 4) ! prof:void(.)", "", root(DualMap.class));
+    check("(3 to 13) ! prof:void(.)", "", root(DualMap.class));
   }
 
   /** Rewrite FLWOR to simple map. */
   @Test public void gh1890() {
-    check("for $i in 1 to 2 return ($i + $i)", "2\n4", root(DualMap.class));
-    check("for $a in 1 to 2 for $b in 1 to 2 return ($a * 2)", "2\n2\n4\n4",
+    check("for $i in (1 to 2)[. >= 0] return ($i + $i)", "2\n4", root(DualMap.class));
+    check("for $a in (1 to 2)[. >= 0] for $b in (1 to 2) return ($a * 2)", "2\n2\n4\n4",
         root(IterMap.class), exists(_UTIL_REPLICATE));
   }
 
@@ -1968,23 +1969,23 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $a in (1, 'a', 1) group by $a return $a", "1\na", root(SmallSeq.class));
     check("for $a allowing empty in () group by $a return $a", "", empty());
 
-    check("for $p in 1 to 2 group by $q := string($p) return $q",
+    check("for $p in (1 to 2)[. >= 0] group by $q := string($p) return $q",
         "1\n2", root(DISTINCT_VALUES), exists(DualMap.class));
-    check("for $a in (1, 2) group by $a return $a promote to xs:double",
+    check("for $a in (1 to 2)[. >= 0] group by $a return $a promote to xs:double",
         "1\n2", root(DualMap.class));
 
-    check("for $a in (1, 2) group by $b := string($a) return $b || 'x'",
+    check("for $a in (1 to 2)[. >= 0] group by $b := string($a) return $b || 'x'",
         "1x\n2x", count(DualMap.class, 2));
 
-    error("for $a as xs:byte in (1, 2) group by $a return $a", INVTREAT_X_X_X);
-    error("for $a in (1, 2) group by $a as xs:byte := $a return $a", INVTREAT_X_X_X);
+    error("for $a as xs:byte in (1 to 2)[. >= 0] group by $a return $a", INVTREAT_X_X_X);
+    error("for $a in (1 to 2)[. >= 0] group by $a as xs:byte := $a return $a", INVTREAT_X_X_X);
   }
 
   /** Rewrite expression range to util:replicate. */
   @Test public void gh1934() {
-    check("for $i in 1 to 2 return (1 to $i) ! $i", "1\n2\n2",
+    check("for $i in (1 to 2)[. >= 0] return (1 to $i) ! $i", "1\n2\n2",
         root(IterMap.class), exists(_UTIL_REPLICATE));
-    check("for $i in 1 to 2 for $j in 1 to $i return $i", "1\n2\n2",
+    check("for $i in (1 to 2)[. >= 0] for $j in 1 to $i return $i", "1\n2\n2",
         root(IterMap.class), exists(_UTIL_REPLICATE));
   }
 
@@ -2009,9 +2010,12 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(1, 3, 5)[not(position() < 2)]", "3\n5", root(SubSeq.class));
     check("(1, <_/>[data()])[not(position() = 2)]", 1, root(REMOVE));
 
-    check("for $i in 1 to 2 return (3 to 4)[not(position() = $i)]", "4\n3", exists(REMOVE));
-    check("for $i in 1 to 2 return (3 to 4)[not(position() > $i)]", "3\n3\n4", exists(_UTIL_RANGE));
-    check("for $i in 1 to 2 return (3 to 4)[not(position() < $i)]", "3\n4\n4", exists(_UTIL_RANGE));
+    check("for $i in (1 to 2)[. >= 0] return (3 to 4)[not(position() = $i)]",
+        "4\n3", exists(REMOVE));
+    check("for $i in (1 to 2)[. >= 0] return (3 to 4)[not(position() > $i)]",
+        "3\n3\n4", exists(_UTIL_RANGE));
+    check("for $i in (1 to 2)[. >= 0] return (3 to 4)[not(position() < $i)]",
+        "3\n4\n4", exists(_UTIL_RANGE));
   }
 
   /** Simple map, context value. */
@@ -2071,31 +2075,31 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Rewrite order by to fn:sort. */
   @Test public void gh1966() {
-    check("for $i in 1 to 2 order by 1 return $i", "1\n2",
-        empty(OrderBy.class), root(RangeSeq.class));
-    check("for $i in 1 to 2 order by 1 descending return $i", "1\n2",
-        empty(OrderBy.class), root(RangeSeq.class));
+    check("for $i in (1 to 2)[. >= 0] order by 1 return $i", "1\n2",
+        empty(OrderBy.class), root(IterFilter.class));
+    check("for $i in (1 to 2)[. >= 0] order by 1 descending return $i", "1\n2",
+        empty(OrderBy.class), root(IterFilter.class));
 
-    check("for $i in 1 to 2 order by $i return $i", "1\n2",
-        empty(OrderBy.class), root(RangeSeq.class));
-    check("for $i in 1 to 2 order by $i descending return $i", "2\n1",
-        empty(OrderBy.class), root(RangeSeq.class));
-    check("for $i in 1 to 2 order by $i return $i * 2", "2\n4",
+    check("for $i in (1 to 2)[. >= 0] order by $i return $i", "1\n2",
+        empty(OrderBy.class), root(SORT));
+    check("for $i in (1 to 2)[. >= 0] order by $i descending return $i", "2\n1",
+        empty(OrderBy.class), root(REVERSE));
+    check("for $i in (1 to 2)[. >= 0] order by $i return $i * 2", "2\n4",
         empty(OrderBy.class), root(DualMap.class));
-    check("let $_ := <_>1</_> for $i in 1 to 2 order by $i return $i + $_", "2\n3",
+    check("let $_ := <_>1</_> for $i in (1 to 2)[. >= 0] order by $i return $i + $_", "2\n3",
         empty(OrderBy.class), root(GFLWOR.class));
 
-    check("for $i in 1 to 2 order by $i empty greatest return $i", "1\n2",
+    check("for $i in (1 to 2)[. >= 0] order by $i empty greatest return $i", "1\n2",
         exists(OrderBy.class));
-    check("for $i in 1 to 2 order by $i collation '?lang=de' return $i", "1\n2",
+    check("for $i in (1 to 2)[. >= 0] order by $i collation '?lang=de' return $i", "1\n2",
         exists(OrderBy.class));
     check("for $i in ([ 1 ], [ 2 ]) order by $i return $i?*", "1\n2",
         exists(OrderBy.class));
-    check("for $a in 1 to 2 for $b in 3 to 4 order by $a return $a", "1\n1\n2\n2",
+    check("for $a in (1 to 2)[. >= 0] for $b in 3 to 4 order by $a return $a", "1\n1\n2\n2",
         exists(OrderBy.class));
-    check("for $i in 1 to 2 order by $i, 1 return $i", "1\n2",
+    check("for $i in (1 to 2)[. >= 0] order by $i, 1 return $i", "1\n2",
         exists(OrderBy.class));
-    check("for $i in 1 to 2 order by -$i return $i", "2\n1",
+    check("for $i in (1 to 2)[. >= 0] order by -$i return $i", "2\n1",
         exists(OrderBy.class));
   }
 
@@ -2109,7 +2113,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Existence checks, filter expressions. */
   @Test public void gh1971() {
-    check("for $i in 1 to 2 return exists($i[. = 1])", "true\nfalse",
+    check("for $i in (1 to 2)[. >= 0] return exists($i[. = 1])", "true\nfalse",
         root(DualMap.class), exists(CmpSimpleG.class));
   }
 

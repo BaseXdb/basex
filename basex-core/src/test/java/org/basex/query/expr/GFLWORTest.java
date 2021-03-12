@@ -270,12 +270,12 @@ public final class GFLWORTest extends QueryPlanTest {
 
   /** Tests is where clauses are rewritten to if. */
   @Test public void whereToIfTest() {
-    check("(1 to 3) ! (for $j in 1 to 5 where . eq 1 return $j)",
+    check("(1 to 6) ! (for $j in 1 to 5 where . eq 1 return $j)",
         "1\n2\n3\n4\n5",
         exists(If.class),
         empty(GFLWOR.class)
     );
-    check("(1 to 3) ! (for $j at $p in 1 to 5 where . eq 1 return $j * $p)",
+    check("(1 to 6) ! (for $j at $p in 1 to 5 where . eq 1 return $j * $p)",
         "1\n4\n9\n16\n25",
         exists(If.class),
         exists(GFLWOR.class)
@@ -313,11 +313,11 @@ public final class GFLWORTest extends QueryPlanTest {
   /** FLWOR expressions containing updates or non-determinism. */
   @Test public void updatesNdt() {
     check("copy $x := <x/> modify (" +
-        "  for $i in 1 to 3" +
+        "  for $i in 1 to 6" +
         "  let $y := <y>{ $i }</y>" +
         "  return insert node $y into $x" +
         ") return $x",
-        "<x>\n<y>1</y>\n<y>2</y>\n<y>3</y>\n</x>",
+        "<x>\n<y>1</y>\n<y>2</y>\n<y>3</y>\n<y>4</y>\n<y>5</y>\n<y>6</y>\n</x>",
         empty(GFLWOR.class),
         exists(DualMap.class),
         exists(Insert.class)
@@ -382,17 +382,17 @@ public final class GFLWORTest extends QueryPlanTest {
   /** Tests flattening. */
   @Test public void flattening1() {
     check("for $a at $p in " +
-        "  for $x in (1 to 2) " +
+        "  for $x in (1 to 6) " +
         "  return $x * 2 " +
         "return $a",
-        "2\n4",
+        "2\n4\n6\n8\n10\n12",
         root(DualMap.class)
     );
     check("for $a at $p in " +
-        "  for $x in (1 to 2) " +
+        "  for $x in (1 to 6) " +
         "  return $x * 2 " +
         "return $p",
-        "1\n2",
+        "1\n2\n3\n4\n5\n6",
         root(RangeSeq.class)
     );
   }

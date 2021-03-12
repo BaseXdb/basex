@@ -43,7 +43,7 @@ public final class HofModuleTest extends QueryPlanTest {
     error(func.args(" ()", " function($x, $y) { $x + $y }"), EMPTYFOUND);
 
     // should be unrolled and evaluated at compile time
-    final int limit = StandardFunc.UNROLL_LIMIT;
+    final int limit = ParseExpr.UNROLL_LIMIT;
     check(func.args(" 1 to " + limit, " function($a, $b) { $a + $b }"),
         15,
         empty(func),
