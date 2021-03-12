@@ -125,4 +125,13 @@ public final class SimpleMapTest extends QueryPlanTest {
     check("(<a/>, <b/>) ! data()", "\n", root(DATA));
     check("(<a/>, <b/>) ! data(.)", "\n", root(DATA));
   }
+
+  /** XQuery: Unroll simple map expressions. */
+  @Test public void gh1994() {
+    check("(1, 2) ! (. * 2)", "2\n4", root(IntSeq.class));
+    check("(true(), false()) ! (. = true())", "true\nfalse", root(BlnSeq.class));
+
+    // do not unroll more than 5 iterations
+    check("(1 to 6) ! (. * 2)", "2\n4\n6\n8\n10\n12", root(DualMap.class));
+  }
 }

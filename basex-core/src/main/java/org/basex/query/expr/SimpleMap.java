@@ -15,11 +15,13 @@ import org.basex.query.func.fn.*;
 import org.basex.query.func.util.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Simple map operator.
@@ -194,12 +196,13 @@ public abstract class SimpleMap extends Arr {
         return Filter.get(cc, info, expr, ((Filter) next).exprs);
     }
 
+    final long size = expr.size();
     if(!expr.has(Flag.NDT) && !next.has(Flag.POS)) {
       // merge expressions if next expression does not rely on the context
       if(!next.has(Flag.CTX)) {
         Expr count = null;
-        if(expr.size() != -1) {
-          count = Int.get(expr.size());
+        if(size != -1) {
+          count = Int.get(size);
         } else if(expr instanceof Range && expr.arg(0) == Int.ONE &&
             expr.arg(1).seqType().instanceOf(SeqType.INTEGER_O)) {
           count = expr.arg(1);
@@ -287,8 +290,19 @@ public abstract class SimpleMap extends Arr {
             ex = cc.error(qe, next);
           }
           // util:replicate(1, 2) ! (. = 1)  ->  util:replicate(1 = 1, 2)
-          return expr == input ? ex : cc.replicate(ex, Int.get(expr.size()), info);
+          return expr == input ? ex : cc.replicate(ex, Int.get(size), info);
         }
+      }
+
+      if(expr instanceof Seq && size <= UNROLL_LIMIT) {
+        // (1, 2) ! (. + 1)  ->  1 ! (. + 1), 2 ! (. + 1)
+        final ExprList results = new ExprList((int) size);
+        for(final Item item : (Value) expr) {
+          final Expr nxt = results.size() == size - 1 ? next : next.copy(cc, new IntObjMap<>());
+          results.add(SimpleMap.get(cc, info, item, nxt));
+        }
+        cc.info(QueryText.OPTUNROLL_X, this);
+        return List.get(cc, info, results.finish());
       }
     }
 
