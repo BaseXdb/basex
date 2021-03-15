@@ -104,7 +104,7 @@ public final class GFLWOR extends ParseExpr {
     flattenAnd();
 
     // apply all optimizations in a row until nothing changes anymore
-    while(flattenReturn(cc) | flattenFor(cc) | unnestFLWR(cc) | forToLet(cc) | inlineLets(cc) |
+    while(flattenReturn(cc) | flattenFor(cc) | unnestFLWR(cc) | inlineForLet(cc) | forToLet(cc) |
         slideLetsOut(cc) | unusedVars(cc) | cleanDeadVars() | optimizeWhere(cc) | optimizePos(cc) |
         unnestLets(cc) | ifToWhere(cc) | mergeReturn(cc) | optimizeOrderBy(cc));
 
@@ -317,27 +317,28 @@ public final class GFLWOR extends ParseExpr {
    * @return change flag
    * @throws QueryException query exception
    */
-  private boolean inlineLets(final CompileContext cc) throws QueryException {
+  private boolean inlineForLet(final CompileContext cc) throws QueryException {
     boolean changed = false, changing;
     do {
       changing = false;
       final ListIterator<Clause> iter = clauses.listIterator();
       while(iter.hasNext()) {
         final Clause clause = iter.next();
-        if(!(clause instanceof Let) || clause.has(Flag.NDT)) continue;
+        if(!(clause instanceof ForLet)) continue;
 
-        final Let lt = (Let) clause;
-        final Expr inlined = lt.inlineExpr(cc);
-        if(inlined == null) continue;
-        final InlineContext ic = new InlineContext(lt.var, inlined, cc);
+        final ForLet fl = (ForLet) clause;
+        final Expr inline = fl.inlineExpr(cc);
+        if(inline == null || !inline(fl, iter.nextIndex())) continue;
+
+        final InlineContext ic = new InlineContext(fl.var, inline, cc);
         final ExprList exprs = new ExprList();
         for(final ListIterator<Clause> ir = clauses.listIterator(iter.nextIndex()); ir.hasNext();) {
           exprs.add(ir.next());
         }
         if(ic.inlineable(exprs.add(rtrn).finish())) {
-          cc.info(QueryText.OPTINLINE_X, lt);
+          cc.info(QueryText.OPTINLINE_X, fl);
           inline(ic, iter);
-          clauses.remove(lt);
+          clauses.remove(fl);
           changing = changed = true;
           // continue from the beginning as clauses below could have been deleted
           break;
@@ -345,6 +346,33 @@ public final class GFLWOR extends ParseExpr {
       }
     } while(changing);
     return changed;
+  }
+
+  /**
+   * Checks if a for/let expression can be inlined.
+   * @param fl for/let clause
+   * @param index index of next clause
+   * @return success flag
+   */
+  private boolean inline(final ForLet fl, final int index) {
+    // check if current expression can be inlined into next clause
+    //   for $a in /a for $b in $a/b  ->  for $b in /a/b
+    if(fl.expr.ddo() && index < clauses.size()) {
+      final Clause next = clauses.get(index);
+      if(next instanceof For) {
+        final For fr = (For) next;
+        if(fr.expr instanceof Path) {
+          final Path path = (Path) fr.expr;
+          if(path.simple() && path.root instanceof VarRef &&
+            ((VarRef) path.root).var.is(fl.var) && count(fl.var, index) == VarUsage.ONCE) {
+            return true;
+          }
+        }
+      }
+    }
+    // check let clause
+    //   let $a := 123 return $a  ->  return 123
+    return fl instanceof Let && !fl.has(Flag.NDT);
   }
 
   /**

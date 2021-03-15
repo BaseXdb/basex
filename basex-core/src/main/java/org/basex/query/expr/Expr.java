@@ -232,7 +232,7 @@ public abstract class Expr extends ExprInfo {
    * This function is called by:
    * <ul>
    *   <li> {@link Closure#optimize}</li>
-   *   <li> {@link GFLWOR#inlineLets}</li>
+   *   <li> {@link GFLWOR#inlineForLet}</li>
    *   <li> {@link GFLWOR#optimizePos}</li>
    *   <li> {@link GFLWOR#simplify}</li>
    *   <li> {@link GFLWOR#unusedVars}</li>

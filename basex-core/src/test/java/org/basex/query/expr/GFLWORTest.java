@@ -433,4 +433,12 @@ public final class GFLWORTest extends QueryPlanTest {
     check("for $x allowing empty in () return $x", "", empty());
     check("for $x allowing empty in prof:void(1) return $x", "", exists(GFLWOR.class));
   }
+
+  /** Merge for/let clauses. */
+  @Test public void gh1995() {
+    check("let $a := (<a/> | <b/>) for $b in $a/* return <c/> ! <d>{ $b, . }</d>", "",
+        empty(Let.class), count(For.class, 1));
+    check("for $a in (<a/> | <b/>) for $b in $a/* return <c/> ! <d>{ $b, . }</d>", "",
+        count(For.class, 1));
+  }
 }
