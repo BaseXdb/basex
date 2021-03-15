@@ -65,7 +65,7 @@ public final class InlineContext {
 
     // check if expression can be inlined into the specified target expressions
     for(final Expr target : targets) {
-      if(!target.inlineable(this)) return false;
+      if((var == null || target.uses(var)) && !target.inlineable(this)) return false;
     }
     return true;
   }
