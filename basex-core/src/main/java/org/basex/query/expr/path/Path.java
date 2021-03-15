@@ -250,7 +250,7 @@ public abstract class Path extends ParseExpr {
     for(final Expr step : steps) {
       if(!(step instanceof Step)) return false;
       final Axis axis = ((Step) step).axis;
-      return axis == Axis.SELF || axis == Axis.CHILD || axis == Axis.ATTRIBUTE;
+      if(axis != Axis.SELF && axis != Axis.CHILD && axis != Axis.ATTRIBUTE) return false;
     }
     return true;
   }
