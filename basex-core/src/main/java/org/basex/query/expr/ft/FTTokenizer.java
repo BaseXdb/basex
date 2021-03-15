@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
 import org.basex.util.*;
@@ -43,24 +42,16 @@ public final class FTTokenizer {
   /**
    * Constructor.
    * @param opt full-text options
-   * @param qc query context
+   * @param errors levenshtein errors
    * @param info input info
    */
-  FTTokenizer(final FTOpt opt, final QueryContext qc, final InputInfo info) {
-    this(opt, new Levenshtein(qc.context.options.get(MainOptions.LSERROR)), info);
-  }
-
-  /**
-   * Constructor.
-   * @param opt full-text options
-   * @param ls Levenshtein distance calculation
-   * @param info input info
-   */
-  private FTTokenizer(final FTOpt opt, final Levenshtein ls, final InputInfo info) {
+  FTTokenizer(final FTOpt opt, final int errors, final InputInfo info) {
     this.opt = opt;
     this.info = info;
 
     cmp = (in, qu) -> {
+      final Levenshtein ls = opt.is(FZ) ? new Levenshtein(
+          opt.errors != -1 ? opt.errors : errors) : null;
       FTWildcard ftw = null;
       if(opt.is(WC)) {
         ftw = wcCache.get(qu);

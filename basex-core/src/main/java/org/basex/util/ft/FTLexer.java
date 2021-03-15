@@ -22,11 +22,11 @@ public final class FTLexer extends FTIterator implements IndexSearch {
   private final Tokenizer tokens;
   /** Full-text options. */
   private final FTOpt ftOpt;
+
   /** Text to be tokenized. */
   private byte[] text = Token.EMPTY;
-
   /** Levenshtein error. */
-  private int lserror;
+  private int errors = -1;
 
   /** Iterator over result tokens. */
   private FTIterator iter;
@@ -66,19 +66,23 @@ public final class FTLexer extends FTIterator implements IndexSearch {
     iter = tokens;
 
     // wrap original iterator
-    if(ftOpt != null && ftOpt.is(ST)) {
-      if(ftOpt.sd == null) {
-        // use default stemmer if specific stemmer is not available.
-        Stemmer st = Stemmer.IMPL.get(0);
-        for(final Stemmer stem : Stemmer.IMPL) {
-          if(stem.supports(lang)) {
-            st = stem;
-            break;
+    if(ftOpt != null) {
+      errors = ftOpt.errors;
+
+      if(ftOpt.is(ST)) {
+        if(ftOpt.sd == null) {
+          // use default stemmer if specific stemmer is not available.
+          Stemmer st = Stemmer.IMPL.get(0);
+          for(final Stemmer stem : Stemmer.IMPL) {
+            if(stem.supports(lang)) {
+              st = stem;
+              break;
+            }
           }
+          iter = st.get(lang, iter);
+        } else {
+          iter = new DictionaryStemmer(ftOpt.sd, iter);
         }
-        iter = st.get(lang, iter);
-      } else {
-        iter = new DictionaryStemmer(ftOpt.sd, iter);
       }
     }
   }
@@ -111,12 +115,12 @@ public final class FTLexer extends FTIterator implements IndexSearch {
   }
 
   /**
-   * Sets the Levenshtein error.
-   * @param ls error
+   * Sets the Levenshtein error if it hasn't been assigned yet.
+   * @param err error
    * @return self reference
    */
-  public FTLexer lserror(final int ls) {
-    lserror = ls;
+  public FTLexer errors(final int err) {
+    if(errors == -1) errors = err;
     return this;
   }
 
@@ -125,8 +129,8 @@ public final class FTLexer extends FTIterator implements IndexSearch {
    * @param token token
    * @return error
    */
-  public int lserror(final byte[] token) {
-    return lserror == 0 ? token.length >> 2 : lserror;
+  public int errors(final byte[] token) {
+    return errors > 0 ? errors : token.length >> 2;
   }
 
   @Override

@@ -120,7 +120,7 @@ public final class FTIndex extends ValueIndex {
 
     // fuzzy search
     if(opt.is(FZ)) {
-      return fuzzy(token, lexer.lserror(token));
+      return fuzzy(token, lexer.errors(token));
     }
 
     // return cached or new result

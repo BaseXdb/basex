@@ -32,6 +32,8 @@ public final class FTOpt extends ExprInfo {
   public ThesQuery th;
   /** Language (can be {@code null}). */
   public Language ln;
+  /** Levenshtein error (ignored if {@code -1}). */
+  public int errors = -1;
 
   /**
    * Adopts the options of the specified argument.
@@ -46,6 +48,7 @@ public final class FTOpt extends ExprInfo {
     if(ln == null) ln = opt.ln;
     if(th == null) th = opt.th;
     else if(opt.th != null) th.merge(opt.th);
+    if(errors == -1) errors = opt.errors;
     return this;
   }
 
@@ -103,14 +106,15 @@ public final class FTOpt extends ExprInfo {
     if(this == obj) return true;
     if(!(obj instanceof FTOpt)) return false;
     final FTOpt f = (FTOpt) obj;
-    return map.equals(f.map) && cs == f.cs && Objects.equals(sd, f.sd) &&
+    return map.equals(f.map) && cs == f.cs && Objects.equals(sd, f.sd) && errors == f.errors &&
         Objects.equals(sw, f.sw) && Objects.equals(th, f.th) && Objects.equals(ln, f.ln);
   }
 
   @Override
   public void plan(final QueryPlan plan) {
     final FElem elem = plan.create(this,
-      WILDCARDS, is(WC) ? TRUE : null, FUZZY, is(FZ) ? TRUE : null, CASE, cs,
+      WILDCARDS, is(WC) ? TRUE : null, FUZZY, is(FZ) ? TRUE : null,
+      ERRORS, errors != -1 ? errors : null, CASE, cs,
       STEMMING, is(ST) || sd != null ? TRUE : null, LANGUAGE, ln,
       THESAURUS, th != null ? TRUE : null);
     if(elem.attributeIter().next() != null) plan.add(elem);
@@ -120,7 +124,7 @@ public final class FTOpt extends ExprInfo {
   public void plan(final QueryString qs) {
     final StringList list = new StringList();
     if(is(WC)) list.add(WILDCARDS);
-    if(is(FZ)) list.add(FUZZY);
+    if(is(FZ)) list.add(errors != -1 ? FUZZY + ' ' + errors + ' ' + ERRORS : FUZZY);
     if(cs == FTCase.LOWER) list.add(LOWERCASE);
     else if(cs == FTCase.UPPER) list.add(UPPERCASE);
     else if(cs == FTCase.SENSITIVE) list.add(CASE + ' ' + SENSITIVE);

@@ -59,6 +59,7 @@ public interface QueryText {
   /** Parser token. */ String ENCODING = "encoding";
   /** Parser token. */ String END = "end";
   /** Parser token. */ String ENTIRE = "entire";
+  /** Parser token. */ String ERRORS = "errors";
   /** Parser token. */ String EVERY = "every";
   /** Parser token. */ String EXACTLY = "exactly";
   /** Parser token. */ String EXCEPT = "except";

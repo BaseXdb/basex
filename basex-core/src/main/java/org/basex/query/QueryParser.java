@@ -3622,6 +3622,10 @@ public class QueryParser extends InputParser {
         if(opt.isSet(FZ)) throw error(FTDUP_X, FUZZY);
         if(opt.is(WC)) throw error(FT_OPTIONS);
         opt.set(FZ, using);
+        if(digit(curr())) {
+          opt.errors = (int) ((ANum) ftAdditive(true)).itr();
+          wsCheck(ERRORS);
+        }
       } else {
         throw error(FTMATCH_X, consume());
       }

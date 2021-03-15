@@ -160,7 +160,7 @@ public final class FTWords extends FTExpr {
         if(ftiter == null) {
           final FTTokenizer ftt = FTWords.this.get(qc);
           final FTLexer lexer = new FTLexer(ftOpt).
-              lserror(qc.context.options.get(MainOptions.LSERROR));
+              errors(qc.context.options.get(MainOptions.LSERROR));
 
           // length distinct tokens
           int len = 0;
@@ -385,7 +385,7 @@ public final class FTWords extends FTExpr {
     final ThreadLocal<FTTokenizer> tl = qc.threads.get(this);
     FTTokenizer ftt = tl.get();
     if(ftt == null) {
-      ftt = new FTTokenizer(ftOpt, qc, info);
+      ftt = new FTTokenizer(ftOpt, qc.context.options.get(MainOptions.LSERROR), info);
       tl.set(ftt);
     }
     return ftt;

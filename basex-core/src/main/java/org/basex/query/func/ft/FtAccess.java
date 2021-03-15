@@ -1,5 +1,10 @@
 package org.basex.query.func.ft;
 
+import static org.basex.query.QueryError.*;
+import static org.basex.util.ft.FTFlag.*;
+
+import org.basex.core.*;
+import org.basex.query.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -13,12 +18,29 @@ import org.basex.util.ft.*;
  */
 abstract class FtAccess extends StandardFunc {
   /**
-   * Parses fulltext options.
-   * @param expr full-text expression
-   * @param opts full-text options
-   * @return expressions
+   * Parses and returns full-text options.
+   * @param opts options specified in the query
+   * @param qc query context
+   * @return options
+   * @throws QueryException query exception
    */
-  final FTExpr options(final FTExpr expr, final FtIndexOptions opts) {
+  final FTOpt ftOpt(final FtIndexOptions opts, final QueryContext qc) throws QueryException {
+    final FTOpt opt = new FTOpt();
+    opt.set(FZ, opts.get(FtIndexOptions.FUZZY));
+    opt.set(WC, opts.get(FtIndexOptions.WILDCARDS));
+    if(opt.is(FZ) && opt.is(WC)) throw FT_OPTIONS.get(info, this);
+    opt.errors = opts.contains(FtIndexOptions.ERRORS) ? opts.get(FtIndexOptions.ERRORS) :
+      qc.context.options.get(MainOptions.LSERROR);
+    return opt;
+  }
+
+  /**
+   * Parses full-text options and returns a full-text expression.
+   * @param expr full-text expression
+   * @param opts options specified in the query
+   * @return expression
+   */
+  final FTExpr ftExpr(final FTExpr expr, final FtIndexOptions opts) {
     FTExpr ex = expr;
     if(opts != null) {
       if(opts.get(FtIndexOptions.ORDERED)) {

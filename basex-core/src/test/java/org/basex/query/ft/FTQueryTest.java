@@ -78,4 +78,20 @@ public final class FTQueryTest extends SandboxTest {
     query("('a b' ! ft:score(. contains text 'a' and . contains text 'b')) > 0", false);
     query("let score $s := 'a b' contains text 'a' and 'a' contains text 'b' return $s > 0", false);
   }
+
+  /** XQuery, ft:search: Levenshtein errors. */
+  @Test public void gh1673() {
+    query(_DB_CREATE.args(NAME, " <x>1</x>", NAME, " map { 'ftindex': true() }"));
+
+    query(_FT_SEARCH.args(NAME, "2"), "");
+    query(_FT_CONTAINS.args("1", "2"), false);
+    query(_FT_SEARCH.args(NAME, "2", " map { 'fuzzy': true(), 'errors': 0 }"), "");
+    query(_FT_CONTAINS.args("1", "2", " map { 'fuzzy': true(), 'errors': 0 }"), false);
+    query(_FT_SEARCH.args(NAME, "2", " map { 'fuzzy': true(), 'errors': 1 }"), 1);
+    query(_FT_CONTAINS.args("1", "2", " map { 'fuzzy': true(), 'errors': 1 }"), true);
+
+    query("'a' contains text 'b' using fuzzy 0 errors", false);
+    query("'a' contains text 'b' using fuzzy 1 errors", true);
+    query("'a' contains text 'b' using fuzzy 10 errors", true);
+  }
 }
