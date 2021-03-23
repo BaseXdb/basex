@@ -18,7 +18,6 @@ import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 import org.basex.build.xml.*; // for CatalogWrapper
-import org.basex.core.*;
 
 /**
  * Function implementation.
@@ -107,7 +106,7 @@ public class XsltTransform extends XsltFn {
   private static byte[] transform(final IO in, final IO xsl, final HashMap<String, String> params,
       final XsltOptions xopts, final QueryContext qc) throws TransformerException {
 
-    final CatalogWrapper cw = CatalogWrapper.get(qc.context.options.get(MainOptions.CATFILE));
+    final URIResolver ur = CatalogWrapper.getURIResolver(qc.context.options);
 
     // retrieve new or cached templates object
     Templates tmp = null;
@@ -118,14 +117,14 @@ public class XsltTransform extends XsltFn {
       // no templates object cached: create new instance
       final TransformerFactory tf = TransformerFactory.newInstance();
       // assign catalog resolver (if defined)
-      if(cw != null) tf.setURIResolver(cw.getURIResolver());
+      if(ur != null) tf.setURIResolver(ur);
       tmp = tf.newTemplates(ss);
       if(key != null) MAP.put(key, tmp);
     }
 
     // create transformer, assign catalog resolver (if defined)
     final Transformer tr = tmp.newTransformer();
-    if(cw != null) tr.setURIResolver(cw.getURIResolver());
+    if(ur != null) tr.setURIResolver(ur);
 
     // bind parameters
     params.forEach(tr::setParameter);
