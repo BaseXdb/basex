@@ -1729,8 +1729,8 @@ public enum Function implements AFunction {
   _XQUERY_EVAL_UPDATE(XQueryEvalUpdate::new, "eval-update(string[,bindings[,options]])",
       arg(STRING_O, MAP_ZO, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), XQUERY_URI),
   /** XQuery function. */
-  _XQUERY_FORK_JOIN(XQueryForkJoin::new, "fork-join(functions[,options])",
-      arg(FUNCTION_ZM, MAP_ZO), ITEM_ZM, flag(HOF), XQUERY_URI),
+  _XQUERY_FORK_JOIN(XQueryForkJoin::new, "fork-join(functions)",
+      arg(FUNCTION_ZM), ITEM_ZM, flag(HOF), XQUERY_URI),
   /** XQuery function (legacy, now: xquery:eval). */
   _XQUERY_INVOKE(XQueryInvoke::new, "invoke(uri[,bindings[,options]])",
       arg(STRING_O, MAP_ZO, MAP_ZO), ITEM_ZM, flag(NDT), XQUERY_URI),
