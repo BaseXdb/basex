@@ -70,7 +70,7 @@ public abstract class ForLet extends Clause {
   }
 
   /**
-   * Returns an expression that is appropriate for inlining.
+   * Tries to return an expression that is appropriate for inlining.
    * @param cc compilation context
    * @return inlineable expression or {@code null}
    * @throws QueryException query exception

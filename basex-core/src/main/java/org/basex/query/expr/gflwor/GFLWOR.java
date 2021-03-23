@@ -312,7 +312,7 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Inlines 'let' expressions if they are used only once (and not in a loop).
+   * Inlines for/let expressions.
    * @param cc compilation context
    * @return change flag
    * @throws QueryException query exception
@@ -628,7 +628,7 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Merge expression of last clause into 'return' clause.
+   * Merges expression of last for/let clause into 'return' clause.
    * @param cc compilation context
    * @return change flag
    * @throws QueryException query exception
@@ -638,34 +638,35 @@ public final class GFLWOR extends ParseExpr {
 
     // do not inline variables with scoring, type checks, etc.
     final ForLet fl = (ForLet) clauses.peekLast();
-    final Expr last = fl.inlineExpr(cc);
-    if(last == null) return false;
+    final Expr inline = fl.inlineExpr(cc);
+    if(inline == null) return false;
     Expr expr = null;
 
     if(rtrn instanceof VarRef && ((VarRef) rtrn).var.is(fl.var)) {
       // replace return clause with expression
       //   for $c in (1, 2) return $c  ->  (1, 2)
       //   let $c := <a/> return $c  ->  <a/>
-      expr = last;
+      expr = inline;
     } else if(fl instanceof Let && rtrn.count(fl.var) == VarUsage.NEVER) {
       // rewrite let clause with unused variable
       //   let $_ := file:write(...) return ()  ->  file:write(...)
       //   let $_ := prof:void(1) return 2  ->  prof:void(1), 2
-      expr = cc.merge(last, rtrn, info);
-    } else if(fl instanceof For || fl instanceof Let && fl.size() == 1) {
-      // rewrite for clause to simple map
+      expr = cc.merge(inline, rtrn, info);
+    } else if(fl.size() == 1) {
+      // rewrite for/let clause to simple map
       //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
+      //   let $c := <_/> return (name($c), $c)  ->  <_/> ! (name(.), .)
       // skip expressions with context reference
       //   <_/>[for $c in (1, 2) return (., $c)]
       final InlineContext ic = new InlineContext(fl.var, new ContextValue(info), cc);
       if(ic.inlineable(rtrn) && !rtrn.has(Flag.CTX)) {
-        expr = SimpleMap.get(cc, info, last, cc.get(last, () -> ic.inline(rtrn)));
+        expr = SimpleMap.get(cc, info, inline, cc.get(inline, () -> ic.inline(rtrn)));
       }
     }
     if(expr == null) return false;
 
     cc.info(QueryText.OPTINLINE_X, fl);
-    clauses.removeLast();
+    clauses.remove(fl);
     rtrn = expr;
     return true;
   }

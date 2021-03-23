@@ -113,7 +113,7 @@ public final class If extends Arr {
     if(!ndt && cmp != null && cmp.equals(br1)) return
         cc.function(_UTIL_OR, info, br1, br2);
 
-    // if(A) then B else B  ->  B (errors in A will be ignored)
+    // if(A) then B else B  ->  prof:void(A), B
     if(br1.equals(br2)) return cc.merge(cond, br1, info);
 
     // determine type

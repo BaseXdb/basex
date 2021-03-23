@@ -336,8 +336,8 @@ public final class CompileContext {
   }
 
   /**
-   * Creates a single expression from a condition and a return expression.
-   * @param cond condition
+   * Creates a list expression from a condition and a return expression.
+   * @param cond condition (an optional result will be swallowed)
    * @param rtrn return expression
    * @param ii input info
    * @return function
