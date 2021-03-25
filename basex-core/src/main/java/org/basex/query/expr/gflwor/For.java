@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -52,6 +53,18 @@ public final class For extends ForLet {
     this.pos = pos;
     this.score = score;
     this.empty = empty;
+  }
+
+  /**
+   * Creates a for expression from a let binding.
+   * @param lt let binding
+   * @param cc compilation context
+   * @return for expression
+   * @throws QueryException query exception
+   */
+  static For fromLet(final Let lt, final CompileContext cc) throws QueryException {
+    final Expr expr = lt.scoring ? cc.function(Function._FT_SCORE, lt.info, lt.expr) : lt.expr;
+    return new For(lt.var, expr).optimize(cc);
   }
 
   @Override

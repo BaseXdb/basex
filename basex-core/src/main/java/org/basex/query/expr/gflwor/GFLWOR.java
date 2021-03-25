@@ -105,8 +105,8 @@ public final class GFLWOR extends ParseExpr {
 
     // apply all optimizations in a row until nothing changes anymore
     while(flattenReturn(cc) | flattenFor(cc) | unnestFLWR(cc) | unnestLets(cc) | ifToWhere(cc) |
-        forToLet(cc) | slideLetsOut(cc) | inlineForLet(cc) | mergeForLet(cc) | unusedVars(cc) |
-        cleanDeadVars() |  optimizeWhere(cc) | optimizePos(cc) | optimizeOrderBy(cc));
+        forToLet(cc) | slideLetsOut(cc) | inlineForLet(cc) | unusedVars(cc) | cleanDeadVars() |
+        optimizeWhere(cc) | optimizePos(cc) | optimizeOrderBy(cc));
 
     mergeWheres();
 
@@ -320,52 +320,106 @@ public final class GFLWOR extends ParseExpr {
    */
   private boolean inlineForLet(final CompileContext cc) throws QueryException {
     boolean changed = false;
-    for(int c = clauses.size() - 1; c >= 0; c--) {
+    int cs = clauses.size();
+    for(int c = cs - 1; c >= 0; c--) {
       final Clause clause = clauses.get(c);
       if(!(clause instanceof ForLet)) continue;
 
       final ForLet fl = (ForLet) clause;
       final Expr inline = fl.inlineExpr(cc);
-      if(inline == null || !inline(fl, c + 1)) continue;
+      if(inline == null) continue;
 
-      final int cs = clauses.size();
-      final InlineContext ic = new InlineContext(fl.var, inline, cc);
-      final ExprList exprs = new ExprList(cs - c);
-      for(int d = c + 1; d < cs; d++) exprs.add(clauses.get(d));
-      if(ic.inlineable(exprs.add(rtrn).finish())) {
-        inline(ic, clauses.listIterator(c));
+      // inline for/let expression
+      //   let $a := 123 return $a  ->  return 123
+      boolean changing = false;
+      if(fl instanceof Let && !fl.has(Flag.NDT)) {
+        final InlineContext ic = new InlineContext(fl.var, inline, cc);
+        final ExprList exprs = new ExprList(cs - c);
+        for(int d = c + 1; d < cs; d++) exprs.add(clauses.get(d));
+        if(ic.inlineable(exprs.add(rtrn).finish())) {
+          inline(ic, clauses.listIterator(c));
+          changing = true;
+        }
+      }
+      // merge for/let expression with subsequent expression
+      final boolean last = c + 1 == cs;
+      if(!changing && (last || clauses.get(c + 1) instanceof ForLet &&
+          count(fl.var, c + 2) == VarUsage.NEVER)) {
+        if(last) {
+          // merge with return expression
+          //   for $c in 1 to 3 return $c  ->  1 to 3
+          final Expr expr = inline(inline, rtrn, fl, cc);
+          if(expr != null) {
+            rtrn = expr;
+            changing = true;
+          }
+        } else {
+          // merge with next for/let expression
+          //   for $a in $seq for $b in 1 to $a  ->  for $b in $seq ! (1 to .)
+          //   for $a in $seq let $b := $a  ->  for $b in $seq
+          ForLet next = (ForLet) clauses.get(c + 1);
+          if(fl instanceof Let || next.size() == 1) {
+            final Expr expr = inline(inline, next.expr, fl, cc);
+            if(expr != null) {
+              next.expr = expr;
+              if(fl instanceof For && next instanceof Let) {
+                next = For.fromLet((Let) next, cc);
+                clauses.set(c + 1, next);
+              }
+              next.optimize(cc);
+              changing = true;
+            }
+          }
+        }
+      }
+
+      if(changing) {
         cc.info(QueryText.OPTINLINE_X, fl);
         clauses.remove(c);
+        cs = clauses.size();
+        changed = true;
       }
     }
+
     return changed;
   }
 
   /**
-   * Checks if a for/let expression can be inlined.
+   * Tries to inline an expression.
+   * @param inline expression to inline
+   * @param expr target expression
    * @param fl for/let clause
-   * @param index index of next clause
-   * @return success flag
+   * @param cc compilation context
+   * @return inlined expression or {@code null}
+   * @throws QueryException query exception
    */
-  private boolean inline(final ForLet fl, final int index) {
-    // check if current expression can be inlined into next clause
-    //   for $a in /a for $b in $a/b  ->  for $b in /a/b
-    if(fl.expr.ddo() && index < clauses.size()) {
-      final Clause next = clauses.get(index);
-      if(next instanceof For) {
-        final For fr = (For) next;
-        if(fr.expr instanceof Path) {
-          final Path path = (Path) fr.expr;
-          if(path.simple() && path.root instanceof VarRef &&
-            ((VarRef) path.root).var.is(fl.var) && count(fl.var, index) == VarUsage.ONCE) {
-            return true;
-          }
-        }
+  private Expr inline(final Expr inline, final Expr expr, final ForLet fl,
+      final CompileContext cc) throws QueryException {
+
+    if(expr instanceof VarRef && ((VarRef) expr).var.is(fl.var)) {
+      // replace return clause with expression
+      //   for $c in (1, 2) return $c  ->  (1, 2)
+      //   let $c := <a/> return $c  ->  <a/>
+      return inline;
+    }
+    if(fl instanceof Let && expr.count(fl.var) == VarUsage.NEVER) {
+      // rewrite let clause with unused variable
+      //   let $_ := file:write(...) return ()  ->  file:write(...)
+      //   let $_ := prof:void(1) return 2  ->  prof:void(1), 2
+      return cc.merge(inline, expr, info);
+    }
+    if(fl.size() == 1) {
+      // rewrite for/let clause to simple map
+      //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
+      //   let $c := <_/> return (name($c), $c)  ->  <_/> ! (name(.), .)
+      // skip expressions with context reference
+      //   <_/>[for $c in (1, 2) return (., $c)]
+      final InlineContext ic = new InlineContext(fl.var, new ContextValue(info), cc);
+      if(ic.inlineable(expr) && !expr.has(Flag.CTX)) {
+        return SimpleMap.get(cc, info, inline, cc.get(inline, () -> ic.inline(expr)));
       }
     }
-    // check let clause
-    //   let $a := 123 return $a  ->  return 123
-    return fl instanceof Let && !fl.has(Flag.NDT);
+    return null;
   }
 
   /**
@@ -618,50 +672,6 @@ public final class GFLWOR extends ParseExpr {
       }
     }
     return changed;
-  }
-
-  /**
-   * Merges expression of last for/let clause into 'return' clause.
-   * @param cc compilation context
-   * @return change flag
-   * @throws QueryException query exception
-   */
-  private boolean mergeForLet(final CompileContext cc) throws QueryException {
-    if(!(clauses.peekLast() instanceof ForLet)) return false;
-
-    // do not inline variables with scoring, type checks, etc.
-    final ForLet fl = (ForLet) clauses.peekLast();
-    final Expr inline = fl.inlineExpr(cc);
-    if(inline == null) return false;
-    Expr expr = null;
-
-    if(rtrn instanceof VarRef && ((VarRef) rtrn).var.is(fl.var)) {
-      // replace return clause with expression
-      //   for $c in (1, 2) return $c  ->  (1, 2)
-      //   let $c := <a/> return $c  ->  <a/>
-      expr = inline;
-    } else if(fl instanceof Let && rtrn.count(fl.var) == VarUsage.NEVER) {
-      // rewrite let clause with unused variable
-      //   let $_ := file:write(...) return ()  ->  file:write(...)
-      //   let $_ := prof:void(1) return 2  ->  prof:void(1), 2
-      expr = cc.merge(inline, rtrn, info);
-    } else if(fl.size() == 1) {
-      // rewrite for/let clause to simple map
-      //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
-      //   let $c := <_/> return (name($c), $c)  ->  <_/> ! (name(.), .)
-      // skip expressions with context reference
-      //   <_/>[for $c in (1, 2) return (., $c)]
-      final InlineContext ic = new InlineContext(fl.var, new ContextValue(info), cc);
-      if(ic.inlineable(rtrn) && !rtrn.has(Flag.CTX)) {
-        expr = SimpleMap.get(cc, info, inline, cc.get(inline, () -> ic.inline(rtrn)));
-      }
-    }
-    if(expr == null) return false;
-
-    cc.info(QueryText.OPTINLINE_X, fl);
-    clauses.remove(fl);
-    rtrn = expr;
-    return true;
   }
 
   /**
