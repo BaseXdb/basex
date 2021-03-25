@@ -141,15 +141,14 @@ public final class HigherOrderTest extends SandboxTest {
         + "  for $f in (prof:void#1(?), error#0)"
         + "  let $err := non-deterministic $f() return ()"
         + "} catch * { 'ERR' }", "ERR");
-    // FLWOR expression will be evaluated (due to internal optimizations)
     query("try {"
         + "  let $f := error#0 let $err := $f() return ()"
-        + "} catch * { 'ERR' }", "ERR");
+        + "} catch * { 'ERR' }", "");
     query("try {"
         + "  let $f := function() { fn:error(()) }"
         + "  let $e := $f()"
         + "  return ()"
-        + "} catch * { 'ERR' }", "ERR");
+        + "} catch * { 'ERR' }", "");
   }
 
   /** Ensures that updating flag is not assigned before function body is known. */

@@ -319,33 +319,25 @@ public final class GFLWOR extends ParseExpr {
    * @throws QueryException query exception
    */
   private boolean inlineForLet(final CompileContext cc) throws QueryException {
-    boolean changed = false, changing;
-    do {
-      changing = false;
-      final ListIterator<Clause> iter = clauses.listIterator();
-      while(iter.hasNext()) {
-        final Clause clause = iter.next();
-        if(!(clause instanceof ForLet)) continue;
+    boolean changed = false;
+    for(int c = clauses.size() - 1; c >= 0; c--) {
+      final Clause clause = clauses.get(c);
+      if(!(clause instanceof ForLet)) continue;
 
-        final ForLet fl = (ForLet) clause;
-        final Expr inline = fl.inlineExpr(cc);
-        if(inline == null || !inline(fl, iter.nextIndex())) continue;
+      final ForLet fl = (ForLet) clause;
+      final Expr inline = fl.inlineExpr(cc);
+      if(inline == null || !inline(fl, c + 1)) continue;
 
-        final InlineContext ic = new InlineContext(fl.var, inline, cc);
-        final ExprList exprs = new ExprList();
-        for(final ListIterator<Clause> ir = clauses.listIterator(iter.nextIndex()); ir.hasNext();) {
-          exprs.add(ir.next());
-        }
-        if(ic.inlineable(exprs.add(rtrn).finish())) {
-          cc.info(QueryText.OPTINLINE_X, fl);
-          inline(ic, iter);
-          clauses.remove(fl);
-          changing = changed = true;
-          // continue from the beginning as clauses below could have been deleted
-          break;
-        }
+      final int cs = clauses.size();
+      final InlineContext ic = new InlineContext(fl.var, inline, cc);
+      final ExprList exprs = new ExprList(cs - c);
+      for(int d = c + 1; d < cs; d++) exprs.add(clauses.get(d));
+      if(ic.inlineable(exprs.add(rtrn).finish())) {
+        inline(ic, clauses.listIterator(c));
+        cc.info(QueryText.OPTINLINE_X, fl);
+        clauses.remove(c);
       }
-    } while(changing);
+    }
     return changed;
   }
 
