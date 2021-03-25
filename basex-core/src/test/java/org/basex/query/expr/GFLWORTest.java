@@ -442,7 +442,7 @@ public final class GFLWORTest extends QueryPlanTest {
     check("for $a in (<a/> | <b/>) for $b in $a/* return <c/> ! <d>{ $b, . }</d>", "",
         count(For.class, 1));
 
-    check("for $e in (<a/>, <b/>) let $n := $e/name() order by $n return $n", "a\nb");
+    check("for $e in (<a/>, <b/>) let $n := $e/name() order by $n return $n", "a\nb", root(SORT));
     error("for $a in (1, 4, 2) let $i := (1, $a, 2) order by $i return $i + 1", SEQFOUND_X);
   }
 }
