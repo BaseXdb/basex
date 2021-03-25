@@ -166,13 +166,17 @@ public final class For extends ForLet {
    * Tries to convert this for loop into a let binding.
    * @param clauses FLWOR clauses
    * @param p position
+   * @param cc compilation context
    * @return {@code true} if the clause was converted, {@code false} otherwise
+   * @throws QueryException query exception
    */
-  boolean asLet(final List<Clause> clauses, final int p) {
+  boolean asLet(final List<Clause> clauses, final int p, final CompileContext cc)
+      throws QueryException {
+
     if(!expr.seqType().one()) return false;
-    clauses.set(p, Let.fromFor(this));
-    if(score != null) clauses.add(p + 1, Let.fromForScore(this));
-    if(pos != null) clauses.add(p + 1, new Let(pos, Int.ONE));
+    clauses.set(p, Let.fromFor(this, cc));
+    if(score != null) clauses.add(p + 1, Let.fromForScore(this, cc));
+    if(pos != null) clauses.add(p + 1, new Let(pos, Int.ONE).optimize(cc));
     return true;
   }
 

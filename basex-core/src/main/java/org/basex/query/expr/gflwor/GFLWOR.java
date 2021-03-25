@@ -104,9 +104,9 @@ public final class GFLWOR extends ParseExpr {
     flattenAnd();
 
     // apply all optimizations in a row until nothing changes anymore
-    while(flattenReturn(cc) | flattenFor(cc) | unnestFLWR(cc) | inlineForLet(cc) | forToLet(cc) |
-        slideLetsOut(cc) | unusedVars(cc) | cleanDeadVars() | optimizeWhere(cc) | optimizePos(cc) |
-        unnestLets(cc) | ifToWhere(cc) | mergeReturn(cc) | optimizeOrderBy(cc));
+    while(flattenReturn(cc) | flattenFor(cc) | unnestFLWR(cc) | unnestLets(cc) | ifToWhere(cc) |
+        forToLet(cc) | slideLetsOut(cc) | inlineForLet(cc) | mergeForLet(cc) | unusedVars(cc) |
+        cleanDeadVars() |  optimizeWhere(cc) | optimizePos(cc) | optimizeOrderBy(cc));
 
     mergeWheres();
 
@@ -232,12 +232,13 @@ public final class GFLWOR extends ParseExpr {
    * Tries to convert 'for' clauses that iterate over a single item into 'let' bindings.
    * @param cc compilation context
    * @return change flag
+   * @throws QueryException query exception
    */
-  private boolean forToLet(final CompileContext cc) {
+  private boolean forToLet(final CompileContext cc) throws QueryException {
     boolean changed = false;
     for(int i = clauses.size(); --i >= 0;) {
       final Clause clause = clauses.get(i);
-      if(clause instanceof For && ((For) clause).asLet(clauses, i)) {
+      if(clause instanceof For && ((For) clause).asLet(clauses, i, cc)) {
         cc.info(QueryText.OPTFORTOLET_X, clause);
         changed = true;
       }
@@ -633,7 +634,7 @@ public final class GFLWOR extends ParseExpr {
    * @return change flag
    * @throws QueryException query exception
    */
-  private boolean mergeReturn(final CompileContext cc) throws QueryException {
+  private boolean mergeForLet(final CompileContext cc) throws QueryException {
     if(!(clauses.peekLast() instanceof ForLet)) return false;
 
     // do not inline variables with scoring, type checks, etc.
@@ -761,7 +762,7 @@ public final class GFLWOR extends ParseExpr {
           if(fst.pos != null) {
             // for $a at $b in ... count $c ...  ->  for $a at $b in ... let $c := $b ...
             final VarRef ref = new VarRef(cnt.info, fst.pos).optimize(cc);
-            clauses.set(1, new Let(cnt.var, ref.optimize(cc)).optimize(cc));
+            clauses.set(1, new Let(cnt.var, ref).optimize(cc));
           } else {
             // for $a in 1 to 3 count $c ...  -> for $a at $c in 1 to 3 ...
             clauses.set(0, new For(fst.var, cnt.var, fst.score, fst.expr, false).optimize(cc));

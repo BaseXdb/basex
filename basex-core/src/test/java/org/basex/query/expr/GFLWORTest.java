@@ -196,12 +196,13 @@ public final class GFLWORTest extends QueryPlanTest {
         root(CElem.class)
     );
     check("for $len in 1 to 3 " +
-        "for sliding window $w in 1 to 3 start at $p when true() only " +
-        "end at $q when $q - $p + 1 eq $len " +
+        "for sliding window $w in 1 to 3 " +
+        "  start at $p when true() only " +
+        "  end at $q when $q - $p + 1 eq $len " +
         "let $x := $len div 2 " +
         "return count($w) div ($x + $x)",
         "1\n1\n1\n1\n1\n1",
-        empty(Let.class)
+        "//Let << //Window"
     );
   }
 
