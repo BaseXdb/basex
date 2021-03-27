@@ -57,7 +57,7 @@ public final class FnAnalyzeString extends RegEx {
   private static int[] match(final Matcher matcher, final String string, final FElem parent,
       final int group) {
 
-    final FElem nd = new FElem(group == 0 ? Q_MATCH : Q_MGROUP);
+    final FElem nd = new FElem(group == 0 ? Q_MATCH : Q_MGROUP).declareNS();
     if(group > 0) nd.add(NR, token(group));
 
     final int start = matcher.start(group), end = matcher.end(group), gc = matcher.groupCount();
@@ -83,6 +83,6 @@ public final class FnAnalyzeString extends RegEx {
    * @param par root node
    */
   private static void nonmatch(final String text, final FElem par) {
-    par.add(new FElem(Q_NONMATCH).add(text));
+    par.add(new FElem(Q_NONMATCH).declareNS().add(text));
   }
 }

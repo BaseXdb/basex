@@ -268,4 +268,13 @@ public final class MixedTest extends SandboxTest {
     query("tail(json:parse('{}')/*/ancestor-or-self::node()) instance of element()", true);
     query("tail(csv:parse('')/*/ancestor-or-self::node()) instance of element()", true);
   }
+
+  /** fn:json-to-xml, namespaces. */
+  @Test public void gh1997() {
+    execute(new Close());
+    query("db:create('" + NAME + "', analyze-string('a', 'a')/*, '" + NAME + "')");
+    query("db:open('" + NAME + "')/* => namespace-uri()", "http://www.w3.org/2005/xpath-functions");
+    query("db:create('" + NAME + "', json-to-xml('[1]')/*/*, '" + NAME + "')");
+    query("db:open('" + NAME + "')/* => namespace-uri()", "http://www.w3.org/2005/xpath-functions");
+  }
 }
