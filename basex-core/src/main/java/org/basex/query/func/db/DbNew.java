@@ -20,10 +20,10 @@ import org.basex.util.*;
  */
 abstract class DbNew extends DbAccess {
   /**
-   * Creates a {@link Data} instance for the specified document.
+   * Creates a container for the specified input.
    * @param input input item (node or string)
    * @param path path argument (optional, can be empty)
-   * @return database instance
+   * @return input container
    * @throws QueryException query exception
    */
   final NewInput checkInput(final Item input, final byte[] path) throws QueryException {
