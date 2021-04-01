@@ -3,7 +3,6 @@ package org.basex.query.up.atomic;
 import static org.basex.util.Token.*;
 
 import java.util.*;
-import java.util.List;
 
 import org.basex.data.*;
 

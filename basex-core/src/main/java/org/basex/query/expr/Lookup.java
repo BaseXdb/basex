@@ -82,11 +82,10 @@ public final class Lookup extends Arr {
     if(ks == 0) return keys;
 
     final long is = inputs.size();
-    final QueryBiFunction<Expr, Expr, Expr> rewrite = (input, arg) -> {
-      return keys == WILDCARD ? cc.function(inputs.funcType() instanceof MapType ?
-        Function._UTIL_MAP_VALUES : Function._UTIL_ARRAY_VALUES, info, input) :
-        new DynFuncCall(info, cc.sc(), input, arg).optimize(cc);
-    };
+    final QueryBiFunction<Expr, Expr, Expr> rewrite = (input, arg) ->
+      keys == WILDCARD ? cc.function(inputs.funcType() instanceof MapType ?
+      Function._UTIL_MAP_VALUES : Function._UTIL_ARRAY_VALUES, info, input) :
+      new DynFuncCall(info, cc.sc(), input, arg).optimize(cc);
 
     // single keys
     if(ks == 1) {
@@ -114,9 +113,8 @@ public final class Lookup extends Arr {
       final LinkedList<Clause> clauses = new LinkedList<>();
       final Var var = cc.vs().addNew(new QNm("_"), null, false, cc.qc, info);
       clauses.add(new For(var, inputs).optimize(cc));
-      final Expr ex = cc.get(keys, () -> {
-        return rewrite.apply(new VarRef(info, var).optimize(cc), ContextValue.get(cc, info));
-      });
+      final Expr ex = cc.get(keys, () ->
+        rewrite.apply(new VarRef(info, var).optimize(cc), ContextValue.get(cc, info)));
       return new GFLWOR(info, clauses, SimpleMap.get(cc, info, keys, ex)).optimize(cc);
     }
     return this;

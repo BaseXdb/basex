@@ -36,7 +36,9 @@ public final class ArrayJoin extends ArrayFn {
     item = iter.next();
     if(item == null) return fst.concat(snd);
 
-    final ArrayBuilder builder = new ArrayBuilder().append(fst).append(snd);
+    final ArrayBuilder builder = new ArrayBuilder();
+    builder.append(fst);
+    builder.append(snd);
     do {
       builder.append(toArray(item));
     } while((item = qc.next(iter)) != null);

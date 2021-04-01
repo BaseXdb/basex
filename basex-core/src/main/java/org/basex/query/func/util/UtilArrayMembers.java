@@ -24,7 +24,7 @@ public final class UtilArrayMembers extends StandardFunc {
     return new Iter() {
       final Iterator<Value> members = array.members().iterator();
       @Override
-      public XQArray next() throws QueryException {
+      public XQArray next() {
         return members.hasNext() ? XQArray.singleton(members.next()) : null;
       }
     };

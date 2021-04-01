@@ -31,9 +31,8 @@ public final class ArrayBuilder {
   /**
    * Adds an element to the start of the array.
    * @param elem element to add
-   * @return self reference for convenience
    */
-  public ArrayBuilder prepend(final Value elem) {
+  public void prepend(final Value elem) {
     if(inLeft < XQArray.MAX_DIGIT) {
       // just insert the element
       vals[(mid - inLeft + CAP - 1) % CAP] = elem;
@@ -62,15 +61,13 @@ public final class ArrayBuilder {
       vals[(mid - rest + CAP - 1) % CAP] = elem;
       inLeft = rest + 1;
     }
-    return this;
   }
 
   /**
    * Adds an element to the end of the array.
    * @param elem element to add
-   * @return self reference for convenience
    */
-  public ArrayBuilder append(final Value elem) {
+  public void append(final Value elem) {
     if(inRight < XQArray.MAX_DIGIT) {
       // just insert the element
       vals[(mid + inRight) % CAP] = elem;
@@ -98,18 +95,16 @@ public final class ArrayBuilder {
       vals[(mid + rest) % CAP] = elem;
       inRight = rest + 1;
     }
-    return this;
   }
 
   /**
    * Appends the given array to this builder.
    * @param arr array to append
-   * @return self reference for convenience
    */
-  public ArrayBuilder append(final XQArray arr) {
+  public void append(final XQArray arr) {
     if(!(arr instanceof BigArray)) {
       for(final Value value : arr.members()) append(value);
-      return this;
+      return;
     }
 
     final BigArray big = (BigArray) arr;
@@ -118,7 +113,7 @@ public final class ArrayBuilder {
     if(midTree.isEmpty()) {
       for(final Value l : big.left) append(l);
       for(final Value r : big.right) append(r);
-      return this;
+      return;
     }
 
     // merge middle digits
@@ -138,7 +133,7 @@ public final class ArrayBuilder {
       for(int i = ls.length; --i >= 0;) prepend(ls[i]);
       for(int i = k; --i >= 0;) prepend(temp[i]);
       for(final Value r : rs) append(r);
-      return this;
+      return;
     }
 
     final int inMiddle = inRight + big.left.length,
@@ -157,7 +152,6 @@ public final class ArrayBuilder {
     tree.append(big.middle);
     inRight = 0;
     for(final Value r : big.right) append(r);
-    return this;
   }
 
   /**
