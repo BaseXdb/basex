@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -20,7 +21,7 @@ import org.basex.util.hash.*;
 public final class Cast extends Single {
   /** Static context. */
   private final StaticContext sc;
-  /** Sequence type to cast to. */
+  /** Sequence type to cast to (zero or one items). */
   final SeqType seqType;
 
   /**
@@ -28,7 +29,7 @@ public final class Cast extends Single {
    * @param sc static context
    * @param info input info
    * @param expr expression
-   * @param seqType target type
+   * @param seqType sequence type to cast to (zero or one items)
    */
   public Cast(final StaticContext sc, final InputInfo info, final Expr expr,
       final SeqType seqType) {
@@ -45,6 +46,9 @@ public final class Cast extends Single {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     expr = expr.simplifyFor(Simplify.STRING, cc);
+
+    if((ZERO_OR_ONE.is(expr) || EXACTLY_ONE.is(expr) || ONE_OR_MORE.is(expr)) &&
+        seqType.occ.instanceOf(expr.seqType().occ)) expr = expr.arg(0);
 
     // target type
     final SeqType est = expr.seqType();

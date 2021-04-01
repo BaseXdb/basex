@@ -2181,4 +2181,31 @@ public final class RewritingsTest extends QueryPlanTest {
         "for $b in $m?0 let $c := .() group by $d := () return $c" +
         ")}(map { 0: 1 })", 1);
   }
+
+  /** Casts, cardinality tests. */
+  @Test public void gh1998() {
+    check("zero-or-one((1 to 2)[. = 2]) cast as xs:decimal?", 2, empty(ZERO_OR_ONE));
+    check("exactly-one((1 to 2)[. = 2]) cast as xs:decimal", 2, empty(EXACTLY_ONE));
+    check("zero-or-one((1 to 2)[. = 2]) cast as xs:decimal", 2, empty(ZERO_OR_ONE));
+    check("one-or-more((1 to 2)[. = 2]) cast as xs:decimal", 2, empty(ONE_OR_MORE));
+
+    check("xs:decimal(exactly-one((1 to 2)[. = 2]))", 2, exists(EXACTLY_ONE));
+    check("xs:decimal(one-or-more((1 to 2)[. = 2]))", 2, exists(ONE_OR_MORE));
+
+    check("zero-or-one((1 to 2)[. = 3]) promote to empty-sequence()", "", empty(ZERO_OR_ONE));
+    check("zero-or-one((1 to 2)[. = 2]) promote to xs:decimal" , 2, empty(ZERO_OR_ONE));
+    check("zero-or-one((1 to 2)[. = 2]) promote to xs:decimal?", 2, empty(ZERO_OR_ONE));
+    check("zero-or-one((1 to 2)[. = 2]) promote to xs:decimal+", 2, exists(ZERO_OR_ONE));
+    check("zero-or-one((1 to 2)[. = 2]) promote to xs:decimal*", 2, exists(ZERO_OR_ONE));
+
+    check("exactly-one((1 to 2)[. = 2]) promote to xs:decimal" , 2, empty(EXACTLY_ONE));
+    check("exactly-one((1 to 2)[. = 2]) promote to xs:decimal?", 2, exists(EXACTLY_ONE));
+    check("exactly-one((1 to 2)[. = 2]) promote to xs:decimal+", 2, exists(EXACTLY_ONE));
+    check("exactly-one((1 to 2)[. = 2]) promote to xs:decimal*", 2, exists(EXACTLY_ONE));
+
+    check("one-or-more((1 to 2)[. = 2]) promote to xs:decimal" , 2, empty(ONE_OR_MORE));
+    check("one-or-more((1 to 2)[. = 2]) promote to xs:decimal?", 2, exists(ONE_OR_MORE));
+    check("one-or-more((1 to 2)[. = 2]) promote to xs:decimal+", 2, empty(ONE_OR_MORE));
+    check("one-or-more((1 to 2)[. = 2]) promote to xs:decimal*", 2, exists(ONE_OR_MORE));
+  }
 }

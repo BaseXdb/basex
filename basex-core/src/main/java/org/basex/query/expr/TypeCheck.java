@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
@@ -56,6 +57,10 @@ public class TypeCheck extends Single {
     if(st.type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
       expr = expr.simplifyFor(Simplify.DATA, cc);
     }
+
+    if((ZERO_OR_ONE.is(expr) || EXACTLY_ONE.is(expr) || ONE_OR_MORE.is(expr)) &&
+        st.occ.instanceOf(expr.seqType().occ)) expr = expr.arg(0);
+
     final SeqType et = expr.seqType();
     occ = et.type.instanceOf(st.type) && et.kindInstanceOf(st);
 
