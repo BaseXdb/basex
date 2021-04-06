@@ -423,11 +423,9 @@ public abstract class SimpleMap extends Arr {
 
   @Override
   public final boolean has(final Flag... flags) {
-    /* Context dependency: Only check first expression.
-     * Examples: . ! abc */
+    // Context dependency, positional access: only check first expression.
+    // Examples: . ! abc, position() ! a
     if(Flag.CTX.in(flags) && exprs[0].has(Flag.CTX)) return true;
-    /* Positional access: only check root node (steps will refer to result of root node).
-     * Example: position()/a */
     if(Flag.POS.in(flags) && exprs[0].has(Flag.POS)) return true;
     // check remaining flags
     final Flag[] flgs = Flag.POS.remove(Flag.CTX.remove(flags));
