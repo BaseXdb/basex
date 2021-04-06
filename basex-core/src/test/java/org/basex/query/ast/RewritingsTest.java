@@ -2214,4 +2214,11 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh2000() {
     check("function() { <a/> update { delete node b } }()", "<a/>", root(TransformWith.class));
   }
+
+  /** Dynamic unroll limit.. */
+  @Test public void gh2001() {
+    check("(1, 3) ! (. * 2)", "2\n6", empty(Arith.class));
+    check("sum((# db:unrolllimit 0 #) { (1, 3) ! (. * 2) })", 8, exists(Arith.class));
+    check("sum((# db:unrolllimit 6 #) { (1 to 6) ! (. * 2) })", 42, empty(Arith.class));
+  }
 }

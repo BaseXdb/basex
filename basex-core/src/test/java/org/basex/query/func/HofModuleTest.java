@@ -43,19 +43,18 @@ public final class HofModuleTest extends QueryPlanTest {
     error(func.args(" ()", " function($x, $y) { $x + $y }"), EMPTYFOUND);
 
     // should be unrolled and evaluated at compile time
-    final int limit = ParseExpr.UNROLL_LIMIT;
-    check(func.args(" 1 to " + limit, " function($a, $b) { $a + $b }"),
+    check(func.args(" 1 to 5", " function($a, $b) { $a + $b }"),
         15,
         empty(func),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 1 to " + limit, " function($a, $b) { 0 * random:double() + $b }"),
+    check(func.args(" 1 to 5", " function($a, $b) { 0 * random:double() + $b }"),
         5,
         exists(Int.class),
         empty(func),
         count(Util.className(Arith.class) + "[@op = '+']", 4));
     // should not be unrolled
-    check(func.args(" 1 to " + (limit + 1), " function($a, $b) { $a + $b }"),
+    check(func.args(" 1 to 6", " function($a, $b) { $a + $b }"),
         21,
         exists(func));
   }

@@ -6,6 +6,7 @@ import static org.basex.query.func.Function.*;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -294,7 +295,8 @@ public abstract class SimpleMap extends Arr {
         }
       }
 
-      if(expr instanceof Seq && size <= UNROLL_LIMIT) {
+      final int limit = cc.qc.context.options.get(MainOptions.UNROLLLIMIT);
+      if(expr instanceof Seq && size <= limit) {
         // (1, 2) ! (. + 1)  ->  1 ! (. + 1), 2 ! (. + 1)
         final ExprList results = new ExprList((int) size);
         for(final Item item : (Value) expr) {

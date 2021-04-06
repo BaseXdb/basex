@@ -2,6 +2,7 @@ package org.basex.query.func.fn;
 
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -61,7 +62,8 @@ public final class FnFoldRight extends StandardFunc {
 
     FnFoldLeft.opt(this, cc, false, false);
 
-    if(expr1 instanceof Value && expr3 instanceof Value && expr1.size() <= UNROLL_LIMIT) {
+    final int limit = cc.qc.context.options.get(MainOptions.UNROLLLIMIT);
+    if(expr1 instanceof Value && expr3 instanceof Value && expr1.size() <= limit) {
       // unroll the loop
       Expr expr = expr2;
       for(final Item item : ((Value) expr1).reverse(cc.qc)) {
