@@ -104,7 +104,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public FuncType funcType() {
-    return FuncType.get(anns, declType, params);
+    final FuncType type = super.funcType();
+    return type != null ? type : FuncType.get(anns, declType, params);
   }
 
   @Override
