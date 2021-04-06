@@ -272,6 +272,27 @@ public final class FnModuleTest extends QueryPlanTest {
 
     check(func.args(" ()", " ()", " function($a, $b) { $b }"), "", empty());
 
+    check(func.args(" <a>1</a>", " xs:byte(1)", " function($n, $_) {" +
+        " if($n instance of xs:byte ) then xs:short  (1) else" +
+        " if($n instance of xs:short) then xs:int    (1) else" +
+        " if($n instance of xs:int  ) then xs:long   (1) else" +
+        " if($n instance of xs:long ) then xs:integer(1) else" +
+        " xs:decimal(1)" +
+        "}"), 1,
+        type(func, "xs:decimal"));
+
+    // type inference
+    inline(true);
+    check(func.args(" (1, 2)[. = 1]", " ()", " function($r, $a) { $r, $a }"), 1,
+        type(func, "xs:integer*"));
+    check(func.args(" (1, 2)[. = 0]", 1, " function($r, $a) { $r, $a }"), 1,
+        type(func, "xs:integer+"));
+    check(func.args(" (1, 2)[. = 1]", "a", " function($r, $a) { $r, $a }"), "a\n1",
+        type(func, "xs:anyAtomicType+"));
+
+    check(func.args(" (1, 2)[. = 0]", 1, " function($r as xs:integer, $a) { $r + $r }"), 1,
+        type(func, "xs:integer"));
+
     // should not be unrolled
     check(func.args(" 1 to 6", 0, " function($a, $b) { $a + $b }"), 21,
         exists(func));
@@ -285,27 +306,6 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" 2 to 5", 1, " function($a, $b) { $b[random:double()] }"), "",
         empty(func),
         exists(_RANDOM_DOUBLE));
-
-    // type inference
-    inline(true);
-    check(func.args(" (1, 2)[. = 1]", " ()", " function($r, $a) { $r, $a }"), 1,
-        type(func, "xs:integer*"));
-    check(func.args(" (1, 2)[. = 0]", 1, " function($r, $a) { $r, $a }"), 1,
-        type(func, "xs:integer+"));
-    check(func.args(" (1, 2)[. = 1]", "a", " function($r, $a) { $r, $a }"), "a\n1",
-        type(func, "xs:anyAtomicType+"));
-
-    check(func.args(" <a>1</a>", " xs:byte(1)", " function($n, $_) {" +
-        " if($n instance of xs:byte ) then xs:short  (1) else" +
-        " if($n instance of xs:short) then xs:int    (1) else" +
-        " if($n instance of xs:int  ) then xs:long   (1) else" +
-        " if($n instance of xs:long ) then xs:integer(1) else" +
-        " xs:decimal(1)" +
-        "}"), 1,
-        type(func, "xs:decimal"));
-
-    check(func.args(" (1, 2)[. = 0]", 1, " function($r as xs:integer, $a) { $r + $r }"), 1,
-        type(func, "xs:integer"));
   }
 
   /** Test method. */

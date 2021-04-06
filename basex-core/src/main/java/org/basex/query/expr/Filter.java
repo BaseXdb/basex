@@ -4,6 +4,7 @@ import static org.basex.query.func.Function.*;
 
 import java.util.function.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -12,10 +13,13 @@ import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Abstract filter expression.
@@ -100,6 +104,19 @@ public abstract class Filter extends Preds {
       if(exprs.length == 1 && expr.isSimple() && !expr.seqType().mayBeNumber()) {
         final Expr iff = new If(info, expr, root).optimize(cc);
         return cc.replaceWith(this, iff);
+      }
+
+      // unroll filters with few items
+      // example: (1, 2)[. = 1]  ->  1[. = 1], 2[. = 1]
+      final long size = root.size(), limit = cc.qc.context.options.get(MainOptions.UNROLLLIMIT);
+      if(root instanceof Seq && size <= limit) {
+        cc.info(QueryText.OPTUNROLL_X, this);
+        final ExprList results = new ExprList((int) size);
+        for(final Item item : (Value) root) {
+          results.add(Filter.get(cc, info, item, results.size() == size - 1 ? exprs :
+            Arr.copyAll(cc, new IntObjMap<>(), exprs)));
+        }
+        return List.get(cc, info, results.finish());
       }
 
       // otherwise, return iterative filter

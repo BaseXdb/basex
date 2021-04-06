@@ -2230,9 +2230,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(1, 3) ! (. * 2)", "2\n6", exists(Arith.class));
     check("sum((1, 3) ! (. * 2))", 8, exists(Arith.class));
     check("sum((# db:unrolllimit 6 #) { (1 to 6) ! (. * 2) })", 42, empty(Arith.class));
+    check("(1, 2)[. = 1]", 1, root(IterFilter.class));
 
     unroll(true);
     check("(1, 3) ! (. * 2)", "2\n6", empty(Arith.class));
     check("sum((# db:unrolllimit 0 #) { (1, 3) ! (. * 2) })", 8, exists(Arith.class));
+    check("(1, 2)[. = 1]", 1, root(Int.class));
   }
 }
