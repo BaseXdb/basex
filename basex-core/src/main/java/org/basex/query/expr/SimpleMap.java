@@ -298,12 +298,12 @@ public abstract class SimpleMap extends Arr {
       final int limit = cc.qc.context.options.get(MainOptions.UNROLLLIMIT);
       if(expr instanceof Seq && size <= limit) {
         // (1, 2) ! (. + 1)  ->  1 ! (. + 1), 2 ! (. + 1)
+        cc.info(QueryText.OPTUNROLL_X, this);
         final ExprList results = new ExprList((int) size);
         for(final Item item : (Value) expr) {
           final Expr nxt = results.size() == size - 1 ? next : next.copy(cc, new IntObjMap<>());
           results.add(SimpleMap.get(cc, info, item, nxt));
         }
-        cc.info(QueryText.OPTUNROLL_X, this);
         return List.get(cc, info, results.finish());
       }
     }
