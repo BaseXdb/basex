@@ -956,7 +956,7 @@ public enum Function implements AFunction {
       arg(STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_EXISTS(DbExists::new, "exists(database[,path])",
-      arg(STRING_O, STRING_O), BOOLEAN_O, flag(NDT), DB_URI),
+      arg(STRING_O, STRING_O), BOOLEAN_O, DB_URI),
   /** XQuery function. */
   _DB_EXPORT(DbExport::new, "export(database,path[,param]])",
       arg(STRING_O, STRING_O, ITEM_O), EMPTY_SEQUENCE_Z, flag(NDT), DB_URI),

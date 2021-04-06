@@ -7,12 +7,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
-import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
 import org.basex.core.parse.Commands.*;
 import org.basex.io.*;
+import org.basex.query.ast.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
@@ -26,7 +27,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class DbModuleTest extends SandboxTest {
+public final class DbModuleTest extends QueryPlanTest {
   /** Test file. */
   private static final String XML = "src/test/resources/input.xml";
   /** Test file. */
@@ -475,9 +476,10 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(NAME, "xxx"), false);
     query(func.args(NAME, "x"), false);
     query(func.args(NAME, ""), false);
+
     // false expected for missing database
     execute(new DropDB(NAME));
-    query(func.args(NAME), false);
+    check(func.args(NAME), false, root(Bln.class));
   }
 
   /** Test method. */
