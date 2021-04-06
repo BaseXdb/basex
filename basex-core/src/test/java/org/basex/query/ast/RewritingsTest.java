@@ -31,11 +31,11 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Input file. */
   private static final String FILE = "src/test/resources/input.xml";
 
-  /**
-   * Drops the database.
-   */
+  /** Drops the database, resets optimizations. */
   @AfterEach public void tearDown() {
     execute(new DropDB(NAME));
+    inline(false);
+    unroll(false);
   }
 
   /** Checks if the count function is pre-compiled. */
@@ -542,6 +542,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Type checks. */
   @Test public void typeCheck() {
+    inline(true);
     check("declare function local:a($e) as xs:string? { local:b($e) }; " +
         "declare function local:b($e) as xs:string? { $e }; local:a(<_>X</_>)", "X",
         count(TypeCheck.class, 1));
@@ -898,6 +899,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Type checks. */
   @Test public void gh1791() {
+    inline(true);
     check("function() as xs:double { <x>1</x> }() + 2", 3, empty(TypeCheck.class));
     check("declare function local:_() as xs:string { <x>A</x> }; local:_() = 'A'",
         true, empty(TypeCheck.class));
@@ -1154,6 +1156,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Rewriting of positional predicate. */
   @Test public void gh1827() {
+    inline(true);
     check("declare function local:f($pos) { (1, 2)[position() < $pos] };\n" +
         "local:f(1)", "", empty());
   }
@@ -1620,6 +1623,7 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1886() {
     execute(new CreateDB(NAME, "<_>X</_>"));
 
+    inline(true);
     check("function($db) { $db/UNKNOWN }(.)", "", empty());
     check("let $f := function($a) { $a/UNKNOWN } return ./$f(.)", "", empty());
     check("function($db) { $db/_[. = 'X'] }(.)", "<_>X</_>", root(ValueAccess.class));
@@ -1658,6 +1662,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Static properties of closures. */
   @Test public void gh1892() {
+    inline(true);
     check("1 ! (let $a := . return function() { $a }) ! .()", 1, root(Int.class));
     query("function() { for $a in (1, 2) return function() { $a } }() ! .()", "1\n2");
   }
@@ -1684,6 +1689,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Simple maps, inline operands. */
   @Test public void gh1897() {
+    inline(true);
     check("<a/> ! name()", "a", root(Function.NAME));
     check("'s' ! <_>{ . }</_>", "<_>s</_>", root(CElem.class));
     check("count#1 ! .('a')", 1, root(Int.class));
@@ -1713,6 +1719,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Size of type check results. */
   @Test public void gh1902() {
+    inline(true);
     check("function() as xs:string+ { util:replicate(<x/>, 10000000000) }() => count()",
       "10000000000", root(Int.class));
     check("function() as xs:double+ { 1 to 100000000000000 }() => count()",
@@ -1728,6 +1735,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Type check, refine occurrence indicator. */
   @Test public void gh1906() {
+    inline(true);
     check("function() as xs:string* { <_/> }() instance of xs:string*", true, root(Bln.class));
     check("function() as xs:string* { <_/> }() instance of xs:string+", true, root(Bln.class));
     check("function() as xs:string* { <_/> }() instance of xs:string?", true, root(Bln.class));
@@ -1787,6 +1795,7 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Axis steps, better typing. */
   @Test public void gh1909() {
     // fragments
+    inline(true);
     check("function() as element(a)? { <a/>/self::a }()",
         "<a/>", root(IterPath.class));
     check("function() as element(a)? { <a/>/self::Q{}a }()",
@@ -2212,13 +2221,18 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Inline transform-with expression. */
   @Test public void gh2000() {
+    inline(true);
     check("function() { <a/> update { delete node b } }()", "<a/>", root(TransformWith.class));
   }
 
   /** Dynamic unroll limit.. */
   @Test public void gh2001() {
+    check("(1, 3) ! (. * 2)", "2\n6", exists(Arith.class));
+    check("sum((1, 3) ! (. * 2))", 8, exists(Arith.class));
+    check("sum((# db:unrolllimit 6 #) { (1 to 6) ! (. * 2) })", 42, empty(Arith.class));
+
+    unroll(true);
     check("(1, 3) ! (. * 2)", "2\n6", empty(Arith.class));
     check("sum((# db:unrolllimit 0 #) { (1, 3) ! (. * 2) })", 8, exists(Arith.class));
-    check("sum((# db:unrolllimit 6 #) { (1 to 6) ! (. * 2) })", 42, empty(Arith.class));
   }
 }

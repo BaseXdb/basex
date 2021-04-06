@@ -10,6 +10,7 @@ import org.basex.query.expr.constr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -21,6 +22,12 @@ import org.junit.jupiter.api.Test;
 public final class FnModuleTest extends QueryPlanTest {
   /** Text file. */
   private static final String TEXT = "src/test/resources/input.xml";
+
+  /** Resets optimizations. */
+  @AfterEach public void init() {
+    inline(false);
+    unroll(false);
+  }
 
   /** Test method. */
   @Test public void abs() {
@@ -74,6 +81,7 @@ public final class FnModuleTest extends QueryPlanTest {
     error(func.args(" string-length#1", " [ ('a', 'b') ]"), INVPROMOTE_X_X_X);
 
     // no pre-evaluation (higher-order arguments), but type adjustment
+    inline(true);
     check(func.args(" true#0", " []"), true, type(func, "xs:boolean"));
     check(func.args(" count#1", " [1]"), 1, type(func, "xs:integer"));
     check(func.args(" abs#1", " [1]"), 1, type(func, "xs:integer"));
@@ -224,6 +232,8 @@ public final class FnModuleTest extends QueryPlanTest {
     // errors: defer error if not requested; adjust declared sequence type of {@link TypeCheck}
     query("head((1, " + func.args() + "))", 1);
     query("head((1, function() { error() }()))", 1);
+
+    inline(true);
     query("declare function local:e() { error() }; head((1, local:e()))", 1);
     query("declare function local:e() as empty-sequence() { error() }; head((1, local:e()))", 1);
     query("declare %basex:inline(0) function local:f() { error() }; head((1, local:f()))", 1);
@@ -241,6 +251,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" ('a', <a/>)", " function($_ as xs:string) as xs:boolean? { $_ = 'a' }"), "a",
         exists(IterFilter.class));
 
+    inline(true);
     check(func.args(" (<a/>, <b/>)", " boolean#1"), "<a/>\n<b/>", root(List.class));
     check(func.args(" <a/>", " boolean#1"), "<a/>", root(CElem.class));
   }
@@ -261,7 +272,12 @@ public final class FnModuleTest extends QueryPlanTest {
 
     check(func.args(" ()", " ()", " function($a, $b) { $b }"), "", empty());
 
+    // should not be unrolled
+    check(func.args(" 1 to 6", 0, " function($a, $b) { $a + $b }"), 21,
+        exists(func));
+
     // should be unrolled and evaluated at compile time
+    unroll(true);
     check(func.args(" 2 to 5", 1, " function($a, $b) { $a + $b }"), 15,
         empty(func),
         exists(Int.class));
@@ -269,11 +285,9 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" 2 to 5", 1, " function($a, $b) { $b[random:double()] }"), "",
         empty(func),
         exists(_RANDOM_DOUBLE));
-    // should not be unrolled
-    check(func.args(" 1 to 6", 0, " function($a, $b) { $a + $b }"), 21,
-        exists(func));
 
     // type inference
+    inline(true);
     check(func.args(" (1, 2)[. = 1]", " ()", " function($r, $a) { $r, $a }"), 1,
         type(func, "xs:integer*"));
     check(func.args(" (1, 2)[. = 0]", 1, " function($r, $a) { $r, $a }"), 1,
@@ -300,7 +314,12 @@ public final class FnModuleTest extends QueryPlanTest {
 
     check(func.args(" ()", " ()", " function($a, $b) { $a }"), "", empty());
 
+    // should not be unrolled
+    check(func.args(" 0 to 5", 10, " function($a, $b) { $a + $b }"), 25,
+        exists(func));
+
     // should be unrolled and evaluated at compile time
+    unroll(true);
     check(func.args(" 1 to 4", 10, " function($a, $b) { $a + $b }"), 20,
         empty(func),
         exists(Int.class));
@@ -308,9 +327,6 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" 1 to 4", 10, " function($a, $b) { $b[random:double()] }"), "",
         empty(func),
         exists(_RANDOM_DOUBLE));
-    // should not be unrolled
-    check(func.args(" 0 to 5", 10, " function($a, $b) { $a + $b }"), 25,
-        exists(func));
   }
 
   /** Test method. */
@@ -321,9 +337,11 @@ public final class FnModuleTest extends QueryPlanTest {
     query("sort(" + func.args(" (1 to 2)[. > 0]", " string#1") + ')', "1\n2");
     check(func.args(" ()", " boolean#1"), "", empty());
 
+    inline(true);
     // pre-compute result size
     query("count(" + func.args(" 1 to 10000000000", " string#1") + ')', 10000000000L);
-    check("count(" + func.args(" 1 to 20", " function($a) { $a, $a }") + ')', 40, root(Int.class));
+    check("count(" + func.args(" 1 to 20", " function($a) { $a, $a }") + ')',
+        40, root(Int.class));
 
     // rewritten to FLWOR expression
     check(func.args(" 0 to 8", " function($x) { $x + 1 }"),

@@ -16,6 +16,11 @@ import org.junit.jupiter.api.*;
  * @author Leo Woerteler
  */
 public final class FuncItemTest extends QueryPlanTest {
+  /** Resets optimizations. */
+  @BeforeEach public void init() {
+    inline(true);
+  }
+
   /** Checks if the identity function is pre-compiled. */
   @Test public void idTest() {
     check("function($x) { $x }(42)",

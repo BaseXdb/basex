@@ -260,6 +260,10 @@ public abstract class Sandbox {
     Prop.put(StaticOptions.REPOPATH, path + "/repo");
     Prop.put(StaticOptions.SERVERPORT, Integer.toString(DB_PORT));
     context = new Context();
+
+    // disable loop unrolling and function inlining
+    context.options.set(MainOptions.UNROLLLIMIT, 0);
+    context.options.set(MainOptions.INLINELIMIT, 0);
   }
 
   /**
@@ -269,6 +273,22 @@ public abstract class Sandbox {
     context.close();
     Prop.clear();
     if(!sandbox().delete()) throw Util.notExpected("Sandbox could not be deleted.");
+  }
+
+  /**
+   * Triggers function inlining.
+   * @param enable flag
+   */
+  protected static void inline(final boolean enable) {
+    context.options.set(MainOptions.INLINELIMIT, enable ? 1 << 16 : 0);
+  }
+
+  /**
+   * Triggers function inlining.
+   * @param enable flag
+   */
+  protected static void unroll(final boolean enable) {
+    context.options.set(MainOptions.UNROLLLIMIT, enable ? 1 << 16 : 0);
   }
 
   /**

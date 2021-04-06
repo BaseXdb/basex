@@ -18,6 +18,12 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class SimpleMapTest extends QueryPlanTest {
+  /** Resets optimizations. */
+  @AfterEach public void init() {
+    inline(false);
+    unroll(false);
+  }
+
   /** Basic tests. */
   @Test public void basic() {
     query("1 ! 2", 2);
@@ -128,10 +134,12 @@ public final class SimpleMapTest extends QueryPlanTest {
 
   /** XQuery: Unroll simple map expressions. */
   @Test public void gh1994() {
+    // do not unroll
+    check("(1 to 6) ! (. * 2)", "2\n4\n6\n8\n10\n12", root(DualMap.class));
+
+    // unroll expression
+    unroll(true);
     check("(1, 2) ! (. * 2)", "2\n4", root(IntSeq.class));
     check("(true(), false()) ! (. = true())", "true\nfalse", root(BlnSeq.class));
-
-    // do not unroll more than 5 iterations
-    check("(1 to 6) ! (. * 2)", "2\n4\n6\n8\n10\n12", root(DualMap.class));
   }
 }

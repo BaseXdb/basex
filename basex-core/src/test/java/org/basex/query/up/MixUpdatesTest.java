@@ -14,11 +14,15 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class MixUpdatesTest extends SandboxTest {
-  /**
-   * Prepare tests.
-   */
+  /**Prepare tests. */
   @BeforeAll public static void beforeClass() {
     set(MainOptions.MIXUPDATES, true);
+  }
+
+  /** Resets optimizations. */
+  @AfterEach public void init() {
+    inline(false);
+    unroll(false);
   }
 
   /** Transform expression containing a simple expression. */
@@ -90,10 +94,9 @@ public final class MixUpdatesTest extends SandboxTest {
     query("declare function local:f() { update:output('1') }; local:f()", 1);
   }
 
-  /**
-   * Reject updating functions in built-in higher-order function.
-   */
+  /**  Reject updating functions in built-in higher-order function. */
   @Test public void updatingHof() {
+    inline(true);
     query("for-each(1, update:output#1)", 1);
     query("apply(update:output#1, [1])", 1);
   }

@@ -16,6 +16,12 @@ import org.junit.jupiter.api.*;
  * @author Leo Woerteler
  */
 public final class HofModuleTest extends QueryPlanTest {
+  /** Resets optimizations. */
+  @AfterEach public void init() {
+    inline(false);
+    unroll(false);
+  }
+
   /** Test method. */
   @Test public void constTest() {
     final Function func = _HOF_CONST;
@@ -42,7 +48,13 @@ public final class HofModuleTest extends QueryPlanTest {
     query(func.args(" 1 to 10", " function($x, $y) { $x + $y }"), 55);
     error(func.args(" ()", " function($x, $y) { $x + $y }"), EMPTYFOUND);
 
+    // should not be unrolled
+    check(func.args(" 1 to 6", " function($a, $b) { $a + $b }"),
+        21,
+        exists(func));
+
     // should be unrolled and evaluated at compile time
+    unroll(true);
     check(func.args(" 1 to 5", " function($a, $b) { $a + $b }"),
         15,
         empty(func),
@@ -53,10 +65,6 @@ public final class HofModuleTest extends QueryPlanTest {
         exists(Int.class),
         empty(func),
         count(Util.className(Arith.class) + "[@op = '+']", 4));
-    // should not be unrolled
-    check(func.args(" 1 to 6", " function($a, $b) { $a + $b }"),
-        21,
-        exists(func));
   }
 
   /** Test method. */

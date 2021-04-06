@@ -182,8 +182,9 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public boolean has(final Flag... flags) {
-    if(Flag.UPD.in(flags) && (updating || sc.mixUpdates)) return true;
-    if(Flag.NDT.in(flags) && ndt) return true;
+    final boolean upd = updating || sc.mixUpdates;
+    if(Flag.UPD.in(flags) && upd) return true;
+    if(Flag.NDT.in(flags) && (ndt || upd)) return true;
     final Flag[] flgs = Flag.NDT.remove(Flag.UPD.remove(flags));
     return flgs.length != 0 && super.has(flgs);
   }

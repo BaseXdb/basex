@@ -26,6 +26,12 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     set(MainOptions.QUERYINFO, true);
   }
 
+  /** Resets optimizations. */
+  @AfterEach public void init() {
+    inline(false);
+    unroll(false);
+  }
+
   /** Checks the open command. */
   @Test public void openDocTest() {
     createDoc();
@@ -145,6 +151,8 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   /** Checks index optimizations inside functions. */
   @Test public void functionInlining() {
     createColl();
+    inline(true);
+
     // document access after inlining
     indexCheck("declare function db:a($d) { collection($d)//text()[. = '1'] }; "
         + "db:a('" + NAME + "')", 1);

@@ -17,6 +17,12 @@ import org.junit.jupiter.api.*;
  * @author Leo Woerteler
  */
 public final class InlineTest extends QueryPlanTest {
+  /** Resets optimizations. */
+  @BeforeEach public void init() {
+    inline(false);
+    unroll(false);
+  }
+
   /** Tests if inlining works in {@link Arith} expressions. */
   @Test public void plusTest() {
     check("let $x := 21 return $x + 21", 42, empty(GFLWOR.class));
@@ -86,6 +92,7 @@ public final class InlineTest extends QueryPlanTest {
 
   /** Checks that the simple map operator prohibits inlining a context item into its RHS. */
   @Test public void gh1055() {
+    inline(true);
     check("(let $d := for-each(1 to 100, function($a) { $a }) "
         + "return (1 to 2) ! $d)[. = 0]",
         "",
@@ -135,6 +142,7 @@ public final class InlineTest extends QueryPlanTest {
 
   /** Ensures that non-deterministic clauses are not reordered. */
   @Test public void ndtFuncTest() {
+    inline(true);
     check("let $a := function($d) { trace($d) }"
         + "let $b := non-deterministic $a('1st') let $c := non-deterministic $a('2nd') "
         + "return $b", "1st",
@@ -154,6 +162,7 @@ public final class InlineTest extends QueryPlanTest {
 
   /** Checks that inlining a nested closure works properly. */
   @Test public void gh1424() {
+    inline(true);
     check("declare function local:f() {"
         + "  let $func := function($key) { map { $key: 'ok' }($key) }"
         + "  let $input := <ok/>"
