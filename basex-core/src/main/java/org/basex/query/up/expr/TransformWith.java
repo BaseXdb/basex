@@ -92,7 +92,13 @@ public final class TransformWith extends Arr {
   @Override
   public boolean has(final Flag... flags) {
     if(Flag.CNS.in(flags)) return true;
-    final Flag[] flgs = Flag.UPD.remove(flags);
+
+    // Context dependency, positional access: only check first expression.
+    // Example: . update { delete node a }
+    if(Flag.CTX.in(flags) && exprs[0].has(Flag.CTX)) return true;
+    if(Flag.POS.in(flags) && exprs[0].has(Flag.POS)) return true;
+
+    final Flag[] flgs = Flag.UPD.remove(Flag.POS.remove(Flag.CTX.remove(flags)));
     return flgs.length != 0 && super.has(flgs);
   }
 

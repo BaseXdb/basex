@@ -11,6 +11,7 @@ import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
+import org.basex.query.up.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -2207,5 +2208,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("one-or-more((1 to 2)[. = 2]) promote to xs:decimal?", 2, exists(ONE_OR_MORE));
     check("one-or-more((1 to 2)[. = 2]) promote to xs:decimal+", 2, empty(ONE_OR_MORE));
     check("one-or-more((1 to 2)[. = 2]) promote to xs:decimal*", 2, exists(ONE_OR_MORE));
+  }
+
+  /** Inline transform-with expression. */
+  @Test public void gh2000() {
+    check("function() { <a/> update { delete node b } }()", "<a/>", root(TransformWith.class));
   }
 }
