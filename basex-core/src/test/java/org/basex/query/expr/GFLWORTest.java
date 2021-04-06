@@ -445,4 +445,11 @@ public final class GFLWORTest extends QueryPlanTest {
     check("for $e in (<a/>, <b/>) let $n := $e/name() order by $n return $n", "a\nb", root(SORT));
     error("for $a in (1, 4, 2) let $i := (1, $a, 2) order by $i return $i + 1", SEQFOUND_X);
   }
+
+
+  /** Remove clauses that will never be executed. */
+  @Test public void gh1999() {
+    check("for $a in () return delete node a", "", empty());
+    check("for $a in prof:void(1) return delete node a", "", root(_PROF_VOID));
+  }
 }

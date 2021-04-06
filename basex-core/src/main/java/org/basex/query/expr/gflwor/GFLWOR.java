@@ -105,8 +105,8 @@ public final class GFLWOR extends ParseExpr {
 
     // apply all optimizations in a row until nothing changes anymore
     while(flattenReturn(cc) | flattenFor(cc) | unnestFLWR(cc) | unnestLets(cc) | ifToWhere(cc) |
-        forToLet(cc) | slideLetsOut(cc) | inlineForLet(cc) | unusedVars(cc) | cleanDeadVars() |
-        optimizeWhere(cc) | optimizePos(cc) | optimizeOrderBy(cc));
+        forToLet(cc) | slideLetsOut(cc) | inlineForLet(cc) | unusedClauses(cc) | unusedVars(cc) |
+        cleanDeadVars() | optimizeWhere(cc) | optimizePos(cc) | optimizeOrderBy(cc));
 
     mergeWheres();
 
@@ -305,6 +305,29 @@ public final class GFLWOR extends ParseExpr {
         //   for $i at $p in () return $p  ->  for $i in () return $p  ->  ()
         if(fr.pos != null && count(fr.pos, pos) == VarUsage.NEVER) {
           fr.remove(cc, fr.pos);
+          changed = true;
+        }
+      }
+    }
+    return changed;
+  }
+
+  /**
+   * Removes clauses that will never be executed.
+   * @param cc compilation context
+   * @return change flag
+   */
+  private boolean unusedClauses(final CompileContext cc) {
+    // for $_ in () return 1  ->  return ()
+    boolean changed = false;
+    for(int c = clauses.size() - 1; c >= 0; c--) {
+      final Clause clause = clauses.get(c);
+      if(clause instanceof For) {
+        final For fr = (For) clause;
+        if(fr.expr.size() == 0 && !fr.empty) {
+          for(int d = clauses.size() - 1; d >= c; d--) clauses.remove(c);
+          rtrn = fr.expr;
+          cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
           changed = true;
         }
       }
