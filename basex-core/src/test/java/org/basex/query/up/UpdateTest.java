@@ -1269,4 +1269,9 @@ public final class UpdateTest extends SandboxTest {
     query("db:replace('" + NAME + "', 'Sandbox.xml', '" + DOC + "', map { 'addcache': true() })");
     query("db:exists('" + NAME + ".0')", false);
   }
+
+  /** Update expression, context position. */
+  @Test public void gh2002() {
+    query("(<a/>, <b/>) update { insert node position() into . }", "<a>1</a>\n<b>2</b>");
+  }
 }
