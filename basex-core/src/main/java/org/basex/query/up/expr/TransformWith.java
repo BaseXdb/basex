@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -57,30 +56,30 @@ public final class TransformWith extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    final Value value = exprs[0].value(qc);
     final Updates tmp = qc.updates();
     final QueryFocus focus = qc.focus, qf = new QueryFocus();
     qc.focus = qf;
 
     final ValueBuilder vb = new ValueBuilder(qc);
     try {
-      final Iter iter = exprs[0].iter(qc);
-      for(Item item; (item = qc.next(iter)) != null;) {
+      for(final Item item : value) {
         if(!(item instanceof ANode)) throw UPSOURCE_X.get(info, item);
 
         // create main memory copy of node
-        item = ((ANode) item).copy(qc);
+        final ANode node = ((ANode) item).copy(qc);
         // set resulting node as context
-        qf.value = item;
+        qf.value = node;
 
         final Updates updates = new Updates(true);
         qc.updates = updates;
-        updates.addData(item.data());
+        updates.addData(node.data());
 
         if(!exprs[1].value(qc).isEmpty()) throw UPMODIFY.get(info);
 
         updates.prepare(qc);
         updates.apply(qc);
-        vb.add(item);
+        vb.add(node);
         qf.pos++;
       }
     } finally {

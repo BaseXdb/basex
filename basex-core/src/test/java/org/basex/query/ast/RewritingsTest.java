@@ -1656,7 +1656,10 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Inlining in update expression. */
   @Test public void gh1891() {
-    query("for $n in (<a/>, <b/>) return $n ! (. update rename node . as name())", "<a/>\n<b/>");
+    query("(<a/>, <b/>) update { rename node . as name() }", "<a/>\n<b/>");
+    query("(<a/>, <b/>) ! . update { rename node . as name() }", "<a/>\n<b/>");
+    query("(<a/>, <b/>) ! (. update { rename node . as name() })", "<a/>\n<b/>");
+    query("for $n in (<a/>, <b/>) return $n ! . update { rename node . as name() }", "<a/>\n<b/>");
     query("'s' ! (<a/> update delete node .)", "<a/>");
   }
 
