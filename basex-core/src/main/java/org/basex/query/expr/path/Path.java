@@ -828,10 +828,12 @@ public abstract class Path extends ParseExpr {
    */
   private Expr toUnion(final CompileContext cc) throws QueryException {
     // function for rewriting a list to a union expression
-    final QueryFunction<Expr, Expr> rewrite = step -> {
-      if(step instanceof List) {
-        return ((List) step).toUnion(cc);
-      }
+    final QueryBiFunction<Expr, Expr, Expr> rewrite = (step, next) -> {
+      // do not rewrite (a, b)/<c/>
+      if(step == null || next != null && next.has(Flag.CNS)) return step;
+      // (a, b)/c  ->  (a | b)/a
+      if(step instanceof List) return ((List) step).toUnion(cc);
+      // a[b, c]  ->  a[b | c]
       if(step instanceof Filter) {
         final Filter filter = (Filter) step;
         if(!filter.mayBePositional() && filter.root instanceof List) {
@@ -839,9 +841,10 @@ public abstract class Path extends ParseExpr {
           if(st != filter.root) return Filter.get(cc, filter.info, st, filter.exprs);
         }
       }
-      if(step instanceof UtilReplicate && ((UtilReplicate) step).once() &&
-          step.seqType().type instanceof NodeType) {
-        return step.arg(0);
+      // util:replicate(a, 2)/b  ->  a/b
+      if(step.seqType().type instanceof NodeType) {
+        if(step instanceof UtilReplicate && ((UtilReplicate) step).once()) return step.arg(0);
+        if(step instanceof SingletonSeq) return ((SingletonSeq) step).itemAt(0);
       }
       return step;
     };
@@ -849,7 +852,7 @@ public abstract class Path extends ParseExpr {
     // only rewrite root expression if subsequent step yields nodes
     boolean changed = false;
     if(steps[0].seqType().type instanceof NodeType) {
-      final Expr rt = rewrite.apply(root);
+      final Expr rt = rewrite.apply(root, steps[0]);
       if(rt != root) {
         root = rt;
         changed = true;
@@ -860,7 +863,7 @@ public abstract class Path extends ParseExpr {
       boolean chngd = false;
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
-        final Expr step = rewrite.apply(steps[s]);
+        final Expr step = rewrite.apply(steps[s], s + 1 < sl ? steps[s + 1] : null);
         if(step != steps[s]) {
           steps[s] = step;
           chngd = true;

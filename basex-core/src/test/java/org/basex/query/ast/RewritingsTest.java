@@ -2240,4 +2240,13 @@ public final class RewritingsTest extends QueryPlanTest {
     check("sum((# db:unrolllimit 0 #) { (1, 3) ! (. * 2) })", 8, exists(Arith.class));
     check("(1, 2)[. = 1]", 1, root(Int.class));
   }
+
+  /** Identical nodes in mixed paths. */
+  @Test public void gh2005() {
+    check("declare context item := <a/>; (.|.)/self::a", "<a/>", empty(Union.class));
+
+    check("<a/> ! (., .)/<b/>", "<b/>\n<b/>", exists(_UTIL_REPLICATE));
+    check("util:replicate(<a/>, 2)/<b/>", "<b/>\n<b/>", exists(_UTIL_REPLICATE));
+    check("declare context item := <a/>; (., .)/<b/>", "<b/>\n<b/>", exists(SingletonSeq.class));
+  }
 }
