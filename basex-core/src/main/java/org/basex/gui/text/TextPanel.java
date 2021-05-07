@@ -1121,10 +1121,9 @@ public class TextPanel extends BaseXPanel {
    * @param start start position
    */
   private void complete(final String string, final int start) {
-    final int caret = editor.pos();
+    final int pos = editor.pos();
     editor.complete(string, start);
-    hist.store(editor.text(), caret, editor.pos());
-    updateScrollbar.invokeLater(true);
+    finish(pos);
   }
 
   /** Replacement lists. */
