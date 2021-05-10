@@ -27,6 +27,8 @@ public interface HttpText {
   /** HTTP header string. */
   String CACHE_CONTROL = "Cache-Control";
   /** HTTP header string. */
+  String SERVER_TIMING = "Server-Timing";
+  /** HTTP header string. */
   String PRAGMA = "Pragma";
   /** HTTP header string. */
   String EXPIRES = "Expires";

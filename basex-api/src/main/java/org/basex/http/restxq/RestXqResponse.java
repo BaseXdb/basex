@@ -19,6 +19,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.basex.util.http.*;
 
 /**
@@ -49,10 +50,12 @@ final class RestXqResponse extends WebResponse {
 
   @Override
   protected void init(final WebFunction function) throws QueryException, IOException {
+    final Performance perf = new Performance();
     func = new RestXqFunction(function.function, qc, function.module);
     qc.putProperty(HTTPText.REQUEST, conn.requestCtx);
     qc.jc().type(RESTXQ);
     func.parse(ctx);
+    qc.info.parsing = perf.ns();
   }
 
   @Override
@@ -66,14 +69,20 @@ final class RestXqResponse extends WebResponse {
 
     final String id = func.singleton;
     final RestXqSingleton singleton = id != null ? new RestXqSingleton(conn, id, qc) : null;
+    final ArrayOutput cache = id != null ? new ArrayOutput() : null;
     String forward = null;
-    OutputStream out = null;
     boolean response;
 
     qc.register(ctx);
+    final Performance perf = qc.jc().performance;
+    final QueryInfo qi = qc.info;
     try {
+      qc.compile();
+      qi.compiling = perf.ns();
+
       // evaluate query
       final Iter iter = qc.iter();
+      qi.evaluating = perf.ns();
       Item item = iter.next();
       response = item != null;
 
@@ -102,6 +111,7 @@ final class RestXqResponse extends WebResponse {
       // initialize serializer
       conn.sopts(so);
       conn.initResponse();
+      if(cache == null) conn.timing(qi);
 
       if(status != null) {
         final int s = status;
@@ -117,7 +127,7 @@ final class RestXqResponse extends WebResponse {
 
       // serialize result
       if(item != null && body) {
-        out = id != null ? new ArrayOutput() : conn.response.getOutputStream();
+        final OutputStream out = cache != null ? cache : conn.response.getOutputStream();
         try(Serializer ser = Serializer.get(out, so)) {
           for(; item != null; item = qc.next(iter)) ser.serialize(item);
         }
@@ -125,6 +135,9 @@ final class RestXqResponse extends WebResponse {
 
     } finally {
       qc.close();
+      qi.serializing = perf.ns();
+      if(cache != null) conn.timing(qi);
+
       qc.unregister(ctx);
       if(singleton != null) singleton.unregister();
 
@@ -136,10 +149,9 @@ final class RestXqResponse extends WebResponse {
     }
 
     // write cached result
-    if(out instanceof ArrayOutput) {
-      final ArrayOutput ao = (ArrayOutput) out;
-      final int size = (int) ao.size();
-      if(size > 0) conn.response.getOutputStream().write(ao.buffer(), 0, size);
+    if(cache != null) {
+      final int size = (int) cache.size();
+      if(size > 0) conn.response.getOutputStream().write(cache.buffer(), 0, size);
     }
 
     return status != null || forward != null ? Response.CUSTOM :

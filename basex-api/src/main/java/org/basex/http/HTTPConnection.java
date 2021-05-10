@@ -6,6 +6,7 @@ import static org.basex.util.http.HttpText.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -15,11 +16,13 @@ import org.basex.core.StaticOptions.*;
 import org.basex.core.jobs.*;
 import org.basex.core.users.*;
 import org.basex.io.serial.*;
+import org.basex.query.*;
 import org.basex.server.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.basex.util.Base64;
 import org.basex.util.http.*;
+import org.basex.util.list.*;
 
 /**
  * Single HTTP connection.
@@ -329,6 +332,21 @@ public final class HTTPConnection implements ClientInfo {
     } catch(final IllegalStateException | IllegalArgumentException ex) {
       logError(code, message, body, ex);
     }
+  }
+
+  /**
+   * Sets profiling information.
+   * @param qi query info
+   */
+  public void timing(final QueryInfo qi) {
+    final StringList list = new StringList(4);
+    final BiConsumer<String, Long> add = (name, nano) ->
+      list.add(name + ";dur=" + Performance.getTime(nano, 1));
+    add.accept("parse", qi.parsing);
+    add.accept("compile", qi.compiling);
+    add.accept("evaluate", qi.evaluating);
+    add.accept("serialize", qi.serializing);
+    response.setHeader(SERVER_TIMING, String.join(",", list.finish()));
   }
 
   /**
