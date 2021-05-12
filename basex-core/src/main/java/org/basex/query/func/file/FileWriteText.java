@@ -12,7 +12,6 @@ import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -39,7 +38,8 @@ public class FileWriteText extends FileFn {
       throws QueryException, IOException {
 
     final Path path = checkParentDir(toPath(0, qc));
-    final AStr text = (AStr) checkType(exprs[1], qc, AtomType.STRING);
+    Item text = toItem(exprs[1], qc);
+    if(!(text instanceof AStr)) text = Str.get(toToken(text));
     final String encoding = toEncodingOrNull(2, FILE_UNKNOWN_ENCODING_X, qc);
     final Charset cs = encoding == null || encoding == Strings.UTF8 ? null :
       Charset.forName(encoding);
