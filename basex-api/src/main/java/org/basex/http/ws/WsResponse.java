@@ -42,8 +42,8 @@ public final class WsResponse extends WebResponse {
   @Override
   protected void init(final WebFunction function) throws QueryException {
     func = new WsFunction(function.function, qc, function.module);
-    qc.putProperty(HTTPText.WEBSOCKET, ws);
-    qc.putProperty(HTTPText.REQUEST, new RequestContext(ws.request));
+    ctx.setExternal(ws);
+    ctx.setExternal(new RequestContext(ws.request));
     qc.jc().type(WEBSOCKET);
     func.parse(ctx);
   }

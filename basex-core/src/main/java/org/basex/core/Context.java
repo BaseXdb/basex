@@ -1,5 +1,7 @@
 package org.basex.core;
 
+import java.util.*;
+
 import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
@@ -44,6 +46,8 @@ public final class Context {
   /** Locking. */
   public final Locking locking;
 
+  /** External objects (HTTP context, HTTP requests). */
+  private final HashSet<Object> external;
   /** Client info. Set to {@code null} in standalone/server mode. */
   private final ClientInfo client;
   /** Current node context. {@code null} if all documents of the current database are referenced. */
@@ -107,6 +111,7 @@ public final class Context {
     repo = ctx.repo;
     log = ctx.log;
     jobs = ctx.jobs;
+    external = new HashSet<>(ctx.external);
   }
 
   /**
@@ -126,6 +131,7 @@ public final class Context {
     log = new Log(soptions);
     user = users.get(UserText.ADMIN);
     jobs = new JobPool(soptions);
+    external = new HashSet<>();
     client = null;
   }
 
@@ -287,5 +293,25 @@ public final class Context {
       if(perm(Perm.READ, db)) sl.add(db);
     }
     return sl;
+  }
+
+  /**
+   * Assigns an external object.
+   * @param object external object
+   */
+  public void setExternal(final Object object) {
+    external.add(object);
+  }
+
+  /**
+   * Returns an external object.
+   * @param clz class of external object
+   * @return object or {@code null}
+   */
+  public Object getExternal(final Class<?> clz) {
+    for(final Object object : external) {
+      if(object.getClass() == clz) return object;
+    }
+    return null;
   }
 }

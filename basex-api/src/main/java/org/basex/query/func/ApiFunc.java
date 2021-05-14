@@ -21,9 +21,9 @@ public abstract class ApiFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   public final RequestContext requestContext(final QueryContext qc) throws QueryException {
-    final Object request = qc.getProperty(HTTPText.REQUEST);
-    if(request == null) throw BASEX_HTTP.get(info);
-    return (RequestContext) request;
+    final RequestContext rc = (RequestContext) qc.context.getExternal(RequestContext.class);
+    if(rc == null) throw BASEX_HTTP.get(info);
+    return rc;
   }
 
   /**

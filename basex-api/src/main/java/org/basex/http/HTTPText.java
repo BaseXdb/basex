@@ -10,11 +10,6 @@ public interface HTTPText {
   /** HTTP string. */
   String HTTP = "HTTP";
 
-  /** HTTP string. */
-  String REQUEST = "REQUEST";
-  /** WebSocket string. */
-  String WEBSOCKET = "WEBSOCKET";
-
   /** WEB-INF directory. */
   String WEB_INF = "WEB-INF/";
   /** Path to jetty configuration file. */

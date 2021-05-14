@@ -46,6 +46,7 @@ class RESTQuery extends RESTCmd {
     // set base path and serialization parameters
     final HTTPConnection conn = session.conn;
     context.options.set(MainOptions.SERIALIZER, conn.sopts());
+    context.setExternal(conn.requestCtx);
     conn.initResponse();
 
     for(final Command cmd : session) {
@@ -55,7 +56,6 @@ class RESTQuery extends RESTCmd {
         if(value != null) xq.bind(null, value, NodeType.DOCUMENT_NODE.toString());
 
         // bind HTTP context and external variables
-        xq.putExternal(HTTPText.REQUEST, conn.requestCtx);
         vars.forEach((key, val) -> {
           if(val.length == 2) xq.bind(key, val[0], val[1]);
           if(val.length == 1) xq.bind(key, val[0]);

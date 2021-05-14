@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import javax.servlet.http.*;
 
-import org.basex.http.*;
 import org.basex.http.ws.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -29,8 +28,8 @@ abstract class SessionFn extends ApiFunc {
 
     // WebSocket context: access existing session
     HttpSession session = null;
-    final Object ws = qc.getProperty(HTTPText.WEBSOCKET);
-    if(ws != null) session = ((WebSocket) ws).session;
+    final WebSocket ws = (WebSocket) qc.context.getExternal(WebSocket.class);
+    if(ws != null) session = ws.session;
     // HTTP context: get/create session
     if(session == null) session = request.getSession(create);
     // no session created (may happen with WebSockets): raise error or return null reference

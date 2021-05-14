@@ -28,8 +28,6 @@ import org.basex.util.*;
 public abstract class AQuery extends Command {
   /** External variable bindings. */
   protected final HashMap<String, Object> vars = new HashMap<>();
-  /** External properties. */
-  protected final HashMap<String, Object> props = new HashMap<>();
 
   /** Query processor. */
   private QueryProcessor qp;
@@ -166,9 +164,6 @@ public abstract class AQuery extends Command {
     final Performance perf = new Performance();
     if(qp == null) qp = pushJob(new QueryProcessor(query, uri, ctx));
     if(info == null) info = qp.qc.info;
-
-    for(final Map.Entry<String, Object> entry : props.entrySet())
-      qp.qc.putProperty(entry.getKey(), entry.getValue());
     qp.parse();
     qp.qc.info.parsing += perf.ns();
   }
@@ -189,15 +184,6 @@ public abstract class AQuery extends Command {
       popJob();
     }
     return SerializerMode.DEFAULT.get().toString();
-  }
-
-  /**
-   * Caches an external property.
-   * @param key key
-   * @param value value
-   */
-  public void putExternal(final String key, final Object value) {
-    props.put(key, value);
   }
 
   /**
