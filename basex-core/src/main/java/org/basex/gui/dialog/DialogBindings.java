@@ -9,6 +9,8 @@ import java.util.Map.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.layout.BaseXFileChooser.*;
+import org.basex.io.*;
 
 /**
  * Dialog window for defining variable and context bindings.
@@ -51,10 +53,15 @@ public final class DialogBindings extends BaseXDialog {
       BaseXLayout.setWidth(values[c], 250);
       center.add(values[c]);
     }
-    ctxitem = new BaseXTextField(this);
-    ctxitem.hint(gui.editor.context());
 
-    center.add(ctxitem);
+    final BaseXBack ctx = new BaseXBack().layout(new BorderLayout(8, 0));
+    ctxitem = new BaseXTextField(this).hint(gui.editor.context());
+    ctx.add(ctxitem, BorderLayout.CENTER);
+    final BaseXButton browse = new BaseXButton(this, BROWSE_D);
+    browse.addActionListener(e -> choose());
+    ctx.add(browse, BorderLayout.EAST);
+    center.add(ctx);
+
     set(center, BorderLayout.CENTER);
 
     set(okCancel(), BorderLayout.SOUTH);
@@ -87,10 +94,23 @@ public final class DialogBindings extends BaseXDialog {
     }
   }
 
+  /**
+   * Chooses and assigns a context file and closes the dialog window.
+   */
+  private void choose() {
+    final BaseXFileChooser fc = new BaseXFileChooser(gui, OPEN, gui.gopts.get(GUIOptions.WORKPATH));
+    fc.filter(XML_DOCUMENTS, gui.gopts.xmlSuffixes());
+    final IOFile file = fc.select(Mode.FOPEN);
+    if(file == null) return;
+
+    // close dialog, set context
+    final GUI win = gui;
+    close();
+    win.editor.setContext(file);
+  }
+
   @Override
   public void close() {
-    if(!ok) return;
-
     final HashMap<String, String> map = new HashMap<>();
     for(int c = 0; c < MAX; c++) {
       final String name = names[c].getText().replaceAll("^\\s*\\$|\\s+$", "");

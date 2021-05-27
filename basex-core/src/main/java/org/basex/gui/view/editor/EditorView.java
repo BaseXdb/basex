@@ -298,23 +298,28 @@ public final class EditorView extends View {
   }
 
   /**
-   * Sets an editor context document.
-   * @param node document
+   * Sets an XML document as context.
+   * @param file file
    */
-  public void setContext(final DBNode node) {
-    doc = node;
-    // close database
-    if(Close.close(gui.context)) gui.notify.init();
-    // remove context item binding
-    final Map<String, String> map = gui.context.options.toMap(MainOptions.BINDINGS);
-    map.remove("");
-    DialogBindings.assign(map, gui);
-    // remove context label
-    refreshContextLabel();
+  public void setContext(final IOFile file) {
+    try {
+      doc = new DBNode(file);
+      // close database
+      if(Close.close(gui.context)) gui.notify.init();
+      // remove context item binding
+      final Map<String, String> map = gui.context.options.toMap(MainOptions.BINDINGS);
+      map.remove("");
+      DialogBindings.assign(map, gui);
+      // remove context label
+      refreshContextLabel();
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      BaseXDialog.error(gui, Util.info(ex));
+    }
   }
 
   /**
-   * Returns the current context string.
+   * Returns a string describing the current context.
    * @return context string (can be empty)
    */
   public String context() {
@@ -331,7 +336,7 @@ public final class EditorView extends View {
     }
     // check if main-memory document exists
     if(value == null) {
-      if(doc != null) value = Function.DOC.args(doc.data().meta.original).trim();
+      if(doc != null) value = Function.DOC.args(new IOFile(doc.data().meta.original).name()).trim();
     } else {
       doc = null;
     }

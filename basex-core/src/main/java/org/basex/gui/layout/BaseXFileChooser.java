@@ -72,9 +72,9 @@ public final class BaseXFileChooser {
    */
   public BaseXFileChooser filter(final String dsc, final String... suf) {
     if(fc != null) {
-      final FileFilter ff = fc.getFileFilter();
-      fc.addChoosableFileFilter(new Filter(suf, dsc));
-      fc.setFileFilter(ff);
+      final FileFilter ff = fc.getFileFilter(), ff2 = new Filter(suf, dsc);
+      fc.addChoosableFileFilter(ff2);
+      fc.setFileFilter(ff instanceof Filter ? ff : ff2);
     }
     return this;
   }

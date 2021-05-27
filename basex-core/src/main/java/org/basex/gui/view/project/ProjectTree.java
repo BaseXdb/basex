@@ -14,7 +14,6 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.listener.*;
 import org.basex.io.*;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -331,12 +330,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     SetContextCmd() { super(SET_CONTEXT); }
 
     @Override public void execute() {
-      try {
-        view.gui.editor.setContext(new DBNode(selectedNode().file));
-      } catch(final IOException ex) {
-        Util.debug(ex);
-        BaseXDialog.error(view.gui, Util.info(ex));
-      }
+      view.gui.editor.setContext(selectedNode().file);
     }
 
     @Override public boolean enabled(final GUI main) {
