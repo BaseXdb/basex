@@ -433,8 +433,8 @@ public final class EditorView extends View {
   public void open() {
     // open file chooser for XML creation
     final BaseXFileChooser fc = new BaseXFileChooser(gui, OPEN, gui.gopts.get(GUIOptions.WORKPATH));
-    fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
-    fc.filter(BXS_FILES, IO.BXSSUFFIX);
+    fc.filter(XQUERY_FILES, false, IO.XQSUFFIXES);
+    fc.filter(BXS_FILES, false, IO.BXSSUFFIX);
     fc.textFilters();
     for(final IOFile f : fc.multi().selectAll(Mode.FOPEN)) open(f);
   }
@@ -457,8 +457,8 @@ public final class EditorView extends View {
     final EditorArea edit = getEditor();
     final String path = edit.opened() ? edit.file().path() : gui.gopts.get(GUIOptions.WORKPATH);
     final BaseXFileChooser fc = new BaseXFileChooser(gui, SAVE_AS, path);
-    fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
-    fc.filter(BXS_FILES, IO.BXSSUFFIX);
+    fc.filter(XQUERY_FILES, false, IO.XQSUFFIXES);
+    fc.filter(BXS_FILES, false, IO.BXSSUFFIX);
     fc.textFilters();
     fc.suffix(IO.XQSUFFIX);
 

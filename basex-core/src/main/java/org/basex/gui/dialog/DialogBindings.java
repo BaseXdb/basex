@@ -99,7 +99,7 @@ public final class DialogBindings extends BaseXDialog {
    */
   private void choose() {
     final BaseXFileChooser fc = new BaseXFileChooser(gui, OPEN, gui.gopts.get(GUIOptions.WORKPATH));
-    fc.filter(XML_DOCUMENTS, gui.gopts.xmlSuffixes());
+    fc.filter(XML_DOCUMENTS, true, gui.gopts.xmlSuffixes());
     final IOFile file = fc.select(Mode.FOPEN);
     if(file == null) return;
 

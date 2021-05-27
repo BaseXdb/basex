@@ -55,26 +55,27 @@ public final class BaseXFileChooser {
    * @return self reference
    */
   public BaseXFileChooser textFilters() {
-    filter(XML_DOCUMENTS, win.gui().gopts.xmlSuffixes());
-    filter(XSL_DOCUMENTS, IO.XSLSUFFIXES);
-    filter(HTML_DOCUMENTS, IO.HTMLSUFFIXES);
-    filter(JSON_DOCUMENTS, IO.JSONSUFFIX);
-    filter(CSV_DOCUMENTS, IO.CSVSUFFIX);
-    filter(PLAIN_TEXT, IO.TXTSUFFIXES);
+    filter(XML_DOCUMENTS, false, win.gui().gopts.xmlSuffixes());
+    filter(XSL_DOCUMENTS, false, IO.XSLSUFFIXES);
+    filter(HTML_DOCUMENTS, false, IO.HTMLSUFFIXES);
+    filter(JSON_DOCUMENTS, false, IO.JSONSUFFIX);
+    filter(CSV_DOCUMENTS, false, IO.CSVSUFFIX);
+    filter(PLAIN_TEXT, false, IO.TXTSUFFIXES);
     return this;
   }
 
   /**
    * Sets a file filter.
    * @param dsc description
+   * @param dflt set as default
    * @param suf suffix
    * @return self reference
    */
-  public BaseXFileChooser filter(final String dsc, final String... suf) {
+  public BaseXFileChooser filter(final String dsc, final boolean dflt, final String... suf) {
     if(fc != null) {
       final FileFilter ff = fc.getFileFilter(), ff2 = new Filter(suf, dsc);
       fc.addChoosableFileFilter(ff2);
-      fc.setFileFilter(ff instanceof Filter ? ff : ff2);
+      fc.setFileFilter(dflt ? ff2 : ff);
     }
     return this;
   }

@@ -194,7 +194,7 @@ final class DialogImport extends BaseXBack {
   private void choose() {
     String path = input.getText();
     final BaseXFileChooser fc = new BaseXFileChooser(dialog, FILE_OR_DIR, path);
-    fc.textFilters().filter(ZIP_ARCHIVES, IO.ZIPSUFFIXES);
+    fc.textFilters().filter(ZIP_ARCHIVES, false, IO.ZIPSUFFIXES);
     final IOFile file = fc.select(Mode.FDOPEN);
     if(file == null) return;
 
