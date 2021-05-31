@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
 import org.basex.util.*;
@@ -27,8 +28,6 @@ public final class FTTokenizer {
   private final TokenObjMap<FTWildcard> wcCache = new TokenObjMap<>();
   /** Token cache. */
   private final TokenObjMap<FTTokens> cache = new TokenObjMap<>();
-  /** Input info. */
-  private final InputInfo info;
   /** Full-text options. */
   private final FTOpt opt;
 
@@ -47,7 +46,6 @@ public final class FTTokenizer {
    */
   FTTokenizer(final FTOpt opt, final int errors, final InputInfo info) {
     this.opt = opt;
-    this.info = info;
 
     cmp = (in, qu) -> {
       final Levenshtein ls = opt.is(FZ) ? new Levenshtein(
@@ -80,10 +78,11 @@ public final class FTTokenizer {
   /**
    * Returns cached query tokens.
    * @param input query token
+   * @param ctx database context
    * @return number of occurrences
    * @throws QueryException query exception
    */
-  FTTokens cache(final byte[] input) throws QueryException {
+  FTTokens cache(final byte[] input, final Context ctx) throws QueryException {
     FTTokens tokens = cache.get(input);
     if(tokens == null) {
       tokens = new FTTokens();
@@ -96,8 +95,8 @@ public final class FTTokenizer {
       tokens.add(list);
 
       // if thesaurus is required, add the terms which extend the query:
-      if(opt.th != null) {
-        for(final byte[] thes : opt.th.find(info, input)) {
+      if(opt.tl != null) {
+        for(final byte[] thes : opt.tl.find(input, ctx)) {
           // parse each extension term to a set of tokens:
           final TokenList tl = new TokenList(1);
           lexer.init(thes);

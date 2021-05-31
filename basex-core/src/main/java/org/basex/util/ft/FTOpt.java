@@ -28,8 +28,8 @@ public final class FTOpt extends ExprInfo {
   public StemDir sd;
   /** Stop words (can be {@code null}). */
   public StopWords sw;
-  /** Thesaurus (can be {@code null}). */
-  public ThesQuery th;
+  /** Thesaurus list (can be {@code null}). */
+  public ThesList tl;
   /** Language (can be {@code null}). */
   public Language ln;
   /** Levenshtein error (ignored if {@code -1}). */
@@ -46,8 +46,8 @@ public final class FTOpt extends ExprInfo {
     if(sw == null) sw = opt.sw;
     if(sd == null) sd = opt.sd;
     if(ln == null) ln = opt.ln;
-    if(th == null) th = opt.th;
-    else if(opt.th != null) th.merge(opt.th);
+    if(tl == null) tl = opt.tl;
+    else if(opt.tl != null) tl.merge(opt.tl);
     if(errors == -1) errors = opt.errors;
     return this;
   }
@@ -107,7 +107,7 @@ public final class FTOpt extends ExprInfo {
     if(!(obj instanceof FTOpt)) return false;
     final FTOpt f = (FTOpt) obj;
     return map.equals(f.map) && cs == f.cs && Objects.equals(sd, f.sd) && errors == f.errors &&
-        Objects.equals(sw, f.sw) && Objects.equals(th, f.th) && Objects.equals(ln, f.ln);
+        Objects.equals(sw, f.sw) && Objects.equals(tl, f.tl) && Objects.equals(ln, f.ln);
   }
 
   @Override
@@ -116,7 +116,7 @@ public final class FTOpt extends ExprInfo {
       WILDCARDS, is(WC) ? TRUE : null, FUZZY, is(FZ) ? TRUE : null,
       ERRORS, errors != -1 ? errors : null, CASE, cs,
       STEMMING, is(ST) || sd != null ? TRUE : null, LANGUAGE, ln,
-      THESAURUS, th != null ? TRUE : null);
+      THESAURUS, tl != null ? TRUE : null);
     if(elem.attributeIter().next() != null) plan.add(elem);
   }
 
@@ -131,7 +131,7 @@ public final class FTOpt extends ExprInfo {
     if(is(DC)) list.add(DIACRITICS + ' ' + SENSITIVE);
     if(is(ST) || sd != null) list.add(STEMMING);
     if(ln != null) list.add(LANGUAGE + " \"" + ln + '"');
-    if(th != null) list.add(THESAURUS);
+    if(tl != null) list.add(THESAURUS + " at " + tl);
 
     for(final String opt : list) qs.token(USING).token(opt);
   }

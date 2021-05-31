@@ -179,7 +179,7 @@ public final class FTWords extends FTExpr {
                 ++d;
               } else {
                 final FTIndexIterator iter = lexer.token().length > data.meta.maxlen ?
-                  scan(lexer, ftt, data) : (FTIndexIterator) data.iter(lexer);
+                  scan(lexer, ftt, data, qc.context) : (FTIndexIterator) data.iter(lexer);
                 iter.pos(++qc.ftPos);
                 if(ii == null) {
                   ii = iter;
@@ -218,14 +218,15 @@ public final class FTWords extends FTExpr {
    * @param lexer lexer, including the queried value
    * @param ftt full-text tokenizer
    * @param data data reference
+   * @param ctx database context
    * @return node iterator
    * @throws QueryException query exception
    */
-  private FTIndexIterator scan(final FTLexer lexer, final FTTokenizer ftt, final Data data)
-      throws QueryException {
+  private FTIndexIterator scan(final FTLexer lexer, final FTTokenizer ftt, final Data data,
+      final Context ctx) throws QueryException {
 
     final FTLexer input = new FTLexer(ftOpt);
-    final FTTokens fttokens = ftt.cache(lexer.token());
+    final FTTokens fttokens = ftt.cache(lexer.token(), ctx);
     return new FTIndexIterator() {
       final int sz = data.meta.size;
       int pre = -1, ps;
@@ -296,7 +297,7 @@ public final class FTWords extends FTExpr {
     int num = 0;
     if(simple) {
       for(final byte[] input : inputs) {
-        final FTTokens tokens = ftt.cache(input);
+        final FTTokens tokens = ftt.cache(input, qc.context);
         num = Math.max(num, contains(tokens, lexer, ftt) * tokens.firstSize());
       }
       return num;
@@ -306,7 +307,7 @@ public final class FTWords extends FTExpr {
     final boolean all = mode == FTMode.ALL || mode == FTMode.ALL_WORDS;
     int oc = 0;
     for(final byte[] input : unique(inputs(qc))) {
-      final FTTokens tokens = ftt.cache(input);
+      final FTTokens tokens = ftt.cache(input, qc.context);
       final int o = contains(tokens, lexer, ftt);
       if(all && o == 0) return 0;
       num = Math.max(num, o * tokens.firstSize());

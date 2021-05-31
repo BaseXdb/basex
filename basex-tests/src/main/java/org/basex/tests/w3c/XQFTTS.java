@@ -94,8 +94,8 @@ public final class XQFTTS extends W3CTS {
     for(final String s : aux("thesaurus", root)) {
       final IO fn = thes2.get(s);
       if(fn != null) {
-        if(opt.th == null) opt.th = new ThesQuery();
-        opt.th.add(new Thesaurus(fn, context));
+        if(opt.tl == null) opt.tl = new ThesList();
+        opt.tl.add(new Thesaurus(fn));
       }
     }
   }

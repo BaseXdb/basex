@@ -3568,13 +3568,12 @@ public class QueryParser extends InputParser {
         if(opt.isSet(ST)) throw error(FTDUP_X, STEMMING);
         opt.set(ST, using);
       } else if(wsConsumeWs(THESAURUS)) {
-        if(opt.th != null) throw error(FTDUP_X, THESAURUS);
-        opt.th = new ThesQuery();
+        if(opt.tl != null) throw error(FTDUP_X, THESAURUS);
+        opt.tl = new ThesList();
         if(using) {
           final boolean par = wsConsume(PAREN1);
-          if(!wsConsumeWs(DEFAULT)) ftThesaurusID(opt.th);
-          while(par && wsConsume(COMMA))
-            ftThesaurusID(opt.th);
+          if(!wsConsumeWs(DEFAULT)) ftThesaurusID(opt.tl);
+          while(par && wsConsume(COMMA)) ftThesaurusID(opt.tl);
           if(par) wsCheck(PAREN2);
         }
       } else if(wsConsumeWs(STOP)) {
@@ -3638,7 +3637,7 @@ public class QueryParser extends InputParser {
    * @param thes link to thesaurus
    * @throws QueryException query exception
    */
-  private void ftThesaurusID(final ThesQuery thes) throws QueryException {
+  private void ftThesaurusID(final ThesList thes) throws QueryException {
     wsCheck(AT);
 
     final String fn = string(stringLiteral());
@@ -3653,7 +3652,7 @@ public class QueryParser extends InputParser {
       min = ((ANum) range[0]).itr();
       max = ((ANum) range[1]).itr();
     }
-    thes.add(new Thesaurus(fl, rel, min, max, qc.context));
+    thes.add(new Thesaurus(fl, rel, min, max, info()));
   }
 
   /**
