@@ -775,7 +775,7 @@ public enum QueryError {
   /** Error code. */
   FTNOTOK_X(FTST, 9, "No tokenizer available for language '%'."),
   /** Error code. */
-  NOTHES_X(FTST, 18, "Thesaurus not found: '%'."),
+  NOTHES_X(FTST, 18, "Thesaurus not found: %."),
   /** Error code. */
   FTDUP_X(FTST, 19, "Match option '%' is declared twice."),
 

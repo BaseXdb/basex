@@ -1,9 +1,6 @@
 package org.basex.query.expr.ft;
 
-import java.io.*;
-
 import org.basex.core.*;
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -37,20 +34,13 @@ final class ThesNodes {
 
   /**
    * Returns a map with thesaurus nodes.
-   * @param file file reference
-   * @param info input info
+   * @param node thesaurus root node
    * @param ctx database context
    * @throws QueryException query exception
    */
-  ThesNodes(final IO file, final InputInfo info, final Context ctx) throws QueryException {
-    try {
-      final ANode node = new DBNode(file);
-      final Value entries = nodes("descendant::*:entry", node, ctx);
-      for(final Item entry : entries) build(entry, ctx);
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      throw QueryError.NOTHES_X.get(info, file);
-    }
+  ThesNodes(final ANode node, final Context ctx) throws QueryException {
+    final Value entries = nodes("descendant::*:entry", node, ctx);
+    for(final Item entry : entries) build(entry, ctx);
   }
 
   /**

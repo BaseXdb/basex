@@ -192,6 +192,18 @@ public final class FtModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void thesaurus() {
+    final Function func = _FT_THESAURUS;
+    final String doc = " doc('src/test/resources/thesaurus.xml')";
+
+    query(func.args(doc, "happy"), "lucky\nhappy");
+    query(func.args(doc, "happy", " map { 'levels': 0 }"), "");
+    query(func.args(doc, "happy", " map { 'levels': 5 }"), "lucky\nhappy");
+    query(func.args(doc, "happy", " map { 'relationship': 'RT' }"), "lucky\nhappy");
+    query(func.args(doc, "happy", " map { 'relationship': 'XYZ' }"), "");
+  }
+
+  /** Test method. */
   @Test public void tokenize() {
     final Function func = _FT_TOKENIZE;
 

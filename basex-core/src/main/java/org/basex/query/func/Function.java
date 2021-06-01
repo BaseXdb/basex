@@ -1193,6 +1193,9 @@ public enum Function implements AFunction {
   _FT_SEARCH(FtSearch::new, "search(database,terms[,options])",
       arg(STRING_O, ITEM_ZM, MAP_ZO), TEXT_ZM, flag(NDT), FT_URI),
   /** XQuery function. */
+  _FT_THESAURUS(FtThesaurus::new, "thesaurus(node,term[,options])",
+      arg(NODE_O, STRING_O, MAP_ZO), STRING_ZM, FT_URI),
+  /** XQuery function. */
   _FT_TOKENIZE(FtTokenize::new, "tokenize(string[,options])",
       arg(STRING_ZO, MAP_ZO), STRING_ZM, FT_URI),
   /** XQuery function. */
