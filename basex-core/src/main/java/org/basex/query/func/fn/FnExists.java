@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -44,6 +46,9 @@ public final class FnExists extends FnEmpty {
     if(or && Function.EXISTS.is(expr)) {
       final Expr args = List.get(cc, info, exprs[0], expr.arg(0));
       return cc.function(Function.EXISTS, info, args);
+    }
+    if(_UTIL_WITHIN.is(expr)) {
+      return expr.mergeEbv(this, or, cc);
     }
     return null;
   }

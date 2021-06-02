@@ -223,7 +223,7 @@ public abstract class Arr extends ParseExpr {
     for(int l = 0; l < list.size(); l++) {
       for(int m = l + 1; m < list.size(); m++) {
         final Expr expr1 = list.get(l), expr2 = list.get(m);
-        if(!(positional && expr1.has(Flag.POS))) {
+        if(!expr1.has(Flag.NDT) && !(positional && expr1.has(Flag.POS))) {
           // A or not(A)  ->  true()
           // A[not(B)][B]  ->  ()
           // empty(A) or exists(A)  ->  true()

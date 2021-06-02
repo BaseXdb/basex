@@ -79,9 +79,12 @@ public class FnEmpty extends StandardFunc {
   public Expr mergeEbv(final Expr expr, final boolean or, final CompileContext cc)
       throws QueryException {
 
-    if(!or && Function.EMPTY.is(expr)) {
+    if(!or && EMPTY.is(expr)) {
       final Expr args = List.get(cc, info, exprs[0], expr.arg(0));
-      return cc.function(Function.EMPTY, info, args);
+      return cc.function(EMPTY, info, args);
+    }
+    if(_UTIL_WITHIN.is(expr)) {
+      return expr.mergeEbv(this, or, cc);
     }
     return null;
   }

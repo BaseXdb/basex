@@ -583,5 +583,32 @@ public final class UtilModuleTest extends QueryPlanTest {
     check("count((1 to 10)[. < 5]) = 5 to 7", false, root(func));
 
     check("(1 to 2) ! (count((1 to 10)[. < 5]) = .)", "false\nfalse", exists(func));
+
+    // merge multiple counts
+    check("let $s := (1 to 6)[. < 5] return empty($s) or count($s) < 5", true,
+        root(func), count(Int.class, 2), empty(EMPTY));
+    check("let $s := (1 to 6)[. < 5] return exists($s) and count($s) < 5", true,
+        root(func), count(Int.class, 2), empty(EXISTS));
+
+    check("let $s := (1 to 6)[. < 5] return count($s) > 0 and count($s) < 5", true,
+        root(func), count(Int.class, 2), empty(COUNT));
+    check("let $s := (1 to 6)[. < 5] return count($s) >= 0 and count($s) < 5", true,
+        root(func), count(Int.class, 2), empty(COUNT));
+    check("let $s := (1 to 6)[. < 5] return count($s) > 1 and count($s) > 2", true,
+        root(func), count(Int.class, 1), empty(COUNT));
+    check("let $s := (1 to 6)[. < 5] return count($s) > 1 and count($s) > 2", true,
+        root(func), count(Int.class, 1), empty(COUNT));
+    check("let $s := (1 to 6)[. < 5] return count($s) > 1 or count($s) > 2", true,
+        root(func), count(Int.class, 1), empty(COUNT));
+
+    check("let $s := (1 to 6)[. < 5] return count($s) < 5 or count($s) > 5", true,
+        count(_UTIL_WITHIN, 2), empty(COUNT));
+
+    check("let $s := (1 to 6)[. < 5] return count($s) > 0 or count($s) < 5", true,
+        root(Bln.class), empty(COUNT));
+    check("let $s := (1 to 6)[. < 5] return count($s) > 0 or count($s) > 2", true,
+        root(EXISTS), empty(COUNT));
+    check("let $s := (1 to 6)[. < 5] return empty($s) and count($s) < 5", false,
+        root(EMPTY), empty(COUNT));
   }
 }
