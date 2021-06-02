@@ -235,7 +235,7 @@ public final class FTLexer extends FTIterator implements IndexSearch {
     to.set(ST, opt.is(ST));
     to.set(DC, opt.is(DC));
     to.ln = opt.ln;
-    to.tl = opt.tl;
+    to.th = opt.th;
     to.sd = opt.sd;
     // only change case in insensitive mode
     to.cs = opt.cs != null && opt.cs != FTCase.INSENSITIVE ? FTCase.SENSITIVE :

@@ -1194,7 +1194,7 @@ public enum Function implements AFunction {
       arg(STRING_O, ITEM_ZM, MAP_ZO), TEXT_ZM, flag(NDT), FT_URI),
   /** XQuery function. */
   _FT_THESAURUS(FtThesaurus::new, "thesaurus(node,term[,options])",
-      arg(NODE_O, STRING_O, MAP_ZO), STRING_ZM, FT_URI),
+      arg(NODE_O, STRING_O, MAP_ZO), STRING_ZM, flag(NDT), FT_URI),
   /** XQuery function. */
   _FT_TOKENIZE(FtTokenize::new, "tokenize(string[,options])",
       arg(STRING_ZO, MAP_ZO), STRING_ZM, FT_URI),
