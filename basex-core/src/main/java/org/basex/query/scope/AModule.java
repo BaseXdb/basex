@@ -9,7 +9,7 @@ import org.basex.util.hash.*;
 /**
  * An XQuery module.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-21, BSD License
  * @author Leo Woerteler
  */
 public abstract class AModule extends StaticScope {

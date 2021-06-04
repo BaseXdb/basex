@@ -3,7 +3,7 @@
 #
 # Documentation: https://docs.basex.org/wiki/Clients
 #
-# (C) BaseX Team 2005-12, BSD License
+# (C) BaseX Team 2005-21, BSD License
 
 from BaseXClient import BaseXClient
 import time
