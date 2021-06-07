@@ -105,8 +105,8 @@ public final class GUIOptions extends Options {
   public static final NumberOption PREFTAB = new NumberOption("PREFTAB", 0);
   /** Flag for Java look and feel. */
   public static final StringOption LOOKANDFEEL = new StringOption("LOOKANDFEEL", "");
-  /** Flag for dissolving name attributes. */
-  public static final BooleanOption SHOWNAME = new BooleanOption("SHOWNAME", true);
+  /** Label attributes, separated by comma. */
+  public static final StringOption LABELS = new StringOption("LABELS", "name,label,id");
   /** Flag for scrolling editor tabs. */
   public static final BooleanOption SCROLLTABS = new BooleanOption("SCROLLTABS", true);
   /** Focus follows mouse. */

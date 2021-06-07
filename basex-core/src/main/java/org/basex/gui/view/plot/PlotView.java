@@ -311,12 +311,10 @@ public final class PlotView extends View {
         int ya = calcCoordinate(false, y1) + gui.gopts.get(GUIOptions.PLOTDOTS);
         final int ww = getWidth();
 
-        final int id = ViewData.nameID(data);
-        final byte[] nm = data.attValue(id, focused);
-        String name = nm != null ? string(nm) : "";
-        if(!name.isEmpty() && plotData.xAxis.attrID != id &&
-            plotData.yAxis.attrID != id) {
-
+        final int id = ViewData.labelID(data, gui.gopts.get(GUIOptions.LABELS));
+        final byte[] l = data.attValue(id, focused);
+        String name = l != null ? string(l) : "";
+        if(!name.isEmpty() && plotData.xAxis.attrID != id && plotData.yAxis.attrID != id) {
           if(ol > 1) name = ol + "x: " + name + ", ...";
           final int lw = BaseXLayout.width(g, label);
           if(ya < MARGIN[0] + textH && xa < w - lw) {

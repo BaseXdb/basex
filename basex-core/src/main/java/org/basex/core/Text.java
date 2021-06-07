@@ -1296,8 +1296,8 @@ public interface Text {
   String JAVA_LF = "Look & Feel (" + lang("requires_restart") + ')';
   /** Focus. */
   String RT_FOCUS = lang("rt_focus");
-  /** Name display flag. */
-  String SHOW_NAME_ATTS = lang("show_name_atts");
+  /** Label attributes. */
+  String LABEL_ATTS = lang("label_atts");
   /** Scroll editor tabs. */
   String SCROLL_TABS = lang("scroll_tabs");
   /** Maximum number of results. */

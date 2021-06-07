@@ -151,7 +151,7 @@ final class TreeRects {
    * @return text
    */
   byte[] text(final int pre) {
-    return ViewData.namedText(view.gui.gopts, nodes.data(), pre);
+    return ViewData.label(view.gui.gopts, nodes.data(), pre);
   }
 
   /**

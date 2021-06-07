@@ -357,7 +357,7 @@ public final class MapView extends View {
       g.setFont(font);
       BaseXLayout.antiAlias(g);
       if(data.kind(f.pre) == Data.ELEM) BaseXLayout.drawTooltip(g,
-          Token.string(ViewData.namedText(gopts, data, f.pre)), x, y, getWidth(), f.level + 5);
+          Token.string(ViewData.label(gopts, data, f.pre)), x, y, getWidth(), f.level + 5);
 
       if(f.thumb) {
         // draw tooltip for thumbnail
