@@ -94,4 +94,18 @@ public final class FTQueryTest extends SandboxTest {
     query("'a' contains text 'b' using fuzzy 1 errors", true);
     query("'a' contains text 'b' using fuzzy 10 errors", true);
   }
+
+  /** Fuzzy search: handling many similar terms. */
+  @Test public void gh2014() {
+    query(_DB_CREATE.args(NAME, " <a><b>aaaa aabc aaab</b><b>bbbb</b><b>aaad</b></a>",
+        NAME, " map { 'ftindex': true() }"));
+    query(_FT_SEARCH.args(NAME, "aaaa"), "aaaa aabc aaab");
+    query(_FT_SEARCH.args(NAME, "aaaa", " map { 'fuzzy': true() }"), "aaaa aabc aaab\naaad");
+
+    query(_DB_CREATE.args(NAME, " <x>{ for $i in 1 to 100000 " +
+        "return <b>{ format-number($i, '000000000000') }</b>} </x>",
+        NAME, " map { 'ftindex': true() }"));
+    query("count(" + _FT_SEARCH.args(NAME, "000000000000", " map { 'fuzzy': true() }") + ')',
+        8146);
+  }
 }

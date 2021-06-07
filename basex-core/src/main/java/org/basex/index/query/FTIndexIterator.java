@@ -1,6 +1,7 @@
 package org.basex.index.query;
 
 import org.basex.query.util.ft.*;
+import org.basex.util.list.*;
 
 /**
  * This interface provides methods for returning index results.
@@ -36,62 +37,86 @@ public abstract class FTIndexIterator implements IndexIterator {
   public abstract void pos(int p);
 
   /**
-   * Merges two index array iterators.
-   * @param i1 first index array iterator to merge
-   * @param i2 second index array iterator to merge
-   * @return IndexArrayIterator
+   * Merges two index iterators for unions.
+   * @param iters index iterators to merge
+   * @return new iterator
    */
-  public static FTIndexIterator union(final FTIndexIterator i1, final FTIndexIterator i2) {
+  public static FTIndexIterator union(final FTIndexIterator... iters) {
     return new FTIndexIterator() {
-      FTIndexIterator ii1, ii2, next;
-      int diff;
+      final IntList curr = new IntList();
+      FTIndexIterator[] ir;
 
       @Override
       public boolean more() {
-        if(diff <= 0) ii1 = i1.more() ? i1 : null;
-        if(diff >= 0) ii2 = i2.more() ? i2 : null;
-        diff = ii1 != null ? ii2 != null ? ii1.pre() - ii2.pre() : -1 : 1;
-        next = diff <= 0 ? ii1 : ii2;
-        return next != null;
+        final int il = iters.length;
+        if(ir == null) {
+          ir = new FTIndexIterator[il];
+          for(int i = 0; i < il; i++) {
+            ir[i] = iters[i].more() ? iters[i] : null;
+          }
+        } else {
+          final int cs = curr.size();
+          for(int c = 0; c < cs; c++) {
+            final int i = curr.get(c);
+            if(!ir[i].more()) ir[i] = null;
+          }
+        }
+        int pre = Integer.MAX_VALUE;
+        for(int i = 0; i < il; i++) {
+          if(ir[i] == null) continue;
+          final int p = ir[i].pre();
+          if(pre < p) continue;
+          if(pre > p) {
+            pre = p;
+            curr.reset();
+          }
+          curr.add(i);
+        }
+        return pre < Integer.MAX_VALUE;
       }
 
       @Override
       public FTMatches matches() {
-        final FTMatches all = next.matches();
-        if(diff == 0) for(final FTMatch m : ii2.matches())
-          all.add(m);
+        final FTMatches all = ir[curr.peek()].matches();
+        for(int c = curr.size() - 1; --c >= 0;) all.add(ir[curr.get(c)].matches());
         return all;
       }
 
       @Override
       public int pre() {
-        return next.pre();
+        return ir[curr.peek()].pre();
       }
 
       @Override
       public void pos(final int p) {
-        i1.pos(p);
-        i2.pos(p);
+        for(final FTIndexIterator iter : iters) iter.pos(p);
       }
 
       @Override
       public synchronized int size() {
-        return i1.size() + i2.size();
+        int c = 0;
+        for(final FTIndexIterator iter : iters) c += iter.size();
+        return c;
       }
 
       @Override
       public String toString() {
-        return "(" + i1 + " | " + i2 + ')';
+        final StringBuilder sb = new StringBuilder().append('(');
+        for(final FTIndexIterator iter : iters) {
+          if(sb.length() > 1) sb.append(" | ");
+          sb.append(iter);
+        }
+        return sb.append(')').toString();
       }
     };
   }
 
   /**
-   * Merges two index array iterators.
-   * @param i1 first index array iterator to merge
-   * @param i2 second index array iterator to merge
+   * Merges two index iterators for intersections.
+   * @param i1 first index iterator to merge
+   * @param i2 second index iterator to merge
    * @param dis word distance (ignored if {@code 0})
-   * @return IndexArrayIterator
+   * @return index iterator
    */
   public static FTIndexIterator intersect(final FTIndexIterator i1, final FTIndexIterator i2,
       final int dis) {

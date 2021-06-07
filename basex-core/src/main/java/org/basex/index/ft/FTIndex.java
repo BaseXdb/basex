@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
@@ -346,9 +347,9 @@ public final class FTIndex extends ValueIndex {
    * @return iterator
    */
   private IndexIterator fuzzy(final byte[] token, final int k) {
-    FTIndexIterator iter = FTIndexIterator.FTEMPTY;
     final int tokl = token.length, pl = positions.length, e = Math.min(pl - 1, tokl + k);
     int s = Math.max(1, tokl - k) - 1;
+    final ArrayList<FTIndexIterator> iters = new ArrayList<>();
     while(++s <= e) {
       int p = positions[s];
       if(p == -1) continue;
@@ -356,12 +357,13 @@ public final class FTIndex extends ValueIndex {
       while(t < pl && r == -1) r = positions[t++];
       while(p < r) {
         if(ls.similar(dataY.readBytes(p, s), token, k)) {
-          iter = FTIndexIterator.union(iter(pointer(p, s), size(p, s), dataZ, token), iter);
+          iters.add(iter(pointer(p, s), size(p, s), dataZ, token));
         }
         p += s + ENTRY;
       }
     }
-    return iter;
+    return iters.isEmpty() ? FTIndexIterator.FTEMPTY :
+      FTIndexIterator.union(iters.toArray(new FTIndexIterator[0]));
   }
 
   /**

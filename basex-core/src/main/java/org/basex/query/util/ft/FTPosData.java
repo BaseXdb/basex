@@ -25,7 +25,6 @@ public final class FTPosData {
 
   /**
    * Adds position data.
-   *
    * @param data data reference
    * @param pre pre value
    * @param all full-text matches

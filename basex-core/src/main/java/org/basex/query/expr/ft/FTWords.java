@@ -162,7 +162,7 @@ public final class FTWords extends FTExpr {
           final FTLexer lexer = new FTLexer(ftOpt).
               errors(qc.context.options.get(MainOptions.LSERROR));
 
-          // length distinct tokens
+          // length of distinct tokens
           int len = 0;
           // loop through unique tokens
           for(final byte[] input : unique(inputs != null ? inputs : inputs(qc))) {
