@@ -280,12 +280,12 @@ public abstract class Cmp extends Arr {
    */
   private Expr optBoolean(final OpV op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(expr1.seqType().eq(SeqType.BOOLEAN_O)) {
-      // boolean(A) = true()   ->  boolean(A)
-      if(op == OpV.EQ && expr2 == Bln.TRUE || op == OpV.NE && expr2 == Bln.FALSE) return expr1;
+    if(expr1.seqType().eq(SeqType.BOOLEAN_O) && expr2 instanceof Bln) {
+      final boolean ok = expr2 == Bln.TRUE;
+      // boolean(A) = true()  ->  boolean(A)
+      if(op == OpV.EQ && ok || op == OpV.NE && !ok) return expr1;
       // boolean(A) = false()  ->  not(boolean(A))
-      if(op == OpV.EQ && expr2 == Bln.FALSE || op == OpV.NE && expr2 == Bln.TRUE)
-        return cc.function(NOT, info, expr1);
+      if(op == OpV.EQ && !ok || op == OpV.NE && ok) return cc.function(NOT, info, expr1);
     }
     return this;
   }
