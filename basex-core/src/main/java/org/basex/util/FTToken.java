@@ -59,7 +59,6 @@ public final class FTToken {
     return ((1 << Character.UPPERCASE_LETTER |
       1 << Character.LOWERCASE_LETTER |
       1 << Character.TITLECASE_LETTER |
-      1 << Character.MODIFIER_LETTER |
       1 << Character.OTHER_LETTER |
       1 << Character.DECIMAL_DIGIT_NUMBER) >> type & 1)
       != 0;
@@ -74,7 +73,8 @@ public final class FTToken {
     return (1 << type & (
       1 << Character.NON_SPACING_MARK |
       1 << Character.COMBINING_SPACING_MARK |
-      1 << Character.ENCLOSING_MARK
+      1 << Character.ENCLOSING_MARK |
+      1 << Character.MODIFIER_LETTER
     )) != 0;
   }
 

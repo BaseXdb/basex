@@ -108,4 +108,10 @@ public final class FTQueryTest extends SandboxTest {
     query("count(" + _FT_SEARCH.args(NAME, "000000000000", " map { 'fuzzy': true() }") + ')',
         8146);
   }
+
+  /** Full-Text: Modifier Letters. */
+  @Test public void gh2015() {
+    query("count(tokenize('fara&#700;id faraid fara-id Birkan')"
+        + "[. contains text 'fara&#700;id' using fuzzy])", 2);
+  }
 }
