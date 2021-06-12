@@ -58,10 +58,6 @@ public final class HttpRequestParser {
 
       // it is an error if content is set for HTTP methods that do not allow bodies
       final ANode body = parseHeaders(request.childIter(), hr.headers);
-      final String method = hr.attribute(Request.METHOD);
-      if(Strings.eq(method, TRACE) && (body != null || !bodies.isEmpty()))
-        throw HC_REQ_X.get(info, "Body not expected for method " + method);
-
       if(body != null) {
         final QNm pl = body.qname();
         // single part request
