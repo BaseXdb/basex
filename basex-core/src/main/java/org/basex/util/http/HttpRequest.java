@@ -33,7 +33,7 @@ public final class HttpRequest {
   /**
    * Returns the value of the specified attribute.
    * @param name name of request attribute
-   * @return value
+   * @return value or {@code null}
    */
   String attribute(final Request name) {
     return attributes.get(name);
