@@ -170,15 +170,6 @@ public class FnHttpTest extends HTTPTest {
         " <http:request method='delete'/>", RESTURL, " ()") + "[1]/@status/data()", ctx)) {
       assertEquals("404", qp.value().serialize().toString());
     }
-
-    // DELETE (same resource, illegal body)
-    try {
-      new XQuery(_HTTP_SEND_REQUEST.args(" <http:request method='delete'/>", RESTURL, 123)).
-        execute(ctx);
-      fail("Error expected");
-    } catch(final BaseXException ex) {
-      assertTrue(ex.getMessage().contains(ErrType.HC.toString()));
-    }
   }
 
   /**
@@ -381,12 +372,6 @@ public class FnHttpTest extends HTTPTest {
     queries.put("Request with schema different from http",
         "<http:request xmlns:http='http://expath.org/ns/http-client' "
         + "href='ftp://basex.org'/>");
-
-    queries.put("Request with content and method which must be empty",
-        "<http:request xmlns:http='http://expath.org/ns/http-client' "
-        + "method='DELETE' href='" + REST_ROOT + "'>"
-        + "<http:body media-type='text/plain'>" + "</http:body>"
-        + "</http:request>");
 
     final StringBuilder error = new StringBuilder();
     for(final Entry<String, String> entry : queries.entrySet()) {
