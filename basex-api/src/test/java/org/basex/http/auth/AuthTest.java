@@ -85,7 +85,7 @@ public abstract class AuthTest extends HTTPTest {
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request xmlns:http='http://expath.org/ns/http-client' method='GET' " +
         "auth-method='" + method + "' username='" + user + "' password='" + pass + "' " +
-        "send-authorization='true' href='" + REST_ROOT + "'/>") +
+        "href='" + REST_ROOT + "'/>") +
         "[. instance of node()]/@status/string()", ctx)) {
       return qp.value().serialize().toString();
     }

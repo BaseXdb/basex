@@ -66,23 +66,19 @@ public final class HttpClient {
     final HttpRequest req = new HttpRequestParser(info).parse(request, bodies);
     HttpURLConnection conn = null;
     try {
-      // parse request data, set properties
-      final String mediaType = req.attribute(OVERRIDE_MEDIA_TYPE);
-      final String status = req.attribute(STATUS_ONLY);
-      final String sendAuth = req.attribute(SEND_AUTHORIZATION);
-
-      final boolean body = status == null || !Strings.toBoolean(status);
-      final boolean challenge = sendAuth == null || !Strings.toBoolean(sendAuth);
       final String url = href == null || href.length == 0 ? req.attribute(HREF) : string(href);
-
       if(url == null || url.isEmpty()) throw HC_URL.get(info);
-      conn = connect(url, req, challenge);
+      conn = connect(url, req);
 
       if(!req.payload.isEmpty() || !req.parts.isEmpty()) {
         setContentType(conn, req);
         writePayload(conn.getOutputStream(), req);
       }
 
+      // parse request data, set properties
+      final String mediaType = req.attribute(OVERRIDE_MEDIA_TYPE);
+      final String status = req.attribute(STATUS_ONLY);
+      final boolean body = status == null || !Strings.toBoolean(status);
       return new HttpResponse(info, options).getResponse(conn, body, mediaType);
 
     } catch(final IOException ex) {
@@ -96,84 +92,68 @@ public final class HttpClient {
    * Opens an HTTP connection.
    * @param url HTTP URL to open connection to
    * @param request request
-   * @param challenge send challenge
    * @return HTTP connection
    * @throws QueryException query exception
    * @throws IOException I/O Exception
    * @throws MalformedURLException incorrect url
    */
-  private HttpURLConnection connect(final String url, final HttpRequest request,
-      final boolean challenge) throws QueryException, IOException {
+  private HttpURLConnection connect(final String url, final HttpRequest request)
+      throws QueryException, IOException {
 
-    // create connection, check if authentication data was supplied
+    // create connection; check if authorization data was supplied
     HttpURLConnection conn = connection(url, request);
-    final String user = request.attribute(USERNAME), pass = request.attribute(PASSWORD);
+    final String user = request.attribute(USERNAME);
     if(user == null) return conn;
 
-    // Basic authentication
+    final String send = request.attribute(SEND_AUTHORIZATION), pass = request.attribute(PASSWORD);
+    final boolean challenge = send == null || !Strings.toBoolean(send);
     final AuthMethod am = request.authMethod;
-    if(am == AuthMethod.BASIC) {
-      if(challenge) {
-        // send challenge, create new connection
-        if(challenge(conn, am) == null) return conn;
-        conn = connection(url, request);
+
+    // send challenge, create new connection
+    EnumMap<Request, String> map = null;
+    if(challenge) {
+      conn.setRequestProperty(AUTHORIZATION, am.toString());
+      final int code = conn.getResponseCode();
+      if(code == 401) {
+        map = authHeaders(conn.getHeaderField(WWW_AUTHENTICATE));
+        // authentication method differs: discard authentication data
+        if(!am.toString().equals(map.get(AUTH_METHOD))) map = null;
       }
-      // send credentials
-      conn.setRequestProperty(AUTHORIZATION, am + " " + Base64.encode(user + ':' + pass));
-
-    } else if(am == AuthMethod.DIGEST) {
-      final EnumMap<Request, String> map = challenge(conn, am);
-      if(map == null) return conn;
-
-      // generate authorization string
-      final String
-        realm = map.get(REALM),
-        nonce = map.get(NONCE),
-        uri = conn.getURL().getPath(),
-        qop = map.get(QOP),
-        nc = "00000001",
-        cnonce = Strings.md5(Long.toString(System.nanoTime())),
-        ha1 = Strings.md5(user + ':' + realm + ':' + pass),
-        ha2 = Strings.md5(request.attribute(METHOD) + ':' + uri),
-        rsp = Strings.md5(ha1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + ha2);
-
+      conn.disconnect();
       conn = connection(url, request);
-      conn.setRequestProperty(AUTHORIZATION, am + " " +
-        USERNAME + "=\"" + user + "\","
-        + REALM + "=\"" + realm + "\","
-        + NONCE + "=\"" + nonce + "\","
-        + URI + "=\"" + uri + "\","
-        + QOP + '=' + qop + ','
-        + NC + '=' + nc + ','
-        + CNONCE + "=\"" + cnonce + "\","
-        + RESPONSE + "=\"" + rsp + "\","
-        + ALGORITHM + '=' + MD5 + ','
-        + OPAQUE + "=\"" + map.get(OPAQUE) + '"');
+    }
+
+    // assign authorization data if required
+    if(am == AuthMethod.BASIC) {
+      if(map != null || !challenge) {
+        conn.setRequestProperty(AUTHORIZATION, am + " " + Base64.encode(user + ':' + pass));
+      }
+    } else if(am == AuthMethod.DIGEST) {
+      if(map != null) {
+        final String
+          realm = map.get(REALM),
+          nonce = map.get(NONCE),
+          uri = conn.getURL().getPath(),
+          qop = map.get(QOP),
+          nc = "00000001",
+          cnonce = Strings.md5(Long.toString(System.nanoTime())),
+          ha1 = Strings.md5(user + ':' + realm + ':' + pass),
+          ha2 = Strings.md5(request.attribute(METHOD) + ':' + uri),
+          rsp = Strings.md5(ha1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + ha2);
+        conn.setRequestProperty(AUTHORIZATION, am + " " +
+          USERNAME + "=\"" + user + "\","
+          + REALM + "=\"" + realm + "\","
+          + NONCE + "=\"" + nonce + "\","
+          + URI + "=\"" + uri + "\","
+          + QOP + '=' + qop + ','
+          + NC + '=' + nc + ','
+          + CNONCE + "=\"" + cnonce + "\","
+          + RESPONSE + "=\"" + rsp + "\","
+          + ALGORITHM + '=' + MD5 + ','
+          + OPAQUE + "=\"" + map.get(OPAQUE) + '"');
+      }
     }
     return conn;
-  }
-
-  /**
-   * Sends a challenge.
-   * @param conn HTTP connection
-   * @param am authentication method
-   * @return authentication data
-   * @throws IOException I/O exception
-   */
-  private static EnumMap<Request, String> challenge(final HttpURLConnection conn,
-      final AuthMethod am) throws IOException {
-
-    // skip authentication if server needs no credentials or raises an error
-    conn.setRequestProperty(AUTHORIZATION, am.toString());
-    if(conn.getResponseCode() != 401) return null;
-
-    // skip authentication if authentication method differs
-    final EnumMap<Request, String> map = authHeaders(conn.getHeaderField(WWW_AUTHENTICATE));
-    if(!am.toString().equals(map.get(AUTH_METHOD))) return null;
-
-    // disconnect, return map
-    conn.disconnect();
-    return map;
   }
 
   /**
