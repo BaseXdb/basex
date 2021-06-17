@@ -58,7 +58,7 @@ final class GermanStemmer extends InternalStemmer {
       next = c < s ? tb.cp(c) : 0;
       int sb = 0;
       if(curr == last) {
-        curr = '*';
+        curr = '\0';
       } else if(curr == '\u00e4') {
         curr = 'a';
       } else if(curr == '\u00f6') {
@@ -127,7 +127,7 @@ final class GermanStemmer extends InternalStemmer {
   private TokenBuilder opt(final TokenBuilder tb) {
     int tl = tb.size();
     if(tl > 5 && tb.get(tl - 5) == 'e' && tb.get(tl - 4) == 'r' &&
-      tb.get(tl - 3) == 'i' && tb.get(tl - 2) == 'n' && tb.get(tl - 1) == '*') {
+      tb.get(tl - 3) == 'i' && tb.get(tl - 2) == 'n' && tb.get(tl - 1) == '\0') {
       tb.size(tl - 1);
       strip(tb);
     }
@@ -147,7 +147,7 @@ final class GermanStemmer extends InternalStemmer {
     for(int c = 0; c < s; c++) {
       final int ch = tb.get(c);
       switch(ch) {
-        case '*':  tmp.add(tmp.get(c - 1)); break;
+        case '\0': tmp.add(tmp.get(c - 1)); break;
         case '\1': tmp.add('s').add('c').add('h'); break;
         case '\2': tmp.add('c').add('h'); break;
         case '\3': tmp.add('e').add('i'); break;
