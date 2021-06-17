@@ -14,6 +14,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class BaseXScrollBar extends BaseXPanel {
+  /** Scrollbar width. */
+  private static final int SIZE = 18;
   /** Maximum scrolling speed. */
   private static final int MAXSTEP = 15;
   /** Animated scrollbar zooming steps. */
@@ -29,8 +31,6 @@ public final class BaseXScrollBar extends BaseXPanel {
   private int step = STEPS.length / 2;
   /** Flag reporting if the scrollbar animation is running. */
   private boolean animated;
-  /** Scrollbar width. */
-  private int ww;
   /** Scrollbar height. */
   private int hh;
   /** Scrollbar slider position. */
@@ -77,8 +77,7 @@ public final class BaseXScrollBar extends BaseXPanel {
    * Refreshes the layout.
    */
   public void refreshLayout() {
-    ww = 10 + GUIConstants.fontSize / 2;
-    setPreferredSize(new Dimension(ww, getPreferredSize().height));
+    setPreferredSize(new Dimension(SIZE, getPreferredSize().height));
   }
 
   /**
@@ -118,7 +117,7 @@ public final class BaseXScrollBar extends BaseXPanel {
     if(hh >= height) return;
 
     // calculate bar size
-    final int barH = hh - (ww << 1) + 4;
+    final int barH = hh - (SIZE << 1) + 4;
     final double factor = (barH - barOffset) / (double) height;
     int size = (int) (hh * factor);
     // define minimum size for scrollbar mover
@@ -129,28 +128,28 @@ public final class BaseXScrollBar extends BaseXPanel {
 
     // paint scrollbar background
     g.setColor(GUIConstants.PANEL);
-    g.fillRect(0, 0, ww, hh);
+    g.fillRect(0, 0, SIZE, hh);
 
     // draw scroll slider
-    int bh = ww - 2 + barPos;
-    BaseXLayout.drawCell(g, 0, ww, bh, bh + barSize, false);
+    int bh = SIZE - 2 + barPos;
+    BaseXLayout.drawCell(g, 0, SIZE, bh, bh + barSize, false);
 
     final int d = 2;
     bh += barSize / 2;
     g.setColor(GUIConstants.dgray);
-    g.drawLine(5, bh, ww - 6, bh);
-    g.drawLine(5, bh - d, ww - 6, bh - d);
-    g.drawLine(5, bh + d, ww - 6, bh + d);
+    g.drawLine(5, bh, SIZE - 6, bh);
+    g.drawLine(5, bh - d, SIZE - 6, bh - d);
+    g.drawLine(5, bh + d, SIZE - 6, bh + d);
     BaseXLayout.antiAlias(g);
 
     // draw scroll buttons
     drawButton(g, new int[][] { { 0, 6, 3 }, { 6, 6, 0 } }, 0, button && up);
-    drawButton(g, new int[][] { { 0, 6, 3 }, { 0, 0, 6 } }, hh - ww, button && down);
+    drawButton(g, new int[][] { { 0, 6, 3 }, { 0, 0, 6 } }, hh - SIZE, button && down);
 
     // paint scrollbar lines
     g.setColor(GUIConstants.gray);
     g.drawLine(0, 0, 0, hh);
-    g.drawLine(ww - 1, 0, ww - 1, hh);
+    g.drawLine(SIZE - 1, 0, SIZE - 1, hh);
   }
 
   /**
@@ -161,11 +160,11 @@ public final class BaseXScrollBar extends BaseXPanel {
    * @param focus focus flag
    */
   private void drawButton(final Graphics g, final int[][] pol, final int y, final boolean focus) {
-    BaseXLayout.drawCell(g, 0, ww, y, y + ww, focus);
+    BaseXLayout.drawCell(g, 0, SIZE, y, y + SIZE, focus);
     final int pl = pol[0].length;
     for(int i = 0; i < pl; ++i) {
-      pol[0][i] += ww / 2 - 3;
-      pol[1][i] += y + ww / 2 - 3;
+      pol[0][i] += SIZE / 2 - 3;
+      pol[1][i] += y + SIZE / 2 - 3;
     }
     g.setColor(focus ? GUIConstants.TEXT : GUIConstants.dgray);
     g.fillPolygon(pol[0], pol[1], 3);
@@ -174,11 +173,11 @@ public final class BaseXScrollBar extends BaseXPanel {
   @Override
   public void mousePressed(final MouseEvent e) {
     final int y = e.getY();
-    sliding = y > ww + barPos && y < ww + barPos + barSize;
+    sliding = y > SIZE + barPos && y < SIZE + barPos + barSize;
     moving = !sliding;
-    up = y < ww + barPos;
-    down = y > ww + barPos + barSize;
-    button = y < ww || y > hh - ww;
+    up = y < SIZE + barPos;
+    down = y > SIZE + barPos + barSize;
+    button = y < SIZE || y > hh - SIZE;
     if(sliding) dragPos = barPos - y;
 
     // start dragging
@@ -198,7 +197,7 @@ public final class BaseXScrollBar extends BaseXPanel {
         Performance.sleep(25);
         animated = step != STEPS.length / 2;
 
-        if(y > ww + barPos && y < ww + barPos + barSize) {
+        if(y > SIZE + barPos && y < SIZE + barPos + barSize) {
           dragPos = barPos - y;
           animated = false;
           sliding = true;
@@ -222,7 +221,7 @@ public final class BaseXScrollBar extends BaseXPanel {
     // no dragging...
     if(!sliding) return;
 
-    pos = (int) ((long) (e.getY() + dragPos) * height / (hh - (ww << 1)));
+    pos = (int) ((long) (e.getY() + dragPos) * height / (hh - (SIZE << 1)));
     pos = Math.max(0, Math.min(height - hh, pos));
     comp.repaint();
   }
