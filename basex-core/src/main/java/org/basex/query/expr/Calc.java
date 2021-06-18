@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.func.Function.*;
 import static org.basex.query.value.type.AtomType.*;
 
 import java.math.*;
@@ -65,9 +66,19 @@ public enum Calc {
       if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 0) {
         return new Cast(cc.sc(), info, expr1, type.seqType()).optimize(cc);
       }
-      // check for identical operands
+      // merge arithmetical expressions
       if(expr1.equals(expr2)) {
-        return new Arith(info, expr1, Int.get(2), Calc.MULT).optimize(cc);
+        return new Arith(info, expr1, Int.get(2), MULT).optimize(cc);
+      }
+      if(expr2 instanceof Unary) {
+        return new Arith(info, expr1, ((Unary) expr2).expr, MINUS).optimize(cc);
+      }
+      if(expr1 instanceof Arith) {
+        final Arith arith = (Arith) expr1;
+        if(arith.calc == MULT && arith.exprs[0].equals(expr2) && arith.exprs[1] instanceof Int) {
+          final long factor = ((Int) arith.exprs[1]).itr();
+          return new Arith(info, arith.exprs[0], Int.get(factor + 1), MULT).optimize(cc);
+        }
       }
       return null;
     }
@@ -135,9 +146,20 @@ public enum Calc {
       if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 0) {
         return new Cast(cc.sc(), info, expr1, type.seqType()).optimize(cc);
       }
-      // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
+      // replace with neutral number; ignore floating numbers due to special cases (NaN, INF)
       if(expr1.equals(expr2)) {
         return type == DECIMAL ? Dec.ZERO : type == INTEGER ? Int.ZERO : null;
+      }
+      // merge arithmetical expressions; ignore floating numbers due to special cases (NaN, INF)
+      if(expr2 instanceof Unary) {
+        return new Arith(info, expr1, ((Unary) expr2).expr, PLUS).optimize(cc);
+      }
+      if(expr1 instanceof Arith) {
+        final Arith arith = (Arith) expr1;
+        if(arith.calc == MULT && arith.exprs[0].equals(expr2) && arith.exprs[1] instanceof Int) {
+          final long factor = ((Int) arith.exprs[1]).itr();
+          return new Arith(info, arith.exprs[0], Int.get(factor - 1), MULT).optimize(cc);
+        }
       }
       return null;
     }
@@ -213,9 +235,24 @@ public enum Calc {
         // check for absorbing number
         if(dbl2 == 0) return type == DECIMAL ? Dec.ZERO : type == INTEGER ? Int.ZERO : null;
       }
-      // check for identical operands
-      if(expr1.equals(expr2) && type == DOUBLE) {
-        return cc.function(Function._MATH_POW, info, expr1, Dbl.get(2));
+      // merge arithmetical expressions
+      if(type == DOUBLE) {
+        if(expr1.equals(expr2)) {
+          return cc.function(_MATH_POW, info, expr1, Dbl.get(2));
+        }
+        if(_MATH_POW.is(expr1)) {
+          final StandardFunc func = (StandardFunc) expr1;
+          if(func.exprs[0].equals(expr2) && func.exprs[1] instanceof ANum) {
+            final double factor = ((ANum) func.exprs[1]).dbl();
+            return cc.function(_MATH_POW, info, func.exprs[0], Dbl.get(factor + 1));
+          }
+        }
+      }
+      if(expr2 instanceof Arith) {
+        final Arith arith = (Arith) expr2;
+        if(arith.calc == DIV && arith.exprs[0] instanceof Int && arith.exprs[1].equals(expr1)) {
+          return new Cast(cc.sc(), info,  arith.exprs[0], type.seqType()).optimize(cc);
+        }
       }
       return null;
     }
@@ -284,6 +321,13 @@ public enum Calc {
       if(expr1.equals(expr2)) {
         return type == DECIMAL ? Dec.ONE : type == INTEGER ? Int.ONE : null;
       }
+      if(_MATH_POW.is(expr1)) {
+        final StandardFunc func = (StandardFunc) expr1;
+        if(func.exprs[0].equals(expr2) && func.exprs[1] instanceof ANum) {
+          final double factor = ((ANum) func.exprs[1]).dbl();
+          return cc.function(_MATH_POW, info, func.exprs[0], Dbl.get(factor - 1));
+        }
+      }
       return null;
     }
 
@@ -347,7 +391,7 @@ public enum Calc {
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
       if(expr1.equals(expr2)) {
-        return type == DECIMAL ? Dec.ONE : type == INTEGER ? Int.ONE : null;
+        return type == DECIMAL || type == INTEGER ? Int.ONE : null;
       }
       return null;
     }

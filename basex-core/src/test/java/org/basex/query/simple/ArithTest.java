@@ -6,6 +6,7 @@ import org.basex.query.ast.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
+import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -34,6 +35,11 @@ public final class ArithTest extends QueryPlanTest {
         2, count(Function.COUNT, 1), exists(Function._UTIL_REPLICATE));
     check("let $n := <_>1</_>[. = 1] return count($n) + count($n) > 0",
         true, root(CmpSimpleG.class));
+
+    check("<_>3</_> ! (. + .)", 6, exists(Int.class), count(Arith.class, 1));
+    check("<_>3</_> ! (. + . + .)", 9, exists(Int.class), count(Arith.class, 1));
+    check("<_>3</_> ! (. + -.)", 0, empty(Unary.class));
+    check("xs:decimal(<_>3</_>) ! (. + -.)", 0, empty(Unary.class), root(Dec.class));
   }
 
   /** Test method. */
@@ -58,6 +64,10 @@ public final class ArithTest extends QueryPlanTest {
         "2017-07-07T18:29:59.1");
     query("string(xs:dateTime('2017-07-07T18:00:59.1') - xs:dayTimeDuration('PT1M'))",
         "2017-07-07T17:59:59.1");
+
+    check("xs:decimal(<_>3</_>) ! (. - .)", 0, root(Dec.class));
+    check("<_>3</_> ! (. + . - .)", 3, exists(Cast.class), empty(Arith.class));
+    check("<_>3</_> ! (. - -.)", 6, exists(Int.class), empty(Unary.class), count(Arith.class, 1));
   }
 
   /** Test method. */
@@ -83,6 +93,10 @@ public final class ArithTest extends QueryPlanTest {
         "0\n0", exists(Arith.class));
     check("for $i in (1 to 2)[. != 0] return $i * 0e0",
         "0\n0", exists(Arith.class));
+
+    check("<_>3</_> ! (. * .)", 9, exists(Dbl.class), exists(Function._MATH_POW));
+    check("<_>3</_> ! (. * . * .)", 27, exists(Dbl.class), count(Function._MATH_POW, 1));
+    check("<_>3</_> ! (. * (1 div .))", 1, root(Dbl.class));
   }
 
   /** Test method. */
@@ -103,6 +117,9 @@ public final class ArithTest extends QueryPlanTest {
 
     error("xs:dayTimeDuration('PT0S') div xs:dayTimeDuration('PT0S')", DIVZERO_X);
     error("xs:yearMonthDuration('P0M') div xs:yearMonthDuration('P0M')", DIVZERO_X);
+
+    check("xs:decimal(<_>3</_>) ! (. div .)", 1, root(Dec.class));
+    check("<_>3</_> ! (. * . div .)", 3, exists(Cast.class), empty(Arith.class));
   }
 
   /** Test method. */
@@ -118,6 +135,8 @@ public final class ArithTest extends QueryPlanTest {
     // identical arguments
     error("for $i in (1, xs:double('NaN')) return $i idiv $i", DIVFLOW_X);
     check("for $i in (2, 4) return $i idiv $i", "1\n1", empty(Arith.class), empty(GFLWOR.class));
+
+    check("xs:decimal(<_>3</_>) ! (. idiv .)", 1, root(Int.class));
   }
 
   /** Test method. */
