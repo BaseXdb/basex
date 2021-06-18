@@ -51,6 +51,11 @@ public final class MathModuleTest extends QueryPlanTest {
 
     check(func.args(" <_>5</_>", 0), 1, root(Dbl.class));
     check(func.args(" <_>5</_>", 1), 5, root(Cast.class));
+    check(func.args(" <_>5</_>", -1), .2, root(Arith.class));
+
+    check(func.args(func.args(" <_>3</_>", 2), 2), 81, count(func, 1));
+    check(func.args(func.args(func.args(" <_>3</_>", 2), 2), 2), 6561, count(func, 1));
+    check(func.args(func.args(" <_>3</_>", 2), .5), 3, empty(func), root(Cast.class));
   }
 
   /** Test method. */
