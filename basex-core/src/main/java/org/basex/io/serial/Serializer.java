@@ -40,7 +40,7 @@ public abstract class Serializer implements Closeable {
   protected boolean indent;
 
   /** Stack with currently available namespaces. */
-  private final Atts nspaces = new Atts(XML, QueryText.XML_URI).add(EMPTY, EMPTY);
+  private final Atts nspaces = new Atts(2).add(XML, QueryText.XML_URI).add(EMPTY, EMPTY);
   /** Stack with namespace size pointers. */
   private final IntList nstack = new IntList();
 

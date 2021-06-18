@@ -63,10 +63,10 @@ public final class FDoc extends FNode {
    * Constructor for DOM nodes.
    * Originally provided by Erdal Karaca.
    * @param doc DOM node
-   * @param bu base uri
+   * @param uri base uri
    */
-  public FDoc(final DocumentFragment doc, final byte[] bu) {
-    this(bu);
+  public FDoc(final DocumentFragment doc, final byte[] uri) {
+    this(uri);
     final Node elem = doc.getFirstChild();
     if(elem instanceof Element) children.add(new FElem((Element) elem, this, new TokenMap()));
   }

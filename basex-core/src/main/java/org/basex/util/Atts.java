@@ -10,27 +10,35 @@ import org.basex.util.list.*;
  */
 public final class Atts extends ElementList {
   /** Name array. */
-  private byte[][] nm;
+  private byte[][] names;
   /** Value array. */
-  private byte[][] vl;
+  private byte[][] values;
 
   /**
    * Default constructor.
    */
   public Atts() {
-    nm = new byte[1][];
-    vl = new byte[1][];
+    this(1);
   }
 
   /**
-   * Constructor, specifying an initial entry.
-   * @param name name to be added
-   * @param value value to be added
+   * Constructor with initial capacity.
+   * @param capacity array capacity
    */
-  public Atts(final byte[] name, final byte[] value) {
-    nm = new byte[][] { name };
-    vl = new byte[][] { value };
-    size = 1;
+  public Atts(final long capacity) {
+    final int c = Array.checkCapacity(capacity);
+    names = new byte[c][];
+    values = new byte[c][];
+  }
+
+  /**
+   * Constructor.
+   * @param atts  object to copy
+   */
+  public Atts(final Atts atts) {
+    names = atts.names.clone();
+    values = atts.values.clone();
+    size = atts.size;
   }
 
   /**
@@ -41,13 +49,13 @@ public final class Atts extends ElementList {
    */
   public Atts add(final byte[] name, final byte[] value) {
     final int sz = size;
-    if(sz == nm.length) {
+    if(sz == names.length) {
       final int s = Array.newCapacity(sz);
-      nm = Array.copyOf(nm, s);
-      vl = Array.copyOf(vl, s);
+      names = Array.copyOf(names, s);
+      values = Array.copyOf(values, s);
     }
-    nm[sz] = name;
-    vl[sz] = value;
+    names[sz] = name;
+    values[sz] = value;
     ++size;
     return this;
   }
@@ -59,10 +67,10 @@ public final class Atts extends ElementList {
    */
   public Atts remove(final int index) {
     final int sz = size;
-    Array.remove(nm, index, 1, sz);
-    Array.remove(vl, index, 1, sz);
-    nm[sz - 1] = null;
-    vl[sz - 1] = null;
+    Array.remove(names, index, 1, sz);
+    Array.remove(values, index, 1, sz);
+    names[sz - 1] = null;
+    values[sz - 1] = null;
     --size;
     return this;
   }
@@ -83,7 +91,7 @@ public final class Atts extends ElementList {
    */
   public int get(final byte[] name) {
     for(int i = 0; i < size; ++i) {
-      if(Token.eq(nm[i], name)) return i;
+      if(Token.eq(names[i], name)) return i;
     }
     return -1;
   }
@@ -94,7 +102,7 @@ public final class Atts extends ElementList {
    * @return name
    */
   public byte[] name(final int index) {
-    return nm[index];
+    return names[index];
   }
 
   /**
@@ -103,7 +111,7 @@ public final class Atts extends ElementList {
    * @return value
    */
   public byte[] value(final int index) {
-    return vl[index];
+    return values[index];
   }
 
   /**
@@ -113,19 +121,7 @@ public final class Atts extends ElementList {
    */
   public byte[] value(final byte[] name) {
     final int i = get(name);
-    return i == -1 ? null : vl[i];
-  }
-
-  /**
-   * Creates a shallow copy which shares all keys and values.
-   * @return shallow copy
-   */
-  public Atts copy() {
-    final Atts copy = new Atts();
-    copy.nm = nm.clone();
-    copy.vl = vl.clone();
-    copy.size = size;
-    return copy;
+    return i == -1 ? null : values[i];
   }
 
   @Override
@@ -135,7 +131,7 @@ public final class Atts extends ElementList {
     final Atts a = (Atts) obj;
     if(size != a.size) return false;
     for(int i = 0; i < size; ++i) {
-      if(!Token.eq(nm[i], a.nm[i]) || !Token.eq(vl[i], a.vl[i])) return false;
+      if(!Token.eq(names[i], a.names[i]) || !Token.eq(values[i], a.values[i])) return false;
     }
     return true;
   }
@@ -145,7 +141,7 @@ public final class Atts extends ElementList {
     final TokenBuilder tb = new TokenBuilder().add(Util.className(this)).add('[');
     for(int i = 0; i < size; ++i) {
       if(i > 0) tb.add(", ");
-      tb.add(nm[i]).add("=\"").add(vl[i]).add("\"");
+      tb.add(names[i]).add("=\"").add(values[i]).add("\"");
     }
     return tb.add("]").toString();
   }

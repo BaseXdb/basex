@@ -87,7 +87,7 @@ public final class CElem extends CName {
 
       // create node
       final Constr constr = new Constr(info, sc);
-      final FElem node = new FElem(nm, inscopeNS, constr.children, constr.atts);
+      final FElem node = new FElem(nm, inscopeNS, constr.atts, constr.children);
 
       // add child and attribute nodes
       constr.add(qc, exprs);
@@ -151,7 +151,7 @@ public final class CElem extends CName {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new CElem(sc, info, computed, name.copy(cc, vm), nspaces.copy(),
+    return copyType(new CElem(sc, info, computed, name.copy(cc, vm), new Atts(nspaces),
         copyAll(cc, vm, exprs)));
   }
 

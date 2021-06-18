@@ -197,9 +197,9 @@ public final class Namespaces {
    * @return key and value ids
    */
   Atts values(final int pre, final Data data) {
-    final Atts as = new Atts();
     final int[] values = cursor.find(pre, data).values();
     final int nl = values.length;
+    final Atts as = new Atts(nl / 2);
     for(int n = 0; n < nl; n += 2) as.add(prefix(values[n]), uri(values[n + 1]));
     return as;
   }
