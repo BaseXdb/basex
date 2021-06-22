@@ -130,7 +130,7 @@ public class TextInput extends BufferInput {
   public int read() throws IOException {
     final int cp = decoder.read(this);
     if(cp != -1 && !XMLToken.valid(cp)) {
-      if(validate) throw new InputException("Invalid XML character: #" + cp);
+      if(validate) throw new InputException(cp);
       return Token.REPLACEMENT;
     }
     return cp;

@@ -64,7 +64,7 @@ public interface WebText {
   /** Error message. */
   String INV_TEMPLATE_X = "Invalid path template: \"%\".";
   /** Error message. */
-  String INV_ENCODING_X = "Invalid URL encoding: \"%\".";
+  String INV_ENCODING_X = "URL is invalid: \"%\".";
   /** Error message. */
   String INV_VARNAME_X = "Invalid variable name: $%.";
   /** Error message. */
@@ -92,7 +92,7 @@ public interface WebText {
   /** Error message. */
   String METHOD_VALUE_X = "Method % does not allow values.";
   /** Error message. */
-  String BODY_TYPE_X_X = "Request body must be of type \"%\", supplied: %";
+  String BODY_TYPE_X_X = "Body cannot be parsed as %: %.";
   /** Error message. */
   String PATH_CONFLICT_X_X = "Multiple services defined for path \"%\":%";
   /** Error message. */

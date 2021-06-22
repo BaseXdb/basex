@@ -279,6 +279,20 @@ public final class XMLToken {
     return tb.finish();
   }
 
+  /**
+   * Checks if the specified token contains invalid XML 1.0 characters.
+   * @param token the token to be checked
+   * @return invalid character or {@code -1}
+   */
+  public static int invalid(final byte[] token) {
+    final TokenParser tp = new TokenParser(token);
+    while(tp.more()) {
+      final int cp = tp.next();
+      if(!XMLToken.valid(cp)) return cp;
+    }
+    return -1;
+  }
+
   /** HTML entities. */
   private static final String[] HTMLENTITIES = { "Aacute", "\u00c1", "aacute",
     "\u00e1", "Acirc", "\u00c2", "acirc", "\u00e2", "acute", "\u00b4",

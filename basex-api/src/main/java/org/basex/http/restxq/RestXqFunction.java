@@ -20,7 +20,6 @@ import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
@@ -209,13 +208,13 @@ public final class RestXqFunction extends WebFunction {
     // bind request body in the correct format
     final MainOptions mopts = conn.context.options;
     if(requestBody != null) {
-      final MediaType mt = conn.mediaType();
-      final IOContent payload = conn.requestCtx.payload();
+      final MediaType type = conn.mediaType();
+      final byte[] body = conn.requestCtx.body().read();
       final Value value;
       try {
-        value = HttpPayload.value(payload, mopts, mt);
+        value = HttpPayload.value(body, type, mopts);
       } catch(final IOException ex) {
-        throw error(BODY_TYPE_X_X, mt, ex);
+        throw error(BODY_TYPE_X_X, type, ex);
       }
       bind(requestBody, args, value, qc, "Request body");
     }

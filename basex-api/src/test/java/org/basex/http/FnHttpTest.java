@@ -16,7 +16,6 @@ import java.util.Map.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.QueryError.*;
@@ -628,7 +627,7 @@ public class FnHttpTest extends HTTPTest {
       conn.contentType = "text/plain; CHARSET=\\C\\P\\1\\2\\5\\2";
       new HttpResponse(null, ctx.options).getResponse(conn, true, null);
       fail("Encoding exception expected");
-    } catch(final DecodingException expected) { }
+    } catch(final QueryException expected) { }
   }
 
   /**

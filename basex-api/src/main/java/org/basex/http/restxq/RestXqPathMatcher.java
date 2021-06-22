@@ -185,7 +185,7 @@ final class RestXqPathMatcher {
       final InputInfo ii) throws QueryException {
 
     if(literals.length() > 0) {
-      final byte[] path = Token.decodeUri(Token.token(literals.toString()));
+      final byte[] path = Token.decodeUri(Token.token(literals.toString()), false);
       if(path == null) throw RestXqFunction.error(ii, INV_ENCODING_X, literals);
       final TokenBuilder tb = new TokenBuilder(path.length);
       for(final byte b : path) {

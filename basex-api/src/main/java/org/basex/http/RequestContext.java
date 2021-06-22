@@ -33,7 +33,7 @@ public final class RequestContext {
   /** Form parameters. */
   private Map<String, Value> form;
   /** Content body. */
-  private IOContent content;
+  private IOContent body;
 
   /**
    * Returns an immutable map with all query parameters.
@@ -108,15 +108,15 @@ public final class RequestContext {
   }
 
   /**
-   * Returns the cached payload.
+   * Returns the cached body.
    * @return value
    * @throws IOException I/O exception
    */
-  public IOContent payload() throws IOException {
-    if(content == null) {
-      content = new IOContent(BufferInput.get(request.getInputStream()).content());
+  public IOContent body() throws IOException {
+    if(body == null) {
+      body = new IOContent(BufferInput.get(request.getInputStream()).content());
     }
-    return content;
+    return body;
   }
 
   // PRIVATE FUNCTIONS ============================================================================
@@ -132,7 +132,7 @@ public final class RequestContext {
   private void addMultipart(final MediaType type, final MainOptions options,
       final Map<String, Value> map) throws QueryException, IOException {
 
-    try(InputStream is = payload().inputStream()) {
+    try(InputStream is = body().inputStream()) {
       final HttpPayload hp = new HttpPayload(is, true, null, options);
       hp.multiForm(type).forEach(map::put);
     }
@@ -144,7 +144,7 @@ public final class RequestContext {
    * @throws IOException I/O exception
    */
   private void addURLEncoded(final Map<String, Value> map) throws IOException {
-    for(final String param : Strings.split(payload().toString(), '&')) {
+    for(final String param : Strings.split(body().toString(), '&')) {
       final String[] parts = Strings.split(param, '=', 2);
       if(parts.length == 2) {
         final Atm atm = new Atm(URLDecoder.decode(parts[1], Strings.UTF8));

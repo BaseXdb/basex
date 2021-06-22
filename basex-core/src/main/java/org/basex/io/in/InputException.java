@@ -11,6 +11,14 @@ import java.io.*;
 public class InputException extends IOException {
   /**
    * Constructor.
+   * @param cp codepoint
+   */
+  public InputException(final int cp) {
+    this("Invalid XML 1.0 character (#" + cp + ')');
+  }
+
+  /**
+   * Constructor.
    * @param msg error message
    */
   InputException(final String msg) {

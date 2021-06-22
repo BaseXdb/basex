@@ -454,7 +454,7 @@ public final class HTTPConnection implements ClientInfo {
 
           String h2 = method + ':' + map.get(Request.URI);
           final String qop = map.get(Request.QOP);
-          if(Strings.eq(qop, AUTH_INT)) h2 += ':' + Strings.md5(requestCtx.payload().toString());
+          if(Strings.eq(qop, AUTH_INT)) h2 += ':' + Strings.md5(requestCtx.body().toString());
           final String ha2 = Strings.md5(h2);
 
           final StringBuilder sb = new StringBuilder(ha1).append(':').append(nonce);

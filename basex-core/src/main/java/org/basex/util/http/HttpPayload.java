@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import static org.basex.util.http.HttpText.*;
 
 import java.io.*;
-import java.net.*;
 import java.util.*;
 import java.util.zip.*;
 
@@ -36,6 +35,11 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class HttpPayload {
+  /** XML declaration (start). */
+  private static final byte[] DECLSTART = token("<?xml");
+  /** XML declaration (end). */
+  private static final byte[] DECLEND = token("?>");
+
   /** Payloads (may be {@code null}). */
   private final ItemList payloads;
   /** Input stream. */
@@ -86,14 +90,10 @@ public final class HttpPayload {
       body = new FElem(Q_BODY);
       if(payloads != null) {
         final InputStream in = GZIP.equals(encoding) ? new GZIPInputStream(input) : input;
-        // if something goes wrong, input streams will be closed outside the function
-        final byte[] pl = (type.isXML() || type.isText()
-          ? new NewlineInput(in).encoding(type.parameters().get(CHARSET))
-          : BufferInput.get(in)
-        ).content();
         Value value = Empty.VALUE;
         try {
-          value = parse(pl, type);
+          // if something goes wrong, input streams will be closed outside the function
+          value = parse(BufferInput.get(in).content(), type);
         } catch(final QueryException ex) {
           // ignore errors if response was triggered by an error anyway
           if(!error) throw ex;
@@ -122,7 +122,7 @@ public final class HttpPayload {
    */
   private Value parse(final byte[] payload, final MediaType type) throws QueryException {
     try {
-      return payload.length == 0 ? Empty.VALUE : value(new IOContent(payload), options, type);
+      return value(payload, type, options);
     } catch(final IOException ex) {
       throw HC_PARSE_X.get(info, ex);
     }
@@ -304,45 +304,76 @@ public final class HttpPayload {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Returns an XQuery value for the specified content type.
-   * @param input input source
+   * Returns an XQuery value for the specified body.
+   * @param body body
+   * @param type type of the body
    * @param options database options
-   * @param type media type
    * @return value
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public static Value value(final IO input, final MainOptions options, final MediaType type)
-      throws IOException, QueryException {
+  public static Value value(final byte[] body, final MediaType type,
+      final MainOptions options) throws IOException, QueryException {
 
-    if(type.isJSON()) {
+    final IOContent io = prepare(body, type);
+    if(io.length() == 0) {
+      return Empty.VALUE;
+    } else if(type.isJSON()) {
       final JsonParserOptions opts = new JsonParserOptions(options.get(MainOptions.JSONPARSER));
       opts.assign(type);
-      return JsonConverter.get(opts).convert(input);
+      return JsonConverter.get(opts).convert(io);
     } else if(type.isCSV()) {
       final CsvParserOptions opts = new CsvParserOptions(options.get(MainOptions.CSVPARSER));
       opts.assign(type);
-      return CsvConverter.get(opts).convert(input);
+      return CsvConverter.get(opts).convert(io);
     } else if(type.is(MediaType.TEXT_HTML)) {
       final HtmlOptions opts = new HtmlOptions(options.get(MainOptions.HTMLPARSER));
       opts.assign(type);
-      return new DBNode(new HtmlParser(input, options, opts));
-    } else if(type.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
-      String encoding = type.parameters().get(CHARSET);
-      if(encoding == null) encoding = Strings.UTF8;
-      return Str.get(URLDecoder.decode(string(input.read()), encoding));
+      return new DBNode(new HtmlParser(io, options, opts));
     } else if(type.isXML()) {
-      return new DBNode(input);
+      return new DBNode(io);
     } else if(type.isText()) {
-      return Str.get(new NewlineInput(input).content());
+      return Str.get(io.read());
+    } else if(type.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
+      try {
+        final byte[] decoded = decodeUri(io.read(), true);
+        final int cp = XMLToken.invalid(decoded);
+        if(cp != -1) throw new InputException(cp);
+        return Str.get(body);
+      } catch(final IllegalArgumentException ex) {
+        Util.debug(ex);
+        throw new IOException(ex.getMessage());
+      }
     } else if(type.isMultipart()) {
-      try(InputStream is = input.inputStream()) {
+      try(InputStream is = io.inputStream()) {
         final HttpPayload hp = new HttpPayload(is, true, null, options);
         hp.extractParts(concat(DASHES, hp.boundary(type)), null);
         return hp.payloads();
       }
     } else {
-      return B64.get(input.read());
+      return B64.get(io.read());
     }
+  }
+
+  /**
+   * Returns a normalized payload.
+   * @param body body
+   * @param type media type
+   * @return content
+   * @throws IOException I/O exception
+   */
+  private static IOContent prepare(final byte[] body, final MediaType type) throws IOException {
+    final String encoding = type.parameters().get(CHARSET);
+    byte[] data = body;
+    final boolean xml = type.isXML(), text = type.isText();
+    if(xml || text) {
+      // convert text to UTF8; skip redundant XML declaration
+      data = new NewlineInput(body).encoding(encoding).content();
+      if(xml && startsWith(data, DECLSTART)) {
+        final int d = indexOf(data, DECLEND, DECLSTART.length);
+        if(d != -1) data = substring(data, d + DECLEND.length);
+      }
+    }
+    return new IOContent(data);
   }
 }

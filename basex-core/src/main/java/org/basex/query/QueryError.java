@@ -496,7 +496,7 @@ public enum QueryError {
   // Web Module
 
   /** Error code. */
-  WEB_INVALID1_X(WEB, "invalid", "URL contains invalid characters: %"),
+  WEB_INVALID1_X(WEB, "invalid", "URL contains invalid character: &#%;"),
   /** Error code. */
   WEB_INVALID2_X(WEB, "invalid", "%."),
   /** Error code. */
@@ -1247,17 +1247,17 @@ public enum QueryError {
   /** Error code. */
   NSEMPTYURI(XQST, 85, "Namespace URI cannot be empty."),
   /** Error code. */
-  XQUERYENC2_X(XQST, 87, "Unknown encoding '%'."),
+  XQUERYENC2_X(XQST, 87, "Unknown encoding: %."),
   /** Error code. */
   NSMODURI(XQST, 88, "Module namespace cannot be empty."),
   /** Error code. */
   DUPLVAR_X(XQST, 89, "Duplicate declaration of %."),
   /** Error code. */
-  INVCHARREF_X(XQST, 90, "Invalid character reference '%'."),
+  INVCHARREF_X(XQST, 90, "Invalid XML 1.0 character: %."),
   /** Error code. */
   CIRCMODULE(XQST, 93, "Circular module declaration."),
   /** Error code. */
-  GVARNOTDEFINED_X(XQST, 94, "Undeclared grouping variable '%'."),
+  GVARNOTDEFINED_X(XQST, 94, "Undeclared grouping variable: %."),
   /** Error code. */
   INVDECFORM_X_X(XQST, 97, "Invalid decimal-format property: %='%'."),
   /** Error code. */
