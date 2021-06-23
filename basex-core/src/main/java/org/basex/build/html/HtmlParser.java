@@ -113,6 +113,7 @@ public final class HtmlParser extends XMLParser {
       final StringWriter sw = new StringWriter();
       final XMLReader reader = (XMLReader) Reflect.get(READER);
       final Object writer = Reflect.get(WRITER, sw);
+      opt(writer, HtmlOptions.ENCODING.name(), Strings.UTF8);
 
       // set TagSoup options
       if(opts.get(HtmlOptions.HTML)) {
