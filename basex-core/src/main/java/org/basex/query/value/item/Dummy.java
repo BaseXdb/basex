@@ -87,12 +87,12 @@ public final class Dummy extends Item {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     throw Util.notExpected();
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     final TokenList list = new TokenList().add(type.toString());
     if(data != null) list.add(data.meta.name);
     qs.token(getClass()).params(list.finish());

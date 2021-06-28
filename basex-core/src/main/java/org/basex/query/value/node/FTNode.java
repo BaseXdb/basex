@@ -83,8 +83,8 @@ public final class FTNode extends DBNode {
   }
 
   @Override
-  public void plan(final QueryString qs) {
-    super.plan(qs);
+  public void toString(final QueryString qs) {
+    super.toString(qs);
     if(matches != null) qs.paren(matches.size());
   }
 }

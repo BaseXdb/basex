@@ -44,12 +44,12 @@ public final class FTOrder extends FTFilter {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, QueryText.ORDERED, TRUE), exprs);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(exprs[0]).token(ORDERED);
   }
 }

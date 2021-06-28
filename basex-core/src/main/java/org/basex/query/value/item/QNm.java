@@ -346,7 +346,7 @@ public final class QNm extends Item {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(id());
   }
 

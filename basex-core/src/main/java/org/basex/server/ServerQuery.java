@@ -183,7 +183,7 @@ public final class ServerQuery extends Job {
   private void queryPlan() throws QueryIOException {
     if(ctx.options.get(MainOptions.XMLPLAN)) {
       info.append(NL).append(QUERY_PLAN).append(COL).append(NL);
-      info.append(qp.plan().serialize()).append(NL);
+      info.append(qp.toXml().serialize()).append(NL);
     }
   }
 

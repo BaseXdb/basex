@@ -78,12 +78,12 @@ public abstract class Pragma extends ExprInfo {
   }
 
   @Override
-  public final void plan(final QueryPlan plan) {
+  public final void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, VALUEE, value), name);
   }
 
   @Override
-  public final void plan(final QueryString qs) {
+  public final void toString(final QueryString qs) {
     qs.token(PRAGMA).token(name).token(value).token(PRAGMA2);
   }
 }

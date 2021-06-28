@@ -108,12 +108,12 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.attachVariable(plan.create(this), var, false));
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(var.id());
   }
 

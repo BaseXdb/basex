@@ -71,12 +71,12 @@ public final class FTScope extends FTFilter {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, same ? SAME : DIFFERENT, unit), exprs);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(exprs[0]).token(same ? SAME : DIFFERENT).token(unit);
   }
 }

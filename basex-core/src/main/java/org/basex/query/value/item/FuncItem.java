@@ -247,7 +247,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, NAME, name == null ? null : name.prefixId()), params, expr);
   }
 
@@ -266,7 +266,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     if(name != null) qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
     qs.token(anns).token(FUNCTION).params(params);
     qs.token(AS).token(funcType().declType).brace(expr);

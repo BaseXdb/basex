@@ -388,7 +388,7 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public final void plan(final QueryPlan plan) {
+  public final void toXml(final QueryPlan plan) {
     final ExprList list = new ExprList();
     final long size = arraySize();
     final int max = (int) Math.min(size, 5);
@@ -397,7 +397,7 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder();
     final Iterator<Value> iter = iterator(0);
     for(boolean fst = true; iter.hasNext(); fst = false) {

@@ -57,7 +57,7 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this));
   }
 }

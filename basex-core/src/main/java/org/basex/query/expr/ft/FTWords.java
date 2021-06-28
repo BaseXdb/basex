@@ -519,12 +519,12 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), ftOpt, occ, query);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     if(query instanceof AStr) {
       qs.token(query);
     } else {

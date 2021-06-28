@@ -111,7 +111,7 @@ public final class FTOpt extends ExprInfo {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     final FElem elem = plan.create(this,
       WILDCARDS, is(WC) ? TRUE : null, FUZZY, is(FZ) ? TRUE : null,
       ERRORS, errors != -1 ? errors : null, CASE, cs,
@@ -121,7 +121,7 @@ public final class FTOpt extends ExprInfo {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     final StringList list = new StringList();
     if(is(WC)) list.add(WILDCARDS);
     if(is(FZ)) list.add(errors != -1 ? FUZZY + ' ' + errors + ' ' + ERRORS : FUZZY);

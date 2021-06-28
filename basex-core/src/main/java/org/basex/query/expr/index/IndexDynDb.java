@@ -96,12 +96,12 @@ public final class IndexDynDb extends IndexDb {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), expr);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.function(Function._DB_NAME, expr);
   }
 }

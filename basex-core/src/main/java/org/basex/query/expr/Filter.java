@@ -342,13 +342,13 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final void plan(final QueryPlan plan) {
+  public final void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), root, exprs);
   }
 
   @Override
-  public final void plan(final QueryString qs) {
+  public final void toString(final QueryString qs) {
     qs.token(root);
-    super.plan(qs);
+    super.toString(qs);
   }
 }

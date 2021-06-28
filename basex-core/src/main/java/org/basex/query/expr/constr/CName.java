@@ -167,15 +167,15 @@ abstract class CName extends CNode {
   }
 
   @Override
-  public final void plan(final QueryPlan plan) {
+  public final void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), name, exprs);
   }
 
   @Override
-  public final void plan(final QueryString qs, final String kind) {
+  public final void toString(final QueryString qs, final String kind) {
     qs.token(kind);
     if(name instanceof QNm) qs.token(((QNm) name).id());
     else qs.brace(name);
-    super.plan(qs, null);
+    super.toString(qs, null);
   }
 }

@@ -101,12 +101,12 @@ public final class Extension extends Single {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), pragma, expr);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(pragma).brace(expr);
   }
 }

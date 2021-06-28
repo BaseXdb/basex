@@ -104,7 +104,7 @@ public final class Replace extends Update {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(REPLACE);
     if(value) qs.token(VALUEE).token(OF);
     qs.token(NODE).token(exprs[0]).token(WITH).token(exprs[1]);

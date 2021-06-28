@@ -121,12 +121,12 @@ public final class Arith extends Arr {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, OP, calc.name), exprs);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.tokens(exprs, ' ' + calc.name + ' ', true);
   }
 }

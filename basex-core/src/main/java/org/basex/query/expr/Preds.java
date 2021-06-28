@@ -360,7 +360,7 @@ public abstract class Preds extends Arr {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     for(final Expr expr : exprs) qs.bracket(expr);
   }
 }

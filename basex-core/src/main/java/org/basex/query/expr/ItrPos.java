@@ -177,12 +177,12 @@ public final class ItrPos extends Simple implements CmpPos {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, MIN, min, MAX, max == MAX_VALUE ? INF : max));
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.function(Function.POSITION);
     if(exact()) {
       qs.token("=").token(min);

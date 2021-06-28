@@ -581,12 +581,12 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final void plan(final QueryPlan plan) {
+  public final void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, NAME, definition.id()), exprs);
   }
 
   @Override
-  public final void plan(final QueryString qs) {
+  public final void toString(final QueryString qs) {
     qs.token(definition.id()).params(exprs);
   }
 }

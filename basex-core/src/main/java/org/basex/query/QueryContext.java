@@ -486,15 +486,15 @@ public final class QueryContext extends Job implements Closeable {
    * @param full include comprehensive information
    * @return query plan
    */
-  public FElem plan(final boolean full) {
+  public FElem toXml(final boolean full) {
     // only show root node if functions or variables exist
     final QueryPlan plan = new QueryPlan(compiled, closed, full);
     if(root != null) {
-      for(final StaticScope ss : QueryCompiler.usedDecls(root)) ss.plan(plan);
-      root.plan(plan);
+      for(final StaticScope ss : QueryCompiler.usedDecls(root)) ss.toXml(plan);
+      root.toXml(plan);
     } else {
-      funcs.plan(plan);
-      vars.plan(plan);
+      funcs.toXml(plan);
+      vars.toXml(plan);
     }
     return plan.root();
   }

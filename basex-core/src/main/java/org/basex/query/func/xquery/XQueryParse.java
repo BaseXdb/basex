@@ -73,7 +73,7 @@ public class XQueryParse extends StandardFunc {
       }
 
       if(opts.get(XQueryOptions.COMPILE)) qctx.compile();
-      if(opts.get(XQueryOptions.PLAN)) root.add(qctx.plan(false));
+      if(opts.get(XQueryOptions.PLAN)) root.add(qctx.toXml(false));
       return root;
     } catch(final QueryException ex) {
       if(!opts.get(XQueryOptions.PASS)) ex.info(info);

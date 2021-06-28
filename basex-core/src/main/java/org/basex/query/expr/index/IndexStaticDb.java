@@ -88,12 +88,12 @@ public final class IndexStaticDb extends IndexDb {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this));
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.quoted(Token.token(data.meta.name));
   }
 }

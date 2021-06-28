@@ -224,7 +224,7 @@ public final class Catch extends Single {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(CATCH);
     int c = 0;
     for(final NameTest test : tests) {

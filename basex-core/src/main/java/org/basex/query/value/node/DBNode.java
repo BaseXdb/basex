@@ -444,20 +444,20 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final void plan(final QueryPlan plan) {
+  public final void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, PRE, pre));
   }
 
   @Override
   public String toErrorString() {
     final QueryString qs = new QueryString();
-    plan(qs, true);
+    toString(qs, true);
     return qs.toString();
   }
 
   @Override
-  public void plan(final QueryString qs) {
-    plan(qs, false);
+  public void toString(final QueryString qs) {
+    toString(qs, false);
   }
 
   /**
@@ -465,7 +465,7 @@ public class DBNode extends ANode {
    * @param qs query string builder
    * @param error error representation
    */
-  private void plan(final QueryString qs, final boolean error) {
+  private void toString(final QueryString qs, final boolean error) {
     if(error || data.inMemory()) {
       switch((NodeType) type) {
         case ATTRIBUTE:

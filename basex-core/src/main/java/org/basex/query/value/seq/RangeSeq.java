@@ -120,13 +120,13 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     final long[] range = range(true);
     plan.add(plan.create(this, FROM, range[0], TO, range[1]));
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     final long[] range = range(false);
     final String arg = new QueryString().token(range[0]).token(TO).token(range[1]).toString();
     if(asc) {

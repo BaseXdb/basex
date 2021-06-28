@@ -63,9 +63,9 @@ public final class CComm extends CNode {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     if(computed) {
-      plan(qs, COMMENT);
+      toString(qs, COMMENT);
     } else {
       qs.concat("<!--", QueryString.toValue(((Str) exprs[0]).string()), "-->");
     }

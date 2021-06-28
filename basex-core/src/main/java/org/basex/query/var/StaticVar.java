@@ -174,12 +174,12 @@ public final class StaticVar extends StaticDecl {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, NAME, name.string()), expr);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(DECLARE).token(anns).token(VARIABLE).token(name());
     if(declType != null) qs.token(AS).token(declType);
     if(external) qs.token(EXTERNAL);

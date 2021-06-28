@@ -67,12 +67,12 @@ public final class FTContent extends FTFilter {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, CONTENT, content), exprs);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(exprs[0]);
     if(content == FTContents.START) qs.token(AT).token(START);
     if(content == FTContents.END) qs.token(AT).token(END);

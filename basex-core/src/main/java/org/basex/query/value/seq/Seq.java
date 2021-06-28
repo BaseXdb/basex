@@ -226,7 +226,7 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     final int max = (int) Math.min(size, 5);
     final ExprList list = new ExprList(max);
     for(long i = 0; i < max; i++) list.add(itemAt(i));
@@ -239,7 +239,7 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(build(false).finish());
   }
 

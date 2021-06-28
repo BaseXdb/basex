@@ -412,12 +412,12 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, NAME, name.string()));
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     final byte[] nm = name.string();
     final TokenBuilder tb = new TokenBuilder().add('<').add(nm);
     if(namespaces != null) {

@@ -253,14 +253,14 @@ public class TypeCheck extends Single {
   }
 
   @Override
-  public final void plan(final QueryPlan plan) {
+  public final void toXml(final QueryPlan plan) {
     final FElem elem = plan.create(this, AS, seqType());
     if(promote) plan.addAttribute(elem, PROMOTE, true);
     plan.add(elem, expr);
   }
 
   @Override
-  public final void plan(final QueryString qs) {
+  public final void toString(final QueryString qs) {
     qs.token("(").token(expr);
     if(promote) qs.token(PROMOTE).token(TO);
     else qs.token(TREAT).token(AS);

@@ -286,7 +286,7 @@ public final class Var extends ExprInfo {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.attachVariable(plan.create(this), this, true));
   }
 
@@ -299,7 +299,7 @@ public final class Var extends ExprInfo {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(id());
     if(declType != null) qs.token(AS).token(declType);
   }

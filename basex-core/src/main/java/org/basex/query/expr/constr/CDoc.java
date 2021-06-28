@@ -54,7 +54,7 @@ public final class CDoc extends CNode {
   }
 
   @Override
-  public void plan(final QueryString qs) {
-    plan(qs, DOCUMENT);
+  public void toString(final QueryString qs) {
+    toString(qs, DOCUMENT);
   }
 }

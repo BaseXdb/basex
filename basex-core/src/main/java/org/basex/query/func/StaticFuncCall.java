@@ -162,12 +162,12 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, NAME, name.string(), TAILCALL, tco), exprs);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(name.prefixId()).params(exprs);
   }
 }

@@ -207,9 +207,9 @@ public final class CElem extends CName {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     if(computed) {
-      plan(qs, ELEMENT);
+      toString(qs, ELEMENT);
     } else {
       final byte[] nm = ((QNm) name).string();
       qs.token('<').token(nm);

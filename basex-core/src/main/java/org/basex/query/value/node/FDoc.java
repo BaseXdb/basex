@@ -135,12 +135,12 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, BASE, uri));
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(DOCUMENT).brace(uri.length == 0 ? DOTS : QueryString.toQuoted(uri));
   }
 }

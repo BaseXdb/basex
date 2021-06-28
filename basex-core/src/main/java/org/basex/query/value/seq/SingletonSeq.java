@@ -89,12 +89,12 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), value);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.function(_UTIL_REPLICATE, value, size / value.size());
   }
 

@@ -75,13 +75,13 @@ public final class OrderKey extends Single {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, DIR, Token.token(desc ? DESCENDING : ASCENDING),
         Token.token(EMPTYY), Token.token(least ? LEAST : GREATEST)), expr);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(expr);
     if(desc) qs.token(DESCENDING);
     qs.token(EMPTYY).token(least ? LEAST : GREATEST);

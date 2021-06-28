@@ -92,7 +92,7 @@ public abstract class CNode extends Arr {
    * @param qs query string builder
    * @param kind node kind
    */
-  protected void plan(final QueryString qs, final String kind) {
+  protected void toString(final QueryString qs, final String kind) {
     if(kind != null) qs.token(kind);
     qs.token("{");
     if(exprs.length > 0) qs.tokens(exprs, SEP, false);

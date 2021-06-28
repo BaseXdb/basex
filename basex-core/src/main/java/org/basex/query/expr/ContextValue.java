@@ -94,7 +94,7 @@ public final class ContextValue extends Simple {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(".");
   }
 }

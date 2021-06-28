@@ -244,12 +244,12 @@ public final class Typeswitch extends ParseExpr {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), cond, groups);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(TYPESWITCH).paren(cond).tokens(groups);
   }
 }

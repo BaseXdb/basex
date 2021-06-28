@@ -61,10 +61,10 @@ public final class QueryPlan {
 
     for(final Object child : children) {
       if(child instanceof ExprInfo) {
-        ((ExprInfo) child).plan(this);
+        ((ExprInfo) child).toXml(this);
       } else if(child instanceof ExprInfo[]) {
         for(final ExprInfo ex : (ExprInfo[]) child) {
-          if(ex != null) ex.plan(this);
+          if(ex != null) ex.toXml(this);
         }
       } else if(child instanceof byte[]) {
         elem.add((byte[]) child);

@@ -151,12 +151,12 @@ public abstract class Test extends ExprInfo {
   public abstract String toString(boolean full);
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     throw Util.notExpected();
   }
 
   @Override
-  public final void plan(final QueryString qs) {
+  public final void toString(final QueryString qs) {
     qs.token(toString(true));
   }
 }

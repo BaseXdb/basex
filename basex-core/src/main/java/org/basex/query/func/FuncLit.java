@@ -117,7 +117,7 @@ public final class FuncLit extends Single implements Scope {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.concat(name.prefixId(), "#", params.length);
   }
 }

@@ -152,12 +152,12 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), copies, exprs);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(COPY);
     boolean more = false;
     for(final Let copy : copies) {

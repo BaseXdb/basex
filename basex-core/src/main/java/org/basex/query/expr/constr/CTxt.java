@@ -67,7 +67,7 @@ public final class CTxt extends CNode {
   }
 
   @Override
-  public void plan(final QueryString qs) {
-    plan(qs, TEXT);
+  public void toString(final QueryString qs) {
+    toString(qs, TEXT);
   }
 }

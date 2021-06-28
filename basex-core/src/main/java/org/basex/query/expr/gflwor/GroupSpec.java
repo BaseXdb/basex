@@ -89,12 +89,12 @@ public final class GroupSpec extends Single {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.attachVariable(plan.create(this), var, false), expr);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(var).token(ASSIGN).token(expr);
     if(coll != null) qs.token(COLLATION).token("\"").token(coll.uri()).token('"');
   }

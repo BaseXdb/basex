@@ -308,7 +308,7 @@ public final class List extends Arr {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.params(exprs);
   }
 }

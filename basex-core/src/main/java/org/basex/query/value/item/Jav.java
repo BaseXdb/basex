@@ -65,7 +65,7 @@ public final class Jav extends Item {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.quoted(Token.token(value.toString()));
   }
 }

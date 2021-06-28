@@ -132,12 +132,12 @@ public final class CmpN extends Cmp {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, OP, op.name), exprs);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.tokens(exprs, " " + op + ' ', true);
   }
 }

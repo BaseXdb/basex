@@ -34,13 +34,13 @@ public abstract class ExprInfo {
    * Creates a query plan.
    * @param plan expression plan
    */
-  public abstract void plan(QueryPlan plan);
+  public abstract void toXml(QueryPlan plan);
 
   /**
    * Creates a query string.
    * @param qs query string builder
    */
-  public abstract void plan(QueryString qs);
+  public abstract void toString(QueryString qs);
 
   /**
    * Returns a string representation of the expression that can be embedded in error messages.

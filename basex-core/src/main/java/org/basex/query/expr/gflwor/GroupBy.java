@@ -341,12 +341,12 @@ public final class GroupBy extends Clause {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), specs);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     final int pl = post.length;
     for(int p = 0; p < pl; p++) {
       qs.token(LET).token("(: post-group :)").token(post[p]).token(ASSIGN).token(preExpr[p]);

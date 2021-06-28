@@ -141,12 +141,12 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), weight, exprs[0]);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(exprs[0]).token(WEIGHT).brace(weight);
   }
 }

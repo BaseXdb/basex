@@ -50,12 +50,12 @@ public final class FNSpace extends FNode {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, NAME, name, VALUEE, value));
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder().add(Token.XMLNS);
     if(name.length != 0) tb.add(':').add(name);
     tb.add('=').add(QueryString.toQuoted(value));

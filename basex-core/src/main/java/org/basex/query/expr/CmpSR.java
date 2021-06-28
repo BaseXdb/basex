@@ -207,13 +207,13 @@ public final class CmpSR extends Single {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, MIN, min, MAX, max, INCLUDE_MIN, mni, INCLUDE_MAX, mxi,
         SINGLE, single), expr);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     if(min != null) qs.token(expr).token(mni ? ">=" : ">").quoted(min);
     if(min != null && max != null) qs.token(AND);
     if(max != null) qs.token(expr).token(mxi ? "<=" : "<").quoted(max);

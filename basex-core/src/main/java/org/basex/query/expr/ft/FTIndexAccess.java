@@ -116,12 +116,12 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), db, ftexpr);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     Expr expr = ftexpr;
     if(ftexpr instanceof FTWords) {
       final FTWords ftw = (FTWords) ftexpr;

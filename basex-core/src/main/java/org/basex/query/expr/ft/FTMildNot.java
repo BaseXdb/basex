@@ -108,7 +108,7 @@ public final class FTMildNot extends FTExpr {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.tokens(exprs, ' ' + NOT + ' ' + IN + ' ', true);
   }
 }

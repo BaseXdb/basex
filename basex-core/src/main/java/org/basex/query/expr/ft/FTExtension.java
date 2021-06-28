@@ -51,12 +51,12 @@ public final class FTExtension extends FTExpr {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), pragma, exprs);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(pragma).brace(exprs[0]);
   }
 }

@@ -163,7 +163,7 @@ public final class SwitchGroup extends Arr {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     final int el = exprs.length;
     for(int e = 1; e < el; e++) qs.token(CASE).token(exprs[e]);
     if(el == 1) qs.token(DEFAULT);

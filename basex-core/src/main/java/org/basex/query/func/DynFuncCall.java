@@ -201,12 +201,12 @@ public final class DynFuncCall extends FuncCall {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, TAILCALL, tco), exprs);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     final int el = exprs.length - 1;
     qs.token(exprs[el]).token('(');
     for(int e = 0; e < el; e++) {

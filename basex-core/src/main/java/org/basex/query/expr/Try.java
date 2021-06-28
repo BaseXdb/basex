@@ -193,12 +193,12 @@ public final class Try extends Single {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), expr, catches);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(TRY).brace(expr).tokens(catches);
   }
 }

@@ -97,12 +97,12 @@ public final class Unary extends Single {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, VALUEE, minus), expr);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     if(minus) qs.token("-");
     qs.token(expr);
   }

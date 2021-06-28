@@ -336,13 +336,13 @@ public final class Window extends Clause {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     final FElem elem = plan.attachVariable(plan.create(this, SLIDING, sliding), var, false);
     plan.add(elem, start, end, expr);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(FOR).token(sliding ? SLIDING : TUMBLING).token(WINDOW).token(var).token(IN).
       token(expr).token(start);
     if(end != null) {

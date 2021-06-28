@@ -132,12 +132,12 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, DISTANCE, min + "-" + max + ' ' + unit), exprs);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(exprs[0]).token(DISTANCE).paren(min + "-" + max + ' ' + unit);
   }
 }

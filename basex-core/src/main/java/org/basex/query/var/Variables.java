@@ -127,7 +127,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     if(vars.isEmpty()) return;
 
     final ArrayList<ExprInfo> list = new ArrayList<>(vars.size());
@@ -136,7 +136,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     for(final VarEntry ve : vars.values()) qs.token(ve.var);
   }
 

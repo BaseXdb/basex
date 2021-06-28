@@ -274,12 +274,12 @@ public final class If extends Arr {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), cond, exprs);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token("(").token(QueryText.IF).paren(cond).token(QueryText.THEN).token(exprs[0]);
     qs.token(QueryText.ELSE).token(exprs[1]).token(')');
   }

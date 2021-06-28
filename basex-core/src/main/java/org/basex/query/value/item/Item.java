@@ -338,12 +338,11 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     try {
       plan.add(plan.create(this), QueryString.toValue(string(null)));
     } catch(final QueryException ex) {
-      // only function items throw exceptions in atomization, and they should
-      // override plan(Serializer) sensibly
+      // only function items throw exceptions in atomization, and they should override sensibly
       throw Util.notExpected(ex);
     }
   }

@@ -75,12 +75,12 @@ public final class FPI extends FNode {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, NAME, name.string(), VALUEE, value));
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.concat(OPEN, name.string(), " ", QueryString.toValue(value), CLOSE);
   }
 

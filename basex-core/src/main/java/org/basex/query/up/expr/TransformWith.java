@@ -147,7 +147,7 @@ public final class TransformWith extends Arr {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(exprs[0]).token(UPDATE).brace(exprs[1]);
   }
 }

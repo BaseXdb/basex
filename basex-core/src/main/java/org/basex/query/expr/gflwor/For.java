@@ -231,7 +231,7 @@ public final class For extends ForLet {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     final FElem elem = plan.attachVariable(plan.create(this), var, false);
     if(empty) plan.addAttribute(elem, EMPTYY, true);
     if(pos != null) plan.addElement(elem, plan.create(AT, pos));
@@ -240,7 +240,7 @@ public final class For extends ForLet {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(FOR).token(var);
     if(empty) qs.token(ALLOWING).token(EMPTYY);
     if(pos != null) qs.token(AT).token(pos);

@@ -70,7 +70,7 @@ public abstract class AStr extends Item {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.quoted(value);
   }
 }

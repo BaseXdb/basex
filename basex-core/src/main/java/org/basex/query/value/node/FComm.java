@@ -50,7 +50,7 @@ public final class FComm extends FNode {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.concat("<!--", QueryString.toValue(value), "-->");
   }
 

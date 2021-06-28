@@ -70,7 +70,7 @@ public final class CNSpace extends CName {
   }
 
   @Override
-  public void plan(final QueryString qs) {
-    plan(qs, NAMESPACE);
+  public void toString(final QueryString qs) {
+    toString(qs, NAMESPACE);
   }
 }

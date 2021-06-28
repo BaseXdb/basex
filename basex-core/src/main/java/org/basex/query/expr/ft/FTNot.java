@@ -115,7 +115,7 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(FTNOT).token(exprs[0]);
   }
 }

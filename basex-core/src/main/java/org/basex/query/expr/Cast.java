@@ -106,12 +106,12 @@ public final class Cast extends Single {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, AS, seqType), expr);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     if(seqType.one()) {
       qs.token("(").token(expr).token(CAST).token(AS).token(seqType).token(')');
     } else {

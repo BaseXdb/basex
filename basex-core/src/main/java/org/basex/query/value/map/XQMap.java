@@ -258,7 +258,7 @@ public final class XQMap extends XQData {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     try {
       final int size = mapSize();
       final Value keys = keys();
@@ -275,7 +275,7 @@ public final class XQMap extends XQData {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(MAP).brace(root.append(new StringBuilder()).toString().replaceAll(", $", ""));
   }
 }

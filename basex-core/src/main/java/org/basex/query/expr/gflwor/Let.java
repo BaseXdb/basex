@@ -133,14 +133,14 @@ public final class Let extends ForLet {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     final FElem elem = plan.attachVariable(plan.create(this), var, false);
     if(scoring) plan.addAttribute(elem, SCORE, true);
     plan.add(elem, expr);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(LET);
     if(scoring) qs.token(SCORE);
     qs.token(var).token(ASSIGN).token(expr);

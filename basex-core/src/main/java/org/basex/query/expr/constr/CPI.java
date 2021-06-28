@@ -77,9 +77,9 @@ public final class CPI extends CName {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     if(computed) {
-      plan(qs, PROCESSING_INSTRUCTION);
+      toString(qs, PROCESSING_INSTRUCTION);
     } else {
       qs.concat(FPI.OPEN, ((Str) name).string(), " ",
           QueryString.toValue(((Str) exprs[0]).string()), FPI.CLOSE);

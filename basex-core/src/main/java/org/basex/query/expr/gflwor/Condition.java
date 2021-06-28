@@ -186,7 +186,7 @@ public final class Condition extends Single {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     final FElem elem = plan.create(start ? START : END, item);
     if(pos  != null) plan.addElement(elem, plan.create(AT, pos));
     if(prev != null) plan.addElement(elem, plan.create(PREVIOUS, prev));
@@ -194,7 +194,7 @@ public final class Condition extends Single {
     plan.add(elem, expr);
   }
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(start ? START : END);
     if(item != null) qs.token(item);
     if(pos  != null) qs.token(AT).token(pos);

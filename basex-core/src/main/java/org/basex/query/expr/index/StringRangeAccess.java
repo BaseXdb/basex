@@ -119,12 +119,12 @@ public final class StringRangeAccess extends IndexAccess {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, INDEX, index.type(), MIN, index.min, MAX, index.max), db);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     final Function function = index.type() == IndexType.TEXT ? Function._DB_TEXT_RANGE :
       Function._DB_ATTRIBUTE_RANGE;
     qs.function(function, db, Str.get(index.min), Str.get(index.max));

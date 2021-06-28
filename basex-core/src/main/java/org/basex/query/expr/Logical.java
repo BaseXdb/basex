@@ -90,7 +90,7 @@ public abstract class Logical extends Arr {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), exprs);
   }
 }

@@ -129,7 +129,7 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.tokens(exprs, ' ' + FTAND + ' ', true);
   }
 }

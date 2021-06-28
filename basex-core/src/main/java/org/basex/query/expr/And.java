@@ -71,7 +71,7 @@ public final class And extends Logical {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.tokens(exprs, ' ' + AND + ' ', true);
   }
 }

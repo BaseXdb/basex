@@ -320,12 +320,12 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), cond, groups);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(SWITCH).paren(cond).tokens(groups);
   }
 }

@@ -82,7 +82,7 @@ public final class Range extends Arr {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.tokens(exprs, ' ' + TO + ' ', true);
   }
 }

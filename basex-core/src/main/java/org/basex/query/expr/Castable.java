@@ -87,12 +87,12 @@ public final class Castable extends Single {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, AS, seqType), expr);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(expr).token(CASTABLE).token(AS).token(seqType);
   }
 }

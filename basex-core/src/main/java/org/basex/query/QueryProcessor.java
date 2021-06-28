@@ -317,11 +317,11 @@ public final class QueryProcessor extends Job implements Closeable {
   }
 
   /**
-   * Returns a tree representation of the query plan.
-   * @return root node
+   * Returns a query plan as XML.
+   * @return query plan
    */
-  public FDoc plan() {
-    return new FDoc().add(qc.plan(qc.context.options.get(MainOptions.FULLPLAN)));
+  public FElem toXml() {
+    return qc.toXml(qc.context.options.get(MainOptions.FULLPLAN));
   }
 
   @Override

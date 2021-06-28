@@ -126,12 +126,12 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, WINDOW, unit), win, exprs);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(exprs[0]).token(WINDOW).token(win).token(unit);
   }
 }

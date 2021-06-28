@@ -77,7 +77,7 @@ public final class Ann {
    * Adds the annotation to a query string.
    * @param qs query string builder
    */
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.concat("%", sig != null ? sig.id() : name.prefixId(XQ_URI));
     if(args.length != 0) qs.params(args);
   }

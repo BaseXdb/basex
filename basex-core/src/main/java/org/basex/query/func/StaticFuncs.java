@@ -236,7 +236,7 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     if(funcs.isEmpty()) return;
 
     final ArrayList<ExprInfo> list = new ArrayList<>(funcs.size());
@@ -245,7 +245,7 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     for(final FuncCache fc : funcs.values()) {
       if(fc.func != null && fc.func.compiled()) qs.token(fc.func).token(Text.NL);
     }

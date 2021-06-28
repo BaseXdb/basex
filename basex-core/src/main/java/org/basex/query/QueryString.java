@@ -36,9 +36,9 @@ public final class QueryString {
   public QueryString token(final Object token) {
     space();
     if(token instanceof ExprInfo) {
-      ((ExprInfo) token).plan(this);
+      ((ExprInfo) token).toString(this);
     } else if(token instanceof AnnList) {
-      ((AnnList) token).plan(this);
+      ((AnnList) token).toString(this);
     } else {
       final byte[] t = Token.token(token);
       tb.add(last() == ' ' && Token.startsWith(t, ' ') ? Token.substring(t, 1) : t);

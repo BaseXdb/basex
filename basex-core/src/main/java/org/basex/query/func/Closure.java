@@ -471,7 +471,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     final ArrayList<Object> list = new ArrayList<>();
     global.forEach((key, value) -> {
       list.add(key);
@@ -485,7 +485,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     final boolean inlined = !global.isEmpty();
     if(inlined) {
       qs.token("((: inline-closure :)");

@@ -118,7 +118,7 @@ public final class PartFunc extends Arr {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(body()).token('(');
     int p = -1;
     final int el = exprs.length, hs = holes.length;

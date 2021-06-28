@@ -28,7 +28,7 @@ public abstract class QueryPlanTest extends SandboxTest {
       // compile query
       qp.compile();
       // retrieve compiled query plan
-      final FDoc plan = qp.plan();
+      final FDoc plan = new FDoc().add(qp.toXml());
       // compare results
       if(expected != null) {
         final String result = normNL(qp.value().serialize().toString());

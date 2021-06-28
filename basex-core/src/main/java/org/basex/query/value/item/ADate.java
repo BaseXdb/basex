@@ -503,7 +503,7 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
-  public final void plan(final QueryString qs) {
+  public final void toString(final QueryString qs) {
     qs.quoted(string(null));
   }
 }

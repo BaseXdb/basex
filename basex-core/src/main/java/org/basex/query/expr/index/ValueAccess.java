@@ -324,12 +324,12 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, INDEX, type, NAME, test), db, toExpr());
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     final Function function = type == IndexType.TEXT ? Function._DB_TEXT :
       type == IndexType.ATTRIBUTE ? Function._DB_ATTRIBUTE : Function._DB_TOKEN;
     qs.function(function, db, toExpr());

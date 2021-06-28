@@ -156,12 +156,12 @@ public final class MainModule extends AModule {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
-    expr.plan(plan);
+  public void toXml(final QueryPlan plan) {
+    expr.toXml(plan);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(expr);
   }
 

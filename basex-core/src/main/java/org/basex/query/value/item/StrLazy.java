@@ -110,9 +110,9 @@ public final class StrLazy extends AStr implements Lazy {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     if(isCached()) {
-      super.plan(qs);
+      super.toString(qs);
     } else {
       qs.function(Function._FILE_READ_TEXT, input);
     }

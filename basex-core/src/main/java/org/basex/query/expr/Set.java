@@ -231,12 +231,12 @@ abstract class Set extends Arr {
   }
 
   @Override
-  public final void plan(final QueryPlan plan) {
+  public final void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, ITERATIVE, iterative), exprs);
   }
 
   @Override
-  public final void plan(final QueryString qs) {
+  public final void toString(final QueryString qs) {
     qs.tokens(exprs, ' ' + Util.className(this).toLowerCase(Locale.ENGLISH) + ' ', true);
   }
 

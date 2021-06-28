@@ -1142,12 +1142,12 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final void plan(final QueryPlan plan) {
+  public final void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), root, steps);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     if(root != null) qs.token(root).token('/');
     qs.tokens(steps, "/");
   }

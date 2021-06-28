@@ -88,9 +88,9 @@ public final class CAttr extends CName {
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     if(computed) {
-      plan(qs, ATTRIBUTE);
+      toString(qs, ATTRIBUTE);
     } else {
       qs.token(((QNm) name).string()).token('=');
       if(exprs.length == 1 && exprs[0] instanceof Str) {

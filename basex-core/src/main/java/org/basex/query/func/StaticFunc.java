@@ -299,12 +299,12 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public void plan(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, NAME, name.string()), params, expr);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.token(DECLARE).token(anns).token(FUNCTION).token(name.prefixId()).params(params);
     if(declType != null) qs.token(AS).token(declType);
     if(expr != null) qs.brace(expr);

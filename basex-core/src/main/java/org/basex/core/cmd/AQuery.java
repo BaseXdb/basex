@@ -210,7 +210,7 @@ public abstract class AQuery extends Command {
         // show XML plan
         if(options.get(MainOptions.XMLPLAN)) {
           info(NL + QUERY_PLAN + COL);
-          info(qp.plan().serialize().toString());
+          info(qp.toXml().serialize().toString());
         }
         plan = true;
       } catch(final Exception ex) {

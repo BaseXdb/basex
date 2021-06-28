@@ -388,13 +388,13 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public final void plan(final QueryPlan plan) {
+  public final void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, QueryText.AXIS, axis.name, QueryText.TEST,
         test.toString(false)), exprs);
   }
 
   @Override
-  public void plan(final QueryString qs) {
+  public void toString(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder();
     if(test == KindTest.NOD) {
       if(axis == Axis.PARENT) tb.add("..");
@@ -416,6 +416,6 @@ public abstract class Step extends Preds {
       }
     }
     qs.token(tb.finish());
-    super.plan(qs);
+    super.toString(qs);
   }
 }

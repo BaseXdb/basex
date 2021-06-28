@@ -113,7 +113,7 @@ public final class AnnList extends ObjectList<Ann, AnnList> {
    * Adds the annotations to a query string.
    * @param qs query string builder
    */
-  public void plan(final QueryString qs) {
-    for(final Ann ann : this) ann.plan(qs);
+  public void toString(final QueryString qs) {
+    for(final Ann ann : this) ann.toString(qs);
   }
 }
