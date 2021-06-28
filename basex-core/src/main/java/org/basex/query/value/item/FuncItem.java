@@ -254,25 +254,22 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public String toErrorString() {
     final QueryString qs = new QueryString();
-    final StringList list = new StringList(params.length);
-    for(final Var param : params) list.add(param.toErrorString());
-    toString(qs, list.finish());
+    if(name != null) {
+      qs.concat(name.prefixId(), "#", arity());
+    } else {
+      final StringList list = new StringList(params.length);
+      for(final Var param : params) list.add(param.toErrorString());
+      qs.token(anns).token(FUNCTION).params(list.finish()).token(AS);
+      qs.token(funcType().declType).brace(expr);
+    }
     return qs.toString();
   }
 
   @Override
   public void plan(final QueryString qs) {
-    toString(qs, params);
-  }
-
-  /**
-   * Creates a string representation.
-   * @param qs query string builder
-   * @param list list of parameters
-   */
-  private void toString(final QueryString qs, final Object[] list) {
     if(name != null) qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
-    qs.token(anns).token(FUNCTION).params(list).token(AS).token(funcType().declType).brace(expr);
+    qs.token(anns).token(FUNCTION).params(params);
+    qs.token(AS).token(funcType().declType).brace(expr);
   }
 
   /**

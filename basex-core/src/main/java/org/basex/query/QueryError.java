@@ -547,7 +547,7 @@ public enum QueryError {
   // W3 Functions
 
   /** Error code. */
-  APPLY_X_X(FOAP, 1, "Arity differs from number of array members: % vs. %"),
+  APPLY_X_X(FOAP, 1, "% supplied to %: %."),
 
   /** Error code. */
   DIVZERO_X(FOAR, 1, "% cannot be divided by zero."),
@@ -1048,7 +1048,7 @@ public enum QueryError {
   JAVAEVAL_X_X_X(XPTY, 4, "%. Caused by: %(%)."),
 
   /** Error code. */
-  ZEROFUNCS_X_X(XPTY, 4, "Zero-arity functions expected, % found: %."),
+  ZEROFUNCS_X_X(XPTY, 4, "Function with 0 arguments expected, % found: %."),
   /** Error code. */
   NONAME_X(XPTY, 4, "Name expected, '%' found."),
   /** Error code. */

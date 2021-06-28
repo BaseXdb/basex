@@ -25,7 +25,7 @@ public class FnApply extends StandardFunc {
     final XQArray array = toArray(exprs[1], qc);
 
     final long ar = checkUp(func, this instanceof UpdateApply, sc).arity(), as = array.arraySize();
-    if(ar != as) throw APPLY_X_X.get(info, ar, as);
+    if(ar != as) throw APPLY_X_X.get(info, arguments(ar), func, array);
 
     final ValueList values = new ValueList(as);
     for(final Value value : array.members()) values.add(value);
