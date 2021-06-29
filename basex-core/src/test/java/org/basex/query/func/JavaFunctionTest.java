@@ -151,6 +151,9 @@ public final class JavaFunctionTest extends SandboxTest {
         WHICHFUNC_X);
     error("import module namespace n='org.basex.query.func.JavaFunctionExample'; n:x()",
         WHICHFUNC_X);
+
+    error("import module namespace n='org.basex.query.func.JavaFunctionExample'; n:null-array()",
+        BASEX_JAVA);
   }
 
   /** Ensure that items cannot be cast to Java. */

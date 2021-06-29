@@ -66,7 +66,7 @@ public abstract class JavaCall extends Arr {
     // check permission
     if(!qc.context.user().has(perm)) throw BASEX_PERMISSION_X_X.get(info, perm, this);
 
-    final Value value = toValue(eval(qc), qc, sc);
+    final Value value = toValue(eval(qc), qc, sc, info);
     if(!updating) return value;
 
     // updating function: cache output
@@ -89,11 +89,12 @@ public abstract class JavaCall extends Arr {
    * @param object result object
    * @param qc query context
    * @param sc static context
+   * @param info input info
    * @return value
    * @throws QueryException query exception
    */
-  public static Value toValue(final Object object, final QueryContext qc, final StaticContext sc)
-      throws QueryException {
+  public static Value toValue(final Object object, final QueryContext qc, final StaticContext sc,
+      final InputInfo info) throws QueryException {
 
     if(object == null) return Empty.VALUE;
     if(object instanceof Value) return (Value) object;
@@ -102,6 +103,13 @@ public abstract class JavaCall extends Arr {
     final Type type = type(object);
     if(type != null) return type.cast(object, qc, sc, null);
 
+    // no array: return Java type
+    if(!object.getClass().isArray()) return new Jav(object, qc);
+
+    // empty array
+    final int s = Array.getLength(object);
+    if(s == 0) return Empty.VALUE;
+
     // primitive arrays
     if(object instanceof byte[])    return BytSeq.get((byte[]) object);
     if(object instanceof long[])    return IntSeq.get((long[]) object);
@@ -109,20 +117,6 @@ public abstract class JavaCall extends Arr {
     if(object instanceof boolean[]) return BlnSeq.get((boolean[]) object);
     if(object instanceof double[])  return DblSeq.get((double[]) object);
     if(object instanceof float[])   return FltSeq.get((float[]) object);
-
-    // no array: return Java type
-    if(!object.getClass().isArray()) return new Jav(object, qc);
-
-    // empty array
-    final int s = Array.getLength(object);
-    if(s == 0) return Empty.VALUE;
-    // string array
-    if(object instanceof String[]) {
-      final String[] r = (String[]) object;
-      final byte[][] b = new byte[r.length][];
-      for(int v = 0; v < s; v++) b[v] = token(r[v]);
-      return StrSeq.get(b);
-    }
     // character array
     if(object instanceof char[][]) {
       final char[][] r = (char[][]) object;
@@ -144,9 +138,21 @@ public abstract class JavaCall extends Arr {
       for(int v = 0; v < s; v++) b[v] = r[v];
       return IntSeq.get(b, AtomType.INT);
     }
-    // any other array (also nested ones)
+
+    // check for null values
+    for(final Object obj : (Object[]) object) {
+      if(obj == null) throw BASEX_JAVA.get(info);
+    }
+    // string array
+    if(object instanceof String[]) {
+      final String[] r = (String[]) object;
+      final byte[][] b = new byte[r.length][];
+      for(int v = 0; v < s; v++) b[v] = token(r[v]);
+      return StrSeq.get(b);
+    }
+    // any other array (including nested ones)
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Object obj : (Object[]) object) vb.add(toValue(obj, qc, sc));
+    for(final Object obj : (Object[]) object) vb.add(toValue(obj, qc, sc, info));
     return vb.value();
   }
 

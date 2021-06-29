@@ -20,6 +20,6 @@ public final class RequestAttribute extends ApiFunc {
     final Value dflt = exprs.length == 1 ? Empty.VALUE : exprs[1].value(qc);
 
     final Object object = request(qc).getAttribute(name);
-    return object != null ? JavaCall.toValue(object, qc, sc) : dflt;
+    return object != null ? JavaCall.toValue(object, qc, sc, info) : dflt;
   }
 }

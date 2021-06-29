@@ -39,6 +39,8 @@ public enum QueryError {
   /** Error code. */
   BASEX_HTTP(BASEX, "http", "HTTP connection required."),
   /** Error code. */
+  BASEX_JAVA(BASEX, "java", "Java array contains null values."),
+  /** Error code. */
   BASEX_OPTIONS1_X(BASEX, "options", "Unknown database option: %."),
   /** Error code. */
   BASEX_OPTIONS2_X(BASEX, "options", "%"),

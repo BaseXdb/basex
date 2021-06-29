@@ -33,7 +33,7 @@ public class JavaFunctionExample {
   }
 
   /**
-   * Constructor.
+   * Returns a string.
    * @param f argument
    * @return parameter
    */
@@ -42,7 +42,7 @@ public class JavaFunctionExample {
   }
 
   /**
-   * Constructor.
+   * Returns a boolean.
    * @param b argument
    * @return parameter
    */
@@ -51,7 +51,7 @@ public class JavaFunctionExample {
   }
 
   /**
-   * Constructor.
+   * Returns a boolean.
    * @param b argument
    * @return parameter
    */
@@ -60,7 +60,7 @@ public class JavaFunctionExample {
   }
 
   /**
-   * Constructor.
+   * Returns a boolean object.
    * @param b argument
    * @return parameter
    */
@@ -69,7 +69,7 @@ public class JavaFunctionExample {
   }
 
   /**
-   * Constructor.
+   * Returns a string.
    * @param g argument
    * @return parameter
    */
@@ -78,12 +78,20 @@ public class JavaFunctionExample {
   }
 
   /**
-   * Constructor.
+   * Returns an integer object.
    * @param g argument
    * @return parameter
    */
   public Object g(final Integer g) {
     return g;
+  }
+
+  /**
+   * Returns an array with a null value.
+   * @return array
+   */
+  public Object nullArray() {
+    return new Object[] { null };
   }
 
   /**

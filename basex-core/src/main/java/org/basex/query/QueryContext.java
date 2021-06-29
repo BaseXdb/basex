@@ -725,7 +725,7 @@ public final class QueryContext extends Job implements Closeable {
 
     // no type specified: return original value or convert Java object
     if(type == null || type.isEmpty()) {
-      return object instanceof Value ? (Value) object : JavaCall.toValue(object, this, sc);
+      return object instanceof Value ? (Value) object : JavaCall.toValue(object, this, sc, null);
     }
 
     // convert to json
