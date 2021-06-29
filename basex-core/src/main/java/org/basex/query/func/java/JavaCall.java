@@ -85,7 +85,7 @@ public abstract class JavaCall extends Arr {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Converts the specified result to an XQuery value.
+   * Converts the specified object to an XQuery value.
    * @param object result object
    * @param qc query context
    * @param sc static context

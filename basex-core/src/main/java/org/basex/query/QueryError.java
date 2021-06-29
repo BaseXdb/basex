@@ -144,6 +144,8 @@ public enum QueryError {
   /** Error code. */
   CONVERT_INTEGER_X_X(CONVERT, "integer", "Invalid digit for base %: %."),
   /** Error code. */
+  CONVERT_JAVA_X(CONVERT, "java", "Java object cannot be converted: %."),
+  /** Error code. */
   CONVERT_KEY_X(CONVERT, "key", "Key could not be decoded: %."),
 
   // Cryptographic Module

@@ -1,5 +1,9 @@
 package org.basex.query.func;
 
+import java.util.*;
+
+import org.basex.util.list.*;
+
 /**
  * Java binding example.
  *
@@ -92,6 +96,25 @@ public class JavaFunctionExample {
    */
   public Object nullArray() {
     return new Object[] { null };
+  }
+
+  /**
+   * Returns an array with a null value.
+   * @return array
+   */
+  public Object data() {
+    final ArrayList<Object> list = new ArrayList<>();
+    list.add("a");
+    final StringList sl = new StringList();
+    sl.add("b");
+    list.add(sl);
+    final HashSet<String> set = new HashSet<>();
+    set.add("c");
+    list.add(set);
+    final HashMap<String, String> map = new HashMap<>();
+    map.put("d", "e");
+    list.add(map);
+    return new Object[] { list, "f" };
   }
 
   /**
