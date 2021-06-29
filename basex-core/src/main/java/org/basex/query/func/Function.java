@@ -842,18 +842,6 @@ public enum Function implements AFunction {
       "binary-to-string(binary[,encoding[,fallback]])",
       arg(BINARY_O, STRING_O, BOOLEAN_O), STRING_O, CONVERT_URI),
   /** XQuery function. */
-  _CONVERT_INTEGER_FROM_BASE(ConvertIntegerFromBase::new, "integer-from-base(string,base)",
-      arg(STRING_O, INTEGER_O), INTEGER_O, CONVERT_URI),
-  /** XQuery function. */
-  _CONVERT_INTEGER_TO_BASE(ConvertIntegerToBase::new, "integer-to-base(number,base)",
-      arg(INTEGER_O, INTEGER_O), STRING_O, CONVERT_URI),
-  /** XQuery function. */
-  _CONVERT_INTEGER_TO_DATETIME(ConvertIntegerToDateTime::new, "integer-to-dateTime(ms)",
-      arg(INTEGER_O), DATE_TIME_O, CONVERT_URI),
-  /** XQuery function. */
-  _CONVERT_INTEGER_TO_DAYTIME(ConvertIntegerToDayTime::new, "integer-to-dayTime(ms)",
-      arg(INTEGER_O), DAY_TIME_DURATION_O, CONVERT_URI),
-  /** XQuery function. */
   _CONVERT_DATETIME_TO_INTEGER(ConvertDateTimeToInteger::new, "dateTime-to-integer(date)",
       arg(DATE_TIME_O), INTEGER_O, CONVERT_URI),
   /** XQuery function. */
@@ -865,6 +853,18 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _CONVERT_ENCODE_KEY(ConvertEncodeKey::new, "encode-key(string[,lax])",
       arg(STRING_O, BOOLEAN_O), STRING_O, CONVERT_URI),
+  /** XQuery function. */
+  _CONVERT_INTEGER_FROM_BASE(ConvertIntegerFromBase::new, "integer-from-base(string,base)",
+      arg(STRING_O, INTEGER_O), INTEGER_O, CONVERT_URI),
+  /** XQuery function. */
+  _CONVERT_INTEGER_TO_BASE(ConvertIntegerToBase::new, "integer-to-base(number,base)",
+      arg(INTEGER_O, INTEGER_O), STRING_O, CONVERT_URI),
+  /** XQuery function. */
+  _CONVERT_INTEGER_TO_DATETIME(ConvertIntegerToDateTime::new, "integer-to-dateTime(ms)",
+      arg(INTEGER_O), DATE_TIME_O, CONVERT_URI),
+  /** XQuery function. */
+  _CONVERT_INTEGER_TO_DAYTIME(ConvertIntegerToDayTime::new, "integer-to-dayTime(ms)",
+      arg(INTEGER_O), DAY_TIME_DURATION_O, CONVERT_URI),
   /** XQuery function. */
   _CONVERT_INTEGERS_TO_BASE64(ConvertIntegersToBase64::new, "integers-to-base64(numbers)",
       arg(INTEGER_ZM), BASE64_BINARY_O, CONVERT_URI),
@@ -887,13 +887,13 @@ public enum Function implements AFunction {
   _CRYPTO_ENCRYPT(CryptoEncrypt::new, "encrypt(data,type,key,algorithm)",
       arg(STRING_O, STRING_O, STRING_O, STRING_O), STRING_O, CRYPTO_URI),
   /** XQuery function. */
-  _CRYPTO_HMAC(CryptoHmac::new, "hmac(data,key,algorithm[,encoding])",
-      arg(STRING_O, STRING_O, STRING_O, STRING_ZO), STRING_O, CRYPTO_URI),
-  /** XQuery function. */
   _CRYPTO_GENERATE_SIGNATURE(CryptoGenerateSignature::new, "generate-signature" +
       "(data,canonicalization,digest,signature,prefix,type[,item1][,item2])",
       arg(NODE_O, STRING_O, STRING_O, STRING_O, STRING_O, STRING_O, ITEM_ZO, ITEM_ZO),
       NODE_O, CRYPTO_URI),
+  /** XQuery function. */
+  _CRYPTO_HMAC(CryptoHmac::new, "hmac(data,key,algorithm[,encoding])",
+      arg(STRING_O, STRING_O, STRING_O, STRING_ZO), STRING_O, CRYPTO_URI),
   /** XQuery function. */
   _CRYPTO_VALIDATE_SIGNATURE(CryptoValidateSignature::new, "validate-signature(node)",
       arg(NODE_O), BOOLEAN_O, CRYPTO_URI),
