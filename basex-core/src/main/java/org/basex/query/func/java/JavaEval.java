@@ -105,13 +105,18 @@ final class JavaEval {
         if(type != null && arg.type.instanceOf(type)) {
           // convert to Java object if an XQuery type exists for the function parameter
           vals[p] = arg.toJava();
+          if(param == char.class || param == Character.class) {
+            final String string = (String) vals[p];
+            if(string.length() != 1) throw JAVACHAR_X.get(call.info, arg);
+            vals[p] = string.charAt(0);
+          }
         } else {
           // convert to Java object
           // - if argument is a Java object wrapper, or
           // - if function parameter is not a {@link Value} instance
-          final boolean java = arg instanceof Jav ||
+          final boolean convert = arg instanceof Jav ||
               !(values != null ? values[p] : Value.class.isAssignableFrom(params[p]));
-          vals[p] = java ? arg.toJava() : arg;
+          vals[p] = convert ? arg.toJava() : arg;
 
           // check if argument is an instance of the function parameter
           if(!param.isInstance(vals[p])) {
@@ -153,19 +158,20 @@ final class JavaEval {
   /**
    * Returns an error for argument mismatches.
    * @param exec Java executable
-   * @param multiple multiple executables
+   * @param size number of candidates
    * @return exception
    */
-  QueryException argsError(final Executable exec, final boolean multiple) {
-    if(multiple) return DYNARGS_X_X.get(call.info, call.name(), types(exprs));
+  QueryException argsError(final Executable exec, final int size) {
+    if(size > 1) return JAVACALL_X_X_X.get(call.info, call.name(), size, types(exprs));
 
-    final TokenBuilder expect = new TokenBuilder();
+    final StringBuilder expected = new StringBuilder();
     for(final Class<?> param : exec.getParameterTypes()) {
-      if(!expect.isEmpty()) expect.add(", ");
+      if(expected.length() != 0) expected.append(", ");
       final Type type = JavaMapping.type(param, false);
-      expect.add(type != null ? type : Util.className(param));
+      expected.append(type != null ? type : Util.className(param));
     }
-    return JAVAARGS_X_X_X.get(call.info, call.name(), expect, types(exprs));
+    final String found = types(exprs);
+    return JAVAARGS_X_X_X.get(call.info, call.name(), expected, found);
   }
 
   /**
@@ -174,7 +180,7 @@ final class JavaEval {
    * @return exception
    */
   QueryException multipleError(final QueryError error) {
-    return error.get(call.info, call.name(), exprs.length);
+    return error.get(call.info, call.name(), arguments(exprs.length));
   }
 
   /**
@@ -183,12 +189,12 @@ final class JavaEval {
    * @return types string
    */
   private static String types(final Object[] args) {
-    final TokenBuilder tb = new TokenBuilder();
+    final StringBuilder types = new StringBuilder();
     for(final Object arg : args) {
-      if(!tb.isEmpty()) tb.add(", ");
-      tb.add(type(arg));
+      if(types.length() != 0) types.append(", ");
+      types.append(type(arg));
     }
-    return tb.toString();
+    return types.toString();
   }
 
   /**

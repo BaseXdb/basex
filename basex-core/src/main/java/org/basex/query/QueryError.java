@@ -39,8 +39,6 @@ public enum QueryError {
   /** Error code. */
   BASEX_HTTP(BASEX, "http", "HTTP connection required."),
   /** Error code. */
-  BASEX_JAVA(BASEX, "java", "Java array contains null values."),
-  /** Error code. */
   BASEX_OPTIONS1_X(BASEX, "options", "Unknown database option: %."),
   /** Error code. */
   BASEX_OPTIONS2_X(BASEX, "options", "%"),
@@ -1028,6 +1026,10 @@ public enum QueryError {
   JAVAARGS_X_X(XPST, 17, "% cannot be called with (%)."),
   /** Error code. */
   JAVAINIT_X_X(XPST, 17, "%: %."),
+  /** Error code. */
+  JAVACALL_X_X_X(XPST, 17, "% (% candidates) cannot be called with (%)."),
+  /** Error code. */
+  JAVAARGS_X_X_X(XPST, 17, "%(%) expected, (%) found."),
 
   /** Error code. */
   TYPEUNKNOWN_X(XPST, 51, "Unknown type: %."),
@@ -1039,17 +1041,17 @@ public enum QueryError {
   NSMISS_X(XPST, 81, "QName '%' has no namespace."),
 
   /** Error code. */
-  DYNARGS_X_X(XPTY, 4, "% cannot be called with (%)."),
+  JAVACHAR_X(XPTY, 4, "String must contain single character: %."),
   /** Error code. */
-  DYNMULTIFUNC_X_X(XPTY, 4, "%: Multiple functions with %."),
+  JAVAFUNC_X_X(XPTY, 4, "%: Multiple functions with %."),
   /** Error code. */
-  DYNMULTICONS_X_X(XPTY, 4, "%: Multiple constructors with %."),
-  /** Error code. */
-  JAVAARGS_X_X_X(XPTY, 4, "%(%) expected, (%) found."),
+  JAVACONS_X_X(XPTY, 4, "%: Multiple constructors with %."),
   /** Error code. */
   JAVAINVOKE_X_X(XPTY, 4, "% instance expected as first argument, % found."),
   /** Error code. */
   JAVAEVAL_X_X_X(XPTY, 4, "%. Caused by: %(%)."),
+  /** Error code. */
+  JAVANULL(XPTY, 17, "Java array contains null values."),
 
   /** Error code. */
   ZEROFUNCS_X_X(XPTY, 4, "Function with 0 arguments expected, % found: %."),

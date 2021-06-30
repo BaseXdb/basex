@@ -141,7 +141,7 @@ public abstract class JavaCall extends Arr {
 
     // check for null values
     for(final Object obj : (Object[]) object) {
-      if(obj == null) throw BASEX_JAVA.get(info);
+      if(obj == null) throw JAVANULL.get(info);
     }
     // string array
     if(object instanceof String[]) {

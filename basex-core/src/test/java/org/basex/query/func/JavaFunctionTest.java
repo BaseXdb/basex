@@ -120,11 +120,11 @@ public final class JavaFunctionTest extends SandboxTest {
 
   /** Tests ambiguous signatures. */
   @Test public void ambiguous() {
-    error("Q{java:org.basex.query.func.JavaFunctionExample}new(true())", DYNMULTICONS_X_X);
+    error("Q{java:org.basex.query.func.JavaFunctionExample}new(true())", JAVACONS_X_X);
     error("import module namespace n='java:java.lang.StringBuilder'; n:append('x')",
         JAVAMULTIFUNC_X_X);
     error("declare namespace n='java:java.lang.StringBuilder';n:append(n:new(), 'x')",
-        DYNMULTIFUNC_X_X);
+        JAVAFUNC_X_X);
   }
 
   /** Pass on empty sequences. */
@@ -134,7 +134,7 @@ public final class JavaFunctionTest extends SandboxTest {
     error("declare namespace n='org.basex.query.func.JavaFunctionExample'; n:b(n:new(),())",
         JAVAARGS_X_X_X);
     error("declare namespace n='org.basex.query.func.JavaFunctionExample'; n:g(n:new(),())",
-        DYNMULTIFUNC_X_X);
+        JAVAFUNC_X_X);
 
     query("import module namespace n='org.basex.query.func.JavaFunctionExample'; n:f(())", "");
     error("import module namespace n='org.basex.query.func.JavaFunctionExample'; n:a(())",
@@ -153,7 +153,17 @@ public final class JavaFunctionTest extends SandboxTest {
         WHICHFUNC_X);
 
     error("import module namespace n='org.basex.query.func.JavaFunctionExample'; n:null-array()",
-        BASEX_JAVA);
+        JAVANULL);
+    error("Q{java:java.lang.Character}isUpperCase('xx')", JAVACHAR_X);
+    error("Q{java:java.lang.Character}isUpperCase(123)", JAVACALL_X_X_X);
+  }
+
+  /** Character parameters. */
+  @Test public void gh2018() {
+    query("Q{java:java.lang.Character}isUpperCase('A')", true);
+
+    error("Q{java:java.lang.Character}isUpperCase('')", JAVACHAR_X);
+    error("Q{java:java.lang.Character}isUpperCase('aa')", JAVACHAR_X);
   }
 
   /** Ensure that items cannot be cast to Java. */

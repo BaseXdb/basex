@@ -1,12 +1,12 @@
 package org.basex.query.func.convert;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.func.java.JavaCall.*;
 
 import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.func.java.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -20,35 +20,31 @@ import org.basex.query.value.map.*;
 public final class ConvertFromJava extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return fromJava(exprs[0].value(qc), qc);
+    return toValue(exprs[0].value(qc), qc);
   }
 
   /**
    * Converts the specified value to an XQuery value.
    * @param value value to convert
    * @param qc query context
-   * @return converted value
+   * @return XQuery value
    * @throws QueryException query exception
    */
-  private Value fromJava(final Value value, final QueryContext qc) throws QueryException {
+  private Value toValue(final Value value, final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Item item : value) {
       if(item instanceof Jav) {
         final Object object = item.toJava();
         if(object instanceof Iterable) {
-          for(final Object obj : (Iterable<?>) object) {
-            vb.add(fromJava(toValue(obj, qc, sc, info), qc));
-          }
+          for(final Object obj : (Iterable<?>) object) vb.add(toValue(obj, qc));
         } else if(object instanceof Iterator) {
           final Iterator<?> ir = (Iterator<?>) object;
-          while(ir.hasNext()) {
-            vb.add(fromJava(toValue(ir.next(), qc, sc, info), qc));
-          }
+          while(ir.hasNext()) vb.add(toValue(ir.next(), qc));
         } else if(object instanceof Map) {
           XQMap map = XQMap.EMPTY;
           for(final Map.Entry<?, ?> entry : ((Map<?, ?>) object).entrySet()) {
-            final Item key = fromJava(toValue(entry.getKey(), qc, sc, info), qc).item(qc, info);
-            final Value val = fromJava(toValue(entry.getValue(), qc, sc, info), qc);
+            final Item key = toValue(entry.getKey(), qc).item(qc, info);
+            final Value val = toValue(entry.getValue(), qc);
             map = map.put(key, val, info);
           }
           vb.add(map);
@@ -61,4 +57,16 @@ public final class ConvertFromJava extends StandardFunc {
     }
     return vb.value();
   }
+
+  /**
+   * Converts the specified Java object to an XQuery value.
+   * @param object object to convert
+   * @param qc query context
+   * @return converted value
+   * @throws QueryException query exception
+   */
+  private Value toValue(final Object object, final QueryContext qc) throws QueryException {
+    return toValue(JavaCall.toValue(object, qc, sc, info), qc);
+  }
 }
+

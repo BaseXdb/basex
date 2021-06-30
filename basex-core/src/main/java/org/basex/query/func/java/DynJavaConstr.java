@@ -66,7 +66,7 @@ final class DynJavaConstr extends DynJavaCall {
       // do not invoke function if arguments do not match
       if(!je.match(c.getParameterTypes(), true, null)) continue;
 
-      if(constr != null) throw je.multipleError(DYNMULTICONS_X_X);
+      if(constr != null) throw je.multipleError(JAVACONS_X_X);
       constr = c;
     }
 
@@ -80,7 +80,7 @@ final class DynJavaConstr extends DynJavaCall {
     }
 
     // no constructor found: raise error
-    throw je.argsError(constrs.get(0), constrs.size() > 1);
+    throw je.argsError(constrs.get(0), constrs.size());
   }
 
   @Override

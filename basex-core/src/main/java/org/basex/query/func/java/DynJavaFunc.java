@@ -132,7 +132,7 @@ final class DynJavaFunc extends DynJavaCall {
       // do not invoke function if arguments do not match
       if(!je.match(m.getParameterTypes(), isStatic(m), null)) continue;
 
-      if(method != null) throw je.multipleError(DYNMULTIFUNC_X_X);
+      if(method != null) throw je.multipleError(JAVAFUNC_X_X);
       method = m;
     }
 
@@ -158,13 +158,13 @@ final class DynJavaFunc extends DynJavaCall {
     // no method found
     method = methods.get(0);
     // remove static argument
-    final Expr[] ex = je.exprs;
-    final boolean multiple = methods.size() > 1;
-    if(!(multiple || isStatic(method)) ||
-        ex.length > 0 && ((ex[0] instanceof Jav || ex[0] instanceof JavaCall))) {
-      je.exprs = Arrays.copyOfRange(ex, 1, ex.length);
+    final Expr[] args = je.exprs;
+    final int size = methods.size();
+    if(size == 1 && !isStatic(method) ||
+        args.length > 0 && ((args[0] instanceof Jav || args[0] instanceof JavaCall))) {
+      je.exprs = Arrays.copyOfRange(args, 1, args.length);
     }
-    throw je.argsError(method, multiple);
+    throw je.argsError(method, size);
   }
 
   /**
