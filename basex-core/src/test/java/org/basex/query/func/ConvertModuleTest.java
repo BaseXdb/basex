@@ -100,7 +100,7 @@ public final class ConvertModuleTest extends SandboxTest {
         "a\nb\nc\nd\ne\nf");
 
     error("declare namespace Random = 'java:java.util.Random';" +
-        "Random:new(xs:long(0)) => " + func.args(), CONVERT_JAVA_X);
+        "Random:new(xs:long(0)) => " + func.args(), CONVERT_JAVA_X_X);
   }
 
   /** Test method. */

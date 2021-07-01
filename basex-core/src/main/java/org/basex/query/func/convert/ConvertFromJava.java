@@ -10,6 +10,7 @@ import org.basex.query.func.java.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -49,7 +50,7 @@ public final class ConvertFromJava extends StandardFunc {
           }
           vb.add(map);
         } else {
-          throw CONVERT_JAVA_X.get(info, item);
+          throw CONVERT_JAVA_X_X.get(info, Util.className(object), object);
         }
       } else {
         vb.add(item);
