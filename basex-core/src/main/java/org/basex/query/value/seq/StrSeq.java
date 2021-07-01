@@ -34,16 +34,16 @@ public final class StrSeq extends NativeSeq {
   @Override
   public Value reverse(final QueryContext qc) {
     final int sz = (int) size;
-    final byte[][] tmp = new byte[sz][];
-    for(int i = 0; i < sz; i++) tmp[sz - i - 1] = values[i];
-    return get(tmp);
+    final byte[][] array = new byte[sz][];
+    for(int i = 0; i < sz; i++) array[sz - i - 1] = values[i];
+    return get(array);
   }
 
   @Override
   public String[] toJava() {
-    final String[] tmp = new String[(int) size];
-    for(int v = 0; v < size; v++) tmp[v] = Token.string(values[v]);
-    return tmp;
+    final StringList sl = new StringList((int) size);
+    for(final byte[] value : values) sl.add(value);
+    return sl.finish();
   }
 
   @Override

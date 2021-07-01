@@ -9,45 +9,45 @@ import org.basex.query.value.type.*;
 import org.basex.util.list.*;
 
 /**
- * Sequence of items of type {@link Int xs:float}, containing at least two of them.
+ * Sequence of items of type {@link Int xs:short}, containing at least two of them.
  *
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class FltSeq extends NativeSeq {
+public final class ShrSeq extends NativeSeq {
   /** Values. */
-  private final float[] values;
+  private final short[] values;
 
   /**
    * Constructor.
-   * @param values bytes
+   * @param values shorts
    */
-  private FltSeq(final float[] values) {
-    super(values.length, AtomType.FLOAT);
+  private ShrSeq(final short[] values) {
+    super(values.length, AtomType.SHORT);
     this.values = values;
   }
 
   @Override
-  public Flt itemAt(final long pos) {
-    return Flt.get(values[(int) pos]);
+  public Int itemAt(final long pos) {
+    return new Int(values[(int) pos], type);
   }
 
   @Override
   public Value reverse(final QueryContext qc) {
     final int sz = (int) size;
-    final float[] tmp = new float[sz];
+    final short[] tmp = new short[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = values[i];
     return get(tmp);
   }
 
   @Override
-  public float[] toJava() {
+  public short[] toJava() {
     return values;
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof FltSeq ? Arrays.equals(values, ((FltSeq) obj).values) :
+    return this == obj || (obj instanceof ShrSeq ? Arrays.equals(values, ((ShrSeq) obj).values) :
       super.equals(obj));
   }
 
@@ -58,9 +58,10 @@ public final class FltSeq extends NativeSeq {
    * @param values values
    * @return value
    */
-  public static Value get(final float[] values) {
+  public static Value get(final short[] values) {
     final int vl = values.length;
-    return vl == 0 ? Empty.VALUE : vl == 1 ? Flt.get(values[0]) : new FltSeq(values);
+    return vl == 0 ? Empty.VALUE : vl == 1 ? Int.get(values[0], AtomType.SHORT) :
+      new ShrSeq(values);
   }
 
   /**
@@ -71,13 +72,13 @@ public final class FltSeq extends NativeSeq {
    * @throws QueryException query exception
    */
   static Value get(final int size, final Value... values) throws QueryException {
-    final FloatList tmp = new FloatList(size);
+    final ShortList tmp = new ShortList(size);
     for(final Value value : values) {
       // speed up construction, depending on input
-      if(value instanceof FltSeq) {
-        tmp.add(((FltSeq) value).values);
+      if(value instanceof ShrSeq) {
+        tmp.add(((ShrSeq) value).values);
       } else {
-        for(final Item item : value) tmp.add(item.flt(null));
+        for(final Item item : value) tmp.add((short) item.itr(null));
       }
     }
     return get(tmp.finish());

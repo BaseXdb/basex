@@ -92,21 +92,16 @@ final class DynJavaFunc extends DynJavaCall {
 
   @Override
   protected Object eval(final QueryContext qc) throws QueryException {
-    // return field value or result of method invocation
-    final Object value = field(qc);
-    return value != null ? value : method(qc);
+    return field != null ? field(qc) : method(qc);
   }
 
   /**
    * Tries to return the value of a field.
    * @param qc query context
-   * @return resulting object, or {@code null} if fields does not exist
+   * @return resulting object
    * @throws QueryException exception
    */
   private Object field(final QueryContext qc) throws QueryException {
-    // check if a field with the specified name exists
-    if(field == null) return null;
-
     final JavaEval je = new JavaEval(this, qc);
     final Object instance = je.classInstance(isStatic(field));
     try {
@@ -125,19 +120,18 @@ final class DynJavaFunc extends DynJavaCall {
    * @throws QueryException exception
    */
   private Object method(final QueryContext qc) throws QueryException {
-    // loop through all methods, compare types
+    // find methods with matching parameters
+    final ArrayList<Method> candidates = new ArrayList<>(1);
     final JavaEval je = new JavaEval(this, qc);
-    Method method = null;
     for(final Method m : methods) {
-      // do not invoke function if arguments do not match
-      if(!je.match(m.getParameterTypes(), isStatic(m), null)) continue;
-
-      if(method != null) throw je.multipleError(JAVAFUNC_X_X);
-      method = m;
+      if(je.match(m.getParameterTypes(), isStatic(m), null)) candidates.add(m);
     }
 
-    if(method != null) {
+    // single method found: instantiate class
+    final int cs = candidates.size();
+    if(cs == 1) {
       // assign query context if module is inheriting the {@link QueryModule} interface
+      final Method method = candidates.get(0);
       final Object instance = je.classInstance(isStatic(method));
       if(instance instanceof QueryModule) {
         final QueryModule qm = (QueryModule) instance;
@@ -155,16 +149,20 @@ final class DynJavaFunc extends DynJavaCall {
       }
     }
 
-    // no method found
-    method = methods.get(0);
+    // otherwise, raise error
+    if(cs > 1) throw je.multipleError(JAVAMULTIMETH_X_X_X, cs);
+
+    final int size = methods.size();
+    final Method method = methods.get(0);
     // remove static argument
     final Expr[] args = je.exprs;
-    final int size = methods.size();
-    if(size == 1 && !isStatic(method) ||
-        args.length > 0 && ((args[0] instanceof Jav || args[0] instanceof JavaCall))) {
+    if(size == 1 && !isStatic(method) || args.length > 0 &&
+        ((args[0] instanceof Jav || args[0] instanceof JavaCall))) {
       je.exprs = Arrays.copyOfRange(args, 1, args.length);
     }
-    throw je.argsError(method, size);
+
+    if(size > 1) throw JAVAMETH_X_X_X.get(info, size, name(), JavaEval.types(exprs));
+    throw je.argsError(method);
   }
 
   /**

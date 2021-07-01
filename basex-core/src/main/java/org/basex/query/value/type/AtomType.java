@@ -412,7 +412,7 @@ public enum AtomType implements Type {
       // equals() used to also test fractional digits
       if(v.signum() < 0 || v.compareTo(Uln.MAXULN) > 0 ||
         item.type.isStringOrUntyped() && !v.equals(i)) throw castError(item, ii);
-      return Uln.get(i.toBigInteger());
+      return new Uln(i.toBigInteger());
     }
   },
 

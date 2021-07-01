@@ -111,48 +111,41 @@ public abstract class JavaCall extends Arr {
     if(s == 0) return Empty.VALUE;
 
     // primitive arrays
-    if(object instanceof byte[])    return BytSeq.get((byte[]) object);
-    if(object instanceof long[])    return IntSeq.get((long[]) object);
-    if(object instanceof char[])    return Str.get(new String((char[]) object));
     if(object instanceof boolean[]) return BlnSeq.get((boolean[]) object);
-    if(object instanceof double[])  return DblSeq.get((double[]) object);
+    if(object instanceof byte[])    return BytSeq.get((byte[]) object);
+    if(object instanceof short[])   return ShrSeq.get((short[]) object);
+    if(object instanceof long[])    return IntSeq.get((long[]) object);
     if(object instanceof float[])   return FltSeq.get((float[]) object);
+    if(object instanceof double[])  return DblSeq.get((double[]) object);
+    if(object instanceof char[])    return Str.get(new String((char[]) object));
     // character array
     if(object instanceof char[][]) {
-      final char[][] r = (char[][]) object;
-      final byte[][] b = new byte[r.length][];
-      for(int v = 0; v < s; v++) b[v] = token(new String(r[v]));
-      return StrSeq.get(b);
-    }
-    // short array
-    if(object instanceof short[]) {
-      final short[] r = (short[]) object;
-      final long[] b = new long[r.length];
-      for(int v = 0; v < s; v++) b[v] = r[v];
-      return IntSeq.get(b, AtomType.SHORT);
+      final char[][] values = (char[][]) object;
+      final TokenList list = new TokenList(values.length);
+      for(final char[] string : values) list.add(new String(string));
+      return StrSeq.get(list);
     }
     // integer array
     if(object instanceof int[]) {
-      final int[] r = (int[]) object;
-      final long[] b = new long[r.length];
-      for(int v = 0; v < s; v++) b[v] = r[v];
-      return IntSeq.get(b, AtomType.INT);
+      final int[] values = (int[]) object;
+      final LongList list = new LongList(values.length);
+      for(final int value : values) list.add(value);
+      return IntSeq.get(list.finish(), AtomType.INT);
     }
-
     // check for null values
     for(final Object obj : (Object[]) object) {
       if(obj == null) throw JAVANULL.get(info);
     }
     // string array
     if(object instanceof String[]) {
-      final String[] r = (String[]) object;
-      final byte[][] b = new byte[r.length][];
-      for(int v = 0; v < s; v++) b[v] = token(r[v]);
-      return StrSeq.get(b);
+      final String[] values = (String[]) object;
+      final TokenList list = new TokenList(values.length);
+      for(final String string : values) list.add(string);
+      return StrSeq.get(list);
     }
     // any other array (including nested ones)
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Object obj : (Object[]) object) vb.add(toValue(obj, qc, sc, info));
+    for(final Object value : (Object[]) object) vb.add(toValue(value, qc, sc, info));
     return vb.value();
   }
 
@@ -255,29 +248,31 @@ public abstract class JavaCall extends Arr {
       throws QueryException {
 
     // find method with identical name and arity
-    Method method = null;
+    final ArrayList<Method> candidates = new ArrayList<>(1);
     final IntList arities = new IntList();
     final Method[] methods = module.getClass().getMethods();
-    for(final Method m : methods) {
-      if(!m.getName().equals(name)) continue;
-      final Class<?>[] pTypes = m.getParameterTypes();
+    for(final Method method : methods) {
+      if(!method.getName().equals(name)) continue;
+      final Class<?>[] pTypes = method.getParameterTypes();
       final int mArity = pTypes.length;
       if(mArity == arity) {
-        if(typesMatch(pTypes, types)) {
-          if(method != null) throw JAVAMULTIFUNC_X_X.get(ii, qname.string(), arguments(arity));
-          method = m;
-        }
+        if(typesMatch(pTypes, types)) candidates.add(method);
       } else if(types == null) {
         arities.add(mArity);
       }
     }
 
-    // method found: add module locks to QueryContext
-    if(method != null) {
+    // single method found: add module locks to query context
+    final int cs = candidates.size();
+    if(cs == 1) {
+      final Method method = candidates.get(0);
       final Lock lock = method.getAnnotation(Lock.class);
       if(lock != null) qc.locks.add(Locking.BASEX_PREFIX + lock.value());
       return method;
     }
+
+    // otherwise, raise error
+    if(cs > 1) throw JAVAMULTIMETH_X_X_X.get(ii, qname.string(), cs, arguments(arity));
 
     // no suitable method found: check if method with correct name was found
     final TokenList names = new TokenList();

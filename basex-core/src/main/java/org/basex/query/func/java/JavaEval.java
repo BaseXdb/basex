@@ -105,11 +105,7 @@ final class JavaEval {
         if(type != null && arg.type.instanceOf(type)) {
           // convert to Java object if an XQuery type exists for the function parameter
           vals[p] = arg.toJava();
-          if(param == char.class || param == Character.class) {
-            final String string = (String) vals[p];
-            if(string.length() != 1) throw JAVACHAR_X.get(call.info, arg);
-            vals[p] = string.charAt(0);
-          }
+          if(param == char.class || param == Character.class) vals[p] = toChar((String) vals[p]);
         } else {
           // convert to Java object
           // - if argument is a Java object wrapper, or
@@ -117,6 +113,20 @@ final class JavaEval {
           final boolean convert = arg instanceof Jav ||
               !(values != null ? values[p] : Value.class.isAssignableFrom(params[p]));
           vals[p] = convert ? arg.toJava() : arg;
+
+          if(vals[p] instanceof String[]) {
+            final String[] strings = (String[]) vals[p];
+            final int sl = strings.length;
+            if(param == char[].class) {
+              final char[] chars = new char[sl];
+              for(int c = 0; c < sl; c++) chars[c] = toChar(strings[p]);
+              vals[p] = chars;
+            } else if(param == Character[].class) {
+              final Character[] chars = new Character[sl];
+              for(int c = 0; c < sl; c++) chars[c] = toChar(strings[p]);
+              vals[p] = chars;
+            }
+          }
 
           // check if argument is an instance of the function parameter
           if(!param.isInstance(vals[p])) {
@@ -132,6 +142,17 @@ final class JavaEval {
     }
     args = vals;
     return true;
+  }
+
+  /**
+   * Converts a single-character string to a primitive character.
+   * @param string string
+   * @return character
+   * @throws QueryException query exception
+   */
+  private char toChar(final String string) throws QueryException {
+    if(string.length() != 1) throw JAVACHAR_X.get(call.info, string);
+    return string.charAt(0);
   }
 
   /**
@@ -158,12 +179,9 @@ final class JavaEval {
   /**
    * Returns an error for argument mismatches.
    * @param exec Java executable
-   * @param size number of candidates
    * @return exception
    */
-  QueryException argsError(final Executable exec, final int size) {
-    if(size > 1) return JAVACALL_X_X_X.get(call.info, call.name(), size, types(exprs));
-
+  QueryException argsError(final Executable exec) {
     final StringBuilder expected = new StringBuilder();
     for(final Class<?> param : exec.getParameterTypes()) {
       if(expected.length() != 0) expected.append(", ");
@@ -177,10 +195,11 @@ final class JavaEval {
   /**
    * Returns an error for multiple execution candidates.
    * @param error error to be raised
+   * @param size number of candidates
    * @return exception
    */
-  QueryException multipleError(final QueryError error) {
-    return error.get(call.info, call.name(), arguments(exprs.length));
+  QueryException multipleError(final QueryError error, final int size) {
+    return error.get(call.info, call.name(), size, arguments(exprs.length));
   }
 
   /**
@@ -188,7 +207,7 @@ final class JavaEval {
    * @param args arguments
    * @return types string
    */
-  private static String types(final Object[] args) {
+  static String types(final Object[] args) {
     final StringBuilder types = new StringBuilder();
     for(final Object arg : args) {
       if(types.length() != 0) types.append(", ");

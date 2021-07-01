@@ -50,7 +50,7 @@ public final class JavaMapping {
     new Pair(double.class, DOUBLE),
     new Pair(Double.class, DOUBLE),
     new Pair(BigDecimal.class, DECIMAL),
-    new Pair(BigInteger.class, INTEGER),
+    new Pair(long.class, INTEGER),
     new Pair(QName.class, QNAME),
     new Pair(char.class, STRING),
     new Pair(Character.class, STRING),

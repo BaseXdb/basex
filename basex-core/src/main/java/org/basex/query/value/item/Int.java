@@ -176,11 +176,8 @@ public final class Int extends ANum {
       case INT:
       case UNSIGNED_SHORT:
         return (int) value;
-      case LONG:
-      case UNSIGNED_INT:
-        return value;
       default:
-        return BigInteger.valueOf(value);
+        return value;
     }
   }
 

@@ -26,18 +26,9 @@ public final class Uln extends ANum {
    * Constructor.
    * @param value decimal value
    */
-  private Uln(final BigInteger value) {
+  public Uln(final BigInteger value) {
     super(AtomType.UNSIGNED_LONG);
     this.value = value;
-  }
-
-  /**
-   * Constructor.
-   * @param value big decimal value
-   * @return value
-   */
-  public static Uln get(final BigInteger value) {
-    return new Uln(value);
   }
 
   @Override

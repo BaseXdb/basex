@@ -59,28 +59,29 @@ final class DynJavaConstr extends DynJavaCall {
 
   @Override
   protected Object eval(final QueryContext qc) throws QueryException {
-    // loop through all constructors, compare types
+    // find constructors with matching parameters
+    final ArrayList<Constructor<?>> candidates = new ArrayList<>(1);
     final JavaEval je = new JavaEval(this, qc);
-    Constructor<?> constr = null;
-    for(final Constructor<?> c : constrs) {
-      // do not invoke function if arguments do not match
-      if(!je.match(c.getParameterTypes(), true, null)) continue;
-
-      if(constr != null) throw je.multipleError(JAVACONS_X_X);
-      constr = c;
+    for(final Constructor<?> cnstr : constrs) {
+      if(je.match(cnstr.getParameterTypes(), true, null)) candidates.add(cnstr);
     }
 
-    // constructor found: instantiate class
-    if(constr != null) {
+    // single constructor found: instantiate class
+    final int cs = candidates.size();
+    if(cs == 1) {
       try {
-        return constr.newInstance(je.args);
+        return candidates.get(0).newInstance(je.args);
       } catch(final Exception ex) {
         throw je.execError(ex);
       }
     }
 
-    // no constructor found: raise error
-    throw je.argsError(constrs.get(0), constrs.size());
+    // otherwise, raise error
+    if(cs > 1) throw je.multipleError(JAVAMULTICONS_X_X_X, cs);
+
+    final int cos = constrs.size();
+    if(cos > 1) throw JAVACONS_X_X_X.get(info, cos, name(), JavaEval.types(exprs));
+    throw je.argsError(constrs.get(0));
   }
 
   @Override

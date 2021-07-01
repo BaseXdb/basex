@@ -78,7 +78,7 @@ public final class StaticJavaCall extends JavaCall {
       }
     }
     // arguments could not be matched: raise error
-    throw je.argsError(method, 1);
+    throw je.argsError(method);
   }
 
   @Override

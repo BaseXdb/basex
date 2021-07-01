@@ -72,19 +72,19 @@ public final class IntSeq extends NativeSeq {
   public Object toJava() {
     switch((AtomType) type) {
       case BYTE:
-        final byte[] t1 = new byte[(int) size];
-        for(int s = 0; s < size; s++) t1[s] = (byte) values[s];
-        return t1;
+        final ByteList bl = new ByteList((int) size);
+        for(final long value : values) bl.add((byte) value);
+        return bl.finish();
       case SHORT:
       case UNSIGNED_BYTE:
-        final short[] t2 = new short[(int) size];
-        for(int s = 0; s < size; s++) t2[s] = (short) values[s];
-        return t2;
+        final ShortList sl = new ShortList((int) size);
+        for(final long value : values) sl.add((short) value);
+        return sl.finish();
       case INT:
       case UNSIGNED_SHORT:
-        final int[] t3 = new int[(int) size];
-        for(int s = 0; s < size; s++) t3[s] = (int) values[s];
-        return t3;
+        final IntList il = new IntList((int) size);
+        for(final long value : values) il.add((int) value);
+        return il.finish();
       default:
         return values;
     }

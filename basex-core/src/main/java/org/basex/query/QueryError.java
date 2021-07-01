@@ -1018,16 +1018,13 @@ public enum QueryError {
   FUNCNOIMPL_X(XPST, 17, "External function not implemented: %."),
   /** Error code. */
   WHICHCLASS_X(XPST, 17, "Unknown class: %."),
+
   /** Error code. */
   JAVACONSTR_X_X(XPST, 17, "Unknown constructor: %#%."),
-  /** Error code. */
-  JAVAMULTIFUNC_X_X(XPST, 17, "%: Multiple functions with %."),
   /** Error code. */
   JAVAARGS_X_X(XPST, 17, "% cannot be called with (%)."),
   /** Error code. */
   JAVAINIT_X_X(XPST, 17, "%: %."),
-  /** Error code. */
-  JAVACALL_X_X_X(XPST, 17, "% (% candidates) cannot be called with (%)."),
   /** Error code. */
   JAVAARGS_X_X_X(XPST, 17, "%(%) expected, (%) found."),
 
@@ -1043,15 +1040,19 @@ public enum QueryError {
   /** Error code. */
   JAVACHAR_X(XPTY, 4, "String must contain single character: %."),
   /** Error code. */
-  JAVAFUNC_X_X(XPTY, 4, "%: Multiple functions with %."),
-  /** Error code. */
-  JAVACONS_X_X(XPTY, 4, "%: Multiple constructors with %."),
-  /** Error code. */
   JAVAINVOKE_X_X(XPTY, 4, "% instance expected as first argument, % found."),
   /** Error code. */
   JAVAEVAL_X_X_X(XPTY, 4, "%. Caused by: %(%)."),
   /** Error code. */
   JAVANULL(XPTY, 17, "Java array contains null values."),
+  /** Error code. */
+  JAVAMULTICONS_X_X_X(XPTY, 4, "%: % constructors with % found."),
+  /** Error code. */
+  JAVAMULTIMETH_X_X_X(XPTY, 4, "%: % methods with % found."),
+  /** Error code. */
+  JAVACONS_X_X_X(XPST, 17, "None of the % % constructors can be called with (%)."),
+  /** Error code. */
+  JAVAMETH_X_X_X(XPST, 17, "None of the % % methods can be called with (%)."),
 
   /** Error code. */
   ZEROFUNCS_X_X(XPTY, 4, "Function with 0 arguments expected, % found: %."),
