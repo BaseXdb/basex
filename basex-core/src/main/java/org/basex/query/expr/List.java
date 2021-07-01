@@ -83,15 +83,13 @@ public final class List extends Arr {
     if(e == el) return el == 1 ? exprs[0] : cc.replicate(exprs[0], Int.get(el), info);
 
     // determine result type, compute number of results, set expression type
-    SeqType st = null;
+    final SeqType st = SeqType.union(exprs, false);
     Occ occ = Occ.ZERO;
     long size = 0;
     for(final Expr expr : exprs) {
-      final SeqType st2 = expr.seqType();
-      if(!st2.zero()) st = st == null ? st2 : st.union(st2);
       final long sz = expr.size();
       if(size != -1) size = sz == -1 ? -1 : size + sz;
-      occ = occ.add(st2.occ);
+      occ = occ.add(expr.seqType().occ);
     }
     exprType.assign(st != null ? st : SeqType.EMPTY_SEQUENCE_Z, occ, size);
 

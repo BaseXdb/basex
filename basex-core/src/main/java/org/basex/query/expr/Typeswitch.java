@@ -79,11 +79,8 @@ public final class Typeswitch extends ParseExpr {
     }
     groups = newGroups.toArray(new TypeswitchGroup[0]);
 
-    // combine types of return expressions
-    final int gl = groups.length;
-    SeqType st = groups[0].seqType();
-    for(int g = 1; g < gl; g++) st = st.union(groups[g].seqType());
-    exprType.assign(st);
+    // determine common type
+    exprType.assign(SeqType.union(groups, true));
 
     // check if always the same branch will be evaluated
     Expr expr = this;
@@ -93,6 +90,7 @@ public final class Typeswitch extends ParseExpr {
       if(tg == null && group.instance(ct)) tg = group;
     }
     // choose default branch if none of the branches will be chosen
+    final int gl = groups.length;
     if(tg == null) {
       boolean opt = true;
       for(int g = 0; opt && g < gl - 1; g++) opt = groups[g].noMatches(ct);

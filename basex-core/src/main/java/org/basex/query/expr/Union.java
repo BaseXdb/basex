@@ -39,12 +39,7 @@ public final class Union extends Set {
     flatten(cc);
 
     // determine type
-    SeqType st = null;
-    for(final Expr expr : exprs) {
-      final SeqType st2 = expr.seqType();
-      if(!st2.zero()) st = st == null ? st2 : st.union(st2);
-    }
-    // check if all operands yield an empty sequence
+    SeqType st = SeqType.union(exprs, false);
     if(st == null) st = SeqType.NODE_ZM;
 
     // skip optimizations if operands do not have the correct type

@@ -228,11 +228,7 @@ public final class GroupBy extends Clause {
     for(int p = 0; p < pl; p++) {
       post[p].refineType(preExpr[p].seqType().union(Occ.ONE_OR_MORE), cc);
     }
-    SeqType st = null;
-    for(final GroupSpec spec : specs) {
-      st = st == null ? spec.seqType() : st.union(spec.seqType());
-    }
-    exprType.assign(st);
+    exprType.assign(SeqType.union(specs, true));
     return this;
   }
 
