@@ -375,10 +375,8 @@ public abstract class XQArray extends XQData {
 
   @Override
   public final Object[] toJava() throws QueryException {
-    final long size = arraySize();
-    final ArrayList<Object> list = new ArrayList<>((int) size);
-    final Iterator<Value> iter = iterator(0);
-    while(iter.hasNext()) list.add(iter.next().toJava());
+    final ArrayList<Object> list = new ArrayList<>((int) arraySize());
+    for(final Value member : members()) list.add(member.toJava());
     return list.toArray();
   }
 
@@ -399,15 +397,13 @@ public abstract class XQArray extends XQData {
   @Override
   public void toString(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder();
-    final Iterator<Value> iter = iterator(0);
-    for(boolean fst = true; iter.hasNext(); fst = false) {
-      tb.add(fst ? " " : ", ");
-      final Value value = iter.next();
-      final long vs = value.size();
+    for(final Value member : members()) {
+      tb.add(tb.isEmpty() ? " " : ", ");
+      final long vs = member.size();
       if(vs != 1) tb.add('(');
       for(int i = 0; i < vs; i++) {
         if(i != 0) tb.add(", ");
-        tb.add(value.itemAt(i));
+        tb.add(member.itemAt(i));
       }
       if(vs != 1) tb.add(')');
     }

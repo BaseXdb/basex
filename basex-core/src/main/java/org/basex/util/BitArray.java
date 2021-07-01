@@ -157,8 +157,11 @@ public final class BitArray {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("BitArray. Size: " + size + ", Entries: ");
-    for(final long w : words) sb.append(toBinaryString(w)).append(' ');
-    return sb.toString();
+    final StringBuilder sb = new StringBuilder();
+    for(final long word : words) {
+      if(sb.length() > 0) sb.append(' ');
+      sb.append(toBinaryString(word));
+    }
+    return "BitArray[size: " + size + ", entries: " + sb + ']';
   }
 }

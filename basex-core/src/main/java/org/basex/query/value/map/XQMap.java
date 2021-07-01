@@ -203,7 +203,7 @@ public final class XQMap extends XQData {
 
   @Override
   public HashMap<Object, Object> toJava() throws QueryException {
-    final HashMap<Object, Object> map = new HashMap<>();
+    final HashMap<Object, Object> map = new HashMap<>(root.size);
     for(final Item key : keys()) map.put(key.toJava(), get(key, null).toJava());
     return map;
   }
