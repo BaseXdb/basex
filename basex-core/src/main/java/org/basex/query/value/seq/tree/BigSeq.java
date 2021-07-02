@@ -31,7 +31,7 @@ public final class BigSeq extends TreeSeq {
    * @param left left digit
    * @param middle middle tree
    * @param right right digit
-   * @param type type of all items in this sequence, can be {@code null}
+   * @param type item type
    */
   BigSeq(final Item[] left, final FingerTree<Item, Item> middle, final Item[] right,
       final Type type) {
@@ -47,7 +47,7 @@ public final class BigSeq extends TreeSeq {
    * Constructor for sequences with an empty middle tree.
    * @param left left digit
    * @param right right digit
-   * @param type type of all items in this sequence, can be {@code null}
+   * @param type item type
    */
   BigSeq(final Item[] left, final Item[] right, final Type type) {
     this(left, FingerTree.empty(), right, type);
@@ -372,7 +372,7 @@ public final class BigSeq extends TreeSeq {
 
   @Override
   public TreeSeq concat(final TreeSeq seq) {
-    final Type tp = type.eq(seq.type) ? type : null;
+    final Type tp = type.union(seq.type);
     if(seq instanceof SmallSeq) {
       // merge with right digit
       final Item[] newRight = concat(right, ((SmallSeq) seq).items);

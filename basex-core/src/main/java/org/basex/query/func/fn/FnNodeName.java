@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.value.type.NodeType.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;

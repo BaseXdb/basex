@@ -23,9 +23,6 @@ import org.basex.util.list.*;
  * @author Leo Woerteler
  */
 public abstract class XQArray extends XQData {
-  /** The empty array. */
-  private static final EmptyArray EMPTY = new EmptyArray();
-
   /** Minimum size of a leaf. */
   static final int MIN_LEAF = 8;
   /** Maximum size of a leaf. */
@@ -51,7 +48,7 @@ public abstract class XQArray extends XQData {
    * @return (unique) instance of an empty array
    */
   public static XQArray empty() {
-    return EMPTY;
+    return EmptyArray.EMPTY;
   }
 
   /**

@@ -198,7 +198,7 @@ public final class ArrayRemoveTest extends ArrayTest {
 
     final ArrayBuilder builder = new ArrayBuilder();
     for(final Value value : list) builder.append(value);
-    XQArray arr = builder.freeze();
+    XQArray arr = builder.array();
 
     final Random rng = new Random(42);
     for(int i = 0; i < n; i++) {
@@ -250,7 +250,7 @@ public final class ArrayRemoveTest extends ArrayTest {
   private static XQArray from(final int... vals) {
     final ArrayBuilder builder = new ArrayBuilder();
     for(final int v : vals) builder.append(Int.get(v));
-    return builder.freeze();
+    return builder.array();
   }
 
   /**

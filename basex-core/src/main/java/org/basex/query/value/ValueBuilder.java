@@ -140,20 +140,20 @@ public final class ValueBuilder {
    * @return value
    */
   public Value value() {
-    return value((Type) null);
+    return value(AtomType.ITEM);
   }
 
   /**
    * Returns a {@link Value} representation of the items currently stored in this builder
    * annotated with the given item type.
-   * @param type type (can be {@code null}, only considered if new sequence is created)
+   * @param type type (only considered if new sequence is created)
    * @return value
    */
   public Value value(final Type type) {
     final Value first = firstValue;
     if(first != null) return first;
     final TreeSeqBuilder tree = builder;
-    return tree != null ? tree.seq(type) : Empty.VALUE;
+    return tree != null ? tree.sequence(type) : Empty.VALUE;
   }
 
   /**
@@ -163,7 +163,7 @@ public final class ValueBuilder {
    * @return value
    */
   public Value value(final Expr expr) {
-    return value(expr != null ? expr.seqType().type : null);
+    return expr != null ? value(expr.seqType().type) : value();
   }
 
   @Override

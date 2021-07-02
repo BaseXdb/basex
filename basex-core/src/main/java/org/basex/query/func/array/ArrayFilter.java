@@ -24,7 +24,7 @@ public final class ArrayFilter extends ArrayFn {
     for(final Value value : array.members()) {
       if(toBoolean(func.invoke(qc, info, value).item(qc, info))) builder.append(value);
     }
-    return builder.freeze(this);
+    return builder.array(this);
   }
 
   @Override

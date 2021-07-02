@@ -20,7 +20,7 @@ public final class ArrayBuilderTest extends ArrayTest {
     for(int len = 0; len < 2_000; len++) {
       final ArrayBuilder builder = new ArrayBuilder();
       for(int i = 0; i < len; i++) builder.append(Int.get(i));
-      final XQArray arr = builder.freeze();
+      final XQArray arr = builder.array();
       arr.checkInvariants();
       assertEquals(len, arr.arraySize());
       final Iterator<Value> iter = arr.iterator(0);
@@ -37,7 +37,7 @@ public final class ArrayBuilderTest extends ArrayTest {
     for(int len = 0; len < 2_000; len++) {
       final ArrayBuilder builder = new ArrayBuilder();
       for(int i = 0; i < len; i++) builder.prepend(Int.get(len - 1 - i));
-      final XQArray arr = builder.freeze();
+      final XQArray arr = builder.array();
       arr.checkInvariants();
       assertEquals(len, arr.arraySize());
       final Iterator<Value> iter = arr.iterator(0);
@@ -70,7 +70,7 @@ public final class ArrayBuilderTest extends ArrayTest {
         }
       }
 
-      final XQArray arr = builder.freeze();
+      final XQArray arr = builder.array();
       arr.checkInvariants();
       assertEquals(len, arr.arraySize());
       final Iterator<Value> iter = arr.iterator(0);
@@ -104,7 +104,7 @@ public final class ArrayBuilderTest extends ArrayTest {
         }
       }
 
-      final XQArray arr = builder.freeze();
+      final XQArray arr = builder.array();
       arr.checkInvariants();
       assertEquals(len, arr.arraySize());
       final Iterator<Integer> iter1 = deque.iterator();
@@ -124,33 +124,33 @@ public final class ArrayBuilderTest extends ArrayTest {
 
     ArrayBuilder ab = new ArrayBuilder();
     for(int i = 0; i < 39; i++) ab.append(Int.get(i));
-    XQArray c = ab.freeze();
+    XQArray c = ab.array();
     for(int i = 0; i < 6; i++) c = c.tail();
 
     ab = new ArrayBuilder();
     ab.append(a);
-    ab.freeze().checkInvariants();
+    ab.array().checkInvariants();
     ab.append(b);
-    ab.freeze().checkInvariants();
+    ab.array().checkInvariants();
     ab.append(c);
-    ab.freeze().checkInvariants();
+    ab.array().checkInvariants();
   }
 
   /** Test for {@link ArrayBuilder#append(XQArray)}. */
   @Test public void repro() {
     final ArrayBuilder leftBuilder = new ArrayBuilder();
     for(int i = 0; i < 63; i++) leftBuilder.append(Int.get(i));
-    final XQArray left = leftBuilder.freeze();
+    final XQArray left = leftBuilder.array();
 
     final ArrayBuilder rightBuilder = new ArrayBuilder();
     for(int i = 0; i < 67; i++) rightBuilder.append(Int.get(i + 63));
-    final XQArray right = rightBuilder.freeze();
+    final XQArray right = rightBuilder.array();
 
     final ArrayBuilder resBuilder = new ArrayBuilder();
     resBuilder.append(left);
     resBuilder.append(XQArray.member(Int.get(999)));
     resBuilder.append(right);
-    final XQArray result = resBuilder.freeze();
+    final XQArray result = resBuilder.array();
     result.checkInvariants();
 
     assertEquals(left.arraySize() + 1 + right.arraySize(), result.arraySize());
@@ -164,6 +164,6 @@ public final class ArrayBuilderTest extends ArrayTest {
   private static XQArray fromInts(final int... xs) {
     final ArrayBuilder ab = new ArrayBuilder();
     for(final int x : xs) ab.append(Int.get(x));
-    return ab.freeze();
+    return ab.array();
   }
 }

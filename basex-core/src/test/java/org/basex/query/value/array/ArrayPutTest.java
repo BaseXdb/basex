@@ -21,7 +21,7 @@ public final class ArrayPutTest extends ArrayTest {
     for(int i = 0; i < n; i++) {
       builder.append(Int.get(i));
     }
-    final XQArray array = builder.freeze();
+    final XQArray array = builder.array();
     for(int i = 0; i < n; i++) {
       final XQArray arr = array.put(i, Int.get(-i));
       for(int j = 0; j < n; j++) {

@@ -24,7 +24,7 @@ public final class SmallSeq extends TreeSeq {
   /**
    * Constructor.
    * @param items items
-   * @param type type of all items in this sequence, can be {@code null}
+   * @param type item type
    */
   SmallSeq(final Item[] items, final Type type) {
     super(items.length, type);

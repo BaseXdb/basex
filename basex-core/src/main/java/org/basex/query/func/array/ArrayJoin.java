@@ -42,7 +42,7 @@ public final class ArrayJoin extends ArrayFn {
     do {
       builder.append(toArray(item));
     } while((item = qc.next(iter)) != null);
-    return builder.freeze(this);
+    return builder.array(this);
   }
 
   @Override

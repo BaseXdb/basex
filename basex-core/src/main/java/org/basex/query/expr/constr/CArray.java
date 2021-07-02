@@ -64,7 +64,7 @@ public final class CArray extends Arr {
         for(Item item; (item = qc.next(iter)) != null;) builder.append(item);
       }
     }
-    return builder.freeze(this);
+    return builder.array(this);
   }
 
   @Override

@@ -24,7 +24,7 @@ public final class MapFind extends StandardFunc {
 
     final ArrayBuilder builder = new ArrayBuilder();
     find(iter, item, builder, qc);
-    return builder.freeze(this);
+    return builder.array(this);
   }
 
   @Override

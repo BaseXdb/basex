@@ -24,14 +24,14 @@ public final class TreeSeqBuilder implements Iterable<Item> {
   /** Size of inner nodes. */
   private static final int NODE_SIZE = (TreeSeq.MIN_LEAF + TreeSeq.MAX_LEAF + 1) / 2;
 
-  /** Ring buffer containing the root-level elements. */
-  private final Item[] vals = new Item[CAP];
+  /** Ring buffer containing the root-level items. */
+  private final Item[] items = new Item[CAP];
 
-  /** Number of elements in left digit. */
+  /** Number of items in left digit. */
   private int inLeft;
   /** Middle between left and right digit in the buffer. */
   private int mid = CAP / 2;
-  /** Number of elements in right digit. */
+  /** Number of items in right digit. */
   private int inRight;
   /** Builder for the middle tree. */
   private final FingerTreeBuilder<Item> tree = new FingerTreeBuilder<>();
@@ -47,19 +47,19 @@ public final class TreeSeqBuilder implements Iterable<Item> {
   }
 
   /**
-   * Adds an item to the start of the array.
+   * Adds an item to the start of the sequence.
    * @param item item to add
    * @return reference to this builder for convenience
    */
   public TreeSeqBuilder addFront(final Item item) {
     if(inLeft < TreeSeq.MAX_DIGIT) {
-      // just insert the element
-      vals[(mid - inLeft + CAP - 1) % CAP] = item;
+      // just insert the item
+      items[(mid - inLeft + CAP - 1) % CAP] = item;
       inLeft++;
     } else if(tree.isEmpty() && inRight < TreeSeq.MAX_DIGIT) {
       // move the middle to the left
       mid = (mid + CAP - 1) % CAP;
-      vals[(mid - inLeft + CAP) % CAP] = item;
+      items[(mid - inLeft + CAP) % CAP] = item;
       inRight++;
     } else {
       // push leaf node into the tree
@@ -70,31 +70,31 @@ public final class TreeSeqBuilder implements Iterable<Item> {
       final int p0 = (mid - inLeft + CAP) % CAP;
       for(int i = 0; i < rest; i++) {
         final int from = (p0 + i) % CAP, to = (from + NODE_SIZE) % CAP;
-        vals[to] = vals[from];
+        items[to] = items[from];
       }
 
-      // insert the element
-      vals[(mid - rest + CAP - 1) % CAP] = item;
+      // insert the item
+      items[(mid - rest + CAP - 1) % CAP] = item;
       inLeft = rest + 1;
     }
     return this;
   }
 
   /**
-   * Adds an item to the end of the array.
+   * Adds an item to the end of the sequence.
    * @param item item to add
    * @return reference to this builder for convenience
    */
   public TreeSeqBuilder add(final Item item) {
     if(inRight < TreeSeq.MAX_DIGIT) {
-      // just insert the element
-      vals[(mid + inRight) % CAP] = item;
+      // just insert the item
+      items[(mid + inRight) % CAP] = item;
       inRight++;
 
     } else if(tree.isEmpty() && inLeft < TreeSeq.MAX_DIGIT) {
       // move the middle to the right
       mid = (mid + 1) % CAP;
-      vals[(mid + inRight + CAP - 1) % CAP] = item;
+      items[(mid + inRight + CAP - 1) % CAP] = item;
       inLeft++;
 
     } else {
@@ -104,10 +104,10 @@ public final class TreeSeqBuilder implements Iterable<Item> {
       final int rest = inRight - NODE_SIZE;
       for(int i = 0; i < rest; i++) {
         final int to = (mid + i) % CAP, from = (to + NODE_SIZE) % CAP;
-        vals[to] = vals[from];
+        items[to] = items[from];
       }
       // insert the item
-      vals[(mid + rest) % CAP] = item;
+      items[(mid + rest) % CAP] = item;
       inRight = rest + 1;
     }
     return this;
@@ -153,10 +153,10 @@ public final class TreeSeqBuilder implements Iterable<Item> {
       final Item[] temp = new Item[k];
       final int l = (mid - inLeft + CAP) % CAP, m = CAP - l;
       if(k <= m) {
-        Array.copyToStart(vals, l, k, temp);
+        Array.copyToStart(items, l, k, temp);
       } else {
-        Array.copyToStart(vals, l, m, temp);
-        Array.copyFromStart(vals, k - m, temp, m);
+        Array.copyToStart(items, l, m, temp);
+        Array.copyFromStart(items, k - m, temp, m);
       }
 
       inLeft = inRight = 0;
@@ -183,7 +183,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
       final int inLeaf = Math.min(leafSize, inMiddle - i);
       final Item[] leaf = new Item[inLeaf];
       for(int p = 0; p < inLeaf; p++) {
-        leaf[p] = i < inRight ? vals[(mid + i) % CAP] : ls[i - inRight];
+        leaf[p] = i < inRight ? items[(mid + i) % CAP] : ls[i - inRight];
         i++;
       }
       tree.append(new LeafNode(leaf));
@@ -199,37 +199,37 @@ public final class TreeSeqBuilder implements Iterable<Item> {
   }
 
   /**
-   * Creates a sequence containing the current elements of this builder.
-   * @param type type of all items in this sequence, can be {@code null}
+   * Creates a sequence containing the items of this builder.
+   * @param type type of all items in this sequence
    * @return resulting sequence
    */
-  public Seq seq(final Type type) {
-    // small int array, fill directly
+  public Seq sequence(final Type type) {
+    // small int sequence, fill directly
     final int n = inLeft + inRight, start = (mid - inLeft + CAP) % CAP;
     if(n <= TreeSeq.MAX_SMALL) return new SmallSeq(items(start, n), type);
 
-    // deep array
+    // deep sequence
     final int ll = tree.isEmpty() ? n / 2 : inLeft;
     return new BigSeq(items(start, ll), tree.freeze(), items(start + ll, n - ll), type);
   }
 
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(getClass()).add('[');
-    if(tree.isEmpty()) {
-      final int n = inLeft + inRight, first = (mid - inLeft + CAP) % CAP;
-      if(n > 0) {
-        tb.add(vals[first]);
-        for(int i = 1; i < n; i++) tb.add(", ").add(vals[(first + i) % CAP]);
-      }
+  /**
+   * Returns an array containing the given number of items starting at the given position in this
+   * builder's ring buffer.
+   * @param from position of the first item
+   * @param n number of items
+   * @return array containing the items
+   */
+  private Item[] items(final int from, final int n) {
+    final Item[] arr = new Item[n];
+    final int p = ((from % CAP) + CAP) % CAP, m = CAP - p;
+    if(n <= m) {
+      Array.copyToStart(items, p, n, arr);
     } else {
-      final int first = (mid - inLeft + CAP) % CAP;
-      tb.add(vals[first]);
-      for(int i = 1; i < inLeft; i++) tb.add(", ").add(vals[(first + i) % CAP]);
-      for(final Item item : tree) tb.add(", ").add(item);
-      for(int i = 0; i < inRight; i++) tb.add(", ").add(vals[(mid + i) % CAP]);
+      Array.copyToStart(items, p, m, arr);
+      Array.copyFromStart(items, n - m, arr, m);
     }
-    return tb.add(']').toString();
+    return arr;
   }
 
   @Override
@@ -247,7 +247,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
       public Item next() {
         if(pos < 0) {
           final int p = pos++;
-          return vals[(mid + p + CAP) % CAP];
+          return items[(mid + p + CAP) % CAP];
         }
 
         if(pos == 0) {
@@ -259,7 +259,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
 
         // pos > 0
         final int p = pos++;
-        return vals[(mid + p - 1) % CAP];
+        return items[(mid + p - 1) % CAP];
       }
 
       @Override
@@ -269,22 +269,22 @@ public final class TreeSeqBuilder implements Iterable<Item> {
     };
   }
 
-  /**
-   * Returns an array containing the given number of items starting at the given position in this
-   * builder's ring buffer.
-   * @param from position of the first item
-   * @param n number of items
-   * @return array containing the items
-   */
-  private Item[] items(final int from, final int n) {
-    final Item[] arr = new Item[n];
-    final int p = ((from % CAP) + CAP) % CAP, m = CAP - p;
-    if(n <= m) {
-      Array.copyToStart(vals, p, n, arr);
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder().add(getClass()).add('[');
+    if(tree.isEmpty()) {
+      final int n = inLeft + inRight, first = (mid - inLeft + CAP) % CAP;
+      if(n > 0) {
+        tb.add(items[first]);
+        for(int i = 1; i < n; i++) tb.add(", ").add(items[(first + i) % CAP]);
+      }
     } else {
-      Array.copyToStart(vals, p, m, arr);
-      Array.copyFromStart(vals, n - m, arr, m);
+      final int first = (mid - inLeft + CAP) % CAP;
+      tb.add(items[first]);
+      for(int i = 1; i < inLeft; i++) tb.add(", ").add(items[(first + i) % CAP]);
+      for(final Item item : tree) tb.add(", ").add(item);
+      for(int i = 0; i < inRight; i++) tb.add(", ").add(items[(mid + i) % CAP]);
     }
-    return arr;
+    return tb.add(']').toString();
   }
 }

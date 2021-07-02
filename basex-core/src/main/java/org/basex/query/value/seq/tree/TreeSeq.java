@@ -33,11 +33,11 @@ public abstract class TreeSeq extends Seq {
 
   /**
    * Default constructor.
-   * @param size number of elements in this sequence
-   * @param type type of all items in this sequence, can be {@code null}
+   * @param size number of items in this sequence
+   * @param type type of all items in this sequence
    */
   TreeSeq(final long size, final Type type) {
-    super(size, type == null ? AtomType.ITEM : type);
+    super(size, type);
   }
 
   @Override
@@ -63,7 +63,7 @@ public abstract class TreeSeq extends Seq {
       tsb.add(subsequence(pos, right, qc), qc);
     }
 
-    return tsb.seq(type.union(value.type));
+    return tsb.sequence(type.union(value.type));
   }
 
   /**

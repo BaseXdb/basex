@@ -39,7 +39,7 @@ public final class ArraySort extends StandardFunc {
 
     final ArrayBuilder builder = new ArrayBuilder();
     for(final int order : FnSort.sort(values, this, coll, qc)) builder.append(array.get(order));
-    return builder.freeze(this);
+    return builder.array(this);
   }
 
   @Override

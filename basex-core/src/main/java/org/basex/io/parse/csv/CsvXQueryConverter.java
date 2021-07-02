@@ -40,7 +40,7 @@ public final class CsvXQueryConverter extends CsvConverter {
 
   @Override
   protected void record() {
-    if(row != null) rows.add(row.freeze(SeqType.STRING_ARRAY));
+    if(row != null) rows.add(row.array(SeqType.STRING_ARRAY));
     row = new ArrayBuilder();
   }
 
@@ -55,13 +55,13 @@ public final class CsvXQueryConverter extends CsvConverter {
 
   @Override
   protected XQMap finish() throws QueryIOException {
-    if(row != null) rows.add(row.freeze(SeqType.STRING_ARRAY));
+    if(row != null) rows.add(row.array(SeqType.STRING_ARRAY));
     try {
       XQMap map = XQMap.empty();
       if(!headers.isEmpty()) {
         final ArrayBuilder names = new ArrayBuilder();
         for(final byte[] header : headers) names.append(Str.get(header));
-        map = map.put(NAMES, names.freeze(SeqType.STRING_ARRAY), null);
+        map = map.put(NAMES, names.array(SeqType.STRING_ARRAY), null);
       }
       return map.put(RECORDS, rows.value(), null);
     } catch(final QueryException ex) {
