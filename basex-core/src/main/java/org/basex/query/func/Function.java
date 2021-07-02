@@ -1313,8 +1313,8 @@ public enum Function implements AFunction {
   _INSPECT_MODULE(InspectModule::new, "module(uri)",
       arg(STRING_O), ELEMENT_O, INSPECT_URI),
   /** XQuery function. */
-  _INSPECT_TYPE(InspectType::new, "type(value)",
-      arg(ITEM_ZM), STRING_O, INSPECT_URI),
+  _INSPECT_TYPE(InspectType::new, "type(value[,options])",
+      arg(ITEM_ZM, MAP_O), STRING_O, INSPECT_URI),
   /** XQuery function. */
   _INSPECT_STATIC_CONTEXT(InspectStaticContext::new, "static-context(function,name)",
       arg(FUNCTION_O, STRING_O), ITEM_ZM, INSPECT_URI),

@@ -1,11 +1,14 @@
 package org.basex.query.func.inspect;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -14,23 +17,54 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class InspectType extends StandardFunc {
+  /** Inspection options. */
+  public static class InspectOptions extends Options {
+    /** Mode. */
+    public static final EnumOption<Mode> MODE = new EnumOption<>("mode", Mode.COMPUTED);
+    /** Item. */
+    public static final BooleanOption ITEM = new BooleanOption("item", false);
+  }
+
+  /** Inspection mode. */
+  public enum Mode {
+    /** Combined.   */ COMPUTED,
+    /** Value.      */ VALUE,
+    /** Expression. */ EXPRESSION;
+
+    @Override
+    public String toString() {
+      return name().toLowerCase(Locale.ENGLISH);
+    }
+  }
+
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value value = exprs[0].value(qc);
+    final InspectOptions opts = toOptions(1, new InspectOptions(), qc);
+    final Mode mode = opts.get(InspectOptions.MODE);
+    final boolean item = opts.get(InspectOptions.ITEM);
 
-    // combine types of all items to get more specific type
     SeqType st = null;
-    for(final Item item : value) {
-      final SeqType st2 = item.seqType();
-      st = st == null ? st2 : st.union(st2);
+    switch(mode) {
+      case EXPRESSION:
+        st = exprs[0].seqType();
+        break;
+      case VALUE:
+        st = value.seqType();
+        break;
+      default:
+        // combine types of all items to get more specific type
+        for(final Item it : value) {
+          final SeqType st2 = it.seqType();
+          st = st == null ? st2 : st.union(st2);
+        }
+        if(st == null) st = SeqType.EMPTY_SEQUENCE_Z;
+        st = st.with(value.seqType().occ);
+
+        // compare with original type, which may be more specific (in particular for node types)
+        final SeqType et = exprs[0].seqType();
+        if(et.instanceOf(st)) st = et;
     }
-    if(st == null) st = SeqType.EMPTY_SEQUENCE_Z;
-    st = st.with(value.seqType().occ);
-
-    // compare with original type, which may be more specific (in particular for node types)
-    final SeqType et = exprs[0].seqType();
-    if(et.instanceOf(st)) st = et;
-
-    return Str.get(st.toString());
+    return Str.get((item ? st.type : st).toString());
   }
 }
