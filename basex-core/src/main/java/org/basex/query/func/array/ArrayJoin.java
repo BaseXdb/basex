@@ -29,16 +29,14 @@ public final class ArrayJoin extends ArrayFn {
     final Iter iter = expr.iter(qc);
     Item item = iter.next();
     if(item == null) return XQArray.empty();
-    final XQArray fst = toArray(item);
+    final XQArray first = toArray(item);
     item = iter.next();
-    if(item == null) return fst;
-    final XQArray snd = toArray(item);
+    if(item == null) return first;
+    final XQArray second = toArray(item);
     item = iter.next();
-    if(item == null) return fst.concat(snd);
+    if(item == null) return first.concat(second);
 
-    final ArrayBuilder builder = new ArrayBuilder();
-    builder.append(fst);
-    builder.append(snd);
+    final ArrayBuilder builder = new ArrayBuilder().append(first).append(second);
     do {
       builder.append(toArray(item));
     } while((item = qc.next(iter)) != null);

@@ -33,8 +33,9 @@ public final class ArrayBuilder {
   /**
    * Adds a member to the start of the array.
    * @param member member to add
+   * @return self reference
    */
-  public void prepend(final Value member) {
+  public ArrayBuilder prepend(final Value member) {
     if(inLeft < XQArray.MAX_DIGIT) {
       // just insert the member
       members[(mid - inLeft + CAP - 1) % CAP] = member;
@@ -63,13 +64,15 @@ public final class ArrayBuilder {
       members[(mid - rest + CAP - 1) % CAP] = member;
       inLeft = rest + 1;
     }
+    return this;
   }
 
   /**
    * Adds a member to the end of the array.
    * @param member member to add
+   * @return self reference
    */
-  public void append(final Value member) {
+  public ArrayBuilder append(final Value member) {
     if(inRight < XQArray.MAX_DIGIT) {
       // just insert the member
       members[(mid + inRight) % CAP] = member;
@@ -97,63 +100,61 @@ public final class ArrayBuilder {
       members[(mid + rest) % CAP] = member;
       inRight = rest + 1;
     }
+    return this;
   }
 
   /**
    * Appends the given array to this builder.
    * @param array array to append
+   * @return self reference
    */
-  public void append(final XQArray array) {
+  public ArrayBuilder append(final XQArray array) {
     if(!(array instanceof BigArray)) {
       for(final Value value : array.members()) append(value);
-      return;
-    }
+    } else {
+      final BigArray big = (BigArray) array;
+      final Value[] ls = big.left, rs = big.right;
+      final FingerTree<Value, Value> midTree = big.middle;
+      if(midTree.isEmpty()) {
+        for(final Value l : big.left) append(l);
+        for(final Value r : big.right) append(r);
+      } else if(tree.isEmpty()) {
+        // merge middle digits
+        final int k = inLeft + inRight;
+        final Value[] temp = new Value[k];
+        final int l = (mid - inLeft + CAP) % CAP, m = CAP - l;
+        if(k <= m) {
+          Array.copyToStart(members, l, k, temp);
+        } else {
+          Array.copyToStart(members, l, m, temp);
+          Array.copyFromStart(members, k - m, temp, m);
+        }
 
-    final BigArray big = (BigArray) array;
-    final Value[] ls = big.left, rs = big.right;
-    final FingerTree<Value, Value> midTree = big.middle;
-    if(midTree.isEmpty()) {
-      for(final Value l : big.left) append(l);
-      for(final Value r : big.right) append(r);
-      return;
-    }
-
-    // merge middle digits
-    if(tree.isEmpty()) {
-      final int k = inLeft + inRight;
-      final Value[] temp = new Value[k];
-      final int l = (mid - inLeft + CAP) % CAP, m = CAP - l;
-      if(k <= m) {
-        Array.copyToStart(members, l, k, temp);
+        inLeft = inRight = 0;
+        tree.append(midTree);
+        for(int i = ls.length; --i >= 0;) prepend(ls[i]);
+        for(int i = k; --i >= 0;) prepend(temp[i]);
+        for(final Value r : rs) append(r);
       } else {
-        Array.copyToStart(members, l, m, temp);
-        Array.copyFromStart(members, k - m, temp, m);
+        final int inMiddle = inRight + big.left.length,
+            leaves = (inMiddle + XQArray.MAX_LEAF - 1) / XQArray.MAX_LEAF,
+            leafSize = (inMiddle + leaves - 1) / leaves;
+        for(int i = 0, l = 0; l < leaves; l++) {
+          final int inLeaf = Math.min(leafSize, inMiddle - i);
+          final Value[] leaf = new Value[inLeaf];
+          for(int p = 0; p < inLeaf; p++) {
+            leaf[p] = i < inRight ? members[(mid + i) % CAP] : big.left[i - inRight];
+            i++;
+          }
+          tree.append(new LeafNode(leaf));
+        }
+
+        tree.append(big.middle);
+        inRight = 0;
+        for(final Value r : big.right) append(r);
       }
-
-      inLeft = inRight = 0;
-      tree.append(midTree);
-      for(int i = ls.length; --i >= 0;) prepend(ls[i]);
-      for(int i = k; --i >= 0;) prepend(temp[i]);
-      for(final Value r : rs) append(r);
-      return;
     }
-
-    final int inMiddle = inRight + big.left.length,
-        leaves = (inMiddle + XQArray.MAX_LEAF - 1) / XQArray.MAX_LEAF,
-        leafSize = (inMiddle + leaves - 1) / leaves;
-    for(int i = 0, l = 0; l < leaves; l++) {
-      final int inLeaf = Math.min(leafSize, inMiddle - i);
-      final Value[] leaf = new Value[inLeaf];
-      for(int p = 0; p < inLeaf; p++) {
-        leaf[p] = i < inRight ? members[(mid + i) % CAP] : big.left[i - inRight];
-        i++;
-      }
-      tree.append(new LeafNode(leaf));
-    }
-
-    tree.append(big.middle);
-    inRight = 0;
-    for(final Value r : big.right) append(r);
+    return this;
   }
 
   /**

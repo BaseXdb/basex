@@ -128,12 +128,9 @@ public final class ArrayBuilderTest extends ArrayTest {
     for(int i = 0; i < 6; i++) c = c.tail();
 
     ab = new ArrayBuilder();
-    ab.append(a);
-    ab.array().checkInvariants();
-    ab.append(b);
-    ab.array().checkInvariants();
-    ab.append(c);
-    ab.array().checkInvariants();
+    ab.append(a).array().checkInvariants();
+    ab.append(b).array().checkInvariants();
+    ab.append(c).array().checkInvariants();
   }
 
   /** Test for {@link ArrayBuilder#append(XQArray)}. */
@@ -146,11 +143,8 @@ public final class ArrayBuilderTest extends ArrayTest {
     for(int i = 0; i < 67; i++) rightBuilder.append(Int.get(i + 63));
     final XQArray right = rightBuilder.array();
 
-    final ArrayBuilder resBuilder = new ArrayBuilder();
-    resBuilder.append(left);
-    resBuilder.append(XQArray.member(Int.get(999)));
-    resBuilder.append(right);
-    final XQArray result = resBuilder.array();
+    final XQArray result = new ArrayBuilder().append(left).
+        append(XQArray.member(Int.get(999))).append(right).array();
     result.checkInvariants();
 
     assertEquals(left.arraySize() + 1 + right.arraySize(), result.arraySize());
