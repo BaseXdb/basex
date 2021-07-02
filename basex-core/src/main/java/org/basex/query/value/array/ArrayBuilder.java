@@ -155,7 +155,7 @@ public final class ArrayBuilder {
   }
 
   /**
-   * Creates an {@link XQArray} containing the elements of this builder.
+   * Creates an {@link XQArray} containing the values of this builder.
    * @return resulting array
    */
   public XQArray freeze() {

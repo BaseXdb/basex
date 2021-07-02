@@ -43,7 +43,7 @@ public final class ArrayType extends FuncType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(type.oneOf(SeqType.ARRAY, SeqType.FUNCTION, AtomType.ITEM)) return true;
+    if(this == type || type.oneOf(SeqType.ARRAY, SeqType.FUNCTION, AtomType.ITEM)) return true;
     if(!(type instanceof FuncType) || type instanceof MapType) return false;
 
     final FuncType ft = (FuncType) type;

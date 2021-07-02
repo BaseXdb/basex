@@ -23,13 +23,13 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public XQArray cons(final Value elem) {
-    return new SmallArray(new Value[] { elem });
+  public XQArray cons(final Value head) {
+    return new SmallArray(new Value[] { head });
   }
 
   @Override
-  public XQArray snoc(final Value elem) {
-    return new SmallArray(new Value[] { elem });
+  public XQArray snoc(final Value last) {
+    return new SmallArray(new Value[] { last });
   }
 
   @Override
@@ -73,7 +73,7 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public XQArray subArray(final long pos, final long len, final QueryContext qc) {
+  public XQArray subArray(final long pos, final long length, final QueryContext qc) {
     return this;
   }
 

@@ -23,6 +23,7 @@ public final class MapPut extends StandardFunc {
     final XQMap map = toMap(exprs[0], qc);
     final Item key = toAtomItem(exprs[1], qc);
     final Value value = exprs[2].value(qc);
+
     return map.put(key, value, info);
   }
 

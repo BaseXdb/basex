@@ -5,7 +5,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -13,18 +12,18 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * A small sequence that is represented as a single Java array.
+ * A small sequence that is stored in a single Java array.
  *
  * @author BaseX Team 2005-21, BSD License
  * @author Leo Woerteler
  */
 public final class SmallSeq extends TreeSeq {
-  /** The elements. */
+  /** The items. */
   final Item[] items;
 
   /**
    * Constructor.
-   * @param items elements
+   * @param items items
    * @param type type of all items in this sequence, can be {@code null}
    */
   SmallSeq(final Item[] items, final Type type) {
@@ -56,7 +55,7 @@ public final class SmallSeq extends TreeSeq {
 
     final Type tp = type.union(item.type);
     return n < MAX_SMALL ? new SmallSeq(out, tp) :
-      new BigSeq(slice(out, 0, MIN_DIGIT), FingerTree.empty(), slice(out, MIN_DIGIT, n + 1), tp);
+      new BigSeq(slice(out, 0, MIN_DIGIT), slice(out, MIN_DIGIT, n + 1), tp);
   }
 
   @Override
@@ -71,8 +70,8 @@ public final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  protected Seq subSeq(final long offset, final long length, final QueryContext qc) {
-    final int o = (int) offset, l = (int) length;
+  protected Seq subSeq(final long pos, final long length, final QueryContext qc) {
+    final int o = (int) pos, l = (int) length;
     return new SmallSeq(slice(items, o, o + l), type);
   }
 
@@ -156,19 +155,19 @@ public final class SmallSeq extends TreeSeq {
   @Override
   TreeSeq prepend(final SmallSeq seq) {
     final Type tp = type.union(seq.type);
-    final Item[] values = seq.items;
-    final int a = values.length, b = items.length, n = a + b;
+    final Item[] itms = seq.items;
+    final int a = itms.length, b = items.length, n = a + b;
 
     // both arrays can be used as digits
-    if(Math.min(a, b) >= MIN_DIGIT) return new BigSeq(values, FingerTree.empty(), items, tp);
+    if(Math.min(a, b) >= MIN_DIGIT) return new BigSeq(itms, items, tp);
 
     final Item[] out = new Item[n];
-    Array.copy(values, a, out);
+    Array.copy(itms, a, out);
     Array.copyFromStart(items, b, out, a);
     if(n <= MAX_SMALL) return new SmallSeq(out, tp);
 
     final int mid = n / 2;
-    return new BigSeq(slice(out, 0, mid), FingerTree.empty(), slice(out, mid, n), tp);
+    return new BigSeq(slice(out, 0, mid), slice(out, mid, n), tp);
   }
 
   @Override

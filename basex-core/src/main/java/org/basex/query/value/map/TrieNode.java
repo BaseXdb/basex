@@ -62,7 +62,7 @@ abstract class TrieNode {
     int hash(final InputInfo ii) { return 0; }
     @Override
     boolean deep(final TrieNode node, final Collation coll, final InputInfo ii) {
-return this == node; }
+      return this == node; }
     @Override
     public TrieNode put(final int hash, final Item key, final Value value, final int level,
         final InputInfo ii) { return new TrieLeaf(hash, key, value); }

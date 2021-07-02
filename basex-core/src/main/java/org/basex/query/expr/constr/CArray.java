@@ -50,13 +50,16 @@ public final class CArray extends Arr {
 
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    // create array with single member
+    if(exprs.length == 1 && (seq || exprs[0].size() == 1)) {
+      return XQArray.member(exprs[0].value(qc));
+    }
+
     final ArrayBuilder builder = new ArrayBuilder();
-    if(seq) {
-      for(final Expr expr : exprs) {
+    for(final Expr expr : exprs) {
+      if(seq) {
         builder.append(expr.value(qc));
-      }
-    } else {
-      for(final Expr expr : exprs) {
+      } else {
         final Iter iter = expr.iter(qc);
         for(Item item; (item = qc.next(iter)) != null;) builder.append(item);
       }

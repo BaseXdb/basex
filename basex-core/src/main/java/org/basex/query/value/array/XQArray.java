@@ -55,50 +55,50 @@ public abstract class XQArray extends XQData {
 
   /**
    * Creates an array with a single member.
-   * @param elem the contained element
+   * @param value single member
    * @return array
    */
-  public static XQArray member(final Value elem) {
-    return new SmallArray(new Value[] { elem });
+  public static XQArray member(final Value value) {
+    return new SmallArray(new Value[] { value });
   }
 
   /**
-   * Prepends an element to the front of this array.
+   * Prepends a member to the front of this array.
    * Running time: <i>O(1)*</i>
-   * @param elem element to prepend
+   * @param head value to prepend
    * @return resulting array
    */
-  public abstract XQArray cons(Value elem);
+  public abstract XQArray cons(Value head);
 
   /**
-   * Appends an element to the back of this array.
+   * Appends a member to the back of this array.
    * Running time: <i>O(1)*</i>
-   * @param elem element to append
+   * @param last value to append
    * @return resulting array
    */
-  public abstract XQArray snoc(Value elem);
+  public abstract XQArray snoc(Value last);
 
   /**
-   * Gets the element at the given position in this array.
+   * Gets the member at the given position in this array.
    * Running time: <i>O(log n)</i>
-   * @param index index of the element to get
-   * @return the corresponding element
+   * @param index index of the member to get
+   * @return the corresponding member
    */
   public abstract Value get(long index);
 
   /**
-   * Returns a copy of this array where the entry at the given position is
+   * Returns a copy of this array where the member at the given position is
    * replaced by the given value.
-   * @param pos position of the entry to replace
+   * @param pos position of the member to replace
    * @param value value to put into this array
    * @return resulting array
    */
   public abstract XQArray put(long pos, Value value);
 
   /**
-   * Returns the number of elements in this array.
+   * Returns the number of members in this array.
    * Running time: <i>O(1)</i>
-   * @return number of elements
+   * @return number of members
    */
   public abstract long arraySize();
 
@@ -111,21 +111,21 @@ public abstract class XQArray extends XQData {
   public abstract XQArray concat(XQArray other);
 
   /**
-   * First element of this array, equivalent to {@code array.get(0)}.
+   * First member of this array, equivalent to {@code array.get(0)}.
    * Running time: <i>O(1)</i>
-   * @return the first element
+   * @return the first member
    */
   public abstract Value head();
 
   /**
-   * Last element of this array, equivalent to {@code array.get(array.arraySize() - 1)}.
+   * Last member of this array, equivalent to {@code array.get(array.arraySize() - 1)}.
    * Running time: <i>O(1)</i>
-   * @return last element
+   * @return last member
    */
   public abstract Value last();
 
   /**
-   * Initial segment of this array, i.e. an array containing all elements of this array (in the
+   * Initial segment of this array, i.e. an array containing all members of this array (in the
    * same order), except for the last one.
    * Running time: <i>O(1)*</i>
    * @return initial segment
@@ -133,7 +133,7 @@ public abstract class XQArray extends XQData {
   public abstract XQArray init();
 
   /**
-   * Tail segment of this array, i.e. an array containing all elements of this array (in the
+   * Tail segment of this array, i.e. an array containing all members of this array (in the
    * same order), except for the first one.
    * Running time: <i>O(1)*</i>
    * @return tail segment
@@ -142,15 +142,15 @@ public abstract class XQArray extends XQData {
 
   /**
    * Extracts a contiguous part of this array.
-   * @param pos position of first element
-   * @param len number of elements
+   * @param pos position of first member
+   * @param length number of member
    * @param qc query context
    * @return the sub-array
    */
-  public abstract XQArray subArray(long pos, long len, QueryContext qc);
+  public abstract XQArray subArray(long pos, long length, QueryContext qc);
 
   /**
-   * Returns an array with the same elements as this one, but their order reversed.
+   * Returns an array with the same members as this one, but their order reversed.
    * Running time: <i>O(n)</i>
    * @param qc query context
    * @return reversed version of this array
@@ -165,17 +165,17 @@ public abstract class XQArray extends XQData {
   public abstract boolean isEmptyArray();
 
   /**
-   * Inserts the given element at the given position into this array.
+   * Inserts the given member at the given position into this array.
    * Running time: <i>O(log n)</i>
    * @param pos insertion position, must be between {@code 0} and {@code arraySize()}
-   * @param value element to insert
+   * @param value member to insert
    * @param qc query context
    * @return resulting array
    */
   public abstract XQArray insertBefore(long pos, Value value, QueryContext qc);
 
   /**
-   * Removes the element at the given position in this array.
+   * Removes the member at the given position in this array.
    * Running time: <i>O(log n)</i>
    * @param pos deletion position, must be between {@code 0} and {@code arraySize() - 1}
    * @param qc query context
@@ -196,7 +196,7 @@ public abstract class XQArray extends XQData {
    */
   public abstract ListIterator<Value> iterator(long start);
 
-  /** Iterable over the elements of this array. */
+  /** Iterable over the members of this array. */
   private Iterable<Value> iterable;
 
   /**
@@ -209,7 +209,7 @@ public abstract class XQArray extends XQData {
   }
 
   /**
-   * Prepends the given sequence to this array.
+   * Prepends the given array to this array.
    * @param array small array
    * @return resulting array
    */
@@ -249,7 +249,7 @@ public abstract class XQArray extends XQData {
   }
 
   /**
-   * Checks that this array's implementation does not violate any invariants.
+   * Checks that this array implementation does not violate any invariants.
    * @throws AssertionError if an invariant was violated
    */
   abstract void checkInvariants();

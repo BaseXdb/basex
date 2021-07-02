@@ -3,6 +3,7 @@ package org.basex.query.func.map;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 
 /**
@@ -14,6 +15,8 @@ import org.basex.util.*;
 public final class MapSize extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Int.get(toMap(exprs[0], qc).mapSize());
+    final XQMap map = toMap(exprs[0], qc);
+
+    return Int.get(map.mapSize());
   }
 }

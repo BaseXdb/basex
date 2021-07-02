@@ -34,9 +34,9 @@ public final class SubSeq extends Seq {
   }
 
   @Override
-  protected Seq subSeq(final long offset, final long length, final QueryContext qc) {
+  protected Seq subSeq(final long pos, final long length, final QueryContext qc) {
     qc.checkStop();
-    return new SubSeq(sub, start + offset, length);
+    return new SubSeq(sub, start + pos, length);
   }
 
   @Override

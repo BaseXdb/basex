@@ -36,8 +36,8 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
    * @param right right digit
    * @param size size of this tree
    */
-  DeepTree(final Node<N, E>[] left, final long leftSize,
-      final FingerTree<Node<N, E>, E> middle, final Node<N, E>[] right, final long size) {
+  DeepTree(final Node<N, E>[] left, final long leftSize, final FingerTree<Node<N, E>, E> middle,
+      final Node<N, E>[] right, final long size) {
     this.left = left;
     this.leftSize = leftSize;
     this.middle = middle;

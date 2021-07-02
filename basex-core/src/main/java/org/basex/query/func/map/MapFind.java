@@ -19,8 +19,11 @@ import org.basex.query.value.seq.*;
 public final class MapFind extends StandardFunc {
   @Override
   public XQArray value(final QueryContext qc) throws QueryException {
+    final Iter iter = exprs[0].iter(qc);
+    final Item item = toAtomItem(exprs[1], qc);
+
     final ArrayBuilder builder = new ArrayBuilder();
-    find(exprs[0].iter(qc), toAtomItem(exprs[1], qc), builder, qc);
+    find(iter, item, builder, qc);
     return builder.freeze();
   }
 

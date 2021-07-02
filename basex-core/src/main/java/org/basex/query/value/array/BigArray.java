@@ -8,7 +8,7 @@ import org.basex.query.value.*;
 import org.basex.util.*;
 
 /**
- * An array containing more elements than fit into a {@link SmallArray}.
+ * An array containing more members than fit into a {@link SmallArray}.
  *
  * @author BaseX Team 2005-21, BSD License
  * @author Leo Woerteler
@@ -41,11 +41,7 @@ final class BigArray extends XQArray {
    * @param right right digit
    */
   BigArray(final Value[] left, final Value[] right) {
-    this.left = left;
-    middle = FingerTree.empty();
-    this.right = right;
-    assert left.length >= MIN_DIGIT && left.length <= MAX_DIGIT
-        && right.length >= MIN_DIGIT && right.length <= MAX_DIGIT;
+    this(left, FingerTree.empty(), right);
   }
 
   @Override
@@ -70,31 +66,31 @@ final class BigArray extends XQArray {
   }
 
   @Override
-  public XQArray cons(final Value elem) {
+  public XQArray cons(final Value head) {
     if(left.length < MAX_DIGIT) {
       final Value[] newLeft = slice(left, -1, left.length);
-      newLeft[0] = elem;
+      newLeft[0] = head;
       return new BigArray(newLeft, middle, right);
     }
 
     final int mid = MAX_DIGIT / 2;
     final Value[] newLeft = slice(left, -1, mid);
-    newLeft[0] = elem;
+    newLeft[0] = head;
     final Node<Value, Value> sub = new LeafNode(slice(left, mid, left.length));
     return new BigArray(newLeft, middle.cons(sub), right);
   }
 
   @Override
-  public XQArray snoc(final Value elem) {
+  public XQArray snoc(final Value last) {
     if(right.length < MAX_DIGIT) {
       final Value[] newRight = slice(right, 0, right.length + 1);
-      newRight[right.length] = elem;
+      newRight[right.length] = last;
       return new BigArray(left, middle, newRight);
     }
 
     final int mid = (MAX_DIGIT + 1) / 2;
     final Value[] newRight = slice(right, mid, right.length + 1);
-    newRight[right.length - mid] = elem;
+    newRight[right.length - mid] = last;
     final Node<Value, Value> sub = new LeafNode(slice(right, 0, mid));
     return new BigArray(left, middle.snoc(sub), newRight);
   }
@@ -170,13 +166,13 @@ final class BigArray extends XQArray {
   }
 
   @Override
-  public XQArray concat(final XQArray seq) {
+  public XQArray concat(final XQArray array) {
     // empty array
-    if(seq.isEmptyArray()) return this;
+    if(array.isEmptyArray()) return this;
 
-    if(seq instanceof SmallArray) {
+    if(array instanceof SmallArray) {
       // merge with right digit
-      final Value[] newRight = concat(right, ((SmallArray) seq).elems);
+      final Value[] newRight = concat(right, ((SmallArray) array).members);
       final int r = newRight.length;
       if(r <= MAX_DIGIT) return new BigArray(left, middle, newRight);
       final int mid = r / 2;
@@ -185,7 +181,7 @@ final class BigArray extends XQArray {
       return new BigArray(left, newMid, slice(newRight, mid, r));
     }
 
-    final BigArray other = (BigArray) seq;
+    final BigArray other = (BigArray) array;
 
     // make nodes out of the digits facing each other
     final Value[] ls = right, rs = other.left;
@@ -211,7 +207,7 @@ final class BigArray extends XQArray {
     final long midSize = left.length + middle.size();
     if(index >= midSize) return right[(int) (index - midSize)];
 
-    // the element is in the middle tree
+    // the member is in the middle tree
     return middle.get(index - left.length);
   }
 
@@ -273,8 +269,7 @@ final class BigArray extends XQArray {
     if(r < MAX_DIGIT) return new BigArray(left, middle, temp);
 
     final int m = (r + 1) / 2;
-    return new BigArray(left, middle.snoc(new LeafNode(slice(temp, 0, m))),
-        slice(temp, m, r + 1));
+    return new BigArray(left, middle.snoc(new LeafNode(slice(temp, 0, m))), slice(temp, m, r + 1));
   }
 
   @Override
@@ -284,7 +279,7 @@ final class BigArray extends XQArray {
       // delete from left digit
       final int p = (int) pos, l = left.length;
       if(l > MIN_DIGIT) {
-        // there is enough space, just delete the element
+        // there is enough space, just delete the member
         final Value[] newLeft = new Value[l - 1];
         Array.copy(left, p, newLeft);
         Array.copy(left, p + 1, newLeft.length - p, newLeft, p);
@@ -329,7 +324,7 @@ final class BigArray extends XQArray {
       // delete from right digit
       final int p = (int) (pos - rightOffset), r = right.length;
       if(r > MIN_DIGIT) {
-        // there is enough space, just delete the element
+        // there is enough space, just delete the member
         final Value[] newRight = new Value[r - 1];
         Array.copy(right, p, newRight);
         Array.copy(right, p + 1, r - 1 - p, newRight, p);
@@ -409,19 +404,19 @@ final class BigArray extends XQArray {
   }
 
   @Override
-  public XQArray subArray(final long pos, final long len, final QueryContext qc) {
+  public XQArray subArray(final long pos, final long length, final QueryContext qc) {
     qc.checkStop();
 
     // the easy cases
     final long midSize = middle.size(), size = left.length + midSize + right.length;
-    if(len == 0) return XQArray.empty();
-    if(len == size) return this;
+    if(length == 0) return XQArray.empty();
+    if(length == size) return this;
 
-    final long end = pos + len;
+    final long end = pos + length;
     if(end <= left.length) {
       // completely in left digit
-      final int p = (int) pos, n = (int) len;
-      if(len <= MAX_SMALL) return new SmallArray(slice(left, p, p + n));
+      final int p = (int) pos, n = (int) length;
+      if(length <= MAX_SMALL) return new SmallArray(slice(left, p, p + n));
       final int mid = p + n / 2;
       return new BigArray(slice(left, p, mid), slice(left, mid, p + n));
     }
@@ -429,8 +424,8 @@ final class BigArray extends XQArray {
     final long rightOffset = left.length + midSize;
     if(pos >= rightOffset) {
       // completely in right digit
-      final int p = (int) (pos - rightOffset), n = (int) len;
-      if(len <= MAX_SMALL) return new SmallArray(slice(right, p, p + n));
+      final int p = (int) (pos - rightOffset), n = (int) length;
+      if(length <= MAX_SMALL) return new SmallArray(slice(right, p, p + n));
       final int mid = p + n / 2;
       return new BigArray(slice(right, p, mid), slice(right, mid, p + n));
     }
@@ -458,7 +453,7 @@ final class BigArray extends XQArray {
       return fromMerged(out);
     }
 
-    final long inMiddle = len - inLeft - inRight;
+    final long inMiddle = length - inLeft - inRight;
     final FingerTree<Value, Value> mid;
     if(inMiddle == midSize) {
       mid = middle;
@@ -521,7 +516,7 @@ final class BigArray extends XQArray {
         Array.copyFromStart(right, inRight, newRight, last.length);
       }
     } else {
-      // not enough elements for a right digit
+      // not enough members for a right digit
       if(inRight == 0) return fromMerged(newLeft);
       final int n = newLeft.length + inRight;
       final Value[] out = slice(newLeft, 0, n);
@@ -650,7 +645,7 @@ final class BigArray extends XQArray {
 
   @Override
   XQArray prepend(final SmallArray array) {
-    final Value[] values = array.elems;
+    final Value[] values = array.members;
     final int a = values.length, b = left.length, n = a + b;
 
     // no need to change the middle tree

@@ -13,7 +13,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * A sequence containing more elements than fit into a {@link SmallSeq}.
+ * A sequence containing more items than fit into a {@link SmallSeq}.
  *
  * @author BaseX Team 2005-21, BSD License
  * @author Leo Woerteler
@@ -43,6 +43,16 @@ public final class BigSeq extends TreeSeq {
         && right.length >= MIN_DIGIT && right.length <= MAX_DIGIT;
   }
 
+  /**
+   * Constructor for sequences with an empty middle tree.
+   * @param left left digit
+   * @param right right digit
+   * @param type type of all items in this sequence, can be {@code null}
+   */
+  BigSeq(final Item[] left, final Item[] right, final Type type) {
+    this(left, FingerTree.empty(), right, type);
+  }
+
   @Override
   public Item itemAt(final long index) {
     // index in one of the digits?
@@ -50,7 +60,7 @@ public final class BigSeq extends TreeSeq {
     final long midSize = size - right.length;
     if(index >= midSize) return right[(int) (index - midSize)];
 
-    // the element is in the middle tree
+    // the item is in the middle tree
     return middle.get(index - left.length);
   }
 
@@ -103,7 +113,7 @@ public final class BigSeq extends TreeSeq {
       // delete from left digit
       final int p = (int) pos, l = left.length;
       if(l > MIN_DIGIT) {
-        // there is enough space, just delete the element
+        // there is enough space, just delete the item
         final Item[] newLeft = new Item[l - 1];
         Array.copy(left, p, newLeft);
         Array.copy(left, p + 1, newLeft.length - p, newLeft, p);
@@ -148,7 +158,7 @@ public final class BigSeq extends TreeSeq {
       // delete from right digit
       final int p = (int) (pos - rightOffset), r = right.length;
       if(r > MIN_DIGIT) {
-        // there is enough space, just delete the element
+        // there is enough space, just delete the item
         final Item[] newRight = new Item[r - 1];
         Array.copy(right, p, newRight);
         Array.copy(right, p + 1, r - 1 - p, newRight, p);
@@ -224,36 +234,38 @@ public final class BigSeq extends TreeSeq {
     Array.copyFromStart(mid, ml, newLeft, l);
     final Item[] newRight = slice(right, -mr, r);
     Array.copyToStart(mid, ml, mr, newRight);
-    return new BigSeq(newLeft, FingerTree.empty(), newRight, type);
+    return new BigSeq(newLeft, newRight, type);
   }
 
   @Override
-  protected Seq subSeq(final long offset, final long length, final QueryContext qc) {
+  protected Seq subSeq(final long pos, final long length, final QueryContext qc) {
     qc.checkStop();
+
+    // the easy cases
     final long midSize = middle.size();
-    final long end = offset + length;
+    final long end = pos + length;
     if(end <= left.length) {
       // completely in left digit
-      final int p = (int) offset, n = (int) length;
+      final int p = (int) pos, n = (int) length;
       if(length <= MAX_SMALL) return new SmallSeq(slice(left, p, p + n), type);
       final int mid = p + n / 2;
-      return new BigSeq(slice(left, p, mid), FingerTree.empty(), slice(left, mid, p + n), type);
+      return new BigSeq(slice(left, p, mid), slice(left, mid, p + n), type);
     }
 
     final long rightOffset = left.length + midSize;
-    if(offset >= rightOffset) {
+    if(pos >= rightOffset) {
       // completely in right digit
-      final int p = (int) (offset - rightOffset), n = (int) length;
+      final int p = (int) (pos - rightOffset), n = (int) length;
       if(length <= MAX_SMALL) return new SmallSeq(slice(right, p, p + n), type);
       final int mid = p + n / 2;
-      return new BigSeq(slice(right, p, mid), FingerTree.empty(), slice(right, mid, p + n), type);
+      return new BigSeq(slice(right, p, mid), slice(right, mid, p + n), type);
     }
 
-    final int inLeft = offset < left.length ? (int) (left.length - offset) : 0,
+    final int inLeft = pos < left.length ? (int) (left.length - pos) : 0,
         inRight = end > rightOffset ? (int) (end - rightOffset) : 0;
     if(inLeft >= MIN_DIGIT && inRight >= MIN_DIGIT) {
       // digits are still long enough
-      final Item[] newLeft = inLeft == left.length ? left : slice(left, (int) offset, left.length);
+      final Item[] newLeft = inLeft == left.length ? left : slice(left, (int) pos, left.length);
       final Item[] newRight = inRight == right.length ? right : slice(right, 0, inRight);
       return new BigSeq(newLeft, middle, newRight, type);
     }
@@ -278,13 +290,13 @@ public final class BigSeq extends TreeSeq {
       mid = middle;
     } else {
       // the middle tree must be split
-      final long off = offset < left.length ? 0 : offset - left.length;
+      final long off = pos < left.length ? 0 : pos - left.length;
       final TreeSlice<Item, Item> slice = middle.slice(off, inMiddle);
       // only a partial leaf, merge with digits
       if(!slice.isTree()) {
         final Item[] single = ((PartialLeafNode) slice.getPartial()).elems;
         if(inLeft > 0) {
-          final Item[] out = slice(left, (int) offset, left.length + single.length);
+          final Item[] out = slice(left, (int) pos, left.length + single.length);
           Array.copyFromStart(single, single.length, out, inLeft);
           return fromMerged(out);
         }
@@ -335,7 +347,7 @@ public final class BigSeq extends TreeSeq {
         Array.copyFromStart(right, inRight, newRight, last.length);
       }
     } else {
-      // not enough elements for a right digit
+      // not enough items for a right digit
       if(inRight == 0) return fromMerged(newLeft);
       final int n = newLeft.length + inRight;
       final Item[] out = slice(newLeft, 0, n);
@@ -355,8 +367,7 @@ public final class BigSeq extends TreeSeq {
   private TreeSeq fromMerged(final Item[] merged) {
     if(merged.length <= MAX_SMALL) return new SmallSeq(merged, type);
     final int mid = merged.length / 2;
-    return new BigSeq(slice(merged, 0, mid), FingerTree.empty(),
-        slice(merged, mid, merged.length), type);
+    return new BigSeq(slice(merged, 0, mid), slice(merged, mid, merged.length), type);
   }
 
   @Override

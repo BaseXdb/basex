@@ -111,14 +111,14 @@ public abstract class Seq extends Value {
 
   /**
    * Returns a sub sequence of this value with the given start and length.
-   * @param offset offset (ge 0)
+   * @param pos position of first item (ge 0)
    * @param length number of items (1 lt length lt size())
    * @param qc query context
    * @return sub sequence
    */
-  protected Seq subSeq(final long offset, final long length, final QueryContext qc) {
+  protected Seq subSeq(final long pos, final long length, final QueryContext qc) {
     qc.checkStop();
-    return new SubSeq(this, offset, length);
+    return new SubSeq(this, pos, length);
   }
 
   /**
