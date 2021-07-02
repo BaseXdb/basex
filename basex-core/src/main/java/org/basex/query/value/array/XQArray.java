@@ -39,9 +39,10 @@ public abstract class XQArray extends XQData {
 
   /**
    * Default constructor.
+   * @param type function type
    */
-  XQArray() {
-    super(SeqType.ARRAY);
+  XQArray(final Type type) {
+    super(type);
   }
 
   /**
@@ -59,7 +60,7 @@ public abstract class XQArray extends XQData {
    * @return array
    */
   public static XQArray member(final Value value) {
-    return new SmallArray(new Value[] { value });
+    return new SmallArray(new Value[] { value }, ArrayType.get(value.seqType()));
   }
 
   /**
@@ -246,6 +247,16 @@ public abstract class XQArray extends XQData {
     Array.copy(values1, l, out);
     Array.copyFromStart(values2, r, out, l);
     return out;
+  }
+
+  /**
+   * Creates a new array type.
+   * @param value value to be added to the array.
+   * @return union type
+   */
+  final Type union(final Value value) {
+    final SeqType dt = ((ArrayType) type).declType, st = value.seqType();
+    return dt.eq(st) ? type : ArrayType.get(dt.union(st));
   }
 
   /**

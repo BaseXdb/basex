@@ -19,9 +19,9 @@ import org.basex.util.*;
 public abstract class XQData extends FItem {
   /**
    * Constructor.
-   * @param type type
+   * @param type function type
    */
-  protected XQData(final FuncType type) {
+  protected XQData(final Type type) {
     super(type, new AnnList());
   }
 

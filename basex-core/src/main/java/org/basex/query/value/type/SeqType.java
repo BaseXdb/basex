@@ -167,6 +167,8 @@ public final class SeqType {
   public static final MapType MAP = new MapType(ANY_ATOMIC_TYPE, ITEM_ZM);
   /** The general array type. */
   public static final ArrayType ARRAY = new ArrayType(ITEM_ZM);
+  /** String array type. */
+  public static final ArrayType STRING_ARRAY = new ArrayType(STRING_O);
 
   /** Single function. */
   public static final SeqType FUNCTION_O = FUNCTION.seqType();

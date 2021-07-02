@@ -6,6 +6,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.type.*;
 
 /**
  * This class converts CSV data to an XQuery representation.
@@ -39,7 +40,7 @@ public final class CsvXQueryConverter extends CsvConverter {
 
   @Override
   protected void record() {
-    if(row != null) rows.add(row.freeze());
+    if(row != null) rows.add(row.freeze(SeqType.STRING_ARRAY));
     row = new ArrayBuilder();
   }
 
@@ -54,13 +55,13 @@ public final class CsvXQueryConverter extends CsvConverter {
 
   @Override
   protected XQMap finish() throws QueryIOException {
-    if(row != null) rows.add(row.freeze());
+    if(row != null) rows.add(row.freeze(SeqType.STRING_ARRAY));
     try {
       XQMap map = XQMap.empty();
       if(!headers.isEmpty()) {
         final ArrayBuilder names = new ArrayBuilder();
         for(final byte[] header : headers) names.append(Str.get(header));
-        map = map.put(NAMES, names.freeze(), null);
+        map = map.put(NAMES, names.freeze(SeqType.STRING_ARRAY), null);
       }
       return map.put(RECORDS, rows.value(), null);
     } catch(final QueryException ex) {

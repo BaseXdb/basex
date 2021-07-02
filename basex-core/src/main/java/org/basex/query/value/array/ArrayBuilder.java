@@ -1,7 +1,9 @@
 package org.basex.query.value.array;
 
+import org.basex.query.expr.*;
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -159,6 +161,16 @@ public final class ArrayBuilder {
    * @return resulting array
    */
   public XQArray freeze() {
+    return freeze((ArrayType) null);
+  }
+
+  /**
+   * Creates an {@link XQArray} containing the values of this builder.
+   * @param type array type
+   * @return resulting array
+   */
+  public XQArray freeze(final Type type) {
+    final Type tp = type != null ? type : SeqType.ARRAY;
     final int n = inLeft + inRight;
     if(n == 0) return XQArray.empty();
 
@@ -167,7 +179,7 @@ public final class ArrayBuilder {
       // small int array, fill directly
       final Value[] small = new Value[n];
       for(int i = 0; i < n; i++) small[i] = vals[(start + i) % CAP];
-      return new SmallArray(small);
+      return new SmallArray(small, tp);
     }
 
     // deep array
@@ -175,7 +187,16 @@ public final class ArrayBuilder {
     final Value[] ls = new Value[a], rs = new Value[b];
     for(int i = 0; i < a; i++) ls[i] = vals[(start + i) % CAP];
     for(int i = a; i < n; i++) rs[i - a] = vals[(start + i) % CAP];
-    return new BigArray(ls, tree.freeze(), rs);
+    return new BigArray(ls, tree.freeze(), rs, tp);
+  }
+
+  /**
+   * Creates an {@link XQArray} containing the values of this builder.
+   * @param expr expression that created the array (can be {@code null})
+   * @return resulting array
+   */
+  public XQArray freeze(final Expr expr) {
+    return freeze(expr != null ? expr.seqType().type : null);
   }
 
   @Override

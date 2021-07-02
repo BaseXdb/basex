@@ -22,7 +22,7 @@ public final class ArrayForEach extends ArrayFn {
 
     final ArrayBuilder builder = new ArrayBuilder();
     for(final Value value : array.members()) builder.append(func.invoke(qc, info, value));
-    return builder.freeze();
+    return builder.freeze(this);
   }
 
   @Override
