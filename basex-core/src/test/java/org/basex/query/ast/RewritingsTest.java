@@ -1953,11 +1953,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("()?*", "", empty());
     check("map { 1: 2 }?*", 2, root(Int.class));
     check("[ 1 ]?*", 1, root(Int.class));
+    check("((map { 1: 'A', 'x': 'B' }) treat as function(xs:anyAtomicType) as xs:string)?1",
+        "A", root(Str.class));
 
     // do not pre-evaluate lookups with multiple input items
     check("([ 1 ], map { 2: 3 })?*", "1\n3", root(Lookup.class));
-    check("((map { 1: 'A', 'x': 'B' }) treat as function(xs:anyAtomicType) as xs:string)?1",
-        "A", root(Lookup.class));
   }
 
   /** Rewrite distinct sequence checks. */

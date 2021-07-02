@@ -248,7 +248,7 @@ public abstract class XQArray extends XQData {
 
   /**
    * Creates a new array type.
-   * @param value value to be added to the array.
+   * @param value value to be added
    * @return union type
    */
   final Type union(final Value value) {

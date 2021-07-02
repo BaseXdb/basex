@@ -170,7 +170,7 @@ public final class InspectModuleTest extends SandboxTest {
     query(func.args(1), "xs:integer");
     query(func.args(" 1 to 2"), "xs:integer+");
     query(func.args(" <_/>"), "element(_)");
-    query(func.args(" map { 'a': (1, 2)[. = 1] }"), "map(xs:string, xs:integer*)");
+    query(func.args(" map { 'a': (1, 2)[. = 1] }"), "map(xs:string, xs:integer)");
     query(func.args(" map { 'a': 'b' }"), "map(xs:string, xs:string)");
     query(func.args(" array { 1, <a/> }"), "array(item())");
     query(func.args(" array { 1, 2 }"), "array(xs:integer)");
@@ -180,11 +180,19 @@ public final class InspectModuleTest extends SandboxTest {
     query(func.args(" (<a/>, <b/>)[name() = 'a']", " map { 'mode': 'expression' }"),
         "element(a)|element(b)*");
 
-    final String expr = " (<a/>, <b/>)[name() = 'a']";
-    query(func.args(expr), "element()");
-    query(func.args(expr, " map { 'mode': 'computed' }"), "element()");
-    query(func.args(expr, " map { 'mode': 'value' }"), "element()");
+    String expr = " (<a/>, <b/>)[name() = 'a']";
+    String result = "element()";
+    query(func.args(expr), result);
+    query(func.args(expr, " map { 'mode': 'computed' }"), result);
+    query(func.args(expr, " map { 'mode': 'value' }"), result);
     query(func.args(expr, " map { 'mode': 'expression' }"), "element(a)|element(b)*");
+
+    expr = " map:put(map { 1: text { 2 } }, 2, text { 2 })";
+    result = "map(xs:integer, text())";
+    query(func.args(expr), result);
+    query(func.args(expr, " map { 'mode': 'computed' }"), result);
+    query(func.args(expr, " map { 'mode': 'value' }"), result);
+    query(func.args(expr, " map { 'mode': 'expression' }"), result);
   }
 
   /** Test method. */

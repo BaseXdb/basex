@@ -25,7 +25,7 @@ import org.basex.util.*;
  */
 public final class XQMap extends XQData {
   /** The empty map. */
-  private static final XQMap EMPTY = new XQMap(TrieNode.EMPTY);
+  private static final XQMap EMPTY = new XQMap(TrieNode.EMPTY, SeqType.MAP);
   /** Number of bits per level, maximum is 5 because {@code 1 << 5 == 32}. */
   static final int BITS = 5;
 
@@ -35,9 +35,10 @@ public final class XQMap extends XQData {
   /**
    * Constructor.
    * @param root map
+   * @param type function type
    */
-  private XQMap(final TrieNode root) {
-    super(SeqType.MAP);
+  private XQMap(final TrieNode root, final Type type) {
+    super(type);
     this.root = root;
   }
 
@@ -60,7 +61,8 @@ public final class XQMap extends XQData {
    */
   public static XQMap entry(final Item key, final Value value, final InputInfo ii)
       throws QueryException {
-    return new XQMap(new TrieLeaf(key.hash(ii), key, value));
+    return new XQMap(new TrieLeaf(key.hash(ii), key, value),
+        MapType.get((AtomType) key.type, value.seqType()));
   }
 
   @Override
@@ -87,7 +89,7 @@ public final class XQMap extends XQData {
    */
   public XQMap delete(final Item key, final InputInfo ii) throws QueryException {
     final TrieNode del = root.delete(key.hash(ii), key, 0, ii);
-    return del == root ? this : del == null ? EMPTY : new XQMap(del);
+    return del == root ? this : del == null ? EMPTY : new XQMap(del, type);
   }
 
   @Override
@@ -119,9 +121,10 @@ public final class XQMap extends XQData {
   public XQMap addAll(final XQMap map, final MergeDuplicates merge, final QueryContext qc,
       final InputInfo ii) throws QueryException {
 
+    if(this == EMPTY) return map;
     if(map == EMPTY) return this;
     final TrieNode upd = root.addAll(map.root, 0, merge, qc, ii);
-    return upd == map.root ? map : new XQMap(upd);
+    return upd == map.root ? map : new XQMap(upd, type.union(map.type));
   }
 
   @Override
@@ -169,8 +172,23 @@ public final class XQMap extends XQData {
    * @throws QueryException query exception
    */
   public XQMap put(final Item key, final Value value, final InputInfo ii) throws QueryException {
+    if(this == EMPTY) return entry(key, value, ii);
+
     final TrieNode ins = root.put(key.hash(ii), key, value, 0, ii);
-    return ins == root ? this : new XQMap(ins);
+    return ins == root ? this : new XQMap(ins, union(key, value));
+  }
+
+  /**
+   * Creates a new map type.
+   * @param key key to be added
+   * @param value value to be added
+   * @return union type
+   */
+  private Type union(final Item key, final Value value) {
+    final MapType mt = (MapType) type;
+    final Type mkt = mt.keyType(), kt = key.type;
+    final SeqType mst = mt.declType, st = value.seqType();
+    return mkt == kt && mst.eq(st) ? type : MapType.get((AtomType) mkt.union(kt), mst.union(st));
   }
 
   /**
