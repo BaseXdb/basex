@@ -80,8 +80,12 @@ public final class IntSeq extends NativeSeq {
         final ShortList sl = new ShortList((int) size);
         for(final long value : values) sl.add((short) value);
         return sl.finish();
-      case INT:
       case UNSIGNED_SHORT:
+        final char[] chars = new char[(int) size];
+        int c = 0;
+        for(final long value : values) chars[c++] = (char) value;
+        return chars;
+      case INT:
         final IntList il = new IntList((int) size);
         for(final long value : values) il.add((int) value);
         return il.finish();

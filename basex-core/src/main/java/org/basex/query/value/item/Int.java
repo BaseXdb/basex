@@ -173,8 +173,9 @@ public final class Int extends ANum {
       case SHORT:
       case UNSIGNED_BYTE:
         return (short) value;
-      case INT:
       case UNSIGNED_SHORT:
+        return (char) value;
+      case INT:
         return (int) value;
       default:
         return value;

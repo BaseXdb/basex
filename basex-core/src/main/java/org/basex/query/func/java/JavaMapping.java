@@ -9,8 +9,9 @@ import java.util.*;
 
 import javax.xml.namespace.*;
 
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.XQMap;
+import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -34,43 +35,44 @@ public final class JavaMapping {
 
   /** Pairs with simple type conversions. */
   private static final Pair[] ATOMIC = {
-    new Pair(String.class, STRING),
+    new Pair(BigDecimal.class, DECIMAL),
+    new Pair(BigInteger.class, UNSIGNED_LONG),
     new Pair(boolean.class, BOOLEAN),
     new Pair(Boolean.class, BOOLEAN),
     new Pair(byte.class, BYTE),
     new Pair(Byte.class, BYTE),
-    new Pair(short.class, SHORT),
-    new Pair(Short.class, SHORT),
-    new Pair(int.class, INT),
-    new Pair(Integer.class, INT),
-    new Pair(long.class, LONG),
-    new Pair(Long.class, LONG),
-    new Pair(float.class, FLOAT),
-    new Pair(Float.class, FLOAT),
-    new Pair(double.class, DOUBLE),
-    new Pair(Double.class, DOUBLE),
-    new Pair(BigDecimal.class, DECIMAL),
-    new Pair(long.class, INTEGER),
-    new Pair(QName.class, QNAME),
     new Pair(char.class, STRING),
     new Pair(Character.class, STRING),
+    new Pair(double.class, DOUBLE),
+    new Pair(Double.class, DOUBLE),
+    new Pair(float.class, FLOAT),
+    new Pair(Float.class, FLOAT),
+    new Pair(int.class, INT),
+    new Pair(Integer.class, INT),
+    new Pair(long.class, INTEGER),
+    new Pair(Long.class, INTEGER),
+    new Pair(QName.class, QNAME),
+    new Pair(short.class, SHORT),
+    new Pair(Short.class, SHORT),
+    new Pair(String.class, STRING),
     new Pair(URI.class, ANY_URI),
     new Pair(URL.class, ANY_URI),
   };
   /** Node pairs. */
   private static final Pair[] NODES = {
-    new Pair(Node.class, NODE),
-    new Pair(Element.class, ELEMENT),
-    new Pair(Document.class, DOCUMENT_NODE),
-    new Pair(DocumentFragment.class, DOCUMENT_NODE),
     new Pair(Attr.class, ATTRIBUTE),
     new Pair(Comment.class, COMMENT),
+    new Pair(Document.class, DOCUMENT_NODE),
+    new Pair(DocumentFragment.class, DOCUMENT_NODE),
+    new Pair(Element.class, ELEMENT),
+    new Pair(Node.class, NODE),
     new Pair(ProcessingInstruction.class, PROCESSING_INSTRUCTION),
     new Pair(Text.class, TEXT),
   };
   /** XQuery pairs (no conversion required). */
   private static final Pair[] XQUERY = {
     // atomic types
+    new Pair(ANum.class, NUMERIC),
     new Pair(Atm.class, UNTYPED_ATOMIC),
     new Pair(B64.class, BASE64_BINARY),
     new Pair(Bln.class, BOOLEAN),
@@ -82,27 +84,26 @@ public final class JavaMapping {
     new Pair(Dur.class, DURATION),
     new Pair(Flt.class, FLOAT),
     new Pair(Hex.class, HEX_BINARY),
-    new Pair(Item.class, ITEM),
     new Pair(Int.class, INTEGER),
-    new Pair(ANum.class, NUMERIC),
+    new Pair(Item.class, ITEM),
     new Pair(QNm.class, QNAME),
     new Pair(Str.class, STRING),
     new Pair(Tim.class, TIME),
     new Pair(Uri.class, ANY_URI),
     new Pair(YMDur.class, YEAR_MONTH_DURATION),
     // node types
+    new Pair(ANode.class, NODE),
+    new Pair(DBNode.class, NODE),
     new Pair(FAttr.class, ATTRIBUTE),
     new Pair(FComm.class, COMMENT),
     new Pair(FDoc.class, DOCUMENT_NODE),
     new Pair(FElem.class, ELEMENT),
-    new Pair(ANode.class, NODE),
-    new Pair(DBNode.class, NODE),
     new Pair(FNode.class, NODE),
     new Pair(FNSpace.class, NAMESPACE_NODE),
     new Pair(FPI.class, PROCESSING_INSTRUCTION),
     new Pair(FTxt.class, TEXT),
     // function types
-    new Pair(Array.class, SeqType.ARRAY),
+    new Pair(XQArray.class, SeqType.ARRAY),
     new Pair(XQMap.class, SeqType.MAP),
   };
 

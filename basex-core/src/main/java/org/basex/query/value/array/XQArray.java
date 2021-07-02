@@ -400,7 +400,13 @@ public abstract class XQArray extends XQData {
         for(final Value member : members()) list.add((short) ((Int) member).itr());
         return list.finish();
       }
-      if(t == AtomType.INT || t == AtomType.UNSIGNED_SHORT) {
+      if(t == AtomType.UNSIGNED_SHORT) {
+        final char[] chars = new char[sz];
+        int c = 0;
+        for(final Value member : members()) chars[c++] = (char) ((Int) member).itr();
+        return chars;
+      }
+      if(t == AtomType.INT) {
         final IntList list = new IntList(sz);
         for(final Value member : members()) list.add((int) ((Int) member).itr());
         return list.finish();
