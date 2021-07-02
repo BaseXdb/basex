@@ -25,7 +25,7 @@ public final class UtilArrayMembers extends StandardFunc {
       final Iterator<Value> members = array.members().iterator();
       @Override
       public XQArray next() {
-        return members.hasNext() ? XQArray.singleton(members.next()) : null;
+        return members.hasNext() ? XQArray.member(members.next()) : null;
       }
     };
   }
@@ -35,7 +35,7 @@ public final class UtilArrayMembers extends StandardFunc {
     final XQArray array = toArray(exprs[0], qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Value member : array.members()) vb.add(XQArray.singleton(member));
+    for(final Value member : array.members()) vb.add(XQArray.member(member));
     return vb.value(this);
   }
 

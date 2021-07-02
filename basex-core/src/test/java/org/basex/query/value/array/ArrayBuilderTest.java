@@ -117,19 +117,6 @@ public final class ArrayBuilderTest extends ArrayTest {
     }
   }
 
-  /** Tests {@link XQArray#from(Value...)}. */
-  @Test public void fromArrayTest() {
-    final int n = 2_000;
-    for(int k = 0; k < n; k++) {
-      final Value[] vals = new Value[k];
-      for(int i = 0; i < k; i++) vals[i] = Int.get(i);
-
-      final XQArray arr = XQArray.from(vals);
-      assertEquals(k, arr.arraySize());
-      for(int i = 0; i < k; i++) assertEquals(i, ((Int) arr.get(i)).itr());
-    }
-  }
-
   /** Test for {@link ArrayBuilder#append(XQArray)}. */
   @Test public void appendArrayTest() {
     final XQArray a = fromInts(0, 1, 2, 3, 4);
@@ -161,7 +148,7 @@ public final class ArrayBuilderTest extends ArrayTest {
 
     final ArrayBuilder resBuilder = new ArrayBuilder();
     resBuilder.append(left);
-    resBuilder.append(XQArray.singleton(Int.get(999)));
+    resBuilder.append(XQArray.member(Int.get(999)));
     resBuilder.append(right);
     final XQArray result = resBuilder.freeze();
     result.checkInvariants();

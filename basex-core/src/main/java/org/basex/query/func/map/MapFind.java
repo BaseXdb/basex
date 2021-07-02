@@ -26,7 +26,7 @@ public final class MapFind extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return exprs[0] == XQMap.EMPTY  ? XQArray.empty() : this;
+    return exprs[0] == XQMap.empty()  ? XQArray.empty() : this;
   }
 
   /**

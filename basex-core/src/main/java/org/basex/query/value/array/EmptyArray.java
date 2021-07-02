@@ -14,11 +14,8 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 final class EmptyArray extends XQArray {
-  /** The empty array. */
-  static final EmptyArray INSTANCE = new EmptyArray();
-
   /** Hidden constructor. */
-  private EmptyArray() {
+  EmptyArray() {
   }
 
   @Override

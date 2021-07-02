@@ -65,7 +65,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
     final long itr1 = next(s0), itr2 = next(itr1);
     final Dbl number = Dbl.get(((itr1 >>> 22 << 27) + (itr2 >>> 21)) / (double) (1L << 53));
     final FItem next = nextFunc(itr2), permute = permuteFunc(itr1, qc);
-    return XQMap.EMPTY.put(NUMBER, number, info).put(NEXT, next, info).put(PERMUTE, permute, info);
+    return XQMap.entry(NUMBER, number, info).put(NEXT, next, info).put(PERMUTE, permute, info);
   }
 
   /**

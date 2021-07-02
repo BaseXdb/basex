@@ -27,7 +27,7 @@ public class MapForEach extends StandardFunc {
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0];
-    if(expr1 == XQMap.EMPTY) return Empty.VALUE;
+    if(expr1 == XQMap.empty()) return Empty.VALUE;
 
     final Type type1 = expr1.seqType().type;
     if(type1 instanceof MapType) {

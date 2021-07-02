@@ -42,7 +42,7 @@ public final class ConvertFromJava extends StandardFunc {
           final Iterator<?> ir = (Iterator<?>) object;
           while(ir.hasNext()) vb.add(toValue(ir.next(), qc));
         } else if(object instanceof Map) {
-          XQMap map = XQMap.EMPTY;
+          XQMap map = XQMap.empty();
           for(final Map.Entry<?, ?> entry : ((Map<?, ?>) object).entrySet()) {
             final Item key = toValue(entry.getKey(), qc).item(qc, info);
             final Value val = toValue(entry.getValue(), qc);

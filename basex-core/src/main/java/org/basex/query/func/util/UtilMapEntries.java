@@ -53,7 +53,7 @@ public final class UtilMapEntries extends StandardFunc {
    * @throws QueryException query exception
    */
   private XQMap entry(final XQMap map, final Item key) throws QueryException {
-    return XQMap.EMPTY.put(KEY, key, info).put(VALUE, map.get(key, info), info);
+    return XQMap.entry(KEY, key, info).put(VALUE, map.get(key, info), info);
   }
 
   @Override

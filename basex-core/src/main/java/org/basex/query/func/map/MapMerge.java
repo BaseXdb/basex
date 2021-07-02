@@ -32,7 +32,7 @@ public final class MapMerge extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter maps = exprs[0].iter(qc);
     final MergeDuplicates merge = options(qc).get(MergeOptions.DUPLICATES);
-    XQMap map = XQMap.EMPTY;
+    XQMap map = XQMap.empty();
     for(Item item; (item = qc.next(maps)) != null;) map = map.addAll(toMap(item), merge, qc, info);
     return map;
   }
@@ -42,9 +42,9 @@ public final class MapMerge extends StandardFunc {
     if(exprs[0].seqType().type instanceof MapType) {
       // remove empty entries
       if(exprs[0] instanceof List &&
-          ((Checks<Expr>) arg -> arg == XQMap.EMPTY).any(exprs[0].args())) {
+          ((Checks<Expr>) arg -> arg == XQMap.empty()).any(exprs[0].args())) {
         final ExprList list = new ExprList();
-        for(final Expr arg : exprs[0].args()) if(arg != XQMap.EMPTY) list.add(arg);
+        for(final Expr arg : exprs[0].args()) if(arg != XQMap.empty()) list.add(arg);
         exprs[0] = List.get(cc, info, list.finish());
       }
       // return simple arguments

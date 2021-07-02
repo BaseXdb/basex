@@ -27,7 +27,7 @@ public final class MapRemove extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr expr1 = exprs[0];
-    if(expr1 == XQMap.EMPTY) return expr1;
+    if(expr1 == XQMap.empty()) return expr1;
 
     final Type type = expr1.seqType().type;
     if(type instanceof MapType) exprType.assign(type);

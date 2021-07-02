@@ -13,7 +13,7 @@ import org.basex.query.value.seq.*;
  */
 public final class MapBuilder {
   /** Map. */
-  private XQMap map = XQMap.EMPTY;
+  private XQMap map = XQMap.empty();
 
   /**
    * Adds a key/value pair to the map.

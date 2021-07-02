@@ -453,7 +453,7 @@ public abstract class StandardFunc extends Arr {
     final int el = exprs.length;
     if(i < el) {
       final Item item = exprs[i].item(qc, info);
-      final XQMap map = item == Empty.VALUE ? XQMap.EMPTY : toMap(item);
+      final XQMap map = item == Empty.VALUE ? XQMap.empty() : toMap(item);
       for(final Item it : map.keys()) {
         final byte[] key;
         if(it.type.isStringOrUntyped()) {

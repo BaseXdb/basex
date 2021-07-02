@@ -269,7 +269,7 @@ public final class HttpPayload {
           Value value = data.get(name);
           if(filename != null) {
             // assign file and contents, join multiple files
-            final XQMap map = value instanceof XQMap ? (XQMap) value : XQMap.EMPTY;
+            final XQMap map = value instanceof XQMap ? (XQMap) value : XQMap.empty();
             final Str file = Str.get(filename);
             final B64 contents = B64.get(cont.next());
             final Value files = new ItemList().add(map.get(file, info)).add(contents).value();

@@ -25,7 +25,7 @@ import org.basex.util.*;
  */
 public final class XQMap extends XQData {
   /** The empty map. */
-  public static final XQMap EMPTY = new XQMap(TrieNode.EMPTY);
+  private static final XQMap EMPTY = new XQMap(TrieNode.EMPTY);
   /** Number of bits per level, maximum is 5 because {@code 1 << 5 == 32}. */
   static final int BITS = 5;
 
@@ -39,6 +39,28 @@ public final class XQMap extends XQData {
   private XQMap(final TrieNode root) {
     super(SeqType.MAP);
     this.root = root;
+  }
+
+  /**
+   * The empty map.
+   * Running time: <i>O(1)</i> and no allocation
+   * @return (unique) instance of an empty map
+   */
+  public static XQMap empty() {
+    return EMPTY;
+  }
+
+  /**
+   * Creates a map with a single entry.
+   * @param key key
+   * @param value value
+   * @param ii input info
+   * @return map
+   * @throws QueryException query exception
+   */
+  public static XQMap entry(final Item key, final Value value, final InputInfo ii)
+      throws QueryException {
+    return new XQMap(new TrieLeaf(key.hash(ii), key, value));
   }
 
   @Override

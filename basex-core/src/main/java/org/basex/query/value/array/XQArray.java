@@ -23,6 +23,9 @@ import org.basex.util.list.*;
  * @author Leo Woerteler
  */
 public abstract class XQArray extends XQData {
+  /** The empty array. */
+  private static final EmptyArray EMPTY = new EmptyArray();
+
   /** Minimum size of a leaf. */
   static final int MIN_LEAF = 8;
   /** Maximum size of a leaf. */
@@ -47,28 +50,16 @@ public abstract class XQArray extends XQData {
    * @return (unique) instance of an empty array
    */
   public static XQArray empty() {
-    return EmptyArray.INSTANCE;
+    return EMPTY;
   }
 
   /**
-   * Creates a singleton array containing the given element.
+   * Creates an array with a single member.
    * @param elem the contained element
-   * @return the singleton array
+   * @return array
    */
-  public static XQArray singleton(final Value elem) {
+  public static XQArray member(final Value elem) {
     return new SmallArray(new Value[] { elem });
-  }
-
-  /**
-   * Creates an array containing the given elements.
-   * @param values elements
-   * @return the resulting array
-   */
-  @SafeVarargs
-  public static XQArray from(final Value... values) {
-    final ArrayBuilder builder = new ArrayBuilder();
-    for(final Value value : values) builder.append(value);
-    return builder.freeze();
   }
 
   /**

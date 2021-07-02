@@ -1,7 +1,6 @@
 package org.basex.query.util.list;
 
 import org.basex.query.value.*;
-import org.basex.query.value.array.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -25,16 +24,6 @@ public final class ValueList extends ObjectList<Value, ValueList> {
    */
   public ValueList(final long capacity) {
     super(new Value[Array.checkCapacity(capacity)]);
-  }
-
-  /**
-   * Creates an XQuery array from the contents of this list.
-   * @return the array
-   */
-  public XQArray array() {
-    final ArrayBuilder builder = new ArrayBuilder();
-    for(int i = 0; i < size; i++) builder.append(list[i]);
-    return builder.freeze();
   }
 
   @Override

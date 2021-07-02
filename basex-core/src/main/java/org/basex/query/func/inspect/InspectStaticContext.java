@@ -38,7 +38,7 @@ public final class InspectStaticContext extends StandardFunc {
       case BASE_URI:
         return sctx.baseURI();
       case NAMESPACES:
-        XQMap map = XQMap.EMPTY;
+        XQMap map = XQMap.empty();
         Atts nsp = sctx.ns.list;
         int ns = nsp.size();
         for(int n = 0; n < ns; n++) {
@@ -71,13 +71,13 @@ public final class InspectStaticContext extends StandardFunc {
         tl.add(sctx.inheritNS ? INHERIT : NO_INHERIT);
         return StrSeq.get(tl);
       case DECIMAL_FORMATS:
-        map = XQMap.EMPTY;
+        map = XQMap.empty();
         // enforce creation of default formatter
         sctx.decFormat(Token.EMPTY);
         // loop through all formatters
         for(final byte[] format : sctx.decFormats) {
           final DecFormatter df = sctx.decFormats.get(format);
-          map = map.put(Str.get(format), XQMap.EMPTY.
+          map = map.put(Str.get(format), XQMap.empty().
               put(Str.get(DF_DEC), Str.get(token(df.decimal)), info).
               put(Str.get(DF_EXP), Str.get(token(df.exponent)), info).
               put(Str.get(DF_GRP), Str.get(token(df.grouping)), info).

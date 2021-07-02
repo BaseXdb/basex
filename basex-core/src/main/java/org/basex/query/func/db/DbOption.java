@@ -37,7 +37,7 @@ public final class DbOption extends StandardFunc {
     if(value instanceof Boolean) return Bln.get((Boolean) value);
     if(value instanceof Integer) return Int.get((Integer) value);
     if(value instanceof Options) {
-      XQMap map = XQMap.EMPTY;
+      XQMap map = XQMap.empty();
       final Options opts = (Options) value;
       for(final Option<?> opt : opts) {
         final Item item = item(opt.value());

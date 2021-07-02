@@ -17,7 +17,7 @@ import org.basex.util.*;
 public final class MapEntry extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return XQMap.EMPTY.put(toAtomItem(exprs[0], qc), exprs[1].value(qc), info);
+    return XQMap.entry(toAtomItem(exprs[0], qc), exprs[1].value(qc), info);
   }
 
   @Override
