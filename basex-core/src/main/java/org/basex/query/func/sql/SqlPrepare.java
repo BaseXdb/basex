@@ -21,9 +21,8 @@ public final class SqlPrepare extends SqlFn {
     checkCreate(qc);
     final Connection conn = connection(qc);
     final byte[] prepStmt = toToken(exprs[1], qc);
-    try {
+    try(PreparedStatement prep = conn.prepareStatement(string(prepStmt))) {
       // Keep prepared statement
-      final PreparedStatement prep = conn.prepareStatement(string(prepStmt));
       return jdbc(qc).add(prep);
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
