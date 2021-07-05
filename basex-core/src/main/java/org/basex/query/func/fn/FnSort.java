@@ -161,8 +161,8 @@ public final class FnSort extends StandardFunc {
       }
       // sortable single or singleton values
       final SeqType st = value.seqType();
-      if(st.type.isSortable() && (st.one() || (value instanceof SingletonSeq &&
-          ((SingletonSeq) value).singleItem()))) return value;
+      if(st.type.isSortable() && (st.one() || value instanceof SingletonSeq &&
+          ((SingletonSeq) value).singleItem())) return value;
     }
     // no quick evaluation possible
     return null;

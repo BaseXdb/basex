@@ -221,7 +221,7 @@ public abstract class Path extends ParseExpr {
     if(Flag.CTX.in(flags) && (root == null || root.has(Flag.CTX))) return true;
     /* Positional access: only check root node (steps will refer to result of root node).
      * Example: position()/a */
-    if(Flag.POS.in(flags) && (root != null && root.has(Flag.POS))) return true;
+    if(Flag.POS.in(flags) && root != null && root.has(Flag.POS)) return true;
     // check remaining flags
     final Flag[] flgs = Flag.POS.remove(Flag.CTX.remove(flags));
     if(flgs.length != 0) {

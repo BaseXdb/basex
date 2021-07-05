@@ -196,7 +196,7 @@ public class CmpG extends Cmp {
         // simple comparisons
         if(!(this instanceof CmpSimpleG)) expr = new CmpSimpleG(expr1, expr2, op, coll, sc, info);
       } else if(op == OpG.EQ && coll == null && (type1.isNumber() && type2.isNumber() ||
-          (type1.isStringOrUntyped() && type2.isStringOrUntyped())) && !st2.zeroOrOne()) {
+          type1.isStringOrUntyped() && type2.isStringOrUntyped()) && !st2.zeroOrOne()) {
         // hash-based comparisons
         hash = this instanceof CmpHashG ? (CmpHashG) this :
           new CmpHashG(expr1, expr2, op, null, sc, info);

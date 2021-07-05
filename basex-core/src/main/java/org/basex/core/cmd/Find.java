@@ -104,7 +104,7 @@ public final class Find extends AQuery {
         }
       }
     }
-    if((pre.length() == 0) && (preds.length() == 0)) return root ? "/" : ".";
+    if(pre.length() == 0 && preds.length() == 0) return root ? "/" : ".";
 
     // create final string
     return pre + (r ? "/" : "") + Axis.DESCENDANT_OR_SELF + "::*" + preds;

@@ -117,7 +117,7 @@ public abstract class Arr extends ParseExpr {
    */
   protected final boolean allAreValues(final boolean limit) {
     for(final Expr expr : exprs) {
-      if(!(expr instanceof Value) || (limit && expr.size() > CompileContext.MAX_PREEVAL))
+      if(!(expr instanceof Value) || limit && expr.size() > CompileContext.MAX_PREEVAL)
         return false;
     }
     return true;

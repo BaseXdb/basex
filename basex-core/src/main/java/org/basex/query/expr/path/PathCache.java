@@ -36,10 +36,9 @@ public final class PathCache {
    */
   boolean sameContext(final Value value, final Expr root) {
     // check if context value has changed, or if roots of cached and new context value are equal
-    return value == initial || (
+    return value == initial ||
       root instanceof UtilRoot && ((UtilRoot) root).exprs[0] instanceof ContextValue &&
       value instanceof ANode && initial instanceof ANode &&
-      ((ANode) initial).root().equals(((ANode) value).root())
-    );
+      ((ANode) initial).root().equals(((ANode) value).root());
   }
 }

@@ -42,8 +42,8 @@ public final class Arith extends Arr {
 
     // move values to second position
     Expr expr1 = exprs[0], expr2 = exprs[1];
-    if((calc == Calc.PLUS || calc == Calc.MULT) && (
-        expr1 instanceof Value && !(expr2 instanceof Value))) {
+    if((calc == Calc.PLUS || calc == Calc.MULT) && expr1 instanceof Value &&
+        !(expr2 instanceof Value)) {
       cc.info(OPTSWAP_X, this);
       exprs[0] = expr2;
       exprs[1] = expr1;
