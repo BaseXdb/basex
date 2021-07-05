@@ -12,7 +12,7 @@ import org.basex.query.var.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class VarContext {
+final class VarContext {
   /** Stack of local variables. */
   final VarStack stack = new VarStack();
   /** Non-local variable bindings for closures. */

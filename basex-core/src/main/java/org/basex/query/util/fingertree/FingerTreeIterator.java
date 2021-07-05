@@ -67,7 +67,7 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
    * @param start start position
    */
   @SuppressWarnings("unchecked")
-  FingerTreeIterator(final DeepTree<?, E> tree, final long start) {
+  private FingerTreeIterator(final DeepTree<?, E> tree, final long start) {
     n = tree.size();
     index = start;
 

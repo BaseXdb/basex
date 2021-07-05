@@ -259,7 +259,7 @@ public final class TypeswitchGroup extends Single {
    * @return {@code true} if expression has changed
    * @throws QueryException query exception
    */
-  public boolean simplify(final Simplify mode, final CompileContext cc) throws QueryException {
+  boolean simplify(final Simplify mode, final CompileContext cc) throws QueryException {
     final Expr ex = expr.simplifyFor(mode, cc);
     if(ex == expr) return false;
     expr = ex;

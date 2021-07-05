@@ -141,7 +141,7 @@ public final class DynFuncCall extends FuncCall {
    * Returns the function body expression.
    * @return body
    */
-  public Expr body() {
+  private Expr body() {
     return exprs[exprs.length - 1];
   }
 

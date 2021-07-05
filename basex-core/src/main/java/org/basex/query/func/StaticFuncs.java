@@ -178,7 +178,7 @@ public final class StaticFuncs extends ExprInfo {
    * @param func function
    * @return sequence types or {@code null}
    */
-  public SeqType[] seqTypes(final StaticFunc func) {
+  SeqType[] seqTypes(final StaticFunc func) {
     // initialize cache for direct lookups of function calls
     if(calls == null) {
       calls = new IdentityHashMap<>(funcs.size());
@@ -207,7 +207,7 @@ public final class StaticFuncs extends ExprInfo {
    * @param ii input info
    * @return exception
    */
-  public QueryException similarError(final QNm qname, final InputInfo ii) {
+  private QueryException similarError(final QNm qname, final InputInfo ii) {
     // check local functions
     final ArrayList<QNm> list = new ArrayList<>();
     for(final FuncCache fc : funcs.values()) {

@@ -265,7 +265,7 @@ public abstract class Arr extends ParseExpr {
    * @param ebv consider ebv checks
    * @return result of check
    */
-  final boolean contradict(final Expr expr1, final Expr expr2, final boolean ebv) {
+  static boolean contradict(final Expr expr1, final Expr expr2, final boolean ebv) {
     // boolean(A), not(A)
     Expr arg = BOOLEAN.is(expr1) ? expr1.arg(0) : expr1;
     if(NOT.is(expr2) && expr2.arg(0).equals(arg)) return true;

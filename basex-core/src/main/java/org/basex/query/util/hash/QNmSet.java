@@ -16,7 +16,7 @@ public class QNmSet extends ASet implements Iterable<QNm> {
   /** Hashed keys. */
   protected QNm[] keys;
   /** Hash values. */
-  protected int[] hash;
+  private int[] hash;
 
   /**
    * Default constructor.

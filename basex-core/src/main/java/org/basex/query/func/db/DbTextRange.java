@@ -45,7 +45,7 @@ public class DbTextRange extends DbAccess {
    * @return iterator
    * @throws QueryException query exception
    */
-  final StringRangeAccess rangeAccess(final QueryContext qc) throws QueryException {
+  private StringRangeAccess rangeAccess(final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
     final byte[] min = toToken(exprs[1], qc), max = toToken(exprs[2], qc);
     final StringRange sr = new StringRange(type(), min, true, max, true);

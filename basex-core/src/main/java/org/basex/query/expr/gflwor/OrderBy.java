@@ -26,9 +26,9 @@ import org.basex.util.hash.*;
  */
 public final class OrderBy extends Clause {
   /** References to the variables to be sorted. */
-  VarRef[] refs;
+  private VarRef[] refs;
   /** Sort keys. */
-  final OrderKey[] keys;
+  private final OrderKey[] keys;
 
   /**
    * Constructor.

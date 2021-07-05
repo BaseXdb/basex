@@ -271,7 +271,7 @@ public final class User {
    * @param password password
    * @return digest digest hash
    */
-  static String digest(final String name, final String password) {
+  private static String digest(final String name, final String password) {
     return md5(name + ':' + Prop.NAME + ':' + password);
   }
 }

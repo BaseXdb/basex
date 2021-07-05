@@ -134,7 +134,7 @@ public abstract class Cmp extends Arr {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public final Expr optPred(final Expr root, final CompileContext cc) throws QueryException {
+  final Expr optPred(final Expr root, final CompileContext cc) throws QueryException {
     final Type type = root.seqType().type;
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final OpV opV = opV();

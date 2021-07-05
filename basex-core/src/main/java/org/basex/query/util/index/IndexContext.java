@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public class IndexContext extends IndexPred {
+class IndexContext extends IndexPred {
   /**
    * Constructor.
    * @param ii index info

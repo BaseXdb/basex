@@ -76,7 +76,7 @@ public class FileList extends FileFn {
    * @param qc query context
    * @throws IOException I/O exception
    */
-  static void list(final Path root, final boolean recursive, final Pattern pattern,
+  private static void list(final Path root, final boolean recursive, final Pattern pattern,
       final TokenList list, final int index, final QueryContext qc) throws IOException {
 
     // filter function for adding results

@@ -385,7 +385,7 @@ public abstract class SimpleMap extends Arr {
    * @return converted or original expression
    * @throws QueryException query context
    */
-  public Expr toPath(final CompileContext cc) throws QueryException {
+  private Expr toPath(final CompileContext cc) throws QueryException {
     Expr root = exprs[0];
     final ExprList steps = new ExprList();
     if(root instanceof AxisPath) {

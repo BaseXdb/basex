@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class Pos extends Arr implements CmpPos {
+final class Pos extends Arr implements CmpPos {
   /**
    * Constructor.
    * @param info input info

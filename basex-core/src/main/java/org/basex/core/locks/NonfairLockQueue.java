@@ -8,7 +8,7 @@ import java.util.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class NonfairLockQueue extends LockQueue {
+final class NonfairLockQueue extends LockQueue {
   /** Queued readers. */
   private final Queue<Long> readers = new LinkedList<>();
   /** Queued writers. */

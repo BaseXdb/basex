@@ -129,7 +129,6 @@ public interface QueryText {
   /** Parser token. */ String REVALIDATION = "revalidation";
   /** Parser token. */ String SAME = "same";
   /** Parser token. */ String SATISFIES = "satisfies";
-  /** Parser token. */ String SCHEMA_ATTRIBUTE = "schema-attribute";
   /** Parser token. */ String SCHEMA_ELEMENT = "schema-element";
   /** Parser token. */ String SCHEMA = "schema";
   /** Parser token. */ String SCORE = "score";

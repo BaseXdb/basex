@@ -28,11 +28,10 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class DBNode extends ANode {
-  /** Parent of the database instance  (can be {@code null}). */
-  FNode root;
-
   /** Data reference. */
   private final Data data;
+  /** Parent of the database instance  (can be {@code null}). */
+  private FNode root;
   /** Pre value. */
   private int pre;
 

@@ -24,7 +24,7 @@ import org.w3c.dom.*;
  * @author Christian Gruen
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public final class JavaMapping {
+final class JavaMapping {
   /** Private constructor. */
   private JavaMapping() { }
 

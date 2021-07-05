@@ -101,15 +101,6 @@ public final class NSContext {
   }
 
   /**
-   * Returns the namespace stack.
-   * @return stack
-   */
-  public Atts stack() {
-    if(stack == null) stack = new Atts();
-    return stack;
-  }
-
-  /**
    * Adds the namespaces that are currently in scope.
    * @param atts namespaces
    */
@@ -120,5 +111,14 @@ public final class NSContext {
         if(!atts.contains(nm)) atts.add(nm, stack.value(s));
       }
     }
+  }
+
+  /**
+   * Returns the namespace stack.
+   * @return stack
+   */
+  private Atts stack() {
+    if(stack == null) stack = new Atts();
+    return stack;
   }
 }

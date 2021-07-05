@@ -11,7 +11,7 @@ import org.basex.query.util.list.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public class IndexPath extends IndexPred {
+class IndexPath extends IndexPred {
   /** Path expression. */
   private final AxisPath path;
 

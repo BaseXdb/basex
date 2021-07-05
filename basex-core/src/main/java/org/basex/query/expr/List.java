@@ -254,7 +254,7 @@ public final class List extends Arr {
    * If possible, rewrites the list to a distinct range expression.
    * @return range or original expression
    */
-  public Expr toDistinctRange() {
+  private Expr toDistinctRange() {
     long start = 0, end = 0;
     final LongList list = new LongList(2);
     for(final Expr ex : exprs) {

@@ -21,7 +21,7 @@ abstract class ArchiveOut implements Closeable {
   /** Output. */
   final ArrayOutput ao = new ArrayOutput();
   /** Buffer. */
-  final byte[] data = new byte[IO.BLOCKSIZE];
+  private final byte[] data = new byte[IO.BLOCKSIZE];
 
   /**
    * Returns a new instance of an archive writer.

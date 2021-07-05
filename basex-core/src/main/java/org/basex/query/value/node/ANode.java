@@ -547,7 +547,7 @@ public abstract class ANode extends Item {
    * @param children child nodes
    * @param nodes node cache
    */
-  static void addDesc(final BasicNodeIter children, final ANodeList nodes) {
+  private static void addDesc(final BasicNodeIter children, final ANodeList nodes) {
     for(final ANode node : children) {
       nodes.add(node.finish());
       addDesc(node.childIter(), nodes);

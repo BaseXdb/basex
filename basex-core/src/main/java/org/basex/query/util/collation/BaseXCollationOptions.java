@@ -93,7 +93,7 @@ public final class BaseXCollationOptions extends CollationOptions {
    * @return collator collator
    * @throws BaseXException database exception
    */
-  public Collator collator(final HashMap<String, String> args) throws BaseXException {
+  private Collator collator(final HashMap<String, String> args) throws BaseXException {
     if(fallback) {
       for(final Entry<String, String> entry : args.entrySet()) {
         final String name = entry.getKey();

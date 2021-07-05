@@ -13,7 +13,7 @@ public final class FTPos {
   /** Pre value. */
   final int pre;
   /** Positions. */
-  IntList list;
+  private IntList list;
 
   /**
    * Constructor.

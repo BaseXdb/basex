@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public abstract class FormatParser extends FormatUtil {
+abstract class FormatParser extends FormatUtil {
   /** Input information. */
   private final InputInfo info;
 

@@ -9,7 +9,7 @@ import org.basex.query.util.list.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Leo Woerteler
  */
-public final class TypedFunc {
+final class TypedFunc {
   /** Function expression. */
   final Expr func;
   /** Annotations. */

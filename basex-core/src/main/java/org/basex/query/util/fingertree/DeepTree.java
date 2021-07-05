@@ -26,7 +26,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
   final Node<N, E>[] right;
 
   /** Size of this tree. */
-  final long size;
+  private final long size;
 
   /**
    * Constructor.

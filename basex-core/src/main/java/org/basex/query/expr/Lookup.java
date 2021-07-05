@@ -76,7 +76,7 @@ public final class Lookup extends Arr {
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  public Expr opt(final CompileContext cc) throws QueryException {
+  private Expr opt(final CompileContext cc) throws QueryException {
     final Expr inputs = exprs[0], keys = exprs[1];
     final long ks = keys.seqType().mayBeArray() || keys.has(Flag.NDT) ? -1 : keys.size();
     if(ks == 0) return keys;

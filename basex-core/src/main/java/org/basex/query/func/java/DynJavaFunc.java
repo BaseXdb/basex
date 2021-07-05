@@ -23,11 +23,10 @@ import org.basex.util.list.*;
 final class DynJavaFunc extends DynJavaCall {
   /** Name of Java field/method. */
   private final String name;
-
   /** Method candidates. */
-  public ArrayList<Method> methods;
+  private ArrayList<Method> methods;
   /** Field candidate. */
-  public Field field;
+  private Field field;
 
   /**
    * Constructor.
