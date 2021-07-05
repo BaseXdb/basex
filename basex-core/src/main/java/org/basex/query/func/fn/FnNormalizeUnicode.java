@@ -29,6 +29,7 @@ public final class FnNormalizeUnicode extends StandardFunc {
       try {
         form = Form.valueOf(string(n));
       } catch(final IllegalArgumentException ex) {
+        Util.debug(ex);
         throw NORMUNI_X.get(info, n);
       }
     }

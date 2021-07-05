@@ -113,6 +113,7 @@ public class B64 extends Bin {
     try {
       return Base64.decode(item.string(ii));
     } catch(final IllegalArgumentException ex) {
+      Util.debug(ex);
       throw AtomType.BASE64_BINARY.castError(item, ii);
     }
   }
@@ -128,6 +129,7 @@ public class B64 extends Bin {
     try {
       return Base64.decode(value);
     } catch(final IllegalArgumentException ex) {
+      Util.debug(ex);
       throw AtomType.BASE64_BINARY.castError(value, ii);
     }
   }

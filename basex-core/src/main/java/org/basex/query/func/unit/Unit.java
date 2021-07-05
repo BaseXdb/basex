@@ -268,7 +268,8 @@ final class Unit {
       } else {
         try {
           exp.add(item.string(null));
-        } catch(final QueryException ignored) {
+        } catch(final QueryException ex) {
+          Util.debug(ex);
           exp.add(normalize(item.toString(), null));
         }
       }

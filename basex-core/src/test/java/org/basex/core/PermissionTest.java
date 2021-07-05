@@ -324,7 +324,8 @@ public final class PermissionTest extends SandboxTest {
     try {
       s.execute(cmd);
       fail("\"" + cmd + "\" was supposed to fail.");
-    } catch(final IOException ignored) {
+    } catch(final IOException ex) {
+      Util.debug(ex);
     }
   }
 }

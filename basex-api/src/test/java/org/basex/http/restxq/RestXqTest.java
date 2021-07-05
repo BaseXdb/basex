@@ -58,7 +58,8 @@ public abstract class RestXqTest extends HTTPTest {
     try {
       get(query);
       fail("Error expected: " + query);
-    } catch(final BaseXException ignored) {
+    } catch(final BaseXException ex) {
+      Util.debug(ex);
     }
   }
 

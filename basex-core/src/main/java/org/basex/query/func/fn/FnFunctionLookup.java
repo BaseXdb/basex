@@ -23,7 +23,9 @@ public final class FnFunctionLookup extends StandardFunc {
       try {
         final Expr lit = Functions.getLiteral(name, (int) arity, qc, sc, info, true);
         if(lit != null) return lit.item(qc, info);
-      } catch(final QueryException ignore) { }
+      } catch(final QueryException ex) {
+        Util.debug(ex);
+      }
     }
     // function not found
     return Empty.VALUE;

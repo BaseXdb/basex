@@ -561,6 +561,7 @@ public final class Token {
     try {
       return Double.parseDouble(string(token, start, end - start));
     } catch(final NumberFormatException ex) {
+      Util.debug(ex);
       return Double.NaN;
     }
   }

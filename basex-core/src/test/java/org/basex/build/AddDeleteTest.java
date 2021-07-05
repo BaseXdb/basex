@@ -186,7 +186,9 @@ public final class AddDeleteTest extends SandboxTest {
     try {
       new Add("", io.path()).execute(context);
       fail("Broken file was added to the database.");
-    } catch(final BaseXException ignored) { }
+    } catch(final BaseXException ex) {
+      Util.debug(ex);
+    }
 
     assertTrue(io.delete());
   }
@@ -227,7 +229,9 @@ public final class AddDeleteTest extends SandboxTest {
     try {
       new Add("", "<x").execute(context);
       fail("Broken file was added to the database.");
-    } catch(final BaseXException ignored) { }
+    } catch(final BaseXException ex) {
+      Util.debug(ex);
+    }
   }
 
   /**

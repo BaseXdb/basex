@@ -106,7 +106,9 @@ final class Docs {
       // try to read paths from disk
       try(DataInput in = new DataInput(data.meta.dbFile(DATAPTH))) {
         pathList = new TokenList(in.readTokens());
-      } catch(final IOException ignore) { }
+      } catch(final IOException ex) {
+        Util.debug(ex);
+      }
     }
 
     // generate paths

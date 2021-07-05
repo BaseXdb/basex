@@ -170,6 +170,7 @@ public final class XMLCommandTest extends SandboxTest {
       CommandParser.get(xml, context).parse();
       fail('"' + xml + "\" was supposed to fail.");
     } catch(final QueryException ex) {
+      Util.debug(ex);
       /* expected */
     }
   }

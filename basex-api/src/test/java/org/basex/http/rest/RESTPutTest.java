@@ -7,6 +7,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.io.in.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -74,6 +75,8 @@ public final class RESTPutTest extends RESTTest {
     try(FileInputStream fis = new FileInputStream(FILE)) {
       put(NAME + "?xxx=yyy", fis);
       fail("Error expected.");
-    } catch(final IOException ignored) { }
+    } catch(final IOException ex) {
+      Util.debug(ex);
+    }
   }
 }

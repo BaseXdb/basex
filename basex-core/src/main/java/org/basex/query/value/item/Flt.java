@@ -136,7 +136,9 @@ public final class Flt extends ANum {
     if(!Token.eq(v, Token.INFINITY, Token.NEGATIVE_INFINITY)) {
       try {
         return Float.parseFloat(Token.string(v));
-      } catch(final NumberFormatException ignore) { }
+      } catch(final NumberFormatException ex) {
+        Util.debug(ex);
+      }
     }
 
     if(Token.eq(v, Token.INF)) return Float.POSITIVE_INFINITY;

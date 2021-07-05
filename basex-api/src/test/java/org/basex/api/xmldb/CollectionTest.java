@@ -6,6 +6,7 @@ import java.io.*;
 
 import javax.xml.parsers.*;
 
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
@@ -191,7 +192,9 @@ public final class CollectionTest extends XMLDBBaseTest {
     try {
       collection.createResource("hans", "UnknownResource");
       fail("Resource Type is expected to be unknown.");
-    } catch(final XMLDBException ignored) { }
+    } catch(final XMLDBException ex) {
+      Util.debug(ex);
+    }
 
     // test xml resource and ID creation
     Resource resource = collection.createResource(null, XMLResource.RESOURCE_TYPE);

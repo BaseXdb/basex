@@ -98,6 +98,7 @@ public final class TextEditor {
         searchContext = sc;
         searchThread = null;
       } catch(final JobException ex) {
+        Util.debug(ex);
         // search was interrupted
       } catch(final Exception ex) {
         final String info = Util.message(ex).replaceAll(Text.NL + ".*", "");

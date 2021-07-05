@@ -24,6 +24,7 @@ public final class FnNumber extends ContextFn {
       if(info != null) info.internal(true);
       return AtomType.DOUBLE.cast(item, qc, sc, info);
     } catch(final QueryException ex) {
+      Util.debug(ex);
       return Dbl.NAN;
     } finally {
       if(info != null) info.internal(false);

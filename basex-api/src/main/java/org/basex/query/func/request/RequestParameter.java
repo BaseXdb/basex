@@ -35,6 +35,7 @@ public final class RequestParameter extends ApiFunc {
       if(form != null) vb.add(form);
       return vb.value(this);
     } catch(final IOException ex) {
+      Util.debug(ex);
       throw REQUEST_PARAMETER.get(info, requestCtx.queryString());
     }
   }

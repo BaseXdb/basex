@@ -78,7 +78,9 @@ final class WebDAVUtils {
     final int c = ti.read();
     try {
       bi.reset();
-    } catch(final IOException ignore) { }
+    } catch(final IOException ex) {
+      Util.debug(ex);
+    }
     return c;
   }
 }

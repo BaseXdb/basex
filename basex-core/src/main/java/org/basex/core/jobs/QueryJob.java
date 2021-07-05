@@ -198,6 +198,7 @@ public final class QueryJob extends Job implements Runnable {
 
     } catch(final JobException ex) {
       // query was interrupted: remove cached result
+      Util.debug(ex);
       ctx.jobs.results.remove(jc.id());
     } catch(final QueryException ex) {
       result.exception = ex;

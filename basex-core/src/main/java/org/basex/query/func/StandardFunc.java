@@ -405,8 +405,9 @@ public abstract class StandardFunc extends Arr {
     try {
       final String enc = string(toToken(exprs[i], qc));
       if(Charset.isSupported(enc)) return Strings.normEncoding(enc);
-    } catch(final IllegalArgumentException ignored) {
-      /* character set is invalid or unknown (e.g. empty string) */
+    } catch(final IllegalArgumentException ex) {
+      // character set is invalid or unknown (e.g. empty string)
+      Util.debug(ex);
     }
     throw err.get(info, QueryError.similar(encoding,
         Levenshtein.similar(encoding, Strings.encodings())));

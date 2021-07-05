@@ -162,6 +162,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
     try {
       if(session != null) session.getCreationTime();
     } catch(final IllegalStateException ex) {
+      Util.debug(ex);
       session = null;
     }
 

@@ -9,6 +9,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
@@ -30,6 +31,7 @@ public final class RequestParameterNames extends ApiFunc {
       for(final byte[] name : cache) names.add(name);
       return StrSeq.get(names);
     } catch(final IOException ex) {
+      Util.debug(ex);
       throw REQUEST_PARAMETER.get(info, requestCtx.queryString());
     }
   }

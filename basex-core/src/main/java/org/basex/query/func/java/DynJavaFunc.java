@@ -65,6 +65,7 @@ final class DynJavaFunc extends DynJavaCall {
         arities.add(al);
       }
     } catch(final NoSuchFieldException ex) {
+      Util.debug(ex);
       // field not found
     }
 

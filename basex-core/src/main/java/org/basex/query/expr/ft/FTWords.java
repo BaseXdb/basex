@@ -242,8 +242,9 @@ public final class FTWords extends FTExpr {
           ftt.matches.reset(ps);
           try {
             if(contains(fttokens, input, ftt) != 0) return true;
-          } catch(final QueryException ignore) {
+          } catch(final QueryException ex) {
             // ignore exceptions
+            Util.debug(ex);
           }
         }
         return false;

@@ -29,7 +29,8 @@ public final class RESTDeleteTest extends RESTTest {
       // no database left
       delete(NAME);
       fail("Error expected.");
-    } catch(final BaseXException ignored) {
+    } catch(final BaseXException ex) {
+      Util.debug(ex);
     }
   }
 
@@ -53,7 +54,8 @@ public final class RESTDeleteTest extends RESTTest {
       // no database left
       delete(NAME);
       fail("Error expected.");
-    } catch(final BaseXException ignored) {
+    } catch(final BaseXException ex) {
+      Util.debug(ex);
     }
   }
 
@@ -67,7 +69,8 @@ public final class RESTDeleteTest extends RESTTest {
     try {
       delete(NAME + "/a?xxx=true");
       fail("Error expected.");
-    } catch(final IOException ignored) {
+    } catch(final IOException ex) {
+      Util.debug(ex);
     }
   }
 

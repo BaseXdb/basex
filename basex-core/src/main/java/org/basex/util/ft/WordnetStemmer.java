@@ -54,6 +54,7 @@ final class WordnetStemmer extends Stemmer {
       final Object dict = Reflect.get(ctr, new URL("file", null, PATH));
       return Reflect.invoke(Reflect.method(dct, "open"), dict);
     } catch(final Exception ex) {
+      Util.debug(ex);
       return null;
     }
   }

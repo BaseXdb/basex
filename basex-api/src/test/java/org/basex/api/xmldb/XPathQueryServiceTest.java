@@ -3,6 +3,7 @@ package org.basex.api.xmldb;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.io.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
@@ -54,12 +55,16 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     try {
       service.setNamespace("hell", null);
       fail("Null URIs are not allowed.");
-    } catch(final XMLDBException ignored) { }
+    } catch(final XMLDBException ex) {
+      Util.debug(ex);
+    }
 
     try {
       collection.createResource("hans", "");
       fail("Empty URIs are not allowed.");
-    } catch(final XMLDBException ignored) { }
+    } catch(final XMLDBException ex) {
+      Util.debug(ex);
+    }
   }
 
   /**
@@ -112,7 +117,9 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     try {
       service.query("1+");
       fail("Buggy query was accepted.");
-    } catch(final XMLDBException ignored) { }
+    } catch(final XMLDBException ex) {
+      Util.debug(ex);
+    }
 
     assertEquals(1, service.query("/").getSize(), "Wrong result size.");
 
@@ -137,7 +144,9 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     try {
       service.queryResource("UnknownDoc", "/");
       fail("Query was executed on unknown document.");
-    } catch(final XMLDBException ignore) { }
+    } catch(final XMLDBException ex) {
+      Util.debug(ex);
+    }
   }
 
   /**

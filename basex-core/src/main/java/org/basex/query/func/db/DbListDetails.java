@@ -58,8 +58,9 @@ public final class DbListDetails extends DbList {
           database.add(MODIFIED_DATE, DateTime.format(new Date(meta.dbTime())));
           database.add(SIZE, token(meta.dbSize()));
           if(ctx.perm(Perm.CREATE, name)) database.add(PATH, meta.original);
-        } catch(final IOException ignore) {
+        } catch(final IOException ex) {
           // invalid database will be ignored
+          Util.debug(ex);
         }
         return database.add(name);
       }

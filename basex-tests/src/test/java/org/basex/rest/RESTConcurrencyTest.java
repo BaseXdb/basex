@@ -120,8 +120,9 @@ public final class RESTConcurrencyTest extends SandboxTest {
       final HTTPResponse result = writer.get(TIMEOUT, TimeUnit.MILLISECONDS);
       if(result.status.isSuccess()) fail("Database modified while a reader is running");
       throw new Exception(result.toString());
-    } catch(final TimeoutException e) {
+    } catch(final TimeoutException ex) {
       // writer is blocked by the reader: stop it
+      Util.debug(ex);
       writerAction.stop = true;
     }
 
@@ -196,7 +197,9 @@ public final class RESTConcurrencyTest extends SandboxTest {
             for(int i; (i = input.read()) != -1;) bl.add(i);
 
             return new HTTPResponse(code, bl.toString());
-          } catch(final SocketTimeoutException ignore) { }
+          } catch(final SocketTimeoutException ex) {
+            Util.debug(ex);
+          }
         }
         return null;
       } finally {
@@ -251,7 +254,9 @@ public final class RESTConcurrencyTest extends SandboxTest {
         while(!stop) {
           try {
             return new HTTPResponse(hc.getResponseCode());
-          } catch(final SocketTimeoutException ignore) { }
+          } catch(final SocketTimeoutException ex) {
+            Util.debug(ex);
+          }
         }
         return null;
       } finally {

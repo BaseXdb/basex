@@ -6,6 +6,7 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.serial.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
@@ -53,6 +54,7 @@ public final class XMLParserTest extends SandboxTest {
       try {
         new CreateDB(NAME, doc).execute(context);
       } catch(final BaseXException ex) {
+        Util.debug(ex);
         def = false;
       }
 
@@ -62,6 +64,7 @@ public final class XMLParserTest extends SandboxTest {
       try {
         new CreateDB(NAME, doc).execute(context);
       } catch(final BaseXException ex) {
+        Util.debug(ex);
         cust = false;
       }
 

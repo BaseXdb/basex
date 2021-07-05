@@ -2,6 +2,7 @@ package org.basex.io.parse.json;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -155,8 +156,9 @@ public final class JsonParserTest {
     try {
       parse(json, liberal);
       fail("Should have failed: '" + json + '\'');
-    } catch(final Exception qe) {
+    } catch(final Exception ex) {
       // expected error
+      Util.debug(ex);
     }
   }
 

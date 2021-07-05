@@ -60,6 +60,7 @@ final class XdmNode extends XdmItem {
     try {
       return node.serialize().toString();
     } catch(final QueryIOException ex) {
+      Util.debug(ex);
       return node.toString();
     }
   }

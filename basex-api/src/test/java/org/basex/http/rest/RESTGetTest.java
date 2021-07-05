@@ -7,6 +7,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.util.*;
 import org.basex.util.http.*;
 import org.junit.jupiter.api.*;
 
@@ -44,6 +45,7 @@ public final class RESTGetTest extends RESTTest {
       fail("Error expected.");
     } catch(final IOException ex) {
       // expected
+      Util.debug(ex);
     }
   }
 
@@ -77,7 +79,8 @@ public final class RESTGetTest extends RESTTest {
     try {
       get("?query=()&method=xxx");
       fail("Error expected.");
-    } catch(final IOException ignored) {
+    } catch(final IOException ex) {
+      Util.debug(ex);
     }
   }
 
@@ -141,14 +144,16 @@ public final class RESTGetTest extends RESTTest {
     try {
       get("?run=unknown.abc");
       fail("Error expected.");
-    } catch(final IOException ignored) {
+    } catch(final IOException ex) {
+      Util.debug(ex);
     }
 
     try {
       new IOFile(path, "x.bxs").write("<set option='unknown'>123</set>");
       assertEquals("", get("?run=x.bxs"));
       fail("Error expected.");
-    } catch(final IOException ignored) {
+    } catch(final IOException ex) {
+      Util.debug(ex);
     }
   }
 }

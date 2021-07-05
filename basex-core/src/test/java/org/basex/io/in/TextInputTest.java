@@ -122,6 +122,7 @@ public final class TextInputTest {
       for(int b; (b = ti.read()) != -1;) tb.add(b);
       assertSame(data, tb.finish());
     } catch(final IOException ex) {
+      Util.debug(ex);
       assertTrue(data.length >= IO.BLOCKSIZE,
         "Mark could not be reset for data size of " + data.length);
     }

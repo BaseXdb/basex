@@ -63,6 +63,7 @@ public final class JsonParser extends InputParser {
     try {
       value();
     } catch(final StackOverflowError er) {
+      Util.debug(er);
       throw error("Input is too deeply nested");
     }
     if(more()) throw error("Unexpected trailing content: %", remaining());

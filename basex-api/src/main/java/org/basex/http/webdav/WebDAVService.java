@@ -485,10 +485,11 @@ final class WebDAVService {
           return db == null ? createDb(dbName(path), bi) : replace(db, path, bi);
         } catch(final IOException ex) {
           // reset stream if it did not work out
+          Util.debug(ex);
           try {
             bi.reset();
           } catch(final IOException e) {
-            Util.debug(ex);
+            Util.debug(e);
             // throw original exception if input cannot be reset
             throw ex;
           }

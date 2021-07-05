@@ -260,7 +260,9 @@ final class DialogImport extends BaseXBack {
       }
       // all characters were of type ascii
       return MainParser.TEXT;
-    } catch(final IOException ignored) { }
+    } catch(final IOException ex) {
+      Util.debug(ex);
+    }
     // could not evaluate type
     return null;
   }

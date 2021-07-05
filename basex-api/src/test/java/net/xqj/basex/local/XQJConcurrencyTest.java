@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor.*;
 
 import javax.xml.xquery.*;
 
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 import com.xqj2.*;
@@ -96,8 +97,8 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
     if(conn != null) {
       try {
         conn.close();
-      } catch(final XQException ignored) {
-        /* ... superfluous ... */
+      } catch(final XQException ex) {
+        Util.debug(ex);
       }
     }
   }

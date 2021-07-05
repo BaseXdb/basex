@@ -644,6 +644,7 @@ public class CommandTest extends SandboxTest {
       session.execute(cmd);
       fail("\"" + cmd + "\" was supposed to fail.");
     } catch(final IOException ex) {
+      Util.debug(ex);
       /* expected */
     }
   }

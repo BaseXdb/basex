@@ -83,6 +83,7 @@ public abstract class Sandbox {
     try {
       return eval(query);
     } catch(final JobException ex) {
+      Util.debug(ex);
       return "";
     } catch(final QueryException | IOException ex) {
       Util.stack(ex);

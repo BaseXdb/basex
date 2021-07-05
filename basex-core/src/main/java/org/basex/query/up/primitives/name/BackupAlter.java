@@ -42,6 +42,7 @@ public final class BackupAlter extends NameUpdate {
     try {
       AlterBackup.alter(name, newName, qc.context.soptions);
     } catch(final IOException ex) {
+      Util.debug(ex);
       throw UPDROPBACK_X_X.get(info, name, operation());
     }
   }

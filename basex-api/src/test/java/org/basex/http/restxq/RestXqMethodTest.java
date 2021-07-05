@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.util.*;
 import org.basex.util.http.*;
 import org.junit.jupiter.api.*;
 
@@ -73,7 +74,8 @@ public final class RestXqMethodTest extends RestXqTest {
       // java.net.HttpUrlConnection does not support custom HTTP methods
       request("", "RETRIEVE");
       fail("Error expected: " + q);
-    } catch (final BaseXException ignored) {
+    } catch (final BaseXException ex) {
+      Util.debug(ex);
     }
   }
 
@@ -152,7 +154,8 @@ public final class RestXqMethodTest extends RestXqTest {
     try {
       head("");
       fail("Error expected: " + "");
-    } catch(final BaseXException ignored) {
+    } catch(final BaseXException ex) {
+      Util.debug(ex);
     }
   }
 }

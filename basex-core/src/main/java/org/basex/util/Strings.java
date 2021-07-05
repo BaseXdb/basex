@@ -234,6 +234,7 @@ public final class Strings {
     try {
       return Charset.isSupported(encoding);
     } catch(final IllegalArgumentException ex) {
+      Util.debug(ex);
       return false;
     }
   }
@@ -319,7 +320,9 @@ public final class Strings {
         tb.add(p == null || p.isEmpty() ? "/" : p.replace('.', '/'));
       }
       path = tb.toString();
-    } catch(final URISyntaxException ignore) { }
+    } catch(final URISyntaxException ex) {
+      Util.debug(ex);
+    }
 
     // replace special characters with dashes; remove multiple slashes
     path = path.replaceAll("[^\\w.-/]+", "-").replaceAll("//+", "/");

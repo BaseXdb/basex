@@ -8,6 +8,7 @@ import javax.swing.*;
 
 import org.basex.gui.*;
 import org.basex.gui.listener.*;
+import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -162,7 +163,8 @@ public class BaseXTextField extends JTextField {
         final int num = Integer.parseInt(getText());
         if(assign) options.set((NumberOption) option, num);
         setBackground(back);
-      } catch(final NumberFormatException ignored) {
+      } catch(final NumberFormatException ex) {
+        Util.debug(ex);
         setBackground(GUIConstants.LRED);
         return false;
       }

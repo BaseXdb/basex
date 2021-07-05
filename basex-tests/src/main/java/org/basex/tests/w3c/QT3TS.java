@@ -387,6 +387,7 @@ public final class QT3TS extends Main {
       res = ex.getCode() + ": " + ex.getLocalizedMessage();
       err = true;
     } catch(final Throwable ex) {
+      Util.debug(ex);
       res = returned.value.toString();
     }
 
@@ -974,6 +975,7 @@ public final class QT3TS extends Main {
       f2.setAccessible(true);
       ((Map<String, String>) f2.get(null)).putAll(ne);
     } catch(final NoSuchFieldException ex) {
+      Util.debug(ex);
       try {
         for(final Class<?> cl : Collections.class.getDeclaredClasses()) {
           if("java.util.Collections$UnmodifiableMap".equals(cl.getName())) {

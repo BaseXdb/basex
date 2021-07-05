@@ -80,7 +80,9 @@ public final class Reflect {
       try {
         f = clazz.getField(name);
         FIELDS.put(key, f);
-      } catch(final Throwable ignored) { }
+      } catch(final Throwable ex) {
+        Util.debug(ex);
+      }
     }
     return f;
   }

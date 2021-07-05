@@ -573,8 +573,8 @@ public final class LockingTest extends SandboxTest {
       if(await != null) {
         try {
           if(!await.await(WAIT, TimeUnit.MILLISECONDS)) fail("Latch timed out.");
-        } catch(final InterruptedException e) {
-          throw new RuntimeException("Unexpectedly interrupted.");
+        } catch(final InterruptedException ex) {
+          throw new RuntimeException("Unexpectedly interrupted" + ex);
         }
       }
 
@@ -592,7 +592,7 @@ public final class LockingTest extends SandboxTest {
 
         locking.release();
       } catch(final InterruptedException ex) {
-        throw new RuntimeException("Unexpectedly interrupted.");
+        throw new RuntimeException("Unexpectedly interrupted" + ex);
       }
     }
 
