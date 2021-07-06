@@ -51,7 +51,7 @@ public final class GUIMacOSX9 extends GUIMacOS implements InvocationHandler {
   public Object invoke(final Object proxy, final Method method, final Object[] args) {
     final String name = method.getName();
     if(name.equals("handleAbout")) GUIMenuCmd.C_ABOUT.execute(main);
-    if(name.equals("handlePreferences")) GUIMenuCmd.C_PREFS.execute(main);
+    if(name.equals("handlePreferences")) GUIMenuCmd.C_PREFERENCES.execute(main);
     return null;
   }
 }

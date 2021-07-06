@@ -188,7 +188,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     final AbstractButton go = BaseXButton.get("c_go", RUN_QUERY, false, this);
     go.addActionListener(e -> execute());
 
-    filter = BaseXButton.command(GUIMenuCmd.C_FILTER, this);
+    filter = BaseXButton.command(GUIMenuCmd.C_FILTER_NODES, this);
 
     b = new BaseXBack(new ColumnLayout(1));
     b.add(stop);
@@ -310,7 +310,7 @@ public final class GUI extends JFrame implements BaseXWindow {
         cp.pwReader(pwReader);
         execute(cp.parse());
       } catch(final QueryException ex) {
-        if(!info.visible()) GUIMenuCmd.C_SHOWINFO.execute(this);
+        if(!info.visible()) GUIMenuCmd.C_SHOW_INFO.execute(this);
         info.setInfo(Util.message(ex), null, false, true);
       }
     } else if(gopts.get(GUIOptions.SEARCHMODE) == 1 || Strings.startsWith(in, '/')) {
@@ -436,7 +436,7 @@ public final class GUI extends JFrame implements BaseXWindow {
 
       // show text view if a non-empty result does not reference the currently opened database
       if(!text.visible() && output.size() != 0 && nodes == null) {
-        GUIMenuCmd.C_SHOWRESULT.execute(this);
+        GUIMenuCmd.C_SHOW_RESULT.execute(this);
       }
 
       // check if query feedback was evaluated in the query view
@@ -444,7 +444,7 @@ public final class GUI extends JFrame implements BaseXWindow {
         // display error in info view
         text.setText(output, 0);
         if(!info.visible() && (!edit || inf.startsWith(S_BUGINFO))) {
-          GUIMenuCmd.C_SHOWINFO.execute(this);
+          GUIMenuCmd.C_SHOW_INFO.execute(this);
         }
       } else {
         final boolean updated = cmd.updated(context);

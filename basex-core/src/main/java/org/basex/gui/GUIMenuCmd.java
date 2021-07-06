@@ -53,7 +53,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows database info. */
-  C_INFO(PROPERTIES + DOTS, "% shift M", true, false) {
+  C_PROPERTIES(PROPERTIES + DOTS, "% shift M", true, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogProps(gui);
@@ -107,7 +107,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Creates a new file in the editor. */
-  C_EDITNEW(NEW, "% T", false, false) {
+  C_EDIT_NEW(NEW, "% T", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.newFile();
@@ -115,7 +115,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Opens a new file in the editor. */
-  C_EDITOPEN(OPEN + DOTS, "% O", false, false) {
+  C_EDIT_OPEN(OPEN + DOTS, "% O", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.open();
@@ -123,7 +123,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Reverts the current editor file. */
-  C_EDITREOPEN(REOPEN + DOTS, null, false, false) {
+  C_EDIT_REOPEN(REOPEN + DOTS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.getEditor().reopen(true);
@@ -136,7 +136,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Saves the current file in the editor. */
-  C_EDITSAVE(SAVE, "% S", false, false) {
+  C_EDIT_SAVE(SAVE, "% S", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.save();
@@ -150,7 +150,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Saves the current editor file under a new name. */
-  C_EDITSAVEAS(SAVE_AS + DOTS, "% shift S", false, false) {
+  C_EDIT_SAVE_AS(SAVE_AS + DOTS, "% shift S", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.saveAs();
@@ -163,7 +163,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Closes the current editor file. */
-  C_EDITCLOSE(CLOSE, "% W", false, false) {
+  C_EDIT_CLOSE(CLOSE, "% W", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.close(null);
@@ -176,7 +176,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Closes all editor files. */
-  C_EDITCLOSEALL(CLOSE_ALL, "% shift W", false, false) {
+  C_EDIT_CLOSE_ALL(CLOSE_ALL, "% shift W", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.closeAll();
@@ -189,7 +189,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Edits external variables. */
-  C_VARS(EXTERNAL_VARIABLES, "% shift E", false, false) {
+  C_EXTERNAL_VARIABLES(EXTERNAL_VARIABLES, "% shift E", false, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogBindings(gui);
@@ -202,7 +202,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Jumps to the next error. */
-  C_NEXTERROR(NEXT_ERROR, "% PERIOD", false, false) {
+  C_NEXT_ERROR(NEXT_ERROR, "% PERIOD", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.markError(true);
@@ -254,7 +254,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Lower case. */
-  C_LOWERCASE(LOWER_CASE, "% shift L", false, false) {
+  C_LOWER_CASE(LOWER_CASE, "% shift L", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.getEditor().toCase(Case.LOWER);
@@ -267,7 +267,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Upper case. */
-  C_UPPERCASE(UPPER_CASE, "% shift U", false, false) {
+  C_UPPER_CASE(UPPER_CASE, "% shift U", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.getEditor().toCase(Case.UPPER);
@@ -280,7 +280,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Title case. */
-  C_TITLECASE(TITLE_CASE, "% shift T", false, false) {
+  C_TITLE_CASE(TITLE_CASE, "% shift T", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.getEditor().toCase(Case.TITLE);
@@ -293,7 +293,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Jump to matching bracket. */
-  C_BRACKET(JUMP_TO_BRACKET, "% shift B", false, false) {
+  C_JUMP_TO_BRACKET(JUMP_TO_BRACKET, "% shift B", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.getEditor().bracket();
@@ -316,7 +316,7 @@ public enum GUIMenuCmd implements GUICommand {
   /* EDIT COMMANDS */
 
   /** Copies the current database path to the clipboard. */
-  C_COPYPATH(COPY_PATH, "% shift C", true, false) {
+  C_COPY_PATH(COPY_PATH, "% shift C", true, false) {
     @Override
     public void execute(final GUI gui) {
       final int pre = gui.context.marked.pre(0);
@@ -332,7 +332,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Copies the currently marked nodes. */
-  C_COPY(COPY, null, true, false) {
+  C_COPY_NODES(COPY, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
@@ -348,7 +348,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Pastes the copied nodes. */
-  C_PASTE(PASTE, null, true, false) {
+  C_PASTE_NODES(PASTE, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       final StringBuilder sb = new StringBuilder();
@@ -372,7 +372,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Deletes the currently marked nodes. */
-  C_DELETE(DELETE + DOTS, null, true, false) {
+  C_DELETE_NODES(DELETE + DOTS, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       if(!BaseXDialog.confirm(gui, DELETE_NODES)) return;
@@ -396,7 +396,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Inserts new nodes. */
-  C_INSERT(NEW + DOTS, null, true, false) {
+  C_NEW_NODES(NEW + DOTS, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       final DBNodes n = gui.context.marked;
@@ -424,7 +424,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Opens a dialog to edit the currently marked nodes. */
-  C_EDIT(EDIT + DOTS, null, true, false) {
+  C_EDIT_NODES(EDIT + DOTS, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       final DBNodes n = gui.context.marked;
@@ -454,7 +454,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Filters the currently marked nodes. */
-  C_FILTER(FILTER_SELECTED, null, true, false) {
+  C_FILTER_NODES(FILTER_SELECTED, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
@@ -475,7 +475,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the XQuery view. */
-  C_SHOWEDITOR(EDITOR, "% E", false, true) {
+  C_SHOW_EDITOR(EDITOR, "% E", false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWEDITOR);
@@ -489,7 +489,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Jumps to the currently edited file. */
-  C_JUMPFILE(JUMP_TO_FILE, "% J", false, false) {
+  C_JUMP_TO_FILE(JUMP_TO_FILE, "% J", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.showProject();
@@ -503,7 +503,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Finds files. */
-  C_FILESEARCH(FIND_FILES + DOTS, Prop.MAC ? "% shift H" : "% H", false, false) {
+  C_FIND_CONTENTS(FIND_CONTENTS, Prop.MAC ? "% shift H" : "% H", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.showProject();
@@ -517,7 +517,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the XQuery project structure. */
-  C_SHOWPROJECT(PROJECT, "% P", false, true) {
+  C_SHOW_PROJECT(PROJECT, "% P", false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWPROJECT);
@@ -536,7 +536,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows info. */
-  C_SHOWINFO(INFO, "% I", false, true) {
+  C_SHOW_INFO(INFO, "% I", false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWINFO);
@@ -560,7 +560,7 @@ public enum GUIMenuCmd implements GUICommand {
   /* VIEW MENU */
 
   /** Shows the buttons. */
-  C_SHOWBUTTONS(BUTTONS, null, false, true) {
+  C_SHOW_BUTTONS(BUTTONS, null, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWBUTTONS);
@@ -574,7 +574,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Show Input Field. */
-  C_SHOWINPUT(INPUT_BAR, null, false, true) {
+  C_SHOW_INPUT_BAR(INPUT_BAR, null, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.updateControl(gui.nav, gui.gopts.invert(GUIOptions.SHOWINPUT), BorderLayout.SOUTH);
@@ -587,7 +587,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the status bar. */
-  C_SHOWSTATUS(STATUS_BAR, null, false, true) {
+  C_SHOW_STATUS_BAR(STATUS_BAR, null, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.updateControl(gui.status, gui.gopts.invert(GUIOptions.SHOWSTATUS), BorderLayout.SOUTH);
@@ -600,7 +600,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the text view. */
-  C_SHOWRESULT(RESULT, "% R", false, true) {
+  C_SHOW_RESULT(RESULT, "% R", false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWTEXT);
@@ -614,7 +614,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the map. */
-  C_SHOWMAP(MAP, "% 1", true, true) {
+  C_SHOW_MAP(MAP, "% 1", true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWMAP);
@@ -628,7 +628,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the tree view. */
-  C_SHOWTREE(TREE, "% 2", true, true) {
+  C_SHOW_TREE(TREE, "% 2", true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWTREE);
@@ -642,7 +642,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the tree view. */
-  C_SHOWFOLDER(FOLDER, "% 3", true, true) {
+  C_SHOW_FOLDER(FOLDER, "% 3", true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWFOLDER);
@@ -656,7 +656,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the plot view. */
-  C_SHOWPLOT(PLOT, "% 4", true, true) {
+  C_SHOW_PLOT(PLOT, "% 4", true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWPLOT);
@@ -670,7 +670,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the table view. */
-  C_SHOWTABLE(TABLE, "% 5", true, true) {
+  C_SHOW_TABLE(TABLE, "% 5", true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWTABLE);
@@ -684,7 +684,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the explorer view. */
-  C_SHOWEXPLORE(EXPLORER, "% 6", true, true) {
+  C_SHOW_EXPLORE(EXPLORER, "% 6", true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWEXPLORE);
@@ -698,7 +698,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows used memory. */
-  C_SHOWMEM(USED_MEM + DOTS, null, false, false) {
+  C_SHOW_MEM(USED_MEM + DOTS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       DialogMem.show(gui);
@@ -706,7 +706,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Fullscreen mode. */
-  C_FULL(FULLSCREEN, Prop.MAC ? "% shift F" : "F11", false, true) {
+  C_FULLSCREEN(FULLSCREEN, Prop.MAC ? "% shift F" : "F11", false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.fullscreen();
@@ -721,7 +721,7 @@ public enum GUIMenuCmd implements GUICommand {
   /* OPTION MENU */
 
   /** Realtime execution on/off. */
-  C_RTEXEC(RT_EXECUCTION, null, false, true) {
+  C_RT_EXECUTION(RT_EXECUCTION, null, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.EXECRT);
@@ -735,7 +735,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Realtime filtering on/off. */
-  C_RTFILTER(RT_FILTERING, null, true, true) {
+  C_RT_FILTERING(RT_FILTERING, null, true, true) {
     @Override
     public void execute(final GUI gui) {
       final boolean rt = gui.gopts.invert(GUIOptions.FILTERRT);
@@ -783,7 +783,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows a preference dialog. */
-  C_PREFS(PREFERENCES + DOTS, Prop.MAC ? "% COMMA" : "% shift P", false, false) {
+  C_PREFERENCES(PREFERENCES + DOTS, Prop.MAC ? "% COMMA" : "% shift P", false, false) {
     @Override
     public void execute(final GUI gui) {
       DialogPrefs.show(gui);
@@ -809,7 +809,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Opens the update web page. */
-  C_UPDATES(CHECK_FOR_UPDATES, null, false, false) {
+  C_CHECK_FOR_UPDATES(CHECK_FOR_UPDATES, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       BaseXDialog.browse(gui, UPDATE_URL);
@@ -827,7 +827,7 @@ public enum GUIMenuCmd implements GUICommand {
   /* BROWSE COMMANDS */
 
   /** Goes one step back. */
-  C_GOBACK(GO_BACK, "alt LEFT", true, false) {
+  C_GO_BACK(GO_BACK, "alt LEFT", true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.notify.hist(false);
@@ -840,7 +840,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Goes one step forward. */
-  C_GOFORWARD(GO_FORWARD, "alt RIGHT", true, false) {
+  C_GO_FORWARD(GO_FORWARD, "alt RIGHT", true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.notify.hist(true);
@@ -853,7 +853,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Goes one level up. */
-  C_GOUP(GO_UP, "alt UP", true, false) {
+  C_GO_UP(GO_UP, "alt UP", true, false) {
     @Override
     public void execute(final GUI gui) {
       // skip operation for root context
@@ -888,7 +888,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Goes to the root node. */
-  C_GOHOME(GO_HOME, "alt HOME", true, false) {
+  C_GO_HOME(GO_HOME, "alt HOME", true, false) {
     @Override
     public void execute(final GUI gui) {
       // skip operation for root context
@@ -901,7 +901,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
    /** Displays the root node in the text view. */
-  C_HOME(GO_HOME, null, true, false) {
+  C_SHOW_HOME(GO_HOME, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.execute(new XQuery("/"));

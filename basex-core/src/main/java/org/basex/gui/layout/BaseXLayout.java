@@ -290,13 +290,13 @@ public final class BaseXLayout {
       // browse back/forward
       if(gui.context.data() != null) {
         if(GOBACK.is(e)) {
-          GUIMenuCmd.C_GOBACK.execute(gui);
+          GUIMenuCmd.C_GO_BACK.execute(gui);
         } else if(GOFORWARD.is(e)) {
-          GUIMenuCmd.C_GOFORWARD.execute(gui);
+          GUIMenuCmd.C_GO_FORWARD.execute(gui);
         } else if(GOUP.is(e)) {
-          GUIMenuCmd.C_GOUP.execute(gui);
+          GUIMenuCmd.C_GO_UP.execute(gui);
         } else if(GOHOME.is(e)) {
-          GUIMenuCmd.C_GOHOME.execute(gui);
+          GUIMenuCmd.C_GO_HOME.execute(gui);
         }
       }
 

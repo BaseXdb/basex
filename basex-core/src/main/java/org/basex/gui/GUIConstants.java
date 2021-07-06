@@ -40,7 +40,7 @@ import org.basex.util.*;
  *  <li> optionally add localized translations in the .lang files
  *    (e.g. {@code c_showmap} and {@code c_showmaptt})</li>
  *  <li> add a corresponding command in the {@link GUIMenuCmd} class
- *   (e.g. {@link GUIMenuCmd#C_SHOWMAP})and add a reference in the
+ *   (e.g. {@link GUIMenuCmd#C_SHOW_MAP})and add a reference in the
  *   {@link #MENUITEMS} menu structure</li>
  * </ul>
  *
@@ -85,10 +85,10 @@ public final class GUIConstants {
 
   /** Toolbar entries, containing the button commands. */
   static final GUIMenuCmd[] TOOLBAR = {
-    C_CREATE, C_OPEN_MANAGE, C_INFO, C_CLOSE, null,
-    C_GOHOME, C_GOBACK, C_GOUP, C_GOFORWARD, null,
-    C_SHOWEDITOR, C_SHOWRESULT, C_SHOWINFO, null,
-    C_SHOWMAP, C_SHOWTREE, C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE, C_SHOWEXPLORE
+    C_CREATE, C_OPEN_MANAGE, C_PROPERTIES, C_CLOSE, null,
+    C_GO_HOME, C_GO_BACK, C_GO_UP, C_GO_FORWARD, null,
+    C_SHOW_EDITOR, C_SHOW_RESULT, C_SHOW_INFO, null,
+    C_SHOW_MAP, C_SHOW_TREE, C_SHOW_FOLDER, C_SHOW_PLOT, C_SHOW_TABLE, C_SHOW_EXPLORE
   };
 
   // MENUBARS =====================================================================================
@@ -103,31 +103,35 @@ public final class GUIConstants {
    * {@link GUIPopupCmd#SEPARATOR} references serve as menu separators.
    */
   static final GUICommand[][] MENUITEMS = { {
-    C_CREATE, C_OPEN_MANAGE, SEPARATOR, C_INFO, C_EXPORT, C_CLOSE,
+    C_CREATE, C_OPEN_MANAGE, SEPARATOR, C_PROPERTIES, C_EXPORT, C_CLOSE,
     Prop.MAC ? null : SEPARATOR, Prop.MAC ? null : C_EXIT
   }, {
-    C_EDITNEW, C_EDITOPEN, C_EDITREOPEN, C_EDITSAVE, C_EDITSAVEAS, C_EDITCLOSE, C_EDITCLOSEALL,
-    SEPARATOR, C_FORMAT, C_COMMENT, C_SORT,
-    SEPARATOR, C_LOWERCASE, C_UPPERCASE, C_TITLECASE,
-    SEPARATOR, C_BRACKET, C_JUMPFILE, C_NEXTERROR,
-    SEPARATOR, C_VARS
+    C_EDIT_NEW, C_EDIT_OPEN, C_EDIT_REOPEN, C_EDIT_SAVE, C_EDIT_SAVE_AS, C_EDIT_CLOSE,
+    C_EDIT_CLOSE_ALL, SEPARATOR,
+    C_FORMAT, C_COMMENT, C_SORT, SEPARATOR,
+    C_LOWER_CASE, C_UPPER_CASE, C_TITLE_CASE, SEPARATOR,
+    C_JUMP_TO_BRACKET, C_JUMP_TO_FILE, C_NEXT_ERROR, SEPARATOR,
+    C_EXTERNAL_VARIABLES
   }, {
-    C_SHOWEDITOR, C_SHOWPROJECT, C_FILESEARCH, SEPARATOR,
-    C_SHOWRESULT, C_SHOWINFO, SEPARATOR, C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS,
-    Prop.MAC ? null : C_FULL
+    C_SHOW_EDITOR, C_SHOW_PROJECT, C_FIND_CONTENTS, SEPARATOR,
+    C_SHOW_RESULT, C_SHOW_INFO, SEPARATOR,
+    C_SHOW_BUTTONS, C_SHOW_INPUT_BAR, C_SHOW_STATUS_BAR, Prop.MAC ? null : C_FULLSCREEN
   }, {
-    C_SHOWMAP, C_SHOWTREE, C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE, C_SHOWEXPLORE,
+    C_SHOW_MAP, C_SHOW_TREE, C_SHOW_FOLDER, C_SHOW_PLOT, C_SHOW_TABLE, C_SHOW_EXPLORE,
   }, {
-    C_RTEXEC, C_RTFILTER, SEPARATOR, C_COLOR, C_FONTS, SEPARATOR, C_PACKAGES,
-    Prop.MAC ? null : SEPARATOR, Prop.MAC ? null : C_PREFS
+    C_RT_EXECUTION, C_RT_FILTERING, SEPARATOR,
+    C_COLOR, C_FONTS, SEPARATOR, C_PACKAGES, Prop.MAC ? null : SEPARATOR,
+    Prop.MAC ? null : C_PREFERENCES
   }, {
-    C_HELP, SEPARATOR, C_COMMUNITY, C_UPDATES,
-    SEPARATOR, C_SHOWMEM, Prop.MAC ? null : C_ABOUT
+    C_HELP, SEPARATOR, C_COMMUNITY, C_CHECK_FOR_UPDATES, SEPARATOR,
+    C_SHOW_MEM, Prop.MAC ? null : C_ABOUT
   }};
 
   /** Context menu entries. */
   public static final GUIMenuCmd[] POPUP = {
-    C_GOBACK, C_FILTER, null, C_COPY, C_PASTE, C_DELETE, C_INSERT, C_EDIT, null, C_COPYPATH
+    C_GO_BACK, C_FILTER_NODES, null,
+    C_COPY_NODES, C_PASTE_NODES, C_DELETE_NODES, C_NEW_NODES, C_EDIT_NODES, null,
+    C_COPY_PATH
   };
 
   // CURSORS ======================================================================================

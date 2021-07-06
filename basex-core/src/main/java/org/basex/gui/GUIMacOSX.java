@@ -137,7 +137,7 @@ public final class GUIMacOSX extends GUIMacOS {
     /** Called when the Preference item in the application menu is selected. */
     public void handlePreferences() {
       // explicit cast to circumvent Java compiler bug
-      GUIMenuCmd.C_PREFS.execute(main);
+      GUIMenuCmd.C_PREFERENCES.execute(main);
     }
 
     /**

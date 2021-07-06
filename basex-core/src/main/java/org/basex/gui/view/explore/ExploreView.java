@@ -33,7 +33,7 @@ public final class ExploreView extends View {
     super(EXPLOREVIEW, notifier);
     border(5).layout(new BorderLayout(0, 4));
 
-    filter = BaseXButton.command(GUIMenuCmd.C_FILTER, gui);
+    filter = BaseXButton.command(GUIMenuCmd.C_FILTER_NODES, gui);
 
     final BaseXBack buttons = new BaseXBack(false);
     buttons.layout(new ColumnLayout(1)).border(0, 0, 4, 0);
