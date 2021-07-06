@@ -221,6 +221,7 @@ public final class ProjectView extends BaseXPanel {
         gui.status.setText(PARSING_CC + perf.getTime());
         return true;
       }
+
       @Override
       protected void done(final Boolean refresh) {
         if(refresh) refreshHighlight(root);

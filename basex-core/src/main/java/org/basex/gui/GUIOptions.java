@@ -23,6 +23,15 @@ public final class GUIOptions extends Options {
   // DATABASE & PROGRAM PATHS =====================================================================
 
   /** Comment: written to options file. */
+  public static final Comment C_VERSION = new Comment("Version");
+
+  /** Latest released version. */
+  public static final StringOption UPDATEVERSION = new StringOption("UPDATEVERSION",
+    VERSION.replaceAll(" .*", ""));
+  /** Check for updates. */
+  public static final BooleanOption CHECKUPDATES = new BooleanOption("CHECKUPDATES", false);
+
+  /** Comment: written to options file. */
   public static final Comment C_PATHS = new Comment("Paths");
 
   /** Current path to database input. */
@@ -58,10 +67,6 @@ public final class GUIOptions extends Options {
 
   /** Comment: written to options file. */
   public static final Comment C_WINDOWS = new Comment("Windows");
-
-  /** Last updated version. */
-  public static final StringOption UPDATEVERSION = new StringOption("UPDATEVERSION",
-    VERSION.replaceAll(" .*", ""));
 
   /** GUI layout. */
   public static final StringOption VIEWS = new StringOption("VIEWS", GUIConstants.VIEWS);

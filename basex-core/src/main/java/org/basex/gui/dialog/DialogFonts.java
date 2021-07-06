@@ -158,6 +158,7 @@ public final class DialogFonts extends BaseXDialog {
         monoFonts = monos.finish();
         return gui.gopts.get(GUIOptions.ONLYMONO);
       }
+
       @Override
       protected void done(final Boolean mono) {
         if(mono) action(onlyMono);

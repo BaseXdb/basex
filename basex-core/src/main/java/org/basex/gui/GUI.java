@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
+import java.io.*;
 import java.util.concurrent.atomic.*;
 import java.util.regex.*;
 
@@ -224,8 +225,10 @@ public final class GUI extends JFrame implements BaseXWindow {
     views.updateViews();
     refreshControls(true);
 
-    // check version
-    checkVersion();
+    // update check (skip if beta/snapshot version is running)
+    if(gopts.get(GUIOptions.CHECKUPDATES) && !Strings.contains(Prop.VERSION, ' ')) {
+      SwingUtilities.invokeLater(() -> checkVersion(false));
+    }
   }
 
   @Override
@@ -672,52 +675,6 @@ public final class GUI extends JFrame implements BaseXWindow {
     setVisible(!full);
   }
 
-  /**
-   * Starts a new thread that checks for new versions.
-   */
-  private void checkVersion() {
-    // ignore snapshots and beta versions
-    if(Strings.contains(Prop.VERSION, ' ')) return;
-
-    new GUIWorker<Version>() {
-      @Override
-      protected Version doInBackground() throws Exception {
-        final Version disk = new Version(gopts.get(GUIOptions.UPDATEVERSION));
-        final Version used = new Version(Prop.VERSION);
-
-        if(disk.compareTo(used) < 0) {
-          // update version option to latest used version
-          writeVersion(used);
-        } else {
-          final String page = Token.string(new IOUrl(VERSION_URL).read());
-          final Matcher m = Pattern.compile("^(Version )?([\\w\\d.]*?)( .*|$)",
-              Pattern.DOTALL).matcher(page);
-          if(m.matches()) {
-            final Version latest = new Version(m.group(2));
-            if(disk.compareTo(latest) < 0) return latest;
-          }
-        }
-        return null;
-      }
-
-      @Override
-      protected void done(final Version latest) {
-        if(BaseXDialog.confirm(GUI.this, Util.info(H_NEW_VERSION, Prop.NAME, latest))) {
-          // jump to browser
-          BaseXDialog.browse(GUI.this, UPDATE_URL);
-        } else {
-          // don't show update dialog anymore if it has been rejected once
-          writeVersion(latest);
-        }
-      }
-
-      private void writeVersion(final Version version) {
-        gopts.set(GUIOptions.UPDATEVERSION, version.toString());
-        saveOptions();
-      }
-    }.execute();
-  }
-
   @Override
   public GUI gui() {
     return this;
@@ -731,5 +688,50 @@ public final class GUI extends JFrame implements BaseXWindow {
   @Override
   public GUI component() {
     return this;
+  }
+
+  /** Pattern for version check. */
+  private static final Pattern VERSION_CHECK = Pattern.compile("^(Version )?([\\w\\d.]*?)( .*|$)",
+      Pattern.DOTALL);
+
+  /**
+   * Checks for new versions.
+   * @param ask ask for automatic update checks
+   */
+  public void checkVersion(final boolean ask) {
+    // retrieve latest version
+    final Version version = new Version(gopts.get(GUIOptions.UPDATEVERSION));
+    Version latest = version;
+    try {
+      final Matcher matcher = VERSION_CHECK.matcher(Token.string(new IOUrl(VERSION_URL).read()));
+      if(matcher.matches()) {
+        latest = new Version(matcher.group(2));
+        gopts.set(GUIOptions.UPDATEVERSION, latest.toString());
+      }
+    } catch(IOException ex) {
+      Util.debug(ex);
+    }
+
+    final boolean check = gopts.get(GUIOptions.CHECKUPDATES);
+    boolean chk = check;
+    if(version.compareTo(latest) < 0) {
+      if(BaseXDialog.confirm(this, Util.info(H_VERSION_NEW_X_X, Prop.NAME, latest))) {
+        // new version found: open browser page
+        BaseXDialog.browse(this, UPDATE_URL);
+      } else if(ask) {
+        // if page is not opened, ask for automatic check
+        chk = BaseXDialog.confirm(this, H_VERSION_CHECK);
+        gopts.set(GUIOptions.CHECKUPDATES, chk);
+      }
+      saveOptions();
+    } else if(ask) {
+      // version is up to date: ask for automatic check
+      chk = BaseXDialog.confirm(this, Util.info(H_VERSION_LATEST_X, Prop.NAME) + '\n' +
+          H_VERSION_CHECK);
+      gopts.set(GUIOptions.CHECKUPDATES, chk);
+    }
+
+    // save changed options
+    if(!version.equals(latest) || check != chk) saveOptions();
   }
 }

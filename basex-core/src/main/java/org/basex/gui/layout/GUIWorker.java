@@ -5,7 +5,7 @@ import javax.swing.*;
 import org.basex.util.*;
 
 /**
- * Simplified version of the {@link SwingWorker} class.
+ * Custom version of the {@link SwingWorker} class.
  *
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
@@ -34,13 +34,14 @@ public abstract class GUIWorker<T> {
       protected T doInBackground() throws Exception {
         return GUIWorker.this.doInBackground();
       }
+
       @Override
       protected void done() {
         try {
-          final T t = get();
-          if(t != null) GUIWorker.this.done(t);
+          GUIWorker.this.done(get());
         } catch(final Exception ex) {
-          if(!(ex.getCause() instanceof InterruptedException)) Util.stack(ex);
+          if(ex.getCause() instanceof InterruptedException) Util.debug(ex);
+          else Util.stack(ex);
         }
       }
     }.execute();

@@ -812,7 +812,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_CHECK_FOR_UPDATES(CHECK_FOR_UPDATES, null, false, false) {
     @Override
     public void execute(final GUI gui) {
-      BaseXDialog.browse(gui, UPDATE_URL);
+      gui.checkVersion(true);
     }
   },
 

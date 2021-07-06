@@ -117,6 +117,7 @@ final class ProjectFilter extends BaseXBack {
         final String pattern = files.isEmpty() ? view.gui.gopts.get(GUIOptions.FILES) : files;
         return view.files.filter(pattern, contents, view.root.file);
       }
+
       @Override
       protected void done(final String[] list) {
         view.list.setElements(list, contents);

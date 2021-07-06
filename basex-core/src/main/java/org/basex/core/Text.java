@@ -1443,10 +1443,14 @@ public interface Text {
   String H_INDEX_FORMAT = lang("h_index_format");
   /** Dialog title for opening a large database. */
   String H_LARGE_DB = lang("h_large_db") + NL + ' ';
-  /** Dialog for downloading a new version. */
-  String H_NEW_VERSION = lang("h_new_version");
   /** Dialog title for announcing binary file. */
   String H_FILE_BINARY = lang("h_binary_file") + NL + ' ';
+  /** Version dialog: automatic checks. */
+  String H_VERSION_CHECK = lang("h_version_check");
+  /** Version dialog: latest version. */
+  String H_VERSION_LATEST_X = lang("h_version_latest_%");
+  /** Version dialog: download new version. */
+  String H_VERSION_NEW_X_X = lang("h_version_new_%_%");
 
   /** HTML Parser. */
   String H_HTML_PARSER = lang("h_html_parser");
