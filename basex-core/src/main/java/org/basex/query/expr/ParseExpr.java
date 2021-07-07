@@ -135,7 +135,7 @@ public abstract class ParseExpr extends Expr {
    * @param exprs expressions
    * @return data reference or {@code null}
    */
-  static final Data data(final Expr... exprs) {
+  static Data data(final Expr... exprs) {
     Data data1 = null;
     for(final Expr expr : exprs) {
       if(expr.seqType().zero()) continue;

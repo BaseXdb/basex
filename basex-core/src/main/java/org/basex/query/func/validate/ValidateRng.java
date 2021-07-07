@@ -49,7 +49,7 @@ public class ValidateRng extends ValidateFn {
         try {
           /*
           PropertyMapBuilder pmb = new PropertyMapBuilder();
-          pmb.put(RngProperty.ERROR_HANDLER, handler);
+          pmb.put(ValidateProperty.ERROR_HANDLER, handler);
           pmb.put(RngProperty.CHECK_ID_IDREF, Flag.PRESENT);
 
           SchemaReader sr = compact ? CompactSchemaReader.getInstance() : null;
@@ -57,16 +57,15 @@ public class ValidateRng extends ValidateFn {
 
           if(vd.loadSchema(schema.inputSource())) vd.validate(in.inputSource());
           */
-
           final Class<?>
+            piClass  = Class.forName("com.thaiopensource.util.PropertyId"),
+            pmClass  = Class.forName("com.thaiopensource.util.PropertyMap"),
             pmbClass = Class.forName("com.thaiopensource.util.PropertyMapBuilder"),
-            flClass = Class.forName("com.thaiopensource.validate.Flag"),
-            vdClass = Class.forName("com.thaiopensource.validate.ValidationDriver"),
-            vpClass = Class.forName("com.thaiopensource.validate.ValidateProperty"),
-            rpClass = Class.forName("com.thaiopensource.validate.prop.rng.RngProperty"),
-            piClass = Class.forName("com.thaiopensource.util.PropertyId"),
-            pmClass = Class.forName("com.thaiopensource.util.PropertyMap"),
-            srClass = Class.forName("com.thaiopensource.validate.SchemaReader"),
+            flClass  = Class.forName("com.thaiopensource.validate.Flag"),
+            srClass  = Class.forName("com.thaiopensource.validate.SchemaReader"),
+            vpClass  = Class.forName("com.thaiopensource.validate.ValidateProperty"),
+            vdClass  = Class.forName("com.thaiopensource.validate.ValidationDriver"),
+            rpClass  = Class.forName("com.thaiopensource.validate.prop.rng.RngProperty"),
             csrClass = Class.forName("com.thaiopensource.validate.rng.CompactSchemaReader");
           final Method
             piPut = piClass.getMethod("put", pmbClass, Object.class),
@@ -74,7 +73,7 @@ public class ValidateRng extends ValidateFn {
             vdValidate = vdClass.getMethod("validate", InputSource.class);
 
           // assign error handler
-          final Object pmb = pmbClass.getDeclaredConstructor().newInstance();
+          final Object pmb = pmbClass.getConstructor().newInstance();
           piPut.invoke(vpClass.getField("ERROR_HANDLER").get(null), pmb, handler);
 
           // enable ID/IDREF checks
