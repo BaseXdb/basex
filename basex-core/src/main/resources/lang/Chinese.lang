@@ -438,6 +438,7 @@ h_large_db           = 这个数据库大小为%， 你想关闭\n一些可视�
 h_version_check      = 您是否要启用自动更新检查？
 h_version_latest_%   = %是最新版本。
 h_version_new_%_%    = 发现了新版本(% %)！\n你想更新么？
+h_no_html_parser     = 没有找到HTML解析器，将会把输入作为普通XML处理
 h_out_of_mem         = 使用 -Xmx<size> 选项来加大Java堆内存
 h_path_index         = 路径索引可以优化XPath查询
 h_stemming           = Terms are stemmed before they are indexed.
