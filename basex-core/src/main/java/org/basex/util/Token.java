@@ -173,7 +173,7 @@ public final class Token {
   }
 
   /**
-   * Converts a string to a byte array.
+   * Converts a string to a token.
    * All strings should be converted by this function to guarantee
    * a consistent character conversion.
    * @param string string to be converted

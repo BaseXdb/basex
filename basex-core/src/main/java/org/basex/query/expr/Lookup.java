@@ -160,7 +160,7 @@ public final class Lookup extends Arr {
   private ValueBuilder add(final Item item, final ValueBuilder vb, final QueryContext qc)
       throws QueryException {
 
-    if(!(item instanceof XQMap || item instanceof XQArray)) throw LOOKUP_X.get(info, item);
+    if(!(item instanceof XQData)) throw LOOKUP_X.get(info, item);
 
     final Expr keys = exprs[1];
     if(keys == WILDCARD) {

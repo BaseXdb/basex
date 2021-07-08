@@ -55,8 +55,8 @@ public final class Str extends AStr {
   }
 
   /**
-   * Returns a string representation of the specified value.
-   * @param value object (will be converted to token)
+   * Returns a valid string representation of the specified value.
+   * @param value object (can be {@code null}, will be converted to token otherwise)
    * @param qc query context
    * @param inf input info
    * @return instance
@@ -65,23 +65,29 @@ public final class Str extends AStr {
   public static Str get(final Object value, final QueryContext qc, final InputInfo inf)
       throws QueryException {
 
+    if(value == null) return Str.EMPTY;
+
     final boolean validate = qc.context.options.get(MainOptions.CHECKSTRINGS);
     final byte[] bytes = Token.token(value.toString());
-    final int bl = bytes.length;
-    TokenBuilder tb = null;
-    for(int c = 0; c < bl; c += Token.cl(bytes, c)) {
-      int cp = Token.cp(bytes, c);
-      if(!XMLToken.valid(cp)) {
-        if(validate) throw INVCODE_X.get(inf, Integer.toHexString(cp));
-        cp = Token.REPLACEMENT;
-        if(tb == null) {
-          tb = new TokenBuilder(bl);
-          for(int b = 0; b < c; b++) tb.addByte(bytes[b]);
-        }
-      }
-      if(tb != null) tb.add(cp);
+
+    // check if string is valid
+    boolean valid = true;
+    final TokenParser pt = new TokenParser(bytes);
+    while(valid && pt.more()) {
+      final int cp = pt.next();
+      valid = XMLToken.valid(cp);
+      if(!valid && validate) throw INVCODE_X.get(inf, Integer.toHexString(cp));
     }
-    return get(tb == null ? bytes : tb.finish());
+    if(valid) return get(bytes);
+
+    // if not, replace invalid characters with replacement character
+    final TokenBuilder tb = new TokenBuilder(bytes.length);
+    pt.reset();
+    while(pt.more()) {
+      final int cp = pt.next();
+      tb.add(XMLToken.valid(cp) ? cp : Token.REPLACEMENT);
+    }
+    return get(tb.finish());
   }
 
   @Override
