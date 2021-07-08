@@ -60,7 +60,7 @@ public final class Empty extends Item {
 
   @Override
   public Object toJava() {
-    return new Object[0];
+    return null;
   }
 
   @Override

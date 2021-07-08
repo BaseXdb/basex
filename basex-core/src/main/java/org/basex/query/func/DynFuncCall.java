@@ -10,9 +10,7 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.XQMap;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -86,9 +84,7 @@ public final class DynFuncCall extends FuncCall {
     }
 
     // maps and arrays can only contain evaluated values, so this is safe
-    if((func instanceof XQMap || func instanceof XQArray) && allAreValues(false)) {
-      return cc.preEval(this);
-    }
+    if(func instanceof XQData && allAreValues(false)) return cc.preEval(this);
 
     if(func instanceof XQFunctionExpr) {
       // try to inline the function

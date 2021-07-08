@@ -147,6 +147,9 @@ public final class MainOptions extends Options {
   public static final BooleanOption ENFORCEINDEX = new BooleanOption("ENFORCEINDEX", false);
   /** Deep node copies. */
   public static final BooleanOption COPYNODE = new BooleanOption("COPYNODE", true);
+  /** Unwrap Java object. */
+  public static final EnumOption<WrapOptions> WRAPJAVA =
+      new EnumOption<>("WRAPJAVA", WrapOptions.SOME);
 
   // Serialize
 
@@ -189,7 +192,19 @@ public final class MainOptions extends Options {
 
     @Override
     public String toString() {
-      return super.toString().toLowerCase(Locale.ENGLISH);
+      return name().toLowerCase(Locale.ENGLISH);
+    }
+  }
+
+  /** Java wrapper. */
+  public enum WrapOptions {
+    /** ALL.  */ ALL,
+    /** SOME. */ SOME,
+    /** NONE. */ NONE;
+
+    @Override
+    public String toString() {
+      return name().toLowerCase(Locale.ENGLISH);
     }
   }
 

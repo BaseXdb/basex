@@ -142,8 +142,6 @@ public enum QueryError {
   /** Error code. */
   CONVERT_INTEGER_X_X(CONVERT, "integer", "Invalid digit for base %: %."),
   /** Error code. */
-  CONVERT_JAVA_X_X(CONVERT, "java", "Java class % cannot be converted: %."),
-  /** Error code. */
   CONVERT_KEY_X(CONVERT, "key", "Key could not be decoded: %."),
 
   // Cryptographic Module
@@ -1038,8 +1036,6 @@ public enum QueryError {
   NSMISS_X(XPST, 81, "QName '%' has no namespace."),
 
   /** Error code. */
-  JAVACHAR_X(XPTY, 4, "String must contain single character: %."),
-  /** Error code. */
   JAVAINVOKE_X_X(XPTY, 4, "% instance expected as first argument, % found."),
   /** Error code. */
   JAVAEVAL_X_X_X(XPTY, 4, "%. Caused by: %(%)."),
@@ -1050,9 +1046,11 @@ public enum QueryError {
   /** Error code. */
   JAVAMULTIMETH_X_X_X(XPTY, 4, "%: % methods with % found."),
   /** Error code. */
-  JAVACONS_X_X_X(XPST, 17, "None of the % % constructors can be called with (%)."),
+  JAVACONS_X_X_X(XPTY, 4, "None of the % % constructors can be called with (%)."),
   /** Error code. */
-  JAVAMETH_X_X_X(XPST, 17, "None of the % % methods can be called with (%)."),
+  JAVAMETH_X_X_X(XPTY, 4, "None of the % % methods can be called with (%)."),
+  /** Error code. */
+  JAVACONVERT_X_X(CONVERT, "java", "Java class % cannot be converted: %."),
 
   /** Error code. */
   ZEROFUNCS_X_X(XPTY, 4, "Function with 0 arguments expected, % found: %."),

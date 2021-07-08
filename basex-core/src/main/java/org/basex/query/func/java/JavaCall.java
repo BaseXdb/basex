@@ -11,6 +11,8 @@ import java.util.*;
 import javax.xml.datatype.*;
 import javax.xml.namespace.*;
 
+import org.basex.core.*;
+import org.basex.core.MainOptions.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
@@ -22,6 +24,7 @@ import org.basex.query.util.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.Type;
@@ -29,6 +32,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 import org.basex.util.similarity.*;
 import org.w3c.dom.*;
+import org.w3c.dom.Text;
 
 /**
  * This class contains common methods for executing Java code and mapping
@@ -95,58 +99,102 @@ public abstract class JavaCall extends Arr {
    */
   public static Value toValue(final Object object, final QueryContext qc, final StaticContext sc,
       final InputInfo info) throws QueryException {
+    return toValue(object, qc, sc, info, qc.context.options.get(MainOptions.WRAPJAVA));
+  }
 
-    if(object == null) return Empty.VALUE;
+  /**
+   * Converts the specified object to an XQuery value.
+   * @param object result object
+   * @param qc query context
+   * @param sc static context
+   * @param info input info
+   * @param wrap wrap options
+   * @return value
+   * @throws QueryException query exception
+   */
+  public static Value toValue(final Object object, final QueryContext qc, final StaticContext sc,
+      final InputInfo info, final WrapOptions wrap) throws QueryException {
+
+    // return XQuery types unchanged
     if(object instanceof Value) return (Value) object;
     if(object instanceof Iter) return ((Iter) object).value(qc, null);
-    // find XQuery mapping for specified type
-    final Type type = type(object);
-    if(type != null) return type.cast(object, qc, sc, null);
 
-    // no array: return Java type
-    if(!object.getClass().isArray()) return new Jav(object, qc);
+    if(wrap != WrapOptions.ALL) {
+      // null values
+      if(object == null) return Empty.VALUE;
 
-    // empty array
-    final int s = Array.getLength(object);
-    if(s == 0) return Empty.VALUE;
+      // values with XQuery types
+      final Type type = type(object);
+      if(type != null) return type.cast(object, qc, sc, null);
 
-    // primitive arrays
-    if(object instanceof boolean[]) return BlnSeq.get((boolean[]) object);
-    if(object instanceof byte[])    return BytSeq.get((byte[]) object);
-    if(object instanceof short[])   return ShrSeq.get((short[]) object);
-    if(object instanceof long[])    return IntSeq.get((long[]) object);
-    if(object instanceof float[])   return FltSeq.get((float[]) object);
-    if(object instanceof double[])  return DblSeq.get((double[]) object);
-    if(object instanceof char[])    return Str.get(new String((char[]) object));
-    // character array
-    if(object instanceof char[][]) {
-      final char[][] values = (char[][]) object;
-      final TokenList list = new TokenList(values.length);
-      for(final char[] string : values) list.add(new String(string));
-      return StrSeq.get(list);
+      // arrays
+      if(object.getClass().isArray()) {
+        // empty array
+        final int s = Array.getLength(object);
+        if(s == 0) return Empty.VALUE;
+
+        // primitive arrays
+        if(object instanceof boolean[]) return BlnSeq.get((boolean[]) object);
+        if(object instanceof byte[])    return BytSeq.get((byte[]) object);
+        if(object instanceof short[])   return ShrSeq.get((short[]) object);
+        if(object instanceof long[])    return IntSeq.get((long[]) object);
+        if(object instanceof float[])   return FltSeq.get((float[]) object);
+        if(object instanceof double[])  return DblSeq.get((double[]) object);
+        // char array
+        if(object instanceof char[]) {
+          final char[] values = (char[]) object;
+          final LongList list = new LongList(values.length);
+          for(final int value : values) list.add(value);
+          return IntSeq.get(list.finish(), AtomType.UNSIGNED_LONG);
+        }
+        // integer array
+        if(object instanceof int[]) {
+          final int[] values = (int[]) object;
+          final LongList list = new LongList(values.length);
+          for(final int value : values) list.add(value);
+          return IntSeq.get(list.finish(), AtomType.INT);
+        }
+        // check for null values
+        for(final Object obj : (Object[]) object) {
+          if(obj == null) throw JAVANULL.get(info);
+        }
+        // string array
+        if(object instanceof String[]) {
+          final String[] values = (String[]) object;
+          final TokenList list = new TokenList(values.length);
+          for(final String string : values) list.add(string);
+          return StrSeq.get(list);
+        }
+        // any other array (including nested ones)
+        final ValueBuilder vb = new ValueBuilder(qc);
+        for(final Object value : (Object[]) object) vb.add(toValue(value, qc, sc, info, wrap));
+        return vb.value();
+      }
+
+      // data structures
+      if(wrap == WrapOptions.NONE) {
+        final ValueBuilder vb = new ValueBuilder(qc);
+        if(object instanceof Iterable) {
+          for(final Object obj : (Iterable<?>) object) vb.add(toValue(obj, qc, sc, info, wrap));
+        } else if(object instanceof Iterator) {
+          final Iterator<?> ir = (Iterator<?>) object;
+          while(ir.hasNext()) vb.add(toValue(ir.next(), qc, sc, info, wrap));
+        } else if(object instanceof Map) {
+          XQMap map = XQMap.empty();
+          for(final Map.Entry<?, ?> entry : ((Map<?, ?>) object).entrySet()) {
+            final Item key = toValue(entry.getKey(), qc, sc, info, wrap).item(qc, info);
+            final Value val = toValue(entry.getValue(), qc, sc, info, wrap);
+            map = map.put(key, val, info);
+          }
+          vb.add(map);
+        } else {
+          throw JAVACONVERT_X_X.get(info, Util.className(object), object);
+        }
+        return vb.value();
+      }
     }
-    // integer array
-    if(object instanceof int[]) {
-      final int[] values = (int[]) object;
-      final LongList list = new LongList(values.length);
-      for(final int value : values) list.add(value);
-      return IntSeq.get(list.finish(), AtomType.INT);
-    }
-    // check for null values
-    for(final Object obj : (Object[]) object) {
-      if(obj == null) throw JAVANULL.get(info);
-    }
-    // string array
-    if(object instanceof String[]) {
-      final String[] values = (String[]) object;
-      final TokenList list = new TokenList(values.length);
-      for(final String string : values) list.add(string);
-      return StrSeq.get(list);
-    }
-    // any other array (including nested ones)
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Object value : (Object[]) object) vb.add(toValue(value, qc, sc, info));
-    return vb.value();
+    // wrap Java object
+    return new Jav(object, qc);
   }
 
   /**

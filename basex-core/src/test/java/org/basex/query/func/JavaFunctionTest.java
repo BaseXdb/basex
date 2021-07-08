@@ -170,8 +170,6 @@ public final class JavaFunctionTest extends SandboxTest {
   @Test public void errors() {
     error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; "
         + "n:null-array()", JAVANULL);
-    error("Q{java:java.lang.Character}isUpperCase('xx')", JAVACHAR_X);
-    error("Q{java:java.lang.Character}isUpperCase(123)", JAVAMETH_X_X_X);
   }
 
   /** Process arrays. */
@@ -181,15 +179,16 @@ public final class JavaFunctionTest extends SandboxTest {
     query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; "
         + "n:longs(array { 1 })", 1);
     query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; "
-        + "n:chars()", "ab");
+        + "n:chars() => codepoints-to-string()", "ab");
   }
 
   /** Character parameters. */
   @Test public void gh2018() {
-    query("Q{java:java.lang.Character}isUpperCase('A')", true);
-
-    error("Q{java:java.lang.Character}isUpperCase('')", JAVACHAR_X);
-    error("Q{java:java.lang.Character}isUpperCase('aa')", JAVACHAR_X);
+    query("'A' "
+        + "=> string-to-codepoints()"
+        + "=> xs:unsignedShort()"
+        + "=> Q{java:java.lang.Character}isUpperCase()",
+        true);
   }
 
   /** Ensure that items cannot be cast to Java. */

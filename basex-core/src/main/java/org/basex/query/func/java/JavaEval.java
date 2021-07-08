@@ -75,15 +75,15 @@ final class JavaEval {
   }
 
   /**
-   * Checks if the XQuery arguments match with the function parameters.
+   * Checks if the XQuery arguments match the function parameters.
    * The converted arguments are stored in {@link #args}.
    * @param params parameter types
    * @param stat static flag
-   * @param values indicates which parameter types are XQuery values (can be {@code null})
+   * @param xquery indicates which parameter types are XQuery values (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  boolean match(final Class<?>[] params, final boolean stat, final boolean[] values)
+  boolean match(final Class<?>[] params, final boolean stat, final boolean[] xquery)
       throws QueryException {
 
     // start with second argument if function is not static
@@ -91,68 +91,36 @@ final class JavaEval {
     if(pl != exprs.length - s) return false;
 
     // function arguments
-    final Object[] vals = new Object[pl];
+    final Object[] values = new Object[pl];
     for(int p = 0; p < pl; p++) {
       final Class<?> param = params[p];
       final Expr expr = exprs[s + p];
 
       if(param == Expr.class) {
-        vals[p] = expr;
+        values[p] = expr;
       } else {
         final Value arg = expr.value(qc);
         exprs[s + p] = arg;
         final Type type = JavaMapping.type(param, true);
         if(type != null && arg.type.instanceOf(type)) {
           // convert to Java object if an XQuery type exists for the function parameter
-          vals[p] = arg.toJava();
-          if(param == char.class || param == Character.class) vals[p] = toChar((String) vals[p]);
+          values[p] = arg.toJava();
         } else {
           // convert to Java object
           // - if argument is a Java object wrapper, or
           // - if function parameter is not a {@link Value} instance
           final boolean convert = arg instanceof Jav ||
-              !(values != null ? values[p] : Value.class.isAssignableFrom(params[p]));
-          vals[p] = convert ? arg.toJava() : arg;
+              !(xquery != null ? xquery[p] : Value.class.isAssignableFrom(params[p]));
+          values[p] = convert ? arg.toJava() : arg;
 
-          if(vals[p] instanceof String[]) {
-            final String[] strings = (String[]) vals[p];
-            final int sl = strings.length;
-            if(param == char[].class) {
-              final char[] chars = new char[sl];
-              for(int c = 0; c < sl; c++) chars[c] = toChar(strings[p]);
-              vals[p] = chars;
-            } else if(param == Character[].class) {
-              final Character[] chars = new Character[sl];
-              for(int c = 0; c < sl; c++) chars[c] = toChar(strings[p]);
-              vals[p] = chars;
-            }
-          }
-
-          // check if argument is an instance of the function parameter
-          if(!param.isInstance(vals[p])) {
-            // if no, check if argument is an empty sequence; otherwise, give up
-            if(arg.isEmpty() && !param.isPrimitive()) {
-              vals[p] = null;
-            } else {
-              return false;
-            }
-          }
+          // if argument is no instance of the function parameter, check for null value
+          if(!param.isInstance(values[p]) && (values[p] != null || param.isPrimitive()))
+            return false;
         }
       }
     }
-    args = vals;
+    args = values;
     return true;
-  }
-
-  /**
-   * Converts a single-character string to a primitive character.
-   * @param string string
-   * @return character
-   * @throws QueryException query exception
-   */
-  private char toChar(final String string) throws QueryException {
-    if(string.length() != 1) throw JAVACHAR_X.get(call.info, string);
-    return string.charAt(0);
   }
 
   /**
@@ -222,10 +190,9 @@ final class JavaEval {
    * @return type string
    */
   private static String type(final Object arg) {
-    return
-      arg == null ? Util.info(null) :
-      arg instanceof Jav ? Util.className(((Jav) arg).toJava()) :
-      arg instanceof Value ? ((Value) arg).seqType().toString() :
-      Util.className(arg);
+    final Object object = arg instanceof Jav ? ((Jav) arg).toJava() : arg;
+    return object instanceof Value ? ((Value) object).seqType().toString() :
+      object == null ? Util.info(null) :
+      Util.className(object);
   }
 }

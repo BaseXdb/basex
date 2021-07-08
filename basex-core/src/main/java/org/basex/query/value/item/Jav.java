@@ -1,5 +1,7 @@
 package org.basex.query.value.item;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
@@ -12,14 +14,14 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class Jav extends Item {
-  /** Java object. */
+  /** Java object (can be {@code null}). */
   private final Object value;
   /** Query context. */
   private final QueryContext qc;
 
   /**
    * Constructor.
-   * @param value value
+   * @param value value (can be {@code null})
    * @param qc query context
    */
   public Jav(final Object value, final QueryContext qc) {
@@ -35,7 +37,7 @@ public final class Jav extends Item {
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return !value.toString().isEmpty();
+    return value != null && !value.toString().isEmpty();
   }
 
   @Override
@@ -61,11 +63,12 @@ public final class Jav extends Item {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj == this || obj instanceof Jav && value.equals(((Jav) obj).value);
+    return obj == this || obj instanceof Jav && Objects.equals(value, ((Jav) obj).value);
   }
 
   @Override
   public void toString(final QueryString qs) {
-    qs.quoted(Token.token(value.toString()));
+    if(value == null) qs.token(value);
+    else qs.quoted(Token.token(value.toString()));
   }
 }

@@ -95,12 +95,16 @@ public final class ConvertModuleTest extends SandboxTest {
     final Function func = _CONVERT_FROM_JAVA;
 
     query("import module namespace jfe = 'org.basex.query.func.JavaFunctionExample'; "
+        + "jfe:data() => " + func.args(),
+        "a\nb\nc\nmap {\n\"d\": \"e\"\n}\nf");
+
+    query("import module namespace jfe = 'org.basex.query.func.JavaFunctionExample'; "
         + "let $c := jfe:data() => " + func.args()
         + "return ($c[1], $c[2], $c[3], map:keys($c[4]), $c[4]?*, $c[5])",
         "a\nb\nc\nd\ne\nf");
 
     error("declare namespace Random = 'java:java.util.Random';" +
-        "Random:new(xs:long(0)) => " + func.args(), CONVERT_JAVA_X_X);
+        "Random:new(xs:long(0)) => " + func.args(), JAVACONVERT_X_X);
   }
 
   /** Test method. */
