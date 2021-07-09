@@ -739,20 +739,7 @@ public enum AtomType implements Type {
   },
 
   /** NOTATION Type. */
-  NOTATION("NOTATION", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.NOT),
-
-  /** Java type. */
-  JAVA("java", ITEM, BASEX_URI, true, true, true, false, Type.ID.JAVA) {
-    @Override
-    public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) {
-      return new Jav(item, qc);
-    }
-    @Override
-    public Item cast(final Object value, final QueryContext qc, final InputInfo ii) {
-      return new Jav(value, qc);
-    }
-  };
+  NOTATION("NOTATION", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.NOT);
 
   /** Language pattern. */
   private static final Pattern LANGPATTERN = Pattern.compile("[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*");

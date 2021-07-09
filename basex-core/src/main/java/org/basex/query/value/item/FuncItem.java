@@ -220,6 +220,11 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
+  public byte[] string(final InputInfo ii) throws QueryException {
+    throw FIATOM_X.get(ii, type);
+  }
+
+  @Override
   public Item materialize(final QueryContext qc, final boolean copy) {
     return null;
   }

@@ -109,7 +109,7 @@ final class JavaEval {
           // convert to Java object
           // - if argument is a Java object wrapper, or
           // - if function parameter is not a {@link Value} instance
-          final boolean convert = arg instanceof Jav ||
+          final boolean convert = arg instanceof XQJava ||
               !(xquery != null ? xquery[p] : Value.class.isAssignableFrom(params[p]));
           values[p] = convert ? arg.toJava() : arg;
 
@@ -190,7 +190,7 @@ final class JavaEval {
    * @return type string
    */
   private static String type(final Object arg) {
-    final Object object = arg instanceof Jav ? ((Jav) arg).toJava() : arg;
+    final Object object = arg instanceof XQJava ? ((XQJava) arg).toJava() : arg;
     return object instanceof Value ? ((Value) object).seqType().toString() :
       object == null ? Util.info(null) :
       Util.className(object);

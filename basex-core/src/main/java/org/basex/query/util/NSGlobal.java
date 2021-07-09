@@ -53,6 +53,7 @@ public final class NSGlobal {
     NS.add(REST_PREFIX, REST_URI);
     // BaseX namespaces
     NS.add(BASEX_PREFIX, BASEX_URI);
+    NS.add(JAVA_PREFIX, JAVA_URI);
     // namespaces of built-in modules
     NS.add(ADMIN_PREFIX, ADMIN_URI);
     NS.add(ARCHIVE_PREFIX, ARCHIVE_URI);

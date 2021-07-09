@@ -23,7 +23,7 @@ public final class FnString extends ContextFn {
     if(item == Empty.VALUE) return Str.EMPTY;
     if(item.type == AtomType.STRING) return item;
 
-    if(item instanceof FItem) throw FISTRING_X.get(info, item.type);
+    if(item instanceof FItem && !(item instanceof XQJava)) throw FISTRING_X.get(info, item.type);
     return Str.get(item.string(info));
   }
 

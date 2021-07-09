@@ -157,7 +157,7 @@ final class DynJavaFunc extends DynJavaCall {
     // remove static argument
     final Expr[] args = je.exprs;
     if(size == 1 && !isStatic(method) || args.length > 0 &&
-        ((args[0] instanceof Jav || args[0] instanceof JavaCall))) {
+        ((args[0] instanceof XQJava || args[0] instanceof JavaCall))) {
       je.exprs = Arrays.copyOfRange(args, 1, args.length);
     }
 

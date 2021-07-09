@@ -268,6 +268,7 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] INDEX_PREFIX = token("index");
   /** XQuery prefix. */ byte[] INPUT_PREFIX = token("input");
   /** XQuery prefix. */ byte[] INSPECT_PREFIX = token("inspect");
+  /** XQuery prefix. */ byte[] JAVA_PREFIX = token("java");
   /** XQuery prefix. */ byte[] JOBS_PREFIX = token("jobs");
   /** XQuery prefix. */ byte[] JSON_PREFIX = token("json");
   /** XQuery prefix. */ byte[] LAZY_PREFIX = token("lazy");
@@ -350,6 +351,7 @@ public interface QueryText {
   /** BaseX URI. */ byte[] INDEX_URI = token(BXMODULES_URL + "index");
   /** BaseX URI. */ byte[] INPUT_URI = token(BXMODULES_URL + "input");
   /** BaseX URI. */ byte[] INSPECT_URI = token(BXMODULES_URL + "inspect");
+  /** BaseX URI. */ byte[] JAVA_URI = token(BXMODULES_URL + "java");
   /** BaseX URI. */ byte[] JOBS_URI = token(BXMODULES_URL + "jobs");
   /** BaseX URI. */ byte[] JSON_URI = token(BXMODULES_URL + "json");
   /** BaseX URI. */ byte[] LAZY_URI = token(BXMODULES_URL + "lazy");

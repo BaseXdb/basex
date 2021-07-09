@@ -137,7 +137,6 @@ public final class SeqTypeTest {
     combine(ATTRIBUTE_O, op);
     combine(ITEM_O, op);
     combine(NORMALIZED_STRING.seqType(), op);
-    combine(JAVA.seqType(), op);
     combine(ATTRIBUTE_O, op);
     combine(ELEMENT_O, op);
     combine(NODE_O, op);
@@ -147,7 +146,6 @@ public final class SeqTypeTest {
     combine(STRING_O, ATTRIBUTE_O, ITEM_O, op);
     combine(NORMALIZED_STRING.seqType(), STRING_O, STRING_O, op);
     combine(STRING_O, NORMALIZED_STRING.seqType(), STRING_O, op);
-    combine(STRING_O, JAVA.seqType(), ITEM_O, op);
 
     combine(ATTRIBUTE_O, ELEMENT_O, NODE_O, op);
     combine(NODE_O, ELEMENT_O, NODE_O, op);
@@ -247,7 +245,6 @@ public final class SeqTypeTest {
     combine(ATTRIBUTE_O, op);
     combine(ITEM_O, op);
     combine(NORMALIZED_STRING.seqType(), op);
-    combine(JAVA.seqType(), op);
     combine(ATTRIBUTE_O, op);
     combine(ELEMENT_O, op);
     combine(NODE_O, op);

@@ -19,10 +19,10 @@ public final class JavaFunctionTest extends SandboxTest {
     query("Q{java:java.lang.Integer}new\u00b7java.lang.String('456')", 456);
     query("Q{java:java.lang.Integer}new\u00b7int(xs:int(789))", 789);
 
-    query("declare namespace random = 'java:java.util.Random'; random:nextInt(random:new())");
-    query("declare namespace sl = 'java:org.basex.util.list.StringList'; sl:new()");
+    query("declare namespace Random = 'java:java.util.Random'; Random:nextInt(Random:new())");
+    query("declare namespace List = 'java:org.basex.util.list.StringList'; List:new()");
 
-    error("declare namespace rand = 'java:java.util.random'; rand:new()", WHICHCLASS_X);
+    error("declare namespace Random = 'java:java.util.random'; Random:new()", WHICHCLASS_X);
     error("Q{java:java.util.rndm}new()", WHICHCLASS_X);
     error("Q{java:java.util.random}new()", WHICHCLASS_X);
     error("Q{java:java.lang.Integer}new\u00b7int('abc')", JAVAARGS_X_X_X);
@@ -32,8 +32,8 @@ public final class JavaFunctionTest extends SandboxTest {
   @Test public void rewriteURI() {
     query("Q{java.lang.integer}new('123')", 123);
     query("Q{java.lang.Integer}new\u00b7int(xs:int(456))", 456);
-    query("declare namespace random = 'java.util.random'; random:nextInt(random:new())");
-    query("declare namespace sl = 'http://basex.org/util/list/string-list'; sl:new()");
+    query("declare namespace Random = 'java.util.random'; Random:nextInt(Random:new())");
+    query("declare namespace List = 'http://basex.org/util/list/string-list'; List:new()");
   }
 
   /** Tests calling some Java static fields from XQuery. */
@@ -48,8 +48,8 @@ public final class JavaFunctionTest extends SandboxTest {
 
   /** Tests calling some Java object fields from XQuery. */
   @Test public void field() {
-    query("declare namespace point = 'java:java.awt.Point'; "
-        + "point:new() => point:x()", 0);
+    query("declare namespace Point = 'java:java.awt.Point'; " +
+        "Point:new() => Point:x()", 0);
   }
 
   /** Tests calling some Java static methods from XQuery. */
@@ -65,30 +65,33 @@ public final class JavaFunctionTest extends SandboxTest {
 
   /** Tests calling some Java static methods from XQuery. */
   @Test public void method() {
-    query("declare namespace rect = 'java.awt.Rectangle'; " +
-        "rect:new(xs:int(2), xs:int(2)) => rect:contains(xs:int(1), xs:int(1))", true);
-    query("declare namespace p = 'java.util.Properties'; "
-        + "p:new()", "{}");
+    query("declare namespace Rectangle = 'java.awt.Rectangle'; " +
+        "Rectangle:new(xs:int(2), xs:int(2)) => Rectangle:contains(xs:int(1), xs:int(1))", true);
+
+    query("declare namespace Properties = 'java.util.Properties'; Properties:new()",
+        "java:java.util.Properties#0");
+    query("declare namespace Properties = 'java.util.Properties'; Properties:new()()",
+        "map {\n}");
   }
 
   /** Tests importing a Java class. */
   @Test public void importClass() {
-    query("import module namespace set = 'java.util.HashSet'; " +
-        "let $a := (set:add('a'), set:add('b')) return set:size()", 2);
-    query("import module namespace set = 'java.util.HashSet'; " +
-        "let $a := (set:add(128), set:add(128)) return set:size()", 1);
-    query("import module namespace set = 'java.util.HashSet'; " +
-        "let $a := set:add\u00b7java.lang.Object(128) return set:size()", 1);
+    query("import module namespace Set = 'java.util.HashSet'; " +
+        "let $a := (Set:add('a'), Set:add('b')) return Set:size()", 2);
+    query("import module namespace Set = 'java.util.HashSet'; " +
+        "let $a := (Set:add(128), Set:add(128)) return Set:size()", 1);
+    query("import module namespace Set = 'java.util.HashSet'; " +
+        "let $a := Set:add\u00b7java.lang.Object(128) return Set:size()", 1);
 
     // use class with capital and lower case
-    query("import module namespace string = 'http://lang.java/String'; "
-        + "string:length()", 0);
-    query("import module namespace string = 'http://lang.java/string'; "
-        + "string:length()", 0);
+    query("import module namespace String = 'http://lang.java/String'; " +
+        "String:length()", 0);
+    query("import module namespace String = 'http://lang.java/string'; " +
+        "String:length()", 0);
 
     // handle {@link Jav} type
-    query("declare namespace set = 'java.util.HashSet';" +
-        "set:add(set:new(), Q{java.awt.Point}new())", true);
+    query("declare namespace Set = 'java.util.HashSet';" +
+        "Set:add(Set:new(), Q{java.awt.Point}new())", true);
   }
 
   /** Tests importing a query module. */
@@ -111,10 +114,10 @@ public final class JavaFunctionTest extends SandboxTest {
     // handle {@link Jav} type
     error("declare namespace string = 'java.lang.String'; " +
         "string:concat(string:new(), Q{java.awt.Point}new())", JAVAARGS_X_X_X);
-    error("import module namespace qm = 'java:org.basex.query.func.QueryModuleTest'; "
-        + "qm:xyz()", WHICHFUNC_X);
-    error("import module namespace qm = 'java:org.basex.query.func.QueryModuleTest'; "
-        + "qm:fast()", FUNCARITY_X_X_X);
+    error("import module namespace qm = 'java:org.basex.query.func.QueryModuleTest'; " +
+        "qm:xyz()", WHICHFUNC_X);
+    error("import module namespace qm = 'java:org.basex.query.func.QueryModuleTest'; " +
+        "qm:fast()", FUNCARITY_X_X_X);
 
     query("declare namespace qm = 'java:org.basex.query.func.QueryModuleTest'; " +
         "try{ qm:error(qm:new()) } catch * { $err:code }", "basex:error");
@@ -126,68 +129,68 @@ public final class JavaFunctionTest extends SandboxTest {
   @Test public void ambiguous() {
     error("Q{java:org.basex.query.func.JavaFunctionExample}new(true())",
         JAVAMULTICONS_X_X_X);
-    error("import module namespace n = 'java:java.lang.StringBuilder'; "
-        + "n:append('x')", JAVAMULTIMETH_X_X_X);
-    error("declare namespace n = 'java:java.lang.StringBuilder';"
-        + "n:append(n:new(), 'x')", JAVAMULTIMETH_X_X_X);
+    error("import module namespace StringBuilder = 'java:java.lang.StringBuilder'; " +
+        "StringBuilder:append('x')", JAVAMULTIMETH_X_X_X);
+    error("declare namespace StringBuilder = 'java:java.lang.StringBuilder';" +
+        "StringBuilder:append(StringBuilder:new(), 'x')", JAVAMULTIMETH_X_X_X);
   }
 
   /** Pass on empty sequences. */
   @Test public void emptyDecl() {
-    query("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; "
-        + "n:string(n:new(),())", "");
-    query("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; "
-        + "n:ambiguous1(n:new(),())", "");
+    query("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
+        "n:string(n:new(),())", "");
+    query("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
+        "n:ambiguous1(n:new(),())", "");
 
-    error("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; "
-        + "n:bool(n:new(),())", JAVAARGS_X_X_X);
-    error("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; "
-        + "n:ambiguous2(n:new(),())", JAVAMULTIMETH_X_X_X);
+    error("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
+        "n:bool(n:new(),())", JAVAARGS_X_X_X);
+    error("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
+        "n:ambiguous2(n:new(),())", JAVAMULTIMETH_X_X_X);
   }
 
   /** Pass on empty sequences. */
   @Test public void emptyImport() {
-    query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; "
-        + "n:string(())", "");
+    query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
+        "n:string(())", "");
 
-    error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; "
-        + "n:bool(())", JAVAARGS_X_X_X);
-    error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; "
-        + "n:ambiguous1(())", JAVAMULTIMETH_X_X_X);
-    error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; "
-        + "n:ambiguous2(())", JAVAMULTIMETH_X_X_X);
+    error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
+        "n:bool(())", JAVAARGS_X_X_X);
+    error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
+        "n:ambiguous1(())", JAVAMULTIMETH_X_X_X);
+    error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
+        "n:ambiguous2(())", JAVAMULTIMETH_X_X_X);
   }
 
   /** Address invisible code. */
   @Test public void notVisible() {
-    error("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; "
-        + "n:var(n:new())", WHICHFUNC_X);
-    error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; "
-        + "n:var()", WHICHFUNC_X);
+    error("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
+        "n:var(n:new())", WHICHFUNC_X);
+    error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
+        "n:var()", WHICHFUNC_X);
   }
 
   /** Error cases. */
   @Test public void errors() {
-    error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; "
-        + "n:null-array()", JAVANULL);
+    error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
+        "n:null-array()", JAVANULL);
   }
 
   /** Process arrays. */
   @Test public void array() {
-    query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; "
-        + "n:strings(array { '1' })", 1);
-    query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; "
-        + "n:longs(array { 1 })", 1);
-    query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; "
-        + "n:chars() => codepoints-to-string()", "ab");
+    query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
+        "n:strings(array { '1' })", 1);
+    query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
+        "n:longs(array { 1 })", 1);
+    query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
+        "n:chars() => codepoints-to-string()", "ab");
   }
 
   /** Character parameters. */
   @Test public void gh2018() {
-    query("'A' "
-        + "=> string-to-codepoints()"
-        + "=> xs:unsignedShort()"
-        + "=> Q{java:java.lang.Character}isUpperCase()",
+    query("'A' " +
+        "=> string-to-codepoints()" +
+        "=> xs:unsignedShort()" +
+        "=> Q{java:java.lang.Character}isUpperCase()",
         true);
   }
 
@@ -209,28 +212,50 @@ public final class JavaFunctionTest extends SandboxTest {
 
   /** Pass on Java items to functions. */
   @Test public void funcItem() {
-    query("function($x) { $x }(Q{java:java.io.File}new('x'))", "x");
-    query("declare function db:f($x) { $x }; db:f#1(Q{java:java.io.File}new('x'))", "x");
+    final String ns = "declare namespace File = 'java:java.io.File'; ";
+    query(ns + "declare function db:f($x) { $x }; db:f(File:new('x'))", "java:java.io.File#0");
+    query(ns + "declare function db:f($x) { $x }; db:f(File:new('x')) => File:toString()", "x");
+
+    query(ns + "declare function db:f($x) { $x }; db:f#1(File:new('x'))", "java:java.io.File#0");
+    query(ns + "declare function db:f($x) { $x }; db:f#1(File:new('x')) => File:toString()", "x");
+
+    query(ns + "function($x) { $x }(File:new('x'))", "java:java.io.File#0");
+    query(ns + "function($x) { $x }(File:new('x')) => File:toString()", "x");
   }
 
   /** URI test. */
   @Test public void uri() {
-    query("declare namespace uri = 'java.net.URI'; uri:get-host(uri:new('http://a'))", "a");
-    query("declare namespace uri = 'java.net.URI'; uri:get-path(uri:new('http://a/b'))", "/b");
+    final String ns = "declare namespace URI = 'java.net.URI'; ";
+    query(ns + "URI:get-host(URI:new('http://a'))", "a");
+    query(ns + "URI:get-path(URI:new('http://a/b'))", "/b");
   }
 
   /** Return Java items. */
   @Test public void data() {
-    query("Q{java:java.util.ArrayList}new()", "[]");
+    final String ns = "declare namespace List = 'java:java.util.ArrayList'; ";
+    query(ns + "List:new()", "java:java.util.ArrayList#0");
+    query(ns + "List:new()()", "");
   }
 
   /** Retrieve function items as Java objects. */
   @Test public void toJava() {
-    query("import module namespace set = 'java:java.util.HashSet'; set:add(true#0)", "true");
+    query("import module namespace Set = 'java:java.util.HashSet'; Set:add(true#0)", "true");
   }
 
   /** Empty sequences. */
   @Test public void emptySequence() {
     error("Q{java.lang.String}new·java.lang.String(())", JAVAEVAL_X_X_X);
+  }
+
+  /** Array arguments. */
+  @Test public void arrays() {
+    final String ns = "declare namespace String = 'java:java.lang.String'; ";
+    query(ns + "String:new(array { xs:unsignedShort(33) })", "!");
+    query(ns + "String:new·char...(array { xs:unsignedShort(33) })", "!");
+    query(ns + "String:new·char...(array { (65 to 69) ! xs:unsignedShort(.) })", "ABCDE");
+    query(ns + "String:new·char...·int·int(" +
+        "  array { (65 to 69) ! xs:unsignedShort(.) }, xs:int(1), xs:int(3)" +
+        ")",
+        "BCD");
   }
 }

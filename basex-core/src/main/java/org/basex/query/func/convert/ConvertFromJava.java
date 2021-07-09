@@ -20,7 +20,7 @@ public final class ConvertFromJava extends StandardFunc {
 
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Item item : value) {
-      if(item instanceof Jav) {
+      if(item instanceof XQJava) {
         vb.add(JavaCall.toValue(item.toJava(), qc, info, WrapOptions.NONE));
       } else {
         vb.add(item);

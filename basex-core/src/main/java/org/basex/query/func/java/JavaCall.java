@@ -186,13 +186,13 @@ public abstract class JavaCall extends Arr {
           }
           vb.add(map);
         } else {
-          throw JAVACONVERT_X_X.get(info, Util.className(object), object);
+          vb.add(Str.get(object.toString()));
         }
         return vb.value();
       }
     }
     // wrap Java object
-    return new Jav(object, qc);
+    return new XQJava(object);
   }
 
   /**
@@ -213,7 +213,11 @@ public abstract class JavaCall extends Arr {
     String[] types = null;
     final int n = name.indexOf('\u00b7');
     if(n != -1) {
-      types = Strings.split(name.substring(n + 1), '\u00b7');
+      final StringList list = new StringList();
+      for(final String type : Strings.split(name.substring(n + 1), '\u00b7')) {
+        list.add(type.replace("...", "[]"));
+      }
+      types = list.finish();
       name = name.substring(0, n);
     }
     final String uri = string(qname.uri());
@@ -372,7 +376,7 @@ public abstract class JavaCall extends Arr {
     final int pl = pTypes.length;
     if(pl != qTypes.length) return false;
     for(int p = 0; p < pl; p++) {
-      if(!qTypes[p].equals(pTypes[p].getName())) return false;
+      if(!qTypes[p].equals(pTypes[p].getCanonicalName())) return false;
     }
     return true;
   }
