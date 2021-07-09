@@ -725,7 +725,7 @@ public final class QueryContext extends Job implements Closeable {
 
     // no type specified: return original value or convert Java object
     if(type == null || type.isEmpty()) {
-      return object instanceof Value ? (Value) object : JavaCall.toValue(object, this, sc, null);
+      return object instanceof Value ? (Value) object : JavaCall.toValue(object, this, null);
     }
 
     // convert to json
@@ -771,12 +771,12 @@ public final class QueryContext extends Job implements Closeable {
     if(object instanceof String[]) {
       // cast string array
       final ValueBuilder vb = new ValueBuilder(this);
-      for(final String string : (String[]) object) vb.add(tp.cast(string, this, sc, null));
+      for(final String string : (String[]) object) vb.add(tp.cast(string, this, null));
       return vb.value(tp);
     }
 
     // cast any other object to XDM
-    return tp.cast(object, this, sc, null);
+    return tp.cast(object, this, null);
   }
 
   /**

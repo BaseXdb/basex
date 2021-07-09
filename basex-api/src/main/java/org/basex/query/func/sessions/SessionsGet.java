@@ -20,6 +20,6 @@ public final class SessionsGet extends SessionsFn {
     final Value dflt = exprs.length == 2 ? Empty.VALUE : exprs[2].value(qc);
 
     final Object object = session.get(name);
-    return object != null ? JavaCall.toValue(object, qc, sc, info) : dflt;
+    return object != null ? JavaCall.toValue(object, qc, info) : dflt;
   }
 }

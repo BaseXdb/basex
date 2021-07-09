@@ -21,7 +21,7 @@ public final class ConvertFromJava extends StandardFunc {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Item item : value) {
       if(item instanceof Jav) {
-        vb.add(JavaCall.toValue(item.toJava(), qc, sc, info, WrapOptions.NONE));
+        vb.add(JavaCall.toValue(item.toJava(), qc, info, WrapOptions.NONE));
       } else {
         vb.add(item);
       }

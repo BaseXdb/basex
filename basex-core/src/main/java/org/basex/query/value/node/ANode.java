@@ -84,21 +84,13 @@ public abstract class ANode extends Item {
 
   @Override
   public final Item atomValue(final QueryContext qc, final InputInfo ii) {
-    return atomItem();
+    return atomItem(qc, ii);
   }
 
   @Override
   public final Item atomItem(final QueryContext qc, final InputInfo ii) {
-    return atomItem();
-  }
-
-  /**
-   * Returns an atomic item.
-   * @return item
-   */
-  public Item atomItem() {
-    return type == NodeType.PROCESSING_INSTRUCTION || type == NodeType.COMMENT ? Str.get(string()) :
-      new Atm(string());
+    return type == NodeType.PROCESSING_INSTRUCTION || type == NodeType.COMMENT ?
+      Str.get(string()) : new Atm(string());
   }
 
   @Override

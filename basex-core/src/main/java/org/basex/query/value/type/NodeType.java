@@ -32,8 +32,7 @@ public enum NodeType implements Type {
   /** Text type. */
   TEXT("text", NODE, ID.TXT) {
     @Override
-    public ANode cast(final Object value, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) {
+    public ANode cast(final Object value, final QueryContext qc, final InputInfo ii) {
       if(value instanceof BXText) return ((BXNode) value).getNode();
       if(value instanceof Text) return new FTxt((Text) value);
       return new FTxt(value.toString());
@@ -43,8 +42,8 @@ public enum NodeType implements Type {
   /** PI type. */
   PROCESSING_INSTRUCTION("processing-instruction", NODE, ID.PI) {
     @Override
-    public ANode cast(final Object value, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+    public ANode cast(final Object value, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
       if(value instanceof BXPI) return ((BXNode) value).getNode();
       if(value instanceof ProcessingInstruction) return new FPI((ProcessingInstruction) value);
       final Matcher m = Pattern.compile("<\\?(.*?) (.*)\\?>").matcher(value.toString());
@@ -56,8 +55,8 @@ public enum NodeType implements Type {
   /** Element type. */
   ELEMENT("element", NODE, ID.ELM) {
     @Override
-    public ANode cast(final Object value, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+    public ANode cast(final Object value, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
       if(value instanceof BXElem)  return ((BXNode) value).getNode();
       if(value instanceof Element) return new FElem((Element) value, null, new TokenMap());
       try {
@@ -71,8 +70,8 @@ public enum NodeType implements Type {
   /** Document type. */
   DOCUMENT_NODE("document-node", NODE, ID.DOC) {
     @Override
-    public ANode cast(final Object value, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+    public ANode cast(final Object value, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
       if(value instanceof BXDoc) return ((BXNode) value).getNode();
       try {
         if(value instanceof Document) {
@@ -97,17 +96,17 @@ public enum NodeType implements Type {
   /** Document element type. */
   DOCUMENT_NODE_ELEMENT("document-node(element())", DOCUMENT_NODE, ID.DEL) {
     @Override
-    public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return DOCUMENT_NODE.cast(value, qc, sc, ii);
+    public Item cast(final Object value, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+      return DOCUMENT_NODE.cast(value, qc, ii);
     }
   },
 
   /** Attribute type. */
   ATTRIBUTE("attribute", NODE, ID.ATT) {
     @Override
-    public ANode cast(final Object value, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+    public ANode cast(final Object value, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
       if(value instanceof BXAttr) return ((BXNode) value).getNode();
       if(value instanceof Attr) return new FAttr((Attr) value);
       final Matcher m = Pattern.compile(" (.*?)=\"(.*)\"").matcher(value.toString());
@@ -119,8 +118,8 @@ public enum NodeType implements Type {
   /** Comment type. */
   COMMENT("comment", NODE, ID.COM) {
     @Override
-    public ANode cast(final Object value, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+    public ANode cast(final Object value, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
       if(value instanceof BXComm) return ((BXNode) value).getNode();
       if(value instanceof Comment) return new FComm((Comment) value);
       final Matcher m = Pattern.compile("<!--(.*?)-->").matcher(value.toString());
@@ -201,15 +200,15 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public Item cast(final Object value, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+  public Item cast(final Object value, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
     throw Util.notExpected(value);
   }
 
   @Override
-  public final Item castString(final String value, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return cast(value, qc, sc, ii);
+  public final Item castString(final String value, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+    return cast(value, qc, ii);
   }
 
   @Override

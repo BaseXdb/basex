@@ -160,7 +160,7 @@ public interface Type {
    * Casts the specified item to this type.
    * @param item item to be converted
    * @param qc query context
-   * @param sc static context
+   * @param sc static context (only required for {@link AtomType#QNAME} conversion)
    * @param ii input info
    * @return cast value
    * @throws QueryException query exception
@@ -171,24 +171,21 @@ public interface Type {
    * Casts the specified Java value to this type.
    * @param value Java value
    * @param qc query context
-   * @param sc static context
    * @param ii input info
    * @return cast value
    * @throws QueryException query exception
    */
-  Value cast(Object value, QueryContext qc, StaticContext sc, InputInfo ii) throws QueryException;
+  Value cast(Object value, QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
    * Casts the specified string to this type.
    * @param value string object
    * @param qc query context
-   * @param sc static context
    * @param ii input info
    * @return cast value
    * @throws QueryException query exception
    */
-  Value castString(String value, QueryContext qc, StaticContext sc, InputInfo ii)
-      throws QueryException;
+  Value castString(String value, QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
    * Returns a sequence type with a single number of occurrence.

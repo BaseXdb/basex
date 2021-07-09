@@ -20,7 +20,7 @@ public final class SessionGet extends SessionFn {
 
     if(session != null) {
       final Object object = session.get(name);
-      if(object != null) return JavaCall.toValue(object, qc, sc, info);
+      if(object != null) return JavaCall.toValue(object, qc, info);
     }
     return dflt;
   }

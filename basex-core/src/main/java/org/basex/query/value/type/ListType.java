@@ -85,15 +85,15 @@ public enum ListType implements Type {
   }
 
   @Override
-  public final Value cast(final Object value, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return cast(Str.get(value, qc, ii), qc, sc, ii);
+  public final Value cast(final Object value, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+    return cast(Str.get(value, qc, ii), qc, null, ii);
   }
 
   @Override
-  public final Value castString(final String value, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return cast(value, qc, sc, ii);
+  public final Value castString(final String value, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+    return cast(value, qc, ii);
   }
 
   @Override

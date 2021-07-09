@@ -365,7 +365,8 @@ public final class HttpClient {
     // serialize payload
     try(Serializer ser = Serializer.get(out, sopts)) {
       for(final Item item : payload) {
-        ser.serialize(atom && item.type instanceof NodeType ? ((ANode) item).atomItem() : item);
+        ser.serialize(atom && item.type instanceof NodeType ?
+          ((ANode) item).atomItem(null, null) : item);
       }
     }
   }

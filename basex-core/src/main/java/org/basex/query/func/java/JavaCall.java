@@ -70,7 +70,7 @@ public abstract class JavaCall extends Arr {
     // check permission
     if(!qc.context.user().has(perm)) throw BASEX_PERMISSION_X_X.get(info, perm, this);
 
-    final Value value = toValue(eval(qc), qc, sc, info);
+    final Value value = toValue(eval(qc), qc, info);
     if(!updating) return value;
 
     // updating function: cache output
@@ -92,28 +92,26 @@ public abstract class JavaCall extends Arr {
    * Converts the specified object to an XQuery value.
    * @param object result object
    * @param qc query context
-   * @param sc static context
    * @param info input info
    * @return value
    * @throws QueryException query exception
    */
-  public static Value toValue(final Object object, final QueryContext qc, final StaticContext sc,
-      final InputInfo info) throws QueryException {
-    return toValue(object, qc, sc, info, qc.context.options.get(MainOptions.WRAPJAVA));
+  public static Value toValue(final Object object, final QueryContext qc, final InputInfo info)
+      throws QueryException {
+    return toValue(object, qc, info, qc.context.options.get(MainOptions.WRAPJAVA));
   }
 
   /**
    * Converts the specified object to an XQuery value.
    * @param object result object
    * @param qc query context
-   * @param sc static context
    * @param info input info
    * @param wrap wrap options
    * @return value
    * @throws QueryException query exception
    */
-  public static Value toValue(final Object object, final QueryContext qc, final StaticContext sc,
-      final InputInfo info, final WrapOptions wrap) throws QueryException {
+  public static Value toValue(final Object object, final QueryContext qc, final InputInfo info,
+      final WrapOptions wrap) throws QueryException {
 
     // return XQuery types unchanged
     if(object instanceof Value) return (Value) object;
@@ -125,7 +123,7 @@ public abstract class JavaCall extends Arr {
 
       // values with XQuery types
       final Type type = type(object);
-      if(type != null) return type.cast(object, qc, sc, null);
+      if(type != null) return type.cast(object, qc, null);
 
       // arrays
       if(object.getClass().isArray()) {
@@ -167,7 +165,7 @@ public abstract class JavaCall extends Arr {
         }
         // any other array (including nested ones)
         final ValueBuilder vb = new ValueBuilder(qc);
-        for(final Object value : (Object[]) object) vb.add(toValue(value, qc, sc, info, wrap));
+        for(final Object value : (Object[]) object) vb.add(toValue(value, qc, info, wrap));
         return vb.value();
       }
 
@@ -175,15 +173,15 @@ public abstract class JavaCall extends Arr {
       if(wrap == WrapOptions.NONE) {
         final ValueBuilder vb = new ValueBuilder(qc);
         if(object instanceof Iterable) {
-          for(final Object obj : (Iterable<?>) object) vb.add(toValue(obj, qc, sc, info, wrap));
+          for(final Object obj : (Iterable<?>) object) vb.add(toValue(obj, qc, info, wrap));
         } else if(object instanceof Iterator) {
           final Iterator<?> ir = (Iterator<?>) object;
-          while(ir.hasNext()) vb.add(toValue(ir.next(), qc, sc, info, wrap));
+          while(ir.hasNext()) vb.add(toValue(ir.next(), qc, info, wrap));
         } else if(object instanceof Map) {
           XQMap map = XQMap.empty();
           for(final Map.Entry<?, ?> entry : ((Map<?, ?>) object).entrySet()) {
-            final Item key = toValue(entry.getKey(), qc, sc, info, wrap).item(qc, info);
-            final Value val = toValue(entry.getValue(), qc, sc, info, wrap);
+            final Item key = toValue(entry.getKey(), qc, info, wrap).item(qc, info);
+            final Value val = toValue(entry.getValue(), qc, info, wrap);
             map = map.put(key, val, info);
           }
           vb.add(map);
