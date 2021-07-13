@@ -242,6 +242,21 @@ public final class JavaFunctionTest extends SandboxTest {
     query("import module namespace Set = 'java:java.util.HashSet'; Set:add(true#0)", "true");
   }
 
+  /** Test method. */
+  @Test public void fromJava() {
+    query("import module namespace jfe = 'org.basex.query.func.JavaFunctionExample'; "
+        + "jfe:data() ! (if(. instance of function(*)) then .() else .)",
+        "a\nb\nc\nmap {\n\"d\": \"e\"\n}\nf");
+
+    query("import module namespace jfe = 'org.basex.query.func.JavaFunctionExample'; "
+        + "let $c := jfe:data() ! (if(. instance of function(*)) then .() else .) "
+        + "return ($c[1], $c[2], $c[3], map:keys($c[4]), $c[4]?*, $c[5])",
+        "a\nb\nc\nd\ne\nf");
+
+    query("declare namespace Random = 'java:java.util.Random';" +
+        "starts-with(Random:new(xs:long(0))(), 'java.util.Random@')", true);
+  }
+
   /** Empty sequences. */
   @Test public void emptySequence() {
     error("Q{java.lang.String}new·java.lang.String(())", JAVAEVAL_X_X_X);

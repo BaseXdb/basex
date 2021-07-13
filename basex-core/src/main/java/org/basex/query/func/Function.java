@@ -854,9 +854,6 @@ public enum Function implements AFunction {
   _CONVERT_ENCODE_KEY(ConvertEncodeKey::new, "encode-key(string[,lax])",
       arg(STRING_O, BOOLEAN_O), STRING_O, CONVERT_URI),
   /** XQuery function. */
-  _CONVERT_FROM_JAVA(ConvertFromJava::new, "from-java(items)",
-      arg(ITEM_ZM), ITEM_ZM, CONVERT_URI),
-  /** XQuery function. */
   _CONVERT_INTEGER_FROM_BASE(ConvertIntegerFromBase::new, "integer-from-base(string,base)",
       arg(STRING_O, INTEGER_O), INTEGER_O, CONVERT_URI),
   /** XQuery function. */
