@@ -15,6 +15,11 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 public final class CsvXQueryConverter extends CsvConverter {
+  /** String array type. */
+  public static final ArrayType STRING_ARRAY = ArrayType.get(SeqType.STRING_O);
+  /** Map with String array type. */
+  //public static final ArrayType STRING_MAP = MapType.get(SeqType.STRING_O);
+
   /** Field names. */
   public static final Str NAMES = Str.get("names");
   /** Records. */
@@ -40,7 +45,7 @@ public final class CsvXQueryConverter extends CsvConverter {
 
   @Override
   protected void record() {
-    if(row != null) rows.add(row.array(SeqType.STRING_ARRAY));
+    if(row != null) rows.add(row.array(STRING_ARRAY));
     row = new ArrayBuilder();
   }
 
@@ -55,15 +60,15 @@ public final class CsvXQueryConverter extends CsvConverter {
 
   @Override
   protected XQMap finish() throws QueryIOException {
-    if(row != null) rows.add(row.array(SeqType.STRING_ARRAY));
+    if(row != null) rows.add(row.array(STRING_ARRAY));
     try {
       XQMap map = XQMap.empty();
       if(!headers.isEmpty()) {
         final ArrayBuilder names = new ArrayBuilder();
         for(final byte[] header : headers) names.append(Str.get(header));
-        map = map.put(NAMES, names.array(SeqType.STRING_ARRAY), null);
+        map = map.put(NAMES, names.array(STRING_ARRAY), null);
       }
-      return map.put(RECORDS, rows.value(), null);
+      return map.put(RECORDS, rows.value(STRING_ARRAY), null);
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }

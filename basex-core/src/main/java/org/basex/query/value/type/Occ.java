@@ -22,14 +22,27 @@ public enum Occ {
 
   /**
    * Constructor.
-   * @param min minimal result size
-   * @param max maximal result size
+   * @param min minimal result size (0, 1 or larger than 1)
+   * @param max maximal result size (0, 1 or larger than 1)
    * @param string string representation
    */
   Occ(final long min, final long max, final String string) {
     this.min = min;
     this.max = max;
     this.string = string;
+  }
+
+  /**
+   * Returns a new occurrence.
+   * @param min minimum occurrence
+   * @param max maximum occurrence
+   * @return occurrence
+   */
+  public static Occ get(final long min, final long max) {
+    return max < min ? null :
+      max == 0 ? ZERO :
+      max == 1 ? min == 0 ? ZERO_OR_ONE : EXACTLY_ONE :
+      min == 0 ? ZERO_OR_MORE : ONE_OR_MORE;
   }
 
   /**
@@ -49,9 +62,7 @@ public enum Occ {
    * @return intersection or {@code null}
    */
   public Occ intersect(final Occ other) {
-    final long mn = Math.max(min, other.min), mx = Math.min(max, other.max);
-    return mx < mn ? null : mx == 0 ? ZERO : mn == mx ? EXACTLY_ONE : mx == 1 ? ZERO_OR_ONE :
-      mn == 0 ? ZERO_OR_MORE : ONE_OR_MORE;
+    return get(Math.max(min, other.min), Math.min(max, other.max));
   }
 
   /**
@@ -60,9 +71,7 @@ public enum Occ {
    * @return union
    */
   public Occ union(final Occ other) {
-    final long mn = Math.min(min, other.min), mx = Math.max(max, other.max);
-    return mx == 0 ? ZERO : mn == mx ? EXACTLY_ONE : mx == 1 ? ZERO_OR_ONE :
-      mn == 0 ? ZERO_OR_MORE : ONE_OR_MORE;
+    return get(Math.min(min, other.min), Math.max(max, other.max));
   }
 
   /**
@@ -71,9 +80,16 @@ public enum Occ {
    * @return union
    */
   public Occ add(final Occ other) {
-    final long mn = min + other.min, mx = max + other.max;
-    return mx == 0 ? ZERO : mx == 1 ? mn == 0 ? ZERO_OR_ONE : EXACTLY_ONE :
-      mn == 0 ? ZERO_OR_MORE : ONE_OR_MORE;
+    return get(min + other.min, Math.min(2, max) + Math.min(2, other.max));
+  }
+
+  /**
+   * Multiplies two occurrence indicators.
+   * @param other other occurrence indicator
+   * @return union
+   */
+  public Occ multiply(final Occ other) {
+    return get(min * other.min, Math.min(2, max) * Math.min(2, other.max));
   }
 
   /**

@@ -1,3 +1,4 @@
+
 package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;

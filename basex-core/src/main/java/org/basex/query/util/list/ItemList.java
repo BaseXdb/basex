@@ -63,7 +63,7 @@ public final class ItemList extends ObjectList<Item, ItemList> {
    * @return the value
    */
   public Value value(final Expr expr) {
-    return ItemSeq.get(list, size, expr);
+    return ItemSeq.get(list, size, expr != null ? expr.seqType().type : null);
   }
 
   @Override

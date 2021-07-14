@@ -13,6 +13,7 @@ import org.basex.query.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 
@@ -77,7 +78,7 @@ public final class RequestContext {
       queryStrings().forEach((key, value) -> {
         final ItemList items = new ItemList();
         for(final String string : value) items.add(new Atm(string));
-        values.put(key, items.value());
+        values.put(key, items.value(AtomType.UNTYPED_ATOMIC));
       });
     }
     return values;

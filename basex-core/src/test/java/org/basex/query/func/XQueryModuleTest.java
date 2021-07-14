@@ -3,9 +3,9 @@ package org.basex.query.func;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
-import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.query.ast.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class XQueryModuleTest extends SandboxTest {
+public final class XQueryModuleTest extends QueryPlanTest {
   /** Path to test file. */
   private static final String PATH = "src/test/resources/input.xml";
 
@@ -134,9 +134,20 @@ public final class XQueryModuleTest extends SandboxTest {
     query(func.args(" (true#0, function() { (1 to 10000000)[.=1] })"), "true\n1");
     query(func.args(" ()"), "");
 
+    // optimizations
+    check(func.args(" ()"), "", empty());
+    check(func.args(" false#0"), false, root(DynFuncCall.class));
+
     // errors
-    error(func.args(" count#1"), ZEROFUNCS_X_X);
-    error(func.args(" 123"), ZEROFUNCS_X_X);
+    final String updating = " %updating function() { delete node <a/> }";
+    error(func.args(updating), FUNCUP_X);
+    error(func.args(" (" + updating + ", " + updating + ')'), FUNCUP_X);
+    error(func.args(" (" + updating + ", " + updating + ")[number(<_>1</_>)]"), FUNCUP_X);
+
+    error(func.args(" count#1"), INVARITY_X_X_X);
+    error(func.args(" 123"), INVFUNCITEM_X_X);
+    error(func.args(" (count#1, count#1)"), ZEROFUNCS_X_X);
+    error(func.args(" (123, 123)"), ZEROFUNCS_X_X);
     error(func.args(" error#0"), FUNERR1);
   }
 

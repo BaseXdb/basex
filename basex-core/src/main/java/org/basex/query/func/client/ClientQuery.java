@@ -41,10 +41,10 @@ public final class ClientQuery extends ClientFn {
       // evaluate query
       cq.cache(true);
       while(cq.more()) {
-        final String result = cq.next();
+        final String value = cq.next();
         final Type type = cq.type();
-        if(type instanceof FuncType) throw CLIENT_FITEM_X.get(info, result);
-        vb.add(cq.type().castString(result, qc, info));
+        if(type instanceof FuncType) throw CLIENT_FITEM_X.get(info, value);
+        vb.add(type.castString(value, qc, info));
       }
       return vb.value();
     } catch(final QueryIOException ex) {

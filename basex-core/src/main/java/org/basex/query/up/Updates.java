@@ -108,7 +108,7 @@ public final class Updates {
   }
 
   /**
-   * Returns value to be output.
+   * Returns the value to be output.
    * @param reset reset cache
    * @return value
    */

@@ -206,7 +206,7 @@ public final class XQMap extends XQData {
   public Value keys() {
     final ItemList items = new ItemList(root.size);
     root.keys(items);
-    return items.value();
+    return items.value(((MapType) type).keyType());
   }
 
   /**
@@ -222,14 +222,14 @@ public final class XQMap extends XQData {
    * @param func function to apply on keys and values
    * @param qc query context
    * @param ii input info
-   * @return resulting value
+   * @return value builder
    * @throws QueryException query exception
    */
-  public Value forEach(final FItem func, final QueryContext qc, final InputInfo ii)
+  public ValueBuilder forEach(final FItem func, final QueryContext qc, final InputInfo ii)
       throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     root.forEach(vb, func, qc, ii);
-    return vb.value();
+    return vb;
   }
 
   @Override

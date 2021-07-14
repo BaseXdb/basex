@@ -109,7 +109,7 @@ public final class GroupBy extends Clause {
           }
         }
         final int pl = post.length;
-        for(int i = 0; i < pl; i++) qc.set(post[i], curr.ngv[i].value());
+        for(int i = 0; i < pl; i++) qc.set(post[i], curr.ngv[i].value(preExpr[i]));
         return true;
       }
 

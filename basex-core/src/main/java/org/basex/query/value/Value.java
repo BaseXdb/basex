@@ -87,7 +87,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
       if(it == null) throw error.get(info, item);
       vb.add(it);
     }
-    return vb.value();
+    return vb.value(this);
   }
 
   /**

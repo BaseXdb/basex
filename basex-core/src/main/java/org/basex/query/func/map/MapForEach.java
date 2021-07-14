@@ -22,7 +22,8 @@ public class MapForEach extends StandardFunc {
     final XQMap map = toMap(exprs[0], qc);
     final FItem func = checkArity(exprs[1], 2, this instanceof UpdateMapForEach, qc);
 
-    return map.forEach(func, qc, info);
+    final ValueBuilder vb = map.forEach(func, qc, info);
+    return vb.value(this);
   }
 
   @Override

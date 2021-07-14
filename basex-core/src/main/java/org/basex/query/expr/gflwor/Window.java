@@ -129,7 +129,7 @@ public final class Window extends Clause {
             }
 
             start.bind(qc, st[0], ps, st[1], st[2]);
-            qc.set(var, vb.value());
+            qc.set(var, vb.value(Window.this));
             return true;
           }
 
@@ -165,7 +165,7 @@ public final class Window extends Clause {
 
             // don't return dangling items if the {@code only} flag was specified
             if(found || !only) {
-              qc.set(var, vb.value());
+              qc.set(var, vb.value(Window.this));
               return true;
             }
           }
@@ -222,7 +222,7 @@ public final class Window extends Clause {
             if(!(it == null && only)) {
               start.bind(qc, curr, pos, prev, next);
               prev = curr;
-              qc.set(var, vb.value());
+              qc.set(var, vb.value(Window.this));
               return true;
             }
           }

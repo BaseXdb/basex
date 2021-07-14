@@ -1,5 +1,6 @@
 package org.basex.query.func.xquery;
 
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.query.*;
@@ -12,9 +13,9 @@ import org.basex.util.*;
  *
  * @author James Wright
  */
-final class XQueryTask extends RecursiveTask<Value> {
+final class XQueryTask extends RecursiveTask<ValueBuilder> {
   /** Functions to evaluate in parallel. */
-  private final Value funcs;
+  private final ArrayList<FItem> funcs;
   /** Query context. */
   private final QueryContext qc;
   /** Input info. */
@@ -30,8 +31,8 @@ final class XQueryTask extends RecursiveTask<Value> {
    * @param qc query context
    * @param ii input info
    */
-  XQueryTask(final Value funcs, final QueryContext qc, final InputInfo ii) {
-    this(funcs, qc, ii, 0, (int) funcs.size());
+  XQueryTask(final ArrayList<FItem> funcs, final QueryContext qc, final InputInfo ii) {
+    this(funcs, qc, ii, 0, funcs.size());
   }
 
   /**
@@ -42,7 +43,7 @@ final class XQueryTask extends RecursiveTask<Value> {
    * @param start first function to evaluate
    * @param end last function to evaluate
    */
-  private XQueryTask(final Value funcs, final QueryContext qc, final InputInfo ii,
+  private XQueryTask(final ArrayList<FItem> funcs, final QueryContext qc, final InputInfo ii,
       final int start, final int end) {
     this.funcs = funcs;
     this.qc = new QueryContext(qc);
@@ -52,13 +53,13 @@ final class XQueryTask extends RecursiveTask<Value> {
   }
 
   @Override
-  protected Value compute() {
+  protected ValueBuilder compute() {
     final ValueBuilder vb = new ValueBuilder(qc);
     final int s = start, e = end, l = e - s;
     if(l == 1) {
       // perform the work
       try {
-        vb.add(((FItem) funcs.itemAt(s)).invoke(qc, ii));
+        vb.add(funcs.get(s).invoke(qc, ii));
       } catch(final QueryException ex) {
         completeExceptionally(ex);
         cancel(true);
@@ -71,8 +72,8 @@ final class XQueryTask extends RecursiveTask<Value> {
       final XQueryTask task2 = new XQueryTask(funcs, qc, ii, m, e);
       task2.fork();
       final XQueryTask task1  = new XQueryTask(funcs, qc, ii, s, m);
-      vb.add(task1.invoke()).add(task2.join());
+      vb.add(task1.invoke().value()).add(task2.join().value());
     }
-    return vb.value();
+    return vb;
   }
 }

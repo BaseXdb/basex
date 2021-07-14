@@ -17,57 +17,86 @@ import org.junit.jupiter.api.*;
  * @author Leo Woerteler
  */
 public final class SeqTypeTest {
+  /** Occurrences. */
+  private static final Occ[] OCCS = { ZERO, ZERO_OR_ONE, EXACTLY_ONE, ZERO_OR_MORE, ONE_OR_MORE };
+
   /** Tests for {@link Occ#intersect(Occ)}. */
   @Test public void occIntersect() {
-    final Occ[] occs = { ZERO, ZERO_OR_ONE, EXACTLY_ONE, ZERO_OR_MORE, ONE_OR_MORE };
     final Occ[][] table = {
-        { ZERO, ZERO,     null, ZERO,      null     },
-        { ZERO, ZERO_OR_ONE, EXACTLY_ONE,  ZERO_OR_ONE,  EXACTLY_ONE      },
-        { null, EXACTLY_ONE,      EXACTLY_ONE,  EXACTLY_ONE,       EXACTLY_ONE      },
-        { ZERO, ZERO_OR_ONE, EXACTLY_ONE,  ZERO_OR_MORE, ONE_OR_MORE },
-        { null, EXACTLY_ONE,      EXACTLY_ONE,  ONE_OR_MORE,  ONE_OR_MORE }
+      { ZERO, ZERO,        null,        ZERO,         null        },
+      { ZERO, ZERO_OR_ONE, EXACTLY_ONE, ZERO_OR_ONE,  EXACTLY_ONE },
+      { null, EXACTLY_ONE, EXACTLY_ONE, EXACTLY_ONE,  EXACTLY_ONE },
+      { ZERO, ZERO_OR_ONE, EXACTLY_ONE, ZERO_OR_MORE, ONE_OR_MORE },
+      { null, EXACTLY_ONE, EXACTLY_ONE, ONE_OR_MORE,  ONE_OR_MORE }
     };
-
-    final int ol = occs.length;
-    for(int o = 0; o < ol; o++) {
-      for(int p = 0; p < ol; p++) {
-        assertSame(table[o][p], occs[o].intersect(occs[p]), "(" + o + ", " + p + ')');
-      }
-    }
+    compute(table, (occ1, occ2) -> occ1.intersect(occ2));
   }
 
   /** Tests for {@link Occ#union(Occ)}. */
   @Test public void occUnion() {
-    final Occ[] occs = { ZERO, ZERO_OR_ONE, EXACTLY_ONE, ZERO_OR_MORE, ONE_OR_MORE };
     final Occ[][] table = {
-        { ZERO,      ZERO_OR_ONE,  ZERO_OR_ONE,  ZERO_OR_MORE, ZERO_OR_MORE },
-        { ZERO_OR_ONE,  ZERO_OR_ONE,  ZERO_OR_ONE,  ZERO_OR_MORE, ZERO_OR_MORE },
-        { ZERO_OR_ONE,  ZERO_OR_ONE,  EXACTLY_ONE,       ZERO_OR_MORE, ONE_OR_MORE  },
-        { ZERO_OR_MORE, ZERO_OR_MORE, ZERO_OR_MORE, ZERO_OR_MORE, ZERO_OR_MORE },
-        { ZERO_OR_MORE, ZERO_OR_MORE, ONE_OR_MORE,  ZERO_OR_MORE, ONE_OR_MORE  }
+      { ZERO,         ZERO_OR_ONE,  ZERO_OR_ONE,  ZERO_OR_MORE, ZERO_OR_MORE },
+      { ZERO_OR_ONE,  ZERO_OR_ONE,  ZERO_OR_ONE,  ZERO_OR_MORE, ZERO_OR_MORE },
+      { ZERO_OR_ONE,  ZERO_OR_ONE,  EXACTLY_ONE,  ZERO_OR_MORE, ONE_OR_MORE  },
+      { ZERO_OR_MORE, ZERO_OR_MORE, ZERO_OR_MORE, ZERO_OR_MORE, ZERO_OR_MORE },
+      { ZERO_OR_MORE, ZERO_OR_MORE, ONE_OR_MORE,  ZERO_OR_MORE, ONE_OR_MORE  }
     };
+    compute(table, (occ1, occ2) -> occ1.union(occ2));
+  }
 
-    final int ol = occs.length;
+  /** Tests for {@link Occ#add(Occ)}. */
+  @Test public void occAdd() {
+    final Occ[][] table = {
+      { ZERO,         ZERO_OR_ONE,  EXACTLY_ONE,  ZERO_OR_MORE, ONE_OR_MORE },
+      { ZERO_OR_ONE,  ZERO_OR_MORE, ONE_OR_MORE,  ZERO_OR_MORE, ONE_OR_MORE },
+      { EXACTLY_ONE,  ONE_OR_MORE,  ONE_OR_MORE,  ONE_OR_MORE,  ONE_OR_MORE },
+      { ZERO_OR_MORE, ZERO_OR_MORE, ONE_OR_MORE,  ZERO_OR_MORE, ONE_OR_MORE },
+      { ONE_OR_MORE,  ONE_OR_MORE,  ONE_OR_MORE,  ONE_OR_MORE,  ONE_OR_MORE }
+    };
+    compute(table, (occ1, occ2) -> occ1.add(occ2));
+  }
+
+  /** Tests for {@link Occ#multiply(Occ)}. */
+  @Test public void occMultiply() {
+    final Occ[][] table = {
+      { ZERO, ZERO,         ZERO,         ZERO,         ZERO         },
+      { ZERO, ZERO_OR_ONE,  ZERO_OR_ONE,  ZERO_OR_MORE, ZERO_OR_MORE },
+      { ZERO, ZERO_OR_ONE,  EXACTLY_ONE,  ZERO_OR_MORE, ONE_OR_MORE  },
+      { ZERO, ZERO_OR_MORE, ZERO_OR_MORE, ZERO_OR_MORE, ZERO_OR_MORE },
+      { ZERO, ZERO_OR_MORE, ONE_OR_MORE,  ZERO_OR_MORE, ONE_OR_MORE  }
+    };
+    compute(table, (occ1, occ2) -> occ1.multiply(occ2));
+  }
+
+  /**
+   * Computes occurrences.
+   * @param table result table
+   * @param func function for computing the result
+   */
+  private static void compute(final Occ[][] table, final BiFunction<Occ, Occ, Occ> func) {
+    final int ol = OCCS.length;
     for(int o = 0; o < ol; o++) {
       for(int p = 0; p < ol; p++) {
-        assertSame(table[o][p], occs[o].union(occs[p]), "(" + o + ", " + p + ')');
+        final Occ occ = func.apply(OCCS[o], OCCS[p]);
+        final String exp = table[o][p] == null ? "null" : table[o][p].name();
+        final String res = occ == null ? "null" : occ.name();
+        assertEquals(exp, res, "(" + o + ": " + OCCS[o].name() + ", " + p + ": " +
+            OCCS[p].name() + ')');
       }
     }
   }
 
   /** Tests for {@link Occ#instanceOf(Occ)}. */
   @Test public void occInstanceOf() {
-    final Occ[] occs = { ZERO, ZERO_OR_ONE, EXACTLY_ONE, ZERO_OR_MORE, ONE_OR_MORE };
-
     assertTrue(EXACTLY_ONE.instanceOf(ZERO_OR_MORE));
     assertFalse(ZERO_OR_MORE.instanceOf(EXACTLY_ONE));
     final int bits = 0x014F90E1;
 
-    final int ol = occs.length;
+    final int ol = OCCS.length;
     for(int o = 0; o < ol; o++) {
       for(int p = 0; p < ol; p++) {
         final boolean inst = (bits >>> 5 * p + o & 1) != 0;
-        assertEquals(inst, occs[o].instanceOf(occs[p]), "(" + o + ", " + p + ')');
+        assertEquals(inst, OCCS[o].instanceOf(OCCS[p]), "(" + o + ", " + p + ')');
       }
     }
   }
