@@ -101,7 +101,7 @@ public abstract class WebFunction implements Comparable<WebFunction> {
       if(list.isEmpty()) throw error(ANN_MISSING);
       if(list.size() > 1) {
         final StringList names = new StringList(list.size());
-        for(final Ann ann : list) names.add('%' + Token.string(ann.sig.id()));
+        for(final Ann ann : list) names.add('%' + Token.string(ann.definition.id()));
         throw error(ANN_CONFLICT_X, String.join(", ", names.finish()));
       }
 

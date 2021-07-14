@@ -98,14 +98,14 @@ public final class RestXqFunction extends WebFunction {
 
     final AnnList starts = new AnnList();
     for(final Ann ann : function.anns) {
-      final Annotation sig = ann.sig;
-      if(sig == null) continue;
+      final Annotation def = ann.definition;
+      if(def == null) continue;
 
-      found |= eq(sig.uri, QueryText.REST_URI, QueryText.PERM_URI);
-      final Item[] args = ann.args();
-      if(sig == _REST_PATH) {
+      found |= eq(def.uri, QueryText.REST_URI, QueryText.PERM_URI);
+      final Value value = ann.value();
+      if(def == _REST_PATH) {
         try {
-          path = new RestXqPath(toString(args[0]), ann.info);
+          path = new RestXqPath(toString(value.itemAt(0)), ann.info);
           starts.add(ann);
         } catch(final IllegalArgumentException ex) {
           throw error(ann.info, ex.getMessage());
@@ -113,59 +113,59 @@ public final class RestXqFunction extends WebFunction {
         for(final QNm name : path.varNames()) {
           checkVariable(name, declared);
         }
-      } else if(sig == _REST_ERROR) {
+      } else if(def == _REST_ERROR) {
         error(ann);
         // function can have multiple error annotations
-        if(!starts.contains(sig)) starts.add(ann);
-      } else if(sig == _REST_CONSUMES) {
+        if(!starts.contains(def)) starts.add(ann);
+      } else if(def == _REST_CONSUMES) {
         strings(ann, consumes);
-      } else if(sig == _REST_PRODUCES) {
+      } else if(def == _REST_PRODUCES) {
         strings(ann, produces);
-      } else if(sig == _REST_QUERY_PARAM) {
+      } else if(def == _REST_QUERY_PARAM) {
         queryParams.add(param(ann, declared));
-      } else if(sig == _REST_FORM_PARAM) {
+      } else if(def == _REST_FORM_PARAM) {
         formParams.add(param(ann, declared));
-      } else if(sig == _REST_HEADER_PARAM) {
+      } else if(def == _REST_HEADER_PARAM) {
         headerParams.add(param(ann, declared));
-      } else if(sig == _REST_COOKIE_PARAM) {
+      } else if(def == _REST_COOKIE_PARAM) {
         cookieParams.add(param(ann, declared));
-      } else if(sig == _REST_ERROR_PARAM) {
+      } else if(def == _REST_ERROR_PARAM) {
         errorParams.add(param(ann, declared));
-      } else if(sig == _REST_METHOD) {
-        final String mth = toString(args[0]).toUpperCase(Locale.ENGLISH);
-        final Item body = args.length > 1 ? args[1] : null;
+      } else if(def == _REST_METHOD) {
+        final String mth = toString(value.itemAt(0)).toUpperCase(Locale.ENGLISH);
+        final Item body = value.size() > 1 ? value.itemAt(1) : null;
         addMethod(mth, body, declared, ann.info);
-      } else if(sig == _REST_SINGLE) {
-        singleton = '\u0001' + (args.length > 0 ? toString(args[0]) :
+      } else if(def == _REST_SINGLE) {
+        singleton = '\u0001' + (!value.isEmpty() ? toString(value.itemAt(0)) :
           (function.info.path() + ':' + function.info.line()));
-      } else if(eq(sig.uri, QueryText.REST_URI)) {
-        final Item body = args.length == 0 ? null : args[0];
-        addMethod(string(sig.local()), body, declared, ann.info);
-      } else if(sig == _INPUT_CSV) {
+      } else if(eq(def.uri, QueryText.REST_URI)) {
+        final Item body = value.isEmpty() ? null : value.itemAt(0);
+        addMethod(string(def.local()), body, declared, ann.info);
+      } else if(def == _INPUT_CSV) {
         final CsvParserOptions opts = new CsvParserOptions(options.get(MainOptions.CSVPARSER));
         options.set(MainOptions.CSVPARSER, parse(opts, ann));
-      } else if(sig == _INPUT_JSON) {
+      } else if(def == _INPUT_JSON) {
         final JsonParserOptions opts = new JsonParserOptions(options.get(MainOptions.JSONPARSER));
         options.set(MainOptions.JSONPARSER, parse(opts, ann));
-      } else if(sig == _INPUT_HTML) {
+      } else if(def == _INPUT_HTML) {
         final HtmlOptions opts = new HtmlOptions(options.get(MainOptions.HTMLPARSER));
         options.set(MainOptions.HTMLPARSER, parse(opts, ann));
-      } else if(sig == _INPUT_TEXT) {
+      } else if(def == _INPUT_TEXT) {
         final TextOptions opts = new TextOptions(options.get(MainOptions.TEXTPARSER));
         options.set(MainOptions.TEXTPARSER, parse(opts, ann));
-      } else if(eq(sig.uri, QueryText.OUTPUT_URI)) {
+      } else if(eq(def.uri, QueryText.OUTPUT_URI)) {
         // serialization parameters
         try {
-          output.assign(string(sig.local()), toString(args[0]));
+          output.assign(string(def.local()), toString(value.itemAt(0)));
         } catch(final BaseXException ex) {
           Util.debug(ex);
-          throw error(ann.info, UNKNOWN_SER_X, sig.local());
+          throw error(ann.info, UNKNOWN_SER_X, def.local());
         }
-      } else if(sig == _PERM_ALLOW) {
-        for(final Item arg : args) allows.add(toString(arg));
-      } else if(sig == _PERM_CHECK) {
-        final String p = args.length > 0 ? toString(args[0]) : "";
-        final QNm v = args.length > 1 ? checkVariable(toString(args[1]), declared) : null;
+      } else if(def == _PERM_ALLOW) {
+        for(final Item arg : value) allows.add(toString(arg));
+      } else if(def == _PERM_CHECK) {
+        final String p = value.isEmpty() ? "" : toString(value.itemAt(0));
+        final QNm v = value.size() > 1 ? checkVariable(toString(value.itemAt(1)), declared) : null;
         permission = new RestXqPerm(p, v);
         starts.add(ann);
       }
@@ -341,7 +341,7 @@ public final class RestXqFunction extends WebFunction {
    */
   private static <O extends Options> O parse(final O opts, final Ann ann)
       throws QueryException, IOException {
-    for(final Item arg : ann.args()) opts.assign(string(arg.string(ann.info)));
+    for(final Item arg : ann.value()) opts.assign(string(arg.string(ann.info)));
     return opts;
   }
 
@@ -419,7 +419,7 @@ public final class RestXqFunction extends WebFunction {
    * @param list list to add values to
    */
   private static void strings(final Ann ann, final ArrayList<MediaType> list) {
-    for(final Item arg : ann.args()) list.add(new MediaType(toString(arg)));
+    for(final Item arg : ann.value()) list.add(new MediaType(toString(arg)));
   }
 
   /**
@@ -431,14 +431,14 @@ public final class RestXqFunction extends WebFunction {
    */
   private WebParam param(final Ann ann, final boolean... declared) throws QueryException {
     // name of parameter
-    final Item[] args = ann.args();
-    final String name = toString(args[0]);
+    final Value value = ann.value();
+    final String name = toString(value.itemAt(0));
     // variable template
-    final QNm var = checkVariable(toString(args[1]), declared);
+    final QNm var = checkVariable(toString(value.itemAt(1)), declared);
     // default value
-    final int al = args.length;
+    final long al = value.size();
     final ItemList items = new ItemList(al - 2);
-    for(int a = 2; a < al; a++) items.add(args[a]);
+    for(int a = 2; a < al; a++) items.add(value.itemAt(a));
     return new WebParam(var, name, items.value());
   }
 
@@ -451,7 +451,7 @@ public final class RestXqFunction extends WebFunction {
     if(error == null) error = new RestXqError();
 
     // name of parameter
-    for(final Item arg : ann.args()) {
+    for(final Item arg : ann.value()) {
       final String err = toString(arg);
       final QNm name;
       final NamePart part;

@@ -15,21 +15,21 @@ import org.basex.util.list.*;
 public final class AnnList extends ObjectList<Ann, AnnList> {
   /**
    * Checks if the specified signature is found in the list.
-   * @param sig signature to be found
+   * @param def signature to be found
    * @return result of check
    */
-  public boolean contains(final Annotation sig) {
-    return get(sig) != null;
+  public boolean contains(final Annotation def) {
+    return get(def) != null;
   }
 
   /**
    * Returns an annotation with the specified signature.
-   * @param sig signature to be found
+   * @param def annotation to be found
    * @return annotation or {@code null}
    */
-  public Ann get(final Annotation sig) {
+  public Ann get(final Annotation def) {
     for(final Ann ann : this) {
-      if(ann.sig == sig) return ann;
+      if(ann.definition == def) return ann;
     }
     return null;
   }
@@ -43,22 +43,22 @@ public final class AnnList extends ObjectList<Ann, AnnList> {
     final AnnList tmp = new AnnList();
     boolean pub = false, priv = false, up = false;
     for(final Ann ann : this) {
-      final Annotation sig = ann.sig;
-      if(sig == Annotation.PUBLIC) pub = true;
-      else if(sig == Annotation.PRIVATE) priv = true;
-      else if(sig == Annotation.UPDATING) up = true;
+      final Annotation def = ann.definition;
+      if(def == Annotation.PUBLIC) pub = true;
+      else if(def == Annotation.PRIVATE) priv = true;
+      else if(def == Annotation.UPDATING) up = true;
       tmp.add(ann);
     }
 
     for(final Ann ann : anns) {
-      final Annotation sig = ann.sig;
-      if(sig == Annotation.PUBLIC) {
+      final Annotation def = ann.definition;
+      if(def == Annotation.PUBLIC) {
         if(pub) continue;
         if(priv) return null;
-      } else if(sig == Annotation.PRIVATE) {
+      } else if(def == Annotation.PRIVATE) {
         if(pub) return null;
         if(priv) continue;
-      } else if(sig == Annotation.UPDATING && up) {
+      } else if(def == Annotation.UPDATING && up) {
         continue;
       }
       tmp.add(ann);
@@ -91,11 +91,11 @@ public final class AnnList extends ObjectList<Ann, AnnList> {
   public AnnList check(final boolean variable, final boolean visible) throws QueryException {
     boolean up = false, vis = false;
     for(final Ann ann : this) {
-      final Annotation sig = ann.sig;
-      if(sig == Annotation.UPDATING) {
+      final Annotation def = ann.definition;
+      if(def == Annotation.UPDATING) {
         if(up) throw DUPLUPD.get(ann.info);
         up = true;
-      } else if(visible && (sig == Annotation.PUBLIC || sig == Annotation.PRIVATE)) {
+      } else if(visible && (def == Annotation.PUBLIC || def == Annotation.PRIVATE)) {
         // only one visibility modifier allowed
         if(vis) throw (variable ? DUPLVARVIS : DUPLFUNVIS).get(ann.info);
         vis = true;

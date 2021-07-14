@@ -106,7 +106,7 @@ public abstract class Inspect {
       annotation.add("name", name.string());
       if(uri) annotation.add("uri", name.uri());
 
-      for(final Item arg : ann.args()) {
+      for(final Item arg : ann.value()) {
         elem("literal", annotation).add("type", arg.type.toString()).add(arg.string(null));
       }
     }

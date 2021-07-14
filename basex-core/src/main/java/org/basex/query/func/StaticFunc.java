@@ -236,8 +236,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   @Override
   public boolean visit(final ASTVisitor visitor) {
     for(final Ann ann : anns) {
-      if(ann.sig == Annotation._BASEX_LOCK) {
-        for(final Item arg : ann.args()) {
+      if(ann.definition == Annotation._BASEX_LOCK) {
+        for(final Item arg : ann.value()) {
           for(final String lock : Locking.queryLocks(((Str) arg).string())) {
             visitor.lock(lock, false);
           }
@@ -253,7 +253,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public byte[] id() {
-    return StaticFuncs.signature(name, params.length);
+    return StaticFuncs.id(name, params.length);
   }
 
   @Override
@@ -287,8 +287,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     if(ann == null) {
       limit = cc.qc.context.options.get(MainOptions.INLINELIMIT);
     } else {
-      final Item[] args = ann.args();
-      limit = args.length > 0 ? ((ANum) args[0]).itr() : Long.MAX_VALUE;
+      final Value value = ann.value();
+      limit = value.isEmpty() ? Long.MAX_VALUE : ((ANum) value.itemAt(0)).itr();
     }
     return expr.exprSize() < limit;
   }

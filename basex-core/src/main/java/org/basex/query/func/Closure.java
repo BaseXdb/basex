@@ -17,6 +17,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -435,7 +436,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     updating = expr.has(Flag.UPD);
     final boolean updAnn = anns.contains(Annotation.UPDATING);
     if(updating != updAnn) {
-      if(!updAnn) anns.add(new Ann(info, Annotation.UPDATING));
+      if(!updAnn) anns.add(new Ann(info, Annotation.UPDATING, Empty.VALUE));
       else if(!expr.vacuous()) throw UPEXPECTF.get(info);
     }
   }

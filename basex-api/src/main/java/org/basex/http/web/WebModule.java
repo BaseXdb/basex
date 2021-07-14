@@ -14,6 +14,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.func.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -117,7 +118,7 @@ public final class WebModule {
     for(final StaticFunc sf : qc.funcs.funcs()) {
       if(func.info.equals(sf.info)) {
         // inline arguments of called function
-        sf.anns.addUnique(new Ann(sf.info, Annotation._BASEX_INLINE));
+        sf.anns.addUnique(new Ann(sf.info, Annotation._BASEX_INLINE, Empty.VALUE));
         return sf;
       }
     }

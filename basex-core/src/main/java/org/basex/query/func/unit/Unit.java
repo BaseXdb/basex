@@ -87,9 +87,11 @@ final class Unit {
       for(final StaticFunc sf : qc.funcs.funcs()) {
         // find Unit annotations
         final AnnList anns = sf.anns;
-        boolean xq = false;
-        for(final Ann ann : anns) xq |= ann.sig != null && eq(ann.sig.uri, QueryText.UNIT_URI);
-        if(!xq) continue;
+        boolean unit = false;
+        for(final Ann ann : anns) {
+          unit = unit || ann.definition != null && eq(ann.definition.uri, QueryText.UNIT_URI);
+        }
+        if(!unit) continue;
 
         // Unit function:
         if(anns.contains(PRIVATE)) throw UNIT_PRIVATE_X.get(null, sf.name.local());
@@ -117,13 +119,13 @@ final class Unit {
         // check arguments
         final AnnList anns = sf.anns;
         final Ann ann = anns.get(_UNIT_TEST);
-        final Item[] args = ann.args();
-        final int vs = args.length;
+        final Value value = ann.value();
+        final long vs = value.size();
 
         // expected error code
         QNm code = null;
-        if(vs == 2 && eq(EXPECTED, args[0].string(null))) {
-          code = QNm.resolve(args[1].string(null), QueryText.ERROR_URI, sf.sc, sf.info);
+        if(vs == 2 && eq(EXPECTED, value.itemAt(0).string(null))) {
+          code = QNm.resolve(value.itemAt(1).string(null), QueryText.ERROR_URI, sf.sc, sf.info);
         } else if(vs != 0) {
           throw BASEX_ANNOTATION2_X_X.get(ann.info, ann, arguments(vs));
         }
@@ -159,8 +161,8 @@ final class Unit {
           }
         } else {
           // skip test
-          final Item[] iargs = ignore.args();
-          testcase.add(SKIPPED, iargs.length == 0 ? EMPTY : iargs[0].string(null));
+          final Value ignored = ignore.value();
+          testcase.add(SKIPPED, ignored.isEmpty() ? EMPTY : ignored.itemAt(0).string(null));
           skipped++;
         }
         testcase.add(TIME, time(perf2));
@@ -200,9 +202,9 @@ final class Unit {
    * @throws QueryException query exception
    */
   private static QNm name(final StaticFunc sf, final Ann ann) throws QueryException {
-    final Item[] args = ann.args();
-    if(args.length != 0) {
-      final byte[] name = args[0].string(null);
+    final Value value = ann.value();
+    if(!value.isEmpty()) {
+      final byte[] name = value.itemAt(0).string(null);
       if(name.length != 0) return QNm.resolve(name, sf.name.uri(), sf.sc, sf.info);
     }
     return null;

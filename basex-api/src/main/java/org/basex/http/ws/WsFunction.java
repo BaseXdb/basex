@@ -46,30 +46,30 @@ public final class WsFunction extends WebFunction {
     final AnnList starts = new AnnList();
 
     for(final Ann ann : function.anns) {
-      final Annotation sig = ann.sig;
-      if(sig == null || !eq(sig.uri, QueryText.WS_URI)) continue;
+      final Annotation def = ann.definition;
+      if(def == null || !eq(def.uri, QueryText.WS_URI)) continue;
 
       found = true;
-      final Item[] args = ann.args();
-      switch(sig) {
+      final Value value = ann.value();
+      switch(def) {
         case _WS_HEADER_PARAM:
-          final String name = toString(args[0]);
-          final QNm var = checkVariable(toString(args[1]), declared);
-          final int al = args.length;
-          final ItemList items = new ItemList(al - 2);
-          for(int a = 2; a < al; a++) items.add(args[a]);
+          final String name = toString(value.itemAt(0));
+          final QNm var = checkVariable(toString(value.itemAt(1)), declared);
+          final long vs = value.size();
+          final ItemList items = new ItemList(vs - 2);
+          for(int v = 2; v < vs; v++) items.add(value.itemAt(v));
           headerParams.add(new WebParam(var, name, items.value()));
           break;
         case _WS_CLOSE:
         case _WS_CONNECT:
-          path = new WsPath(toString(args[0]));
+          path = new WsPath(toString(value.itemAt(0)));
           starts.add(ann);
           break;
         case _WS_ERROR:
         case _WS_MESSAGE:
-          final QNm msg = checkVariable(toString(args[1]), declared);
+          final QNm msg = checkVariable(toString(value.itemAt(1)), declared);
           message = new WebParam(msg, "message", null);
-          path = new WsPath(toString(args[0]));
+          path = new WsPath(toString(value.itemAt(0)));
           starts.add(ann);
           break;
         default:
@@ -103,13 +103,14 @@ public final class WsFunction extends WebFunction {
 
   /**
    * Checks if an WebSocket request matches this annotation and path.
-   * @param ann annotation (can be {@code null})
+   * @param definition annotation definition (can be {@code null})
    * @param pth path to compare to (can be {@code null})
    * @return boolean result of check
    */
-  public boolean matches(final Annotation ann, final WsPath pth) {
-    for(final Ann a : function.anns) {
-      if((ann == null || a.sig == ann) && (pth == null || path.compareTo(pth) == 0)) return true;
+  public boolean matches(final Annotation definition, final WsPath pth) {
+    for(final Ann ann : function.anns) {
+      if((definition == null || ann.definition == definition) &&
+          (pth == null || path.compareTo(pth) == 0)) return true;
     }
     return false;
   }

@@ -401,7 +401,7 @@ public class QueryParser extends InputParser {
     while(true) {
       final Ann ann;
       if(updating && wsConsumeWs(UPDATING)) {
-        ann = new Ann(info(), Annotation.UPDATING);
+        ann = new Ann(info(), Annotation.UPDATING, Empty.VALUE);
       } else if(consume('%')) {
         skipWs();
         final InputInfo ii = info();
@@ -421,38 +421,38 @@ public class QueryParser extends InputParser {
         }
         skipWs();
 
-        final Annotation sig = Annotation.get(name);
+        final Annotation def = Annotation.get(name);
         // check if annotation is a pre-defined one
-        if(sig == null) {
+        if(def == null) {
           // reject unknown annotations with pre-defined namespaces, ignore others
           final byte[] uri = name.uri();
           if(NSGlobal.prefix(uri).length != 0 && !eq(uri, LOCAL_URI, ERROR_URI)) {
             throw (NSGlobal.reserved(uri) ? ANNWHICH_X_X : BASEX_ANNOTATION1_X_X).get(
                 ii, '%', name.string());
           }
-          ann = new Ann(ii, name, items.finish());
+          ann = new Ann(ii, name, items.value());
 
         } else {
           // check if annotation is specified more than once
-          if(sig.single && anns.contains(sig)) throw BASEX_ANNOTATION3_X_X.get(ii, '%', sig.id());
+          if(def.single && anns.contains(def)) throw BASEX_ANNOTATION3_X_X.get(ii, '%', def.id());
 
           final long arity = items.size();
-          if(arity < sig.minMax[0] || arity > sig.minMax[1])
-            throw BASEX_ANNOTATION2_X_X.get(ii, sig, arguments(arity));
-          final int al = sig.args.length;
+          if(arity < def.minMax[0] || arity > def.minMax[1])
+            throw BASEX_ANNOTATION2_X_X.get(ii, def, arguments(arity));
+          final int al = def.params.length;
           for(int a = 0; a < arity; a++) {
-            final SeqType st = sig.args[Math.min(al - 1, a)];
+            final SeqType st = def.params[Math.min(al - 1, a)];
             final Item item = items.get(a);
-            if(!st.instance(item)) throw BASEX_ANNOTATION_X_X_X.get(ii, sig, st, item.seqType());
+            if(!st.instance(item)) throw BASEX_ANNOTATION_X_X_X.get(ii, def, st, item.seqType());
           }
-          ann = new Ann(ii, sig, items.finish());
+          ann = new Ann(ii, def, items.value());
         }
       } else {
         break;
       }
 
       anns.add(ann);
-      if(ann.sig == Annotation.UPDATING) qc.updating();
+      if(ann.definition == Annotation.UPDATING) qc.updating();
     }
     skipWs();
     return anns;

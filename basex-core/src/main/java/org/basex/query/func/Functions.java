@@ -14,6 +14,7 @@ import org.basex.query.func.java.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.Type;
 import org.basex.query.var.*;
@@ -244,7 +245,7 @@ public final class Functions {
       final StandardFunc sf = fd.get(sc, ii, args);
       final boolean upd = sf.has(Flag.UPD);
       if(upd) {
-        anns.add(new Ann(ii, Annotation.UPDATING));
+        anns.add(new Ann(ii, Annotation.UPDATING, Empty.VALUE));
         qc.updating();
       }
       // context/positional access must be bound to original focus
