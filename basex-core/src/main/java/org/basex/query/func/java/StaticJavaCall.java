@@ -1,15 +1,19 @@
 package org.basex.query.func.java;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.lang.reflect.*;
 
+import org.basex.core.MainOptions.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.QueryModule.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.Array;
@@ -60,7 +64,7 @@ public final class StaticJavaCall extends JavaCall {
   }
 
   @Override
-  protected Object eval(final QueryContext qc) throws QueryException {
+  protected Value eval(final QueryContext qc, final WrapOptions wrap) throws QueryException {
     final JavaEval je = new JavaEval(this, qc);
     if(je.match(params, true, values)) {
       // assign query context if module is inheriting the {@link QueryModule} interface
@@ -72,13 +76,16 @@ public final class StaticJavaCall extends JavaCall {
 
       // invoke found method
       try {
-        return method.invoke(module, je.args);
+        final Object result = method.invoke(module, je.args);
+        if(wrap == WrapOptions.INSTANCE) return new XQJava(module);
+        if(wrap == WrapOptions.VOID) return Empty.VALUE;
+        return toValue(result, qc, info, wrap);
       } catch(final Throwable th) {
-        throw je.execError(th);
+        throw je.executionError(th);
       }
     }
     // arguments could not be matched: raise error
-    throw je.argsError(method);
+    throw JAVAARGS_X_X_X.get(info, name(), JavaCall.paramTypes(method, true), argTypes(exprs));
   }
 
   @Override
@@ -109,7 +116,7 @@ public final class StaticJavaCall extends JavaCall {
 
   @Override
   String name() {
-    return Util.className(module) + COL + method.getName();
+    return className(module.getClass()) + COL + method.getName();
   }
 
   @Override

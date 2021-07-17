@@ -6,8 +6,10 @@ import static org.basex.query.QueryText.*;
 import java.lang.reflect.*;
 import java.util.*;
 
+import org.basex.core.MainOptions.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -47,9 +49,9 @@ final class DynJavaConstr extends DynJavaCall {
 
     // method candidates: no check supplied expression: class instance or does not
     constrs = new ArrayList<>();
-    for(final Constructor<?> c : clazz.getConstructors()) {
-      final Class<?>[] params = c.getParameterTypes();
-      if(params.length == el && typesMatch(params, types)) constrs.add(c);
+    for(final Constructor<?> cnstr : clazz.getConstructors()) {
+      final Class<?>[] params = cnstr.getParameterTypes();
+      if(params.length == el && typesMatch(params, types)) constrs.add(cnstr);
     }
     if(!constrs.isEmpty()) return true;
     if(!enforce) return false;
@@ -58,30 +60,22 @@ final class DynJavaConstr extends DynJavaCall {
   }
 
   @Override
-  protected Object eval(final QueryContext qc) throws QueryException {
+  protected Value eval(final QueryContext qc, final WrapOptions wrap) throws QueryException {
     // find constructors with matching parameters
     final ArrayList<Constructor<?>> candidates = new ArrayList<>(1);
     final JavaEval je = new JavaEval(this, qc);
     for(final Constructor<?> cnstr : constrs) {
       if(je.match(cnstr.getParameterTypes(), true, null)) candidates.add(cnstr);
     }
+    if(candidates.size() != 1) throw candidates(constrs.toArray(new Executable[0]),
+        candidates.toArray(new Executable[0]));
 
     // single constructor found: instantiate class
-    final int cs = candidates.size();
-    if(cs == 1) {
-      try {
-        return candidates.get(0).newInstance(je.args);
-      } catch(final Exception ex) {
-        throw je.execError(ex);
-      }
+    try {
+      return new XQJava(candidates.get(0).newInstance(je.args));
+    } catch(final Throwable th) {
+      throw je.executionError(th);
     }
-
-    // otherwise, raise error
-    if(cs > 1) throw je.multipleError(JAVAMULTICONS_X_X_X, cs);
-
-    final int cos = constrs.size();
-    if(cos > 1) throw JAVACONS_X_X_X.get(info, cos, name(), JavaEval.types(exprs));
-    throw je.argsError(constrs.get(0));
   }
 
   @Override
@@ -93,12 +87,12 @@ final class DynJavaConstr extends DynJavaCall {
 
   @Override
   String desc() {
-    return QNm.eqName(JAVAPREF + clazz.getName(), NEW);
+    return QNm.eqName(JAVAPREF + className(clazz), NEW);
   }
 
   @Override
   String name() {
-    return clazz.getName();
+    return className(clazz);
   }
 
   @Override

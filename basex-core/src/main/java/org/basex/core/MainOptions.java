@@ -198,9 +198,11 @@ public final class MainOptions extends Options {
 
   /** Java wrapper. */
   public enum WrapOptions {
-    /** ALL.  */ ALL,
-    /** SOME. */ SOME,
-    /** NONE. */ NONE;
+    /** INSTANCE. */ INSTANCE,
+    /** ALL.      */ ALL,
+    /** VOID.     */ VOID,
+    /** SOM.      */ SOME,
+    /** NONE.     */ NONE;
 
     @Override
     public String toString() {

@@ -239,7 +239,8 @@ public interface QueryText {
   /** Parser token. */ String ELVIS = "?:";
 
   /** Java prefix. */ String JAVAPREF = "java:";
-  /** New keyword. */ String NEW = "new";
+  /** Java keyword: new. */ String NEW = "new";
+  /** Java default namespace. */ String JAVALANG = "java.lang.";
 
   // PREFIXES =====================================================================================
 

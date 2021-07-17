@@ -70,7 +70,7 @@ public abstract class JavaCall extends Arr {
     // check permission
     if(!qc.context.user().has(perm)) throw BASEX_PERMISSION_X_X.get(info, perm, this);
 
-    final Value value = toValue(eval(qc), qc, info);
+    final Value value = eval(qc, qc.context.options.get(MainOptions.WRAPJAVA));
     if(!updating) return value;
 
     // updating function: cache output
@@ -81,10 +81,11 @@ public abstract class JavaCall extends Arr {
   /**
    * Returns the result of the evaluated Java function.
    * @param qc query context
-   * @return arguments
+   * @param wrap wrap options
+   * @return result value
    * @throws QueryException query exception
    */
-  protected abstract Object eval(QueryContext qc) throws QueryException;
+  protected abstract Value eval(QueryContext qc, WrapOptions wrap) throws QueryException;
 
   // STATIC METHODS ===============================================================================
 
@@ -92,7 +93,7 @@ public abstract class JavaCall extends Arr {
    * Converts the specified object to an XQuery value.
    * @param object result object
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @return value
    * @throws QueryException query exception
    */
@@ -105,7 +106,7 @@ public abstract class JavaCall extends Arr {
    * Converts the specified object to an XQuery value.
    * @param object result object
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param wrap wrap options
    * @return value
    * @throws QueryException query exception
@@ -215,7 +216,7 @@ public abstract class JavaCall extends Arr {
     if(n != -1) {
       final StringList list = new StringList();
       for(final String type : Strings.split(name.substring(n + 1), '\u00b7')) {
-        list.add(type.replace("...", "[]"));
+        list.add(type.replace("...", "[]").replaceAll("^([A-Z][^.]+)$", JAVALANG + "$1"));
       }
       types = list.finish();
       name = name.substring(0, n);
@@ -224,8 +225,8 @@ public abstract class JavaCall extends Arr {
 
     // check if URI starts with "java:" prefix. if yes, skip rewritings
     final boolean enforce = uri.startsWith(JAVAPREF);
-    final String className = enforce ? uri.substring(JAVAPREF.length()) :
-      Strings.className(Strings.uri2path(uri));
+    final String className = (enforce ? uri.substring(JAVAPREF.length()) :
+      Strings.className(Strings.uri2path(uri))).replaceAll("^([A-Z][^.]+)$", JAVALANG + "$1");
 
     // function in imported Java module
     final ModuleLoader modules = qc.resources.modules();
@@ -257,7 +258,7 @@ public abstract class JavaCall extends Arr {
       try {
         clazz = modules.findClass(className);
       } catch(final ClassNotFoundException ex) {
-        if(enforce) Util.debug(ex);
+        Util.debug(ex);
       } catch(final Throwable th) {
         // catch linkage and other errors as well
         throw JAVAINIT_X_X.get(ii, Util.className(th), th);
@@ -277,7 +278,6 @@ public abstract class JavaCall extends Arr {
         if(djf.init(enforce)) return djf;
       }
     }
-
     return null;
   }
 
@@ -298,36 +298,23 @@ public abstract class JavaCall extends Arr {
       throws QueryException {
 
     // find method with identical name and arity
-    final ArrayList<Method> candidates = new ArrayList<>(1);
     final IntList arities = new IntList();
-    final Method[] methods = module.getClass().getMethods();
-    for(final Method method : methods) {
-      if(!method.getName().equals(name)) continue;
-      final Class<?>[] pTypes = method.getParameterTypes();
-      final int mArity = pTypes.length;
-      if(mArity == arity) {
-        if(typesMatch(pTypes, types)) candidates.add(method);
-      } else if(types == null) {
-        arities.add(mArity);
-      }
+    final HashMap<String, ArrayList<Method>> allMethods = methods(module.getClass());
+    final ArrayList<Method> methods = filter(allMethods, name, types, arity, arities, true);
+    final int ms = methods.size();
+    if(ms == 0) {
+      final TokenList names = new TokenList();
+      for(final String mthd : allMethods.keySet()) names.add(mthd);
+      throw noFunction(name, arity, string(qname.string()), arities, types, ii, names.finish());
     }
+    if(ms > 1) throw JAVAMULTIPLE_X_X.get(ii, qname.string(),
+        paramTypes(methods.toArray(new Executable[0]), false));
 
     // single method found: add module locks to query context
-    final int cs = candidates.size();
-    if(cs == 1) {
-      final Method method = candidates.get(0);
-      final Lock lock = method.getAnnotation(Lock.class);
-      if(lock != null) qc.locks.add(Locking.BASEX_PREFIX + lock.value());
-      return method;
-    }
-
-    // otherwise, raise error
-    if(cs > 1) throw JAVAMULTIMETH_X_X_X.get(ii, qname.string(), cs, arguments(arity));
-
-    // no suitable method found: check if method with correct name was found
-    final TokenList names = new TokenList();
-    for(final Method m : methods) names.add(m.getName());
-    throw noFunction(name, arity, string(qname.string()), arities, types, ii, names.finish());
+    final Method method = methods.get(0);
+    final Lock lock = method.getAnnotation(Lock.class);
+    if(lock != null) qc.locks.add(Locking.BASEX_PREFIX + lock.value());
+    return method;
   }
 
   /**
@@ -357,10 +344,151 @@ public abstract class JavaCall extends Arr {
           if(!tb.isEmpty()) tb.add(", ");
           tb.add(type.replaceAll("^.*\\.", ""));
         }
-        return JAVAARGS_X_X.get(ii, full, tb);
+        return JAVAARGS_X_X.get(ii, tb, full);
       }
     }
     return WHICHFUNC_X.get(ii, similar(full, similar));
+  }
+
+  /**
+   * Returns a map with all relevant methods for a class.
+   * @param clazz class
+   * @return methods
+   */
+  static HashMap<String, ArrayList<Method>> methods(final Class<?> clazz) {
+    final HashSet<String> names = new HashSet<>();
+    final HashMap<String, ArrayList<Method>> list = new HashMap<>();
+    for(final boolean bridge : new boolean[] { false, true }) {
+      for(final Method method : clazz.getMethods()) {
+        if(bridge == method.isBridge()) {
+          final StringBuilder id = new StringBuilder().append(method.getName()).append('-');
+          for(final Class<?> type : method.getParameterTypes()) {
+            id.append(type.getName()).append('-');
+          }
+          if(names.add(id.toString())) {
+            list.computeIfAbsent(method.getName(), n -> new ArrayList<>(1)).add(method);
+          }
+        }
+      }
+    }
+    return list;
+  }
+
+  /**
+   * Returns the methods with the specified name.
+   * @param methods methods
+   * @param name name
+   * @param types types
+   * @param arity arity
+   * @param arities arities
+   * @param stat static calls
+   * @return methods
+   */
+  static ArrayList<Method> filter(final HashMap<String, ArrayList<Method>> methods,
+      final String name, final String[] types, final int arity, final IntList arities,
+      final boolean stat) {
+    final ArrayList<Method> list = new ArrayList<>(1);
+    final ArrayList<Method> mthds = methods.get(name);
+    if(mthds != null) {
+      for(final Method method : mthds) {
+        final Class<?>[] params = method.getParameterTypes();
+        final int al = params.length + (stat || isStatic(method) ? 0 : 1);
+        if(al == arity) {
+          if(typesMatch(params, types)) list.add(method);
+        } else if(types == null) {
+          arities.add(al);
+        }
+      }
+    }
+    return list;
+  }
+
+  /**
+   * Returns the normalized class name.
+   * @param clazz class
+   * @return normalized name
+   */
+  static String className(final Class<?> clazz) {
+    final String name = clazz.getCanonicalName();
+    return name.startsWith(QueryText.JAVALANG) ? name.substring(QueryText.JAVALANG.length()) : name;
+  }
+
+
+  /**
+   * Checks if the specified executable is static.
+   * @param exec executable (constructor, method)
+   * @return result of check
+   */
+  static boolean isStatic(final Executable exec) {
+    return Modifier.isStatic(exec.getModifiers());
+  }
+
+  /**
+   * Checks if the specified field is static.
+   * @param field field
+   * @return result of check
+   */
+  static boolean isStatic(final Field field) {
+    return Modifier.isStatic(field.getModifiers());
+  }
+
+  /**
+   * Returns parameters for all candidates.
+   * @param execs candidates
+   * @param xquery xquery include XQuery types
+   * @return string
+   */
+  static String paramTypes(final Executable[] execs, final boolean xquery) {
+    final StringBuilder sb = new StringBuilder();
+    final int el = execs.length;
+    for(int e = 0; e < el; e++) {
+      final Executable exec = execs[e];
+      if(sb.length() > 0) sb.append(", ");
+      sb.append(paramTypes(exec, xquery));
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Returns the parameters types from the specified executable.
+   * @param exec executable (constructor, method)
+   * @param xquery xquery include XQuery types
+   * @return string
+   */
+  static String paramTypes(final Executable exec, final boolean xquery) {
+    final StringBuilder sb = new StringBuilder().append('(');
+    for(final Class<?> param : exec.getParameterTypes()) {
+      if(sb.length() > 1) sb.append(", ");
+      final Type type = xquery ? JavaMapping.type(param, false) : null;
+      sb.append(type != null ? type : className(param));
+    }
+    return sb.append(')').toString();
+  }
+
+  /**
+   * Returns a string representation of the XQuery or Java types of the specified arguments.
+   * @param args arguments
+   * @return types string
+   */
+  static String argTypes(final Object[] args) {
+    final StringBuilder sb = new StringBuilder().append('(');
+    for(final Object arg : args) {
+      if(sb.length() > 1) sb.append(", ");
+      sb.append(argType(arg));
+    }
+    return sb.append(')').toString();
+  }
+
+  /**
+   * Returns a string representation of the XQuery or Java type of the specified argument.
+   * @param arg argument
+   * @return type string
+   */
+  static String argType(final Object arg) {
+    final Object object = arg instanceof XQJava ? ((XQJava) arg).toJava() : arg;
+    return object instanceof Value ? ((Value) object).seqType().toString() :
+      object == null ? Util.info(null) :
+      Util.className(object);
   }
 
   /**

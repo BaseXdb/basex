@@ -69,7 +69,7 @@ public final class ModuleLoader {
     // add Java repository package
     final String repoPath = context.soptions.get(StaticOptions.REPOPATH);
     final boolean java = uri.startsWith(JAVAPREF);
-    final String className;
+    String className;
     if(java) {
       className = uri.substring(JAVAPREF.length());
     } else {
@@ -102,6 +102,7 @@ public final class ModuleLoader {
       // convert to Java notation
       className = Strings.className(path);
     }
+    className = className.replaceAll("^([A-Z][^.]+)$", JAVALANG + "$1");
 
     // load Java module
     final IOFile jar = new IOFile(repoPath, Strings.uri2path(className) + IO.JARSUFFIX);

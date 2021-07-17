@@ -2,8 +2,6 @@ package org.basex.query.func.java;
 
 import static org.basex.query.QueryError.*;
 
-import java.lang.reflect.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
@@ -24,9 +22,9 @@ final class JavaEval {
   private final QueryContext qc;
   /** Class to be called. */
   private final Class<?> clazz;
-
   /** Expressions (will be evaluated to values). */
-  Expr[] exprs;
+  private final Expr[] exprs;
+
   /** Java arguments resulting from the parameter matching. */
   Object[] args = {};
 
@@ -64,10 +62,10 @@ final class JavaEval {
   /**
    * Evaluates the first argument.
    * @param stat static flag
-   * @return Java object
+   * @return Java object (can be {@code null})
    * @throws QueryException query exception
    */
-  Object classInstance(final boolean stat) throws QueryException {
+  Object instance(final boolean stat) throws QueryException {
     if(stat) return null;
     final Value value = exprs[0].value(qc);
     exprs[0] = value;
@@ -128,71 +126,21 @@ final class JavaEval {
    * @param ex exception
    * @return exception
    */
-  QueryException instanceError(final IllegalArgumentException ex) {
+  QueryException instanceExpected(final IllegalArgumentException ex) {
     Util.debug(ex);
-    return JAVAINVOKE_X_X.get(call.info, clazz.getName(), type(exprs[0]));
+    return JAVANOINSTANCE_X_X.get(call.info, JavaCall.className(clazz),
+        JavaCall.argType(exprs[0]));
   }
 
   /**
-   * Handles a Java execution error.
-   * @param th exception
+   * Returns a Java execution error.
+   * @param th throwable
    * @return exception
    */
-  QueryException execError(final Throwable th) {
+  QueryException executionError(final Throwable th) {
+    Util.debug(th);
     final Throwable root = Util.rootException(th);
-    if(root instanceof QueryException) return ((QueryException) root).info(call.info);
-    return JAVAEVAL_X_X_X.get(call.info, root, call.name(), types(args));
-  }
-
-  /**
-   * Returns an error for argument mismatches.
-   * @param exec Java executable
-   * @return exception
-   */
-  QueryException argsError(final Executable exec) {
-    final StringBuilder expected = new StringBuilder();
-    for(final Class<?> param : exec.getParameterTypes()) {
-      if(expected.length() != 0) expected.append(", ");
-      final Type type = JavaMapping.type(param, false);
-      expected.append(type != null ? type : Util.className(param));
-    }
-    final String found = types(exprs);
-    return JAVAARGS_X_X_X.get(call.info, call.name(), expected, found);
-  }
-
-  /**
-   * Returns an error for multiple execution candidates.
-   * @param error error to be raised
-   * @param size number of candidates
-   * @return exception
-   */
-  QueryException multipleError(final QueryError error, final int size) {
-    return error.get(call.info, call.name(), size, arguments(exprs.length));
-  }
-
-  /**
-   * Returns a string representation of the XQuery or Java types of the specified arguments.
-   * @param args arguments
-   * @return types string
-   */
-  static String types(final Object[] args) {
-    final StringBuilder types = new StringBuilder();
-    for(final Object arg : args) {
-      if(types.length() != 0) types.append(", ");
-      types.append(type(arg));
-    }
-    return types.toString();
-  }
-
-  /**
-   * Returns a string representation of the XQuery or Java type of the specified argument.
-   * @param arg argument
-   * @return type string
-   */
-  private static String type(final Object arg) {
-    final Object object = arg instanceof XQJava ? ((XQJava) arg).toJava() : arg;
-    return object instanceof Value ? ((Value) object).seqType().toString() :
-      object == null ? Util.info(null) :
-      Util.className(object);
+    return root instanceof QueryException ? ((QueryException) root).info(call.info) :
+      JAVAEXEC_X_X_X.get(call.info, root, call.name(), JavaCall.argTypes(args));
   }
 }

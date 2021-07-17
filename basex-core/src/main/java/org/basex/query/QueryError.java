@@ -699,7 +699,7 @@ public enum QueryError {
   /** Error code. */
   EBV_X_X(FORG, 6, "Effective boolean value not defined for %: %."),
   /** Error code. */
-  SUM_X_X(FORG, 6, "Argument type % is invalid: %."),
+  SUM_X_X(FORG, 6, "Number or duration expected, % found: %."),
 
   /** Error code. */
   FUNZONE_X_X(FORG, 8, "% and % have different timezones."),
@@ -1020,11 +1020,7 @@ public enum QueryError {
   /** Error code. */
   JAVACONSTR_X_X(XPST, 17, "Unknown constructor: %#%."),
   /** Error code. */
-  JAVAARGS_X_X(XPST, 17, "% cannot be called with (%)."),
-  /** Error code. */
   JAVAINIT_X_X(XPST, 17, "%: %."),
-  /** Error code. */
-  JAVAARGS_X_X_X(XPST, 17, "%(%) expected, (%) found."),
 
   /** Error code. */
   TYPEUNKNOWN_X(XPST, 51, "Unknown type: %."),
@@ -1036,21 +1032,19 @@ public enum QueryError {
   NSMISS_X(XPST, 81, "QName '%' has no namespace."),
 
   /** Error code. */
-  JAVAINVOKE_X_X(XPTY, 4, "% instance expected as first argument, % found."),
+  JAVANOINSTANCE_X_X(XPTY, 4, "% instance expected as first argument, % found."),
   /** Error code. */
-  JAVAEVAL_X_X_X(XPTY, 4, "%. Caused by: %(%)."),
+  JAVAEXEC_X_X_X(XPTY, 4, "%. Caused by: %%."),
   /** Error code. */
   JAVANULL(XPTY, 17, "Java array contains null values."),
   /** Error code. */
-  JAVAMULTICONS_X_X_X(XPTY, 4, "%: % constructors with % found."),
+  JAVAMULTIPLE_X_X(XPTY, 4, "Multiple % candidates. Parameters: %."),
   /** Error code. */
-  JAVAMULTIMETH_X_X_X(XPTY, 4, "%: % methods with % found."),
+  JAVANONE_X_X_X(XPTY, 4, "% cannot be called with %. Expected: %."),
   /** Error code. */
-  JAVACONS_X_X_X(XPTY, 4, "None of the % % constructors can be called with (%)."),
+  JAVAARGS_X_X_X(XPTY, 4, "%% expected, % found."),
   /** Error code. */
-  JAVAMETH_X_X_X(XPTY, 4, "None of the % % methods can be called with (%)."),
-  /** Error code. */
-  JAVACONVERT_X_X(CONVERT, "java", "Java class % cannot be converted: %."),
+  JAVAARGS_X_X(XPTY, 4, "Function cannot be called with (%): %."),
 
   /** Error code. */
   ZEROFUNCS_X_X(XPTY, 4, "Function with 0 arguments expected, % found: %."),

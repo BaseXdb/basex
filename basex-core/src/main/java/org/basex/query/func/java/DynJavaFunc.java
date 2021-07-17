@@ -1,14 +1,16 @@
 package org.basex.query.func.java;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.lang.reflect.*;
 import java.util.*;
 
+import org.basex.core.MainOptions.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -51,10 +53,9 @@ final class DynJavaFunc extends DynJavaCall {
    * @throws QueryException query exception
    */
   public boolean init(final boolean enforce) throws QueryException {
-    final int arity = exprs.length;
-
-    // field candidate: supplied expression is class instance
+    // field candidate
     final IntList arities = new IntList();
+    final int arity = exprs.length;
     try {
       final Field f = clazz.getField(name);
       final int al = isStatic(f) ? 0 : 1;
@@ -68,119 +69,80 @@ final class DynJavaFunc extends DynJavaCall {
       // field not found
     }
 
-    // method candidates: no check supplied expression: class instance or does not
-    methods = new ArrayList<>();
-    for(final Method m : clazz.getMethods()) {
-      // check name, types and parameter count
-      if(!m.getName().equals(name)) continue;
-      final Class<?>[] params = m.getParameterTypes();
-      final int al = params.length + (isStatic(m) ? 0 : 1);
-      if(al == arity) {
-        if(typesMatch(params, types)) methods.add(m);
-      } else if(types == null) {
-        arities.add(al);
-      }
-    }
+    // method candidates
+    final HashMap<String, ArrayList<Method>> allMethods = methods(clazz);
+    methods = filter(allMethods, name, types, arity, arities, false);
+
     if(field != null || !methods.isEmpty()) return true;
     if(!enforce) return false;
 
     final TokenList names = new TokenList();
-    for(final Method m : clazz.getMethods()) names.add(m.getName());
-    for(final Field f : clazz.getFields()) names.add(f.getName());
+    for(final String mthd : allMethods.keySet()) names.add(mthd);
+    for(final Field fld : clazz.getFields()) names.add(fld.getName());
     throw noFunction(name, arity, name(), arities, types, info, names.finish());
   }
 
   @Override
-  protected Object eval(final QueryContext qc) throws QueryException {
-    return field != null ? field(qc) : method(qc);
+  protected Value eval(final QueryContext qc, final WrapOptions wrap) throws QueryException {
+    final Object[] array = field != null ? field(qc) : method(qc);
+    if(wrap == WrapOptions.INSTANCE && array[1] != null) return new XQJava(array[1]);
+    if(wrap == WrapOptions.VOID) return Empty.VALUE;
+    return toValue(array[0], qc, info, wrap);
   }
 
   /**
    * Tries to return the value of a field.
    * @param qc query context
-   * @return resulting object
+   * @return result and class instance (instance can be {@code null})
    * @throws QueryException exception
    */
-  private Object field(final QueryContext qc) throws QueryException {
+  private Object[] field(final QueryContext qc) throws QueryException {
     final JavaEval je = new JavaEval(this, qc);
-    final Object instance = je.classInstance(isStatic(field));
+    final Object instance = je.instance(isStatic(field));
     try {
-      return field.get(instance);
+      return new Object[] { field.get(instance), instance };
     } catch(final IllegalArgumentException ex) {
-      throw je.instanceError(ex);
+      throw je.instanceExpected(ex);
     } catch(final Throwable th) {
-      throw je.execError(th);
+      throw je.executionError(th);
     }
   }
 
   /**
    * Calls a method.
    * @param qc query context
-   * @return resulting object
+   * @return result and class instance (instance can be {@code null})
    * @throws QueryException exception
    */
-  private Object method(final QueryContext qc) throws QueryException {
+  private Object[] method(final QueryContext qc) throws QueryException {
     // find methods with matching parameters
     final ArrayList<Method> candidates = new ArrayList<>(1);
     final JavaEval je = new JavaEval(this, qc);
-    for(final Method m : methods) {
-      if(je.match(m.getParameterTypes(), isStatic(m), null)) candidates.add(m);
-    }
-
-    // single method found: instantiate class
-    final int cs = candidates.size();
-    if(cs == 1) {
-      // assign query context if module is inheriting the {@link QueryModule} interface
-      final Method method = candidates.get(0);
-      final Object instance = je.classInstance(isStatic(method));
-      if(instance instanceof QueryModule) {
-        final QueryModule qm = (QueryModule) instance;
-        qm.staticContext = sc;
-        qm.queryContext = qc;
-      }
-
-      // invoke found method
-      try {
-        return method.invoke(instance, je.args);
-      } catch(final IllegalArgumentException ex) {
-        throw je.instanceError(ex);
-      } catch(final Throwable th) {
-        throw je.execError(th);
+    for(final Method method : methods) {
+      if(je.match(method.getParameterTypes(), isStatic(method), null)) {
+        candidates.add(method);
       }
     }
+    if(candidates.size() != 1) throw candidates(methods.toArray(new Executable[0]),
+        candidates.toArray(new Executable[0]));
 
-    // otherwise, raise error
-    if(cs > 1) throw je.multipleError(JAVAMULTIMETH_X_X_X, cs);
-
-    final int size = methods.size();
-    final Method method = methods.get(0);
-    // remove static argument
-    final Expr[] args = je.exprs;
-    if(size == 1 && !isStatic(method) || args.length > 0 &&
-        ((args[0] instanceof XQJava || args[0] instanceof JavaCall))) {
-      je.exprs = Arrays.copyOfRange(args, 1, args.length);
+    // assign query context if module is inheriting the {@link QueryModule} interface
+    final Method method = candidates.get(0);
+    final Object instance = je.instance(isStatic(method));
+    if(instance instanceof QueryModule) {
+      final QueryModule qm = (QueryModule) instance;
+      qm.staticContext = sc;
+      qm.queryContext = qc;
     }
 
-    if(size > 1) throw JAVAMETH_X_X_X.get(info, size, name(), JavaEval.types(exprs));
-    throw je.argsError(method);
-  }
-
-  /**
-   * Checks if the specified method is static.
-   * @param method method
-   * @return result of check
-   */
-  private static boolean isStatic(final Method method) {
-    return Modifier.isStatic(method.getModifiers());
-  }
-
-  /**
-   * Checks if the specified field is static.
-   * @param field field
-   * @return result of check
-   */
-  private static boolean isStatic(final Field field) {
-    return Modifier.isStatic(field.getModifiers());
+    // invoke found method
+    try {
+      return new Object[] { method.invoke(instance, je.args), instance };
+    } catch(final IllegalArgumentException ex) {
+      throw je.instanceExpected(ex);
+    } catch(final Throwable th) {
+      throw je.executionError(th);
+    }
   }
 
   @Override
@@ -193,12 +155,12 @@ final class DynJavaFunc extends DynJavaCall {
 
   @Override
   String desc() {
-    return QNm.eqName(JAVAPREF + clazz.getName(), name);
+    return QNm.eqName(JAVAPREF + className(clazz), name);
   }
 
   @Override
   String name() {
-    return clazz.getName() + COL + name;
+    return className(clazz) + COL + name;
   }
 
   @Override
