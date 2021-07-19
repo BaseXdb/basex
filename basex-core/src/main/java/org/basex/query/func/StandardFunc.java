@@ -79,11 +79,12 @@ public abstract class StandardFunc extends Arr {
     simplifyArgs(cc);
 
     final Expr expr = opt(cc);
+    final SeqType st = definition.seqType;
     return
       // return optimized expression
       expr != this ? cc.replaceWith(this, expr) :
-      // pre-evaluate function
-      allAreValues(definition.seqType.occ.max > 1) && isSimple() ? cc.preEval(this) :
+      // pre-evaluate if arguments are values and not too large
+      allAreValues(st.occ.max > 1 || st.type instanceof FuncType) && isSimple() ? cc.preEval(this) :
       // return original function
       this;
   }
