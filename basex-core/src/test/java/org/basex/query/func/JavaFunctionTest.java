@@ -1,8 +1,10 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
+import org.basex.query.func.java.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
@@ -23,9 +25,9 @@ public final class JavaFunctionTest extends SandboxTest {
     query("declare namespace Random = 'java:java.util.Random'; Random:nextInt(Random:new())");
     query("declare namespace List = 'java:org.basex.util.list.StringList'; List:new()");
 
-    error("declare namespace Random = 'java:java.util.random'; Random:new()", WHICHCLASS_X);
-    error("Q{java:java.util.rndm}new()", WHICHCLASS_X);
-    error("Q{java:java.util.random}new()", WHICHCLASS_X);
+    error("declare namespace random = 'java:java.util.random'; random:new()", JAVACLASS_X);
+    error("Q{java:java.util.rndm}new()", JAVACLASS_X);
+    error("Q{java:java.util.random}new()", JAVACLASS_X);
     error("Q{java:Integer}new\u00b7int('abc')", JAVAARGS_X_X_X);
 
     error("Q{java:StringBuilder}new(1)", JAVANONE_X_X_X);
@@ -118,7 +120,7 @@ public final class JavaFunctionTest extends SandboxTest {
     error("declare namespace string = 'java.lang.String'; " +
         "string:concat(string:new(), Q{java.awt.Point}new())", JAVAARGS_X_X_X);
     error("import module namespace qm = 'java:org.basex.query.func.QueryModuleTest'; " +
-        "qm:xyz()", WHICHFUNC_X);
+        "qm:xyz()", JAVAMEMBER_X);
     error("import module namespace qm = 'java:org.basex.query.func.QueryModuleTest'; " +
         "qm:fast()", FUNCARITY_X_X_X);
 
@@ -169,13 +171,19 @@ public final class JavaFunctionTest extends SandboxTest {
     error("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
         "n:var(n:new())", WHICHFUNC_X);
     error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:var()", WHICHFUNC_X);
+        "n:var()", JAVAMEMBER_X);
   }
 
   /** Error cases. */
   @Test public void errors() {
     error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
         "n:null-array()", JAVANULL);
+  }
+
+  /** Instance errors. */
+  @Test public void instance() {
+    error("Q{String}toString(())", JAVANOINSTANCE_X_X);
+    error("Q{String}toString(123)", JAVANOINSTANCE_X_X);
   }
 
   /** Process arrays. */
@@ -209,7 +217,7 @@ public final class JavaFunctionTest extends SandboxTest {
   @Test public void javaNameTest() {
     error("rest:XYZ()", WHICHFUNC_X);
     error("Q{java.lang.String}XYZ()", WHICHFUNC_X);
-    error("Q{java:java.lang.String}XYZ()", WHICHFUNC_X);
+    error("Q{java:java.lang.String}XYZ()", JAVAMEMBER_X);
 
   }
 
@@ -318,5 +326,56 @@ public final class JavaFunctionTest extends SandboxTest {
     query(Util.info(pattern, "some", ""), true);
     query(Util.info(pattern, "none", ""), true);
     query(Util.info(pattern, "void", ""), "");
+  }
+
+  /** Test. */
+  @Test public void camelCase() {
+    assertEquals("", JavaCall.camelCase(""));
+    assertEquals("a", JavaCall.camelCase("a"));
+    assertEquals("aB", JavaCall.camelCase("a-b"));
+    assertEquals("aBC", JavaCall.camelCase("a-b--c"));
+    assertEquals("a.bC", JavaCall.camelCase("a.b-c"));
+    assertEquals("a/b.cD", JavaCall.camelCase("a/b.c-D"));
+  }
+
+  /** Test. */
+  @Test public void className() {
+    assertEquals("", JavaCall.uriToClasspath(""));
+    assertEquals("A", JavaCall.uriToClasspath("a"));
+    assertEquals(".", JavaCall.uriToClasspath("."));
+    assertEquals(".A", JavaCall.uriToClasspath(".a"));
+    assertEquals(".Ab", JavaCall.uriToClasspath(".ab"));
+    assertEquals("String", JavaCall.uriToClasspath("string"));
+    assertEquals("java.lang.String", JavaCall.uriToClasspath("java.lang.string"));
+    assertEquals("java.lang.String", JavaCall.uriToClasspath("java.lang.string"));
+    assertEquals("java.lang.String", JavaCall.uriToClasspath("java/lang/string"));
+    assertEquals("org.basex.modules.MD", JavaCall.uriToClasspath("org.basex.modules.m-d"));
+    assertEquals("a.BC", JavaCall.uriToClasspath("a/-b-c"));
+  }
+
+  /** Test. */
+  @Test public void uri2Path() {
+    assertEquals("a", JavaCall.uri2path("a"));
+    assertEquals("a", JavaCall.uri2path("/a"));
+    assertEquals("a/b", JavaCall.uri2path("a/b"));
+    assertEquals("a-c", JavaCall.uri2path("a-c"));
+    assertEquals("A", JavaCall.uri2path("%41"));
+    assertEquals("a/b", JavaCall.uri2path("a///b"));
+    assertEquals("a/index", JavaCall.uri2path("a/"));
+    assertEquals("index", JavaCall.uri2path("/"));
+    assertEquals("index", JavaCall.uri2path(""));
+
+    assertEquals("org/index", JavaCall.uri2path("http://org"));
+    assertEquals("org/index", JavaCall.uri2path("http://org/"));
+    assertEquals("org/basex/m/hello/World", JavaCall.uri2path("http://basex.org/m/hello/World"));
+    assertEquals("com/example/www/index", JavaCall.uri2path("http://www.example.com"));
+    assertEquals("a/b/c", JavaCall.uri2path("a:b:c"));
+    assertEquals("A/A", JavaCall.uri2path("http://%41/%41"));
+
+    assertEquals("-gg", JavaCall.uri2path("%gg"));
+    assertEquals("-", JavaCall.uri2path(";"));
+    assertEquals("http-/-gg", JavaCall.uri2path("http://%gg"));
+
+    assertEquals("a/b/c", JavaCall.uri2path("a:b:c"));
   }
 }

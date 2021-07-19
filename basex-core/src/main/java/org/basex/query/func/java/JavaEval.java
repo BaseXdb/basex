@@ -6,7 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.Type;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -20,8 +20,6 @@ final class JavaEval {
   private final JavaCall call;
   /** Query context. */
   private final QueryContext qc;
-  /** Class to be called. */
-  private final Class<?> clazz;
   /** Expressions (will be evaluated to values). */
   private final Expr[] exprs;
 
@@ -34,42 +32,9 @@ final class JavaEval {
    * @param qc query context
    */
   JavaEval(final JavaCall call, final QueryContext qc) {
-    this(call, qc, null);
-  }
-
-  /**
-   * Constructor.
-   * @param call Java call
-   * @param qc query context
-   */
-  JavaEval(final DynJavaCall call, final QueryContext qc) {
-    this(call, qc, call.clazz);
-  }
-
-  /**
-   * Constructor.
-   * @param call Java call
-   * @param qc query context
-   * @param clazz class (can be {@code null})
-   */
-  private JavaEval(final JavaCall call, final QueryContext qc, final Class<?> clazz) {
     this.call = call;
     this.qc = qc;
-    this.clazz = clazz;
     exprs = call.exprs.clone();
-  }
-
-  /**
-   * Evaluates the first argument.
-   * @param stat static flag
-   * @return Java object (can be {@code null})
-   * @throws QueryException query exception
-   */
-  Object instance(final boolean stat) throws QueryException {
-    if(stat) return null;
-    final Value value = exprs[0].value(qc);
-    exprs[0] = value;
-    return clazz.isInstance(value) ? value : value.toJava();
   }
 
   /**
@@ -119,17 +84,6 @@ final class JavaEval {
     }
     args = values;
     return true;
-  }
-
-  /**
-   * Returns an error for field/method invocations in which first argument is no class instance.
-   * @param ex exception
-   * @return exception
-   */
-  QueryException instanceExpected(final IllegalArgumentException ex) {
-    Util.debug(ex);
-    return JAVANOINSTANCE_X_X.get(call.info, JavaCall.className(clazz),
-        JavaCall.argType(exprs[0]));
   }
 
   /**

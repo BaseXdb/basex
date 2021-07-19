@@ -1011,16 +1011,18 @@ public enum QueryError {
   /** Error code. */
   WHICHFUNC_X(XPST, 17, "Unknown function: %."),
   /** Error code. */
-  INVALIDFUNC_X(XPST, 17, "Invalid function: %."),
+  ABSTRACTFUNC_X(XPST, 17, "No function exists for abstract type: %."),
   /** Error code. */
   FUNCNOIMPL_X(XPST, 17, "External function not implemented: %."),
-  /** Error code. */
-  WHICHCLASS_X(XPST, 17, "Unknown class: %."),
 
   /** Error code. */
   JAVACONSTR_X_X(XPST, 17, "Unknown constructor: %#%."),
   /** Error code. */
   JAVAINIT_X_X(XPST, 17, "%: %."),
+  /** Error code. */
+  JAVACLASS_X(XPST, 17, "Unknown class: %."),
+  /** Error code. */
+  JAVAMEMBER_X(XPST, 17, "Unknown method or field: %."),
 
   /** Error code. */
   TYPEUNKNOWN_X(XPST, 51, "Unknown type: %."),
@@ -1044,7 +1046,7 @@ public enum QueryError {
   /** Error code. */
   JAVAARGS_X_X_X(XPTY, 4, "%% expected, % found."),
   /** Error code. */
-  JAVAARGS_X_X(XPTY, 4, "Function cannot be called with (%): %."),
+  JAVAARGS_X_X(XPTY, 4, "% cannot be called with %."),
 
   /** Error code. */
   ZEROFUNCS_X_X(XPTY, 4, "Function with 0 arguments expected, % found: %."),

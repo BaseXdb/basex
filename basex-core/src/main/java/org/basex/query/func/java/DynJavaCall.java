@@ -9,6 +9,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.Array;
@@ -41,12 +42,29 @@ abstract class DynJavaCall extends JavaCall {
   }
 
   /**
+   * Evaluates the first argument.
+   * @param stat static flag
+   * @return Java object (can be {@code null})
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  final Object instance(final boolean stat, final QueryContext qc) throws QueryException {
+    if(stat) return null;
+
+    final Value value = exprs[0].value(qc);
+    exprs[0] = value;
+    final Object object = value.toJava();
+    if(object == null) throw instanceExpected();
+    return object;
+  }
+
+  /**
    * Returns an error for the specified execution candidates.
    * @param execs executables (constructors, methods)
    * @param candidates candidates
    * @return exception
    */
-  final QueryException candidates(final Executable[] execs, final Executable[] candidates) {
+  final QueryException noCandidate(final Executable[] execs, final Executable[] candidates) {
     final int cl = candidates.length;
     if(cl > 1) return JAVAMULTIPLE_X_X.get(info, name(), paramTypes(candidates, false));
 
@@ -61,6 +79,14 @@ abstract class DynJavaCall extends JavaCall {
         argTypes(tmp.finish()));
 
     return JAVANONE_X_X_X.get(info, name(), argTypes(tmp.finish()), paramTypes(execs, true));
+  }
+
+  /**
+   * Returns an error for field/method invocations in which first argument is no class instance.
+   * @return exception
+   */
+  final QueryException instanceExpected() {
+    return JAVANOINSTANCE_X_X.get(info, JavaCall.className(clazz), JavaCall.argType(exprs[0]));
   }
 
   @Override

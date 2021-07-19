@@ -79,7 +79,7 @@ final class DynJavaFunc extends DynJavaCall {
     final TokenList names = new TokenList();
     for(final String mthd : allMethods.keySet()) names.add(mthd);
     for(final Field fld : clazz.getFields()) names.add(fld.getName());
-    throw noFunction(name, arity, name(), arities, types, info, names.finish());
+    throw noFunction(name, types, arity, name(), arities, names.finish(), info);
   }
 
   @Override
@@ -98,11 +98,13 @@ final class DynJavaFunc extends DynJavaCall {
    */
   private Object[] field(final QueryContext qc) throws QueryException {
     final JavaEval je = new JavaEval(this, qc);
-    final Object instance = je.instance(isStatic(field));
+    final Object instance = instance(isStatic(field), qc);
+
     try {
       return new Object[] { field.get(instance), instance };
     } catch(final IllegalArgumentException ex) {
-      throw je.instanceExpected(ex);
+      Util.debug(ex);
+      throw instanceExpected();
     } catch(final Throwable th) {
       throw je.executionError(th);
     }
@@ -123,12 +125,12 @@ final class DynJavaFunc extends DynJavaCall {
         candidates.add(method);
       }
     }
-    if(candidates.size() != 1) throw candidates(methods.toArray(new Executable[0]),
+    if(candidates.size() != 1) throw noCandidate(methods.toArray(new Executable[0]),
         candidates.toArray(new Executable[0]));
 
     // assign query context if module is inheriting the {@link QueryModule} interface
     final Method method = candidates.get(0);
-    final Object instance = je.instance(isStatic(method));
+    final Object instance = instance(isStatic(method), qc);
     if(instance instanceof QueryModule) {
       final QueryModule qm = (QueryModule) instance;
       qm.staticContext = sc;
@@ -139,7 +141,8 @@ final class DynJavaFunc extends DynJavaCall {
     try {
       return new Object[] { method.invoke(instance, je.args), instance };
     } catch(final IllegalArgumentException ex) {
-      throw je.instanceExpected(ex);
+      Util.debug(ex);
+      throw instanceExpected();
     } catch(final Throwable th) {
       throw je.executionError(th);
     }

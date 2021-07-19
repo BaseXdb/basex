@@ -14,6 +14,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.func.java.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -208,7 +209,7 @@ public final class RepoManager {
     try(QueryContext qc = new QueryContext(context)) {
       final byte[] uri = qc.parseLibrary(string(content), path).sc.module.uri();
       // copy file to rewritten URI file path
-      return write(Strings.uri2path(string(uri)) + IO.XQMSUFFIX, content);
+      return write(JavaCall.uri2path(string(uri)) + IO.XQMSUFFIX, content);
     }
   }
 

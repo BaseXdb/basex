@@ -11,6 +11,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.func.java.*;
 import org.basex.util.*;
 
 /**
@@ -91,7 +92,7 @@ public final class ModuleLoader {
         }
       }
       // check XQuery modules
-      final String path = Strings.uri2path(uri);
+      final String path = JavaCall.uri2path(uri);
       for(final String suffix : IO.XQSUFFIXES) {
         final IOFile file = new IOFile(repoPath, path + suffix);
         if(file.exists()) {
@@ -100,12 +101,12 @@ public final class ModuleLoader {
         }
       }
       // convert to Java notation
-      className = Strings.className(path);
+      className = JavaCall.uriToClasspath(path);
     }
-    className = className.replaceAll("^([A-Z][^.]+)$", JAVALANG + "$1");
+    className = JavaCall.classPath(className);
 
     // load Java module
-    final IOFile jar = new IOFile(repoPath, Strings.uri2path(className) + IO.JARSUFFIX);
+    final IOFile jar = new IOFile(repoPath, JavaCall.uri2path(className) + IO.JARSUFFIX);
     if(jar.exists()) addURL(jar);
 
     // create Java class instance

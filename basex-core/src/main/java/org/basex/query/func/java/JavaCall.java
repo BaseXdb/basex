@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.lang.reflect.*;
 import java.lang.reflect.Array;
+import java.net.*;
 import java.util.*;
 
 import javax.xml.datatype.*;
@@ -202,21 +203,21 @@ public abstract class JavaCall extends Arr {
    * @param args arguments
    * @param qc query context
    * @param sc static context
-   * @param ii input info
+   * @param info input info
    * @return Java function or {@code null}
    * @throws QueryException query exception
    */
   public static JavaCall get(final QNm qname, final Expr[] args, final QueryContext qc,
-      final StaticContext sc, final InputInfo ii) throws QueryException {
+      final StaticContext sc, final InputInfo info) throws QueryException {
 
     // rewrite function name, extract argument types
-    String name = Strings.camelCase(string(qname.local()));
+    String name = camelCase(string(qname.local()));
     String[] types = null;
     final int n = name.indexOf('\u00b7');
     if(n != -1) {
       final StringList list = new StringList();
       for(final String type : Strings.split(name.substring(n + 1), '\u00b7')) {
-        list.add(type.replace("...", "[]").replaceAll("^([A-Z][^.]+)$", JAVALANG + "$1"));
+        list.add(classPath(type.replace("...", "[]")));
       }
       types = list.finish();
       name = name.substring(0, n);
@@ -225,20 +226,20 @@ public abstract class JavaCall extends Arr {
 
     // check if URI starts with "java:" prefix. if yes, skip rewritings
     final boolean enforce = uri.startsWith(JAVAPREF);
-    final String className = (enforce ? uri.substring(JAVAPREF.length()) :
-      Strings.className(Strings.uri2path(uri))).replaceAll("^([A-Z][^.]+)$", JAVALANG + "$1");
+    final String className = classPath(enforce ? uri.substring(JAVAPREF.length()) :
+      uriToClasspath(uri2path(uri)));
 
     // function in imported Java module
     final ModuleLoader modules = qc.resources.modules();
     final Object module  = modules.findModule(className);
     if(module != null) {
-      final Method meth = moduleMethod(module, name, args.length, types, qname, qc, ii);
+      final Method meth = moduleMethod(module, name, args.length, types, qname, qc, info);
       final Requires req = meth.getAnnotation(Requires.class);
       final Perm perm = req == null ? Perm.ADMIN :
         Perm.get(req.value().name().toLowerCase(Locale.ENGLISH));
       final boolean updating = meth.getAnnotation(Updating.class) != null;
       if(updating) qc.updating();
-      return new StaticJavaCall(module, meth, args, perm, updating, sc, ii);
+      return new StaticJavaCall(module, meth, args, perm, updating, sc, info);
     }
 
     /* skip Java class lookup if...
@@ -261,20 +262,20 @@ public abstract class JavaCall extends Arr {
         Util.debug(ex);
       } catch(final Throwable th) {
         // catch linkage and other errors as well
-        throw JAVAINIT_X_X.get(ii, Util.className(th), th);
+        throw JAVAINIT_X_X.get(info, Util.className(th), th);
       }
 
       if(clazz == null) {
         // class not found, java prefix was specified
-        if(enforce) throw WHICHCLASS_X.get(ii, className);
+        if(enforce) throw JAVACLASS_X.get(info, className);
       } else {
         // constructor
         if(name.equals(NEW)) {
-          final DynJavaConstr djc = new DynJavaConstr(clazz, types, args, sc, ii);
+          final DynJavaConstr djc = new DynJavaConstr(clazz, types, args, sc, info);
           if(djc.init(enforce)) return djc;
         }
         // field or method
-        final DynJavaFunc djf = new DynJavaFunc(clazz, name, types, args, sc, ii);
+        final DynJavaFunc djf = new DynJavaFunc(clazz, name, types, args, sc, info);
         if(djf.init(enforce)) return djf;
       }
     }
@@ -289,12 +290,12 @@ public abstract class JavaCall extends Arr {
    * @param types types provided in the query (can be {@code null})
    * @param qname original name
    * @param qc query context
-   * @param ii input info
+   * @param info input info
    * @return method if found
    * @throws QueryException query exception
    */
   private static Method moduleMethod(final Object module, final String name, final int arity,
-      final String[] types, final QNm qname, final QueryContext qc, final InputInfo ii)
+      final String[] types, final QNm qname, final QueryContext qc, final InputInfo info)
       throws QueryException {
 
     // find method with identical name and arity
@@ -305,9 +306,9 @@ public abstract class JavaCall extends Arr {
     if(ms == 0) {
       final TokenList names = new TokenList();
       for(final String mthd : allMethods.keySet()) names.add(mthd);
-      throw noFunction(name, arity, string(qname.string()), arities, types, ii, names.finish());
+      throw noFunction(name, types, arity, string(qname.string()), arities, names.finish(), info);
     }
-    if(ms > 1) throw JAVAMULTIPLE_X_X.get(ii, qname.string(),
+    if(ms > 1) throw JAVAMULTIPLE_X_X.get(info, qname.string(),
         paramTypes(methods.toArray(new Executable[0]), false));
 
     // single method found: add module locks to query context
@@ -320,34 +321,29 @@ public abstract class JavaCall extends Arr {
   /**
    * Returns an error message if no fields and methods could be chosen for execution.
    * @param name name of field or method
+   * @param types types (can be {@code null})
    * @param arity supplied arity
    * @param full full name of field or method
    * @param arities arities of found methods
-   * @param types types (can be {@code null})
-   * @param ii input info
    * @param names list of available names
+   * @param info input info
    * @return exception
    */
-  static QueryException noFunction(final String name, final int arity, final String full,
-      final IntList arities, final String[] types, final InputInfo ii, final byte[][] names) {
+  static QueryException noFunction(final String name, final String[] types, final int arity,
+      final String full, final IntList arities, final byte[][] names, final InputInfo info) {
     // functions with different arities
-    if(!arities.isEmpty()) return Functions.wrongArity(full, arity, arities, ii);
+    if(!arities.isEmpty()) return Functions.wrongArity(full, arity, arities, info);
 
     // find similar field/method names
     final byte[] nm = token(name);
     final Object similar = Levenshtein.similar(nm, names);
-    if(similar != null) {
+    if(similar != null && eq(nm, (byte[]) similar)) {
       // if name is equal, no function was chosen via exact type matching
-      if(eq(nm, (byte[]) similar)) {
-        final TokenBuilder tb = new TokenBuilder();
-        for(final String type : types) {
-          if(!tb.isEmpty()) tb.add(", ");
-          tb.add(type.replaceAll("^.*\\.", ""));
-        }
-        return JAVAARGS_X_X.get(ii, tb, full);
-      }
+      final StringJoiner sj = new StringJoiner(", ", "(", ")");
+      for(final String type : types) sj.add(className(type));
+      return JAVAARGS_X_X.get(info, full, sj);
     }
-    return WHICHFUNC_X.get(ii, similar(full, similar));
+    return JAVAMEMBER_X.get(info, similar(full, similar));
   }
 
   /**
@@ -395,7 +391,7 @@ public abstract class JavaCall extends Arr {
         final int al = params.length + (stat || isStatic(method) ? 0 : 1);
         if(al == arity) {
           if(typesMatch(params, types)) list.add(method);
-        } else if(types == null) {
+        } else {
           arities.add(al);
         }
       }
@@ -404,15 +400,107 @@ public abstract class JavaCall extends Arr {
   }
 
   /**
-   * Returns the normalized class name.
+   * Converts the given string to a Java class name. Slashes will be replaced with dots, and
+   * the last package segment will be capitalized and camel-cased.
+   * @param string string to convert
+   * @return class name
+   */
+  public static String uriToClasspath(final String string) {
+    final String s = string.replace('/', '.');
+    final int c = s.lastIndexOf('.') + 1;
+    return s.substring(0, c) + Strings.capitalize(camelCase(s.substring(c)));
+  }
+
+  /**
+   * Converts the given string to camel case.
+   * @param string string to convert
+   * @return resulting string
+   */
+  public static String camelCase(final String string) {
+    final StringBuilder sb = new StringBuilder();
+    boolean upper = false;
+    final int sl = string.length();
+    for(int s = 0; s < sl; s++) {
+      final char ch = string.charAt(s);
+      if(ch == '-') {
+        upper = true;
+      } else if(upper) {
+        sb.append(Character.toUpperCase(ch));
+        upper = false;
+      } else {
+        sb.append(ch);
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Converts a URI to a directory path.
+   * See https://docs.basex.org/wiki/Repository#URI_Rewriting for details.
+   * @param uri namespace uri
+   * @return converted path
+   */
+  public static String uri2path(final String uri) {
+    String path = uri;
+    try {
+      final URI u = new URI(uri);
+      final TokenBuilder tb = new TokenBuilder();
+      if(u.isOpaque()) {
+        tb.add(u.getScheme()).add('/').add(u.getSchemeSpecificPart().replace(':', '/'));
+      } else {
+        final String auth = u.getAuthority();
+        if(auth != null) {
+          // reverse authority, replace dots by slashes. example: basex.org  ->  org/basex
+          final String[] comp = Strings.split(auth, '.');
+          for(int c = comp.length - 1; c >= 0; c--) tb.add('/').add(comp[c]);
+        }
+        // add remaining path
+        final String p = u.getPath();
+        tb.add(p == null || p.isEmpty() ? "/" : p.replace('.', '/'));
+      }
+      path = tb.toString();
+    } catch(final URISyntaxException ex) {
+      Util.debug(ex);
+    }
+
+    // replace special characters with dashes; remove multiple slashes
+    path = path.replaceAll("[^\\w.-/]+", "-").replaceAll("//+", "/");
+    // add "index" string
+    if(Strings.endsWith(path, '/')) path += "index";
+    // remove heading slash
+    if(Strings.startsWith(path, '/')) path = path.substring(1);
+    return path;
+  }
+
+  /**
+   * Returns a fully qualified class name.
+   * @param name class string
+   * @return normalized name
+   */
+  public static String classPath(final String name) {
+    // prepend standard package if name starts with uppercase letter and has no dots
+    //   String  ->  java.lang.String
+    //   char[]  ->  char[]
+    return name.replaceAll("^([A-Z][^.]+)$", JAVALANG + "$1");
+  }
+
+  /**
+   * Returns a normalized class name without path to standard package.
    * @param clazz class
    * @return normalized name
    */
   static String className(final Class<?> clazz) {
-    final String name = clazz.getCanonicalName();
-    return name.startsWith(QueryText.JAVALANG) ? name.substring(QueryText.JAVALANG.length()) : name;
+    return className(clazz.getCanonicalName());
   }
 
+  /**
+   * Returns a normalized class name without path to standard package.
+   * @param name class string
+   * @return normalized name
+   */
+  static String className(final String name) {
+    return name.startsWith(QueryText.JAVALANG) ? name.substring(QueryText.JAVALANG.length()) : name;
+  }
 
   /**
    * Checks if the specified executable is static.
@@ -433,20 +521,15 @@ public abstract class JavaCall extends Arr {
   }
 
   /**
-   * Returns parameters for all candidates.
-   * @param execs candidates
+   * Returns parameters from the specified executables.
+   * @param execs executables
    * @param xquery xquery include XQuery types
    * @return string
    */
   static String paramTypes(final Executable[] execs, final boolean xquery) {
-    final StringBuilder sb = new StringBuilder();
-    final int el = execs.length;
-    for(int e = 0; e < el; e++) {
-      final Executable exec = execs[e];
-      if(sb.length() > 0) sb.append(", ");
-      sb.append(paramTypes(exec, xquery));
-    }
-    return sb.toString();
+    final StringJoiner sj = new StringJoiner(", ");
+    for(final Executable exec : execs) sj.add(paramTypes(exec, xquery));
+    return sj.toString();
   }
 
   /**
@@ -456,36 +539,32 @@ public abstract class JavaCall extends Arr {
    * @return string
    */
   static String paramTypes(final Executable exec, final boolean xquery) {
-    final StringBuilder sb = new StringBuilder().append('(');
+    final StringJoiner sj = new StringJoiner(", ", "(", ")");
     for(final Class<?> param : exec.getParameterTypes()) {
-      if(sb.length() > 1) sb.append(", ");
       final Type type = xquery ? JavaMapping.type(param, false) : null;
-      sb.append(type != null ? type : className(param));
+      sj.add(type != null ? type.toString() : className(param));
     }
-    return sb.append(')').toString();
+    return sj.toString();
   }
 
   /**
-   * Returns a string representation of the XQuery or Java types of the specified arguments.
+   * Returns a string representation of the XQuery or Java types from the specified arguments.
    * @param args arguments
    * @return types string
    */
   static String argTypes(final Object[] args) {
-    final StringBuilder sb = new StringBuilder().append('(');
-    for(final Object arg : args) {
-      if(sb.length() > 1) sb.append(", ");
-      sb.append(argType(arg));
-    }
-    return sb.append(')').toString();
+    final StringJoiner sj = new StringJoiner(", ", "(", ")");
+    for(final Object arg : args) sj.add(argType(arg));
+    return sj.toString();
   }
 
   /**
-   * Returns a string representation of the XQuery or Java type of the specified argument.
-   * @param arg argument
+   * Returns a string representation of the XQuery or Java type from the specified argument.
+   * @param argument argument
    * @return type string
    */
-  static String argType(final Object arg) {
-    final Object object = arg instanceof XQJava ? ((XQJava) arg).toJava() : arg;
+  static String argType(final Object argument) {
+    final Object object = argument instanceof XQJava ? ((XQJava) argument).toJava() : argument;
     return object instanceof Value ? ((Value) object).seqType().toString() :
       object == null ? Util.info(null) :
       Util.className(object);
@@ -497,7 +576,7 @@ public abstract class JavaCall extends Arr {
    * @param qTypes query types (can be {@code null})
    * @return result of check
    */
-  protected static boolean typesMatch(final Class<?>[] pTypes, final String[] qTypes) {
+  static boolean typesMatch(final Class<?>[] pTypes, final String[] qTypes) {
     // no query types: accept method
     if(qTypes == null) return true;
     // compare types

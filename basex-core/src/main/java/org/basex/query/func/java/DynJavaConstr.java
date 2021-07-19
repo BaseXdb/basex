@@ -67,7 +67,7 @@ final class DynJavaConstr extends DynJavaCall {
     for(final Constructor<?> cnstr : constrs) {
       if(je.match(cnstr.getParameterTypes(), true, null)) candidates.add(cnstr);
     }
-    if(candidates.size() != 1) throw candidates(constrs.toArray(new Executable[0]),
+    if(candidates.size() != 1) throw noCandidate(constrs.toArray(new Executable[0]),
         candidates.toArray(new Executable[0]));
 
     // single constructor found: instantiate class
