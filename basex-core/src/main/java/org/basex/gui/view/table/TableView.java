@@ -231,9 +231,7 @@ public final class TableView extends View {
     final Context context = gui.context;
     final Data data = gui.context.data();
 
-    if(tdata.rows == null) return;
-
-    if(e.getY() < header.getHeight()) return;
+    if(tdata.rows == null || e.getY() < header.getHeight()) return;
 
     if(SwingUtilities.isLeftMouseButton(e)) {
       if(e.getClickCount() == 1) {

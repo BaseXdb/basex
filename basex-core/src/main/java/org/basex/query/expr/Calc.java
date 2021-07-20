@@ -89,8 +89,8 @@ public enum Calc {
       if(type1 == DAY_TIME_DURATION && type2 == DAY_TIME_DURATION) return DAY_TIME_DURATION;
       if(type1 == DATE_TIME || type2 == DATE_TIME) return DATE_TIME;
       if(type1 == DATE || type2 == DATE) return DATE;
-      if(type1 == TIME && type2 == DAY_TIME_DURATION) return TIME;
-      if(type1 == DAY_TIME_DURATION && type2 == TIME) return TIME;
+      if(type1 == TIME && type2 == DAY_TIME_DURATION ||
+         type1 == DAY_TIME_DURATION && type2 == TIME) return TIME;
       return numType(type1, type2);
     }
 
@@ -166,8 +166,8 @@ public enum Calc {
 
     @Override
     public Type type(final Type type1, final Type type2) {
-      if(type1 == DATE_TIME && type2 == DATE_TIME) return DAY_TIME_DURATION;
-      if(type1 == DATE && type2 == DATE) return DAY_TIME_DURATION;
+      if(type1 == DATE_TIME && type2 == DATE_TIME ||
+         type1 == DATE && type2 == DATE) return DAY_TIME_DURATION;
       if(type1 == TIME && type2 == TIME) return DAY_TIME_DURATION;
       if(type1 == DATE_TIME) return DATE_TIME;
       if(type1 == DATE) return DATE;

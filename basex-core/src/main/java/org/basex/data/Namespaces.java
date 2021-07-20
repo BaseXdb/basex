@@ -132,9 +132,9 @@ public final class Namespaces {
       final NSNode child = root.child(0);
       final int[] values = child.values();
       // give up if child node has more children or more than one namespace
-      if(child.children() > 0 || child.pre() != 1 || values.length != 2) return null;
       // give up if namespace has a non-empty prefix
-      if(prefix(values[0]).length != 0) return null;
+      if(child.children() > 0 || child.pre() != 1 || values.length != 2 ||
+          prefix(values[0]).length != 0) return null;
       // check if all documents have the same default namespace
       if(c == 0) {
         id = values[1];

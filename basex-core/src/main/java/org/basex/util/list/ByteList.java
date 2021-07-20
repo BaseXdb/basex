@@ -116,7 +116,7 @@ public class ByteList extends ElementList {
    * @return self reference
    */
   public ByteList reverse() {
-    byte[] lst = list;
+    final byte[] lst = list;
     for(int l = 0, r = size - 1; l < r; l++, r--) {
       final byte tmp = lst[l];
       lst[l] = lst[r];

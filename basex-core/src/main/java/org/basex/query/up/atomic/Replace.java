@@ -83,11 +83,8 @@ final class Replace extends StructuralUpdate {
     final List<BasicUpdate> valueUpdates = new ArrayList<>();
     for(int c = 0; c < srcSize; c++) {
       final int s = clip.start + c, t = location + c, sk = src.kind(s), tk = data.kind(t);
-      if(sk != tk)
-        return false;
       // distance can differ for first two tuples
-      if(c > 0 && src.dist(s, sk) != data.dist(t, tk))
-        return false;
+      if(sk != tk || c > 0 && src.dist(s, sk) != data.dist(t, tk)) return false;
       // check texts, comments and documents
       if(sk == Data.TEXT || sk == Data.COMM || sk == Data.DOC) {
         final byte[] srcText = src.text(s, true);

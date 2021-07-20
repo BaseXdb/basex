@@ -725,10 +725,9 @@ public class QueryParser extends InputParser {
   private void importModule(final ModInfo mi) throws QueryException {
     final byte[] uri = mi.uri;
     if(mi.paths.isEmpty()) {
-      // no paths specified: skip statically available modules
-      if(Functions.staticURI(uri)) return;
-      // try to resolve module uri
-      if(qc.resources.modules().addImport(string(uri), this, mi.info)) return;
+      // no paths specified: skip statically available modules; try to resolve module uri
+      if(Functions.staticURI(uri) || qc.resources.modules().addImport(string(uri), this, mi.info))
+        return;
       // module not found
       throw WHICHMOD_X.get(mi.info, uri);
     }

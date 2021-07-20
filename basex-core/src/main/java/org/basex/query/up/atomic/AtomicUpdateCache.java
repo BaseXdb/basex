@@ -498,10 +498,9 @@ public final class AtomicUpdateCache {
     final int b = pre + 1;
     // don't leave table
     if(pre >= s || b >= s || pre < 0 || b < 0) return null;
-    // only merge texts
-    if(data.kind(pre) != Data.TEXT || data.kind(b) != Data.TEXT) return null;
-    // only merge neighboring texts
-    if(data.parent(pre, Data.TEXT) != data.parent(b, Data.TEXT)) return null;
+    // only merge texts and neighboring texts
+    if(data.kind(pre) != Data.TEXT || data.kind(b) != Data.TEXT ||
+       data.parent(pre, Data.TEXT) != data.parent(b, Data.TEXT)) return null;
 
     // apply text node updates on the fly and throw them away
     UpdateValue.getInstance(data, pre, Token.concat(data.text(pre, true),

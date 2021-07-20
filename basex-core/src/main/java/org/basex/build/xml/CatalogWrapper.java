@@ -92,7 +92,7 @@ public final class CatalogWrapper {
     final String catfile = options.get(MainOptions.CATFILE);
     if(XMLRESOLVER != null && !catfile.isEmpty()) {
       final StringList catalogs = new StringList();
-      for(String path : catfile.split(";")) catalogs.add(new File(path).getAbsolutePath());
+      for(final String path : catfile.split(";")) catalogs.add(new File(path).getAbsolutePath());
       return (LSResourceResolver) Reflect.get(XMLRESOLVER, new Object[] { catalogs.finish() });
     }
     return null;

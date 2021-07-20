@@ -708,7 +708,7 @@ public final class GUI extends JFrame implements BaseXWindow {
         latest = new Version(matcher.group(2));
         gopts.set(GUIOptions.UPDATEVERSION, latest.toString());
       }
-    } catch(IOException ex) {
+    } catch(final IOException ex) {
       Util.debug(ex);
     }
 

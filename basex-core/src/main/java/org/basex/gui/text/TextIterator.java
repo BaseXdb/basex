@@ -187,8 +187,7 @@ final class TextIterator {
    * @return result of check
    */
   boolean searchStart() {
-    if(searchResults == null) return false;
-    if(searchIndex == searchResults[0].size()) return false;
+    if(searchResults == null || searchIndex == searchResults[0].size()) return false;
     while(pos > searchResults[1].get(searchIndex)) {
       if(++searchIndex == searchResults[0].size()) return false;
     }

@@ -659,8 +659,8 @@ public abstract class JavaCall extends Arr {
     if(type != null) return type;
 
     if(object instanceof Element) return NodeType.ELEMENT;
-    if(object instanceof Document) return NodeType.DOCUMENT_NODE;
-    if(object instanceof DocumentFragment) return NodeType.DOCUMENT_NODE;
+    if(object instanceof Document ||
+       object instanceof DocumentFragment) return NodeType.DOCUMENT_NODE;
     if(object instanceof Attr) return NodeType.ATTRIBUTE;
     if(object instanceof Comment) return NodeType.COMMENT;
     if(object instanceof ProcessingInstruction) return NodeType.PROCESSING_INSTRUCTION;

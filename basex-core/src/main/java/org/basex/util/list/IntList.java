@@ -239,7 +239,7 @@ public class IntList extends ElementList {
    * @return self reference
    */
   public IntList reverse() {
-    int[] lst = list;
+    final int[] lst = list;
     for(int l = 0, r = size - 1; l < r; l++, r--) {
       final int tmp = lst[l];
       lst[l] = lst[r];

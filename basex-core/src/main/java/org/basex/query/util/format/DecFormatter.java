@@ -238,10 +238,7 @@ public final class DecFormatter extends FormatUtil {
 
       // "A sub-picture that contains a percent-sign or per-mille-sign must not contain a character
       // treated as an exponent-separator-sign."
-      if(per && exp) return false;
-
-      // (*) continued
-      if(exp && !expAct) return false;
+      if(per && exp || exp && !expAct) return false;
     }
 
     // everything ok
