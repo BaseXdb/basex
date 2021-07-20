@@ -41,21 +41,21 @@ final class DynJavaFunc extends DynJavaCall {
    */
   DynJavaFunc(final Class<?> clazz, final String name, final String[] types,
       final Expr[] args, final StaticContext sc, final InputInfo info) {
-
     super(clazz, types, args, sc, info);
     this.name = name;
   }
 
   /**
-   * Initializes the dynamic call.
+   * Initializes the dynamic call (happens at parse time).
    * @param enforce enforce checks
    * @return success flag
    * @throws QueryException query exception
    */
   public boolean init(final boolean enforce) throws QueryException {
-    // field candidate
     final IntList arities = new IntList();
     final int arity = exprs.length;
+
+    // field candidate
     try {
       final Field f = clazz.getField(name);
       final int al = isStatic(f) ? 0 : 1;
@@ -79,7 +79,7 @@ final class DynJavaFunc extends DynJavaCall {
     final TokenList names = new TokenList();
     for(final String mthd : allMethods.keySet()) names.add(mthd);
     for(final Field fld : clazz.getFields()) names.add(fld.getName());
-    throw noFunction(name, types, arity, name(), arities, names.finish(), info);
+    throw noMember(name, types, arity, name(), arities, names.finish(), info);
   }
 
   @Override
@@ -91,27 +91,25 @@ final class DynJavaFunc extends DynJavaCall {
   }
 
   /**
-   * Tries to return the value of a field.
+   * Returns the value of a field.
    * @param qc query context
    * @return result and class instance (instance can be {@code null})
    * @throws QueryException exception
    */
   private Object[] field(final QueryContext qc) throws QueryException {
-    final JavaEval je = new JavaEval(this, qc);
     final Object instance = instance(isStatic(field), qc);
 
     try {
       return new Object[] { field.get(instance), instance };
     } catch(final IllegalArgumentException ex) {
-      Util.debug(ex);
-      throw instanceExpected();
+      throw instanceExpected(ex);
     } catch(final Throwable th) {
-      throw je.executionError(th);
+      throw executionError(th, new Object[0]);
     }
   }
 
   /**
-   * Calls a method.
+   * Returns the result of a method invocation.
    * @param qc query context
    * @return result and class instance (instance can be {@code null})
    * @throws QueryException exception
@@ -119,10 +117,12 @@ final class DynJavaFunc extends DynJavaCall {
   private Object[] method(final QueryContext qc) throws QueryException {
     // find methods with matching parameters
     final ArrayList<Method> candidates = new ArrayList<>(1);
-    final JavaEval je = new JavaEval(this, qc);
+    Object[] args = null;
     for(final Method method : methods) {
-      if(je.match(method.getParameterTypes(), isStatic(method), null)) {
+      final Object[] tmp = args(method.getParameterTypes(), isStatic(method), null, qc);
+      if(tmp != null) {
         candidates.add(method);
+        args = tmp;
       }
     }
     if(candidates.size() != 1) throw noCandidate(methods.toArray(new Executable[0]),
@@ -139,12 +139,11 @@ final class DynJavaFunc extends DynJavaCall {
 
     // invoke found method
     try {
-      return new Object[] { method.invoke(instance, je.args), instance };
+      return new Object[] { method.invoke(instance, args), instance };
     } catch(final IllegalArgumentException ex) {
-      Util.debug(ex);
-      throw instanceExpected();
+      throw instanceExpected(ex);
     } catch(final Throwable th) {
-      throw je.executionError(th);
+      throw executionError(th, args);
     }
   }
 

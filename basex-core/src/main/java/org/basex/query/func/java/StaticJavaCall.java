@@ -65,27 +65,27 @@ public final class StaticJavaCall extends JavaCall {
 
   @Override
   protected Value eval(final QueryContext qc, final WrapOptions wrap) throws QueryException {
-    final JavaEval je = new JavaEval(this, qc);
-    if(je.match(params, true, values)) {
-      // assign query context if module is inheriting the {@link QueryModule} interface
-      if(module instanceof QueryModule) {
-        final QueryModule qm = (QueryModule) module;
-        qm.staticContext = sc;
-        qm.queryContext = qc;
-      }
-
-      // invoke found method
-      try {
-        final Object result = method.invoke(module, je.args);
-        if(wrap == WrapOptions.INSTANCE) return new XQJava(module);
-        if(wrap == WrapOptions.VOID) return Empty.VALUE;
-        return toValue(result, qc, info, wrap);
-      } catch(final Throwable th) {
-        throw je.executionError(th);
-      }
-    }
     // arguments could not be matched: raise error
-    throw JAVAARGS_X_X_X.get(info, name(), JavaCall.paramTypes(method, true), argTypes(exprs));
+    final Object[] args = args(params, true, values, qc);
+    if(args == null) throw JAVAARGS_X_X_X.get(info, name(),
+        JavaCall.paramTypes(method, true), argTypes(exprs));
+
+    // assign query context if module is inheriting the {@link QueryModule} interface
+    if(module instanceof QueryModule) {
+      final QueryModule qm = (QueryModule) module;
+      qm.staticContext = sc;
+      qm.queryContext = qc;
+    }
+
+    // invoke found method
+    try {
+      final Object result = method.invoke(module, args);
+      if(wrap == WrapOptions.INSTANCE) return new XQJava(module);
+      if(wrap == WrapOptions.VOID) return Empty.VALUE;
+      return toValue(result, qc, info, wrap);
+    } catch(final Throwable th) {
+      throw executionError(th, args);
+    }
   }
 
   @Override

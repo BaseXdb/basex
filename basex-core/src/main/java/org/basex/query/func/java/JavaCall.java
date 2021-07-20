@@ -88,6 +88,67 @@ public abstract class JavaCall extends Arr {
    */
   protected abstract Value eval(QueryContext qc, WrapOptions wrap) throws QueryException;
 
+  /**
+   * Converts the XQuery arguments to Java arguments.
+   * @param params parameter types
+   * @param stat static flag
+   * @param xquery indicates which parameter types are XQuery values (can be {@code null})
+   * @param qc query context
+   * @return converted arguments or {@code null}
+   * @throws QueryException query exception
+   */
+  final Object[] args(final Class<?>[] params, final boolean stat, final boolean[] xquery,
+      final QueryContext qc) throws QueryException {
+
+    // start with second argument if function is not static
+    final int s = stat ? 0 : 1, pl = params.length;
+    if(pl != exprs.length - s) return null;
+
+    // function arguments
+    final Object[] values = new Object[pl];
+    for(int p = 0; p < pl; p++) {
+      final Class<?> param = params[p];
+      final Expr expr = exprs[s + p];
+
+      if(param == Expr.class) {
+        values[p] = expr;
+      } else {
+        final Value arg = expr.value(qc);
+        exprs[s + p] = arg;
+        final Type type = JavaMapping.type(param, true);
+        if(type != null && arg.type.instanceOf(type)) {
+          // convert to Java object if an XQuery type exists for the function parameter
+          values[p] = arg.toJava();
+        } else {
+          // convert to Java object
+          // - if argument is a Java object wrapper, or
+          // - if function parameter is not a {@link Value} instance
+          final boolean convert = arg instanceof XQJava ||
+              !(xquery != null ? xquery[p] : Value.class.isAssignableFrom(params[p]));
+          values[p] = convert ? arg.toJava() : arg;
+
+          // if argument is no instance of the function parameter, check for null value
+          if(!param.isInstance(values[p]) && (values[p] != null || param.isPrimitive()))
+            return null;
+        }
+      }
+    }
+    return values;
+  }
+
+  /**
+   * Returns a Java execution error.
+   * @param th throwable
+   * @param args converted arguments
+   * @return exception
+   */
+  final QueryException executionError(final Throwable th, final Object[] args) {
+    Util.debug(th);
+    final Throwable root = Util.rootException(th);
+    return root instanceof QueryException ? ((QueryException) root).info(info) :
+      JAVAEXEC_X_X_X.get(info, root, name(), JavaCall.argTypes(args));
+  }
+
   // STATIC METHODS ===============================================================================
 
   /**
@@ -306,7 +367,7 @@ public abstract class JavaCall extends Arr {
     if(ms == 0) {
       final TokenList names = new TokenList();
       for(final String mthd : allMethods.keySet()) names.add(mthd);
-      throw noFunction(name, types, arity, string(qname.string()), arities, names.finish(), info);
+      throw noMember(name, types, arity, string(qname.string()), arities, names.finish(), info);
     }
     if(ms > 1) throw JAVAMULTIPLE_X_X.get(info, qname.string(),
         paramTypes(methods.toArray(new Executable[0]), false));
@@ -329,7 +390,7 @@ public abstract class JavaCall extends Arr {
    * @param info input info
    * @return exception
    */
-  static QueryException noFunction(final String name, final String[] types, final int arity,
+  static QueryException noMember(final String name, final String[] types, final int arity,
       final String full, final IntList arities, final byte[][] names, final InputInfo info) {
     // functions with different arities
     if(!arities.isEmpty()) return Functions.wrongArity(full, arity, arities, info);
@@ -383,8 +444,7 @@ public abstract class JavaCall extends Arr {
   static ArrayList<Method> filter(final HashMap<String, ArrayList<Method>> methods,
       final String name, final String[] types, final int arity, final IntList arities,
       final boolean stat) {
-    final ArrayList<Method> list = new ArrayList<>(1);
-    final ArrayList<Method> mthds = methods.get(name);
+    final ArrayList<Method> list = new ArrayList<>(1), mthds = methods.get(name);
     if(mthds != null) {
       for(final Method method : mthds) {
         final Class<?>[] params = method.getParameterTypes();
@@ -504,11 +564,12 @@ public abstract class JavaCall extends Arr {
 
   /**
    * Checks if the specified executable is static.
+   * Constructor is treated as static, as no instance reference exists.
    * @param exec executable (constructor, method)
    * @return result of check
    */
   static boolean isStatic(final Executable exec) {
-    return Modifier.isStatic(exec.getModifiers());
+    return exec instanceof Constructor || Modifier.isStatic(exec.getModifiers());
   }
 
   /**

@@ -1016,8 +1016,6 @@ public enum QueryError {
   FUNCNOIMPL_X(XPST, 17, "External function not implemented: %."),
 
   /** Error code. */
-  JAVACONSTR_X_X(XPST, 17, "Unknown constructor: %#%."),
-  /** Error code. */
   JAVAINIT_X_X(XPST, 17, "%: %."),
   /** Error code. */
   JAVACLASS_X(XPST, 17, "Unknown class: %."),

@@ -1,6 +1,5 @@
 package org.basex.query.func.java;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.lang.reflect.*;
@@ -9,11 +8,13 @@ import java.util.*;
 import org.basex.core.MainOptions.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Dynamic invocation of a Java constructor.
@@ -39,42 +40,51 @@ final class DynJavaConstr extends DynJavaCall {
   }
 
   /**
-   * Initializes the dynamic call.
+   * Initializes the dynamic call (happens at parse time).
    * @param enforce enforce checks
    * @return {@code true} if at least one candidate for invocation was found
    * @throws QueryException query exception
    */
   public boolean init(final boolean enforce) throws QueryException {
-    final int el = exprs.length;
+    final IntList arities = new IntList();
+    final int arity = exprs.length;
 
-    // method candidates: no check supplied expression: class instance or does not
     constrs = new ArrayList<>();
     for(final Constructor<?> cnstr : clazz.getConstructors()) {
       final Class<?>[] params = cnstr.getParameterTypes();
-      if(params.length == el && typesMatch(params, types)) constrs.add(cnstr);
+      final int pl = params.length;
+      if(pl == arity) {
+        if(typesMatch(params, types)) constrs.add(cnstr);
+      } else {
+        arities.add(pl);
+      }
     }
     if(!constrs.isEmpty()) return true;
     if(!enforce) return false;
 
-    throw JAVACONSTR_X_X.get(info, name(), el);
+    throw Functions.wrongArity(name(), arity, arities, info);
   }
 
   @Override
   protected Value eval(final QueryContext qc, final WrapOptions wrap) throws QueryException {
     // find constructors with matching parameters
     final ArrayList<Constructor<?>> candidates = new ArrayList<>(1);
-    final JavaEval je = new JavaEval(this, qc);
+    Object[] args = null;
     for(final Constructor<?> cnstr : constrs) {
-      if(je.match(cnstr.getParameterTypes(), true, null)) candidates.add(cnstr);
+      final Object[] tmp = args(cnstr.getParameterTypes(), true, null, qc);
+      if(tmp != null) {
+        candidates.add(cnstr);
+        args = tmp;
+      }
     }
     if(candidates.size() != 1) throw noCandidate(constrs.toArray(new Executable[0]),
         candidates.toArray(new Executable[0]));
 
     // single constructor found: instantiate class
     try {
-      return new XQJava(candidates.get(0).newInstance(je.args));
+      return new XQJava(candidates.get(0).newInstance(args));
     } catch(final Throwable th) {
-      throw je.executionError(th);
+      throw executionError(th, args);
     }
   }
 
@@ -92,7 +102,7 @@ final class DynJavaConstr extends DynJavaCall {
 
   @Override
   String name() {
-    return className(clazz);
+    return className(clazz) + COL + NEW;
   }
 
   @Override

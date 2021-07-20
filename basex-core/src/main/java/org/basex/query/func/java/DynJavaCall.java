@@ -54,7 +54,7 @@ abstract class DynJavaCall extends JavaCall {
     final Value value = exprs[0].value(qc);
     exprs[0] = value;
     final Object object = value.toJava();
-    if(object == null) throw instanceExpected();
+    if(object == null) throw instanceExpected(null);
     return object;
   }
 
@@ -70,22 +70,23 @@ abstract class DynJavaCall extends JavaCall {
 
     final Executable single = execs.length == 1 ? execs[0] : null;
     final int el = exprs.length;
-    final ExprList tmp = new ExprList(el);
+    final ExprList list = new ExprList(el);
     int e = single != null && !isStatic(single) || el > 0 &&
         (exprs[0] instanceof XQJava || exprs[0] instanceof JavaCall) ? 0 : -1;
-    while(++e < el) tmp.add(exprs[e]);
+    while(++e < el) list.add(exprs[e]);
 
-    if(single != null) return JAVAARGS_X_X_X.get(info, name(), paramTypes(single, true),
-        argTypes(tmp.finish()));
-
-    return JAVANONE_X_X_X.get(info, name(), argTypes(tmp.finish()), paramTypes(execs, true));
+    final String args = argTypes(list.finish());
+    return single != null ? JAVAARGS_X_X_X.get(info, name(), paramTypes(single, true), args) :
+      JAVANONE_X_X_X.get(info, name(), args, paramTypes(execs, true));
   }
 
   /**
    * Returns an error for field/method invocations in which first argument is no class instance.
+   * @param ex exception (can be {@code null})
    * @return exception
    */
-  final QueryException instanceExpected() {
+  final QueryException instanceExpected(final Exception ex) {
+    if(ex != null) Util.debug(ex);
     return JAVANOINSTANCE_X_X.get(info, JavaCall.className(clazz), JavaCall.argType(exprs[0]));
   }
 
