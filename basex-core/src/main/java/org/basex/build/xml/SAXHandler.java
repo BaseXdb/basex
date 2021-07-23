@@ -66,11 +66,9 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
     try {
       finishText();
 
-      final int as = attr.getLength();
-      for(int a = 0; a < as; ++a) {
-        final byte[] an = token(attr.getQName(a));
-        final byte[] av = token(attr.getValue(a));
-        atts.add(stripNS ? local(an) : an, av);
+      final int al = attr.getLength();
+      for(int a = 0; a < al; a++) {
+        atts.add(token(attr.getQName(a)), token(attr.getValue(a)), stripNS);
       }
       final byte[] en = token(name);
       builder.openElem(stripNS ? local(en) : en, atts, nsp);

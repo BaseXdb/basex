@@ -152,7 +152,7 @@ public class XMLParser extends SingleParser {
         if(!stripNS) nsp.add(EMPTY, av);
       } else {
         // add attribute
-        atts.add(stripNS ? local(an) : an, av);
+        atts.add(an, av, stripNS);
       }
 
       if(scanner.type != Type.R_BR && scanner.type != Type.CLOSE_R_BR) {

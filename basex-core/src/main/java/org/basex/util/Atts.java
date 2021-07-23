@@ -61,6 +61,23 @@ public final class Atts extends ElementList {
   }
 
   /**
+   * Adds the next name/value pair.
+   * @param name name to be added (can be {@code null})
+   * @param value value to be added (can be {@code null})
+   * @param stripNS strip namespaces
+   * @return self reference
+   */
+  public Atts add(final byte[] name, final byte[] value, final boolean stripNS) {
+    byte[] an = name;
+    if(stripNS) {
+      an = Token.local(an);
+      int c = 0;
+      while(contains(an)) an = Token.concat(Token.local(an), '_', Token.token(++c));
+    }
+    return add(an, value);
+  }
+
+  /**
    * Removes the element at the specified position.
    * @param index entry index
    * @return self reference

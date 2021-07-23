@@ -61,14 +61,13 @@ public final class DOMWrapper extends Parser {
           final int as = at.getLength();
           for(int a = 0; a < as; ++a) {
             final Attr att = (Attr) at.item(a);
-            final byte[] an = token(att.getName());
-            final byte[] av = token(att.getValue());
+            final byte[] an = token(att.getName()), av = token(att.getValue());
             if(eq(an, XMLNS)) {
               if(!stripNS) nsp.add(EMPTY, av);
             } else if(startsWith(an, XMLNS_COLON)) {
               if(!stripNS) nsp.add(local(an), av);
             } else {
-              atts.add(stripNS ? local(an) : an, av);
+              atts.add(an, av, stripNS);
             }
           }
           final byte[] en = token(n.getNodeName());

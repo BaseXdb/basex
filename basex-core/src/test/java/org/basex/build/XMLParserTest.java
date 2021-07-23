@@ -17,16 +17,12 @@ import org.junit.jupiter.api.Test;
  * @author Christian Gruen
  */
 public final class XMLParserTest extends SandboxTest {
-  /**
-   * Prepares the tests.
-   */
+  /** Prepares the tests. */
   @BeforeEach public void before() {
     set(MainOptions.MAINMEM, true);
   }
 
-  /**
-   * Finishes the tests.
-   */
+  /** Finishes the tests. */
   @AfterEach public void after() {
     set(MainOptions.MAINMEM, false);
     set(MainOptions.CHOP, true);
@@ -35,9 +31,7 @@ public final class XMLParserTest extends SandboxTest {
     set(MainOptions.INTPARSE, true);
   }
 
-  /**
-   * Tests the internal parser (Option {@link MainOptions#INTPARSE}).
-   */
+  /** Tests the internal parser (Option {@link MainOptions#INTPARSE}). */
   @Test public void intParse() {
     set(MainOptions.CHOP, false);
 
@@ -78,11 +72,8 @@ public final class XMLParserTest extends SandboxTest {
     if(sb.length() != 0) fail(sb.toString());
   }
 
-  /**
-   * Empty elements with 31 attributes.
-   * @throws Exception exception
-   */
-  @Test public void gh1648() throws Exception {
+  /** Empty elements with 31 attributes. */
+  @Test public void gh1648() {
     set(MainOptions.INTPARSE, true);
 
     // build document with various number of arguments (30..33)
@@ -91,14 +82,13 @@ public final class XMLParserTest extends SandboxTest {
       for(int i = 0; i < a; i++) doc.append(" a").append(a).append("=''");
       doc.append("/>");
 
-      new CreateDB(NAME, doc.toString()).execute(context);
-      new XQuery("_[_]").execute(context);
+      execute(new CreateDB(NAME, doc.toString()));
+      query("_[_]", "");
+      query("count(_/@*)", a);
     }
   }
 
-  /**
-   * Tests the namespace stripping option (Option {@link MainOptions#STRIPNS}).
-   */
+  /** Tests the namespace stripping option (Option {@link MainOptions#STRIPNS}). */
   @Test public void parse() {
     set(MainOptions.STRIPNS, true);
     set(MainOptions.SERIALIZER, SerializerMode.NOINDENT.get());
@@ -128,5 +118,13 @@ public final class XMLParserTest extends SandboxTest {
       execute(new CreateDB(NAME, in));
       assertEquals(out, query("."), "Internal parser: " + b);
     }
+  }
+
+  /** STRIPNS option with identical attribute names. */
+  @Test public void gh2027() {
+    set(MainOptions.STRIPNS, true);
+
+    execute(new CreateDB(NAME, "<a a:a='x' b:a='y' xmlns:a='a' xmlns:b='b'/>"));
+    query("/a/@* ! name()", "a\na_1");
   }
 }
