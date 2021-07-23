@@ -32,8 +32,6 @@ public final class StaticJavaCall extends JavaCall {
   private final Method method;
   /** Method parameter types. */
   private final Class<?>[] params;
-  /** Indicates if function parameters are of (sub)class {@link Value}. */
-  private final boolean[] values;
 
   /**
    * Constructor.
@@ -54,8 +52,8 @@ public final class StaticJavaCall extends JavaCall {
     params = method.getParameterTypes();
 
     final int pl = params.length;
-    values = new boolean[pl];
-    for(int p = 0; p < pl; p++) values[p] = Value.class.isAssignableFrom(params[p]);
+    xquery = new boolean[pl];
+    for(int p = 0; p < pl; p++) xquery[p] = Value.class.isAssignableFrom(params[p]);
   }
 
   @Override
@@ -66,7 +64,7 @@ public final class StaticJavaCall extends JavaCall {
   @Override
   protected Value eval(final QueryContext qc, final WrapOptions wrap) throws QueryException {
     // arguments could not be matched: raise error
-    final Object[] args = args(params, true, values, qc);
+    final Object[] args = args(values(qc), params, true);
     if(args == null) throw JAVAARGS_X_X_X.get(info, name(),
         JavaCall.paramTypes(method, true), argTypes(exprs));
 

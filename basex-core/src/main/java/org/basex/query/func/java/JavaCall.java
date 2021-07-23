@@ -22,6 +22,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -49,6 +50,8 @@ public abstract class JavaCall extends Arr {
   final Perm perm;
   /** Updating flag. */
   final boolean updating;
+  /** Indicates if function parameters are XQuery types. */
+  boolean[] xquery;
 
   /**
    * Constructor.
@@ -89,49 +92,54 @@ public abstract class JavaCall extends Arr {
   protected abstract Value eval(QueryContext qc, WrapOptions wrap) throws QueryException;
 
   /**
+   * Evaluates the arguments.
+   * @param qc query context
+   * @return arguments
+   * @throws QueryException query exception
+   */
+  final Value[] values(final QueryContext qc) throws QueryException {
+    final ValueList list = new ValueList(exprs.length);
+    for(final Expr expr : exprs) list.add(expr.value(qc));
+    return list.finish();
+  }
+
+  /**
    * Converts the XQuery arguments to Java arguments.
+   * @param args arguments
    * @param params parameter types
    * @param stat static flag
-   * @param xquery indicates which parameter types are XQuery values (can be {@code null})
-   * @param qc query context
    * @return converted arguments or {@code null}
    * @throws QueryException query exception
    */
-  final Object[] args(final Class<?>[] params, final boolean stat, final boolean[] xquery,
-      final QueryContext qc) throws QueryException {
+  final Object[] args(final Value[] args, final Class<?>[] params, final boolean stat)
+      throws QueryException {
 
     // start with second argument if function is not static
     final int s = stat ? 0 : 1, pl = params.length;
-    if(pl != exprs.length - s) return null;
+    if(pl != args.length - s) return null;
 
     // function arguments
     final Object[] values = new Object[pl];
     for(int p = 0; p < pl; p++) {
       final Class<?> param = params[p];
-      final Expr expr = exprs[s + p];
-
-      if(param == Expr.class) {
-        values[p] = expr;
-      } else {
-        final Value arg = expr.value(qc);
-        exprs[s + p] = arg;
+      final Value arg = args[p + s];
+      Object value = arg;
+      if(param != Expr.class) {
         final Type type = JavaMapping.type(param, true);
         if(type != null && arg.type.instanceOf(type)) {
           // convert to Java object if an XQuery type exists for the function parameter
-          values[p] = arg.toJava();
+          value = arg.toJava();
         } else {
           // convert to Java object
           // - if argument is a Java object wrapper, or
           // - if function parameter is not a {@link Value} instance
-          final boolean convert = arg instanceof XQJava ||
-              !(xquery != null ? xquery[p] : Value.class.isAssignableFrom(params[p]));
-          values[p] = convert ? arg.toJava() : arg;
-
+          if(arg instanceof XQJava || !(xquery != null ? xquery[p] :
+            Value.class.isAssignableFrom(params[p]))) value = arg.toJava();
           // if argument is no instance of the function parameter, check for null value
-          if(!param.isInstance(values[p]) && (values[p] != null || param.isPrimitive()))
-            return null;
+          if(!param.isInstance(value) && (value != null || param.isPrimitive())) return null;
         }
       }
+      values[p] = value;
     }
     return values;
   }

@@ -69,9 +69,10 @@ final class DynJavaConstr extends DynJavaCall {
   protected Value eval(final QueryContext qc, final WrapOptions wrap) throws QueryException {
     // find constructors with matching parameters
     final ArrayList<Constructor<?>> candidates = new ArrayList<>(1);
+    final Value[] values = values(qc);
     Object[] args = null;
     for(final Constructor<?> cnstr : constrs) {
-      final Object[] tmp = args(cnstr.getParameterTypes(), true, null, qc);
+      final Object[] tmp = args(values, cnstr.getParameterTypes(), true);
       if(tmp != null) {
         candidates.add(cnstr);
         args = tmp;

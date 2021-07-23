@@ -97,8 +97,7 @@ final class DynJavaFunc extends DynJavaCall {
    * @throws QueryException exception
    */
   private Object[] field(final QueryContext qc) throws QueryException {
-    final Object instance = instance(isStatic(field), qc);
-
+    final Object instance = instance(values(qc), isStatic(field));
     try {
       return new Object[] { field.get(instance), instance };
     } catch(final IllegalArgumentException ex) {
@@ -117,9 +116,10 @@ final class DynJavaFunc extends DynJavaCall {
   private Object[] method(final QueryContext qc) throws QueryException {
     // find methods with matching parameters
     final ArrayList<Method> candidates = new ArrayList<>(1);
+    final Value[] values = values(qc);
     Object[] args = null;
     for(final Method method : methods) {
-      final Object[] tmp = args(method.getParameterTypes(), isStatic(method), null, qc);
+      final Object[] tmp = args(values, method.getParameterTypes(), isStatic(method));
       if(tmp != null) {
         candidates.add(method);
         args = tmp;
@@ -130,7 +130,7 @@ final class DynJavaFunc extends DynJavaCall {
 
     // assign query context if module is inheriting the {@link QueryModule} interface
     final Method method = candidates.get(0);
-    final Object instance = instance(isStatic(method), qc);
+    final Object instance = instance(values, isStatic(method));
     if(instance instanceof QueryModule) {
       final QueryModule qm = (QueryModule) instance;
       qm.staticContext = sc;

@@ -109,9 +109,13 @@ public final class JavaFunctionTest extends SandboxTest {
     query("import module namespace qm = 'java:org.basex.query.func.QueryModuleTest';" +
         "qm:functionNS()", "http://www.w3.org/2005/xpath-functions");
     query("import module namespace qm = 'java:org.basex.query.func.QueryModuleTest';" +
-        "qm:ignore((1 to 1000000000)[. = 0])", "");
-    query("import module namespace qm = 'java:org.basex.query.func.QueryModuleTest';" +
         "qm:faculty(1 to 5)", "120");
+  }
+
+  /** Expression argument. */
+  @Test public void expr() {
+    query("import module namespace qm = 'java:org.basex.query.func.QueryModuleTest';" +
+        "qm:ignore((1 to 10)[. > 1])", "");
   }
 
   /** Tests importing a Java class and throwing errors. */

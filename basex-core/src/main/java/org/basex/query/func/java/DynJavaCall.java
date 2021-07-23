@@ -43,17 +43,14 @@ abstract class DynJavaCall extends JavaCall {
 
   /**
    * Evaluates the first argument.
+   * @param args arguments
    * @param stat static flag
    * @return Java object (can be {@code null})
-   * @param qc query context
    * @throws QueryException query exception
    */
-  final Object instance(final boolean stat, final QueryContext qc) throws QueryException {
+  final Object instance(final Value[] args, final boolean stat) throws QueryException {
     if(stat) return null;
-
-    final Value value = exprs[0].value(qc);
-    exprs[0] = value;
-    final Object object = value.toJava();
+    final Object object = args[0].toJava();
     if(object == null) throw instanceExpected(null);
     return object;
   }
