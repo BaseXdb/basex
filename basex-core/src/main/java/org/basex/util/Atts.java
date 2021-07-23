@@ -68,12 +68,12 @@ public final class Atts extends ElementList {
    * @return self reference
    */
   public Atts add(final byte[] name, final byte[] value, final boolean stripNS) {
-    byte[] an = name;
-    if(stripNS) {
-      an = Token.local(an);
-      int c = 0;
-      while(contains(an)) an = Token.concat(Token.local(an), '_', Token.token(++c));
-    }
+    if(!stripNS) return add(name, value);
+
+    final byte[] local = Token.local(name);
+    byte[] an = local;
+    int c = 0;
+    while(contains(an)) an = Token.concat(local, '_', Token.token(++c));
     return add(an, value);
   }
 

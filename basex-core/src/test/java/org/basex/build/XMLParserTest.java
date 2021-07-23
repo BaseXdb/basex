@@ -126,5 +126,8 @@ public final class XMLParserTest extends SandboxTest {
 
     execute(new CreateDB(NAME, "<a a:a='x' b:a='y' xmlns:a='a' xmlns:b='b'/>"));
     query("/a/@* ! name()", "a\na_1");
+
+    execute(new CreateDB(NAME, "<a a:a='x' b:a='y' c:a='z' xmlns:a='a' xmlns:b='b' xmlns:c='c'/>"));
+    query("/a/@* ! name()", "a\na_1\na_2");
   }
 }
