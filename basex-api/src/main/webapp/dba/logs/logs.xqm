@@ -72,11 +72,7 @@ function dba:logs(
   $page   as xs:string,
   $time   as xs:string?
 ) as element(html) {
-  let $files := (
-    for $file in admin:logs()
-    order by $file descending
-    return $file
-  )
+  let $files := reverse(sort(admin:logs()))
   let $name := if($name) then $name else string(head($files))
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
@@ -94,7 +90,7 @@ function dba:logs(
               map { 'key': 'size', 'label': 'Size', 'type': 'bytes' }
             )
             let $entries := 
-              for $entry in reverse(sort($files))
+              for $entry in $files
               return map {
                 'name': function() {
                   let $link := html:link(
