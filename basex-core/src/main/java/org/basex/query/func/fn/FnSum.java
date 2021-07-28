@@ -147,7 +147,7 @@ public class FnSum extends StandardFunc {
     Item result = item.type.isUntyped() ? Dbl.get(item.dbl(info)) : item;
     final boolean num = result instanceof ANum;
     final boolean dtd = result.type == DAY_TIME_DURATION, ymd = result.type == YEAR_MONTH_DURATION;
-    if(!num && !dtd && !ymd) throw SUM_X_X.get(info, result.type, result);
+    if(!num && !dtd && !ymd) throw NUMDUR_X_X.get(info, result.type, result);
 
     int c = 1;
     for(Item it; (it = qc.next(iter)) != null;) {
@@ -164,7 +164,7 @@ public class FnSum extends StandardFunc {
           tp = DURATION;
         }
       }
-      if(tp != null) throw CMP_X_X_X.get(info, tp, type, it);
+      if(tp != null) throw ARGTYPE_X_X_X.get(info, tp, type, it);
       result = Calc.PLUS.eval(result, it, info);
       c++;
     }

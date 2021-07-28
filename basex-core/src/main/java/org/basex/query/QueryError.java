@@ -690,13 +690,11 @@ public enum QueryError {
   EXACTLYONE(FORG, 5, "Exactly one item expected."),
 
   /** Error code. */
-  CMP_X(FORG, 6, "Type % is not comparable."),
+  ARGTYPE_X_X_X(FORG, 6, "% expected, % found: %."),
   /** Error code. */
-  CMP_X_X_X(FORG, 6, "% expected, % found: %."),
+  COMPARE_X_X(FORG, 6, "Type % cannot be compared: %."),
   /** Error code. */
-  EBV_X_X(FORG, 6, "Number, string, boolean, URI or nodes expected, % found: %."),
-  /** Error code. */
-  SUM_X_X(FORG, 6, "Number or duration expected, % found: %."),
+  NUMDUR_X_X(FORG, 6, "Number or duration expected, % found: %."),
 
   /** Error code. */
   FUNZONE_X_X(FORG, 8, "% and % have different timezones."),
@@ -1636,12 +1634,22 @@ public enum QueryError {
 
   /**
    * Throws an EBV exception.
-   * @param ii input info
    * @param value value
+   * @param ii input info
    * @return query exception
    */
-  public static QueryException ebvError(final InputInfo ii, final Value value) {
-    return EBV_X_X.get(ii, value.seqType(), value);
+  public static QueryException ebvError(final Value value, final InputInfo ii) {
+    final String expected, found;
+    Type type = value.seqType().type;
+    if(type.instanceOf(AtomType.NUMERIC) || type.instanceOf(AtomType.STRING) ||
+        type == AtomType.BOOLEAN || type == AtomType.ANY_URI) {
+      expected = "Single " + type;
+      found = "sequence";
+    } else {
+      expected = "Number, string, boolean, URI or nodes";
+      found = value.itemAt(0).seqType().toString();
+    }
+    return ARGTYPE_X_X_X.get(ii, expected, found, value);
   }
 
   /**

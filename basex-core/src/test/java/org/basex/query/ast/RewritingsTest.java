@@ -411,8 +411,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>/self::*[.][.]", "<a/>", empty(ContextValue.class));
     check("('a', 'b')[. ! position()]", "a", exists("*[contains(name(), 'Map')]"));
     check("(1, 0)[.]", 1, exists(ContextValue.class));
-    error("true#0[.]", EBV_X_X);
-    error("(true#0, false#0)[.]", EBV_X_X);
+    error("true#0[.]", ARGTYPE_X_X_X);
+    error("(true#0, false#0)[.]", ARGTYPE_X_X_X);
 
     // map expression
     check("'s'['s' ! <a/>]", "s", root(Str.class));
@@ -1560,7 +1560,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Singleton sequences in predicates. */
   @Test public void gh1878() {
-    error("<a/>[util:replicate(1, 2)]", EBV_X_X);
+    error("<a/>[util:replicate(1, 2)]", ARGTYPE_X_X_X);
   }
 
   /** Lacking filter rewriting. */

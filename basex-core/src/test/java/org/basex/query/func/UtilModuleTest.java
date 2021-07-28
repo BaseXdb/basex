@@ -145,7 +145,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" 1", 1, 2), 1);
     query(func.args(" ()", 1, 2), 2);
     query(func.args(" (<a/>, <b/>)", 1, 2), 1);
-    error(func.args(" (1, 2)", 1, 2), EBV_X_X);
+    error(func.args(" (1, 2)", 1, 2), ARGTYPE_X_X_X);
   }
 
   /** Test method. */

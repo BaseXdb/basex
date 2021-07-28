@@ -524,10 +524,10 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" <x>1</x>"), 1, exists(func));
 
     // errors
-    error(func.args(" xs:QName('a')"), CMP_X);
-    error(func.args(" ('b', 'c', 'a', 1)"), CMP_X_X_X);
-    error(func.args(" (2, 3, 1, 'a')"), CMP_X_X_X);
-    error(func.args(" (false(), true(), false(), 1)"), CMP_X_X_X);
+    error(func.args(" xs:QName('a')"), COMPARE_X_X);
+    error(func.args(" ('b', 'c', 'a', 1)"), ARGTYPE_X_X_X);
+    error(func.args(" (2, 3, 1, 'a')"), ARGTYPE_X_X_X);
+    error(func.args(" (false(), true(), false(), 1)"), ARGTYPE_X_X_X);
     error(func.args(" 'x'", 1), INVTYPE_X_X_X);
   }
 
@@ -1015,8 +1015,8 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" (1 to 10) ! 10"), 100);
     query(func.args(" (1 to 1000000) ! 1000000"), 1000000000000L);
     query(func.args(" (1 to 10) ! xs:untypedAtomic('10')"), 100);
-    error(func.args(" (1 to 10) ! 'a'"), SUM_X_X);
-    error(func.args(" (1 to 1000000) ! 'b'"), SUM_X_X);
+    error(func.args(" (1 to 10) ! 'a'"), NUMDUR_X_X);
+    error(func.args(" (1 to 1000000) ! 'b'"), NUMDUR_X_X);
 
     query("for $i in 1 to 2 return " + func.args(" ()", " $i"), "1\n2");
     query(func.args(" ()", " <x>0</x>"), 0);

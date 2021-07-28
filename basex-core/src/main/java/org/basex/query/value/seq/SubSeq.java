@@ -65,7 +65,7 @@ public final class SubSeq extends Seq {
   public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item head = itemAt(0);
     if(head instanceof ANode) return head;
-    throw ebvError(ii, this);
+    throw ebvError(this, ii);
   }
 
   @Override

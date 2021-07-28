@@ -52,12 +52,12 @@ public class FnMin extends StandardFunc {
 
     // ensure that item is sortable
     final Type type1 = item1.type;
-    if(!type1.isSortable()) throw CMP_X.get(info, type1);
+    if(!type1.isSortable()) throw COMPARE_X_X.get(info, type1, item1);
 
     // strings and URIs
     if(item1 instanceof AStr) {
       for(Item item2; (item2 = qc.next(iter)) != null;) {
-        if(!(item2 instanceof AStr)) throw CMP_X_X_X.get(info, type1, item2.type, item2);
+        if(!(item2 instanceof AStr)) throw ARGTYPE_X_X_X.get(info, type1, item2.type, item2);
         final Type type2 = item2.type;
         if(cmp.eval(item1, item2, coll, sc, info)) item1 = item2;
         if(type1 != type2 && item1.type == ANY_URI) item1 = STRING.cast(item1, qc, sc, info);
@@ -67,7 +67,7 @@ public class FnMin extends StandardFunc {
     // booleans, dates, durations, binaries
     if(type1 == BOOLEAN || item1 instanceof ADate || item1 instanceof Dur || item1 instanceof Bin) {
       for(Item item; (item = qc.next(iter)) != null;) {
-        if(type1 != item.type) throw CMP_X_X_X.get(info, type1, item.type, item);
+        if(type1 != item.type) throw ARGTYPE_X_X_X.get(info, type1, item.type, item);
         if(cmp.eval(item1, item, coll, sc, info)) item1 = item;
       }
       return item1;
@@ -93,7 +93,7 @@ public class FnMin extends StandardFunc {
     final Type type2 = item2.type;
     if(type2.isUntyped()) return DOUBLE;
     final Type type1 = item1.type;
-    if(!(item2 instanceof ANum)) throw CMP_X_X_X.get(info, type1, type2, item2);
+    if(!(item2 instanceof ANum)) throw ARGTYPE_X_X_X.get(info, type1, type2, item2);
     return type1 == type2 ? null :
            type1 == DOUBLE || type2 == DOUBLE ? DOUBLE :
            type1 == FLOAT || type2 == FLOAT ? FLOAT :
