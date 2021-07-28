@@ -16,9 +16,10 @@ public final class ProfSleep extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final long ms = toLong(exprs[0], qc);
+
+    // allow interruption of long sleeps; abort loop if maximum sleep time has been reached
     final Performance perf = new Performance();
-    for(int m = 0; m < ms; m++) {
-      if(perf.ns(false) / 1000000 >= ms) break;
+    for(int m = 0; m < ms && perf.ns(false) / 1000000 < ms; m++) {
       Performance.sleep(1);
       qc.checkStop();
     }
