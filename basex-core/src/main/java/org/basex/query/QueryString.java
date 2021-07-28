@@ -209,7 +209,7 @@ public final class QueryString {
    * @return string
    */
   public static byte[] toValue(final byte[] value) {
-    return Serializer.value(value, 0, true);
+    return Serializer.value(value, (char) 0, true);
   }
 
   /**

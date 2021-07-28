@@ -537,21 +537,22 @@ public abstract class Serializer implements Closeable {
    * @param quote character for quoting the value; ignored if {@code null}
    * @return value
    */
-  public static byte[] value(final byte[] value, final int quote, final boolean chop) {
-    final TokenBuilder tb = new TokenBuilder();
-    if(quote != 0) tb.add(quote);
-    for(final byte v : value) {
-      if(chop && tb.size() > 127) {
+  public static byte[] value(final byte[] value, final char quote, final boolean chop) {
+    final boolean quoting = quote != 0;
+    final TokenBuilder tb = new TokenBuilder(Math.min(203, value.length + (quoting ? 2 : 0)));
+    if(quoting) tb.add(quote);
+    for(final byte b : value) {
+      if(chop && tb.size() >= 200) {
         tb.add(QueryText.DOTS);
         break;
       }
-      if(v == '&') tb.add(E_AMP);
-      else if(v == '\r') tb.add(E_CR);
-      else if(v == '\n') tb.add(E_NL);
-      else if(v == quote) tb.add(quote).add(quote);
-      else tb.addByte(v);
+      if(b == '&') tb.add(E_AMP);
+      else if(b == '\r') tb.add(E_CR);
+      else if(b == '\n') tb.add(E_NL);
+      else if(b == quote) tb.add(quote).add(quote);
+      else tb.addByte(b);
     }
-    if(quote != 0) tb.add(quote);
+    if(quoting) tb.add(quote);
     return tb.finish();
   }
 }

@@ -13,7 +13,10 @@ import org.basex.util.*;
  */
 public final class JobContext {
   /** Prints trace output to the standard error. */
-  private static final QueryTracer ERRLN = info -> { Util.errln(info); return false; };
+  private static final QueryTracer ERRLN = info -> {
+    Util.errln(info);
+    return false;
+  };
 
   /** Job prefix. */
   static final String PREFIX = "job";

@@ -35,7 +35,7 @@ public final class SingletonSeq extends Seq {
   public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item head = value.itemAt(0);
     if(head instanceof ANode) return head;
-    throw EBV_X.get(ii, this);
+    throw ebvError(ii, this);
   }
 
   @Override

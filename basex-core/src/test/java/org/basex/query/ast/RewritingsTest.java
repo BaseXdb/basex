@@ -1560,7 +1560,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Singleton sequences in predicates. */
   @Test public void gh1878() {
-    error("<a/>[util:replicate(1, 2)]", EBV_X);
+    error("<a/>[util:replicate(1, 2)]", EBV_X_X);
   }
 
   /** Lacking filter rewriting. */

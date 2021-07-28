@@ -3,7 +3,6 @@ package org.basex.query;
 import static org.basex.query.QueryError.ErrType.*;
 import static org.basex.query.QueryText.*;
 
-import org.basex.core.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -695,9 +694,7 @@ public enum QueryError {
   /** Error code. */
   CMP_X_X_X(FORG, 6, "% expected, % found: %."),
   /** Error code. */
-  EBV_X(FORG, 6, "Effective boolean value not defined for %."),
-  /** Error code. */
-  EBV_X_X(FORG, 6, "Effective boolean value not defined for %: %."),
+  EBV_X_X(FORG, 6, "Number, string, boolean, URI or nodes expected, % found: %."),
   /** Error code. */
   SUM_X_X(FORG, 6, "Number or duration expected, % found: %."),
 
@@ -1638,6 +1635,16 @@ public enum QueryError {
   }
 
   /**
+   * Throws an EBV exception.
+   * @param ii input info
+   * @param value value
+   * @return query exception
+   */
+  public static QueryException ebvError(final InputInfo ii, final Value value) {
+    return EBV_X_X.get(ii, value.seqType(), value);
+  }
+
+  /**
    * Throws a number exception.
    * @param expr parsing expression
    * @param item item
@@ -1723,12 +1730,11 @@ public enum QueryError {
   public static byte[] normalize(final byte[] token, final InputInfo ii) {
     if(ii != null && ii.internal()) return Token.EMPTY;
 
-    final TokenBuilder tb = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder(Math.min(203, token.length));
     byte l = 0;
     for(byte b : token) {
-      final int ts = tb.size();
-      if(ts == 100) {
-        tb.add(Text.DOTS);
+      if(tb.size() == 200) {
+        tb.add(QueryText.DOTS);
         break;
       }
       if(b == '\n' || b == '\r') b = ' ';
