@@ -8,6 +8,7 @@ import java.nio.file.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.query.func.archive.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 
@@ -35,17 +36,24 @@ public class FileWriteBinary extends FileFn {
       throws QueryException, IOException {
 
     final Path path = checkParentDir(toPath(0, qc));
-    final Bin bin = toBin(exprs[1], qc);
+    final boolean full = exprs.length == 2, archive = full && exprs[1] instanceof ArchiveCreate;
+    final Bin bin = archive ? null : toBin(exprs[1], qc);
+    final long off = full ? 0 : toLong(exprs[2], qc);
 
-    // write full file
-    if(exprs.length == 2) {
-      try(BufferOutput out = new BufferOutput(new FileOutputStream(path.toFile(), append));
-          BufferInput in = bin.input(info)) {
-        for(int b; (b = in.read()) != -1;) out.write(b);
+    if(full) {
+      // write full file
+      try(BufferOutput out = new BufferOutput(new FileOutputStream(path.toFile(), append))) {
+        if(archive) {
+          // optimization: stream created archives
+          ((ArchiveCreate) exprs[1]).create(out, qc);
+        } else {
+          try(BufferInput in = bin.input(info)) {
+            for(int b; (b = in.read()) != -1;) out.write(b);
+          }
+        }
       }
     } else {
       // write file chunk
-      final long off = toLong(exprs[2], qc);
       try(RandomAccessFile raf = new RandomAccessFile(path.toFile(), "rw")) {
         final long dlen = raf.length();
         if(off < 0 || off > dlen) throw FILE_OUT_OF_RANGE_X_X.get(info, off, dlen);
