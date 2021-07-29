@@ -19,9 +19,10 @@ import org.basex.query.value.type.*;
 public final class FnInsertBefore extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
-    final long pos = pos(qc);
-    final Iter insert = exprs[2].iter(qc);
+    final Iter original = exprs[0].iter(qc), insert = exprs[2].iter(qc);
+    final long osize = original.size(), isize = insert.size();
+    final long size = osize != -1 && isize != -1 ? osize + isize : -1;
+    final long ps = pos(qc), pos = osize != -1 ? Math.min(ps, osize) : ps;
 
     return new Iter() {
       long p = pos;
@@ -31,27 +32,35 @@ public final class FnInsertBefore extends StandardFunc {
       public Item next() throws QueryException {
         while(!last) {
           final boolean sub = p == -1 || --p == -1;
-          final Item item = qc.next(sub ? insert : iter);
+          final Item item = qc.next(sub ? insert : original);
           if(item != null) return item;
           if(sub) --p;
           else last = true;
         }
         return p >= 0 ? insert.next() : null;
       }
+      @Override
+      public Item get(final long i) throws QueryException {
+        final long off = i - pos;
+        return off < 0 ? original.get(i) : off < isize ? insert.get(off) : original.get(i - isize);
+      }
+      @Override
+      public long size() {
+        return size;
+      }
     };
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = exprs[0].value(qc), insert = exprs[2].value(qc);
-    final long size = value.size(), pos = Math.min(pos(qc), size);
+    final Value original = exprs[0].value(qc), insert = exprs[2].value(qc);
+    final long osize = original.size(), pos = Math.min(pos(qc), osize);
 
     // prepend, append or insert new value
-    return pos == 0 ? ValueBuilder.concat(insert, value, qc) :
-           pos == size ? ValueBuilder.concat(value, insert, qc) :
-           ((Seq) value).insertBefore(pos, insert, qc);
+    return pos == 0 ? ValueBuilder.concat(insert, original, qc) :
+           pos == osize ? ValueBuilder.concat(original, insert, qc) :
+           ((Seq) original).insertBefore(pos, insert, qc);
   }
-
 
   /**
    * Returns the insertion position.

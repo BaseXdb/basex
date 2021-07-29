@@ -461,6 +461,23 @@ public final class FnModuleTest extends QueryPlanTest {
     query("count(" + func.args(" ()", 2, " 1 to 100000000") + ')', 100000000);
     query("count(" + func.args(" 1 to 100000000", 3, " ()") + ')', 100000000);
     query("count(" + func.args(" 1 to 100000000", 4, " 1 to 100000000") + ')', 200000000);
+
+    query("head(" + func.args(" 1 to 100000000", " <_>4</_>", " 1 to 100000000") + ')', 1);
+    query("subsequence(" + func.args(" 1 to 100000000", " <_>2</_>", " 1 to 100000000") + ", 1, 3)",
+        "1\n1\n2");
+
+    query("for $p in (0 to 4)" +
+        "return string-join(" +
+        "  for $i in (5, 4, 3, 2, 1, 0)" +
+        "  return insert-before(6 to 7, $p, 1 to 2)[$i]" +
+        ")",
+        "7621\n7621\n7216\n2176\n2176");
+    query("for $p in (0 to 4)" +
+        "return string-join(" +
+        "  for $i in (5, 4, 3, 2, 1, 0)" +
+        "  return insert-before((6, 5), $p, ('x', 'y', 'z'))[$i]" +
+        ")",
+        "56zyx\n56zyx\n5zyx6\nzyx56\nzyx56");
   }
 
   /** Test method. */
