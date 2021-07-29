@@ -32,8 +32,7 @@ public final class FnTail extends StandardFunc {
     final Value value = iter.iterValue();
     if(value != null) return value.subsequence(1, size - 1, qc).iter();
 
-    // return optimized iterator if result size is known
-    if(size > 1) return new Iter() {
+    return new Iter() {
       @Override
       public Item next() throws QueryException {
         return qc.next(iter);
@@ -44,15 +43,7 @@ public final class FnTail extends StandardFunc {
       }
       @Override
       public long size() {
-        return size - 1;
-      }
-    };
-
-    // otherwise, return standard iterator
-    return new Iter() {
-      @Override
-      public Item next() throws QueryException {
-        return qc.next(iter);
+        return Math.max(-1, size - 1);
       }
     };
   }

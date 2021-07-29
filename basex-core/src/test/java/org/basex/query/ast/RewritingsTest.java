@@ -2250,13 +2250,22 @@ public final class RewritingsTest extends QueryPlanTest {
     check("declare context item := <a/>; (., .)/<b/>", "<b/>\n<b/>", exists(SingletonSeq.class));
   }
 
-  /** Simple maps with known result size. */
-  @Test public void gh2028() {
+  /** Accessing iterators with known result size. */
+  @Test public void gh2029() {
     check("((1 to 1000000000000) ! string())[last()]", 1000000000000L,
         root(_UTIL_LAST));
     check("((1 to 1000000000000) ! string())[position() = 999999999999]", 999999999999L,
         root(_UTIL_ITEM));
     check("((1 to 1000000000000) ! string())[position() = last() - 999999999999]", 1,
         root(HEAD));
+
+    check("util:replicate(<x/>, <c>200000000000</c>)[last()]", "<x/>",
+        root(_UTIL_LAST));
+    check("util:replicate(<x/>, <c>200000000000</c>, true())[last()]", "<x/>",
+        root(_UTIL_LAST));
+
+    check("for-each-pair((1 to 10000000000), (1 to 9999999999), "
+        + "function($a, $b) { $a = $b })[last()]", true,
+        root(_UTIL_LAST));
   }
 }

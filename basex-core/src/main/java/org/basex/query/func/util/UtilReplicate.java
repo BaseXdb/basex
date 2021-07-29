@@ -25,11 +25,12 @@ public final class UtilReplicate extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final Expr expr = exprs[0];
     final long count = toLong(exprs[1], qc);
-    final boolean single = exprs.length < 3 || !toBoolean(exprs[2], qc);
-
     if(count <= 0) return Empty.VALUE;
     if(count == 1) return expr.value(qc);
-    if(single) return SingletonSeq.get(expr.value(qc), count);
+
+    // check if expression must be evaluated only once
+    final boolean once = expr instanceof Value || exprs.length < 3 || !toBoolean(exprs[2], qc);
+    if(once) return SingletonSeq.get(expr.value(qc), count);
 
     // repeated evaluations
     final ValueBuilder vb = new ValueBuilder(qc);
@@ -41,13 +42,36 @@ public final class UtilReplicate extends StandardFunc {
   public Iter iter(final QueryContext qc) throws QueryException {
     final Expr expr = exprs[0];
     final long count = toLong(exprs[1], qc);
-    final boolean single = exprs.length < 3 || !toBoolean(exprs[2], qc);
-
     if(count <= 0) return Empty.ITER;
     if(count == 1) return expr.iter(qc);
-    if(single) return SingletonSeq.get(expr.value(qc), count).iter();
+
+    // check if expression must be evaluated only once
+    final boolean once = exprs.length < 3 || !toBoolean(exprs[2], qc);
+    if(once) return SingletonSeq.get(expr.value(qc), count).iter();
 
     // repeated evaluations
+    final long size = exprs[0].size();
+    if(size == 1) {
+      // replication of single item
+      return new Iter() {
+        long c = count;
+
+        @Override
+        public Item next() throws QueryException {
+          return --c >= 0 ? expr.item(qc, info) : null;
+        }
+        @Override
+        public Item get(final long i) throws QueryException {
+          return expr.item(qc, info);
+        }
+        @Override
+        public long size() {
+          return count;
+        }
+      };
+    }
+
+    // standard evaluation
     return new Iter() {
       long c = count;
       Iter iter;
@@ -127,11 +151,11 @@ public final class UtilReplicate extends StandardFunc {
   }
 
   /**
-   * Indicates if the input argument will be evaluated exactly once.
+   * Indicates if the expression to be replicated  will be evaluated only once.
    * @return result of check, {@code false} if unknown at compile time
    */
   public boolean once() {
     // static integer will always be greater than 1
-    return singleEval() && exprs[1] instanceof Int;
+    return exprs[0] instanceof Value || singleEval() && exprs[1] instanceof Int;
   }
 }

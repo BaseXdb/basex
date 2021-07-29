@@ -21,6 +21,7 @@ public class FnForEachPair extends StandardFunc {
   public final Iter iter(final QueryContext qc) throws QueryException {
     final Iter iter1 = exprs[0].iter(qc), iter2 = exprs[1].iter(qc);
     final FItem func = checkArity(exprs[2], 2, this instanceof UpdateForEachPair, qc);
+    final long size = func.funcType().declType.one() ? Math.min(iter1.size(), iter2.size()) : -1;
 
     return new Iter() {
       Iter iter = Empty.ITER;
@@ -34,6 +35,16 @@ public class FnForEachPair extends StandardFunc {
           if(item1 == null || item2 == null) return null;
           iter = func.invoke(qc, info, item1, item2).iter();
         } while(true);
+      }
+
+      @Override
+      public Item get(final long i) throws QueryException {
+        return func.invoke(qc, info, iter1.get(i), iter2.get(i)).item(qc, info);
+      }
+
+      @Override
+      public long size() {
+        return size;
       }
     };
   }

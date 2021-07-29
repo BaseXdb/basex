@@ -32,6 +32,7 @@ public final class UtilOr extends StandardFunc {
 
     return new Iter() {
       boolean more;
+
       @Override
       public Item next() throws QueryException {
         if(more) return qc.next(iter);

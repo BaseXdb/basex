@@ -28,9 +28,9 @@ public final class FnRemove extends StandardFunc {
     final Value value = iter.iterValue();
     if(value != null) return value(value, pos, qc).iter();
 
-    // return optimized iterator if result size is known
-    if(size > 1) return new Iter() {
+    return new Iter() {
       long c;
+
       @Override
       public Item next() throws QueryException {
         return ++c != pos || iter.next() != null ? qc.next(iter) : null;
@@ -41,16 +41,7 @@ public final class FnRemove extends StandardFunc {
       }
       @Override
       public long size() {
-        return size - 1;
-      }
-    };
-
-    // return standard iterator
-    return new Iter() {
-      long c;
-      @Override
-      public Item next() throws QueryException {
-        return ++c != pos || iter.next() != null ? qc.next(iter) : null;
+        return Math.max(-1, size - 1);
       }
     };
   }

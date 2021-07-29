@@ -26,12 +26,20 @@ public final class UtilMapEntries extends StandardFunc {
     final XQMap map = toMap(exprs[0], qc);
 
     return new Iter() {
-      final Iter keys = map.keys().iter();
+      final BasicIter<Item> keys = map.keys().iter();
 
       @Override
       public XQMap next() throws QueryException {
         final Item key = keys.next();
         return key != null ? entry(map, key) : null;
+      }
+      @Override
+      public Item get(final long i) throws QueryException {
+        return entry(map, keys.get(i));
+      }
+      @Override
+      public long size() {
+        return keys.size();
       }
     };
   }

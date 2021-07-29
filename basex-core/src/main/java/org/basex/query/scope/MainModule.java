@@ -109,12 +109,12 @@ public final class MainModule extends AModule {
         return null;
       }
       @Override
-      public long size() throws QueryException {
-        return iter.size();
-      }
-      @Override
       public Item get(final long i) throws QueryException {
         return iter.get(i);
+      }
+      @Override
+      public long size() throws QueryException {
+        return iter.size();
       }
       @Override
       public Value value(final QueryContext q, final Expr ex) throws QueryException {
