@@ -3,6 +3,7 @@ package org.basex.query.func.archive;
 import java.io.*;
 import java.util.zip.*;
 
+import org.basex.io.in.*;
 import org.basex.util.*;
 
 /**
@@ -17,10 +18,11 @@ final class GZIPOut extends ArchiveOut {
 
   /**
    * Writing constructor.
+   * @param os output stream
    * @throws IOException I/O exception
    */
-  GZIPOut() throws IOException {
-    zos = new GZIPOutputStream(ao);
+  GZIPOut(final OutputStream os) throws IOException {
+    zos = new GZIPOutputStream(os);
   }
 
   @Override
@@ -39,7 +41,16 @@ final class GZIPOut extends ArchiveOut {
   }
 
   @Override
+  public void write(final ZipEntry entry, final BufferInput in) throws IOException {
+    for(int b; (b = in.read()) != -1;) zos.write(b);
+  }
+
+  @Override
   public void close() {
-    try { zos.close(); } catch(final IOException ex) { Util.debug(ex); }
+    try {
+      zos.close();
+    } catch(final IOException ex) {
+      Util.debug(ex);
+    }
   }
 }

@@ -9,6 +9,7 @@ import java.nio.charset.*;
 import java.util.*;
 import java.util.zip.*;
 
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
@@ -24,15 +25,40 @@ import org.basex.util.*;
 public class ArchiveCreate extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final ArrayOutput ao = new ArrayOutput();
+    create(ao, qc);
+    return B64.get(ao.finish());
+  }
+
+  /**
+   * Creates the archive.
+   * @param os output stream
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  public final void create(final OutputStream os, final QueryContext qc) throws QueryException {
     final Map<String, Item[]> map = toMap(0, qc);
     final CreateOptions opts = toOptions(2, new CreateOptions(), qc);
+    create(map, opts, os, qc);
+  }
+
+  /**
+   * Creates the archive.
+   * @param map entries to add to the archive
+   * @param opts create options
+   * @param os output stream
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  final void create(final Map<String, Item[]> map, final CreateOptions opts, final OutputStream os,
+      final QueryContext qc) throws QueryException {
 
     // check options
-    final String format = opts.get(CreateOptions.FORMAT);
+    final String format = opts.get(CreateOptions.FORMAT).toLowerCase(Locale.ENGLISH);
     if(format.equals(GZIP) && map.size() > 1) throw ARCHIVE_SINGLE_X.get(info, format);
 
     final int level = level(opts);
-    try(ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info)) {
+    try(ArchiveOut out = ArchiveOut.get(format, info, os)) {
       out.level(level);
       try {
         for(final Item[] entry : map.values()) {
@@ -41,7 +67,6 @@ public class ArchiveCreate extends ArchiveFn {
       } catch(final IOException ex) {
         throw ARCHIVE_ERROR_X.get(info, ex);
       }
-      return B64.get(out.finish());
     }
   }
 
@@ -51,7 +76,7 @@ public class ArchiveCreate extends ArchiveFn {
    * @return level
    * @throws QueryException query exception
    */
-  protected int level(final CreateOptions options) throws QueryException {
+  final int level(final CreateOptions options) throws QueryException {
     int level = ZipEntry.DEFLATED;
     final String format = options.get(CreateOptions.FORMAT);
     final String alg = options.get(CreateOptions.ALGORITHM);
@@ -75,7 +100,7 @@ public class ArchiveCreate extends ArchiveFn {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  protected final void add(final Item[] entry, final ArchiveOut out, final int level,
+  final void add(final Item[] entry, final ArchiveOut out, final int level,
       final String root, final QueryContext qc) throws QueryException, IOException {
 
     // create new zip entry
@@ -112,17 +137,21 @@ public class ArchiveCreate extends ArchiveFn {
       }
     }
 
-    // data to be compressed
-    byte[] value = toBytes(content);
-    if(!(content instanceof Bin) && encoding != Strings.UTF8) value = encode(value, encoding, qc);
-
     try {
       out.level(lvl == null ? level : toInt(lvl));
     } catch(final IllegalArgumentException ex) {
       Util.debug(ex);
       throw ARCHIVE_DESCRIPTOR2_X.get(info, lvl);
     }
-    out.write(ze, value);
+
+    // data to be compressed
+    if(content instanceof Lazy) {
+      out.write(ze, content.input(info));
+    } else {
+      byte[] value = toBytes(content);
+      if(!(content instanceof Bin) && encoding != Strings.UTF8) value = encode(value, encoding, qc);
+      out.write(ze, value);
+    }
   }
 
   /**

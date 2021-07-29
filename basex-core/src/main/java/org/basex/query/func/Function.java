@@ -711,25 +711,28 @@ public enum Function implements AFunction {
       params(STRING_O, MAP_ZO, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_DELETE(ArchiveDelete::new, "delete(archive,entries)",
-      params(BASE64_BINARY_O, ITEM_ZM), BASE64_BINARY_O, ARCHIVE_URI),
+      params(BASE64_BINARY_O, ITEM_ZM), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_ENTRIES(ArchiveEntries::new, "entries(archive)",
-      params(BASE64_BINARY_O), ELEMENT_ZM, ARCHIVE_URI),
+      params(BASE64_BINARY_O), ELEMENT_ZM, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_BINARY(ArchiveExtractBinary::new, "extract-binary(archive[,entries])",
-      params(BASE64_BINARY_O, ITEM_ZM), BASE64_BINARY_ZM, ARCHIVE_URI),
+      params(BASE64_BINARY_O, ITEM_ZM), BASE64_BINARY_ZM, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_TEXT(ArchiveExtractText::new, "extract-text(archive[,entries[,encoding]])",
-      params(BASE64_BINARY_O, ITEM_ZM, STRING_O), STRING_ZM, ARCHIVE_URI),
+      params(BASE64_BINARY_O, ITEM_ZM, STRING_O), STRING_ZM, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_TO(ArchiveExtractTo::new, "extract-to(path,archive[,entries])",
       params(STRING_O, BASE64_BINARY_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_OPTIONS(ArchiveOptions::new, "options(archive)",
-      params(BASE64_BINARY_O), MAP_O, ARCHIVE_URI),
+      params(BASE64_BINARY_O), MAP_O, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_UPDATE(ArchiveUpdate::new, "update(archive,entries,contents)",
-      params(BASE64_BINARY_O, ITEM_ZM, ITEM_ZM), BASE64_BINARY_O, ARCHIVE_URI),
+      params(BASE64_BINARY_O, ITEM_ZM, ITEM_ZM), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI),
+  /** XQuery function. */
+  _ARCHIVE_WRITE(ArchiveWrite::new, "write(path,entries,contents[,options])",
+      params(STRING_O, ITEM_ZM, ITEM_ZM, MAP_ZO), EMPTY_SEQUENCE_Z, flag(NDT), ARCHIVE_URI),
 
   // Binary Module
 

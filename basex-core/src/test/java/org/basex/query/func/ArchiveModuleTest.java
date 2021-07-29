@@ -224,6 +224,15 @@ public final class ArchiveModuleTest extends SandboxTest {
         func.args(" .", "X", "Y"), ARCHIVE_MODIFY_X);
   }
 
+  /** Test method. */
+  @Test public void write() {
+    final Function func = _ARCHIVE_WRITE;
+
+    final String file = new IOFile(sandbox(), "tmp").path() + "write.zip";
+    query(func.args(file, "1", "1"));
+    query(_ARCHIVE_EXTRACT_TEXT.args(_FILE_READ_BINARY.args(file)), 1);
+  }
+
   /**
    * Counts the entries of an archive.
    * @param archive archive

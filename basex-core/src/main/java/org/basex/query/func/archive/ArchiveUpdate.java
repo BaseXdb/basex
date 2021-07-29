@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -28,7 +29,9 @@ public final class ArchiveUpdate extends ArchiveCreate {
     try(ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
       final String format = in.format();
       if(in instanceof GZIPIn) throw ARCHIVE_MODIFY_X.get(info, format);
-      try(ArchiveOut out = ArchiveOut.get(format, info)) {
+
+      final ArrayOutput ao = new ArrayOutput();
+      try(ArchiveOut out = ArchiveOut.get(format, info, ao)) {
         // write existing or updated entries
         while(in.more()) {
           final Item[] entry = map.remove(in.entry().getName());
@@ -42,8 +45,8 @@ public final class ArchiveUpdate extends ArchiveCreate {
         for(final Item[] entry : map.values()) {
           add(entry, out, ZipEntry.DEFLATED, "", qc);
         }
-        return B64.get(out.finish());
       }
+      return B64.get(ao.finish());
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);
     }

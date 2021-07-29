@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.io.*;
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
@@ -47,10 +48,10 @@ public class ArchiveCreateFrom extends ArchiveCreate {
     }
 
     final int level = level(opts);
-    final String format = opts.get(CreateOptions.FORMAT);
+    final String format = opts.get(CreateOptions.FORMAT).toLowerCase(Locale.ENGLISH);
     final String dir = rootDir && root.parent() != null ? root.name() + '/' : "";
-
-    try(ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info)) {
+    final ArrayOutput ao = new ArrayOutput();
+    try(ArchiveOut out = ArchiveOut.get(format, info, ao)) {
       out.level(level);
       try {
         while(true) {
@@ -64,7 +65,7 @@ public class ArchiveCreateFrom extends ArchiveCreate {
       } catch(final IOException ex) {
         throw ARCHIVE_ERROR_X.get(info, ex);
       }
-      return B64.get(out.finish());
     }
+    return B64.get(ao.finish());
   }
 }

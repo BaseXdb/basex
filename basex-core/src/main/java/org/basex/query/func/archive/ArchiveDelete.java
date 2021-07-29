@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
@@ -33,12 +34,14 @@ public final class ArchiveDelete extends ArchiveFn {
     try(ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
       final String format = in.format();
       if(in instanceof GZIPIn) throw ARCHIVE_MODIFY_X.get(info, format);
-      try(ArchiveOut out = ArchiveOut.get(format, info)) {
+
+      final ArrayOutput ao = new ArrayOutput();
+      try(ArchiveOut out = ArchiveOut.get(format, info, ao)) {
         while(in.more()) {
           if(!names.contains(token(in.entry().getName()))) out.write(in);
         }
-        return B64.get(out.finish());
       }
+      return B64.get(ao.finish());
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);
     }
