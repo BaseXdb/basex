@@ -26,14 +26,13 @@ public final class DualMap extends SimpleMap {
   }
 
   @Override
-  public Iter iter(final QueryContext qc) {
-    return new Iter() {
-      Iter iter;
+  public Iter iter(final QueryContext qc) throws QueryException {
+    final Iter iter = exprs[0].iter(qc);
+    final long size = exprs[1].size() == 1 ? iter.size() : -1;
 
+    return new Iter() {
       @Override
       public Item next() throws QueryException {
-        if(iter == null) iter = exprs[0].iter(qc);
-
         final QueryFocus qf = qc.focus;
         final Value value = qf.value;
         try {
@@ -50,6 +49,24 @@ public final class DualMap extends SimpleMap {
         } finally {
           qf.value = value;
         }
+      }
+
+      @Override
+      public Item get(final long i) throws QueryException {
+        final QueryFocus qf = qc.focus;
+        final Value value = qf.value;
+        try {
+          qf.value = value;
+          qf.value = iter.get(i);
+          return exprs[1].item(qc, info);
+        } finally {
+          qf.value = value;
+        }
+      }
+
+      @Override
+      public long size() {
+        return size;
       }
     };
   }

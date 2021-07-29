@@ -2132,7 +2132,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Parallel execution. */
   @Test public void gh1329() {
-    query("xquery:fork-join(util:replicate(function() { <x/>[@a] }, 100000))", "");
+    query("xquery:fork-join(util:replicate(function() { <x/>[@a] }, 10000))", "");
     query("1!fn:last#0()", 1);
   }
 
@@ -2248,5 +2248,15 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/> ! (., .)/<b/>", "<b/>\n<b/>", exists(_UTIL_REPLICATE));
     check("util:replicate(<a/>, 2)/<b/>", "<b/>\n<b/>", exists(_UTIL_REPLICATE));
     check("declare context item := <a/>; (., .)/<b/>", "<b/>\n<b/>", exists(SingletonSeq.class));
+  }
+
+  /** Simple maps with known result size. */
+  @Test public void gh2028() {
+    check("((1 to 1000000000000) ! string())[last()]", 1000000000000L,
+        root(_UTIL_LAST));
+    check("((1 to 1000000000000) ! string())[position() = 999999999999]", 999999999999L,
+        root(_UTIL_ITEM));
+    check("((1 to 1000000000000) ! string())[position() = last() - 999999999999]", 1,
+        root(HEAD));
   }
 }
