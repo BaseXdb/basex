@@ -750,12 +750,22 @@ public class TextPanel extends BaseXPanel {
   private static String clip() {
     // copy selection to clipboard
     final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
-    final Transferable tr = clip.getContents(null);
-    if(tr != null) {
-      final ArrayList<Object> contents = BaseXLayout.contents(tr);
-      if(!contents.isEmpty()) return contents.get(0).toString();
-    } else {
-      Util.debug("Clipboard has no contents.");
+
+    // try multiple times (system clipboard may be accessed by another process)
+    final int n = 10;
+    for(int i = 1; i <= n; i++) {
+      try {
+        final Transferable tr = clip.getContents(null);
+        if(tr != null) {
+          final ArrayList<Object> contents = BaseXLayout.contents(tr);
+          if(!contents.isEmpty()) return contents.get(0).toString();
+        }
+        Util.debug("Clipboard has no contents.");
+        break;
+      } catch(final Exception ex) {
+        Util.stack(ex);
+        Performance.sleep(i * 200);
+      }
     }
     return null;
   }

@@ -217,7 +217,24 @@ public final class BaseXLayout {
    * @param text text
    */
   public static void copy(final String text) {
-    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
+    final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+
+    // try multiple times (system clipboard may be accessed by another process)
+    final int n = 10;
+    for(int i = 1; i <= n; i++) {
+      try {
+        clip.setContents(new StringSelection(text), null);
+        return;
+      } catch(final Exception ex) {
+        Util.stack(ex);
+        if(i == n) {
+          Util.stack(ex);
+        } else {
+          Util.debug(ex);
+          Performance.sleep(i * 200);
+        }
+      }
+    }
   }
 
   /**
