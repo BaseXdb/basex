@@ -193,6 +193,8 @@ public final class JavaFunctionTest extends SandboxTest {
   /** Process arrays. */
   @Test public void array() {
     query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
+        "n:strings(array { })", "");
+    query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
         "n:strings(array { '1' })", 1);
     query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
         "n:longs(array { 1 })", 1);

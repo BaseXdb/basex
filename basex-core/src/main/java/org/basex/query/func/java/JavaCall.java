@@ -25,6 +25,7 @@ import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
@@ -133,8 +134,27 @@ public abstract class JavaCall extends Arr {
           // convert to Java object
           // - if argument is a Java object wrapper, or
           // - if function parameter is not a {@link Value} instance
-          if(arg instanceof XQJava || !(xquery != null ? xquery[p] :
-            Value.class.isAssignableFrom(params[p]))) value = arg.toJava();
+          if(arg instanceof XQJava ||
+            !(xquery != null ? xquery[p] : Value.class.isAssignableFrom(params[p]))) {
+
+            // convert empty array to target type
+            if(arg instanceof XQArray && ((XQArray) arg).arraySize() == 0 && param.isArray()) {
+              final Class<?> atype = param.getComponentType();
+              if(atype == boolean.class) value = new boolean[0];
+              else if(atype == byte.class) value = new byte[0];
+              else if(atype == short.class) value = new short[0];
+              else if(atype == char.class) value = new char[0];
+              else if(atype == int.class) value = new int[0];
+              else if(atype == long.class) value = new long[0];
+              else if(atype == float.class) value = new float[0];
+              else if(atype == double.class) value = new double[0];
+              else if(atype == String.class) value = new String[0];
+              else value = new Object[0];
+            } else {
+              value = arg.toJava();
+            }
+          }
+
           // if argument is no instance of the function parameter, check for null value
           if(!param.isInstance(value) && (value != null || param.isPrimitive())) return null;
         }

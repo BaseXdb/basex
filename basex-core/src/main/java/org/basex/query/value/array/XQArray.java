@@ -393,11 +393,6 @@ public abstract class XQArray extends XQData {
         for(final Value member : members()) list.add(((Bln) member).bool(null));
         return list.finish();
       }
-      if(t == AtomType.STRING) {
-        final StringList list = new StringList(sz);
-        for(final Value member : members()) list.add((String) member.toJava());
-        return list.finish();
-      }
       if(t == AtomType.BYTE) {
         final ByteList list = new ByteList(sz);
         for(final Value member : members()) list.add((byte) ((Int) member).itr());
@@ -432,6 +427,11 @@ public abstract class XQArray extends XQData {
       if(t == AtomType.DOUBLE) {
         final DoubleList list = new DoubleList(sz);
         for(final Value member : members()) list.add(((Dbl) member).dbl());
+        return list.finish();
+      }
+      if(t.instanceOf(AtomType.STRING)) {
+        final StringList list = new StringList(sz);
+        for(final Value member : members()) list.add((String) member.toJava());
         return list.finish();
       }
     }
