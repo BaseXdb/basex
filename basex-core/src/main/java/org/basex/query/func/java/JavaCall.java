@@ -135,7 +135,7 @@ public abstract class JavaCall extends Arr {
           // - if argument is a Java object wrapper, or
           // - if function parameter is not a {@link Value} instance
           if(arg instanceof XQJava ||
-            !(xquery != null ? xquery[p] : Value.class.isAssignableFrom(params[p]))) {
+            !(xquery != null ? xquery[p] : Value.class.isAssignableFrom(param))) {
 
             // convert empty array to target type
             if(arg instanceof XQArray && ((XQArray) arg).arraySize() == 0 && param.isArray()) {
