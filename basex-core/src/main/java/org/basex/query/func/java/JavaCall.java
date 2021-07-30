@@ -45,6 +45,9 @@ import org.w3c.dom.Text;
  * @author Christian Gruen
  */
 public abstract class JavaCall extends Arr {
+  /** Placeholder for invalid Java arguments. */
+  private static final Object INVALID = new Object();
+
   /** Static context. */
   final StaticContext sc;
   /** Permission. */
@@ -105,14 +108,14 @@ public abstract class JavaCall extends Arr {
   }
 
   /**
-   * Converts the XQuery arguments to Java arguments.
+   * Returns a candidate with function arguments if the XQuery arguments match the Java arguments.
    * @param args arguments
-   * @param params parameter types
+   * @param params expected parameters
    * @param stat static flag
-   * @return converted arguments or {@code null}
+   * @return candidate with Java arguments, or {@code null}
    * @throws QueryException query exception
    */
-  final Object[] args(final Value[] args, final Class<?>[] params, final boolean stat)
+  final JavaCandidate candidate(final Value[] args, final Class<?>[] params, final boolean stat)
       throws QueryException {
 
     // start with second argument if function is not static
@@ -120,48 +123,90 @@ public abstract class JavaCall extends Arr {
     if(pl != args.length - s) return null;
 
     // function arguments
-    final Object[] values = new Object[pl];
+    final JavaCandidate jc = new JavaCandidate(pl);
     for(int p = 0; p < pl; p++) {
-      final Class<?> param = params[p];
       final Value arg = args[p + s];
-      Object value = arg;
-      if(param != Expr.class) {
-        final Type type = JavaMapping.type(param, true);
-        if(type != null && arg.type.instanceOf(type)) {
-          // convert to Java object if an XQuery type exists for the function parameter
-          value = arg.toJava();
-        } else {
-          // convert to Java object
-          // - if argument is a Java object wrapper, or
-          // - if function parameter is not a {@link Value} instance
-          if(arg instanceof XQJava ||
-            !(xquery != null ? xquery[p] : Value.class.isAssignableFrom(param))) {
+      final Class<?> param = params[p];
+      final Object value = convert(arg, param, p);
+      if(value == INVALID) return null;
 
-            // convert empty array to target type
-            if(arg instanceof XQArray && ((XQArray) arg).arraySize() == 0 && param.isArray()) {
-              final Class<?> atype = param.getComponentType();
-              if(atype == boolean.class) value = new boolean[0];
-              else if(atype == byte.class) value = new byte[0];
-              else if(atype == short.class) value = new short[0];
-              else if(atype == char.class) value = new char[0];
-              else if(atype == int.class) value = new int[0];
-              else if(atype == long.class) value = new long[0];
-              else if(atype == float.class) value = new float[0];
-              else if(atype == double.class) value = new double[0];
-              else if(atype == String.class) value = new String[0];
-              else value = new Object[0];
-            } else {
-              value = arg.toJava();
-            }
-          }
-
-          // if argument is no instance of the function parameter, check for null value
-          if(!param.isInstance(value) && (value != null || param.isPrimitive())) return null;
-        }
-      }
-      values[p] = value;
+      // check if parameter and argument types match exactly
+      jc.exact = jc.exact && JavaMapping.type(param, false) == arg.seqType().type;
+      jc.arguments[p] = value;
     }
-    return values;
+    return jc;
+  }
+
+  /**
+   * Converts an XQuery value to a Java value.
+   * @param arg argument
+   * @param param expected parameter
+   * @param p parameter offset
+   * @return value or {@code null}
+   * @throws QueryException query exception
+   */
+  private Object convert(final Value arg, final Class<?> param, final int p) throws QueryException {
+    // XQuery expression: value must not be converted
+    if(param == Expr.class) return arg;
+
+    // argument to a Java object if a mapping entry exists
+    final Type type = JavaMapping.type(param, true);
+    if(type != null && arg.type.instanceOf(type)) return arg.toJava();
+
+    // convert empty array to target type
+    if(arg instanceof XQArray && ((XQArray) arg).arraySize() == 0 && param.isArray()) {
+      final Class<?> atype = param.getComponentType();
+      if(atype == boolean.class) return new boolean[0];
+      if(atype == byte.class) return new byte[0];
+      if(atype == short.class) return new short[0];
+      if(atype == char.class) return new char[0];
+      if(atype == int.class) return new int[0];
+      if(atype == long.class) return new long[0];
+      if(atype == float.class) return new float[0];
+      if(atype == double.class) return new double[0];
+      if(atype == String.class) return new String[0];
+      return new Object[0];
+    }
+
+    // convert empty number to smallest type
+    if(arg instanceof ANum) {
+      final double d = ((ANum) arg).dbl();
+      if((param == byte.class  || param == Byte.class)      && (byte)  d == d) return (byte)   d;
+      if((param == short.class || param == Short.class)     && (short) d == d) return (short)  d;
+      if((param == char.class  || param == Character.class) && (char)  d == d) return (char)   d;
+      if((param == int.class   || param == Integer.class)   && (int)   d == d) return (int)    d;
+      if((param == float.class || param == Float.class)     && (float) d == d) return (float)  d;
+      if(param == double.class || param == Double.class)                       return (double) d;
+    }
+
+    // convert to Java object
+    // - if argument is a Java object wrapper, or
+    // - if function parameter is not a {@link Value} instance
+    final Object value = arg instanceof XQJava ||
+      !(xquery != null ? xquery[p] : Value.class.isAssignableFrom(param)) ? arg.toJava() : arg;
+
+    // return value
+    // - if argument is an instance of the function parameter, or
+    // - if value is null and and parameter is not primitive
+    if(param.isInstance(value) || value == null && !param.isPrimitive()) return value;
+
+    // give up
+    return INVALID;
+  }
+
+  /**
+   * Finds the best candidate.
+   * Removes approximate candidates if some are exactly matching.
+   * @param candidates candidates
+   * @return best candidate, or {@code null} if multiple candidates are left
+   */
+  final JavaCandidate bestCandidate(final ArrayList<JavaCandidate> candidates) {
+    if(((Checks<JavaCandidate>) jc -> jc.exact).any(candidates)) {
+      for(int c = candidates.size() - 1; c >= 0; c--) {
+        if(!candidates.get(c).exact) candidates.remove(c);
+      }
+    }
+    return candidates.size() == 1 ? candidates.get(0) : null;
   }
 
   /**
@@ -390,18 +435,18 @@ public abstract class JavaCall extends Arr {
     // find method with identical name and arity
     final IntList arities = new IntList();
     final HashMap<String, ArrayList<Method>> allMethods = methods(module.getClass());
-    final ArrayList<Method> methods = filter(allMethods, name, types, arity, arities, true);
-    final int ms = methods.size();
-    if(ms == 0) {
+    final ArrayList<Method> candidates = candidates(allMethods, name, types, arity, arities, true);
+    final int cs = candidates.size();
+    if(cs == 0) {
       final TokenList names = new TokenList();
-      for(final String mthd : allMethods.keySet()) names.add(mthd);
+      for(final String method : allMethods.keySet()) names.add(method);
       throw noMember(name, types, arity, string(qname.string()), arities, names.finish(), info);
     }
-    if(ms > 1) throw JAVAMULTIPLE_X_X.get(info, qname.string(),
-        paramTypes(methods.toArray(new Executable[0]), false));
+    if(cs > 1) throw JAVAMULTIPLE_X_X.get(info, qname.string(),
+        paramTypes(candidates.toArray(new Executable[0]), false));
 
     // single method found: add module locks to query context
-    final Method method = methods.get(0);
+    final Method method = candidates.get(0);
     final Lock lock = method.getAnnotation(Lock.class);
     if(lock != null) qc.locks.add(Locking.BASEX_PREFIX + lock.value());
     return method;
@@ -469,7 +514,7 @@ public abstract class JavaCall extends Arr {
    * @param stat static calls
    * @return methods
    */
-  static ArrayList<Method> filter(final HashMap<String, ArrayList<Method>> methods,
+  static ArrayList<Method> candidates(final HashMap<String, ArrayList<Method>> methods,
       final String name, final String[] types, final int arity, final IntList arities,
       final boolean stat) {
     final ArrayList<Method> list = new ArrayList<>(1), mthds = methods.get(name);

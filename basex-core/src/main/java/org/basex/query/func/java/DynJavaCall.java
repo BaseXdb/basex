@@ -3,6 +3,7 @@ package org.basex.query.func.java;
 import static org.basex.query.QueryError.*;
 
 import java.lang.reflect.*;
+import java.util.*;
 
 import org.basex.core.users.*;
 import org.basex.query.*;
@@ -57,13 +58,19 @@ abstract class DynJavaCall extends JavaCall {
 
   /**
    * Returns an error for the specified execution candidates.
-   * @param execs executables (constructors, methods)
    * @param candidates candidates
+   * @param execs executables (constructors, methods)
    * @return exception
    */
-  final QueryException noCandidate(final Executable[] execs, final Executable[] candidates) {
-    final int cl = candidates.length;
-    if(cl > 1) return JAVAMULTIPLE_X_X.get(info, name(), paramTypes(candidates, false));
+  final QueryException noCandidate(final ArrayList<JavaCandidate> candidates,
+      final Executable[] execs) {
+
+    final int cl = candidates.size();
+    if(cl > 1) {
+      final ArrayList<Executable> list = new ArrayList<>(cl);
+      for(final JavaCandidate jc : candidates) list.add(jc.executable);
+      return JAVAMULTIPLE_X_X.get(info, name(), paramTypes(list.toArray(new Executable[0]), false));
+    }
 
     final Executable single = execs.length == 1 ? execs[0] : null;
     final int el = exprs.length;

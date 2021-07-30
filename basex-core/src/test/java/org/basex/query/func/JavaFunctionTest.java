@@ -25,12 +25,13 @@ public final class JavaFunctionTest extends SandboxTest {
     query("declare namespace Random = 'java:java.util.Random'; Random:nextInt(Random:new())");
     query("declare namespace List = 'java:org.basex.util.list.StringList'; List:new()");
 
+    // implicitly cast xs:integer to int
+    query("Q{java:StringBuilder}new(1)()", "");
+
     error("declare namespace random = 'java:java.util.random'; random:new()", JAVACLASS_X);
     error("Q{java:java.util.rndm}new()", JAVACLASS_X);
     error("Q{java:java.util.random}new()", JAVACLASS_X);
     error("Q{java:Integer}new\u00b7int('abc')", JAVAARGS_X_X_X);
-
-    error("Q{java:StringBuilder}new(1)", JAVANONE_X_X_X);
   }
 
   /** Tests namespace rewritings. */
@@ -136,12 +137,16 @@ public final class JavaFunctionTest extends SandboxTest {
 
   /** Tests ambiguous signatures. */
   @Test public void ambiguous() {
-    error("Q{java:org.basex.query.func.JavaFunctionExample}new(true())",
-        JAVAMULTIPLE_X_X);
+    query("Q{StringBuilder}new() => Q{StringBuilder}append(1) => string()", 1);
+    query("Q{StringBuilder}new() => Q{StringBuilder}append·int(1) => string()", 1);
+    query("Q{StringBuilder}new() => Q{StringBuilder}append(xs:int(1)) => string()", 1);
+    query("Q{StringBuilder}new() => Q{StringBuilder}append('x') => string()", "x");
+
+    error("Q{StringBuilder}new() => Q{StringBuilder}append(xs:byte(1))", JAVAMULTIPLE_X_X);
+    error("Q{java:org.basex.query.func.JavaFunctionExample}new(true())", JAVAMULTIPLE_X_X);
+
     error("import module namespace StringBuilder = 'java:java.lang.StringBuilder'; " +
         "StringBuilder:append('x')", JAVAMULTIPLE_X_X);
-    error("declare namespace StringBuilder = 'java:java.lang.StringBuilder';" +
-        "StringBuilder:append(StringBuilder:new(), 'x')", JAVAMULTIPLE_X_X);
   }
 
   /** Pass on empty sequences. */
@@ -209,6 +214,10 @@ public final class JavaFunctionTest extends SandboxTest {
         "=> xs:unsignedShort()" +
         "=> Q{java:java.lang.Character}isUpperCase()",
         true);
+
+    query("Q{java:java.lang.Character}isUpperCase(xs:int(65))", true);
+    query("Q{java:java.lang.Character}isUpperCase(xs:unsignedShort(65))", true);
+    error("Q{java:java.lang.Character}isUpperCase(65)", JAVAMULTIPLE_X_X);
   }
 
   /** Ensure that items cannot be cast to Java. */

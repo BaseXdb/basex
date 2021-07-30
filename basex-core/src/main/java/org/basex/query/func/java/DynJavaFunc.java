@@ -71,7 +71,7 @@ final class DynJavaFunc extends DynJavaCall {
 
     // method candidates
     final HashMap<String, ArrayList<Method>> allMethods = methods(clazz);
-    methods = filter(allMethods, name, types, arity, arities, false);
+    methods = candidates(allMethods, name, types, arity, arities, false);
 
     if(field != null || !methods.isEmpty()) return true;
     if(!enforce) return false;
@@ -114,22 +114,22 @@ final class DynJavaFunc extends DynJavaCall {
    * @throws QueryException exception
    */
   private Object[] method(final QueryContext qc) throws QueryException {
-    // find methods with matching parameters
-    final ArrayList<Method> candidates = new ArrayList<>(1);
     final Value[] values = values(qc);
-    Object[] args = null;
+
+    // find best candidate with matching parameters
+    final ArrayList<JavaCandidate> candidates = new ArrayList<>(1);
     for(final Method method : methods) {
-      final Object[] tmp = args(values, method.getParameterTypes(), isStatic(method));
-      if(tmp != null) {
-        candidates.add(method);
-        args = tmp;
+      final JavaCandidate jc = candidate(values, method.getParameterTypes(), isStatic(method));
+      if(jc != null) {
+        jc.executable = method;
+        candidates.add(jc);
       }
     }
-    if(candidates.size() != 1) throw noCandidate(methods.toArray(new Executable[0]),
-        candidates.toArray(new Executable[0]));
+    final JavaCandidate jc = bestCandidate(candidates);
+    if(jc == null) throw noCandidate(candidates, methods.toArray(new Executable[0]));
 
     // assign query context if module is inheriting the {@link QueryModule} interface
-    final Method method = candidates.get(0);
+    final Method method = (Method) jc.executable;
     final Object instance = instance(values, isStatic(method));
     if(instance instanceof QueryModule) {
       final QueryModule qm = (QueryModule) instance;
@@ -139,11 +139,11 @@ final class DynJavaFunc extends DynJavaCall {
 
     // invoke found method
     try {
-      return new Object[] { method.invoke(instance, args), instance };
+      return new Object[] { method.invoke(instance, jc.arguments), instance };
     } catch(final IllegalArgumentException ex) {
       throw instanceExpected(ex);
     } catch(final Throwable th) {
-      throw executionError(th, args);
+      throw executionError(th, jc.arguments);
     }
   }
 

@@ -67,25 +67,25 @@ final class DynJavaConstr extends DynJavaCall {
 
   @Override
   protected Value eval(final QueryContext qc, final WrapOptions wrap) throws QueryException {
-    // find constructors with matching parameters
-    final ArrayList<Constructor<?>> candidates = new ArrayList<>(1);
     final Value[] values = values(qc);
-    Object[] args = null;
+
+    // find best candidate with matching parameters
+    final ArrayList<JavaCandidate> candidates = new ArrayList<>(1);
     for(final Constructor<?> cnstr : constrs) {
-      final Object[] tmp = args(values, cnstr.getParameterTypes(), true);
-      if(tmp != null) {
-        candidates.add(cnstr);
-        args = tmp;
+      final JavaCandidate jc = candidate(values, cnstr.getParameterTypes(), true);
+      if(jc != null) {
+        jc.executable = cnstr;
+        candidates.add(jc);
       }
     }
-    if(candidates.size() != 1) throw noCandidate(constrs.toArray(new Executable[0]),
-        candidates.toArray(new Executable[0]));
+    final JavaCandidate jc = bestCandidate(candidates);
+    if(jc == null) throw noCandidate(candidates, constrs.toArray(new Executable[0]));
 
     // single constructor found: instantiate class
     try {
-      return new XQJava(candidates.get(0).newInstance(args));
+      return new XQJava(((Constructor<?>) jc.executable).newInstance(jc.arguments));
     } catch(final Throwable th) {
-      throw executionError(th, args);
+      throw executionError(th, jc.arguments);
     }
   }
 
