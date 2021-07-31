@@ -127,7 +127,7 @@ public final class Escape extends RegExp {
       s += Character.charCount(rng[1] = string.codePointAt(s));
       ranges.add(rng);
     }
-    return ranges.toArray(new int[ranges.size()][]);
+    return ranges.toArray(new int[0][]);
   }
 
   /**
@@ -148,7 +148,7 @@ public final class Escape extends RegExp {
         ranges.remove(i + 1);
       }
     }
-    return ranges.toArray(new int[ranges.size()][]);
+    return ranges.toArray(new int[0][]);
   }
 
   /**
@@ -168,7 +168,7 @@ public final class Escape extends RegExp {
     if(start <= Character.MAX_CODE_POINT)
       ranges.add(new int[] { start, Character.MAX_CODE_POINT });
 
-    return ranges.toArray(new int[ranges.size()][]);
+    return ranges.toArray(new int[0][]);
   }
 
   /**

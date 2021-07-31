@@ -57,12 +57,12 @@ public final class AtomIter extends Iter {
   }
 
   @Override
-  public long size() {
-    return size;
+  public Item get(final long i) throws QueryException {
+    return iter.get(i);
   }
 
   @Override
-  public Item get(final long i) throws QueryException {
-    return iter.get(i);
+  public long size() {
+    return size;
   }
 }

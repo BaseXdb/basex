@@ -141,7 +141,7 @@ public final class ModuleLoader {
     // add cached URLs to class loader
     final int us = urls.size();
     if(us != 0) {
-      loader = new JarLoader(urls.toArray(new URL[us]), loader);
+      loader = new JarLoader(urls.toArray(new URL[0]), loader);
       urls.clear();
     }
     // no external classes added: use default class loader
