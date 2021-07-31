@@ -41,20 +41,19 @@ public final class UtilReplicate extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Expr expr = exprs[0];
-    final long count = toLong(exprs[1], qc);
-    if(count <= 0) return Empty.ITER;
-    if(count == 1) return expr.iter(qc);
+    final long size = toLong(exprs[1], qc);
+    if(size <= 0) return Empty.ITER;
+    if(size == 1) return expr.iter(qc);
 
     // check if expression must be evaluated only once
     final boolean once = exprs.length < 3 || !toBoolean(exprs[2], qc);
-    if(once) return SingletonSeq.get(expr.value(qc), count).iter();
+    if(once) return SingletonSeq.get(expr.value(qc), size).iter();
 
     // repeated evaluations
-    final long size = exprs[0].size();
-    if(size == 1) {
+    if(expr.seqType().one()) {
       // replication of single item
       return new Iter() {
-        long c = count;
+        long c = size;
 
         @Override
         public Item next() throws QueryException {
@@ -66,21 +65,21 @@ public final class UtilReplicate extends StandardFunc {
         }
         @Override
         public long size() {
-          return count;
+          return size;
         }
       };
     }
 
     // standard evaluation
     return new Iter() {
-      long c = count;
+      long c = size;
       Iter iter;
 
       @Override
       public Item next() throws QueryException {
         while(true) {
           if(iter == null) {
-            if(c-- == 0) return null;
+            if(--c < 0) return null;
             iter = expr.iter(qc);
           }
           final Item item = iter.next();

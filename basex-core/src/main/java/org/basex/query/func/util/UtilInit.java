@@ -34,10 +34,11 @@ public final class UtilInit extends StandardFunc {
 
     // return optimized iterator if result size is known
     if(size != -1) return new Iter() {
-      int n;
+      int c;
+
       @Override
       public Item next() throws QueryException {
-        return ++n < size ? qc.next(iter) : null;
+        return ++c < size ? qc.next(iter) : null;
       }
       @Override
       public Item get(final long i) throws QueryException {

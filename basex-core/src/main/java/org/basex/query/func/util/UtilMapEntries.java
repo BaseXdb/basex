@@ -39,7 +39,7 @@ public final class UtilMapEntries extends StandardFunc {
       }
       @Override
       public long size() {
-        return keys.size();
+        return map.mapSize();
       }
     };
   }

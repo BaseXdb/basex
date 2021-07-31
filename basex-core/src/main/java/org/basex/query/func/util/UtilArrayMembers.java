@@ -8,6 +8,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -23,9 +24,18 @@ public final class UtilArrayMembers extends StandardFunc {
 
     return new Iter() {
       final Iterator<Value> members = array.members().iterator();
+
       @Override
       public XQArray next() {
         return members.hasNext() ? XQArray.member(members.next()) : null;
+      }
+      @Override
+      public Item get(final long i) throws QueryException {
+        return XQArray.member(array.get(i));
+      }
+      @Override
+      public long size() {
+        return array.arraySize();
       }
     };
   }

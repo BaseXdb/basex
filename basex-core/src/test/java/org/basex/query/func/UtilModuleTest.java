@@ -27,6 +27,8 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" [ 1, 2 ]"), "[1]\n[2]");
     query(func.args(" [ (1, 2) ]"), "[(1, 2)]");
     query(func.args(" [ (1, 2), 3 ]"), "[(1, 2)]\n[3]");
+    query(func.args(" array { <_>1</_> to 100000 }") + " => util:last()", "[100000]");
+
   }
 
   /** Test method. */
@@ -39,6 +41,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" [ 1, 2 ]"), "1\n2");
     query(func.args(" [ (1, 2) ]"), "1\n2");
     query(func.args(" [ (1, 2), 3 ]"), "1\n2\n3");
+    query(func.args(" array { <_>1</_> to 100000 }") + " => util:last()", "100000");
   }
 
   /** Test method. */

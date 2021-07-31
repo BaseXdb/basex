@@ -42,6 +42,7 @@ public final class FnReverse extends StandardFunc {
     // fast route if the size is known
     if(size > -1) return new Iter() {
       long c = size;
+
       @Override
       public Item next() throws QueryException {
         qc.checkStop();

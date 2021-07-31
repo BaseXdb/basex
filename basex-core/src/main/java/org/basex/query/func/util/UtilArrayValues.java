@@ -37,6 +37,14 @@ public final class UtilArrayValues extends StandardFunc {
           ir = members.next().iter();
         }
       }
+      @Override
+      public Item get(final long i) throws QueryException {
+        return array.get(i).item(qc, info);
+      }
+      @Override
+      public long size() {
+        return array.funcType().declType.one() ? array.arraySize() : -1;
+      }
     };
   }
 
