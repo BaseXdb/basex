@@ -124,7 +124,17 @@ public final class XQMap extends XQData {
     if(this == EMPTY) return map;
     if(map == EMPTY) return this;
     final TrieNode upd = root.addAll(map.root, 0, merge, qc, ii);
-    return upd == map.root ? map : new XQMap(upd, type.union(map.type));
+    if(upd == map.root) return map;
+
+    final Type tp;
+    if(merge == MergeDuplicates.COMBINE) {
+      final MapType mt = (MapType) map.type;
+      final SeqType mst = mt.declType;
+      tp = union(mt.keyType(), mst.zero() ? mst : mst.with(Occ.ONE_OR_MORE));
+    } else {
+      tp = type.union(map.type);
+    }
+    return new XQMap(upd, tp);
   }
 
   @Override
@@ -175,20 +185,20 @@ public final class XQMap extends XQData {
     if(this == EMPTY) return entry(key, value, ii);
 
     final TrieNode ins = root.put(key.hash(ii), key, value, 0, ii);
-    return ins == root ? this : new XQMap(ins, union(key, value));
+    return ins == root ? this : new XQMap(ins, union(key.type, value.seqType()));
   }
 
   /**
    * Creates a new map type.
-   * @param key key to be added
-   * @param value value to be added
+   * @param kt key type
+   * @param vt value type
    * @return union type
    */
-  private Type union(final Item key, final Value value) {
+  private Type union(final Type kt, final SeqType vt) {
     final MapType mt = (MapType) type;
-    final Type mkt = mt.keyType(), kt = key.type;
-    final SeqType mst = mt.declType, st = value.seqType();
-    return mkt == kt && mst.eq(st) ? type : MapType.get((AtomType) mkt.union(kt), mst.union(st));
+    final Type mkt = mt.keyType();
+    final SeqType mst = mt.declType;
+    return mkt == kt && mst.eq(vt) ? type : MapType.get((AtomType) mkt.union(kt), mst.union(vt));
   }
 
   /**
