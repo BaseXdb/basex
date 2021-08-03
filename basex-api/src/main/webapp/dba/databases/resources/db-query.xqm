@@ -24,7 +24,7 @@ declare
 function dba:db-query(
   $name      as xs:string,
   $resource  as xs:string,
-  $query     as xs:string
+  $query     as xs:string?
 ) as xs:string {
   util:query(if($query) then $query else '.', db:open($name, $resource))
 };
