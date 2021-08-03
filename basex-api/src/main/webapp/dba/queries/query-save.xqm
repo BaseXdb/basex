@@ -20,7 +20,7 @@ declare
   %output:method('text')
 function dba:query-save(
   $name   as xs:string,
-  $query  as xs:string
+  $query  as xs:string?
 ) as xs:string {
   let $path := config:directory() || $name
   return (
