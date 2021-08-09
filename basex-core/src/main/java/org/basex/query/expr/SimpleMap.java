@@ -246,6 +246,10 @@ public abstract class SimpleMap extends Arr {
             args[0] instanceof ContextValue)) {
           // ITEMS ! data(.)  ->  data(ITEMS)
           return cc.function(DATA, info, expr);
+        } else if(STRING_TO_CODEPOINTS.is(expr) && CODEPOINTS_TO_STRING.is(next) &&
+            args[0] instanceof ContextValue) {
+          // string-to-codepoints(STRING) ! codepoints-to-string(.)  ->  util:chars(STRING)
+          return cc.function(_UTIL_CHARS, info, expr.args());
         }
       }
 

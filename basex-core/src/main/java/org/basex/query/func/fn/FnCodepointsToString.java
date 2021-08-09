@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -40,7 +41,12 @@ public final class FnCodepointsToString extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr expr = exprs[0];
+
+    // codepoints-to-string(string-to-codepoints(A))  ->  string(A)
+    if(STRING_TO_CODEPOINTS.is(expr)) return cc.function(STRING, info, expr.args());
+
     singleInt = exprs[0].seqType().instanceOf(SeqType.INTEGER_O);
     return this;
   }

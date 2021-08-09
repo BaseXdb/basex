@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -38,9 +40,14 @@ public final class FnStringJoin extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final SeqType st1 = exprs[0].seqType();
-    final SeqType st2 = (exprs.length > 1 ? exprs[1] : Str.EMPTY).seqType();
+    final Expr expr1 = exprs[0], expr2 = exprs.length > 1 ? exprs[1] : Str.EMPTY;
+
+    // string-join(util:chars(A))  ->  string(A)
+    if(_UTIL_CHARS.is(expr1) && expr2 == Str.EMPTY) return cc.function(STRING, info, expr1.args());
+
+    final SeqType st1 = expr1.seqType();
+    final SeqType st2 = expr2.seqType();
     return (st1.zero() || st1.one() && st1.type.isStringOrUntyped()) &&
-        st2.type.isStringOrUntyped() ? cc.function(Function.STRING, info, exprs[0]) : this;
+        st2.type.isStringOrUntyped() ? cc.function(Function.STRING, info, expr1) : this;
   }
 }

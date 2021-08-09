@@ -154,6 +154,12 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void codepointsToString() {
+    final Function func = CODEPOINTS_TO_STRING;
+    check(func.args(" string-to-codepoints(<_>ABC</_>)"), "ABC", root(STRING));
+  }
+
+  /** Test method. */
   @Test public void contains() {
     final Function func = CONTAINS;
 
@@ -873,6 +879,14 @@ public final class FnModuleTest extends QueryPlanTest {
 
     error(func.args(), NOCTX_X);
     error(func.args(" true#0"), FISTRING_X);
+  }
+
+  /** Test method. */
+  @Test public void stringJoin() {
+    final Function func = STRING_JOIN;
+    check(func.args(" util:chars(<_>ABC</_>)"), "ABC", root(STRING));
+    check(func.args(" string-to-codepoints(<_>ABC</_>) ! codepoints-to-string(.)"),
+        "ABC", root(STRING));
   }
 
   /** Test method. */

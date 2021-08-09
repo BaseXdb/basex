@@ -62,8 +62,10 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" <_>abc</_>"), "a\nb\nc");
     query(func.args(" <_>abc</_>") + "[2]", "b");
     query(func.args(" <_>abc</_>") + "[last()]", "c");
+
     check("count(" + func.args(" string-join(util:replicate(<_>A</_>, 100000))") + ')', 100000,
         exists(STRING_LENGTH));
+    check("string-to-codepoints(<_>AB</_>) ! codepoints-to-string(.)", "A\nB", root(func));
   }
 
   /** Test method. */
