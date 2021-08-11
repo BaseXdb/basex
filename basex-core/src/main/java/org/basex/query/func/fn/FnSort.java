@@ -39,12 +39,12 @@ public final class FnSort extends StandardFunc {
 
   /**
    * Sort the input data and returns an iterator.
-   * @param value value
+   * @param input items to be sorted
    * @param qc query context
    * @return iterator with ordered items
    * @throws QueryException query exception
    */
-  private Iter iter(final Value value, final QueryContext qc) throws QueryException {
+  private Iter iter(final Value input, final QueryContext qc) throws QueryException {
     Collation coll = sc.collation;
     if(exprs.length > 1) {
       final byte[] token = toTokenOrNull(exprs[1], qc);
@@ -52,9 +52,9 @@ public final class FnSort extends StandardFunc {
     }
     final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
 
-    final long size = value.size();
+    final long size = input.size();
     final ValueList values = new ValueList(size);
-    final Iter iter = value.iter();
+    final Iter iter = input.iter();
     for(Item item; (item = qc.next(iter)) != null;) {
       values.add((key == null ? item : key.invoke(qc, info, item)).atomValue(qc, info));
     }
@@ -63,14 +63,14 @@ public final class FnSort extends StandardFunc {
     return new BasicIter<Item>(size) {
       @Override
       public Item get(final long i) {
-        return value.itemAt(order[(int) i]);
+        return input.itemAt(order[(int) i]);
       }
     };
   }
 
   /**
    * Sort the input data and returns integers representing the item order.
-   * @param values value list
+   * @param values values to sort
    * @param sf calling function
    * @param coll collation
    * @param qc query context

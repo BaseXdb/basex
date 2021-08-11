@@ -1,11 +1,15 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -27,5 +31,18 @@ public final class FnSubstringAfter extends StandardFunc {
       return pos == -1 ? Str.EMPTY : Str.get(substring(string, pos + sub.length));
     }
     return Str.get(coll.after(string, sub, info));
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
+
+    if((st1.zero() || st1.one() && st1.type.isStringOrUntyped()) &&
+       (st2.zero() || st2.one() && st2.type.isStringOrUntyped()) && exprs.length < 3) {
+      if(expr1 == Empty.VALUE || expr1 == Str.EMPTY || expr1.equals(expr2)) return Str.EMPTY;
+      if(expr2 == Empty.VALUE || expr2 == Str.EMPTY) return cc.function(STRING, info, expr1);
+    }
+    return this;
   }
 }

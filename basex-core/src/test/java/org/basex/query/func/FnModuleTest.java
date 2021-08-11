@@ -505,6 +505,23 @@ public final class FnModuleTest extends QueryPlanTest {
     final Function func = MATCHES;
     query(func.args("a", ""), true);
     query(func.args("a", "", "j"), true);
+
+    query(func.args("nop", 'o'), true);
+    query(func.args("nöp", 'ö'), true);
+    query(func.args("nop", '.'), true);
+
+    check(func.args(" <_>nop</_>", 'o'), true, root(CONTAINS));
+    check(func.args(" <_>nöp</_>", 'ö'), true, root(CONTAINS));
+    check(func.args(" <_>nop</_>", '.'), true, root(func));
+
+    query(func.args("nop", " <_>o</_>"), true);
+    query(func.args("nöp", " <_>ö</_>"), true);
+    query(func.args("nop", " <_>.</_>"), true);
+
+    query(func.args(" <_>nop</_>", " <_>o</_>"), true);
+    query(func.args(" <_>nöp</_>", " <_>ö</_>"), true);
+    query(func.args(" <_>nop</_>", " <_>.</_>"), true);
+
     error(func.args("a", "+"), REGPAT_X);
     error(func.args("a", "+", "j"), REGPAT_X);
   }
@@ -751,6 +768,10 @@ public final class FnModuleTest extends QueryPlanTest {
   @Test public void replace() {
     final Function func = REPLACE;
 
+    query(func.args("a", "a", "b"), "b");
+    query(func.args("ä", "ä", "b"), "b");
+    query(func.args("a", ".", "b"), "b");
+
     query(func.args("a", "", "x", "j"), "xax");
     error(func.args("a", "", "x"), REGROUP);
 
@@ -760,10 +781,10 @@ public final class FnModuleTest extends QueryPlanTest {
     error(func.args("asdf", "a{12, 3}", ""), REGPAT_X);
 
     // GH-1940
-    query("replace('hello', 'hel(?:lo)', '$1')", "");
-    query("replace('abc', 'b', '$0')", "abc");
-    query("replace('abc', 'b', '$1')", "ac");
-    query("replace('abc', 'b', '$10')", "a0c");
+    query(func.args("hello", "hel(?:lo)", "$1"), "");
+    query(func.args("abc", "b", "$0"), "abc");
+    query(func.args("abc", "b", "$1"), "ac");
+    query(func.args("abc", "b", "$10"), "a0c");
   }
 
   /** Test method. */
@@ -900,6 +921,16 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void stringToCodepoints() {
+    final Function func = STRING_TO_CODEPOINTS;
+    query(func.args("ab"), "97\n98");
+    query(func.args(" <_>ab</_>"), "97\n98");
+
+    query("subsequence(" + func.args(" <_>aaa</_>") + ", 3)", 97);
+    query("subsequence(" + func.args(" <_>äaaa</_>") + ", 3)", "97\n97");
+  }
+
+  /** Test method. */
   @Test public void subsequence() {
     final Function func = SUBSEQUENCE;
 
@@ -1029,6 +1060,50 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void substringAfter() {
+    final Function func = SUBSTRING_AFTER;
+    check(func.args(" ()", " <_>1</_>"), "", root(Str.class));
+    check(func.args("", " <_>1</_>"), "", root(Str.class));
+    check(func.args(" <_>1</_>", " <_>1</_>"), "", root(Str.class));
+    check(func.args(" <_>1</_>", " () "), 1, root(STRING));
+    check(func.args(" <_>1</_>", ""), 1, root(STRING));
+
+    check(func.args(" <_>1</_>", " <_/>"), 1, root(func));
+    check(func.args(" <_/>", " <_>1</_>"), "", root(func));
+
+    check(func.args("12", "1"), 2, root(Str.class));
+    check(func.args(" <_>12</_>", "1"), 2, root(func));
+    check(func.args("12", " <_>1</_>"), 2, root(func));
+    check(func.args(" <_>12</_>", " <_>1</_>"), 2, root(func));
+
+    check(func.args(" <_>12</_>", " <_>13</_>"), "", root(func));
+    check(func.args("A", "B", "?lang=de"), "", root(Str.class));
+  }
+
+  /** Test method. */
+  @Test public void substringBefore() {
+    final Function func = SUBSTRING_BEFORE;
+    check(func.args(" ()", " <_>1</_>"), "", root(Str.class));
+    check(func.args("", " <_>1</_>"), "", root(Str.class));
+    check(func.args(" <_>1</_>", " <_>1</_>"), "", root(Str.class));
+    check(func.args(" ()", " <_>1</_>"), "", root(Str.class));
+    check(func.args("", " <_>1</_>"), "", root(Str.class));
+    check(func.args(" <_>1</_>", " ()"), "", root(Str.class));
+    check(func.args(" <_>1</_>", ""), "", root(Str.class));
+
+    check(func.args(" <_>1</_>", " <_/>"), "", root(func));
+    check(func.args(" <_/>", " <_>1</_>"), "", root(func));
+
+    check(func.args("12", "2"), 1, root(Str.class));
+    check(func.args(" <_>12</_>", "2"), 1, root(func));
+    check(func.args("12", " <_>2</_>"), 1, root(func));
+    check(func.args(" <_>12</_>", " <_>2</_>"), 1, root(func));
+
+    check(func.args(" <_>12</_>", " <_>13</_>"), "", root(func));
+    check(func.args("A", "B", "?lang=de"), "", root(Str.class));
+  }
+
+  /** Test method. */
   @Test public void sum() {
     final Function func = SUM;
     query(func.args(1), 1);
@@ -1135,7 +1210,42 @@ public final class FnModuleTest extends QueryPlanTest {
   @Test public void tokenize() {
     final Function func = TOKENIZE;
     query(func.args("a", "", "j"), "\na\n");
+    query(func.args(" <_>a</_>", "", "j"), "\na\n");
+    query(func.args("a", " <_/>", "j"), "\na\n");
+    query(func.args(" <_>a</_>", " <_/>", "j"), "\na\n");
+
+    query("subsequence(" + func.args(" <_>a b c d</_>") + ", 3)", "c\nd");
+    query("subsequence(" + func.args(" <_>a,b,c,d</_>", ",") + ", 3)", "c\nd");
+    query("subsequence(" + func.args(" <_>a!!b!!c!!d</_>", "!!") + ", 3)", "c\nd");
+    query("subsequence(" + func.args(" <_/>") + ", 3)", "");
+    query("subsequence(" + func.args(" <_/>", "!!") + ", 3)", "");
+
+    query("subsequence(" + func.args(" <_>aXbXcXd</_>", "x", "i") + ", 3)", "c\nd");
+
+    query(func.args(" <_>a b c d</_>"), "a\nb\nc\nd");
+    query(func.args(" <_>a,b,c,d</_>", ","), "a\nb\nc\nd");
+    query(func.args(" <_>a!!b!!c!!d</_>", "!!"), "a\nb\nc\nd");
+    query(func.args(" <_/>"), "");
+    query(func.args(" <_/>", "!!"), "");
+
+    check(func.args(" normalize-space(<_>A</_>)", " ' '"), "A", empty(NORMALIZE_SPACE));
+    check("(<_>A</_>, <_>B</_>) ! " + func.args(" normalize-space()", " ' '"), "A\nB",
+        empty(NORMALIZE_SPACE));
+    check(func.args(" normalize-space(<_>A</_>)", " <_>;</_>"), "A", exists(NORMALIZE_SPACE));
+    check(func.args(" normalize-space(<_>A</_>)", ";"), "A", exists(NORMALIZE_SPACE));
+
     error(func.args("a", ""), REGROUP);
+  }
+
+  /** Test method. */
+  @Test public void translate() {
+    final Function func = TRANSLATE;
+    query(func.args("a", "a", "b"), "b");
+    query(func.args("a", "", "b"), "a");
+
+    check(func.args("a", " <_/>", "b"), "a", root(func));
+    check(func.args(" <_/>", "a", "b"), "", root(func));
+    check(func.args(" <_>abcd</_>", "bd", "B"), "aBc", root(func));
   }
 
   /** Test method. */

@@ -4,6 +4,7 @@ import java.text.*;
 import java.util.*;
 
 import org.basex.io.out.*;
+import org.basex.util.list.*;
 
 /**
  * <p>This class provides convenience operations for handling 'Tokens'.
@@ -320,11 +321,16 @@ public final class Token {
    * @return codepoints
    */
   public static int[] cps(final byte[] token) {
+    final int cl = token.length;
+    final int[] cps = new int[cl];
+    if(ascii(token)) {
+      for(int c = 0; c < cl; c++) cps[c] = token[c];
+      return cps;
+    }
+
     int pos = 0;
-    final int tl = token.length;
-    final int[] cp = new int[tl];
-    for(int i = 0; i < tl; i += cl(token, i)) cp[pos++] = cp(token, i);
-    return pos < tl ? Arrays.copyOf(cp, pos) : cp;
+    for(int c = 0; c < cl; c += cl(token, c)) cps[pos++] = cp(token, c);
+    return pos < cl ? Arrays.copyOf(cps, pos) : cps;
   }
 
   /**
@@ -751,13 +757,24 @@ public final class Token {
    * @return position or {@code -1}
    */
   public static int indexOf(final byte[] token, final int ch) {
+    return indexOf(token, ch, 0);
+  }
+
+  /**
+   * Returns the position of the specified character or -1.
+   * @param token token
+   * @param ch character to be found
+   * @param pos start position
+   * @return position or {@code -1}
+   */
+  public static int indexOf(final byte[] token, final int ch, final int pos) {
     final int tl = token.length;
     if(ch < 0x80) {
-      for(int t = 0; t < tl; t++) {
+      for(int t = pos; t < tl; t++) {
         if(token[t] == ch) return t;
       }
     } else {
-      for(int t = 0; t < tl; t += cl(token, t)) {
+      for(int t = pos; t < tl; t += cl(token, t)) {
         if(cp(token, t) == ch) return t;
       }
     }
@@ -946,28 +963,38 @@ public final class Token {
     return Arrays.copyOfRange(token, s, t);
   }
 
+
   /**
    * Splits a token around matches of the given separator.
    * @param token token to be split
-   * @param sep separation character
+   * @param separator separator character
    * @return array
    */
-  public static byte[][] split(final byte[] token, final int sep) {
-    final int tl = token.length;
-    final byte[][] split = new byte[tl][];
+  public static byte[][] split(final byte[] token, final int separator) {
+    return split(token, separator, false);
+  }
 
-    int sl = 0;
+  /**
+   * Splits a token around matches of the given separator.
+   * @param token token to be split
+   * @param separator separator character
+   * @param empty include empty tokens
+   * @return array
+   */
+  public static byte[][] split(final byte[] token, final int separator, final boolean empty) {
+    final TokenList split = new TokenList();
     final TokenBuilder tb = new TokenBuilder();
+    final int tl = token.length;
     for(int t = 0; t < tl; t += cl(token, t)) {
       final int c = cp(token, t);
-      if(c == sep) {
-        if(!tb.isEmpty()) split[sl++] = tb.next();
+      if(c == separator) {
+        if(empty || !tb.isEmpty()) split.add(tb.next());
       } else {
         tb.add(c);
       }
     }
-    if(!tb.isEmpty()) split[sl++] = tb.finish();
-    return Array.copyOf(split, sl);
+    if(empty || !tb.isEmpty()) split.add(tb.finish());
+    return split.finish();
   }
 
   /**

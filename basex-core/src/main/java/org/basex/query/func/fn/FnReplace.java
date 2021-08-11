@@ -18,21 +18,28 @@ import org.basex.util.*;
 public final class FnReplace extends RegEx {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String input = string(toZeroToken(exprs[0], qc));
-    final RegExpr regExpr = regExpr(exprs[1], exprs.length == 4 ? exprs[3] : null, qc, true);
-    final byte[] value2 = toToken(exprs[2], qc);
-    String replace = string(value2);
+    final byte[] value = toZeroToken(exprs[0], qc);
+    final byte[] pttrn = toToken(exprs[1], qc), rplc = toToken(exprs[2], qc);
+
+    if(exprs.length < 4) {
+      final int sp = patternChar(pttrn), rp = patternChar(rplc);
+      if(sp != -1 && rp != -1) return Str.get(replace(value, sp, rp));
+    }
+
+    final RegExpr regExpr = regExpr(pttrn, exprs.length == 4 ? exprs[3] : null, qc, true);
+    final String input = string(value);
+    String replace = string(rplc);
 
     if((regExpr.pattern.flags() & Pattern.LITERAL) == 0) {
       // standard parsing: raise errors for some special cases
-      final int rl = value2.length;
+      final int rl = rplc.length;
       for(int r = 0; r < rl; ++r) {
-        final int n = r + 1 == rl ? 0 : value2[r + 1];
-        if(value2[r] == '\\') {
-          if(n != '\\' && n != '$') throw FUNREPBS_X.get(info, value2);
+        final int n = r + 1 == rl ? 0 : rplc[r + 1];
+        if(rplc[r] == '\\') {
+          if(n != '\\' && n != '$') throw FUNREPBS_X.get(info, rplc);
           ++r;
-        } else if(value2[r] == '$' && (r == 0 || value2[r - 1] != '\\') && !digit(n)) {
-          throw FUNREPDOL_X.get(info, value2);
+        } else if(rplc[r] == '$' && (r == 0 || rplc[r - 1] != '\\') && !digit(n)) {
+          throw FUNREPDOL_X.get(info, rplc);
         }
       }
 

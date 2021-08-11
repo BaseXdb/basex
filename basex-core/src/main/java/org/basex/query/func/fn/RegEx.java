@@ -21,6 +21,12 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 abstract class RegEx extends StandardFunc {
+  /** Regex characters. */
+  static final byte[] REGEX_CHARS = Token.token("\\^$.|?*+()[]{}");
+
+  /** Pattern cache. */
+  private final TokenObjMap<RegExpr> patterns = new TokenObjMap<>();
+
   /**
    * Regular expression pattern.
    */
@@ -31,47 +37,53 @@ abstract class RegEx extends StandardFunc {
     int groups;
   }
 
-  /** Pattern cache. */
-  private final TokenObjMap<RegExpr> patterns = new TokenObjMap<>();
-
   /**
    * Returns a regular expression pattern.
-   * @param regex pattern
+   * @param pattern pattern
    * @param modifier modifier item
    * @param qc query context
    * @param check check result for empty strings
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  protected final Pattern pattern(final Expr regex, final Expr modifier, final QueryContext qc,
+  final Pattern pattern(final byte[] pattern, final Expr modifier, final QueryContext qc,
       final boolean check) throws QueryException {
-    return regExpr(regex, modifier, qc, check).pattern;
+    return regExpr(pattern, modifier, qc, check).pattern;
   }
 
   /**
    * Returns a regular expression pattern.
-   * @param regex pattern
-   * @param modifier modifier item
+   * @param pattern pattern
+   * @param modifier modifier item (can be {@code null})
    * @param qc query context
    * @param check check result for empty strings
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  protected final RegExpr regExpr(final Expr regex, final Expr modifier, final QueryContext qc,
+  final RegExpr regExpr(final byte[] pattern, final Expr modifier, final QueryContext qc,
       final boolean check) throws QueryException {
 
-    final byte[] pat = toToken(regex, qc);
     final byte[] mod = modifier != null ? toToken(modifier, qc) : Token.EMPTY;
-    final byte[] key = Token.concat(pat, '\b', mod);
+    final byte[] key = Token.concat(pattern, '\b', mod);
 
     synchronized(patterns) {
       RegExpr regExpr = patterns.get(key);
       if(regExpr == null) {
-        regExpr = parse(pat, mod, check);
+        regExpr = parse(pattern, mod, check);
         patterns.put(key, regExpr);
       }
       return regExpr;
     }
+  }
+
+  /**
+   * Tries to convert the regex pattern to a single character.
+   * @param pattern pattern
+   * @return character
+   */
+  int patternChar(final byte[] pattern) {
+    final int sl = pattern.length, separator = sl > 0 && cl(pattern, 0) == sl ? cp(pattern, 0) : -1;
+    return separator == -1 || contains(REGEX_CHARS, separator) ? -1 : separator;
   }
 
   /**

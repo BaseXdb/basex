@@ -45,8 +45,7 @@ public final class FnStringJoin extends StandardFunc {
     // string-join(util:chars(A))  ->  string(A)
     if(_UTIL_CHARS.is(expr1) && expr2 == Str.EMPTY) return cc.function(STRING, info, expr1.args());
 
-    final SeqType st1 = expr1.seqType();
-    final SeqType st2 = expr2.seqType();
+    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     return (st1.zero() || st1.one() && st1.type.isStringOrUntyped()) &&
         st2.type.isStringOrUntyped() ? cc.function(Function.STRING, info, expr1) : this;
   }
