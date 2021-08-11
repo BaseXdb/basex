@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -35,21 +34,13 @@ public final class CComm extends CNode {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     simplifyAll(Simplify.STRING, cc);
+    optValue(cc);
     return this;
   }
 
   @Override
   public FComm item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = exprs[0].atomIter(qc, info);
-
-    final TokenBuilder tb = new TokenBuilder();
-    boolean more = false;
-    for(Item item; (item = qc.next(iter)) != null;) {
-      if(more) tb.add(' ');
-      tb.add(item.string(info));
-      more = true;
-    }
-    return new FComm(FComm.parse(tb.finish(), info));
+    return new FComm(FComm.parse(atomValue(qc, true), info));
   }
 
   @Override

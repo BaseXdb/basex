@@ -3,6 +3,7 @@ package org.basex.query.expr.constr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -41,15 +42,28 @@ public abstract class CNode extends Arr {
   public abstract Item item(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
+   * Optimizes the node value.
+   * @param cc compilation context
+   * @throws QueryException query exception
+   */
+  final void optValue(final CompileContext cc) throws QueryException {
+    simplifyAll(Simplify.STRING, cc);
+    if(allAreValues(true) && (exprs.length != 1 || !(exprs[0] instanceof Str))) {
+      exprs = new Expr[] { Str.get(atomValue(cc.qc, true)) };
+    }
+  }
+
+  /**
    * Returns the atomized node value.
    * @param qc query context
    * @return resulting value or {@code null}
+   * @param empty return empty string
    * @throws QueryException query exception
    */
-  byte[] atomValue(final QueryContext qc) throws QueryException {
+  final byte[] atomValue(final QueryContext qc, final boolean empty) throws QueryException {
     final int el = exprs.length;
     // empty sequence: empty string
-    if(el == 0) return null;
+    if(el == 0) return empty ? Token.EMPTY : null;
     // single string argument
     if(el == 1 && exprs[0] instanceof Str) return ((Str) exprs[0]).string();
 
@@ -64,7 +78,7 @@ public abstract class CNode extends Arr {
         more = true;
       }
     }
-    return more ? tb.finish() : null;
+    return more ? tb.finish() : empty ? Token.EMPTY : null;
   }
 
   @Override

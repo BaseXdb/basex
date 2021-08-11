@@ -51,7 +51,7 @@ public final class CNSpace extends CName {
     final byte[] nm = ncname(true, qc);
     if(nm.length != 0 && !XMLToken.isNCName(nm)) throw INVNSNAME_X.get(info, nm);
 
-    final byte[] value = atomValue(qc);
+    final byte[] value = atomValue(qc, true);
     if(eq(nm, XML) ^ eq(value, XML_URI)) throw CNXML.get(info);
     if(eq(nm, XMLNS)) throw CNINV_X.get(info, nm);
     if(eq(value, XMLNS_URI) || value.length == 0) throw CNINVNS_X.get(info, value);

@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import static org.basex.util.Token.normalize;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -50,24 +49,6 @@ abstract class CName extends CNode {
   public Expr compile(final CompileContext cc) throws QueryException {
     name = name.compile(cc);
     return super.compile(cc);
-  }
-
-  /**
-   * Optimizes the node value.
-   * @param cc compilation context
-   * @throws QueryException query exception
-   */
-  final void optValue(final CompileContext cc) throws QueryException {
-    simplifyAll(Simplify.STRING, cc);
-    if(allAreValues(true) && (exprs.length != 1 || !(exprs[0] instanceof Str))) {
-      exprs = new Expr[] { Str.get(atomValue(cc.qc)) };
-    }
-  }
-
-  @Override
-  final byte[] atomValue(final QueryContext qc) throws QueryException {
-    final byte[] value = super.atomValue(qc);
-    return value != null ? value : Token.EMPTY;
   }
 
   /**

@@ -71,7 +71,7 @@ public final class CAttr extends CName {
     }
     if(!nm.hasURI() && nm.hasPrefix()) throw INVPREF_X.get(info, nm);
 
-    byte[] value = atomValue(qc);
+    byte[] value = atomValue(qc, true);
     if(eq(cp, XML) && eq(nm.local(), ID)) value = normalize(value);
 
     return new FAttr(nm, value);

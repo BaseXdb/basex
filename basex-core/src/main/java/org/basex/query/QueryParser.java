@@ -2546,7 +2546,7 @@ public class QueryParser extends InputParser {
       if(consume('`') && consume('{')) {
         if(!tb.isEmpty()) el.add(Str.get(tb.next()));
         final Expr ex = expr();
-        if(ex != null) el.add(Function.STRING_JOIN.get(sc, info(), ex, Str.get(" ")));
+        if(ex != null) el.add(Function.STRING_JOIN.get(sc, info(), ex, Str.SPACE));
         skipWs();
         check('}');
         check('`');
@@ -2937,7 +2937,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compText() throws QueryException {
-    return curr('{') ? new CTxt(sc, info(), true, enclosedExpr()) : null;
+    return curr('{') ? new CTxt(sc, info(), enclosedExpr()) : null;
   }
 
   /**

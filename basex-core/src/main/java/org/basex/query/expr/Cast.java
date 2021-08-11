@@ -29,7 +29,7 @@ public final class Cast extends Single {
    * @param sc static context
    * @param info input info
    * @param expr expression
-   * @param seqType sequence type to cast to (zero or one items)
+   * @param seqType sequence type to cast to (zero or one item)
    */
   public Cast(final StaticContext sc, final InputInfo info, final Expr expr,
       final SeqType seqType) {

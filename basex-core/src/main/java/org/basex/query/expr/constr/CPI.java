@@ -1,7 +1,6 @@
 package org.basex.query.expr.constr;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
@@ -57,10 +56,10 @@ public final class CPI extends CName {
     if(eq(lc(nm), XML)) throw CPIXML_X.get(info, nm);
     if(!XMLToken.isNCName(nm)) throw CPIINVAL_X.get(info, nm);
 
-    byte[] value = atomValue(qc);
+    byte[] value = atomValue(qc, true);
     int i = -1;
     final int vl = value.length;
-    while(++i < vl && value[i] >= 0 && value[i] <= ' ');
+    while(++i < vl && ws(value[i]));
     value = substring(value, i);
 
     return new FPI(new QNm(nm), FPI.parse(value, info));
@@ -79,7 +78,7 @@ public final class CPI extends CName {
   @Override
   public void toString(final QueryString qs) {
     if(computed) {
-      toString(qs, PROCESSING_INSTRUCTION);
+      toString(qs, QueryText.PROCESSING_INSTRUCTION);
     } else {
       qs.concat(FPI.OPEN, ((Str) name).string(), " ",
           QueryString.toValue(((Str) exprs[0]).string()), FPI.CLOSE);

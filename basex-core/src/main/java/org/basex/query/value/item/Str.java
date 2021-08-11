@@ -18,6 +18,8 @@ import org.basex.util.*;
 public final class Str extends AStr {
   /** Zero-length string. */
   public static final Str EMPTY = new Str(Token.EMPTY);
+  /** Single-spaced string. */
+  public static final Str SPACE = new Str(Token.SPACE);
 
   /**
    * Constructor.
