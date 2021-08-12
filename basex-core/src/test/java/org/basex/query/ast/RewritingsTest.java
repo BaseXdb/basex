@@ -2268,4 +2268,25 @@ public final class RewritingsTest extends QueryPlanTest {
         + "function($a, $b) { $a = $b })[last()]", true,
         root(_UTIL_LAST));
   }
+
+  /** Element constructors: Text concatenation. */
+  @Test public void gh2031() {
+    check("<a>{ }</a>", "<a/>", empty(Empty.class));
+    check("<a>{ () }</a>", "<a/>", empty(Empty.class));
+
+    check("<a>{ 'Jack' }</a>", "<a>Jack</a>",
+        count(Str.class, 1));
+    check("<a>Hi { 'Jack' }123</a>", "<a>Hi Jack123</a>",
+        count(Str.class, 1), empty(Int.class));
+    check("<a>Hi { text { 'Jack' } }123</a>", "<a>Hi Jack123</a>",
+        count(Str.class, 1), empty(CTxt.class), empty(Int.class));
+    check("<a>{ 'Hi', 'Jack', 123 }</a>", "<a>Hi Jack 123</a>",
+        count(Str.class, 1), empty(CTxt.class), empty(Int.class));
+    check("<a>{ 'Hi ', text { 'Jack' }, '123' }</a>", "<a>Hi Jack123</a>",
+        count(Str.class, 1), empty(CTxt.class), empty(Int.class));
+    check("<a>{ 'Hi ', (text { 'Jack' }, (), '123') }</a>", "<a>Hi Jack123</a>",
+        count(Str.class, 1), empty(CTxt.class), empty(Int.class), empty(Empty.class));
+    check("<a>{ 'Hi ', (), text { 'Jack' }, '123' }</a>", "<a>Hi Jack123</a>",
+        count(Str.class, 1), empty(CTxt.class), empty(Int.class), empty(Empty.class));
+  }
 }

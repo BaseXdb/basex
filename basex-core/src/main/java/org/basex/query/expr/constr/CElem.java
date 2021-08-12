@@ -5,15 +5,19 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.expr.path.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -65,6 +69,58 @@ public final class CElem extends CName {
             Test.get(NodeType.ELEMENT, nm)));
       }
     }
+
+    // merge adjacent and nested text values
+    final Predicate<Expr> atomic = arg -> arg.seqType().instanceOf(SeqType.ANY_ATOMIC_TYPE_ZM);
+    final Predicate<Expr> text = arg -> arg instanceof CTxt && arg.arg(0) instanceof Item;
+    final TokenBuilder tb = new TokenBuilder();
+    final ExprList list = new ExprList(exprs.length);
+    for(final Expr expr : exprs) {
+      if(expr instanceof List && ((Checks<Expr>) arg -> text.test(arg) ||
+          arg instanceof Value && atomic.test(arg)).all(expr.args())) {
+        boolean more = false;
+        for(final Expr arg : expr.args()) {
+          if(text.test(arg)) {
+            tb.add(((Item) arg.arg(0)).string(info));
+            more = false;
+          } else {
+            for(final Item item : (Value) arg) {
+              if(more) tb.add(' ');
+              tb.add(item.string(info));
+              more = true;
+            }
+          }
+        }
+        list.add(Str.get(tb.next()));
+      } else if(expr instanceof Seq && atomic.test(expr)) {
+        boolean more = false;
+        for(final Item item : (Seq) expr) {
+          if(more) tb.add(' ');
+          tb.add(item.string(info));
+          more = true;
+        }
+        list.add(Str.get(tb.next()));
+      } else if(!(expr instanceof Empty)) {
+        list.add(expr);
+      }
+    }
+    exprs = list.next();
+
+    if(exprs.length > 1 || exprs.length == 1 && !(exprs[0] instanceof Str)) {
+      for(final Expr expr : exprs) {
+        if(expr instanceof Item && atomic.test(expr)) {
+          tb.add(((Item) expr).string(info));
+        } else if(text.test(expr)) {
+          tb.add(((Item) expr.arg(0)).string(info));
+        } else {
+          if(!tb.isEmpty()) list.add(Str.get(tb.next()));
+          list.add(expr);
+        }
+      }
+      if(!tb.isEmpty()) list.add(Str.get(tb.finish()));
+      exprs = list.finish();
+    }
+
     return this;
   }
 
