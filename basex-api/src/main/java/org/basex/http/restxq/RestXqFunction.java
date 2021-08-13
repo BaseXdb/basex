@@ -201,7 +201,7 @@ public final class RestXqFunction extends WebFunction {
       for(final QNm qname : qnames) {
         final QNm qnm = new QNm(qname.string(), function.sc);
         if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
-        bind(qnm, args, new Atm(qnames.get(qname)), qc, "Path segment");
+        bind(qnm, args, Atm.get(qnames.get(qname)), qc, "Path segment");
       }
     }
 

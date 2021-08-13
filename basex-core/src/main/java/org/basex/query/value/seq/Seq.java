@@ -4,11 +4,13 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -202,6 +204,52 @@ public abstract class Seq extends Value {
   @Override
   public final SeqType seqType() {
     return SeqType.get(type, Occ.ONE_OR_MORE);
+  }
+
+  @Override
+  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(final Item item : this) vb.add(item.atomValue(qc, ii));
+    return vb.value(AtomType.ANY_ATOMIC_TYPE);
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc)
+      throws QueryException {
+
+    Value value = null;
+    if(type instanceof NodeType && (mode == Simplify.DATA || mode == Simplify.NUMBER ||
+      mode == Simplify.STRING)) {
+      if(mode == Simplify.STRING) {
+        final TokenList list = new TokenList(size);
+        for(int i = 0; i < size; i++) list.add(itemAt(i).string(null));
+        value = StrSeq.get(list);
+      } else {
+        final Item[] items = new Item[(int) size];
+        for(int i = 0; i < size; i++) items[i] = Atm.get(itemAt(i).string(null));
+        value = ItemSeq.get(items, (int) size, AtomType.UNTYPED_ATOMIC);
+      }
+    }
+    return value != null ? cc.simplify(this, value) : super.simplifyFor(mode, cc);
+  }
+
+  @Override
+  public void cache(final boolean lazy, final InputInfo ii) throws QueryException {
+    for(final Item item : this) item.cache(lazy, ii);
+  }
+
+  @Override
+  public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Item head = itemAt(0);
+    if(head instanceof ANode) return head;
+    throw ebvError(this, ii);
+  }
+
+  @Override
+  public long atomSize() {
+    long sz = 0;
+    for(final Item item : this) sz += item.atomSize();
+    return sz;
   }
 
   @Override

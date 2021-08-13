@@ -923,6 +923,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Promote to expression. */
   @Test public void gh1798() {
+    check("<a>1</a> promote to xs:string", 1, root(Str.class));
     check(wrap(1) + "promote to xs:string", 1, root(TypeCheck.class));
     check("(1, 2) promote to xs:double+", "1\n2",
         empty(TypeCheck.class), root(ItemSeq.class), count(Dbl.class, 2));
@@ -980,8 +981,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // absolute paths
     check("text { 'a' } ! <x>{ . }</x>/text() = 'a'", true, exists(IterMap.class));
-    check("string(<a>a</a>) ! <x>{ . }</x>/text() = 'a'", true, exists(IterMap.class));
-    check("<a>a</a>/string() ! <x>{ . }</x>/text() = 'a'", true, exists(IterMap.class));
+    check("string(<a>a</a>) ! <x>{ . }</x>/text() = 'a'", true, empty(IterMap.class));
+    check("<a>a</a>/string() ! <x>{ . }</x>/text() = 'a'", true, empty(IterMap.class));
   }
 
   /** Rewrite if to where. */
@@ -2295,5 +2296,22 @@ public final class RewritingsTest extends QueryPlanTest {
         count(Str.class, 1), empty(CTxt.class), empty(Int.class), empty(Empty.class));
     check("<a>{ 'Hi ', (), text { 'Jack' }, '123' }</a>", "<a>Hi Jack123</a>",
         count(Str.class, 1), empty(CTxt.class), empty(Int.class), empty(Empty.class));
+  }
+
+  /** Access to values in node constructors. */
+  @Test public void gh2032() {
+    check("declare variable $CONSTANTS := "
+        + "<xml><value>a</value><value>b</value><value>c</value></xml>/value;"
+        + "('a', 'b', 'c', 'd', 'e', 'f')[. = $CONSTANTS]",
+        "a\nb\nc", empty(FElem.class), empty(SmallSeq.class));
+
+    check("for $a in (1 to 7) ! string() return <_>{ $a }</_> = '4'",
+        "false\nfalse\nfalse\ntrue\nfalse\nfalse\nfalse",
+        empty(CElem.class), exists(Str.class));
+
+    check("declare variable $x := util:replicate(<a>a</a>, 2); data($x)",
+        "a\na", exists(SingletonSeq.class), exists(Atm.class));
+    check("declare variable $x := util:replicate(<a>a</a>, 2); distinct-values($x)",
+        "a", root(Atm.class));
   }
 }

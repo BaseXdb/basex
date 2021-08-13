@@ -8,6 +8,7 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
+import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -49,20 +50,20 @@ public final class CompileContext {
      * Atomizations.
      * Requested by {@link FnData}, {@link FnDistinctValues}, {@link GroupSpec}, {@link OrderKey},
      * {@link Lookup}, {@link TypeCheck}.
-     * Evaluated by {@link Cast}, {@link TypeCheck}, {@link FnData}.
+     * Evaluated by {@link Cast}, {@link TypeCheck}, {@link CNode}, {@link FnData}.
      */
     DATA,
     /**
      * String arguments.
      * Requested by {@link Cast}, {@link CmpG}, {@link StandardFunc} and others.
-     * Evaluated by {@link Cast}, {@link TypeCheck}, {@link FnData},
+     * Evaluated by {@link Cast}, {@link TypeCheck}, {@link CNode}, {@link FnData},
      * {@link FnString}, {@link UtilReplicate}.
      */
     STRING,
     /**
      * Numeric arguments.
      * Requested by {@link Arith}, {@link CmpIR}, {@link Range}, {@link StandardFunc} and others.
-     * Evaluated by {@link Cast}, {@link TypeCheck}, {@link FnData},
+     * Evaluated by {@link Cast}, {@link TypeCheck}, {@link CNode}, {@link FnData},
      * {@link FnNumber}, {@link UtilReplicate}.
      */
     NUMBER,

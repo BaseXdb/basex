@@ -9,6 +9,7 @@ import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -80,7 +81,14 @@ public final class SingletonSeq extends Seq {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    return mode == Simplify.DISTINCT ? cc.replaceWith(this, value) : super.simplifyFor(mode, cc);
+    Expr expr = null;
+    if(mode == Simplify.DISTINCT) {
+      expr = value;
+    } else if(type instanceof NodeType && (mode == Simplify.DATA || mode == Simplify.NUMBER ||
+        mode == Simplify.STRING)) {
+      expr = get((Value) value.simplifyFor(mode, cc), size / value.size());
+    }
+    return expr != null ? cc.simplify(this, expr) : super.simplifyFor(mode, cc);
   }
 
   @Override

@@ -6,6 +6,8 @@ import org.basex.api.dom.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -59,6 +61,18 @@ public abstract class ANode extends Item {
   public abstract byte[] string();
 
   @Override
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
+      throws QueryException {
+    Item item = null;
+    if(mode == Simplify.STRING) {
+      item = Str.get(string());
+    } else if(mode == Simplify.DATA || mode == Simplify.NUMBER) {
+      item = Atm.get(string());
+    }
+    return item != null ? cc.simplify(this, item) : super.simplifyFor(mode, cc);
+  }
+
+  @Override
   public final boolean comparable(final Item item) {
     return item.type.isStringOrUntyped();
   }
@@ -90,7 +104,7 @@ public abstract class ANode extends Item {
   @Override
   public final Item atomItem(final QueryContext qc, final InputInfo ii) {
     return type == NodeType.PROCESSING_INSTRUCTION || type == NodeType.COMMENT ?
-      Str.get(string()) : new Atm(string());
+      Str.get(string()) : Atm.get(string());
   }
 
   @Override

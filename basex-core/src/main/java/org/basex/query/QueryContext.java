@@ -257,7 +257,7 @@ public final class QueryContext extends Job implements Closeable {
       if(root != null && parent == null) {
         for(final Entry<String, String> entry : mopts.toMap(MainOptions.BINDINGS).entrySet()) {
           final String key = entry.getKey();
-          final Atm value = new Atm(entry.getValue());
+          final Atm value = Atm.get(entry.getValue());
           if(key.isEmpty()) {
             if(ctxItem == null) context(value, root.sc);
           } else {

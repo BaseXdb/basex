@@ -43,11 +43,11 @@ public enum AtomType implements Type {
     @Override
     public Atm cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return new Atm(item.string(ii));
+      return Atm.get(item.string(ii));
     }
     @Override
     public Atm cast(final Object value, final QueryContext qc, final InputInfo ii) {
-      return new Atm(value.toString());
+      return Atm.get(value.toString());
     }
   },
 
@@ -56,11 +56,11 @@ public enum AtomType implements Type {
     @Override
     public Atm cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      return new Atm(item.string(ii));
+      return Atm.get(item.string(ii));
     }
     @Override
     public Atm cast(final Object value, final QueryContext qc, final InputInfo ii) {
-      return new Atm(value.toString());
+      return Atm.get(value.toString());
     }
   },
 

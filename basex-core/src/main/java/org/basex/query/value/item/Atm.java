@@ -12,6 +12,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class Atm extends Item {
+  /** Zero-length atomic item. */
+  public static final Atm EMPTY = new Atm(Token.EMPTY);
+
   /** String data. */
   private final byte[] value;
 
@@ -19,17 +22,27 @@ public final class Atm extends Item {
    * Constructor.
    * @param value value
    */
-  public Atm(final byte[] value) {
+  private Atm(final byte[] value) {
     super(AtomType.UNTYPED_ATOMIC);
     this.value = value;
   }
 
   /**
-   * Constructor.
+   * Returns an instance of this class.
    * @param value value
+   * @return instance
    */
-  public Atm(final String value) {
-    this(Token.token(value));
+  public static Atm get(final String value) {
+    return get(Token.token(value));
+  }
+
+  /**
+   * Returns an instance of this class.
+   * @param value value
+   * @return instance
+   */
+  public static Atm get(final byte[] value) {
+    return value.length == 0 ? EMPTY : new Atm(value);
   }
 
   @Override

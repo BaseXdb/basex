@@ -77,7 +77,7 @@ public final class RequestContext {
       values = new HashMap<>();
       queryStrings().forEach((key, value) -> {
         final ItemList items = new ItemList();
-        for(final String string : value) items.add(new Atm(string));
+        for(final String string : value) items.add(Atm.get(string));
         values.put(key, items.value(AtomType.UNTYPED_ATOMIC));
       });
     }
@@ -148,7 +148,7 @@ public final class RequestContext {
     for(final String param : Strings.split(body().toString(), '&')) {
       final String[] parts = Strings.split(param, '=', 2);
       if(parts.length == 2) {
-        final Atm atm = new Atm(URLDecoder.decode(parts[1], Strings.UTF8));
+        final Atm atm = Atm.get(URLDecoder.decode(parts[1], Strings.UTF8));
         map.merge(parts[0], atm, (value1, value2) -> {
           final ItemList items = new ItemList();
           for(final Item item : value1) items.add(item);

@@ -87,7 +87,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
       // add headers (for binding them to the XQuery parameters in the corresponding bind method)
       final UpgradeRequest ur = sess.getUpgradeRequest();
       final BiConsumer<String, String> addHeader = (k, v) -> {
-        if(v != null) headers.put(k, new Atm(v));
+        if(v != null) headers.put(k, Atm.get(v));
       };
 
       addHeader.accept("http-version", ur.getHttpVersion());

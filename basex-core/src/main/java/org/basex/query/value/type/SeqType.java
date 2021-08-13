@@ -76,6 +76,8 @@ public final class SeqType {
   public static final SeqType NCNAME_ZO = NCNAME.seqType(ZERO_OR_ONE);
   /** Single language. */
   public static final SeqType LANGUAGE_O = LANGUAGE.seqType();
+  /** Single string. */
+  public static final SeqType UNTYPED_ATOMIC_ZO = UNTYPED_ATOMIC.seqType(ZERO_OR_ONE);
 
   /** Single URI. */
   public static final SeqType ANY_URI_O = ANY_URI.seqType();

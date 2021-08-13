@@ -1,14 +1,11 @@
 package org.basex.query.value.seq.tree;
 
-import static org.basex.query.QueryError.*;
-
 import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -89,32 +86,6 @@ public abstract class TreeSeq extends Seq {
 
   @Override
   public abstract BasicIter<Item> iter();
-
-  @Override
-  public final void cache(final boolean lazy, final InputInfo ii) throws QueryException {
-    for(final Item item : this) item.cache(lazy, ii);
-  }
-
-  @Override
-  public final Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Item item : this) vb.add(item.atomValue(qc, ii));
-    return vb.value(AtomType.ANY_ATOMIC_TYPE);
-  }
-
-  @Override
-  public final long atomSize() {
-    long sz = 0;
-    for(final Item item : this) sz += item.atomSize();
-    return sz;
-  }
-
-  @Override
-  public final Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item head = itemAt(0);
-    if(head instanceof ANode) return head;
-    throw ebvError(this, ii);
-  }
 
   /**
    * Prepends the given elements to this sequence.

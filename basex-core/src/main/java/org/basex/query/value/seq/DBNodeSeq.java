@@ -7,6 +7,7 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -101,6 +102,26 @@ public class DBNodeSeq extends NativeSeq {
     final int[] tmp = new int[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = pres[i];
     return new DBNodeSeq(tmp, data, type, false);
+  }
+
+  @Override
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
+      throws QueryException {
+
+    Value value = null;
+    if(mode == Simplify.DATA || mode == Simplify.NUMBER || mode == Simplify.STRING) {
+      if(mode == Simplify.STRING) {
+        final TokenList list = new TokenList(size);
+        for(int i = 0; i < size; i++) list.add(data.atom(pres[i]));
+        value = StrSeq.get(list);
+      } else {
+        final int sz = (int) size;
+        final Item[] items = new Item[sz];
+        for(int i = 0; i < size; i++) items[i] = Atm.get(data.atom(pres[i]));
+        value = ItemSeq.get(items, sz, AtomType.UNTYPED_ATOMIC);
+      }
+    }
+    return value != null ? cc.simplify(this, value) : super.simplifyFor(mode, cc);
   }
 
   @Override

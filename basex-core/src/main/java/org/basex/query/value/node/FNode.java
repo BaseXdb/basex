@@ -1,6 +1,7 @@
 package org.basex.query.value.node;
 
 import java.util.*;
+
 import org.basex.api.dom.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;

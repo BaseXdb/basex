@@ -82,6 +82,26 @@ public abstract class CNode extends Arr {
   }
 
   @Override
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
+      throws QueryException {
+
+    SeqType st = null;
+    // ignore PIs and attributes as values must be normalized
+    if(exprs.length == 1 && !(this instanceof CPI || this instanceof CAttr)) {
+      final SeqType st1 = exprs[0].seqType();
+      if(st1.zeroOrOne() && st1.instanceOf(SeqType.ANY_ATOMIC_TYPE_ZO) && !has(Flag.NDT)) {
+        if(mode == Simplify.STRING) {
+          st = SeqType.STRING_ZO;
+        } else if(mode == Simplify.DATA || mode == Simplify.NUMBER) {
+          st = this instanceof CComm ? SeqType.STRING_ZO : SeqType.UNTYPED_ATOMIC_ZO;
+        }
+      }
+    }
+    return st != null ? cc.simplify(this, new Cast(cc.sc(), info, exprs[0], st).optimize(cc)) :
+      super.simplifyFor(mode, cc);
+  }
+
+  @Override
   public boolean has(final Flag... flags) {
     return Flag.CNS.in(flags) || super.has(flags);
   }
