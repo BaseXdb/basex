@@ -31,15 +31,15 @@ public final class ArithTest extends QueryPlanTest {
         "1\n2", exists(Cast.class));
 
     // counts
-    check("let $n := <_>1</_>[. = 1] return count($n) + count($n)",
+    check("let $n := " + wrap(1) + "[. = 1] return count($n) + count($n)",
         2, count(Function.COUNT, 1), exists(Function._UTIL_REPLICATE));
-    check("let $n := <_>1</_>[. = 1] return count($n) + count($n) > 0",
+    check("let $n := " + wrap(1) + "[. = 1] return count($n) + count($n) > 0",
         true, root(CmpSimpleG.class));
 
-    check("<_>3</_> ! (. + .)", 6, exists(Int.class), count(Arith.class, 1));
-    check("<_>3</_> ! (. + . + .)", 9, exists(Int.class), count(Arith.class, 1));
-    check("<_>3</_> ! (. + -.)", 0, empty(Unary.class));
-    check("xs:decimal(<_>3</_>) ! (. + -.)", 0, empty(Unary.class), root(Dec.class));
+    check(wrap(3) + "! (. + .)", 6, exists(Int.class), count(Arith.class, 1));
+    check(wrap(3) + "! (. + . + .)", 9, exists(Int.class), count(Arith.class, 1));
+    check(wrap(3) + "! (. + -.)", 0, empty(Unary.class));
+    check("xs:decimal(" + wrap(3) + ") ! (. + -.)", 0, empty(Unary.class), root(Dec.class));
   }
 
   /** Test method. */
@@ -65,9 +65,9 @@ public final class ArithTest extends QueryPlanTest {
     query("string(xs:dateTime('2017-07-07T18:00:59.1') - xs:dayTimeDuration('PT1M'))",
         "2017-07-07T17:59:59.1");
 
-    check("xs:decimal(<_>3</_>) ! (. - .)", 0, root(Dec.class));
-    check("<_>3</_> ! (. + . - .)", 3, exists(Cast.class), empty(Arith.class));
-    check("<_>3</_> ! (. - -.)", 6, exists(Int.class), empty(Unary.class), count(Arith.class, 1));
+    check("xs:decimal(" + wrap(3) + ") ! (. - .)", 0, root(Dec.class));
+    check(wrap(3) + "! (. + . - .)", 3, exists(Cast.class), empty(Arith.class));
+    check(wrap(3) + "! (. - -.)", 6, exists(Int.class), empty(Unary.class), count(Arith.class, 1));
   }
 
   /** Test method. */
@@ -94,9 +94,9 @@ public final class ArithTest extends QueryPlanTest {
     check("for $i in (1 to 2)[. != 0] return $i * 0e0",
         "0\n0", exists(Arith.class));
 
-    check("<_>3</_> ! (. * .)", 9, exists(Dbl.class), exists(Function._MATH_POW));
-    check("<_>3</_> ! (. * . * .)", 27, exists(Dbl.class), count(Function._MATH_POW, 1));
-    check("<_>3</_> ! (. * (1 div .))", 1, root(Dbl.class));
+    check(wrap(3) + "! (. * .)", 9, exists(Dbl.class), exists(Function._MATH_POW));
+    check(wrap(3) + "! (. * . * .)", 27, exists(Dbl.class), count(Function._MATH_POW, 1));
+    check(wrap(3) + "! (. * (1 div .))", 1, root(Dbl.class));
   }
 
   /** Test method. */
@@ -118,8 +118,8 @@ public final class ArithTest extends QueryPlanTest {
     error("xs:dayTimeDuration('PT0S') div xs:dayTimeDuration('PT0S')", DIVZERO_X);
     error("xs:yearMonthDuration('P0M') div xs:yearMonthDuration('P0M')", DIVZERO_X);
 
-    check("xs:decimal(<_>3</_>) ! (. div .)", 1, root(Dec.class));
-    check("<_>3</_> ! (. * . div .)", 3, exists(Cast.class), empty(Arith.class));
+    check("xs:decimal(" + wrap(3) + ") ! (. div .)", 1, root(Dec.class));
+    check(wrap(3) + "! (. * . div .)", 3, exists(Cast.class), empty(Arith.class));
   }
 
   /** Test method. */
@@ -136,7 +136,7 @@ public final class ArithTest extends QueryPlanTest {
     error("for $i in (1, xs:double('NaN')) return $i idiv $i", DIVFLOW_X);
     check("for $i in (2, 4) return $i idiv $i", "1\n1", empty(Arith.class), empty(GFLWOR.class));
 
-    check("xs:decimal(<_>3</_>) ! (. idiv .)", 1, root(Int.class));
+    check("xs:decimal(" + wrap(3) + ") ! (. idiv .)", 1, root(Int.class));
   }
 
   /** Test method. */
@@ -146,9 +146,9 @@ public final class ArithTest extends QueryPlanTest {
 
   /** Merge arithmetic expressions. */
   @Test public void gh1938() {
-    check("(<_>1</_> + 1 - 1)[. instance of xs:double]", 1, root(Cast.class));
-    check("<_>6</_> div 3 * 2", 4, count(Arith.class, 1));
-    check("(1 to 2) ! (<_>1</_> + . - .)", "1\n1", empty(Arith.class), exists(Cast.class));
-    check("(1 to 2) ! (<_>{ . }</_> + . - .)", "1\n2", empty(Arith.class), exists(Cast.class));
+    check("(" + wrap(1) + "+ 1 - 1)[. instance of xs:double]", 1, root(Cast.class));
+    check(wrap(6) + "div 3 * 2", 4, count(Arith.class, 1));
+    check("(1 to 2) ! (" + wrap(1) + "+ . - .)", "1\n1", empty(Arith.class));
+    check("(1 to 2) ! (" + wrapContext() + "+ . - .)", "1\n2", empty(Arith.class));
   }
 }

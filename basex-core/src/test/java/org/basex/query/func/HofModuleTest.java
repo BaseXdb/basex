@@ -81,6 +81,7 @@ public final class HofModuleTest extends QueryPlanTest {
     query(func.args(" ()", " function($a, $b) { $a < $b }"), "");
     query(func.args(" 1 to 5", " function($a, $b) { $a > $b }"), "5\n4\n3\n2\n1");
     error(func.args(" 1 to 5", " <x/>"), INVTYPE_X_X_X);
+    error(func.args(" 1 to 5", wrap("")), INVTYPE_X_X_X);
   }
 
   /** Test method. */

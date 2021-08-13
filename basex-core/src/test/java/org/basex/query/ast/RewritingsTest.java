@@ -182,7 +182,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(0, 1)[. = 1] >= 1e0", true, exists(cmpr));
     check("(0e0, 1e0)[. = 1] >= 1", true, exists(cmpr));
     check("(0e0, 1e0)[. = 1] >= 1e0", true, exists(cmpr));
-    check("<_>1.1</_> >= 1.1", true, exists(cmpr));
+    check(wrap("1.1") + ">= 1.1", true, exists(cmpr));
 
     // do not rewrite decimal/double comparisons
     check("(0e0, 1e0)[. = 1] >= 1.0", true, empty(cmpr));
@@ -194,7 +194,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(0e0, 1e0)[. = 1] = 1", true, empty(cmpr));
     check("(0e0, 1e0)[. = 1] = 1.0", true, empty(cmpr));
     check("(0e0, 1e0)[. = 1] = 1e0", true, empty(cmpr));
-    check("<_>1.1</_> = 1.1", true, empty(cmpr));
+    check(wrap("1.1") + "= 1.1", true, empty(cmpr));
 
     // suppressed rewritings
     check("random:double() = 2", false, empty(cmpr));
@@ -242,7 +242,7 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Checks count optimizations. */
   @Test public void count() {
     // static occurrence: zero-or-one
-    String count = "count(<_>1</_>[. = 1])";
+    String count = "count(" + wrap(1) + "[. = 1])";
 
     // static result: no need to evaluate count
     check(count + " <    0", false, root(Bln.class));
@@ -277,7 +277,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check(count + " - 1 = 0", true, root(CmpSimpleG.class));
 
     // one-or-more results: no need to evaluate count
-    count = "count((1, <_>1</_>[. = 1]))";
+    count = "count((1," + wrap(1) + "[. = 1]))";
     check(count + " >  0", true, root(Bln.class));
     check(count + " >= 1", true, root(Bln.class));
     check(count + " != 0", true, root(Bln.class));
@@ -419,7 +419,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("'s'['s' ! <a/>]", "s", root(Str.class));
     check("'s'['x' ! <a/> ! <b/>]", "s", root(Str.class));
     check("'s'['x' ! (<a/>, <b/>) ! <b/>]", "s", root(Str.class));
-    check("'s'['x' ! <a>{ . }</a>[. = 'x']]", "s", root(If.class));
+    check("'s'['x' ! " + wrapContext() + "[. = 'x']]", "s", root(If.class));
 
     // path expression
     check("let $a := <a/> return $a[$a/self::a]", "<a/>", empty(VarRef.class));
@@ -494,7 +494,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("document { <a/> }/preceding-sibling::node()", "", empty());
 
     // skip further tests if previous node type is unknown, or if current test accepts all nodes
-    check("(<a/>, <_>1</_>[. = 0])/node()", "", exists(IterStep.class));
+    check("(<a/>," + wrap(1) + "[. = 0])/node()", "", exists(IterStep.class));
 
     // check step after any other expression
     check("<a/>/self::text()", "", empty());
@@ -524,11 +524,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("xs:string(''[. = <_/>])", "", empty(Cast.class), root(If.class));
 
     check("xs:string(<_/>[. = '']) = ''", true, empty(Cast.class), root(CmpSimpleG.class));
-    check("xs:double(<_>1</_>) + 2", 3, empty(Cast.class), type(Arith.class, "xs:double"));
+    check("xs:double(" + wrap(1) + ") + 2", 3, empty(Cast.class), type(Arith.class, "xs:double"));
     check("(1, 2)[. != 0] ! (xs:byte(.)) ! (xs:integer(.) + 2)", "3\n4",
         count(Cast.class, 1), type(Arith.class, "xs:integer"));
 
-    error("(if(<_>!</_> = 'a') then 'b') cast as xs:string", INVTYPE_X_X_X);
+    error("(if(" + wrap("!") + "= 'a') then 'b') cast as xs:string", INVTYPE_X_X_X);
     error("((1 to 1000000000) ! (. || 'x')) cast as xs:string", INVTYPE_X_X_X);
     error("() cast as xs:string", INVTYPE_X_X_X);
     error("(1 to 100000)[. < 3] cast as xs:integer", INVTYPE_X_X_X);
@@ -544,13 +544,13 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void typeCheck() {
     inline(true);
     check("declare function local:a($e) as xs:string? { local:b($e) }; " +
-        "declare function local:b($e) as xs:string? { $e }; local:a(<_>X</_>)", "X",
+        "declare function local:b($e) as xs:string? { $e }; local:a(" + wrap("X") + ")", "X",
         count(TypeCheck.class, 1));
     check("declare function local:a($e) as xs:string? { local:b($e) }; " +
-        "declare function local:b($e) as xs:string* { $e }; local:a(<_>X</_>)", "X",
+        "declare function local:b($e) as xs:string* { $e }; local:a(" + wrap("X") + ")", "X",
         count(TypeCheck.class, 1));
     check("declare function local:a($e) as xs:string* { local:b($e) }; " +
-        "declare function local:b($e) as xs:string? { $e }; local:a(<_>X</_>)", "X",
+        "declare function local:b($e) as xs:string? { $e }; local:a(" + wrap("X") + ")", "X",
         count(TypeCheck.class, 1));
 
     query("declare function local:f() as item()  { data([ <_/> ]) }; local:f()", "");
@@ -732,7 +732,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("<_>A</_>[. = <a>B</a> and . = 'A']", "", exists(NOT), empty(And.class));
     check("<_>A</_>[. = <a>A</a> and . = 'A']", "<_>A</_>", empty(And.class));
-
+    check("<_>A</_>[. =" + wrap("A") + "and . = 'A']", "<_>A</_>",
+        exists(NOT), exists(List.class));
     check("(<a/>, <b/>, <c/>)[name() = 'a' and name() = 'b']", "",
         exists(NOT), exists(StrSeq.class));
   }
@@ -757,11 +758,11 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Remove redundant atomizations. */
   @Test public void gh1769data() {
-    check("data(<_>1</_>) + 2", 3, empty(DATA));
-    check("string-join(data(<_>X</_>))", "X", empty(DATA));
-    check("data(data(<_>X</_>))", "X", count(DATA, 1));
-    check("string(data(<_>X</_>))", "X", empty(DATA));
-    check("data(string(<_>X</_>))", "X", empty(DATA));
+    check("data(" + wrap(1) + ") + 2", 3, empty(DATA));
+    check("string-join(data(" + wrap("X") + "))", "X", empty(DATA));
+    check("data(data(" + wrap("X") + "))", "X", count(DATA, 1));
+    check("string(data(" + wrap("X") + "))", "X", empty(DATA));
+    check("data(string(" + wrap("X") + "))", "X", empty(DATA));
 
     check("<x>A</x>[data() = 'A']", "<x>A</x>", empty(DATA), count(ContextValue.class, 1));
     check("<x>A</x>[data() ! data() ! data() = 'A']", "<x>A</x>",
@@ -773,8 +774,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("data(string(<_/>)) instance of xs:string", true, root(Bln.class));
     check("data(xs:NMTOKENS(<_/>) ! xs:untypedAtomic(.)) instance of xs:untypedAtomic*",
         true, root(Bln.class));
-    error("data(data(<_>a</_>) promote to element(e))", INVPROMOTE_X_X_X);
-    error("data(<_>a</_> promote to element(e))", INVPROMOTE_X_X_X);
+    error("data(data(" + wrap("a") + ") promote to element(e))", INVPROMOTE_X_X_X);
+    error("data(" + wrap("a") + "promote to element(e))", INVPROMOTE_X_X_X);
   }
 
   /** Remove redundant atomizations. */
@@ -790,7 +791,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("max((<_>1</_>, <_>2</_>) ! string(@a))", "", root(MAX));
     check("min(<_ _='A'/>/@_ ! string())", "A", root(MIN));
 
-    check("string(<_>1</_>[.= 1]) = <_>1</_>", true, exists(STRING));
+    check("string(" + wrap(1) + "[.= 1]) =" + wrap(1), true, exists(STRING));
   }
 
   /** Remove redundant atomizations. */
@@ -801,7 +802,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_>1</_>[number() = 1]", "<_>1</_>", empty(NUMBER));
     check("<_>1</_>[number(.) = 1]", "<_>1</_>", empty(NUMBER));
 
-    check("number(<_>1</_>) + 2", 3, empty(NUMBER));
+    check("number(" + wrap(1) + ") + 2", 3, empty(NUMBER));
     check("(1e0, 2e0) ! (number() + 1)", "2\n3", empty(NUMBER));
     check("for $v in (1e0, 2e0) return number($v) + 1", "2\n3", empty(NUMBER));
 
@@ -864,8 +865,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // no rewritings
     check("<a/>[local-name() != 'a']", "", exists(LOCAL_NAME));
-    check("<a/>[local-name() = <_>a</_>]", "<a/>", exists(LOCAL_NAME));
-    check("<a/>[node-name() = xs:QName(<_>a</_>)]", "<a/>", exists(NODE_NAME));
+    check("<a/>[local-name() =" + wrap("a") + "]", "<a/>", exists(LOCAL_NAME));
+    check("<a/>[node-name() = xs:QName(" + wrap("a") + ")]", "<a/>", exists(NODE_NAME));
     check("parse-xml('<a/>')[name(*) = 'a']", "<a/>", exists(Function.NAME));
   }
 
@@ -917,12 +918,12 @@ public final class RewritingsTest extends QueryPlanTest {
     check("let $i := -128 return --xs:byte($i) instance of xs:byte", false,
         empty(Unary.class), empty(Cast.class));
 
-    check("--xs:byte(<_>-128</_>)", -128, empty(Unary.class), count(Cast.class, 2));
+    check("--xs:byte(" + wrap("-128") + ")", -128, empty(Unary.class), count(Cast.class, 2));
   }
 
   /** Promote to expression. */
   @Test public void gh1798() {
-    check("<a>1</a> promote to xs:string", 1, root(TypeCheck.class));
+    check(wrap(1) + "promote to xs:string", 1, root(TypeCheck.class));
     check("(1, 2) promote to xs:double+", "1\n2",
         empty(TypeCheck.class), root(ItemSeq.class), count(Dbl.class, 2));
 
@@ -979,6 +980,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // absolute paths
     check("text { 'a' } ! <x>{ . }</x>/text() = 'a'", true, exists(IterMap.class));
+    check("string(<a>a</a>) ! <x>{ . }</x>/text() = 'a'", true, exists(IterMap.class));
     check("<a>a</a>/string() ! <x>{ . }</x>/text() = 'a'", true, exists(IterMap.class));
   }
 
@@ -1001,7 +1003,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** If expression with empty branches. */
   @Test public void gh1809() {
-    check("if(<_>1</_>[. = 1]) then () else ()", "", empty());
+    check("if(" + wrap(1) + "[. = 1]) then () else ()", "", empty());
     check("if(prof:void(1)) then () else ()", "", root(_PROF_VOID), count(_PROF_VOID, 1));
   }
 
@@ -1149,9 +1151,9 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Map/array lookups: better typing. */
   @Test public void gh1825() {
-    check("[ 1 ](<_>1</_>) instance of xs:integer", true, root(Bln.class));
+    check("[ 1 ](" + wrap(1) + ") instance of xs:integer", true, root(Bln.class));
 
-    check("map { 'a': 2 }(<_>a</_>) instance of xs:integer?", true, root(Bln.class));
+    check("map { 'a': 2 }(" + wrap("a") + ") instance of xs:integer?", true, root(Bln.class));
     check("map { 1: 2 }(<_/>) instance of xs:integer?", true, root(Bln.class));
     check("map { 1: (2, 'a') }(<_/>) instance of xs:anyAtomicType*", true, root(Bln.class));
   }
@@ -1200,8 +1202,8 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Equality tests on QNames. */
   @Test public void gh1823() {
     query("declare namespace p = 'U';\n" +
-      "prefix-from-QName(QName('U', 'a')[. = xs:QName(<_>p:a</_>)]) or\n" +
-      "prefix-from-QName(QName('U', 'p:a')[. = xs:QName(<_>p:a</_>)])",
+      "prefix-from-QName(QName('U', 'a')[. = xs:QName(" + wrap("p:a") + ")]) or\n" +
+      "prefix-from-QName(QName('U', 'p:a')[. = xs:QName(" + wrap("p:a") + ")])",
       true);
     query("let $f := function($a) { string($a) }\n" +
       "return distinct-values(($f(QName('U', 'l')), $f(QName('U', 'p:l'))))",
@@ -1386,7 +1388,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $c in 1 to 10 return $c[position() = (0, 2)]", "", root(DualMap.class));
 
     // no rewriting: position checks are replaced by util:item
-    check("for $c in 1 to 10 return $c[position() = <_>2</_>]", "", root(DualMap.class));
+    check("for $c in 1 to 10 return $c[position() =" + wrap(2) + "]", "", root(DualMap.class));
     check("for $c in 1 to 10 return $c[$c]", 1, root(DualMap.class));
   }
 
@@ -1539,7 +1541,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Distinct-values, optimization of arguments. */
   @Test public void gh1868() {
-    check("let $s as xs:string* := distinct-values(<_>x</_> ! string()) return $s",
+    check("let $s as xs:string* := distinct-values(" + wrap("x") + "! string()) return $s",
         "x", root(STRING));
   }
 
@@ -1550,8 +1552,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** EBV Rewritings: count(expr), numeric checks. */
   @Test public void gh1875() {
-    check("boolean(count(<_>A</_>[. >= 'A']))", true, empty(COUNT));
-    check("boolean(count(<_>A</_>[. >= 'A']) != 0)", true, empty(COUNT));
+    check("boolean(count(" + wrap("A") + "[. >= 'A']))", true, empty(COUNT));
+    check("boolean(count(" + wrap("A") + "[. >= 'A']) != 0)", true, empty(COUNT));
   }
 
   /** Switch Expression: Rewrite to if expression. */
@@ -1867,7 +1869,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Push type checks into expressions. */
   @Test public void gh1915() {
-    check("(switch(<_>a</_>) "
+    check("(switch(" + wrap("a") + ") "
         + "  case 'a' return <a/> "
         + "  case 'b' return <b/> "
         + "  default  return error()"
@@ -1896,7 +1898,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Switch expression: static and dynamic cases. */
   @Test public void gh1919() {
-    query("switch('x') case <_>x</_>return 1 case 'x' return 2 default return 3", 1);
+    query("switch('x') case" + wrap("x") + "return 1 case 'x' return 2 default return 3", 1);
   }
 
   /** Switch expression, merge branches. */
@@ -1908,16 +1910,16 @@ public final class RewritingsTest extends QueryPlanTest {
     check("switch(<_/>) case 'a' return 1 case 'b' return 2 case 'c' return 3 default return 3", 3,
         root(Switch.class), count(SwitchGroup.class, 3));
 
-    check("switch(<_>a</_>) case 'a' return 1 case 'b' return 1 default return 2", 1,
+    check("switch(" + wrap("a") + ") case 'a' return 1 case 'b' return 1 default return 2", 1,
         root(If.class));
-    check("switch(<_>a</_>) case 'a' return 1 case 'b' return 2 default return 2", 1,
+    check("switch(" + wrap("a") + ") case 'a' return 1 case 'b' return 2 default return 2", 1,
         root(If.class));
     check("switch(<_/>) case 'a' return 1 case 'b' return 1 case 'c' return 1 default return 2", 2,
         root(If.class));
 
-    check("switch(<_>a</_>) case 'a' return 1 default return 1", 1,
+    check("switch(" + wrap("a") + ") case 'a' return 1 default return 1", 1,
         root(Int.class));
-    check("switch(<_>a</_>) case 'a' return 1 case 'b' return 1 default return 1", 1,
+    check("switch(" + wrap("a") + ") case 'a' return 1 case 'b' return 1 default return 1", 1,
         root(Int.class));
     check("switch(<_/>) case 'a' return 1 case 'b' return 1 case 'c' return 1 default return 1", 1,
         root(Int.class));
@@ -2101,7 +2103,10 @@ public final class RewritingsTest extends QueryPlanTest {
         empty(OrderBy.class), root(REVERSE));
     check("for $i in (1 to 2)[. >= 0] order by $i return $i * 2", "2\n4",
         empty(OrderBy.class), root(DualMap.class));
-    check("let $_ := <_>1</_> for $i in (1 to 2)[. >= 0] order by $i return $i + $_", "2\n3",
+    check("let $_ :=" + wrap(1) +
+        "for $i in (1 to 2)[. >= 0] " +
+        "order by $i " +
+        "return $i + $_", "2\n3",
         empty(OrderBy.class), root(GFLWOR.class));
 
     check("for $i in (1 to 2)[. >= 0] order by $i empty greatest return $i", "1\n2",
@@ -2150,7 +2155,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("boolean(count((1, 2)[. <= 2]))", true, root(EXISTS));
     check("boolean(count((1, 2)[. >= 3]))", false, root(EXISTS));
 
-    check("boolean(string-length(<_>A</_>))", true, exists(STRING));
+    check("boolean(string-length(" + wrap("A") + "))", true, exists(STRING));
     check("boolean(string-length(<_/>))", false, exists(STRING));
   }
 

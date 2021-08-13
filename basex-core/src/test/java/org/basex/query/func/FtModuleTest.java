@@ -36,7 +36,7 @@ public final class FtModuleTest extends SandboxTest {
     // check index results
     query(func.args("Assignments", "assignments"), true);
     query(func.args("Exercise 1", "('exercise', '1')"), true);
-    query(func.args("Exercise 1", " <x>1</x>"), true);
+    query(func.args("Exercise 1", wrap(1)), true);
     query(func.args("Exercise 1", "1"), true);
     query(func.args("Exercise 1", "X"), false);
     query(func.args(" ('A', 'B')", " ('C', 'B')"), true);
@@ -155,7 +155,7 @@ public final class FtModuleTest extends SandboxTest {
     // check index results
     query(func.args(NAME, "assignments"), "Assignments");
     query(func.args(NAME, " ('exercise', '1')"), "Exercise 1\nExercise 2");
-    query(func.args(NAME, " <x>1</x>"), "Exercise 1");
+    query(func.args(NAME, wrap(1)), "Exercise 1");
     query(func.args(NAME, "1"), "Exercise 1");
     query(func.args(NAME, "XXX"), "");
 

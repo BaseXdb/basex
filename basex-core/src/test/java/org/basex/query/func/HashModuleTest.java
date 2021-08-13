@@ -45,7 +45,7 @@ public final class HashModuleTest extends SandboxTest {
     // queries
     query("string(" + func.args("") + ")", "1B2M2Y8AsgTpgAmY7PhCfg==");
     query("string(" + func.args("BaseX") + ")", "DWUYXJ4pYxHAoiABeeR5og==");
-    query("string(" + func.args(" <x/>") + ")", "1B2M2Y8AsgTpgAmY7PhCfg==");
+    query("string(" + func.args(wrap("")) + ")", "1B2M2Y8AsgTpgAmY7PhCfg==");
   }
 
   /** Test method. */
@@ -54,7 +54,7 @@ public final class HashModuleTest extends SandboxTest {
     // queries
     query("string(" + func.args("") + ")", "2jmj7l5rSw0yVb/vlWAYkK/YBwk=");
     query("string(" + func.args("BaseX") + ")", "OtWVjw8n1a/9yilXVg8SHQWXpO0=");
-    query("string(" + func.args(" <x/>") + ")", "2jmj7l5rSw0yVb/vlWAYkK/YBwk=");
+    query("string(" + func.args(wrap("")) + ")", "2jmj7l5rSw0yVb/vlWAYkK/YBwk=");
   }
 
   /** Test method. */

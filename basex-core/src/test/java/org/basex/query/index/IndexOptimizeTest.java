@@ -260,7 +260,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   @Test public void pragma() {
     createDoc();
     final String pragma = "(# db:enforceindex #) { ";
-    final String db = _DB_OPEN.args(" <x>" + NAME + "</x>");
+    final String db = _DB_OPEN.args(wrap(NAME));
 
     indexCheck(pragma + db + "//a[text() = '1']/text() }", 1);
     indexCheck(pragma + db + "//a/text()[. = '1'] }", 1);

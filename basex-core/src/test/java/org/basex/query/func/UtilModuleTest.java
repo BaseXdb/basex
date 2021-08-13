@@ -58,19 +58,20 @@ public final class UtilModuleTest extends QueryPlanTest {
         empty(func), empty(STRING_LENGTH));
 
     // test iterative evaluation
-    query(func.args(" <_/>"), "");
-    query(func.args(" <_>abc</_>"), "a\nb\nc");
-    query(func.args(" <_>abc</_>") + "[2]", "b");
-    query(func.args(" <_>abc</_>") + "[last()]", "c");
+    query(func.args(wrap("")), "");
+    query(func.args(wrap("abc")), "a\nb\nc");
+    query(func.args(wrap("abc")) + "[2]", "b");
+    query(func.args(wrap("abc")) + "[last()]", "c");
 
-    query(func.args(" <_>äöü</_>"), "ä\nö\nü");
-    query("subsequence(" + func.args(" <_/>") + ", 3)", "");
-    query("subsequence(" + func.args(" <_>aeiou</_>") + ", 3)", "i\no\nu");
-    query("subsequence(" + func.args(" <_>äeiöü</_>") + ", 3)", "i\nö\nü");
+    query(func.args(wrap("äöü")), "ä\nö\nü");
+    query("subsequence(" + func.args(wrap("")) + ", 3)", "");
+    query("subsequence(" + func.args(wrap("aeiou")) + ", 3)", "i\no\nu");
+    query("subsequence(" + func.args(wrap("äeiöü")) + ", 3)", "i\nö\nü");
 
-    check("count(" + func.args(" string-join(util:replicate(<_>A</_>, 100000))") + ')', 100000,
-        exists(STRING_LENGTH));
-    check("string-to-codepoints(<_>AB</_>) ! codepoints-to-string(.)", "A\nB", root(func));
+    check("count(" + func.args(" string-join(util:replicate(" + wrap("A") + ", 100000))") + ')',
+        100000, exists(STRING_LENGTH));
+    check("string-to-codepoints(" + wrap("AB") + ") ! codepoints-to-string(.)", "A\nB",
+        root(func));
   }
 
   /** Test method. */
@@ -102,7 +103,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" (1, 'a', true())"), "");
     query(func.args(" 1 to 5000000000"), "");
     query(func.args(" (1 to 5000000000) ! 1"), 1);
-    query(func.args(" <_>1</_> to 5000000000"), "");
+    query(func.args(wrap(1) + "to 5000000000"), "");
 
     query(func.args(" (1 to 5) ! <_>1</_>"), 1);
     query(func.args(" (<a>1</a>, <b>1</b>)"), 1);
@@ -115,7 +116,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     error(func.args(" (1 to 5) ! true#0"), FIATOM_X);
 
     // optimizations
-    String seq = "let $seq := (<_>1</_>, 2, <_>1</_>) return ";
+    String seq = "let $seq := (" + wrap(1) + ", 2, " + wrap(1) + ") return ";
     check(seq + "count($seq)  = count(distinct-values($seq))", false, root(EMPTY), exists(func));
     check(seq + "count($seq) <= count(distinct-values($seq))", false, root(EMPTY), exists(func));
     check(seq + "count($seq) <  count(distinct-values($seq))", false, root(Bln.class));
@@ -169,8 +170,8 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" (1 to 3)"), "1\n2");
 
     // known result size
-    query(func.args(" <_>1</_> + 1"), "");
-    query(func.args(" (<_>1</_> + 1, 3)"), 2);
+    query(func.args(wrap(1) + "+ 1"), "");
+    query(func.args(" (" + wrap(1) + "+ 1, 3)"), 2);
     query(func.args(" prof:void(())"), "");
 
     // unknown result size
@@ -266,12 +267,12 @@ public final class UtilModuleTest extends QueryPlanTest {
 
     query(func.args(" (<a/>, <b/>)", 1.5), "");
     query(func.args(" <a/>", 2), "");
-    query(func.args(" (<a/>, <b/>)", " <_>1</_>"), "<a/>");
-    query(func.args(" tokenize(<_>1</_>)", 2), "");
+    query(func.args(" (<a/>, <b/>)", wrap(1)), "<a/>");
+    query(func.args(" tokenize(" + wrap(1) + ")", 2), "");
 
-    query(func.args(" 1", " <_>0</_>"), "");
-    query(func.args(" 1[. = 1]", " <_>1</_>"), 1);
-    query(func.args(" 1[. = 1]", " <_>2</_>"), "");
+    query(func.args(1, wrap(0)), "");
+    query(func.args(" 1[. = 1]", wrap(1)), 1);
+    query(func.args(" 1[. = 1]", wrap(2)), "");
 
     check(func.args(" prof:void(())", 0), "", empty(func));
     check(func.args(" (7 to 9)[. = 8]", -1), "", empty());
@@ -322,8 +323,8 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" reverse((1, 2, 3)[. > 1])"), 2, exists(HEAD));
 
     check(func.args(" tokenize(<_/>)"), "", exists(_UTIL_LAST));
-    check(func.args(" tokenize(<_>1</_>)"), 1, exists(_UTIL_LAST));
-    check(func.args(" tokenize(<_>1 2</_>)"), 2, exists(_UTIL_LAST));
+    check(func.args(" tokenize(" + wrap(1) + ")"), 1, exists(_UTIL_LAST));
+    check(func.args(" tokenize(" + wrap("1 2") + ")"), 2, exists(_UTIL_LAST));
 
     check(func.args(" tail(tokenize(<a/>))"), "", exists(TAIL));
     check(func.args(" tail(1 ! <_>{.}</_>)"), "", empty());
@@ -451,16 +452,16 @@ public final class UtilModuleTest extends QueryPlanTest {
 
     query("for $i in 1 to 2 return " + func.args(1, " $i"), "1\n1\n1");
     query(func.args(" <a/>", 2), "<a/>\n<a/>");
-    query(func.args(" <a/>", " <_>2</_>"), "<a/>\n<a/>");
+    query(func.args(" <a/>", wrap(2)), "<a/>\n<a/>");
 
     query(func.args(" 1[. = 1]", 2), "1\n1");
 
     check(func.args(" <a/>", -1), "", empty());
     check(func.args(" <a/>", 0), "", empty());
-    check(func.args(" ()", " <_>2</_>"), "", empty());
+    check(func.args(" ()", wrap(2)), "", empty());
     check(func.args(" <a/>", 1), "<a/>", empty(func));
     check(func.args(" <a/>", 2), "<a/>\n<a/>", type(func, "element(a)+"));
-    check(func.args(" <a/>", " <_>2</_>"), "<a/>\n<a/>", type(func, "element(a)*"));
+    check(func.args(" <a/>", wrap(2)), "<a/>\n<a/>", type(func, "element(a)*"));
 
     check(func.args(func.args(" <a/>", 2), 2),
         "<a/>\n<a/>\n<a/>\n<a/>", count(_UTIL_REPLICATE, 1));
@@ -502,9 +503,9 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" (8, 9, 9)[. = 9]", 1), true, root(Bln.class));
     query(func.args(" (8, 9, 9)[. = 9]", 2), true);
     query(func.args(" (8, 9, 9)[. = 9]", 3), false);
-    query(func.args(" (8, 9, 9)[. = 9]", " <_>1</_>"), true);
-    query(func.args(" (8, 9, 9)[. = 9]", " <_>2</_>"), true);
-    query(func.args(" (8, 9, 9)[. = 9]", " <_>3</_>"), false);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(1)), true);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(2)), true);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(3)), false);
 
     // minimum and maximum
     query(func.args(" ()", 0, 0), true);
@@ -538,31 +539,31 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" (8, 9, 9)[. = 9]", 2, 3), true);
     check(func.args(" (8, 9, 9)[. = 9]", 3, 2), false, root(Bln.class));
 
-    query(func.args(" (8, 9, 9)[. = 9]", 0, " <_>0</_>"), false);
-    query(func.args(" (8, 9, 9)[. = 9]", 1, " <_>1</_>"), false);
-    query(func.args(" (8, 9, 9)[. = 9]", 1, " <_>2</_>"), true);
-    query(func.args(" (8, 9, 9)[. = 9]", 2, " <_>2</_>"), true);
-    query(func.args(" (8, 9, 9)[. = 9]", 2, " <_>3</_>"), true);
-    query(func.args(" (8, 9, 9)[. = 9]", 3, " <_>2</_>"), false);
+    query(func.args(" (8, 9, 9)[. = 9]", 0, wrap(0)), false);
+    query(func.args(" (8, 9, 9)[. = 9]", 1, wrap(1)), false);
+    query(func.args(" (8, 9, 9)[. = 9]", 1, wrap(2)), true);
+    query(func.args(" (8, 9, 9)[. = 9]", 2, wrap(2)), true);
+    query(func.args(" (8, 9, 9)[. = 9]", 2, wrap(3)), true);
+    query(func.args(" (8, 9, 9)[. = 9]", 3, wrap(2)), false);
 
-    query(func.args(" (8, 9, 9)[. = 9]", " <_>0</_>", 0), false);
-    query(func.args(" (8, 9, 9)[. = 9]", " <_>1</_>", 1), false);
-    query(func.args(" (8, 9, 9)[. = 9]", " <_>1</_>", 2), true);
-    query(func.args(" (8, 9, 9)[. = 9]", " <_>2</_>", 2), true);
-    query(func.args(" (8, 9, 9)[. = 9]", " <_>2</_>", 3), true);
-    query(func.args(" (8, 9, 9)[. = 9]", " <_>3</_>", 2), false);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(0), 0), false);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(1), 1), false);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(1), 2), true);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(2), 2), true);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(2), 3), true);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(3), 2), false);
 
-    query(func.args(" (8, 9, 9)[. = 9]", " <_>0</_>", " <_>0</_>"), false);
-    query(func.args(" (8, 9, 9)[. = 9]", " <_>1</_>", " <_>1</_>"), false);
-    query(func.args(" (8, 9, 9)[. = 9]", " <_>1</_>", " <_>2</_>"), true);
-    query(func.args(" (8, 9, 9)[. = 9]", " <_>2</_>", " <_>2</_>"), true);
-    query(func.args(" (8, 9, 9)[. = 9]", " <_>2</_>", " <_>3</_>"), true);
-    query(func.args(" (8, 9, 9)[. = 9]", " <_>3</_>", " <_>2</_>"), false);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(0), wrap(0)), false);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(1), wrap(1)), false);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(1), wrap(2)), true);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(2), wrap(2)), true);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(2), wrap(3)), true);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(3), wrap(2)), false);
 
     // simplified arguments
-    check(func.args(" sort(<_/>)", " <_>0</_>"), true, empty(SORT));
-    check(func.args(" reverse(<_/>)", " <_>0</_>"), true, empty(REVERSE));
-    check(func.args(" for $i in 1 to 2 order by $i return $i", " <_>0</_>"),
+    check(func.args(" sort(<_/>)", wrap(0)), true, empty(SORT));
+    check(func.args(" reverse(<_/>)", wrap(0)), true, empty(REVERSE));
+    check(func.args(" for $i in 1 to 2 order by $i return $i", wrap(0)),
         true, empty(GFLWOR.class));
 
     // rewritings

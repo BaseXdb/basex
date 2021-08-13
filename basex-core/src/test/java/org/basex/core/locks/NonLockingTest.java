@@ -52,7 +52,7 @@ public final class NonLockingTest extends SandboxTest {
 
   /** Test. */
   @Test public void nonLockingAfterGlobalWrite() {
-    nonLockingAfterWrite(_DB_CREATE.args(" <_>" + NAME + "</_>"));
+    nonLockingAfterWrite(_DB_CREATE.args(wrap(NAME)));
   }
 
   /**
