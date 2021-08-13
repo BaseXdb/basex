@@ -53,7 +53,7 @@ public final class FnNumber extends ContextFn {
         // number(<a>1</a>) + 2  ->  <a>1</a> + 2
         if(!context) return cc.simplify(this, exprs[0]);
         // A[number() = 1]  ->  A[. = 0]
-        if(cc.nestedFocus()) return ContextValue.get(cc, info);
+        if(cc.nestedFocus()) return cc.simplify(this, ContextValue.get(cc, info));
       }
     }
     return super.simplifyFor(mode, cc);

@@ -268,7 +268,7 @@ public abstract class Filter extends Preds {
       if(expr != this) return cc.simplify(this, expr);
     } else if(mode == Simplify.DISTINCT && !mayBePositional()) {
       final Expr expr = root.simplifyFor(mode, cc);
-      if(expr != root) return Filter.get(cc, info, expr, exprs);
+      if(expr != root) return cc.simplify(this, Filter.get(cc, info, expr, exprs));
     }
     return super.simplifyFor(mode, cc);
   }

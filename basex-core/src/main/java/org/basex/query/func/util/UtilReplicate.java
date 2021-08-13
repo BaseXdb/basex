@@ -135,8 +135,10 @@ public final class UtilReplicate extends StandardFunc {
       if(count > 0 && (single || !expr.has(Flag.NDT))) {
         return cc.replaceWith(this, expr);
       }
-    } else if(mode == Simplify.STRING || mode == Simplify.NUMBER) {
-      exprs[0] = expr.simplifyFor(mode, cc);
+    } else if(mode == Simplify.STRING || mode == Simplify.NUMBER || mode == Simplify.DATA) {
+      final Expr[] args = exprs.clone();
+      args[0] = expr.simplifyFor(mode, cc);
+      return cc.simplify(expr, cc.function(_UTIL_REPLICATE, info, args));
     }
     return super.simplifyFor(mode, cc);
   }

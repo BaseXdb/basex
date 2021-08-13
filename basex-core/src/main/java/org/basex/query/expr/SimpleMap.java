@@ -424,7 +424,7 @@ public abstract class SimpleMap extends Arr {
         expr = SimpleMap.get(cc, info, list.finish());
       }
     }
-    return expr != this ? expr : super.simplifyFor(mode, cc);
+    return expr != this ? cc.simplify(this, expr) : super.simplifyFor(mode, cc);
   }
 
   @Override
