@@ -40,7 +40,7 @@ public final class Lookup extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    exprs[1] = exprs[1].simplifyFor(Simplify.STRING, cc);
+    exprs[1] = exprs[1].simplifyFor(Simplify.DATA, cc);
 
     final Expr inputs = exprs[0];
     final long is = inputs.size();

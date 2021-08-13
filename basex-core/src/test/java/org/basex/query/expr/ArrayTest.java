@@ -47,6 +47,8 @@ public final class ArrayTest extends SandboxTest {
     query("[ 1, 2, 3 ]?([ 1 ])", 1);
     query("[ 1, 2, 3 ]?([ 1, 2 ])", "1\n2");
 
+    error("[1]?(string(<_>1</_>))", INVTYPE_X_X_X);
+
     error("[](0)", ARRAYEMPTY);
     error("[](1)", ARRAYEMPTY);
     error("[ 1 ](-5000000000)", ARRAYBOUNDS_X_X);

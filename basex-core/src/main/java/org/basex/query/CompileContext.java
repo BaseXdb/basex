@@ -8,12 +8,12 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
-import org.basex.query.expr.ft.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
+import org.basex.query.func.util.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -47,29 +47,30 @@ public final class CompileContext {
     EBV,
     /**
      * Atomizations.
-     * Requested by {@link FnData}, {@link FnDistinctValues}, {@link Data}, {@link GroupSpec},
-     * {@link OrderKey}.
-     * Evaluated by {@link FnData}, {@link Cast}, {@link TypeCheck}.
+     * Requested by {@link FnData}, {@link FnDistinctValues}, {@link GroupSpec}, {@link OrderKey},
+     * {@link Lookup}, {@link TypeCheck}.
+     * Evaluated by {@link Cast}, {@link TypeCheck}, {@link FnData}.
      */
     DATA,
     /**
      * String arguments.
      * Requested by {@link Cast}, {@link CmpG}, {@link StandardFunc} and others.
-     * Evaluated by {@link FnData}, {@link Cast}, {@link TypeCheck}.
+     * Evaluated by {@link Cast}, {@link TypeCheck}, {@link FnData},
+     * {@link FnString}, {@link UtilReplicate}.
      */
     STRING,
     /**
      * Numeric arguments.
-     * Requested by {@link Arith}, {@link CmpIR}, {@link FTWeight} and others.
-     * Evaluated by {@link FnData}, {@link Cast}, {@link TypeCheck},
-     * {@link SimpleMap} or {@link FnNumber}.
+     * Requested by {@link Arith}, {@link CmpIR}, {@link Range}, {@link StandardFunc} and others.
+     * Evaluated by {@link Cast}, {@link TypeCheck}, {@link FnData},
+     * {@link FnNumber}, {@link UtilReplicate}.
      */
     NUMBER,
     /**
      * Predicate checks.
      * Requested by {@link Preds}.
-     * Evaluated by {@link Expr} , {@link FnData}, {@link Cast}, {@link TypeCheck},
-     * {@link SimpleMap} or {@link FnNumber}.
+     * Evaluated by {@link Expr}, {@link FnData}, {@link Cast}, {@link TypeCheck},
+     * {@link SimpleMap}, {@link FnNumber}, {@link UtilReplicate}.
      */
     PREDICATE,
     /**
