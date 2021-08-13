@@ -1,6 +1,7 @@
 package org.basex.query.ast;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.func.Function.*;
 
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -273,5 +274,12 @@ public final class FuncItemTest extends QueryPlanTest {
     check("function($v) { if($v = 0) then () else $v }(<x>0</x>)",
         "",
         root(IterFilter.class));
+  }
+
+  /** Simplification of map/array arguments. */
+  @Test public void simplify() {
+    check("[0](data(<_>1</_>))", 0, empty(DATA));
+    check("map { 'a': 0 }(data(<_>a</_>))", 0, empty(DATA));
+    check("map { 1: 0 }(data(<_>1</_>))", "", empty(DATA));
   }
 }

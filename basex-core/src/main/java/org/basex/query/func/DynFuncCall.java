@@ -7,6 +7,7 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -84,8 +85,12 @@ public final class DynFuncCall extends FuncCall {
       exprType.assign(ft instanceof MapType ? dt.union(Occ.ZERO) : dt);
     }
 
-    // maps and arrays can only contain evaluated values, so this is safe
-    if(func instanceof XQData && allAreValues(false)) return cc.preEval(this);
+    if(func instanceof XQData) {
+      // lookup key must be atomic
+      if(nargs == 1) exprs[0] = exprs[0].simplifyFor(Simplify.DATA, cc);
+      // pre-evaluation is safe as maps and arrays contain values
+      if(allAreValues(false)) return cc.preEval(this);
+    }
 
     if(func instanceof XQFunctionExpr) {
       // try to inline the function
