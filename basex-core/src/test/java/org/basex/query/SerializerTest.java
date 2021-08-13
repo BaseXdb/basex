@@ -79,21 +79,21 @@ public final class SerializerTest extends SandboxTest {
   /** Test: method=text. */
   @Test public void text() {
     final String option = SerializerOptions.METHOD.arg("text");
-    query(option + "1,2", "1 2");
+    query(option + "1, 2", "1 2");
     query(option + "<a>1</a>", 1);
-    query(option + "1,<a>2</a>,3", 123);
+    query(option + "1, <a>2</a>, 3", 123);
     query(option + SerializerOptions.USE_CHARACTER_MAPS.arg(";=,,") + "'1;2'", "1,2");
   }
 
   /** Test: item-separator. */
   @Test public void itemSeparator() {
-    query(SerializerOptions.ITEM_SEPARATOR.arg("-") + "1,2", "1-2");
-    query(SerializerOptions.ITEM_SEPARATOR.arg("") + "1,2", 12);
+    query(SerializerOptions.ITEM_SEPARATOR.arg("-") + "1, 2", "1-2");
+    query(SerializerOptions.ITEM_SEPARATOR.arg("") + "1, 2", 12);
     query(SerializerOptions.ITEM_SEPARATOR.arg("ABC") + "1 to 3", "1ABC2ABC3");
 
-    query(SerializerOptions.ITEM_SEPARATOR.arg("&#xa;") + "<a/>,<b/>", "<a/>\n<b/>");
+    query(SerializerOptions.ITEM_SEPARATOR.arg("&#xa;") + "<a/>, <b/>", "<a/>\n<b/>");
     query(SerializerOptions.ITEM_SEPARATOR.arg("&#xa;") +
-        SerializerOptions.METHOD.arg("text") + "1,2", "1\n2");
+        SerializerOptions.METHOD.arg("text") + "1, 2", "1\n2");
   }
 
   /** Test: xml:space='preserve'. */

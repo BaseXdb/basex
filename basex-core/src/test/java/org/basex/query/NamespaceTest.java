@@ -604,7 +604,7 @@ public final class NamespaceTest extends SandboxTest {
    * Detects malformed namespace hierarchy.
    */
   @Test public void nsInAtt() {
-    query("data(<a a='{namespace-uri-for-prefix('x', <x:a/>)}' xmlns:x='X'/>/@a)",
+    query("data(<a a='{ namespace-uri-for-prefix('x', <x:a/>) }' xmlns:x='X'/>/@a)",
         "X");
   }
 
@@ -694,7 +694,7 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test @Disabled
   public void copyPreserveNoInheritPersistent() {
-    query("declare copy-namespaces preserve,no-inherit;" +
+    query("declare copy-namespaces preserve, no-inherit;" +
         "declare namespace my = 'ns';" +
         "let $v :=" +
         "(copy $c := <my:n><my:a/></my:n>" +
@@ -741,15 +741,15 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void duplicateNamespaces() {
     query("copy $c := <a xmlns='X'/> modify (" +
-          "  rename node $c as QName('X','b')," +
+          "  rename node $c as QName('X', 'b')," +
           "  insert node attribute c{'a'} into $c" +
           ") return $c", "<b xmlns=\"X\" c=\"a\"/>");
     error("copy $c := <a xmlns='X'/> modify (" +
-        "  rename node $c as QName('Y','b')," +
+        "  rename node $c as QName('Y', 'b')," +
         "  insert node attribute c{'a'} into $c" +
         ") return $c", UPNSCONFL_X_X);
     query("copy $c := <a/> modify (" +
-        "  rename node $c as QName('X','b')," +
+        "  rename node $c as QName('X', 'b')," +
         "  insert node attribute c{'a'} into $c" +
         ") return $c", "<b xmlns=\"X\" c=\"a\"/>");
   }

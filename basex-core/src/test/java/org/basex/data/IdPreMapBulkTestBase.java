@@ -76,12 +76,9 @@ public abstract class IdPreMapBulkTestBase {
     final StringBuilder s = new StringBuilder();
     for(final int[] o : ops) {
       s.append(o[2] > 0 ? "insert(" : "delete(");
-      s.append(o[0]);
-      s.append(',');
-      s.append(o[1]);
-      s.append(',');
-      s.append(o[2]);
-      s.append(");\n");
+      s.append(o[0]).append(',');
+      s.append(o[1]).append(',');
+      s.append(o[2]).append(");\n");
     }
     Util.errln("Operations:\n" + s);
     Util.errln(testedmap);

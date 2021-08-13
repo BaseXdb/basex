@@ -438,7 +438,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * @throws XQException XQuery exception
    */
   @Test public void testQNameURI() throws XQException {
-    uriTest("fn:QName('http://a/b/c','a:b')", "http://a/b/c");
+    uriTest("fn:QName('http://a/b/c', 'a:b')", "http://a/b/c");
   }
 
   /**

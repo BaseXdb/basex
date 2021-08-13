@@ -38,7 +38,7 @@ public final class CompileContext {
    */
   public enum Simplify {
     /**
-     * Simplify EBV checks.
+     * EBV checks.
      * Requested by {@link If}, {@link Logical}, {@link Preds}, {@link Condition}, {@link Where},
      * {@link FnBoolean}, {@link FnNot}.
      * Evaluated by {@link Expr} {@link Filter}, {@link List}, {@link SimpleMap}, {@link Path}
@@ -46,7 +46,7 @@ public final class CompileContext {
      */
     EBV,
     /**
-     * Skip redundant atomizations.
+     * Atomizations.
      * Requested by {@link FnData}, {@link FnDistinctValues}, {@link Data}, {@link GroupSpec},
      * {@link OrderKey}.
      * Evaluated by {@link FnData}, {@link Cast}, {@link TypeCheck}.

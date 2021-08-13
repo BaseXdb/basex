@@ -73,8 +73,8 @@ public final class InspectModuleTest extends SandboxTest {
     query(func.args(" true#0"), "map {\n}");
     query(func.args(" %local:x function() { }") +
         "=> " + _MAP_CONTAINS.args(" xs:QName('local:x')"), true);
-    query(func.args(" %Q{uri}name('a','b') function() {}") +
-        " (QName('uri','name'))", "a\nb");
+    query(func.args(" %Q{uri}name('a', 'b') function() {}") +
+        " (QName('uri', 'name'))", "a\nb");
     query(_MAP_SIZE.args(func.args(" %basex:inline %basex:lazy function() {}")), 2);
   }
 
@@ -94,7 +94,7 @@ public final class InspectModuleTest extends SandboxTest {
 
     // ensure that closures will be compiled (GH-1194)
     query(func.args(url)
-        + "[function-name(.) = QName('world','closure')]()", 1);
+        + "[function-name(.) = QName('world', 'closure')]()", 1);
     query("import module namespace hello='world' at '" + url + "';"
         + func.args() + "[function-name(.) = xs:QName('hello:closure')]()", 1);
   }

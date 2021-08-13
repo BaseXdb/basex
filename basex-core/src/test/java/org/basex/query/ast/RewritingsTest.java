@@ -730,7 +730,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $n in (1, 2, 3) where $n != 2 and $n != 3 return $n", 1,
         exists(NOT), exists(RangeSeq.class));
 
-    check("<_>A</_>[. = <a>A</a> and . = 'A']", "<_>A</_>", exists(NOT), exists(List.class));
+    check("<_>A</_>[. = <a>B</a> and . = 'A']", "", exists(NOT), empty(And.class));
+    check("<_>A</_>[. = <a>A</a> and . = 'A']", "<_>A</_>", empty(And.class));
+
     check("(<a/>, <b/>, <c/>)[name() = 'a' and name() = 'b']", "",
         exists(NOT), exists(StrSeq.class));
   }
@@ -975,7 +977,7 @@ public final class RewritingsTest extends QueryPlanTest {
     // EBV rewritings
     check("<a><b/></a>[b ! ..]", "<a>\n<b/>\n</a>", exists(CachedPath.class));
 
-    // do not rewrite absolute paths
+    // absolute paths
     check("text { 'a' } ! <x>{ . }</x>/text() = 'a'", true, exists(IterMap.class));
     check("<a>a</a>/string() ! <x>{ . }</x>/text() = 'a'", true, exists(IterMap.class));
   }
@@ -1311,17 +1313,17 @@ public final class RewritingsTest extends QueryPlanTest {
 
     /** Combine position predicates. */
   @Test public void gh1840() {
-    check("(1,2,3)[position() = 1 or position() = 1]", 1, root(Int.class));
-    check("(1,2,3)[position() = 1 or position() = 2]", "1\n2", root(RangeSeq.class));
-    check("(1,2,3)[position() = 1 or position() = 3]", "1\n3", count(ItrPos.class, 2));
+    check("(1, 2, 3)[position() = 1 or position() = 1]", 1, root(Int.class));
+    check("(1, 2, 3)[position() = 1 or position() = 2]", "1\n2", root(RangeSeq.class));
+    check("(1, 2, 3)[position() = 1 or position() = 3]", "1\n3", count(ItrPos.class, 2));
 
-    check("(1,2,3)[position() = 1 to 2 or position() = 1]", "1\n2", root(RangeSeq.class));
-    check("(1,2,3)[position() = 1 to 2 or position() = 2]", "1\n2", root(RangeSeq.class));
-    check("(1,2,3)[position() = 1 to 2 or position() = 3]", "1\n2\n3", root(RangeSeq.class));
+    check("(1, 2, 3)[position() = 1 to 2 or position() = 1]", "1\n2", root(RangeSeq.class));
+    check("(1, 2, 3)[position() = 1 to 2 or position() = 2]", "1\n2", root(RangeSeq.class));
+    check("(1, 2, 3)[position() = 1 to 2 or position() = 3]", "1\n2\n3", root(RangeSeq.class));
 
-    check("(1,2,3)[position() = 1 to 2 and position() = 1]", 1, root(Int.class));
-    check("(1,2,3)[position() = 1 to 2 and position() = 2 to 3]", 2, root(Int.class));
-    check("(1,2,3)[position() = 1 to 2 and position() = 3]", "", empty());
+    check("(1, 2, 3)[position() = 1 to 2 and position() = 1]", 1, root(Int.class));
+    check("(1, 2, 3)[position() = 1 to 2 and position() = 2 to 3]", 2, root(Int.class));
+    check("(1, 2, 3)[position() = 1 to 2 and position() = 3]", "", empty());
   }
 
   /** Distinct integer sequences. */
@@ -1474,7 +1476,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Enforce index pragma, full-text. */
   @Test public void gh1860() {
-    query(_DB_CREATE.args(NAME, " <_>a</_>", "_.xml", " map { 'ftindex': true() }"));
+    query(_DB_CREATE.args(NAME, "<_>a</_>", "_.xml", " map { 'ftindex': true() }"));
     query("(# db:enforceindex #) {\n" +
       "  let $t := 'a'\n" +
       "  for $db in '" + NAME + "'\n" +
@@ -1519,8 +1521,8 @@ public final class RewritingsTest extends QueryPlanTest {
     // child, attribute, self axis: merge steps
     check("for $a in /* return $a/c", "<c/>", empty(GFLWOR.class));
     check("for $n in //* return $n/c", "<c/>\n<c/>", empty(GFLWOR.class));
-    check("for $n in //(a,b,c) return $n/@*", "c=\"d\"", empty(GFLWOR.class));
-    check("for $n in //(a,b,c) return $n/self::d", "", empty(GFLWOR.class));
+    check("for $n in //(a, b, c) return $n/@*", "c=\"d\"", empty(GFLWOR.class));
+    check("for $n in //(a, b, c) return $n/self::d", "", empty(GFLWOR.class));
 
     // other axes: rewrite to simple map operator
     check("count(for $c in //c return $c/..)", 2, exists(DualMap.class));
@@ -2133,7 +2135,7 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Parallel execution. */
   @Test public void gh1329() {
     query("xquery:fork-join(util:replicate(function() { <x/>[@a] }, 10000))", "");
-    query("1!fn:last#0()", 1);
+    query("1 ! fn:last#0()", 1);
   }
 
   /** Range and arithmetic expression. */

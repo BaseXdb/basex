@@ -26,7 +26,7 @@ public final class XQueryModuleTest extends QueryPlanTest {
     query(func.args("1 + 2"), 3);
     error(func.args("1+"), CALCEXPR);
     error("declare variable $a:=1;" + func.args("$a"), VARUNDEF_X);
-    error("for $a in (1,2) return " + func.args("$a"), VARUNDEF_X);
+    error("for $a in (1, 2) return" + func.args("$a"), VARUNDEF_X);
     // check updating expressions
     error(func.args("delete node ()"), XQUERY_UPDATE1);
     error(func.args("declare %updating function local:x() {()}; local:x()"), XQUERY_UPDATE1);
@@ -79,7 +79,7 @@ public final class XQueryModuleTest extends QueryPlanTest {
     // queries
     query(func.args("declare variable $a external; $a", " map { '$a': 'b' }"), "b");
     query(func.args("declare variable $a external; $a", " map { 'a': 'b' }"), "b");
-    query(func.args("declare variable $a external; $a", " map { 'a': (1,2) }"), "1\n2");
+    query(func.args("declare variable $a external; $a", " map { 'a': (1, 2) }"), "1\n2");
     query(func.args("declare variable $local:a external; $local:a",
       " map { xs:QName('local:a'): 1 }"), 1);
     query(func.args(".", " map { '': 1 }"), 1);
@@ -125,7 +125,7 @@ public final class XQueryModuleTest extends QueryPlanTest {
     final Function func = _XQUERY_FORK_JOIN;
     // pass on one or more functions
     query(func.args(" true#0"), true);
-    query(func.args(" (false#0,true#0)"), "false\ntrue");
+    query(func.args(" (false#0, true#0)"), "false\ntrue");
     query(func.args(" function() { 123 }"), 123);
     query("count(" + func.args(" (1 to 100) ! false#0") + ')', 100);
 

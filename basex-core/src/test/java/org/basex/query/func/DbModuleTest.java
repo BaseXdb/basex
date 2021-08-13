@@ -94,21 +94,21 @@ public final class DbModuleTest extends QueryPlanTest {
 
     // specify parsing options
     query(func.args(NAME, " '<a> </a>'", "chop.xml",
-        " map { '" + lc(MainOptions.CHOP) + "':true() }"));
+        " map { '" + lc(MainOptions.CHOP) + "': true() }"));
     query(_DB_OPEN.args(NAME, "chop.xml"), "<a/>");
     query(func.args(NAME, " '<a> </a>'", "nochop.xml",
-        " map { '" + lc(MainOptions.CHOP) + "':false() }"));
+        " map { '" + lc(MainOptions.CHOP) + "': false() }"));
     query(_DB_OPEN.args(NAME, "nochop.xml"), "<a> </a>");
 
     // specify parsing options
     query(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser':'csv','csvparser': 'header=true' }"));
+        " map { 'parser': 'csv', 'csvparser': 'header=true' }"));
     query("exists(" + _DB_OPEN.args(NAME, "csv.xml") + "//City)", true);
     query(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser':'csv','csvparser': map { 'header': 'true' } }"));
+        " map { 'parser': 'csv', 'csvparser': map { 'header': 'true' } }"));
     query("exists(" + _DB_OPEN.args(NAME, "csv.xml") + "//City)", true);
     query(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser':'csv','csvparser': map { 'header': true() } }"));
+        " map { 'parser': 'csv', 'csvparser': map { 'header': true() } }"));
     query("exists(" + _DB_OPEN.args(NAME, "csv.xml") + "//City)", true);
 
     final String addcache = " map { 'addcache': true() }";
@@ -120,13 +120,14 @@ public final class DbModuleTest extends QueryPlanTest {
     query("exists(" + _DB_OPEN.args(NAME, "C3.xml") + ")", true);
 
     error(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser':('csv','html') }"), BASEX_OPTIONS_X_X);
+        " map { 'parser': ('csv', 'html') }"), BASEX_OPTIONS_X_X);
     error(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser':'csv','csvparser': map { 'header': ('true','false') } }"), INVALIDOPT_X);
+        " map { 'parser': 'csv', 'csvparser': map { 'header': ('true', 'false') } }"),
+        INVALIDOPT_X);
     error(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser':'csv','csvparser': map { 'headr': 'true' } }"), BASEX_OPTIONS2_X);
+        " map { 'parser': 'csv', 'csvparser': map { 'headr': 'true' } }"), BASEX_OPTIONS2_X);
     error(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser':'csv','csvparser': 'headr=true' }"), BASEX_OPTIONS2_X);
+        " map { 'parser': 'csv', 'csvparser': 'headr=true' }"), BASEX_OPTIONS2_X);
 
     error(func.args(NAME, " <a/>"), RESINV_X);
     error(func.args(NAME, " <a/>", " ()"), RESINV_X);
@@ -294,11 +295,11 @@ public final class DbModuleTest extends QueryPlanTest {
     query("count(" + COLLECTION.args(NAME + "/test/dir") + ")", XMLFILES);
 
     // create DB w/ more than one input
-    query(func.args(NAME, " (<a/>,<b/>)", " ('1.xml','2.xml')"));
-    query(func.args(NAME, " (<a/>,'" + XML + "')", " ('1.xml','2.xml')"));
+    query(func.args(NAME, " (<a/>, <b/>)", " ('1.xml', '2.xml')"));
+    query(func.args(NAME, " (<a/>, '" + XML + "')", " ('1.xml', '2.xml')"));
 
     error(func.args(NAME, " ()", "1.xml"), DB_ARGS_X_X);
-    error(func.args(NAME, " (<a/>,<b/>)", "1.xml"), DB_ARGS_X_X);
+    error(func.args(NAME, " (<a/>, <b/>)", "1.xml"), DB_ARGS_X_X);
 
     // create and drop more than one database
     query("for $i in 1 to 5 return " + func.args(" '" + NAME + "' || $i"));
@@ -623,7 +624,7 @@ public final class DbModuleTest extends QueryPlanTest {
     final Function func = _DB_OPEN_ID;
     query(func.args(NAME, " ()"), "");
     query(func.args(NAME, 0) + "//title/text()", "XML");
-    query(func.args(NAME, " (0,1)") + "//title/text()", "XML");
+    query(func.args(NAME, " (0, 1)") + "//title/text()", "XML");
     error(func.args(NAME, -1), DB_RANGE_X_X);
     error(func.args(NAME, Integer.MAX_VALUE), DB_RANGE_X_X);
   }
@@ -633,7 +634,7 @@ public final class DbModuleTest extends QueryPlanTest {
     final Function func = _DB_OPEN_PRE;
     query(func.args(NAME, " ()"), "");
     query(func.args(NAME, 0) + "//title/text()", "XML");
-    query(func.args(NAME, " (0,1)") + "//title/text()", "XML");
+    query(func.args(NAME, " (0, 1)") + "//title/text()", "XML");
     error(func.args(NAME, -1), DB_RANGE_X_X);
     error(func.args(NAME, Integer.MAX_VALUE), DB_RANGE_X_X);
   }
@@ -668,10 +669,10 @@ public final class DbModuleTest extends QueryPlanTest {
       query(func.args(NAME, false, " map { '" + option + "': 1 }"));
     for(final String option : boolOptions) {
       for(final boolean bool : new boolean[] { true, false })
-        query(func.args(NAME, false, " map { '" + option + "':" + bool + "() }"));
+        query(func.args(NAME, false, " map { '" + option + "': " + bool + "() }"));
     }
     for(final String option : stringOptions)
-      query(func.args(NAME, false, " map { '" + option + "':'' }"));
+      query(func.args(NAME, false, " map { '" + option + "': '' }"));
     // ensure that option in context was not changed
     assertEquals(context.options.get(MainOptions.TEXTINDEX), true);
 
@@ -683,7 +684,7 @@ public final class DbModuleTest extends QueryPlanTest {
         BASEX_OPTIONS_X_X);
     error(func.args(NAME, false, " map { '" + lc(MainOptions.MAXLEN) + "': 'a' }"),
         BASEX_OPTIONS_X_X);
-    error(func.args(NAME, false, " map { '" + lc(MainOptions.TEXTINDEX) + "':'nope' }"),
+    error(func.args(NAME, false, " map { '" + lc(MainOptions.TEXTINDEX) + "': 'nope' }"),
         BASEX_OPTIONS_X_X);
 
     // check if optimize call adopts original options
@@ -713,9 +714,9 @@ public final class DbModuleTest extends QueryPlanTest {
 
     // check if options specified in map are adopted
     final StringBuilder options = new StringBuilder();
-    for(final String option : indexes) options.append('\'').append(option).append("':true(),");
-    for(final String option : includes) options.append('\'').append(option).append("':'a',");
-    options.append('\'').append(lc(MainOptions.UPDINDEX)).append("':true()");
+    for(final String option : indexes) options.append('\'').append(option).append("': true(),");
+    for(final String option : includes) options.append('\'').append(option).append("': 'a',");
+    options.append('\'').append(lc(MainOptions.UPDINDEX)).append("': true()");
     query(func.args(NAME, true, " map { " + options + '}'));
 
     for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", true);

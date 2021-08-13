@@ -31,16 +31,16 @@ public final class MapModuleTest extends QueryPlanTest {
     query("exists(" + func.args(1, 2) + ')', true);
     query("exists(" + _MAP_MERGE.args(func.args(1, 2)) + ')', true);
     error("exists(" + func.args(" ()", 2) + ')', EMPTYFOUND);
-    error("exists(" + func.args(" (1,2)", 2) + ')', SEQFOUND_X);
+    error("exists(" + func.args(" (1, 2)", 2) + ')', SEQFOUND_X);
   }
 
   /** Test method. */
   @Test public void forEach() {
     final Function func = _MAP_FOR_EACH;
 
-    query("(1,map { 1: 2 })[. instance of map(*)] ! " +
+    query("(1, map { 1: 2 })[. instance of map(*)] ! " +
         func.args(" .", " function($k, $v) { $v }"), 2);
-    query("(1,matches#2)[. instance of function(*)] ! " +
+    query("(1, matches#2)[. instance of function(*)] ! " +
         func.args(" map { 'aa': 'a' }", " ."), true);
 
     query(func.args(" map { }", " function($k, $v) { 1 }"), "");

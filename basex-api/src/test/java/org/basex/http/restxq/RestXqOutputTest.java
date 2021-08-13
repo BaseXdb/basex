@@ -20,7 +20,7 @@ public final class RestXqOutputTest extends RestXqTest {
     getE("declare %R:path('') %output:xyz('abc') function m:f() {'9'};", "");
     // parameter must contain single string
     getE("declare %R:path('') %output:method function m:f() {'9'};", "");
-    getE("declare %R:path('') %output:method('xml','html') function m:f() {'9'};", "");
+    getE("declare %R:path('') %output:method('xml', 'html') function m:f() {'9'};", "");
 
     get("declare %R:path('') function m:f() { <R:response>" +
         "  <output:serialization-parameters>" +

@@ -95,7 +95,7 @@ public final class FileModuleTest extends SandboxTest {
 
     query(func.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), 1 + Prop.NL.length());
-    query(func.args(PATH1, " ('y','z')"));
+    query(func.args(PATH1, " ('y', 'z')"));
     query(_FILE_SIZE.args(PATH1), 3 * (1 + Prop.NL.length()));
     query(func.args(PATH1, "\u00fc", "US-ASCII"));
     query(_FILE_READ_TEXT_LINES.args(PATH1), "x\ny\nz\n?");

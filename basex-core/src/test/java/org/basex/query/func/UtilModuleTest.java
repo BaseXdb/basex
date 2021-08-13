@@ -119,40 +119,40 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(seq + "count($seq)  = count(distinct-values($seq))", false, root(EMPTY), exists(func));
     check(seq + "count($seq) <= count(distinct-values($seq))", false, root(EMPTY), exists(func));
     check(seq + "count($seq) <  count(distinct-values($seq))", false, root(Bln.class));
-    check(seq + "count($seq) >= count(distinct-values($seq))", true, root(Bln.class));
-    check(seq + "count($seq) >  count(distinct-values($seq))", true, root(EXISTS), exists(func));
-    check(seq + "count($seq) != count(distinct-values($seq))", true, root(EXISTS), exists(func));
+    check(seq + "count($seq) >= count(distinct-values($seq))", true,  root(Bln.class));
+    check(seq + "count($seq) >  count(distinct-values($seq))", true,  root(EXISTS), exists(func));
+    check(seq + "count($seq) != count(distinct-values($seq))", true,  root(EXISTS), exists(func));
 
     check(seq + "count(distinct-values($seq))  = count($seq)", false, root(EMPTY), exists(func));
-    check(seq + "count(distinct-values($seq)) <= count($seq)", true, root(Bln.class));
-    check(seq + "count(distinct-values($seq)) <  count($seq)", true, root(EXISTS), exists(func));
+    check(seq + "count(distinct-values($seq)) <= count($seq)", true,  root(Bln.class));
+    check(seq + "count(distinct-values($seq)) <  count($seq)", true,  root(EXISTS), exists(func));
     check(seq + "count(distinct-values($seq)) >= count($seq)", false, root(EMPTY), exists(func));
     check(seq + "count(distinct-values($seq)) >  count($seq)", false, root(Bln.class));
-    check(seq + "count(distinct-values($seq)) != count($seq)", true, root(EXISTS), exists(func));
+    check(seq + "count(distinct-values($seq)) != count($seq)", true,  root(EXISTS), exists(func));
 
     seq = "let $seq := (<_>1</_>, 2, <_>1</_>)[. = 1] return ";
     check(seq + "count($seq)  = count(distinct-values($seq))", false, root(EMPTY), exists(func));
     check(seq + "count($seq) <= count(distinct-values($seq))", false, root(EMPTY), exists(func));
     check(seq + "count($seq) <  count(distinct-values($seq))", false, root(Bln.class));
-    check(seq + "count($seq) >= count(distinct-values($seq))", true, root(Bln.class));
-    check(seq + "count($seq) >  count(distinct-values($seq))", true, root(EXISTS), exists(func));
-    check(seq + "count($seq) != count(distinct-values($seq))", true, root(EXISTS), exists(func));
+    check(seq + "count($seq) >= count(distinct-values($seq))", true,  root(Bln.class));
+    check(seq + "count($seq) >  count(distinct-values($seq))", true,  root(EXISTS), exists(func));
+    check(seq + "count($seq) != count(distinct-values($seq))", true,  root(EXISTS), exists(func));
 
     check(seq + "count(distinct-values($seq))  = count($seq)", false, root(EMPTY), exists(func));
-    check(seq + "count(distinct-values($seq)) <= count($seq)", true, root(Bln.class));
-    check(seq + "count(distinct-values($seq)) <  count($seq)", true, root(EXISTS), exists(func));
+    check(seq + "count(distinct-values($seq)) <= count($seq)", true,  root(Bln.class));
+    check(seq + "count(distinct-values($seq)) <  count($seq)", true,  root(EXISTS), exists(func));
     check(seq + "count(distinct-values($seq)) >= count($seq)", false, root(EMPTY), exists(func));
     check(seq + "count(distinct-values($seq)) >  count($seq)", false, root(Bln.class));
-    check(seq + "count(distinct-values($seq)) != count($seq)", true, root(EXISTS), exists(func));
+    check(seq + "count(distinct-values($seq)) != count($seq)", true,  root(EXISTS), exists(func));
   }
 
   /** Test method. */
   @Test public void iff() {
     final Function func = _UTIL_IF;
-    query(func.args(" 1", 1), 1);
+    query(func.args(1, 1), 1);
     query(func.args(" ()", 1), "");
 
-    query(func.args(" 1", 1, 2), 1);
+    query(func.args(1, 1, 2), 1);
     query(func.args(" ()", 1, 2), 2);
     query(func.args(" (<a/>, <b/>)", 1, 2), 1);
     error(func.args(" (1, 2)", 1, 2), ARGTYPE_X_X_X);
@@ -391,16 +391,16 @@ public final class UtilModuleTest extends QueryPlanTest {
     query("count(" + func.args(" (1, 2, 3)[. = 4]", 4) + ')', 1);
     query("count(" + func.args(" (1, 2, 3)[. = 4]", " (4, 5)") + ')', 2);
 
-    check(func.args(null, null), "", empty());
-    check(func.args(null, 1), 1, root(Int.class));
-    check(func.args(1, null), 1, root(Int.class));
-    check(func.args(null, " <x/>"), "<x/>", root(CElem.class));
-    check(func.args(" <x/>", null), "<x/>", root(CElem.class));
+    check(func.args(" ()", " ()"), "", empty());
+    check(func.args(" ()", 1), 1, root(Int.class));
+    check(func.args(1, " ()"), 1, root(Int.class));
+    check(func.args(" ()", " <x/>"), "<x/>", root(CElem.class));
+    check(func.args(" <x/>", " ()"), "<x/>", root(CElem.class));
 
-    check(func.args(" (1, <_>2</_>[. = 3])", null), 1, root(List.class));
+    check(func.args(" (1, <_>2</_>[. = 3])", " ()"), 1, root(List.class));
     check(func.args(" (2, <_>3</_>[. = 4])", "<z/>"), 2, root(List.class));
 
-    check(func.args(" (3, <_>4</_>)[. = 3]", null), 3, root(IterFilter.class));
+    check(func.args(" (3, <_>4</_>)[. = 3]", " ()"), 3, root(IterFilter.class));
     check(func.args(" (4, <_>5</_>)[. = 4]", "<z/>"), 4, root(_UTIL_OR));
 
     check(func.args(" prof:void(1)", 2), 2, root(List.class));
@@ -466,10 +466,10 @@ public final class UtilModuleTest extends QueryPlanTest {
         "<a/>\n<a/>\n<a/>\n<a/>", count(_UTIL_REPLICATE, 1));
     check(func.args(" <_/>", 2) + " ! " + func.args(" .", 2),
         "<_/>\n<_/>\n<_/>\n<_/>", count(_UTIL_REPLICATE, 1));
-    check("(1,1) ! " + func.args(" .", 2),
+    check("(1, 1) ! " + func.args(" .", 2),
         "1\n1\n1\n1", empty(_UTIL_REPLICATE));
 
-    check("(1,1) ! " + func.args(" .", 2),
+    check("(1, 1) ! " + func.args(" .", 2),
         "1\n1\n1\n1", empty(_UTIL_REPLICATE));
   }
 

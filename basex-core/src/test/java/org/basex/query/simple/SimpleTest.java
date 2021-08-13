@@ -39,8 +39,8 @@ public final class SimpleTest extends QueryTest {
 
       { "Compare 1", booleans(true), "xs:QName('b') = attribute a { 'b' }" },
       { "Compare 2", booleans(false), "<a/>/x = (c, ())" },
-      { "Compare 3", booleans(false), "(4,5,6) < (1,2)" },
-      { "Compare 4", booleans(false), "(4,5) < (1,2,3)" },
+      { "Compare 3", booleans(false), "(4, 5, 6) < (1, 2)" },
+      { "Compare 4", booleans(false), "(4, 5) < (1, 2, 3)" },
       { "Compare 5", booleans(false), "1234567890.12345678 = 1234567890.1234567" },
       { "Compare 6", booleans(false), "123456789012345678  = 123456789012345679" },
 
@@ -50,15 +50,15 @@ public final class SimpleTest extends QueryTest {
       { "FLWOR 3", booleans(true), "declare namespace x = 'X'; " +
         "let $a := <a>0</a> let $b := $a return $b = 0" },
       { "FLWOR 4", integers(1),
-        "for $a in (1,2) let $b := 'a' where $a = 1 return $a" },
+        "for $a in (1, 2) let $b := 'a' where $a = 1 return $a" },
       { "FLWOR 5", integers(1, 2),
-        "for $a in (1,2) let $b := 'a'[$a = 1] return $a" },
+        "for $a in (1, 2) let $b := 'a'[$a = 1] return $a" },
       { "FLWOR 6", empty(),
-        "for $a in (1,2) let $b := 3 where $b = 4 return $a" },
+        "for $a in (1, 2) let $b := 3 where $b = 4 return $a" },
       { "FLWOR 7", integers(1, 2),
-        "for $a in (1,2) let $b := 3[. = 4] return $a" },
+        "for $a in (1, 2) let $b := 3[. = 4] return $a" },
       { "FLWOR 8", integers(2),
-        "for $a at $p in (1,2) where $a = 2 return $p" },
+        "for $a at $p in (1, 2) where $a = 2 return $p" },
 
       { "ForLet 1", integers(3, 3),
         "for $a in 1 to 2 let $b := 3 return $b" },
@@ -100,7 +100,7 @@ public final class SimpleTest extends QueryTest {
 
       { "Seq 1", integers(), "((( )  )    )" },
       { "Seq 2", integers(1), "((( 1 )  )    )" },
-      { "Seq 3", integers(1, 2), "((( 1,2 )  )    )" },
+      { "Seq 3", integers(1, 2), "((( 1, 2 )  )    )" },
       { "Seq 4", integers(1, 2, 3), "(1, (( 2,3 )  )    )" },
       { "Seq 5", integers(1, 2, 3, 4), "(1, (( 2,3 )  ),4   )" },
       { "Seq 6", "()()" },
@@ -114,17 +114,17 @@ public final class SimpleTest extends QueryTest {
 
       { "Filter 1", "1[1][error()]" },
       { "Filter 2", empty(), "1[1][<x/>/a]" },
-      { "Filter 3", strings("b"), "name(<x><a/><b c='d'/></x>/(a,b)[@c])" },
-      { "Filter 4", strings("b"), "name(<x><a/><b/></x>/(b,a)[self::b])" },
-      { "Filter 5", empty(), "<x><a><b c='d'/></a></x>/(a,b)[@c]" },
-      { "Filter 6", booleans(true), "empty((1,2,3)[3][2])" },
-      { "Filter 7", booleans(true), "empty((1,2,3)[position() = 3][2])" },
+      { "Filter 3", strings("b"), "name(<x><a/><b c='d'/></x>/(a, b)[@c])" },
+      { "Filter 4", strings("b"), "name(<x><a/><b/></x>/(b, a)[self::b])" },
+      { "Filter 5", empty(), "<x><a><b c='d'/></a></x>/(a, b)[@c]" },
+      { "Filter 6", booleans(true), "empty((1, 2, 3)[3][2])" },
+      { "Filter 7", booleans(true), "empty((1, 2, 3)[position() = 3][2])" },
       { "Filter 8", integers(1), "1[boolean(max((<a>1</a>, <b>2</b>)))]" },
       { "Filter 9", strings("x"), "string(<n><a/><a>x</a></n>/a/text()[.][.])" },
       { "Filter 10", strings("x"), "string(<n><a/><a>x</a></n>/a/text()[1][1])" },
       { "Filter 11", "1[1 to 2]" },
       { "Filter 12", empty(), "for $n in 0 to 1 return 'a'[position()= $n to 0]" },
-      { "Filter 13", strings("a", "a"), "for $n in 0 to 1 return ('a','b')[position()= $n to 1]" },
+      { "Filter 13", strings("a", "a"), "for $n in 0 to 1 return ('a', 'b')[position()= $n to 1]" },
 
       { "ContextItem 0", nodes(0), "." },
       { "ContextItem 1", nodes(0), "42[not(.)], ." },
@@ -158,14 +158,14 @@ public final class SimpleTest extends QueryTest {
       { "Cast 9", strings("1", "2"), "('1', '2 3') ! xs:NMTOKENS(.)[1]" },
       { "Cast 10", "exactly-one(xs:NMTOKENS(<x>1 2</x>))" },
 
-      { "Mixed 1", "(<a/>,<b/>)/(if(name() = 'a') then <a/> else 2)/." },
+      { "Mixed 1", "(<a/>, <b/>)/(if(name() = 'a') then <a/> else 2)/." },
 
       { "Typeswitch 1", integers(1),
         "typeswitch(<a>1</a>) case xs:string return 1 default return 1" },
       { "Typeswitch 2", integers(1),
         "typeswitch(<a>1</a>) case $a as xs:string return 1 default return 1" },
       { "Typeswitch 3", integers(1, 2),
-        "typeswitch(<a>1</a>) case $a as xs:string return (1,2) default return (1,2)" },
+        "typeswitch(<a>1</a>) case $a as xs:string return (1, 2) default return (1, 2)" },
 
       { "FunctionContext 0", "declare function local:x() { /x }; local:x()" },
 
@@ -173,7 +173,7 @@ public final class SimpleTest extends QueryTest {
       { "XQuery 1.0", empty(), "xquery version '1.0'; <a/>/node()" },
 
       { "DeclFun 1", integers(0, 1), "declare function local:x($x as xs:integer) { $x }; " +
-        "let $a := 0, $b := 1 return try { local:x( (1 to 20) ) } catch * { ($a,$b) }" },
+        "let $a := 0, $b := 1 return try { local:x( (1 to 20) ) } catch * { $a, $b }" },
 
       { "Catch 1", "try { 1+'' } catch XPTY0004 { 1 }" },
       { "Catch 2", integers(1), "try { 1+'' } catch err:XPTY0004 { 1 }" },
@@ -231,14 +231,14 @@ public final class SimpleTest extends QueryTest {
       // #1140
       { "Pred 1", empty(), "declare function local:test() {" +
           "for $n in (1, 1) return <_><c/><w/></_>/*[$n[1]] }; local:test()/self::w" },
-      { "Pred 2", empty(), "for $n in (2,2) return (<c><c0/></c>, <d><d0/><d2/></d>)/*[$n[$n]]" },
+      { "Pred 2", empty(), "for $n in (2, 2) return (<c><c0/></c>, <d><d0/><d2/></d>)/*[$n[$n]]" },
       { "Pred 3", strings("XML"), "(('XML')[1])[1]" },
       { "Pred 4", integers(1), "1[position() = 1 to 2]" },
-      { "Pred 5", integers(1), "1[position() = (1,2)]" },
+      { "Pred 5", integers(1), "1[position() = (1, 2)]" },
       { "Pred 6", integers(1), "count((text { 'x' }, element x {})[. instance of element()])" },
 
       { "FItem 1", integers(1), "declare context item := 0; last#0()" },
-      { "FItem 2", integers(2), "declare context item := 1; let $f := last#0 return (2,3)[$f()]" },
+      { "FItem 2", integers(2), "declare context item := 1; let $f := last#0 return (2, 3)[$f()]" },
 
       { "List 1", integers(1, 10000000000L),
         "for $i in (1, 10000000000) return (1 to $i)[last()]" },

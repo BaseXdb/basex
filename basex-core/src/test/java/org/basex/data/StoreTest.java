@@ -103,8 +103,8 @@ public final class StoreTest extends SandboxTest {
    */
   @Test public void gh1662() {
     final String[] adds = {
-      _DB_ADD.args(NAME, " element x { (1 to 254) ! element y {} }", "a"),
-      _DB_ADD.args(NAME, " element x {}", "b")
+      _DB_ADD.args(NAME, " element x { (1 to 254) ! element y { } }", "a"),
+      _DB_ADD.args(NAME, " element x { }", "b")
     };
     final String[] deletes = {
       _DB_DELETE.args(NAME, "a"),
@@ -118,7 +118,7 @@ public final class StoreTest extends SandboxTest {
       query("count(//y)", 254);
       query(deletes[i % 2]);
       query(deletes[1 - i % 2]);
-      query(_DB_ADD.args(NAME, " element x { (1 to 256) ! element y {} }", "a"));
+      query(_DB_ADD.args(NAME, " element x { (1 to 256) ! element y { } }", "a"));
       query("count(//y)", 256);
       assertTrue(execute(new Inspect()).contains("No inconsistencies found."));
       execute(new Close());

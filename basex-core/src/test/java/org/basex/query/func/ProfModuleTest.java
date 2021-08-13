@@ -86,6 +86,6 @@ public final class ProfModuleTest extends SandboxTest {
     final Function func = _PROF_VOID;
     query(func.args(" ()"), "");
     query(func.args(1), "");
-    query(func.args("1,2"), "");
+    query(func.args("1, 2"), "");
   }
 }

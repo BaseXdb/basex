@@ -36,7 +36,7 @@ public final class ArchiveModuleTest extends SandboxTest {
         "last-modified='2000-01-01T12:12:12'>X</archive:entry>", ""), 1);
     count(func.args(" <archive:entry>X</archive:entry>", "", " map { }"), 1);
     count(func.args(" <archive:entry>X</archive:entry>", "",
-        " map { 'format':'zip', 'algorithm':'deflate' }"), 1);
+        " map { 'format': 'zip', 'algorithm': 'deflate' }"), 1);
     count(func.args("X", "", " map {}"), 1);
     count(func.args(" <archive:entry>X</archive:entry>", "",
         " map { 'format': 'zip', 'algorithm': 'deflate' }"), 1);
@@ -65,17 +65,17 @@ public final class ArchiveModuleTest extends SandboxTest {
     error(func.args(" <archive:entry encoding='US-ASCII'>X</archive:entry>", "\u00fc"),
         ARCHIVE_ENCODE2_X);
     // format not supported
-    error(func.args(" <archive:entry>X</archive:entry>", "", " map { 'format':'rar' }"),
+    error(func.args(" <archive:entry>X</archive:entry>", "", " map { 'format': 'rar' }"),
         ARCHIVE_FORMAT);
     // unknown option
-    error(func.args(" <archive:entry>X</archive:entry>", "", " map { 'x':'y' }"), INVALIDOPT_X);
+    error(func.args(" <archive:entry>X</archive:entry>", "", " map { 'x': 'y' }"), INVALIDOPT_X);
     error(func.args(" <archive:entry>X</archive:entry>", "", " map { 'format': 'xxx' }"),
         ARCHIVE_FORMAT);
     // algorithm not supported
     error(func.args(" <archive:entry>X</archive:entry>", "", " map { 'algorithm': 'unknown' }"),
         ARCHIVE_FORMAT_X_X);
     // algorithm not supported
-    error(func.args(" ('x','y')", " ('a','b')", " map { 'format': 'gzip' }"), ARCHIVE_SINGLE_X);
+    error(func.args(" ('x', 'y')", " ('a', 'b')", " map { 'format': 'gzip' }"), ARCHIVE_SINGLE_X);
   }
 
   /** Test method. */

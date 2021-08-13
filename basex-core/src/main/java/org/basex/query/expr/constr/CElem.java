@@ -40,11 +40,11 @@ public final class CElem extends CName {
    * @param computed computed constructor
    * @param name name
    * @param nspaces namespaces or {@code null} if this is a computed constructor
-   * @param cont element contents
+   * @param exprs element contents
    */
   public CElem(final StaticContext sc, final InputInfo info, final boolean computed,
-      final Expr name, final Atts nspaces, final Expr... cont) {
-    super(sc, info, SeqType.ELEMENT_O, computed, name, cont);
+      final Expr name, final Atts nspaces, final Expr... exprs) {
+    super(sc, info, SeqType.ELEMENT_O, computed, name, exprs);
     this.nspaces = nspaces;
   }
 

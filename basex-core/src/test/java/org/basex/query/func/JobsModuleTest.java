@@ -42,7 +42,7 @@ public final class JobsModuleTest extends SandboxTest {
     query(func.args(".", " map { '': <a/> }"));
     query(func.args("declare variable $a external;$a", " map { 'a': <a/> }"));
     query(func.args("static-base-uri()", " map { 'base-uri': 'abc.xq' }"));
-    query(func.args("1", " ()", " map { 'id':'123' }"));
+    query(func.args("1", " ()", " map { 'id': '123' }"));
   }
 
   /** Test method. */
@@ -73,14 +73,14 @@ public final class JobsModuleTest extends SandboxTest {
   @Test public void evalError() {
     // errors
     final Function func = _JOBS_EVAL;
-    error(func.args("1", " ()", " map { 'start':'abc' }"), DATEFORMAT_X_X_X);
+    error(func.args("1", " ()", " map { 'start': 'abc' }"), DATEFORMAT_X_X_X);
     error(func.args("1", " ()",
-        " map { 'start':'2030-01-01T01:01:01','end':'2029-01-01T01:01:01' }"), JOBS_RANGE_X);
-    error(func.args("1", " ()", " map { 'interval':'12345' }"), DATEFORMAT_X_X_X);
-    error(func.args("1", " ()", " map { 'interval':'-PT1S' }"), JOBS_RANGE_X);
-    error(func.args("1", " ()", " map { 'id':'job123' }"), JOBS_ID_INVALID_X);
-    error(func.args("1", " ()", " map { 'id':'job123' }"), JOBS_ID_INVALID_X);
-    error("(1,2)!" + func.args(SLOW_QUERY, " ()", " map { 'id': 'abc', 'cache': true() }"),
+        " map { 'start': '2030-01-01T01:01:01', 'end': '2029-01-01T01:01:01' }"), JOBS_RANGE_X);
+    error(func.args("1", " ()", " map { 'interval': '12345' }"), DATEFORMAT_X_X_X);
+    error(func.args("1", " ()", " map { 'interval': '-PT1S' }"), JOBS_RANGE_X);
+    error(func.args("1", " ()", " map { 'id': 'job123' }"), JOBS_ID_INVALID_X);
+    error(func.args("1", " ()", " map { 'id': 'job123' }"), JOBS_ID_INVALID_X);
+    error("(1, 2) ! " + func.args(SLOW_QUERY, " ()", " map { 'id': 'abc', 'cache': true() }"),
         JOBS_ID_EXISTS_X);
   }
 
@@ -142,12 +142,12 @@ public final class JobsModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void evalService() {
     final Function func = _JOBS_EVAL;
-    query(func.args("1", " ()", " map { 'id': 'ID','service': true() }"));
+    query(func.args("1", " ()", " map { 'id': 'ID', 'service': true() }"));
     query("file:exists(db:option('dbpath') || '/jobs.xml')", true);
     query("exists(" + _JOBS_SERVICES.args() + "[@id = 'ID'])", true);
     query(_JOBS_STOP.args("id"));
     query("exists(" + _JOBS_SERVICES.args() + "[@id = 'ID'])", true);
-    query(_JOBS_STOP.args("ID", " map { 'service':true() }"));
+    query(_JOBS_STOP.args("ID", " map { 'service': true() }"));
     query("exists(" + _JOBS_SERVICES.args() + "[@id = 'ID'])", false);
   }
 
@@ -165,7 +165,7 @@ public final class JobsModuleTest extends SandboxTest {
 
     // write UUID into logs
     final String uuid = UUID.randomUUID().toString();
-    final String id = query(func.args("1", null, " map { 'log': '" + uuid + "' }"));
+    final String id = query(func.args("1", " ()", " map { 'log': '" + uuid + "' }"));
     query(_JOBS_WAIT.args(id));
     // find log entry
     final String date = DateTime.format(new Date(), DateTime.DATE);
@@ -240,8 +240,7 @@ public final class JobsModuleTest extends SandboxTest {
     query("let $q := " + _JOBS_EVAL.args(SLOW_QUERY, " ()", " map { 'cache': true() }") +
         " return ("
         + _HOF_UNTIL.args(" function($r) { " + _JOBS_FINISHED.args(" $q") + " },"
-            + "function($c) { prof:sleep(1) }, ()") + ','
-        + func.args(" $q") + ')', 1);
+            + "function($c) { prof:sleep(1) }, ()") + ',' + func.args(" $q") + ')', 1);
 
     // ensure that the result will not be cached
     String id = query(_JOBS_EVAL.args(SLOW_QUERY));

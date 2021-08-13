@@ -163,7 +163,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
   }
 
   /**
-   * Merge atomic updates A,B with A being an insert atomic.
+   * Merge atomic updates A, B with A being an insert atomic.
    */
   @Test public void mergeSequence01() {
     // a=1, b=2
@@ -175,7 +175,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
     auc.addInsert(3, 2, elemClip(md, "<c/>", false));
     auc.addInsert(3, 2, elemClip(md, "<d/>", false));
     assertEquals(2, auc.updatesSize());
-    query(transform(doc, "insert node <c/> into $input/b,insert node <d/> into $input/b"),
+    query(transform(doc, "insert node <c/> into $input/b, insert node <d/> into $input/b"),
         "<a>\n<b>\n<c/>\n<d/>\n</b>\n</a>");
 
     // delete(x) -> insert(x+1)
@@ -183,7 +183,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
     auc.addDelete(2);
     auc.addInsert(3, 1, elemClip(md, "<d/>", false));
     assertEquals(1, auc.updatesSize());
-    query(transform(doc, "insert node <d/> into $input,delete node $input/b"),
+    query(transform(doc, "insert node <d/> into $input, delete node $input/b"),
         "<a>\n<d/>\n</a>");
 
     // delete(x) -> insert(x+1) with affecting insert before x
@@ -193,14 +193,14 @@ public final class AtomicUpdatesTest extends SandboxTest {
     auc.addInsert(4, 1, elemClip(md, "<d/>", false));
     assertEquals(2, auc.updatesSize());
     query(transform("<a><b/><c/></a>", "insert node <d/> into $input," +
-        "delete node $input/c,delete node $input/b"), "<a>\n<d/>\n</a>");
+        "delete node $input/c, delete node $input/b"), "<a>\n<d/>\n</a>");
 
     // insert(x) <- delete(x)
     auc = atomics(doc);
     auc.addInsert(2, 1, elemClip(md, "<d/>", false));
     auc.addDelete(2);
     assertEquals(1, auc.updatesSize());
-    query(transform(doc, "insert node <d/> into $input,delete node $input/b"), "<a>\n<d/>\n</a>");
+    query(transform(doc, "insert node <d/> into $input, delete node $input/b"), "<a>\n<d/>\n</a>");
   }
 
   /**
@@ -385,7 +385,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
     assertEquals(9, auc.calculatePreValue(6, false));
     assertEquals(1, auc.calculatePreValue(1, true));
     assertEquals(2, auc.calculatePreValue(2, true));
-    // nodes like 3,4 that have not existed prior to insert are not recalculated
+    // nodes like 3, 4 that have not existed prior to insert are not recalculated
     assertEquals(3, auc.calculatePreValue(3, true));
     assertEquals(4, auc.calculatePreValue(4, true));
     assertEquals(3, auc.calculatePreValue(5, true));

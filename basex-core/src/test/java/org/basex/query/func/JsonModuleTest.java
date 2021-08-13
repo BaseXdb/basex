@@ -45,30 +45,30 @@ public final class JsonModuleTest extends SandboxTest {
     parse("{ \"\" : 0, \"\": 1 }", "",
         "... type=\"object\">\n<_ type=\"number\">0</_>\n<_ type=\"number\">1</_>");
     parse("{ \"O\" : [ 1 ] }", "", "...<O type=\"array\">\n<_ type=\"number\">1</_>\n</O>");
-    parse("{ \"A\" : [ 0,1 ] }", "",
+    parse("{ \"A\" : [ 0, 1 ] }", "",
         "...<A type=\"array\">\n<_ type=\"number\">0</_>\n<_ type=\"number\">1</_>");
     parse("{ \"\" : 0.0 }", "", "...0.0");
 
     // merging data types
-    parse("[]", "'merge':true()", "<json arrays=\"json\"/>");
-    parse("{}", "'merge':true()", "<json objects=\"json\"/>");
-    parse("{ } ", "'merge':true()", "<json objects=\"json\"/>");
-    parse("{ \"\\t\" : 0 }", "'merge':true()",
+    parse("[]", "'merge': true()", "<json arrays=\"json\"/>");
+    parse("{}", "'merge': true()", "<json objects=\"json\"/>");
+    parse("{ } ", "'merge': true()", "<json objects=\"json\"/>");
+    parse("{ \"\\t\" : 0 }", "'merge': true()",
         "<json objects=\"json\" numbers=\"_0009\">\n<_0009>0</_0009>\n</json>");
-    parse("{ \"a\" :0 }", "'merge':true()",
+    parse("{ \"a\" :0 }", "'merge': true()",
         "<json objects=\"json\" numbers=\"a\">\n<a>0</a>\n</json>");
-    parse("{ \"\" : 0 }", "'merge':true()",
+    parse("{ \"\" : 0 }", "'merge': true()",
         "<json objects=\"json\" numbers=\"_\">\n<_>0</_>\n</json>");
-    parse("{ \"\" : 0.0e0 }", "'merge':true()", "...<_>0.0e0</_>");
-    parse("{ \"\" : null }", "'merge':true()", "...<_/>");
-    parse("{ \"\" : true }", "'merge':true()", "...<_>true</_>");
-    parse("{ \"\" : {} }", "'merge':true()", "... objects=\"json _\">\n<_/>");
-    parse("{ \"\" : [] }", "'merge':true()", "... objects=\"json\" arrays=\"_\">\n<_/>");
-    parse("{ \"\" : 0, \"\": 1 }", "'merge':true()",
+    parse("{ \"\" : 0.0e0 }", "'merge': true()", "...<_>0.0e0</_>");
+    parse("{ \"\" : null }", "'merge': true()", "...<_/>");
+    parse("{ \"\" : true }", "'merge': true()", "...<_>true</_>");
+    parse("{ \"\" : {} }", "'merge': true()", "... objects=\"json _\">\n<_/>");
+    parse("{ \"\" : [] }", "'merge': true()", "... objects=\"json\" arrays=\"_\">\n<_/>");
+    parse("{ \"\" : 0, \"\": 1 }", "'merge': true()",
         "... objects=\"json\" numbers=\"_\">\n<_>0</_>\n<_>1</_>");
-    parse("{ \"O\" : [ 1 ] }", "'merge':true()",
+    parse("{ \"O\" : [ 1 ] }", "'merge': true()",
         "... objects=\"json\" arrays=\"O\" numbers=\"_\">\n<O>\n<_>1</_>\n</O>");
-    parse("{ \"A\" : [ 0,1 ] }", "'merge':true()",
+    parse("{ \"A\" : [ 0, 1 ] }", "'merge': true()",
         "... objects=\"json\" arrays=\"A\" numbers=\"_\">\n<A>\n<_>0</_>\n<_>1</_>");
 
     // errors
@@ -82,14 +82,14 @@ public final class JsonModuleTest extends SandboxTest {
     parseError("{ \"\" : 0.1. }", "");
     parseError("{ \"\" : 0.1e }", "");
     parseError("{ \"a\" : 0 }}", "");
-    parseError("{ \"a\" : 0, }", "'liberal':false()");
+    parseError("{ \"a\" : 0, }", "'liberal': false()");
   }
 
   /** Test method. */
   @Test public void parseXQuery() {
     final Function func = _JSON_PARSE;
     // queries
-    final String map = " map { 'format':'xquery' }";
+    final String map = " map { 'format': 'xquery' }";
     query(func.args("{}", map), "map {\n}");
     query(func.args("{\"A\":1}", map), "map {\n\"A\": 1.0e0\n}");
     query(func.args("{\"\":null}", map), "map {\n\"\": ()\n}");

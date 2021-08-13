@@ -31,11 +31,11 @@ abstract class CName extends CNode {
    * @param seqType sequence type
    * @param computed computed constructor
    * @param name name
-   * @param cont contents
+   * @param exprs contents
    */
   CName(final StaticContext sc, final InputInfo info, final SeqType seqType, final boolean computed,
-      final Expr name, final Expr... cont) {
-    super(sc, info, seqType, computed, cont);
+      final Expr name, final Expr... exprs) {
+    super(sc, info, seqType, computed, exprs);
     this.name = name;
   }
 

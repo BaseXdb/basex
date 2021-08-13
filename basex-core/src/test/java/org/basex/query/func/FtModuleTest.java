@@ -35,34 +35,34 @@ public final class FtModuleTest extends SandboxTest {
 
     // check index results
     query(func.args("Assignments", "assignments"), true);
-    query(func.args("Exercise 1", "('exercise','1')"), true);
+    query(func.args("Exercise 1", "('exercise', '1')"), true);
     query(func.args("Exercise 1", " <x>1</x>"), true);
     query(func.args("Exercise 1", "1"), true);
     query(func.args("Exercise 1", "X"), false);
-    query(func.args(" ('A','B')", " ('C','B')"), true);
+    query(func.args(" ('A', 'B')", " ('C', 'B')"), true);
 
     // check match options
-    query(func.args("Assignments", "Azzignments", " map { 'fuzzy':'yes' }"), true);
-    query(func.args("Assignments", "Azzignments", " map { 'fuzzy':'no' }"), false);
-    query(func.args("Assignments", "assignment", " map { 'stemming':true() }"), true);
-    query(func.args("Assignment", "assignments", " map { 'stemming':true() }"), true);
-    query(func.args("A", "a", " map { 'case':'upper' }"), true);
-    query(func.args("a", "A", " map { 'case':'lower' }"), true);
-    query(func.args("A", "a", " map { 'case':'insensitive' }"), true);
-    query(func.args("A", "a", " map { 'case':'sensitive' }"), false);
+    query(func.args("Assignments", "Azzignments", " map { 'fuzzy': 'yes' }"), true);
+    query(func.args("Assignments", "Azzignments", " map { 'fuzzy': 'no' }"), false);
+    query(func.args("Assignments", "assignment", " map { 'stemming': true() }"), true);
+    query(func.args("Assignment", "assignments", " map { 'stemming': true() }"), true);
+    query(func.args("A", "a", " map { 'case': 'upper' }"), true);
+    query(func.args("a", "A", " map { 'case': 'lower' }"), true);
+    query(func.args("A", "a", " map { 'case': 'insensitive' }"), true);
+    query(func.args("A", "a", " map { 'case': 'sensitive' }"), false);
     // check search modes
-    query(func.args("Exercise 1", "1 Exercise", " map { 'mode':'phrase' }"), false);
-    query(func.args("Exercise 1", "1 Exercise", " map { 'mode':'all' }"), false);
-    query(func.args("Exercise 1", "1 Exercise", " map { 'mode':'any' }"), false);
-    query(func.args("Exercise 1", "1 Exercise", " map { 'mode':'any word' }"), true);
-    query(func.args("Exercise 1", "1 Exercise", " map { 'mode':'all words' }"), true);
+    query(func.args("Exercise 1", "1 Exercise", " map { 'mode': 'phrase' }"), false);
+    query(func.args("Exercise 1", "1 Exercise", " map { 'mode': 'all' }"), false);
+    query(func.args("Exercise 1", "1 Exercise", " map { 'mode': 'any' }"), false);
+    query(func.args("Exercise 1", "1 Exercise", " map { 'mode': 'any word' }"), true);
+    query(func.args("Exercise 1", "1 Exercise", " map { 'mode': 'all words' }"), true);
 
     query(func.args("databases and xml", "databases xml",
-        " map { 'mode': 'all words', 'distance':map { 'min': 0, 'max': 1 } }"), true);
+        " map { 'mode': 'all words', 'distance': map { 'min': 0, 'max': 1 } }"), true);
     query(func.args("databases and xml", "databases xml",
-        " map { 'mode': 'all words', 'distance':map { 'max': 0 } }"), false);
+        " map { 'mode': 'all words', 'distance': map { 'max': 0 } }"), false);
     query(func.args("databases and xml", "databases xml",
-        " map { 'mode': 'all words', 'window':map { 'size': 3 } }"), true);
+        " map { 'mode': 'all words', 'window': map { 'size': 3 } }"), true);
 
     // check buggy options
     error(func.args("x", "x", " map { 'x': 'y' }"), INVALIDOPT_X);
@@ -154,7 +154,7 @@ public final class FtModuleTest extends SandboxTest {
 
     // check index results
     query(func.args(NAME, "assignments"), "Assignments");
-    query(func.args(NAME, " ('exercise','1')"), "Exercise 1\nExercise 2");
+    query(func.args(NAME, " ('exercise', '1')"), "Exercise 1\nExercise 2");
     query(func.args(NAME, " <x>1</x>"), "Exercise 1");
     query(func.args(NAME, "1"), "Exercise 1");
     query(func.args(NAME, "XXX"), "");
@@ -168,23 +168,23 @@ public final class FtModuleTest extends SandboxTest {
 
     // check match options
     query(func.args(NAME, "Assignments", " map { }"), "Assignments");
-    query(func.args(NAME, "Azzignments", " map { 'fuzzy':'yes' }"), "Assignments");
-    query(func.args(NAME, "Azzignments", " map { 'fuzzy':'no' }"), "");
+    query(func.args(NAME, "Azzignments", " map { 'fuzzy': 'yes' }"), "Assignments");
+    query(func.args(NAME, "Azzignments", " map { 'fuzzy': 'no' }"), "");
     // check search modes
-    query(func.args(NAME, "1 Exercise", " map { 'mode':'phrase' }"), "");
-    query(func.args(NAME, "1 Exercise", " map { 'mode':'all' }"), "");
-    query(func.args(NAME, "1 Exercise", " map { 'mode':'any' }"), "");
-    query(func.args(NAME, "1 Exercise", " map { 'mode':'any word' }"), "Exercise 1\nExercise 2");
-    query(func.args(NAME, "1 Exercise", " map { 'mode':'all words' }"), "Exercise 1");
+    query(func.args(NAME, "1 Exercise", " map { 'mode': 'phrase' }"), "");
+    query(func.args(NAME, "1 Exercise", " map { 'mode': 'all' }"), "");
+    query(func.args(NAME, "1 Exercise", " map { 'mode': 'any' }"), "");
+    query(func.args(NAME, "1 Exercise", " map { 'mode': 'any word' }"), "Exercise 1\nExercise 2");
+    query(func.args(NAME, "1 Exercise", " map { 'mode': 'all words' }"), "Exercise 1");
 
     query(func.args(NAME, "databases xml",
-        " map { 'mode': 'all words', 'distance':map { 'min': 0, 'max': 1 } }"),
+        " map { 'mode': 'all words', 'distance': map { 'min': 0, 'max': 1 } }"),
         "Databases and XML");
     query(func.args(NAME, "databases xml",
-        " map { 'mode': 'all words', 'distance':map { 'max': 0 } }"),
+        " map { 'mode': 'all words', 'distance': map { 'max': 0 } }"),
         "");
     query(func.args(NAME, "databases xml",
-        " map { 'mode': 'all words', 'window':map { 'size': 3 } }"),
+        " map { 'mode': 'all words', 'window': map { 'size': 3 } }"),
         "Databases and XML");
 
     // check buggy options

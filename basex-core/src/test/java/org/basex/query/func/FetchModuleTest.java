@@ -50,16 +50,16 @@ public final class FetchModuleTest extends SandboxTest {
     final Function func = _FETCH_XML;
     // successful queries
     query(func.args(XML));
-    query("exists(" + func.args(XML, " map { 'chop':true() }") +
+    query("exists(" + func.args(XML, " map { 'chop': true() }") +
         "//text()[not(normalize-space())])", false);
-    query("exists(" + func.args(XML, " map { 'chop':false() }") +
+    query("exists(" + func.args(XML, " map { 'chop': false() }") +
         "//text()[not(normalize-space())])", true);
     query(COUNT.args(func.args(CSV,
-        " map { 'parser':'csv','csvparser': 'header=true' }") + "//City"), 3);
+        " map { 'parser': 'csv', 'csvparser': 'header=true' }") + "//City"), 3);
     query(COUNT.args(func.args(CSV,
-        " map { 'parser':'csv','csvparser': map { 'header': true() } }") + "//City"), 3);
+        " map { 'parser': 'csv', 'csvparser': map { 'header': true() } }") + "//City"), 3);
     query(COUNT.args(func.args(CSV,
-        " map { 'parser':'csv','csvparser': map { 'header': 'true' } }") + "//City"), 3);
+        " map { 'parser': 'csv', 'csvparser': map { 'header': 'true' } }") + "//City"), 3);
 
     // catalog manager; requires resolver in lib/ directory
     final String catalog = DIR + "catalog/";

@@ -175,13 +175,13 @@ public final class CommandLockingTest extends SandboxTest {
 
   /** Tests user-defined functions. */
   @Test public void userDefined() {
-    ckDBs(new XQuery("declare function local:a($a) {" +
+    ckDBs(new XQuery("declare function local:a($a) { " +
         "if($a = 0) then $a else local:a($a idiv 2) };" +
         "local:a(5)"), false, NONE);
-    ckDBs(new XQuery("declare function local:a($a) {" +
+    ckDBs(new XQuery("declare function local:a($a) { " +
         "if($a = 0) then " + COLLECTION.args() + " else local:a($a idiv 2) };" +
         "local:a(5)"), false, CTX_LIST);
-    ckDBs(new XQuery("declare function local:a($a) {" +
+    ckDBs(new XQuery("declare function local:a($a) { " +
         "if($a = 0) then " + DOC.args(NAME) + " else local:a($a idiv 2) };" +
         "local:a(5)"), false, NAME_LIST);
   }

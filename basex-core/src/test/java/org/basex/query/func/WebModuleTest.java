@@ -27,13 +27,13 @@ public final class WebModuleTest extends SandboxTest {
     final Function func = _WEB_CREATE_URL;
     query(func.args("http://x.com", " map {}"), "http://x.com");
     query(func.args("url", " map { 'a': 'b' }"), "url?a=b");
-    query(func.args("url", " map { 'a': ('b','c') }"), "url?a=b&a=c");
+    query(func.args("url", " map { 'a': ('b', 'c') }"), "url?a=b&a=c");
     query(func.args("url", " map { 12: true() }"), "url?12=true");
 
     query(func.args("url", " map { }", "a"), "url#a");
 
     error(func.args("url", " map { (): 'a' }"), EMPTYFOUND);
-    error(func.args("url", " map { ('a','b'): () }"), SEQFOUND_X);
+    error(func.args("url", " map { ('a', 'b'): () }"), SEQFOUND_X);
     error(func.args("url", " map { 'a': true#0 }"), FIATOM_X);
   }
 
@@ -77,7 +77,7 @@ public final class WebModuleTest extends SandboxTest {
     query(func.args("a/b") + "/*:response/@status = 302", true);
     query(func.args("a/b", " map { }", "a") + "/*:response/*:header/@value = 'a/b#a'", true);
 
-    query(func.args("a/b", " map { 'a':'b' }") +
+    query(func.args("a/b", " map { 'a': 'b' }") +
         "/*:response/*:header[@name = 'Location']/@value/string()", "a/b?a=b");
 
     // GH-1585

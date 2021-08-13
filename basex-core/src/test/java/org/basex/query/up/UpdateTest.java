@@ -523,7 +523,7 @@ public final class UpdateTest extends SandboxTest {
    */
   @Test public void textMerging00() {
     query(transform("<a>AA<b/>CC</a>", "delete node $input//b",
-        "($input,count($input//text()))"),
+        "($input, count($input//text()))"),
         "<a>AACC</a>\n1");
   }
 
@@ -661,8 +661,8 @@ public final class UpdateTest extends SandboxTest {
     final String query =
         "replace node $input//e with 'T6'," +
         "insert node 'T11' before $input//a," +
-        "delete node ($input//a,$input//b,$input//c), " +
-        "replace node $input//d with (<newd/>,'T44')";
+        "delete node ($input//a, $input//b, $input//c), " +
+        "replace node $input//d with (<newd/>, 'T44')";
     final String expected = "<n>T1T11T2T3T4<newd/>T44T5T6</n>";
     checkTextNodeMerging(doc, query, expected, 2);
   }
@@ -780,7 +780,7 @@ public final class UpdateTest extends SandboxTest {
    */
   @Test public void delayedDistanceAdjustment7() {
     createDB("<A><B/><C/><D/><E/></A>");
-    query("delete node (//B,//D)");
+    query("delete node (//B, //D)");
     query("/", "<A>\n<C/>\n<E/>\n</A>");
   }
 
@@ -789,7 +789,7 @@ public final class UpdateTest extends SandboxTest {
    */
   @Test public void delayedDistanceAdjustment8() {
     createDB("<A><B/><C><D/><E/></C></A>");
-    query("delete node (//B,//D)");
+    query("delete node (//B, //D)");
     query("/", "<A>\n<C>\n<E/>\n</C>\n</A>");
   }
 
@@ -798,7 +798,7 @@ public final class UpdateTest extends SandboxTest {
    */
   @Test public void delayedDistanceAdjustment9() {
     createDB("<A><B/><C><D/><E/><F/></C></A>");
-    query("delete node (//B,//D)");
+    query("delete node (//B, //D)");
     query("/", "<A>\n<C>\n<E/>\n<F/>\n</C>\n</A>");
   }
 
@@ -807,7 +807,7 @@ public final class UpdateTest extends SandboxTest {
    */
   @Test public void delayedDistanceAdjustment10() {
     createDB("<A><B/><C><D/><E/></C><F/></A>");
-    query("delete node (//B,//D)");
+    query("delete node (//B, //D)");
     query("/", "<A>\n<C>\n<E/>\n</C>\n<F/>\n</A>");
   }
 
@@ -816,7 +816,7 @@ public final class UpdateTest extends SandboxTest {
    */
   @Test public void delayedDistanceAdjustment11() {
     createDB("<A><B/><C/><D/><E/></A>");
-    query("delete node (//C,//D)");
+    query("delete node (//C, //D)");
     query("/", "<A>\n<B/>\n<E/>\n</A>");
   }
 
@@ -983,7 +983,7 @@ public final class UpdateTest extends SandboxTest {
    */
   @Test public void dbUpdateTransform() {
     error("copy $c := <a/> modify update:output('x') return $c", BASEX_UPDATE);
-    error("copy $c := <a/> modify db:add('" + NAME + "','<x/>','x.xml') return $c",
+    error("copy $c := <a/> modify db:add('" + NAME + "', '<x/>', 'x.xml') return $c",
         BASEX_UPDATE);
     error("copy $c := <a/> modify put(<a/>, 'x.txt') return $c", BASEX_UPDATE);
   }
@@ -1039,7 +1039,7 @@ public final class UpdateTest extends SandboxTest {
     query("<x/> update {}", "<x/>");
     query("<x/> update {} update {}", "<x/>");
     query("<x/> update {}", "<x/>");
-    query("(<x/>,<y/>) update {}", "<x/>\n<y/>");
+    query("(<x/>, <y/>) update {}", "<x/>\n<y/>");
     error("update:output('a') update ()", UPNOT_X);
     error("<x/> update 1", UPMODIFY);
 
@@ -1055,17 +1055,17 @@ public final class UpdateTest extends SandboxTest {
   @Test public void updateLastStep() {
     query("<X/>!(delete node .)");
     query("<X/>/(delete node .)");
-    query("(<X/>,<Y/>)/(insert node <Z/> into .)");
+    query("(<X/>, <Y/>)/(insert node <Z/> into .)");
   }
 
   /** Tests the expressions in modify clauses for updates. */
   @Test public void modifyCheck() {
     error("copy $c:= <a>X</a> modify 'a' return $c", UPMODIFY);
-    error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", UPALL);
+    error("copy $c:= <a>X</a> modify(delete node $c/text(), 'a') return $c", UPALL);
 
-    error("text { <a/> update (delete node <a/>,<b/>) }", UPALL);
-    error("1[<a/> update (delete node <a/>,<b/>)]", UPALL);
-    error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", UPALL);
+    error("text { <a/> update (delete node <a/>, <b/>) }", UPALL);
+    error("1[<a/> update (delete node <a/>, <b/>)]", UPALL);
+    error("for $i in 1 order by (<a/> update (delete node <a/>, <b/>)) return $i", UPALL);
   }
 
   /** Reject updating function items. */
@@ -1143,20 +1143,20 @@ public final class UpdateTest extends SandboxTest {
   /** Checks if updating expressions are treated like non-deterministic code. */
   @Test public void noOptimization() {
     query("<a/> update { . ! (insert node text { '1' } into .) }", "<a>1</a>");
-    query("<a/> update { for $a in (1,2) return insert node text { '1' } into . }", "<a>11</a>");
+    query("<a/> update { for $a in (1, 2) return insert node text { '1' } into . }", "<a>11</a>");
     query("(update:output('1'), update:output('2'))", "1\n2");
   }
 
   /** Test. */
   @Test public void gh1576() {
-    query("update:output([])", "[]");
-    query("update:output([1,(2,[3,4])])", "[1, (2, [3, 4])]");
+    query("update:output([ ])", "[]");
+    query("update:output([ 1, (2, [ 3, 4 ]) ])", "[1, (2, [3, 4])]");
     query("update:output(map { })", "map {\n}");
     query("update:output(map { 1: map { 2: 3 }})", "map {\n1: map {\n2: 3\n}\n}");
 
     error("update:output(true#0)", BASEX_FUNCTION_X);
-    error("update:output([true#0])", BASEX_FUNCTION_X);
-    error("update:output([1,(2,[3,true#0])])", BASEX_FUNCTION_X);
+    error("update:output([ true#0 ])", BASEX_FUNCTION_X);
+    error("update:output([1, (2, [ 3, true#0 ])])", BASEX_FUNCTION_X);
     error("update:output(map { 1: map { 2: true#0 }})", BASEX_FUNCTION_X);
   }
 

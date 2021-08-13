@@ -288,7 +288,7 @@ final class XMLParser extends CommandParser {
     // check existence of mandatory attributes
     tb.add("[every $e in $A satisfies @*/name() = $e]");
     // check existence of unknown attributes
-    tb.add("[every $e in @* satisfies $e/name() = ($A,$O)]");
+    tb.add("[every $e in @* satisfies $e/name() = ($A, $O)]");
     // ensure that all values are non-empty
     tb.add("[every $e in @* satisfies data($e)]");
     if(t == null) {

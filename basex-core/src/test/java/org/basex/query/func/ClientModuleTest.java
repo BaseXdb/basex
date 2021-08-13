@@ -98,7 +98,7 @@ public final class ClientModuleTest extends SandboxTest {
     query(func.args(connection(), "declare variable $a external; count($a)",
         " map { 'a': (1 to 5) }"), 5);
     query(func.args(connection(), "declare context item external; .",
-        " map { '': (1,<a/>,'a') }"), "1\n<a/>\na");
+        " map { '': (1, <a/>, 'a') }"), "1\n<a/>\na");
     // binary data
     query(func.args(connection(), "xs:hexBinary('41')"), "A");
     query(func.args(connection(), "xs:base64Binary('QQ==')"), "A");

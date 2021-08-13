@@ -106,7 +106,7 @@ final class WebDAVService {
   private WebDAVMetaData metaData(final String db, final String path) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(
       "let $a := " + _DB_LIST_DETAILS.args(" $db", " $path") + "[1] " +
-      "return string-join(($a, $a/(@raw, @content-type, @modified-date, @size)),out:tab())");
+      "return string-join(($a, $a/(@raw, @content-type, @modified-date, @size)), out:tab())");
     query.bind("db", db);
     query.bind("path", path);
 

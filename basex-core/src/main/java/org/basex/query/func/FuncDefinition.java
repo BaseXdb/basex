@@ -179,9 +179,7 @@ public final class FuncDefinition {
     final TokenBuilder tb = new TokenBuilder();
     for(final Object arg : args) {
       if(!tb.isEmpty()) tb.add(", ");
-      if(arg == null) {
-        tb.add("()");
-      } else if(arg instanceof Expr) {
+      if(arg instanceof Expr) {
         tb.add(arg);
       } else if(arg instanceof Number) {
         tb.add(arg);

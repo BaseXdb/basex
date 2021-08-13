@@ -36,7 +36,7 @@ public final class SessionModuleTest extends HTTPTest {
    * @throws Exception exception
    */
   @Test public void names() throws Exception {
-    assertEquals("a", get("?query=" + request("S:set('a','b'), S:names()")));
+    assertEquals("a", get("?query=" + request("S:set('a', 'b'), S:names()")));
   }
 
   /**
@@ -52,7 +52,7 @@ public final class SessionModuleTest extends HTTPTest {
    * @throws Exception exception
    */
   @Test public void set() throws Exception {
-    final String query = "S:set('a','b'), S:get('a')";
+    final String query = "S:set('a', 'b'), S:get('a')";
     assertEquals("b", get("?query=" + request(query)));
   }
 

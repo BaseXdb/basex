@@ -71,8 +71,8 @@ public final class UserModuleTest extends SandboxTest {
     query(func.args(NAME, ""));
     // specify permissions
     query(func.args(NAME, NAME, Perm.ADMIN));
-    query(func.args(NAME, NAME, " ('admin','none')", " ('','x')"));
-    query(func.args(NAME, NAME, " ('admin','none')", " ('','x')", " <info a='x'/>"));
+    query(func.args(NAME, NAME, " ('admin', 'none')", " ('', 'x')"));
+    query(func.args(NAME, NAME, " ('admin', 'none')", " ('', 'x')", " <info a='x'/>"));
 
     // invalid permission
     error(func.args(NAME, NAME, ""), USER_PERMISSION_X);
@@ -84,8 +84,8 @@ public final class UserModuleTest extends SandboxTest {
 
     // redundant operations
     error(func.args(NAME, "") + ',' + func.args(NAME, ""), USER_UPDATE1_X_X);
-    error(func.args(NAME, "", " ('admin','admin')", " ('','')"), USER_UPDATE3_X_X);
-    error(func.args(NAME, "", " ('admin','admin')", " ('x','x')"), USER_UPDATE2_X);
+    error(func.args(NAME, "", " ('admin', 'admin')", " ('', '')"), USER_UPDATE3_X_X);
+    error(func.args(NAME, "", " ('admin', 'admin')", " ('x', 'x')"), USER_UPDATE2_X);
   }
 
   /** Test method. */
@@ -148,7 +148,7 @@ public final class UserModuleTest extends SandboxTest {
         "write");
 
     // grant list of permissions
-    query(func.args(NAME, " ('admin','none')", " ('','x')"));
+    query(func.args(NAME, " ('admin', 'none')", " ('', 'x')"));
 
     // admin permission can only be set globally
     error(func.args(NAME, Perm.ADMIN, NAME), USER_LOCAL);

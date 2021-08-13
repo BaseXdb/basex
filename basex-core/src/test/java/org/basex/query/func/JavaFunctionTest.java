@@ -65,7 +65,7 @@ public final class JavaFunctionTest extends SandboxTest {
     error("Q{java:org.basex.query.func.JavaFunctionExample}error()", JAVAEXEC_X_X_X);
 
     // sequence types
-    query("Q{java:org.basex.util.Strings}eqic('1', (('1','2')))", true);
+    query("Q{java:org.basex.util.Strings}eqic('1', (('1', '2')))", true);
     query("Q{java:org.basex.util.Strings}eqic('1', (1 to 2) ! string())", true);
   }
 
@@ -152,14 +152,14 @@ public final class JavaFunctionTest extends SandboxTest {
   /** Pass on empty sequences. */
   @Test public void emptyDecl() {
     query("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:string(n:new(),())", "");
+        "n:string(n:new(), ())", "");
     query("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:ambiguous1(n:new(),())", "");
+        "n:ambiguous1(n:new(), ())", "");
 
     error("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:bool(n:new(),())", JAVAARGS_X_X_X);
+        "n:bool(n:new(), ())", JAVAARGS_X_X_X);
     error("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:ambiguous2(n:new(),())", JAVAMULTIPLE_X_X);
+        "n:ambiguous2(n:new(), ())", JAVAMULTIPLE_X_X);
   }
 
   /** Pass on empty sequences. */

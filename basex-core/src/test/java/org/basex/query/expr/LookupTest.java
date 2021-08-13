@@ -15,10 +15,10 @@ import org.junit.jupiter.api.*;
 public final class LookupTest extends SandboxTest {
   /** Test. */
   @Test public void map() {
-    query("map { 'a':'b' } ? a", "b");
-    query("(map { 'a':'b' }, map { 'c':'d' }) ? a", "b");
-    query("map { 'a':'b', 'c':'d' } ? ('a','c')", "b\nd");
-    query("(map { 'a':'b' }, map { 'c':'d' }) ? ('a','c')", "b\nd");
+    query("map { 'a': 'b' } ? a", "b");
+    query("(map { 'a': 'b' }, map { 'c': 'd' }) ? a", "b");
+    query("map { 'a': 'b', 'c': 'd' } ? ('a', 'c')", "b\nd");
+    query("(map { 'a': 'b' }, map { 'c': 'd' }) ? ('a', 'c')", "b\nd");
     query("map:merge(for $i in 1 to 5 return map { $i: $i+1 })? 2", 3);
 
     query("map { 'first' : 'Jenna', 'last' : 'Scott' } ? first", "Jenna");
@@ -39,7 +39,7 @@ public final class LookupTest extends SandboxTest {
     query("[1, 2, 5, 7] ?*", "1\n2\n5\n7");
     query("[[1, 2, 3], [4, 5, 6]] ?* ?*", "1\n2\n3\n4\n5\n6");
     query("[4, 5, 6]?2", 5);
-    query("([1,2,3], [4,5,6])?2", "2\n5");
+    query("([1, 2, 3], [4, 5, 6])?2", "2\n5");
   }
 
   /** Test. */

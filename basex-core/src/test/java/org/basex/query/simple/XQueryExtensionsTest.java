@@ -14,7 +14,7 @@ public final class XQueryExtensionsTest extends QueryTest {
       { "Ternary 1", strings("ok"), "() ?? 'fail' !! 'ok'" },
       { "Ternary 2", integers(2), "0??1!!2" },
       { "Ternary 3", integers(1), "2 ?? 1 !! 0" },
-      { "Ternary 4", "(1,2) ?? 'no-sequences' !! 'allowed'" },
+      { "Ternary 4", "(1, 2) ?? 'no-sequences' !! 'allowed'" },
       { "Ternary 5", integers(3), "1 ?? (2 ?? 3 !! 4) !! 5" },
       { "Ternary 6", integers(3), "1 ?? (2 ?? 3 !! 4) !! 5" },
       { "Ternary 7", integers(3), "1 ?? 2 ?? 3 !! 4 !! 5" },

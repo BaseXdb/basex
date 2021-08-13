@@ -48,7 +48,7 @@ public final class MapTest extends SandboxTest {
         + "let $k2 := xs:time('01:01:02')"
         + "let $k3 := xs:time('01:01:03+01:00')"
         + "let $m := map { $k1: 1, $k2: 2 }"
-        + "return map:put(map:remove($m,$k2), $k3, 3)");
+        + "return map:put(map:remove($m, $k2), $k3, 3)");
     query("let $k1 := xs:time('01:01:01')"
         + "let $k2 := xs:time('01:01:02')"
         + "let $k3 := xs:time('01:01:02+01:00')"

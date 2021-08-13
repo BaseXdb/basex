@@ -133,9 +133,9 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     execute(new Open(NAME));
     indexCheck("data(//*[text() contains text '1'])", 1);
     indexCheck("data(//*[text() contains text '1 2' any word])", "1\n2 3");
-    indexCheck("//*[text() contains text {'2','4'} all]", "");
-    indexCheck("//*[text() contains text {'2','3'} all words]", "<a>2 3</a>");
-    indexCheck("//*[text() contains text {'2','4'} all words]", "");
+    indexCheck("//*[text() contains text { '2', '4' } all]", "");
+    indexCheck("//*[text() contains text { '2', '3' } all words]", "<a>2 3</a>");
+    indexCheck("//*[text() contains text { '2', '4' } all words]", "");
   }
 
   /** Checks if a full-text index with language option is used. */

@@ -97,11 +97,11 @@ public final class CollationTest extends SandboxTest {
   /** Tests the group by clause. */
   @Test public void groupBy() {
     // identical strings
-    query(PROLOG + "for $a in ('a','a') group by $b:=$a return count($a)", 2);
-    query("for $a in ('a','a') group by $b:=$a return count($a)", 2);
+    query(PROLOG + "for $a in ('a', 'a') group by $b:=$a return count($a)", 2);
+    query("for $a in ('a', 'a') group by $b:=$a return count($a)", 2);
     // different strings
-    query(PROLOG + "for $a in ('a','\u00c4') group by $b:=$a return count($a)", 2);
-    query("for $a in ('a','\u00c4') group by $b:=$a collation '" + COLLATION +
+    query(PROLOG + "for $a in ('a', '\u00c4') group by $b:=$a return count($a)", 2);
+    query("for $a in ('a', '\u00c4') group by $b:=$a collation '" + COLLATION +
         "' return count($a)", 2);
     query("for $a in 'a' group by $a, $a:=$a collation '" + COLLATION + "' return $a", "a");
   }

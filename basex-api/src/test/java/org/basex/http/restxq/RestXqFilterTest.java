@@ -20,7 +20,7 @@ public final class RestXqFilterTest extends RestXqTest {
     getE("declare %R:path('') %R:consumes('text/plain;bla=blu') function m:f() { 1 };", "");
 
     // multiple types
-    get("declare %R:path('') %R:consumes('text/plain','*/*') function m:f() { 1 };", "", "1");
+    get("declare %R:path('') %R:consumes('text/plain', '*/*') function m:f() { 1 };", "", "1");
     get("declare %R:path('') %R:consumes('text/plain') %R:consumes('*/*') function m:f() { 1 };",
         "", "1");
     get("declare %R:path('') %R:consumes('text/plain') function m:f() { 1 };" +
@@ -41,7 +41,7 @@ public final class RestXqFilterTest extends RestXqTest {
     get("declare %R:path('') %R:produces('*/*') function m:f() { 1 };", "", "1");
     get("declare %R:path('') %R:produces('text/plain;bla=blu') function m:f() { 1 };", "", "1");
     // multiple types
-    get("declare %R:path('') %R:produces('text/plain','*/*') function m:f() { 1 };", "", "1");
+    get("declare %R:path('') %R:produces('text/plain', '*/*') function m:f() { 1 };", "", "1");
     get("declare %R:path('') %R:produces('text/plain') %R:produces('*/*') " +
         "function m:f() { 1 };", "", "1");
   }

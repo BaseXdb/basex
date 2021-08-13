@@ -93,8 +93,8 @@ public final class BinModuleTest extends SandboxTest {
     final Function func = _BIN_FROM_OCTETS;
     // successful queries
     hexQuery(func.args(0),            "00");
-    hexQuery(func.args(" (1,127)"),   "017F");
-    hexQuery(func.args(" (128,255)"), "80FF");
+    hexQuery(func.args(" (1, 127)"),   "017F");
+    hexQuery(func.args(" (128, 255)"), "80FF");
     // errors
     error(func.args(-1),  BIN_OOR_X);
     error(func.args(256), BIN_OOR_X);

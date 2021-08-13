@@ -39,12 +39,12 @@ public final class MixUpdatesTest extends SandboxTest {
   /** Update test. */
   @Test public void evalUpdate() {
     query(_XQUERY_EVAL_UPDATE.args("1"), 1);
-    query(_XQUERY_EVAL_UPDATE.args("1") + ",2", "1\n2");
+    query(_XQUERY_EVAL_UPDATE.args("1") + ", 2", "1\n2");
   }
 
   /** Test method. */
   @Test public void output() {
-    query(_UPDATE_OUTPUT.args("x") + ",1", "1\nx");
+    query(_UPDATE_OUTPUT.args("x") + ", 1", "1\nx");
   }
 
   /** Annotations. */

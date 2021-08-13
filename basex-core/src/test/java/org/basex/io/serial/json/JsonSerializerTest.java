@@ -123,7 +123,7 @@ public final class JsonSerializerTest extends SandboxTest {
     error("map { 'A': 0 div 0.0e0 }", format, SERNUMBER_X);
 
     error("map { true(): true#0 }", format, SERJSONFUNC_X);
-    error("map { 'A': ('B','C') }", format, SERJSONSEQ);
+    error("map { 'A': ('B', 'C') }", format, SERJSONSEQ);
 
     // arrays
     serialize("[()]", "[null]", format);
@@ -131,7 +131,7 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("[2, 3]", "[2,3]", format);
     serialize("[2, (), 4]", "[2,null,4]", format);
 
-    error("[ (1,2) ]", format, SERJSONSEQ);
+    error("[ (1, 2) ]", format, SERJSONSEQ);
 
     // mixed
     serialize("map { 'A': map {} }", "{'A':{}}", format);

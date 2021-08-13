@@ -100,7 +100,7 @@ public final class HigherOrderTest extends SandboxTest {
 
   /**  Tests the creation of a cast function as function item. */
   @Test public void wrongArityTest() {
-    error("count(concat#2('1','2','3'))", INVARITY_X_X_X);
+    error("count(concat#2('1', '2', '3'))", INVARITY_X_X_X);
   }
 
   /** Tests using a partial function application as the context value. */
@@ -118,12 +118,12 @@ public final class HigherOrderTest extends SandboxTest {
   @Test public void gh1191() {
     final IOFile sandbox = sandbox();
     query(
-      "let $files := ('a','b') ! (\"" + sandbox + "/\" || . || '.txt')" +
+      "let $files := ('a', 'b') ! (\"" + sandbox + "/\" || . || '.txt')" +
       "return (\n" +
-      "  for $file in $files return (file:write-text($file, ?))(''),\n" +
-      "  $files ! file:exists(.),\n" +
-      "  $files ! file:delete(?)(.),\n" +
-      "  $files ! file:exists(.)\n" +
+      "  for $file in $files return (file:write-text($file, ?))('')," +
+      "  $files ! file:exists(.)," +
+      "  $files ! file:delete(?)(.)," +
+      "  $files ! file:exists(.)" +
         ')',
       "true\ntrue\nfalse\nfalse"
     );

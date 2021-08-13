@@ -17,7 +17,7 @@ public final class UnitModuleTest extends SandboxTest {
   @Test public void assrt() {
     final Function func = _UNIT_ASSERT;
     query(func.args(1), "");
-    query(func.args(" (<a/>,<b/>)"), "");
+    query(func.args(" (<a/>, <b/>)"), "");
     error(func.args(" ()"), UNIT_FAIL);
     error(func.args(" ()", "X"), UNIT_FAIL_X);
   }
