@@ -2188,6 +2188,23 @@ public final class RewritingsTest extends QueryPlanTest {
     check("document { <a b='c'/> }/descendant::a//@*", "b=\"c\"",
         exists("IterStep[@axis = 'descendant']"));
     check("<a b='c'/>/descendant-or-self::attribute()", "", root(Empty.class));
+
+    check("(document { }, <a/>)/descendant-or-self::document-node()", "",
+        exists("IterStep[@axis = 'self']"));
+
+    check("(<a/> | text { 'a' })/ancestor-or-self::text()", "a",
+        exists("IterStep[@axis = 'self']"));
+    check("(<a/> | text { 'a' })/ancestor-or-self::comment()", "",
+        exists("IterStep[@axis = 'self']"));
+    check("(<a/> | text { 'a' })/ancestor-or-self::attribute()", "",
+        exists("IterStep[@axis = 'self']"));
+    check("(<a/> | text { 'a' })/ancestor-or-self::processing-instruction()", "",
+        exists("IterStep[@axis = 'self']"));
+
+    check("text { 'a' }/ancestor-or-self::text()", "a", root(CTxt.class));
+    check("(<a/> | <b/>)/ancestor-or-self::text()", "", empty());
+    check("document { }/descendant-or-self::document-node()", "", root(CDoc.class));
+    check("(<a/> | <b/>)/descendant-or-self::document-node()", "", empty());
   }
 
   /** Lookup operator, iterative evaluation. */

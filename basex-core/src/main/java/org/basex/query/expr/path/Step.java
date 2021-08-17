@@ -147,16 +147,21 @@ public abstract class Step extends Preds {
     type(ex);
 
     // choose stricter axis
-    if(ex != null) {
-      final Type rtype = ex.seqType().type, type = seqType().type;
-      if(type.intersect(rtype) == null) {
-        // db:open('x')/descendant-or-self::x  ->  db:open('x')/descendant::x
-        final Axis old = axis;
-        if(axis == Axis.DESCENDANT_OR_SELF) axis = Axis.DESCENDANT;
-        else if(axis == Axis.ANCESTOR_OR_SELF) axis = Axis.ANCESTOR;
-        if(axis != old) cc.info(QueryText.OPTREWRITE_X_X, old, this);
-      }
+    final Axis old = axis;
+    final Type type = seqType().type;
+    if(axis == Axis.DESCENDANT_OR_SELF && type.instanceOf(NodeType.DOCUMENT_NODE)) {
+      // descendant-or-self::document-node()  ->  self::document-node()
+      axis = Axis.SELF;
+    } else if(axis == Axis.ANCESTOR_OR_SELF && type.oneOf(NodeType.LEAF_TYPES)) {
+      // ancestor-or-self::text()  ->  self::text()
+      axis = Axis.SELF;
+    } else if(ex != null && ex.seqType().type.intersect(type) == null) {
+      // root()/descendant-or-self::x  ->  root()/descendant::x
+      if(axis == Axis.DESCENDANT_OR_SELF) axis = Axis.DESCENDANT;
+      // $text/ancestor-or-self::x  ->  $text/ancestor::x
+      else if(axis == Axis.ANCESTOR_OR_SELF) axis = Axis.ANCESTOR;
     }
+    if(axis != old) cc.info(QueryText.OPTREWRITE_X_X, old, this);
 
     // check if step or test will never yield results
     if(noMatches() || ex != null && test.noMatches(ex.data())) {
