@@ -34,7 +34,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public String getBaseURI() {
-    throw new XQueryException(new QueryException("Item must be a node: " + internal()));
+    throw new XQueryException(new QueryException("Item must be a node: " + this));
   }
 
   /**
@@ -42,7 +42,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public QName getName() {
-    throw new XQueryException(new QueryException("Item must be a node: " + internal()));
+    throw new XQueryException(new QueryException("Item must be a node: " + this));
   }
 
   /**
@@ -51,7 +51,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    */
   public boolean getBoolean() {
     throw new XQueryException(new QueryException(
-        "Value has no boolean representation: " + internal()));
+        "Value has no boolean representation: " + this));
   }
 
   /**
@@ -64,7 +64,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
     } catch(final NumberFormatException ex) {
       Util.debug(ex);
       throw new XQueryException(new QueryException(
-          "Value has no integer representation: " + internal()));
+          "Value has no integer representation: " + this));
     }
   }
 
@@ -74,7 +74,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    */
   public String getString() {
     throw new XQueryException(new QueryException(
-        "Value has no string representation: " + internal()));
+        "Value has no string representation: " + this));
   }
 
   /**
@@ -102,6 +102,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return value type
    */
   public abstract SeqType getType();
+
   /**
    * Returns the internal value representation.
    * Should be made invisible to other packages.

@@ -38,11 +38,8 @@ public final class QT3TS extends Main {
   /** EQName pattern. */
   private static final Pattern BIND = Pattern.compile("^Q\\{(.*?)\\}(.+)$");
 
-  /** Test suite id. */
-  private static final String TESTID = "qt3ts";
   /** Path to the test suite (ignored if {@code null}). */
   private String basePath;
-
   /** Maximum length of result output. */
   private int maxout = 2000;
 
@@ -114,7 +111,8 @@ public final class QT3TS extends Main {
    * @throws Exception exception
    */
   private void run() throws Exception {
-    ctx.soptions.set(StaticOptions.DBPATH, sandbox().path() + "/data");
+    final IOFile sandbox = new IOFile(TEMPDIR, "tests");
+    ctx.soptions.set(StaticOptions.DBPATH, sandbox + "/data");
     parseArgs();
     init();
 
@@ -147,8 +145,8 @@ public final class QT3TS extends Main {
     result.append(" Ignored : ").append(ignored).append(NL);
 
     // save log data
-    Util.outln(NL + "Writing log file '" + TESTID + ".log'...");
-    try(PrintOutput po = new PrintOutput(new IOFile(TESTID + ".log"))) {
+    Util.outln(NL + "Writing log file...");
+    try(PrintOutput po = new PrintOutput(new IOFile("tests.log"))) {
       po.println("QT3TS RESULTS __________________________" + NL);
       po.println(result.toString());
       po.println("WRONG __________________________________" + NL);
@@ -182,7 +180,7 @@ public final class QT3TS extends Main {
     }
 
     ctx.close();
-    sandbox().delete();
+    sandbox.delete();
   }
 
   /**
@@ -434,7 +432,8 @@ public final class QT3TS extends Main {
 
   /** Flags for dependencies that are not supported. */
   private static final String NOSUPPORT =
-    "('schema-location-hint','schemaImport','schemaValidation','staticTyping','typedData')";
+    "('schema-location-hint', 'schemaImport', 'schemaValidation', " +
+    "'staticTyping', 'typedData', 'XQUpdate')";
 
   /**
    * Checks if the current test case is supported.
@@ -1006,14 +1005,6 @@ public final class QT3TS extends Main {
     XQueryException xqerror;
     /** Query error. */
     Throwable error;
-  }
-
-  /**
-   * Returns the sandbox database path.
-   * @return database path
-   */
-  private IOFile sandbox() {
-    return new IOFile(TEMPDIR, TESTID);
   }
 
   @Override
