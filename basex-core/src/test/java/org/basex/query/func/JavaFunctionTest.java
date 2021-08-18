@@ -212,12 +212,19 @@ public final class JavaFunctionTest extends SandboxTest {
     query("'A' " +
         "=> string-to-codepoints()" +
         "=> xs:unsignedShort()" +
-        "=> Q{java:java.lang.Character}isUpperCase()",
+        "=> Q{Character}isUpperCase()",
         true);
 
-    query("Q{java:java.lang.Character}isUpperCase(xs:int(65))", true);
-    query("Q{java:java.lang.Character}isUpperCase(xs:unsignedShort(65))", true);
-    error("Q{java:java.lang.Character}isUpperCase(65)", JAVAMULTIPLE_X_X);
+    query("Q{Character}isUpperCase(xs:int(65))", true);
+    query("Q{Character}isUpperCase(xs:unsignedShort(65))", true);
+    error("Q{Character}isUpperCase(65)", JAVAMULTIPLE_X_X);
+
+    query("Q{String}charAt('ABC', 1)", 66);
+    query("Q{String}charAt('ABC', xs:byte(1))", 66);
+    query("Q{String}charAt('ABC', xs:int(1))", 66);
+    query("Q{String}charAt('ABC', xs:decimal(1))", 66);
+    query("Q{String}charAt('ABC', xs:double(1))", 66);
+    query("Q{String}charAt('ABC', xs:float(1))", 66);
   }
 
   /** Ensure that items cannot be cast to Java. */
@@ -304,10 +311,10 @@ public final class JavaFunctionTest extends SandboxTest {
   @Test public void wrap() {
     String pattern = "declare namespace S = 'java:String'; " +
         "let $s := (# db:wrapjava % #) { S:new('12') => S:charAt(xs:int(0)) } return $s%";
-    query(Util.info(pattern, "all", "()"), 1);
+    query(Util.info(pattern, "all", "()"), 49);
     query(Util.info(pattern, "instance", "()"), 12);
-    query(Util.info(pattern, "some", ""), 1);
-    query(Util.info(pattern, "none", ""), 1);
+    query(Util.info(pattern, "some", ""), 49);
+    query(Util.info(pattern, "none", ""), 49);
     query(Util.info(pattern, "void", ""), "");
 
     pattern = "declare namespace SB = 'java:StringBuilder'; " +

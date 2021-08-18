@@ -947,6 +947,12 @@ public enum AtomType implements Type {
       final Value val = (Value) value;
       if(val.size() != 1) throw typeError(val, this, ii);
       item = (Item) val;
+    } else if(value instanceof Double || value instanceof Float) {
+      item = Dbl.get(((Number) value).doubleValue());
+    } else if(value instanceof Number) {
+      item = Int.get(((Number) value).longValue());
+    } else if(value instanceof Character) {
+      item = Int.get((char) value);
     } else {
       item = Str.get(value.toString());
     }
