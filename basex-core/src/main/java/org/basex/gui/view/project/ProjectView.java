@@ -86,7 +86,7 @@ public final class ProjectView extends BaseXPanel {
       }
     );
 
-    final AbstractButton browse = BaseXButton.get("c_editopen", OPEN, false, gui);
+    final AbstractButton browse = BaseXButton.get("c_edit_open", OPEN, false, gui);
     browse.setToolTipText(CHOOSE_DIR + DOTS);
     browse.addActionListener(e -> chooseRoot());
 
