@@ -1,3 +1,23 @@
+VERSION 9.6 (August 19, 2021) ------------------------------------------
+
+ XQUERY: MODULES, FEATURES
+ - Archive Module, archive:write: stream large archives to file
+ - SQL Module: support for more SQL types
+ - Full-Text Module, ft:thesaurus: perform Thesaurus queries
+ - Fulltext, fuzzy search: specify Levenshtein limit
+ - UNROLLLIMIT option: controll limit for unrolling loops
+
+ XQUERY: JAVA BINDINGS
+ - Java objects of unknown type are wrapped into function items
+ - results of constructor calls are returned as function items
+ - the standard package java.lang. has become optional
+ - array arguments can be specified with the middle dot notation
+ - conversion can be controlled with the WRAPJAVA option
+ - better support for XQuery arrays and maps
+
+ WEB APPLICATIONS
+ - RESTXQ: Server-Timing HTTP headers are attached to the reponse
+
 VERSION 9.5.2 (May 27, 2021) -------------------------------------------
 
  - Performance tweaks, minor bug fixes
