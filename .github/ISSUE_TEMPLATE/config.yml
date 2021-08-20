@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: BaseX Mailing List
+    url: https://mailman.uni-konstanz.de/mailman/listinfo/basex-talk
+    about: Questions, feature requests and unconfirmed bugs are best directed to the BaseX mailing list.
+  - name: BaseX Mailing List: Archive
+    url: https://www.mail-archive.com/basex-talk@mailman.uni-konstanz.de/
+    about: Check out the mailing list archive for past discussions.
+  - name: Stack Overflow: BaseX
+    url: https://stackoverflow.com/questions/tagged/basex
+    about: Questions can also be asked on Stack Overflow.
