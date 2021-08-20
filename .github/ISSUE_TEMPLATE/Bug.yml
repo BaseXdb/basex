@@ -48,12 +48,6 @@ body:
   validations:
     required: true
 - type: textarea
-  id: possible-cause
-  attributes:
-    label: Do you have any idea what has caused this?
-    description: |
-      This field is optional.
-- type: textarea
   id: possible-solution
   attributes:
     label: Do you have an idea how to solve the issue?
