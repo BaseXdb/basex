@@ -7,20 +7,20 @@ body:
 - type: markdown
   attributes:
     value: |
-## Welcome!
+      ## Welcome!
 
-We appreciate your feedback on BaseX. Please mind the following guidelines:
+      We appreciate your feedback on BaseX. Please mind the following guidelines:
 
-* For unconfirmed bugs, feature requests and questions, please write to our
-   basex-talk mailing list: https://basex.org/open-source/.
-* This tracker is used to discuss confirmed bugs and issues.
-* You may as well find it helpful to browse through our documentation:
-   https://docs.basex.org/.
-* Other helpful resources are:
-   * Stackoverflow: https://stackoverflow.com/questions/tagged/basex
-   * Mailing list archive: https://www.mail-archive.com/basex-talk@mailman.uni-konstanz.de/
+      * For unconfirmed bugs, feature requests and questions, please write to our
+         basex-talk mailing list: https://basex.org/open-source/.
+      * This tracker is used to discuss confirmed bugs and issues.
+      * You may as well find it helpful to browse through our documentation:
+         https://docs.basex.org/.
+      * Other helpful resources are:
+         * Stackoverflow: https://stackoverflow.com/questions/tagged/basex
+         * Mailing list archive: https://www.mail-archive.com/basex-talk@mailman.uni-konstanz.de/
 
-Thanks for your understanding.
+      Thanks for your understanding.
 - type: textarea
   id: description
   attributes:
