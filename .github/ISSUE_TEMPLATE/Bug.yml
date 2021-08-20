@@ -11,14 +11,12 @@ body:
 
       We appreciate your feedback on BaseX. Please mind the following guidelines:
 
-      * For unconfirmed bugs, feature requests and questions, please write to our
-         basex-talk mailing list: https://basex.org/open-source/.
-      * This tracker is used to discuss confirmed bugs and issues.
-      * You may as well find it helpful to browse through our documentation:
-         https://docs.basex.org/.
+      * Our issue tracker is used to discuss confirmed bugs and issues.
+      * For unconfirmed bugs, feature requests and questions, please write to our **basex-talk** mailing list: https://basex.org/open-source/.
+      * You may as well find it helpful to browse through our documentation: https://docs.basex.org/.
       * Other helpful resources are:
-         * Stackoverflow: https://stackoverflow.com/questions/tagged/basex
-         * Mailing list archive: https://www.mail-archive.com/basex-talk@mailman.uni-konstanz.de/
+         * Stack Overflow: https://stackoverflow.com/questions/tagged/basex
+         * The mailing list archive: https://www.mail-archive.com/basex-talk@mailman.uni-konstanz.de/
 
       Thanks for your understanding.
 - type: textarea
