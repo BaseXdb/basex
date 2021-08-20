@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a problem with BaseX to help us resolve it.
+description: Report a confirmed and reproducible bug with BaseX.
 labels:
 - 'type: bug'
 - 'status: needs-triage'
