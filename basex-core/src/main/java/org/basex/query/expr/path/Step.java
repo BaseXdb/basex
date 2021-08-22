@@ -1,6 +1,6 @@
 package org.basex.query.expr.path;
 
-import static org.basex.query.value.type.NodeType.*;
+import static org.basex.query.expr.path.Axis.*;
 
 import java.util.*;
 
@@ -42,7 +42,7 @@ public abstract class Step extends Preds {
    */
   public static Expr get(final CompileContext cc, final Expr root, final InputInfo ii,
       final Expr... preds) throws QueryException {
-    return get(cc, root, ii, KindTest.NOD, preds);
+    return get(cc, root, ii, KindTest.NODE, preds);
   }
 
   /**
@@ -57,7 +57,7 @@ public abstract class Step extends Preds {
    */
   public static Expr get(final CompileContext cc, final Expr root, final InputInfo ii,
       final Test test, final Expr... preds) throws QueryException {
-    return get(cc, root, ii, Axis.SELF, test, preds);
+    return get(cc, root, ii, SELF, test, preds);
   }
 
   /**
@@ -117,18 +117,20 @@ public abstract class Step extends Preds {
   Step(final InputInfo info, final Axis axis, final Test test, final Expr... preds) {
     super(info, SeqType.get(
       // type
-      axis == Axis.ATTRIBUTE ? ATTRIBUTE : test.type,
+      axis == ATTRIBUTE ? NodeType.ATTRIBUTE : test.type,
       // occurrence
-      axis == Axis.SELF && test == KindTest.NOD && preds.length == 0
+      axis == SELF && test == KindTest.NODE && preds.length == 0
       // one result: self::node()
       ? Occ.EXACTLY_ONE :
-        (axis == Axis.SELF || axis == Axis.PARENT || axis == Axis.ATTRIBUTE &&
-        test instanceof NameTest && ((NameTest) test).part == NamePart.FULL ||
+        (axis == SELF || axis == PARENT ||
+        axis == ATTRIBUTE && test instanceof NameTest && ((NameTest) test).part == NamePart.FULL ||
         preds.length == 1 && preds[0] instanceof CmpPos && ((CmpPos) preds[0]).exact())
       // zero or one result: self::X, parent::X, attribute::Q{uri}local, ...[position() = n]
       ? Occ.ZERO_OR_ONE
-      : Occ.ZERO_OR_MORE
-    , test instanceof KindTest ? null : test), preds);
+      : Occ.ZERO_OR_MORE,
+      // node kind test
+      test instanceof KindTest ? null : test
+    ), preds);
 
     this.axis = axis;
     this.test = test;
@@ -154,17 +156,17 @@ public abstract class Step extends Preds {
     // choose stricter axis
     final Axis old = axis;
     final Type type = seqType().type;
-    if(axis == Axis.DESCENDANT_OR_SELF && type.instanceOf(NodeType.DOCUMENT_NODE)) {
+    if(axis == DESCENDANT_OR_SELF && type.instanceOf(NodeType.DOCUMENT_NODE)) {
       // descendant-or-self::document-node()  ->  self::document-node()
-      axis = Axis.SELF;
-    } else if(axis == Axis.ANCESTOR_OR_SELF && type.oneOf(NodeType.LEAF_TYPES)) {
+      axis = SELF;
+    } else if(axis == ANCESTOR_OR_SELF && type.oneOf(NodeType.LEAF_TYPES)) {
       // ancestor-or-self::text()  ->  self::text()
-      axis = Axis.SELF;
+      axis = SELF;
     } else if(ex != null && ex.seqType().type.intersect(type) == null) {
       // root()/descendant-or-self::x  ->  root()/descendant::x
-      if(axis == Axis.DESCENDANT_OR_SELF) axis = Axis.DESCENDANT;
+      if(axis == DESCENDANT_OR_SELF) axis = DESCENDANT;
       // $text/ancestor-or-self::x  ->  $text/ancestor::x
-      else if(axis == Axis.ANCESTOR_OR_SELF) axis = Axis.ANCESTOR;
+      else if(axis == ANCESTOR_OR_SELF) axis = ANCESTOR;
     }
     if(axis != old) cc.info(QueryText.OPTREWRITE_X_X, old, this);
 
@@ -179,9 +181,9 @@ public abstract class Step extends Preds {
 
   @Override
   protected final void type(final Expr expr) {
-    if(expr != null && axis == Axis.SELF && test instanceof KindTest) {
+    if(expr != null && axis == SELF && test instanceof KindTest) {
       final Type type = expr.seqType().type;
-      if(test == KindTest.NOD) {
+      if(test == KindTest.NODE) {
         // node test: adopt type of context expression
         // <a/>/self::node()
         exprType.assign(type);
@@ -218,10 +220,10 @@ public abstract class Step extends Preds {
     if(exprs.length != 0 || data.defaultNs() == null) return null;
 
     // skip axes other than descendant, child, and attribute
-    if(axis != Axis.ATTRIBUTE && axis != Axis.CHILD && axis != Axis.DESCENDANT &&
-       axis != Axis.DESCENDANT_OR_SELF && axis != Axis.SELF) return null;
+    if(axis != ATTRIBUTE && axis != CHILD  && axis != SELF && axis != DESCENDANT &&
+       axis != DESCENDANT_OR_SELF) return null;
     // skip tests other than processing instructions, skip union tests
-    if(test.type == PROCESSING_INSTRUCTION || test instanceof UnionTest) return null;
+    if(test.type == NodeType.PROCESSING_INSTRUCTION || test instanceof UnionTest) return null;
 
     // check node type
     int name = 0;
@@ -229,7 +231,7 @@ public abstract class Step extends Preds {
       final NamePart part = ((NameTest) test).part();
       if(part == NamePart.LOCAL) {
         // element/attribute test (*:ln)
-        final Names names = test.type == ATTRIBUTE ? data.attrNames : data.elemNames;
+        final Names names = test.type == NodeType.ATTRIBUTE ? data.attrNames : data.elemNames;
         name = names.id(((NameTest) test).local);
       } else if(part != null) {
         // skip namespace and standard tests
@@ -240,12 +242,12 @@ public abstract class Step extends Preds {
     final int kind = ANode.kind(test.type);
     final ArrayList<PathNode> tmp = new ArrayList<>();
     for(final PathNode pn : nodes) {
-      if(axis == Axis.SELF || axis == Axis.DESCENDANT_OR_SELF) {
+      if(axis == SELF || axis == DESCENDANT_OR_SELF) {
         if(kind == -1 || kind == pn.kind && (name == 0 || name == pn.name)) {
           if(!tmp.contains(pn)) tmp.add(pn);
         }
       }
-      if(axis != Axis.SELF) add(pn, tmp, name, kind);
+      if(axis != SELF) add(pn, tmp, name, kind);
     }
     return tmp;
   }
@@ -261,10 +263,10 @@ public abstract class Step extends Preds {
       final int kind) {
 
     for(final PathNode pn : node.children) {
-      if(axis == Axis.DESCENDANT || axis == Axis.DESCENDANT_OR_SELF) {
+      if(axis == DESCENDANT || axis == DESCENDANT_OR_SELF) {
         add(pn, nodes, name, kind);
       }
-      if(kind == -1 && pn.kind != Data.ATTR ^ axis == Axis.ATTRIBUTE ||
+      if(kind == -1 && pn.kind != Data.ATTR ^ axis == ATTRIBUTE ||
          kind == pn.kind && (name == 0 || name == pn.name)) {
         if(!nodes.contains(pn)) nodes.add(pn);
       }
@@ -277,16 +279,16 @@ public abstract class Step extends Preds {
    */
   private boolean noMatches() {
     final NodeType type = test.type;
-    if(type.oneOf(NODE, SCHEMA_ATTRIBUTE, SCHEMA_ELEMENT)) return false;
+    if(type.oneOf(NodeType.NODE, NodeType.SCHEMA_ATTRIBUTE, NodeType.SCHEMA_ELEMENT)) return false;
 
     switch(axis) {
       // attribute::element()
       case ATTRIBUTE:
-        return type != ATTRIBUTE;
+        return type != NodeType.ATTRIBUTE;
       case ANCESTOR:
       // parent::comment()
       case PARENT:
-        return type.oneOf(LEAF_TYPES);
+        return type.oneOf(NodeType.LEAF_TYPES);
       // child::attribute()
       case CHILD:
       case DESCENDANT:
@@ -294,7 +296,8 @@ public abstract class Step extends Preds {
       case FOLLOWING_SIBLING:
       case PRECEDING:
       case PRECEDING_SIBLING:
-        return type.oneOf(ATTRIBUTE, DOCUMENT_NODE_ELEMENT, DOCUMENT_NODE, NAMESPACE_NODE);
+        return type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE_ELEMENT,
+            NodeType.DOCUMENT_NODE, NodeType.NAMESPACE_NODE);
       default:
         return false;
     }
@@ -308,16 +311,16 @@ public abstract class Step extends Preds {
   final boolean emptyStep(final NodeType inputType) {
     // checks steps on document nodes
     final NodeType type = test.type;
-    if(inputType.instanceOf(DOCUMENT_NODE) && ((Check) () -> {
+    if(inputType.instanceOf(NodeType.DOCUMENT_NODE) && ((Check) () -> {
       switch(axis) {
         case SELF:
         case ANCESTOR_OR_SELF:
-          return !type.oneOf(NODE, DOCUMENT_NODE);
+          return !type.oneOf(NodeType.NODE, NodeType.DOCUMENT_NODE);
         case CHILD:
         case DESCENDANT:
-          return type.oneOf(DOCUMENT_NODE, ATTRIBUTE);
+          return type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ATTRIBUTE);
         case DESCENDANT_OR_SELF:
-          return type == ATTRIBUTE;
+          return type == NodeType.ATTRIBUTE;
         default:
           return true;
       }
@@ -327,22 +330,23 @@ public abstract class Step extends Preds {
     switch(axis) {
       // $element/self::text(), ...
       case SELF:
-        return type != NODE && !type.instanceOf(inputType);
+        return type != NodeType.NODE && !type.instanceOf(inputType);
       // $attribute/descendant::, $text/child::, $comment/attribute::, ...
       case DESCENDANT:
       case CHILD:
       case ATTRIBUTE:
-        return inputType.oneOf(LEAF_TYPES);
+        return inputType.oneOf(NodeType.LEAF_TYPES);
       // $text/descendant-or-self::text(), ...
       case DESCENDANT_OR_SELF:
-        return inputType.oneOf(LEAF_TYPES) && type != NODE && !type.instanceOf(inputType);
+        return inputType.oneOf(NodeType.LEAF_TYPES) && type != NodeType.NODE &&
+          !type.instanceOf(inputType);
       // $attribute/following-sibling::, $attribute/preceding-sibling::
       case FOLLOWING_SIBLING:
       case PRECEDING_SIBLING:
-        return inputType == ATTRIBUTE;
+        return inputType == NodeType.ATTRIBUTE;
       // $attribute/parent::document-node()
       case PARENT:
-        return inputType == ATTRIBUTE && type == DOCUMENT_NODE;
+        return inputType == NodeType.ATTRIBUTE && type == NodeType.DOCUMENT_NODE;
       default:
         return false;
     }
@@ -406,16 +410,16 @@ public abstract class Step extends Preds {
   @Override
   public void toString(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder();
-    if(test == KindTest.NOD) {
-      if(axis == Axis.PARENT) tb.add("..");
-      if(axis == Axis.SELF) tb.add('.');
+    if(test == KindTest.NODE) {
+      if(axis == PARENT) tb.add("..");
+      if(axis == SELF) tb.add('.');
     }
     if(tb.isEmpty()) {
-      final java.util.function.Function<Test, TokenBuilder> add = t -> {
-        if(axis == Axis.ATTRIBUTE && t instanceof NameTest)
-          return tb.add('@').add(t.toString(false));
-        if(axis != Axis.CHILD) tb.add(axis).add(QueryText.COLS);
-        return tb.add(t.toString(test.type == ATTRIBUTE));
+      final java.util.function.Function<Test, TokenBuilder> add = type -> {
+        if(axis == ATTRIBUTE && type instanceof NameTest)
+          return tb.add('@').add(type.toString(false));
+        if(axis != CHILD) tb.add(axis).add(QueryText.COLS);
+        return tb.add(type.toString(test.type == NodeType.ATTRIBUTE));
       };
       if(test instanceof UnionTest) {
         tb.add('(');

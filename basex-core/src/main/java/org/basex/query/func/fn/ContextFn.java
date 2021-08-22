@@ -88,6 +88,6 @@ public abstract class ContextFn extends StandardFunc {
   public final Expr simplifyEbv(final Expr expr, final CompileContext cc) throws QueryException {
     final SeqType st = expr.seqType();
     return st.instanceOf(SeqType.ELEMENT_O) || st.instanceOf(SeqType.DOCUMENT_NODE_O) ?
-      Path.get(cc, info, expr, Step.get(cc, expr, info, Axis.DESCENDANT, KindTest.TXT)) : null;
+      Path.get(cc, info, expr, Step.get(cc, expr, info, Axis.DESCENDANT, KindTest.TEXT)) : null;
   }
 }

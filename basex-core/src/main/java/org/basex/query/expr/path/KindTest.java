@@ -12,24 +12,25 @@ import org.basex.util.*;
  */
 public class KindTest extends Test {
   /** Generic document node test. */
-  public static final KindTest DOC = new KindTest(NodeType.DOCUMENT_NODE);
+  public static final KindTest DOCUMENT_NODE = new KindTest(NodeType.DOCUMENT_NODE);
   /** Generic element node test. */
-  public static final KindTest ELM = new KindTest(NodeType.ELEMENT) {
+  public static final KindTest ELEMENT = new KindTest(NodeType.ELEMENT) {
     @Override
     public String toString(final boolean full) { return full ? type.toString() : "*"; }
   };
   /** Generic attribute node test. */
-  public static final KindTest ATT = new KindTest(NodeType.ATTRIBUTE);
+  public static final KindTest ATTRIBUTE = new KindTest(NodeType.ATTRIBUTE);
   /** Generic PI node test. */
-  public static final KindTest PI = new KindTest(NodeType.PROCESSING_INSTRUCTION);
+  public static final KindTest PROCESSING_INSTRUCTION =
+      new KindTest(NodeType.PROCESSING_INSTRUCTION);
   /** Generic text node test. No other {@link NodeType#TEXT} tests exist. */
-  public static final KindTest TXT = new KindTest(NodeType.TEXT);
+  public static final KindTest TEXT = new KindTest(NodeType.TEXT);
   /** Generic comment node test. No other {@link NodeType#COMMENT} tests exist. */
-  public static final KindTest COM = new KindTest(NodeType.COMMENT);
+  public static final KindTest COMMENT = new KindTest(NodeType.COMMENT);
   /** Generic namespace node test. No other {@link NodeType#COMMENT} tests exist. */
-  public static final KindTest NSP = new KindTest(NodeType.NAMESPACE_NODE);
+  public static final KindTest NAMESPACE_NODE = new KindTest(NodeType.NAMESPACE_NODE);
   /** Generic node test. No other {@link NodeType#NODE} tests exist. */
-  public static final KindTest NOD = new KindTest(NodeType.NODE) {
+  public static final KindTest NODE = new KindTest(NodeType.NODE) {
     @Override
     public boolean matches(final ANode node) { return true; }
     @Override
@@ -53,14 +54,14 @@ public class KindTest extends Test {
    */
   public static KindTest get(final NodeType type) {
     switch(type) {
-      case TEXT: return TXT;
-      case PROCESSING_INSTRUCTION:  return PI;
-      case ELEMENT: return ELM;
-      case DOCUMENT_NODE: return DOC;
-      case ATTRIBUTE: return ATT;
-      case COMMENT: return COM;
-      case NODE: return NOD;
-      case NAMESPACE_NODE: return NSP;
+      case TEXT: return TEXT;
+      case PROCESSING_INSTRUCTION:  return PROCESSING_INSTRUCTION;
+      case ELEMENT: return ELEMENT;
+      case DOCUMENT_NODE: return DOCUMENT_NODE;
+      case ATTRIBUTE: return ATTRIBUTE;
+      case COMMENT: return COMMENT;
+      case NODE: return NODE;
+      case NAMESPACE_NODE: return NAMESPACE_NODE;
       default: throw Util.notExpected();
     }
   }

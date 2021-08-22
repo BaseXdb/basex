@@ -193,7 +193,7 @@ public final class SeqType {
   public final Type type;
   /** Occurrence indicator. */
   public final Occ occ;
-  /** Kind test (can be {@code null}). */
+  /** Node kind test (can be {@code null}). */
   private final Test test;
 
   /**
@@ -209,7 +209,7 @@ public final class SeqType {
    * Private constructor.
    * @param type type
    * @param occ occurrence indicator
-   * @param test kind test (can be {@code null})
+   * @param test node kind test (can be {@code null})
    */
   private SeqType(final Type type, final Occ occ, final Test test) {
     this.type = type;

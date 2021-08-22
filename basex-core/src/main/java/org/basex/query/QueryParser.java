@@ -1870,7 +1870,7 @@ public class QueryParser extends InputParser {
       if(consume('/')) {
         // two slashes: absolute descendant path
         checkAxis(Axis.DESCENDANT);
-        add(el, new CachedStep(info(), Axis.DESCENDANT_OR_SELF, KindTest.NOD));
+        add(el, new CachedStep(info(), Axis.DESCENDANT_OR_SELF, KindTest.NODE));
         mark();
         ex = step(true);
       } else {
@@ -1907,7 +1907,7 @@ public class QueryParser extends InputParser {
     while(true) {
       if(consume('/')) {
         if(consume('/')) {
-          add(el, new CachedStep(info(), Axis.DESCENDANT_OR_SELF, KindTest.NOD));
+          add(el, new CachedStep(info(), Axis.DESCENDANT_OR_SELF, KindTest.NODE));
           checkAxis(Axis.DESCENDANT);
         } else {
           checkAxis(Axis.CHILD);
@@ -1971,7 +1971,7 @@ public class QueryParser extends InputParser {
     Test test = null;
     if(wsConsume(DOTS2)) {
       axis = Axis.PARENT;
-      test = KindTest.NOD;
+      test = KindTest.NODE;
       checkTest(test, true);
     } else if(consume('@')) {
       axis = Axis.ATTRIBUTE;
@@ -2000,7 +2000,7 @@ public class QueryParser extends InputParser {
       if(axis == null) {
         axis = Axis.CHILD;
         test = nodeTest(NodeType.ELEMENT, true);
-        if(test == KindTest.NSP) throw error(NSAXIS);
+        if(test == KindTest.NAMESPACE_NODE) throw error(NSAXIS);
         if(test != null && test.type == NodeType.ATTRIBUTE) axis = Axis.ATTRIBUTE;
         checkTest(test, axis != Axis.ATTRIBUTE);
       }
@@ -3152,7 +3152,7 @@ public class QueryParser extends InputParser {
     skipWs();
     final Test test = elem ? elementTest() : schemaTest();
     wsCheck(PAREN2);
-    return new DocTest(test != null ? test : KindTest.ELM);
+    return new DocTest(test != null ? test : KindTest.ELEMENT);
   }
 
   /**

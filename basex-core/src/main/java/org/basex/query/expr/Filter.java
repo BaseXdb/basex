@@ -35,10 +35,10 @@ public abstract class Filter extends Preds {
    * Constructor.
    * @param info input info
    * @param root root expression
-   * @param exprs predicate expressions
+   * @param preds predicate expressions
    */
-  protected Filter(final InputInfo info, final Expr root, final Expr... exprs) {
-    super(info, SeqType.ITEM_ZM, exprs);
+  protected Filter(final InputInfo info, final Expr root, final Expr... preds) {
+    super(info, SeqType.ITEM_ZM, preds);
     this.root = root;
   }
 

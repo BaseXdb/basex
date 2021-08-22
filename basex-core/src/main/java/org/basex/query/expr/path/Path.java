@@ -82,11 +82,11 @@ public abstract class Path extends ParseExpr {
       Expr expr = step;
       if(expr instanceof ContextValue) {
         // rewrite context item to self step
-        expr = Step.get(((ContextValue) expr).info, SELF, KindTest.NOD);
+        expr = Step.get(((ContextValue) expr).info, SELF, KindTest.NODE);
       } else if(expr instanceof Filter) {
         // rewrite filter expression to self step with predicates
         final Filter f = (Filter) expr;
-        if(f.root instanceof ContextValue) expr = Step.get(f.info, SELF, KindTest.NOD, f.exprs);
+        if(f.root instanceof ContextValue) expr = Step.get(f.info, SELF, KindTest.NODE, f.exprs);
       }
       tmp.add(expr);
       axes = axes && expr instanceof Step;
@@ -611,7 +611,7 @@ public abstract class Path extends ParseExpr {
       for(int t = 0; t < ts; t++) {
         final Expr[] preds = t == ts - 1 ? ((Preds) steps[s]).exprs : new Expr[0];
         final QNm qName = qNames.get(ts - t - 1);
-        final Test test = qName == null ? KindTest.ELM :
+        final Test test = qName == null ? KindTest.ELEMENT :
           new NameTest(qName, NamePart.LOCAL, NodeType.ELEMENT, null);
         stps[t] = Step.get(cc, root, curr.info, CHILD, test, preds);
       }
@@ -747,12 +747,14 @@ public abstract class Path extends ParseExpr {
     // invert steps that occur before index step and add them as predicate
     final ExprList invSteps = new ExprList(), newPreds = new ExprList();
     final Test rootTest = InvDocTest.get(rt);
-    if(rootTest != KindTest.DOC || data == null || !data.meta.uptodate || invertSteps(indexStep)) {
+    if(rootTest != KindTest.DOCUMENT_NODE || data == null || !data.meta.uptodate ||
+        invertSteps(indexStep)) {
       for(int s = indexStep; s >= 0; s--) {
         final Axis invAxis = axisStep(s).axis.invert();
         if(s == 0) {
           // add document test for collections and axes other than ancestors
-          if(rootTest != KindTest.DOC || invAxis != ANCESTOR && invAxis != ANCESTOR_OR_SELF) {
+          if(rootTest != KindTest.DOCUMENT_NODE ||
+              invAxis != ANCESTOR && invAxis != ANCESTOR_OR_SELF) {
             invSteps.add(Step.get(cc, resultRoot, info, invAxis, rootTest));
           }
         } else {
@@ -892,9 +894,9 @@ public abstract class Path extends ParseExpr {
         if(curr instanceof Step) {
           Expr next = s < sl - 1 ? steps[s + 1] : null;
           final Step crr = (Step) curr;
-          if(crr.test == KindTest.NOD && next instanceof Step && ((Step) next).axis == ATTRIBUTE) {
+          if(crr.test == KindTest.NODE && next instanceof Step && ((Step) next).axis == ATTRIBUTE) {
             // rewrite node test before attribute step: node()/@*  ->  */@*
-            next = Step.get(cc, null, crr.info, crr.axis, KindTest.ELM, crr.exprs);
+            next = Step.get(cc, null, crr.info, crr.axis, KindTest.ELEMENT, crr.exprs);
             curr = cc.replaceWith(curr, next);
             chngd = true;
           } else if(next != null) {
@@ -1003,7 +1005,7 @@ public abstract class Path extends ParseExpr {
       return curr.addPredicates(nxt.exprs);
     }
 
-    if(curr.axis != DESCENDANT_OR_SELF || curr.test != KindTest.NOD || curr.exprs.length > 0)
+    if(curr.axis != DESCENDANT_OR_SELF || curr.test != KindTest.NODE || curr.exprs.length > 0)
       return null;
 
     // checks if an expression is a simple child or descendant step
