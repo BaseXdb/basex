@@ -2331,4 +2331,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("declare variable $x := util:replicate(<a>a</a>, 2); distinct-values($x)",
         "a", root(Atm.class));
   }
+
+  /** Steps with zero or one results. */
+  @Test public void gh2034() {
+    check("<a/>/*[1]/*[1]", "", type(IterPath.class, "element()?"));
+    check("(1 to 10000000) ! tail(<a/>/*[1])", "", empty());
+  }
 }

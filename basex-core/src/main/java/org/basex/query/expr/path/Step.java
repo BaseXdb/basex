@@ -119,10 +119,15 @@ public abstract class Step extends Preds {
       // type
       axis == Axis.ATTRIBUTE ? ATTRIBUTE : test.type,
       // occurrence
-      axis == Axis.SELF && test == KindTest.NOD && preds.length == 0 ? Occ.EXACTLY_ONE :
-      axis == Axis.SELF || axis == Axis.PARENT || axis == Axis.ATTRIBUTE &&
-        test instanceof NameTest && ((NameTest) test).part == NamePart.FULL ?
-        Occ.ZERO_OR_ONE : Occ.ZERO_OR_MORE
+      axis == Axis.SELF && test == KindTest.NOD && preds.length == 0
+      // one result: self::node()
+      ? Occ.EXACTLY_ONE :
+        (axis == Axis.SELF || axis == Axis.PARENT || axis == Axis.ATTRIBUTE &&
+        test instanceof NameTest && ((NameTest) test).part == NamePart.FULL ||
+        preds.length == 1 && preds[0] instanceof CmpPos && ((CmpPos) preds[0]).exact())
+      // zero or one result: self::X, parent::X, attribute::Q{uri}local, ...[position() = n]
+      ? Occ.ZERO_OR_ONE
+      : Occ.ZERO_OR_MORE
     , test instanceof KindTest ? null : test), preds);
 
     this.axis = axis;
