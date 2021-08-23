@@ -2,15 +2,13 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.func.Function.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.List;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -91,9 +89,13 @@ public final class FnReverse extends StandardFunc {
     // rewrite list
     if(expr instanceof List) {
       final Expr[] args = expr.args();
-      if(((Checks<Expr>) ex -> ex.seqType().zeroOrOne()).all(args)) {
-        Collections.reverse(Arrays.asList(args));
-        return expr;
+      if(((Checks<Expr>) ex -> ex instanceof Value || ex.seqType().zeroOrOne()).all(args)) {
+        final int al = args.length;
+        final ExprList list = new ExprList(al);
+        for(int a = al - 1; a >= 0; a--) {
+          list.add(args[a] instanceof Value ? ((Value) args[a]).reverse(cc.qc) : args[a]);
+        }
+        return List.get(cc, ((List) expr).info, list.finish());
       }
     }
     return adoptType(expr);

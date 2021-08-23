@@ -821,11 +821,15 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" (" + func.args(" (1 to 2)[. > 0]") + ")[position() < last()]"),
         2, exists(TAIL));
     check(func.args(" util:replicate(<a/>, 2)"),
-        "<a/>\n<a/>", empty(REVERSE));
+        "<a/>\n<a/>", empty(func));
     check(func.args(" util:replicate((<a/>, <b/>), 2)"),
-        null, exists(REVERSE));
+        null, exists(func));
     check(func.args(" (1, <a/>[. = ''])"),
         "<a/>\n1", root(List.class));
+
+    check(func.args(" (<_/>, ('a', 'b'))"),
+        "b\na\n<_/>", empty(func));
+
   }
 
   /** Test method. */
