@@ -209,8 +209,11 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" reverse((<a>A</a>, <b>A</b>))[data()]"), "A", empty(REVERSE));
     // remove sort function call
     check(func.args(" sort((<a>A</a>, <b>A</b>))"), "A", empty(SORT));
-    check(func.args(" sort((<a>A</a>, <b>A</b>)[data()])"), "A", empty(SORT));
-    check(func.args(" sort((<a>A</a>, <b>A</b>))[data()]"), "A", empty(SORT));
+    // swap distinct-values and sort
+    check(func.args(" sort((<a>A</a>, <b>A</b>)[data()])"),
+        "A", exists(SORT.className() + "/" + DISTINCT_VALUES.className()));
+    check(func.args(" sort((string(<_>X</_>), 1), (), string#1)"),
+        "1\nX", empty(DISTINCT_VALUES));
 
     // single value: replace with data
     check(func.args(wrap("A")), "A", root(DATA));

@@ -6,7 +6,6 @@ import static org.basex.query.func.Function.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -131,15 +130,6 @@ public final class FnSort extends StandardFunc {
       exprs[2] = coerceFunc(exprs[2], cc, SeqType.ANY_ATOMIC_TYPE_ZM, st1.with(Occ.EXACTLY_ONE));
     }
     return adoptType(expr1);
-  }
-
-  @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    Expr expr = this;
-    if(mode == Simplify.DISTINCT && seqType().type.isSortable()) {
-      expr = cc.simplify(this, exprs[0]);
-    }
-    return expr == this ? super.simplifyFor(mode, cc) : expr.simplifyFor(mode, cc);
   }
 
   @Override

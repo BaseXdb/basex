@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.func.Function.*;
+
 import java.util.*;
 
 import org.basex.data.*;
@@ -14,6 +16,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.hash.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -59,6 +62,14 @@ public final class FnDistinctValues extends StandardFunc {
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
     if(st.zero()) return expr;
+
+    // X => sort() => distinct-values()  ->  X => distinct-values() => sort()
+    if(SORT.is(expr) && (expr.args().length == 1 ||
+        expr.arg(0).seqType().type.instanceOf(AtomType.ANY_ATOMIC_TYPE))) {
+      final ExprList list = new ExprList().add(expr.args());
+      list.set(0, cc.function(DISTINCT_VALUES, info, expr.arg(0)));
+      return cc.function(SORT, info, list.finish());
+    }
 
     final AtomType type = st.type.atomic();
     if(type != null) {
