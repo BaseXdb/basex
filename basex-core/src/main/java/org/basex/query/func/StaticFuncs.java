@@ -120,13 +120,13 @@ public final class StaticFuncs extends ExprInfo {
             arities.add(ofc.func.arity());
         }
         // function is unknown: find function with similar name
-        if(arities.isEmpty()) throw similarError(call.name, call.info);
+        if(arities.isEmpty()) throw similarError(call.name, call.info());
         // wrong number of arguments
-        throw Functions.wrongArity(call.name.string(), call.exprs.length, arities, call.info);
+        throw Functions.wrongArity(call.name.string(), call.exprs.length, arities, call.info());
       }
 
       if(call != null) {
-        if(fc.func.expr == null) throw FUNCNOIMPL_X.get(call.info, call.name.prefixString());
+        if(fc.func.expr == null) throw FUNCNOIMPL_X.get(call.info(), call.name.prefixString());
         // set updating flag; this will trigger checks in {@link QueryContext#check}
         qc.updating |= fc.func.updating;
       }

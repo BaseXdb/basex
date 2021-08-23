@@ -63,7 +63,7 @@ public final class For extends ForLet {
    * @throws QueryException query exception
    */
   static For fromLet(final Let lt, final CompileContext cc) throws QueryException {
-    final Expr expr = lt.scoring ? cc.function(Function._FT_SCORE, lt.info, lt.expr) : lt.expr;
+    final Expr expr = lt.scoring ? cc.function(Function._FT_SCORE, lt.info(), lt.expr) : lt.expr;
     return new For(lt.var, expr).optimize(cc);
   }
 

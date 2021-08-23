@@ -82,11 +82,11 @@ public abstract class Path extends ParseExpr {
       Expr expr = step;
       if(expr instanceof ContextValue) {
         // rewrite context item to self step
-        expr = Step.get(((ContextValue) expr).info, SELF, KindTest.NODE);
+        expr = Step.get(expr.info(), SELF, KindTest.NODE);
       } else if(expr instanceof Filter) {
         // rewrite filter expression to self step with predicates
         final Filter f = (Filter) expr;
-        if(f.root instanceof ContextValue) expr = Step.get(f.info, SELF, KindTest.NODE, f.exprs);
+        if(f.root instanceof ContextValue) expr = Step.get(f.info(), SELF, KindTest.NODE, f.exprs);
       }
       tmp.add(expr);
       axes = axes && expr instanceof Step;
@@ -613,7 +613,7 @@ public abstract class Path extends ParseExpr {
         final QNm qName = qNames.get(ts - t - 1);
         final Test test = qName == null ? KindTest.ELEMENT :
           new NameTest(qName, NamePart.LOCAL, NodeType.ELEMENT, null);
-        stps[t] = Step.get(cc, root, curr.info, CHILD, test, preds);
+        stps[t] = Step.get(cc, root, curr.info(), CHILD, test, preds);
       }
       while(++s < sl) stps[ts++] = steps[s];
 
@@ -760,7 +760,7 @@ public abstract class Path extends ParseExpr {
         } else {
           final Step prevStep = axisStep(s - 1);
           final Axis newAxis = prevStep.axis == ATTRIBUTE ? ATTRIBUTE : invAxis;
-          final Expr newStep = Step.get(cc, resultRoot, prevStep.info, newAxis, prevStep.test,
+          final Expr newStep = Step.get(cc, resultRoot, prevStep.info(), newAxis, prevStep.test,
               prevStep.exprs);
           invSteps.add(newStep);
         }
@@ -840,7 +840,7 @@ public abstract class Path extends ParseExpr {
         final Filter filter = (Filter) step;
         if(!filter.mayBePositional() && filter.root instanceof List) {
           final Expr st = ((List) filter.root).toUnion(cc);
-          if(st != filter.root) return Filter.get(cc, filter.info, st, filter.exprs);
+          if(st != filter.root) return Filter.get(cc, filter.info(), st, filter.exprs);
         }
       }
       // util:replicate(a, 2)/b  ->  a/b
@@ -896,7 +896,7 @@ public abstract class Path extends ParseExpr {
           final Step crr = (Step) curr;
           if(crr.test == KindTest.NODE && next instanceof Step && ((Step) next).axis == ATTRIBUTE) {
             // rewrite node test before attribute step: node()/@*  ->  */@*
-            next = Step.get(cc, null, crr.info, crr.axis, KindTest.ELEMENT, crr.exprs);
+            next = Step.get(cc, null, crr.info(), crr.axis, KindTest.ELEMENT, crr.exprs);
             curr = cc.replaceWith(curr, next);
             chngd = true;
           } else if(next != null) {
@@ -968,7 +968,7 @@ public abstract class Path extends ParseExpr {
     // add previous steps
     for(int r = 0; r < s; r++) list.add(steps[r]);
     // add analyzed step without predicates
-    list.add(step.copyType(Step.get(step.info, step.axis, step.test)));
+    list.add(step.copyType(Step.get(step.info(), step.axis, step.test)));
     // add steps in between
     for(int r = s + 1; r < t - 1; r++) list.add(steps[r]);
     // attach remaining predicates of analyzed step
@@ -1049,7 +1049,7 @@ public abstract class Path extends ParseExpr {
       final Filter filter = (Filter) next;
       if(!filter.mayBePositional()) {
         final Expr expr = rewrite.apply(filter.root);
-        if(expr != null) return Filter.get(cc, filter.info, expr, filter.exprs);
+        if(expr != null) return Filter.get(cc, filter.info(), expr, filter.exprs);
       }
     }
     return null;

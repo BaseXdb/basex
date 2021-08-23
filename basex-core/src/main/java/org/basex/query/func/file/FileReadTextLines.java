@@ -137,6 +137,6 @@ public final class FileReadTextLines extends FileRead {
 
     // create new function instance
     final Expr[] args = { exprs[0], encoding, validate, Int.get(s + 1), Int.get(l) };
-    return cc.function(Function._FILE_READ_TEXT_LINES, func.info, args);
+    return cc.function(Function._FILE_READ_TEXT_LINES, func.info(), args);
   }
 }

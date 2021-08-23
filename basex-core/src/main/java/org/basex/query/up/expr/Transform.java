@@ -75,11 +75,11 @@ public final class Transform extends Arr {
       for(final Let copy : copies) {
         final Iter iter = copy.expr.iter(qc);
         Item item = iter.next();
-        if(!(item instanceof ANode)) throw UPSINGLE_X_X.get(
-            copy.info, copy.var.name, item == null ? Empty.VALUE : item);
+        if(!(item instanceof ANode))
+          throw UPSINGLE_X_X.get(copy.info(), copy.var.name, item == null ? Empty.VALUE : item);
         final Item i2 = iter.next();
         if(i2 != null)
-          throw UPSINGLE_X_X.get(copy.info, copy.var.name, ValueBuilder.concat(item, i2, qc));
+          throw UPSINGLE_X_X.get(copy.info(), copy.var.name, ValueBuilder.concat(item, i2, qc));
 
         // create main memory copy of node
         item = ((ANode) item).copy(qc);

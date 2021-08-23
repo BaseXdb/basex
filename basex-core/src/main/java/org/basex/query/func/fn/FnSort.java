@@ -93,10 +93,10 @@ public final class FnSort extends StandardFunc {
             if(item1 == Dbl.NAN || item1 == Flt.NAN) item1 = null;
             if(item2 == Dbl.NAN || item2 == Flt.NAN) item2 = null;
             if(item1 != null && item2 != null && !item1.comparable(item2))
-              throw diffError(item1, item2, sf.info);
+              throw diffError(item1, item2, sf.info());
 
             final int diff = item1 == null ? item2 == null ? 0 : -1 : item2 == null ? 1 :
-              item1.diff(item2, coll, sf.info);
+              item1.diff(item2, coll, sf.info());
             if(diff != 0 && diff != Item.UNDEF) return diff;
           }
           return (int) (size1 - size2);

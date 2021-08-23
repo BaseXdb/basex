@@ -61,7 +61,7 @@ public final class Let extends ForLet {
    * @throws QueryException query exception
    */
   static Let fromForScore(final For fr, final CompileContext cc) throws QueryException {
-    return new Let(fr.score, new VarRef(fr.info, fr.var).optimize(cc), true).optimize(cc);
+    return new Let(fr.score, new VarRef(fr.info(), fr.var).optimize(cc), true).optimize(cc);
   }
 
   @Override

@@ -172,7 +172,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   void checkUp() throws QueryException {
     final boolean upd = expr.has(Flag.UPD);
     if(upd) expr.checkUp();
-    final InputInfo ii = expr instanceof ParseExpr ? ((ParseExpr) expr).info : info;
+    final InputInfo ii = expr.info() != null ? expr.info() : info;
     if(updating) {
       // updating function
       if(declType != null && !declType.zero()) throw UUPFUNCTYPE.get(info);

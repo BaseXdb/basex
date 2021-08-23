@@ -72,22 +72,22 @@ class IndexPath extends IndexPred {
     // choose new root expression: add predicates of last step to root
     int s = path.steps.length - 1;
     final Step last = step(s);
-    final Expr rt = last.exprs.length == 0 ? root : Filter.get(cc, path.info, root, last.exprs);
+    final Expr rt = last.exprs.length == 0 ? root : Filter.get(cc, path.info(), root, last.exprs);
 
     // attribute index request: start inverted path with attribute step
     if(!ii.text && (last.test instanceof NameTest || last.test instanceof UnionTest)) {
-      steps.add(Step.get(cc, rt, last.info, last.test));
+      steps.add(Step.get(cc, rt, last.info(), last.test));
     }
     // add inverted steps in reverse order
     while(--s >= 0) {
       final Step st = step(s);
-      steps.add(Step.get(cc, rt, st.info, step(s + 1).axis.invert(), st.test, st.exprs));
+      steps.add(Step.get(cc, rt, st.info(), step(s + 1).axis.invert(), st.test, st.exprs));
     }
     // add root step without predicates
     final Step st = step(s);
-    steps.add(Step.get(cc, rt, st.info, step(s + 1).axis.invert(), st.test));
+    steps.add(Step.get(cc, rt, st.info(), step(s + 1).axis.invert(), st.test));
 
-    return Path.get(cc, path.info, rt, steps.finish());
+    return Path.get(cc, path.info(), rt, steps.finish());
   }
 
   /**

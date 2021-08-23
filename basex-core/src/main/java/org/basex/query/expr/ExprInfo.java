@@ -31,6 +31,14 @@ public abstract class ExprInfo {
   }
 
   /**
+   * Returns the input info of an expression.
+   * @return info or {@code null}
+   */
+  public InputInfo info() {
+    return null;
+  }
+
+  /**
    * Creates a query plan.
    * @param plan expression plan
    */

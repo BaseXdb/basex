@@ -40,7 +40,7 @@ public abstract class IndexFn extends StandardFunc {
       throws QueryException {
 
     final IndexType type = entries.type();
-    type.check(data, call.info);
+    type.check(data, call.info());
     return entries(data.index(type), entries);
   }
 

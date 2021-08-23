@@ -29,7 +29,7 @@ public abstract class ParseExpr extends Expr {
   /** Expression type. */
   public final ExprType exprType;
   /** Input information. */
-  public InputInfo info;
+  protected InputInfo info;
 
   /**
    * Constructor.
@@ -100,6 +100,11 @@ public abstract class ParseExpr extends Expr {
   public final void refineType(final Expr expr) {
     exprType.refine(expr);
     if(data() == null) data(expr.data());
+  }
+
+  @Override
+  public InputInfo info() {
+    return info;
   }
 
   // OPTIMIZATIONS ================================================================================

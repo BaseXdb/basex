@@ -95,7 +95,7 @@ public final class FnReverse extends StandardFunc {
         for(int a = al - 1; a >= 0; a--) {
           list.add(args[a] instanceof Value ? ((Value) args[a]).reverse(cc.qc) : args[a]);
         }
-        return List.get(cc, ((List) expr).info, list.finish());
+        return List.get(cc, expr.info(), list.finish());
       }
     }
     return adoptType(expr);

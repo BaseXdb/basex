@@ -56,7 +56,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
     for(final VarEntry ve : vars.values()) {
       if(ve.var == null) {
         final StaticVarRef vr = ve.refs.get(0);
-        throw VARUNDEF_X.get(vr.info, vr);
+        throw VARUNDEF_X.get(vr.info(), vr);
       }
     }
   }

@@ -1013,7 +1013,7 @@ public class QueryParser extends InputParser {
           for(final GroupSpec spec : specs) {
             if(spec.var.is(var)) continue VARS;
           }
-          ng.add(new VarRef(specs[0].info, var));
+          ng.add(new VarRef(specs[0].info(), var));
         }
 
         // add new copies for all non-grouping variables
@@ -1027,7 +1027,7 @@ public class QueryParser extends InputParser {
           ngrp[i] = nv;
           curr.put(nv.name.id(), nv);
         }
-        clauses.add(new GroupBy(specs, ng.toArray(new VarRef[0]), ngrp, specs[0].info));
+        clauses.add(new GroupBy(specs, ng.toArray(new VarRef[0]), ngrp, specs[0].info()));
       }
 
       final boolean stable = wsConsumeWs(STABLE);
@@ -1043,8 +1043,8 @@ public class QueryParser extends InputParser {
 
         final VarRef[] vs = new VarRef[curr.size()];
         int i = 0;
-        for(final Var var : curr.values()) vs[i++] = new VarRef(keys[0].info, var);
-        clauses.add(new OrderBy(vs, keys, keys[0].info));
+        for(final Var var : curr.values()) vs[i++] = new VarRef(keys[0].info(), var);
+        clauses.add(new OrderBy(vs, keys, keys[0].info()));
       }
 
       if(wsConsumeWs(COUNT, DOLLAR, NOCOUNT)) {
@@ -1059,7 +1059,7 @@ public class QueryParser extends InputParser {
     final Expr rtrn = check(single(), NORETURN);
     localVars.closeScope(s);
 
-    return new GFLWOR(clauses.peek().info, clauses, rtrn);
+    return new GFLWOR(clauses.peek().info(), clauses, rtrn);
   }
 
   /**
@@ -1280,7 +1280,7 @@ public class QueryParser extends InputParser {
     final Expr rtrn = Function.BOOLEAN.get(sc, info(), check(single(), NOSOME));
     localVars.closeScope(s);
 
-    final InputInfo info = clauses.peek().info;
+    final InputInfo info = clauses.peek().info();
     final GFLWOR flwor = new GFLWOR(info, clauses, rtrn);
     final CmpG cmp = new CmpG(flwor, Bln.get(some), OpG.EQ, null, sc, info);
     return some ? cmp : Function.NOT.get(sc, info, cmp);

@@ -3,7 +3,6 @@ package org.basex.query.util.index;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
-import org.basex.util.*;
 
 /**
  * Index predicate: context expression.
@@ -52,8 +51,7 @@ class IndexContext extends IndexPred {
     if(ii.text || !(st.test instanceof NameTest || st.test instanceof UnionTest)) return root;
 
     // attribute index request: add attribute step
-    final InputInfo info = root instanceof ParseExpr ? ((ParseExpr) root).info : null;
-    final Expr step = Step.get(ii.cc, root, st.info, st.test);
-    return Path.get(info, root, step);
+    final Expr step = Step.get(ii.cc, root, st.info(), st.test);
+    return Path.get(root.info(), root, step);
   }
 }

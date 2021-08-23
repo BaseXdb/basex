@@ -1659,7 +1659,7 @@ public enum QueryError {
    * @return query exception
    */
   public static QueryException numberError(final ParseExpr expr, final Item item) {
-    return numberError(item, expr.info);
+    return numberError(item, expr.info());
   }
 
   /**

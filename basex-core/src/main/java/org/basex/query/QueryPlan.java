@@ -103,9 +103,9 @@ public final class QueryPlan {
     } else if(expr instanceof StaticDecl) {
       attachType(elem, ((StaticDecl) expr).seqType(), -1, null);
     }
-    if(expr instanceof ParseExpr) {
-      attachInputInfo(elem, ((ParseExpr) expr).info);
-    }
+    final InputInfo info = expr.info();
+    if(info != null) attachInputInfo(elem, info);
+
     return elem;
   }
 

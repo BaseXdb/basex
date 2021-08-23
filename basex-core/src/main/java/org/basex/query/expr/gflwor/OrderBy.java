@@ -73,7 +73,7 @@ public final class OrderBy extends Clause {
         while(sub.next(qc)) {
           final int kl = keys.length;
           final Item[] key = new Item[kl];
-          for(int k = 0; k < kl; k++) key[k] = keys[k].expr.atomItem(qc, keys[k].info);
+          for(int k = 0; k < kl; k++) key[k] = keys[k].expr.atomItem(qc, keys[k].info());
           tuples.add(key);
 
           final int rl = refs.length;
@@ -104,11 +104,11 @@ public final class OrderBy extends Clause {
                 if(m == Dbl.NAN || m == Flt.NAN) m = Empty.VALUE;
                 if(n == Dbl.NAN || n == Flt.NAN) n = Empty.VALUE;
                 if(m != Empty.VALUE && n != Empty.VALUE && !m.comparable(n))
-                  throw typeError(n, m.type, key.info);
+                  throw typeError(n, m.type, key.info());
 
                 final int c = m == Empty.VALUE
                     ? n == Empty.VALUE ? 0                 : key.least ? -1 : 1
-                    : n == Empty.VALUE ? key.least ? 1 : -1 : m.diff(n, key.coll, key.info);
+                    : n == Empty.VALUE ? key.least ? 1 : -1 : m.diff(n, key.coll, key.info());
                 if(c != 0) return key.desc ? -c : c;
               }
               return 0;

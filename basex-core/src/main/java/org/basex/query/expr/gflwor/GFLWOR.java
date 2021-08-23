@@ -222,7 +222,7 @@ public final class GFLWOR extends ParseExpr {
         final Where where = (Where) clause;
         if(where.expr instanceof And) {
           iter.remove();
-          for(final Expr expr : where.expr.args()) iter.add(new Where(expr, where.info));
+          for(final Expr expr : where.expr.args()) iter.add(new Where(expr, where.info()));
         }
       }
     }
@@ -584,7 +584,7 @@ public final class GFLWOR extends ParseExpr {
       final Where where = (Where) clause;
       if(where.expr instanceof Value) {
         // if test is always false, skip remaining tests (no results possible)
-        if(!where.expr.ebv(cc.qc, where.info).bool(where.info)) {
+        if(!where.expr.ebv(cc.qc, where.info()).bool(where.info())) {
           where.expr = Bln.FALSE;
           break;
         }
@@ -684,7 +684,7 @@ public final class GFLWOR extends ParseExpr {
         clauses.remove(d);
         if(count(pos.pos, c) == VarUsage.NEVER) {
           // for $e at $p in E where $p = P ...  ->  for $e in E[position() = P] ...
-          pos.addPredicate(cc, ItrPos.get(cmp.min, cmp.max, cmp.info));
+          pos.addPredicate(cc, ItrPos.get(cmp.min, cmp.max, cmp.info()));
           cc.info(QueryText.OPTPRED_X, expr);
           changed = true;
         } else {
@@ -747,7 +747,7 @@ public final class GFLWOR extends ParseExpr {
         final If iff = rewritableIf.apply(fr.expr);
         if(iff != null && !fr.empty) {
           fr.expr = iff.exprs[0];
-          clauses.add(c, new Where(iff.cond, iff.info));
+          clauses.add(c, new Where(iff.cond, iff.info()));
           changed = true;
         }
       }
@@ -755,7 +755,7 @@ public final class GFLWOR extends ParseExpr {
 
     final If iff = rewritableIf.apply(rtrn);
     if(iff != null) {
-      clauses.add(new Where(iff.cond, iff.info));
+      clauses.add(new Where(iff.cond, iff.info()));
       rtrn = iff.exprs[0];
       changed = true;
     }
@@ -786,7 +786,7 @@ public final class GFLWOR extends ParseExpr {
           final Count cnt = (Count) clauses.get(1);
           if(fst.pos != null) {
             // for $a at $b in ... count $c ...  ->  for $a at $b in ... let $c := $b ...
-            final VarRef ref = new VarRef(cnt.info, fst.pos).optimize(cc);
+            final VarRef ref = new VarRef(cnt.info(), fst.pos).optimize(cc);
             clauses.set(1, new Let(cnt.var, ref).optimize(cc));
           } else {
             // for $a in 1 to 3 count $c ...  -> for $a at $c in 1 to 3 ...
@@ -887,7 +887,7 @@ public final class GFLWOR extends ParseExpr {
             final And and = (And) expr;
             and.exprs = ExprList.concat(and.exprs, wh.expr);
           } else {
-            before.expr = new And(before.info, expr, wh.expr);
+            before.expr = new And(before.info(), expr, wh.expr);
           }
         } else {
           before = wh;
