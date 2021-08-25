@@ -616,8 +616,8 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args("X"), "NaN");
     query(func.args(wrap(1)), 1);
 
-    check("for $d in (1e0, 2e-1)[. != 0] return " + func.args(" $d"), "1\n0.2", empty(func));
-    check("for $d in (1, 2.34)[. != 0] return " + func.args(" $d"), "1\n2.34", exists(func));
+    check("for $d in (1e0, 2e-1)[. != 0] return" + func.args(" $d"), "1\n0.2", empty(func));
+    check("for $d in (1, 2.34)[. != 0] return" + func.args(" $d"), "1\n2.34", exists(func));
     check("for $d in (1e0, 2e-1)[. != 0] return $d[" + func.args() + ']', 1, empty(func));
     check("for $d in (1e0, 2e-1)[. != 0] return $d[" + func.args() + " = 1]", 1, empty(func));
     check("for $d in (1, 2.34)[. != 0] return $d[" + func.args() + ']', 1, exists(func));

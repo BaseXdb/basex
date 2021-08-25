@@ -1308,7 +1308,7 @@ public final class RewritingsTest extends QueryPlanTest {
     final StringBuilder sb = new StringBuilder();
     sb.append("string-join(\n");
     for(final String var : vars) {
-      sb.append("  for $").append(var).append(" in (0, 1) ! <_>{ . }</_> ! xs:boolean(.)\n");
+      sb.append("  for $").append(var).append(" in (0, 1) !" + wrapContext() + "! xs:boolean(.)\n");
     }
     sb.append("  return if(").append(query).append(") then 't' else 'f'\n");
     return sb.append(")").toString();

@@ -89,8 +89,7 @@ public final class Arith extends Arr {
           }
         } else if(acalc == calc.invert() && arg2.equals(expr2)) {
           // E + INT - INT  ->  E
-          expr = arg1.seqType().instanceOf(SeqType.NUMERIC_O) ? arg1 :
-            new Cast(cc.sc(), info, arg1, SeqType.NUMERIC_O).optimize(cc);
+          expr = new Cast(cc.sc(), info, arg1, SeqType.NUMERIC_O).optimize(cc);
         }
       }
     }
