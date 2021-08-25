@@ -6,6 +6,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -51,25 +52,39 @@ public final class Cast extends Single {
         seqType.occ.instanceOf(expr.seqType().occ)) expr = expr.arg(0);
 
     // target type
-    final SeqType est = expr.seqType();
-    Type dt = seqType.type;
-    Occ o = seqType.occ;
-    if(dt instanceof ListType) {
-      dt = dt.atomic();
-      o = Occ.ZERO_OR_MORE;
-    } else if(o == Occ.ZERO_OR_ONE && est.oneOrMore() && !est.mayBeArray()) {
-      o = Occ.EXACTLY_ONE;
+    final SeqType sst = expr.seqType();
+    Type type = seqType.type;
+    Occ occ = seqType.occ;
+    if(type instanceof ListType) {
+      type = type.atomic();
+      occ = Occ.ZERO_OR_MORE;
+    } else if(occ == Occ.ZERO_OR_ONE && sst.oneOrMore() && !sst.mayBeArray()) {
+      occ = Occ.EXACTLY_ONE;
     }
-    exprType.assign(dt, o);
+    exprType.assign(type, occ);
 
-    if(!est.mayBeArray()) {
+    if(!sst.mayBeArray()) {
       final long es = expr.size();
-      if(es != -1 && (es < o.min || es > o.max)) throw error(expr);
+      if(es != -1 && (es < occ.min || es > occ.max)) throw error(expr);
 
-      final Type et = est.type;
-      if(et.instanceOf(dt)) {
-        if(est.occ.instanceOf(o) && (et.eq(dt) || dt == AtomType.NUMERIC))
-          return cc.replaceWith(this, expr);
+      final Type stype = sst.type;
+      if(stype.instanceOf(type) && sst.occ.instanceOf(occ) &&
+          (stype.eq(type) || type == AtomType.NUMERIC)) {
+        return cc.replaceWith(this, expr);
+      }
+
+      // xs:int(string(ITEM))
+      // xs:int(xs:double(ITEM))  ->  xs:int(ITEM)
+      if(sst.one() && type.instanceOf(AtomType.NUMERIC)) {
+        Expr arg = FnNumber.simplify(expr, cc);
+        if(arg == null && expr instanceof Cast && (
+          type.instanceOf(stype) ||
+          type.instanceOf(AtomType.INT) && stype == AtomType.DOUBLE ||
+          type.instanceOf(AtomType.SHORT) && stype == AtomType.FLOAT
+        )) {
+          arg = ((Cast) expr).expr;
+        }
+        if(arg != null) return new Cast(sc, info, arg, seqType).optimize(cc);
       }
     }
     return expr instanceof Value ? cc.preEval(this) : this;

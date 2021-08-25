@@ -2337,4 +2337,41 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>/*[1]/*[1]", "", type(IterPath.class, "element()?"));
     check("(1 to 10000000) ! tail(<a/>/*[1])", "", empty());
   }
+
+  /** Merge redundant casts. */
+  @Test public void gh2036() {
+    final String loop = "(1 to 6) ! ";
+    final String string = "1\n2\n3\n4\n5\n6";
+
+    check(loop + "number(string())", string, empty(STRING));
+    check(loop + "number(string(.))", string, empty(STRING));
+    check(loop + "xs:double(.) ! number(string())", string, empty(NUMBER), empty(STRING));
+    check(loop + "xs:double(.) ! number(string(.))", string, empty(NUMBER), empty(STRING));
+    check(loop + "xs:double(.) ! number(xs:string(.))", string, count(Cast.class, 1));
+    check(loop + "xs:double(.) ! number(xs:untypedAtomic(.))", string, count(Cast.class, 1));
+
+    check(loop + "xs:int(string())", string, empty(STRING));
+    check(loop + "xs:int(string(.))", string, empty(STRING));
+    check(loop + "xs:double(.) ! xs:int(string())", string, empty(STRING), count(Cast.class, 1));
+    check(loop + "xs:double(.) ! xs:int(string(.))", string, empty(STRING), count(Cast.class, 1));
+    check(loop + "xs:double(.) ! xs:int(xs:string(.))", string, count(Cast.class, 1));
+    check(loop + "xs:double(.) ! xs:int(xs:untypedAtomic(.))", string, count(Cast.class, 1));
+
+    check(loop + "xs:integer(xs:decimal(.))", string, root(RangeSeq.class));
+    check(loop + "xs:int(xs:double(.))", string, count(Cast.class, 1));
+    check(loop + "xs:short(xs:float(.))", string, count(Cast.class, 1));
+
+    check(loop + "xs:decimal(xs:byte(.))", string, count(Cast.class, 2));
+    check(loop + "xs:integer(xs:double(.))", string, count(Cast.class, 2));
+    check(loop + "xs:int(xs:float(.))", string, count(Cast.class, 2));
+
+    check("let $n := %basex:inline function($v as xs:anyAtomicType) { number($v) } " +
+        "return <_><a>1</a><a>b</a></_>/a ! $n(.)",
+        "1\nNaN",
+        empty(TypeCheck.class));
+    check("let $n := %basex:inline function($v as xs:untypedAtomic) { number($v) } " +
+        "return <_><a>1</a><a>b</a></_>/a ! $n(.)",
+        "1\nNaN",
+        empty(TypeCheck.class));
+  }
 }
