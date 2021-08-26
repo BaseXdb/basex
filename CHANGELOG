@@ -1,3 +1,7 @@
+VERSION 9.6.1 (August 26, 2021) ----------------------------------------
+
+ - GUI bug fix, XQuery performance tweaks
+
 VERSION 9.6 (August 19, 2021) ------------------------------------------
 
  XQUERY: MODULES, FEATURES
