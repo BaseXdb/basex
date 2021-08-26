@@ -208,7 +208,7 @@ public final class HttpPayload {
     }
 
     if(payloads != null) {
-      final String encoding = type.parameters().get(CHARSET);
+      final String encoding = type.parameter(CHARSET);
       final byte[] part = new TextInput(bl.finish()).encoding(encoding).content();
       payloads.add(parse(base64 ? Base64.decode(part) : part, type));
     }
@@ -242,7 +242,7 @@ public final class HttpPayload {
    * @throws QueryException query exception
    */
   private byte[] boundary(final MediaType type) throws QueryException {
-    final String b = type.parameters().get(BOUNDARY);
+    final String b = type.parameter(BOUNDARY);
     if(b == null) throw HC_REQ_X.get(info, "No separation boundary specified");
     return token(b);
   }
@@ -363,7 +363,7 @@ public final class HttpPayload {
    * @throws IOException I/O exception
    */
   private static IOContent prepare(final byte[] body, final MediaType type) throws IOException {
-    final String encoding = type.parameters().get(CHARSET);
+    final String encoding = type.parameter(CHARSET);
     byte[] data = body;
     final boolean xml = type.isXML(), text = type.isText();
     if(xml || text) {

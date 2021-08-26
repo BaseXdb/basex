@@ -544,7 +544,7 @@ public class Options implements Iterable<Option<?>> {
    * @throws BaseXException database exception
    */
   public final synchronized void assign(final MediaType type) throws BaseXException {
-    for(final Entry<String, String> entry : type.parameters().entrySet()) {
+    for(final Entry<String, String> entry : type.parameters()) {
       if(options.isEmpty()) {
         free.put(entry.getKey(), entry.getValue());
       } else {

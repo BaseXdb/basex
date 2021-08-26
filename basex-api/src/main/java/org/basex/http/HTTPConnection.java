@@ -114,15 +114,14 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Initializes the output and assigns the character encoding and content type.
+   * Initializes the output and assigns the content type.
    */
   public void initResponse() {
     final SerializerOptions sopts = sopts();
     final MediaType mt = mediaType(sopts);
-    final HashMap<String, String> params = mt.parameters();
-    params.putIfAbsent(CHARSET, sopts.get(SerializerOptions.ENCODING));
-    response.setCharacterEncoding(params.get(CHARSET));
-    response.setContentType(mt.toString());
+    response.setContentType((mt.parameter(CHARSET) == null ?
+      new MediaType(mt + ";" + CHARSET + "=" + sopts.get(SerializerOptions.ENCODING)) :
+      mt).toString());
   }
 
   /**
@@ -164,8 +163,8 @@ public final class HTTPConnection implements ClientInfo {
       for(final String accept : accepts.split("\\s*,\\s*")) {
         // check if quality factor was specified
         final MediaType type = new MediaType(accept);
-        final String qf = type.parameters().get("q");
-        final double d = qf != null ? toDouble(token(qf)) : 1;
+        final String q = type.parameter("q");
+        final double d = q != null ? toDouble(token(q)) : 1;
         // only accept media types with valid double values
         if(d > 0 && d <= 1) {
           final StringBuilder sb = new StringBuilder();

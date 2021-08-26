@@ -66,7 +66,7 @@ public final class MediaType implements Comparable<MediaType> {
   /** Sub type. */
   private final String sub;
   /** Parameters. */
-  private final HashMap<String, String> params = new HashMap<>();
+  private final HashMap<String, String> parameters = new HashMap<>();
 
   /**
    * Constructor.
@@ -90,7 +90,7 @@ public final class MediaType implements Comparable<MediaType> {
         // value: trim whitespaces, remove quotes and backslashed characters
         String v = kv.length < 2 ? "" : kv[1].trim();
         if(Strings.startsWith(v, '"')) v = v.replaceAll("^\"|\"$", "").replaceAll("\\\\(.)", "$1");
-        params.put(k, v);
+        parameters.put(k, v);
       }
     }
   }
@@ -120,11 +120,20 @@ public final class MediaType implements Comparable<MediaType> {
   }
 
   /**
-   * Returns the parameters.
-   * @return parameters
+   * Returns the value of the specified parameter.
+   * @param name name of parameter
+   * @return parameter or {@code null}
    */
-  public HashMap<String, String> parameters() {
-    return params;
+  public String parameter(final String name) {
+    return parameters.get(name);
+  }
+
+  /**
+   * Returns an iterable set of all parameters.
+   * @return parameter set
+   */
+  public Set<Map.Entry<String, String>> parameters() {
+    return parameters.entrySet();
   }
 
   /**
@@ -216,7 +225,7 @@ public final class MediaType implements Comparable<MediaType> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(type());
-    params.forEach((key, value) -> sb.append("; ").append(key).append('=').append(value));
+    parameters.forEach((key, value) -> sb.append("; ").append(key).append('=').append(value));
     return sb.toString();
   }
 

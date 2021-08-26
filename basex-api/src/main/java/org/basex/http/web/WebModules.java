@@ -300,11 +300,11 @@ public final class WebModules {
   /**
    * Returns the quality factor of the specified media type.
    * @param type media type
-   * @param f quality factor string
+   * @param factor quality factor string
    * @return quality factor
    */
-  private static double qf(final MediaType type, final String f) {
-    final String qf = type.parameters().get(f);
+  private static double qf(final MediaType type, final String factor) {
+    final String qf = type.parameter(factor);
     return qf != null ? toDouble(token(qf)) : 1;
   }
 
