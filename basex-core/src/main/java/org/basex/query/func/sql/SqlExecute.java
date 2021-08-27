@@ -43,7 +43,8 @@ public class SqlExecute extends SqlFn {
     final String query = string(toToken(exprs[1], qc));
     final StatementOptions options = toOptions(2, new StatementOptions(), qc);
 
-    try(Statement stmt = conn.createStatement()) {
+    try {
+      final Statement stmt = conn.createStatement();
       stmt.setQueryTimeout(options.get(StatementOptions.TIMEOUT));
       return iter(stmt, true, stmt.execute(query));
     } catch(final SQLTimeoutException ex) {
