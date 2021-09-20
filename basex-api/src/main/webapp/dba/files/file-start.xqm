@@ -23,16 +23,12 @@ function dba:file-start(
   $file  as xs:string
 ) as element(rest:response) {
   let $id := replace($file, '\.\.+|/|\\', '')
-  let $path := config:directory() || $id
+  let $uri := xs:anyURI(config:directory() || $id)
   let $params := try {
     (: stop running job before starting new job :)
     jobs:stop($id),
     jobs:wait($id),
-    prof:void(jobs:eval(xs:anyURI($path), (), map {
-      'cache': 'true',
-      'id': $id,
-      'log': 'DBA job (' || $path || ')'
-    })),
+    prof:void(jobs:eval($uri, (), map { 'cache': 'true', 'id': $id, 'log': 'DBA job' })),
     map { 'info': 'Job was started.', 'job': $id }
   } catch * {
     map { 'error': $err:description }

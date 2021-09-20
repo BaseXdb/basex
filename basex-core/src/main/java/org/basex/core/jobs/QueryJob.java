@@ -225,7 +225,7 @@ public final class QueryJob extends Job implements Runnable {
 
       // write concluding log entry, invalidate performance measurements
       if(result.exception != null) {
-        log(LogType.ERROR, result.exception.getLocalizedMessage());
+        log(LogType.ERROR, result.exception.getMessage());
       } else {
         log(LogType.OK, null);
       }
