@@ -286,9 +286,9 @@ declare function html:properties(
  : * Supplied buttons will placed on top of the table.
  : * Query parameters will be included in table links.
  : * The options argument can have the following keys:
- :   * 'sort': key of the ordered column. if empty, sorting will be disabled
- :   * 'presort': key of pre-sorted column. if identical to sort, entries will not be resorted
- :   * 'link': function for generating a link reference.
+ :   * 'sort': key of the ordered column; if empty, sorting will be disabled
+ :   * 'presort': key of pre-sorted column; if identical to sort, entries will not be resorted
+ :   * 'link': function for generating a link reference
  :   * 'page': currently displayed page
  :   * 'count': maximum number of results
  :
@@ -316,144 +316,153 @@ declare function html:table(
 
   (: sort entries :)
   let $sort := $options?sort
-  let $sort-key := head(($sort[.], $headers[1]?key))
-  let $sorted-entries := if($sort and not($sort-key = $options?presort)) then (
-    let $sort-header := $headers[?key = $sort-key]
-    let $sort-value := (
-      let $sort-desc := $sort-header?order = 'desc'
-      return switch($sort-header?type)
-        case 'decimal' case 'number' case 'bytes' return
-          if($sort-desc)
-          then function($v) { 0 - number($v) }
-          else function($v) { number($v) }
-        case 'time' return
-          if($sort-desc)
-          then function($v) { xs:time('00:00:00') - xs:time($v) }
-          else function($v) { $v }
-        case 'date' return
-          if($sort-desc)
-          then function($v) { xs:date('0001-01-01') - xs:date($v) }
-          else function($v) { $v }
-        case 'dateTime' return
-          if($sort-desc)
-          then function($v) { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime($v) }
-          else function($v) { $v }
-        case 'dynamic' return
-          function($v) { if($v instance of function(*)) then string-join($v()) else $v }
-        default return
-          function($v) { $v }
+  let $sorted-entries := (
+    let $key := head(($sort[.], $headers[1]?key))
+    return if(not($sort) or $key = $options?presort) then (
+      $entries
+    ) else (
+      let $header := $headers[?key = $key]
+      let $value := (
+        let $desc := $header?order = 'desc'
+        return switch($header?type)
+          case 'decimal' case 'number' case 'bytes' return
+            if($desc)
+            then function($v) { 0 - number($v) }
+            else function($v) { number($v) }
+          case 'time' return
+            if($desc)
+            then function($v) { xs:time('00:00:00') - xs:time($v) }
+            else function($v) { $v }
+          case 'date' return
+            if($desc)
+            then function($v) { xs:date('0001-01-01') - xs:date($v) }
+            else function($v) { $v }
+          case 'dateTime' return
+            if($desc)
+            then function($v) { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime($v) }
+            else function($v) { $v }
+          case 'dynamic' return
+            function($v) { if($v instance of function(*)) then string-join($v()) else $v }
+          default return
+            function($v) { $v }
+      )
+      for $entry in $entries
+      order by $value($entry($key)) empty greatest collation '?lang=en'
+      return $entry
     )
-    for $entry in $entries
-    order by $sort-value($entry($sort-key)) empty greatest collation '?lang=en'
-    return $entry
-  ) else (
-    $entries
   )
 
   (: show results :)
-  let $count := if($sort) then () else $options?count
-  let $page := $options?page
-  let $max := options:get($options:MAXROWS)
-  let $start := head((($page - 1) * $max + 1, 1))
+  let $max-option := options:get($options:MAXROWS)
+  let $count-option := $options?count[not($sort)]
+  let $page-option := $options?page
+
+  let $entries := $count-option ?: count($sorted-entries)
+  let $last-page := ($entries - 1) idiv $max-option + 1
+  let $curr-page := min((max(($page-option, 1)), $last-page))
   return (
     (: result summary :)
-    let $count := head(($count, count($sorted-entries)))
-    let $single-page := not($page) or ($page = 1 and $count < $start + $max)
-    return element h4 {
-      $count,
-      if($count = 1) then ' Entry' else 'Entries',
+    element h4 {
+      $entries,
+      if($entries = 1) then ' Entry' else 'Entries',
 
-      if($single-page) then () else (
+      if(not($page-option) or $last-page = 1) then () else (
         '(Page: ',
-        let $last := ($count - 1) idiv $max + 1
         let $pages := sort(distinct-values((
-          1, $page - ($last idiv 10), $page - 1, $page, $page + 1, $page + ($last idiv 10), $last
-        ))[. >= 1 and . <= $last])
-        for $p at $pos in $pages
-        let $suffix := (if($p = $last) then ')' else ' ') ||
-          (if($pages[$pos + 1] > $p + 1) then ' … ' else ())
-        return (
-          if ($page = $p) then $p || $suffix else (
-            html:link(string($p), '', ($params, map { 'page': $p, 'sort': $sort })), $suffix
-          )
+          1,
+          $curr-page - $last-page idiv 10,
+          $curr-page - 1,
+          $curr-page,
+          $curr-page + 1,
+          $curr-page + $last-page idiv 10,
+          $last-page
+        ))[. >= 1 and . <= $last-page])
+        for $page at $pos in $pages
+        let $suffix := (if($page = $last-page) then ')' else ' ') ||
+          (if($pages[$pos + 1] > $page + 1) then ' … ' else ())
+        return if ($curr-page = $page) then (
+          $page || $suffix
+        ) else (
+          html:link(string($page), '', ($params, map { 'page': $page, 'sort': $sort })),
+          $suffix
         )
       )
     },
 
     (: list of results :)
-    let $shown-entries := if($count) then (
+    let $shown-entries := if($count-option) then (
       $sorted-entries
     ) else (
-      $sorted-entries[position() >= $start][position() <= $max + 1]
+      let $first := ($curr-page - 1) * $max-option + 1
+      return $sorted-entries[position() >= $first][position() <= $max-option + 1]
     )
-    return if(empty($shown-entries)) then () else (
-      element table {
-        element tr {
-          for $header at $pos in $headers
-          let $name := $header?key
-          let $label := upper-case($header?label)
-          return element th {
-            attribute align {
-              if($header?type = $html:NUMBER) then 'right' else 'left'
-            },
+    where exists($shown-entries)
+    return element table {
+      element tr {
+        for $header at $pos in $headers
+        let $name := $header?key
+        let $label := upper-case($header?label)
+        return element th {
+          attribute align {
+            if($header?type = $html:NUMBER) then 'right' else 'left'
+          },
 
-            if($pos = 1 and $buttons) then (
-              <input type='checkbox' onclick='toggle(this)'/>, ' '
-            ) else (),
+          if($pos = 1 and $buttons) then (
+            <input type='checkbox' onclick='toggle(this)'/>, ' '
+          ) else (),
 
-            if($header?type = 'id') then (
-              (: id columns: empty header column :)
-            ) else if(empty($sort) or $name = $sort) then (
-              (: sorted column, xml column: only display label :)
-              $label
-            ) else (
-              (: generate sort link :)
-              html:link($label, '', ($params, map { 'sort': $name }))
-            )
-          }
-        },
+          if($header?type = 'id') then (
+            (: id columns: empty header column :)
+          ) else if(empty($sort) or $name = $sort) then (
+            (: sorted column, xml column: only display label :)
+            $label
+          ) else (
+            (: generate sort link :)
+            html:link($label, '', ($params, map { 'sort': $name }))
+          )
+        }
+      },
 
-        let $link := $options?link
-        for $entry in $shown-entries[position() <= $max]
-        return element tr {
-          $entry?id ! attribute id { . },
-          for $header at $pos in $headers
-          let $name := $header?key
-          let $type := $header?type
+      let $link := $options?link
+      for $entry in $shown-entries[position() <= $max-option]
+      return element tr {
+        $entry?id ! attribute id { . },
+        for $header at $pos in $headers
+        let $name := $header?key
+        let $type := $header?type
 
-          (: format value :)
-          let $v := $entry($name)
-          let $value := try {
-            if($type = 'bytes') then (
-              prof:human(if(exists($v)) then xs:integer($v) else 0)
-            ) else if($type = 'decimal') then (
-              format-number(if(exists($v)) then number($v) else 0, '0.00')
-            ) else if($type = 'dateTime') then (
-              html:date(xs:dateTime($v))
-            ) else if($v instance of function(*)) then (
-              $v()
-            ) else (
-              string($v)
-            )
-          } catch * {
-            $err:description
-          }
-          return element td {
-            attribute align { if($type = $html:NUMBER) then 'right' else 'left' },
-            if($pos = 1 and $buttons) then (
-              <input type='checkbox' name='{ $name }' value='{ data($value) }'
-                onclick='buttons(this)'/>,
-              ' '
-            ) else (),
-            if($pos = 1 and exists($link)) then (
-              html:link($value, $link, ($params, map { $name: $value }))
-            ) else if($type = 'id') then () else (
-              $value
-            )
-          }
+        (: format value :)
+        let $v := $entry($name)
+        let $value := try {
+          if($type = 'bytes') then (
+            prof:human(if(exists($v)) then xs:integer($v) else 0)
+          ) else if($type = 'decimal') then (
+            format-number(if(exists($v)) then number($v) else 0, '0.00')
+          ) else if($type = 'dateTime') then (
+            html:date(xs:dateTime($v))
+          ) else if($v instance of function(*)) then (
+            $v()
+          ) else (
+            string($v)
+          )
+        } catch * {
+          $err:description
+        }
+        return element td {
+          attribute align { if($type = $html:NUMBER) then 'right' else 'left' },
+          if($pos = 1 and $buttons) then (
+            <input type='checkbox' name='{ $name }' value='{ data($value) }'
+              onclick='buttons(this)'/>,
+            ' '
+          ) else (),
+          if($pos = 1 and exists($link)) then (
+            html:link($value, $link, ($params, map { $name: $value }))
+          ) else if($type = 'id') then () else (
+            $value
+          )
         }
       }
-    )
+    }
   )
 };
 
