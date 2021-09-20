@@ -39,13 +39,14 @@ public final class JobsStop extends Command {
    */
   public static boolean stop(final Context ctx, final String id) {
     // stop scheduled task
-    final TimerTask task = ctx.jobs.tasks.remove(id);
+    final JobPool jobs = ctx.jobs;
+    final TimerTask task = jobs.tasks.remove(id);
     if(task != null) task.cancel();
     // send stop signal to job
-    final Job job = ctx.jobs.active.get(id);
+    final Job job = jobs.active.get(id);
     if(job != null) job.stop();
     // remove potentially cached result
-    ctx.jobs.results.remove(id);
+    jobs.results.remove(id);
 
     return job != null || task != null;
   }

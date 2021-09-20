@@ -10,6 +10,7 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
 
@@ -170,6 +171,7 @@ public final class QueryJob extends Job implements Runnable {
   @Override
   public void run() {
     final JobContext jc = jc();
+    final String id = jc.id();
     final Context ctx = jc.context;
     final JobsOptions opts = job.options;
     log(LogType.REQUEST, opts.get(JobsOptions.LOG));
@@ -191,7 +193,7 @@ public final class QueryJob extends Job implements Runnable {
       // register job
       pushJob(qp);
       register(ctx);
-      if(remove) ctx.jobs.tasks.remove(jc.id());
+      if(remove) ctx.jobs.tasks.remove(id);
 
       // retrieve result
       result.value = qp.value().materialize(qp.qc, BASEX_FUNCTION_X, null);
@@ -199,7 +201,7 @@ public final class QueryJob extends Job implements Runnable {
     } catch(final JobException ex) {
       // query was interrupted: remove cached result
       Util.debug(ex);
-      ctx.jobs.results.remove(jc.id());
+      ctx.jobs.results.remove(id);
     } catch(final QueryException ex) {
       result.exception = ex;
     } catch(final Throwable ex) {
@@ -213,7 +215,7 @@ public final class QueryJob extends Job implements Runnable {
         state(JobState.SCHEDULED);
       }
 
-      if(ctx.jobs.active.containsKey(jc.id())) {
+      if(ctx.jobs.active.containsKey(id)) {
         qp.close();
         unregister(ctx);
         popJob();
@@ -229,8 +231,9 @@ public final class QueryJob extends Job implements Runnable {
       }
       jc.performance = null;
 
-      if(remove) ctx.jobs.tasks.remove(jc.id());
+      if(remove) ctx.jobs.tasks.remove(id);
       if(notify != null) notify.accept(result);
+      if(result.value == Empty.VALUE) ctx.jobs.results.remove(id);
     }
   }
 

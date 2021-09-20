@@ -580,7 +580,7 @@ public class CommandTest extends SandboxTest {
 
   /** Command test. */
   @Test public final void jobsResult() {
-    no(new JobsResult("job1"));
+    ok(new JobsResult("job1"));
   }
 
   /** Command test. */

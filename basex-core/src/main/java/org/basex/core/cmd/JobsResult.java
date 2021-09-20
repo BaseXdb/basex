@@ -37,25 +37,26 @@ public final class JobsResult extends Command {
     final JobPool jobs = context.jobs;
     final Map<String, QueryJobResult> results = jobs.results;
     final QueryJobResult result = results.get(id);
-    if(result == null) return error(JOBS_UNKNOWN_X.message, id);
-    if(!result.cached()) error(JOBS_RUNNING_X.message, id);
+    if(result != null) {
+      if(!result.cached()) error(JOBS_RUNNING_X.message, id);
 
-    try {
-      if(result.value == null) throw result.exception;
+      try {
+        if(result.exception != null) throw result.exception;
 
-      final Serializer ser = Serializer.get(out);
-      final Iter iter = result.value.iter();
-      for(Item item; (item = iter.next()) != null;) {
-        ser.serialize(item);
-        checkStop();
+        final Serializer ser = Serializer.get(out);
+        final Iter iter = result.value.iter();
+        for(Item item; (item = iter.next()) != null;) {
+          ser.serialize(item);
+          checkStop();
+        }
+      } catch(final QueryException | IOException ex) {
+        exception = ex;
+        return error(Util.message(ex));
+      } finally {
+        results.remove(id);
       }
-      return true;
-    } catch(final QueryException | IOException ex) {
-      exception = ex;
-      return error(Util.message(ex));
-    } finally {
-      results.remove(id);
     }
+    return true;
   }
 
   @Override

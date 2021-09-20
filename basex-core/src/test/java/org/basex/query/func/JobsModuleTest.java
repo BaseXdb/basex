@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.*;
@@ -210,31 +209,8 @@ public final class JobsModuleTest extends SandboxTest {
 
   /**
    * Test method.
-   * @throws IOException I/O exception */
-  @Test public void stop() throws IOException {
-    final String id = verySlowQuery();
-    final Function func = _JOBS_STOP;
-    query(func.args(id));
-
-    // check if query was interrupted
-    while(true) {
-      try {
-        eval(_JOBS_RESULT.args(id));
-        fail("Query was not stopped.");
-      } catch(final QueryException ex) {
-        // query was successfully stopped
-        if(ex.error() == JOBS_UNKNOWN_X) break;
-        // query is still running: check error code
-        assertSame(JOBS_RUNNING_X, ex.error());
-      }
-      Performance.sleep(1);
-    }
-  }
-
-  /**
-   * Test method.
-   * @throws IOException I/O exception */
-  @Test public void result() throws IOException {
+   * @throws Exception exception */
+  @Test public void result1() throws Exception {
     // receive result of asynchronous execution
     final Function func = _JOBS_RESULT;
     query("let $q := " + _JOBS_EVAL.args(SLOW_QUERY, " ()", " map { 'cache': true() }") +
@@ -244,18 +220,7 @@ public final class JobsModuleTest extends SandboxTest {
 
     // ensure that the result will not be cached
     String id = query(_JOBS_EVAL.args(SLOW_QUERY));
-    while(true) {
-      try {
-        eval(func.args(id));
-        fail("Result was cached.");
-      } catch(final QueryException ex) {
-        // query was successfully stopped
-        if(ex.error() == JOBS_UNKNOWN_X) break;
-        // query is still running: check error code
-        assertSame(JOBS_RUNNING_X, ex.error());
-      }
-      Performance.sleep(1);
-    }
+    assertEquals(eval(func.args(id)), "");
 
     // receive cached result
     id = query(_JOBS_EVAL.args(SLOW_QUERY, " ()", " map { 'cache': true() }"));
@@ -274,6 +239,34 @@ public final class JobsModuleTest extends SandboxTest {
     id = query(_JOBS_EVAL.args("db:open('db')", " ()", " map { 'cache': true() }"));
     query(_JOBS_WAIT.args(id));
     error(func.args(id), DB_OPEN2_X);
+  }
+
+  /** Test method. */
+  @Test public void result2() {
+    final String id = query(_JOBS_EVAL.args("()", " ()", " map { 'cache': true() }"));
+    query(_JOBS_WAIT.args(id));
+    query(_JOBS_LIST.args() + " = '" + id + "'", false);
+    query(_JOBS_RESULT.args(id), "");
+  }
+
+  /**
+   * Test method.
+   * @throws Exception exception */
+  @Test public void stop() throws Exception {
+    final String id = verySlowQuery();
+    try {
+      eval(_JOBS_RESULT.args(id));
+    } catch(final QueryException ex) {
+      // query is still running: check error code
+      assertSame(JOBS_RUNNING_X, ex.error());
+    }
+
+    final Function func = _JOBS_STOP;
+    query(func.args(id));
+    Performance.sleep(100);
+
+    // check if query was successfully stopped
+    assertEquals(eval(_JOBS_RESULT.args(id)), "");
   }
 
   /** Test method. */
