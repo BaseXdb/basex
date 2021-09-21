@@ -62,10 +62,10 @@ abstract class MarkupSerializer extends StandardSerializer {
 
     super(os, sopts);
 
-    final String ver = supported(VERSION, sopts.get(VERSION), versions);
-    String htmlver = sopts.get(HTML_VERSION);
-    if(htmlver.matches("\\d+(\\.\\d+)?")) htmlver = Double.toString(Double.parseDouble(htmlver));
-    html5 = supported(HTML_VERSION, htmlver, V40, V401, V50).equals(V50) || ver.equals(V50);
+    final String version = supported(VERSION, sopts.get(VERSION), versions);
+    String hv = sopts.get(HTML_VERSION);
+    if(hv.matches("\\d+(\\.\\d+)?")) hv = Double.toString(Double.parseDouble(hv));
+    html5 = version.equals(V50) || supported(HTML_VERSION, hv, V40, V401, V50).equals(V50);
 
     final boolean omitDecl = sopts.yes(OMIT_XML_DECLARATION);
     final YesNoOmit sa = sopts.get(STANDALONE);
@@ -84,14 +84,14 @@ abstract class MarkupSerializer extends StandardSerializer {
     final boolean html = this instanceof HTMLSerializer;
     final boolean xml = this instanceof XMLSerializer || this instanceof XHTMLSerializer;
     if(xml || html) {
-      if(undecl && ver.equals(V10)) throw SERUNDECL.getIO();
+      if(undecl && version.equals(V10)) throw SERUNDECL.getIO();
       if(xml) {
         if(omitDecl) {
-          if(!saomit || !ver.equals(V10) && docsys != null) throw SERSTAND.getIO();
+          if(!saomit || !version.equals(V10) && docsys != null) throw SERSTAND.getIO();
         } else {
           out.print(PI_O);
           out.print(DOCDECL1);
-          out.print(ver);
+          out.print(version);
           out.print(DOCDECL2);
           out.print(sopts.get(ENCODING));
           if(!saomit) {
