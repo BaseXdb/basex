@@ -83,12 +83,12 @@ public final class CmpSR extends Single {
 
   /**
    * Tries to convert the specified expression into a range expression.
-   * @param cmp expression to be converted
    * @param cc compilation context
+   * @param cmp expression to be converted
    * @return new or original expression
    * @throws QueryException query exception
    */
-  static Expr get(final CmpG cmp, final CompileContext cc) throws QueryException {
+  static Expr get(final CompileContext cc, final CmpG cmp) throws QueryException {
     final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
     if(cmp1.has(Flag.NDT) || !(cmp2 instanceof AStr)) return cmp;
 
@@ -137,7 +137,8 @@ public final class CmpSR extends Single {
   }
 
   @Override
-  public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc) {
+  public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc)
+      throws QueryException {
     if(or || !(ex instanceof CmpSR)) return null;
 
     // skip intersection if expressions to be compared are different
@@ -154,10 +155,11 @@ public final class CmpSR extends Single {
       if(d > 0) return Bln.FALSE;
       if(d == 0) {
         // return simplified comparison for exact hit, or false if value is not included
-        return mni && mxi ? new CmpG(expr, Str.get(mn), OpG.EQ, null, null, info) : Bln.FALSE;
+        return mni && mxi ? new CmpG(expr, Str.get(mn), OpG.EQ, null, null, info).optimize(cc) :
+          Bln.FALSE;
       }
     }
-    return new CmpSR(cmp.expr, mn, mni && cmp.mni, mx, mxi && cmp.mxi, null, info);
+    return new CmpSR(cmp.expr, mn, mni && cmp.mni, mx, mxi && cmp.mxi, null, info).optimize(cc);
   }
 
   @Override

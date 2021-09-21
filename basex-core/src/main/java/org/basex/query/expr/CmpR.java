@@ -58,26 +58,28 @@ public final class CmpR extends Single {
 
   /**
    * Tries to convert the specified expression into a range expression.
+   * @param cc compilation context
+   * @param info input info
    * @param expr expression to be compared
    * @param min minimum position
    * @param max minimum position (inclusive)
-   * @param info input info
    * @return expression
+   * @throws QueryException query exception
    */
-  private static Expr get(final Expr expr, final double min, final double max,
-      final InputInfo info) {
+  private static Expr get(final CompileContext cc, final InputInfo info, final Expr expr,
+      final double min, final double max) throws QueryException {
     return min > max ? Bln.FALSE : min == NEGATIVE_INFINITY && max == POSITIVE_INFINITY ? Bln.TRUE :
-      new CmpR(expr, min, max, info);
+      new CmpR(expr, min, max, info).optimize(cc);
   }
 
   /**
    * Tries to convert the specified expression into a range expression.
-   * @param cmp expression to be converted
    * @param cc compilation context
+   * @param cmp expression to be converted
    * @return new or original expression
    * @throws QueryException query exception
    */
-  static Expr get(final CmpG cmp, final CompileContext cc) throws QueryException {
+  static Expr get(final CompileContext cc, final CmpG cmp) throws QueryException {
     final Expr expr1 = cmp.exprs[0], expr2 = cmp.exprs[1];
     final Type type1 = expr1.seqType().type, type2 = expr2.seqType().type;
 
@@ -101,7 +103,7 @@ public final class CmpR extends Single {
       // do not rewrite (non-)equality comparisons
       default: return cmp;
     }
-    return get(expr1, mn, mx, cmp.info).optimize(cc);
+    return get(cc, cmp.info, expr1, mn, mx);
   }
 
   @Override
@@ -162,13 +164,14 @@ public final class CmpR extends Single {
   }
 
   @Override
-  public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc) {
+  public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc)
+      throws QueryException {
     if(ex instanceof CmpR) {
       final CmpR cmp = (CmpR) ex;
       if(expr.equals(cmp.expr) && (!or || max >= cmp.min && min <= cmp.max)) {
         final double mn = or ? Math.min(min, cmp.min) : Math.max(min, cmp.min);
         final double mx = or ? Math.max(max, cmp.max) : Math.min(max, cmp.max);
-        return get(expr, mn, mx, info);
+        return get(cc, info, expr, mn, mx);
       }
     }
     return null;

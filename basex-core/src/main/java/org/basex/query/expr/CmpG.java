@@ -176,9 +176,9 @@ public class CmpG extends Cmp {
 
     // range comparisons
     if(expr == this) expr = optArith(cc);
-    if(expr == this) expr = CmpIR.get(this, false, cc);
-    if(expr == this) expr = CmpR.get(this, cc);
-    if(expr == this) expr = CmpSR.get(this, cc);
+    if(expr == this) expr = CmpIR.get(cc, this, false);
+    if(expr == this) expr = CmpR.get(cc, this);
+    if(expr == this) expr = CmpSR.get(cc, this);
 
     if(expr == this) {
       // determine types, choose best implementation

@@ -96,7 +96,7 @@ public abstract class SimpleMap extends Arr {
         list.add(expr);
       }
     }
-    if(list.size() != exprs.length) return SimpleMap.get(cc, info, list.finish());
+    if(list.size() != exprs.length) return get(cc, info, list.finish());
     exprs = list.next();
 
     // determine type and result size, drop expressions that will never be evaluated
@@ -306,7 +306,7 @@ public abstract class SimpleMap extends Arr {
         final ExprList results = new ExprList((int) size);
         for(final Item item : (Value) expr) {
           final Expr nxt = results.size() == size - 1 ? next : next.copy(cc, new IntObjMap<>());
-          results.add(SimpleMap.get(cc, info, item, nxt));
+          results.add(get(cc, info, item, nxt));
         }
         return List.get(cc, info, results.finish());
       }
@@ -421,7 +421,7 @@ public abstract class SimpleMap extends Arr {
       final Expr ex = cc.get(exprs[el - 2], () -> old.simplifyFor(mode, cc));
       if(ex != old) {
         final ExprList list = new ExprList(el).add(exprs).set(el - 1, ex);
-        expr = SimpleMap.get(cc, info, list.finish());
+        expr = get(cc, info, list.finish());
       }
     }
     return expr != this ? cc.simplify(this, expr) : super.simplifyFor(mode, cc);

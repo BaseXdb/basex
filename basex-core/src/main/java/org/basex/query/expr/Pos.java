@@ -87,7 +87,7 @@ final class Pos extends Arr implements CmpPos {
         return Bln.FALSE;
       }
     }
-    return min != null ? new Pos(ii, min, max) : null;
+    return min != null ? new Pos(ii, min, max).optimize(cc) : null;
   }
 
   @Override
@@ -114,7 +114,8 @@ final class Pos extends Arr implements CmpPos {
   }
 
   @Override
-  public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc) {
+  public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc)
+      throws QueryException {
     if(or || !(ex instanceof Pos)) return null;
     final Pos pos = (Pos) ex;
     final Expr[] posExpr = pos.exprs;
@@ -122,7 +123,7 @@ final class Pos extends Arr implements CmpPos {
       final Expr expr1 = exprs[0], expr2 = exprs[1];
       final Expr min = expr1 == Int.ONE ? posExpr[0] : posExpr[0] == Int.ONE ? expr1 : null;
       final Expr max = expr2 == Int.MAX ? posExpr[1] : posExpr[1] == Int.MAX ? expr2 : null;
-      if(min != null && max != null) return new Pos(info, min, max);
+      if(min != null && max != null) return new Pos(info, min, max).optimize(cc);
     }
     return null;
   }

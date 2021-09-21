@@ -674,7 +674,7 @@ public final class GFLWOR extends ParseExpr {
         }
 
         Expr expr = ((Where) cl).expr;
-        if(expr instanceof CmpG) expr = CmpIR.get((CmpG) expr, true, cc);
+        if(expr instanceof CmpG) expr = CmpIR.get(cc, (CmpG) expr, true);
         if(!(expr instanceof CmpIR)) continue;
 
         final CmpIR cmp = (CmpIR) expr;
