@@ -51,10 +51,9 @@ public final class FnModuleTest extends QueryPlanTest {
 
     // function is replaced by its argument (argument yields no result)
     check(func.args(" prof:void(())"), "", empty(func));
-    // but type is adjusted
+    // check adjusted type
     check(func.args(wrap(1)), 1, type(func, "xs:double"));
-    // no adjustment of type
-    check(func.args(wrap(1) + "! array { . }"), 1, type(func, "xs:numeric?"));
+    check(func.args(wrap(1) + "! array { . }"), 1, type(func, "xs:double"));
   }
 
   /** Test method. */

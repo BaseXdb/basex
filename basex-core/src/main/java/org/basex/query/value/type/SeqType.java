@@ -527,20 +527,19 @@ public final class SeqType {
   }
 
   /**
-   * Tests if expressions of this type may be numeric. User for predicate rewritings.
+   * Tests if expressions of this type may yield numbers.
    * @return result of check
    */
   public boolean mayBeNumber() {
-    // check if type is number, or any other super type
     return !zero() && (type.isNumber() || ANY_ATOMIC_TYPE.instanceOf(type));
   }
 
   /**
-   * Tests if expressions of this type may be an array.
+   * Tests if expressions of this type may yield arrays.
    * @return result of check
    */
   public boolean mayBeArray() {
-    return !(zero() || type.atomic() != null || type instanceof MapType);
+    return !zero() && (type instanceof ArrayType || ARRAY.instanceOf(type));
   }
 
   /**

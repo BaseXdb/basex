@@ -265,7 +265,7 @@ public class FuncType implements Type {
   }
 
   @Override
-  public final AtomType atomic() {
+  public AtomType atomic() {
     return null;
   }
 

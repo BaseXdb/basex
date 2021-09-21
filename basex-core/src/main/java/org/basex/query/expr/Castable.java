@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -17,12 +16,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class Castable extends Single {
-  /** Static context. */
-  private final StaticContext sc;
-  /** Sequence type to check for. */
-  private final SeqType seqType;
-
+public final class Castable extends Convert {
   /**
    * Constructor.
    * @param sc static context
@@ -32,41 +26,20 @@ public final class Castable extends Single {
    */
   public Castable(final StaticContext sc, final InputInfo info, final Expr expr,
       final SeqType seqType) {
-    super(info, expr, SeqType.BOOLEAN_O);
-    this.sc = sc;
-    this.seqType = seqType;
-  }
-
-  @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
-    return super.compile(cc).optimize(cc);
+    super(sc, info, expr, seqType, SeqType.BOOLEAN_O);
   }
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(Simplify.STRING, cc);
+    super.optimize(cc);
 
-    // target type
-    final SeqType est = expr.seqType();
-    Type dt = seqType.type;
-    Occ o = seqType.occ;
-    if(dt instanceof ListType) {
-      dt = dt.atomic();
-      o = Occ.ZERO_OR_MORE;
-    } else if(o == Occ.ZERO_OR_ONE && est.oneOrMore() && !est.mayBeArray()) {
-      o = Occ.EXACTLY_ONE;
-    }
+    final SeqType castType = castType();
+    final Boolean castable = cast(castType);
+    if(castable != null) return cc.replaceWith(this, Bln.get(castable));
 
-    if(!est.mayBeArray()) {
-      final long es = expr.size();
-      if(es != -1 && (es < o.min || es > o.max)) return cc.replaceWith(this, Bln.FALSE);
+    final Expr arg = simplify(castType, cc);
+    if(arg != null) return new Castable(sc, info, arg, seqType).optimize(cc);
 
-      final Type et = est.type;
-      if(et.instanceOf(dt)) {
-        if(est.occ.instanceOf(o) && (et.eq(dt) || dt == AtomType.NUMERIC))
-          return cc.replaceWith(this, Bln.TRUE);
-      }
-    }
     return expr instanceof Value ? cc.preEval(this) : this;
   }
 
@@ -87,12 +60,7 @@ public final class Castable extends Single {
   }
 
   @Override
-  public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, AS, seqType), expr);
-  }
-
-  @Override
   public void toString(final QueryString qs) {
-    qs.token(expr).token(CASTABLE).token(AS).token(seqType);
+    qs.token("(").token(expr).token(CASTABLE).token(AS).token(seqType).token(')');
   }
 }

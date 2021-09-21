@@ -57,10 +57,11 @@ public final class UtilDuplicates extends StandardFunc {
         // util:duplicates(1 to 10)  ->  ()
         if(expr instanceof RangeSeq || expr instanceof Range || st.zeroOrOne()) return Empty.VALUE;
         // util:duplicates((1 to 3) ! 1)  ->  1
-        if(expr instanceof SingletonSeq && exprs.length == 1) {
+        if(expr instanceof SingletonSeq && exprs.length == 1 && !st.mayBeArray()) {
           final SingletonSeq ss = (SingletonSeq) expr;
-          if(ss.singleItem())
+          if(ss.singleItem()) {
             return type == st.type ? ss.itemAt(0) : cc.function(Function.DATA, info, ss.itemAt(0));
+          }
         }
       }
     }

@@ -81,7 +81,8 @@ public final class FnDistinctValues extends StandardFunc {
         if(expr instanceof Range || expr instanceof RangeSeq) return expr;
         // distinct-values($string)  ->  $string
         // distinct-values($node)  ->  data($node)
-        if(st.zeroOrOne()) return type == st.type ? expr : cc.function(Function.DATA, info, exprs);
+        if(st.zeroOrOne() && !st.mayBeArray())
+          return type == st.type ? expr : cc.function(Function.DATA, info, exprs);
       }
     }
     return optStats(expr, cc);

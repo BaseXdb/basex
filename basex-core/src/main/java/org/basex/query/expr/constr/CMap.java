@@ -40,7 +40,7 @@ public final class CMap extends Arr {
     for(int e = 0; e < el; e += 2) {
       final SeqType st = exprs[e].seqType();
       final Type type = st.type.atomic();
-      if(type == null || !st.one()) {
+      if(type == null || !st.one() || st.mayBeArray()) {
         kt = null;
         break;
       }

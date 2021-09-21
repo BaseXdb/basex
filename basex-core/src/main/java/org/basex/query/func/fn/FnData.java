@@ -35,6 +35,7 @@ public final class FnData extends ContextFn {
   protected Expr opt(final CompileContext cc) {
     final boolean context = contextAccess();
     final Expr expr = context ? cc.qc.focus.value : exprs[0];
+
     if(expr != null) {
       final SeqType st = expr.seqType();
       if(st.zero()) return expr;
@@ -44,7 +45,10 @@ public final class FnData extends ContextFn {
         // $string[data() = 'a']  ->  $string[. = 'a']
         return context && cc.nestedFocus() ? ContextValue.get(cc, info) : expr;
       }
-      if(type != null) exprType.assign(SeqType.get(type, st.occ), expr.size());
+      // ignore arrays: data((1 to 6) ! [ ., . ])
+      if(type != null) {
+        exprType.assign(SeqType.get(type, st.occ), st.mayBeArray() ? -1 : expr.size());
+      }
     }
     return this;
   }

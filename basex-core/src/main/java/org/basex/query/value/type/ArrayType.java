@@ -83,6 +83,11 @@ public final class ArrayType extends FuncType {
       new FuncType(dt, ft.argTypes[0].union(SeqType.INTEGER_O)) : null;
   }
 
+  @Override
+  public AtomType atomic() {
+    return argTypes[0].type.atomic();
+  }
+
   /**
    * Creates a new array type.
    * @param declType declared return type

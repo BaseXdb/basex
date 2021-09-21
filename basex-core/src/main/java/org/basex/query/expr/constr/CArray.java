@@ -1,7 +1,9 @@
 package org.basex.query.expr.constr;
 
 import static org.basex.query.QueryText.*;
+
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.array.*;
@@ -65,6 +67,16 @@ public final class CArray extends Arr {
       }
     }
     return builder.array(this);
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    Expr expr = null;
+    if(mode == Simplify.STRING || mode == Simplify.NUMBER || mode == Simplify.DATA) {
+      simplifyAll(mode, cc);
+      expr = List.get(cc, info, exprs);
+    }
+    return expr != null ? cc.simplify(this, expr) : super.simplifyFor(mode, cc);
   }
 
   @Override
