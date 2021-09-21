@@ -848,6 +848,10 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args("1", " map { 'indent': true() }"), 1);
     query(func.args("1", " map { 'indent': 1 }"), 1);
     error(func.args("1", " map { 'indent': 2 }"), SEROPT_X);
+
+    query(func.args("<html/>", " map { 'html-version': 5 }"), "&lt;html/&gt;");
+    query(func.args("<html/>", " map { 'html-version': 5.0 }"), "&lt;html/&gt;");
+    query(func.args("<html/>", " map { 'html-version': 5.0000 }"), "&lt;html/&gt;");
   }
 
   /** Test method. */

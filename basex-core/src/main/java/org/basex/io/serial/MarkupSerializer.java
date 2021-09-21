@@ -62,9 +62,10 @@ abstract class MarkupSerializer extends StandardSerializer {
 
     super(os, sopts);
 
-    final String ver = supported(VERSION, sopts, versions);
-    final String htmlver = supported(HTML_VERSION, sopts, V40, V401, V50);
-    html5 = htmlver.equals(V50) || ver.equals(V50);
+    final String ver = supported(VERSION, sopts.get(VERSION), versions);
+    String htmlver = sopts.get(HTML_VERSION);
+    if(htmlver.matches("\\d+(\\.\\d+)?")) htmlver = Double.toString(Double.parseDouble(htmlver));
+    html5 = supported(HTML_VERSION, htmlver, V40, V401, V50).equals(V50) || ver.equals(V50);
 
     final boolean omitDecl = sopts.yes(OMIT_XML_DECLARATION);
     final YesNoOmit sa = sopts.get(STANDALONE);
@@ -358,19 +359,16 @@ abstract class MarkupSerializer extends StandardSerializer {
   /**
    * Retrieves a value from the specified option and checks for supported values.
    * @param option option
-   * @param opts options
+   * @param string value
    * @param allowed allowed values
    * @return value
    * @throws QueryIOException query I/O exception
    */
-  private static String supported(final StringOption option, final Options opts,
+  private static String supported(final StringOption option, final String string,
       final String... allowed) throws QueryIOException {
 
-    final String string = opts.get(option);
     if(string.isEmpty()) return allowed.length > 0 ? allowed[0] : string;
-    for(final String value : allowed) {
-      if(value.equals(string)) return string;
-    }
+    if(Strings.eq(string, allowed)) return string;
     throw SERNOTSUPP_X.getIO(Options.allowed(option, string, (Object[]) allowed));
   }
 
