@@ -223,17 +223,20 @@ public class CmpG extends Cmp {
    * @throws QueryException query exception
    */
   private Expr optArith(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0], count = exprs[1];
-    if(expr1 instanceof Arith && count instanceof ANum) {
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if(expr1 instanceof Arith) {
       final Arith arith = (Arith) expr1;
       final Expr op1 = arith.arg(0), op2 = arith.arg(1);
-      if(arith.calc == Calc.MINUS && op2.seqType().instanceOf(SeqType.NUMERIC_O) &&
-          count == Int.ZERO) {
+      final Calc calc = arith.calc;
+      if(calc == Calc.MINUS && op2.seqType().instanceOf(SeqType.NUMERIC_O) && expr2 == Int.ZERO) {
         // sum(A) - sum(B) = 0  ->  sum(A) = sum(B)
         return new CmpG(op1, op2, op, coll, sc, info).optimize(cc);
-      } else if(arith.calc != Calc.MOD && arith.calc != Calc.IDIV && op2 instanceof ANum) {
+      }
+      if(calc != Calc.MOD && calc != Calc.IDIV && op2 instanceof ANum &&
+        (expr2 instanceof ANum || expr2 instanceof Arith && expr2.arg(1) instanceof ANum)) {
         // count(E) div 2 = 1  ->  count(E) = 1 * 2
-        final Expr arg2 = new Arith(info, count, op2, arith.calc.invert()).optimize(cc);
+        // $a - 1 = $b + 1  ->  $a = $b + 2
+        final Expr arg2 = new Arith(info, expr2, op2, calc.invert()).optimize(cc);
         return new CmpG(op1, arg2, op, coll, sc, info).optimize(cc);
       }
     }

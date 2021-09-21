@@ -151,4 +151,13 @@ public final class ArithTest extends QueryPlanTest {
     check("(1 to 2) ! (" + wrap(1) + "+ . - .)", "1\n1", empty(Arith.class));
     check("(1 to 2) ! (" + wrapContext() + "+ . - .)", "1\n2", empty(Arith.class));
   }
+
+  /** Simplify arithmetic expressions. */
+  @Test public void simplify() {
+    check(wrap(1) + "- 1 = 0", true, empty(Arith.class), count(Int.class, 1));
+    check(wrap(1) + "- 1 = " + wrap(1) + " - 1", true,
+        empty(Arith.class), empty(Int.class), exists(Cast.class));
+    check(wrap(1) + "- 1 != " + wrap(1) + " - 2", true,
+        count(Arith.class, 1), count(Int.class, 1));
+  }
 }
