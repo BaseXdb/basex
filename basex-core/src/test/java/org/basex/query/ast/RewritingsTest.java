@@ -808,6 +808,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("for $n in (10000000000000000, 1)[. != 0] return number($n) = 10000000000000001",
         "true\nfalse", exists(NUMBER));
+
+    check("number(<?_ 1?>) + number(<_>2</_>)", 3, count(NUMBER, 1));
   }
 
   /** Inlining of where clauses. */

@@ -67,7 +67,7 @@ public final class FnNumber extends ContextFn {
   }
 
   /**
-   * Returns the argument type.
+   * Returns the atomic argument type.
    * @param cc compilation context
    * @return argument type or {@code null}
    */
@@ -75,7 +75,7 @@ public final class FnNumber extends ContextFn {
     final Expr expr = contextAccess() ? cc.qc.focus.value : exprs[0];
     if(expr != null) {
       final SeqType st = expr.seqType();
-      if(st.one()) return st.type;
+      if(st.one()) return st.type.atomic();
     }
     return null;
   }
