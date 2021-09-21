@@ -2158,8 +2158,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("boolean(count((1, 2)[. <= 2]))", true, root(EXISTS));
     check("boolean(count((1, 2)[. >= 3]))", false, root(EXISTS));
 
+    check("boolean(string-length(<_/>))", false, root(EXISTS), exists(IterPath.class));
     check("boolean(string-length(" + wrap("A") + "))", true, exists(STRING));
-    check("boolean(string-length(<_/>))", false, exists(STRING));
   }
 
   /** Axis steps: Rewrites. */
