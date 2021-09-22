@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.func.Function.*;
 
-import java.util.*;
 import java.util.function.*;
 
 import org.basex.core.*;
@@ -126,40 +125,6 @@ public abstract class SimpleMap extends Arr {
       }
     }
     return list.size() != exprs.length ? get(cc, info, list.finish()) : null;
-  }
-
-  /**
-   * Determines the type and result size and drops expressions that will never be evaluated.
-   * @param cc compilation context
-   * @return optimized expression or {@code null}
-   */
-  private Expr dropOps(final CompileContext cc) {
-    final ExprList list = new ExprList(exprs.length);
-    long min = 1, max = 1;
-    for(final Expr expr : exprs) {
-      // no results: skip remaining expressions
-      if(max == 0) break;
-      list.add(expr);
-      final long es = expr.size();
-      if(es == 0) {
-        min = 0;
-        max = 0;
-      } else if(es > 0) {
-        min *= es;
-        if(max != -1) max *= es;
-      } else {
-        final Occ o = expr.seqType().occ;
-        if(o.min == 0) min = 0;
-        if(o.max > 1) max = -1;
-      }
-    }
-    final int ls = list.size();
-    if(exprs.length != ls) cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
-    if(ls == 1) return exprs[0];
-
-    exprType.assign(list.peek().seqType(), new long[] { min, max });
-    exprs = list.finish();
-    return size() == 0 && !has(Flag.NDT) ? cc.emptySeq(this) : null;
   }
 
   /**
@@ -369,34 +334,73 @@ public abstract class SimpleMap extends Arr {
    * @throws QueryException query exception
    */
   private Expr mergeOps(final CompileContext cc) throws QueryException {
-    // merge operands
     final int el = exprs.length;
-    int e = 0;
-    boolean pushed = false;
-    for(int n = 1; n < el; n++) {
-      final Expr next = exprs[n], merged = merge(exprs[e], next, cc);
-      if(merged != null) {
-        cc.info(OPTMERGE_X, merged);
-        exprs[e] = merged;
-      } else if(!(next instanceof ContextValue)) {
-        // context item expression can be ignored
-        exprs[++e] = next;
-      }
+    final ExprList list = new ExprList(el).add(exprs[0]);
 
-      if(e > 0) {
+    boolean pushed = false;
+    for(int e = 1; e < el; e++) {
+      final Expr merged = merge(list.peek(), exprs[e], cc);
+      if(merged != null) {
+        list.set(list.size() - 1, merged);
+      } else {
+        list.add(exprs[e]);
+      }
+      if(list.size() > 1) {
+        final Expr expr = list.get(list.size() - 2);
         if(pushed) {
-          cc.updateFocus(exprs[e - 1]);
+          cc.updateFocus(expr);
         } else {
-          cc.pushFocus(exprs[e - 1]);
+          cc.pushFocus(expr);
           pushed = true;
         }
       }
     }
     if(pushed) cc.removeFocus();
 
-    if(e == 0) return exprs[0];
-    if(++e != el) exprs = Arrays.copyOf(exprs, e);
+    // remove context value references (ignore first expression)
+    // (1 to 10) ! .  ->  (1 to 10)
+    for(int n = list.size() - 1; n > 0; n--) {
+      if(list.get(n) instanceof ContextValue) list.remove(n);
+    }
+
+    if(list.size() == 1) return cc.replaceWith(this, list.peek());
+    exprs = list.finish();
+    if(exprs.length != el) cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
     return null;
+  }
+
+  /**
+   * Determines the type and result size and drops expressions that will never be evaluated.
+   * @param cc compilation context
+   * @return optimized expression or {@code null}
+   */
+  private Expr dropOps(final CompileContext cc) {
+    final ExprList list = new ExprList(exprs.length);
+    long min = 1, max = 1;
+    for(final Expr expr : exprs) {
+      // no results: skip remaining expressions
+      if(max == 0) break;
+      list.add(expr);
+      final long es = expr.size();
+      if(es == 0) {
+        min = 0;
+        max = 0;
+      } else if(es > 0) {
+        min *= es;
+        if(max != -1) max *= es;
+      } else {
+        final Occ o = expr.seqType().occ;
+        if(o.min == 0) min = 0;
+        if(o.max > 1) max = -1;
+      }
+    }
+    final int ls = list.size();
+    if(exprs.length != ls) cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
+    if(ls == 1) return exprs[0];
+
+    exprType.assign(list.peek().seqType(), new long[] { min, max });
+    exprs = list.finish();
+    return size() == 0 && !has(Flag.NDT) ? cc.emptySeq(this) : null;
   }
 
   @Override
