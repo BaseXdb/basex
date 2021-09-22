@@ -338,24 +338,27 @@ public abstract class SimpleMap extends Arr {
     final ExprList list = new ExprList(el).add(exprs[0]);
 
     boolean pushed = false;
-    for(int e = 1; e < el; e++) {
-      final Expr merged = merge(list.peek(), exprs[e], cc);
-      if(merged != null) {
-        list.set(list.size() - 1, merged);
-      } else {
-        list.add(exprs[e]);
-      }
-      if(list.size() > 1) {
-        final Expr expr = list.get(list.size() - 2);
-        if(pushed) {
-          cc.updateFocus(expr);
+    try {
+      for(int e = 1; e < el; e++) {
+        final Expr merged = merge(list.peek(), exprs[e], cc);
+        if(merged != null) {
+          list.set(list.size() - 1, merged);
         } else {
-          cc.pushFocus(expr);
-          pushed = true;
+          list.add(exprs[e]);
+        }
+        if(list.size() > 1) {
+          final Expr expr = list.get(list.size() - 2);
+          if(pushed) {
+            cc.updateFocus(expr);
+          } else {
+            cc.pushFocus(expr);
+            pushed = true;
+          }
         }
       }
+    } finally {
+      if(pushed) cc.removeFocus();
     }
-    if(pushed) cc.removeFocus();
 
     // remove context value references (ignore first expression)
     // (1 to 10) ! .  ->  (1 to 10)
