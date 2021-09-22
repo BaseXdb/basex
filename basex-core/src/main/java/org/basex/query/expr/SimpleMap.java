@@ -86,8 +86,37 @@ public abstract class SimpleMap extends Arr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    // flatten nested expressions (unless result needs to be cached)
-    final ExprList list = new ExprList(exprs.length);
+    // merge operands
+    Expr ex = flattenMaps(cc);
+    if(ex == null) ex = mergePaths(cc);
+    if(ex == null) ex = mergeOps(cc);
+    if(ex == null) ex = dropOps(cc);
+    if(ex != null) return ex;
+
+    // choose best map implementation
+    boolean cached = false, item = true;
+    for(final Expr expr : exprs) {
+      cached = cached || expr.has(Flag.POS);
+      item = item && expr.seqType().zeroOrOne();
+    }
+    final boolean dual = exprs.length == 2 && exprs[1].seqType().zeroOrOne();
+
+    return copyType(
+      cached ? new CachedMap(info, exprs) :
+      item ? new ItemMap(info, exprs) :
+      dual ? new DualMap(info, exprs) :
+      new IterMap(info, exprs)
+    );
+  }
+
+  /**
+   * Flattens nested map expressions.
+   * @param cc compilation context
+   * @return optimized expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr flattenMaps(final CompileContext cc) throws QueryException {
+    final ExprList list = new ExprList();
     for(final Expr expr : exprs) {
       if(expr instanceof SimpleMap && !(expr instanceof CachedMap)) {
         list.add(expr.args());
@@ -96,14 +125,19 @@ public abstract class SimpleMap extends Arr {
         list.add(expr);
       }
     }
-    if(list.size() != exprs.length) return get(cc, info, list.finish());
-    exprs = list.next();
+    return list.size() != exprs.length ? get(cc, info, list.finish()) : null;
+  }
 
-    // determine type and result size, drop expressions that will never be evaluated
+  /**
+   * Determines the type and result size and drops expressions that will never be evaluated.
+   * @param cc compilation context
+   * @return optimized expression or {@code null}
+   */
+  private Expr dropOps(final CompileContext cc) {
+    final ExprList list = new ExprList(exprs.length);
     long min = 1, max = 1;
-    boolean item = true;
     for(final Expr expr : exprs) {
-      // no results: skip evaluation of remaining expressions
+      // no results: skip remaining expressions
       if(max == 0) break;
       list.add(expr);
       final long es = expr.size();
@@ -113,69 +147,19 @@ public abstract class SimpleMap extends Arr {
       } else if(es > 0) {
         min *= es;
         if(max != -1) max *= es;
-        if(es > 1) item = false;
       } else {
         final Occ o = expr.seqType().occ;
         if(o.min == 0) min = 0;
-        if(o.max > 1) {
-          max = -1;
-          item = false;
-        }
+        if(o.max > 1) max = -1;
       }
     }
-    if(exprs.length != list.size()) {
-      exprs = list.next();
-      cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
-    }
-    exprType.assign(exprs[exprs.length - 1].seqType(), new long[] { min, max });
+    final int ls = list.size();
+    if(exprs.length != ls) cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
+    if(ls == 1) return exprs[0];
 
-    // no results, deterministic expressions: return empty sequence
-    if(size() == 0 && !has(Flag.NDT)) return cc.emptySeq(this);
-
-    // merge paths
-    final Expr ex = mergePaths(cc);
-    if(ex != null) return ex;
-
-    // merge operands
-    final int el = exprs.length;
-    int e = 0;
-    boolean pushed = false;
-    for(int n = 1; n < el; n++) {
-      final Expr next = exprs[n], merged = merge(exprs[e], next, cc);
-      if(merged != null) {
-        cc.info(OPTMERGE_X, merged);
-        exprs[e] = merged;
-      } else if(!(next instanceof ContextValue)) {
-        // context item expression can be ignored
-        exprs[++e] = next;
-      }
-
-      if(e > 0) {
-        if(pushed) {
-          cc.updateFocus(exprs[e - 1]);
-        } else {
-          cc.pushFocus(exprs[e - 1]);
-          pushed = true;
-        }
-      }
-    }
-    if(pushed) cc.removeFocus();
-
-    // single expression: return this expression
-    if(e == 0) return exprs[0];
-    if(++e != el) exprs = Arrays.copyOf(exprs, e);
-
-    boolean cached = false;
-    for(final Expr expr : exprs) cached = cached || expr.has(Flag.POS);
-    final boolean dual = exprs.length == 2 && exprs[1].seqType().zeroOrOne();
-
-    // choose best map implementation
-    return copyType(
-      cached ? new CachedMap(info, exprs) :
-      item ? new ItemMap(info, exprs) :
-      dual ? new DualMap(info, exprs) :
-      new IterMap(info, exprs)
-    );
+    exprType.assign(list.peek().seqType(), new long[] { min, max });
+    exprs = list.finish();
+    return size() == 0 && !has(Flag.NDT) ? cc.emptySeq(this) : null;
   }
 
   /**
@@ -376,6 +360,43 @@ public abstract class SimpleMap extends Arr {
     final ExprList list = new ExprList(el - e + 1).add(path);
     for(; e < el; e++) list.add(exprs[e]);
     return get(cc, info, list.finish());
+  }
+
+  /**
+   * Merges the operands.
+   * @param cc compilation context
+   * @return resulting expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr mergeOps(final CompileContext cc) throws QueryException {
+    // merge operands
+    final int el = exprs.length;
+    int e = 0;
+    boolean pushed = false;
+    for(int n = 1; n < el; n++) {
+      final Expr next = exprs[n], merged = merge(exprs[e], next, cc);
+      if(merged != null) {
+        cc.info(OPTMERGE_X, merged);
+        exprs[e] = merged;
+      } else if(!(next instanceof ContextValue)) {
+        // context item expression can be ignored
+        exprs[++e] = next;
+      }
+
+      if(e > 0) {
+        if(pushed) {
+          cc.updateFocus(exprs[e - 1]);
+        } else {
+          cc.pushFocus(exprs[e - 1]);
+          pushed = true;
+        }
+      }
+    }
+    if(pushed) cc.removeFocus();
+
+    if(e == 0) return exprs[0];
+    if(++e != el) exprs = Arrays.copyOf(exprs, e);
+    return null;
   }
 
   @Override
