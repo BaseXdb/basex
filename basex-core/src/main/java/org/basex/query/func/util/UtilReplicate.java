@@ -133,7 +133,7 @@ public final class UtilReplicate extends StandardFunc {
       final long count = exprs[1] instanceof Int ? ((Int) exprs[1]).itr() : -1;
       final boolean single = singleEval();
       if(count > 0 && (single || !expr.has(Flag.NDT))) {
-        return cc.replaceWith(this, expr);
+        return cc.simplify(this, expr);
       }
     } else if(mode == Simplify.STRING || mode == Simplify.NUMBER || mode == Simplify.DATA) {
       final Expr[] args = exprs.clone();
