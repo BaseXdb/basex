@@ -93,7 +93,7 @@ public final class Dummy extends Item {
 
   @Override
   public void toString(final QueryString qs) {
-    final TokenList list = new TokenList().add(type.toString());
+    final TokenList list = new TokenList().add(seqType.toString());
     if(data != null) list.add(data.meta.name);
     qs.token(getClass()).params(list.finish());
   }

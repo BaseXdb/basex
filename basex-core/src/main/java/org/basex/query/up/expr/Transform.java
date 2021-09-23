@@ -12,7 +12,6 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -24,7 +23,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Lukas Kircher
  */
-public final class Transform extends Arr {
+public final class Transform extends Copy {
   /** Variable bindings created by copy clause. */
   private final Let[] copies;
 
@@ -32,38 +31,25 @@ public final class Transform extends Arr {
    * Constructor.
    * @param info input info
    * @param copies copy expressions
-   * @param mod modify expression
+   * @param modify modify expression
    * @param rtrn return expression
    */
-  public Transform(final InputInfo info, final Let[] copies, final Expr mod, final Expr rtrn) {
-    super(info, SeqType.ITEM_ZM, mod, rtrn);
+  public Transform(final InputInfo info, final Let[] copies, final Expr modify, final Expr rtrn) {
+    super(info, SeqType.ITEM_ZM, modify, rtrn);
     this.copies = copies;
+  }
+
+  @Override
+  public Expr compile(final CompileContext cc) throws QueryException {
+    for(final Let copy : copies) copy.compile(cc);
+    return super.compile(cc);
   }
 
   @Override
   public void checkUp() throws QueryException {
     for(final Let copy : copies) copy.checkUp();
-    final Expr modify = exprs[0];
-    modify.checkUp();
-    if(!modify.vacuous() && !modify.has(Flag.UPD)) throw UPMODIFY.get(info);
-    exprs[1].checkUp();
-  }
-
-  @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
-    for(final Let copy : copies) copy.expr = copy.expr.compile(cc);
-    return super.compile(cc);
-  }
-
-  @Override
-  public Expr optimize(final CompileContext cc) {
-    for(final Let copy : copies) {
-      copy.exprType.assign(copy.expr);
-    }
-    // name of node may change
-    final SeqType st = exprs[1].seqType();
-    exprType.assign(st.type, st.occ);
-    return this;
+    super.checkUp();
+    result().checkUp();
   }
 
   @Override
@@ -74,27 +60,25 @@ public final class Transform extends Arr {
     try {
       for(final Let copy : copies) {
         final Iter iter = copy.expr.iter(qc);
-        Item item = iter.next();
-        if(!(item instanceof ANode))
-          throw UPSINGLE_X_X.get(copy.info(), copy.var.name, item == null ? Empty.VALUE : item);
-        final Item i2 = iter.next();
-        if(i2 != null)
-          throw UPSINGLE_X_X.get(copy.info(), copy.var.name, ValueBuilder.concat(item, i2, qc));
+        Item node = iter.next(), node2 = node != null ? iter.next() : null;
+        final Value value = !(node instanceof ANode) ? node :
+          node2 != null ? ValueBuilder.concat(node, node2, qc) : null;
+        if(value != null) throw UPSINGLE_X_X.get(copy.info(), copy.var.name, value);
 
         // create main memory copy of node
-        item = ((ANode) item).copy(qc);
+        node = ((ANode) node).copy(qc);
         // add resulting node to variable
-        qc.set(copy.var, item);
-        updates.addData(item.data());
+        qc.set(copy.var, node);
+        updates.addData(node.data());
       }
-      if(!exprs[0].value(qc).isEmpty()) throw UPMODIFY.get(info);
 
+      if(!modify().value(qc).isEmpty()) throw UPMODIFY.get(info);
       updates.prepare(qc);
       updates.apply(qc);
     } finally {
       qc.updates = tmp;
     }
-    return exprs[1].value(qc);
+    return result().value(qc);
   }
 
   @Override
@@ -102,9 +86,9 @@ public final class Transform extends Arr {
     for(final Let copy : copies) {
       if(copy.has(flags)) return true;
     }
-    if(Flag.CNS.in(flags) || Flag.UPD.in(flags) && exprs[1].has(Flag.UPD)) return true;
-    final Flag[] flgs = Flag.UPD.remove(flags);
-    return flgs.length != 0 && super.has(flgs);
+    return Flag.CNS.in(flags) ||
+        Flag.UPD.in(flags) && result().has(Flag.UPD) ||
+        super.has(Flag.UPD.remove(flags));
   }
 
   @Override
@@ -128,8 +112,8 @@ public final class Transform extends Arr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Transform(info, copyAll(cc, vm, copies), exprs[0].copy(cc, vm),
-        exprs[1].copy(cc, vm)));
+    return copyType(new Transform(info, copyAll(cc, vm, copies), modify().copy(cc, vm),
+        result().copy(cc, vm)));
   }
 
   @Override
@@ -141,8 +125,7 @@ public final class Transform extends Arr {
   public int exprSize() {
     int size = 1;
     for(final Let copy : copies) size += copy.exprSize();
-    for(final Expr expr : exprs) size += expr.exprSize();
-    return size;
+    return size + super.exprSize();
   }
 
   @Override
@@ -165,6 +148,6 @@ public final class Transform extends Arr {
       else more = true;
       qs.token(copy.var.id()).token(ASSIGN).token(copy.expr);
     }
-    qs.token(MODIFY).token(exprs[0]).token(RETURN).token(exprs[1]);
+    qs.token(MODIFY).token(modify()).token(RETURN).token(result());
   }
 }
