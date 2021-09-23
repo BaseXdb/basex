@@ -901,7 +901,7 @@ public abstract class Path extends ParseExpr {
             chngd = true;
           } else if(next != null) {
             // merge steps: //*  ->  /descendant::*
-            next = mergeStep(crr, next, cc);
+            next = mergeStep(crr, next, s > 0 ? steps[s - 1] : root, cc);
             if(next != null) {
               cc.info(QueryText.OPTMERGE_X, next);
               curr = next;
@@ -989,12 +989,13 @@ public abstract class Path extends ParseExpr {
    * Merges adjacent steps.
    * @param curr current step
    * @param next next step
+   * @param prev previous step (can be {@code null})
    * @param cc compilation context
    * @return merged expression or {@code null}
    * @throws QueryException query exception
    */
-  private static Expr mergeStep(final Step curr, final Expr next, final CompileContext cc)
-      throws QueryException {
+  private static Expr mergeStep(final Step curr, final Expr next, final Expr prev,
+      final CompileContext cc) throws QueryException {
 
     // merge self steps:  child::*/self::a  ->  child::a
     final Step nxt = next instanceof Step ? (Step) next : null;
@@ -1002,7 +1003,7 @@ public abstract class Path extends ParseExpr {
       final Test test = curr.test.intersect(nxt.test);
       if(test == null) return null;
       curr.test = test;
-      return curr.addPredicates(nxt.exprs);
+      return curr.addPredicates(nxt.exprs).optimize(prev, cc);
     }
 
     if(curr.axis != DESCENDANT_OR_SELF || curr.test != KindTest.NODE || curr.exprs.length > 0)
@@ -1016,6 +1017,12 @@ public abstract class Path extends ParseExpr {
       }
       return false;
     };
+    // example: //child::*  ->  descendant::*
+    if(simple.test(nxt)) {
+      nxt.axis = DESCENDANT;
+      return nxt.optimize(prev, cc);
+    }
+
     // function for merging steps inside union expressions
     final QueryFunction<Expr, Expr> rewrite = expr -> {
       final Checks<Expr> startWithChild = ex -> {
@@ -1034,12 +1041,6 @@ public abstract class Path extends ParseExpr {
       }
       return null;
     };
-
-    // example: //child::*  ->  descendant::*
-    if(simple.test(nxt)) {
-      nxt.axis = DESCENDANT;
-      return nxt;
-    }
     // example: //(text()|*)  ->  (descendant::text() | descendant::*)
     if(next instanceof Union) {
       return rewrite.apply(next);

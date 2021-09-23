@@ -2190,6 +2190,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("document { <a b='c'/> }/descendant::a//@*", "b=\"c\"",
         exists("IterStep[@axis = 'descendant']"));
     check("<a b='c'/>/descendant-or-self::attribute()", "", root(Empty.class));
+    check("document { <a/> }//self::a", "<a/>",
+        exists("IterStep[@axis = 'descendant'][@test = 'a']"));
 
     check("(document { }, <a/>)/descendant-or-self::document-node()", "",
         exists("IterStep[@axis = 'self']"));
