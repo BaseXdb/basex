@@ -52,6 +52,7 @@ public final class UtilItem extends StandardFunc {
     final SeqType st = expr.seqType();
     if(st.zero()) return expr;
 
+    Occ occ = Occ.ZERO_OR_ONE;
     if(position instanceof Value) {
       // retrieve (possibly invalid) position
       final long pos = pos(cc.qc);
@@ -66,6 +67,7 @@ public final class UtilItem extends StandardFunc {
         if(pos + 1 > size) return Empty.VALUE;
         if(REVERSE.is(expr))
           return cc.function(_UTIL_ITEM, info, expr.arg(0), Int.get(size - pos));
+        occ = Occ.EXACTLY_ONE;
       }
       if(pos == 0) return cc.function(HEAD, info, expr);
 
@@ -100,7 +102,7 @@ public final class UtilItem extends StandardFunc {
     if(_UTIL_INIT.is(expr))
       return cc.function(_UTIL_ITEM, info, expr.arg(0), position);
 
-    exprType.assign(st.with(Occ.ZERO_OR_ONE));
+    exprType.assign(st.with(occ));
     data(expr.data());
     return this;
   }
