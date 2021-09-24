@@ -41,11 +41,6 @@ public final class Dummy extends Item {
   }
 
   @Override
-  public boolean ddo() {
-    return type instanceof NodeType;
-  }
-
-  @Override
   public byte[] string(final InputInfo ii) {
     throw Util.notExpected();
   }

@@ -31,11 +31,6 @@ public final class UtilDdo extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     Expr expr = exprs[0];
-    final Type type = expr.seqType().type;
-
-    // util:ddo(util:replicate(*, 2))  ->  util:ddo(*)
-    if(expr instanceof UtilReplicate && ((UtilReplicate) expr).once() &&
-        type instanceof NodeType) return expr.arg(0);
 
     // replace list with union:
     // util:ddo((<a/>, <b/>))  ->  <a/> | <b/>
@@ -45,12 +40,15 @@ public final class UtilDdo extends StandardFunc {
       if(expr != exprs[0]) return expr;
     }
 
-    // util:ddo(/a/b/c)  ->  /a/b/c
-    if(expr.ddo()) return expr;
-
-    // adopt type of argument
-    if(type instanceof NodeType) exprType.assign(type);
-
+    final Type type = expr.seqType().type;
+    if(type instanceof NodeType) {
+      // util:ddo(util:replicate(*, 2))  ->  util:ddo(*)
+      if(expr instanceof UtilReplicate && ((UtilReplicate) expr).once()) return expr.arg(0);
+      // util:ddo(/a/b/c)  ->  /a/b/c
+      if(expr.ddo()) return expr;
+      // adopt type of argument
+      exprType.assign(type);
+    }
     return this;
   }
 }

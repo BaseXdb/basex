@@ -310,7 +310,7 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Indicates if this expression returns nodes in document order without duplicates.
+   * Indicates if this expression returns items in document order without duplicates.
    * @return result of check
    */
   public boolean ddo() {

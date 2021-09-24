@@ -288,8 +288,8 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public boolean ddo() {
-    return type instanceof NodeType;
+  public final boolean ddo() {
+    return true;
   }
 
   /**

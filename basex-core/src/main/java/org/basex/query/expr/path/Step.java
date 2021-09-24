@@ -373,7 +373,7 @@ public abstract class Step extends Preds {
     final Value value = qc.focus.value;
     if(value instanceof ANode) return (ANode) value;
     throw value == null ? QueryError.NOCTX_X.get(info, this) :
-      QueryError.STEPNODE_X_X_X.get(info, this, value.type, value);
+      QueryError.PATHNODE_X_X_X.get(info, this, value.type, value);
   }
 
   @Override
