@@ -250,7 +250,7 @@ public abstract class Path extends ParseExpr {
     for(final Expr step : steps) {
       if(!(step instanceof Step)) return false;
       final Axis axis = ((Step) step).axis;
-      if(axis != Axis.SELF && axis != Axis.CHILD && axis != Axis.ATTRIBUTE) return false;
+      if(axis != SELF && axis != CHILD && axis != ATTRIBUTE) return false;
     }
     return true;
   }
@@ -311,15 +311,16 @@ public abstract class Path extends ParseExpr {
       // remove redundant steps:
       // <xml/>/self::node()  ->  <xml/>
       // $text/descendant-or-self::text()  ->  $text
-      final Step st = axisStep(s);
-      if(st != null && st.exprs.length == 0 && st.test instanceof KindTest) {
-        final Expr prev = list.isEmpty() ? root : list.peek();
-        if(prev != null) {
-          final Type type = prev.seqType().type;
-          if(type.instanceOf(st.test.type) && (
+      final Expr prev = list.isEmpty() ? root : list.peek();
+      if(prev != null) {
+        final Type prevType = prev.seqType().type;
+        if(prevType instanceof NodeType && prevType.instanceOf(steps[s].seqType().type)) {
+          final Step st = axisStep(s);
+          if(steps[s] instanceof ContextValue ||
+            st != null && st.exprs.length == 0 && st.test instanceof KindTest && (
             st.axis == SELF ||
-            st.axis == DESCENDANT_OR_SELF && type.oneOf(NodeType.LEAF_TYPES) ||
-            st.axis == ANCESTOR_OR_SELF && type.instanceOf(NodeType.DOCUMENT_NODE)
+            st.axis == DESCENDANT_OR_SELF && prevType.oneOf(NodeType.LEAF_TYPES) ||
+            st.axis == ANCESTOR_OR_SELF && prevType.instanceOf(NodeType.DOCUMENT_NODE)
           )) {
             removed = true;
             continue;
@@ -350,7 +351,7 @@ public abstract class Path extends ParseExpr {
 
     // no steps left: return root
     steps = list.finish();
-    return steps.length == 0 ? cc.replaceWith(this, root) : this;
+    return steps.length == 0 ? cc.simplify(this, root) : this;
   }
 
   /**
