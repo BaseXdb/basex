@@ -88,6 +88,10 @@ public abstract class Filter extends Preds {
 
     // no positional access..
     if(!mayBePositional()) {
+      // convert to axis path: .[text()]  ->  self::node()[text()]
+      if(root instanceof ContextValue && st.type instanceof NodeType) {
+        return Path.get(cc, info, null, Step.get(cc, root, info, exprs));
+      }
       // convert to axis path: (//x)[text() = 'a']  ->  //x[text() = 'a']
       if(root instanceof AxisPath) return ((AxisPath) root).addPredicates(cc, exprs);
 

@@ -1234,10 +1234,6 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("<_><a/></_>/*/(.[self::a] union .[self::b])", "<a/>",
         empty(Union.class));
-    check("<_><a/></_>/*/(.[self::a] intersect .[self::b])", "",
-        empty(Intersect.class));
-    check("<_><a/></_>/*/(.[self::a] except .[self::b])", "<a/>",
-        empty(Except.class), exists(EMPTY));
 
     check("<_><a/></_>/(.[b][c] union .[d])", "",
         empty(Union.class), exists(And.class), exists(Or.class));
@@ -2077,7 +2073,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("util:replicate(<a/>, 2) ! (. = 'x')", "false\nfalse", root(_UTIL_REPLICATE));
 
     check("(10, 10) ! .[. = 5]", "", root(IterFilter.class));
-    check("util:replicate(<a/>, 2) ! .[data()]", "", root(IterFilter.class));
+    check("util:replicate(<a/>, 2) ! .[data()]", "", root(_UTIL_REPLICATE));
   }
 
   /** Inlining context item expression. */
