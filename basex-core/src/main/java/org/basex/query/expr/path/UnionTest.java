@@ -35,6 +35,14 @@ public final class UnionTest extends Test {
   }
 
   @Override
+  public Boolean matches(final SeqType seqType) {
+    final Type tp = seqType.type;
+    if(tp.intersect(type) == null) return Boolean.FALSE;
+    final Test test = seqType.test();
+    return tp == type && test instanceof UnionTest && equals(test) ? Boolean.TRUE : null;
+  }
+
+  @Override
   public Test copy() {
     return this;
   }
@@ -67,6 +75,11 @@ public final class UnionTest extends Test {
       if(t2 != null) list.add(t2);
     }
     return get(list.toArray(new Test[0]));
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return obj instanceof UnionTest && Arrays.equals(tests, ((UnionTest) obj).tests);
   }
 
   @Override

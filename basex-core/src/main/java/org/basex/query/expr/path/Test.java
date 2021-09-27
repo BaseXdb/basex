@@ -121,6 +121,15 @@ public abstract class Test extends ExprInfo {
   }
 
   /**
+   * Checks if the current test will match items of the specified type.
+   * @param seqType type to be checked
+   * @return result of check (matches never, always, or {@code null} if unknown)
+   */
+  public Boolean matches(@SuppressWarnings("unused") final SeqType seqType) {
+    return null;
+  }
+
+  /**
    * Copies this test.
    * @return deep copy
    */

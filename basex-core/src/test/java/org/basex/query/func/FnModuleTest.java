@@ -142,7 +142,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" ()"), false, empty(func));
 
     // function is replaced with fn:exists
-    check(func.args(" <a/>/self::a"), true, exists(EXISTS));
+    check(func.args(" <a>A</a>/text()"), true, exists(EXISTS));
     // function is replaced by its argument (argument yields no result)
     check("(false(), true())[" + func.args(" .") + "]", true, empty(func));
     // no replacement

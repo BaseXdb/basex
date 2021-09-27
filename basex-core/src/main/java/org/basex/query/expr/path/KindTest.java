@@ -77,6 +77,13 @@ public class KindTest extends Test {
   }
 
   @Override
+  public Boolean matches(final SeqType seqType) {
+    final Type tp = seqType.type;
+    if(tp.intersect(type) == null) return Boolean.FALSE;
+    return tp.instanceOf(type) ? Boolean.TRUE : null;
+  }
+
+  @Override
   public boolean instanceOf(final Test test) {
     return (test instanceof KindTest || test instanceof UnionTest) && super.instanceOf(test);
   }

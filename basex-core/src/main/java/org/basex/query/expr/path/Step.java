@@ -181,17 +181,17 @@ public abstract class Step extends Preds {
 
   @Override
   protected final void type(final Expr expr) {
-    if(expr != null && axis == SELF && test instanceof KindTest) {
-      final Type type = expr.seqType().type;
-      if(test == KindTest.NODE) {
-        // node test: adopt type of context expression
-        // <a/>/self::node()
-        exprType.assign(type);
-      } else if(type == test.type && exprs.length == 0) {
-        // other kind tests, no predicates: step will yield one result
-        // $elements/self::element()
-        exprType.assign(Occ.EXACTLY_ONE);
-      }
+    if(expr == null || axis != SELF) return;
+
+    final SeqType seqType = expr.seqType();
+    if(test == KindTest.NODE) {
+      // node test: adopt type of context expression
+      // <a/>/self::node()
+      exprType.assign(seqType.type);
+    } else if(exprs.length == 0 && test.matches(seqType) == Boolean.TRUE) {
+      // other kind tests, no predicates: step will yield one result
+      // $elements/self::element()
+      exprType.assign(Occ.EXACTLY_ONE);
     }
   }
 
@@ -331,7 +331,7 @@ public abstract class Step extends Preds {
     switch(axis) {
       // $element/self::text(), ...
       case SELF:
-        return type != NodeType.NODE && !type.instanceOf(inputType);
+        return test.matches(seqType) == Boolean.FALSE;
       // $attribute/descendant::, $text/child::, $comment/attribute::, ...
       case DESCENDANT:
       case CHILD:
@@ -362,13 +362,13 @@ public abstract class Step extends Preds {
     // <xml/>/.  ->  <xml/>
     // <xml/>/self::node()  ->  <xml/>
     // $text/descendant-or-self::text()  ->  $text
-    // $doc/ancestor-or-self::text()  ->  doc
+    // $doc/ancestor-or-self::text()  ->  $doc
     final Type prevType = seqType.type;
-    return exprs.length == 0 && test instanceof KindTest && (
+    return exprs.length == 0 && (
       axis == SELF ||
       axis == DESCENDANT_OR_SELF && prevType.oneOf(NodeType.LEAF_TYPES) ||
       axis == ANCESTOR_OR_SELF && prevType.instanceOf(NodeType.DOCUMENT_NODE)
-    ) && prevType.instanceOf(seqType().type);
+    ) && test.matches(seqType) == Boolean.TRUE;
   }
 
   /**

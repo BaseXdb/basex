@@ -107,6 +107,18 @@ public final class NameTest extends Test {
     }
   }
 
+  @Override
+  public Boolean matches(final SeqType seqType) {
+    final Type tp = seqType.type;
+    if(tp.intersect(type) == null) return Boolean.FALSE;
+    final Test test = seqType.test();
+    if(tp == type && test instanceof NameTest) {
+      final NameTest np = (NameTest) test;
+      if(np.part == NamePart.FULL || np.part == part) return matches(np.qname);
+    }
+    return null;
+  }
+
   /**
    * Returns the name part relevant at runtime.
    * @return name part

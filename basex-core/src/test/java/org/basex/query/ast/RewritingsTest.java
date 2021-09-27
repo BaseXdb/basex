@@ -606,7 +606,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>/1", 1, root(Int.class));
     check("<a/>/<a/>", "<a/>", root(CElem.class));
     check("(<a/>/map { 1:2 })?1", 2, root(Int.class));
-    check("<a/>/self::a/count(.)", 1, root("ItemMap"));
+    check("<a/>/self::a/count(.)", 1, root(Int.class));
+    check("<a/>/a/count(.)", "", root(DualMap.class));
 
     // no rewriting possible
     check("(<a/>, <b/>)/<c/>", "<c/>\n<c/>", root(MixedPath.class));
@@ -650,10 +651,13 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Merge adjacent steps in path expressions. */
   @Test public void gh1761() {
     // merge self steps
-    check("<a/>/self::*/self::a", "<a/>", count(IterStep.class, 1));
-    check("<a/>/self::*/self::b", "", count(IterStep.class, 1));
-    check("<a/>/self::a/self::*", "<a/>", count(IterStep.class, 1));
-    check("<a/>/self::a/self::node()", "<a/>", count(IterStep.class, 1));
+    check("<a/>/self::*/self::a", "<a/>", root(CElem.class));
+    check("<a/>/self::*/self::Q{}a", "<a/>", root(CElem.class));
+
+    check("<a/>/self::*/self::b", "", empty());
+    check("<a/>/self::Q{}*/self::a", "<a/>", root(CElem.class));
+    check("<a/>/self::a/self::*", "<a/>", root(CElem.class));
+    check("<a/>/self::a/self::node()", "<a/>", root(CElem.class));
 
     // merge descendant and self steps
     check("document { <a/> }//self::a", "<a/>", count(IterStep.class, 1));
@@ -669,13 +673,13 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Merge steps and predicates with self steps. */
   @Test public void gh1762() {
     // merge self steps
-    check("<a/>/self::*[self::a]", "<a/>", count(IterStep.class, 1));
-    check("<a/>/self::*[self::b]", "", count(IterStep.class, 1));
-    check("<a/>/self::a[self::*]", "<a/>", count(IterStep.class, 1));
-    check("<a/>/self::a[self::node()]", "<a/>", count(IterStep.class, 1));
+    check("<a/>/self::*[self::a]", "<a/>", root(CElem.class));
+    check("<a/>/self::*[self::b]", "", empty());
+    check("<a/>/self::a[self::*]", "<a/>", root(CElem.class));
+    check("<a/>/self::a[self::node()]", "<a/>", root(CElem.class));
 
     // nested predicates
-    check("<a/>/self::a[self::a[self::a[self::a]]]", "<a/>", count(IterStep.class, 1));
+    check("<a/>/self::a[self::a[self::a[self::a]]]", "<a/>", root(CElem.class));
 
     // combined kind test
     check("document { <a/>, <b/> }/a[self::a | self::b]", "<a/>", count(IterStep.class, 1));
@@ -683,9 +687,13 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Path tests. */
   @Test public void gh1729() {
+    check("let $x := 'g' return <g/>[name() = $x]", "<g/>",
+        root(IterFilter.class), exists(IterFilter.class));
     check("let $x := 'g' return <g/> ! self::g[name() = $x]", "<g/>",
         root(IterPath.class));
     check("let $x := 'g' return <g/> ! self::*[local-name() = $x]", "<g/>",
+        root(CElem.class));
+    check("let $x := 'g' return <g/> ! *[local-name() = $x]", "",
         root(IterPath.class));
   }
 
@@ -845,14 +853,13 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Rewrite name tests to self steps. */
   @Test public void gh1770() {
-    check("<a/>[node-name() eq xs:QName('a')]", "<a/>", exists(SingleIterPath.class));
-    check("<a/>[local-name() eq 'a']", "<a/>", exists(SingleIterPath.class));
+    check("<a/>[node-name() eq xs:QName('a')]", "<a/>", root(CElem.class));
+    check("<a/>[local-name() eq 'a']", "<a/>", root(CElem.class));
 
-    check("<a/>[local-name() = ('a', 'b', '')]", "<a/>", exists(SingleIterPath.class));
-    check("<a/>[local-name() = 'a' or local-name() = 'b']", "<a/>", exists(SingleIterPath.class));
-    check("<a/>[node-name() = (xs:QName('a'), xs:QName('b'))]", "<a/>",
-        exists(SingleIterPath.class));
-    check("<a/>[local-name() = ('a', 'a', 'a')]", "<a/>", exists(SingleIterPath.class));
+    check("<a/>[local-name() = ('a', 'b', '')]", "<a/>", root(CElem.class));
+    check("<a/>[local-name() = 'a' or local-name() = 'b']", "<a/>", root(CElem.class));
+    check("<a/>[node-name() = (xs:QName('a'), xs:QName('b'))]", "<a/>", root(CElem.class));
+    check("<a/>[local-name() = ('a', 'a', 'a')]", "<a/>", root(CElem.class));
 
     check("(<a/>, <b/>)[. = '!'][local-name() = 'a']", "", empty(LOCAL_NAME));
 
@@ -861,9 +868,9 @@ public final class RewritingsTest extends QueryPlanTest {
 
     final String prolog = "declare default element namespace 'A'; ";
     check(prolog + "<a/>[node-name() eq QName('A', 'a')]",
-        "<a xmlns=\"A\"/>", exists(SingleIterPath.class));
+        "<a xmlns=\"A\"/>", root(CElem.class));
     check(prolog + "<a/>[namespace-uri() eq 'A']",
-        "<a xmlns=\"A\"/>", exists(SingleIterPath.class));
+        "<a xmlns=\"A\"/>", root(CElem.class));
 
     // no rewritings
     check("<a/>[local-name() != 'a']", "", exists(LOCAL_NAME));
@@ -1242,10 +1249,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_><a/></_>/(.[b][c] except .[d])", "",
         empty(Except.class), exists(EMPTY), empty(And.class));
 
+    check("<_><a/></_>/(a union self::a)", "<a/>", empty(Union.class));
+
     // no optimization
     check("<_><a/></_>/(a union a/*[b])", "<a/>", exists(Union.class));
     check("<_><a/></_>/(a union a/<b/>)", "<a/>\n<b/>", exists(Union.class));
-    check("<_><a/></_>/(a union self::a)", "<a/>", exists(Union.class));
     check("<_><a/></_>/(a[1] union a[2])", "<a/>", exists(Union.class));
     check("<_/>/(<b/>[*] union <c/>[*])", "", exists(Union.class));
   }
@@ -1568,12 +1576,9 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Lacking filter rewriting. */
   @Test public void gh1879() {
-    check("let $a := <a/> return $a[$a/self::a]", "<a/>",
-        empty(CachedFilter.class), count(IterFilter.class, 1));
-    check("let $a := <a/> return $a[./self::a]", "<a/>",
-        empty(CachedFilter.class), count(IterFilter.class, 1));
-    check("let $a := <a/> return $a[self::a]", "<a/>",
-        empty(CachedFilter.class), count(IterFilter.class, 1));
+    check("let $a := <a/> return $a[$a/self::a]", "<a/>", root(CElem.class));
+    check("let $a := <a/> return $a[./self::a]", "<a/>", root(CElem.class));
+    check("let $a := <a/> return $a[self::a]", "<a/>", root(CElem.class));
   }
 
   /** Single let, inline where clause. */
@@ -1581,11 +1586,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("let $a := <a/> where $a return $a", "<a/>",
         empty(GFLWOR.class), root(CElem.class));
     check("let $a := <a/> where $a/self::a return $a", "<a/>",
-        empty(GFLWOR.class), root(IterFilter.class));
+        empty(GFLWOR.class), root(CElem.class));
     check("let $a := <a/> where $a/self::a return $a[. = '']", "<a/>",
         empty(GFLWOR.class), count(IterFilter.class, 1));
     check("let $a := <a/> where $a[. = ''] return $a/self::a", "<a/>",
-        empty(GFLWOR.class), root(IterPath.class));
+        empty(GFLWOR.class), root(IterFilter.class));
     check("let $a as element(a) := <a/> where $a return $a", "<a/>",
         root(CElem.class));
 
@@ -1803,11 +1808,11 @@ public final class RewritingsTest extends QueryPlanTest {
     // fragments
     inline(true);
     check("function() as element(a)? { <a/>/self::a }()",
-        "<a/>", root(IterPath.class));
+        "<a/>", root(CElem.class));
     check("function() as element(a)? { <a/>/self::Q{}a }()",
-        "<a/>", root(IterPath.class));
+        "<a/>", root(CElem.class));
     check("function() as element(Q{}a)? { <a/>/self::Q{}a }()",
-        "<a/>", root(IterPath.class));
+        "<a/>", root(CElem.class));
 
     // database nodes
     execute(new CreateDB(NAME, "<x>A</x>"));
@@ -1824,9 +1829,9 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // no rewriting allowed
     check("function() as element(a)? { <a/>/self::*:a }()",
-        "<a/>", root(TypeCheck.class));
+        "<a/>", root(CElem.class));
     check("function() as element(xml:a)? { <xml:a/>/self::xml:* }()",
-        "<xml:a/>", root(TypeCheck.class));
+        "<xml:a/>", root(CElem.class));
     error("function() as element(a)? { <xml:a/>/self::xml:a }()", INVPROMOTE_X_X_X);
   }
 

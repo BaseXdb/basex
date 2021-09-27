@@ -565,6 +565,14 @@ public final class SeqType {
   }
 
   /**
+   * Returns the kind test.
+   * @return kind test
+   */
+  public Test test() {
+    return test;
+  }
+
+  /**
    * Checks the types for equality.
    * @param st type
    * @return result of check
