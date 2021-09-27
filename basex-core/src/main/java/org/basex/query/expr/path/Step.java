@@ -305,11 +305,12 @@ public abstract class Step extends Preds {
 
   /**
    * Checks if the step will never yield results.
-   * @param inputType type of incoming nodes
+   * @param seqType type of incoming nodes
    * @return {@code true} if steps will never yield results
    */
-  final boolean emptyStep(final NodeType inputType) {
+  final boolean empty(final SeqType seqType) {
     // checks steps on document nodes
+    final Type inputType = seqType.type;
     final NodeType type = test.type;
     if(inputType.instanceOf(NodeType.DOCUMENT_NODE) && ((Check) () -> {
       switch(axis) {
@@ -350,6 +351,24 @@ public abstract class Step extends Preds {
       default:
         return false;
     }
+  }
+
+  /**
+   * Checks if the step is redundant.
+   * @param seqType type of incoming nodes
+   * @return {@code true} if the step can be ignored
+   */
+  final boolean redundant(final SeqType seqType) {
+    // <xml/>/.  ->  <xml/>
+    // <xml/>/self::node()  ->  <xml/>
+    // $text/descendant-or-self::text()  ->  $text
+    // $doc/ancestor-or-self::text()  ->  doc
+    final Type prevType = seqType.type;
+    return exprs.length == 0 && test instanceof KindTest && (
+      axis == SELF ||
+      axis == DESCENDANT_OR_SELF && prevType.oneOf(NodeType.LEAF_TYPES) ||
+      axis == ANCESTOR_OR_SELF && prevType.instanceOf(NodeType.DOCUMENT_NODE)
+    ) && prevType.instanceOf(seqType().type);
   }
 
   /**

@@ -221,12 +221,6 @@ public abstract class Preds extends Arr {
             return;
           }
         }
-        if(predStep.test instanceof KindTest && predStep.exprs.length == 0 &&
-            rst.type.instanceOf(predStep.test.type)) {
-          // <a/>[self:*]  ->  <a/>
-          cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-          return;
-        }
       }
     }
 

@@ -308,23 +308,14 @@ public abstract class Path extends ParseExpr {
     boolean removed = false;
     final ExprList list = new ExprList(sl);
     for(int s = 0; s < sl; s++) {
-      // remove redundant steps:
-      // <xml/>/self::node()  ->  <xml/>
-      // $text/descendant-or-self::text()  ->  $text
+      final Expr step = steps[s];
       final Expr prev = list.isEmpty() ? root : list.peek();
       if(prev != null) {
-        final Type prevType = prev.seqType().type;
-        if(prevType instanceof NodeType && prevType.instanceOf(steps[s].seqType().type)) {
-          final Step st = axisStep(s);
-          if(steps[s] instanceof ContextValue ||
-            st != null && st.exprs.length == 0 && st.test instanceof KindTest && (
-            st.axis == SELF ||
-            st.axis == DESCENDANT_OR_SELF && prevType.oneOf(NodeType.LEAF_TYPES) ||
-            st.axis == ANCESTOR_OR_SELF && prevType.instanceOf(NodeType.DOCUMENT_NODE)
-          )) {
-            removed = true;
-            continue;
-          }
+        final SeqType seqType = prev.seqType();
+        if(seqType.type instanceof NodeType && (step instanceof ContextValue ||
+            step instanceof Step && ((Step) step).redundant(seqType))) {
+          removed = true;
+          continue;
         }
       }
 
@@ -357,7 +348,7 @@ public abstract class Path extends ParseExpr {
   /**
    * Returns the path nodes that will result from this path.
    * @param rt root at compile time (can be {@code null})
-   * @return path nodes or {@code null} if nodes cannot be evaluated
+   * @return path nodes, or {@code null} if nodes cannot be evaluated
    */
   public final ArrayList<PathNode> pathNodes(final Expr rt) {
     // ensure that path starts with document nodes
@@ -365,16 +356,32 @@ public abstract class Path extends ParseExpr {
         !data.meta.uptodate) return null;
 
     ArrayList<PathNode> nodes = data.paths.root();
-    final int sl = steps.length;
-    for(int s = 0; s < sl; s++) {
-      final Step curr = axisStep(s);
-      if(curr == null) return null;
-      nodes = curr.nodes(nodes, data);
-      if(nodes == null) return null;
+    for(final Expr step : steps) {
+      if(step instanceof Step) {
+        nodes = ((Step) step).nodes(nodes, data);
+        if(nodes == null) return null;
+      }
     }
     return nodes;
   }
 
+  /**
+   * Checks if the path contains empty steps.
+   * @param rt root at compile time (can be {@code null})
+   * @return result of check
+   */
+  public final boolean emptySteps(final Expr rt) {
+    if(rt != null) {
+      Expr prev = rt;
+      for(final Expr step : steps) {
+        final SeqType seqType = prev.seqType();
+        if(seqType.type instanceof NodeType && step instanceof Step && ((Step) step).empty(seqType))
+          return true;
+        prev = step;
+      }
+    }
+    return false;
+  }
   /**
    * Checks if a path can be evaluated iteratively (i.e., if all results will be in distinct
    * document order without final sorting).
@@ -540,20 +547,8 @@ public abstract class Path extends ParseExpr {
    * @return original or new expression
    */
   private Expr removeEmpty(final CompileContext cc, final Expr rt) {
-    final Check emptySteps = () -> {
-      Expr prev = rt;
-      for(final Expr step : steps) {
-        if(step instanceof Step && prev != null) {
-          final Type type = prev.seqType().type;
-          if(type instanceof NodeType && ((Step) step).emptyStep((NodeType) type)) return true;
-        }
-        prev = step;
-      }
-      return false;
-    };
-
     final ArrayList<PathNode> nodes = pathNodes(rt);
-    if(nodes != null ? nodes.isEmpty() : emptySteps.ok()) {
+    if(nodes != null ? nodes.isEmpty() : emptySteps(rt)) {
       cc.info(QueryText.OPTPATH_X, this);
       return Empty.VALUE;
     }
