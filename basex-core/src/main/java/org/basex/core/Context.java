@@ -304,13 +304,17 @@ public final class Context {
   }
 
   /**
-   * Returns an external object.
+   * Returns an external object of the specified class or interface.
    * @param clz class of external object
    * @return object or {@code null}
    */
   public Object getExternal(final Class<?> clz) {
     for(final Object object : external) {
-      if(object.getClass() == clz) return object;
+      final Class<?> c = object.getClass();
+      if(c == clz) return object;
+      for(final Class<?> inter : c.getInterfaces()) {
+        if(inter == clz) return object;
+      }
     }
     return null;
   }

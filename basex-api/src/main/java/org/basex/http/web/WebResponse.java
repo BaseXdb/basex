@@ -60,8 +60,6 @@ public abstract class WebResponse {
       final Expr[] args = new Expr[sf.params.length];
       bind(args, data);
       qc.jc().description(toString(func, args));
-      if(ctx.soptions.get(StaticOptions.LOGTRACE)) qc.jc().tracer = ctx.log;
-
       qc.mainModule(MainModule.get(sf, args));
       return serialize(body);
     } catch(final QueryException ex) {

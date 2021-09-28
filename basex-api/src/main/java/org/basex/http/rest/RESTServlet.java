@@ -25,11 +25,8 @@ public final class RESTServlet extends BaseXServlet {
 
     // generate and run commands
     final RESTCmd cmd = command(session);
-    final Context ctx = conn.context;
-    if(ctx.soptions.get(StaticOptions.LOGTRACE)) cmd.jc().tracer = ctx.log;
-
     try {
-      cmd.execute(ctx);
+      cmd.execute(conn.context);
       conn.log(SC_OK, "");
     } catch(final BaseXException ex) {
       // ignore error if code was assigned (same error message)

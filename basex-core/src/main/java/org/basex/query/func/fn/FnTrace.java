@@ -59,6 +59,6 @@ public class FnTrace extends StandardFunc {
     final TokenBuilder tb = new TokenBuilder();
     if(label != null) tb.add(label);
     final String info = tb.add(value).toString();
-    if(qc.jc().tracer.print(info)) qc.evalInfo(info);
+    if(qc.jc().tracer().print(info)) qc.evalInfo(info);
   }
 }

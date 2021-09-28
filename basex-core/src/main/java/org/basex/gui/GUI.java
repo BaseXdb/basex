@@ -205,6 +205,8 @@ public final class GUI extends JFrame implements BaseXWindow {
     text = new TextView(notify);
     editor = new EditorView(notify);
     info = new InfoView(notify);
+    // register the info view for trace output
+    context.setExternal(info);
 
     // create panels for closed and opened database mode
     views = new ViewContainer(this, text, editor, info, new FolderView(notify),
@@ -400,8 +402,6 @@ public final class GUI extends JFrame implements BaseXWindow {
     output.setLimit(gopts.get(GUIOptions.MAXTEXT));
     // sets the maximum number of hits
     cmd.maxResults(gopts.get(GUIOptions.MAXRESULTS));
-    // attaches the info listener to the command
-    cmd.jc().tracer = info;
 
     final Performance perf = new Performance();
     boolean ok = true;

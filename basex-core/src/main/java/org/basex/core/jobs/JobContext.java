@@ -12,8 +12,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class JobContext {
-  /** Prints trace output to the standard error. */
-  private static final QueryTracer ERRLN = info -> {
+  /** Prints trace output to standard error. */
+  private static final QueryTracer TRACER = info -> {
     Util.errln(info);
     return false;
   };
@@ -30,13 +30,11 @@ public final class JobContext {
 
   /** Performance measurements. */
   public Performance performance;
-  /** Query tracer. */
-  public QueryTracer tracer = ERRLN;
   /** Database context. */
   public Context context;
+
   /** Root job. */
   private final Job job;
-
   /** Job id. Will be set while job is registered. */
   private String id;
   /** Job name (optional). */
@@ -94,6 +92,18 @@ public final class JobContext {
    */
   public String type() {
     return tp != null ? tp : Util.className(job);
+  }
+
+  /**
+   * Returns the query tracer.
+   * @return name
+   */
+  public QueryTracer tracer() {
+    if(context != null) {
+      final QueryTracer qt = (QueryTracer) context.getExternal(QueryTracer.class);
+      if(qt != null) return qt;
+    }
+    return TRACER;
   }
 
   @Override

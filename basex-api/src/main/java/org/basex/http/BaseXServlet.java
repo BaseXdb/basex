@@ -33,8 +33,10 @@ public abstract class BaseXServlet extends HttpServlet {
   @Override
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
+
+    final HTTPContext hc = HTTPContext.get();
     try {
-      HTTPContext.get().init(config.getServletContext());
+      hc.init(config.getServletContext());
     } catch(final IOException ex) {
       throw new ServletException(ex);
     }
@@ -53,6 +55,8 @@ public abstract class BaseXServlet extends HttpServlet {
         }
       }
     }
+    final Context ctx = hc.context();
+    if(ctx.soptions.get(StaticOptions.LOGTRACE)) ctx.setExternal(ctx.log);
   }
 
   @Override
