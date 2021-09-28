@@ -308,7 +308,8 @@ public abstract class Path extends ParseExpr {
     boolean removed = false;
     final ExprList list = new ExprList(sl);
     for(int s = 0; s < sl; s++) {
-      final Expr step = steps[s], prev = list.isEmpty() ? root : list.peek();
+      final Expr step = steps[s];
+      final Expr prev = list.isEmpty() ? root != null ? root : cc.qc.focus.value : list.peek();
       if(prev != null) {
         final SeqType seqType = prev.seqType();
         if(seqType.type instanceof NodeType && (step instanceof ContextValue ||

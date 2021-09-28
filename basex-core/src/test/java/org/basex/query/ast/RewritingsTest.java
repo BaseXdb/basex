@@ -2180,7 +2180,16 @@ public final class RewritingsTest extends QueryPlanTest {
     check("document { }/ancestor-or-self::node()", "", root(CDoc.class));
     check("attribute a {}/descendant-or-self::attribute()", "a=\"\"", root(CAttr.class));
     check("text { '' }/descendant-or-self::text()", "", root(CTxt.class));
-  }
+
+    check("text { '' }[self::node()]", "", root(CTxt.class));
+    check("text { '' }[self::text()]", "", root(CTxt.class));
+    check("text { '' }[descendant-or-self::text()]", "", root(CTxt.class));
+    check("document { }[ancestor-or-self::node()]", "", root(CDoc.class));
+    check("document { }[ancestor-or-self::document-node()]", "", root(CDoc.class));
+
+    check("text { '' }[self::element()]", "", empty());
+    check("document { }[ancestor-or-self::element()]", "", empty());
+}
 
   /** descendant-or-self -> descendant. */
   @Test public void gh1979() {
