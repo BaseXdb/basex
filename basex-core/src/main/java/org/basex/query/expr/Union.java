@@ -41,29 +41,27 @@ public final class Union extends Set {
     // determine type
     SeqType st = SeqType.union(exprs, false);
     if(st == null) st = SeqType.NODE_ZM;
+    if(!(st.type instanceof NodeType)) return null;
 
-    // skip optimizations if operands do not have the correct type
-    if(st.type instanceof NodeType) {
-      exprType.assign(st.union(Occ.ONE_OR_MORE));
+    exprType.assign(st.union(Occ.ONE_OR_MORE));
 
-      final ExprList list = new ExprList(exprs.length);
-      for(final Expr expr : exprs) {
-        if(expr == Empty.VALUE || list.contains(expr) && !expr.has(Flag.CNS, Flag.NDT)) {
-          // remove empty operands: * union ()  ->  *
-          // remove duplicates: * union *  ->  *
-          cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-        } else {
-          list.add(expr);
-        }
+    final ExprList list = new ExprList(exprs.length);
+    for(final Expr expr : exprs) {
+      if(expr == Empty.VALUE || list.contains(expr) && !expr.has(Flag.CNS, Flag.NDT)) {
+        // remove empty operands: * union ()  ->  *
+        // remove duplicates: * union *  ->  *
+        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+      } else {
+        list.add(expr);
       }
-      exprs = list.finish();
+    }
+    exprs = list.finish();
 
-      final Expr ex = rewrite(Intersect.class, (invert, ops) ->
-        invert ? new Intersect(info, ops) : new Union(info, ops), cc);
-      if(ex != null) {
-        cc.info(OPTREWRITE_X_X, (Supplier<?>) this::description, ex);
-        return ex;
-      }
+    final Expr ex = rewrite(Intersect.class, (invert, ops) ->
+      invert ? new Intersect(info, ops) : new Union(info, ops), cc);
+    if(ex != null) {
+      cc.info(OPTREWRITE_X_X, (Supplier<?>) this::description, ex);
+      return ex;
     }
     return null;
   }

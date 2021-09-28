@@ -1347,7 +1347,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(<a/>, (<b/>, <c/>))", "<a/>\n<b/>\n<c/>", count(List.class, 1));
 
     check("count(<a/> union (<b/> union <c/>))", 3, count(Union.class, 1));
-    check("count(<a/> intersect (<b/> intersect <c/>))", 0, count(Intersect.class, 1));
+    check("count(<a/> intersect (<b/> intersect <c/>))", 0, root(Int.class));
     check("count(<a/> except (<b/> except <c/>))", 1, count(Except.class, 2));
 
     check("<a/> ! (. > '0' or (. < '1' or . < '2'))", true, count(Or.class, 1));

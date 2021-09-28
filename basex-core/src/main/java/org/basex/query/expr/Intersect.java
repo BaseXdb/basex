@@ -38,41 +38,38 @@ public final class Intersect extends Set {
   Expr opt(final CompileContext cc) throws QueryException {
     flatten(cc);
 
-    // determine type; skip optimizations if operands do not have the correct type
-    SeqType st = null;
+    // determine type
+    SeqType st = SeqType.NODE_ZM;
     for(final Expr expr : exprs) {
       final SeqType st2 = expr.seqType();
       if(!st2.zero()) {
-        st = st == null ? st2 : st.intersect(st2);
-        if(st == null) return null;
+        if(!(st2.type instanceof NodeType)) return null;
+        st = st.intersect(st2);
+        // check for incompatible node types
+        if(st == null) return Empty.VALUE;
       }
     }
-    // check if all operands yield an empty sequence
-    if(st == null) st = SeqType.NODE_ZM;
+    exprType.assign(st.union(Occ.ZERO));
 
-    if(st.type instanceof NodeType) {
-      exprType.assign(st.union(Occ.ZERO));
-
-      final ExprList list = new ExprList(exprs.length);
-      for(final Expr expr : exprs) {
-        if(expr == Empty.VALUE) {
-          // remove empty operands: * intersect ()  ->  ()
-          return cc.emptySeq(this);
-        } else if(!expr.has(Flag.CNS, Flag.NDT) && list.contains(expr)) {
-          // remove duplicates: * intersect *  ->  *
-          cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-        } else {
-          list.add(expr);
-        }
+    final ExprList list = new ExprList(exprs.length);
+    for(final Expr expr : exprs) {
+      if(expr == Empty.VALUE) {
+        // empty operand: * intersect ()  ->  ()
+        return Empty.VALUE;
+      } else if(!expr.has(Flag.CNS, Flag.NDT) && list.contains(expr)) {
+        // remove duplicates: * intersect *  ->  *
+        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+      } else {
+        list.add(expr);
       }
-      exprs = list.finish();
+    }
+    exprs = list.finish();
 
-      final Expr ex = rewrite(Union.class, (invert, ops) ->
-        invert ? new Union(info, ops) : new Intersect(info, ops), cc);
-      if(ex != null) {
-        cc.info(OPTREWRITE_X_X, (Supplier<?>) this::description, ex);
-        return ex;
-      }
+    final Expr ex = rewrite(Union.class, (invert, ops) ->
+      invert ? new Union(info, ops) : new Intersect(info, ops), cc);
+    if(ex != null) {
+      cc.info(OPTREWRITE_X_X, (Supplier<?>) this::description, ex);
+      return ex;
     }
     return null;
   }

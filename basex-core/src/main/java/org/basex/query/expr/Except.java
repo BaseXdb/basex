@@ -37,37 +37,32 @@ public final class Except extends Set {
 
   @Override
   Expr opt(final CompileContext cc) {
-    // first operand is empty: return empty sequence
-    if(exprs[0] == Empty.VALUE) return cc.emptySeq(this);
-
     // determine type
-    SeqType st = exprs[0].seqType();
-    if(st.zero()) st = SeqType.NODE_ZM;
+    final SeqType st = exprs[0].seqType();
+    if(st.zero()) return exprs[0];
+    if(!(st.type instanceof NodeType)) return null;
 
-    // skip optimizations if operands do not have the correct type
-    if(st.type instanceof NodeType) {
-      exprType.assign(st.union(Occ.ZERO));
+    exprType.assign(st.union(Occ.ZERO));
 
-      final ExprList list = new ExprList(exprs.length);
-      for(final Expr expr : exprs) {
-        if(expr == Empty.VALUE) {
-          // ignore empty operands
-          cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-        } else if(!expr.has(Flag.CNS, Flag.NDT)) {
-          final int same = ((Checks<Expr>) ex -> ex.equals(expr)).index(list);
-          // identical to first operand: return empty sequence
-          // example: text() except text()  ->  ()
-          if(same == 0) return cc.emptySeq(this);
-          // identical to subsequent operand: remove duplicate
-          // example: node() except * except *  ->  node() except *
-          if(same > 0) cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-          else list.add(expr);
-        } else {
-          list.add(expr);
-        }
+    final ExprList list = new ExprList(exprs.length);
+    for(final Expr expr : exprs) {
+      if(expr == Empty.VALUE) {
+        // ignore empty operands
+        cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+      } else if(!expr.has(Flag.CNS, Flag.NDT)) {
+        final int same = ((Checks<Expr>) ex -> ex.equals(expr)).index(list);
+        // identical to first operand: return empty sequence
+        // example: text() except text()  ->  ()
+        if(same == 0) return Empty.VALUE;
+        // identical to subsequent operand: remove duplicate
+        // example: node() except * except *  ->  node() except *
+        if(same > 0) cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+        else list.add(expr);
+      } else {
+        list.add(expr);
       }
-      exprs = list.finish();
     }
+    exprs = list.finish();
     return null;
   }
 
