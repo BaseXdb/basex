@@ -2189,7 +2189,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("text { '' }[self::element()]", "", empty());
     check("document { }[ancestor-or-self::element()]", "", empty());
-}
+  }
 
   /** descendant-or-self -> descendant. */
   @Test public void gh1979() {

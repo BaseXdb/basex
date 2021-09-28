@@ -251,7 +251,6 @@ public final class QueryJob extends Job implements Runnable {
     ctx.log.write(type, info, jc.performance, "JOB:" + jc.id(), ctx);
   }
 
-
   @Override
   public void addLocks() {
     qp.addLocks();

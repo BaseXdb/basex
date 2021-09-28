@@ -963,7 +963,6 @@ public final class Token {
     return Arrays.copyOfRange(token, s, t);
   }
 
-
   /**
    * Splits a token around matches of the given separator.
    * @param token token to be split

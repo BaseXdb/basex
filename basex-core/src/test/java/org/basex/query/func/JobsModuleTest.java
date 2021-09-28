@@ -171,7 +171,6 @@ public final class JobsModuleTest extends SandboxTest {
     query(_ADMIN_LOGS.args(date) + " = '" + uuid + "'", true);
   }
 
-
   /** Test method. */
   @Test public void finished() {
     final String id = verySlowQuery();

@@ -127,7 +127,6 @@ public final class NameTest extends Test {
     return simple ? NamePart.LOCAL : part;
   }
 
-
   @Override
   public boolean instanceOf(final Test test) {
     if(test instanceof NameTest) {
