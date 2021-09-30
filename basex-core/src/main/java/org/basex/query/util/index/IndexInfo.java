@@ -134,7 +134,7 @@ public final class IndexInfo {
     final Data data = db.data();
     if(data == null && !enforce()) return false;
 
-    final ParseExpr root;
+    final ValueAccess va;
     if(search instanceof Value) {
       // loop through all items
       final Iter iter = search.iter(cc.qc);
@@ -158,19 +158,23 @@ public final class IndexInfo {
         }
       }
 
-      // ignore expressions that yield no results
+      // ignore expressions that yield no results.
+      // count number of results. prerequisites:
+      // - index access is not followed by a name test,
+      // - no token index is used, or only one token is looked up
       final TokenSet tokens = new TokenSet();
-      int counts = 0;
+      int size = test == null ? 0 : -1;
       for(final byte[] token : cache) {
         final int count = cache.get(token);
         if(count != 0) tokens.add(token);
-        if(counts >= 0) counts = count >= 0 ? counts + count : -1;
+        if(size >= 0) {
+          size = count < 0 || type == IndexType.TOKEN && tokens.size() > 1 ? -1 : size + count;
+        }
       }
 
       // create expression for index access
-      final ValueAccess va = new ValueAccess(ii, tokens, type, test, db);
-      va.size(counts);
-      root = va;
+      va = new ValueAccess(ii, tokens, type, test, db);
+      va.exprType.assign(va.seqType(), size);
 
     } else {
       /* index access is not possible if returned type is not a string or untyped; if
@@ -184,10 +188,10 @@ public final class IndexInfo {
       // estimate costs for dynamic query terms
       costs = enforce() ? IndexCosts.ENFORCE_DYNAMIC :
         IndexCosts.get(Math.max(1, data.meta.size / 10));
-      root = new ValueAccess(ii, search, type, test, db);
+      va = new ValueAccess(ii, search, type, test, db);
     }
 
-    create(root, false, Util.info(OPTINDEX_X_X, type, search), ii);
+    create(va, false, Util.info(OPTINDEX_X_X, type, search), ii);
     return true;
   }
 

@@ -87,21 +87,6 @@ public final class ValueAccess extends IndexAccess {
     this.tokens = tokens;
   }
 
-  /**
-   * Assigns the result size.
-   * @param size result size
-   */
-  public void size(final int size) {
-    // result size can be determined statically if:
-    // - index access is not followed by a name test,
-    // - all search tokens are known, and
-    // - at most token is looked up, or it is not looked up in a token index
-    if(test == null && tokens != null && (tokens.size() <= 1 || type != IndexType.TOKEN)) {
-      // example: //text()[. = ('A', 'B')]
-      exprType.assign(seqType(), size);
-    }
-  }
-
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     // cache distinct search terms
