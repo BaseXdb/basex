@@ -5,7 +5,7 @@
   <!-- Artifact information -->
   <groupId>org.basex</groupId>
   <artifactId>basex-parent</artifactId>
-  <version>9.6.2-SNAPSHOT</version>
+  <version>9.6.2</version>
   <packaging>pom</packaging>
 
   <distributionManagement>
@@ -30,7 +30,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
     <jettyVersion>9.4.43.v20210629</jettyVersion>
-    <junit.version>5.7.0</junit.version>
+    <junit.version>5.8.1</junit.version>
   </properties>
 
   <dependencyManagement>
@@ -181,7 +181,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
-        <version>1.7.30</version>
+        <version>1.7.32</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -352,7 +352,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.2.0</version>
+            <version>3.3.1</version>
             <inherited>true</inherited>
             <configuration>
               <doclint>none</doclint>
@@ -489,7 +489,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.1.2</version>
+          <version>3.2.0</version>
           <inherited>true</inherited>
           <configuration>
             <outputDirectory>${project.lib.directory}</outputDirectory>
@@ -530,7 +530,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.1.1</version>
+          <version>3.1.2</version>
           <inherited>true</inherited>
           <executions>
             <execution>
@@ -568,7 +568,7 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
-        <version>3.4.1</version>
+        <version>3.4.3</version>
       </extension>
     </extensions>
   </build>

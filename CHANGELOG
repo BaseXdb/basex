@@ -1,3 +1,7 @@
+VERSION 9.6.2 (September 30, 2021) -------------------------------------
+
+ - Performance tweaks, minor bug fixes
+
 VERSION 9.6.1 (August 26, 2021) ----------------------------------------
 
  - GUI bug fix, XQuery performance tweaks
