@@ -679,7 +679,7 @@ public abstract class Path extends ParseExpr {
     // cache index access costs
     IndexInfo index = null;
     // cheapest predicate and step
-    int indexPred = 0, indexStep = 0;
+    int predIndex = 0, stepIndex = 0;
 
     // check if path can be converted to an index access
     final int sl = steps.length;
@@ -709,8 +709,8 @@ public abstract class Path extends ParseExpr {
 
           if(index == null || index.costs.compareTo(ii.costs) > 0) {
             index = ii;
-            indexPred = e;
-            indexStep = s;
+            predIndex = e;
+            stepIndex = s;
           }
         }
       }
@@ -740,51 +740,43 @@ public abstract class Path extends ParseExpr {
       ((ParseExpr) indexRoot).exprType.assign(occ);
     }
 
-    // invert steps that occur before index step and add them as predicate
+    // invert steps that occur before index step, rewrite them to predicates
+    final Expr indexStep = indexSteps.isEmpty() ? null : indexSteps.peek();
     final ExprList invSteps = new ExprList(), lastPreds = new ExprList();
     final Test rootTest = InvDocTest.get(rt);
     if(rootTest != KindTest.DOCUMENT_NODE || data == null || !data.meta.uptodate ||
-        invertSteps(indexStep)) {
-      for(int s = indexStep; s >= 0; s--) {
-        final Axis invAxis = axisStep(s).axis.invert();
+        invertSteps(stepIndex)) {
+      for(int s = stepIndex; s >= 0; s--) {
+        final Axis axis = axisStep(s).axis.invert();
+        Expr expr = invSteps.isEmpty() ? indexRoot : invSteps.peek();
         if(s == 0) {
           // add document test for collections and axes other than ancestors
-          if(rootTest != KindTest.DOCUMENT_NODE ||
-              invAxis != ANCESTOR && invAxis != ANCESTOR_OR_SELF) {
-            invSteps.add(Step.get(cc, indexRoot, info, invAxis, rootTest));
-          }
+          expr = rootTest != KindTest.DOCUMENT_NODE || axis != ANCESTOR && axis != ANCESTOR_OR_SELF
+               ? Step.get(cc, expr, info, axis, rootTest) : null;
         } else {
           final Step prevStep = axisStep(s - 1);
-          final Axis newAxis = prevStep.axis == ATTRIBUTE ? ATTRIBUTE : invAxis;
-          final Expr newStep = Step.get(cc, indexRoot, prevStep.info(), newAxis, prevStep.test,
-              prevStep.exprs);
-          invSteps.add(newStep);
+          final Axis newAxis = prevStep.axis == ATTRIBUTE ? ATTRIBUTE : axis;
+          expr = Step.get(cc, expr, prevStep.info(), newAxis, prevStep.test, prevStep.exprs);
         }
+        if(expr != null) invSteps.add(expr);
       }
     }
+    // add created steps, followed by remaining predicates
     if(!invSteps.isEmpty()) {
-      lastPreds.add(get(info, null, invSteps.finish()));
+      lastPreds.add(cc.get(indexStep != null ? indexStep : indexRoot,
+        () -> get(cc, info, null, invSteps.finish())));
     }
+    lastPreds.add(Array.remove(index.step.exprs, predIndex));
 
-    // add remaining predicates
-    final Expr[] preds = index.step.exprs;
-    final int pl = preds.length;
-    for(int p = 0; p < pl; p++) {
-      if(p != indexPred) lastPreds.add(preds[p]);
-    }
-
-    // add predicates to end of path
+    // attach predicates to last step or new self::node() step
     if(!lastPreds.isEmpty()) {
-      final Expr step = indexSteps.isEmpty() ? null : indexSteps.peek();
-      if(step instanceof Step) {
-        indexSteps.set(indexSteps.size() - 1, ((Step) step).addPredicates(lastPreds.finish()));
-      } else {
-        // add at least one self axis step
-        indexSteps.add(Step.get(cc, indexRoot, info, lastPreds.finish()));
-      }
+      indexSteps.add(indexStep instanceof Step
+          ? ((Step) indexSteps.pop()).addPredicates(lastPreds.finish())
+          : Step.get(cc, indexRoot, info, lastPreds.finish()));
     }
+
     // add remaining steps
-    for(int s = indexStep + 1; s < sl; s++) indexSteps.add(steps[s]);
+    for(int s = stepIndex + 1; s < sl; s++) indexSteps.add(steps[s]);
 
     return indexSteps.isEmpty() ? indexRoot : get(cc, info, indexRoot, indexSteps.finish());
   }
