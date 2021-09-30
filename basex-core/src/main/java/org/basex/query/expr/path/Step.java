@@ -34,7 +34,7 @@ public abstract class Step extends Preds {
   /**
    * Returns a new optimized self::node() step.
    * @param cc compilation context
-   * @param root root expression; if {@code null}, the current context will be used
+   * @param root root context expression; if {@code null}, the current context will be used
    * @param ii input info
    * @param preds predicates
    * @return step
@@ -48,7 +48,7 @@ public abstract class Step extends Preds {
   /**
    * Returns a new optimized self step.
    * @param cc compilation context
-   * @param root root expression; if {@code null}, the current context will be used
+   * @param root root context expression; if {@code null}, the current context will be used
    * @param ii input info
    * @param test test
    * @param preds predicates
@@ -63,7 +63,7 @@ public abstract class Step extends Preds {
   /**
    * Returns a new optimized step.
    * @param cc compilation context
-   * @param root root expression; if {@code null}, the current context will be used
+   * @param root root context expression; if {@code null}, the current context will be used
    * @param ii input info
    * @param axis axis
    * @param test node test
@@ -144,14 +144,14 @@ public abstract class Step extends Preds {
   /**
    * Optimizes the step for the given root expression.
    * @param cc compilation context
-   * @param expr context expression; if {@code null}, the current context will be used
+   * @param root root context expression; if {@code null}, the current context will be used
    * @return optimized step
    * @throws QueryException query exception
    */
-  final Expr optimize(final Expr expr, final CompileContext cc) throws QueryException {
+  final Expr optimize(final Expr root, final CompileContext cc) throws QueryException {
     // updates the static type
-    final Expr ex = expr != null ? expr : cc.qc.focus.value;
-    type(ex);
+    final Expr rt = root != null ? root : cc.qc.focus.value;
+    type(rt);
 
     // choose stricter axis
     final Axis old = axis;
@@ -162,7 +162,7 @@ public abstract class Step extends Preds {
     } else if(axis == ANCESTOR_OR_SELF && type.oneOf(NodeType.LEAF_TYPES)) {
       // ancestor-or-self::text()  ->  self::text()
       axis = SELF;
-    } else if(ex != null && ex.seqType().type.intersect(type) == null) {
+    } else if(rt != null && rt.seqType().type.intersect(type) == null) {
       // root()/descendant-or-self::x  ->  root()/descendant::x
       if(axis == DESCENDANT_OR_SELF) axis = DESCENDANT;
       // $text/ancestor-or-self::x  ->  $text/ancestor::x
@@ -171,7 +171,7 @@ public abstract class Step extends Preds {
     if(axis != old) cc.info(QueryText.OPTREWRITE_X_X, old, this);
 
     // check if step or test will never yield results
-    if(noMatches() || ex != null && test.noMatches(ex.data())) {
+    if(noMatches() || rt != null && test.noMatches(rt.data())) {
       cc.info(QueryText.OPTSTEP_X, this);
       return cc.emptySeq(this);
     }

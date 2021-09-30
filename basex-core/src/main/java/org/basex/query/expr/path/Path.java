@@ -703,7 +703,7 @@ public abstract class Path extends ParseExpr {
 
           if(ii.costs.results() == 0) {
             // no results...
-            cc.info(QueryText.OPTNORESULTS_X, ii.step);
+            cc.info(QueryText.OPTNORESULTS_X, step);
             return Empty.VALUE;
           }
 
@@ -725,23 +725,23 @@ public abstract class Path extends ParseExpr {
     cc.info(index.optInfo);
 
     // create new root expression
-    final ExprList resultSteps = new ExprList();
-    final Expr resultRoot;
+    final ExprList indexSteps = new ExprList();
+    final Expr indexRoot;
     if(index.expr instanceof Path) {
       final Path path = (Path) index.expr;
-      resultRoot = path.root;
-      resultSteps.add(path.steps);
+      indexRoot = path.root;
+      indexSteps.add(path.steps);
     } else {
-      resultRoot = index.expr;
+      indexRoot = index.expr;
     }
     // only one hit: update sequence type
-    if(index.costs.results() == 1 && resultRoot instanceof ParseExpr) {
-      final Occ occ = resultRoot instanceof IndexAccess ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
-      ((ParseExpr) resultRoot).exprType.assign(occ);
+    if(index.costs.results() == 1 && indexRoot instanceof ParseExpr) {
+      final Occ occ = indexRoot instanceof IndexAccess ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
+      ((ParseExpr) indexRoot).exprType.assign(occ);
     }
 
     // invert steps that occur before index step and add them as predicate
-    final ExprList invSteps = new ExprList(), newPreds = new ExprList();
+    final ExprList invSteps = new ExprList(), lastPreds = new ExprList();
     final Test rootTest = InvDocTest.get(rt);
     if(rootTest != KindTest.DOCUMENT_NODE || data == null || !data.meta.uptodate ||
         invertSteps(indexStep)) {
@@ -751,48 +751,42 @@ public abstract class Path extends ParseExpr {
           // add document test for collections and axes other than ancestors
           if(rootTest != KindTest.DOCUMENT_NODE ||
               invAxis != ANCESTOR && invAxis != ANCESTOR_OR_SELF) {
-            invSteps.add(Step.get(cc, resultRoot, info, invAxis, rootTest));
+            invSteps.add(Step.get(cc, indexRoot, info, invAxis, rootTest));
           }
         } else {
           final Step prevStep = axisStep(s - 1);
           final Axis newAxis = prevStep.axis == ATTRIBUTE ? ATTRIBUTE : invAxis;
-          final Expr newStep = Step.get(cc, resultRoot, prevStep.info(), newAxis, prevStep.test,
+          final Expr newStep = Step.get(cc, indexRoot, prevStep.info(), newAxis, prevStep.test,
               prevStep.exprs);
           invSteps.add(newStep);
         }
       }
     }
     if(!invSteps.isEmpty()) {
-      newPreds.add(get(info, null, invSteps.finish()));
+      lastPreds.add(get(info, null, invSteps.finish()));
     }
 
     // add remaining predicates
     final Expr[] preds = index.step.exprs;
     final int pl = preds.length;
     for(int p = 0; p < pl; p++) {
-      if(p != indexPred) newPreds.add(preds[p]);
+      if(p != indexPred) lastPreds.add(preds[p]);
     }
 
     // add predicates to end of path
-    if(!newPreds.isEmpty()) {
-      int ls = resultSteps.size() - 1;
-      final Expr step;
-      if(ls < 0 || !(resultSteps.get(ls) instanceof Step)) {
-        // add at least one self axis step
-        step = Step.get(cc, resultRoot, info, newPreds.finish());
-        ls++;
+    if(!lastPreds.isEmpty()) {
+      final Expr step = indexSteps.isEmpty() ? null : indexSteps.peek();
+      if(step instanceof Step) {
+        indexSteps.set(indexSteps.size() - 1, ((Step) step).addPredicates(lastPreds.finish()));
       } else {
-        step = ((Step) resultSteps.get(ls)).addPredicates(newPreds.finish());
+        // add at least one self axis step
+        indexSteps.add(Step.get(cc, indexRoot, info, lastPreds.finish()));
       }
-      resultSteps.set(ls, step);
     }
-
     // add remaining steps
-    for(int s = indexStep + 1; s < sl; s++) {
-      resultSteps.add(steps[s]);
-    }
+    for(int s = indexStep + 1; s < sl; s++) indexSteps.add(steps[s]);
 
-    return resultSteps.isEmpty() ? resultRoot : get(cc, info, resultRoot, resultSteps.finish());
+    return indexSteps.isEmpty() ? indexRoot : get(cc, info, indexRoot, indexSteps.finish());
   }
 
   /**
