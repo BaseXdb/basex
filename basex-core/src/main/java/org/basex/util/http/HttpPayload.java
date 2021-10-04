@@ -339,7 +339,7 @@ public final class HttpPayload {
         final byte[] decoded = decodeUri(io.read(), true);
         final int cp = XMLToken.invalid(decoded);
         if(cp != -1) throw new InputException(cp);
-        return Str.get(body);
+        return Str.get(decoded);
       } catch(final IllegalArgumentException ex) {
         Util.debug(ex);
         throw new IOException(ex.getMessage());
