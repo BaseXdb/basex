@@ -97,8 +97,8 @@ public final class IndexInfo {
 
     // check if the index contains result for the specified elements or attributes
     final IndexType it = type != null ? type : text ? IndexType.TEXT : IndexType.ATTRIBUTE;
-    if(text ? (it != IndexType.TEXT && it != IndexType.FULLTEXT) :
-      (it != IndexType.TOKEN && it != IndexType.ATTRIBUTE)) return null;
+    if(text ? it != IndexType.TEXT && it != IndexType.FULLTEXT :
+      it != IndexType.TOKEN && it != IndexType.ATTRIBUTE) return null;
 
     // database is known at compile time: perform additional checks
     if(data != null) {

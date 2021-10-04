@@ -1096,10 +1096,8 @@ public final class TreeView extends View {
         gui.notify.context(gui.context.marked, false, this);
         refreshContext(false, false);
       }
-    } else {
-      if(!marked(mousePosX, mousePosY)) {
-        gui.notify.mark(0, null);
-      }
+    } else if(!marked(mousePosX, mousePosY)) {
+      gui.notify.mark(0, null);
     }
   }
 

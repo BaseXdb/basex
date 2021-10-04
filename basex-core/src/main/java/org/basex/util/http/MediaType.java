@@ -116,7 +116,7 @@ public final class MediaType implements Comparable<MediaType> {
    * @return type without parameters
    */
   public String type() {
-    return sub.isEmpty() ? main : (main + '/' + sub);
+    return sub.isEmpty() ? main : main + '/' + sub;
   }
 
   /**

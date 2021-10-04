@@ -223,9 +223,7 @@ public final class ValueAccess extends IndexAccess {
       @Override
       public boolean more() {
         while(++pre < sz) {
-          if(data.kind(pre) == kind) {
-            if(eq(data.text(pre, text), value)) return true;
-          }
+          if(data.kind(pre) == kind && eq(data.text(pre, text), value)) return true;
         }
         return false;
       }

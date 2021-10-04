@@ -451,10 +451,13 @@ public final class HTTPConnection implements ClientInfo {
           if(Strings.eq(map.get(Request.ALGORITHM), MD5_SESS))
             ha1 = Strings.md5(ha1 + ':' + nonce + ':' + cnonce);
 
-          String h2 = method + ':' + map.get(Request.URI);
+          final StringBuilder h2 = new StringBuilder().append(method).append(':').
+              append(map.get(Request.URI));
           final String qop = map.get(Request.QOP);
-          if(Strings.eq(qop, AUTH_INT)) h2 += ':' + Strings.md5(requestCtx.body().toString());
-          final String ha2 = Strings.md5(h2);
+          if(Strings.eq(qop, AUTH_INT)) {
+            h2.append(':').append(Strings.md5(requestCtx.body().toString()));
+          }
+          final String ha2 = Strings.md5(h2.toString());
 
           final StringBuilder sb = new StringBuilder(ha1).append(':').append(nonce);
           if(Strings.eq(qop, AUTH, AUTH_INT)) {

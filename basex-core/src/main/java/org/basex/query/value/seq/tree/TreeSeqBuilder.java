@@ -222,7 +222,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
    */
   private Item[] items(final int from, final int n) {
     final Item[] arr = new Item[n];
-    final int p = ((from % CAP) + CAP) % CAP, m = CAP - p;
+    final int p = (from % CAP + CAP) % CAP, m = CAP - p;
     if(n <= m) {
       Array.copyToStart(items, p, n, arr);
     } else {

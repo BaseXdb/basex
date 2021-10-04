@@ -55,7 +55,7 @@ public final class Pkg {
    * @return id
    */
   public String id() {
-    return type == PkgType.EXPATH ? (name + '-' + version) : name;
+    return type == PkgType.EXPATH ? name + '-' + version : name;
   }
 
   /**

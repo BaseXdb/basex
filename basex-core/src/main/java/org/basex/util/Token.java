@@ -1354,7 +1354,7 @@ public final class Token {
    */
   public static int dec(final int ch1, final int ch2) {
     final int n1 = dec(ch1), n2 = dec(ch2);
-    return n1 < 0 || n2 < 0 ? -1 : (n1 << 4) | n2;
+    return n1 < 0 || n2 < 0 ? -1 : n1 << 4 | n2;
   }
 
   /**

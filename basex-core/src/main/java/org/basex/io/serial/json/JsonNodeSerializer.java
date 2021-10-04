@@ -137,8 +137,8 @@ public final class JsonNodeSerializer extends JsonSerializer {
         if(atts) {
           if(!eq(elem.string(), ITEM)) throw error("<%> found, <%> expected", elem, ITEM);
           if(key != null) throw error("<%> must have no name attribute", elem);
-        } else {
-          if(!eq(elem.string(), VALUE)) throw error("<%> found, <%> expected", elem, VALUE);
+        } else if(!eq(elem.string(), VALUE)) {
+          throw error("<%> found, <%> expected", elem, VALUE);
         }
       } else {
         throw error("<%> is typed as \"%\" and cannot be nested", elems.get(level - 1), ptype);

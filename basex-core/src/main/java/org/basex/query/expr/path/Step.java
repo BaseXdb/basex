@@ -122,9 +122,9 @@ public abstract class Step extends Preds {
       axis == SELF && test == KindTest.NODE && preds.length == 0
       // one result: self::node()
       ? Occ.EXACTLY_ONE :
-        (axis == SELF || axis == PARENT ||
+        axis == SELF || axis == PARENT ||
         axis == ATTRIBUTE && test instanceof NameTest && ((NameTest) test).part == NamePart.FULL ||
-        preds.length == 1 && preds[0] instanceof CmpPos && ((CmpPos) preds[0]).exact())
+        preds.length == 1 && preds[0] instanceof CmpPos && ((CmpPos) preds[0]).exact()
       // zero or one result: self::X, parent::X, attribute::Q{uri}local, ...[position() = n]
       ? Occ.ZERO_OR_ONE
       : Occ.ZERO_OR_MORE,
@@ -156,10 +156,9 @@ public abstract class Step extends Preds {
     // choose stricter axis
     final Axis old = axis;
     final Type type = seqType().type;
-    if(axis == DESCENDANT_OR_SELF && type.instanceOf(NodeType.DOCUMENT_NODE)) {
+    if(axis == DESCENDANT_OR_SELF && type.instanceOf(NodeType.DOCUMENT_NODE) ||
+       axis == ANCESTOR_OR_SELF && type.oneOf(NodeType.LEAF_TYPES)) {
       // descendant-or-self::document-node()  ->  self::document-node()
-      axis = SELF;
-    } else if(axis == ANCESTOR_OR_SELF && type.oneOf(NodeType.LEAF_TYPES)) {
       // ancestor-or-self::text()  ->  self::text()
       axis = SELF;
     } else if(rt != null && rt.seqType().type.intersect(type) == null) {

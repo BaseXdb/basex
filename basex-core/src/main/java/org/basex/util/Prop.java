@@ -2,6 +2,7 @@ package org.basex.util;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.*;
 import java.nio.file.*;
 import java.security.*;
 import java.util.*;
@@ -28,9 +29,9 @@ public final class Prop {
   public static final String PROJECT = NAME.toLowerCase(Locale.ENGLISH);
 
   /** System-specific newline string. */
-  public static final String NL = System.getProperty("line.separator");
+  public static final String NL = System.lineSeparator();
   /** Returns the system's default encoding. */
-  public static final String ENCODING = System.getProperty("file.encoding");
+  public static final String ENCODING = Charset.defaultCharset().displayName();
   /** OS flag (source: {@code http://lopica.sourceforge.net/os.html}). */
   private static final String OS = System.getProperty("os.name");
   /** Flag denoting if OS belongs to Mac family. */

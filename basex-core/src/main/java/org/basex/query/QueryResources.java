@@ -192,14 +192,12 @@ public final class QueryResources {
    */
   public synchronized DBNode doc(final QueryInput qi, final InputInfo ii) throws QueryException {
     final MainOptions options = qc.context.options;
-    if(options.get(MainOptions.WITHDB)) {
-      // favor default database
-      if(options.get(MainOptions.DEFAULTDB)) {
-        final Data data = globalData();
-        if(data != null) {
-          final int pre = data.resources.doc(qi.original);
-          if(pre != -1) return new DBNode(data, pre, Data.DOC);
-        }
+    // favor default database
+    if(options.get(MainOptions.WITHDB) && options.get(MainOptions.DEFAULTDB)) {
+      final Data data = globalData();
+      if(data != null) {
+        final int pre = data.resources.doc(qi.original);
+        if(pre != -1) return new DBNode(data, pre, Data.DOC);
       }
     }
 

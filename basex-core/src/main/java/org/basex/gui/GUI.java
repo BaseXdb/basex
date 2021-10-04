@@ -578,9 +578,10 @@ public final class GUI extends JFrame implements BaseXWindow {
       final int s = show ? menuHeight : 0;
       comp.setPreferredSize(new Dimension(comp.getPreferredSize().width, s));
       menu.setSize(menu.getWidth(), s);
-    } else { // buttons, input
-      if(show) control.add(comp, layout);
-      else control.remove(comp);
+    } else if(show) {
+      control.add(comp, layout);
+    } else {
+      control.remove(comp);
     }
     setContentBorder();
     final Component frame = fullscr == null ? getRootPane() : fullscr;

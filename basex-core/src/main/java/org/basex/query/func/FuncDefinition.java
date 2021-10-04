@@ -179,9 +179,7 @@ public final class FuncDefinition {
     final TokenBuilder tb = new TokenBuilder();
     for(final Object arg : args) {
       if(!tb.isEmpty()) tb.add(", ");
-      if(arg instanceof Expr) {
-        tb.add(arg);
-      } else if(arg instanceof Number) {
+      if(arg instanceof Expr || arg instanceof Number) {
         tb.add(arg);
       } else if(arg instanceof Boolean) {
         tb.add(arg + "()");
@@ -190,7 +188,7 @@ public final class FuncDefinition {
         if(Strings.startsWith(str, ' ')) {
           tb.add(str.substring(1));
         } else {
-          tb.add('"' + str.replaceAll("\"", "\"\"") + '"');
+          tb.add('"' + str.replace("\"", "\"\"") + '"');
         }
       }
     }

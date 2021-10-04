@@ -190,9 +190,7 @@ public class TextPanel extends BaseXPanel {
     } else if(text.length != size) {
       txt = Arrays.copyOf(text, size);
     }
-    if(editor.text(txt)) {
-      if(hist != null) hist.store(txt, editor.pos(), 0);
-    }
+    if(editor.text(txt) && hist != null) hist.store(txt, editor.pos(), 0);
     if(isShowing()) resizeCode.invokeLater();
   }
 

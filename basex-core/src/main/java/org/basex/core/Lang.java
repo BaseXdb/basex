@@ -143,7 +143,7 @@ public final class Lang {
   private static synchronized String credits(final byte[] cont) {
     final StringTokenizer st = new StringTokenizer(Token.string(cont), "\n");
     st.nextToken();
-    return st.nextToken().replaceAll("# ", "");
+    return st.nextToken().replace("# ", "");
   }
 
   /**

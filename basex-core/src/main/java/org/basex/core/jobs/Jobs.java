@@ -146,11 +146,9 @@ public final class Jobs {
     final FElem xml = toXML();
     synchronized(FILE) {
       // only create jobs file if jobs are registered
-      if(list.isEmpty()) {
-        if(file.exists()) {
-          file.delete();
-          return;
-        }
+      if(list.isEmpty() && file.exists()) {
+        file.delete();
+        return;
       }
 
       // write jobs file

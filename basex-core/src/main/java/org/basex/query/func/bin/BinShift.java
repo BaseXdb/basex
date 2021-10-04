@@ -31,7 +31,7 @@ public final class BinShift extends StandardFunc {
     // single byte
     if(bl == 1) {
       final int b = bytes[0];
-      return B64.get((byte) (by > 0 ? (b << by) : ((b & 0xFF) >> -by)));
+      return B64.get((byte) (by > 0 ? b << by : (b & 0xFF) >> -by));
     }
 
     byte[] shifted;
@@ -44,15 +44,13 @@ public final class BinShift extends StandardFunc {
       if(by > 0) {
         // left shift
         bi = bi.shiftLeft(shifts);
-      } else {
+      } else if(bi.signum() >= 0) {
         // right shift
-        if(bi.signum() >= 0) {
-          bi = bi.shiftRight(shifts);
-        } else {
-          final BigInteger o = BigInteger.ONE.shiftLeft((bl << 3) + 1);
-          final BigInteger m = o.subtract(BigInteger.ONE).shiftRight(shifts + 1);
-          bi = bi.subtract(o).shiftRight(shifts).and(m);
-        }
+        bi = bi.shiftRight(shifts);
+      } else {
+        final BigInteger o = BigInteger.ONE.shiftLeft((bl << 3) + 1);
+        final BigInteger m = o.subtract(BigInteger.ONE).shiftRight(shifts + 1);
+        bi = bi.subtract(o).shiftRight(shifts).and(m);
       }
       shifted = bi.toByteArray();
     }

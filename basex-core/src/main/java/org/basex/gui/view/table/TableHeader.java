@@ -273,15 +273,12 @@ final class TableHeader extends BaseXPanel {
             view.gui.cursor(CURSORARROW, true);
           }
         }
+      } else if(clickCol == tdata.cols.length) {
+        // activate table filter: reset
+        tdata.resetFilter();
+        view.query();
       } else {
-        // activate table filter
-        if(clickCol == tdata.cols.length) {
-          // reset table filter
-          tdata.resetFilter();
-          view.query();
-        } else {
-          filter(clickCol);
-        }
+        filter(clickCol);
       }
     } else {
       chooseCols(e);

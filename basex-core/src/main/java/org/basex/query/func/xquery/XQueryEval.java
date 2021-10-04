@@ -116,8 +116,8 @@ public class XQueryEval extends StandardFunc {
         if(updating) {
           if(!sc.mixUpdates && !qctx.updating && !qctx.root.expr.vacuous())
             throw XQUERY_UPDATE2.get(info);
-        } else {
-          if(qctx.updating) throw XQUERY_UPDATE1.get(info);
+        } else if(qctx.updating) {
+          throw XQUERY_UPDATE1.get(info);
         }
 
         final ValueBuilder vb = new ValueBuilder(qc);

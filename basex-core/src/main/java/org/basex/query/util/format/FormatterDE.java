@@ -160,16 +160,17 @@ final class FormatterDE extends Formatter {
         if(i == 1) tb.add(EINE);
         else word(tb, i, null);
         tb.add(' ');
-      } else {
-        if(i != 1) word(tb, i, null);
+      } else if(i != 1) {
+        word(tb, i, null);
       }
       tb.add(WORDS1000000[w]);
       final long r = n % f;
       if(ord != null && r == 0) {
         tb.add("st").add(ord.length == 0 ? E : ord);
-      } else {
-        if(i > 1) tb.add("en");
-        else if(endsWith(WORDS1000000[w], 'f')) tb.add("e");
+      } else if(i > 1) {
+        tb.add("en");
+      } else if(endsWith(WORDS1000000[w], 'f')) {
+        tb.add("e");
       }
       if(r != 0) {
         tb.add(' ');

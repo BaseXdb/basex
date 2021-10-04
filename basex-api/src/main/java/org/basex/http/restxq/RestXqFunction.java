@@ -137,7 +137,7 @@ public final class RestXqFunction extends WebFunction {
         addMethod(mth, body, declared, ann.info);
       } else if(def == _REST_SINGLE) {
         singleton = '\u0001' + (!value.isEmpty() ? toString(value.itemAt(0)) :
-          (function.info.path() + ':' + function.info.line()));
+          function.info.path() + ':' + function.info.line());
       } else if(eq(def.uri, QueryText.REST_URI)) {
         final Item body = value.isEmpty() ? null : value.itemAt(0);
         addMethod(string(def.local()), body, declared, ann.info);
@@ -177,7 +177,7 @@ public final class RestXqFunction extends WebFunction {
       if(qs != null) {
         final double d = toDouble(token(qs));
         // NaN will be included if negated condition is used...
-        if(!(d >= 0 && d <= 1)) throw error(ERROR_QS_X, qs);
+        if(d < 0 || d > 1) throw error(ERROR_QS_X, qs);
       }
     }
     return checkParsed(found, starts, declared);
@@ -274,8 +274,8 @@ public final class RestXqFunction extends WebFunction {
    */
   public boolean matches(final HTTPConnection conn, final QNm err, final boolean perm) {
     // check method, consumed and produced media type, and path or error
-    if(!((methods.isEmpty() || methods.contains(conn.method)) && consumes(conn) &&
-        produces(conn))) return false;
+    if(!methods.isEmpty() && !methods.contains(conn.method) || !consumes(conn) || !produces(conn))
+      return false;
 
     if(perm) return permission != null && permission.matches(conn);
     if(err != null) return error != null && error.matches(err);

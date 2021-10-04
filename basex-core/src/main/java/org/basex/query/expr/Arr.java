@@ -194,7 +194,7 @@ public abstract class Arr extends ParseExpr {
       // pre-evaluate values
       if(expr instanceof Value) {
         // skip evaluation: true() or $bool  ->  true()
-        if(expr.ebv(cc.qc, info).bool(info) ^ !or) return true;
+        if(expr.ebv(cc.qc, info).bool(info) == or) return true;
         // ignore result: true() and $bool  ->  $bool
         cc.info(QueryText.OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else if(!pos && list.contains(expr) && !expr.has(Flag.NDT)) {
@@ -211,7 +211,7 @@ public abstract class Arr extends ParseExpr {
     if(!(positional && has(Flag.POS))) {
       final Class<? extends Arr> clazz = or ? And.class : Or.class;
       final QueryBiFunction<Boolean, Expr[], Expr> func = (invert, args) ->
-        (invert != or) ? new Or(info, args) : new And(info, args);
+        invert == or ? new And(info, args) : new Or(info, args);
       final Expr tmp = rewrite(clazz, func, cc);
       if(tmp != null) {
         exprs = new Expr[] { tmp };

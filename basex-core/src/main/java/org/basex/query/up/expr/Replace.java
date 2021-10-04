@@ -82,9 +82,9 @@ public final class Replace extends Update {
         // replace attribute node
         if(!list.isEmpty()) throw UPWRATTR_X.get(info, list.get(0));
         list = checkNS(aList, parent);
-      } else {
+      } else if(!aList.isEmpty()) {
         // replace non-attribute node
-        if(!aList.isEmpty()) throw UPWRELM_X.get(info, targ);
+        throw UPWRELM_X.get(info, targ);
       }
       // conforms to specification: insertion sequence may be empty
       updates.add(new ReplaceNode(dbn.pre(), dbn.data(), info, list), qc);

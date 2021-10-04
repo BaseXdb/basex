@@ -73,7 +73,7 @@ public final class Compress {
       for(int i = 0; i < s; i++) {
         out |= (in & 1) << off;
         in >>>= 1;
-        off = (off + 1) & 7;
+        off = off + 1 & 7;
         if(off == 0) {
           // skip compression if packed array gets too large
           if(size == tl) return text;

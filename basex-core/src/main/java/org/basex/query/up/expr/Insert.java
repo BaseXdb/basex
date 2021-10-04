@@ -74,9 +74,8 @@ public final class Insert extends Update {
       if(node.type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE))
         throw UPTRGTYP2_X.get(info, node);
       if(parent == null) throw UPPAREMPTY_X.get(info, node);
-    } else {
-      if(!node.type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE))
-        throw UPTRGTYP_X.get(info, node);
+    } else if(!node.type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE)) {
+      throw UPTRGTYP_X.get(info, node);
     }
 
     NodeUpdate up;

@@ -85,7 +85,7 @@ public class ZipZipFile extends ZipFn {
       String name = attribute(node, NAME, false);
       // source: if null, the node's children are serialized
       String src = attribute(node, SRC, false);
-      if(src != null) src = src.replaceAll("\\\\", "/");
+      if(src != null) src = src.replace('\\', '/');
       // compressed: if null, the node's children are serialized
       String store = attribute(node, COMPRESSED, false);
       if(store != null && store.equals("yes")) store = null;

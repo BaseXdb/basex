@@ -221,17 +221,15 @@ public class FnSubsequence extends StandardFunc {
       if(expr instanceof List) {
         final Expr[] args = expr.args();
         if(((Checks<Expr>) ex -> ex.seqType().one()).all(args)) {
-          return List.get(cc, info, Arrays.copyOfRange(args, (int) sr.start, (int) (sr.end)));
+          return List.get(cc, info, Arrays.copyOfRange(args, (int) sr.start, (int) sr.end));
         }
       }
-    } else {
+    } else if(exprs[1] == Int.ONE && exprs[2] instanceof Arith && !exprs[0].has(Flag.NDT)) {
       // subsequence(expr, 1, count(expr) - 1)  ->  util:init(expr)
-      if(exprs[1] == Int.ONE && exprs[2] instanceof Arith && !exprs[0].has(Flag.NDT)) {
-        final Arith ar = (Arith) exprs[2];
-        if(COUNT.is(ar.exprs[0]) && ar.calc == Calc.MINUS && ar.exprs[1] == Int.ONE &&
-            exprs[0].equals(ar.exprs[0].arg(0))) {
-          return cc.function(_UTIL_INIT, info, expr);
-        }
+      final Arith ar = (Arith) exprs[2];
+      if(COUNT.is(ar.exprs[0]) && ar.calc == Calc.MINUS && ar.exprs[1] == Int.ONE &&
+          exprs[0].equals(ar.exprs[0].arg(0))) {
+        return cc.function(_UTIL_INIT, info, expr);
       }
     }
 

@@ -149,7 +149,7 @@ public final class DirParser extends Parser {
    * @return stream
    */
   private IOStream newStream(final InputStream is, final String path, final IO input) {
-    return new IOStream(is, archiveName ? (input.path() + '/' + path) : path);
+    return new IOStream(is, archiveName ? input.path() + '/' + path : path);
   }
 
   /**

@@ -301,24 +301,22 @@ final class XMLScanner extends Job {
           return;
         }
         cDATA();
+      } else if(c == '&') {
+        // scan entity
+        final byte[] r = ref(true);
+        if(r.length == 1) token.add(r);
+        else if(!input.add(r, false)) throw error(RECENT);
       } else {
-        if(c == '&') {
-          // scan entity
-          final byte[] r = ref(true);
-          if(r.length == 1) token.add(r);
-          else if(!input.add(r, false)) throw error(RECENT);
-        } else {
-          if(c == ']') {
-            // ']]>' not allowed in content
-            if(consume() == ']') {
-              if(consume() == '>') throw error(CONTCDATA);
-              prev(1);
-            }
+        if(c == ']') {
+          // ']]>' not allowed in content
+          if(consume() == ']') {
+            if(consume() == '>') throw error(CONTCDATA);
             prev(1);
           }
-          // add character to cached content
-          token.add(c);
+          prev(1);
         }
+        // add character to cached content
+        token.add(c);
       }
       c = consume();
       f = false;
@@ -842,12 +840,11 @@ final class XMLScanner extends Job {
           if(consume(NOT)) { // [57,58]
             checkS(); check('('); s(); name(true); s();
             while(consume('|')) { s(); name(true); s(); }
-            check(')');
           } else { // [59]
             check('('); s(); nmtoken(); s();
             while(consume('|')) { s(); nmtoken(); s(); }
-            check(')');
           }
+          check(')');
         }
 
         // [54]

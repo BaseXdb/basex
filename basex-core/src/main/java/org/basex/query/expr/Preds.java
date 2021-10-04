@@ -209,17 +209,16 @@ public abstract class Preds extends Arr {
     // merge node tests with steps; remove redundant node tests
     if(expr instanceof SingleIterPath) {
       final Step predStep = (Step) ((Path) expr).steps[0];
-      if(predStep.axis == Axis.SELF && !predStep.mayBePositional()) {
-        if(root instanceof Step && !mayBePositional()) {
-          final Step rootStep = (Step) root;
-          final Test test = rootStep.test.intersect(predStep.test);
-          if(test != null) {
-            // child::node()[self:*]  ->  child::*
-            cc.info(OPTMERGE_X, predStep);
-            rootStep.test = test;
-            list.add(predStep.exprs);
-            return;
-          }
+      if(predStep.axis == Axis.SELF && !predStep.mayBePositional() && root instanceof Step &&
+          !mayBePositional()) {
+        final Step rootStep = (Step) root;
+        final Test test = rootStep.test.intersect(predStep.test);
+        if(test != null) {
+          // child::node()[self:*]  ->  child::*
+          cc.info(OPTMERGE_X, predStep);
+          rootStep.test = test;
+          list.add(predStep.exprs);
+          return;
         }
       }
     }

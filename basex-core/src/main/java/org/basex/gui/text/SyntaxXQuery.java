@@ -155,14 +155,14 @@ final class SyntaxXQuery extends Syntax {
           tb.add('\n');
           for(int i = 0; i < ind; i++) tb.add(spaces);
         }
-      } else if(close != -1 && (prev != ':' || ch != ')')) {
-        ind--;
-        if(!spaces(tb) && !matches(OPENING.charAt(close), t, text, -3)) {
-          tb.add('\n');
-          for(int i = 0; i < ind; i++) tb.add(spaces);
-        }
-        tb.addByte(ch);
       } else {
+        if(close != -1 && (prev != ':' || ch != ')')) {
+          ind--;
+          if(!spaces(tb) && !matches(OPENING.charAt(close), t, text, -3)) {
+            tb.add('\n');
+            for(int i = 0; i < ind; i++) tb.add(spaces);
+          }
+        }
         tb.addByte(ch);
       }
     }

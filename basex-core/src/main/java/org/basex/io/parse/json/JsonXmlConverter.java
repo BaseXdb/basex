@@ -86,35 +86,30 @@ abstract class JsonXmlConverter extends JsonConverter {
    */
   final void addType(final FElem elem, final byte[] name, final byte[] type) {
     // merge type information
-    if(merge) {
-      // check if name exists and contains no whitespaces
-      if(name != null && !contains(name, ' ')) {
-        // check if name is already known
-        if(names.contains(name)) {
-          final TypeCache arr = names.get(name);
-          if(arr != null && arr.type == type) {
-            // add element if all types are identical
-            arr.add(elem);
-          } else {
-            // different types for same element
-            if(arr != null) {
-              // invalidate cached elements, add type attributes
-              for(int i = 0; i < arr.size; i++) addType(arr.vals[i], arr.type);
-              names.put(name, null);
-            }
-            // add type attribute, ignore string type
-            addType(elem, type);
-          }
+    // check if name exists and contains no whitespaces
+    if(merge && name != null && !contains(name, ' ')) {
+      // check if name is already known
+      if(names.contains(name)) {
+        final TypeCache arr = names.get(name);
+        if(arr != null && arr.type == type) {
+          // add element if all types are identical
+          arr.add(elem);
         } else {
-          // new name: create new type cache
-          names.put(name, new TypeCache(name, type, elem));
+          // different types for same element
+          if(arr != null) {
+            // invalidate cached elements, add type attributes
+            for(int i = 0; i < arr.size; i++) addType(arr.vals[i], arr.type);
+            names.put(name, null);
+          }
+          // add type attribute, ignore string type
+          addType(elem, type);
         }
       } else {
-        // no name, or name with whitespaces: add type attribute, ignore string type
-        addType(elem, type);
+        // new name: create new type cache
+        names.put(name, new TypeCache(name, type, elem));
       }
     } else {
-      // add type attribute
+      // no name, or name with whitespaces: add type attribute, ignore string type
       addType(elem, type);
     }
   }

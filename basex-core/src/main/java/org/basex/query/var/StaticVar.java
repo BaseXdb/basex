@@ -82,8 +82,8 @@ public final class StaticVar extends StaticDecl {
 
     if(lazy) {
       if(!compiled) throw Util.notExpected(this + " was not compiled.");
-    } else {
-      if(expr == null) throw VAREMPTY_X.get(info, name());
+    } else if(expr == null) {
+      throw VAREMPTY_X.get(info, name());
     }
 
     if(value != null) return value;

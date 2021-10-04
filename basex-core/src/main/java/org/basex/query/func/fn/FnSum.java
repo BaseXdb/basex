@@ -157,12 +157,10 @@ public class FnSum extends StandardFunc {
         if(!num) {
           tp = DURATION;
         }
-      } else {
-        if(num) {
-          tp = NUMERIC;
-        } else if(dtd && type != DAY_TIME_DURATION || ymd && type != YEAR_MONTH_DURATION) {
-          tp = DURATION;
-        }
+      } else if(num) {
+        tp = NUMERIC;
+      } else if(dtd && type != DAY_TIME_DURATION || ymd && type != YEAR_MONTH_DURATION) {
+        tp = DURATION;
       }
       if(tp != null) throw ARGTYPE_X_X_X.get(info, tp, type, it);
       result = Calc.PLUS.eval(result, it, info);

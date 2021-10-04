@@ -27,7 +27,7 @@ public final class SelectiveIndexTest extends SandboxTest {
       set(MainOptions.TEXTINCLUDE, key);
       execute(new CreateDB(NAME, FILE));
       final int size = context.data().textIndex.size();
-      assertEquals(value.intValue(), size, "TextIndex: \"" + key + "\": ");
+      assertEquals(value, size, "TextIndex: \"" + key + "\": ");
     });
   }
 
@@ -40,7 +40,7 @@ public final class SelectiveIndexTest extends SandboxTest {
         set(MainOptions.ATTRINCLUDE, key);
         execute(new CreateDB(NAME, FILE));
         final int size = context.data().attrIndex.size();
-        assertEquals(value.intValue(), size, "AttrIndex: \"" + key + "\": ");
+        assertEquals(value, size, "AttrIndex: \"" + key + "\": ");
       });
     } finally {
       set(MainOptions.ATTRINCLUDE, "");
@@ -57,7 +57,7 @@ public final class SelectiveIndexTest extends SandboxTest {
         set(MainOptions.TOKENINCLUDE, key);
         execute(new CreateDB(NAME, FILE));
         final int size = context.data().tokenIndex.size();
-        assertEquals(value.intValue(), size, "TokenIndex: \"" + key + "\": ");
+        assertEquals(value, size, "TokenIndex: \"" + key + "\": ");
       });
     } finally {
       set(MainOptions.TOKENINCLUDE, "");

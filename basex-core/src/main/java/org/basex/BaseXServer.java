@@ -257,12 +257,10 @@ public final class BaseXServer extends CLI implements Runnable {
           default:
             throw arg.usage();
         }
+      } else if(S_STOP.equalsIgnoreCase(arg.string())) {
+        stop = true;
       } else {
-        if(S_STOP.equalsIgnoreCase(arg.string())) {
-          stop = true;
-        } else {
-          throw arg.usage();
-        }
+        throw arg.usage();
       }
     }
     // do not evaluate command if additional service will be started

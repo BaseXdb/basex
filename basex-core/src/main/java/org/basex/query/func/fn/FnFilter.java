@@ -38,8 +38,7 @@ public final class FnFilter extends StandardFunc {
     final Expr pred = cc.get(items, () -> {
       Expr p = ContextValue.get(cc, info);
       p = new DynFuncCall(info, sc, exprs[1], p).optimize(cc);
-      p = new TypeCheck(sc, info, p, SeqType.BOOLEAN_O, true).optimize(cc);
-      return p;
+      return new TypeCheck(sc, info, p, SeqType.BOOLEAN_O, true).optimize(cc);
     });
     return Filter.get(cc, info, items, cc.function(Function.BOOLEAN, info, pred));
   }

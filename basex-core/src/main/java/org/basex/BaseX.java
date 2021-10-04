@@ -73,7 +73,7 @@ public class BaseX extends CLI {
           case 'b':
             if(bind.length() != 0) bind.append(',');
             // commas are escaped by a second comma
-            value = bind.append(value.replaceAll(",", ",,")).toString();
+            value = bind.append(value.replace(",", ",,")).toString();
             execute(new Set(MainOptions.BINDINGS, value), false);
             break;
           case 'c':
@@ -88,7 +88,7 @@ public class BaseX extends CLI {
           case 'I':
             if(bind.length() != 0) bind.append(',');
             // commas are escaped by a second comma
-            value = bind.append('=').append(value.replaceAll(",", ",,")).toString();
+            value = bind.append('=').append(value.replace(",", ",,")).toString();
             execute(new Set(MainOptions.BINDINGS, value), false);
             break;
           case 'o':

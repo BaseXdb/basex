@@ -132,12 +132,10 @@ final class RestXqPathMatcher {
             break;
           } else if(ch == '{') {
             ++braces;
-            variable.add(ch);
           } else if(ch == '}' && --braces == 0) {
             break;
-          } else {
-            variable.add(ch);
           }
+          variable.add(ch);
         }
 
         final byte[] var = variable.toArray();
