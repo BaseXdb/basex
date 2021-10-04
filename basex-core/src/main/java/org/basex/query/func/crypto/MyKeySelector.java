@@ -15,6 +15,7 @@ import javax.xml.crypto.dsig.keyinfo.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Lukas Kircher
  */
+@SuppressWarnings("deprecation")
 final class MyKeySelector extends KeySelector {
   /**
    * Wrapper for KeySelector results.
