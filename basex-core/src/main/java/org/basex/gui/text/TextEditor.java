@@ -630,9 +630,7 @@ public final class TextEditor {
     // adopt current indentation
     final int ind = open();
     if(ind != 0) {
-      final StringBuilder spaces = new StringBuilder();
-      for(int i = 0; i < ind; i++) spaces.append(' ');
-      v = new TokenBuilder().addAll(v.split("\n"), "\n" + spaces).toString();
+      v = new TokenBuilder().addAll(v.split("\n"), "\n".concat(" ".repeat(ind))).toString();
     }
     // delete old string, add new one
     replace(p, pos, v);
@@ -786,7 +784,7 @@ public final class TextEditor {
     int indent = open(), move = 0;
     if(opening) {
       if(closing) {
-        for(int p = 0; p < indent + ind; p++) sb.append(' ');
+        sb.append(" ".repeat(Math.max(0, indent + ind)));
         move = indent + ind + 1;
         sb.append('\n');
       } else {
@@ -796,7 +794,7 @@ public final class TextEditor {
       // unindent before closing bracket
       indent -= ind;
     }
-    for(int p = 0; p < indent; p++) sb.append(' ');
+    sb.append(" ".repeat(Math.max(0, indent)));
     add(sb, false);
     return move;
   }

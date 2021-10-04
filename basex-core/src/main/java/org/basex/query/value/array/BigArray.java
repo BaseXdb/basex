@@ -567,7 +567,7 @@ final class BigArray extends XQArray {
       sub = middle.listIterator(m);
     }
 
-    return new ListIterator<Value>() {
+    return new ListIterator<>() {
       int pos = startPos;
 
       @Override

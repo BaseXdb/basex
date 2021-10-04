@@ -34,7 +34,7 @@ public final class XdmEmpty extends XdmValue {
 
   @Override
   public Iterator<XdmItem> iterator() {
-    return new Iterator<XdmItem>() {
+    return new Iterator<>() {
       @Override
       public boolean hasNext() {
         return false;

@@ -41,7 +41,7 @@ public abstract class BasicNodeIter extends NodeIter implements Iterable<ANode> 
 
   @Override
   public final Iterator<ANode> iterator() {
-    return new Iterator<ANode>() {
+    return new Iterator<>() {
       private ANode node;
 
       @Override

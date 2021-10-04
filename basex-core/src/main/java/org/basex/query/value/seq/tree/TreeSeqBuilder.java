@@ -234,7 +234,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
 
   @Override
   public Iterator<Item> iterator() {
-    return new Iterator<Item>() {
+    return new Iterator<>() {
       private int pos = -inLeft;
       private Iterator<Item> sub;
 

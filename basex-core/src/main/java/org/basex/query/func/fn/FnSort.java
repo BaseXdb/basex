@@ -59,7 +59,7 @@ public final class FnSort extends StandardFunc {
     }
 
     final Integer[] order = sort(values, this, coll, qc);
-    return new BasicIter<Item>(size) {
+    return new BasicIter<>(size) {
       @Override
       public Item get(final long i) {
         return input.itemAt(order[(int) i]);

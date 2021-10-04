@@ -109,8 +109,7 @@ final class EmptyTree<N, E> extends FingerTree<N, E> {
 
   @Override
   void toString(final StringBuilder sb, final int indent) {
-    for(int i = 0; i < indent; i++) sb.append("  ");
-    sb.append("Empty[]");
+    sb.append("  ".repeat(indent)).append("Empty[]");
   }
 
   @Override

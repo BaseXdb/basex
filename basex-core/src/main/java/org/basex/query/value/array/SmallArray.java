@@ -152,7 +152,7 @@ final class SmallArray extends XQArray {
 
   @Override
   public ListIterator<Value> iterator(final long start) {
-    return new ListIterator<Value>() {
+    return new ListIterator<>() {
       private int index = (int) start;
 
       @Override

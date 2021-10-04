@@ -82,7 +82,7 @@ public abstract class Seq extends Value {
 
   @Override
   public BasicIter<Item> iter() {
-    return new BasicIter<Item>(size) {
+    return new BasicIter<>(size) {
       @Override
       public Item get(final long i) {
         return itemAt(i);

@@ -108,7 +108,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   @Override
   public Iterator<StaticVar> iterator() {
     final Iterator<QNm> qnames = vars.iterator();
-    return new Iterator<StaticVar>() {
+    return new Iterator<>() {
       @Override
       public boolean hasNext() {
         return qnames.hasNext();

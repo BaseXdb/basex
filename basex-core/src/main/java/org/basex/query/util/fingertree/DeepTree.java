@@ -812,35 +812,27 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
 
   @Override
   void toString(final StringBuilder sb, final int indent) {
-    for(int i = 0; i < indent; i++) sb.append("  ");
-    sb.append("Deep(").append(size).append(")[\n");
+    sb.append("  ".repeat(indent)).append("Deep(").append(size).append(")[\n");
 
     // left digit
-    for(int i = 0; i < indent + 1; i++) sb.append("  ");
-    sb.append("Left(").append(leftSize).append(")[\n");
+    sb.append("  ".repeat(indent + 1)).append("Left(").append(leftSize).append(")[\n");
     for(final Node<N, E> e : left) {
       toString(e, sb, indent + 2);
       sb.append('\n');
     }
-    for(int i = 0; i < indent + 1; i++) sb.append("  ");
-    sb.append("]\n");
+    sb.append("  ".repeat(indent + 1)).append("]\n");
 
     // middle tree
     middle.toString(sb, indent + 1);
     sb.append('\n');
 
     // right digit
-    for(int i = 0; i < indent + 1; i++) sb.append("  ");
-    sb.append("Right[\n");
+    sb.append("  ".repeat(indent + 1)).append("Right[\n");
     for(final Node<N, E> e : right) {
       toString(e, sb, indent + 2);
       sb.append('\n');
     }
-    for(int i = 0; i < indent + 1; i++) sb.append("  ");
-    sb.append("]\n");
-
-    for(int i = 0; i < indent; i++) sb.append("  ");
-    sb.append(']');
+    sb.append("  ".repeat(indent + 1)).append("]\n").append("  ".repeat(indent)).append(']');
   }
 
   @Override

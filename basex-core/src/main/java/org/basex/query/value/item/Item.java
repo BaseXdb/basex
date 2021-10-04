@@ -40,7 +40,7 @@ public abstract class Item extends Value {
 
   @Override
   public BasicIter<Item> iter() {
-    return new BasicIter<Item>(1) {
+    return new BasicIter<>(1) {
       @Override
       public Item get(final long i) {
         return Item.this;

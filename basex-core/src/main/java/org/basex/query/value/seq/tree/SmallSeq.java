@@ -82,7 +82,7 @@ public final class SmallSeq extends TreeSeq {
 
   @Override
   public ListIterator<Item> iterator(final long start) {
-    return new ListIterator<Item>() {
+    return new ListIterator<>() {
       private int index = (int) start;
 
       @Override
@@ -134,7 +134,7 @@ public final class SmallSeq extends TreeSeq {
 
   @Override
   public BasicIter<Item> iter() {
-    return new BasicIter<Item>(size) {
+    return new BasicIter<>(size) {
       @Override
       public Item get(final long i) {
         return items[(int) i];

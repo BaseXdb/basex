@@ -22,7 +22,7 @@ public final class Empty extends Item {
   /** Singleton instance. */
   public static final Empty VALUE = new Empty();
   /** Empty iterator. */
-  public static final BasicIter<Item> ITER = new BasicIter<Item>(0) {
+  public static final BasicIter<Item> ITER = new BasicIter<>(0) {
     @Override
     public Item next() {
       return null;

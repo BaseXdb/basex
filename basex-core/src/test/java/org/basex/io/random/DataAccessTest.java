@@ -26,7 +26,7 @@ public class DataAccessTest {
   /** String. */
   private static final String STR = "string with characters: 10";
   /** Long string. */
-  private static final String STR_LONG = repeat(STR, 1000);
+  private static final String STR_LONG = STR.repeat(1000);
   /** Byte. */
   private static final byte BYTE = Byte.MIN_VALUE;
   /** Long (5-byte long). */
@@ -465,17 +465,5 @@ public class DataAccessTest {
     } else {
       return new int[] { v };
     }
-  }
-
-  /**
-   * Construct a new string by repeating a given string several times.
-   * @param s string
-   * @param n number of time to repeat the string
-   * @return result string
-   */
-  private static String repeat(final String s, final int n) {
-    final StringBuilder str = new StringBuilder(n * s.length());
-    for(int i = 0; i < n; ++i) str.append(s);
-    return str.toString();
   }
 }

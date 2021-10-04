@@ -1406,11 +1406,8 @@ public enum QueryError {
    * @param message message
    */
   QueryError(final ErrType type, final int number, final String message) {
-    final StringBuilder sb = new StringBuilder(8).append(type);
     final String n = Integer.toString(number);
-    final int s = 4 - n.length();
-    for(int i = 0; i < s; i++) sb.append('0');
-    code = sb.append(n).toString();
+    code = new StringBuilder().append(type).append("0".repeat(4 - n.length())).append(n).toString();
     uri = type.uri;
     prefix = type.prefix;
     this.message = message;

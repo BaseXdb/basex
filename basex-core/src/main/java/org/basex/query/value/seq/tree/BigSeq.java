@@ -420,7 +420,7 @@ final class BigSeq extends TreeSeq {
       sub = middle.listIterator(m);
     }
 
-    return new ListIterator<Item>() {
+    return new ListIterator<>() {
       int pos = startPos;
 
       @Override
@@ -501,7 +501,7 @@ final class BigSeq extends TreeSeq {
 
   @Override
   public BasicIter<Item> iter() {
-    return new BasicIter<Item>(size) {
+    return new BasicIter<>(size) {
       private Iterator<Item> sub;
 
       @Override

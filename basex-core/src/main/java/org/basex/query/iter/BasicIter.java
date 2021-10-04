@@ -45,7 +45,7 @@ public abstract class BasicIter<I extends Item> extends Iter implements Iterable
 
   @Override
   public final Iterator<I> iterator() {
-    return new Iterator<I>() {
+    return new Iterator<>() {
       private I item;
 
       @Override
