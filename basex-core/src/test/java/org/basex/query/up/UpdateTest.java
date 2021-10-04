@@ -1274,4 +1274,9 @@ public final class UpdateTest extends SandboxTest {
   @Test public void gh2002() {
     query("(<a/>, <b/>) update { insert node position() into . }", "<a>1</a>\n<b>2</b>");
   }
+
+  /** Transform expression: NPE. */
+  @Test public void gh2041() {
+    error("copy $a := <a/>[. = 'x'] modify () return $a", UPSINGLE_X_X);
+  }
 }
