@@ -12,6 +12,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -60,16 +61,23 @@ public final class Transform extends Copy {
     try {
       for(final Let copy : copies) {
         final Iter iter = copy.expr.iter(qc);
-        Item node = iter.next(), node2 = node != null ? iter.next() : null;
-        final Value value = !(node instanceof ANode) ? node :
-          node2 != null ? ValueBuilder.concat(node, node2, qc) : null;
-        if(value != null) throw UPSINGLE_X_X.get(copy.info(), copy.var.name, value);
+        Item item = iter.next();
+        Value error = null;
+        if(item == null) {
+          error = Empty.VALUE;
+        } else if(!(item instanceof ANode)) {
+          error = item;
+        } else {
+          final Item item2 = iter.next();
+          if(item2 != null) error = ValueBuilder.concat(item, item2, qc);
+        }
+        if(error != null) throw UPSINGLE_X_X.get(copy.info(), copy.var.name, error);
 
         // create main memory copy of node
-        node = ((ANode) node).copy(qc);
+        item = ((ANode) item).copy(qc);
         // add resulting node to variable
-        qc.set(copy.var, node);
-        updates.addData(node.data());
+        qc.set(copy.var, item);
+        updates.addData(item.data());
       }
 
       if(!modify().value(qc).isEmpty()) throw UPMODIFY.get(info);
