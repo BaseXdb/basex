@@ -1,0 +1,11 @@
+<!ELEMENT classpath (classpathentry+)>
+<!ELEMENT classpathentry (attributes?)>
+<!ATTLIST classpathentry kind NMTOKEN #REQUIRED>
+<!ATTLIST classpathentry output CDATA #IMPLIED>
+<!ATTLIST classpathentry path CDATA #REQUIRED>
+<!ATTLIST classpathentry excluding CDATA #IMPLIED>
+<!ATTLIST classpathentry combineaccessrules NMTOKEN #IMPLIED>
+<!ELEMENT attributes (attribute+)>
+<!ELEMENT attribute EMPTY>
+<!ATTLIST attribute name (maven.pomderived|optional|test) #REQUIRED>
+<!ATTLIST attribute value NMTOKEN #FIXED "true">
