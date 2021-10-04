@@ -5,6 +5,7 @@ import static org.basex.http.HTTPText.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.Map.*;
 import java.util.function.*;
 
 import org.basex.core.*;
@@ -158,7 +159,7 @@ public final class BaseXHTTP extends CLI {
     context.log.writeServer(LogType.OK, msg2.apply(true));
 
     // execute initial command-line arguments
-    for(final Pair<String, String> cmd : commands) {
+    for(final Entry<String, String> cmd : commands) {
       if(!execute(cmd)) return;
     }
   }

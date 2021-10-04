@@ -9,6 +9,8 @@ import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.AbstractMap.*;
+import java.util.Map.*;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -1062,12 +1064,12 @@ public class TextPanel extends BaseXPanel {
     final String input = string(substring(editor.text(), start, caret)).toLowerCase(Locale.ENGLISH);
 
     // find insertion candidates
-    final ArrayList<Pair<String, String>> pairs = new ArrayList<>();
+    final ArrayList<Entry<String, String>> pairs = new ArrayList<>();
     final int il = LISTS.size();
     for(int i = 0; i < il; i++) {
       if(i > 0) pairs.add(null);
-      for(final Pair<String, String> pair : LISTS.get(i)) {
-        final String name = pair.name();
+      for(final Entry<String, String> pair : LISTS.get(i)) {
+        final String name = pair.getKey();
         if(name.startsWith(input) || name.replace(":", "").startsWith(input)) pairs.add(pair);
       }
     }
@@ -1075,8 +1077,8 @@ public class TextPanel extends BaseXPanel {
       pairs.clear();
       for(int i = 0; i < il; i++) {
         if(i > 0) pairs.add(null);
-        for(final Pair<String, String> pair : LISTS.get(i)) {
-          if(SmartStrings.matches(pair.name(), input)) pairs.add(pair);
+        for(final Entry<String, String> pair : LISTS.get(i)) {
+          if(SmartStrings.matches(pair.getKey(), input)) pairs.add(pair);
         }
       }
     }
@@ -1092,17 +1094,17 @@ public class TextPanel extends BaseXPanel {
 
     if(pairs.size() == 1) {
       // insert single candidate
-      complete(pairs.get(0).value(), start);
+      complete(pairs.get(0).getValue(), start);
     } else if(!pairs.isEmpty()) {
       // show popup menu
       final JPopupMenu pm = new JPopupMenu();
       final ActionListener al = ae -> complete(
         ae.getActionCommand().replaceAll("^.*?] ", ""), start);
-      for(final Pair<String, String> entry : pairs) {
+      for(final Entry<String, String> entry : pairs) {
         if(entry == null) {
           pm.addSeparator();
         } else {
-          final JMenuItem mi = new JMenuItem(entry.value());
+          final JMenuItem mi = new JMenuItem(entry.getValue());
           pm.add(mi);
           mi.addActionListener(al);
         }
@@ -1135,7 +1137,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Replacement lists. */
-  private static final ArrayList<ArrayList<Pair<String, String>>> LISTS = new ArrayList<>();
+  private static final ArrayList<ArrayList<Entry<String, String>>> LISTS = new ArrayList<>();
 
   /* Reads in the property file. */
   static {
@@ -1150,7 +1152,7 @@ public class TextPanel extends BaseXPanel {
         for(String line; (line = nli.readLine()) != null;) {
           final int i = line.indexOf('=');
           if(i == -1 || Strings.startsWith(line, '#')) continue;
-          LISTS.get(0).add(new Pair<>(line.substring(0, i),
+          LISTS.get(0).add(new SimpleEntry<>(line.substring(0, i),
               line.substring(i + 1).replace("\\n", "\n")));
         }
       } catch(final IOException ex) {
@@ -1164,13 +1166,13 @@ public class TextPanel extends BaseXPanel {
       final String value = name + (func.contains("()") ? "()" : "(_)");
       if(fd.uri() == QueryText.FN_URI) {
         if(name.contains("-")) LISTS.get(1).add(
-            new Pair<>(name.replaceAll("(.)[^-A-Z]*-?", "$1").
+            new SimpleEntry<>(name.replaceAll("(.)[^-A-Z]*-?", "$1").
             toLowerCase(Locale.ENGLISH), value));
-        LISTS.get(2).add(new Pair<>(name.toLowerCase(Locale.ENGLISH), value));
+        LISTS.get(2).add(new SimpleEntry<>(name.toLowerCase(Locale.ENGLISH), value));
       } else {
-        LISTS.get(3).add(new Pair<>(name.replaceAll("(:?.)[^-:A-Z]*-?", "$1").
+        LISTS.get(3).add(new SimpleEntry<>(name.replaceAll("(:?.)[^-:A-Z]*-?", "$1").
             toLowerCase(Locale.ENGLISH), value));
-        LISTS.get(4).add(new Pair<>(name.toLowerCase(Locale.ENGLISH), value));
+        LISTS.get(4).add(new SimpleEntry<>(name.toLowerCase(Locale.ENGLISH), value));
       }
     }
   }

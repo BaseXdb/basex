@@ -5,6 +5,8 @@ import static org.basex.core.Text.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.AbstractMap.*;
+import java.util.Map.*;
 
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
@@ -24,7 +26,7 @@ public abstract class CLI extends Main {
   public Context context;
 
   /** Cached initial commands. */
-  protected final ArrayList<Pair<String, String>> commands = new ArrayList<>();
+  protected final ArrayList<Entry<String, String>> commands = new ArrayList<>();
   /** Output file for queries. */
   protected OutputStream out = System.out;
   /** Verbose mode. */
@@ -58,9 +60,9 @@ public abstract class CLI extends Main {
    * @return {@code false} if the exit command was sent
    * @throws IOException database exception
    */
-  protected final boolean execute(final Pair<String, String> command) throws IOException {
-    final CommandParser cp = CommandParser.get(command.value(), context);
-    return execute(cp.baseURI(command.name()).pwReader(PWREADER));
+  protected final boolean execute(final Entry<String, String> command) throws IOException {
+    final CommandParser cp = CommandParser.get(command.getValue(), context);
+    return execute(cp.baseURI(command.getKey()).pwReader(PWREADER));
   }
 
   /**
@@ -140,10 +142,10 @@ public abstract class CLI extends Main {
    * @return return base URI and query string
    * @throws IOException I/O exception
    */
-  protected static Pair<String, String> input(final String input) throws IOException {
+  protected static Entry<String, String> input(final String input) throws IOException {
     final IO io = IO.get(input);
     final boolean file = !(io instanceof IOContent) && io.exists() && !io.isDir();
-    return new Pair<>(file ? io.path() : "./", file ? io.string() : input);
+    return new SimpleEntry<>(file ? io.path() : "./", file ? io.string() : input);
   }
 
   /**

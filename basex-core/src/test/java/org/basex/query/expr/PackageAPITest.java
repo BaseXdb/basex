@@ -117,8 +117,7 @@ public final class PackageAPITest extends SandboxTest {
   }
 
   /**
-   * Tests package with not installed dependencies - dependency is defined with
-   * no specific versions.
+   * Tests package with not installed dependencies. Dependency is defined with no specific versions.
    */
   @Test public void notInstalledDeps() {
     error(
@@ -128,8 +127,7 @@ public final class PackageAPITest extends SandboxTest {
   }
 
   /**
-   * Tests package with not installed dependencies - dependency is defined with
-   * version set.
+   * Tests package with not installed dependencies. Dependency is defined with version set.
    */
   @Test public void notInstalledDepVersion() {
     error(
@@ -139,8 +137,7 @@ public final class PackageAPITest extends SandboxTest {
   }
 
   /**
-   * Tests package with not installed dependencies - dependency is defined with
-   * version template.
+   * Tests package with not installed dependencies. Dependency is defined with version template.
    */
   @Test public void notInstalledDepTemp() {
     error(
@@ -150,8 +147,8 @@ public final class PackageAPITest extends SandboxTest {
   }
 
   /**
-   * Tests package with not installed dependencies - dependency is defined with
-   * version template for minimal acceptable version.
+   * Tests package with not installed dependencies. Dependency is defined with version template for
+   * minimal acceptable version.
    */
   @Test public void notInstalledMin() {
     error(
@@ -161,8 +158,8 @@ public final class PackageAPITest extends SandboxTest {
   }
 
   /**
-   * Tests package with not installed dependencies - dependency is defined with
-   * version template for maximal acceptable version.
+   * Tests package with not installed dependencies. Dependency is defined with version template for
+   * maximal acceptable version.
    */
   @Test public void notInstalledMax() {
     error(
@@ -172,8 +169,8 @@ public final class PackageAPITest extends SandboxTest {
   }
 
   /**
-   * Tests package with not installed dependencies - dependency is defined with
-   * version templates for minimal and maximal acceptable version.
+   * Tests package with not installed dependencies. Dependency is defined with version templates for
+   * minimal and maximal acceptable version.
    */
   @Test public void notInstalledMinMax() {
     error(desc(PKG5, "pkg5", "12.0",
@@ -183,8 +180,7 @@ public final class PackageAPITest extends SandboxTest {
   }
 
   /**
-   * Tests package with component which is already installed as part of another
-   * package.
+   * Tests package with component which is already installed as part of another package.
    */
   @Test public void alreadyAnotherInstalled() {
     error(desc(PKG5, "pkg5", "12.0",
@@ -202,8 +198,8 @@ public final class PackageAPITest extends SandboxTest {
   }
 
   /**
-   * Tests package with component which is already installed as part of another
-   * version of the same package.
+   * Tests package with component which is already installed as part of another version of the same
+   * package.
    */
   @Test public void alreadyAnotherSame() {
     ok(desc(PKG1, "pkg1", "10.0",
