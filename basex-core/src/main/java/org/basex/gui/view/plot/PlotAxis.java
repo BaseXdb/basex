@@ -244,8 +244,8 @@ final class PlotAxis {
     final int limit = pre + data.size(pre, Data.ELEM);
     for(int p = pre; p < limit; ++p) {
       final int kind = data.kind(p);
-      if((kind == Data.ELEM && elem || kind == Data.ATTR && !elem) &&
-          attrID == data.nameId(p)) return data.atom(p);
+      if((elem ? kind == Data.ELEM : kind == Data.ATTR) && attrID == data.nameId(p))
+        return data.atom(p);
     }
     return EMPTY;
   }

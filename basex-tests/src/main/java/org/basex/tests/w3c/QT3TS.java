@@ -729,10 +729,10 @@ public final class QT3TS extends Main {
       if(exp.equals(r)) return null;
 
       // include check for comments, processing instructions and namespaces
-      String flags = "'" + Mode.ALLNODES + '\'';
-      if(!pref) flags += ",'" + Mode.NAMESPACES + '\'';
+      final StringBuilder flags = new StringBuilder("'").append(Mode.ALLNODES).append('\'');
+      if(!pref) flags.append(",'").append(Mode.NAMESPACES).append('\'');
       final String query = Function._UTIL_DEEP_EQUAL.args(" <X>" + exp + "</X>",
-          " <X>" + res + "</X>" , " (" + flags + ")");
+          " <X>" + res + "</X>" , " (" + flags.append(")").toString());
       return asBoolean(query, expected) ? null : exp;
     } catch(final IOException ex) {
       return Util.info("% (found: %)", exp, ex);

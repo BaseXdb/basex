@@ -58,7 +58,7 @@ public final class XQJava extends FItem {
   @Override
   public QNm funcName() {
     return new QNm(JAVA_PREFIX, value == null ? "null" :
-      value.getClass().getCanonicalName().replaceAll("\\[\\]", "..."), JAVA_URI);
+      value.getClass().getCanonicalName().replace("[]", "..."), JAVA_URI);
   }
 
   @Override

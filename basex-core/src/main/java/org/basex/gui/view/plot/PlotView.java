@@ -443,15 +443,12 @@ public final class PlotView extends View {
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
 
     // drawing horizontal axis line
-    if(drawX) {
-      if(plotChanged) {
+    if(plotChanged) {
+      if(drawX) {
         if(plotData.pres.length > 0) axis.calcCaption(pWidth);
         xLog.setEnabled(StatsType.isNumeric(plotData.xAxis.type) &&
             Math.abs(axis.min - axis.max) >= 1);
-      }
-    } else {
-      // drawing vertical axis line
-      if(plotChanged) {
+      } else {
         if(plotData.pres.length > 0) axis.calcCaption(pHeight);
         yLog.setEnabled(StatsType.isNumeric(plotData.yAxis.type) &&
             Math.abs(axis.min - axis.max) >= 1);
@@ -719,12 +716,10 @@ public final class PlotView extends View {
         g.drawImage(img, MARGIN[1] - imgW - fs / 2, pos - fs, this);
         g.drawLine(MARGIN[1], pos, w - MARGIN[3], pos);
       }
+    } else if(drawX) {
+      g.drawLine(pos, MARGIN[0], pos, h - MARGIN[2] - sf);
     } else {
-      if(drawX) {
-        g.drawLine(pos, MARGIN[0], pos, h - MARGIN[2] - sf);
-      } else {
-        g.drawLine(MARGIN[1] + sf, pos, w - MARGIN[3], pos);
-      }
+      g.drawLine(MARGIN[1] + sf, pos, w - MARGIN[3], pos);
     }
   }
 

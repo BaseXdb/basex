@@ -167,9 +167,8 @@ public final class BaseXFileChooser {
 
       // show replace dialog
       for(final IOFile io : files) {
-        if(io.exists()) {
-          if(!BaseXDialog.confirm(win.gui(), Util.info(FILE_EXISTS_X, io))) return new IOFile[0];
-        }
+        if(io.exists() && !BaseXDialog.confirm(win.gui(), Util.info(FILE_EXISTS_X, io)))
+          return new IOFile[0];
       }
     }
     return files;

@@ -221,10 +221,10 @@ public final class DecFormatter extends FormatUtil {
             expAct = true;
           }
           act = true;
-        } else {
+        } else if(act && containsActive(pt, i + cl)) {
           // "A sub-picture must not contain a passive character that is preceded by an active
           // character and that is followed by another active character."
-          if(act && containsActive(pt, i + cl)) return false;
+          return false;
         }
 
         // cache last character
@@ -238,7 +238,7 @@ public final class DecFormatter extends FormatUtil {
 
       // "A sub-picture that contains a percent-sign or per-mille-sign must not contain a character
       // treated as an exponent-separator-sign."
-      if(per && exp || exp && !expAct) return false;
+      if(exp && (per || !expAct)) return false;
     }
 
     // everything ok
@@ -293,9 +293,10 @@ public final class DecFormatter extends FormatUtil {
         } else if(contains(digits, ch)) {
           if(exp) {
             pic.minExp++;
+          } else if(frac) {
+            pic.minFrac++;
           } else {
-            if(frac) pic.minFrac++;
-            else pic.minInt++;
+            pic.minInt++;
           }
         }
 

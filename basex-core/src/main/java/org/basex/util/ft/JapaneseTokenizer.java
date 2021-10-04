@@ -182,12 +182,8 @@ final class JapaneseTokenizer extends Tokenizer {
         for(int s = 0; s < sl; s++) {
           final String c = String.valueOf(srfc.charAt(s));
           final byte[] t = token(c);
-          if(t.length == 1) {
-            if(letter(t[0]) || digit(t[0])) cont = false;
-            else marks.add(new Morpheme(c, KIGOU_FEATURE));
-          } else {
-            cont = false;
-          }
+          if(t.length != 1 || letter(t[0]) || digit(t[0])) cont = false;
+          else marks.add(new Morpheme(c, KIGOU_FEATURE));
         }
 
         if(cont) list.addAll(marks);
@@ -273,25 +269,19 @@ final class JapaneseTokenizer extends Tokenizer {
           }
           continue;
         }
-      } else {
-        // last token.
-        if(cMark) {
-          if("\\".equals(cSrfc)) continue;
-          if(word.length() != 0) {
-            word.append(cSrfc);
-          }
-          more = true;
-          continue;
-        }
+      } else if(cMark) {
+        // last token
+        if("\\".equals(cSrfc)) continue;
+        if(word.length() != 0) word.append(cSrfc);
+        more = true;
+        continue;
       }
 
       if(period) {
         word.append(cSrfc);
-      } else {
-        if(bs)
-          if(!isFtChar(cSrfc)) word.append(cSrfc);
-        else
-          word.setLength(0);
+      } else if(bs) {
+        if(!isFtChar(cSrfc)) word.append(cSrfc);
+        else word.setLength(0);
       }
       more = true;
       cpos++;
@@ -399,11 +389,7 @@ final class JapaneseTokenizer extends Tokenizer {
         tb.add(0x0020);
       } else if(c == 0xFF01) { // !
         tb.add(0x0021);
-      } else if(c == 0xFF02) { // " FULLWIDTH QUOTATION MARK
-        tb.add(0x0022);
-      } else if(c == 0x201C) { // " LEFT DOUBLE QUOTATION MARK
-        tb.add(0x0022);
-      } else if(c == 0x201D) { // " RIGHT DOUBLE QUOTATION MARK
+      } else if(c == 0xFF02 || c == 0x201C || c == 0x201D) { // " FULLWIDTH QUOTATION MARK
         tb.add(0x0022);
       } else if(c == 0xFF03) { // #
         tb.add(0x0023);
@@ -413,11 +399,7 @@ final class JapaneseTokenizer extends Tokenizer {
         tb.add(0x0025);
       } else if(c == 0xFF06) { // &
         tb.add(0x0026);
-      } else if(c == 0xFF07) { // ' FULLWIDTH APOSTROPHE
-        tb.add(0x0027);
-      } else if(c == 0x2018) { // ' LEFT SINGLE QUOTATION MARK
-        tb.add(0x0027);
-      } else if(c == 0x2019) { // ' RIGHT SINGLE QUOTATION MARK
+      } else if(c == 0xFF07 || c == 0x2018 || c == 0x2019) { // ' FULLWIDTH APOSTROPHE
         tb.add(0x0027);
       } else if(c == 0xFF08) { // (
         tb.add(0x0028);

@@ -804,8 +804,8 @@ public final class NamespaceTest extends SandboxTest {
     final String result = Sandbox.query(second).trim();
 
     // quotes are replaced by apostrophes to simplify comparison
-    final String res = result.replaceAll("\"", "'");
-    final String exp = expected.replaceAll("\"", "'");
+    final String res = result.replace('"', '\'');
+    final String exp = expected.replace('"', '\'');
     if(!exp.equals(res)) fail("\n[E] " + exp + "\n[F] " + res);
   }
 }

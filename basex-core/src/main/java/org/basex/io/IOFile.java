@@ -419,10 +419,8 @@ public final class IOFile extends IO {
       for(final IOFile child : io.children(filter)) {
         addDescendants(child, files, filter, offset);
       }
-    } else {
-      if(filter == null || filter.accept(io.file)) {
-        files.add(io.path().substring(offset));
-      }
+    } else if(filter == null || filter.accept(io.file)) {
+      files.add(io.path().substring(offset));
     }
   }
 

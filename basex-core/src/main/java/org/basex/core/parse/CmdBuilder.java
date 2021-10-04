@@ -109,7 +109,7 @@ public final class CmdBuilder {
       if(key != null) tb.add(' ').add(key);
       tb.add(' ');
       if(arg.indexOf(' ') != -1 || arg.indexOf(';') != -1) {
-        tb.add('"').add(arg.replaceAll("\"", "\\\"")).add('"');
+        tb.add('"').add(arg.replace('"', '"')).add('"');
       } else {
         tb.add(arg);
       }

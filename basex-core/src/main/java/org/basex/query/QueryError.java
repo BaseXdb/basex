@@ -1638,7 +1638,7 @@ public enum QueryError {
    */
   public static QueryException ebvError(final Value value, final InputInfo ii) {
     final String expected, found;
-    Type type = value.seqType().type;
+    final Type type = value.seqType().type;
     if(type.instanceOf(AtomType.NUMERIC) || type.instanceOf(AtomType.STRING) ||
         type == AtomType.BOOLEAN || type == AtomType.ANY_URI) {
       expected = "Single " + type;

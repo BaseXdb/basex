@@ -34,8 +34,8 @@ final class SimpleFilter extends CachedFilter {
         final double pos = pred.dbl(info);
         if(pos > 0 && pos <= value.size() && pos == (long) pos)
           return value.itemAt((long) pos - 1);
-      } else {
-        if(pred.bool(info)) return value;
+      } else if(pred.bool(info)) {
+        return value;
       }
     }
     return Empty.VALUE;

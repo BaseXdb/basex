@@ -341,9 +341,10 @@ public final class SearchBar extends BaseXBack {
           if(ch != '\\') sb.append(ch);
         }
         bs = false;
+      } else if(ch == '\\') {
+        bs = true;
       } else {
-        if(ch == '\\') bs = true;
-        else sb.append(ch);
+        sb.append(ch);
       }
     }
     if(bs) sb.append('\\');

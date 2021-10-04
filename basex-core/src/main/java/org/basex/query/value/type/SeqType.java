@@ -166,7 +166,7 @@ public final class SeqType {
   /** Any function type. */
   public static final FuncType FUNCTION = new FuncType(null, (SeqType[]) null);
   /** Java function type. */
-  public static final FuncType JAVA = new FuncType(null, new SeqType[0]);
+  public static final FuncType JAVA = new FuncType(null);
   /** The general map type. */
   public static final MapType MAP = new MapType(ANY_ATOMIC_TYPE, ITEM_ZM);
   /** The general array type. */

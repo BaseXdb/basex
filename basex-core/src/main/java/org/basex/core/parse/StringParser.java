@@ -435,7 +435,7 @@ final class StringParser extends CommandParser {
    * @return completions
    */
   private static <T extends Enum<T>> Enum<?>[] startWith(final Class<T> en, final String prefix) {
-    Enum<?>[] list = new Enum<?>[0];
+    Enum<?>[] list = { };
     final String t = prefix == null ? "" : prefix.toUpperCase(Locale.ENGLISH);
     for(final Enum<?> e : en.getEnumConstants()) {
       if(e.name().startsWith(t)) {

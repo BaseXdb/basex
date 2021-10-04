@@ -75,7 +75,7 @@ public final class Find extends AQuery {
     if(query.isEmpty()) return r ? "/" : ".";
 
     // parse user input
-    final String qu = query.replaceAll(" \\+", " ");
+    final String qu = query.replace(" +", " ");
     final String[] terms = split(qu);
 
     final StringBuilder pre = new StringBuilder(), preds = new StringBuilder();
@@ -184,8 +184,7 @@ public final class Find extends AQuery {
       if(delim == 0) {
         if(c == '\'' || c == '"') {
           delim = c;
-        } else if(!XMLToken.isChar(c) && c != '@' && c != '='
-            && c != '<' && c != '>' && c != '~') {
+        } else if(!XMLToken.isChar(c) && c != '@' && c != '=' && c != '<' && c != '>' && c != '~') {
           if(sb.length() != 0) {
             split[s++] = sb.toString();
             sb.setLength(0);
@@ -193,16 +192,14 @@ public final class Find extends AQuery {
         } else {
           sb.append(c);
         }
-      } else {
-        if(c == delim) {
-          delim = 0;
-          if(sb.length() != 0) {
-            split[s++] = sb.toString();
-            sb.setLength(0);
-          }
-        } else {
-          if(c != '\'' && c != '"') sb.append(c);
+      } else if(c == delim) {
+        delim = 0;
+        if(sb.length() != 0) {
+          split[s++] = sb.toString();
+          sb.setLength(0);
         }
+      } else if(c != '\'' && c != '"') {
+        sb.append(c);
       }
     }
     if(sb.length() != 0) split[s++] = sb.toString();

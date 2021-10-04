@@ -411,7 +411,7 @@ public final class MapView extends View {
         xe += (zr.x + xe * zr.w / tw - xe) * s / MAXZS;
         ye += (zr.y + ye * zr.h / th - ye) * s / MAXZS;
       } else {
-        final long s = 10000 - (ZS[zoomIn ? -zs : ZOOMSIZE + zs]);
+        final long s = 10000 - ZS[zoomIn ? -zs : ZOOMSIZE + zs];
         if(zr.w == 0) zr.w = 1;
         if(zr.h == 0) zr.h = 1;
         xs = -xe * zr.x / zr.w * s / MAXZS;
@@ -463,8 +463,8 @@ public final class MapView extends View {
       gui.notify.mark(1, null);
     } else if(sc(e) && SwingUtilities.isLeftMouseButton(e)) {
       gui.notify.mark(2, null);
-    } else {
-      if(!marked.contains(gui.context.focused)) gui.notify.mark(0, null);
+    } else if(!marked.contains(gui.context.focused)) {
+      gui.notify.mark(0, null);
     }
   }
 
@@ -473,10 +473,7 @@ public final class MapView extends View {
     if(gui.updating || ++dragTol < 8 || mainRects.sorted != mainRects.list) return;
 
     // refresh mouse focus
-    int mx = mouseX;
-    int my = mouseY;
-    int mw = e.getX() - mx;
-    int mh = e.getY() - my;
+    int mx = mouseX, my = mouseY, mw = e.getX() - mx, mh = e.getY() - my;
     if(mw < 0) mx -= mw = -mw;
     if(mh < 0) my -= mh = -mh;
     selBox = new MapRect(mx, my, mw, mh);

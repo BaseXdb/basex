@@ -172,8 +172,8 @@ public final class FTWildcard {
         }
         if(n > m) return false;
         ti += n;
-      } else {
-        if(ti >= tl || tok[ti++] != cps[qi++]) return false;
+      } else if(ti >= tl || tok[ti++] != cps[qi++]) {
+        return false;
       }
     }
     return ti == tl;

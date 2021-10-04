@@ -71,17 +71,18 @@ public class PrintOutput extends OutputStream {
   public void print(final int cp) throws IOException {
     if(cp <= 0x7F) {
       write(cp);
-    } else if(cp <= 0x7FF) {
-      write(cp >>  6 & 0x1F | 0xC0);
-      write(cp & 0x3F | 0x80);
-    } else if(cp <= 0xFFFF) {
-      write(cp >> 12 & 0x0F | 0xE0);
-      write(cp >>  6 & 0x3F | 0x80);
-      write(cp & 0x3F | 0x80);
     } else {
-      write(cp >> 18 & 0x07 | 0xF0);
-      write(cp >> 12 & 0x3F | 0x80);
-      write(cp >>  6 & 0x3F | 0x80);
+      if(cp <= 0x7FF) {
+        write(cp >>  6 & 0x1F | 0xC0);
+      } else {
+        if(cp <= 0xFFFF) {
+          write(cp >> 12 & 0x0F | 0xE0);
+        } else {
+          write(cp >> 18 & 0x07 | 0xF0);
+          write(cp >> 12 & 0x3F | 0x80);
+        }
+        write(cp >>  6 & 0x3F | 0x80);
+      }
       write(cp & 0x3F | 0x80);
     }
   }

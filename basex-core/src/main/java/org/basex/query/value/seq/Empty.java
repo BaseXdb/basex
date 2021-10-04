@@ -116,7 +116,7 @@ public final class Empty extends Item {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) {
-    return (mode == Simplify.EBV || mode == Simplify.PREDICATE) ?
+    return mode == Simplify.EBV || mode == Simplify.PREDICATE ?
       cc.simplify(this, Bln.FALSE) : this;
   }
 

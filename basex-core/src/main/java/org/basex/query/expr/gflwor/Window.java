@@ -417,15 +417,13 @@ public final class Window extends Clause {
       prev = curr;
       pos++;
       final Item item = next();
-      // serve the stored item if available
       if(next != null) {
+        // serve the stored item if available
         curr = next;
         next = item;
-      } else if(item != null && popNext) {
-        // only assign if necessary
-        next = next();
-        curr = item;
       } else {
+        // only assign if necessary
+        if(item != null && popNext) next = next();
         curr = item;
       }
       return curr != null;

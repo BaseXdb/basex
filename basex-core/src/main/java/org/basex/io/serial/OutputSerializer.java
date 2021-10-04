@@ -142,7 +142,7 @@ public abstract class OutputSerializer extends Serializer {
     out.print("&#x");
     boolean o = false;
     for(int i = 3; i >= 0; i--) {
-      final int b = (cp >> (i << 3)) & 0xFF;
+      final int b = cp >> (i << 3) & 0xFF;
       if(o || b > 0x0F) {
         out.print(HEX_TABLE[b >> 4]);
       }

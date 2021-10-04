@@ -107,7 +107,7 @@ public final class WebModules {
       throws QueryException, IOException {
 
     // collect all function candidates
-    List<RestXqFunction> funcs = find(conn, error, false);
+    final List<RestXqFunction> funcs = find(conn, error, false);
     if(funcs.isEmpty()) return null;
 
     // multiple functions: check specifity

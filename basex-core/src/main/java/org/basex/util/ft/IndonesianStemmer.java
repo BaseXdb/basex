@@ -92,7 +92,6 @@ final class IndonesianStemmer extends InternalStemmer {
       // a rule is fired again
       if(n != s && numSyllables > 2) {
         remSecondPrefix(tb);
-        return tb.finish();
       }
       return tb.finish();
     }
@@ -143,7 +142,7 @@ final class IndonesianStemmer extends InternalStemmer {
     final int tl = tb.size();
     if(tl > 3) {
       final int c1 = tb.get(tl - 1), c2 = tb.get(tl - 2), c3 = tb.get(tl - 3);
-      if(c3 == 'k' && c2 == 'a' && c1 == 'h' || c3 == 'l' && c2 == 'a' && c1 == 'h' ||
+      if(c1 == 'h' && c2 == 'a' && (c3 == 'k' || c3 == 'l') ||
          c3 == 'p' && c2 == 'u' && c1 == 'n' || c3 == 't' && c2 == 'a' && c1 == 'h') {
         numSyllables--;
         tb.size(tl - 3);
@@ -163,7 +162,7 @@ final class IndonesianStemmer extends InternalStemmer {
       final int c2 = tb.get(tl - 2);
       final int c3 = tb.get(tl - 3);
 
-      if(c2 == 'k' && c1 == 'u' || c2 == 'm' && c1 == 'u') {
+      if(c1 == 'u' && (c2 == 'k' || c2 == 'm')) {
         numSyllables--;
         tb.size(tl - 2);
       } else if(c3 == 'n' && c2 == 'y' && c1 == 'a') {
@@ -190,12 +189,12 @@ final class IndonesianStemmer extends InternalStemmer {
           && (flags & REMOVED_PE) == 0) {
         numSyllables--;
         tb.size(tl - 3);
-      } else if(c2 == 'a' && c1 == 'n' && (flags & REMOVED_DI) == 0
-          && (flags & REMOVED_MENG) == 0 && (flags & REMOVED_TER) == 0) {
+      } else if(c2 == 'a' && c1 == 'n' && (flags & REMOVED_DI) == 0 &&
+          (flags & REMOVED_MENG) == 0 && (flags & REMOVED_TER) == 0) {
         numSyllables--;
         tb.size(tl - 2);
-      } else if(c1 == 'i' && c2 != 's' && (flags & REMOVED_BER) == 0
-          && (flags & REMOVED_KE) == 0 && (flags & REMOVED_PENG) == 0) {
+      } else if(c1 == 'i' && c2 != 's' && (flags & REMOVED_BER) == 0 &&
+          (flags & REMOVED_KE) == 0 && (flags & REMOVED_PENG) == 0) {
         numSyllables--;
         tb.size(tl - 1);
       }

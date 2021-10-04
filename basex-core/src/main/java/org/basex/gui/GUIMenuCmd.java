@@ -405,16 +405,17 @@ public enum GUIMenuCmd implements GUICommand {
 
       final StringList sl = insert.result;
       final NodeType type = ANode.type(insert.kind);
-      String item = Strings.concat(type.qname().local(), " { ", quote(sl.get(0)), " }");
+      final TokenBuilder item = new TokenBuilder();
+      item.add(type.qname().local()).add(" { ").add(quote(sl.get(0))).add(" }");
 
       if(type == NodeType.ATTRIBUTE || type == NodeType.PROCESSING_INSTRUCTION) {
-        item += " { " + quote(sl.get(1)) + " }";
+        item.add(" { ").add(quote(sl.get(1))).add(" }");
       } else if(type == NodeType.ELEMENT) {
-        item += " { () }";
+        item.add(" { () }");
       }
 
       gui.context.copied = null;
-      gui.execute(new XQuery("insert node " + item + " into " + openPre(n, 0)));
+      gui.execute(new XQuery("insert node " + item.add(" into ").add(openPre(n, 0)).toString()));
     }
 
     @Override
@@ -752,11 +753,9 @@ public enum GUIMenuCmd implements GUICommand {
           ctx.marked = new DBNodes(data);
           gui.notify.context(mark, true, null);
         }
-      } else {
-        if(!root) {
-          gui.notify.context(new DBNodes(data, 0), true, null);
-          gui.notify.mark(ctx.current(), null);
-        }
+      } else if(!root) {
+        gui.notify.context(new DBNodes(data, 0), true, null);
+        gui.notify.mark(ctx.current(), null);
       }
     }
 
@@ -979,7 +978,7 @@ public enum GUIMenuCmd implements GUICommand {
    * @return quoted string
    */
   private static String quote(final String string) {
-    return '"' + string.replaceAll("\"", "&quot;") + '"';
+    return '"' + string.replace("\"", "&quot;") + '"';
   }
 
   /**

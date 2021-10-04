@@ -38,7 +38,7 @@ public final class UtilIntersperse extends StandardFunc {
     if(st1.zeroOrOne() || expr2 == Empty.VALUE) return expr1;
 
     final long size1 = expr1.size(), size2 = expr2.size();
-    final long sz = size1 != -1 && size2 != -1 ? size1 + (size2 * (size1 - 1)) : -1;
+    final long sz = size1 != -1 && size2 != -1 ? size1 + size2 * (size1 - 1) : -1;
     exprType.assign(st1.union(st2), st1.occ, sz);
 
     final Data data1 = expr1.data(), data2 = expr2.data();

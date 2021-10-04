@@ -283,9 +283,9 @@ public abstract class Cmp extends Arr {
     if(expr1.seqType().eq(SeqType.BOOLEAN_O) && expr2 instanceof Bln) {
       final boolean ok = expr2 == Bln.TRUE;
       // boolean(A) = true()  ->  boolean(A)
-      if(op == OpV.EQ && ok || op == OpV.NE && !ok) return expr1;
+      if(ok ? op == OpV.EQ : op == OpV.NE) return expr1;
       // boolean(A) = false()  ->  not(boolean(A))
-      if(op == OpV.EQ && !ok || op == OpV.NE && ok) return cc.function(NOT, info, expr1);
+      if(ok ? op == OpV.NE : op == OpV.EQ) return cc.function(NOT, info, expr1);
     }
     return this;
   }
@@ -299,7 +299,7 @@ public abstract class Cmp extends Arr {
    */
   private Expr optCount(final OpV op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0];
-    if(!(COUNT.is(expr1))) return this;
+    if(!COUNT.is(expr1)) return this;
 
     // distinct values checks
     final Expr arg = expr1.arg(0), count = exprs[1];

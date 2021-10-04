@@ -223,7 +223,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
         while(++s < sl && !split[s].isEmpty()) optqu.add(split[s]);
       } else if(line.startsWith(EVALUATING)) {
         while(++s < sl && split[s].startsWith(LI)) {
-          eval.add(split[s].substring(2).replaceAll("\\|", "\n"));
+          eval.add(split[s].substring(2).replace('|', '\n'));
         }
       } else if(line.equals(QUERY_PLAN + COL)) {
         while(++s < sl && !split[s].isEmpty()) plan.add(split[s]);
@@ -408,7 +408,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     final long ms = Long.parseLong(info.replaceAll("^.+: |\\..+", ""));
     if(ms >= 60000) {
       // choose hh:mm:ss.mm format if time exceeds 1 minute
-      final long seconds = ms / 1000, minutes = (seconds % 3600) / 60, hours = seconds / 3600;
+      final long seconds = ms / 1000, minutes = seconds % 3600 / 60, hours = seconds / 3600;
       final String frac = info.replaceAll("^.+\\.| ms.*", "");
       final String time = String.format("%02d:%02d:%02d.%s", hours, minutes, seconds % 60, frac);
       label.setText(info.replaceAll("\\d+\\.\\d+ ms", time.replaceAll("^00:", "")));

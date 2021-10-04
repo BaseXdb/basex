@@ -107,7 +107,7 @@ public final class Inline {
    * @return unpacked integer
    */
   public static long unpackLong(final long value) {
-    return (value & STRING) == 0 ? (value & INLINE - 1) : toLong(unpackString(value));
+    return (value & STRING) == 0 ? value & INLINE - 1 : toLong(unpackString(value));
   }
 
   /**
@@ -116,7 +116,7 @@ public final class Inline {
    * @return unpacked double
    */
   public static double unpackDouble(final long value) {
-    return (value & STRING) == 0 ? (value & INLINE - 1) : toDouble(unpackString(value));
+    return (value & STRING) == 0 ? value & INLINE - 1 : toDouble(unpackString(value));
   }
 
   /**
@@ -150,10 +150,7 @@ public final class Inline {
       for(int t = 0, c = 24; t < tl; t++, c -= 8) token[t] = (byte) (v >> c);
     } else {
       // whitespace token
-      for(int t = 0, c = 30; t < tl; t++, c -= 2) {
-        final int o = v >> c;
-        token[t] = WS[o & 2 | o & 1];
-      }
+      for(int t = 0, c = 30; t < tl; t++, c -= 2) token[t] = WS[v >> c & 3];
     }
     return token;
   }

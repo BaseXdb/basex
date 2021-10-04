@@ -37,6 +37,6 @@ final class TreeRect {
    * @return result of check
    */
   boolean contains(final int xx, final int ww) {
-    return xx <= x && xx + ww >= x || xx <= x + w && xx + ww >= x;
+    return xx + ww >= x && xx <= x + w;
   }
 }

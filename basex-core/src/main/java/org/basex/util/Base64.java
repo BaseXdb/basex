@@ -56,13 +56,12 @@ public final class Base64 {
       if(p == 1) {
         bl.add(H2B[b0 << 4 & 0x3f]);
         bl.add('=');
-        bl.add('=');
       } else {
         final int b1 = token[c] & 0xff;
         bl.add(H2B[b0 << 4 & 0x3f | b1 >> 4]);
         bl.add(H2B[b1 << 2 & 0x3f]);
-        bl.add('=');
       }
+      bl.add('=');
     }
     return bl.finish();
   }

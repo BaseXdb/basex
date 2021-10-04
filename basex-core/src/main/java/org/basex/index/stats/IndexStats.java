@@ -62,7 +62,7 @@ public final class IndexStats {
     final byte[][] txt = dsc ? txtMax : txtMin;
     final int[] ocs = dsc ? occMax : occMin;
     for(int a = max - 1; a >= 0; a--) {
-      if(a == 0 || dsc && oc < ocs[a - 1] || !dsc && oc > ocs[a - 1]) {
+      if(a == 0 || (dsc ? oc < ocs[a - 1] : oc > ocs[a - 1])) {
         txt[a] = tx;
         ocs[a] = oc;
         break;

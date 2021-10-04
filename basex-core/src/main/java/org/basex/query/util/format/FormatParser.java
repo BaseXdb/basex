@@ -59,19 +59,15 @@ abstract class FormatParser extends FormatUtil {
       if(ch == 'W' && tp.consume('w')) return pic;
       // Textual output (title case)
       if(date && ch == 'N' && tp.consume('n')) return pic;
-    } else {
-      // Latin, Greek and other alphabets
-      if(sequence(ch) != null ||
-        // Roman sequences (lower/upper case)
-        ch == 'i' || ch == 'I' ||
-        // Word output (lower/upper case)
-        ch == 'w' || ch == 'W' ||
-        // Textual output
-        date && (ch == 'n' || ch == 'N') ||
-        // circled, parenthesized or full stop digits
-        ch == '\u2460' || ch == '\u2474' || ch == '\u2488' ||
-        // Japanese numbering
-        ch == KANJI[1]) return pic;
+    } else if(
+      sequence(ch) != null || // Latin, Greek and other alphabets
+      ch == 'i' || ch == 'I' || // Roman sequences (lower/upper case)
+      ch == 'w' || ch == 'W' || // Word output (lower/upper case)
+      date && (ch == 'n' || ch == 'N') || // Textual output
+      ch == '\u2460' || ch == '\u2474' || ch == '\u2488' || // circled, parenthesized, full stop
+      ch == KANJI[1] // Japanese numbering
+    ) {
+      return pic;
     }
 
     // find digit of decimal-digit-pattern

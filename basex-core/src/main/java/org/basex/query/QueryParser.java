@@ -1738,13 +1738,12 @@ public class QueryParser extends InputParser {
       skipWs();
       if(consume('-')) {
         minus ^= true;
-        found = true;
       } else if(consume('+')) {
-        found = true;
       } else {
         final Expr ex = value();
         return found ? new Unary(info(), check(ex, EVALUNARY), minus) : ex;
       }
+      found = true;
     } while(true);
   }
 
@@ -1882,7 +1881,6 @@ public class QueryParser extends InputParser {
         if(ex == null) return root;
       }
       add(el, ex);
-      relativePath(el);
     } else {
       // relative path (no preceding slash)
       mark();
@@ -1893,8 +1891,8 @@ public class QueryParser extends InputParser {
       el = new ExprList();
       if(ex instanceof Step) add(el, ex);
       else root = ex;
-      relativePath(el);
     }
+    relativePath(el);
     return Path.get(info(), root, el.finish());
   }
 

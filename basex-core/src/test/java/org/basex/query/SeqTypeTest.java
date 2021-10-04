@@ -29,7 +29,7 @@ public final class SeqTypeTest {
       { ZERO, ZERO_OR_ONE, EXACTLY_ONE, ZERO_OR_MORE, ONE_OR_MORE },
       { null, EXACTLY_ONE, EXACTLY_ONE, ONE_OR_MORE,  ONE_OR_MORE }
     };
-    compute(table, (occ1, occ2) -> occ1.intersect(occ2));
+    compute(table, Occ::intersect);
   }
 
   /** Tests for {@link Occ#union(Occ)}. */
@@ -41,7 +41,7 @@ public final class SeqTypeTest {
       { ZERO_OR_MORE, ZERO_OR_MORE, ZERO_OR_MORE, ZERO_OR_MORE, ZERO_OR_MORE },
       { ZERO_OR_MORE, ZERO_OR_MORE, ONE_OR_MORE,  ZERO_OR_MORE, ONE_OR_MORE  }
     };
-    compute(table, (occ1, occ2) -> occ1.union(occ2));
+    compute(table, Occ::union);
   }
 
   /** Tests for {@link Occ#add(Occ)}. */
@@ -53,7 +53,7 @@ public final class SeqTypeTest {
       { ZERO_OR_MORE, ZERO_OR_MORE, ONE_OR_MORE,  ZERO_OR_MORE, ONE_OR_MORE },
       { ONE_OR_MORE,  ONE_OR_MORE,  ONE_OR_MORE,  ONE_OR_MORE,  ONE_OR_MORE }
     };
-    compute(table, (occ1, occ2) -> occ1.add(occ2));
+    compute(table, Occ::add);
   }
 
   /** Tests for {@link Occ#multiply(Occ)}. */
@@ -65,7 +65,7 @@ public final class SeqTypeTest {
       { ZERO, ZERO_OR_MORE, ZERO_OR_MORE, ZERO_OR_MORE, ZERO_OR_MORE },
       { ZERO, ZERO_OR_MORE, ONE_OR_MORE,  ZERO_OR_MORE, ONE_OR_MORE  }
     };
-    compute(table, (occ1, occ2) -> occ1.multiply(occ2));
+    compute(table, Occ::multiply);
   }
 
   /**

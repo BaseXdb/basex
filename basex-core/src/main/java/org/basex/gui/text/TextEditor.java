@@ -191,13 +191,11 @@ public final class TextEditor {
     if(ch != '\n') {
       if(FTToken.lod(ch)) {
         while(FTToken.lod(ch)) ch = next();
-        while(ch != '\n' && FTToken.ws(ch)) ch = next();
       } else if(FTToken.ws(ch)) {
-        while(ch != '\n' && FTToken.ws(ch)) ch = next();
       } else {
         while(ch != '\n' && !FTToken.lod(ch) && !FTToken.ws(ch)) ch = next();
-        while(ch != '\n' && FTToken.ws(ch)) ch = next();
       }
+      while(ch != '\n' && FTToken.ws(ch)) ch = next();
       if(pos != size()) prev();
     }
     if(select) endSelection();

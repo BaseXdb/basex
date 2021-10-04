@@ -114,6 +114,6 @@ public final class FNCryptoTest extends SandboxTest {
     if(first != null) query(first);
     final String result = query(second);
     // quotes are replaced by apostrophes to simplify comparison
-    assertEquals(expected.replaceAll("\"", "'"), result.replaceAll("\"", "'"));
+    assertEquals(expected.replace('"', '\''), result.replace('"', '\''));
   }
 }

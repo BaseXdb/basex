@@ -206,7 +206,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
         set(MainOptions.ATTRINCLUDE, include);
         execute(new CreateDB(NAME, "<xml><a a='1'>1</a></xml>"));
 
-        final String test = exists(ValueAccess.class) + " = " + (include.equals("a") + "()");
+        final String test = exists(ValueAccess.class) + " = " + include.equals("a") + "()";
         check("data(//*[a = '1'])", 1, test);
         check("data(//*[a/text() = '1'])", 1, test);
         check("data(//a[. = '1'])", 1, test);

@@ -404,8 +404,8 @@ public abstract class W3CTS extends Main {
             if(xml || frag) {
               try {
                 final Value val = toValue(expect.replaceAll("^<\\?xml.*?\\?>", "").trim(), frag);
-                if(new DeepEqual().equal(value.iter(), val.iter())) break;
-                if(new DeepEqual().equal(toValue(actual, frag).iter(), val.iter())) break;
+                if(new DeepEqual().equal(value.iter(), val.iter()) ||
+                   new DeepEqual().equal(toValue(actual, frag).iter(), val.iter())) break;
               } catch(final Throwable ex) {
                 Util.errln('\n' + outname + ':');
                 Util.stack(ex);
@@ -438,35 +438,33 @@ public abstract class W3CTS extends Main {
             }
             ++ok;
           }
-        } else {
-          if(expOut.isEmpty() || !expError.isEmpty()) {
-            if(print) {
-              logOK2.append(logStr);
-              logOK2.append('[').append(testid).append(" ] ");
-              logOK2.append(norm(expError));
-              logOK2.append(NL);
-              logOK2.append("[Rght?] ");
-              logOK2.append(norm(er));
-              logOK2.append(NL);
-              logOK2.append(NL);
-              addLog(pth, outname + ".log", er);
-            }
-            ++ok2;
-          } else {
-            if(print) {
-              logErr2.append(logStr);
-              logErr2.append('[').append(testid).append(" ] ");
-              logErr2.append(norm(string(result.get(0))));
-              logErr2.append(NL);
-              logErr2.append("[Wrong] ");
-              logErr2.append(norm(er));
-              logErr2.append(NL);
-              logErr2.append(NL);
-              addLog(pth, outname + ".log", er);
-            }
-            correct = false;
-            ++err2;
+        } else if(expOut.isEmpty() || !expError.isEmpty()) {
+          if(print) {
+            logOK2.append(logStr);
+            logOK2.append('[').append(testid).append(" ] ");
+            logOK2.append(norm(expError));
+            logOK2.append(NL);
+            logOK2.append("[Rght?] ");
+            logOK2.append(norm(er));
+            logOK2.append(NL);
+            logOK2.append(NL);
+            addLog(pth, outname + ".log", er);
           }
+          ++ok2;
+        } else {
+          if(print) {
+            logErr2.append(logStr);
+            logErr2.append('[').append(testid).append(" ] ");
+            logErr2.append(norm(string(result.get(0))));
+            logErr2.append(NL);
+            logErr2.append("[Wrong] ");
+            logErr2.append(norm(er));
+            logErr2.append(NL);
+            logErr2.append(NL);
+            addLog(pth, outname + ".log", er);
+          }
+          correct = false;
+          ++err2;
         }
       }
     }

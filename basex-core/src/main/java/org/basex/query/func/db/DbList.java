@@ -102,8 +102,8 @@ public class DbList extends StandardFunc {
   public final boolean accept(final ASTVisitor visitor) {
     if(exprs.length == 0) {
       if(!visitor.lock(null, false)) return false;
-    } else {
-      if(!dataLock(visitor, 0)) return false;
+    } else if(!dataLock(visitor, 0)) {
+      return false;
     }
     return super.accept(visitor);
   }

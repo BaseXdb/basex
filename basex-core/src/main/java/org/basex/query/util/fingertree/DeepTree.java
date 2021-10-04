@@ -680,16 +680,17 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
     if(inBuffer == 0) {
       mid3 = mid2.init();
       newRight = ((InnerNode<N, E>) mid2.last()).children;
-    } else if(inBuffer > 1 || buffer[0] instanceof Node) {
-      mid3 = mid2;
-      newRight = slice(buffer, 0, inBuffer);
     } else {
-      final NodeLike<N, E> partial = buffer[0];
-      final InnerNode<N, E> last = (InnerNode<N, E>) mid2.last();
-      final int k = last.arity();
-      for(int i = 0; i < k; i++) buffer[i] = last.getSub(i);
-      inBuffer = partial.append(buffer, k);
-      mid3 = mid2.init();
+      if(inBuffer > 1 || buffer[0] instanceof Node) {
+        mid3 = mid2;
+      } else {
+        final NodeLike<N, E> partial = buffer[0];
+        final InnerNode<N, E> last = (InnerNode<N, E>) mid2.last();
+        final int k = last.arity();
+        for(int i = 0; i < k; i++) buffer[i] = last.getSub(i);
+        inBuffer = partial.append(buffer, k);
+        mid3 = mid2.init();
+      }
       newRight = slice(buffer, 0, inBuffer);
     }
 
