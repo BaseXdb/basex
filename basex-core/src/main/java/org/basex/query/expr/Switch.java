@@ -144,7 +144,7 @@ public final class Switch extends ParseExpr {
 
     // update branches
     if(tmpGroups.size() != groups.length) {
-      groups = tmpGroups.toArray(new SwitchGroup[0]);
+      groups = tmpGroups.toArray(SwitchGroup[]::new);
       cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
     }
 

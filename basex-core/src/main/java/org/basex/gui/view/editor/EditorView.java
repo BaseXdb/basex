@@ -1104,6 +1104,6 @@ public final class EditorView extends View {
     for(final Component c : tabs.getComponents()) {
       if(c instanceof EditorArea) edits.add((EditorArea) c);
     }
-    return edits.toArray(new EditorArea[0]);
+    return edits.toArray(EditorArea[]::new);
   }
 }

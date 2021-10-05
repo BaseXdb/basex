@@ -132,7 +132,7 @@ public final class TypeswitchGroup extends Single {
     // replace types
     if(sl != tmp.size()) {
       if(tmp.isEmpty()) return false;
-      seqTypes = tmp.toArray(new SeqType[0]);
+      seqTypes = tmp.toArray(SeqType[]::new);
       refineType(cc);
     }
 

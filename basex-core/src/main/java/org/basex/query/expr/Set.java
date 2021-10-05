@@ -146,7 +146,7 @@ abstract class Set extends Arr {
         tests.add(step.test);
       }
       // all steps were parsed. try to merge tests
-      if(s == sl) test = Test.get(tests.toArray(new Test[0]));
+      if(s == sl) test = Test.get(tests.toArray(Test[]::new));
     }
 
     // try to merge first predicates of all steps

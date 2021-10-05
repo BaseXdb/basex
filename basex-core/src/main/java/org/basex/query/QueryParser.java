@@ -1027,7 +1027,7 @@ public class QueryParser extends InputParser {
           ngrp[i] = nv;
           curr.put(nv.name.id(), nv);
         }
-        clauses.add(new GroupBy(specs, ng.toArray(new VarRef[0]), ngrp, specs[0].info()));
+        clauses.add(new GroupBy(specs, ng.toArray(VarRef[]::new), ngrp, specs[0].info()));
       }
 
       final boolean stable = wsConsumeWs(STABLE);
@@ -1314,7 +1314,7 @@ public class QueryParser extends InputParser {
       groups.add(new SwitchGroup(info(), exprs.finish()));
     } while(exprs.size() != 1);
 
-    return new Switch(ii, cond, groups.toArray(new SwitchGroup[0]));
+    return new Switch(ii, cond, groups.toArray(SwitchGroup[]::new));
   }
 
   /**
@@ -1351,7 +1351,7 @@ public class QueryParser extends InputParser {
       }
       wsCheck(RETURN);
       final Expr rtrn = check(single(), NOTYPESWITCH);
-      final SeqType[] st = types.toArray(new SeqType[0]);
+      final SeqType[] st = types.toArray(SeqType[]::new);
       cases = Array.add(cases, new TypeswitchGroup(info(), var, st, rtrn));
       localVars.closeScope(s);
       types.clear();
@@ -1830,7 +1830,7 @@ public class QueryParser extends InputParser {
       }
       pos += 2;
     } while(wsConsumeWs(PRAGMA));
-    return el.toArray(new Pragma[0]);
+    return el.toArray(Pragma[]::new);
   }
 
   /**

@@ -502,7 +502,7 @@ public class Options implements Iterable<Option<?>> {
    */
   public final synchronized String error(final String name) {
     final Object similar = Levenshtein.similar(token(name),
-        options.keySet().toArray(new String[0]));
+        options.keySet().toArray(String[]::new));
     return similar != null ? Util.info(Text.UNKNOWN_OPT_SIMILAR_X_X, name, similar) :
       Util.info(Text.UNKNOWN_OPTION_X, name);
   }
@@ -658,7 +658,7 @@ public class Options implements Iterable<Option<?>> {
       final Object obj = f.get(null);
       if(obj instanceof Option) opts.add((Option<?>) obj);
     }
-    return opts.toArray(new Option[0]);
+    return opts.toArray(Option[]::new);
   }
 
   /**

@@ -79,7 +79,7 @@ final class DynJavaConstr extends DynJavaCall {
       }
     }
     final JavaCandidate jc = bestCandidate(candidates);
-    if(jc == null) throw noCandidate(candidates, constrs.toArray(new Executable[0]));
+    if(jc == null) throw noCandidate(candidates, constrs.toArray(Executable[]::new));
 
     // single constructor found: instantiate class
     try {

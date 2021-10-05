@@ -74,7 +74,7 @@ public final class UnionTest extends Test {
       final Test t2 = t.intersect(test);
       if(t2 != null) list.add(t2);
     }
-    return get(list.toArray(new Test[0]));
+    return get(list.toArray(Test[]::new));
   }
 
   @Override

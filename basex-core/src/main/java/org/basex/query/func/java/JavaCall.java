@@ -443,7 +443,7 @@ public abstract class JavaCall extends Arr {
       throw noMember(name, types, arity, string(qname.string()), arities, names.finish(), info);
     }
     if(cs > 1) throw JAVAMULTIPLE_X_X.get(info, qname.string(),
-        paramTypes(candidates.toArray(new Executable[0]), false));
+        paramTypes(candidates.toArray(Executable[]::new), false));
 
     // single method found: add module locks to query context
     final Method method = candidates.get(0);
