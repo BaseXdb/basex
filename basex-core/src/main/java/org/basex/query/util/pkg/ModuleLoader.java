@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
@@ -48,7 +49,13 @@ public final class ModuleLoader {
    * implementing {@link QueryResource}.
    */
   public void close() {
-    if(loader instanceof JarLoader) ((JarLoader) loader).close();
+    if(loader instanceof URLClassLoader) {
+      try {
+        ((URLClassLoader) loader).close();
+      } catch(IOException ex) {
+        Util.stack(ex);
+      }
+    }
     for(final Object jm : javaModules) {
       for(final Class<?> c : jm.getClass().getInterfaces()) {
         if(c == QueryResource.class) Reflect.invoke(CLOSE, jm);
@@ -138,10 +145,9 @@ public final class ModuleLoader {
    * @throws ClassNotFoundException class not found exception
    */
   public Class<?> findClass(final String name) throws ClassNotFoundException {
-    // add cached URLs to class loader
-    final int us = urls.size();
-    if(us != 0) {
-      loader = new JarLoader(urls.toArray(new URL[0]), loader);
+    // create new class loader for cached URLs at first access
+    if(!urls.isEmpty()) {
+      loader = new URLClassLoader(urls.toArray(new URL[0]), loader);
       urls.clear();
     }
     // no external classes added: use default class loader
