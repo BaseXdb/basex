@@ -147,7 +147,7 @@ public final class ModuleLoader {
   public Class<?> findClass(final String name) throws ClassNotFoundException {
     // create new class loader for cached URLs at first access
     if(!urls.isEmpty()) {
-      loader = new URLClassLoader(urls.toArray(new URL[0]), loader);
+      loader = new URLClassLoader(urls.toArray(URL[]::new), loader);
       urls.clear();
     }
     // no external classes added: use default class loader

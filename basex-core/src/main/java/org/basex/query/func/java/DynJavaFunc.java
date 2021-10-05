@@ -126,7 +126,7 @@ final class DynJavaFunc extends DynJavaCall {
       }
     }
     final JavaCandidate jc = bestCandidate(candidates);
-    if(jc == null) throw noCandidate(candidates, methods.toArray(new Executable[0]));
+    if(jc == null) throw noCandidate(candidates, methods.toArray(Executable[]::new));
 
     // assign query context if module is inheriting the {@link QueryModule} interface
     final Method method = (Method) jc.executable;

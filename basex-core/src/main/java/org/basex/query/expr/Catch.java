@@ -86,7 +86,7 @@ public final class Catch extends Single {
     final Var[] vrs = new Var[NAMES.length];
     final int vl = vrs.length;
     for(int v = 0; v < vl; v++) vrs[v] = cc.vs().addNew(NAMES[v], TYPES[v], false, cc.qc, info);
-    final Catch ctch = new Catch(info, tests.toArray(new NameTest[0]), vrs);
+    final Catch ctch = new Catch(info, tests.toArray(NameTest[]::new), vrs);
     final int val = vars.length;
     for(int v = 0; v < val; v++) vm.put(vars[v].id, ctch.vars[v]);
     ctch.expr = expr.copy(cc, vm);

@@ -363,7 +363,7 @@ public final class FTIndex extends ValueIndex {
       }
     }
     return iters.isEmpty() ? FTIndexIterator.FTEMPTY :
-      FTIndexIterator.union(iters.toArray(new FTIndexIterator[0]));
+      FTIndexIterator.union(iters.toArray(FTIndexIterator[]::new));
   }
 
   /**

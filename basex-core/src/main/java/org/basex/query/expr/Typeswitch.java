@@ -77,7 +77,7 @@ public final class Typeswitch extends ParseExpr {
     for(final TypeswitchGroup group : groups) {
       if(group.removeTypes(ct, types, cc)) newGroups.add(group);
     }
-    groups = newGroups.toArray(new TypeswitchGroup[0]);
+    groups = newGroups.toArray(TypeswitchGroup[]::new);
 
     // determine common type
     exprType.assign(SeqType.union(groups, true));

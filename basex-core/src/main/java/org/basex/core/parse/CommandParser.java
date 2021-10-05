@@ -97,7 +97,7 @@ public abstract class CommandParser {
   public final Command[] parse() throws QueryException {
     final ArrayList<Command> cmds = new ArrayList<>();
     parse(cmds);
-    if(!single || cmds.size() == 1) return cmds.toArray(new Command[0]);
+    if(!single || cmds.size() == 1) return cmds.toArray(Command[]::new);
     throw new QueryException(null, QNm.EMPTY, Text.SINGLE_CMD);
   }
 

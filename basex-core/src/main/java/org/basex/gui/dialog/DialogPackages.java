@@ -152,7 +152,7 @@ public final class DialogPackages extends BaseXDialog {
 
     // run all commands
     if(!cmds.isEmpty()) {
-      DialogProgress.execute(this, cmds.toArray(new Command[0]));
+      DialogProgress.execute(this, cmds.toArray(Command[]::new));
     }
   }
 }

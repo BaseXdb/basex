@@ -71,7 +71,7 @@ public final class Try extends Single {
     for(final Catch ctch : catches) {
       if(ctch.simplify(tests, cc)) list.add(ctch);
     }
-    catches = list.toArray(new Catch[0]);
+    catches = list.toArray(Catch[]::new);
 
     // join types of try and catch expressions
     SeqType st = expr.seqType();

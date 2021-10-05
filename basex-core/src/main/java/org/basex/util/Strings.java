@@ -294,7 +294,7 @@ public final class Strings {
    * @return encodings
    */
   public static String[] encodings() {
-    if(encodings == null) encodings = Charset.availableCharsets().keySet().toArray(new String[0]);
+    if(encodings == null) encodings = Charset.availableCharsets().keySet().toArray(String[]::new);
     return encodings;
   }
 }

@@ -214,7 +214,7 @@ public final class StaticFuncs extends ExprInfo {
       final StaticFunc sf = fc.func;
       if(sf != null && sf.expr != null) list.add(sf.name);
     }
-    final Object similar = Levenshtein.similar(qname.local(), list.toArray(new QNm[0]),
+    final Object similar = Levenshtein.similar(qname.local(), list.toArray(QNm[]::new),
         o -> ((QNm) o).local());
 
     // return error for local or global function

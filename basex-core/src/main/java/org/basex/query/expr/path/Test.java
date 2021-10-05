@@ -91,7 +91,7 @@ public abstract class Test extends ExprInfo {
         add.accept(test);
       }
     }
-    return list.size() == 1 ? list.get(0) : new UnionTest(type, list.toArray(new Test[0]));
+    return list.size() == 1 ? list.get(0) : new UnionTest(type, list.toArray(Test[]::new));
   }
 
   /**

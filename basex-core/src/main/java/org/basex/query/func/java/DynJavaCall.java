@@ -69,7 +69,7 @@ abstract class DynJavaCall extends JavaCall {
     if(cl > 1) {
       final ArrayList<Executable> list = new ArrayList<>(cl);
       for(final JavaCandidate jc : candidates) list.add(jc.executable);
-      return JAVAMULTIPLE_X_X.get(info, name(), paramTypes(list.toArray(new Executable[0]), false));
+      return JAVAMULTIPLE_X_X.get(info, name(), paramTypes(list.toArray(Executable[]::new), false));
     }
 
     final Executable single = execs.length == 1 ? execs[0] : null;
