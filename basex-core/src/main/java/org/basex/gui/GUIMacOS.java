@@ -1,7 +1,6 @@
 package org.basex.gui;
 
 import java.awt.*;
-import java.awt.desktop.*;
 
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
@@ -19,7 +18,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Alexander Holupirek
  */
-public final class GUIMacOS implements AboutHandler, PreferencesHandler {
+public final class GUIMacOS {
   /** Reference to the main UI. */
   final GUI main;
 
@@ -41,34 +40,11 @@ public final class GUIMacOS implements AboutHandler, PreferencesHandler {
   /**
    * Constructor.
    * @param main reference to main window
-   * @throws Exception if any error occurs
    */
-  GUIMacOS(final GUI main) throws Exception {
+  GUIMacOS(final GUI main) {
     this.main = main;
-
-    Desktop.getDesktop().setAboutHandler(this);
-    Desktop.getDesktop().setPreferencesHandler(this);
-
-    final Class<?> tbClass = Class.forName("java.awt.Taskbar");
-    final Object tb = tbClass.getMethod("getTaskbar").invoke(null);
-    tbClass.getMethod("setIconImage", Image.class).invoke(tb, BaseXImages.get("logo_256"));
-  }
-
-  /**
-   * Shows the about dialog.
-   * @param e about event received
-   */
-  @Override
-  public void handleAbout(final AboutEvent e) {
-    DialogAbout.show(main);
-  }
-
-  /**
-   * Shows the preferences dialog.
-   * @param e preference event received
-   */
-  @Override
-  public void handlePreferences(final PreferencesEvent e) {
-    DialogAbout.show(main);
+    Desktop.getDesktop().setAboutHandler(e -> { DialogAbout.show(main); });
+    Desktop.getDesktop().setPreferencesHandler(e -> { DialogPrefs.show(main); });
+    Taskbar.getTaskbar().setIconImage(BaseXImages.get("logo_256"));
   }
 }
