@@ -10,6 +10,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 import org.xml.sax.*;
 
 /**
@@ -113,18 +114,18 @@ public final class HtmlParser extends XMLParser {
       final StringWriter sw = new StringWriter();
       final XMLReader reader = (XMLReader) Reflect.get(READER);
       final Object writer = Reflect.get(WRITER, sw);
-      opt(writer, HtmlOptions.ENCODING.name(), Strings.UTF8);
+      set(writer, HtmlOptions.ENCODING, Strings.UTF8);
 
       // set TagSoup options
       if(opts.get(HtmlOptions.HTML)) {
         reader.setFeature("http://xml.org/sax/features/namespaces", false);
-        opt(writer, HtmlOptions.METHOD.name(), "html");
-        opt(writer, HtmlOptions.OMIT_XML_DECLARATION.name(), "yes");
+        set(writer, HtmlOptions.METHOD, "html");
+        set(writer, HtmlOptions.OMIT_XML_DECLARATION, "yes");
       }
       if(opts.get(HtmlOptions.NONS))
         reader.setFeature("http://xml.org/sax/features/namespaces", false);
       if(opts.get(HtmlOptions.OMIT_XML_DECLARATION))
-        opt(writer, HtmlOptions.OMIT_XML_DECLARATION.name(), "yes");
+        set(writer, HtmlOptions.OMIT_XML_DECLARATION, "yes");
       if(opts.get(HtmlOptions.NOBOGONS))
         reader.setFeature(FEATURES + "ignore-bogons", true);
       if(opts.get(HtmlOptions.NODEFAULTS))
@@ -146,11 +147,11 @@ public final class HtmlParser extends XMLParser {
       if(opts.get(HtmlOptions.LEXICAL))
         reader.setProperty("http://xml.org/sax/properties/lexical-handler", writer);
       if(opts.contains(HtmlOptions.METHOD))
-        opt(writer, HtmlOptions.METHOD.name(), opts.get(HtmlOptions.METHOD));
+        set(writer, HtmlOptions.METHOD, opts.get(HtmlOptions.METHOD));
       if(opts.contains(HtmlOptions.DOCTYPE_SYSTEM))
-        opt(writer, HtmlOptions.DOCTYPE_SYSTEM.name(), opts.get(HtmlOptions.DOCTYPE_SYSTEM));
+        set(writer, HtmlOptions.DOCTYPE_SYSTEM, opts.get(HtmlOptions.DOCTYPE_SYSTEM));
       if(opts.contains(HtmlOptions.DOCTYPE_PUBLIC))
-        opt(writer, HtmlOptions.DOCTYPE_PUBLIC.name(), opts.get(HtmlOptions.DOCTYPE_PUBLIC));
+        set(writer, HtmlOptions.DOCTYPE_PUBLIC, opts.get(HtmlOptions.DOCTYPE_PUBLIC));
       if(opts.contains(HtmlOptions.ENCODING))
         is.setEncoding(opts.get(HtmlOptions.ENCODING));
       // end TagSoup options
@@ -168,10 +169,10 @@ public final class HtmlParser extends XMLParser {
   /**
    * Reflection invoke XMLWriter.setOutputProperty().
    * @param writer writer instance
-   * @param name property
+   * @param option property
    * @param value value
    */
-  private static void opt(final Object writer, final String name, final String value) {
-    Reflect.invoke(METHOD, writer, name, value);
+  private static void set(final Object writer, final Option<?> option, final String value) {
+    Reflect.invoke(METHOD, writer, option.name(), value);
   }
 }
