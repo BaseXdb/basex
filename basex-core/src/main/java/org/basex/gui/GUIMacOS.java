@@ -46,6 +46,9 @@ public final class GUIMacOS implements AboutHandler, PreferencesHandler {
   GUIMacOS(final GUI main) throws Exception {
     this.main = main;
 
+    Desktop.getDesktop().setAboutHandler(this);
+    Desktop.getDesktop().setPreferencesHandler(this);
+
     final Class<?> tbClass = Class.forName("java.awt.Taskbar");
     final Object tb = tbClass.getMethod("getTaskbar").invoke(null);
     tbClass.getMethod("setIconImage", Image.class).invoke(tb, BaseXImages.get("logo_256"));
