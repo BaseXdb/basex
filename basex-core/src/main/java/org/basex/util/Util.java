@@ -267,12 +267,9 @@ public final class Util {
    * @return string array
    */
   private static String[] toArray(final Throwable throwable) {
-    final StackTraceElement[] st = throwable.getStackTrace();
-    final int sl = st.length;
-    final String[] obj = new String[sl + 1];
-    obj[0] = throwable.toString();
-    for(int s = 0; s < sl; s++) obj[s + 1] = "\tat " + st[s];
-    return obj;
+    final StringList sl = new StringList().add(throwable.toString());
+    for(final StackTraceElement st : throwable.getStackTrace()) sl.add("\tat " + st);
+    return sl.finish();
   }
 
   /**
