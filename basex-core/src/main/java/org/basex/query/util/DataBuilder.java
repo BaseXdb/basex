@@ -55,19 +55,38 @@ public final class DataBuilder {
   /**
    * Adds database entries for the specified node.
    * @param node node
+   * @throws QueryException query exception
    */
-  public void build(final ANode node) {
+  public void build(final ANode node) throws QueryException {
     build(new ANodeList().add(node));
   }
 
   /**
    * Adds database entries for the specified nodes.
    * @param nodes node list
+   * @throws QueryException query exception
    */
-  public void build(final ANodeList nodes) {
+  public void build(final ANodeList nodes) throws QueryException {
     data.meta.update();
     int next = data.meta.size;
     for(final ANode node : nodes) next = addNode(node, next, -1);
+
+    // see Builder#addElem
+    limit(data.elemNames.size(), 0x8000, "distinct element names");
+    limit(data.attrNames.size(), 0x8000, "distinct attribute names");
+    limit(data.nspaces.size(), 0x100, "distinct namespaces");
+    if(next < 0) limit(0, 0, "nodes");
+  }
+
+  /**
+   * Checks a value limit and optionally throws an exception.
+   * @param value value
+   * @param limit limit
+   * @param message error message
+   * @throws QueryException query exception
+   */
+  private void limit(final int value, final int limit, final String message) throws QueryException {
+    if(value >= limit) throw QueryError.BASEX_LIMIT_X_X.get(null, message, limit);
   }
 
   /**
@@ -264,8 +283,11 @@ public final class DataBuilder {
    * @param ns namespace to be stripped
    * @param ctx database context
    * @return new node
+   * @throws QueryException query exception
    */
-  public static ANode stripNS(final ANode node, final byte[] ns, final Context ctx) {
+  public static ANode stripNS(final ANode node, final byte[] ns, final Context ctx)
+      throws QueryException {
+
     if(node.type != NodeType.ELEMENT && node.type != NodeType.DOCUMENT_NODE) return node;
 
     final MemData data = new MemData(ctx.options);

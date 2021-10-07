@@ -129,8 +129,9 @@ public final class Updates {
    * @param target target fragment
    * @param qc query context
    * @return database node created from input fragment
+   * @throws QueryException query exception
    */
-  public DBNode determineDataRef(final ANode target, final QueryContext qc) {
+  public DBNode determineDataRef(final ANode target, final QueryContext qc) throws QueryException {
     if(target instanceof DBNode) return (DBNode) target;
 
     // determine highest ancestor node
@@ -143,7 +144,11 @@ public final class Updates {
     // if data instance does not exist, create mapping between fragment id and data reference
     MemData data;
     synchronized(fragmentIDs) {
-      data = fragmentIDs.computeIfAbsent(root.id, () -> (MemData) root.copy(qc).data());
+      data = fragmentIDs.get(root.id);
+      if(data == null) {
+        data = (MemData) root.copy(qc).data();
+        fragmentIDs.put(root.id, data);
+      }
     }
 
     // determine the pre value of the target node within its database

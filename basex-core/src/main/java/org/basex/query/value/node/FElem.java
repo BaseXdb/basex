@@ -384,7 +384,7 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public FElem materialize(final QueryContext qc, final boolean copy) {
+  public FElem materialize(final QueryContext qc, final boolean copy) throws QueryException {
     if(!copy) return this;
 
     // nodes must be added after root constructor in order to ensure ascending node ids

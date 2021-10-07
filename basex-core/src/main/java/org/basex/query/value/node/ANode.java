@@ -108,14 +108,15 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public abstract ANode materialize(QueryContext qc, boolean copy);
+  public abstract ANode materialize(QueryContext qc, boolean copy) throws QueryException;
 
   /**
    * Creates a database node copy from this node.
    * @param qc query context
    * @return database node
+   * @throws QueryException query exception
    */
-  public final DBNode copy(final QueryContext qc) {
+  public final DBNode copy(final QueryContext qc) throws QueryException {
     return copy(qc.context.options, qc);
   }
 
@@ -124,8 +125,9 @@ public abstract class ANode extends Item {
    * @param options main options
    * @param qc query context (can be {@code null}; if supplied, allows interruption of process)
    * @return database node
+   * @throws QueryException query exception
    */
-  public final DBNode copy(final MainOptions options, final QueryContext qc) {
+  public final DBNode copy(final MainOptions options, final QueryContext qc) throws QueryException {
     final MemData data = new MemData(options);
     new DataBuilder(data, qc).build(this);
     return new DBNode(data);
@@ -590,7 +592,7 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public abstract BXNode toJava();
+  public abstract BXNode toJava() throws QueryException;
 
   /**
    * Returns this Node's node type.

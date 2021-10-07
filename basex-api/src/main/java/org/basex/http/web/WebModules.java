@@ -90,8 +90,9 @@ public final class WebModules {
    * Returns a WADL description for all available URIs.
    * @param request HTTP request
    * @return WADL description
+   * @throws QueryException query exception
    */
-  public FElem wadl(final HttpServletRequest request) {
+  public FElem wadl(final HttpServletRequest request) throws QueryException {
     return new RestXqWadl(request).create(modules);
   }
 

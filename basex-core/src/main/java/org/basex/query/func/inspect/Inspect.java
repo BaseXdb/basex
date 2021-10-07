@@ -83,8 +83,9 @@ public abstract class Inspect {
    * Creates a comment sub element.
    * @param tags map with tags
    * @param parent parent element
+   * @throws QueryException query exception
    */
-  final void comment(final TokenObjMap<TokenList> tags, final FElem parent) {
+  final void comment(final TokenObjMap<TokenList> tags, final FElem parent) throws QueryException {
     for(final byte[] tag : tags) {
       for(final byte[] name : tags.get(tag)) add(name, elem(tag, parent));
     }
@@ -132,8 +133,9 @@ public abstract class Inspect {
    * Parses a string as XML and adds the resulting nodes to the specified parent.
    * @param value string to parse
    * @param elem element
+   * @throws QueryException query exception
    */
-  public static void add(final byte[] value, final FElem elem) {
+  public static void add(final byte[] value, final FElem elem) throws QueryException {
     try {
       final MainOptions mopts = MainOptions.get();
       if(contains(value, '<')) {

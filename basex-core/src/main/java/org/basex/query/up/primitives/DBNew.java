@@ -109,7 +109,7 @@ public final class DBNew {
         }
       }
       return data == null ? null : new DataClip(data).context(qc.context);
-    } catch(final IOException ex) {
+    } catch(final IOException | QueryException ex) {
       if(data != null) new DataClip(data).context(qc.context).finish();
       throw UPDBERROR_X.get(info, ex);
     } finally {
@@ -156,8 +156,10 @@ public final class DBNew {
    * @param cache cache data to disk
    * @return database
    * @throws IOException I/O exception
+   * @throws QueryException query exception
    */
-  private Data tmpData(final String name, final int i, final boolean cache) throws IOException {
+  private Data tmpData(final String name, final int i, final boolean cache)
+      throws IOException, QueryException {
     // free memory: clear list entries after retrieval
     final NewInput input = inputs.get(i);
     final MainOptions mopts = dboptions.get(i).assignTo(new MainOptions(qc.context.options, true));

@@ -148,7 +148,7 @@ public final class XQMap extends XQData {
   }
 
   @Override
-  public Item materialize(final QueryContext qc, final boolean copy) {
+  public Item materialize(final QueryContext qc, final boolean copy) throws QueryException {
     return root.materialized() ? this : null;
   }
 
