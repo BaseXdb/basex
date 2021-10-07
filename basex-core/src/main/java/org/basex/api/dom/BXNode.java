@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.node.*;
@@ -87,7 +88,11 @@ public abstract class BXNode implements Node {
 
   @Override
   public final BXNode cloneNode(final boolean deep) {
-    return nd.toJava();
+    try {
+      return nd.toJava();
+    } catch(QueryException ex) {
+      throw new DOMException(DOMException.NOT_SUPPORTED_ERR, ex.getLocalizedMessage());
+    }
   }
 
   @Override

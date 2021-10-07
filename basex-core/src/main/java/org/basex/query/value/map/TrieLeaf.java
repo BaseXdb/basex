@@ -208,7 +208,7 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  boolean materialized() {
+  boolean materialized() throws QueryException {
     for(final Item item : value) {
       if(item.persistent() || item.materialize(null, false) == null) return false;
     }

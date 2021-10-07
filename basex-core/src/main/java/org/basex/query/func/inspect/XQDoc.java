@@ -144,8 +144,9 @@ final class XQDoc extends Inspect {
    * Creates a comment element.
    * @param scope scope
    * @param parent parent element
+   * @throws QueryException query exception
    */
-  private void comment(final StaticScope scope, final FElem parent) {
+  private void comment(final StaticScope scope, final FElem parent) throws QueryException {
     final TokenObjMap<TokenList> map = scope.doc();
     if(map != null) comment(map, elem("comment", parent));
   }

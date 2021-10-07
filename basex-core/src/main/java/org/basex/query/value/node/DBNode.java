@@ -222,7 +222,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final DBNode materialize(final QueryContext qc, final boolean copy) {
+  public final DBNode materialize(final QueryContext qc, final boolean copy) throws QueryException {
     return copy ? copy(qc) : this;
   }
 
@@ -428,7 +428,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final BXNode toJava() {
+  public final BXNode toJava() throws QueryException {
     return BXNode.get(copy(new MainOptions(), null));
   }
 

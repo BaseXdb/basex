@@ -329,7 +329,7 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public Item materialize(final QueryContext qc, final boolean copy) {
+  public Item materialize(final QueryContext qc, final boolean copy) throws QueryException {
     for(final Value value : members()) {
       for(final Item item : value) {
         if(item.persistent() || item.materialize(null, false) == null) return null;

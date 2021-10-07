@@ -119,6 +119,12 @@ public abstract class Builder extends Job {
     setSize(pre, meta.size - pre);
     ++meta.ndocs;
     nspaces.close(meta.size);
+
+    // check if data ranges exceed database limits, based on the storage details in {@link Data}
+    limit(elemNames.size(), 0x8000, LIMITELEMS);
+    limit(attrNames.size(), 0x8000, LIMITATTS);
+    limit(nspaces.size(), 0x100, LIMITNS);
+    if(meta.size < 0) limit(0, 0, LIMITRANGE);
   }
 
   /**
@@ -317,12 +323,6 @@ public abstract class Builder extends Job {
 
     // set leaf node information in index
     if(level > 1) elemNames.stats(elemStack.get(level - 1)).setLeaf(false);
-
-    // check if data ranges exceed database limits, based on the storage details in {@link Data}
-    limit(elemNames.size(), 0x8000, LIMITELEMS);
-    limit(attrNames.size(), 0x8000, LIMITATTS);
-    limit(nspaces.size(), 0x100, LIMITNS);
-    if(meta.size < 0) limit(0, 0, LIMITRANGE);
   }
 
   /**

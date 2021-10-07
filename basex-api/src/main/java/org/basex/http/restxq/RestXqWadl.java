@@ -10,6 +10,7 @@ import javax.servlet.http.*;
 
 import org.basex.http.*;
 import org.basex.http.web.*;
+import org.basex.query.*;
 import org.basex.query.func.inspect.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -40,8 +41,9 @@ public final class RestXqWadl {
    * Returns a WADL description for all available URIs.
    * @param modules available modules
    * @return WADL description
+   * @throws QueryException query exception
    */
-  public synchronized FElem create(final HashMap<String, WebModule> modules) {
+  public synchronized FElem create(final HashMap<String, WebModule> modules) throws QueryException {
     // create root nodes
     final FElem application = new FElem(WADL + "application", WADL_URI).declareNS();
     final String base = request.getRequestURL().toString().replace(request.getRequestURI(),
@@ -100,9 +102,10 @@ public final class RestXqWadl {
    * @param root root element
    * @param xqdoc documentation
    * @param func function
+   * @throws QueryException query exception
    */
   private static void addParam(final String name, final String style, final FElem root,
-                               final TokenObjMap<TokenList> xqdoc, final RestXqFunction func) {
+      final TokenObjMap<TokenList> xqdoc, final RestXqFunction func) throws QueryException {
 
     final FElem param = elem("param", root);
     param.add("name", name).add("style", style);
@@ -131,8 +134,9 @@ public final class RestXqWadl {
    * Adds a documentation element to the specified element.
    * @param xqdoc documentation (may be {@code null})
    * @param parent parent node
+   * @throws QueryException query exception
    */
-  private static void addDoc(final byte[] xqdoc, final FElem parent) {
+  private static void addDoc(final byte[] xqdoc, final FElem parent) throws QueryException {
     if(xqdoc == null) return;
     final FElem doc = elem("doc", parent);
     doc.namespaces().add(EMPTY, token(XHTML_URL));

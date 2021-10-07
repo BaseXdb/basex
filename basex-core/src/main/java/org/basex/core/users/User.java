@@ -97,8 +97,9 @@ public final class User {
    * Returns user information as XML.
    * @param qc query context ({@code null} if element will only be created for serialization)
    * @return user element
+   * @throws QueryException query exception
    */
-  public synchronized FElem toXML(final QueryContext qc) {
+  public synchronized FElem toXML(final QueryContext qc) throws QueryException {
     final FElem user = new FElem(USER).add(NAME, name).add(PERMISSION, perm.toString());
     passwords.forEach((key, value) -> {
       final FElem pw = new FElem(PASSWORD).add(ALGORITHM, key.toString());

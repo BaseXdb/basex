@@ -216,7 +216,7 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  boolean materialized() {
+  boolean materialized() throws QueryException {
     for(final TrieNode nd : kids) {
       if(nd != null && !nd.materialized()) return false;
     }

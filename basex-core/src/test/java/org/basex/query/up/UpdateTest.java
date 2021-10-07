@@ -1279,4 +1279,14 @@ public final class UpdateTest extends SandboxTest {
   @Test public void gh2041() {
     error("copy $a := <a/>[. = 'x'] modify () return $a", UPSINGLE_X_X);
   }
+
+  /** Too many element/attribute names. */
+  @Test public void gh2042() {
+    error("<_>{ (1 to 100000) ! element { 'x' || . } {} }</_> update { }",
+        BASEX_LIMIT_X_X);
+    error("<_>{ (1 to 100000) ! <_>{ attribute { 'x' || . } {} }</_>}</_> update { }",
+        BASEX_LIMIT_X_X);
+    error("<_>{ (1 to 1000) ! <_>{ namespace { 'x' || . } { . } }</_>}</_> update { }",
+        BASEX_LIMIT_X_X);
+  }
 }

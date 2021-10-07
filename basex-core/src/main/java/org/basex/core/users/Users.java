@@ -12,6 +12,7 @@ import java.util.regex.*;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -88,18 +89,18 @@ public final class Users {
    */
   public void write() {
     synchronized(users) {
-      file.parent().md();
-      final FElem root = new FElem(USERS);
-      for(final User user : users.values()) {
-        root.add(user.toXML(null));
-      }
-      if(info != null) {
-        root.add(info);
-        info.parent(null);
-      }
       try {
+        file.parent().md();
+        final FElem root = new FElem(USERS);
+        for(final User user : users.values()) {
+          root.add(user.toXML(null));
+        }
+        if(info != null) {
+          root.add(info);
+          info.parent(null);
+        }
         file.write(root.serialize().finish());
-      } catch(final IOException ex) {
+      } catch(final IOException | QueryException ex) {
         Util.errln(ex);
       }
     }

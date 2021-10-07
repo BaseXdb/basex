@@ -215,8 +215,9 @@ abstract class TrieNode {
   /**
    * Checks if all values are materialized.
    * @return result of check
+   * @throws QueryException query exception
    */
-  abstract boolean materialized();
+  abstract boolean materialized() throws QueryException;
 
   /**
    * Applies a function on all entries.
