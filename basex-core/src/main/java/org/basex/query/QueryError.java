@@ -991,7 +991,7 @@ public enum QueryError {
   /** Error code. */
   CIRCREF_X(XPST, 8, "Static variable references itself: %"),
   /** Error code. */
-  VARPRIVATE_X(XPST, 8, "Variable % is not visible from this module."),
+  VARPRIVATE_X(XPST, 8, "Variable % is private."),
   /** Error code. */
   TYPEUNDEF_X(XPST, 8, "Undefined type annotation: %."),
   /** Error code. */
