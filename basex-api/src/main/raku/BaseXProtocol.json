@@ -1,0 +1,62 @@
+{
+	"query": {
+		"close": {
+			"char": 2,
+			"receive": ["bool"]
+		},
+		"bind": {
+			"char": 3,
+			"send": ["name", "value", "type"],
+			"receive": ["NULL"],
+			"clearcache": 1
+		},
+		"execute": {
+			"char": 5,
+			"receive": ["result"]
+		},
+		"info": {
+			"char": 6,
+			"receive": ["result"]
+		},
+		"options": {
+			"char": 7,
+			"receive": ["result"]
+		},
+		"context": {
+			"char": 14,
+			"send": ["value", "type"],
+			"clearcache": 1
+		}
+	},
+	"session": {
+		"command": {
+			"send": ["command"],
+			"receive": ["result", "info"]
+		},
+		"query": {
+			"char": 0,
+			"send": ["query"],
+			"receive": ["id"]
+		},
+		"create": {
+			"char": 8,
+			"send": ["name", "input"],
+			"receive": ["info"]
+		},
+		"add": {
+			"char": 9,
+			"send": ["path", "input"],
+			"receive": ["info"]
+		},
+		"replace": {
+			"char": 12,
+			"send": ["path", "input"],
+			"receive": ["info"]
+		},
+		"store": {
+			"char": 13,
+			"send": ["path", "input"],
+			"receive": ["info"]
+		}
+	}
+}

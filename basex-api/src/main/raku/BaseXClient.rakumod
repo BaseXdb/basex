@@ -5,46 +5,20 @@
 # 
 # (C) BaseX Team 2005-21, BSD License
 
-#use	OpenSSL::Digest::MD5;
 use	Digest::MD5;
+use	JSON::Fast;
 
 class	Query {
 	has	$.session;
 	has	@!cache;
 	has	$!pos;
 	has	$.id;
-	has	%.protocol-commands = (
-		close => {
-			char => 0x02,
-			receive => ['bool'],
-		},
-		bind => {
-			char => 0x03,
-			send => [<name value type>],
-			receive => ['NULL'],
-			clearcache => 1,
-		},
-		execute => {
-			char => 0x05,
-			receive => [<result>],
-		},
-		info => {
-			char => 0x06,
-			receive => [<result>],
-		},
-		options => {
-			char => 0x07,
-			receive => [<result>],
-		},
-		context => {
-			char => 0x0E,
-			send => [<value type>],
-			clearcache => 1,
-		},
-	);
+	has	%.protocol-commands;
 
 	# Post-processes some things after object creation
 	submethod	TWEAK(:$session, :$command) {
+		%!protocol-commands<bind><clearcache> = 1;
+		%!protocol-commands<context><clearcache> = 1;
 		for %!protocol-commands.kv -> $cmd, $hash {
 			$hash<send>:exists or $hash<send> = [];
 			$hash<clearcache>:exists or $hash<clearcache> = 0;
@@ -88,38 +62,8 @@ class	Session {
 	has	Cool		 $!buf;
 	has	$!result;
 	has	$.info;
-	has	%!protocol-commands = (
-		command => {
-			send => [<command>],
-			receive => [<result info>],
-		},
-		query => { # creates a query
-			char => 0x00,
-			send => [<query>],
-			receive => [<id>],
-		},
-		create => {
-			char => 0x08,
-			send => [<name input>],
-			receive => [<info>],
-		},
-		add => {
-			char => 0x09,
-			send => [<path input>],
-			receive => [<info>],
-		},
-		replace => {
-			char => 0x0C,
-			send => [<path input>],
-			receive => [<info>],
-		},
-		store => {
-			char => 0x0D,
-			send => [<path input>],
-			receive => [<info>],
-		},
-	);
-
+	has	$!json;
+	has	%!protocol-commands;
 
 	submethod	TWEAK(:$host, :$port, :$username, :$password) {
 		# create server connection
@@ -145,10 +89,19 @@ class	Session {
 
 		# evaluate success flag
 		self.read() and die "Access denied.";
+
+		# Read protocol information in JSON
+		$!json = from-json("BaseXProtocol.json".IO.slurp);
+		# Set up session info
+		%!protocol-commands = $!json<session>;
 	}
 
 	method	query(*%params) {
-		return Query.new(session => self, |%params);
+		return Query.new(
+			session => self, 
+			protocol-commands => $!json<query>,
+			|%params
+		);
 	}
 
 	# If a method doesn't exist, it does this instead; this makes the methods defined in %!protocol-commands work
