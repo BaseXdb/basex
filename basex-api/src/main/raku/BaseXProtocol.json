@@ -8,7 +8,6 @@
 			"char": 3,
 			"send": ["name", "value", "type"],
 			"receive": ["NULL"],
-			"clearcache": 1
 		},
 		"execute": {
 			"char": 5,
@@ -25,7 +24,10 @@
 		"context": {
 			"char": 14,
 			"send": ["value", "type"],
-			"clearcache": 1
+		},
+		"updating": {
+			"char": 30,
+			"receive": ["result"],
 		}
 	},
 	"session": {
