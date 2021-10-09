@@ -25,7 +25,15 @@ try {
 	say %results<info>;
   
 	# add document
+	%results = $session.add("world/World2.xml", "<x>Hello World 2!</x>");
+	say %results<info>;
+  
+	# add document
 	%results = $session.add(path => "Universe.xml", input => "<x>Hello Universe!</x>");
+	say %results<info>; 
+  
+	# add document
+	%results = $session.add("Universe2.xml", input => "<x>Hello Universe!</x>");
 	say %results<info>; 
   
 	# run query on database

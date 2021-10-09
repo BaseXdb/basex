@@ -30,11 +30,11 @@ class	Query {
 	}
 
 	# If a method doesn't exist, it does this instead; this makes the methods defined in %!protocol-commands work
-	method	FALLBACK ($name, *%params) {
+	method	FALLBACK ($name, *%named-params, *@positional-params) {
 		# If method isn't in %!protocol-commands either, just die with an error
 		%!protocol-commands{$name}:exists or die "Error: Unknown protocol-command '$name'";
 		# Run the protocol-command against the server
-		my (%rvs) = $!session.send-command($name, QueryObject => self, |%params);
+		my (%rvs) = $!session.send-command($name, QueryObject => self, |%named-params, |@positional-params);
 		# Clear the cache if necessary
 		%!protocol-commands{$name}<clearcache> and @!cache = ();
 		# Return whatever came back from the server
@@ -97,20 +97,21 @@ class	Session {
 		%!protocol-commands = $!json<session>;
 	}
 
-	method	query(*%params) {
+	method	query(*%params, *@params) {
 		return Query.new(
 			session => self, 
 			protocol-commands => $!json<query>,
-			|%params
+			|%params,
+			|@params,
 		);
 	}
 
 	# If a method doesn't exist, it does this instead; this makes the methods defined in %!protocol-commands work
-	method	FALLBACK ($name, *%params) {
+	method	FALLBACK ($name, *%named-params, *@positional-params) {
 		# If method isn't in %!protocol-commands either, just die with an error
 		%!protocol-commands{$name}:exists or die "Error: Unknown protocol-command '$name'";
 		# Run the protocol-command against the server
-		my (%rvs) = self.send-command($name, |%params);
+		my (%rvs) = self.send-command($name, |%named-params, |@positional-params);
 		# Return whatever came back from the server
 		return %rvs;
 	}
@@ -151,7 +152,8 @@ class	Session {
 
 	method	send-command($protocol-command, 
 		:$QueryObject, 
-		*%params
+		*%named-params,
+		*@positional-params,
 	) {
 		# Process $protocol-command -> $sendchar
 		my $protocol-command-hash;
@@ -172,13 +174,19 @@ class	Session {
 
 		# Process params -> $arg
 		my @useparams;
+		my $index = 0;
 		for $protocol-command-hash<send>.values -> $name {
-			if %params{$name}:exists {
-				defined(%params{$name}) or die "Undefined param '$name'";
-				push @useparams, map { s:g/(0x00|0xFF)/0xFF($1)/; $_ }, %params{$name};
-			} else {
+			{
+				when %named-params{$name}:exists {
+					defined(%named-params{$name}) or die "Undefined param '$name'";
+					push @useparams, map { s:g/(0x00|0xFF)/0xFF($1)/; $_ }, %named-params{$name};
+				}
+				when @positional-params[$index]:exists {
+					push @useparams, map { s:g/(0x00|0xFF)/0xFF($1)/; $_ }, @positional-params[$index];
+				}
 				push @useparams, '';
 			}
+			$index++;
 		}
 		$type eq 'query' and unshift @useparams, $QueryObject.id;
 		my $arg = join chr(0), @useparams;
