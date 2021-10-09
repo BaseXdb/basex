@@ -20,7 +20,7 @@ try {
 
 	# perform command and print returned string
 	my %results;
-	%results = $session.command("xquery 1 to 10");
+	%results = $session.command(command => "xquery 1 to 10");
 	say %results<result>;
 
 	# close session

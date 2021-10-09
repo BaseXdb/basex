@@ -17,7 +17,7 @@ try {
 
 	# create query instance
 	my $input = 'for $i in 1 to 10 return <xml>Text { $i }</xml>';
-	my $query = $session.query(command => $input);
+	my $query = $session.query(query => $input);
 
 	# loop through all results
 	while ($query.more()) {

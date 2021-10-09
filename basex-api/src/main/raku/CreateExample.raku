@@ -17,15 +17,15 @@ try {
 
 	# create new database
 	my %results;
-	%results = $session.create("database", "<x>Hello World!</x>");
+	%results = $session.create(name => "database", input => "<x>Hello World!</x>");
 	say %results<info>;
   
 	# run query on database
-	%results = $session.command("xquery doc('database')");
+	%results = $session.command(command => "xquery doc('database')");
 	say %results<result>;
   
 	# drop database
-	$session.command("drop db database");
+	$session.command(command => "drop db database");
   
 	# close session
 	$session.close();

@@ -17,22 +17,22 @@ try {
 
 	# create empty database
 	my %results;
-	%results = $session.command("create db database");
+	%results = $session.command(command => "create db database");
 	say %results<info>;
   
 	# add document
-	%results = $session.add("world/World.xml", "<x>Hello World!</x>");
+	%results = $session.add(path => "world/World.xml", input => "<x>Hello World!</x>");
 	say %results<info>;
   
 	# add document
-	%results = $session.add("Universe.xml", "<x>Hello Universe!</x>");
+	%results = $session.add(path => "Universe.xml", input => "<x>Hello Universe!</x>");
 	say %results<info>; 
   
 	# run query on database
-	say $session.command("xquery collection('database')")<result>;
+	say $session.command(command => "xquery collection('database')")<result>;
   
 	# drop database
-	$session.command("drop db database");
+	$session.command(command => "drop db database");
   
 	# close session
 	$session.close();

@@ -20,10 +20,10 @@ sub	MAIN($username = 'admin', :$ask-password = 0) {
 
 		# create query instance
 		my $input = 'declare variable $name external; for $i in 1 to 10 return element { $name } { $i }';
-		my $query = $session.query(command => $input);
+		my $query = $session.query(query => $input);
 	
 		# bind variable
-		$query.bind("name", "number", "");
+		$query.bind(name => "name", value => "number");
 
 		# print result
 		say $query.execute()<result>;

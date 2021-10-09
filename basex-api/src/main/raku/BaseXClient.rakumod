@@ -16,7 +16,7 @@ class	Query {
 	has	%.protocol-commands;
 
 	# Post-processes some things after object creation
-	submethod	TWEAK(:$session, :$command) {
+	submethod	TWEAK(:$session, :$query) {
 		%!protocol-commands<bind><clearcache> = 1;
 		%!protocol-commands<context><clearcache> = 1;
 		for %!protocol-commands.kv -> $cmd, $hash {
@@ -25,15 +25,16 @@ class	Query {
 		}
 
 		defined($!session) or die "No session defined!\n";
-		$!id = $!session.send-command('query', $command)<id>;
+		defined($query) or die "No query defined";
+		$!id = $!session.send-command('query', query => $query)<id>;
 	}
 
 	# If a method doesn't exist, it does this instead; this makes the methods defined in %!protocol-commands work
-	method	FALLBACK ($name, *@params) {
+	method	FALLBACK ($name, *%params) {
 		# If method isn't in %!protocol-commands either, just die with an error
 		%!protocol-commands{$name}:exists or die "Error: Unknown protocol-command '$name'";
 		# Run the protocol-command against the server
-		my (%rvs) = $!session.send-command($name, query => self, |@params);
+		my (%rvs) = $!session.send-command($name, QueryObject => self, |%params);
 		# Clear the cache if necessary
 		%!protocol-commands{$name}<clearcache> and @!cache = ();
 		# Return whatever came back from the server
@@ -105,11 +106,11 @@ class	Session {
 	}
 
 	# If a method doesn't exist, it does this instead; this makes the methods defined in %!protocol-commands work
-	method	FALLBACK ($name, *@params) {
+	method	FALLBACK ($name, *%params) {
 		# If method isn't in %!protocol-commands either, just die with an error
 		%!protocol-commands{$name}:exists or die "Error: Unknown protocol-command '$name'";
 		# Run the protocol-command against the server
-		my (%rvs) = self.send-command($name, |@params);
+		my (%rvs) = self.send-command($name, |%params);
 		# Return whatever came back from the server
 		return %rvs;
 	}
@@ -149,8 +150,8 @@ class	Session {
 	}
 
 	method	send-command($protocol-command, 
-		:$query, 
-		*@params
+		:$QueryObject, 
+		*%params
 	) {
 		# Process $protocol-command -> $sendchar
 		my $protocol-command-hash;
@@ -160,8 +161,8 @@ class	Session {
 				$protocol-command-hash = %!protocol-commands{$_};
 				$type = 'session';
 			}
-			when defined($query) and $query.protocol-commands{$_}:exists {
-				$protocol-command-hash = $query.protocol-commands{$_};
+			when defined($QueryObject) and $QueryObject.protocol-commands{$_}:exists {
+				$protocol-command-hash = $QueryObject.protocol-commands{$_};
 				$type = 'query';
 			}
 			die "Don't recognise protocol-command '$protocol-command'\n";
@@ -170,9 +171,16 @@ class	Session {
 		defined($sendchar) or die "Unknown character for protocol-command $protocol-command";
 
 		# Process params -> $arg
-		my @useparams = map { s:g/(0x00|0xFF)/0xFF($1)/; $_ }, @params; # clean data
-		while @useparams < $protocol-command-hash<send>.elems { push @useparams, ''; }
-		$type eq 'query' and unshift @useparams, $query.id;
+		my @useparams;
+		for $protocol-command-hash<send>.values -> $name {
+			if %params{$name}:exists {
+				defined(%params{$name}) or die "Undefined param '$name'";
+				push @useparams, map { s:g/(0x00|0xFF)/0xFF($1)/; $_ }, %params{$name};
+			} else {
+				push @useparams, '';
+			}
+		}
+		$type eq 'query' and unshift @useparams, $QueryObject.id;
 		my $arg = join chr(0), @useparams;
 		defined($arg) or die "Unknown argument in protocol-command '$protocol-command'";
 
