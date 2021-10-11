@@ -1718,7 +1718,7 @@ public enum Function implements AFunction {
   _WEB_ENCODE_URL(WebEncodeUrl::new, "encode-url(string)",
       params(STRING_O), STRING_O, WEB_URI),
   /** XQuery function. */
-  _WEB_ERROR(WebError::new, "error(code[,message])",
+  _WEB_ERROR(WebError::new, "error(code,message)",
       params(INTEGER_O, STRING_O), ITEM_ZM, flag(NDT), WEB_URI),
   /** XQuery function. */
   _WEB_FORWARD(WebForward::new, "forward(location[,params])",
