@@ -1109,10 +1109,6 @@ public interface Text {
   String USE_CATALOG_FILE = lang("use_catalog_file");
   /** Use XInclude. */
   String USE_XINCLUDE = lang("use_xinclude");
-  /** Use Catalog file not found on CP. */
-  String HELP1_USE_CATALOG = lang("help1_use_catalog");
-  /** Use Catalog file not found on CP. */
-  String HELP2_USE_CATALOG = lang("help2_use_catalog");
 
   /** Database creation filter. */
   String FILE_PATTERNS = lang("file_patterns");

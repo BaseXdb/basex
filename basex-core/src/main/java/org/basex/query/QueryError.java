@@ -245,6 +245,8 @@ public enum QueryError {
   /** Error code. */
   FETCH_OPEN_X(FETCH, "open", "%"),
   /** Error code. */
+  FETCH_EXISTS_X(FETCH, "open", "'%' does not exist."),
+  /** Error code. */
   FETCH_ENCODING_X(FETCH, "encoding", "Unknown encoding '%'."),
 
   // File Module

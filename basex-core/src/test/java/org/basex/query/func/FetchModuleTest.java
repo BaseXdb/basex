@@ -25,7 +25,8 @@ public final class FetchModuleTest extends SandboxTest {
     final Function func = _FETCH_BINARY;
     // successful queries
     query(func.args(XML));
-    error(func.args(XML + 'x'), FETCH_OPEN_X);
+    error(func.args(XML + 'x'), FETCH_EXISTS_X);
+    error(func.args("httttp://x"), FETCH_OPEN_X);
   }
 
   /** Test method. */
@@ -33,7 +34,8 @@ public final class FetchModuleTest extends SandboxTest {
     final Function func = _FETCH_CONTENT_TYPE;
     // successful queries
     query(func.args(XML));
-    error(func.args(XML + 'x'), FETCH_OPEN_X);
+    error(func.args(XML + 'x'), FETCH_EXISTS_X);
+    error(func.args("httttp://x"), FETCH_OPEN_X);
   }
 
   /** Test method. */
@@ -41,7 +43,8 @@ public final class FetchModuleTest extends SandboxTest {
     final Function func = _FETCH_TEXT;
     // successful queries
     query(func.args(XML));
-    error(func.args(XML + 'x'), FETCH_OPEN_X);
+    error(func.args(XML + 'x'), FETCH_EXISTS_X);
+    error(func.args("httttp://x"), FETCH_OPEN_X);
     error(func.args(XML, "xxx"), FETCH_ENCODING_X);
   }
 
@@ -67,7 +70,8 @@ public final class FetchModuleTest extends SandboxTest {
         " map { 'catfile': '" + catalog + "catalog.xml', 'dtd': true() }"), "<x>X</x>");
 
     error(func.args(XML, " map { 'parser': 'unknown' }"), BASEX_OPTIONS_X_X);
-    error(func.args(XML + 'x'), FETCH_OPEN_X);
+    error(func.args(XML + 'x'), FETCH_EXISTS_X);
+    error(func.args("httttp://x"), FETCH_OPEN_X);
   }
 
   /** Test method. */

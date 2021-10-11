@@ -6,7 +6,6 @@ import java.io.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
@@ -17,13 +16,11 @@ import org.basex.util.http.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class FetchContentType extends StandardFunc {
+public final class FetchContentType extends FetchXml {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] uri = toToken(exprs[0], qc);
-    final IO io = IO.get(Token.string(uri));
+    final IO io = io(qc);
 
-    final String path = io.path();
     MediaType mt = null;
     if(io instanceof IOUrl) {
       try {
@@ -35,9 +32,9 @@ public final class FetchContentType extends StandardFunc {
     } else if(io instanceof IOContent) {
       mt = MediaType.APPLICATION_XML;
     } else if(io.exists()) {
-      mt = MediaType.get(path);
+      mt = MediaType.get(io.path());
     }
-    if(mt == null) throw FETCH_OPEN_X.get(info, new FileNotFoundException(path));
+    if(mt == null) throw FETCH_OPEN_X.get(info, new FileNotFoundException(io.path()));
     return Str.get(mt.toString());
   }
 }

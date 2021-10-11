@@ -9,6 +9,7 @@ import java.util.*;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -17,7 +18,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
-import org.basex.build.xml.*; // for CatalogWrapper
 
 /**
  * Function implementation.
@@ -60,8 +60,13 @@ public class XsltTransform extends XsltFn {
       System.setErr(new PrintStream(ao));
       return transform(in, xsl, opts.free(), xopts, qc);
     } catch(final TransformerException ex) {
-      Util.debug(ex);
-      throw XSLT_ERROR_X.get(info, trim(utf8(ao.toArray(), Prop.ENCODING)));
+      byte[] msg = trim(utf8(ao.toArray(), Prop.ENCODING));
+      if(msg.length == 0) {
+        msg = token(Util.message(ex));
+      } else {
+        Util.debug(ex);
+      }
+      throw XSLT_ERROR_X.get(info, msg);
     } catch(final IllegalArgumentException ex) {
       // Saxon raises runtime exceptions for illegal parameters
       Util.debug(ex);
@@ -106,27 +111,25 @@ public class XsltTransform extends XsltFn {
   private static byte[] transform(final IO in, final IO xsl, final HashMap<String, String> params,
       final XsltOptions xopts, final QueryContext qc) throws TransformerException {
 
-    final URIResolver ur = CatalogWrapper.getURIResolver(qc.context.options);
-
-    // retrieve new or cached templates object
-    Templates tmp = null;
     final StreamSource ss = xsl.streamSource();
     final String key = xopts.get(XsltOptions.CACHE) ? ss.getSystemId() : null;
-    if(key != null) tmp = MAP.get(key);
-    if(tmp == null) {
+
+    // retrieve new or cached templates instance
+    Templates templates = key != null ? MAP.get(key) : null;
+    if(templates == null) {
       // no templates object cached: create new instance
       final TransformerFactory tf = TransformerFactory.newInstance();
       // assign catalog resolver (if defined)
-      if(ur != null) tf.setURIResolver(ur);
-      tmp = tf.newTemplates(ss);
-      if(key != null) MAP.put(key, tmp);
+      final String catfile = qc.context.options.get(MainOptions.CATFILE);
+      if(!catfile.isEmpty()) {
+        tf.setAttribute("javax.xml.catalog.files", IO.get(catfile).url());
+      }
+      templates = tf.newTemplates(ss);
+      if(key != null) MAP.put(key, templates);
     }
 
-    // create transformer, assign catalog resolver (if defined)
-    final Transformer tr = tmp.newTransformer();
-    if(ur != null) tr.setURIResolver(ur);
-
-    // bind parameters
+    // create transformer, bind parameters
+    final Transformer tr = templates.newTransformer();
     params.forEach(tr::setParameter);
 
     // do transformation and return result

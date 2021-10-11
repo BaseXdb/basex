@@ -14,6 +14,7 @@ import org.basex.util.*;
 public final class FetchXmlBinary extends FetchXml {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return fetch(new IOContent(toBin(exprs[0], qc).binary(info)), qc);
+    final IO io = new IOContent(toBin(exprs[0], qc).binary(info));
+    return fetch(io, qc);
   }
 }

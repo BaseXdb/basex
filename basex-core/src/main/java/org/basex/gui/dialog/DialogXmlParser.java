@@ -3,7 +3,6 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
-import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
@@ -64,14 +63,11 @@ final class DialogXmlParser extends DialogParser {
     // catalog resolver
     final boolean cat = !opts.get(MainOptions.CATFILE).isEmpty();
     usecat = new BaseXCheckBox(dialog, USE_CATALOG_FILE, cat).bold();
-    final boolean rsen = CatalogWrapper.available();
     final BaseXBack cr = new BaseXBack(new TableLayout(2, 2, 8, 0));
-    usecat.setEnabled(rsen);
     cr.add(usecat);
     cr.add(new BaseXLabel());
 
     cfile = new BaseXTextField(dialog, opts.get(MainOptions.CATFILE));
-    cfile.setEnabled(rsen);
     cr.add(cfile);
 
     browsec = new BaseXButton(dialog, BROWSE_D);
@@ -83,15 +79,8 @@ final class DialogXmlParser extends DialogParser {
       final IO file = fc.select(Mode.FDOPEN);
       if(file != null) cfile.setText(file.path());
     });
-    browsec.setEnabled(rsen);
     cr.add(browsec);
     pp.add(cr);
-    if(!rsen) {
-      final BaseXBack rs = new BaseXBack(new RowLayout());
-      rs.add(new BaseXLabel(HELP1_USE_CATALOG).color(GUIConstants.dgray));
-      rs.add(new BaseXLabel(HELP2_USE_CATALOG).color(GUIConstants.dgray));
-      pp.add(rs);
-    }
 
     add(pp, BorderLayout.WEST);
     action(true);
@@ -103,7 +92,7 @@ final class DialogXmlParser extends DialogParser {
     final boolean uc = usecat.isSelected();
     intparse.setEnabled(!uc);
     xinclude.setEnabled(!ip);
-    usecat.setEnabled(!ip && CatalogWrapper.available());
+    usecat.setEnabled(!ip);
     cfile.setEnabled(uc);
     browsec.setEnabled(uc);
     return true;

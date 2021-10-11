@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
+import javax.xml.catalog.*;
 import javax.xml.transform.sax.*;
 
 import org.basex.build.*;
@@ -12,7 +13,7 @@ import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.parse.xml.*;
-import org.basex.util.*;
+import org.basex.util.Util;
 import org.xml.sax.*;
 
 /**
@@ -31,7 +32,7 @@ public final class SAXWrapper extends SingleParser {
   private int lines;
 
   /** SAX handler reference. */
-  private SAXHandler saxh;
+  private SAXHandler sh;
   /** File length (real or estimated). */
   private long length;
 
@@ -53,16 +54,14 @@ public final class SAXWrapper extends SingleParser {
       if(reader == null) {
         reader = XmlParser.reader(options.get(MainOptions.DTD), options.get(MainOptions.XINCLUDE));
       }
+      final CatalogResolver cr = options.catalogResolver();
+      if(cr != null) reader.setEntityResolver(cr);
 
-      saxh = new SAXHandler(builder, options.get(MainOptions.CHOP),
-          options.get(MainOptions.STRIPNS));
-      final EntityResolver er = CatalogWrapper.getEntityResolver(options);
-      if(er != null) reader.setEntityResolver(er);
-
-      reader.setDTDHandler(saxh);
-      reader.setContentHandler(saxh);
-      reader.setProperty("http://xml.org/sax/properties/lexical-handler", saxh);
-      reader.setErrorHandler(saxh);
+      sh = new SAXHandler(builder, options.get(MainOptions.CHOP), options.get(MainOptions.STRIPNS));
+      reader.setDTDHandler(sh);
+      reader.setContentHandler(sh);
+      reader.setProperty("http://xml.org/sax/properties/lexical-handler", sh);
+      reader.setErrorHandler(sh);
 
       reader.parse(is);
     } catch(final SAXParseException ex) {
@@ -72,10 +71,9 @@ public final class SAXWrapper extends SingleParser {
     } catch(final JobException ex) {
       throw ex;
     } catch(final Exception ex) {
-      // occurs, e.g. if document encoding is invalid:
-      // prefix message with source id
-      // wrap and return original message
-      throw new IOException('"' + source.path() + '"' + Util.message(ex), ex);
+      // invalid document encoding, catalog raises an error, ...
+      final String msg = ex.getCause() != null ? ex.getCause().getMessage() : Util.message(ex);
+      throw new IOException(source.path() + ": " + msg, ex);
     } finally {
       try(Reader r = is.getCharacterStream()) { /* no action */ }
       try(InputStream ist = is.getByteStream()) { /* no action */ }
@@ -132,6 +130,6 @@ public final class SAXWrapper extends SingleParser {
 
   @Override
   public double progressInfo() {
-    return length == 0 ? saxh == null ? 0 : saxh.nodes / 3000000.0d % 1 : (double) bytes / length;
+    return length == 0 ? sh == null ? 0 : sh.nodes / 3000000.0d % 1 : (double) bytes / length;
   }
 }
