@@ -133,8 +133,6 @@ public final class EditorArea extends TextPanel {
     final boolean exec = gui.editor.go.isEnabled();
     if(EXEC1.is(e)) {
       if(exec) release(Action.EXECUTE);
-    } else if(UNIT.is(e)) {
-      if(exec) release(Action.TEST);
     } else if((!e.isActionKey() || MOVEDOWN.is(e) || MOVEUP.is(e)) && !modifier(e)) {
       release(Action.CHECK);
     }

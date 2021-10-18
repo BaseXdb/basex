@@ -315,6 +315,8 @@ public final class BaseXLayout {
           GUIMenuCmd.C_GO_UP.execute(gui);
         } else if(GOHOME.is(e)) {
           GUIMenuCmd.C_GO_HOME.execute(gui);
+        } else if(FILTER.is(e)) {
+          GUIMenuCmd.C_FILTER_NODES.execute(gui);
         }
       }
 
@@ -344,11 +346,11 @@ public final class BaseXLayout {
   /**
    * Adds human readable shortcuts to the specified string.
    * @param string tooltip string
-   * @param sc shortcut
+   * @param sc shortcut (can be {@code null})
    * @return tooltip
    */
   public static String addShortcut(final String string, final String sc) {
-    if(sc == null || string == null) return string;
+    if(sc == null) return string;
     final StringBuilder sb = new StringBuilder();
     for(final String s : sc.split(" ")) {
       String t = "%".equals(s) ? Prop.MAC ? "meta" : "control" : s;

@@ -35,7 +35,7 @@ final class ProjectList extends JList<String> {
       @Override public void execute() { openExternal(); }
       @Override public boolean enabled(final GUI main) { return selectedValue() != null; }
     }, null,
-    new GUIPopupCmd(RUN_TESTS, BaseXKeys.UNIT) {
+    new GUIPopupCmd(RUN_TESTS) {
       @Override public void execute() { test(); }
       @Override public boolean enabled(final GUI main) { return selectedValue() != null; }
     }, null,

@@ -45,6 +45,6 @@ public final class GUIMacOS {
     this.main = main;
     Desktop.getDesktop().setAboutHandler(e -> { DialogAbout.show(main); });
     Desktop.getDesktop().setPreferencesHandler(e -> { DialogPrefs.show(main); });
-    Taskbar.getTaskbar().setIconImage(BaseXImages.get("logo_256"));
+    Taskbar.getTaskbar().setIconImage(BaseXImages.get("logo_large"));
   }
 }

@@ -122,12 +122,11 @@ public final class EditorView extends View {
     final AbstractButton vars = BaseXButton.command(GUIMenuCmd.C_EXTERNAL_VARIABLES, gui);
 
     history = BaseXButton.get("c_history", RECENTLY_OPENED, false, gui);
+    go = BaseXButton.get("c_go", BaseXLayout.addShortcut(RUN_QUERY, BaseXKeys.EXEC1.toString()),
+        false, gui);
     stop = BaseXButton.get("c_stop", STOP, false, gui);
     stop.setEnabled(false);
-    go = BaseXButton.get("c_go", BaseXLayout.addShortcut(RUN_QUERY,
-        BaseXKeys.EXEC1.toString()), false, gui);
-    test = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS,
-        BaseXKeys.UNIT.toString()), false, gui);
+    test = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS, null), false, gui);
 
     final BaseXBack buttons = new BaseXBack(false);
     buttons.layout(new ColumnLayout());
@@ -135,13 +134,13 @@ public final class EditorView extends View {
     buttons.add(openB);
     buttons.add(saveB);
     buttons.add(history);
-    buttons.add(Box.createHorizontalStrut(4));
-    buttons.add(find);
-    buttons.add(Box.createHorizontalStrut(4));
-    buttons.add(stop);
+    buttons.add(Box.createHorizontalStrut(8));
     buttons.add(go);
+    buttons.add(stop);
     buttons.add(vars);
     buttons.add(test);
+    buttons.add(Box.createHorizontalStrut(8));
+    buttons.add(find);
 
     context = new BaseXLabel("").resize(1.2f);
     context.setForeground(dgray);
@@ -1033,7 +1032,7 @@ public final class EditorView extends View {
     final BaseXBack tab = new BaseXBack(false).layout(new BorderLayout(10, 0));
     tab.add(edit.label, BorderLayout.CENTER);
 
-    final AbstractButton close = tabButton("e_close", "e_close2");
+    final AbstractButton close = tabButton("e_close", "e_close_hover");
     close.addActionListener(e -> close(edit));
     tab.add(close, BorderLayout.EAST);
 

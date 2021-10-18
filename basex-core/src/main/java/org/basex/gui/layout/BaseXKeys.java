@@ -79,6 +79,7 @@ public enum BaseXKeys {
   /** Browse back.           */ GOBACK(MAC ? META : ALT, VK_LEFT),
   /** Browse forward.        */ GOFORWARD(MAC ? META : ALT, VK_RIGHT),
   /** Browse up.             */ GOUP(MAC ? META : ALT, VK_UP),
+  /** Browse up.             */ FILTER(MAC ? META : ALT, VK_DOWN),
   /** Browse home.           */ GOHOME(MAC ? META : ALT, VK_HOME),
 
   /** Go to line.            */ GOTOLINE(META, VK_L),
@@ -105,7 +106,6 @@ public enum BaseXKeys {
   // General
 
   /** Execute.               */ EXEC1(META, VK_ENTER),
-  /** Test.                  */ UNIT(META | SHIFT, VK_ENTER),
 
   /** Escape.                */ ESCAPE(NO_MOD, VK_ESCAPE),
   /** Context menu.          */ CONTEXT(NO_MOD, VK_CONTEXT_MENU),

@@ -297,7 +297,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   /** Test command. */
   private final class TestCmd extends GUIPopupCmd {
     /** Constructor. */
-    TestCmd() { super(RUN_TESTS, BaseXKeys.UNIT); }
+    TestCmd() { super(RUN_TESTS); }
 
     @Override public void execute() {
       for(final ProjectNode node : selectedNodes()) {

@@ -60,7 +60,7 @@ public final class ViewContainer extends BaseXBack {
     setBackground(BACK);
 
     this.gui = gui;
-    logo = BaseXImages.get("logo_256");
+    logo = BaseXImages.get("logo_large");
 
     final int vl = view.length;
     views = new ViewPanel[vl];

@@ -115,7 +115,6 @@ public final class ViewNotifier {
     for(final View view : views) {
       if(view != vw && view.visible()) view.refreshMark();
     }
-    gui.filter.setEnabled(!mark.isEmpty());
     gui.refreshControls(true);
   }
 

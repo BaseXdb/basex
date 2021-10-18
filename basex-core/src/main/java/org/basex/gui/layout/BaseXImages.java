@@ -1,6 +1,7 @@
 package org.basex.gui.layout;
 
 import java.awt.*;
+import java.awt.image.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -20,6 +21,8 @@ import org.basex.util.http.*;
  * @author Christian Gruen
  */
 public final class BaseXImages {
+  /** Cached images. */
+  private static final HashMap<String, Image> IMAGES = new HashMap<>();
   /** Cached image icons. */
   private static final HashMap<String, ImageIcon> ICONS = new HashMap<>();
 
@@ -29,24 +32,22 @@ public final class BaseXImages {
   private static final FileSystemView FS = FileSystemView.getFileSystemView();
 
   /** Icon for xml files. */
-  private static final Icon XMLTEXT = icon("text_xml");
+  private static final Icon DBXML = icon("db_xml");
   /** Icon for raw files. */
-  private static final Icon RAWTEXT = icon("text_raw");
+  private static final Icon DBRAW = icon("db_raw");
 
   /** Icon for closed directories. */
-  private static final Icon DIR1 = icon("file_dir1");
+  private static final Icon DIR1 = icon("file_dir_closed");
   /** Icon for opened directories. */
-  private static final Icon DIR2 = icon("file_dir2");
+  private static final Icon DIR2 = icon("file_dir_opened");
   /** Icon for textual files. */
-  private static final Icon TEXT = icon("file_text");
+  private static final Icon FILE = icon("file_text");
   /** Icon for XML/XQuery file types. */
   private static final Icon XML = icon("file_xml");
   /** Icon for XML/XQuery file types. */
   private static final Icon XQUERY = icon("file_xquery");
   /** Icon for BaseX file types. */
   private static final Icon BASEX = icon("file_basex");
-  /** Icon for unknown file types. */
-  private static final Icon UNKNOWN = icon("file_unknown");
 
   /** Private constructor. */
   private BaseXImages() { }
@@ -57,20 +58,22 @@ public final class BaseXImages {
    * @return image
    */
   public static Image get(final String name) {
-    return get(url(name));
-  }
-
-  /**
-   * Returns the specified image.
-   * @param url image url
-   * @return image
-   */
-  public static Image get(final URL url) {
-    try {
-      return ImageIO.read(url);
-    } catch(final IOException ex) {
-      throw Util.notExpected(ex);
+    if(!IMAGES.containsKey(name)) {
+      final int n = 4;
+      final Image[] images = new Image[n];
+      for(int i = 0; i < n; i++) {
+        final String path = "/img/" + name + '-' + i + ".png";
+        final URL url = BaseXImages.class.getResource(path);
+        if(url == null) throw Util.notExpected("Image missing: " + path);
+        try {
+          images[i] = ImageIO.read(url);
+        } catch(IOException ex) {
+          throw Util.notExpected(ex);
+        }
+      }
+      IMAGES.put(name, new BaseMultiResolutionImage(images));
     }
+    return IMAGES.get(name);
   }
 
   /**
@@ -80,21 +83,6 @@ public final class BaseXImages {
    */
   public static ImageIcon icon(final String name) {
     return ICONS.computeIfAbsent(name, n -> new ImageIcon(get(n)));
-  }
-
-  /**
-   * Returns the image url.
-   * @param name name of image
-   * @return url
-   */
-  private static URL url(final String name) {
-    final String path = "/img/" + name + ".png";
-    URL url = BaseXImages.class.getResource(path);
-    if(url == null) {
-      Util.stack("Image not found: " + path);
-      url = BaseXImages.class.getResource("/img/warn.png");
-    }
-    return url;
   }
 
   /**
@@ -112,7 +100,7 @@ public final class BaseXImages {
    * @return icon
    */
   public static Icon text(final boolean raw) {
-    return raw ? RAWTEXT : XMLTEXT;
+    return raw ? DBRAW : DBXML;
   }
 
   /**
@@ -121,7 +109,7 @@ public final class BaseXImages {
    * @return icon
    */
   public static Icon file(final IOFile file) {
-    if(file == null) return UNKNOWN;
+    if(file == null) return FILE;
 
     // fallback code for displaying icons
     final String path = file.path();
@@ -143,6 +131,6 @@ public final class BaseXImages {
       return icon;
     }
     // default icon chooser
-    return type.isText() ? TEXT : UNKNOWN;
+    return FILE;
   }
 }

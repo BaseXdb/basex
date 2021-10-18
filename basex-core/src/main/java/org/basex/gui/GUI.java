@@ -54,8 +54,6 @@ public final class GUI extends JFrame implements BaseXWindow {
   public final GUIStatus status;
   /** Input field. */
   public final GUIInput input;
-  /** Filter button. */
-  public final AbstractButton filter;
   /** Search view. */
   public final EditorView editor;
   /** Info view. */
@@ -118,7 +116,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     this.gopts = gopts;
 
     if(Prop.MAC) GUIMacOS.init(this);
-    setIconImage(BaseXImages.get("logo_64"));
+    setIconImage(BaseXImages.get("logo_small"));
     setTitle();
 
     // set window size
@@ -177,6 +175,9 @@ public final class GUI extends JFrame implements BaseXWindow {
     nav.add(mode, BorderLayout.WEST);
     nav.add(b, BorderLayout.CENTER);
 
+    final AbstractButton go = BaseXButton.get("c_go", RUN_QUERY, false, this);
+    go.addActionListener(e -> execute());
+
     stop = BaseXButton.get("c_stop", STOP, false, this);
     stop.setEnabled(false);
     stop.addActionListener(e -> {
@@ -186,15 +187,9 @@ public final class GUI extends JFrame implements BaseXWindow {
       }
     });
 
-    final AbstractButton go = BaseXButton.get("c_go", RUN_QUERY, false, this);
-    go.addActionListener(e -> execute());
-
-    filter = BaseXButton.command(GUIMenuCmd.C_FILTER_NODES, this);
-
     b = new BaseXBack(new ColumnLayout(1));
-    b.add(stop);
     b.add(go);
-    b.add(filter);
+    b.add(stop);
     nav.add(b, BorderLayout.EAST);
 
     if(this.gopts.get(GUIOptions.SHOWINPUT)) control.add(nav, BorderLayout.SOUTH);
@@ -606,8 +601,6 @@ public final class GUI extends JFrame implements BaseXWindow {
     if(result && marked != null) {
       results.setText(gopts.results((marked.isEmpty() ? context.current() : marked).size(), 0));
     }
-
-    filter.setEnabled(marked != null && !marked.isEmpty());
 
     final boolean inf = gopts.get(GUIOptions.SHOWINFO);
     context.options.set(MainOptions.QUERYINFO, inf);
