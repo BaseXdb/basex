@@ -235,7 +235,7 @@ final class DialogResources extends BaseXBack {
         final boolean focus) {
 
       super.getTreeCellRendererComponent(tree, val, sel, exp, leaf, row, focus);
-      if(leaf) setIcon(BaseXImages.text(((ResourceLeaf) val).raw));
+      if(leaf) setIcon(BaseXImages.resource(((ResourceLeaf) val).raw));
       return this;
     }
   }

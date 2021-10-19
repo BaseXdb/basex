@@ -32,22 +32,20 @@ public final class BaseXImages {
   private static final FileSystemView FS = FileSystemView.getFileSystemView();
 
   /** Icon for xml files. */
-  private static final Icon DBXML = icon("db_xml");
+  private static final Icon DB_XML = icon("db_xml");
   /** Icon for raw files. */
-  private static final Icon DBRAW = icon("db_raw");
+  private static final Icon DB_RAW = icon("db_raw");
 
   /** Icon for closed directories. */
-  private static final Icon DIR1 = icon("file_dir_closed");
+  private static final Icon DIR_CLOSED = icon("dir_closed");
   /** Icon for opened directories. */
-  private static final Icon DIR2 = icon("file_dir_opened");
+  private static final Icon DIR_OPENED = icon("dir_opened");
   /** Icon for textual files. */
-  private static final Icon FILE = icon("file_text");
+  private static final Icon FILE_TEXT = icon("file_text");
   /** Icon for XML/XQuery file types. */
-  private static final Icon XML = icon("file_xml");
+  private static final Icon FILE_XML = icon("file_xml");
   /** Icon for XML/XQuery file types. */
-  private static final Icon XQUERY = icon("file_xquery");
-  /** Icon for BaseX file types. */
-  private static final Icon BASEX = icon("file_basex");
+  private static final Icon FILE_XQUERY = icon("file_xquery");
 
   /** Private constructor. */
   private BaseXImages() { }
@@ -87,11 +85,11 @@ public final class BaseXImages {
 
   /**
    * Returns a directory icon.
-   * @param expanded expanded state (open/closed)
+   * @param opened expanded state (open/closed)
    * @return icon
    */
-  public static Icon dir(final boolean expanded) {
-    return expanded ? DIR2 : DIR1;
+  public static Icon dir(final boolean opened) {
+    return opened ? DIR_OPENED : DIR_CLOSED;
   }
 
   /**
@@ -99,8 +97,8 @@ public final class BaseXImages {
    * @param raw raw/xml text
    * @return icon
    */
-  public static Icon text(final boolean raw) {
-    return raw ? DBRAW : DBXML;
+  public static Icon resource(final boolean raw) {
+    return raw ? DB_RAW : DB_XML;
   }
 
   /**
@@ -109,14 +107,13 @@ public final class BaseXImages {
    * @return icon
    */
   public static Icon file(final IOFile file) {
-    if(file == null) return FILE;
+    if(file == null) return FILE_TEXT;
 
     // fallback code for displaying icons
     final String path = file.path();
     final MediaType type = MediaType.get(path);
-    if(type.isXML()) return XML;
-    if(type.isXQuery()) return XQUERY;
-    if(path.contains(IO.BASEXSUFFIX)) return BASEX;
+    if(type.isXML()) return FILE_XML;
+    if(type.isXQuery()) return FILE_XQUERY;
 
     if(Prop.WIN) {
       // retrieve system icons (only supported on Windows)
@@ -130,7 +127,7 @@ public final class BaseXImages {
       }
       return icon;
     }
-    // default icon chooser
-    return FILE;
+    // default icon
+    return FILE_TEXT;
   }
 }
