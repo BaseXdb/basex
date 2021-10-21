@@ -31,7 +31,7 @@ public final class Namespaces {
   /** Current level. Index starts at 1 (required by XQUF operations). */
   private int level = 1;
   /** Current namespace node. */
-  private NSNode cursor;
+  private NSNode current;
 
   // Creating and Writing Namespaces ==============================================================
 
@@ -42,7 +42,7 @@ public final class Namespaces {
     prefixes = new TokenSet();
     uris = new TokenSet();
     root = new NSNode(-1);
-    cursor = root;
+    current = root;
   }
 
   /**
@@ -54,7 +54,7 @@ public final class Namespaces {
     prefixes = new TokenSet(in);
     uris = new TokenSet(in);
     root = new NSNode(in, null);
-    cursor = root;
+    current = root;
   }
 
   /**
@@ -156,7 +156,7 @@ public final class Namespaces {
    */
   public int uriIdForPrefix(final byte[] prefix, final boolean element) {
     if(isEmpty()) return 0;
-    return prefix.length == 0 ? element ? defaults.get(level) : 0 : uriId(prefix, cursor);
+    return prefix.length == 0 ? element ? defaults.get(level) : 0 : uriId(prefix, current);
   }
 
   /**
@@ -167,7 +167,7 @@ public final class Namespaces {
    * @return id of namespace uri, or {@code 0} if no entry is found
    */
   public int uriIdForPrefix(final byte[] prefix, final int pre, final Data data) {
-    return uriId(prefix, cursor.find(pre, data));
+    return uriId(prefix, current.find(pre, data));
   }
 
   /**
@@ -197,7 +197,7 @@ public final class Namespaces {
    * @return key and value ids
    */
   Atts values(final int pre, final Data data) {
-    final int[] values = cursor.find(pre, data).values();
+    final int[] values = current.find(pre, data).values();
     final int nl = values.length;
     final Atts as = new Atts(nl / 2);
     for(int n = 0; n < nl; n += 2) as.add(prefix(values[n]), uri(values[n + 1]));
@@ -246,7 +246,7 @@ public final class Namespaces {
     defaults.set(level, uriId);
     // remember uri before insert of first node n to connect siblings of n to according namespace
     defaults.set(level - 1, uriId);
-    cursor = nd;
+    current = nd;
   }
 
   /**
@@ -284,7 +284,7 @@ public final class Namespaces {
    * @param node namespace node
    */
   void cursor(final NSNode node) {
-    cursor = node;
+    current = node;
   }
 
   /**
@@ -292,7 +292,7 @@ public final class Namespaces {
    * @return current namespace node
    */
   NSNode cursor() {
-    return cursor;
+    return current;
   }
 
   /**
@@ -312,8 +312,8 @@ public final class Namespaces {
     open();
     if(!atts.isEmpty()) {
       final NSNode nd = new NSNode(pre);
-      cursor.add(nd);
-      cursor = nd;
+      current.add(nd);
+      current = nd;
 
       final int as = atts.size();
       for(int a = 0; a < as; a++) {
@@ -335,7 +335,7 @@ public final class Namespaces {
    */
   public int add(final int pre, final byte[] prefix, final byte[] uri, final Data data) {
     final int prefId = prefixes.put(prefix), uriId = uris.put(uri);
-    NSNode nd = cursor.find(pre, data);
+    NSNode nd = current.find(pre, data);
     if(nd.pre() != pre) {
       final NSNode child = new NSNode(pre);
       nd.add(child);
@@ -350,10 +350,10 @@ public final class Namespaces {
    * @param pre current pre value
    */
   public void close(final int pre) {
-    while(cursor.pre() >= pre) {
-      final NSNode nd = cursor.parent();
+    while(current.pre() >= pre) {
+      final NSNode nd = current.parent();
       if(nd == null) break;
-      cursor = nd;
+      current = nd;
     }
     --level;
   }
@@ -364,7 +364,7 @@ public final class Namespaces {
    */
   public void delete(final byte[] uri) {
     final int id = uris.id(uri);
-    if(id != 0) cursor.delete(id);
+    if(id != 0) current.delete(id);
   }
 
   /**
@@ -374,7 +374,7 @@ public final class Namespaces {
    * @param size number of entries to be deleted
    */
   void delete(final int pre, final int size, final Data data) {
-    NSNode nd = cursor.find(pre, data);
+    NSNode nd = current.find(pre, data);
     if(nd.pre() == pre) nd = nd.parent();
     while(nd != null) {
       nd.delete(pre, size);
