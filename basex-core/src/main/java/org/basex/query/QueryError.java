@@ -40,6 +40,8 @@ public enum QueryError {
   /** Error code. */
   BASEX_LIMIT_X_X(BASEX, "limit", "Too many % (limit: %)."),
   /** Error code. */
+  BASEX_STRIP_X(BASEX, "strip", "Duplicate attribute name: %."),
+  /** Error code. */
   BASEX_OPTIONS1_X(BASEX, "options", "Unknown database option: %."),
   /** Error code. */
   BASEX_OPTIONS2_X(BASEX, "options", "%"),
@@ -1122,7 +1124,7 @@ public enum QueryError {
   NSSENS_X_X(XPTY, 117, "Cannot convert % to %."),
 
   /** Error code. */
-  CATTDUPL_X(XQDY, 25, "Duplicate attribute '%'."),
+  CATTDUPL_X(XQDY, 25, "Duplicate attribute name: %."),
   /** Error code. */
   CPICONT_X(XQDY, 26, "Processing instruction has invalid content: '%'."),
   /** Error code. */
@@ -1179,7 +1181,7 @@ public enum QueryError {
   /** Error code. */
   FUNCDUPL_X(XQST, 39, "Duplicate parameter name: %."),
   /** Error code. */
-  ATTDUPL_X(XQST, 40, "Duplicate attribute '%'."),
+  ATTDUPL_X(XQST, 40, "Duplicate attribute name: %."),
   /** Error code. */
   FNRESERVED_X(XQST, 45, "Function '%' is in reserved namespace."),
   /** Error code. */
@@ -1313,7 +1315,7 @@ public enum QueryError {
   /** Error code. */
   UPMULTREPV_X(XUDY, 17, "Node can only be replaced once: %."),
   /** Error code. */
-  UPATTDUPL_X(XUDY, 21, "Duplicate attribute: %."),
+  UPATTDUPL_X(XUDY, 21, "Duplicate attribute name: %."),
   /** Error code. */
   UPNSCONFL_X_X(XUDY, 23, "Namespace conflicts: % vs. %."),
   /** Error code. */
