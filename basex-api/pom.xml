@@ -7,12 +7,12 @@
   <parent>
     <groupId>org.basex</groupId>
     <artifactId>basex-parent</artifactId>
-    <version>9.6.3-SNAPSHOT</version>
+    <version>9.6.3</version>
     <relativePath>..</relativePath>
   </parent>
 
   <properties>
-    <jettyVersion>9.4.43.v20210629</jettyVersion>
+    <jettyVersion>9.4.44.v20210927</jettyVersion>
   </properties>
 
   <name>BaseX API</name>
