@@ -475,6 +475,44 @@ public final class UtilModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void stripNamespaces() {
+    final Function func = _UTIL_STRIP_NAMESPACES;
+
+    query(func.args(" <x/>"), "<x/>");
+    query(func.args(" <x/>", " ()"), "<x/>");
+    query(func.args(" <x/>", " ('')"), "<x/>");
+
+    query(func.args(" document { }"), "");
+    query(func.args(" text { 'T' }"), "T");
+    query(func.args(" comment { 'C' }"), "<!--C-->");
+    query(func.args(" attribute N { 'V' }"), "N=\"V\"");
+    query(func.args(" processing-instruction N { 'V' }"), "<?N V?>");
+
+    query(func.args(" <x xmlns='G'/>"), "<x/>");
+    query(func.args(" <x xmlns='G'/>", " ()"), "<x/>");
+    query(func.args(" <x xmlns='G'/>", ""), "<x/>");
+
+    query(func.args(" <l:x xmlns:l='L'/>"), "<x/>");
+    query(func.args(" <l:x xmlns:l='L'/>", " ()"), "<x/>");
+    query(func.args(" <l:x xmlns:l='L'/>", "l"), "<x/>");
+    query(func.args(" <l:x xmlns:l='L'/>", "l") + " => in-scope-prefixes()", "xml");
+    query(func.args(" <l:x xmlns:l='L'/>", "") + " => in-scope-prefixes()", "l\nxml");
+
+    query(func.args(" <l:x xmlns:l='L' l:a=''/>", "l"), "<x a=\"\"/>");
+    query(func.args(" <l:x xmlns:l='L' l:a='' l:b=''/>", "l"), "<x a=\"\" b=\"\"/>");
+
+    query(func.args(" <l:x xmlns='G' xmlns:l='L'/>"), "<x/>");
+    query(func.args(" <l:x xmlns='G' xmlns:l='L'/>", "l"), "<x/>");
+
+    query(func.args(" <x xmlns=''><y xmlns=''/></x>", ""), "<x>\n<y/>\n</x>");
+    query(func.args(" <x xmlns=''><l:y xmlns:l='L'/></x>", ""), "<x>\n<l:y xmlns:l=\"L\"/>\n</x>");
+    query(func.args(" <x xmlns:x='L' x:a=''><y x:a=''/></x>") + "/y", "<y a=\"\"/>");
+
+    error(func.args(" <_ xmlns:l='L' l:a='' a=''/>"), BASEX_STRIP_X);
+    error(func.args(" <_ xmlns:l='L' a='' l:a=''/>"), BASEX_STRIP_X);
+  }
+
+  /** Test method. */
   @Test public void within() {
     final Function func = _UTIL_WITHIN;
 

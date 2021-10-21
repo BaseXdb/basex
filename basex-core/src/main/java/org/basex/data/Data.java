@@ -412,7 +412,7 @@ public abstract class Data {
    * Returns the id of the namespace uri of the addressed element or attribute.
    * @param pre pre value
    * @param kind node kind
-   * @return id of the namespace uri
+   * @return id of the namespace uri, or {@code 0} if node has no namespace
    */
   public final int uriId(final int pre, final int kind) {
     return kind == ELEM || kind == ATTR ? table.read1(pre, kind == ELEM ? 3 : 11) & 0xFF : 0;

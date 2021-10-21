@@ -50,7 +50,7 @@ final class RESTPost {
       // handle request
       final String cmd = value("local-name(*)", doc, ctx);
       if(cmd.equals(COMMANDS)) {
-        final String script = DataBuilder.stripNS(doc, REST_URI, ctx).serialize().toString();
+        final String script = DataBuilder.stripNamespace(doc, REST_URI, ctx).serialize().toString();
         return RESTScript.get(session, script);
       }
 
@@ -95,7 +95,7 @@ final class RESTPost {
         for(final Item item : qp.value()) {
           if(val != null) throw HTTPCode.MULTIPLE_CONTEXTS.get();
           // create main memory instance of the specified node
-          val = DataBuilder.stripNS((ANode) item, REST_URI, ctx).serialize().toString();
+          val = DataBuilder.stripNamespace((ANode) item, REST_URI, ctx).serialize().toString();
         }
       }
 

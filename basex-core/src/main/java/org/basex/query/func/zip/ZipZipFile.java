@@ -141,7 +141,7 @@ public class ZipZipFile extends ZipFn {
               final ArrayOutput ao = new ArrayOutput();
               try(Serializer ser = Serializer.get(ao, sopts(node))) {
                 do {
-                  ser.serialize(DataBuilder.stripNS(n, ZIP_URI, qc.context));
+                  ser.serialize(DataBuilder.stripNamespace(n, ZIP_URI, qc.context));
                 } while((n = ch.next()) != null);
               } catch(final QueryIOException ex) {
                 throw ex.getCause(info);
