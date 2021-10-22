@@ -130,9 +130,10 @@ public final class EditorArea extends TextPanel {
 
   @Override
   public void keyReleased(final KeyEvent e) {
-    final boolean exec = gui.editor.go.isEnabled();
     if(EXEC1.is(e)) {
-      if(exec) release(Action.EXECUTE);
+      if(gui.editor.go.isEnabled()) release(Action.EXECUTE);
+    } else if(UNIT.is(e)) {
+      if(gui.editor.test.isEnabled()) release(Action.TEST);
     } else if((!e.isActionKey() || MOVEDOWN.is(e) || MOVEUP.is(e)) && !modifier(e)) {
       release(Action.CHECK);
     }

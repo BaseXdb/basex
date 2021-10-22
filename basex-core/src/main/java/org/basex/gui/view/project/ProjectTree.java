@@ -161,7 +161,9 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   /** Refresh command. */
   private final class RefreshCmd extends GUIPopupCmd {
     /** Constructor. */
-    RefreshCmd() { super(REFRESH, BaseXKeys.REFRESH); }
+    RefreshCmd() {
+      super(REFRESH, BaseXKeys.REFRESH);
+    }
 
     @Override public void execute() {
       view.refresh();
@@ -176,7 +178,9 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   /** New directory command. */
   private final class NewDirCmd extends GUIPopupCmd {
     /** Constructor. */
-    NewDirCmd() { super(NEW_DIR, BaseXKeys.NEWDIR); }
+    NewDirCmd() {
+      super(NEW_DIR, BaseXKeys.NEWDIR);
+    }
 
     @Override public void execute() {
       final ProjectNode node = selectedNode();
@@ -216,7 +220,9 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   /** Delete command. */
   private final class DeleteCmd extends GUIPopupCmd {
     /** Constructor. */
-    DeleteCmd() { super(DELETE + DOTS, BaseXKeys.DELNEXT); }
+    DeleteCmd() {
+      super(DELETE + DOTS, BaseXKeys.DELNEXT);
+    }
 
     @Override public void execute() {
       final ProjectNode node = selectedNode();
@@ -243,7 +249,9 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   /** Rename command. */
   private final class RenameCmd extends GUIPopupCmd {
     /** Constructor. */
-    RenameCmd() { super(RENAME, BaseXKeys.RENAME); }
+    RenameCmd() {
+      super(RENAME, BaseXKeys.RENAME);
+    }
 
     @Override public void execute() {
       startEditingAtPath(selectedNode().path());
@@ -259,7 +267,9 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   /** Open command. */
   private final class OpenCmd extends GUIPopupCmd {
     /** Constructor. */
-    OpenCmd() { super(OPEN, BaseXKeys.ENTER); }
+    OpenCmd() {
+      super(OPEN, BaseXKeys.ENTER);
+    }
 
     @Override public void execute() {
       for(final ProjectNode node : selectedNodes()) view.open(node.file, "");
@@ -276,7 +286,9 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   /** Open externally command. */
   private final class OpenExternalCmd extends GUIPopupCmd {
     /** Constructor. */
-    OpenExternalCmd() { super(OPEN_EXTERNALLY, BaseXKeys.SHIFT_ENTER); }
+    OpenExternalCmd() {
+      super(OPEN_EXTERNALLY, BaseXKeys.SHIFT_ENTER);
+    }
 
     @Override public void execute() {
       for(final ProjectNode node : selectedNodes()) {
@@ -297,23 +309,33 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   /** Test command. */
   private final class TestCmd extends GUIPopupCmd {
     /** Constructor. */
-    TestCmd() { super(RUN_TESTS); }
+    TestCmd() {
+      super(RUN_TESTS, BaseXKeys.UNIT);
+    }
 
     @Override public void execute() {
       for(final ProjectNode node : selectedNodes()) {
-        view.gui.execute(new Test(node.file.path()));
+        final IOFile file = node.file;
+        if(file.isDir() || file.hasSuffix(IO.XQSUFFIXES)) {
+          view.gui.execute(new Test(file.path()));
+        }
       }
     }
 
     @Override public boolean enabled(final GUI main) {
-      return selectedNode() != null;
+      final ProjectNode node = selectedNode();
+      if(node == null) return false;
+      final IOFile file = node.file;
+      return file.isDir() || file.hasSuffix(IO.XQSUFFIXES);
     }
   }
 
   /** Copy path command. */
   private final class CopyPathCmd extends GUIPopupCmd {
     /** Constructor. */
-    CopyPathCmd() { super(COPY_PATH, BaseXKeys.COPYPATH); }
+    CopyPathCmd() {
+      super(COPY_PATH, BaseXKeys.COPYPATH);
+    }
 
     @Override public void execute() {
       BaseXLayout.copyPath(selectedNode().file.path());
@@ -327,7 +349,9 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   /** Set context command. */
   private final class SetContextCmd extends GUIPopupCmd {
     /** Constructor. */
-    SetContextCmd() { super(SET_CONTEXT); }
+    SetContextCmd() {
+      super(SET_CONTEXT);
+    }
 
     @Override public void execute() {
       view.gui.editor.setContext(selectedNode().file);

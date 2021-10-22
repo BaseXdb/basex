@@ -57,13 +57,13 @@ public final class EditorView extends View {
   final ProjectView project;
   /** Go button. */
   final AbstractButton go;
+  /** Test button. */
+  final AbstractButton test;
 
   /** History Button. */
   private final AbstractButton history;
   /** Stop Button. */
   private final AbstractButton stop;
-  /** Test button. */
-  private final AbstractButton test;
   /** Search bar. */
   private final SearchBar search;
   /** Info label. */
@@ -126,7 +126,8 @@ public final class EditorView extends View {
         false, gui);
     stop = BaseXButton.get("c_stop", STOP, false, gui);
     stop.setEnabled(false);
-    test = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS, null), false, gui);
+    test = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS, BaseXKeys.UNIT.toString()),
+        false, gui);
 
     final BaseXBack buttons = new BaseXBack(false);
     buttons.layout(new ColumnLayout());
@@ -257,7 +258,7 @@ public final class EditorView extends View {
 
   @Override
   public void refreshMark() {
-    test.setEnabled(!getEditor().file().hasSuffix(IO.BXSSUFFIX));
+    test.setEnabled(getEditor().file().hasSuffix(IO.XQSUFFIXES));
   }
 
   @Override
