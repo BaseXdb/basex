@@ -8,7 +8,7 @@
 use	Digest::MD5;
 use	JSON::Fast;
 
-class	Query {
+class	BaseXClient::Query {
 	has	$.session;
 	has	@!cache;
 	has	$!pos;
@@ -48,7 +48,9 @@ class	Query {
 	method	more {
 		if (!@!cache) {
 			$!session.send(chr(4) ~ $!id ~ chr(0));
-			push(@!cache, $!session.receive()) while $!session.read();
+			while ($!session.read()) {
+				push(@!cache, $!session.receive());
+			}
 			die $!session.receive() if !$!session.ok();
 			$!pos = 0;
 		}
@@ -58,7 +60,7 @@ class	Query {
 	}
 }
 
-class	Session {
+class	BaseXClient::Session {
 	has	IO::Socket::INET $!sock;
 	has	Cool		 $!buf;
 	has	$!result;
@@ -92,13 +94,14 @@ class	Session {
 		self.read() and die "Access denied.";
 
 		# Read protocol information in JSON
-		$!json = from-json("BaseXProtocol.json".IO.slurp);
+		my $filename = join '/', $?FILE.IO.dirname, "BaseXProtocol.json";
+		$!json = from-json($filename.IO.slurp);
 		# Set up session info
 		%!protocol-commands = $!json<session>;
 	}
 
 	method	query(*%params, *@params) {
-		return Query.new(
+		return BaseXClient::Query.new(
 			session => self, 
 			protocol-commands => $!json<query>,
 			|%params,
@@ -135,7 +138,7 @@ class	Session {
 
 	# Returns a single byte from the socket.
 	method	read {
-		$!buf = $!sock.recv(1);
+		$!buf = chr($!sock.read(1)[0]);
 		return ord($!buf);
 	}
 
