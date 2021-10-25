@@ -6,10 +6,10 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
+import javax.xml.catalog.*;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -17,6 +17,7 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.Util;
 import org.basex.util.options.*;
 
 /**
@@ -116,20 +117,18 @@ public class XsltTransform extends XsltFn {
 
     // retrieve new or cached templates instance
     Templates templates = key != null ? MAP.get(key) : null;
+    CatalogResolver cr = qc.context.options.catalogResolver();
     if(templates == null) {
       // no templates object cached: create new instance
       final TransformerFactory tf = TransformerFactory.newInstance();
-      // assign catalog resolver (if defined)
-      final String catfile = qc.context.options.get(MainOptions.CATFILE);
-      if(!catfile.isEmpty()) {
-        tf.setAttribute("javax.xml.catalog.files", IO.get(catfile).url());
-      }
+      if(cr != null) tf.setURIResolver(cr);
       templates = tf.newTemplates(ss);
       if(key != null) MAP.put(key, templates);
     }
 
     // create transformer, bind parameters
     final Transformer tr = templates.newTransformer();
+    if(cr != null) tr.setURIResolver(cr);
     params.forEach(tr::setParameter);
 
     // do transformation and return result
