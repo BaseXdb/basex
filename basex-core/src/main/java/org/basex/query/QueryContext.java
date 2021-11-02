@@ -53,9 +53,6 @@ public final class QueryContext extends Job implements Closeable {
   public final Variables vars = new Variables();
   /** Functions. */
   public final StaticFuncs funcs = new StaticFuncs();
-  /** Externally bound variables. */
-  private final QNmMap<Value> bindings = new QNmMap<>();
-
   /** Parent query context. */
   public final QueryContext parent;
   /** Query info. */
@@ -118,6 +115,11 @@ public final class QueryContext extends Job implements Closeable {
   public MainModule ctxItem;
   /** Root expression of the query. */
   public MainModule root;
+
+  /** Map with external variables to be bound at compile time. */
+  private final QNmMap<Value> bindings = new QNmMap<>();
+  /** Flag for binding the context item only once. */
+  private boolean contextItem;
 
   /** Serialization parameters. */
   private SerializerOptions serParams;
@@ -259,10 +261,9 @@ public final class QueryContext extends Job implements Closeable {
           final String key = entry.getKey();
           final Atm value = Atm.get(entry.getValue());
           if(key.isEmpty()) {
-            if(ctxItem == null) context(value, root.sc);
+            context(value, root.sc);
           } else {
-            final QNm name = qname(key, root.sc);
-            if(!bindings.contains(name)) bind(name, value);
+            bind(qname(key, root.sc), value);
           }
         }
       }
@@ -363,7 +364,7 @@ public final class QueryContext extends Job implements Closeable {
     final LockList list = updating ? l.writes : l.reads;
 
     if(root == null || !root.databases(l, this) || ctxItem != null && !ctxItem.databases(l, this)) {
-      // use global locking if referenced databases cannot statically be determined
+      // use global locking if referenced databases cannot be determined statically
       list.addGlobal();
     } else {
       // add custom locks
@@ -372,8 +373,8 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Binds the context value, using the same rules as for
-   * {@link #bind(String, Object, String, StaticContext) binding variables}.
+   * Binds the context value,  if no value has been assigned yet. The rules are the same
+   * as for {@link #bind(String, Object, String, StaticContext) binding variables}.
    * @param value value to be bound
    * @param type type (may be {@code null})
    * @param sc static context
@@ -385,16 +386,20 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Binds the context value.
+   * Binds the context value if no value has been assigned yet.
    * @param value value to be bound
    * @param sc static context
    */
   public void context(final Value value, final StaticContext sc) {
-    ctxItem = MainModule.get(new VarScope(sc), value, null, null, null);
+    if(!contextItem) {
+      ctxItem = MainModule.get(new VarScope(sc), value, null, null, null);
+      contextItem = true;
+    }
   }
 
   /**
-   * Binds a value to a global variable. The specified type is interpreted as follows:
+   * Binds a value to a global variable if no value has been assigned yet.
+   * The specified type is interpreted as follows:
    * <ul>
    *   <li> If {@code "json"} is specified, the value is converted according to the rules
    *        specified in {@link JsonXQueryConverter}.</li>
@@ -414,7 +419,7 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Binds a value to a global variable.
+   * Binds a value to a global variable if no value has been assigned yet.
    * @param name name of variable
    * @param value value to be bound
    * @param sc static context
@@ -426,12 +431,12 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Binds a value to a global variable.
+   * Binds a value to a global variable if no value has been assigned yet.
    * @param name name of variable
    * @param value value to be bound
    */
   public void bind(final QNm name, final Value value) {
-    bindings.put(name, value);
+    if(!bindings.contains(name)) bindings.put(name, value);
   }
 
   /**
