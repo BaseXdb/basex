@@ -41,7 +41,7 @@ public final class Util {
     tb.add(NL).add("OS: ").add(System.getProperty("os.name"));
     tb.add(", ").add(System.getProperty("os.arch"));
     tb.add(NL).add("Stack Trace: ");
-    for(final String e : toArray(throwable)) tb.add(NL).add(e);
+    for(final String string : toArray(throwable)) tb.add(NL).add(string);
     return tb.toString();
   }
 
@@ -250,7 +250,7 @@ public final class Util {
     errln(message);
     final String[] stack = toArray(new Throwable());
     final int l = Math.min(Math.max(2, depth + 2), stack.length);
-    for(int s = 2; s < l; ++s) errln(stack[s]);
+    for(int s = 3; s < l; s++) errln(stack[s]);
   }
 
   /**

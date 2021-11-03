@@ -86,6 +86,17 @@ public final class JsonModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void parseJsonML() {
+    parse("[ \"a\" ]", "'format': 'jsonml'", "<a/>");
+    parse("[ \"a\", \"A\" ]", "'format': 'jsonml'", "<a>A</a>");
+    parse("[ \"a\", { \"b\": \"c\" } ]", "'format': 'jsonml'", "<a b=\"c\"/>");
+    parse("[ \"a\", { \"b\": \"\", \"c\": \"\" } ]", "'format': 'jsonml'", "<a b=\"\" c=\"\"/>");
+
+    // duplicate attribute
+    parseError("[ \"a\", { \"b\": \"\", \"b\": \"\" } ]", "'format': 'jsonml'");
+  }
+
+  /** Test method. */
   @Test public void parseXQuery() {
     final Function func = _JSON_PARSE;
     // queries
