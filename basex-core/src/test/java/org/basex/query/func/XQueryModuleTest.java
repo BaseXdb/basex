@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.core.*;
-import org.basex.core.cmd.*;
 import org.basex.query.ast.*;
 import org.junit.jupiter.api.Test;
 
