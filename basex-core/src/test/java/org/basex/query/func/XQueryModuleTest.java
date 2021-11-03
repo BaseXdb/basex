@@ -85,12 +85,12 @@ public final class XQueryModuleTest extends QueryPlanTest {
     query(func.args(".", " map { '': 1 }"), 1);
 
     // ensure that global bindings will not overwrite local bindings
-    execute(new Set(MainOptions.BINDINGS, "a=X"));
+    set(MainOptions.BINDINGS, "a=X");
     try {
       error(func.args("declare variable $a external; $a", " ()"), VAREMPTY_X);
       query(func.args("declare variable $a external; $a", " map { '$a': 'b' }"), "b");
     } finally {
-      execute(new Set(MainOptions.BINDINGS, ""));
+      set(MainOptions.BINDINGS, "");
     }
   }
 

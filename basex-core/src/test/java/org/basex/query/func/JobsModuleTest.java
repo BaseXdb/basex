@@ -271,7 +271,7 @@ public final class JobsModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void waitFor() {
     final Function func = _JOBS_WAIT;
-    query(func.args(_JOBS_EVAL.args("1",  " ()", " map { 'start': 'PT0.1S' }")));
+    query(func.args(_JOBS_EVAL.args("1", " ()", " map { 'start': 'PT0.1S' }")));
     error(func.args(_JOBS_CURRENT.args()), JOBS_SELF_X);
   }
 

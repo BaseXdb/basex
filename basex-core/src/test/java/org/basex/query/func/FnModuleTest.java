@@ -586,7 +586,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
     // pre-evaluated expressions
     check(func.args(1), false, empty(func));
-    check(func.args(" ()"), true,  empty(func));
+    check(func.args(" ()"), true, empty(func));
 
     check(func.args(" empty((1, 2)[. = 1])"), true, root(Bln.class));
     check(func.args(" exists((1, 2)[. = 1])"), false, root(Bln.class));

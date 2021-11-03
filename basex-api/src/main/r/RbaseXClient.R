@@ -159,7 +159,7 @@ Query <- R6Class("Query",
       private$req_exe(0x05, self$raw_id)
       result <- private$req_result %>% private$clean()
       return(result)
-    },  
+    },
     more = function() {
       if (is.null(private$cache)) {
         in_stream <- out_stream <- super$get_sock()
@@ -188,16 +188,16 @@ Query <- R6Class("Query",
     info = function() { 
       private$req_exe(0x06, self$raw_id)
       result <- private$req_result %>% private$clean()
-      return(result)},  
+      return(result)},
     options = function() { 
       private$req_exe(0x07, self$raw_id)
       res <- private$req_result 
       res <- ifelse(length(private$req_result) > 1,
-      private$req_result %>% private$clean(), "No options set")},  
+      private$req_result %>% private$clean(), "No options set")},
     updating = function() { 
       private$req_exe(0x1E, self$raw_id)
       result <- private$req_result %>% as.logical()
-      return(result)},  
+      return(result)},
     full = function() { 
       in_stream <- out_stream <- super$get_sock()
       writeBin(as.raw(0x1F), out_stream)
@@ -209,7 +209,7 @@ Query <- R6Class("Query",
       }
       private$req_success <- super$bool_test_sock()
       result <- cache
-      return(result)},  
+      return(result)},
   
     print = function(...) {
       cat("Query-ID: ", self$str_id, "\n", sep = "")

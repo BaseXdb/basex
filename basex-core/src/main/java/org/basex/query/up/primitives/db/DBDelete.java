@@ -37,7 +37,7 @@ public final class DBDelete extends DBUpdate {
 
   @Override
   public void apply() {
-    for(final String path : paths) Delete.deleteBinary(data,  path);
+    for(final String path : paths) Delete.deleteBinary(data, path);
   }
 
   @Override
