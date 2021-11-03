@@ -8,6 +8,7 @@ import org.basex.build.json.*;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * <p>This class converts a <a href="http://jsonml.org">JsonML</a>
@@ -22,6 +23,8 @@ import org.basex.util.*;
 final class JsonMLConverter extends JsonXmlConverter {
   /** Element stack. */
   private final Stack<FElem> stack = new Stack<>();
+  /** Current attributes. */
+  private final TokenSet atts = new TokenSet();
   /** Current attribute name. */
   private byte[] attName;
 
@@ -69,6 +72,7 @@ final class JsonMLConverter extends JsonXmlConverter {
   @Override
   public void openPair(final byte[] key, final boolean add) throws QueryIOException {
     attName = check(key);
+    if(!atts.add(attName)) error("Duplicate attribute found");
   }
 
   @Override
@@ -78,7 +82,7 @@ final class JsonMLConverter extends JsonXmlConverter {
   public void closeObject() {
     stack.pop();
     stack.push(curr);
-    curr = null;
+    reset();
   }
 
   @Override
@@ -87,13 +91,12 @@ final class JsonMLConverter extends JsonXmlConverter {
       if(attName == null && curr != null && stack.peek() == null) {
         stack.pop();
         stack.push(curr);
-        curr = null;
       } else if(attName != null || curr != null || stack.peek() == null) {
         error("No array allowed at this stage");
       }
     }
     stack.push(null);
-    curr = null;
+    reset();
   }
 
   @Override
@@ -104,16 +107,15 @@ final class JsonMLConverter extends JsonXmlConverter {
 
   @Override
   public void closeArray() throws QueryIOException {
-    FElem val = stack.pop();
-    if(val == null) {
-      val = curr;
-      curr = null;
+    FElem value = stack.pop();
+    if(value == null) {
+      value = curr;
+      reset();
     }
+    if(value == null) error("Missing element name");
 
-    if(val == null) error("Missing element name");
-
-    if(stack.isEmpty()) stack.push(val);
-    else stack.peek().add(val);
+    if(stack.isEmpty()) stack.push(value);
+    else stack.peek().add(value);
   }
 
   @Override
@@ -121,7 +123,7 @@ final class JsonMLConverter extends JsonXmlConverter {
     if(attName == null && curr != null && stack.peek() == null) {
       stack.pop();
       stack.push(curr);
-      curr = null;
+      reset();
     }
 
     if(curr == null) {
@@ -149,5 +151,13 @@ final class JsonMLConverter extends JsonXmlConverter {
   @Override
   public void booleanLit(final byte[] b) throws QueryIOException {
     error("No booleans allowed");
+  }
+
+  /**
+   * Resets the element creation.
+   */
+  private void reset() {
+    curr = null;
+    atts.clear();
   }
 }
