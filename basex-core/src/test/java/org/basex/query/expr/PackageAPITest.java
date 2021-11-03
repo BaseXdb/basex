@@ -298,7 +298,7 @@ public final class PackageAPITest extends SandboxTest {
 
     // run query
     String query = "import module namespace h='http://basex.org/modules/Hello';h:hello('Universe')";
-    assertEquals("Hello Universe", execute(new XQuery(query)));
+    query(query, "Hello Universe");
 
     // run query, ensure that wrong types will be rejected
     query = "import module namespace h='http://basex.org/modules/Hello';h:hello(123)";

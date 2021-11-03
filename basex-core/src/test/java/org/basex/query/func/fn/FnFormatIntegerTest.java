@@ -104,7 +104,7 @@ public final class FnFormatIntegerTest extends QueryTest {
         "\u4E8C|469=\u56DB\u767E\u516D\u5341\u4E5D|2025=\u4E8C\u5343" +
         "\u4E8C\u5341\u4E94|"),
         "string-join(for $i in (1 to 23, 151, 302, 469, 2025) " +
-        "return concat($i, '=',  format-integer($i, '\u4e00'), '|'))" },
+        "return concat($i, '=', format-integer($i, '\u4e00'), '|'))" },
 
       // errors
       { "err010", "format-integer(123, '0\u0661')" },

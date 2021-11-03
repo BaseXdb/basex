@@ -71,7 +71,7 @@ public final class AlterBackup extends ABackup {
     try(BufferInput bi = new BufferInput(src); ZipInputStream in = new ZipInputStream(bi);
         BufferOutput bo = new BufferOutput(trg); ZipOutputStream out = new ZipOutputStream(bo)) {
       for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
-        out.putNextEntry(new ZipEntry(name + '/' + ze.getName().replaceAll("^.*/",  "")));
+        out.putNextEntry(new ZipEntry(name + '/' + ze.getName().replaceAll("^.*/", "")));
         for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
       }
     }

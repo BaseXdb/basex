@@ -251,7 +251,7 @@ public enum Calc {
       if(expr2 instanceof Arith) {
         final Arith arith = (Arith) expr2;
         if(arith.calc == DIV && arith.exprs[0] instanceof Int && arith.exprs[1].equals(expr1)) {
-          return new Cast(cc.sc(), info,  arith.exprs[0], type.seqType()).optimize(cc);
+          return new Cast(cc.sc(), info, arith.exprs[0], type.seqType()).optimize(cc);
         }
       }
       return null;

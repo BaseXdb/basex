@@ -231,7 +231,7 @@ final class QueryCompiler {
 
     scopes.add(scp);
     adjacent.add(null);
-    if(ids != null) ids.put(scp,  id);
+    if(ids != null) ids.put(scp, id);
     return id;
   }
 

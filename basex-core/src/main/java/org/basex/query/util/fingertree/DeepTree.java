@@ -184,7 +184,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
 
   @Override
   public FingerTree<N, E> tail() {
-    final long fstSize = left[0].size(),  newSize = size - fstSize;
+    final long fstSize = left[0].size(), newSize = size - fstSize;
 
     if(left.length > 1) {
       // left digit is safe, just shrink it

@@ -35,7 +35,7 @@ final class DialogAdd extends BaseXBack {
     this.dialog = dialog;
     setLayout(new BorderLayout());
 
-    add(new BaseXLabel(ADD_RESOURCES).large().border(0,  0, 16, 0), BorderLayout.NORTH);
+    add(new BaseXLabel(ADD_RESOURCES).large().border(0, 0, 16, 0), BorderLayout.NORTH);
 
     target = new BaseXTextField(dialog, "/");
 

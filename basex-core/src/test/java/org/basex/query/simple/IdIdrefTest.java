@@ -70,9 +70,9 @@ public final class IdIdrefTest extends QueryTest {
       throws Exception {
 
     // set up environment
-    execute(new Set(MainOptions.MAINMEM, mainmem));
-    execute(new Set(MainOptions.UPDINDEX, updindex));
-    execute(new Set(MainOptions.TOKENINDEX, tokenindex));
+    set(MainOptions.MAINMEM, mainmem);
+    set(MainOptions.UPDINDEX, updindex);
+    set(MainOptions.TOKENINDEX, tokenindex);
     execute(new CreateDB(NAME));
     execute(new Add("1.xml", "<root1 id='foo' idref='bar quix' />"));
     execute(new Add("2.xml", "<root2 id='batz' idref2='quix' />"));

@@ -74,7 +74,7 @@ final class DialogEditorPrefs extends BaseXBack {
     p.add(shownl);
     p.add(numbers);
     p.add(markline);
-    p.add(new BaseXLabel(FILE_FILTER + COL, true, true).border(6,  0,  6,  0));
+    p.add(new BaseXLabel(FILE_FILTER + COL, true, true).border(6, 0, 6, 0));
     p.add(files);
     add(p);
 

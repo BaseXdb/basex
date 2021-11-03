@@ -65,7 +65,7 @@ class WebDAVFolder extends WebDAVResource implements FolderResource, DeletableCo
     return new WebDAVCode<WebDAVFolder>(this) {
       @Override
       public WebDAVFolder get() throws IOException {
-        return (WebDAVFolder) service.createFolder(meta.db, meta.path,  folder);
+        return (WebDAVFolder) service.createFolder(meta.db, meta.path, folder);
       }
     }.eval();
   }

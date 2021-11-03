@@ -154,7 +154,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
         }
       }
       if(type == null) type = STRING;
-      types.set(level,  type);
+      types.set(level, type);
     }
 
     if(eq(type, OBJECT)) {
