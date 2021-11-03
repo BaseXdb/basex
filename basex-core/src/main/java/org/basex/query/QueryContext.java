@@ -70,9 +70,9 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Query threads. */
   public final QueryThreads threads = new QueryThreads();
-  /** Current context value. */
+  /** Current query focus. */
   public QueryFocus focus = new QueryFocus();
-  /** Current date/time values. */
+  /** Date/time values. */
   public QueryDateTime dateTime;
 
   /** Full-text position data (needed for highlighting full-text results). */
@@ -111,15 +111,15 @@ public final class QueryContext extends Job implements Closeable {
   /** Stack of module files that are currently parsed. */
   final TokenList modStack = new TokenList();
 
-  /** Initial context value. */
-  public MainModule ctxItem;
   /** Root expression of the query. */
   public MainModule root;
+  /** Context value. */
+  public MainModule ctxValue;
+  /** Flag for binding the context item only once. */
+  public boolean ctxAssigned;
 
   /** Map with external variables to be bound at compile time. */
   private final QNmMap<Value> bindings = new QNmMap<>();
-  /** Flag for binding the context item only once. */
-  private boolean contextItem;
 
   /** Serialization parameters. */
   private SerializerOptions serParams;
@@ -254,17 +254,23 @@ public final class QueryContext extends Job implements Closeable {
 
     final CompileContext cc = new CompileContext(this);
     try {
-      // bind external variables of global option (if not assigned yet by other APIs)
+      // bind external variables and context (if not assigned yet by other APIs)
       final MainOptions mopts = context.options;
       if(root != null && parent == null) {
         for(final Entry<String, String> entry : mopts.toMap(MainOptions.BINDINGS).entrySet()) {
           final String key = entry.getKey();
-          final Atm value = Atm.get(entry.getValue());
+          final Atm atm = Atm.get(entry.getValue());
           if(key.isEmpty()) {
-            context(value, root.sc);
+            context(atm, root.sc);
           } else {
-            bind(qname(key, root.sc), value);
+            bind(qname(key, root.sc), atm);
           }
+        }
+        final DBNodes nodes = context.current();
+        if(nodes != null && !ctxAssigned) {
+          final String name = nodes.data().meta.name;
+          if(!context.perm(Perm.READ, name)) throw BASEX_PERMISSION_X_X.get(null, Perm.READ, name);
+          context(resources.compile(nodes), root.sc);
         }
       }
 
@@ -276,30 +282,17 @@ public final class QueryContext extends Job implements Closeable {
       // bind external variables
       vars.bindExternal(this, bindings);
 
-      if(ctxItem != null) {
-        // evaluate initial expression
+      // compile context value
+      if(ctxValue != null) {
         try {
-          ctxItem.comp(cc);
-          focus.value = ctxItem.value(this);
+          ctxValue.comp(cc);
+          final Value v = ctxValue.value(this);
+          final SeqType st = root.sc.contextType;
+          focus.value = st == null ? v : st.promote(v, null, this, root.sc, null, true);
         } catch(final QueryException ex) {
           // only {@link ParseExpr} instances may lead to a missing context
-          throw ex.error() == NOCTX_X ? CIRCCTX.get(ctxItem.info) : ex;
+          throw ex.error() == NOCTX_X ? CIRCCTX.get(ctxValue.info) : ex;
         }
-      } else {
-        // cache the initial context nodes
-        final DBNodes nodes = context.current();
-        if(nodes != null) {
-          final String name = nodes.data().meta.name;
-          if(!context.perm(Perm.READ, name))
-            throw BASEX_PERMISSION_X_X.get(null, Perm.READ, name);
-          focus.value = resources.compile(nodes);
-        }
-      }
-
-      // if specified, convert context value to specified type
-      // [LW] should not be necessary
-      if(focus.value != null && root.sc != null && root.sc.contextType != null) {
-        focus.value = root.sc.contextType.promote(focus.value, null, this, root.sc, null, true);
       }
 
       try {
@@ -363,7 +356,8 @@ public final class QueryContext extends Job implements Closeable {
     final Locks l = jc().locks;
     final LockList list = updating ? l.writes : l.reads;
 
-    if(root == null || !root.databases(l, this) || ctxItem != null && !ctxItem.databases(l, this)) {
+    if(root == null || !root.databases(l, this) ||
+        ctxValue != null && !ctxValue.databases(l, this)) {
       // use global locking if referenced databases cannot be determined statically
       list.addGlobal();
     } else {
@@ -373,7 +367,7 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Binds the context value,  if no value has been assigned yet. The rules are the same
+   * Binds the context value if no value has been assigned yet. The rules are the same
    * as for {@link #bind(String, Object, String, StaticContext) binding variables}.
    * @param value value to be bound
    * @param type type (may be {@code null})
@@ -391,9 +385,9 @@ public final class QueryContext extends Job implements Closeable {
    * @param sc static context
    */
   public void context(final Value value, final StaticContext sc) {
-    if(!contextItem) {
-      ctxItem = MainModule.get(new VarScope(sc), value, null, null, null);
-      contextItem = true;
+    if(!ctxAssigned) {
+      ctxValue = MainModule.get(new VarScope(sc), value, null, null, null);
+      ctxAssigned = true;
     }
   }
 

@@ -187,7 +187,7 @@ public final class MainModule extends AModule {
     private LockVisitor(final Locks locks, final QueryContext qc) {
       this.locks = locks;
       updating = qc.updating;
-      level = qc.ctxItem == null ? 0 : 1;
+      level = qc.ctxValue == null ? 0 : 1;
     }
 
     @Override

@@ -804,14 +804,18 @@ public class QueryParser extends InputParser {
       }
     }
 
-    if(!wsConsumeWs(EXTERNAL)) wsCheck(ASSIGN);
-    else if(!wsConsumeWs(ASSIGN)) return;
+    final boolean external = wsConsumeWs(EXTERNAL);
+    if(external) {
+      if(!wsConsumeWs(ASSIGN)) return;
+    } else {
+      wsCheck(ASSIGN);
+      qc.ctxAssigned = true;
+    }
 
     localVars.pushContext(null);
     final Expr ex = check(single(), NOCIDECL);
     final SeqType st = sc.contextType != null ? sc.contextType : SeqType.ITEM_O;
-    final VarScope vs = localVars.popContext();
-    qc.ctxItem = MainModule.get(vs, ex, st, currDoc.toString(), info());
+    qc.ctxValue = MainModule.get(localVars.popContext(), ex, st, currDoc.toString(), info());
 
     if(sc.module != null) throw error(DECITEM);
     if(!sc.mixUpdates && ex.has(Flag.UPD)) throw error(UPCTX, ex);
