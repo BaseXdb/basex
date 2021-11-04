@@ -12,6 +12,7 @@ import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
+import org.eclipse.jetty.http.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.gzip.*;
 import org.eclipse.jetty.util.resource.*;
@@ -82,6 +83,7 @@ public final class BaseXHTTP extends CLI {
     // enable GZIP support
     if(soptions.get(StaticOptions.GZIP)) {
       final GzipHandler gzip = new GzipHandler();
+      gzip.addIncludedMethods(HttpMethod.POST.asString(), HttpMethod.PUT.asString());
       gzip.setHandler(wac);
       jetty.setHandler(gzip);
     } else {
