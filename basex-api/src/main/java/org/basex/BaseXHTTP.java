@@ -85,6 +85,7 @@ public final class BaseXHTTP extends CLI {
     if(soptions.get(StaticOptions.GZIP)) {
       final GzipHandler gzip = new GzipHandler();
       gzip.addIncludedMethods(HttpMethod.POST.asString(), HttpMethod.PUT.asString());
+      gzip.setInflateBufferSize(1024);
       gzip.setHandler(wac);
       jetty.setHandler(gzip);
     } else {
