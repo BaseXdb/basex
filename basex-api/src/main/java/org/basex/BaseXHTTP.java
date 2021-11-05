@@ -7,6 +7,8 @@ import java.io.*;
 import java.net.*;
 import java.util.function.*;
 
+import javax.servlet.DispatcherType;
+
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
@@ -83,6 +85,7 @@ public final class BaseXHTTP extends CLI {
     // enable GZIP support
     if(soptions.get(StaticOptions.GZIP)) {
       final GzipHandler gzip = new GzipHandler();
+      gzip.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.RESPONSE);
       gzip.addIncludedMethods(HttpMethod.POST.asString(), HttpMethod.PUT.asString());
       gzip.setHandler(wac);
       jetty.setHandler(gzip);
