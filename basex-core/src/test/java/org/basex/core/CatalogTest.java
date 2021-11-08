@@ -70,23 +70,6 @@ public class CatalogTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void x() {
-    // returns an XML document with the string contents of import-xsl.xml
-    final Function func = _XSLT_TRANSFORM;
-    final String xml = "<dummy/>";
-    final String xsl =
-      " <xsl:stylesheet version='1.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>" +
-      "   <xsl:template match='/'>" +
-      "     <document><xsl:value-of select='document(\"http://doc.xml\")'/></document>" +
-      "   </xsl:template>" +
-      " </xsl:stylesheet>";
-    final String output = "<document>text</document>";
-
-    query(OPTION + func.args(xml, xsl), output);
-    query(PRAGMA + "{ " + func.args(xml, xsl) + " }", output);
-  }
-
-  /** Test method. */
   @Test public void validateXsd() {
     final Function func = _VALIDATE_XSD;
     final String xml =
