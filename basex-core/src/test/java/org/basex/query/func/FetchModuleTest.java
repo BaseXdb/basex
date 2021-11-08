@@ -64,11 +64,6 @@ public final class FetchModuleTest extends SandboxTest {
     query(COUNT.args(func.args(CSV,
         " map { 'parser': 'csv', 'csvparser': map { 'header': 'true' } }") + "//City"), 3);
 
-    // catalog manager; requires resolver in lib/ directory
-    final String catalog = DIR + "catalog/";
-    query(func.args(catalog + "document.xml",
-        " map { 'catfile': '" + catalog + "catalog.xml', 'dtd': true() }"), "<x>X</x>");
-
     error(func.args(XML, " map { 'parser': 'unknown' }"), BASEX_OPTIONS_X_X);
     error(func.args(XML + 'x'), FETCH_EXISTS_X);
     error(func.args("httttp://x"), FETCH_OPEN_X);

@@ -1,0 +1,2 @@
+<!ENTITY x 'X'>
+<!ELEMENT doc (#PCDATA)>
