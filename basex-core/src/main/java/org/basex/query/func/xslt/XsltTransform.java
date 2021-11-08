@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
-import javax.xml.catalog.*;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
 
@@ -117,7 +116,7 @@ public class XsltTransform extends XsltFn {
 
     // retrieve new or cached templates instance
     Templates templates = key != null ? MAP.get(key) : null;
-    CatalogResolver cr = qc.context.options.catalogResolver();
+    URIResolver cr = Resolver.uris(qc.context.options);
     if(templates == null) {
       // no templates object cached: create new instance
       final TransformerFactory tf = TransformerFactory.newInstance();

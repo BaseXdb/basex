@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
-import javax.xml.catalog.*;
 import javax.xml.transform.sax.*;
 
 import org.basex.build.*;
@@ -13,6 +12,7 @@ import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.parse.xml.*;
+import org.basex.util.*;
 import org.basex.util.Util;
 import org.xml.sax.*;
 
@@ -54,8 +54,8 @@ public final class SAXWrapper extends SingleParser {
       if(reader == null) {
         reader = XmlParser.reader(options.get(MainOptions.DTD), options.get(MainOptions.XINCLUDE));
       }
-      final CatalogResolver cr = options.catalogResolver();
-      if(cr != null) reader.setEntityResolver(cr);
+      final EntityResolver er = Resolver.entities(options);
+      if(er != null) reader.setEntityResolver(er);
 
       sh = new SAXHandler(builder, options.get(MainOptions.CHOP), options.get(MainOptions.STRIPNS));
       reader.setDTDHandler(sh);

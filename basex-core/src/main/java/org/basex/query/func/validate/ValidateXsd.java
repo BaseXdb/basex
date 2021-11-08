@@ -76,12 +76,8 @@ public class ValidateXsd extends ValidateFn {
         // Saxon: use version 1.1
         if(SAXON) sf.setProperty(SAXON_VERSION_URI, IMPL[OFFSET + 2]);
 
-        final LSResourceResolver ls = qc.context.options.catalogResolver();
-        if(ls != null) {
-          //sf.setProperty(CatalogFeatures.Feature.FILES.getPropertyName(),
-          //    qc.context.options.get(MainOptions.CATFILE));
-          sf.setResourceResolver(ls);
-        }
+        final LSResourceResolver ls = Resolver.resources(qc.context.options);
+        if(ls != null) sf.setResourceResolver(ls);
 
         // assign parser features
         for(final Entry<String, String> entry : options.entrySet()) {

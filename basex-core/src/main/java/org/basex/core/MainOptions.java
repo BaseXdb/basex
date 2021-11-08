@@ -1,15 +1,11 @@
 package org.basex.core;
 
-import java.net.*;
 import java.util.*;
-
-import javax.xml.catalog.*;
 
 import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
 import org.basex.build.text.*;
-import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.util.options.*;
 
@@ -257,20 +253,5 @@ public final class MainOptions extends Options {
     final MainOptions mopts = new MainOptions(false);
     mopts.set(CHOP, false);
     return mopts;
-  }
-
-  /**
-   * Returns a catalog resolver.
-   * @return catalog resolver (can be {@code null})
-   */
-  public CatalogResolver catalogResolver() {
-    String catfile = get(MainOptions.CATFILE);
-    if(!catfile.isEmpty()) {
-      final URI uri = URI.create(IO.get(catfile).url());
-      final CatalogFeatures cf = CatalogFeatures.defaults();
-      final Catalog catalog = CatalogManager.catalog(cf, uri);
-      return CatalogManager.catalogResolver(catalog);
-    }
-    return null;
   }
 }
