@@ -34,11 +34,6 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>xml-resolver</groupId>
-      <artifactId>xml-resolver</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
       <groupId>jline</groupId>
       <artifactId>jline</artifactId>
       <optional>true</optional>
