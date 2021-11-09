@@ -26,7 +26,7 @@ import org.basex.query.func.html.*;
 import org.basex.query.func.http.*;
 import org.basex.query.func.index.*;
 import org.basex.query.func.inspect.*;
-import org.basex.query.func.jobs.*;
+import org.basex.query.func.job.*;
 import org.basex.query.func.json.*;
 import org.basex.query.func.lazy.*;
 import org.basex.query.func.map.*;
@@ -37,7 +37,7 @@ import org.basex.query.func.prof.*;
 import org.basex.query.func.random.*;
 import org.basex.query.func.repo.*;
 import org.basex.query.func.sql.*;
-import org.basex.query.func.strings.*;
+import org.basex.query.func.string.*;
 import org.basex.query.func.unit.*;
 import org.basex.query.func.update.*;
 import org.basex.query.func.user.*;
@@ -46,7 +46,6 @@ import org.basex.query.func.validate.*;
 import org.basex.query.func.web.*;
 import org.basex.query.func.xquery.*;
 import org.basex.query.func.xslt.*;
-import org.basex.query.func.zip.*;
 import org.basex.query.util.*;
 import org.basex.query.value.type.*;
 
@@ -1047,17 +1046,17 @@ public enum Function implements AFunction {
   _FETCH_BINARY(FetchBinary::new, "binary(uri)",
       params(STRING_O), BASE64_BINARY_O, flag(NDT), FETCH_URI),
   /** XQuery function. */
+  _FETCH_BINARY_DOC(FetchBinaryDoc::new, "binary-doc(binary[,options])",
+      params(BASE64_BINARY_O, MAP_ZO), DOCUMENT_NODE_O, flag(NDT), FETCH_URI),
+  /** XQuery function. */
   _FETCH_CONTENT_TYPE(FetchContentType::new, "content-type(uri)",
       params(STRING_O), STRING_O, flag(NDT), FETCH_URI),
   /** XQuery function. */
-  _FETCH_TEXT(FetchText::new, "text(uri[,encoding[,fallback]])",
-      params(STRING_O, STRING_O, BOOLEAN_O), STRING_O, flag(NDT), FETCH_URI),
-  /** XQuery function. */
-  _FETCH_XML(FetchXml::new, "xml(uri[,options])",
+  _FETCH_DOC(FetchDoc::new, "doc(uri[,options])",
       params(STRING_O, MAP_ZO), DOCUMENT_NODE_O, flag(NDT), FETCH_URI),
   /** XQuery function. */
-  _FETCH_XML_BINARY(FetchXmlBinary::new, "xml-binary(binary[,options])",
-      params(BASE64_BINARY_O, MAP_ZO), DOCUMENT_NODE_O, flag(NDT), FETCH_URI),
+  _FETCH_TEXT(FetchText::new, "text(uri[,encoding[,fallback]])",
+      params(STRING_O, STRING_O, BOOLEAN_O), STRING_O, flag(NDT), FETCH_URI),
 
   // File Module
 
@@ -1330,34 +1329,34 @@ public enum Function implements AFunction {
   // Jobs Module
 
   /** XQuery function. */
-  _JOBS_CURRENT(JobsCurrent::new, "current()",
+  _JOB_CURRENT(JobCurrent::new, "current()",
       params(), STRING_O, flag(NDT), JOBS_URI),
   /** XQuery function. */
-  _JOBS_EVAL(JobsEval::new, "eval(string[,bindings[,options]])",
+  _JOB_EVAL(JobEval::new, "eval(string[,bindings[,options]])",
       params(STRING_O, MAP_ZO, MAP_ZO), STRING_O, flag(NDT), JOBS_URI),
   /** XQuery function. */
-  _JOBS_FINISHED(JobsFinished::new, "finished(id)",
+  _JOB_FINISHED(JobFinished::new, "finished(id)",
       params(STRING_O), BOOLEAN_O, flag(NDT), JOBS_URI),
   /** XQuery function (legacy, now: jobs:eval). */
-  _JOBS_INVOKE(JobsInvoke::new, "invoke(uri[,bindings[,options]])",
+  _JOB_INVOKE(JobInvoke::new, "invoke(uri[,bindings[,options]])",
       params(STRING_O, MAP_ZO, MAP_ZO), STRING_O, flag(NDT), JOBS_URI),
   /** XQuery function. */
-  _JOBS_LIST(JobsList::new, "list()",
+  _JOB_LIST(JobList::new, "list()",
       params(), STRING_ZM, flag(NDT), JOBS_URI),
   /** XQuery function. */
-  _JOBS_LIST_DETAILS(JobsListDetails::new, "list-details([id])",
+  _JOB_LIST_DETAILS(JobListDetails::new, "list-details([id])",
       params(STRING_O), ELEMENT_ZM, flag(NDT), JOBS_URI),
   /** XQuery function. */
-  _JOBS_RESULT(JobsResult::new, "result(id)",
+  _JOB_RESULT(JobResult::new, "result(id)",
       params(STRING_O), ITEM_ZM, flag(NDT), JOBS_URI),
   /** XQuery function. */
-  _JOBS_SERVICES(JobsServices::new, "services()",
+  _JOB_SERVICES(JobServices::new, "services()",
       params(), ELEMENT_ZM, flag(NDT), JOBS_URI),
   /** XQuery function. */
-  _JOBS_STOP(JobsStop::new, "stop(id[,options])",
+  _JOB_STOP(JobStop::new, "stop(id[,options])",
       params(STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(NDT), JOBS_URI),
   /** XQuery function. */
-  _JOBS_WAIT(JobsWait::new, "wait(id)",
+  _JOB_WAIT(JobWait::new, "wait(id)",
       params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), JOBS_URI),
 
   // JSON Module
@@ -1525,13 +1524,13 @@ public enum Function implements AFunction {
   // Strings Module
 
   /** XQuery function. */
-  _STRINGS_COLOGNE_PHONETIC(StringsColognePhonetic::new, "cologne-phonetic(string)",
+  _STRING_COLOGNE_PHONETIC(StringColognePhonetic::new, "cologne-phonetic(string)",
       params(STRING_O), STRING_O, STRINGS_URI),
   /** XQuery function. */
-  _STRINGS_LEVENSHTEIN(StringsLevenshtein::new, "levenshtein(string1,string2)",
+  _STRING_LEVENSHTEIN(StringLevenshtein::new, "levenshtein(string1,string2)",
       params(STRING_O, STRING_O), DOUBLE_O, STRINGS_URI),
   /** XQuery function. */
-  _STRINGS_SOUNDEX(StringsSoundex::new, "soundex(string)",
+  _STRING_SOUNDEX(StringSoundex::new, "soundex(string)",
       params(STRING_O), STRING_O, STRINGS_URI),
 
   // Unit Module
@@ -1774,31 +1773,7 @@ public enum Function implements AFunction {
       params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), STRING_O, flag(NDT), XSLT_URI),
   /** XQuery function. */
   _XSLT_VERSION(XsltVersion::new, "version()",
-      params(), STRING_O, XSLT_URI),
-
-  // ZIP Module
-
-  /** XQuery function. */
-  _ZIP_BINARY_ENTRY(ZipBinaryEntry::new, "binary-entry(path,entry)",
-      params(STRING_O, STRING_O), BASE64_BINARY_O, flag(NDT), ZIP_URI),
-  /** XQuery function. */
-  _ZIP_ENTRIES(ZipEntries::new, "entries(path)",
-      params(STRING_O), ELEMENT_O, flag(NDT), ZIP_URI),
-  /** XQuery function. */
-  _ZIP_HTML_ENTRY(ZipHtmlEntry::new, "html-entry(path,entry)",
-      params(STRING_O, STRING_O), NODE_O, flag(NDT), ZIP_URI),
-  /** XQuery function. */
-  _ZIP_TEXT_ENTRY(ZipTextEntry::new, "text-entry(path,entry[,encoding])",
-      params(STRING_O, STRING_O, STRING_O), STRING_O, flag(NDT), ZIP_URI),
-  /** XQuery function. */
-  _ZIP_XML_ENTRY(ZipXmlEntry::new, "xml-entry(path,entry)",
-      params(STRING_O, STRING_O), NODE_O, flag(NDT), ZIP_URI),
-  /** XQuery function. */
-  _ZIP_UPDATE_ENTRIES(ZipUpdateEntries::new, "update-entries(zip,output)",
-      params(ELEMENT_O, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), ZIP_URI),
-  /** XQuery function. */
-  _ZIP_ZIP_FILE(ZipZipFile::new, "zip-file(zip)",
-      params(ELEMENT_O), EMPTY_SEQUENCE_Z, flag(NDT), ZIP_URI);
+      params(), STRING_O, XSLT_URI);
 
   /** Function definition. */
   private final FuncDefinition definition;

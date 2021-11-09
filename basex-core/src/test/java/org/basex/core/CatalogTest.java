@@ -92,7 +92,7 @@ public class CatalogTest extends SandboxTest {
 
   /** Test method.*/
   @Test public void fetchXml() {
-    final Function func = _FETCH_XML;
+    final Function func = _FETCH_DOC;
     query(func.args(DIR + "doc.xml",
       " map { 'catfile': '" + CAT + "', 'dtd': true() }"), "<doc>X</doc>");
   }

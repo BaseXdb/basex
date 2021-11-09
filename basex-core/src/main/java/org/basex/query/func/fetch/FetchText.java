@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class FetchText extends FetchXml {
+public final class FetchText extends FetchDoc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final IO io = io(qc);

@@ -6,14 +6,14 @@ import org.basex.*;
 import org.junit.jupiter.api.*;
 
 /**
- * This class tests the functions of the Strings Module.
+ * This class tests the functions of the String Module.
  * Many of the Soundex and ColognePhonetic tests have been adopted from the
  * Apache Commons project (SoundexTest.java, ColognePhoneticTest.java).
  *
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class StringsModuleTest extends SandboxTest {
+public final class StringModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void colognePhonetic() {
     colognePhonetic("", "");
@@ -112,7 +112,7 @@ public final class StringsModuleTest extends SandboxTest {
 
   /** Test method. */
   @Test public void levenshtein() {
-    final Function func = _STRINGS_LEVENSHTEIN;
+    final Function func = _STRING_LEVENSHTEIN;
     // queries
     query(func.args("ab", "ab"), 1);
     query(func.args("ab", "a"), 0.5);
@@ -132,7 +132,7 @@ public final class StringsModuleTest extends SandboxTest {
 
   /** Tests, adopted from Apache Commons project (SoundexTest.java). */
   @Test public void soundex() {
-    final Function func = _STRINGS_SOUNDEX;
+    final Function func = _STRING_SOUNDEX;
     // queries
     query(func.args(""), "0000");
     query(func.args(" \"\""), "0000");
@@ -250,7 +250,7 @@ public final class StringsModuleTest extends SandboxTest {
    * @param variations variations
    */
   private static void soundexVariations(final String code, final String... variations) {
-    final Function func = _STRINGS_SOUNDEX;
+    final Function func = _STRING_SOUNDEX;
     for(final String string : variations) query(func.args(string), code);
   }
 
@@ -261,7 +261,7 @@ public final class StringsModuleTest extends SandboxTest {
    * @param diff difference
    */
   private static void soundexDiff(final String string1, final String string2, final int diff) {
-    final Function func = _STRINGS_SOUNDEX;
+    final Function func = _STRING_SOUNDEX;
     // queries
     query("sum(for-each-pair(" +
       "string-to-codepoints(" + func.args(string1) + "), " +
@@ -275,7 +275,7 @@ public final class StringsModuleTest extends SandboxTest {
    * @param result result
    */
   private static void colognePhonetic(final String arg, final String result) {
-    final Function func = _STRINGS_COLOGNE_PHONETIC;
+    final Function func = _STRING_COLOGNE_PHONETIC;
     query(func.args(arg), result);
   }
 
@@ -285,7 +285,7 @@ public final class StringsModuleTest extends SandboxTest {
    * @param string2 second string
    */
   private static void cologneEquals(final String string1, final String string2) {
-    final Function func = _STRINGS_COLOGNE_PHONETIC;
+    final Function func = _STRING_COLOGNE_PHONETIC;
     query(func.args(string1) + " = " + func.args(string2), true);
   }
 
@@ -295,7 +295,7 @@ public final class StringsModuleTest extends SandboxTest {
    * @param variations variations
    */
   private static void cologneVariations(final String code, final String... variations) {
-    final Function func = _STRINGS_COLOGNE_PHONETIC;
+    final Function func = _STRING_COLOGNE_PHONETIC;
     for(final String string : variations) query(func.args(string), code);
   }
 }

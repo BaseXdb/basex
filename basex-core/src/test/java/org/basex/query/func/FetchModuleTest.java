@@ -30,6 +30,17 @@ public final class FetchModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void binaryDoc() {
+    final Function func = _FETCH_BINARY_DOC;
+    // successful queries
+    query(func.args(_CONVERT_STRING_TO_BASE64.args("<x/>")), "<x/>");
+    final String encoding = "CP1252";
+    final String xml = "<x>Ä</x>";
+    final String data = "<?xml version=''1.0'' encoding=''" + encoding + "''?>" + xml;
+    query(func.args(_CONVERT_STRING_TO_BASE64.args(" '" + data + '\'', encoding)), xml);
+  }
+
+  /** Test method. */
   @Test public void contentType() {
     final Function func = _FETCH_CONTENT_TYPE;
     // successful queries
@@ -39,18 +50,8 @@ public final class FetchModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void text() {
-    final Function func = _FETCH_TEXT;
-    // successful queries
-    query(func.args(XML));
-    error(func.args(XML + 'x'), FETCH_EXISTS_X);
-    error(func.args("httttp://x"), FETCH_OPEN_X);
-    error(func.args(XML, "xxx"), FETCH_ENCODING_X);
-  }
-
-  /** Test method. */
-  @Test public void xml() {
-    final Function func = _FETCH_XML;
+  @Test public void doc() {
+    final Function func = _FETCH_DOC;
     // successful queries
     query(func.args(XML));
     query("exists(" + func.args(XML, " map { 'chop': true() }") +
@@ -70,13 +71,12 @@ public final class FetchModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void xmlBinary() {
-    final Function func = _FETCH_XML_BINARY;
+  @Test public void text() {
+    final Function func = _FETCH_TEXT;
     // successful queries
-    query(func.args(_CONVERT_STRING_TO_BASE64.args("<x/>")), "<x/>");
-    final String encoding = "CP1252";
-    final String xml = "<x>Ä</x>";
-    final String data = "<?xml version=''1.0'' encoding=''" + encoding + "''?>" + xml;
-    query(func.args(_CONVERT_STRING_TO_BASE64.args(" '" + data + '\'', encoding)), xml);
+    query(func.args(XML));
+    error(func.args(XML + 'x'), FETCH_EXISTS_X);
+    error(func.args("httttp://x"), FETCH_OPEN_X);
+    error(func.args(XML, "xxx"), FETCH_ENCODING_X);
   }
 }

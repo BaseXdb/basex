@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
  */
 public final class NonLockingTest extends SandboxTest {
   /** Query for returning all jobs except for the current one. */
-  private static final String LIST_JOBS = _JOBS_LIST.args() + '[' + _JOBS_CURRENT.args() + "!= .]";
+  private static final String LIST_JOBS = _JOB_LIST.args() + '[' + _JOB_CURRENT.args() + "!= .]";
   /** Very slow query. */
   private static final String SLEEP_10_SECONDS = _PROF_SLEEP.args(10000);
 
@@ -37,8 +37,8 @@ public final class NonLockingTest extends SandboxTest {
       query("let $db := <a>" + NAME + "</a> return " + _DB_ADD.args(" $db", " <a/>", "a.xml"));
 
       // stop sleeping process, wait for its completion
-      query(_JOBS_STOP.args(id));
-      query(_JOBS_WAIT.args(id));
+      query(_JOB_STOP.args(id));
+      query(_JOB_WAIT.args(id));
 
     } finally {
       execute(new DropDB(NAME));
@@ -68,7 +68,7 @@ public final class NonLockingTest extends SandboxTest {
       assertEquals("1", query("1"));
 
       // stop sleeping jobs
-      query(LIST_JOBS + '!' + _JOBS_STOP.args(" ."));
+      query(LIST_JOBS + '!' + _JOB_STOP.args(" ."));
 
     } finally {
       execute(new DropDB(NAME));

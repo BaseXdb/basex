@@ -1,4 +1,4 @@
-package org.basex.query.func.jobs;
+package org.basex.query.func.job;
 
 import static org.basex.query.QueryError.*;
 
@@ -18,7 +18,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class JobsStop extends StandardFunc {
+public final class JobStop extends StandardFunc {
   /** Stop options. */
   public static final class StopOptions extends Options {
     /** Stop service. */

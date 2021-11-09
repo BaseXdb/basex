@@ -1,4 +1,4 @@
-package org.basex.query.func.strings;
+package org.basex.query.func.string;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -12,7 +12,7 @@ import org.basex.util.similarity.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class StringsSoundex extends StandardFunc {
+public final class StringSoundex extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final int[] cps = new TokenParser(toToken(exprs[0], qc)).toArray();

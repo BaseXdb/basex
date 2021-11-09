@@ -1,4 +1,4 @@
-package org.basex.query.func.jobs;
+package org.basex.query.func.job;
 
 import static org.basex.query.QueryError.*;
 
@@ -20,7 +20,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public class JobsEval extends StandardFunc {
+public class JobEval extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return eval(toQuery(0, qc), qc);

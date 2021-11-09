@@ -1,4 +1,4 @@
-package org.basex.query.func.jobs;
+package org.basex.query.func.job;
 
 import static org.basex.query.QueryError.*;
 
@@ -15,7 +15,7 @@ import org.basex.query.value.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class JobsServices extends StandardFunc {
+public final class JobServices extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     checkAdmin(qc);

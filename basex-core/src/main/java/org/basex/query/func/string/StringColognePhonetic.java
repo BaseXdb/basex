@@ -1,4 +1,4 @@
-package org.basex.query.func.strings;
+package org.basex.query.func.string;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -12,11 +12,14 @@ import org.basex.util.similarity.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class StringsLevenshtein extends StandardFunc {
+public final class StringColognePhonetic extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final int[] cps1 = new TokenParser(toToken(exprs[0], qc)).toArray();
-    final int[] cps2 = new TokenParser(toToken(exprs[1], qc)).toArray();
-    return Dbl.get(Levenshtein.distance(cps1, cps2));
+    final int[] cps = new TokenParser(toToken(exprs[0], qc)).toArray();
+    final int[] encoded = ColognePhonetic.encode(cps);
+
+    final TokenBuilder tb = new TokenBuilder(encoded.length);
+    for(final int cp : encoded) tb.add(cp);
+    return Str.get(tb.finish());
   }
 }

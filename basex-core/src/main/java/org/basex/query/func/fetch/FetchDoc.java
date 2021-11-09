@@ -21,7 +21,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public class FetchXml extends StandardFunc {
+public class FetchDoc extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return fetch(io(qc), qc);

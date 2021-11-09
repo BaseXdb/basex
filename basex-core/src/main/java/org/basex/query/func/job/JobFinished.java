@@ -1,4 +1,4 @@
-package org.basex.query.func.jobs;
+package org.basex.query.func.job;
 
 import org.basex.core.jobs.*;
 import org.basex.query.*;
@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class JobsFinished extends StandardFunc {
+public final class JobFinished extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
