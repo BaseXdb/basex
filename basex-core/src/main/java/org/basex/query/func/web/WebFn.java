@@ -1,8 +1,5 @@
 package org.basex.query.func.web;
 
-import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
-
 import java.util.*;
 
 import org.basex.io.serial.*;
@@ -12,6 +9,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 import org.basex.util.options.*;
 
 /**
@@ -24,9 +22,9 @@ abstract class WebFn extends StandardFunc {
   /** Response options. */
   public static class ResponseOptions extends Options {
     /** Status. */
-    public static final NumberOption STATUS = new NumberOption("status");
+    public static final NumberOption STATUS = new NumberOption(HttpText.STATUS);
     /** Message. */
-    public static final StringOption MESSAGE = new StringOption("message");
+    public static final StringOption MESSAGE = new StringOption(HttpText.MESSAGE);
   }
 
   /**
@@ -65,31 +63,35 @@ abstract class WebFn extends StandardFunc {
       final HashMap<String, String> output) throws QueryException {
 
     // root element
-    final FElem rrest = new FElem(new QNm(REST_PREFIX, "response", REST_URI)).declareNS();
+    final FElem rrest = new FElem(HttpText.Q_REST_RESPONSE).declareNS();
 
     // HTTP response
-    final FElem hresp = new FElem(new QNm(HTTP_PREFIX, "response", HTTP_URI)).declareNS();
+    final FElem hresp = new FElem(HttpText.Q_HTTP_RESPONSE).declareNS();
     for(final Option<?> o : response) {
       if(response.contains(o)) hresp.add(o.name(), response.get(o).toString());
     }
     headers.forEach((name, value) -> {
-      if(!value.isEmpty()) hresp.add(new FElem(new QNm(HTTP_PREFIX, "header", HTTP_URI)).
-          add("name", name).add("value", value));
+      if(!value.isEmpty()) {
+        final FElem hheader = new FElem(HttpText.Q_HTTP_HEADER);
+        hresp.add(hheader.add(HttpText.NAME, name).add(HttpText.VALUE, value));
+      }
     });
     rrest.add(hresp);
 
     // serialization parameters
     if(output != null) {
-      final SerializerOptions so = SerializerMode.DEFAULT.get();
+      final SerializerOptions sopts = SerializerMode.DEFAULT.get();
       for(final String entry : output.keySet())
-        if(so.option(entry) == null) throw INVALIDOPTION_X.get(info, entry);
+        if(sopts.option(entry) == null) throw QueryError.INVALIDOPTION_X.get(info, entry);
 
-      final FElem oseri = new FElem(FuncOptions.Q_SPARAM).declareNS();
+      final FElem param = new FElem(FuncOptions.Q_SPARAM).declareNS();
       output.forEach((name, value) -> {
-        if(!value.isEmpty()) oseri.add(new FElem(new QNm(OUTPUT_PREFIX, name, OUTPUT_URI)).
-            add("value", value));
+        if(!value.isEmpty()) {
+          final FElem out = new FElem(new QNm(QueryText.OUTPUT_PREFIX, name, QueryText.OUTPUT_URI));
+          param.add(out.add(HttpText.VALUE, value));
+        }
       });
-      rrest.add(oseri);
+      rrest.add(param);
     }
 
     return rrest;

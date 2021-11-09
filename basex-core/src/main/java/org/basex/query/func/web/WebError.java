@@ -1,6 +1,7 @@
 package org.basex.query.func.web;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -32,7 +33,8 @@ public final class WebError extends StandardFunc {
     final String message = Token.string(toToken(exprs[1], qc));
     if(code <= 0 || code > 999) throw WEB_STATUS_X.get(info, code);
 
-    throw new QueryException(info, QNm.REST_ERROR, message).value(Int.get(code));
+    final QNm qname = new QNm(Token.concat(STATUS, code), REST_URI);
+    throw new QueryException(info, qname, message).value(Int.get(code));
   }
 
   @Override

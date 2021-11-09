@@ -55,7 +55,7 @@ public final class HttpResponse {
     final ItemList items = new ItemList();
 
     // construct <http:response/>
-    final FElem response = new FElem(Q_RESPONSE).declareNS();
+    final FElem response = new FElem(Q_HTTP_RESPONSE).declareNS();
     items.add(response);
 
     final String msg = conn.getResponseMessage();
@@ -66,7 +66,7 @@ public final class HttpResponse {
       final String name = entry.getKey();
       if(name != null) {
         for(final String value : entry.getValue()) {
-          response.add(new FElem(Q_HEADER).add(NAME, name).add(VALUE, value));
+          response.add(new FElem(Q_HTTP_HEADER).add(NAME, name).add(VALUE, value));
         }
       }
     }

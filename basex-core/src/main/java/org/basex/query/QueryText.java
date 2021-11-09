@@ -438,7 +438,7 @@ public interface QueryText {
   // MISCELLANEOUS ================================================================================
 
   /** Base token. */ byte[] BASE = token("base");
-  /** Error token. */ byte[] ERROR = token("error");
+  /** Status token. */ byte[] STATUS = token("status");
   /** Language attribute. */ byte[] LANG = token("xml:lang");
 
   /** Serialization. */ byte[] SERIALIZATION_PARAMETERS = token("serialization-parameters");

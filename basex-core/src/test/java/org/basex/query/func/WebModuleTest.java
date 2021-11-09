@@ -58,8 +58,12 @@ public final class WebModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void error() {
     final Function func = _WEB_ERROR;
-    query("try { " + func.args(400, "x") + " } catch rest:error { 'x' }", "x");
+    query("try { " + func.args(1, "x") + " } catch rest:status1 { 'x' }", "x");
+    query("try { " + func.args(400, "x") + " } catch rest:status400 { 'x' }", "x");
+    query("try { " + func.args(999, "x") + " } catch rest:* { 'x' }", "x");
     error(func.args(-1, "x"), WEB_STATUS_X);
+    error(func.args(0, "x"), WEB_STATUS_X);
+    error(func.args(1000, "x"), WEB_STATUS_X);
   }
 
   /** Test method. */

@@ -28,23 +28,23 @@ import org.xml.sax.*;
  * @author Marco Lettere (greedy/verbose validation)
  */
 abstract class ValidateFn extends StandardFunc {
-  /** Report element. */
+  /** String: report. */
   private static final String REPORT = "report";
-  /** Error element. */
+  /** String: message. */
   private static final String MESSAGE = "message";
-  /** Status. */
+  /** String: status. */
   private static final String STATUS = "status";
-  /** Valid. */
+  /** String: valid. */
   private static final String VALID = "valid";
-  /** Invalid. */
+  /** String: invalid. */
   private static final String INVALID = "invalid";
-  /** Line. */
+  /** String: line. */
   private static final String LINE = "line";
-  /** Column. */
+  /** String: column. */
   private static final String COLUMN = "column";
-  /** Type. */
+  /** String: level. */
   private static final String LEVEL = "level";
-  /** File. */
+  /** String: url. */
   private static final String URL = "url";
 
   /**

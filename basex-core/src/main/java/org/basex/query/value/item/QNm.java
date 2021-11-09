@@ -26,8 +26,6 @@ public final class QNm extends Item {
   public static final QNm EMPTY = new QNm(Token.EMPTY);
   /** QName: xml:base. */
   public static final QNm XML_BASE = new QNm(BASE, XML_URI);
-  /** QName: rest:error. */
-  public static final QNm REST_ERROR = new QNm(ERROR, REST_URI);
 
   /** URL pattern (matching Clark and EQName notation). */
   public static final Pattern EQNAME = Pattern.compile("^Q?\\{(.*?)}(.+)$");

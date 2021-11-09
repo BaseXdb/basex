@@ -848,7 +848,7 @@ public class FnHttpTest extends HTTPTest {
     assertTrue(value.itemAt(0) instanceof FElem);
     final FElem response = (FElem) value.itemAt(0);
     assertNotNull(response.attributeIter());
-    if(!eq(response.attribute(STATUS), token(expStatus))) {
+    if(!eq(response.attribute(token(STATUS)), token(expStatus))) {
       fail("Expected: " + expStatus + "\nFound: " + response);
     }
   }

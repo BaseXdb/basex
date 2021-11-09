@@ -73,21 +73,24 @@ public interface HttpText {
   String GZIP = "gzip";
 
   /** QName. */
-  QNm Q_BODY = new QNm(HTTP_PREFIX, "body", HTTP_URI);
+  QNm Q_REST_RESPONSE = new QNm(REST_PREFIX, "response", REST_URI);
+
   /** QName. */
-  QNm Q_RESPONSE = new QNm(HTTP_PREFIX, "response", HTTP_URI);
+  QNm Q_HTTP_BODY = new QNm(HTTP_PREFIX, "body", HTTP_URI);
   /** QName. */
-  QNm Q_HEADER = new QNm(HTTP_PREFIX, "header", HTTP_URI);
+  QNm Q_HTTP_RESPONSE = new QNm(HTTP_PREFIX, "response", HTTP_URI);
   /** QName. */
-  QNm Q_MULTIPART = new QNm(HTTP_PREFIX, "multipart", HTTP_URI);
+  QNm Q_HTTP_HEADER = new QNm(HTTP_PREFIX, "header", HTTP_URI);
+  /** QName. */
+  QNm Q_HTTP_MULTIPART = new QNm(HTTP_PREFIX, "multipart", HTTP_URI);
 
   /** Carriage return/line feed. */
   byte[] CRLF = { '\r', '\n' };
 
   /** Response attribute: status. */
-  byte[] STATUS = token("status");
+  String STATUS = "status";
   /** Response attribute: message. */
-  byte[] MESSAGE = token("message");
+  String MESSAGE = "message";
 
   /** Header attribute: name. */
   String NAME = "name";

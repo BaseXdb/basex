@@ -74,7 +74,8 @@ public abstract class BaseXServlet extends HttpServlet {
     } catch(final QueryException ex) {
       int code = SC_INTERNAL_SERVER_ERROR;
       boolean full = conn.context.soptions.get(StaticOptions.RESTXQERRORS);
-      if(ex.qname().eq(QNm.REST_ERROR)) {
+      final QNm qname = ex.qname();
+      if(Token.eq(qname.uri(), QueryText.REST_URI)) {
         final Value value = ex.value();
         if(value instanceof ANum) code = (int) ((ANum) value).itr();
         full = false;
