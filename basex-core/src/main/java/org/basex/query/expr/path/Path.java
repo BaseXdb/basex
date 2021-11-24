@@ -1,6 +1,7 @@
 package org.basex.query.expr.path;
 
 import static org.basex.query.expr.path.Axis.*;
+import static org.basex.query.func.Function.*;
 
 import java.util.*;
 import java.util.function.*;
@@ -827,7 +828,7 @@ public abstract class Path extends ParseExpr {
       }
       // util:replicate(a, 2)/b  ->  a/b
       if(step.seqType().type instanceof NodeType) {
-        if(step instanceof UtilReplicate && ((UtilReplicate) step).once()) return step.arg(0);
+        if(_UTIL_REPLICATE.is(step) && ((UtilReplicate) step).singleEval(false)) return step.arg(0);
         if(step instanceof SingletonSeq) return ((SingletonSeq) step).itemAt(0);
       }
       return step;

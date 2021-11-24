@@ -93,10 +93,10 @@ public final class UtilReplicate extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr = exprs[0], count = exprs[1];
-    final boolean single = singleEval();
+    final boolean single = singleEval(true);
 
     // merge replicate functions
-    if(_UTIL_REPLICATE.is(expr) && single == ((UtilReplicate) expr).singleEval()) {
+    if(_UTIL_REPLICATE.is(expr) && single == ((UtilReplicate) expr).singleEval(true)) {
       final ExprList args = new ExprList(2).add(expr.arg(0));
       args.add(new Arith(info, count, expr.arg(1), Calc.MULT).optimize(cc));
       if(!single) args.add(Bln.TRUE);
@@ -131,7 +131,7 @@ public final class UtilReplicate extends StandardFunc {
       // ensure that input argument will be evaluated exactly once
       // util:replicate($node, 2)  ->  $node
       final long count = exprs[1] instanceof Int ? ((Int) exprs[1]).itr() : -1;
-      final boolean single = singleEval();
+      final boolean single = singleEval(true);
       if(count > 0 && (single || !expr.has(Flag.NDT))) {
         return cc.simplify(this, expr);
       }
@@ -144,19 +144,20 @@ public final class UtilReplicate extends StandardFunc {
   }
 
   /**
-   * Indicates if the input argument will be evaluated at most once.
+   * Indicates if the input argument will be evaluated at zero times or once.
+   * @param zero allow zero evaluations
    * @return result of check
    */
-  public boolean singleEval() {
-    return exprs.length < 3 || exprs[2] == Bln.FALSE;
-  }
-
-  /**
-   * Indicates if the expression to be replicated  will be evaluated only once.
-   * @return result of check, {@code false} if unknown at compile time
-   */
-  public boolean once() {
-    // static integer will always be greater than 1
-    return exprs[0] instanceof Value || singleEval() && exprs[1] instanceof Int;
+  public boolean singleEval(final boolean zero) {
+    /* accepted:
+     * - util:replicate(<a/>, 2)
+     * - util:replicate(1 to 10, <_>5</_>)
+     * - util:replicate(reverse(1 to 10), 5, false())
+     * - util:replicate(1, 2, true())
+     * rejected:
+     * - util:replicate(random:uuid(), 2, true()) */
+    return exprs[0] instanceof Value ||
+      // if second argument is a static integer, it is >= 1
+      (exprs.length < 3 || exprs[2] == Bln.FALSE) && (zero || exprs[1] instanceof Int);
   }
 }

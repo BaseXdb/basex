@@ -882,6 +882,11 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" (1 to 100000000) ! 1") + "[1]", 1, empty(func));
     check(func.args(" reverse((1 to 100000000) ! 1)") + "[1]", 1, empty(func));
 
+    check("(random:double() => util:replicate(10) => " + func.args() + ")[. > 1]", "",
+        empty(func));
+    check("(random:double() => util:replicate(10, true()) => " + func.args() + ")[. > 1]", "",
+        exists(func));
+
     error(func.args(" true#0"), FIATOM_X);
     error(func.args(" (1 to 2) ! true#0"), FIATOM_X);
   }

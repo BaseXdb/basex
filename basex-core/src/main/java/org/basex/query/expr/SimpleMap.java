@@ -165,9 +165,9 @@ public abstract class SimpleMap extends Arr {
       if(next instanceof StandardFunc && !next.has(Flag.NDT)) {
         // next operand relies on context and is a deterministic function call
         final Expr[] args = next.args();
-        if(_UTIL_REPLICATE.is(next) && ((UtilReplicate) next).singleEval() &&
+        if(_UTIL_REPLICATE.is(next) && ((UtilReplicate) next).singleEval(true) &&
             args[0] instanceof ContextValue && !args[1].has(Flag.CTX)) {
-          if(_UTIL_REPLICATE.is(expr) && ((UtilReplicate) expr).singleEval()) {
+          if(_UTIL_REPLICATE.is(expr) && ((UtilReplicate) expr).singleEval(true)) {
             // util:replicate(E, C) ! util:replicate(., D)  ->  util:replicate(E, C * D)
             final Expr cnt = new Arith(info, expr.arg(1), args[1], Calc.MULT).optimize(cc);
             return cc.function(_UTIL_REPLICATE, info, expr.arg(0), cnt);
@@ -215,7 +215,7 @@ public abstract class SimpleMap extends Arr {
 
       // try to merge deterministic expressions
       Expr input = expr;
-      if(_UTIL_REPLICATE.is(expr) && ((UtilReplicate) expr).singleEval()) {
+      if(_UTIL_REPLICATE.is(expr) && ((UtilReplicate) expr).singleEval(true)) {
         input = expr.arg(0);
       } else if(expr instanceof SingletonSeq && ((SingletonSeq) expr).singleItem()) {
         input = ((SingletonSeq) expr).itemAt(0);
