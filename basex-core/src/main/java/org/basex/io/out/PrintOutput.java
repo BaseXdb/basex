@@ -135,16 +135,14 @@ public class PrintOutput extends OutputStream {
   }
 
   @Override
-  public final void flush() throws IOException {
-    if(os != null) os.flush();
+  public void flush() throws IOException {
+    os.flush();
   }
 
   @Override
-  public final void close() throws IOException {
-    if(os != null) {
-      if(os == System.out || os == System.err) os.flush();
-      else os.close();
-    }
+  public void close() throws IOException {
+    if(os == System.out || os == System.err) flush();
+    else os.close();
   }
 
   /**

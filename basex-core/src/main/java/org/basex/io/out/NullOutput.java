@@ -17,5 +17,14 @@ public final class NullOutput extends PrintOutput {
   }
 
   @Override
-  public void write(final int value) { }
+  public void write(final int value) {
+  }
+
+  @Override
+  public void flush() {
+  }
+
+  @Override
+  public void close() {
+  }
 }

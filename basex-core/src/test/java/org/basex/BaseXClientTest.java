@@ -83,6 +83,7 @@ public final class BaseXClientTest extends BaseXTest {
       return ao.toString();
     } finally {
       stopServer(server);
+      System.setOut(OUT);
     }
   }
 }
