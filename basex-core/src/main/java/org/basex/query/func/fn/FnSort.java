@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.util.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -122,7 +123,7 @@ public final class FnSort extends StandardFunc {
       final Value value = quickValue((Value) expr1);
       if(value != null) return value;
     }
-    if(_UTIL_REPLICATE.is(expr1)) {
+    if(_UTIL_REPLICATE.is(expr1) && ((UtilReplicate) expr1).singleEval(false)) {
       final SeqType st = expr1.arg(0).seqType();
       if(st.zeroOrOne() && st.type.isSortable()) return expr1;
     }
