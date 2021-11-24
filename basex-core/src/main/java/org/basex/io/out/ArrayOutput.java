@@ -35,6 +35,14 @@ public final class ArrayOutput extends PrintOutput {
     size = s + 1;
   }
 
+  @Override
+  public void flush() {
+  }
+
+  @Override
+  public void close() {
+  }
+
   /**
    * Returns the output as byte array.
    * @return byte array
