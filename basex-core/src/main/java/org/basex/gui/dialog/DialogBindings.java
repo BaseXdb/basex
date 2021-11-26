@@ -38,21 +38,21 @@ public final class DialogBindings extends BaseXDialog {
 
     final BaseXBack west = new BaseXBack(new GridLayout(MAX + 2, 1, 0, 4));
     west.add(new BaseXLabel(NAME + COLS, false, true));
+    final BaseXBack center = new BaseXBack(new GridLayout(MAX + 2, 1, 0, 4));
+    center.add(new BaseXLabel(VALUE + COLS, false, true));
     for(int c = 0; c < MAX; c++) {
       names[c] = new BaseXTextField(this);
       BaseXLayout.setWidth(names[c], 100);
       west.add(names[c]);
-    }
-    west.add(new BaseXLabel("Context item" + COLS));
-    set(west, BorderLayout.WEST);
-
-    final BaseXBack center = new BaseXBack(new GridLayout(MAX + 2, 1, 0, 4));
-    center.add(new BaseXLabel(VALUE + COLS, false, true));
-    for(int c = 0; c < MAX; c++) {
       values[c] = new BaseXTextField(this);
       BaseXLayout.setWidth(values[c], 250);
       center.add(values[c]);
+      names[c].setNextFocusableComponent(values[c]);
+      if (c > 0)
+        values[c - 1].setNextFocusableComponent(names[c]);
     }
+    west.add(new BaseXLabel("Context item" + COLS));
+    set(west, BorderLayout.WEST);
 
     final BaseXBack ctx = new BaseXBack().layout(new BorderLayout(8, 0));
     ctxitem = new BaseXTextField(this).hint(gui.editor.context());
