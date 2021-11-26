@@ -36,34 +36,33 @@ public final class DialogBindings extends BaseXDialog {
     super(gui, EXTERNAL_VARIABLES);
     ((BorderLayout) panel.getLayout()).setHgap(4);
 
-    final BaseXBack west = new BaseXBack(new GridLayout(MAX + 2, 1, 0, 4));
-    west.add(new BaseXLabel(NAME + COLS, false, true));
-    final BaseXBack center = new BaseXBack(new GridLayout(MAX + 2, 1, 0, 4));
-    center.add(new BaseXLabel(VALUE + COLS, false, true));
-    for(int c = 0; c < MAX; c++) {
-      names[c] = new BaseXTextField(this);
-      BaseXLayout.setWidth(names[c], 100);
-      west.add(names[c]);
-      values[c] = new BaseXTextField(this);
-      BaseXLayout.setWidth(values[c], 250);
-      center.add(values[c]);
-      names[c].setNextFocusableComponent(values[c]);
-      if (c > 0)
-        values[c - 1].setNextFocusableComponent(names[c]);
-    }
-    west.add(new BaseXLabel("Context item" + COLS));
-    set(west, BorderLayout.WEST);
-
-    final BaseXBack ctx = new BaseXBack().layout(new BorderLayout(8, 0));
     ctxitem = new BaseXTextField(this).hint(gui.editor.context());
-    ctx.add(ctxitem, BorderLayout.CENTER);
-    final BaseXButton browse = new BaseXButton(this, BROWSE_D);
-    browse.addActionListener(e -> choose());
-    ctx.add(browse, BorderLayout.EAST);
-    center.add(ctx);
 
+    final BaseXBack center = new BaseXBack(new RowLayout(4));
+    for(int c = -1; c < MAX + 1; c++) {
+      final BaseXBack row = new BaseXBack(new ColumnLayout(4));
+      if(c == -1) {
+        row.add(new BaseXLabel(NAME + COLS, false, true));
+        row.add(new BaseXLabel(VALUE + COLS, false, true));
+      } else if(c < MAX) {
+        names[c] = new BaseXTextField(this);
+        row.add(names[c]);
+        values[c] = new BaseXTextField(this);
+        row.add(values[c]);
+      } else {
+        row.add(new BaseXLabel("Context item" + COLS));
+        final BaseXBack ctx = new BaseXBack().layout(new BorderLayout(8, 0));
+        ctx.add(ctxitem, BorderLayout.CENTER);
+        final BaseXButton browse = new BaseXButton(this, BROWSE_D);
+        browse.addActionListener(e -> choose());
+        ctx.add(browse, BorderLayout.EAST);
+        row.add(ctx);
+      }
+      BaseXLayout.setWidth(row.getComponent(0), 120);
+      BaseXLayout.setWidth(row.getComponent(1), 480);
+      center.add(row);
+    }
     set(center, BorderLayout.CENTER);
-
     set(okCancel(), BorderLayout.SOUTH);
 
     fill();
