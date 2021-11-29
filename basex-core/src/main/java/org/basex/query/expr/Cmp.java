@@ -364,7 +364,7 @@ public abstract class Cmp extends Arr {
 
     // count(A) = 1  ->  util:within(A, 1, 1)
     args.insert(0, arg);
-    return cc.function(_UTIL_WITHIN, info, args.finish());
+    return cc.function(_UTIL_COUNT_WITHIN, info, args.finish());
   }
 
   /**

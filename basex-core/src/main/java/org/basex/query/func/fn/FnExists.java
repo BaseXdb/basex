@@ -47,7 +47,7 @@ public final class FnExists extends FnEmpty {
       final Expr args = List.get(cc, info, exprs[0], expr.arg(0));
       return cc.function(Function.EXISTS, info, args);
     }
-    if(_UTIL_WITHIN.is(expr)) {
+    if(_UTIL_COUNT_WITHIN.is(expr)) {
       return expr.mergeEbv(this, or, cc);
     }
     return null;

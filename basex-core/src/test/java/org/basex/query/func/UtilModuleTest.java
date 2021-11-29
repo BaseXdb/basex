@@ -28,7 +28,6 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" [ (1, 2) ]"), "[(1, 2)]");
     query(func.args(" [ (1, 2), 3 ]"), "[(1, 2)]\n[3]");
     query(func.args(" array { <_>1</_> to 100000 }") + " => util:last()", "[100000]");
-
   }
 
   /** Test method. */
@@ -72,6 +71,155 @@ public final class UtilModuleTest extends QueryPlanTest {
         100000, exists(STRING_LENGTH));
     check("string-to-codepoints(" + wrap("AB") + ") ! codepoints-to-string(.)", "A\nB",
         root(func));
+  }
+
+  /** Test method. */
+  @Test public void countWithin() {
+    final Function func = _UTIL_COUNT_WITHIN;
+
+    // minimum
+    query(func.args(" ()", -1), true);
+    query(func.args(" ()", 0), true);
+    query(func.args(" ()", 1), false);
+
+    query(func.args(9, -1), true);
+    query(func.args(9, 0), true);
+    query(func.args(9, 1), true);
+    query(func.args(9, 2), false);
+
+    query(func.args(" <a/>", -1), true);
+    query(func.args(" <a/>", 0), true);
+    query(func.args(" <a/>", 1), true);
+    query(func.args(" <a/>", 2), false);
+
+    query(func.args(" trace(1)", 1), true);
+
+    query(func.args(" (8, 9)", 1), true);
+    query(func.args(" (8, 9)", 2), true);
+    query(func.args(" (8, 9)", 3), false);
+
+    check(func.args(" (8, 9, 9)[. = 9]", 0), true, root(Bln.class));
+    check(func.args(" (8, 9, 9)[. = 9]", 1), true, root(Bln.class));
+    query(func.args(" (8, 9, 9)[. = 9]", 2), true);
+    query(func.args(" (8, 9, 9)[. = 9]", 3), false);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(1)), true);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(2)), true);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(3)), false);
+
+    // minimum and maximum
+    query(func.args(" ()", 0, 0), true);
+    query(func.args(" ()", 0, 1), true);
+    query(func.args(" ()", 1, 0), false);
+
+    query(func.args(9, 0, 0), false);
+    query(func.args(9, 0, 1), true);
+    query(func.args(9, 0, 1), true);
+    query(func.args(9, 1, 2), true);
+    query(func.args(9, 2, 1), false);
+
+    query(func.args(" <a/>", 0, 0), false);
+    query(func.args(" <a/>", 0, 1), true);
+    query(func.args(" <a/>", 0, 1), true);
+    query(func.args(" <a/>", 1, 2), true);
+    query(func.args(" <a/>", 2, 1), false);
+
+    query(func.args(" trace(1)", 1, 2), true);
+
+    query(func.args(" (8, 9)", 1, 1), false);
+    query(func.args(" (8, 9)", 1, 2), true);
+    query(func.args(" (8, 9)", 2, 2), true);
+    query(func.args(" (8, 9)", 2, 3), true);
+    query(func.args(" (8, 9)", 3, 2), false);
+
+    check(func.args(" (8, 9, 9)[. = 9]", 0, 0), false, root(Bln.class));
+    query(func.args(" (8, 9, 9)[. = 9]", 1, 1), false);
+    query(func.args(" (8, 9, 9)[. = 9]", 1, 2), true);
+    query(func.args(" (8, 9, 9)[. = 9]", 2, 2), true);
+    query(func.args(" (8, 9, 9)[. = 9]", 2, 3), true);
+    check(func.args(" (8, 9, 9)[. = 9]", 3, 2), false, root(Bln.class));
+
+    query(func.args(" (8, 9, 9)[. = 9]", 0, wrap(0)), false);
+    query(func.args(" (8, 9, 9)[. = 9]", 1, wrap(1)), false);
+    query(func.args(" (8, 9, 9)[. = 9]", 1, wrap(2)), true);
+    query(func.args(" (8, 9, 9)[. = 9]", 2, wrap(2)), true);
+    query(func.args(" (8, 9, 9)[. = 9]", 2, wrap(3)), true);
+    query(func.args(" (8, 9, 9)[. = 9]", 3, wrap(2)), false);
+
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(0), 0), false);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(1), 1), false);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(1), 2), true);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(2), 2), true);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(2), 3), true);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(3), 2), false);
+
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(0), wrap(0)), false);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(1), wrap(1)), false);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(1), wrap(2)), true);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(2), wrap(2)), true);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(2), wrap(3)), true);
+    query(func.args(" (8, 9, 9)[. = 9]", wrap(3), wrap(2)), false);
+
+    // simplified arguments
+    check(func.args(" sort(<_/>)", wrap(0)), true, empty(SORT));
+    check(func.args(" reverse(<_/>)", wrap(0)), true, empty(REVERSE));
+    check(func.args(" for $i in 1 to 2 order by $i return $i", wrap(0)),
+        true, empty(GFLWOR.class));
+
+    // rewritings
+    check("count((8, 9, 9)[. >= 9]) < 3", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) < 2.1", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) < 2", false, root(func));
+
+    check("count((8, 9, 9)[. >= 9]) <= 2.1", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) <= 2", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) <= 1.9", false, root(func));
+
+    check("count((8, 9, 9)[. >= 9]) > 1", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) > 1.1", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) > 1.9", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) > 2", false, root(func));
+    check("count((8, 9, 9)[. >= 9]) > 2.1", false, root(func));
+
+    check("count((8, 9, 9)[. >= 9]) >= 1.9", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) >= 2", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) >= 2.1", false, root(func));
+
+    check("count((8, 9, 9)[. >= 9]) = 1", false, root(func));
+    check("count((8, 9, 9)[. >= 9]) = 2", true, root(func));
+    check("count((8, 9, 9)[. >= 9]) = 3", false, root(func));
+
+    check("count((1 to 10)[. < 5]) = 1 to 3", false, root(func));
+    check("count((1 to 10)[. < 5]) = 3 to 5", true, root(func));
+    check("count((1 to 10)[. < 5]) = 5 to 7", false, root(func));
+
+    check("(1 to 2) ! (count((1 to 10)[. < 5]) = .)", "false\nfalse", exists(func));
+
+    // merge multiple counts
+    check("let $s := (1 to 6)[. < 5] return empty($s) or count($s) < 5", true,
+        root(func), count(Int.class, 2), empty(EMPTY));
+    check("let $s := (1 to 6)[. < 5] return exists($s) and count($s) < 5", true,
+        root(func), count(Int.class, 2), empty(EXISTS));
+
+    check("let $s := (1 to 6)[. < 5] return count($s) > 0 and count($s) < 5", true,
+        root(func), count(Int.class, 2), empty(COUNT));
+    check("let $s := (1 to 6)[. < 5] return count($s) >= 0 and count($s) < 5", true,
+        root(func), count(Int.class, 2), empty(COUNT));
+    check("let $s := (1 to 6)[. < 5] return count($s) > 1 and count($s) > 2", true,
+        root(func), count(Int.class, 1), empty(COUNT));
+    check("let $s := (1 to 6)[. < 5] return count($s) > 1 and count($s) > 2", true,
+        root(func), count(Int.class, 1), empty(COUNT));
+    check("let $s := (1 to 6)[. < 5] return count($s) > 1 or count($s) > 2", true,
+        root(func), count(Int.class, 1), empty(COUNT));
+
+    check("let $s := (1 to 6)[. < 5] return count($s) < 5 or count($s) > 5", true,
+        count(_UTIL_COUNT_WITHIN, 2), empty(COUNT));
+
+    check("let $s := (1 to 6)[. < 5] return count($s) > 0 or count($s) < 5", true,
+        root(Bln.class), empty(COUNT));
+    check("let $s := (1 to 6)[. < 5] return count($s) > 0 or count($s) > 2", true,
+        root(EXISTS), empty(COUNT));
+    check("let $s := (1 to 6)[. < 5] return empty($s) and count($s) < 5", false,
+        root(EMPTY), empty(COUNT));
   }
 
   /** Test method. */
@@ -510,154 +658,5 @@ public final class UtilModuleTest extends QueryPlanTest {
 
     error(func.args(" <_ xmlns:l='L' l:a='' a=''/>"), BASEX_STRIP_X);
     error(func.args(" <_ xmlns:l='L' a='' l:a=''/>"), BASEX_STRIP_X);
-  }
-
-  /** Test method. */
-  @Test public void within() {
-    final Function func = _UTIL_WITHIN;
-
-    // minimum
-    query(func.args(" ()", -1), true);
-    query(func.args(" ()", 0), true);
-    query(func.args(" ()", 1), false);
-
-    query(func.args(9, -1), true);
-    query(func.args(9, 0), true);
-    query(func.args(9, 1), true);
-    query(func.args(9, 2), false);
-
-    query(func.args(" <a/>", -1), true);
-    query(func.args(" <a/>", 0), true);
-    query(func.args(" <a/>", 1), true);
-    query(func.args(" <a/>", 2), false);
-
-    query(func.args(" trace(1)", 1), true);
-
-    query(func.args(" (8, 9)", 1), true);
-    query(func.args(" (8, 9)", 2), true);
-    query(func.args(" (8, 9)", 3), false);
-
-    check(func.args(" (8, 9, 9)[. = 9]", 0), true, root(Bln.class));
-    check(func.args(" (8, 9, 9)[. = 9]", 1), true, root(Bln.class));
-    query(func.args(" (8, 9, 9)[. = 9]", 2), true);
-    query(func.args(" (8, 9, 9)[. = 9]", 3), false);
-    query(func.args(" (8, 9, 9)[. = 9]", wrap(1)), true);
-    query(func.args(" (8, 9, 9)[. = 9]", wrap(2)), true);
-    query(func.args(" (8, 9, 9)[. = 9]", wrap(3)), false);
-
-    // minimum and maximum
-    query(func.args(" ()", 0, 0), true);
-    query(func.args(" ()", 0, 1), true);
-    query(func.args(" ()", 1, 0), false);
-
-    query(func.args(9, 0, 0), false);
-    query(func.args(9, 0, 1), true);
-    query(func.args(9, 0, 1), true);
-    query(func.args(9, 1, 2), true);
-    query(func.args(9, 2, 1), false);
-
-    query(func.args(" <a/>", 0, 0), false);
-    query(func.args(" <a/>", 0, 1), true);
-    query(func.args(" <a/>", 0, 1), true);
-    query(func.args(" <a/>", 1, 2), true);
-    query(func.args(" <a/>", 2, 1), false);
-
-    query(func.args(" trace(1)", 1, 2), true);
-
-    query(func.args(" (8, 9)", 1, 1), false);
-    query(func.args(" (8, 9)", 1, 2), true);
-    query(func.args(" (8, 9)", 2, 2), true);
-    query(func.args(" (8, 9)", 2, 3), true);
-    query(func.args(" (8, 9)", 3, 2), false);
-
-    check(func.args(" (8, 9, 9)[. = 9]", 0, 0), false, root(Bln.class));
-    query(func.args(" (8, 9, 9)[. = 9]", 1, 1), false);
-    query(func.args(" (8, 9, 9)[. = 9]", 1, 2), true);
-    query(func.args(" (8, 9, 9)[. = 9]", 2, 2), true);
-    query(func.args(" (8, 9, 9)[. = 9]", 2, 3), true);
-    check(func.args(" (8, 9, 9)[. = 9]", 3, 2), false, root(Bln.class));
-
-    query(func.args(" (8, 9, 9)[. = 9]", 0, wrap(0)), false);
-    query(func.args(" (8, 9, 9)[. = 9]", 1, wrap(1)), false);
-    query(func.args(" (8, 9, 9)[. = 9]", 1, wrap(2)), true);
-    query(func.args(" (8, 9, 9)[. = 9]", 2, wrap(2)), true);
-    query(func.args(" (8, 9, 9)[. = 9]", 2, wrap(3)), true);
-    query(func.args(" (8, 9, 9)[. = 9]", 3, wrap(2)), false);
-
-    query(func.args(" (8, 9, 9)[. = 9]", wrap(0), 0), false);
-    query(func.args(" (8, 9, 9)[. = 9]", wrap(1), 1), false);
-    query(func.args(" (8, 9, 9)[. = 9]", wrap(1), 2), true);
-    query(func.args(" (8, 9, 9)[. = 9]", wrap(2), 2), true);
-    query(func.args(" (8, 9, 9)[. = 9]", wrap(2), 3), true);
-    query(func.args(" (8, 9, 9)[. = 9]", wrap(3), 2), false);
-
-    query(func.args(" (8, 9, 9)[. = 9]", wrap(0), wrap(0)), false);
-    query(func.args(" (8, 9, 9)[. = 9]", wrap(1), wrap(1)), false);
-    query(func.args(" (8, 9, 9)[. = 9]", wrap(1), wrap(2)), true);
-    query(func.args(" (8, 9, 9)[. = 9]", wrap(2), wrap(2)), true);
-    query(func.args(" (8, 9, 9)[. = 9]", wrap(2), wrap(3)), true);
-    query(func.args(" (8, 9, 9)[. = 9]", wrap(3), wrap(2)), false);
-
-    // simplified arguments
-    check(func.args(" sort(<_/>)", wrap(0)), true, empty(SORT));
-    check(func.args(" reverse(<_/>)", wrap(0)), true, empty(REVERSE));
-    check(func.args(" for $i in 1 to 2 order by $i return $i", wrap(0)),
-        true, empty(GFLWOR.class));
-
-    // rewritings
-    check("count((8, 9, 9)[. >= 9]) < 3", true, root(func));
-    check("count((8, 9, 9)[. >= 9]) < 2.1", true, root(func));
-    check("count((8, 9, 9)[. >= 9]) < 2", false, root(func));
-
-    check("count((8, 9, 9)[. >= 9]) <= 2.1", true, root(func));
-    check("count((8, 9, 9)[. >= 9]) <= 2", true, root(func));
-    check("count((8, 9, 9)[. >= 9]) <= 1.9", false, root(func));
-
-    check("count((8, 9, 9)[. >= 9]) > 1", true, root(func));
-    check("count((8, 9, 9)[. >= 9]) > 1.1", true, root(func));
-    check("count((8, 9, 9)[. >= 9]) > 1.9", true, root(func));
-    check("count((8, 9, 9)[. >= 9]) > 2", false, root(func));
-    check("count((8, 9, 9)[. >= 9]) > 2.1", false, root(func));
-
-    check("count((8, 9, 9)[. >= 9]) >= 1.9", true, root(func));
-    check("count((8, 9, 9)[. >= 9]) >= 2", true, root(func));
-    check("count((8, 9, 9)[. >= 9]) >= 2.1", false, root(func));
-
-    check("count((8, 9, 9)[. >= 9]) = 1", false, root(func));
-    check("count((8, 9, 9)[. >= 9]) = 2", true, root(func));
-    check("count((8, 9, 9)[. >= 9]) = 3", false, root(func));
-
-    check("count((1 to 10)[. < 5]) = 1 to 3", false, root(func));
-    check("count((1 to 10)[. < 5]) = 3 to 5", true, root(func));
-    check("count((1 to 10)[. < 5]) = 5 to 7", false, root(func));
-
-    check("(1 to 2) ! (count((1 to 10)[. < 5]) = .)", "false\nfalse", exists(func));
-
-    // merge multiple counts
-    check("let $s := (1 to 6)[. < 5] return empty($s) or count($s) < 5", true,
-        root(func), count(Int.class, 2), empty(EMPTY));
-    check("let $s := (1 to 6)[. < 5] return exists($s) and count($s) < 5", true,
-        root(func), count(Int.class, 2), empty(EXISTS));
-
-    check("let $s := (1 to 6)[. < 5] return count($s) > 0 and count($s) < 5", true,
-        root(func), count(Int.class, 2), empty(COUNT));
-    check("let $s := (1 to 6)[. < 5] return count($s) >= 0 and count($s) < 5", true,
-        root(func), count(Int.class, 2), empty(COUNT));
-    check("let $s := (1 to 6)[. < 5] return count($s) > 1 and count($s) > 2", true,
-        root(func), count(Int.class, 1), empty(COUNT));
-    check("let $s := (1 to 6)[. < 5] return count($s) > 1 and count($s) > 2", true,
-        root(func), count(Int.class, 1), empty(COUNT));
-    check("let $s := (1 to 6)[. < 5] return count($s) > 1 or count($s) > 2", true,
-        root(func), count(Int.class, 1), empty(COUNT));
-
-    check("let $s := (1 to 6)[. < 5] return count($s) < 5 or count($s) > 5", true,
-        count(_UTIL_WITHIN, 2), empty(COUNT));
-
-    check("let $s := (1 to 6)[. < 5] return count($s) > 0 or count($s) < 5", true,
-        root(Bln.class), empty(COUNT));
-    check("let $s := (1 to 6)[. < 5] return count($s) > 0 or count($s) > 2", true,
-        root(EXISTS), empty(COUNT));
-    check("let $s := (1 to 6)[. < 5] return empty($s) and count($s) < 5", false,
-        root(EMPTY), empty(COUNT));
   }
 }
