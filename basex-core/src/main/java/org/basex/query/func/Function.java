@@ -1666,7 +1666,7 @@ public enum Function implements AFunction {
   _UTIL_STRIP_NAMESPACES(UtilStripNamespaces::new, "strip-namespaces(node[,prefixes])",
       params(NODE_O, STRING_ZM), NODE_O, UTIL_URI),
   /** XQuery function. */
-  _UTIL_WITHIN(UtilWithin::new, "within(items,min[,max])",
+  _UTIL_COUNT_WITHIN(UtilCountWithin::new, "count-within(items,min[,max])",
       params(ITEM_ZM, INTEGER_O, INTEGER_O), BOOLEAN_O, UTIL_URI),
 
   // Validate Module

@@ -19,7 +19,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
-public final class UtilWithin extends StandardFunc {
+public final class UtilCountWithin extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final long[] minMax = minMax(qc);
@@ -69,7 +69,7 @@ public final class UtilWithin extends StandardFunc {
     if(arg != expr1) {
       final Expr[] args = exprs.clone();
       args[0] = arg;
-      return cc.function(_UTIL_WITHIN, info, args);
+      return cc.function(_UTIL_COUNT_WITHIN, info, args);
     }
     return this;
   }
@@ -81,7 +81,7 @@ public final class UtilWithin extends StandardFunc {
     final long[] mm = minMaxValues(cc.qc);
     long[] cmm = null;
     if(mm != null) {
-      if(_UTIL_WITHIN.is(expr)) cmm = ((UtilWithin) expr).minMaxValues(cc.qc);
+      if(_UTIL_COUNT_WITHIN.is(expr)) cmm = ((UtilCountWithin) expr).minMaxValues(cc.qc);
       else if(EXISTS.is(expr))  cmm = new long[] { 1, Long.MAX_VALUE };
       else if(EMPTY.is(expr))   cmm = new long[] { 0, 0 };
     }
@@ -90,7 +90,7 @@ public final class UtilWithin extends StandardFunc {
       final long mx = or ? Math.max(mm[1], cmm[1]) : Math.min(mm[1], cmm[1]);
       final ExprList args = new ExprList(3).add(exprs[0]).add(Int.get(mn));
       if(mx < Long.MAX_VALUE) args.add(Int.get(mx));
-      return cc.function(_UTIL_WITHIN, info, args.finish());
+      return cc.function(_UTIL_COUNT_WITHIN, info, args.finish());
     }
     return null;
   }
