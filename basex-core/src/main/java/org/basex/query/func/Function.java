@@ -1622,6 +1622,9 @@ public enum Function implements AFunction {
   _UTIL_CHARS(UtilChars::new, "chars(string)",
       params(STRING_O), STRING_ZM, UTIL_URI),
   /** XQuery function. */
+  _UTIL_COUNT_WITHIN(UtilCountWithin::new, "count-within(items,min[,max])",
+      params(ITEM_ZM, INTEGER_O, INTEGER_O), BOOLEAN_O, UTIL_URI),
+  /** XQuery function. */
   _UTIL_DEEP_EQUAL(UtilDeepEqual::new, "deep-equal(items1,items2[,options])",
       params(ITEM_ZM, ITEM_ZM, STRING_ZM), BOOLEAN_O, UTIL_URI),
   /** XQuery function. */
@@ -1666,9 +1669,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UTIL_STRIP_NAMESPACES(UtilStripNamespaces::new, "strip-namespaces(node[,prefixes])",
       params(NODE_O, STRING_ZM), NODE_O, UTIL_URI),
-  /** XQuery function. */
-  _UTIL_COUNT_WITHIN(UtilCountWithin::new, "count-within(items,min[,max])",
-      params(ITEM_ZM, INTEGER_O, INTEGER_O), BOOLEAN_O, UTIL_URI),
 
   // Validate Module
 
