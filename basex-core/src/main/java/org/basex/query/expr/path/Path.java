@@ -980,6 +980,9 @@ public abstract class Path extends ParseExpr {
   private static Expr mergeStep(final Step curr, final Expr next, final Expr prev,
       final CompileContext cc) throws QueryException {
 
+    // do not merge steps if first one contains positional predicates
+    if(curr.mayBePositional()) return null;
+
     // merge self steps:  child::*/self::a  ->  child::a
     final Step nxt = next instanceof Step ? (Step) next : null;
     if(nxt != null && nxt.axis == SELF && !nxt.mayBePositional()) {
@@ -989,6 +992,7 @@ public abstract class Path extends ParseExpr {
       return curr.addPredicates(nxt.exprs).optimize(prev, cc);
     }
 
+    // merge descendant-or-self::node()
     if(curr.axis != DESCENDANT_OR_SELF || curr.test != KindTest.NODE || curr.exprs.length > 0)
       return null;
 

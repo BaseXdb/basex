@@ -2388,4 +2388,9 @@ public final class RewritingsTest extends QueryPlanTest {
         "1\nNaN",
         empty(TypeCheck.class));
   }
+
+  /** XQuery: Predicates with name tests. */
+  @Test public void gh2052() {
+    query("<doc><a/><b/><a/></doc>/a[following::*[1]/self::a]", "");
+  }
 }
