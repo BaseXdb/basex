@@ -377,15 +377,20 @@ public final class GFLWOR extends ParseExpr {
             changing = true;
           }
         } else {
-          // merge with next for/let expression
+          // rewrite for/let combinations to single for clause
+          //   for $a in $seq for $b in $a  ->  for $b in $seq
           //   for $a in $seq for $b in 1 to $a  ->  for $b in $seq ! (1 to .)
-          //   for $a in $seq let $b := $a  ->  for $b in $seq
+          // check next clause: skip let clause with sequences or positional for clause
+          //   for $a in (1, 2) let $i := (3, $a)
+          //   for $a in $seq for $b at $pos in $a
           ForLet next = (ForLet) clauses.get(c + 1);
-          if(fl instanceof Let || next.size() == 1) {
+          final boolean let = fl instanceof Let, nextLet = next instanceof Let;
+          if(let || (nextLet ? next.size() == 1 : ((For) next).pos == null)) {
             final Expr expr = inline(inline, next.expr, fl, cc);
             if(expr != null) {
               next.expr = expr;
-              if(fl instanceof For && next instanceof Let) {
+              if(!let && nextLet) {
+                // for $a in $seq let $b := $a  ->  for $b in $seq
                 next = For.fromLet((Let) next, cc);
                 clauses.set(c + 1, next);
               }
