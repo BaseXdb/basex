@@ -27,8 +27,8 @@ public final class MixUpdatesTest extends SandboxTest {
 
   /** Transform expression containing a simple expression. */
   @Test public void transSimple() {
-    error("<a/> update ('')", UPMODIFY);
-    error("copy $a := <a/> modify ('') return $a", UPMODIFY);
+    error("<a/> update { '' }", UPMODIFY);
+    error("copy $a := <a/> modify '' return $a", UPMODIFY);
   }
 
   /** Update test. */
@@ -75,13 +75,13 @@ public final class MixUpdatesTest extends SandboxTest {
 
   /** Test method. */
   @Test public void flwor() {
-    query("<x>X</x> update (let $_ := delete node text() where 0 return $_)", "<x/>");
-    query("<x>X</x> update (let $_ := delete node text() return ())", "<x/>");
+    query("<x>X</x> update { let $_ := delete node text() where 0 return $_ }", "<x/>");
+    query("<x>X</x> update { let $_ := delete node text() return () }", "<x/>");
   }
 
   /** Test method. */
   @Test public void functionItem() {
-    query("let $x := <a>a</a> update () return (delete node $x/text(), [$x])", "[<a/>]");
+    query("let $x := <a>a</a> update { } return (delete node $x/text(), [$x])", "[<a/>]");
   }
 
   /** Test method. */

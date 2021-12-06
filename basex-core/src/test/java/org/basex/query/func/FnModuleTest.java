@@ -500,7 +500,7 @@ public final class FnModuleTest extends QueryPlanTest {
   @Test public void jsonToXml() {
     final Function func = JSON_TO_XML;
     contains(func.args("null"), "xmlns");
-    contains(func.args("null") + " update ()", "xmlns");
+    contains(func.args("null") + " update { }", "xmlns");
   }
 
   /** Test method. */

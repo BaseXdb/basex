@@ -110,10 +110,10 @@ public final class ValidateModuleTest extends SandboxTest {
       "let $doc := <root/> " +
       "let $schema := '<!ELEMENT unknown (#PCDATA)>' " +
       "let $report := " + func.args(" $doc", " $schema") +
-      "return $report update (" +
+      "return $report update {" +
       "  delete node .//message/text()," +
       "  for $a in .//@* return replace value of node $a with ''" +
-        ')',
+        '}',
       "<report>\n<status>invalid</status>\n" +
       "<message level=\"\" line=\"\" column=\"\"/>\n" +
       "</report>");
@@ -230,10 +230,10 @@ public final class ValidateModuleTest extends SandboxTest {
       "                 <xs:element name='unknown'/> " +
       "               </xs:schema> " +
       "let $report := " + func.args(" $doc", " $schema") +
-      "return $report update (" +
+      "return $report update {" +
       "  delete node .//message/text()," +
       "  for $a in .//@* return replace value of node $a with ''" +
-        ')',
+        '}',
       "<report>\n<status>invalid</status>\n" +
       "<message level=\"\" line=\"\" column=\"\"/>\n" +
       "</report>");

@@ -130,7 +130,7 @@ public final class MixedTest extends SandboxTest {
     query("<A>{ document { <a><b/><c/></a> }/a/* }</A>/c/preceding-sibling::b", "<b/>");
     query("<A>{ (document { <a><b/><c/></a> } update {})/a/* }</A>/c/preceding-sibling::b", "<b/>");
 
-    error("let $doc := document { <a><b/></a> } update ()"
+    error("let $doc := document { <a><b/></a> } update { }"
         + "return id('id', element c { $doc/*/node() }/*)", IDDOC);
   }
 

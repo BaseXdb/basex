@@ -739,7 +739,7 @@ public final class DbModuleTest extends QueryPlanTest {
     final Function func = _DB_PATH;
     query(func.args(_DB_OPEN.args(NAME)), XML.replaceAll(".*/", ""));
     query(func.args(_DB_OPEN.args(NAME) + "/*"), XML.replaceAll(".*/", ""));
-    query(func.args(" <x/> update ()"), "");
+    query(func.args(" <x/> update { }"), "");
   }
 
   /** Test method. */

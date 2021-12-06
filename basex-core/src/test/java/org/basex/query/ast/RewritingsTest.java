@@ -1606,7 +1606,7 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Typeswitch: default branch with variable. */
   @Test public void gh1883() {
     query(
-      "typeswitch(<x/> update delete node x) " +
+      "typeswitch(<x/> update { delete node x }) " +
       " case $i as xs:int return '-' " +
       " default $i return $i", "<x/>");
   }
@@ -1668,7 +1668,7 @@ public final class RewritingsTest extends QueryPlanTest {
     query("(<a/>, <b/>) ! . update { rename node . as name() }", "<a/>\n<b/>");
     query("(<a/>, <b/>) ! (. update { rename node . as name() })", "<a/>\n<b/>");
     query("for $n in (<a/>, <b/>) return $n ! . update { rename node . as name() }", "<a/>\n<b/>");
-    query("'s' ! (<a/> update delete node .)", "<a/>");
+    query("'s' ! (<a/> update { delete node . })", "<a/>");
   }
 
   /** Static properties of closures. */
