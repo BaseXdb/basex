@@ -1429,30 +1429,13 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr and() throws QueryException {
-    final Expr ex = update();
+    final Expr ex = comparison();
     if(!wsConsumeWs(AND)) return ex;
 
     final InputInfo ii = info();
     final ExprList el = new ExprList(2).add(ex);
-    do add(el, update()); while(wsConsumeWs(AND));
+    do add(el, comparison()); while(wsConsumeWs(AND));
     return new And(ii, el.finish());
-  }
-
-  /**
-   * Parses the "UpdateExpr" rule.
-   * @return query expression or {@code null}
-   * @throws QueryException query exception
-   */
-  private Expr update() throws QueryException {
-    Expr ex = comparison();
-    if(ex != null) {
-      while(wsConsumeWs(UPDATE)) {
-        qc.updating();
-        ex = new TransformWith(info(), ex, curr('{') ? enclosedExpr() : check(single(),
-            UPDATEEXPR));
-      }
-    }
-    return ex;
   }
 
   /**
@@ -1670,26 +1653,10 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr cast() throws QueryException {
-    final Expr ex = transformWith();
+    final Expr ex = arrow();
     if(!wsConsumeWs(CAST)) return ex;
     wsCheck(AS);
     return new Cast(sc, info(), ex, simpleType());
-  }
-
-  /**
-   * Parses the "TransformWithExpr" rule.
-   * @return query expression or {@code null}
-   * @throws QueryException query exception
-   */
-  private Expr transformWith() throws QueryException {
-    final Expr ex = arrow();
-    final int p = pos;
-    if(ex != null && wsConsume(TRANSFORM) && wsConsume(WITH)) {
-      qc.updating();
-      return new TransformWith(info(), ex, enclosedExpr());
-    }
-    pos = p;
-    return ex;
   }
 
   /**
@@ -1698,7 +1665,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr arrow() throws QueryException {
-    Expr ex = unary();
+    Expr ex = transformWith();
     if(ex != null) {
       while(wsConsume(ARROW)) {
         skipWs();
@@ -1731,13 +1698,31 @@ public class QueryParser extends InputParser {
   }
 
   /**
+   * Parses the "TransformWithExpr" rule.
+   * @return query expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr transformWith() throws QueryException {
+    Expr ex = unary();
+    while(ex != null) {
+      if(wsConsume(TRANSFORM)) {
+        wsCheck(WITH);
+      } else if(!wsConsume(UPDATE)) {
+        break;
+      }
+      qc.updating();
+      ex = new TransformWith(info(), ex, enclosedExpr());
+    }
+    return ex;
+  }
+
+  /**
    * Parses the "UnaryExpr" rule.
    * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr unary() throws QueryException {
-    boolean minus = false;
-    boolean found = false;
+    boolean minus = false, found = false;
     do {
       skipWs();
       if(consume('-')) {
