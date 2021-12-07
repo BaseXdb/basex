@@ -61,24 +61,18 @@ public abstract class CNode extends Arr {
    * @throws QueryException query exception
    */
   final byte[] atomValue(final QueryContext qc, final boolean empty) throws QueryException {
-    final int el = exprs.length;
-    // empty sequence: empty string
-    if(el == 0) return empty ? Token.EMPTY : null;
-    // single string argument
-    if(el == 1 && exprs[0] instanceof Str) return ((Str) exprs[0]).string();
-
-    boolean more = false;
-    final TokenBuilder tb = new TokenBuilder();
+    TokenBuilder tb = null;
     for(final Expr expr : exprs) {
-      more = false;
+      boolean space = false;
       final Iter iter = expr.atomIter(qc, info);
       for(Item item; (item = qc.next(iter)) != null;) {
-        if(more) tb.add(' ');
+        if(tb == null) tb = new TokenBuilder();
+        else if(space) tb.add(' ');
         tb.add(item.string(info));
-        more = true;
+        space = true;
       }
     }
-    return more ? tb.finish() : empty ? Token.EMPTY : null;
+    return tb != null ? tb.finish() : empty ? Token.EMPTY : null;
   }
 
   @Override
