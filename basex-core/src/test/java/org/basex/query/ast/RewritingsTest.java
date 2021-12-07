@@ -2389,8 +2389,14 @@ public final class RewritingsTest extends QueryPlanTest {
         empty(TypeCheck.class));
   }
 
-  /** XQuery: Predicates with name tests. */
+  /** Predicates with name tests. */
   @Test public void gh2052() {
     query("<doc><a/><b/><a/></doc>/a[following::*[1]/self::a]", "");
+  }
+
+  /** Attribute constructor. */
+  @Test public void gh2054() {
+    query("<x attr=\"a{ }\"/>", "<x attr=\"a\"/>");
+    query("<x>a{ }</x>", "<x>a</x>");
   }
 }
