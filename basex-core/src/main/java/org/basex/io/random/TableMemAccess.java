@@ -10,16 +10,14 @@ import org.basex.util.*;
  * This class allows main memory access to the database table representation.
  * All table entries are stored in arrays
  *
- * NOTE: this class is not thread-safe.
- *
  * @author BaseX Team 2005-21, BSD License
  * @author Christian Gruen
  */
 public final class TableMemAccess extends TableAccess {
-  /** Table data (first half). */
-  private long[] data1 = new long[Array.INITIAL_CAPACITY];
-  /** Table data (second half). */
-  private long[] data2 = new long[Array.INITIAL_CAPACITY];
+  /** Table blocks. */
+  private ArrayList<TableMemBlock> blocks = new ArrayList<>();
+  /** Current block index. */
+  private int current;
 
   /**
    * Constructor.
@@ -30,10 +28,12 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public void flush(final boolean all) { }
+  public void flush(final boolean all) {
+  }
 
   @Override
-  public void close() { }
+  public void close() {
+  }
 
   @Override
   public boolean lock(final boolean lock) {
@@ -42,117 +42,185 @@ public final class TableMemAccess extends TableAccess {
 
   @Override
   public int read1(final int pre, final int offset) {
-    return (int) ((offset < 8 ? data1 : data2)[pre] >>
-      ((offset < 8 ? 7 : 15) - offset << 3) & 0xFF);
+    final TableMemBlock block = block(pre);
+    return (int) (block.value(pre, offset) >> ((offset < 8 ? 7 : 15) - offset << 3) & 0xFF);
   }
 
   @Override
   public int read2(final int pre, final int offset) {
-    return (int) ((offset < 8 ? data1 : data2)[pre] >>
-      ((offset < 8 ? 6 : 14) - offset << 3) & 0xFFFF);
+    final TableMemBlock block = block(pre);
+    return (int) (block.value(pre, offset) >> ((offset < 8 ? 6 : 14) - offset << 3) & 0xFFFF);
   }
 
   @Override
   public int read4(final int pre, final int offset) {
-    return (int) ((offset < 8 ? data1 : data2)[pre] >>
-      ((offset < 8 ? 4 : 12) - offset << 3));
+    final TableMemBlock block = block(pre);
+    return (int) (block.value(pre, offset) >> ((offset < 8 ? 4 : 12) - offset << 3));
   }
 
   @Override
   public long read5(final int pre, final int offset) {
-    return (offset < 8 ? data1 : data2)[pre] >>
-      ((offset < 8 ? 3 : 11) - offset << 3) & 0xFFFFFFFFFFL;
+    final TableMemBlock block = block(pre);
+    return block.value(pre, offset) >> ((offset < 8 ? 3 : 11) - offset << 3) & 0xFFFFFFFFFFL;
   }
 
   @Override
   public void write1(final int pre, final int offset, final int value) {
-    dirty();
-    final long[] buf = offset < 8 ? data1 : data2;
+    final TableMemBlock block = block(pre);
     final long d = (offset < 8 ? 7 : 15) - offset << 3;
-    buf[pre] = buf[pre] & ~(0xFFL << d) | (long) value << d;
+    block.value(pre, offset, block.value(pre, offset) & ~(0xFFL << d) | (long) value << d);
   }
 
   @Override
   public void write2(final int pre, final int offset, final int value) {
-    dirty();
-    final long[] buf = offset < 8 ? data1 : data2;
+    final TableMemBlock block = block(pre);
     final long d = (offset < 8 ? 6 : 14) - offset << 3;
-    buf[pre] = buf[pre] & ~(0xFFFFL << d) | (long) value << d;
+    block.value(pre, offset, block.value(pre, offset) & ~(0xFFFFL << d) | (long) value << d);
   }
 
   @Override
   public void write4(final int pre, final int offset, final int value) {
-    dirty();
-    final long[] buf = offset < 8 ? data1 : data2;
+    final TableMemBlock block = block(pre);
     final long d = (offset < 8 ? 4 : 12) - offset << 3;
-    buf[pre] = buf[pre] & ~(0xFFFFFFFFL << d) | (long) value << d;
+    block.value(pre, offset, block.value(pre, offset) & ~(0xFFFFFFFFL << d) | (long) value << d);
   }
 
   @Override
   public void write5(final int pre, final int offset, final long value) {
-    dirty();
-    final long[] buf = offset < 8 ? data1 : data2;
+    final TableMemBlock block = block(pre);
     final long d = (offset < 8 ? 3 : 11) - offset << 3;
-    buf[pre] = buf[pre] & ~(0xFFFFFFFFFFL << d) | value << d;
+    block.value(pre, offset, block.value(pre, offset) & ~(0xFFFFFFFFFFL << d) | value << d);
   }
 
   @Override
-  protected void copy(final byte[] entries, final int pre, final int last) {
-    dirty();
-    for(int o = 0, i = pre; i < last; ++i, o += IO.NODESIZE) {
-      data1[i] = getLong(entries, o);
-      data2[i] = getLong(entries, o + 8);
+  protected void copy(final byte[] entries, final int first, final int last) {
+    for(int o = 0, pre = first; pre < last; pre++, o += IO.NODESIZE) {
+      final TableMemBlock block = block(pre);
+      block.value(pre, 0, toLong(entries, o));
+      block.value(pre, 8, toLong(entries, o + 8));
     }
   }
 
   @Override
   public void delete(final int pre, final int count) {
-    if(count == 0) return;
-    move(pre + count, pre);
+    TableMemBlock block = block(pre);
+    int c = current;
+    for(int deleted = 0; deleted < count;) {
+      // delete entries inside block
+      deleted += block.delete(pre, count - deleted, firstPre(c + 1) - deleted);
+      // adjust firstPre value of next block
+      if(c + 1 < blocks.size()) {
+        block = blocks.get(c + 1);
+        block.firstPre -= deleted;
+      }
+      // delete emptied block
+      if(firstPre(c) == firstPre(c + 1)) {
+        blocks.remove(c);
+      } else {
+        ++c;
+      }
+    }
+    updateFirstPre(c + 1, -count);
+    // decrease table size,
+    meta.size -= count;
   }
 
   @Override
   public void insert(final int pre, final byte[] entries) {
-    if(entries.length == 0) return;
-    move(pre, pre + (entries.length >>> IO.NODEPOWER));
-    set(pre, entries);
+    final int count = entries.length >>> IO.NODEPOWER;
+    if(pre == meta.size) {
+      // append entries. if no space is left, append new blocks
+      final int bs = blocks.size();
+      if(bs == 0 || blocks.get(bs - 1).full(meta.size)) {
+        blocks.addAll(bs, TableMemBlock.get(count, pre));
+      }
+    } else {
+      // insert entries. if no space is left, insert new blocks
+      final TableMemBlock block = block(pre);
+      int c = current + 1;
+      final Collection<TableMemBlock> list = block.insert(pre, count, firstPre(c));
+      if(list != null) {
+        blocks.addAll(c, list);
+        c += list.size();
+      }
+      updateFirstPre(c, count);
+    }
+    // increase table size, populate table with actual entries
+    meta.size += count;
+    copy(entries, pre, pre + count);
   }
 
   @Override
-  protected void dirty() {
-    dirty = true;
+  public String toString() {
+    return Util.className(this) + "[size: " + meta.size + ", current: " + current +
+        ", blocks: " + blocks + ']';
   }
 
   // PRIVATE METHODS ==============================================================================
 
   /**
-   * Moves data inside the value arrays.
-   * @param source source position
-   * @param target target position
+   * Returns the current block and assigns the {@link #current} block index.
+   * @param pre pre value
+   * @return block
    */
-  private void move(final int source, final int target) {
-    dirty();
-    final int l = meta.size - source;
-    while(l + target >= data1.length) {
-      final int s = Array.newCapacity(data1.length);
-      data1 = Arrays.copyOf(data1, s);
-      data2 = Arrays.copyOf(data2, s);
+  private TableMemBlock block(final int pre) {
+    int c = current, fp = firstPre(c), np = firstPre(c + 1);
+    if(pre >= np) {
+      // choose next block
+      fp = np;
+      np = firstPre(++c + 1);
+    } else if(pre < fp) {
+      // choose previous block
+      np = fp;
+      fp = firstPre(--c);
+    } else {
+      return blocks.get(c);
     }
-    Array.copy(data1, source, l, data1, target);
-    Array.copy(data2, source, l, data2, target);
-    meta.size += target - source;
+    if(pre >= np || pre < fp) {
+      // binary search
+      int l = 0, h = blocks.size() - 1;
+      while(l <= h) {
+        if(pre >= np) l = c + 1;
+        else if(pre < fp) h = c - 1;
+        else break;
+        c = h + l >>> 1;
+        fp = firstPre(c);
+        np = firstPre(c + 1);
+      }
+    }
+    current = c;
+    return blocks.get(c);
   }
 
   /**
-   * Returns a long value from the specified array.
-   * @param entry array input
-   * @param index index
+   * Returns the first pre value of the specified block.
+   * @param index block index
+   * @return first pre value
+   */
+  private int firstPre(final int index) {
+    return index < blocks.size() ? blocks.get(index).firstPre : meta.size;
+  }
+
+  /**
+   * Updates the firstPre values of the specified and all subsequent blocks.
+   * @param index index of the first block
+   * @param count number of insertions (can be negative)
+   */
+  private void updateFirstPre(final int index, final int count) {
+    final int bs = blocks.size();
+    for(int b = index; b < bs; b++) blocks.get(b).firstPre += count;
+  }
+
+  /**
+   * Converts values from the specified array to a long value.
+   * @param data data
+   * @param offset offset (multiple of 8)
    * @return long value
    */
-  private static long getLong(final byte[] entry, final int index) {
-    return (entry[index] & 0xFFL) << 56 | (entry[index + 1] & 0xFFL) << 48 |
-       (entry[index + 2] & 0xFFL) << 40 | (entry[index + 3] & 0xFFL) << 32 |
-       (entry[index + 4] & 0xFFL) << 24 | (entry[index + 5] & 0xFFL) << 16 |
-       (entry[index + 6] & 0xFFL) <<  8 | entry[index + 7] & 0xFFL;
+  private static long toLong(final byte[] data, final int offset) {
+    return (data[offset] & 0xFFL) << 56 | (data[offset + 1] & 0xFFL) << 48
+        | (data[offset + 2] & 0xFFL) << 40 | (data[offset + 3] & 0xFFL) << 32
+        | (data[offset + 4] & 0xFFL) << 24 | (data[offset + 5] & 0xFFL) << 16
+        | (data[offset + 6] & 0xFFL) << 8 | data[offset + 7] & 0xFFL;
   }
 }

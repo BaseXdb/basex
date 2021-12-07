@@ -227,8 +227,9 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  protected void copy(final byte[] entries, final int pre, final int last) {
-    for(int o = 0, i = pre; i < last; ++i, o += IO.NODESIZE) {
+  protected void copy(final byte[] entries, final int first, final int last) {
+    dirty();
+    for(int o = 0, i = first; i < last; ++i, o += IO.NODESIZE) {
       final int off = cursor(i);
       final Buffer buffer = buffers.current();
       Array.copy(entries, o, IO.NODESIZE, buffer.data, off);
@@ -426,19 +427,6 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  protected void dirty() {
-    // initialize data structures required for performing updates
-    if(fPreIndex == null) {
-      fPreIndex = new int[pages];
-      for(int i = 0; i < pages; i++) fPreIndex[i] = i * IO.ENTRIES;
-      pageIndex = new int[pages];
-      for(int i = 0; i < pages; i++) pageIndex[i] = i;
-      usedPages = new BitArray(used, true);
-    }
-    dirty = true;
-  }
-
-  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(Util.className(this)).append(" (").append("pages: ").append(pages);
@@ -451,6 +439,21 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   // PRIVATE METHODS ==============================================================================
+
+  /**
+   * Marks the data structures as dirty.
+   */
+  private void dirty() {
+    // initialize data structures required for performing updates
+    if(fPreIndex == null) {
+      fPreIndex = new int[pages];
+      for(int i = 0; i < pages; i++) fPreIndex[i] = i * IO.ENTRIES;
+      pageIndex = new int[pages];
+      for(int i = 0; i < pages; i++) pageIndex[i] = i;
+      usedPages = new BitArray(used, true);
+    }
+    dirty = true;
+  }
 
   /**
    * Searches for the page containing the entry for the specified pre value.

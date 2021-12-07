@@ -118,7 +118,6 @@ public abstract class TableAccess {
    * @param count number of entries to be replaced
    */
   public final void replace(final int pre, final byte[] entries, final int count) {
-    dirty();
     final int nsize = entries.length >>> IO.NODEPOWER;
     final int diff = count - nsize;
     final int last = diff <= 0 ? pre + nsize - Math.abs(diff) : pre + nsize;
@@ -136,27 +135,12 @@ public abstract class TableAccess {
   }
 
   /**
-   * Copies the specified entries into the database.
-   * @param pre pre value
-   * @param entries array of bytes containing the entries to insert
-   */
-  final void set(final int pre, final byte[] entries) {
-    dirty();
-    copy(entries, pre, pre + (entries.length >>> IO.NODEPOWER));
-  }
-
-  /**
-   * Marks the data structures as dirty.
-   */
-  protected abstract void dirty();
-
-  /**
    * Copies the specified values into the database.
    * @param entries entries to copy
-   * @param pre first target pre value
+   * @param first first target pre value
    * @param last last pre value
    */
-  protected abstract void copy(byte[] entries, int pre, int last);
+  protected abstract void copy(byte[] entries, int first, int last);
 
   /**
    * Deletes the specified number of entries from the database.
