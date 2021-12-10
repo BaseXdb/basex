@@ -54,18 +54,69 @@ public final class TableMemAccessTest extends SandboxTest {
     singleAppend(100000);
   }
 
+  /** Test method. */
+  @Test public void singleAppend4095and2() {
+    singleAppend(4095);
+    singleAppend(2, 4095);
+  }
+
+  /** Test method. */
+  @Test public void singleAppend4095and4098() {
+    singleAppend(4095);
+    singleAppend(4098, 4095);
+  }
+
+  /** Test method. */
+  @Test public void singleAppend2and4095() {
+    singleAppend(2);
+    singleAppend(4095, 2);
+  }
+
+  /** Test method. */
+  @Test public void singleAppend1and4096() {
+    singleAppend(1);
+    singleAppend(4096, 1);
+  }
+
+  /** Test method. */
+  @Test public void singleAppend1and4097() {
+    singleAppend(1);
+    singleAppend(4097, 1);
+  }
+
+  /** Test method. */
+  @Test public void singleAppend1and8191() {
+    singleAppend(1);
+    singleAppend(8191, 1);
+  }
+
+  /** Test method. */
+  @Test public void singleAppend2and8192() {
+    singleAppend(2);
+    singleAppend(8192, 2);
+  }
+
   /**
    * Appends the specified number of entries via a single insert operation.
    * @param n number of entries
    */
   private void singleAppend(final int n) {
+    singleAppend(n, 0);
+  }
+
+  /**
+   * Appends the specified number of entries via a single insert operation.
+   * @param n number of entries
+   * @param o offset
+   */
+  private void singleAppend(final int n, final int o) {
     final ByteList list = new ByteList(n * ENTRY.length);
     for(int i = 0; i < n; i++) {
-      ENTRY[0] = (byte) i;
+      ENTRY[0] = (byte) (o + i);
       list.add(ENTRY);
     }
-    table.insert(0, list.finish());
-    check(n);
+    table.insert(table.meta.size, list.finish());
+    check(n + o);
   }
 
   /** Test method. */

@@ -131,8 +131,9 @@ public final class TableMemAccess extends TableAccess {
     if(pre == meta.size) {
       // append entries. if no space is left, append new blocks
       final int bs = blocks.size();
-      if(bs == 0 || blocks.get(bs - 1).full(meta.size)) {
-        blocks.addAll(bs, TableMemBlock.get(count, pre));
+      final int remaining = bs == 0 ? 0 : blocks.get(bs - 1).remaining(meta.size);
+      if(remaining < count) {
+        blocks.addAll(bs, TableMemBlock.get(count - remaining, pre + remaining));
       }
     } else {
       // insert entries. if no space is left, insert new blocks

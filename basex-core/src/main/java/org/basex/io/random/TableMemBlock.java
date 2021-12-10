@@ -27,7 +27,7 @@ final class TableMemBlock {
    * @return new blocks
    */
   static ArrayList<TableMemBlock> get(final int count) {
-    final int bs = 1 + (count - 1) & (SIZE - 1);
+    final int bs = (SIZE + count - 1) / SIZE;
     final ArrayList<TableMemBlock> list = new ArrayList<>(bs);
     for(int b = 0; b < bs; b++) list.add(new TableMemBlock());
     return list;
@@ -50,12 +50,12 @@ final class TableMemBlock {
   }
 
   /**
-   * Indicates if the block is full.
+   * Returns the number of remaining entries in this block.
    * @param nextPre pre value of next block
-   * @return result of check
+   * @return remaining entries
    */
-  boolean full(final int nextPre) {
-    return nextPre - firstPre == SIZE;
+  int remaining(final int nextPre) {
+    return SIZE - nextPre + firstPre;
   }
 
   /**
