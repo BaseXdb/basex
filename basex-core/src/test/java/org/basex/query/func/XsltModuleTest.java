@@ -45,7 +45,6 @@ public final class XsltModuleTest extends SandboxTest {
     query("(# db:catfile " + dir + "catalog.xml #) { " +
         func.args(" <dummy/>", dir + "document.xsl") + " }",
         "<x>X</x>");
-
   }
 
   /** Test method. */
@@ -60,6 +59,18 @@ public final class XsltModuleTest extends SandboxTest {
     style = wrap("<xsl:param name='t'/><xsl:output omit-xml-declaration='yes'/>" +
       "<xsl:template match='/'><xsl:value-of select='$t'/></xsl:template>");
     query(func.args(doc, ' ' + style, " map { 't': '1' }"), 1);
+  }
+
+  /** Test method. */
+  @Test public void transformReport() {
+    final Function func = _XSLT_TRANSFORM_REPORT;
+    final String doc = " <a/>";
+    String style = wrap("<xsl:template match='/'>" +
+        "<xsl:output omit-xml-declaration='yes'/>1</xsl:template>");
+    query(func.args(doc, ' ' + style) + "?result", 1);
+    query(func.args(doc, ' ' + style) + "?error => exists()", false);
+    query(func.args(doc, ' ' + wrap("")) + "?error => exists()", false);
+    query(func.args(doc, ' ' + wrap("<xsl:x/>")) + "?error => exists()", true);
   }
 
   /** Test method. */
