@@ -1769,6 +1769,10 @@ public enum Function implements AFunction {
   _XSLT_TRANSFORM(XsltTransform::new, "transform(input,stylesheet[,params[,options]])",
       params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), NODE_O, flag(NDT), XSLT_URI),
   /** XQuery function. */
+  _XSLT_TRANSFORM_REPORT(XsltTransformReport::new,
+      "transform-report(input,stylesheet[,params[,options]])",
+      params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), MAP_O, flag(NDT), XSLT_URI),
+  /** XQuery function. */
   _XSLT_TRANSFORM_TEXT(XsltTransformText::new,
       "transform-text(input,stylesheet[,params[,options]])",
       params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), STRING_O, flag(NDT), XSLT_URI),
