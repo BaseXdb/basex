@@ -16,6 +16,8 @@ import org.basex.util.*;
 public final class TableMemAccess extends TableAccess {
   /** Table blocks. */
   private ArrayList<TableMemBlock> blocks = new ArrayList<>();
+  /** Dense flag (blocks contain no gaps). */
+  private boolean dense = true;
   /** Current block index. */
   private int current;
 
@@ -121,17 +123,23 @@ public final class TableMemAccess extends TableAccess {
       }
     }
     updateFirstPre(c + 1, -count);
-    // decrease table size,
-    meta.size -= count;
+
+    // decrease table size; update dense flag
+    int size = meta.size;
+    size -= count;
+    if(pre < size) dense = false;
+    else if(size == 0) dense = true;
+    meta.size = size;
   }
 
   @Override
   public void insert(final int pre, final byte[] entries) {
     final int count = entries.length >>> IO.NODEPOWER;
-    if(pre == meta.size) {
+    int size = meta.size;
+    if(pre == size) {
       // append entries. if no space is left, append new blocks
       final int bs = blocks.size();
-      final int remaining = bs == 0 ? 0 : blocks.get(bs - 1).remaining(meta.size);
+      final int remaining = bs == 0 ? 0 : blocks.get(bs - 1).remaining(size);
       if(remaining < count) {
         blocks.addAll(bs, TableMemBlock.get(count - remaining, pre + remaining));
       }
@@ -145,9 +153,11 @@ public final class TableMemAccess extends TableAccess {
         c += list.size();
       }
       updateFirstPre(c, count);
+      dense = false;
     }
     // increase table size, populate table with actual entries
-    meta.size += count;
+    size += count;
+    meta.size = size;
     copy(entries, pre, pre + count);
   }
 
@@ -165,28 +175,34 @@ public final class TableMemAccess extends TableAccess {
    * @return block
    */
   private TableMemBlock block(final int pre) {
-    int c = current, fp = firstPre(c), np = firstPre(c + 1);
-    if(pre >= np) {
-      // choose next block
-      fp = np;
-      np = firstPre(++c + 1);
-    } else if(pre < fp) {
-      // choose previous block
-      np = fp;
-      fp = firstPre(--c);
+    int c;
+    if(dense) {
+      c = pre >>> IO.BLOCKPOWER;
     } else {
-      return blocks.get(c);
-    }
-    if(pre >= np || pre < fp) {
-      // binary search
-      int l = 0, h = blocks.size() - 1;
-      while(l <= h) {
-        if(pre >= np) l = c + 1;
-        else if(pre < fp) h = c - 1;
-        else break;
-        c = h + l >>> 1;
-        fp = firstPre(c);
-        np = firstPre(c + 1);
+      c = current;
+      int fp = firstPre(c), np = firstPre(c + 1);
+      if(pre >= np) {
+        // choose next block
+        fp = np;
+        np = firstPre(++c + 1);
+      } else if(pre < fp) {
+        // choose previous block
+        np = fp;
+        fp = firstPre(--c);
+      } else {
+        return blocks.get(c);
+      }
+      if(pre >= np || pre < fp) {
+        // binary search
+        int l = 0, h = blocks.size() - 1;
+        while(l <= h) {
+          if(pre >= np) l = c + 1;
+          else if(pre < fp) h = c - 1;
+          else break;
+          c = h + l >>> 1;
+          fp = firstPre(c);
+          np = firstPre(c + 1);
+        }
       }
     }
     current = c;

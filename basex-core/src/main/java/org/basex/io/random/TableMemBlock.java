@@ -14,10 +14,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class TableMemBlock {
-  /** Number of block entries. */
-  private static final int SIZE = IO.BLOCKSIZE;
   /** Table data, with two values for a single entry. */
-  private final long[] data = new long[SIZE << 1];
+  private final long[] data = new long[IO.BLOCKSIZE << 1];
   /** First pre value. */
   int firstPre;
 
@@ -27,7 +25,7 @@ final class TableMemBlock {
    * @return new blocks
    */
   static ArrayList<TableMemBlock> get(final int count) {
-    final int bs = (SIZE + count - 1) / SIZE;
+    final int bs = (IO.BLOCKSIZE + count - 1) >>> IO.BLOCKPOWER;
     final ArrayList<TableMemBlock> list = new ArrayList<>(bs);
     for(int b = 0; b < bs; b++) list.add(new TableMemBlock());
     return list;
@@ -44,7 +42,7 @@ final class TableMemBlock {
     int fp = pre;
     for(final TableMemBlock block : blocks) {
       block.firstPre = fp;
-      fp += SIZE;
+      fp += IO.BLOCKSIZE;
     }
     return blocks;
   }
@@ -55,7 +53,7 @@ final class TableMemBlock {
    * @return remaining entries
    */
   int remaining(final int nextPre) {
-    return SIZE - nextPre + firstPre;
+    return IO.BLOCKSIZE - nextPre + firstPre;
   }
 
   /**
@@ -101,7 +99,7 @@ final class TableMemBlock {
    */
   ArrayList<TableMemBlock> insert(final int pre, final int count, final int nextPre) {
     final int first = pre - firstPre, last = first + count, filled = nextPre - firstPre;
-    final int remaining = SIZE - filled, copy = nextPre - pre;
+    final int remaining = IO.BLOCKSIZE - filled, copy = nextPre - pre;
 
     // check if entries can be inserted into existing block
     if(count <= remaining) {
