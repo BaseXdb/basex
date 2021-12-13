@@ -12,10 +12,10 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -43,13 +43,16 @@ final class XsltReport {
   /** Report map builder. */
   private final MapBuilder rb = new MapBuilder();
   /** Saxon-specific: Message collector. */
-  final Stack<Object> messages = new Stack<>();
+  private final Stack<Object> messages = new Stack<>();
+  /** Query context. */
+  private final QueryContext qc;
 
   /**
    * Constructor.
+   * @param qc query context
    */
-  XsltReport() {
-
+  XsltReport(final QueryContext qc) {
+    this.qc = qc;
   }
 
   /**
@@ -77,19 +80,22 @@ final class XsltReport {
    * @throws QueryException query exception
    */
   void addResult(final byte[] result) throws QueryException {
-    rb.put("result", convert(new IOContent(result)));
+    rb.put("result", convert(new IOContent(result), true));
   }
 
   /**
    * Adds report messages.
-   * @param qc query context
    * @throws QueryException query exception
    */
-  void addMessage(final QueryContext qc) throws QueryException {
+  void addMessage() throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     try {
       for(final Object message : messages) {
-        vb.add(convert(new IOContent(MW_GW.invoke(message).toString())));
+        ArrayBuilder ab = new ArrayBuilder();
+        for(final Item item : convert(new IOContent(MW_GW.invoke(message).toString()), false)) {
+          ab.append(item);
+        }
+        vb.add(ab.array());
       }
     } catch(final Exception ex) {
       Util.debug(ex);
@@ -116,24 +122,28 @@ final class XsltReport {
 
   /**
    * Converts a transformation result to an item (node or untyped atomic).
-   * @param io result container
+   * @param content result
+   * @param result result or message flag
    * @return item or empty sequence
    */
-  private Item convert(final IOContent io) {
+  private Value convert(final IOContent content, final boolean result) {
     ANode node = null;
     try {
-      node = new DBNode(io);
+      node = new DBNode(content);
     } catch(final IOException ex) {
       Util.debug(ex);
       try {
-        node = new DBNode(new XMLParser(io, MainOptions.get(), true));
+        node = new DBNode(new XMLParser(content, MainOptions.get(), true));
       } catch(final IOException ex2) {
         Util.debug(ex2);
-        return Str.get(io.read());
+        return Str.get(content.read());
       }
     }
-    node = node.childIter().next();
-    return node == null ? Empty.VALUE : node.type == NodeType.TEXT ? Atm.get(node.string()) :
-      node.finish();
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(final ANode child : node.childIter()) {
+      vb.add(child.type == NodeType.TEXT ? Atm.get(child.string()) :
+        result ? new FDoc().add(child.finish()) : child.finish());
+    }
+    return vb.value();
   }
 }

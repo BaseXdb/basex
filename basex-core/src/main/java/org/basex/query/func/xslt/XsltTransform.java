@@ -58,7 +58,7 @@ public class XsltTransform extends XsltFn {
     final ArrayOutput result = new ArrayOutput();
     final PrintStream errPS = System.err;
     final ArrayOutput err = new ArrayOutput();
-    final XsltReport xr = simple ? null : new XsltReport();
+    final XsltReport xr = simple ? null : new XsltReport(qc);
     try {
       // redirect errors
       System.setErr(new PrintStream(err));
@@ -93,7 +93,7 @@ public class XsltTransform extends XsltFn {
 
       xr.register(tr);
       tr.transform(in.streamSource(), new StreamResult(result));
-      xr.addMessage(qc);
+      xr.addMessage();
     } catch(final IllegalArgumentException ex) {
       // Saxon raises runtime exceptions for illegal parameters
       if(simple) throw XSLT_ERROR_X.get(info, ex);
@@ -104,7 +104,7 @@ public class XsltTransform extends XsltFn {
       final byte[] error = trim(utf8(err.toArray(), Prop.ENCODING));
       if(simple) throw XSLT_ERROR_X.get(info, error);
       xr.addError(Str.get(error));
-      xr.addMessage(qc);
+      xr.addMessage();
     } finally {
       System.setErr(errPS);
     }
