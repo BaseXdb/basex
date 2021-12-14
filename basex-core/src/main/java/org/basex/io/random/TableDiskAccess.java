@@ -363,8 +363,8 @@ public final class TableDiskAccess extends TableAccess {
 
     // number of new required pages and remaining bytes
     final int req = all.length - nrem;
-    int needed = req / IO.BLOCKSIZE;
-    final int remain = req % IO.BLOCKSIZE;
+    int needed = req >>> IO.BLOCKPOWER;
+    final int remain = req & IO.BLOCKSIZE - 1;
 
     if(remain > 0) {
       // check if the last entries can fit in the page after the current one
@@ -528,7 +528,7 @@ public final class TableDiskAccess extends TableAccess {
       if(pre >= pages) {
         pages = pre + 1;
       } else {
-        file.seek(buffer.pos * IO.BLOCKSIZE);
+        file.seek(buffer.pos << IO.BLOCKPOWER);
         file.readFully(buffer.data);
       }
     } catch(final IOException ex) {
@@ -544,7 +544,7 @@ public final class TableDiskAccess extends TableAccess {
   private void write(final Buffer buffer) throws IOException {
     if(!buffer.dirty) return;
 
-    file.seek(buffer.pos * IO.BLOCKSIZE);
+    file.seek(buffer.pos << IO.BLOCKPOWER);
     file.write(buffer.data);
     buffer.dirty = false;
   }

@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class TableMemBlock {
-  /** Table data, with two values for a single entry. */
+  /** Table data, with two values for one XML node. */
   private final long[] data = new long[IO.BLOCKSIZE << 1];
   /** First pre value. */
   int firstPre;
@@ -116,9 +116,9 @@ final class TableMemBlock {
     System.arraycopy(data, first << 1, longs, last << 1, copy << 1);
 
     /* redistribute entries evenly:
-     * 300 entries: 150 per block each
-     * 257 entries: 129 and 128 entries
-     * 514 entries: 172, 172 and 170 entries */
+     * 300 entries: 2 blocks with 150 entries each
+     * 301 entries: 2 blocks with 151 and 150 entries
+     * 514 entries: 3 blocks with 172, 172 and 170 entries */
     final int bs = blocks.size(), fill = (total + bs) / (bs + 1);
     final int total2 = total << 1, fill2 = fill << 1;
     // populate original block
