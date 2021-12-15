@@ -337,16 +337,18 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     final int l = stat.size();
     if(l == 0) return;
 
-    focus = -1;
+    int f = -1;
     if(e.getY() < h) {
       for(int i = 0; i < l; ++i) {
         final int bx = w - bw + bs * i;
-        if(e.getX() >= bx && e.getX() < bx + bs) focus = i;
+        if(e.getX() >= bx && e.getX() < bx + bs) f = i;
       }
     }
-
-    setTime(strings.get(focus == -1 ? l - 1 : focus).replace(LI, ""));
-    repaint();
+    if(f != focus) {
+      setTime(strings.get(f == -1 ? l - 1 : f).replace(LI, ""));
+      repaint();
+      focus = f;
+    }
   }
 
   @Override
@@ -405,15 +407,14 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
    * @param info info string with measured time;
    */
   private void setTime(final String info) {
+    final StringBuilder sb = new StringBuilder().append(info);
     final long ms = Long.parseLong(info.replaceAll("^.+: |\\..+", ""));
     if(ms >= 60000) {
-      // choose hh:mm:ss.mm format if time exceeds 1 minute
+      // append hh:mm:ss format if time exceeds 1 minute
       final long seconds = ms / 1000, minutes = seconds % 3600 / 60, hours = seconds / 3600;
-      final String frac = info.replaceAll("^.+\\.| ms.*", "");
-      final String time = String.format("%02d:%02d:%02d.%s", hours, minutes, seconds % 60, frac);
-      label.setText(info.replaceAll("\\d+\\.\\d+ ms", time.replaceAll("^00:", "")));
-    } else {
-      label.setText(info);
+      final String time = String.format("%02d:%02d:%02d", hours, minutes, seconds % 60);
+      sb.append(" (").append(time).append(')');
     }
+    label.setText(sb.toString());
   }
 }
