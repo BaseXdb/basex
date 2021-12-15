@@ -241,7 +241,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
 
   @Override
   public Iterator<XdmItem> iterator() {
-    return new Iterator<>() {
+    return new Iterator<XdmItem>() {
       private XdmItem next;
 
       @Override

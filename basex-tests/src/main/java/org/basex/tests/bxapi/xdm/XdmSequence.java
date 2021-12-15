@@ -37,7 +37,7 @@ final class XdmSequence extends XdmValue {
 
   @Override
   public Iterator<XdmItem> iterator() {
-    return new Iterator<>() {
+    return new Iterator<XdmItem>() {
       private final int ss = size();
       private int s;
 

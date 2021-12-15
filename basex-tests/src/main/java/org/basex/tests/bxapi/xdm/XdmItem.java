@@ -32,7 +32,7 @@ public abstract class XdmItem extends XdmValue {
 
   @Override
   public final Iterator<XdmItem> iterator() {
-    return new Iterator<>() {
+    return new Iterator<XdmItem>() {
       private boolean more = true;
 
       @Override
