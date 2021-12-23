@@ -1898,6 +1898,10 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1918() {
     check("(1, 1)", "1\n1", root(SingletonSeq.class));
     check("let $a := (<a/>, <a/>) return $a[1] is $a[2]", false, exists(_UTIL_REPLICATE));
+
+    // partial rewrites
+    check("1, 1, <a/>", "1\n1\n<a/>", exists(SingletonSeq.class));
+    check("<a/>, 1, 1", "<a/>\n1\n1", exists(SingletonSeq.class));
   }
 
   /** Switch expression: static and dynamic cases. */
@@ -1938,6 +1942,18 @@ public final class RewritingsTest extends QueryPlanTest {
     check("5 to 6, 7 to 8", "5\n6\n7\n8", root(RangeSeq.class));
     check("5 to 6, 8", "5\n6\n8", root(IntSeq.class));
     check("1, 3 to 4", "1\n3\n4", root(IntSeq.class));
+
+    // partial rewrites
+    check("<a/>, 0 to 1", "<a/>\n0\n1", exists(RangeSeq.class));
+    check("0 to 1, <a/>", "0\n1\n<a/>", exists(RangeSeq.class));
+    check("0 to 1, <a/>, 2 to 3", "0\n1\n<a/>\n2\n3", count(RangeSeq.class, 2));
+    check("0, 1, <a/>, 2, 3", "0\n1\n<a/>\n2\n3", count(RangeSeq.class, 2));
+    check("0, 1 to 2, <a/>, 2 to 3, 4", "0\n1\n2\n<a/>\n2\n3\n4",
+        count(RangeSeq.class, 2), empty(Int.class));
+    check("0 to 1, 2 to 3, <a/>", "0\n1\n2\n3\n<a/>", count(RangeSeq.class, 1));
+    check("0, reverse(1 to 2), <a/>", "0\n2\n1\n<a/>", count(RangeSeq.class, 1), exists(Int.class));
+    check("xs:byte(0), 1, 2, <a/>", "0\n1\n2\n<a/>", exists(RangeSeq.class));
+    check("1 to 2, 1 to 2, 3, <a/>", "1\n2\n1\n2\n3\n<a/>", count(RangeSeq.class, 2));
   }
 
   /** DDO property of recursive function. */
