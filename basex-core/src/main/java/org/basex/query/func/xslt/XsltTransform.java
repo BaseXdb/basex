@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.*;
 
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
