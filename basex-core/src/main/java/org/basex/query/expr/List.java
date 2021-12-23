@@ -62,25 +62,13 @@ public final class List extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     flatten(cc);
-
-    // remove empty sequences
-    final ExprList list = new ExprList(exprs.length);
-    for(final Expr expr : exprs) {
-      if(expr == Empty.VALUE) {
-        cc.info(OPTREMOVE_X_X, Empty.VALUE, (Supplier<?>) this::description);
-      } else {
-        list.add(expr);
-      }
-    }
-    exprs = list.finish();
+    removeEmpty(cc);
+    toRange(cc);
+    toReplicate(cc);
 
     final int el = exprs.length;
-    if(el == 0) return Empty.VALUE;
-
-    // rewrite identical expressions to util:replicate
-    int e = 0;
-    while(++e < el && exprs[e].equals(exprs[0]));
-    if(e == el) return el == 1 ? exprs[0] : cc.replicate(exprs[0], Int.get(el), info);
+    if(el == 0) return cc.emptySeq(this);
+    if(el == 1) return exprs[0];
 
     // determine result type, compute number of results, set expression type
     final SeqType st = SeqType.union(exprs, false);
@@ -95,10 +83,6 @@ public final class List extends Arr {
 
     // pre-evaluate list; skip expressions with large result sizes
     if(allAreValues(true)) {
-      // rewrite to range sequence: 1, 2, 3  ->  1 to 3
-      final Expr range = toRange();
-      if(range != null) return cc.replaceWith(this, range);
-
       Type tp = null;
       final Value[] values = new Value[el];
       int vl = 0;
@@ -124,29 +108,87 @@ public final class List extends Arr {
   }
 
   /**
-   * Tries to rewrite the list to a range sequence.
-   * @return rewritten expression or {@code null}
+   * Removes empty expressions.
+   * @param cc compilation context
    */
-  private Expr toRange() {
-    Long start = null, end = null;
+  private void removeEmpty(final CompileContext cc) {
+    if(!((Checks<Expr>) expr -> expr == Empty.VALUE).any(exprs)) return;
+
+    final ExprList list = new ExprList(exprs.length - 1);
     for(final Expr expr : exprs) {
-      long s, e;
-      if(expr instanceof Int && expr.seqType().type == AtomType.INTEGER) {
-        s = ((Int) expr).itr();
-        e = s + 1;
-      } else if(expr instanceof RangeSeq) {
-        final long[] range = ((RangeSeq) expr).range(true);
-        s = range[0];
-        e = range[1] + 1;
-        if(e <= s) return null;
-      } else {
-        return null;
-      }
-      if(start == null) start = s;
-      else if(end != s) return null;
-      end = e;
+      if(expr != Empty.VALUE) list.add(expr);
     }
-    return RangeSeq.get(start, end - start, true);
+    cc.info(OPTREMOVE_X_X, Empty.VALUE, (Supplier<?>) this::description);
+    exprs = list.finish();
+  }
+
+  /**
+   * Tries to rewrite identical expressions to util:replicate.
+   * @param cc compilation context
+   * @throws QueryException query exception
+   */
+  private void toReplicate(final CompileContext cc) throws QueryException {
+    final int el = exprs.length;
+    final ExprList list = new ExprList(el);
+    int s = 0, e = 0;
+    while(++e <= el) {
+      if(e == el || !exprs[e].equals(exprs[s])) {
+        if(e - s > 1) {
+          list.add(cc.replicate(exprs[s], Int.get(e - s), info));
+          cc.info(OPTMERGE_X, list.peek());
+        } else {
+          while(s < e) list.add(exprs[s++]);
+        }
+        s = e;
+      }
+    }
+    exprs = list.finish();
+  }
+
+  /**
+   * Tries to rewrite consecutive integers to range sequences.
+   * @param cc compilation context
+   */
+  private void toRange(final CompileContext cc) {
+    if(!((Checks<Expr>) expr -> expr instanceof Int || expr instanceof RangeSeq).any(exprs)) return;
+
+    long[] range = null;
+    final int el = exprs.length;
+    final ExprList list = new ExprList(el);
+    for(int e = 0; e <= el; e++) {
+      final Expr expr = e < el ? exprs[e] : null;
+      long[] rng = null;
+      if(expr instanceof Int && expr.seqType().type == AtomType.INTEGER) {
+        final long l = ((Int) expr).itr();
+        rng = new long[] { l, l };
+      } else if(expr instanceof RangeSeq) {
+        rng = ((RangeSeq) expr).range(true);
+        if(rng[1] < rng[0]) rng = null;
+      }
+      boolean add = rng == null;
+      if(!add) {
+        if(range == null) {
+          // start new range: 1 - 2
+          range = rng;
+        } else if(rng[0] == range[1] + 1) {
+          // extend range: 1 - 2, 3 - 4  ->  1 - 4
+          range[1] = rng[1];
+        } else {
+          // finalize existing range
+          add = true;
+        }
+      }
+      if(add) {
+        if(range != null) {
+          final long s = range[1] - range[0] + 1;
+          list.add(RangeSeq.get(range[0], s, true));
+          if(s > 1) cc.info(OPTMERGE_X, list.peek());
+          range = rng;
+        }
+        if(range == null && expr != null) list.add(expr);
+      }
+    }
+    exprs = list.finish();
   }
 
   @Override
