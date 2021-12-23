@@ -20,7 +20,7 @@ public final class RESTDelete {
     System.out.println("=== DELETE: delete a document or database ===");
 
     // The java URL connection to the resource
-    URL url = new URL("http://admin:admin@localhost:8984/rest/factbook/input.xml");
+    URL url = new URL("http://admin:admin@localhost:8080/rest/factbook/input.xml");
     System.out.println("\n* URL: " + url);
 
     // Establish the connection to the URL
@@ -33,7 +33,7 @@ public final class RESTDelete {
         " (" + conn.getResponseMessage() + ')');
 
     // The java URL connection to the resource
-    url = new URL("http://admin:admin@localhost:8984/rest/factbook");
+    url = new URL("http://admin:admin@localhost:8080/rest/factbook");
     System.out.println("\n* URL: " + url);
 
     // Establish the connection to the URL

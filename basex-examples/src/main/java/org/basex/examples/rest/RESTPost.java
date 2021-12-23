@@ -20,7 +20,7 @@ public final class RESTPost {
     System.out.println("=== POST: execute a query ===");
 
     // The java URL connection to the resource
-    URL url = new URL("http://admin:admin@localhost:8984/rest/factbook");
+    URL url = new URL("http://admin:admin@localhost:8080/rest/factbook");
     System.out.println("\n* URL: " + url);
 
     // Query to be sent to the server

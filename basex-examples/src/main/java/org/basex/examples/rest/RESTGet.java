@@ -20,7 +20,7 @@ public final class RESTGet {
     System.out.println("=== GET: execute a query ===");
 
     // The java URL connection to the resource
-    String base = "http://localhost:8984/rest/";
+    String base = "http://localhost:8080/rest/";
 
     URL url = new URL(base + "factbook?query=(//city/name)[position()=1+to+5]");
     System.out.println("\n* URL: " + url);

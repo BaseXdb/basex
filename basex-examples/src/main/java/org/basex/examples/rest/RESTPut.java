@@ -20,7 +20,7 @@ public final class RESTPut {
     System.out.println("=== PUT: create a new database ===");
 
     // The java URL connection to the resource
-    URL url = new URL("http://admin:admin@localhost:8984/rest/factbook");
+    URL url = new URL("http://admin:admin@localhost:8080/rest/factbook");
     System.out.println("\n* URL: " + url);
 
     // Establish the connection to the URL
