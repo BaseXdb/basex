@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Delete primitive.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Lukas Kircher
  */
 public final class DeleteNode extends NodeUpdate {

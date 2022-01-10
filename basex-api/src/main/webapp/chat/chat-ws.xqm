@@ -1,6 +1,6 @@
 (:~
  : Simple WebSocket chat. WebSocket functions.
- : @author BaseX Team 2005-21, BSD License
+ : @author BaseX Team 2005-22, BSD License
  :)
 module namespace chat-ws = 'chat-ws';
 

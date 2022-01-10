@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Transform expression.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class TransformWith extends Copy {

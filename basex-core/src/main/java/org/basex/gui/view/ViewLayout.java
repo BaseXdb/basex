@@ -7,7 +7,7 @@ import org.basex.gui.layout.*;
 /**
  * Layout class.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 final class ViewLayout implements ViewComponent {

@@ -4,7 +4,7 @@
 '
 ' Documentation: https://docs.basex.org/wiki/Clients
 '
-' (C) BaseX Team 2005-21, BSD License
+' (C) BaseX Team 2005-22, BSD License
 
 Imports System
 Imports System.Net.Sockets

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests the functions of the Index Module.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Andreas Weiler
  */
 public final class IndexModuleTest extends SandboxTest {

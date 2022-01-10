@@ -9,7 +9,7 @@ import org.basex.util.*;
  * It extends the {@link IntSet} class. All values except for {@link Integer#MIN_VALUE}
  * can be stored as values.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class IntMap extends IntSet {

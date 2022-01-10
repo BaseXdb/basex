@@ -9,7 +9,7 @@ import com.bradmcevoy.http.*;
  * the source was integrated into BaseX.
  *
  * @author Milton Development Team
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */

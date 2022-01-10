@@ -8,7 +8,7 @@ import org.basex.io.*;
 /**
  * This class allows a blockwise output of the database table.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */

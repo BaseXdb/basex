@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Evaluates the 'open' command and opens a database.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class Open extends Command {

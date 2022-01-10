@@ -12,7 +12,7 @@ import javax.xml.xquery.*;
  *
  * Part 3: Binding Java variables to XQuery.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  */
 public final class Part3 extends Main {
   /** Default ISBN number. */

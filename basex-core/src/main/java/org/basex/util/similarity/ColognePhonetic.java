@@ -12,7 +12,7 @@ import org.basex.util.list.*;
  * <p>The implementation has been inspired by the Apache Commons Codec algorithms
  * (http://commons.apache.org/proper/commons-codec/).</p>
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class ColognePhonetic {

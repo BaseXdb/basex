@@ -12,7 +12,7 @@ import org.junit.jupiter.api.*;
 /**
  * Locking tests.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Jens Erat
  */
 public final class LockingTest extends SandboxTest {

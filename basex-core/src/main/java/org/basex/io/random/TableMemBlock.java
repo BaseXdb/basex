@@ -10,7 +10,7 @@ import org.basex.util.list.*;
  * Organizes a single main memory table block.
  * All table entries are stored in arrays
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 final class TableMemBlock {

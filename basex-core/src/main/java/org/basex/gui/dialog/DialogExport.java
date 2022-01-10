@@ -13,7 +13,7 @@ import org.basex.io.*;
 /**
  * Dialog window for changing some project's preferences.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class DialogExport extends BaseXDialog {

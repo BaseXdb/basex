@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * Bit array that grows when needed. The implementation is similar to {@link BitSet}.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Dimitar Popov
  */
 public final class BitArray {

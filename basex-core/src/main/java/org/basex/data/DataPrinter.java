@@ -9,7 +9,7 @@ import org.basex.util.list.*;
 /**
  * Serializes the database table to a string representation.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class DataPrinter {

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the embedded HTTP Client.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Rositsa Shadura
  */
 public final class ServerFnHttpTest extends FnHttpTest {

@@ -3,7 +3,7 @@ package org.basex.query;
 /**
  * Function that supplied results.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  * @param <T> the type of results supplied by this supplier
  */

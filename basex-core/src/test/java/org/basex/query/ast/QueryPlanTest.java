@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Abstract test class for properties on the Query Plan.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Leo Woerteler
  */
 public abstract class QueryPlanTest extends SandboxTest {

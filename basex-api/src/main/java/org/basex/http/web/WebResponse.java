@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * This abstract class defines common methods of Web responses.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public abstract class WebResponse {

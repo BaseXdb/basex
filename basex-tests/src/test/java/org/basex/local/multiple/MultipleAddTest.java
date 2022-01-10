@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class performs local stress tests with a specified number of threads and queries.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class MultipleAddTest extends SandboxTest {

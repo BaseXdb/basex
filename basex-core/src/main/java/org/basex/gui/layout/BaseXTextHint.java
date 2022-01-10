@@ -11,7 +11,7 @@ import org.basex.gui.*;
  * Displays a text hint on empty text fields.
  * Inspired by {@code http://tips4java.wordpress.com/2009/11/29/text-prompt/}.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 final class BaseXTextHint extends JLabel implements DocumentListener {

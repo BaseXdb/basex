@@ -16,7 +16,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 /**
  * This class tests the update features of the {@link Data} class.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Tim Petrowsky
  */
 //@RunWith(Parameterized.class)

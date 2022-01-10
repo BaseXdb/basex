@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
 /**
  * Data builder. Provides methods for copying XML nodes into a main-memory database instance.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class DataBuilder {

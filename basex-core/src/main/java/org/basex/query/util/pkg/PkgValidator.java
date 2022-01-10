@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Package validator. This class executes some essential checks before installing a new package.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Rositsa Shadura
  */
 public final class PkgValidator {

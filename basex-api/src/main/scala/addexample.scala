@@ -4,7 +4,7 @@ import java.io._
  * This example shows how documents can be added to databases.
  * Documentation: https://docs.basex.org/wiki/Clients
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  */
 object addexample {
   /**

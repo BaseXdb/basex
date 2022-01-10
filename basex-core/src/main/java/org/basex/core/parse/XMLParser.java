@@ -22,7 +22,7 @@ import org.basex.util.list.*;
 /**
  * This is a parser for XML input, creating {@link Command} instances.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 final class XMLParser extends CommandParser {

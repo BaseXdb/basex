@@ -10,7 +10,7 @@ import org.basex.util.*;
  * This class allows main memory access to the database table representation.
  * All table entries are stored in arrays
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class TableMemAccess extends TableAccess {

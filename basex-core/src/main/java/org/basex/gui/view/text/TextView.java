@@ -27,7 +27,7 @@ import org.basex.util.*;
 /**
  * This class offers a fast text view, using the {@link TextPanel} class.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class TextView extends View {

@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Node constructor.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public abstract class CNode extends Arr {

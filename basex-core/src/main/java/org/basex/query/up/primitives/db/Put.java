@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 /**
  * Fn:put operation primitive.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Lukas Kircher
  */
 public final class Put extends DBUpdate {

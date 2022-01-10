@@ -1,7 +1,7 @@
 (:~
  : Logging page.
  :
- : @author Christian Grün, BaseX Team 2005-21, BSD License
+ : @author Christian Grün, BaseX Team 2005-22, BSD License
  :)
 module namespace dba = 'dba/logs';
 

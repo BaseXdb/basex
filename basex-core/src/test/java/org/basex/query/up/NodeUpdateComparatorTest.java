@@ -17,7 +17,7 @@ import org.junit.jupiter.api.*;
  * Tests {@link NodeUpdateComparator} that creates an order on update primitives
  * and is part of the XQuery Update Facility implementation.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Lukas Kircher
  */
 public final class NodeUpdateComparatorTest extends SandboxTest {

@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * <p>This class converts CSV input to XML.</p>
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public abstract class CsvConverter extends Job {

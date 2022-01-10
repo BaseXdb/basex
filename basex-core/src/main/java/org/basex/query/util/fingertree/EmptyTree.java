@@ -6,7 +6,7 @@ import org.basex.util.*;
 /**
  * An empty finger tree.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Leo Woerteler
  *
  * @param <N> node type

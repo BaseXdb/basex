@@ -9,7 +9,7 @@ import org.basex.util.*;
  * This is an efficient and memory-saving hash map for storing primitive integers
  * and objects. It extends the {@link IntSet} class.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  * @param <E> generic value type
  */

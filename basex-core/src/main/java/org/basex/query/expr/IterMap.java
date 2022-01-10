@@ -12,7 +12,7 @@ import org.basex.util.hash.*;
 /**
  * Simple map expression: iterative evaluation, no positional access.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class IterMap extends SimpleMap {
