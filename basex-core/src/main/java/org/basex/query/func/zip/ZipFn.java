@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
 /**
  * Functions on zip files.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 abstract class ZipFn extends StandardFunc {

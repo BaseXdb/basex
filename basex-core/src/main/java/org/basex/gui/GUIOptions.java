@@ -16,7 +16,7 @@ import org.basex.util.options.*;
  * This class contains options which are used in the GUI.
  * They are also stored in the project's home directory.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class GUIOptions extends Options {

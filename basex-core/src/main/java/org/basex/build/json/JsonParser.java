@@ -14,7 +14,7 @@ import org.basex.io.parse.json.*;
  * <p>The parser provides some options, which can be specified via the
  * {@link MainOptions#JSONPARSER} option.</p>
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class JsonParser extends XMLParser {

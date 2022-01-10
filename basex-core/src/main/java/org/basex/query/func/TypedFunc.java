@@ -6,7 +6,7 @@ import org.basex.query.util.list.*;
 /**
  * Wrapper that provides types for function expressions.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Leo Woerteler
  */
 final class TypedFunc {

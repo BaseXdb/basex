@@ -11,7 +11,7 @@ import org.junit.jupiter.api.*;
 /**
  * Class for testing the {@link Compress} methods.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class InlineTest extends SandboxTest {

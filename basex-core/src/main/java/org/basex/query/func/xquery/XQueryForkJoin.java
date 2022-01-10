@@ -18,7 +18,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author James Wright
  */
 public final class XQueryForkJoin extends StandardFunc {

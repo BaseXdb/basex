@@ -9,7 +9,7 @@ import org.basex.util.list.*;
 /**
  * List of annotations.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class AnnList extends ObjectList<Ann, AnnList> {

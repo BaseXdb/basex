@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * JTree node which represents a folder.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Lukas Kircher
  */
 public class ResourceFolder extends ResourceNode {

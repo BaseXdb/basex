@@ -3,7 +3,7 @@ package org.basex.query.util.pkg;
 /**
  * Package type.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public enum PkgType {

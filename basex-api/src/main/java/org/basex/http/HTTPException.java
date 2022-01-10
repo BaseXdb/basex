@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * HTTP exception. Also thrown to pass on correct status codes.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class HTTPException extends IOException {

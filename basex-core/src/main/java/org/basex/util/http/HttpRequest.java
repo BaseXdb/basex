@@ -10,7 +10,7 @@ import org.basex.query.util.list.*;
 /**
  * Container for parsed data from {@code <http:request/>}.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Rositsa Shadura
  */
 public final class HttpRequest {
@@ -50,7 +50,7 @@ public final class HttpRequest {
 
   /**
    * Container for parsed data from "part" element.
-   * @author BaseX Team 2005-21, BSD License
+   * @author BaseX Team 2005-22, BSD License
    * @author Rositsa Shadura
    */
   public static class Part {

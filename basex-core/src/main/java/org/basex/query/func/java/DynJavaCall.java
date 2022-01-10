@@ -18,7 +18,7 @@ import org.basex.util.Array;
 /**
  * Dynamic invocation of a Java constructor, field or method.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 abstract class DynJavaCall extends JavaCall {

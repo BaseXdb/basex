@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Caches values and ids for update operations.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class ValueCache implements Iterable<byte[]> {

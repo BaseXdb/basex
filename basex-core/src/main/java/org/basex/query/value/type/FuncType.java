@@ -17,7 +17,7 @@ import org.basex.util.similarity.*;
 /**
  * XQuery 3.0 function types.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Leo Woerteler
  */
 public class FuncType implements Type {

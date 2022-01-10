@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Sequence of items, which are stored in their primitive/native representation.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 abstract class NativeSeq extends Seq {

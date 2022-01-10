@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * FLWOR {@code for}/{@code let} clause.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 abstract class ForLet extends Clause {

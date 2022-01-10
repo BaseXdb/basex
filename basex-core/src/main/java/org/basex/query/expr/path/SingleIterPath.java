@@ -12,7 +12,7 @@ import org.basex.util.hash.*;
  * Simple iterative path expression with no root expression and a single step without
  * positional access.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class SingleIterPath extends AxisPath {

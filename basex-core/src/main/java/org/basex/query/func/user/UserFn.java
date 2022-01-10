@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 abstract class UserFn extends StandardFunc {

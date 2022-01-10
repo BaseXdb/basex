@@ -12,7 +12,7 @@ import org.junit.jupiter.api.*;
 /**
  * This test contains RESTXQ methods.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class RestXqMethodTest extends RestXqTest {

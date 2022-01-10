@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * Document test for inverted location paths.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 final class InvDocTest extends Test {

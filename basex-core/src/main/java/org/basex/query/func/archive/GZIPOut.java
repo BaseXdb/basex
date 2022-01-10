@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * GZIP output.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 final class GZIPOut extends ArchiveOut {

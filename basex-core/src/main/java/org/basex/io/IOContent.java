@@ -9,7 +9,7 @@ import org.xml.sax.*;
 /**
  * {@link IO} reference, representing a byte array.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class IOContent extends IO {

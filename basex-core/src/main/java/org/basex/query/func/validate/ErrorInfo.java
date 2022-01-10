@@ -7,7 +7,7 @@ import org.xml.sax.*;
 /**
  * Error info.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 final class ErrorInfo {

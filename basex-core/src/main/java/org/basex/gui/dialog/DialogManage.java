@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 /**
  * Open database dialog.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class DialogManage extends BaseXDialog {

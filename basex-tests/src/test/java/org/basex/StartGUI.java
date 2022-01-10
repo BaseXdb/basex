@@ -2,7 +2,7 @@ package org.basex;
 /**
  * GUI start class, which includes all module libraries for convenient testing.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class StartGUI {

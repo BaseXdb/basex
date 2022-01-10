@@ -7,7 +7,7 @@ import org.basex.core.cmd.*;
 /**
  * This example demonstrates a simple filesystem parser.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class SimpleFSExample {

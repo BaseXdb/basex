@@ -13,7 +13,7 @@ import org.basex.util.list.*;
  * <p>In order to ensure a consistent representation of tokens in the project, all string
  * conversions should be done via the methods of this class.</p>
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class Token {

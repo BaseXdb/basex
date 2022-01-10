@@ -6,7 +6,7 @@ import org.w3c.dom.*;
 /**
  * DOM - CData implementation.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 final class BXCData extends BXText implements CDATASection {

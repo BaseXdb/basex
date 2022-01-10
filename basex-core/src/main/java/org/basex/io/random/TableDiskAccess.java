@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * This class stores the table on disk and reads it page-wise.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */

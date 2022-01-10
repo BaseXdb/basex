@@ -11,7 +11,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the Repository Module.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Rositsa Shadura
  */
 public final class RepoModuleTest extends SandboxTest {

@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.*;
 /**
  * Tests for {@code id} and {@code idref}.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Jens Erat
  */
 public final class IdIdrefTest extends QueryTest {

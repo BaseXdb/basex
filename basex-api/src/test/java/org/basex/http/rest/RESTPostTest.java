@@ -11,7 +11,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the embedded REST API and the POST method.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class RESTPostTest extends RESTTest {

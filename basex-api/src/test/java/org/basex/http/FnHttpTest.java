@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests the server-based HTTP Client.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Rositsa Shadura
  */
 public class FnHttpTest extends HTTPTest {
@@ -865,7 +865,7 @@ public class FnHttpTest extends HTTPTest {
 
 /**
  * Fake HTTP connection.
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Rositsa Shadura
  */
 final class FakeHttpConnection extends HttpURLConnection {

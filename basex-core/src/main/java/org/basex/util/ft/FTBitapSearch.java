@@ -11,7 +11,7 @@ import org.basex.util.list.*;
  * based on the implementation in Wikipedia, but uses {@link BitSet} for fast bit operation. This
  * version works with a set of needles and each one of it can be matched in the haystack.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Dimitar Popov
  * @see <a href="http://en.wikipedia.org/wiki/Bitap_algorithm"
  *      >http://en.wikipedia.org/wiki/Bitap_algorithm</a>
@@ -127,7 +127,7 @@ public final class FTBitapSearch {
   /**
    * Token comparator.
    *
-   * @author BaseX Team 2005-21, BSD License
+   * @author BaseX Team 2005-22, BSD License
    * @author Dimitar Popov
    */
   public interface TokenComparator {

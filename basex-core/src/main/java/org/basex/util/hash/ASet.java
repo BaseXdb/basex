@@ -8,7 +8,7 @@ import org.basex.util.*;
  * This is the basic structure of an efficient and memory-saving hash set.
  * The first entry of the token set (offset 0) will always be kept empty.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public abstract class ASet {

@@ -5,7 +5,7 @@ import org.basex.util.options.*;
 /**
  * Options for serializing JSON documents.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class JsonSerialOptions extends JsonOptions {

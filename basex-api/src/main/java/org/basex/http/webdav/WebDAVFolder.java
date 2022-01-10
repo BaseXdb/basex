@@ -14,7 +14,7 @@ import com.bradmcevoy.http.exceptions.*;
 /**
  * WebDAV resource representing a folder within a collection database.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */

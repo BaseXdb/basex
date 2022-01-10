@@ -1,4 +1,4 @@
-/* Copyright (c) 2005-21, Alexander Holupirek <alex@holupirek.de>, BSD license */
+/* Copyright (c) 2005-22, Alexander Holupirek <alex@holupirek.de>, BSD license */
 #include <err.h>
 #include <openssl/evp.h>
 #include <openssl/md5.h>

@@ -6,7 +6,7 @@ import org.basex.util.list.*;
 /**
  * This interface provides methods for returning index results.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public abstract class FTIndexIterator implements IndexIterator {

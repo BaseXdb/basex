@@ -7,7 +7,7 @@ import org.basex.core.jobs.*;
  * Interruptible string implementation.
  * Inspired by https://stackoverflow.com/questions/910740/cancelling-a-long-running-regex-match
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  * @author gojomo
  */

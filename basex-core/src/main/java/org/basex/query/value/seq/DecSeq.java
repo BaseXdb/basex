@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Sequence of items of type {@link Int xs:decimal}, containing at least two of them.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class DecSeq extends NativeSeq {

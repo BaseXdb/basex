@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Performs bulk updates with standalone version.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Lukas Kircher
  */
 public final class XQUFStressTest extends SandboxTest {

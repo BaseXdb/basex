@@ -22,7 +22,7 @@ import org.basex.util.list.*;
 /**
  * This index class retrieves numeric ranges from a value index.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class RangeAccess extends IndexAccess {

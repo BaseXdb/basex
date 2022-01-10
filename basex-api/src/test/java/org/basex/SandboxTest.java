@@ -6,7 +6,7 @@ import org.junit.jupiter.api.*;
 /**
  * If this class is extended, tests will be run in a sandbox.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public abstract class SandboxTest extends Sandbox {

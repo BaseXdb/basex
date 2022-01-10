@@ -18,7 +18,7 @@ import org.basex.util.*;
 /**
  * Function item, wrapping a Java object.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class XQJava extends FItem {

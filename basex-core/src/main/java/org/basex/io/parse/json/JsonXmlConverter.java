@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * This class provides a parse method to convert JSON data to XML nodes.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 abstract class JsonXmlConverter extends JsonConverter {

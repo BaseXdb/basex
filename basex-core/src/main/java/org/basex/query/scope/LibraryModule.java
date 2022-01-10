@@ -9,7 +9,7 @@ import org.basex.util.hash.*;
 /**
  * An XQuery library module.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Leo Woerteler
  */
 public final class LibraryModule extends AModule {

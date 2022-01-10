@@ -11,7 +11,7 @@ import javax.xml.xquery.*;
  *
  * Part 2: Executing XQuery in Java.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  */
 public final class Part2 extends Main {
   /**

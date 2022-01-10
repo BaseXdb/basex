@@ -20,7 +20,7 @@ import org.eclipse.jetty.websocket.api.*;
 /**
  * Creates WebSocket responses.
  *
- * @author BaseX Team 2005-21, BSD License
+ * @author BaseX Team 2005-22, BSD License
  * @author Johannes Finckh
  */
 public final class WsResponse extends WebResponse {
