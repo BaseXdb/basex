@@ -114,9 +114,9 @@ function dba:database(
                 }
               }
             let $buttons := (
-              html:button('backup-create', 'Create', false(), map { 'class': 'global' }) update (
+              html:button('backup-create', 'Create', false(), map { 'class': 'global' }) update {
                 if($db-exists) then () else insert node attribute disabled { '' } into .
-              ),
+              },
               html:button('backup-restore', 'Restore', true()),
               html:button('backup-drop', 'Drop', true())
             )

@@ -86,7 +86,7 @@ function dba:db-replace-post(
       let $input := if(db:is-raw($name, $resource)) then (
         $file($key)
       ) else (
-        fetch:xml-binary($file($key))
+        fetch:binary-doc($file($key))
       )
       return db:replace($name, $resource, $input),
       util:redirect($dba:SUB, map {

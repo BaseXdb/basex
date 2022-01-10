@@ -123,7 +123,7 @@ function dba:db-add-post(
       return if($binary) then (
         db:store($name, $path, $input)
       ) else (
-        db:add($name, fetch:xml-binary($input), $path, map:merge(
+        db:add($name, fetch:binary-doc($input), $path, map:merge(
           ('intparse', 'dtd', 'stripns', 'chop', 'xinclude') ! map:entry(., $opts = .))
         )
       ),

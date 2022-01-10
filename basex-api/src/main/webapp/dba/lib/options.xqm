@@ -48,7 +48,7 @@ declare %basex:lazy %private variable $options:OPTIONS := (
   if(file:exists($options:FILE)) then (
     try {
       (: merge defaults with saved options :)
-      let $options := fetch:xml($options:FILE)/options
+      let $options := fetch:doc($options:FILE)/options
       return map:merge(
         map:for-each($options:DEFAULTS, function($key, $value) {
           map:entry($key,
