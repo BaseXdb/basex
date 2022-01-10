@@ -41,7 +41,7 @@ function dba:sessions(
             map { 'key': 'id', 'label': 'ID', 'type': 'id' },
             map { 'key': 'name', 'label': 'Name' },
             map { 'key': 'value', 'label': 'Value' },
-            map { 'key': 'access', 'label': 'Last Access', 'type': 'dateTime', 'order': 'desc' },
+            map { 'key': 'access', 'label': 'Last Access', 'type': 'time', 'order': 'desc' },
             map { 'key': 'you', 'label': 'You' }
           )
           let $entries :=

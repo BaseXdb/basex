@@ -46,7 +46,8 @@ function dba:jobs(
             map { 'key': 'duration', 'label': 'Dur.', 'type': 'number', 'order': 'desc' },
             map { 'key': 'user', 'label': 'User' },
             map { 'key': 'you', 'label': 'You' },
-            map { 'key': 'time', 'label': 'Time', 'type': 'dateTime', 'order': 'desc' }
+            map { 'key': 'time', 'label': 'Time', 'type': 'time', 'order': 'desc' },
+            map { 'key': 'start', 'label': 'Start', 'type': 'time', 'order': 'desc' }
           )
           let $entries :=
             let $curr := jobs:current()
@@ -56,7 +57,9 @@ function dba:jobs(
               let $dur := xs:dayTimeDuration($details/@duration)
               return if(exists($dur)) then $dur div xs:dayTimeDuration('PT1S') else 0
             )
-            order by $sec descending, $details/@start descending
+            let $time := data($details/@time)
+            let $start := data($details/@start)
+            order by $sec descending, $start descending
             return map {
               'id': $id,
               'type': $details/@type,
@@ -64,7 +67,8 @@ function dba:jobs(
               'duration': html:duration($sec),
               'user': $details/@user,
               'you': if($id = $curr) then '✓' else '–',
-              'time': $details/@time
+              'time': $time,
+              'start': $start ?: $time
             }
           let $buttons := (
             html:button('job-stop', 'Stop', true())

@@ -273,7 +273,7 @@ declare function html:properties(
  :     * 'number': sorted as numbers
  :     * 'decimal': sorted as numbers, output with two decimal digits
  :     * 'bytes': sorted as numbers, output in a human-readable format
- :     * 'date', 'dateTime', 'time': sorted and output as dates
+ :     * dateTime', 'time': sorted and output as dates
  :     * 'dynamic': function generating dynamic input; sorted as strings
  :     * 'id': suppressed (only used for creating checkboxes)
  :     * otherwise, sorted and output as strings
@@ -329,15 +329,7 @@ declare function html:table(
             if($desc)
             then function($v) { 0 - number($v) }
             else function($v) { number($v) }
-          case 'time' return
-            if($desc)
-            then function($v) { xs:time('00:00:00') - xs:time($v) }
-            else function($v) { $v }
-          case 'date' return
-            if($desc)
-            then function($v) { xs:date('0001-01-01') - xs:date($v) }
-            else function($v) { $v }
-          case 'dateTime' return
+          case 'time' case 'dateTime' return
             if($desc)
             then function($v) { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime($v) }
             else function($v) { $v }
@@ -440,6 +432,8 @@ declare function html:table(
             format-number(if(exists($v)) then number($v) else 0, '0.00')
           ) else if($type = 'dateTime') then (
             html:date(xs:dateTime($v))
+          ) else if($type = 'time') then (
+            html:time(xs:dateTime($v))
           ) else if($v instance of function(*)) then (
             $v()
           ) else (
@@ -507,16 +501,39 @@ declare function html:link(
 };
 
 (:~
- : Formats a date.
+ : Returns a formatted representation of a dateTime value.
  : @param  $date  date
  : @return string
  :)
 declare function html:date(
   $date  as xs:dateTime
 ) as xs:string {
+  format-dateTime(html:adjust($date), '[Y0000]-[M00]-[D00], [H00]:[m00]:[s00]')
+};
+
+(:~
+ : Returns a formatted time representation of a dateTime value with tooltip.
+ : @param  $date  date
+ : @return element with tooltip
+ :)
+declare function html:time(
+  $date  as xs:dateTime
+) as element(span) {
+  let $adjusted := html:adjust($date)
+  let $formatted := format-dateTime(html:adjust($date), '[H00]:[m00]:[s00]')
+  return <span title='{ $adjusted }'>{ $formatted }</span>
+};
+
+(:~
+ : Returns a dateTime value adjusted to the current time zone.
+ : @param  $date  date
+ : @return adjusted value
+ :)
+declare function html:adjust(
+  $date  as xs:dateTime
+) as xs:dateTime {
   let $zone := timezone-from-dateTime(current-dateTime())
-  let $dt := fn:adjust-dateTime-to-timezone(xs:dateTime($date), $zone)
-  return format-dateTime($dt, '[Y0000]-[M00]-[D00], [H00]:[m00]:[s00]')
+  return fn:adjust-dateTime-to-timezone(xs:dateTime($date), $zone)
 };
 
 (:~
