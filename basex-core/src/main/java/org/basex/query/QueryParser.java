@@ -40,6 +40,7 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
@@ -658,15 +659,10 @@ public class QueryParser extends InputParser {
       wsCheck(ELEMENT);
       wsCheck(NAMESPACE);
     }
-    byte[] ns = stringLiteral();
-    if(pref != null && ns.length == 0) throw error(NSEMPTY);
-    if(!Uri.uri(ns).isValid()) throw error(INVURI_X, ns);
-    if(wsConsumeWs(AT)) {
-      do {
-        ns = stringLiteral();
-        if(!Uri.uri(ns).isValid()) throw error(INVURI_X, ns);
-      } while(wsConsumeWs(COMMA));
-    }
+    final byte[] uri = stringLiteral();
+    if(pref != null && uri.length == 0) throw error(NSEMPTY);
+    if(!Uri.uri(uri).isValid()) throw error(INVURI_X, uri);
+    addLocations(new TokenList());
     throw error(IMPLSCHEMA);
   }
 
@@ -684,7 +680,7 @@ public class QueryParser extends InputParser {
     final byte[] uri = trim(stringLiteral());
     if(uri.length == 0) throw error(NSMODURI);
     if(!Uri.uri(uri).isValid()) throw error(INVURI_X, uri);
-    if(modules.contains(uri)) throw error(DUPLMODULE_X, uri);
+    if(modules.contains(token(uri))) throw error(DUPLMODULE_X, uri);
     modules.add(uri);
 
     // add non-default namespace
@@ -700,13 +696,30 @@ public class QueryParser extends InputParser {
     mods.add(mi);
 
     // check modules at specified locations
-    if(wsConsumeWs(AT)) {
-      do mi.paths.add(stringLiteral()); while(wsConsumeWs(COMMA));
-    } else {
+    if(!addLocations(mi.paths)) {
       // check module files that have been pre-declared by a test API
       final byte[] path = qc.modDeclared.get(uri);
       if(path != null) mi.paths.add(path);
     }
+  }
+
+  /**
+   * Adds locations.
+   * @param list list of locations
+   * @return if locations were added
+   * @throws QueryException query exception
+   */
+  private boolean addLocations(final TokenList list) throws QueryException {
+    final boolean add = wsConsumeWs(AT);
+    if(add) {
+      do {
+        final byte[] uri = stringLiteral();
+        if(!Uri.uri(uri).isValid() || IO.get(string(uri)) instanceof IOContent)
+          throw error(INVURI_X, uri);
+        list.add(uri);
+      } while(wsConsumeWs(COMMA));
+    }
+    return add;
   }
 
   /**
