@@ -449,6 +449,11 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" (1, <a/>)"), 1, root(Int.class));
     check(func.args(" (1 to 2, <a/>)"), 1, root(Int.class));
     check(func.args(" (<a/>[. = ''], 1)"), "<a/>", root(_UTIL_OR));
+
+    check(func.args(" (<a/>[. = ''], <b/>, <c/>)"), "<a/>", root(_UTIL_OR));
+    check(func.args(" (<a/>[. = ''], <b/>[. = ''])"), "<a/>", root(_UTIL_OR));
+    check(func.args(" (<a/>[. = ''], <b/>[. = ''], <c/>[. = ''])"), "<a/>", empty(_UTIL_OR));
+
   }
 
   /** Test method. */
