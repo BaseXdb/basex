@@ -59,10 +59,15 @@ public final class FnHead extends StandardFunc {
       final Expr[] args = expr.args();
       final Expr first = args[0];
       final SeqType st1 = first.seqType();
+      // head((1, 2))  ->  1
       if(st1.one()) return first;
+      // head((1 to 2), 3))  ->  head(1 to 2)
       if(st1.oneOrMore()) return cc.function(HEAD, info, first);
-      if(st1.zeroOrOne()) {
-        final Expr dflt = List.get(cc, info, Arrays.copyOfRange(args, 1, args.length));
+      final int al = args.length;
+      if(st1.zeroOrOne() && (al == 2 || args[1].seqType().occ != Occ.ZERO_OR_ONE)) {
+        // head(($a[.], 1))         ->  util:or($a[.], 1)
+        // head(($a[.], $b[.], 1))  ->  (will not be rewritten)
+        final Expr dflt = List.get(cc, info, Arrays.copyOfRange(args, 1, al));
         return cc.function(_UTIL_OR, info, first, cc.function(HEAD, info, dflt));
       }
     }

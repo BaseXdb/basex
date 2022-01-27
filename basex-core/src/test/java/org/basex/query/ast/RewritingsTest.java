@@ -1844,7 +1844,7 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Elvis Operator rewritings. */
   @Test public void gh1911() {
     check("head((<a/>[data()], 1))", 1, root(_UTIL_OR));
-    check("head((<a/>[data()], <b/>[data()], <c/>[data()]))", null, count(_UTIL_OR, 2));
+    check("head((<a/>[data()], <b/>[data()], <c/>[data()]))", null, empty(_UTIL_OR));
 
     check("head((1, <_/>))", 1, root(Int.class));
     check("head((<item/>, <default/>))", "<item/>", root(CElem.class));
