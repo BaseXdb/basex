@@ -85,6 +85,8 @@ public final class NSTest extends QueryTest {
         "let $e := element E { namespace { '' } { 'B' } } return <_ xmlns='A'>{ $e }</_>" },
       { "NsError4",
         "<_ xmlns='a'>{ namespace { '' } { 'B' } }</_>" },
+      { "NsError5",
+        "<_ xmlns='A'>{ element E { namespace { '' } { 'B' } } }</_>" },
     };
   }
 }
