@@ -135,10 +135,10 @@ public final class CElem extends CName {
 
       // create and check QName
       final QNm nm = qname(true, qc, sc);
-      final byte[] cp = nm.prefix(), cu = nm.uri();
-      if(eq(cp, XML) ^ eq(cu, XML_URI)) throw CEXML.get(info, cu, cp);
-      if(eq(cu, XMLNS_URI)) throw CEINV_X.get(info, cu);
-      if(eq(cp, XMLNS)) throw CEINV_X.get(info, cp);
+      final byte[] nmPrefix = nm.prefix(), nmUri = nm.uri();
+      if(eq(nmPrefix, XML) ^ eq(nmUri, XML_URI)) throw CEXML.get(info, nmUri, nmPrefix);
+      if(eq(nmUri, XMLNS_URI)) throw CEINV_X.get(info, nmUri);
+      if(eq(nmPrefix, XMLNS)) throw CEINV_X.get(info, nmPrefix);
       if(!nm.hasURI() && nm.hasPrefix()) throw INVPREF_X.get(info, nm);
 
       // create node
@@ -154,16 +154,16 @@ public final class CElem extends CName {
       if(constr.nspaces.contains(EMPTY) && !nm.hasPrefix()) throw DUPLNSCONS_X.get(info, EMPTY);
 
       // add namespace for element name (unless its prefix is "xml")
-      if(!eq(cp, XML)) {
+      if(!eq(nmPrefix, XML)) {
         // get URI for the specified prefix
-        final byte[] uri = sc.ns.uri(cp);
+        final byte[] uri = sc.ns.uri(nmPrefix);
 
         // check if element has a namespace
         if(nm.hasURI()) {
           // add to statically known namespaces
-          if(!computed && (uri == null || !eq(uri, cu))) sc.ns.add(cp, cu);
+          if(!computed && (uri == null || !eq(uri, nmUri))) sc.ns.add(nmPrefix, nmUri);
           // add to in-scope namespaces
-          if(!inscopeNS.contains(cp)) inscopeNS.add(cp, cu);
+          if(!inscopeNS.contains(nmPrefix)) inscopeNS.add(nmPrefix, nmUri);
         } else {
           // element has no namespace: assign default uri
           nm.uri(uri);
