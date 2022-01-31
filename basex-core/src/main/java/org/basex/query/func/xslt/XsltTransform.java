@@ -98,9 +98,14 @@ public class XsltTransform extends XsltFn {
       if(simple) throw XSLT_ERROR_X.get(info, ex);
       xr.addError(Str.get(Util.message(ex)));
     } catch(final TransformerException ex) {
-      // catch transformation errors, throw them again or add them to report
       Util.debug(ex);
-      final byte[] error = trim(utf8(err.toArray(), Prop.ENCODING));
+      // catch transformation errors, throw them again or add them to report
+      byte[] error = trim(utf8(err.toArray(), Prop.ENCODING));
+      if(error.length == 0) {
+        Throwable th = ex;
+        while(th.getCause() != null) th = th.getCause();
+        error = token(th.getLocalizedMessage());
+      }
       if(simple) throw XSLT_ERROR_X.get(info, error);
       xr.addError(Str.get(error));
       xr.addMessage();
