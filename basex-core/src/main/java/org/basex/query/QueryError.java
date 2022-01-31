@@ -1160,6 +1160,8 @@ public enum QueryError {
   /** Error code. */
   CNINVNS_X(XQDY, 101, "Invalid namespace URI '%'."),
   /** Error code. */
+  EMPTYNSCONS_X(XQDY, 102, "No default namespace allowed if element has no namespace: '%'."),
+  /** Error code. */
   DUPLNSCONS_X(XQDY, 102, "Duplicate namespace declaration: '%'."),
   /** Error code. */
   MAPDUPLKEY_X_X_X(XQDY, 137, "Key % already exists in map (values: % vs. %)."),

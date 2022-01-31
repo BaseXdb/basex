@@ -151,14 +151,21 @@ public final class CElem extends CName {
       if(constr.errNS != null) throw NONSALL_X.get(info, constr.errNS);
       if(constr.duplAtt != null) throw CATTDUPL_X.get(info, constr.duplAtt);
       if(constr.duplNS != null) throw DUPLNSCONS_X.get(info, constr.duplNS);
-      if(constr.nspaces.contains(EMPTY) && !nm.hasPrefix()) throw DUPLNSCONS_X.get(info, EMPTY);
 
       // add namespace for element name (unless its prefix is "xml")
+      final Atts cns = constr.nspaces;
       if(!eq(nmPrefix, XML)) {
-        // get URI for the specified prefix
-        final byte[] uri = sc.ns.uri(nmPrefix);
+        // check declaration of default namespace
+        final int cnsDef = cns.get(EMPTY);
+        if(cnsDef != -1) {
+          final byte[] uri = cns.value(cnsDef);
+          if(!nm.hasURI()) throw EMPTYNSCONS_X.get(info, uri);
+          final int defUri = inscopeNS.get(EMPTY);
+          if(defUri != -1 && !eq(inscopeNS.value(defUri), uri)) throw DUPLNSCONS_X.get(info, EMPTY);
+        }
 
         // check if element has a namespace
+        final byte[] uri = sc.ns.uri(nmPrefix);
         if(nm.hasURI()) {
           // add to statically known namespaces
           if(!computed && (uri == null || !eq(uri, nmUri))) sc.ns.add(nmPrefix, nmUri);
@@ -171,7 +178,6 @@ public final class CElem extends CName {
       }
 
       // add constructed namespaces
-      final Atts cns = constr.nspaces;
       final int cl = cns.size();
       for(int c = 0; c < cl; c++) addNS(cns.name(c), cns.value(c), inscopeNS);
 
