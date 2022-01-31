@@ -69,29 +69,22 @@ public final class NSTest extends QueryTest {
       { "STEP 1", strings("X"),
         "string(<e a='{ <e>X</e>/self::e }' xmlns='A'/>/@*)" },
 
+      { "Ns1", strings("_"),
+        "<_ xmlns='a'>{ namespace { '' } { 'a' } }</_> ! name()" },
+      { "NS2", strings("_"),
+        "<_ xmlns='a'>{ element E { namespace { '' } { 'a' } } }</_> ! name()" },
+      { "NS3", strings("_:_"),
+        "<_:_ xmlns:_='_'>{ namespace { '' } { 'b' } }</_:_> ! name()" },
+
       // expected error: XQDY0102
-      { "NSCon 1", "<e xmlns='x'>{ namespace {''} { 'y' } }</e>" },
-      { "NSCon 2", strings("p_1", "p", "xml"),
+      { "NsError1",
+        "<e xmlns='x'>{ namespace { '' } { 'B' } }</e>" },
+      { "NsError2", strings("p_1", "p", "xml"),
         "declare namespace p = 'A'; <p:l>{ namespace p { 'B' } }</p:l> => in-scope-prefixes()" },
-
-      /* Buggy queries:
-
-      { "NSCon 3", "<p:l xmlns:p='A'>{ namespace {'p'} { 'B' } }</p:l>" },
-
-      // function prefix is declared by element constructor
-      { "FuncX 1", dbl(1),
-        "number(<b a='{ p:count(5) }' " +
-        "xmlns:p='http://www.w3.org/2005/xpath-functions'/>/@*)" },
-      // error expected: variable namespace must be invalidated by
-      // element namespace declaration
-      { "VarDecl X1", "declare namespace x='a'; " +
-        "let $x:x := 1 return <x a='{ $x:x }' xmlns:x='b'/>" },
-
-      { "NUFP 9", str("O"),
-        "string(<a xmlns:o='O'>{ namespace-uri-for-prefix('o', <e/>) }</a>)" },
-      { "ISP 4", dbl(2),
-        "number(<e xmlns:n='O'> { count( in-scope-prefixes(<e/>) ) } </e>)" }
-      */
+      { "NsError3",
+        "let $e := element E { namespace { '' } { 'B' } } return <_ xmlns='A'>{ $e }</_>" },
+      { "NsError4",
+        "<_ xmlns='a'>{ namespace { '' } { 'B' } }</_>" },
     };
   }
 }
