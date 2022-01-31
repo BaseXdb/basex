@@ -160,8 +160,9 @@ public final class CElem extends CName {
         if(cnsDef != -1) {
           final byte[] uri = cns.value(cnsDef);
           if(!nm.hasURI()) throw EMPTYNSCONS_X.get(info, uri);
-          final int defUri = inscopeNS.get(EMPTY);
-          if(defUri != -1 && !eq(inscopeNS.value(defUri), uri)) throw DUPLNSCONS_X.get(info, EMPTY);
+          final int scope = inscopeNS.get(EMPTY);
+          final byte[] scopeUri = scope != -1 ? inscopeNS.value(scope) : sc.ns.uri(EMPTY);
+          if(scopeUri != null && !eq(scopeUri, uri)) throw DUPLNSCONS_X.get(info, uri);
         }
 
         // check if element has a namespace
