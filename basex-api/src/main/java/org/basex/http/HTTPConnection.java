@@ -48,7 +48,7 @@ public final class HTTPConnection implements ClientInfo {
   /** Performance. */
   private final Performance perf = new Performance();
   /** Authentication method. */
-  private final AuthMethod auth;
+  private final AuthMethod authMethod;
   /** Path, starting with a slash. */
   private final String path;
 
@@ -61,10 +61,10 @@ public final class HTTPConnection implements ClientInfo {
    * Constructor.
    * @param request request
    * @param response response
-   * @param auth authentication method (can be {@code null})
+   * @param authMethod authentication method (can be {@code null})
    */
   HTTPConnection(final HttpServletRequest request, final HttpServletResponse response,
-      final AuthMethod auth) {
+      final AuthMethod authMethod) {
 
     this.request = request;
     this.response = response;
@@ -78,7 +78,8 @@ public final class HTTPConnection implements ClientInfo {
     path = normalize(request.getPathInfo());
 
     // authentication method (servlet-specific or global)
-    this.auth = auth != null ? auth : context.soptions.get(StaticOptions.AUTHMETHOD);
+    this.authMethod = authMethod != null ? authMethod :
+      context.soptions.get(StaticOptions.AUTHMETHOD);
   }
 
   /**
@@ -306,8 +307,8 @@ public final class HTTPConnection implements ClientInfo {
       response.resetBuffer();
       if(code == SC_UNAUTHORIZED && !response.containsHeader(WWW_AUTHENTICATE)) {
         final TokenBuilder header = new TokenBuilder();
-        header.add(auth).add(' ').add(Request.REALM).add("=\"").add(Prop.NAME).add('"');
-        if(auth == AuthMethod.DIGEST) {
+        header.add(authMethod).add(' ').add(Request.REALM).add("=\"").add(Prop.NAME).add('"');
+        if(authMethod == AuthMethod.DIGEST) {
           final String nonce = Strings.md5(Long.toString(System.nanoTime()));
           header.add(",").add(Request.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT);
           header.add('"').add(',').add(Request.NONCE).add("=\"").add(nonce).add('"');
@@ -426,7 +427,7 @@ public final class HTTPConnection implements ClientInfo {
   private User login() throws IOException {
     try {
       final User user;
-      if(auth == AuthMethod.CUSTOM) {
+      if(authMethod == AuthMethod.CUSTOM) {
         // custom authentication
         user = user(UserText.ADMIN);
       } else {
@@ -434,26 +435,26 @@ public final class HTTPConnection implements ClientInfo {
         final String header = request.getHeader(AUTHORIZATION);
         final String[] am = header != null ? Strings.split(header, ' ', 2) : new String[] { "" };
         final AuthMethod meth = StaticOptions.AUTHMETHOD.get(am[0]);
-        if(auth != meth) throw new LoginException(HTTPText.WRONGAUTH_X, auth);
+        if(authMethod != meth) throw new LoginException(HTTPText.WRONGAUTH_X, authMethod);
 
-        if(auth == AuthMethod.BASIC) {
+        if(authMethod == AuthMethod.BASIC) {
           final String details = am.length > 1 ? am[1] : "";
           final String[] creds = Strings.split(Base64.decode(details), ':', 2);
           user = user(creds[0]);
           if(creds.length < 2 || !user.matches(creds[1])) throw new LoginException(user.name());
 
         } else {
-          final EnumMap<Request, String> map = HttpClient.authHeaders(header);
-          user = user(map.get(Request.USERNAME));
+          final EnumMap<Request, String> auth = HttpClient.authHeaders(header);
+          user = user(auth.get(Request.USERNAME));
 
-          final String nonce = map.get(Request.NONCE), cnonce = map.get(Request.CNONCE);
+          final String nonce = auth.get(Request.NONCE), cnonce = auth.get(Request.CNONCE);
           String ha1 = user.code(Algorithm.DIGEST, Code.HASH);
-          if(Strings.eq(map.get(Request.ALGORITHM), MD5_SESS))
+          if(Strings.eq(auth.get(Request.ALGORITHM), MD5_SESS))
             ha1 = Strings.md5(ha1 + ':' + nonce + ':' + cnonce);
 
           final StringBuilder h2 = new StringBuilder().append(method).append(':').
-              append(map.get(Request.URI));
-          final String qop = map.get(Request.QOP);
+              append(auth.get(Request.URI));
+          final String qop = auth.get(Request.QOP);
           if(Strings.eq(qop, AUTH_INT)) {
             h2.append(':').append(Strings.md5(requestCtx.body().toString()));
           }
@@ -461,12 +462,12 @@ public final class HTTPConnection implements ClientInfo {
 
           final StringBuilder sb = new StringBuilder(ha1).append(':').append(nonce);
           if(Strings.eq(qop, AUTH, AUTH_INT)) {
-            sb.append(':').append(map.get(Request.NC));
+            sb.append(':').append(auth.get(Request.NC));
             sb.append(':').append(cnonce).append(':').append(qop);
           }
           sb.append(':').append(ha2);
 
-          if(!Strings.md5(sb.toString()).equals(map.get(Request.RESPONSE)))
+          if(!Strings.md5(sb.toString()).equals(auth.get(Request.RESPONSE)))
             throw new LoginException(user.name());
         }
       }

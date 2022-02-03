@@ -53,10 +53,6 @@ public interface HttpText {
   String DEFAULT_BOUNDARY = "1BEF0A57BE110FD467A";
   /** Boundary marker. */
   String BOUNDARY = "boundary";
-  /** HTTP method TRACE. */
-  String TRACE = "TRACE";
-  /** HTTP method DELETE. */
-  String DELETE = "DELETE";
   /** Body attribute: src. */
   String SRC = "src";
 
