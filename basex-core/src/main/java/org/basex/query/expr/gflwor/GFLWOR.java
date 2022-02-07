@@ -581,7 +581,7 @@ public final class GFLWOR extends ParseExpr {
    */
   private boolean optimizeWhere(final CompileContext cc) throws QueryException {
     boolean changed = false;
-    final HashSet<ForLet> forLets = new HashSet<>();
+    final HashSet<ForLet> optimize = new HashSet<>();
     for(int c = 0; c < clauses.size(); c++) {
       final Clause clause = clauses.get(c);
       if(!(clause instanceof Where)) continue;
@@ -608,40 +608,46 @@ public final class GFLWOR extends ParseExpr {
           if(!(curr instanceof Where)) insert = j;
         }
 
-        if(insert >= 0) {
+        if(insert == -1) {
+          insert = c;
+        } else {
           clauses.add(insert, clauses.remove(c));
           cc.info(QueryText.OPTMOVE_X, where.expr);
           changed = true;
           // it's safe to go on because clauses below the current one are never touched
         }
 
-        // rewrite where clause to predicate:
-        //   for $b in /a/b where $b/c  ->  for $b in /a/b[c]
-        //   let $a := 1 to 3 where $a > 1 return $a  ->  let $a := (1 to 3)[. > 1] ...
-        //   let $a := <a/> where $a[. = ''] return $a/self::a  ->  let $a := <a/>[. == ''] ...
+        // rewrite where clause
         if(!clause.has(Flag.CTX)) {
-          final int newPos = insert < 0 ? c : insert;
-          for(int b4 = newPos; --b4 >= 0;) {
-            final Clause before = clauses.get(b4);
+          for(int i = insert; --i >= 0;) {
+            final Clause before = clauses.get(i);
             // skip where clauses
             if(before instanceof Where) continue;
             // analyze for/let clauses, abort otherwise
             if(before instanceof ForLet) {
               final ForLet fl = (ForLet) before;
-              final Predicate<Expr> var = expr ->
+              final Predicate<Expr> varRef = expr ->
                 expr instanceof VarRef && ((VarRef) expr).var.is(fl.var);
-              if(before instanceof For || c + 1 == clauses.size() && (
-                var.test(rtrn) ||
-                rtrn instanceof Filter && var.test(((Filter) rtrn).root) ||
-                rtrn instanceof Path && var.test(((Path) rtrn).root)
-              )) {
-                if(fl.toPredicate(cc, where.expr)) {
-                  forLets.add(fl);
-                  clauses.remove(newPos);
-                  cc.info(QueryText.OPTPRED_X, where.expr);
-                  changed = true;
-                  c--;
-                }
+              final boolean let = before instanceof Let;
+              if(let && before.seqType().instanceOf(SeqType.NODE_ZO) && varRef.test(where.expr)) {
+                // let $a := <a/>[text()] where $a  ->  for $a in <a/>[text()]
+                clauses.set(i, For.fromLet((Let) before, cc));
+                clauses.remove(insert);
+                changed = true;
+                c--;
+              } else if((!let || c + 1 == clauses.size() && (
+                varRef.test(rtrn) ||
+                rtrn instanceof Filter && varRef.test(((Filter) rtrn).root) ||
+                rtrn instanceof Path && varRef.test(((Path) rtrn).root)
+              )) && fl.toPredicate(cc, where.expr)) {
+                // for $b in /a/b where $b/c  ->  for $b in /a/b[c]
+                // let $a := 1 to 3 where $a > 1 return $a  ->  let $a := (1 to 3)[. > 1] ...
+                // let $a := <a/> where $a = '' return $a/self::a  ->  let $a := <a/>[. = ''] ...
+                optimize.add(fl);
+                clauses.remove(insert);
+                cc.info(QueryText.OPTPRED_X, where.expr);
+                changed = true;
+                c--;
               }
             }
             break;
@@ -650,7 +656,7 @@ public final class GFLWOR extends ParseExpr {
       }
     }
     // optimize on rewritten expressions (only once per clause)
-    for(final ForLet fl : forLets) fl.expr = fl.expr.optimize(cc);
+    for(final ForLet fl : optimize) fl.expr = fl.expr.optimize(cc);
     return changed;
   }
 

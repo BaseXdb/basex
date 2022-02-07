@@ -2409,4 +2409,17 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh2052() {
     query("<doc><a/><b/><a/></doc>/a[following::*[1]/self::a]", "");
   }
+
+  /** Attribute constructor. */
+  @Test public void gh2054() {
+    query("<x attr=\"a{ }\"/>", "<x attr=\"a\"/>");
+    query("<x>a{ }</x>", "<x>a</x>");
+  }
+
+  /** Rewrite let/where to for. */
+  @Test public void gh2058() {
+    check("let $a := <a/>[data()] where $a return $a", "", root(IterFilter.class));
+    check("let $a := <a/>[data()] where $a return string($a)", "", root(ItemMap.class));
+    check("let $_ := prof:void(1) where $_ return string($_)", "", root(_PROF_VOID));
+  }
 }
