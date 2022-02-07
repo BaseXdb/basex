@@ -366,10 +366,12 @@ public abstract class SimpleMap extends Arr {
       if(list.get(n) instanceof ContextValue) list.remove(n);
     }
 
-    if(list.size() == 1) return cc.replaceWith(this, list.peek());
-    exprs = list.finish();
-    if(exprs.length != el) cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
-    return null;
+    final int ls = list.size();
+    if(ls == el) return null;
+    if(ls == 1) return cc.replaceWith(this, list.peek());
+
+    cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
+    return get(cc, info, list.finish());
   }
 
   /**
