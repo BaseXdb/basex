@@ -391,7 +391,7 @@ public final class GFLWOR extends ParseExpr {
               next.expr = expr;
               if(!let && nextLet) {
                 // for $a in $seq let $b := $a  ->  for $b in $seq
-                next = For.fromLet((Let) next, cc);
+                next = ((Let) next).toFor(cc);
                 clauses.set(c + 1, next);
               }
               next.optimize(cc);
@@ -631,7 +631,7 @@ public final class GFLWOR extends ParseExpr {
               final boolean let = before instanceof Let;
               if(let && before.seqType().instanceOf(SeqType.NODE_ZO) && varRef.test(where.expr)) {
                 // let $a := <a/>[text()] where $a  ->  for $a in <a/>[text()]
-                clauses.set(i, For.fromLet((Let) before, cc));
+                clauses.set(i, ((Let) before).toFor(cc).optimize(cc));
                 clauses.remove(insert);
                 changed = true;
                 c--;
