@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -105,10 +106,16 @@ public abstract class Cmp extends Arr {
   public abstract Expr invert();
 
   /**
-   * Returns the value operator of the expression.
+   * Returns the value comparator of the expression.
    * @return operator, or {@code null} for node comparisons
    */
   public abstract OpV opV();
+
+  /**
+   * Returns the general comparator of the expression.
+   * @return operator, or {@code null} for node comparisons
+   */
+  public abstract OpG opG();
 
   /**
    * Performs various optimizations.
