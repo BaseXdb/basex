@@ -2422,4 +2422,36 @@ public final class RewritingsTest extends QueryPlanTest {
     check("let $a := <a/>[data()] where $a return string($a)", "", root(ItemMap.class));
     check("let $_ := prof:void(1) where $_ return string($_)", "", root(_PROF_VOID));
   }
+
+  /** Rewrite fn:not, comparisons (related to GH-1775). */
+  @Test public void gh2061() {
+    check("(1 to 6) ! boolean(.)[. = not(.)]", "", empty());
+    check("(1 to 6) ! boolean(.)[not(.) = .]", "", empty());
+
+    check("(1 to 6) ! boolean(.) ! (. = not(.))",
+        "false\nfalse\nfalse\nfalse\nfalse\nfalse", root(SingletonSeq.class));
+    check("(1 to 6) ! boolean(.) ! (not(.) = .)",
+        "false\nfalse\nfalse\nfalse\nfalse\nfalse", root(SingletonSeq.class));
+
+    query("count((0 to 5)[boolean(.)  = true()])", 5);
+    query("count((0 to 5)[boolean(.) != true()])", 1);
+    query("count((0 to 5)[boolean(.) >= true()])", 5);
+    query("count((0 to 5)[boolean(.) <= true()])", 6);
+    query("count((0 to 5)[boolean(.) >  true()])", 0);
+    query("count((0 to 5)[boolean(.) <  true()])", 1);
+
+    query("count((0 to 5)[boolean(.)  = false()])", 1);
+    query("count((0 to 5)[boolean(.) != false()])", 5);
+    query("count((0 to 5)[boolean(.) >= false()])", 6);
+    query("count((0 to 5)[boolean(.) <= false()])", 1);
+    query("count((0 to 5)[boolean(.) >  false()])", 5);
+    query("count((0 to 5)[boolean(.) <  false()])", 0);
+
+    query("string-join("
+        + "for $a in (false(), true())"
+        + "for $b in (false(), true())"
+        + "for $c in ($a = $b, $a != $b, $a >= $b, $a > $b, $a <= $b, $a <  $b)"
+        + "return if($c) then 1 else 0)",
+        "101010010011011100101010");
+  }
 }
