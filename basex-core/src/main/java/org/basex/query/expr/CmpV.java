@@ -35,6 +35,8 @@ public final class CmpV extends Cmp {
       public OpV swap() { return GE; }
       @Override
       public OpV invert() { return GT; }
+      @Override
+      public OpG general() { return OpG.LE; }
     },
 
     /** Item comparison: less. */
@@ -49,6 +51,8 @@ public final class CmpV extends Cmp {
       public OpV swap() { return GT; }
       @Override
       public OpV invert() { return GE; }
+      @Override
+      public OpG general() { return OpG.LT; }
     },
 
     /** Item comparison: greater of equal. */
@@ -63,6 +67,8 @@ public final class CmpV extends Cmp {
       public OpV swap() { return LE; }
       @Override
       public OpV invert() { return LT; }
+      @Override
+      public OpG general() { return OpG.GE; }
     },
 
     /** Item comparison: greater. */
@@ -77,6 +83,8 @@ public final class CmpV extends Cmp {
       public OpV swap() { return LT; }
       @Override
       public OpV invert() { return LE; }
+      @Override
+      public OpG general() { return OpG.GT; }
     },
 
     /** Item comparison: equal. */
@@ -90,6 +98,8 @@ public final class CmpV extends Cmp {
       public OpV swap() { return EQ; }
       @Override
       public OpV invert() { return NE; }
+      @Override
+      public OpG general() { return OpG.EQ; }
     },
 
     /** Item comparison: not equal. */
@@ -103,6 +113,8 @@ public final class CmpV extends Cmp {
       public OpV swap() { return NE; }
       @Override
       public OpV invert() { return EQ; }
+      @Override
+      public OpG general() { return OpG.NE; }
     };
 
     /** Cached enums (faster). */
@@ -142,6 +154,12 @@ public final class CmpV extends Cmp {
      * @return inverted comparator
      */
     public abstract OpV invert();
+
+    /**
+     * Returns the general comparator.
+     * @return comparator
+     */
+    public abstract OpG general();
 
     @Override
     public String toString() {
@@ -226,6 +244,11 @@ public final class CmpV extends Cmp {
   @Override
   public OpV opV() {
     return opV;
+  }
+
+  @Override
+  public OpG opG() {
+    return opV.general();
   }
 
   @Override

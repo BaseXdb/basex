@@ -275,20 +275,29 @@ public abstract class Preds extends Arr {
     final Expr pred = exprs[el - 1];
     final QueryFunction<Expr, Expr> createRoot = r ->
       el == 1 ? r : Filter.get(cc, info, r, Arrays.copyOfRange(exprs, 0, el - 1));
-    final QueryFunction<Expr, Expr> createExpr = e ->
-      e instanceof ContextValue ? createRoot.apply(root) :
-      e instanceof Path ? Path.get(cc, info, createRoot.apply(root), e) : null;
+    final QueryBiFunction<Expr, Boolean, Expr> createExpr = (e, cmp) -> {
+      return e instanceof ContextValue ? createRoot.apply(root) :
+             e instanceof Path ? Path.get(cc, info, createRoot.apply(root), e) :
+             cmp ? SimpleMap.get(cc, info, createRoot.apply(root), e) : null;
+    };
 
-    // rewrite to general comparison (right operand must not depend on context):
-    // a[. = 'x']  ->  a = 'x'
-    // a[text() = 'x']  ->  a/text() = 'x'
-    if(pred instanceof CmpG) {
-      // not applicable to value/node comparisons, as cardinality of expression might change
-      final CmpG cmp = (CmpG) pred;
-      final Expr expr1 = createExpr.apply(cmp.exprs[0]), expr2 = cmp.exprs[1];
-      // right operand must not depend on context
-      if(expr1 != null && !expr2.has(Flag.CTX)) {
-        return new CmpG(expr1, expr2, cmp.op, cmp.coll, cmp.sc, cmp.info).optimize(cc);
+    // rewrite to general comparison
+    // a[. = 'x']           ->  a = 'x'
+    // a[@id eq 'id1']      ->  a/@id = 'id1'
+    // a[text() = data(.)]  ->  skip: right operand must not depend on context
+    // a[b eq ('a', 'b')]   ->  skip: an error must be raised as right operand yields a sequence
+    if(pred instanceof Cmp) {
+      final Cmp cmp = (Cmp) pred;
+      final Expr op1 = cmp.exprs[0], op2 = cmp.exprs[1];
+      final SeqType st1 = op1.seqType(), st2 = op2.seqType();
+      final Type type1 = st1.type, type2 = st2.type;
+      if((cmp instanceof CmpG || cmp instanceof CmpV && st1.zeroOrOne() && st2.zeroOrOne() && (
+        type1 == type2 || type1.isStringOrUntyped() && type2.isStringOrUntyped()
+      )) && !op2.has(Flag.CTX)) {
+        final Expr expr = createExpr.apply(op1, true);
+        if(expr != null) {
+          return new CmpG(expr, op2, cmp.opG(), cmp.coll, cmp.sc, cmp.info).optimize(cc);
+        }
       }
     }
 
@@ -297,17 +306,17 @@ public abstract class Preds extends Arr {
     // a[text() contains text 'x']  ->  a/text() contains text 'x'
     if(pred instanceof FTContains) {
       final FTContains cmp = (FTContains) pred;
-      final Expr expr = createExpr.apply(cmp.expr);
       final FTExpr ftexpr = cmp.ftexpr;
-      if(expr != null && !ftexpr.has(Flag.CTX)) {
-        return new FTContains(expr, ftexpr, cmp.info).optimize(cc);
+      if(!ftexpr.has(Flag.CTX)) {
+        final Expr expr = createExpr.apply(cmp.expr, true);
+        if(expr != null) return new FTContains(expr, ftexpr, cmp.info).optimize(cc);
       }
     }
 
     // rewrite to path: root[path]  ->  root/path
     // rewrite to path: root[data()]  ->  root/descendant::text()
     if(rst.type instanceof NodeType) {
-      Expr expr = createExpr.apply(pred);
+      Expr expr = createExpr.apply(pred, false);
       if(expr == null && (Function.DATA.is(pred) || Function.STRING.is(pred))) {
         final ContextFn func = (ContextFn) pred;
         if(func.contextAccess()) expr = func.simplifyEbv(root, cc);

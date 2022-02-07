@@ -2454,4 +2454,12 @@ public final class RewritingsTest extends QueryPlanTest {
         + "return if($c) then 1 else 0)",
         "101010010011011100101010");
   }
+
+  /** Unnest predicate with value comparison. */
+  @Test public void gh2059() {
+    check("<a/>[b[@c eq '']]", "", empty(CmpV.class));
+    check("<a><b c=''/></a>[b[@c eq '']] => count()", 1, empty(CmpV.class));
+
+    check("boolean(<a b=''/>[@b eq ''])", true, empty(CmpV.class), root(CmpSimpleG.class));
+  }
 }

@@ -94,7 +94,7 @@ public final class CmpSR extends Single {
 
     final byte[] d = ((AStr) cmp2).string(cmp.info);
     ParseExpr expr = null;
-    switch(cmp.op.opV) {
+    switch(cmp.op.value()) {
       case GE: expr = new CmpSR(cmp1, d,    true,  null, true,  cmp.coll, cmp.info); break;
       case GT: expr = new CmpSR(cmp1, d,    false, null, true,  cmp.coll, cmp.info); break;
       case LE: expr = new CmpSR(cmp1, null, true,  d,    true,  cmp.coll, cmp.info); break;

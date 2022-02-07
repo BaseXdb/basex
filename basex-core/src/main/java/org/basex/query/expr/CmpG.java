@@ -28,68 +28,76 @@ public class CmpG extends Cmp {
   /** Comparators. */
   public enum OpG {
     /** General comparison: less or equal. */
-    LE("<=", OpV.LE) {
+    LE("<=") {
       @Override
       public OpG swap() { return OpG.GE; }
       @Override
       public OpG invert() { return OpG.GT; }
+      @Override
+      public OpV value() { return OpV.LE; }
     },
 
     /** General comparison: less. */
-    LT("<", OpV.LT) {
+    LT("<") {
       @Override
       public OpG swap() { return OpG.GT; }
       @Override
       public OpG invert() { return OpG.GE; }
+      @Override
+      public OpV value() { return OpV.LT; }
     },
 
     /** General comparison: greater of equal. */
-    GE(">=", OpV.GE) {
+    GE(">=") {
       @Override
       public OpG swap() { return LE; }
       @Override
       public OpG invert() { return LT; }
+      @Override
+      public OpV value() { return OpV.GE; }
     },
 
     /** General comparison: greater. */
-    GT(">", OpV.GT) {
+    GT(">") {
       @Override
       public OpG swap() { return LT; }
       @Override
       public OpG invert() { return LE; }
+      @Override
+      public OpV value() { return OpV.GT; }
     },
 
     /** General comparison: equal. */
-    EQ("=", OpV.EQ) {
+    EQ("=") {
       @Override
       public OpG swap() { return OpG.EQ; }
       @Override
       public OpG invert() { return OpG.NE; }
+      @Override
+      public OpV value() { return OpV.EQ; }
     },
 
     /** General comparison: not equal. */
-    NE("!=", OpV.NE) {
+    NE("!=") {
       @Override
       public OpG swap() { return OpG.NE; }
       @Override
       public OpG invert() { return EQ; }
+      @Override
+      public OpV value() { return OpV.NE; }
     };
 
     /** Cached enums (faster). */
     public static final OpG[] VALUES = values();
     /** String representation. */
     public final String name;
-    /** Value comparison operator. */
-    public final OpV opV;
 
     /**
      * Constructor.
      * @param name string representation
-     * @param opV operator for value comparisons
      */
-    OpG(final String name, final OpV opV) {
+    OpG(final String name) {
       this.name = name;
-      this.opV = opV;
     }
 
     /**
@@ -104,6 +112,12 @@ public class CmpG extends Cmp {
      */
     public abstract OpG invert();
 
+    /**
+     * Returns the value comparator.
+     * @return comparator
+     */
+    public abstract OpV value();
+
     @Override
     public String toString() {
       return name;
@@ -116,7 +130,7 @@ public class CmpG extends Cmp {
      */
     static OpG get(final OpV opV) {
       for(final OpG value : VALUES) {
-        if(value.opV == opV) return value;
+        if(value.value() == opV) return value;
       }
       return null;
     }
@@ -324,7 +338,7 @@ public class CmpG extends Cmp {
           item1 instanceof AStr && item2 instanceof AStr ||
           item1 instanceof Dur && item2 instanceof Dur)) throw diffError(item1, item2, info);
     }
-    return op.opV.eval(item1, item2, coll, sc, info);
+    return op.value().eval(item1, item2, coll, sc, info);
   }
 
   @Override
@@ -337,7 +351,12 @@ public class CmpG extends Cmp {
 
   @Override
   public final OpV opV() {
-    return op.opV;
+    return op.value();
+  }
+
+  @Override
+  public final OpG opG() {
+    return op;
   }
 
   @Override
