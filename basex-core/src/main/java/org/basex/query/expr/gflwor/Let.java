@@ -7,6 +7,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -160,7 +161,8 @@ public final class Let extends ForLet {
         qc.scoring = true;
         double s = 0;
         int c = 0;
-        for(Item item; (item = qc.next(expr.iter(qc))) != null; s += item.score(), c++);
+        final Iter iter = expr.iter(qc);
+        for(Item item; (item = qc.next(iter)) != null; s += item.score(), c++);
         return Dbl.get(Scoring.avg(s, c));
       } finally {
         qc.scoring = scoring;
