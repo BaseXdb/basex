@@ -1597,10 +1597,6 @@ public final class RewritingsTest extends QueryPlanTest {
     // skip rewritings: let
     check("let $e := (<a/>, <b/>) where $e/self::a return $e", "<a/>\n<b/>", root(GFLWOR.class));
     check("let score $s := <a/> where $s return $s", "", root(GFLWOR.class));
-    check("let $a := <a/> where $a = '' return data($a)", "", root(GFLWOR.class));
-    // skip rewritings: for
-    check("for $a score $s in (<a/>, <b/>) where $a/self::a return $s", 0, root(GFLWOR.class));
-    check("for $a score $s in <a/> where $a/self::a return $s", 0, root(GFLWOR.class));
   }
 
   /** Typeswitch: default branch with variable. */

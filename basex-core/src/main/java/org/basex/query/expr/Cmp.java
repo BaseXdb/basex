@@ -287,25 +287,34 @@ public abstract class Cmp extends Arr {
    */
   private Expr optBoolean(final OpV op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(expr1.seqType().eq(SeqType.BOOLEAN_O) && expr2.seqType().eq(SeqType.BOOLEAN_O)) {
-      // boolean(A) = true()  ->  boolean(A)
-      // boolean(A) <= true()  ->  true()
+    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
+    if(st1.type == AtomType.BOOLEAN && st2.type == AtomType.BOOLEAN) {
+      final boolean eq = op == OpV.EQ, ne = op == OpV.NE;
       if(expr2 instanceof Bln) {
-        final QuerySupplier<Expr> not = () -> cc.function(NOT, info, expr1);
+        // boolean(A) = true()  ->  boolean(A)
+        // boolean(A) <= true()  ->  true()
         final boolean ok = expr2 == Bln.TRUE;
-        switch(op) {
-          case EQ: return ok ? expr1     : not.get();
-          case NE: return ok ? not.get() : expr1;
-          case GE: return ok ? expr1     : Bln.TRUE;
-          case LE: return ok ? Bln.TRUE  : not.get();
-          case GT: return ok ? Bln.FALSE : expr1;
-          default: return ok ? not.get() : Bln.FALSE;
+        if(st1.one()) {
+          final QuerySupplier<Expr> not = () -> cc.function(NOT, info, expr1);
+          switch(op) {
+            case EQ: return ok ? expr1     : not.get();
+            case NE: return ok ? not.get() : expr1;
+            case GE: return ok ? expr1     : Bln.TRUE;
+            case LE: return ok ? Bln.TRUE  : not.get();
+            case GT: return ok ? Bln.FALSE : expr1;
+            default: return ok ? not.get() : Bln.FALSE;
+          }
+        }
+        // (A, B) = true()  ->  A or B
+        // (A, B) = false()  ->  not(A and B)
+        final Checks<Expr> booleans = expr -> expr.seqType().eq(SeqType.BOOLEAN_O);
+        if((eq || ne) && expr1 instanceof List && booleans.all(expr1.args())) {
+          if(ne ^ ok) return new Or(info, expr1.args()).optimize(cc);
+          return cc.function(NOT, info, new And(info, expr1.args()).optimize(cc));
         }
       }
-
       // BOOL = not(BOOL)  ->  false()
-      final boolean eq = op == OpV.EQ, ne = op == OpV.NE;
-      if((eq || ne) && (NOT.is(expr2) && expr1.equals(expr2.arg(0)) ||
+      if((eq || ne) && st1.one() && st2.one() && (NOT.is(expr2) && expr1.equals(expr2.arg(0)) ||
           NOT.is(expr1) && expr2.equals(expr1.arg(0)))) return Bln.get(ne);
     }
     return this;
