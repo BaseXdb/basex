@@ -1597,10 +1597,6 @@ public final class RewritingsTest extends QueryPlanTest {
     // skip rewritings: let
     check("let $e := (<a/>, <b/>) where $e/self::a return $e", "<a/>\n<b/>", root(GFLWOR.class));
     check("let score $s := <a/> where $s return $s", "", root(GFLWOR.class));
-    check("let $a := <a/> where $a = '' return data($a)", "", root(GFLWOR.class));
-    // skip rewritings: for
-    check("for $a score $s in (<a/>, <b/>) where $a/self::a return $s", 0, root(GFLWOR.class));
-    check("for $a score $s in <a/> where $a/self::a return $s", 0, root(GFLWOR.class));
   }
 
   /** Typeswitch: default branch with variable. */
@@ -2461,5 +2457,25 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a><b c=''/></a>[b[@c eq '']] => count()", 1, empty(CmpV.class));
 
     check("boolean(<a b=''/>[@b eq ''])", true, empty(CmpV.class), root(CmpSimpleG.class));
+  }
+
+  /** Comparisons with boolean lists. */
+  @Test public void gh2060() {
+    unroll(true);
+    check("some $i in 1 to 2 satisfies contains(<_/>/*, string($i))", false, exists(Or.class));
+    check("every $i in 1 to 2 satisfies contains(<_/>/*, string($i))", false, exists(And.class));
+
+    check("let $a := <a><b>1</b><c>2</c></a> "
+        + "where every $b in (1, 2) satisfies $a/* = $b "
+        + "return $a/b/text()",
+        1, empty(NOT), empty(And.class), count(CmpG.class, 2));
+    unroll(false);
+
+    check("for $a in 1 to 6 "
+        + "let $b := boolean($a mod 2) "
+        + "let $c := boolean($a mod 3) "
+        + "return every $d in ($b, $c) satisfies $d",
+        "true\nfalse\nfalse\nfalse\ntrue\nfalse",
+        root(DualMap.class), exists(And.class));
   }
 }
