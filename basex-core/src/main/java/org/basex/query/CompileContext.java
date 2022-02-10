@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
@@ -363,5 +364,31 @@ public final class CompileContext {
     final ExprList args = new ExprList().add(expr).add(count);
     if(expr.has(Flag.NDT, Flag.CNS)) args.add(Bln.TRUE);
     return function(Function._UTIL_REPLICATE, ii, args.finish());
+  }
+
+  /**
+   * Returns an expression list for unrolling an expression.
+   * @param expr expression to analyze
+   * @param items unroll lists only if all its expressions yield items the number of which
+   *   do not exceed limit
+   * @return expression list or {@code null}
+   */
+  public ExprList unroll(final Expr expr, final boolean items) {
+    final long size = expr.size(), limit = qc.context.options.get(MainOptions.UNROLLLIMIT);
+    final boolean seq = expr instanceof Seq && size <= limit;
+    final boolean list = expr instanceof List && (
+        items ? size <= limit && ((Checks<Expr>) ex -> ex.seqType().one()).all(expr.args())
+              : expr.args().length <= limit
+    );
+    if(!(seq || list)) return null;
+
+    info(QueryText.OPTUNROLL_X, expr);
+    final ExprList exprs = new ExprList((int) size);
+    if(seq) {
+      for(final Item item : (Value) expr) exprs.add(item);
+    } else {
+      for(final Expr arg : expr.args()) exprs.add(arg);
+    }
+    return exprs;
   }
 }

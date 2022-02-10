@@ -4,7 +4,6 @@ import static org.basex.query.func.Function.*;
 
 import java.util.function.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -13,9 +12,7 @@ import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -112,12 +109,12 @@ public abstract class Filter extends Preds {
 
       // unroll filters with few items
       // example: (1, 2)[. = 1]  ->  1[. = 1], 2[. = 1]
-      final long size = root.size(), limit = cc.qc.context.options.get(MainOptions.UNROLLLIMIT);
-      if(root instanceof Seq && size <= limit) {
-        cc.info(QueryText.OPTUNROLL_X, this);
-        final ExprList results = new ExprList((int) size);
-        for(final Item item : (Value) root) {
-          results.add(Filter.get(cc, info, item, results.size() == size - 1 ? exprs :
+      final ExprList unroll = cc.unroll(root, false);
+      if(unroll != null) {
+        final long last = root.size() - 1;
+        final ExprList results = new ExprList(unroll.size());
+        for(final Expr ex : unroll) {
+          results.add(get(cc, info, ex, results.size() == last ? exprs :
             Arr.copyAll(cc, new IntObjMap<>(), exprs)));
         }
         return List.get(cc, info, results.finish());
@@ -272,7 +269,7 @@ public abstract class Filter extends Preds {
       if(expr != this) return cc.simplify(this, expr);
     } else if(mode == Simplify.DISTINCT && !mayBePositional()) {
       final Expr expr = root.simplifyFor(mode, cc);
-      if(expr != root) return cc.simplify(this, Filter.get(cc, info, expr, exprs));
+      if(expr != root) return cc.simplify(this, get(cc, info, expr, exprs));
     }
     return super.simplifyFor(mode, cc);
   }

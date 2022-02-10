@@ -2,11 +2,11 @@ package org.basex.query.func.hof;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -35,17 +35,18 @@ public final class HofFoldLeft1 extends StandardFunc {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if(expr1.seqType().zero()) throw EMPTYFOUND.get(info);
 
-    final int limit = cc.qc.context.options.get(MainOptions.UNROLLLIMIT);
-    if(allAreValues(false) && expr1.size() <= limit) {
-      final Value seq = (Value) expr1;
-      final FItem func = checkArity(expr2, 2, cc.qc);
-      Expr expr = seq.itemAt(0);
-      final long is = seq.size();
-      for(int i = 1; i < is; i++) {
-        expr = new DynFuncCall(info, sc, func, expr, seq.itemAt(i)).optimize(cc);
+    // unroll fold
+    if(expr2 instanceof Value) {
+      final ExprList unroll = cc.unroll(expr1, true);
+      if(unroll != null) {
+        final FItem func = checkArity(expr2, 2, cc.qc);
+        Expr expr = unroll.get(0);
+        final long is = unroll.size();
+        for(int i = 1; i < is; i++) {
+          expr = new DynFuncCall(info, sc, func, expr, unroll.get(i)).optimize(cc);
+        }
+        return expr;
       }
-      cc.info(QueryText.OPTUNROLL_X, this);
-      return expr;
     }
 
     final FuncType ft = expr2.funcType();
