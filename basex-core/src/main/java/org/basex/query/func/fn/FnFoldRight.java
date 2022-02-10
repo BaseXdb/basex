@@ -2,11 +2,11 @@ package org.basex.query.func.fn;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -62,15 +62,16 @@ public final class FnFoldRight extends StandardFunc {
 
     FnFoldLeft.opt(this, cc, false, false);
 
-    final int limit = cc.qc.context.options.get(MainOptions.UNROLLLIMIT);
-    if(expr1 instanceof Value && expr3 instanceof Value && expr1.size() <= limit) {
-      // unroll the loop
-      Expr expr = expr2;
-      for(final Item item : ((Value) expr1).reverse(cc.qc)) {
-        expr = new DynFuncCall(info, sc, expr3, item, expr).optimize(cc);
+    // unroll fold
+    if(expr3 instanceof Value) {
+      final ExprList unroll = cc.unroll(expr1, true);
+      if(unroll != null) {
+        Expr expr = expr2;
+        for(int es = unroll.size() - 1; es >= 0; es--) {
+          expr = new DynFuncCall(info, sc, expr3, unroll.get(es), expr).optimize(cc);
+        }
+        return expr;
       }
-      cc.info(QueryText.OPTUNROLL_X, this);
-      return expr;
     }
     return this;
   }

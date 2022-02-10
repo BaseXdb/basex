@@ -5,7 +5,6 @@ import static org.basex.query.func.Function.*;
 
 import java.util.function.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -15,7 +14,6 @@ import org.basex.query.func.fn.*;
 import org.basex.query.func.util.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -248,14 +246,13 @@ public abstract class SimpleMap extends Arr {
         }
       }
 
-      final int limit = cc.qc.context.options.get(MainOptions.UNROLLLIMIT);
-      if(expr instanceof Seq && size <= limit) {
-        // (1, 2) ! (. + 1)  ->  1 ! (. + 1), 2 ! (. + 1)
-        cc.info(QueryText.OPTUNROLL_X, this);
-        final ExprList results = new ExprList((int) size);
-        for(final Item item : (Value) expr) {
+      // (1, 2) ! (. + 1)  ->  1 ! (. + 1), 2 ! (. + 1)
+      final ExprList unroll = cc.unroll(expr, false);
+      if(unroll != null) {
+        final ExprList results = new ExprList(unroll.size());
+        for(final Expr ex : unroll) {
           final Expr nxt = results.size() == size - 1 ? next : next.copy(cc, new IntObjMap<>());
-          results.add(get(cc, info, item, nxt));
+          results.add(get(cc, info, ex, nxt));
         }
         return List.get(cc, info, results.finish());
       }

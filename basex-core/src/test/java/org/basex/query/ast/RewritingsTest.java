@@ -2478,4 +2478,19 @@ public final class RewritingsTest extends QueryPlanTest {
         "true\nfalse\nfalse\nfalse\ntrue\nfalse",
         root(DualMap.class), exists(And.class));
   }
+
+  /** XQuery, simple map and filter expressions: Unroll lists. */
+  @Test public void gh2067() {
+    unroll(true);
+
+    // unroll simple maps
+    check("(<a/>, <b/>) ! self::a", "<a/>", root(CElem.class));
+    check("(<a/>[data()], <b/>[data()]) ! self::c", "", empty());
+
+    // unroll filters
+    check("(<a/>, <b/>)[. = 'x']",
+        "", root(List.class), count(IterFilter.class, 2));
+    check("(<a/>[data()], <b/>[data()])[. = 'x']",
+        "", root(List.class), count(IterFilter.class, 2));
+  }
 }
