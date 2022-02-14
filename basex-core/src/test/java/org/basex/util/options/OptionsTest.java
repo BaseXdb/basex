@@ -30,6 +30,7 @@ public final class OptionsTest extends SandboxTest {
     new UCAOptions();
     new CsvOptions();
     new CsvParserOptions();
+    new CsvSerialOptions();
     new HtmlOptions();
     new JsonOptions();
     new JsonParserOptions();

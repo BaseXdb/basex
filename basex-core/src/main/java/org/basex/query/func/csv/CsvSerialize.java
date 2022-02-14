@@ -20,7 +20,7 @@ public final class CsvSerialize extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
-    final CsvOptions copts = toOptions(1, new CsvOptions(), qc);
+    final CsvSerialOptions copts = toOptions(1, new CsvSerialOptions(), qc);
 
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.CSV);

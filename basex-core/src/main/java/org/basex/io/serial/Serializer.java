@@ -80,7 +80,7 @@ public abstract class Serializer implements Closeable {
       case HTML:  return new HTMLSerializer(os, so);
       case TEXT:  return new TextSerializer(os, so);
       case CSV:
-        final CsvOptions copts = so.get(SerializerOptions.CSV);
+        final CsvSerialOptions copts = so.get(SerializerOptions.CSV);
         return copts.get(CsvOptions.FORMAT) == CsvFormat.XQUERY
                ? new CsvXQuerySerializer(os, so)
                : new CsvDirectSerializer(os, so);
