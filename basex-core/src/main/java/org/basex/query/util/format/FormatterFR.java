@@ -42,9 +42,9 @@ final class FormatterFR extends Formatter {
   private static final byte[][] ERAS = tokens("av. J.-C.", "ap. J.-C.");
 
   @Override
-  public byte[] word(final long n, final byte[] ord) {
+  public byte[] word(final long n, final byte[] ordinal) {
     final TokenBuilder tb = new TokenBuilder();
-    word(tb, n, ord, true);
+    word(tb, n, ordinal, true);
     // create title case
     final TokenParser tp = new TokenParser(tb.next());
     for(boolean u = true; tp.more(); u = false) {
@@ -54,7 +54,7 @@ final class FormatterFR extends Formatter {
   }
 
   @Override
-  public byte[] ordinal(final long n, final byte[] ord) {
+  public byte[] ordinal(final long n, final byte[] ordinal) {
     return EMPTY;
   }
 

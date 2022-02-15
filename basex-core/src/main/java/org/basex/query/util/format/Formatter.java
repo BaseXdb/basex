@@ -54,18 +54,18 @@ public abstract class Formatter extends FormatUtil {
   /**
    * Returns a word representation for the specified number.
    * @param n number to be formatted
-   * @param ord ordinal suffix
+   * @param ordinal ordinal suffix
    * @return token
    */
-  protected abstract byte[] word(long n, byte[] ord);
+  protected abstract byte[] word(long n, byte[] ordinal);
 
   /**
    * Returns an ordinal representation for the specified number.
    * @param n number to be formatted
-   * @param ord ordinal suffix
+   * @param ordinal ordinal suffix
    * @return ordinal
    */
-  protected abstract byte[] ordinal(long n, byte[] ord);
+  protected abstract byte[] ordinal(long n, byte[] ordinal);
 
   /**
    * Returns the specified month (0-11).

@@ -66,25 +66,22 @@ final class FormatterEN extends Formatter {
   private static final byte[][] ERAS = tokens("Bc", "Ad");
 
   @Override
-  public byte[] word(final long n, final byte[] ord) {
+  public byte[] word(final long n, final byte[] ordinal) {
     final TokenBuilder tb = new TokenBuilder();
-    word(tb, n, ord != null);
+    word(tb, n, ordinal != null);
     return tb.finish();
   }
 
   @Override
-  public byte[] ordinal(final long n, final byte[] ord) {
-    if(ord == null) return EMPTY;
+  public byte[] ordinal(final long n, final byte[] ordinal) {
+    if(ordinal == null) return EMPTY;
     final int f = (int) (n % 10);
     return ORDSUFFIX[f > 0 && f < 4 && n % 100 / 10 != 1 ? f - 1 : 3];
   }
 
   @Override
   public byte[] month(final int n, final int min, final int max) {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(substring(MONTHS[n], 0, Math.max(3, max)));
-    while(tb.size() < min) tb.add(' ');
-    return tb.finish();
+    return format(MONTHS[n], min, max);
   }
 
   @Override
@@ -130,7 +127,7 @@ final class FormatterEN extends Formatter {
       if(r == 0) {
         tb.add((ordinal ? ORDINALS10 : WORDS10)[(int) number / 10]);
       } else {
-        tb.add(WORDS10[(int) number / 10]).add(' ');
+        tb.add(WORDS10[(int) number / 10]).add(ordinal ? '-' : ' ');
         tb.add((ordinal ? ORDINALS : WORDS)[r]);
       }
     } else {
