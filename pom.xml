@@ -42,10 +42,10 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-          <groupId>org.junit.platform</groupId>
-          <artifactId>junit-platform-commons</artifactId>
-          <version>1.8.2</version>
-          <scope>test</scope>
+        <groupId>org.junit.platform</groupId>
+        <artifactId>junit-platform-commons</artifactId>
+        <version>1.8.2</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>jp.sourceforge.igo</groupId>
