@@ -29,7 +29,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
-    <jettyVersion>9.4.43.v20210629</jettyVersion>
+    <jettyVersion>9.4.45.v20220203</jettyVersion>
     <junit.version>5.8.1</junit.version>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
@@ -46,7 +46,7 @@
       <dependency>
         <groupId>org.junit.platform</groupId>
         <artifactId>junit-platform-commons</artifactId>
-        <version>1.4.2</version>
+        <version>1.8.2</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -170,7 +170,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
-        <version>1.7.32</version>
+        <version>1.7.36</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -341,7 +341,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.3.1</version>
+            <version>3.3.2</version>
             <inherited>true</inherited>
             <configuration>
               <doclint>none</doclint>
@@ -386,7 +386,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.8.1</version>
+          <version>3.10.0</version>
           <inherited>true</inherited>
           <configuration>
             <source>${compileSource}</source>
@@ -418,7 +418,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.2.0</version>
+          <version>3.2.2</version>
           <inherited>true</inherited>
           <configuration>
             <archive>
@@ -542,7 +542,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>nexus-staging-maven-plugin</artifactId>
-          <version>1.6.8</version>
+          <version>1.6.10</version>
           <extensions>true</extensions>
           <configuration>
             <serverId>ossrh</serverId>
@@ -557,7 +557,7 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
-        <version>3.4.3</version>
+        <version>3.5.1</version>
       </extension>
     </extensions>
   </build>
