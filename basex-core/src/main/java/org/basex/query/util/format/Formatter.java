@@ -38,6 +38,7 @@ public abstract class Formatter extends FormatUtil {
   static {
     MAP.put(EN, new FormatterEN());
     MAP.put(token("de"), new FormatterDE());
+    MAP.put(token("fr"), new FormatterFR());
   }
 
   /**
@@ -614,5 +615,24 @@ public abstract class Formatter extends FormatUtil {
     final TokenBuilder result = new TokenBuilder();
     for(int rs = reverse.size() - 1; rs >= 0; --rs) result.add(reverse.get(rs));
     return result.finish();
+  }
+
+  /**
+   * Formats a token.
+   * @param token token
+   * @param min minimum size
+   * @param max maximum size
+   * @return resulting token
+   */
+  static byte[] format(final byte[] token, final int min, final int max) {
+    if(min == 0 && max == Integer.MAX_VALUE) return token;
+
+    final int mx = Math.max(3, max);
+    final TokenBuilder tb = new TokenBuilder(mx);
+    final TokenParser tp = new TokenParser(token);
+    int p = -1;
+    while(++p < mx && tp.more()) tb.add(tp.next());
+    while(p++ < min) tb.add(' ');
+    return tb.finish();
   }
 }
