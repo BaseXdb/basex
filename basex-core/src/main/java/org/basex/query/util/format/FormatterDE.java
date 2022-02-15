@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 import org.basex.util.*;
 
 /**
- * English language formatter. Can be instantiated via {@link Formatter#get}.
+ * German language formatter. Can be instantiated via {@link Formatter#get}.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
@@ -71,9 +71,9 @@ final class FormatterDE extends Formatter {
   private static final byte[][] ERAS = tokens("v. Chr.", "n. Chr.");
 
   @Override
-  public byte[] word(final long n, final byte[] ord) {
+  public byte[] word(final long n, final byte[] ordinal) {
     final TokenBuilder tb = new TokenBuilder();
-    word(tb, n, ord);
+    word(tb, n, ordinal);
     // create title case
     final TokenParser tp = new TokenParser(tb.next());
     for(boolean u = true; tp.more(); u = false) {
@@ -83,16 +83,13 @@ final class FormatterDE extends Formatter {
   }
 
   @Override
-  public byte[] ordinal(final long n, final byte[] ord) {
-    return ord == null ? EMPTY : E;
+  public byte[] ordinal(final long n, final byte[] ordinal) {
+    return ordinal == null ? EMPTY : E;
   }
 
   @Override
   public byte[] month(final int n, final int min, final int max) {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(substring(MONTHS[n], 0, Math.max(3, max)));
-    while(tb.size() < min) tb.add(' ');
-    return tb.finish();
+    return format(MONTHS[n], min, max);
   }
 
   @Override
@@ -127,36 +124,36 @@ final class FormatterDE extends Formatter {
    * Creates a word character sequence for the specified number.
    * @param tb token builder
    * @param n number to be formatted
-   * @param ord ordinal suffix
+   * @param ordinal ordinal suffix
    */
-  private static void word(final TokenBuilder tb, final long n, final byte[] ord) {
+  private static void word(final TokenBuilder tb, final long n, final byte[] ordinal) {
     if(n == 0 && !tb.isEmpty()) {
-      if(ord != null) tb.add("st").add(ord.length == 0 ? E : ord);
+      if(ordinal != null) tb.add("st").add(ordinal.length == 0 ? E : ordinal);
     } else if(n < 20) {
-      if(ord == null) tb.add(WORDS[(int) n]);
-      else tb.add(ORDINALS[(int) n]).add(ord.length == 0 ? E : ord);
+      if(ordinal == null) tb.add(WORDS[(int) n]);
+      else tb.add(ORDINALS[(int) n]).add(ordinal.length == 0 ? E : ordinal);
     } else if(n < 100) {
       final int r = (int) (n % 10);
       if(r != 0) tb.add(r == 1 ? EIN : WORDS[r]).add(UND);
       tb.add(WORDS20[(int) n / 10]);
-      if(ord != null) tb.add("st").add(ord.length == 0 ? E : ord);
+      if(ordinal != null) tb.add("st").add(ordinal.length == 0 ? E : ordinal);
     } else if(n < 1000) {
       if(n < 200) tb.add("ein");
       else word(tb, n / 100, null);
       tb.add(HUNDERT);
-      word(tb, n % 100, ord);
+      word(tb, n % 100, ordinal);
     } else if(n < 1000000) {
       if(n < 2000) tb.add("ein");
       if(n >= 2000) word(tb, n / 1000, null);
       tb.add(TAUSEND);
-      word(tb, n % 1000, ord);
+      word(tb, n % 1000, ordinal);
     } else {
       int w = WORDS1000000.length;
       while(--w > 0 && n < UNITS100[w]);
       final long f = UNITS100[w];
 
       final long i = n / f;
-      if(ord == null) {
+      if(ordinal == null) {
         if(i == 1) tb.add(EINE);
         else word(tb, i, null);
         tb.add(' ');
@@ -165,8 +162,8 @@ final class FormatterDE extends Formatter {
       }
       tb.add(WORDS1000000[w]);
       final long r = n % f;
-      if(ord != null && r == 0) {
-        tb.add("st").add(ord.length == 0 ? E : ord);
+      if(ordinal != null && r == 0) {
+        tb.add("st").add(ordinal.length == 0 ? E : ordinal);
       } else if(i > 1) {
         tb.add("en");
       } else if(endsWith(WORDS1000000[w], 'f')) {
@@ -174,7 +171,7 @@ final class FormatterDE extends Formatter {
       }
       if(r != 0) {
         tb.add(' ');
-        word(tb, r, ord);
+        word(tb, r, ordinal);
       }
     }
   }
