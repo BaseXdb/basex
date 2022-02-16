@@ -36,8 +36,6 @@ public final class AlterDB extends ACreate {
 
     // database does not exist
     if(!soptions.dbExists(src)) return error(DB_NOT_FOUND_X, src);
-    // target database already exists
-    if(soptions.dbExists(trg)) return error(DB_EXISTS_X, trg);
 
     // close database if it's currently opened and not opened by others
     if(!closed) closed = close(context, src);

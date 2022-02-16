@@ -10,6 +10,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.*;
+import org.basex.gui.dialog.DialogInput.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
 import org.basex.util.*;
@@ -150,13 +151,13 @@ public final class DialogManage extends BaseXDialog {
       refresh = true;
 
     } else if(cmp == rename) {
-      final DialogInput dr = new DialogInput(db, RENAME_DB, this, 1);
+      final DialogInput dr = new DialogInput(db, this, Action.ALTER_DATABASE);
       if(!dr.ok() || dr.input().equals(db)) return;
       cmds.add(new AlterDB(db, dr.input()));
       refresh = true;
 
     } else if(cmp == copy) {
-      final DialogInput dc = new DialogInput(db, COPY_DB, this, 2);
+      final DialogInput dc = new DialogInput(db, this, Action.COPY_DATABASE);
       if(!dc.ok() || dc.input().equals(db)) return;
       cmds.add(new Copy(db, dc.input()));
       refresh = true;
