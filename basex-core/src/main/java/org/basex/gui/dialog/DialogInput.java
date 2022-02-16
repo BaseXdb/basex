@@ -6,7 +6,7 @@ import java.awt.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.gui.GUIConstants.Msg;
+import org.basex.gui.GUIConstants.*;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -20,40 +20,49 @@ import org.basex.util.list.*;
 final class DialogInput extends BaseXDialog {
   /** User input. */
   private final BaseXTextField input;
-  /** Old input. */
-  private final String old;
   /** Buttons. */
   private final BaseXBack buttons;
   /** Info label. */
   private final BaseXLabel info;
   /** Available databases. */
-  private final StringList db;
+  private final StringList databases;
   /** Rename/copy/delete dialog. */
-  private final int type;
+  private final Action action;
+
+  /** Action. */
+  enum Action {
+    /** Rename document. */ RENAME_DOCUMENT(RENAME, TARGET_PATH),
+    /** Alter database.  */ ALTER_DATABASE(RENAME_DB, NAME_OF_DB),
+    /** Copy database.   */ COPY_DATABASE(COPY_DB, NAME_OF_DB_COPY);
+
+    /** Title of action. */
+    final String title;
+    /** Descriptive label. */
+    final String label;
+
+    /**
+     * Constructor.
+     * @param title title of action
+     * @param label descriptive label
+     */
+    Action(final String title, final String label) {
+      this.title = title;
+      this.label = label;
+    }
+  }
 
   /**
    * Default constructor.
    * @param old old input
-   * @param title title string
    * @param dialog dialog window
-   * @param type type of dialog: 0 = rename database, 1 = drop documents, 2 = copy database
+   * @param action action
    */
-  DialogInput(final String old, final String title, final BaseXDialog dialog, final int type) {
-    super(dialog, title);
-    this.old = old;
-    this.type = type;
-    db = dialog.gui.context.listDBs();
+  DialogInput(final String old, final BaseXDialog dialog, final Action action) {
+    super(dialog, action.title);
+    this.action = action;
+    databases = dialog.gui.context.listDBs();
 
-    String t = "";
-    if(type == 0) {
-      t = TARGET_PATH + COLS;
-    } else if(type == 1) {
-      t = NAME_OF_DB + COLS;
-    } else if(type == 2) {
-      t = NAME_OF_DB_COPY + COLS;
-    }
-
-    set(new BaseXLabel(t, false, true).border(0, 0, 6, 0), BorderLayout.NORTH);
+    set(new BaseXLabel(action.label + COL, false, true).border(0, 0, 6, 0), BorderLayout.NORTH);
 
     input = new BaseXTextField(this, old);
     info = new BaseXLabel(" ");
@@ -80,15 +89,24 @@ final class DialogInput extends BaseXDialog {
   @Override
   public void action(final Object cmp) {
     final String in = input();
-    ok = type != 0 && (db.contains(in) || in.equals(old));
-    String msg = null;
-    if(ok) msg = Util.info(DB_EXISTS_X, in);
-    if(!ok) {
-      ok = type == 0 ? MetaData.normPath(in) != null : Databases.validName(in);
-      if(!ok) msg = in.isEmpty() ? ENTER_DB_NAME : Util.info(INVALID_X, NAME);
-    }
 
-    info.setText(msg, type == 1 || type == 2 ? Msg.ERROR : Msg.WARN);
+    String inf = null;
+    Msg icon = Msg.ERROR;
+    if(action == Action.RENAME_DOCUMENT) {
+      // document checks
+      ok = !in.isEmpty() && MetaData.normPath(in) != null;
+      if(!ok) inf = Util.info(INVALID_X, PATH);
+    } else {
+      // database checks
+      ok = Databases.validName(in);
+      if(!ok) {
+        inf = Util.info(INVALID_X, NAME);
+      } else if(databases.contains(in)) {
+        inf = Util.info(DB_EXISTS_X, in);
+        icon = Msg.WARN;
+      }
+    }
+    info.setText(inf, icon);
     enableOK(buttons, B_OK, ok);
   }
 

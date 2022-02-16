@@ -101,7 +101,7 @@ public class CommandTest extends SandboxTest {
     ok(new AlterDB(NAME, NAME2));
     ok(new CreateDB(NAME));
     ok(new Close());
-    no(new AlterDB(NAME, NAME2));
+    ok(new AlterDB(NAME, NAME2));
     no(new AlterDB(NAME, NAME2));
     no(new AlterDB(NAME2, "?"));
     no(new AlterDB("?", NAME2));

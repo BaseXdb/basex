@@ -13,6 +13,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.*;
+import org.basex.gui.dialog.DialogInput.Action;
 import org.basex.gui.layout.*;
 
 /**
@@ -271,7 +272,7 @@ final class DialogResources extends BaseXBack {
       final ResourceNode n = selection();
       if(n == null) return;
 
-      final DialogInput d = new DialogInput(n.path(), RENAME, dialog, 0);
+      final DialogInput d = new DialogInput(n.path(), dialog, Action.RENAME_DOCUMENT);
       if(!d.ok()) return;
 
       final String p = string(ResourceNode.preparePath(token(d.input())));
