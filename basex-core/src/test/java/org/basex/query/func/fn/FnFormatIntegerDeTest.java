@@ -170,7 +170,7 @@ public final class FnFormatIntegerDeTest extends QueryTest {
       { "de1000.", strings("eintausendste"), "format-integer(1000, 'w;o', 'de')" },
       { "de10000.", strings("zehntausendste"), "format-integer(10000, 'w;o', 'de')" },
       { "de100000.", strings("einhunderttausendste"), "format-integer(100000, 'w;o', 'de')" },
-      { "de1000000.", strings("millionste"), "format-integer(1000000, 'w;o', 'de')" },
+      { "de1000000.", strings("eine millionste"), "format-integer(1000000, 'w;o', 'de')" },
     };
   }
 }
