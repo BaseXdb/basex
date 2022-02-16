@@ -33,7 +33,7 @@ public final class FnFormatDateTest extends QueryTest {
         "format-date(xs:date('2002-12-31'), '[D] [MNn], [Y]', 'en', (), ()) " },
       { "formdate 110", strings("[2002-12-31]"),
         "format-date(xs:date('2002-12-31'), '[[[Y0001]-[M01]-[D01]]]') " },
-      { "formdate 120", strings("Two Thousand and Two"),
+      { "formdate 120", strings("Two Thousand Two"),
         "format-date(xs:date('2002-12-31'), '[YWw]', 'en', (), ()) " },
       { "formdate 130", strings("einunddrei\u00dfigste Dezember"),
         "format-date(xs:date('2002-12-31'), '[Dwo] [MNn]', 'de', (), ()) " },
@@ -42,14 +42,6 @@ public final class FnFormatDateTest extends QueryTest {
       { "formdate 150", strings("3:58:45 pm"),
         "format-time(xs:time('15:58:45.762+02:00'), " +
         "'[h]:[m01]:[s01] [Pn]', 'en', (), ()) " },
-      /*
-      { "formdate 160", strings("3:58:45 PM PDT"),
-        "format-time(xs:time('15:58:45.762+02:00'), " +
-        "'[h]:[m01]:[s01] [PN] [ZN,*-3]', 'en', (), ()) " },
-      { "formdate 170", strings("3:58:45 o'clock PM PDT"),
-        "format-time(xs:time('15:58:45.762+02:00'), " +
-        "'[h]:[m01]:[s01] o''clock [PN] [ZN,*-3]', 'en', (), ()) " },
-      */
       { "formdate 180", strings("15:58"),
         "format-time(xs:time('15:58:45.762+02:00'),'[H01]:[m01]') " },
       { "formdate 190", strings("15:58:45.762"),
