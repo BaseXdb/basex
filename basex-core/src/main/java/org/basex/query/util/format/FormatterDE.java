@@ -23,7 +23,7 @@ final class FormatterDE extends Formatter {
 
   /** Written numbers (1000000, ...). */
   private static final byte[][] WORDS1000000 = tokens(
-      "million", "milliard", "billion", "billiard", "trillion");
+      "Million", "Milliarde", "Billion", "Billiarde", "Trillion");
 
   /** Units (100, 1000, ...). */
   private static final long[] UNITS100 = {
@@ -74,11 +74,7 @@ final class FormatterDE extends Formatter {
   public byte[] word(final long n, final byte[] ordinal) {
     final TokenBuilder tb = new TokenBuilder();
     word(tb, n, ordinal);
-    // create title case
-    final TokenParser tp = new TokenParser(tb.next());
-    for(boolean u = true; tp.more(); u = false) {
-      tb.add(u ? uc(tp.next()) : lc(tp.next()));
-    }
+    if(!tb.isEmpty()) tb.set(0, (byte) uc(tb.get(0)));
     return tb.finish();
   }
 
@@ -124,7 +120,7 @@ final class FormatterDE extends Formatter {
    * Creates a word character sequence for the specified number.
    * @param tb token builder
    * @param n number to be formatted
-   * @param ordinal ordinal suffix
+   * @param ordinal ordinal suffix (can be {@code null} or empty)
    */
   private static void word(final TokenBuilder tb, final long n, final byte[] ordinal) {
     if(n == 0 && !tb.isEmpty()) {
@@ -138,13 +134,18 @@ final class FormatterDE extends Formatter {
       tb.add(WORDS20[(int) n / 10]);
       if(ordinal != null) tb.add("st").add(ordinal.length == 0 ? E : ordinal);
     } else if(n < 1000) {
-      if(n < 200) tb.add("ein");
+      if(n < 200) tb.add(EIN);
       else word(tb, n / 100, null);
       tb.add(HUNDERT);
       word(tb, n % 100, ordinal);
     } else if(n < 1000000) {
-      if(n < 2000) tb.add("ein");
-      if(n >= 2000) word(tb, n / 1000, null);
+      final long m = n % 100000;
+      if(m >= 1000 && m < 2000) {
+        word(tb, n / 1000, null);
+        tb.delete(tb.size() - 1, tb.size());
+      } else {
+        word(tb, n / 1000, null);
+      }
       tb.add(TAUSEND);
       word(tb, n % 1000, ordinal);
     } else {
@@ -153,21 +154,14 @@ final class FormatterDE extends Formatter {
       final long f = UNITS100[w];
 
       final long i = n / f;
-      if(ordinal == null) {
-        if(i == 1) tb.add(EINE);
-        else word(tb, i, null);
-        tb.add(' ');
-      } else if(i != 1) {
-        word(tb, i, null);
-      }
-      tb.add(WORDS1000000[w]);
+      if(i == 1) tb.add(EINE);
+      else word(tb, i, null);
+      tb.add(' ').add(WORDS1000000[w]);
       final long r = n % f;
       if(ordinal != null && r == 0) {
         tb.add("st").add(ordinal.length == 0 ? E : ordinal);
       } else if(i > 1) {
-        tb.add("en");
-      } else if(endsWith(WORDS1000000[w], 'f')) {
-        tb.add("e");
+        tb.add(w % 2 == 0 ? "en" : "n");
       }
       if(r != 0) {
         tb.add(' ');
