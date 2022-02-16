@@ -58,8 +58,6 @@ final class FormatterEN extends Formatter {
 
   /** AM/PM Markers. */
   private static final byte[][] AMPM = tokens("Am", "Pm");
-  /** And. */
-  private static final byte[] AND = token("and");
   /** Ordinal suffixes (st, nr, rd, th). */
   private static final byte[][] ORDSUFFIX = tokens("st", "nd", "rd", "th");
   /** Eras: BC, AD. */
@@ -127,7 +125,7 @@ final class FormatterEN extends Formatter {
       if(r == 0) {
         tb.add((ordinal ? ORDINALS10 : WORDS10)[(int) number / 10]);
       } else {
-        tb.add(WORDS10[(int) number / 10]).add(ordinal ? '-' : ' ');
+        tb.add(WORDS10[(int) number / 10]).add('-');
         tb.add((ordinal ? ORDINALS : WORDS)[r]);
       }
     } else {
@@ -142,7 +140,6 @@ final class FormatterEN extends Formatter {
           if(ordinal) tb.add(ORDSUFFIX[3]);
         } else {
           tb.add(' ');
-          if(r < 100) tb.add(AND).add(' ');
         }
         word(tb, r, ordinal);
         break;
