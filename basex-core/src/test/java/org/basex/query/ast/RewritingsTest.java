@@ -2506,6 +2506,6 @@ public final class RewritingsTest extends QueryPlanTest {
     check("//(title, li) => distinct-values() => count()", 3, root(Int.class));
 
     // empty paths
-    check("/html/(ul, li, unknown, div, title, head)", "", empty());
+    check("/html/(ul, li, unknown, div, title)", "", empty());
   }
 }
