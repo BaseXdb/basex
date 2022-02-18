@@ -2462,4 +2462,54 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("boolean(<a b=''/>[@b eq ''])", true, empty(CmpV.class), root(CmpSimpleG.class));
   }
+
+  /** Comparisons with boolean lists. */
+  @Test public void gh2060() {
+    unroll(true);
+    check("some $i in 1 to 2 satisfies contains(<_/>/*, string($i))", false, exists(Or.class));
+    check("every $i in 1 to 2 satisfies contains(<_/>/*, string($i))", false, exists(And.class));
+
+    check("let $a := <a><b>1</b><c>2</c></a> "
+        + "where every $b in (1, 2) satisfies $a/* = $b "
+        + "return $a/b/text()",
+        1, empty(NOT), empty(And.class), count(CmpG.class, 2));
+    unroll(false);
+
+    check("for $a in 1 to 6 "
+        + "let $b := boolean($a mod 2) "
+        + "let $c := boolean($a mod 3) "
+        + "return every $d in ($b, $c) satisfies $d",
+        "true\nfalse\nfalse\nfalse\ntrue\nfalse",
+        root(DualMap.class), exists(And.class));
+  }
+
+  /** XQuery, simple map and filter expressions: Unroll lists. */
+  @Test public void gh2067() {
+    unroll(true);
+
+    // unroll simple maps
+    check("(<a/>, <b/>) ! self::a", "<a/>", root(CElem.class));
+    check("(<a/>[data()], <b/>[data()]) ! self::c", "", empty());
+
+    // unroll filters
+    check("(<a/>, <b/>)[. = 'x']",
+        "", root(List.class), count(IterFilter.class, 2));
+    check("(<a/>[data()], <b/>[data()])[. = 'x']",
+        "", root(List.class), count(IterFilter.class, 2));
+  }
+
+  /** UnionTest, Path index. */
+  @Test public void gh2068() {
+    execute(new CreateDB(NAME, FILE));
+
+    // count
+    check("/html/(head, body) => count()", 2, root(Int.class));
+    check("//(title, li) => count()", 3, root(Int.class));
+
+    // distinct-values
+    check("//(title, li) => distinct-values() => count()", 3, root(Int.class));
+
+    // empty paths
+    check("/html/(ul, li, unknown, div, title, head)", "", empty());
+  }
 }

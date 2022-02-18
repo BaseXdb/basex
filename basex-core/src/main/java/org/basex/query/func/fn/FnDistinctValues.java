@@ -71,6 +71,9 @@ public final class FnDistinctValues extends StandardFunc {
       return cc.function(SORT, info, list.finish());
     }
 
+    final Expr opt = optStats(expr, cc);
+    if(opt != this) return opt;
+
     final AtomType type = st.type.atomic();
     if(type != null) {
       // assign atomic type of argument
@@ -85,7 +88,7 @@ public final class FnDistinctValues extends StandardFunc {
           return type == st.type ? expr : cc.function(Function.DATA, info, exprs);
       }
     }
-    return optStats(expr, cc);
+    return this;
   }
 
   /**

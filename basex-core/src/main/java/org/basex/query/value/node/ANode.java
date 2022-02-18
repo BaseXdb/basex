@@ -572,13 +572,13 @@ public abstract class ANode extends Item {
    */
   public static int kind(final NodeType type) {
     switch(type) {
-      case DOCUMENT_NODE: return Data.DOC;
-      case ELEMENT: return Data.ELEM;
-      case TEXT: return Data.TEXT;
-      case ATTRIBUTE: return Data.ATTR;
-      case COMMENT: return Data.COMM;
-      case PROCESSING_INSTRUCTION : return Data.PI;
-      default : return -1;
+      case DOCUMENT_NODE:          return Data.DOC;
+      case ELEMENT:                return Data.ELEM;
+      case TEXT:                   return Data.TEXT;
+      case ATTRIBUTE:              return Data.ATTR;
+      case COMMENT:                return Data.COMM;
+      case PROCESSING_INSTRUCTION: return Data.PI;
+      default:                     return -1;
     }
   }
 
