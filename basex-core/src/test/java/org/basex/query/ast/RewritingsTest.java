@@ -2493,4 +2493,19 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(<a/>[data()], <b/>[data()])[. = 'x']",
         "", root(List.class), count(IterFilter.class, 2));
   }
+
+  /** UnionTest, Path index. */
+  @Test public void gh2068() {
+    execute(new CreateDB(NAME, FILE));
+
+    // count
+    check("/html/(head, body) => count()", 2, root(Int.class));
+    check("//(title, li) => count()", 3, root(Int.class));
+
+    // distinct-values
+    check("//(title, li) => distinct-values() => count()", 3, root(Int.class));
+
+    // empty paths
+    check("/html/(ul, li, unknown, div, title, head)", "", empty());
+  }
 }

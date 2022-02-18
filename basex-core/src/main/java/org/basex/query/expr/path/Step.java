@@ -3,13 +3,14 @@ package org.basex.query.expr.path;
 import static org.basex.query.expr.path.Axis.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.index.name.*;
 import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
+import org.basex.query.func.Function;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -221,32 +222,39 @@ public abstract class Step extends Preds {
     // skip axes other than descendant, child, and attribute
     if(axis != ATTRIBUTE && axis != CHILD  && axis != SELF && axis != DESCENDANT &&
        axis != DESCENDANT_OR_SELF) return null;
-    // skip tests other than processing instructions, skip union tests
-    if(test.type == NodeType.PROCESSING_INSTRUCTION || test instanceof UnionTest) return null;
 
-    // check node type
-    int name = 0;
-    if(test instanceof NameTest) {
-      final NamePart part = ((NameTest) test).part();
-      if(part == NamePart.LOCAL) {
-        // element/attribute test (*:ln)
-        final Names names = test.type == NodeType.ATTRIBUTE ? data.attrNames : data.elemNames;
-        name = names.id(((NameTest) test).local);
-      } else if(part != null) {
-        // skip namespace and standard tests
-        return null;
-      }
-    }
+    // skip processing instructions
+    final NodeType type = test.type;
+    if(type == NodeType.PROCESSING_INSTRUCTION) return null;
 
+    final Names names = type == NodeType.ATTRIBUTE ? data.attrNames : data.elemNames;
     final int kind = ANode.kind(test.type);
     final ArrayList<PathNode> tmp = new ArrayList<>();
-    for(final PathNode pn : nodes) {
-      if(axis == SELF || axis == DESCENDANT_OR_SELF) {
-        if(kind == -1 || kind == pn.kind && (name == 0 || name == pn.name)) {
-          if(!tmp.contains(pn)) tmp.add(pn);
-        }
+    final Predicate<Test> addNodes = t -> {
+      int name = 0;
+      if(t instanceof NameTest) {
+        final NameTest nt = (NameTest) t;
+        if(nt.part() != NamePart.LOCAL) return false;
+        name = names.id(nt.local);
       }
-      if(axis != SELF) add(pn, tmp, name, kind);
+      for(final PathNode pn : nodes) {
+        if(axis == SELF || axis == DESCENDANT_OR_SELF) {
+          if(kind == -1 || kind == pn.kind && (name == 0 || name == pn.name)) {
+            if(!tmp.contains(pn)) tmp.add(pn);
+          }
+        }
+        if(axis != SELF) add(pn, tmp, name, kind);
+      }
+      return true;
+    };
+
+    // add nodes
+    if(test instanceof UnionTest) {
+      for(final Test t : ((UnionTest) test).tests) {
+        if(!addNodes.test(t)) return null;
+      }
+    } else {
+      if(!addNodes.test(test)) return null;
     }
     return tmp;
   }
