@@ -73,22 +73,28 @@ public final class CmpIR extends Single {
   public static Expr get(final CompileContext cc, final CmpG cmp, final boolean eq)
       throws QueryException {
 
+    // skip non-deterministic expressions
     final Expr expr1 = cmp.exprs[0], expr2 = cmp.exprs[1];
-
-    // only rewrite deterministic integer comparisons
-    if(cmp.has(Flag.NDT) || !expr1.seqType().type.instanceOf(AtomType.INTEGER)) return cmp;
+    if(cmp.has(Flag.NDT)) return cmp;
 
     long mn, mx;
+    final boolean cmpEq = cmp.op == OpG.EQ;
     if(expr2 instanceof RangeSeq) {
       final long[] range = ((RangeSeq) expr2).range(false);
       mn = range[0];
       mx = range[1];
-    } else if(expr2 instanceof Int && (eq || cmp.op != OpG.EQ)) {
+    } else if(expr2 instanceof Int && (eq || !cmpEq)) {
       mn = ((Int) expr2).itr();
       mx = mn;
     } else {
       return cmp;
     }
+
+    // only rewrite integer or equality comparisons
+    // allowed : $integer > 2, $value = 10 to 20
+    // rejected: $double  > 2
+    final Type type = expr1.seqType().type;
+    if(!(type.instanceOf(AtomType.INTEGER) || cmpEq && type.isUntyped())) return cmp;
 
     switch(cmp.op) {
       case EQ: break;
@@ -128,7 +134,7 @@ public final class CmpIR extends Single {
     // atomic evaluation of arguments (faster)
     if(single) {
       final Item item = expr.item(qc, info);
-      return Bln.get(item != Empty.VALUE && inRange(item.itr(info)));
+      return Bln.get(item != Empty.VALUE && inRange(item));
     }
 
     // pre-evaluate ranges
@@ -136,7 +142,7 @@ public final class CmpIR extends Single {
       final Value value = expr.value(qc);
       final long size = value.size();
       if(size == 0) return Bln.FALSE;
-      if(size == 1) return Bln.get(inRange(((Item) value).itr(info)));
+      if(size == 1) return Bln.get(inRange((Item) value));
       final long[] range = ((RangeSeq) value).range(false);
       return Bln.get(range[1] >= min && range[0] <= max);
     }
@@ -144,18 +150,20 @@ public final class CmpIR extends Single {
     // iterative evaluation
     final Iter iter = expr.atomIter(qc, info);
     for(Item item; (item = qc.next(iter)) != null;) {
-      if(inRange(item.itr(info))) return Bln.TRUE;
+      if(inRange(item)) return Bln.TRUE;
     }
     return Bln.FALSE;
   }
 
   /**
    * Checks if the specified value is within the allowed range.
-   * @param value double value
+   * @param item value to check
    * @return result of check
+   * @throws QueryException query exception
    */
-  private boolean inRange(final long value) {
-    return value >= min && value <= max;
+  private boolean inRange(final Item item) throws QueryException {
+    final double value = item.dbl(info);
+    return value >= min && value <= max && value == (long) value;
   }
 
   @Override

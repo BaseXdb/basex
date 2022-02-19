@@ -23,10 +23,12 @@ public final class CmpSimpleG extends CmpG {
    * @param coll collation (can be {@code null})
    * @param sc static context
    * @param info input info
+   * @param check check flag
    */
   CmpSimpleG(final Expr expr1, final Expr expr2, final OpG op, final Collation coll,
-      final StaticContext sc, final InputInfo info) {
+      final StaticContext sc, final InputInfo info, final boolean check) {
     super(expr1, expr2, op, coll, sc, info);
+    this.check = check;
   }
 
   @Override
@@ -40,7 +42,7 @@ public final class CmpSimpleG extends CmpG {
   @Override
   public CmpG copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return copyType(new CmpSimpleG(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc,
-        info));
+        info, check));
   }
 
   @Override

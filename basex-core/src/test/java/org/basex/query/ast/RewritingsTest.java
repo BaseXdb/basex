@@ -1123,7 +1123,7 @@ public final class RewritingsTest extends QueryPlanTest {
     // OR: merge
     check("(<_/>, <_/>) = 'a' or (<_/>, <_/>) = 'b'", false, empty(Or.class));
     check("(<_/>, <_/>) = 'a' or (<_/>, <_/>) = ('b', 'c')", false, empty(Or.class));
-    check("<_>1</_>[. = 1 or . = (2, 3)]", "<_>1</_>", empty(Or.class), exists(CmpG.class));
+    check("<_>1</_>[. = 1 or . = 2]", "<_>1</_>", empty(Or.class), exists(CmpIR.class));
     check("<_>1</_>[not(. = 1) or . != (2, 3)]", "<_>1</_>", empty(Or.class));
     check("exists(let $x := <a><b>c</b><b>d</b></a> return $x[b = 'c' or b = 'd'])", true,
         count(CmpHashG.class, 1));
@@ -1138,8 +1138,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_>a</_>[. = 'a' or .. != 'b']", "<_>a</_>", exists(Or.class));
 
     // AND: merge
-    check("<_>1</_>[not(. = 1) and not(. = (2, 3))]", "",
-        exists(CmpG.class), empty(CmpSimpleG.class));
+    check("<_>1</_>[not(. = 1) and not(. = 2)]", "",
+        exists(CmpIR.class), empty(CmpSimpleG.class));
     check("not((<_/>, <_/>) != 'a') and not((<_/>, <_/>) != 'b')", false,
         exists(CmpG.class), empty(CmpSimpleG.class));
 
@@ -1149,12 +1149,12 @@ public final class RewritingsTest extends QueryPlanTest {
     check("exists(let $x := <a><b>c</b><b>d</b></a> return $x[b = 'c' and b = 'd'])", true,
         count(CmpG.class, 2));
 
-    check("<_>1</_>[. = 1 and . = (2, 3)]", "",
-        exists(CmpG.class), exists(CmpSimpleG.class));
-    check("<_>1</_>[not(. = 1) and . = (2, 3)]", "",
-        exists(CmpG.class), exists(CmpSimpleG.class));
-    check("<_>1</_>[. = 1 and not(. = (2, 3))]", "<_>1</_>",
-        exists(CmpG.class), exists(CmpSimpleG.class));
+    check("<_>1</_>[. = 1 and . = 2]", "",
+        count(CmpG.class, 1));
+    check("<_>1</_>[not(. = 1) and . = 2]", "",
+        count(CmpSimpleG.class, 2));
+    check("<_>1</_>[. = 1 and not(. = 2)]", "<_>1</_>",
+        count(CmpSimpleG.class, 2));
 
     check("(<_/>, <_/>) = '' and (<_/>, <_/>) = 'a'", false, exists(And.class));
   }
@@ -2507,5 +2507,24 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // empty paths
     check("/html/(ul, li, unknown, div, title)", "", empty());
+  }
+
+  /** Comparisons with range expressions. */
+  @Test public void gh2070() {
+    // rewrite to integer comparison
+    check("<x a='1'/>/@a = 1 to 3", true, exists(CmpIR.class));
+    check("<x a='1'/>/@a = 1 to 3", true, exists(CmpIR.class));
+
+    // no rewrite
+    check("<x a='2'/>/@a >= 1 to 3", true, exists(CmpG.class));
+    check("<x a='2'/>/@a >  1 to 3", true, exists(CmpG.class));
+    check("<x a='2'/>/@a <= 1 to 3", true, exists(CmpG.class));
+    check("<x a='2'/>/@a <  1 to 3", true, exists(CmpG.class));
+    check("<x a='2'/>/@a != 1 to 3", true, exists(CmpG.class));
+    check("<x a='2'/>/@a =  2"     , true, exists(CmpSimpleG.class));
+
+    error("<x/> = 1", FUNCCAST_X_X);
+    error("<x/> = 1 to 2", FUNCCAST_X_X);
+    error("<?_ 1?> = 1 to 2", CMPTYPES_X_X);
   }
 }
