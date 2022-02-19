@@ -61,11 +61,11 @@ public final class HttpRequestParser {
       if(body != null) {
         final QNm pl = body.qname();
         // single part request
-        if(pl.eq(Q_BODY)) {
+        if(pl.eq(Q_HTTP_BODY)) {
           parseBody(body, bodies, hr.payloadAtts, hr.payload);
           hr.isMultipart = false;
           // multipart request
-        } else if(pl.eq(Q_MULTIPART)) {
+        } else if(pl.eq(Q_HTTP_MULTIPART)) {
           parseMultipart(body, bodies.iter(), hr.payloadAtts, hr.parts);
           hr.isMultipart = true;
         } else {
@@ -97,7 +97,7 @@ public final class HttpRequestParser {
     for(final ANode node : iter) {
       final QNm nm = node.qname();
       if(nm == null) continue;
-      if(!nm.eq(Q_HEADER)) return node;
+      if(!nm.eq(Q_HTTP_HEADER)) return node;
 
       String name = "", value = "";
       for(final ANode attr : node.attributeIter()) {

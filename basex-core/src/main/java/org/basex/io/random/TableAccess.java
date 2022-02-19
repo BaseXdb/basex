@@ -153,10 +153,10 @@ public abstract class TableAccess {
   /**
    * Copies the specified values into the database.
    * @param entries entries to copy
-   * @param pre first target pre value
+   * @param first first target pre value
    * @param last last pre value
    */
-  protected abstract void copy(byte[] entries, int pre, int last);
+  protected abstract void copy(byte[] entries, int first, int last);
 
   /**
    * Deletes the specified number of entries from the database.

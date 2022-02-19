@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -103,8 +104,8 @@ public class BaseX extends CLI {
           case 'Q':
             // hidden: run query with base uri
             console = false;
-            final Pair<String, String> input = input(value);
-            execute(new XQuery(input.value()).baseURI(input.name()), verbose);
+            final Entry<String, String> input = input(value);
+            execute(new XQuery(input.getValue()).baseURI(input.getKey()), verbose);
             break;
           case 'r':
             execute(new Set(MainOptions.RUNS, Strings.toInt(value)), false);

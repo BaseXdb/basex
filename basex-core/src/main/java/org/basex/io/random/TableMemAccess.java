@@ -97,9 +97,9 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  protected void copy(final byte[] entries, final int pre, final int last) {
+  protected void copy(final byte[] entries, final int first, final int last) {
     dirty();
-    for(int o = 0, i = pre; i < last; ++i, o += IO.NODESIZE) {
+    for(int o = 0, i = first; i < last; ++i, o += IO.NODESIZE) {
       data1[i] = getLong(entries, o);
       data2[i] = getLong(entries, o + 8);
     }

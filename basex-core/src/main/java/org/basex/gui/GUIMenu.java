@@ -2,7 +2,6 @@ package org.basex.gui;
 
 import static org.basex.gui.GUIConstants.*;
 
-import java.awt.*;
 import javax.swing.*;
 
 import org.basex.gui.layout.*;
@@ -28,7 +27,6 @@ public final class GUIMenu extends JMenuBar {
    */
   GUIMenu(final GUI gui) {
     this.gui = gui;
-    if(Prop.langright) setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 
     // create menu for each top level menu entries
     int c = 0;
@@ -54,9 +52,6 @@ public final class GUIMenu extends JMenuBar {
           final JMenuItem item = newItem(cmd, gui, mnemCache);
           item.setAccelerator(BaseXLayout.keyStroke(cmd));
           items[c++] = item;
-          if(Prop.langright) {
-            item.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-          }
           menu.add(item);
         }
       }

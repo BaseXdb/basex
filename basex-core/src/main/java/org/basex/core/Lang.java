@@ -49,16 +49,12 @@ public final class Lang {
           if(i == -1 || Strings.startsWith(line, '#')) continue;
           final String key = line.substring(0, i).trim();
           String val = line.substring(i + 1).trim();
-          if("langright".equals(key)) {
-            Prop.langright = "true".equals(val);
-          } else {
-            if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
-            if(Prop.langkeys) val = '[' + key + ": " + val + ']';
-            if(TEXTS.put(key, val) != null) {
-              Util.errln("%." + SUFFIX + ": '%' is declared twice", lang, key);
-            }
-            CHECK.put(key, true);
+          if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
+          if(Prop.langkeys) val = '[' + key + ": " + val + ']';
+          if(TEXTS.put(key, val) != null) {
+            Util.errln("%." + SUFFIX + ": '%' is declared twice", lang, key);
           }
+          CHECK.put(key, true);
         }
       } catch(final IOException ex) {
         Util.errln(ex);

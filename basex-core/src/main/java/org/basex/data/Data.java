@@ -747,7 +747,7 @@ public abstract class Data {
     resources.docs();
 
     // resize buffer to cache more entries
-    final int bSize = Math.min(sCount, IO.BLOCKSIZE >> IO.NODEPOWER);
+    final int bSize = Math.min(sCount, IO.ENTRIES);
     bufferSize(bSize);
 
     // organize namespaces to avoid duplicate declarations

@@ -55,9 +55,9 @@ public final class BaseXSerializerTest extends SandboxTest {
     serialize("[ () ]", "[()]");
 
     serialize("[ <a/> ]", "[<a/>]");
-    serialize("[ <a/> update () ]", "[<a/>]");
+    serialize("[ <a/> update { } ]", "[<a/>]");
     serialize("[ document { <a/> } ]", "[<a/>]");
-    serialize("[ document { <a/> } update () ]", "[<a/>]");
+    serialize("[ document { <a/> } update { } ]", "[<a/>]");
   }
 
   /**

@@ -81,13 +81,13 @@ public final class HttpPayload {
     if(type.isMultipart()) {
       // multipart response
       final byte[] boundary = boundary(type);
-      body = new FElem(Q_MULTIPART).add(BOUNDARY, boundary);
+      body = new FElem(Q_HTTP_MULTIPART).add(BOUNDARY, boundary);
       final ANodeList parts = new ANodeList();
       extractParts(concat(DASHES, boundary), parts);
       for(final ANode node : parts) body.add(node);
     } else {
       // single part response
-      body = new FElem(Q_BODY);
+      body = new FElem(Q_HTTP_BODY);
       if(payloads != null) {
         final InputStream in = GZIP.equals(encoding) ? new GZIPInputStream(input) : input;
         Value value = Empty.VALUE;
@@ -184,12 +184,12 @@ public final class HttpPayload {
           base64 = val.equals(BASE64);
         }
         if(!val.isEmpty() && parts != null)
-          parts.add(new FElem(Q_HEADER).add(NAME, key).add(VALUE, val));
+          parts.add(new FElem(Q_HTTP_HEADER).add(NAME, key).add(VALUE, val));
       }
       l = readLine();
     }
     if(parts != null) {
-      parts.add(new FElem(Q_BODY).add(SerializerOptions.MEDIA_TYPE.name(), type.toString()));
+      parts.add(new FElem(Q_HTTP_BODY).add(SerializerOptions.MEDIA_TYPE.name(), type.toString()));
     }
 
     // extract payload

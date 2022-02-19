@@ -6,6 +6,8 @@ import static org.basex.query.value.type.NodeType.*;
 import java.math.*;
 import java.net.*;
 import java.util.*;
+import java.util.AbstractMap.*;
+import java.util.Map.*;
 
 import javax.xml.namespace.*;
 
@@ -14,7 +16,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 import org.w3c.dom.*;
 
 /**
@@ -28,89 +29,90 @@ final class JavaMapping {
   /** Private constructor. */
   private JavaMapping() { }
 
-  /** Atomic mappings. */
-  private static final HashMap<Class<?>, Type> ATOMIC_MAP = new HashMap<>();
-  /** XQuery mappings. */
-  private static final HashMap<Class<?>, Type> XQUERY_MAP = new HashMap<>();
-
   /** Pairs with simple type conversions. */
-  private static final Pair[] ATOMIC = {
-    new Pair(BigDecimal.class, DECIMAL),
-    new Pair(BigInteger.class, UNSIGNED_LONG),
-    new Pair(boolean.class, BOOLEAN),
-    new Pair(Boolean.class, BOOLEAN),
-    new Pair(byte.class, BYTE),
-    new Pair(Byte.class, BYTE),
-    new Pair(char.class, UNSIGNED_SHORT),
-    new Pair(Character.class, UNSIGNED_SHORT),
-    new Pair(double.class, DOUBLE),
-    new Pair(Double.class, DOUBLE),
-    new Pair(float.class, FLOAT),
-    new Pair(Float.class, FLOAT),
-    new Pair(int.class, INT),
-    new Pair(Integer.class, INT),
-    new Pair(long.class, INTEGER),
-    new Pair(Long.class, INTEGER),
-    new Pair(QName.class, QNAME),
-    new Pair(short.class, SHORT),
-    new Pair(Short.class, SHORT),
-    new Pair(String.class, STRING),
-    new Pair(URI.class, ANY_URI),
-    new Pair(URL.class, ANY_URI),
+  private static final Entry[] ATOMIC = {
+    new SimpleEntry(BigDecimal.class, DECIMAL),
+    new SimpleEntry(BigInteger.class, UNSIGNED_LONG),
+    new SimpleEntry(boolean.class, BOOLEAN),
+    new SimpleEntry(Boolean.class, BOOLEAN),
+    new SimpleEntry(byte.class, BYTE),
+    new SimpleEntry(Byte.class, BYTE),
+    new SimpleEntry(char.class, UNSIGNED_SHORT),
+    new SimpleEntry(Character.class, UNSIGNED_SHORT),
+    new SimpleEntry(double.class, DOUBLE),
+    new SimpleEntry(Double.class, DOUBLE),
+    new SimpleEntry(float.class, FLOAT),
+    new SimpleEntry(Float.class, FLOAT),
+    new SimpleEntry(int.class, INT),
+    new SimpleEntry(Integer.class, INT),
+    new SimpleEntry(long.class, INTEGER),
+    new SimpleEntry(Long.class, INTEGER),
+    new SimpleEntry(QName.class, QNAME),
+    new SimpleEntry(short.class, SHORT),
+    new SimpleEntry(Short.class, SHORT),
+    new SimpleEntry(String.class, STRING),
+    new SimpleEntry(URI.class, ANY_URI),
+    new SimpleEntry(URL.class, ANY_URI),
   };
   /** Node pairs. */
-  private static final Pair[] NODES = {
-    new Pair(Attr.class, ATTRIBUTE),
-    new Pair(Comment.class, COMMENT),
-    new Pair(Document.class, DOCUMENT_NODE),
-    new Pair(DocumentFragment.class, DOCUMENT_NODE),
-    new Pair(Element.class, ELEMENT),
-    new Pair(Node.class, NODE),
-    new Pair(ProcessingInstruction.class, PROCESSING_INSTRUCTION),
-    new Pair(Text.class, TEXT),
+  private static final Entry[] NODES = {
+    new SimpleEntry(Attr.class, ATTRIBUTE),
+    new SimpleEntry(Comment.class, COMMENT),
+    new SimpleEntry(Document.class, DOCUMENT_NODE),
+    new SimpleEntry(DocumentFragment.class, DOCUMENT_NODE),
+    new SimpleEntry(Element.class, ELEMENT),
+    new SimpleEntry(Node.class, NODE),
+    new SimpleEntry(ProcessingInstruction.class, PROCESSING_INSTRUCTION),
+    new SimpleEntry(Text.class, TEXT),
   };
   /** XQuery pairs (no conversion required). */
-  private static final Pair[] XQUERY = {
+  private static final Entry[] XQUERY = {
     // atomic types
-    new Pair(ANum.class, NUMERIC),
-    new Pair(Atm.class, UNTYPED_ATOMIC),
-    new Pair(B64.class, BASE64_BINARY),
-    new Pair(Bln.class, BOOLEAN),
-    new Pair(Dat.class, DATE),
-    new Pair(Dbl.class, DOUBLE),
-    new Pair(Dec.class, DECIMAL),
-    new Pair(DTDur.class, DAY_TIME_DURATION),
-    new Pair(Dtm.class, DATE_TIME),
-    new Pair(Dur.class, DURATION),
-    new Pair(Flt.class, FLOAT),
-    new Pair(Hex.class, HEX_BINARY),
-    new Pair(Int.class, INTEGER),
-    new Pair(Item.class, ITEM),
-    new Pair(QNm.class, QNAME),
-    new Pair(Str.class, STRING),
-    new Pair(Tim.class, TIME),
-    new Pair(Uri.class, ANY_URI),
-    new Pair(YMDur.class, YEAR_MONTH_DURATION),
+    new SimpleEntry(ANum.class, NUMERIC),
+    new SimpleEntry(Atm.class, UNTYPED_ATOMIC),
+    new SimpleEntry(B64.class, BASE64_BINARY),
+    new SimpleEntry(Bln.class, BOOLEAN),
+    new SimpleEntry(Dat.class, DATE),
+    new SimpleEntry(Dbl.class, DOUBLE),
+    new SimpleEntry(Dec.class, DECIMAL),
+    new SimpleEntry(DTDur.class, DAY_TIME_DURATION),
+    new SimpleEntry(Dtm.class, DATE_TIME),
+    new SimpleEntry(Dur.class, DURATION),
+    new SimpleEntry(Flt.class, FLOAT),
+    new SimpleEntry(Hex.class, HEX_BINARY),
+    new SimpleEntry(Int.class, INTEGER),
+    new SimpleEntry(Item.class, ITEM),
+    new SimpleEntry(QNm.class, QNAME),
+    new SimpleEntry(Str.class, STRING),
+    new SimpleEntry(Tim.class, TIME),
+    new SimpleEntry(Uri.class, ANY_URI),
+    new SimpleEntry(YMDur.class, YEAR_MONTH_DURATION),
     // node types
-    new Pair(ANode.class, NODE),
-    new Pair(DBNode.class, NODE),
-    new Pair(FAttr.class, ATTRIBUTE),
-    new Pair(FComm.class, COMMENT),
-    new Pair(FDoc.class, DOCUMENT_NODE),
-    new Pair(FElem.class, ELEMENT),
-    new Pair(FNode.class, NODE),
-    new Pair(FNSpace.class, NAMESPACE_NODE),
-    new Pair(FPI.class, PROCESSING_INSTRUCTION),
-    new Pair(FTxt.class, TEXT),
+    new SimpleEntry(ANode.class, NODE),
+    new SimpleEntry(DBNode.class, NODE),
+    new SimpleEntry(FAttr.class, ATTRIBUTE),
+    new SimpleEntry(FComm.class, COMMENT),
+    new SimpleEntry(FDoc.class, DOCUMENT_NODE),
+    new SimpleEntry(FElem.class, ELEMENT),
+    new SimpleEntry(FNode.class, NODE),
+    new SimpleEntry(FNSpace.class, NAMESPACE_NODE),
+    new SimpleEntry(FPI.class, PROCESSING_INSTRUCTION),
+    new SimpleEntry(FTxt.class, TEXT),
     // function types
-    new Pair(XQArray.class, SeqType.ARRAY),
-    new Pair(XQMap.class, SeqType.MAP),
+    new SimpleEntry(XQArray.class, SeqType.ARRAY),
+    new SimpleEntry(XQMap.class, SeqType.MAP),
   };
 
+  /** Atomic mappings. */
+  private static final Map<Class<?>, Type> ATOMIC_MAP = new HashMap<>(ATOMIC.length);
+  /** XQuery mappings. */
+  private static final Map<Class<?>, Type> XQUERY_MAP = new HashMap<>(XQUERY.length);
+
   static {
-    for(final Pair<Class<?>, Type> pair : ATOMIC) ATOMIC_MAP.put(pair.name(), pair.value());
-    for(final Pair<Class<?>, Type> pair : XQUERY) XQUERY_MAP.put(pair.name(), pair.value());
+    for(final Entry<Class<?>, Type> pair : ATOMIC) ATOMIC_MAP.put(pair.getKey(), pair.getValue());
+    for(final Entry<Class<?>, Type> pair : XQUERY) XQUERY_MAP.put(pair.getKey(), pair.getValue());
   }
+
 
   /**
    * Returns an appropriate XQuery type for the specified Java class.
@@ -133,8 +135,8 @@ final class JavaMapping {
    * @return type or {@code null}
    */
   private static Type nodeType(final Class<?> clazz) {
-    for(final Pair<Class<?>, Type> pair : NODES) {
-      if(pair.name().isInstance(clazz)) return pair.value();
+    for(final Entry<Class<?>, Type> pair : NODES) {
+      if(pair.getKey().isInstance(clazz)) return pair.getValue();
     }
     return null;
   }

@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.Map.*;
 
 import org.basex.api.client.*;
 import org.basex.core.*;
@@ -127,7 +128,7 @@ public final class BaseXServer extends CLI implements Runnable {
     Runtime.getRuntime().addShutdownHook(new Thread(this::close));
 
     // execute initial command-line arguments
-    for(final Pair<String, String> cmd : commands) {
+    for(final Entry<String, String> cmd : commands) {
       if(!execute(cmd)) return;
     }
   }

@@ -62,7 +62,7 @@ public final class DiskTableTest extends SandboxTest {
     for(int i = 0; i < bc; ++i) {
       storage[i] = (byte) tda.read1(i >> IO.NODEPOWER, i % (1 << IO.NODEPOWER));
     }
-    nodes = IO.BLOCKSIZE >>> IO.NODEPOWER;
+    nodes = IO.ENTRIES;
     blocks = (int) Math.ceil((double) size / nodes);
   }
 

@@ -79,8 +79,10 @@ public abstract class IO {
   /** JS file suffixes. */
   public static final String[] JSSUFFIXES = { ".js", ".java", ".ts", ".vue" };
 
+  /** Disk block/page size (12). */
+  public static final int BLOCKPOWER = 12;
   /** Disk block/page size (4096). */
-  public static final int BLOCKSIZE = 1 << 12;
+  public static final int BLOCKSIZE = 1 << BLOCKPOWER;
   /** Table node size power (4). */
   public static final int NODEPOWER = 4;
   /** Table node size power (16). */

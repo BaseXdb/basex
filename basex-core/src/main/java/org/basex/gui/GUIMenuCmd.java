@@ -455,7 +455,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Filters the currently marked nodes. */
-  C_FILTER_NODES(FILTER_SELECTED, null, true, false) {
+  C_FILTER_NODES(FILTER_SELECTED, "alt DOWN", true, false) {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
@@ -909,7 +909,7 @@ public enum GUIMenuCmd implements GUICommand {
 
   /** Menu label. */
   private final String label;
-  /** Key shortcut. */
+  /** Key shortcut (can be {@code null}). */
   private final Object key;
   /** States if the command needs a data reference. */
   private final boolean data;
@@ -921,7 +921,7 @@ public enum GUIMenuCmd implements GUICommand {
   /**
    * Constructor.
    * @param label label of the menu item
-   * @param key shortcut
+   * @param key shortcut (can be {@code null})
    * @param data requires a database to be opened
    * @param toggle indicates if this command has two states
    */

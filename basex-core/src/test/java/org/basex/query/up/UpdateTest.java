@@ -72,13 +72,13 @@ public final class UpdateTest extends SandboxTest {
   /** Transform expression shadowing another variable. */
   @Test public void shadowing() {
     query("let $c := <x/> return copy $c := $c modify () return $c", "<x/>");
-    query("declare variable $d := document{ <x/> } update (); $d/x", "<x/>");
+    query("declare variable $d := document{ <x/> } update { }; $d/x", "<x/>");
   }
 
   /** Transform expression containing a simple expression. */
   @Test public void transSimple() {
-    error("<a/> update ('')", UPMODIFY);
-    error("copy $a := <a/> modify ('') return $a", UPMODIFY);
+    error("<a/> update { '' }", UPMODIFY);
+    error("copy $a := <a/> modify '' return $a", UPMODIFY);
   }
 
   /**
@@ -91,10 +91,10 @@ public final class UpdateTest extends SandboxTest {
       query(
           "for $voc in 1 to 2 " +
           "let $xml := db:open('DBtransform') " +
-          "return (" +
-          "$xml update (" +
-          "for $i in 1 to 2 return " +
-          "insert node $xml/instance/data/vocable[@hits = '1'] into ./instance))",
+          "return $xml update {" +
+          "  for $i in 1 to 2 return " +
+          "    insert node $xml/instance/data/vocable[@hits = '1'] into ./instance" +
+          "}",
           "<instance>\n<data>\n" +
           "<vocable hits=\"1\"/>\n</data>\n" +
           "<vocable hits=\"1\"/>\n" +
@@ -970,10 +970,11 @@ public final class UpdateTest extends SandboxTest {
    */
   @Test public void delayedDistanceAdjustment26() {
     query(
-        "<n><x at1='0' at2='0'/><y at3='0'/><b/></n> update (" +
-        "delete node .//@at1," +
-        "delete node .//@at3," +
-        "rename node (.//@at2)[1] as 'at2x')",
+        "<n><x at1='0' at2='0'/><y at3='0'/><b/></n> update {" +
+        "  delete node .//@at1," +
+        "  delete node .//@at3," +
+        "  rename node (.//@at2)[1] as 'at2x'" +
+        "}",
         "<n>\n<x at2x=\"0\"/>\n<y/>\n<b/>\n</n>");
   }
 
@@ -1032,20 +1033,18 @@ public final class UpdateTest extends SandboxTest {
 
   /** Tests the "update" and "transform with" operators. */
   @Test public void update() {
-    query("<x/> update ()", "<x/>");
-    query("<x/> update insert node <y/> into .", "<x>\n<y/>\n</x>");
-    query("<x/> update (insert node <y/> into .)", "<x>\n<y/>\n</x>");
+    query("<x/> update { }", "<x/>");
     query("<x/> update { insert node <y/> into . }", "<x>\n<y/>\n</x>");
-    query("<x/> update {}", "<x/>");
-    query("<x/> update {} update {}", "<x/>");
-    query("<x/> update {}", "<x/>");
-    query("(<x/>, <y/>) update {}", "<x/>\n<y/>");
-    error("update:output('a') update ()", UPNOT_X);
-    error("<x/> update 1", UPMODIFY);
+    query("<x/> update { }", "<x/>");
+    query("<x/> update { } update { }", "<x/>");
+    query("<x/> update { }", "<x/>");
+    query("(<x/>, <y/>) update { }", "<x/>\n<y/>");
+    error("update:output('a') update { }", UPNOT_X);
+    error("<x/> update { 1 }", UPMODIFY);
 
-    query("(<a>X</a>/text() update {})/..", "");
+    query("(<a>X</a>/text() update { })/..", "");
 
-    query("<x/> transform with {}", "<x/>");
+    query("<x/> transform with { }", "<x/>");
     query("<x/> transform with { insert node <y/> into . }", "<x>\n<y/>\n</x>");
     error("update:output('a') transform with {}", UPNOT_X);
     error("<x/> transform with { 1 }", UPMODIFY);
@@ -1053,7 +1052,7 @@ public final class UpdateTest extends SandboxTest {
 
   /** Tests the relaxed rule that the last step of a path may be simple, vacuous, or updating. */
   @Test public void updateLastStep() {
-    query("<X/>!(delete node .)");
+    query("<X/> ! (delete node .)");
     query("<X/>/(delete node .)");
     query("(<X/>, <Y/>)/(insert node <Z/> into .)");
   }
@@ -1063,9 +1062,9 @@ public final class UpdateTest extends SandboxTest {
     error("copy $c:= <a>X</a> modify 'a' return $c", UPMODIFY);
     error("copy $c:= <a>X</a> modify(delete node $c/text(), 'a') return $c", UPALL);
 
-    error("text { <a/> update (delete node <a/>, <b/>) }", UPALL);
-    error("1[<a/> update (delete node <a/>, <b/>)]", UPALL);
-    error("for $i in 1 order by (<a/> update (delete node <a/>, <b/>)) return $i", UPALL);
+    error("text { <a/> update { delete node <a/>, <b/> } }", UPALL);
+    error("1[<a/> update { delete node <a/>, <b/> }]", UPALL);
+    error("for $i in 1 order by (<a/> update { delete node <a/>, <b/> }) return $i", UPALL);
   }
 
   /** Reject updating function items. */
@@ -1167,8 +1166,8 @@ public final class UpdateTest extends SandboxTest {
 
   /** Do not merge non-updating expressions. */
   @Test public void gh1943() {
-    query("let $c := <a/> ! (. update {}, . update {}) return $c[1] is $c[2]", false);
-    query("let $a := <a/> let $c := ($a update {}, $a update {}) return $c[1] is $c[2]", false);
+    query("let $c := <a/> ! (. update { }, . update { }) return $c[1] is $c[2]", false);
+    query("let $a := <a/> let $c := ($a update { }, $a update { }) return $c[1] is $c[2]", false);
 
     query("<a/> ! (copy $_ := . modify () return $_)", "<a/>");
     query("let $a := <a/> let $c := ("
