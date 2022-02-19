@@ -175,12 +175,12 @@ public enum NodeType implements Type {
 
   @Override
   public final boolean isUntyped() {
-    return true;
+    return this != PROCESSING_INSTRUCTION && this != COMMENT && this != NODE;
   }
 
   @Override
   public final boolean isNumberOrUntyped() {
-    return true;
+    return this != PROCESSING_INSTRUCTION && this != COMMENT && this != NODE;
   }
 
   @Override
