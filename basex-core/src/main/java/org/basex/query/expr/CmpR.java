@@ -80,26 +80,36 @@ public final class CmpR extends Single {
    * @throws QueryException query exception
    */
   static Expr get(final CompileContext cc, final CmpG cmp) throws QueryException {
+    // only rewrite deterministic expressions
     final Expr expr1 = cmp.exprs[0], expr2 = cmp.exprs[1];
-    final Type type1 = expr1.seqType().type, type2 = expr2.seqType().type;
+    if(cmp.has(Flag.NDT)) return cmp;
 
-    // only rewrite deterministic comparisons if input is not decimal
-    if(cmp.has(Flag.NDT) || !type1.isNumberOrUntyped() || type1 == AtomType.DECIMAL) return cmp;
+    // only rewrite numeric comparisons, skip decimals
+    // allowed: $node > 20; rejected: $decimal = 1 to 10
+    final Type type1 = expr1.seqType().type;
+    final boolean int1 = type1.instanceOf(AtomType.INTEGER);
+    if(!(type1.isUntyped() || type1 == AtomType.FLOAT || type1 == AtomType.DOUBLE || int1))
+      return cmp;
 
-    // if value to be compared is a decimal, input must be untyped or integer
-    if(!(expr2 instanceof ANum) || type2 == AtomType.DECIMAL && !type1.isUntyped() &&
-        !type1.instanceOf(AtomType.INTEGER)) return cmp;
+    double mn = POSITIVE_INFINITY, mx = NEGATIVE_INFINITY;
+    if(expr2 instanceof RangeSeq) {
+      final long[] range = ((RangeSeq) expr2).range(false);
+      mn = range[0];
+      mx = range[1];
+    } else if(expr2 instanceof ANum && !(expr2 instanceof Dec && int1)) {
+      mn = ((ANum) expr2).dbl();
+      mx = mn;
+    } else {
+      return cmp;
+    }
+    // integer comparisons: reject numbers that are too large to be safely compared as doubles
+    if(int1 && (Math.abs(mn) >= MAX_INTEGER || Math.abs(mx) >= MAX_INTEGER)) return cmp;
 
-    // reject numbers that are too large or small to be safely compared as doubles
-    final double d = ((ANum) expr2).dbl();
-    if(d < -MAX_INTEGER || d > MAX_INTEGER) return cmp;
-
-    double mn = d, mx = d;
     switch(cmp.op) {
       case GE: mx = POSITIVE_INFINITY; break;
-      case GT: mn = Math.nextUp(d); mx = POSITIVE_INFINITY; break;
+      case GT: mn = Math.nextUp(mn); mx = POSITIVE_INFINITY; break;
       case LE: mn = NEGATIVE_INFINITY; break;
-      case LT: mn = NEGATIVE_INFINITY; mx = Math.nextDown(d); break;
+      case LT: mn = NEGATIVE_INFINITY; mx = Math.nextDown(mx); break;
       // do not rewrite (non-)equality comparisons
       default: return cmp;
     }
