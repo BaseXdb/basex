@@ -169,24 +169,31 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a>5</a>[text() > 800000000]", "", exists(cmpr));
     check("<a>5</a>[text() < -800000000]", "", exists(cmpr));
     check("<a>5</a>[text() <= -800000000]", "", exists(cmpr));
+    check("<a>5</a>[text() > 8000000000000000000]", "", exists(cmpr));
+    check("<a>5</a>[text() < -8000000000000000000]", "", exists(cmpr));
     check("exists(<x>1234567890.12345678</x>[. = 1234567890.1234567])", true, empty(cmpr));
 
     check("exists(<x>123456789012345678</x> [. = 123456789012345679])", true, empty(cmpr));
-    check("<a>5</a>[text() > 8000000000000000000]", "", empty(cmpr));
-    check("<a>5</a>[text() < -8000000000000000000]", "", empty(cmpr));
+    check("<a>5</a>[xs:integer(.) > 8000000000000000000]", "", empty(cmpr));
+    check("<a>5</a>[xs:integer(.) < -8000000000000000000]", "", empty(cmpr));
     check("(1, 1234567890.12345678)[. = 1234567890.1234567]", "", empty(cmpr));
     check("(1, 123456789012345678 )[. = 123456789012345679]", "", empty(cmpr));
 
     // rewrite equality comparisons
-    check("(0, 1)[. = 1] >= 1.0", true, exists(cmpr));
     check("(0, 1)[. = 1] >= 1e0", true, exists(cmpr));
     check("(0e0, 1e0)[. = 1] >= 1", true, exists(cmpr));
     check("(0e0, 1e0)[. = 1] >= 1e0", true, exists(cmpr));
     check(wrap("1.1") + ">= 1.1", true, exists(cmpr));
+    check("(0e0, 1e0)[. = 1] >= 1.0", true, exists(cmpr));
+    check("(0e0, 1e0)[. = 1] >= 1.000000000000001", false, exists(cmpr));
+    check("(0e0, 1e0)[. = 1] >= 1.0000000000000001", true, exists(cmpr));
 
     // do not rewrite decimal/double comparisons
-    check("(0e0, 1e0)[. = 1] >= 1.0", true, empty(cmpr));
+    check("(0, 1)[. = 1] >= 1.0", true, empty(cmpr));
+    check("(0, 1)[. = 1] >= 1.0000000000000001", false, empty(cmpr));
     check("(0.0, 1.0)[. = 1] >= 1e0", true, empty(cmpr));
+    check("(0.0, 1.0)[. = 1] >= 1.000000000000001e0", false, empty(cmpr));
+    check("(0.0, 1.0)[. = 1] >= 1.0000000000000001e0", true, empty(cmpr));
 
     // do not rewrite equality comparisons
     check("(0, 1)[. = 1] = 1.0", true, empty(cmpr));
@@ -2515,13 +2522,49 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<x a='1'/>/@a = 1 to 3", true, exists(CmpIR.class));
     check("<x a='1'/>/@a = 1 to 3", true, exists(CmpIR.class));
 
+    check("xs:integer(<x>1</x>/text()) >= (1 to 3)", true , exists(CmpIR.class));
+    check("xs:integer(<x>1</x>/text()) >  (1 to 3)", false, exists(CmpIR.class));
+    check("xs:integer(<x>3</x>/text()) <= (1 to 3)", true , exists(CmpIR.class));
+    check("xs:integer(<x>3</x>/text()) <  (1 to 3)", false, exists(CmpIR.class));
+
+    check("xs:integer(<x>1</x>/text()) >= 1", true , exists(CmpIR.class));
+    check("xs:integer(<x>1</x>/text()) >  1", false, exists(CmpIR.class));
+    check("xs:integer(<x>3</x>/text()) <= 3", true , exists(CmpIR.class));
+    check("xs:integer(<x>3</x>/text()) <  3", false, exists(CmpIR.class));
+
+    check("<x a='2'/>/@a >= 1 to 3", true, exists(CmpR.class));
+    check("<x a='2'/>/@a >  1 to 3", true, exists(CmpR.class));
+    check("<x a='2'/>/@a <= 1 to 3", true, exists(CmpR.class));
+    check("<x a='2'/>/@a <  1 to 3", true, exists(CmpR.class));
+
+    check("<x a='2'/>/@a             >  1e0", true , exists(CmpR.class));
+    check("xs:integer(<x a='2'/>/@a) >  1e0", true , exists(CmpR.class));
+    check("<x a='1'/>/@a             >  1e0", false, exists(CmpR.class));
+    check("xs:integer(<x a='1'/>/@a) >  1e0", false, exists(CmpR.class));
+    check("<x a='1'/>/@a             >= 1e0", true , exists(CmpR.class));
+    check("xs:integer(<x a='1'/>/@a) >= 1e0", true , exists(CmpR.class));
+
+    check("<x a='2'/>/@a >  1.0", true , exists(CmpR.class));
+    check("<x a='1'/>/@a >  1.0", false, exists(CmpR.class));
+    check("<x a='1'/>/@a >= 1.0", true , exists(CmpR.class));
+
+    check("<x a='2'/>/@a >  11111111111111111", false, exists(CmpR.class));
+    check("<x a='2'/>/@a < -11111111111111111", false, exists(CmpR.class));
+
     // no rewrite
-    check("<x a='2'/>/@a >= 1 to 3", true, exists(CmpG.class));
-    check("<x a='2'/>/@a >  1 to 3", true, exists(CmpG.class));
-    check("<x a='2'/>/@a <= 1 to 3", true, exists(CmpG.class));
-    check("<x a='2'/>/@a <  1 to 3", true, exists(CmpG.class));
-    check("<x a='2'/>/@a != 1 to 3", true, exists(CmpG.class));
-    check("<x a='2'/>/@a =  2"     , true, exists(CmpSimpleG.class));
+    check("<x a='2'/>/@a != 1 to 3", true, empty(CmpR.class));
+    check("<x a='2'/>/@a =  2"     , true, empty(CmpR.class));
+    check("trace(2) = 1 to 3", true , empty(CmpR.class));
+    check("xs:decimal(<x>1</x>/text()) >= 1.0", true , empty(CmpR.class));
+    check("(1.0000000000000001, xs:double(<?_ 1?>)) > 1.0", true, empty(CmpR.class));
+
+    check("xs:integer(<x a='2'/>/@a) != 2  ", false, empty(CmpR.class));
+    check("xs:integer(<x a='2'/>/@a) >  1.0", true , empty(CmpR.class));
+    check("xs:integer(<x a='1'/>/@a) >  1.0", false, empty(CmpR.class));
+    check("xs:integer(<x a='1'/>/@a) >= 1.0", true , empty(CmpR.class));
+
+    check("xs:integer(<x a='2'/>/@a) >  11111111111111111", false, empty(CmpR.class));
+    check("xs:integer(<x a='2'/>/@a) < -11111111111111111", false, empty(CmpR.class));
 
     error("<x/> = 1", FUNCCAST_X_X);
     error("<x/> = 1 to 2", FUNCCAST_X_X);

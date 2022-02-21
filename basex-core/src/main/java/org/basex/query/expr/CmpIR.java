@@ -73,12 +73,17 @@ public final class CmpIR extends Single {
   public static Expr get(final CompileContext cc, final CmpG cmp, final boolean eq)
       throws QueryException {
 
-    // skip non-deterministic expressions
+    // only rewrite deterministic expressions
     final Expr expr1 = cmp.exprs[0], expr2 = cmp.exprs[1];
     if(cmp.has(Flag.NDT)) return cmp;
 
-    long mn, mx;
+    // only rewrite integer or equality comparisons
+    // allowed: $integer > 2, $value = 10 to 20; rejected: $double  > 2
+    final Type type1 = expr1.seqType().type;
     final boolean cmpEq = cmp.op == OpG.EQ;
+    if(!(type1.instanceOf(AtomType.INTEGER) || cmpEq && type1.isUntyped())) return cmp;
+
+    long mn = MAX_VALUE, mx = MIN_VALUE;
     if(expr2 instanceof RangeSeq) {
       final long[] range = ((RangeSeq) expr2).range(false);
       mn = range[0];
@@ -90,18 +95,12 @@ public final class CmpIR extends Single {
       return cmp;
     }
 
-    // only rewrite integer or equality comparisons
-    // allowed : $integer > 2, $value = 10 to 20
-    // rejected: $double  > 2
-    final Type type = expr1.seqType().type;
-    if(!(type.instanceOf(AtomType.INTEGER) || cmpEq && type.isUntyped())) return cmp;
-
     switch(cmp.op) {
-      case EQ: break;
       case GE: mx = MAX_VALUE; break;
       case GT: mn++; mx = MAX_VALUE; break;
       case LE: mn = MIN_VALUE; break;
       case LT: mn = MIN_VALUE; mx--; break;
+      case EQ: break;
       default: return cmp;
     }
     return get(cc, cmp.info, expr1, mn, mx);

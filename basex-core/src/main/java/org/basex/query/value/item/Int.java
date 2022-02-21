@@ -154,13 +154,15 @@ public final class Int extends ANum {
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return item instanceof Int ? value == ((Int) item).value :
-           item.type != AtomType.DECIMAL ? value == item.dbl(ii) :
-           item.eq(this, coll, sc, ii);
+            item instanceof Dec ? item.eq(this, coll, sc, ii) :
+            value == item.dbl(ii);
+
   }
 
   @Override
   public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
     if(item instanceof Int) return Long.compare(value, ((Int) item).value);
+    if(item instanceof Dec) return -item.diff(this, coll, ii);
     final double n = item.dbl(ii);
     return Double.isNaN(n) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
   }
