@@ -60,10 +60,10 @@ public final class IntSeq extends NativeSeq {
         // try to rewrite to range sequence
         int t = 0;
         while(++t < tl && tmp[0] + t == tmp[t]);
-        if(t == tl) return cc.replaceWith(this, RangeSeq.get(tmp[0], tl, true));
+        if(t == tl) return cc.simplify(this, RangeSeq.get(tmp[0], tl, true));
       }
       // replace with new, sorted (possibly smaller) sequence
-      return cc.replaceWith(this, get(tmp, type));
+      return cc.simplify(this, get(tmp, type));
     }
     return super.simplifyFor(mode, cc);
   }

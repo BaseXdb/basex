@@ -83,7 +83,7 @@ public final class SingletonSeq extends Seq {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = null;
     if(mode == Simplify.DISTINCT) {
-      expr = value;
+      expr = value.simplifyFor(mode, cc);
     } else if(type instanceof NodeType && (mode == Simplify.DATA || mode == Simplify.NUMBER ||
         mode == Simplify.STRING)) {
       expr = get((Value) value.simplifyFor(mode, cc), size / value.size());

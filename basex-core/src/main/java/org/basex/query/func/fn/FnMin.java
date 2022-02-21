@@ -134,16 +134,20 @@ public class FnMin extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    return opt(OpV.GT);
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    return opt(OpV.GT, cc);
   }
 
   /**
    * Optimizes a minimum or maximum item.
    * @param cmp comparator
+   * @param cc compilation context
    * @return optimized or original item
+   * @throws QueryException query exception
    */
-  final Expr opt(final OpV cmp) {
+  final Expr opt(final OpV cmp, final CompileContext cc) throws QueryException {
+    exprs[0] = exprs[0].simplifyFor(Simplify.DISTINCT, cc);
+
     Expr expr = optFirst();
     if(expr != this) return expr;
 
