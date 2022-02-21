@@ -570,6 +570,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" prof:void(123)"), "", empty(func));
     check(func.args(" 123"), 123, empty(func));
     check(func.args(wrap(1)), 1, exists(func));
+    check(func.args(" (0 to 99999999999) ! (1 to 10000000)"), 1, root(Int.class));
 
     // errors
     error(func.args(" xs:QName('a')"), COMPARE_X_X);

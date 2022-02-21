@@ -19,7 +19,7 @@ public final class FnMax extends FnMin {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    return opt(OpV.LT);
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    return opt(OpV.LT, cc);
   }
 }

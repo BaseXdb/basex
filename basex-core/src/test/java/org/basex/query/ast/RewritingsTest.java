@@ -2148,10 +2148,28 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** distinct-values: simplify arguments. */
   @Test public void gh1967() {
-    check("count(distinct-values((1 to 100000000, 1 to 100000000)))", 100000000, root(Int.class));
-    check("count(distinct-values((1 to 100000000, 1)))", 100000000, root(Int.class));
-    check("count(distinct-values((1 to 100000000, 1, 0, 100000000, 100, 10 to 10000, 100000001)))",
-        100000002, root(Int.class));
+    final java.util.function.BiConsumer<String, Integer> check = (query, result) -> {
+      check("count(distinct-values((" + query + ")))", result, root(Int.class));
+    };
+
+    // values will not be pre-evaluated as range is larger than CompileContext#MAX_PREEVAL
+    check.accept("1 to 10000000, 1 to 10000000", 10000000);
+    check.accept("1 to 10000000, 1", 10000000);
+    check.accept("1, 1 to 10000000", 10000000);
+
+    check.accept("0, 1 to 10000000", 10000001);
+    check.accept("1 to 10000000, 0", 10000001);
+    check.accept("1 to 10000000, 10000001", 10000001);
+    check.accept("10000001, 1 to 10000000", 10000001);
+
+    check.accept("0, 1 to 10000000, 10000001", 10000002);
+    check.accept("10000001, 1 to 10000000, 0", 10000002);
+
+    check.accept("1 to 50, 51 to 10000000, 10000001 to 10000006", 10000006);
+    check.accept("1 to 10000000, 1, 0, 10000000, 100, 10 to 10000, 10000001", 10000002);
+
+    check("count(distinct-values((1 to 1000000, 1000002)))", 1000001, root(COUNT));
+    check("count(distinct-values((0, 2 to 1000000)))", 1000000, root(COUNT));
   }
 
   /** Existence checks, filter expressions. */

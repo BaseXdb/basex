@@ -299,11 +299,11 @@ public final class List extends Arr {
   private Expr toDistinctRange() {
     long start = 0, end = 0;
     final LongList list = new LongList(2);
-    for(final Expr ex : exprs) {
-      if(ex instanceof Int) {
-        list.add(((Int) ex).itr());
-      } else if(ex instanceof RangeSeq) {
-        list.add(((RangeSeq) ex).range(false));
+    for(final Expr expr : exprs) {
+      if(expr instanceof Int) {
+        list.add(((Int) expr).itr());
+      } else if(expr instanceof RangeSeq) {
+        list.add(((RangeSeq) expr).range(false));
       } else {
         return this;
       }
@@ -312,9 +312,9 @@ public final class List extends Arr {
         start = mn;
         end = mx;
       } else {
-        if(mn < start - 1 || mx > end + 1) return this;
-        if(mn == start - 1) start = mn;
-        if(mx == end + 1) end = mx;
+        if(mx < start - 1 || mn > end) return this;
+        if(mn < start) start = mn;
+        if(mx > end) end = mx;
       }
       list.reset();
     }
