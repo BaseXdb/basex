@@ -66,7 +66,7 @@ final class RESTRun extends RESTQuery {
       }
     } else {
       // otherwise, interpret input as xquery
-      session.add(new XQuery(input));
+      session.add(new XQuery(input).baseURI(file.path()));
     }
 
     // perform query
