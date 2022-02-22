@@ -2,7 +2,6 @@ package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -15,11 +14,11 @@ import org.basex.util.*;
 public final class FnMax extends FnMin {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return minmax(OpV.LT, qc);
+    return minmax(false, qc);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    return opt(OpV.LT, cc);
+    return opt(false, cc);
   }
 }

@@ -259,7 +259,7 @@ public final class CmpR extends Single {
 
     final Names names = type == IndexType.TEXT ? data.elemNames : data.attrNames;
     final Stats stats = names.stats(names.id(test.qname.local()));
-    return stats == null || StatsType.isNumeric(stats.type) ? stats : null;
+    return stats != null && StatsType.isNumeric(stats.type) ? stats : null;
   }
 
   @Override

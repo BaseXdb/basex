@@ -9,6 +9,7 @@ import java.util.function.*;
 import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.index.path.*;
+import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -358,12 +359,40 @@ public abstract class Path extends ParseExpr {
 
     ArrayList<PathNode> nodes = data.paths.root();
     for(final Expr step : steps) {
-      if(step instanceof Step) {
-        nodes = ((Step) step).nodes(nodes, data);
-        if(nodes == null) return null;
-      }
+      if(!(step instanceof Step)) return null;
+      nodes = ((Step) step).nodes(nodes, data);
+      if(nodes == null) return null;
     }
     return nodes;
+  }
+
+  /**
+   * Returns database statistics for the path nodes that will result from this path.
+   * @param numeric only return numeric values
+   * @return statistics or {@code null}
+   */
+  public ArrayList<Stats> pathStats(final boolean numeric) {
+    final ArrayList<PathNode> nodes = pathNodes(root);
+    if(nodes == null) return null;
+
+    // loop through all nodes
+    final ArrayList<Stats> stats = new ArrayList<>();
+    for(PathNode node : nodes) {
+      // retrieve text child if addressed node is an element
+      if(node.kind == Data.ELEM) {
+        if(!node.stats.isLeaf()) return null;
+        for(final PathNode nd : node.children) {
+          if(nd.kind == Data.TEXT) node = nd;
+        }
+      }
+      // skip nodes others than texts and attributes
+      // check if distinct values are available
+      final int kind = node.kind, type = node.stats.type;
+      if(kind != Data.TEXT && kind != Data.ATTR || !StatsType.isCategory(type) ||
+          numeric && !StatsType.isNumeric(type)) return null;
+      stats.add(node.stats);
+    }
+    return stats;
   }
 
   /**

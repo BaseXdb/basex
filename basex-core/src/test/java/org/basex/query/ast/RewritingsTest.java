@@ -2588,4 +2588,31 @@ public final class RewritingsTest extends QueryPlanTest {
     error("<x/> = 1 to 2", FUNCCAST_X_X);
     error("<?_ 1?> = 1 to 2", CMPTYPES_X_X);
   }
+
+  /** Database statistics: min, max, sum, avg. */
+  @Test public void gh2071() {
+    execute(new CreateDB(NAME, "<xml><a>1</a><a>3</a></xml>"));
+    check("//a => min()", 1, root(Dbl.class));
+    check("//a => max()", 3, root(Dbl.class));
+    check("//a => sum()", 4, root(Dbl.class));
+    check("//a => avg()", 2, root(Dbl.class));
+
+    execute(new CreateDB(NAME, "<xml><a>1.5</a><a>3.5</a></xml>"));
+    check("//a => min()", 1.5, root(Dbl.class));
+    check("//a => max()", 3.5, root(Dbl.class));
+    check("//a => sum()", 5, root(Dbl.class));
+    check("//a => avg()", 2.5, root(Dbl.class));
+
+    execute(new CreateDB(NAME, "<xml><a>-1</a><a>1</a></xml>"));
+    check("//a => min()", -1, root(Dbl.class));
+    check("//a => max()", 1, root(Dbl.class));
+    check("//a => sum()", 0, root(Dbl.class));
+    check("//a => avg()", 0, root(Dbl.class));
+
+    execute(new CreateDB(NAME, "<xml><a>-1</a><a>1</a><a/></xml>"));
+    error("//a => min()", FUNCCAST_X_X);
+    error("//a => max()", FUNCCAST_X_X);
+    error("//a => sum()", FUNCCAST_X_X);
+    error("//a => avg()", FUNCCAST_X_X);
+  }
 }

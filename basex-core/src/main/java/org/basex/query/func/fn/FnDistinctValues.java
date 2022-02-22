@@ -4,8 +4,6 @@ import static org.basex.query.func.Function.*;
 
 import java.util.*;
 
-import org.basex.data.*;
-import org.basex.index.path.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -71,8 +69,20 @@ public final class FnDistinctValues extends StandardFunc {
       return cc.function(SORT, info, list.finish());
     }
 
-    final Expr opt = optStats(expr, cc);
-    if(opt != this) return opt;
+    if(exprs.length == 1 && exprs[0] instanceof Path) {
+      final ArrayList<Stats> list = ((Path) exprs[0]).pathStats(false);
+      if(list != null) {
+        final ValueBuilder vb = new ValueBuilder(cc.qc);
+        final HashItemSet set = new HashItemSet(false);
+        for(final Stats stats : list) {
+          for(final byte[] value : stats.values) {
+            final Atm item = Atm.get(value);
+            if(set.add(item, info)) vb.add(item);
+          }
+        }
+        return vb.value(this);
+      }
+    }
 
     final AtomType type = st.type.atomic();
     if(type != null) {
@@ -89,46 +99,6 @@ public final class FnDistinctValues extends StandardFunc {
       }
     }
     return this;
-  }
-
-  /**
-   * Tries to evaluate distinct values based on the database statistics.
-   * @param expr expression
-   * @param cc compilation context
-   * @return original expression or sequence of distinct values
-   * @throws QueryException query exception
-   */
-  private Expr optStats(final Expr expr, final CompileContext cc) throws QueryException {
-    // can only be performed without collation and on axis paths
-    if(exprs.length > 1 || !(expr instanceof AxisPath)) return this;
-
-    // try to get statistics for resulting nodes
-    final AxisPath path = (AxisPath) expr;
-    final ArrayList<PathNode> nodes = path.pathNodes(path.root);
-    if(nodes == null) return this;
-
-    // loop through all nodes
-    final ValueBuilder vb = new ValueBuilder(cc.qc);
-    final HashItemSet set = new HashItemSet(false);
-    for(PathNode node : nodes) {
-      // retrieve text child if addressed node is an element
-      if(node.kind == Data.ELEM) {
-        if(!node.stats.isLeaf()) return this;
-        for(final PathNode nd : node.children) {
-          if(nd.kind == Data.TEXT) node = nd;
-        }
-      }
-      // skip nodes others than texts and attributes
-      // check if distinct values are available
-      if(node.kind != Data.TEXT && node.kind != Data.ATTR ||
-         !StatsType.isCategory(node.stats.type)) return this;
-      // if yes, add them to the item set
-      for(final byte[] c : node.stats.values) {
-        final Atm item = Atm.get(c);
-        if(set.add(item, info)) vb.add(item);
-      }
-    }
-    return vb.value(this);
   }
 
   /**

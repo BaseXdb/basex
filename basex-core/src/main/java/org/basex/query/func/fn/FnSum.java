@@ -4,9 +4,12 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.AtomType.*;
 
 import java.math.*;
+import java.util.*;
 
+import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -25,33 +28,16 @@ import org.basex.util.*;
 public class FnSum extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Expr expr = exprs[0];
-    if(expr instanceof RangeSeq || expr instanceof Range) {
-      final Item item = range(expr.value(qc), false);
-      if(item != null) return item;
-    } else {
-      if(expr instanceof SingletonSeq) {
-        final Item item = singleton((SingletonSeq) expr, false);
-        if(item != null) return item;
-      }
-      final Iter iter = exprs[0].atomIter(qc, info);
-      final Item item = iter.next();
-      if(item != null) return sum(iter, item, false, qc);
-    }
-    // return default item
-    return exprs.length == 2 ? exprs[1].atomItem(qc, info) : Int.ZERO;
+    final Item item = sum(false, qc);
+    return item != null ? item : exprs.length == 2 ? exprs[1].atomItem(qc, info) : Int.ZERO;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0];
-    if(expr1 instanceof RangeSeq) return range((Value) expr1, false);
-    if(expr1 instanceof SingletonSeq) {
-      final Item item = singleton((SingletonSeq) expr1, false);
-      if(item != null) return item;
-    }
+    final Expr expr = opt(false);
+    if(expr != null) return expr;
 
-    final Expr expr2 = exprs.length == 2 ? exprs[1] : null;
+    final Expr expr1 = exprs[0], expr2 = exprs.length == 2 ? exprs[1] : null;
     final SeqType st1 = expr1.seqType(), st2 = expr2 != null ? expr2.seqType() : null;
     if(st1.zero()) {
       // sequence is empty: check if it also deterministic
@@ -73,19 +59,56 @@ public class FnSum extends StandardFunc {
     return this;
   }
 
+  /**
+   * Pre-evaluates a value expression.
+   * @param avg calculate average
+   * @return optimized expression or {@code null}
+   * @throws QueryException query exception
+   */
+  final Expr opt(final boolean avg) throws QueryException {
+    final Expr expr = exprs[0];
+    if(expr instanceof RangeSeq) {
+      return range((RangeSeq) expr, avg);
+    } else if(expr instanceof SingletonSeq) {
+      final SingletonSeq seq = (SingletonSeq) expr;
+      if(seq.singleItem()) {
+        Item item = seq.itemAt(0);
+        final Type type = item.type;
+        if(type.isUntyped()) item = Dbl.get(item.dbl(info));
+        if(type.isNumber()) return avg ? item : Calc.MULT.eval(item, Int.get(seq.size()), info);
+      }
+    } else if(expr instanceof Path) {
+      final ArrayList<Stats> list = ((Path) expr).pathStats(true);
+      if(list != null) {
+        double sum = 0;
+        long count = 0;
+        for(final Stats stats : list) {
+          for(final byte[] value : stats.values) {
+            if(value.length == 0) return null;
+            final long c = stats.values.get(value);
+            sum += c * Token.toDouble(value);
+            count += c;
+          }
+        }
+        return Dbl.get(avg ? sum / count : sum);
+      }
+    }
+    return null;
+  }
+
   @Override
   protected final void simplifyArgs(final CompileContext cc) {
     // do not simplify summed-up items and zero argument
   }
 
   /**
-   * Compute result from range value.
+   * Computes the result from a range value.
    * @param value sequence
    * @param avg calculate average
    * @return result, or {@code null} if sequence is empty
    * @throws QueryException query exception
    */
-  protected final Item range(final Value value, final boolean avg) throws QueryException {
+  final Item range(final Value value, final boolean avg) throws QueryException {
     if(value.isEmpty()) return null;
 
     long min = value.itemAt(0).itr(info), max = value.itemAt(value.size() - 1).itr(info);
@@ -115,34 +138,19 @@ public class FnSum extends StandardFunc {
   }
 
   /**
-   * Compute result from singleton value.
-   * @param seq singleton sequence
-   * @param avg calculate average
-   * @return result, or {@code null} if value cannot be evaluated
-   * @throws QueryException query exception
-   */
-  protected final Item singleton(final SingletonSeq seq, final boolean avg) throws QueryException {
-    if(seq.singleItem()) {
-      Item item = seq.itemAt(0);
-      if(item.type.isUntyped()) item = Dbl.get(item.dbl(info));
-      if(item.type.isNumber()) {
-        return avg ? item : Calc.MULT.eval(item, Int.get(seq.size()), info);
-      }
-    }
-    return null;
-  }
-
-  /**
    * Sums up the specified item(s).
-   * @param iter iterator
-   * @param item first item
    * @param avg calculate average
    * @param qc query context
    * @return summed up item
    * @throws QueryException query exception
    */
-  final Item sum(final Iter iter, final Item item, final boolean avg, final QueryContext qc)
-      throws QueryException {
+  final Item sum(final boolean avg, final QueryContext qc) throws QueryException {
+    final Expr expr = exprs[0];
+    if(expr instanceof Range) return range(expr.value(qc), avg);
+
+    final Iter iter = expr.atomIter(qc, info);
+    final Item item = iter.next();
+    if(item == null) return null;
 
     Item result = item.type.isUntyped() ? Dbl.get(item.dbl(info)) : item;
     final boolean num = result instanceof ANum;
@@ -154,9 +162,7 @@ public class FnSum extends StandardFunc {
       final Type type = it.type;
       Type tp = null;
       if(type.isNumberOrUntyped()) {
-        if(!num) {
-          tp = DURATION;
-        }
+        if(!num) tp = DURATION;
       } else if(num) {
         tp = NUMERIC;
       } else if(dtd && type != DAY_TIME_DURATION || ymd && type != YEAR_MONTH_DURATION) {
