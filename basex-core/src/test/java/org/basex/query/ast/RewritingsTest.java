@@ -1,3 +1,4 @@
+
 package org.basex.query.ast;
 
 import static org.basex.query.QueryError.*;
@@ -2591,28 +2592,94 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Database statistics: min, max, sum, avg. */
   @Test public void gh2071() {
-    execute(new CreateDB(NAME, "<xml><a>1</a><a>3</a></xml>"));
+    // single value
+    execute(new CreateDB(NAME, "<xml><a>1</a></xml>"));
+    check("//a => count()", 1, root(Int.class));
     check("//a => min()", 1, root(Dbl.class));
-    check("//a => max()", 3, root(Dbl.class));
-    check("//a => sum()", 4, root(Dbl.class));
-    check("//a => avg()", 2, root(Dbl.class));
+    check("//a => max()", 1, root(Dbl.class));
+    check("//a => sum()", 1, root(Dbl.class));
+    check("//a => avg()", 1, root(Dbl.class));
+    // access text nodes
+    check("//a/text() => count()", 1, root(Int.class));
+    check("//a/text() => min()", 1, root(Dbl.class));
+    check("//a/text() => max()", 1, root(Dbl.class));
+    check("//a/text() => sum()", 1, root(Dbl.class));
+    check("//a/text() => avg()", 1, root(Dbl.class));
 
+    // access attributes
+    execute(new CreateDB(NAME, "<xml><a b='1'/></xml>"));
+    check("//@b => count()", 1, root(Int.class));
+    check("//@b => min()", 1, root(Dbl.class));
+    check("//@b => max()", 1, root(Dbl.class));
+    check("//@b => sum()", 1, root(Dbl.class));
+    check("//@b => avg()", 1, root(Dbl.class));
+
+    // double values
     execute(new CreateDB(NAME, "<xml><a>1.5</a><a>3.5</a></xml>"));
+    check("//a => count()", 2, root(Int.class));
     check("//a => min()", 1.5, root(Dbl.class));
     check("//a => max()", 3.5, root(Dbl.class));
-    check("//a => sum()", 5, root(Dbl.class));
+    check("//a => sum()", 5  , root(Dbl.class));
     check("//a => avg()", 2.5, root(Dbl.class));
 
-    execute(new CreateDB(NAME, "<xml><a>-1</a><a>1</a></xml>"));
+    // negative and positive values
+    execute(new CreateDB(NAME, "<xml><a>-1</a><a>0</a><a>1</a></xml>"));
+    check("//a => count()", 3, root(Int.class));
     check("//a => min()", -1, root(Dbl.class));
-    check("//a => max()", 1, root(Dbl.class));
-    check("//a => sum()", 0, root(Dbl.class));
-    check("//a => avg()", 0, root(Dbl.class));
+    check("//a => max()",  1, root(Dbl.class));
+    check("//a => sum()",  0, root(Dbl.class));
+    check("//a => avg()",  0, root(Dbl.class));
 
+    // empty value must yield an error
     execute(new CreateDB(NAME, "<xml><a>-1</a><a>1</a><a/></xml>"));
+    check("//a/text() => count()", 2, root(Int.class));
+    check("//a => count()", 3, root(Int.class));
     error("//a => min()", FUNCCAST_X_X);
     error("//a => max()", FUNCCAST_X_X);
     error("//a => sum()", FUNCCAST_X_X);
     error("//a => avg()", FUNCCAST_X_X);
+
+    // queries across multiple elements
+    execute(new CreateDB(NAME, "<xml><a>1</a><b>3</b><c>5</c></xml>"));
+    check("//(b, c, d) => count()", 2, root(Int.class));
+    check("//(b, c, d) => min()", 3, root(Dbl.class));
+    check("//(b, c, d) => max()", 5, root(Dbl.class));
+    check("//(b, c, d) => sum()", 8, root(Dbl.class));
+    check("//(b, c, d) => avg()", 4, root(Dbl.class));
+    execute(new Close());
+
+    // whitespaces will be preserved in categories, but numbers will still be detected
+    query(_DB_CREATE.args(NAME, " <a><b>1</b><b>3 </b><b> 5</b></a>", NAME));
+    final String query = _DB_OPEN.args(NAME) + "//b => ";
+    check(query + "count()", 3, root(Int.class));
+    check(query + "min()", 1, root(Dbl.class));
+    check(query + "max()", 5, root(Dbl.class));
+    check(query + "sum()", 9, root(Dbl.class));
+    check(query + "avg()", 3, root(Dbl.class));
+
+    // check default MAXCATS limit
+    query(_DB_CREATE.args(NAME, " <a>{ (1 to 100) ! <b>{ . }</b> }</a>", NAME));
+    check(query + "count()", 100, root(Int.class));
+    check(query + "min()", 1, root(Dbl.class));
+    check(query + "max()", 100, root(Dbl.class));
+    check(query + "sum()", 5050, root(Dbl.class));
+    check(query + "avg()", 50.5, root(Dbl.class));
+
+    // exceed MAXCATS limit
+    query(_DB_CREATE.args(NAME, " <a>{ (1 to 1000) ! <b>{ . }</b> }</a>", NAME));
+    check(query + "count()", 1000, root(Int.class));
+    check(query + "min()", 1, root(Dbl.class));
+    check(query + "max()", 1000, root(Dbl.class));
+    check(query + "sum()", 500500, root(SUM));
+    check(query + "avg()", 500.5, root(AVG));
+
+    // lower MAXCATS limit
+    query(_DB_CREATE.args(NAME, " <a>{ (1 to 1000) ! <b>{ . }</b> }</a>", NAME,
+        " map { 'maxcats': 0 }"));
+    check(query + "count()", 1000, root(Int.class));
+    check(query + "min()", 1, root(Dbl.class));
+    check(query + "max()", 1000, root(Dbl.class));
+    check(query + "sum()", 500500, root(SUM));
+    check(query + "avg()", 500.5, root(AVG));
   }
 }

@@ -19,6 +19,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -158,14 +159,20 @@ public class FnMin extends StandardFunc {
     }
 
     if(noColl && expr instanceof Path) {
-      final ArrayList<Stats> list = ((Path) expr).pathStats(true);
+      final ArrayList<Stats> list = ((Path) expr).pathStats();
       if(list != null) {
         double v = min ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
         for(final Stats stats : list) {
-          for(final byte[] value : stats.values) {
-            if(value.length == 0) return this;
-            final double d = Token.toDouble(value);
-            v = min ? Math.min(v, d) : Math.max(v, d);
+          if(!StatsType.isNumeric(stats.type)) return this;
+          final TokenIntMap values = stats.values;
+          if(values == null) {
+            v = min ? Math.min(v, stats.min) : Math.max(v, stats.max);
+          } else {
+            for(final byte[] value : values) {
+              if(value.length == 0) return this;
+              final double d = Token.toDouble(value);
+              v = min ? Math.min(v, d) : Math.max(v, d);
+            }
           }
         }
         return Dbl.get(v);

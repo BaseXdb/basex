@@ -132,6 +132,8 @@ public final class Stats {
           if(max < d) max = d;
         }
       }
+    } else {
+      t = STRING;
     }
     type = t;
 

@@ -368,10 +368,9 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Returns database statistics for the path nodes that will result from this path.
-   * @param numeric only return numeric values
    * @return statistics or {@code null}
    */
-  public ArrayList<Stats> pathStats(final boolean numeric) {
+  public ArrayList<Stats> pathStats() {
     final ArrayList<PathNode> nodes = pathNodes(root);
     if(nodes == null) return null;
 
@@ -387,9 +386,8 @@ public abstract class Path extends ParseExpr {
       }
       // skip nodes others than texts and attributes
       // check if distinct values are available
-      final int kind = node.kind, type = node.stats.type;
-      if(kind != Data.TEXT && kind != Data.ATTR || !StatsType.isCategory(type) ||
-          numeric && !StatsType.isNumeric(type)) return null;
+      final int kind = node.kind;
+      if(kind != Data.TEXT && kind != Data.ATTR) return null;
       stats.add(node.stats);
     }
     return stats;

@@ -69,20 +69,8 @@ public final class FnDistinctValues extends StandardFunc {
       return cc.function(SORT, info, list.finish());
     }
 
-    if(exprs.length == 1 && exprs[0] instanceof Path) {
-      final ArrayList<Stats> list = ((Path) exprs[0]).pathStats(false);
-      if(list != null) {
-        final ValueBuilder vb = new ValueBuilder(cc.qc);
-        final HashItemSet set = new HashItemSet(false);
-        for(final Stats stats : list) {
-          for(final byte[] value : stats.values) {
-            final Atm item = Atm.get(value);
-            if(set.add(item, info)) vb.add(item);
-          }
-        }
-        return vb.value(this);
-      }
-    }
+    final Expr opt = optStats(cc);
+    if(opt != null) return opt;
 
     final AtomType type = st.type.atomic();
     if(type != null) {
@@ -114,5 +102,30 @@ public final class FnDistinctValues extends StandardFunc {
 
     final Expr dupl = cc.function(Function._UTIL_DUPLICATES, info, exprs);
     return cc.function(op == OpV.LE || op == OpV.EQ ? Function.EMPTY : Function.EXISTS, info, dupl);
+  }
+
+  /**
+   * Tries to evaluate distinct values based on the database statistics.
+   * @param cc compilation context
+   * @return sequence of distinct values or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr optStats(final CompileContext cc) throws QueryException {
+    if(exprs.length == 1 && exprs[0] instanceof Path) {
+      final ArrayList<Stats> list = ((Path) exprs[0]).pathStats();
+      if(list != null) {
+        final ValueBuilder vb = new ValueBuilder(cc.qc);
+        final HashItemSet set = new HashItemSet(false);
+        for(final Stats stats : list) {
+          if(!StatsType.isCategory(stats.type)) return null;
+          for(final byte[] value : stats.values) {
+            final Atm item = Atm.get(value);
+            if(set.add(item, info)) vb.add(item);
+          }
+        }
+        return vb.value(this);
+      }
+    }
+    return null;
   }
 }

@@ -78,11 +78,12 @@ public class FnSum extends StandardFunc {
         if(type.isNumber()) return avg ? item : Calc.MULT.eval(item, Int.get(seq.size()), info);
       }
     } else if(expr instanceof Path) {
-      final ArrayList<Stats> list = ((Path) expr).pathStats(true);
+      final ArrayList<Stats> list = ((Path) expr).pathStats();
       if(list != null) {
         double sum = 0;
         long count = 0;
         for(final Stats stats : list) {
+          if(!StatsType.isNumeric(stats.type) || !StatsType.isCategory(stats.type)) return this;
           for(final byte[] value : stats.values) {
             if(value.length == 0) return null;
             final long c = stats.values.get(value);
