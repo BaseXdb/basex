@@ -38,8 +38,8 @@ public class FetchDoc extends StandardFunc {
     final Options opts = toOptions(1, new Options(), qc);
     if(!io.exists()) throw FETCH_EXISTS_X.get(info, io);
 
-    final MainOptions mopts = MainOptions.get();
-    new DBOptions(opts, DBOptions.PARSING, info).assignTo(mopts);
+    final DBOptions dbopts = new DBOptions(opts, MainOptions.PARSING, info);
+    final MainOptions mopts = dbopts.assignTo(MainOptions.get());
     try {
       return new DBNode(Parser.singleParser(io, mopts, ""));
     } catch(final IOException ex) {

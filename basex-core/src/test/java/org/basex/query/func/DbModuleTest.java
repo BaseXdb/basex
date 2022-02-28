@@ -358,6 +358,13 @@ public final class DbModuleTest extends QueryPlanTest {
         " map { '" + lc(MainOptions.CHOP) + "': false() }"));
     query(_DB_OPEN.args(NAME), "<a> </a>");
 
+    query("(# db:chop false #) { " + func.args(NAME, " '<a> </a>'", "a.xml") + " }");
+    query(_DB_OPEN.args(NAME), "<a> </a>");
+
+    final String path = "src/test/resources/example.json";
+    query("(# db:parser json #) { " + func.args(NAME, path, "a.json") + " }");
+    query(_DB_OPEN.args(NAME) + "/* ! name()", "json");
+
     // specify unknown or invalid options
     error(func.args(NAME, " ()", " ()", " map { 'xyz': 'abc' }"),
         BASEX_OPTIONS1_X);

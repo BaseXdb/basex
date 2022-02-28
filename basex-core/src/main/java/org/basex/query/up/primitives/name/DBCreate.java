@@ -23,10 +23,10 @@ import org.basex.util.options.*;
  * @author Lukas Kircher
  */
 public final class DBCreate extends NameUpdate {
-  /** Database update options. */
-  private final DBOptions options;
   /** Container for new documents. */
   private final DBNew newDocs;
+  /** Main options. */
+  private final MainOptions options;
   /** Data clip with input. */
   private DataClip clip;
 
@@ -44,9 +44,11 @@ public final class DBCreate extends NameUpdate {
 
     super(UpdateType.DBCREATE, name, qc, info);
     final List<Option<?>> supported = new ArrayList<>();
-    Collections.addAll(supported, DBOptions.INDEXING);
-    Collections.addAll(supported, DBOptions.PARSING);
-    options = new DBOptions(opts, supported, info);
+    Collections.addAll(supported, MainOptions.INDEXING);
+    Collections.addAll(supported, MainOptions.PARSING);
+
+    final DBOptions dbopts = new DBOptions(opts, supported, info);
+    options = dbopts.assignTo(new MainOptions(qc.context.options, false));
     newDocs = new DBNew(qc, options, info, inputs);
   }
 
@@ -62,17 +64,16 @@ public final class DBCreate extends NameUpdate {
       close();
 
       // create new database
-      final MainOptions mopts = options.assignTo(new MainOptions(qc.context.options, true));
-      final Data data = CreateDB.create(name, Parser.emptyParser(mopts), qc.context, mopts);
+      final Data data = CreateDB.create(name, Parser.emptyParser(options), qc.context, options);
 
       // add initial documents and optimize database
       if(clip != null) {
-        data.startUpdate(mopts);
+        data.startUpdate(options);
         try {
           newDocs.addTo(data);
           Optimize.optimize(data, null);
         } finally {
-          data.finishUpdate(mopts);
+          data.finishUpdate(options);
         }
       }
       Close.close(data, qc.context);
