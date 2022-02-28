@@ -21,8 +21,8 @@ import org.basex.util.options.*;
  * @author Dimitar Popov
  */
 public final class DBOptimize extends DBUpdate {
-  /** Options supplied with the function call. */
-  private final DBOptions options;
+  /** Main options. */
+  private final MainOptions options;
   /** Query context. */
   private final QueryContext qc;
   /** Flag to optimize all database structures. */
@@ -45,10 +45,27 @@ public final class DBOptimize extends DBUpdate {
     this.qc = qc;
 
     final ArrayList<Option<?>> supported = new ArrayList<>();
-    for(final Option<?> option : DBOptions.INDEXING) {
+    for(final Option<?> option : MainOptions.INDEXING) {
       if(all || option != MainOptions.UPDINDEX) supported.add(option);
     }
-    options = new DBOptions(opts, supported, info);
+
+    // create options, based on global defaults
+    final DBOptions dbopts = new DBOptions(opts, supported, info);
+    final MetaData meta = data.meta;
+    dbopts.assignIfAbsent(MainOptions.TEXTINDEX, meta.createtext);
+    dbopts.assignIfAbsent(MainOptions.ATTRINDEX, meta.createattr);
+    dbopts.assignIfAbsent(MainOptions.TOKENINDEX, meta.createtoken);
+    dbopts.assignIfAbsent(MainOptions.FTINDEX, meta.createft);
+    dbopts.assignIfAbsent(MainOptions.TEXTINCLUDE, meta.textinclude);
+    dbopts.assignIfAbsent(MainOptions.ATTRINCLUDE, meta.attrinclude);
+    dbopts.assignIfAbsent(MainOptions.TOKENINCLUDE, meta.tokeninclude);
+    dbopts.assignIfAbsent(MainOptions.FTINCLUDE, meta.ftinclude);
+    dbopts.assignIfAbsent(MainOptions.UPDINDEX, meta.updindex);
+    dbopts.assignIfAbsent(MainOptions.AUTOOPTIMIZE, meta.autooptimize);
+    dbopts.assignIfAbsent(MainOptions.SPLITSIZE, meta.splitsize);
+    dbopts.assignIfAbsent(MainOptions.MAXCATS, meta.maxcats);
+    dbopts.assignIfAbsent(MainOptions.MAXLEN, meta.maxlen);
+    options = dbopts.assignTo(new MainOptions(qc.context.options, false));
   }
 
   @Override
@@ -57,36 +74,19 @@ public final class DBOptimize extends DBUpdate {
 
   @Override
   public void apply() throws QueryException {
-    // create new options, based on global defaults, and overwrite with database options
-    final MainOptions opts = new MainOptions(qc.context.options, true);
-    final MetaData meta = data.meta;
-    options.assignIfAbsent(MainOptions.TEXTINDEX, meta.createtext);
-    options.assignIfAbsent(MainOptions.ATTRINDEX, meta.createattr);
-    options.assignIfAbsent(MainOptions.TOKENINDEX, meta.createtoken);
-    options.assignIfAbsent(MainOptions.FTINDEX, meta.createft);
-    options.assignIfAbsent(MainOptions.TEXTINCLUDE, meta.textinclude);
-    options.assignIfAbsent(MainOptions.ATTRINCLUDE, meta.attrinclude);
-    options.assignIfAbsent(MainOptions.TOKENINCLUDE, meta.tokeninclude);
-    options.assignIfAbsent(MainOptions.FTINCLUDE, meta.ftinclude);
-    options.assignIfAbsent(MainOptions.UPDINDEX, meta.updindex);
-    options.assignIfAbsent(MainOptions.AUTOOPTIMIZE, meta.autooptimize);
-    options.assignIfAbsent(MainOptions.SPLITSIZE, meta.splitsize);
-    options.assignIfAbsent(MainOptions.MAXCATS, meta.maxcats);
-    options.assignIfAbsent(MainOptions.MAXLEN, meta.maxlen);
-    options.assignTo(opts);
-
     // check which options have changed
-    final int maxlen = opts.get(MainOptions.MAXLEN);
-    final String textinclude = opts.get(MainOptions.TEXTINCLUDE);
-    final String attrinclude = opts.get(MainOptions.ATTRINCLUDE);
-    final String tokeninclude = opts.get(MainOptions.TOKENINCLUDE);
-    final String ftinclude = opts.get(MainOptions.FTINCLUDE);
-    final boolean stemming = opts.get(MainOptions.STEMMING);
-    final boolean casesens = opts.get(MainOptions.CASESENS);
-    final boolean diacritics = opts.get(MainOptions.DIACRITICS);
-    final Language language = Language.get(opts);
-    final String stopwords = opts.get(MainOptions.STOPWORDS);
+    final int maxlen = options.get(MainOptions.MAXLEN);
+    final String textinclude = options.get(MainOptions.TEXTINCLUDE);
+    final String attrinclude = options.get(MainOptions.ATTRINCLUDE);
+    final String tokeninclude = options.get(MainOptions.TOKENINCLUDE);
+    final String ftinclude = options.get(MainOptions.FTINCLUDE);
+    final boolean stemming = options.get(MainOptions.STEMMING);
+    final boolean casesens = options.get(MainOptions.CASESENS);
+    final boolean diacritics = options.get(MainOptions.DIACRITICS);
+    final Language language = Language.get(options);
+    final String stopwords = options.get(MainOptions.STOPWORDS);
 
+    final MetaData meta = data.meta;
     final boolean rebuild = maxlen != meta.maxlen;
     final boolean rebuildText = !meta.textinclude.equals(textinclude) || rebuild;
     final boolean rebuildAttr = !meta.attrinclude.equals(attrinclude) || rebuild;
@@ -96,14 +96,14 @@ public final class DBOptimize extends DBUpdate {
         !language.equals(meta.language) || !stopwords.equals(meta.stopwords);
 
     // assign options to meta data
-    meta.createtext = opts.get(MainOptions.TEXTINDEX);
-    meta.createattr = opts.get(MainOptions.ATTRINDEX);
-    meta.createtoken = opts.get(MainOptions.TOKENINDEX);
-    meta.createft = opts.get(MainOptions.FTINDEX);
-    meta.maxcats = opts.get(MainOptions.MAXCATS);
-    meta.updindex = opts.get(MainOptions.UPDINDEX);
-    meta.autooptimize = opts.get(MainOptions.AUTOOPTIMIZE);
-    meta.splitsize = opts.get(MainOptions.SPLITSIZE);
+    meta.createtext = options.get(MainOptions.TEXTINDEX);
+    meta.createattr = options.get(MainOptions.ATTRINDEX);
+    meta.createtoken = options.get(MainOptions.TOKENINDEX);
+    meta.createft = options.get(MainOptions.FTINDEX);
+    meta.maxcats = options.get(MainOptions.MAXCATS);
+    meta.updindex = options.get(MainOptions.UPDINDEX);
+    meta.autooptimize = options.get(MainOptions.AUTOOPTIMIZE);
+    meta.splitsize = options.get(MainOptions.SPLITSIZE);
     meta.textinclude = textinclude;
     meta.attrinclude = attrinclude;
     meta.tokeninclude = tokeninclude;
@@ -116,7 +116,7 @@ public final class DBOptimize extends DBUpdate {
     meta.stopwords  = stopwords;
 
     try {
-      if(all) OptimizeAll.optimizeAll(data, qc.context, opts, null);
+      if(all) OptimizeAll.optimizeAll(data, qc.context, options, null);
       else Optimize.optimize(data, rebuildText, rebuildAttr, rebuildToken, rebuildFt, null);
     } catch(final IOException ex) {
       throw UPDBERROR_X.get(info, ex);

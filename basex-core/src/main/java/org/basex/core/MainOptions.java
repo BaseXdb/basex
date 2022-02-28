@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import java.util.*;
+import java.util.stream.*;
 
 import org.basex.build.csv.*;
 import org.basex.build.html.*;
@@ -178,8 +179,19 @@ public final class MainOptions extends Options {
 
   // Other
 
-  /** Options that are adopted from parent options. */
-  private static final Option<?>[] INHERIT = { CHOP, INTPARSE, STRIPNS, DTD, XINCLUDE, CATFILE };
+  /** Indexing options. */
+  public static final Option<?>[] INDEXING = { MAXCATS, MAXLEN, SPLITSIZE, LANGUAGE, STOPWORDS,
+    TEXTINDEX, ATTRINDEX, TOKENINDEX, FTINDEX, TEXTINCLUDE, ATTRINCLUDE, TOKENINCLUDE, FTINCLUDE,
+    STEMMING, CASESENS, DIACRITICS, UPDINDEX, AUTOOPTIMIZE };
+
+  /** XML Parsing options. */
+  private static final Option<?>[] XMLPARSING = { CHOP, INTPARSE, STRIPNS, DTD, XINCLUDE, CATFILE };
+  /** Extended parsing options. */
+  public static final Option<?>[] EXTPARSING = { CREATEFILTER, ADDARCHIVES, ARCHIVENAME,
+      SKIPCORRUPT, ADDRAW, ADDCACHE, CSVPARSER, TEXTPARSER, JSONPARSER, HTMLPARSER, PARSER };
+  /** All parsing options. */
+  public static final Option<?>[] PARSING = Stream.concat(Stream.of(XMLPARSING),
+      Stream.of(EXTPARSING)).toArray(Option<?>[]::new);
 
   /** Parser. */
   public enum MainParser {
@@ -226,7 +238,7 @@ public final class MainOptions extends Options {
   }
 
   /**
-   * Constructor, adopting the specified options.
+   * Constructor, adopting all options from the specified instance.
    * @param options parent options
    */
   public MainOptions(final MainOptions options) {
@@ -234,15 +246,13 @@ public final class MainOptions extends Options {
   }
 
   /**
-   * Constructor, adopting XML parsing options from the specified options.
+   * Constructor, adopting parsing options from the specified instance.
    * @param options parent options
-   * @param xml adopt xml options
+   * @param xml limit to XML parsing options
    */
   public MainOptions(final MainOptions options, final boolean xml) {
     this(false);
-    if(xml) {
-      for(final Option<?> option : INHERIT) put(option, options.get(option));
-    }
+    for(final Option<?> option : xml ? XMLPARSING : PARSING) put(option, options.get(option));
   }
 
   /**

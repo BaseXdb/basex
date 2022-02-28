@@ -17,19 +17,6 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class DBOptions {
-  /** Parsing options. */
-  public static final Option<?>[] PARSING = { MainOptions.CREATEFILTER, MainOptions.ADDARCHIVES,
-    MainOptions.ARCHIVENAME, MainOptions.SKIPCORRUPT, MainOptions.ADDRAW, MainOptions.ADDCACHE,
-    MainOptions.CSVPARSER, MainOptions.TEXTPARSER, MainOptions.JSONPARSER, MainOptions.HTMLPARSER,
-    MainOptions.PARSER, MainOptions.CHOP, MainOptions.INTPARSE, MainOptions.STRIPNS,
-    MainOptions.DTD, MainOptions.CATFILE, MainOptions.XINCLUDE };
-  /** Indexing options. */
-  public static final Option<?>[] INDEXING = { MainOptions.MAXCATS, MainOptions.MAXLEN,
-    MainOptions.SPLITSIZE, MainOptions.LANGUAGE, MainOptions.STOPWORDS, MainOptions.TEXTINDEX,
-    MainOptions.ATTRINDEX, MainOptions.TOKENINDEX, MainOptions.FTINDEX, MainOptions.TEXTINCLUDE,
-    MainOptions.ATTRINCLUDE, MainOptions.TOKENINCLUDE, MainOptions.FTINCLUDE, MainOptions.STEMMING,
-    MainOptions.CASESENS, MainOptions.DIACRITICS, MainOptions.UPDINDEX, MainOptions.AUTOOPTIMIZE };
-
   /** Runtime options. */
   private final HashMap<Option<?>, Object> map = new HashMap<>();
 

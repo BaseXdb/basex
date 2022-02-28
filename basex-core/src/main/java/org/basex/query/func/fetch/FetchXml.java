@@ -38,8 +38,8 @@ public class FetchXml extends StandardFunc {
   protected DBNode fetch(final IO io, final QueryContext qc) throws QueryException {
     final Options opts = toOptions(1, new Options(), qc);
 
-    final MainOptions mopts = MainOptions.get();
-    new DBOptions(opts, DBOptions.PARSING, info).assignTo(mopts);
+    final DBOptions dbopts = new DBOptions(opts, MainOptions.PARSING, info);
+    final MainOptions mopts = dbopts.assignTo(MainOptions.get());
     try {
       return new DBNode(Parser.singleParser(io, mopts, ""));
     } catch(final IOException ex) {

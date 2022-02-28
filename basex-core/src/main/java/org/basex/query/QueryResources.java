@@ -322,7 +322,7 @@ public final class QueryResources {
   public void addDoc(final String name, final String path, final StaticContext sc)
       throws QueryException {
     final QueryInput qi = new QueryInput(path, sc);
-    final Data data = create(true, qi, null);
+    final Data data = create(qi, null, true);
     if(name != null) data.meta.original = name;
   }
 
@@ -349,7 +349,7 @@ public final class QueryResources {
     final ItemList items = new ItemList(paths.length);
     for(final String path : paths) {
       final QueryInput qi = new QueryInput(path, sc);
-      items.add(new DBNode(create(true, qi, null), 0, Data.DOC));
+      items.add(new DBNode(create(qi, null, false), 0, Data.DOC));
     }
     addCollection(items.value(NodeType.DOCUMENT_NODE), name);
   }
@@ -407,7 +407,7 @@ public final class QueryResources {
     }
 
     // otherwise, create new instance
-    final Data data = create(single, qi, ii);
+    final Data data = create(qi, ii, single);
     // reset database path: indicates that all documents were parsed
     qi.dbPath = "";
     return data;
@@ -416,13 +416,13 @@ public final class QueryResources {
 
   /**
    * Creates a new database instance.
-   * @param single expect single document
    * @param input query input
    * @param ii input info
+   * @param single expect single document
    * @return data reference
    * @throws QueryException query exception
    */
-  private Data create(final boolean single, final QueryInput input, final InputInfo ii)
+  private Data create(final QueryInput input, final InputInfo ii, final boolean single)
       throws QueryException {
 
     // check if new databases can be created
@@ -439,7 +439,7 @@ public final class QueryResources {
 
     // overwrite parsing options with default values
     final boolean mem = !context.options.get(MainOptions.FORCECREATE);
-    final MainOptions opts = new MainOptions(context.options, true);
+    final MainOptions opts = new MainOptions(context.options, single);
     final Parser parser = new DirParser(io, opts);
 
     final Data data;

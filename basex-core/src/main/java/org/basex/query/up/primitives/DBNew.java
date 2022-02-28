@@ -34,29 +34,29 @@ public final class DBNew {
   /** Input info. */
   private final InputInfo info;
   /** Main options for all inputs to be added. */
-  private final List<DBOptions> dboptions;
+  private final List<MainOptions> options;
   /** New database nodes. */
   private Data data;
 
   /**
    * Constructor.
    * @param qc query context
-   * @param options database options
+   * @param opts main options
    * @param info input info
    * @param list list of inputs
    */
-  public DBNew(final QueryContext qc, final DBOptions options, final InputInfo info,
+  public DBNew(final QueryContext qc, final MainOptions opts, final InputInfo info,
       final NewInput... list) {
 
     this.qc = qc;
     this.info = info;
 
-    final int is = list.length;
-    inputs = new ArrayList<>(is);
-    dboptions = new ArrayList<>(is);
+    final int ll = list.length;
+    inputs = new ArrayList<>(ll);
+    options = new ArrayList<>(ll);
     for(final NewInput input : list) {
       inputs.add(input);
-      dboptions.add(options);
+      options.add(opts);
     }
   }
 
@@ -66,7 +66,7 @@ public final class DBNew {
    */
   public void merge(final DBNew add) {
     inputs.addAll(add.inputs);
-    dboptions.addAll(add.dboptions);
+    options.addAll(add.options);
   }
 
   /**
@@ -113,7 +113,7 @@ public final class DBNew {
       if(data != null) new DataClip(data).context(qc.context).finish();
       throw UPDBERROR_X.get(info, ex);
     } finally {
-      dboptions.clear();
+      options.clear();
       inputs.clear();
     }
   }
@@ -137,7 +137,7 @@ public final class DBNew {
    * @return result of check
    */
   private boolean cache(final boolean create) {
-    for(final DBOptions dbopts : dboptions) {
+    for(final MainOptions dbopts : options) {
       Object v = dbopts.get(MainOptions.ADDCACHE);
       if(v instanceof Boolean && (Boolean) v) return true;
       if(create) {
@@ -162,9 +162,9 @@ public final class DBNew {
       throws IOException, QueryException {
     // free memory: clear list entries after retrieval
     final NewInput input = inputs.get(i);
-    final MainOptions mopts = dboptions.get(i).assignTo(new MainOptions(qc.context.options, true));
+    final MainOptions mopts = options.get(i);
     inputs.set(i, null);
-    dboptions.set(i, null);
+    options.set(i, null);
 
     // existing node: create data clip for copied instance
     ANode node = input.node;
