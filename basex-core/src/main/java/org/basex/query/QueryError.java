@@ -1110,7 +1110,7 @@ public enum QueryError {
   /** Error code. */
   INVALIDOPTION_X(XPTY, 4, "Unknown option '%'."),
   /** Error code. */
-  FUNCUP_X(XPTY, 4, "Function must not be updating: %."),
+  FUNCUP_X(XPTY, 4, "Function is updating: %."),
   /** Error code. */
   FUNCNOTUP_X(XPTY, 4, "Function is not updating: %."),
 

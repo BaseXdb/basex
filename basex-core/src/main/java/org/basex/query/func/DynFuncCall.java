@@ -8,6 +8,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -81,6 +82,9 @@ public final class DynFuncCall extends FuncCall {
       if(ft.argTypes != null && ft.argTypes.length != nargs) {
         throw INVARITY_X_X_X.get(info, arguments(nargs), ft.argTypes.length, func.toErrorString());
       }
+      if(!sc.mixUpdates && !updating && ft.anns.contains(Annotation.UPDATING)) {
+        throw FUNCUP_X.get(info, func);
+      }
       final SeqType dt = ft.declType;
       exprType.assign(ft instanceof MapType ? dt.union(Occ.ZERO) : dt);
     }
@@ -94,17 +98,17 @@ public final class DynFuncCall extends FuncCall {
 
     if(func instanceof XQFunctionExpr) {
       // try to inline the function
-      final XQFunctionExpr fe = (XQFunctionExpr) func;
-      if(!(fe instanceof FuncItem && comesFrom((FuncItem) fe))) {
+      if(!(func instanceof FuncItem && comesFrom((FuncItem) func))) {
+        final XQFunctionExpr fe = (XQFunctionExpr) func;
         checkUp(fe, updating, sc);
         final Expr inlined = fe.inline(Arrays.copyOf(exprs, nargs), cc);
         if(inlined != null) return inlined;
       }
     } else if(func instanceof Value) {
       // raise error (values tested at this stage are no functions)
-      final Item item = toItem(func, cc.qc);
-      throw INVFUNCITEM_X_X.get(info, item.type, func);
+      throw INVFUNCITEM_X_X.get(info, toItem(func, cc.qc).type, func);
     }
+
     return this;
   }
 
