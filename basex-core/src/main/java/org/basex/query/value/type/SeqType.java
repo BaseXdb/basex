@@ -543,6 +543,14 @@ public final class SeqType {
   }
 
   /**
+   * Tests if expressions of this type may yield functions.
+   * @return result of check
+   */
+  public boolean mayBeFunction() {
+    return !zero() && (type instanceof FuncType || ANY_ATOMIC_TYPE.instanceOf(type));
+  }
+
+  /**
    * Checks if this sequence type is an instance of the specified sequence type.
    * @param st sequence type to check
    * @return result of check
