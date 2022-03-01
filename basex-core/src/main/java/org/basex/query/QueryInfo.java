@@ -15,7 +15,6 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * This class remembers descriptive query information sent back to the client.
@@ -24,6 +23,11 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class QueryInfo {
+  /** Maximum size for compilation and evaluation output. */
+  private static final int MAX = 1 << 20;
+  /** Maximum size for compilation and evaluation output per line. */
+  private static final int MAX_LINE = 1 << 14;
+
   /** Verbose info. */
   private final boolean verbose;
 
@@ -41,9 +45,9 @@ public final class QueryInfo {
   /** Runtime flag. */
   boolean runtime;
   /** Compilation info. */
-  private final TokenList compile = new TokenList(0);
+  private final TokenBuilder compile = new TokenBuilder();
   /** Evaluation info. */
-  private final TokenList evaluate = new TokenList(0);
+  private final TokenBuilder evaluate = new TokenBuilder();
 
   /**
    * Constructor.
@@ -59,7 +63,7 @@ public final class QueryInfo {
    * @param ext text text extensions
    */
   void compInfo(final String string, final Object... ext) {
-    if(verbose) {
+    if(verbose && compile.size() < MAX) {
       final int el = ext.length;
       for(int e = 0; e < el; e++) {
         final Object o = ext[e];
@@ -72,7 +76,8 @@ public final class QueryInfo {
           info = "RUNTIME: " + info;
           if(Prop.debug) Util.stack(info);
         }
-        compile.add(info);
+        compile.add(LI).add(info).add(NL);
+        if(compile.size() >= MAX) compile.add(LI).add(DOTS).add(NL);
       }
     }
   }
@@ -84,8 +89,9 @@ public final class QueryInfo {
   void evalInfo(final String string) {
     if(verbose) {
       synchronized(evaluate) {
-        if(evaluate.size() < 500000) {
-          evaluate.add(chop(token(string.replaceAll("\r?\n", "|")), 1 << 14));
+        if(evaluate.size() < MAX) {
+          evaluate.add(LI).add(chop(token(string.replaceAll("\r?\n", "|")), MAX_LINE)).add(NL);
+          if(evaluate.size() >= MAX) compile.add(LI).add(DOTS).add(NL);
         }
       }
     }
@@ -137,16 +143,10 @@ public final class QueryInfo {
       final String qu = QueryProcessor.removeComments(query, Integer.MAX_VALUE);
       tb.add(NL).add(QUERY).add(COL).add(NL).add(qu).add(NL);
     }
-    if(!compile.isEmpty()) {
-      tb.add(NL).add(COMPILING).add(COL).add(NL);
-      for(final byte[] line : compile) tb.add(LI).add(line).add(NL);
-    }
+    if(!compile.isEmpty()) tb.add(NL).add(COMPILING).add(COL).add(NL).add(compile);
     tb.add(NL).add(OPTIMIZED_QUERY).add(COL).add(NL);
     tb.add(qc.root == null ? qc.funcs : usedDecls(qc.root)).add(NL);
-    if(!evaluate.isEmpty()) {
-      tb.add(NL).add(EVALUATING).add(COL).add(NL);
-      for(final byte[] line : evaluate) tb.add(LI).add(line).add(NL);
-    }
+    if(!evaluate.isEmpty()) tb.add(NL).add(EVALUATING).add(COL).add(NL).add(evaluate);
     return tb.toString();
   }
 
