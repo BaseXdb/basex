@@ -2639,4 +2639,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check(query + "sum()", 500500, root(SUM));
     check(query + "avg()", 500.5, root(AVG));
   }
+
+  /** Dynamic function calls, check updates. */
+  @Test public void gh2073() {
+    error("let $f := if(<a/>/text()) then db:create#3 else db:add#3 "
+        + "return $f('db', <a/>, 'a.xml')", FUNCUP_X);
+  }
 }
