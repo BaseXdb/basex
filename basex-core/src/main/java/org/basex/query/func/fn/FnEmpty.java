@@ -4,6 +4,8 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.CmpG.*;
+import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -57,22 +59,58 @@ public class FnEmpty extends StandardFunc {
       if(st.zero()) return Bln.get(empty);
       if(st.oneOrMore()) return Bln.get(!empty);
     }
-    // rewrite list to union expression
+
+    // rewrite util:replicate
+    if(_UTIL_REPLICATE.is(expr)) expr = expr.arg(0);
+
+    // rewrite list to union expression:  exists((a, b))  ->  exists(a | b)
     if(expr instanceof List && expr.seqType().type instanceof NodeType) {
       expr = new Union(info, expr.args()).optimize(cc);
     }
-    // rewrite filter
+    // rewrite filter:  exists($a[text() = 'Ukraine'])  ->  $a/text() = 'Ukraine'
     if(expr instanceof Filter) {
       final Filter filter = (Filter) expr;
       expr = filter.flattenEbv(filter.root, false, cc);
       if(expr != filter) return cc.function(empty ? NOT : BOOLEAN, info, expr);
     }
-    // simplify replicate
-    if(_UTIL_REPLICATE.is(expr)) expr = expr.arg(0);
-    // simplify argument
-    expr = FnCount.simplify(expr, cc);
+    // simplify argument:  exists(sort($nodes))  ->  exists($nodex)
+    expr = simplify(expr, cc);
+
+    // rewrite index-of:  exists(index-of($texts, 'Ukraine')) ->  $texts = 'Ukraine'
+    if(INDEX_OF.is(expr)) {
+      final Expr[] args = expr.args();
+      if(args.length == 2 && args[1].seqType().one() &&
+          CmpG.compatible(args[0].seqType(), args[1].seqType(), true)) {
+        expr = new CmpG(args[0], args[1], OpG.EQ, null, sc, info).optimize(cc);
+        return cc.function(empty ? NOT : BOOLEAN, info, expr);
+      }
+    }
 
     return expr != exprs[0] ? cc.function(empty ? EMPTY : EXISTS, info, expr) : this;
+  }
+
+  /**
+   * Simplify arguments of existence and count operations.
+   * @param expr expression to simplify
+   * @param cc compilation context
+   * @return simplified or supplied expression
+   * @throws QueryException query exception
+   */
+  public static Expr simplify(final Expr expr, final CompileContext cc) throws QueryException {
+    // simplify filter expression
+    if(expr instanceof Filter) {
+      return ((Filter) expr).simplifyCount(cc);
+    }
+    // rewrite count(reverse(...)) to count(...)
+    if(REVERSE.is(expr) || SORT.is(expr)) {
+      return expr.arg(0);
+    }
+    // remove order by clauses from FLWOR expression
+    if(expr instanceof GFLWOR) {
+      final Expr flwor = ((GFLWOR) expr).removeOrderBy(cc);
+      if(flwor != null) return flwor;
+    }
+    return expr;
   }
 
   @Override

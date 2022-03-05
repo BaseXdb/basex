@@ -65,7 +65,7 @@ public final class UtilCountWithin extends StandardFunc {
     }
 
     // simplify argument
-    final Expr arg = FnCount.simplify(expr1, cc);
+    final Expr arg = FnEmpty.simplify(expr1, cc);
     if(arg != expr1) {
       final Expr[] args = exprs.clone();
       args[0] = arg;
