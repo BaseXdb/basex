@@ -5,7 +5,6 @@ import static org.basex.query.func.Function.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -47,7 +46,7 @@ public final class FnCount extends StandardFunc {
       return cc.function(STRING_LENGTH, info, expr.args());
 
     // simplify argument
-    final Expr arg = simplify(expr, cc);
+    final Expr arg = FnEmpty.simplify(expr, cc);
     return arg != expr ? cc.function(COUNT, info, arg) : this;
   }
 
@@ -61,29 +60,5 @@ public final class FnCount extends StandardFunc {
         cc.function(EXISTS, info, exprs));
     }
     return this;
-  }
-
-  /**
-   * Simplify count arguments.
-   * @param expr expression to simplify
-   * @param cc compilation context
-   * @return simplified or supplied expression
-   * @throws QueryException query exception
-   */
-  public static Expr simplify(final Expr expr, final CompileContext cc) throws QueryException {
-    // simplify filter expression
-    if(expr instanceof Filter) {
-      return ((Filter) expr).simplifyCount(cc);
-    }
-    // rewrite count(reverse(...)) to count(...)
-    if(REVERSE.is(expr) || SORT.is(expr)) {
-      return expr.arg(0);
-    }
-    // remove order by clauses from FLWOR expression
-    if(expr instanceof GFLWOR) {
-      final Expr flwor = ((GFLWOR) expr).removeOrderBy(cc);
-      if(flwor != null) return flwor;
-    }
-    return expr;
   }
 }

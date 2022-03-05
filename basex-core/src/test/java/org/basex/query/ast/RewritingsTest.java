@@ -1200,7 +1200,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // no rewritings
     query("for $a in (1 to 2)[. != 0] return <a/>[empty(($a[. = 1], $a[. = 1]))]", "<a/>");
-    check("exists(<a/>/a) and exists(<b/>/b)", false, exists(And.class));
+    check("exists(<a/>/a) and exists(<b/>/b)", false, exists(And.class), empty(EXISTS));
     check("for $i in (1 to 2)[. != 0] return exists($i[. = 1]) and exists($i[. = 2])",
         "false\nfalse", empty(And.class), empty(EXISTS), root(DualMap.class));
     check("<a/>/a and <b/>/b", false, exists(And.class));
@@ -2687,5 +2687,21 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh2073() {
     error("let $f := if(<a/>/text()) then db:create#3 else db:add#3 "
         + "return $f('db', <a/>, 'a.xml')", FUNCUP_X);
+  }
+
+  /** Rewrite index-of to comparison. */
+  @Test public void gh2077() {
+    check("let $a := (1 to 100000) ! string() "
+        + "let $b := (100000 to 200001) ! string() "
+        + "return $a[exists(index-of($b, .))]", 100000,
+        exists(CmpHashG.class));
+    check("let $a := (1 to 100001) ! string() "
+        + "let $b := (1 to 100000) ! string() "
+        + "return $a[empty(index-of($b, .))]", 100001,
+        exists(CmpHashG.class));
+
+    check("for $a in (1 to 6) "
+        + "return <a/>[exists(($a[. = 1], $a[. = 1]))]", "<a/>",
+        count(CmpSimpleG.class, 1));
   }
 }

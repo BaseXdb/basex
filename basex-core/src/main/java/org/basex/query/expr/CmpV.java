@@ -206,15 +206,7 @@ public final class CmpV extends Cmp {
         exprType.assign(Occ.EXACTLY_ONE);
 
         // no type check: rewrite to general expression (faster evaluation)
-        final Type type1 = st1.type, type2 = st2.type;
-        if(st1.one() && st2.one() && (
-          type1 == type2 && !AtomType.ANY_ATOMIC_TYPE.instanceOf(type1) &&
-            (type1.isSortable() || opV != OpV.EQ && opV != OpV.NE) ||
-          type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
-          type1 == AtomType.QNAME && type2 == AtomType.QNAME ||
-          type1.instanceOf(AtomType.NUMERIC) && type2.instanceOf(AtomType.NUMERIC) ||
-          type1.instanceOf(AtomType.DURATION) && type2.instanceOf(AtomType.DURATION))
-        ) {
+        if(st1.one() && st2.one() && CmpG.compatible(st1, st2, opV == OpV.EQ || opV == OpV.NE)) {
           expr = new CmpG(expr1, expr2, OpG.get(opV), coll, sc, info).optimize(cc);
         }
       }

@@ -337,6 +337,23 @@ public class CmpG extends Cmp {
   }
 
   /**
+   * Checks if an expression with the specified types can be rewritten to a general comparison.
+   * @param st1   first sequence type
+   * @param st2   second sequence type
+   * @param eqne  eq/ne comparison
+   * @return result of check
+   */
+  public static boolean compatible(final SeqType st1, final SeqType st2, final boolean eqne) {
+    final Type type1 = st1.type, type2 = st2.type;
+    return type1 == type2 && !AtomType.ANY_ATOMIC_TYPE.instanceOf(type1) &&
+        (type1.isSortable() || !eqne) ||
+      type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
+      type1 == AtomType.QNAME && type2 == AtomType.QNAME ||
+      type1.instanceOf(AtomType.NUMERIC) && type2.instanceOf(AtomType.NUMERIC) ||
+      type1.instanceOf(AtomType.DURATION) && type2.instanceOf(AtomType.DURATION);
+  }
+
+  /**
    * Checks if types can be compared.
    * @param type1 first type to compare
    * @param type2 second type to compare
