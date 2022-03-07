@@ -1,7 +1,5 @@
 package org.basex.query;
 
-import static org.basex.query.QueryText.*;
-
 import java.util.*;
 import java.util.function.*;
 
@@ -79,9 +77,26 @@ public final class CompileContext {
      * Distinct values.
      * Requested by {@link CmpG} and {@link FnDistinctValues}.
      * Evaluated by {@link Filter}, {@link List}, {@link SimpleMap} and others.
-     * and others.
      */
-    DISTINCT
+    DISTINCT,
+    /**
+     * Count and existence checks.
+     * Requested by {@link FnCount}, {@link FnEmpty} and {@link FnExists}.
+     * Evaluated by {@link Filter}, {@link GFLWOR}, {@link FnReverse} and others.
+     */
+    COUNT;
+
+    /**
+     * Checks if this is one of the specified types.
+     * @param values values
+     * @return result of check
+     */
+    public boolean oneOf(final Simplify... values) {
+      for(final Simplify value : values) {
+        if(this == value) return true;
+      }
+      return false;
+    }
   }
 
   /** Limit for the size of sequences that are pre-evaluated. */
@@ -301,7 +316,7 @@ public final class CompileContext {
       info("%", (Supplier<String>) () -> {
         final TokenBuilder tb = new TokenBuilder();
         final String exprDesc = expr.description(), resDesc = res.description();
-        tb.add(OPTREWRITE).add(' ').add(exprDesc);
+        tb.add(QueryText.OPTREWRITE).add(' ').add(exprDesc);
         if(!exprDesc.equals(resDesc)) tb.add(" to ").add(resDesc);
 
         final byte[] exprString = QueryError.normalize(Token.token(expr.toString()), null);

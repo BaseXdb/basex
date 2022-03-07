@@ -72,7 +72,7 @@ public final class CArray extends Arr {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = null;
-    if(mode == Simplify.STRING || mode == Simplify.NUMBER || mode == Simplify.DATA) {
+    if(mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA, Simplify.COUNT)) {
       simplifyAll(mode, cc);
       expr = List.get(cc, info, exprs);
     }

@@ -66,7 +66,7 @@ public abstract class ANode extends Item {
     Item item = null;
     if(mode == Simplify.STRING) {
       item = Str.get(string());
-    } else if(mode == Simplify.DATA || mode == Simplify.NUMBER) {
+    } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
       item = Atm.get(string());
     }
     return item != null ? cc.simplify(this, item) : super.simplifyFor(mode, cc);

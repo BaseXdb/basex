@@ -31,10 +31,14 @@ public final class FnCount extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0];
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    exprs[0] = exprs[0].simplifyFor(Simplify.COUNT, cc);
+  }
 
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
     // return static result size
+    final Expr expr = exprs[0];
     final long size = expr.size();
     if(size >= 0 && !expr.has(Flag.NDT)) return Int.get(size);
 
@@ -45,9 +49,7 @@ public final class FnCount extends StandardFunc {
     if(STRING_TO_CODEPOINTS.is(expr) || _UTIL_CHARS.is(expr))
       return cc.function(STRING_LENGTH, info, expr.args());
 
-    // simplify argument
-    final Expr arg = FnEmpty.simplify(expr, cc);
-    return arg != expr ? cc.function(COUNT, info, arg) : this;
+    return this;
   }
 
   @Override

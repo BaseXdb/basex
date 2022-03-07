@@ -5,6 +5,7 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
@@ -118,6 +119,15 @@ public final class GFLWOR extends ParseExpr {
 
     exprType.assign(rtrn.seqType(), calcSize(true));
     return this;
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    Expr expr = null;
+    if(mode == Simplify.COUNT) {
+      expr = removeOrderBy(cc);
+    }
+    return expr != null ? expr.simplifyFor(mode, cc) : super.simplifyFor(mode, cc);
   }
 
   /**

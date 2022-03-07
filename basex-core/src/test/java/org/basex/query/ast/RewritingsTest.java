@@ -1,4 +1,3 @@
-
 package org.basex.query.ast;
 
 import static org.basex.query.QueryError.*;
@@ -1872,7 +1871,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("(<a/> | <b/> | <a/>)/self::b", "<b/>", type(Union.class, "element(a)|element(b)+"));
     check("(<a/>, <b/>, <a/>)/self::b", "<b/>", type(Union.class, "element(a)|element(b)+"));
-    check("count((<a/>, <b/> | <a/>))", 3, type(List.class, "element(a)|element(b)+"));
+    check("count((<a/> | <b/>, <b/> | <a/>))", 4, type(List.class, "element(a)|element(b)+"));
   }
 
   /** Push type checks into expressions. */
@@ -2192,6 +2191,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("reverse((1 to 2) ! (. - 1))", "1\n0", root(RangeSeq.class));
   }
 
+  /** Count optimizations. */
+  @Test public void gh1973() {
+    check("count((<a/>, <b/>)[self::a])", 1, exists(DualMap.class));
+  }
+
   /** EBV tests, count -> exists. */
   @Test public void gh1974() {
     check("boolean(count((1, 2)[. <= 2]))", true, root(EXISTS));
@@ -2442,7 +2446,6 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh2058() {
     check("let $a := <a/>[data()] where $a return $a", "", root(IterFilter.class));
     check("let $a := <a/>[data()] where $a return string($a)", "", root(ItemMap.class));
-    check("let $_ := prof:void(1) where $_ return string($_)", "", root(_PROF_VOID));
   }
 
   /** Rewrite fn:not, comparisons (related to GH-1775). */

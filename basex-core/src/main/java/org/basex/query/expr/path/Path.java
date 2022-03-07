@@ -198,7 +198,7 @@ public abstract class Path extends ParseExpr {
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
 
-    if(mode == Simplify.EBV || mode == Simplify.PREDICATE) {
+    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       final Expr last = steps[steps.length - 1];
       if(last instanceof Step) {
         final Step step = (Step) last;

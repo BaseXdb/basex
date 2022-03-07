@@ -2,8 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.func.Function.*;
 
-import java.util.function.*;
-
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -232,46 +230,22 @@ public abstract class Filter extends Preds {
     return copyType(get(cc, info, root, exprs));
   }
 
-  /**
-   * Rewrites a filter expression for count operations.
-   * @param cc compilation context
-   * @return optimized or original expression.
-   * @throws QueryException query exception
-   */
-  public final Expr simplifyCount(final CompileContext cc) throws QueryException {
-    if(exprs.length != 1) return this;
-
-    // exists($nodes[@attr])  ->  exists($nodes ! @attr)
-    final Expr pred = exprs[0];
-    if(pred.seqType().instanceOf(SeqType.NODE_ZO)) return SimpleMap.get(cc, info, root, pred);
-
-    // count($seq[. = 'x'])  ->  count(index-of($seq, 'x'))
-    final Function<Expr, Integer> type = expr -> {
-      final Type t = expr.seqType().type;
-      return t.isStringOrUntyped() ? 1 : t.isNumber() ? 2 : 0;
-    };
-    final int rtype = type.apply(root);
-    if(rtype != 0 && pred instanceof CmpG && ((CmpG) pred).opV() == OpV.EQ) {
-      final Expr op2 = pred.arg(1);
-      if(pred.arg(0) instanceof ContextValue && op2.seqType().one() && type.apply(op2) == rtype) {
-        return cc.function(INDEX_OF, info, root, op2);
-      }
-    }
-    return this;
-  }
-
   @Override
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
 
-    if(mode == Simplify.EBV || mode == Simplify.PREDICATE) {
-      final Expr expr = flattenEbv(root, true, cc);
-      if(expr != this) return cc.simplify(this, expr);
+    Expr expr = this;
+    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+      expr = flattenEbv(root, true, cc);
     } else if(mode == Simplify.DISTINCT && !mayBePositional()) {
-      final Expr expr = root.simplifyFor(mode, cc);
-      if(expr != root) return cc.simplify(this, get(cc, info, expr, exprs));
+      final Expr ex = root.simplifyFor(mode, cc);
+      if(ex != root) expr = get(cc, info, ex, exprs);
+    } else if (mode == Simplify.COUNT && exprs.length == 1) {
+      // $nodes[@attr]  ->  $nodes ! @attr
+      final Expr pred = exprs[0];
+      if(pred.seqType().instanceOf(SeqType.NODE_ZO)) expr = SimpleMap.get(cc, info, root, pred);
     }
-    return super.simplifyFor(mode, cc);
+    return expr != this ? expr.simplifyFor(mode, cc) : super.simplifyFor(mode, cc);
   }
 
   @Override

@@ -84,8 +84,8 @@ public final class SingletonSeq extends Seq {
     Expr expr = null;
     if(mode == Simplify.DISTINCT) {
       expr = value.simplifyFor(mode, cc);
-    } else if(type instanceof NodeType && (mode == Simplify.DATA || mode == Simplify.NUMBER ||
-        mode == Simplify.STRING)) {
+    } else if(type instanceof NodeType && mode.oneOf(Simplify.DATA, Simplify.NUMBER,
+        Simplify.STRING)) {
       expr = get((Value) value.simplifyFor(mode, cc), size / value.size());
     }
     return expr != null ? cc.simplify(this, expr) : super.simplifyFor(mode, cc);

@@ -3,9 +3,9 @@ package org.basex.query.func.util;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -41,6 +41,11 @@ public final class UtilCountWithin extends StandardFunc {
   }
 
   @Override
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    exprs[0] = exprs[0].simplifyFor(Simplify.COUNT, cc);
+  }
+
+  @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0];
 
@@ -62,14 +67,6 @@ public final class UtilCountWithin extends StandardFunc {
         if(min < 1 && max <= 1) return Bln.TRUE;
         if(min >= 2) return Bln.FALSE;
       }
-    }
-
-    // simplify argument
-    final Expr arg = FnEmpty.simplify(expr1, cc);
-    if(arg != expr1) {
-      final Expr[] args = exprs.clone();
-      args[0] = arg;
-      return cc.function(_UTIL_COUNT_WITHIN, info, args);
     }
     return this;
   }

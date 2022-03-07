@@ -125,22 +125,20 @@ public final class UtilReplicate extends StandardFunc {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0];
-
-    if(mode == Simplify.DISTINCT) {
-      // ensure that input argument will be evaluated exactly once
-      // util:replicate($node, 2)  ->  $node
-      final long count = exprs[1] instanceof Int ? ((Int) exprs[1]).itr() : -1;
-      final boolean single = singleEval(true);
-      if(count > 0 && (single || !expr.has(Flag.NDT))) {
-        return cc.simplify(this, expr);
-      }
-    } else if(mode == Simplify.STRING || mode == Simplify.NUMBER || mode == Simplify.DATA) {
+    Expr expr = this;
+    if(mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA, Simplify.COUNT)) {
+      // data(util:replicate(<a>1</a>, 2))  ->  data(util:replicate(xs:untypedAtomic('1'), 2))
       final Expr[] args = exprs.clone();
-      args[0] = expr.simplifyFor(mode, cc);
-      return cc.simplify(expr, cc.function(_UTIL_REPLICATE, info, args));
+      args[0] = exprs[0].simplifyFor(mode, cc);
+      expr = cc.function(_UTIL_REPLICATE, info, args);
+    } else if(mode == Simplify.DISTINCT) {
+      // distinct-values(util:replicate($node, 2))  ->  distinct-values($node)
+      final long count = exprs[1] instanceof Int ? ((Int) exprs[1]).itr() : -1;
+      if(count > 0 && (singleEval(true) || !exprs[0].has(Flag.NDT))) {
+        expr = exprs[0].simplifyFor(mode, cc);
+      }
     }
-    return super.simplifyFor(mode, cc);
+    return expr != this ? cc.simplify(this, expr) : super.simplifyFor(mode, cc);
   }
 
   /**
