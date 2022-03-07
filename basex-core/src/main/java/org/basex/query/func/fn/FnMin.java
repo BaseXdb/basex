@@ -123,7 +123,7 @@ public class FnMin extends StandardFunc {
    * @throws QueryException query exception
    */
   final Expr opt(final boolean min, final CompileContext cc) throws QueryException {
-    exprs[0] = exprs[0].simplifyFor(Simplify.DISTINCT, cc);
+    exprs[0] = exprs[0].simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc);
 
     Expr expr = optFirst();
     if(expr != this) return expr;

@@ -439,7 +439,7 @@ public abstract class SimpleMap extends Arr {
       throws QueryException {
 
     Expr expr = this;
-    if(mode == Simplify.EBV || mode == Simplify.PREDICATE || mode == Simplify.DISTINCT) {
+    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE, Simplify.DISTINCT)) {
       // nodes ! text() = string  ->  nodes/text() = string
       expr = toPath(cc);
     } else {

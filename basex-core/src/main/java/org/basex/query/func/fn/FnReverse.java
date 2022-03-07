@@ -103,10 +103,8 @@ public final class FnReverse extends StandardFunc {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    Expr expr = this;
-    if(mode == Simplify.DISTINCT) {
-      expr = cc.simplify(this, exprs[0]);
-    }
-    return expr == this ? super.simplifyFor(mode, cc) : expr.simplifyFor(mode, cc);
+    return mode.oneOf(Simplify.DISTINCT, Simplify.COUNT)
+        ? cc.simplify(this, exprs[0]).simplifyFor(mode, cc)
+        : super.simplifyFor(mode, cc);
   }
 }

@@ -109,7 +109,7 @@ public class DBNodeSeq extends NativeSeq {
       throws QueryException {
 
     Value value = null;
-    if(mode == Simplify.DATA || mode == Simplify.NUMBER || mode == Simplify.STRING) {
+    if(mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING)) {
       if(mode == Simplify.STRING) {
         final TokenList list = new TokenList(size);
         for(int i = 0; i < size; i++) list.add(data.atom(pres[i]));

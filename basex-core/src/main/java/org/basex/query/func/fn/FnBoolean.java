@@ -44,7 +44,7 @@ public final class FnBoolean extends StandardFunc {
     // if(boolean(number))  ->  if(number)
     // E[boolean(nodes)]  ->  E[nodes]
     final Expr expr = exprs[0];
-    return mode == Simplify.EBV || mode == Simplify.PREDICATE && !expr.seqType().mayBeNumber() ?
+    return mode.oneOf(Simplify.EBV, Simplify.PREDICATE) && !expr.seqType().mayBeNumber() ?
       cc.simplify(this, expr) : this;
   }
 }

@@ -6,6 +6,7 @@ import static org.basex.query.func.Function.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.util.*;
@@ -109,6 +110,13 @@ public final class FnSort extends StandardFunc {
       throw ex.getCause();
     }
     return order;
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    return mode.oneOf(Simplify.COUNT)
+        ? cc.simplify(this, exprs[0]).simplifyFor(mode, cc)
+        : super.simplifyFor(mode, cc);
   }
 
   @Override

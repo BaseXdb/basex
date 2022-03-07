@@ -218,8 +218,7 @@ public abstract class Seq extends Value {
       throws QueryException {
 
     Value value = null;
-    if(type instanceof NodeType && (mode == Simplify.DATA || mode == Simplify.NUMBER ||
-      mode == Simplify.STRING)) {
+    if(type instanceof NodeType && mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING)) {
       if(mode == Simplify.STRING) {
         final TokenList list = new TokenList(size);
         for(int i = 0; i < size; i++) list.add(itemAt(i).string(null));

@@ -290,8 +290,14 @@ public abstract class Expr extends ExprInfo {
   @SuppressWarnings("unused")
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // return true if a deterministic expression returns at least one node
-    return (mode == Simplify.EBV || mode == Simplify.PREDICATE) &&
-      seqType().instanceOf(SeqType.NODE_OM) && !has(Flag.NDT) ? cc.simplify(this, Bln.TRUE) : this;
+    Expr expr = this;
+    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+      if(seqType().instanceOf(SeqType.NODE_OM) && !has(Flag.NDT)) expr = Bln.TRUE;
+    } else if(mode == Simplify.COUNT) {
+      final long size = size();
+      if(size != -1 && !has(Flag.NDT)) expr = SingletonSeq.get(Str.EMPTY, size);
+    }
+    return cc.simplify(this, expr);
   }
 
   /**

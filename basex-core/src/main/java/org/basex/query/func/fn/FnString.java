@@ -50,7 +50,7 @@ public final class FnString extends ContextFn {
     if(mode == Simplify.STRING && st1.type.isStringOrUntyped() && st1.one()) {
       // $node[string() = 'x']  ->  $node[. = 'x']
       expr = expr1;
-    } else if(mode == Simplify.EBV || mode == Simplify.PREDICATE) {
+    } else if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       // boolean(string($node))  ->  boolean($node/descendant::text())
       expr = simplifyEbv(expr1, cc);
     }

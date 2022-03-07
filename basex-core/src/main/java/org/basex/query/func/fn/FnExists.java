@@ -30,7 +30,7 @@ public final class FnExists extends FnEmpty {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // if(exists(nodes))  ->  if(nodes)
-    if(mode == Simplify.EBV || mode == Simplify.PREDICATE) {
+    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       final Expr expr = exprs[0];
       if(expr.seqType().type instanceof NodeType) {
         return cc.simplify(this, expr.simplifyFor(mode, cc));
