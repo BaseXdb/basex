@@ -724,6 +724,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("(false(), true())[random:double() < 2] ! (.  = false())", "true\nfalse", exists(NOT));
     check("(false(), true())[random:double() < 2] ! (. != true())", "true\nfalse", exists(NOT));
+
+    check("(if(random:double() + 1) then true() else ()) = true()", true, root(BOOLEAN));
   }
 
   /** Merge predicates. */
