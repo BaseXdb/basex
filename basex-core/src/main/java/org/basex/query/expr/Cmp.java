@@ -294,14 +294,16 @@ public abstract class Cmp extends Arr {
         // boolean(A) = true()  ->  boolean(A)
         // boolean(A) <= true()  ->  true()
         final boolean ok = expr2 == Bln.TRUE;
-        if(st1.one()) {
-          final QuerySupplier<Expr> not = () -> cc.function(NOT, info, expr1);
+        final Expr ex1 = st1.one() ? expr1 : st1.zeroOrOne() ? cc.function(BOOLEAN, info, expr1) :
+          null;
+        if(ex1 != null) {
+          final QuerySupplier<Expr> not = () -> cc.function(NOT, info, ex1);
           switch(op) {
-            case EQ: return ok ? expr1     : not.get();
-            case NE: return ok ? not.get() : expr1;
-            case GE: return ok ? expr1     : Bln.TRUE;
+            case EQ: return ok ? ex1       : not.get();
+            case NE: return ok ? not.get() : ex1;
+            case GE: return ok ? ex1       : Bln.TRUE;
             case LE: return ok ? Bln.TRUE  : not.get();
-            case GT: return ok ? Bln.FALSE : expr1;
+            case GT: return ok ? Bln.FALSE : ex1;
             default: return ok ? not.get() : Bln.FALSE;
           }
         }
