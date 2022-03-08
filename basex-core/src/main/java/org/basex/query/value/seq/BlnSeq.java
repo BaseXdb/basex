@@ -3,6 +3,8 @@ package org.basex.query.value.seq;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -38,6 +40,20 @@ public final class BlnSeq extends NativeSeq {
     final boolean[] tmp = new boolean[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = values[i];
     return get(tmp);
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    if(mode == Simplify.DISTINCT) {
+      // replace with new sequence
+      boolean f = false, t = false;
+      for(final boolean b : values) {
+        if(b) t = true;
+        else f = true;
+      }
+      return cc.simplify(this, f && t ? new BlnSeq(new boolean[] { true, false }) : Bln.get(t));
+    }
+    return super.simplifyFor(mode, cc);
   }
 
   @Override

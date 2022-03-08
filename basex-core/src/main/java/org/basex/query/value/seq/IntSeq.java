@@ -55,7 +55,7 @@ public final class IntSeq extends NativeSeq {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     if(mode == Simplify.DISTINCT) {
       // replace with new sequence or range sequence
-      final long[] tmp = new LongList((int) size).add(values).sort().distinct().finish();
+      final long[] tmp = new LongList((int) size).add(values).ddo().finish();
       final int tl = tmp.length;
       int t = 0;
       if(seqType().type == AtomType.INTEGER) {

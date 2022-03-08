@@ -24,7 +24,7 @@ public final class ArrayRemove extends ArrayFn {
     final LongList list = new LongList();
     final Iter pos = exprs[1].iter(qc);
     for(Item item; (item = qc.next(pos)) != null;) list.add(checkPos(array, toLong(item), false));
-    list.sort().distinct();
+    list.ddo();
 
     // delete entries backwards
     for(int l = list.size() - 1; l >= 0; l--) array = array.remove(list.get(l), qc);
