@@ -56,7 +56,7 @@ public final class CmpIR extends Single {
    * @return expression
    * @throws QueryException query exception
    */
-  private static Expr get(final CompileContext cc, final InputInfo info, final Expr expr,
+  public static Expr get(final CompileContext cc, final InputInfo info, final Expr expr,
       final long min, final long max) throws QueryException {
     return min > max ? Bln.FALSE : min == MIN_VALUE && max == MAX_VALUE ? Bln.TRUE :
       new CmpIR(expr, min, max, info).optimize(cc);

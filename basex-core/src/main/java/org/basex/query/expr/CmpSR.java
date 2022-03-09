@@ -32,15 +32,15 @@ import org.basex.util.hash.*;
  */
 public final class CmpSR extends Single {
   /** Collation (can be {@code null}). */
-  private final Collation coll;
+  public final Collation coll;
   /** Minimum (can be {@code null} if {@link #max} is assigned). */
-  private final byte[] min;
+  public final byte[] min;
   /** Include minimum value. */
-  private final boolean mni;
+  public final boolean mni;
   /** Maximum (can be {@code null} if {@link #min} is assigned). */
-  private final byte[] max;
+  public final byte[] max;
   /** Include maximum value. */
-  private final boolean mxi;
+  public final boolean mxi;
 
   /** Flag for atomic evaluation. */
   private boolean single;
@@ -55,7 +55,7 @@ public final class CmpSR extends Single {
    * @param coll collation (can be {@code null})
    * @param info input info
    */
-  private CmpSR(final Expr expr, final byte[] min, final boolean mni, final byte[] max,
+  public CmpSR(final Expr expr, final byte[] min, final boolean mni, final byte[] max,
       final boolean mxi, final Collation coll, final InputInfo info) {
 
     super(info, expr, SeqType.BOOLEAN_O);

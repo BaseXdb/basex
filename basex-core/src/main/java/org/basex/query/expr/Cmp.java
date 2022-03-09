@@ -293,7 +293,7 @@ public abstract class Cmp extends Arr {
       if(expr2 instanceof Bln) {
         // boolean(A) = true()  ->  boolean(A)
         // boolean(A) <= true()  ->  true()
-        final boolean ok = expr2 == Bln.TRUE;
+        final boolean ok = expr2 == Bln.TRUE, success = ne ^ ok;
         final Expr ex1 = st1.one() ? expr1 : st1.zeroOrOne() ? cc.function(BOOLEAN, info, expr1) :
           null;
         if(ex1 != null) {
@@ -314,19 +314,39 @@ public abstract class Cmp extends Arr {
           final Checks<Expr> booleans = expr -> expr.seqType().eq(SeqType.BOOLEAN_O);
           final Expr[] args = expr1.args();
           if((eq || ne) && expr1 instanceof List && booleans.all(args)) {
-            if(ne ^ ok) return new Or(info, args).optimize(cc);
+            if(success) return new Or(info, args).optimize(cc);
             return cc.function(NOT, info, new And(info, args).optimize(cc));
           }
 
-          // (text() ! (. = 'Ukraine')) = true()  ->  text() = 'Ukraine'
-          if(eq && ok && expr1 instanceof SimpleMap) {
+          if(expr1 instanceof SimpleMap) {
             final int al = args.length;
             final Expr last = args[al - 1];
-            if(last instanceof CmpG) {
-              final CmpG cmp = (CmpG) last;
-              if(cmp.exprs[0] instanceof ContextValue && !cmp.exprs[1].has(Flag.CTX)) {
-                final Expr op1 = SimpleMap.get(cc, info, Arrays.copyOf(args, al - 1));
-                return new CmpG(op1, cmp.exprs[1], cmp.op, coll, sc, info).optimize(cc);
+            final Expr[] ops = last.args();
+            if(ops != null && ops[0] instanceof ContextValue) {
+              final QuerySupplier<Expr> op1 = () ->
+                SimpleMap.get(cc, info, Arrays.copyOf(args, al - 1));
+              if(last instanceof CmpG) {
+                // (name ! (. = 'Ukraine')) = true()  ->  name = 'Ukraine'
+                // (code ! (. = 1)) = false()  ->  code != 1
+                final Expr op2 = ops[1];
+                if(!op2.has(Flag.CTX) && (eq && ok || op2.seqType().one())) {
+                  OpG opG = ((CmpG) last).op;
+                  if(!success) opG = opG.invert();
+                  return new CmpG(op1.get(), op2, opG, coll, sc, info).optimize(cc);
+                }
+              } else if(success && last instanceof CmpR) {
+                // (number ! (. >= 1e0) = true()  ->  number >= 1e0
+                final CmpR cmp = (CmpR) last;
+                return CmpR.get(cc, info, op1.get(), cmp.min, cmp.max);
+              } else if(success && last instanceof CmpIR) {
+                // (integer ! (. >= 1) != false()  ->  integer >= 1
+                final CmpIR cmp = (CmpIR) last;
+                return CmpIR.get(cc, info, op1.get(), cmp.min, cmp.max);
+              } else if(success && last instanceof CmpSR) {
+                // (string ! (. >= 'b') = true()  ->  string >= 'b'
+                final CmpSR cmp = (CmpSR) last;
+                return new CmpSR(op1.get(), cmp.min, cmp.mni, cmp.max, cmp.mxi, cmp.coll,
+                    info).optimize(cc);
               }
             }
           }

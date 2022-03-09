@@ -350,7 +350,7 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public Expr[] args() {
+  public final Expr[] args() {
     return exprs;
   }
 

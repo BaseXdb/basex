@@ -74,6 +74,11 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
+  public Expr[] args() {
+    return new Expr[] { expr };
+  }
+
+  @Override
   public int exprSize() {
     return expr.exprSize() + 1;
   }
