@@ -2720,5 +2720,28 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("<xml>Ukraine</xml>[some $text in text() satisfies $text = 'Ukraine']",
         "<xml>Ukraine</xml>", count(CmpG.class, 1), empty(GFLWOR.class));
+    check("<xml>Ukraine</xml>[every $text in text() satisfies $text = 'Ukraine']",
+        "<xml>Ukraine</xml>", count(CmpG.class, 1), empty(GFLWOR.class));
+
+    check("(1 to 1000) ! (. >= 1)  = true() ", true, root(Bln.class));
+    check("(1 to 1000) ! (. >= 1) != false()", true, root(Bln.class));
+
+    check("<_><a>0</a><a>1</a></_>/(a ! (.  =  1 )  = true() )", true, count(CmpG.class, 1));
+    check("<_><a>0</a><a>1</a></_>/(a ! (.  =  1 )  = false())", true, count(CmpG.class, 1));
+    check("<_><a>0</a><a>1</a></_>/(a ! (. >=  1 )  = true() )", true, root(CmpR.class));
+    check("<_><a>0</a><a>1</a></_>/(a ! (. >=  1 ) != false())", true, root(CmpR.class));
+    check("<_><a>0</a><a>1</a></_>/(a ! (. >= '1')  = true() )", true, root(CmpSR.class));
+    check("<_><a>0</a><a>1</a></_>/(a ! (. >= '1') != false())", true, root(CmpSR.class));
+
+    // must not be rewritten
+    check("(1 to 1000) ! (. >= 1) != true() ", false, root(CmpG.class));
+    check("(1 to 1000) ! (. >= 1)  = false()", false, root(CmpG.class));
+
+    check("<_><a>0</a><a>1</a></_>/(a ! (.  = (0, 2)) != true() )", true, count(CmpG.class, 2));
+    check("<_><a>0</a><a>1</a></_>/(a ! (.  = (0, 2))  = false())", true, count(CmpG.class, 2));
+    check("<_><a>0</a><a>1</a></_>/(a ! (. >=  1    )  = false())", true, root(CmpG.class));
+    check("<_><a>0</a><a>1</a></_>/(a ! (. >=  1    ) != true() )", true, root(CmpG.class));
+    check("<_><a>0</a><a>1</a></_>/(a ! (. >= '1'   )  = false())", true, root(CmpG.class));
+    check("<_><a>0</a><a>1</a></_>/(a ! (. >= '1'   ) != true() )", true, root(CmpG.class));
   }
 }

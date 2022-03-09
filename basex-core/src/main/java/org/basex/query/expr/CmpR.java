@@ -36,9 +36,9 @@ public final class CmpR extends Single {
   private static final double MAX_INTEGER = 1L << 53;
 
   /** Minimum. */
-  private final double min;
+  public final double min;
   /** Maximum. */
-  private final double max;
+  public final double max;
 
   /** Evaluation flag: atomic evaluation. */
   private boolean single;
@@ -66,7 +66,7 @@ public final class CmpR extends Single {
    * @return expression
    * @throws QueryException query exception
    */
-  private static Expr get(final CompileContext cc, final InputInfo info, final Expr expr,
+  public static Expr get(final CompileContext cc, final InputInfo info, final Expr expr,
       final double min, final double max) throws QueryException {
     return min > max ? Bln.FALSE : min == NEGATIVE_INFINITY && max == POSITIVE_INFINITY ? Bln.TRUE :
       new CmpR(expr, min, max, info).optimize(cc);
