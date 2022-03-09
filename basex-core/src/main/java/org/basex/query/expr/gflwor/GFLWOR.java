@@ -597,16 +597,17 @@ public final class GFLWOR extends ParseExpr {
       if(!(clause instanceof Where)) continue;
 
       final Where where = (Where) clause;
-      if(where.expr instanceof Value) {
-        // if test is always false, skip remaining tests (no results possible)
-        if(!where.expr.ebv(cc.qc, where.info()).bool(where.info())) {
-          where.expr = Bln.FALSE;
-          break;
-        }
-        // test is always true: remove it
+      if(where.expr instanceof Bln) {
         cc.info(QueryText.OPTREMOVE_X_X, where.expr, (Supplier<?>) this::description);
-        clauses.remove(c--);
         changed = true;
+        if(where.expr == Bln.TRUE) {
+          // test is always true: remove it
+          clauses.remove(c--);
+        } else {
+          // otherwise, remove remaining clauses
+          for(int d = clauses.size() - 1; d >= c; d--) clauses.remove(d);
+          rtrn = Empty.VALUE;
+        }
       } else if(!clause.has(Flag.NDT)) {
         // find insertion position
         int insert = -1;
