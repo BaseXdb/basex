@@ -2709,4 +2709,16 @@ public final class RewritingsTest extends QueryPlanTest {
         + "return <a/>[exists(($a[. = 1], $a[. = 1]))]", "<a/>",
         count(CmpSimpleG.class, 1));
   }
+
+  /** Simple maps and comparisons. */
+  @Test public void gh2078() {
+    check("<_ c='1'/>/(every $c in @c satisfies contains($c, '1'))", true, root(BOOLEAN));
+    check("<_ c='1'/>/(some $c in @c satisfies contains($c, '1'))", true, root(BOOLEAN));
+    check("<_ c='1'/>/((@c ! contains(., '1')) = true())", true, root(BOOLEAN));
+    check("<_ c='1'/>/(@c ! contains(., '1')) = true()", true, root(BOOLEAN));
+    check("(<_ c='1'/>/@c ! contains(., '1')) = true()", true, root(BOOLEAN));
+
+    check("<xml>Ukraine</xml>[some $text in text() satisfies $text = 'Ukraine']",
+        "<xml>Ukraine</xml>", count(CmpG.class, 1), empty(GFLWOR.class));
+  }
 }
