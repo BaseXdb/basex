@@ -2701,4 +2701,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_><a>0</a><a>1</a></_>/(a ! (. >= '1'   )  = false())", true, root(CmpG.class));
     check("<_><a>0</a><a>1</a></_>/(a ! (. >= '1'   ) != true() )", true, root(CmpG.class));
   }
+
+
+  /** where false(). */
+  @Test public void gh2080() {
+    check("let $_ := prof:void(1) where false() return ()", "", root(_PROF_VOID));
+    check("let $_ := prof:void(1) where false() return prof:void(2)", "", root(_PROF_VOID));
+  }
 }
