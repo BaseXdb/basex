@@ -307,12 +307,29 @@ public abstract class Cmp extends Arr {
             default: return ok ? not.get() : Bln.FALSE;
           }
         }
-        // (A, B) = true()  ->  A or B
-        // (A, B) = false()  ->  not(A and B)
-        final Checks<Expr> booleans = expr -> expr.seqType().eq(SeqType.BOOLEAN_O);
-        if((eq || ne) && expr1 instanceof List && booleans.all(expr1.args())) {
-          if(ne ^ ok) return new Or(info, expr1.args()).optimize(cc);
-          return cc.function(NOT, info, new And(info, expr1.args()).optimize(cc));
+
+        if(this instanceof CmpG) {
+          // (A, B) = true()  ->  A or B
+          // (A, B) = false()  ->  not(A and B)
+          final Checks<Expr> booleans = expr -> expr.seqType().eq(SeqType.BOOLEAN_O);
+          final Expr[] args = expr1.args();
+          if((eq || ne) && expr1 instanceof List && booleans.all(args)) {
+            if(ne ^ ok) return new Or(info, args).optimize(cc);
+            return cc.function(NOT, info, new And(info, args).optimize(cc));
+          }
+
+          // (text() ! (. = 'Ukraine')) = true()  ->  text() = 'Ukraine'
+          if(eq && ok && expr1 instanceof SimpleMap) {
+            final int al = args.length;
+            final Expr last = args[al - 1];
+            if(last instanceof CmpG) {
+              final CmpG cmp = (CmpG) last;
+              if(cmp.exprs[0] instanceof ContextValue && !cmp.exprs[1].has(Flag.CTX)) {
+                final Expr op1 = SimpleMap.get(cc, info, Arrays.copyOf(args, al - 1));
+                return new CmpG(op1, cmp.exprs[1], cmp.op, coll, sc, info).optimize(cc);
+              }
+            }
+          }
         }
       }
       // BOOL = not(BOOL)  ->  false()

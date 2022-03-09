@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.func.Function.*;
 
+import java.util.*;
 import java.util.function.*;
 
 import org.basex.data.*;
@@ -439,19 +440,29 @@ public abstract class SimpleMap extends Arr {
       throws QueryException {
 
     Expr expr = this;
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE, Simplify.DISTINCT)) {
-      // nodes ! text() = string  ->  nodes/text() = string
-      expr = toPath(cc);
-    } else {
-      final int el = exprs.length;
-      final Expr old = exprs[el - 1];
-      final Expr ex = cc.get(exprs[el - 2], () -> old.simplifyFor(mode, cc));
-      if(ex != old) {
-        final ExprList list = new ExprList(el).add(exprs).set(el - 1, ex);
-        expr = get(cc, info, list.finish());
+    final int el = exprs.length;
+    final Expr last = exprs[el - 1], prev = exprs[el - 2];
+    if(mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING, Simplify.COUNT,
+        Simplify.DISTINCT)) {
+      // distinct-values(@id ! data())  ->  distinct-values(@id)
+      final Expr lst = cc.get(prev, () -> last.simplifyFor(mode, cc));
+      if(lst != last) expr = get(cc, info, new ExprList(el).add(exprs).set(el - 1, lst).finish());
+    }
+
+    if(expr == this) {
+      if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE, Simplify.DISTINCT)) {
+        if(mode != Simplify.DISTINCT && seqType().zeroOrOne() &&
+            prev.seqType().type instanceof NodeType && last instanceof Bln) {
+          // boolean(@id ! true())  ->  boolean(@id)
+          expr = last == Bln.FALSE ? Bln.FALSE : get(cc, info, Arrays.copyOf(exprs, el - 1));
+        } else {
+          // nodes ! text() = string  ->  nodes/text() = string
+          expr = toPath(cc);
+        }
       }
     }
-    return expr != this ? cc.simplify(this, expr) : super.simplifyFor(mode, cc);
+    return expr != this ? cc.simplify(this, expr).simplifyFor(mode, cc) :
+      super.simplifyFor(mode, cc);
   }
 
   @Override

@@ -126,11 +126,15 @@ public final class UtilReplicate extends StandardFunc {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
+
     if(mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA, Simplify.COUNT)) {
       // data(util:replicate(<a>1</a>, 2))  ->  data(util:replicate(xs:untypedAtomic('1'), 2))
-      final Expr[] args = exprs.clone();
-      args[0] = exprs[0].simplifyFor(mode, cc);
-      expr = cc.function(_UTIL_REPLICATE, info, args);
+      final Expr arg = exprs[0].simplifyFor(mode, cc);
+      if(arg != exprs[0]) {
+        final Expr[] args = exprs.clone();
+        args[0] = arg;
+        expr = cc.function(_UTIL_REPLICATE, info, args);
+      }
     } else if(mode == Simplify.DISTINCT) {
       // distinct-values(util:replicate($node, 2))  ->  distinct-values($node)
       final long count = exprs[1] instanceof Int ? ((Int) exprs[1]).itr() : -1;
