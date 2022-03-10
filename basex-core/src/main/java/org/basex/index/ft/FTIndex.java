@@ -437,10 +437,13 @@ public final class FTIndex extends ValueIndex {
       public boolean more() {
         if(c == size) return false;
         all.reset(pos);
-        pre = ftc.pre.get(ftc.order[c]);
-        all.or(ftc.pos.get(ftc.order[c++]));
-        while(c < size && pre == ftc.pre.get(ftc.order[c])) {
-          all.or(ftc.pos.get(ftc.order[c++]));
+        int o = ftc.order[c];
+        pre = ftc.pre.get(o);
+        all.or(ftc.pos.get(o));
+        while(++c < size) {
+          o = ftc.order[c];
+          if(pre != ftc.pre.get(o)) break;
+          all.or(ftc.pos.get(o));
         }
         return true;
       }

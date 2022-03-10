@@ -114,4 +114,11 @@ public final class FTQueryTest extends SandboxTest {
     query("count(tokenize('fara&#700;id faraid fara-id Birkan')"
         + "[. contains text 'fara&#700;id' using fuzzy])", 2);
   }
+
+  /** Full-Text Search: Fuzzy Phrases. */
+  @Test public void gh2081() {
+    query(_DB_CREATE.args(NAME, " <_>test a text</_>", NAME, " map { 'ftindex': true() }"));
+    query(_FT_SEARCH.args(NAME, "test a", " map { 'fuzzy': true() }"), "test a text");
+    query(_FT_SEARCH.args(NAME, "a test", " map { 'fuzzy': true() }"), "test a text");
+  }
 }
