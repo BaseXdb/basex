@@ -76,23 +76,23 @@ public final class FTMatches extends ObjectList<FTMatch, FTMatches> {
 
   /**
    * Combines two matches as phrase.
-   * @param all second match list
+   * @param matches second match list
    * @param distance word distance
    * @return true if matches are left
    */
-  public boolean phrase(final FTMatches all, final int distance) {
-    int a = 0, b = 0, c = 0;
-    while(a < size && b < all.size) {
-      final int e = all.list[b].list[0].start;
-      final int d = e - list[a].list[0].end - distance;
+  public boolean phrase(final FTMatches matches, final int distance) {
+    int l = 0, m = 0, s = 0, ms = matches.size;
+    while(l < size && m < ms) {
+      final FTStringMatch ll = list[l].list[0], ml = matches.list[m].list[0];
+      final int e = ml.start, d = e - ll.end - distance;
       if(d == 0) {
-        list[c] = list[a];
-        list[c++].list[0].end = e;
+        ll.end = e;
+        list[s++] = list[l];
       }
-      if(d >= 0) ++a;
-      if(d <= 0) ++b;
+      if(d >= 0) ++l;
+      if(d <= 0) ++m;
     }
-    size = c;
+    size = s;
     return size != 0;
   }
 

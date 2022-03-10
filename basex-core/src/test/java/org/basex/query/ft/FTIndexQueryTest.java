@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,9 +37,17 @@ public final class FTIndexQueryTest extends FTData {
    */
   @Test public void testFTTest() {
     init(DOC);
+    final StringBuilder sb = new StringBuilder();
     for(final Object[] q : QUERIES) {
-      if(q.length == 3) assertQuery((String) q[0], (String) q[2]);
+      try {
+        if(q.length == 3) assertQuery((String) q[0], (String) q[2]);
+      } catch(final Throwable th) {
+        System.out.println(q[2]);
+        Util.debug(th);
+        sb.append(th.getMessage());
+      }
     }
+    if(sb.length() != 0) fail(sb.toString());
   }
 
   /**
@@ -73,6 +82,6 @@ public final class FTIndexQueryTest extends FTData {
     final String result1 = query(query);
     execute(new Open(NAME + "ix"));
     final String resultIx = query(query);
-    assertEquals(result1, resultIx, "Query \"" + name + "\" failed:\nQuery: " + query + '\n');
+    assertEquals(result1, resultIx, '\n' + name + ": " + query + '\n');
   }
 }

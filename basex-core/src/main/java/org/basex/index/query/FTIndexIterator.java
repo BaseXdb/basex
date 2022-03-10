@@ -77,8 +77,16 @@ public abstract class FTIndexIterator implements IndexIterator {
 
       @Override
       public FTMatches matches() {
-        final FTMatches all = ir[curr.peek()].matches();
-        for(int c = curr.size() - 1; --c >= 0;) all.add(ir[curr.get(c)].matches());
+        final FTMatches all = ir[curr.get(0)].matches();
+        final int cs = curr.size();
+        for(int c = 1; c < cs; c++) {
+          for(final FTMatch match : ir[curr.get(c)].matches()) {
+            final int s = match.list[0].start;
+            int i = all.size();
+            while(--i >= 0 && s < all.get(i).list[0].start);
+            all.insert(++i, match);
+          }
+        }
         return all;
       }
 
