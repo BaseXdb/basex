@@ -333,7 +333,7 @@ public enum QueryError {
   /** Error code. */
   JOBS_OPTIONS(JOBS, "options", "Either 'cache' or 'interval' option is allowed."),
   /** Error code. */
-  JOBS_OVERFLOW(JOBS, "overflow", "Too many queries queued."),
+  JOBS_OVERFLOW(JOBS, "overflow", "Too many queries cached."),
   /** Error code. */
   JOBS_RANGE_X(JOBS, "range", "Value out of range: %."),
   /** Error code. */
