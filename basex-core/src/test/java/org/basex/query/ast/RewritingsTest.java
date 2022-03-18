@@ -2743,8 +2743,14 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_><a>0</a><a>1</a></_>/(a ! (. >=  1    ) != true() )", true, root(CmpG.class));
     check("<_><a>0</a><a>1</a></_>/(a ! (. >= '1'   )  = false())", true, root(CmpG.class));
     check("<_><a>0</a><a>1</a></_>/(a ! (. >= '1'   ) != true() )", true, root(CmpG.class));
-  }
 
+    check("let $seq := (1 to 1000000000) ! string() return"
+        + "  some $a in $seq satisfies (some $b in $seq satisfies $a = $b)",
+        true, root(Bln.class));
+    check("let $seq := (1 to 1000000000) ! string() return"
+        + "  some $a in $seq satisfies (some $b in $seq satisfies $b = $a)",
+        true, root(Bln.class));
+  }
 
   /** where false(). */
   @Test public void gh2080() {

@@ -76,6 +76,8 @@ public abstract class Cmp extends Arr {
       // hashed comparisons: . = $words
       expr1 instanceof VarRef && expr1.seqType().occ.max > 1 &&
         !(expr2 instanceof VarRef && expr2.seqType().occ.max > 1) ||
+      // context value: . = $item
+      expr1 instanceof VarRef && expr2 instanceof ContextValue ||
       // index rewritings: move path to the left: word/text() = $word
       !(expr1 instanceof Path && ((Path) expr1).root == null) &&
         expr2 instanceof Path && ((Path) expr2).root == null
