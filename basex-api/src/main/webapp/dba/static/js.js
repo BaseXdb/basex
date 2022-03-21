@@ -204,6 +204,8 @@ function runQuery(reverse) {
   // decide if query is read-only or updating
   var updating = (document.getElementById("mode").selectedIndex === 1) ^ reverse;
   var path = updating ? "query-update" : "query-eval";
+  var file = document.getElementById("file");
+  if(file && file.value) path += "?file=" + encodeURIComponent(file.value);
 
   // stop old query if mode was changed (each has its own %rest:single function)
   if(_running && _updating !== updating) stopQuery();
