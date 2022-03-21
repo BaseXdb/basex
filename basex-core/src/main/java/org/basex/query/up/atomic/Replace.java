@@ -47,21 +47,18 @@ final class Replace extends StructuralUpdate {
   @Override
   void apply(final Data data) {
     try {
-      if(data.nspaces.isEmpty() && clip.data.nspaces.isEmpty()) {
-        // Lazy Replace: rewrite to value updates if structure has not changed
-        if(lazyReplace(data)) return;
-        // Rapid Replace: in-place update, overwrite existing table entries
-        data.replace(location, clip);
+      // if possible, replace values or overwrite database entries
+      if(data.nspaces.isEmpty() && clip.data.nspaces.isEmpty() && (
+        lazyReplace(data) || data.replace(location, clip)
+      )) return;
+
+      // otherwise, delete old entries and insert new ones
+      final int kind = data.kind(location), par = data.parent(location, kind);
+      data.delete(location);
+      if(kind == Data.ATTR) {
+        data.insertAttr(location, par, clip);
       } else {
-        // fallback: delete old entries, add new ones
-        final int kind = data.kind(location), par = data.parent(location, kind);
-        // delete first - otherwise insert must be at location+1
-        data.delete(location);
-        if(kind == Data.ATTR) {
-          data.insertAttr(location, par, clip);
-        } else {
-          data.insert(location, par, clip);
-        }
+        data.insert(location, par, clip);
       }
     } finally {
       clip.finish();
@@ -72,7 +69,7 @@ final class Replace extends StructuralUpdate {
    * Lazy Replace implementation. Checks if the replace operation can be substituted with
    * cheaper value updates. If structural changes have to be made no substitution takes place.
    * @param data destination data reference
-   * @return true if substitution successful
+   * @return true if operation was successful
    */
   private boolean lazyReplace(final Data data) {
     final Data src = clip.data;

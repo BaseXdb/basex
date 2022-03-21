@@ -579,17 +579,16 @@ public abstract class Data {
    * Rapid Replace implementation. Replaces parts of the database with the specified data instance.
    * @param pre pre value of the node to be replaced
    * @param source clip with source data
+   * @return success flag
    */
-  public final void replace(final int pre, final DataClip source) {
+  public final boolean replace(final int pre, final DataClip source) {
+    final int sCount = source.size();
+    if(!bufferSize(sCount)) return false;
+
     meta.update();
 
-    final int sCount = source.size();
-    final int tKind = kind(pre);
-    final int tSize = size(pre, tKind);
-    final int tPar = parent(pre, tKind);
-    bufferSize(sCount);
-
     // update index structures
+    final int tKind = kind(pre), tSize = size(pre, tKind), tPar = parent(pre, tKind);
     indexDelete(pre, id(pre), tSize);
 
     final Data sData = source.data;
@@ -666,6 +665,7 @@ public abstract class Data {
 
     // add entries to index structures
     indexAdd(pre, meta.lastid - sCount + 1, sCount, source);
+    return true;
   }
 
   /**
@@ -948,12 +948,15 @@ public abstract class Data {
   private int bufferPos;
 
   /**
-   * Sets the update buffer to a new size.
+   * Tries to resize the update buffer.
    * @param size number of table entries
+   * @return success flag
    */
-  private void bufferSize(final int size) {
+  private boolean bufferSize(final int size) {
     final int bs = size << IO.NODEPOWER;
-    if(buffer.length != bs) buffer = new byte[bs];
+    if(bs < 0) return false;
+    buffer = new byte[bs];
+    return true;
   }
 
   /**
