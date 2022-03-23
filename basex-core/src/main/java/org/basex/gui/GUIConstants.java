@@ -196,6 +196,9 @@ public final class GUIConstants {
   /** Panel color. */
   public static final Color PANEL = new Color(LABEL.getBackground().getRGB());
 
+  /** Dark theme. */
+  private static final boolean INVERT = BACK.getRed() + BACK.getGreen() + BACK.getBlue() < 384;
+
   /** Color: red. */
   public static final Color RED = color(224, 0, 0);
   /** Color: light red. */
@@ -227,8 +230,6 @@ public final class GUIConstants {
 
   /** Cached color gradient. */
   private static final Color[] COLORS = new Color[100];
-  /** Dark theme. */
-  private static final boolean INVERT = BACK.getRed() + BACK.getGreen() + BACK.getBlue() < 384;
 
   /** Second bright GUI color. */
   public static Color color1;
@@ -375,6 +376,8 @@ public final class GUIConstants {
    * @return converted color
    */
   private static Color color(final int r, final int g, final int b) {
+    System.out.println(INVERT);
+    System.out.println(BACK.getRed() + BACK.getGreen() + BACK.getBlue() < 384);
     return INVERT ? new Color(255 - r, 255 - g, 255 - b) : new Color(r, g, b);
   }
 
