@@ -376,8 +376,6 @@ public final class GUIConstants {
    * @return converted color
    */
   private static Color color(final int r, final int g, final int b) {
-    System.out.println(INVERT);
-    System.out.println(BACK.getRed() + BACK.getGreen() + BACK.getBlue() < 384);
     return INVERT ? new Color(255 - r, 255 - g, 255 - b) : new Color(r, g, b);
   }
 
