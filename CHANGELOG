@@ -1,3 +1,12 @@
+VERSION 9.7 (March 23, 2022) -------------------------------------------
+
+ XQUERY
+ - numerous performance tweaks and optimizations
+ - support for formatting integers and dates in French
+ - xslt:transform-report: support for xsl:messages
+ - util:strip-namespaces: remove namespaces from elements
+ - XSD validation: improved support for XML catalogs
+
 VERSION 9.6.4 (December 17, 2021) --------------------------------------
 
  - Performance tweaks, minor fixes
