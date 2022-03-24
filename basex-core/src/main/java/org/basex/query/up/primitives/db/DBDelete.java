@@ -1,11 +1,12 @@
 package org.basex.query.up.primitives.db;
 
-import org.basex.core.cmd.*;
+import java.util.*;
+
 import org.basex.data.*;
+import org.basex.io.*;
 import org.basex.query.func.*;
 import org.basex.query.up.primitives.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Update primitive for the {@link Function#_DB_DELETE} function.
@@ -14,21 +15,21 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class DBDelete extends DBUpdate {
-  /** Resources to be deleted. */
-  private final StringList paths = new StringList(1);
+  /** Path to binaries to be deleted. */
+  private final ArrayList<IOFile> paths = new ArrayList<>(1);
   /** Number of keys. */
   private int size;
 
   /**
    * Constructor.
    * @param data data
-   * @param path target path
+   * @param path path to binaries
    * @param info input info
    */
-  public DBDelete(final Data data, final String path, final InputInfo info) {
+  public DBDelete(final Data data, final IOFile path, final InputInfo info) {
     super(UpdateType.DBDELETE, data, info);
+    this.size = path.isDir() ? path.descendants().size() : 1;
     paths.add(path);
-    size = data.resources.binaries(path).size();
   }
 
   @Override
@@ -37,12 +38,12 @@ public final class DBDelete extends DBUpdate {
 
   @Override
   public void apply() {
-    for(final String path : paths) Delete.deleteBinary(data, path);
+    for(final IOFile path : paths) path.delete();
   }
 
   @Override
   public void merge(final Update update) {
-    for(final String path : ((DBDelete) update).paths) paths.add(path);
+    for(final IOFile path : ((DBDelete) update).paths) paths.add(path);
     size += update.size();
   }
 

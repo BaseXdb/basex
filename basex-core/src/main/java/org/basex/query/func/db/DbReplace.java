@@ -42,7 +42,9 @@ public final class DbReplace extends DbNew {
     if(disk && item instanceof Bin) {
       updates.add(new DBStore(data, path, item, info), qc);
     } else {
-      if(disk && bin.exists()) updates.add(new DBDelete(data, path, info), qc);
+      if(disk && bin.exists()) {
+        updates.add(new DBDelete(data, bin, info), qc);
+      }
       final NewInput input = checkInput(item, token(path));
       final Update update = docs.isEmpty() ?
         new DBAdd(data, input, opts, true, qc, info) :

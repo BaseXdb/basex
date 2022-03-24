@@ -33,28 +33,19 @@ public final class Delete extends ACreate {
         // delete XML documents
         final IntList docs = data.resources.docs(target);
         final AtomicUpdateCache auc = new AtomicUpdateCache(data);
-        final int ds = docs.size();
-        for(int d = 0; d < ds; d++) auc.addDelete(docs.get(d));
+        int size = docs.size();
+        for(int d = 0; d < size; d++) auc.addDelete(docs.get(d));
         auc.execute(false);
         context.invalidate();
 
         // delete binaries
-        final TokenList bins = data.resources.binaries(target);
-        deleteBinary(data, target);
-
-        return info(RES_DELETED_X_X, docs.size() + bins.size(), jc().performance);
+        if(!data.inMemory()) {
+          final IOFile path = data.meta.binary(target);
+          size += path.isDir() ? path.descendants().size() : 1;
+          path.delete();
+        }
+        return info(RES_DELETED_X_X, size, jc().performance);
       }
     });
-  }
-
-  /**
-   * Deletes the specified binaries.
-   * @param data data reference
-   * @param path resource to be deleted
-   */
-  public static void deleteBinary(final Data data, final String path) {
-    if(data.inMemory()) return;
-    final IOFile file = data.meta.binary(path);
-    if(file != null) file.delete();
   }
 }
