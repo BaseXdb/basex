@@ -36,7 +36,7 @@ public final class DbDelete extends DbAccess {
     if(!data.inMemory()) {
       final IOFile bin = data.meta.binary(path);
       if(bin == null) throw DB_PATH_X.get(info, path);
-      updates.add(new DBDelete(data, path, info), qc);
+      updates.add(new DBDelete(data, bin, info), qc);
     }
     return Empty.VALUE;
   }
