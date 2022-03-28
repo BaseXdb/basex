@@ -97,6 +97,10 @@ public final class InspectModuleTest extends SandboxTest {
         + "[function-name(.) = QName('world', 'closure')]()", 1);
     query("import module namespace hello='world' at '" + url + "';"
         + func.args() + "[function-name(.) = xs:QName('hello:closure')]()", 1);
+
+    // ensure that a module will only be parsed once
+    query("prof:void((" + func.args(url) + "))", "");
+    query("prof:void((" + func.args(url) + ", " + func.args(url) + "))", "");
   }
 
   /** Test method. */
