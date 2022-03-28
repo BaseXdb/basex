@@ -22,26 +22,38 @@ import org.basex.util.*;
 public final class InspectFunctions extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    checkCreate(qc);
-    // about to be updated in a future version
-    final ArrayList<StaticFunc> old = new ArrayList<>();
-    if(exprs.length > 0) {
-      // cache existing functions
-      Collections.addAll(old, qc.funcs.funcs());
-      try {
-        final IO io = checkPath(0, qc);
-        qc.parse(Token.string(io.read()), io.path());
-        qc.funcs.compileAll(new CompileContext(qc));
-      } catch(final IOException ex) {
-        throw IOERR_X.get(info, ex);
+    // returns all functions from the query context
+    if(exprs.length == 0) {
+      final ValueBuilder vb = new ValueBuilder(qc);
+      for(final StaticFunc sf : qc.funcs.funcs()) {
+        vb.add(Functions.getUser(sf, qc, sf.sc, info));
       }
+      return vb.value(this);
     }
 
+    // URI specified: compile module and return all newly added functions
+    checkCreate(qc);
+    final IO io = checkPath(0, qc);
+    Value funcs = qc.resources.functions(io.path());
+    if(funcs != null) return funcs;
+
+    // cache existing functions
+    final HashSet<StaticFunc> old = new HashSet<>();
+    Collections.addAll(old, qc.funcs.funcs());
+    try {
+      qc.parse(Token.string(io.read()), io.path());
+      qc.funcs.compileAll(new CompileContext(qc));
+    } catch(final IOException ex) {
+      throw IOERR_X.get(info, ex);
+    }
+    // collect new functions
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final StaticFunc sf : qc.funcs.funcs()) {
       if(!old.contains(sf)) vb.add(Functions.getUser(sf, qc, sf.sc, info));
     }
-    return vb.value(this);
+    funcs = vb.value(this);
+    qc.resources.addFunctions(io.path(), funcs);
+    return funcs;
   }
 
   @Override

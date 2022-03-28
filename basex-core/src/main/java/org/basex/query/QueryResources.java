@@ -51,6 +51,8 @@ public final class QueryResources {
   private final ArrayList<Data> datas = new ArrayList<>(1);
   /** External resources. */
   private final Map<Class<? extends QueryResource>, QueryResource> external = new HashMap<>();
+  /** Function items. */
+  private final Map<String, Value> functions = new HashMap<>();
   /** Input references. */
   private final ArrayList<InputStream> inputs = new ArrayList<>(1);
 
@@ -86,7 +88,7 @@ public final class QueryResources {
   }
 
   /**
-   * Closes all opened data references that have not been added by the global context.
+   * Finalizes data instances.
    */
   void close() {
     for(final Data data : datas) Close.close(data, qc.context);
@@ -97,7 +99,7 @@ public final class QueryResources {
     // close external resources
     for(final QueryResource c : external.values()) c.close();
     external.clear();
-    // close external resources
+    // close input resources
     for(final InputStream is : inputs) {
       try {
         is.close();
@@ -152,6 +154,24 @@ public final class QueryResources {
   public synchronized void remove(final InputStream input) throws IOException {
     inputs.remove(input);
     input.close();
+  }
+
+  /**
+   * Returns inspected functions.
+   * @param path path to module
+   * @return inspected functions
+   */
+  public synchronized Value functions(final String path) {
+    return functions.get(path);
+  }
+
+  /**
+   * Adds inspected functions.
+   * @param path path to module
+   * @param funcs functions
+   */
+  public synchronized void addFunctions(final String path, final Value funcs) {
+    functions.put(path, funcs);
   }
 
   /**
