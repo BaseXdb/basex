@@ -1,6 +1,10 @@
 package org.basex.query.func.db;
 
+import org.basex.data.*;
 import org.basex.index.*;
+import org.basex.query.*;
+import org.basex.query.iter.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -9,6 +13,17 @@ import org.basex.index.*;
  * @author Christian Gruen
  */
 public final class DbAttributeRange extends DbTextRange {
+  @Override
+  public Iter iter(final QueryContext qc) throws QueryException {
+    final Data data = checkData(qc);
+    return attribute(data, rangeAccess(data, qc), qc, 3);
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    return iter(qc).value(qc, this);
+  }
+
   @Override
   IndexType type() {
     return IndexType.ATTRIBUTE;

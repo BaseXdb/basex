@@ -207,6 +207,9 @@ public final class DbModuleTest extends QueryPlanTest {
     execute(new CreateIndex(CmdIndex.ATTRIBUTE));
     query(func.args(NAME, "0", "9") + "/data()", "0\n1");
     query(func.args(NAME, "XXX", "XXX"), "");
+
+    query(func.args(NAME, "0", "9", "id") + "/data()", "0\n1");
+    query(func.args(NAME, "0", "9", "xyz"), "");
   }
 
   /** Test method. */
