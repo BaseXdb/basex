@@ -3,6 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpG.*;
@@ -188,6 +190,7 @@ public final class CmpV extends Cmp {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     simplifyAll(Simplify.STRING, cc);
+    if(allAreValues(false)) return cc.preEval(this);
 
     // swap operands
     if(swap()) {
@@ -196,23 +199,42 @@ public final class CmpV extends Cmp {
     }
 
     Expr expr = emptyExpr();
+    if(expr == this) expr = toGeneral(cc, true);
+    if(expr == this) expr = opt(cc);
     if(expr == this) {
-      if(allAreValues(false)) return cc.preEval(this);
-
-      // check if operands will always yield a single item
-      final Expr expr1 = exprs[0], expr2 = exprs[1];
-      final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
+      // restrict type
+      final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
       if(st1.oneOrMore() && !st1.mayBeArray() && st2.oneOrMore() && !st2.mayBeArray()) {
         exprType.assign(Occ.EXACTLY_ONE);
-
-        // no type check: rewrite to general expression (faster evaluation)
-        if(st1.one() && st2.one() && CmpG.compatible(st1, st2, opV == OpV.EQ || opV == OpV.NE)) {
-          expr = new CmpG(expr1, expr2, OpG.get(opV), coll, sc, info).optimize(cc);
-        }
       }
     }
-    if(expr == this) expr = opt(cc);
     return cc.replaceWith(this, expr);
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    Expr expr = this;
+    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+      expr = toGeneral(cc, false);
+    }
+    return expr != this ? expr.simplifyFor(mode, cc) : super.simplifyFor(mode, cc);
+  }
+
+  /**
+   * Tries to rewrite this expression to a general comparison.
+   * @param cc compilation context
+   * @param single operands must yield single values
+   * @return general comparison or original expression
+   * @throws QueryException query exception
+   */
+  private Expr toGeneral(final CompileContext cc, final boolean single) throws QueryException {
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
+    final Predicate<SeqType> p = st -> single ? st.one() : st.zeroOrOne();
+    if(p.test(st1) && p.test(st2) && CmpG.compatible(st1, st2, opV == OpV.EQ || opV == OpV.NE)) {
+      return new CmpG(expr1, expr2, OpG.get(opV), coll, sc, info).optimize(cc);
+    }
+    return this;
   }
 
   @Override

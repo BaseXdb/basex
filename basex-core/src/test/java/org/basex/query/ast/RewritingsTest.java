@@ -2757,4 +2757,15 @@ public final class RewritingsTest extends QueryPlanTest {
     check("let $_ := prof:void(1) where false() return ()", "", root(_PROF_VOID));
     check("let $_ := prof:void(1) where false() return prof:void(2)", "", root(_PROF_VOID));
   }
+
+  /** Rewrite value to general comparison. */
+  @Test public void gh2082() {
+    check("<a/>/@a eq ''", "", exists(CmpV.class));
+    check("boolean(<a/>/@a eq '')", false, exists(CmpSimpleG.class));
+    check("<e a=''/>[@a eq ''] ! name()", "e", exists(CmpSimpleG.class));
+    check("<e a=''/>[@a ne ''] ! name()", "", exists(CmpSimpleG.class));
+
+    execute(new CreateDB(NAME, "<e a='a'/>"));
+    check("/e[@a eq 'a'] ! name()", "e", exists(ValueAccess.class));
+  }
 }
