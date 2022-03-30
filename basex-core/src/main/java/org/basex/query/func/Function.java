@@ -707,7 +707,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, ITEM_ZM, MAP_ZO), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_CREATE_FROM(ArchiveCreateFrom::new, "create-from(path[,options[,entries]])",
-      params(STRING_O, MAP_ZO, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(NDT), ARCHIVE_URI),
+      params(STRING_O, MAP_ZO, ITEM_ZM), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_DELETE(ArchiveDelete::new, "delete(archive,entries)",
       params(BASE64_BINARY_O, ITEM_ZM), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI),
