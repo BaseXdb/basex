@@ -16,7 +16,7 @@ public final class DbIsRaw extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = checkData(qc);
-    final String path = path(1, qc);
+    final String path = toDbPath(1, qc);
     if(data.inMemory()) return Bln.FALSE;
     final IOFile io = data.meta.binary(path);
     return Bln.get(io.exists() && !io.isDir());

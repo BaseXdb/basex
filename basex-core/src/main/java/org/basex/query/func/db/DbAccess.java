@@ -30,8 +30,8 @@ abstract class DbAccess extends StandardFunc {
    * @return normalized path
    * @throws QueryException query exception
    */
-  final String path(final int i, final QueryContext qc) throws QueryException {
-    return path(toToken(exprs[i], qc));
+  final String toDbPath(final int i, final QueryContext qc) throws QueryException {
+    return toDbPath(toToken(exprs[i], qc));
   }
 
   /**
@@ -41,7 +41,7 @@ abstract class DbAccess extends StandardFunc {
    * @return normalized path
    * @throws QueryException query exception
    */
-  final String path(final byte[] path) throws QueryException {
+  final String toDbPath(final byte[] path) throws QueryException {
     final String norm = MetaData.normPath(string(path));
     if(norm == null) throw RESINV_X.get(info, path);
     return norm;

@@ -22,7 +22,7 @@ public final class DbExists extends DbAccess {
       final Data data = checkData(qc);
       if(exprs.length == 1) return Bln.TRUE;
       // check if raw file or XML document exists
-      final String path = path(1, qc);
+      final String path = toDbPath(1, qc);
       boolean raw = false;
       if(!data.inMemory()) {
         final IOFile io = data.meta.binary(path);
