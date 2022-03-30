@@ -36,17 +36,15 @@ public class FileWriteBinary extends FileFn {
       throws QueryException, IOException {
 
     final Path path = checkParentDir(toPath(0, qc));
-    final boolean full = exprs.length == 2, archive = full && exprs[1] instanceof ArchiveCreate;
-    final Bin bin = archive ? null : toBin(exprs[1], qc);
-    final long off = full ? 0 : toLong(exprs[2], qc);
 
-    if(full) {
+    if(exprs.length == 2) {
       // write full file
       try(BufferOutput out = new BufferOutput(new FileOutputStream(path.toFile(), append))) {
-        if(archive) {
-          // optimization: stream created archives
+        if(exprs[1].getClass() == ArchiveCreate.class) {
+          // optimization: stream archive to disk (no support for ArchiveCreateFrom)
           ((ArchiveCreate) exprs[1]).create(out, qc);
         } else {
+          final Bin bin = toBin(exprs[1], qc);
           try(BufferInput in = bin.input(info)) {
             for(int b; (b = in.read()) != -1;) out.write(b);
           }
@@ -54,10 +52,13 @@ public class FileWriteBinary extends FileFn {
       }
     } else {
       // write file chunk
+      final Bin bin = toBin(exprs[1], qc);
+      final long offset = toLong(exprs[2], qc);
+
       try(RandomAccessFile raf = new RandomAccessFile(path.toFile(), "rw")) {
-        final long dlen = raf.length();
-        if(off < 0 || off > dlen) throw FILE_OUT_OF_RANGE_X_X.get(info, off, dlen);
-        raf.seek(off);
+        final long length = raf.length();
+        if(offset < 0 || offset > length) throw FILE_OUT_OF_RANGE_X_X.get(info, offset, length);
+        raf.seek(offset);
         raf.write(bin.binary(info));
       }
     }
