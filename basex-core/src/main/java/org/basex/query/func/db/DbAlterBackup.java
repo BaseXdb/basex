@@ -1,9 +1,7 @@
 package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.name.*;
@@ -21,11 +19,8 @@ import org.basex.util.list.*;
 public final class DbAlterBackup extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = string(toToken(exprs[0], qc));
-    final String newname = string(toToken(exprs[1], qc));
-
-    if(!Databases.validName(name)) throw DB_NAME_X.get(info, name);
-    if(!Databases.validName(newname)) throw DB_NAME_X.get(info, newname);
+    final String name = toName(0, qc);
+    final String newname = toName(1, qc);
     if(name.equals(newname)) throw DB_CONFLICT4_X.get(info, name, newname);
 
     final StringList backups = qc.context.databases.backups(name);
