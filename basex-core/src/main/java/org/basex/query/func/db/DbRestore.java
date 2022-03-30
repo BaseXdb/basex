@@ -1,7 +1,6 @@
 package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
@@ -21,8 +20,7 @@ public final class DbRestore extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // extract database name from backup file
-    final String name = string(toToken(exprs[0], qc));
-    if(!Databases.validName(name)) throw DB_NAME_X.get(info, name);
+    final String name = toName(0, qc);
 
     // find backup with or without date suffix
     final StringList backups = qc.context.databases.backups(name);

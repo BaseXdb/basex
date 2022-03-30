@@ -1,9 +1,7 @@
 package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.name.*;
 import org.basex.query.value.item.*;
@@ -19,8 +17,7 @@ import org.basex.util.*;
 public final class DbDrop extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = string(toToken(exprs[0], qc));
-    if(!Databases.validName(name)) throw DB_NAME_X.get(info, name);
+    final String name = toName(0, qc);
     if(!qc.context.soptions.dbExists(name)) throw DB_OPEN1_X.get(info, name);
     qc.updates().add(new DBDrop(name, qc, info), qc);
     return Empty.VALUE;

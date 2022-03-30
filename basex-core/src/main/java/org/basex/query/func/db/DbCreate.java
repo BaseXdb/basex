@@ -3,7 +3,6 @@ package org.basex.query.func.db;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.primitives.*;
@@ -24,8 +23,7 @@ import org.basex.util.options.*;
 public final class DbCreate extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = string(toToken(exprs[0], qc));
-    if(!Databases.validName(name)) throw DB_NAME_X.get(info, name);
+    final String name = toName(0, qc);
 
     final TokenList paths = new TokenList();
     if(exprs.length > 2) {

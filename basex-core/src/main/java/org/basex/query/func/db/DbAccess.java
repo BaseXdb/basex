@@ -3,6 +3,7 @@ package org.basex.query.func.db;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.index.*;
@@ -44,6 +45,20 @@ abstract class DbAccess extends StandardFunc {
     final String norm = MetaData.normPath(string(path));
     if(norm == null) throw RESINV_X.get(info, path);
     return norm;
+  }
+
+  /**
+   * Returns the specified expression as database name.
+   * Throws an exception if the path is invalid.
+   * @param i index of argument
+   * @param qc query context
+   * @return normalized path
+   * @throws QueryException query exception
+   */
+  protected final String toName(final int i, final QueryContext qc) throws QueryException {
+    final String name = string(toToken(exprs[i], qc));
+    if(Databases.validName(name)) return name;
+    throw DB_NAME_X.get(info, name);
   }
 
   @Override
