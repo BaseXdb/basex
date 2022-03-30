@@ -20,7 +20,7 @@ public final class DbStore extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = checkData(qc);
-    final String path = path(1, qc);
+    final String path = toDbPath(1, qc);
     final Item item = toNodeOrAtomItem(2, qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
 

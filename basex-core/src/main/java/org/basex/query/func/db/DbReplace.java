@@ -1,7 +1,6 @@
 package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import org.basex.data.*;
 import org.basex.io.*;
@@ -26,7 +25,7 @@ public final class DbReplace extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = checkData(qc);
-    final String path = path(1, qc);
+    final String path = toDbPath(1, qc);
     final Item item = toNodeOrAtomItem(2, qc);
     final Options opts = toOptions(3, new Options(), qc);
 
@@ -45,7 +44,7 @@ public final class DbReplace extends DbNew {
       if(disk && bin.exists()) {
         updates.add(new DBDelete(data, bin, info), qc);
       }
-      final NewInput input = checkInput(item, token(path));
+      final NewInput input = checkInput(item, path);
       final Update update = docs.isEmpty() ?
         new DBAdd(data, input, opts, true, qc, info) :
         new ReplaceDoc(docs.get(d++), data, input, opts, qc, info);

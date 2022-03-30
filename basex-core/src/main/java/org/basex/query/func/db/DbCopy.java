@@ -29,8 +29,7 @@ public class DbCopy extends DbAccess {
    * @throws QueryException query exception
    */
   final void copy(final QueryContext qc, final boolean keep) throws QueryException {
-    final String name = toName(0, qc);
-    final String newname = toName(1, qc);
+    final String name = toName(0, qc), newname = toName(1, qc);
     if(name.equals(newname)) throw DB_CONFLICT4_X.get(info, name, newname);
 
     // source database does not exist

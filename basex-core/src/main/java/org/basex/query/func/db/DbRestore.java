@@ -26,8 +26,7 @@ public final class DbRestore extends DbAccess {
     final StringList backups = qc.context.databases.backups(name);
     if(backups.isEmpty()) throw DB_NOBACKUP_X.get(info, name);
 
-    final String backup = backups.get(0);
-    final String db = Databases.name(backup);
+    final String backup = backups.get(0), db = Databases.name(backup);
     qc.updates().add(new DBRestore(db, backup, qc, info), qc);
     return Empty.VALUE;
   }

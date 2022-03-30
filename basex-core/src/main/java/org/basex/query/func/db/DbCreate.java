@@ -1,7 +1,6 @@
 package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -25,10 +24,10 @@ public final class DbCreate extends DbNew {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = toName(0, qc);
 
-    final TokenList paths = new TokenList();
+    final StringList paths = new StringList();
     if(exprs.length > 2) {
       final Iter iter = exprs[2].iter(qc);
-      for(Item item; (item = qc.next(iter)) != null;) paths.add(path(toToken(item)));
+      for(Item item; (item = qc.next(iter)) != null;) paths.add(toDbPath(toToken(item)));
     }
 
     final NewInput[] inputs;
@@ -41,7 +40,7 @@ public final class DbCreate extends DbNew {
       inputs = new NewInput[(int) is];
       for(int i = 0; i < is; i++) {
         qc.checkStop();
-        inputs[i] = checkInput(value.itemAt(i), i < ps ? paths.get(i) : EMPTY);
+        inputs[i] = checkInput(value.itemAt(i), i < ps ? paths.get(i) : "");
       }
     } else {
       inputs = new NewInput[0];

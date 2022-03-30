@@ -19,8 +19,7 @@ import org.basex.util.list.*;
 public final class DbAlterBackup extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = toName(0, qc);
-    final String newname = toName(1, qc);
+    final String name = toName(0, qc), newname = toName(1, qc);
     if(name.equals(newname)) throw DB_CONFLICT4_X.get(info, name, newname);
 
     final StringList backups = qc.context.databases.backups(name);
