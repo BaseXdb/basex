@@ -84,8 +84,8 @@ final class XMLParser extends CommandParser {
       return new Close();
     if(e.equals(COPY) && check(root, NAME, NEWNAME))
       return new Copy(value(root, NAME), value(root, NEWNAME));
-    if(e.equals(CREATE_BACKUP) && check(root, NAME))
-      return new CreateBackup(value(root, NAME));
+    if(e.equals(CREATE_BACKUP) && check(root, NAME, COMMENT + '?'))
+      return new CreateBackup(value(root, NAME), value(root, COMMENT));
     if(e.equals(CREATE_DB) && check(root, NAME, '<' + INPUT + '?'))
       return new CreateDB(value(root, NAME), xml(root));
     if(e.equals(CREATE_INDEX) && check(root, TYPE))

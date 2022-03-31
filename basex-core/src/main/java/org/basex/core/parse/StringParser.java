@@ -64,7 +64,7 @@ final class StringParser extends CommandParser {
       case CREATE:
         switch(consume(CmdCreate.class, cmd)) {
           case BACKUP:
-            return new CreateBackup(glob(cmd));
+            return new CreateBackup(glob(cmd), string(null));
           case DATABASE: case DB:
             return new CreateDB(name(cmd), remaining(null, true));
           case INDEX:

@@ -101,6 +101,7 @@ function dba:database(
             let $headers := (
               map { 'key': 'backup', 'label': 'Name', 'order': 'desc' },
               map { 'key': 'size', 'label': 'Size', 'type': 'bytes' },
+              map { 'key': 'comment', 'label': 'Comment' },
               map { 'key': 'action', 'label': 'Action', 'type': 'dynamic' }
             )
             let $entries :=
@@ -109,12 +110,13 @@ function dba:database(
               return map {
                 'backup': $backup,
                 'size': $backup/@size,
+                'comment': $backup/@comment,
                 'action': function() {
                   html:link('Download', 'backup/' || encode-for-uri($backup) || '.zip')
                 }
               }
             let $buttons := (
-              html:button('backup-create', 'Create', false(), map { 'class': 'global' }) update {
+              html:button('backup-create', 'Create…', false(), map { 'class': 'global' }) update {
                 if($db-exists) then () else insert node attribute disabled { '' } into .
               },
               html:button('backup-restore', 'Restore', true()),

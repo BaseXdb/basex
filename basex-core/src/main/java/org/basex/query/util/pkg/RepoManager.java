@@ -224,7 +224,7 @@ public final class RepoManager {
   private boolean installJAR(final byte[] content, final String path)
       throws QueryException, IOException {
 
-    final byte[] manifest = new Zip(new IOContent(content)).read(MANIFEST_MF);
+    final byte[] manifest = new RepoArchive(content).read(MANIFEST_MF);
     try(NewlineInput nli = new NewlineInput(manifest)) {
       for(String s; (s = nli.readLine()) != null;) {
         // write file to rewritten file path
@@ -285,9 +285,9 @@ public final class RepoManager {
    * @throws IOException I/O exception
    */
   private boolean installXAR(final byte[] content) throws QueryException, IOException {
-    final Zip zip = new Zip(new IOContent(content));
+    final RepoArchive repoArchive = new RepoArchive(content);
     // parse and validate descriptor file
-    final IOContent dsc = new IOContent(zip.read(DESCRIPTOR));
+    final IOContent dsc = new IOContent(repoArchive.read(DESCRIPTOR));
     final Pkg pkg = new PkgParser(info).parse(dsc);
 
     // remove existing package
@@ -299,7 +299,7 @@ public final class RepoManager {
 
     // choose unique directory, unzip files and register repository
     final IOFile file = uniqueDir(id.replaceAll("[^\\w.-]+", "-"));
-    zip.unzip(file);
+    repoArchive.unzip(file);
 
     // adds package to the repository after assigning its path
     repo.add(pkg.path(file.name()));

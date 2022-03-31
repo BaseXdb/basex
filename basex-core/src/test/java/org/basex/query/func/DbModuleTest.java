@@ -216,11 +216,11 @@ public final class DbModuleTest extends QueryPlanTest {
   @Test public void backups() {
     final Function func = _DB_BACKUPS;
     query("count(" + func.args(NAME) + ")", 0);
-    execute(new CreateBackup(NAME));
+    execute(new CreateBackup(NAME, "BLA"));
     query("count(" + func.args() + ")", 1);
     query("count(" + func.args(NAME) + ")", 1);
-    query("count(" + func.args(NAME) + "/(@database | @date | @size))", 3);
-    query("count(" + func.args(NAME) + "/(@database, @date, @size))", 3);
+    query("count(" + func.args(NAME) + "/(@database | @date | @size | @comment))", 4);
+    query(func.args(NAME) + "/@comment ! data()", "BLA");
     query("count(" + func.args(NAME + 'X') + ")", 0);
     execute(new DropBackup(NAME));
     query("count(" + func.args(NAME) + ")", 0);
@@ -400,6 +400,9 @@ public final class DbModuleTest extends QueryPlanTest {
     query("count(" + _DB_BACKUPS.args(NAME) + ")", 0);
     query(func.args(NAME));
     query("count(" + _DB_BACKUPS.args(NAME) + ")", 1);
+
+    query(func.args(NAME, "BLA"));
+    query(_DB_BACKUPS.args(NAME) + "/@comment ! data()", "BLA");
 
     // invalid name
     error(func.args(""), DB_NAME_X);

@@ -11,24 +11,6 @@ import module namespace util = 'dba/util' at '../lib/util.xqm';
 declare variable $dba:SUB := 'database';
 
 (:~
- : Creates a database backup.
- : @param  $name  name of database
- : @return redirection
- :)
-declare
-  %updating
-  %rest:GET
-  %rest:path('/dba/backup-create')
-  %rest:query-param('name', '{$name}')
-function dba:backup-create(
-  $name  as xs:string
-) as empty-sequence() {
-  dba:action($name, 'Backup was created.', function() {
-    db:create-backup($name)
-  })
-};
-
-(:~
  : Drops a database backup.
  : @param  $name     name of database
  : @param  $backups  backup files

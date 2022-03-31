@@ -152,7 +152,7 @@ public class CommandTest extends SandboxTest {
     ok(new Restore(NAME));
     ok(new Close());
     ok(new Restore(NAME));
-    ok(new CreateBackup(NAME));
+    ok(new CreateBackup(NAME, "BLA"));
     ok(new Restore(NAME));
     ok(new DropBackup(NAME));
     ok(new CreateBackup(NAME + '*'));

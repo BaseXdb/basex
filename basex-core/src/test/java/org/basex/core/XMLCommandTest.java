@@ -36,6 +36,7 @@ public final class XMLCommandTest extends SandboxTest {
     ok("<copy name='X' newname='X'/>");
 
     ok("<create-backup name='X'/>");
+    ok("<create-backup name='X' comment='bla'/>");
 
     ok("<create-db name='X'/>");
     ok("<create-db name='X'>X</create-db>");

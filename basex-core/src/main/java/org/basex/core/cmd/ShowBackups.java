@@ -3,12 +3,12 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+import java.util.zip.*;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.Cmd;
-import org.basex.core.parse.Commands.CmdShow;
+import org.basex.core.parse.Commands.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -26,11 +26,14 @@ public final class ShowBackups extends ABackup {
     table.description = BACKUPS_X;
     table.header.add(NAME);
     table.header.add(SIZE);
+    table.header.add(COMMENT);
 
     for(final String name : context.databases.backups()) {
       final TokenList tl = new TokenList();
       tl.add(name);
-      tl.add(soptions.dbPath(name + IO.ZIPSUFFIX).length());
+      final IOFile zip = soptions.dbPath(name + IO.ZIPSUFFIX);
+      tl.add(zip.length());
+      tl.add(comment(name, context));
       table.contents.add(tl);
     }
     out.println(table.sort().finish());
@@ -50,5 +53,21 @@ public final class ShowBackups extends ABackup {
   @Override
   public void addLocks() {
     jc().locks.reads.add(Locking.BACKUP);
+  }
+
+  /**
+   * Returns the comment of a backup file.
+   * @param name name of backup
+   * @param ctx database context
+   * @return comment, possibly empty
+   */
+  public static String comment(final String name, final Context ctx) {
+    String comment = null;
+    try(ZipFile zf = new ZipFile(ctx.soptions.dbPath(name + IO.ZIPSUFFIX).file())) {
+      comment = zf.getComment();
+    } catch(final IOException ex) {
+      Util.debug(ex);
+    }
+    return comment != null ? comment : "";
   }
 }
