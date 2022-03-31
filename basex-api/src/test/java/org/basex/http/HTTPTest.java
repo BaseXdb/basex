@@ -229,7 +229,7 @@ public abstract class HTTPTest extends SandboxTest {
   /**
    * Executes the specified PUT request.
    * @param url url
-   * @param is input stream
+   * @param is input stream (may be {@code null})
    * @throws IOException I/O exception
    */
   protected static void put(final String url, final InputStream is) throws IOException {
@@ -239,7 +239,7 @@ public abstract class HTTPTest extends SandboxTest {
   /**
    * Executes the specified PUT request.
    * @param url url
-   * @param is input stream
+   * @param is input stream (may be {@code null})
    * @param type media type (optional, may be {@code null})
    * @throws IOException I/O exception
    */
@@ -251,7 +251,7 @@ public abstract class HTTPTest extends SandboxTest {
     conn.setDoOutput(true);
     conn.setRequestMethod(PUT.name());
     if(type != null) conn.setRequestProperty(HttpText.CONTENT_TYPE, type.toString());
-    try(OutputStream bos = new BufferedOutputStream(conn.getOutputStream())) {
+    try(OutputStream os = conn.getOutputStream(); OutputStream bos = new BufferedOutputStream(os)) {
       if(is != null) {
         // send input stream if it not empty
         try(BufferedInputStream bis = new BufferedInputStream(is)) {
