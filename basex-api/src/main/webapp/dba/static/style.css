@@ -51,8 +51,16 @@ textarea {
   width: 100%;
 }
 
+input[type=text] {
+  width: 240;
+}
+
+input[type=password] {
+  width: 240;
+}
+
 select {
-  width: 166;
+  width: 240;
 }
 
 code {

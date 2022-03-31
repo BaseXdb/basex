@@ -114,7 +114,7 @@ function dba:logs(
             <h3>{
               $name, '&#xa0;',
               <input type='hidden' name='name' value='{ $name }'/>,
-              <input size='40' id='input' name='input' value='{ $input }'
+              <input type='text' id='input' name='input' value='{ $input }'
                 title='Enter regular expression'
                 onkeydown='if(event.keyCode==13) {{logEntries(true,false);event.preventDefault();}}'
                 onkeyup='logEntries(false, true);'/>,

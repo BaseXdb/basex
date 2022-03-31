@@ -55,8 +55,7 @@ function dba:db-add(
             <tr>
               <td>Input:</td>
               <td>{
-                <input type='file' name='file' id='file'/>,
-                html:focus('file')
+                <input type='file' name='file' id='file'/>
               }</td>
             </tr>
             <tr>

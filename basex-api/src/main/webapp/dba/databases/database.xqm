@@ -139,7 +139,8 @@ function dba:database(
             }
           </form>,
           <h4>Enter your query…</h4>,
-          <input style='width:100%' name='input' id='input' onkeyup='queryResource(false)'/>,
+          <input type='text' style='width:100%' name='input' id='input'
+                 onkeyup='queryResource(false)'/>,
           <div class='small'/>,
           <textarea name='output' id='output' readonly='' spellcheck='false'/>,
           html:focus('input'),

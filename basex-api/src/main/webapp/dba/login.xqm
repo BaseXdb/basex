@@ -61,10 +61,10 @@ function dba:login(
     <tr>
       <td>
         <form action='login-check' method='post'>
-          <input name='_page' value='{ $page }' type='hidden'/>
+          <input type='hidden' name='_page' value='{ $page }'/>
           {
             map:for-each(html:parameters(), function($key, $value) {
-              <input name='{ $key }' value='{ $value }' type='hidden'/>
+              <input type='hidden' name='{ $key }' value='{ $value }'/>
             })
           }
           <div class='small'/>
@@ -72,14 +72,14 @@ function dba:login(
             <tr>
               <td><b>Name:</b></td>
               <td>
-                <input name='_name' value='{ $name }' id='user' size='30'/>
+                <input type='text' name='_name' value='{ $name }' id='user'/>
                 { html:focus('user') }
               </td>
             </tr>
             <tr>
               <td><b>Password:</b></td>
               <td>{
-                <input name='_pass' type='password' size='30'/>,
+                <input type='password' name='_pass'/>,
                 ' ',
                 <input type='submit' value='Login'/>
               }</td>
