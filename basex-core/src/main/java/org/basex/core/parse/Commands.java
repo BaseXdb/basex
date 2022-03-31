@@ -160,6 +160,8 @@ public interface Commands {
   String VALUE = "value";
   /** Command attribute: "command". */
   String COMMAND = "command";
+  /** Command attribute: "comment". */
+  String COMMENT = "comment";
 
   /** Create commands. */
   enum CmdCreate { DATABASE, DB, INDEX, USER, BACKUP }

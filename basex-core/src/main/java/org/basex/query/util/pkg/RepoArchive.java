@@ -1,50 +1,60 @@
-package org.basex.query.func.zip;
-
-import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
+package org.basex.query.util.pkg;
 
 import java.io.*;
 import java.util.zip.*;
 
 import org.basex.io.*;
-import org.basex.query.*;
-import org.basex.query.value.item.*;
-import org.basex.util.*;
+import org.basex.io.in.*;
 import org.basex.util.list.*;
 
 /**
- * Functions on zip files.
+ * Contains methods for zipping and unzipping archives.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public class ZipBinaryEntry extends ZipFn {
-  @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return B64.get(entry(qc));
+final class RepoArchive {
+  /** Archive data. */
+  private final byte[] data;
+
+  /**
+   * Constructor.
+   * @param data archive data
+   */
+  RepoArchive(final byte[] data) {
+    this.data = data;
   }
 
   /**
-   * Returns an entry from a zip file.
-   * @param qc query context
-   * @return binary result
-   * @throws QueryException query exception
+   * Returns the contents of a zip file entry.
+   * @param path file to be read
+   * @return resulting byte array
+   * @throws IOException I/O exception
    */
-  final byte[] entry(final QueryContext qc) throws QueryException {
-    checkCreate(qc);
-    final IOFile file = new IOFile(string(toToken(exprs[0], qc)));
-    final String path = string(toToken(exprs[1], qc));
-    if(!file.exists()) throw ZIP_NOTFOUND_X.get(info, file);
-
-    try(ZipInputStream in = new ZipInputStream(file.inputStream())) {
+  byte[] read(final String path) throws IOException {
+    try(ZipInputStream in = new ZipInputStream(new ArrayInput(data))) {
       final byte[] cont = getEntry(in, path);
       if(cont == null) throw new FileNotFoundException(path);
       return cont;
-    } catch(final FileNotFoundException ex) {
-      Util.debug(ex);
-      throw ZIP_NOTFOUND_X.get(info, file + "/" + path);
-    } catch(final IOException ex) {
-      throw ZIP_FAIL_X.get(info, ex);
+    }
+  }
+
+  /**
+   * Unzips the archive to the specified directory.
+   * @param target target path
+   * @throws IOException I/O exception
+   */
+  void unzip(final IOFile target) throws IOException {
+    try(ZipInputStream in = new ZipInputStream(new ArrayInput(data))) {
+      for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
+        final IOFile trg = new IOFile(target, ze.getName());
+        if(ze.isDirectory()) {
+          trg.md();
+        } else {
+          trg.parent().md();
+          trg.write(in);
+        }
+      }
     }
   }
 

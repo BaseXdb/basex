@@ -3,6 +3,7 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+import java.util.zip.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -16,6 +17,10 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Restore extends ABackup {
+  /** Total files in a zip operation. */
+  private int total;
+  /** Current file in a zip operation. */
+  private int curr;
   /** States if current database was closed. */
   private boolean closed;
 
@@ -66,24 +71,35 @@ public final class Restore extends ABackup {
   /**
    * Restores the specified database.
    * @param db name of database
-   * @param backup name of backup
+   * @param name name of backup
    * @param sopts static options
-   * @param cmd calling command instance
+   * @param cmd calling command instance (can be {@code null})
    * @throws IOException I/O exception
    */
-  public static void restore(final String db, final String backup, final StaticOptions sopts,
+  public static void restore(final String db, final String name, final StaticOptions sopts,
       final Restore cmd) throws IOException {
 
     // drop target database
     DropDB.drop(db, sopts);
 
     final IOFile dbPath = sopts.dbPath();
-    final Zip zip = new Zip(new IOFile(dbPath, backup + IO.ZIPSUFFIX));
-    try {
-      if(cmd != null) cmd.pushJob(zip);
-      zip.unzip(dbPath);
-    } finally {
-      if(cmd != null) cmd.popJob();
+    final IOFile backup = new IOFile(dbPath, name + IO.ZIPSUFFIX);
+    if(cmd != null) {
+      try(ZipFile zip = new ZipFile(backup.file())) {
+        cmd.total = zip.size();
+      }
+    }
+    try(InputStream is = backup.inputStream(); ZipInputStream in = new ZipInputStream(is)) {
+      for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
+        final IOFile trg = new IOFile(dbPath, ze.getName());
+        if(ze.isDirectory()) {
+          trg.md();
+        } else {
+          trg.parent().md();
+          trg.write(in);
+        }
+        if(cmd != null) cmd.curr++;
+      }
     }
   }
 
@@ -101,5 +117,10 @@ public final class Restore extends ABackup {
   @Override
   public boolean supportsProg() {
     return true;
+  }
+
+  @Override
+  public double progressInfo() {
+    return (double) curr / total;
   }
 }

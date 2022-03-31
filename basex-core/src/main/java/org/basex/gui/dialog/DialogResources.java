@@ -272,10 +272,10 @@ final class DialogResources extends BaseXBack {
       final ResourceNode n = selection();
       if(n == null) return;
 
-      final DialogInput d = new DialogInput(n.path(), dialog, Action.RENAME_DOCUMENT);
-      if(!d.ok()) return;
+      final DialogInput input = new DialogInput(n.path(), dialog, Action.RENAME_DOCUMENT);
+      if(!input.ok()) return;
 
-      final String p = string(ResourceNode.preparePath(token(d.input())));
+      final String p = string(ResourceNode.preparePath(token(input.input())));
       final Runnable run = () -> refreshNewFolder(p);
       DialogProgress.execute(dialog, run, new Rename(n.path(), p));
     }

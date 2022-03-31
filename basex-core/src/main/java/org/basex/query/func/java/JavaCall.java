@@ -351,7 +351,7 @@ public abstract class JavaCall extends Arr {
     if(n != -1) {
       final StringList list = new StringList();
       for(final String type : Strings.split(name.substring(n + 1), '\u00b7')) {
-        list.add(classPath(type.replace("...", "[]")));
+        list.add(classPath(type.replace(DOTS, "[]")));
       }
       types = list.finish();
       name = name.substring(0, n);

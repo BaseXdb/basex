@@ -945,8 +945,8 @@ public enum Function implements AFunction {
   _DB_CREATE(DbCreate::new, "create(name[,inputs[,paths[,options]]])",
       params(STRING_O, ITEM_ZM, STRING_ZM, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_CREATE_BACKUP(DbCreateBackup::new, "create-backup(database)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+  _DB_CREATE_BACKUP(DbCreateBackup::new, "create-backup(database[,comment)",
+      params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_DELETE(DbDelete::new, "delete(database,path)",
       params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),

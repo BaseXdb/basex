@@ -45,6 +45,8 @@ public final class DialogManage extends BaseXDialog {
   private final BaseXButton copy;
   /** Combobox that lists available backups for a database. */
   private final BaseXList backups;
+  /** Backup comment. */
+  private final BaseXLabel comment;
   /** Delete button for backups. */
   private final BaseXButton delete;
   /** Deletes all backups. */
@@ -64,7 +66,7 @@ public final class DialogManage extends BaseXDialog {
     // create database chooser
     final String[] dbs = gui.context.databases.list().finish();
     choice = new BaseXList(this, false, dbs);
-    choice.setSize(250, 650);
+    choice.setSize(240, 600);
     final Data data = gui.context.data();
     if(data != null) {
       data.flush(true);
@@ -93,7 +95,13 @@ public final class DialogManage extends BaseXDialog {
     doc2.setFont(doc1.getFont());
 
     backups = new BaseXList(this);
-    backups.setSize(600, 470);
+    backups.setSize(600, 420);
+    comment = new BaseXLabel("x ");
+
+    final BaseXBack back = new BaseXBack(new RowLayout(8));
+    back.add(backups);
+    back.add(new BaseXLabel(COMMENT + COL, false, true));
+    back.add(comment);
 
     // backup buttons
     backup = new BaseXButton(this, BACKUP);
@@ -104,7 +112,7 @@ public final class DialogManage extends BaseXDialog {
     // second tab
     final BaseXBack tab2 = new BaseXBack(new BorderLayout(0, 8)).border(8);
     tab2.add(doc2, BorderLayout.NORTH);
-    tab2.add(backups, BorderLayout.CENTER);
+    tab2.add(back, BorderLayout.CENTER);
     tab2.add(newButtons(backup, restore, delete, deleteAll), BorderLayout.SOUTH);
 
     final BaseXTabs tabs = new BaseXTabs(this);
@@ -151,19 +159,21 @@ public final class DialogManage extends BaseXDialog {
       refresh = true;
 
     } else if(cmp == rename) {
-      final DialogInput dr = new DialogInput(db, this, Action.ALTER_DATABASE);
-      if(!dr.ok() || dr.input().equals(db)) return;
-      cmds.add(new AlterDB(db, dr.input()));
+      final DialogInput input = new DialogInput(db, this, Action.ALTER_DATABASE);
+      if(!input.ok() || input.input().equals(db)) return;
+      cmds.add(new AlterDB(db, input.input()));
       refresh = true;
 
     } else if(cmp == copy) {
-      final DialogInput dc = new DialogInput(db, this, Action.COPY_DATABASE);
-      if(!dc.ok() || dc.input().equals(db)) return;
-      cmds.add(new Copy(db, dc.input()));
+      final DialogInput input = new DialogInput(db, this, Action.COPY_DATABASE);
+      if(!input.ok() || input.input().equals(db)) return;
+      cmds.add(new Copy(db, input.input()));
       refresh = true;
 
     } else if(cmp == backup) {
-      for(final String s : dbs) cmds.add(new CreateBackup(s));
+      final DialogInput input = new DialogInput("", this, Action.CREATE_BACKUP);
+      if(!input.ok()) return;
+      for(final String name : dbs) cmds.add(new CreateBackup(name, input.input()));
 
     } else if(cmp == restore) {
       // show warning if existing database would be overwritten
@@ -172,9 +182,10 @@ public final class DialogManage extends BaseXDialog {
 
     } else if(cmp == backups) {
       // don't reset the combo box after selecting an item
-      // no direct consequences if backup selection changes
+      comment.setText(ShowBackups.comment(backups.getValue(), ctx));
 
     } else if(cmp == delete) {
+      if(!BaseXDialog.confirm(gui, Util.info(DROP_BACKUPS_X, 1))) return;
       cmds.add(new DropBackup(backups.getValue()));
       refresh = backups.getList().length == 1;
       backups.requestFocusInWindow();
@@ -226,6 +237,9 @@ public final class DialogManage extends BaseXDialog {
       restore.setEnabled(active);
       delete.setEnabled(active);
       deleteAll.setEnabled(active);
+
+      final String name = backups.getValue();
+      comment.setText(name.isEmpty() ? "" : ShowBackups.comment(name, ctx));
     }
 
     // run all commands

@@ -5,6 +5,7 @@ import static org.basex.data.DataText.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.zip.*;
 
 import org.basex.core.*;
 import org.basex.core.parse.*;
@@ -12,6 +13,7 @@ import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdCreate;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.io.out.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -22,18 +24,33 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class CreateBackup extends ABackup {
+  /** Total files in a zip operation. */
+  private int total;
+  /** Current file in a zip operation. */
+  private int curr;
+
   /**
    * Default constructor.
-   * @param arg optional argument
+   * @param name name of database
    */
-  public CreateBackup(final String arg) {
-    super(arg);
+  public CreateBackup(final String name) {
+    this(name, null);
+  }
+
+  /**
+   * Default constructor.
+   * @param name name of database
+   * @param comment (can be {@code null})
+   */
+  public CreateBackup(final String name, final String comment) {
+    super(name, comment);
   }
 
   @Override
   protected boolean run() {
     final String pattern = args[0];
     if(!Databases.validPattern(pattern)) return error(NAME_INVALID_X, pattern);
+    final String comment = args[1];
 
     // retrieve all databases
     final StringList dbs = context.listDBs(pattern);
@@ -49,7 +66,7 @@ public final class CreateBackup extends ABackup {
         ok = false;
       } else {
         try {
-          backup(db, soptions, this);
+          backup(db, comment, soptions, this);
           // backup was successful
           info(DB_BACKUP_X, db, jc().performance);
         } catch(final IOException ex) {
@@ -65,26 +82,39 @@ public final class CreateBackup extends ABackup {
   /**
    * Backups the specified database.
    * @param db name of the database
+   * @param comment comment (can be {@code null})
    * @param sopts static options
    * @param cmd calling command instance
    * @throws IOException I/O Exception
    */
-  public static void backup(final String db, final StaticOptions sopts, final CreateBackup cmd)
-      throws IOException {
+  public static void backup(final String db, final String comment, final StaticOptions sopts,
+      final CreateBackup cmd) throws IOException {
 
-    final String backup = db + '-' + DateTime.format(new Date(), DateTime.DATETIME) + IO.ZIPSUFFIX;
-    final IOFile zf = sopts.dbPath(backup);
-    final Zip zip = new Zip(zf);
+    final IOFile dbpath = sopts.dbPath(db);
+    final StringList files = dbpath.descendants();
+    if(cmd != null) cmd.total = files.size();
 
-    try {
-      if(cmd != null) cmd.pushJob(zip);
-      final IOFile dbpath = sopts.dbPath(db);
-      final StringList files = dbpath.descendants();
-      // ignore file indicating an update (this file is generated when using XQuery)
-      files.removeAll(DATAUPD + IO.BASEXSUFFIX);
-      zip.zip(dbpath, files);
-    } finally {
-      if(cmd != null) cmd.popJob();
+    final String name = db + '-' + DateTime.format(new Date(), DateTime.DATETIME) + IO.ZIPSUFFIX;
+    final IOFile backup = sopts.dbPath(name);
+    try(BufferOutput bo = new BufferOutput(backup); ZipOutputStream out = new ZipOutputStream(bo)) {
+      if(comment != null) {
+        out.setComment(comment.length() > 100 ? comment.substring(0, 100) + DOTS : comment);
+      }
+      // use simple, fast compression
+      out.setLevel(1);
+      final byte[] data = new byte[IO.BLOCKSIZE];
+      for(final String file : files) {
+        // skip update file (generated when using XQuery)
+        if(!file.equals(DATAUPD + IO.BASEXSUFFIX)) {
+          final String path = Prop.WIN ? file.replace('\\', '/') : file;
+          out.putNextEntry(new ZipEntry(dbpath.name() + '/' + path));
+          try(FileInputStream in = new FileInputStream(new File(dbpath.file(), file))) {
+            for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
+          }
+          out.closeEntry();
+        }
+        if(cmd != null) cmd.curr++;
+      }
     }
   }
 
@@ -102,6 +132,11 @@ public final class CreateBackup extends ABackup {
   @Override
   public boolean supportsProg() {
     return true;
+  }
+
+  @Override
+  public double progressInfo() {
+    return (double) curr / total;
   }
 
   @Override
