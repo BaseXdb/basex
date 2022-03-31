@@ -35,14 +35,14 @@ function dba:settings(
     $table-row((
       $label,
       <br/>,
-      <input name='{ $key }' type='number' value='{ options:get($key) }'/>
+      <input type='number' name='{ $key }' value='{ options:get($key) }'/>
     ))
   }
   let $string := function($key, $label) {
     $table-row((
       $label,
       <br/>,
-      <input name='{ $key }' type='text' value='{ options:get($key) }'/>
+      <input type='text' name='{ $key }' value='{ options:get($key) }'/>
     ))
   }
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },

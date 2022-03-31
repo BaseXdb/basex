@@ -39,28 +39,22 @@ function dba:queries(
     },
     <tr>
       <td width='50%'>
-        <table width='100%'>
-          <tr>
-            <td width='80%'>
-              <select id='mode'>{
-                for $mode in ('Read-Only', 'Updating')
-                return element option { $mode }
-              }</select>{ ' ' }
-              <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>{ ' ' }
-              <button id='stop' onclick='stopQuery()' disabled=''>Stop</button>
-            </td>
-            <td width='20%' align='right'>
-              <h2>Editor</h2>
-            </td>
-          </tr>
-        </table>
+        <select id='mode' style='width:revert'>{
+          for $mode in ('Read-Only', 'Updating')
+          return element option { $mode }
+        }</select>{ ' ' }
+        <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>{ ' ' }
+        <button id='stop' onclick='stopQuery()' disabled=''>Stop</button>
+        <div class='right'>
+        </div>
+        <h2 class='right'>Editor</h2>
         <textarea id='editor' name='editor'/>
         <table width='100%'>
           <form autocomplete='off' action='javascript:void(0);'>
             <tr>
               <td class='slick'>
                 <div align='right'>
-                  <input id='file' name='file' placeholder='Name of query' size='35'
+                  <input type='text' id='file' name='file' placeholder='Name of query'
                          list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>
                   <datalist id='files'>{
                     for $file in config:query-files()
@@ -80,13 +74,7 @@ function dba:queries(
         { html:focus('editor') }
       </td>
       <td width='50%'>{
-        <table width='100%'>
-          <tr>
-            <td align='right'>
-              <h2>Result</h2>
-            </td>
-          </tr>
-        </table>,
+        <h2 class='right'>Result</h2>,
         <textarea name='output' id='output' readonly=''/>,
         html:js('loadCodeMirror("xquery", true);'),
         for $name in head(($file, config:query())[.])
