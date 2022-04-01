@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * <p>This index organizes binary files in a database.</p>
+ * This index organizes binary files in a database.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
@@ -29,8 +29,8 @@ final class Binaries {
   }
 
   /**
-   * Returns the database paths to all binary files that match the
-   * specified path. All paths are relative to the filesystem.
+   * Returns the database paths to all binary files that match the specified path.
+   * All paths are relative to the filesystem.
    * @param path input path
    * @return root nodes
    */
@@ -49,8 +49,7 @@ final class Binaries {
   }
 
   /**
-   * Adds the database paths for the binaries of the given path to
-   * the given map.
+   * Adds the database paths for the binaries of the given path to the given map.
    * @param path path
    * @param dir returns directories instead of files
    * @param tbm map; values will be {@code true} to indicate raw files
