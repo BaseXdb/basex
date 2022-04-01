@@ -37,12 +37,13 @@ public final class QueryJob extends Job implements Runnable {
    * Constructor.
    * @param job job info
    * @param context database context
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @param notify notify function (ignored if {@code null})
+   * @param qc query context (ignored if {@code null})
    * @throws QueryException query exception
    */
   public QueryJob(final QueryJobSpec job, final Context context, final InputInfo ii,
-      final Consumer<QueryJobResult> notify) throws QueryException {
+      final Consumer<QueryJobResult> notify, final QueryContext qc) throws QueryException {
 
     this.job = job;
     this.notify = notify;
@@ -72,9 +73,14 @@ public final class QueryJob extends Job implements Runnable {
     final boolean cache = opts.contains(JobsOptions.CACHE) && opts.get(JobsOptions.CACHE);
     if(cache && interval > 0) throw JOBS_OPTIONS.get(ii);
 
+    // number of scheduled and active tasks must not exceed limit
     final JobPool jobs = context.jobs;
+    while(jobs.tasks.size() + jobs.active.size() >= JobPool.MAXQUERIES) {
+      Performance.sleep(10);
+      if(qc != null) qc.checkStop();
+    }
+
     synchronized(jobs.tasks) {
-      while(jobs.active.size() >= JobPool.MAXQUERIES) Performance.sleep(100);
       // custom job id: check if it is invalid or has already been assigned
       String id = opts.get(JobsOptions.ID);
       if(id != null) {

@@ -27,8 +27,6 @@ public final class Jobs {
 
   /** Query jobs. */
   private final ArrayList<QueryJobSpec> list = new ArrayList<>();
-  /** Database context. */
-  private final Context context;
   /** File. */
   private final IOFile file;
 
@@ -38,7 +36,6 @@ public final class Jobs {
    * @throws IOException I/O exception
    */
   public Jobs(final Context context) throws IOException {
-    this.context = context;
     file = context.soptions.dbPath(string(JOBS) + IO.XMLSUFFIX);
 
     // parse jobs file
@@ -67,6 +64,28 @@ public final class Jobs {
         }
       }
     }
+
+    // start all jobs
+    boolean error = false;
+    for(int l = 0; l < list.size(); l++) {
+      final QueryJobSpec spec = list.get(l);
+      try {
+        new QueryJob(spec, context, null, null, null);
+      } catch(final QueryException ex) {
+        // drop failing jobs
+        Util.errln(ex);
+        list.remove(l);
+        error = true;
+      }
+    }
+    // write jobs if list has changed
+    if(error) {
+      try {
+        write();
+      } catch(final IOException ex) {
+        Util.errln(file + ": %", ex);
+      }
+    }
   }
 
   /**
@@ -91,33 +110,6 @@ public final class Jobs {
    */
   public void remove(final String id) {
     list.removeIf(job -> id.equals(job.options.get(JobsOptions.ID)));
-  }
-
-  /**
-   * Schedules all registered jobs.
-   */
-  public void run() {
-    boolean error = false;
-    // request size every time (list may shrink)
-    for(int l = 0; l < list.size(); l++) {
-      final QueryJobSpec spec = list.get(l);
-      try {
-        new QueryJob(spec, context, null, null);
-      } catch(final QueryException ex) {
-        // drop failing jobs
-        Util.errln(ex);
-        list.remove(l);
-        error = true;
-      }
-    }
-    // write jobs if list has changed
-    if(error) {
-      try {
-        write();
-      } catch(final IOException ex) {
-        Util.errln(file + ": %", ex);
-      }
-    }
   }
 
   /**
