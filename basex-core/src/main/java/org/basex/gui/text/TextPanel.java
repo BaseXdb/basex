@@ -434,31 +434,19 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public void mouseReleased(final MouseEvent e) {
-    if(linkListener == null) return;
+    if(!SwingUtilities.isLeftMouseButton(e) || linkListener == null) return;
 
-    if(SwingUtilities.isLeftMouseButton(e)) {
-      editor.endSelection();
-      // evaluate link
-      if(!editor.isSelected()) {
-        final TextIterator iter = rend.jump(e.getPoint());
-        final String link = iter.link();
-        if(link != null) linkListener.linkClicked(link);
-      }
+    editor.endSelection();
+    // evaluate link
+    if(!editor.isSelected()) {
+      final TextIterator iter = rend.jump(e.getPoint());
+      final String link = iter.link();
+      if(link != null) linkListener.linkClicked(link);
     }
   }
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    if(SwingUtilities.isMiddleMouseButton(e)) {
-      if(editor.isSelected()) {
-        copy();
-        editor.noSelect();
-        rend.repaint();
-      } else {
-        final ArrayList<Object> clips = BaseXLayout.fromClipboard(null);
-        if(!clips.isEmpty()) paste(clips.get(0).toString());
-      }
-    }
   }
 
   @Override
@@ -473,6 +461,19 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public final void mousePressed(final MouseEvent e) {
+    // copy and paste text with middle mouse button
+    if(SwingUtilities.isMiddleMouseButton(e)) {
+      if(editor.isSelected()) {
+        copy();
+        editor.noSelect();
+        rend.repaint();
+      } else if(editable && isEnabled()) {
+        final ArrayList<Object> clips = BaseXLayout.fromClipboard(null);
+        if(!clips.isEmpty()) paste(clips.get(0).toString());
+      }
+      return;
+    }
+
     if(!isEnabled() || !isFocusable()) return;
 
     requestFocusInWindow();

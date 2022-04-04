@@ -7,6 +7,7 @@ import java.awt.event.*;
 import java.util.*;
 
 import javax.swing.*;
+import javax.swing.event.*;
 
 import org.basex.gui.*;
 import org.basex.gui.listener.*;
@@ -19,7 +20,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public class BaseXTextField extends JTextField implements MouseClickedListener {
+public class BaseXTextField extends JTextField {
   /** Default width of text fields. */
   public static final int DWIDTH = 450;
   /** Default foreground color. */
@@ -105,7 +106,25 @@ public class BaseXTextField extends JTextField implements MouseClickedListener {
         last = t;
       }
     });
-    addMouseListener(this);
+
+    // copy and paste text with middle mouse button
+    addMouseListener(new MouseInputAdapter() {
+      @Override
+      public void mousePressed(final MouseEvent e) {
+        if(!SwingUtilities.isMiddleMouseButton(e)) return;
+        final String txt = getSelectedText();
+        if(txt != null) {
+          BaseXLayout.toClipboard(txt);
+          setCaretPosition(getCaretPosition());
+        } else if(isEnabled() && isEditable()) {
+          final ArrayList<Object> clips = BaseXLayout.fromClipboard(null);
+          if(!clips.isEmpty()) {
+            final String string = clips.get(0).toString();
+            setText(new StringBuilder(getText()).insert(getCaretPosition(), string).toString());
+          }
+        }
+      }
+    });
 
     final BaseXDialog dialog = win.dialog();
     if(dialog != null) addKeyListener(dialog.keys);
@@ -175,23 +194,5 @@ public class BaseXTextField extends JTextField implements MouseClickedListener {
       options.set((StringOption) option, getText());
     }
     return true;
-  }
-
-  @Override
-  public final void mouseClicked(final MouseEvent e) {
-    // copy and paste text with middle mouse button
-    if(SwingUtilities.isMiddleMouseButton(e)) {
-      final String text = getSelectedText();
-      if(text != null) {
-        BaseXLayout.toClipboard(text);
-        setCaretPosition(getText().length());
-      } else {
-        final ArrayList<Object> clips = BaseXLayout.fromClipboard(null);
-        if(!clips.isEmpty()) {
-          final String string = clips.get(0).toString();
-          setText(new StringBuilder(getText()).insert(getCaretPosition(), string).toString());
-        }
-      }
-    }
   }
 }
