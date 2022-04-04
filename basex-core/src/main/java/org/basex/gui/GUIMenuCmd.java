@@ -320,7 +320,7 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final int pre = gui.context.marked.pre(0);
-      BaseXLayout.copy(Token.string(ViewData.path(gui.context.data(), pre)));
+      BaseXLayout.toClipboard(Token.string(ViewData.path(gui.context.data(), pre)));
     }
 
     @Override

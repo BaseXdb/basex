@@ -5,7 +5,6 @@ import static org.basex.gui.layout.BaseXKeys.*;
 import static org.basex.util.Token.*;
 
 import java.awt.*;
-import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
@@ -450,8 +449,16 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    if(!SwingUtilities.isMiddleMouseButton(e)) return;
-    new PasteCmd().execute(gui);
+    if(SwingUtilities.isMiddleMouseButton(e)) {
+      if(editor.isSelected()) {
+        copy();
+        editor.noSelect();
+        rend.repaint();
+      } else {
+        final ArrayList<Object> clips = BaseXLayout.fromClipboard(null);
+        if(!clips.isEmpty()) paste(clips.get(0).toString());
+      }
+    }
   }
 
   @Override
@@ -470,8 +477,6 @@ public class TextPanel extends BaseXPanel {
 
     requestFocusInWindow();
     caret(true);
-
-    if(SwingUtilities.isMiddleMouseButton(e)) copy();
 
     final boolean shift = e.isShiftDown();
     final boolean selected = editor.isSelected();
@@ -736,38 +741,9 @@ public class TextPanel extends BaseXPanel {
    */
   private boolean copy() {
     final String txt = editor.selected();
-    if(txt.isEmpty()) return false;
-
-    // copy selection to clipboard
-    BaseXLayout.copy(txt);
-    return true;
-  }
-
-  /**
-   * Returns the clipboard text.
-   * @return text or {@code null}
-   */
-  private static String clip() {
-    // copy selection to clipboard
-    final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
-
-    // try multiple times (system clipboard may be accessed by another process)
-    final int n = 10;
-    for(int i = 1; i <= n; i++) {
-      try {
-        final Transferable tr = clip.getContents(null);
-        if(tr != null) {
-          final ArrayList<Object> contents = BaseXLayout.contents(tr);
-          if(!contents.isEmpty()) return contents.get(0).toString();
-        }
-        Util.debug("Clipboard has no contents.");
-        break;
-      } catch(final Exception ex) {
-        Util.stack(ex);
-        Performance.sleep(i * 200);
-      }
-    }
-    return null;
+    final boolean copy = !txt.isEmpty();
+    if(copy) BaseXLayout.toClipboard(txt);
+    return copy;
   }
 
   /**
@@ -882,11 +858,13 @@ public class TextPanel extends BaseXPanel {
 
     @Override
     public void execute() {
-      final String clip = clip();
-      if(clip != null) paste(clip);
+      final ArrayList<Object> contents = BaseXLayout.fromClipboard(null);
+      if(!contents.isEmpty()) paste(contents.get(0).toString());
     }
     @Override
-    public boolean enabled(final GUI main) { return hist.active() && clip() != null; }
+    public boolean enabled(final GUI main) {
+      return hist.active() && !BaseXLayout.fromClipboard(null).isEmpty();
+    }
   }
 
   /** Delete command. */

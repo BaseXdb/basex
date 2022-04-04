@@ -12,6 +12,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -136,8 +137,9 @@ public final class BaseXLayout {
       @Override
       public synchronized void drop(final DropTargetDropEvent dtde) {
         dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
-        final Transferable tr = dtde.getTransferable();
-        for(final Object o : contents(tr)) dnd.drop(o);
+        for(final Object clip : fromClipboard(() -> dtde.getTransferable())) {
+          dnd.drop(clip);
+        }
         comp.requestFocusInWindow();
       }
     });
@@ -187,27 +189,39 @@ public final class BaseXLayout {
   }
 
   /**
-   * Returns the contents of the specified transferable.
-   * @param tr transferable
-   * @return contents
+   * Returns the clipboard contents.
+   * @param clipboard clipboard supplier (optional)
+   * @return clipboard contents
    */
   @SuppressWarnings("unchecked")
-  public static ArrayList<Object> contents(final Transferable tr) {
+  public static ArrayList<Object> fromClipboard(final Supplier<Transferable> clipboard) {
+    // try multiple times (system clipboard may be blocked by another process)
     final ArrayList<Object> list = new ArrayList<>();
-    try {
-      if(tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-        list.addAll((List<File>) tr.getTransferData(DataFlavor.javaFileListFlavor));
-      } else if(tr.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-        list.add(tr.getTransferData(DataFlavor.stringFlavor));
-      } else {
-        final StringBuilder sb = new StringBuilder("Data flavors not supported:\n");
-        for(final DataFlavor df : tr.getTransferDataFlavors()) {
-          sb.append("- ").append(df).append('\n');
+    final int n = 10;
+    for(int i = 1; i <= n; i++) {
+      try {
+        final Transferable tr = clipboard != null ? clipboard.get() :
+          Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+        if(tr != null) {
+          if(tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+            list.addAll((List<File>) tr.getTransferData(DataFlavor.javaFileListFlavor));
+          } else if(tr.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+            list.add(tr.getTransferData(DataFlavor.stringFlavor));
+          } else {
+            final StringBuilder sb = new StringBuilder("Data flavors not supported:\n");
+            for(final DataFlavor df : tr.getTransferDataFlavors()) {
+              sb.append("- ").append(df).append('\n');
+            }
+            Util.debug(sb);
+          }
+          break;
         }
-        Util.debug(sb);
+        Util.debug("Clipboard has no contents.");
+        break;
+      } catch(final Exception ex) {
+        Util.stack(ex);
+        Performance.sleep(i * 200);
       }
-    } catch(final Exception ex) {
-      Util.stack(ex);
     }
     return list;
   }
@@ -216,13 +230,12 @@ public final class BaseXLayout {
    * Copies the specified string to the clipboard.
    * @param text text
    */
-  public static void copy(final String text) {
-    final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
-
-    // try multiple times (system clipboard may be accessed by another process)
+  public static void toClipboard(final String text) {
+    // try multiple times (system clipboard may be blocked by another process)
     final int n = 10;
     for(int i = 1; i <= n; i++) {
       try {
+        final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
         clip.setContents(new StringSelection(text), null);
         return;
       } catch(final Exception ex) {
@@ -243,7 +256,7 @@ public final class BaseXLayout {
    */
   public static void copyPath(final String path) {
     try {
-      copy(Paths.get(path).toRealPath().toString());
+      toClipboard(Paths.get(path).toRealPath().toString());
     } catch(final Exception ex) {
       Util.stack(ex);
     }
@@ -257,9 +270,9 @@ public final class BaseXLayout {
   public interface DropHandler {
     /**
      * Drops a file.
-     * @param obj object to be dropped
+     * @param object object to be dropped
      */
-    void drop(Object obj);
+    void drop(Object object);
   }
 
   /**
