@@ -1,20 +1,15 @@
 package org.basex.gui.view.project;
 
-import static org.basex.core.Text.*;
-
 import java.awt.*;
-import java.io.*;
 import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
 
-import org.basex.core.cmd.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.listener.*;
 import org.basex.io.*;
-import org.basex.util.*;
 
 /**
  * List of filtered file entries.
@@ -22,64 +17,15 @@ import org.basex.util.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-final class ProjectList extends JList<String> {
+final class ProjectList extends JList<String> implements ProjectCommands {
   /** Font metrics. */
   private static FontMetrics fm;
 
-  /** Popup commands. */
-  final GUIPopupCmd[] commands = {
-    new GUIPopupCmd(OPEN, BaseXKeys.ENTER) {
-      @Override public void execute() {
-        open();
-      }
-    },
-    new GUIPopupCmd(OPEN_EXTERNALLY, BaseXKeys.SHIFT_ENTER) {
-      @Override
-      public void execute() {
-        final IOFile file = selectedFile();
-        try {
-          file.open();
-        } catch(final IOException ex) {
-          Util.debug(ex);
-          BaseXDialog.error(view.gui, Util.info(FILE_NOT_OPENED_X, file));
-        }
-      }
-      @Override
-      public boolean enabled(final GUI main) {
-        return selectedFile() != null;
-      }
-    }, null,
-    new GUIPopupCmd(RUN_TESTS, BaseXKeys.UNIT) {
-      @Override
-      public void execute() {
-        view.gui.execute(new Test(selectedFile().path()));
-      }
-      @Override
-      public boolean enabled(final GUI main) {
-        final IOFile file = selectedFile();
-        return file != null && file.hasSuffix(IO.XQSUFFIXES);
-      }
-    }, null,
-    new GUIPopupCmd(REFRESH, BaseXKeys.REFRESH) {
-      @Override
-      public void execute() {
-        view.refresh();
-      }
-    }, null,
-    new GUIPopupCmd(COPY_PATH, BaseXKeys.COPYPATH) {
-      @Override
-      public void execute() {
-        BaseXLayout.copyPath(selectedFile().path());
-      }
-      @Override
-      public boolean enabled(final GUI main) {
-        return selectedFile() != null;
-      }
-    }
-  };
-
   /** Project view. */
   private final ProjectView view;
+  /** Popup menu commands. */
+  final GUIPopupCmd[] commands;
+
   /** Content search string. */
   private String search = "";
 
@@ -92,8 +38,12 @@ final class ProjectList extends JList<String> {
     setBorder(BaseXLayout.border(4, 4, 4, 4));
     setCellRenderer(new CellRenderer());
     addMouseListener((MouseClickedListener) e -> {
-      if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) open();
+      if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
+        view.open(selectedFile(), search);
+      }
     });
+
+    commands = commands();
     new BaseXPopup(this, view.gui, commands);
   }
 
@@ -115,15 +65,6 @@ final class ProjectList extends JList<String> {
 
     // remember search string
     search = srch;
-  }
-
-  /**
-   * Open all selected files.
-   */
-  private void open() {
-    for(final IOFile file : selectedFiles()) {
-      view.open(file, search);
-    }
   }
 
   /** List cell renderer. */
@@ -151,15 +92,8 @@ final class ProjectList extends JList<String> {
           g.setColor(GUIConstants.TEXT);
           g.drawString(s, x, y);
           x += fm.stringWidth(s);
-
-          final String[] names = file.file().getParent().split("[/\\\\]");
-          final StringBuilder sb = new StringBuilder(" \u00b7 ");
-          for(int n = names.length - 1; n >= 0; n--) {
-            sb.append(names[n]);
-            if(n > 0) sb.append('/');
-          }
-          g.setColor(GUIConstants.dgray);
-          g.drawString(sb.toString(), x, y);
+          g.setColor(GUIConstants.gray);
+          g.drawString(" \u00b7 " + BaseXLayout.reversePath(file), x, y);
         }
       };
       label.setOpaque(true);
@@ -172,7 +106,7 @@ final class ProjectList extends JList<String> {
       file = new IOFile(value.toString());
       label.setIcon(BaseXImages.file(file));
       label.setText("");
-      label.setToolTipText(ProjectFile.toString(file, true));
+      label.setToolTipText(BaseXLayout.info(file, true));
 
       if(selected) {
         label.setBackground(getSelectionBackground());
@@ -185,25 +119,34 @@ final class ProjectList extends JList<String> {
     }
   }
 
-  /**
-   * Returns the selected file, or {@code null} if zero or more than one value is selected.
-   * @return selected file
-   */
-  private IOFile selectedFile() {
+  @Override
+  public IOFile selectedFile() {
     final List<IOFile> files = selectedFiles();
     return files.size() == 1 ? files.get(0) : null;
   }
 
-  /**
-   * Returns all selected files.
-   * @return selected files
-   */
-  private List<IOFile> selectedFiles() {
+  @Override
+  public List<IOFile> selectedFiles() {
     // nothing selected: select first entry
     if(isSelectionEmpty() && getModel().getSize() != 0) setSelectedIndex(0);
 
     final ArrayList<IOFile> files = new ArrayList<>();
     for(final String value : getSelectedValuesList()) files.add(new IOFile(value));
     return files;
+  }
+
+  @Override
+  public ProjectView view() {
+    return view;
+  }
+
+  @Override
+  public String search() {
+    return search;
+  }
+
+  @Override
+  public void refresh() {
+    view.refresh();
   }
 }

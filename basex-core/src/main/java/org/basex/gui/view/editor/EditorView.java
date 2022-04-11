@@ -5,7 +5,6 @@ import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.Timer;
@@ -146,13 +145,10 @@ public final class EditorView extends View {
     context = new BaseXLabel("").resize(1.2f);
     context.setForeground(dgray);
 
-    final BaseXBack top = new BaseXBack(false);
-    top.layout(new ColumnLayout(10));
-    top.add(buttons);
-    top.add(context);
-
-    final BaseXBack north = new BaseXBack(false).layout(new BorderLayout());
-    north.add(top, BorderLayout.WEST);
+    final BaseXBack north = new BaseXBack(false);
+    north.layout(new BorderLayout(10, 0));
+    north.add(buttons, BorderLayout.WEST);
+    north.add(context, BorderLayout.CENTER);
     north.add(new BaseXHeader(EDITOR), BorderLayout.EAST);
 
     // status and query pane
@@ -198,35 +194,10 @@ public final class EditorView extends View {
       pop.add(sas);
       pop.show(saveB, 0, saveB.getHeight());
     });
-    history.addActionListener(e -> {
-      final JPopupMenu pm = new JPopupMenu();
-      ActionListener al = ac -> {
-        // rewrite and open chosen file
-        open(new IOFile(ac.getActionCommand().replaceAll("(.*) \\[(.*)]", "$2/$1")));
-      };
 
-      // create popup menu with of recently opened files
-      final StringList opened = new StringList();
-      for(final EditorArea ea : editors()) opened.add(ea.file().path());
-
-      final StringList hst = new StringList(BaseXHistory.MAX);
-      final StringList all = new StringList(gui.gopts.get(GUIOptions.EDITOR));
-      final int fl = Math.min(all.size(), e == null ? BaseXHistory.MAX : BaseXHistory.MAXCOMPACT);
-      for(int f = 0; f < fl; f++) hst.add(all.get(f));
-
-      for(final String en : hst.sort(Prop.CASE)) {
-        // disable opened files
-        final JMenuItem item = new JMenuItem(en.replaceAll("(.*)[/\\\\](.*)", "$2 [$1]"));
-        if(opened.contains(en)) BaseXLayout.boldFont(item);
-        pm.add(item).addActionListener(al);
-      }
-      al = ac -> history.getActionListeners()[0].actionPerformed(null);
-      if(e != null && pm.getComponentCount() == BaseXHistory.MAXCOMPACT) {
-        pm.add(new JMenuItem(DOTS)).addActionListener(al);
-      }
-      pm.show(history, 0, history.getHeight());
-    });
+    history.addActionListener(e -> historyPopup(true));
     refreshHistory(null);
+
     info.addMouseListener((MouseClickedListener) e -> markError(true));
     stop.addActionListener(e -> {
       stop.setEnabled(false);
@@ -290,6 +261,34 @@ public final class EditorView extends View {
   }
 
   /**
+   * Shows a history popup menu.
+   * @param compact show only recently used files
+   */
+  public void historyPopup(final boolean compact) {
+    final HashSet<String> opened = new HashSet<>();
+    for(final EditorArea ea : editors()) opened.add(ea.file().path());
+
+    final StringList list = new StringList(BaseXHistory.MAX);
+    final StringList all = new StringList(gui.gopts.get(GUIOptions.EDITOR));
+    final int fl = Math.min(all.size(), compact ? BaseXHistory.MAXCOMPACT : BaseXHistory.MAX);
+    for(int f = 0; f < fl; f++) list.add(all.get(f));
+
+    final JPopupMenu menu = new JPopupMenu();
+    for(final String path : compact ? list : list.sort(Prop.CASE)) {
+      final IOFile file = new IOFile(path);
+      final String label = file.name() + " \u00b7 " + BaseXLayout.reversePath(file);
+      final JMenuItem item = new JMenuItem(label);
+      item.setToolTipText(BaseXLayout.info(file, true));
+      if(opened.contains(path)) BaseXLayout.boldFont(item);
+      menu.add(item).addActionListener(ac -> open(file));
+    }
+    if(compact && menu.getComponentCount() == BaseXHistory.MAXCOMPACT) {
+      menu.add(new JMenuItem(DOTS)).addActionListener(ac -> historyPopup(false));
+    }
+    menu.show(history, 0, history.getHeight());
+  }
+
+  /**
    * Refreshes the context label.
    */
   public void refreshContextLabel() {
@@ -303,14 +302,13 @@ public final class EditorView extends View {
    */
   public void setContext(final IOFile file) {
     try {
-      doc = new DBNode(file);
       // close database
       if(Close.close(gui.context)) gui.notify.init();
+      doc = new DBNode(file);
       // remove context item binding
       final Map<String, String> map = gui.context.options.toMap(MainOptions.BINDINGS);
       map.remove("");
       DialogBindings.assign(map, gui);
-      // remove context label
       refreshContextLabel();
     } catch(final IOException ex) {
       Util.debug(ex);
@@ -328,19 +326,18 @@ public final class EditorView extends View {
     if(value != null) {
       value = Strings.concat("xs:untypedAtomic(", Atm.get(value), ')');
     }
-
     // check if database is opened
     if(value == null) {
       final Data data = gui.context.data();
-      if(data != null) value = Function._DB_OPEN.args(data.meta.name).trim();
+      if(data != null) value = Function._DB_OPEN.args(data.meta.name);
     }
     // check if main-memory document exists
     if(value == null) {
-      if(doc != null) value = Function.DOC.args(new IOFile(doc.data().meta.original).name()).trim();
+      if(doc != null) value = Function.DOC.args(new IOFile(doc.data().meta.original).name());
     } else {
       doc = null;
     }
-    return value != null ? value : "";
+    return value != null ? value.trim() : "";
   }
 
   /**
@@ -675,9 +672,8 @@ public final class EditorView extends View {
     final StringList paths = new StringList();
     if(file != null) {
       gui.gopts.setFile(GUIOptions.WORKPATH, file.parent());
-      final String path = file.path();
-      paths.add(path);
-      tabs.setToolTipTextAt(tabs.getSelectedIndex(), path);
+      paths.add(file.path());
+      tabs.setToolTipTextAt(tabs.getSelectedIndex(), BaseXLayout.info(file, true));
     }
     for(final String old : gui.gopts.get(GUIOptions.EDITOR)) {
       if(paths.size() < BaseXHistory.MAX) paths.addUnique(old);

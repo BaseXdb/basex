@@ -330,9 +330,7 @@ public final class ProjectView extends BaseXPanel {
    * Shows a dialog for changing the root directory.
    */
   private void chooseRoot() {
-    final ProjectNode child = tree.selectedNode();
-    final IOFile file = (child != null ? child : root).file;
-    final BaseXFileChooser fc = new BaseXFileChooser(gui, CHOOSE_DIR, file.path());
+    final BaseXFileChooser fc = new BaseXFileChooser(gui, CHOOSE_DIR, root.file.path());
     final IOFile io = fc.select(Mode.DOPEN);
     if(io != null) {
       rootPath.setText(io.normalize().path());
