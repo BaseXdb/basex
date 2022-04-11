@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.Timer;
 import java.util.regex.*;
 
@@ -55,9 +56,9 @@ public final class EditorView extends View {
   /** Project files. */
   final ProjectView project;
   /** Go button. */
-  final AbstractButton go;
+  final AbstractButton exec;
   /** Test button. */
-  final AbstractButton test;
+  final AbstractButton tests;
 
   /** History Button. */
   private final AbstractButton history;
@@ -120,13 +121,14 @@ public final class EditorView extends View {
     final AbstractButton find = search.button(FIND_REPLACE);
     final AbstractButton vars = BaseXButton.command(GUIMenuCmd.C_EXTERNAL_VARIABLES, gui);
 
-    history = BaseXButton.get("c_history", RECENTLY_OPENED, false, gui);
+    history = BaseXButton.get("c_history", BaseXLayout.addShortcut(RECENTLY_OPENED,
+        BaseXKeys.HISTORY.toString()), false, gui);
     stop = BaseXButton.get("c_stop", STOP, false, gui);
     stop.setEnabled(false);
-    go = BaseXButton.get("c_go", BaseXLayout.addShortcut(RUN_QUERY, BaseXKeys.EXEC1.toString()),
-        false, gui);
-    test = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS, BaseXKeys.UNIT.toString()),
-        false, gui);
+    exec = BaseXButton.get("c_go", BaseXLayout.addShortcut(RUN_QUERY,
+        BaseXKeys.EXEC.toString()), false, gui);
+    tests = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS,
+        BaseXKeys.TESTS.toString()), false, gui);
 
     final BaseXBack buttons = new BaseXBack(false);
     buttons.layout(new ColumnLayout());
@@ -138,9 +140,9 @@ public final class EditorView extends View {
     buttons.add(find);
     buttons.add(Box.createHorizontalStrut(8));
     buttons.add(stop);
-    buttons.add(go);
+    buttons.add(exec);
     buttons.add(vars);
-    buttons.add(test);
+    buttons.add(tests);
 
     context = new BaseXLabel("").resize(1.2f);
     context.setForeground(dgray);
@@ -195,7 +197,7 @@ public final class EditorView extends View {
       pop.show(saveB, 0, saveB.getHeight());
     });
 
-    history.addActionListener(e -> historyPopup(true));
+    history.addActionListener(e -> historyPopup(0));
     refreshHistory(null);
 
     info.addMouseListener((MouseClickedListener) e -> markError(true));
@@ -203,8 +205,8 @@ public final class EditorView extends View {
       stop.setEnabled(false);
       gui.stop();
     });
-    go.addActionListener(e -> run(getEditor(), Action.EXECUTE));
-    test.addActionListener(e -> run(getEditor(), Action.TEST));
+    exec.addActionListener(e -> run(getEditor(), Action.EXECUTE));
+    tests.addActionListener(e -> run(getEditor(), Action.TEST));
     tabs.addChangeListener(e -> {
       final EditorArea ea = getEditor();
       if(ea == null) return;
@@ -229,7 +231,7 @@ public final class EditorView extends View {
 
   @Override
   public void refreshMark() {
-    test.setEnabled(getEditor().file().hasSuffix(IO.XQSUFFIXES));
+    tests.setEnabled(getEditor().file().hasSuffix(IO.XQSUFFIXES));
   }
 
   @Override
@@ -262,19 +264,28 @@ public final class EditorView extends View {
 
   /**
    * Shows a history popup menu.
-   * @param compact show only recently used files
+   * @param start first entry
    */
-  public void historyPopup(final boolean compact) {
+  public void historyPopup(final int start) {
+    // create list of paths; show opened files first
     final HashSet<String> opened = new HashSet<>();
-    for(final EditorArea ea : editors()) opened.add(ea.file().path());
-
-    final StringList list = new StringList(BaseXHistory.MAX);
-    final StringList all = new StringList(gui.gopts.get(GUIOptions.EDITOR));
-    final int fl = Math.min(all.size(), compact ? BaseXHistory.MAXCOMPACT : BaseXHistory.MAX);
-    for(int f = 0; f < fl; f++) list.add(all.get(f));
+    for(final EditorArea edit : editors()) opened.add(edit.file().path());
+    final List<String> paths = new ArrayList<>(opened);
+    for(final String path : gui.gopts.get(GUIOptions.EDITOR)) {
+      if(!paths.contains(path)) paths.add(path);
+    }
+    paths.sort((path1, path2) -> {
+      final boolean c1 = opened.contains(path1), c2 = opened.contains(path2);
+      return c1 == c2 ? path1.compareTo(path2) : c1 ? -1 : 1;
+    });
 
     final JPopupMenu menu = new JPopupMenu();
-    for(final String path : compact ? list : list.sort(Prop.CASE)) {
+    int p = start - 1;
+    final int max = Math.min(paths.size(), start + BaseXHistory.MAXPAGE);
+    if(start > 0) menu.add(new JMenuItem(DOTS)).addActionListener(
+        ac -> historyPopup(start - BaseXHistory.MAXPAGE));
+    while(++p < max) {
+      final String path = paths.get(p);
       final IOFile file = new IOFile(path);
       final String label = file.name() + " \u00b7 " + BaseXLayout.reversePath(file);
       final JMenuItem item = new JMenuItem(label);
@@ -282,9 +293,8 @@ public final class EditorView extends View {
       if(opened.contains(path)) BaseXLayout.boldFont(item);
       menu.add(item).addActionListener(ac -> open(file));
     }
-    if(compact && menu.getComponentCount() == BaseXHistory.MAXCOMPACT) {
-      menu.add(new JMenuItem(DOTS)).addActionListener(ac -> historyPopup(false));
-    }
+    if(p < paths.size()) menu.add(new JMenuItem(DOTS)).addActionListener(
+        ac -> historyPopup(start + BaseXHistory.MAXPAGE));
     menu.show(history, 0, history.getHeight());
   }
 
