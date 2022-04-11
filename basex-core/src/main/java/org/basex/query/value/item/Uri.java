@@ -23,7 +23,7 @@ public final class Uri extends AStr {
   /** Empty URI. */
   public static final Uri EMPTY = new Uri(Token.EMPTY);
   /** Parsed URI (lazy instantiation). */
-  private ParsedUri pUri;
+  private ParsedUri parsed;
 
   /**
    * Constructor.
@@ -93,15 +93,15 @@ public final class Uri extends AStr {
   }
 
   /**
-   * Tests if this is an absolute URI.
+   * Tests if the URI is absolute.
    * @return result of check
    */
   public boolean isAbsolute() {
-    return isValid() && parsed().scheme() != null;
+    return parsed().absolute();
   }
 
   /**
-   * Checks the validity of this URI.
+   * Tests if the URI is valid.
    * @return result of check
    */
   public boolean isValid() {
@@ -129,11 +129,11 @@ public final class Uri extends AStr {
 
   /**
    * Caches and returns a parsed URI representation.
-   * @return parsed uri
+   * @return parsed URI
    */
   private ParsedUri parsed() {
-    if(pUri == null) pUri = UriParser.parse(Token.string(Token.encodeUri(value, true)));
-    return pUri;
+    if(parsed == null) parsed = UriParser.parse(Token.string(Token.encodeUri(value, true)));
+    return parsed;
   }
 
   @Override
