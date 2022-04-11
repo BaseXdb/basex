@@ -79,7 +79,7 @@ interface ProjectCommands {
         return selectedFile() != null;
       }
     });
-    commands.add(new GUIPopupCmd(RUN_TESTS, BaseXKeys.UNIT) {
+    commands.add(new GUIPopupCmd(RUN_TESTS, BaseXKeys.TESTS) {
       @Override public void execute() {
         view().gui.execute(new Test(selectedFile().path()));
       }

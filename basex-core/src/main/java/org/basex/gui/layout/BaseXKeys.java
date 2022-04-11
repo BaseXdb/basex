@@ -105,12 +105,13 @@ public enum BaseXKeys {
 
   // General
 
-  /** Execute.               */ EXEC1(META, VK_ENTER),
-  /** Test.                  */ UNIT(META | SHIFT, VK_ENTER),
+  /** Run query.             */ EXEC(META, VK_ENTER),
+  /** Run test.              */ TESTS(META | SHIFT, VK_ENTER),
 
   /** Escape.                */ ESCAPE(NO_MOD, VK_ESCAPE),
   /** Context menu.          */ CONTEXT(NO_MOD, VK_CONTEXT_MENU),
   /** Copy path.             */ COPYPATH(META | SHIFT, VK_C),
+  /** File history.          */ HISTORY(META, VK_F6),
 
   /** Refresh.               */ REFRESH(NO_MOD, VK_F5),
   /** Rename.                */ RENAME(NO_MOD, VK_F2),

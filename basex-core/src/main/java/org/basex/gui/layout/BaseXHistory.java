@@ -11,9 +11,9 @@ import org.basex.util.options.*;
  */
 public final class BaseXHistory {
   /** Maximum number of history entries. */
-  public static final int MAX = 18;
-  /** Maximum number of compact history. */
-  public static final int MAXCOMPACT = 7;
+  public static final int MAX = 20;
+  /** Maximum number per page. */
+  public static final int MAXPAGE = 25;
 
   /** Options. */
   private final Options options;
