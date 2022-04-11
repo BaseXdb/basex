@@ -1134,35 +1134,35 @@ public enum QueryError {
   /** Error code. */
   CAXML(XQDY, 44, "XML prefix and namespace cannot be rebound."),
   /** Error code. */
-  CAINV_(XQDY, 44, "Invalid attribute prefix/namespace: '%'."),
+  CAINV_(XQDY, 44, "Invalid attribute prefix/namespace: %."),
   /** Error code. */
   CIRCVAR_X(XQDY, 54, "Static variable depends on itself: %"),
   /** Error code. */
   CIRCCTX(XQDY, 54, "Context value is not defined."),
   /** Error code. */
-  CPIXML_X(XQDY, 64, "Processing instruction has illegal name: '%'."),
+  CPIXML_X(XQDY, 64, "Processing instruction has illegal name: %."),
   /** Error code. */
   COMINVALID(XQDY, 72, "Comment must not contain '--' or end with '-'."),
   /** Error code. */
-  INVNSNAME_X(XQDY, 74, "Invalid namespace prefix: '%'."),
+  INVNSNAME_X(XQDY, 74, "Invalid namespace prefix: %."),
   /** Error code. */
-  INVNAME_X(XQDY, 74, "Invalid QName: '%'."),
+  INVNAME_X(XQDY, 74, "Invalid QName: %."),
   /** Error code. */
   INVPREF_X(XQDY, 74, "No namespace declared for %."),
   /** Error code. */
-  CEXML(XQDY, 96, "XML prefix or namespace cannot be rebound: '%'/'%'."),
+  CEXML(XQDY, 96, "XML prefix or namespace cannot be rebound: %/%."),
   /** Error code. */
-  CEINV_X(XQDY, 96, "Invalid element prefix/namespace '%'."),
+  CEINV_X(XQDY, 96, "Invalid element prefix/namespace: %."),
   /** Error code. */
   CNXML(XQDY, 101, "XML prefix and namespace cannot be rebound."),
   /** Error code. */
-  CNINV_X(XQDY, 101, "Invalid namespace prefix '%'."),
+  CNINV_X(XQDY, 101, "Invalid namespace prefix: %."),
   /** Error code. */
-  CNINVNS_X(XQDY, 101, "Invalid namespace URI '%'."),
+  CNINVNS_X(XQDY, 101, "Invalid namespace URI: %."),
   /** Error code. */
-  EMPTYNSCONS_X(XQDY, 102, "No default namespace allowed if element has no namespace: '%'."),
+  EMPTYNSCONS_X(XQDY, 102, "No default namespace allowed if element has no namespace: %."),
   /** Error code. */
-  DUPLNSCONS_X(XQDY, 102, "Duplicate namespace declaration: '%'."),
+  DUPLNSCONS_X(XQDY, 102, "Duplicate namespace declaration: %."),
   /** Error code. */
   MAPDUPLKEY_X_X_X(XQDY, 137, "Key % already exists in map (values: % vs. %)."),
 
@@ -1175,9 +1175,9 @@ public enum QueryError {
   /** Error code. */
   DUPLBASE(XQST, 32, "Duplicate 'base-uri' declaration."),
   /** Error code. */
-  DUPLNSDECL_X(XQST, 33, "Duplicate declaration of prefix '%'."),
+  DUPLNSDECL_X(XQST, 33, "Duplicate declaration of prefix: %."),
   /** Error code. */
-  FUNCDEFINED_X(XQST, 34, "Duplicate declaration of function '%'."),
+  FUNCDEFINED_X(XQST, 34, "Duplicate declaration of function: %."),
   /** Error code. */
   DUPLCOLL(XQST, 38, "Duplicate 'collation' declaration."),
   /** Error code. */
@@ -1191,9 +1191,9 @@ public enum QueryError {
   /** Error code. */
   ANNWHICH_X_X(XQST, 45, "Annotation %% is in reserved namespace."),
   /** Error code. */
-  INVURI_X(XQST, 46, "URI '%' is invalid."),
+  INVURI_X(XQST, 46, "Invalid URI: %."),
   /** Error code. */
-  DUPLMODULE_X(XQST, 47, "Module namespace is declared twice: '%'."),
+  DUPLMODULE_X(XQST, 47, "Module namespace is declared twice: %."),
   /** Error code. */
   MODULENS_X(XQST, 48, "Declaration % does not match the module namespace."),
   /** Error code. */
@@ -1741,16 +1741,19 @@ public enum QueryError {
   public static byte[] normalize(final byte[] token, final InputInfo ii) {
     if(ii != null && ii.internal()) return Token.EMPTY;
 
-    final TokenBuilder tb = new TokenBuilder(Math.min(203, token.length));
-    byte l = 0;
-    for(byte b : token) {
-      if(tb.size() == 200) {
+    final TokenBuilder tb = new TokenBuilder();
+    int last = 0, c = 0;
+    for(final TokenParser tp = new TokenParser(token); tp.more();) {
+      if(c == 200) {
         tb.add(QueryText.DOTS);
         break;
       }
-      if(b == '\n' || b == '\r') b = ' ';
-      if(b != ' ' || l != ' ') tb.addByte(b);
-      l = b;
+      final int cp = Math.max(tp.next(), ' ');
+      if(cp != ' ' || last != ' ') {
+        tb.add(cp);
+        c++;
+      }
+      last = cp;
     }
     return tb.finish();
   }
