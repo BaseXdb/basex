@@ -534,7 +534,7 @@ public abstract class Serializer implements Closeable {
    * Serializes the specified value.
    * @param value value
    * @param chop chop large tokens
-   * @param quote character for quoting the value; ignored if {@code null}
+   * @param quote character for quoting the value; ignored if {@code 0}
    * @return value
    */
   public static byte[] value(final byte[] value, final char quote, final boolean chop) {

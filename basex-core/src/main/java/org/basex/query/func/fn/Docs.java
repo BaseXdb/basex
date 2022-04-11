@@ -35,9 +35,8 @@ public abstract class Docs extends StandardFunc {
     if(qi == null) {
       final Item item = exprs.length == 0 ? Empty.VALUE : exprs[0].atomItem(qc, info);
       if(item != Empty.VALUE) {
-        final byte[] uri = toToken(item);
-        qi = queryInput(uri);
-        if(qi == null) throw INVCOLL_X.get(info, uri);
+        qi = queryInput(toToken(item));
+        if(qi == null) throw INVCOLL_X.get(info, item);
       }
     }
     return qc.resources.collection(qi, info);
@@ -52,10 +51,10 @@ public abstract class Docs extends StandardFunc {
   final Item doc(final QueryContext qc) throws QueryException {
     QueryInput qi = queryInput;
     if(qi == null) {
-      final byte[] uri = toTokenOrNull(exprs[0], qc);
-      if(uri == null) return Empty.VALUE;
-      qi = queryInput(uri);
-      if(qi == null) throw INVDOC_X.get(info, uri);
+      final Item item = exprs[0].atomItem(qc, info);
+      if(item == Empty.VALUE) return Empty.VALUE;
+      qi = queryInput(toToken(item, qc));
+      if(qi == null) throw INVDOC_X.get(info, item);
     }
     return qc.resources.doc(qi, info);
   }
