@@ -82,8 +82,7 @@ abstract class CName extends CNode {
         return new QNm(local, uri);
       }
     }
-
-    throw INVNAME_X.get(info, token);
+    throw INVNAME_X.get(info, item);
   }
 
   /**
