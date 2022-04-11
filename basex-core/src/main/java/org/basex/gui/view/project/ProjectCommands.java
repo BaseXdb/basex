@@ -121,6 +121,6 @@ interface ProjectCommands {
         return selectedFile() != null;
       }
     });
-    return commands.toArray(new GUIPopupCmd[0]);
+    return commands.toArray(GUIPopupCmd[]::new);
   }
 }
