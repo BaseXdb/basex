@@ -20,6 +20,7 @@ import javax.swing.border.*;
 import org.basex.gui.*;
 import org.basex.gui.listener.*;
 import org.basex.gui.text.*;
+import org.basex.io.*;
 import org.basex.util.*;
 
 /**
@@ -521,5 +522,35 @@ public final class BaseXLayout {
    */
   public static void boldFont(final JComponent comp) {
     comp.setFont(comp.getFont().deriveFont(Font.BOLD));
+  }
+
+  /**
+   * Returns the file name and a reverse representation of the file path.
+   * @param file file
+   * @return path
+   */
+  public static String reversePath(final IOFile file) {
+    final StringBuilder sb = new StringBuilder();
+    final String[] names = file.file().getParent().split("[/\\\\]");
+    for(int n = names.length - 1; n >= 0; n--) {
+      sb.append(names[n]);
+      if(n > 0) sb.append('/');
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Returns a string representation for the specified file.
+   * @param file file
+   * @param full full path
+   * @return string
+   */
+  public static String info(final IOFile file, final boolean full) {
+    final StringBuilder sb = new StringBuilder();
+    if(file != null) {
+      sb.append(full ? file.path() : file.name());
+      if(file.exists()) sb.append(" (").append(Performance.format(file.length())).append(')');
+    }
+    return sb.toString();
   }
 }
