@@ -61,7 +61,7 @@ public final class Cast extends Convert {
    * @return query exception
    */
   private QueryException error(final Expr ex) {
-    return INVTYPE_X_X_X.get(info, ex.seqType(), seqType, ex);
+    return INVCONVERT_X_X_X.get(info, ex.seqType(), seqType, ex);
   }
 
   @Override

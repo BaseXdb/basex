@@ -127,7 +127,7 @@ abstract class RegEx extends StandardFunc {
           // http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#lt
           final Pattern p = (pattern.flags() & Pattern.MULTILINE) == 0 ? pattern :
             Pattern.compile(pattern.pattern());
-          if(p.matcher("").matches()) throw REGROUP.get(info);
+          if(p.matcher("").matches()) throw REGROUP_X.get(info, string);
         }
         groups = parser.groups();
       }

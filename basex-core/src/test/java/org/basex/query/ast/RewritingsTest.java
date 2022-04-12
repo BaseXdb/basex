@@ -535,10 +535,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(1, 2)[. != 0] ! (xs:byte(.)) ! (xs:integer(.) + 2)", "3\n4",
         count(Cast.class, 1), type(Arith.class, "xs:integer"));
 
-    error("(if(" + wrap("!") + "= 'a') then 'b') cast as xs:string", INVTYPE_X_X_X);
-    error("((1 to 1000000000) ! (. || 'x')) cast as xs:string", INVTYPE_X_X_X);
-    error("() cast as xs:string", INVTYPE_X_X_X);
-    error("(1 to 100000)[. < 3] cast as xs:integer", INVTYPE_X_X_X);
+    error("(if(" + wrap("!") + "= 'a') then 'b') cast as xs:string", INVCONVERT_X_X_X);
+    error("((1 to 1000000000) ! (. || 'x')) cast as xs:string", INVCONVERT_X_X_X);
+    error("() cast as xs:string", INVCONVERT_X_X_X);
+    error("(1 to 100000)[. < 3] cast as xs:integer", INVCONVERT_X_X_X);
   }
 
   /** Type promotions. */
@@ -2592,7 +2592,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     error("<x/> = 1", FUNCCAST_X_X);
     error("<x/> = 1 to 2", FUNCCAST_X_X);
-    error("<?_ 1?> = 1 to 2", CMPTYPES_X_X);
+    error("<?_ 1?> = 1 to 2", CMPTYPES_X_X_X_X);
   }
 
   /** Database statistics: min, max, sum, avg. */

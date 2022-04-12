@@ -34,7 +34,7 @@ public final class WebModuleTest extends SandboxTest {
 
     error(func.args("url", " map { (): 'a' }"), EMPTYFOUND);
     error(func.args("url", " map { ('a', 'b'): () }"), SEQFOUND_X);
-    error(func.args("url", " map { 'a': true#0 }"), FIATOM_X);
+    error(func.args("url", " map { 'a': true#0 }"), FIATOM_X_X);
   }
 
   /** Test method. */

@@ -60,7 +60,7 @@ public final class FnModuleTest extends QueryPlanTest {
   @Test public void analyzeString() {
     final Function func = ANALYZE_STRING;
     query(func.args("a", "", "j") + "//fn:non-match/text()", "a");
-    error(func.args("a", ""), REGROUP);
+    error(func.args("a", ""), REGROUP_X);
   }
 
   /** Test method. */
@@ -128,9 +128,9 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" util:replicate(1.0, 3)"), 1, empty(func));
     check(func.args(" util:replicate(" + wrap(1) + ", 3)"), 1, type(func, "xs:double"));
 
-    error(func.args(" true#0"), FIATOM_X);
-    error(func.args(" util:replicate(true#0, 2)"), FIATOM_X);
-    error(func.args(" (1 to 999999) ! true#0"), FIATOM_X);
+    error(func.args(" true#0"), FIATOM_X_X);
+    error(func.args(" util:replicate(true#0, 2)"), FIATOM_X_X);
+    error(func.args(" (1 to 999999) ! true#0"), FIATOM_X_X);
   }
 
   /** Test method. */
@@ -577,7 +577,7 @@ public final class FnModuleTest extends QueryPlanTest {
     error(func.args(" ('b', 'c', 'a', 1)"), ARGTYPE_X_X_X);
     error(func.args(" (2, 3, 1, 'a')"), ARGTYPE_X_X_X);
     error(func.args(" (false(), true(), false(), 1)"), ARGTYPE_X_X_X);
-    error(func.args(" 'x'", 1), INVTYPE_X_X_X);
+    error(func.args(" 'x'", 1), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -628,7 +628,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check("for $d in (1, 2.34)[. != 0] return $d[" + func.args() + ']', 1, exists(func));
 
     error(func.args(), NOCTX_X);
-    error(func.args(" true#0"), FIATOM_X);
+    error(func.args(" true#0"), FIATOM_X_X);
   }
 
   /** Test method. */
@@ -782,7 +782,7 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args("a", ".", "b"), "b");
 
     query(func.args("a", "", "x", "j"), "xax");
-    error(func.args("a", "", "x"), REGROUP);
+    error(func.args("a", "", "x"), REGROUP_X);
 
     // GH-573
     query(func.args("aaaaa bbbbbbbb ddd ", "(.{6,15}) ", "$1@"), "aaaaa bbbbbbbb@ddd ");
@@ -893,8 +893,8 @@ public final class FnModuleTest extends QueryPlanTest {
     check("(random:double() => util:replicate(10, true()) => " + func.args() + ")[. > 1]", "",
         exists(func));
 
-    error(func.args(" true#0"), FIATOM_X);
-    error(func.args(" (1 to 2) ! true#0"), FIATOM_X);
+    error(func.args(" true#0"), FIATOM_X_X);
+    error(func.args(" (1 to 2) ! true#0"), FIATOM_X_X);
   }
 
   /** Test method. */
@@ -921,7 +921,7 @@ public final class FnModuleTest extends QueryPlanTest {
         empty(func), exists(SingleIterPath.class));
 
     error(func.args(), NOCTX_X);
-    error(func.args(" true#0"), FISTRING_X);
+    error(func.args(" true#0"), FISTRING_X_X);
   }
 
   /** Test method. */
@@ -939,7 +939,7 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args("A"), 1);
     query("<_>A</_>[" + func.args() + ']', "<_>A</_>");
     query(func.args(" ([()], 'a')"), 1);
-    error("true#0[" + func.args() + ']', FIATOM_X);
+    error("true#0[" + func.args() + ']', FIATOM_X_X);
   }
 
   /** Test method. */
@@ -1259,7 +1259,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" normalize-space(" + wrap("A") + ")", ";"), "A",
         exists(NORMALIZE_SPACE));
 
-    error(func.args("a", ""), REGROUP);
+    error(func.args("a", ""), REGROUP_X);
   }
 
   /** Test method. */

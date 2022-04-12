@@ -49,7 +49,7 @@ public final class CNSpace extends CName {
   @Override
   public FNSpace item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] nm = ncname(true, qc);
-    if(nm.length != 0 && !XMLToken.isNCName(nm)) throw INVNSNAME_X.get(info, nm);
+    if(nm.length != 0 && !XMLToken.isNCName(nm)) throw INVNSPREFIX_X.get(info, nm);
 
     final byte[] value = atomValue(qc, true);
     if(eq(nm, XML) ^ eq(value, XML_URI)) throw CNXML.get(info);

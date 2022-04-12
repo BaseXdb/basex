@@ -87,7 +87,7 @@ public final class XQJava extends FItem {
   public boolean deep(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
     if(item instanceof XQJava) return equals(item);
-    throw FICMP_X.get(ii, type);
+    throw FICMP_X_X.get(ii, type, this);
   }
 
   @Override

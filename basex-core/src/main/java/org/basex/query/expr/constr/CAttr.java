@@ -69,7 +69,7 @@ public final class CAttr extends CName {
       if(eq(cp, EMPTY) && !eq(cu, EMPTY))
         nm = new QNm(concat(NS0, nm.string()), cu);
     }
-    if(!nm.hasURI() && nm.hasPrefix()) throw INVPREF_X.get(info, nm);
+    if(!nm.hasURI() && nm.hasPrefix()) throw NOQNNAMENS_X.get(info, nm);
 
     byte[] value = atomValue(qc, true);
     if(eq(cp, XML) && eq(nm.local(), ID)) value = normalize(value);

@@ -593,9 +593,9 @@ public enum QueryError {
   /** Error code. */
   RESDIR_X(FODC, 2, "URI '%' points to directory."),
   /** Error code. */
-  INVCOLL_X(FODC, 4, "Invalid collection URI: '%'."),
+  INVCOLL_X(FODC, 4, "Invalid collection URI: %."),
   /** Error code. */
-  INVDOC_X(FODC, 5, "Invalid document URI: '%'."),
+  INVDOC_X(FODC, 5, "Invalid document URI: %."),
   /** Error code. */
   SAXERR_X(FODC, 6, "SAX: %"),
   /** Error code. */
@@ -651,7 +651,7 @@ public enum QueryError {
   /** Error code. */
   INVFDPATTERN_X(FOFD, 1340, "%"),
   /** Error code. */
-  PICINVCOMP_X_X(FOFD, 1350, "Component '[%]' not applicable to % values."),
+  PICINVCOMP_X_X_X(FOFD, 1350, "[%] not applicable to %: %."),
 
   /** Error code. */
   PARSE_JSON_X(FOJS, 1, "%"),
@@ -694,7 +694,7 @@ public enum QueryError {
   /** Error code. */
   ARGTYPE_X_X_X(FORG, 6, "% expected, % found: %."),
   /** Error code. */
-  COMPARE_X_X(FORG, 6, "Type % cannot be compared: %."),
+  COMPARE_X_X(FORG, 6, "Items of type % cannot be compared: %."),
   /** Error code. */
   NUMDUR_X_X(FORG, 6, "Number or duration expected, % found: %."),
 
@@ -711,18 +711,18 @@ public enum QueryError {
   /** Error code. */
   REGPAT_X(FORX, 2, "Invalid regular expression: %."),
   /** Error code. */
-  REGROUP(FORX, 3, "Pattern matches empty string."),
+  REGROUP_X(FORX, 3, "Pattern matches empty string: '%'."),
   /** Error code. */
   FUNREPBS_X(FORX, 4, "Invalid backslash in replacement string: %."),
   /** Error code. */
   FUNREPDOL_X(FORX, 4, "Invalid dollar sign in replacement string: %."),
 
   /** Error code. */
-  FIATOM_X(FOTY, 13, "Items of type % cannot be atomized."),
+  FIATOM_X_X(FOTY, 13, "Items of type % cannot be atomized: %."),
   /** Error code. */
-  FISTRING_X(FOTY, 14, "Items of type % have no string representation."),
+  FISTRING_X_X(FOTY, 14, "Items of type % have no string representation: %."),
   /** Error code. */
-  FICMP_X(FOTY, 15, "Type % is not comparable."),
+  FICMP_X_X(FOTY, 15, "Items of type % cannot be compared: %."),
 
   /** Error code. */
   UPFOTYPE_X(FOUP, 1, "Document or element expected, % found."),
@@ -781,7 +781,7 @@ public enum QueryError {
   /** Error code. */
   SERNS_X(SENR, 1, "Namespaces cannot be serialized:%."),
   /** Error code. */
-  SERFUNC_X(SENR, 1, "Items of type % cannot be serialized."),
+  SERFUNC_X(SENR, 1, "% items cannot be serialized."),
   /** Error code. */
   SERSA(SEPM, 4, "If 'standalone' is specified, the root must be a single element."),
   /** Error code. */
@@ -813,7 +813,7 @@ public enum QueryError {
   /** Error code. */
   SERNUMBER_X(SERE, 20, "Numeric value cannot be represented: '%'"),
   /** Error code. */
-  SERJSONFUNC_X(SERE, 21, "Items of type % cannot be serialized."),
+  SERJSONFUNC_X(SERE, 21, "% items cannot be serialized."),
   /** Error code. */
   SERDUPL_X(SERE, 22, "Duplicate name found: '%'"),
   /** Error code. */
@@ -1024,7 +1024,7 @@ public enum QueryError {
   /** Error code. */
   INVALIDCAST_X(XPST, 80, "Invalid cast type: %."),
   /** Error code. */
-  NOURI_X(XPST, 81, "No namespace declared for '%'."),
+  NOURI_X(XPST, 81, "No namespace declared for QName '%'."),
   /** Error code. */
   NSMISS_X(XPST, 81, "QName '%' has no namespace."),
 
@@ -1064,7 +1064,7 @@ public enum QueryError {
   /** Error code. */
   STRNCN_X_X(XPTY, 4, "String or NCName expected, % found: %."),
   /** Error code. */
-  INVTYPE_X_X_X(XPTY, 4, "Cannot convert % to %: %."),
+  INVCONVERT_X_X_X(XPTY, 4, "Cannot convert % to %: %."),
   /** Error code. */
   INVPROMOTE_X_X_X(XPTY, 4, "Cannot promote % to %: %."),
   /** Error code. */
@@ -1074,9 +1074,9 @@ public enum QueryError {
   /** Error code. */
   INVFUNCITEM_X_X(XPTY, 4, "Function expected, % found: %."),
   /** Error code. */
-  CMPTYPE_X(XPTY, 4, "Type % is not comparable."),
+  CMPTYPE_X_X_X(XPTY, 4, "Items of type % cannot be compared: % vs. %."),
   /** Error code. */
-  CMPTYPES_X_X(XPTY, 4, "Types % and % are not comparable."),
+  CMPTYPES_X_X_X_X(XPTY, 4, "% and % cannot be compared: % vs. %."),
   /** Error code. */
   DOCATTS_X(XPTY, 4, "Cannot add attributes to a document node: %."),
   /** Error code. */
@@ -1142,11 +1142,11 @@ public enum QueryError {
   /** Error code. */
   COMINVALID(XQDY, 72, "Comment must not contain '--' or end with '-'."),
   /** Error code. */
-  INVNSNAME_X(XQDY, 74, "Invalid namespace prefix: %."),
+  INVNSPREFIX_X(XQDY, 74, "Invalid namespace prefix: %."),
   /** Error code. */
-  INVNAME_X(XQDY, 74, "Invalid QName: %."),
+  INVQNAME_X(XQDY, 74, "Invalid QName: %."),
   /** Error code. */
-  INVPREF_X(XQDY, 74, "No namespace declared for %."),
+  NOQNNAMENS_X(XQDY, 74, "No namespace declared for QName '%'."),
   /** Error code. */
   CEXML(XQDY, 96, "XML prefix or namespace cannot be rebound: %/%."),
   /** Error code. */
@@ -1156,11 +1156,11 @@ public enum QueryError {
   /** Error code. */
   CNINV_X(XQDY, 101, "Invalid namespace prefix: %."),
   /** Error code. */
-  CNINVNS_X(XQDY, 101, "Invalid namespace URI: %."),
+  CNINVNS_X(XQDY, 101, "Invalid namespace URI: '%'."),
   /** Error code. */
   EMPTYNSCONS_X(XQDY, 102, "No default namespace allowed if element has no namespace: %."),
   /** Error code. */
-  DUPLNSCONS_X(XQDY, 102, "Duplicate namespace declaration: %."),
+  DUPLNSCONS_X(XQDY, 102, "Duplicate declaration of namespace '%'."),
   /** Error code. */
   MAPDUPLKEY_X_X_X(XQDY, 137, "Key % already exists in map (values: % vs. %)."),
 
@@ -1173,9 +1173,9 @@ public enum QueryError {
   /** Error code. */
   DUPLBASE(XQST, 32, "Duplicate 'base-uri' declaration."),
   /** Error code. */
-  DUPLNSDECL_X(XQST, 33, "Duplicate declaration of prefix: %."),
+  DUPLNSDECL_X(XQST, 33, "Duplicate declaration of prefix '%'."),
   /** Error code. */
-  FUNCDEFINED_X(XQST, 34, "Duplicate declaration of function: %."),
+  FUNCDEFINED_X(XQST, 34, "Duplicate declaration of function '%'."),
   /** Error code. */
   DUPLCOLL(XQST, 38, "Duplicate 'collation' declaration."),
   /** Error code. */
@@ -1589,8 +1589,8 @@ public enum QueryError {
    */
   public static QueryException diffError(final Item item1, final Item item2, final InputInfo ii) {
     final Type type1 = item1.type, type2 = item2.type;
-    return type1 == type2 ? CMPTYPE_X.get(ii, type1, item1) :
-      CMPTYPES_X_X.get(ii, type1, type2);
+    return type1 == type2 ? CMPTYPE_X_X_X.get(ii, type1, item1, item2) :
+      CMPTYPES_X_X_X_X.get(ii, type1, type2, item1, item2);
   }
 
   /**
@@ -1633,7 +1633,7 @@ public enum QueryError {
    * @return query exception
    */
   public static QueryException typeError(final Value value, final Type type, final InputInfo ii) {
-    return INVTYPE_X_X_X.get(ii, value.type, type, value);
+    return INVCONVERT_X_X_X.get(ii, value.type, type, value);
   }
 
   /**

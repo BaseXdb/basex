@@ -74,7 +74,10 @@ public final class FnReplace extends RegEx {
     try {
       return Str.get(regExpr.pattern.matcher(input).replaceAll(replace));
     } catch(final Exception ex) {
-      if(ex.getMessage().contains("No group")) throw REGROUP.get(info);
+      if(ex.getMessage().contains("No group")) {
+        Util.debug(ex);
+        throw REGROUP_X.get(info, pttrn);
+      }
       throw REGPAT_X.get(info, ex);
     }
   }

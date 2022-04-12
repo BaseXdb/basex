@@ -82,7 +82,7 @@ abstract class CName extends CNode {
         return new QNm(local, uri);
       }
     }
-    throw INVNAME_X.get(info, item);
+    throw INVQNAME_X.get(info, item);
   }
 
   /**

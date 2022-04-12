@@ -22,7 +22,7 @@ public final class GeoModuleTest extends SandboxTest {
     final ApiFunction func = _GEO_DIMENSION;
 
     run(func.args(" <gml:Point><gml:coordinates>1,2</gml:coordinates></gml:Point>"), 0);
-    error(func.args(" text { 'a' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'a' }"), INVCONVERT_X_X_X);
     error(func.args(" <gml:unknown/>"), GEO_WHICH);
     error(func.args(" <gml:Point><gml:coordinates>1 2</gml:coordinates></gml:Point>"), GEO_READ);
   }
@@ -35,7 +35,7 @@ public final class GeoModuleTest extends SandboxTest {
         "<gml:coordinates>1,1</gml:coordinates></gml:Point>" +
         "<gml:Point><gml:coordinates>1,2</gml:coordinates></gml:Point>" +
         "</gml:MultiPoint>"), "gml:MultiPoint");
-    error(func.args(" text { 'srsName' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'srsName' }"), INVCONVERT_X_X_X);
     error(func.args(" <gml:unknown/>"), GEO_WHICH);
     error(func.args(" <gml:Point><gml:coordinates>1 2</gml:coordinates></gml:Point>"),
         GEO_READ);
@@ -51,7 +51,7 @@ public final class GeoModuleTest extends SandboxTest {
         "-150,50 -150,60 -125,60 -125,50 -150,50" +
         "</coordinates></gml:LinearRing></outerboundaryIs></gml:Polygon>"), 0);
 
-    error(func.args(" text { 'a' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'a' }"), INVCONVERT_X_X_X);
     error(func.args(" <gml:unknown/>"), GEO_WHICH);
     error(func.args(" <gml:LinearRing><gml:pos>1,1 20,1 50,30 1,1</gml:pos></gml:LinearRing>"),
         GEO_READ);
@@ -68,7 +68,7 @@ public final class GeoModuleTest extends SandboxTest {
         "<gml:coordinates>1.0,1.0 1.0,30.0 50.0,30.0 50.0,1.0 1.0,1.0" +
         "</gml:coordinates></gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>");
 
-    error(func.args(" text { 'a' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'a' }"), INVCONVERT_X_X_X);
     error(func.args(" <gml:unknown/>"), GEO_WHICH);
     error(func.args(" <gml:LinearRing><gml:pos>1,1 20,1 50,30 1,1</gml:pos></gml:LinearRing>"),
         GEO_READ);
@@ -81,7 +81,7 @@ public final class GeoModuleTest extends SandboxTest {
     run(func.args(" <gml:LineString><gml:coordinates>1,1 55,99 2,1" +
         "</gml:coordinates></gml:LineString>"), "LINESTRING (1 1, 55 99, 2 1)");
 
-    error(func.args(" text { 'a' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'a' }"), INVCONVERT_X_X_X);
     error(func.args(" <gml:unknown/>"), GEO_WHICH);
     error(func.args(" <gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>"),
         GEO_READ);
@@ -95,7 +95,7 @@ public final class GeoModuleTest extends SandboxTest {
         "</gml:coordinates></gml:LineString>") + ')',
         "AAAAAAIAAAADP/AAAAAAAAA/8AAAAAAAAEBLgAAAAAAAQFjAAAAAAABAAAAAAAAAAD/wAAAAAAAA");
 
-    error(func.args(" text { 'a' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'a' }"), INVCONVERT_X_X_X);
     error(func.args(" <gml:unknown/>"), GEO_WHICH);
     error(func.args(" <gml:LinearRing><gml:coordinates>1,1 55,99 2,1" +
         "</gml:coordinates></gml:LinearRing>"), GEO_READ);
@@ -108,7 +108,7 @@ public final class GeoModuleTest extends SandboxTest {
     run(func.args(" <gml:LineString><gml:coordinates>1,1 20,1 10,4 20,-10" +
         "</gml:coordinates></gml:LineString>"), false);
 
-    error(func.args(" text { 'a' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'a' }"), INVCONVERT_X_X_X);
     error(func.args(" <gml:unknown/>"), GEO_WHICH);
     error(func.args(" <gml:LinearRing><gml:coordinates>1,1 55,99 2,1" +
         "</gml:coordinates></gml:LinearRing>"), GEO_READ);
@@ -127,7 +127,7 @@ public final class GeoModuleTest extends SandboxTest {
     run(func.args(" <gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>"),
         "<gml:MultiGeometry xmlns:gml=\"http://www.opengis.net/gml\"/>");
 
-    error(func.args(" text { 'a' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'a' }"), INVCONVERT_X_X_X);
     error(func.args(" a"), NOCTX_X);
     error(func.args(" <gml:geo/>"), GEO_WHICH);
     error(func.args(" <gml:Point><gml:pos>1 2</gml:pos></gml:Point>"), GEO_READ);
@@ -143,7 +143,7 @@ public final class GeoModuleTest extends SandboxTest {
         "<gml:coordinates>1,1 2,1 5,3 1,1</gml:coordinates></gml:LinearRing>" +
         "</gml:outerBoundaryIs></gml:Polygon>"), false);
 
-    error(func.args(" text { 'a' }", " a"), INVTYPE_X_X_X);
+    error(func.args(" text { 'a' }", " a"), INVCONVERT_X_X_X);
     error(func.args(" <gml:unknown/>", " <gml:LinearRing><gml:coordinates>" +
         "1,1 2,1 5,3 1,1</gml:coordinates></gml:LinearRing>"), GEO_WHICH);
     error(func.args(" <gml:LinearRing><gml:coordinates>1,1 55,99 2,1" +
@@ -399,7 +399,7 @@ public final class GeoModuleTest extends SandboxTest {
         " <gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>"),
         GEO_READ);
     error(func.args(" text { 'a' }", " <gml:Point><gml:coordinates>2,3" +
-        "</gml:coordinates></gml:Point>"), INVTYPE_X_X_X);
+        "</gml:coordinates></gml:Point>"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -416,7 +416,7 @@ public final class GeoModuleTest extends SandboxTest {
         " <gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>"),
         GEO_READ);
     error(func.args(" text { 'a' }", " <gml:Point><gml:coordinates>2,3" +
-        "</gml:coordinates></gml:Point>"), INVTYPE_X_X_X);
+        "</gml:coordinates></gml:Point>"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -437,7 +437,7 @@ public final class GeoModuleTest extends SandboxTest {
         " <gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>"),
         GEO_WHICH);
     error(func.args(" text { 'a' }", "<gml:Point><gml:coordinates>2,3" +
-        "</gml:coordinates></gml:Point>"), INVTYPE_X_X_X);
+        "</gml:coordinates></gml:Point>"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -455,7 +455,7 @@ public final class GeoModuleTest extends SandboxTest {
     error(func.args(" <gml:Point><gml:coordinates>2,1</gml:coordinates></gml:Point>, 2"),
         GEO_RANGE);
     error(func.args(" text { 'a' }", " <gml:Point><gml:coordinates>2,3" +
-        "</gml:coordinates></gml:Point>"), INVTYPE_X_X_X);
+        "</gml:coordinates></gml:Point>"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -473,7 +473,7 @@ public final class GeoModuleTest extends SandboxTest {
         GEO_READ);
     error(func.args(" <gml:geo><gml:coordinates>2,1</gml:coordinates></gml:geo>"),
         GEO_WHICH);
-    error(func.args(" text { 'a' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'a' }"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -554,7 +554,7 @@ public final class GeoModuleTest extends SandboxTest {
     error(func.args(" <gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>"),
         GEO_READ);
     error(func.args(" "), FUNCARITY_X_X_X);
-    error(func.args(" text { 'gml:Point' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'gml:Point' }"), INVCONVERT_X_X_X);
     error(func.args(" <gml:geo><gml:coordinates>2,1</gml:coordinates></gml:geo>"),
         GEO_WHICH);
   }
@@ -579,7 +579,7 @@ public final class GeoModuleTest extends SandboxTest {
     error(func.args(" <gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>"),
         GEO_READ);
     error(func.args(" "), FUNCARITY_X_X_X);
-    error(func.args(" text { 'gml:Point' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'gml:Point' }"), INVCONVERT_X_X_X);
     error(func.args(" <gml:geo><gml:coordinates>2,1</gml:coordinates></gml:geo>"),
         GEO_WHICH);
   }
@@ -603,7 +603,7 @@ public final class GeoModuleTest extends SandboxTest {
     error(func.args(" <gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>"),
         GEO_READ);
     error(func.args(" "), FUNCARITY_X_X_X);
-    error(func.args(" text { 'gml:Point' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'gml:Point' }"), INVCONVERT_X_X_X);
     error(func.args(" <gml:Point><gml:coordinates>2,1</gml:coordinates></gml:Point>"),
         GEO_TYPE);
   }
@@ -626,7 +626,7 @@ public final class GeoModuleTest extends SandboxTest {
     error(func.args(" <gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>"),
         GEO_READ);
     error(func.args(" "), FUNCARITY_X_X_X);
-    error(func.args(" text { 'gml:Point' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'gml:Point' }"), INVCONVERT_X_X_X);
     error(func.args(" <Point><gml:coordinates>2,1</gml:coordinates></Point>"), GEO_WHICH);
   }
 
@@ -646,7 +646,7 @@ public final class GeoModuleTest extends SandboxTest {
     error(func.args(" <gml:LineString><gml:coordinates>1,1</gml:coordinates>" +
         "</gml:LineString>"), GEO_READ);
     error(func.args(" "), FUNCARITY_X_X_X);
-    error(func.args(" text { 'gml:Point' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'gml:Point' }"), INVCONVERT_X_X_X);
     error(func.args(" <Point><gml:coordinates>2,1</gml:coordinates></Point>"),
         GEO_WHICH);
   }
@@ -674,7 +674,7 @@ public final class GeoModuleTest extends SandboxTest {
         "</gml:coordinates></gml:LineString>, 5"), GEO_RANGE);
     error(func.args(" <gml:LineString><gml:coordinates>11,10 20,1 20,20 12,13" +
         "</gml:coordinates></gml:LineString>, 0"), GEO_RANGE);
-    error(func.args(" text { 'a' },3"), INVTYPE_X_X_X);
+    error(func.args(" text { 'a' },3"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -720,7 +720,7 @@ public final class GeoModuleTest extends SandboxTest {
     error(func.args(" <gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>"),
         GEO_WHICH);
     error(func.args(" "), FUNCARITY_X_X_X);
-    error(func.args(" text { 'a' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'a' }"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -745,7 +745,7 @@ public final class GeoModuleTest extends SandboxTest {
     error(func.args(" <gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>"),
         GEO_WHICH);
     error(func.args(" "), FUNCARITY_X_X_X);
-    error(func.args(" text { 'a' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'a' }"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -764,7 +764,7 @@ public final class GeoModuleTest extends SandboxTest {
     error(func.args(" <gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>"),
         GEO_WHICH);
     error(func.args(" "), FUNCARITY_X_X_X);
-    error(func.args(" text { 'a' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'a' }"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -780,7 +780,7 @@ public final class GeoModuleTest extends SandboxTest {
     error(func.args(" <gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>"),
         GEO_WHICH);
     error(func.args(" "), FUNCARITY_X_X_X);
-    error(func.args(" text { 'a' }"), INVTYPE_X_X_X);
+    error(func.args(" text { 'a' }"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -809,7 +809,7 @@ public final class GeoModuleTest extends SandboxTest {
         GEO_RANGE);
     error(func.args(" <gml:Point><gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>, 1"),
         GEO_TYPE);
-    error(func.args(" text { '<gml:Polygon/' }, 1"), INVTYPE_X_X_X);
+    error(func.args(" text { '<gml:Polygon/' }, 1"), INVCONVERT_X_X_X);
     error(func.args(" "), FUNCARITY_X_X_X);
   }
 

@@ -274,7 +274,8 @@ public abstract class ParseExpr extends Expr {
   protected final byte[] toToken(final Item item) throws QueryException {
     final Type type = item.type;
     if(type.isStringOrUntyped()) return item.string(info);
-    throw item instanceof FItem ? FIATOM_X.get(info, item.type) : typeError(item, STRING, info);
+    throw item instanceof FItem ? FIATOM_X_X.get(info, item.type, item) :
+      typeError(item, STRING, info);
   }
 
   /**
