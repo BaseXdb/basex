@@ -301,7 +301,7 @@ public final class SeqType {
     // check cardinality
     final long size = value.size();
     if(!occ.check(size)) {
-      if(error) throw INVTYPE_X_X_X.get(ii, value.seqType(), this, value);
+      if(error) throw INVCONVERT_X_X_X.get(ii, value.seqType(), this, value);
       return null;
     }
     if(size == 0) return Empty.VALUE;

@@ -22,7 +22,8 @@ public final class FnStringLength extends ContextFn {
     final byte[] token;
     if(exprs.length == 0) {
       final Item item = ctxValue(qc).item(qc, info);
-      if(item instanceof FItem && !(item instanceof XQJava)) throw FISTRING_X.get(info, item.type);
+      if(item instanceof FItem && !(item instanceof XQJava))
+        throw FISTRING_X_X.get(info, item.type, item);
       token = item == Empty.VALUE ? Token.EMPTY : item.string(info);
     } else {
       token = toZeroToken(exprs[0], qc);

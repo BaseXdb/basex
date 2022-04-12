@@ -240,7 +240,7 @@ public abstract class Formatter extends FormatUtil {
           default:
             throw INVCOMPSPEC_X.get(ii, marker);
         }
-        if(err) throw PICINVCOMP_X_X.get(ii, marker, date.type);
+        if(err) throw PICINVCOMP_X_X_X.get(ii, marker, date.type, date);
         if(pres == null) continue;
 
         // parse presentation modifier(s) and width modifier

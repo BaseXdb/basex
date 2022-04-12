@@ -27,7 +27,7 @@ public abstract class XQData extends FItem {
 
   @Override
   public final byte[] string(final InputInfo ii) throws QueryException {
-    throw FIATOM_X.get(ii, type);
+    throw FIATOM_X_X.get(ii, type, this);
   }
 
   @Override

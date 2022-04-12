@@ -17,7 +17,7 @@ public final class MapTest extends SandboxTest {
   @Test public void mapAsKeyTest() {
     error("declare variable $m := map { 'a': 'b' };" +
           "declare variable $q := map { $m: 'a' };" +
-          "$q", FIATOM_X);
+          "$q", FIATOM_X_X);
   }
 
   /** Tests the the new syntax for map literals. */

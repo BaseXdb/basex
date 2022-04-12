@@ -47,7 +47,7 @@ public final class ArrayTest extends SandboxTest {
     query("[ 1, 2, 3 ]?([ 1 ])", 1);
     query("[ 1, 2, 3 ]?([ 1, 2 ])", "1\n2");
 
-    error("[1]?(string(<_>1</_>))", INVTYPE_X_X_X);
+    error("[1]?(string(<_>1</_>))", INVCONVERT_X_X_X);
 
     error("[](0)", ARRAYEMPTY);
     error("[](1)", ARRAYEMPTY);
@@ -216,13 +216,13 @@ public final class ArrayTest extends SandboxTest {
     query("[] cast as xs:integer?", "");
     query("xs:integer([ 1 ])", 1);
 
-    error("[] cast as xs:integer", INVTYPE_X_X_X);
-    error("[ 1, 2 ] cast as xs:integer", INVTYPE_X_X_X);
+    error("[] cast as xs:integer", INVCONVERT_X_X_X);
+    error("[ 1, 2 ] cast as xs:integer", INVCONVERT_X_X_X);
   }
 
   /** Functions. */
   @Test public void functions() {
-    error("string([ 1 ])", FISTRING_X);
+    error("string([ 1 ])", FISTRING_X_X);
     query("number([ 1 ])", 1);
     query("concat('a', [ 'b' ], [])", "ab");
     query("count(([ 1 ], [ 2 ]))", 2);

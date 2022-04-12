@@ -228,7 +228,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" <a/>"), "<a/>");
     query(func.args(" (<a/>, <b/>)"), "<a/>\n<b/>");
     query(func.args(" reverse((<a/>, <b/>))"), "<b/>\n<a/>");
-    error(func.args(1), INVTYPE_X_X_X);
+    error(func.args(1), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -260,8 +260,8 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" ('a', 'a')", "?lang=de"), "a");
     query(func.args(" ('a', 'a', 'a')", "?lang=de"), "a");
 
-    error(func.args(" (1, true#0)"), FIATOM_X);
-    error(func.args(" (1 to 5) ! true#0"), FIATOM_X);
+    error(func.args(" (1, true#0)"), FIATOM_X_X);
+    error(func.args(" (1 to 5) ! true#0"), FIATOM_X_X);
 
     // optimizations
     String seq = "let $seq := (" + wrap(1) + ", 2, " + wrap(1) + ") return ";

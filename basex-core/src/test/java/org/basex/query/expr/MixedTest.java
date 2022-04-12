@@ -218,15 +218,15 @@ public final class MixedTest extends SandboxTest {
 
     query("attribute { ' a ' } {}", "a=\"\"");
 
-    error("element { '' } {}", INVNAME_X);
-    error("element { ' ' } {}", INVNAME_X);
-    error("element { 'a b' } {}", INVNAME_X);
-    error("element { 'a:b' } {}", INVPREF_X);
-    error("element { 'a: b' } {}", INVNAME_X);
-    error("element { 'Q{}' } {}", INVNAME_X);
-    error("element { 'Q{ }' } {}", INVNAME_X);
+    error("element { '' } {}", INVQNAME_X);
+    error("element { ' ' } {}", INVQNAME_X);
+    error("element { 'a b' } {}", INVQNAME_X);
+    error("element { 'a:b' } {}", NOQNNAMENS_X);
+    error("element { 'a: b' } {}", INVQNAME_X);
+    error("element { 'Q{}' } {}", INVQNAME_X);
+    error("element { 'Q{ }' } {}", INVQNAME_X);
 
-    error("element { 'Q{ http://www.w3.org/2000/xmlns/ }a' } {}", INVNAME_X);
+    error("element { 'Q{ http://www.w3.org/2000/xmlns/ }a' } {}", INVQNAME_X);
   }
 
   /** Faster instance of checks. */

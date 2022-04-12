@@ -211,17 +211,17 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw FIATOM_X.get(info, type);
+    throw FIATOM_X_X.get(info, type, this);
   }
 
   @Override
   public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw FIATOM_X.get(info, type);
+    throw FIATOM_X_X.get(info, type, this);
   }
 
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
-    throw FIATOM_X.get(ii, type);
+    throw FIATOM_X_X.get(ii, type, this);
   }
 
   @Override
@@ -232,7 +232,7 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public boolean deep(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    throw FICMP_X.get(info, type);
+    throw FICMP_X_X.get(info, type, this);
   }
 
   @Override
