@@ -32,7 +32,7 @@ public final class SAXWrapper extends SingleParser {
   private int lines;
 
   /** SAX handler reference. */
-  private SAXHandler sh;
+  private SAXHandler saxh;
   /** File length (real or estimated). */
   private long length;
 
@@ -57,11 +57,12 @@ public final class SAXWrapper extends SingleParser {
       final EntityResolver er = Resolver.entities(options);
       if(er != null) reader.setEntityResolver(er);
 
-      sh = new SAXHandler(builder, options.get(MainOptions.CHOP), options.get(MainOptions.STRIPNS));
-      reader.setDTDHandler(sh);
-      reader.setContentHandler(sh);
-      reader.setProperty("http://xml.org/sax/properties/lexical-handler", sh);
-      reader.setErrorHandler(sh);
+      saxh = new SAXHandler(builder, options.get(MainOptions.CHOP),
+          options.get(MainOptions.STRIPNS));
+      reader.setDTDHandler(saxh);
+      reader.setContentHandler(saxh);
+      reader.setProperty("http://xml.org/sax/properties/lexical-handler", saxh);
+      reader.setErrorHandler(saxh);
 
       reader.parse(is);
     } catch(final SAXParseException ex) {
@@ -130,6 +131,6 @@ public final class SAXWrapper extends SingleParser {
 
   @Override
   public double progressInfo() {
-    return length == 0 ? sh == null ? 0 : sh.nodes / 3000000.0d % 1 : (double) bytes / length;
+    return length == 0 ? saxh == null ? 0 : saxh.nodes / 3000000.0d % 1 : (double) bytes / length;
   }
 }
