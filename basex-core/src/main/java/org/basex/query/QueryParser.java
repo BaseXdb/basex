@@ -1749,8 +1749,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr unary() throws QueryException {
-    boolean minus = false;
-    boolean found = false;
+    boolean minus = false, found = false;
     do {
       skipWs();
       if(consume('-')) {

@@ -10,8 +10,6 @@ import org.basex.util.*;
  * This class allows main memory access to the database table representation.
  * All table entries are stored in arrays
  *
- * NOTE: this class is not thread-safe.
- *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
@@ -30,10 +28,12 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public void flush(final boolean all) { }
+  public void flush(final boolean all) {
+  }
 
   @Override
-  public void close() { }
+  public void close() {
+  }
 
   @Override
   public boolean lock(final boolean lock) {
@@ -100,8 +100,8 @@ public final class TableMemAccess extends TableAccess {
   protected void copy(final byte[] entries, final int first, final int last) {
     dirty();
     for(int o = 0, i = first; i < last; ++i, o += IO.NODESIZE) {
-      data1[i] = getLong(entries, o);
-      data2[i] = getLong(entries, o + 8);
+      data1[i] = toLong(entries, o);
+      data2[i] = toLong(entries, o + 8);
     }
   }
 
@@ -144,15 +144,15 @@ public final class TableMemAccess extends TableAccess {
   }
 
   /**
-   * Returns a long value from the specified array.
-   * @param entry array input
-   * @param index index
+   * Converts values from the specified array to a long value.
+   * @param data data
+   * @param offset offset (multiple of 8)
    * @return long value
    */
-  private static long getLong(final byte[] entry, final int index) {
-    return (entry[index] & 0xFFL) << 56 | (entry[index + 1] & 0xFFL) << 48 |
-       (entry[index + 2] & 0xFFL) << 40 | (entry[index + 3] & 0xFFL) << 32 |
-       (entry[index + 4] & 0xFFL) << 24 | (entry[index + 5] & 0xFFL) << 16 |
-       (entry[index + 6] & 0xFFL) <<  8 | entry[index + 7] & 0xFFL;
+  private static long toLong(final byte[] data, final int offset) {
+    return (data[offset] & 0xFFL) << 56 | (data[offset + 1] & 0xFFL) << 48
+        | (data[offset + 2] & 0xFFL) << 40 | (data[offset + 3] & 0xFFL) << 32
+        | (data[offset + 4] & 0xFFL) << 24 | (data[offset + 5] & 0xFFL) << 16
+        | (data[offset + 6] & 0xFFL) << 8 | data[offset + 7] & 0xFFL;
   }
 }

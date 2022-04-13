@@ -328,6 +328,8 @@ public final class BaseXLayout {
           GUIMenuCmd.C_GO_UP.execute(gui);
         } else if(GOHOME.is(e)) {
           GUIMenuCmd.C_GO_HOME.execute(gui);
+        } else if(FILTER.is(e)) {
+          GUIMenuCmd.C_FILTER_NODES.execute(gui);
         }
       }
 

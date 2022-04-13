@@ -142,7 +142,7 @@ public final class BaseXImages {
       }
       return icon;
     }
-    // default icon chooser
+    // default icon
     return type.isText() ? TEXT : UNKNOWN;
   }
 }

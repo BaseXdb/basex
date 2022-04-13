@@ -62,13 +62,12 @@ public class XsltTransform extends XsltFn {
     try {
       // redirect errors
       System.setErr(new PrintStream(err));
-      final URIResolver ur = CatalogWrapper.getURIResolver(qc.context.options);
-
-      // retrieve new or cached templates object
-      Templates templates = null;
       final StreamSource ss = xsl.streamSource();
       final String key = xopts.get(XsltOptions.CACHE) ? ss.getSystemId() : null;
-      if(key != null) templates = MAP.get(key);
+
+      // retrieve new or cached templates object
+      Templates templates = key != null ? MAP.get(key) : null;
+      final URIResolver ur = CatalogWrapper.getURIResolver(qc.context.options);
       if(templates == null) {
         // no templates object cached: create new instance
         final TransformerFactory tf = TransformerFactory.newInstance();
@@ -99,9 +98,14 @@ public class XsltTransform extends XsltFn {
       if(simple) throw XSLT_ERROR_X.get(info, ex);
       xr.addError(Str.get(Util.message(ex)));
     } catch(final TransformerException ex) {
-      // catch transformation errors, throw them again or add them to report
       Util.debug(ex);
-      final byte[] error = trim(utf8(err.toArray(), Prop.ENCODING));
+      // catch transformation errors, throw them again or add them to report
+      byte[] error = trim(utf8(err.toArray(), Prop.ENCODING));
+      if(error.length == 0) {
+        Throwable th = ex;
+        while(th.getCause() != null) th = th.getCause();
+        error = token(th.getLocalizedMessage());
+      }
       if(simple) throw XSLT_ERROR_X.get(info, error);
       xr.addError(Str.get(error));
       xr.addMessage();
@@ -126,8 +130,8 @@ public class XsltTransform extends XsltFn {
         final IO io = new IOContent(item.serialize(SerializerMode.NOINDENT.get()).finish());
         io.name(string(((ANode) item).baseURI()));
         return io;
-      } catch(final QueryIOException e) {
-        e.getCause(info);
+      } catch(final QueryIOException ex) {
+        throw ex.getCause(info);
       }
     }
     if(item.type.isStringOrUntyped()) return checkPath(toToken(item));
