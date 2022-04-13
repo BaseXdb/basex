@@ -104,7 +104,7 @@ public final class QueryProcessor extends Job implements Closeable {
    * This function is called by the GUI; use {@link #iter()} or {@link #value()} instead.
    * Caches and returns the result of the specified query. If all nodes are of the same database
    * instance, the returned value will be of type {@link DBNodes}.
-   * @param max maximum number of results to cache (negative: return all values)
+   * @param max maximum number of items to cache (negative: return full result)
    * @return result of query
    * @throws QueryException query exception
    */

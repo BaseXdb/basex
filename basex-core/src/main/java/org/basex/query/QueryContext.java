@@ -167,22 +167,22 @@ public final class QueryContext extends Job implements Closeable {
    * Parses the specified query.
    * @param query query string
    * @param uri base URI (may be {@code null})
-   * @return main module
+   * @return module
    * @throws QueryException query exception
    */
   public AModule parse(final String query, final String uri) throws QueryException {
-    return parse(query, QueryProcessor.isLibrary(query), uri);
+    return parse(query, uri, QueryProcessor.isLibrary(query));
   }
 
   /**
    * Parses the specified query.
    * @param query query string
-   * @param library library/main module
    * @param uri base URI (may be {@code null})
-   * @return main module
+   * @param library library/main module
+   * @return module
    * @throws QueryException query exception
    */
-  public AModule parse(final String query, final boolean library, final String uri)
+  public AModule parse(final String query, final String uri, final boolean library)
       throws QueryException {
     return library ? parseLibrary(query, uri) : parseMain(query, uri);
   }
@@ -194,7 +194,7 @@ public final class QueryContext extends Job implements Closeable {
    * @return main module
    * @throws QueryException query exception
    */
-  public MainModule parseMain(final String query, final String uri) throws QueryException {
+  MainModule parseMain(final String query, final String uri) throws QueryException {
     return parseMain(query, uri, null);
   }
 
@@ -221,10 +221,10 @@ public final class QueryContext extends Job implements Closeable {
    * Parses the specified module.
    * @param query query string
    * @param uri base URI (may be {@code null})
-   * @return name of module
+   * @return library module
    * @throws QueryException query exception
    */
-  public LibraryModule parseLibrary(final String query, final String uri) throws QueryException {
+  LibraryModule parseLibrary(final String query, final String uri) throws QueryException {
     info.query = query;
     try {
       return new QueryParser(query, uri, this, null).parseLibrary(true);
@@ -236,11 +236,11 @@ public final class QueryContext extends Job implements Closeable {
 
   /**
    * Sets the main module (root expression).
-   * @param rt main module
+   * @param main main module
    */
-  public void mainModule(final MainModule rt) {
-    root = rt;
-    updating = rt.expr.has(Flag.UPD);
+  public void mainModule(final MainModule main) {
+    root = main;
+    updating = main.expr.has(Flag.UPD);
   }
 
   /**
@@ -593,10 +593,11 @@ public final class QueryContext extends Job implements Closeable {
   // CLASS METHODS ================================================================================
 
   /**
+   * This function is called by the GUI.
    * Caches and returns the result of the specified query. If all nodes are of the same database
    * instance, the returned value will be of type {@link DBNodes}.
-   * @param max maximum number of results to cache (negative: return all values)
-   * @return resulting value
+   * @param max maximum number of items to cache (negative: return full result)
+   * @return result of query
    * @throws QueryException query exception
    */
   Value cache(final int max) throws QueryException {

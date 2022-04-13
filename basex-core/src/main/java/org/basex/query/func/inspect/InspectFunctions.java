@@ -1,8 +1,5 @@
 package org.basex.query.func.inspect;
 
-import static org.basex.query.QueryError.*;
-
-import java.io.*;
 import java.util.*;
 
 import org.basex.io.*;
@@ -33,19 +30,17 @@ public final class InspectFunctions extends StandardFunc {
 
     // URI specified: compile module and return all newly added functions
     checkCreate(qc);
-    final IO io = checkPath(0, qc);
+
+    final IOContent io = toContent(toToken(exprs[0], qc), qc);
     Value funcs = qc.resources.functions(io.path());
     if(funcs != null) return funcs;
 
     // cache existing functions
     final HashSet<StaticFunc> old = new HashSet<>();
     Collections.addAll(old, qc.funcs.funcs());
-    try {
-      qc.parse(Token.string(io.read()), io.path());
-      qc.funcs.compileAll(new CompileContext(qc));
-    } catch(final IOException ex) {
-      throw IOERR_X.get(info, ex);
-    }
+    qc.parse(Token.string(io.read()), io.path());
+    qc.funcs.compileAll(new CompileContext(qc));
+
     // collect new functions
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final StaticFunc sf : qc.funcs.funcs()) {

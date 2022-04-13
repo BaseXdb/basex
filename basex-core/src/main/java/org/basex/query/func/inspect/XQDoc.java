@@ -1,5 +1,6 @@
 package org.basex.query.func.inspect;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryText.DOLLAR;
 import static org.basex.util.Token.*;
@@ -44,8 +45,17 @@ final class XQDoc extends Inspect {
   }
 
   @Override
-  public FElem parse(final IO io) throws QueryException {
-    final QueryParser qp = parseQuery(io);
+  public FElem parse(final IOContent io) throws QueryException {
+    final QueryParser qp;
+    final AModule module;
+    try(QueryContext qctx = new QueryContext(qc.context)) {
+      final String input = io.toString();
+      qp = new QueryParser(input, io.path(), qctx, null);
+      module = QueryProcessor.isLibrary(input) ? qp.parseLibrary(true) : qp.parseMain();
+    } catch(final QueryException ex) {
+      throw IOERR_X.get(info, ex);
+    }
+
     final FElem xqdoc = new FElem(PREFIX, PREFIX, URI).declareNS();
     final FElem control = elem("control", xqdoc);
     elem("date", control).add(qc.dateTime().datm.string(info));

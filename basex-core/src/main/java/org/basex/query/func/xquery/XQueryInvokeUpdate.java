@@ -12,6 +12,6 @@ import org.basex.query.value.*;
 public final class XQueryInvokeUpdate extends XQueryEval {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return eval(toQuery(toToken(exprs[0], qc), qc), true, qc);
+    return eval(toContent(toToken(exprs[0], qc), qc), true, qc);
   }
 }

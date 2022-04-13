@@ -132,22 +132,21 @@ final class ProjectFiles {
    * Parses a single file.
    * @param path file path
    * @param ctx database context
-   * @param errs files with errors
+   * @param errors files with errors
    * @return parsed modules or {@code null}
    */
   static TokenMap parse(final String path, final Context ctx,
-      final TreeMap<String, InputInfo> errs) {
+      final TreeMap<String, InputInfo> errors) {
 
     try(TextInput ti = new TextInput(new IOFile(path))) {
+      final String input = ti.cache().toString();
       // parse query
       try(QueryContext qc = new QueryContext(ctx)) {
-        final String input = ti.cache().toString();
-        final boolean library = QueryProcessor.isLibrary(input);
-        qc.parse(input, library, path);
-        errs.remove(path);
+        qc.parse(input, path, QueryProcessor.isLibrary(input));
+        errors.remove(path);
         return qc.modParsed;
       } catch(final QueryException ex) {
-        errs.put(path, ex.info());
+        errors.put(path, ex.info());
       }
     } catch(final IOException ex) {
       // file may not be accessible

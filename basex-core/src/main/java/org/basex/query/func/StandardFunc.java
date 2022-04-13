@@ -344,31 +344,33 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final IO checkPath(final byte[] uri) throws QueryException {
-    final QueryInput qi = new QueryInput(string(uri), sc);
-    if(qi.io.exists()) return qi.io;
-    throw WHICHRES_X.get(info, normalize(uri, info));
+    final IO io = new QueryInput(string(uri), sc).io;
+    if(!io.exists()) throw WHICHRES_X.get(info, normalize(uri, info));
+    if(io.isDir()) throw RESDIR_X.get(info, normalize(uri, info));
+    return io;
   }
 
   /**
-   * Evaluates the specified URI.
-   * @param i index of input argument
+   * Returns the content of the specified input.
+   * @param i index of input argument (xs:anyURI with URI or xs:string with content)
    * @param qc query context
-   * @return query contents and URL
+   * @return content with optional base URI
    * @throws QueryException query exception
    */
-  protected final IOContent toQuery(final int i, final QueryContext qc) throws QueryException {
+  protected final IOContent toContent(final int i, final QueryContext qc) throws QueryException {
     final Item item = toItem(exprs[i], qc);
-    return item instanceof Uri ? toQuery(item.string(info), qc) : new IOContent(toToken(item));
+    return item instanceof Uri ? toContent(item.string(info), qc) : new IOContent(toToken(item));
   }
 
   /**
-   * Evaluates the specified URI.
-   * @param uri uri
+   * Returns the content of the specified input.
+   * @param uri URI
    * @param qc query context
-   * @return query contents and URL
+   * @return content with attached base URI
    * @throws QueryException query exception
    */
-  protected final IOContent toQuery(final byte[] uri, final QueryContext qc) throws QueryException {
+  protected final IOContent toContent(final byte[] uri, final QueryContext qc)
+      throws QueryException {
     checkAdmin(qc);
     final IO io = checkPath(uri);
     try {

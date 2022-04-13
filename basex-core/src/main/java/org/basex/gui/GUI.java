@@ -401,7 +401,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     final ArrayOutput output = new ArrayOutput();
     output.setLimit(gopts.get(GUIOptions.MAXTEXT));
     // sets the maximum number of hits
-    cmd.maxResults(gopts.get(GUIOptions.MAXRESULTS));
+    if(cmd instanceof AQuery) ((AQuery) cmd).maxResults(gopts.get(GUIOptions.MAXRESULTS));
 
     final Performance perf = new Performance();
     boolean ok = true;
