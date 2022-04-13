@@ -1,6 +1,5 @@
 package org.basex.query.func.inspect;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -10,7 +9,6 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
-import org.basex.query.scope.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -40,9 +38,6 @@ public abstract class Inspect {
   /** Input info. */
   final InputInfo info;
 
-  /** Parsed main module. */
-  AModule module;
-
   /**
    * Constructor.
    * @param qc query context
@@ -59,25 +54,7 @@ public abstract class Inspect {
    * @return inspection element
    * @throws QueryException query exception
    */
-  public abstract FElem parse(IO io) throws QueryException;
-
-  /**
-   * Parses a module.
-   * @param io input reference
-   * @return query parser
-   * @throws QueryException query exception
-   */
-  final QueryParser parseQuery(final IO io) throws QueryException {
-    try(QueryContext qctx = new QueryContext(qc.context)) {
-      final String input = string(io.read());
-      // parse query
-      final QueryParser qp = new QueryParser(input, io.path(), qctx, null);
-      module = QueryProcessor.isLibrary(input) ? qp.parseLibrary(true) : qp.parseMain();
-      return qp;
-    } catch(final IOException | QueryException ex) {
-      throw IOERR_X.get(info, ex);
-    }
-  }
+  public abstract FElem parse(IOContent io) throws QueryException;
 
   /**
    * Creates a comment sub element.

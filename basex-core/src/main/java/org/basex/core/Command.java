@@ -46,10 +46,8 @@ public abstract class Command extends Job {
 
   /** Exception, resulting from command execution. */
   protected Exception exception;
-  /** Maximum number of results (ignored if negative). */
-  protected int maxResults = -1;
 
-  /** Container for query information. */
+  /** Info on command execution. */
   private final TokenBuilder info = new TokenBuilder();
   /** Permission required to execute this command. */
   private final Perm perm;
@@ -195,14 +193,6 @@ public abstract class Command extends Job {
   @SuppressWarnings("unused")
   public boolean newData(final Context ctx) {
     return false;
-  }
-
-  /**
-   * Enforces a maximum number of query results. This method is only required by the GUI.
-   * @param max maximum number of results (ignored if negative)
-   */
-  public final void maxResults(final int max) {
-    maxResults = max;
   }
 
   /**

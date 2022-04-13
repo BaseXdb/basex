@@ -37,6 +37,8 @@ public abstract class AQuery extends Command {
   private Value result;
   /** Query plan was serialized. */
   private boolean plan;
+  /** Maximum number of results (ignored if negative). */
+  private int maxResults = -1;
 
   /**
    * Protected constructor.
@@ -134,6 +136,14 @@ public abstract class AQuery extends Command {
     }
     queryPlan();
     return extError(error);
+  }
+
+  /**
+   * Enforces a maximum number of query results. This method is only required by the GUI.
+   * @param max maximum number of results (ignored if negative)
+   */
+  public final void maxResults(final int max) {
+    maxResults = max;
   }
 
   /**

@@ -772,16 +772,16 @@ public class QueryParser extends InputParser {
     imports.put(tUri);
 
     // read module
-    final String qu;
+    final String query;
     try {
-      qu = string(io.read());
+      query = string(io.read());
     } catch(final IOException ex) {
       Util.debug(ex);
       throw error(WHICHMODFILE_X, io);
     }
 
     qc.modStack.push(tPath);
-    final QueryParser qp = new QueryParser(qu, io.path(), qc, null);
+    final QueryParser qp = new QueryParser(query, io.path(), qc, null);
 
     // check if import and declaration uri match
     final LibraryModule lib = qp.parseLibrary(false);

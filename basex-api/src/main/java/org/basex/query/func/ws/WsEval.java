@@ -20,7 +20,7 @@ import org.basex.util.*;
 public final class WsEval extends WsFn {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final IOContent query = toQuery(0, qc);
+    final IOContent query = toContent(0, qc);
     final HashMap<String, Value> bindings = toBindings(1, qc);
     final WsOptions wo = toOptions(2, new WsOptions(), qc);
 

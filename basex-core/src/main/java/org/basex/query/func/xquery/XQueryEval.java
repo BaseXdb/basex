@@ -41,7 +41,7 @@ public class XQueryEval extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return eval(toQuery(0, qc), false, qc);
+    return eval(toContent(0, qc), false, qc);
   }
 
   /**

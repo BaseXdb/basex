@@ -1,5 +1,6 @@
 package org.basex.query.func.inspect;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import org.basex.io.*;
@@ -44,8 +45,16 @@ final class PlainDoc extends Inspect {
   }
 
   @Override
-  public FElem parse(final IO io) throws QueryException {
-    parseQuery(io);
+  public FElem parse(final IOContent io) throws QueryException {
+    final AModule module;
+    try(QueryContext qctx = new QueryContext(qc.context)) {
+      final String input = io.toString();
+      final QueryParser qp = new QueryParser(input, io.path(), qctx, null);
+      module = QueryProcessor.isLibrary(input) ? qp.parseLibrary(true) : qp.parseMain();
+    } catch(final QueryException ex) {
+      throw IOERR_X.get(info, ex);
+    }
+
     final FElem root = elem("module", null);
     if(module instanceof LibraryModule) {
       final QNm name = module.sc.module;

@@ -765,7 +765,7 @@ public final class EditorView extends View {
         // parse query
         try(QueryContext qc = new QueryContext(gui.context)) {
           parseQC = qc;
-          qc.parse(input, library, file.path());
+          qc.parse(input, file.path(), library);
           if(id == statusID) info(null);
         } catch(final QueryException ex) {
           if(id == statusID) info(ex);

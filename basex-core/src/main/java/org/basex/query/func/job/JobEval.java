@@ -23,7 +23,7 @@ import org.basex.util.*;
 public class JobEval extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return eval(toQuery(0, qc), qc);
+    return eval(toContent(0, qc), qc);
   }
 
   /**
