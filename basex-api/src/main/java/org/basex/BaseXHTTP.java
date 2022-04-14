@@ -185,8 +185,8 @@ public final class BaseXHTTP extends CLI {
    * @throws IOException I/O exception
    */
   private static IOFile locate(final String file, final String root) throws IOException {
-    final IOFile trg = new IOFile(root, file);
-    final boolean create = !trg.exists();
+    final IOFile target = new IOFile(root, file);
+    final boolean create = !target.exists();
 
     // try to locate file from development branch
     final IO io = new IOFile("src/main/webapp", file);
@@ -211,16 +211,16 @@ public final class BaseXHTTP extends CLI {
         data = new IOStream(is).read();
       }
     } else {
-      return trg;
+      return target;
     }
 
     if(create) {
       // create configuration file
-      Util.errln("Creating " +  trg);
-      trg.parent().md();
-      trg.write(data);
+      Util.errln("Creating " +  target);
+      target.parent().md();
+      target.write(data);
     }
-    return trg;
+    return target;
   }
 
   @Override

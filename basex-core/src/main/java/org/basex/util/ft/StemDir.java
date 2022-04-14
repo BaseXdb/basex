@@ -42,7 +42,7 @@ public final class StemDir extends TokenMap {
    * @return resulting token
    */
   byte[] stem(final byte[] word) {
-    final byte[] sn = get(word);
-    return sn != null ? sn : word;
+    final byte[] token = get(word);
+    return token != null ? token : word;
   }
 }

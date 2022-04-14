@@ -664,7 +664,7 @@ final class XMLScanner extends Job {
    * @throws IOException I/O exception
    */
   private byte[] externalID(final boolean full, final boolean root) throws IOException {
-    byte[] cont = null;
+    byte[] content = null;
     final boolean pub = consume(PUBLIC);
     if(pub || consume(SYSTEM)) {
       checkS();
@@ -684,14 +684,14 @@ final class XMLScanner extends Job {
         final XMLInput tin = input;
         if(dtd) {
           try {
-            cont = input.io().merge(name).read();
+            content = input.io().merge(name).read();
           } catch(final IOException ex) {
             throw error(Util.message(ex));
           }
         } else {
-          cont = new byte[0];
+          content = new byte[0];
         }
-        input = new XMLInput(new IOContent(cont, name));
+        input = new XMLInput(new IOContent(content, name));
 
         if(consume(XDECL)) {
           check(XML); s();
@@ -703,7 +703,7 @@ final class XMLScanner extends Job {
           if(ch != '?') throw error(WRONGCHAR, '?', ch);
           ch = nextChar();
           if(ch != '>') throw error(WRONGCHAR, '>', ch);
-          cont = Arrays.copyOfRange(cont, input.pos(), cont.length);
+          content = Arrays.copyOfRange(content, input.pos(), content.length);
         }
 
         s();
@@ -717,7 +717,7 @@ final class XMLScanner extends Job {
         prev(1);
       }
     }
-    return cont;
+    return content;
   }
 
   /**

@@ -43,7 +43,7 @@ public final class PkgParser {
     final ANode node;
     try {
       // checks root node
-      node = childElements(new DBNode(new IOContent(io.read()))).next();
+      node = childElements(new DBNode(io)).next();
       if(!eqNS(E_PACKAGE, node.qname()))
         throw REPO_DESCRIPTOR_X.get(info, Util.info(WHICHELEM, node.qname()));
     } catch(final IOException ex) {
@@ -51,9 +51,9 @@ public final class PkgParser {
     }
 
     final QueryFunction<byte[], String> attribute = name -> {
-      final byte[] v = node.attribute(name);
-      if(v == null) throw REPO_DESCRIPTOR_X.get(info, Util.info(MISSATTR, name, E_PACKAGE));
-      return string(v);
+      final byte[] value = node.attribute(name);
+      if(value == null) throw REPO_DESCRIPTOR_X.get(info, Util.info(MISSATTR, name, E_PACKAGE));
+      return string(value);
     };
     final Pkg pkg = new Pkg(attribute.apply(A_NAME));
     pkg.abbrev = attribute.apply(A_ABBREV);
@@ -71,8 +71,8 @@ public final class PkgParser {
    * @throws QueryException query exception
    */
   private void parseChildren(final ANode node, final Pkg pkg) throws QueryException {
-    final BasicNodeIter ch = childElements(node);
-    for(ANode next; (next = ch.next()) != null;) {
+    final BasicNodeIter iter = childElements(node);
+    for(ANode next; (next = iter.next()) != null;) {
       final QNm name = next.qname();
       if(eqNS(E_DEPENDENCY, name)) pkg.dep.add(parseDependency(next));
       else if(eqNS(E_XQUERY, name)) pkg.comps.add(parseComp(next));
@@ -85,10 +85,11 @@ public final class PkgParser {
    * @return dependency container
    */
   private static PkgDep parseDependency(final ANode node) {
-    final Function<byte[], String> attribute = att -> {
-      final byte[] v = node.attribute(att);
-      return v == null ? null : string(v);
+    final Function<byte[], String> attribute = name -> {
+      final byte[] value = node.attribute(name);
+      return value == null ? null : string(value);
     };
+
     final PkgDep dep = new PkgDep(attribute.apply(A_PACKAGE));
     dep.processor = attribute.apply(A_PROCESSOR);
     dep.versions = attribute.apply(A_VERSIONS);
@@ -128,12 +129,13 @@ public final class PkgParser {
    */
   private static BasicNodeIter childElements(final ANode node) {
     return new BasicNodeIter() {
-      final BasicNodeIter ch = node.childIter();
+      final BasicNodeIter iter = node.childIter();
+
       @Override
       public ANode next() {
         while(true) {
-          final ANode n = ch.next();
-          if(n == null || n.type == NodeType.ELEMENT) return n;
+          final ANode nd = iter.next();
+          if(nd == null || nd.type == NodeType.ELEMENT) return nd;
         }
       }
     };

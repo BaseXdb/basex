@@ -139,10 +139,10 @@ public final class ProjectView extends BaseXPanel {
    * @param file file to be opened
    * @param rename file has been renamed
    * @param xquery file is XQuery module
-   * @param library XQuery module is a library
+   * @param enforce enforce parsing of XQuery files
    */
   public void save(final IOFile file, final boolean rename, final boolean xquery,
-      final boolean library) {
+      final boolean enforce) {
 
     SwingUtilities.invokeLater(() -> {
       final IOFile io = file.normalize();
@@ -150,7 +150,7 @@ public final class ProjectView extends BaseXPanel {
         if(xquery) ProjectFiles.parse(file.path(), gui.context, files.errors());
         refreshTree(io);
       }
-      refresh(rename, library);
+      refresh(rename, enforce);
     });
   }
 

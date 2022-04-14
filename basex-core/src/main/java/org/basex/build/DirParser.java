@@ -186,7 +186,7 @@ public final class DirParser extends Parser {
       if(skipCorrupt) {
         // parse file twice to ensure that it is well-formed
         try {
-          // cache file contents to allow or speed up a second run
+          // cache file contents to facilitate or speed up a second run
           if(!(source instanceof IOContent || dtd)) {
             in = new IOContent(source.read());
             in.name(name);

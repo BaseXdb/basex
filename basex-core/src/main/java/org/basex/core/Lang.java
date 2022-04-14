@@ -115,14 +115,13 @@ public final class Lang {
           final JarEntry entry = je.nextElement();
           final String name = entry.getName();
           if(!name.startsWith(pre) || !name.endsWith(SUFFIX)) continue;
-          final byte[] cont = new IOStream(jar.getInputStream(entry)).read();
           langs.add(name.replaceAll(".*/|." + SUFFIX, ""));
-          creds.add(credits(cont));
+          creds.add(credits(new IOStream(jar.getInputStream(entry)).read()));
         }
       } else {
-        for(final IO f : ((IOFile) IO.get(url.toString())).children()) {
-          langs.add(f.name().replace('.' + SUFFIX, ""));
-          creds.add(credits(f.read()));
+        for(final IO file : ((IOFile) IO.get(url.toString())).children()) {
+          langs.add(file.name().replace('.' + SUFFIX, ""));
+          creds.add(credits(file.read()));
         }
       }
     } catch(final IOException ex) {
@@ -133,11 +132,11 @@ public final class Lang {
 
   /**
    * Returns the credits from the specified file.
-   * @param cont content
+   * @param content file content
    * @return credits
    */
-  private static synchronized String credits(final byte[] cont) {
-    final StringTokenizer st = new StringTokenizer(Token.string(cont), "\n");
+  private static synchronized String credits(final byte[] content) {
+    final StringTokenizer st = new StringTokenizer(Token.string(content), "\n");
     st.nextToken();
     return st.nextToken().replace("# ", "");
   }

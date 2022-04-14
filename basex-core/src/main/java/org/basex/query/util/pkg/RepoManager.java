@@ -59,18 +59,18 @@ public final class RepoManager {
   public boolean install(final String path) throws QueryException {
     // check if package exists, and cache contents
     final IO io = IO.get(path);
-    final byte[] cont;
+    final byte[] content;
     try {
-      cont = io.read();
+      content = io.read();
     } catch(final IOException ex) {
       Util.debug(ex);
       throw REPO_NOTFOUND_X.get(info, path);
     }
 
     try {
-      if(io.hasSuffix(IO.XQSUFFIXES)) return installXQ(cont, path);
-      if(io.hasSuffix(IO.JARSUFFIX)) return installJAR(cont, path);
-      return installXAR(cont);
+      if(io.hasSuffix(IO.XQSUFFIXES)) return installXQ(content, path);
+      if(io.hasSuffix(IO.JARSUFFIX)) return installJAR(content, path);
+      return installXAR(content);
     } catch(final IOException ex) {
       throw REPO_PARSE_X_X.get(info, io.name(), ex);
     }

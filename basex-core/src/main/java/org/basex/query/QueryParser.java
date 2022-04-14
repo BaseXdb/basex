@@ -137,7 +137,7 @@ public class QueryParser extends InputParser {
    * Parses the "MainModule" rule.
    * Parses the "Setter" rule.
    * Parses the "QueryBody (= Expr)" rule.
-   * @return resulting root expression
+   * @return module
    * @throws QueryException query exception
    */
   public final MainModule parseMain() throws QueryException {
@@ -172,11 +172,11 @@ public class QueryParser extends InputParser {
   /**
    * Parses a library module.
    * Parses the "ModuleDecl" rule.
-   * @param check check functions and variables
-   * @return name of the module
+   * @param root indicates if this library is or is not imported by another module
+   * @return module
    * @throws QueryException query exception
    */
-  public final LibraryModule parseLibrary(final boolean check) throws QueryException {
+  public final LibraryModule parseLibrary(final boolean root) throws QueryException {
     init();
     try {
       versionDecl();
@@ -204,7 +204,7 @@ public class QueryParser extends InputParser {
       importModules();
       prolog2();
       finish(null);
-      if(check) check(null);
+      if(root) check(null);
 
       qc.modStack.pop();
       return new LibraryModule(doc, funcs, vars, imports, sc);
