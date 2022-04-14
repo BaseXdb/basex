@@ -27,6 +27,8 @@ public final class Jobs {
 
   /** Query jobs. */
   private final ArrayList<QueryJobSpec> list = new ArrayList<>();
+  /** Database context. */
+  private final Context context;
   /** File. */
   private final IOFile file;
 
@@ -36,35 +38,38 @@ public final class Jobs {
    * @throws IOException I/O exception
    */
   public Jobs(final Context context) throws IOException {
-    file = context.soptions.dbPath(string(JOBS) + IO.XMLSUFFIX);
+    this.context = context;
 
-    // parse jobs file
-    final IOContent content;
     synchronized(FILE) {
+      file = context.soptions.dbPath(string(JOBS) + IO.XMLSUFFIX);
       if(!file.exists()) return;
-      content = new IOContent(file.read(), file.path());
-    }
 
-    final MainOptions options = new MainOptions(false);
-    options.set(MainOptions.INTPARSE, true);
-    final ANode doc = new DBNode(Parser.singleParser(content, options, ""));
-    final ANode root = children(doc, JOBS).next();
-    if(root == null) {
-      Util.errln(file + ": No '%' root element.", JOBS);
-    } else {
-      for(final ANode child : children(root)) {
-        final byte[] qname = child.qname().id();
-        if(eq(qname, JOB)) {
-          final JobsOptions opts = options(child);
-          if(opts != null) {
-            add(new QueryJobSpec(opts, new HashMap<>(), new IOContent(child.string())));
+      final MainOptions options = new MainOptions(false);
+      options.set(MainOptions.INTPARSE, true);
+      final ANode doc = new DBNode(Parser.singleParser(file, options, ""));
+      final ANode root = children(doc, JOBS).next();
+      if(root == null) {
+        Util.errln(file + ": No '%' root element.", JOBS);
+      } else {
+        for(final ANode child : children(root)) {
+          final byte[] qname = child.qname().id();
+          if(eq(qname, JOB)) {
+            final JobsOptions opts = options(child);
+            if(opts != null) {
+              add(new QueryJobSpec(opts, new HashMap<>(), new IOContent(child.string())));
+            }
+          } else {
+            Util.errln(file + ": invalid element: %.", qname);
           }
-        } else {
-          Util.errln(file + ": invalid element: %.", qname);
         }
       }
     }
+  }
 
+  /**
+   * Schedules all registered jobs.
+   */
+  public void init() {
     // start all jobs
     boolean error = false;
     for(int l = 0; l < list.size(); l++) {
@@ -135,17 +140,15 @@ public final class Jobs {
    * @throws IOException I/O exception
    */
   public void write() throws IOException {
-    final FElem xml = toXML();
     synchronized(FILE) {
       // only create jobs file if jobs are registered
       if(list.isEmpty() && file.exists()) {
         file.delete();
         return;
       }
-
       // write jobs file
       file.parent().md();
-      file.write(xml.serialize().finish());
+      file.write(toXML().serialize().finish());
     }
   }
 

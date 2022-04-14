@@ -64,7 +64,7 @@ public final class BaseXServer extends CLI implements Runnable {
     this(new Context(), args);
 
     // start persistent jobs
-    new Jobs(context);
+    new Jobs(context).init();
   }
 
   /**
