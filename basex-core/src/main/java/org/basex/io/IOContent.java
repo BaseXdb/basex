@@ -18,7 +18,7 @@ public final class IOContent extends IO {
 
   /**
    * Constructor.
-   * @param content contents
+   * @param content content
    */
   public IOContent(final byte[] content) {
     this(content, "");
@@ -26,7 +26,7 @@ public final class IOContent extends IO {
 
   /**
    * Constructor.
-   * @param content contents
+   * @param content content
    */
   public IOContent(final String content) {
     this(Token.token(content));

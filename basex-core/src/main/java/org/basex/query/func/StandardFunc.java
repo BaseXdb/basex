@@ -354,7 +354,7 @@ public abstract class StandardFunc extends Arr {
    * Returns the content of the specified input.
    * @param i index of input argument (xs:anyURI with URI or xs:string with content)
    * @param qc query context
-   * @return content with optional base URI
+   * @return input content (UTF-8) with optional base URI
    * @throws QueryException query exception
    */
   protected final IOContent toContent(final int i, final QueryContext qc) throws QueryException {
@@ -366,7 +366,7 @@ public abstract class StandardFunc extends Arr {
    * Returns the content of the specified input.
    * @param uri URI
    * @param qc query context
-   * @return content with attached base URI
+   * @return input content (UTF-8) with attached base URI
    * @throws QueryException query exception
    */
   protected final IOContent toContent(final byte[] uri, final QueryContext qc)
@@ -382,7 +382,7 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Evaluates the specified URI.
-   * @param path custom path
+   * @param path custom path (can be {@code null})
    * @param options options with base-uri property
    * @return base URI
    */
