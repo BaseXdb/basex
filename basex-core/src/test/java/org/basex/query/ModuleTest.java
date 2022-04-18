@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.util.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,10 +26,10 @@ public final class ModuleTest extends SandboxTest {
    */
   @Test public void module() {
     try(QueryContext qc = new QueryContext(context)) {
-      qc.parseLibrary("module namespace m='foo'; declare function m:foo() { m:bar() }; ", "");
+      qc.parse("module namespace m='foo'; declare function m:foo() { m:bar() }; ", "");
       fail("Unknown function 'm:bar()' was not detected.");
-    } catch(final QueryException e) {
-      assertSame(QueryError.WHICHFUNC_X, e.error());
+    } catch(final QueryException ex) {
+      assertSame(QueryError.WHICHFUNC_X, ex.error());
     }
   }
 
@@ -39,9 +38,9 @@ public final class ModuleTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test public void module2() throws Exception {
-    final IOFile a = new IOFile("src/test/resources/recmod/a.xqm");
+    final IOFile file = new IOFile("src/test/resources/recmod/a.xqm");
     try(QueryContext qc = new QueryContext(context)) {
-      qc.parseLibrary(Token.string(a.read()), a.path());
+      qc.parse(file.string(), file.path());
     }
   }
 
@@ -56,7 +55,7 @@ public final class ModuleTest extends SandboxTest {
     write(new IOFile(repo, "a.xqm"), "module namespace a='a'; declare function a:a(){()};");
 
     try(QueryContext qc = new QueryContext(context)) {
-      qc.parseMain("import module namespace a='a'; a:a()", null);
+      qc.parse("import module namespace a='a'; a:a()", null);
     }
   }
 
@@ -84,7 +83,7 @@ public final class ModuleTest extends SandboxTest {
         + "import module namespace a='a'; declare function b:b(){a:a()};");
 
     try(QueryContext qc = new QueryContext(context)) {
-      qc.parseMain("import module namespace a='a'; ()", null);
+      qc.parse("import module namespace a='a'; ()", null);
     }
   }
 

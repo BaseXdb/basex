@@ -3,7 +3,6 @@ package org.basex.query.scope;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.var.*;
-import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -14,44 +13,36 @@ import org.basex.util.hash.*;
  */
 public abstract class AModule extends StaticScope {
   /** User-defined functions. */
-  private final TokenObjMap<StaticFunc> funcs;
+  public TokenObjMap<StaticFunc> funcs;
   /** Static variables. */
-  private final TokenObjMap<StaticVar> vars;
-  /** Namespace URIs of imported modules (currently not used). */
-  protected final TokenSet imports;
+  public TokenObjMap<StaticVar> vars;
+  /** URIs of modules. */
+  public TokenSet modules;
+  /** Namespaces. */
+  public TokenMap namespaces;
 
   /**
    * Constructor.
    * @param sc static context
-   * @param vs variable scope (can be {@code null})
-   * @param doc documentation (can be {@code null})
-   * @param info input info (can be {@code null})
-   * @param funcs user-defined functions (can be {@code null})
-   * @param vars static variables (can be {@code null})
-   * @param imports namespace URIs of imported modules (can be {@code null})
    */
-  AModule(final StaticContext sc, final VarScope vs, final String doc, final InputInfo info,
-      final TokenObjMap<StaticFunc> funcs, final TokenObjMap<StaticVar> vars,
-      final TokenSet imports) {
-    super(sc, vs, doc, info);
-    this.funcs = funcs;
-    this.vars = vars;
-    this.imports = imports;
+  AModule(final StaticContext sc) {
+    super(sc);
   }
 
   /**
-   * Return static variables.
-   * @return static variables
+   * Assigns module properties.
+   * @param f user-defined functions
+   * @param v static variables
+   * @param m URIs of modules
+   * @param n namespaces
+   * @param d documentation string
    */
-  public final TokenObjMap<StaticVar> vars() {
-    return vars;
-  }
-
-  /**
-   * Return static functions.
-   * @return static functions
-   */
-  public final TokenObjMap<StaticFunc> funcs() {
-    return funcs;
+  public void set(final TokenObjMap<StaticFunc> f, final TokenObjMap<StaticVar> v,
+      final TokenSet m, final TokenMap n, final String d) {
+    funcs = f;
+    vars = v;
+    modules = m;
+    namespaces = n;
+    doc(d);
   }
 }

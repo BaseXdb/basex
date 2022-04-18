@@ -10,7 +10,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Thrown to indicate an exception during the parsing or evaluation of a query.
@@ -33,8 +32,6 @@ public class QueryException extends Exception {
   private Value value = Empty.VALUE;
   /** Error reference ({@code null} for dynamic error messages). */
   private QueryError error;
-  /** Code suggestions. */
-  private StringList suggest;
   /** Error line and column. */
   private InputInfo info;
   /** Marked error column. */
@@ -126,21 +123,11 @@ public class QueryException extends Exception {
   }
 
   /**
-   * Returns suggestions for code suggestions.
-   * @return suggestions
-   */
-  public final StringList suggest() {
-    return suggest == null ? new StringList() : suggest;
-  }
-
-  /**
    * Sets code suggestions.
    * @param qp query parser
-   * @param sug code suggestions
    * @return self reference
    */
-  public final QueryException suggest(final InputParser qp, final StringList sug) {
-    suggest = sug;
+  public final QueryException suggest(final InputParser qp) {
     pos(qp);
     return this;
   }

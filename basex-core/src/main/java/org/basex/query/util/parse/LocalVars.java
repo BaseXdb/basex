@@ -93,7 +93,8 @@ public final class LocalVars {
     // accept variable reference...
     // - if a variable uses the module or an imported URI, or
     // - if it is specified in the main module
-    if(parser.sc.module == null || eq(parser.sc.module.uri(), uri) || parser.modules.contains(uri))
+    final QNm module = parser.sc.module;
+    if(module == null || eq(module.uri(), uri) || parser.moduleURIs.contains(uri))
       return parser.qc.vars.newRef(name, parser.sc, ii);
 
     throw parser.error(VARUNDEF_X, ii, '$' + string(name.string()));

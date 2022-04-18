@@ -1,19 +1,19 @@
 package org.basex.query.func.unit;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.func.unit.Constants.*;
+import static org.basex.query.QueryError.normalize;
 import static org.basex.query.ann.Annotation.*;
+import static org.basex.query.func.unit.Constants.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
 
-import org.basex.core.Context;
+import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.scope.*;
@@ -80,7 +80,7 @@ final class Unit {
     final Performance perf = new Performance();
 
     try(QueryContext qc = new QueryContext(ctx)) {
-      input = string(file.read());
+      input = file.string();
       qc.parse(input, file.path());
 
       // loop through all functions
@@ -288,12 +288,11 @@ final class Unit {
   private void eval(final StaticFunc func) throws QueryException {
     current = func;
 
-    try(QueryContext qctx = job.pushJob(new QueryContext(ctx))) {
-      qctx.parse(input, file.path());
-      qctx.mainModule(MainModule.get(find(qctx, func), new Expr[0]));
+    try(QueryContext qc = job.pushJob(new QueryContext(ctx))) {
+      qc.parse(input, file.path());
+      qc.mainModule(MainModule.get(find(qc, func)));
       // ignore results
-      final Iter iter = qctx.iter();
-      while(qctx.next(iter) != null);
+      for(final Iter iter = qc.iter(); qc.next(iter) != null;);
     } finally {
       job.popJob();
     }

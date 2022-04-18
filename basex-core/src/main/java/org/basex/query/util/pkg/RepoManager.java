@@ -207,7 +207,7 @@ public final class RepoManager {
 
     // parse module to find namespace uri
     try(QueryContext qc = new QueryContext(context)) {
-      final byte[] uri = qc.parse(string(content), path, true).sc.module.uri();
+      final byte[] uri = qc.parseLibrary(string(content), path).sc.module.uri();
       // copy file to rewritten URI file path
       return write(JavaCall.uri2path(string(uri)) + IO.XQMSUFFIX, content);
     }

@@ -48,10 +48,9 @@ public final class Users {
   private void read() {
     if(!file.exists()) return;
     try {
-      final IOContent content = new IOContent(file.read(), file.path());
       final MainOptions options = new MainOptions(false);
       options.set(MainOptions.INTPARSE, true);
-      final ANode doc = new DBNode(Parser.singleParser(content, options, ""));
+      final ANode doc = new DBNode(Parser.singleParser(file, options, ""));
       final ANode root = children(doc, USERS).next();
       if(root == null) {
         Util.errln(file + ": No '%' root element.", USERS);

@@ -9,6 +9,7 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.Timer;
+import java.util.concurrent.atomic.*;
 import java.util.regex.*;
 
 import javax.swing.*;
@@ -82,11 +83,10 @@ public final class EditorView extends View {
   /** Main-memory document. */
   private DBNode doc;
 
-  /** Evaluation counter. */
-  private int statusID;
-
+  /** Parse counter. */
+  private AtomicInteger parseID = new AtomicInteger();
   /** Parse query context. */
-  private volatile QueryContext parseQC;
+  private final AtomicBoolean parsing = new AtomicBoolean();
   /** Input info. */
   private InputInfo inputInfo;
 
@@ -578,7 +578,7 @@ public final class EditorView extends View {
       String input = string(text);
       if(action == Action.EXECUTE || gui.gopts.get(GUIOptions.EXECRT)) {
         // find main module if current file cannot be evaluated; return early if no module is found
-        if(!xquery || QueryProcessor.isLibrary(input)) {
+        if(!xquery || QueryParser.isLibrary(input)) {
           final EditorArea ea = execEditor();
           if(ea == null) return;
           file = ea.file();
@@ -591,7 +591,7 @@ public final class EditorView extends View {
         execFile = file;
       } else {
         // parse: replace empty query with empty sequence (suppresses errors for plain text files)
-        parse(input.isEmpty() ? "()" : input, file, QueryProcessor.isLibrary(input));
+        parse(input.isEmpty() ? "()" : input, file);
       }
     } else if(file.hasSuffix(IO.JSONSUFFIX)) {
       try {
@@ -751,26 +751,25 @@ public final class EditorView extends View {
    * Parses the current query after a little delay.
    * @param input query input
    * @param file file
-   * @param library library flag
    */
-  private void parse(final String input, final IO file, final boolean library) {
-    final int id = ++statusID;
+  private void parse(final String input, final IO file) {
+    final int id = parseID.incrementAndGet();
     new Timer(true).schedule(new TimerTask() {
       @Override
       public void run() {
         // let current parser finish; check if thread is obsolete
-        while(parseQC != null) Performance.sleep(1);
-        if(id != statusID) return;
+        while(parsing.get()) Performance.sleep(1);
+        if(id != parseID.get()) return;
 
         // parse query
+        parsing.set(true);
         try(QueryContext qc = new QueryContext(gui.context)) {
-          parseQC = qc;
-          qc.parse(input, file.path(), library);
-          if(id == statusID) info(null);
+          qc.parse(input, file.path());
+          if(id == parseID.get()) info(null);
         } catch(final QueryException ex) {
-          if(id == statusID) info(ex);
+          if(id == parseID.get()) info(ex);
         } finally {
-          parseQC = null;
+          parsing.set(false);
         }
       }
     }, SEARCH_DELAY);
@@ -786,7 +785,7 @@ public final class EditorView extends View {
     // do not refresh view when query is running
     if(!refresh && stop.isEnabled()) return;
 
-    ++statusID;
+    parseID.incrementAndGet();
     final EditorArea editor = getEditor();
     String path = "";
     if(editor != null) {

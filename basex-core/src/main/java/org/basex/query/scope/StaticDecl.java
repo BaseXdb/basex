@@ -34,10 +34,13 @@ public abstract class StaticDecl extends StaticScope {
    */
   protected StaticDecl(final AnnList anns, final QNm name, final SeqType declType,
       final VarScope vs, final String doc, final InputInfo info) {
-    super(vs.sc, vs, doc, info);
+    super(vs.sc);
     this.anns = anns;
     this.name = name;
     this.declType = declType;
+    this.vs = vs;
+    this.info = info;
+    doc(doc);
   }
 
   /**

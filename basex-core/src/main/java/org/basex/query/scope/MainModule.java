@@ -12,8 +12,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
-import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * An XQuery main module.
@@ -23,21 +21,7 @@ import org.basex.util.hash.*;
  */
 public final class MainModule extends AModule {
   /** Declared type, {@code null} if not specified. */
-  private final SeqType declType;
-
-  /**
-   * Creates a new main module for a context item declared in the prolog.
-   * @param vs variable scope
-   * @param expr root expression
-   * @param declType declared type (can be {@code null})
-   * @param doc documentation (can be {@code null})
-   * @param ii input info (can be {@code null})
-   * @return main module
-   */
-  public static MainModule get(final VarScope vs, final Expr expr, final SeqType declType,
-      final String doc, final InputInfo ii) {
-    return new MainModule(vs, expr, declType, doc, ii, null, null, null);
-  }
+  public SeqType declType;
 
   /**
    * Creates a new main module for the specified function.
@@ -46,29 +30,20 @@ public final class MainModule extends AModule {
    * @return main module
    * @throws QueryException query exception
    */
-  public static MainModule get(final StaticFunc sf, final Expr[] args) throws QueryException {
+  public static MainModule get(final StaticFunc sf, final Expr... args) throws QueryException {
     final StaticFuncCall expr = new StaticFuncCall(sf.name, args, sf.sc, sf.info).init(sf);
-    return new MainModule(new VarScope(sf.sc), expr, null, null, null, null, null, null);
+    return new MainModule(expr, new VarScope(sf.sc));
   }
 
   /**
    * Constructor.
-   * @param vs variable scope
    * @param expr root expression
-   * @param declType optional type (can be {@code null})
-   * @param doc documentation (can be {@code null})
-   * @param info input info (can be {@code null})
-   * @param funcs user-defined functions (can be {@code null})
-   * @param vars static variables (can be {@code null})
-   * @param imports namespace URIs of imported modules (can be {@code null})
+   * @param vs variable scope
    */
-  public MainModule(final VarScope vs, final Expr expr, final SeqType declType, final String doc,
-      final InputInfo info, final TokenObjMap<StaticFunc> funcs,
-      final TokenObjMap<StaticVar> vars, final TokenSet imports) {
-
-    super(vs.sc, vs, doc, info, funcs, vars, imports);
+  public MainModule(final Expr expr, final VarScope vs) {
+    super(vs.sc);
+    this.vs = vs;
     this.expr = expr;
-    this.declType = declType;
   }
 
   @Override

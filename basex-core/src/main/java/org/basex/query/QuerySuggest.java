@@ -11,8 +11,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This class analyzes the current path and gives suggestions for code
- * completions.
+ * This class analyzes the current path and gives suggestions for code completions.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
@@ -20,13 +19,14 @@ import org.basex.util.list.*;
 public final class QuerySuggest extends QueryParser {
   /** Data reference. */
   private final Data data;
-  /** All current path nodes. */
+
+  /** Stack of current path nodes. */
   private Stack<ArrayList<PathNode>> stack;
   /** All current path nodes. */
   private ArrayList<PathNode> all;
   /** Current path nodes. */
-  private ArrayList<PathNode> curr;
-  /** Hide flag. */
+  private ArrayList<PathNode> current;
+  /** Show or hide completions. */
   private boolean show;
   /** Last element name. */
   private byte[] name;
@@ -37,7 +37,7 @@ public final class QuerySuggest extends QueryParser {
    * @param qc query context
    * @param data data reference
    */
-  public QuerySuggest(final String query, final QueryContext qc, final Data data) {
+  QuerySuggest(final String query, final QueryContext qc, final Data data) {
     super(query, null, qc, null);
     this.data = data;
     checkInit();
@@ -45,33 +45,35 @@ public final class QuerySuggest extends QueryParser {
 
   /**
    * Sorts and returns the query suggestions.
-   * @return completions
+   * @param index of valid input
+   * @return list of suggestions, followed by valid input string
    */
-  public StringList complete() {
-    final StringList sl = new StringList();
+  public StringList complete(final int index) {
+    final StringList list = new StringList();
     if(show) {
-      for(final PathNode pn : curr) {
-        final String nm = string(pn.token(data));
-        if(!nm.isEmpty() && !sl.contains(nm)) sl.add(nm);
+      for(final PathNode node : current) {
+        final String nm = string(node.token(data));
+        if(!nm.isEmpty()) list.addUnique(nm);
       }
-      sl.sort();
+      list.sort();
     }
-    return sl;
+    return list.add(input.substring(0, index));
   }
 
   @Override
   void checkInit() {
-    if(stack != null && !stack.empty()) return;
-    all = data.paths.root();
-    curr = all;
-    stack = new Stack<>();
+    if(stack == null || stack.empty()) {
+      stack = new Stack<>();
+      all = data.paths.root();
+      current = all;
+    }
   }
 
   @Override
   void checkAxis(final Axis axis) {
     all = axis != Axis.CHILD && axis != Axis.DESCENDANT ?
-      new ArrayList<>() : PathIndex.desc(curr, axis == Axis.DESCENDANT);
-    curr = all;
+      new ArrayList<>() : PathIndex.desc(current, axis == Axis.DESCENDANT);
+    current = all;
     show = true;
   }
 
@@ -102,7 +104,7 @@ public final class QuerySuggest extends QueryParser {
       }
     }
     show = name.length == 0 || s;
-    curr = tmp;
+    current = tmp;
   }
 
   @Override
@@ -110,17 +112,17 @@ public final class QuerySuggest extends QueryParser {
     if(stack == null) return;
     if(open) {
       checkTest(true);
-      stack.add(new ArrayList<>(curr));
+      stack.add(new ArrayList<>(current));
       checkAxis(Axis.CHILD);
     } else {
-      curr = stack.pop();
+      current = stack.pop();
       show = false;
-      all = curr;
+      all = current;
     }
   }
 
   @Override
-  public QueryException error(final QueryError err, final InputInfo ii, final Object... arg) {
-    return err.get(ii, arg).suggest(this, complete());
+  public QueryException error(final QueryError error, final InputInfo ii, final Object... arg) {
+    return super.error(error, ii, arg).suggest(this);
   }
 }

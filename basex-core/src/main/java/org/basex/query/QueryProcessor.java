@@ -1,7 +1,6 @@
 package org.basex.query;
 
 import java.io.*;
-import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
@@ -21,10 +20,6 @@ import org.basex.query.value.seq.*;
  * @author Christian Gruen
  */
 public final class QueryProcessor extends Job implements Closeable {
-  /** Pattern for detecting library modules. */
-  private static final Pattern LIBMOD_PATTERN = Pattern.compile(
-  "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])? ?; ?)?module namespace.*");
-
   /** Static context. */
   public final StaticContext sc;
   /** Expression context. */
@@ -270,50 +265,6 @@ public final class QueryProcessor extends Job implements Closeable {
    */
   public String info() {
     return qc.info();
-  }
-
-  /**
-   * Checks if the specified XQuery string is a library module.
-   * @param query query string
-   * @return result of check
-   */
-  public static boolean isLibrary(final String query) {
-    return LIBMOD_PATTERN.matcher(removeComments(query, 80)).matches();
-  }
-
-  /**
-   * Removes comments from the specified string and returns the first characters
-   * of a query.
-   * @param qu query string
-   * @param max maximum length of string to return
-   * @return result
-   */
-  public static String removeComments(final String qu, final int max) {
-    final StringBuilder sb = new StringBuilder();
-    int m = 0;
-    boolean s = false;
-    final int cl = qu.length();
-    for(int c = 0; c < cl && sb.length() < max; ++c) {
-      final char ch = qu.charAt(c);
-      if(ch == 0x0d) continue;
-      if(ch == '(' && c + 1 < cl && qu.charAt(c + 1) == ':') {
-        if(m == 0 && !s) {
-          sb.append(' ');
-          s = true;
-        }
-        ++m;
-        ++c;
-      } else if(m != 0 && ch == ':' && c + 1 < cl && qu.charAt(c + 1) == ')') {
-        --m;
-        ++c;
-      } else if(m == 0) {
-        if(ch > ' ') sb.append(ch);
-        else if(!s) sb.append(' ');
-        s = ch <= ' ';
-      }
-    }
-    if(sb.length() >= max) sb.append(Text.DOTS);
-    return sb.toString().trim();
   }
 
   /**

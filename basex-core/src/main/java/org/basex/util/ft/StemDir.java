@@ -1,7 +1,5 @@
 package org.basex.util.ft;
 
-import static org.basex.util.Token.*;
-
 import java.io.*;
 
 import org.basex.io.*;
@@ -22,12 +20,10 @@ public final class StemDir extends TokenMap {
    */
   public boolean read(final IO fl) {
     try {
-      for(final byte[] sl : split(fl.read(), '\n')) {
-        byte[] val = null;
-        for(final byte[] st : distinctTokens(sl)) {
-          if(val == null) val = st;
-          else put(st, val);
-        }
+      for(final String line : fl.string().split("\\n")) {
+        final String[] terms = line.split("\\s+");
+        final int tl = terms.length;
+        for(int t = 1; t < tl; t++) put(terms[t], terms[0]);
       }
       return true;
     } catch(final IOException ex) {

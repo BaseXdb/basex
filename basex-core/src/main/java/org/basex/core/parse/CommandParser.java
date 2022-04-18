@@ -6,6 +6,7 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This is a parser for command strings, creating {@link Command} instances.
@@ -22,6 +23,8 @@ public abstract class CommandParser {
 
   /** Password reader. */
   PasswordReader pwReader;
+  /** Possible completions. */
+  Enum<?>[] completions;
   /** Base URI. */
   String uri = "";
   /** Parse single command. */
@@ -71,12 +74,23 @@ public abstract class CommandParser {
   }
 
   /**
-   * XQuery suggestions.
-   * @return self reference
+   * Command suggestions.
+   * @return list of suggestions, followed by valid input string
    */
-  public final CommandParser suggest() {
+  public final StringList suggest() {
     suggest = true;
-    return this;
+    final StringList list = new StringList();
+    String valid = "";
+    try {
+      parse();
+    } catch(final QueryException ex) {
+      if(completions != null) {
+        for(final Enum<?> cmp : completions) list.add(cmp.name().toLowerCase(Locale.ENGLISH));
+      }
+      final int marked = ex.markedColumn() + 1;
+      if(marked <= input.length()) valid = input.substring(0, marked);
+    }
+    return list.add(valid);
   }
 
   /**

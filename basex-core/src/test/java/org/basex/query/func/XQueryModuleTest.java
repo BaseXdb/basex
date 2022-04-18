@@ -174,14 +174,10 @@ public final class XQueryModuleTest extends QueryPlanTest {
     query("contains(try {" + func.args("1 +",
         " map { 'base-uri': 'XXXX', 'pass': 'true' }") + "} catch * { $err:module }, 'XXXX')",
         true);
-  }
 
-  /** Test method. */
-  @Test public void parseUri() {
-    final Function func = _XQUERY_PARSE_URI;
     // queries
-    query(func.args("src/test/resources/input.xq") + "/name()", "MainModule");
-    query(func.args("src/test/resources/input.xq") + "/@updating/string()", false);
-    error(func.args("src/test/resources/xxx.xq"), WHICHRES_X);
+    query(func.args(" xs:anyURI('src/test/resources/input.xq')") + "/name()", "MainModule");
+    query(func.args(" xs:anyURI('src/test/resources/input.xq')") + "/@updating/string()", false);
+    error(func.args(" xs:anyURI('src/test/resources/xxx.xq')"), WHICHRES_X);
   }
 }

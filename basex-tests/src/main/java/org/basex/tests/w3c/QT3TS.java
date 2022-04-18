@@ -369,7 +369,7 @@ public final class QT3TS extends Main {
     final String exp = test(returned, expected);
     final TokenBuilder tmp = new TokenBuilder();
     tmp.add(name).add(NL);
-    tmp.add(QueryProcessor.removeComments(string, maxout)).add(NL);
+    tmp.add(QueryParser.removeComments(string, maxout)).add(NL);
 
     boolean err = returned.value == null;
     String res;
