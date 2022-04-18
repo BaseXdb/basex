@@ -31,7 +31,7 @@ public final class GUIInput extends BaseXCombo {
   private GUIInputPopup popup;
 
   /** String for temporary input. */
-  private String pre = "";
+  private String prefix = "";
 
   /**
    * Default constructor.
@@ -71,13 +71,13 @@ public final class GUIInput extends BaseXCombo {
           if(popup.isVisible()) {
             if(++bi == count) bi = 0;
           } else {
-            showCompletions();
+            popupMenu();
           }
         } else if(PREVLINE.is(e)) {
           if(popup.isVisible()) {
             if(--bi < 0) bi = count - 1;
           } else {
-            showCompletions();
+            popupMenu();
           }
         }
         if(bi != completions.getSelectedIndex()) completions.setSelectedIndex(bi);
@@ -87,8 +87,7 @@ public final class GUIInput extends BaseXCombo {
       public void keyReleased(final KeyEvent e) {
         if(!NEXTLINE.is(e) && !PREVLINE.is(e)) {
           if(modifier(e) || control(e)) return;
-          showCompletions();
-          // skip commands
+          popupMenu();
           if(gui.gopts.get(GUIOptions.EXECRT) && !cmdMode()) main.execute();
         }
       }
@@ -116,12 +115,21 @@ public final class GUIInput extends BaseXCombo {
   }
 
   /**
-   * Checks if the query is a command.
+   * Checks if the input is a command.
    * @return result of check
    */
   private boolean cmdMode() {
-    return gui.gopts.get(GUIOptions.SEARCHMODE) == 2 ||
-      gui.context.data() == null || Strings.startsWith(getText(), '!');
+    final int mode = gui.gopts.get(GUIOptions.SEARCHMODE);
+    return mode == 2 || gui.context.data() == null;
+  }
+
+  /**
+   * Checks if the input is a query.
+   * @return result of check
+   */
+  private boolean queryMode() {
+    final int mode = gui.gopts.get(GUIOptions.SEARCHMODE);
+    return mode == 1 || mode == 0 && Strings.startsWith(getText(), '/');
   }
 
   /**
@@ -130,70 +138,37 @@ public final class GUIInput extends BaseXCombo {
   private void completeInput() {
     final String suffix = completions.getSelectedItem();
     if(suffix.isEmpty()) return;
-    final int pl = pre.length();
-    final int ll = pl > 0 ? pre.charAt(pl - 1) : ' ';
-    if(Character.isLetter(ll) && Character.isLetter(suffix.charAt(0))) pre += " ";
-    setText(pre + suffix);
-    showCompletions();
+    final int pl = prefix.length(), ll = pl > 0 ? prefix.charAt(pl - 1) : ' ';
+    if(Character.isLetter(ll) && Character.isLetter(suffix.charAt(0))) prefix += " ";
+    setText(prefix + suffix);
+    popupMenu();
     if(gui.gopts.get(GUIOptions.EXECRT) && !cmdMode()) gui.execute();
   }
 
   /**
-   * Shows the command popup menu.
+   * Shows or hides a popup menu with input completions.
    */
-  private void showCompletions() {
+  private void popupMenu() {
     final String query = getText();
-    final int mode = gui.gopts.get(GUIOptions.SEARCHMODE);
-    if(cmdMode()) {
-      cmdPopup(query);
-    } else if(mode == 1 || mode == 0 && Strings.startsWith(query, '/')) {
-      queryPopup(query);
+
+    StringList list = null;
+    if(textField().getCaretPosition() == query.length()) {
+      final Data data = gui.context.data();
+      if(queryMode() && data != null) {
+        try(QueryContext qc = new QueryContext(gui.context)) {
+          list = qc.suggest(query, data);
+        }
+      } else if(cmdMode()) {
+        list = CommandParser.get(query, gui.context).suggest();
+      }
+    }
+
+    if(list != null) {
+      prefix = list.pop();
+      createCombo(list);
     } else {
       popup.setVisible(false);
     }
-  }
-
-  /**
-   * Shows the command popup menu.
-   * @param query query input
-   */
-  private void cmdPopup(final String query) {
-    StringList sl = null;
-    final boolean excl = Strings.startsWith(query, '!');
-    try {
-      pre = excl ? "!" : "";
-      final String suf = getText().substring(pre.length());
-      CommandParser.get(suf, gui.context).suggest().parse();
-    } catch(final QueryException ex) {
-      sl = ex.suggest();
-      final int marked = ex.markedColumn() + (excl ? 2 : 1);
-      if(ex.markedColumn() > -1 && marked <= query.length()) {
-        pre = query.substring(0, marked);
-      }
-    }
-    createCombo(sl);
-  }
-
-  /**
-   * Shows the xpath popup menu.
-   * @param query query input
-   */
-  private void queryPopup(final String query) {
-    final Data data = gui.context.data();
-    if(data == null) return;
-
-    StringList sl;
-    try(QueryContext qc = new QueryContext(gui.context)) {
-      final QuerySuggest qs = new QuerySuggest(query, qc, data);
-      qs.parseMain();
-      sl = qs.complete();
-      pre = query.substring(0, qs.mark);
-    } catch(final QueryException ex) {
-      sl = ex.suggest();
-      pre = query.substring(0, ex.column() - 1);
-    }
-    if(textField().getCaretPosition() < pre.length()) sl = null;
-    createCombo(sl);
   }
 
   /**
@@ -211,20 +186,20 @@ public final class GUIInput extends BaseXCombo {
       popup = new GUIInputPopup(completions);
     }
 
-    final int w = getFontMetrics(getFont()).stringWidth(pre);
+    final int w = getFontMetrics(getFont()).stringWidth(prefix);
     popup.show(this, Math.min(getWidth(), w), getHeight());
   }
 
   /**
    * Tests if the combo box entries have changed.
-   * @param sl strings to be compared
+   * @param list strings to be compared
    * @return result of check
    */
-  private boolean completionsChanged(final StringList sl) {
-    if(sl.size() != completions.getItemCount()) return true;
-    final int is = sl.size();
-    for(int i = 0; i < is; ++i) {
-      if(!sl.get(i).equals(completions.getItemAt(i))) return true;
+  private boolean completionsChanged(final StringList list) {
+    final int ls = list.size();
+    if(ls != completions.getItemCount()) return true;
+    for(int l = 0; l < ls; ++l) {
+      if(!list.get(l).equals(completions.getItemAt(l))) return true;
     }
     return false;
   }

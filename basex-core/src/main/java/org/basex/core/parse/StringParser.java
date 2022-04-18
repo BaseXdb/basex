@@ -14,7 +14,6 @@ import org.basex.core.parse.Commands.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 import org.basex.util.similarity.*;
 
 /**
@@ -457,26 +456,13 @@ final class StringParser extends CommandParser {
 
   /**
    * Returns a query exception instance.
-   * @param complete input completions
+   * @param complete input completions (can be {@code null})
    * @param msg message
    * @param ext extension
    * @return query exception
    */
   private QueryException error(final Enum<?>[] complete, final String msg, final Object... ext) {
-    return new QueryException(parser.info(), QNm.EMPTY, msg, ext).suggest(parser, list(complete));
-  }
-
-  /**
-   * Converts the specified commands into a string list.
-   * @param complete input completions
-   * @return string list
-   */
-  private static StringList list(final Enum<?>[] complete) {
-    final StringList list = new StringList();
-    if(complete != null) {
-      for(final Enum<?> c : complete) list.add(c.name().toLowerCase(Locale.ENGLISH));
-    }
-    return list;
+    completions = complete;
+    return new QueryException(parser.info(), QNm.EMPTY, msg, ext).suggest(parser);
   }
 }
-

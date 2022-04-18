@@ -171,20 +171,23 @@ public final class QueryContext extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public AModule parse(final String query, final String uri) throws QueryException {
-    return parse(query, uri, QueryProcessor.isLibrary(query));
+    return QueryParser.isLibrary(query) ? parseLibrary(query, uri) : parseMain(query, uri);
   }
 
   /**
-   * Parses the specified query.
+   * Collects suggestions for completing a path expression.
    * @param query query string
-   * @param uri base URI (may be {@code null})
-   * @param library library/main module
-   * @return module
-   * @throws QueryException query exception
+   * @param data data reference
+   * @return list of suggestions, followed by valid input string
    */
-  public AModule parse(final String query, final String uri, final boolean library)
-      throws QueryException {
-    return library ? parseLibrary(query, uri) : parseMain(query, uri);
+  public StringList suggest(final String query, final Data data) {
+    final QuerySuggest qs = new QuerySuggest(query, this, data);
+    try {
+      qs.parseMain();
+      return qs.complete(qs.mark);
+    } catch(final QueryException ex) {
+      return qs.complete(ex.column() - 1);
+    }
   }
 
   /**
@@ -194,7 +197,7 @@ public final class QueryContext extends Job implements Closeable {
    * @return main module
    * @throws QueryException query exception
    */
-  MainModule parseMain(final String query, final String uri) throws QueryException {
+  public MainModule parseMain(final String query, final String uri) throws QueryException {
     return parseMain(query, uri, null);
   }
 
@@ -224,7 +227,7 @@ public final class QueryContext extends Job implements Closeable {
    * @return library module
    * @throws QueryException query exception
    */
-  LibraryModule parseLibrary(final String query, final String uri) throws QueryException {
+  public LibraryModule parseLibrary(final String query, final String uri) throws QueryException {
     info.query = query;
     try {
       return new QueryParser(query, uri, this, null).parseLibrary(true);
@@ -386,7 +389,7 @@ public final class QueryContext extends Job implements Closeable {
    */
   public void context(final Value value, final StaticContext sc) {
     if(!ctxAssigned) {
-      ctxValue = MainModule.get(new VarScope(sc), value, null, null, null);
+      ctxValue = new MainModule(value, new VarScope(sc));
       ctxAssigned = true;
     }
   }

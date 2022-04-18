@@ -363,7 +363,7 @@ public abstract class W3CTS extends Main {
         log.append(NL);
 
         // Remove comments.
-        log.append(norm(in)).append(NL);
+        log.append(removeComments(in)).append(NL);
         final String logStr = log.toString();
         // skip queries with variable results
         final boolean print = currTime || !logStr.contains("current-");
@@ -384,7 +384,7 @@ public abstract class W3CTS extends Main {
           if(print) {
             logOK.append(logStr);
             logOK.append("[Right] ");
-            logOK.append(norm(er));
+            logOK.append(removeComments(er));
             logOK.append(NL);
             logOK.append(NL);
             addLog(pth, outname + ".log", er);
@@ -417,10 +417,10 @@ public abstract class W3CTS extends Main {
               if(expOut.isEmpty()) result.add(error(pth + outname, expError));
               logErr.append(logStr);
               logErr.append('[').append(testid).append(" ] ");
-              logErr.append(norm(string(result.get(0))));
+              logErr.append(removeComments(string(result.get(0))));
               logErr.append(NL);
               logErr.append("[Wrong] ");
-              logErr.append(norm(ao.toString()));
+              logErr.append(removeComments(ao.toString()));
               logErr.append(NL);
               logErr.append(NL);
               addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"), ao.toString());
@@ -431,7 +431,7 @@ public abstract class W3CTS extends Main {
             if(print) {
               logOK.append(logStr);
               logOK.append("[Right] ");
-              logOK.append(norm(ao.toString()));
+              logOK.append(removeComments(ao.toString()));
               logOK.append(NL);
               logOK.append(NL);
               addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"), ao.toString());
@@ -442,10 +442,10 @@ public abstract class W3CTS extends Main {
           if(print) {
             logOK2.append(logStr);
             logOK2.append('[').append(testid).append(" ] ");
-            logOK2.append(norm(expError));
+            logOK2.append(removeComments(expError));
             logOK2.append(NL);
             logOK2.append("[Rght?] ");
-            logOK2.append(norm(er));
+            logOK2.append(removeComments(er));
             logOK2.append(NL);
             logOK2.append(NL);
             addLog(pth, outname + ".log", er);
@@ -455,10 +455,10 @@ public abstract class W3CTS extends Main {
           if(print) {
             logErr2.append(logStr);
             logErr2.append('[').append(testid).append(" ] ");
-            logErr2.append(norm(string(result.get(0))));
+            logErr2.append(removeComments(string(result.get(0))));
             logErr2.append(NL);
             logErr2.append("[Wrong] ");
-            logErr2.append(norm(er));
+            logErr2.append(removeComments(er));
             logErr2.append(NL);
             logErr2.append(NL);
             addLog(pth, outname + ".log", er);
@@ -516,8 +516,8 @@ public abstract class W3CTS extends Main {
    * @param in input string
    * @return result
    */
-  private String norm(final String in) {
-    return QueryProcessor.removeComments(in, maxout);
+  private String removeComments(final String in) {
+    return QueryParser.removeComments(in, maxout);
   }
 
   /**

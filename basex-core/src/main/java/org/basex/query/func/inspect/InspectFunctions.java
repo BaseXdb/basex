@@ -8,7 +8,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -31,14 +30,14 @@ public final class InspectFunctions extends StandardFunc {
     // URI specified: compile module and return all newly added functions
     checkCreate(qc);
 
-    final IOContent io = toContent(toToken(exprs[0], qc), qc);
-    Value funcs = qc.resources.functions(io.path());
+    final IOContent content = toContent(toToken(exprs[0], qc), qc);
+    Value funcs = qc.resources.functions(content.path());
     if(funcs != null) return funcs;
 
     // cache existing functions
     final HashSet<StaticFunc> old = new HashSet<>();
     Collections.addAll(old, qc.funcs.funcs());
-    qc.parse(Token.string(io.read()), io.path());
+    qc.parse(content.toString(), content.path());
     qc.funcs.compileAll(new CompileContext(qc));
 
     // collect new functions
@@ -47,7 +46,7 @@ public final class InspectFunctions extends StandardFunc {
       if(!old.contains(sf)) vb.add(Functions.getUser(sf, qc, sf.sc, info));
     }
     funcs = vb.value(this);
-    qc.resources.addFunctions(io.path(), funcs);
+    qc.resources.addFunctions(content.path(), funcs);
     return funcs;
   }
 

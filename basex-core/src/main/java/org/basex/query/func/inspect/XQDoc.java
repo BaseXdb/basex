@@ -1,6 +1,5 @@
 package org.basex.query.func.inspect;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryText.DOLLAR;
 import static org.basex.util.Token.*;
@@ -45,17 +44,8 @@ final class XQDoc extends Inspect {
   }
 
   @Override
-  public FElem parse(final IOContent io) throws QueryException {
-    final QueryParser qp;
-    final AModule module;
-    try(QueryContext qctx = new QueryContext(qc.context)) {
-      final String input = io.toString();
-      qp = new QueryParser(input, io.path(), qctx, null);
-      module = QueryProcessor.isLibrary(input) ? qp.parseLibrary(true) : qp.parseMain();
-    } catch(final QueryException ex) {
-      throw IOERR_X.get(info, ex);
-    }
-
+  public FElem parse(final IOContent content) throws QueryException {
+    final AModule module = parseModule(content);
     final FElem xqdoc = new FElem(PREFIX, PREFIX, URI).declareNS();
     final FElem control = elem("control", xqdoc);
     elem("date", control).add(qc.dateTime().datm.string(info));
@@ -66,25 +56,25 @@ final class XQDoc extends Inspect {
     if(module instanceof LibraryModule) {
       final QNm name = module.sc.module;
       elem("uri", mod).add(name.uri());
-      elem("name", mod).add(io.name());
+      elem("name", mod).add(content.name());
     } else {
-      elem("uri", mod).add(io.name());
+      elem("uri", mod).add(content.name());
     }
     comment(module, mod);
 
     // imports
     final FElem imports = elem("imports", xqdoc);
-    for(final byte[] imp : qp.modules) {
-      elem("uri", elem("import", imports).add("type", "library")).add(imp);
+    for(final byte[] uri : module.modules) {
+      elem("uri", elem("import", imports).add("type", "library")).add(uri);
     }
 
     // namespaces
     final FElem namespaces = elem("namespaces", xqdoc);
-    for(final byte[] pref : qp.namespaces) nsCache.put(pref, qp.namespaces.get(pref));
+    for(final byte[] pref : module.namespaces) nsCache.put(pref, module.namespaces.get(pref));
 
     // variables
     final FElem variables = elem("variables", xqdoc);
-    for(final StaticVar sv : module.vars().values()) {
+    for(final StaticVar sv : module.vars.values()) {
       final FElem variable = elem("variable", variables);
       elem("name", variable).add(sv.name.string());
       if(sv.name.hasPrefix()) nsCache.put(sv.name.prefix(), sv.name.uri());
@@ -95,7 +85,7 @@ final class XQDoc extends Inspect {
 
     // functions
     final FElem functions = elem("functions", xqdoc);
-    for(final StaticFunc sf : module.funcs().values()) {
+    for(final StaticFunc sf : module.funcs.values()) {
       final int al = sf.arity();
       final QNm name = sf.funcName();
       final FuncType tp = sf.funcType();

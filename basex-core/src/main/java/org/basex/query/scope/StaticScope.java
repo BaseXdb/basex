@@ -20,30 +20,34 @@ import org.basex.util.list.*;
 public abstract class StaticScope extends ExprInfo implements Scope {
   /** Static context. */
   public final StaticContext sc;
-  /** Variable scope. */
-  public final VarScope vs;
-  /** Input info. */
-  public final InputInfo info;
 
   /** Root expression of this declaration ({@code null} if this is an external function). */
   public Expr expr;
+  /** Input info. */
+  public InputInfo info;
+
+  /** Variable scope. */
+  protected VarScope vs;
+  /** Documentation string. */
+  private byte[] doc = Token.EMPTY;
+
   /** Compilation flag. */
   protected boolean compiled;
-  /** Documentation. */
-  private final byte[] doc;
 
   /**
    * Constructor.
    * @param sc static context
-   * @param vs variable scope (can be {@code null})
-   * @param doc xqdoc documentation (can be {@code null} or empty)
-   * @param info input info (can be {@code null})
    */
-  StaticScope(final StaticContext sc, final VarScope vs, final String doc, final InputInfo info) {
+  StaticScope(final StaticContext sc) {
     this.sc = sc;
-    this.vs = vs;
-    this.doc = doc != null && !doc.isEmpty() ? Token.token(doc) : null;
-    this.info = info;
+  }
+
+  /**
+   * Assigns a documentation string.
+   * @param string documentation string
+   */
+  public void doc(final String string) {
+    doc = Token.token(string.trim());
   }
 
   @Override
@@ -59,7 +63,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
    * @return documentation or {@code null}
    */
   public final TokenObjMap<TokenList> doc() {
-    if(doc == null) return null;
+    if(doc.length == 0) return null;
 
     final TokenObjMap<TokenList> map = new TokenObjMap<>();
     final TokenBuilder key = new TokenBuilder(), value = new TokenBuilder();

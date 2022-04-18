@@ -26,14 +26,14 @@ public final class QueryJobSpec {
    * Constructor.
    * @param options options
    * @param bindings variable bindings
-   * @param query query container
+   * @param content query content
    */
   public QueryJobSpec(final JobsOptions options, final HashMap<String, Value> bindings,
-      final IOContent query) {
+      final IOContent content) {
     this.options = options;
     this.bindings = bindings;
-    this.query = Token.string(query.read());
-    simple = query.url().isEmpty();
+    this.query = content.toString();
+    simple = content.url().isEmpty();
   }
 
   @Override

@@ -1,5 +1,6 @@
 package org.basex.query.func.inspect;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -9,6 +10,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
+import org.basex.query.scope.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -50,11 +52,25 @@ public abstract class Inspect {
 
   /**
    * Parses a module and returns an inspection element.
-   * @param io input reference
+   * @param content module content
    * @return inspection element
    * @throws QueryException query exception
    */
-  public abstract FElem parse(IOContent io) throws QueryException;
+  public abstract FElem parse(IOContent content) throws QueryException;
+
+  /**
+   * Parses a module.
+   * @param content module content
+   * @return module
+   * @throws QueryException query exception
+   */
+  final AModule parseModule(final IO content) throws QueryException {
+    try(QueryContext qctx = new QueryContext(qc.context)) {
+      return qctx.parse(content.toString(), content.path());
+    } catch(final QueryException ex) {
+      throw IOERR_X.get(info, ex);
+    }
+  }
 
   /**
    * Creates a comment sub element.

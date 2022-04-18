@@ -1,7 +1,11 @@
 package org.basex.query.func.xquery;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
+
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
@@ -42,31 +46,28 @@ public class XQueryParse extends StandardFunc {
 
   @Override
   public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return parse(qc, toToken(exprs[0], qc), null);
+    return parse(qc, toContent(0, qc));
   }
 
   /**
    * Parses the specified query and returns the resulting query plan.
    * @param qc query context
    * @param query query
-   * @param path file path (may be {@code null})
    * @return query plan
    * @throws QueryException query exception
    */
-  protected final FElem parse(final QueryContext qc, final byte[] query, final String path)
-      throws QueryException {
-
+  protected final FElem parse(final QueryContext qc, final IO query) throws QueryException {
     final XQueryOptions opts = toOptions(1, new XQueryOptions(), qc);
 
     // base-uri: choose uri specified in options, file path, or base-uri from parent query
     try(QueryContext qctx = new QueryContext(qc.context)) {
-      final AModule mod = qctx.parse(string(query), toBaseUri(path, opts));
+      final AModule module = qctx.parse(query.string(), toBaseUri(query.path(), opts));
       final FElem root;
-      if(mod instanceof LibraryModule) {
-        final QNm module = mod.sc.module;
+      if(module instanceof LibraryModule) {
+        final QNm name = module.sc.module;
         root = new FElem(LIBRARY_MODULE);
-        root.add(PREFIX, module.string());
-        root.add(URI, module.uri());
+        root.add(PREFIX, name.string());
+        root.add(URI, name.uri());
       } else {
         root = new FElem(MAIN_MODULE);
         root.add(UPDATING, token(qctx.updating));
@@ -78,6 +79,8 @@ public class XQueryParse extends StandardFunc {
     } catch(final QueryException ex) {
       if(!opts.get(XQueryOptions.PASS)) ex.info(info);
       throw ex;
+    } catch(final IOException ex) {
+      throw IOERR_X.get(info, ex);
     }
   }
 }

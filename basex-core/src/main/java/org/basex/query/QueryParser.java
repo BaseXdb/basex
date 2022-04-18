@@ -9,7 +9,9 @@ import static org.basex.util.ft.FTFlag.*;
 import java.io.*;
 import java.math.*;
 import java.util.*;
+import java.util.regex.*;
 
+import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
@@ -50,6 +52,9 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public class QueryParser extends InputParser {
+  /** Pattern for detecting library modules. */
+  private static final Pattern LIBMOD_PATTERN = Pattern.compile(
+      "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])? ?; ?)?module .*");
   /** QName check: URI is mandatory. */
   private static final byte[] URICHECK = {};
   /** QName check: skip namespace check. */
@@ -77,37 +82,22 @@ public class QueryParser extends InputParser {
     for(final byte[] key : keys) KEYWORDS.add(key);
   }
 
-  /** Modules loaded by the current file. */
-  public final TokenSet modules = new TokenSet();
-  /** Namespaces. */
-  public final TokenMap namespaces = new TokenMap();
-
+  /** URIs of modules loaded by the current file. */
+  public final TokenSet moduleURIs = new TokenSet();
   /** Query context. */
   public final QueryContext qc;
   /** Static context. */
   public final StaticContext sc;
 
-  /** Imported modules. */
-  private final TokenSet imports = new TokenSet();
   /** List of modules to be parsed. */
-  private final ArrayList<ModInfo> mods = new ArrayList<>();
+  private final ArrayList<ModInfo> modules = new ArrayList<>();
+  /** Namespaces. */
+  private final TokenMap namespaces = new TokenMap();
 
   /** Parsed variables. */
   private final TokenObjMap<StaticVar> vars = new TokenObjMap<>();
   /** Parsed functions. */
   private final TokenObjMap<StaticFunc> funcs = new TokenObjMap<>();
-
-  /** Temporary token cache. */
-  private final TokenBuilder token = new TokenBuilder();
-  /** Current XQDoc string. */
-  private final StringBuilder currDoc = new StringBuilder();
-  /** XQDoc string of module. */
-  private String doc = "";
-
-  /** Alternative error. */
-  private QueryError alter;
-  /** Alternative position. */
-  private int alterPos;
 
   /** Declared flags. */
   private final HashSet<String> decl = new HashSet<>();
@@ -116,6 +106,18 @@ public class QueryParser extends InputParser {
   /** Local variable. */
   private final LocalVars localVars = new LocalVars(this);
 
+  /** Temporary token cache. */
+  private final TokenBuilder token = new TokenBuilder();
+  /** Current XQDoc string. */
+  private final StringBuilder currDoc = new StringBuilder();
+
+  /** XQDoc string of module. */
+  private String doc = "";
+  /** Alternative error. */
+  private QueryError alter;
+  /** Alternative position. */
+  private int alterPos;
+
   /**
    * Constructor.
    * @param query query string
@@ -123,7 +125,7 @@ public class QueryParser extends InputParser {
    * @param qctx query context
    * @param sctx static context (can be {@code null})
    */
-  public QueryParser(final String query, final String uri, final QueryContext qctx,
+  QueryParser(final String query, final String uri, final QueryContext qctx,
       final StaticContext sctx) {
 
     super(query);
@@ -140,7 +142,7 @@ public class QueryParser extends InputParser {
    * @return module
    * @throws QueryException query exception
    */
-  public final MainModule parseMain() throws QueryException {
+  final MainModule parseMain() throws QueryException {
     init();
     try {
       versionDecl();
@@ -154,11 +156,12 @@ public class QueryParser extends InputParser {
       prolog2();
 
       localVars.pushContext(null);
-      final Expr ex = expr();
-      if(ex == null) throw alterError(EXPREMPTY);
+      final Expr expr = expr();
+      if(expr == null) throw alterError(EXPREMPTY);
       final VarScope vs = localVars.popContext();
 
-      final MainModule mm = new MainModule(vs, ex, null, doc, null, funcs, vars, imports);
+      final MainModule mm = new MainModule(expr, vs);
+      mm.set(funcs, vars, moduleURIs, namespaces, doc);
       finish(mm);
       check(mm);
       return mm;
@@ -176,7 +179,7 @@ public class QueryParser extends InputParser {
    * @return module
    * @throws QueryException query exception
    */
-  public final LibraryModule parseLibrary(final boolean root) throws QueryException {
+  final LibraryModule parseLibrary(final boolean root) throws QueryException {
     init();
     try {
       versionDecl();
@@ -207,7 +210,9 @@ public class QueryParser extends InputParser {
       if(root) check(null);
 
       qc.modStack.pop();
-      return new LibraryModule(doc, funcs, vars, imports, sc);
+      final LibraryModule lm = new LibraryModule(sc);
+      lm.set(funcs, vars, moduleURIs, namespaces, doc);
+      return lm;
     } catch(final QueryException ex) {
       mark();
       ex.pos(this);
@@ -680,8 +685,8 @@ public class QueryParser extends InputParser {
     final byte[] uri = trim(stringLiteral());
     if(uri.length == 0) throw error(NSMODURI);
     if(!Uri.uri(uri).isValid()) throw error(INVURI_X, uri);
-    if(modules.contains(token(uri))) throw error(DUPLMODULE_X, uri);
-    modules.add(uri);
+    if(moduleURIs.contains(token(uri))) throw error(DUPLMODULE_X, uri);
+    moduleURIs.add(uri);
 
     // add non-default namespace
     if(pref != EMPTY) {
@@ -693,7 +698,7 @@ public class QueryParser extends InputParser {
     final ModInfo mi = new ModInfo();
     mi.info = info();
     mi.uri = uri;
-    mods.add(mi);
+    modules.add(mi);
 
     // check modules at specified locations
     if(!addLocations(mi.paths)) {
@@ -727,7 +732,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void importModules() throws QueryException {
-    for(final ModInfo mi : mods) importModule(mi);
+    for(final ModInfo mi : modules) importModule(mi);
   }
 
   /**
@@ -769,12 +774,11 @@ public class QueryParser extends InputParser {
       return;
     }
     qc.modParsed.put(tPath, tUri);
-    imports.put(tUri);
 
     // read module
     final String query;
     try {
-      query = string(io.read());
+      query = io.string();
     } catch(final IOException ex) {
       Util.debug(ex);
       throw error(WHICHMODFILE_X, io);
@@ -826,12 +830,17 @@ public class QueryParser extends InputParser {
     }
 
     localVars.pushContext(null);
-    final Expr ex = check(single(), NOCIDECL);
-    final SeqType st = sc.contextType != null ? sc.contextType : SeqType.ITEM_O;
-    qc.ctxValue = MainModule.get(localVars.popContext(), ex, st, currDoc.toString(), info());
+    final Expr expr = check(single(), NOCIDECL);
+    final VarScope vs = localVars.popContext();
+
+    final MainModule main = new MainModule(expr, vs);
+    main.declType = sc.contextType != null ? sc.contextType : SeqType.ITEM_O;
+    main.info = info();
+    main.doc(currDoc.toString());
+    qc.ctxValue = main;
 
     if(sc.module != null) throw error(DECITEM);
-    if(!sc.mixUpdates && ex.has(Flag.UPD)) throw error(UPCTX, ex);
+    if(!sc.mixUpdates && expr.has(Flag.UPD)) throw error(UPCTX, expr);
   }
 
   /**
@@ -853,7 +862,8 @@ public class QueryParser extends InputParser {
       bind = check(single(), NOVARDECL);
     }
     final VarScope vs = localVars.popContext();
-    final StaticVar sv = qc.vars.declare(var, anns, bind, ext, currDoc.toString(), vs);
+    final String varDoc = currDoc.toString();
+    final StaticVar sv = qc.vars.declare(var, anns, bind, ext, varDoc, vs);
     vars.put(sv.id(), sv);
   }
 
@@ -4182,5 +4192,47 @@ public class QueryParser extends InputParser {
    */
   public QueryException error(final QueryError error, final InputInfo ii, final Object... arg) {
     return error.get(ii, arg);
+  }
+
+  /**
+   * Checks if the specified XQuery string is a library module.
+   * @param query query string
+   * @return result of check
+   */
+  public static boolean isLibrary(final String query) {
+    return LIBMOD_PATTERN.matcher(removeComments(query, 80)).matches();
+  }
+
+  /**
+   * Removes comments from the specified string and returns the first characters of a query.
+   * @param query query string
+   * @param max maximum length of string to return
+   * @return result
+   */
+  public static String removeComments(final String query, final int max) {
+    final StringBuilder sb = new StringBuilder();
+    boolean s = false;
+    final int ql = query.length();
+    for(int m = 0, c = 0; c < ql && sb.length() < max; ++c) {
+      final char ch = query.charAt(c);
+      if(ch == 0x0d) continue;
+      if(ch == '(' && c + 1 < ql && query.charAt(c + 1) == ':') {
+        if(m == 0 && !s) {
+          sb.append(' ');
+          s = true;
+        }
+        ++m;
+        ++c;
+      } else if(m != 0 && ch == ':' && c + 1 < ql && query.charAt(c + 1) == ')') {
+        --m;
+        ++c;
+      } else if(m == 0) {
+        if(ch > ' ') sb.append(ch);
+        else if(!s) sb.append(' ');
+        s = ch <= ' ';
+      }
+    }
+    if(sb.length() >= max) sb.append(Text.DOTS);
+    return sb.toString().trim();
   }
 }

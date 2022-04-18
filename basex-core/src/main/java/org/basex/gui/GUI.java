@@ -697,7 +697,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     final Version version = new Version(gopts.get(GUIOptions.UPDATEVERSION));
     Version latest = version;
     try {
-      final Matcher matcher = VERSION_CHECK.matcher(Token.string(new IOUrl(VERSION_URL).read()));
+      final Matcher matcher = VERSION_CHECK.matcher(new IOUrl(VERSION_URL).string());
       if(matcher.matches()) {
         latest = new Version(matcher.group(2));
         gopts.set(GUIOptions.UPDATEVERSION, latest.toString());

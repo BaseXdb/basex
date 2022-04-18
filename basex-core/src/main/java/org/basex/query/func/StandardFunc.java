@@ -374,7 +374,7 @@ public abstract class StandardFunc extends Arr {
     checkAdmin(qc);
     final IO io = checkPath(uri);
     try {
-      return new IOContent(io.read(), io.url());
+      return new IOContent(io.string(), io.url());
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);
     }

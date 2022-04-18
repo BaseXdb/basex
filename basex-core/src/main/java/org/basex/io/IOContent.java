@@ -37,6 +37,15 @@ public final class IOContent extends IO {
    * @param content content
    * @param path content path
    */
+  public IOContent(final String content, final String path) {
+    this(Token.token(content), path);
+  }
+
+  /**
+   * Constructor.
+   * @param content content
+   * @param path content path
+   */
   public IOContent(final byte[] content, final String path) {
     super(path);
     this.content = content;

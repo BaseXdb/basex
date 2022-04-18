@@ -1,10 +1,7 @@
 package org.basex.query.scope;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.util.*;
-import org.basex.query.var.*;
-import org.basex.util.hash.*;
 
 /**
  * An XQuery library module.
@@ -15,15 +12,10 @@ import org.basex.util.hash.*;
 public final class LibraryModule extends AModule {
   /**
    * Constructor.
-   * @param doc documentation
-   * @param funcs user-defined functions
-   * @param vars static variables
-   * @param modules imported modules
    * @param sc static context
    */
-  public LibraryModule(final String doc, final TokenObjMap<StaticFunc> funcs,
-      final TokenObjMap<StaticVar> vars, final TokenSet modules, final StaticContext sc) {
-    super(sc, null, doc, null, funcs, vars, modules);
+  public LibraryModule(final StaticContext sc) {
+    super(sc);
   }
 
   @Override

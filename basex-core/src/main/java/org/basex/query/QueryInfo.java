@@ -140,7 +140,7 @@ public final class QueryInfo {
   String toString(final QueryContext qc) {
     final TokenBuilder tb = new TokenBuilder();
     if(query != null) {
-      final String string = QueryProcessor.removeComments(query, Integer.MAX_VALUE);
+      final String string = QueryParser.removeComments(query, Integer.MAX_VALUE);
       tb.add(NL).add(QUERY).add(COL).add(NL).add(string).add(NL);
     }
     if(!compile.isEmpty()) tb.add(NL).add(COMPILING).add(COL).add(NL).add(compile);

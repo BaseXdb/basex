@@ -142,7 +142,7 @@ final class ProjectFiles {
       final String input = ti.cache().toString();
       // parse query
       try(QueryContext qc = new QueryContext(ctx)) {
-        qc.parse(input, path, QueryProcessor.isLibrary(input));
+        qc.parse(input, path);
         errors.remove(path);
         return qc.modParsed;
       } catch(final QueryException ex) {
