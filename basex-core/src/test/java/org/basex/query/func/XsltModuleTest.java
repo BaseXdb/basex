@@ -65,7 +65,7 @@ public final class XsltModuleTest extends SandboxTest {
   @Test public void transformReport() {
     final Function func = _XSLT_TRANSFORM_REPORT;
     final String doc = " <a/>";
-    String style = wrap("<xsl:template match='/'>" +
+    final String style = wrap("<xsl:template match='/'>" +
         "<xsl:output omit-xml-declaration='yes'/>1</xsl:template>");
     query(func.args(doc, ' ' + style) + "?result", 1);
     query(func.args(doc, ' ' + style) + "?error => exists()", false);
