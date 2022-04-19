@@ -49,18 +49,19 @@ final class RestXqResponse extends WebResponse {
   }
 
   @Override
-  protected void init(final WebFunction function) throws QueryException, IOException {
-    final Performance perf = new Performance();
-    func = new RestXqFunction(function.function, qc, function.module);
-    ctx.setExternal(conn.requestCtx);
-    qc.jc().type(RESTXQ);
-    func.parse(ctx);
-    qc.info.parsing = perf.ns();
-  }
+  protected Expr[] init(final WebFunction function, final Object data)
+      throws QueryException, IOException {
 
-  @Override
-  protected void bind(final Expr[] args, final Object data) throws QueryException, IOException {
-    func.bind(args, data, conn, qc);
+    final Performance perf = new Performance();
+    qc = function.module.qc(ctx);
+    qc.jc().type(RESTXQ);
+    qc.info.parsing = perf.ns();
+
+    ctx.setExternal(conn.requestCtx);
+
+    func = new RestXqFunction(function.function, function.module, qc);
+    func.parseAnnotations(ctx);
+    return func.bind(data, conn, qc);
   }
 
   @Override

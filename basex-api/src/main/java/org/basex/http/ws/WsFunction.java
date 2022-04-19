@@ -31,15 +31,15 @@ public final class WsFunction extends WebFunction {
   /**
    * Constructor.
    * @param function associated user function
-   * @param qc query context
    * @param module web module
+   * @param qc query context
    */
-  public WsFunction(final StaticFunc function, final QueryContext qc, final WebModule module) {
+  public WsFunction(final StaticFunc function, final WebModule module, final QueryContext qc) {
     super(function, module, qc);
   }
 
   @Override
-  public boolean parse(final Context ctx) throws QueryException {
+  public boolean parseAnnotations(final Context ctx) throws QueryException {
     final boolean[] declared = new boolean[function.params.length];
     // counter for annotations that should occur only once
     boolean found = false;
@@ -81,15 +81,16 @@ public final class WsFunction extends WebFunction {
 
   /**
    * Binds the function parameters.
-   * @param args arguments
    * @param msg message (can be {@code null}; otherwise string or byte array)
    * @param values header values
    * @param qc query context
+   * @return arguments
    * @throws QueryException query exception
    */
-  void bind(final Expr[] args, final Object msg, final Map<String, Value> values,
+  Expr[] bind(final Object msg, final Map<String, Value> values,
       final QueryContext qc) throws QueryException {
 
+    final Expr[] args = new Expr[function.params.length];
     if(msg != null) values.put("message", msg instanceof byte[] ?
       B64.get((byte[]) msg) : Str.get((String) msg));
 
@@ -99,6 +100,7 @@ public final class WsFunction extends WebFunction {
     if(message != null) {
       bind(message.var, args, values.get(message.name), qc, "Message");
     }
+    return args;
   }
 
   /**

@@ -70,10 +70,12 @@ final class PlainDoc extends Inspect {
    */
   private FElem variable(final StaticVar sv, final FElem parent) throws QueryException {
     final FElem variable = elem("variable", parent);
-    variable.add("name", sv.name.string());
-    if(sv.name.uri().length != 0) variable.add("uri", sv.name.uri());
+    final byte[] name = sv.name.string(), uri = sv.name.uri();
+    variable.add("name", name);
+    if(uri.length != 0) variable.add("uri", uri);
     type(sv.seqType(), variable);
     variable.add("external", Boolean.toString(sv.external));
+
     comment(sv, variable);
     annotation(sv.anns, variable, true);
     return variable;

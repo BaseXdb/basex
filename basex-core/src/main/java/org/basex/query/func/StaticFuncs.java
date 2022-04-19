@@ -28,7 +28,7 @@ public final class StaticFuncs extends ExprInfo {
   /** User-defined functions. */
   private final TokenObjMap<FuncCache> funcs = new TokenObjMap<>();
   /** User-defined functions. */
-  private Map<StaticFunc, ArrayList<StaticFuncCall>> calls;
+  private Map<StaticFunc, ArrayList<StaticFuncCall>> callsMap;
 
   /**
    * Declares a new user-defined function.
@@ -180,21 +180,19 @@ public final class StaticFuncs extends ExprInfo {
    */
   SeqType[] seqTypes(final StaticFunc func) {
     // initialize cache for direct lookups of function calls
-    if(calls == null) {
-      calls = new IdentityHashMap<>(funcs.size());
+    if(callsMap == null) {
+      callsMap = new IdentityHashMap<>(funcs.size());
       for(final FuncCache fc : funcs.values()) {
-        if(func.params.length > 0 && !fc.calls.isEmpty()) calls.put(fc.func, fc.calls);
+        if(func.params.length > 0 && !fc.calls.isEmpty()) callsMap.put(fc.func, fc.calls);
       }
     }
-
-    final ArrayList<StaticFuncCall> sfcs = calls.get(func);
-    if(sfcs == null) return null;
+    if(!callsMap.containsKey(func)) return null;
 
     final int sl = func.params.length;
     final SeqType[] seqTypes = new SeqType[sl];
-    for(final StaticFuncCall sfc : sfcs) {
+    for(final StaticFuncCall call : callsMap.get(func)) {
       for(int s = 0; s < sl; s++) {
-        final SeqType st = sfc.arg(s).seqType(), stOld = seqTypes[s];
+        final SeqType st = call.arg(s).seqType(), stOld = seqTypes[s];
         seqTypes[s] = stOld == null ? st : stOld.union(st);
       }
     }

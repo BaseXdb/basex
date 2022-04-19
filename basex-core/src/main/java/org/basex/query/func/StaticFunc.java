@@ -205,7 +205,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @return result of check
    * @see Expr#has(Flag...)
    */
-  boolean updating() {
+  public boolean updating() {
     // MIXUPDATES: recursive check; otherwise, rely on flag (GH-1281)
     return sc.mixUpdates ? check(Flag.UPD) : updating;
   }

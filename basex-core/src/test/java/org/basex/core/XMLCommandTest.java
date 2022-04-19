@@ -17,8 +17,12 @@ import org.junit.jupiter.api.*;
 public final class XMLCommandTest extends SandboxTest {
   /** Check syntax of all commands. */
   @Test public void commands() {
-    // surrounded by <commands/> element (required to process more than one command)
+    ok("<commands/>");
+    ok("<commands> </commands>");
+    ok("<commands> \n </commands>");
+    ok("<commands> <!-- xyz --> </commands>");
     ok("<commands><add>x</add></commands>");
+    ok("<commands><info/><info/></commands>");
 
     ok("<add>x</add>");
     ok("<add path='X'>X</add>");
@@ -140,6 +144,7 @@ public final class XMLCommandTest extends SandboxTest {
 
   /** Evaluates some commands with invalid syntax. */
   @Test public void failing() {
+    no("<commands>X</commands>");
     no("<add/>");
     no("<add x='X'>X</add>");
     no("<add path='X' x='X'>X</add>");
@@ -152,11 +157,11 @@ public final class XMLCommandTest extends SandboxTest {
 
   /**
    * Assumes that this command is successful.
-   * @param xml command
+   * @param string XML command string
    */
-  private static void ok(final String xml) {
+  private static void ok(final String string) {
     try {
-      CommandParser.get(xml, context).parse();
+      CommandParser.get(string, context).parse();
     } catch(final QueryException ex) {
       fail(Util.message(ex));
     }
@@ -164,12 +169,12 @@ public final class XMLCommandTest extends SandboxTest {
 
   /**
    * Assumes that this command fails.
-   * @param xml command
+   * @param string XML command string
    */
-  private static void no(final String xml) {
+  private static void no(final String string) {
     try {
-      CommandParser.get(xml, context).parse();
-      fail('"' + xml + "\" was supposed to fail.");
+      CommandParser.get(string, context).parse();
+      fail('"' + string + "\" was supposed to fail.");
     } catch(final QueryException ex) {
       Util.debug(ex);
       /* expected */

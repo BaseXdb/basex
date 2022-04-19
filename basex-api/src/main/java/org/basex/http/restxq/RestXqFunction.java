@@ -46,21 +46,20 @@ public final class RestXqFunction extends WebFunction {
   /** EQName pattern. */
   private static final Pattern EQNAME = Pattern.compile("^Q\\{(.*?)}(.*)$");
 
+  /** Returned media types. */
+  public final ArrayList<MediaType> produces = new ArrayList<>();
   /** Query parameters. */
   final ArrayList<WebParam> queryParams = new ArrayList<>();
   /** Form parameters. */
   final ArrayList<WebParam> formParams = new ArrayList<>();
-  /** Returned media types. */
-  public final ArrayList<MediaType> produces = new ArrayList<>();
 
   /** Supported methods. */
   final Set<String> methods = new HashSet<>();
   /** Permissions (can be empty). */
   final TokenList allows = new TokenList();
 
-  /** Query parameters. */
+  /** Error parameters. */
   private final ArrayList<WebParam> errorParams = new ArrayList<>();
-
   /** Cookie parameters. */
   private final ArrayList<WebParam> cookieParams = new ArrayList<>();
   /** Consumed media types. */
@@ -82,15 +81,15 @@ public final class RestXqFunction extends WebFunction {
   /**
    * Constructor.
    * @param function associated user function
-   * @param qc query context
    * @param module web module
+   * @param qc query context
    */
-  public RestXqFunction(final StaticFunc function, final QueryContext qc, final WebModule module) {
+  public RestXqFunction(final StaticFunc function, final WebModule module, final QueryContext qc) {
     super(function, module, qc);
   }
 
   @Override
-  public boolean parse(final Context ctx) throws QueryException, IOException {
+  public boolean parseAnnotations(final Context ctx) throws QueryException, IOException {
     // parse all annotations
     final boolean[] declared = new boolean[function.params.length];
     boolean found = false;
@@ -185,17 +184,18 @@ public final class RestXqFunction extends WebFunction {
 
   /**
    * Binds the annotated variables.
-   * @param args arguments
    * @param ext extended processing information (can be {@code null})
    * @param conn HTTP connection
    * @param qc query context
+   * @return arguments
    * @throws QueryException exception
    * @throws IOException I/O exception
    */
-  public void bind(final Expr[] args, final Object ext, final HTTPConnection conn,
+  public Expr[] bind(final Object ext, final HTTPConnection conn,
       final QueryContext qc) throws QueryException, IOException {
 
     // bind variables from segments
+    final Expr[] args = new Expr[function.params.length];
     if(path != null) {
       final QNmMap<String> qnames = path.values(conn);
       for(final QNm qname : qnames) {
@@ -263,6 +263,7 @@ public final class RestXqFunction extends WebFunction {
     if(ext instanceof RestXqFunction && permission.var != null) {
       bind(permission.var, args, RestXqPerm.map((RestXqFunction) ext, conn), qc, "Error info");
     }
+    return args;
   }
 
   /**

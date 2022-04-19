@@ -19,7 +19,7 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class StaticVar extends StaticDecl {
-  /** If this variable can be bound from outside the query. */
+  /** Indicates if this variable can be bound from outside the query. */
   public final boolean external;
   /** Flag for lazy evaluation. */
   private final boolean lazy;
@@ -116,9 +116,10 @@ public final class StaticVar extends StaticDecl {
    * @throws QueryException query exception
    */
   void bind(final Value val, final QueryContext qc) throws QueryException {
-    if(!external || compiled) return;
-    bindValue(declType == null || declType.instance(val) ? val :
-      declType.cast(val, true, qc, sc, info), qc);
+    if(external && !compiled) {
+      bindValue(declType == null || declType.instance(val) ? val :
+        declType.cast(val, true, qc, sc, info), qc);
+    }
   }
 
   /**

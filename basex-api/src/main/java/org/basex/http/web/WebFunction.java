@@ -30,18 +30,18 @@ public abstract class WebFunction implements Comparable<WebFunction> {
   /** Single template pattern. */
   private static final Pattern TEMPLATE = Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*}\\s*");
 
-  /** Associated function. */
+  /** User-defined function. */
   public final StaticFunc function;
+  /** Web module. Only required if used as function template */
+  public final WebModule module;
   /** Serialization parameters. */
   public final SerializerOptions output;
-  /** Web module. */
-  public final WebModule module;
   /** Header Parameters. */
   public final ArrayList<WebParam> headerParams = new ArrayList<>();
 
   /**
    * Constructor.
-   * @param function associated user function
+   * @param function user-defined function
    * @param qc query context
    * @param module web module
    */
@@ -59,7 +59,7 @@ public abstract class WebFunction implements Comparable<WebFunction> {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public abstract boolean parse(Context ctx) throws QueryException, IOException;
+  public abstract boolean parseAnnotations(Context ctx) throws QueryException, IOException;
 
   /**
    * Creates an exception with the specified message.

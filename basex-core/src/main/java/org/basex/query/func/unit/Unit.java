@@ -16,7 +16,6 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.scope.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -290,25 +289,12 @@ final class Unit {
 
     try(QueryContext qc = job.pushJob(new QueryContext(ctx))) {
       qc.parse(input, file.path());
-      qc.mainModule(MainModule.get(find(qc, func)));
+      qc.assign(func);
       // ignore results
       for(final Iter iter = qc.iter(); qc.next(iter) != null;);
     } finally {
       job.popJob();
     }
-  }
-
-  /**
-   * Returns the specified function from the given query context.
-   * @param qctx query context
-   * @param func function to be found
-   * @return function or {@code null}
-   */
-  private static StaticFunc find(final QueryContext qctx, final StaticFunc func) {
-    for(final StaticFunc sf : qctx.funcs.funcs()) {
-      if(func.info.equals(sf.info)) return sf;
-    }
-    return null;
   }
 
   /**

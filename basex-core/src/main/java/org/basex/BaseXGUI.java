@@ -1,3 +1,4 @@
+
 package org.basex;
 
 import static org.basex.core.Text.*;

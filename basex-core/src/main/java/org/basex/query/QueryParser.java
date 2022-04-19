@@ -853,9 +853,9 @@ public class QueryParser extends InputParser {
     if(sc.module != null && !eq(var.name.uri(), sc.module.uri())) throw error(MODULENS_X, var);
 
     localVars.pushContext(null);
-    final boolean ext = wsConsumeWs(EXTERNAL);
+    final boolean external = wsConsumeWs(EXTERNAL);
     final Expr bind;
-    if(ext) {
+    if(external) {
       bind = wsConsumeWs(ASSIGN) ? check(single(), NOVARDECL) : null;
     } else {
       wsCheck(ASSIGN);
@@ -863,7 +863,7 @@ public class QueryParser extends InputParser {
     }
     final VarScope vs = localVars.popContext();
     final String varDoc = currDoc.toString();
-    final StaticVar sv = qc.vars.declare(var, anns, bind, ext, varDoc, vs);
+    final StaticVar sv = qc.vars.declare(var, anns, bind, external, varDoc, vs);
     vars.put(sv.id(), sv);
   }
 

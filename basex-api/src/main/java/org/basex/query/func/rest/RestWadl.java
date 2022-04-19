@@ -15,6 +15,6 @@ import org.basex.util.*;
 public final class RestWadl extends ApiFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return WebModules.get(qc.context).wadl(request(qc));
+    return WebModules.get(qc.context).wadl(request(qc), qc.context);
   }
 }

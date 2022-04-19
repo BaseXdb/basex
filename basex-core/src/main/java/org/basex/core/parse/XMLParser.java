@@ -12,7 +12,6 @@ import org.basex.core.cmd.List;
 import org.basex.core.cmd.Set;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -40,18 +39,13 @@ final class XMLParser extends CommandParser {
     try {
       final DBNode node = new DBNode(IO.get(input));
       String query = "/*";
-      if(!execute(COMMANDS, node).isEmpty()) {
+      if(!string(COMMANDS + " ! name()", node).isEmpty()) {
         query = COMMANDS + query;
-        // ensure that the root contains no text nodes as children
-        final String ws = COMMANDS + "/text()[normalize-space()]";
-        try(QueryProcessor qp = new QueryProcessor(ws, ctx)) {
-          qp.context(node);
-          if(!qp.value().isEmpty())
-            throw error(Text.SYNTAX_X, '<' + COMMANDS + "><...></" + COMMANDS + '>');
+        if(!string(COMMANDS + "/text()", node).isEmpty()) {
+          throw error(Text.SYNTAX_X, '<' + COMMANDS + "><...></" + COMMANDS + '>');
         }
       }
-      try(QueryProcessor qp = new QueryProcessor(query, ctx)) {
-        qp.context(node);
+      try(QueryProcessor qp = new QueryProcessor(query, ctx).context(node)) {
         for(final Item ia : qp.value()) cmds.add(command(ia).baseURI(uri));
       }
     } catch(final IOException ex) {
@@ -189,7 +183,7 @@ final class XMLParser extends CommandParser {
    * @throws QueryException query exception
    */
   private String value(final Item root, final String att) throws QueryException {
-    return execute("string(@" + att + ')', root);
+    return string("@" + att, root);
   }
 
   /**
@@ -199,7 +193,7 @@ final class XMLParser extends CommandParser {
    * @throws QueryException query exception
    */
   private String value(final Item root) throws QueryException {
-    return execute("string(.)", root);
+    return string(".", root);
   }
 
   /**
@@ -209,36 +203,34 @@ final class XMLParser extends CommandParser {
    * @throws QueryException query exception
    */
   private String password(final Item root) throws QueryException {
-    final String pw = execute("string(.)", root);
+    final String pw = string(".", root);
     return pw.isEmpty() && pwReader != null ? pwReader.password() : pw;
   }
 
   /**
-   * Returns an xml value (text node).
-   * @param root root node
+   * Returns the serialized XML value.
+   * @param context context node
    * @return xml value
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private String xml(final Item root) throws IOException, QueryException {
-    try(QueryProcessor qp = new QueryProcessor("node()", ctx)) {
-      return qp.context(root).value().serialize().toString().trim();
+  private String xml(final Item context) throws IOException, QueryException {
+    try(QueryProcessor qp = new QueryProcessor("node()", ctx).context(context)) {
+      return qp.value().serialize().toString().trim();
     }
   }
 
   /**
-   * Executes the specified query and returns a string representation.
+   * Returns the string value of the executed query.
    * @param query query
    * @param context context node
-   * @return string representation
+   * @return string
    * @throws QueryException query exception
    */
-  private String execute(final String query, final Item context) throws QueryException {
-    try(QueryProcessor qp = new QueryProcessor(query, ctx)) {
+  private String string(final String query, final Item context) throws QueryException {
+    try(QueryProcessor qp = new QueryProcessor("string-join(" + query + ')', ctx)) {
       qp.context(context);
-      final Iter iter = qp.iter();
-      final Item item = iter.next();
-      return item == null ? "" : item.toJava().toString().trim();
+      return qp.value().toJava().toString().trim();
     }
   }
 
@@ -301,8 +293,7 @@ final class XMLParser extends CommandParser {
     }
 
     // run query
-    try(QueryProcessor qp = new QueryProcessor(tb.toString(), ctx)) {
-      qp.context(root);
+    try(QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root)) {
       qp.bind("A", StrSeq.get(mand.toArray())).bind("O", StrSeq.get(opt.toArray()));
       if(!qp.value().isEmpty()) return true;
     }

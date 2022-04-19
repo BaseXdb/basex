@@ -24,18 +24,6 @@ public final class MainModule extends AModule {
   public SeqType declType;
 
   /**
-   * Creates a new main module for the specified function.
-   * @param sf user-defined function
-   * @param args arguments
-   * @return main module
-   * @throws QueryException query exception
-   */
-  public static MainModule get(final StaticFunc sf, final Expr... args) throws QueryException {
-    final StaticFuncCall expr = new StaticFuncCall(sf.name, args, sf.sc, sf.info).init(sf);
-    return new MainModule(expr, new VarScope(sf.sc));
-  }
-
-  /**
    * Constructor.
    * @param expr root expression
    * @param vs variable scope
