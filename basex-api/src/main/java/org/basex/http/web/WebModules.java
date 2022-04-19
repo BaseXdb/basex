@@ -89,11 +89,16 @@ public final class WebModules {
   /**
    * Returns a WADL description for all available URIs.
    * @param request HTTP request
+   * @param ctx database context
    * @return WADL description
    * @throws QueryException query exception
    */
-  public FElem wadl(final HttpServletRequest request) throws QueryException {
-    return new RestXqWadl(request).create(modules);
+  public FElem wadl(final HttpServletRequest request, final Context ctx) throws QueryException {
+    try {
+      return new RestXqWadl(request).create(cache(ctx));
+    } catch(final IOException ex) {
+      throw new QueryException(ex);
+    }
   }
 
   /**
@@ -141,8 +146,8 @@ public final class WebModules {
 
     // collect and sort all functions
     final ArrayList<RestXqFunction> list = new ArrayList<>();
-    for(final WebModule mod : cache(conn.context).values()) {
-      for(final RestXqFunction func : mod.functions()) {
+    for(final WebModule module : cache(conn.context).values()) {
+      for(final RestXqFunction func : module.functions()) {
         if(func.matches(conn, error, perm)) list.add(func);
       }
     }

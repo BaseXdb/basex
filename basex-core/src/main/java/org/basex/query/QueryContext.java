@@ -18,6 +18,8 @@ import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
+import org.basex.query.ann.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.java.*;
 import org.basex.query.iter.*;
@@ -98,9 +100,9 @@ public final class QueryContext extends Job implements Closeable {
   public int maxCalls;
 
   /** Function for the next tail call. */
-  private XQFunction tailFunc;
+  private XQFunction tcFunc;
   /** Arguments for the next tail call. */
-  private Value[] args;
+  private Value[] tcArgs;
   /** Counter for variable IDs. */
   public int varIDs;
 
@@ -202,7 +204,7 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Parses the specified query.
+   * Parses the specified query and assigns the root expression.
    * @param query query string
    * @param uri base URI (may be {@code null})
    * @param sc static context (may be {@code null})
@@ -238,12 +240,24 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Sets the main module (root expression).
-   * @param main main module
+   * Creates a function call for the specified function and assigns it as root expression.
+   * @param func user-defined function
+   * @param args arguments
+   * @throws QueryException query exception
    */
-  public void mainModule(final MainModule main) {
-    root = main;
-    updating = main.expr.has(Flag.UPD);
+  public void assign(final StaticFunc func, final Expr... args) throws QueryException {
+    for(final StaticFunc sf : funcs.funcs()) {
+      if(func.info.equals(sf.info)) {
+        // inline arguments of called function
+        sf.anns.addUnique(new Ann(sf.info, Annotation._BASEX_INLINE, Empty.VALUE));
+        // create and assign function call
+        final StaticFuncCall call = new StaticFuncCall(sf.name, args, sf.sc, sf.info).init(sf);
+        root = new MainModule(call, new VarScope(sf.sc));
+        updating = sf.updating();
+        return;
+      }
+    }
+    throw BASEX_WHICH_X.get(null, func);
   }
 
   /**
@@ -432,7 +446,7 @@ public final class QueryContext extends Job implements Closeable {
    * @param name name of variable
    * @param value value to be bound
    */
-  public void bind(final QNm name, final Value value) {
+  private void bind(final QNm name, final Value value) {
     if(!bindings.contains(name)) bindings.put(name, value);
   }
 
@@ -554,8 +568,8 @@ public final class QueryContext extends Job implements Closeable {
    * @param arg arguments to pass to {@code fn}
    */
   public void registerTailCall(final XQFunction fn, final Value[] arg) {
-    tailFunc = fn;
-    args = arg;
+    tcFunc = fn;
+    tcArgs = arg;
   }
 
   /**
@@ -563,8 +577,8 @@ public final class QueryContext extends Job implements Closeable {
    * @return function to call if present, {@code null} otherwise
    */
   public XQFunction pollTailCall() {
-    final XQFunction fn = tailFunc;
-    tailFunc = null;
+    final XQFunction fn = tcFunc;
+    tcFunc = null;
     return fn;
   }
 
@@ -573,8 +587,8 @@ public final class QueryContext extends Job implements Closeable {
    * @return argument values if a tail call was registered, {@code null} otherwise
    */
   public Value[] pollTailArgs() {
-    final Value[] as = args;
-    args = null;
+    final Value[] as = tcArgs;
+    tcArgs = null;
     return as;
   }
 

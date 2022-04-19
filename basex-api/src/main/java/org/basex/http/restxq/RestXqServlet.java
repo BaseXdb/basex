@@ -68,10 +68,10 @@ public final class RestXqServlet extends BaseXServlet {
       for(final RestXqFunction check : modules.checks(conn)) {
         if(response.create(check, func, body) != Response.NONE) return;
       }
-
       // run addressed function
-      if(response.create(func, null, body) != Response.CUSTOM) conn.log(SC_OK, "");
-
+      if(response.create(func, null, body) != Response.CUSTOM) {
+        conn.log(SC_OK, "");
+      }
     } catch(final QueryException ex) {
       // run optional error function
       func = modules.restxq(conn, ex.qname());

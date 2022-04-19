@@ -1,20 +1,14 @@
 package org.basex.http.web;
 
-import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
-
 import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.http.*;
 import org.basex.http.restxq.*;
 import org.basex.http.ws.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.ann.*;
 import org.basex.query.func.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -30,8 +24,11 @@ public final class WebModule {
   private final ArrayList<WsFunction> wsFunctions = new ArrayList<>();
   /** File reference. */
   private final IOFile file;
-  /** Parsing timestamp. */
+
+  /** Parsing timestamp, initially {{@code -1}. */
   private long time = -1;
+  /** File content. */
+  private String content;
 
   /**
    * Constructor.
@@ -50,7 +47,9 @@ public final class WebModule {
   void parse(final Context ctx) throws QueryException, IOException {
     final long ts = file.timeStamp();
     if(time == ts) return;
+
     time = ts;
+    content = file.string();
 
     functions.clear();
     wsFunctions.clear();
@@ -61,10 +60,10 @@ public final class WebModule {
       for(final StaticFunc sf : qc.funcs.funcs()) {
         // only add functions that are defined in the same module (file)
         if(sf.expr != null && name.equals(new IOFile(sf.info.path()).name())) {
-          final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
-          if(rxf.parse(ctx)) functions.add(rxf);
-          final WsFunction wxq = new WsFunction(sf, qc, this);
-          if(wxq.parse(ctx)) wsFunctions.add(wxq);
+          final RestXqFunction rxf = new RestXqFunction(sf, this, qc);
+          if(rxf.parseAnnotations(ctx)) functions.add(rxf);
+          final WsFunction wxq = new WsFunction(sf, this, qc);
+          if(wxq.parseAnnotations(ctx)) wsFunctions.add(wxq);
         }
       }
     } catch(final QueryException ex) {
@@ -86,43 +85,19 @@ public final class WebModule {
    * Returns all WebSocket functions.
    * @return functions
    */
-  ArrayList<WsFunction> wsFunctions() {
+  public ArrayList<WsFunction> wsFunctions() {
     return wsFunctions;
   }
 
   /**
-   * Retrieves a query context for the given module.
+   * Parses the module and returns the query context.
    * @param ctx database context
    * @return query context
    * @throws QueryException query exception
    */
-  QueryContext qc(final Context ctx) throws QueryException {
+  public QueryContext qc(final Context ctx) throws QueryException {
     final QueryContext qc = new QueryContext(ctx);
-    try {
-      qc.parse(string(file.read()), file.path());
-      return qc;
-    } catch(final IOException ex) {
-      // may be triggered when reading the file
-      throw IOERR_X.get(null, ex);
-    }
-  }
-
-  /**
-   * Returns the specified function from the given query context.
-   * @param func function to be found
-   * @param qc query context
-   * @return function or {@code null}
-   * @throws HTTPException HTTP exception
-   */
-  static StaticFunc get(final StaticFunc func, final QueryContext qc) throws HTTPException {
-    for(final StaticFunc sf : qc.funcs.funcs()) {
-      if(func.info.equals(sf.info)) {
-        // inline arguments of called function
-        sf.anns.addUnique(new Ann(sf.info, Annotation._BASEX_INLINE, Empty.VALUE));
-        return sf;
-      }
-    }
-    // not to be expected; can only happen if file has been swapped between caching and parsing
-    throw HTTPCode.SERVICE_NOT_FOUND.get();
+    qc.parse(content, file.path());
+    return qc;
   }
 }

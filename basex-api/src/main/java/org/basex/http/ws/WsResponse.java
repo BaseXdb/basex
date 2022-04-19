@@ -40,17 +40,18 @@ public final class WsResponse extends WebResponse {
   }
 
   @Override
-  protected void init(final WebFunction function) throws QueryException {
-    func = new WsFunction(function.function, qc, function.module);
+  protected Expr[] init(final WebFunction function, final Object data)
+      throws QueryException, IOException {
+
+    qc = function.module.qc(ctx);
+    qc.jc().type(WEBSOCKET);
+
     ctx.setExternal(ws);
     ctx.setExternal(new RequestContext(ws.request));
-    qc.jc().type(WEBSOCKET);
-    func.parse(ctx);
-  }
 
-  @Override
-  protected void bind(final Expr[] args, final Object data) throws QueryException {
-    func.bind(args, data, ws.headers, qc);
+    func = new WsFunction(function.function, function.module, qc);
+    func.parseAnnotations(ctx);
+    return func.bind(data, ws.headers, qc);
   }
 
   @Override

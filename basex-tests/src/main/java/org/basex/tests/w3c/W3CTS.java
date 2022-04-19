@@ -668,8 +668,8 @@ public abstract class W3CTS extends Main {
    * @throws QueryException query exception
    */
   protected Value nodes(final String qu, final Value root) throws QueryException {
-    try(QueryProcessor qp = new QueryProcessor(qu, context)) {
-      return qp.context(root).value();
+    try(QueryProcessor qp = new QueryProcessor(qu, context).context(root)) {
+      return qp.value();
     }
   }
 
