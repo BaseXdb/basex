@@ -81,7 +81,8 @@ public final class FTMatches extends ObjectList<FTMatch, FTMatches> {
    * @return true if matches are left
    */
   public boolean phrase(final FTMatches matches, final int distance) {
-    int l = 0, m = 0, s = 0, ms = matches.size;
+    int l = 0, m = 0, s = 0;
+    final int ms = matches.size;
     while(l < size && m < ms) {
       final FTStringMatch ll = list[l].list[0], ml = matches.list[m].list[0];
       final int e = ml.start, d = e - ll.end - distance;

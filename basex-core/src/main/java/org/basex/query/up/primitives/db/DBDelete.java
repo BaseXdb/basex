@@ -43,7 +43,7 @@ public final class DBDelete extends DBUpdate {
 
   @Override
   public void merge(final Update update) {
-    for(final IOFile path : ((DBDelete) update).paths) paths.add(path);
+    paths.addAll(((DBDelete) update).paths);
     size += update.size();
   }
 

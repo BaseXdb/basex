@@ -84,7 +84,7 @@ public final class EditorView extends View {
   private DBNode doc;
 
   /** Parse counter. */
-  private AtomicInteger parseID = new AtomicInteger();
+  private final AtomicInteger parseID = new AtomicInteger();
   /** Parse query context. */
   private final AtomicBoolean parsing = new AtomicBoolean();
   /** Input info. */

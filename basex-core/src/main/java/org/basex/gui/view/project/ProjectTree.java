@@ -171,7 +171,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
   }
 
   /** Commands for editing nodes. */
-  private GUIPopupCmd[] edit = {
+  private final GUIPopupCmd[] edit = {
     new GUIPopupCmd(DELETE + DOTS, BaseXKeys.DELNEXT) {
       @Override public void execute() {
         final ProjectNode node = selectedNode();

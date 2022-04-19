@@ -90,7 +90,7 @@ public abstract class BXNode implements Node {
   public final BXNode cloneNode(final boolean deep) {
     try {
       return nd.toJava();
-    } catch(QueryException ex) {
+    } catch(final QueryException ex) {
       throw new DOMException(DOMException.NOT_SUPPORTED_ERR, ex.getLocalizedMessage());
     }
   }
