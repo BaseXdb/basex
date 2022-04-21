@@ -163,7 +163,7 @@ public abstract class AQuery extends Command {
     try {
       init(query, ctx);
       return qp.updating;
-    } catch(final QueryException ex) {
+    } catch(final Exception ex) {
       Util.debug(ex);
       exception = ex;
       qp.close();

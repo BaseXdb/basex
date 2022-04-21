@@ -102,7 +102,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
     if(headers != null) {
       final byte[] key = atts && attv != null ? attv : elem.string();
       final byte[] name = XMLToken.decode(key, lax);
-      if(name == null) throw CSV_SERIALIZE_X.getIO(Util.inf("Invalid element name <%>", key));
+      if(name == null) throw CSV_SERIALIZE_X_X.getIO("Invalid element name", key);
       if(!headers.contains(name)) headers.add(name);
       final byte[] old = data.get(name);
       data.put(name, old == null || old.length == 0 ? value :

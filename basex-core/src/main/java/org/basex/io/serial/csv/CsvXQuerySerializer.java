@@ -36,7 +36,7 @@ public final class CsvXQuerySerializer extends CsvSerializer {
     if(sep && level == 0) out.print(' ');
 
     if(!(item instanceof XQMap))
-      throw CSV_SERIALIZE_X.getIO("Top level must be a map; " + item.type + " found");
+      throw CSV_SERIALIZE_X_X.getIO("Top level must be a map, found", item.type);
 
     final XQMap m = (XQMap) item;
     final TokenList tl = new TokenList();
@@ -68,10 +68,9 @@ public final class CsvXQuerySerializer extends CsvSerializer {
    */
   private void record(final Value line, final TokenList tl) throws QueryException, IOException {
     if(!(line instanceof XQArray))
-      throw CSV_SERIALIZE_X.getIO("Array expected, " + line.seqType() + " found");
+      throw CSV_SERIALIZE_X_X.getIO("Array expected, found", line.seqType());
     for(final Value entry : ((XQArray) line).members()) {
-      if(!entry.isItem())
-        throw CSV_SERIALIZE_X.getIO("Item expected, " + entry.seqType() + " found");
+      if(!entry.isItem()) throw CSV_SERIALIZE_X_X.getIO("Item expected, found" + entry.seqType());
       tl.add(((Item) entry).string(null));
     }
     record(tl);

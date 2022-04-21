@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryError.normalize;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
@@ -320,7 +319,7 @@ public abstract class StandardFunc extends Arr {
       return p.startsWith(IO.FILEPREF) ? Paths.get(new URI(p)) : Paths.get(p);
     } catch(final InvalidPathException | URISyntaxException ex) {
       Util.debug(ex);
-      throw FILE_INVALID_PATH_X.get(info, normalize(path, info));
+      throw FILE_INVALID_PATH_X.get(info, path);
     }
   }
 
@@ -345,8 +344,8 @@ public abstract class StandardFunc extends Arr {
    */
   protected final IO checkPath(final byte[] uri) throws QueryException {
     final IO io = new QueryInput(string(uri), sc).io;
-    if(!io.exists()) throw WHICHRES_X.get(info, normalize(uri, info));
-    if(io.isDir()) throw RESDIR_X.get(info, normalize(uri, info));
+    if(!io.exists()) throw WHICHRES_X.get(info, uri);
+    if(io.isDir()) throw RESDIR_X.get(info, uri);
     return io;
   }
 

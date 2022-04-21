@@ -15,6 +15,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class remembers descriptive query information sent back to the client.
@@ -64,13 +65,12 @@ public final class QueryInfo {
    */
   void compInfo(final String string, final Object... ext) {
     if(verbose && compile.size() < MAX) {
-      final int el = ext.length;
-      for(int e = 0; e < el; e++) {
-        final Object o = ext[e];
-        ext[e] = o instanceof Supplier<?> ? ((Supplier<?>) o).get() :
-          QueryError.normalize(token(o), null);
+      final TokenList list = new TokenList(ext.length);
+      for(final Object e : ext) {
+        list.add(e instanceof Supplier<?> ? token(((Supplier<?>) e).get().toString()) :
+          QueryError.normalize(e, null));
       }
-      String info = Util.info(string, ext);
+      String info = Util.info(string, (Object[]) list.finish());
       if(!info.isEmpty()) {
         if(runtime) {
           info = "RUNTIME: " + info;

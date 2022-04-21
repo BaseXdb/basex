@@ -10,6 +10,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Thrown to indicate an exception during the parsing or evaluation of a query.
@@ -79,7 +80,7 @@ public class QueryException extends Exception {
   public QueryException(final InputInfo info, final QNm name, final String message,
       final Object... ext) {
 
-    super(message(message, ext));
+    super(message(message, ext, info));
     this.name = name;
     if(info != null) info(info);
     for(final Object o : ext) {
@@ -254,17 +255,16 @@ public class QueryException extends Exception {
 
   /**
    * Creates the error message from the specified text and extension array.
+   * @param info input info (can be {@code null})
    * @param text text message with optional placeholders
    * @param ext info extensions
    * @return argument
    */
-  private static String message(final String text, final Object[] ext) {
-    final int el = ext.length;
-    for(int e = 0; e < el; e++) {
-      if(ext[e] instanceof ExprInfo) {
-        ext[e] = normalize(((ExprInfo) ext[e]).toErrorString(), null);
-      }
+  private static String message(final String text, final Object[] ext, final InputInfo info) {
+    final TokenList list = new TokenList(ext.length);
+    for(final Object e : ext) {
+      list.add(normalize(e instanceof ExprInfo ? ((ExprInfo) e).toErrorString() : e, info));
     }
-    return Util.info(text, ext);
+    return Util.info(text, (Object[]) list.finish());
   }
 }

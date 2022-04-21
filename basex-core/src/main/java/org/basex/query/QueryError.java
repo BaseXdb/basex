@@ -202,6 +202,8 @@ public enum QueryError {
   CSV_PARSE_X(CSV, "parse", "%"),
   /** Error code. */
   CSV_SERIALIZE_X(CSV, "serialize", "%."),
+  /** Error code. */
+  CSV_SERIALIZE_X_X(CSV, "serialize", "%: %."),
 
   // Database Module
 
@@ -678,7 +680,7 @@ public enum QueryError {
   /** Error code. */
   INVALIDZONE_X(FORG, 1, "Invalid timezone: %."),
   /** Error code. */
-  FUNCCAST_X_X(FORG, 1, "Cannot convert to %: %."),
+  FUNCCAST_X_X(FORG, 1, "Cannot convert to %: '%'."),
   /** Error code. */
   FUNCCAST_X_X_X(FORG, 1, "Cannot convert % to %: %."),
   /** Error code. */
@@ -1622,8 +1624,7 @@ public enum QueryError {
 
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) tb.add('$').add(name.string()).add(" := ");
-    final byte[] value = tb.add(normalize(expr, ii)).finish();
-    return error.get(ii, expr.seqType(), st, value);
+    return error.get(ii, expr.seqType(), st, tb.add(expr).finish());
   }
 
   /**
@@ -1712,40 +1713,16 @@ public enum QueryError {
   /**
    * Removes whitespaces and chops the specified value to a maximum size.
    * @param value value
-   * @param ii input info (can be {@code null}; an empty string will be returned if
+   * @param ii input info (can be {@code null}; an empty token will be returned if
    * {@link InputInfo#internal()} returns {@code true})
-   * @return chopped or empty string
+   * @return chopped or empty token
    */
   public static byte[] normalize(final Object value, final InputInfo ii) {
-    return ii != null && ii.internal() ? Token.EMPTY :
-           value instanceof byte[] ? normalize((byte[]) value, ii) :
-             normalize(value.toString(), ii);
-  }
-
-  /**
-   * Removes whitespaces and chops the specified string to a maximum size.
-   * @param string string
-   * @param ii input info (can be {@code null}; an empty string will be returned if
-   * {@link InputInfo#internal()} returns {@code true})
-   * @return chopped or empty string
-   */
-  public static byte[] normalize(final String string, final InputInfo ii) {
-    return ii != null && ii.internal() ? Token.EMPTY : normalize(Token.token(string), ii);
-  }
-
-  /**
-   * Removes whitespaces and chops the specified token to a maximum size.
-   * @param token token
-   * @param ii input info (can be {@code null}; an empty string will be returned if
-   * {@link InputInfo#internal()} returns {@code true})
-   * @return chopped or empty string
-   */
-  public static byte[] normalize(final byte[] token, final InputInfo ii) {
     if(ii != null && ii.internal()) return Token.EMPTY;
 
     final TokenBuilder tb = new TokenBuilder();
     int last = 0, c = 0;
-    for(final TokenParser tp = new TokenParser(token); tp.more();) {
+    for(final TokenParser tp = new TokenParser(Token.token(value)); tp.more();) {
       if(c == 200) {
         tb.add(QueryText.DOTS);
         break;

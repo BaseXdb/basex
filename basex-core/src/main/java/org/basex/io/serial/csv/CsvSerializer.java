@@ -51,7 +51,7 @@ abstract class CsvSerializer extends StandardSerializer {
         allow = Pattern.compile(allw);
       } catch(final PatternSyntaxException ex) {
         Util.debug(ex);
-        throw CSV_SERIALIZE_X.getIO(Util.info("Invalid pattern: %", allw));
+        throw CSV_SERIALIZE_X_X.getIO("Invalid pattern", allw);
       }
     }
     separator = copts.separator();
@@ -72,15 +72,15 @@ abstract class CsvSerializer extends StandardSerializer {
       byte[] txt = EMPTY;
       if(v != null) {
         txt = v;
-        if(allow != null && !allow.matcher(string(v)).matches()) throw CSV_SERIALIZE_X.getIO(
-            Util.info("Value is not allowed: %", normalize(v, null)));
+        if(allow != null && !allow.matcher(string(v)).matches())
+          throw CSV_SERIALIZE_X_X.getIO("Value is not allowed", v);
       }
       final boolean delim = contains(txt, separator) || contains(txt, '\n');
       final boolean special = contains(txt, '\r') || contains(txt, '\t') || contains(txt, '"');
       if(delim || special || backslashes && contains(txt, '\\')) {
         final TokenBuilder tb = new TokenBuilder();
-        if(delim && !backslashes && !quotes) throw CSV_SERIALIZE_X.getIO(
-            Util.info("Output must be put into quotes: %", normalize(txt, null)));
+        if(delim && !backslashes && !quotes)
+          throw CSV_SERIALIZE_X_X.getIO("Output must be put into quotes", txt);
 
         if(quotes && (delim || special)) tb.add('"');
         final int len = txt.length;

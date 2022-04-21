@@ -2378,7 +2378,7 @@ public class QueryParser extends InputParser {
     if(token.isEmpty()) throw error(NUMBER_X, token);
     final long l = toLong(token.toArray());
     return l != Long.MIN_VALUE ? Int.get(l) :
-      FnError.get(RANGE_X.get(info(), normalize(token, null)), SeqType.INTEGER_O, sc);
+      FnError.get(RANGE_X.get(info(), token), SeqType.INTEGER_O, sc);
   }
 
   /**
