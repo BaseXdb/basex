@@ -319,8 +319,8 @@ public final class CompileContext {
         tb.add(QueryText.OPTREWRITE).add(' ').add(exprDesc);
         if(!exprDesc.equals(resDesc)) tb.add(" to ").add(resDesc);
 
-        final byte[] exprString = QueryError.normalize(Token.token(expr.toString()), null);
-        final byte[] resString = QueryError.normalize(Token.token(res.toString()), null);
+        final byte[] exprString = QueryError.normalize(expr, null);
+        final byte[] resString = QueryError.normalize(res, null);
         tb.add(": ").add(exprString);
         if(!Token.eq(exprString, resString)) tb.add(" -> ").add(resString);
         return tb.toString();

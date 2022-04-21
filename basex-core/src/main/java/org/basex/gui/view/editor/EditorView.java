@@ -805,9 +805,10 @@ public final class EditorView extends View {
       inputInfo = null;
     } else {
       info.setCursor(CURSORHAND);
-      info.setText(th.getLocalizedMessage(), Msg.ERROR);
-      final String tt = th.getMessage().replace("<", "&lt;").replace(">", "&gt;").replaceAll(
-          "\r?\n", "<br/>").replaceAll("(<br/>.*?)<br/>.*", "$1");
+      final String msg = Util.message(th), local = th.getLocalizedMessage();
+      info.setText(local != null ? local : msg, Msg.ERROR);
+      final String tt = msg.replace("<", "&lt;").replace(">", "&gt;").
+        replaceAll("\r?\n", "<br/>").replaceAll("(<br/>.*?)<br/>.*", "$1");
       info.setToolTipText("<html>" + tt + "</html>");
 
       if(th instanceof QueryIOException) {

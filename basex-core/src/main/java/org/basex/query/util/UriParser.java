@@ -182,7 +182,7 @@ public final class UriParser {
   public static ParsedUri parse(final String uri) {
     final Matcher matcher = URI_REF.matcher(uri);
     try {
-      if(matcher.matches()) {
+      if(uri.length() <= 2048 && matcher.matches()) {
         final ParsedUri pu = new ParsedUri();
         pu.absolute = matcher.group("scheme") != null;
         pu.valid = true;

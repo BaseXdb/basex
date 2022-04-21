@@ -454,8 +454,8 @@ public final class QueryResources {
 
     // check if input points to a single file
     final IO io = input.io;
-    if(!io.exists()) throw WHICHRES_X.get(ii, normalize(io.path(), ii));
-    if(single && io.isDir()) throw RESDIR_X.get(ii, normalize(io.path(), ii));
+    if(!io.exists()) throw WHICHRES_X.get(ii, io.path());
+    if(single && io.isDir()) throw RESDIR_X.get(ii, io.path());
 
     // overwrite parsing options with default values
     final boolean mem = !context.options.get(MainOptions.FORCECREATE);

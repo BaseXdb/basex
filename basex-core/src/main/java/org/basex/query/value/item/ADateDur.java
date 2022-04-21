@@ -88,7 +88,7 @@ public abstract class ADateDur extends Item {
       return Long.parseLong(string);
     } catch(final NumberFormatException ex) {
       Util.debug(ex);
-      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(ii, type, normalize(string, ii));
+      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(ii, type, string);
     }
   }
 
@@ -108,7 +108,7 @@ public abstract class ADateDur extends Item {
       return new BigDecimal(string);
     } catch(final NumberFormatException ex) {
       Util.debug(ex);
-      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(ii, type, normalize(string, ii));
+      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(ii, type, string);
     }
   }
 }

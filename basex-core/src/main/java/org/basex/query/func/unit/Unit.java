@@ -1,7 +1,6 @@
 package org.basex.query.func.unit;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryError.normalize;
 import static org.basex.query.ann.Annotation.*;
 import static org.basex.query.func.unit.Constants.*;
 import static org.basex.util.Token.*;
@@ -271,7 +270,7 @@ final class Unit {
           exp.add(item.string(null));
         } catch(final QueryException ex) {
           Util.debug(ex);
-          exp.add(normalize(item.toString(), null));
+          exp.add(item.toString());
         }
       }
       if(count != -1) exp.add(ITEM, token(count)).add(TYPE, item.type.toString());

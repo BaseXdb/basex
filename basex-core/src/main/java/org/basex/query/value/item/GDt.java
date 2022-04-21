@@ -68,8 +68,7 @@ public final class GDt extends ADate {
       yea = toLong(mt.group(1), false, ii);
       // +1 is added to BC values to simplify computations
       if(yea < 0) yea++;
-      if(yea < MIN_YEAR || yea >= MAX_YEAR)
-        throw DATERANGE_X_X.get(ii, type, normalize(date, ii));
+      if(yea < MIN_YEAR || yea >= MAX_YEAR) throw DATERANGE_X_X.get(ii, type, date);
     }
     if(i > 0 && i < 4) {
       mon = (byte) (Strings.toLong(mt.group(i == 1 ? 3 : 1)) - 1);

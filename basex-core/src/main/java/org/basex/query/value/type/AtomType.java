@@ -1,10 +1,8 @@
 package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryError.normalize;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.Token.normalize;
 
 import java.math.*;
 import java.util.*;
@@ -989,7 +987,7 @@ public enum AtomType implements Type {
    * @return query exception
    */
   public final QueryException castError(final byte[] value, final InputInfo ii)  {
-    return FUNCCAST_X_X.get(ii, this, normalize(value, ii));
+    return FUNCCAST_X_X.get(ii, this, value);
   }
 
   @Override
