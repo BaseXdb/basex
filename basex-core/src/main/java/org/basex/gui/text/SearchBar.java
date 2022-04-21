@@ -279,7 +279,7 @@ public final class SearchBar extends BaseXBack {
     final boolean hits = sc.nr != 0, empty = sc.string.isEmpty();
     rplc.setEnabled(hits && !empty);
     find.highlight(hits || empty);
-    if(isVisible()) gui.status.setText(Util.info(Text.STRINGS_FOUND_X, sc.nr()));
+    if(isVisible()) gui.status.setText(Util.info(Text.STRINGS_FOUND_X, sc.nr()), true);
     if(jump) editor.jump(SearchDir.CURRENT, false);
   }
 
@@ -300,7 +300,7 @@ public final class SearchBar extends BaseXBack {
    */
   private void search(final boolean jump) {
     final String text = isVisible() ? find.getText() : "";
-    if(!text.isEmpty()) gui.status.setText(Text.SEARCHING + Text.DOTS);
+    if(!text.isEmpty()) gui.status.setText(Text.SEARCHING + Text.DOTS, true);
     editor.search(new SearchContext(this, text), jump);
   }
 

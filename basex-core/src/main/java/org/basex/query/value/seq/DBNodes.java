@@ -2,7 +2,7 @@ package org.basex.query.value.seq;
 
 import java.util.*;
 
-import org.basex.core.Context;
+import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
@@ -12,17 +12,16 @@ import org.basex.util.list.*;
 
 /**
  * This class stores database nodes in an ascending order.
- * Instances of this class will be returned by the method {@link QueryProcessor#cache(int)} method.
- * They are used in the GUI and in the {@link Context} class to reference currently opened,
- * marked, and copied database nodes.
+ * Instances of this class are returned by {@link QueryProcessor#cache(AQuery, int)}.
+ * They are processed in the GUI to reference currently opened, marked, and copied database nodes.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 public final class DBNodes extends DBNodeSeq {
-  /** Full-text position data (can be {@code null}). */
+  /** Full-text position data. */
   private FTPosData ftpos;
-  /** Sorted pre values (can be {@code null}). */
+  /** Sorted pre values. */
   private int[] sorted;
 
   /**

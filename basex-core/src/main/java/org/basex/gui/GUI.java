@@ -13,6 +13,7 @@ import javax.swing.border.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.jobs.*;
 import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.gui.dialog.*;
@@ -145,7 +146,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     toolbar = new GUIToolBar(TOOLBAR, this);
     buttons.add(toolbar, BorderLayout.WEST);
 
-    results = new BaseXLabel(" ").border(0, 0, 0, 4).resize(1.7f);
+    results = new BaseXLabel(" ").border(-2, 0, 0, 4).resize(1.7f);
     results.setHorizontalAlignment(SwingConstants.RIGHT);
 
     BaseXBack b = new BaseXBack();
@@ -346,17 +347,17 @@ public final class GUI extends JFrame implements BaseXWindow {
   /**
    * Launches the specified commands in a separate thread.
    * Commands are ignored if an update operation takes place.
-   * @param edit call from editor view
+   * @param editing call from editor view
    * @param cmds commands to be executed
    */
-  public void execute(final boolean edit, final Command... cmds) {
+  public void execute(final boolean editing, final Command... cmds) {
     // ignore command if updates take place
     if(updating) return;
 
     new Thread(() -> {
       if(cmds.length == 0) info.setInfo("", null, true, true);
       for(final Command cmd : cmds) {
-        if(!exec(cmd, edit)) break;
+        if(!execute(cmd, editing)) break;
       }
     }).start();
   }
@@ -364,10 +365,10 @@ public final class GUI extends JFrame implements BaseXWindow {
   /**
    * Executes the specified command.
    * @param cmd command to be executed
-   * @param edit called from editor view
+   * @param editing called from editor view
    * @return success flag
    */
-  private boolean exec(final Command cmd, final boolean edit) {
+  private boolean execute(final Command cmd, final boolean editing) {
     // wait when command is still running
     final int id = commandID.incrementAndGet();
     while(true) {
@@ -382,7 +383,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     cursor(CURSORWAIT);
     input.setCursor(CURSORWAIT);
     stop.setEnabled(true);
-    if(edit) editor.pleaseWait(id);
+    if(editing) editor.pleaseWait(id);
 
     final Data data = context.data();
     // reset current context if realtime filter is activated
@@ -423,29 +424,24 @@ public final class GUI extends JFrame implements BaseXWindow {
         running = false;
       }
 
-      // show query info, send feedback to query editor
-      final String time = info.setInfo(inf, cmd, perf.getTime(), ok, true);
-      final boolean stopped = inf.substring(inf.lastIndexOf('\n') + 1).equals(INTERRUPTED);
-      if(edit) editor.info(cause, stopped, true);
-
       // get query result and node references to currently opened database
-      final Value result = cmd.result();
-      DBNodes nodes = result instanceof DBNodes ? (DBNodes) result : null;
+      final Value value = cmd.result;
+      DBNodes nodes = value instanceof DBNodes ? (DBNodes) value : null;
+      final boolean updated = cmd.updated(context);
 
-      // show text view if a non-empty result does not reference the currently opened database
-      if(!text.visible() && output.size() != 0 && nodes == null) {
-        GUIMenuCmd.C_SHOW_RESULT.execute(this);
+      if(!text.visible()) {
+        // show text view if the result does not comprise nodes of the opened database
+        if(nodes == null && output.size() != 0) GUIMenuCmd.C_SHOW_RESULT.execute(this);
+        // open info view if error occurs
+        if(!ok && !editing && !info.visible()) GUIMenuCmd.C_SHOW_INFO.execute(this);
       }
 
-      // check if query feedback was evaluated in the query view
-      if(!ok && !stopped) {
-        // display error in info view
-        text.setText(output, 0);
-        if(!info.visible() && (!edit || inf.startsWith(S_BUGINFO))) {
-          GUIMenuCmd.C_SHOW_INFO.execute(this);
-        }
-      } else {
-        final boolean updated = cmd.updated(context);
+      // show query info, send feedback to query editor
+      final boolean stopped = cause instanceof JobException;
+      if(editing) editor.info(cause, stopped, true);
+
+      // update context and send notifications if command was successful
+      if(ok) {
         if(context.data() != data) {
           // database reference has changed - notify views
           notify.init();
@@ -453,42 +449,44 @@ public final class GUI extends JFrame implements BaseXWindow {
           // update visualizations
           notify.update();
           // adopt updated nodes as result set
-          if(nodes == null && result == Empty.VALUE) nodes = context.current();
-        } else if(result != null) {
+          if(nodes == null && value == Empty.VALUE) nodes = context.current();
+        } else if(value != null) {
           // check if result has changed
-          final boolean flt = gopts.get(GUIOptions.FILTERRT);
+          final boolean filterrt = gopts.get(GUIOptions.FILTERRT);
           final DBNodes curr = context.current();
-          if(flt || curr != null && !curr.equals(current)) {
+          if(filterrt || curr != null && !curr.equals(current)) {
             // refresh context if at least one node was found
-            if(nodes != null) notify.context(nodes, flt, null);
+            if(nodes != null) notify.context(nodes, filterrt, null);
           } else if(context.marked != null) {
             // refresh highlight
-            DBNodes m = context.marked;
+            DBNodes marked = context.marked;
             if(nodes != null) {
               // use query result
-              m = nodes;
-            } else if(!m.isEmpty()) {
+              marked = nodes;
+            } else if(!marked.isEmpty()) {
               // remove old highlighting
-              m = new DBNodes(data);
+              marked = new DBNodes(data);
             }
             // refresh views
-            if(context.marked != m) notify.mark(m, null);
+            if(context.marked != marked) notify.mark(marked, null);
           }
         }
-
-        if(id == commandID.get() && !stopped) {
-          // refresh editor info
-          editor.refreshContextLabel();
-          // show status info
-          status.setText(TIME_REQUIRED + COLS + time);
-          // show number of hits
-          if(result != null) results.setText(gopts.results(result.size(), 0));
-          // assign textual output if no node result was created
-          if(nodes == null) text.setText(output, result != null ? result.size() : 0);
-          // only cache output if data has not been updated (in which case notifyUpdate was called)
-          if(!updated) text.cache(output, cmd, result);
-        }
       }
+
+      if(id == commandID.get()) {
+        // refresh editor info
+        editor.refreshContextLabel();
+        // refresh info view and status bar
+        final String total = info.setInfo(inf, cmd, perf.getTime(), ok, true);
+        if(ok) status.setText(TIME_REQUIRED + COLS + total, true);
+        // show number of hits
+        results.setText(BaseXLayout.results(value != null ? value.size() : -1, -1, this));
+        // assign textual output if no node result was created
+        if(nodes == null) text.setText(output, value != null ? value.size() : -1, cause);
+        // only cache output if data has not been updated (in which case notifyUpdate was called)
+        if(!updated) text.cache(output, cmd, value);
+      }
+
     } catch(final Exception ex) {
       // unexpected error
       BaseXDialog.error(this, Util.info(EXEC_ERROR_X_X, cmd, Util.bug(ex)));
@@ -597,9 +595,9 @@ public final class GUI extends JFrame implements BaseXWindow {
    * @param result update number of results
    */
   public void refreshControls(final boolean result) {
-    final DBNodes marked = context.marked;
+    final DBNodes marked = context.marked, current = context.current();
     if(result && marked != null) {
-      results.setText(gopts.results((marked.isEmpty() ? context.current() : marked).size(), 0));
+      results.setText(BaseXLayout.results((marked.isEmpty() ? current : marked).size(), -1, this));
     }
 
     final boolean inf = gopts.get(GUIOptions.SHOWINFO);

@@ -525,8 +525,10 @@ public interface Text {
   String NO_MAINMEM = lang("no_mainmem");
   /** Out of memory error. */
   String OUT_OF_MEM = lang("out_of_mem");
-  /** Progress exception. */
-  String INTERRUPTED = lang("interrupted");
+  /** Interrupted command execution. */
+  String INTERRUPTED = lang("interrupted") + DOT;
+  /** Chopped result. */
+  String CHOPPED = lang("chopped");
 
   /** Expecting command. */
   String EXPECTING_CMD = lang("expecting_cmd");
@@ -893,8 +895,6 @@ public interface Text {
   /** "Local Options". */
   String LOCAL_OPTIONS = lang("local_options");
 
-  /** "(chopped)". */
-  String CHOPPED = '(' + lang("chopped") + ") ";
   /** "(% entries)". */
   String ENTRIES_X = '(' + lang("entries_%") + ')';
   /** "Error". */

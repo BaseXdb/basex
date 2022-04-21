@@ -33,8 +33,6 @@ public abstract class AQuery extends Command {
   private QueryProcessor qp;
   /** Query info. */
   private QueryInfo info;
-  /** Query result. */
-  private Value result;
   /** Query plan was serialized. */
   private boolean plan;
   /** Maximum number of results (ignored if negative). */
@@ -55,12 +53,13 @@ public abstract class AQuery extends Command {
    * @return success flag
    */
   final boolean query(final String query) {
-    String error;
+    final boolean queryinfo = options.get(MainOptions.QUERYINFO);
+    String error = null;
+    long hits = 0;
     if(exception != null) {
       error = Util.message(exception);
     } else {
       try {
-        long hits = 0;
         final boolean run = options.get(MainOptions.RUNQUERY);
         final boolean serial = options.get(MainOptions.SERIALIZE);
         final boolean compplan = options.get(MainOptions.COMPPLAN);
@@ -98,10 +97,12 @@ public abstract class AQuery extends Command {
           final PrintOutput po = r == 0 && serial ? out : new NullOutput();
           try(Serializer ser = qp.getSerializer(po)) {
             if(maxResults >= 0) {
-              result = qp.cache(maxResults);
+              qp.cache(this, maxResults);
               info.evaluating += perf.ns();
-              result.serialize(ser);
               hits = result.size();
+              result.serialize(ser);
+              if(exception instanceof QueryException) throw (QueryException) exception;
+              if(exception instanceof JobException) throw (JobException) exception;
             } else {
               hits = 0;
               final Iter iter = qp.iter();
@@ -116,26 +117,32 @@ public abstract class AQuery extends Command {
           qp.close();
           info.serializing += perf.ns();
         }
-        return info(info.toString(qp, out.size(), hits, jc().locks));
-
       } catch(final QueryException | IOException ex) {
         exception = ex;
         error = Util.message(ex);
       } catch(final JobException ex) {
+        exception = ex;
         error = ex.getMessage();
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
         error = BASEX_OVERFLOW.message;
       } catch(final RuntimeException ex) {
-        extError("");
-        throw ex;
+        exception = ex;
       } finally {
         // close processor after exceptions
         if(qp != null) qp.close();
       }
     }
+    // add query plan, if not done yet, and info string
     queryPlan();
-    return extError(error);
+    info(info.toString(qp, out.size(), hits, jc().locks, error == null));
+
+    // error
+    if(error != null) return error(queryinfo ? info() + ERROR + COL + NL + error : error);
+    // critical error
+    if(exception instanceof RuntimeException) throw (RuntimeException) exception;
+    // success
+    return true;
   }
 
   /**
@@ -175,7 +182,7 @@ public abstract class AQuery extends Command {
     if(qp == null) qp = pushJob(new QueryProcessor(query, uri, ctx));
     if(info == null) info = qp.qc.info;
     qp.parse();
-    qp.qc.info.parsing += perf.ns();
+    info.parsing += perf.ns();
   }
 
   /**
@@ -197,21 +204,6 @@ public abstract class AQuery extends Command {
   }
 
   /**
-   * Returns an extended error message.
-   * @param message error message
-   * @return result of check
-   */
-  private boolean extError(final String message) {
-    // will only be evaluated when an error has occurred
-    final StringBuilder sb = new StringBuilder();
-    if(options.get(MainOptions.QUERYINFO)) {
-      sb.append(info()).append(qp.info()).append(NL).append(ERROR).append(COL).append(NL);
-    }
-    sb.append(message);
-    return error(sb.toString());
-  }
-
-  /**
    * Generates a query plan.
    */
   private void queryPlan() {
@@ -223,7 +215,7 @@ public abstract class AQuery extends Command {
           info(qp.toXml().serialize().toString());
         }
         plan = true;
-      } catch(final Exception ex) {
+      } catch(final QueryIOException ex) {
         Util.stack(ex);
       }
     }
@@ -256,12 +248,5 @@ public abstract class AQuery extends Command {
   @Override
   public boolean stoppable() {
     return true;
-  }
-
-  @Override
-  public final Value result() {
-    final Value r = result;
-    result = null;
-    return r;
   }
 }

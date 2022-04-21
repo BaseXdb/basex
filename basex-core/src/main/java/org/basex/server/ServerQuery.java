@@ -155,7 +155,7 @@ public final class ServerQuery extends Job {
       qi.serializing = perf.ns();
 
       // generate query info
-      info.append(qi.toString(qp, po.size(), hits, jc().locks));
+      info.append(qi.toString(qp, po.size(), hits, jc().locks, true));
 
     } catch(final QueryException | JobException ex) {
       throw new BaseXException(ex);

@@ -27,10 +27,10 @@ final class RESTList extends RESTCmd {
 
   @Override
   protected void run0() throws IOException {
-    String result = "";
-    for(final Command cmd : session) result = run(cmd);
+    String input = "";
+    for(final Command cmd : session) input = run(cmd);
 
-    final Table table = new Table(result);
+    final Table table = new Table(input);
     final FElem elem = new FElem(RESTText.Q_DATABASES).declareNS();
     elem.add(RESTText.RESOURCES, token(table.contents.size()));
     list(table, elem, RESTText.Q_DATABASE, 1);

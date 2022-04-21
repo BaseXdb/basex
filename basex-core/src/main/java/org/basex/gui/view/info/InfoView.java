@@ -105,18 +105,16 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     text.setLinkListener(this);
     editor = new SearchEditor(gui, text);
 
-    final BaseXBack buttons = new BaseXBack(false);
-    buttons.layout(new ColumnLayout());
+    final BaseXBack buttons = new BaseXBack(false).layout(new ColumnLayout());
     buttons.add(editor.button(FIND));
 
-    final BaseXBack top = new BaseXBack(false);
-    top.layout(new ColumnLayout(10));
-    top.add(buttons);
-    top.add(cats);
-    top.add(label);
+    final BaseXBack center = new BaseXBack(false).layout(new ColumnLayout(10));
+    center.add(cats);
+    center.add(label);
 
-    final BaseXBack north = new BaseXBack(false).layout(new BorderLayout());
-    north.add(top, BorderLayout.WEST);
+    final BaseXBack north = new BaseXBack(false).layout(new BorderLayout(10, 10));
+    north.add(buttons, BorderLayout.WEST);
+    north.add(center, BorderLayout.CENTER);
     north.add(header, BorderLayout.EAST);
     add(north, BorderLayout.NORTH);
 
@@ -362,10 +360,9 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     super.paintComponent(g);
     final int l = stat.size();
     if(l != 0) {
-      final int fs = GUIConstants.fontSize;
-      h = header.getHeight() - 4;
-      w = (int) (getWidth() * 0.98 - fs / 2.0d - header.getWidth());
-      bw = (fs << 1) + w / 10;
+      h = header.getHeight();
+      w = getWidth() - header.getWidth() - 16;
+      bw = 80;
       bs = bw / (l - 1);
 
       // find maximum value
@@ -373,9 +370,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
       for(int i = 0; i < l - 1; ++i) m = Math.max(m, stat.get(i));
 
       // draw focused bar
-      final int by = 8;
-      final int bh = h - by;
-
+      final int by = 8, bh = h - by;
       for(int i = 0; i < l - 1; ++i) {
         if(i != focus) continue;
         final int bx = w - bw + bs * i;
@@ -385,11 +380,11 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
       // draw all bars
       for(int i = 0; i < l - 1; ++i) {
-        final int bx = w - bw + bs * i;
-        g.setColor(GUIConstants.color((i == focus ? 3 : 2) + (i << 1)));
+        final int bx = w - bw + bs * i, c = (i == focus ? 4 : 2) + i;
+        g.setColor(GUIConstants.color(c));
         final int p = Math.max(1, stat.get(i) * bh / m);
         g.fillRect(bx, by + bh - p, bs, p);
-        g.setColor(GUIConstants.color(8));
+        g.setColor(GUIConstants.color(c + 2));
         g.drawRect(bx, by + bh - p, bs, p - 1);
       }
     }

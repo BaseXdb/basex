@@ -10,6 +10,7 @@ import java.awt.dnd.*;
 import java.awt.event.*;
 import java.io.*;
 import java.nio.file.*;
+import java.text.*;
 import java.util.*;
 import java.util.List;
 import java.util.function.*;
@@ -17,6 +18,7 @@ import java.util.function.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.listener.*;
 import org.basex.gui.text.*;
@@ -552,5 +554,28 @@ public final class BaseXLayout {
       if(file.exists()) sb.append(" (").append(Performance.format(file.length())).append(')');
     }
     return sb.toString();
+  }
+
+  /**
+   * Returns a string representation of the number of results.
+   * @param count number of results (ignored if {@code -1})
+   * @param bytes number of bytes (ignored if {@code -1})
+   * @param gui GUI reference
+   * @return result string
+   */
+  public static String results(final long count, final long bytes, final GUI gui) {
+    final GUIOptions gopts = gui.gopts;
+    final BiFunction<Long, Integer, String> more = (num, max) -> num >= max ? "\u2265" : "";
+    final StringBuilder sb = new StringBuilder();
+    if(count >= 0) {
+      final String num = new DecimalFormat("#,###,###").format(count);
+      final String text = more.apply(count, gopts.get(GUIOptions.MAXRESULTS)) + num;
+      sb.append(Util.info(count == 1 ? Text.RESULT_X : Text.RESULTS_X, text));
+      if(bytes >= 0) {
+        final int maxtext = gopts.get(GUIOptions.MAXTEXT);
+        sb.append(", ").append(more.apply(bytes, maxtext)).append(Performance.format(bytes));
+      }
+    }
+    return sb.length() > 0 ? sb.toString() : " ";
   }
 }

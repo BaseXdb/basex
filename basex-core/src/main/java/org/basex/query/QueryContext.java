@@ -12,6 +12,7 @@ import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
+import org.basex.core.cmd.*;
 import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
@@ -461,14 +462,6 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Returns info on query compilation and evaluation.
-   * @return query info
-   */
-  public String info() {
-    return info.toString(this);
-  }
-
-  /**
    * Returns query-specific or default serialization parameters.
    * @return serialization parameters
    */
@@ -611,48 +604,51 @@ public final class QueryContext extends Job implements Closeable {
 
   /**
    * This function is called by the GUI.
-   * Caches and returns the result of the specified query. If all nodes are of the same database
+   * Caches the result of the specified query. If all nodes are of the same database
    * instance, the returned value will be of type {@link DBNodes}.
+   * @param cmd query command
    * @param max maximum number of items to cache (negative: return full result)
-   * @return result of query
-   * @throws QueryException query exception
    */
-  Value cache(final int max) throws QueryException {
-    final int mx = max >= 0 ? max : Integer.MAX_VALUE;
-
-    // evaluates the query
-    final Iter iter = iter();
-    final ItemList items;
-    Item item;
-
-    // check if all results belong to the database of the input context
+  void cache(final AQuery cmd, final int max) {
+    final ItemList items = new ItemList();
     final Data data = resources.globalData();
-    if(defaultOutput && data != null) {
-      final IntList pres = new IntList();
-      while((item = next(iter)) != null && item.data() == data && pres.size() < mx) {
-        pres.add(((DBNode) item).pre());
-      }
+    final IntList pres = new IntList();
 
-      // all results processed: return compact node sequence, attach full-text positions
-      final int ps = pres.size();
-      if(item == null || ps == mx) {
-        return ps == 0 ? Empty.VALUE : new DBNodes(data, pres.finish()).ftpos(ftPosData);
-      }
+    try {
+      // evaluates the query
+      final int mx = max >= 0 ? max : Integer.MAX_VALUE;
+      final Iter iter = iter();
+      Item item;
 
-      // otherwise, add nodes to standard iterator
-      items = new ItemList();
-      for(int p = 0; p < ps; p++) items.add(new DBNode(data, pres.get(p)));
-      items.add(item);
-    } else {
-      items = new ItemList();
+      do {
+        // collect pre values if a database is opened globally
+        if(defaultOutput && data != null) {
+          while((item = next(iter)) != null && item.data() == data && pres.size() < mx) {
+            pres.add(((DBNode) item).pre());
+          }
+          // skip if all results have been collected
+          if(item == null || pres.size() == mx) break;
+
+          // otherwise, add nodes to standard iterator
+          for(int pre : pres.finish()) items.add(new DBNode(data, pre));
+          items.add(item);
+        }
+
+        // use standard iterator
+        while((item = next(iter)) != null && items.size() < mx) {
+          item.cache(false, null);
+          items.add(item);
+        }
+      } while(false);
+    } catch(final QueryException ex) {
+      cmd.exception = ex;
+    } catch(final JobException ex) {
+      cmd.exception = ex;
     }
 
-    // use standard iterator
-    while((item = next(iter)) != null && items.size() < mx) {
-      item.cache(false, null);
-      items.add(item);
-    }
-    return items.value();
+    // collect results
+    cmd.result = !items.isEmpty() ? items.value() :
+      !pres.isEmpty() ? new DBNodes(data, pres.finish()).ftpos(ftPosData) : Empty.VALUE;
   }
 
   // PRIVATE METHODS ==============================================================================

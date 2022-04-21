@@ -147,8 +147,7 @@ public final class EditorView extends View {
     context = new BaseXLabel("").resize(1.2f);
     context.setForeground(dgray);
 
-    final BaseXBack north = new BaseXBack(false);
-    north.layout(new BorderLayout(10, 0));
+    final BaseXBack north = new BaseXBack(false).layout(new BorderLayout(10, 0)).border(0, 0, 4, 0);
     north.add(buttons, BorderLayout.WEST);
     north.add(context, BorderLayout.CENTER);
     north.add(new BaseXHeader(EDITOR), BorderLayout.EAST);
@@ -302,8 +301,9 @@ public final class EditorView extends View {
    * Refreshes the context label.
    */
   public void refreshContextLabel() {
-    final String label = context();
-    context.setText(label.isEmpty() ? "" : CONTEXT + COLS + label);
+    String label = context();
+    label = label.isEmpty() ? "" : CONTEXT + COLS + label;
+    if(!context.getText().equals(label)) context.setText(label);
   }
 
   /**
@@ -778,7 +778,7 @@ public final class EditorView extends View {
   /**
    * Processes the result from a command or query execution.
    * @param th exception or {@code null}
-   * @param stopped {@code true} if evaluation was interrupted
+   * @param stopped {@code true} if evaluation was stopped
    * @param refresh refresh buttons
    */
   public void info(final Throwable th, final boolean stopped, final boolean refresh) {

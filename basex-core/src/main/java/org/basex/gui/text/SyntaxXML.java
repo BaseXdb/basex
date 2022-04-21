@@ -44,42 +44,42 @@ public final class SyntaxXML extends Syntax {
     if(name) {
       if(quote != 0) {
         if(quote == ch) quote = 0;
-        return VALUE;
+        return DGRAY;
       }
       if(ch == '"' || ch == '\'') {
         quote = ch;
-        return VALUE;
+        return DGRAY;
       }
       if(ch == '>') {
         name = false;
-        return KEYWORD;
+        return BLUE;
       }
       if(ch == '=' || ch == '/') {
-        return KEYWORD;
+        return BLUE;
       }
       if(ch == '!') {
         comment = 1;
         name = false;
-        return COMMENT;
+        return GRAY;
       }
       if(ch == '?') {
         pi = 1;
         name = false;
-        return VARIABLE;
+        return GRAY;
       }
 
       if(elem) {
         if(ch <= ' ') elem = false;
-        return KEYWORD;
+        return BLUE;
       }
-      return VARIABLE;
+      return PURPLE;
     }
 
     // start of a new element, comment or processing instruction
     if(ch == '<') {
       name = true;
       elem = true;
-      return KEYWORD;
+      return BLUE;
     }
     return plain;
   }
@@ -103,7 +103,7 @@ public final class SyntaxXML extends Syntax {
       // "<! ... >"
       case 6: if(ch == '>') comment = 0; break;
     }
-    return comment > 0 ? COMMENT : KEYWORD;
+    return comment > 0 ? GRAY : BLUE;
   }
 
   /**
@@ -118,7 +118,7 @@ public final class SyntaxXML extends Syntax {
       // "<!? ... ?"
       case 2: pi = ch == '>' ? 0 : 1; break;
     }
-    return pi > 0 ? VARIABLE : KEYWORD;
+    return pi > 0 ? GRAY : BLUE;
   }
 
   @Override

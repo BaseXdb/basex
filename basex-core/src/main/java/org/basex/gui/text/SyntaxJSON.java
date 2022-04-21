@@ -40,12 +40,12 @@ final class SyntaxJSON extends Syntax {
     if(quoted) {
       back = !back && ch == '\\';
     } else {
-      if("-+0123456789".indexOf(ch) != -1) return DIGIT;
-      if("{}[]:,".indexOf(ch) != -1) return COMMENT;
-      if(KEYWORDS.contains(iter.currString())) return KEYWORD;
+      if("-+0123456789".indexOf(ch) != -1) return PURPLE;
+      if("{}[]:,".indexOf(ch) != -1) return GRAY;
+      if(KEYWORDS.contains(iter.currString())) return BLUE;
     }
 
     if(quote) quoted ^= true;
-    return quote || quoted ? VALUE : RED;
+    return quote || quoted ? DGRAY : RED;
   }
 }

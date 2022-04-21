@@ -76,7 +76,7 @@ final class SyntaxXQuery extends Syntax {
     // opened quote
     if(quote != 0) {
       if(ch == quote) quote = 0;
-      return VALUE;
+      return DGRAY;
     }
 
     // comment
@@ -91,36 +91,36 @@ final class SyntaxXQuery extends Syntax {
     }
     if(comment != 0) {
       var = false;
-      return COMMENT;
+      return GRAY;
     }
 
     // quotes
     if(ch == '"' || ch == '\'') {
       quote = ch;
-      return VALUE;
+      return DGRAY;
     }
 
     // variables
     if(ch == '$') {
       var = true;
-      return VARIABLE;
+      return GREEN;
     }
     if(var) {
       var = XMLToken.isChar(ch);
-      return VARIABLE;
+      return GREEN;
     }
 
     // integers
-    if(digit(ch) && toLong(token(iter.currString())) != Long.MIN_VALUE) return DIGIT;
+    if(digit(ch) && toLong(token(iter.currString())) != Long.MIN_VALUE) return PURPLE;
 
     // special characters
     if(!XMLToken.isNCChar(ch)) {
       elem = ch == '<' || ch == '%';
-      return COMMENT;
+      return GRAY;
     }
 
     // check for keywords
-    if(!elem && KEYWORDS.contains(iter.currString())) return KEYWORD;
+    if(!elem && KEYWORDS.contains(iter.currString())) return BLUE;
 
     // standard text
     elem = false;

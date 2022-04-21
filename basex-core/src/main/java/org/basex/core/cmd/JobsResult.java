@@ -17,7 +17,7 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * Evaluates the 'jobs stop' command.
+ * Evaluates the 'jobs result' command.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
@@ -36,15 +36,15 @@ public final class JobsResult extends Command {
     final String id = args[0];
     final JobPool jobs = context.jobs;
     final Map<String, QueryJobResult> results = jobs.results;
-    final QueryJobResult result = results.get(id);
-    if(result != null) {
-      if(!result.cached()) error(JOBS_RUNNING_X.message, id);
+    final QueryJobResult qjr = results.get(id);
+    if(qjr != null) {
+      if(!qjr.cached()) error(JOBS_RUNNING_X.message, id);
 
       try {
-        if(result.exception != null) throw result.exception;
+        if(qjr.exception != null) throw qjr.exception;
 
         final Serializer ser = Serializer.get(out);
-        final Iter iter = result.value.iter();
+        final Iter iter = qjr.value.iter();
         for(Item item; (item = iter.next()) != null;) {
           ser.serialize(item);
           checkStop();

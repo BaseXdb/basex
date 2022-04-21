@@ -69,7 +69,7 @@ public class Execute extends Command {
         final boolean ok = pushJob(cmd).run(context, out);
         sb.append(cmd.info());
         if(!ok) {
-          exception = cmd.exception();
+          exception = cmd.exception;
           return error(sb.toString());
         }
       } finally {

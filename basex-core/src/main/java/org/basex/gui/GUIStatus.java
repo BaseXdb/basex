@@ -36,18 +36,10 @@ public final class GUIStatus extends BaseXPanel {
   /**
    * Sets the status text.
    * @param txt the text to be set
+   * @param ok success flag
    */
-  public void setText(final String txt) {
+  public void setText(final String txt, final boolean ok) {
     label.setText(txt);
-    label.setForeground(GUIConstants.TEXT);
-  }
-
-  /**
-   * Sets the status text.
-   * @param txt the text to be set
-   */
-  public void setError(final String txt) {
-    label.setText(txt);
-    label.setForeground(GUIConstants.RED);
+    label.setForeground(ok ? GUIConstants.TEXT : GUIConstants.RED);
   }
 }

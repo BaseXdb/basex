@@ -3,12 +3,8 @@ package org.basex.gui;
 import static org.basex.util.Prop.*;
 
 import java.awt.*;
-import java.text.*;
-import java.util.function.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
 
@@ -281,24 +277,5 @@ public final class GUIOptions extends Options {
     final StringList list = new StringList();
     for(final String suffix : get(XMLSUFFIXES).split("\\W+")) list.add('.' + suffix);
     return list.finish();
-  }
-
-  /**
-   * Returns a string representation of the number of results.
-   * @param results number of results
-   * @param bytes number of bytes (ignored if smaller than {@code 1})
-   * @return result string
-   */
-  public String results(final long results, final long bytes) {
-    final BiFunction<Long, Integer, String> more = (num, max) -> num >= max ? "\u2265" : "";
-    final StringBuilder sb = new StringBuilder();
-    final String num = new DecimalFormat("#,###,###").format(results);
-    final String text = more.apply(results, get(MAXRESULTS)) + num;
-    sb.append(Util.info(results == 1 ? Text.RESULT_X : Text.RESULTS_X, text));
-    if(bytes > 0) {
-      sb.append(", ");
-      sb.append(more.apply(bytes, get(MAXTEXT))).append(Performance.format(bytes));
-    }
-    return sb.toString();
   }
 }

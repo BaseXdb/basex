@@ -103,22 +103,39 @@ public final class QueryInfo {
    * @param printed printed bytes
    * @param hits number of returned hits
    * @param locks read and write locks
+   * @param success success flag
    * @return query string
    */
   public String toString(final QueryProcessor qp, final long printed, final long hits,
-      final Locks locks) {
-    final int runs = Math.max(1, qp.qc.context.options.get(MainOptions.RUNS));
+      final Locks locks, final boolean success) {
+
     final TokenBuilder tb = new TokenBuilder();
+    final int runs = Math.max(1, qp.qc.context.options.get(MainOptions.RUNS));
     final long total = parsing + compiling + evaluating + serializing;
     if(qp.qc.context.options.get(MainOptions.QUERYINFO)) {
-      final int up = qp.updates();
-      tb.add(toString(qp.qc)).add(NL);
+      tb.add(NL);
+      if(query != null) {
+        tb.add(QUERY).add(COL).add(NL);
+        tb.add(QueryParser.removeComments(query, Integer.MAX_VALUE)).add(NL).add(NL);
+      }
+      if(!compile.isEmpty()) {
+        tb.add(COMPILING).add(COL).add(NL);
+        tb.add(compile).add(NL);
+      }
+      tb.add(OPTIMIZED_QUERY).add(COL).add(NL);
+      tb.add(qp.qc.root == null ? qp.qc.funcs : usedDecls(qp.qc.root)).add(NL);
+      tb.add(NL);
+      if(!evaluate.isEmpty()) {
+        tb.add(EVALUATING).add(COL).add(NL);
+        tb.add(evaluate).add(NL);
+      }
       tb.add(PARSING_CC).add(Performance.getTime(parsing, runs)).add(NL);
       tb.add(COMPILING_CC).add(Performance.getTime(compiling, runs)).add(NL);
       tb.add(EVALUATING_CC).add(Performance.getTime(evaluating, runs)).add(NL);
       tb.add(PRINTING_CC).add(Performance.getTime(serializing, runs)).add(NL);
       tb.add(TOTAL_TIME_CC).add(Performance.getTime(total, runs)).add(NL).add(NL);
       tb.add(HITS_X_CC + hits).add(' ').add(hits == 1 ? ITEM : ITEMS).add(NL);
+      final int up = qp.updates();
       tb.add(UPDATED_CC + up).add(' ').add(up == 1 ? ITEM : ITEMS).add(NL);
       tb.add(PRINTED_CC).add(Performance.format(printed)).add(NL);
       if(locks != null) {
@@ -126,27 +143,13 @@ public final class QueryInfo {
         tb.add(WRITE_LOCKING_CC).add(locks.writes).add(NL);
       }
     }
-    final IO baseIO = qp.sc.baseIO();
-    final String name = baseIO == null ? "" : " \"" + baseIO.name() + '"';
-    tb.addExt(NL + QUERY_EXECUTED_X_X, name, Performance.getTime(total, runs));
-    return tb.toString();
-  }
-
-  /**
-   * Returns detailed compilation and evaluation information.
-   * @param qc query context
-   * @return string
-   */
-  String toString(final QueryContext qc) {
-    final TokenBuilder tb = new TokenBuilder();
-    if(query != null) {
-      final String string = QueryParser.removeComments(query, Integer.MAX_VALUE);
-      tb.add(NL).add(QUERY).add(COL).add(NL).add(string).add(NL);
+    if(success) {
+      tb.add(NL);
+      final IO baseIO = qp.sc.baseIO();
+      final String name = baseIO == null ? "" : " \"" + baseIO.name() + '"';
+      final String time = Performance.getTime(total, runs);
+      tb.addExt(QUERY_EXECUTED_X_X, name, time);
     }
-    if(!compile.isEmpty()) tb.add(NL).add(COMPILING).add(COL).add(NL).add(compile);
-    tb.add(NL).add(OPTIMIZED_QUERY).add(COL).add(NL);
-    tb.add(qc.root == null ? qc.funcs : usedDecls(qc.root)).add(NL);
-    if(!evaluate.isEmpty()) tb.add(NL).add(EVALUATING).add(COL).add(NL).add(evaluate);
     return tb.toString();
   }
 

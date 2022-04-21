@@ -3,6 +3,7 @@ package org.basex.query;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.cmd.*;
 import org.basex.core.jobs.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
@@ -96,16 +97,14 @@ public final class QueryProcessor extends Job implements Closeable {
   }
 
   /**
-   * This function is called by the GUI; use {@link #iter()} or {@link #value()} instead.
-   * Caches and returns the result of the specified query. If all nodes are of the same database
-   * instance, the returned value will be of type {@link DBNodes}.
+   * This function is called by the GUI.
+   * Caches the result of the specified query. If all nodes are of the same database
+   * instance, the cached value will be of type {@link DBNodes}.
+   * @param cmd query command
    * @param max maximum number of items to cache (negative: return full result)
-   * @return result of query
-   * @throws QueryException query exception
    */
-  public Value cache(final int max) throws QueryException {
-    parse();
-    return qc.cache(max);
+  public void cache(final AQuery cmd, final int max) {
+    qc.cache(cmd, max);
   }
 
   /**
@@ -257,14 +256,6 @@ public final class QueryProcessor extends Job implements Closeable {
    */
   public int updates() {
     return updating ? qc.updates().size() : 0;
-  }
-
-  /**
-   * Returns query information.
-   * @return query information
-   */
-  public String info() {
-    return qc.info();
   }
 
   /**

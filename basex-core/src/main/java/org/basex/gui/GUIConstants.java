@@ -204,20 +204,15 @@ public final class GUIConstants {
   /** Color: light red. */
   public static final Color LRED = color(255, 216, 216);
   /** Color: green. */
-  public static final Color GREEN = color(0, 160, 0);
-  /** Color: blue. */
-  public static final Color BLUE = color(0, 64, 192);
-
-  /** Color: keywords. */
-  public static final Color KEYWORD = color(32, 96, 176);
-  /** Color: comments. */
-  public static final Color COMMENT = color(0, 160, 160);
-  /** Color: digits. */
-  public static final Color DIGIT = color(192, 112, 32);
-  /** Color: variables. */
-  public static final Color VARIABLE = color(32, 160, 32);
-  /** Color: names. */
-  public static final Color VALUE = color(112, 112, 112);
+  public static final Color GREEN = color(32, 160, 32);
+  /** Color: cyan. */
+  public static final Color BLUE = color(32, 96, 192);
+  /** Color: purple. */
+  public static final Color PURPLE = color(160, 32, 160);
+  /** Color: gray. */
+  public static final Color GRAY = color(0, 160, 160);
+  /** Color: dark gray. */
+  public static final Color DGRAY = color(112, 112, 112);
 
   /** Cell color. */
   public static Color lgray;

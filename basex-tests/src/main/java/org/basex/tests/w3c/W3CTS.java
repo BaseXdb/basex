@@ -79,8 +79,6 @@ public abstract class W3CTS extends Main {
   private int timer = Integer.MAX_VALUE;
   /** Minimum conformance. */
   private boolean minimum;
-  /** Print compilation steps. */
-  private boolean compile;
   /** test-group to use. */
   private String group;
 
@@ -285,7 +283,6 @@ public abstract class W3CTS extends Main {
         curr = DBNodeSeq.get(d.resources.docs(), d, true, true);
       }
 
-      context.options.set(MainOptions.QUERYINFO, compile);
       try(QueryProcessor qp = new QueryProcessor(in, query.path(), context)) {
         if(curr != null) qp.context(curr);
         context.options.set(MainOptions.QUERYINFO, false);
@@ -330,13 +327,6 @@ public abstract class W3CTS extends Main {
           if(!er.isEmpty() && er.charAt(0) == '[')
             er = er.replaceAll("\\[(.*?)\\] (.*)", "$1 $2");
           // unexpected error - dump stack trace
-        }
-
-        // print compilation steps
-        if(compile) {
-          Util.errln("---------------------------------------------------------");
-          Util.err(qp.info());
-          Util.errln(in);
         }
 
         final Value expOut = nodes("*:output-file/text()", state);
@@ -732,8 +722,6 @@ public abstract class W3CTS extends Main {
           currTime = true;
         } else if(c == 'C') {
           currTime = true;
-        } else if(c == 'c') {
-          compile = true;
         } else if(c == 'd') {
           Prop.debug = true;
         } else if(c == 'm') {

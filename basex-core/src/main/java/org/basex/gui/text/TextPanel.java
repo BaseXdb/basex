@@ -397,10 +397,10 @@ public class TextPanel extends BaseXPanel {
         editor.select(select[0], select[sel ? 1 : 0]);
         release(Action.CHECK);
       }
-      gui.status.setText(Text.STRINGS_REPLACED);
+      gui.status.setText(Text.STRINGS_REPLACED, true);
     } catch(final Exception ex) {
       final String msg = Util.message(ex).replaceAll(Prop.NL + ".*", "");
-      gui.status.setError(Text.REGULAR_EXPR + Text.COLS + msg);
+      gui.status.setText(Text.REGULAR_EXPR + Text.COLS + msg, false);
     }
   }
 

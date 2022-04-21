@@ -4,7 +4,7 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 
 /**
- * Cached job result.
+ * Result of a query job.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen

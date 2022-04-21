@@ -13,7 +13,7 @@ import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.layout.BaseXFileChooser.Mode;
+import org.basex.gui.layout.BaseXFileChooser.*;
 import org.basex.gui.text.*;
 import org.basex.gui.view.*;
 import org.basex.io.*;
@@ -34,8 +34,6 @@ public final class TextView extends View {
   /** Search editor. */
   private final SearchEditor editor;
 
-  /** Header string. */
-  private final BaseXHeader header;
   /** Home button. */
   private final AbstractButton home;
   /** Info label for total time. */
@@ -56,8 +54,6 @@ public final class TextView extends View {
     super(TEXTVIEW, notifier);
     border(5).layout(new BorderLayout(0, 5));
 
-    header = new BaseXHeader(RESULT);
-
     home = BaseXButton.command(GUIMenuCmd.C_SHOW_HOME, gui);
     home.setEnabled(false);
 
@@ -70,20 +66,15 @@ public final class TextView extends View {
     final AbstractButton save = BaseXButton.get("c_save", SAVE, false, gui);
     save.addActionListener(e -> save());
 
-    final BaseXBack buttons = new BaseXBack(false);
-    buttons.layout(new ColumnLayout());
+    final BaseXBack buttons = new BaseXBack(false).layout(new ColumnLayout());
     buttons.add(save);
     buttons.add(home);
     buttons.add(editor.button(FIND));
 
-    final BaseXBack top = new BaseXBack(false);
-    top.layout(new ColumnLayout(10));
-    top.add(buttons);
-    top.add(label);
-
-    final BaseXBack north = new BaseXBack(false).layout(new BorderLayout());
-    north.add(top, BorderLayout.WEST);
-    north.add(header, BorderLayout.EAST);
+    final BaseXBack north = new BaseXBack(false).layout(new BorderLayout(10, 10));
+    north.add(buttons, BorderLayout.WEST);
+    north.add(label, BorderLayout.CENTER);
+    north.add(new BaseXHeader(RESULT), BorderLayout.EAST);
     add(north, BorderLayout.NORTH);
 
     add(editor, BorderLayout.CENTER);
@@ -146,7 +137,7 @@ public final class TextView extends View {
         final ArrayOutput ao = new ArrayOutput();
         ao.setLimit(gui.gopts.get(GUIOptions.MAXTEXT));
         if(nodes != null) nodes.serialize(Serializer.get(ao));
-        setText(ao, nodes != null ? nodes.size() : 0);
+        setText(ao, nodes != null ? nodes.size() : 0, null);
         cachedCmd = null;
         cachedNodes = ao.finished() ? nodes : null;
       } catch(final IOException ex) {
@@ -195,18 +186,25 @@ public final class TextView extends View {
    * Sets the output text.
    * @param out cached output
    * @param results number of results
+   * @param throwable error, can be {@code null}
    */
-  public void setText(final ArrayOutput out, final long results) {
+  public void setText(final ArrayOutput out, final long results, final Throwable throwable) {
     final byte[] buffer = out.buffer();
-    // will never exceed integer range as the underlying array is limited to 2^31 bytes
     final int size = (int) out.size();
     final byte[] chop = token(DOTS);
     final int cl = chop.length;
     if(out.finished() && size >= cl) Array.copyFromStart(chop, cl, buffer, size - cl);
     text.setText(buffer, size);
-    header.setText((out.finished() ? CHOPPED : "") + RESULT);
+
+    String info;
+    if(throwable != null) {
+      info = throwable.getLocalizedMessage();
+    } else {
+      info = BaseXLayout.results(results, size, gui);
+      if(out.finished()) info += " (" + CHOPPED + ')';
+    }
+    label.setText(info);
     home.setEnabled(gui.context.data() != null);
-    label.setText(gui.gopts.results(results, size));
   }
 
   /**
