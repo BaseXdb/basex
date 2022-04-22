@@ -228,13 +228,15 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
       } else if(line.equals(QUERY_PLAN + COL)) {
         while(++s < sl && !split[s].isEmpty()) plan.add(split[s]);
       } else if(line.equals(Text.ERROR + COL)) {
+        boolean stopped = false;
         while(++s < sl && !split[s].isEmpty()) {
           final Pattern pattern = Pattern.compile(STOPPED_AT + "(.*)" + COL);
           final Matcher matcher = pattern.matcher(split[s]);
-          if(matcher.find()) {
+          if(!stopped && matcher.find()) {
             final TokenBuilder tmp = new TokenBuilder();
             tmp.add(STOPPED_AT).uline().add(matcher.group(1)).uline().add(COL);
             split[s] = tmp.toString();
+            stopped = true;
           }
           error.add(split[s]);
         }
@@ -255,6 +257,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
         error.add(line);
       }
     }
+    System.out.println("=> " + error);
 
     stat = times;
     strings = timings;
