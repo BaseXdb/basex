@@ -129,7 +129,7 @@ final class XMLParser extends CommandParser {
     if(e.equals(LIST) && check(root, NAME + '?', PATH + '?'))
       return new List(value(root, NAME), value(root, PATH));
     if(e.equals(OPEN) && check(root, NAME, PATH + '?'))
-      return new Open(value(root, NAME), value(root, PATH));
+      return new Open(value(root, NAME));
     if(e.equals(OPTIMIZE) && check(root))
       return new Optimize();
     if(e.equals(OPTIMIZE_ALL) && check(root))

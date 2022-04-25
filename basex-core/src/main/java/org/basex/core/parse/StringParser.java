@@ -87,7 +87,7 @@ final class StringParser extends CommandParser {
         }
         break;
       case OPEN:
-        return new Open(name(cmd), string(null));
+        return new Open(name(cmd));
       case CHECK:
         return new Check(string(cmd));
       case ADD:

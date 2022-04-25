@@ -373,8 +373,6 @@ public class CommandTest extends SandboxTest {
     ok(new CreateDB(NAME, FILE));
     ok(new Open(NAME));
     ok(new Open(NAME));
-    ok(new Open(NAME, FILE));
-    ok(new Open(NAME, "abc"));
     no(new Open(":"));
   }
 
