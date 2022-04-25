@@ -515,7 +515,7 @@ public interface Text {
   /** Command timing information. */
   String TIME_REQUIRED = lang("time_required");
   /** Command syntax information. */
-  String SYNTAX_X = lang("syntax") + ": %";
+  String SYNTAX = lang("syntax");
   /** Command execution error. */
   String EXEC_ERROR_X_X = lang("exec_error_%") + COL + NL + '%';
 

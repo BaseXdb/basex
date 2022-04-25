@@ -423,7 +423,7 @@ final class StringParser extends CommandParser {
    * @return QueryException query exception
    */
   private QueryException help(final Enum<?>[] alt, final Cmd cmd) {
-    return error(alt, SYNTAX_X, cmd.help(true));
+    return error(alt, SYNTAX + COLS + cmd.help(true));
   }
 
   /**
