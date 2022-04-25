@@ -16,6 +16,7 @@ import org.basex.core.StaticOptions.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
+import org.basex.util.list.*;
 import org.xml.sax.*;
 
 /**
@@ -33,7 +34,7 @@ public final class IOUrl extends IO {
    * @param url url
    */
   public IOUrl(final String url) {
-    super(url);
+    super(normalize(url));
   }
 
   @Override
@@ -168,5 +169,42 @@ public final class IOUrl extends IO {
     } catch(final Exception ex) {
       Util.errln(ex);
     }
+  }
+
+  // PRIVATE METHODS ==============================================================================
+
+  /**
+   * Returns a normalized URL.
+   * @param string input URL
+   * @return path
+   */
+  private static String normalize(final String string) {
+    int i = string.indexOf("://") + 3;
+    if(i == 2) return string;
+
+    final String scheme = string.substring(0, i);
+    String path = string.substring(i), query = "", anchor = "";
+    i = path.indexOf('#');
+    if(i != -1) {
+      anchor = path.substring(i);
+      path = path.substring(0, i);
+    }
+    i = path.indexOf('?');
+    if(i != -1) {
+      query = path.substring(i);
+      path = path.substring(0, i);
+    }
+
+    final StringList segments = new StringList(Strings.split(path, '/'));
+    for(int s = 1; s < segments.size(); s++) {
+      final String segment = segments.get(s);
+      if(segment.equals(".")) {
+        segments.remove(s--);
+      } else if(segment.equals("..") && s > 1) {
+        segments.remove(s--);
+        segments.remove(s--);
+      }
+    }
+    return scheme + String.join("/", segments.finish()) + query + anchor;
   }
 }

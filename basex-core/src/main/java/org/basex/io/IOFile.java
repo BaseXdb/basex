@@ -71,7 +71,7 @@ public final class IOFile extends IO {
    * @param last last path segment; if it ends with a slash, it indicates a directory
    */
   private IOFile(final File file, final String last) {
-    super(create(file.getAbsolutePath(), Strings.endsWith(last, '/') ||
+    super(normalize(file.getAbsolutePath(), Strings.endsWith(last, '/') ||
         Strings.endsWith(last, '\\')));
     boolean abs = file.isAbsolute();
     this.file = abs ? file : new File(pth);
@@ -497,12 +497,12 @@ public final class IOFile extends IO {
   // PRIVATE METHODS ==============================================================================
 
   /**
-   * Creates a path.
+   * Returns a normalized file path.
    * @param path input path
    * @param directory directory flag
    * @return path
    */
-  private static String create(final String path, final boolean directory) {
+  private static String normalize(final String path, final boolean directory) {
     final StringList sl = new StringList();
     final int l = path.length();
     final TokenBuilder tb = new TokenBuilder(l);
@@ -550,5 +550,4 @@ public final class IOFile extends IO {
     }
     tb.reset();
   }
-
 }
