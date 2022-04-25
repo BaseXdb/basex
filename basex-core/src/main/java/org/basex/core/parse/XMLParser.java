@@ -42,7 +42,7 @@ final class XMLParser extends CommandParser {
       if(!string(COMMANDS + " ! name()", node).isEmpty()) {
         query = COMMANDS + query;
         if(!string(COMMANDS + "/text()", node).isEmpty()) {
-          throw error(Text.SYNTAX_X, '<' + COMMANDS + "><...></" + COMMANDS + '>');
+          throw error(Text.SYNTAX + Text.COLS + '<' + COMMANDS + "><...></" + COMMANDS + '>');
         }
       }
       try(QueryProcessor qp = new QueryProcessor(query, ctx).context(node)) {
@@ -312,7 +312,7 @@ final class XMLParser extends CommandParser {
     } else {
       syntax.add("/>");
     }
-    throw error(Text.SYNTAX_X, syntax);
+    throw error(Text.SYNTAX + Text.COLS + syntax);
   }
 
   /**
