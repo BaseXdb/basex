@@ -654,13 +654,15 @@ public abstract class Data {
       updateDist(pre + sCount, diff);
     }
 
-    // adjust attribute size of parent if attributes inserted. attribute size
-    // of parent cannot be decreased via a replace expression.
-    int sPre = source.start;
-    if(sData.kind(sPre) == ATTR) {
-      int d = 0;
-      while(sPre < source.end && sData.kind(sPre++) == ATTR) d++;
-      if(d > 1) attSize(tPar, kind(tPar), d + attSize(tPar, ELEM) - 1);
+    // adjust attribute size of parent if attributes are inserted
+    // attribute size of parent cannot be decreased via a replace expression.
+    if(sCount > 0) {
+      int sPre = source.start;
+      if(sData.kind(sPre) == ATTR) {
+        int d = 0;
+        while(sPre < source.end && sData.kind(sPre++) == ATTR) d++;
+        if(d > 1) attSize(tPar, kind(tPar), d + attSize(tPar, ELEM) - 1);
+      }
     }
 
     // add entries to index structures

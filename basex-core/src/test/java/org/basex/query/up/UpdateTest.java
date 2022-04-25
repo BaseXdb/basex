@@ -1288,4 +1288,11 @@ public final class UpdateTest extends SandboxTest {
     error("<_>{ (1 to 1000) ! <_>{ namespace { 'x' || . } { . } }</_>}</_> update { }",
         BASEX_LIMIT_X_X);
   }
+
+  /** Replace with empty sequence. */
+  @Test public void gh2094() {
+    query("<a><b/></a> update { replace node b with () }", "<a/>");
+    query("<a>{ (1 to 10000) ! <b/> }</a> update { * ! (replace node . with ()) }", "<a/>");
+    query("<a>{ (1 to 10000) ! <b>X</b> }</a> update { * ! (replace node . with ()) }", "<a/>");
+  }
 }
