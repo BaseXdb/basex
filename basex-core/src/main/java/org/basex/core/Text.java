@@ -353,7 +353,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPOPEN = {
-    '[' + S_NAME + "] ([" + S_PATH + "])", lang("c_open1"), lang("c_open2", S_NAME, S_PATH)
+    '[' + S_NAME + "]", lang("c_open1"), lang("c_open2", S_NAME)
   };
   /** Command help. */
   String[] HELPINFO = {
