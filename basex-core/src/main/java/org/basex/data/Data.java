@@ -583,7 +583,7 @@ public abstract class Data {
    */
   public final boolean replace(final int pre, final DataClip source) {
     final int sCount = source.size();
-    if(!bufferSize(sCount)) return false;
+    if(sCount == 0 || !bufferSize(sCount)) return false;
 
     meta.update();
 
@@ -656,13 +656,11 @@ public abstract class Data {
 
     // adjust attribute size of parent if attributes are inserted
     // attribute size of parent cannot be decreased via a replace expression.
-    if(sCount > 0) {
-      int sPre = source.start;
-      if(sData.kind(sPre) == ATTR) {
-        int d = 0;
-        while(sPre < source.end && sData.kind(sPre++) == ATTR) d++;
-        if(d > 1) attSize(tPar, kind(tPar), d + attSize(tPar, ELEM) - 1);
-      }
+    int sPre = source.start;
+    if(sData.kind(sPre) == ATTR) {
+      int d = 0;
+      while(sPre < source.end && sData.kind(sPre++) == ATTR) d++;
+      if(d > 1) attSize(tPar, kind(tPar), d + attSize(tPar, ELEM) - 1);
     }
 
     // add entries to index structures
