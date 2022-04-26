@@ -42,7 +42,6 @@ public final class FTIndexQueryTest extends FTData {
       try {
         if(q.length == 3) assertQuery((String) q[0], (String) q[2]);
       } catch(final Throwable th) {
-        System.out.println(q[2]);
         Util.debug(th);
         sb.append(th.getMessage());
       }
