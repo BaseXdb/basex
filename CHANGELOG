@@ -1,3 +1,14 @@
+VERSION 9.7.1 (April 26, 2022) -----------------------------------------
+
+ - RESTXQ: improved caching for unmodified modules
+ - GUI: improved support for middle mouse button
+ - GUI, editor: list opened files (Ctrl-F6)
+ - Backups: support for comments added
+ - XQuery: inspect:functions: parse modules only once
+ - XQuery: db:delete: Faster deletion of binary resources
+ - XQuery: jobs:eval: handling of large job numbers revised
+ - XQuery optimizations: rewrite value to general comparisons
+
 VERSION 9.7 (March 23, 2022) -------------------------------------------
 
  XQUERY
