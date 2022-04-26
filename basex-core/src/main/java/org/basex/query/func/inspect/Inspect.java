@@ -68,7 +68,7 @@ public abstract class Inspect {
     try(QueryContext qctx = new QueryContext(qc.context)) {
       return qctx.parse(content.toString(), content.path());
     } catch(final QueryException ex) {
-      throw IOERR_X.get(info, ex);
+      throw INSPECT_PARSE_X.get(info, ex);
     }
   }
 

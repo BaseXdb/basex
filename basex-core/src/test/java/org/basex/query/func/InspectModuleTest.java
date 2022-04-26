@@ -101,14 +101,14 @@ public final class InspectModuleTest extends SandboxTest {
     // ensure that a module will only be parsed once
     query("prof:void((" + func.args(url) + "))", "");
     query("prof:void((" + func.args(url) + ", " + func.args(url) + "))", "");
+
+    error(func.args("non-existent"), WHICHRES_X);
+    error(func.args("src/test/resources/error.xqm"), INSPECT_PARSE_X);
   }
 
   /** Test method. */
   @Test public void module() {
     final Function func = _INSPECT_MODULE;
-    // queries
-    error(func.args("src/test/resources/non-existent.xqm"), WHICHRES_X);
-
     final String module = "src/test/resources/hello.xqm";
     final String result = query(func.args(module)).replace("{", "{{").replace("}", "}}");
 
@@ -137,6 +137,9 @@ public final class InspectModuleTest extends SandboxTest {
 
     final String query3 = query(result + "/function[@name = 'hello:ext']");
     query(query3 + "/@external/data()", true);
+
+    error(func.args("non-existent"), WHICHRES_X);
+    error(func.args("src/test/resources/error.xqm"), INSPECT_PARSE_X);
   }
 
   /** Test method. */
@@ -202,12 +205,12 @@ public final class InspectModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void xqdoc() {
     final Function func = _INSPECT_XQDOC;
-    // queries
-    error(func.args("src/test/resources/non-existent.xqm"), WHICHRES_X);
-
     // validate against xqDoc schema
     final String result = query(func.args("src/test/resources/hello.xqm")).
         replace("{", "{{").replace("}", "}}");
     query(_VALIDATE_XSD.args(' ' + result, "src/test/resources/xqdoc.xsd"));
+
+    error(func.args("non-existent"), WHICHRES_X);
+    error(func.args("src/test/resources/error.xqm"), INSPECT_PARSE_X);
   }
 }

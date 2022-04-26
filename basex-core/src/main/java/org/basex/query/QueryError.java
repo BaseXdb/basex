@@ -251,14 +251,14 @@ public enum QueryError {
   /** Error code. */
   FETCH_OPEN_X(FETCH, "open", "%"),
   /** Error code. */
-  FETCH_EXISTS_X(FETCH, "open", "'%' does not exist."),
+  FETCH_EXISTS_X(FETCH, "open", "Resource '%' not found."),
   /** Error code. */
   FETCH_ENCODING_X(FETCH, "encoding", "Unknown encoding '%'."),
 
   // File Module
 
   /** Error code. */
-  FILE_NOT_FOUND_X(FILE, "not-found", "'%' does not exist."),
+  FILE_NOT_FOUND_X(FILE, "not-found", "'%' not found."),
   /** Error code. */
   FILE_EXISTS_X(FILE, "exists", "'%' already exists."),
   /** Error code. */
@@ -329,6 +329,8 @@ public enum QueryError {
 
   /** Error code. */
   INSPECT_UNKNOWN_X(INSPECT, "unknown", "Component '%' does not exist."),
+  /** Error code. */
+  INSPECT_PARSE_X(INSPECT, "parse", "%"),
 
   // Jobs Module
 
@@ -595,7 +597,7 @@ public enum QueryError {
   /** Error code. */
   IOERR_X(FODC, 2, "%"),
   /** Error code. */
-  WHICHRES_X(FODC, 2, "Resource '%' does not exist."),
+  WHICHRES_X(FODC, 2, "Resource '%' not found."),
   /** Error code. */
   RESDIR_X(FODC, 2, "URI '%' points to directory."),
   /** Error code. */
