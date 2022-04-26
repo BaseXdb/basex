@@ -37,6 +37,7 @@ public class FetchXml extends StandardFunc {
    */
   protected DBNode fetch(final IO io, final QueryContext qc) throws QueryException {
     final Options opts = toOptions(1, new Options(), qc);
+    if(!io.exists()) throw FETCH_EXISTS_X.get(info, io);
 
     final DBOptions dbopts = new DBOptions(opts, MainOptions.PARSING, info);
     final MainOptions mopts = dbopts.assignTo(MainOptions.get());

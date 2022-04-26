@@ -344,8 +344,8 @@ public abstract class StandardFunc extends Arr {
    */
   protected final IO checkPath(final byte[] uri) throws QueryException {
     final IO io = new QueryInput(string(uri), sc).io;
-    if(!io.exists()) throw WHICHRES_X.get(info, uri);
-    if(io.isDir()) throw RESDIR_X.get(info, uri);
+    if(!io.exists()) throw WHICHRES_X.get(info, io);
+    if(io.isDir()) throw RESDIR_X.get(info, io);
     return io;
   }
 
