@@ -31,10 +31,7 @@ public final class FetchContentType extends FetchDoc {
       }
     } else if(io instanceof IOContent) {
       mt = MediaType.APPLICATION_XML;
-    } else if(io.exists()) {
-      mt = MediaType.get(io.path());
     }
-    if(mt == null) throw FETCH_OPEN_X.get(info, new FileNotFoundException(io.path()));
-    return Str.get(mt.toString());
+    return Str.get((mt == null ? MediaType.get(io.path()) : mt).toString());
   }
 }
