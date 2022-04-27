@@ -3,7 +3,6 @@ package org.basex.query.func.fn;
 import static org.basex.query.value.type.AtomType.*;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -52,18 +51,6 @@ public final class FnNumber extends ContextFn {
       if(arg != null) return cc.function(Function.NUMBER, info, arg);
     }
     return this;
-  }
-
-  @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    final Type type = argType(cc);
-    if(mode == Simplify.NUMBER && type != null && (type.isUntyped() || type == DOUBLE)) {
-      // number(<a>1</a>) + 2  ->  <a>1</a> + 2
-      if(!contextAccess()) return cc.simplify(this, exprs[0]);
-      // A[number() = 1]  ->  A[. = 0]
-      if(cc.nestedFocus()) return cc.simplify(this, ContextValue.get(cc, info));
-    }
-    return super.simplifyFor(mode, cc);
   }
 
   /**
