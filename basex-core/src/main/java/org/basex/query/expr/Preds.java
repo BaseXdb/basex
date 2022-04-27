@@ -144,29 +144,14 @@ public abstract class Preds extends Arr {
   private void simplify(final Expr pred, final ExprList list, final Expr root,
       final CompileContext cc) throws QueryException {
 
-    // AND expression
-    if(pred instanceof And && !pred.has(Flag.POS)) {
-      // E[A and B]  ->  E[A][B]
-      cc.info(OPTPRED_X, pred);
-      for(final Expr expr : pred.args()) {
-        simplify(expr.seqType().mayBeNumber() ? cc.function(Function.BOOLEAN, info, expr) : expr,
-          list, root, cc);
-      }
-      return;
-    }
-
-    // comparisons
     Expr expr = pred;
-    if(expr instanceof CmpG || expr instanceof CmpV) {
-      // E[position() = 1]  ->  E[1]
-      expr = ((Cmp) expr).optPred(root, cc);
-    }
 
-    // map operator
+    // comparisons: E[position() = 1]  ->  E[1]
+    if(expr instanceof CmpG || expr instanceof CmpV) expr = ((Cmp) expr).optPred(root, cc);
+
+    // map operator: E[. ! ...]  ->  E[...], E[E ! ...]  ->  E[...]
     final SeqType rst = root.seqType();
     if(expr instanceof SimpleMap) {
-      // E[. ! ...]  ->  E[...]
-      // E[E ! ...]  ->  E[...]
       final SimpleMap map = (SimpleMap) expr;
       final Expr[] mexprs = map.exprs;
       final Expr first = mexprs[0], second = mexprs[1];
@@ -176,10 +161,8 @@ public abstract class Preds extends Arr {
       }
     }
 
-    // paths
+    // paths: E[./...]  ->  E[...], E[E/...]  ->  E[...]
     if(expr instanceof Path && rst.type instanceof NodeType) {
-      // E[./...]  ->  E[...]
-      // E[E/...]  ->  E[...]
       final Path path = (Path) expr;
       final Expr first = path.root;
       if((first instanceof ContextValue || root.equals(first) && root.isSimple() && rst.one()) &&
@@ -188,8 +171,7 @@ public abstract class Preds extends Arr {
       }
     }
 
-    // inline root item (ignore nodes)
-    // 1[. = 1]  ->  1[1 = 1]
+    // inline root item (ignore nodes): 1[. = 1]  ->  1[1 = 1]
     if(root instanceof Item && !(rst.type instanceof NodeType)) {
       try {
         expr = new InlineContext(null, root, cc).inline(expr);
@@ -203,10 +185,14 @@ public abstract class Preds extends Arr {
     // E[count(nodes)]  will not be rewritten
     expr = expr.simplifyFor(Simplify.PREDICATE, cc);
 
-    // rewrite number to positional test
+    // E[position()]  ->  E[true()]
+    if(Function.POSITION.is(expr)) expr = Bln.TRUE;
+
+    // positional tests: E[1]  ->  E[position() = 1]
     if(expr instanceof ANum) expr = ItrPos.get(((ANum) expr).dbl(), info);
 
     // merge node tests with steps; remove redundant node tests
+    // child::node()[self:*]  ->  child::*
     if(expr instanceof SingleIterPath) {
       final Step predStep = (Step) ((Path) expr).steps[0];
       if(predStep.axis == Axis.SELF && !predStep.mayBePositional() && root instanceof Step &&
@@ -214,45 +200,50 @@ public abstract class Preds extends Arr {
         final Step rootStep = (Step) root;
         final Test test = rootStep.test.intersect(predStep.test);
         if(test != null) {
-          // child::node()[self:*]  ->  child::*
           cc.info(OPTMERGE_X, predStep);
           rootStep.test = test;
           list.add(predStep.exprs);
-          return;
+          expr = Bln.TRUE;
         }
       }
     }
 
-    // context value
+    // context value: E[.]  ->  E
     if(expr instanceof ContextValue && rst.type instanceof NodeType) {
-      // E[.]  ->  E
       cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-      return;
+      expr = Bln.TRUE;
     }
 
-    // positional tests
+    // positional tests:
+    //   <a/>/.[position() = 1]  ->  <a/>/.[true()]
+    //   $child/..[position() = 2]  ->  $child/..[false()]
     if(root instanceof Step && expr instanceof ItrPos) {
-      // <a/>/.[1]  ->  <a/>/.[true()]
-      // $child/..[2]  ->  $child/..[false()]
       final Axis axis = ((Step) root).axis;
       if(axis == Axis.SELF || axis == Axis.PARENT) expr = Bln.get(((ItrPos) expr).min == 1);
     }
 
-    // positional tests with position()
+    // positional comparisons: E[position() = last() - 1]  ->  E[last() - 1]
     if(expr instanceof Cmp) {
       final Cmp cmp = (Cmp) expr;
       final Expr ex = cmp.exprs[1];
       final SeqType st = ex.seqType();
       if(cmp.positional() && cmp.opV() == OpV.EQ && st.one()) {
-        // E[position() = last() - 1]  ->  E[last() - 1]
         expr = new Cast(cc.sc(), info, ex, SeqType.NUMERIC_O).optimize(cc);
       }
     }
 
-    // E[position()]  ->  E
-    if(Function.POSITION.is(expr)) expr = Bln.TRUE;
+    // recursive optimization of AND expressions: E[A and [B and C]]  ->  E[A][B][C]
+    if(expr instanceof And && !expr.has(Flag.POS)) {
+      cc.info(OPTPRED_X, expr);
+      for(final Expr ex : expr.args()) {
+        final boolean numeric = ex.seqType().mayBeNumber();
+        simplify(numeric ? cc.function(Function.BOOLEAN, info, ex) : ex, list, root, cc);
+      }
+      expr = Bln.TRUE;
+    }
 
-    list.add(cc.simplify(pred, expr));
+    // add predicate to list
+    if(expr != Bln.TRUE) list.add(cc.simplify(pred, expr));
   }
 
   /**
