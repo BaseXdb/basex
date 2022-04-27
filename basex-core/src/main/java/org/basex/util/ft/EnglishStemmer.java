@@ -2,16 +2,24 @@ package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.util.*;
 
+import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+
 /**
- * English stemming algorithm, based on the publication from
- * Porter (1980), "An algorithm for suffix stripping".
+ * English stemming algorithm, based on the publication from Porter (1980),
+ * "An algorithm for suffix stripping", enhanced with a basic dictionary for irregular plurals.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
 final class EnglishStemmer extends InternalStemmer {
+  /** Dictionary with most frequent terms. */
+  private static final TokenMap DICTIONARY = new TokenMap();
+
   /** Stemming character. */
   private static final byte[] AT = token("at");
   /** Stemming character. */
@@ -67,6 +75,18 @@ final class EnglishStemmer extends InternalStemmer {
     "iti", "ive", "ize", "ment", "ou", "ous", "sion", "tion"
   );
 
+  /* Reads in dictionary. */
+  static {
+    try(InputStream is = EnglishStemmer.class.getResourceAsStream("/stemmer-en.properties")) {
+      for(final byte[] line : split(new IOStream(is).read(), '\n')) {
+        final byte[][] tokens = split(line, '=');
+        if(!startsWith(line, '#') && tokens.length == 2) DICTIONARY.put(tokens[0], tokens[1]);
+      }
+    } catch(final Throwable ex) {
+      Util.stack(ex);
+    }
+  }
+
   /** Token to be stemmed. */
   private byte[] token;
   /** Token length. */
@@ -94,6 +114,8 @@ final class EnglishStemmer extends InternalStemmer {
 
   @Override
   protected byte[] stem(final byte[] str) {
+    final byte[] s = DICTIONARY.get(str);
+    if(s != null) return s;
     tl = str.length;
     token = str;
     return s() ? Arrays.copyOf(str, tl) : str;

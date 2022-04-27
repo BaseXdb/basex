@@ -322,6 +322,12 @@ abstract class FTData extends QueryTest {
         " using stemming using language 'Russian'" },
       { "FTStemming 11", booleans(true),
         "'de' contains text 'de' using stemming using language 'pt'" },
+      { "FTStemming 12", booleans(true),
+        "'mice' contains text 'mouse' using stemming" },
+      { "FTStemming 13", booleans(true),
+        "'symposia' contains text 'symposium' using stemming" },
+      { "FTStemming 14", booleans(true),
+        "'men' contains text 'man' using stemming" },
 
       { "FTLanguage 1", nodes(14),
         "//*[text() contains text 'hello' using language 'en']" },
