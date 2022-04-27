@@ -35,7 +35,6 @@ public final class FetchModuleTest extends SandboxTest {
     // successful queries
     query(func.args(XML));
     error(func.args(XML + 'x'), FETCH_EXISTS_X);
-    error(func.args(XML + 'x'), FETCH_OPEN_X);
   }
 
   /** Test method. */
@@ -70,7 +69,6 @@ public final class FetchModuleTest extends SandboxTest {
 
     error(func.args(XML, " map { 'parser': 'unknown' }"), BASEX_OPTIONS_X_X);
     error(func.args(XML + 'x'), FETCH_EXISTS_X);
-    error(func.args(XML + 'x'), FETCH_OPEN_X);
   }
 
   /** Test method. */
