@@ -2768,4 +2768,12 @@ public final class RewritingsTest extends QueryPlanTest {
     execute(new CreateDB(NAME, "<e a='a'/>"));
     check("/e[@a eq 'a'] ! name()", "e", exists(ValueAccess.class));
   }
+
+  /** Predicates: further optimize rewritings of 'if' expressions. */
+  @Test public void gh2096() {
+    check("<x/>[if(random:double() + 1) then . = '1' else ()]", "",
+        empty(If.class), empty(And.class));
+    check("<x>1</x>[if(. castable as xs:integer) then . = 1 else false()]", "<x>1</x>",
+        empty(If.class), empty(And.class));
+  }
 }
