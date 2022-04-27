@@ -31,9 +31,7 @@ public final class FetchContentType extends FetchXml {
       }
     } else if(io instanceof IOContent) {
       mt = MediaType.APPLICATION_XML;
-    } else {
-      mt = MediaType.get(io.path());
     }
-    return Str.get(mt.toString());
+    return Str.get((mt == null ? MediaType.get(io.path()) : mt).toString());
   }
 }
