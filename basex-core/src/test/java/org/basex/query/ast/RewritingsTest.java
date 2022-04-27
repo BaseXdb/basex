@@ -815,18 +815,24 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1769number() {
     check("(0e0, 1e0)[number() = 1]", 1, empty(NUMBER));
     check("(0e0, 1e0)[number(.) = 1]", 1, empty(NUMBER));
+    check("(0e0, 1e0, 2e0, 3e0, 4e0, 5e0)[number() = 1]", 1, empty(NUMBER));
+    check("(0e0, 1e0, 2e0, 3e0, 4e0, 5e0)[number(.) = 1]", 1, empty(NUMBER));
 
-    check("<_>1</_>[number() = 1]", "<_>1</_>", empty(NUMBER));
-    check("<_>1</_>[number(.) = 1]", "<_>1</_>", empty(NUMBER));
+    check("<_>1</_>[xs:double(.) = 1]", "<_>1</_>", empty(Cast.class));
+    check("<_>1</_>[number(.) = 1]", "<_>1</_>", exists(NUMBER));
 
-    check("number(" + wrap(1) + ") + 2", 3, empty(NUMBER));
-    check("(1e0, 2e0) ! (number() + 1)", "2\n3", empty(NUMBER));
-    check("for $v in (1e0, 2e0) return number($v) + 1", "2\n3", empty(NUMBER));
+    check("xs:double(" + wrap(1) + ") + 2", 3, empty(Cast.class));
+    check("(1e0, 2e0) ! (xs:double(.) + 1)", "2\n3", empty(Cast.class));
+    check("for $v in (1e0, 2e0, 3e0, 4e0, 5e0, 6e0) return xs:double($v) + 1",
+        "2\n3\n4\n5\n6\n7", empty(Cast.class));
 
     check("for $n in (10000000000000000, 1)[. != 0] return number($n) = 10000000000000001",
         "true\nfalse", exists(NUMBER));
+    check("for $n in (10000000000000000, 1)[. != 0] return xs:double($n) = 10000000000000001",
+        "true\nfalse", exists(Cast.class));
 
     check("number(<?_ 1?>) + number(<_>2</_>)", 3, count(NUMBER, 1));
+    check("xs:double(<?_ 1?>) + xs:double(<_>2</_>)", 3, count(Cast.class, 1));
   }
 
   /** Inlining of where clauses. */
