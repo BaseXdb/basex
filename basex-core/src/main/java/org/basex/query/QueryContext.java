@@ -712,9 +712,7 @@ public final class QueryContext extends Job implements Closeable {
    * @throws QueryException query exception
    */
   private Value cast(final Object value, final String type) throws QueryException {
-    final StaticContext sc = root != null ? root.sc : new StaticContext(this);
-
-    // String input
+    // interpret string input
     Object object = value;
     if(object instanceof String) {
       final String string = (String) object;
@@ -723,8 +721,7 @@ public final class QueryContext extends Job implements Closeable {
       if(string.indexOf('\1') == -1) {
         strings.add(string);
       } else {
-        strings.add(string.split("\1"));
-        object = strings.toArray();
+        object = strings.add(string.split("\1")).toArray();
       }
 
       // sub types overriding the global value (value \2 type)
@@ -740,12 +737,12 @@ public final class QueryContext extends Job implements Closeable {
       }
     }
 
-    // no type specified: return original value or convert Java object
+    // no type specified: return original value or convert as Java object
     if(type == null || type.isEmpty()) {
       return object instanceof Value ? (Value) object : JavaCall.toValue(object, this, null);
     }
 
-    // convert to json
+    // convert JSON input
     if(type.equalsIgnoreCase(MainParser.JSON.name())) {
       try {
         final JsonParserOptions jp = new JsonParserOptions();
@@ -756,23 +753,11 @@ public final class QueryContext extends Job implements Closeable {
       }
     }
 
-    // test for empty sequence
-    if(type.equals(QueryText.EMPTY_SEQUENCE + "()")) return Empty.VALUE;
-
-    // convert to the specified type
-    // [LW] type should be parsed properly
-    final QNm nm = new QNm(token(type.replaceAll("\\(.*?\\)$", "")), sc);
-    if(!nm.hasURI() && nm.hasPrefix()) throw NOURI_X.get(null, nm.string());
-
-    Type tp;
-    if(Strings.endsWith(type, ')')) {
-      tp = nm.eq(AtomType.ITEM.qname()) ? AtomType.ITEM : NodeType.find(nm);
-      if(tp == null) tp = FuncType.find(nm);
-    } else {
-      tp = ListType.find(nm);
-      if(tp == null) tp = AtomType.find(nm, false);
-    }
-    if(tp == null) throw WHICHTYPE_X.get(null, type);
+    // parse target type
+    final StaticContext sc = root != null ? root.sc : new StaticContext(this);
+    final SeqType st = new QueryParser(type, null, this, sc).parseSeqType();
+    if(st.eq(SeqType.EMPTY_SEQUENCE_Z)) return Empty.VALUE;
+    final Type tp = st.type;
 
     // cast XDM values
     if(object instanceof Value) {
@@ -785,8 +770,8 @@ public final class QueryContext extends Job implements Closeable {
       return vb.value(tp);
     }
 
+    // cast sequences
     if(object instanceof String[]) {
-      // cast string array
       final ValueBuilder vb = new ValueBuilder(this);
       for(final String string : (String[]) object) vb.add(tp.cast(string, this, null));
       return vb.value(tp);

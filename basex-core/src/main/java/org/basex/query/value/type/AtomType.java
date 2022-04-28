@@ -801,13 +801,7 @@ public enum AtomType implements Type {
   @Override
   public Item cast(final Object value, final QueryContext qc, final InputInfo ii)
       throws QueryException {
-    throw Util.notExpected(value);
-  }
-
-  @Override
-  public final Item castString(final String value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
-    return cast(value, qc, ii);
+    throw FUNCCAST_X_X.get(ii, this, value);
   }
 
   @Override
