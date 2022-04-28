@@ -178,16 +178,6 @@ public interface Type {
   Value cast(Object value, QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
-   * Casts the specified string to this type.
-   * @param value string object
-   * @param qc query context
-   * @param ii input info
-   * @return cast value
-   * @throws QueryException query exception
-   */
-  Value castString(String value, QueryContext qc, InputInfo ii) throws QueryException;
-
-  /**
    * Returns a sequence type with a single number of occurrence.
    * @return sequence type
    */

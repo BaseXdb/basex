@@ -91,12 +91,6 @@ public enum ListType implements Type {
   }
 
   @Override
-  public final Value castString(final String value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
-    return cast(value, qc, ii);
-  }
-
-  @Override
   public SeqType seqType(final Occ occ) {
     // cannot statically be instantiated due to circular dependencies
     if(seqTypes == null) seqTypes = new EnumMap<>(Occ.class);

@@ -220,6 +220,21 @@ public class QueryParser extends InputParser {
     }
   }
 
+
+  /**
+   * Parses a sequence type.
+   * @return sequence type
+   * @throws QueryException query exception
+   */
+  final SeqType parseSeqType() throws QueryException {
+    try {
+      return sequenceType();
+    } catch(final QueryException ex) {
+      Util.debug(ex);
+      throw CASTTYPE_X.get(null, ex.getLocalizedMessage());
+    }
+  }
+
   /**
    * Initializes the parsing process.
    * @throws QueryException query exception

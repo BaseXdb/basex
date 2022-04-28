@@ -682,7 +682,7 @@ public enum QueryError {
   /** Error code. */
   INVALIDZONE_X(FORG, 1, "Invalid timezone: %."),
   /** Error code. */
-  FUNCCAST_X_X(FORG, 1, "Cannot convert to %: '%'."),
+  FUNCCAST_X_X(FORG, 1, "Cannot convert to %: %."),
   /** Error code. */
   FUNCCAST_X_X_X(FORG, 1, "Cannot convert % to %: %."),
   /** Error code. */
@@ -992,6 +992,8 @@ public enum QueryError {
   KEYSPEC(XPST, 3, "No specifier after lookup operator: '%'."),
   /** Error code. */
   ARROWSPEC(XPST, 3, "No specifier after arrow operator: '%'."),
+  /** Error code. */
+  CASTTYPE_X(XPST, 3, "%"),
 
   /** Error code. */
   STATIC_X(XPST, 5, "No XML Schema support: %."),

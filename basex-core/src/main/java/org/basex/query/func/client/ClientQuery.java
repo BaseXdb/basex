@@ -44,7 +44,7 @@ public final class ClientQuery extends ClientFn {
         final String value = cq.next();
         final Type type = cq.type();
         if(type instanceof FuncType) throw CLIENT_FITEM_X.get(info, value);
-        vb.add(type.castString(value, qc, info));
+        vb.add(type.cast(value, qc, info));
       }
       return vb.value();
     } catch(final QueryIOException ex) {

@@ -99,13 +99,9 @@ public class FuncType implements Type {
   }
 
   @Override
-  public final Item cast(final Object value, final QueryContext qc, final InputInfo ii) {
-    throw Util.notExpected(value);
-  }
-
-  @Override
-  public final Item castString(final String string, final QueryContext qc, final InputInfo ii) {
-    throw Util.notExpected(string);
+  public Item cast(final Object value, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+    throw FUNCCAST_X_X.get(ii, this, value);
   }
 
   @Override
