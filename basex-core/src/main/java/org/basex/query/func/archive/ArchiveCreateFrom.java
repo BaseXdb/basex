@@ -24,8 +24,6 @@ import org.basex.util.list.*;
 public class ArchiveCreateFrom extends ArchiveCreate {
   @Override
   public B64 item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
-
     final IOFile root = new IOFile(toPath(0, qc).toString());
     final CreateFromOptions opts = toOptions(1, new CreateFromOptions(), qc);
     final boolean recursive = opts.get(CreateFromOptions.RECURSIVE);

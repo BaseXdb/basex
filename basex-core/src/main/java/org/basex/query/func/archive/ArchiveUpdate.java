@@ -20,8 +20,6 @@ import org.basex.util.*;
 public final class ArchiveUpdate extends ArchiveCreate {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
-
     // entries to be updated
     final B64 archive = toB64(exprs[0], qc, false);
     final Map<String, Item[]> map = toMap(1, qc);

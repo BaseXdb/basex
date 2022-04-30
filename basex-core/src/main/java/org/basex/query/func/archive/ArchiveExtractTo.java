@@ -24,8 +24,6 @@ import org.basex.util.hash.*;
 public class ArchiveExtractTo extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
-
     final Path path = toPath(0, qc);
     final B64 archive = toB64(exprs[1], qc, false);
     final TokenSet hs = entries(2, qc);

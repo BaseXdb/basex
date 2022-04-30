@@ -36,7 +36,6 @@ public abstract class Parse extends StandardFunc {
   final Item unparsedText(final QueryContext qc, final boolean check, final boolean encoding)
       throws QueryException {
 
-    checkCreate(qc);
     final byte[] path = toTokenOrNull(exprs[0], qc);
     if(path == null) return check ? Bln.FALSE : Empty.VALUE;
 

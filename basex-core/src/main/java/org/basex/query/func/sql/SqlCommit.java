@@ -18,7 +18,6 @@ import org.basex.util.*;
 public final class SqlCommit extends SqlFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
     try {
       connection(qc).commit();
       return Empty.VALUE;

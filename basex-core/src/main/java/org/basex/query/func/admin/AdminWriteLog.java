@@ -17,8 +17,6 @@ import org.basex.util.*;
 public final class AdminWriteLog extends AdminFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkAdmin(qc);
-
     final String message = toString(exprs[0], qc);
     final String type = exprs.length > 1 ? toString(exprs[1], qc) : LogType.INFO.toString();
     if(type.matches(".*\\s.*$")) throw ADMIN_TYPE_X.get(info, type);

@@ -18,8 +18,6 @@ import org.basex.util.*;
 public final class RequestSetAttribute extends ApiFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkAdmin(qc);
-
     final String name = toString(exprs[0], qc);
     final Value value = exprs[1].value(qc);
 

@@ -26,13 +26,11 @@ import org.basex.util.*;
 public final class AdminLogs extends AdminFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    checkAdmin(qc);
     return exprs.length == 0 ? list(qc).iter() : logs(qc);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    checkAdmin(qc);
     return exprs.length == 0 ? list(qc) : logs(qc).value(qc, this);
   }
 

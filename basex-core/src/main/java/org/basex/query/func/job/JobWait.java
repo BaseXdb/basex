@@ -18,8 +18,6 @@ import org.basex.util.*;
 public final class JobWait extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkAdmin(qc);
-
     final String id = toString(exprs[0], qc);
     if(qc.jc().id().equals(id)) throw JOBS_SELF_X.get(info, id);
 

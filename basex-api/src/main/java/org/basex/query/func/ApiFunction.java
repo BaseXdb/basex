@@ -5,8 +5,9 @@ import static org.basex.query.util.Flag.*;
 import static org.basex.query.value.type.SeqType.*;
 
 import java.util.*;
-import java.util.function.Supplier;
+import java.util.function.*;
 
+import org.basex.core.users.*;
 import org.basex.query.func.geo.*;
 import org.basex.query.func.request.*;
 import org.basex.query.func.rest.*;
@@ -216,7 +217,7 @@ public enum ApiFunction implements AFunction {
       params(), STRING_O, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_SET_ATTRIBUTE(RequestSetAttribute::new, "set-attribute(name,value)",
-      params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(NDT), REQUEST_URI),
+      params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(NDT), REQUEST_URI, Perm.ADMIN),
   /** XQuery function. */
   _REQUEST_URI(RequestUri::new, "uri()",
       params(), ANY_URI_O, REQUEST_URI),
@@ -267,28 +268,28 @@ public enum ApiFunction implements AFunction {
 
   /** XQuery function. */
   _SESSIONS_ACCESSED(SessionsAccessed::new, "accessed(id)",
-      params(STRING_O), DATE_TIME_O, flag(NDT), SESSIONS_URI),
+      params(STRING_O), DATE_TIME_O, flag(NDT), SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_CLOSE(SessionsClose::new, "close(id,)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), SESSIONS_URI),
+      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_CREATED(SessionsCreated::new, "created(id)",
-      params(STRING_O), DATE_TIME_O, flag(NDT), SESSIONS_URI),
+      params(STRING_O), DATE_TIME_O, flag(NDT), SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_DELETE(SessionsDelete::new, "delete(id,key)",
-      params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), SESSIONS_URI),
+      params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_GET(SessionsGet::new, "get(id,key[,default])",
-      params(STRING_O, STRING_O, ITEM_ZM), ITEM_ZM, flag(NDT), SESSIONS_URI),
+      params(STRING_O, STRING_O, ITEM_ZM), ITEM_ZM, flag(NDT), SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_IDS(SessionsIds::new, "ids()",
-      params(), STRING_ZM, flag(NDT), SESSIONS_URI),
+      params(), STRING_ZM, flag(NDT), SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_NAMES(SessionsNames::new, "names(id)",
-      params(STRING_O), STRING_ZM, flag(NDT), SESSIONS_URI),
+      params(STRING_O), STRING_ZM, flag(NDT), SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_SET(SessionsSet::new, "set(id,key,value)",
-      params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(NDT), SESSIONS_URI),
+      params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(NDT), SESSIONS_URI, Perm.ADMIN),
 
   // WebSocket Module
 
@@ -331,20 +332,7 @@ public enum ApiFunction implements AFunction {
 
   /**
    * Constructs a function signature; calls
-   * {@link #ApiFunction(Supplier, String, SeqType[], SeqType, EnumSet)}.
-   * @param supplier function implementation constructor
-   * @param desc descriptive function string
-   * @param params parameter types
-   * @param seqType return type
-   */
-  ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
-      final SeqType[] params, final SeqType seqType) {
-    this(supplier, desc, params, seqType, EnumSet.noneOf(Flag.class));
-  }
-
-  /**
-   * Constructs a function signature; calls
-   * {@link #ApiFunction(Supplier, String, SeqType[], SeqType, EnumSet)}.
+   * {@link #ApiFunction(Supplier, String, SeqType[], SeqType, EnumSet, byte[])}.
    * @param supplier function implementation constructor
    * @param desc descriptive function string
    * @param params parameter types
@@ -354,20 +342,6 @@ public enum ApiFunction implements AFunction {
   ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
       final SeqType[] params, final SeqType type, final byte[] uri) {
     this(supplier, desc, params, type, EnumSet.noneOf(Flag.class), uri);
-  }
-
-  /**
-   * Constructs a function signature; calls
-   * {@link #ApiFunction(Supplier, String, SeqType[], SeqType, EnumSet, byte[])}.
-   * @param supplier function implementation constructor
-   * @param desc descriptive function string
-   * @param params parameter types
-   * @param seqType return type
-   * @param flag static function properties
-   */
-  ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
-      final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flag) {
-    this(supplier, desc, params, seqType, flag, FN_URI);
   }
 
   /**
@@ -383,7 +357,25 @@ public enum ApiFunction implements AFunction {
    */
   ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
       final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri) {
-    definition = new FuncDefinition(supplier, desc, params, seqType, flags, uri);
+    this(supplier, desc, params, seqType, flags, uri, Perm.NONE);
+  }
+
+  /**
+   * Constructs a function signature.
+   * @param supplier function implementation constructor
+   * @param desc descriptive function string, containing the function name and its parameters in
+   *   parentheses. Optional parameters are represented in nested square brackets; three dots
+   *   indicate that the number of parameters of a function is not limited.
+   * @param params parameter types
+   * @param seqType return type
+   * @param flags static function properties
+   * @param perm minimum permission
+   * @param uri uri
+   */
+  ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
+      final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri,
+      final Perm perm) {
+    definition = new FuncDefinition(supplier, desc, params, seqType, flags, uri, perm);
   }
 
   @Override

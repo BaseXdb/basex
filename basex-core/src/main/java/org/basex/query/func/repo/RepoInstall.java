@@ -15,7 +15,6 @@ import org.basex.util.*;
 public final class RepoInstall extends RepoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
     new RepoManager(qc.context, info).install(toString(exprs[0], qc));
     return Empty.VALUE;
   }

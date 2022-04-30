@@ -18,8 +18,6 @@ import org.basex.util.*;
 public final class ClientConnect extends ClientFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
-
     final String host = toString(exprs[0], qc);
     final String user = toString(exprs[2], qc);
     final String pass = toString(exprs[3], qc);

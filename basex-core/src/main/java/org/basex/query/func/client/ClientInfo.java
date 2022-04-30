@@ -13,7 +13,6 @@ import org.basex.util.*;
 public final class ClientInfo extends ClientFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
     return Str.get(session(qc, false).info().replace("\r\n?", "\n").trim());
   }
 }

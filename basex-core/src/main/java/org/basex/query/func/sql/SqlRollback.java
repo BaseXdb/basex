@@ -18,7 +18,6 @@ import org.basex.util.*;
 public final class SqlRollback extends SqlFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
     try {
       connection(qc).rollback();
       return Empty.VALUE;

@@ -34,7 +34,6 @@ public final class DbBackups extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    checkCreate(qc);
     final String name = exprs.length == 0 ? null : toString(exprs[0], qc);
 
     final Context ctx = qc.context;

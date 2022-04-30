@@ -18,24 +18,13 @@ import org.basex.util.*;
  */
 abstract class SessionsFn extends ApiFunc {
   /**
-   * Checks permissions.
-   * @param qc query context
-   * @throws QueryException query exception
-   */
-  final void check(final QueryContext qc) throws QueryException {
-    checkAdmin(qc);
-    // check if HTTP connection is available
-    request(qc);
-  }
-
-  /**
    * Returns a session instance.
    * @param qc query context
    * @return session instance
    * @throws QueryException query exception
    */
   final ASession session(final QueryContext qc) throws QueryException {
-    check(qc);
+    request(qc);
 
     // retrieve session from global listener
     final byte[] id = toToken(exprs[0], qc);

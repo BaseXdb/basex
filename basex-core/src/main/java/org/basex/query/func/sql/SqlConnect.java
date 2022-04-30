@@ -27,7 +27,6 @@ public final class SqlConnect extends SqlFn {
   @SuppressWarnings("resource")
   @Override
   public Uri item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
     // URL to relational database
     final String url = toString(exprs[0], qc);
     final JDBCConnections jdbc = jdbc(qc);

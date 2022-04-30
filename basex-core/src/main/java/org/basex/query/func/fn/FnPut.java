@@ -23,7 +23,6 @@ import org.basex.util.*;
 public final class FnPut extends StandardFunc {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
     final ANode nd = toNode(exprs[0], qc);
     final byte[] file = toZeroToken(exprs[1], qc);
     final Item so = exprs.length > 2 ? exprs[2].item(qc, info) : Empty.VALUE;

@@ -18,7 +18,6 @@ import org.basex.query.value.*;
 public final class JobServices extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    checkAdmin(qc);
     try {
       return new Jobs(qc.context).toXML().childIter().value(qc, this);
     } catch(final IOException ex) {

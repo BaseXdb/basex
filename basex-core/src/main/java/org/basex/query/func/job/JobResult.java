@@ -19,8 +19,6 @@ import org.basex.query.value.seq.*;
 public final class JobResult extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    checkAdmin(qc);
-
     final String id = toString(exprs[0], qc);
     final JobPool jobs = qc.context.jobs;
 

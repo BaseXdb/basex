@@ -75,6 +75,7 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
+    checkPerm(cc.qc, definition.perm);
     simplifyArgs(cc);
 
     final Expr expr = opt(cc);
@@ -370,7 +371,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final IOContent toContent(final byte[] uri, final QueryContext qc)
       throws QueryException {
-    checkAdmin(qc);
+    checkPerm(qc, Perm.ADMIN);
     final IO io = toIO(uri);
     try {
       return new IOContent(io.string(), io.url());
@@ -485,33 +486,15 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Checks if the current user has create permissions. If negative, an
-   * exception is thrown.
-   * @param qc query context
-   * @throws QueryException query exception
-   */
-  protected final void checkAdmin(final QueryContext qc) throws QueryException {
-    checkPerm(qc, Perm.ADMIN);
-  }
-
-  /**
-   * Checks if the current user has create permissions. If negative, an exception is thrown.
-   * @param qc query context
-   * @throws QueryException query exception
-   */
-  protected final void checkCreate(final QueryContext qc) throws QueryException {
-    checkPerm(qc, Perm.CREATE);
-  }
-
-  /**
    * Checks if the current user has given permissions. If negative, an
    * exception is thrown.
    * @param qc query context
    * @param perm permission
    * @throws QueryException query exception
    */
-  private void checkPerm(final QueryContext qc, final Perm perm) throws QueryException {
-    if(!qc.context.user().has(perm)) throw BASEX_PERMISSION_X_X.get(info, perm, this);
+  protected void checkPerm(final QueryContext qc, final Perm perm) throws QueryException {
+    if(perm != Perm.NONE && !qc.context.user().has(perm))
+      throw BASEX_PERMISSION_X_X.get(info, perm, this);
   }
 
   /**
