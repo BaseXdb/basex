@@ -12,7 +12,6 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -28,7 +27,7 @@ public final class ClientQuery extends ClientFn {
   public Value value(final QueryContext qc) throws QueryException {
     checkCreate(qc);
     final ClientSession cs = session(qc, false);
-    final String query = Token.string(toToken(exprs[1], qc));
+    final String query = toString(exprs[1], qc);
     final ValueBuilder vb = new ValueBuilder(qc);
     try(org.basex.api.client.ClientQuery cq = cs.query(query)) {
       // bind variables and context value

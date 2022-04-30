@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class GeoCrosses extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(checkGeo(0, qc).crosses(checkGeo(1, qc)));
+    return Bln.get(toGeometry(0, qc).crosses(toGeometry(1, qc)));
   }
 }

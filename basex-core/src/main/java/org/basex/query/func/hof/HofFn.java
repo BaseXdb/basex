@@ -23,7 +23,7 @@ abstract class HofFn extends StandardFunc {
    * @throws QueryException exception
    */
   final Comparator<Item> getComp(final int pos, final QueryContext qc) throws QueryException {
-    final FItem lt = checkArity(exprs[pos], 2, qc);
+    final FItem lt = toFunction(exprs[pos], 2, qc);
     return (a, b) -> {
       try {
         return toBoolean(lt.invoke(qc, info, a, b).item(qc, info)) ? -1 : 1;

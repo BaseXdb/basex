@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class GeoGeometryType extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return new QNm(GML, checkGeo(0, qc).getGeometryType(), URI);
+    return new QNm(GML, toGeometry(0, qc).getGeometryType(), URI);
   }
 }

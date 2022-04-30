@@ -21,7 +21,7 @@ import org.basex.util.ft.*;
 public final class FtTokens extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     byte[] entry = exprs.length < 2 ? Token.EMPTY : toToken(exprs[1], qc);
     if(entry.length != 0) {
       final FTLexer lexer = new FTLexer(new FTOpt().assign(data.meta));

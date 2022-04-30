@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class GeoBoundary extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toElement(checkGeo(0, qc).getBoundary(), qc);
+    return toElement(toGeometry(0, qc).getBoundary(), qc);
   }
 }

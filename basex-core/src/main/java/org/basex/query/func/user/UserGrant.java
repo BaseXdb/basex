@@ -23,7 +23,7 @@ public final class UserGrant extends UserFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
     final User user = toInactiveUser(0, qc);
-    final ArrayList<Perm> perms = toPerms(1, qc);
+    final ArrayList<Perm> perms = toPermissions(1, qc);
     final StringList patterns = toPatterns(2, qc);
 
     if(user.name().equals(UserText.ADMIN)) throw USER_ADMIN.get(info);

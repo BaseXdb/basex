@@ -39,7 +39,7 @@ public final class DbDir extends DbList {
    * @throws QueryException query exception
    */
   private Value resources(final QueryContext qc) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     byte[] path = toToken(exprs[1], qc);
     String root = MetaData.normPath(string(path));
     if(root == null) throw DB_PATH_X.get(info, path);

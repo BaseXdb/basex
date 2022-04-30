@@ -30,7 +30,7 @@ public final class WebError extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final long code = toLong(exprs[0], qc);
-    final String message = Token.string(toToken(exprs[1], qc));
+    final String message = toString(exprs[1], qc);
     if(code <= 0 || code > 999) throw WEB_STATUS_X.get(info, code);
 
     final QNm qname = new QNm(Token.concat(STATUS, code), REST_URI);

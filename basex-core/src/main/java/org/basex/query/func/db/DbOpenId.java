@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 public class DbOpenId extends DbAccess {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     final Iter iter = exprs[1].atomIter(qc, info);
 
     final IntList list = new IntList(Seq.initialCapacity(iter.size()));

@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class GeoZ extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Dbl.get(geo(0, qc, POINT, Q_GML_POINT).getCoordinate().z);
+    return Dbl.get(toGeometry(0, qc, POINT, Q_GML_POINT).getCoordinate().z);
   }
 }

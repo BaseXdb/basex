@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
 public final class HofUntil extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final FItem pred = checkArity(exprs[0], 1, qc), func = checkArity(exprs[1], 1, qc);
+    final FItem pred = toFunction(exprs[0], 1, qc), func = toFunction(exprs[1], 1, qc);
     Value value = exprs[2].value(qc);
 
     while(!toBoolean(pred.invoke(qc, info, value).item(qc, info))) {

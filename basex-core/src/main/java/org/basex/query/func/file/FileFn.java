@@ -54,7 +54,7 @@ abstract class FileFn extends StandardFunc {
    * @return specified file
    * @throws QueryException query exception
    */
-  final Path checkParentDir(final Path path) throws QueryException {
+  final Path toParent(final Path path) throws QueryException {
     if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
     final Path parent = path.getParent();
     if(parent != null && !Files.exists(parent))
@@ -69,7 +69,7 @@ abstract class FileFn extends StandardFunc {
    * @return boolean value
    * @throws QueryException query exception
    */
-  final boolean optionalBool(final int i, final QueryContext qc) throws QueryException {
+  final boolean toBoolean(final int i, final QueryContext qc) throws QueryException {
     return i < exprs.length && toBoolean(exprs[i], qc);
   }
 

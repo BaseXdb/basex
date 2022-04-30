@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class GeoDistance extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Dbl.get(checkGeo(0, qc).distance(checkGeo(1, qc)));
+    return Dbl.get(toGeometry(0, qc).distance(toGeometry(1, qc)));
   }
 }

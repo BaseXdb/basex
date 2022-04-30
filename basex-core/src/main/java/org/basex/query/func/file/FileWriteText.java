@@ -37,7 +37,7 @@ public class FileWriteText extends FileFn {
   final synchronized void write(final boolean append, final QueryContext qc)
       throws QueryException, IOException {
 
-    final Path path = checkParentDir(toPath(0, qc));
+    final Path path = toParent(toPath(0, qc));
     Item text = toItem(exprs[1], qc);
     if(!(text instanceof AStr)) text = Str.get(toToken(text));
     final String encoding = toEncodingOrNull(2, FILE_UNKNOWN_ENCODING_X, qc);

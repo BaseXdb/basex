@@ -15,7 +15,7 @@ import org.basex.query.value.*;
 public final class DbAttributeRange extends DbTextRange {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     return attribute(data, rangeAccess(data, qc), qc, 3);
   }
 

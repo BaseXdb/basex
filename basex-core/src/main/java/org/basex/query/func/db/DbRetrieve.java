@@ -17,7 +17,7 @@ import org.basex.util.*;
 public final class DbRetrieve extends DbAccess {
   @Override
   public B64Lazy item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     final String path = toDbPath(1, qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
 

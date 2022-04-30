@@ -21,7 +21,7 @@ import org.basex.query.value.type.*;
 public class FnApply extends StandardFunc {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    final FItem func = toFunc(exprs[0], qc);
+    final FItem func = toFunction(exprs[0], qc);
     final XQArray array = toArray(exprs[1], qc);
 
     final long ar = checkUp(func, this instanceof UpdateApply, sc).arity(), as = array.arraySize();

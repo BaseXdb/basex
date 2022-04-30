@@ -15,7 +15,7 @@ import com.vividsolutions.jts.geom.*;
 public final class GeoIsClosed extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Geometry geo = geo(0, qc, LINE,
+    final Geometry geo = toGeometry(0, qc, LINE,
         Q_GML_LINEARRING, Q_GML_LINESTRING, Q_GML_MULTILINESTRING);
     return Bln.get(geo instanceof LineString ? ((LineString) geo).isClosed() :
       ((MultiLineString) geo).isClosed());

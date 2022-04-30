@@ -20,7 +20,7 @@ public final class RequestSetAttribute extends ApiFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
 
-    final String name = Token.string(toToken(exprs[0], qc));
+    final String name = toString(exprs[0], qc);
     final Value value = exprs[1].value(qc);
 
     request(qc).setAttribute(name, value.materialize(qc, REQUEST_ATTRIBUTE_X, info));

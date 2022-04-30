@@ -608,8 +608,6 @@ public enum QueryError {
   SAXERR_X(FODC, 6, "SAX: %"),
   /** Error code. */
   RESINV_X(FODC, 7, "Resource path '%' is invalid."),
-  /** Error code. */
-  INVDB_X(FODC, 7, "Invalid database name: '%'."),
 
   /** Error code. */
   FORMNUM_X(FODF, 1280, "Unknown decimal format: '%'."),

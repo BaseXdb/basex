@@ -15,9 +15,9 @@ public final class CryptoDecrypt extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] data = toBytes(exprs[0], qc);
-    final String type = Token.string(toToken(exprs[1], qc));
+    final String type = toString(exprs[1], qc);
     final byte[] key = toBytes(exprs[2], qc);
-    final String algorithm = Token.string(toToken(exprs[3], qc));
+    final String algorithm = toString(exprs[3], qc);
     return new Encryption(info).encryption(data, type, key, algorithm, false);
   }
 }

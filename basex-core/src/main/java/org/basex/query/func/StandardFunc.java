@@ -162,7 +162,7 @@ public abstract class StandardFunc extends Arr {
    * Serializes the data from the specified iterator.
    * @param iter data to serialize
    * @param opts serialization parameters
-   * @param err error code
+   * @param err error to raise
    * @param qc query context
    * @return result
    * @throws QueryException query exception
@@ -242,7 +242,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final Expr compileData(final CompileContext cc) throws QueryException {
     if(exprs.length > 0 && exprs[0] instanceof Value) {
-      data = checkData(cc.qc);
+      data = toData(cc.qc);
       cc.info(OPTOPEN_X, data.meta.name);
     }
     return this;
@@ -331,8 +331,8 @@ public abstract class StandardFunc extends Arr {
    * @return input source, or exception
    * @throws QueryException query exception
    */
-  protected final IO checkPath(final int i, final QueryContext qc) throws QueryException {
-    return checkPath(toToken(exprs[i], qc));
+  protected final IO toIO(final int i, final QueryContext qc) throws QueryException {
+    return toIO(toToken(exprs[i], qc));
   }
 
   /**
@@ -342,7 +342,7 @@ public abstract class StandardFunc extends Arr {
    * @return input source, or exception
    * @throws QueryException query exception
    */
-  protected final IO checkPath(final byte[] uri) throws QueryException {
+  protected final IO toIO(final byte[] uri) throws QueryException {
     final IO io = new QueryInput(string(uri), sc).io;
     if(!io.exists()) throw WHICHRES_X.get(info, io);
     if(io.isDir()) throw RESDIR_X.get(info, io);
@@ -371,7 +371,7 @@ public abstract class StandardFunc extends Arr {
   protected final IOContent toContent(final byte[] uri, final QueryContext qc)
       throws QueryException {
     checkAdmin(qc);
-    final IO io = checkPath(uri);
+    final IO io = toIO(uri);
     try {
       return new IOContent(io.string(), io.url());
     } catch(final IOException ex) {
@@ -394,7 +394,7 @@ public abstract class StandardFunc extends Arr {
   /**
    * Returns a normalized encoding representation.
    * @param i index of encoding argument
-   * @param err error for invalid encoding
+   * @param err error to raise
    * @param qc query context
    * @return string or {@code null}
    * @throws QueryException query exception
@@ -405,7 +405,7 @@ public abstract class StandardFunc extends Arr {
     if(i >= exprs.length) return null;
     final byte[] encoding = toToken(exprs[i], qc);
     try {
-      final String enc = string(toToken(exprs[i], qc));
+      final String enc = toString(exprs[i], qc);
       if(Charset.isSupported(enc)) return Strings.normEncoding(enc);
     } catch(final IllegalArgumentException ex) {
       // character set is invalid or unknown (e.g. empty string)
@@ -480,11 +480,8 @@ public abstract class StandardFunc extends Arr {
    * @return data instance
    * @throws QueryException query exception
    */
-  protected final Data checkData(final QueryContext qc) throws QueryException {
-    if(data != null) return data;
-    final String name = string(toToken(exprs[0], qc));
-    if(!Databases.validName(name)) throw INVDB_X.get(info, name);
-    return qc.resources.database(name, info);
+  protected final Data toData(final QueryContext qc) throws QueryException {
+    return data != null ? data : qc.resources.database(toName(0, DB_NAME_X, qc), info);
   }
 
   /**
@@ -525,9 +522,9 @@ public abstract class StandardFunc extends Arr {
    * @return function item
    * @throws QueryException query exception
    */
-  protected final FItem checkArity(final Expr expr, final int nargs, final QueryContext qc)
+  protected final FItem toFunction(final Expr expr, final int nargs, final QueryContext qc)
       throws QueryException {
-    return checkArity(expr, nargs, false, qc);
+    return toFunction(expr, nargs, false, qc);
   }
 
   /**
@@ -539,13 +536,28 @@ public abstract class StandardFunc extends Arr {
    * @return function item
    * @throws QueryException query exception
    */
-  protected final FItem checkArity(final Expr expr, final int nargs, final boolean updating,
+  protected final FItem toFunction(final Expr expr, final int nargs, final boolean updating,
       final QueryContext qc) throws QueryException {
 
-    final FItem func = checkUp(toFunc(expr, qc), updating, sc);
+    final FItem func = checkUp(toFunction(expr, qc), updating, sc);
     final int fargs = func.arity();
     if(fargs == nargs) return func;
     throw FUNARITY_X_X.get(info, arguments(fargs), nargs);
+  }
+
+  /**
+   * Checks if the specified expression is a valid name.
+   * @param i index of argument
+   * @param err error to raise
+   * @param qc query context
+   * @return normalized path
+   * @throws QueryException query exception
+   */
+  protected final String toName(final int i, final QueryError err, final QueryContext qc)
+      throws QueryException {
+    final String name = toString(exprs[i], qc);
+    if(Databases.validName(name)) return name;
+    throw err.get(info, name);
   }
 
   /**
@@ -555,7 +567,8 @@ public abstract class StandardFunc extends Arr {
    * @return resulting value
    * @throws QueryException query exception
    */
-  protected final long dateTimeToMs(final Expr expr, final QueryContext qc) throws QueryException {
+  protected final long toMilliseconds(final Expr expr, final QueryContext qc)
+      throws QueryException {
     final Dtm dtm = (Dtm) checkType(expr, qc, AtomType.DATE_TIME);
     if(dtm.yea() > 292278993) throw INTRANGE_X.get(info, dtm.yea());
     return dtm.toJava().toGregorianCalendar().getTimeInMillis();

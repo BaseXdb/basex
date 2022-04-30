@@ -18,7 +18,7 @@ import org.basex.query.value.*;
 public class DbTextRange extends DbAccess {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     return rangeAccess(data, qc).iter(qc);
   }
 

@@ -17,7 +17,7 @@ import org.basex.util.options.*;
 public final class DbOptimize extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     final boolean all = exprs.length > 1 && toBoolean(exprs[1], qc);
     final Options opts = toOptions(2, new Options(), qc);
     qc.updates().add(new DBOptimize(data, all, opts, qc, info), qc);

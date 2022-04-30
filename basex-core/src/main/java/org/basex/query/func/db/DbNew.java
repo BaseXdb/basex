@@ -26,7 +26,7 @@ abstract class DbNew extends DbAccess {
    * @return input container
    * @throws QueryException query exception
    */
-  final NewInput checkInput(final Item input, final String path) throws QueryException {
+  final NewInput toNewInput(final Item input, final String path) throws QueryException {
     final NewInput ni = new NewInput();
 
     if(input instanceof ANode) {

@@ -17,7 +17,7 @@ public final class JobFinished extends StandardFunc {
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
 
-    final String id = Token.string(toToken(exprs[0], qc));
+    final String id = toString(exprs[0], qc);
     final JobPool pool = qc.context.jobs;
     final QueryJobResult result = pool.results.get(id);
     // returns true if job is not active, and if no result exists or if it has been cached

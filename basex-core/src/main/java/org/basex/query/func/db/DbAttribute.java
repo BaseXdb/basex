@@ -15,7 +15,7 @@ import org.basex.query.value.*;
 public class DbAttribute extends DbText {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     return attribute(data, valueAccess(data, qc), qc, 2);
   }
 

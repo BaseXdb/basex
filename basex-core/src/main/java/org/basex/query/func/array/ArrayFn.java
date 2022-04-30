@@ -21,7 +21,7 @@ abstract class ArrayFn extends StandardFunc {
    * @return specified position -1
    * @throws QueryException query exception
    */
-  final long checkPos(final XQArray array, final long pos, final boolean incl)
+  final long toPos(final XQArray array, final long pos, final boolean incl)
       throws QueryException {
 
     final long as = array.arraySize() + (incl ? 1 : 0);

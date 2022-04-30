@@ -1,7 +1,6 @@
 package org.basex.query.func.sql;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -19,7 +18,7 @@ public final class SqlInit extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkCreate(qc);
-    final String driver = string(toToken(exprs[0], qc));
+    final String driver = toString(exprs[0], qc);
     if(Reflect.find(driver) == null) throw SQL_INIT_X.get(info, driver);
     return Empty.VALUE;
   }

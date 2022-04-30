@@ -7,7 +7,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -18,7 +17,7 @@ import org.basex.util.*;
 public final class RequestCookie extends ApiFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final String name = Token.string(toToken(exprs[0], qc));
+    final String name = toString(exprs[0], qc);
     final Cookie[] cookies = request(qc).getCookies();
     if(cookies != null) {
       for(final Cookie c : cookies) {

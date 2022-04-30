@@ -20,9 +20,9 @@ public final class ClientConnect extends ClientFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkCreate(qc);
 
-    final String host = Token.string(toToken(exprs[0], qc));
-    final String user = Token.string(toToken(exprs[2], qc));
-    final String pass = Token.string(toToken(exprs[3], qc));
+    final String host = toString(exprs[0], qc);
+    final String user = toString(exprs[2], qc);
+    final String pass = toString(exprs[3], qc);
     final int port = (int) toLong(exprs[1], qc);
     try {
       return sessions(qc).add(new ClientSession(host, port, user, pass));

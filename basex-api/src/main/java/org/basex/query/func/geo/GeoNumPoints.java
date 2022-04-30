@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class GeoNumPoints extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Int.get(checkGeo(0, qc).getNumPoints());
+    return Int.get(toGeometry(0, qc).getNumPoints());
   }
 }

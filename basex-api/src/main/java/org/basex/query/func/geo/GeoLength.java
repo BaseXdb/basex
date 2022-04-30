@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class GeoLength extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Dbl.get(checkGeo(0, qc).getLength());
+    return Dbl.get(toGeometry(0, qc).getLength());
   }
 }

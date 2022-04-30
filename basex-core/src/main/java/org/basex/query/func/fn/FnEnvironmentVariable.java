@@ -15,7 +15,7 @@ import org.basex.util.*;
 public final class FnEnvironmentVariable extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String env = System.getenv(Token.string(toToken(exprs[0], qc)));
-    return env != null ? Str.get(env) : Empty.VALUE;
+    final String value = System.getenv(toString(exprs[0], qc));
+    return value != null ? Str.get(value) : Empty.VALUE;
   }
 }

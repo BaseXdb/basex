@@ -1,7 +1,6 @@
 package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
@@ -17,8 +16,8 @@ import org.basex.util.*;
 public final class DbProperty extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Data data = checkData(qc);
-    final String name = string(toToken(exprs[1], qc));
+    final Data data = toData(qc);
+    final String name = toString(exprs[1], qc);
     final MetaProp prop = MetaProp.get(name);
     if(prop == null) throw DB_PROPERTY_X.get(info, name);
 

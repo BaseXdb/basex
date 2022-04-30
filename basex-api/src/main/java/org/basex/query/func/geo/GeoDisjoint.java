@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class GeoDisjoint extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(checkGeo(0, qc).disjoint(checkGeo(1, qc)));
+    return Bln.get(toGeometry(0, qc).disjoint(toGeometry(1, qc)));
   }
 }

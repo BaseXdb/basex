@@ -1,8 +1,6 @@
 package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
-
 import java.io.*;
 
 import org.basex.core.cmd.*;
@@ -24,8 +22,8 @@ public final class DbExport extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkCreate(qc);
-    final Data data = checkData(qc);
-    final String path = string(toToken(exprs[1], qc));
+    final Data data = toData(qc);
+    final String path = toString(exprs[1], qc);
     final Item so = exprs.length > 2 ? exprs[2].item(qc, info) : Empty.VALUE;
     final SerializerOptions sopts = FuncOptions.serializer(so, info);
     try {

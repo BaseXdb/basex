@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class GeoIntersection extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toElement(checkGeo(0, qc).intersection(checkGeo(1, qc)), qc);
+    return toElement(toGeometry(0, qc).intersection(toGeometry(1, qc)), qc);
   }
 }
