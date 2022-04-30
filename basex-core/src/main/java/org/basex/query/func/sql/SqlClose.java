@@ -16,8 +16,6 @@ import org.basex.util.*;
 public final class SqlClose extends SqlFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
-
     @SuppressWarnings("resource")
     final AutoCloseable ac = get(qc, true);
     try {

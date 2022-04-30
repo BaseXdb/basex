@@ -56,7 +56,7 @@ public final class InspectModuleTest extends SandboxTest {
     query(query + "/argument/@type/data()", "xs:int");
     query(query + "/annotation/@name/data()", "private");
     query(query + "/annotation/@uri/data()", "http://www.w3.org/2012/xquery");
-    query(query + "/return/@type/data()", "xs:int");
+    query(query + "/return/@type/data()", "xs:integer");
     query(query + "/return/@occurrence/data()", "");
 
     // unknown annotation

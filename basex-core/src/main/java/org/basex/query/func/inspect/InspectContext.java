@@ -14,7 +14,6 @@ import org.basex.util.*;
 public final class InspectContext extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
     return new PlainDoc(qc, info).context();
   }
 }

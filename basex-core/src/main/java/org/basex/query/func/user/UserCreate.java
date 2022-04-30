@@ -22,7 +22,6 @@ import org.basex.util.list.*;
 public final class UserCreate extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkAdmin(qc);
     final String name = toInactiveName(0, qc);
     final String pw = toString(exprs[1], qc);
     final ArrayList<Perm> perms = toPermissions(2, qc);

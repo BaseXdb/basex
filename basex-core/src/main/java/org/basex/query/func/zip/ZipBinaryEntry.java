@@ -30,7 +30,6 @@ public class ZipBinaryEntry extends ZipFn {
    * @throws QueryException query exception
    */
   final byte[] entry(final QueryContext qc) throws QueryException {
-    checkCreate(qc);
     final IOFile file = new IOFile(toString(exprs[0], qc));
     final String path = toString(exprs[1], qc);
     if(!file.exists()) throw ZIP_NOTFOUND_X.get(info, file);

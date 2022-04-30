@@ -60,8 +60,6 @@ public class ValidateXsd extends ValidateFn {
 
   @Override
   public ArrayList<ErrorInfo> errors(final QueryContext qc) throws QueryException {
-    checkCreate(qc);
-
     return process(new Validation() {
       @Override
       void process(final ValidationHandler handler) throws IOException, SAXException,

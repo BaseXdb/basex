@@ -24,7 +24,6 @@ import org.basex.util.list.*;
 public class FileList extends FileFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    checkCreate(qc);
     try {
       final Path dir = toPath(0, qc).toRealPath();
       final boolean recursive = toBoolean(1, qc);
@@ -51,7 +50,6 @@ public class FileList extends FileFn {
    * @throws QueryException query exception
    */
   Value paths(final boolean recursive, final QueryContext qc) throws QueryException {
-    checkCreate(qc);
     try {
       final TokenList tl = new TokenList();
       list(toPath(0, qc), recursive, null, tl, -1, qc);

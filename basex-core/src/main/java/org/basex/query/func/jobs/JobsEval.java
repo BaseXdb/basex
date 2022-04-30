@@ -34,7 +34,6 @@ public class JobsEval extends StandardFunc {
    * @throws QueryException query exception
    */
   final Str eval(final IOContent query, final QueryContext qc) throws QueryException {
-    checkAdmin(qc);
     final HashMap<String, Value> bindings = toBindings(1, qc);
     final JobsOptions opts = toOptions(2, new JobsOptions(), qc);
     opts.set(JobsOptions.BASE_URI, toBaseUri(query.url(), opts));

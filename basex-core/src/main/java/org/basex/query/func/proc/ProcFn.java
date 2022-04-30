@@ -38,8 +38,6 @@ abstract class ProcFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final ProcResult exec(final QueryContext qc, final boolean fork) throws QueryException {
-    checkAdmin(qc);
-
     // arguments
     final StringList sl = new StringList();
     sl.add(toToken(exprs[0], qc));

@@ -20,8 +20,6 @@ import org.basex.util.list.*;
 public final class JobsListDetails extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    checkAdmin(qc);
-
     final Context ctx = qc.context;
     final TokenList ids = exprs.length == 0 ? JobsList.ids(ctx) :
       new TokenList(1).add(toToken(exprs[0], qc));

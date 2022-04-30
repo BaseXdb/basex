@@ -30,8 +30,6 @@ public final class InspectFunctions extends StandardFunc {
     }
 
     // URI specified: compile module and return all newly added functions
-    checkCreate(qc);
-
     final IOContent content = toContent(toToken(exprs[0], qc), qc);
     Value funcs = qc.resources.functions(content.path());
     if(funcs != null) return funcs;

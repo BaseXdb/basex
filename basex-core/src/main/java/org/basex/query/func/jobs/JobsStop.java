@@ -27,8 +27,6 @@ public final class JobsStop extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkAdmin(qc);
-
     final String id = toString(exprs[0], qc);
     final StopOptions opts = toOptions(1, new StopOptions(), qc);
 

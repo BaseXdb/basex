@@ -21,8 +21,6 @@ import org.basex.util.hash.*;
 public final class ArchiveDelete extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
-
     final B64 archive = toB64(exprs[0], qc, false);
     // entries to be deleted
     final TokenSet names = new TokenSet();

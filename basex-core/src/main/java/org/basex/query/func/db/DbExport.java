@@ -21,7 +21,6 @@ import org.basex.util.*;
 public final class DbExport extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
     final Data data = toData(qc);
     final String path = toString(exprs[1], qc);
     final Item so = exprs.length > 2 ? exprs[2].item(qc, info) : Empty.VALUE;

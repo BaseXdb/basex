@@ -14,7 +14,6 @@ import org.basex.util.*;
 public final class InspectXqdoc extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
     return new XQDoc(qc, info).parse(toContent(toToken(exprs[0], qc), qc));
   }
 }

@@ -17,7 +17,6 @@ import org.basex.util.*;
 public final class SqlInit extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
     final String driver = toString(exprs[0], qc);
     if(Reflect.find(driver) == null) throw SQL_INIT_X.get(info, driver);
     return Empty.VALUE;

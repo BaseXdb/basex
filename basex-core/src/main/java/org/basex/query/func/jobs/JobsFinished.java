@@ -15,8 +15,6 @@ import org.basex.util.*;
 public final class JobsFinished extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkAdmin(qc);
-
     final String id = toString(exprs[0], qc);
     final JobPool pool = qc.context.jobs;
     final QueryJobResult result = pool.results.get(id);

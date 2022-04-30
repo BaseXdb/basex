@@ -21,7 +21,6 @@ import org.basex.util.list.*;
 public final class UserGrant extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkAdmin(qc);
     final User user = toInactiveUser(0, qc);
     final ArrayList<Perm> perms = toPermissions(1, qc);
     final StringList patterns = toPatterns(2, qc);

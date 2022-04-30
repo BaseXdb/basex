@@ -14,7 +14,6 @@ import org.basex.query.value.seq.*;
 public final class JobsList extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    checkAdmin(qc);
     return StrSeq.get(org.basex.core.cmd.JobsList.ids(qc.context));
   }
 }

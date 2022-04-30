@@ -20,7 +20,6 @@ import org.basex.util.*;
 public final class ClientExecute extends ClientFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
     final ClientSession cs = session(qc, false);
     final String cmd = toString(exprs[1], qc);
 

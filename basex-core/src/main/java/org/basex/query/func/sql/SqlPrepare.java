@@ -18,7 +18,6 @@ import org.basex.util.*;
 public final class SqlPrepare extends SqlFn {
   @Override
   public Uri item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkCreate(qc);
     final Connection conn = connection(qc);
     final byte[] prepStmt = toToken(exprs[1], qc);
     try {

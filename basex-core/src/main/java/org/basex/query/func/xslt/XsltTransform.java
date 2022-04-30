@@ -50,7 +50,6 @@ public class XsltTransform extends XsltFn {
    * @throws QueryException query exception
    */
   final Item transform(final QueryContext qc, final boolean simple) throws QueryException {
-    checkCreate(qc);
     final IO in = read(0, qc), xsl = read(1, qc);
     final Options opts = toOptions(2, new Options(), qc);
     final XsltOptions xopts = toOptions(3, new XsltOptions(), qc);

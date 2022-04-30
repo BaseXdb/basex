@@ -32,8 +32,6 @@ public final class SqlExecutePrepared extends SqlExecute {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    checkCreate(qc);
-
     final PreparedStatement ps = prepared(qc);
     ANode params = null;
     if(exprs.length > 1) {

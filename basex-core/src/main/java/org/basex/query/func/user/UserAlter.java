@@ -18,7 +18,6 @@ import org.basex.util.*;
 public final class UserAlter extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    checkAdmin(qc);
     final User user = toInactiveUser(0, qc);
     final String name = user.name(), newname = toInactiveName(1, qc);
     if(Strings.eq(UserText.ADMIN, name, newname)) throw USER_ADMIN.get(info);

@@ -77,7 +77,6 @@ public final class FileReadTextLines extends FileRead {
    * @throws QueryException query exception
    */
   private NewlineInput input(final QueryContext qc) throws IOException, QueryException {
-    checkCreate(qc);
     final Path path = toPath(0, qc);
     final String encoding = toEncodingOrNull(1, FILE_UNKNOWN_ENCODING_X, qc);
     final boolean validate = exprs.length < 3 || !toBoolean(exprs[2], qc);

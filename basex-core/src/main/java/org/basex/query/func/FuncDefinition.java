@@ -3,8 +3,9 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
-import java.util.function.Supplier;
+import java.util.function.*;
 
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
@@ -30,6 +31,8 @@ public final class FuncDefinition {
   public final SeqType seqType;
   /** URI. */
   final byte[] uri;
+  /** Minimum permission. */
+  final Perm perm;
 
   /** Description. */
   private final String desc;
@@ -47,9 +50,11 @@ public final class FuncDefinition {
    * @param seqType return type
    * @param flags static function properties
    * @param uri uri
+   * @param perm minimum permission
    */
   FuncDefinition(final Supplier<? extends StandardFunc> supplier, final String desc,
-      final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri) {
+      final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri,
+      final Perm perm) {
 
     this.supplier = supplier;
     this.desc = desc;
@@ -57,6 +62,7 @@ public final class FuncDefinition {
     this.params = params;
     this.flags = flags;
     this.uri = uri;
+    this.perm = perm;
     minMax = minMax(desc, params);
 
     // treat updating expressions as non-deterministic

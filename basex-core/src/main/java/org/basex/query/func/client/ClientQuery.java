@@ -25,7 +25,6 @@ public final class ClientQuery extends ClientFn {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    checkCreate(qc);
     final ClientSession cs = session(qc, false);
     final String query = toString(exprs[1], qc);
     final ValueBuilder vb = new ValueBuilder(qc);
