@@ -1,7 +1,6 @@
 package org.basex.query.func.zip;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
@@ -31,7 +30,7 @@ public final class ZipUpdateEntries extends ZipZipFile {
     final String in = attribute(elm, HREF, true);
 
     // target and temporary output file
-    final IOFile target = new IOFile(string(toToken(exprs[1], qc)));
+    final IOFile target = new IOFile(toString(exprs[1], qc));
     IOFile out;
     do {
       out = new IOFile(target.path() + new Random().nextInt(0x7FFFFFFF));

@@ -134,7 +134,7 @@ public class XsltTransform extends XsltFn {
         throw ex.getCause(info);
       }
     }
-    if(item.type.isStringOrUntyped()) return checkPath(toToken(item));
+    if(item.type.isStringOrUntyped()) return toIO(toToken(item));
     throw STRNOD_X_X.get(info, item.type, item);
   }
 }

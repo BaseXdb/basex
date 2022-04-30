@@ -24,7 +24,7 @@ import org.basex.util.list.*;
 public final class DbRename extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     final String source = toDbPath(1, qc), target = toDbPath(2, qc);
 
     // rename XML resources

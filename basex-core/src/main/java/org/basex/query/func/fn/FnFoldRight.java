@@ -40,7 +40,7 @@ public final class FnFoldRight extends StandardFunc {
    */
   private Value value(final Value items, final QueryContext qc) throws QueryException {
     Value value = exprs[1].value(qc);
-    final FItem func = checkArity(exprs[2], 2, qc);
+    final FItem func = toFunction(exprs[2], 2, qc);
 
     if(items instanceof TreeSeq) {
       final ListIterator<Item> iter = ((TreeSeq) items).iterator(items.size());

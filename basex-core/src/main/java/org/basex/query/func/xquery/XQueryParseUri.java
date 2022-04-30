@@ -14,6 +14,6 @@ public final class XQueryParseUri extends XQueryParse {
   @Override
   public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkCreate(qc);
-    return parse(qc, checkPath(0, qc));
+    return parse(qc, toIO(0, qc));
   }
 }

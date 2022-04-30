@@ -15,7 +15,7 @@ public final class HofDropWhile extends HofTakeWhile {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
-    final FItem pred = checkArity(exprs[1], 1, qc);
+    final FItem pred = toFunction(exprs[1], 1, qc);
 
     // check if iterator is value-based
     final Value value = value(iter, pred, qc);
@@ -39,7 +39,7 @@ public final class HofDropWhile extends HofTakeWhile {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
-    final FItem pred = checkArity(exprs[1], 1, qc);
+    final FItem pred = toFunction(exprs[1], 1, qc);
 
     // check if iterator is value-based
     final Value value = value(iter, pred, qc);

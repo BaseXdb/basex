@@ -18,7 +18,7 @@ public final class ArrayFilter extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(exprs[0], qc);
-    final FItem func = checkArity(exprs[1], 1, qc);
+    final FItem func = toFunction(exprs[1], 1, qc);
 
     final ArrayBuilder builder = new ArrayBuilder();
     for(final Value value : array.members()) {

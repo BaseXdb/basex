@@ -17,7 +17,7 @@ public final class ArrayPut extends ArrayFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(exprs[0], qc);
-    return array.put(checkPos(array, toLong(exprs[1], qc), false), exprs[2].value(qc));
+    return array.put(toPos(array, toLong(exprs[1], qc), false), exprs[2].value(qc));
   }
 
   @Override

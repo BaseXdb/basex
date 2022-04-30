@@ -19,7 +19,7 @@ public final class DbExists extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     try {
-      final Data data = checkData(qc);
+      final Data data = toData(qc);
       if(exprs.length == 1) return Bln.TRUE;
       // check if raw file or XML document exists
       final String path = toDbPath(1, qc);

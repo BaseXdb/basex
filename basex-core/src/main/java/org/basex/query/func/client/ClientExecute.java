@@ -22,7 +22,7 @@ public final class ClientExecute extends ClientFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkCreate(qc);
     final ClientSession cs = session(qc, false);
-    final String cmd = Token.string(toToken(exprs[1], qc));
+    final String cmd = toString(exprs[1], qc);
 
     try {
       final ArrayOutput ao = new ArrayOutput();

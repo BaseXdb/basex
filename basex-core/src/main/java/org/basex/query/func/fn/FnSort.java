@@ -51,7 +51,7 @@ public final class FnSort extends StandardFunc {
       final byte[] token = toTokenOrNull(exprs[1], qc);
       if(token != null) coll = Collation.get(token, qc, sc, info, WHICHCOLL_X);
     }
-    final FItem key = exprs.length > 2 ? checkArity(exprs[2], 1, qc) : null;
+    final FItem key = exprs.length > 2 ? toFunction(exprs[2], 1, qc) : null;
 
     final long size = input.size();
     final ValueList values = new ValueList(size);

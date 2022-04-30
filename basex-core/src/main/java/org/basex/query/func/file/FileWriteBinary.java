@@ -35,7 +35,7 @@ public class FileWriteBinary extends FileFn {
   final synchronized void write(final boolean append, final QueryContext qc)
       throws QueryException, IOException {
 
-    final Path path = checkParentDir(toPath(0, qc));
+    final Path path = toParent(toPath(0, qc));
 
     if(exprs.length == 2) {
       // write full file

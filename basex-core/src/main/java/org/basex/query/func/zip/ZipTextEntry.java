@@ -1,7 +1,6 @@
 package org.basex.query.func.zip;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 
@@ -20,7 +19,7 @@ import org.basex.util.*;
 public final class ZipTextEntry extends ZipBinaryEntry {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String encoding = exprs.length < 3 ? null : string(toToken(exprs[2], qc));
+    final String encoding = exprs.length < 3 ? null : toString(exprs[2], qc);
     final byte[] entry = entry(qc);
     final boolean validate = qc.context.options.get(MainOptions.CHECKSTRINGS);
 

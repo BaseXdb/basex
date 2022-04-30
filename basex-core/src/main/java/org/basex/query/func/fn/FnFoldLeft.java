@@ -42,7 +42,7 @@ public final class FnFoldLeft extends StandardFunc {
   private Value value(final Iter iter, final Item item, final QueryContext qc)
       throws QueryException {
     Value value = exprs[1].value(qc);
-    final FItem func = checkArity(exprs[2], 2, qc);
+    final FItem func = toFunction(exprs[2], 2, qc);
     Item it = item;
     do {
       value = func.invoke(qc, info, value, it);

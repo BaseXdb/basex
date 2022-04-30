@@ -19,7 +19,7 @@ public final class HofScanLeft extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter outer = exprs[0].iter(qc);
-    final FItem func = checkArity(exprs[2], 2, qc);
+    final FItem func = toFunction(exprs[2], 2, qc);
 
     return new Iter() {
       private Value acc = exprs[1].value(qc);

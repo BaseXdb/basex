@@ -15,6 +15,6 @@ import org.basex.util.*;
 public final class FetchBinary extends FetchXml {
   @Override
   public B64Lazy item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return new B64Lazy(io(qc), FETCH_OPEN_X);
+    return new B64Lazy(toIO(qc), FETCH_OPEN_X);
   }
 }

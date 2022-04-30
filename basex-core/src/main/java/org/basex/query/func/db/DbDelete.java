@@ -22,7 +22,7 @@ import org.basex.util.list.*;
 public final class DbDelete extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     final String path = toDbPath(1, qc);
 
     // delete XML resources

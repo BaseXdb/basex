@@ -15,6 +15,6 @@ import com.vividsolutions.jts.io.*;
 public final class GeoAsText extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Str.get(new WKTWriter().write(checkGeo(0, qc)));
+    return Str.get(new WKTWriter().write(toGeometry(0, qc)));
   }
 }

@@ -17,7 +17,7 @@ public final class FileDelete extends FileFn {
   @Override
   public Item item(final QueryContext qc) throws QueryException, IOException {
     final Path path = toPath(0, qc);
-    if(optionalBool(1, qc)) {
+    if(toBoolean(1, qc)) {
       delete(path, qc);
     } else {
       Files.delete(path);

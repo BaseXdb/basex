@@ -17,7 +17,7 @@ import com.vividsolutions.jts.geom.*;
 public final class GeoInteriorRingN extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Geometry geo = geo(0, qc, POLYGON, Q_GML_POLYGON);
+    final Geometry geo = toGeometry(0, qc, POLYGON, Q_GML_POLYGON);
     final long n = toLong(exprs[1], qc);
     final int max = ((Polygon) geo).getNumInteriorRing();
     if(n < 1 || n > max) throw GEO_RANGE.get(info, n);

@@ -34,7 +34,7 @@ public class FileWrite extends FileFn {
   final synchronized void write(final boolean append, final QueryContext qc)
       throws QueryException, IOException {
 
-    final Path path = checkParentDir(toPath(0, qc));
+    final Path path = toParent(toPath(0, qc));
     final Item opts = exprs.length > 2 ? exprs[2].item(qc, info) : Empty.VALUE;
     final SerializerOptions sopts = FuncOptions.serializer(opts, info);
 

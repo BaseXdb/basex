@@ -15,6 +15,6 @@ import com.vividsolutions.jts.io.*;
 public final class GeoAsBinary extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return B64.get(new WKBWriter().write(checkGeo(0, qc)));
+    return B64.get(new WKBWriter().write(toGeometry(0, qc)));
   }
 }

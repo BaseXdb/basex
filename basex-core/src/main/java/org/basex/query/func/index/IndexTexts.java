@@ -18,7 +18,7 @@ import org.basex.query.value.*;
 public class IndexTexts extends IndexFn {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     final byte[] entry = exprs.length < 2 ? EMPTY : toToken(exprs[1], qc);
 
     final IndexEntries entries = exprs.length < 3 ? new IndexEntries(entry, type()) :

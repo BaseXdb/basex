@@ -20,7 +20,7 @@ import org.basex.util.*;
 public final class RequestParameter extends ApiFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final String name = Token.string(toToken(exprs[0], qc));
+    final String name = toString(exprs[0], qc);
 
     final RequestContext requestCtx = requestContext(qc);
     try {

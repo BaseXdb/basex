@@ -5,7 +5,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -16,7 +15,7 @@ import org.basex.util.*;
 public final class RequestHeader extends ApiFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final String name = Token.string(toToken(exprs[0], qc));
+    final String name = toString(exprs[0], qc);
     final String value = request(qc).getHeader(name);
     if(value != null) return Str.get(value);
 

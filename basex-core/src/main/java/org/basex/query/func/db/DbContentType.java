@@ -19,7 +19,7 @@ import org.basex.util.http.*;
 public final class DbContentType extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     final String path = toDbPath(1, qc);
     final int pre = data.resources.doc(path);
     MediaType type = null;

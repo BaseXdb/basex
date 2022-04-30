@@ -9,7 +9,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -22,7 +21,7 @@ public final class JobsResult extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     checkAdmin(qc);
 
-    final String id = Token.string(toToken(exprs[0], qc));
+    final String id = toString(exprs[0], qc);
     final JobPool jobs = qc.context.jobs;
 
     final Map<String, QueryJobResult> results = jobs.results;

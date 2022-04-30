@@ -1,7 +1,6 @@
 package org.basex.query.func.zip;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.zip.*;
@@ -32,8 +31,8 @@ public class ZipBinaryEntry extends ZipFn {
    */
   final byte[] entry(final QueryContext qc) throws QueryException {
     checkCreate(qc);
-    final IOFile file = new IOFile(string(toToken(exprs[0], qc)));
-    final String path = string(toToken(exprs[1], qc));
+    final IOFile file = new IOFile(toString(exprs[0], qc));
+    final String path = toString(exprs[1], qc);
     if(!file.exists()) throw ZIP_NOTFOUND_X.get(info, file);
 
     try(ZipInputStream in = new ZipInputStream(file.inputStream())) {

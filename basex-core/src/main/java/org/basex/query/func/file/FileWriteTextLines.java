@@ -41,7 +41,7 @@ public class FileWriteTextLines extends FileFn {
   final synchronized void write(final boolean append, final QueryContext qc)
       throws QueryException, IOException {
 
-    final Path path = checkParentDir(toPath(0, qc));
+    final Path path = toParent(toPath(0, qc));
     final String encoding = toEncodingOrNull(2, FILE_UNKNOWN_ENCODING_X, qc);
     final Charset cs = encoding == null || encoding == Strings.UTF8 ? null :
       Charset.forName(encoding);

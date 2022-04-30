@@ -65,8 +65,8 @@ abstract class GeoFn extends StandardFunc {
    * @return geometry
    * @throws QueryException query exception
    */
-  final Geometry checkGeo(final int i, final QueryContext qc) throws QueryException {
-    return checkGeo(toElem(exprs[i], qc));
+  final Geometry toGeometry(final int i, final QueryContext qc) throws QueryException {
+    return toGeometry(toElem(exprs[i], qc));
   }
 
   /**
@@ -79,13 +79,13 @@ abstract class GeoFn extends StandardFunc {
    * @return geometry
    * @throws QueryException query exception
    */
-  final Geometry geo(final int i, final QueryContext qc, final byte[] type, final QNm... names)
-      throws QueryException {
+  final Geometry toGeometry(final int i, final QueryContext qc, final byte[] type,
+      final QNm... names) throws QueryException {
 
     final ANode node = toElem(exprs[i], qc);
-    final Geometry geo = geo(node, names);
+    final Geometry geo = toGeo(node, names);
     if(geo == null) {
-      checkGeo(node);
+      toGeometry(node);
       throw GEO_TYPE.get(info, type, node.qname().local());
     }
     return geo;
@@ -123,8 +123,8 @@ abstract class GeoFn extends StandardFunc {
    * @return geometry
    * @throws QueryException query exception
    */
-  private Geometry checkGeo(final ANode node) throws QueryException {
-    final Geometry geo = geo(node, QNAMES);
+  private Geometry toGeometry(final ANode node) throws QueryException {
+    final Geometry geo = toGeo(node, QNAMES);
     if(geo == null) throw GEO_WHICH.get(info, node.qname().local());
     return geo;
   }
@@ -136,7 +136,7 @@ abstract class GeoFn extends StandardFunc {
    * @return geometry or {@code null}
    * @throws QueryException query exception
    */
-  private Geometry geo(final ANode node, final QNm... names) throws QueryException {
+  private Geometry toGeo(final ANode node, final QNm... names) throws QueryException {
     if(node.type != NodeType.ELEMENT) throw typeError(node, NodeType.ELEMENT, null);
 
     final QNm qname = node.qname();

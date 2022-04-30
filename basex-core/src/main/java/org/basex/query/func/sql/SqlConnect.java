@@ -1,7 +1,6 @@
 package org.basex.query.func.sql;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.sql.*;
 import java.util.*;
@@ -30,14 +29,13 @@ public final class SqlConnect extends SqlFn {
   public Uri item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkCreate(qc);
     // URL to relational database
-    final String url = string(toToken(exprs[0], qc));
+    final String url = toString(exprs[0], qc);
     final JDBCConnections jdbc = jdbc(qc);
     try {
       final Connection conn;
       if(exprs.length > 2) {
         // credentials
-        final String user = string(toToken(exprs[1], qc));
-        final String pass = string(toToken(exprs[2], qc));
+        final String user = toString(exprs[1], qc), pass = toString(exprs[2], qc);
         if(exprs.length == 4) {
           // parse connection options
           final HashMap<String, String> options = toOptions(3, new Options(), qc).free();

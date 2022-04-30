@@ -24,7 +24,7 @@ import org.basex.util.options.*;
 public class FetchXml extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return fetch(io(qc), qc);
+    return fetch(toIO(qc), qc);
   }
 
   /**
@@ -53,9 +53,8 @@ public class FetchXml extends StandardFunc {
    * @return return IO instance
    * @throws QueryException query exception
    */
-  protected IO io(final QueryContext qc) throws QueryException {
-    final byte[] uri = toToken(exprs[0], qc);
-    final IO io = IO.get(Token.string(uri));
+  protected IO toIO(final QueryContext qc) throws QueryException {
+    final IO io = IO.get(toString(exprs[0], qc));
     if(!io.exists()) throw FETCH_EXISTS_X.get(info, io);
     return io;
   }

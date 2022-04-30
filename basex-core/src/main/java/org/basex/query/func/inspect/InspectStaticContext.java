@@ -24,12 +24,12 @@ public final class InspectStaticContext extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     Item func = exprs[0].item(qc, info);
-    final String name = Token.string(toToken(exprs[1], qc));
+    final String name = toString(exprs[1], qc);
     final StaticContext sctx;
     if(func == Empty.VALUE) {
       sctx = sc;
     } else {
-      func = toFunc(func, qc);
+      func = toFunction(func, qc);
       if(!(func instanceof FuncItem)) throw INVFUNCITEM_X_X.get(info, func.type, func);
       sctx = ((FuncItem) func).sc;
     }

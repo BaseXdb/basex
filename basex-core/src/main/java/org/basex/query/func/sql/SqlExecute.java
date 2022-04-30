@@ -2,7 +2,6 @@ package org.basex.query.func.sql;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.sql.*;
@@ -40,7 +39,7 @@ public class SqlExecute extends SqlFn {
   public Iter iter(final QueryContext qc) throws QueryException {
     checkCreate(qc);
     final Connection conn = connection(qc);
-    final String query = string(toToken(exprs[1], qc));
+    final String query = toString(exprs[1], qc);
     final StatementOptions options = toOptions(2, new StatementOptions(), qc);
 
     try {

@@ -53,16 +53,14 @@ abstract class UserFn extends StandardFunc {
   }
 
   /**
-   * Checks if the specified expression is a valid user name.
-   * @param i expression index
+   * Checks if the specified expression is a valid as user name.
+   * @param i index of argument
    * @param qc query context
-   * @return name
+   * @return user name
    * @throws QueryException query exception
    */
   protected final String toName(final int i, final QueryContext qc) throws QueryException {
-    final String name = toString(i, qc);
-    if(!Databases.validName(name)) throw USER_NAME_X.get(info, name);
-    return name;
+    return toName(i, USER_NAME_X, qc);
   }
 
   /**
@@ -87,7 +85,7 @@ abstract class UserFn extends StandardFunc {
    * @return permissions
    * @throws QueryException query exception
    */
-  protected final ArrayList<Perm> toPerms(final int i, final QueryContext qc)
+  protected final ArrayList<Perm> toPermissions(final int i, final QueryContext qc)
       throws QueryException {
 
     final ArrayList<Perm> perms = new ArrayList<>();
@@ -106,48 +104,37 @@ abstract class UserFn extends StandardFunc {
   }
 
   /**
-   * Checks if the specified expression is a string.
-   * @param i expression index
-   * @param qc query context
-   * @return name of database
-   * @throws QueryException query exception
-   */
-  protected final String toString(final int i, final QueryContext qc) throws QueryException {
-    return Token.string(toToken(exprs[i], qc));
-  }
-
-  /**
-   * Checks if the specified user is currently logged in.
+   * Ensures that no user with the specified name is logged in.
    * @param i expression index
    * @param qc query context
    * @return name
    * @throws QueryException query exception
    */
-  protected final String toSafeName(final int i, final QueryContext qc) throws QueryException {
+  protected final String toInactiveName(final int i, final QueryContext qc) throws QueryException {
     final String name = toName(i, qc);
-    checkInactive(qc.context.users.get(name), qc);
+    toInactiveUser(qc.context.users.get(name), qc);
     return name;
   }
 
   /**
-   * Checks if the specified user is currently not logged in.
+   * Ensures that the specified user is not logged in.
    * @param i expression index
    * @param qc query context
    * @return user
    * @throws QueryException query exception
    */
   protected final User toInactiveUser(final int i, final QueryContext qc) throws QueryException {
-    return checkInactive(toUser(i, qc), qc);
+    return toInactiveUser(toUser(i, qc), qc);
   }
 
   /**
-   * Checks if the specified user is currently not logged in.
+   * Ensures that the specified user is not logged in.
    * @param user user (can be {@code null})
    * @param qc query context
    * @return specified user
    * @throws QueryException query exception
    */
-  private User checkInactive(final User user, final QueryContext qc) throws QueryException {
+  private User toInactiveUser(final User user, final QueryContext qc) throws QueryException {
     if(user != null) {
       final String name = user.name();
       for(final ClientListener cl : qc.context.sessions) {

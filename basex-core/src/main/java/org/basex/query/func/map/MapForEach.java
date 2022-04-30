@@ -20,7 +20,7 @@ public class MapForEach extends StandardFunc {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(exprs[0], qc);
-    final FItem func = checkArity(exprs[1], 2, this instanceof UpdateMapForEach, qc);
+    final FItem func = toFunction(exprs[1], 2, this instanceof UpdateMapForEach, qc);
 
     final ValueBuilder vb = map.forEach(func, qc, info);
     return vb.value(this);

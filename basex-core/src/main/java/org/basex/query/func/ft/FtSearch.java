@@ -20,7 +20,7 @@ import org.basex.util.ft.*;
 public final class FtSearch extends FtAccess {
   @Override
   public NodeIter iter(final QueryContext qc) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     final Value query = exprs[1].value(qc);
     final FtIndexOptions opts = toOptions(2, new FtIndexOptions(), qc);
 

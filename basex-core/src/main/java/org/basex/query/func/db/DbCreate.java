@@ -40,7 +40,7 @@ public final class DbCreate extends DbNew {
       inputs = new NewInput[(int) is];
       for(int i = 0; i < is; i++) {
         qc.checkStop();
-        inputs[i] = checkInput(value.itemAt(i), i < ps ? paths.get(i) : "");
+        inputs[i] = toNewInput(value.itemAt(i), i < ps ? paths.get(i) : "");
       }
     } else {
       inputs = new NewInput[0];

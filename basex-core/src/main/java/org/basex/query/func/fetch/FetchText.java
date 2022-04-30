@@ -16,7 +16,7 @@ import org.basex.util.*;
 public final class FetchText extends FetchXml {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final IO io = io(qc);
+    final IO io = toIO(qc);
     final String encoding = toEncodingOrNull(1, FETCH_ENCODING_X, qc);
     final boolean validate = exprs.length < 3 || !toBoolean(exprs[2], qc);
     return new StrLazy(io, encoding, FETCH_OPEN_X, validate);

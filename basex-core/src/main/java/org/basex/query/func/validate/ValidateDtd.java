@@ -36,7 +36,7 @@ public class ValidateDtd extends ValidateFn {
         IO schema = null;
         if(exprs.length > 1) {
           final byte[] path = toTokenOrNull(exprs[1], qc);
-          if(path != null) schema = checkPath(path);
+          if(path != null) schema = toIO(path);
         }
 
         // integrate doctype declaration via serialization parameters

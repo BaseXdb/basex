@@ -1,7 +1,6 @@
 package org.basex.query.func.file;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.nio.file.*;
@@ -34,8 +33,8 @@ public class FileCreateTempFile extends FileFn {
   final synchronized Item createTemp(final boolean dir, final QueryContext qc)
       throws QueryException, IOException {
 
-    final String pref = string(toToken(exprs[0], qc));
-    final String suf = exprs.length > 1 ? string(toToken(exprs[1], qc)) : "";
+    final String pref = toString(exprs[0], qc);
+    final String suf = exprs.length > 1 ? toString(exprs[1], qc) : "";
     final Path root;
     if(exprs.length > 2) {
       root = toPath(2, qc);

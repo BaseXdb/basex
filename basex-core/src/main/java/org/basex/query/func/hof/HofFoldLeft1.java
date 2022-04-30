@@ -21,7 +21,7 @@ public final class HofFoldLeft1 extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Iter iter = exprs[0].iter(qc);
-    final FItem func = checkArity(exprs[1], 2, qc);
+    final FItem func = toFunction(exprs[1], 2, qc);
 
     Value sum = checkNoEmpty(iter.next());
     for(Item item; (item = qc.next(iter)) != null;) {
@@ -39,7 +39,7 @@ public final class HofFoldLeft1 extends StandardFunc {
     if(expr2 instanceof Value) {
       final ExprList unroll = cc.unroll(expr1, true);
       if(unroll != null) {
-        final FItem func = checkArity(expr2, 2, cc.qc);
+        final FItem func = toFunction(expr2, 2, cc.qc);
         Expr expr = unroll.get(0);
         final long is = unroll.size();
         for(int i = 1; i < is; i++) {

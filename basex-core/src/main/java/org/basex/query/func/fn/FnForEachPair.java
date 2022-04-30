@@ -20,7 +20,7 @@ public class FnForEachPair extends StandardFunc {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
     final Iter iter1 = exprs[0].iter(qc), iter2 = exprs[1].iter(qc);
-    final FItem func = checkArity(exprs[2], 2, this instanceof UpdateForEachPair, qc);
+    final FItem func = toFunction(exprs[2], 2, this instanceof UpdateForEachPair, qc);
     final long size = func.funcType().declType.one() ? Math.min(iter1.size(), iter2.size()) : -1;
 
     return new Iter() {
@@ -52,7 +52,7 @@ public class FnForEachPair extends StandardFunc {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     final Iter iter1 = exprs[0].iter(qc), iter2 = exprs[1].iter(qc);
-    final FItem func = checkArity(exprs[2], 2, this instanceof UpdateForEachPair, qc);
+    final FItem func = toFunction(exprs[2], 2, this instanceof UpdateForEachPair, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item1, item2; (item1 = iter1.next()) != null && (item2 = iter2.next()) != null;) {

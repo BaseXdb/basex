@@ -23,7 +23,7 @@ public final class DbInfo extends DbAccess {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     return toNode(InfoDB.db(data.meta, false, true), DATABASE);
   }
 

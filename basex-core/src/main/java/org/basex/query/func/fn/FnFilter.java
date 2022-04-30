@@ -19,7 +19,7 @@ public final class FnFilter extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
     final Iter iter = exprs[0].iter(qc);
-    final FItem func = checkArity(exprs[1], 1, qc);
+    final FItem func = toFunction(exprs[1], 1, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = iter.next()) != null;) {

@@ -279,6 +279,17 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Checks if the specified expression yields a string.
+   * @param expr expression to be evaluated
+   * @param qc query context
+   * @return string
+   * @throws QueryException query exception
+   */
+  protected final String toString(final Expr expr, final QueryContext qc) throws QueryException {
+    return Token.string(toToken(expr, qc));
+  }
+
+  /**
    * Checks if the specified expression yields a boolean.
    * @param expr expression to be evaluated
    * @param qc query context
@@ -571,7 +582,7 @@ public abstract class ParseExpr extends Expr {
    * @return function item
    * @throws QueryException query exception
    */
-  protected final FItem toFunc(final Expr expr, final QueryContext qc) throws QueryException {
+  protected final FItem toFunction(final Expr expr, final QueryContext qc) throws QueryException {
     return (FItem) checkType(toItem(expr, qc, SeqType.FUNCTION), SeqType.FUNCTION);
   }
 

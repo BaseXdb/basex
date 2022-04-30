@@ -20,7 +20,7 @@ public final class ArrayFoldRight extends ArrayFn {
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(exprs[0], qc);
     Value result = exprs[1].value(qc);
-    final FItem func = checkArity(exprs[2], 2, qc);
+    final FItem func = toFunction(exprs[2], 2, qc);
 
     final ListIterator<Value> iter = array.iterator(array.arraySize());
     while(iter.hasPrevious()) result = func.invoke(qc, info, iter.previous(), result);

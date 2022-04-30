@@ -26,7 +26,7 @@ public class FnForEach extends StandardFunc {
   public final Value value(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
     final Iter iter = exprs[0].iter(qc);
-    final FItem func = checkArity(exprs[1], 1, this instanceof UpdateForEach, qc);
+    final FItem func = toFunction(exprs[1], 1, this instanceof UpdateForEach, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = qc.next(iter)) != null;) vb.add(func.invoke(qc, info, item));

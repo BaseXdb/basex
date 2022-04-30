@@ -17,7 +17,7 @@ import com.vividsolutions.jts.geom.*;
 public final class GeoGeometryN extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Geometry geo = checkGeo(0, qc);
+    final Geometry geo = toGeometry(0, qc);
     final long n = toLong(exprs[1], qc);
     if(n < 1 || n > geo.getNumGeometries()) throw GEO_RANGE.get(info, n);
     return toElement(geo.getGeometryN((int) n - 1), qc);

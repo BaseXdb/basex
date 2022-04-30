@@ -21,13 +21,13 @@ import org.basex.util.hash.*;
 public class DbText extends DbAccess {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     return valueAccess(data, qc).iter(qc);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     return valueAccess(data, qc).value(qc);
   }
 

@@ -19,7 +19,7 @@ public final class AdminDeleteLogs extends AdminFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
 
-    final String name = Token.string(toToken(exprs[0], qc));
+    final String name = toString(exprs[0], qc);
     final LogFile file = qc.context.log.file(name);
     if(file == null) throw WHICHRES_X.get(info, name);
     if(file.current()) throw ADMIN_TODAY.get(info, name);

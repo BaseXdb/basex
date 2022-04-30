@@ -18,13 +18,13 @@ import org.basex.util.options.*;
 public final class DbAdd extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Data data = checkData(qc);
+    final Data data = toData(qc);
     String path = "";
     if(exprs.length > 2) {
       final byte[] token = toTokenOrNull(exprs[2], qc);
       if(token != null) path = toDbPath(token);
     }
-    final NewInput input = checkInput(toNodeOrAtomItem(1, qc), path);
+    final NewInput input = toNewInput(toNodeOrAtomItem(1, qc), path);
     final Options opts = toOptions(3, new Options(), qc);
 
     qc.updates().add(new DBAdd(data, input, opts, false, qc, info), qc);

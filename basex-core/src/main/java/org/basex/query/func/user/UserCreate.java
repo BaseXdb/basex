@@ -23,9 +23,9 @@ public final class UserCreate extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
-    final String name = toSafeName(0, qc);
-    final String pw = toString(1, qc);
-    final ArrayList<Perm> perms = toPerms(2, qc);
+    final String name = toInactiveName(0, qc);
+    final String pw = toString(exprs[1], qc);
+    final ArrayList<Perm> perms = toPermissions(2, qc);
     final StringList patterns = toPatterns(3, qc);
 
     final User user = new User(name, pw);
@@ -59,8 +59,8 @@ public final class UserCreate extends UserFn {
 
     @Override
     public void apply() {
-      final User olduser = users.get(user.name());
-      if(olduser != null) users.drop(olduser);
+      final User old = users.get(user.name());
+      if(old != null) users.drop(old);
       users.add(user);
       grant();
     }

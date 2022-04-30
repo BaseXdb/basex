@@ -37,7 +37,7 @@ abstract class Ids extends ContextFn {
    */
   protected final Value ids(final QueryContext qc, final boolean idref) throws QueryException {
     final TokenSet idSet = ids(exprs[0].atomIter(qc, info), qc);
-    final ANode root = checkRoot(toNode(ctxArg(1, qc), qc));
+    final ANode root = toRoot(toNode(ctxArg(1, qc), qc));
 
     final ANodeBuilder list = new ANodeBuilder();
     if(index(root, idref)) {
@@ -109,7 +109,7 @@ abstract class Ids extends ContextFn {
    * @return root node
    * @throws QueryException query exception
    */
-  private ANode checkRoot(final ANode node) throws QueryException {
+  private ANode toRoot(final ANode node) throws QueryException {
     final ANode root = node.root();
     if(root.type != NodeType.DOCUMENT_NODE) throw IDDOC.get(info);
     return root;

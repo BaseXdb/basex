@@ -3,7 +3,6 @@ package org.basex.query.func.db;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.index.*;
@@ -48,17 +47,14 @@ abstract class DbAccess extends StandardFunc {
   }
 
   /**
-   * Returns the specified expression as database name.
-   * Throws an exception if the path is invalid.
+   * Checks if the specified expression is a valid database name.
    * @param i index of argument
    * @param qc query context
-   * @return normalized path
+   * @return database name
    * @throws QueryException query exception
    */
   protected final String toName(final int i, final QueryContext qc) throws QueryException {
-    final String name = string(toToken(exprs[i], qc));
-    if(Databases.validName(name)) return name;
-    throw DB_NAME_X.get(info, name);
+    return toName(i, DB_NAME_X, qc);
   }
 
   @Override

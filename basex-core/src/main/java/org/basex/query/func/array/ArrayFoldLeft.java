@@ -18,7 +18,7 @@ public final class ArrayFoldLeft extends ArrayFn {
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(exprs[0], qc);
     Value result = exprs[1].value(qc);
-    final FItem func = checkArity(exprs[2], 2, qc);
+    final FItem func = toFunction(exprs[2], 2, qc);
 
     for(final Value value : array.members()) result = func.invoke(qc, info, result, value);
     return result;

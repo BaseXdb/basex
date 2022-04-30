@@ -15,6 +15,6 @@ import org.basex.util.*;
 public final class GeoSrid extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Uri.uri(token(checkGeo(0, qc).getSRID()));
+    return Uri.uri(token(toGeometry(0, qc).getSRID()));
   }
 }

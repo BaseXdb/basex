@@ -58,7 +58,7 @@ public final class AdminLogs extends AdminFn {
    */
   private Iter logs(final QueryContext qc) throws QueryException {
     // return content of single log file
-    final String name = Token.string(toToken(exprs[0], qc));
+    final String name = toString(exprs[0], qc);
     final boolean merge = exprs.length > 1 && toBoolean(exprs[1], qc);
 
     final LinkedList<LogEntry> list = logs(name, qc);

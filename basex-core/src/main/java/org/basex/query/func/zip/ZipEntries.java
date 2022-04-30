@@ -1,7 +1,6 @@
 package org.basex.query.func.zip;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
@@ -23,7 +22,7 @@ import org.basex.util.list.*;
 public final class ZipEntries extends ZipFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String file = string(toToken(exprs[0], qc));
+    final String file = toString(exprs[0], qc);
 
     // check file path
     final IOFile path = new IOFile(file);
