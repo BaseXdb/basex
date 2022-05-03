@@ -111,7 +111,7 @@ public final class HttpClient {
           auth = authHeaders(conn.getHeaderField(WWW_AUTHENTICATE));
           // authentication method in request and response differs: discard authentication data
           if(!auth.get(AUTH_METHOD).toString().equals(am.toString())) auth = null;
-        } else if(code >= 500) {
+        } else if(code >= 400) {
           // unexpected error: skip second request and payload
           return conn;
         }
