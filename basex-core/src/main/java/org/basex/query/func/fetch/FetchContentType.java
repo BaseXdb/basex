@@ -19,7 +19,7 @@ import org.basex.util.http.*;
 public final class FetchContentType extends FetchXml {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final IO io = toIO(qc);
+    final IO io = toIO(0, qc);
 
     MediaType mt = null;
     if(io instanceof IOUrl) {

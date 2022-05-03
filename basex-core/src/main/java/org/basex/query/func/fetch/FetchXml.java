@@ -24,7 +24,7 @@ import org.basex.util.options.*;
 public class FetchXml extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return fetch(toIO(qc), qc);
+    return fetch(toIO(0, qc), qc);
   }
 
   /**
@@ -36,8 +36,6 @@ public class FetchXml extends StandardFunc {
    */
   protected DBNode fetch(final IO io, final QueryContext qc) throws QueryException {
     final Options opts = toOptions(1, new Options(), qc);
-    if(!io.exists()) throw FETCH_EXISTS_X.get(info, io);
-
     final DBOptions dbopts = new DBOptions(opts, MainOptions.PARSING, info);
     final MainOptions mopts = dbopts.assignTo(MainOptions.get());
     try {
@@ -45,17 +43,5 @@ public class FetchXml extends StandardFunc {
     } catch(final IOException ex) {
       throw FETCH_OPEN_X.get(info, ex);
     }
-  }
-
-  /**
-   * Returns an IO instance.
-   * @param qc query context
-   * @return return IO instance
-   * @throws QueryException query exception
-   */
-  protected IO toIO(final QueryContext qc) throws QueryException {
-    final IO io = IO.get(toString(exprs[0], qc));
-    if(!io.exists()) throw FETCH_EXISTS_X.get(info, io);
-    return io;
   }
 }

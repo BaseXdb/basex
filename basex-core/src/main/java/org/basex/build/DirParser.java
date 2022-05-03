@@ -61,7 +61,7 @@ public final class DirParser extends Parser {
   public DirParser(final IO source, final MainOptions options) {
     super(source, options);
 
-    final boolean isDir = source.isDir();
+    final boolean isDir = source instanceof IOFile && source.isDir();
     if(isDir) {
       dir = source.path().replaceAll("/$", "") + '/';
       original = dir;
