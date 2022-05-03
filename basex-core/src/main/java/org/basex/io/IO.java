@@ -168,7 +168,7 @@ public abstract class IO {
    * @return result of check
    */
   public boolean isDir() {
-    return false;
+    return Strings.endsWith(pth, '/');
   }
 
   /**

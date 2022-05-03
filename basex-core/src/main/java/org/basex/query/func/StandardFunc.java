@@ -337,16 +337,15 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Returns a valid reference if a file is found at the specified path or the static base uri.
-   * Otherwise, returns an error.
+   * Converts the specified URI to a reference to a resource.
    * @param uri file URI
-   * @return input source, or exception
+   * @return io reference
    * @throws QueryException query exception
    */
   protected final IO toIO(final byte[] uri) throws QueryException {
     final IO io = new QueryInput(string(uri), sc).io;
     if(!io.exists()) throw WHICHRES_X.get(info, io);
-    if(io.isDir()) throw RESDIR_X.get(info, io);
+    if(io instanceof IOFile && io.isDir()) throw RESDIR_X.get(info, io);
     return io;
   }
 

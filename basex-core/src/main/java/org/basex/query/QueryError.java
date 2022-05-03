@@ -251,8 +251,6 @@ public enum QueryError {
   /** Error code. */
   FETCH_OPEN_X(FETCH, "open", "%"),
   /** Error code. */
-  FETCH_EXISTS_X(FETCH, "open", "Resource '%' not found."),
-  /** Error code. */
   FETCH_ENCODING_X(FETCH, "encoding", "Unknown encoding '%'."),
 
   // File Module
@@ -599,7 +597,7 @@ public enum QueryError {
   /** Error code. */
   WHICHRES_X(FODC, 2, "Resource '%' not found."),
   /** Error code. */
-  RESDIR_X(FODC, 2, "URI '%' points to directory."),
+  RESDIR_X(FODC, 2, "URI '%' points to a directory."),
   /** Error code. */
   INVCOLL_X(FODC, 4, "Invalid collection URI: %."),
   /** Error code. */

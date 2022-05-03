@@ -94,11 +94,6 @@ public final class IOUrl extends IO {
     return conn;
   }
 
-  @Override
-  public boolean isDir() {
-    return Strings.endsWith(pth, '/');
-  }
-
   /**
    * Checks if the specified string is a valid URL.
    * @param url url string
