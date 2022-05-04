@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -47,7 +48,7 @@ public final class FComm extends FNode {
   }
 
   @Override
-  public FComm materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii) {
+  public FComm materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc) {
     return materialized(test, ii) ? this : new FComm(value);
   }
 

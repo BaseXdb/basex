@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 import java.util.Map.*;
+import java.util.function.*;
 
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
@@ -671,10 +672,10 @@ public final class QueryContext extends Job implements Closeable {
 
       final ValueBuilder vb = new ValueBuilder(this);
       final QueryConsumer<Value> materialize = val -> {
-        final Value v = val.materialize(this, node -> {
-          final Data d = node.data();
+        final Predicate<Data> test = d -> {
           return d != null && (datas.contains(d) || !d.inMemory() && dbs.contains(d.meta.name));
-        }, null);
+        };
+        final Value v = val.materialize(test, null, this);
         if(v == null) throw BASEX_CACHE_X.get(null, value);
         vb.add(v);
       };

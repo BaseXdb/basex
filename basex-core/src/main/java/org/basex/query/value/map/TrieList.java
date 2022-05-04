@@ -6,12 +6,12 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -298,7 +298,7 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
     for(final Value value : values)  {
       if(!value.materialized(test, ii)) return false;

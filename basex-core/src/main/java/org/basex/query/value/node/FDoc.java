@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -112,7 +113,7 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public FDoc materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii) {
+  public FDoc materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc) {
     return materialized(test, ii) ? this : new FDoc(children, uri).optimize();
   }
 

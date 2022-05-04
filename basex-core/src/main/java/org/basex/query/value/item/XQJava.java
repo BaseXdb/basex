@@ -7,13 +7,13 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.core.MainOptions.*;
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.java.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -93,7 +93,7 @@ public final class XQJava extends FItem {
   }
 
   @Override
-  public Item materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii)
+  public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
     return null;
   }

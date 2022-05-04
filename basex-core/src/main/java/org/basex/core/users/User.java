@@ -114,7 +114,7 @@ public final class User {
     if(info != null) {
       if(qc != null) {
         // create copy of the info node if query context is available
-        user.add(info.materialize(qc, n -> true, ii));
+        user.add(info.materialize(n -> false, ii, qc));
       } else {
         // otherwise, referenced original info node and invalidate parent reference
         user.add(info);

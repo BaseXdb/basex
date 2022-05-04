@@ -223,8 +223,8 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final DBNode materialize(final QueryContext qc, final Predicate<ANode> test,
-      final InputInfo ii) throws QueryException {
+  public final DBNode materialize(final Predicate<Data> test, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
     return materialized(test, ii) ? this : copy(qc);
   }
 

@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -94,16 +95,16 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public Value materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii)
+  public Value materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
 
     if(materialized(test, ii)) return this;
-    final Value v = value.materialize(qc, test, ii);
+    final Value v = value.materialize(test, ii, qc);
     return v != null ? new SingletonSeq(size, v) : null;
   }
 
   @Override
-  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
     return value.materialized(test, ii);
   }

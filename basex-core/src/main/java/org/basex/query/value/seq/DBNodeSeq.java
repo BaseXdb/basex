@@ -126,9 +126,9 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
-    return test.test(itemAt(0));
+    return test.test(data);
   }
 
   @Override

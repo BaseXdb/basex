@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 import java.math.*;
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -263,13 +264,13 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public Item materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii)
+  public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
     return this;
   }
 
   @Override
-  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
     return true;
   }

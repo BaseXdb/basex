@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -254,7 +255,7 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public Value materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii)
+  public Value materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
 
     if(materialized(test, ii)) return this;
@@ -262,7 +263,7 @@ public abstract class Seq extends Value {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Item item : this) {
       qc.checkStop();
-      final Item it = item.materialize(qc, test, ii);
+      final Item it = item.materialize(test, ii, qc);
       if(it == null) return it;
       vb.add(it);
     }
@@ -270,7 +271,7 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
     if(!type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
       for(final Item item : this) {
