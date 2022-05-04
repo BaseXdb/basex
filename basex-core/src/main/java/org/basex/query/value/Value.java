@@ -79,10 +79,11 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   /**
    * Returns a materialized version of this value without dependencies to persistent data.
+   * Raises an error if the value contains function items
    * @param test check if a contained node can be adopted unchanged
    * @param ii input info
    * @param qc query context
-   * @return materialized value, or {@code null} if the value contains function items
+   * @return materialized value
    * @throws QueryException query exception
    */
   public abstract Value materialize(Predicate<Data> test, InputInfo ii, QueryContext qc)

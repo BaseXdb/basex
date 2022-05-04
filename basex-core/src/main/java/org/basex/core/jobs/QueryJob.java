@@ -7,7 +7,6 @@ import java.util.Map.*;
 import java.util.function.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -205,10 +204,7 @@ public final class QueryJob extends Job implements Runnable {
       if(remove) ctx.jobs.tasks.remove(id);
 
       // retrieve result; copy persistent database nodes
-      final Predicate<Data> test = d -> d == null || d.inMemory();
-      final Value value = qp.value(), v = value.materialize(test, null, qp.qc);
-      if(v == null) throw BASEX_CACHE_X.get(null, value);
-      result.value = v;
+      result.value = qp.value().materialize(d -> d == null || d.inMemory(), null, qp.qc);
 
     } catch(final JobException ex) {
       // query was interrupted: remove cached result

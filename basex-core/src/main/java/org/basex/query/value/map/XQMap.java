@@ -157,9 +157,7 @@ public final class XQMap extends XQData {
     XQMap map = EMPTY;
     for(final Item key : keys()) {
       qc.checkStop();
-      final Value value = get(key, ii).materialize(test, ii, qc);
-      if(value == null) return null;
-      map = map.put(key, value, ii);
+      map = map.put(key, get(key, ii).materialize(test, ii, qc), ii);
     }
     return map;
   }

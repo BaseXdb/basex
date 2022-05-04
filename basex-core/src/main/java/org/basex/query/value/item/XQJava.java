@@ -4,10 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
-import java.util.function.*;
 
 import org.basex.core.MainOptions.*;
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.java.*;
@@ -90,12 +88,6 @@ public final class XQJava extends FItem {
       throws QueryException {
     if(item instanceof XQJava) return equals(item);
     throw FICMP_X_X.get(ii, type, this);
-  }
-
-  @Override
-  public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
-    return null;
   }
 
   @Override

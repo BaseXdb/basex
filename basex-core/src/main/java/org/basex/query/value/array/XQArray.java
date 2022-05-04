@@ -339,9 +339,7 @@ public abstract class XQArray extends XQData {
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : members()) {
       qc.checkStop();
-      final Value v = value.materialize(test, ii, qc);
-      if(v == null) return null;
-      ab.append(v);
+      ab.append(value.materialize(test, ii, qc));
     }
     return ab.array(this);
   }

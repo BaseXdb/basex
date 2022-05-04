@@ -4,9 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
-import java.util.function.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
@@ -224,18 +222,6 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
     throw FIATOM_X_X.get(ii, type, this);
-  }
-
-  @Override
-  public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
-    return null;
-  }
-
-  @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
-      throws QueryException {
-    return false;
   }
 
   @Override

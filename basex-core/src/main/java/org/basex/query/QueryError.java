@@ -411,20 +411,14 @@ public enum QueryError {
 
   /** Error code. */
   REQUEST_PARAMETER(REQUEST, "parameter", "Query string cannot be decoded: %."),
-  /** Error code. */
-  REQUEST_ATTRIBUTE_X(REQUEST, "attribute", "Attribute cannot be stored: %."),
 
   // Session Module
 
-  /** Error code. */
-  SESSION_SET_X(SESSION, "set", "Value cannot be stored: %."),
   /** Error code. */
   SESSION_NOTFOUND(SESSIONS, "not-found", "Session not available."),
 
   // Sessions Module
 
-  /** Error code. */
-  SESSIONS_SET_X(SESSIONS, "set", "Value cannot be stored: %."),
   /** Error code. */
   SESSIONS_NOTFOUND_X(SESSIONS, "not-found", "Session not available: %."),
 
@@ -511,8 +505,6 @@ public enum QueryError {
 
   // WebSocket Module
 
-  /** Error code. */
-  WS_SET_X(WS, "set", "Function items cannot be stored: %."),
   /** Error code. */
   WS_NOTFOUND_X(WS, "not-found", "Unknown WebSocket: %."),
 

@@ -1,7 +1,5 @@
 package org.basex.query.func.session;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -19,10 +17,9 @@ public final class SessionSet extends SessionFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ASession session = session(qc, true);
     final byte[] name = toToken(exprs[0], qc);
-    final Value value = exprs[1].value(qc), v = value.materialize(n -> false, ii, qc);
-    if(v == null) throw SESSION_SET_X.get(info, value);
+    final Value value = exprs[1].value(qc);
 
-    session.set(name, v);
+    session.set(name, value.materialize(n -> false, ii, qc));
     return Empty.VALUE;
   }
 }
