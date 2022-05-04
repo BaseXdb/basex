@@ -2,6 +2,10 @@ package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
 
+import java.io.*;
+
+import org.basex.core.*;
+import org.basex.io.in.DataInput;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -35,6 +39,15 @@ public final class MapType extends FuncType {
       if(m.instanceOf(this)) return m;
     }
     throw typeError(item, this, ii);
+  }
+
+  @Override
+  public XQMap read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+    XQMap map = XQMap.empty();
+    for(int s = in.readNum() - 1; s >= 0; s--) {
+      map = map.put((Item) Cache.read(in, qc), Cache.read(in, qc), null);
+    }
+    return map;
   }
 
   @Override

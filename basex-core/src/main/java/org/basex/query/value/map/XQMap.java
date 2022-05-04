@@ -3,10 +3,13 @@ package org.basex.query.value.map;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.collation.*;
@@ -64,6 +67,15 @@ public final class XQMap extends XQData {
       throws QueryException {
     return new XQMap(new TrieLeaf(key.hash(ii), key, value),
         MapType.get((AtomType) key.type, value.seqType()));
+  }
+
+  @Override
+  public void write(final DataOutput out) throws IOException, QueryException {
+    out.writeNum(mapSize());
+    for(final Item key : keys()) {
+      Cache.write(out, key);
+      Cache.write(out, get(key, null));
+    }
   }
 
   @Override

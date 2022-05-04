@@ -119,6 +119,15 @@ public enum QueryError {
   /** Error code. */
   BIN_USO_X(BIN, "unknown-significance-order", "Unknown octet-order value: '%'."),
 
+  // Caching Module
+
+  /** Error code. */
+  CACHE_IO_X(CACHE, "io", "%"),
+  /** Error code. */
+  CACHE_NAME_X(CACHE, "name", "Invalid name: %."),
+  /** Error code. */
+  CACHE_NOTFOUND_X(CACHE, "not-found", "Cache '%' not found."),
+
   // Client Module
 
   /** Error code. */
@@ -1457,6 +1466,7 @@ public enum QueryError {
     /** Error type. */ ADMIN(ADMIN_PREFIX,       ADMIN_URI),
     /** Error type. */ BASEX(BASEX_PREFIX,       BASEX_URI),
     /** Error type. */ ARCHIVE(ADMIN_PREFIX,     ARCHIVE_URI),
+    /** Error type. */ CACHE(CACHE_PREFIX,       CACHE_URI),
     /** Error type. */ CLIENT(CLIENT_PREFIX,     CLIENT_URI),
     /** Error type. */ CONVERT(CONVERT_PREFIX,   CONVERT_URI),
     /** Error type. */ CSV(CSV_PREFIX,           CSV_URI),

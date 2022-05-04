@@ -3,9 +3,11 @@ package org.basex.query.value.seq;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.io.*;
 import java.util.function.*;
 
 import org.basex.data.*;
+import org.basex.io.in.DataInput;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -210,6 +212,16 @@ public abstract class Seq extends Value {
   }
 
   @Override
+  public boolean sameType() {
+    final BasicIter<Item> iter = iter();
+    final Type tp = iter.next().type;
+    for(Item item; (item = iter.next()) != null;) {
+      if(!tp.eq(item.type)) return false;
+    }
+    return true;
+  }
+
+  @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Item item : this) vb.add(item.atomValue(qc, ii));
@@ -334,6 +346,21 @@ public abstract class Seq extends Value {
   }
 
   // STATIC METHODS ===============================================================================
+
+  /**
+   * Creates a value from the input stream.
+   * @param in data input
+   * @param type type
+   * @param qc query context
+   * @return value
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public static Value read(final DataInput in, final Type type, final QueryContext qc)
+      throws IOException, QueryException {
+    throw Util.notExpected();
+  }
 
   /**
    * Tries to create a typed sequence with the items of the specified values.

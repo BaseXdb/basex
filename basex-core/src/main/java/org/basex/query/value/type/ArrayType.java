@@ -2,8 +2,12 @@ package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
 
+import java.io.*;
+
+import org.basex.core.*;
+import org.basex.io.in.DataInput;
 import org.basex.query.*;
-import org.basex.query.value.array.XQArray;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -34,6 +38,14 @@ public final class ArrayType extends FuncType {
       if(a.instanceOf(this)) return a;
     }
     throw typeError(item, this, ii);
+  }
+
+  @Override
+  public XQArray read(final DataInput in, final QueryContext qc)
+      throws IOException, QueryException {
+    final ArrayBuilder ab = new ArrayBuilder();
+    for(int s = in.readNum() - 1; s >= 0; s--) ab.append(Cache.read(in, qc));
+    return ab.array();
   }
 
   @Override

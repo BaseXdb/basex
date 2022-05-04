@@ -1,8 +1,10 @@
 package org.basex.query.value.item;
 
+import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
@@ -81,6 +83,11 @@ public class B64 extends Bin {
    */
   public static B64 get(final byte[] value, final InputInfo ii) throws QueryException {
     return get(parse(value, ii));
+  }
+
+  @Override
+  public void write(final DataOutput out) throws IOException {
+    out.writeToken(data);
   }
 
   @Override

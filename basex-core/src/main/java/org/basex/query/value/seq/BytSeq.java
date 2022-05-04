@@ -1,7 +1,10 @@
 package org.basex.query.value.seq;
 
+import java.io.*;
 import java.util.*;
 
+import org.basex.io.in.DataInput;
+import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -25,6 +28,28 @@ public final class BytSeq extends NativeSeq {
   private BytSeq(final byte[] values) {
     super(values.length, AtomType.BYTE);
     this.values = values;
+  }
+
+  /**
+   * Creates a value from the input stream.
+   * @param in data input
+   * @param type type
+   * @param qc query context
+   * @return value
+   * @throws IOException I/O exception
+   */
+  public static Value read(final DataInput in, final Type type, final QueryContext qc)
+      throws IOException {
+    final int size = in.readNum();
+    final byte[] values = new byte[size];
+    for(int s = 0; s < size; s++) values[s] = (byte) in.readNum();
+    return get(values);
+  }
+
+  @Override
+  public void write(final DataOutput out) throws IOException {
+    out.writeNum((int) size);
+    for(final byte v : values) out.writeNum(v);
   }
 
   @Override

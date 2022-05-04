@@ -1,7 +1,9 @@
 package org.basex.query.value.item;
 
+import java.io.*;
 import java.math.*;
 
+import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
@@ -71,6 +73,11 @@ public final class Int extends ANum {
    */
   public static Int get(final long value, final Type type) {
     return type == AtomType.INTEGER ? get(value) : new Int(value, type);
+  }
+
+  @Override
+  public void write(final DataOutput out) throws IOException {
+    out.writeLong(value);
   }
 
   @Override

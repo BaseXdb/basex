@@ -8,6 +8,7 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.io.out.*;
+import org.basex.io.out.DataOutput;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -40,6 +41,17 @@ public abstract class Value extends Expr implements Iterable<Item> {
    */
   protected Value(final Type type) {
     this.type = type;
+  }
+
+  /**
+   * Writes the data structure to disk.
+   * @param out data output
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public void write(final DataOutput out) throws IOException, QueryException {
+    throw Util.notExpected();
   }
 
   @Override
@@ -227,6 +239,12 @@ public abstract class Value extends Expr implements Iterable<Item> {
       ser.serialize(item);
     }
   }
+
+  /**
+   * Checks if all items of the sequence are of the same type.
+   * @return result of check
+   */
+  public abstract boolean sameType();
 
   /**
    * Returns the item at the given position in the value.

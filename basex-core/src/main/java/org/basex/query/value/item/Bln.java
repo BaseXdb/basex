@@ -1,7 +1,9 @@
 package org.basex.query.value.item;
 
+import java.io.*;
 import java.math.*;
 
+import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
@@ -57,6 +59,11 @@ public final class Bln extends Item {
    */
   public static Bln get(final boolean value) {
     return value ? TRUE : FALSE;
+  }
+
+  @Override
+  public void write(final DataOutput out) throws IOException {
+    out.writeBool(value);
   }
 
   @Override

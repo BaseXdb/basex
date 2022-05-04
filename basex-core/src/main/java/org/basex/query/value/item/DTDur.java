@@ -4,9 +4,11 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.value.item.Dec.*;
 
+import java.io.*;
 import java.math.*;
 import java.util.regex.*;
 
+import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
@@ -125,6 +127,11 @@ public final class DTDur extends Dur {
         date.seconds().subtract(sub.seconds()));
     final double d = sec.doubleValue();
     if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECRANGE_X.get(ii, d);
+  }
+
+  @Override
+  public void write(final DataOutput out) throws IOException {
+    out.writeToken(string(null));
   }
 
   /**

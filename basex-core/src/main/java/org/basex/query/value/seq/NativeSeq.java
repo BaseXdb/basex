@@ -42,6 +42,11 @@ abstract class NativeSeq extends Seq {
     return size;
   }
 
+  @Override
+  public boolean sameType() {
+    return true;
+  }
+
   /**
    * {@inheritDoc}
    * Because this function will mostly be invoked recursively, the standard implementation

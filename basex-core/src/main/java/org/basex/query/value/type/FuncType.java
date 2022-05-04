@@ -3,8 +3,10 @@ package org.basex.query.value.type;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.util.*;
 
+import org.basex.io.in.DataInput;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.util.list.*;
@@ -102,6 +104,11 @@ public class FuncType implements Type {
   public Item cast(final Object value, final QueryContext qc, final InputInfo ii)
       throws QueryException {
     throw FUNCCAST_X_X.get(ii, this, value);
+  }
+
+  @Override
+  public Item read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+    throw Util.notExpected();
   }
 
   @Override

@@ -120,6 +120,16 @@ public final class DataInput extends BufferInput {
   }
 
   /**
+   * Reads a long value.
+   * @return read value
+   * @throws IOException I/O Exception
+   */
+  public long readLong() throws IOException {
+    final int v = readNum();
+    return v == 0x3FFF ? read8() : v;
+  }
+
+  /**
    * Reads an array of long values.
    * @param s array size
    * @return array of longs
