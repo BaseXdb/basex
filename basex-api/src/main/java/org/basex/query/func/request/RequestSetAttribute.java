@@ -1,7 +1,5 @@
 package org.basex.query.func.request;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -19,10 +17,9 @@ public final class RequestSetAttribute extends ApiFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = toString(exprs[0], qc);
-    final Value value = exprs[1].value(qc), v = value.materialize(n -> false, ii, qc);
-    if(v == null) throw REQUEST_ATTRIBUTE_X.get(info, value);
+    final Value value = exprs[1].value(qc);
 
-    request(qc).setAttribute(name, v);
+    request(qc).setAttribute(name, value.materialize(n -> false, ii, qc));
     return Empty.VALUE;
   }
 }

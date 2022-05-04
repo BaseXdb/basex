@@ -263,9 +263,7 @@ public abstract class Seq extends Value {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Item item : this) {
       qc.checkStop();
-      final Item it = item.materialize(test, ii, qc);
-      if(it == null) return it;
-      vb.add(it);
+      vb.add(item.materialize(test, ii, qc));
     }
     return vb.value(this);
   }

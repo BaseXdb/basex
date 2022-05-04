@@ -679,9 +679,7 @@ public final class QueryContext extends Job implements Closeable {
         final Predicate<Data> test = d -> {
           return d != null && (datas.contains(d) || !d.inMemory() && dbs.contains(d.meta.name));
         };
-        final Value v = val.materialize(test, null, this);
-        if(v == null) throw BASEX_CACHE_X.get(null, value);
-        vb.add(v);
+        vb.add(val.materialize(test, null, this));
       };
       materialize.accept(value);
       materialize.accept(updates.output(true));
