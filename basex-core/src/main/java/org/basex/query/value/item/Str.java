@@ -34,7 +34,7 @@ public final class Str extends AStr {
    * @param value value
    * @param type item type
    */
-  public Str(final byte[] value, final AtomType type) {
+  private Str(final byte[] value, final Type type) {
     super(value, type);
   }
 
@@ -45,6 +45,16 @@ public final class Str extends AStr {
    */
   public static Str get(final byte[] value) {
     return value.length == 0 ? EMPTY : new Str(value);
+  }
+
+  /**
+   * Returns an instance of this class.
+   * @param value value
+   * @param type type
+   * @return instance
+   */
+  public static Str get(final byte[] value, final AtomType type) {
+    return type == AtomType.STRING ? get(value) : new Str(value, type);
   }
 
   /**
@@ -70,7 +80,7 @@ public final class Str extends AStr {
     if(value == null) return Str.EMPTY;
 
     final boolean validate = qc.context.options.get(MainOptions.CHECKSTRINGS);
-    final byte[] bytes = Token.token(value.toString());
+    final byte[] bytes = Token.token(value);
 
     // check if string is valid
     boolean valid = true;
