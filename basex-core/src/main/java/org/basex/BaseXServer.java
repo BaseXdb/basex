@@ -63,7 +63,7 @@ public final class BaseXServer extends CLI implements Runnable {
   public BaseXServer(final String... args) throws IOException {
     this(new Context(), args);
 
-    // start persistent jobs
+    // initialize persistent jobs
     new Jobs(context).init();
   }
 

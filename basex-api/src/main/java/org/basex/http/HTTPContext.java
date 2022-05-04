@@ -106,9 +106,8 @@ public final class HTTPContext {
       }
     }
 
-    // start persistent jobs
+    // initialize persistent jobs
     new Jobs(context).init();
-
     return context;
   }
 

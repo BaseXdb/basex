@@ -169,7 +169,6 @@ public final class XQMap extends XQData {
 
     SeqType dt = ft.declType;
     if(dt.eq(SeqType.ITEM_ZM)) dt = null;
-
     return kt == null && dt == null || root.instanceOf(kt, dt);
   }
 
@@ -183,7 +182,6 @@ public final class XQMap extends XQData {
    */
   public XQMap put(final Item key, final Value value, final InputInfo ii) throws QueryException {
     if(this == EMPTY) return entry(key, value, ii);
-
     final TrieNode ins = root.put(key.hash(ii), key, value, 0, ii);
     return ins == root ? this : new XQMap(ins, union(key.type, value.seqType()));
   }
@@ -230,16 +228,10 @@ public final class XQMap extends XQData {
   /**
    * Applies a function on all entries.
    * @param func function to apply on keys and values
-   * @param qc query context
-   * @param ii input info
-   * @return value builder
    * @throws QueryException query exception
    */
-  public ValueBuilder forEach(final FItem func, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc);
-    root.forEach(vb, func, qc, ii);
-    return vb;
+  public void apply(final QueryBiConsumer<Item, Value> func) throws QueryException {
+    root.apply(func);
   }
 
   @Override
@@ -254,7 +246,7 @@ public final class XQMap extends XQData {
   @Override
   public HashMap<Object, Object> toJava() throws QueryException {
     final HashMap<Object, Object> map = new HashMap<>(root.size);
-    for(final Item key : keys()) map.put(key.toJava(), get(key, null).toJava());
+    apply((key, value) -> map.put(key.toJava(), value.toJava()));
     return map;
   }
 

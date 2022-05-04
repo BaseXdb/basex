@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.*;
 import java.util.*;
 
 import javax.net.ssl.*;
@@ -175,7 +176,8 @@ public final class Util {
     String msg = throwable.getMessage();
     if(msg == null || msg.isEmpty() || throwable instanceof RuntimeException)
       msg = throwable.toString();
-    if(throwable instanceof FileNotFoundException) return info(RES_NOT_FOUND_X, msg);
+    if(throwable instanceof FileNotFoundException ||
+        throwable instanceof NoSuchFileException) return info(RES_NOT_FOUND_X, msg);
     if(throwable instanceof UnknownHostException) return info(UNKNOWN_HOST_X, msg);
     if(throwable instanceof SSLException) return "SSL: " + msg;
 

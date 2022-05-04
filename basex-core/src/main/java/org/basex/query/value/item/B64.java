@@ -29,10 +29,18 @@ public class B64 extends Bin {
   }
 
   /**
+   * Constructor.
+   * @param data binary data
+   */
+  private B64(final byte[] data) {
+    super(data, AtomType.BASE64_BINARY);
+  }
+
+  /**
    * Empty constructor.
    */
   B64() {
-    super(null, AtomType.BASE64_BINARY);
+    this(null);
   }
 
   /**
@@ -73,14 +81,6 @@ public class B64 extends Bin {
    */
   public static B64 get(final byte[] value, final InputInfo ii) throws QueryException {
     return get(parse(value, ii));
-  }
-
-  /**
-   * Constructor.
-   * @param data binary data
-   */
-  private B64(final byte[] data) {
-    super(data, AtomType.BASE64_BINARY);
   }
 
   @Override

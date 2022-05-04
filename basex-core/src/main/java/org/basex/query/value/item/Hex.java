@@ -30,7 +30,7 @@ public final class Hex extends Bin {
    * @throws QueryException query exception
    */
   public Hex(final byte[] value, final InputInfo ii) throws QueryException {
-    super(parse(Token.trim(value), ii), AtomType.HEX_BINARY);
+    this(parse(Token.trim(value), ii));
   }
 
   /**

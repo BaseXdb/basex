@@ -48,9 +48,7 @@ public final class MapFind extends StandardFunc {
         final XQMap map = (XQMap) item;
         final Value value = map.get(key, info);
         if(value != Empty.VALUE) builder.append(value);
-        for(final Item it : map.keys()) {
-          find(map.get(it, info).iter(), key, builder, qc);
-        }
+        map.apply((it, val) -> find(val.iter(), key, builder, qc));
       } else if(item instanceof XQArray) {
         for(final Value value : ((XQArray) item).members()) {
           find(value.iter(), key, builder, qc);

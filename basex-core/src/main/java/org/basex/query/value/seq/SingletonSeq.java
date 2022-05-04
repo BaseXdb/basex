@@ -13,7 +13,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Sequence of a single item.
+ * Singleton value sequence.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
