@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -385,10 +386,10 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public FElem materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii)
+  public FElem materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
 
-    if(test.test(this)) return this;
+    if(materialized(test, ii)) return this;
 
     // nodes must be added after root constructor in order to ensure ascending node ids
     final Atts nsp = namespaces != null ? new Atts(namespaces) : null;
@@ -396,10 +397,10 @@ public final class FElem extends FNode {
     final ANodeList ch = children != null ? new ANodeList(children.size()) : null;
     final FElem node = new FElem(name, nsp, at, ch);
     if(at != null) {
-      for(final ANode attr : attributes) at.add(attr.materialize(qc, test, ii));
+      for(final ANode attr : attributes) at.add(attr.materialize(test, ii, qc));
     }
     if(ch != null) {
-      for(final ANode child : children) ch.add(child.materialize(qc, test, ii));
+      for(final ANode child : children) ch.add(child.materialize(test, ii, qc));
     }
     return node.optimize();
   }

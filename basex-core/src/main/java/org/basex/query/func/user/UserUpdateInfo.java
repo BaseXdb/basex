@@ -23,7 +23,7 @@ public final class UserUpdateInfo extends UserFn {
     if(!T_INFO.matches(node)) throw ELM_X_X.get(info, Q_INFO.prefixId(), node);
     final User user = exprs.length > 1 ? toUser(1, qc) : null;
 
-    qc.updates().add(new UpdateInfo(node.materialize(qc, n -> true, info), user, qc, info), qc);
+    qc.updates().add(new UpdateInfo(node.materialize(n -> false, info, qc), user, qc, info), qc);
     return Empty.VALUE;
   }
 

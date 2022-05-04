@@ -109,12 +109,12 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public abstract ANode materialize(QueryContext qc, Predicate<ANode> test, InputInfo ii)
+  public abstract ANode materialize(Predicate<Data> test, InputInfo ii, QueryContext qc)
       throws QueryException;
 
   @Override
-  public final boolean materialized(final Predicate<ANode> test, final InputInfo ii) {
-    return test.test(this);
+  public final boolean materialized(final Predicate<Data> test, final InputInfo ii) {
+    return test.test(data());
   }
 
   /**

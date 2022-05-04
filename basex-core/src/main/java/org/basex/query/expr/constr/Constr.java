@@ -160,7 +160,7 @@ public final class Constr {
         // add text node
         if(!text.isEmpty()) children.add(new FTxt(text.next()));
         final boolean keep = !qc.context.options.get(MainOptions.COPYNODE);
-        children.add(node.materialize(qc, n -> keep, info));
+        children.add(node.materialize(n -> keep, info, qc));
       }
       more = false;
     } else {

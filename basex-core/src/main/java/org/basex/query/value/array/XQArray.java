@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.collation.*;
@@ -13,7 +14,6 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -331,7 +331,7 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public Item materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii)
+  public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
 
     if(materialized(test, ii)) return this;
@@ -339,7 +339,7 @@ public abstract class XQArray extends XQData {
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : members()) {
       qc.checkStop();
-      final Value v = value.materialize(qc, test, ii);
+      final Value v = value.materialize(test, ii, qc);
       if(v == null) return null;
       ab.append(v);
     }
@@ -347,7 +347,7 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
     if(!(funcType().declType.type.instanceOf(AtomType.ANY_ATOMIC_TYPE))) {
       for(final Value value : members()) {

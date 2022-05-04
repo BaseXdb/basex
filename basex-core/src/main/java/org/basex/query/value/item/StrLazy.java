@@ -4,11 +4,11 @@ import java.io.*;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.Function;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -100,14 +100,14 @@ public final class StrLazy extends AStr implements Lazy {
   }
 
   @Override
-  public Item materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii)
+  public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
     cache(ii);
     return this;
   }
 
   @Override
-  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
     cache(ii);
     return true;

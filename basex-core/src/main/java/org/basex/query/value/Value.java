@@ -15,7 +15,6 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -80,24 +79,24 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   /**
    * Returns a materialized version of this value without dependencies to persistent data.
-   * @param qc query context
-   * @param test test if node is materialized
+   * @param test check if a contained node can be adopted unchanged
    * @param ii input info
+   * @param qc query context
    * @return materialized value, or {@code null} if the value contains function items
    * @throws QueryException query exception
    */
-  public abstract Value materialize(QueryContext qc, Predicate<ANode> test, InputInfo ii)
+  public abstract Value materialize(Predicate<Data> test, InputInfo ii, QueryContext qc)
       throws QueryException;
 
   /**
    * Checks if this value is materialized, i.e., contains no persistent database nodes or
    * function items.
-   * @param test test for copying nodes
+   * @param test check if a contained node can be adopted unchanged
    * @param ii input info
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean materialized(Predicate<ANode> test, InputInfo ii) throws QueryException;
+  public abstract boolean materialized(Predicate<Data> test, InputInfo ii) throws QueryException;
 
   /**
    * Tests if this is an empty sequence.
