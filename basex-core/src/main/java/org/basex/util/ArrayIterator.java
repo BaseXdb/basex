@@ -45,6 +45,10 @@ public final class ArrayIterator<E> implements Iterator<E>, Iterable<E> {
 
   @Override
   public boolean hasNext() {
+    while(start < end) {
+      if(array[start] != null) return true;
+      ++start;
+    }
     return start < end;
   }
 

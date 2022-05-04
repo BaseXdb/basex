@@ -1,7 +1,10 @@
 package org.basex.query.value.seq;
 
+import java.io.*;
 import java.util.*;
 
+import org.basex.io.in.DataInput;
+import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -27,6 +30,28 @@ public final class BlnSeq extends NativeSeq {
   private BlnSeq(final boolean[] values) {
     super(values.length, AtomType.BOOLEAN);
     this.values = values;
+  }
+
+  /**
+   * Creates a value from the input stream.
+   * @param in data input
+   * @param type type
+   * @param qc query context
+   * @return value
+   * @throws IOException I/O exception
+   */
+  public static Value read(final DataInput in, final Type type, final QueryContext qc)
+      throws IOException {
+    final int size = in.readNum();
+    final boolean[] values = new boolean[size];
+    for(int s = 0; s < size; s++) values[s] = in.readBool();
+    return get(values);
+  }
+
+  @Override
+  public void write(final DataOutput out) throws IOException {
+    out.writeNum((int) size);
+    for(final boolean v : values) out.writeBool(v);
   }
 
   @Override

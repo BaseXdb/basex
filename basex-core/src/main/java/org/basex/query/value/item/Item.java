@@ -3,11 +3,13 @@ package org.basex.query.value.item;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.io.*;
 import java.math.*;
 import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.io.in.*;
+import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -40,6 +42,11 @@ public abstract class Item extends Value {
   }
 
   @Override
+  public void write(final DataOutput out) throws IOException, QueryException {
+    out.writeToken(string(null));
+  }
+
+  @Override
   public BasicIter<Item> iter() {
     return new BasicIter<Item>(1) {
       @Override
@@ -65,6 +72,11 @@ public abstract class Item extends Value {
   @Override
   public final Item itemAt(final long pos) {
     return this;
+  }
+
+  @Override
+  public boolean sameType() {
+    return true;
   }
 
   @Override

@@ -145,6 +145,20 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
+   * Writes a long value.
+   * @param v value to be written
+   * @throws IOException I/O exception
+   */
+  public void writeLong(final long v) throws IOException {
+    if(v < Integer.MIN_VALUE || v >= Integer.MAX_VALUE || v == 0x3FFF) {
+      writeNum(0x3FFF);
+      write8(v);
+    } else {
+      writeNum((int) v);
+    }
+  }
+
+  /**
    * Writes long values. The value will not be compressed
    * @param array array to be written
    * @throws IOException I/O exception

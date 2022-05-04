@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.math.*;
 import java.util.*;
 import java.util.function.*;
@@ -11,6 +12,7 @@ import java.util.regex.*;
 
 import javax.xml.namespace.*;
 
+import org.basex.io.in.DataInput;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -61,6 +63,10 @@ public enum AtomType implements Type {
     public Atm cast(final Object value, final QueryContext qc, final InputInfo ii) {
       return Atm.get(token(value));
     }
+    @Override
+    public Atm read(final DataInput in, final QueryContext qc) throws IOException {
+      return Atm.get(in.readToken());
+    }
   },
 
   /** String type. */
@@ -72,8 +78,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return Str.get(value, qc, ii);
+    }
+    @Override
+    public Str read(final DataInput in, final QueryContext qc) throws IOException {
+      return Str.get(in.readToken());
     }
   },
 
@@ -92,6 +102,10 @@ public enum AtomType implements Type {
         throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
+    @Override
+    public Str read(final DataInput in, final QueryContext qc) throws IOException {
+      return Str.get(in.readToken(), this);
+    }
   },
 
   /** Token type. */
@@ -103,8 +117,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public Str read(final DataInput in, final QueryContext qc) throws IOException {
+      return Str.get(in.readToken(), this);
     }
   },
 
@@ -119,8 +137,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public Str read(final DataInput in, final QueryContext qc) throws IOException {
+      return Str.get(in.readToken(), this);
     }
   },
 
@@ -135,8 +157,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public Str read(final DataInput in, final QueryContext qc) throws IOException {
+      return Str.get(in.readToken(), this);
     }
   },
 
@@ -151,8 +177,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public Str read(final DataInput in, final QueryContext qc) throws IOException {
+      return Str.get(in.readToken(), this);
     }
   },
 
@@ -165,8 +195,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public Str read(final DataInput in, final QueryContext qc) throws IOException {
+      return Str.get(in.readToken(), this);
     }
   },
 
@@ -179,8 +213,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public Str read(final DataInput in, final QueryContext qc) throws IOException {
+      return Str.get(in.readToken(), this);
     }
   },
 
@@ -193,8 +231,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public Str read(final DataInput in, final QueryContext qc) throws IOException {
+      return Str.get(in.readToken(), this);
     }
   },
 
@@ -207,8 +249,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public Str read(final DataInput in, final QueryContext qc) throws IOException {
+      return Str.get(in.readToken(), this);
     }
   },
 
@@ -222,7 +268,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       // return double
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
@@ -237,8 +283,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Flt cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public Flt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+      return Flt.get(in.readToken(), null);
     }
   },
 
@@ -251,8 +301,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Dbl cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public Dbl read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+      return Dbl.get(in.readToken(), null);
     }
   },
 
@@ -267,6 +321,10 @@ public enum AtomType implements Type {
     public Dec cast(final Object value, final QueryContext qc, final InputInfo ii) {
       return Dec.get(value instanceof BigDecimal ? (BigDecimal) value :
         new BigDecimal(string(token(value))));
+    }
+    @Override
+    public Dec read(final DataInput in, final QueryContext qc) throws IOException {
+      return Dec.get(new BigDecimal(string(in.readToken())));
     }
   },
 
@@ -285,6 +343,10 @@ public enum AtomType implements Type {
         throws QueryException {
       return Int.get(checkLong(value, 0, 0, ii));
     }
+    @Override
+    public Int read(final DataInput in, final QueryContext qc) throws IOException {
+      return Int.get(in.readLong());
+    }
   },
 
   /** Non-positive integer type. */
@@ -300,6 +362,10 @@ public enum AtomType implements Type {
         throws QueryException {
       return new Int(checkLong(value, Long.MIN_VALUE, 0, ii), this);
     }
+    @Override
+    public Int read(final DataInput in, final QueryContext qc) throws IOException {
+      return Int.get(in.readLong(), this);
+    }
   },
 
   /** Negative integer type. */
@@ -312,8 +378,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return new Int(checkLong(value, Long.MIN_VALUE, -1, ii), this);
+    }
+    @Override
+    public Int read(final DataInput in, final QueryContext qc) throws IOException {
+      return Int.get(in.readLong(), this);
     }
   },
 
@@ -326,8 +396,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return new Int(checkLong(value, 0, 0, ii), this);
+    }
+    @Override
+    public Int read(final DataInput in, final QueryContext qc) throws IOException {
+      return Int.get(in.readLong(), this);
     }
   },
 
@@ -340,8 +414,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return new Int(checkLong(value, -0x80000000, 0x7FFFFFFF, ii), this);
+    }
+    @Override
+    public Int read(final DataInput in, final QueryContext qc) throws IOException {
+      return Int.get(in.readLong(), this);
     }
   },
 
@@ -354,8 +432,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return new Int(checkLong(value, -0x8000, 0x7FFF, ii), this);
+    }
+    @Override
+    public Int read(final DataInput in, final QueryContext qc) throws IOException {
+      return Int.get(in.readLong(), this);
     }
   },
 
@@ -368,8 +450,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return new Int(checkLong(value, -0x80, 0x7F, ii), this);
+    }
+    @Override
+    public Int read(final DataInput in, final QueryContext qc) throws IOException {
+      return Int.get(in.readLong(), this);
     }
   },
 
@@ -383,8 +469,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return new Int(checkLong(value, 0, Long.MAX_VALUE, ii), this);
+    }
+    @Override
+    public Int read(final DataInput in, final QueryContext qc) throws IOException {
+      return Int.get(in.readLong(), this);
     }
   },
 
@@ -398,7 +488,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Uln cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
 
       final Item item = checkNum(value, ii);
       final BigDecimal v = item.dec(ii), i = v.setScale(0, RoundingMode.DOWN);
@@ -406,6 +496,10 @@ public enum AtomType implements Type {
       if(v.signum() < 0 || v.compareTo(Uln.MAXULN) > 0 ||
         item.type.isStringOrUntyped() && !v.equals(i)) throw castError(item, ii);
       return new Uln(i.toBigInteger());
+    }
+    @Override
+    public Uln read(final DataInput in, final QueryContext qc) throws IOException {
+      return new Uln(new BigInteger(string(in.readToken())));
     }
   },
 
@@ -418,8 +512,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return new Int(checkLong(value, 0, 0xFFFFFFFFL, ii), this);
+    }
+    @Override
+    public Int read(final DataInput in, final QueryContext qc) throws IOException {
+      return Int.get(in.readLong(), this);
     }
   },
 
@@ -432,8 +530,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return new Int(checkLong(value, 0, 0xFFFF, ii), this);
+    }
+    @Override
+    public Int read(final DataInput in, final QueryContext qc) throws IOException {
+      return Int.get(in.readLong(), this);
     }
   },
 
@@ -446,8 +548,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return new Int(checkLong(value, 0, 0xFF, ii), this);
+    }
+    @Override
+    public Int read(final DataInput in, final QueryContext qc) throws IOException {
+      return Int.get(in.readLong(), this);
     }
   },
 
@@ -461,8 +567,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return new Int(checkLong(value, 1, Long.MAX_VALUE, ii), this);
+    }
+    @Override
+    public Int read(final DataInput in, final QueryContext qc) throws IOException {
+      return Int.get(in.readLong(), this);
     }
   },
 
@@ -477,8 +587,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Dur cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public Dur read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+      return new Dur(in.readToken(), null);
     }
   },
 
@@ -494,8 +608,13 @@ public enum AtomType implements Type {
     }
     @Override
     public YMDur cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public YMDur read(final DataInput in, final QueryContext qc)
+        throws IOException, QueryException {
+      return new YMDur(in.readToken(), null);
     }
   },
 
@@ -510,8 +629,13 @@ public enum AtomType implements Type {
     }
     @Override
     public DTDur cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public DTDur read(final DataInput in, final QueryContext qc)
+        throws IOException, QueryException {
+      return new DTDur(in.readToken(), null);
     }
   },
 
@@ -526,8 +650,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Dtm cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public Dtm read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+      return new Dtm(in.readToken(), null);
     }
   },
 
@@ -545,8 +673,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Dat cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public Dat read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+      return new Dat(in.readToken(), null);
     }
   },
 
@@ -561,8 +693,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Tim cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public Tim read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+      return new Tim(in.readToken(), null);
     }
   },
 
@@ -577,8 +713,12 @@ public enum AtomType implements Type {
     }
     @Override
     public GDt cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public GDt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+      return new GDt(in.readToken(), this, null);
     }
   },
 
@@ -593,8 +733,12 @@ public enum AtomType implements Type {
     }
     @Override
     public GDt cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public GDt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+      return new GDt(in.readToken(), this, null);
     }
   },
 
@@ -609,8 +753,12 @@ public enum AtomType implements Type {
     }
     @Override
     public GDt cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public GDt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+      return new GDt(in.readToken(), this, null);
     }
   },
 
@@ -625,8 +773,12 @@ public enum AtomType implements Type {
     }
     @Override
     public GDt cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public GDt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+      return new GDt(in.readToken(), this, null);
     }
   },
 
@@ -641,8 +793,12 @@ public enum AtomType implements Type {
     }
     @Override
     public GDt cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
+    }
+    @Override
+    public GDt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+      return new GDt(in.readToken(), this, null);
     }
   },
 
@@ -661,6 +817,10 @@ public enum AtomType implements Type {
       return value instanceof Boolean ? Bln.get((Boolean) value) :
         cast(Str.get(value, qc, ii), qc, null, ii);
     }
+    @Override
+    public Bln read(final DataInput in, final QueryContext qc) throws IOException {
+      return Bln.get(in.readBool());
+    }
   },
 
   /** Implementation specific: binary type. */
@@ -677,8 +837,12 @@ public enum AtomType implements Type {
     }
     @Override
     public B64 cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return value instanceof byte[] ? B64.get((byte[]) value) : B64.get(token(value), ii);
+    }
+    @Override
+    public B64 read(final DataInput in, final QueryContext qc) throws IOException {
+      return B64.get(in.readToken());
     }
   },
 
@@ -693,8 +857,12 @@ public enum AtomType implements Type {
     }
     @Override
     public Hex cast(final Object value, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+        throws QueryException {
       return new Hex(value instanceof byte[] ? (byte[]) value : token(value), ii);
+    }
+    @Override
+    public Hex read(final DataInput in, final QueryContext qc) throws IOException {
+      return new Hex(in.readToken());
     }
   },
 
@@ -712,6 +880,10 @@ public enum AtomType implements Type {
     @Override
     public Uri cast(final Object value, final QueryContext qc, final InputInfo ii) {
       return Uri.uri(token(value));
+    }
+    @Override
+    public Uri read(final DataInput in, final QueryContext qc) throws IOException {
+      return Uri.uri(in.readToken());
     }
   },
 
@@ -731,6 +903,10 @@ public enum AtomType implements Type {
     @Override
     public QNm cast(final Object value, final QueryContext qc, final InputInfo ii) {
       return value instanceof QName ? new QNm((QName) value) : new QNm(token(value));
+    }
+    @Override
+    public QNm read(final DataInput in, final QueryContext qc) throws IOException {
+      return new QNm(in.readToken(), in.readBool() ? in.readToken() : null);
     }
   },
 
@@ -800,6 +976,11 @@ public enum AtomType implements Type {
   public Item cast(final Object value, final QueryContext qc, final InputInfo ii)
       throws QueryException {
     throw FUNCCAST_X_X.get(ii, this, value);
+  }
+
+  @Override
+  public Item read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+    throw Util.notExpected();
   }
 
   @Override

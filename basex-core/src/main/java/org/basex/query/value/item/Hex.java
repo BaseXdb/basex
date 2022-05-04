@@ -1,8 +1,10 @@
 package org.basex.query.value.item;
 
+import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
@@ -41,6 +43,11 @@ public final class Hex extends Bin {
    */
   public Hex(final Bin bin, final InputInfo ii) throws QueryException {
     this(bin.binary(ii));
+  }
+
+  @Override
+  public void write(final DataOutput out) throws IOException {
+    out.writeToken(data);
   }
 
   @Override

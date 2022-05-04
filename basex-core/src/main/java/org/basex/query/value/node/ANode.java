@@ -1,11 +1,15 @@
 package org.basex.query.value.node;
 
+import java.io.*;
 import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
 import org.basex.api.dom.*;
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.io.out.*;
+import org.basex.io.out.DataOutput;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -43,6 +47,13 @@ public abstract class ANode extends Item {
    */
   ANode(final NodeType type) {
     super(type);
+  }
+
+  @Override
+  public final void write(final DataOutput out) throws IOException {
+    final ArrayOutput ao = new ArrayOutput();
+    Serializer.get(ao, SerializerMode.NOINDENT.get()).serialize(this);
+    out.writeToken(ao.finish());
   }
 
   @Override

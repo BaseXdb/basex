@@ -4,8 +4,10 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.util.*;
 
+import org.basex.io.in.DataInput;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -88,6 +90,11 @@ public enum ListType implements Type {
   public final Value cast(final Object value, final QueryContext qc, final InputInfo ii)
       throws QueryException {
     return cast(Str.get(value, qc, ii), qc, null, ii);
+  }
+
+  @Override
+  public Item read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+    throw Util.notExpected();
   }
 
   @Override

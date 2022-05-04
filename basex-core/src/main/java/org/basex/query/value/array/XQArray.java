@@ -3,10 +3,13 @@ package org.basex.query.value.array;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.collation.*;
@@ -182,6 +185,14 @@ public abstract class XQArray extends XQData {
    * @return resulting array
    */
   public abstract XQArray remove(long pos, QueryContext qc);
+
+  @Override
+  public void write(final DataOutput out) throws IOException, QueryException {
+    out.writeLong(arraySize());
+    for(final Value member : members()) {
+      Cache.write(out, member);
+    }
+  }
 
   @Override
   public final void cache(final boolean lazy, final InputInfo ii) throws QueryException {

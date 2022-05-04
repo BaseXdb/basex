@@ -11,6 +11,7 @@ import org.basex.build.*;
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.io.in.DataInput;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -204,6 +205,11 @@ public enum NodeType implements Type {
   public ANode cast(final Object value, final QueryContext qc, final InputInfo ii)
       throws QueryException {
     throw FUNCCAST_X_X.get(ii, this, value);
+  }
+
+  @Override
+  public ANode read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+    return cast(in.readToken(), qc, null);
   }
 
   @Override

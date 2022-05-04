@@ -3,9 +3,12 @@ package org.basex.query.value.seq;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.io.*;
 import java.util.function.*;
 
 import org.basex.data.*;
+import org.basex.io.in.DataInput;
+import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.func.Function;
 import org.basex.query.value.*;
@@ -46,6 +49,28 @@ public final class RangeSeq extends Seq {
    */
   public static Value get(final long start, final long size, final boolean asc) {
     return size < 1 ? Empty.VALUE : size == 1 ? Int.get(start) : new RangeSeq(start, size, asc);
+  }
+
+  /**
+   * Creates a value from the input stream.
+   * @param in data input
+   * @param type type
+   * @param qc query context
+   * @return value
+   * @throws IOException I/O exception
+   */
+  public static Value read(final DataInput in, final Type type, final QueryContext qc)
+      throws IOException {
+    final long size = in.readLong(), start = in.readLong();
+    final boolean asc = in.readBool();
+    return get(start, size, asc);
+  }
+
+  @Override
+  public void write(final DataOutput out) throws IOException {
+    out.writeLong(size);
+    out.writeLong(start);
+    out.writeBool(asc);
   }
 
   /**
@@ -107,6 +132,11 @@ public final class RangeSeq extends Seq {
   @Override
   public long atomSize() {
     return size;
+  }
+
+  @Override
+  public boolean sameType() {
+    return true;
   }
 
   @Override

@@ -1,5 +1,8 @@
 package org.basex.query.value.type;
 
+import java.io.*;
+
+import org.basex.io.in.DataInput;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
@@ -180,6 +183,16 @@ public interface Type {
    * @throws QueryException query exception
    */
   Value cast(Object value, QueryContext qc, InputInfo ii) throws QueryException;
+
+  /**
+   * Reads an item from the input stream.
+   * @param in data input
+   * @param qc query context
+   * @return item
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  Item read(DataInput in, QueryContext qc) throws IOException, QueryException;
 
   /**
    * Returns a sequence type with a single number of occurrence.

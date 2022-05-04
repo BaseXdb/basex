@@ -246,6 +246,7 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] ARRAY_PREFIX = token("array");
   /** XQuery prefix. */ byte[] BASEX_PREFIX = token("basex");
   /** XQuery prefix. */ byte[] BIN_PREFIX = token("bin");
+  /** XQuery prefix. */ byte[] CACHE_PREFIX = token("cache");
   /** XQuery prefix. */ byte[] CLIENT_PREFIX = token("client");
   /** XQuery prefix. */ byte[] CONVERT_PREFIX = token("convert");
   /** XQuery prefix. */ byte[] CRYPTO_PREFIX = token("crypto");
@@ -336,6 +337,7 @@ public interface QueryText {
   /** BaseX URI. */ String BXMODULES_URL = BASEX_URL + "/modules/";
   /** BaseX URI. */ byte[] ADMIN_URI = token(BXMODULES_URL + "admin");
   /** BaseX URI. */ byte[] ARCHIVE_URI = token(BXMODULES_URL + "archive");
+  /** BaseX URI. */ byte[] CACHE_URI = token(BXMODULES_URL + "cache");
   /** BaseX URI. */ byte[] CLIENT_URI = token(BXMODULES_URL + "client");
   /** BaseX URI. */ byte[] CONVERT_URI = token(BXMODULES_URL + "convert");
   /** BaseX URI. */ byte[] CSV_URI = token(BXMODULES_URL + "csv");

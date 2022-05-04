@@ -1,7 +1,12 @@
 package org.basex.query.value.seq;
 
+import static org.basex.util.Token.*;
+
+import java.io.*;
 import java.math.*;
 
+import org.basex.io.in.DataInput;
+import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -25,6 +30,28 @@ public final class DecSeq extends NativeSeq {
   private DecSeq(final BigDecimal[] values) {
     super(values.length, AtomType.DECIMAL);
     this.values = values;
+  }
+
+  /**
+   * Creates a value from the input stream.
+   * @param in data input
+   * @param type type
+   * @param qc query context
+   * @return value
+   * @throws IOException I/O exception
+   */
+  public static Value read(final DataInput in, final Type type, final QueryContext qc)
+      throws IOException {
+    final int size = in.readNum();
+    final BigDecimal[] values = new BigDecimal[size];
+    for(int s = 0; s < size; s++) values[s] = new BigDecimal(Token.string(in.readToken()));
+    return get(values);
+  }
+
+  @Override
+  public void write(final DataOutput out) throws IOException {
+    out.writeNum((int) size);
+    for(final BigDecimal v : values) out.writeToken(chopNumber(token(v.toPlainString())));
   }
 
   @Override

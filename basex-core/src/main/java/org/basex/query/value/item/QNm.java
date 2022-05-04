@@ -3,11 +3,14 @@ package org.basex.query.value.item;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.Token.normalize;
 
+import java.io.*;
 import java.util.regex.*;
 
 import javax.xml.namespace.*;
 
+import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -123,6 +126,13 @@ public final class QNm extends Item {
    */
   public QNm(final byte[] prefix, final byte[] local, final byte[] uri) {
     this(name(prefix, local), uri);
+  }
+
+  @Override
+  public void write(final DataOutput out) throws IOException {
+    out.writeToken(name);
+    out.writeBool(uri != null);
+    if(uri != null) out.writeToken(uri);
   }
 
   /**
