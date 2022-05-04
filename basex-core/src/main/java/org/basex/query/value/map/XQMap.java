@@ -13,6 +13,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -148,8 +149,26 @@ public final class XQMap extends XQData {
   }
 
   @Override
-  public Item materialize(final QueryContext qc, final boolean copy) throws QueryException {
-    return root.materialized() ? this : null;
+  public Item materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
+
+    if(materialized(test, ii)) return this;
+
+    XQMap map = EMPTY;
+    for(final Item key : keys()) {
+      qc.checkStop();
+      final Value value = get(key, ii).materialize(qc, test, ii);
+      if(value == null) return null;
+      map = map.put(key, value, ii);
+    }
+    return map;
+  }
+
+  @Override
+  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
+    return funcType().declType.type.instanceOf(AtomType.ANY_ATOMIC_TYPE) ||
+        root.materialized(test, ii);
   }
 
   @Override

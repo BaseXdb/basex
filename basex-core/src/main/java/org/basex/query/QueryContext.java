@@ -668,19 +668,18 @@ public final class QueryContext extends Job implements Closeable {
       // create copies of results that will be modified by an update operation
       final HashSet<Data> datas = updates.prepare(this);
       final StringList dbs = updates.databases();
-      final QueryFunction<Item, Item> materialize = item -> {
-        checkStop();
-        final Data d = item.data();
-        final boolean copy = d != null && (datas.contains(d) ||
-            !d.inMemory() && dbs.contains(d.meta.name));
-        final Item it = item.materialize(this, copy);
-        if(it == null) throw BASEX_CACHE_X.get(null, item);
-        return it;
-      };
 
       final ValueBuilder vb = new ValueBuilder(this);
-      for(final Item item : value) vb.add(materialize.apply(item));
-      for(final Item item : updates.output(true)) vb.add(materialize.apply(item));
+      final QueryConsumer<Value> materialize = val -> {
+        final Value v = val.materialize(this, node -> {
+          final Data d = node.data();
+          return d != null && (datas.contains(d) || !d.inMemory() && dbs.contains(d.meta.name));
+        }, null);
+        if(v == null) throw BASEX_CACHE_X.get(null, value);
+        vb.add(v);
+      };
+      materialize.accept(value);
+      materialize.accept(updates.output(true));
 
       // invalidate current node set in context, apply updates
       if(context.data() != null) context.invalidate();

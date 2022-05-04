@@ -3,6 +3,7 @@ package org.basex.query.value.node;
 import static org.basex.query.QueryText.*;
 
 import java.io.*;
+import java.util.function.*;
 
 import org.basex.api.dom.*;
 import org.basex.build.*;
@@ -10,7 +11,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.func.*;
+import org.basex.query.func.Function;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -222,8 +223,9 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final DBNode materialize(final QueryContext qc, final boolean copy) throws QueryException {
-    return copy ? copy(qc) : this;
+  public final DBNode materialize(final QueryContext qc, final Predicate<ANode> test,
+      final InputInfo ii) throws QueryException {
+    return materialized(test, ii) ? this : copy(qc);
   }
 
   @Override

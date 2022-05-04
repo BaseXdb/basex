@@ -1,6 +1,7 @@
 package org.basex.query.value.node;
 
 import java.util.concurrent.atomic.*;
+import java.util.function.*;
 
 import org.basex.api.dom.*;
 import org.basex.core.*;
@@ -108,7 +109,13 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public abstract ANode materialize(QueryContext qc, boolean copy) throws QueryException;
+  public abstract ANode materialize(QueryContext qc, Predicate<ANode> test, InputInfo ii)
+      throws QueryException;
+
+  @Override
+  public final boolean materialized(final Predicate<ANode> test, final InputInfo ii) {
+    return test.test(this);
+  }
 
   /**
    * Creates a database node copy from this node.

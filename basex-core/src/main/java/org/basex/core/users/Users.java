@@ -92,7 +92,7 @@ public final class Users {
         file.parent().md();
         final FElem root = new FElem(USERS);
         for(final User user : users.values()) {
-          root.add(user.toXML(null));
+          root.add(user.toXML(null, null));
         }
         if(info != null) {
           root.add(info);

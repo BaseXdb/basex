@@ -3,6 +3,8 @@ package org.basex.query.value.seq;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -89,6 +91,21 @@ public final class SingletonSeq extends Seq {
       expr = get((Value) value.simplifyFor(mode, cc), size / value.size());
     }
     return expr != null ? cc.simplify(this, expr) : super.simplifyFor(mode, cc);
+  }
+
+  @Override
+  public Value materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
+
+    if(materialized(test, ii)) return this;
+    final Value v = value.materialize(qc, test, ii);
+    return v != null ? new SingletonSeq(size, v) : null;
+  }
+
+  @Override
+  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
+    return value.materialized(test, ii);
   }
 
   @Override

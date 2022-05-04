@@ -99,6 +99,11 @@ public final class MapType extends FuncType {
     return (AtomType) argTypes[0].type;
   }
 
+  @Override
+  public ID id() {
+    return Type.ID.MAP;
+  }
+
   /**
    * Creates a new map type.
    * @param keyType key type

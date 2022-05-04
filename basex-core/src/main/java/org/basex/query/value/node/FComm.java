@@ -3,6 +3,8 @@ package org.basex.query.value.node;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -45,8 +47,8 @@ public final class FComm extends FNode {
   }
 
   @Override
-  public FComm materialize(final QueryContext qc, final boolean copy) {
-    return copy ? new FComm(value) : this;
+  public FComm materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii) {
+    return materialized(test, ii) ? this : new FComm(value);
   }
 
   @Override

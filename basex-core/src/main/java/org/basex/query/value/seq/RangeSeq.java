@@ -3,10 +3,13 @@ package org.basex.query.value.seq;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
-import org.basex.query.func.*;
+import org.basex.query.func.Function;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -104,6 +107,12 @@ public final class RangeSeq extends Seq {
   @Override
   public long atomSize() {
     return size;
+  }
+
+  @Override
+  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
+    return true;
   }
 
   @Override

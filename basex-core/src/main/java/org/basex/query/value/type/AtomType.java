@@ -72,7 +72,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return Str.get(value, qc, ii);
     }
   },
@@ -103,7 +103,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -119,7 +119,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -135,7 +135,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -151,7 +151,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -165,7 +165,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -179,7 +179,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -193,7 +193,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -207,7 +207,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -222,7 +222,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       // return double
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
@@ -237,7 +237,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Flt cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -251,7 +251,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Dbl cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -312,7 +312,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return new Int(checkLong(value, Long.MIN_VALUE, -1, ii), this);
     }
   },
@@ -326,7 +326,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return new Int(checkLong(value, 0, 0, ii), this);
     }
   },
@@ -340,7 +340,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return new Int(checkLong(value, -0x80000000, 0x7FFFFFFF, ii), this);
     }
   },
@@ -354,7 +354,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return new Int(checkLong(value, -0x8000, 0x7FFF, ii), this);
     }
   },
@@ -368,7 +368,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return new Int(checkLong(value, -0x80, 0x7F, ii), this);
     }
   },
@@ -383,7 +383,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return new Int(checkLong(value, 0, Long.MAX_VALUE, ii), this);
     }
   },
@@ -398,7 +398,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Uln cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
 
       final Item item = checkNum(value, ii);
       final BigDecimal v = item.dec(ii), i = v.setScale(0, RoundingMode.DOWN);
@@ -418,7 +418,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return new Int(checkLong(value, 0, 0xFFFFFFFFL, ii), this);
     }
   },
@@ -432,7 +432,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return new Int(checkLong(value, 0, 0xFFFF, ii), this);
     }
   },
@@ -446,7 +446,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return new Int(checkLong(value, 0, 0xFF, ii), this);
     }
   },
@@ -461,7 +461,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return new Int(checkLong(value, 1, Long.MAX_VALUE, ii), this);
     }
   },
@@ -477,7 +477,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Dur cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -494,7 +494,7 @@ public enum AtomType implements Type {
     }
     @Override
     public YMDur cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -510,7 +510,7 @@ public enum AtomType implements Type {
     }
     @Override
     public DTDur cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -526,7 +526,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Dtm cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -545,7 +545,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Dat cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -561,7 +561,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Tim cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -577,7 +577,7 @@ public enum AtomType implements Type {
     }
     @Override
     public GDt cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -593,7 +593,7 @@ public enum AtomType implements Type {
     }
     @Override
     public GDt cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -609,7 +609,7 @@ public enum AtomType implements Type {
     }
     @Override
     public GDt cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -625,7 +625,7 @@ public enum AtomType implements Type {
     }
     @Override
     public GDt cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -641,7 +641,7 @@ public enum AtomType implements Type {
     }
     @Override
     public GDt cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return cast(Str.get(value, qc, ii), qc, null, ii);
     }
   },
@@ -677,7 +677,7 @@ public enum AtomType implements Type {
     }
     @Override
     public B64 cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return value instanceof byte[] ? B64.get((byte[]) value) : B64.get(token(value), ii);
     }
   },
@@ -693,7 +693,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Hex cast(final Object value, final QueryContext qc, final InputInfo ii)
-        throws QueryException {
+      throws QueryException {
       return new Hex(value instanceof byte[] ? (byte[]) value : token(value), ii);
     }
   },

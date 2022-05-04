@@ -3,6 +3,8 @@ package org.basex.query.value.seq;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -249,6 +251,33 @@ public abstract class Seq extends Value {
     long sz = 0;
     for(final Item item : this) sz += item.atomSize();
     return sz;
+  }
+
+  @Override
+  public Value materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
+
+    if(materialized(test, ii)) return this;
+
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(final Item item : this) {
+      qc.checkStop();
+      final Item it = item.materialize(qc, test, ii);
+      if(it == null) return it;
+      vb.add(it);
+    }
+    return vb.value(this);
+  }
+
+  @Override
+  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
+    if(!type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
+      for(final Item item : this) {
+        if(!item.materialized(test, ii)) return false;
+      }
+    }
+    return true;
   }
 
   @Override

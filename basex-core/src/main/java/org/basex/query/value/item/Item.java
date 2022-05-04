@@ -4,8 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.math.*;
+import java.util.function.*;
 
-import org.basex.data.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -262,16 +262,16 @@ public abstract class Item extends Value {
     return 1;
   }
 
-  /**
-   * Returns a materialized, context-independent version of this item.
-   * @param qc query context (if {@code null}, process cannot be interrupted)
-   * @param copy create full copy
-   * @return item copy, or {@code null}) if the item cannot be materialized
-   * @throws QueryException query exception
-   */
-  @SuppressWarnings("unused")
-  public Item materialize(final QueryContext qc, final boolean copy) throws QueryException {
+  @Override
+  public Item materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
     return this;
+  }
+
+  @Override
+  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
+    return true;
   }
 
   @Override
@@ -291,15 +291,6 @@ public abstract class Item extends Value {
   @Override
   public final boolean ddo() {
     return true;
-  }
-
-  /**
-   * Indicates if this item references a persistent database.
-   * @return result of check
-   */
-  public final boolean persistent() {
-    final Data data = data();
-    return data != null && !data.inMemory();
   }
 
   /**
