@@ -213,7 +213,7 @@ abstract class TrieNode {
   abstract void cache(boolean lazy, InputInfo ii) throws QueryException;
 
   /**
-   * Checks if all values are materialized.
+   * Checks if all value of this node are materialized.
    * @return result of check
    * @throws QueryException query exception
    */
