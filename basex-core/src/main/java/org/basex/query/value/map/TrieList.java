@@ -4,12 +4,14 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -296,11 +298,10 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  boolean materialized() throws QueryException {
+  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
     for(final Value value : values)  {
-      for(final Item item : value) {
-        if(item.persistent() || item.materialize(null, false) == null) return false;
-      }
+      if(!value.materialized(test, ii)) return false;
     }
     return true;
   }

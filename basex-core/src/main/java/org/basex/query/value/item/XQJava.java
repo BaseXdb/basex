@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.core.MainOptions.*;
 import org.basex.query.*;
@@ -12,6 +13,7 @@ import org.basex.query.func.java.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -88,6 +90,12 @@ public final class XQJava extends FItem {
       throws QueryException {
     if(item instanceof XQJava) return equals(item);
     throw FICMP_X_X.get(ii, type, this);
+  }
+
+  @Override
+  public Item materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
+    return null;
   }
 
   @Override

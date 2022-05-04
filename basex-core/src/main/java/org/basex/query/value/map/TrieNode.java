@@ -2,12 +2,15 @@ package org.basex.query.value.map;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -55,7 +58,7 @@ abstract class TrieNode {
     @Override
     void cache(final boolean lazy, final InputInfo ii) { }
     @Override
-    boolean materialized() { return true; }
+    boolean materialized(final Predicate<ANode> test, final InputInfo ii) { return true; }
     @Override
     boolean instanceOf(final AtomType kt, final SeqType dt) { return true; }
     @Override
@@ -214,10 +217,12 @@ abstract class TrieNode {
 
   /**
    * Checks if all value of this node are materialized.
+   * @param test test for copying nodes
+   * @param ii input info
    * @return result of check
    * @throws QueryException query exception
    */
-  abstract boolean materialized() throws QueryException;
+  abstract boolean materialized(Predicate<ANode> test, InputInfo ii) throws QueryException;
 
   /**
    * Applies a function on all entries.

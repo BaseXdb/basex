@@ -88,6 +88,11 @@ public final class ArrayType extends FuncType {
     return argTypes[0].type.atomic();
   }
 
+  @Override
+  public ID id() {
+    return Type.ID.ARRAY;
+  }
+
   /**
    * Creates a new array type.
    * @param declType declared return type

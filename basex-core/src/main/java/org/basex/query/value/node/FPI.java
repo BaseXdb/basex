@@ -4,6 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -65,8 +67,8 @@ public final class FPI extends FNode {
   }
 
   @Override
-  public FPI materialize(final QueryContext qc, final boolean copy) {
-    return copy ? new FPI(name, value) : this;
+  public FPI materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii) {
+    return materialized(test, ii) ? this : new FPI(name, value);
   }
 
   @Override

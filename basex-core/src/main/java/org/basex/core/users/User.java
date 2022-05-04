@@ -96,10 +96,11 @@ public final class User {
   /**
    * Returns user information as XML.
    * @param qc query context ({@code null} if element will only be created for serialization)
+   * @param ii input info
    * @return user element
    * @throws QueryException query exception
    */
-  public synchronized FElem toXML(final QueryContext qc) throws QueryException {
+  public synchronized FElem toXML(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FElem user = new FElem(USER).add(NAME, name).add(PERMISSION, perm.toString());
     passwords.forEach((key, value) -> {
       final FElem pw = new FElem(PASSWORD).add(ALGORITHM, key.toString());
@@ -113,7 +114,7 @@ public final class User {
     if(info != null) {
       if(qc != null) {
         // create copy of the info node if query context is available
-        user.add(info.materialize(qc, true));
+        user.add(info.materialize(qc, n -> true, ii));
       } else {
         // otherwise, referenced original info node and invalidate parent reference
         user.add(info);

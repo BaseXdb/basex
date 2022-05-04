@@ -3,9 +3,12 @@ package org.basex.query.value.node;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 import org.w3c.dom.*;
 
@@ -70,8 +73,8 @@ public final class FAttr extends FNode {
   }
 
   @Override
-  public FAttr materialize(final QueryContext qc, final boolean copy) {
-    return copy ? new FAttr(name, value) : this;
+  public FAttr materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii) {
+    return materialized(test, ii) ? this : new FAttr(name, value);
   }
 
   @Override

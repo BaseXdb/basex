@@ -1,5 +1,7 @@
 package org.basex.query.value.node;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -39,8 +41,9 @@ public final class FTxt extends FNode {
   }
 
   @Override
-  public FTxt materialize(final QueryContext qc, final boolean copy) {
-    return copy ? new FTxt(value) : this;
+  public FTxt materialize(final QueryContext qc, final Predicate<ANode> test,
+      final InputInfo ii) {
+    return materialized(test, ii) ? this : new FTxt(value);
   }
 
   @Override

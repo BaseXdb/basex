@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.func.fn.*;
@@ -12,6 +13,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -329,13 +331,30 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public Item materialize(final QueryContext qc, final boolean copy) throws QueryException {
+  public Item materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
+
+    if(materialized(test, ii)) return this;
+
+    final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : members()) {
-      for(final Item item : value) {
-        if(item.persistent() || item.materialize(null, false) == null) return null;
+      qc.checkStop();
+      final Value v = value.materialize(qc, test, ii);
+      if(v == null) return null;
+      ab.append(v);
+    }
+    return ab.array(this);
+  }
+
+  @Override
+  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
+    if(!(funcType().declType.type.instanceOf(AtomType.ANY_ATOMIC_TYPE))) {
+      for(final Value value : members()) {
+        if(!value.materialized(test, ii)) return false;
       }
     }
-    return this;
+    return true;
   }
 
   @Override

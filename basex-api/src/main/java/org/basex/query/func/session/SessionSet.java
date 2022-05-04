@@ -19,9 +19,10 @@ public final class SessionSet extends SessionFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ASession session = session(qc, true);
     final byte[] name = toToken(exprs[0], qc);
-    final Value value = exprs[1].value(qc);
+    final Value value = exprs[1].value(qc), v = value.materialize(qc, n -> false, ii);
+    if(v == null) throw SESSION_SET_X.get(info, value);
 
-    session.set(name, value.materialize(qc, SESSION_SET_X, info));
+    session.set(name, v);
     return Empty.VALUE;
   }
 }

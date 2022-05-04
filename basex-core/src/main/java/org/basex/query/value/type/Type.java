@@ -17,6 +17,8 @@ public interface Type {
   enum ID {
     // function types
     /** function(*).              */ FUN(7),
+    /** map(*).                   */ MAP(30),
+    /** array(*).                 */ ARRAY(31),
 
     // node types
     /** node().                   */ NOD(8),
@@ -151,6 +153,8 @@ public interface Type {
       final ID i = get(id);
       if(i == null) return null;
       if(i == FUN) return SeqType.FUNCTION;
+      if(i == MAP) return SeqType.MAP;
+      if(i == ARRAY) return SeqType.ARRAY;
       final Type type = AtomType.getType(i);
       return type != null ? type : NodeType.getType(i);
     }

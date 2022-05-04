@@ -1,11 +1,13 @@
 package org.basex.query.value.item;
 
 import java.io.*;
+import java.util.function.*;
 
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.func.*;
+import org.basex.query.func.Function;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -67,6 +69,20 @@ public final class B64Lazy extends B64 implements Lazy {
   @Override
   public boolean isCached() {
     return data != null;
+  }
+
+  @Override
+  public Item materialize(final QueryContext qc, final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
+    cache(ii);
+    return this;
+  }
+
+  @Override
+  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
+    cache(ii);
+    return true;
   }
 
   @Override

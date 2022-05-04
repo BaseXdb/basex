@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.io.out.*;
@@ -14,6 +15,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -77,24 +79,25 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
-   * Returns a materialized, context-independent version of this value.
-   * @param qc query context (if {@code null}, process cannot be interrupted)
-   * @param error query error
-   * @param info input info
-   * @return item copy, or {@code null}) if the value cannot be materialized
+   * Returns a materialized version of this value without dependencies to persistent data.
+   * @param qc query context
+   * @param test test if node is materialized
+   * @param ii input info
+   * @return materialized value, or {@code null} if the value contains function items
    * @throws QueryException query exception
    */
-  public Value materialize(final QueryContext qc, final QueryError error, final InputInfo info)
-      throws QueryException {
+  public abstract Value materialize(QueryContext qc, Predicate<ANode> test, InputInfo ii)
+      throws QueryException;
 
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Item item : this) {
-      final Item it = item.materialize(qc, item.persistent());
-      if(it == null) throw error.get(info, item);
-      vb.add(it);
-    }
-    return vb.value(this);
-  }
+  /**
+   * Checks if this value is materialized, i.e., contains no persistent database nodes or
+   * function items.
+   * @param test test for copying nodes
+   * @param ii input info
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public abstract boolean materialized(Predicate<ANode> test, InputInfo ii) throws QueryException;
 
   /**
    * Tests if this is an empty sequence.

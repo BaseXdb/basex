@@ -1,10 +1,13 @@
 package org.basex.query.value.map;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -216,9 +219,10 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  boolean materialized() throws QueryException {
+  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
     for(final TrieNode nd : kids) {
-      if(nd != null && !nd.materialized()) return false;
+      if(nd != null && !nd.materialized(test, ii)) return false;
     }
     return true;
   }

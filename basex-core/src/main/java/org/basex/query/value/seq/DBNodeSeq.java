@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.func.Function.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
@@ -122,6 +123,12 @@ public class DBNodeSeq extends NativeSeq {
       }
     }
     return value != null ? cc.simplify(this, value) : super.simplifyFor(mode, cc);
+  }
+
+  @Override
+  public boolean materialized(final Predicate<ANode> test, final InputInfo ii)
+      throws QueryException {
+    return test.test(itemAt(0));
   }
 
   @Override

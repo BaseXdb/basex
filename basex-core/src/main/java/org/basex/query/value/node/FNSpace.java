@@ -2,6 +2,8 @@ package org.basex.query.value.node;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -39,8 +41,9 @@ public final class FNSpace extends FNode {
   }
 
   @Override
-  public FNSpace materialize(final QueryContext qc, final boolean copy) {
-    return copy ? new FNSpace(name, value) : this;
+  public FNSpace materialize(final QueryContext qc, final Predicate<ANode> test,
+      final InputInfo ii) {
+    return materialized(test, ii) ? this : new FNSpace(name, value);
   }
 
   @Override
