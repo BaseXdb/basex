@@ -457,7 +457,7 @@ public abstract class StandardFunc extends Arr {
     if(i < el) {
       final Item item = exprs[i].item(qc, info);
       final XQMap map = item == Empty.VALUE ? XQMap.empty() : toMap(item);
-      for(final Item it : map.keys()) {
+      map.apply((it, v) -> {
         final byte[] key;
         if(it.type.isStringOrUntyped()) {
           key = it.string(null);
@@ -467,8 +467,8 @@ public abstract class StandardFunc extends Arr {
           if(qnm.uri() != null) tb.add('{').add(qnm.uri()).add('}');
           key = tb.add(qnm.local()).finish();
         }
-        hm.put(string(key), map.get(it, info));
-      }
+        hm.put(string(key), v);
+      });
     }
     return hm;
   }

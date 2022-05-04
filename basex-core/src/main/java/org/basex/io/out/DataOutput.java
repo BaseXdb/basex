@@ -145,8 +145,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes long values.
-   * NOTE: the long values are not compressed!
+   * Writes long values. The value will not be compressed
    * @param array array to be written
    * @throws IOException I/O exception
    */

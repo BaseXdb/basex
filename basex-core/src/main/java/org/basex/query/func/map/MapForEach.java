@@ -22,7 +22,8 @@ public class MapForEach extends StandardFunc {
     final XQMap map = toMap(exprs[0], qc);
     final FItem func = toFunction(exprs[1], 2, this instanceof UpdateMapForEach, qc);
 
-    final ValueBuilder vb = map.forEach(func, qc, info);
+    final ValueBuilder vb = new ValueBuilder(qc);
+    map.apply((i, v) -> vb.add(func.invoke(qc, info, i, v)));
     return vb.value(this);
   }
 

@@ -6,14 +6,16 @@ package org.basex.query;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  * @param <T> the type of the input to the operation
+ * @param <U> the type of the second argument to the function
  */
 @FunctionalInterface
-public interface QueryConsumer<T> {
+public interface QueryBiConsumer<T, U> {
   /**
    * Performs this operation on the given argument.
    *
-   * @param t the input argument
+   * @param t the first input argument
+   * @param u the second input argument
    * @throws QueryException query exception
    */
-  void accept(T t) throws QueryException;
+  void accept(T t, U u) throws QueryException;
 }

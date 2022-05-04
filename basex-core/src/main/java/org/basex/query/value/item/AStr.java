@@ -24,10 +24,10 @@ public abstract class AStr extends Item {
 
   /**
    * Constructor, specifying a type and value.
-   * @param type atomic type
    * @param value value
+   * @param type atomic type
    */
-  AStr(final AtomType type, final byte[] value) {
+  AStr(final byte[] value, final Type type) {
     super(type);
     this.value = value;
   }

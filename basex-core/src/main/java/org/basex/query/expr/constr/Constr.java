@@ -159,7 +159,8 @@ public final class Constr {
 
         // add text node
         if(!text.isEmpty()) children.add(new FTxt(text.next()));
-        children.add(node.materialize(qc, qc.context.options.get(MainOptions.COPYNODE)));
+        final boolean copy = qc.context.options.get(MainOptions.COPYNODE);
+        children.add(node.materialize(qc, copy));
       }
       more = false;
     } else {

@@ -203,8 +203,8 @@ public final class QueryJob extends Job implements Runnable {
       register(ctx);
       if(remove) ctx.jobs.tasks.remove(id);
 
-      // retrieve result
-      result.value = qp.value().materialize(qp.qc, BASEX_FUNCTION_X, null);
+      // retrieve result; copy persistent database nodes
+      result.value = qp.value().materialize(qp.qc, BASEX_CACHE_X, null);
 
     } catch(final JobException ex) {
       // query was interrupted: remove cached result

@@ -238,10 +238,6 @@ public interface QueryText {
   /** Parser token. */ String TERNARY2 = "!!";
   /** Parser token. */ String ELVIS = "?:";
 
-  /** Java prefix. */ String JAVAPREF = "java:";
-  /** Java keyword: new. */ String NEW = "new";
-  /** Java default namespace. */ String JAVALANG = "java.lang.";
-
   // PREFIXES =====================================================================================
 
   /** XQuery prefix. */ byte[] ADMIN_PREFIX = token("admin");
@@ -456,6 +452,10 @@ public interface QueryText {
 
   /** Debugging info. */ String DEBUGLOCAL = "Local Variables";
   /** Debugging info. */ String DEBUGGLOBAL = "Global Variables";
+
+  /** Java prefix. */ String JAVAPREF = "java:";
+  /** Java keyword: new. */ String NEW = "new";
+  /** Java default namespace. */ String JAVALANG = "java.lang.";
 
   /** Example for a Date format.              */ String XDATE = "2000-12-31";
   /** Example for a Time format.              */ String XTIME = "23:59:59.999";

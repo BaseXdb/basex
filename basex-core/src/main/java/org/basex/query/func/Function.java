@@ -5,7 +5,7 @@ import static org.basex.query.util.Flag.*;
 import static org.basex.query.value.type.SeqType.*;
 
 import java.util.*;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import org.basex.core.users.*;
 import org.basex.query.func.admin.*;

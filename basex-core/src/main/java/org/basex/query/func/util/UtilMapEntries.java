@@ -31,11 +31,12 @@ public final class UtilMapEntries extends StandardFunc {
       @Override
       public XQMap next() throws QueryException {
         final Item key = keys.next();
-        return key != null ? entry(map, key) : null;
+        return key != null ? entry(key, map.get(key, info)) : null;
       }
       @Override
       public Item get(final long i) throws QueryException {
-        return entry(map, keys.get(i));
+        final Item key = keys.get(i);
+        return entry(key, map.get(key, info));
       }
       @Override
       public long size() {
@@ -49,19 +50,19 @@ public final class UtilMapEntries extends StandardFunc {
     final XQMap map = toMap(exprs[0], qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Item key : map.keys()) vb.add(entry(map, key));
+    map.apply((k, v) -> vb.add(entry(k, v)));
     return vb.value(this);
   }
 
   /**
    * Creates a single map entry.
-   * @param map map
    * @param key key
+   * @param value value
    * @return created map entry
    * @throws QueryException query exception
    */
-  private XQMap entry(final XQMap map, final Item key) throws QueryException {
-    return XQMap.entry(KEY, key, info).put(VALUE, map.get(key, info), info);
+  private XQMap entry(final Item key, final Value value) throws QueryException {
+    return XQMap.entry(KEY, key, info).put(VALUE, value, info);
   }
 
   @Override

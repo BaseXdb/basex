@@ -673,7 +673,7 @@ public final class QueryContext extends Job implements Closeable {
         final boolean copy = data != null &&
             (datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name));
         final Item it = item.materialize(this, copy);
-        if(it == null) throw BASEX_FUNCTION_X.get(null, item);
+        if(it == null) throw BASEX_CACHE_X.get(null, item);
         return it;
       };
 

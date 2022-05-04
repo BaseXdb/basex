@@ -216,9 +216,8 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  void forEach(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
-    vb.add(func.invoke(qc, ii, key, value));
+  void apply(final QueryBiConsumer<Item, Value> func) throws QueryException {
+    func.accept(key, value);
   }
 
   @Override

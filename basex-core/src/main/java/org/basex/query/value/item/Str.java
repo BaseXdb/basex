@@ -35,7 +35,7 @@ public final class Str extends AStr {
    * @param type item type
    */
   public Str(final byte[] value, final AtomType type) {
-    super(type, value);
+    super(value, type);
   }
 
   /**

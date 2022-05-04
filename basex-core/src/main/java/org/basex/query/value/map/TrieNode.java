@@ -67,8 +67,7 @@ abstract class TrieNode {
     public TrieNode put(final int hash, final Item key, final Value value, final int level,
         final InputInfo ii) { return new TrieLeaf(hash, key, value); }
     @Override
-    void forEach(final ValueBuilder vb, final FItem func, final QueryContext qc,
-        final InputInfo ii) { }
+    void apply(final QueryBiConsumer<Item, Value> func) { }
     @Override
     StringBuilder append(final StringBuilder sb, final String indent) { return sb.append("{ }"); }
     @Override
@@ -77,6 +76,7 @@ abstract class TrieNode {
 
   /** Size of this node. */
   final int size;
+
   /**
    * Constructor.
    * @param size size
@@ -221,14 +221,10 @@ abstract class TrieNode {
 
   /**
    * Applies a function on all entries.
-   * @param vb value builder
    * @param func function to apply on keys and values
-   * @param qc query context
-   * @param ii input info
    * @throws QueryException query exception
    */
-  abstract void forEach(ValueBuilder vb, FItem func, QueryContext qc, InputInfo ii)
-      throws QueryException;
+  abstract void apply(QueryBiConsumer<Item, Value> func) throws QueryException;
 
   /**
    * Calculates the hash key for the given level.

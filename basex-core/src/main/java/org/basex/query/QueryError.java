@@ -32,7 +32,7 @@ public enum QueryError {
   /** Error code. */
   BASEX_DBPATH2_X(BASEX, "doc", "Database path '%' yields more than one document."),
   /** Error code. */
-  BASEX_FUNCTION_X(BASEX, "function", "Function items cannot be cached: %."),
+  BASEX_CACHE_X(BASEX, "cache", "Value cannot be cached: %."),
   /** Error code. */
   BASEX_WHICH_X(BASEX, "function", "Function not found: %."),
   /** Error code. */
@@ -417,14 +417,14 @@ public enum QueryError {
   // Session Module
 
   /** Error code. */
-  SESSION_SET_X(SESSION, "set", "Item cannot be stored: %."),
+  SESSION_SET_X(SESSION, "set", "Value cannot be stored: %."),
   /** Error code. */
   SESSION_NOTFOUND(SESSIONS, "not-found", "Session not available."),
 
   // Sessions Module
 
   /** Error code. */
-  SESSIONS_SET_X(SESSIONS, "set", "Item cannot be stored: %."),
+  SESSIONS_SET_X(SESSIONS, "set", "Value cannot be stored: %."),
   /** Error code. */
   SESSIONS_NOTFOUND_X(SESSIONS, "not-found", "Session not available: %."),
 

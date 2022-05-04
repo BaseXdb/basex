@@ -1153,10 +1153,10 @@ public final class UpdateTest extends SandboxTest {
     query("update:output(map { })", "map {\n}");
     query("update:output(map { 1: map { 2: 3 }})", "map {\n1: map {\n2: 3\n}\n}");
 
-    error("update:output(true#0)", BASEX_FUNCTION_X);
-    error("update:output([ true#0 ])", BASEX_FUNCTION_X);
-    error("update:output([1, (2, [ 3, true#0 ])])", BASEX_FUNCTION_X);
-    error("update:output(map { 1: map { 2: true#0 }})", BASEX_FUNCTION_X);
+    error("update:output(true#0)", BASEX_CACHE_X);
+    error("update:output([ true#0 ])", BASEX_CACHE_X);
+    error("update:output([1, (2, [ 3, true#0 ])])", BASEX_CACHE_X);
+    error("update:output(map { 1: map { 2: true#0 }})", BASEX_CACHE_X);
   }
 
   /** Test. */

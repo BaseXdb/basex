@@ -1,7 +1,7 @@
 package org.basex.query;
 
 /**
- * Function that supplied results.
+ * Function that supplies results.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen

@@ -224,10 +224,9 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  void forEach(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+  void apply(final QueryBiConsumer<Item, Value> func) throws QueryException {
     for(final TrieNode nd : kids) {
-      if(nd != null) nd.forEach(vb, func, qc, ii);
+      if(nd != null) nd.apply(func);
     }
   }
 

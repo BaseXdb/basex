@@ -7,7 +7,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.ft.*;
 
 /**
- * Disk-based full-text Node item.
+ * Database node with full-text matches.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
