@@ -47,9 +47,8 @@ public enum NodeType implements Type {
       throws QueryException {
       if(value instanceof BXPI) return ((BXNode) value).getNode();
       if(value instanceof ProcessingInstruction) return new FPI((ProcessingInstruction) value);
-      final Matcher m = Pattern.compile("<\\?(.*?) (.*)\\?>").matcher(toString(value));
-      if(m.find()) return new FPI(m.group(1), m.group(2));
-      throw NODEERR_X_X.get(ii, this, value);
+      final Matcher m = matcher("<\\?(.*?) (.*)\\?>", value, ii);
+      return new FPI(m.group(1), m.group(2));
     }
   },
 
@@ -110,9 +109,8 @@ public enum NodeType implements Type {
       throws QueryException {
       if(value instanceof BXAttr) return ((BXNode) value).getNode();
       if(value instanceof Attr) return new FAttr((Attr) value);
-      final Matcher m = Pattern.compile(" ?(.*?)=\"(.*)\"").matcher(toString(value));
-      if(m.find()) return new FAttr(m.group(1), m.group(2));
-      throw NODEERR_X_X.get(ii, this, value);
+      final Matcher m = matcher(" ?(.*?)=\"(.*)\"", value, ii);
+      return new FAttr(m.group(1), m.group(2));
     }
   },
 
@@ -123,9 +121,8 @@ public enum NodeType implements Type {
       throws QueryException {
       if(value instanceof BXComm) return ((BXNode) value).getNode();
       if(value instanceof Comment) return new FComm((Comment) value);
-      final Matcher m = Pattern.compile("<!--(.*?)-->").matcher(toString(value));
-      if(m.find()) return new FComm(m.group(1));
-      throw NODEERR_X_X.get(ii, this, value);
+      final Matcher m = matcher("<!--(.*?)-->", value, ii);
+      return new FComm(m.group(1));
     }
   },
 
@@ -271,6 +268,21 @@ public enum NodeType implements Type {
   }
 
   /**
+   * Creates a matcher for the specified pattern or raises an error.
+   * @param pattern pattern
+   * @param value value
+   * @param ii info info
+   * @return matcher
+   * @throws QueryException query exception
+   */
+  final Matcher matcher(final String pattern, final Object value, final InputInfo ii)
+      throws QueryException {
+    final Matcher m = Pattern.compile(pattern).matcher(Token.string(Token.token(value)));
+    if(m.find()) return m;
+    throw NODEERR_X_X.get(ii, this, value);
+  }
+
+  /**
    * Returns a string representation with the specified argument.
    * @param arg argument
    * @return string representation
@@ -304,14 +316,5 @@ public enum NodeType implements Type {
       if(type.id == id) return type;
     }
     return null;
-  }
-
-  /**
-   * Returns a string representation of the specified value.
-   * @param value value
-   * @return string
-   */
-  private static String toString(final Object value) {
-    return value instanceof byte[] ? Token.string((byte[]) value) : value.toString();
   }
 }
