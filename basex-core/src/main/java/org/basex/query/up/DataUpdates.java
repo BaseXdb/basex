@@ -158,17 +158,16 @@ final class DataUpdates {
    * @throws QueryException query exception
    */
   void apply(final QueryContext qc) throws QueryException {
-    // execute database updates
+    // apply initial database operations
+    Collections.sort(dbUpdates);
+    applyDbUpdates(true);
+
+    // execute updates within databases
     auc.execute(true);
     auc = null;
 
-    // execute database operations
-    Collections.sort(dbUpdates);
-    final int sz = dbUpdates.size();
-    for(int i = 0; i < sz; i++) {
-      dbUpdates.get(i).apply();
-      dbUpdates.set(i, null);
-    }
+    // apply remaining database operations
+    applyDbUpdates(false);
 
     // execute fn:put operations
     for(final Put put : puts.values()) put.apply();
@@ -199,6 +198,23 @@ final class DataUpdates {
   }
 
   /**
+   * Applies all database operations.
+   * @param before run updates specified before or after node updates
+   * @throws QueryException query exception
+   */
+  private void applyDbUpdates(final boolean before) throws QueryException {
+    final int pos = UpdateType._NODE_UPDATES_.ordinal();
+    for(final ListIterator<DBUpdate> iter = dbUpdates.listIterator(); iter.hasNext();) {
+      final DBUpdate up = iter.next();
+      final int ord = up.type.ordinal();
+      if(before ? ord < pos : ord > pos) {
+        up.apply();
+        iter.remove();
+      }
+    }
+  }
+
+  /**
    * Prepares the {@link NodeUpdate} for execution incl. ordering,
    * and removes the update primitive references to save memory.
    * @return ordered list of update primitives
@@ -207,17 +223,13 @@ final class DataUpdates {
     final List<NodeUpdate> upd = new ArrayList<>();
     for(int i = nodes.size() - 1; i >= 0; i--) {
       final int pre = nodes.get(i);
-      final NodeUpdates n = nodeUpdates.get(pre);
-      for(final NodeUpdate p : n.finish()) {
-        upd.add(p);
-        size += p.size();
+      for(final NodeUpdate up : nodeUpdates.get(pre).finish()) {
+        upd.add(up);
+        size += up.size();
       }
     }
-    for(int i = dbUpdates.size() - 1; i >= 0; i--) {
-      size += dbUpdates.get(i).size();
-    }
-    nodeUpdates = null;
     nodes = null;
+    for(final DBUpdate up : dbUpdates) size += up.size();
     upd.sort(new NodeUpdateComparator());
     return upd;
   }

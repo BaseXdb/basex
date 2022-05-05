@@ -277,4 +277,14 @@ public final class MixedTest extends SandboxTest {
     query("db:create('" + NAME + "', json-to-xml('[1]')/*/*, '" + NAME + "')");
     query("db:open('" + NAME + "')/* => namespace-uri()", "http://www.w3.org/2005/xpath-functions");
   }
+
+  /** db:store: out of bounds. */
+  @Test public void gh2100() {
+    query("db:create('x', <x>A</x>, 'x.xml')");
+    query("db:open('x') ! (delete node x, db:store('x', 'x.bin', x))");
+    query("db:retrieve('x', 'x.bin')", "A");
+
+    query("db:create('x', <x>A</x>, 'x.xml')");
+    query("db:open('x') ! (delete node x, db:add('x', x, 'y.xml'))");
+  }
 }
