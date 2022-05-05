@@ -55,7 +55,9 @@ final class NameUpdates {
     final int pos = UpdateType._NODE_UPDATES_.ordinal();
     for(final NameUpdate up : nameUpdates) {
       final int ord = up.type.ordinal();
-      if(before ? ord < pos : ord > pos) up.apply();
+      if(before ? ord < pos : ord > pos) {
+        up.apply();
+      }
     }
   }
 

@@ -26,6 +26,8 @@ public enum UpdateType {
   /** Alter backup.         */ BACKUPALTER,
   /** Create backup.        */ BACKUPCREATE,
 
+  /** Add binary resource.  */ DBSTORE,
+
   // Operations on nodes of existing databases
 
   /** Dummy type, indicating start of node updates. */ _NODE_UPDATES_,
@@ -45,7 +47,6 @@ public enum UpdateType {
   // Operations on resources of existing databases
 
   /** Add document.         */ DBADD,
-  /** Add binary resource.  */ DBSTORE,
   /** Rename resource.      */ DBRENAME,
   /** Delete resource.      */ DBDELETE,
   /** Optimize database.    */ DBOPTIMIZE,
