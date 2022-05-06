@@ -139,7 +139,7 @@ public final class Resources implements Index {
    * @param dir returns directories
    * @return paths with binary flags
    */
-  public synchronized TokenBoolMap children(final byte[] path, final boolean dir) {
+  public synchronized TokenBoolMap children(final String path, final boolean dir) {
     final TokenBoolMap tbm = new TokenBoolMap();
     docs.children(path, dir, tbm);
     bins.children(path, dir, tbm);

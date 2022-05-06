@@ -64,9 +64,9 @@ public final class DbDir extends DbList {
       }
     }
 
-    final IOFile file = data.meta.binary(string(path));
-    if(file != null) {
-      for(final IOFile io : file.children()) {
+    final IOFile bin = data.meta.binary(string(path));
+    if(bin != null) {
+      for(final IOFile io : bin.children()) {
         final String np = io.name();
         if(set.add(np)) {
           vb.add(io.isDir() ? dir(np, io.timeStamp()) :

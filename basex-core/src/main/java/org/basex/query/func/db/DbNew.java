@@ -30,7 +30,7 @@ abstract class DbNew extends DbAccess {
     final NewInput ni = new NewInput();
 
     if(input instanceof ANode) {
-      if(Strings.endsWith(path, '.') || Strings.endsWith(path, '/')) throw RESINV_X.get(info, path);
+      if(Strings.endsWith(path, '/')) throw RESINV_X.get(info, path);
 
       // ensure that the final name is not empty
       final ANode node = (ANode) input;
@@ -60,7 +60,6 @@ abstract class DbNew extends DbAccess {
 
     // add slash to the target if the addressed file is an archive or directory
     String name = path;
-    if(Strings.endsWith(name, '.')) throw RESINV_X.get(info, path);
     if(!Strings.endsWith(name, '/') && (io.isDir() || io.isArchive())) name += "/";
     String target = "";
     final int s = name.lastIndexOf('/');

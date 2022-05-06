@@ -39,12 +39,10 @@ public final class Delete extends ACreate {
         context.invalidate();
 
         // delete binary resources
-        if(!data.inMemory()) {
-          final IOFile path = data.meta.binary(target);
-          if(path.exists()) {
-            size += path.isDir() ? path.descendants().size() : 1;
-            path.delete();
-          }
+        final IOFile bin = data.meta.binary(target);
+        if(bin != null && bin.exists()) {
+          size += bin.isDir() ? bin.descendants().size() : 1;
+          bin.delete();
         }
         return info(RES_DELETED_X_X, size, jc().performance);
       }

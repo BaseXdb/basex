@@ -185,19 +185,21 @@ public final class MetaData {
   }
 
   /**
-   * Adds a path segment.
+   * Adds a segment to the path if it is valid.
    * @param sb string builder
    * @param list list of segments
    * @return result flag
    */
   private static boolean addToPath(final StringBuilder sb, final StringList list) {
     if(sb.length() != 0) {
-      final String seg = sb.toString();
-      if(seg.equals("..")) {
+      final String segment = sb.toString();
+      if(segment.endsWith(".")) {
+        if(!segment.equals(".")) return false;
+      } else if(segment.equals("..")) {
         if(list.isEmpty()) return false;
         list.remove(list.size() - 1);
-      } else if(!seg.equals(".")) {
-        list.add(seg);
+      } else {
+        list.add(segment);
       }
       sb.setLength(0);
     }
@@ -284,13 +286,13 @@ public final class MetaData {
   /**
    * Returns a reference to the specified binary resource.
    * @param path internal file path
-   * @return path, or {@code null} if this is a main-memory database of
+   * @return path, or {@code null} if this is a main-memory database or
    *   if the resource path cannot be resolved (e.g. because it points to a parent directory).
    */
   public IOFile binary(final String path) {
     if(dir != null) {
       final IOFile bin = binaryDir(), file = new IOFile(bin, path);
-      return file.path().startsWith(bin.path()) ? file : null;
+      if(file.path().startsWith(bin.path())) return file;
     }
     return null;
   }

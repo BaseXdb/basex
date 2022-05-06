@@ -58,13 +58,11 @@ final class Binaries {
    * @param dir returns directories instead of files
    * @param tbm map; values will be {@code true} to indicate binary resources
    */
-  synchronized void children(final byte[] path, final boolean dir, final TokenBoolMap tbm) {
-    if(!data.inMemory()) {
-      final IOFile file = data.meta.binary(string(path));
-      if(file != null) {
-        for(final IOFile child : file.children()) {
-          if(dir == child.isDir()) tbm.put(token(child.name()), true);
-        }
+  synchronized void children(final String path, final boolean dir, final TokenBoolMap tbm) {
+    final IOFile bin = data.meta.binary(path);
+    if(bin != null) {
+      for(final IOFile child : bin.children()) {
+        if(dir == child.isDir()) tbm.put(token(child.name()), true);
       }
     }
   }
@@ -75,7 +73,6 @@ final class Binaries {
    * @return result of check
    */
   synchronized boolean isDir(final String path) {
-    if(data.inMemory()) return false;
     final IOFile bin = data.meta.binary(path);
     return bin != null && bin.isDir();
   }

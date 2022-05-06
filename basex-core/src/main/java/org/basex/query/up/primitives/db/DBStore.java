@@ -43,11 +43,11 @@ public final class DBStore extends DBUpdate {
   @Override
   public void apply() throws QueryException {
     for(final byte[] path : map) {
-      final IOFile file = data.meta.binary(string(path));
-      if(file.isDir()) file.delete();
-      file.parent().md();
+      final IOFile bin = data.meta.binary(string(path));
+      if(bin.isDir()) bin.delete();
+      bin.parent().md();
       try {
-        file.write(map.get(path).input(info));
+        bin.write(map.get(path).input(info));
       } catch(final IOException ex) {
         Util.debug(ex);
         throw UPDBPUT_X.get(info, path);

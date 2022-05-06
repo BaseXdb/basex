@@ -1,7 +1,5 @@
 package org.basex.query.func.db;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
@@ -34,11 +32,9 @@ public final class DbDelete extends DbAccess {
     }
 
     // delete binary resources
-    if(!data.inMemory()) {
-      final IOFile file = data.meta.binary(path);
-      if(file == null) throw DB_PATH_X.get(info, path);
-      updates.add(new DBDelete(data, file, info), qc);
-    }
+    final IOFile bin = data.meta.binary(path);
+    if(bin != null) updates.add(new DBDelete(data, bin, info), qc);
+
     return Empty.VALUE;
   }
 }
