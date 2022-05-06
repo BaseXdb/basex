@@ -1133,8 +1133,8 @@ public interface Text {
   String PARSE_ARCHIVES = lang("parse_archives");
   /** Include name of archive in database path. */
   String ADD_ARCHIVE_NAME = lang("add_archive_name");
-  /** Add remaining files as raw files. */
-  String ADD_RAW_FILES = lang("add_raw_files");
+  /** Add remaining files as binary files. */
+  String ADD_BINARY_FILES = lang("add_binary_files");
   /** "Add Resources". */
   String ADD_RESOURCES = lang("add_resources");
   /** Skip corrupt files. */

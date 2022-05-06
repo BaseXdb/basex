@@ -37,12 +37,12 @@ public final class DirParser extends Parser {
   private final boolean archives;
   /** Skip corrupt files in directories. */
   private final boolean skipCorrupt;
-  /** Add ignored files as raw files. */
-  private final boolean addRaw;
+  /** Add ignored files as binary files. */
+  private final boolean addBinary;
   /** DTD parsing. */
   private final boolean dtd;
-  /** Raw parsing. */
-  private final boolean rawParser;
+  /** Binary parsing. */
+  private final boolean binaryParser;
   /** Archive name. */
   private final boolean archiveName;
 
@@ -72,9 +72,9 @@ public final class DirParser extends Parser {
     skipCorrupt = options.get(MainOptions.SKIPCORRUPT);
     archives = options.get(MainOptions.ADDARCHIVES);
     archiveName = options.get(MainOptions.ARCHIVENAME);
-    addRaw = options.get(MainOptions.ADDRAW);
+    addBinary = options.get(MainOptions.ADDRAW);
     dtd = options.get(MainOptions.DTD);
-    rawParser = options.get(MainOptions.PARSER) == MainParser.RAW;
+    binaryParser = options.get(MainOptions.PARSER) == MainParser.RAW;
     filter = !isDir && !source.isArchive() ? null :
       Pattern.compile(IOFile.regex(options.get(MainOptions.CREATEFILTER)));
   }
@@ -176,8 +176,8 @@ public final class DirParser extends Parser {
     final boolean include = filter == null ||
         filter.matcher(Prop.CASE ? name : name.toLowerCase(Locale.ENGLISH)).matches();
 
-    if(include ? rawParser : addRaw) {
-      // store input in raw format if raw parser was chosen, or if file was included otherwise
+    if(include ? binaryParser : addBinary) {
+      // store input in binary format if binary parser was chosen, or if file was included otherwise
       builder.binary(targ + name, source);
     } else if(include) {
       // store input as XML

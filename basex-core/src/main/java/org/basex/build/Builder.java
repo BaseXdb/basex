@@ -55,7 +55,7 @@ public abstract class Builder extends Job {
   private int level;
 
   /** Optional path to binary files. */
-  private IOFile binDir;
+  private IOFile binaryDir;
 
   /**
    * Constructor.
@@ -88,13 +88,13 @@ public abstract class Builder extends Job {
   }
 
   /**
-   * Sets the path to the raw database files. The path might differ from the actual database path
+   * Sets the path to the binary database files. The path might differ from the actual database path
    * if XML data is written to a temporary instance.
    * @param dir database directory (can be {@code null})
    * @return self reference
    */
   public final Builder binaryDir(final IOFile dir) {
-    if(dir != null) binDir = new IOFile(dir, IO.RAW);
+    if(dir != null) binaryDir = new IOFile(dir, IO.RAW);
     return this;
   }
 
@@ -200,7 +200,7 @@ public abstract class Builder extends Job {
    * @throws IOException I/O exception
    */
   public final void binary(final String target, final IO data) throws IOException {
-    Store.store(data.inputSource(), new IOFile(binDir, target));
+    Store.store(data.inputSource(), new IOFile(binaryDir, target));
   }
 
   // PROGRESS INFORMATION =========================================================================

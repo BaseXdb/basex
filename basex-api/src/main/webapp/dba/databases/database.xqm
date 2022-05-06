@@ -62,8 +62,8 @@ function dba:database(
             if($db-exists) then (
               let $headers := (
                 map { 'key': 'resource' , 'label': 'Name' },
-                map { 'key': 'type' , 'label': 'Content type' },
-                map { 'key': 'raw' , 'label': 'Raw' },
+                map { 'key': 'content-type' , 'label': 'Content type' },
+                map { 'key': 'binary' , 'label': 'Binary' },
                 map { 'key': 'size' , 'label': 'Size', 'type': 'number', 'order': 'desc' }
               )
               let $entries :=
@@ -72,8 +72,8 @@ function dba:database(
                 for $res in db:list-details($name)[position() = $start to $end]
                 return map {
                   'resource': $res,
-                  'type': $res/@content-type,
-                  'raw': if($res/@raw = 'true') then '✓' else '–',
+                  'content-type': $res/@content-type,
+                  'binary': if($res/@raw = 'true') then '✓' else '–',
                   'size': $res/@size
                 }
               let $buttons := (

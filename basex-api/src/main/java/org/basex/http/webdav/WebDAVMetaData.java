@@ -20,8 +20,8 @@ final class WebDAVMetaData {
   final String path;
   /** Last modification date of resource. */
   final Date mdate;
-  /** Raw binary file flag. */
-  final boolean raw;
+  /** Binary file flag. */
+  final boolean binary;
   /** Resource content type. */
   final MediaType type;
   /** Resource size in bytes. */
@@ -56,16 +56,16 @@ final class WebDAVMetaData {
    * @param db database owning the resource (can be {@code null})
    * @param path resource path
    * @param ms resource last modification date (can be {@code null})
-   * @param raw raw binary file flag
+   * @param binary binary file flag
    * @param type resource media type (can be {@code null})
    * @param size resource size in bytes (can be {@code null} or empty)
    */
-  WebDAVMetaData(final String db, final String path, final String ms, final boolean raw,
+  WebDAVMetaData(final String db, final String path, final String ms, final boolean binary,
       final MediaType type, final String size) {
 
     this.db = db;
     this.path = stripLeadingSlash(path);
-    this.raw = raw;
+    this.binary = binary;
     this.type = type;
     this.size = size == null || size.isEmpty() ? null : Long.valueOf(size);
     mdate = ms == null ? null : new Date(DateTime.parse(ms).getTime());

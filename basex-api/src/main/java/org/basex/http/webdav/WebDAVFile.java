@@ -58,7 +58,7 @@ final class WebDAVFile extends WebDAVResource implements FileResource {
     new WebDAVCode<>(this) {
       @Override
       public void run() throws IOException {
-        service.retrieve(meta.db, meta.path, meta.raw, out);
+        service.retrieve(meta.db, meta.path, meta.binary, out);
       }
     }.eval();
   }

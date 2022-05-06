@@ -26,26 +26,26 @@ public final class DbRename extends DbAccess {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
     final String source = toDbPath(1, qc), target = toDbPath(2, qc);
-
-    // rename XML resources
-    final Updates updates = qc.updates();
-    final IntList docs = data.resources.docs(source);
-    final int ds = docs.size();
-    for(int d = 0; d < ds; d++) {
-      final int pre = docs.get(d);
-      final String trg = Rename.target(data, pre, source, target);
-      if(trg.isEmpty() || Strings.endsWith(trg, '/') || Strings.endsWith(trg, '.'))
-        throw DB_PATH_X.get(info, trg);
-      updates.add(new ReplaceValue(pre, data, info, token(trg)), qc);
-    }
-    // rename XML resources
-    if(!data.inMemory()) {
-      final IOFile src = data.meta.binary(source);
-      final IOFile trg = data.meta.binary(target);
-      if(src == null || trg == null) throw DB_PATH_X.get(info, src);
-      if(!src.eq(trg)) {
-        rename(data, src, trg, qc);
-        updates.add(new DBDelete(data, src, info), qc);
+    if(!(Prop.CASE ? source.equals(target) : source.equalsIgnoreCase(target))) {
+      // rename XML resources
+      final Updates updates = qc.updates();
+      final IntList docs = data.resources.docs(source);
+      final int ds = docs.size();
+      for(int d = 0; d < ds; d++) {
+        final int pre = docs.get(d);
+        final String trg = Rename.target(data, pre, source, target);
+        if(trg.isEmpty() || Strings.endsWith(trg, '/') || Strings.endsWith(trg, '.'))
+          throw DB_PATH_X.get(info, trg);
+        updates.add(new ReplaceValue(pre, data, info, token(trg)), qc);
+      }
+      if(!data.inMemory()) {
+        // rename binary resources
+        final IOFile src = data.meta.binary(source), trg = data.meta.binary(target);
+        if(src == null || trg == null) throw DB_PATH_X.get(info, src);
+        if(!src.eq(trg)) {
+          rename(data, src, trg, qc);
+          updates.add(new DBDelete(data, src, info), qc);
+        }
       }
     }
     return Empty.VALUE;

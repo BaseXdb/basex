@@ -21,8 +21,9 @@ public final class DbContentType extends DbAccess {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
     final String path = toDbPath(1, qc);
-    final int pre = data.resources.doc(path);
+
     MediaType type = null;
+    final int pre = data.resources.doc(path);
     if(pre != -1) {
       // check media type; return application/xml if returned string is not of type xml
       type = MediaType.get(string(data.text(pre, true)));

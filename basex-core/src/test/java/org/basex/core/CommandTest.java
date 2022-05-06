@@ -499,7 +499,7 @@ public class CommandTest extends SandboxTest {
     ok(new DropBackup(NAME));
   }
 
-  /** Retrieves raw data. */
+  /** Retrieves binary data. */
   @Test public final void retrieve() {
     ok(new CreateDB(NAME));
     // retrieve non-existing file
@@ -509,7 +509,7 @@ public class CommandTest extends SandboxTest {
     ok(new Retrieve(NAME2));
   }
 
-  /** Stores raw data. */
+  /** Stores binary data. */
   @Test public final void store() {
     ok(new CreateDB(NAME));
     ok(new Store(NAME2, FILE));

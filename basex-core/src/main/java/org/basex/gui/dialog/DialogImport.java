@@ -50,8 +50,8 @@ final class DialogImport extends BaseXBack {
   private final BaseXCheckBox archiveName;
   /** Skip corrupt files. */
   private final BaseXCheckBox skipCorrupt;
-  /** Add remaining files as raw files. */
-  private final BaseXCheckBox addRaw;
+  /** Add remaining files as binary files. */
+  private final BaseXCheckBox addBinary;
   /** Document filter. */
   private final BaseXTextField createFilter;
 
@@ -100,7 +100,7 @@ final class DialogImport extends BaseXBack {
     createFilter = new BaseXTextField(dialog, opts.get(MainOptions.CREATEFILTER));
     createFilter.setColumns(30);
 
-    addRaw = new BaseXCheckBox(dialog, ADD_RAW_FILES, MainOptions.ADDRAW, opts);
+    addBinary = new BaseXCheckBox(dialog, ADD_BINARY_FILES, MainOptions.ADDRAW, opts);
     skipCorrupt = new BaseXCheckBox(dialog, SKIP_CORRUPT_FILES, MainOptions.SKIPCORRUPT, opts);
     addArchives = new BaseXCheckBox(dialog, PARSE_ARCHIVES, MainOptions.ADDARCHIVES, opts);
     archiveName = new BaseXCheckBox(dialog, ADD_ARCHIVE_NAME, MainOptions.ARCHIVENAME, opts);
@@ -112,7 +112,7 @@ final class DialogImport extends BaseXBack {
     p.add(createFilter);
     add(p);
     add(Box.createVerticalStrut(8));
-    add(addRaw);
+    add(addBinary);
     add(skipCorrupt);
     add(addArchives);
     add(archiveName);
@@ -157,13 +157,13 @@ final class DialogImport extends BaseXBack {
     archiveName.setEnabled(addArchives.isSelected());
 
     final MainParser parser = MainParser.valueOf(parsers.getSelectedItem());
-    final boolean raw = parser == MainParser.RAW;
-    addRaw.setEnabled(multi && !raw && !gui.context.options.get(MainOptions.MAINMEM));
-    skipCorrupt.setEnabled(!raw);
+    final boolean binary = parser == MainParser.RAW;
+    addBinary.setEnabled(multi && !binary && !gui.context.options.get(MainOptions.MAINMEM));
+    skipCorrupt.setEnabled(!binary);
 
     if(comp == parsers) {
       parsing.setType(parser);
-      if(multi) createFilter.setText(raw ? "*" : "*." + parser);
+      if(multi) createFilter.setText(binary ? "*" : "*." + parser);
     }
 
     ok &= empty ? in.isEmpty() || io.exists() : !in.isEmpty() && io.exists();
@@ -182,7 +182,7 @@ final class DialogImport extends BaseXBack {
     gui.set(MainOptions.ADDARCHIVES, addArchives.isSelected());
     gui.set(MainOptions.ARCHIVENAME, archiveName.isSelected());
     gui.set(MainOptions.SKIPCORRUPT, skipCorrupt.isSelected());
-    gui.set(MainOptions.ADDRAW, addRaw.isSelected());
+    gui.set(MainOptions.ADDRAW, addBinary.isSelected());
     input.updateHistory();
     parsing.setOptions();
   }
@@ -254,7 +254,7 @@ final class DialogImport extends BaseXBack {
       if(b == '<') return MainParser.XML;
 
       for(int c = 0; b >= 0 && ++c < IO.BLOCKSIZE;) {
-        // treat as raw data if characters are no ascii
+        // treat as binary data if characters are no ascii
         if(b < ' ' && !Token.ws(b) || b >= 128) return MainParser.RAW;
         b = bi.read();
       }

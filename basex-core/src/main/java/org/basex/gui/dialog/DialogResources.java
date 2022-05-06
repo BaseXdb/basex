@@ -17,8 +17,8 @@ import org.basex.gui.dialog.DialogInput.Action;
 import org.basex.gui.layout.*;
 
 /**
- * Combination of a JTree and a text field. The tree visualizes the database content including raw
- * files and documents. The search field allows to quickly access specific files/documents.
+ * Combination of a JTree and a text field. The tree visualizes the database contents.
+ * The search field allows to quickly access specific resources.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Lukas Kircher
@@ -176,7 +176,7 @@ final class DialogResources extends BaseXBack {
 
     int cmax = ResourceFolder.MAXC;
     // check if there's a directory
-    // create a folder if there's either a raw or document folder
+    // create a folder if there's either a binary or document folder
     if(data.resources.isDir(filterPath)) {
       root.add(new ResourceFolder(ResourceFolder.name(filterPath), ResourceFolder.path(filterPath),
           tree, context));
@@ -225,7 +225,7 @@ final class DialogResources extends BaseXBack {
   }
 
   /**
-   * Custom tree cell renderer to distinguish between raw and xml leaf nodes.
+   * Custom tree cell renderer to distinguish between resource types.
    * @author BaseX Team 2005-22, BSD License
    * @author Lukas Kircher
    */
@@ -236,7 +236,7 @@ final class DialogResources extends BaseXBack {
         final boolean focus) {
 
       super.getTreeCellRendererComponent(tree, val, sel, exp, leaf, row, focus);
-      if(leaf) setIcon(BaseXImages.resource(((ResourceLeaf) val).raw));
+      if(leaf) setIcon(BaseXImages.resource(((ResourceLeaf) val).binary));
       return this;
     }
   }

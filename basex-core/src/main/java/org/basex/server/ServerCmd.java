@@ -29,7 +29,7 @@ public enum ServerCmd {
   ADD(9),
   /** Code for replacing a document in a database: {path}0{input}0. */
   REPLACE(12),
-  /** Code for storing raw data in a database: {path}0{input}0. */
+  /** Code for storing binary data in a database: {path}0{input}0. */
   STORE(13),
   /** Code for binding a context value: {id}0{val}0{type}0. */
   CONTEXT(14),

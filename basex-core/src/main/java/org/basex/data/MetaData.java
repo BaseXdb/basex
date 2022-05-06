@@ -282,16 +282,17 @@ public final class MetaData {
   }
 
   /**
-   * Returns a reference to the specified binary file.
+   * Returns a reference to the specified binary resource.
    * @param path internal file path
    * @return path, or {@code null} if this is a main-memory database of
    *   if the resource path cannot be resolved (e.g. because it points to a parent directory).
    */
   public IOFile binary(final String path) {
-    if(dir == null) return null;
-    final IOFile bin = binaryDir();
-    final IOFile file = new IOFile(bin, path);
-    return file.path().startsWith(bin.path()) ? file : null;
+    if(dir != null) {
+      final IOFile bin = binaryDir(), file = new IOFile(bin, path);
+      return file.path().startsWith(bin.path()) ? file : null;
+    }
+    return null;
   }
 
   /**

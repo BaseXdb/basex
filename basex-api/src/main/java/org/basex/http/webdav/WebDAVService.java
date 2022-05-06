@@ -112,11 +112,11 @@ final class WebDAVService {
 
     final String[] result = Strings.split(query.execute(session()), '\t');
     final String pth = stripLeadingSlash(result[0]);
-    final boolean raw = Boolean.parseBoolean(result[1]);
+    final boolean binary = Boolean.parseBoolean(result[1]);
     final MediaType type = new MediaType(result[2]);
     final String ms = result[3];
-    final String size = raw ? result[4] : null;
-    return new WebDAVMetaData(db, pth, ms, raw, type, size);
+    final String size = binary ? result[4] : null;
+    return new WebDAVMetaData(db, pth, ms, binary, type, size);
   }
 
   /**
@@ -208,16 +208,16 @@ final class WebDAVService {
    * Writes a file to the specified output stream.
    * @param db database
    * @param path path
-   * @param raw is the file a raw file
+   * @param binary is the file binary
    * @param out output stream
    * @throws IOException I/O exception
    */
-  void retrieve(final String db, final String path, final boolean raw, final OutputStream out)
+  void retrieve(final String db, final String path, final boolean binary, final OutputStream out)
       throws IOException {
 
     session().setOutputStream(out);
     final WebDAVQuery query = new WebDAVQuery(
-      (raw ? _DB_RETRIEVE : _DB_OPEN).args(" $db", " $path") + "[1]",
+      (binary ? _DB_RETRIEVE : _DB_OPEN).args(" $db", " $path") + "[1]",
       SerializerOptions.USE_CHARACTER_MAPS.arg(WEBDAV));
     query.bind("db", db);
     query.bind("path", path);
@@ -291,10 +291,10 @@ final class WebDAVService {
       if(dir) {
         ch.add(WebDAVFactory.folder(this, new WebDAVMetaData(db, p, mod)));
       } else if(!name.equals(DUMMY)) {
-        final boolean raw = Boolean.parseBoolean(result[r + 3]);
+        final boolean binary = Boolean.parseBoolean(result[r + 3]);
         final MediaType ctype = new MediaType(result[r + 4]);
         final String size = result[r + 5];
-        ch.add(WebDAVFactory.file(this, new WebDAVMetaData(db, p, mod, raw, ctype, size)));
+        ch.add(WebDAVFactory.file(this, new WebDAVMetaData(db, p, mod, binary, ctype, size)));
       }
     }
     return ch;
@@ -496,7 +496,7 @@ final class WebDAVService {
         }
       }
 
-      // add input as raw file (do this also if an error occurred, and if the stream could be reset)
+      // add input as binary (do this also if an error occurred, and if the stream could be reset)
       final String d;
       if(db == null) {
         d = dbName(path);

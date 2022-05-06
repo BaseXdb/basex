@@ -17,10 +17,10 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team 2005-22, BSD License
  * @author Dimitar Popov
  */
-public final class AddRawOptionTest extends SandboxTest {
+public final class AddBinaryOptionTest extends SandboxTest {
   /** Test directory. */
   private static final String DIR = "src/test/resources/dir";
-  /** Test files from {@link AddRawOptionTest#DIR}}. */
+  /** Test files from {@link AddBinaryOptionTest#DIR}}. */
   private static final StringList FILES = new IOFile(DIR).descendants();
 
   /**
@@ -38,7 +38,7 @@ public final class AddRawOptionTest extends SandboxTest {
   }
 
   /**
-   * Test if raw files are added on executing a {@code CREATE} command.
+   * Test if binary files are added on executing a {@code CREATE} command.
    */
   @Test public void testCreate() {
     execute(new CreateDB(NAME, DIR));
@@ -46,7 +46,7 @@ public final class AddRawOptionTest extends SandboxTest {
   }
 
   /**
-   * Test if raw files are added on executing an {@code ADD} command.
+   * Test if binary files are added on executing an {@code ADD} command.
    */
   @Test public void testAdd() {
     execute(new Add("", DIR));

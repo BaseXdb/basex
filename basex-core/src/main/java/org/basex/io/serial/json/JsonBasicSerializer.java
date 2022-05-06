@@ -258,11 +258,11 @@ public final class JsonBasicSerializer extends JsonSerializer {
   /**
    * Returns an unescaped representation of the value.
    * @param value value to escape
-   * @return raw token
+   * @return unescaped token
    * @throws QueryIOException I/O exception
    */
   private static byte[] unescape(final byte[] value) throws QueryIOException {
-    final TokenBuilder raw = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     final TokenParser tp = new TokenParser(value);
     while(tp.more()) {
       int cp = tp.next();
@@ -279,28 +279,28 @@ public final class JsonBasicSerializer extends JsonSerializer {
                 throw ESCAPE_JSON_X.getIO(value);
               cp = (cp << 4) + c - (c >= 0x61 ? 0x57 : c >= 0x41 ? 0x37 : 0x30);
             }
-            raw.add(cp);
+            tb.add(cp);
             break;
           case '"': case '\\': case '/':
-            raw.add(cp); break;
+            tb.add(cp); break;
           case 'b':
-            raw.add('\b'); break;
+            tb.add('\b'); break;
           case 'f':
-            raw.add('\f'); break;
+            tb.add('\f'); break;
           case 'n':
-            raw.add('\n'); break;
+            tb.add('\n'); break;
           case 'r':
-            raw.add('\r'); break;
+            tb.add('\r'); break;
           case 't':
-            raw.add('\t'); break;
+            tb.add('\t'); break;
           default:
             throw ESCAPE_JSON_X.getIO(value);
         }
       } else {
-        raw.add(cp);
+        tb.add(cp);
       }
     }
-    return raw.finish();
+    return tb.finish();
   }
 
   /**

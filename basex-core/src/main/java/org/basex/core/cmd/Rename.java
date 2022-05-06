@@ -51,25 +51,28 @@ public final class Rename extends ACreate {
   private boolean rename(final Data data, final String src, final String trg) {
     boolean ok = true;
     int c = 0;
-    final IntList docs = data.resources.docs(src);
-    final int ds = docs.size();
-    for(int i = 0; i < ds; i++) {
-      final int pre = docs.get(i);
-      final String target = target(data, pre, src, trg);
-      if(target.isEmpty()) {
-        ok = !info(NAME_INVALID_X, target);
-      } else {
-        data.update(pre, Data.DOC, token(target));
+    if(!(Prop.CASE ? src.equals(trg) : src.equalsIgnoreCase(trg))) {
+      final IntList docs = data.resources.docs(src);
+      final int ds = docs.size();
+      for(int i = 0; i < ds; i++) {
+        final int pre = docs.get(i);
+        final String target = target(data, pre, src, trg);
+        if(target.isEmpty()) {
+          ok = !info(NAME_INVALID_X, target);
+        } else {
+          data.update(pre, Data.DOC, token(target));
+          c++;
+        }
+      }
+
+      final IOFile file = data.meta.binary(src);
+      if(file != null && file.exists()) {
+        final IOFile target = data.meta.binary(trg), trgdir = target.parent();
+        if(!trgdir.md() || !file.rename(target)) {
+          ok = !info(NAME_INVALID_X, trg);
+        }
         c++;
       }
-    }
-
-    final IOFile file = data.inMemory() ? null : data.meta.binary(src);
-    if(file != null && file.exists()) {
-      final IOFile target = data.meta.binary(trg);
-      final IOFile trgdir = target.parent();
-      if(!trgdir.md() || !file.rename(target)) ok = !info(NAME_INVALID_X, trg);
-      c++;
     }
     // return info message
     return info(RES_RENAMED_X_X, c, jc().performance) && ok;

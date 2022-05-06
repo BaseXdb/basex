@@ -86,7 +86,7 @@ public final class Export extends Command {
 
     // XML documents
     final IntList docs = data.resources.docs();
-    // raw files
+    // binary resources
     final IOFile source;
     final StringList files;
     if(data.inMemory()) {
@@ -126,7 +126,7 @@ public final class Export extends Command {
       if(export != null) export.progPos++;
     }
 
-    // export raw files
+    // export binary resources
     for(final String file : files) {
       final IOFile io = new IOFile(root.path(), file);
       if(export != null) {

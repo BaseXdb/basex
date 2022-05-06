@@ -27,9 +27,9 @@ public final class RESTGetTest extends RESTTest {
     assertEquals("a,b", get("?query=string-join(('a','b'),',')"));
 
     put(NAME, new ArrayInput("<a/>"));
-    put(NAME + "/raw", new ArrayInput("XXX"), MediaType.APPLICATION_OCTET_STREAM);
+    put(NAME + "/binary", new ArrayInput("XXX"), MediaType.APPLICATION_OCTET_STREAM);
     assertEquals("<a/>", get(NAME + '/' + NAME + ".xml"));
-    assertEquals("XXX", get(NAME + "/raw"));
+    assertEquals("XXX", get(NAME + "/binary"));
     delete(NAME);
   }
 

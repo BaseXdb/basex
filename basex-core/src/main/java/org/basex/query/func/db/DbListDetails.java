@@ -52,9 +52,9 @@ public final class DbListDetails extends DbList {
         final MetaData meta = new MetaData(name, ctx.options, ctx.soptions);
         try {
           meta.read();
-          // count number of raw files
-          final int bin = meta.binaryDir().descendants().size();
-          database.add(RESOURCES, token(meta.ndocs + bin));
+          // count number of binary files
+          final int binary = meta.binaryDir().descendants().size();
+          database.add(RESOURCES, token(meta.ndocs + binary));
           database.add(MODIFIED_DATE, DateTime.format(new Date(meta.dbTime())));
           database.add(SIZE, token(meta.dbSize()));
           if(ctx.perm(Perm.CREATE, name)) database.add(PATH, meta.original);
@@ -77,20 +77,20 @@ public final class DbListDetails extends DbList {
     final Data data = toData(qc);
     final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
     final IntList docs = data.resources.docs(path);
-    final TokenList bins = data.resources.binaries(path);
-    final int ds = docs.size(), size = ds + bins.size();
+    final TokenList binaries = data.resources.binaryPaths(path);
+    final int ds = docs.size(), size = ds + binaries.size();
     return new BasicIter<FNode>(size) {
       @Override
       public FNode get(final long i) {
         if(i < ds) {
           final int pre = docs.get((int) i);
-          final byte[] pt = data.text(pre, true);
+          final String pt = string(data.text(pre, true));
           final int sz = data.size(pre, Data.DOC);
           return resource(pt, false, MediaType.APPLICATION_XML, data.meta.time, (long) sz);
         }
         if(i < size) {
-          final byte[] pt = bins.get((int) i - ds);
-          final IOFile io = data.meta.binary(string(pt));
+          final String pt = string(binaries.get((int) i - ds));
+          final IOFile io = data.meta.binary(pt);
           return resource(pt, true, MediaType.get(io.path()), io.timeStamp(), io.length());
         }
         return null;

@@ -34,7 +34,7 @@ public final class MainOptions extends Options {
   public static final BooleanOption ARCHIVENAME = new BooleanOption("ARCHIVENAME", false);
   /** Flag for skipping corrupt files. */
   public static final BooleanOption SKIPCORRUPT = new BooleanOption("SKIPCORRUPT", false);
-  /** Flag for adding remaining files as raw files. */
+  /** Flag for adding remaining files as binary files. */
   public static final BooleanOption ADDRAW = new BooleanOption("ADDRAW", false);
   /** Define CSV parser options. */
   public static final OptionsOption<CsvParserOptions> CSVPARSER =

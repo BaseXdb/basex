@@ -230,9 +230,9 @@ public final class DbModuleTest extends QueryPlanTest {
   @Test public void contentType() {
     final Function func = _DB_CONTENT_TYPE;
     query(_DB_ADD.args(NAME, " <a/>", "xml"));
-    query(_DB_STORE.args(NAME, "raw", "bla"));
+    query(_DB_STORE.args(NAME, "binary", "bla"));
     query(func.args(NAME, "xml"), MediaType.APPLICATION_XML.toString());
-    query(func.args(NAME, "raw"), MediaType.APPLICATION_OCTET_STREAM.toString());
+    query(func.args(NAME, "binary"), MediaType.APPLICATION_OCTET_STREAM.toString());
     error(func.args(NAME, "test"), WHICHRES_X);
   }
 
@@ -422,21 +422,21 @@ public final class DbModuleTest extends QueryPlanTest {
   @Test public void dir() {
     final Function func = _DB_DIR;
     query(_DB_ADD.args(NAME, " <a/>", "xml/doc.xml"));
-    query(_DB_STORE.args(NAME, "raw/raw.data", "bla"));
+    query(_DB_STORE.args(NAME, "binary/binary.data", "bla"));
 
-    final String xmlCall = func.args(NAME, "xml");
-    query(xmlCall + "/@raw/data()", false);
-    query(xmlCall + "/@content-type/data()", MediaType.APPLICATION_XML.toString());
-    query(xmlCall + "/@modified-date/xs:dateTime(.)");
-    query(xmlCall + "/@size/data()", "");
-    query(xmlCall + "/text()", "doc.xml");
+    String call = func.args(NAME, "xml");
+    query(call + "/@raw/data()", false);
+    query(call + "/@content-type/data()", MediaType.APPLICATION_XML.toString());
+    query(call + "/@modified-date/xs:dateTime(.)");
+    query(call + "/@size/data()", "");
+    query(call + "/text()", "doc.xml");
 
-    final String rawCall = func.args(NAME, "raw");
-    query(rawCall + "/@raw/data()", true);
-    query(rawCall + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
-    query(rawCall + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", true);
-    query(rawCall + "/@size/data()", 3);
-    query(rawCall + "/text()", "raw.data");
+    call = func.args(NAME, "binary/");
+    query(call + "/@raw/data()", true);
+    query(call + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
+    query(call + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", true);
+    query(call + "/@size/data()", 3);
+    query(call + "/text()", "binary.data");
 
     query(func.args(NAME, "test"), "");
     error(func.args("notAvailable", ""), DB_OPEN2_X);
@@ -482,11 +482,11 @@ public final class DbModuleTest extends QueryPlanTest {
   @Test public void exists() {
     final Function func = _DB_EXISTS;
     query(_DB_ADD.args(NAME, " <a/>", "x/xml"));
-    query(_DB_STORE.args(NAME, "x/raw", "bla"));
+    query(_DB_STORE.args(NAME, "x/binary", "bla"));
     // checks if the specified resources exist (false expected for directories)
     query(func.args(NAME), true);
     query(func.args(NAME, "x/xml"), true);
-    query(func.args(NAME, "x/raw"), true);
+    query(func.args(NAME, "x/binary"), true);
     query(func.args(NAME, "xxx"), false);
     query(func.args(NAME, "x"), false);
     query(func.args(NAME, ""), false);
@@ -528,9 +528,9 @@ public final class DbModuleTest extends QueryPlanTest {
   @Test public void isRaw() {
     final Function func = _DB_IS_RAW;
     query(_DB_ADD.args(NAME, " <a/>", "xml"));
-    query(_DB_STORE.args(NAME, "raw", "bla"));
+    query(_DB_STORE.args(NAME, "binary", "bla"));
     query(func.args(NAME, "xml"), false);
-    query(func.args(NAME, "raw"), true);
+    query(func.args(NAME, "binary"), true);
     query(func.args(NAME, "xxx"), false);
   }
 
@@ -538,9 +538,9 @@ public final class DbModuleTest extends QueryPlanTest {
   @Test public void isXML() {
     final Function func = _DB_IS_XML;
     query(_DB_ADD.args(NAME, " <a/>", "xml"));
-    query(_DB_STORE.args(NAME, "raw", "bla"));
+    query(_DB_STORE.args(NAME, "binary", "bla"));
     query(func.args(NAME, "xml"), true);
-    query(func.args(NAME, "raw"), false);
+    query(func.args(NAME, "binary"), false);
     query(func.args(NAME, "xxx"), false);
   }
 
@@ -570,22 +570,22 @@ public final class DbModuleTest extends QueryPlanTest {
     final Function func = _DB_LIST_DETAILS;
     query(func.args() + "/@resources/string()", 1);
 
-    query(_DB_ADD.args(NAME, " <a/>", "xml"));
-    query(_DB_STORE.args(NAME, "raw", "bla"));
+    query(_DB_ADD.args(NAME, " <a/>", "xml/xml.xml"));
+    query(_DB_STORE.args(NAME, "binary/binary.data", "bla"));
 
-    final String xmlCall = func.args(NAME, "xml");
-    query(xmlCall + "/@raw/data()", false);
-    query(xmlCall + "/@content-type/data()", MediaType.APPLICATION_XML.toString());
-    query(xmlCall + "/@modified-date/xs:dateTime(.)");
-    query(xmlCall + "/@size/data()", 2);
-    query(xmlCall + "/text()", "xml");
+    String call = func.args(NAME, "xml/");
+    query(call + "/@raw/data()", false);
+    query(call + "/@content-type/data()", MediaType.APPLICATION_XML.toString());
+    query(call + "/@modified-date/xs:dateTime(.)");
+    query(call + "/@size/data()", 2);
+    query(call + "/text()", "xml/xml.xml");
 
-    final String rawCall = func.args(NAME, "raw");
-    query(rawCall + "/@raw/data()", true);
-    query(rawCall + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
-    query(rawCall + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", true);
-    query(rawCall + "/@size/data()", 3);
-    query(rawCall + "/text()", "raw");
+    call = func.args(NAME, "binary/");
+    query(call + "/@raw/data()", true);
+    query(call + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
+    query(call + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", true);
+    query(call + "/@size/data()", 3);
+    query(call + "/text()", "binary/binary.data");
 
     query(func.args(NAME, "test"), "");
     error(func.args("notAvailable"), DB_OPEN2_X);
@@ -872,21 +872,23 @@ public final class DbModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test public void retrieve() {
     final Function func = _DB_RETRIEVE;
-    error(func.args(NAME, "raw"), WHICHRES_X);
-    query(_DB_STORE.args(NAME, "raw", " xs:hexBinary('41')"));
-    query("xs:hexBinary(" + func.args(NAME, "raw") + ')', "A");
-    query(_DB_DELETE.args(NAME, "raw"));
-    error(func.args(NAME, "raw"), WHICHRES_X);
+    error(func.args(NAME, "binary"), WHICHRES_X);
+    query(_DB_STORE.args(NAME, "binary", " xs:hexBinary('41')"));
+    query("xs:hexBinary(" + func.args(NAME, "binary") + ')', "A");
+    query(_DB_DELETE.args(NAME, "binary"));
+    error(func.args(NAME, "binary"), WHICHRES_X);
   }
 
   /** Test method. */
   @Test public void store() {
     final Function func = _DB_STORE;
-    query(func.args(NAME, "raw1", "xs:hexBinary('41')"));
-    query(func.args(NAME, "raw2", "b"));
-    query(_DB_RETRIEVE.args(NAME, "raw2"), "b");
-    query(func.args(NAME, "raw3", 123));
-    query(_DB_RETRIEVE.args(NAME, "raw3"), 123);
+    query(func.args(NAME, "binary1", "xs:hexBinary('41')"));
+    query(func.args(NAME, "binary2", "b"));
+    query(_DB_RETRIEVE.args(NAME, "binary2"), "b");
+    query(func.args(NAME, "binary3", 123));
+    query(_DB_RETRIEVE.args(NAME, "binary3"), 123);
+
+    error(func.args(NAME, "bin/x", "x") + ", " + func.args(NAME, "bin//x", "x"), DB_CONFLICT5_X);
   }
 
   /** Test method. */

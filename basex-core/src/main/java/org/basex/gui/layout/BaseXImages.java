@@ -94,11 +94,11 @@ public final class BaseXImages {
 
   /**
    * Returns an icon for the specified text.
-   * @param raw raw/xml text
+   * @param binary resource type
    * @return icon
    */
-  public static Icon resource(final boolean raw) {
-    return raw ? DB_RAW : DB_XML;
+  public static Icon resource(final boolean binary) {
+    return binary ? DB_RAW : DB_XML;
   }
 
   /**

@@ -43,10 +43,10 @@ public final class DBStore extends DBUpdate {
   @Override
   public void apply() throws QueryException {
     for(final byte[] path : map) {
+      final IOFile file = data.meta.binary(string(path));
+      if(file.isDir()) file.delete();
+      file.parent().md();
       try {
-        final IOFile file = data.meta.binary(string(path));
-        if(file.isDir()) file.delete();
-        file.parent().md();
         file.write(map.get(path).input(info));
       } catch(final IOException ex) {
         Util.debug(ex);
@@ -56,9 +56,12 @@ public final class DBStore extends DBUpdate {
   }
 
   @Override
-  public void merge(final Update update) {
-    final DBStore put = (DBStore) update;
-    for(final byte[] path : put.map) map.put(path, put.map.get(path));
+  public void merge(final Update update) throws QueryException {
+    final TokenObjMap<Item> store = ((DBStore) update).map;
+    for(final byte[] path : store) {
+      if(map.contains(path)) throw DB_CONFLICT5_X.get(info, path);
+      map.put(path, store.get(path));
+    }
   }
 
   @Override

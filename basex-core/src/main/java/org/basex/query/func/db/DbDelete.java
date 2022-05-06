@@ -32,11 +32,12 @@ public final class DbDelete extends DbAccess {
     for(int d = 0; d < ds; d++) {
       updates.add(new DeleteNode(docs.get(d), data, info), qc);
     }
-    // delete raw resources
+
+    // delete binary resources
     if(!data.inMemory()) {
-      final IOFile bin = data.meta.binary(path);
-      if(bin == null) throw DB_PATH_X.get(info, path);
-      updates.add(new DBDelete(data, bin, info), qc);
+      final IOFile file = data.meta.binary(path);
+      if(file == null) throw DB_PATH_X.get(info, path);
+      updates.add(new DBDelete(data, file, info), qc);
     }
     return Empty.VALUE;
   }

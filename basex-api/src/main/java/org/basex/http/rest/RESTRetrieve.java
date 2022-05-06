@@ -37,12 +37,12 @@ final class RESTRetrieve extends RESTCmd {
     final SerializerOptions sopts = conn.sopts();
     if(run(query(_DB_EXISTS)).equals(Text.TRUE)) {
       // return database resource
-      final boolean raw = run(query(_DB_IS_RAW)).equals(Text.TRUE);
-      if(raw) sopts.set(SerializerOptions.MEDIA_TYPE, run(query(_DB_CONTENT_TYPE)));
+      final boolean binary = run(query(_DB_IS_RAW)).equals(Text.TRUE);
+      if(binary) sopts.set(SerializerOptions.MEDIA_TYPE, run(query(_DB_CONTENT_TYPE)));
       conn.initResponse();
 
       context.options.set(MainOptions.SERIALIZER, sopts);
-      run(query(raw ? _DB_RETRIEVE : _DB_OPEN), conn.response.getOutputStream());
+      run(query(binary ? _DB_RETRIEVE : _DB_OPEN), conn.response.getOutputStream());
 
     } else {
       // list database resources
