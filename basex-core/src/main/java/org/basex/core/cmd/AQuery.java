@@ -189,9 +189,6 @@ public abstract class AQuery extends Command {
       return qp.qc.serParams().toString();
     } catch(final QueryException ex) {
       error(Util.message(ex));
-    } finally {
-      qp = null;
-      popJob();
     }
     return SerializerMode.DEFAULT.get().toString();
   }
