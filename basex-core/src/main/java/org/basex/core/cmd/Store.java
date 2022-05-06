@@ -57,15 +57,13 @@ public final class Store extends ACreate {
     // ensure that the name is not empty and contains no trailing dots
     final Data data = context.data();
     if(data.inMemory()) return error(NO_MAINMEM);
+    if(path.isEmpty()) return error(PATH_INVALID_X, create ? path : args[0]);
 
-    final IOFile file = data.meta.binary(path);
-    if(path.isEmpty() || Strings.endsWith(path, '.') || file == null)
-      return error(PATH_INVALID_X, create ? path : args[0]);
-
+    final IOFile bin = data.meta.binary(path);
     return update(data, new Code() {
       @Override
       boolean run() throws IOException {
-        store(in, file);
+        store(in, bin);
         return info(QUERY_EXECUTED_X_X, "", jc().performance);
       }
     });

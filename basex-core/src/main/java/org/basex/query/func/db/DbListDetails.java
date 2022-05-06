@@ -90,8 +90,8 @@ public final class DbListDetails extends DbList {
         }
         if(i < size) {
           final String pt = string(binaries.get((int) i - ds));
-          final IOFile io = data.meta.binary(pt);
-          return resource(pt, true, MediaType.get(io.path()), io.timeStamp(), io.length());
+          final IOFile bin = data.meta.binary(pt);
+          return resource(pt, true, MediaType.get(bin.path()), bin.timeStamp(), bin.length());
         }
         return null;
       }

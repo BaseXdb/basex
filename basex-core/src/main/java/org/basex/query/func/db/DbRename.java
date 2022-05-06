@@ -34,18 +34,14 @@ public final class DbRename extends DbAccess {
       for(int d = 0; d < ds; d++) {
         final int pre = docs.get(d);
         final String trg = Rename.target(data, pre, source, target);
-        if(trg.isEmpty() || Strings.endsWith(trg, '/') || Strings.endsWith(trg, '.'))
-          throw DB_PATH_X.get(info, trg);
+        if(trg.isEmpty() || Strings.endsWith(trg, '/')) throw DB_PATH_X.get(info, trg);
         updates.add(new ReplaceValue(pre, data, info, token(trg)), qc);
       }
-      if(!data.inMemory()) {
-        // rename binary resources
-        final IOFile src = data.meta.binary(source), trg = data.meta.binary(target);
-        if(src == null || trg == null) throw DB_PATH_X.get(info, src);
-        if(!src.eq(trg)) {
-          rename(data, src, trg, qc);
-          updates.add(new DBDelete(data, src, info), qc);
-        }
+      // rename binary resources
+      final IOFile src = data.meta.binary(source), trg = data.meta.binary(target);
+      if(src != null && trg != null) {
+        rename(data, src, trg, qc);
+        updates.add(new DBDelete(data, src, info), qc);
       }
     }
     return Empty.VALUE;
