@@ -83,7 +83,7 @@ public final class List extends Command {
         meta.read();
         dbsize = meta.dbSize();
         file = meta.original;
-        // add number of raw files
+        // add number of binary resources
         count = meta.ndocs + meta.binaryDir().descendants().size();
       } catch(final IOException ex) {
         Util.debug(ex);
@@ -134,7 +134,7 @@ public final class List extends Command {
         table.contents.add(tl);
       }
       // add binary resources
-      for(final byte[] file : resources.binaries(path)) {
+      for(final byte[] file : resources.binaryPaths(path)) {
         final String bin = string(file);
         final TokenList tl = new TokenList(4);
         tl.add(file);

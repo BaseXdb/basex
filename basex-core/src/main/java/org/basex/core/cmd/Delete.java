@@ -38,7 +38,7 @@ public final class Delete extends ACreate {
         auc.execute(false);
         context.invalidate();
 
-        // delete binaries
+        // delete binary resources
         if(!data.inMemory()) {
           final IOFile path = data.meta.binary(target);
           if(path.exists()) {

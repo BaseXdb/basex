@@ -21,14 +21,15 @@ public final class DbExists extends DbAccess {
     try {
       final Data data = toData(qc);
       if(exprs.length == 1) return Bln.TRUE;
-      // check if raw file or XML document exists
       final String path = toDbPath(1, qc);
-      boolean raw = false;
+
+      boolean exists = false;
       if(!data.inMemory()) {
         final IOFile io = data.meta.binary(path);
-        raw = io.exists() && !io.isDir();
+        exists = io.exists() && !io.isDir();
       }
-      return Bln.get(raw || data.resources.doc(path) != -1);
+      if(!exists) exists = data.resources.doc(path) != -1;
+      return Bln.get(exists);
     } catch(final QueryException ex) {
       if(ex.error() == DB_OPEN2_X) return Bln.FALSE;
       throw ex;

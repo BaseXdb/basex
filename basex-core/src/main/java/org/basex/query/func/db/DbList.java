@@ -78,20 +78,20 @@ public class DbList extends StandardFunc {
     final Data data = toData(qc);
     final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
     final IntList docs = data.resources.docs(path);
-    final TokenList bins = data.resources.binaries(path);
+    final TokenList binaries = data.resources.binaryPaths(path);
     final int ds = docs.size();
 
-    return new BasicIter<Str>(ds + bins.size()) {
+    return new BasicIter<Str>(ds + binaries.size()) {
       @Override
       public Str get(final long i) {
-        return Str.get(i < ds ? data.text(docs.get((int) i), true) : bins.get((int) i - ds));
+        return Str.get(i < ds ? data.text(docs.get((int) i), true) : binaries.get((int) i - ds));
       }
 
       @Override
       public Value value(final QueryContext q, final Expr expr) throws QueryException {
         final TokenList tl = new TokenList(Seq.initialCapacity(size));
         for(int d = 0; d < ds; d++) tl.add(data.text(docs.get(d), true));
-        return StrSeq.get(tl.add(bins));
+        return StrSeq.get(tl.add(binaries));
       }
     };
   }
@@ -107,32 +107,30 @@ public class DbList extends StandardFunc {
   }
 
   /**
-   * Creates a directory node.
+   * Creates a directory element.
    * @param path path
    * @param mdate modified date
    * @return resource node
    */
-  static FNode dir(final byte[] path, final long mdate) {
-    final FElem dir = new FElem(DIR);
-    dir.add(path).add(MODIFIED_DATE, DateTime.format(new Date(mdate)));
-    return dir;
+  static FElem dir(final String path, final long mdate) {
+    return new FElem(DIR).add(path).add(MODIFIED_DATE, DateTime.format(new Date(mdate)));
   }
 
   /**
-   * Creates a resource node.
+   * Creates a resource element.
    * @param path path
-   * @param raw raw flag
-   * @param type media type
+   * @param binary binary flag
+   * @param ct content type
    * @param mdate modified date
    * @param size size (can be {@code null})
    * @return resource node
    */
-  static FNode resource(final byte[] path, final boolean raw, final MediaType type,
+  static FElem resource(final String path, final boolean binary, final MediaType ct,
       final long mdate, final Long size) {
 
     final FElem resource = new FElem(RESOURCE).add(path);
-    resource.add(RAW, token(raw));
-    resource.add(CONTENT_TYPE, type.toString());
+    resource.add(RAW, token(binary));
+    resource.add(CONTENT_TYPE, ct.toString());
     resource.add(MODIFIED_DATE, DateTime.format(new Date(mdate)));
     if(size != null) resource.add(SIZE, token(size));
     return resource;

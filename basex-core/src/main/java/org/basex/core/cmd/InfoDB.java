@@ -50,8 +50,6 @@ public final class InfoDB extends AInfo {
     info(tb, MetaProp.NAME, meta);
     info(tb, MetaProp.SIZE.name(), Performance.format(meta.dbSize()));
     info(tb, MetaProp.NODES, meta);
-
-    // count number of raw files
     info(tb, MetaProp.DOCUMENTS, meta);
     info(tb, MetaProp.BINARIES, meta);
     info(tb, MetaProp.TIMESTAMP, meta);

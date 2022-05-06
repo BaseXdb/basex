@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This index organizes binary files in a database.
+ * This index organizes binary resources in a database.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
@@ -29,38 +29,43 @@ final class Binaries {
   }
 
   /**
-   * Returns the database paths to all binary files that match the specified path.
+   * Returns the database paths to all binary resources that match the specified path.
    * All paths are relative to the filesystem.
    * @param path input path
-   * @return root nodes
+   * @return database paths of binary resources
    */
-  synchronized TokenList bins(final String path) {
+  synchronized TokenList paths(final String path) {
     final TokenList tl = new TokenList();
-    final String np = MetaData.normPath(path);
-    if(np == null || data.inMemory()) return tl;
-
-    final String exct = Prop.CASE ? np : np.toLowerCase(Locale.ENGLISH);
-    final String pref = Strings.endsWith(exct, '/') ? exct : exct + '/';
-    for(final String f : data.meta.binaryDir().descendants()) {
-      final String lc = Prop.CASE ? f : f.toLowerCase(Locale.ENGLISH);
-      if(exct.isEmpty() || lc.equals(exct) || lc.startsWith(pref)) tl.add(f);
+    final String norm = MetaData.normPath(path);
+    if(norm != null && !data.inMemory()) {
+      final IOFile bin = data.meta.binaryDir(), root = new IOFile(bin, norm);
+      if(root.exists()) {
+        final String exact = Prop.CASE ? norm : norm.toLowerCase(Locale.ENGLISH);
+        final String dir = root.isDir() ? (
+            exact.isEmpty() || Strings.endsWith(exact, '/') ? exact : exact + '/') : null;
+        for(final String relative : bin.descendants()) {
+          final String rel = Prop.CASE ? relative : relative.toLowerCase(Locale.ENGLISH);
+          if(dir != null ? rel.startsWith(dir) : rel.equals(exact)) tl.add(relative);
+        }
+      }
     }
     return tl.sort(Prop.CASE);
   }
 
   /**
-   * Adds the database paths for the binaries of the given path to the given map.
+   * Adds the paths of binary resources to a map.
    * @param path path
    * @param dir returns directories instead of files
-   * @param tbm map; values will be {@code true} to indicate raw files
+   * @param tbm map; values will be {@code true} to indicate binary resources
    */
   synchronized void children(final byte[] path, final boolean dir, final TokenBoolMap tbm) {
-    if(data.inMemory()) return;
-    final IOFile file = data.meta.binary(string(path));
-    if(file == null) return;
-
-    for(final IOFile f : file.children()) {
-      if(dir == f.isDir()) tbm.put(token(f.name()), true);
+    if(!data.inMemory()) {
+      final IOFile file = data.meta.binary(string(path));
+      if(file != null) {
+        for(final IOFile child : file.children()) {
+          if(dir == child.isDir()) tbm.put(token(child.name()), true);
+        }
+      }
     }
   }
 

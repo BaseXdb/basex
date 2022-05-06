@@ -227,13 +227,15 @@ public enum QueryError {
   /** Error code. */
   DB_CONFLICT4_X(DB, "conflict", "Name of source and target is equal: %."),
   /** Error code. */
+  DB_CONFLICT5_X(DB, "conflict", "Resource '%' can only be stored once."),
+  /** Error code. */
   DB_LOCK1_X(DB, "lock", "Database '%' cannot be updated, it is opened by another process."),
   /** Error code. */
   DB_LOCK2_X(DB, "lock", "%"),
   /** Error code. */
   DB_MAINMEM_X(DB, "mainmem", "Database '%' is in main memory."),
   /** Error code. */
-  DB_NAME_X(DB, "name", "Invalid database name: %."),
+  DB_NAME_X(DB, "name", "Invalid name: %."),
   /** Error code. */
   DB_NOBACKUP_X(DB, "no-backup", "No backup exists for database '%'."),
   /** Error code. */

@@ -503,7 +503,7 @@ public class FnHttpTest extends HTTPTest {
   }
 
   /**
-   * Tests writing of body content when @method is raw and output is xs:base64Binary.
+   * Tests writing of body content when @method is binary and output is xs:base64Binary.
    * @throws IOException I/O Exception
    */
   @Test public void writeBase64() throws IOException {
@@ -545,7 +545,7 @@ public class FnHttpTest extends HTTPTest {
   }
 
   /**
-   * Tests writing of body content when @method is raw and output is xs:hexBinary.
+   * Tests writing of body content when @method is binary and output is xs:hexBinary.
    * @throws IOException I/O Exception
    */
   @Test public void writeHex() throws IOException {

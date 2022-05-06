@@ -10,7 +10,7 @@ import org.basex.data.*;
 import org.basex.util.*;
 
 /**
- * JTree node for representing database content (raw files / documents).
+ * JTree node for representing database resources.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Lukas Kircher

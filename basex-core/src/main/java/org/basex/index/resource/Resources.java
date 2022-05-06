@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * <p>This index organizes the resources of a database (XML documents and raw files).</p>
+ * This index organizes the resources of a database.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
@@ -116,12 +116,12 @@ public final class Resources implements Index {
   }
 
   /**
-   * Returns the database paths to all binary files that start with the specified path.
+   * Returns the database paths to all binary resources that start with the specified path.
    * @param path input path
-   * @return root nodes
+   * @return database paths of binary resources
    */
-  public synchronized TokenList binaries(final String path) {
-    return bins.bins(path);
+  public synchronized TokenList binaryPaths(final String path) {
+    return bins.paths(path);
   }
 
   /**
@@ -137,7 +137,7 @@ public final class Resources implements Index {
    * Returns the child resources for the given path.
    * @param path path
    * @param dir returns directories
-   * @return paths; values of documents will be {@code false}
+   * @return paths with binary flags
    */
   public synchronized TokenBoolMap children(final byte[] path, final boolean dir) {
     final TokenBoolMap tbm = new TokenBoolMap();

@@ -83,7 +83,7 @@ public abstract class Session implements Closeable {
   public abstract void replace(String path, InputStream input) throws IOException;
 
   /**
-   * Stores raw data in an open database.
+   * Stores binary data in an open database.
    * @param path target path
    * @param input binary input
    * @throws IOException I/O exception

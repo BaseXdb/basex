@@ -9,7 +9,7 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 
 /**
- * Custom tree cell renderer to distinguish between raw and xml leaf nodes.
+ * Custom tree cell renderer to distinguish between resource types.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen

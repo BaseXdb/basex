@@ -1,8 +1,6 @@
 package org.basex.util.http;
 
-import static java.net.HttpURLConnection.*;
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 import static org.basex.util.http.HttpText.*;
 import static org.basex.util.http.HttpText.Request.*;
 
@@ -66,7 +64,8 @@ public final class HttpClient {
     final HttpRequest req = new HttpRequestParser(info).parse(request, bodies);
     HttpURLConnection conn = null;
     try {
-      final String url = href == null || href.length == 0 ? req.attribute(HREF) : string(href);
+      final String url = href == null || href.length == 0 ? req.attribute(HREF) :
+        Token.string(href);
       if(url == null || url.isEmpty()) throw HC_URL.get(info);
       conn = send(url, req);
 
@@ -216,7 +215,7 @@ public final class HttpClient {
         conn.setReadTimeout(Strings.toInt(timeout) * 1000);
       }
       final String redirect = request.attribute(FOLLOW_REDIRECT);
-      if(redirect != null) setFollowRedirects(Strings.toBoolean(redirect));
+      if(redirect != null) HttpURLConnection.setFollowRedirects(Strings.toBoolean(redirect));
 
       request.headers.forEach(conn::addRequestProperty);
     }
@@ -283,7 +282,7 @@ public final class HttpClient {
         writePayload(part.bodyContents, part.bodyAtts, ao);
 
         // write boundary preceded by "--"
-        out.write(concat("--", boundary, CRLF));
+        out.write(Token.concat("--", boundary, CRLF));
 
         // write headers
         for(final Entry<String, String> header : part.headers.entrySet())
@@ -295,7 +294,7 @@ public final class HttpClient {
         out.write(ao.finish());
         out.write(CRLF);
       }
-      out.write(concat("--", boundary, "--", CRLF));
+      out.write(Token.concat("--", boundary, "--", CRLF));
     } else {
       writePayload(request.payload, request.payloadAtts, out);
     }
@@ -311,7 +310,7 @@ public final class HttpClient {
    */
   private static void writeHeader(final String key, final String value, final OutputStream out)
       throws IOException {
-    out.write(concat(key, ": ", value, CRLF));
+    out.write(Token.concat(key, ": ", value, CRLF));
   }
 
   /**

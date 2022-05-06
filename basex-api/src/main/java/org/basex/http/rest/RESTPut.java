@@ -66,7 +66,7 @@ final class RESTPut {
       xml = false;
     }
 
-    // store data as XML or raw file, depending on content type
+    // store data as XML or binary resource, depending on content type
     final String path = conn.dbpath();
     if(path.isEmpty()) {
       // do not OPEN database

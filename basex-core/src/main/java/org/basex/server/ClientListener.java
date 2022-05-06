@@ -324,7 +324,7 @@ public final class ClientListener extends Thread implements ClientInfo {
   }
 
   /**
-   * Stores raw data in a database.
+   * Stores binary data in a database.
    * @throws IOException I/O exception
    */
   private void store() throws IOException {
