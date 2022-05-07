@@ -139,6 +139,7 @@ public abstract class ConsoleReader implements AutoCloseable, PasswordReader {
       final Class<?> fileNameCompleter = Reflect.find(JLINE_FILE_NAME_COMPLETER);
 
       Reflect.invoke(Reflect.method(readerC, "setBellEnabled", boolean.class), reader, false);
+      Reflect.invoke(Reflect.method(readerC, "setExpandEvents", boolean.class), reader, false);
       Reflect.invoke(Reflect.method(readerC, "setHistory", history), reader, fileHistory);
       Reflect.invoke(Reflect.method(readerC, "setHistoryEnabled", boolean.class), reader, true);
 
