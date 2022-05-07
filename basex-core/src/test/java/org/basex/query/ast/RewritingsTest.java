@@ -2782,4 +2782,43 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<x>1</x>[if(. castable as xs:integer) then . = 1 else false()]", "<x>1</x>",
         empty(If.class), empty(And.class));
   }
+
+  /** Static typing: Intersection of name tests. */
+  @Test public void gh2102() {
+    final String xml = "<a xmlns=\"x\"/>";
+    query(xml + "[self::Q{x}a[local-name() = 'a'][namespace-uri() = 'x']]", xml);
+    query(xml + "[self::*:a[local-name() = 'a'][namespace-uri() = 'x']]", xml);
+    query(xml + "[self::*[local-name() = 'a'][namespace-uri() = 'x']]", xml);
+    query(xml + "[self::a[local-name() = 'a'][namespace-uri() = 'x']]", "");
+
+    query("<_><n/></_>/Q{}n instance of element(Q{}n)", true);
+    query("<_><n/></_>/Q{}n instance of element(Q{}o)", false);
+    query("<_><n/></_>/Q{}n instance of element(n)   ", true);
+    query("<_><n/></_>/Q{}n instance of element(o)   ", false);
+    query("<_><n/></_>/Q{}n instance of element()    ", true);
+
+    query("<_><n/></_>/Q{}* instance of element(Q{}n)", true);
+    query("<_><n/></_>/Q{}* instance of element(Q{}o)", false);
+    query("<_><n/></_>/Q{}* instance of element(n)   ", true);
+    query("<_><n/></_>/Q{}* instance of element(o)   ", false);
+    query("<_><n/></_>/Q{}* instance of element()    ", true);
+
+    query("<_><n/></_>/*:n  instance of element(Q{}n)", true);
+    query("<_><n/></_>/*:n  instance of element(Q{}o)", false);
+    query("<_><n/></_>/*:n  instance of element(n)   ", true);
+    query("<_><n/></_>/*:n  instance of element(o)   ", false);
+    query("<_><n/></_>/*:n  instance of element()    ", true);
+
+    query("<_><n/></_>/n    instance of element(Q{}n)", true);
+    query("<_><n/></_>/n    instance of element(Q{}o)", false);
+    query("<_><n/></_>/n    instance of element(n)   ", true);
+    query("<_><n/></_>/n    instance of element(o)   ", false);
+    query("<_><n/></_>/n    instance of element()    ", true);
+
+    query("<_><n/></_>/*    instance of element(Q{}n)", true);
+    query("<_><n/></_>/*    instance of element(Q{}o)", false);
+    query("<_><n/></_>/*    instance of element(n)   ", true);
+    query("<_><n/></_>/*    instance of element(o)   ", false);
+    query("<_><n/></_>/*    instance of element()    ", true);
+  }
 }
