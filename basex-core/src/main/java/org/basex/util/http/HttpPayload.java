@@ -3,6 +3,7 @@ package org.basex.util.http;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.http.HttpText.*;
+import static org.basex.util.http.HttpText.VALUE;
 
 import java.io.*;
 import java.util.*;

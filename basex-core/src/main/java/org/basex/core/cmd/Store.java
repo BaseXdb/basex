@@ -7,6 +7,7 @@ import java.io.*;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
+import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
@@ -59,7 +60,7 @@ public final class Store extends ACreate {
     if(data.inMemory()) return error(NO_MAINMEM);
     if(path.isEmpty()) return error(PATH_INVALID_X, create ? path : args[0]);
 
-    final IOFile bin = data.meta.binary(path);
+    final IOFile bin = data.meta.file(path, ResourceType.BINARY);
     return update(data, () -> {
       store(in, bin);
       return info(QUERY_EXECUTED_X_X, "", jc().performance);

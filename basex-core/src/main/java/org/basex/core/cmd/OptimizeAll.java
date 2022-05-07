@@ -10,6 +10,7 @@ import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
+import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.value.item.*;
@@ -142,9 +143,11 @@ public final class OptimizeAll extends ACreate {
       ndata.close();
     }
 
-    // move binary resources
-    final IOFile dir = ometa.binaryDir();
-    if(dir.exists()) dir.rename(nmeta.binaryDir());
+    // move file resources to new database
+    for(final ResourceType type : Resources.BINARIES) {
+      final IOFile bin = ometa.dir(type);
+      if(bin.exists()) bin.rename(nmeta.dir(type));
+    }
 
     // drop old database, rename temporary database
     if(!DropDB.drop(name, sopts)) throw new BaseXException(DB_NOT_DROPPED_X, name);

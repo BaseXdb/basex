@@ -155,7 +155,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     buttons.add(b, BorderLayout.EAST);
     if(this.gopts.get(GUIOptions.SHOWBUTTONS)) control.add(buttons, BorderLayout.CENTER);
 
-    mode = new BaseXCombo(this, FIND, XQUERY, COMMAND);
+    mode = new BaseXCombo(this, FIND, "XQuery", COMMAND);
     mode.setSelectedIndex(2);
 
     input = new GUIInput(this);

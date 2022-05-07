@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import org.basex.core.users.*;
 import org.basex.data.*;
+import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.query.up.atomic.*;
 import org.basex.util.list.*;
@@ -28,19 +29,24 @@ public final class Delete extends ACreate {
     final Data data = context.data();
     final String target = args[0];
     return update(data, () -> {
-      // delete XML documents
-      final IntList docs = data.resources.docs(target);
-      final AtomicUpdateCache auc = new AtomicUpdateCache(data);
-      int size = docs.size();
-      for(int d = 0; d < size; d++) auc.addDelete(docs.get(d));
-      auc.execute(false);
       context.invalidate();
 
-      // delete binary resources
-      final IOFile bin = data.meta.binary(target);
-      if(bin != null && bin.exists()) {
-        size += bin.isDir() ? bin.descendants().size() : 1;
-        bin.delete();
+      // delete XML documents
+      final IntList docs = data.resources.docs(target);
+      int size = docs.size();
+      if(size != 0) {
+        final AtomicUpdateCache auc = new AtomicUpdateCache(data);
+        for(int d = 0; d < size; d++) auc.addDelete(docs.get(d));
+        auc.execute(false);
+      }
+
+      // delete file resources
+      for(final ResourceType type : Resources.BINARIES) {
+        final IOFile bin = data.meta.file(target, type);
+        if(bin != null && bin.exists()) {
+          size += bin.isDir() ? bin.descendants().size() : 1;
+          bin.delete();
+        }
       }
       return info(RES_DELETED_X_X, size, jc().performance);
     });

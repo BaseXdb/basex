@@ -1,6 +1,6 @@
 package org.basex.gui.layout;
 
-import org.basex.core.*;
+import org.basex.data.*;
 
 /**
  * JTree node which represents the root folder. The root folder carries
@@ -16,11 +16,11 @@ public final class ResourceRootFolder extends ResourceFolder {
    * @param name name
    * @param path path
    * @param tree tree reference
-   * @param context database context
+   * @param data database reference
    */
   public ResourceRootFolder(final byte[] name, final byte[] path, final BaseXTree tree,
-      final Context context) {
-    super(name, path, tree, context);
+      final Data data) {
+    super(name, path, tree, data);
   }
 
   @Override

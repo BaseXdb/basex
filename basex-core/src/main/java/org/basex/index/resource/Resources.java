@@ -20,6 +20,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Resources implements Index {
+  /** Binary resource types. */
+  public static final ResourceType[] BINARIES = { ResourceType.BINARY, ResourceType.VALUE };
   /** Document references. */
   private final Docs docs;
   /** Binary files. */
@@ -116,12 +118,13 @@ public final class Resources implements Index {
   }
 
   /**
-   * Returns the database paths to all binary resources that start with the specified path.
+   * Returns the database paths to all file resources that start with the specified path.
+   * @param type resource type
    * @param path input path
-   * @return database paths of binary resources
+   * @return paths
    */
-  public synchronized TokenList binaryPaths(final String path) {
-    return bins.paths(path);
+  public synchronized TokenList paths(final String path, final ResourceType type) {
+    return bins.paths(path, type);
   }
 
   /**
@@ -129,21 +132,22 @@ public final class Resources implements Index {
    * @param path given path
    * @return result of check
    */
-  public synchronized boolean isDir(final byte[] path) {
-    return docs.isDir(path) || bins.isDir(Token.string(path));
+  public synchronized boolean isDir(final String path) {
+    return docs.isDir(path) || bins.isDir(path, ResourceType.BINARY) ||
+        bins.isDir(path, ResourceType.VALUE);
   }
 
   /**
    * Returns the child resources for the given path.
    * @param path path
    * @param dir returns directories
-   * @return paths with binary flags
+   * @return paths with resource types
    */
-  public synchronized TokenBoolMap children(final String path, final boolean dir) {
-    final TokenBoolMap tbm = new TokenBoolMap();
-    docs.children(path, dir, tbm);
-    bins.children(path, dir, tbm);
-    return tbm;
+  public synchronized TokenObjMap<ResourceType> children(final String path, final boolean dir) {
+    final TokenObjMap<ResourceType> map = new TokenObjMap<>();
+    docs.children(path, dir, map);
+    bins.children(path, dir, map);
+    return map;
   }
 
   // Inherited methods ============================================================================

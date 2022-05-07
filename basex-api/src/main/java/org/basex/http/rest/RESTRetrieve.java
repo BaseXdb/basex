@@ -37,7 +37,7 @@ final class RESTRetrieve extends RESTCmd {
     final SerializerOptions sopts = conn.sopts();
     if(run(query(_DB_EXISTS)).equals(Text.TRUE)) {
       // return database resource
-      final boolean binary = run(query(_DB_IS_RAW)).equals(Text.TRUE);
+      final boolean binary = !run(query(_DB_TYPE)).equals(string(XML));
       if(binary) sopts.set(SerializerOptions.MEDIA_TYPE, run(query(_DB_CONTENT_TYPE)));
       conn.initResponse();
 

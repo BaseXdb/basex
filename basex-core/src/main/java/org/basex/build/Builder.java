@@ -11,6 +11,7 @@ import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.index.name.*;
 import org.basex.index.path.*;
+import org.basex.index.resource.*;
 import org.basex.index.stats.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -54,8 +55,8 @@ public abstract class Builder extends Job {
   /** Current tree height. */
   private int level;
 
-  /** Optional path to binary files. */
-  private IOFile binaryDir;
+  /** Optional path to binary resources. */
+  private IOFile binariesDir;
 
   /**
    * Constructor.
@@ -90,12 +91,10 @@ public abstract class Builder extends Job {
   /**
    * Sets the path to the binary database files. The path might differ from the actual database path
    * if XML data is written to a temporary instance.
-   * @param dir database directory (can be {@code null})
-   * @return self reference
+   * @param dbpath database path (can be {@code null})
    */
-  public final Builder binaryDir(final IOFile dir) {
-    if(dir != null) binaryDir = new IOFile(dir, IO.RAW);
-    return this;
+  public final void binariesDir(final IOFile dbpath) {
+    if(dbpath != null) binariesDir = ResourceType.BINARY.dir(dbpath);
   }
 
   /**
@@ -200,7 +199,7 @@ public abstract class Builder extends Job {
    * @throws IOException I/O exception
    */
   public final void binary(final String target, final IO data) throws IOException {
-    Store.store(data.inputSource(), new IOFile(binaryDir, target));
+    Store.store(data.inputSource(), new IOFile(binariesDir, target));
   }
 
   // PROGRESS INFORMATION =========================================================================

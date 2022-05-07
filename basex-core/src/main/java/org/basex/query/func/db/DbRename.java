@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.core.cmd.*;
 import org.basex.data.*;
+import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.up.*;
@@ -26,6 +27,7 @@ public final class DbRename extends DbAccess {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
     final String source = toDbPath(1, qc), target = toDbPath(2, qc);
+
     if(!(Prop.CASE ? source.equals(target) : source.equalsIgnoreCase(target))) {
       // rename XML resources
       final Updates updates = qc.updates();
@@ -37,11 +39,13 @@ public final class DbRename extends DbAccess {
         if(trg.isEmpty() || Strings.endsWith(trg, '/')) throw DB_PATH_X.get(info, trg);
         updates.add(new ReplaceValue(pre, data, info, token(trg)), qc);
       }
-      // rename binary resources
-      final IOFile src = data.meta.binary(source), trg = data.meta.binary(target);
-      if(src != null && trg != null) {
-        rename(data, src, trg, qc);
-        updates.add(new DBDelete(data, src, info), qc);
+      // rename file resources
+      for(final ResourceType type : Resources.BINARIES) {
+        final IOFile src = data.meta.file(source, type), trg = data.meta.file(target, type);
+        if(src != null && trg != null) {
+          rename(data, src, trg, qc);
+          updates.add(new DBDelete(data, src, info), qc);
+        }
       }
     }
     return Empty.VALUE;

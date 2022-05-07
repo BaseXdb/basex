@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.core.users.*;
 import org.basex.data.*;
+import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -47,6 +48,7 @@ public final class Rename extends ACreate {
     boolean ok = true;
     int c = 0;
     if(!(Prop.CASE ? src.equals(trg) : src.equalsIgnoreCase(trg))) {
+      // rename XML documents
       final IntList docs = data.resources.docs(src);
       final int ds = docs.size();
       for(int i = 0; i < ds; i++) {
@@ -60,13 +62,14 @@ public final class Rename extends ACreate {
         }
       }
 
-      final IOFile source = data.meta.binary(src);
-      if(source != null && source.exists()) {
-        final IOFile target = data.meta.binary(trg), trgdir = target.parent();
-        if(!trgdir.md() || !source.rename(target)) {
-          ok = !info(NAME_INVALID_X, trg);
+      // rename file resources
+      for(final ResourceType type : Resources.BINARIES) {
+        final IOFile source = data.meta.file(src, type);
+        if(source != null && source.exists()) {
+          final IOFile target = data.meta.file(trg, type), trgdir = target.parent();
+          if(!trgdir.md() || !source.rename(target)) ok = !info(NAME_INVALID_X, trg);
+          c++;
         }
-        c++;
       }
     }
     // return info message

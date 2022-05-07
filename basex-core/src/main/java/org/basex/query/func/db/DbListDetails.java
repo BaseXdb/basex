@@ -8,13 +8,13 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
+import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.http.*;
 import org.basex.util.list.*;
 
 /**
@@ -53,8 +53,9 @@ public final class DbListDetails extends DbList {
         try {
           meta.read();
           // count number of binary files
-          final int binary = meta.binaryDir().descendants().size();
-          database.add(RESOURCES, token(meta.ndocs + binary));
+          final int binaries = meta.dir(ResourceType.BINARY).descendants().size();
+          final int values = meta.dir(ResourceType.VALUE).descendants().size();
+          database.add(RESOURCES, token(meta.ndocs + binaries + values));
           database.add(MODIFIED_DATE, DateTime.format(new Date(meta.dbTime())));
           database.add(SIZE, token(meta.dbSize()));
           if(ctx.perm(Perm.CREATE, name)) database.add(PATH, meta.original);
@@ -76,24 +77,33 @@ public final class DbListDetails extends DbList {
   private Iter resources(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
+
     final IntList docs = data.resources.docs(path);
-    final TokenList binaries = data.resources.binaryPaths(path);
-    final int ds = docs.size(), size = ds + binaries.size();
+    final TokenList binaries = data.resources.paths(path, ResourceType.BINARY);
+    final TokenList values = data.resources.paths(path, ResourceType.VALUE);
+    final int ds = docs.size(), bs = ds + binaries.size(), size = bs + values.size();
     return new BasicIter<FNode>(size) {
       @Override
       public FNode get(final long i) {
+        if(i >= size) return null;
+        final ResourceType type;
+        final String pt;
+        final long mdate, sz;
         if(i < ds) {
           final int pre = docs.get((int) i);
-          final String pt = string(data.text(pre, true));
-          final int sz = data.size(pre, Data.DOC);
-          return resource(pt, false, MediaType.APPLICATION_XML, data.meta.time, (long) sz);
+          type = ResourceType.XML;
+          pt = string(data.text(pre, true));
+          mdate = data.meta.time;
+          sz = data.size(pre, Data.DOC);
+        } else {
+          type = i >= bs ? ResourceType.VALUE : ResourceType.BINARY;
+          pt = string(type == ResourceType.VALUE ? values.get((int) i - bs) :
+            binaries.get((int) i - ds));
+          final IOFile bin = new IOFile(data.meta.dir(type), pt);
+          mdate = bin.timeStamp();
+          sz = bin.length();
         }
-        if(i < size) {
-          final String pt = string(binaries.get((int) i - ds));
-          final IOFile bin = data.meta.binary(pt);
-          return resource(pt, true, MediaType.get(bin.path()), bin.timeStamp(), bin.length());
-        }
-        return null;
+        return resource(pt, mdate, sz, type);
       }
     };
   }

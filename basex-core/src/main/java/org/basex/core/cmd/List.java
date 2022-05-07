@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 
@@ -12,7 +11,6 @@ import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.basex.util.http.*;
 import org.basex.util.list.*;
 
 /**
@@ -83,8 +81,8 @@ public final class List extends Command {
         meta.read();
         dbsize = meta.dbSize();
         file = meta.original;
-        // add number of binary resources
-        count = meta.ndocs + meta.binaryDir().descendants().size();
+        count = meta.ndocs + meta.dir(ResourceType.BINARY).descendants().size() +
+            meta.dir(ResourceType.VALUE).descendants().size();
       } catch(final IOException ex) {
         Util.debug(ex);
         file = ERROR;
@@ -119,29 +117,23 @@ public final class List extends Command {
     table.header.add(SIZE);
 
     try {
-      // add xml documents
+      // list xml documents
       final Data data = Open.open(db, context, options);
       final Resources resources = data.resources;
-      final IntList il = resources.docs(path);
-      final int ds = il.size();
-      for(int i = 0; i < ds; i++) {
-        final int pre = il.get(i);
-        final TokenList tl = new TokenList(4);
-        tl.add(data.text(pre, true));
-        tl.add(XML);
-        tl.add(MediaType.APPLICATION_XML.toString());
-        tl.add(data.size(pre, Data.DOC));
-        table.contents.add(tl);
+      final IntList docs = resources.docs(path);
+      final int ds = docs.size();
+      for(int d = 0; d < ds; d++) {
+        final int pre = docs.get(d);
+        final ResourceType type = ResourceType.XML;
+        add(table, type, Token.string(data.text(pre, true)), data.size(pre, Data.DOC));
       }
-      // add binary resources
-      for(final byte[] file : resources.binaryPaths(path)) {
-        final String bin = string(file);
-        final TokenList tl = new TokenList(4);
-        tl.add(file);
-        tl.add(IO.RAW);
-        tl.add(MediaType.get(bin).toString());
-        tl.add(data.meta.binary(bin).length());
-        table.contents.add(tl);
+      // list file resources
+      for(final ResourceType type : Resources.BINARIES) {
+        final IOFile bin = data.meta.dir(type);
+        for(final byte[] pt : resources.paths(path, type)) {
+          final String string = Token.string(pt);
+          add(table, type, string, new IOFile(bin, string).length());
+        }
       }
       Close.close(data, context);
     } catch(final IOException ex) {
@@ -149,5 +141,21 @@ public final class List extends Command {
     }
     out.println(table.sort().finish());
     return true;
+  }
+
+  /**
+   * Adds a table entry.
+   * @param table table
+   * @param type resource type
+   * @param path path to resource
+   * @param size size of resource
+   */
+  private void add(final Table table, final ResourceType type, final String path, final long size) {
+    final TokenList tl = new TokenList(4);
+    tl.add(type.path(path));
+    tl.add(type.toString());
+    tl.add(type.contentType(path).toString());
+    tl.add(size);
+    table.contents.add(tl);
   }
 }

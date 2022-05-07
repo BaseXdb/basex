@@ -8,6 +8,7 @@ import java.util.function.*;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
+import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.query.up.atomic.*;
 import org.basex.util.list.*;
@@ -50,7 +51,9 @@ public final class Replace extends ACreate {
     if(path == null) return error(PATH_INVALID_X, args[0]);
 
     final Data data = context.data();
-    return update(data, () -> replace(data, data.meta.binary(path), path));
+    final IOFile bin = data.meta.file(path, ResourceType.BINARY);
+
+    return update(data, () -> replace(data, bin, path));
   }
 
   /**

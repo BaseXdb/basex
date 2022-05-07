@@ -6,12 +6,12 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.data.*;
+import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.util.*;
-import org.basex.util.http.*;
 import org.basex.util.list.*;
 
 /**
@@ -41,36 +41,35 @@ public final class DbDir extends DbList {
    */
   private Value resources(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    byte[] path = toToken(exprs[1], qc);
-    String root = MetaData.normPath(string(path));
-    if(root == null) throw DB_PATH_X.get(info, path);
+    final byte[] token = toToken(exprs[1], qc);
 
-    if(!root.isEmpty() && !Strings.endsWith(root, '/')) root += '/';
-    path = token(root);
+    String path = MetaData.normPath(string(token));
+    if(path == null) throw DB_PATH_X.get(info, token);
+    if(!path.isEmpty() && !Strings.endsWith(path, '/')) path += '/';
 
     final ValueBuilder vb = new ValueBuilder(qc);
     final HashSet<String> set = new HashSet<>();
 
-    final IntList docs = data.resources.docs(root, false);
+    // list XML resources
+    final IntList docs = data.resources.docs(path, false);
     final int ds = docs.size();
     for(int d = 0; d < ds; d++) {
-      String np = string(data.text(docs.get(d), true)).substring(path.length);
-      final int i = np.indexOf('/');
+      String pt = string(substring(data.text(docs.get(d), true), path.length()));
+      final int i = pt.indexOf('/');
       final boolean dir = i >= 0;
-      if(dir) np = np.substring(0, i);
-      if(set.add(np)) {
-        vb.add(dir ? dir(np, data.meta.time) :
-          resource(np, false, MediaType.APPLICATION_XML, data.meta.time, null));
-      }
+      if(dir) pt = pt.substring(0, i);
+      if(set.add(pt)) vb.add(dir ? dir(pt, data.meta.time) :
+        resource(pt, data.meta.time, null, ResourceType.XML));
     }
 
-    final IOFile bin = data.meta.binary(string(path));
-    if(bin != null) {
-      for(final IOFile io : bin.children()) {
-        final String np = io.name();
-        if(set.add(np)) {
-          vb.add(io.isDir() ? dir(np, io.timeStamp()) :
-            resource(np, true, MediaType.get(io.path()), io.timeStamp(), io.length()));
+    // list file resources
+    for(final ResourceType type : Resources.BINARIES) {
+      final IOFile bin = data.meta.file(path, type);
+      if(bin != null) {
+        for(final IOFile child : bin.children()) {
+          final String pt = child.name();
+          if(set.add(pt)) vb.add(child.isDir() ? dir(pt, child.timeStamp()) :
+            resource(pt, child.timeStamp(), child.length(), type));
         }
       }
     }

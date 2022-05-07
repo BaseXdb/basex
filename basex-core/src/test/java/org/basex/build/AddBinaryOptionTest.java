@@ -59,9 +59,11 @@ public final class AddBinaryOptionTest extends SandboxTest {
   private static void assertAllFilesExist() {
     final StringList files = new StringList(query(Function._DB_LIST.args(NAME)).split(Prop.NL));
     assertFalse(files.isEmpty(), "No files were imported");
+    final StringBuilder sb = new StringBuilder();
     for(final String name : FILES) {
-      assertTrue(files.contains(name), "File " + name + " is not imported");
+      if(!files.contains(name)) sb.append("\n- " + name);
     }
+    if(sb.length() != 0) fail(FILES.size() + " files expected, missing: " + sb);
     assertEquals(FILES.size(), files.size(), "Expected number of imported files is different");
   }
 }

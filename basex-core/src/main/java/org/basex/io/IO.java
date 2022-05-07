@@ -57,8 +57,6 @@ public abstract class IO {
   public static final String LOGSUFFIX = ".log";
   /** Ignore suffix. */
   public static final String IGNORESUFFIX = ".ignore";
-  /** Directory for binary files. */
-  public static final String RAW = "raw";
   /** File prefix. */
   public static final String FILEPREF = "file:/";
 

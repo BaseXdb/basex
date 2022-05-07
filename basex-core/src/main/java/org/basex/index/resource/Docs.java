@@ -229,9 +229,8 @@ final class Docs {
     final IntList docs = docs();
     if(desc && pth.isEmpty()) return docs;
 
-    // normalize paths
+    // normalize paths, check for explicit directory indicator
     byte[] exact = EMPTY, prefix = normalize(token(pth));
-    // check for explicit directory indicator
     if(!(pth.isEmpty() || Strings.endsWith(pth, '/'))) {
       exact = prefix;
       prefix = concat(exact, SLASH);
@@ -274,7 +273,7 @@ final class Docs {
    * @param path given path (will be normalized by adding a trailing slash)
    * @return path to a directory or not
    */
-  synchronized boolean isDir(final byte[] path) {
+  synchronized boolean isDir(final String path) {
     final byte[] pref = concat(path, SLASH);
     for(final byte[] pth : paths()) {
       if(startsWith(pth, pref)) return true;
@@ -286,9 +285,11 @@ final class Docs {
    * Adds the database paths for the child documents of the given path to the given map.
    * @param path path
    * @param dir returns directories instead of files
-   * @param tbm map; values will be {@code false} to indicate documents
+   * @param map map with resource types
    */
-  synchronized void children(final String path, final boolean dir, final TokenBoolMap tbm) {
+  synchronized void children(final String path, final boolean dir,
+      final TokenObjMap<ResourceType> map) {
+
     final String pth = MetaData.normPath(path);
     if(pth == null) return;
 
@@ -304,8 +305,8 @@ final class Docs {
         np = substring(np, root.length, np.length);
         final int i = indexOf(np, SLASH);
         // no more slashes means this must be a leaf
-        if(!dir && i == -1) tbm.put(np, false);
-        else if(dir && i >= 0) tbm.put(substring(np, 0, i), false);
+        if(!dir && i == -1) map.put(np, ResourceType.XML);
+        else if(dir && i >= 0) map.put(substring(np, 0, i), ResourceType.XML);
       }
     }
   }

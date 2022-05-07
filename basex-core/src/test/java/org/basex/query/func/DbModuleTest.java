@@ -423,20 +423,28 @@ public final class DbModuleTest extends QueryPlanTest {
     final Function func = _DB_DIR;
     query(_DB_ADD.args(NAME, " <a/>", "xml/doc.xml"));
     query(_DB_STORE.args(NAME, "binary/binary.data", "bla"));
+    query(_DB_PUT.args(NAME, "value/value.data", " 1 to 5"));
 
     String call = func.args(NAME, "xml");
-    query(call + "/@raw/data()", false);
+    query(call + "/@type/data()", "xml");
     query(call + "/@content-type/data()", MediaType.APPLICATION_XML.toString());
     query(call + "/@modified-date/xs:dateTime(.)");
     query(call + "/@size/data()", "");
     query(call + "/text()", "doc.xml");
 
     call = func.args(NAME, "binary/");
-    query(call + "/@raw/data()", true);
+    query(call + "/@type/data()", "binary");
     query(call + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
     query(call + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", true);
     query(call + "/@size/data()", 3);
     query(call + "/text()", "binary.data");
+
+    call = func.args(NAME, "value/");
+    query(call + "/@type/data()", "value");
+    query(call + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
+    query(call + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", true);
+    query(call + "/@size/data()", 6);
+    query(call + "/text()", "value.data");
 
     query(func.args(NAME, "test"), "");
     error(func.args("notAvailable", ""), DB_OPEN2_X);
@@ -518,30 +526,17 @@ public final class DbModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void get() {
+    final Function func = _DB_GET;
+    query("(0 to 5) !" + _DB_PUT.args(NAME, " 'value' || .", " ."), "");
+    query("(0 to 5) !" + func.args(NAME, " 'value' || ."), "0\n1\n2\n3\n4\n5");
+  }
+
+  /** Test method. */
   @Test public void info() {
     final Function func = _DB_INFO;
     query("count(" + func.args(NAME) + "//" +
         SIZE.replaceAll("[- ]", "").toLowerCase(Locale.ENGLISH) + ')', 1);
-  }
-
-  /** Test method. */
-  @Test public void isRaw() {
-    final Function func = _DB_IS_RAW;
-    query(_DB_ADD.args(NAME, " <a/>", "xml"));
-    query(_DB_STORE.args(NAME, "binary", "bla"));
-    query(func.args(NAME, "xml"), false);
-    query(func.args(NAME, "binary"), true);
-    query(func.args(NAME, "xxx"), false);
-  }
-
-  /** Test method. */
-  @Test public void isXML() {
-    final Function func = _DB_IS_XML;
-    query(_DB_ADD.args(NAME, " <a/>", "xml"));
-    query(_DB_STORE.args(NAME, "binary", "bla"));
-    query(func.args(NAME, "xml"), true);
-    query(func.args(NAME, "binary"), false);
-    query(func.args(NAME, "xxx"), false);
   }
 
   /** Test method. */
@@ -556,6 +551,9 @@ public final class DbModuleTest extends QueryPlanTest {
     query(_DB_STORE.args(NAME, "bin/b", "b"));
     query(func.args(NAME, "bin/"), "bin/b");
     query(func.args(NAME, "bin/b"), "bin/b");
+
+    query(_DB_PUT.args(NAME, "value/value.data", " 1 to 5"));
+    query(func.args(NAME, "value/"), "value/value.data");
 
     // create two other database and compare substring
     execute(new CreateDB(NAME + 1));
@@ -572,20 +570,28 @@ public final class DbModuleTest extends QueryPlanTest {
 
     query(_DB_ADD.args(NAME, " <a/>", "xml/xml.xml"));
     query(_DB_STORE.args(NAME, "binary/binary.data", "bla"));
+    query(_DB_PUT.args(NAME, "value/value.data", " 1 to 5"));
 
     String call = func.args(NAME, "xml/");
-    query(call + "/@raw/data()", false);
+    query(call + "/@type/data()", "xml");
     query(call + "/@content-type/data()", MediaType.APPLICATION_XML.toString());
     query(call + "/@modified-date/xs:dateTime(.)");
     query(call + "/@size/data()", 2);
     query(call + "/text()", "xml/xml.xml");
 
     call = func.args(NAME, "binary/");
-    query(call + "/@raw/data()", true);
+    query(call + "/@type/data()", "binary");
     query(call + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
     query(call + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", true);
     query(call + "/@size/data()", 3);
     query(call + "/text()", "binary/binary.data");
+
+    call = func.args(NAME, "value/");
+    query(call + "/@type/data()", "value");
+    query(call + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
+    query(call + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", true);
+    query(call + "/@size/data()", 6);
+    query(call + "/text()", "value/value.data");
 
     query(func.args(NAME, "test"), "");
     error(func.args("notAvailable"), DB_OPEN2_X);
@@ -880,6 +886,20 @@ public final class DbModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void put() {
+    final Function func = _DB_PUT;
+    query(func.args(NAME, "value1", "a"));
+    query(func.args(NAME, "value2", " 1 to 2"));
+    query(_DB_GET.args(NAME, "value1"), "a");
+    query(_DB_GET.args(NAME, "value2"), "1\n2");
+    query(func.args(NAME, "value2", 1));
+    query(_DB_GET.args(NAME, "value2"), 1);
+
+    error(func.args(NAME, "value/x", "x") + ", " + func.args(NAME, "value//x", "x"),
+        DB_CONFLICT5_X);
+  }
+
+  /** Test method. */
   @Test public void store() {
     final Function func = _DB_STORE;
     query(func.args(NAME, "binary1", "xs:hexBinary('41')"));
@@ -933,6 +953,15 @@ public final class DbModuleTest extends QueryPlanTest {
     query("data(" + func.args(NAME, "0", "id") + ")", 0);
     query("data(" + func.args(NAME, "0", "XXX") + ")", "");
     query("data(" + func.args(NAME, "XXX") + ")", "");
+  }
+
+  /** Test method. */
+  @Test public void type() {
+    final Function func = _DB_TYPE;
+    query(_DB_ADD.args(NAME, " <a/>", "xml.xml"));
+    query(_DB_STORE.args(NAME, "bla.bin", "bla"));
+    query(func.args(NAME, "xml.xml"), "xml");
+    query(func.args(NAME, "bla.bin"), "binary");
   }
 
   /**

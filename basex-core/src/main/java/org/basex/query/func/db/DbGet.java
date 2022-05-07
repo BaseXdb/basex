@@ -2,12 +2,15 @@ package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
 
+import java.io.*;
+
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
+import org.basex.io.in.DataInput;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
-import org.basex.util.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -15,15 +18,20 @@ import org.basex.util.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class DbRetrieve extends DbAccess {
+public final class DbGet extends DbAccess {
   @Override
-  public B64Lazy item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final String path = toDbPath(1, qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
 
-    final IOFile bin = data.meta.file(path, ResourceType.BINARY);
+    final IOFile bin = data.meta.file(path, ResourceType.VALUE);
     if(!bin.exists() || bin.isDir()) throw WHICHRES_X.get(info, path);
-    return new B64Lazy(bin, IOERR_X);
+
+    try(DataInput in = new DataInput(bin)) {
+      return Cache.read(in, qc);
+    } catch(final IOException ex) {
+      throw IOERR_X.get(info, ex);
+    }
   }
 }

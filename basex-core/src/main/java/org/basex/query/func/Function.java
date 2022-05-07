@@ -1005,14 +1005,11 @@ public enum Function implements AFunction {
   _DB_FLUSH(DbFlush::new, "flush(database)",
       params(ITEM_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
+  _DB_GET(DbGet::new, "get(database,path)",
+      params(STRING_O, STRING_O), ITEM_ZM, flag(NDT), DB_URI),
+  /** XQuery function. */
   _DB_INFO(DbInfo::new, "info(database)",
       params(STRING_O), STRING_O, DB_URI),
-  /** XQuery function. */
-  _DB_IS_RAW(DbIsRaw::new, "is-raw(database,path)",
-      params(STRING_O, STRING_O), BOOLEAN_O, DB_URI),
-  /** XQuery function. */
-  _DB_IS_XML(DbIsXml::new, "is-xml(database,path)",
-      params(STRING_O, STRING_O), BOOLEAN_O, DB_URI),
   /** XQuery function. */
   _DB_LIST(DbList::new, "list([database[,path]])",
       params(STRING_O, STRING_O), STRING_ZM, flag(NDT), DB_URI),
@@ -1050,6 +1047,9 @@ public enum Function implements AFunction {
   _DB_PROPERTY(DbProperty::new, "property(database,name)",
       params(STRING_O, STRING_O), ANY_ATOMIC_TYPE_O, DB_URI),
   /** XQuery function. */
+  _DB_PUT(DbPut::new, "put(database,name,input)",
+      params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+  /** XQuery function. */
   _DB_RENAME(DbRename::new, "rename(database,path,new-path)",
       params(STRING_O, STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
@@ -1076,6 +1076,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _DB_TOKEN(DbToken::new, "token(database,strings[,name])",
       params(STRING_O, ITEM_ZM, STRING_O), ATTRIBUTE_ZM, flag(NDT), DB_URI),
+  /** XQuery function. */
+  _DB_TYPE(DbType::new, "type(database,path)",
+      params(STRING_O, STRING_O), STRING_O, flag(NDT), DB_URI),
 
   // Fetch Module
 

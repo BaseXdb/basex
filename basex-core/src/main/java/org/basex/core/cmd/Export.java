@@ -9,6 +9,7 @@ import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
+import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -84,25 +85,23 @@ public final class Export extends Command {
     final IOFile root = new IOFile(path);
     root.md();
 
-    // XML documents
+    // collect resources to be exported
     final IntList docs = data.resources.docs();
-    // binary resources
     final IOFile source;
     final StringList files;
     if(data.inMemory()) {
       source = null;
       files = new StringList();
     } else {
-      source = data.meta.binaryDir();
+      source = data.meta.dir(ResourceType.BINARY);
       files = source.descendants();
     }
-
     if(export != null) {
       export.progPos = 0;
       export.progSize = docs.size() + files.size();
     }
 
-    // XML documents
+    // export XML documents
     final HashSet<String> target = new HashSet<>();
     final int is = docs.size();
     for(int i = 0; i < is; i++) {
@@ -122,7 +121,6 @@ public final class Export extends Command {
           ser.serialize(new DBNode(data, pre));
         }
       }
-
       if(export != null) export.progPos++;
     }
 
@@ -134,7 +132,6 @@ public final class Export extends Command {
         export.progFile = io;
       }
       new IOFile(source, file).copyTo(unique(target, io.path()));
-
       if(export != null) export.progPos++;
     }
   }

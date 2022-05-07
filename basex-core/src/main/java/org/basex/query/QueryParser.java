@@ -3,6 +3,7 @@ package org.basex.query;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryText.DOLLAR;
+import static org.basex.query.QueryText.XQUERY;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 

@@ -168,7 +168,7 @@ final class WebDAVService {
       throws IOException {
 
     final WebDAVQuery query = new WebDAVQuery(
-      "if(" + _DB_IS_RAW.args(" $db", " $path") + ')' +
+      "if(" + _DB_TYPE.args(" $db", " $path") + " = 'binary')" +
       " then " + _DB_STORE.args(" $tdb", " $tpath", _DB_RETRIEVE.args(" $db", " $path")) +
       " else " + _DB_ADD.args(" $tdb", _DB_OPEN.args(" $db", " $path"), " $tpath"),
       "declare option db:chop 'false';");
@@ -193,7 +193,7 @@ final class WebDAVService {
     final WebDAVQuery query = new WebDAVQuery(
       "for $d in " + _DB_LIST.args(" $db", " $path") +
       "let $t := $tpath ||'/'|| substring($d, string-length($path) + 1) return " +
-      "if(" + _DB_IS_RAW.args(" $db", " $d") + ") " +
+      "if(" + _DB_TYPE.args(" $db", " $d") + " = 'binary') " +
       "then " + _DB_STORE.args(" $tdb", " $t", _DB_RETRIEVE.args(" $db", " $d")) +
       " else " + _DB_ADD.args(" $tdb", _DB_OPEN.args(" $db", " $d"), " $t"),
       "declare option db:chop 'false';");

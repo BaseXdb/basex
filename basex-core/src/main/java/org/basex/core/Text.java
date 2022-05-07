@@ -1053,8 +1053,6 @@ public interface Text {
   String COMMAND = lang("command");
   /** "Backup". */
   String BACKUP = lang("backup");
-  /** "XQuery". */
-  String XQUERY = "XQuery";
 
   /** Button text for deleting files. */
   String DROP = lang("drop");

@@ -7,6 +7,7 @@ import java.io.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
+import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 
@@ -33,7 +34,7 @@ public final class Retrieve extends ACreate {
     final Data data = context.data();
     if(data.inMemory()) return error(NO_MAINMEM);
 
-    final IOFile bin = data.meta.binary(path);
+    final IOFile bin = data.meta.file(path, ResourceType.BINARY);
     if(!bin.exists() || bin.isDir()) return error(RES_NOT_FOUND_X, path);
 
     try(BufferInput bi = BufferInput.get(bin)) {

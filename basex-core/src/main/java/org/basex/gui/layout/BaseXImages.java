@@ -10,6 +10,7 @@ import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.filechooser.*;
 
+import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
@@ -31,10 +32,12 @@ public final class BaseXImages {
   /** System icons. */
   private static final FileSystemView FS = FileSystemView.getFileSystemView();
 
-  /** Icon for xml files. */
+  /** Icon for XML resources. */
   private static final Icon DB_XML = icon("db_xml");
-  /** Icon for raw files. */
-  private static final Icon DB_RAW = icon("db_raw");
+  /** Icon for binary resources. */
+  private static final Icon DB_BIN = icon("db_bin");
+  /** Icon for value resources. */
+  private static final Icon DB_VAL = icon("db_val");
 
   /** Icon for closed directories. */
   private static final Icon DIR_CLOSED = icon("dir_closed");
@@ -94,11 +97,11 @@ public final class BaseXImages {
 
   /**
    * Returns an icon for the specified text.
-   * @param binary resource type
+   * @param type resource type
    * @return icon
    */
-  public static Icon resource(final boolean binary) {
-    return binary ? DB_RAW : DB_XML;
+  public static Icon resource(final ResourceType type) {
+    return type == ResourceType.XML ? DB_XML : type == ResourceType.BINARY ? DB_BIN : DB_VAL;
   }
 
   /**

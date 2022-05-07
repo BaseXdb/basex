@@ -2,6 +2,8 @@ package org.basex.data;
 
 import java.util.*;
 
+import org.basex.index.resource.*;
+import org.basex.io.*;
 import org.basex.util.*;
 
 /**
@@ -35,7 +37,16 @@ public enum MetaProp {
   BINARIES(false) {
     @Override
     public Integer value(final MetaData meta) {
-      return meta.dir != null ? meta.binaryDir().descendants().size() : 0;
+      final IOFile dir = meta.dir(ResourceType.BINARY);
+      return dir != null ? dir.descendants().size() : 0;
+    }
+  },
+  /** Property. */
+  VALUES(false) {
+    @Override
+    public Integer value(final MetaData meta) {
+      final IOFile dir = meta.dir(ResourceType.VALUE);
+      return dir != null ? dir.descendants().size() : 0;
     }
   },
   /** Property. */
@@ -167,7 +178,7 @@ public enum MetaProp {
   }
 
   /** Cached enums (faster). */
-  public static final MetaProp[] VALUES = values();
+  public static final MetaProp[] ENUMS = values();
 
   /**
    * Returns the value of a property.
@@ -182,7 +193,7 @@ public enum MetaProp {
    * @return permission, or {@code null} if no match is found
    */
   public static MetaProp get(final String name) {
-    for(final MetaProp prop : VALUES) {
+    for(final MetaProp prop : ENUMS) {
       if(prop.toString().toLowerCase(Locale.ENGLISH).equals(name)) return prop;
     }
     return null;

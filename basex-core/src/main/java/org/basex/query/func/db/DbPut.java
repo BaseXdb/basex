@@ -3,10 +3,11 @@ package org.basex.query.func.db;
 import static org.basex.query.QueryError.*;
 
 import org.basex.data.*;
-import org.basex.index.resource.*;
-import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.up.primitives.db.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -15,15 +16,16 @@ import org.basex.util.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class DbRetrieve extends DbAccess {
+public final class DbPut extends DbAccess {
   @Override
-  public B64Lazy item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
     final String path = toDbPath(1, qc);
+    final Value value = exprs[2].value(qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
+    if(path.isEmpty()) throw RESINV_X.get(info, path);
 
-    final IOFile bin = data.meta.file(path, ResourceType.BINARY);
-    if(!bin.exists() || bin.isDir()) throw WHICHRES_X.get(info, path);
-    return new B64Lazy(bin, IOERR_X);
+    qc.updates().add(new DBPut(data, path, value, info), qc);
+    return Empty.VALUE;
   }
 }

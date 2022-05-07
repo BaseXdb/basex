@@ -160,7 +160,7 @@ public abstract class SessionTest extends SandboxTest {
   @Test public final void store() throws IOException {
     session.execute("create db " + NAME);
     session.store("X", new ArrayInput("!"));
-    assertEqual("true", session.query(_DB_IS_RAW.args(NAME, "X")).execute());
+    assertEqual("binary", session.query(_DB_TYPE.args(NAME, "X")).execute());
     session.store("X", new ArrayInput(""));
     assertEqual("", session.query(_DB_RETRIEVE.args(NAME, "X")).execute());
     session.store("X", new ArrayInput(new byte[] { 0, 1, -1 }));

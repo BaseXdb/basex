@@ -15,6 +15,7 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.dialog.DialogInput.Action;
 import org.basex.gui.layout.*;
+import org.basex.index.resource.*;
 
 /**
  * Combination of a JTree and a text field. The tree visualizes the database contents.
@@ -58,10 +59,9 @@ final class DialogResources extends BaseXBack {
     tree.setCellRenderer(new TreeNodeRenderer());
 
     // add default children to tree
-    final Context context = dialog.gui.context;
-    final Data data = context.data();
+    final Data data = dialog.gui.context.data();
     final String label = data.meta.name + " (/)";
-    root = new ResourceRootFolder(token(label), token("/"), tree, context);
+    root = new ResourceRootFolder(token(label), token("/"), tree, data);
     ((DefaultTreeModel) tree.getModel()).insertNodeInto(root, rootNode, 0);
 
     filter = new BaseXButton(dialog, FILTER);
@@ -176,21 +176,23 @@ final class DialogResources extends BaseXBack {
 
     int cmax = ResourceFolder.MAXC;
     // check if there's a directory
-    // create a folder if there's either a binary or document folder
-    if(data.resources.isDir(filterPath)) {
-      root.add(new ResourceFolder(ResourceFolder.name(filterPath), ResourceFolder.path(filterPath),
-          tree, context));
+    // create a folder if there's either a files or document folder
+    if(data.resources.isDir(string(filterPath))) {
+      final byte[] name = ResourceFolder.name(filterPath), path = ResourceFolder.path(filterPath);
+      root.add(new ResourceFolder(name, path, tree, data));
       cmax--;
     }
 
     // now add the actual files (if there are any)
     final byte[] name = ResourceFolder.name(filterPath);
     final byte[] sub = ResourceFolder.path(filterPath);
-    cmax = new ResourceFolder(ResourceFolder.name(sub), ResourceFolder.path(sub), tree, context).
+    cmax = new ResourceFolder(ResourceFolder.name(sub), ResourceFolder.path(sub), tree, data).
         addLeaves(name, cmax, root);
 
     // add dummy node if maximum number of nodes is exceeded
-    if(cmax <= 0) root.add(new ResourceLeaf(token(DOTS), sub, false, true, tree, context));
+    if(cmax <= 0) {
+      root.add(new ResourceLeaf(token(DOTS), sub, ResourceType.XML, true, tree, data));
+    }
 
     ((DefaultTreeModel) tree.getModel()).nodeStructureChanged(root);
   }
@@ -236,7 +238,7 @@ final class DialogResources extends BaseXBack {
         final boolean focus) {
 
       super.getTreeCellRendererComponent(tree, val, sel, exp, leaf, row, focus);
-      if(leaf) setIcon(BaseXImages.resource(((ResourceLeaf) val).binary));
+      if(leaf) setIcon(BaseXImages.resource(((ResourceLeaf) val).type));
       return this;
     }
   }

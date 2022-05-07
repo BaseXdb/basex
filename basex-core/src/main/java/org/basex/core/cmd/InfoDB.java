@@ -52,6 +52,7 @@ public final class InfoDB extends AInfo {
     info(tb, MetaProp.NODES, meta);
     info(tb, MetaProp.DOCUMENTS, meta);
     info(tb, MetaProp.BINARIES, meta);
+    info(tb, MetaProp.VALUES, meta);
     info(tb, MetaProp.TIMESTAMP, meta);
     info(tb, MetaProp.UPTODATE, meta);
     if(meta.corrupt) tb.add(' ' + DB_CORRUPT + NL);
@@ -66,7 +67,7 @@ public final class InfoDB extends AInfo {
       if(meta.oldindex()) {
         tb.add(' ' + H_INDEX_FORMAT + NL);
       } else {
-        for(final MetaProp prop : MetaProp.VALUES) {
+        for(final MetaProp prop : MetaProp.ENUMS) {
           if(prop.index) info(tb, prop, meta);
         }
       }

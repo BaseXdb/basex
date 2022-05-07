@@ -3,6 +3,7 @@ package org.basex.query.func.db;
 import static org.basex.query.QueryError.*;
 
 import org.basex.data.*;
+import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -23,12 +24,11 @@ public final class DbExists extends DbAccess {
       if(exprs.length == 1) return Bln.TRUE;
       final String path = toDbPath(1, qc);
 
-      boolean exists = false;
-      final IOFile bin = data.meta.binary(path);
-      exists = bin != null && bin.exists() && !bin.isDir();
-
-      if(!exists) exists = data.resources.doc(path) != -1;
-      return Bln.get(exists);
+      final Checks<ResourceType> exists = type -> {
+        final IOFile bin = data.meta.file(path, type);
+        return bin != null && bin.exists() && !bin.isDir();
+      };
+      return Bln.get(data.resources.doc(path) != -1 || exists.any(Resources.BINARIES));
     } catch(final QueryException ex) {
       if(ex.error() == DB_OPEN2_X) return Bln.FALSE;
       throw ex;

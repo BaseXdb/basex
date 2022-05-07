@@ -10,6 +10,7 @@ import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.index.*;
+import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
@@ -24,9 +25,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class MetaData {
-  /** Database directory. Set to {@code null} if database is in main memory. */
-  public final IOFile dir;
-
   /** Database name. */
   public String name;
 
@@ -101,6 +99,8 @@ public final class MetaData {
   /** Last (highest) id assigned to a node. Can be {@code -1} if database is empty. */
   public int lastid = -1;
 
+  /** Database directory. Set to {@code null} if database is in main memory. */
+  private final IOFile dir;
   /** Flag for out-of-date indexes. */
   private boolean oldindex;
 
@@ -258,7 +258,7 @@ public final class MetaData {
   }
 
   /**
-   * Returns a file instance for the specified database file.
+   * Returns a database file for the specified filename.
    * Should only be called if database is disk-based.
    * @param filename filename
    * @return database filename
@@ -268,11 +268,29 @@ public final class MetaData {
   }
 
   /**
-   * Returns the binary directory.
-   * @return binary directory, or {@code null} if this is a main-memory database
+   * Returns a directory with file resources.
+   * @param type resource type
+   * @return directory, or {@code null} for XML type or if this is a main-memory database
    */
-  public IOFile binaryDir() {
-    return dir == null ? null : new IOFile(dir, IO.RAW);
+  public IOFile dir(final ResourceType type) {
+    return dir == null ? null : type.dir(dir);
+  }
+
+  /**
+   * Returns a path to the specified binary resource.
+   * @param path internal file path
+   * @param type resource type
+   * @return path, or {@code null} if this is a main-memory database
+   */
+  public IOFile file(final String path, final ResourceType type) {
+    if(dir != null) {
+      final IOFile bin = dir(type), file = new IOFile(bin, path);
+      if(file.path().startsWith(bin.path())) {
+        return type == ResourceType.VALUE && !file.isDir() ?
+          new IOFile(bin, path + IO.BASEXSUFFIX) : file;
+      }
+    }
+    return null;
   }
 
   /**
@@ -281,20 +299,6 @@ public final class MetaData {
    */
   public IOFile updateFile() {
     return dbFile(DATAUPD);
-  }
-
-  /**
-   * Returns a reference to the specified binary resource.
-   * @param path internal file path
-   * @return path, or {@code null} if this is a main-memory database or
-   *   if the resource path cannot be resolved (e.g. because it points to a parent directory).
-   */
-  public IOFile binary(final String path) {
-    if(dir != null) {
-      final IOFile bin = binaryDir(), file = new IOFile(bin, path);
-      if(file.path().startsWith(bin.path())) return file;
-    }
-    return null;
   }
 
   /**

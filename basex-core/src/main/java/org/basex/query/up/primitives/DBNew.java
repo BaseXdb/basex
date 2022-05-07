@@ -13,6 +13,8 @@ import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
+import org.basex.index.resource.*;
+import org.basex.index.resource.ResourceType;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
@@ -186,7 +188,8 @@ public final class DBNew {
     } else {
       builder = new MemBuilder(dbname, parser);
     }
-    return builder.binaryDir(sopts.dbPath(dbname)).build();
+    builder.binariesDir(sopts.dbPath(dbname));
+    return builder.build();
   }
 
   /**
@@ -198,16 +201,17 @@ public final class DBNew {
   private static void copy(final Data source, final Data target) throws IOException {
     // insert documents
     target.insert(target.meta.size, -1, new DataClip(source));
-    // move binary resources
-    final IOFile srcDir = source.meta.binaryDir(), trgDir = target.meta.binaryDir();
-    if(srcDir != null && srcDir.exists()) {
-      trgDir.md();
-      for(final String file : srcDir.descendants()) {
-        final IOFile srcFile = new IOFile(srcDir, file);
-        final IOFile trgFile = new IOFile(trgDir, file);
-        trgFile.delete();
-        trgFile.parent().md();
-        Files.move(Paths.get(srcFile.path()), Paths.get(trgFile.path()));
+    // move file resources
+    for(final ResourceType type : Resources.BINARIES) {
+      final IOFile srcDir = source.meta.dir(type), trgDir = target.meta.dir(type);
+      if(srcDir != null && srcDir.exists()) {
+        trgDir.md();
+        for(final String file : srcDir.descendants()) {
+          final IOFile srcFile = new IOFile(srcDir, file), trgFile = new IOFile(trgDir, file);
+          trgFile.delete();
+          trgFile.parent().md();
+          Files.move(Paths.get(srcFile.path()), Paths.get(trgFile.path()));
+        }
       }
     }
   }

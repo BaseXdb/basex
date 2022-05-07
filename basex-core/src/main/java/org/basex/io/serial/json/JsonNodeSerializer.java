@@ -1,6 +1,7 @@
 package org.basex.io.serial.json;
 
 import static org.basex.io.parse.json.JsonConstants.*;
+import static org.basex.io.parse.json.JsonConstants.VALUE;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 

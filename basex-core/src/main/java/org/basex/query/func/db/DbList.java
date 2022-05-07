@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.index.resource.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -16,7 +17,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.http.*;
 import org.basex.util.list.*;
 
 /**
@@ -34,10 +34,10 @@ public class DbList extends StandardFunc {
   static final String RESOURCES = "resources";
   /** Path. */
   static final String PATH = "path";
-  /** Raw. */
-  static final String RAW = "raw";
   /** Size. */
   static final String SIZE = "size";
+  /** Type. */
+  static final String TYPE = "type";
   /** Content type. */
   static final String CONTENT_TYPE = "content-type";
   /** Modified date. */
@@ -77,21 +77,29 @@ public class DbList extends StandardFunc {
   private Iter resources(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
-    final IntList docs = data.resources.docs(path);
-    final TokenList binaries = data.resources.binaryPaths(path);
-    final int ds = docs.size();
 
-    return new BasicIter<Str>(ds + binaries.size()) {
+    final IntList docs = data.resources.docs(path);
+    final TokenList binaries = data.resources.paths(path, ResourceType.BINARY);
+    final TokenList values = data.resources.paths(path, ResourceType.VALUE);
+    final int ds = docs.size(), bs = ds + binaries.size(), size = bs + values.size();
+
+    return new BasicIter<Str>(size) {
       @Override
       public Str get(final long i) {
-        return Str.get(i < ds ? data.text(docs.get((int) i), true) : binaries.get((int) i - ds));
+        return i < size ? Str.get(path((int) i)) : null;
       }
 
       @Override
       public Value value(final QueryContext q, final Expr expr) throws QueryException {
         final TokenList tl = new TokenList(Seq.initialCapacity(size));
-        for(int d = 0; d < ds; d++) tl.add(data.text(docs.get(d), true));
-        return StrSeq.get(tl.add(binaries));
+        for(int i = 0; i < size; i++) tl.add(path(i));
+        return StrSeq.get(tl);
+      }
+
+      private byte[] path(final int i) {
+        return i < ds ? data.text(docs.get(i), true) :
+               i < bs ? binaries.get(i - ds) :
+               Token.token(ResourceType.VALUE.path(Token.string(values.get(i - bs))));
       }
     };
   }
@@ -119,18 +127,17 @@ public class DbList extends StandardFunc {
   /**
    * Creates a resource element.
    * @param path path
-   * @param binary binary flag
-   * @param ct content type
    * @param mdate modified date
    * @param size size (can be {@code null})
+   * @param type resource type
    * @return resource node
    */
-  static FElem resource(final String path, final boolean binary, final MediaType ct,
-      final long mdate, final Long size) {
+  static FElem resource(final String path, final long mdate, final Long size,
+      final ResourceType type) {
 
-    final FElem resource = new FElem(RESOURCE).add(path);
-    resource.add(RAW, token(binary));
-    resource.add(CONTENT_TYPE, ct.toString());
+    final FElem resource = new FElem(RESOURCE).add(type.path(path));
+    resource.add(TYPE, type.toString());
+    resource.add(CONTENT_TYPE, type.contentType(path).toString());
     resource.add(MODIFIED_DATE, DateTime.format(new Date(mdate)));
     if(size != null) resource.add(SIZE, token(size));
     return resource;

@@ -3,6 +3,7 @@ package org.basex.query.func.db;
 import static org.basex.query.QueryError.*;
 
 import org.basex.data.*;
+import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.up.*;
@@ -34,22 +35,25 @@ public final class DbReplace extends DbNew {
     int d = 0;
 
     if(item instanceof Bin) {
+      // store binary resource
       if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
       updates.add(new DBStore(data, path, item, info), qc);
     } else {
-      final IOFile bin = data.meta.binary(path);
-      if(bin != null) {
-        if(bin.isDir()) throw DB_TARGET_X.get(info, path);
-        if(bin.exists()) updates.add(new DBDelete(data, bin, info), qc);
-      }
+      // store XML document: replace existing document or add new one
       final NewInput input = toNewInput(item, path);
       final Update update = docs.isEmpty() ?
         new DBAdd(data, input, opts, true, qc, info) :
         new ReplaceDoc(docs.get(d++), data, input, opts, qc, info);
       updates.add(update, qc);
+
+      // delete file resources
+      for(final ResourceType type : Resources.BINARIES) {
+        final IOFile bin = data.meta.file(path, type);
+        if(bin != null && bin.exists()) updates.add(new DBDelete(data, bin, info), qc);
+      }
     }
 
-    // delete old documents
+    // delete spare documents
     final int ds = docs.size();
     for(; d < ds; d++) updates.add(new DeleteNode(docs.get(d), data, info), qc);
     return Empty.VALUE;
