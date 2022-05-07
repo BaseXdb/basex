@@ -140,10 +140,22 @@ public final class NameTest extends Test {
   public Test intersect(final Test test) {
     if(test instanceof NameTest) {
       final NameTest nt = (NameTest) test;
-      return type == nt.type && qname.eq(nt.qname) ? this : null;
+      if(type == nt.type) {
+        if(part == nt.part || part == NamePart.FULL) {
+          if(nt.matches(qname)) return this;
+        } else if(nt.part == NamePart.FULL) {
+          return test.intersect(this);
+        } else {
+          final boolean lcl = part == NamePart.LOCAL;
+          final QNm qnm = new QNm(lcl ? local : nt.local, lcl ? nt.qname.uri() : qname.uri());
+          return new NameTest(qnm, NamePart.FULL, type, defaultNs);
+        }
+      }
+    } else if(test instanceof KindTest) {
+      if(type.instanceOf(test.type)) return this;
+    } else if(test instanceof UnionTest) {
+      return test.intersect(this);
     }
-    if(test instanceof KindTest) return type.instanceOf(test.type) ? this : null;
-    if(test instanceof UnionTest) return test.intersect(this);
     // DocTest, InvDocTest
     return null;
   }
