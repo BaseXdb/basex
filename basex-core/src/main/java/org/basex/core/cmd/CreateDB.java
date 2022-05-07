@@ -111,12 +111,9 @@ public final class CreateDB extends ACreate {
         data = context.data();
       }
 
-      if(!update(data, new Code() {
-        @Override
-        boolean run() throws IOException {
-          CreateIndex.create(data, CreateDB.this);
-          return info(parser.info() + DB_CREATED_X_X, name, jc().performance);
-        }
+      if(!update(data, () -> {
+        CreateIndex.create(data, CreateDB.this);
+        return info(parser.info() + DB_CREATED_X_X, name, jc().performance);
       })) return false;
 
       if(options.get(MainOptions.CREATEONLY)) Close.close(context);

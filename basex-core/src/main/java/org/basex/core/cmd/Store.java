@@ -60,12 +60,9 @@ public final class Store extends ACreate {
     if(path.isEmpty()) return error(PATH_INVALID_X, create ? path : args[0]);
 
     final IOFile bin = data.meta.binary(path);
-    return update(data, new Code() {
-      @Override
-      boolean run() throws IOException {
-        store(in, bin);
-        return info(QUERY_EXECUTED_X_X, "", jc().performance);
-      }
+    return update(data, () -> {
+      store(in, bin);
+      return info(QUERY_EXECUTED_X_X, "", jc().performance);
     });
   }
 

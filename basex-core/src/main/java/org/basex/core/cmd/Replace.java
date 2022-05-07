@@ -50,12 +50,7 @@ public final class Replace extends ACreate {
     if(path == null) return error(PATH_INVALID_X, args[0]);
 
     final Data data = context.data();
-    return update(data, new Code() {
-      @Override
-      boolean run() {
-        return replace(data, data.meta.binary(path), path);
-      }
-    });
+    return update(data, () -> replace(data, data.meta.binary(path), path));
   }
 
   /**

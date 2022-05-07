@@ -38,18 +38,15 @@ public final class Optimize extends ACreate {
     final MetaData meta = data.meta;
     size = meta.size;
 
-    return update(data, new Code() {
-      @Override
-      boolean run() throws IOException {
-        // reassign autooptimize flag
-        final boolean autooptimize = options.get(MainOptions.AUTOOPTIMIZE);
-        if(autooptimize != data.meta.autooptimize) {
-          data.meta.autooptimize = autooptimize;
-          data.meta.dirty = true;
-        }
-        optimize(data, Optimize.this);
-        return info(DB_OPTIMIZED_X, meta.name, jc().performance);
+    return update(data, () -> {
+      // reassign autooptimize flag
+      final boolean autooptimize = options.get(MainOptions.AUTOOPTIMIZE);
+      if(autooptimize != data.meta.autooptimize) {
+        data.meta.autooptimize = autooptimize;
+        data.meta.dirty = true;
       }
+      optimize(data, Optimize.this);
+      return info(DB_OPTIMIZED_X, meta.name, jc().performance);
     });
   }
 

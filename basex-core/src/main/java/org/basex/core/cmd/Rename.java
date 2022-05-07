@@ -33,12 +33,7 @@ public final class Rename extends ACreate {
     final String trg = MetaData.normPath(args[1]);
     if(trg == null) return error(NAME_INVALID_X, args[1]);
 
-    return update(data, new Code() {
-      @Override
-      boolean run() {
-        return rename(data, src, trg);
-      }
-    });
+    return update(data, () -> rename(data, src, trg));
   }
 
   /**

@@ -35,15 +35,12 @@ public final class OptimizeAll extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    if(!update(data, new Code() {
-      @Override
-      boolean run() throws IOException {
-        try {
-          optimizeAll(data, context, options, OptimizeAll.this);
-          return true;
-        } finally {
-          context.closeDB();
-        }
+    if(!update(data, () -> {
+      try {
+        optimizeAll(data, context, options, OptimizeAll.this);
+        return true;
+      } finally {
+        context.closeDB();
       }
     })) return false;
 

@@ -132,12 +132,12 @@ public abstract class ACreate extends Command {
    * @author BaseX Team 2005-22, BSD License
    * @author Christian Gruen
    */
-  abstract static class Code {
+  interface Code {
     /**
      * Runs the update.
      * @return success flag
      * @throws IOException I/O exception
      */
-    abstract boolean run() throws IOException;
+    boolean run() throws IOException;
   }
 }

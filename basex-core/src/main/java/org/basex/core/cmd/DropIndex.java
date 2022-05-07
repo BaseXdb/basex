@@ -48,12 +48,9 @@ public final class DropIndex extends ACreate {
     }
     data.meta.names(type, options);
 
-    return update(data, new Code() {
-      @Override
-      boolean run() throws IOException {
-        drop(type, data);
-        return info(INDEX_DROPPED_X_X, type, jc().performance);
-      }
+    return update(data, () -> {
+      drop(type, data);
+      return info(INDEX_DROPPED_X_X, type, jc().performance);
     });
   }
 
