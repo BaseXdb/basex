@@ -2342,11 +2342,11 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Accessing iterators with known result size. */
   @Test public void gh2029() {
     check("((1 to 1000000000000) ! string())[last()]", 1000000000000L,
-        root(_UTIL_LAST));
+        root(Str.class));
     check("((1 to 1000000000000) ! string())[position() = 999999999999]", 999999999999L,
-        root(_UTIL_ITEM));
+        root(Str.class));
     check("((1 to 1000000000000) ! string())[position() = last() - 999999999999]", 1,
-        root(HEAD));
+        root(Str.class));
 
     check("util:replicate(<x/>, <c>200000000000</c>)[last()]", "<x/>",
         root(_UTIL_LAST));
@@ -2820,5 +2820,17 @@ public final class RewritingsTest extends QueryPlanTest {
     query("<_><n/></_>/*    instance of element(n)   ", true);
     query("<_><n/></_>/*    instance of element(o)   ", false);
     query("<_><n/></_>/*    instance of element()    ", true);
+  }
+
+  /** Embed positional function calls in arguments. */
+  @Test public void gh2104() {
+    check("head((1 to 10) ! <_>{ . }</_>)", "<_>1</_>", root(CElem.class));
+    check("tail((1 to 3) ! (. * 10))", "20\n30", root(DualMap.class));
+    check("reverse((1 to 2) ! <_>{ . }</_>)", "<_>2</_>\n<_>1</_>", root(DualMap.class));
+    check("subsequence((1 to 6) ! (. * 2), 2, 2)", "4\n6", root(DualMap.class));
+
+    check("util:init((1 to 10)[. > 7] ! (. * .))", "64\n81", root(DualMap.class));
+    check("util:item((1 to 10)[. > 6] ! (. * .), 2)", 64, root(ItemMap.class));
+    check("util:last((1 to 10)[. > 5] ! (. * .))", 100, root(ItemMap.class));
   }
 }

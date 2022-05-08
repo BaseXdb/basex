@@ -102,6 +102,9 @@ public final class UtilItem extends StandardFunc {
     if(_UTIL_INIT.is(expr))
       return cc.function(_UTIL_ITEM, info, expr.arg(0), position);
 
+    final Expr embedded = embed(cc);
+    if(embedded != this) return embedded;
+
     exprType.assign(st.with(occ));
     data(expr.data());
     return this;

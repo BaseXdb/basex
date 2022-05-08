@@ -249,6 +249,25 @@ public abstract class StandardFunc extends Arr {
     return this;
   }
 
+  /**
+   * Tries to embed a positional function call in its first argument.
+   * @param cc compilation context
+   * @return optimized or original expression
+   * @throws QueryException query exception
+   */
+  protected Expr embed(final CompileContext cc) throws QueryException {
+    // util:last((1 to 8) ! <_>{ . }</_>)  ->  util:last((1 to 8)) ! <_>{ . }</_>
+    if(exprs[0] instanceof SimpleMap) {
+      final Expr[] ops = exprs[0].args();
+      if(((Checks<Expr>) op -> op == ops[0] || op.seqType().one()).all(ops)) {
+        exprs[0] = ops[0];
+        ops[0] = optimize(cc);
+        return SimpleMap.get(cc, info, ops);
+      }
+    }
+    return this;
+  }
+
   @Override
   public final Data data() {
     return data;
