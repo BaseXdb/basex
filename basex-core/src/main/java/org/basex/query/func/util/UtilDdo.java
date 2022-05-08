@@ -46,6 +46,8 @@ public final class UtilDdo extends StandardFunc {
     if(type instanceof NodeType) {
       // util:ddo(util:replicate(*, 2))  ->  util:ddo(*)
       if(_UTIL_REPLICATE.is(expr) && ((UtilReplicate) expr).singleEval(false)) return expr.arg(0);
+      // util:ddo(reverse(*))  ->  util:ddo(*)
+      if(REVERSE.is(expr) || SORT.is(expr)) return cc.function(_UTIL_DDO, info, expr.arg(0));
       // util:ddo(/a/b/c)  ->  /a/b/c
       if(expr.ddo()) return expr;
       // adopt type of argument
