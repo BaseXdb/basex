@@ -76,6 +76,8 @@ public final class FnReverse extends StandardFunc {
     // reverse sequence
     if(expr instanceof RangeSeq) return ((RangeSeq) expr).reverse(cc.qc);
 
+    // reverse(reverse(E))  ->  E
+    if(REVERSE.is(expr)) return expr.arg(0);
     // reverse(tail(reverse(E))  ->  util:init(E)
     if(TAIL.is(expr) && REVERSE.is(expr.arg(0)))
       return cc.function(_UTIL_INIT, info, expr.arg(0).args());

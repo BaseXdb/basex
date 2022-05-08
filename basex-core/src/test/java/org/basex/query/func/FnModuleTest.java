@@ -834,7 +834,8 @@ public final class FnModuleTest extends QueryPlanTest {
 
     check(func.args(" (<_/>, ('a', 'b'))"),
         "b\na\n<_/>", empty(func));
-
+    check("(<a/>, <b/>)[. = ''] =>" + func.args() + " =>" + func.args(),
+        "<a/>\n<b/>", empty(func));
   }
 
   /** Test method. */
