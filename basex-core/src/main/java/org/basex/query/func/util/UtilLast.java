@@ -55,9 +55,14 @@ public final class UtilLast extends StandardFunc {
       final Expr[] args = expr.args();
       final Expr last = args[args.length - 1];
       final SeqType stl = last.seqType();
+      // head((1, 2))  ->  2
       if(stl.one()) return last;
+      // head((1, (2 to 3))  ->  util:last(2 to 3)
       if(stl.oneOrMore()) return cc.function(_UTIL_LAST, info, last);
     }
+
+    final Expr embedded = embed(cc);
+    if(embedded != this) return embedded;
 
     exprType.assign(st.with(st.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE));
     data(expr.data());

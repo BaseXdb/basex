@@ -72,6 +72,9 @@ public final class FnHead extends StandardFunc {
       }
     }
 
+    final Expr embedded = embed(cc);
+    if(embedded != this) return embedded;
+
     exprType.assign(st.with(st.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE));
     data(expr.data());
     return this;

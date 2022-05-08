@@ -347,7 +347,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(func.args(" (<a/>, <b/>, <c/>, <d/>)")), "<a/>\n<b/>", root(List.class));
     check(func.args(func.args(" (1 to 10) ! <a>{. }</a>")),
         "<a>1</a>\n<a>2</a>\n<a>3</a>\n<a>4</a>\n<a>5</a>\n<a>6</a>\n<a>7</a>\n<a>8</a>",
-        root(SUBSEQUENCE));
+        root(DualMap.class));
 
     check(func.args(" util:replicate(<a/>, 2)"), "<a/>", root(CElem.class));
     check(func.args(" util:replicate(<a/>, 3)"), "<a/>\n<a/>", root(_UTIL_REPLICATE));
@@ -360,13 +360,13 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 1, 1)"),
         "", empty());
     check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 1, 2)"),
-        "<_>1</_>", root(HEAD));
+        "<_>1</_>", root(CElem.class));
     check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 1, 3)"),
-        "<_>1</_>\n<_>2</_>", root(SUBSEQUENCE));
+        "<_>1</_>\n<_>2</_>", root(DualMap.class));
     check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 2, 3)"),
-        "<_>2</_>\n<_>3</_>", root(SUBSEQUENCE));
+        "<_>2</_>\n<_>3</_>", root(DualMap.class));
     check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 4, 2)"),
-        "<_>4</_>", root(_UTIL_ITEM));
+        "<_>4</_>", root(CElem.class));
     check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 5, 1)"),
         "", empty());
   }
