@@ -135,6 +135,11 @@ public final class FnSort extends StandardFunc {
       final SeqType st = expr1.arg(0).seqType();
       if(st.zeroOrOne() && st.type.isSortable()) return expr1;
     }
+    if(REVERSE.is(expr1) || SORT.is(expr1)) {
+      final Expr[] args = exprs.clone();
+      args[0] = args[0].arg(0);
+      return cc.function(SORT, info, args);
+    }
     if(exprs.length == 3) {
       exprs[2] = coerceFunc(exprs[2], cc, SeqType.ANY_ATOMIC_TYPE_ZM, st1.with(Occ.EXACTLY_ONE));
     }

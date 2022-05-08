@@ -227,7 +227,19 @@ public final class UtilModuleTest extends QueryPlanTest {
     final Function func = _UTIL_DDO;
     query(func.args(" <a/>"), "<a/>");
     query(func.args(" (<a/>, <b/>)"), "<a/>\n<b/>");
-    query(func.args(" reverse((<a/>, <b/>))"), "<b/>\n<a/>");
+
+    check(func.args(" util:replicate((<a/>, <b/>), 10)"), "<a/>\n<b/>",
+        empty(_UTIL_REPLICATE));
+    check(func.args(" util:replicate(<a/>, 2, true())"), "<a/>\n<a/>",
+        exists(_UTIL_REPLICATE));
+
+    check("(<a><b/></a> ! (., *)) => reverse() => " + func.args(),
+        "<a>\n<b/>\n</a>\n<b/>", empty(REVERSE));
+    check("(<a><b/></a> ! (., *)) => sort() => " + func.args(),
+        "<a>\n<b/>\n</a>\n<b/>", empty(SORT));
+    check("(<a><b/></a> ! (., *)) => sort() => reverse() => sort() => " + func.args(),
+        "<a>\n<b/>\n</a>\n<b/>", empty(SORT), empty(REVERSE));
+
     error(func.args(1), INVCONVERT_X_X_X);
   }
 
