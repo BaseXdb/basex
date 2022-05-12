@@ -79,7 +79,7 @@ public final class AdminLogs extends AdminFn {
             if(entries.peekFirst() != entry) continue;
             entries.removeFirst();
 
-            if(entry.type.equals(LogType.REQUEST.name())) {
+            if(entry.type != null && entry.type.equals(LogType.REQUEST.name())) {
               final Iterator<LogEntry> iter = entries.iterator();
               while(iter.hasNext()) {
                 final LogEntry next = iter.next();
