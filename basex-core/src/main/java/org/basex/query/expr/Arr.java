@@ -75,24 +75,6 @@ public abstract class Arr extends ParseExpr {
   }
 
   /**
-   * Inlines an expression (see {@link Expr#inline(InlineContext)}).
-   * @param ic inlining context
-   * @param context function for context inlining; yields {@code null} if no inlining is required
-   * @return resulting expression if something changed, {@code null} otherwise
-   * @throws QueryException query exception
-   */
-  public Expr inline(final InlineContext ic, final QuerySupplier<Expr> context)
-      throws QueryException {
-
-    // inline arguments
-    final boolean changed = ic.inline(exprs);
-    // context reference: create new expression with inlined context
-    final Expr expr = ic.var == null && !(ic.expr instanceof ContextValue) ? context.get() : null;
-    // new expression exists and/or arguments were inlined: optimize expression
-    return expr != null ? expr.optimize(ic.cc) : changed ? optimize(ic.cc) : null;
-  }
-
-  /**
    * Creates a deep copy of the given array.
    * @param <T> element type
    * @param cc compilation context

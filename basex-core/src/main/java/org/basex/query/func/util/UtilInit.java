@@ -115,8 +115,8 @@ public final class UtilInit extends StandardFunc {
       }
     }
 
-    final Expr embedded = embed(cc);
-    if(embedded != this) return embedded;
+    final Expr embedded = embed(cc, false);
+    if(embedded != null) return embedded;
 
     exprType.assign(st.union(Occ.ZERO), size - 1);
     data(expr.data());
