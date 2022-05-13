@@ -401,7 +401,12 @@ public final class DbModuleTest extends QueryPlanTest {
     query(func.args(NAME));
     query("count(" + _DB_BACKUPS.args(NAME) + ")", 1);
 
-    query(func.args(NAME, "BLA"));
+    final int size1 = Integer.parseInt(query(_DB_BACKUPS.args(NAME) + "/@size ! data()"));
+    query(func.args(NAME, " map { 'compress': false() }"));
+    final int size2 = Integer.parseInt(query(_DB_BACKUPS.args(NAME) + "/@size ! data()"));
+    assertTrue(size1 < size2, "Compressed backup is not smaller than uncompressed one");
+
+    query(func.args(NAME, " map { 'comment': 'BLA' }"));
     query(_DB_BACKUPS.args(NAME) + "/@comment ! data()", "BLA");
 
     // invalid name

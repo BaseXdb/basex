@@ -66,7 +66,7 @@ public final class CreateBackup extends ABackup {
         ok = false;
       } else {
         try {
-          backup(db, comment, soptions, this);
+          backup(db, comment, true, soptions, this);
           // backup was successful
           info(DB_BACKUP_X, db, jc().performance);
         } catch(final IOException ex) {
@@ -83,12 +83,13 @@ public final class CreateBackup extends ABackup {
    * Backups the specified database.
    * @param db name of the database
    * @param comment comment (can be {@code null})
+   * @param compress compress flag
    * @param sopts static options
    * @param cmd calling command instance
    * @throws IOException I/O Exception
    */
-  public static void backup(final String db, final String comment, final StaticOptions sopts,
-      final CreateBackup cmd) throws IOException {
+  public static void backup(final String db, final String comment, final boolean compress,
+      final StaticOptions sopts, final CreateBackup cmd) throws IOException {
 
     final IOFile dbpath = sopts.dbPath(db);
     final StringList files = dbpath.descendants();
@@ -100,8 +101,8 @@ public final class CreateBackup extends ABackup {
       if(comment != null) {
         out.setComment(comment.length() > 100 ? comment.substring(0, 100) + DOTS : comment);
       }
-      // use simple, fast compression
-      out.setLevel(1);
+      // use simple, fast compression or no compression at all
+      out.setLevel(compress ? 1 : 0);
       final byte[] data = new byte[IO.BLOCKSIZE];
       for(final String file : files) {
         // skip update file (generated when using XQuery)
