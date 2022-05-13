@@ -1371,34 +1371,34 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _JOB_BINDINGS(JobBindings::new, "bindings(id)",
-      params(STRING_O), MAP_O, flag(NDT), JOBS_URI, Perm.ADMIN),
+      params(STRING_O), MAP_O, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
   _JOB_CURRENT(JobCurrent::new, "current()",
-      params(), STRING_O, flag(NDT), JOBS_URI),
+      params(), STRING_O, flag(NDT), JOB_URI),
   /** XQuery function. */
   _JOB_EVAL(JobEval::new, "eval(input[,bindings[,options]])",
-      params(STRING_O, MAP_ZO, MAP_ZO), STRING_O, flag(NDT), JOBS_URI, Perm.ADMIN),
+      params(STRING_O, MAP_ZO, MAP_ZO), STRING_O, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
   _JOB_FINISHED(JobFinished::new, "finished(id)",
-      params(STRING_O), BOOLEAN_O, flag(NDT), JOBS_URI, Perm.ADMIN),
+      params(STRING_O), BOOLEAN_O, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
   _JOB_LIST(JobList::new, "list()",
-      params(), STRING_ZM, flag(NDT), JOBS_URI, Perm.ADMIN),
+      params(), STRING_ZM, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
   _JOB_LIST_DETAILS(JobListDetails::new, "list-details([id])",
-      params(STRING_O), ELEMENT_ZM, flag(NDT), JOBS_URI, Perm.ADMIN),
+      params(STRING_O), ELEMENT_ZM, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
   _JOB_RESULT(JobResult::new, "result(id)",
-      params(STRING_O), ITEM_ZM, flag(NDT), JOBS_URI, Perm.ADMIN),
+      params(STRING_O), ITEM_ZM, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
   _JOB_SERVICES(JobServices::new, "services()",
-      params(), ELEMENT_ZM, flag(NDT), JOBS_URI, Perm.ADMIN),
+      params(), ELEMENT_ZM, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
   _JOB_STOP(JobStop::new, "stop(id[,options])",
-      params(STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(NDT), JOBS_URI, Perm.ADMIN),
+      params(STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
   _JOB_WAIT(JobWait::new, "wait(id)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), JOBS_URI, Perm.ADMIN),
+      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), JOB_URI, Perm.ADMIN),
 
   // JSON Module
 
@@ -1567,13 +1567,13 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _STRING_COLOGNE_PHONETIC(StringColognePhonetic::new, "cologne-phonetic(string)",
-      params(STRING_O), STRING_O, STRINGS_URI),
+      params(STRING_O), STRING_O, STRING_URI),
   /** XQuery function. */
   _STRING_LEVENSHTEIN(StringLevenshtein::new, "levenshtein(string1,string2)",
-      params(STRING_O, STRING_O), DOUBLE_O, STRINGS_URI),
+      params(STRING_O, STRING_O), DOUBLE_O, STRING_URI),
   /** XQuery function. */
   _STRING_SOUNDEX(StringSoundex::new, "soundex(string)",
-      params(STRING_O), STRING_O, STRINGS_URI),
+      params(STRING_O), STRING_O, STRING_URI),
 
   // Unit Module
 

@@ -199,6 +199,8 @@ public interface Text {
   String S_LIST = "list";
   /** Command keyword. */
   String S_STOP = "stop";
+  /** Command keyword. */
+  String S_RESULT = "result";
 
   /** Index info. */
   String LI_STRUCTURE = LI + "Structure: ";
@@ -425,7 +427,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPJOBS = {
-    '[' + S_LIST + '|' + S_STOP + ']', lang("c_jobs1"), lang("c_jobs2")
+    '[' + S_LIST + '|' + S_STOP + '|' + S_RESULT + ']', lang("c_jobs1"), lang("c_jobs2")
   };
   /** Command help. */
   String[] HELPKILL = {

@@ -1479,7 +1479,7 @@ public enum QueryError {
     /** Error type. */ HTML(HTML_PREFIX,         HTML_URI),
     /** Error type. */ HASH(HASH_PREFIX,         HASH_URI),
     /** Error type. */ INSPECT(INSPECT_PREFIX,   INSPECT_URI),
-    /** Error type. */ JOBS(JOBS_PREFIX,         JOBS_URI),
+    /** Error type. */ JOBS(JOB_PREFIX,          JOB_URI),
     /** Error type. */ JSON(JSON_PREFIX,         JSON_URI),
     /** Error type. */ OUTPUT(OUTPUT_PREFIX,     OUTPUT_URI),
     /** Error type. */ PROC(PROC_PREFIX,         PROC_URI),

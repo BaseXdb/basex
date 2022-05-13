@@ -47,7 +47,6 @@ public final class NSGlobal {
     NS.add(GEO_PREFIX, GEO_URI);
     NS.add(HTTP_PREFIX, HTTP_URI);
     NS.add(PKG_PREFIX, PKG_URI);
-    NS.add(ZIP_PREFIX, ZIP_URI);
     // EXQuery namespaces
     NS.add(REQUEST_PREFIX, REQUEST_URI);
     NS.add(REST_PREFIX, REST_URI);
@@ -70,7 +69,7 @@ public final class NSGlobal {
     NS.add(INDEX_PREFIX, INDEX_URI);
     NS.add(INPUT_PREFIX, INPUT_URI);
     NS.add(INSPECT_PREFIX, INSPECT_URI);
-    NS.add(JOBS_PREFIX, JOBS_URI);
+    NS.add(JOB_PREFIX, JOB_URI);
     NS.add(JSON_PREFIX, JSON_URI);
     NS.add(LAZY_PREFIX, LAZY_URI);
     NS.add(OUT_PREFIX, OUT_URI);
@@ -82,7 +81,7 @@ public final class NSGlobal {
     NS.add(SESSION_PREFIX, SESSION_URI);
     NS.add(SESSIONS_PREFIX, SESSIONS_URI);
     NS.add(SQL_PREFIX, SQL_URI);
-    NS.add(STRINGS_PREFIX, STRINGS_URI);
+    NS.add(STRING_PREFIX, STRING_URI);
     NS.add(UNIT_PREFIX, UNIT_URI);
     NS.add(UPDATE_PREFIX, UPDATE_URI);
     NS.add(USER_PREFIX, USER_URI);
