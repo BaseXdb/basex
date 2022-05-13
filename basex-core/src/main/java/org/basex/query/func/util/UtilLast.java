@@ -61,8 +61,8 @@ public final class UtilLast extends StandardFunc {
       if(stl.oneOrMore()) return cc.function(_UTIL_LAST, info, last);
     }
 
-    final Expr embedded = embed(cc);
-    if(embedded != this) return embedded;
+    final Expr embedded = embed(cc, false);
+    if(embedded != null) return embedded;
 
     exprType.assign(st.with(st.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE));
     data(expr.data());

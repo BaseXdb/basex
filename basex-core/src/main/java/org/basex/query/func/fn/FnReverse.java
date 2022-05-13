@@ -100,8 +100,8 @@ public final class FnReverse extends StandardFunc {
         return List.get(cc, expr.info(), list.finish());
       }
     }
-    final Expr embedded = embed(cc);
-    if(embedded != this) return embedded;
+    final Expr embedded = embed(cc, false);
+    if(embedded != null) return embedded;
 
     return adoptType(expr);
   }

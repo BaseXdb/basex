@@ -220,6 +220,9 @@ public final class UtilModuleTest extends QueryPlanTest {
         root(EXISTS), empty(COUNT));
     check("let $s := (1 to 6)[. < 5] return empty($s) and count($s) < 5", false,
         root(EMPTY), empty(COUNT));
+
+    check(_UTIL_COUNT_WITHIN.args(" (1 to 100)[. > 90] ! <_>{ . }</_>", 8, 10), true,
+        empty(SimpleMap.class));
   }
 
   /** Test method. */

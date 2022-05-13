@@ -49,6 +49,9 @@ public final class FnCount extends StandardFunc {
     if(STRING_TO_CODEPOINTS.is(expr) || _UTIL_CHARS.is(expr))
       return cc.function(STRING_LENGTH, info, expr.args());
 
+    final Expr embedded = embed(cc, true);
+    if(embedded != null) return embedded;
+
     return this;
   }
 

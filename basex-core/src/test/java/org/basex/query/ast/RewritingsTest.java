@@ -1205,8 +1205,24 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $a in (<b/>, <c/>) return <a/>[empty(($a[. = 'i'], $a[. = 'j']))]", "<a/>\n<a/>",
         root(DualMap.class), exists(NOT), empty(If.class));
 
+    check("for $a in (1 to 6)[. != 0] return <a/>[exists(($a[. = 1], $a[. = 1]))]",
+        "<a/>", count(CmpSimpleG.class, 2), empty(EXISTS));
+    check("exists(string-to-codepoints(<?_ x?>))",
+        true, empty(STRING_TO_CODEPOINTS), empty(EXISTS), exists(BOOLEAN), exists(STRING));
+    check("empty(string-to-codepoints(<?_ x?>))",
+        false, empty(STRING_TO_CODEPOINTS), empty(EMPTY), exists(NOT), exists(STRING));
+    check("exists(util:chars(<?_ x?>))",
+        true, empty(_UTIL_CHARS), empty(EXISTS), exists(BOOLEAN), exists(STRING));
+    check("empty(util:chars(<?_ x?>))",
+        false, empty(_UTIL_CHARS), empty(EMPTY), exists(NOT), exists(STRING));
+
+
+    check("exists(map:keys(map:entry(1, <_/>)))",
+        true, empty(_MAP_KEYS), empty(EXISTS), exists(_MAP_SIZE), exists(CmpSimpleG.class));
+    check("empty(map:keys(map:entry(1, <_/>)))",
+        false, empty(_MAP_KEYS), empty(EMPTY), exists(_MAP_SIZE), exists(CmpSimpleG.class));
+
     // no rewritings
-    query("for $a in (1 to 2)[. != 0] return <a/>[empty(($a[. = 1], $a[. = 1]))]", "<a/>");
     check("exists(<a/>/a) and exists(<b/>/b)", false, exists(And.class), empty(EXISTS));
     check("for $i in (1 to 2)[. != 0] return exists($i[. = 1]) and exists($i[. = 2])",
         "false\nfalse", empty(And.class), empty(EXISTS), root(DualMap.class));
