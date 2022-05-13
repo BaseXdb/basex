@@ -74,7 +74,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
 
   @Override
   public void delete() throws BadRequestException {
-    new WebDAVCode<>(this) {
+    new WebDAVCode<Object>(this) {
       @Override
       public void run() throws IOException {
         remove();
@@ -86,7 +86,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
   public void copyTo(final CollectionResource target, final String name)
       throws BadRequestException {
 
-    new WebDAVCode<>(this) {
+    new WebDAVCode<Object>(this) {
       @Override
       public void run() throws IOException {
         if(target instanceof WebDAVRoot) {
@@ -102,7 +102,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
   public void moveTo(final CollectionResource target, final String name)
       throws BadRequestException {
 
-    new WebDAVCode<>(this) {
+    new WebDAVCode<Object>(this) {
       @Override
       public void run() throws IOException {
         if(target instanceof WebDAVRoot) {

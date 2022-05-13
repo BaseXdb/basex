@@ -130,7 +130,7 @@ function dba:database(
       <td class='vertical'/>
       <td>{
         if($resource) then (
-          <h3>{ $resource }</h3>,
+          <h2>Resource: { $resource }</h2>,
           <form action='resource' method='post' id='resources'>
             <input type='hidden' name='name' value='{ $name }'/>
             <input type='hidden' name='resource' value='{ $resource }' id='resource'/>
@@ -140,7 +140,7 @@ function dba:database(
               html:button('db-replace', 'Replace…')
             }
           </form>,
-          <h4>Enter your query…</h4>,
+          <b>Enter your query…</b>,
           <input type='text' style='width:100%' name='input' id='input'
                  onkeyup='queryResource(false)'/>,
           <div class='small'/>,

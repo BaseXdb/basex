@@ -1370,6 +1370,9 @@ public enum Function implements AFunction {
   // Jobs Module
 
   /** XQuery function. */
+  _JOB_BINDINGS(JobBindings::new, "bindings(id)",
+      params(STRING_O), MAP_O, flag(NDT), JOBS_URI, Perm.ADMIN),
+  /** XQuery function. */
   _JOB_CURRENT(JobCurrent::new, "current()",
       params(), STRING_O, flag(NDT), JOBS_URI),
   /** XQuery function. */

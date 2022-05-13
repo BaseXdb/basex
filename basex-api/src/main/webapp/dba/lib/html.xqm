@@ -354,7 +354,7 @@ declare function html:table(
   let $curr-page := min((max(($page-option, 1)), $last-page))
   return (
     (: result summary :)
-    element h4 {
+    element h3 {
       $entries,
       if($entries = 1) then ' Entry' else 'Entries',
 

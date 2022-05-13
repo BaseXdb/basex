@@ -35,7 +35,7 @@ function dba:jobs(
 ) as element(html) {
   html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>{
-      <td width='60%'>
+      <td>
         <form action='{ $dba:CAT }' method='post' class='update'>
         <h2>Jobs</h2>
         {
@@ -90,8 +90,8 @@ function dba:jobs(
         let $cached := $details/@state = 'cached'
         return (
           <td class='vertical'/>,
-          <td width='40%'>{
-            <h3>{ $job }</h3>,
+          <td>{
+            <h2>Job: { $job }</h2>,
             if($details) then (
               <form action='jobs' method='post' id='jobs'>
                 <input type='hidden' name='id' value='{ $job }'/>
@@ -104,18 +104,33 @@ function dba:jobs(
                   )
                 }
               </form>,
+              <h3>General Information</h3>,
               <table>{
                 for $value in $details/@*
                 for $name in name($value)[. != 'id']
                 return <tr>
                   <td><b>{ util:capitalize($name) }</b></td>
                   <td>{ string($value) }</td>
-                </tr>,
-                <tr>
-                  <td><b>Description</b></td>
-                  <td>{ util:chop($details, 500) }</td>
                 </tr>
-              }</table>
+              }</table>,
+              let $bindings := jobs:bindings($job)
+              where map:size($bindings) > 0
+              return (
+                <h3>Query Bindings</h3>,
+                <table>{
+                  map:for-each($bindings, function($key, $value) {
+                    <tr>
+                      <td><b>{ $key ?? '$' || $key !! 'Context' }</b></td>
+                      <td><code>{ util:chop(serialize($value), 50) }</code></td>
+                    </tr>
+                  })
+                }
+                </table>
+              ),
+              <h3>Job String</h3>,
+              <textarea readonly='' rows='10'>{
+                util:chop($details, 500)
+              }</textarea>
             ) else (
               'Job is defunct.'
             )
