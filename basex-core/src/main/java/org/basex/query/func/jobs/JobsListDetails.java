@@ -31,8 +31,8 @@ public final class JobsListDetails extends StandardFunc {
     final byte[][] atts = {
       ID, TYPE, STATE, USER, DURATION, START, END, INTERVAL, READS, WRITES, TIME
     };
-    for(final byte[] key : ids) {
-      final TokenList entry = JobsList.entry(key, jobs, max);
+    for(final byte[] id : ids) {
+      final TokenList entry = JobsList.entry(id, jobs, max);
       if(entry == null) continue;
 
       final FElem elem = new FElem(JOB);

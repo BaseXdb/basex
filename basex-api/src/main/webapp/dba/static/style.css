@@ -49,6 +49,7 @@ textarea {
   font-size: 90%;
   margin: 4px 0px 4px 0px;
   width: 100%;
+  resize: vertical;
 }
 
 input[type=text] {
@@ -94,11 +95,6 @@ h3 {
   font-size: 120%;
   color: #606060;
   margin: 0.2em 0 0.2em 0;
-}
-
-h4 {
-  font-size: 120%;
-  margin: 0.4em 0 0.2em 0;
 }
 
 hr {

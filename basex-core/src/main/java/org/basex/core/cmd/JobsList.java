@@ -49,8 +49,8 @@ public final class JobsList extends Command {
     table.header.add(TIME);
 
     final JobPool jobs = context.jobs;
-    for(final byte[] key : ids(context)) {
-      final TokenList entry = entry(key, jobs, 0);
+    for(final byte[] id : ids(context)) {
+      final TokenList entry = entry(id, jobs, 0);
       if(entry != null) table.contents.add(entry);
     }
     out.println(table.sort().finish());
@@ -83,9 +83,9 @@ public final class JobsList extends Command {
   public static TokenList entry(final byte[] key, final JobPool jobs, final int max) {
     final String id = string(key);
     Job job = jobs.active.get(id);
-    final QueryJobTask jt = jobs.tasks.get(id);
     final QueryJobResult jr = jobs.results.get(id);
     if(job == null && jr != null) job = jr.job;
+    final QueryJobTask jt = jobs.tasks.get(id);
     if(job == null && jt != null) job = jt.job;
     if(job == null) return null;
 

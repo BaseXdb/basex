@@ -3,6 +3,7 @@ package org.basex.core.jobs;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
 import java.util.Map.*;
 import java.util.function.*;
 
@@ -126,6 +127,14 @@ public final class QueryJob extends Job implements Runnable {
     if(ADate.TIME.matcher(string).matches()) return new Tim(token(string), ii);
     // dateTime
     return new Dtm(token(string), ii);
+  }
+
+  /**
+   * Returns the bindings for a query.
+   * @return bindings
+   */
+  public HashMap<String, Value> bindings() {
+    return job.bindings;
   }
 
   /**

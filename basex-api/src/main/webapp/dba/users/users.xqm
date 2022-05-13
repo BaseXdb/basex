@@ -69,7 +69,7 @@ function dba:users(
       <td class='vertical'/>
       <td>
         <form action='users-info' method='post'>{
-          <h3>Extra Information</h3>,
+          <h2>User Information</h2>,
           html:button('save', 'Save'),
           <div class='small'/>,
           <textarea name='info' id='editor' spellcheck='false'>{
