@@ -121,7 +121,9 @@ function dba:jobs(
                   map:for-each($bindings, function($key, $value) {
                     <tr>
                       <td><b>{ $key ?? '$' || $key !! 'Context' }</b></td>
-                      <td><code>{ util:chop(serialize($value), 50) }</code></td>
+                      <td><code>{
+                        util:chop(serialize($value, map { 'method': 'basex' }), 1000)
+                      }</code></td>
                     </tr>
                   })
                 }
@@ -129,7 +131,7 @@ function dba:jobs(
               ),
               <h3>Job String</h3>,
               <textarea readonly='' rows='10'>{
-                util:chop($details, 500)
+                string($details)
               }</textarea>
             ) else (
               'Job is defunct.'
