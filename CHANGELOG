@@ -1,3 +1,9 @@
+VERSION 9.7.2 (May 14, 2022) -------------------------------------------
+
+ - English Stemmer: dictionary for irregular forms added
+ - Preview implementations of BaseX 10 features
+ - Performance tweaks, minor fixes
+
 VERSION 9.7.1 (April 26, 2022) -----------------------------------------
 
  - RESTXQ: improved caching for unmodified modules
