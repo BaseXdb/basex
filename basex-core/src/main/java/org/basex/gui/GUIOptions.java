@@ -160,9 +160,9 @@ public final class GUIOptions extends Options {
 
   /** Current input mode in global text field (Search, XQuery, Command). */
   public static final NumberOption SEARCHMODE = new NumberOption("SEARCHMODE", 0);
-  /** Flag for realtime context filtering. */
+  /** Flag for real-time context filtering. */
   public static final BooleanOption FILTERRT = new BooleanOption("FILTERRT", false);
-  /** Flag for realtime query execution. */
+  /** Flag for real-time query execution. */
   public static final BooleanOption EXECRT = new BooleanOption("EXECRT", false);
 
   /** Name of new database. */
@@ -238,7 +238,7 @@ public final class GUIOptions extends Options {
    */
   public GUIOptions() {
     super(new IOFile(HOMEDIR + IO.BASEXSUFFIX + "gui"));
-    // reset realtime operations
+    // reset real-time operations
     set(FILTERRT, false);
     set(EXECRT, false);
     gui = true;

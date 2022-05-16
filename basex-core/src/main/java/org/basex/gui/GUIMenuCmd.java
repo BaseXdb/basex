@@ -721,7 +721,7 @@ public enum GUIMenuCmd implements GUICommand {
 
   /* OPTION MENU */
 
-  /** Realtime execution on/off. */
+  /** Real-time execution on/off. */
   C_RT_EXECUTION(RT_EXECUCTION, null, false, true) {
     @Override
     public void execute(final GUI gui) {
@@ -735,7 +735,7 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
-  /** Realtime filtering on/off. */
+  /** Real-time filtering on/off. */
   C_RT_FILTERING(RT_FILTERING, null, true, true) {
     @Override
     public void execute(final GUI gui) {

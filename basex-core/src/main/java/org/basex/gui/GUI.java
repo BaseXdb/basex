@@ -390,7 +390,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     if(edit) editor.pleaseWait(id);
 
     final Data data = context.data();
-    // reset current context if realtime filter is activated
+    // reset current context if real-time filter is activated
     if(gopts.get(GUIOptions.FILTERRT) && data != null && !context.root()) context.invalidate();
 
     // remember current command and context nodes
