@@ -60,7 +60,7 @@ public final class BaseXImages {
    */
   public static Image get(final String name) {
     if(!IMAGES.containsKey(name)) {
-      final int n = 4;
+      final int n = 5;
       final Image[] images = new Image[n];
       for(int i = 0; i < n; i++) {
         final String path = "/img/" + name + '-' + i + ".png";
