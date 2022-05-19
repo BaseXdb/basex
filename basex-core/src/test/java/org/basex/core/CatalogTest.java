@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.query.func.*;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -25,17 +26,18 @@ public class CatalogTest extends SandboxTest {
   /** Query string: Pragma. */
   private static final String PRAGMA = "(# db:catfile " + CAT + " #) ";
 
+  /** Before.*/
+  @BeforeEach public void before() {
+    set(MainOptions.CATFILE, "");
+    set(MainOptions.DTD, false);
+  }
+
   /** Test method.*/
   @Test public void createDB() {
-    try {
-      set(MainOptions.DTD, true);
-      set(MainOptions.CATFILE, CAT);
-      execute(new CreateDB("document", DIR + "doc.xml"));
-      query("db:open('document')", "<doc>X</doc>");
-    } finally {
-      set(MainOptions.CATFILE, "");
-      set(MainOptions.DTD, false);
-    }
+    set(MainOptions.DTD, true);
+    set(MainOptions.CATFILE, CAT);
+    execute(new CreateDB("document", DIR + "doc.xml"));
+    query("db:open('document')", "<doc>X</doc>");
   }
 
   /** Test method. */
@@ -95,5 +97,14 @@ public class CatalogTest extends SandboxTest {
     final Function func = _FETCH_DOC;
     query(func.args(DIR + "doc.xml",
       " map { 'catfile': '" + CAT + "', 'dtd': true() }"), "<doc>X</doc>");
+  }
+
+  /** Test method.*/
+  @Test public void doc() {
+    final Function func = DOC;
+
+    set(MainOptions.DTD, true);
+    set(MainOptions.CATFILE, CAT);
+    query(func.args("http://doc.xml"), "<doc>X</doc>");
   }
 }

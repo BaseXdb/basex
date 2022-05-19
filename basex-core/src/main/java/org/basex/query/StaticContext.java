@@ -3,6 +3,9 @@ package org.basex.query;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import javax.xml.transform.*;
+import javax.xml.transform.sax.*;
+
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.util.*;
@@ -12,6 +15,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.xml.sax.*;
 
 /**
  * This class contains the static context of an expression.
@@ -53,8 +57,10 @@ public final class StaticContext {
 
   /** Static type of context value. */
   SeqType contextType;
-  /** Sets a module URI resolver. */
+  /** Sets a custom URI resolver. */
   UriResolver resolver;
+  /** Sets an XML catalog URI resolver. */
+  final URIResolver uriResolver;
 
   /** Static Base URI. */
   private Uri baseURI = Uri.EMPTY;
@@ -64,8 +70,10 @@ public final class StaticContext {
    * @param qc query context
    */
   public StaticContext(final QueryContext qc) {
-    mixUpdates = qc.context.options.get(MainOptions.MIXUPDATES);
-    withdb = qc.context.options.get(MainOptions.WITHDB);
+    final MainOptions mopts = qc.context.options;
+    mixUpdates = mopts.get(MainOptions.MIXUPDATES);
+    withdb = mopts.get(MainOptions.WITHDB);
+    uriResolver = Resolver.uris(mopts);
   }
 
   /**
@@ -126,8 +134,7 @@ public final class StaticContext {
    * @return resulting path
    */
   public IO resolve(final String path) {
-    final IO baseIO = baseIO();
-    return baseIO == null ? IO.get(path) : baseIO.merge(path);
+    return resolve(path, null);
   }
 
   /**
@@ -138,7 +145,23 @@ public final class StaticContext {
    * @return io reference
    */
   public IO resolve(final String path, final String uri) {
-    return resolver == null ? resolve(path) : resolver.resolve(path, uri, baseURI);
+    if(resolver != null) return resolver.resolve(path, uri, baseURI);
+
+    final IO baseIO = baseIO();
+    if(baseIO == null) return IO.get(path);
+
+    // try to resolve the path against the registered URI resolver
+    if(uriResolver != null) {
+      try {
+        final Source s = uriResolver.resolve(path, baseIO.path());
+        final InputSource is = s instanceof SAXSource ? ((SAXSource) s).getInputSource() : null;
+        final String id = is != null ? is.getSystemId() : null;
+        if(id != null) return IO.get(id);
+      } catch(TransformerException ex) {
+        Util.debug(ex);
+      }
+    }
+    return baseIO.merge(path);
   }
 
   /**

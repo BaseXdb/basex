@@ -3,4 +3,5 @@
   <system systemId='http://import.xsd' uri='import.xsd' />
   <system systemId='http://import.xsl' uri='import.xsl' />
   <system systemId='http://import-xsl.xml' uri='import-xsl.xml' />
+  <uri name='http://doc.xml' uri='doc.xml' />
 </catalog>
