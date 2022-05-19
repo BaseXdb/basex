@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.basex.core.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
@@ -218,6 +219,17 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(wrap("A")), "A", root(DATA));
     check("(<a/>, <b/>) ! " + func.args(" ."), "\n", root(DATA));
     check("(1 to 2) ! " + func.args(" ."), "1\n2", root(RangeSeq.class));
+  }
+
+  /** Test method. */
+  @Test public void doc() {
+    final Function func = DOC;
+    try {
+      set(MainOptions.CATFILE, "src/test/resources/catalog/catalog.xml");
+      query(func.args("http://doc.xml"), "<doc/>");
+    } finally {
+      set(MainOptions.CATFILE, "");
+    }
   }
 
   /** Test method. */
