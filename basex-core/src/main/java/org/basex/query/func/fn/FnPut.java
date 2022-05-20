@@ -36,7 +36,7 @@ public final class FnPut extends StandardFunc {
     final Updates updates = qc.updates();
     final DBNode target = updates.determineDataRef(nd, qc);
 
-    final String path = new QueryInput(string(uri.string()), sc).io.path();
+    final String path = sc.resolve(string(uri.string())).path();
     // check if all target paths are unique
     if(!updates.putPaths.add(path)) throw UPURIDUP_X.get(info, path);
 

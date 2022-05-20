@@ -363,7 +363,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final IO toIO(final byte[] uri) throws QueryException {
-    final IO io = new QueryInput(string(uri), sc).io;
+    final IO io = sc.resolve(string(uri));
     if(!io.exists()) throw WHICHRES_X.get(info, io);
     if(io instanceof IOFile && io.isDir()) throw RESDIR_X.get(info, io);
     return io;

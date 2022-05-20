@@ -36,28 +36,22 @@ public abstract class Parse extends StandardFunc {
   final Item unparsedText(final QueryContext qc, final boolean check, final boolean encoding)
       throws QueryException {
 
-    final byte[] path = toTokenOrNull(exprs[0], qc);
-    if(path == null) return check ? Bln.FALSE : Empty.VALUE;
+    final byte[] token = toTokenOrNull(exprs[0], qc);
+    if(token == null) return check ? Bln.FALSE : Empty.VALUE;
+    final String path = string(token);
 
     String enc;
     IO io;
     try {
       enc = encoding ? toEncodingOrNull(1, ENCODING_X, qc) : null;
 
-      final String p = string(path);
-      if(p.indexOf('#') != -1) throw FRAGID_X.get(info, p);
-      final Uri uri = Uri.uri(p);
-      if(!uri.isValid()) throw INVURL_X.get(info, p);
-
-      if(uri.isAbsolute()) {
-        io = IO.get(p);
-      } else {
-        if(sc.baseURI() == Uri.EMPTY) throw STBASEURI.get(info);
-        io = sc.resolve(p);
-      }
+      if(contains(token, '#')) throw FRAGID_X.get(info, path);
+      if(sc.baseURI() == Uri.EMPTY) throw STBASEURI.get(info);
+      if(!Uri.uri(path).isValid()) throw INVURL_X.get(info, path);
+      io = sc.resolve(path);
 
       // overwrite path with global resource files
-      String[] rp = qc.resources.text(p);
+      String[] rp = qc.resources.text(path);
       if(rp == null) rp = qc.resources.text(io.path());
       if(rp != null && rp.length > 0) {
         io = IO.get(rp[0]);
