@@ -145,7 +145,7 @@ public abstract class CLI extends Main {
   protected static Entry<String, String> input(final String input) throws IOException {
     final IO io = IO.get(input);
     final boolean file = !(io instanceof IOContent) && io.exists() && !io.isDir();
-    return new SimpleEntry<>(file ? io.path() : "./", file ? io.string() : input);
+    return new SimpleEntry<>(file ? io.path() : "", file ? io.string() : input);
   }
 
   /**
