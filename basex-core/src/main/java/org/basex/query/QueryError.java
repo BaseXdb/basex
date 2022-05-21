@@ -1282,7 +1282,7 @@ public enum QueryError {
   /** Error code. */
   DUPLFUNVIS(XQST, 106, "More than one visibility annotation declared."),
   /** Error code. */
-  OPTDECL_X(XQST, 108, "Output declaration not allowed library module: %."),
+  OPTDECL_X(XQST, 108, "Output declaration not allowed in library module: %."),
   /** Error code. */
   OUTINVALID_X(XQST, 109, "%"),
   /** Error code. */

@@ -38,8 +38,9 @@ public class UtilRoot extends StandardFunc {
   public Expr opt(final CompileContext cc) {
     final Expr expr = exprs[0];
     final SeqType st = expr.seqType();
-    if(st.type.eq(NodeType.DOCUMENT_NODE)) return expr;
+    if(st.instanceOf(SeqType.DOCUMENT_NODE_ZM)) return expr;
     if(st.zeroOrOne()) exprType.assign(st.occ);
+    data(expr.data());
     return this;
   }
 }

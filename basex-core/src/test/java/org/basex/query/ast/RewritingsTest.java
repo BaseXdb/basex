@@ -2849,4 +2849,18 @@ public final class RewritingsTest extends QueryPlanTest {
     check("util:item((1 to 10)[. > 6] ! (. * .), 2)", 64, root(ItemMap.class));
     check("util:last((1 to 10)[. > 5] ! (. * .))", 100, root(ItemMap.class));
   }
+
+  /** Check existence of paths in predicates. */
+  @Test public void gh2109() {
+    execute(new CreateDB(NAME, "<a><b/></a>"));
+    check("b", "", empty());
+    check("a/a", "", empty());
+    check("a/a[b]", "", empty());
+    check("a[a]", "", empty());
+
+    check("a[/b]", "", empty());
+    check("a[/a/a]", "", empty());
+    check("a[/a[/b]]", "", empty());
+    check("a[/a]", "<a>\n<b/>\n</a>", root(IterPath.class), exists(DBNode.class));
+  }
 }
