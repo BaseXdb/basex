@@ -33,7 +33,7 @@ public final class QNm extends Item {
   public static final QNm REST_ERROR = new QNm(ERROR, REST_URI);
 
   /** URL pattern (matching Clark and EQName notation). */
-  public static final Pattern EQNAME = Pattern.compile("^Q?\\{(.*?)}(.+)$");
+  public static final Pattern EQNAME = Pattern.compile("^Q?\\{(.*?)\\}(.+)$");
 
   /** Name with optional prefix. */
   private final byte[] name;
