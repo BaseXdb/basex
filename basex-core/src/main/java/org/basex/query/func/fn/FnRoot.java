@@ -2,9 +2,11 @@ package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -22,6 +24,15 @@ public final class FnRoot extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return optFirst(true, false, cc.qc.focus.value);
+    final Value value = cc.qc.focus.value;
+    final Expr expr;
+    if(exprs.length > 0) {
+      expr = exprs[0];
+      if(expr.seqType().instanceOf(SeqType.DOCUMENT_NODE_ZO)) return expr;
+    } else {
+      expr = value;
+    }
+    if(expr != null) data(expr.data());
+    return optFirst(true, false, value);
   }
 }

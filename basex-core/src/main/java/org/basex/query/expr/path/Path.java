@@ -350,20 +350,41 @@ public abstract class Path extends ParseExpr {
   /**
    * Returns the path nodes that will result from this path.
    * @param rt root at compile time (can be {@code null})
+   * @param stats utilize statistics
    * @return path nodes, or {@code null} if nodes cannot be evaluated
    */
-  public final ArrayList<PathNode> pathNodes(final Expr rt) {
+  public final ArrayList<PathNode> pathNodes(final Expr rt, final boolean stats) {
     // ensure that path starts with document nodes
-    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT_NODE) || data == null ||
-        !data.meta.uptodate) return null;
+    return rt != null && rt.seqType().type.instanceOf(NodeType.DOCUMENT_NODE) && data != null &&
+        data.meta.uptodate ? pathNodes(data.paths.root(), stats) : null;
+  }
 
-    ArrayList<PathNode> nodes = data.paths.root();
+  /**
+   * Returns the path nodes that will result from this path.
+   * @param nodes current path nodes
+   * @param stats utilize statistics
+   * @return path nodes, or {@code null} if nodes cannot be evaluated
+   */
+  final ArrayList<PathNode> pathNodes(final ArrayList<PathNode> nodes, final boolean stats) {
+    ArrayList<PathNode> pn = nodes;
     for(final Expr step : steps) {
       if(!(step instanceof Step)) return null;
-      nodes = ((Step) step).nodes(nodes, data);
-      if(nodes == null) return null;
+      pn = ((Step) step).nodes(pn, data, stats);
+      // check if paths within predicates are correct
+      if(!stats) {
+        for(final Expr expr : step.args()) {
+          if(expr instanceof Path) {
+            final Path path = (Path) expr;
+            if(path.root == null) {
+              final ArrayList<PathNode> tmp = path.pathNodes(pn, stats);
+              if(tmp != null && tmp.isEmpty()) return tmp;
+            }
+          }
+        }
+      }
+      if(pn == null) return null;
     }
-    return nodes;
+    return pn;
   }
 
   /**
@@ -371,7 +392,7 @@ public abstract class Path extends ParseExpr {
    * @return statistics or {@code null}
    */
   public ArrayList<Stats> pathStats() {
-    final ArrayList<PathNode> nodes = pathNodes(root);
+    final ArrayList<PathNode> nodes = pathNodes(root, true);
     if(nodes == null) return null;
 
     // loop through all nodes
@@ -467,7 +488,7 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Assigns a sequence type and (if statically known) result size.
-   * @param rt compile time root (can be {@code null})
+   * @param rt root at compile time (can be {@code null})
    */
   private void seqType(final Expr rt) {
     if(rt != null) data = rt.data();
@@ -493,7 +514,7 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Computes the result size via database statistics.
-   * @param rt compile time root (can be {@code null})
+   * @param rt root at compile time (can be {@code null})
    * @return number of results (or {@code -1})
    */
   private long size(final Expr rt) {
@@ -516,7 +537,7 @@ public abstract class Path extends ParseExpr {
     for(int s = 0; s < sl; s++) {
       final Step curr = axisStep(s);
       if(curr != null) {
-        nodes = curr.nodes(nodes, data);
+        nodes = curr.nodes(nodes, data, true);
         if(nodes == null) return -1;
       } else if(s + 1 == sl) {
         lastSize = steps[s].size();
@@ -571,11 +592,11 @@ public abstract class Path extends ParseExpr {
   /**
    * Returns an empty sequence if the path will yield no results.
    * @param cc compilation context
-   * @param rt compile time root (can be {@code null})
+   * @param rt root at compile time (can be {@code null})
    * @return original or new expression
    */
   private Expr removeEmpty(final CompileContext cc, final Expr rt) {
-    final ArrayList<PathNode> nodes = pathNodes(rt);
+    final ArrayList<PathNode> nodes = pathNodes(rt, false);
     if(nodes != null ? nodes.isEmpty() : emptySteps(rt)) {
       cc.info(QueryText.OPTPATH_X, this);
       return Empty.VALUE;
@@ -586,7 +607,7 @@ public abstract class Path extends ParseExpr {
   /**
    * Converts descendant to child steps.
    * @param cc compilation context
-   * @param rt compile time root (can be {@code null})
+   * @param rt root at compile time (can be {@code null})
    * @return original or new expression
    * @throws QueryException query exception
    */
@@ -696,7 +717,7 @@ public abstract class Path extends ParseExpr {
    * Queries of type 1, 3, 5 will not yield any results if the string to be compared is empty.
    *
    * @param cc compilation context
-   * @param rt compile time root (can be {@code null})
+   * @param rt root at compile time (can be {@code null})
    * @return original or new expression
    * @throws QueryException query exception
    */
