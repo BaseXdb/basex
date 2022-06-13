@@ -9,9 +9,10 @@ import java.text.*;
 import java.text.Normalizer.*;
 import java.util.*;
 
+import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.XQArray;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -106,8 +107,8 @@ public abstract class StandardSerializer extends OutputSerializer {
     if(sep && atomic) out.print(' ');
     try {
       if(item instanceof StrLazy && form == null) {
-        try(InputStream is = item.input(null)) {
-          for(int cp; (cp = is.read()) != -1;) printChar(cp);
+        try(TextInput ti = item.stringInput(null)) {
+          for(int cp; (cp = ti.read()) != -1;) printChar(cp);
         }
       } else {
         printChars(norm(item.string(null)));

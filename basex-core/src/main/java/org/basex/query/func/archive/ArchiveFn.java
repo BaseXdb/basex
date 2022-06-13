@@ -35,7 +35,7 @@ abstract class ArchiveFn extends StandardFunc {
   /**
    * Encodes the specified string to another encoding.
    * @param value value to be encoded
-   * @param encoding encoding
+   * @param encoding encoding (can be {@code null})
    * @param qc query context
    * @return encoded string
    * @throws QueryException query exception

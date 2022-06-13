@@ -145,12 +145,11 @@ public class ArchiveCreate extends ArchiveFn {
     }
 
     // data to be compressed
-    if(content instanceof Lazy) {
+    if(content instanceof Bin) {
       out.write(ze, content.input(info));
     } else {
-      byte[] value = toBytes(content);
-      if(!(content instanceof Bin) && encoding != Strings.UTF8) value = encode(value, encoding, qc);
-      out.write(ze, value);
+      final byte[] value = toBytes(content);
+      out.write(ze, encoding == Strings.UTF8 ? value : encode(value, encoding, qc));
     }
   }
 

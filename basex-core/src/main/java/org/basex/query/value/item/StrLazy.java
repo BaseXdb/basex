@@ -56,9 +56,9 @@ public final class StrLazy extends AStr implements Lazy {
   }
 
   @Override
-  public BufferInput input(final InputInfo ii) throws QueryException {
+  public TextInput stringInput(final InputInfo ii) throws IOException, QueryException {
     if(cache) cache(ii);
-    return isCached() ? super.input(ii) : get(ii);
+    return isCached() ? super.stringInput(ii) : get(ii);
   }
 
   @Override
@@ -82,7 +82,7 @@ public final class StrLazy extends AStr implements Lazy {
    * @return stream
    * @throws QueryException query exception
    */
-  private BufferInput get(final InputInfo ii) throws QueryException {
+  private TextInput get(final InputInfo ii) throws QueryException {
     TextInput ti = null;
     try {
       ti = new TextInput(input);
