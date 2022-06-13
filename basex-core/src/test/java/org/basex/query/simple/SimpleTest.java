@@ -48,6 +48,15 @@ public final class SimpleTest extends QueryTest {
       { "Compare 8",  booleans(false), "xs:decimal(1.13) gt xs:float(1.13)" },
       { "Compare 9",  booleans(true),  "xs:decimal(1.13) le xs:double(1.13)" },
       { "Compare 10", booleans(true),  "xs:decimal(1.13) le xs:float(1.13)" },
+      // GH-2113, GH-2114
+      { "Compare 11", booleans(false), "xs:float (1.13) ge xs:double(1.13)" },
+      { "Compare 12", booleans(true),  "xs:float (1.13) le xs:double(1.13)" },
+      { "Compare 13", booleans(true),  "xs:float (1.13) lt xs:double(1.13)" },
+      { "Compare 14", booleans(false), "xs:float (1.13) gt xs:double(1.13)" },
+      { "Compare 15", booleans(true),  "xs:double(1.13) ge xs:float (1.13)" },
+      { "Compare 16", booleans(false), "xs:double(1.13) le xs:float (1.13)" },
+      { "Compare 17", booleans(false), "xs:double(1.13) lt xs:float (1.13)" },
+      { "Compare 18", booleans(true),  "xs:double(1.13) gt xs:float (1.13)" },
 
       { "FLWOR 1", integers(3), "(for $i in 1 to 5 return $i)[3]" },
       { "FLWOR 2", integers(4),
