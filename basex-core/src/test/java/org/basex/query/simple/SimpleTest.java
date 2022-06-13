@@ -37,12 +37,17 @@ public final class SimpleTest extends QueryTest {
       { "Annotation 2", integers(1), "declare %local:x(1.) variable $a := 1; $a" },
       { "Annotation 3", "declare %local:x(.) variable $a := 1; $a" },
 
-      { "Compare 1", booleans(true), "xs:QName('b') = attribute a { 'b' }" },
-      { "Compare 2", booleans(false), "<a/>/x = (c, ())" },
-      { "Compare 3", booleans(false), "(4, 5, 6) < (1, 2)" },
-      { "Compare 4", booleans(false), "(4, 5) < (1, 2, 3)" },
-      { "Compare 5", booleans(false), "1234567890.12345678 = 1234567890.1234567" },
-      { "Compare 6", booleans(false), "123456789012345678  = 123456789012345679" },
+      { "Compare 1",  booleans(true),  "xs:QName('b') = attribute a { 'b' }" },
+      { "Compare 2",  booleans(false), "<a/>/x = (c, ())" },
+      { "Compare 3",  booleans(false), "(4, 5, 6) < (1, 2)" },
+      { "Compare 4",  booleans(false), "(4, 5) < (1, 2, 3)" },
+      { "Compare 5",  booleans(false), "1234567890.12345678 = 1234567890.1234567" },
+      { "Compare 6",  booleans(false), "123456789012345678  = 123456789012345679" },
+      // GH-2112, GH-2115
+      { "Compare 7",  booleans(false), "xs:decimal(1.13) gt xs:double(1.13)" },
+      { "Compare 8",  booleans(false), "xs:decimal(1.13) gt xs:float(1.13)" },
+      { "Compare 9",  booleans(true),  "xs:decimal(1.13) le xs:double(1.13)" },
+      { "Compare 10", booleans(true),  "xs:decimal(1.13) le xs:float(1.13)" },
 
       { "FLWOR 1", integers(3), "(for $i in 1 to 5 return $i)[3]" },
       { "FLWOR 2", integers(4),
