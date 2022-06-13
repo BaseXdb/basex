@@ -66,4 +66,10 @@ public final class InspectFunctions extends StandardFunc {
     // do not relocate function, as it introduces new code
     return Flag.NDT.in(flags) && exprs.length == 1 || super.has(flags);
   }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    // locked resources cannot be detected statically
+    return visitor.lock(null, false) && super.accept(visitor);
+  }
 }
