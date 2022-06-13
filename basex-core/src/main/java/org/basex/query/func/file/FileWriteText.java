@@ -46,8 +46,8 @@ public class FileWriteText extends FileFn {
 
     try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
       if(cs == null) {
-        try(BufferInput in = text.input(info)) {
-          for(int b; (b = in.read()) != -1;) out.write(b);
+        try(TextInput in = text.stringInput(info)) {
+          for(int cp; (cp = in.read()) != -1;) out.print(cp);
         }
       } else {
         out.write(string(text.string(info)).getBytes(cs));

@@ -56,7 +56,7 @@ public abstract class ConvertFn extends StandardFunc {
   /**
    * Converts the specified input to a string in the specified encoding.
    * @param is input stream
-   * @param encoding encoding
+   * @param encoding encoding (can be {@code null})
    * @param validate validate string
    * @return resulting value
    * @throws IOException I/O exception

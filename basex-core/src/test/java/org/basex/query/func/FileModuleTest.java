@@ -497,6 +497,11 @@ public final class FileModuleTest extends SandboxTest {
     query(_FILE_SIZE.args(PATH1), 1);
     query(func.args(PATH1, "\u00fc", "US-ASCII"));
     query(_FILE_READ_TEXT.args(PATH1), "?");
+
+    query(func.args(PATH1, "\u00b0"));
+    query(_FILE_READ_TEXT.args(PATH1), "\u00b0");
+    query(func.args(PATH2, _FILE_READ_TEXT.args(PATH1)));
+    query(_FILE_READ_TEXT.args(PATH2), "\u00b0");
   }
 
   /** Test method. */

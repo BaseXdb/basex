@@ -236,6 +236,17 @@ public abstract class Item extends Value {
     return new ArrayInput(string(ii));
   }
 
+  /**
+   * Returns an text input stream for the string representation of the item.
+   * @param ii input info (can be {@code null})
+   * @return input stream
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  public TextInput stringInput(final InputInfo ii) throws IOException, QueryException {
+    return new TextInput(string(ii));
+  }
+
   @Override
   public Value subsequence(final long start, final long length, final QueryContext qc) {
     return length == 1 ? this : Empty.VALUE;
