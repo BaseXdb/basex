@@ -40,6 +40,7 @@ abstract class FTData extends QueryTest {
       "  <wld>yeah</wld>\n" +
       "  <mix>A<sub/>B</mix>\n" +
       "  <mix>B<sub/>A</mix>\n" +
+      "  <order>A B A</order>\n" +
       "</fttest>";
 
   static { create(DOC); }
@@ -369,6 +370,14 @@ abstract class FTData extends QueryTest {
         "'A B' contains text ('B' ftor 'A') ordered" },
       { "FTOrdered 11", booleans(true),
         "'A B C' contains text ('A' ftor 'C') ftand 'B' ordered" },
+      { "FTOrdered 12", booleans(true),
+        "//order contains text { 'A', 'B' } all ordered" },
+      { "FTOrdered 13", booleans(true),
+        "//order contains text { 'B', 'A' } all ordered" },
+      { "FTOrdered 14", booleans(true),
+        "//order contains text 'A B' all words ordered" },
+      { "FTOrdered 15", booleans(true),
+        "//order contains text 'B A' all words ordered" },
 
       { "FTDistance 1", nodes(3),
         "//w[text() contains text 'the' ftand 'fourth' " +
