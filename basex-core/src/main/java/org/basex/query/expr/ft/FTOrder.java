@@ -28,14 +28,21 @@ public final class FTOrder extends FTFilter {
 
   @Override
   protected boolean filter(final QueryContext qc, final FTMatch match, final FTLexer lexer) {
-    int pos = 0, start = 0;
+    int pos = -1, start = -1;
+    boolean ordered = false;
     for(final FTStringMatch sm : match) {
-      if(sm.exclude || pos == sm.pos) continue;
-      if(start > sm.start) return false;
-      pos = sm.pos;
-      start = sm.start;
+      if(sm.exclude) continue;
+      if(pos < sm.pos) {
+        if(pos > -1 && !ordered) break;
+        pos = sm.pos;
+        ordered = false;
+      }
+      if(start < sm.start) {
+        start = sm.start;
+        ordered = true;
+      }
     }
-    return true;
+    return ordered;
   }
 
   @Override
