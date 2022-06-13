@@ -562,7 +562,7 @@ public enum QueryError {
   /** Error code. */
   DIVZERO_X(FOAR, 1, "% cannot be divided by zero."),
   /** Error code. */
-  DIVFLOW_X(FOAR, 2, "Invalid division result: %."),
+  INVIDIV(FOAR, 2, "Invalid integer division: %."),
   /** Error code. */
   RANGE_X(FOAR, 2, "Value out of range: %."),
 

@@ -133,10 +133,16 @@ public final class ArithTest extends QueryPlanTest {
     check("for $i in (2, 4) return $i idiv 1", "2\n4", empty(Arith.class), empty(GFLWOR.class));
 
     // identical arguments
-    error("for $i in (1, xs:double('NaN')) return $i idiv $i", DIVFLOW_X);
+    error("for $i in (1, xs:double('NaN')) return $i idiv $i", INVIDIV);
     check("for $i in (2, 4) return $i idiv $i", "1\n1", empty(Arith.class), empty(GFLWOR.class));
 
     check("xs:decimal(" + wrap(3) + ") ! (. idiv .)", 1, root(Int.class));
+
+    // GH-2111
+    check("xs:float  (1.13) idiv xs:float  (1.13)", 1, root(Int.class));
+    check("xs:double (1.13) idiv xs:double (1.13)", 1, root(Int.class));
+    check("xs:double (1.13) idiv xs:float  (1.13)", 1, root(Int.class));
+    check("xs:float  (1.13) idiv xs:double (1.13)", 0, root(Int.class));
   }
 
   /** Test method. */

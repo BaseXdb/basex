@@ -352,32 +352,41 @@ public enum Calc {
     @Override
     public Int eval(final Item item1, final Item item2, final InputInfo ii)
         throws QueryException {
+
       checkNum(ii, item1, item2);
       final Type type = numType(item1.type, item2.type);
-      if(type == DOUBLE || type == FLOAT) {
-        final double dbl1 = item1.dbl(ii), dbl2 = item2.dbl(ii);
-        if(dbl2 == 0) throw zeroError(ii, item1);
-        final double dbl = dbl1 / dbl2;
-        if(Double.isNaN(dbl) || Double.isInfinite(dbl))
-          throw DIVFLOW_X.get(ii, dbl1 + " idiv " + dbl2);
-        if(dbl < Long.MIN_VALUE || dbl > Long.MAX_VALUE)
-          throw RANGE_X.get(ii, dbl1 + " idiv " + dbl2);
-        return Int.get((long) dbl);
+      boolean inv = false, range = false, zero = false;
+      long l = 0;
+
+      if(type == FLOAT) {
+        final float n1 = item1.flt(ii), n2 = item2.flt(ii), n = n1 / n2;
+        zero = n2 == 0;
+        inv = Float.isNaN(n) || Float.isInfinite(n);
+        range = n < Long.MIN_VALUE || n > Long.MAX_VALUE;
+        l = (long) n;
+      } else if(type == DOUBLE) {
+        final double n1 = item1.dbl(ii), n2 = item2.dbl(ii), n = n1 / n2;
+        zero = n2 == 0;
+        inv = Double.isNaN(n) || Double.isInfinite(n);
+        range = n < Long.MIN_VALUE || n > Long.MAX_VALUE;
+        l = (long) n;
+      } else if(type == INTEGER) {
+        final long n1 = item1.itr(ii), n2 = item2.itr(ii);
+        zero = n2 == 0;
+        range = n1 == Integer.MIN_VALUE && n2 == -1;
+        l = zero ? 0 : n1 / n2;
+      } else {
+        final BigDecimal n1 = item1.dec(ii), n2 = item2.dec(ii);
+        zero = n2.signum() == 0;
+        final BigDecimal n = zero ? BigDecimal.ZERO : n1.divideToIntegralValue(n2);
+        range = MIN_LONG.compareTo(n) > 0 || n.compareTo(MAX_LONG) > 0;
+        l = range ? Long.MAX_VALUE : n.longValueExact();
       }
 
-      if(type == INTEGER) {
-        final long itr1 = item1.itr(ii), itr2 = item2.itr(ii);
-        if(itr2 == 0) throw zeroError(ii, item1);
-        if(itr1 == Integer.MIN_VALUE && itr2 == -1) throw RANGE_X.get(ii, itr1 + " idiv " + itr2);
-        return Int.get(itr1 / itr2);
-      }
-
-      final BigDecimal dec1 = item1.dec(ii), dec2 = item2.dec(ii);
-      if(dec2.signum() == 0) throw zeroError(ii, item1);
-      final BigDecimal dec = dec1.divideToIntegralValue(dec2);
-      if(!(MIN_LONG.compareTo(dec) <= 0 && dec.compareTo(MAX_LONG) <= 0))
-        throw RANGE_X.get(ii, dec1 + " idiv " + dec2);
-      return Int.get(dec.longValueExact());
+      if(zero) throw zeroError(ii, item1);
+      if(inv) throw INVIDIV.get(ii, item1 + " idiv " + item2);
+      if(range) throw RANGE_X.get(ii, item1 + " idiv " + item2);
+      return Int.get(l);
     }
 
     @Override
