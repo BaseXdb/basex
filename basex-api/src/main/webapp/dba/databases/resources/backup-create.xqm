@@ -69,7 +69,7 @@ function dba:db-rename(
   $comment  as xs:string
 ) as empty-sequence() {
   try {
-    db:create-backup($name, $comment),
+    db:create-backup($name, map { 'comment': $comment }),
     util:redirect($dba:SUB, map { 'name': $name, 'info': 'Backup was created.' })
   } catch * {
     util:redirect($dba:SUB, map { 'name': $name, 'error': $err:description })
