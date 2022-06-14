@@ -259,6 +259,7 @@ public final class Token {
     if(object instanceof byte[]) return (byte[]) object;
     if(object instanceof ArrayOutput) return ((ArrayOutput) object).toArray();
     if(object instanceof TokenBuilder) return ((TokenBuilder) object).toArray();
+    if(object instanceof Supplier<?>) return token(((Supplier<?>) object).get());
 
     final String s;
     if(object == null) {
@@ -267,8 +268,6 @@ public final class Token {
       s = Util.message((Throwable) object);
     } else if(object instanceof Class<?>) {
       s = Util.className((Class<?>) object);
-    } else if(object instanceof Supplier<?>) {
-      s = ((Supplier<?>) object).get().toString();
     } else {
       s = object.toString();
     }
