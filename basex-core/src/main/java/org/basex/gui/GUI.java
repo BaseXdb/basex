@@ -188,10 +188,10 @@ public final class GUI extends JFrame implements BaseXWindow {
       }
     });
 
-    b = new BaseXBack(new ColumnLayout(1));
-    b.add(go);
-    b.add(stop);
-    nav.add(b, BorderLayout.EAST);
+    final BaseXToolBar tb = new BaseXToolBar();
+    tb.add(go);
+    tb.add(stop);
+    nav.add(tb, BorderLayout.EAST);
 
     if(this.gopts.get(GUIOptions.SHOWINPUT)) control.add(nav, BorderLayout.SOUTH);
     top.add(control, BorderLayout.NORTH);

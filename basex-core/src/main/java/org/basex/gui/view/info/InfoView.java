@@ -105,8 +105,8 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     text.setLinkListener(this);
     editor = new SearchEditor(gui, text);
 
-    final BaseXBack buttons = new BaseXBack(false).layout(new ColumnLayout());
-    buttons.add(editor.button(FIND));
+    final BaseXToolBar buttons = new BaseXToolBar();
+    buttons.add(editor.button());
 
     final BaseXBack center = new BaseXBack(false).layout(new ColumnLayout(10));
     center.add(cats);

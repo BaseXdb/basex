@@ -72,9 +72,9 @@ public final class SearchBar extends BaseXBack {
     setVisible(false);
 
     find = new BaseXCombo(gui, true).history(GUIOptions.SEARCHED, gui.gopts);
-    find.hint(Text.FIND + Text.DOTS);
+    find.hint(Text.FIND + "\u2026");
     replace = new BaseXCombo(gui, true).history(GUIOptions.REPLACED, gui.gopts);
-    replace.hint(Text.REPLACE_WITH + Text.DOTS);
+    replace.hint(Text.REPLACE_WITH + "\u2026");
 
     final ActionListener al = e -> search();
     mcase = button("f_case", BaseXLayout.addShortcut(Text.MATCH_CASE, MATCHCASE.toString()), al);
@@ -160,7 +160,7 @@ public final class SearchBar extends BaseXBack {
     final boolean editable = text.isEditable();
     if(editor == null || editable != editor.isEditable()) {
       removeAll();
-      final BaseXBack west = new BaseXBack(false).layout(new ColumnLayout(1));
+      final BaseXToolBar west = new BaseXToolBar();
       west.add(mcase);
       west.add(word);
       west.add(regex);
@@ -170,7 +170,7 @@ public final class SearchBar extends BaseXBack {
       center.add(find);
       if(editable) center.add(replace);
 
-      final BaseXBack east = new BaseXBack(false).layout(new ColumnLayout(1));
+      final BaseXToolBar east = new BaseXToolBar();
       if(editable) east.add(rplc);
       east.add(cls);
 

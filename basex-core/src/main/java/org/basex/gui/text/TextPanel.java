@@ -895,7 +895,7 @@ public class TextPanel extends BaseXPanel {
   /** Find next hit. */
   private class FindCmd extends GUIPopupCmd {
     /** Constructor. */
-    FindCmd() { super(Text.FIND + Text.DOTS, FIND); }
+    FindCmd() { super(Text.FIND + "\u2026", FIND); }
 
     @Override
     public void execute() { search.activate(searchString(), true, false); }

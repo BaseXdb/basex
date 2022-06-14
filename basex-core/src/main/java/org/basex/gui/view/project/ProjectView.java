@@ -86,12 +86,15 @@ public final class ProjectView extends BaseXPanel {
       }
     );
 
+    final BaseXToolBar buttons = new BaseXToolBar();
+
     final AbstractButton browse = BaseXButton.get("c_edit_open", OPEN, false, gui);
     browse.setToolTipText(CHOOSE_DIR + DOTS);
     browse.addActionListener(e -> chooseRoot());
+    buttons.add(browse);
 
     back.add(rootPath, BorderLayout.CENTER);
-    back.add(browse, BorderLayout.EAST);
+    back.add(buttons, BorderLayout.EAST);
     back.add(filter, BorderLayout.SOUTH);
 
     // add scroll bars

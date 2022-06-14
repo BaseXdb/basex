@@ -130,18 +130,17 @@ public final class EditorView extends View {
     tests = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS,
         BaseXKeys.TESTS.toString()), false, gui);
 
-    final BaseXBack buttons = new BaseXBack(false);
-    buttons.layout(new ColumnLayout());
+    final BaseXToolBar buttons = new BaseXToolBar();
     buttons.add(newB);
     buttons.add(openB);
     buttons.add(saveB);
     buttons.add(history);
-    buttons.add(Box.createHorizontalStrut(8));
+    buttons.addSeparator();
     buttons.add(exec);
     buttons.add(stop);
     buttons.add(vars);
     buttons.add(tests);
-    buttons.add(Box.createHorizontalStrut(8));
+    buttons.addSeparator();
     buttons.add(find);
 
     context = new BaseXLabel("").resize(1.2f);

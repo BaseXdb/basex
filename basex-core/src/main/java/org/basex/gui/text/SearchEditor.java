@@ -4,6 +4,7 @@ import java.awt.*;
 
 import javax.swing.*;
 
+import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 
@@ -51,10 +52,9 @@ public final class SearchEditor extends BaseXBack {
 
   /**
    * Returns a search button.
-   * @param help help text
    * @return button
    */
-  public AbstractButton button(final String help) {
-    return search.button(help);
+  public AbstractButton button() {
+    return search.button(Text.FIND);
   }
 }

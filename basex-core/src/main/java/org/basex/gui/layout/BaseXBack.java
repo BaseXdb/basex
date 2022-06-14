@@ -3,7 +3,6 @@ package org.basex.gui.layout;
 import java.awt.*;
 
 import javax.swing.*;
-import javax.swing.border.*;
 
 /**
  * Panel background, extending the {@link JPanel}.
@@ -52,7 +51,7 @@ public class BaseXBack extends JPanel {
    * @return self reference
    */
   public final BaseXBack border(final int t, final int l, final int b, final int r) {
-    setBorder(new EmptyBorder(t, l, b, r));
+    setBorder(BaseXLayout.border(t, l, b, r));
     return this;
   }
 

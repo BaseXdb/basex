@@ -54,22 +54,21 @@ public final class TextView extends View {
     super(TEXTVIEW, notifier);
     border(5).layout(new BorderLayout(0, 5));
 
-    home = BaseXButton.command(GUIMenuCmd.C_SHOW_HOME, gui);
-    home.setEnabled(false);
-
-    label = new BaseXLabel(" ").resize(1.2f);
-
     text = new TextPanel(gui, false);
     text.setSyntax(new SyntaxXML());
     editor = new SearchEditor(gui, text);
+    label = new BaseXLabel(" ").resize(1.2f);
 
     final AbstractButton save = BaseXButton.get("c_save", SAVE, false, gui);
     save.addActionListener(e -> save());
 
-    final BaseXBack buttons = new BaseXBack(false).layout(new ColumnLayout());
+    home = BaseXButton.command(GUIMenuCmd.C_SHOW_HOME, gui);
+    home.setEnabled(false);
+
+    final BaseXToolBar buttons = new BaseXToolBar();
     buttons.add(save);
     buttons.add(home);
-    buttons.add(editor.button(FIND));
+    buttons.add(editor.button());
 
     final BaseXBack north = new BaseXBack(false).layout(new BorderLayout(10, 10));
     north.add(buttons, BorderLayout.WEST);
