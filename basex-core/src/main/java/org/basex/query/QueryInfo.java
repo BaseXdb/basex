@@ -67,7 +67,7 @@ public final class QueryInfo {
     if(verbose && compile.size() < MAX) {
       final TokenList list = new TokenList(ext.length);
       for(final Object e : ext) {
-        list.add(e instanceof Supplier<?> ? token(((Supplier<?>) e).get().toString()) :
+        list.add(e instanceof Supplier<?> ? token(((Supplier<?>) e).get()) :
           QueryError.normalize(e, null));
       }
       String info = Util.info(string, (Object[]) list.finish());
