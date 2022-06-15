@@ -21,13 +21,22 @@ declare
 function dba:dir-change(
   $dir  as xs:string
 ) as element(rest:response) {
-  config:directory(
-    if(contains($dir, file:dir-separator())) then (
+  try {
+    let $sep := file:dir-separator()
+    let $path := file:path-to-native(if(contains($dir, $sep)) then (
       $dir
     ) else (
-      file:path-to-native(config:directory() || $dir || '/')
+      config:directory() || $dir || $sep)
     )
-  ),
-  config:query(''),
-  web:redirect($dba:CAT)
+    return (
+      (: ensure that the directory can be accessed :)
+      prof:void(file:list($path)),
+  
+      config:directory($path),
+      config:query('')
+    ),
+    web:redirect($dba:CAT)
+  } catch file:io-error {
+    web:redirect($dba:CAT, map { 'error': $err:description })
+  }
 };
