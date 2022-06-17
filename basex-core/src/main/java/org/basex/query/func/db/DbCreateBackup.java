@@ -14,12 +14,12 @@ import org.basex.util.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class DbCreateBackup extends DbAccess {
+public final class DbCreateBackup extends BackupFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = toName(0, qc);
+    final String name = toName(0, true, qc);
     final CreateBackupOptions opts = toOptions(1, new CreateBackupOptions(), qc);
-    if(!qc.context.soptions.dbExists(name)) throw DB_OPEN1_X.get(info, name);
+    if(!name.isEmpty() && !qc.context.soptions.dbExists(name)) throw DB_OPEN1_X.get(info, name);
 
     final String comment = opts.get(CreateBackupOptions.COMMENT);
     final boolean compress = opts.get(CreateBackupOptions.COMPRESS);

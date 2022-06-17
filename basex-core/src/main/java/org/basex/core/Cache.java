@@ -33,7 +33,7 @@ public final class Cache implements Closeable {
   private final Context context;
 
   /** Name of current cache. */
-  private String cache = "";
+  private String name = "";
   /** Dirty flag. */
   private boolean dirty = true;
   /** Initialization flag. */
@@ -115,20 +115,20 @@ public final class Cache implements Closeable {
 
   /**
    * Reads a cache from disk.
-   * @param name name (empty for standard cache)
+   * @param cache name (empty for standard cache)
    * @param qc query context
    * @throws IOException I/O exception
    * @return success flag (also {@code true} if standard cache is requested and does not exist)
    * @throws QueryException query exception
    */
-  public synchronized boolean read(final String name, final QueryContext qc)
+  public synchronized boolean read(final String cache, final QueryContext qc)
       throws IOException, QueryException {
 
-    final IOFile file = file(name);
+    final IOFile file = file(cache);
     final boolean exists = file.exists();
-    if(!exists && !standard(name)) return false;
+    if(!exists && !standard(cache)) return false;
 
-    cache = name;
+    name = cache;
     init = true;
     dirty = false;
     map.clear();
@@ -144,17 +144,17 @@ public final class Cache implements Closeable {
 
   /**
    * Writes the current cache to disk.
-   * @param name name (empty for standard cache)
+   * @param cache name (empty for standard cache)
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public synchronized void write(final String name) throws IOException, QueryException {
+  public synchronized void write(final String cache) throws IOException, QueryException {
     init();
-    cache = name;
+    name = cache;
     dirty = false;
 
-    final IOFile file = file(name);
-    if(standard(name) && map.isEmpty()) {
+    final IOFile file = file(cache);
+    if(standard(cache) && map.isEmpty()) {
       // standard cache: delete standard cache if it is empty
       file.delete();
     } else {
@@ -172,11 +172,11 @@ public final class Cache implements Closeable {
 
   /**
    * Deletes a cache on disk.
-   * @param name name (empty for standard cache)
+   * @param cache name (empty for standard cache)
    * @return success flag
    */
-  public synchronized boolean delete(final String name) {
-    final IOFile file = file(name);
+  public synchronized boolean delete(final String cache) {
+    final IOFile file = file(cache);
     return file.exists() && file.delete();
   }
 
@@ -184,7 +184,7 @@ public final class Cache implements Closeable {
   public synchronized void close() {
     // skip write if cache has not been used or cache is not standard cache
     try {
-      if(init && cache.isEmpty() && dirty) write("");
+      if(init && name.isEmpty() && dirty) write("");
     } catch(final IOException | QueryException ex) {
       Util.stack(ex);
     }
@@ -205,24 +205,24 @@ public final class Cache implements Closeable {
   }
 
   /**
-   * Reads a file reference for the specified file name.
-   * @param name name (empty for standard cache)
+   * Reads a file reference for the specified cache.
+   * @param cache name (empty for standard cache)
    * @return file
    */
-  private IOFile file(final String name) {
+  private IOFile file(final String cache) {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(Util.className(this).toLowerCase(Locale.ENGLISH));
-    if(!standard(name)) tb.add('-').add(name);
+    if(!standard(cache)) tb.add('-').add(cache);
     return context.soptions.dbPath(tb.add(IO.BASEXSUFFIX).toString());
   }
 
   /**
-   * Checks if the specified name refers to the standard cache.
-   * @param name name (empty for standard cache)
+   * Checks if the supplied cache name refers to the standard cache.
+   * @param cache name (empty for standard cache)
    * @return result of check
    */
-  private boolean standard(final String name) {
-    return name.isEmpty();
+  private boolean standard(final String cache) {
+    return cache.isEmpty();
   }
 
   // STATIC FUNCTIONS =============================================================================

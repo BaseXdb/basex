@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import java.io.*;
 
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
@@ -24,5 +25,10 @@ public final class CacheWrite extends CacheFn {
       throw CACHE_IO_X.get(info, ex);
     }
     return Empty.VALUE;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitor.lock(null, false) && super.accept(visitor);
   }
 }

@@ -7,7 +7,7 @@ module namespace dba = 'dba/databases';
 
 (:~
  : Downloads a database backup.
- : @param  $backup  name of backup file (ignored)
+ : @param  $backup  name of backup file (ignored by the server)
  : @return binary data
  :)
 declare

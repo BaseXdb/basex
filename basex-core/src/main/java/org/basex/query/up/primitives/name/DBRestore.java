@@ -22,7 +22,7 @@ public final class DBRestore extends NameUpdate {
 
   /**
    * Constructor.
-   * @param name database name
+   * @param name name of database (empty string for general data)
    * @param backup backup file
    * @param qc query context
    * @param info input info
@@ -40,7 +40,7 @@ public final class DBRestore extends NameUpdate {
 
   @Override
   public void apply() throws QueryException {
-    close();
+    if(!name.isEmpty()) close();
     // restore backup
     try {
       Restore.restore(name, backup, qc.context.soptions, null);

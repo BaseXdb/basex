@@ -192,6 +192,8 @@ public interface Text {
   /** Command keyword. */
   String S_NAME = "name";
   /** Command keyword. */
+  String S_COMMENT = "comment";
+  /** Command keyword. */
   String S_PW = "password";
   /** Command keyword. */
   String S_DIR = "dir";
@@ -315,7 +317,7 @@ public interface Text {
     CmdCreate.INDEX + '|' + CmdCreate.USER + "] [...]",
     lang("c_create1"),
     lang("c_create2") + NL +
-    LI + CmdDrop.BACKUP + " [" + S_NAME + "]:" + NL +
+    LI + CmdDrop.BACKUP + " ([" + S_NAME + "] ([" + S_COMMENT + "])):" + NL +
     "  " + lang("c_create22", S_NAME) + NL +
     LI + CmdCreate.DATABASE + " [" + S_NAME + "] ([" + S_INPUT + "]):"  + NL +
     "  " + lang("c_create21", S_NAME, S_INPUT) + NL +
@@ -382,7 +384,7 @@ public interface Text {
       CmdDrop.INDEX + '|' + CmdDrop.USER + "] [...]",
     lang("c_drop1"),
     lang("c_drop2") + NL +
-    LI + CmdDrop.BACKUP + " [" + S_NAME + "]:" + NL +
+    LI + CmdDrop.BACKUP + " ([" + S_NAME + "]):" + NL +
     "  " + lang("c_drop24") + NL +
     LI + CmdDrop.DATABASE + " [" + S_NAME + "]:" + NL +
     "  " + lang("c_drop21") + NL +
@@ -444,7 +446,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPRESTORE = {
-    '[' + S_NAME + "-(date)]", lang("c_restore1"), lang("c_restore2")
+    "([" + S_NAME + "(-date)])", lang("c_restore1"), lang("c_restore2")
   };
   /** Command help. */
   String[] HELPSHOW = {

@@ -206,8 +206,8 @@ public final class DBNew {
       final IOFile srcDir = source.meta.dir(type), trgDir = target.meta.dir(type);
       if(srcDir != null && srcDir.exists()) {
         trgDir.md();
-        for(final String file : srcDir.descendants()) {
-          final IOFile srcFile = new IOFile(srcDir, file), trgFile = new IOFile(trgDir, file);
+        for(final String path : srcDir.descendants()) {
+          final IOFile srcFile = new IOFile(srcDir, path), trgFile = new IOFile(trgDir, path);
           trgFile.delete();
           trgFile.parent().md();
           Files.move(Paths.get(srcFile.path()), Paths.get(trgFile.path()));

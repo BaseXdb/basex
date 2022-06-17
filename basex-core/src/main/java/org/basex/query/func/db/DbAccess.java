@@ -49,17 +49,19 @@ abstract class DbAccess extends StandardFunc {
   /**
    * Checks if the specified expression is a valid database name.
    * @param i index of argument
+   * @param empty allow empty string
    * @param qc query context
-   * @return database name
+   * @return database name (empty string for general data)
    * @throws QueryException query exception
    */
-  protected final String toName(final int i, final QueryContext qc) throws QueryException {
-    return toName(i, DB_NAME_X, qc);
+  protected final String toName(final int i, final boolean empty, final QueryContext qc)
+      throws QueryException {
+    return toName(i, empty, DB_NAME_X, qc);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return dataLock(visitor, 0) && super.accept(visitor);
+    return dataLock(visitor, false, 0) && super.accept(visitor);
   }
 
   /**

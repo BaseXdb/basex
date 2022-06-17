@@ -235,7 +235,7 @@ public final class SimpleTest extends QueryTest {
       { "Empty 5", booleans(true), "declare function local:foo($x as empty-sequence())"
           + "as xs:boolean { empty($x) }; local:foo(())" },
 
-      { "Map 1", strings("c", "a"), "<a/> ! (('b'!'c'), name())" },
+      { "Map 1", strings("c", "a"), "<a/> ! (('b' ! 'c'), name())" },
       { "Map 2", integers(5), "((1 to 100000) ! 5)[1]" },
       { "Map 3", strings("a", "b"), "<a><b/></a>/b ! ancestor-or-self::node() ! name()" },
       { "Map 4", strings("a", "b"), "<_ a='a' b='b'/> ! (@a, @b) ! string()" },

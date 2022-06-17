@@ -6,7 +6,6 @@ import java.io.*;
 import java.util.zip.*;
 
 import org.basex.core.*;
-import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.io.*;
@@ -28,12 +27,12 @@ public final class ShowBackups extends ABackup {
     table.header.add(SIZE);
     table.header.add(COMMENT);
 
-    for(final String name : context.databases.backups()) {
+    for(final String backup : context.databases.backups()) {
       final TokenList tl = new TokenList();
-      tl.add(name);
-      final IOFile zip = soptions.dbPath(name + IO.ZIPSUFFIX);
+      tl.add(backup);
+      final IOFile zip = soptions.dbPath(backup + IO.ZIPSUFFIX);
       tl.add(zip.length());
-      tl.add(comment(name, context));
+      tl.add(comment(backup, context));
       table.contents.add(tl);
     }
     out.println(table.sort().finish());
@@ -52,7 +51,7 @@ public final class ShowBackups extends ABackup {
 
   @Override
   public void addLocks() {
-    jc().locks.reads.add(Locking.BACKUP);
+    jc().locks.reads.addGlobal();
   }
 
   /**

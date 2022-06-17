@@ -42,11 +42,8 @@ public final class CommandLockingTest extends SandboxTest {
   private static final LockList USER_LIST = new LockList().add(Locking.USER);
   /** StringList containing REPO lock string. */
   private static final LockList REPO_LIST = new LockList().add(Locking.REPO);
-  /** StringList containing BACKUP lock string. */
-  private static final LockList BACKUP_LIST = new LockList().add(Locking.BACKUP);
   /** StringList containing BACKUP lock string and name. */
-  private static final LockList BACKUP_NAME =
-      new LockList().add(Locking.BACKUP).add(NAME);
+  private static final LockList BACKUP_NAME = new LockList().add(NAME);
   /** StringList containing java module test lock strings. */
   private static final LockList MODULE_LIST = new LockList().
       add(Locking.BASEX_PREFIX + QueryModuleTest.LOCK);
@@ -62,12 +59,12 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new Check(NAME), false, NAME_CTX);
     ckDBs(new Close(), false, CTX_LIST);
     ckDBs(new Copy(NAME2, NAME), new LockList().add(NAME2), NAME_LIST);
-    ckDBs(new CreateBackup(NAME), NAME_LIST, BACKUP_LIST);
+    ckDBs(new CreateBackup(NAME), true, NAME_LIST);
     ckDBs(new CreateDB(NAME), CTX_LIST, NAME_LIST);
     ckDBs(new CreateIndex(IndexType.TEXT), true, CTX_LIST);
     ckDBs(new CreateUser(NAME, NAME), true, USER_LIST);
     ckDBs(new Delete(FILE), true, CTX_LIST);
-    ckDBs(new DropBackup(NAME), true, BACKUP_LIST);
+    ckDBs(new DropBackup(NAME), true, NAME_LIST);
     ckDBs(new DropDB(NAME + '*'), true, null); // Drop using globbing
     ckDBs(new DropDB(NAME), true, NAME_LIST);
     ckDBs(new DropIndex(IndexType.TEXT), true, CTX_LIST);
@@ -105,7 +102,7 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new Retrieve(FILE), false, CTX_LIST);
     ckDBs(new Run(FILE), false, null);
     ckDBs(new Set(NAME, NAME), false, NONE);
-    ckDBs(new ShowBackups(), false, BACKUP_LIST);
+    ckDBs(new ShowBackups(), false, null);
     ckDBs(new ShowSessions(), false, NONE);
     ckDBs(new ShowUsers(), false, NONE);
     ckDBs(new ShowUsers(NAME), false, NONE);

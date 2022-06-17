@@ -122,17 +122,20 @@ function dba:files(
           return html:table($headers, $entries, $buttons, map { }, $options)
         }</form>
 
-        <h3>Upload Files</h3>
-        <form action='file-upload' method='post' enctype='multipart/form-data'>
-          <input type='file' name='files' multiple='multiple'/>
-          <input type='submit' value='Send'/>
-        </form>
-
         <h3>Create Directory</h3>
         <form action='dir-create' method='post'>
           <input type='text' name='name'/><![CDATA[ ]]>
           <input type='submit' value='Create'/>
         </form>
+
+        <h3>Upload Files</h3>
+        <form action='file-upload' method='post' enctype='multipart/form-data'>
+          <input type='file' name='files' multiple='multiple'/>
+          <input type='submit' value='Send'/>
+        </form>
+        <div class='note'>
+          Ensure that your server has enough RAM to upload large files.
+        </div>
       </td>
     </tr>
   )

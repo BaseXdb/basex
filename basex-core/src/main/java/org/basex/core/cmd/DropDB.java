@@ -3,7 +3,6 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import org.basex.core.*;
-import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
@@ -19,10 +18,10 @@ import org.basex.util.list.*;
 public final class DropDB extends ACreate {
   /**
    * Default constructor.
-   * @param name name of database
+   * @param pattern database pattern
    */
-  public DropDB(final String name) {
-    super(name);
+  public DropDB(final String pattern) {
+    super(pattern);
   }
 
   @Override
@@ -67,25 +66,33 @@ public final class DropDB extends ACreate {
   }
 
   /**
-   * Deletes the specified database.
-   * @param db name of the database
+   * Deletes the specified database or general data.
+   * @param db name of the database (empty string for general data)
    * @param sopts static options
    * @return success flag
    */
   public static synchronized boolean drop(final String db, final StaticOptions sopts) {
     final IOFile dbpath = sopts.dbPath(db);
-    return dbpath.exists() && dbpath.delete();
+    boolean ok = true;
+    if(db.isEmpty()) {
+      for(final String path : sopts.dbFiles(db)) ok &= new IOFile(dbpath, path).delete();
+    } else {
+      ok = dbpath.exists() && dbpath.delete();
+    }
+    return ok;
   }
 
   /**
-   * Recursively drops files in database directory with the specified pattern.
+   * Recursively drops files in a database directory with the specified pattern.
    * @param path database path
-   * @param pat file pattern
+   * @param pattern file pattern
    * @return success of operation
    */
-  public static synchronized boolean drop(final IOFile path, final String pat) {
+  public static synchronized boolean drop(final IOFile path, final String pattern) {
     boolean ok = true;
-    for(final IOFile f : path.children()) ok &= !f.name().matches(pat) || f.delete();
+    for(final IOFile file : path.children()) {
+      ok &= !file.name().matches(pattern) || file.delete();
+    }
     return ok;
   }
 
@@ -96,8 +103,7 @@ public final class DropDB extends ACreate {
 
   @Override
   public void addLocks() {
-    final Locks locks = jc().locks;
-    if(!addLocks(locks.writes, 0)) locks.writes.addGlobal();
+    addLocks(jc().locks.writes, 0);
   }
 
   @Override

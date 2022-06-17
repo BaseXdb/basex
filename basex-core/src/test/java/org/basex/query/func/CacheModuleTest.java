@@ -17,6 +17,9 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public class CacheModuleTest extends SandboxTest {
+  /** Invalid characters for database names. */
+  private static final char[] INVALID = ",*?;\\/:\"<>|".toCharArray();
+
   /** Initializes a test. */
   @BeforeEach public void initTest() {
     final Function clear = _CACHE_CLEAR;
@@ -43,8 +46,9 @@ public class CacheModuleTest extends SandboxTest {
     error(func.args("DELETE"), CACHE_NOTFOUND_X);
 
     error(func.args("unknown"), CACHE_NOTFOUND_X);
-    error(func.args("I N V A L I D"), CACHE_NAME_X);
+    // invalid names
     error(func.args(""), CACHE_NAME_X);
+    for(final char ch : INVALID) error(func.args(ch), CACHE_NAME_X);
   }
 
   /** Test method. */
@@ -122,8 +126,10 @@ public class CacheModuleTest extends SandboxTest {
     query(_CACHE_KEYS.args(), "key");
 
     error(func.args("unknown"), CACHE_NOTFOUND_X);
-    error(func.args("I N V A L I D"), CACHE_NAME_X);
+
+    // invalid names
     error(func.args(""), CACHE_NAME_X);
+    for(final char ch : INVALID) error(func.args(ch), CACHE_NAME_X);
   }
 
   /** Test method. */
@@ -144,8 +150,9 @@ public class CacheModuleTest extends SandboxTest {
     query(func.args("cache"));
     query(_CACHE_KEYS.args(), "key");
 
-    error(func.args("I N V A L I D"), CACHE_NAME_X);
+    // invalid names
     error(func.args(""), CACHE_NAME_X);
+    for(final char ch : INVALID) error(func.args(ch), CACHE_NAME_X);
   }
 
   /** Test method. */

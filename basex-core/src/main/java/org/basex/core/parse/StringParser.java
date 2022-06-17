@@ -63,7 +63,7 @@ final class StringParser extends CommandParser {
       case CREATE:
         switch(consume(CmdCreate.class, cmd)) {
           case BACKUP:
-            return new CreateBackup(glob(cmd), string(null));
+            return new CreateBackup(glob(null), string(null));
           case DATABASE: case DB:
             return new CreateDB(name(cmd), remaining(null, true));
           case INDEX:
@@ -133,7 +133,7 @@ final class StringParser extends CommandParser {
           case USER:
             return new DropUser(glob(cmd), key(ON, null) ? glob(cmd) : null);
           case BACKUP:
-            return new DropBackup(glob(cmd));
+            return new DropBackup(glob(null));
         }
         break;
       case OPTIMIZE:
@@ -172,7 +172,7 @@ final class StringParser extends CommandParser {
       case KILL:
         return new Kill(string(cmd));
       case RESTORE:
-        return new Restore(name(cmd));
+        return new Restore(name(null));
       case JOBS:
         switch(consume(CmdJobs.class, cmd)) {
           case LIST:

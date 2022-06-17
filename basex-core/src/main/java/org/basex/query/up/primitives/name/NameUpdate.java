@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * @author Lukas Kircher
  */
 public abstract class NameUpdate extends Update implements Comparable<NameUpdate> {
-  /** Name of the database. */
+  /** Name of the database (empty string for general data). */
   final String name;
   /** Query context. */
   final QueryContext qc;
@@ -22,7 +22,7 @@ public abstract class NameUpdate extends Update implements Comparable<NameUpdate
   /**
    * Constructor.
    * @param type type of this operation
-   * @param name name of database
+   * @param name name of database (empty string for general data)
    * @param qc query context
    * @param info input info
    */

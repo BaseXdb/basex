@@ -6,12 +6,13 @@ import java.io.*;
 import java.util.zip.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Evaluates the 'restore' command and restores a backup of a database.
+ * Evaluates the 'restore' command and restores a database.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
@@ -26,70 +27,61 @@ public final class Restore extends ABackup {
 
   /**
    * Default constructor.
-   * @param arg optional argument
+   * @param name name of backup with optional date ({@code null} for general data)
    */
-  public Restore(final String arg) {
-    super(arg);
+  public Restore(final String name) {
+    super(name != null ? name : "");
   }
 
   @Override
   protected boolean run() {
     final String name = args[0];
-    if(!Databases.validName(name)) return error(NAME_INVALID_X, name);
+    if(!(name.isEmpty() || Databases.validName(name))) return error(NAME_INVALID_X, name);
 
     // find backup with or without date suffix
     final StringList backups = context.databases.backups(name);
     if(backups.isEmpty()) return error(BACKUP_NOT_FOUND_X, name);
 
-    final String backup = backups.get(0);
-    final String db = Databases.name(backup);
-
-    // close database if it's currently opened and not opened by others
-    if(!closed) closed = close(context, db);
-    // check if database is still pinned
-    if(context.pinned(db)) return error(DB_PINNED_X, db);
+    final String backup = backups.get(0), db = Databases.name(backup);
+    if(!db.isEmpty()) {
+      // close database if it's currently opened and not opened by others
+      if(!closed) closed = close(context, db);
+      // check if database is still pinned
+      if(context.pinned(db)) return error(DB_PINNED_X, db);
+    }
 
     // try to restore database
     try {
       restore(db, backup, soptions, this);
-      return !closed || new Open(db).run(context) ? info(DB_RESTORED_X, backup, jc().performance) :
-        error(DB_NOT_RESTORED_X, db);
+      return db.isEmpty() || !closed || new Open(db).run(context) ?
+        info(DB_RESTORED_X, backup, jc().performance) : error(DB_NOT_RESTORED_X, db);
     } catch(final IOException ex) {
       Util.debug(ex);
       return error(DB_NOT_RESTORED_X, db);
     }
   }
 
-  @Override
-  public void addLocks() {
-    super.addLocks();
-    // Not sure whether database or name of backup file is provided: lock both
-    final String backup = args[0];
-    jc().locks.writes.add(backup).add(Databases.name(backup));
-  }
-
   /**
-   * Restores the specified database.
-   * @param db name of database
-   * @param name name of backup
+   * Restores the specified database .
+   * @param db name of database (empty string for general data)
+   * @param backup name of backup
    * @param sopts static options
    * @param cmd calling command instance (can be {@code null})
    * @throws IOException I/O exception
    */
-  public static void restore(final String db, final String name, final StaticOptions sopts,
+  public static void restore(final String db, final String backup, final StaticOptions sopts,
       final Restore cmd) throws IOException {
 
-    // drop target database
+    // drop existing files
     DropDB.drop(db, sopts);
-
-    final IOFile dbPath = sopts.dbPath();
-    final IOFile backup = new IOFile(dbPath, name + IO.ZIPSUFFIX);
+    // unzip backup
+    final IOFile dbPath = sopts.dbPath(), file = new IOFile(dbPath, backup + IO.ZIPSUFFIX);
     if(cmd != null) {
-      try(ZipFile zip = new ZipFile(backup.file())) {
+      try(ZipFile zip = new ZipFile(file.file())) {
         cmd.total = zip.size();
       }
     }
-    try(InputStream is = backup.inputStream(); ZipInputStream in = new ZipInputStream(is)) {
+    try(InputStream is = file.inputStream(); ZipInputStream in = new ZipInputStream(is)) {
       for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
         final IOFile trg = new IOFile(dbPath, ze.getName());
         if(ze.isDirectory()) {
@@ -100,6 +92,18 @@ public final class Restore extends ABackup {
         }
         if(cmd != null) cmd.curr++;
       }
+    }
+  }
+
+  @Override
+  public void addLocks() {
+    final LockList list = jc().locks.writes;
+    final String name = args[0], db = Databases.name(name);
+    if(db.isEmpty()) {
+      list.addGlobal();
+    } else {
+      // not sure whether database or name of backup file is provided: lock both
+      list.add(name).add(db);
     }
   }
 

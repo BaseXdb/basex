@@ -28,6 +28,8 @@ import org.junit.jupiter.api.Test;
  * @author Christian Gruen
  */
 public final class DbModuleTest extends QueryPlanTest {
+  /** Invalid characters for database names. */
+  private static final char[] INVALID = ",*?;\\/:\"<>|".toCharArray();
   /** Test file. */
   private static final String XML = "src/test/resources/input.xml";
   /** Test file. */
@@ -149,8 +151,8 @@ public final class DbModuleTest extends QueryPlanTest {
     query(func.args(NAME + 'a', NAME));
 
     // invalid names
-    error(func.args("x", " ''"), DB_NAME_X);
-    error(func.args(" ''", "x"), DB_NAME_X);
+    for(final char ch : INVALID) error(func.args("x", ch), DB_NAME_X);
+    for(final char ch : INVALID) error(func.args(ch, "x"), DB_NAME_X);
 
     // same name is disallowed
     error(func.args(NAME, NAME), DB_CONFLICT4_X);
@@ -171,8 +173,8 @@ public final class DbModuleTest extends QueryPlanTest {
     query(func.args(NAME + 'a', NAME));
 
     // invalid names
-    error(func.args("x", " ''"), DB_NAME_X);
-    error(func.args(" ''", "x"), DB_NAME_X);
+    for(final char ch : INVALID) error(func.args("x", ch), DB_NAME_X);
+    for(final char ch : INVALID) error(func.args(ch, "x"), DB_NAME_X);
 
     // same name is disallowed
     error(func.args(NAME, NAME), DB_CONFLICT4_X);
@@ -251,8 +253,8 @@ public final class DbModuleTest extends QueryPlanTest {
     }
 
     // invalid names
-    error(func.args("x", " ''"), DB_NAME_X);
-    error(func.args(" ''", "x"), DB_NAME_X);
+    for(final char ch : INVALID) error(func.args("x", ch), DB_NAME_X);
+    for(final char ch : INVALID) error(func.args(ch, "x"), DB_NAME_X);
 
     // same name is disallowed
     error(func.args(NAME, NAME), DB_CONFLICT4_X);
@@ -377,6 +379,9 @@ public final class DbModuleTest extends QueryPlanTest {
         BASEX_OPTIONS_X_X);
     error(func.args(NAME, " ()", " ()", " map { '" + lc(MainOptions.TEXTINDEX) + "': 'nope' }"),
         BASEX_OPTIONS_X_X);
+
+    // invalid names
+    for(final char ch : INVALID) error(func.args(ch), DB_NAME_X);
   }
 
   /** Test method. */
@@ -401,6 +406,11 @@ public final class DbModuleTest extends QueryPlanTest {
     query(func.args(NAME));
     query("count(" + _DB_BACKUPS.args(NAME) + ")", 1);
 
+    // create and drop backup of general data
+    query(func.args(""));
+    query("count(" + _DB_BACKUPS.args("") + ")", 1);
+    query("count(" + _DB_BACKUPS.args() + ")", 2);
+
     final int size1 = Integer.parseInt(query(_DB_BACKUPS.args(NAME) + "/@size ! data()"));
     query(func.args(NAME, " map { 'compress': false() }"));
     final int size2 = Integer.parseInt(query(_DB_BACKUPS.args(NAME) + "/@size ! data()"));
@@ -409,8 +419,8 @@ public final class DbModuleTest extends QueryPlanTest {
     query(func.args(NAME, " map { 'comment': 'BLA' }"));
     query(_DB_BACKUPS.args(NAME) + "/@comment ! data()", "BLA");
 
-    // invalid name
-    error(func.args(""), DB_NAME_X);
+    // invalid names
+    for(final char ch : INVALID) error(func.args(ch), DB_NAME_X);
     // try to backup non-existing database
     error(func.args(NAME + "backup"), DB_OPEN1_X);
   }
@@ -465,8 +475,8 @@ public final class DbModuleTest extends QueryPlanTest {
     query(func.args(dbName));
     query(_DB_EXISTS.args(dbName), false);
 
-    // invalid name
-    error(func.args(" ''"), DB_NAME_X);
+    // invalid names
+    for(final char ch : INVALID) error(func.args(ch), DB_NAME_X);
     // try to drop non-existing DB
     error(func.args(dbName), DB_OPEN1_X);
   }
@@ -483,10 +493,15 @@ public final class DbModuleTest extends QueryPlanTest {
     query(_DB_CREATE_BACKUP.args(NAME));
     query(func.args(' ' + query(_DB_BACKUPS.args(NAME))));
 
+    // create and drop backup of general data
+    query(_DB_CREATE_BACKUP.args(""));
+    query(func.args(' ' + query(_DB_BACKUPS.args(""))));
+
     // invalid name
-    error(func.args(""), DB_NAME_X);
+    for(final char ch : INVALID) error(func.args(String.valueOf(ch)), DB_NAME_X);
     // backup file does not exist
     error(func.args(NAME), DB_NOBACKUP_X);
+    error(func.args(""), DB_NOBACKUP_X);
     // check if drop is called before create
     error(_DB_CREATE_BACKUP.args(NAME) + ',' + func.args(NAME), DB_NOBACKUP_X);
   }
@@ -867,17 +882,21 @@ public final class DbModuleTest extends QueryPlanTest {
     final Function func = _DB_RESTORE;
     execute(new Close());
 
-    // backup and restore file
+    // backup and restore
     query(_DB_CREATE_BACKUP.args(NAME));
     query(func.args(NAME));
     query(func.args(NAME));
+
+    // backup and restore general data
+    query(_DB_CREATE_BACKUP.args(""));
+    query(func.args(""));
 
     // drop backups
     query(_DB_DROP_BACKUP.args(NAME));
     error(func.args(NAME), DB_NOBACKUP_X);
 
     // invalid names
-    error(func.args(" ''"), DB_NAME_X);
+    for(final char ch : INVALID) error(func.args(ch), DB_NAME_X);
   }
 
   /** Test method. */

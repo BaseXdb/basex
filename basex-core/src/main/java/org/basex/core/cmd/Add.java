@@ -151,9 +151,9 @@ public final class Add extends ACreate {
     // (does not work for input streams and directories)
     long fl = parser.source.length();
     if(parser.source instanceof IOFile) {
-      final IOFile f = (IOFile) parser.source;
-      if(f.isDir()) {
-        for(final String d : f.descendants()) fl += new IOFile(f, d).length();
+      final IOFile src = (IOFile) parser.source;
+      if(src.isDir()) {
+        for(final String path : src.descendants()) fl += new IOFile(src, path).length();
       }
     }
 

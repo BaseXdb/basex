@@ -8,6 +8,11 @@ module namespace util = 'dba/util';
 import module namespace options = 'dba/options' at 'options.xqm';
 import module namespace config = 'dba/config' at 'config.xqm';
 
+(:~ Regular expression for backups. :)
+declare variable $util:BACKUP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)$';
+(:~ Regular expression for backups. :)
+declare variable $util:BACKUP-ZIP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)\.zip$';
+
 (:~
  : Evaluates a query and returns the result.
  : @param  $query    query string
@@ -141,7 +146,7 @@ declare function util:info(
   $action  as xs:string
 ) as xs:string {
   let $count := count($items)
-  return $count || ' ' || $name || (if($count > 1) then 's were ' else ' was ') || $action || '.'
+  return $count || ' ' || $name || (if($count != 1) then 's were ' else ' was ') || $action || '.'
 };
 
 (:~
