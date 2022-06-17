@@ -7,8 +7,9 @@ import org.basex.build.html.*;
 import org.basex.build.json.*;
 import org.basex.build.text.*;
 import org.basex.core.*;
-import org.basex.core.MainOptions.MainParser;
+import org.basex.core.MainOptions.*;
 import org.basex.core.cmd.*;
+import org.basex.core.cmd.Store;
 import org.basex.http.*;
 import org.basex.util.http.*;
 

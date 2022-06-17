@@ -9,12 +9,13 @@ import java.util.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.cmd.Store;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
-import org.basex.server.Log.LogType;
+import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 

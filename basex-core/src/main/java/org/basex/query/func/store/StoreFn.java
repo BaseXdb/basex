@@ -1,4 +1,4 @@
-package org.basex.query.func.cache;
+package org.basex.query.func.store;
 
 import static org.basex.query.QueryError.*;
 
@@ -7,12 +7,12 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 
 /**
- * Cache function.
+ * Store function.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public abstract class CacheFn extends StandardFunc {
+public abstract class StoreFn extends StandardFunc {
   /**
    * Returns the key argument.
    * @param qc query context
@@ -24,22 +24,22 @@ public abstract class CacheFn extends StandardFunc {
   }
 
   /**
-   * Checks if the specified expression is a valid cache name.
+   * Checks if the specified expression is a valid store name.
    * @param i expression index
    * @param qc query context
    * @return name
    * @throws QueryException query exception
    */
   final String toName(final int i, final QueryContext qc) throws QueryException {
-    return toName(i, false, CACHE_NAME_X, qc);
+    return toName(i, false, STORE_NAME_X, qc);
   }
 
   /**
-   * Returns the state map.
+   * Returns the store.
    * @param qc query context
    * @return state map
    */
-  final Cache cache(final QueryContext qc) {
-    return qc.context.cache;
+  final Store store(final QueryContext qc) {
+    return qc.context.store;
   }
 }

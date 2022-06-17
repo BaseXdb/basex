@@ -190,7 +190,7 @@ public abstract class XQArray extends XQData {
   public void write(final DataOutput out) throws IOException, QueryException {
     out.writeLong(arraySize());
     for(final Value member : members()) {
-      Cache.write(out, member);
+      Store.write(out, member);
     }
   }
 

@@ -18,21 +18,23 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class provides a global key/value cache.
+ * This class provides a main-memory key/value store.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class Cache implements Closeable {
+public final class Store implements Closeable {
+  /** Name of store files. */
+  private static final String NAME = Util.className(Store.class).toLowerCase(Locale.ENGLISH);
   /** File pattern. */
-  private static final Pattern PATTERN = Pattern.compile("cache-(.*)\\" + IO.BASEXSUFFIX);
+  private static final Pattern PATTERN = Pattern.compile(NAME + "-(.*)\\" + IO.BASEXSUFFIX);
 
-  /** Cache entries. */
+  /** Store entries. */
   private final TokenObjMap<Value> map = new TokenObjMap<>();
   /** Database context. */
   private final Context context;
 
-  /** Name of current cache. */
+  /** Name of current store. */
   private String name = "";
   /** Dirty flag. */
   private boolean dirty = true;
@@ -43,7 +45,7 @@ public final class Cache implements Closeable {
    * Constructor.
    * @param context database context
    */
-  public Cache(final Context context) {
+  public Store(final Context context) {
     this.context = context;
   }
 
@@ -101,7 +103,7 @@ public final class Cache implements Closeable {
   }
 
   /**
-   * Returns the names of all caches.
+   * Returns the names of all stores.
    * @return keys
    */
   public synchronized Value list() {
@@ -114,21 +116,21 @@ public final class Cache implements Closeable {
   }
 
   /**
-   * Reads a cache from disk.
-   * @param cache name (empty for standard cache)
+   * Reads a store from disk.
+   * @param store name (empty for standard store)
    * @param qc query context
    * @throws IOException I/O exception
-   * @return success flag (also {@code true} if standard cache is requested and does not exist)
+   * @return success flag (also {@code true} if standard store is requested and does not exist)
    * @throws QueryException query exception
    */
-  public synchronized boolean read(final String cache, final QueryContext qc)
+  public synchronized boolean read(final String store, final QueryContext qc)
       throws IOException, QueryException {
 
-    final IOFile file = file(cache);
+    final IOFile file = file(store);
     final boolean exists = file.exists();
-    if(!exists && !standard(cache)) return false;
+    if(!exists && !standard(store)) return false;
 
-    name = cache;
+    name = store;
     init = true;
     dirty = false;
     map.clear();
@@ -143,22 +145,22 @@ public final class Cache implements Closeable {
   }
 
   /**
-   * Writes the current cache to disk.
-   * @param cache name (empty for standard cache)
+   * Writes the current store to disk.
+   * @param store name (empty for standard store)
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public synchronized void write(final String cache) throws IOException, QueryException {
+  public synchronized void write(final String store) throws IOException, QueryException {
     init();
-    name = cache;
+    name = store;
     dirty = false;
 
-    final IOFile file = file(cache);
-    if(standard(cache) && map.isEmpty()) {
-      // standard cache: delete standard cache if it is empty
+    final IOFile file = file(store);
+    if(standard(store) && map.isEmpty()) {
+      // delete standard store if it is empty
       file.delete();
     } else {
-      // write cache to disk
+      // write store to disk
       file.parent().md();
       try(DataOutput out = new DataOutput(file)) {
         out.writeNum(map.size());
@@ -171,18 +173,18 @@ public final class Cache implements Closeable {
   }
 
   /**
-   * Deletes a cache on disk.
-   * @param cache name (empty for standard cache)
+   * Deletes a store on disk.
+   * @param store name (empty for standard store)
    * @return success flag
    */
-  public synchronized boolean delete(final String cache) {
-    final IOFile file = file(cache);
+  public synchronized boolean delete(final String store) {
+    final IOFile file = file(store);
     return file.exists() && file.delete();
   }
 
   @Override
   public synchronized void close() {
-    // skip write if cache has not been used or cache is not standard cache
+    // skip write if store has not been used or is not standard store
     try {
       if(init && name.isEmpty() && dirty) write("");
     } catch(final IOException | QueryException ex) {
@@ -193,7 +195,7 @@ public final class Cache implements Closeable {
   // PRIVATE FUNCTIONS ============================================================================
 
   /**
-   * Initializes the cache.
+   * Initializes the store.
    */
   private synchronized void init() {
     if(init) return;
@@ -205,24 +207,23 @@ public final class Cache implements Closeable {
   }
 
   /**
-   * Reads a file reference for the specified cache.
-   * @param cache name (empty for standard cache)
+   * Reads a file reference for the specified store.
+   * @param store name (empty for standard store)
    * @return file
    */
-  private IOFile file(final String cache) {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(Util.className(this).toLowerCase(Locale.ENGLISH));
-    if(!standard(cache)) tb.add('-').add(cache);
+  private IOFile file(final String store) {
+    final TokenBuilder tb = new TokenBuilder().add(NAME);
+    if(!standard(store)) tb.add('-').add(store);
     return context.soptions.dbPath(tb.add(IO.BASEXSUFFIX).toString());
   }
 
   /**
-   * Checks if the supplied cache name refers to the standard cache.
-   * @param cache name (empty for standard cache)
+   * Checks if the supplied store refers to the standard store.
+   * @param store name (empty for standard store)
    * @return result of check
    */
-  private boolean standard(final String cache) {
-    return cache.isEmpty();
+  private boolean standard(final String store) {
+    return store.isEmpty();
   }
 
   // STATIC FUNCTIONS =============================================================================
@@ -288,7 +289,7 @@ public final class Cache implements Closeable {
   }
 
   /**
-   * Reads a cache from disk.
+   * Reads a store from disk.
    * @param in input stream
    * @param qc query context
    * @return value or {@code null} if data could not be read

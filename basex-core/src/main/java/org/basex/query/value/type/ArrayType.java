@@ -44,7 +44,7 @@ public final class ArrayType extends FuncType {
   public XQArray read(final DataInput in, final QueryContext qc)
       throws IOException, QueryException {
     final ArrayBuilder ab = new ArrayBuilder();
-    for(int s = in.readNum() - 1; s >= 0; s--) ab.append(Cache.read(in, qc));
+    for(int s = in.readNum() - 1; s >= 0; s--) ab.append(Store.read(in, qc));
     return ab.array();
   }
 

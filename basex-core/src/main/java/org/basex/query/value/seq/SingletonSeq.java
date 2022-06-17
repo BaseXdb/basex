@@ -51,14 +51,14 @@ public final class SingletonSeq extends Seq {
   public static Value read(final DataInput in, final Type type, final QueryContext qc)
       throws IOException, QueryException {
     final long count = in.readLong();
-    final Value value = Cache.read(in, qc);
+    final Value value = Store.read(in, qc);
     return get(value, count);
   }
 
   @Override
   public void write(final DataOutput out) throws IOException, QueryException {
     out.writeLong(size / value.size());
-    Cache.write(out, value);
+    Store.write(out, value);
   }
 
   @Override

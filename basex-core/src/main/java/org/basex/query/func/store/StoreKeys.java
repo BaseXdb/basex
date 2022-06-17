@@ -1,4 +1,4 @@
-package org.basex.query.func.cache;
+package org.basex.query.func.store;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -9,10 +9,9 @@ import org.basex.query.value.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class CacheGet extends CacheFn {
+public final class StoreKeys extends StoreFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final byte[] key = toKey(qc);
-    return cache(qc).get(key);
+    return store(qc).keys();
   }
 }
