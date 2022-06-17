@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.cmd.Store;
 import org.basex.index.*;
 import org.basex.query.func.*;
 import org.basex.util.list.*;

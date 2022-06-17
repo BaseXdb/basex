@@ -56,7 +56,6 @@ public final class NSGlobal {
     // namespaces of built-in modules
     NS.add(ADMIN_PREFIX, ADMIN_URI);
     NS.add(ARCHIVE_PREFIX, ARCHIVE_URI);
-    NS.add(CACHE_PREFIX, CACHE_URI);
     NS.add(CLIENT_PREFIX, CLIENT_URI);
     NS.add(CONVERT_PREFIX, CONVERT_URI);
     NS.add(CSV_PREFIX, CSV_URI);
@@ -81,6 +80,7 @@ public final class NSGlobal {
     NS.add(SESSION_PREFIX, SESSION_URI);
     NS.add(SESSIONS_PREFIX, SESSIONS_URI);
     NS.add(SQL_PREFIX, SQL_URI);
+    NS.add(STORE_PREFIX, STORE_URI);
     NS.add(STRING_PREFIX, STRING_URI);
     NS.add(UNIT_PREFIX, UNIT_URI);
     NS.add(UPDATE_PREFIX, UPDATE_URI);

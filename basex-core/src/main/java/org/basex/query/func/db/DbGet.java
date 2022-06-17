@@ -29,7 +29,7 @@ public final class DbGet extends DbAccess {
     if(!bin.exists() || bin.isDir()) throw WHICHRES_X.get(info, path);
 
     try(DataInput in = new DataInput(bin)) {
-      return Cache.read(in, qc);
+      return Store.read(in, qc);
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);
     }

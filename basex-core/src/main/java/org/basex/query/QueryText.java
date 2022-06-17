@@ -246,7 +246,6 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] ARRAY_PREFIX = token("array");
   /** XQuery prefix. */ byte[] BASEX_PREFIX = token("basex");
   /** XQuery prefix. */ byte[] BIN_PREFIX = token("bin");
-  /** XQuery prefix. */ byte[] CACHE_PREFIX = token("cache");
   /** XQuery prefix. */ byte[] CLIENT_PREFIX = token("client");
   /** XQuery prefix. */ byte[] CONVERT_PREFIX = token("convert");
   /** XQuery prefix. */ byte[] CRYPTO_PREFIX = token("crypto");
@@ -286,6 +285,7 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] SESSION_PREFIX = token("session");
   /** XQuery prefix. */ byte[] SESSIONS_PREFIX = token("sessions");
   /** XQuery prefix. */ byte[] SQL_PREFIX = token("sql");
+  /** XQuery prefix. */ byte[] STORE_PREFIX = token("store");
   /** XQuery prefix. */ byte[] STRING_PREFIX = token("string");
   /** XQuery prefix. */ byte[] UNIT_PREFIX = token("unit");
   /** XQuery prefix. */ byte[] UPDATE_PREFIX = token("update");
@@ -335,7 +335,6 @@ public interface QueryText {
   /** BaseX URI. */ String BXMODULES_URL = BASEX_URL + "/modules/";
   /** BaseX URI. */ byte[] ADMIN_URI = token(BXMODULES_URL + "admin");
   /** BaseX URI. */ byte[] ARCHIVE_URI = token(BXMODULES_URL + "archive");
-  /** BaseX URI. */ byte[] CACHE_URI = token(BXMODULES_URL + "cache");
   /** BaseX URI. */ byte[] CLIENT_URI = token(BXMODULES_URL + "client");
   /** BaseX URI. */ byte[] CONVERT_URI = token(BXMODULES_URL + "convert");
   /** BaseX URI. */ byte[] CSV_URI = token(BXMODULES_URL + "csv");
@@ -361,6 +360,7 @@ public interface QueryText {
   /** BaseX URI. */ byte[] SQL_URI = token(BXMODULES_URL + "sql");
   /** BaseX URI. */ byte[] SESSION_URI = token(BXMODULES_URL + "session");
   /** BaseX URI. */ byte[] SESSIONS_URI = token(BXMODULES_URL + "sessions");
+  /** BaseX URI. */ byte[] STORE_URI = token(BXMODULES_URL + "store");
   /** BaseX URI. */ byte[] STRING_URI = token(BXMODULES_URL + "string");
   /** BaseX URI. */ byte[] UNIT_URI = token(BXMODULES_URL + "unit");
   /** BaseX URI. */ byte[] UPDATE_URI = token(BXMODULES_URL + "update");

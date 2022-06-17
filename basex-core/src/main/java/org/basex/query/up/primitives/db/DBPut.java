@@ -49,7 +49,7 @@ public final class DBPut extends DBUpdate {
       final IOFile bin = data.meta.file(string(path), ResourceType.VALUE);
       bin.parent().md();
       try(DataOutput out = new DataOutput(bin)) {
-        Cache.write(out, paths.get(path));
+        Store.write(out, paths.get(path));
       } catch(final IOException ex) {
         Util.debug(ex);
         throw UPDBPUT_X.get(info, path);

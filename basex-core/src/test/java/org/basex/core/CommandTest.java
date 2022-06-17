@@ -8,6 +8,7 @@ import java.io.*;
 import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
+import org.basex.core.cmd.Store;
 import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.io.*;

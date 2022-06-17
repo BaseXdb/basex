@@ -11,155 +11,159 @@ import org.basex.*;
 import org.junit.jupiter.api.*;
 
 /**
- * This class tests the functions of the Caching Module.
+ * This class tests the functions of the Store Module.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public class CacheModuleTest extends SandboxTest {
+public class StoreModuleTest extends SandboxTest {
   /** Invalid characters for database names. */
   private static final char[] INVALID = ",*?;\\/:\"<>|".toCharArray();
 
   /** Initializes a test. */
   @BeforeEach public void initTest() {
-    final Function clear = _CACHE_CLEAR;
+    final Function clear = _STORE_CLEAR;
     query(clear.args());
   }
 
   /** Test method. */
-  @Test public void cacheClear() {
-    final Function func = _CACHE_CLEAR;
-    query(_CACHE_PUT.args("key", "CLEAR"));
-    query(_CACHE_KEYS.args(), "key");
+  @Test public void storeClear() {
+    final Function func = _STORE_CLEAR;
+    query(_STORE_PUT.args("key", "CLEAR"));
+    query(_STORE_KEYS.args(), "key");
     query(func.args(), "");
-    query(_CACHE_KEYS.args(), "");
+    query(_STORE_KEYS.args(), "");
   }
 
   /** Test method. */
-  @Test public void cacheDelete() {
-    final Function func = _CACHE_DELETE;
-    query(_CACHE_PUT.args("key", "CLEAR"));
-    query(_CACHE_WRITE.args("DELETE"));
-    query(_CACHE_KEYS.args(), "key");
+  @Test public void storeDelete() {
+    final Function func = _STORE_DELETE;
+    query(_STORE_PUT.args("key", "CLEAR"));
+    query(_STORE_WRITE.args("DELETE"));
+    query(_STORE_KEYS.args(), "key");
     query(func.args("DELETE"));
-    query(_CACHE_KEYS.args(), "key");
-    error(func.args("DELETE"), CACHE_NOTFOUND_X);
+    query(_STORE_KEYS.args(), "key");
+    error(func.args("DELETE"), STORE_NOTFOUND_X);
 
-    error(func.args("unknown"), CACHE_NOTFOUND_X);
+    error(func.args("unknown"), STORE_NOTFOUND_X);
     // invalid names
-    error(func.args(""), CACHE_NAME_X);
-    for(final char ch : INVALID) error(func.args(ch), CACHE_NAME_X);
+    error(func.args(""), STORE_NAME_X);
+    for(final char ch : INVALID) error(func.args(ch), STORE_NAME_X);
   }
 
   /** Test method. */
-  @Test public void cacheGet() {
-    final Function func = _CACHE_GET;
+  @Test public void storeGet() {
+    final Function func = _STORE_GET;
     query(func.args("key"), "");
   }
 
   /** Test method. */
-  @Test public void cacheGetOrPut() {
-    final Function func = _CACHE_GET_OR_PUT;
-    query(_CACHE_GET.args("key"), "");
+  @Test public void storeGetOrPut() {
+    final Function func = _STORE_GET_OR_PUT;
+    query(_STORE_GET.args("key"), "");
     query(func.args("key", " function() { 'GET-OR-PUT' }"), "GET-OR-PUT");
-    query(_CACHE_GET.args("key"), "GET-OR-PUT");
-    query(_CACHE_KEYS.args(), "key");
+    query(_STORE_GET.args("key"), "GET-OR-PUT");
+    query(_STORE_KEYS.args(), "key");
     query(func.args("key", " function() { 'NOT' + 'INVOKED' }"), "GET-OR-PUT");
-    query(_CACHE_GET.args("key"), "GET-OR-PUT");
-    query(_CACHE_KEYS.args(), "key");
+    query(_STORE_GET.args("key"), "GET-OR-PUT");
+    query(_STORE_KEYS.args(), "key");
   }
 
   /** Test method. */
-  @Test public void cacheKeys() {
-    final Function func = _CACHE_KEYS;
-    for(int i = 0; i < 3; i++) query(_CACHE_PUT.args(Integer.toString(i), i));
+  @Test public void storeKeys() {
+    final Function func = _STORE_KEYS;
+    for(int i = 0; i < 3; i++) query(_STORE_PUT.args(Integer.toString(i), i));
     query(func.args() + " => sort()", "0\n1\n2");
-    query(_CACHE_CLEAR.args());
+    query(_STORE_CLEAR.args());
     query(func.args(), "");
   }
 
   /** Test method. */
-  @Test public void cacheList() {
-    final Function func = _CACHE_LIST;
-    query(_CACHE_WRITE.args());
-    query(_CACHE_WRITE.args("LIST1"));
-    query(_CACHE_WRITE.args("LIST2"));
+  @Test public void storeList() {
+    final Function func = _STORE_LIST;
+    query(_STORE_WRITE.args());
+    query(_STORE_WRITE.args("LIST1"));
+    query(_STORE_WRITE.args("LIST2"));
     query(func.args(), "LIST1\nLIST2");
-    query(func.args() + " ! " + _CACHE_DELETE.args(" ."));
+    query(func.args() + " ! " + _STORE_DELETE.args(" ."));
     query(func.args(), "");
   }
 
   /** Test method. */
-  @Test public void cachePut() {
-    final Function func = _CACHE_PUT;
+  @Test public void storePut() {
+    final Function func = _STORE_PUT;
     query(func.args("key", "PUT"), "");
-    query(_CACHE_GET.args("key"), "PUT");
-    query(_CACHE_KEYS.args(), "key");
+    query(_STORE_GET.args("key"), "PUT");
+    query(_STORE_KEYS.args(), "key");
     query(func.args("key", " ()"), "");
-    query(_CACHE_GET.args("key"), "");
-    query(_CACHE_KEYS.args(), "");
+    query(_STORE_GET.args("key"), "");
+    query(_STORE_KEYS.args(), "");
     query(func.args("key", " map:merge((1 to 100000) ! map:entry(., .))"), "");
-    query(_CACHE_KEYS.args(), "key");
-    query(_CACHE_GET.args("key") + " => map:size()", 100000);
+    query(_STORE_KEYS.args(), "key");
+    query(_STORE_GET.args("key") + " => map:size()", 100000);
 
-    error(func.args("key", " true#0"), BASEX_CACHE_X);
-    error(func.args("key", " [ function() { 123 } ]"), BASEX_CACHE_X);
-    error(func.args("key", " map { 0: concat(1, ?) }"), BASEX_CACHE_X);
-    error(func.args("key", " Q{java.util.Random}new()"), BASEX_CACHE_X);
+    error(func.args("key", " true#0"), BASEX_STORE_X);
+    error(func.args("key", " [ function() { 123 } ]"), BASEX_STORE_X);
+    error(func.args("key", " map { 0: concat(1, ?) }"), BASEX_STORE_X);
+    error(func.args("key", " Q{java.util.Random}new()"), BASEX_STORE_X);
   }
 
   /** Test method. */
-  @Test public void cacheRead() {
-    final Function func = _CACHE_READ;
+  @Test public void storeRead() {
+    final Function func = _STORE_READ;
     query(func.args());
-    query(_CACHE_PUT.args("key", "READ"));
-    query(_CACHE_KEYS.args(), "key");
-    query(_CACHE_WRITE.args());
-    query(_CACHE_CLEAR.args());
-    query(_CACHE_KEYS.args(), "");
+    query(_STORE_PUT.args("key", "READ"));
+    query(_STORE_KEYS.args(), "key");
+    query(_STORE_WRITE.args());
+    query(_STORE_CLEAR.args());
+    query(_STORE_KEYS.args(), "");
     query(func.args());
-    query(_CACHE_KEYS.args(), "key");
-    query(_CACHE_WRITE.args("READ"));
-    query(_CACHE_CLEAR.args());
-    query(_CACHE_KEYS.args(), "");
+    query(_STORE_KEYS.args(), "key");
+    query(_STORE_WRITE.args("READ"));
+    query(_STORE_CLEAR.args());
+    query(_STORE_KEYS.args(), "");
     query(func.args("READ"));
-    query(_CACHE_KEYS.args(), "key");
+    query(_STORE_KEYS.args(), "key");
 
-    error(func.args("unknown"), CACHE_NOTFOUND_X);
+    error(func.args("unknown"), STORE_NOTFOUND_X);
 
     // invalid names
-    error(func.args(""), CACHE_NAME_X);
-    for(final char ch : INVALID) error(func.args(ch), CACHE_NAME_X);
+    error(func.args(""), STORE_NAME_X);
+    for(final char ch : INVALID) error(func.args(ch), STORE_NAME_X);
   }
 
   /** Test method. */
-  @Test public void cacheRemove() {
-    final Function func = _CACHE_REMOVE;
-    query(_CACHE_PUT.args("key", "REMOVE"));
-    query(_CACHE_KEYS.args(), "key");
+  @Test public void storeRemove() {
+    final Function func = _STORE_REMOVE;
+    query(_STORE_PUT.args("key", "REMOVE"));
+    query(_STORE_KEYS.args(), "key");
     query(func.args("key"), "");
-    query(_CACHE_KEYS.args(), "");
+    query(_STORE_KEYS.args(), "");
   }
 
   /** Test method. */
-  @Test public void cacheWrite() {
-    final Function func = _CACHE_WRITE;
-    query(_CACHE_PUT.args("key", "WRITE"));
+  @Test public void storeWrite() {
+    final Function func = _STORE_WRITE;
+    query(_STORE_PUT.args("key", "WRITE"));
     query(func.args());
-    query(_CACHE_KEYS.args(), "key");
-    query(func.args("cache"));
-    query(_CACHE_KEYS.args(), "key");
+    query(_STORE_KEYS.args(), "key");
+    query(func.args("store"));
+    try {
+      query(_STORE_KEYS.args(), "key");
+    } finally {
+      query(_STORE_DELETE.args("store"));
+    }
 
     // invalid names
-    error(func.args(""), CACHE_NAME_X);
-    for(final char ch : INVALID) error(func.args(ch), CACHE_NAME_X);
+    error(func.args(""), STORE_NAME_X);
+    for(final char ch : INVALID) error(func.args(ch), STORE_NAME_X);
   }
 
   /** Test method. */
   @Test public void values() {
     unroll(true);
 
-    final Function put = _CACHE_PUT;
+    final Function put = _STORE_PUT;
     query(put.args("xs:untypedAtomic", " xs:untypedAtomic('x')"));
     query(put.args("xs:string", " xs:string('x')"));
     query(put.args("xs:normalizedString", " xs:normalizedString('x')"));
@@ -241,17 +245,17 @@ public class CacheModuleTest extends SandboxTest {
     query(put.args("XQArray4", " array { 1 to 1000 }"));
     query(put.args("XQArray5", " [ 1 to 1000 ]"));
 
-    // write cache
-    query(_CACHE_WRITE.args());
+    // write store
+    query(_STORE_WRITE.args());
     final HashMap<String, String> values = new HashMap<>();
-    for(final String key : query(_CACHE_KEYS.args()).split("\\s")) {
-      values.put(key, query(_CACHE_GET.args(key)));
+    for(final String key : query(_STORE_KEYS.args()).split("\\s")) {
+      values.put(key, query(_STORE_GET.args(key)));
     }
 
-    // check if items of all types have the same representation after reading the cache
-    query(_CACHE_READ.args());
+    // check if items of all types have the same representation after reading the store
+    query(_STORE_READ.args());
     for(final Entry<String, String> entry : values.entrySet()) {
-      assertEquals(entry.getValue(), query(_CACHE_GET.args(entry.getKey())));
+      assertEquals(entry.getValue(), query(_STORE_GET.args(entry.getKey())));
     }
   }
 }

@@ -45,7 +45,7 @@ public final class MapType extends FuncType {
   public XQMap read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
     XQMap map = XQMap.empty();
     for(int s = in.readNum() - 1; s >= 0; s--) {
-      map = map.put((Item) Cache.read(in, qc), Cache.read(in, qc), null);
+      map = map.put((Item) Store.read(in, qc), Store.read(in, qc), null);
     }
     return map;
   }

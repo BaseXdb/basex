@@ -32,7 +32,7 @@ public enum QueryError {
   /** Error code. */
   BASEX_DBPATH2_X(BASEX, "doc", "Database path '%' yields more than one document."),
   /** Error code. */
-  BASEX_CACHE_X(BASEX, "cache", "Value cannot be cached: %."),
+  BASEX_STORE_X(BASEX, "store", "Value cannot be stored: %."),
   /** Error code. */
   BASEX_WHICH_X(BASEX, "function", "Function not found: %."),
   /** Error code. */
@@ -118,15 +118,6 @@ public enum QueryError {
   BIN_CE_X(BIN, "conversion-error", "%."),
   /** Error code. */
   BIN_USO_X(BIN, "unknown-significance-order", "Unknown octet-order value: '%'."),
-
-  // Caching Module
-
-  /** Error code. */
-  CACHE_IO_X(CACHE, "io", "%"),
-  /** Error code. */
-  CACHE_NAME_X(CACHE, "name", "Invalid name: %."),
-  /** Error code. */
-  CACHE_NOTFOUND_X(CACHE, "not-found", "Cache '%' not found."),
 
   // Client Module
 
@@ -451,6 +442,15 @@ public enum QueryError {
   SQL_PARAMETERS(SQL, "parameters", "No parameter type supplied."),
   /** Error code. */
   SQL_TYPE_X_X(SQL, "type", "Invalid type (%): %."),
+
+  // Store Module
+
+  /** Error code. */
+  STORE_IO_X(STORE, "io", "%"),
+  /** Error code. */
+  STORE_NAME_X(STORE, "name", "Invalid name: %."),
+  /** Error code. */
+  STORE_NOTFOUND_X(STORE, "not-found", "Cache '%' not found."),
 
   // Unit Module
 
@@ -1468,7 +1468,6 @@ public enum QueryError {
     /** Error type. */ ADMIN(ADMIN_PREFIX,       ADMIN_URI),
     /** Error type. */ BASEX(BASEX_PREFIX,       BASEX_URI),
     /** Error type. */ ARCHIVE(ADMIN_PREFIX,     ARCHIVE_URI),
-    /** Error type. */ CACHE(CACHE_PREFIX,       CACHE_URI),
     /** Error type. */ CLIENT(CLIENT_PREFIX,     CLIENT_URI),
     /** Error type. */ CONVERT(CONVERT_PREFIX,   CONVERT_URI),
     /** Error type. */ CSV(CSV_PREFIX,           CSV_URI),
@@ -1491,6 +1490,7 @@ public enum QueryError {
     /** Error type. */ SESSIONS(SESSIONS_PREFIX, SESSIONS_URI),
     /** Error type. */ WS(WS_PREFIX,             WS_URI),
     /** Error type. */ SQL(SQL_PREFIX,           SQL_URI),
+    /** Error type. */ STORE(STORE_PREFIX,       STORE_URI),
     /** Error type. */ UNIT(UNIT_PREFIX,         UNIT_URI),
     /** Error type. */ USER(USER_PREFIX,         USER_URI),
     /** Error type. */ VALIDATE(VALIDATE_PREFIX, VALIDATE_URI),

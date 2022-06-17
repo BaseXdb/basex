@@ -10,6 +10,7 @@ import org.basex.core.cmd.*;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Set;
+import org.basex.core.cmd.Store;
 import org.basex.core.parse.Commands.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;

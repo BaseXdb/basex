@@ -12,7 +12,6 @@ import org.basex.query.func.admin.*;
 import org.basex.query.func.archive.*;
 import org.basex.query.func.array.*;
 import org.basex.query.func.bin.*;
-import org.basex.query.func.cache.*;
 import org.basex.query.func.client.*;
 import org.basex.query.func.convert.*;
 import org.basex.query.func.crypto.*;
@@ -39,6 +38,7 @@ import org.basex.query.func.prof.*;
 import org.basex.query.func.random.*;
 import org.basex.query.func.repo.*;
 import org.basex.query.func.sql.*;
+import org.basex.query.func.store.*;
 import org.basex.query.func.string.*;
 import org.basex.query.func.unit.*;
 import org.basex.query.func.update.*;
@@ -819,38 +819,6 @@ public enum Function implements AFunction {
   _BIN_XOR(BinXor::new, "xor(binary1,binary2)",
       params(BASE64_BINARY_ZO, BASE64_BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
 
-  // Cache Module
-
-  /** XQuery function. */
-  _CACHE_CLEAR(CacheClear::new, "clear()",
-      params(), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
-  /** XQuery function. */
-  _CACHE_DELETE(CacheDelete::new, "delete(name)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
-  /** XQuery function. */
-  _CACHE_GET(CacheGet::new, "get(key)",
-      params(STRING_O), ITEM_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
-  /** XQuery function. */
-  _CACHE_GET_OR_PUT(CacheGetOrPut::new, "get-or-put(key,put)",
-      params(STRING_O, FuncType.get(ITEM_ZM).seqType()),
-      ITEM_ZM, flag(HOF, NDT), CACHE_URI, Perm.CREATE),
-  /** XQuery function. */
-  _CACHE_KEYS(CacheKeys::new, "keys()", params(), STRING_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
-  /** XQuery function. */
-  _CACHE_LIST(CacheList::new, "list()", params(), STRING_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
-  /** XQuery function. */
-  _CACHE_PUT(CachePut::new, "put(key,value)",
-      params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
-  /** XQuery function. */
-  _CACHE_READ(CacheRead::new, "read([name])",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
-  /** XQuery function. */
-  _CACHE_REMOVE(CacheRemove::new, "remove(key)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
-  /** XQuery function. */
-  _CACHE_WRITE(CacheWrite::new, "write([name])",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
-
   // Client Module
 
   /** XQuery function. */
@@ -1562,6 +1530,38 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _SQL_ROLLBACK(SqlRollback::new, "rollback(id)",
       params(INTEGER_O), EMPTY_SEQUENCE_Z, flag(NDT), SQL_URI, Perm.CREATE),
+
+  // Store Module
+
+  /** XQuery function. */
+  _STORE_CLEAR(StoreClear::new, "clear()",
+      params(), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _STORE_DELETE(StoreDelete::new, "delete(name)",
+      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _STORE_GET(StoreGet::new, "get(key)",
+      params(STRING_O), ITEM_ZM, flag(NDT), STORE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _STORE_GET_OR_PUT(StoreGetOrPut::new, "get-or-put(key,put)",
+      params(STRING_O, FuncType.get(ITEM_ZM).seqType()),
+      ITEM_ZM, flag(HOF, NDT), STORE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _STORE_KEYS(StoreKeys::new, "keys()", params(), STRING_ZM, flag(NDT), STORE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _STORE_LIST(StoreList::new, "list()", params(), STRING_ZM, flag(NDT), STORE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _STORE_PUT(StorePut::new, "put(key,value)",
+      params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _STORE_READ(StoreRead::new, "read([name])",
+      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _STORE_REMOVE(StoreRemove::new, "remove(key)",
+      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _STORE_WRITE(StoreWrite::new, "write([name])",
+      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
 
   // Strings Module
 

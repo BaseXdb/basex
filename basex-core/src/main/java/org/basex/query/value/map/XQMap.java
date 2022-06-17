@@ -73,8 +73,8 @@ public final class XQMap extends XQData {
   public void write(final DataOutput out) throws IOException, QueryException {
     out.writeNum(mapSize());
     for(final Item key : keys()) {
-      Cache.write(out, key);
-      Cache.write(out, get(key, null));
+      Store.write(out, key);
+      Store.write(out, get(key, null));
     }
   }
 

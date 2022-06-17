@@ -1,4 +1,4 @@
-package org.basex.query.func.cache;
+package org.basex.query.func.store;
 
 import static org.basex.query.QueryError.*;
 
@@ -15,14 +15,14 @@ import org.basex.util.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class CacheWrite extends CacheFn {
+public final class StoreRead extends StoreFn {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = exprs.length > 0 ? toName(0, qc) : "";
     try {
-      cache(qc).write(name);
+      if(!store(qc).read(name, qc)) throw STORE_NOTFOUND_X.get(info, name);
     } catch(final IOException ex) {
-      throw CACHE_IO_X.get(info, ex);
+      throw STORE_IO_X.get(info, ex);
     }
     return Empty.VALUE;
   }
