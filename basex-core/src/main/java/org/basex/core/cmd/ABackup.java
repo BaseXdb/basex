@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import org.basex.core.*;
-import org.basex.core.locks.*;
 import org.basex.core.users.*;
 
 /**
@@ -17,10 +16,5 @@ abstract class ABackup extends Command {
    */
   ABackup(final String... args) {
     super(Perm.CREATE, false, args);
-  }
-
-  @Override
-  public void addLocks() {
-    jc().locks.writes.add(Locking.BACKUP); // No parallel backup operations
   }
 }

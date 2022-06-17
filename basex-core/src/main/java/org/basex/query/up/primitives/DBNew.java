@@ -202,9 +202,9 @@ public final class DBNew {
     final IOFile srcDir = source.meta.binaryDir(), trgDir = target.meta.binaryDir();
     if(srcDir != null && srcDir.exists()) {
       trgDir.md();
-      for(final String file : srcDir.descendants()) {
-        final IOFile srcFile = new IOFile(srcDir, file);
-        final IOFile trgFile = new IOFile(trgDir, file);
+      for(final String path : srcDir.descendants()) {
+        final IOFile srcFile = new IOFile(srcDir, path);
+        final IOFile trgFile = new IOFile(trgDir, path);
         trgFile.delete();
         trgFile.parent().md();
         Files.move(Paths.get(srcFile.path()), Paths.get(trgFile.path()));

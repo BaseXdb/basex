@@ -25,7 +25,7 @@ public abstract class IndexFn extends StandardFunc {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    return dataLock(visitor, 0) && super.accept(visitor);
+    return dataLock(visitor, false, 0) && super.accept(visitor);
   }
 
   /**

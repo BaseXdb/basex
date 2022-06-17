@@ -9,8 +9,7 @@ import java.util.zip.*;
 
 import org.basex.core.*;
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.Cmd;
-import org.basex.core.parse.Commands.CmdCreate;
+import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
@@ -31,47 +30,47 @@ public final class CreateBackup extends ABackup {
 
   /**
    * Default constructor.
-   * @param name name of database
+   * @param pattern database pattern ({@code null} for general data)
    */
-  public CreateBackup(final String name) {
-    this(name, null);
+  public CreateBackup(final String pattern) {
+    this(pattern, null);
   }
 
   /**
    * Default constructor.
-   * @param name name of database
+   * @param pattern database pattern ({@code null} for general data)
    * @param comment (can be {@code null})
    */
-  public CreateBackup(final String name, final String comment) {
-    super(name, comment);
+  public CreateBackup(final String pattern, final String comment) {
+    super(pattern != null ? pattern : "", comment);
   }
 
   @Override
   protected boolean run() {
-    final String pattern = args[0];
-    if(!Databases.validPattern(pattern)) return error(NAME_INVALID_X, pattern);
-    final String comment = args[1];
+    final String pattern = args[0], comment = args[1];
+    if(!(pattern.isEmpty() || Databases.validPattern(pattern)))
+      return error(NAME_INVALID_X, pattern);
 
     // retrieve all databases
-    final StringList dbs = context.listDBs(pattern);
-    if(dbs.isEmpty()) return error(DB_NOT_FOUND_X, pattern);
+    final StringList names = pattern.isEmpty() ? new StringList("") : context.listDBs(pattern);
+    if(names.isEmpty()) return error(DB_NOT_FOUND_X, pattern);
 
     // loop through all databases
     boolean ok = true;
-    for(final String db : dbs) {
+    for(final String name : names) {
       // don't open databases marked as updating
-      if(MetaData.file(soptions.dbPath(db), DATAUPD).exists()) {
+      if(!name.isEmpty() && MetaData.file(soptions.dbPath(name), DATAUPD).exists()) {
         // reject backups of databases that are currently being updated (or corrupt)
-        info(DB_UPDATED_X, db);
+        info(DB_UPDATED_X, name);
         ok = false;
       } else {
         try {
-          backup(db, comment, true, soptions, this);
+          backup(name, comment, true, soptions, this);
           // backup was successful
-          info(DB_BACKUP_X, db, jc().performance);
+          info(DB_BACKUP_X, name, jc().performance);
         } catch(final IOException ex) {
           Util.debug(ex);
-          info(DB_NOT_BACKUP_X, db);
+          info(DB_NOT_BACKUP_X, name);
           ok = false;
         }
       }
@@ -81,7 +80,7 @@ public final class CreateBackup extends ABackup {
 
   /**
    * Backups the specified database.
-   * @param db name of the database
+   * @param db name of the database (empty string for general data)
    * @param comment comment (can be {@code null})
    * @param compress compress flag
    * @param sopts static options
@@ -92,7 +91,7 @@ public final class CreateBackup extends ABackup {
       final StaticOptions sopts, final CreateBackup cmd) throws IOException {
 
     final IOFile dbpath = sopts.dbPath(db);
-    final StringList files = dbpath.descendants();
+    final StringList files = sopts.dbFiles(db);
     if(cmd != null) cmd.total = files.size();
 
     final String name = db + '-' + DateTime.format(new Date(), DateTime.DATETIME) + IO.ZIPSUFFIX;
@@ -108,7 +107,7 @@ public final class CreateBackup extends ABackup {
         // skip update file (generated when using XQuery)
         if(!file.equals(DATAUPD + IO.BASEXSUFFIX)) {
           final String path = Prop.WIN ? file.replace('\\', '/') : file;
-          out.putNextEntry(new ZipEntry(dbpath.name() + '/' + path));
+          out.putNextEntry(new ZipEntry(db + '/' + path));
           try(FileInputStream in = new FileInputStream(new File(dbpath.file(), file))) {
             for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
           }
@@ -121,8 +120,7 @@ public final class CreateBackup extends ABackup {
 
   @Override
   public void addLocks() {
-    super.addLocks();
-    addLocks(jc().locks.reads, 0);
+    addLocks(jc().locks.writes, 0);
   }
 
   @Override

@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
@@ -146,15 +147,6 @@ public final class StaticOptions extends Options {
   }
 
   /**
-   * Returns a reference to a file or database in the database directory.
-   * @param name name of the file or database
-   * @return database directory
-   */
-  public IOFile dbPath(final String name) {
-    return new IOFile(get(DBPATH), name);
-  }
-
-  /**
    * Creates a temporary database directory and returns its name.
    * @param name name of the original database
    * @return name of random database
@@ -174,10 +166,19 @@ public final class StaticOptions extends Options {
 
   /**
    * Returns the path to the directory that contains all databases.
-   * @return database filename
+   * @return database path
    */
   public IOFile dbPath() {
     return new IOFile(get(DBPATH));
+  }
+
+  /**
+   * Returns a reference to a file or database in the database directory.
+   * @param name name of the file or database (empty string for general data)
+   * @return database path
+   */
+  public IOFile dbPath(final String name) {
+    return name.isEmpty() ? dbPath() : new IOFile(get(DBPATH), name);
   }
 
   /**
@@ -187,5 +188,20 @@ public final class StaticOptions extends Options {
    */
   public boolean dbExists(final String db) {
     return !db.isEmpty() && dbPath(db).exists();
+  }
+
+  /**
+   * Returns relative paths to database files.
+   * @param db name of the database (empty string for general data)
+   * @return paths
+   */
+  public StringList dbFiles(final String db) {
+    if(db.isEmpty()) {
+      final StringList list = new StringList();
+      final String pattern = ".*(\\" + IO.XMLSUFFIX + "|\\" + IO.BASEXSUFFIX + ")$";
+      for(final IOFile file : dbPath().children(pattern)) list.add(file.name());
+      return list;
+    }
+    return dbPath(db).descendants();
   }
 }

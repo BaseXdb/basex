@@ -24,7 +24,7 @@ public final class BackupCreate extends NameUpdate {
 
   /**
    * Constructor.
-   * @param name name of database to be backed up
+   * @param name name of database (empty string for general data)
    * @param comment comment
    * @param compress compress data
    * @param qc query context
@@ -51,7 +51,12 @@ public final class BackupCreate extends NameUpdate {
   }
 
   @Override
+  public void merge(final Update update) throws QueryException {
+    throw DB_CONFLICT2_X_X.get(info, name, operation());
+  }
+
+  @Override
   public String operation() {
-    return "backed up";
+    return "created";
   }
 }

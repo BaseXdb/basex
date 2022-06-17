@@ -33,7 +33,7 @@ function buttons(source) {
       if(button.className === "global") continue;
 
       var values = [
-        "backup", "backup-drop", "backup-restore",
+        "backup", "backup-drop", "backup-restore", "backup-create-all", "backup-restore-all",
         "db-drop", "db-optimize", "db-optimize-all", "delete",
         "file-delete", "job-stop", "log-delete", "session-kill",
         "pattern-drop", "user-drop"

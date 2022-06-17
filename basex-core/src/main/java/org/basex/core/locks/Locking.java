@@ -42,8 +42,6 @@ public final class Locking {
   public static final String COLLECTION = INTERNAL_PREFIX + "collection";
   /** Special lock identifier for user commands. */
   public static final String USER = INTERNAL_PREFIX + "user";
-  /** Special lock identifier for backup commands. */
-  public static final String BACKUP = INTERNAL_PREFIX + "backup";
   /** Special lock identifier for repository commands. */
   public static final String REPO = INTERNAL_PREFIX + "repo";
 

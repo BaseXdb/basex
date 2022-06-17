@@ -78,7 +78,7 @@ final class XMLParser extends CommandParser {
       return new Close();
     if(e.equals(COPY) && check(root, NAME, NEWNAME))
       return new Copy(value(root, NAME), value(root, NEWNAME));
-    if(e.equals(CREATE_BACKUP) && check(root, NAME, COMMENT + '?'))
+    if(e.equals(CREATE_BACKUP) && check(root, NAME + '?', COMMENT + '?'))
       return new CreateBackup(value(root, NAME), value(root, COMMENT));
     if(e.equals(CREATE_DB) && check(root, NAME, '<' + INPUT + '?'))
       return new CreateDB(value(root, NAME), xml(root));
@@ -88,7 +88,7 @@ final class XMLParser extends CommandParser {
       return new CreateUser(value(root, NAME), password(root));
     if(e.equals(DELETE) && check(root, PATH))
       return new Delete(value(root, PATH));
-    if(e.equals(DROP_BACKUP) && check(root, NAME))
+    if(e.equals(DROP_BACKUP) && check(root, NAME + '?'))
       return new DropBackup(value(root, NAME));
     if(e.equals(DROP_DB) && check(root, NAME))
       return new DropDB(value(root, NAME));
@@ -148,7 +148,7 @@ final class XMLParser extends CommandParser {
       return new RepoInstall(value(root, PATH), null);
     if(e.equals(REPO_LIST) && check(root))
       return new RepoList();
-    if(e.equals(RESTORE) && check(root, NAME))
+    if(e.equals(RESTORE) && check(root, NAME + '?'))
       return new Restore(value(root, NAME));
     if(e.equals(RETRIEVE) && check(root, PATH))
       return new Retrieve(value(root, PATH));

@@ -50,7 +50,7 @@ function dba:user(
       'scripts': ('codemirror/lib/codemirror.js', 'codemirror/mode/xml/xml.js')
     },
     <tr>
-      <td width='49%'>
+      <td>
         <form action='user-edit' method='post' autocomplete='off'>
           <!--  force chrome not to autocomplete form -->
           <input style='display:none' type='text' name='fake1'/>
@@ -111,7 +111,7 @@ function dba:user(
         </form>
       </td>
       <td class='vertical'/>
-      <td width='49%'>{
+      <td>{
         if($admin) then () else <_>
           <h3>Local Permissions</h3>
           <form action='{ $dba:SUB }' method='post' id='{ $dba:SUB }' class='update'>

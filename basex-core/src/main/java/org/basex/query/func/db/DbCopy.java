@@ -29,7 +29,7 @@ public class DbCopy extends DbAccess {
    * @throws QueryException query exception
    */
   final void copy(final QueryContext qc, final boolean keep) throws QueryException {
-    final String name = toName(0, qc), newname = toName(1, qc);
+    final String name = toName(0, false, qc), newname = toName(1, false, qc);
     if(name.equals(newname)) throw DB_CONFLICT4_X.get(info, name, newname);
 
     // source database does not exist
@@ -41,6 +41,6 @@ public class DbCopy extends DbAccess {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    return dataLock(visitor, 0) && dataLock(visitor, 1) && super.accept(visitor);
+    return dataLock(visitor, false, 1) && super.accept(visitor);
   }
 }

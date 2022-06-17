@@ -982,8 +982,8 @@ public enum Function implements AFunction {
   _DB_CREATE(DbCreate::new, "create(name[,inputs[,paths[,options]]])",
       params(STRING_O, ITEM_ZM, STRING_ZM, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_CREATE_BACKUP(DbCreateBackup::new, "create-backup(database[,comment)",
-      params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+  _DB_CREATE_BACKUP(DbCreateBackup::new, "create-backup(database[,options])",
+      params(STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_DELETE(DbDelete::new, "delete(database,path)",
       params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
@@ -1357,7 +1357,7 @@ public enum Function implements AFunction {
       params(STRING_O), ELEMENT_O, flag(NDT), INSPECT_URI, Perm.CREATE),
   /** XQuery function. */
   _INSPECT_TYPE(InspectType::new, "type(value[,options])",
-      params(ITEM_ZM, MAP_O), STRING_O, INSPECT_URI),
+      params(ITEM_ZM, MAP_ZO), STRING_O, INSPECT_URI),
   /** XQuery function. */
   _INSPECT_STATIC_CONTEXT(InspectStaticContext::new, "static-context(function,name)",
       params(FUNCTION_O, STRING_O), ITEM_ZM, INSPECT_URI),
@@ -1732,16 +1732,16 @@ public enum Function implements AFunction {
       params(ITEM_O, ITEM_O, BOOLEAN_O), ELEMENT_O, flag(NDT), VALIDATE_URI, Perm.CREATE),
   /** XQuery function. */
   _VALIDATE_XSD(ValidateXsd::new, "xsd(input[,schema[,options]])",
-      params(ITEM_O, ITEM_O, MAP_O), EMPTY_SEQUENCE_Z, flag(NDT), VALIDATE_URI, Perm.CREATE),
+      params(ITEM_O, ITEM_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(NDT), VALIDATE_URI, Perm.CREATE),
   /** XQuery function. */
   _VALIDATE_XSD_INFO(ValidateXsdInfo::new, "xsd-info(input[,schema[,options]])",
-      params(ITEM_O, ITEM_O, MAP_O), STRING_ZM, flag(NDT), VALIDATE_URI, Perm.CREATE),
+      params(ITEM_O, ITEM_O, MAP_ZO), STRING_ZM, flag(NDT), VALIDATE_URI, Perm.CREATE),
   /** XQuery function. */
   _VALIDATE_XSD_PROCESSOR(ValidateXsdProcessor::new, "xsd-processor()",
       params(), STRING_O, VALIDATE_URI),
   /** XQuery function. */
   _VALIDATE_XSD_REPORT(ValidateXsdReport::new, "xsd-report(input[,schema[,options]])",
-      params(ITEM_O, ITEM_O, MAP_O), ELEMENT_O, flag(NDT), VALIDATE_URI, Perm.CREATE),
+      params(ITEM_O, ITEM_O, MAP_ZO), ELEMENT_O, flag(NDT), VALIDATE_URI, Perm.CREATE),
   /** XQuery function. */
   _VALIDATE_XSD_VERSION(ValidateXsdVersion::new, "xsd-version()",
       params(), STRING_O, VALIDATE_URI),

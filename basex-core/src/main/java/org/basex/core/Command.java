@@ -358,14 +358,16 @@ public abstract class Command extends Job {
    * No databases will be added if the argument uses glob syntax.
    * @param list lock list
    * @param index argument index
-   * @return {@code false} if database cannot be determined due to glob syntax
    */
-  protected final boolean addLocks(final LockList list, final int index) {
-    // return true if the addressed database argument does not exists
-    if(args.length <= index || args[index] == null) return true;
-    final boolean noglob = !args[index].matches(".*[?*,].*");
-    if(noglob) list.add(args[index]);
-    return noglob;
+  protected final void addLocks(final LockList list, final int index) {
+    if(index < args.length && args[index] != null) {
+      final String db = args[index];
+      if(db.isEmpty() || db.matches(".*[?*,].*")) {
+        list.addGlobal();
+      } else {
+        list.add(args[index]);
+      }
+    }
   }
 
   /**

@@ -24,14 +24,14 @@ public abstract class CacheFn extends StandardFunc {
   }
 
   /**
-   * Checks if the specified expression is a valid user name.
+   * Checks if the specified expression is a valid cache name.
    * @param i expression index
    * @param qc query context
    * @return name
    * @throws QueryException query exception
    */
   final String toName(final int i, final QueryContext qc) throws QueryException {
-    return toName(i, CACHE_NAME_X, qc);
+    return toName(i, false, CACHE_NAME_X, qc);
   }
 
   /**

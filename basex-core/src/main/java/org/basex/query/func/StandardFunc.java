@@ -501,7 +501,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final Data toData(final QueryContext qc) throws QueryException {
-    return data != null ? data : qc.resources.database(toName(0, DB_NAME_X, qc), info);
+    return data != null ? data : qc.resources.database(toName(0, false, DB_NAME_X, qc), info);
   }
 
   /**
@@ -550,15 +550,16 @@ public abstract class StandardFunc extends Arr {
   /**
    * Checks if the specified expression is a valid name.
    * @param i index of argument
+   * @param empty allow empty string
    * @param err error to raise
    * @param qc query context
-   * @return normalized path
+   * @return name
    * @throws QueryException query exception
    */
-  protected final String toName(final int i, final QueryError err, final QueryContext qc)
-      throws QueryException {
+  protected final String toName(final int i, final boolean empty, final QueryError err,
+      final QueryContext qc) throws QueryException {
     final String name = toString(exprs[i], qc);
-    if(Databases.validName(name)) return name;
+    if(empty && name.length() == 0 || Databases.validName(name)) return name;
     throw err.get(info, name);
   }
 
@@ -580,11 +581,24 @@ public abstract class StandardFunc extends Arr {
    * Tries to mark the specified argument for locking.
    * @param visitor visitor
    * @param i index of database argument
+   * @param backup backup flag
    * @return result of check
    */
-  protected final boolean dataLock(final ASTVisitor visitor, final int i) {
-    final String db = exprs[i] instanceof Str ? string(((Str) exprs[i]).string()) : null;
-    return visitor.lock(db, false);
+  protected final boolean dataLock(final ASTVisitor visitor, final boolean backup, final int i) {
+    String name = null;
+    if(exprs[i] instanceof Str) {
+      name = string(((Str) exprs[i]).string());
+      if(backup) {
+        final String db = Databases.name(name);
+        if(db.isEmpty()) {
+          name = db;
+        } else if(!visitor.lock(db, false)) {
+          return false;
+        }
+      }
+      if(name.isEmpty()) name = null;
+    }
+    return visitor.lock(name, false);
   }
 
   @Override

@@ -16,11 +16,11 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class DbRestore extends DbAccess {
+public final class DbRestore extends BackupFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // extract database name from backup file
-    final String name = toName(0, qc);
+    final String name = toName(0, true, qc);
 
     // find backup with or without date suffix
     final StringList backups = qc.context.databases.backups(name);

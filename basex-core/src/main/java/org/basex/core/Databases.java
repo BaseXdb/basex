@@ -77,8 +77,8 @@ public final class Databases {
       final String name = file.name();
       String add = null;
       if(backup && name.endsWith(IO.ZIPSUFFIX)) {
-        final String n = ZIPPATTERN.split(name)[0];
-        if(!n.equals(name)) add = n;
+        final String[] split = ZIPPATTERN.split(name);
+        if(split.length > 0 && !split[0].equals(name)) add = split[0];
       } else if(file.isDir() && !Strings.startsWith(name, '.')) {
         add = name;
       }
@@ -128,19 +128,19 @@ public final class Databases {
   /**
    * Returns the name of a specific backup, or all backups found for a specific database,
    * in a descending order.
-   * @param db database
-   * @return names of specified backups
+   * @param name name of backup with or without date suffix (empty string for general data)
+   * @return names of the backups
    */
-  public StringList backups(final String db) {
+  public StringList backups(final String name) {
     final StringList backups = new StringList();
-    final IOFile path = soptions.dbPath(db + IO.ZIPSUFFIX);
+    final IOFile path = soptions.dbPath(name + IO.ZIPSUFFIX);
     if(path.exists()) {
-      backups.add(db);
+      backups.add(name);
     } else {
-      final Pattern regex = regex(db, '-' + DATE + '\\' + IO.ZIPSUFFIX);
+      final Pattern regex = regex(name, '-' + DATE + '\\' + IO.ZIPSUFFIX);
       for(final IOFile file : soptions.dbPath().children()) {
-        final String name = file.name();
-        if(regex.matcher(name).matches()) backups.add(name.substring(0, name.lastIndexOf('.')));
+        final String n = file.name();
+        if(regex.matcher(n).matches()) backups.add(n.substring(0, n.lastIndexOf('.')));
       }
     }
     return backups.sort(Prop.CASE, false);
@@ -148,18 +148,17 @@ public final class Databases {
 
   /**
    * Extracts the name of a database from the name of a backup.
-   * @param backup Name of the backup file. Valid formats:
-   *   {@code [dbname]-yyyy-mm-dd-hh-mm-ss},
-   *   {@code [dbname]}
-   * @return name of the database ({@code [dbname]})
+   * @param backup name of the backup (empty string for general data), optionally followed by date
+   * @return name of the database (empty string for general data)
    */
   public static String name(final String backup) {
-    return Pattern.compile('-' + DATE + '$').split(backup)[0];
+    final String[] strings = Pattern.compile('-' + DATE + '$').split(backup);
+    return strings.length > 0 ? strings[0] : "";
   }
 
   /**
    * Extracts the date of a database from the name of a backup.
-   * @param backup name of the backup file, including the date
+   * @param backup name of the backup, including the date
    * @return date string
    */
   public static String date(final String backup) {

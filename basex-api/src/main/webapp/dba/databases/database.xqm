@@ -50,7 +50,7 @@ function dba:database(
       'css': 'codemirror/lib/codemirror.css',
       'scripts': ('codemirror/lib/codemirror.js', 'codemirror/mode/xml/xml.js')
     },
-    <tr>
+    <tr>{
       <td>
         <form action='{ $dba:SUB }' method='post' id='{ $dba:SUB }' class='update'>
           <input type='hidden' name='name' value='{ $name }' id='name'/>
@@ -94,40 +94,45 @@ function dba:database(
             ) else ()
           }
         </form>
-        <form action='{ $dba:SUB }' method='post' class='update'>
-          <input type='hidden' name='name' value='{ $name }'/>
-          <h3>Backups</h3>
-          {
-            let $headers := (
-              map { 'key': 'backup', 'label': 'Name', 'order': 'desc' },
-              map { 'key': 'size', 'label': 'Size', 'type': 'bytes' },
-              map { 'key': 'comment', 'label': 'Comment' },
-              map { 'key': 'action', 'label': 'Action', 'type': 'dynamic' }
-            )
-            let $entries :=
-              for $backup in db:backups($name)
-              order by $backup descending
-              return map {
-                'backup': $backup,
-                'size': $backup/@size,
-                'comment': $backup/@comment,
-                'action': function() {
-                  html:link('Download', 'backup/' || encode-for-uri($backup) || '.zip')
+      </td>,
+      if(not($resource)) then (
+        <td class='vertical'/>,
+        <td>
+          <form action='{ $dba:SUB }' method='post' class='update'>
+            <input type='hidden' name='name' value='{ $name }'/>
+            <h2>Backups</h2>
+            {
+              let $headers := (
+                map { 'key': 'backup', 'label': 'Name', 'order': 'desc' },
+                map { 'key': 'size', 'label': 'Size', 'type': 'bytes' },
+                map { 'key': 'comment', 'label': 'Comment' },
+                map { 'key': 'action', 'label': 'Action', 'type': 'dynamic' }
+              )
+              let $entries :=
+                for $backup in db:backups($name)
+                order by $backup descending
+                return map {
+                  'backup': substring-after($backup, $name || '-'),
+                  'size': $backup/@size,
+                  'comment': $backup/@comment,
+                  'action': function() {
+                    html:link('Download', 'backup/' || encode-for-uri($backup) || '.zip')
+                  }
                 }
-              }
-            let $buttons := (
-              html:button('backup-create', 'Create…', false(), map { 'class': 'global' }) update {
-                if($db-exists) then () else insert node attribute disabled { '' } into .
-              },
-              html:button('backup-restore', 'Restore', true()),
-              html:button('backup-drop', 'Drop', true())
-            )
-            let $params := map { 'name': $name }
-            return html:table($headers, $entries, $buttons, $params, map { })
-          }
-        </form>
-      </td>
-      <td class='vertical'/>
+              let $buttons := (
+                html:button('backup-create', 'Create…', false(), map { 'class': 'global' }) update {
+                  if($db-exists) then () else insert node attribute disabled { '' } into .
+                },
+                html:button('backup-restore', 'Restore', true()),
+                html:button('backup-drop', 'Drop', true())
+              )
+              let $params := map { 'name': $name }
+              return html:table($headers, $entries, $buttons, $params, map { })
+            }
+          </form>
+        </td>
+      ),
+      <td class='vertical'/>,
       <td>{
         if($resource) then (
           <h2>Resource: { $resource }</h2>,
@@ -148,10 +153,11 @@ function dba:database(
           html:focus('input'),
           html:js('loadCodeMirror("xml", false); queryResource(true);')
         ) else if($db-exists) then (
+          <h2>Information</h2>,
           html:properties(db:info($name))
         ) else ()
       }</td>
-    </tr>
+    }</tr>
   )
 };
 

@@ -22,7 +22,7 @@ import org.basex.util.options.*;
 public final class DbCreate extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = toName(0, qc);
+    final String name = toName(0, false, qc);
 
     final StringList paths = new StringList();
     if(exprs.length > 2) {
