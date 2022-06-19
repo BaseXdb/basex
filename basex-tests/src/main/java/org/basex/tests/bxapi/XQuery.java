@@ -167,7 +167,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * @throws XQueryException exception
    */
   public void addResource(final String name, final String... strings) {
-    qp.qc.resources.addResource(name, strings);
+    qp.qc.resources.addText(name, strings);
   }
 
   /**
