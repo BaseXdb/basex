@@ -398,7 +398,7 @@ public enum Function implements AFunction {
       params(STRING_ZO, STRING_O), QNAME_O),
   /** XQuery function. */
   RANDOM_NUMBER_GENERATOR(FnRandomNumberGenerator::new, "random-number-generator([seed])",
-      params(ANY_ATOMIC_TYPE_O), MAP_O),
+      params(ANY_ATOMIC_TYPE_O), MAP_O, flag(HOF, NDT)),
   /** XQuery function. */
   REMOVE(FnRemove::new, "remove(items,position)",
       params(ITEM_ZM, INTEGER_O), ITEM_ZM),
@@ -977,7 +977,7 @@ public enum Function implements AFunction {
       params(STRING_O, STRING_O), ITEM_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_INFO(DbInfo::new, "info(database)",
-      params(STRING_O), STRING_O, DB_URI),
+      params(STRING_O), ELEMENT_O, flag(NDT, CNS), DB_URI),
   /** XQuery function. */
   _DB_LIST(DbList::new, "list([database[,path]])",
       params(STRING_O, STRING_O), STRING_ZM, flag(NDT), DB_URI),
@@ -1034,7 +1034,7 @@ public enum Function implements AFunction {
       params(STRING_O, STRING_O, ITEM_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_SYSTEM(DbSystem::new, "system()",
-      params(), STRING_O, DB_URI),
+      params(), ELEMENT_O, flag(CNS), DB_URI),
   /** XQuery function. */
   _DB_TEXT(DbText::new, "text(database,strings)",
       params(STRING_O, ITEM_ZM), TEXT_ZM, flag(NDT), DB_URI),
@@ -1312,7 +1312,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _INSPECT_CONTEXT(InspectContext::new, "context()",
-      params(), ELEMENT_O, flag(HOF), INSPECT_URI, Perm.CREATE),
+      params(), ELEMENT_O, flag(NDT), INSPECT_URI, Perm.CREATE),
   /** XQuery function. */
   _INSPECT_FUNCTION(InspectFunction::new, "function(function)",
       params(STRING_O), ELEMENT_O, INSPECT_URI),

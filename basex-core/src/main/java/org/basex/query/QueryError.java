@@ -751,7 +751,7 @@ public enum QueryError {
   /** Error code. */
   RESNF_X(FOUT, 1170, "Resource '%' cannot be retrieved."),
   /** Error code. */
-  FRAGID_X(FOUT, 1170, "URI contains a fragment identifier: %"),
+  FRAGID_X(FOUT, 1170, "URI contains a fragment identifier: %."),
   /** Error code. */
   INVURL_X(FOUT, 1170, "URI is invalid: %"),
   /** Error code. */

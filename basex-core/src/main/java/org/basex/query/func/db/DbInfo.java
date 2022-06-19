@@ -1,13 +1,10 @@
 package org.basex.query.func.db;
 
-import static org.basex.util.Token.*;
-
 import java.util.*;
 
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -22,42 +19,33 @@ public final class DbInfo extends DbAccess {
   private static final String DATABASE = "database";
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    return toNode(InfoDB.db(data.meta, false, true), DATABASE);
+    return toNode(DATABASE, InfoDB.db(data.meta, false, true));
   }
 
   /**
    * Converts the specified info string to a node fragment.
-   * @param root name of the root node
+   * @param name name of the root node
    * @param string string to be converted
    * @return node
    */
-  static ANode toNode(final String string, final String root) {
-    final FElem top = new FElem(root);
+  static FElem toNode(final String name, final String string) {
+    final FElem root = new FElem(name);
     FElem node = null;
-    for(final String l : string.split("\r\n?|\n")) {
-      final String[] cols = l.split(": ", 2);
+    for(final String line : string.split(Prop.NL)) {
+      final String[] cols = line.split(": ", 2);
       if(cols[0].isEmpty()) continue;
 
-      final FElem n = new FElem(token(toName(cols[0])));
+      final FElem child = new FElem(cols[0].replaceAll("[ -:]", "").toLowerCase(Locale.ENGLISH));
       if(Strings.startsWith(cols[0], ' ')) {
-        if(node != null) node.add(n);
-        if(!cols[1].isEmpty()) n.add(cols[1]);
+        if(node != null) node.add(child);
+        if(!cols[1].isEmpty()) child.add(cols[1]);
       } else {
-        node = n;
-        top.add(n);
+        node = child;
+        root.add(child);
       }
     }
-    return top;
-  }
-
-  /**
-   * Converts the specified info key to an element name.
-   * @param string string to be converted
-   * @return resulting name
-   */
-  public static String toName(final String string) {
-    return string.replaceAll("[ -:]", "").toLowerCase(Locale.ENGLISH);
+    return root;
   }
 }

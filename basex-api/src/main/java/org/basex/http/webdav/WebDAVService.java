@@ -14,7 +14,6 @@ import org.basex.core.cmd.Set;
 import org.basex.http.*;
 import org.basex.io.in.*;
 import org.basex.io.serial.*;
-import org.basex.query.func.db.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 
@@ -92,7 +91,7 @@ final class WebDAVService {
    */
   String timestamp(final String db) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(DATA.args(_DB_INFO.args(" $db") +
-        "/descendant::" + DbInfo.toName(Text.TIMESTAMP) + "[1]")).bind("db", db);
+        "/descendant::timestamp[1]")).bind("db", db);
     return query.execute(session());
   }
 

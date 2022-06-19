@@ -18,6 +18,6 @@ public final class DbSystem extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return DbInfo.toNode(Info.info(qc.context), SYSTEM);
+    return DbInfo.toNode(SYSTEM, Info.info(qc.context));
   }
 }

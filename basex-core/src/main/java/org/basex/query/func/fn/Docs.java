@@ -72,7 +72,7 @@ public abstract class Docs extends StandardFunc {
           // add local lock if argument may reference a database
           queryInput = queryInput(((Str) expr).string());
           if(queryInput != null) visitor.lock(queryInput.dbName, false);
-        } else if(expr != Empty.VALUE) {
+        } else if(!expr.seqType().zero()) {
           // otherwise, database cannot be locked statically
           if(!visitor.lock(null, false)) return false;
         }

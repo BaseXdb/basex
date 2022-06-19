@@ -40,13 +40,6 @@ public final class QueryResources {
   /** Indicates if the first database in the context is globally opened. */
   private boolean globalData;
 
-  /** Textual resources. Required for test APIs. */
-  private Map<String, String[]> texts;
-  /** Cached stop word files. Required for test APIs. */
-  private Map<String, IO> stop;
-  /** Cached thesaurus files. Required for test APIs. */
-  private Map<String, IO> thes;
-
   /** Opened databases (both temporary and persistent ones). */
   private final ArrayList<Data> datas = new ArrayList<>(1);
   /** External resources. */
@@ -301,6 +294,15 @@ public final class QueryResources {
     }
   }
 
+  // TEST APIS ====================================================================================
+
+  /** Textual resources. Required for test APIs. */
+  private Map<String, String[]> texts;
+  /** Cached stop word files. Required for test APIs. */
+  private Map<String, IO> stop;
+  /** Cached thesaurus files. Required for test APIs. */
+  private Map<String, IO> thes;
+
   /**
    * Returns the document path of a textual resource and its encoding. Only required for test APIs.
    * @param uri resource uri
@@ -330,8 +332,6 @@ public final class QueryResources {
     return thes != null ? thes.get(path) : sc.resolve(path);
   }
 
-  // TEST APIS ====================================================================================
-
   /**
    * Adds a document with the specified path. Only called from the test APIs.
    * @param name document identifier (may be {@code null})
@@ -351,7 +351,7 @@ public final class QueryResources {
    * @param uri resource uri
    * @param strings resource strings (path, encoding)
    */
-  public void addResource(final String uri, final String... strings) {
+  public void addText(final String uri, final String... strings) {
     if(texts == null) texts = new HashMap<>();
     texts.put(uri, strings);
   }

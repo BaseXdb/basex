@@ -64,20 +64,22 @@ public final class QueryContext extends Job implements Closeable {
   /** Database context. */
   public final Context context;
 
-  /** Query resources. */
-  public QueryResources resources;
-  /** Update container; will be created if the first update is evaluated. */
-  public Updates updates;
-
   /** Global database options (will be reassigned after query execution). */
   final QueryOptions options = new QueryOptions(this);
 
   /** Query threads. */
   public final QueryThreads threads = new QueryThreads();
+  /** User-defined locks. */
+  public final LockList locks = new LockList();
   /** Current query focus. */
   public QueryFocus focus = new QueryFocus();
   /** Date/time values. */
   public QueryDateTime dateTime;
+
+  /** Query resources. */
+  public QueryResources resources;
+  /** Update container; will be created if the first update is evaluated. */
+  public Updates updates;
 
   /** Full-text position data (needed for highlighting full-text results). */
   public FTPosData ftPosData = Prop.gui ? new FTPosData() : null;
@@ -92,9 +94,6 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Available collations. */
   public TokenObjMap<Collation> collations;
-
-  /** User-defined locks. */
-  public final LockList locks = new LockList();
 
   /** Number of successive tail calls. */
   public int tailCalls;

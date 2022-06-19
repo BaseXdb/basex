@@ -3621,9 +3621,8 @@ public class QueryParser extends InputParser {
               } while(wsConsume(COMMA));
               wsCheck(PAREN2);
             } else if(wsConsumeWs(AT)) {
-              final String fn = string(stringLiteral());
               // optional: resolve URI reference
-              final IO fl = qc.resources.stopWords(fn, sc);
+              final IO fl = qc.resources.stopWords(string(stringLiteral()), sc);
               try {
                 opt.sw.read(fl, except);
               } catch(final IOException ex) {
@@ -3665,9 +3664,8 @@ public class QueryParser extends InputParser {
   private void ftThesaurusID(final ThesList queries) throws QueryException {
     wsCheck(AT);
 
-    final String fn = string(stringLiteral());
     // optional: resolve URI reference
-    final IO fl = qc.resources.thesaurus(fn, sc);
+    final IO fl = qc.resources.thesaurus(string(stringLiteral()), sc);
     final byte[] rel = wsConsumeWs(RELATIONSHIP) ? stringLiteral() : EMPTY;
     final Expr[] range = ftRange(true);
     long min = 0, max = Long.MAX_VALUE;
