@@ -96,6 +96,7 @@ public final class FTWords extends FTExpr {
     }
     query = query.compile(cc);
     ftOpt = cc.qc.ftOpt().copy();
+    if(db != null) db.compile(cc);
 
     return optimize(cc);
   }
@@ -452,10 +453,12 @@ public final class FTWords extends FTExpr {
 
   @Override
   public boolean has(final Flag... flags) {
-    if(occ != null) for(final Expr o : occ) {
-      if(o.has(flags)) return true;
+    if(occ != null) {
+      for(final Expr o : occ) {
+        if(o.has(flags)) return true;
+      }
     }
-    return query.has(flags);
+    return (db == null || db.has(flags)) && query.has(flags);
   }
 
   @Override
@@ -465,12 +468,15 @@ public final class FTWords extends FTExpr {
         if(!o.inlineable(ic)) return false;
       }
     }
-    return query.inlineable(ic);
+    return (db == null || db.inlineable(ic)) && query.inlineable(ic);
   }
 
   @Override
   public VarUsage count(final Var var) {
-    return occ != null ? VarUsage.sum(var, occ).plus(query.count(var)) : query.count(var);
+    VarUsage vu = query.count(var);
+    if(occ != null) vu = vu.plus(VarUsage.sum(var, occ));
+    if(db != null) vu = vu.plus(db.count(var));
+    return vu;
   }
 
   @Override
@@ -480,6 +486,13 @@ public final class FTWords extends FTExpr {
     if(inlined != null) {
       query = inlined;
       changed = true;
+    }
+    if(db != null) {
+      final IndexDb id = db.inline(ic);
+      if(id != null) {
+        db = id;
+        changed = true;
+      }
     }
     return changed ? optimize(ic.cc) : null;
   }
@@ -499,14 +512,15 @@ public final class FTWords extends FTExpr {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     return super.accept(visitor) && query.accept(visitor) &&
-        (occ == null || visitAll(visitor, occ));
+        (occ == null || visitAll(visitor, occ)) && (db == null || db.accept(visitor));
   }
 
   @Override
   public int exprSize() {
     int size = 1;
-    if(occ != null) for(final Expr o : occ) size += o.exprSize();
     for(final Expr expr : exprs) size += expr.exprSize();
+    if(occ != null) for(final Expr o : occ) size += o.exprSize();
+    if(db != null) size += db.exprSize();
     return size + query.exprSize();
   }
 

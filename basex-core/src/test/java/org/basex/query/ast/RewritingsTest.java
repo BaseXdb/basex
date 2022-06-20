@@ -2863,4 +2863,19 @@ public final class RewritingsTest extends QueryPlanTest {
     check("a[/a[/b]]", "", empty());
     check("a[/a]", "<a>\n<b/>\n</a>", root(IterPath.class), exists(DBNode.class));
   }
+
+  /** Full-text search, enforceindex enabled, AIOOB. */
+  @Test public void gh2110() {
+    query(_DB_CREATE.args(NAME, "<_>a</_>", "_.xml", " map { 'ftindex': true() }"));
+
+    query("declare option db:enforceindex 'true';"
+        + "let $db := '" + NAME + "' "
+        + "let $rs := db:open($db)/descendant::text()[. contains text 'A'] "
+        + "return $rs", "a");
+    query("let $db := '" + NAME + "' "
+        + "let $rs := (# db:enforceindex #) { "
+        + "  db:open($db)//text()[. contains text 'A'] "
+        + "} "
+        + "return $rs", "a");
+  }
 }
