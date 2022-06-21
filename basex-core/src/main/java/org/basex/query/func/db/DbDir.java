@@ -58,8 +58,10 @@ public final class DbDir extends DbList {
       final int i = pt.indexOf('/');
       final boolean dir = i >= 0;
       if(dir) pt = pt.substring(0, i);
-      if(set.add(pt)) vb.add(dir ? dir(pt, data.meta.time) :
-        resource(pt, data.meta.time, null, ResourceType.XML));
+      if(set.add(pt)) {
+        vb.add(dir ? dir(pt, data.meta.time) :
+          resource(pt, data.meta.time, null, ResourceType.XML));
+      }
     }
 
     // list file resources
@@ -68,8 +70,10 @@ public final class DbDir extends DbList {
       if(bin != null) {
         for(final IOFile child : bin.children()) {
           final String pt = child.name();
-          if(set.add(pt)) vb.add(child.isDir() ? dir(pt, child.timeStamp()) :
-            resource(pt, child.timeStamp(), child.length(), type));
+          if(set.add(pt)) {
+            vb.add(child.isDir() ? dir(pt, child.timeStamp()) :
+              resource(pt, child.timeStamp(), child.length(), type));
+          }
         }
       }
     }

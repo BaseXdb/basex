@@ -66,19 +66,19 @@ public class XsltTransform extends XsltFn {
 
       // retrieve new or cached templates object
       Templates templates = key != null ? MAP.get(key) : null;
-      URIResolver cr = Resolver.uris(qc.context.options);
+      URIResolver ur = Resolver.uris(qc.context.options);
       if(templates == null) {
         // no templates object cached: create new instance
         final TransformerFactory tf = TransformerFactory.newInstance();
         // assign catalog resolver (if defined)
-        if(cr != null) tf.setURIResolver(cr);
+        if(ur != null) tf.setURIResolver(ur);
         templates = tf.newTemplates(ss);
         if(key != null) MAP.put(key, templates);
       }
 
       // create transformer, assign catalog resolver (if defined)
       final Transformer tr = templates.newTransformer();
-      if(cr != null) tr.setURIResolver(cr);
+      if(ur != null) tr.setURIResolver(ur);
 
       // bind parameters
       opts.free().forEach(tr::setParameter);

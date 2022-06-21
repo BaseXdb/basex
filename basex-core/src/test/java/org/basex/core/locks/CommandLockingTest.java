@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 import org.junit.jupiter.api.Test;
 
 /**
- * This class tests commands and XQuer expressions for correct identification of databases to lock.
+ * This class tests commands and XQuery expressions for correct identification of databases to lock.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Jens Erat

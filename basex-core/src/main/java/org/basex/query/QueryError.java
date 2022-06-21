@@ -335,23 +335,23 @@ public enum QueryError {
   // Jobs Module
 
   /** Error code. */
-  JOBS_ID_EXISTS_X(JOBS, "id", "Job id already exists: %."),
+  JOBS_ID_EXISTS_X(JOB, "id", "Job id already exists: %."),
   /** Error code. */
-  JOBS_ID_INVALID_X(JOBS, "id", "Invalid job name: %."),
+  JOBS_ID_INVALID_X(JOB, "id", "Invalid job name: %."),
   /** Error code. */
-  JOBS_OPTIONS(JOBS, "options", "Either 'cache' or 'interval' option is allowed."),
+  JOBS_OPTIONS(JOB, "options", "Either 'cache' or 'interval' option is allowed."),
   /** Error code. */
-  JOBS_OVERFLOW(JOBS, "overflow", "Too many queries cached."),
+  JOBS_OVERFLOW(JOB, "overflow", "Too many queries cached."),
   /** Error code. */
-  JOBS_RANGE_X(JOBS, "range", "Value out of range: %."),
+  JOBS_RANGE_X(JOB, "range", "Value out of range: %."),
   /** Error code. */
-  JOBS_RUNNING_X(JOBS, "running", "Result is not available yet: %."),
+  JOBS_RUNNING_X(JOB, "running", "Result is not available yet: %."),
   /** Error code. */
-  JOBS_SELF_X(JOBS, "self", "Cannot wait for own job: %"),
+  JOBS_SELF_X(JOB, "self", "Cannot wait for own job: %"),
   /** Error code. */
-  JOBS_SERVICE(JOBS, "service", "No variables allowed."),
+  JOBS_SERVICE(JOB, "service", "No variables allowed."),
   /** Error code. */
-  JOBS_SERVICE_X_X(JOBS, "service", "Could not write service: %."),
+  JOBS_SERVICE_X_X(JOB, "service", "Could not write service: %."),
 
   // JSON Module
 
@@ -1478,7 +1478,7 @@ public enum QueryError {
     /** Error type. */ HTML(HTML_PREFIX,         HTML_URI),
     /** Error type. */ HASH(HASH_PREFIX,         HASH_URI),
     /** Error type. */ INSPECT(INSPECT_PREFIX,   INSPECT_URI),
-    /** Error type. */ JOBS(JOB_PREFIX,          JOB_URI),
+    /** Error type. */ JOB(JOB_PREFIX,           JOB_URI),
     /** Error type. */ JSON(JSON_PREFIX,         JSON_URI),
     /** Error type. */ OUTPUT(OUTPUT_PREFIX,     OUTPUT_URI),
     /** Error type. */ PROC(PROC_PREFIX,         PROC_URI),
