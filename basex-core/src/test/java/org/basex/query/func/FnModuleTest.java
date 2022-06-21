@@ -410,15 +410,16 @@ public final class FnModuleTest extends QueryPlanTest {
   @Test public void functionLookup() {
     final Function func = FUNCTION_LOOKUP;
 
-    check("for $f in ('fn:true', 'fn:position') ! function-lookup(xs:QName(.), 0) " +
-        "return (8, 9)[$f()]", "8\n9\n9", exists(func));
-    check("for $f in xs:QName('fn:position') return (8, 9)[function-lookup($f, 0)()]", "8\n9",
-        empty(func));
+    check("for $f in ('fn:true', 'fn:position') !" + func.args(" xs:QName(.)", 0) +
+        " return (8, 9)[$f()]",
+        "8\n9\n9", exists(func));
+    check("for $f in xs:QName('fn:position') return (8, 9)[" + func.args(" $f", 0) + "()]",
+        "8\n9", empty(func));
 
     inline(true);
-    check("function-lookup(xs:QName('fn:count'), 1)((1, 2))", 2, root(Int.class));
-    check("function-lookup(xs:QName('hof:id'), 1)(1)", 1, root(Int.class));
-    check("function-lookup(xs:QName('hof:id'), 1)(<a/>)", "<a/>", root(CElem.class));
+    check(func.args(" xs:QName('fn:count')", 1) + "((1, 2))", 2, root(Int.class));
+    check(func.args(" xs:QName('hof:id')", 1) + "(1)", 1, root(Int.class));
+    check(func.args(" xs:QName('hof:id')", 1) + "(<a/>)", "<a/>", root(CElem.class));
   }
 
   /** Test method. */
