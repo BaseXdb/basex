@@ -1,7 +1,6 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -139,7 +138,7 @@ public final class DialogInsert extends BaseXDialog {
     ok = kind != Data.TEXT || input2.getText().length != 0;
     String msg = null;
     if(kind != Data.TEXT && kind != Data.COMM) {
-      ok = XMLToken.isQName(token(input1.getText()));
+      ok = XMLToken.isQName(Token.token(input1.getText()));
       if(!ok && !input1.getText().isEmpty()) msg = Util.info(INVALID_X, NAME);
     }
     info.setText(msg, Msg.ERROR);
@@ -148,7 +147,7 @@ public final class DialogInsert extends BaseXDialog {
 
   @Override
   public void close() {
-    final String in1 = input1.getText(), in2 = string(input2.getText());
+    final String in1 = input1.getText(), in2 = Token.string(input2.getText());
     switch(kind) {
       case Data.ATTR: case Data.PI:
         result.add(in1).add(in2);

@@ -78,15 +78,14 @@ public abstract class StandardFunc extends Arr {
     checkPerm(cc.qc, definition.perm);
     simplifyArgs(cc);
 
+    // apply custom optimizations
     final Expr expr = opt(cc);
+    if(expr != this) return cc.replaceWith(this, expr);
+
+    // pre-evaluate if arguments are values and not too large
     final SeqType st = definition.seqType;
-    return
-      // return optimized expression
-      expr != this ? cc.replaceWith(this, expr) :
-      // pre-evaluate if arguments are values and not too large
-      allAreValues(st.occ.max > 1 || st.type instanceof FuncType) && isSimple() ? cc.preEval(this) :
-      // return original function
-      this;
+    return allAreValues(st.occ.max > 1 || st.type instanceof FuncType) && isSimple()
+        ? cc.preEval(this) : this;
   }
 
   /**

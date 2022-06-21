@@ -134,6 +134,7 @@ public abstract class AQuery extends Command {
         if(qp != null) qp.close();
       }
     }
+    // add query plan, if not done yet, and info string
     queryPlan();
     return extError(error);
   }
@@ -220,7 +221,7 @@ public abstract class AQuery extends Command {
           info(qp.toXml().serialize().toString());
         }
         plan = true;
-      } catch(final Exception ex) {
+      } catch(final QueryIOException ex) {
         Util.stack(ex);
       }
     }

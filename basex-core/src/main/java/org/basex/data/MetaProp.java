@@ -167,7 +167,7 @@ public enum MetaProp {
   }
 
   /** Cached enums (faster). */
-  public static final MetaProp[] VALUES = values();
+  public static final MetaProp[] ENUMS = values();
 
   /**
    * Returns the value of a property.
@@ -182,7 +182,7 @@ public enum MetaProp {
    * @return permission, or {@code null} if no match is found
    */
   public static MetaProp get(final String name) {
-    for(final MetaProp prop : VALUES) {
+    for(final MetaProp prop : ENUMS) {
       if(prop.toString().toLowerCase(Locale.ENGLISH).equals(name)) return prop;
     }
     return null;

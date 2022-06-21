@@ -26,6 +26,7 @@ public final class DbRename extends DbAccess {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
     final String source = toDbPath(1, qc), target = toDbPath(2, qc);
+
     if(!(Prop.CASE ? source.equals(target) : source.equalsIgnoreCase(target))) {
       // rename XML resources
       final Updates updates = qc.updates();
@@ -37,7 +38,7 @@ public final class DbRename extends DbAccess {
         if(trg.isEmpty() || Strings.endsWith(trg, '/')) throw DB_PATH_X.get(info, trg);
         updates.add(new ReplaceValue(pre, data, info, token(trg)), qc);
       }
-      // rename binary resources
+      // rename file resources
       final IOFile src = data.meta.binary(source), trg = data.meta.binary(target);
       if(src != null && trg != null) {
         rename(data, src, trg, qc);

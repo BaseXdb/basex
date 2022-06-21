@@ -100,7 +100,7 @@ public final class ViewNotifier {
       if(view != vw && view.visible()) view.refreshFocus();
     }
     if(pre != -1) {
-      gui.status.setText(Token.string(ViewData.path(gui.context.data(), pre)));
+      gui.status.setText(Token.string(ViewData.path(gui.context.data(), pre)), true);
     }
   }
 

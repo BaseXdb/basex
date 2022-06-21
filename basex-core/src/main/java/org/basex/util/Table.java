@@ -35,13 +35,13 @@ public final class Table {
 
   /**
    * Constructor with table input.
-   * @param in textual table input
+   * @param input textual table input
    */
-  public Table(final String in) {
-    if(in.isEmpty()) return;
+  public Table(final String input) {
+    if(input.isEmpty()) return;
 
     // parse table header
-    final Scanner scan = new Scanner(in);
+    final Scanner scan = new Scanner(input);
     byte[] line = token(scan.nextLine());
     final IntList il = new IntList();
     int l = 0;

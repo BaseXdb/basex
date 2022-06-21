@@ -1,7 +1,5 @@
 package org.basex.gui.layout;
 
-import javax.swing.border.*;
-
 import org.basex.gui.*;
 
 /**
@@ -19,6 +17,6 @@ public final class BaseXHeader extends BaseXLabel {
     super(string, true, false);
     setForeground(GUIConstants.dgray);
     resize(1.7f);
-    setBorder(new EmptyBorder(-2, 0, 8, 2));
+    border(-2, 0, 8, 2);
   }
 }

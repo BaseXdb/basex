@@ -156,7 +156,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     buttons.add(b, BorderLayout.EAST);
     if(this.gopts.get(GUIOptions.SHOWBUTTONS)) control.add(buttons, BorderLayout.CENTER);
 
-    mode = new BaseXCombo(this, FIND, XQUERY, COMMAND);
+    mode = new BaseXCombo(this, FIND, "XQuery", COMMAND);
     mode.setSelectedIndex(2);
 
     input = new GUIInput(this);
@@ -177,6 +177,9 @@ public final class GUI extends JFrame implements BaseXWindow {
     nav.add(mode, BorderLayout.WEST);
     nav.add(b, BorderLayout.CENTER);
 
+    final AbstractButton go = BaseXButton.get("c_go", RUN_QUERY, false, this);
+    go.addActionListener(e -> execute());
+
     stop = BaseXButton.get("c_stop", STOP, false, this);
     stop.setEnabled(false);
     stop.addActionListener(e -> {
@@ -185,9 +188,6 @@ public final class GUI extends JFrame implements BaseXWindow {
         stop.setEnabled(false);
       }
     });
-
-    final AbstractButton go = BaseXButton.get("c_go", RUN_QUERY, false, this);
-    go.addActionListener(e -> execute());
 
     filter = BaseXButton.command(GUIMenuCmd.C_FILTER_NODES, this);
 
@@ -351,17 +351,17 @@ public final class GUI extends JFrame implements BaseXWindow {
   /**
    * Launches the specified commands in a separate thread.
    * Commands are ignored if an update operation takes place.
-   * @param edit call from editor view
+   * @param editing call from editor view
    * @param cmds commands to be executed
    */
-  public void execute(final boolean edit, final Command... cmds) {
+  public void execute(final boolean editing, final Command... cmds) {
     // ignore command if updates take place
     if(updating) return;
 
     new Thread(() -> {
       if(cmds.length == 0) info.setInfo("", null, true, true);
       for(final Command cmd : cmds) {
-        if(!exec(cmd, edit)) break;
+        if(!execute(cmd, editing)) break;
       }
     }).start();
   }
@@ -369,10 +369,10 @@ public final class GUI extends JFrame implements BaseXWindow {
   /**
    * Executes the specified command.
    * @param cmd command to be executed
-   * @param edit called from editor view
+   * @param editing called from editor view
    * @return success flag
    */
-  private boolean exec(final Command cmd, final boolean edit) {
+  private boolean execute(final Command cmd, final boolean editing) {
     // wait when command is still running
     final int id = commandID.incrementAndGet();
     while(true) {
@@ -387,7 +387,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     cursor(CURSORWAIT);
     input.setCursor(CURSORWAIT);
     stop.setEnabled(true);
-    if(edit) editor.pleaseWait(id);
+    if(editing) editor.pleaseWait(id);
 
     final Data data = context.data();
     // reset current context if real-time filter is activated
@@ -431,11 +431,11 @@ public final class GUI extends JFrame implements BaseXWindow {
       // show query info, send feedback to query editor
       final String time = info.setInfo(inf, cmd, perf.getTime(), ok, true);
       final boolean stopped = inf.substring(inf.lastIndexOf('\n') + 1).equals(INTERRUPTED);
-      if(edit) editor.info(cause, stopped, true);
+      if(editing) editor.info(cause, stopped, true);
 
       // get query result and node references to currently opened database
-      final Value result = cmd.result();
-      DBNodes nodes = result instanceof DBNodes ? (DBNodes) result : null;
+      final Value value = cmd.result();
+      DBNodes nodes = value instanceof DBNodes ? (DBNodes) value : null;
 
       // show text view if a non-empty result does not reference the currently opened database
       if(!text.visible() && output.size() != 0 && nodes == null) {
@@ -446,7 +446,7 @@ public final class GUI extends JFrame implements BaseXWindow {
       if(!ok && !stopped) {
         // display error in info view
         text.setText(output, 0);
-        if(!info.visible() && (!edit || inf.startsWith(S_BUGINFO))) {
+        if(!info.visible() && (!editing || inf.startsWith(S_BUGINFO))) {
           GUIMenuCmd.C_SHOW_INFO.execute(this);
         }
       } else {
@@ -458,40 +458,40 @@ public final class GUI extends JFrame implements BaseXWindow {
           // update visualizations
           notify.update();
           // adopt updated nodes as result set
-          if(nodes == null && result == Empty.VALUE) nodes = context.current();
-        } else if(result != null) {
+          if(nodes == null && value == Empty.VALUE) nodes = context.current();
+        } else if(value != null) {
           // check if result has changed
-          final boolean flt = gopts.get(GUIOptions.FILTERRT);
+          final boolean filterrt = gopts.get(GUIOptions.FILTERRT);
           final DBNodes curr = context.current();
-          if(flt || curr != null && !curr.equals(current)) {
+          if(filterrt || curr != null && !curr.equals(current)) {
             // refresh context if at least one node was found
-            if(nodes != null) notify.context(nodes, flt, null);
+            if(nodes != null) notify.context(nodes, filterrt, null);
           } else if(context.marked != null) {
             // refresh highlight
-            DBNodes m = context.marked;
+            DBNodes marked = context.marked;
             if(nodes != null) {
               // use query result
-              m = nodes;
-            } else if(!m.isEmpty()) {
+              marked = nodes;
+            } else if(!marked.isEmpty()) {
               // remove old highlighting
-              m = new DBNodes(data);
+              marked = new DBNodes(data);
             }
             // refresh views
-            if(context.marked != m) notify.mark(m, null);
+            if(context.marked != marked) notify.mark(marked, null);
           }
         }
 
         if(id == commandID.get() && !stopped) {
           // refresh editor info
           editor.refreshContextLabel();
-          // show status info
-          status.setText(TIME_REQUIRED + COLS + time);
+          // refresh info view and status bar
+          status.setText(TIME_REQUIRED + COLS + time, true);
           // show number of hits
-          if(result != null) results.setText(gopts.results(result.size(), 0));
+          if(value != null) results.setText(gopts.results(value.size(), 0));
           // assign textual output if no node result was created
-          if(nodes == null) text.setText(output, result != null ? result.size() : 0);
+          if(nodes == null) text.setText(output, value != null ? value.size() : 0);
           // only cache output if data has not been updated (in which case notifyUpdate was called)
-          if(!updated) text.cache(output, cmd, result);
+          if(!updated) text.cache(output, cmd, value);
         }
       }
     } catch(final Exception ex) {

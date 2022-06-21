@@ -190,7 +190,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
         // return status information
         final String time = perf.toString();
         gui.info.setInfo(info, cmd, time, ok, true);
-        gui.status.setText(cmd + ": " + time);
+        gui.status.setText(cmd + ": " + time, true);
 
         // close progress window and show error if command failed
         wait.dispose();

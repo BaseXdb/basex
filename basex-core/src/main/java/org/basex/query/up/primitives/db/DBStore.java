@@ -21,8 +21,8 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class DBStore extends DBUpdate {
-  /** Keys. */
-  private final TokenObjMap<Item> map = new TokenObjMap<>();
+  /** Paths. */
+  private final TokenObjMap<Item> paths = new TokenObjMap<>();
 
   /**
    * Constructor.
@@ -33,7 +33,7 @@ public final class DBStore extends DBUpdate {
    */
   public DBStore(final Data data, final String path, final Item item, final InputInfo info) {
     super(UpdateType.DBSTORE, data, info);
-    map.put(token(path), item);
+    paths.put(token(path), item);
   }
 
   @Override
@@ -42,12 +42,12 @@ public final class DBStore extends DBUpdate {
 
   @Override
   public void apply() throws QueryException {
-    for(final byte[] path : map) {
+    for(final byte[] path : paths) {
       final IOFile bin = data.meta.binary(string(path));
       if(bin.isDir()) bin.delete();
       bin.parent().md();
       try {
-        bin.write(map.get(path).input(info));
+        bin.write(paths.get(path).input(info));
       } catch(final IOException ex) {
         Util.debug(ex);
         throw UPDBPUT_X.get(info, path);
@@ -57,15 +57,15 @@ public final class DBStore extends DBUpdate {
 
   @Override
   public void merge(final Update update) throws QueryException {
-    final TokenObjMap<Item> store = ((DBStore) update).map;
+    final TokenObjMap<Item> store = ((DBStore) update).paths;
     for(final byte[] path : store) {
-      if(map.contains(path)) throw DB_CONFLICT5_X.get(info, path);
-      map.put(path, store.get(path));
+      if(paths.contains(path)) throw DB_CONFLICT5_X.get(info, path);
+      paths.put(path, store.get(path));
     }
   }
 
   @Override
   public int size() {
-    return map.size();
+    return paths.size();
   }
 }

@@ -258,7 +258,7 @@ public final class MetaData {
   }
 
   /**
-   * Returns a file instance for the specified database file.
+   * Returns a database file for the specified filename.
    * Should only be called if database is disk-based.
    * @param filename filename
    * @return database filename
@@ -268,19 +268,11 @@ public final class MetaData {
   }
 
   /**
-   * Returns the binary directory.
-   * @return binary directory, or {@code null} if this is a main-memory database
+   * Returns a directory with file resources.
+   * @return directory, or {@code null} if this is a main-memory database
    */
   public IOFile binaryDir() {
     return dir == null ? null : new IOFile(dir, IO.RAW);
-  }
-
-  /**
-   * Returns a file that indicates ongoing updates.
-   * @return updating file
-   */
-  public IOFile updateFile() {
-    return dbFile(DATAUPD);
   }
 
   /**
@@ -295,6 +287,14 @@ public final class MetaData {
       if(file.path().startsWith(bin.path())) return file;
     }
     return null;
+  }
+
+  /**
+   * Returns a file that indicates ongoing updates.
+   * @return updating file
+   */
+  public IOFile updateFile() {
+    return dbFile(DATAUPD);
   }
 
   /**

@@ -77,21 +77,26 @@ public class DbList extends StandardFunc {
   private Iter resources(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
+
     final IntList docs = data.resources.docs(path);
     final TokenList binaries = data.resources.binaryPaths(path);
-    final int ds = docs.size();
+    final int ds = docs.size(), bs = binaries.size(), size = ds + bs;
 
-    return new BasicIter<Str>(ds + binaries.size()) {
+    return new BasicIter<Str>(size) {
       @Override
       public Str get(final long i) {
-        return Str.get(i < ds ? data.text(docs.get((int) i), true) : binaries.get((int) i - ds));
+        return i < size ? Str.get(path((int) i)) : null;
       }
 
       @Override
       public Value value(final QueryContext q, final Expr expr) throws QueryException {
         final TokenList tl = new TokenList(Seq.initialCapacity(size));
-        for(int d = 0; d < ds; d++) tl.add(data.text(docs.get(d), true));
-        return StrSeq.get(tl.add(binaries));
+        for(int i = 0; i < size; i++) tl.add(path(i));
+        return StrSeq.get(tl);
+      }
+
+      private byte[] path(final int i) {
+        return i < ds ? data.text(docs.get(i), true) : binaries.get(i - ds);
       }
     };
   }

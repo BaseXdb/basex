@@ -34,9 +34,11 @@ public final class DbReplace extends DbNew {
     int d = 0;
 
     if(item instanceof Bin) {
+      // store binary resource
       if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
       updates.add(new DBStore(data, path, item, info), qc);
     } else {
+      // store XML document: replace existing document or add new one
       final IOFile bin = data.meta.binary(path);
       if(bin != null) {
         if(bin.isDir()) throw DB_TARGET_X.get(info, path);
@@ -49,7 +51,7 @@ public final class DbReplace extends DbNew {
       updates.add(update, qc);
     }
 
-    // delete old documents
+    // delete spare documents
     final int ds = docs.size();
     for(; d < ds; d++) updates.add(new DeleteNode(docs.get(d), data, info), qc);
     return Empty.VALUE;

@@ -28,9 +28,9 @@ public final class BaseXImages {
   /** System icons. */
   private static final FileSystemView FS = FileSystemView.getFileSystemView();
 
-  /** Icon for xml files. */
+  /** Icon for XML resources. */
   private static final Icon XMLTEXT = icon("text_xml");
-  /** Icon for raw files. */
+  /** Icon for binary resources. */
   private static final Icon RAWTEXT = icon("text_raw");
 
   /** Icon for closed directories. */
@@ -99,11 +99,11 @@ public final class BaseXImages {
 
   /**
    * Returns a directory icon.
-   * @param expanded expanded state (open/closed)
+   * @param opened expanded state (open/closed)
    * @return icon
    */
-  public static Icon dir(final boolean expanded) {
-    return expanded ? DIR2 : DIR1;
+  public static Icon dir(final boolean opened) {
+    return opened ? DIR2 : DIR1;
   }
 
   /**

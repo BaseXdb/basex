@@ -107,7 +107,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
     final BaseXBack buttons = new BaseXBack(false);
     buttons.layout(new ColumnLayout());
-    buttons.add(editor.button(FIND));
+    buttons.add(editor.button());
 
     final BaseXBack top = new BaseXBack(false);
     top.layout(new ColumnLayout(10));
@@ -374,9 +374,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
       for(int i = 0; i < l - 1; ++i) m = Math.max(m, stat.get(i));
 
       // draw focused bar
-      final int by = 8;
-      final int bh = h - by;
-
+      final int by = 8, bh = h - by;
       for(int i = 0; i < l - 1; ++i) {
         if(i != focus) continue;
         final int bx = w - bw + bs * i;

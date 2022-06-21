@@ -83,7 +83,6 @@ public final class List extends Command {
         meta.read();
         dbsize = meta.dbSize();
         file = meta.original;
-        // add number of binary resources
         count = meta.ndocs + meta.binaryDir().descendants().size();
       } catch(final IOException ex) {
         Util.debug(ex);
@@ -119,13 +118,13 @@ public final class List extends Command {
     table.header.add(SIZE);
 
     try {
-      // add xml documents
+      // list XML documents
       final Data data = Open.open(db, context, options);
       final Resources resources = data.resources;
-      final IntList il = resources.docs(path);
-      final int ds = il.size();
-      for(int i = 0; i < ds; i++) {
-        final int pre = il.get(i);
+      final IntList docs = resources.docs(path);
+      final int ds = docs.size();
+      for(int d = 0; d < ds; d++) {
+        final int pre = docs.get(d);
         final TokenList tl = new TokenList(4);
         tl.add(data.text(pre, true));
         tl.add(XML);
@@ -133,7 +132,7 @@ public final class List extends Command {
         tl.add(data.size(pre, Data.DOC));
         table.contents.add(tl);
       }
-      // add binary resources
+      // list file resources
       for(final byte[] file : resources.binaryPaths(path)) {
         final String bin = string(file);
         final TokenList tl = new TokenList(4);

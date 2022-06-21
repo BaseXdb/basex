@@ -53,8 +53,8 @@ public final class DbListDetails extends DbList {
         try {
           meta.read();
           // count number of binary files
-          final int binary = meta.binaryDir().descendants().size();
-          database.add(RESOURCES, token(meta.ndocs + binary));
+          final int binaries = meta.binaryDir().descendants().size();
+          database.add(RESOURCES, token(meta.ndocs + binaries));
           database.add(MODIFIED_DATE, DateTime.format(new Date(meta.dbTime())));
           database.add(SIZE, token(meta.dbSize()));
           if(ctx.perm(Perm.CREATE, name)) database.add(PATH, meta.original);
@@ -76,6 +76,7 @@ public final class DbListDetails extends DbList {
   private Iter resources(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
+
     final IntList docs = data.resources.docs(path);
     final TokenList binaries = data.resources.binaryPaths(path);
     final int ds = docs.size(), size = ds + binaries.size();

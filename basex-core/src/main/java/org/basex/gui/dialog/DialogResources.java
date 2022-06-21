@@ -176,7 +176,7 @@ final class DialogResources extends BaseXBack {
 
     int cmax = ResourceFolder.MAXC;
     // check if there's a directory
-    // create a folder if there's either a binary or document folder
+    // create a folder if there's either a files or document folder
     if(data.resources.isDir(filterPath)) {
       root.add(new ResourceFolder(ResourceFolder.name(filterPath), ResourceFolder.path(filterPath),
           tree, context));
@@ -190,7 +190,9 @@ final class DialogResources extends BaseXBack {
         addLeaves(name, cmax, root);
 
     // add dummy node if maximum number of nodes is exceeded
-    if(cmax <= 0) root.add(new ResourceLeaf(token(DOTS), sub, false, true, tree, context));
+    if(cmax <= 0) {
+      root.add(new ResourceLeaf(token(DOTS), sub, false, true, tree, context));
+    }
 
     ((DefaultTreeModel) tree.getModel()).nodeStructureChanged(root);
   }

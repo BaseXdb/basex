@@ -186,7 +186,8 @@ public final class DBNew {
     } else {
       builder = new MemBuilder(dbname, parser);
     }
-    return builder.binaryDir(sopts.dbPath(dbname)).build();
+    builder.binariesDir(sopts.dbPath(dbname));
+    return builder.build();
   }
 
   /**
@@ -198,13 +199,12 @@ public final class DBNew {
   private static void copy(final Data source, final Data target) throws IOException {
     // insert documents
     target.insert(target.meta.size, -1, new DataClip(source));
-    // move binary resources
+    // move file resources
     final IOFile srcDir = source.meta.binaryDir(), trgDir = target.meta.binaryDir();
     if(srcDir != null && srcDir.exists()) {
       trgDir.md();
       for(final String path : srcDir.descendants()) {
-        final IOFile srcFile = new IOFile(srcDir, path);
-        final IOFile trgFile = new IOFile(trgDir, path);
+        final IOFile srcFile = new IOFile(srcDir, path), trgFile = new IOFile(trgDir, path);
         trgFile.delete();
         trgFile.parent().md();
         Files.move(Paths.get(srcFile.path()), Paths.get(trgFile.path()));

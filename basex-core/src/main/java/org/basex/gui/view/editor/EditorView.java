@@ -123,10 +123,10 @@ public final class EditorView extends View {
 
     history = BaseXButton.get("c_history", BaseXLayout.addShortcut(RECENTLY_OPENED,
         BaseXKeys.HISTORY.toString()), false, gui);
-    stop = BaseXButton.get("c_stop", STOP, false, gui);
-    stop.setEnabled(false);
     exec = BaseXButton.get("c_go", BaseXLayout.addShortcut(RUN_QUERY,
         BaseXKeys.EXEC.toString()), false, gui);
+    stop = BaseXButton.get("c_stop", STOP, false, gui);
+    stop.setEnabled(false);
     tests = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS,
         BaseXKeys.TESTS.toString()), false, gui);
 
@@ -147,8 +147,7 @@ public final class EditorView extends View {
     context = new BaseXLabel("").resize(1.2f);
     context.setForeground(dgray);
 
-    final BaseXBack north = new BaseXBack(false);
-    north.layout(new BorderLayout(10, 0));
+    final BaseXBack north = new BaseXBack(false).layout(new BorderLayout(10, 0));
     north.add(buttons, BorderLayout.WEST);
     north.add(context, BorderLayout.CENTER);
     north.add(new BaseXHeader(EDITOR), BorderLayout.EAST);
@@ -778,7 +777,7 @@ public final class EditorView extends View {
   /**
    * Processes the result from a command or query execution.
    * @param th exception or {@code null}
-   * @param stopped {@code true} if evaluation was interrupted
+   * @param stopped {@code true} if evaluation was stopped
    * @param refresh refresh buttons
    */
   public void info(final Throwable th, final boolean stopped, final boolean refresh) {

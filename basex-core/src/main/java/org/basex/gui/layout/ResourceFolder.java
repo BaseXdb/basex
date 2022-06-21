@@ -72,11 +72,11 @@ public class ResourceFolder extends ResourceNode {
    * @return number of remaining nodes that can be added
    */
   public final int addLeaves(final byte[] filter, final int cmax, final ResourceFolder target) {
-    final TokenBoolMap tbm = context.data().resources.children(string(subfolder()), false);
-    final List<byte[]> keys = new ArrayList<>(tbm.size());
+    final TokenBoolMap map = context.data().resources.children(string(subfolder()), false);
+    final List<byte[]> keys = new ArrayList<>(map.size());
 
     // get desired leaves, depending on the given filter
-    for(final byte[] b : tbm) {
+    for(final byte[] b : map) {
       if(filter.length == 0 || eq(b, filter)) keys.add(b);
     }
     keys.sort(CMP);
@@ -87,7 +87,7 @@ public class ResourceFolder extends ResourceNode {
     final int ks = keys.size();
     while(k < ks && m-- > 0) {
       final byte[] nm = keys.get(k++);
-      target.add(new ResourceLeaf(nm, sub, tbm.get(nm), false, tree, context));
+      target.add(new ResourceLeaf(nm, sub, map.get(nm), false, tree, context));
     }
 
     return m;

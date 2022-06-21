@@ -142,7 +142,7 @@ public final class OptimizeAll extends ACreate {
       ndata.close();
     }
 
-    // move binary resources
+    // move file resources to new database
     final IOFile dir = ometa.binaryDir();
     if(dir.exists()) dir.rename(nmeta.binaryDir());
 

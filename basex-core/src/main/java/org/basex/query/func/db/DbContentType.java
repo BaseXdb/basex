@@ -30,7 +30,9 @@ public final class DbContentType extends DbAccess {
       if(!type.isXML()) type = MediaType.APPLICATION_XML;
     } else {
       final IOFile bin = data.meta.binary(path);
-      if(bin != null && bin.exists() && !bin.isDir()) type = MediaType.get(path);
+      if(bin != null && bin.exists() && !bin.isDir()) {
+        type = MediaType.get(path);
+      }
     }
     if(type == null) throw WHICHRES_X.get(info, path);
     return Str.get(type.toString());

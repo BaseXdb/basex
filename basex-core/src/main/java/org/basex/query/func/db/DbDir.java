@@ -41,36 +41,38 @@ public final class DbDir extends DbList {
    */
   private Value resources(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    byte[] path = toToken(exprs[1], qc);
-    String root = MetaData.normPath(string(path));
-    if(root == null) throw DB_PATH_X.get(info, path);
+    byte[] token = toToken(exprs[1], qc);
+    String path = MetaData.normPath(string(token));
+    if(path == null) throw DB_PATH_X.get(info, token);
 
-    if(!root.isEmpty() && !Strings.endsWith(root, '/')) root += '/';
-    path = token(root);
+    if(!path.isEmpty() && !Strings.endsWith(path, '/')) path += '/';
+    token = token(path);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     final HashSet<String> set = new HashSet<>();
 
-    final IntList docs = data.resources.docs(root, false);
+    // list XML resources
+    final IntList docs = data.resources.docs(path, false);
     final int ds = docs.size();
     for(int d = 0; d < ds; d++) {
-      String np = string(data.text(docs.get(d), true)).substring(path.length);
-      final int i = np.indexOf('/');
+      String pt = string(data.text(docs.get(d), true)).substring(token.length);
+      final int i = pt.indexOf('/');
       final boolean dir = i >= 0;
-      if(dir) np = np.substring(0, i);
-      if(set.add(np)) {
-        vb.add(dir ? dir(np, data.meta.time) :
-          resource(np, false, MediaType.APPLICATION_XML, data.meta.time, null));
+      if(dir) pt = pt.substring(0, i);
+      if(set.add(pt)) {
+        vb.add(dir ? dir(pt, data.meta.time) :
+          resource(pt, false, MediaType.APPLICATION_XML, data.meta.time, null));
       }
     }
 
-    final IOFile bin = data.meta.binary(string(path));
+    // list file resources
+    final IOFile bin = data.meta.binary(string(token));
     if(bin != null) {
-      for(final IOFile io : bin.children()) {
-        final String np = io.name();
-        if(set.add(np)) {
-          vb.add(io.isDir() ? dir(np, io.timeStamp()) :
-            resource(np, true, MediaType.get(io.path()), io.timeStamp(), io.length()));
+      for(final IOFile child : bin.children()) {
+        final String pt = child.name();
+        if(set.add(pt)) {
+          vb.add(child.isDir() ? dir(pt, child.timeStamp()) :
+            resource(pt, true, MediaType.get(child.path()), child.timeStamp(), child.length()));
         }
       }
     }

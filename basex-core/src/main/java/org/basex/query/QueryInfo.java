@@ -103,8 +103,9 @@ public final class QueryInfo {
    */
   public String toString(final QueryProcessor qp, final long printed, final long hits,
       final Locks locks) {
-    final int runs = Math.max(1, qp.qc.context.options.get(MainOptions.RUNS));
+
     final TokenBuilder tb = new TokenBuilder();
+    final int runs = Math.max(1, qp.qc.context.options.get(MainOptions.RUNS));
     final long total = parsing + compiling + evaluating + serializing;
     if(qp.qc.context.options.get(MainOptions.QUERYINFO)) {
       final int up = qp.updates();

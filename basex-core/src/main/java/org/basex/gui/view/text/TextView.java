@@ -58,23 +58,22 @@ public final class TextView extends View {
 
     header = new BaseXHeader(RESULT);
 
-    home = BaseXButton.command(GUIMenuCmd.C_SHOW_HOME, gui);
-    home.setEnabled(false);
-
-    label = new BaseXLabel(" ").resize(1.2f);
-
     text = new TextPanel(gui, false);
     text.setSyntax(new SyntaxXML());
     editor = new SearchEditor(gui, text);
+    label = new BaseXLabel(" ").resize(1.2f);
 
     final AbstractButton save = BaseXButton.get("c_save", SAVE, false, gui);
     save.addActionListener(e -> save());
+
+    home = BaseXButton.command(GUIMenuCmd.C_SHOW_HOME, gui);
+    home.setEnabled(false);
 
     final BaseXBack buttons = new BaseXBack(false);
     buttons.layout(new ColumnLayout());
     buttons.add(save);
     buttons.add(home);
-    buttons.add(editor.button(FIND));
+    buttons.add(editor.button());
 
     final BaseXBack top = new BaseXBack(false);
     top.layout(new ColumnLayout(10));
@@ -198,15 +197,16 @@ public final class TextView extends View {
    */
   public void setText(final ArrayOutput out, final long results) {
     final byte[] buffer = out.buffer();
-    // will never exceed integer range as the underlying array is limited to 2^31 bytes
     final int size = (int) out.size();
     final byte[] chop = token(DOTS);
     final int cl = chop.length;
     if(out.finished() && size >= cl) Array.copyFromStart(chop, cl, buffer, size - cl);
     text.setText(buffer, size);
+
+    final String info = gui.gopts.results(results, size);
     header.setText((out.finished() ? CHOPPED : "") + RESULT);
+    label.setText(info);
     home.setEnabled(gui.context.data() != null);
-    label.setText(gui.gopts.results(results, size));
   }
 
   /**

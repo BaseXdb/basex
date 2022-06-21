@@ -116,9 +116,9 @@ public final class Resources implements Index {
   }
 
   /**
-   * Returns the database paths to all binary resources that start with the specified path.
+   * Returns the database paths to all file resources that start with the specified path.
    * @param path input path
-   * @return database paths of binary resources
+   * @return paths
    */
   public synchronized TokenList binaryPaths(final String path) {
     return bins.paths(path);
@@ -137,13 +137,13 @@ public final class Resources implements Index {
    * Returns the child resources for the given path.
    * @param path path
    * @param dir returns directories
-   * @return paths with binary flags
+   * @return map with paths and booleans, indicating binary resources
    */
   public synchronized TokenBoolMap children(final String path, final boolean dir) {
-    final TokenBoolMap tbm = new TokenBoolMap();
-    docs.children(path, dir, tbm);
-    bins.children(path, dir, tbm);
-    return tbm;
+    final TokenBoolMap map = new TokenBoolMap();
+    docs.children(path, dir, map);
+    bins.children(path, dir, map);
+    return map;
   }
 
   // Inherited methods ============================================================================

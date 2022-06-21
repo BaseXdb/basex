@@ -102,7 +102,7 @@ public final class TextEditor {
         // search was interrupted
       } catch(final Exception ex) {
         final String info = Util.message(ex).replaceAll(Text.NL + ".*", "");
-        gui.status.setError(Text.REGULAR_EXPR + Text.COLS + info);
+        gui.status.setText(Text.REGULAR_EXPR + Text.COLS + info, false);
       }
     });
     t.setDaemon(true);

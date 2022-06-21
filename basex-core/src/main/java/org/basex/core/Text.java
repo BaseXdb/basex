@@ -527,7 +527,7 @@ public interface Text {
   String NO_MAINMEM = lang("no_mainmem");
   /** Out of memory error. */
   String OUT_OF_MEM = lang("out_of_mem");
-  /** Progress exception. */
+  /** Interrupted command execution. */
   String INTERRUPTED = lang("interrupted");
 
   /** Expecting command. */
@@ -1055,8 +1055,6 @@ public interface Text {
   String COMMAND = lang("command");
   /** "Backup". */
   String BACKUP = lang("backup");
-  /** "XQuery". */
-  String XQUERY = "XQuery";
 
   /** Button text for deleting files. */
   String DROP = lang("drop");

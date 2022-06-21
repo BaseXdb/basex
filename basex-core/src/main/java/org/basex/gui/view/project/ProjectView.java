@@ -218,7 +218,7 @@ public final class ProjectView extends BaseXPanel {
         final Performance perf = new Performance();
         files.parse(root.file, gui.context);
         parsed = true;
-        gui.status.setText(PARSING_CC + perf.getTime());
+        gui.status.setText(PARSING_CC + perf.getTime(), true);
         return true;
       }
 

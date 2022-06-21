@@ -73,13 +73,13 @@ public final class Add extends ACreate {
    * @return success flag
    */
   boolean build() {
-    String name = MetaData.normPath(args[0]);
-    if(name == null) return error(PATH_INVALID_X, args[0]);
+    String path = MetaData.normPath(args[0]);
+    if(path == null) return error(PATH_INVALID_X, args[0]);
 
     // retrieve input
     final IO source;
     try {
-      source = sourceToIO(name);
+      source = sourceToIO(path);
     } catch(final IOException ex) {
       return error(Util.message(ex));
     }
@@ -89,34 +89,37 @@ public final class Add extends ACreate {
     if(!source.exists()) return in != null ? error(RES_NOT_FOUND) :
         error(RES_NOT_FOUND_X, context.user().has(Perm.CREATE) ? source : args[1]);
 
-    if(!Strings.endsWith(name, '/') && (source.isDir() || source.isArchive())) name += '/';
+    if(!Strings.endsWith(path, '/') && (source.isDir() || source.isArchive())) path += '/';
 
     String target = "";
-    final int s = name.lastIndexOf('/');
+    final int s = path.lastIndexOf('/');
     if(s != -1) {
-      target = name.substring(0, s);
-      name = name.substring(s + 1);
+      target = path.substring(0, s);
+      path = path.substring(s + 1);
     }
 
     // get name from io reference
-    if(name.isEmpty()) name = source.name();
-    else source.name(name);
+    if(path.isEmpty()) path = source.name();
+    else source.name(path);
 
     // ensure that the final name is not empty
-    if(name.isEmpty()) return error(NAME_INVALID_X, name);
+    if(path.isEmpty()) return error(NAME_INVALID_X, path);
 
     try {
       final Data data = context.data();
+      final String name = data.meta.name;
       final Parser parser = new DirParser(source, options).target(target);
 
       // create random database name for disk-based creation
       if(cache(parser)) {
-        final String tmpName = soptions.createTempDb(data.meta.name);
+        final String tmpName = soptions.createTempDb(name);
         builder = new DiskBuilder(tmpName, parser, soptions, options);
       } else {
-        builder = new MemBuilder(name, parser);
+        builder = new MemBuilder(path, parser);
       }
-      tmpData = builder.binaryDir(data.meta.dir).build();
+
+      if(!data.inMemory()) builder.binariesDir(data.meta.dir);
+      tmpData = builder.build();
       return true;
     } catch(final IOException ex) {
       return error(Util.message(ex));

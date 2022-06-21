@@ -97,9 +97,10 @@ public final class CreateDB extends ACreate {
 
         // create disk-based instance
         final DiskBuilder builder = new DiskBuilder(name, parser, soptions, options);
+        builder.binariesDir(soptions.dbPath(name));
         pushJob(builder);
         try {
-          builder.binaryDir(soptions.dbPath(name)).build().close();
+          builder.build().close();
         } finally {
           popJob();
         }

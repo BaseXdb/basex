@@ -1,6 +1,5 @@
 package org.basex.util.http;
 
-import static org.basex.util.Token.*;
 import static org.basex.util.http.HttpText.*;
 
 import java.io.*;
@@ -59,7 +58,7 @@ public final class HttpResponse {
     items.add(response);
 
     final String msg = conn.getResponseMessage();
-    response.add(STATUS, token(conn.getResponseCode()));
+    response.add(STATUS, Token.token(conn.getResponseCode()));
     response.add(MESSAGE, msg == null ? "" : msg);
     // add <http:header/> elements
     for(final Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {

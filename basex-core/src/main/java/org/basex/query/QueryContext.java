@@ -63,20 +63,22 @@ public final class QueryContext extends Job implements Closeable {
   /** Database context. */
   public final Context context;
 
-  /** Query resources. */
-  public QueryResources resources;
-  /** Update container; will be created if the first update is evaluated. */
-  public Updates updates;
-
   /** Global database options (will be reassigned after query execution). */
   final QueryOptions options = new QueryOptions(this);
 
   /** Query threads. */
   public final QueryThreads threads = new QueryThreads();
+  /** User-defined locks. */
+  public final LockList locks = new LockList();
   /** Current query focus. */
   public QueryFocus focus = new QueryFocus();
   /** Date/time values. */
   public QueryDateTime dateTime;
+
+  /** Query resources. */
+  public QueryResources resources;
+  /** Update container; will be created if the first update is evaluated. */
+  public Updates updates;
 
   /** Full-text position data (needed for highlighting full-text results). */
   public FTPosData ftPosData = Prop.gui ? new FTPosData() : null;
@@ -91,9 +93,6 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Available collations. */
   public TokenObjMap<Collation> collations;
-
-  /** User-defined locks. */
-  public final LockList locks = new LockList();
 
   /** Number of successive tail calls. */
   public int tailCalls;
@@ -612,16 +611,17 @@ public final class QueryContext extends Job implements Closeable {
 
   /**
    * This function is called by the GUI.
-   * Caches and returns the result of the specified query. If all nodes are of the same database
+   * Caches the result of the specified query. If all nodes are of the same database
    * instance, the returned value will be of type {@link DBNodes}.
    * @param max maximum number of items to cache (negative: return full result)
    * @return result of query
    * @throws QueryException query exception
    */
   Value cache(final int max) throws QueryException {
-    final int mx = max >= 0 ? max : Integer.MAX_VALUE;
 
     // evaluates the query
+    final int mx = max >= 0 ? max : Integer.MAX_VALUE;
+
     final Iter iter = iter();
     final ItemList items;
     Item item;

@@ -30,8 +30,7 @@ public final class DbDelete extends DbAccess {
     for(int d = 0; d < ds; d++) {
       updates.add(new DeleteNode(docs.get(d), data, info), qc);
     }
-
-    // delete binary resources
+    // delete file resources
     final IOFile bin = data.meta.binary(path);
     if(bin != null) updates.add(new DBDelete(data, bin, info), qc);
 

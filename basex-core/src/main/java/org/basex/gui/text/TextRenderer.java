@@ -159,15 +159,6 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
-   * Marks the current line as erroneous.
-   * @param g graphics reference
-   */
-  private void drawErrorLine(final Graphics g) {
-    g.setColor(GUIConstants.colormark2A);
-    g.fillRect(0, lineY, offset - OFFSET * 3 / 2, fontHeight);
-  }
-
-  /**
    * Draws the line number separator.
    * @param g graphics reference
    */
@@ -403,6 +394,15 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
+   * Marks the current line as erroneous.
+   * @param g graphics reference
+   */
+  private void markErrorLine(final Graphics g) {
+    g.setColor(GUIConstants.colormark2A);
+    g.fillRect(0, lineY, offset - OFFSET * 3 / 2, fontHeight);
+  }
+
+  /**
    * Finishes the current token.
    * @param iter iterator
    * @return new line
@@ -563,7 +563,7 @@ final class TextRenderer extends BaseXBack {
     final int s = Math.max(2, fontHeight / 6);
     g.setColor(GUIConstants.RED);
     for(int xp = x; xp < x + ww; xp += 2) g.drawLine(xp - 1, y + 2, xp, y + s + 1);
-    if(edit) drawErrorLine(g);
+    if(edit) markErrorLine(g);
   }
 
   /**

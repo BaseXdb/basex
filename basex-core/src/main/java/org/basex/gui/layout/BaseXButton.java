@@ -67,6 +67,7 @@ public final class BaseXButton extends JButton {
       button.setBorder(TEMPLATE.getBorder());
       button.setMargin(TEMPLATE.getMargin());
     }
+    button.setFocusable(false);
     return button;
   }
 
