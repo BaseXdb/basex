@@ -239,7 +239,7 @@ public enum Function implements AFunction {
       params(FUNCTION_O), INTEGER_O),
   /** XQuery function. */
   FUNCTION_LOOKUP(FnFunctionLookup::new, "function-lookup(name,arity)",
-      params(QNAME_O, INTEGER_O), FUNCTION_ZO, flag(POS, CTX, NDT, HOF), FN_URI, Perm.ADMIN),
+      params(QNAME_O, INTEGER_O), FUNCTION_ZO, flag(POS, CTX, CNS, NDT), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   FUNCTION_NAME(FnFunctionName::new, "function-name(function)",
       params(FUNCTION_O), QNAME_ZO),
@@ -1321,7 +1321,7 @@ public enum Function implements AFunction {
       params(FUNCTION_O), MAP_ZO, INSPECT_URI),
   /** XQuery function. */
   _INSPECT_FUNCTIONS(InspectFunctions::new, "functions([uri])",
-      params(STRING_O), FUNCTION_ZM, flag(POS, CTX, NDT, HOF), INSPECT_URI, Perm.ADMIN),
+      params(STRING_O), FUNCTION_ZM, flag(POS, CTX, CNS, NDT), INSPECT_URI, Perm.ADMIN),
   /** XQuery function. */
   _INSPECT_MODULE(InspectModule::new, "module(uri)",
       params(STRING_O), ELEMENT_O, flag(NDT), INSPECT_URI, Perm.CREATE),
