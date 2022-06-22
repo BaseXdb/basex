@@ -83,17 +83,12 @@ public final class Functions {
    * @return function if found, {@code null} otherwise
    */
   static FuncDefinition getBuiltIn(final QNm name) {
-    final int i = CACHE.id(name.id());
-    if(i == 0) return null;
-    final FuncDefinition fd = DEFINITIONS.get(i - 1);
-    if(!eq(fd.uri(), name.uri())) {
-      throw Util.notExpected(name);
-    }
-    return eq(fd.uri(), name.uri()) ? fd : null;
+    final int id = CACHE.id(name.id());
+    return id != 0 ? DEFINITIONS.get(id - 1) : null;
   }
 
   /**
-   * Checks if the specific URI is statically available.
+   * Checks if the specified URI is statically available.
    * @param uri URI to check
    * @return result of check
    */

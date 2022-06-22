@@ -390,10 +390,8 @@ public final class QNm extends Item {
    * @return EQName representation
    */
   private static byte[] internal(final byte[] prefix, final byte[] local, final byte[] uri) {
-    // optimized for speed, as it is called quite frequently
-    final int ul = uri == null ? 0 : uri.length;
-    final int pl = prefix == null ? 0 : prefix.length;
     // return local name if no prefix and uri exist
+    final int ul = uri == null ? 0 : uri.length, pl = prefix == null ? 0 : prefix.length;
     if(ul == 0 && pl == 0) return local;
 
     final int l = (ul == 0 ? 0 : ul + 3) + (pl == 0 ? 0 : pl + 1) + local.length;
