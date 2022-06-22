@@ -158,7 +158,6 @@ function dba:databases-redirect(
   $names    as xs:string*,
   $backups  as xs:string*
 ) as element(rest:response) {
-  prof:dump($backups, "BACKUPS: "),
   web:redirect($action,
     if($action = ('db-create')) then (
       map { }
