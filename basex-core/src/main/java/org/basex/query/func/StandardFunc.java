@@ -588,7 +588,6 @@ public abstract class StandardFunc extends Arr {
     String name = expr instanceof Str ? string(((Str) expr).string()) :
       expr instanceof Atm ? string(((Atm) expr).string(null)) : null;
     if(name != null) {
-      name = string(((Str) exprs[i]).string());
       if(backup) {
         final String db = Databases.name(name);
         if(db.isEmpty()) {
