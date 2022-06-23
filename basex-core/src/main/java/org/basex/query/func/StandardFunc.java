@@ -584,8 +584,10 @@ public abstract class StandardFunc extends Arr {
    * @return result of check
    */
   protected final boolean dataLock(final ASTVisitor visitor, final boolean backup, final int i) {
-    String name = null;
-    if(exprs[i] instanceof Str) {
+    final Expr expr = exprs[i];
+    String name = expr instanceof Str ? string(((Str) expr).string()) :
+      expr instanceof Atm ? string(((Atm) expr).string(null)) : null;
+    if(name != null) {
       name = string(((Str) exprs[i]).string());
       if(backup) {
         final String db = Databases.name(name);
