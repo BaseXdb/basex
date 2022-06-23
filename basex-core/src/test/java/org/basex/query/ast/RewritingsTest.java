@@ -2878,4 +2878,10 @@ public final class RewritingsTest extends QueryPlanTest {
         + "} "
         + "return $rs", "a");
   }
+
+  /** Nested database node paths. */
+  @Test public void gh2121() {
+    execute(new CreateDB(NAME, "<x><x/></x>"));
+    query("x[x/(text() | *)]", "");
+  }
 }
