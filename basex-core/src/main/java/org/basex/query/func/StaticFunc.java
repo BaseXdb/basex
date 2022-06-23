@@ -235,15 +235,17 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    for(final Ann ann : anns) {
-      if(ann.definition == Annotation._BASEX_LOCK) {
-        for(final Item arg : ann.value()) {
-          for(final String lock : Locking.queryLocks(((Str) arg).string())) {
-            visitor.lock(lock, false);
+    visitor.lock(() -> {
+      final ArrayList<String> list = new ArrayList<>(1);
+      for(final Ann ann : anns) {
+        if(ann.definition == Annotation._BASEX_LOCK) {
+          for(final Item arg : ann.value()) {
+            for(final String lock : Locking.queryLocks(((Str) arg).string())) list.add(lock);
           }
         }
       }
-    }
+      return list;
+    });
 
     for(final Var var : params) {
       if(!visitor.declared(var)) return false;

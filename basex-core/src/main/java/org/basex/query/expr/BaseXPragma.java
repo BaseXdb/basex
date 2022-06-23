@@ -1,5 +1,7 @@
 package org.basex.query.expr;
 
+import java.util.*;
+
 import org.basex.core.locks.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
@@ -43,11 +45,13 @@ public final class BaseXPragma extends Pragma {
 
   @Override
   public void accept(final ASTVisitor visitor) {
-    if(Token.eq(name.local(), Annotation._BASEX_LOCK.local())) {
-      for(final String lock : Locking.queryLocks(value)) {
-        visitor.lock(lock, false);
+    visitor.lock(() -> {
+      final ArrayList<String> list = new ArrayList<>(1);
+      if(Token.eq(name.local(), Annotation._BASEX_LOCK.local())) {
+        for(final String lock : Locking.queryLocks(value)) list.add(lock);
       }
-    }
+      return list;
+    });
   }
 
   @Override

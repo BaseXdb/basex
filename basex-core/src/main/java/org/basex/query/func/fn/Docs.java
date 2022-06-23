@@ -3,6 +3,8 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.core.locks.*;
 import org.basex.io.*;
 import org.basex.query.*;
@@ -61,24 +63,29 @@ public abstract class Docs extends StandardFunc {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    if(sc.withdb) {
-      if(exprs.length == 0) {
+    return visitor.lock(() -> {
+      final ArrayList<String> list = new ArrayList<>(1);
+      if(sc.withdb) {
         // lock default collection (only collection functions can have 0 arguments)
-        visitor.lock(Locking.COLLECTION, false);
-      } else {
-        // check if input argument is a static string
-        final Expr expr = exprs[0];
-        if(expr instanceof Str) {
-          // add local lock if argument may reference a database
-          queryInput = queryInput(((Str) expr).string());
-          if(queryInput != null) visitor.lock(queryInput.dbName, false);
-        } else if(!expr.seqType().zero()) {
-          // otherwise, database cannot be locked statically
-          if(!visitor.lock(null, false)) return false;
+        if(exprs.length == 0) {
+          list.add(Locking.COLLECTION);
+        } else {
+          // check if input argument is a static string
+          final Expr expr = exprs[0];
+          final byte[] uri = expr instanceof Str ? ((Str) expr).string() :
+            expr instanceof Atm ? ((Atm) expr).string(null) : null;
+          if(uri != null) {
+            // add local lock if argument may reference a database
+            queryInput = queryInput(uri);
+            if(queryInput != null && queryInput.dbName != null) list.add(queryInput.dbName);
+          } else if(!expr.seqType().zero()) {
+            // otherwise, database cannot be locked statically
+            list.add((String) null);
+          }
         }
       }
-    }
-    return super.accept(visitor);
+      return list;
+    }) && super.accept(visitor);
   }
 
   @Override

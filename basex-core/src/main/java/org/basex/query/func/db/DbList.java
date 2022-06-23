@@ -106,7 +106,7 @@ public class DbList extends StandardFunc {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    return (exprs.length == 0 ? visitor.lock(null, false) : dataLock(visitor, false, 0)) &&
+    return (exprs.length == 0 ? visitor.lock((String) null) : dataLock(visitor, false, 0)) &&
         super.accept(visitor);
   }
 

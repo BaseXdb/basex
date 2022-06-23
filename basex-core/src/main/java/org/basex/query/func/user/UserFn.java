@@ -146,7 +146,6 @@ abstract class UserFn extends StandardFunc {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    return (!definition.has(Flag.UPD) || visitor.lock(Locking.USER, false)) &&
-        super.accept(visitor);
+    return (!definition.has(Flag.UPD) || visitor.lock(Locking.USER)) && super.accept(visitor);
   }
 }

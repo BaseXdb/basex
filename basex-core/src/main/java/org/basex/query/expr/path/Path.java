@@ -1155,7 +1155,7 @@ public abstract class Path extends ParseExpr {
   @Override
   public final boolean accept(final ASTVisitor visitor) {
     if(root == null) {
-      visitor.lock(Locking.CONTEXT, false);
+      visitor.lock(Locking.CONTEXT);
     } else if(!root.accept(visitor)) {
       return false;
     }
