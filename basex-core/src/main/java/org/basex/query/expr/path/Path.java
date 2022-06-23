@@ -363,18 +363,20 @@ public abstract class Path extends ParseExpr {
    * Returns the path nodes that will result from this path.
    * @param nodes current path nodes
    * @param stats utilize statistics
-   * @return path nodes, or {@code null} if nodes cannot be evaluated
+   * @return path nodes, or {@code null} if nodes cannot be collected
    */
   final ArrayList<PathNode> pathNodes(final ArrayList<PathNode> nodes, final boolean stats) {
     ArrayList<PathNode> pn = nodes;
     for(final Expr step : steps) {
       if(!(step instanceof Step)) return null;
       pn = ((Step) step).nodes(pn, data, stats);
+      if(pn == null) return null;
+
       // check if paths within predicates are correct
       if(!stats) {
         for(final Expr expr : step.args()) {
-          if(expr instanceof Path) {
-            final Path path = (Path) expr;
+          if(expr instanceof AxisPath) {
+            final AxisPath path = (AxisPath) expr;
             if(path.root == null) {
               final ArrayList<PathNode> tmp = path.pathNodes(pn, stats);
               if(tmp != null && tmp.isEmpty()) return tmp;
@@ -382,7 +384,6 @@ public abstract class Path extends ParseExpr {
           }
         }
       }
-      if(pn == null) return null;
     }
     return pn;
   }

@@ -214,7 +214,7 @@ public abstract class Step extends Preds {
    * @param nodes initial path nodes
    * @param stats utilize statistics
    * @param data data reference
-   * @return resulting path nodes or {@code null} if nodes cannot be collected
+   * @return path nodes, or {@code null} if nodes cannot be collected
    */
   final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes, final Data data,
       final boolean stats) {
