@@ -301,11 +301,11 @@ public final class CommandLockingTest extends SandboxTest {
    * no additional ones allowed.
    * Pass empty string for currently opened database, {@code null} for all.
    * @param cmd command to test
-   * @param up updating command?
+   * @param updating updating command?
    * @param dbs required and allowed databases (can be {@code null})
    */
-  private static void ckDBs(final Command cmd, final boolean up, final LockList dbs) {
-    ckDBs(cmd, up, dbs, dbs);
+  private static void ckDBs(final Command cmd, final boolean updating, final LockList dbs) {
+    ckDBs(cmd, updating, dbs, dbs);
   }
 
   /**
@@ -324,15 +324,15 @@ public final class CommandLockingTest extends SandboxTest {
    * Test if the right databases are identified for locking.
    * Pass empty string for currently opened database, {@code null} for all.
    * @param cmd command to test
-   * @param up updating command?
+   * @param updating updating command?
    * @param required required databases (can be {@code null})
    * @param allowed allowed databases (can be {@code null})
    */
-  private static void ckDBs(final Command cmd, final boolean up, final LockList required,
+  private static void ckDBs(final Command cmd, final boolean updating, final LockList required,
       final LockList allowed) {
 
-    final LockList reqRd = up ? NONE : required, allowRd = up ? NONE : allowed;
-    final LockList reqWt = up ? required : NONE, allowWt = up ? allowed : NONE;
+    final LockList reqRd = updating ? NONE : required, allowRd = updating ? NONE : allowed;
+    final LockList reqWt = updating ? required : NONE, allowWt = updating ? allowed : NONE;
     ckDBs(cmd, reqRd, allowRd, reqWt, allowWt);
   }
 
@@ -362,23 +362,23 @@ public final class CommandLockingTest extends SandboxTest {
     // read locks
     final StringList list = new StringList();
     if(reqRd == null && !locks.reads.global())
-      list.add("Should apply global READ lock.");
+      list.add("No global READ lock.");
     if(reqRd != null && allowRd != null && !containsAll(locks.reads, reqRd))
-      list.add("Applied too few READ locks: " + locks.reads + " vs. " + reqRd);
+      list.add("Too few READ locks: " + locks.reads + " vs. " + reqRd);
     if(allowRd != null && locks.reads.global())
-      list.add("Applied global WRITE locks; expected: " + allowRd);
+      list.add("Global READ lock; expected: " + allowRd);
     if(allowRd != null && !containsAll(allowRd, locks.reads))
-      list.add("Applied too many READ locks: " + locks.reads + " vs. " + allowRd);
+      list.add("Too many READ locks: " + locks.reads + " vs. " + allowRd);
 
     // write locks
     if(reqWt == null && !locks.writes.global())
-      list.add("Should apply global WRITE lock.");
+      list.add("No global WRITE lock.");
     if(reqWt != null && allowWt != null && !containsAll(locks.writes, reqWt))
-      list.add("Applied too few WRITE locks: " + locks.writes + " vs. " + reqWt);
+      list.add("Too few WRITE locks: " + locks.writes + " vs. " + reqWt);
     if(allowWt != null && locks.writes.global())
-      list.add("Applied global WRITE locks; expected: " + allowWt);
+      list.add("Global WRITE lock; expected: " + allowWt);
     if(allowWt != null && !containsAll(allowWt, locks.writes))
-      list.add("Applied too many WRITE locks: " + locks.writes + " vs. " + allowWt);
+      list.add("Too many WRITE locks: " + locks.writes + " vs. " + allowWt);
 
     if(!list.isEmpty()) {
       final StringBuilder sb = new StringBuilder("Errors:");

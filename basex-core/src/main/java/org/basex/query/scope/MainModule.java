@@ -1,6 +1,7 @@
 package org.basex.query.scope;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.core.locks.*;
 import org.basex.query.*;
@@ -154,12 +155,20 @@ public final class MainModule extends AModule {
     }
 
     @Override
-    public boolean lock(final String lock, final boolean update) {
+    public boolean lock(final String lock) {
       // name is unknown at compile time: return false
       if(lock == null) return false;
       // if context item is found on top level, it will refer to currently opened database
       if(level == 0 || lock != Locking.CONTEXT) {
-        (updating || update ? locks.writes : locks.reads).add(lock);
+        (updating ? locks.writes : locks.reads).add(lock);
+      }
+      return true;
+    }
+
+    @Override
+    public boolean lock(final Supplier<ArrayList<String>> list) {
+      for(final String lock : list.get()) {
+        if(!lock(lock)) return false;
       }
       return true;
     }

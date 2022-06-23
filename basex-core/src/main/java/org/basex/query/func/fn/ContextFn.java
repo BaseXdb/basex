@@ -51,7 +51,7 @@ public abstract class ContextFn extends StandardFunc {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    return (!contextAccess() || visitor.lock(Locking.CONTEXT, false)) && super.accept(visitor);
+    return (!contextAccess() || visitor.lock(Locking.CONTEXT)) && super.accept(visitor);
   }
 
   /**

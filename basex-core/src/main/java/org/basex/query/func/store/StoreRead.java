@@ -29,6 +29,6 @@ public final class StoreRead extends StoreFn {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(null, false) && super.accept(visitor);
+    return visitor.lock((String) null) && super.accept(visitor);
   }
 }
