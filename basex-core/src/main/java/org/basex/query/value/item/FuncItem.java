@@ -176,11 +176,6 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public void comp(final CompileContext cc) {
-    // nothing to do here
-  }
-
-  @Override
   public boolean compiled() {
     return true;
   }

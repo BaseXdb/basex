@@ -45,10 +45,10 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
   private boolean paint;
   /** Category chosen by user. */
   private String cat = ALL;
-  /** Query statistics. */
-  private IntList stat = new IntList(4);
-  /** Query statistics strings. */
-  private StringList strings = new StringList(4);
+  /** Time measurements. */
+  private IntList times = new IntList(4);
+  /** Time strings. */
+  private StringList timeStrings = new StringList(4);
   /** Full text. */
   private byte[] all = Token.EMPTY;
   /** New text. */
@@ -193,8 +193,8 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     final StringList optqu = new StringList(1);
     final StringList command = new StringList(1);
 
-    final StringList timings = new StringList(5);
-    final IntList times = new IntList(5);
+    final StringList strings = new StringList(5);
+    final IntList tms = new IntList(5);
 
     final int runs = Math.max(1, gui.context.options.get(MainOptions.RUNS));
     final String[] split = info.split(NL);
@@ -207,10 +207,10 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
         final int t = line.indexOf(" ms");
         final int d = line.indexOf(':');
         final int tm = (int) (Double.parseDouble(line.substring(d + 1, t)) * 100);
-        times.add(tm);
+        tms.add(tm);
         final String key = line.substring(0, d).trim();
         final String val = Performance.getTime(tm * 10000L * runs, runs);
-        timings.add(LI + key + COLS + val);
+        strings.add(LI + key + COLS + val);
       } else if(line.startsWith(HITS_X_CC) || line.startsWith(UPDATED_CC) ||
           line.startsWith(PRINTED_CC) || line.startsWith(READ_LOCKING_CC) ||
           line.startsWith(WRITE_LOCKING_CC)) {
@@ -257,15 +257,15 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
       }
     }
 
-    stat = times;
-    strings = timings;
+    times = tms;
+    timeStrings = strings;
 
     final boolean test = cmd instanceof Test, query = cmd instanceof AQuery;
     /* reset old text if:
      * a) deletion was requested by the last function call
      * b) the result contains execution times
      * c) result is not ok and no XQUnit tests are run */
-    if(clear || !times.isEmpty() || !(ok || test)) {
+    if(clear || !tms.isEmpty() || !(ok || test)) {
       tb.reset();
     } else if(test) {
       // XQUnit tests: adopt trace output
@@ -290,15 +290,15 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     add(OPTIMIZED_QUERY, optqu, tb, list);
     add(QUERY, origqu, tb, list);
     add(RESULT, result, tb, list);
-    add(TIMING, timings, tb, list);
+    add(TIMING, strings, tb, list);
     add(QUERY_PLAN, plan, tb, list);
     if(inf != null) tb.add(inf).nline();
     clear = reset;
 
     // show total time required for running a command
     String total = time;
-    if(!times.isEmpty()) {
-      total = Performance.getTime(times.get(times.size() - 1) * 10000L * runs, runs);
+    if(!tms.isEmpty()) {
+      total = Performance.getTime(tms.get(tms.size() - 1) * 10000L * runs, runs);
     }
     if(total != null) setTime(TOTAL_TIME_CC + total);
     all = tb.finish();
@@ -323,7 +323,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
       final StringList cats) {
     if(list.isEmpty()) return;
     tb.bold().add(head).add(COL).norm().nline();
-    for(final String s : list) tb.add(s).nline();
+    for(final String line : list) tb.add(line).nline();
     tb.hline();
     cats.add(head);
   }
@@ -335,7 +335,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
   @Override
   public void mouseMoved(final MouseEvent e) {
-    final int l = stat.size();
+    final int l = times.size();
     if(l == 0) return;
 
     int f = -1;
@@ -346,7 +346,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
       }
     }
     if(f != focus) {
-      setTime(strings.get(f == -1 ? l - 1 : f).replace(LI, ""));
+      setTime(timeStrings.get(f == -1 ? l - 1 : f).replace(LI, ""));
       repaint();
       focus = f;
     }
@@ -361,7 +361,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     }
 
     super.paintComponent(g);
-    final int l = stat.size();
+    final int l = times.size();
     if(l != 0) {
       final int fs = GUIConstants.fontSize;
       h = header.getHeight() - 4;
@@ -371,7 +371,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
       // find maximum value
       int m = 1;
-      for(int i = 0; i < l - 1; ++i) m = Math.max(m, stat.get(i));
+      for(int i = 0; i < l - 1; ++i) m = Math.max(m, times.get(i));
 
       // draw focused bar
       final int by = 8, bh = h - by;
@@ -386,7 +386,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
       for(int i = 0; i < l - 1; ++i) {
         final int bx = w - bw + bs * i;
         g.setColor(GUIConstants.color((i == focus ? 3 : 2) + (i << 1)));
-        final int p = Math.max(1, stat.get(i) * bh / m);
+        final int p = Math.max(1, times.get(i) * bh / m);
         g.fillRect(bx, by + bh - p, bs, p);
         g.setColor(GUIConstants.color(8));
         g.drawRect(bx, by + bh - p, bs, p - 1);

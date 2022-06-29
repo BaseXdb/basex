@@ -146,17 +146,17 @@ public final class StaticFuncs extends ExprInfo {
    * @param cc compilation context
    */
   public void compileAll(final CompileContext cc) {
-    for(final FuncCache fc : funcs.values()) fc.func.comp(cc);
+    for(final FuncCache fc : funcs.values()) fc.func.compile(cc);
   }
 
   /**
-   * Compiles all referenced functions.
+   * Compiles and optimizes all referenced functions.
    * @param cc compilation context
    */
   public void compile(final CompileContext cc) {
     for(final FuncCache fc : funcs.values()) {
       if(!fc.calls.isEmpty()) {
-        fc.func.comp(cc);
+        fc.func.compile(cc);
         fc.func.optimize(cc);
       }
     }

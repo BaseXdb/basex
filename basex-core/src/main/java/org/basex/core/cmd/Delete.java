@@ -40,7 +40,7 @@ public final class Delete extends ACreate {
       }
 
       // delete file resources
-      final IOFile bin = data.meta.binary(target);
+      final IOFile bin = data.meta.file(target);
       if(bin != null && bin.exists()) {
         size += bin.isDir() ? bin.descendants().size() : 1;
         bin.delete();

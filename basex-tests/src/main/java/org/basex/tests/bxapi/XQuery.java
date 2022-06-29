@@ -278,6 +278,6 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
 
   @Override
   public String toString() {
-    return qp.query();
+    return qp.toString();
   }
 }

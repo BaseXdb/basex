@@ -201,6 +201,8 @@ public interface Text {
   String S_LIST = "list";
   /** Command keyword. */
   String S_STOP = "stop";
+  /** Command keyword. */
+  String S_RESULT = "result";
 
   /** Index info. */
   String LI_STRUCTURE = LI + "Structure: ";
@@ -427,7 +429,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPJOBS = {
-    '[' + S_LIST + '|' + S_STOP + ']', lang("c_jobs1"), lang("c_jobs2")
+    '[' + S_LIST + '|' + S_STOP + '|' + S_RESULT + ']', lang("c_jobs1"), lang("c_jobs2")
   };
   /** Command help. */
   String[] HELPKILL = {
@@ -529,6 +531,8 @@ public interface Text {
   String OUT_OF_MEM = lang("out_of_mem");
   /** Interrupted command execution. */
   String INTERRUPTED = lang("interrupted");
+  /** "(chopped)". */
+  String CHOPPED = '(' + lang("chopped") + ") ";
 
   /** Expecting command. */
   String EXPECTING_CMD = lang("expecting_cmd");
@@ -684,8 +688,12 @@ public interface Text {
   String QUERY = lang("query");
   /** Query info: optimized query. */
   String OPTIMIZED_QUERY = lang("optimized_query");
+  /** Query info: parsing. */
+  String PARSING = lang("parsing");
   /** Query info: compiling. */
   String COMPILING = lang("compiling");
+  /** Query info: optimizing. */
+  String OPTIMIZING = lang("optimizing");
   /** Query info: evaluating. */
   String EVALUATING = lang("evaluating");
   /** Query info: querying. */
@@ -698,11 +706,11 @@ public interface Text {
   /** "Query: ". */
   String QUERY_CC = lang("query") + COLS;
   /** "Parsing: ". */
-  String PARSING_CC = lang("parsing") + COLS;
+  String PARSING_CC = PARSING + COLS;
   /** "Compiling: ". */
-  String COMPILING_CC = lang("compiling") + COLS;
+  String COMPILING_CC = COMPILING + COLS;
   /** "Evaluating: ". */
-  String EVALUATING_CC = lang("evaluating") + COLS;
+  String EVALUATING_CC = EVALUATING + COLS;
   /** "Printing: ". */
   String PRINTING_CC = lang("printing") + COLS;
   /** "Total time: ". */
@@ -895,8 +903,6 @@ public interface Text {
   /** "Local Options". */
   String LOCAL_OPTIONS = lang("local_options");
 
-  /** "(chopped)". */
-  String CHOPPED = '(' + lang("chopped") + ") ";
   /** "(% entries)". */
   String ENTRIES_X = '(' + lang("entries_%") + ')';
   /** "Error". */
@@ -1208,8 +1214,6 @@ public interface Text {
 
   /** General info. */
   String GENERAL = lang("general");
-  /** General info. */
-  String PARSING = lang("parsing");
   /** Name indexes. */
   String NAMES = lang("names");
   /** Paths. */

@@ -53,12 +53,11 @@ public final class SAXWrapper extends SingleParser {
       if(reader == null) {
         reader = XmlParser.reader(options.get(MainOptions.DTD), options.get(MainOptions.XINCLUDE));
       }
-
-      saxh = new SAXHandler(builder, options.get(MainOptions.CHOP),
-          options.get(MainOptions.STRIPNS));
       final EntityResolver er = CatalogWrapper.getEntityResolver(options);
       if(er != null) reader.setEntityResolver(er);
 
+      saxh = new SAXHandler(builder, options.get(MainOptions.CHOP),
+          options.get(MainOptions.STRIPNS));
       reader.setDTDHandler(saxh);
       reader.setContentHandler(saxh);
       reader.setProperty("http://xml.org/sax/properties/lexical-handler", saxh);
@@ -72,10 +71,9 @@ public final class SAXWrapper extends SingleParser {
     } catch(final JobException ex) {
       throw ex;
     } catch(final Exception ex) {
-      // occurs, e.g. if document encoding is invalid:
-      // prefix message with source id
-      // wrap and return original message
-      throw new IOException('"' + source.path() + '"' + Util.message(ex), ex);
+      // invalid document encoding, catalog raises an error, ...
+      final String msg = ex.getCause() != null ? ex.getCause().getMessage() : Util.message(ex);
+      throw new IOException(source.path() + ": " + msg, ex);
     } finally {
       try(Reader r = is.getCharacterStream()) { /* no action */ }
       try(InputStream ist = is.getByteStream()) { /* no action */ }

@@ -47,7 +47,7 @@ public final class XQuery extends AQuery {
    * Binds a variable.
    * @param name name of variable (if {@code null}, value will be bound as context value)
    * @param value value to be bound
-   * @param type type
+   * @param type type (can be {@code null})
    * @return self reference
    */
   public XQuery bind(final String name, final String value, final String type) {

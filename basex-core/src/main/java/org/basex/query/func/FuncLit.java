@@ -26,8 +26,6 @@ public final class FuncLit extends Single implements Scope {
   private final Var[] params;
   /** Annotations. */
   private final AnnList anns;
-  /** Compilation flag. */
-  private boolean compiled;
 
   /**
    * Constructor.
@@ -50,10 +48,7 @@ public final class FuncLit extends Single implements Scope {
   }
 
   @Override
-  public void comp(final CompileContext cc) {
-    if(compiled) return;
-    compiled = true;
-
+  public Expr compile(final CompileContext cc) throws QueryException {
     cc.pushScope(vs);
     try {
       expr = expr.compile(cc);
@@ -63,12 +58,12 @@ public final class FuncLit extends Single implements Scope {
     } finally {
       cc.removeScope(this);
     }
+    return optimize(cc);
   }
 
   @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
-    comp(cc);
-    return optimize(cc);
+  public boolean compiled() {
+    return true;
   }
 
   @Override
@@ -103,11 +98,6 @@ public final class FuncLit extends Single implements Scope {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     return visitor.inlineFunc(this);
-  }
-
-  @Override
-  public boolean compiled() {
-    return compiled;
   }
 
   @Override

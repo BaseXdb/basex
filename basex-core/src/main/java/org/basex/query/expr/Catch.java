@@ -181,6 +181,14 @@ public final class Catch extends Single {
   }
 
   /**
+   * Checks if all errors are caught by this cause.
+   * @return result of check
+   */
+  boolean global() {
+    return tests.size() == 1 && tests.get(0) == null;
+  }
+
+  /**
    * Checks if one of the specified errors match the thrown error.
    * @param qe thrown error
    * @return result of check

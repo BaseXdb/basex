@@ -38,7 +38,7 @@ final class Binaries {
     final TokenList paths = new TokenList();
     final String norm = MetaData.normPath(path);
     if(norm != null && !data.inMemory()) {
-      final IOFile bin = data.meta.binaryDir(), root = new IOFile(bin, norm);
+      final IOFile bin = data.meta.dir(), root = new IOFile(bin, norm);
       if(root.exists()) {
         final String exact = Prop.CASE ? norm : norm.toLowerCase(Locale.ENGLISH);
         final String dir = root.isDir() ? (
@@ -59,7 +59,7 @@ final class Binaries {
    * @param map map paths and booleans, indicating binary resources
    */
   synchronized void children(final String path, final boolean dir, final TokenBoolMap map) {
-    final IOFile bin = data.meta.binary(path);
+    final IOFile bin = data.meta.file(path);
     if(bin != null) {
       for(final IOFile child : bin.children()) {
         if(dir == child.isDir()) {
@@ -75,7 +75,7 @@ final class Binaries {
    * @return result of check
    */
   synchronized boolean isDir(final String path) {
-    final IOFile bin = data.meta.binary(path);
+    final IOFile bin = data.meta.file(path);
     return bin != null && bin.isDir();
   }
 }

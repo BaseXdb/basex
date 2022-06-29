@@ -157,10 +157,10 @@ public final class CommandLockingTest extends SandboxTest {
         GENERATE_ID, HAS_CHILDREN, PATH };
     for(final Function function : functions) {
       ckDBs(new XQuery(function.args()), false, CTX_LIST);
-      ckDBs(new XQuery(DOC.args(NAME) + '/' + function.args()), false, NAME_LIST, NAME_CTX);
+      ckDBs(new XQuery(DOC.args(NAME) + "/*/" + function.args()), false, NAME_LIST, NAME_CTX);
     }
     for(final Function function : functions) {
-      ckDBs(new XQuery(function.args(DOC.args(NAME))), false, NAME_LIST);
+      ckDBs(new XQuery(function.args(DOC.args(NAME) + "/*")), false, NAME_LIST);
     }
 
     // errors

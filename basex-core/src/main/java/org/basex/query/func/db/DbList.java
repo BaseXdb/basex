@@ -79,7 +79,7 @@ public class DbList extends StandardFunc {
     final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
 
     final IntList docs = data.resources.docs(path);
-    final TokenList binaries = data.resources.binaryPaths(path);
+    final TokenList binaries = data.resources.paths(path);
     final int ds = docs.size(), bs = binaries.size(), size = ds + bs;
 
     return new BasicIter<Str>(size) {

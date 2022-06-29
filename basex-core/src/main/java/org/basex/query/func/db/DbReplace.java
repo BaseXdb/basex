@@ -39,7 +39,7 @@ public final class DbReplace extends DbNew {
       updates.add(new DBStore(data, path, item, info), qc);
     } else {
       // store XML document: replace existing document or add new one
-      final IOFile bin = data.meta.binary(path);
+      final IOFile bin = data.meta.file(path);
       if(bin != null) {
         if(bin.isDir()) throw DB_TARGET_X.get(info, path);
         if(bin.exists()) updates.add(new DBDelete(data, bin, info), qc);

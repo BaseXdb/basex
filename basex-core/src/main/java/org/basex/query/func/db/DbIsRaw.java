@@ -18,7 +18,7 @@ public final class DbIsRaw extends DbAccess {
     final Data data = toData(qc);
     final String path = toDbPath(1, qc);
 
-    final IOFile bin = data.meta.binary(path);
+    final IOFile bin = data.meta.file(path);
     return Bln.get(bin != null && bin.exists() && !bin.isDir());
   }
 }

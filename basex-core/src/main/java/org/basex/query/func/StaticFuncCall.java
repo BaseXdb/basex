@@ -61,7 +61,7 @@ public final class StaticFuncCall extends FuncCall {
     checkVisible();
 
     // compile mutually recursive functions
-    func.comp(cc);
+    func.compile(cc);
 
     // try to inline the function
     final Expr inlined = func.inline(exprs, cc);

@@ -66,7 +66,7 @@ public final class DbDir extends DbList {
     }
 
     // list file resources
-    final IOFile bin = data.meta.binary(string(token));
+    final IOFile bin = data.meta.file(string(token));
     if(bin != null) {
       for(final IOFile child : bin.children()) {
         final String pt = child.name();

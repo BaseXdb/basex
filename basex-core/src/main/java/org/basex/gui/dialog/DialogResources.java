@@ -177,9 +177,9 @@ final class DialogResources extends BaseXBack {
     int cmax = ResourceFolder.MAXC;
     // check if there's a directory
     // create a folder if there's either a files or document folder
-    if(data.resources.isDir(filterPath)) {
-      root.add(new ResourceFolder(ResourceFolder.name(filterPath), ResourceFolder.path(filterPath),
-          tree, context));
+    if(data.resources.isDir(string(filterPath))) {
+      final byte[] name = ResourceFolder.name(filterPath), path = ResourceFolder.path(filterPath);
+      root.add(new ResourceFolder(name, path, tree, context));
       cmax--;
     }
 

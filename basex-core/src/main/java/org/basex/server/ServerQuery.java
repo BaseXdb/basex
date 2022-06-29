@@ -129,9 +129,9 @@ public final class ServerQuery extends Job {
       final QueryContext qc = qp.qc;
       final QueryInfo qi = qc.info;
 
-      qi.compiling = perf.ns();
+      qi.compiling.addAndGet(perf.ns());;
       final Iter iter = qp.iter();
-      qi.evaluating = perf.ns();
+      qi.evaluating.addAndGet(perf.ns());;
 
       // iterate through results
       int hits = 0;
@@ -152,7 +152,7 @@ public final class ServerQuery extends Job {
           hits++;
         }
       }
-      qi.serializing = perf.ns();
+      qi.serializing.addAndGet(perf.ns());;
 
       // generate query info
       info.append(qi.toString(qp, po.size(), hits, jc().locks));
@@ -200,7 +200,7 @@ public final class ServerQuery extends Job {
     } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
-    qp.qc.info.parsing = perf.ns();
+    qp.qc.info.parsing.addAndGet(perf.ns());;
     parsed = true;
   }
 

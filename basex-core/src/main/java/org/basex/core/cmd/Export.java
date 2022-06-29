@@ -92,7 +92,7 @@ public final class Export extends Command {
       source = null;
       files = new StringList();
     } else {
-      source = data.meta.binaryDir();
+      source = data.meta.dir();
       files = source.descendants();
     }
     if(export != null) {

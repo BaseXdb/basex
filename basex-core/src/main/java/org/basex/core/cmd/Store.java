@@ -59,7 +59,7 @@ public final class Store extends ACreate {
     if(data.inMemory()) return error(NO_MAINMEM);
     if(path.isEmpty()) return error(PATH_INVALID_X, create ? path : args[0]);
 
-    final IOFile bin = data.meta.binary(path);
+    final IOFile bin = data.meta.file(path);
     return update(data, () -> {
       store(in, bin);
       return info(QUERY_EXECUTED_X_X, "", jc().performance);

@@ -118,7 +118,7 @@ public final class Add extends ACreate {
         builder = new MemBuilder(path, parser);
       }
 
-      if(!data.inMemory()) builder.binariesDir(data.meta.dir);
+      if(!data.inMemory()) builder.binariesDir(soptions.dbPath(name));
       tmpData = builder.build();
       return true;
     } catch(final IOException ex) {

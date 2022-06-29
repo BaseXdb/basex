@@ -83,7 +83,7 @@ public final class List extends Command {
         meta.read();
         dbsize = meta.dbSize();
         file = meta.original;
-        count = meta.ndocs + meta.binaryDir().descendants().size();
+        count = meta.ndocs + meta.dir().descendants().size();
       } catch(final IOException ex) {
         Util.debug(ex);
         file = ERROR;
@@ -133,13 +133,13 @@ public final class List extends Command {
         table.contents.add(tl);
       }
       // list file resources
-      for(final byte[] file : resources.binaryPaths(path)) {
+      for(final byte[] file : resources.paths(path)) {
         final String bin = string(file);
         final TokenList tl = new TokenList(4);
         tl.add(file);
         tl.add(IO.RAW);
         tl.add(MediaType.get(bin).toString());
-        tl.add(data.meta.binary(bin).length());
+        tl.add(data.meta.file(bin).length());
         table.contents.add(tl);
       }
       Close.close(data, context);

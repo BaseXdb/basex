@@ -273,7 +273,7 @@ final class Docs {
    * @param path given path (will be normalized by adding a trailing slash)
    * @return path to a directory or not
    */
-  synchronized boolean isDir(final byte[] path) {
+  synchronized boolean isDir(final String path) {
     final byte[] pref = concat(path, SLASH);
     for(final byte[] pth : paths()) {
       if(startsWith(pth, pref)) return true;

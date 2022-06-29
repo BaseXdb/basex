@@ -39,7 +39,7 @@ public final class Find extends AQuery {
 
   @Override
   protected boolean run() {
-    final String query = find(args[0], context, root);
+    final String query = query(args[0], context, root);
     final boolean ok = query(query);
     final StringBuilder sb = new StringBuilder();
     if(options.get(MainOptions.QUERYINFO)) {
@@ -52,7 +52,7 @@ public final class Find extends AQuery {
 
   @Override
   public boolean updating(final Context ctx) {
-    return updates(ctx, find(args[0], ctx, root));
+    return updates(ctx, query(args[0], ctx, root));
   }
 
   @Override
@@ -67,7 +67,7 @@ public final class Find extends AQuery {
    * @param root start from root node
    * @return query
    */
-  public static String find(final String query, final Context ctx, final boolean root) {
+  public static String query(final String query, final Context ctx, final boolean root) {
     // treat input as XQuery
     if(Strings.startsWith(query, '/')) return query;
 
@@ -119,8 +119,8 @@ public final class Find extends AQuery {
    * @param root root flag
    * @return query
    */
-  public static String findTable(final StringList filter, final TokenList cols,
-      final BoolList elem, final byte[] name, final boolean root) {
+  public static String tableQuery(final StringList filter, final TokenList cols,
+      final BoolList elem, final String name, final boolean root) {
 
     final TokenBuilder tb = new TokenBuilder();
     final int is = filter.size();
@@ -140,8 +140,7 @@ public final class Find extends AQuery {
         tb.add(']');
       }
     }
-    return tb.isEmpty() ? "/" : (root ? "/" : "") +
-        Axis.DESCENDANT_OR_SELF + "::*:" + string(name) + tb;
+    return tb.isEmpty() ? "/" : (root ? "/" : "") + Axis.DESCENDANT_OR_SELF + "::*:" + name + tb;
   }
 
   /**

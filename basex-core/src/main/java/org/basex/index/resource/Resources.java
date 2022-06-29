@@ -120,7 +120,7 @@ public final class Resources implements Index {
    * @param path input path
    * @return paths
    */
-  public synchronized TokenList binaryPaths(final String path) {
+  public synchronized TokenList paths(final String path) {
     return bins.paths(path);
   }
 
@@ -129,15 +129,15 @@ public final class Resources implements Index {
    * @param path given path
    * @return result of check
    */
-  public synchronized boolean isDir(final byte[] path) {
-    return docs.isDir(path) || bins.isDir(Token.string(path));
+  public synchronized boolean isDir(final String path) {
+    return docs.isDir(path) || bins.isDir(path);
   }
 
   /**
    * Returns the child resources for the given path.
    * @param path path
    * @param dir returns directories
-   * @return map with paths and booleans, indicating binary resources
+   * @return paths and booleans, indicating binary resources
    */
   public synchronized TokenBoolMap children(final String path, final boolean dir) {
     final TokenBoolMap map = new TokenBoolMap();

@@ -138,9 +138,8 @@ public final class ModuleLoader {
    * @throws ClassNotFoundException class not found exception
    */
   public Class<?> findClass(final String name) throws ClassNotFoundException {
-    // add cached URLs to class loader
-    final int us = urls.size();
-    if(us != 0) {
+    // create new class loader for cached URLs at first access
+    if(!urls.isEmpty()) {
       loader = new JarLoader(urls.toArray(new URL[0]), loader);
       urls.clear();
     }

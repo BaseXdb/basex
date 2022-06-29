@@ -31,21 +31,19 @@ public final class MainModule extends AModule {
    */
   public MainModule(final Expr expr, final VarScope vs) {
     super(vs.sc);
-    this.vs = vs;
     this.expr = expr;
+    this.vs = vs;
   }
 
   @Override
-  public void comp(final CompileContext cc) throws QueryException {
-    if(compiled) return;
-    compiled = true;
-
+  public Expr compile(final CompileContext cc) throws QueryException {
     cc.pushScope(vs);
     try {
       expr = expr.compile(cc);
     } finally {
       cc.removeScope(this);
     }
+    return null;
   }
 
   /**

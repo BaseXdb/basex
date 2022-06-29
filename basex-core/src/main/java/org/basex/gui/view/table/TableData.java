@@ -312,7 +312,6 @@ final class TableData {
    */
   String find() {
     final Data data = ctx.data();
-    final boolean r = rows == rootRows;
     final StringList filters = new StringList();
     final TokenList names = new TokenList();
     final BoolList elems = new BoolList();
@@ -321,8 +320,8 @@ final class TableData {
       names.add(col.name);
       elems.add(col.elem);
     }
-    final String query = Find.findTable(filters, names, elems, data.elemNames.key(root),
-        gopts.get(GUIOptions.FILTERRT) || r);
+    final String query = Find.tableQuery(filters, names, elems, string(data.elemNames.key(root)),
+        gopts.get(GUIOptions.FILTERRT) || rows == rootRows);
     if(query.equals(last)) return null;
     last = query;
     return query;

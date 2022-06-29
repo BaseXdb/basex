@@ -2,6 +2,7 @@ package org.basex.data;
 
 import java.util.*;
 
+import org.basex.io.*;
 import org.basex.util.*;
 
 /**
@@ -35,7 +36,8 @@ public enum MetaProp {
   BINARIES(false) {
     @Override
     public Integer value(final MetaData meta) {
-      return meta.dir != null ? meta.binaryDir().descendants().size() : 0;
+      final IOFile dir = meta.dir();
+      return dir != null ? dir.descendants().size() : 0;
     }
   },
   /** Property. */

@@ -53,7 +53,7 @@ public final class DbListDetails extends DbList {
         try {
           meta.read();
           // count number of binary files
-          final int binaries = meta.binaryDir().descendants().size();
+          final int binaries = meta.dir().descendants().size();
           database.add(RESOURCES, token(meta.ndocs + binaries));
           database.add(MODIFIED_DATE, DateTime.format(new Date(meta.dbTime())));
           database.add(SIZE, token(meta.dbSize()));
@@ -78,7 +78,7 @@ public final class DbListDetails extends DbList {
     final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
 
     final IntList docs = data.resources.docs(path);
-    final TokenList binaries = data.resources.binaryPaths(path);
+    final TokenList binaries = data.resources.paths(path);
     final int ds = docs.size(), size = ds + binaries.size();
     return new BasicIter<FNode>(size) {
       @Override
@@ -91,7 +91,7 @@ public final class DbListDetails extends DbList {
         }
         if(i < size) {
           final String pt = string(binaries.get((int) i - ds));
-          final IOFile bin = data.meta.binary(pt);
+          final IOFile bin = data.meta.file(pt);
           return resource(pt, true, MediaType.get(bin.path()), bin.timeStamp(), bin.length());
         }
         return null;

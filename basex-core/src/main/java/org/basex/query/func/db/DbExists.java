@@ -24,7 +24,7 @@ public final class DbExists extends DbAccess {
       final String path = toDbPath(1, qc);
 
       boolean exists = false;
-      final IOFile bin = data.meta.binary(path);
+      final IOFile bin = data.meta.file(path);
       exists = bin != null && bin.exists() && !bin.isDir();
 
       if(!exists) exists = data.resources.doc(path) != -1;

@@ -602,9 +602,9 @@ public final class GUI extends JFrame implements BaseXWindow {
    * @param result update number of results
    */
   public void refreshControls(final boolean result) {
-    final DBNodes marked = context.marked;
+    final DBNodes marked = context.marked, current = context.current();
     if(result && marked != null) {
-      results.setText(gopts.results((marked.isEmpty() ? context.current() : marked).size(), 0));
+      results.setText(gopts.results((marked.isEmpty() ? current : marked).size(), 0));
     }
 
     filter.setEnabled(marked != null && !marked.isEmpty());

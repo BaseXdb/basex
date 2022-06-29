@@ -57,7 +57,7 @@ public final class WebModule {
     try(QueryContext qc = qc(ctx)) {
       // loop through all functions
       final String name = file.name();
-      for(final StaticFunc sf : qc.funcs.funcs()) {
+      for(final StaticFunc sf : qc.functions.funcs()) {
         // only add functions that are defined in the same module (file)
         if(sf.expr != null && name.equals(new IOFile(sf.info.path()).name())) {
           final RestXqFunction rxf = new RestXqFunction(sf, this, qc);

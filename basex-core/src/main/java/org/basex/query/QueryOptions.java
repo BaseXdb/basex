@@ -64,11 +64,11 @@ final class QueryOptions {
   void compile() {
     // cache old database options at compile time; assign local ones
     dummyOptions = null;
-    final MainOptions options = qc.context.options;
+    final MainOptions mopts = qc.context.options;
     for(final Entry<Option<?>, Object> entry : localOpts.entrySet()) {
       final Option<?> option = entry.getKey();
-      cachedOpts.put(option, options.get(option));
-      options.put(option, entry.getValue());
+      cachedOpts.put(option, mopts.get(option));
+      mopts.put(option, entry.getValue());
     }
   }
 

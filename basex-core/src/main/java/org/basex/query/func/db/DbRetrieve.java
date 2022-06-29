@@ -21,7 +21,7 @@ public final class DbRetrieve extends DbAccess {
     final String path = toDbPath(1, qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
 
-    final IOFile bin = data.meta.binary(path);
+    final IOFile bin = data.meta.file(path);
     if(!bin.exists() || bin.isDir()) throw WHICHRES_X.get(info, path);
     return new B64Lazy(bin, IOERR_X);
   }

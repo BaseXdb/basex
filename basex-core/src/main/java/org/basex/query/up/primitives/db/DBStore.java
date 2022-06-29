@@ -43,7 +43,7 @@ public final class DBStore extends DBUpdate {
   @Override
   public void apply() throws QueryException {
     for(final byte[] path : paths) {
-      final IOFile bin = data.meta.binary(string(path));
+      final IOFile bin = data.meta.file(string(path));
       if(bin.isDir()) bin.delete();
       bin.parent().md();
       try {

@@ -105,16 +105,16 @@ public class XQueryEval extends StandardFunc {
       try {
         final StaticContext sctx = new StaticContext(qctx);
         sctx.baseURI(toBaseUri(query.url(), opts));
-        for(final Entry<String, Value> it : bindings.entrySet()) {
-          final String key = it.getKey();
-          final Value value = it.getValue();
+        for(final Entry<String, Value> binding : bindings.entrySet()) {
+          final String key = binding.getKey();
+          final Value value = binding.getValue();
           if(key.isEmpty()) qctx.context(value, sctx);
           else qctx.bind(key, value, sctx);
         }
         qctx.parseMain(string(query.read()), null, sctx);
 
         if(updating) {
-          if(!sc.mixUpdates && !qctx.updating && !qctx.root.expr.vacuous())
+          if(!sc.mixUpdates && !qctx.updating && !qctx.main.expr.vacuous())
             throw XQUERY_UPDATE2.get(info);
         } else if(qctx.updating) {
           throw XQUERY_UPDATE1.get(info);

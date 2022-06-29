@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
@@ -28,26 +29,28 @@ public final class QueryInfo {
   /** Maximum size for compilation and evaluation output per line. */
   private static final int MAX_LINE = 1 << 14;
 
+  /** Parsing time (nano seconds). */
+  public final AtomicLong parsing = new AtomicLong();
+  /** Compilation time (nano seconds). */
+  public final AtomicLong compiling = new AtomicLong();
+
+  /** Evaluation time (nano seconds). */
+  public final AtomicLong evaluating = new AtomicLong();
+  /** Serialization time (nano seconds). */
+  public final AtomicLong serializing = new AtomicLong();
+
   /** Verbose info. */
   private final boolean verbose;
 
-  /** Parsing time (nano seconds). */
-  public long parsing;
-  /** Compilation time (nano seconds). */
-  public long compiling;
-  /** Evaluation time (nano seconds). */
-  public long evaluating;
-  /** Serialization time (nano seconds). */
-  public long serializing;
-
-  /** Query. */
-  String query;
-  /** Runtime flag. */
-  boolean runtime;
   /** Compilation info. */
   private final TokenBuilder compile = new TokenBuilder();
   /** Evaluation info. */
   private final TokenBuilder evaluate = new TokenBuilder();
+
+  /** Runtime flag. */
+  boolean runtime;
+  /** Query string. */
+  String query;
 
   /**
    * Constructor.
@@ -63,7 +66,8 @@ public final class QueryInfo {
    * @param ext text text extensions
    */
   void compInfo(final String string, final Object... ext) {
-    if(verbose && compile.size() < MAX) {
+    final TokenBuilder tb = compile;
+    if(verbose && tb.size() < MAX) {
       final TokenList list = new TokenList(ext.length);
       for(final Object e : ext) list.add(QueryError.normalize(e, null));
       String info = Util.info(string, (Object[]) list.finish());
@@ -72,8 +76,8 @@ public final class QueryInfo {
           info = "RUNTIME: " + info;
           if(Prop.debug) Util.stack(info);
         }
-        compile.add(LI).add(info).add(NL);
-        if(compile.size() >= MAX) compile.add(LI).add(DOTS).add(NL);
+        tb.add(LI).add(info).add(NL);
+        if(tb.size() >= MAX) tb.add(LI).add(DOTS).add(NL);
       }
     }
   }
@@ -87,7 +91,7 @@ public final class QueryInfo {
       synchronized(evaluate) {
         if(evaluate.size() < MAX) {
           evaluate.add(LI).add(chop(token(string.replaceAll("\r?\n", "|")), MAX_LINE)).add(NL);
-          if(evaluate.size() >= MAX) compile.add(LI).add(DOTS).add(NL);
+          if(evaluate.size() >= MAX) evaluate.add(LI).add(DOTS).add(NL);
         }
       }
     }
@@ -106,16 +110,16 @@ public final class QueryInfo {
 
     final TokenBuilder tb = new TokenBuilder();
     final int runs = Math.max(1, qp.qc.context.options.get(MainOptions.RUNS));
-    final long total = parsing + compiling + evaluating + serializing;
+    final long total = parsing.get() + compiling.get() + evaluating.get() + serializing.get();
     if(qp.qc.context.options.get(MainOptions.QUERYINFO)) {
-      final int up = qp.updates();
       tb.add(toString(qp.qc)).add(NL);
-      tb.add(PARSING_CC).add(Performance.getTime(parsing, runs)).add(NL);
-      tb.add(COMPILING_CC).add(Performance.getTime(compiling, runs)).add(NL);
-      tb.add(EVALUATING_CC).add(Performance.getTime(evaluating, runs)).add(NL);
-      tb.add(PRINTING_CC).add(Performance.getTime(serializing, runs)).add(NL);
+      tb.add(PARSING_CC).add(Performance.getTime(parsing.get(), runs)).add(NL);
+      tb.add(COMPILING_CC).add(Performance.getTime(compiling.get(), runs)).add(NL);
+      tb.add(EVALUATING_CC).add(Performance.getTime(evaluating.get(), runs)).add(NL);
+      tb.add(PRINTING_CC).add(Performance.getTime(serializing.get(), runs)).add(NL);
       tb.add(TOTAL_TIME_CC).add(Performance.getTime(total, runs)).add(NL).add(NL);
       tb.add(HITS_X_CC + hits).add(' ').add(hits == 1 ? ITEM : ITEMS).add(NL);
+      final int up = qp.updates();
       tb.add(UPDATED_CC + up).add(' ').add(up == 1 ? ITEM : ITEMS).add(NL);
       tb.add(PRINTED_CC).add(Performance.format(printed)).add(NL);
       if(locks != null) {
@@ -142,7 +146,7 @@ public final class QueryInfo {
     }
     if(!compile.isEmpty()) tb.add(NL).add(COMPILING).add(COL).add(NL).add(compile);
     tb.add(NL).add(OPTIMIZED_QUERY).add(COL).add(NL);
-    tb.add(qc.root == null ? qc.funcs : usedDecls(qc.root)).add(NL);
+    tb.add(qc.main == null ? qc.functions : usedDecls(qc.main)).add(NL);
     if(!evaluate.isEmpty()) tb.add(NL).add(EVALUATING).add(COL).add(NL).add(evaluate);
     return tb.toString();
   }

@@ -115,11 +115,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public void comp(final CompileContext cc) throws QueryException {
-    compile(cc);
-  }
-
-  @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     if(compiled) return this;
     compiled = true;
@@ -461,7 +456,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       params[a] = vs.addNew(new QNm(ARG + (a + 1), ""), null, true, qc, ii);
       args[a] = new VarRef(ii, params[a]);
     }
-    final TypedFunc tf = qc.funcs.undeclaredFuncCall(name, args, sc, ii);
+    final TypedFunc tf = qc.functions.undeclaredFuncCall(name, args, sc, ii);
     return new Closure(ii, name, null, params, tf.func, new AnnList(), null, vs);
   }
 

@@ -62,9 +62,9 @@ public final class Rename extends ACreate {
       }
 
       // rename file resources
-      final IOFile source = data.meta.binary(src);
+      final IOFile source = data.meta.file(src);
       if(source != null && source.exists()) {
-        final IOFile target = data.meta.binary(trg), trgdir = target.parent();
+        final IOFile target = data.meta.file(trg), trgdir = target.parent();
         if(!trgdir.md() || !source.rename(target)) ok = !info(NAME_INVALID_X, trg);
         c++;
       }

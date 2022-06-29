@@ -61,8 +61,8 @@ public abstract class AQuery extends Command {
     } else {
       try {
         long hits = 0;
-        final boolean run = options.get(MainOptions.RUNQUERY);
-        final boolean serial = options.get(MainOptions.SERIALIZE);
+        final boolean runquery = options.get(MainOptions.RUNQUERY);
+        final boolean serialize = options.get(MainOptions.SERIALIZE);
         final boolean compplan = options.get(MainOptions.COMPPLAN);
         final int runs = Math.max(1, options.get(MainOptions.RUNS));
         for(int r = 0; r < runs; ++r) {
@@ -91,21 +91,22 @@ public abstract class AQuery extends Command {
           }
 
           qp.compile();
-          info.compiling += perf.ns();
+          info.compiling.addAndGet(perf.ns());
           if(compplan) queryPlan();
-          if(!run) continue;
+          if(!runquery) continue;
 
-          final PrintOutput po = r == 0 && serial ? out : new NullOutput();
+          final PrintOutput po = r == 0 && serialize ? out : new NullOutput();
           try(Serializer ser = qp.getSerializer(po)) {
             if(maxResults >= 0) {
               result = qp.cache(maxResults);
-              info.evaluating += perf.ns();
-              result.serialize(ser);
+              info.evaluating.addAndGet(perf.ns());
               hits = result.size();
+              result.serialize(ser);
+
             } else {
               hits = 0;
               final Iter iter = qp.iter();
-              info.evaluating += perf.ns();
+              info.evaluating.addAndGet(perf.ns());
               for(Item item; (item = iter.next()) != null;) {
                 ser.serialize(item);
                 ++hits;
@@ -114,7 +115,7 @@ public abstract class AQuery extends Command {
             }
           }
           qp.close();
-          info.serializing += perf.ns();
+          info.serializing.addAndGet(perf.ns());
         }
         return info(info.toString(qp, out.size(), hits, jc().locks));
 
@@ -148,6 +149,53 @@ public abstract class AQuery extends Command {
   }
 
   /**
+   * Returns the serialization parameters.
+   * @param ctx context
+   * @return serialization parameters
+   */
+  public final String parameters(final Context ctx) {
+    try {
+      init(args[0], ctx);
+      return qp.qc.serParams().toString();
+    } catch(final QueryException ex) {
+      error(Util.message(ex));
+    }
+    return SerializerMode.DEFAULT.get().toString();
+  }
+
+  @Override
+  public boolean updating(final Context ctx) {
+    return updates(ctx, args[0]);
+  }
+
+  @Override
+  public final boolean updated(final Context ctx) {
+    return qp.updates() != 0;
+  }
+
+  @Override
+  public void addLocks() {
+    qp.addLocks();
+  }
+
+  @Override
+  public final void build(final CmdBuilder cb) {
+    cb.init().add(0);
+  }
+
+  @Override
+  public final boolean stoppable() {
+    return true;
+  }
+
+  @Override
+  public final Value result() {
+    final Value r = result;
+    result = null;
+    return r;
+  }
+
+  /**
    * Checks if the query is updating.
    * @param ctx database context
    * @param query query string
@@ -176,22 +224,7 @@ public abstract class AQuery extends Command {
     if(qp == null) qp = pushJob(new QueryProcessor(query, uri, ctx));
     if(info == null) info = qp.qc.info;
     qp.parse();
-    qp.qc.info.parsing += perf.ns();
-  }
-
-  /**
-   * Returns the serialization parameters.
-   * @param ctx context
-   * @return serialization parameters
-   */
-  public final String parameters(final Context ctx) {
-    try {
-      init(args[0], ctx);
-      return qp.qc.serParams().toString();
-    } catch(final QueryException ex) {
-      error(Util.message(ex));
-    }
-    return SerializerMode.DEFAULT.get().toString();
+    qp.qc.info.parsing.addAndGet(perf.ns());
   }
 
   /**
@@ -213,53 +246,14 @@ public abstract class AQuery extends Command {
    * Generates a query plan.
    */
   private void queryPlan() {
-    if(!plan && qp != null) {
+    if(!plan && qp != null && options.get(MainOptions.XMLPLAN)) {
       try {
-        // show XML plan
-        if(options.get(MainOptions.XMLPLAN)) {
-          info(NL + QUERY_PLAN + COL);
-          info(qp.toXml().serialize().toString());
-        }
+        info(NL + QUERY_PLAN + COL);
+        info(qp.toXml().serialize().toString());
         plan = true;
       } catch(final QueryIOException ex) {
         Util.stack(ex);
       }
     }
-  }
-
-  @Override
-  public boolean updating(final Context ctx) {
-    return updates(ctx, args[0]);
-  }
-
-  @Override
-  public final boolean updated(final Context ctx) {
-    return qp != null && qp.updates() != 0;
-  }
-
-  @Override
-  public void addLocks() {
-    if(qp == null) {
-      jc().locks.writes.addGlobal();
-    } else {
-      qp.addLocks();
-    }
-  }
-
-  @Override
-  public void build(final CmdBuilder cb) {
-    cb.init().add(0);
-  }
-
-  @Override
-  public boolean stoppable() {
-    return true;
-  }
-
-  @Override
-  public final Value result() {
-    final Value r = result;
-    result = null;
-    return r;
   }
 }

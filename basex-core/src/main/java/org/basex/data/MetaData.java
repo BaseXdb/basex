@@ -24,9 +24,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class MetaData {
-  /** Database directory. Set to {@code null} if database is in main memory. */
-  public final IOFile dir;
-
   /** Database name. */
   public String name;
 
@@ -101,6 +98,8 @@ public final class MetaData {
   /** Last (highest) id assigned to a node. Can be {@code -1} if database is empty. */
   public int lastid = -1;
 
+  /** Database directory. Set to {@code null} if database is in main memory. */
+  private final IOFile dir;
   /** Flag for out-of-date indexes. */
   private boolean oldindex;
 
@@ -271,19 +270,18 @@ public final class MetaData {
    * Returns a directory with file resources.
    * @return directory, or {@code null} if this is a main-memory database
    */
-  public IOFile binaryDir() {
+  public IOFile dir() {
     return dir == null ? null : new IOFile(dir, IO.RAW);
   }
 
   /**
-   * Returns a reference to the specified binary resource.
+   * Returns a path to the specified binary resource.
    * @param path internal file path
-   * @return path, or {@code null} if this is a main-memory database or
-   *   if the resource path cannot be resolved (e.g. because it points to a parent directory).
+   * @return path, or {@code null} if this is a main-memory database
    */
-  public IOFile binary(final String path) {
+  public IOFile file(final String path) {
     if(dir != null) {
-      final IOFile bin = binaryDir(), file = new IOFile(bin, path);
+      final IOFile bin = dir(), file = new IOFile(bin, path);
       if(file.path().startsWith(bin.path())) return file;
     }
     return null;

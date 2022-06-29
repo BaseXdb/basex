@@ -138,7 +138,7 @@ public abstract class Job {
   }
 
   /**
-   * Adds the strings (databases, special identifiers) for which locks need to be acquired.
+   * Collects lock strings (databases, special identifiers) when registering a query.
    */
   public void addLocks() {
     // default (worst case): lock all databases

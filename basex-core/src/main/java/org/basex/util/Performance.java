@@ -24,8 +24,7 @@ public final class Performance {
    * @return execution time
    */
   public long ns(final boolean reset) {
-    final long time2 = System.nanoTime();
-    final long diff = time2 - time;
+    final long time2 = System.nanoTime(), diff = time2 - time;
     if(reset) time = time2;
     return diff;
   }

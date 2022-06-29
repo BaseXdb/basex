@@ -200,7 +200,7 @@ public final class DBNew {
     // insert documents
     target.insert(target.meta.size, -1, new DataClip(source));
     // move file resources
-    final IOFile srcDir = source.meta.binaryDir(), trgDir = target.meta.binaryDir();
+    final IOFile srcDir = source.meta.dir(), trgDir = target.meta.dir();
     if(srcDir != null && srcDir.exists()) {
       trgDir.md();
       for(final String path : srcDir.descendants()) {

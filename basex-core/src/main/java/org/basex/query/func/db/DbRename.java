@@ -39,7 +39,7 @@ public final class DbRename extends DbAccess {
         updates.add(new ReplaceValue(pre, data, info, token(trg)), qc);
       }
       // rename file resources
-      final IOFile src = data.meta.binary(source), trg = data.meta.binary(target);
+      final IOFile src = data.meta.file(source), trg = data.meta.file(target);
       if(src != null && trg != null) {
         rename(data, src, trg, qc);
         updates.add(new DBDelete(data, src, info), qc);

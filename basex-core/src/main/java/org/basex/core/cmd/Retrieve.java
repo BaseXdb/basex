@@ -33,7 +33,7 @@ public final class Retrieve extends ACreate {
     final Data data = context.data();
     if(data.inMemory()) return error(NO_MAINMEM);
 
-    final IOFile bin = data.meta.binary(path);
+    final IOFile bin = data.meta.file(path);
     if(!bin.exists() || bin.isDir()) return error(RES_NOT_FOUND_X, path);
 
     try(BufferInput bi = BufferInput.get(bin)) {

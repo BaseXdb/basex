@@ -82,7 +82,7 @@ final class Unit {
       qc.parse(input, file.path());
 
       // loop through all functions
-      for(final StaticFunc sf : qc.funcs.funcs()) {
+      for(final StaticFunc sf : qc.functions.funcs()) {
         // find Unit annotations
         final AnnList anns = sf.anns;
         boolean unit = false;
