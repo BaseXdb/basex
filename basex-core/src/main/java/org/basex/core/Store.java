@@ -163,7 +163,9 @@ public final class Store implements Closeable {
       // write store to disk
       file.parent().md();
       try(DataOutput out = new DataOutput(file)) {
-        out.writeNum(map.size());
+        int size = 0;
+        for(final Iterator<byte[]> iter = map.iterator(); iter.hasNext(); iter.next()) size++;
+        out.writeNum(size);
         for(final byte[] key : map) {
           out.writeToken(key);
           write(out, map.get(key));
