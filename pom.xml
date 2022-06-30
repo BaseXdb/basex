@@ -29,7 +29,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
-    <jettyVersion>9.4.46.v20220331</jettyVersion>
+    <jettyVersion>9.4.48.v20220622</jettyVersion>
     <junit.version>5.8.2</junit.version>
   </properties>
 
@@ -346,7 +346,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.3.2</version>
+            <version>3.4.0</version>
             <inherited>true</inherited>
             <configuration>
               <doclint>none</doclint>
@@ -547,7 +547,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>nexus-staging-maven-plugin</artifactId>
-          <version>1.6.12</version>
+          <version>1.6.13</version>
           <extensions>true</extensions>
           <configuration>
             <serverId>ossrh</serverId>
@@ -562,7 +562,7 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
-        <version>3.5.1</version>
+        <version>3.5.2</version>
       </extension>
     </extensions>
   </build>
