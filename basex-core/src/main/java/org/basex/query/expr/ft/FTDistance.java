@@ -2,6 +2,8 @@ package org.basex.query.expr.ft;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -64,30 +66,47 @@ public final class FTDistance extends FTFilter {
       throws QueryException {
 
     final long mn = toLong(min, qc), mx = toLong(max, qc);
-    match.sort();
 
-    final FTMatch ftm = new FTMatch();
-    FTStringMatch first = null, last = null;
-    for(final FTStringMatch sm : match) {
-      if(sm.exclude) {
-        ftm.add(sm);
-      } else {
-        if(first == null) {
-          first = sm;
+    // create all possible combinations
+    final FTMatch includes = new FTMatch(), excludes = new FTMatch();
+    for(final FTStringMatch sm : match) (sm.exclude ? excludes : includes).add(sm);
+    int pos = -1;
+    final ArrayList<FTMatch> matches = new ArrayList<>();
+    for(final FTStringMatch include : includes) {
+      if(pos < include.pos) {
+        pos = include.pos;
+        if(matches.isEmpty()) {
+          matches.add(new FTMatch().add(include));
         } else {
-          final int d = pos(sm.start, lexer) - pos(last.end, lexer) - 1;
-          if(d < mn || d > mx) return false;
+          for(final FTMatch ftm : matches) ftm.add(include);
         }
-        last = sm;
+      } else {
+        final int ms = matches.size();
+        for(int m = 0; m < ms; m++) {
+          final FTMatch ftm = matches.get(m);
+          matches.add(new FTMatch().add(ftm).set(ftm.size() - 1, include));
+        }
       }
     }
-    if(first == null) return false;
 
-    first.end = last.end;
+    // collect matches
     match.reset();
-    match.add(first);
-    match.add(ftm);
-    return true;
+    for(final FTMatch ftm : matches) {
+      ftm.sort();
+      final Iterator<FTStringMatch> iter = ftm.iterator();
+      final FTStringMatch first = iter.next();
+      for(int end = first.end; end != -1;) {
+        if(iter.hasNext()) {
+          final FTStringMatch sm = iter.next();
+          final int d = pos(sm.start, lexer) - pos(end, lexer) - 1;
+          end = d < mn || d > mx ? -1 : sm.end;
+        } else {
+          match.add(new FTStringMatch(first.start, end, first.pos));
+          break;
+        }
+      }
+    }
+    return !match.add(excludes).isEmpty();
   }
 
   @Override

@@ -2884,4 +2884,36 @@ public final class RewritingsTest extends QueryPlanTest {
     execute(new CreateDB(NAME, "<x><x/></x>"));
     query("x[x/(text() | *)]", "");
   }
+
+  /** XQFT: distances. */
+  @Test public void gh2123() {
+    query("'5 28 x x 5 28' contains text '5 28' all words distance at most 1 words", true);
+
+    query("'A B A' contains text 'A B' all words distance exactly 0 words", true);
+    query("'A B A' contains text 'B A' all words distance exactly 0 words", true);
+    query("'A B A B' contains text 'A B' all words distance exactly 0 words", true);
+    query("'A B A B' contains text 'B A' all words distance exactly 0 words", true);
+
+    query("'A B A' contains text 'A B' all words distance exactly 1 words", false);
+    query("'A B A' contains text 'B A' all words distance exactly 1 words", false);
+    query("'A B A B' contains text 'A B' all words distance exactly 2 words", true);
+    query("'A B A B' contains text 'B A' all words distance exactly 2 words", true);
+
+    query("'C B A B C' contains text 'A B C' all words distance exactly 0 words", true);
+    query("'C B A B C' contains text 'A C B' all words distance exactly 0 words", true);
+    query("'C B A B C' contains text 'B A C' all words distance exactly 0 words", true);
+    query("'C B A B C' contains text 'B C A' all words distance exactly 0 words", true);
+    query("'C B A B C' contains text 'C A B' all words distance exactly 0 words", true);
+    query("'C B A B C' contains text 'C B A' all words distance exactly 0 words", true);
+
+    query("'C B A B C' contains text 'A' ftand 'B' ftand 'C' distance exactly 0 words", true);
+    query("'C B A B C' contains text 'A' ftand 'B' ftand 'C' distance exactly 0 words", true);
+    query("'C B A B C' contains text 'A' ftand 'B' ftand 'C' distance exactly 0 words", true);
+    query("'C B A B C' contains text 'A' ftand 'B' ftand 'C' distance exactly 0 words", true);
+    query("'C B A B C' contains text 'A' ftand 'B' ftand 'C' distance exactly 0 words", true);
+    query("'C B A B C' contains text 'A' ftand 'B' ftand 'C' distance exactly 0 words", true);
+
+    query("'A B C D' contains text 'A B' ftand 'C D' distance exactly 0 words", true);
+    query("'A B C D' contains text 'C D' ftand 'A B' distance exactly 0 words", true);
+  }
 }

@@ -24,7 +24,7 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
    * @param end end position
    * @param pos query pos
    */
-  FTStringMatch(final int start, final int end, final int pos) {
+  public FTStringMatch(final int start, final int end, final int pos) {
     this.start = start;
     this.end = end;
     this.pos = pos;
