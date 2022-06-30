@@ -692,8 +692,6 @@ public interface Text {
   String PARSING = lang("parsing");
   /** Query info: compiling. */
   String COMPILING = lang("compiling");
-  /** Query info: optimizing. */
-  String OPTIMIZING = lang("optimizing");
   /** Query info: evaluating. */
   String EVALUATING = lang("evaluating");
   /** Query info: querying. */
