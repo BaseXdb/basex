@@ -16,14 +16,15 @@ declare variable $util:BACKUP-ZIP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d
 (:~
  : Evaluates a query and returns the result.
  : @param  $query    query string
- : @param  $context  initial context value
+ : @param  $context  initial context item (can be empty)
  : @return serialized result of query
  :)
 declare function util:query(
   $query    as xs:string?,
-  $context  as item()*
+  $context  as item()?
 ) as xs:string {
-  let $result := xquery:eval($query, map { '': $context }, util:query-options())
+  let $bindings := $context ! map { '': $context }
+  let $result := xquery:eval($query, $bindings, util:query-options())
   return util:finalize($result)
 };
 
@@ -35,7 +36,7 @@ declare function util:query(
 declare %updating function util:update-query(
   $query  as xs:string?
 ) as empty-sequence() {
-  xquery:eval-update($query, map { }, util:query-options()),
+  xquery:eval-update($query, (), util:query-options()),
   
   let $result := update:cache(true())
   return update:output(util:finalize($result))
