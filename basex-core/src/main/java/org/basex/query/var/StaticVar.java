@@ -118,7 +118,7 @@ public final class StaticVar extends StaticDecl {
   }
 
   /**
-   * Binds the specified value to the variable.
+   * Binds an external value and casts it to the declared type (if specified).
    * @param val value to be set
    * @param qc query context
    * @return self reference

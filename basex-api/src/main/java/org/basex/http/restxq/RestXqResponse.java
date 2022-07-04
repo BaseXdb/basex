@@ -55,7 +55,7 @@ final class RestXqResponse extends WebResponse {
     final Performance perf = new Performance();
     qc = function.module.qc(ctx);
     qc.jc().type(RESTXQ);
-    qc.info.parsing.addAndGet(perf.ns());
+    qc.info.parsing.set(perf.ns());
 
     ctx.setExternal(conn.requestCtx);
 
@@ -79,11 +79,11 @@ final class RestXqResponse extends WebResponse {
     final QueryInfo qi = qc.info;
     try {
       qc.compile();
-      qi.compiling.addAndGet(perf.ns());
+      qi.compiling.set(perf.ns());
 
       // evaluate query
       final Iter iter = qc.iter();
-      qi.evaluating.addAndGet(perf.ns());
+      qi.evaluating.set(perf.ns());
       Item item = iter.next();
       response = item != null;
 
@@ -136,7 +136,7 @@ final class RestXqResponse extends WebResponse {
 
     } finally {
       qc.close();
-      qi.serializing.addAndGet(perf.ns());
+      qi.serializing.set(perf.ns());
       if(cache != null) conn.timing(qi);
 
       qc.unregister(ctx);

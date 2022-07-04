@@ -246,7 +246,7 @@ public abstract class AQuery extends Command {
    * Generates a query plan.
    */
   private void queryPlan() {
-    if(!plan && qp != null && options.get(MainOptions.XMLPLAN)) {
+    if(!plan && options.get(MainOptions.XMLPLAN)) {
       try {
         info(NL + QUERY_PLAN + COL);
         info(qp.toXml().serialize().toString());

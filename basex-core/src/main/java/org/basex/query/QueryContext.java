@@ -115,7 +115,7 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Main module (root expression). */
   public MainModule main;
-  /** Context scope. */
+  /** Context value. */
   public MainModule ctxValue;
 
   /** External variables to be bound at compile time. */
@@ -162,7 +162,7 @@ public final class QueryContext extends Job implements Closeable {
       final QueryResources resources, final QueryInfo info) {
     this.context = context;
     this.parent = parent;
-    this.info = info != null ? info : new QueryInfo(this);
+    this.info = info != null ? info : new QueryInfo(context);
     this.resources = resources != null ? resources : new QueryResources(this);
   }
 
@@ -314,10 +314,7 @@ public final class QueryContext extends Job implements Closeable {
       }
 
       try {
-        // compile the expression
-        if(main != null) QueryCompiler.compile(cc, this);
-        // compile static functions
-        else functions.compile(cc);
+        QueryCompiler.compile(cc, this);
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
         throw BASEX_OVERFLOW.get(null, ex);
@@ -410,15 +407,14 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Binds a value to a global variable if no value has been assigned yet.
+   * Binds a value to a global variable or the context value.
+   * The arguments will be ignored if a value has already been assigned.
    * The specified type is interpreted as follows:
    * <ul>
    *   <li> If {@code "json"} is specified, the value is converted according to the rules
    *        specified in {@link JsonXQueryConverter}.</li>
    *   <li> Otherwise, the type is cast to the specified XDM type.</li>
    * </ul>
-   * If the value is an XQuery {@link Value}, it is directly assigned.
-   * Otherwise, it is cast to the XQuery data model, using a Java/XQuery mapping.
    * @param name name of variable
    * @param value value to be bound
    * @param type type (may be {@code null})
@@ -653,7 +649,6 @@ public final class QueryContext extends Job implements Closeable {
     // collect results
     return !items.isEmpty() ? items.value() :
       !pres.isEmpty() ? new DBNodes(data, pres.finish()).ftpos(ftPosData) : Empty.VALUE;
-
   }
 
   // PRIVATE METHODS ==============================================================================

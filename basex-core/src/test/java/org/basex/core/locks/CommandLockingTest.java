@@ -383,7 +383,7 @@ public final class CommandLockingTest extends SandboxTest {
     if(!list.isEmpty()) {
       final StringBuilder sb = new StringBuilder("Errors:");
       for(final String string : list) sb.append("\n- ").append(string);
-      fail(sb.toString());
+      fail(sb.append("\nCommand: ").append(cmd).toString());
     }
   }
 

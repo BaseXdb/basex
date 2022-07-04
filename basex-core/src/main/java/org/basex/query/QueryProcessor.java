@@ -107,7 +107,11 @@ public final class QueryProcessor extends Job implements Closeable {
   }
 
   /**
+<<<<<<< HEAD
    * Binds a value to a global variable
+=======
+   * Binds a value to a global variable or the context value.
+>>>>>>> 7a75aec2ac ([MOD] Alignments between different branches)
    * The arguments will be ignored if a value has already been assigned.
    * @param name name of variable; context value if empty string or {@code null}
    * @param value value to be bound (object or XQuery {@link Value})

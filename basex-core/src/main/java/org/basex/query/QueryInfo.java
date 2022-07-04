@@ -54,10 +54,10 @@ public final class QueryInfo {
 
   /**
    * Constructor.
-   * @param qc query context
+   * @param context database context
    */
-  QueryInfo(final QueryContext qc) {
-    verbose = qc.context.options.get(MainOptions.QUERYINFO) || Prop.debug;
+  public QueryInfo(final Context context) {
+    verbose = context.options.get(MainOptions.QUERYINFO) || Prop.debug;
   }
 
   /**
