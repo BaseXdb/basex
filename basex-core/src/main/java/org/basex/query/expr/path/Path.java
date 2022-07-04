@@ -350,7 +350,7 @@ public abstract class Path extends ParseExpr {
   /**
    * Returns the path nodes that will result from this path.
    * @param rt root at compile time (can be {@code null})
-   * @param stats utilize statistics
+   * @param stats assess database statistics
    * @return path nodes, or {@code null} if nodes cannot be evaluated
    */
   public final ArrayList<PathNode> pathNodes(final Expr rt, final boolean stats) {
@@ -362,28 +362,33 @@ public abstract class Path extends ParseExpr {
   /**
    * Returns the path nodes that will result from this path.
    * @param nodes current path nodes
-   * @param stats utilize statistics
+   * @param stats assess database statistics
    * @return path nodes, or {@code null} if nodes cannot be collected
    */
   final ArrayList<PathNode> pathNodes(final ArrayList<PathNode> nodes, final boolean stats) {
     ArrayList<PathNode> pn = nodes;
-    for(final Expr step : steps) {
-      if(!(step instanceof Step)) return null;
-      pn = ((Step) step).nodes(pn, data, stats);
-      if(pn == null) return null;
-
-      // check if paths within predicates are correct
-      if(!stats) {
-        for(final Expr expr : step.args()) {
-          if(expr instanceof AxisPath) {
-            final AxisPath path = (AxisPath) expr;
-            if(path.root == null) {
-              final ArrayList<PathNode> tmp = path.pathNodes(pn, stats);
-              if(tmp != null && tmp.isEmpty()) return tmp;
+    for(final Expr expr : steps) {
+      if(expr instanceof UtilRoot) {
+        pn = ((UtilRoot) expr).nodes(pn);
+      } else if(expr instanceof Step) {
+        final Step step = (Step) expr;
+        pn = step.nodes(pn, data, stats);
+        // check if paths within predicates are correct
+        if(!stats && pn != null) {
+          for(final Expr ex : step.exprs) {
+            if(ex instanceof AxisPath) {
+              final AxisPath path = (AxisPath) ex;
+              if(path.root == null) {
+                final ArrayList<PathNode> tmp = path.pathNodes(pn, stats);
+                if(tmp != null && tmp.isEmpty()) return tmp;
+              }
             }
           }
         }
+      } else {
+        pn = null;
       }
+      if(pn == null) break;
     }
     return pn;
   }

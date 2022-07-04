@@ -2,6 +2,7 @@ package org.basex.query.expr.path;
 
 import java.util.*;
 
+import org.basex.data.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -24,6 +25,16 @@ public final class UnionTest extends Test {
   UnionTest(final NodeType type, final Test[] tests) {
     super(type);
     this.tests = tests;
+  }
+
+  @Override
+  public Test optimize(final Data data) {
+    final ArrayList<Test> list = new ArrayList<>();
+    for(final Test test : tests) {
+      final Test t = test.optimize(data);
+      if(t != null) list.add(t);
+    }
+    return tests.length != list.size() ? get(list.toArray(Test[]::new)) : this;
   }
 
   @Override

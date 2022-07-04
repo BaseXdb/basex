@@ -1122,7 +1122,7 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this), clauses.toArray(new Clause[0]), rtrn);
+    plan.add(plan.create(this), clauses.toArray(Clause[]::new), rtrn);
   }
 
   @Override

@@ -95,13 +95,13 @@ public abstract class Test extends ExprInfo {
   }
 
   /**
-   * Checks if evaluation can be dropped.
+   * Optimizes the test.
    * @param data data reference (can be {@code null})
-   * @return result of check
+   * @return resulting test, or {@code null} if the test yields no results
    */
   @SuppressWarnings("unused")
-  public boolean noMatches(final Data data) {
-    return false;
+  public Test optimize(final Data data) {
+    return this;
   }
 
   /**

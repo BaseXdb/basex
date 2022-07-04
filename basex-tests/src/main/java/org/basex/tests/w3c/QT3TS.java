@@ -692,10 +692,10 @@ public final class QT3TS extends Main {
     if(exp.size() != res.size())
       return Util.info("% results (found: %)", exp.size(), res.size());
 
-    for(final String s : exp.toArray(new String[0])) {
+    for(final String s : exp.toArray(String[]::new)) {
       if(!res.contains(s)) return Util.info("% (missing)", s);
     }
-    for(final String s : res.toArray(new String[0])) {
+    for(final String s : res.toArray(String[]::new)) {
       if(!exp.contains(s))
         return Util.info("% (missing in expected result)", s);
     }

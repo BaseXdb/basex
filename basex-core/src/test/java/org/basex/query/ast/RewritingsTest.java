@@ -2861,6 +2861,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("a[/b]", "", empty());
     check("a[/a/a]", "", empty());
     check("a[/a[/b]]", "", empty());
+    check("a[/a/util:root(.)/b]", "", empty());
+    check("a[util:root(.)/a/util:root(.)/b]", "", empty());
+
     check("a[/a]", "<a>\n<b/>\n</a>", root(IterPath.class), exists(DBNode.class));
   }
 
